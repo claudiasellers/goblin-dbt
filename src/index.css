@@ -1,0 +1,53 @@
+@import "tailwindcss";
+
+/* Custom CSS Variables for theming */
+:root {
+  --color-sage-50: #f6f7f6;
+  --color-sage-100: #e3e7e3;
+  --color-sage-200: #c7d0c7;
+  --color-sage-300: #a3b2a3;
+  --color-sage-400: #7a8f7a;
+  --color-sage-500: #5f755f;
+  --color-sage-600: #4a5d4a;
+  --color-sage-700: #3d4b3d;
+  --color-sage-800: #333e33;
+  --color-sage-900: #2b332b;
+  
+  --color-warm-50: #fdfcfb;
+  --color-warm-100: #f7f3ef;
+  --color-warm-200: #efe7de;
+  --color-warm-300: #e2d5c7;
+  --color-warm-400: #d1bea8;
+  --color-warm-500: #bfa78d;
+  --color-warm-600: #a68c6f;
+  --color-warm-700: #8a735c;
+  --color-warm-800: #715f4d;
+  --color-warm-900: #5d4f41;
+  
+  --color-calm-50: #f5f8fa;
+  --color-calm-100: #e8eff4;
+  --color-calm-200: #d5e2ec;
+  --color-calm-300: #b6cdde;
+  --color-calm-400: #91b2cb;
+  --color-calm-500: #7399b8;
+  --color-calm-600: #5f82a3;
+  --color-calm-700: #526d89;
+  --color-calm-800: #475b71;
+  --color-calm-900: #3d4d5e;
+}
+
+/* Base styles */
+body {
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  background-color: var(--color-warm-50);
+  color: var(--color-sage-800);
+  min-height: 100vh;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-sage-900);
+    color: var(--color-warm-100);
+  }
+}

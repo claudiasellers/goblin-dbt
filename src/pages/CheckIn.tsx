@@ -1,0 +1,279 @@
+import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
+import { Link } from 'react-router-dom';
+import { EmotionQuadrant } from '../components/checkin/EmotionQuadrant';
+import { EmotionGrid } from '../components/checkin/EmotionGrid';
+import { IntensityGrid } from '../components/checkin/IntensityGrid';
+import { BodyMap } from '../components/checkin/BodyMap';
+import { SensationDetails } from '../components/checkin/SensationDetails';
+import { saveCheckIn, ensureUserExists } from '../services/neo4j';
+
+type CheckInStep = 
+  | 'quadrant' 
+  | 'emotion' 
+  | 'intensity' 
+  | 'body' 
+  | 'sensation' 
+  | 'saving'
+  | 'complete';
+
+interface BodySensation {
+  x: number;
+  y: number;
+  region: string;
+  intensity: { x: number; y: number };
+  tags: string[];
+}
+
+export interface CheckInData {
+  quadrant: string | null;
+  emotion: string | null;
+  intensity: { x: number; y: number } | null;
+  bodySensations: BodySensation[];
+  note: string;
+  timestamp: Date;
+}
+
+export function CheckIn() {
+  const { user } = useAuth();
+  const [step, setStep] = useState<CheckInStep>('quadrant');
+  const [checkInData, setCheckInData] = useState<CheckInData>({
+    quadrant: null,
+    emotion: null,
+    intensity: null,
+    bodySensations: [],
+    note: '',
+    timestamp: new Date(),
+  });
+  const [currentSensation, setCurrentSensation] = useState<Partial<BodySensation> | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // If not logged in, show prompt
+  if (!user) {
+    return (
+      <div className="text-center py-12">
+        <span className="text-5xl mb-4 block">💭</span>
+        <h1 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+          Check in with yourself
+        </h1>
+        <p className="text-[var(--color-sage-600)] mb-6">
+          Create an account to start tracking your emotions and body sensations.
+        </p>
+        <div className="space-y-3">
+          <Link
+            to="/signup"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          >
+            Create account
+          </Link>
+          <Link
+            to="/login"
+            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+          >
+            Log in
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  function handleQuadrantSelect(quadrant: string) {
+    setCheckInData(prev => ({ ...prev, quadrant }));
+    setStep('emotion');
+  }
+
+  function handleEmotionSelect(emotion: string) {
+    setCheckInData(prev => ({ ...prev, emotion }));
+    setStep('intensity');
+  }
+
+  function handleIntensitySelect(intensity: { x: number; y: number }) {
+    setCheckInData(prev => ({ ...prev, intensity }));
+    setStep('body');
+  }
+
+  function handleBodyTap(x: number, y: number, region: string) {
+    setCurrentSensation({ x, y, region });
+    setStep('sensation');
+  }
+
+  function handleSensationComplete(sensation: BodySensation) {
+    setCheckInData(prev => ({
+      ...prev,
+      bodySensations: [...prev.bodySensations, sensation],
+    }));
+    setCurrentSensation(null);
+    setStep('body');
+  }
+
+  async function handleSkipBody() {
+    await saveCheckInData();
+  }
+
+  async function handleBodyComplete() {
+    await saveCheckInData();
+  }
+
+  async function saveCheckInData() {
+    if (!user || !checkInData.emotion || !checkInData.quadrant || !checkInData.intensity) {
+      return;
+    }
+
+    setStep('saving');
+    setSaveError(null);
+
+    try {
+      // Ensure user exists in Neo4j
+      await ensureUserExists(user.uid, user.email || '');
+
+      // Save the check-in
+      await saveCheckIn(user.uid, {
+        emotion: checkInData.emotion,
+        quadrant: checkInData.quadrant,
+        intensity: checkInData.intensity,
+        bodySensations: checkInData.bodySensations,
+        note: checkInData.note,
+        timestamp: new Date(),
+      });
+
+      setStep('complete');
+    } catch (error) {
+      console.error('Failed to save check-in:', error);
+      setSaveError('Failed to save your check-in. It will be stored locally.');
+      setStep('complete');
+      
+      // TODO: Save to localStorage as fallback
+    }
+  }
+
+  function handleComplete() {
+    // Reset for new check-in
+    setCheckInData({
+      quadrant: null,
+      emotion: null,
+      intensity: null,
+      bodySensations: [],
+      note: '',
+      timestamp: new Date(),
+    });
+    setSaveError(null);
+    setStep('quadrant');
+  }
+
+  function handleBack() {
+    switch (step) {
+      case 'emotion':
+        setStep('quadrant');
+        break;
+      case 'intensity':
+        setStep('emotion');
+        break;
+      case 'body':
+        setStep('intensity');
+        break;
+      case 'sensation':
+        setCurrentSensation(null);
+        setStep('body');
+        break;
+      case 'complete':
+        setStep('body');
+        break;
+    }
+  }
+
+  return (
+    <div>
+      {/* Back button for steps after first */}
+      {step !== 'quadrant' && step !== 'saving' && step !== 'complete' && (
+        <button
+          onClick={handleBack}
+          className="flex items-center gap-2 text-[var(--color-sage-600)] hover:text-[var(--color-sage-800)] mb-4 transition-colors"
+        >
+          <span>←</span>
+          <span className="text-sm font-medium">Back</span>
+        </button>
+      )}
+
+      {step === 'quadrant' && (
+        <EmotionQuadrant onSelect={handleQuadrantSelect} />
+      )}
+
+      {step === 'emotion' && checkInData.quadrant && (
+        <EmotionGrid 
+          quadrant={checkInData.quadrant} 
+          onSelect={handleEmotionSelect} 
+        />
+      )}
+
+      {step === 'intensity' && (
+        <IntensityGrid onSelect={handleIntensitySelect} />
+      )}
+
+      {step === 'body' && (
+        <BodyMap 
+          onTap={handleBodyTap}
+          onSkip={handleSkipBody}
+          onComplete={handleBodyComplete}
+          sensations={checkInData.bodySensations}
+        />
+      )}
+
+      {step === 'sensation' && currentSensation && (
+        <SensationDetails
+          x={currentSensation.x!}
+          y={currentSensation.y!}
+          region={currentSensation.region!}
+          onComplete={handleSensationComplete}
+          onCancel={() => {
+            setCurrentSensation(null);
+            setStep('body');
+          }}
+        />
+      )}
+
+      {step === 'saving' && (
+        <div className="text-center py-12">
+          <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
+          <p className="text-[var(--color-sage-600)]">Saving your check-in...</p>
+        </div>
+      )}
+
+      {step === 'complete' && (
+        <div className="text-center py-8">
+          <span className="text-5xl mb-4 block">✨</span>
+          <h2 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+            Check-in complete
+          </h2>
+          <p className="text-[var(--color-sage-600)] mb-6">
+            You checked in feeling <strong>{checkInData.emotion}</strong>
+            {checkInData.bodySensations.length > 0 && (
+              <> with {checkInData.bodySensations.length} body sensation{checkInData.bodySensations.length > 1 ? 's' : ''}</>
+            )}
+          </p>
+
+          {saveError && (
+            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm mb-6">
+              {saveError}
+            </div>
+          )}
+          
+          <div className="space-y-3">
+            <button
+              onClick={handleComplete}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            >
+              Done
+            </button>
+            
+            <Link
+              to={`/tools?emotion=${checkInData.emotion}`}
+              className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+            >
+              Find tools for this feeling →
+            </Link>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
