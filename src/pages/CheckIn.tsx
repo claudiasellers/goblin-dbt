@@ -27,7 +27,7 @@ interface BodySensation {
 
 export interface CheckInData {
   quadrant: string | null;
-  emotion: string | null;
+  emotions: string[];
   intensity: { x: number; y: number } | null;
   bodySensations: BodySensation[];
   note: string;
@@ -39,7 +39,7 @@ export function CheckIn() {
   const [step, setStep] = useState<CheckInStep>('quadrant');
   const [checkInData, setCheckInData] = useState<CheckInData>({
     quadrant: null,
-    emotion: null,
+    emotions: [],
     intensity: null,
     bodySensations: [],
     note: '',
@@ -82,8 +82,8 @@ export function CheckIn() {
     setStep('emotion');
   }
 
-  function handleEmotionSelect(emotion: string) {
-    setCheckInData(prev => ({ ...prev, emotion }));
+  function handleEmotionSelect(emotions: string[]) {
+    setCheckInData(prev => ({ ...prev, emotions }));
     setStep('intensity');
   }
 
@@ -115,7 +115,7 @@ export function CheckIn() {
   }
 
   async function saveCheckInData() {
-    if (!user || !checkInData.emotion || !checkInData.quadrant || !checkInData.intensity) {
+    if (!user || checkInData.emotions.length === 0 || !checkInData.quadrant || !checkInData.intensity) {
       return;
     }
 
@@ -126,9 +126,9 @@ export function CheckIn() {
       // Ensure user exists in Neo4j
       await ensureUserExists(user.uid, user.email || '');
 
-      // Save the check-in
+      // Save the check-in (join emotions with comma for storage)
       await saveCheckIn(user.uid, {
-        emotion: checkInData.emotion,
+        emotion: checkInData.emotions.join(', '),
         quadrant: checkInData.quadrant,
         intensity: checkInData.intensity,
         bodySensations: checkInData.bodySensations,
@@ -150,7 +150,7 @@ export function CheckIn() {
     // Reset for new check-in
     setCheckInData({
       quadrant: null,
-      emotion: null,
+      emotions: [],
       intensity: null,
       bodySensations: [],
       note: '',
@@ -245,7 +245,7 @@ export function CheckIn() {
             Check-in complete
           </h2>
           <p className="text-[var(--color-sage-600)] mb-6">
-            You checked in feeling <strong>{checkInData.emotion}</strong>
+            You checked in feeling <strong>{checkInData.emotions.join(', ')}</strong>
             {checkInData.bodySensations.length > 0 && (
               <> with {checkInData.bodySensations.length} body sensation{checkInData.bodySensations.length > 1 ? 's' : ''}</>
             )}
@@ -266,7 +266,7 @@ export function CheckIn() {
             </button>
             
             <Link
-              to={`/tools?emotion=${checkInData.emotion}`}
+              to={`/tools?emotion=${encodeURIComponent(checkInData.emotions[0] || '')}`}
               className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
             >
               Find tools for this feeling →

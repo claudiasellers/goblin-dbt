@@ -7,7 +7,7 @@ import {
   onAuthStateChanged,
   type User
 } from 'firebase/auth';
-import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
+import { getFunctions } from 'firebase/functions';
 
 // Firebase configuration
 // Replace these with your actual Firebase project credentials
@@ -26,9 +26,6 @@ export const auth = getAuth(app);
 
 // Initialize Cloud Functions
 export const functions = getFunctions(app);
-
-// Uncomment this line to use the local emulator during development
-// connectFunctionsEmulator(functions, 'localhost', 5001);
 
 // Auth functions
 export async function signUp(email: string, password: string) {

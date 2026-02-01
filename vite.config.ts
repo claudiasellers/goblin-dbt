@@ -5,5 +5,5 @@ import tailwindcss from '@tailwindcss/vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
-  base: '/goblin-dbt/', // For GitHub Pages deployment
+  // base: '/goblin-dbt/', // Only needed for GitHub Pages
 })
