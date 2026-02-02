@@ -1596,3 +1596,429 @@ CREATE (fe)-[:CONTEXT_DEPENDENT_ON]->(hippo);
 
 MATCH (fe:Function {id: "fear_extinction"}), (cereb:BrainStructure {id: "cerebellum"})
 CREATE (fe)-[:INVOLVES]->(cereb);
+
+
+// ============================================================
+// ACTIVATION PATTERN LAYER RELATIONSHIPS
+// Source: Goblin DBT Neural Activation Pattern Definitions
+// Synthesized Expert Deliverable (February 2026)
+// ============================================================
+
+
+// ============================================================
+// NEW BRAIN STRUCTURE HIERARCHY
+// ============================================================
+
+MATCH (dlpag:BrainStructure {id: "dlpag"}), (pag:BrainStructure {id: "pag"})
+CREATE (dlpag)-[:PART_OF]->(pag);
+
+MATCH (vlpag:BrainStructure {id: "vlpag"}), (pag:BrainStructure {id: "pag"})
+CREATE (vlpag)-[:PART_OF]->(pag);
+
+MATCH (dorsal:BrainStructure {id: "dorsal_striatum"}), (bg:BrainStructure {id: "basal_ganglia"})
+CREATE (dorsal)-[:PART_OF]->(bg);
+
+MATCH (precuneus:BrainStructure {id: "precuneus"}), (dmn:FunctionalNetwork {id: "dmn"})
+CREATE (precuneus)-[:PARTICIPATES_IN]->(dmn);
+
+
+// ============================================================
+// PATTERN 1: ACUTE ALARM - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "anterior_insula"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "dacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "locus_coeruleus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "arousal_amplifier"}]->(b);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "bnst"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", conditional: "increases with sustained/uncertain threat"}]->(b);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "dlpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "hippocampus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "contextual safety signaling less effective"}]->(b);
+
+
+// ============================================================
+// PATTERN 2: CHRONIC VIGILANCE - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "bnst"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "primary_driver"}]->(b);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "sustained_support"}]->(b);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "ips"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", network: "DAN"}]->(b);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "fef"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", network: "DAN"}]->(b);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "locus_coeruleus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "tonic_arousal"}]->(b);
+
+
+// ============================================================
+// PATTERN 3: EMOTIONAL FLOODING - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "anterior_insula"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dlpag"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "active_defense_component"}]->(b);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dlpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "essentially_offline"}]->(b);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "ofc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate-Strong", role: "key_differentiator"}]->(b);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+
+
+// ============================================================
+// PATTERN 4: CONSERVATION/FREEZE - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "vlpag"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "passive_defense_coordinator"}]->(b);
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "thalamus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", role: "sensory_relay_reduced"}]->(b);
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "motor_cortex"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b);
+
+
+// ============================================================
+// PATTERN 5: DISSOCIATION/OVERMODULATION - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "over_inhibitory_control"}]->(b);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "pcc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"}]->(b);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "precuneus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"}]->(b);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "emotional_numbing_via_top_down"}]->(b);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "thalamus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b);
+
+
+// ============================================================
+// PATTERN 6: RUMINATION LOOP - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "mpfc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "pcc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "precuneus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "vacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "affective_coloring", notes: "sgACC coupling creates caustic compound with DMN"}]->(b);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "dlpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", conditional: "stronger in depressive rumination; variable in anxious worry"}]->(b);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "hippocampus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+
+
+// ============================================================
+// PATTERN 7: REWARD DRIVE LOW - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "vacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "overlap_with_rumination", confidence: "low"}]->(b);
+
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "nucleus_accumbens"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "blunted_reactivity"}]->(b);
+
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "vta"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "DA_signaling_reduced"}]->(b);
+
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "dorsal_striatum"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes: "goal_initiation"}]->(b);
+
+
+// ============================================================
+// PATTERN 8: SOCIAL THREAT/SHAME - INVOLVES RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "dacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "social_pain_alarm"}]->(b);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "anterior_insula"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "mpfc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "self_evaluation"}]->(b);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "tpj"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "mentalizing_guilt_specific"}]->(b);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "premotor_cortex"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"}]->(b);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "ifg"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"}]->(b);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", conditional: "state-dependent, not a fixed deficit"}]->(b);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "pcc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes: "reduced_in_shame_vs_active_in_guilt"}]->(b);
+
+
+// ============================================================
+// DOMINANT_NETWORK RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (n:FunctionalNetwork {id: "salience_network"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "hyper_engaged", evidenceGrade: "Strong"}]->(n);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (n:FunctionalNetwork {id: "dan"})
+CREATE (p)-[:DOMINANT_NETWORK {evidenceGrade: "Strong"}]->(n);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (n:FunctionalNetwork {id: "salience_network"})
+CREATE (p)-[:DOMINANT_NETWORK {evidenceGrade: "Strong"}]->(n);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (n:FunctionalNetwork {id: "salience_network"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "overloaded_high_gain", evidenceGrade: "Strong"}]->(n);
+
+// conservation_freeze: "Global dampening — no single dominant network" - intentionally no edge
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (n:FunctionalNetwork {id: "dmn"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "altered", evidenceGrade: "Strong"}]->(n);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (n:FunctionalNetwork {id: "dmn"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "dominant_with_altered_CEN_coupling", evidenceGrade: "Strong"}]->(n);
+
+
+// ============================================================
+// PATTERN -> EMOTION ASSOCIATIONS
+// ============================================================
+
+// Acute Alarm emotions
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "anxiety"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "panic"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "overwhelm"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "fear"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+// Chronic Vigilance emotions
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (e:Emotion {id: "anxiety"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", quality: "watchful"}]->(e);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (e:Emotion {id: "stress"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+// Emotional Flooding emotions
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "overwhelm"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "anger"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", quality: "explosive"}]->(e);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "sadness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", quality: "cant_stop_crying"}]->(e);
+
+// Conservation/Freeze emotions
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (e:Emotion {id: "numbness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (e:Emotion {id: "emptiness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+// Dissociation emotions
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (e:Emotion {id: "numbness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", quality: "numb_but_alert"}]->(e);
+
+// Rumination Loop emotions
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "sadness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "depressive_brooding"}]->(e);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "anxiety"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", subtype: "anxious_worry"}]->(e);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "guilt"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate"}]->(e);
+
+// Reward Drive Low emotions
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (e:Emotion {id: "boredom"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (e:Emotion {id: "emptiness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+// Social Threat/Shame emotions
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "hot_shame"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "cold_shame"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "guilt"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "guilt"}]->(e);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "rejection"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "social_rejection"}]->(e);
+
+
+// ============================================================
+// MODULATED_BY RELATIONSHIPS
+// State modulators affect pattern intensity and tool selection
+// ============================================================
+
+// Sleep Loss affects arousal-related patterns
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (m:StateModulator {id: "sleep_loss_sensitization"})
+CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (m:StateModulator {id: "sleep_loss_sensitization"})
+CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (m:StateModulator {id: "sleep_loss_sensitization"})
+CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (m:StateModulator {id: "sleep_loss_sensitization"})
+CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (m:StateModulator {id: "sleep_loss_sensitization"})
+CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+
+// Acute Stress affects prefrontal-dependent patterns
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (m:StateModulator {id: "acute_stress_catecholamine"})
+CREATE (p)-[:MODULATED_BY {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"}]->(m);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (m:StateModulator {id: "acute_stress_catecholamine"})
+CREATE (p)-[:MODULATED_BY {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"}]->(m);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (m:StateModulator {id: "acute_stress_catecholamine"})
+CREATE (p)-[:MODULATED_BY {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"}]->(m);
+
+// Interoceptive Threat Bias affects body-signal-sensitive patterns
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (m:StateModulator {id: "interoceptive_threat_bias"})
+CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"}]->(m);
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (m:StateModulator {id: "interoceptive_threat_bias"})
+CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"}]->(m);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (m:StateModulator {id: "interoceptive_threat_bias"})
+CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"}]->(m);
+
+
+// ============================================================
+// TRIGGERS_SAFETY RELATIONSHIPS
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (s:SafetyFlag {id: "crisis_self_harm"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "out_of_control_with_intent_language", threshold: "immediate"}]->(s);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (s:SafetyFlag {id: "crisis_suicidal"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "dissociation_plus_suicidal_ideation", threshold: "immediate"}]->(s);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (s:SafetyFlag {id: "clinical_referral_severe_dissociation"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "cannot_orient_to_present", threshold: "immediate"}]->(s);
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (s:SafetyFlag {id: "clinical_referral_shutdown"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "7_plus_consecutive_days", threshold: "persistent"}]->(s);
+
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (s:SafetyFlag {id: "crisis_suicidal"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "ruminative_content_involves_suicidal_ideation", threshold: "immediate"}]->(s);
+
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (s:SafetyFlag {id: "clinical_referral_shutdown"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "pervasive_anhedonia_multiple_checkins", threshold: "persistent"}]->(s);
+
+
+// ============================================================
+// CAN_ESCALATE_TO RELATIONSHIPS
+// ============================================================
+
+// Social threat can escalate to reactive aggression
+MATCH (p1:ActivationPattern {id: "social_threat_shame"}), (p2:ActivationPattern {id: "reactive_aggression"})
+CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "regain_social_status", weight: "weak"}]->(p2);
+
+// Conservation freeze rebound
+MATCH (p1:ActivationPattern {id: "conservation_freeze"}), (p2:ActivationPattern {id: "acute_alarm"})
+CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "rebound_from_pulling_out_too_quickly", weight: "moderate"}]->(p2);
+
+// Acute alarm to flooding
+MATCH (p1:ActivationPattern {id: "acute_alarm"}), (p2:ActivationPattern {id: "emotional_flooding"})
+CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "regulatory_failure", weight: "moderate"}]->(p2);
+
+
+// ============================================================
+// WINDOW OF TOLERANCE CROSS-REFERENCES
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "extreme"}]->(wot);
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (wot:TherapyConcept {id: "wot_hypoarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
+
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (wot:TherapyConcept {id: "wot_frozen_flight"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "subtype_freeze_high_arousal"}]->(wot);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (wot:TherapyConcept {id: "wot_hypoarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "distinct_mechanism"}]->(wot);
+
+
+// ============================================================
+// POLYVAGAL STATE CROSS-REFERENCES
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (pv:TherapyConcept {id: "pv_sympathetic"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong"}]->(pv);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (pv:TherapyConcept {id: "pv_sympathetic"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong", notes: "sustained_mobilization"}]->(pv);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (pv:TherapyConcept {id: "pv_sympathetic"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong", notes: "extreme_mobilization"}]->(pv);
+
+// Note: conservation_freeze linked to PAG, NOT "dorsal vagal" per expert consensus
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (pv:TherapyConcept {id: "pv_dorsal_vagal"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Moderate", notes: "use_PAG_centered_framing_not_polyvagal_language", caveat: "polyvagal_framing_contested_4_of_4_experts"}]->(pv);

@@ -1,741 +1,702 @@
 // ============================================================
-// INCREMENTAL UPDATE - Run this against existing Neo4j database
-// This file contains ONLY the new additions from the domain expert audit
+// INCREMENTAL UPDATE - Activation Pattern Layer
+// Run this against existing Neo4j database
+// 
+// Source: Goblin DBT Neural Activation Pattern Definitions
+// Synthesized Expert Deliverable (February 2026)
+// 
+// This file contains ONLY the new Activation Pattern layer
+// additions from the domain expert synthesis.
 // ============================================================
 
 
 // ============================================================
-// STEP 1: UPDATE EXISTING NODES (run these first)
-// Using MATCH + SET to update properties on existing nodes
+// STEP 1: CREATE MISSING BRAIN STRUCTURE NODES
+// These structures are referenced by activation patterns but
+// don't exist in the base schema
 // ============================================================
 
-// Update IFS Self with neurochemical properties
-MATCH (self:TherapyConcept {id: "ifs_self"})
-SET self.description = "Core, undamaged essence characterized by the 8 C's; neurobiologically corresponds to mPFC activation and ventral vagal tone",
-    self.neurochemical_markers = ["serotonin", "oxytocin"],
-    self.physiological_correlate = "ventral_vagal_tone",
-    self.neural_hub = "mPFC",
-    self.mechanism = "mPFC sends inhibitory signals to amygdala, quieting alarm system and enabling CEN activation";
-
-// Update Cold Shame with trait vulnerability marker
-MATCH (cs:Emotion {id: "cold_shame"})
-SET cs.description = "Internalized shame with low arousal - collapse, withdrawal, worthlessness; global negative self-evaluation",
-    cs.evaluative_focus = "Global Self ('I am defective')",
-    cs.action_tendency = "hiding, withdrawal, submission",
-    cs.trait_vulnerability_marker = true,
-    cs.clinical_note = "Hypersensitivity persists even in MDD remission - trait marker for depression";
-
-// Update Guilt with other-oriented properties
-MATCH (g:Emotion {id: "guilt"})
-SET g.description = "Feeling of responsibility for wrongdoing; behavior-specific and other-oriented",
-    g.evaluative_focus = "Specific Behavior ('I did something wrong')",
-    g.action_tendency = "reparation, apology, prosocial behavior",
-    g.social_orientation = "other-focused",
-    g.clinical_note = "Often adaptive; increases empathic concern; maladaptive when ruminative";
-
-
-// ============================================================
-// STEP 2: CREATE NEW HITOP FRAMEWORK NODES
-// ============================================================
-
-CREATE (p_factor:HiTOPConstruct {
-  id: "hitop_p_factor",
-  name: "P-Factor (General Psychopathology)",
-  level: "superordinate",
-  description: "General factor underlying all mental disorder symptoms; correlates with mPFC dysregulation of subcortical arousal",
-  neural_correlates: ["mPFC dysfunction", "subcortical arousal dysregulation"],
-  evidence_base: "Caspi & Moffitt (2018); Lahey et al. (2012)"
+// PAG Subdivisions (existing pag is too general for pattern specificity)
+CREATE (dlpag:BrainStructure {
+  id: "dlpag",
+  name: "Dorsolateral Periaqueductal Gray",
+  description: "Active defense component of PAG; involved in fight/flight responses and emotional flooding",
+  aliases: ["dlPAG"],
+  level: "brainstem",
+  parent_structure: "pag"
 });
 
-CREATE (internalizing_spectrum:HiTOPConstruct {
-  id: "hitop_internalizing",
-  name: "Internalizing Spectrum",
-  level: "spectrum",
-  description: "Captures shared genetic diathesis, environmental risk factors, and neural substrates common to distress and fear-based conditions",
-  subfactors: ["Distress", "Fear"],
-  rdoc_domain: "Negative Valence Systems",
-  key_neural_circuitry: ["amygdala", "mPFC", "dACC", "insula"]
+CREATE (vlpag:BrainStructure {
+  id: "vlpag",
+  name: "Ventrolateral Periaqueductal Gray",
+  description: "Passive defense coordinator; mediates freezing, immobility, and conservation responses",
+  aliases: ["vlPAG"],
+  level: "brainstem",
+  parent_structure: "pag"
 });
 
-CREATE (externalizing_spectrum:HiTOPConstruct {
-  id: "hitop_externalizing",
-  name: "Externalizing Spectrum",
-  level: "spectrum",
-  description: "Disinhibited and antagonistic behavioral patterns",
-  subfactors: ["Disinhibited Externalizing", "Antagonistic Externalizing"],
-  rdoc_domain: "Positive Valence / Cognitive Systems",
-  key_neural_circuitry: ["ventral_striatum", "dlPFC", "OFC"]
-});
-
-CREATE (thought_disorder_spectrum:HiTOPConstruct {
-  id: "hitop_thought_disorder",
-  name: "Thought Disorder Spectrum",
-  level: "spectrum",
-  description: "Psychotic and schizotypal presentations",
-  subfactors: ["Psychoticism", "Detachment"],
-  rdoc_domain: "Cognitive / Social Processes",
-  key_neural_circuitry: ["thalamus", "cerebellum", "TPJ", "mPFC"]
-});
-
-CREATE (somatoform_spectrum:HiTOPConstruct {
-  id: "hitop_somatoform",
-  name: "Somatoform Spectrum",
-  level: "spectrum",
-  description: "Somatic symptom presentations and illness anxiety",
-  rdoc_domain: "Arousal and Regulatory Systems",
-  key_neural_circuitry: ["posterior_insula", "somatosensory_cortex"]
-});
-
-CREATE (detachment_spectrum:HiTOPConstruct {
-  id: "hitop_detachment",
-  name: "Detachment Spectrum",
-  level: "spectrum",
-  description: "Social withdrawal, anhedonia, restricted affect",
-  key_neural_circuitry: ["nucleus_accumbens", "mPFC"]
-});
-
-CREATE (hitop_distress:HiTOPConstruct {
-  id: "hitop_distress",
-  name: "Distress Subfactor",
-  level: "subfactor",
-  parent_spectrum: "internalizing",
-  description: "Depressive, dysthymic, anxious-misery presentations",
-  clinical_manifestations: ["MDD", "Dysthymia", "GAD"]
-});
-
-CREATE (hitop_fear:HiTOPConstruct {
-  id: "hitop_fear",
-  name: "Fear Subfactor",
-  level: "subfactor",
-  parent_spectrum: "internalizing",
-  description: "Phobic and panic presentations",
-  clinical_manifestations: ["Panic Disorder", "Specific Phobias", "Social Anxiety"]
-});
-
-
-// ============================================================
-// STEP 3: CREATE NEW RDOC FRAMEWORK NODES
-// ============================================================
-
-CREATE (rdoc_negative_valence:RDoCDomain {
-  id: "rdoc_negative_valence",
-  name: "Negative Valence Systems",
-  description: "Systems for responses to aversive situations/contexts including fear, anxiety, and loss",
-  constructs: ["Acute Threat (Fear)", "Potential Threat (Anxiety)", "Sustained Threat", "Loss", "Frustrative Nonreward"]
-});
-
-CREATE (rdoc_positive_valence:RDoCDomain {
-  id: "rdoc_positive_valence",
-  name: "Positive Valence Systems",
-  description: "Systems for responses to positive motivational situations",
-  constructs: ["Reward Responsiveness", "Reward Learning", "Reward Valuation", "Approach Motivation"]
-});
-
-CREATE (rdoc_cognitive:RDoCDomain {
-  id: "rdoc_cognitive",
-  name: "Cognitive Systems",
-  description: "Systems responsible for various cognitive processes",
-  constructs: ["Attention", "Perception", "Declarative Memory", "Working Memory", "Cognitive Control", "Language"]
-});
-
-CREATE (rdoc_social:RDoCDomain {
-  id: "rdoc_social",
-  name: "Systems for Social Processes",
-  description: "Systems for mediating responses to interpersonal settings",
-  constructs: ["Affiliation and Attachment", "Social Communication", "Perception and Understanding of Self", "Perception and Understanding of Others"]
-});
-
-CREATE (rdoc_arousal:RDoCDomain {
-  id: "rdoc_arousal",
-  name: "Arousal and Regulatory Systems",
-  description: "Systems responsible for activation of neural systems and homeostatic regulation",
-  constructs: ["Arousal", "Circadian Rhythms", "Sleep-Wakefulness"]
-});
-
-CREATE (rdoc_sensorimotor:RDoCDomain {
-  id: "rdoc_sensorimotor",
-  name: "Sensorimotor Systems",
-  description: "Systems responsible for motor behavior control",
-  constructs: ["Motor Actions", "Agency and Ownership"]
-});
-
-CREATE (rdoc_acute_threat:RDoCConstruct {
-  id: "rdoc_acute_threat",
-  name: "Acute Threat (Fear)",
-  domain: "Negative Valence Systems",
-  description: "Activation of the brain's defensive motivational system to promote behaviors that protect from perceived danger",
-  neural_circuit: ["amygdala", "BNST", "PAG", "hypothalamus"],
-  therapeutic_targets: ["exposure", "EMDR", "SE"]
-});
-
-CREATE (rdoc_potential_threat:RDoCConstruct {
-  id: "rdoc_potential_threat",
-  name: "Potential Threat (Anxiety)",
-  domain: "Negative Valence Systems",
-  description: "Sustained activation of defensive system in response to uncertain threat",
-  neural_circuit: ["BNST", "hippocampus", "mPFC"],
-  therapeutic_targets: ["DBT", "ACT", "CBT"]
-});
-
-CREATE (rdoc_loss:RDoCConstruct {
-  id: "rdoc_loss",
-  name: "Loss",
-  domain: "Negative Valence Systems",
-  description: "Response to loss of access to reward or anticipated loss",
-  neural_circuit: ["vACC", "amygdala", "nucleus_accumbens"],
-  therapeutic_targets: ["behavioral_activation", "CPT", "MBCT"]
-});
-
-CREATE (rdoc_self_perception:RDoCConstruct {
-  id: "rdoc_self_perception",
-  name: "Perception and Understanding of Self",
-  domain: "Systems for Social Processes",
-  description: "Processes involved in perceiving, knowing about, and understanding the self",
-  neural_circuit: ["mPFC", "PCC", "insula"],
-  notes: "Neurobiological anchor for IFS Self-energy, ACT Observing Self, DBT Wise Mind"
-});
-
-CREATE (rdoc_affiliation:RDoCConstruct {
-  id: "rdoc_affiliation",
-  name: "Affiliation and Attachment",
-  domain: "Systems for Social Processes",
-  description: "Engagement in positive social interactions and formation of social bonds",
-  neural_circuit: ["hypothalamus", "mPFC", "nucleus_accumbens"],
-  neurochemical: ["oxytocin", "dopamine"],
-  therapeutic_targets: ["IFS", "Polyvagal co-regulation"]
-});
-
-
-// ============================================================
-// STEP 4: CREATE WINDOW OF TOLERANCE NODES
-// ============================================================
-
-CREATE (window_of_tolerance:TherapyConcept {
-  id: "window_of_tolerance",
-  name: "Window of Tolerance",
-  description: "Range of optimal arousal within which a person can function effectively; integrates Siegel's interpersonal neurobiology with Polyvagal Theory",
-  modality: "cross_modality",
-  founder: "Dan Siegel",
-  zones: ["Optimal Zone", "Hyperarousal", "Hypoarousal"]
-});
-
-CREATE (optimal_zone:TherapyConcept {
-  id: "wot_optimal_zone",
-  name: "Optimal Arousal Zone",
-  description: "Ventral Vagal state; emotional/physiological equilibrium; CEN active; adaptable, flexible thinking",
-  modality: "Window of Tolerance",
-  autonomic_state: "ventral_vagal",
-  characteristics: ["emotional equilibrium", "adaptability", "flexible thinking", "social engagement"]
-});
-
-CREATE (hyperarousal_zone:TherapyConcept {
-  id: "wot_hyperarousal",
-  name: "Hyperarousal Zone",
-  description: "Sympathetic/Fight-Flight activation; amygdala distress signals; PFC deactivation; inhibited speech and rational decision-making",
-  modality: "Window of Tolerance",
-  autonomic_state: "sympathetic",
-  characteristics: ["panic", "rage", "hypervigilance", "racing thoughts", "impulsivity"]
-});
-
-CREATE (hypoarousal_zone:TherapyConcept {
-  id: "wot_hypoarousal",
-  name: "Hypoarousal Zone",
-  description: "Dorsal Vagal/Freeze-Shutdown; emotional numbing, dissociation, flat affect, reduced heart rate",
-  modality: "Window of Tolerance",
-  autonomic_state: "dorsal_vagal",
-  characteristics: ["numbness", "dissociation", "flat affect", "collapse", "shutdown"]
-});
-
-CREATE (frozen_flight:TherapyConcept {
-  id: "wot_frozen_flight",
-  name: "Frozen Flight State",
-  description: "Co-activation of high SNS + high PNS; 'deer in headlights' presentation with muscle rigidity",
-  modality: "Window of Tolerance",
-  autonomic_state: "mixed",
-  characteristics: ["muscle rigidity", "frozen terror", "immobility with high arousal"]
-});
-
-
-// ============================================================
-// STEP 5: CREATE NEW BRAIN STRUCTURES
-// ============================================================
-
-CREATE (atl:BrainStructure {
-  id: "atl",
-  name: "Anterior Temporal Lobe",
-  description: "Anterior temporal cortex; social semantic knowledge, conceptual processing, guilt-related cognition",
-  aliases: ["ATL", "anterior temporal cortex"],
-  level: "cortical",
-  functions: ["social_semantic_knowledge", "conceptual_processing"]
-});
-
-CREATE (visual_cortex:BrainStructure {
-  id: "visual_cortex",
-  name: "Visual Cortex",
-  description: "Occipital cortex; visual processing; involved in mental imagery of critical observers (shame)",
-  aliases: ["V1", "occipital cortex"],
+// Inferior Frontal Gyrus (behavioral inhibition in social threat)
+CREATE (ifg:BrainStructure {
+  id: "ifg",
+  name: "Inferior Frontal Gyrus",
+  description: "Involved in response inhibition, language processing, and behavioral inhibition (urge to hide in shame)",
+  aliases: ["IFG", "Broca's area (pars opercularis)"],
   level: "cortical"
 });
 
-CREATE (cerebellum:BrainStructure {
-  id: "cerebellum",
-  name: "Cerebellum",
-  description: "Coordination, motor learning, cognitive functions; involved in fear extinction",
+// Premotor Cortex (behavioral inhibition)
+CREATE (premotor:BrainStructure {
+  id: "premotor_cortex",
+  name: "Premotor Cortex",
+  description: "Motor planning and preparation; involved in behavioral inhibition during social threat",
+  aliases: ["PMC", "premotor area"],
+  level: "cortical"
+});
+
+// Dorsal Striatum (separate from NAc for goal initiation)
+CREATE (dorsal_striatum:BrainStructure {
+  id: "dorsal_striatum",
+  name: "Dorsal Striatum",
+  description: "Caudate and putamen; action selection, goal initiation, and habit formation",
+  aliases: ["caudate-putamen"],
   level: "subcortical"
 });
 
-
-// ============================================================
-// STEP 6: CREATE EMDR CONSOLIDATION MECHANISMS
-// ============================================================
-
-CREATE (emdr_consolidation:TherapyConcept {
-  id: "emdr_consolidation",
-  name: "Memory Consolidation Process",
-  description: "Transfer of traumatic memories from hippocampus-amygdala complex to neocortex; shifts from implicit to explicit memory",
-  modality: "EMDR",
-  mechanism: "hippocampal_cortical_transfer"
+// Precuneus (DMN core, depersonalization)
+CREATE (precuneus:BrainStructure {
+  id: "precuneus",
+  name: "Precuneus",
+  description: "Medial parietal cortex; self-referential processing, autobiographical memory, DMN hub",
+  aliases: ["medial parietal cortex"],
+  level: "cortical"
 });
 
-CREATE (gamma_oscillations:TherapyConcept {
-  id: "emdr_gamma",
-  name: "Gamma Band Oscillations (40 Hz)",
-  description: "Neural oscillations that solve the 'binding problem' by synchronizing neuronal assemblies across sensory and emotional areas",
-  modality: "EMDR",
-  frequency: "40 Hz",
-  function: "Unbinding memory from limbic system, linking with mPFC"
-});
+// Frontal Eye Fields (attentional orienting in chronic vigilance)
+// Note: fef already exists in base schema, but verify it has proper properties
 
-CREATE (memory_reconsolidation:TherapyConcept {
-  id: "emdr_reconsolidation",
-  name: "Memory Reconsolidation",
-  description: "Process by which reactivated memories become labile and can be modified before re-storage",
-  modality: "EMDR",
-  mechanism: "reactivation_modification_restabilization"
-});
+// Intraparietal Sulcus (attentional orienting in chronic vigilance)
+// Note: ips already exists in base schema
 
 
 // ============================================================
-// STEP 7: CREATE NEURAL SIGNATURES (Shame/Guilt Differentiation)
+// STEP 2: LINK NEW STRUCTURES TO EXISTING HIERARCHY
 // ============================================================
 
-CREATE (shame_neural_signature:NeuralSignature {
-  id: "shame_neural",
-  name: "Shame Neural Signature",
-  emotion: "shame",
-  primary_hubs: ["dlPFC", "PCC", "dACC", "sensory_motor_cortex", "visual_cortex"],
-  subcortical: ["amygdala", "posterior_insula"],
-  evaluative_focus: "Global Self ('I am defective')",
-  action_tendency: "behavioral_inhibition, hiding, submission",
-  autonomic_shift: "dorsal_vagal_collapse",
-  clinical_implication: "High risk for Depression, BPD, Suicidality",
-  trait_vulnerability: true,
-  notes: "Hypersensitivity persists even in remission (trait marker for depression)"
-});
+MATCH (dlpag:BrainStructure {id: "dlpag"}), (pag:BrainStructure {id: "pag"})
+CREATE (dlpag)-[:PART_OF]->(pag);
 
-CREATE (guilt_neural_signature:NeuralSignature {
-  id: "guilt_neural",
-  name: "Guilt Neural Signature",
-  emotion: "guilt",
-  primary_hubs: ["TPJ", "ATL", "dmPFC"],
-  shared_core: ["anterior_insula", "dACC"],
-  evaluative_focus: "Specific Behavior ('I did something wrong')",
-  action_tendency: "reparation, prosocial behavior, empathy",
-  clinical_implication: "Often adaptive; maladaptive if ruminative",
-  notes: "Increases empathic concern and prosociality (other-oriented)"
-});
+MATCH (vlpag:BrainStructure {id: "vlpag"}), (pag:BrainStructure {id: "pag"})
+CREATE (vlpag)-[:PART_OF]->(pag);
 
-CREATE (social_pain:NeuralSignature {
-  id: "social_pain_neural",
-  name: "Social Pain Neural Signature",
-  description: "Neural response to social exclusion/rejection",
-  primary_hubs: ["dACC", "anterior_insula", "thalamus"],
-  overlap_with: ["physical_pain"],
-  related_emotions: ["shame", "rejection", "loneliness"]
-});
+MATCH (dorsal:BrainStructure {id: "dorsal_striatum"}), (bg:BrainStructure {id: "basal_ganglia"})
+CREATE (dorsal)-[:PART_OF]->(bg);
+
+MATCH (precuneus:BrainStructure {id: "precuneus"}), (dmn:FunctionalNetwork {id: "dmn"})
+CREATE (precuneus)-[:PARTICIPATES_IN]->(dmn);
 
 
 // ============================================================
-// STEP 8: CREATE CPT NEURAL DISSOCIATION CONCEPTS
+// STEP 3: CREATE ACTIVATION PATTERN NODES (8 Core Patterns)
+// Evidence Grades: Strong | Moderate | Emerging
 // ============================================================
 
-CREATE (cpt_retrieval_demand:TherapyConcept {
-  id: "cpt_retrieval",
-  name: "Memory Retrieval Demand",
-  description: "Left PFC (BA 9/46) activity reflecting effort to retrieve adaptive thoughts; decreases as therapy progresses",
-  modality: "CPT",
-  neural_hub: "left_dlPFC",
-  change_direction: "decreases with treatment",
-  notes: "Reflects 'ease of retrieval' for balanced beliefs"
+// Pattern 1: Acute Alarm
+CREATE (acute_alarm:ActivationPattern {
+  id: "acute_alarm",
+  userFacingLabel: "Your brain's alarm system is activated right now",
+  description: "Phasic/immediate threat response with amygdala-driven arousal and suppressed prefrontal regulation",
+  evidenceGrade: "Strong",
+  expertConsensus: "4/4",
+  keyCitations: ["Shin & Liberzon (2010)", "LeDoux (2016)", "Rauch/Shin/Phelps (2006)", "Reyes et al. (2025, LC-NE)"],
+  clinicalNotes: "BNST involvement scales with sustained/uncertain threat. LC-NE amplifies arousal. Hippocampus suppression = contextual safety signaling less effective.",
+  safetyConstraints: ["Do not say 'amygdala hijacking'", "Frame as current state not trait", "Use 'right now' not 'you tend to'"]
 });
 
-CREATE (cpt_control_demand:TherapyConcept {
-  id: "cpt_control",
-  name: "Goal-Relevant Control Demand",
-  description: "Left ACC (BA 24/32) activity reflecting monitoring required to override traumatic schemas; may increase with skill refinement",
-  modality: "CPT",
-  neural_hub: "left_ACC",
-  change_direction: "may increase with skill refinement",
-  notes: "High-level monitoring to override deeply ingrained schemas"
+// Pattern 2: Chronic Vigilance
+CREATE (chronic_vigilance:ActivationPattern {
+  id: "chronic_vigilance",
+  userFacingLabel: "Your attention is locked onto what could go wrong",
+  description: "Sustained/anticipatory threat processing with BNST as primary driver; radar stuck on mode",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "4/4 confirmed as distinct from acute alarm",
+  keyCitations: ["Somerville et al. (BNST threat proximity)", "Klumpers et al. (BNST vs amygdala)", "Shackman & Fox (extended amygdala)", "Petranu et al. (BNST in PTSD)"],
+  clinicalNotes: "BNST specialized for defensive distance. Treatment levers: attentional retraining and safety-signal conditioning vs autonomic downshift for acute alarm.",
+  safetyConstraints: ["Superior colliculus REJECTED as core node - sparse human fMRI evidence"]
+});
+
+// Pattern 3: Emotional Flooding
+CREATE (emotional_flooding:ActivationPattern {
+  id: "emotional_flooding",
+  userFacingLabel: "Your feelings are hitting all at once",
+  description: "PFC essentially offline; salience network overloaded; cognitive tools will fail in this state",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "4/4 confirmed as clinically distinct from acute alarm",
+  keyCitations: ["Shin & Liberzon (2010)", "SN hyperreactivity literature", "PAG-insula disinhibition (emerging)"],
+  clinicalNotes: "OFC suppression is key differentiator - cannot reason about emotion. MUST recommend bottom-up autonomic tools: cold water, paced breathing, PMR. dlPAG involvement (active defense) included with moderate evidence.",
+  safetyConstraints: ["Screen for self-harm risk when 'out of control' reported", "Emergency state - present tools immediately with minimal cognitive demand", "No browsing, 1-2 options max"]
+});
+
+// Pattern 4: Conservation/Freeze
+CREATE (conservation_freeze:ActivationPattern {
+  id: "conservation_freeze",
+  userFacingLabel: "Your system is conserving energy right now",
+  description: "PAG-centered shutdown/freeze; global dampening with no single dominant network",
+  evidenceGrade: "Moderate",
+  expertConsensus: "3/4 on PAG-centered mechanism; polyvagal framing contested",
+  keyCitations: ["Roelofs (2017, freezing model)", "Kozlowska et al. (defense cascade)", "human freezing/bradycardia PAG literature"],
+  subtype: ["freeze_high_arousal", "collapse_low_arousal"],
+  clinicalNotes: "Model PAG as coordinator NOT 'Dorsal Vagal Complex'. Use neutral ANS terminology. Thalamic suppression reduces sensory bandwidth contributing to dissociative experiences.",
+  safetyConstraints: ["CRITICAL: Traditional calming tools may worsen state", "Do NOT recommend deep breathing or meditation", "Favor gentle up-regulation: cold water, proprioceptive input, micro-movements", "Pulling out too quickly can trigger rebound panic"]
+});
+
+// Pattern 5: Dissociation/Overmodulation
+CREATE (dissociation_overmodulation:ActivationPattern {
+  id: "dissociation_overmodulation",
+  userFacingLabel: "Your mind is protecting you by disconnecting",
+  description: "PFC OVER-active suppressing limbic response; distinct from global dampening of conservation_freeze",
+  evidenceGrade: "Strong within PTSD-dissociative subtype; Moderate for broader DPDR",
+  expertConsensus: "3/4 explicitly separated from shutdown",
+  keyCitations: ["Lanius (2010, 2012, dissociative PTSD)", "Modesti et al. (2022 review)", "Murphy et al. (2023 DPDR overview)"],
+  clinicalNotes: "Control tower actively silencing alarms. Needs interoceptive reconnection - slowly re-establishing contact with suppressed body signals. Amygdala SUPPRESSION is defining feature.",
+  safetyConstraints: ["Dissociation + suicidal ideation = escalation pathway", "Do NOT suggest heavy interoceptive exposure without titration", "Somatic Experiencing and gentle proprioceptive input are safer entry points"]
+});
+
+// Pattern 6: Rumination Loop
+CREATE (rumination_loop:ActivationPattern {
+  id: "rumination_loop",
+  userFacingLabel: "Your mind is stuck on replay",
+  description: "DMN hyperactivity with sgACC coupling; self-referential processing infused with negative valence",
+  evidenceGrade: "Strong for depressive rumination; Moderate for anxious worry",
+  expertConsensus: "4/4 confirmed core DMN hyperactivity model",
+  keyCitations: ["Hamilton et al. (2015, DMN-rumination meta-analytic)", "Zhou et al. (2020, rumination meta-analysis)", "Menon (2023, DMN review)"],
+  subtype: ["depressive_brooding", "anxious_worry"],
+  clinicalNotes: "DMN and sgPFC create caustic compound when functionally linked. dlPFC suppression NOT universal - may be active but failing in anxious worry. Break the link via task-positive activities requiring external focus. Mindfulness can backfire by increasing internal focus.",
+  safetyConstraints: ["If ruminative content involves suicidal ideation trigger crisis pathways", "Do not use 'brain is broken' framing"]
+});
+
+// Pattern 7: Reward Drive Low
+CREATE (reward_drive_low:ActivationPattern {
+  id: "reward_drive_low",
+  userFacingLabel: "Your motivation system is idling right now",
+  description: "Ventral striatal blunting with reduced dopamine signaling; positive valence system under-engaged",
+  evidenceGrade: "Strong for ventral striatal blunting; Moderate for inflammation mechanism",
+  expertConsensus: "4/4 on core, 2/4 on inflammation mechanism",
+  keyCitations: ["Keren et al. (2018, reward meta-analysis)", "Ng et al. (2019)", "Halahakoon et al. (2020)", "inflammation-DA convergence reviews"],
+  clinicalNotes: "Frame as 'reward system under-engaged' not single-cause. Inflammation→dopamine suppression is emerging evidence only - NOT inferable from self-report. High-effort goal setting may backfire. Recommend low-friction behavioral activation with small immediate sensory rewards.",
+  safetyConstraints: ["Screen for MDE if anhedonia pervasive across multiple check-ins", "Consider fatigue/inflammation screening if persistent", "Do NOT imply 'not trying hard enough'"]
+});
+
+// Pattern 8: Social Threat/Shame
+CREATE (social_threat_shame:ActivationPattern {
+  id: "social_threat_shame",
+  userFacingLabel: "Your brain is treating social evaluation like danger",
+  description: "Self-evaluation-forward rather than amygdala-forward; intense Theory-of-Mind engagement modeling negative gaze of others",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "4/4 confirmed as distinct from general anxiety",
+  keyCitations: ["Eisenberger (2012, social pain)", "Piretti et al. (2023 meta-analysis)", "Eslinger (2021, social feelings review)", "voxel-based shame/embarrassment analyses"],
+  subtype: ["shame", "social_rejection", "guilt"],
+  clinicalNotes: "Shame activates behavioral inhibition (hide/freeze). Guilt activates TPJ/reparative action. Social rejection activates dACC/insula pain. vmPFC suppression is state-dependent. Can trigger reactive aggression to regain social status.",
+  safetyConstraints: ["Emphasize self-compassion and common humanity", "Avoid tools that increase self-focus (journaling may amplify shame)", "Do not suggest hopelessness/worthlessness as co-occurring without extreme care"]
 });
 
 
 // ============================================================
-// STEP 9: CREATE ALL NEW RELATIONSHIPS
+// STEP 4: CREATE STATE MODULATOR NODES (3 Modulators)
+// These attach to any pattern via MODULATED_BY relationship
 // ============================================================
 
-// --- HiTOP Hierarchy ---
-MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (int)-[:CONTRIBUTES_TO]->(pf);
+CREATE (sleep_loss:StateModulator {
+  id: "sleep_loss_sensitization",
+  userFacingLabel: "Poor sleep is turning up the volume on your emotions",
+  description: "Increases amygdala reactivity, decreases PFC-amygdala coupling, increases SN bias",
+  evidenceGrade: "Strong",
+  expertConsensus: "4/4",
+  keyCitations: ["Yoo et al. (2007) + replications"],
+  duration: "hours_to_days",
+  effectOnPatterns: "Amygdala reactivity increases; PFC-amygdala coupling decreases; SN bias increases",
+  toolSequencing: "Address sleep first before expecting cognitive tools to work",
+  safetyConstraints: ["Insomnia with significant impairment should route to clinical referral"]
+});
+
+CREATE (acute_stress_catecholamine:StateModulator {
+  id: "acute_stress_catecholamine",
+  userFacingLabel: "Stress is switching off your planning circuits right now",
+  description: "dlPFC working memory and top-down control degraded; habit/limbic circuits gain dominance",
+  evidenceGrade: "Strong",
+  expertConsensus: "3/4 explicit, 1/4 implicit",
+  keyCitations: ["Arnsten 2015", "Gamo & Arnsten 2015"],
+  duration: "minutes_to_hours",
+  effectOnPatterns: "dlPFC working memory degraded; habit/limbic circuits dominant",
+  toolSequencing: "Reduce stress load before attempting executive-function-dependent tools (reappraisal, planning)",
+  safetyConstraints: ["Model as state node not trait - this is reversible"]
+});
+
+CREATE (interoceptive_threat_bias:StateModulator {
+  id: "interoceptive_threat_bias",
+  userFacingLabel: "Your body signals feel noisy or threatening right now",
+  description: "Anterior insula and dACC hyperprecision; body signals interpreted as threats; worsens panic and health anxiety",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "2/4 explicit",
+  keyCitations: ["Khalsa et al. (2018)", "Paulus et al. (2019)", "Kleckner et al. (2017)"],
+  duration: "variable",
+  effectOnPatterns: "Body signals interpreted as threats; worsens panic, health anxiety; distinguishes from externally-focused Patterns 1-2",
+  toolSequencing: "Interoceptive recalibration tools",
+  safetyConstraints: ["Avoid deterministic claims", "Do NOT say 'your insula is broken'"]
+});
+
+
+// ============================================================
+// STEP 5: CREATE PHASE-2 ACTIVATION PATTERNS
+// Approved for future implementation, not for v1
+// ============================================================
+
+CREATE (grief_yearning:ActivationPattern {
+  id: "grief_yearning",
+  userFacingLabel: "Your attachment system is reaching for who is gone",
+  description: "NAc/ventral striatum yearning/craving, PCC autobiographical memory, amygdala distress",
+  evidenceGrade: "Moderate",
+  expertConsensus: "2/4 include in core, 1/4 phase-2, 1/4 reject",
+  keyCitations: ["O'Connor et al. (2008)", "Kakarala et al. (2020)"],
+  phaseRelease: "phase_2",
+  clinicalNotes: "NAc findings specific to PROLONGED/COMPLICATED grief. Do not generalize to all grief.",
+  safetyConstraints: ["Never use 'moving on' language", "Focus on integrated memory and meaning-making", "Do not pathologize normal grief trajectories"]
+});
+
+CREATE (reactive_aggression:ActivationPattern {
+  id: "reactive_aggression",
+  userFacingLabel: "Your protection system is translating stress into anger",
+  description: "Amygdala-hypothalamus-PAG attack circuit with suppressed regulatory PFC nodes",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "3/4 include, 1/4 omit from initial release",
+  keyCitations: ["hypothalamic-limbic attack circuit literature", "amygdala/PAG meta-analytic evidence"],
+  phaseRelease: "phase_2",
+  clinicalNotes: "Higher safety complexity. Tools must discharge sympathetic energy safely before cognitive tools. Affect labeling re-engages vlPFC. High association with hostile attribution bias.",
+  safetyConstraints: ["Proactive/instrumental aggression REJECTED for all releases", "Only reactive aggression modeled", "Requires careful tool sequencing to avoid escalation"]
+});
+
+
+// ============================================================
+// STEP 6: CREATE SAFETY FLAG NODES
+// For crisis escalation triggers
+// ============================================================
+
+CREATE (crisis_suicidal:SafetyFlag {
+  id: "crisis_suicidal",
+  type: "crisis",
+  trigger: "Suicidal ideation in any pattern",
+  action: "Immediate cessation of tool recommendation; present safety resources",
+  doNot: "Attempt to 'modulate' or offer coping tools"
+});
+
+CREATE (crisis_self_harm:SafetyFlag {
+  id: "crisis_self_harm",
+  type: "crisis",
+  trigger: "Self-harm urges + 'out of control'",
+  action: "Safety anchor (crisis line, emergency contact) BEFORE any tool",
+  doNot: "Recommend distress tolerance tools as primary response"
+});
+
+CREATE (clinical_referral_shutdown:SafetyFlag {
+  id: "clinical_referral_shutdown",
+  type: "clinical_referral",
+  trigger: "Persistent shutdown (7+ consecutive days of numb/empty)",
+  action: "Flag potential chronic dysfunction; recommend professional evaluation",
+  doNot: "Continue offering app-based tools as if they're sufficient"
+});
+
+CREATE (clinical_referral_psychosis:SafetyFlag {
+  id: "clinical_referral_psychosis",
+  type: "clinical_referral",
+  trigger: "Psychotic symptoms (hallucinations, delusions)",
+  action: "Acknowledge experience without validating; offer referral",
+  doNot: "Attempt reality testing or reappraisal"
+});
 
-MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (ext:HiTOPConstruct {id: "hitop_externalizing"})
-CREATE (ext)-[:CONTRIBUTES_TO]->(pf);
+CREATE (clinical_referral_severe_dissociation:SafetyFlag {
+  id: "clinical_referral_severe_dissociation",
+  type: "clinical_referral",
+  trigger: "Severe dissociation (user cannot orient to present)",
+  action: "Gentle grounding only; redirect to professional support",
+  doNot: "Push interoceptive exposure or trauma processing"
+});
 
-MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (td:HiTOPConstruct {id: "hitop_thought_disorder"})
-CREATE (td)-[:CONTRIBUTES_TO]->(pf);
 
-MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (som:HiTOPConstruct {id: "hitop_somatoform"})
-CREATE (som)-[:CONTRIBUTES_TO]->(pf);
+// ============================================================
+// STEP 7: CREATE INVOLVES RELATIONSHIPS
+// (Pattern)-[:INVOLVES {direction, evidenceGrade, conditional, confidence}]->(BrainStructure)
+// ============================================================
 
-MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (det:HiTOPConstruct {id: "hitop_detachment"})
-CREATE (det)-[:CONTRIBUTES_TO]->(pf);
+// --- Pattern 1: Acute Alarm INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
 
-MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (pf)-[:ASSOCIATED_WITH {finding: "dysregulation"}]->(mpfc);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "anterior_insula"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
 
-MATCH (dist:HiTOPConstruct {id: "hitop_distress"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (dist)-[:PART_OF]->(int);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "dacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
 
-MATCH (fear:HiTOPConstruct {id: "hitop_fear"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (fear)-[:PART_OF]->(int);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "locus_coeruleus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "arousal_amplifier"}]->(b);
 
-// Clinical to HiTOP
-MATCH (mdd:ClinicalConstruct {id: "mdd"}), (dist:HiTOPConstruct {id: "hitop_distress"})
-CREATE (mdd)-[:MAPS_TO]->(dist);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "bnst"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", conditional: "increases with sustained/uncertain threat"}]->(b);
 
-MATCH (gad:ClinicalConstruct {id: "gad"}), (dist:HiTOPConstruct {id: "hitop_distress"})
-CREATE (gad)-[:MAPS_TO]->(dist);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "dlpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
 
-MATCH (ptsd:ClinicalConstruct {id: "ptsd"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (ptsd)-[:MAPS_TO]->(int);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
 
-MATCH (panic:ClinicalConstruct {id: "panic_disorder"}), (fear:HiTOPConstruct {id: "hitop_fear"})
-CREATE (panic)-[:MAPS_TO]->(fear);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "hippocampus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "contextual safety signaling less effective"}]->(b);
 
-MATCH (sad:ClinicalConstruct {id: "social_anxiety"}), (fear:HiTOPConstruct {id: "hitop_fear"})
-CREATE (sad)-[:MAPS_TO]->(fear);
 
-MATCH (adhd:ClinicalConstruct {id: "adhd"}), (ext:HiTOPConstruct {id: "hitop_externalizing"})
-CREATE (adhd)-[:MAPS_TO]->(ext);
+// --- Pattern 2: Chronic Vigilance INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "bnst"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "primary_driver"}]->(b);
 
-// HiTOP to Neural
-MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (int)-[:KEY_CIRCUIT]->(amyg);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "sustained_support"}]->(b);
 
-MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (int)-[:KEY_CIRCUIT]->(mpfc);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "ips"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", network: "DAN"}]->(b);
 
-MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (int)-[:KEY_CIRCUIT]->(dacc);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "fef"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", network: "DAN"}]->(b);
 
-MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (ins:BrainStructure {id: "insula"})
-CREATE (int)-[:KEY_CIRCUIT]->(ins);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "locus_coeruleus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "tonic_arousal"}]->(b);
 
-MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (nacc:BrainStructure {id: "nucleus_accumbens"})
-CREATE (ext)-[:KEY_CIRCUIT]->(nacc);
 
-MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (dlpfc:BrainStructure {id: "dlpfc"})
-CREATE (ext)-[:KEY_CIRCUIT]->(dlpfc);
+// --- Pattern 3: Emotional Flooding INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
 
-MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (ofc:BrainStructure {id: "ofc"})
-CREATE (ext)-[:KEY_CIRCUIT]->(ofc);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "anterior_insula"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
 
-// --- RDoC Relationships ---
-MATCH (at:RDoCConstruct {id: "rdoc_acute_threat"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (at)-[:BELONGS_TO]->(nv);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
 
-MATCH (pt:RDoCConstruct {id: "rdoc_potential_threat"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (pt)-[:BELONGS_TO]->(nv);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dlpag"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "active_defense_component"}]->(b);
 
-MATCH (loss:RDoCConstruct {id: "rdoc_loss"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (loss)-[:BELONGS_TO]->(nv);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dlpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "essentially_offline"}]->(b);
 
-MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (soc:RDoCDomain {id: "rdoc_social"})
-CREATE (sp)-[:BELONGS_TO]->(soc);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "ofc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate-Strong", role: "key_differentiator"}]->(b);
 
-MATCH (aff:RDoCConstruct {id: "rdoc_affiliation"}), (soc:RDoCDomain {id: "rdoc_social"})
-CREATE (aff)-[:BELONGS_TO]->(soc);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
 
-MATCH (at:RDoCConstruct {id: "rdoc_acute_threat"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (at)-[:PRIMARY_CIRCUIT]->(amyg);
 
-MATCH (at:RDoCConstruct {id: "rdoc_acute_threat"}), (pag:BrainStructure {id: "pag"})
-CREATE (at)-[:PRIMARY_CIRCUIT]->(pag);
+// --- Pattern 4: Conservation/Freeze INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "vlpag"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "passive_defense_coordinator"}]->(b);
 
-MATCH (pt:RDoCConstruct {id: "rdoc_potential_threat"}), (bnst:BrainStructure {id: "bnst"})
-CREATE (pt)-[:PRIMARY_CIRCUIT]->(bnst);
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "thalamus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", role: "sensory_relay_reduced"}]->(b);
 
-MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (sp)-[:PRIMARY_CIRCUIT]->(mpfc);
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "motor_cortex"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b);
 
-MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (pcc:BrainStructure {id: "pcc"})
-CREATE (sp)-[:PRIMARY_CIRCUIT]->(pcc);
 
-MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (ins:BrainStructure {id: "insula"})
-CREATE (sp)-[:PRIMARY_CIRCUIT]->(ins);
+// --- Pattern 5: Dissociation/Overmodulation INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "over_inhibitory_control"}]->(b);
 
-// RDoC as anchor for therapy concepts
-MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (self:TherapyConcept {id: "ifs_self"})
-CREATE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(self);
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "pcc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"}]->(b);
 
-MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (wm:TherapyConcept {id: "dbt_wise_mind"})
-CREATE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(wm);
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "precuneus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"}]->(b);
 
-MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (sac:TherapyConcept {id: "act_self_context"})
-CREATE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(sac);
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "amygdala"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "emotional_numbing_via_top_down"}]->(b);
 
-// HiTOP-RDoC Cross-references
-MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (int)-[:RDOC_DOMAIN_ASSOCIATION]->(nv);
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "thalamus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b);
 
-MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (pv:RDoCDomain {id: "rdoc_positive_valence"})
-CREATE (ext)-[:RDOC_DOMAIN_ASSOCIATION]->(pv);
 
-MATCH (td:HiTOPConstruct {id: "hitop_thought_disorder"}), (cog:RDoCDomain {id: "rdoc_cognitive"})
-CREATE (td)-[:RDOC_DOMAIN_ASSOCIATION]->(cog);
+// --- Pattern 6: Rumination Loop INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "mpfc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
 
-MATCH (som:HiTOPConstruct {id: "hitop_somatoform"}), (ar:RDoCDomain {id: "rdoc_arousal"})
-CREATE (som)-[:RDOC_DOMAIN_ASSOCIATION]->(ar);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "pcc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
 
-// --- Window of Tolerance Relationships ---
-MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (vv:TherapyConcept {id: "pv_ventral_vagal"})
-CREATE (opt)-[:CORRESPONDS_TO]->(vv);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "precuneus"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
 
-MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (symp:TherapyConcept {id: "pv_sympathetic"})
-CREATE (hyper)-[:CORRESPONDS_TO]->(symp);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "vacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "affective_coloring", notes: "sgACC coupling creates caustic compound with DMN"}]->(b);
 
-MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (dv:TherapyConcept {id: "pv_dorsal_vagal"})
-CREATE (hypo)-[:CORRESPONDS_TO]->(dv);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "dlpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", conditional: "stronger in depressive rumination; variable in anxious worry"}]->(b);
 
-MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (cen:FunctionalNetwork {id: "cen"})
-CREATE (opt)-[:ACTIVATES]->(cen);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "hippocampus"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
 
-MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (opt)-[:ENGAGES]->(mpfc);
 
-MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (hyper)-[:ACTIVATES]->(amyg);
+// --- Pattern 7: Reward Drive Low INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "vacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "overlap_with_rumination", confidence: "low"}]->(b);
 
-MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (pfc:BrainStructure {id: "pfc"})
-CREATE (hyper)-[:DEACTIVATES]->(pfc);
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "nucleus_accumbens"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "blunted_reactivity"}]->(b);
 
-MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (thal:BrainStructure {id: "thalamus"})
-CREATE (hypo)-[:DEACTIVATES]->(thal);
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "vta"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "DA_signaling_reduced"}]->(b);
 
-MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (cur:Emotion {id: "curiosity"})
-CREATE (opt)-[:ENABLES]->(cur);
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "dorsal_striatum"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes: "goal_initiation"}]->(b);
 
-MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (calm:Emotion {id: "calm"})
-CREATE (opt)-[:ENABLES]->(calm);
 
-MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (panic:Emotion {id: "panic"})
-CREATE (hyper)-[:ASSOCIATED_WITH]->(panic);
+// --- Pattern 8: Social Threat/Shame INVOLVES relationships ---
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "dacc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "social_pain_alarm"}]->(b);
 
-MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (anger:Emotion {id: "anger"})
-CREATE (hyper)-[:ASSOCIATED_WITH]->(anger);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "anterior_insula"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
 
-MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (numb:Emotion {id: "numbness"})
-CREATE (hypo)-[:ASSOCIATED_WITH]->(numb);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "mpfc"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "self_evaluation"}]->(b);
 
-MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (diss:ClinicalConstruct {id: "dissociation"})
-CREATE (hypo)-[:ASSOCIATED_WITH]->(diss);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "tpj"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "mentalizing_guilt_specific"}]->(b);
 
-MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (opt:TherapyConcept {id: "wot_optimal_zone"})
-CREATE (opt)-[:PART_OF]->(wot);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "premotor_cortex"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"}]->(b);
 
-MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (hyper:TherapyConcept {id: "wot_hyperarousal"})
-CREATE (hyper)-[:PART_OF]->(wot);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "ifg"})
+CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"}]->(b);
 
-MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (hypo:TherapyConcept {id: "wot_hypoarousal"})
-CREATE (hypo)-[:PART_OF]->(wot);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "vmpfc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", conditional: "state-dependent, not a fixed deficit"}]->(b);
 
-MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (ff:TherapyConcept {id: "wot_frozen_flight"})
-CREATE (ff)-[:PART_OF]->(wot);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "pcc"})
+CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes: "reduced_in_shame_vs_active_in_guilt"}]->(b);
 
-// --- EMDR Consolidation Relationships ---
-MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (aip:TherapyConcept {id: "emdr_aip"})
-CREATE (consol)-[:MECHANISM_OF]->(aip);
 
-MATCH (gamma:TherapyConcept {id: "emdr_gamma"}), (consol:TherapyConcept {id: "emdr_consolidation"})
-CREATE (gamma)-[:MEDIATES]->(consol);
+// ============================================================
+// STEP 8: CREATE DOMINANT_NETWORK RELATIONSHIPS
+// ============================================================
 
-MATCH (recon:TherapyConcept {id: "emdr_reconsolidation"}), (consol:TherapyConcept {id: "emdr_consolidation"})
-CREATE (recon)-[:ENABLES]->(consol);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (n:FunctionalNetwork {id: "salience_network"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "hyper_engaged", evidenceGrade: "Strong"}]->(n);
 
-MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (hippo:BrainStructure {id: "hippocampus"})
-CREATE (consol)-[:INVOLVES {role: "source"}]->(hippo);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (n:FunctionalNetwork {id: "dan"})
+CREATE (p)-[:DOMINANT_NETWORK {evidenceGrade: "Strong"}]->(n);
 
-MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (consol)-[:INVOLVES {role: "unbinding_from"}]->(amyg);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (n:FunctionalNetwork {id: "salience_network"})
+CREATE (p)-[:DOMINANT_NETWORK {evidenceGrade: "Strong"}]->(n);
 
-MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (consol)-[:INVOLVES {role: "linking_to"}]->(mpfc);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (n:FunctionalNetwork {id: "salience_network"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "overloaded_high_gain", evidenceGrade: "Strong"}]->(n);
 
-MATCH (gamma:TherapyConcept {id: "emdr_gamma"}), (mc:Function {id: "memory_consolidation"})
-CREATE (gamma)-[:MODULATES]->(mc);
+// conservation_freeze: "Global dampening — no single dominant network" - no DOMINANT_NETWORK edge
 
-MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (emdr:TherapyModality {id: "emdr"})
-CREATE (consol)-[:BELONGS_TO]->(emdr);
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (n:FunctionalNetwork {id: "dmn"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "altered", evidenceGrade: "Strong"}]->(n);
 
-MATCH (gamma:TherapyConcept {id: "emdr_gamma"}), (emdr:TherapyModality {id: "emdr"})
-CREATE (gamma)-[:BELONGS_TO]->(emdr);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (n:FunctionalNetwork {id: "dmn"})
+CREATE (p)-[:DOMINANT_NETWORK {state: "dominant_with_altered_CEN_coupling", evidenceGrade: "Strong"}]->(n);
 
-MATCH (recon:TherapyConcept {id: "emdr_reconsolidation"}), (emdr:TherapyModality {id: "emdr"})
-CREATE (recon)-[:BELONGS_TO]->(emdr);
 
-// --- SE Neural Mappings ---
-MATCH (tit:TherapyConcept {id: "se_titration"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (tit)-[:ENGAGES {mechanism: "maintains mPFC online during trauma processing"}]->(mpfc);
+// ============================================================
+// STEP 9: CREATE ASSOCIATED_WITH RELATIONSHIPS (Pattern to Emotions)
+// ============================================================
 
-MATCH (tit:TherapyConcept {id: "se_titration"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (tit)-[:MODULATES {direction: "prevents_overwhelm"}]->(amyg);
+// Acute Alarm emotions
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "anxiety"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (tit:TherapyConcept {id: "se_titration"}), (opt:TherapyConcept {id: "wot_optimal_zone"})
-CREATE (tit)-[:MAINTAINS]->(opt);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "panic"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (pend:TherapyConcept {id: "se_pendulation"}), (ins:BrainStructure {id: "insula"})
-CREATE (pend)-[:MEDIATED_BY {mechanism: "insular interoceptive awareness"}]->(ins);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "overwhelm"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (pend:TherapyConcept {id: "se_pendulation"}), (vb:TherapyConcept {id: "pv_vagal_brake"})
-CREATE (pend)-[:UTILIZES]->(vb);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "fear"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (pend:TherapyConcept {id: "se_pendulation"}), (sn:FunctionalNetwork {id: "salience_network"})
-CREATE (pend)-[:REWIRES]->(sn);
+// Chronic Vigilance emotions
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (e:Emotion {id: "anxiety"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", quality: "watchful"}]->(e);
 
-MATCH (res:TherapyConcept {id: "se_resourcing"}), (nacc:BrainStructure {id: "nucleus_accumbens"})
-CREATE (res)-[:ACTIVATES]->(nacc);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (e:Emotion {id: "stress"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (res:TherapyConcept {id: "se_resourcing"}), (oxy:NeurochemicalSystem {id: "oxytocin"})
-CREATE (res)-[:PROMOTES]->(oxy);
+// Emotional Flooding emotions
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "overwhelm"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (disch:TherapyConcept {id: "se_discharge"}), (mc:BrainStructure {id: "motor_cortex"})
-CREATE (disch)-[:INVOLVES {mechanism: "motor system completion"}]->(mc);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "anger"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", quality: "explosive"}]->(e);
 
-MATCH (fs:TherapyConcept {id: "se_felt_sense"}), (int:Function {id: "interoception"})
-CREATE (fs)-[:ENGAGES]->(int);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "sadness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", quality: "cant_stop_crying"}]->(e);
 
-MATCH (fs:TherapyConcept {id: "se_felt_sense"}), (ai:BrainStructure {id: "anterior_insula"})
-CREATE (fs)-[:PRIMARY_CIRCUIT]->(ai);
+// Conservation/Freeze emotions
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (e:Emotion {id: "numbness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-// --- Shame/Guilt Neural Signature Relationships ---
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (dlpfc:BrainStructure {id: "dlpfc"})
-CREATE (sns)-[:PRIMARY_HUB]->(dlpfc);
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (e:Emotion {id: "emptiness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (pcc:BrainStructure {id: "pcc"})
-CREATE (sns)-[:PRIMARY_HUB]->(pcc);
+// Dissociation emotions
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (e:Emotion {id: "numbness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", quality: "numb_but_alert"}]->(e);
 
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (sns)-[:PRIMARY_HUB]->(dacc);
+// Rumination Loop emotions
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "sadness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "depressive_brooding"}]->(e);
 
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (sc:BrainStructure {id: "somatosensory_cortex"})
-CREATE (sns)-[:PRIMARY_HUB]->(sc);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "anxiety"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", subtype: "anxious_worry"}]->(e);
 
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (sns)-[:SUBCORTICAL_ACTIVATION {finding: "hypersensitivity in MDD"}]->(amyg);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "guilt"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate"}]->(e);
 
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (pi:BrainStructure {id: "posterior_insula"})
-CREATE (sns)-[:SUBCORTICAL_ACTIVATION]->(pi);
+// Reward Drive Low emotions
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (e:Emotion {id: "boredom"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (hs:Emotion {id: "hot_shame"})
-CREATE (sns)-[:SIGNATURE_OF]->(hs);
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (e:Emotion {id: "emptiness"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (sns:NeuralSignature {id: "shame_neural"}), (cs:Emotion {id: "cold_shame"})
-CREATE (sns)-[:SIGNATURE_OF]->(cs);
+// Social Threat/Shame emotions
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "hot_shame"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (gns:NeuralSignature {id: "guilt_neural"}), (tpj:BrainStructure {id: "tpj"})
-CREATE (gns)-[:PRIMARY_HUB {function: "theory of mind, other perspective"}]->(tpj);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "cold_shame"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
 
-MATCH (gns:NeuralSignature {id: "guilt_neural"}), (atl:BrainStructure {id: "atl"})
-CREATE (gns)-[:PRIMARY_HUB {function: "social semantic knowledge"}]->(atl);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "guilt"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "guilt"}]->(e);
 
-MATCH (gns:NeuralSignature {id: "guilt_neural"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (gns)-[:PRIMARY_HUB]->(mpfc);
+MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "rejection"})
+CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "social_rejection"}]->(e);
 
-MATCH (gns:NeuralSignature {id: "guilt_neural"}), (ai:BrainStructure {id: "anterior_insula"})
-CREATE (gns)-[:SHARED_CORE {notes: "emotional awareness"}]->(ai);
 
-MATCH (gns:NeuralSignature {id: "guilt_neural"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (gns)-[:SHARED_CORE {notes: "negative affect/conflict"}]->(dacc);
+// ============================================================
+// STEP 10: CREATE MODULATED_BY RELATIONSHIPS
+// Any pattern can be modulated by any modulator
+// ============================================================
 
-MATCH (gns:NeuralSignature {id: "guilt_neural"}), (guilt:Emotion {id: "guilt"})
-CREATE (gns)-[:SIGNATURE_OF]->(guilt);
+// Sleep Loss affects all patterns
+MATCH (p:ActivationPattern), (m:StateModulator {id: "sleep_loss_sensitization"})
+WHERE p.id IN ["acute_alarm", "chronic_vigilance", "emotional_flooding", "rumination_loop", "social_threat_shame"]
+CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
 
-MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (sp)-[:PRIMARY_HUB]->(dacc);
+// Acute Stress affects prefrontal-dependent patterns
+MATCH (p:ActivationPattern), (m:StateModulator {id: "acute_stress_catecholamine"})
+WHERE p.id IN ["acute_alarm", "emotional_flooding", "rumination_loop"]
+CREATE (p)-[:MODULATED_BY {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"}]->(m);
 
-MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (ai:BrainStructure {id: "anterior_insula"})
-CREATE (sp)-[:PRIMARY_HUB]->(ai);
+// Interoceptive Threat Bias affects body-signal-sensitive patterns
+MATCH (p:ActivationPattern), (m:StateModulator {id: "interoceptive_threat_bias"})
+WHERE p.id IN ["acute_alarm", "conservation_freeze", "dissociation_overmodulation"]
+CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"}]->(m);
 
-MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (thal:BrainStructure {id: "thalamus"})
-CREATE (sp)-[:PRIMARY_HUB]->(thal);
 
-MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (rej:Emotion {id: "rejection"})
-CREATE (sp)-[:SIGNATURE_OF]->(rej);
+// ============================================================
+// STEP 11: CREATE TRIGGERS_SAFETY RELATIONSHIPS
+// ============================================================
 
-// --- CPT Neural Dissociation ---
-MATCH (ret:TherapyConcept {id: "cpt_retrieval"}), (dlpfc:BrainStructure {id: "dlpfc"})
-CREATE (ret)-[:NEURAL_HUB {side: "left", brodmann_area: "9/46"}]->(dlpfc);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (s:SafetyFlag {id: "crisis_self_harm"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "out_of_control_with_intent_language", threshold: "immediate"}]->(s);
 
-MATCH (ctrl:TherapyConcept {id: "cpt_control"}), (acc:BrainStructure {id: "acc"})
-CREATE (ctrl)-[:NEURAL_HUB {side: "left", brodmann_area: "24/32"}]->(acc);
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (s:SafetyFlag {id: "crisis_suicidal"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "dissociation_plus_suicidal_ideation", threshold: "immediate"}]->(s);
 
-MATCH (ret:TherapyConcept {id: "cpt_retrieval"}), (cpt:TherapyModality {id: "cpt"})
-CREATE (ret)-[:BELONGS_TO]->(cpt);
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (s:SafetyFlag {id: "clinical_referral_severe_dissociation"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "cannot_orient_to_present", threshold: "immediate"}]->(s);
 
-MATCH (ctrl:TherapyConcept {id: "cpt_control"}), (cpt:TherapyModality {id: "cpt"})
-CREATE (ctrl)-[:BELONGS_TO]->(cpt);
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (s:SafetyFlag {id: "clinical_referral_shutdown"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "7_plus_consecutive_days", threshold: "persistent"}]->(s);
 
-MATCH (ret:TherapyConcept {id: "cpt_retrieval"}), (sp:TherapyConcept {id: "cpt_stuck_point"})
-CREATE (ret)-[:ADDRESSES]->(sp);
+MATCH (p:ActivationPattern {id: "rumination_loop"}), (s:SafetyFlag {id: "crisis_suicidal"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "ruminative_content_involves_suicidal_ideation", threshold: "immediate"}]->(s);
 
-MATCH (ctrl:TherapyConcept {id: "cpt_control"}), (sp:TherapyConcept {id: "cpt_stuck_point"})
-CREATE (ctrl)-[:ADDRESSES]->(sp);
+MATCH (p:ActivationPattern {id: "reward_drive_low"}), (s:SafetyFlag {id: "clinical_referral_shutdown"})
+CREATE (p)-[:TRIGGERS_SAFETY {condition: "pervasive_anhedonia_multiple_checkins", threshold: "persistent"}]->(s);
 
-// --- IFS Self Enhanced Mappings ---
-MATCH (self:TherapyConcept {id: "ifs_self"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (self)-[:NEURAL_HUB {mechanism: "metacognitive magic, balances neurochemicals"}]->(mpfc);
 
-MATCH (self:TherapyConcept {id: "ifs_self"}), (ser:NeurochemicalSystem {id: "serotonin"})
-CREATE (self)-[:ASSOCIATED_WITH {role: "calm stabilizer"}]->(ser);
+// ============================================================
+// STEP 12: CREATE CAN_ESCALATE_TO RELATIONSHIPS
+// ============================================================
 
-MATCH (self:TherapyConcept {id: "ifs_self"}), (oxy:NeurochemicalSystem {id: "oxytocin"})
-CREATE (self)-[:ASSOCIATED_WITH {role: "trust between Self and parts"}]->(oxy);
+// Social threat can escalate to reactive aggression
+MATCH (p1:ActivationPattern {id: "social_threat_shame"}), (p2:ActivationPattern {id: "reactive_aggression"})
+CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "regain_social_status", weight: "weak"}]->(p2);
 
-MATCH (self:TherapyConcept {id: "ifs_self"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (self)-[:INHIBITS {mechanism: "inhibitory signals quiet alarm system"}]->(amyg);
+// Conservation freeze rebound
+MATCH (p1:ActivationPattern {id: "conservation_freeze"}), (p2:ActivationPattern {id: "acute_alarm"})
+CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "rebound_from_pulling_out_too_quickly", weight: "moderate"}]->(p2);
 
-MATCH (unb:TherapyConcept {id: "ifs_unblending"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (unb)-[:ACTIVATES]->(mpfc);
+// Acute alarm to flooding
+MATCH (p1:ActivationPattern {id: "acute_alarm"}), (p2:ActivationPattern {id: "emotional_flooding"})
+CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "regulatory_failure", weight: "moderate"}]->(p2);
 
-MATCH (unb:TherapyConcept {id: "ifs_unblending"}), (acc:BrainStructure {id: "acc"})
-CREATE (unb)-[:ACTIVATES {role: "conflict manager, releases serotonin"}]->(acc);
 
-// --- ATL Relationships ---
-MATCH (atl:BrainStructure {id: "atl"}), (sc:Function {id: "social_cognition"})
-CREATE (atl)-[:IMPLICATED_IN {role: "social semantic knowledge"}]->(sc);
+// ============================================================
+// STEP 13: LINK PATTERNS TO WINDOW OF TOLERANCE ZONES
+// Cross-reference with existing WoT concepts
+// ============================================================
 
-MATCH (atl:BrainStructure {id: "atl"}), (tc:BrainStructure {id: "temporal_cortex"})
-CREATE (atl)-[:PART_OF]->(tc);
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
 
-// --- Fear Extinction Enhanced ---
-MATCH (vmpfc:BrainStructure {id: "vmpfc"}), (fe:Function {id: "fear_extinction"})
-CREATE (vmpfc)-[:HOMOLOGUE_OF {rodent_structure: "infralimbic cortex", evidence: "translational research"}]->(fe);
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
 
-MATCH (fe:Function {id: "fear_extinction"}), (da:NeurochemicalSystem {id: "dopamine"})
-CREATE (fe)-[:MEDIATED_BY {role: "reward learning"}]->(da);
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "extreme"}]->(wot);
 
-MATCH (fe:Function {id: "fear_extinction"}), (hippo:BrainStructure {id: "hippocampus"})
-CREATE (fe)-[:CONTEXT_DEPENDENT_ON]->(hippo);
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (wot:TherapyConcept {id: "wot_hypoarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
 
-MATCH (fe:Function {id: "fear_extinction"}), (cereb:BrainStructure {id: "cerebellum"})
-CREATE (fe)-[:INVOLVES]->(cereb);
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (wot:TherapyConcept {id: "wot_frozen_flight"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "subtype_freeze_high_arousal"}]->(wot);
+
+MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (wot:TherapyConcept {id: "wot_hypoarousal"})
+CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "distinct_mechanism"}]->(wot);
+
+
+// ============================================================
+// STEP 14: LINK PATTERNS TO POLYVAGAL STATES
+// Cross-reference with existing Polyvagal concepts
+// ============================================================
+
+MATCH (p:ActivationPattern {id: "acute_alarm"}), (pv:TherapyConcept {id: "pv_sympathetic"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong"}]->(pv);
+
+MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (pv:TherapyConcept {id: "pv_sympathetic"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong", notes: "sustained_mobilization"}]->(pv);
+
+MATCH (p:ActivationPattern {id: "emotional_flooding"}), (pv:TherapyConcept {id: "pv_sympathetic"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong", notes: "extreme_mobilization"}]->(pv);
+
+// Note: conservation_freeze linked to PAG, NOT "dorsal vagal" per expert consensus
+MATCH (p:ActivationPattern {id: "conservation_freeze"}), (pv:TherapyConcept {id: "pv_dorsal_vagal"})
+CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Moderate", notes: "use_PAG_centered_framing_not_polyvagal_language", caveat: "polyvagal_framing_contested_4_of_4_experts"}]->(pv);
+
+
+// ============================================================
+// STEP 15: CREATE UNIQUE CONSTRAINTS AND INDEXES
+// Run these separately if needed
+// ============================================================
+
+// CREATE CONSTRAINT activation_pattern_id IF NOT EXISTS FOR (a:ActivationPattern) REQUIRE a.id IS UNIQUE;
+// CREATE CONSTRAINT state_modulator_id IF NOT EXISTS FOR (s:StateModulator) REQUIRE s.id IS UNIQUE;
+// CREATE CONSTRAINT safety_flag_id IF NOT EXISTS FOR (s:SafetyFlag) REQUIRE s.id IS UNIQUE;
+// CREATE INDEX activation_pattern_evidence IF NOT EXISTS FOR (a:ActivationPattern) ON (a.evidenceGrade);
+// CREATE INDEX activation_pattern_phase IF NOT EXISTS FOR (a:ActivationPattern) ON (a.phaseRelease);
+
+
+// ============================================================
+// END OF ACTIVATION PATTERN LAYER INCREMENTAL UPDATE
+// ============================================================

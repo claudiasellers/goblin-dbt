@@ -115,6 +115,109 @@ export async function initializeSchema(): Promise<void> {
 }
 
 // ============================================
+// KNOWLEDGE GRAPH QUERY FUNCTIONS
+// These power the neural state matching and recommendations
+// ============================================
+
+// Types for state analysis
+export interface ActivationPatternResult {
+  id: string;
+  userFacingLabel: string;
+  description: string;
+  evidenceGrade: string;
+  safetyConstraints: string[];
+  clinicalNotes: string;
+  confidence: number;
+}
+
+export interface ToolRecommendation {
+  id: string;
+  name: string;
+  description: string;
+  whenToUse: string;
+  dbtBasis?: string;
+  relevance: string;
+}
+
+export interface SafetyFlag {
+  id: string;
+  type: string;
+  trigger: string;
+  action: string;
+}
+
+export interface StateResult {
+  pattern: ActivationPatternResult;
+  tools: ToolRecommendation[];
+  safetyFlag?: SafetyFlag;
+}
+
+export interface RelatedEmotion {
+  id: string;
+  name: string;
+  reason: string;
+}
+
+// Cloud Function references for graph queries
+const getStateAndToolsFn = httpsCallable<
+  {
+    quadrant: string;
+    emotions?: string[];
+    intensity?: { x: number; y: number };
+    bodySensations?: Array<{ region: string; tags?: string[] }>;
+  },
+  StateResult
+>(functions, 'getStateAndTools');
+
+const getRelatedEmotionsFn = httpsCallable<
+  { emotionId: string; quadrant?: string },
+  { relatedEmotions: RelatedEmotion[] }
+>(functions, 'getRelatedEmotions');
+
+const getQuickToolsFn = httpsCallable<
+  { quadrant: string; intensity?: { x: number; y: number } },
+  { tools: ToolRecommendation[]; message: string }
+>(functions, 'getQuickTools');
+
+/**
+ * Get the activation pattern and recommended tools based on check-in data
+ * This is the main "What's happening right now" query
+ */
+export async function getStateAndTools(input: {
+  quadrant: string;
+  emotions?: string[];
+  intensity?: { x: number; y: number };
+  bodySensations?: Array<{ region: string; tags?: string[] }>;
+}): Promise<StateResult> {
+  const result = await getStateAndToolsFn(input);
+  return result.data;
+}
+
+/**
+ * Get related emotions based on shared neural substrates
+ * Powers the "You might also be feeling..." feature
+ */
+export async function getRelatedEmotions(
+  emotionId: string,
+  quadrant?: string
+): Promise<RelatedEmotion[]> {
+  const result = await getRelatedEmotionsFn({ emotionId, quadrant });
+  return result.data.relatedEmotions;
+}
+
+/**
+ * Get quick tools based on just quadrant and intensity
+ * Used for the "Help me now" minimal-input path
+ */
+export async function getQuickTools(
+  quadrant: string,
+  intensity?: { x: number; y: number }
+): Promise<{ tools: ToolRecommendation[]; message: string }> {
+  const result = await getQuickToolsFn({ quadrant, intensity });
+  return result.data;
+}
+
+// ============================================
 // REMOVED - These were for direct Neo4j access
 // ============================================
 // The following functions are no longer needed since we don't connect directly:

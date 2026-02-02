@@ -3117,3 +3117,297 @@ CREATE (cpt_control_demand:TherapyConcept {
   change_direction: "may increase with skill refinement",
   notes: "High-level monitoring to override deeply ingrained schemas"
 })
+
+
+// ============================================================
+// ACTIVATION PATTERN LAYER
+// Source: Goblin DBT Neural Activation Pattern Definitions
+// Synthesized Expert Deliverable (February 2026)
+// 
+// This layer defines the 8 core activation patterns used by the
+// recommendation engine to match user states to appropriate tools.
+// ============================================================
+
+
+// ============================================================
+// ADDITIONAL BRAIN STRUCTURES FOR ACTIVATION PATTERNS
+// These structures are referenced by patterns but weren't in base schema
+// ============================================================
+
+// PAG Subdivisions (base pag is too general for pattern specificity)
+CREATE (dlpag:BrainStructure {
+  id: "dlpag",
+  name: "Dorsolateral Periaqueductal Gray",
+  description: "Active defense component of PAG; involved in fight/flight responses and emotional flooding",
+  aliases: ["dlPAG"],
+  level: "brainstem",
+  parent_structure: "pag"
+})
+
+CREATE (vlpag:BrainStructure {
+  id: "vlpag",
+  name: "Ventrolateral Periaqueductal Gray",
+  description: "Passive defense coordinator; mediates freezing, immobility, and conservation responses",
+  aliases: ["vlPAG"],
+  level: "brainstem",
+  parent_structure: "pag"
+})
+
+// Inferior Frontal Gyrus (behavioral inhibition in social threat)
+CREATE (ifg:BrainStructure {
+  id: "ifg",
+  name: "Inferior Frontal Gyrus",
+  description: "Involved in response inhibition, language processing, and behavioral inhibition (urge to hide in shame)",
+  aliases: ["IFG", "Broca's area (pars opercularis)"],
+  level: "cortical"
+})
+
+// Premotor Cortex (behavioral inhibition)
+CREATE (premotor:BrainStructure {
+  id: "premotor_cortex",
+  name: "Premotor Cortex",
+  description: "Motor planning and preparation; involved in behavioral inhibition during social threat",
+  aliases: ["PMC", "premotor area"],
+  level: "cortical"
+})
+
+// Dorsal Striatum (separate from NAc for goal initiation)
+CREATE (dorsal_striatum:BrainStructure {
+  id: "dorsal_striatum",
+  name: "Dorsal Striatum",
+  description: "Caudate and putamen; action selection, goal initiation, and habit formation",
+  aliases: ["caudate-putamen"],
+  level: "subcortical"
+})
+
+// Precuneus (DMN core, depersonalization)
+CREATE (precuneus:BrainStructure {
+  id: "precuneus",
+  name: "Precuneus",
+  description: "Medial parietal cortex; self-referential processing, autobiographical memory, DMN hub",
+  aliases: ["medial parietal cortex"],
+  level: "cortical"
+})
+
+
+// ============================================================
+// ACTIVATION PATTERNS (8 Core + 2 Phase-2)
+// Evidence Grades: Strong | Moderate-Strong | Moderate | Emerging
+// ============================================================
+
+// Pattern 1: Acute Alarm
+CREATE (acute_alarm:ActivationPattern {
+  id: "acute_alarm",
+  userFacingLabel: "Your brain's alarm system is activated right now",
+  description: "Phasic/immediate threat response with amygdala-driven arousal and suppressed prefrontal regulation",
+  evidenceGrade: "Strong",
+  expertConsensus: "4/4",
+  keyCitations: ["Shin & Liberzon (2010)", "LeDoux (2016)", "Rauch/Shin/Phelps (2006)", "Reyes et al. (2025, LC-NE)"],
+  clinicalNotes: "BNST involvement scales with sustained/uncertain threat. LC-NE amplifies arousal. Hippocampus suppression = contextual safety signaling less effective.",
+  safetyConstraints: ["Do not say 'amygdala hijacking'", "Frame as current state not trait", "Use 'right now' not 'you tend to'"]
+})
+
+// Pattern 2: Chronic Vigilance
+CREATE (chronic_vigilance:ActivationPattern {
+  id: "chronic_vigilance",
+  userFacingLabel: "Your attention is locked onto what could go wrong",
+  description: "Sustained/anticipatory threat processing with BNST as primary driver; radar stuck on mode",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "4/4 confirmed as distinct from acute alarm",
+  keyCitations: ["Somerville et al. (BNST threat proximity)", "Klumpers et al. (BNST vs amygdala)", "Shackman & Fox (extended amygdala)", "Petranu et al. (BNST in PTSD)"],
+  clinicalNotes: "BNST specialized for defensive distance. Treatment levers: attentional retraining and safety-signal conditioning vs autonomic downshift for acute alarm.",
+  safetyConstraints: ["Superior colliculus REJECTED as core node - sparse human fMRI evidence"]
+})
+
+// Pattern 3: Emotional Flooding
+CREATE (emotional_flooding:ActivationPattern {
+  id: "emotional_flooding",
+  userFacingLabel: "Your feelings are hitting all at once",
+  description: "PFC essentially offline; salience network overloaded; cognitive tools will fail in this state",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "4/4 confirmed as clinically distinct from acute alarm",
+  keyCitations: ["Shin & Liberzon (2010)", "SN hyperreactivity literature", "PAG-insula disinhibition (emerging)"],
+  clinicalNotes: "OFC suppression is key differentiator - cannot reason about emotion. MUST recommend bottom-up autonomic tools: cold water, paced breathing, PMR. dlPAG involvement (active defense) included with moderate evidence.",
+  safetyConstraints: ["Screen for self-harm risk when 'out of control' reported", "Emergency state - present tools immediately with minimal cognitive demand", "No browsing, 1-2 options max"]
+})
+
+// Pattern 4: Conservation/Freeze
+CREATE (conservation_freeze:ActivationPattern {
+  id: "conservation_freeze",
+  userFacingLabel: "Your system is conserving energy right now",
+  description: "PAG-centered shutdown/freeze; global dampening with no single dominant network",
+  evidenceGrade: "Moderate",
+  expertConsensus: "3/4 on PAG-centered mechanism; polyvagal framing contested",
+  keyCitations: ["Roelofs (2017, freezing model)", "Kozlowska et al. (defense cascade)", "human freezing/bradycardia PAG literature"],
+  subtype: ["freeze_high_arousal", "collapse_low_arousal"],
+  clinicalNotes: "Model PAG as coordinator NOT 'Dorsal Vagal Complex'. Use neutral ANS terminology. Thalamic suppression reduces sensory bandwidth contributing to dissociative experiences.",
+  safetyConstraints: ["CRITICAL: Traditional calming tools may worsen state", "Do NOT recommend deep breathing or meditation", "Favor gentle up-regulation: cold water, proprioceptive input, micro-movements", "Pulling out too quickly can trigger rebound panic"]
+})
+
+// Pattern 5: Dissociation/Overmodulation
+CREATE (dissociation_overmodulation:ActivationPattern {
+  id: "dissociation_overmodulation",
+  userFacingLabel: "Your mind is protecting you by disconnecting",
+  description: "PFC OVER-active suppressing limbic response; distinct from global dampening of conservation_freeze",
+  evidenceGrade: "Strong within PTSD-dissociative subtype; Moderate for broader DPDR",
+  expertConsensus: "3/4 explicitly separated from shutdown",
+  keyCitations: ["Lanius (2010, 2012, dissociative PTSD)", "Modesti et al. (2022 review)", "Murphy et al. (2023 DPDR overview)"],
+  clinicalNotes: "Control tower actively silencing alarms. Needs interoceptive reconnection - slowly re-establishing contact with suppressed body signals. Amygdala SUPPRESSION is defining feature.",
+  safetyConstraints: ["Dissociation + suicidal ideation = escalation pathway", "Do NOT suggest heavy interoceptive exposure without titration", "Somatic Experiencing and gentle proprioceptive input are safer entry points"]
+})
+
+// Pattern 6: Rumination Loop
+CREATE (rumination_loop:ActivationPattern {
+  id: "rumination_loop",
+  userFacingLabel: "Your mind is stuck on replay",
+  description: "DMN hyperactivity with sgACC coupling; self-referential processing infused with negative valence",
+  evidenceGrade: "Strong for depressive rumination; Moderate for anxious worry",
+  expertConsensus: "4/4 confirmed core DMN hyperactivity model",
+  keyCitations: ["Hamilton et al. (2015, DMN-rumination meta-analytic)", "Zhou et al. (2020, rumination meta-analysis)", "Menon (2023, DMN review)"],
+  subtype: ["depressive_brooding", "anxious_worry"],
+  clinicalNotes: "DMN and sgPFC create caustic compound when functionally linked. dlPFC suppression NOT universal - may be active but failing in anxious worry. Break the link via task-positive activities requiring external focus. Mindfulness can backfire by increasing internal focus.",
+  safetyConstraints: ["If ruminative content involves suicidal ideation trigger crisis pathways", "Do not use 'brain is broken' framing"]
+})
+
+// Pattern 7: Reward Drive Low
+CREATE (reward_drive_low:ActivationPattern {
+  id: "reward_drive_low",
+  userFacingLabel: "Your motivation system is idling right now",
+  description: "Ventral striatal blunting with reduced dopamine signaling; positive valence system under-engaged",
+  evidenceGrade: "Strong for ventral striatal blunting; Moderate for inflammation mechanism",
+  expertConsensus: "4/4 on core, 2/4 on inflammation mechanism",
+  keyCitations: ["Keren et al. (2018, reward meta-analysis)", "Ng et al. (2019)", "Halahakoon et al. (2020)", "inflammation-DA convergence reviews"],
+  clinicalNotes: "Frame as 'reward system under-engaged' not single-cause. Inflammation→dopamine suppression is emerging evidence only - NOT inferable from self-report. High-effort goal setting may backfire. Recommend low-friction behavioral activation with small immediate sensory rewards.",
+  safetyConstraints: ["Screen for MDE if anhedonia pervasive across multiple check-ins", "Consider fatigue/inflammation screening if persistent", "Do NOT imply 'not trying hard enough'"]
+})
+
+// Pattern 8: Social Threat/Shame
+CREATE (social_threat_shame:ActivationPattern {
+  id: "social_threat_shame",
+  userFacingLabel: "Your brain is treating social evaluation like danger",
+  description: "Self-evaluation-forward rather than amygdala-forward; intense Theory-of-Mind engagement modeling negative gaze of others",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "4/4 confirmed as distinct from general anxiety",
+  keyCitations: ["Eisenberger (2012, social pain)", "Piretti et al. (2023 meta-analysis)", "Eslinger (2021, social feelings review)", "voxel-based shame/embarrassment analyses"],
+  subtype: ["shame", "social_rejection", "guilt"],
+  clinicalNotes: "Shame activates behavioral inhibition (hide/freeze). Guilt activates TPJ/reparative action. Social rejection activates dACC/insula pain. vmPFC suppression is state-dependent. Can trigger reactive aggression to regain social status.",
+  safetyConstraints: ["Emphasize self-compassion and common humanity", "Avoid tools that increase self-focus (journaling may amplify shame)", "Do not suggest hopelessness/worthlessness as co-occurring without extreme care"]
+})
+
+// Phase-2 Pattern A: Grief/Yearning
+CREATE (grief_yearning:ActivationPattern {
+  id: "grief_yearning",
+  userFacingLabel: "Your attachment system is reaching for who is gone",
+  description: "NAc/ventral striatum yearning/craving, PCC autobiographical memory, amygdala distress",
+  evidenceGrade: "Moderate",
+  expertConsensus: "2/4 include in core, 1/4 phase-2, 1/4 reject",
+  keyCitations: ["O'Connor et al. (2008)", "Kakarala et al. (2020)"],
+  phaseRelease: "phase_2",
+  clinicalNotes: "NAc findings specific to PROLONGED/COMPLICATED grief. Do not generalize to all grief.",
+  safetyConstraints: ["Never use 'moving on' language", "Focus on integrated memory and meaning-making", "Do not pathologize normal grief trajectories"]
+})
+
+// Phase-2 Pattern B: Reactive Aggression
+CREATE (reactive_aggression:ActivationPattern {
+  id: "reactive_aggression",
+  userFacingLabel: "Your protection system is translating stress into anger",
+  description: "Amygdala-hypothalamus-PAG attack circuit with suppressed regulatory PFC nodes",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "3/4 include, 1/4 omit from initial release",
+  keyCitations: ["hypothalamic-limbic attack circuit literature", "amygdala/PAG meta-analytic evidence"],
+  phaseRelease: "phase_2",
+  clinicalNotes: "Higher safety complexity. Tools must discharge sympathetic energy safely before cognitive tools. Affect labeling re-engages vlPFC. High association with hostile attribution bias.",
+  safetyConstraints: ["Proactive/instrumental aggression REJECTED for all releases", "Only reactive aggression modeled", "Requires careful tool sequencing to avoid escalation"]
+})
+
+
+// ============================================================
+// STATE MODULATORS
+// Attach to any pattern via MODULATED_BY relationship
+// Explain why same pattern feels different on different days
+// ============================================================
+
+CREATE (sleep_loss:StateModulator {
+  id: "sleep_loss_sensitization",
+  userFacingLabel: "Poor sleep is turning up the volume on your emotions",
+  description: "Increases amygdala reactivity, decreases PFC-amygdala coupling, increases SN bias",
+  evidenceGrade: "Strong",
+  expertConsensus: "4/4",
+  keyCitations: ["Yoo et al. (2007) + replications"],
+  duration: "hours_to_days",
+  effectOnPatterns: "Amygdala reactivity increases; PFC-amygdala coupling decreases; SN bias increases",
+  toolSequencing: "Address sleep first before expecting cognitive tools to work",
+  safetyConstraints: ["Insomnia with significant impairment should route to clinical referral"]
+})
+
+CREATE (acute_stress_catecholamine:StateModulator {
+  id: "acute_stress_catecholamine",
+  userFacingLabel: "Stress is switching off your planning circuits right now",
+  description: "dlPFC working memory and top-down control degraded; habit/limbic circuits gain dominance",
+  evidenceGrade: "Strong",
+  expertConsensus: "3/4 explicit, 1/4 implicit",
+  keyCitations: ["Arnsten 2015", "Gamo & Arnsten 2015"],
+  duration: "minutes_to_hours",
+  effectOnPatterns: "dlPFC working memory degraded; habit/limbic circuits dominant",
+  toolSequencing: "Reduce stress load before attempting executive-function-dependent tools (reappraisal, planning)",
+  safetyConstraints: ["Model as state node not trait - this is reversible"]
+})
+
+CREATE (interoceptive_threat_bias:StateModulator {
+  id: "interoceptive_threat_bias",
+  userFacingLabel: "Your body signals feel noisy or threatening right now",
+  description: "Anterior insula and dACC hyperprecision; body signals interpreted as threats; worsens panic and health anxiety",
+  evidenceGrade: "Moderate-Strong",
+  expertConsensus: "2/4 explicit",
+  keyCitations: ["Khalsa et al. (2018)", "Paulus et al. (2019)", "Kleckner et al. (2017)"],
+  duration: "variable",
+  effectOnPatterns: "Body signals interpreted as threats; worsens panic, health anxiety; distinguishes from externally-focused Patterns 1-2",
+  toolSequencing: "Interoceptive recalibration tools",
+  safetyConstraints: ["Avoid deterministic claims", "Do NOT say 'your insula is broken'"]
+})
+
+
+// ============================================================
+// SAFETY FLAGS
+// Crisis escalation triggers for pattern-safety integration
+// ============================================================
+
+CREATE (crisis_suicidal:SafetyFlag {
+  id: "crisis_suicidal",
+  type: "crisis",
+  trigger: "Suicidal ideation in any pattern",
+  action: "Immediate cessation of tool recommendation; present safety resources",
+  doNot: "Attempt to 'modulate' or offer coping tools"
+})
+
+CREATE (crisis_self_harm:SafetyFlag {
+  id: "crisis_self_harm",
+  type: "crisis",
+  trigger: "Self-harm urges + 'out of control'",
+  action: "Safety anchor (crisis line, emergency contact) BEFORE any tool",
+  doNot: "Recommend distress tolerance tools as primary response"
+})
+
+CREATE (clinical_referral_shutdown:SafetyFlag {
+  id: "clinical_referral_shutdown",
+  type: "clinical_referral",
+  trigger: "Persistent shutdown (7+ consecutive days of numb/empty)",
+  action: "Flag potential chronic dysfunction; recommend professional evaluation",
+  doNot: "Continue offering app-based tools as if they're sufficient"
+})
+
+CREATE (clinical_referral_psychosis:SafetyFlag {
+  id: "clinical_referral_psychosis",
+  type: "clinical_referral",
+  trigger: "Psychotic symptoms (hallucinations, delusions)",
+  action: "Acknowledge experience without validating; offer referral",
+  doNot: "Attempt reality testing or reappraisal"
+})
+
+CREATE (clinical_referral_severe_dissociation:SafetyFlag {
+  id: "clinical_referral_severe_dissociation",
+  type: "clinical_referral",
+  trigger: "Severe dissociation (user cannot orient to present)",
+  action: "Gentle grounding only; redirect to professional support",
+  doNot: "Push interoceptive exposure or trauma processing"
+})

@@ -1,16 +1,52 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { getEmotionsByQuadrant, quadrantColors } from '../../data/emotions';
+import { getRelatedEmotions, type RelatedEmotion } from '../../services/neo4j';
 
 interface EmotionGridProps {
   quadrant: string;
   onSelect: (emotions: string[]) => void;
+  showRelated?: boolean;
 }
 
-export function EmotionGrid({ quadrant, onSelect }: EmotionGridProps) {
+export function EmotionGrid({ quadrant, onSelect, showRelated = false }: EmotionGridProps) {
   const [search, setSearch] = useState('');
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
+  const [relatedEmotions, setRelatedEmotions] = useState<RelatedEmotion[]>([]);
+  const [loadingRelated, setLoadingRelated] = useState(false);
+  
   const emotions = useMemo(() => getEmotionsByQuadrant(quadrant), [quadrant]);
   const colors = quadrantColors[quadrant];
+
+  // Fetch related emotions when the first emotion is selected
+  useEffect(() => {
+    if (!showRelated || selectedEmotions.length === 0) {
+      setRelatedEmotions([]);
+      return;
+    }
+
+    const firstEmotion = selectedEmotions[0];
+    // Convert to graph ID format (lowercase, underscores)
+    const emotionId = firstEmotion.toLowerCase().replace(/\s+/g, '_');
+
+    setLoadingRelated(true);
+    getRelatedEmotions(emotionId, quadrant)
+      .then(related => {
+        // Filter out already-selected emotions
+        const filtered = related.filter(
+          r => !selectedEmotions.some(
+            s => s.toLowerCase() === r.name.toLowerCase()
+          )
+        );
+        setRelatedEmotions(filtered);
+      })
+      .catch(err => {
+        console.error('Failed to get related emotions:', err);
+        setRelatedEmotions([]);
+      })
+      .finally(() => {
+        setLoadingRelated(false);
+      });
+  }, [selectedEmotions, showRelated, quadrant]);
 
   const filteredEmotions = useMemo(() => {
     if (!search.trim()) return emotions;
@@ -26,6 +62,19 @@ export function EmotionGrid({ quadrant, onSelect }: EmotionGridProps) {
         return [...prev, emotionName];
       }
     });
+  }
+
+  function addRelatedEmotion(emotion: RelatedEmotion) {
+    // Convert the graph emotion name to title case
+    const formattedName = emotion.name
+      .replace(/_/g, ' ')
+      .replace(/\b\w/g, c => c.toUpperCase());
+    
+    if (!selectedEmotions.includes(formattedName)) {
+      setSelectedEmotions(prev => [...prev, formattedName]);
+    }
+    // Remove from related list
+    setRelatedEmotions(prev => prev.filter(r => r.id !== emotion.id));
   }
 
   function handleAddCustom() {
@@ -85,6 +134,45 @@ export function EmotionGrid({ quadrant, onSelect }: EmotionGridProps) {
               </button>
             </span>
           ))}
+        </div>
+      )}
+
+      {/* "You might also be feeling..." - vocabulary expansion */}
+      {showRelated && selectedEmotions.length > 0 && (
+        <div className="mb-4">
+          {loadingRelated ? (
+            <div className="p-3 rounded-lg bg-[var(--color-sage-50)] border border-[var(--color-sage-200)]">
+              <p className="text-sm text-[var(--color-sage-500)] text-center">
+                Finding related feelings...
+              </p>
+            </div>
+          ) : relatedEmotions.length > 0 ? (
+            <div className="p-3 rounded-lg bg-[var(--color-sage-50)] border border-[var(--color-sage-200)]">
+              <p className="text-sm text-[var(--color-sage-600)] mb-2">
+                Some people who feel <strong>{selectedEmotions[0].toLowerCase()}</strong> also describe:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {relatedEmotions.map((related) => (
+                  <button
+                    key={related.id}
+                    onClick={() => addRelatedEmotion(related)}
+                    className="group flex items-center gap-1 py-1.5 px-3 rounded-full text-sm
+                      bg-white border border-[var(--color-sage-300)] text-[var(--color-sage-700)]
+                      hover:bg-[var(--color-sage-100)] hover:border-[var(--color-sage-400)]
+                      transition-colors"
+                  >
+                    <span>{formatEmotionName(related.name)}</span>
+                    <span className="text-[var(--color-sage-400)] group-hover:text-[var(--color-sage-600)]">
+                      +
+                    </span>
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-[var(--color-sage-500)] mt-2">
+                Tap to add · {relatedEmotions[0]?.reason}
+              </p>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -173,4 +261,11 @@ export function EmotionGrid({ quadrant, onSelect }: EmotionGridProps) {
       </div>
     </div>
   );
+}
+
+// Helper to format emotion names from graph format
+function formatEmotionName(name: string): string {
+  return name
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, c => c.toUpperCase());
 }
