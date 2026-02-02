@@ -542,19 +542,27 @@ CREATE (sadness:Emotion {
 CREATE (cold_shame:Emotion {
   id: "cold_shame",
   name: "Cold Shame",
-  description: "Internalized shame with low arousal - collapse, withdrawal, worthlessness",
+  description: "Internalized shame with low arousal - collapse, withdrawal, worthlessness; global negative self-evaluation",
   valence: "negative",
   arousal: "low",
-  quadrant: "low-unpleasant"
+  quadrant: "low-unpleasant",
+  evaluative_focus: "Global Self ('I am defective')",
+  action_tendency: "hiding, withdrawal, submission",
+  trait_vulnerability_marker: true,
+  clinical_note: "Hypersensitivity persists even in MDD remission - trait marker for depression"
 })
 
 CREATE (guilt:Emotion {
   id: "guilt",
   name: "Guilt",
-  description: "Feeling of responsibility for wrongdoing",
+  description: "Feeling of responsibility for wrongdoing; behavior-specific and other-oriented",
   valence: "negative",
   arousal: "low_to_moderate",
-  quadrant: "low-unpleasant"
+  quadrant: "low-unpleasant",
+  evaluative_focus: "Specific Behavior ('I did something wrong')",
+  action_tendency: "reparation, apology, prosocial behavior",
+  social_orientation: "other-focused",
+  clinical_note: "Often adaptive; increases empathic concern; maladaptive when ruminative"
 })
 
 CREATE (loneliness:Emotion {
@@ -1042,10 +1050,14 @@ CREATE (manager_ifs:TherapyConcept {
 CREATE (self_energy:TherapyConcept {
   id: "ifs_self",
   name: "Self",
-  description: "Core, undamaged essence characterized by the 8 C's",
+  description: "Core, undamaged essence characterized by the 8 C's; neurobiologically corresponds to mPFC activation and ventral vagal tone",
   modality: "IFS",
   role: "core_self",
-  qualities: ["Curiosity", "Calm", "Clarity", "Compassion", "Confidence", "Courage", "Creativity", "Connectedness"]
+  qualities: ["Curiosity", "Calm", "Clarity", "Compassion", "Confidence", "Courage", "Creativity", "Connectedness"],
+  neurochemical_markers: ["serotonin", "oxytocin"],
+  physiological_correlate: "ventral_vagal_tone",
+  neural_hub: "mPFC",
+  mechanism: "mPFC sends inhibitory signals to amygdala, quieting alarm system and enabling CEN activation"
 })
 
 CREATE (protector:TherapyConcept {
@@ -2739,3 +2751,369 @@ CREATE (dissociation)-[:ASSOCIATED_WITH {finding: "altered_connectivity"}]->(ins
 // CREATE CONSTRAINT neurochemical_id IF NOT EXISTS FOR (n:NeurochemicalSystem) REQUIRE n.id IS UNIQUE;
 // CREATE INDEX emotion_quadrant IF NOT EXISTS FOR (e:Emotion) ON (e.quadrant);
 // CREATE INDEX therapy_concept_modality IF NOT EXISTS FOR (c:TherapyConcept) ON (c.modality);
+
+
+// ============================================================
+// HiTOP FRAMEWORK - HIERARCHICAL TAXONOMY OF PSYCHOPATHOLOGY
+// Per domain expert: "The fundamental structure of the knowledge
+// graph must move beyond categorical constraints of DSM-5-TR/ICD-11
+// to reflect the dimensional reality of psychopathology"
+// ============================================================
+
+// P-Factor: General factor of psychopathology
+CREATE (p_factor:HiTOPConstruct {
+  id: "hitop_p_factor",
+  name: "P-Factor (General Psychopathology)",
+  level: "superordinate",
+  description: "General factor underlying all mental disorder symptoms; correlates with mPFC dysregulation of subcortical arousal",
+  neural_correlates: ["mPFC dysfunction", "subcortical arousal dysregulation"],
+  evidence_base: "Caspi & Moffitt (2018); Lahey et al. (2012)"
+})
+
+// HiTOP Spectra
+CREATE (internalizing_spectrum:HiTOPConstruct {
+  id: "hitop_internalizing",
+  name: "Internalizing Spectrum",
+  level: "spectrum",
+  description: "Captures shared genetic diathesis, environmental risk factors, and neural substrates common to distress and fear-based conditions",
+  subfactors: ["Distress", "Fear"],
+  rdoc_domain: "Negative Valence Systems",
+  key_neural_circuitry: ["amygdala", "mPFC", "dACC", "insula"]
+})
+
+CREATE (externalizing_spectrum:HiTOPConstruct {
+  id: "hitop_externalizing",
+  name: "Externalizing Spectrum",
+  level: "spectrum",
+  description: "Disinhibited and antagonistic behavioral patterns",
+  subfactors: ["Disinhibited Externalizing", "Antagonistic Externalizing"],
+  rdoc_domain: "Positive Valence / Cognitive Systems",
+  key_neural_circuitry: ["ventral_striatum", "dlPFC", "OFC"]
+})
+
+CREATE (thought_disorder_spectrum:HiTOPConstruct {
+  id: "hitop_thought_disorder",
+  name: "Thought Disorder Spectrum",
+  level: "spectrum",
+  description: "Psychotic and schizotypal presentations",
+  subfactors: ["Psychoticism", "Detachment"],
+  rdoc_domain: "Cognitive / Social Processes",
+  key_neural_circuitry: ["thalamus", "cerebellum", "TPJ", "mPFC"]
+})
+
+CREATE (somatoform_spectrum:HiTOPConstruct {
+  id: "hitop_somatoform",
+  name: "Somatoform Spectrum",
+  level: "spectrum",
+  description: "Somatic symptom presentations and illness anxiety",
+  rdoc_domain: "Arousal and Regulatory Systems",
+  key_neural_circuitry: ["posterior_insula", "somatosensory_cortex"]
+})
+
+CREATE (detachment_spectrum:HiTOPConstruct {
+  id: "hitop_detachment",
+  name: "Detachment Spectrum",
+  level: "spectrum",
+  description: "Social withdrawal, anhedonia, restricted affect",
+  key_neural_circuitry: ["nucleus_accumbens", "mPFC"]
+})
+
+// HiTOP Subfactors
+CREATE (hitop_distress:HiTOPConstruct {
+  id: "hitop_distress",
+  name: "Distress Subfactor",
+  level: "subfactor",
+  parent_spectrum: "internalizing",
+  description: "Depressive, dysthymic, anxious-misery presentations",
+  clinical_manifestations: ["MDD", "Dysthymia", "GAD"]
+})
+
+CREATE (hitop_fear:HiTOPConstruct {
+  id: "hitop_fear",
+  name: "Fear Subfactor",
+  level: "subfactor",
+  parent_spectrum: "internalizing",
+  description: "Phobic and panic presentations",
+  clinical_manifestations: ["Panic Disorder", "Specific Phobias", "Social Anxiety"]
+})
+
+
+// ============================================================
+// RDoC FRAMEWORK - RESEARCH DOMAIN CRITERIA
+// Provides granular "units of analysis" for HiTOP spectra
+// ============================================================
+
+// RDoC Domains
+CREATE (rdoc_negative_valence:RDoCDomain {
+  id: "rdoc_negative_valence",
+  name: "Negative Valence Systems",
+  description: "Systems for responses to aversive situations/contexts including fear, anxiety, and loss",
+  constructs: ["Acute Threat (Fear)", "Potential Threat (Anxiety)", "Sustained Threat", "Loss", "Frustrative Nonreward"]
+})
+
+CREATE (rdoc_positive_valence:RDoCDomain {
+  id: "rdoc_positive_valence",
+  name: "Positive Valence Systems",
+  description: "Systems for responses to positive motivational situations",
+  constructs: ["Reward Responsiveness", "Reward Learning", "Reward Valuation", "Approach Motivation"]
+})
+
+CREATE (rdoc_cognitive:RDoCDomain {
+  id: "rdoc_cognitive",
+  name: "Cognitive Systems",
+  description: "Systems responsible for various cognitive processes",
+  constructs: ["Attention", "Perception", "Declarative Memory", "Working Memory", "Cognitive Control", "Language"]
+})
+
+CREATE (rdoc_social:RDoCDomain {
+  id: "rdoc_social",
+  name: "Systems for Social Processes",
+  description: "Systems for mediating responses to interpersonal settings",
+  constructs: ["Affiliation and Attachment", "Social Communication", "Perception and Understanding of Self", "Perception and Understanding of Others"]
+})
+
+CREATE (rdoc_arousal:RDoCDomain {
+  id: "rdoc_arousal",
+  name: "Arousal and Regulatory Systems",
+  description: "Systems responsible for activation of neural systems and homeostatic regulation",
+  constructs: ["Arousal", "Circadian Rhythms", "Sleep-Wakefulness"]
+})
+
+CREATE (rdoc_sensorimotor:RDoCDomain {
+  id: "rdoc_sensorimotor",
+  name: "Sensorimotor Systems",
+  description: "Systems responsible for motor behavior control",
+  constructs: ["Motor Actions", "Agency and Ownership"]
+})
+
+// Key RDoC Constructs (most relevant to therapy modalities)
+CREATE (rdoc_acute_threat:RDoCConstruct {
+  id: "rdoc_acute_threat",
+  name: "Acute Threat (Fear)",
+  domain: "Negative Valence Systems",
+  description: "Activation of the brain's defensive motivational system to promote behaviors that protect from perceived danger",
+  neural_circuit: ["amygdala", "BNST", "PAG", "hypothalamus"],
+  therapeutic_targets: ["exposure", "EMDR", "SE"]
+})
+
+CREATE (rdoc_potential_threat:RDoCConstruct {
+  id: "rdoc_potential_threat",
+  name: "Potential Threat (Anxiety)",
+  domain: "Negative Valence Systems",
+  description: "Sustained activation of defensive system in response to uncertain threat",
+  neural_circuit: ["BNST", "hippocampus", "mPFC"],
+  therapeutic_targets: ["DBT", "ACT", "CBT"]
+})
+
+CREATE (rdoc_loss:RDoCConstruct {
+  id: "rdoc_loss",
+  name: "Loss",
+  domain: "Negative Valence Systems",
+  description: "Response to loss of access to reward or anticipated loss",
+  neural_circuit: ["vACC", "amygdala", "nucleus_accumbens"],
+  therapeutic_targets: ["behavioral_activation", "CPT", "MBCT"]
+})
+
+CREATE (rdoc_self_perception:RDoCConstruct {
+  id: "rdoc_self_perception",
+  name: "Perception and Understanding of Self",
+  domain: "Systems for Social Processes",
+  description: "Processes involved in perceiving, knowing about, and understanding the self",
+  neural_circuit: ["mPFC", "PCC", "insula"],
+  notes: "Neurobiological anchor for IFS Self-energy, ACT Observing Self, DBT Wise Mind"
+})
+
+CREATE (rdoc_affiliation:RDoCConstruct {
+  id: "rdoc_affiliation",
+  name: "Affiliation and Attachment",
+  domain: "Systems for Social Processes",
+  description: "Engagement in positive social interactions and formation of social bonds",
+  neural_circuit: ["hypothalamus", "mPFC", "nucleus_accumbens"],
+  neurochemical: ["oxytocin", "dopamine"],
+  therapeutic_targets: ["IFS", "Polyvagal co-regulation"]
+})
+
+
+// ============================================================
+// WINDOW OF TOLERANCE
+// Per domain expert: "Serves as the overarching physiological
+// model for the knowledge graph"
+// ============================================================
+
+CREATE (window_of_tolerance:TherapyConcept {
+  id: "window_of_tolerance",
+  name: "Window of Tolerance",
+  description: "Range of optimal arousal within which a person can function effectively; integrates Siegel's interpersonal neurobiology with Polyvagal Theory",
+  modality: "cross_modality",
+  founder: "Dan Siegel",
+  zones: ["Optimal Zone", "Hyperarousal", "Hypoarousal"]
+})
+
+CREATE (optimal_zone:TherapyConcept {
+  id: "wot_optimal_zone",
+  name: "Optimal Arousal Zone",
+  description: "Ventral Vagal state; emotional/physiological equilibrium; CEN active; adaptable, flexible thinking",
+  modality: "Window of Tolerance",
+  autonomic_state: "ventral_vagal",
+  characteristics: ["emotional equilibrium", "adaptability", "flexible thinking", "social engagement"]
+})
+
+CREATE (hyperarousal_zone:TherapyConcept {
+  id: "wot_hyperarousal",
+  name: "Hyperarousal Zone",
+  description: "Sympathetic/Fight-Flight activation; amygdala distress signals; PFC deactivation; inhibited speech and rational decision-making",
+  modality: "Window of Tolerance",
+  autonomic_state: "sympathetic",
+  characteristics: ["panic", "rage", "hypervigilance", "racing thoughts", "impulsivity"]
+})
+
+CREATE (hypoarousal_zone:TherapyConcept {
+  id: "wot_hypoarousal",
+  name: "Hypoarousal Zone",
+  description: "Dorsal Vagal/Freeze-Shutdown; emotional numbing, dissociation, flat affect, reduced heart rate",
+  modality: "Window of Tolerance",
+  autonomic_state: "dorsal_vagal",
+  characteristics: ["numbness", "dissociation", "flat affect", "collapse", "shutdown"]
+})
+
+CREATE (frozen_flight:TherapyConcept {
+  id: "wot_frozen_flight",
+  name: "Frozen Flight State",
+  description: "Co-activation of high SNS + high PNS; 'deer in headlights' presentation with muscle rigidity",
+  modality: "Window of Tolerance",
+  autonomic_state: "mixed",
+  characteristics: ["muscle rigidity", "frozen terror", "immobility with high arousal"]
+})
+
+
+// ============================================================
+// ADDITIONAL BRAIN STRUCTURES (Required by Expert)
+// ============================================================
+
+CREATE (atl:BrainStructure {
+  id: "atl",
+  name: "Anterior Temporal Lobe",
+  description: "Anterior temporal cortex; social semantic knowledge, conceptual processing, guilt-related cognition",
+  aliases: ["ATL", "anterior temporal cortex"],
+  level: "cortical",
+  functions: ["social_semantic_knowledge", "conceptual_processing"]
+})
+
+CREATE (visual_cortex:BrainStructure {
+  id: "visual_cortex",
+  name: "Visual Cortex",
+  description: "Occipital cortex; visual processing; involved in mental imagery of critical observers (shame)",
+  aliases: ["V1", "occipital cortex"],
+  level: "cortical"
+})
+
+CREATE (cerebellum:BrainStructure {
+  id: "cerebellum",
+  name: "Cerebellum",
+  description: "Coordination, motor learning, cognitive functions; involved in fear extinction",
+  level: "subcortical"
+})
+
+
+// ============================================================
+// EMDR CONSOLIDATION MECHANISMS
+// Per expert: "Link AIP model to hippocampal-cortical transfer
+// mediated by 40 Hz Gamma Band oscillations"
+// ============================================================
+
+CREATE (emdr_consolidation:TherapyConcept {
+  id: "emdr_consolidation",
+  name: "Memory Consolidation Process",
+  description: "Transfer of traumatic memories from hippocampus-amygdala complex to neocortex; shifts from implicit to explicit memory",
+  modality: "EMDR",
+  mechanism: "hippocampal_cortical_transfer"
+})
+
+CREATE (gamma_oscillations:TherapyConcept {
+  id: "emdr_gamma",
+  name: "Gamma Band Oscillations (40 Hz)",
+  description: "Neural oscillations that solve the 'binding problem' by synchronizing neuronal assemblies across sensory and emotional areas",
+  modality: "EMDR",
+  frequency: "40 Hz",
+  function: "Unbinding memory from limbic system, linking with mPFC"
+})
+
+CREATE (memory_reconsolidation:TherapyConcept {
+  id: "emdr_reconsolidation",
+  name: "Memory Reconsolidation",
+  description: "Process by which reactivated memories become labile and can be modified before re-storage",
+  modality: "EMDR",
+  mechanism: "reactivation_modification_restabilization"
+})
+
+
+// ============================================================
+// ENHANCED SELF-CONSCIOUS AFFECT MODEL
+// Per expert: "Shame and guilt possess distinct cognitive
+// structures, neural signatures, and action tendencies"
+// ============================================================
+
+// Note: Enhancing existing shame/guilt with more specific properties
+// The base nodes exist; adding supplementary detail nodes
+
+CREATE (shame_neural_signature:NeuralSignature {
+  id: "shame_neural",
+  name: "Shame Neural Signature",
+  emotion: "shame",
+  primary_hubs: ["dlPFC", "PCC", "dACC", "sensory_motor_cortex", "visual_cortex"],
+  subcortical: ["amygdala", "posterior_insula"],
+  evaluative_focus: "Global Self ('I am defective')",
+  action_tendency: "behavioral_inhibition, hiding, submission",
+  autonomic_shift: "dorsal_vagal_collapse",
+  clinical_implication: "High risk for Depression, BPD, Suicidality",
+  trait_vulnerability: true,
+  notes: "Hypersensitivity persists even in remission (trait marker for depression)"
+})
+
+CREATE (guilt_neural_signature:NeuralSignature {
+  id: "guilt_neural",
+  name: "Guilt Neural Signature",
+  emotion: "guilt",
+  primary_hubs: ["TPJ", "ATL", "dmPFC"],
+  shared_core: ["anterior_insula", "dACC"],
+  evaluative_focus: "Specific Behavior ('I did something wrong')",
+  action_tendency: "reparation, prosocial behavior, empathy",
+  clinical_implication: "Often adaptive; maladaptive if ruminative",
+  notes: "Increases empathic concern and prosociality (other-oriented)"
+})
+
+CREATE (social_pain:NeuralSignature {
+  id: "social_pain_neural",
+  name: "Social Pain Neural Signature",
+  description: "Neural response to social exclusion/rejection",
+  primary_hubs: ["dACC", "anterior_insula", "thalamus"],
+  overlap_with: ["physical_pain"],
+  related_emotions: ["shame", "rejection", "loneliness"]
+})
+
+
+// ============================================================
+// CPT NEURAL DISSOCIATION
+// Per expert: "Clear dissociation between left PFC (retrieval
+// demand) and left ACC (goal-relevant control demand)"
+// ============================================================
+
+CREATE (cpt_retrieval_demand:TherapyConcept {
+  id: "cpt_retrieval",
+  name: "Memory Retrieval Demand",
+  description: "Left PFC (BA 9/46) activity reflecting effort to retrieve adaptive thoughts; decreases as therapy progresses",
+  modality: "CPT",
+  neural_hub: "left_dlPFC",
+  change_direction: "decreases with treatment",
+  notes: "Reflects 'ease of retrieval' for balanced beliefs"
+})
+
+CREATE (cpt_control_demand:TherapyConcept {
+  id: "cpt_control",
+  name: "Goal-Relevant Control Demand",
+  description: "Left ACC (BA 24/32) activity reflecting monitoring required to override traumatic schemas; may increase with skill refinement",
+  modality: "CPT",
+  neural_hub: "left_ACC",
+  change_direction: "may increase with skill refinement",
+  notes: "High-level monitoring to override deeply ingrained schemas"
+})
