@@ -543,13 +543,13 @@ export const getRelatedEmotions = onCall(
         WHERE e2.id <> e1.id
           ${quadrant ? 'AND e2.quadrant = $quadrant' : ''}
         
-        // Count shared substrates and get the structure names
-        WITH e2, collect(DISTINCT bs.name) as sharedStructures, count(DISTINCT bs) as sharedCount
+        // Keep e1 for pattern matching, count shared substrates
+        WITH e1, e2, collect(DISTINCT bs.name) as sharedStructures, count(DISTINCT bs) as sharedCount
         WHERE sharedCount >= 1
         
-        // Also check if they appear in same activation patterns
+        // Check if they appear in same activation patterns
         OPTIONAL MATCH (p:ActivationPattern)-[:ASSOCIATED_WITH]->(e1)
-        OPTIONAL MATCH (p)-[:ASSOCIATED_WITH]->(e2)
+        WHERE (p)-[:ASSOCIATED_WITH]->(e2)
         WITH e2, sharedStructures, sharedCount, count(DISTINCT p) as patternOverlap
         
         RETURN e2.id as id,

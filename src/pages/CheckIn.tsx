@@ -62,23 +62,23 @@ export function CheckIn() {
   if (!user) {
     return (
       <div className="text-center py-12">
-        <span className="text-5xl mb-4 block">💭</span>
-        <h1 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+        <span className="text-6xl mb-4 block sparkle">💫</span>
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-3">
           Check in with yourself
         </h1>
-        <p className="text-[var(--color-sage-600)] mb-6">
+        <p className="text-[var(--color-text-secondary)] mb-6">
           Create an account to start tracking your emotions and body sensations.
         </p>
         <div className="space-y-3">
           <Link
             to="/signup"
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="block w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[var(--color-sage-500)] to-[var(--color-sage-600)] text-white font-semibold transition-all shadow-[0_4px_16px_rgba(155,89,182,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(155,89,182,0.4)]"
           >
             Create account
           </Link>
           <Link
             to="/login"
-            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+            className="block w-full py-3.5 px-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-[var(--color-sage-300)] text-[var(--color-text-primary)] font-semibold hover:bg-white/90 hover:border-[#d4af37] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
           >
             Log in
           </Link>
@@ -264,25 +264,29 @@ export function CheckIn() {
 
   return (
     <div>
-      {/* Progress indicator - subtle, shows optionality */}
+      {/* Progress indicator - floating pearl/stars */}
       {showProgress && (
-        <div className="mb-6">
-          <div className="flex items-center justify-center gap-2">
+        <div className="mb-8">
+          <div className="flex items-center justify-center gap-3">
             {stepOrder.map((s, i) => (
               <div
                 key={s}
                 className={`
-                  h-1.5 rounded-full transition-all duration-300
-                  ${i <= currentStepIndex ? 'bg-[var(--color-sage-600)]' : 'bg-[var(--color-sage-200)]'}
-                  ${i === currentStepIndex ? 'w-8' : 'w-4'}
+                  w-4 h-4 rounded-full transition-all duration-500
+                  ${i < currentStepIndex 
+                    ? 'bg-gradient-to-br from-[#f9e076] to-[#d4af37] shadow-[0_0_12px_rgba(212,175,55,0.6)]' 
+                    : i === currentStepIndex 
+                      ? 'bg-gradient-to-br from-[#f9e076] to-[#d4af37] shadow-[0_0_16px_rgba(212,175,55,0.8)] scale-125 pearl-active' 
+                      : 'bg-white/60 border-2 border-[var(--color-sage-300)] shadow-[inset_0_2px_4px_rgba(0,0,0,0.05)]'
+                  }
                 `}
               />
             ))}
           </div>
-          <p className="text-xs text-center text-[var(--color-sage-500)] mt-2">
+          <p className="text-xs text-center text-[var(--color-text-secondary)] mt-4 leading-relaxed">
             {currentStepIndex === 0 
-              ? 'Required' 
-              : 'Optional — tap "Help me now" anytime'}
+              ? '✨ Required' 
+              : '✨ Optional — tap "Help me now" anytime'}
           </p>
         </div>
       )}
@@ -291,16 +295,16 @@ export function CheckIn() {
       {step !== 'quadrant' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-[var(--color-sage-600)] hover:text-[var(--color-sage-800)] mb-4 transition-colors"
+          className="flex items-center gap-2 text-[var(--color-sage-500)] hover:text-[var(--color-sage-700)] mb-4 transition-colors group"
         >
-          <span>←</span>
+          <span className="group-hover:-translate-x-0.5 transition-transform">←</span>
           <span className="text-sm font-medium">Back</span>
         </button>
       )}
 
-      {/* Error display */}
+      {/* Error display - soft rose styling */}
       {analyzeError && (
-        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+        <div className="mb-4 p-4 rounded-2xl bg-[#FEE2E2]/60 backdrop-blur-sm border border-[#FECACA] text-[#991B1B] text-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
           {analyzeError}
         </div>
       )}
@@ -310,39 +314,32 @@ export function CheckIn() {
       )}
 
       {step === 'emotion' && checkInData.quadrant && (
-        <div>
-          <EmotionGrid 
-            quadrant={checkInData.quadrant} 
-            onSelect={handleEmotionSelect}
-            showRelated={true}
-          />
-          
-          {/* Help me now button - always visible after quadrant */}
-          <div className="mt-4 pt-4 border-t border-[var(--color-sage-200)]">
-            <button
-              onClick={handleHelpMeNow}
-              className="w-full py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
-            >
-              Help me now →
-            </button>
-            <p className="text-xs text-center text-[var(--color-sage-500)] mt-2">
-              Skip the rest and get a recommendation
-            </p>
-          </div>
-        </div>
+        <EmotionGrid 
+          quadrant={checkInData.quadrant} 
+          onSelect={handleEmotionSelect}
+          showRelated={true}
+          onHelpMeNow={handleHelpMeNow}
+        />
       )}
 
       {step === 'intensity' && (
         <div>
           <IntensityGrid onSelect={handleIntensitySelect} />
           
-          {/* Help me now button */}
-          <div className="mt-4 pt-4 border-t border-[var(--color-sage-200)]">
+          {/* Help me now button - glassmorphic with gold shimmer */}
+          <div className="mt-6 pt-6 border-t border-[var(--color-sage-200)]/50">
             <button
               onClick={handleHelpMeNow}
-              className="w-full py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
+              className="w-full py-3.5 px-4 rounded-2xl font-semibold transition-all 
+                bg-white/70 backdrop-blur-sm
+                border-2 border-[#d4af37]
+                text-[var(--color-text-primary)]
+                shadow-[0_0_20px_rgba(212,175,55,0.3),inset_0_1px_0_rgba(255,255,255,0.8)]
+                hover:shadow-[0_0_28px_rgba(212,175,55,0.5),inset_0_1px_0_rgba(255,255,255,0.9)]
+                hover:bg-white/80
+                flex items-center justify-center gap-2"
             >
-              Help me now →
+              <span>💫</span> Help me now
             </button>
           </div>
         </div>
@@ -372,8 +369,8 @@ export function CheckIn() {
 
       {step === 'analyzing' && (
         <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
-          <p className="text-[var(--color-sage-600)]">Understanding what's happening...</p>
+          <div className="inline-block w-10 h-10 border-4 border-[var(--color-sage-200)] border-t-[#d4af37] rounded-full animate-spin mb-4 shadow-[0_0_12px_rgba(212,175,55,0.4)]"></div>
+          <p className="text-[var(--color-text-secondary)]">✨ Understanding what's happening...</p>
         </div>
       )}
 
@@ -392,23 +389,23 @@ export function CheckIn() {
 
       {step === 'saving' && (
         <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
-          <p className="text-[var(--color-sage-600)]">Saving your check-in...</p>
+          <div className="inline-block w-10 h-10 border-4 border-[var(--color-sage-200)] border-t-[#d4af37] rounded-full animate-spin mb-4 shadow-[0_0_12px_rgba(212,175,55,0.4)]"></div>
+          <p className="text-[var(--color-text-secondary)]">✨ Saving your check-in...</p>
         </div>
       )}
 
       {step === 'complete' && (
         <div className="text-center py-8">
-          <span className="text-5xl mb-4 block">✨</span>
-          <h2 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+          <span className="text-6xl mb-4 block sparkle">🌟</span>
+          <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-3">
             Check-in saved
           </h2>
-          <p className="text-[var(--color-sage-600)] mb-6">
+          <p className="text-[var(--color-text-secondary)] mb-6">
             Your check-in has been recorded.
           </p>
 
           {saveError && (
-            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm mb-6">
+            <div className="p-4 rounded-2xl bg-[#FEF3C7]/60 backdrop-blur-sm border border-[#FDE68A] text-[#92400E] text-sm mb-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
               {saveError}
             </div>
           )}
@@ -416,14 +413,14 @@ export function CheckIn() {
           <div className="space-y-3">
             <button
               onClick={handleComplete}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[var(--color-sage-500)] to-[var(--color-sage-600)] text-white font-semibold transition-all shadow-[0_4px_16px_rgba(155,89,182,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(155,89,182,0.4)]"
             >
               Done
             </button>
             
             <Link
               to="/history"
-              className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+              className="block w-full py-3.5 px-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-[var(--color-sage-300)] text-[var(--color-text-primary)] font-semibold hover:bg-white/90 hover:border-[#d4af37] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]"
             >
               View history →
             </Link>

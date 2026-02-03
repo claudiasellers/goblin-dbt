@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { getToolById } from '../data/tools';
 import { getCategoryById } from '../data/categories';
 
@@ -16,8 +16,19 @@ const toolComponents: Record<string, React.ComponentType> = {
   'urge-surfing': UrgeSurfing,
 };
 
+// Tools that redirect to other pages (their functionality exists elsewhere)
+const toolRedirects: Record<string, string> = {
+  'name-it': '/checkin', // "Name It" is the Check-In flow
+};
+
 export function ToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
+  
+  // Handle redirects for tools that exist as other pages
+  if (toolId && toolRedirects[toolId]) {
+    return <Navigate to={toolRedirects[toolId]} replace />;
+  }
+  
   const tool = toolId ? getToolById(toolId) : undefined;
   const category = tool ? getCategoryById(tool.categoryId) : undefined;
 

@@ -1,129 +1,81 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 
 interface IntensityGridProps {
   onSelect: (position: { x: number; y: number }) => void;
   initialPosition?: { x: number; y: number };
 }
 
+const intensityLevels = [
+  { value: 0.9, label: 'Overwhelming', description: 'Hard to think or function' },
+  { value: 0.7, label: 'Strong', description: 'Very noticeable, hard to ignore' },
+  { value: 0.5, label: 'Moderate', description: 'Clearly present but manageable' },
+  { value: 0.3, label: 'Mild', description: 'Noticeable but not intrusive' },
+  { value: 0.1, label: 'Subtle', description: 'Barely there, easy to overlook' },
+];
+
 export function IntensityGrid({ onSelect, initialPosition }: IntensityGridProps) {
-  const [position, setPosition] = useState(initialPosition || { x: 0.5, y: 0.5 });
-  const [isDragging, setIsDragging] = useState(false);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const [selectedIntensity, setSelectedIntensity] = useState<number>(
+    initialPosition?.y ?? 0.5
+  );
 
-  function getPositionFromEvent(e: React.MouseEvent | React.TouchEvent) {
-    if (!gridRef.current) return null;
-    
-    const rect = gridRef.current.getBoundingClientRect();
-    let clientX: number, clientY: number;
-    
-    if ('touches' in e) {
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-    
-    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
-    const y = Math.max(0, Math.min(1, 1 - (clientY - rect.top) / rect.height));
-    
-    return { x, y };
-  }
-
-  function handleStart(e: React.MouseEvent | React.TouchEvent) {
-    setIsDragging(true);
-    const pos = getPositionFromEvent(e);
-    if (pos) setPosition(pos);
-  }
-
-  function handleMove(e: React.MouseEvent | React.TouchEvent) {
-    if (!isDragging) return;
-    const pos = getPositionFromEvent(e);
-    if (pos) setPosition(pos);
-  }
-
-  function handleEnd() {
-    setIsDragging(false);
+  function handleSelect(value: number) {
+    setSelectedIntensity(value);
   }
 
   function handleConfirm() {
-    onSelect(position);
+    // x is set to 0.5 (neutral) since valence is already captured by quadrant
+    onSelect({ x: 0.5, y: selectedIntensity });
   }
-
-  // Convert position to labels
-  const intensityLabel = position.y > 0.66 ? 'High' : position.y > 0.33 ? 'Medium' : 'Low';
-  const pleasantnessLabel = position.x > 0.66 ? 'Pleasant' : position.x > 0.33 ? 'Neutral' : 'Unpleasant';
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
+      <h2 className="text-2xl font-bold text-[var(--color-text-primary)] text-center mb-3 tracking-normal">
         How intense is this feeling?
       </h2>
-      <p className="text-sm text-[var(--color-sage-600)] text-center mb-6">
-        Drag to position on the grid
+      <p className="text-sm text-[var(--color-text-secondary)] text-center mb-6 leading-relaxed">
+        Select the level that fits best
       </p>
 
-      {/* Grid container */}
-      <div className="relative mb-6">
-        {/* Y-axis label */}
-        <div className="absolute -left-2 top-0 bottom-0 flex flex-col justify-between text-xs text-[var(--color-sage-500)] -translate-x-full pr-2">
-          <span>High intensity</span>
-          <span>Low intensity</span>
-        </div>
-
-        {/* The grid */}
-        <div
-          ref={gridRef}
-          className="relative aspect-square bg-[var(--color-sage-100)] rounded-2xl overflow-hidden cursor-crosshair touch-none"
-          onMouseDown={handleStart}
-          onMouseMove={handleMove}
-          onMouseUp={handleEnd}
-          onMouseLeave={handleEnd}
-          onTouchStart={handleStart}
-          onTouchMove={handleMove}
-          onTouchEnd={handleEnd}
-        >
-          {/* Dot grid pattern */}
-          <div className="absolute inset-0 p-4">
-            <div 
-              className="w-full h-full"
-              style={{
-                backgroundImage: `radial-gradient(circle, var(--color-sage-300) 2px, transparent 2px)`,
-                backgroundSize: '24px 24px',
-              }}
-            />
-          </div>
-
-          {/* Position marker */}
-          <div
-            className="absolute w-6 h-6 -translate-x-1/2 translate-y-1/2 pointer-events-none"
-            style={{
-              left: `${position.x * 100}%`,
-              bottom: `${position.y * 100}%`,
-            }}
-          >
-            <div className="w-full h-full rounded-full bg-[var(--color-sage-700)] border-4 border-white shadow-lg" />
-          </div>
-        </div>
-
-        {/* X-axis label */}
-        <div className="flex justify-between text-xs text-[var(--color-sage-500)] mt-2 px-2">
-          <span>Unpleasant</span>
-          <span>Pleasant</span>
-        </div>
+      {/* Intensity options - satin pillow buttons */}
+      <div className="space-y-3 mb-6">
+        {intensityLevels.map((level) => {
+          const isSelected = selectedIntensity === level.value;
+          return (
+            <button
+              key={level.value}
+              onClick={() => handleSelect(level.value)}
+              className={`
+                w-full p-4 rounded-2xl text-left transition-all duration-200
+                ${isSelected 
+                  ? 'bg-gradient-to-r from-[var(--color-sage-500)] to-[var(--color-sage-600)] text-white ring-2 ring-[#d4af37] ring-offset-2 shadow-[0_4px_16px_rgba(155,89,182,0.3),inset_0_1px_0_rgba(255,255,255,0.2)]' 
+                  : 'bg-white/70 backdrop-blur-sm hover:bg-white/90 text-[var(--color-text-primary)] border border-[var(--color-sage-200)] shadow-[0_2px_8px_rgba(155,89,182,0.1),inset_0_2px_4px_rgba(255,255,255,0.8)] hover:shadow-[0_4px_12px_rgba(155,89,182,0.2),inset_0_2px_4px_rgba(255,255,255,0.9)]'
+                }
+              `}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className={`font-semibold tracking-normal ${isSelected ? 'text-white' : 'text-[var(--color-text-primary)]'}`}>
+                    {level.label}
+                  </p>
+                  <p className={`text-sm leading-relaxed ${isSelected ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
+                    {level.description}
+                  </p>
+                </div>
+                {isSelected && (
+                  <span className="w-7 h-7 rounded-full bg-gradient-to-br from-[#f9e076] to-[#d4af37] flex items-center justify-center shadow-[0_2px_8px_rgba(212,175,55,0.5)] sparkle">
+                    ✨
+                  </span>
+                )}
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Current selection display */}
-      <div className="text-center mb-6">
-        <p className="text-lg font-medium text-[var(--color-sage-700)]">
-          {intensityLabel} intensity · {pleasantnessLabel}
-        </p>
-      </div>
-
-      {/* Confirm button */}
+      {/* Confirm button - lavender gradient */}
       <button
         onClick={handleConfirm}
-        className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+        className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[var(--color-sage-500)] to-[var(--color-sage-600)] text-white font-semibold transition-all shadow-[0_4px_16px_rgba(155,89,182,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(155,89,182,0.4)]"
       >
         Continue
       </button>

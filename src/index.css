@@ -1,53 +1,122 @@
 @import "tailwindcss";
 
-/* Custom CSS Variables for theming */
+/* ✨ Fairytale Y2K Princess Color Palette ✨ */
 :root {
-  --color-sage-50: #f6f7f6;
-  --color-sage-100: #e3e7e3;
-  --color-sage-200: #c7d0c7;
-  --color-sage-300: #a3b2a3;
-  --color-sage-400: #7a8f7a;
-  --color-sage-500: #5f755f;
-  --color-sage-600: #4a5d4a;
-  --color-sage-700: #3d4b3d;
-  --color-sage-800: #333e33;
-  --color-sage-900: #2b332b;
+  /* Royal Lavender (brand accent) */
+  --color-sage-50: #faf8fc;
+  --color-sage-100: #f3eef8;
+  --color-sage-200: #e8dff2;
+  --color-sage-300: #d4c4e8;
+  --color-sage-400: #b89dd6;
+  --color-sage-500: #9b59b6;
+  --color-sage-600: #8e4aad;
+  --color-sage-700: #7a3d96;
+  --color-sage-800: #4a3259;
+  --color-sage-900: #2d1f38;
   
-  --color-warm-50: #fdfcfb;
-  --color-warm-100: #f7f3ef;
-  --color-warm-200: #efe7de;
-  --color-warm-300: #e2d5c7;
-  --color-warm-400: #d1bea8;
-  --color-warm-500: #bfa78d;
-  --color-warm-600: #a68c6f;
-  --color-warm-700: #8a735c;
-  --color-warm-800: #715f4d;
-  --color-warm-900: #5d4f41;
+  /* Pearl & Cream tones */
+  --color-warm-50: #fffbfc;
+  --color-warm-100: #fef7f8;
+  --color-warm-200: #fdf2f4;
+  --color-warm-300: #fbe8eb;
+  --color-warm-400: #f5d5db;
+  --color-warm-500: #edbfc8;
+  --color-warm-600: #e0a3af;
+  --color-warm-700: #cf8594;
+  --color-warm-800: #b86b7b;
+  --color-warm-900: #955562;
   
-  --color-calm-50: #f5f8fa;
-  --color-calm-100: #e8eff4;
-  --color-calm-200: #d5e2ec;
-  --color-calm-300: #b6cdde;
-  --color-calm-400: #91b2cb;
-  --color-calm-500: #7399b8;
-  --color-calm-600: #5f82a3;
-  --color-calm-700: #526d89;
-  --color-calm-800: #475b71;
-  --color-calm-900: #3d4d5e;
+  /* Soft gold metallic */
+  --color-gold: #d4af37;
+  --color-gold-light: #f9e076;
+  --color-gold-shimmer: linear-gradient(135deg, #d4af37 0%, #f9e076 50%, #d4af37 100%);
+  
+  /* Quadrant colors - Pastel Jewels */
+  --color-rose-quartz: #F786AA;
+  --color-seafoam: #B2E2D4;
+  --color-buttercup: #F9E076;
+  --color-periwinkle: #A3C1DA;
+  
+  /* Typography */
+  --color-text-primary: #4a3259;
+  --color-text-secondary: #6b5678;
 }
 
 /* Base styles */
 body {
-  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
-  background-color: var(--color-warm-50);
-  color: var(--color-sage-800);
+  font-family: 'Quicksand', 'Segoe UI', system-ui, sans-serif;
+  color: var(--color-text-primary);
   min-height: 100vh;
+  /* Pearlescent radial gradient background */
+  background: radial-gradient(ellipse at center, #fffbfc 0%, #f8f0f8 50%, #f0e8f4 100%);
+  background-attachment: fixed;
 }
 
-/* Dark mode */
+/* Fairytale headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', Georgia, serif;
+  color: var(--color-text-primary);
+}
+
+/* Pillow/gemstone button base */
+.btn-gemstone {
+  background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 50%);
+  box-shadow: 
+    0 2px 8px rgba(155, 89, 182, 0.15),
+    inset 0 1px 2px rgba(255, 255, 255, 0.8),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btn-gemstone:hover {
+  box-shadow: 
+    0 4px 12px rgba(155, 89, 182, 0.25),
+    inset 0 1px 2px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Glassmorphic card */
+.card-glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 24px;
+  box-shadow: 
+    0 4px 20px rgba(155, 89, 182, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Gold leaf border */
+.border-gold-leaf {
+  border: 0.5px solid var(--color-gold);
+  box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+}
+
+/* Sparkle animation */
+@keyframes sparkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+}
+
+.sparkle {
+  animation: sparkle 1.5s ease-in-out infinite;
+}
+
+/* Pearl glow for progress */
+@keyframes pearl-glow {
+  0%, 100% { box-shadow: 0 0 4px rgba(212, 175, 55, 0.4); }
+  50% { box-shadow: 0 0 8px rgba(212, 175, 55, 0.8); }
+}
+
+.pearl-active {
+  animation: pearl-glow 2s ease-in-out infinite;
+}
+
+/* Dark mode - Enchanted Night */
 @media (prefers-color-scheme: dark) {
   body {
-    background-color: var(--color-sage-900);
-    color: var(--color-warm-100);
+    background: radial-gradient(ellipse at center, #2d1f38 0%, #1a1225 50%, #0f0a15 100%);
+    color: var(--color-warm-200);
   }
 }

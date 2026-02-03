@@ -23,23 +23,23 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
   if (safetyFlag && safetyFlag.type === 'crisis') {
     return (
       <div className="text-center py-6">
-        <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200">
-          <span className="text-3xl mb-3 block">🆘</span>
-          <h2 className="text-xl font-bold text-red-800 mb-2">
+        <div className="mb-6 p-5 rounded-[24px] bg-[#FEE2E2]/70 backdrop-blur-sm border border-[#FECACA] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+          <span className="text-4xl mb-4 block">🆘</span>
+          <h2 className="text-xl font-bold text-[#991B1B] mb-3">
             We hear you
           </h2>
-          <p className="text-red-700 mb-4">
+          <p className="text-[#B91C1C] mb-5">
             {safetyFlag.action}
           </p>
           <a
             href="tel:988"
-            className="inline-block w-full py-3 px-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors mb-3"
+            className="inline-block w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#DC2626] to-[#B91C1C] text-white font-semibold transition-all shadow-[0_4px_16px_rgba(185,28,28,0.3)] hover:shadow-[0_6px_20px_rgba(185,28,28,0.4)] mb-3"
           >
             Call 988 (Suicide & Crisis Lifeline)
           </a>
           <a
             href="sms:741741?body=HELLO"
-            className="inline-block w-full py-3 px-4 rounded-lg border border-red-300 text-red-700 font-medium hover:bg-red-50 transition-colors"
+            className="inline-block w-full py-3.5 px-4 rounded-2xl bg-white/70 border border-[#FECACA] text-[#B91C1C] font-semibold hover:bg-white/90 transition-all"
           >
             Text HOME to 741741
           </a>
@@ -52,16 +52,16 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
   if (pattern.id === 'positive_state') {
     return (
       <div className="text-center py-6">
-        <span className="text-5xl mb-4 block">✨</span>
-        <h2 className="text-2xl font-bold text-[var(--color-sage-800)] mb-3">
+        <span className="text-6xl mb-4 block sparkle">🌟</span>
+        <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-3">
           {pattern.userFacingLabel}
         </h2>
-        <p className="text-[var(--color-sage-600)] mb-8">
+        <p className="text-[var(--color-text-secondary)] mb-8">
           No action needed right now. Enjoy this moment.
         </p>
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[var(--color-sage-500)] to-[var(--color-sage-600)] text-white font-semibold transition-all shadow-[0_4px_16px_rgba(155,89,182,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(155,89,182,0.4)]"
         >
           Done
         </button>
@@ -73,17 +73,17 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
     <div className="py-4">
       {/* The State Summary - one cohesive sentence */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-sage-100)] mb-4">
-          <span className="text-2xl">{getPatternEmoji(pattern.id)}</span>
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[var(--color-sage-100)] to-[var(--color-sage-200)] mb-4 shadow-[0_4px_16px_rgba(155,89,182,0.15),inset_0_2px_4px_rgba(255,255,255,0.8)]">
+          <span className="text-3xl">{getPatternEmoji(pattern.id)}</span>
         </div>
         
-        <h2 className="text-xl font-bold text-[var(--color-sage-800)] mb-3 leading-relaxed">
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-3 leading-relaxed">
           {pattern.userFacingLabel}
         </h2>
         
         {/* Confidence indicator - subtle, not distracting */}
         {pattern.confidence < 0.6 && (
-          <p className="text-sm text-[var(--color-sage-500)] mb-2">
+          <p className="text-sm text-[var(--color-text-secondary)] mb-2">
             Based on what you've shared
           </p>
         )}
@@ -91,8 +91,8 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
 
       {/* Clinical referral warning if needed */}
       {safetyFlag && safetyFlag.type === 'clinical_referral' && (
-        <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200">
-          <p className="text-amber-800 text-sm">
+        <div className="mb-6 p-4 rounded-[20px] bg-[#FEF3C7]/60 backdrop-blur-sm border border-[#FDE68A] shadow-[inset_0_1px_0_rgba(255,255,255,0.6)]">
+          <p className="text-[#92400E] text-sm">
             <strong>Note:</strong> If this feeling persists, consider reaching out to a mental health professional.
           </p>
         </div>
@@ -101,8 +101,8 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
       {/* The Tools - 1-2 options, that's it */}
       {tools.length > 0 && (
         <div className="mb-8">
-          <p className="text-sm text-[var(--color-sage-600)] text-center mb-4">
-            Here's what might help right now
+          <p className="text-sm text-[var(--color-text-secondary)] text-center mb-4">
+            ✨ Here's what might help right now
           </p>
           
           <div className="space-y-3">
@@ -117,7 +117,7 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
       <div className="space-y-3">
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[var(--color-sage-500)] to-[var(--color-sage-600)] text-white font-semibold transition-all shadow-[0_4px_16px_rgba(155,89,182,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_20px_rgba(155,89,182,0.4)]"
         >
           Done
         </button>
@@ -125,7 +125,7 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
         {onAddMoreDetail && (
           <button
             onClick={onAddMoreDetail}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] transition-colors text-sm"
+            className="w-full py-3.5 px-4 rounded-2xl bg-white/70 backdrop-blur-sm border border-[var(--color-sage-300)] text-[var(--color-text-primary)] font-semibold hover:bg-white/90 hover:border-[#d4af37] transition-all shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] text-sm"
           >
             Add more detail to refine this
           </button>
@@ -145,25 +145,25 @@ function ToolCard({ tool, isPrimary }: { tool: ToolRecommendation; isPrimary: bo
     <Link
       to={toolPath}
       className={`
-        block p-4 rounded-xl transition-all
+        block p-5 rounded-[20px] transition-all duration-200
         ${isPrimary 
-          ? 'bg-[var(--color-sage-600)] text-white shadow-lg hover:shadow-xl hover:bg-[var(--color-sage-700)]' 
-          : 'bg-[var(--color-sage-100)] text-[var(--color-sage-800)] hover:bg-[var(--color-sage-200)]'
+          ? 'bg-gradient-to-r from-[var(--color-sage-500)] to-[var(--color-sage-600)] text-white shadow-[0_4px_20px_rgba(155,89,182,0.25),inset_0_1px_0_rgba(255,255,255,0.2)] hover:shadow-[0_6px_28px_rgba(155,89,182,0.35)] hover:scale-[1.01]' 
+          : 'bg-white/70 backdrop-blur-sm text-[var(--color-text-primary)] border border-[var(--color-sage-200)] shadow-[0_2px_8px_rgba(155,89,182,0.1),inset_0_2px_4px_rgba(255,255,255,0.8)] hover:border-[#d4af37] hover:shadow-[0_4px_16px_rgba(212,175,55,0.2)]'
         }
       `}
     >
       <div className="flex items-center justify-between">
         <div>
-          <h3 className={`font-semibold ${isPrimary ? 'text-white' : 'text-[var(--color-sage-800)]'}`}>
+          <h3 className={`font-semibold ${isPrimary ? 'text-white' : 'text-[var(--color-text-primary)]'}`}>
             {formatToolName(tool.name || tool.id)}
           </h3>
           {tool.whenToUse && (
-            <p className={`text-sm mt-1 ${isPrimary ? 'text-white/80' : 'text-[var(--color-sage-600)]'}`}>
+            <p className={`text-sm mt-1 leading-relaxed ${isPrimary ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
               {truncate(tool.whenToUse, 60)}
             </p>
           )}
         </div>
-        <span className={`text-xl ${isPrimary ? 'text-white/80' : 'text-[var(--color-sage-400)]'}`}>
+        <span className={`text-xl ${isPrimary ? 'text-white/80' : 'text-[#d4af37]'}`}>
           →
         </span>
       </div>
