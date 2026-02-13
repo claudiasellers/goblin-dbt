@@ -465,6 +465,9 @@ CREATE (c)-[:PART_OF]->(mod);
 MATCH (c:TherapyConcept {id: "dbt_willing_hands"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
 CREATE (c)-[:PART_OF]->(mod);
 
+MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
+CREATE (c)-[:PART_OF]->(mod);
+
 // DBT Emotion Regulation Skills -> Module
 MATCH (c:TherapyConcept {id: "dbt_reducing_vulnerability"}), (mod:TherapyConcept {id: "dbt_emotion_regulation_module"})
 CREATE (c)-[:PART_OF]->(mod);
@@ -840,6 +843,19 @@ CREATE (c)-[:REDUCES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (e:Emotion {id: "anger"})
 CREATE (c)-[:REDUCES]->(e);
+
+// Alternate Rebellion - channel rebellious urges into non-destructive outlets
+MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "angsty"})
+CREATE (c)-[:ADDRESSES]->(e);
+
+MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "anger"})
+CREATE (c)-[:ADDRESSES]->(e);
+
+MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "frustration"})
+CREATE (c)-[:ADDRESSES]->(e);
+
+MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "irritation"})
+CREATE (c)-[:ADDRESSES]->(e);
 
 
 // ============================================================

@@ -5,10 +5,11 @@ import { getRelatedEmotions, type RelatedEmotion } from '../../services/neo4j';
 interface EmotionGridProps {
   quadrant: string;
   onSelect: (emotions: string[]) => void;
+  onHelpMeNow?: () => void;
   showRelated?: boolean;
 }
 
-export function EmotionGrid({ quadrant, onSelect, showRelated = false }: EmotionGridProps) {
+export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = false }: EmotionGridProps) {
   const [search, setSearch] = useState('');
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
   const [relatedEmotions, setRelatedEmotions] = useState<RelatedEmotion[]>([]);
@@ -244,19 +245,26 @@ export function EmotionGrid({ quadrant, onSelect, showRelated = false }: Emotion
         </p>
       )}
 
-      {/* Continue button */}
-      <div className="mt-6">
+      {/* Action buttons - side by side */}
+      <div className="mt-6 flex gap-3">
+        {onHelpMeNow && (
+          <button
+            onClick={onHelpMeNow}
+            className="flex-1 py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
+          >
+            Help me now
+          </button>
+        )}
         <button
           onClick={handleContinue}
-          disabled={selectedEmotions.length === 0}
           className={`
-            w-full py-3 px-4 rounded-lg font-medium transition-colors
+            flex-1 py-3 px-4 rounded-lg font-medium transition-colors
             ${selectedEmotions.length > 0 
               ? 'bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white' 
-              : 'bg-[var(--color-sage-200)] text-[var(--color-sage-400)] cursor-not-allowed'}
+              : 'bg-[var(--color-sage-200)] text-[var(--color-sage-500)]'}
           `}
         >
-          Continue with {selectedEmotions.length || 'no'} emotion{selectedEmotions.length !== 1 ? 's' : ''} selected
+          Add more detail
         </button>
       </div>
     </div>

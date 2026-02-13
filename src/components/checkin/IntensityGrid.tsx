@@ -2,10 +2,11 @@ import { useState, useRef } from 'react';
 
 interface IntensityGridProps {
   onSelect: (position: { x: number; y: number }) => void;
+  onHelpMeNow?: () => void;
   initialPosition?: { x: number; y: number };
 }
 
-export function IntensityGrid({ onSelect, initialPosition }: IntensityGridProps) {
+export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: IntensityGridProps) {
   const [position, setPosition] = useState(initialPosition || { x: 0.5, y: 0.5 });
   const [isDragging, setIsDragging] = useState(false);
   const gridRef = useRef<HTMLDivElement>(null);
@@ -120,13 +121,23 @@ export function IntensityGrid({ onSelect, initialPosition }: IntensityGridProps)
         </p>
       </div>
 
-      {/* Confirm button */}
-      <button
-        onClick={handleConfirm}
-        className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
-      >
-        Continue
-      </button>
+      {/* Action buttons - side by side */}
+      <div className="flex gap-3">
+        {onHelpMeNow && (
+          <button
+            onClick={onHelpMeNow}
+            className="flex-1 py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
+          >
+            Help me now
+          </button>
+        )}
+        <button
+          onClick={handleConfirm}
+          className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+        >
+          Add more detail
+        </button>
+      </div>
     </div>
   );
 }

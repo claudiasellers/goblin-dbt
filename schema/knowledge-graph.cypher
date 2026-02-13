@@ -529,6 +529,15 @@ CREATE (rejection:Emotion {
   quadrant: "high-unpleasant"
 })
 
+CREATE (angsty:Emotion {
+  id: "angsty",
+  name: "Angsty",
+  description: "Restless dissatisfaction, feeling rebellious or contrary, wanting to push against expectations or constraints",
+  valence: "negative",
+  arousal: "moderate_high",
+  quadrant: "high-unpleasant"
+})
+
 // --- Low Energy Unpleasant ---
 CREATE (sadness:Emotion {
   id: "sadness",
@@ -1314,6 +1323,16 @@ CREATE (willing_hands:TherapyConcept {
   modality: "DBT",
   module: "Distress Tolerance",
   skill_type: "body_based"
+})
+
+CREATE (alternate_rebellion:TherapyConcept {
+  id: "dbt_alternate_rebellion",
+  name: "Alternate Rebellion",
+  description: "Finding non-destructive ways to rebel when feeling controlled or wanting to act against expectations; channel rebellious urges into harmless or even positive actions",
+  modality: "DBT",
+  module: "Distress Tolerance",
+  skill_type: "crisis_survival",
+  whenToUse: "When feeling controlled, wanting to defy expectations, or having urges to do something destructive just to rebel"
 })
 
 

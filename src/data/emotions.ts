@@ -31,6 +31,7 @@ export const emotions: Emotion[] = [
   { id: 'peeved', name: 'Peeved', quadrant: 'high-unpleasant' },
   { id: 'uneasy', name: 'Uneasy', quadrant: 'high-unpleasant' },
   { id: 'pressured', name: 'Pressured', quadrant: 'high-unpleasant' },
+  { id: 'angsty', name: 'Angsty', quadrant: 'high-unpleasant' },
 
   // High Energy Pleasant (Yellow/Gold)
   { id: 'excited', name: 'Excited', quadrant: 'high-pleasant' },

@@ -310,42 +310,19 @@ export function CheckIn() {
       )}
 
       {step === 'emotion' && checkInData.quadrant && (
-        <div>
-          <EmotionGrid 
-            quadrant={checkInData.quadrant} 
-            onSelect={handleEmotionSelect}
-            showRelated={true}
-          />
-          
-          {/* Help me now button - always visible after quadrant */}
-          <div className="mt-4 pt-4 border-t border-[var(--color-sage-200)]">
-            <button
-              onClick={handleHelpMeNow}
-              className="w-full py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
-            >
-              Help me now →
-            </button>
-            <p className="text-xs text-center text-[var(--color-sage-500)] mt-2">
-              Skip the rest and get a recommendation
-            </p>
-          </div>
-        </div>
+        <EmotionGrid 
+          quadrant={checkInData.quadrant} 
+          onSelect={handleEmotionSelect}
+          onHelpMeNow={handleHelpMeNow}
+          showRelated={true}
+        />
       )}
 
       {step === 'intensity' && (
-        <div>
-          <IntensityGrid onSelect={handleIntensitySelect} />
-          
-          {/* Help me now button */}
-          <div className="mt-4 pt-4 border-t border-[var(--color-sage-200)]">
-            <button
-              onClick={handleHelpMeNow}
-              className="w-full py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
-            >
-              Help me now →
-            </button>
-          </div>
-        </div>
+        <IntensityGrid 
+          onSelect={handleIntensitySelect}
+          onHelpMeNow={handleHelpMeNow}
+        />
       )}
 
       {step === 'body' && (
