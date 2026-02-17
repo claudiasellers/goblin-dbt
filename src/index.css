@@ -1,7 +1,163 @@
 @import "tailwindcss";
 
-/* Custom CSS Variables for theming */
+/* ============================================
+   Dark Dashboard Theme
+   Inspired by LifeOS-style dark UI
+   ============================================ */
+
 :root {
+  /* Background layers */
+  --color-bg-primary: #0a0a0c;
+  --color-bg-secondary: #111114;
+  --color-bg-card: #16161a;
+  --color-bg-card-hover: #1c1c21;
+  --color-bg-elevated: #1e1e24;
+  --color-bg-input: #1a1a1f;
+
+  /* Borders */
+  --color-border: #2a2a30;
+  --color-border-subtle: #1f1f25;
+  --color-border-accent: #3a3a42;
+
+  /* Text hierarchy */
+  --color-text-primary: #f0f0f2;
+  --color-text-secondary: #a0a0a8;
+  --color-text-tertiary: #6b6b74;
+  --color-text-muted: #4a4a52;
+
+  /* Accent -- teal/green (LifeOS-inspired) */
+  --color-accent: #00c896;
+  --color-accent-hover: #00e0a8;
+  --color-accent-muted: #00c89620;
+  --color-accent-subtle: #00c89610;
+
+  /* Status colors */
+  --color-success: #00c896;
+  --color-warning: #f5a623;
+  --color-danger: #ef4444;
+  --color-info: #5b9cf5;
+
+  /* Emotion quadrant colors (preserved from original) */
+  --color-quadrant-high-unpleasant: #ef4444;
+  --color-quadrant-high-pleasant: #f59e0b;
+  --color-quadrant-low-unpleasant: #6366f1;
+  --color-quadrant-low-pleasant: #10b981;
+
+  /* Tag/badge colors */
+  --color-tag-purple: #8b5cf6;
+  --color-tag-blue: #3b82f6;
+  --color-tag-orange: #f97316;
+  --color-tag-pink: #ec4899;
+  --color-tag-teal: #14b8a6;
+
+  /* Sidebar */
+  --color-sidebar-bg: #0d0d10;
+  --color-sidebar-border: #1a1a20;
+  --color-sidebar-active: #00c89618;
+
+  /* Legacy sage/warm/calm for existing components (mapped to dark equivalents) */
+  --color-sage-50: #16161a;
+  --color-sage-100: #1e1e24;
+  --color-sage-200: #2a2a30;
+  --color-sage-300: #3a3a42;
+  --color-sage-400: #6b6b74;
+  --color-sage-500: #8a8a94;
+  --color-sage-600: #a0a0a8;
+  --color-sage-700: #c0c0c8;
+  --color-sage-800: #e0e0e4;
+  --color-sage-900: #f0f0f2;
+
+  --color-warm-50: #0a0a0c;
+  --color-warm-100: #f0f0f2;
+  --color-warm-200: #2a2a30;
+  --color-warm-300: #3a3a42;
+  --color-warm-400: #6b6b74;
+  --color-warm-500: #8a8a94;
+  --color-warm-600: #a0a0a8;
+  --color-warm-700: #c0c0c8;
+  --color-warm-800: #e0e0e4;
+  --color-warm-900: #f0f0f2;
+
+  --color-calm-50: #111118;
+  --color-calm-100: #1a1a24;
+  --color-calm-200: #2a2a38;
+  --color-calm-300: #3a3a4a;
+  --color-calm-400: #5b9cf5;
+  --color-calm-500: #5b9cf5;
+  --color-calm-600: #5b9cf5;
+  --color-calm-700: #4a88e0;
+  --color-calm-800: #3a6fc0;
+  --color-calm-900: #2a5090;
+}
+
+/* Base styles */
+body {
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
+  background-color: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  min-height: 100vh;
+}
+
+/* Scrollbar styling for dark theme */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-accent);
+}
+
+/* Selection color */
+::selection {
+  background: var(--color-accent-muted);
+  color: var(--color-text-primary);
+}
+
+/* ============================================
+   Light Theme
+   ============================================ */
+:root[data-theme="light"] {
+  /* Background layers */
+  --color-bg-primary: #fdfcfb;
+  --color-bg-secondary: #f7f3ef;
+  --color-bg-card: #ffffff;
+  --color-bg-card-hover: #f9f7f5;
+  --color-bg-elevated: #f5f2ee;
+  --color-bg-input: #ffffff;
+
+  /* Borders */
+  --color-border: #e3e0dc;
+  --color-border-subtle: #ede9e5;
+  --color-border-accent: #d1cdc7;
+
+  /* Text hierarchy */
+  --color-text-primary: #2b332b;
+  --color-text-secondary: #5a6358;
+  --color-text-tertiary: #7a8578;
+  --color-text-muted: #a0a89c;
+
+  /* Accent stays the same */
+  --color-accent: #00a87a;
+  --color-accent-hover: #008f68;
+  --color-accent-muted: #00a87a18;
+  --color-accent-subtle: #00a87a0c;
+
+  /* Sidebar */
+  --color-sidebar-bg: #f2efeb;
+  --color-sidebar-border: #e3e0dc;
+  --color-sidebar-active: #00a87a12;
+
+  /* Legacy sage/warm/calm restored to light values */
   --color-sage-50: #f6f7f6;
   --color-sage-100: #e3e7e3;
   --color-sage-200: #c7d0c7;
@@ -12,7 +168,7 @@
   --color-sage-700: #3d4b3d;
   --color-sage-800: #333e33;
   --color-sage-900: #2b332b;
-  
+
   --color-warm-50: #fdfcfb;
   --color-warm-100: #f7f3ef;
   --color-warm-200: #efe7de;
@@ -23,7 +179,7 @@
   --color-warm-700: #8a735c;
   --color-warm-800: #715f4d;
   --color-warm-900: #5d4f41;
-  
+
   --color-calm-50: #f5f8fa;
   --color-calm-100: #e8eff4;
   --color-calm-200: #d5e2ec;
@@ -36,18 +192,71 @@
   --color-calm-900: #3d4d5e;
 }
 
-/* Base styles */
-body {
-  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
-  background-color: var(--color-warm-50);
-  color: var(--color-sage-800);
-  min-height: 100vh;
-}
+/* System theme: use light variables when OS is in light mode */
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    /* Background layers */
+    --color-bg-primary: #fdfcfb;
+    --color-bg-secondary: #f7f3ef;
+    --color-bg-card: #ffffff;
+    --color-bg-card-hover: #f9f7f5;
+    --color-bg-elevated: #f5f2ee;
+    --color-bg-input: #ffffff;
 
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: var(--color-sage-900);
-    color: var(--color-warm-100);
+    /* Borders */
+    --color-border: #e3e0dc;
+    --color-border-subtle: #ede9e5;
+    --color-border-accent: #d1cdc7;
+
+    /* Text hierarchy */
+    --color-text-primary: #2b332b;
+    --color-text-secondary: #5a6358;
+    --color-text-tertiary: #7a8578;
+    --color-text-muted: #a0a89c;
+
+    /* Accent */
+    --color-accent: #00a87a;
+    --color-accent-hover: #008f68;
+    --color-accent-muted: #00a87a18;
+    --color-accent-subtle: #00a87a0c;
+
+    /* Sidebar */
+    --color-sidebar-bg: #f2efeb;
+    --color-sidebar-border: #e3e0dc;
+    --color-sidebar-active: #00a87a12;
+
+    /* Legacy palette - light */
+    --color-sage-50: #f6f7f6;
+    --color-sage-100: #e3e7e3;
+    --color-sage-200: #c7d0c7;
+    --color-sage-300: #a3b2a3;
+    --color-sage-400: #7a8f7a;
+    --color-sage-500: #5f755f;
+    --color-sage-600: #4a5d4a;
+    --color-sage-700: #3d4b3d;
+    --color-sage-800: #333e33;
+    --color-sage-900: #2b332b;
+
+    --color-warm-50: #fdfcfb;
+    --color-warm-100: #f7f3ef;
+    --color-warm-200: #efe7de;
+    --color-warm-300: #e2d5c7;
+    --color-warm-400: #d1bea8;
+    --color-warm-500: #bfa78d;
+    --color-warm-600: #a68c6f;
+    --color-warm-700: #8a735c;
+    --color-warm-800: #715f4d;
+    --color-warm-900: #5d4f41;
+
+    --color-calm-50: #f5f8fa;
+    --color-calm-100: #e8eff4;
+    --color-calm-200: #d5e2ec;
+    --color-calm-300: #b6cdde;
+    --color-calm-400: #91b2cb;
+    --color-calm-500: #7399b8;
+    --color-calm-600: #5f82a3;
+    --color-calm-700: #526d89;
+    --color-calm-800: #475b71;
+    --color-calm-900: #3d4d5e;
   }
 }

@@ -1,6 +1,9 @@
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getToolById } from '../data/tools';
 import { getCategoryById } from '../data/categories';
+import { useAuth } from '../contexts/AuthContext';
+import { trackToolUsage } from '../services/neo4j';
 
 // Import tool components
 import { CoolDown } from './tools/CoolDown';
@@ -18,8 +21,16 @@ const toolComponents: Record<string, React.ComponentType> = {
 
 export function ToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
+  const { user } = useAuth();
   const tool = toolId ? getToolById(toolId) : undefined;
   const category = tool ? getCategoryById(tool.categoryId) : undefined;
+
+  // Track tool usage when the page mounts (fire-and-forget)
+  useEffect(() => {
+    if (user && toolId) {
+      trackToolUsage(toolId);
+    }
+  }, [user, toolId]);
 
   if (!tool || !category) {
     return (

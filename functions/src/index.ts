@@ -1,6 +1,12 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
+import * as admin from 'firebase-admin';
 import neo4j, { Driver } from 'neo4j-driver';
+
+// Initialize Firebase Admin (for updating Auth profiles)
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 
 // Define secrets - these are securely stored in Firebase and injected at runtime
 const neo4jUri = defineSecret('NEO4J_URI');
@@ -253,6 +259,360 @@ export const initializeSchema = onCall(
     } catch (error) {
       console.error('Error initializing schema:', error);
       throw new HttpsError('internal', 'Failed to initialize schema');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+// ============================================
+// USER PROFILE FUNCTIONS
+// ============================================
+
+const PROFILE_DEFAULTS = {
+  displayName: null,
+  photoURL: null,
+  theme: 'dark',
+  checkInReminder: false,
+  reminderTime: '09:00',
+  reminderDays: [1, 2, 3, 4, 5],
+  weeklyDigest: false,
+  dailyCheckInGoal: 1,
+  weeklyToolGoal: 3,
+  focusCategories: [],
+  dataRetentionDays: null,
+  shareAnonymousData: false,
+};
+
+/**
+ * Get user profile -- returns User node properties merged with defaults
+ */
+export const getUserProfile = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+    const email = request.auth.token.email || '';
+
+    const session = getDriver().session();
+    try {
+      const result = await session.run(
+        `
+        MATCH (u:User {id: $userId})
+        RETURN u {.*} AS user
+        `,
+        { userId }
+      );
+
+      const userNode = result.records[0]?.get('user') || {};
+
+      // Merge with defaults, ensuring all fields are present
+      const profile = {
+        ...PROFILE_DEFAULTS,
+        email,
+        ...userNode,
+        // Clean up Neo4j integer types
+        dailyCheckInGoal: toNumber(userNode.dailyCheckInGoal) ?? PROFILE_DEFAULTS.dailyCheckInGoal,
+        weeklyToolGoal: toNumber(userNode.weeklyToolGoal) ?? PROFILE_DEFAULTS.weeklyToolGoal,
+        dataRetentionDays: userNode.dataRetentionDays != null ? toNumber(userNode.dataRetentionDays) : null,
+        reminderDays: userNode.reminderDays ?? PROFILE_DEFAULTS.reminderDays,
+        focusCategories: userNode.focusCategories ?? PROFILE_DEFAULTS.focusCategories,
+      };
+
+      // Remove internal fields
+      delete profile.id;
+      delete profile.createdAt;
+
+      // Enforce data retention: delete check-ins older than dataRetentionDays
+      const retentionDays = profile.dataRetentionDays != null
+        ? toNumber(profile.dataRetentionDays)
+        : null;
+
+      if (retentionDays != null && retentionDays > 0) {
+        try {
+          await session.run(
+            `
+            MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
+            WHERE c.timestamp < datetime() - duration({days: $days})
+            OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
+            DETACH DELETE s, c
+            `,
+            { userId, days: neo4j.int(retentionDays) }
+          );
+        } catch (cleanupErr) {
+          // Don't fail the profile load if cleanup fails
+          console.warn('Data retention cleanup failed:', cleanupErr);
+        }
+      }
+
+      return { profile };
+    } catch (error) {
+      console.error('Error getting user profile:', error);
+      throw new HttpsError('internal', 'Failed to get profile');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/**
+ * Update user profile -- partial update of User node properties
+ */
+export const updateUserProfile = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+    const updates = request.data as Record<string, unknown>;
+
+    if (!updates || typeof updates !== 'object') {
+      throw new HttpsError('invalid-argument', 'Updates must be an object');
+    }
+
+    // Whitelist allowed fields
+    const allowedFields = [
+      'displayName', 'photoURL', 'theme',
+      'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
+      'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories',
+      'dataRetentionDays', 'shareAnonymousData',
+    ];
+
+    const cleanUpdates: Record<string, unknown> = {};
+    for (const key of allowedFields) {
+      if (key in updates) {
+        cleanUpdates[key] = updates[key];
+      }
+    }
+
+    if (Object.keys(cleanUpdates).length === 0) {
+      return { success: true };
+    }
+
+    const session = getDriver().session();
+    try {
+      // Build SET clause dynamically
+      const setClauses = Object.keys(cleanUpdates)
+        .map((key) => `u.${key} = $${key}`)
+        .join(', ');
+
+      await session.run(
+        `
+        MATCH (u:User {id: $userId})
+        SET ${setClauses}, u.updatedAt = datetime()
+        `,
+        { userId, ...cleanUpdates }
+      );
+
+      // Sync displayName/photoURL to Firebase Auth so it persists across sessions
+      const authUpdate: admin.auth.UpdateRequest = {};
+      if ('displayName' in cleanUpdates) {
+        authUpdate.displayName = cleanUpdates.displayName as string || undefined;
+      }
+      if ('photoURL' in cleanUpdates) {
+        authUpdate.photoURL = cleanUpdates.photoURL as string || undefined;
+      }
+      if (Object.keys(authUpdate).length > 0) {
+        await admin.auth().updateUser(userId, authUpdate);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw new HttpsError('internal', 'Failed to update profile');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/**
+ * Delete all user data from Neo4j
+ */
+export const deleteUserData = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+
+    const session = getDriver().session();
+    try {
+      // Delete all check-ins and their body sensations
+      await session.run(
+        `
+        MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
+        OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
+        DETACH DELETE s, c
+        `,
+        { userId }
+      );
+
+      // Delete the user node
+      await session.run(
+        `
+        MATCH (u:User {id: $userId})
+        DETACH DELETE u
+        `,
+        { userId }
+      );
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error deleting user data:', error);
+      throw new HttpsError('internal', 'Failed to delete user data');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/**
+ * Export all user data as JSON
+ */
+export const exportUserData = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+
+    const session = getDriver().session();
+    try {
+      // Get user profile
+      const profileResult = await session.run(
+        `MATCH (u:User {id: $userId}) RETURN u {.*} AS user`,
+        { userId }
+      );
+      const userProfile = profileResult.records[0]?.get('user') || {};
+
+      // Get all check-ins with body sensations
+      const checkInsResult = await session.run(
+        `
+        MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
+        OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
+        WITH c, collect(s {.*}) AS sensations
+        ORDER BY c.timestamp DESC
+        RETURN c {.*} AS checkIn, sensations
+        `,
+        { userId }
+      );
+
+      const checkIns = checkInsResult.records.map((record) => ({
+        ...record.get('checkIn'),
+        bodySensations: record.get('sensations'),
+      }));
+
+      return {
+        data: {
+          exportedAt: new Date().toISOString(),
+          profile: userProfile,
+          checkIns,
+          totalCheckIns: checkIns.length,
+        },
+      };
+    } catch (error) {
+      console.error('Error exporting user data:', error);
+      throw new HttpsError('internal', 'Failed to export data');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/** Helper to convert Neo4j Integer to JS number */
+function toNumber(val: unknown): number | null {
+  if (val == null) return null;
+  if (typeof val === 'number') return val;
+  if (typeof val === 'object' && val !== null && 'toNumber' in val) {
+    return (val as { toNumber: () => number }).toNumber();
+  }
+  return Number(val) || null;
+}
+
+// ============================================
+// TOOL USAGE TRACKING
+// ============================================
+
+/**
+ * Track that a user opened/used a tool
+ */
+export const trackToolUsage = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+    const { toolId } = request.data as { toolId: string };
+
+    if (!toolId) {
+      throw new HttpsError('invalid-argument', 'toolId is required');
+    }
+
+    const session = getDriver().session();
+    try {
+      await session.run(
+        `
+        MATCH (u:User {id: $userId})
+        CREATE (tu:ToolUsage {
+          id: randomUUID(),
+          toolId: $toolId,
+          timestamp: datetime()
+        })
+        MERGE (u)-[:USED_TOOL]->(tu)
+        `,
+        { userId, toolId }
+      );
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error tracking tool usage:', error);
+      throw new HttpsError('internal', 'Failed to track tool usage');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/**
+ * Get the count of tool usages in the last 7 days for the authenticated user
+ */
+export const getWeeklyToolUsageCount = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+
+    const session = getDriver().session();
+    try {
+      const result = await session.run(
+        `
+        MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
+        WHERE tu.timestamp >= datetime() - duration({days: 7})
+        RETURN count(tu) AS count
+        `,
+        { userId }
+      );
+
+      const count = result.records[0]?.get('count');
+      return { count: toNumber(count) ?? 0 };
+    } catch (error) {
+      console.error('Error getting weekly tool usage:', error);
+      throw new HttpsError('internal', 'Failed to get tool usage count');
     } finally {
       await session.close();
     }

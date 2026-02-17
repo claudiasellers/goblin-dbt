@@ -218,6 +218,129 @@ export async function getQuickTools(
 }
 
 // ============================================
+// TOOL USAGE TRACKING
+// ============================================
+
+const trackToolUsageFn = httpsCallable<
+  { toolId: string },
+  { success: boolean }
+>(functions, 'trackToolUsage');
+
+const getWeeklyToolUsageCountFn = httpsCallable<
+  void,
+  { count: number }
+>(functions, 'getWeeklyToolUsageCount');
+
+/**
+ * Track that the user opened/used a tool (fire-and-forget)
+ */
+export async function trackToolUsage(toolId: string): Promise<void> {
+  try {
+    await trackToolUsageFn({ toolId });
+  } catch {
+    // Silently fail -- don't break the tool experience
+  }
+}
+
+/**
+ * Get how many tools the user has used in the last 7 days
+ */
+export async function getWeeklyToolUsageCount(): Promise<number> {
+  const result = await getWeeklyToolUsageCountFn();
+  return result.data.count;
+}
+
+// ============================================
+// USER PROFILE FUNCTIONS
+// ============================================
+
+export interface UserProfile {
+  displayName: string | null;
+  email: string;
+  photoURL: string | null;
+  theme: 'dark' | 'light' | 'system';
+  checkInReminder: boolean;
+  reminderTime: string;
+  reminderDays: number[];
+  weeklyDigest: boolean;
+  dailyCheckInGoal: number;
+  weeklyToolGoal: number;
+  focusCategories: string[];
+  dataRetentionDays: number | null;
+  shareAnonymousData: boolean;
+}
+
+export const DEFAULT_PROFILE: UserProfile = {
+  displayName: null,
+  email: '',
+  photoURL: null,
+  theme: 'dark',
+  checkInReminder: false,
+  reminderTime: '09:00',
+  reminderDays: [1, 2, 3, 4, 5],
+  weeklyDigest: false,
+  dailyCheckInGoal: 1,
+  weeklyToolGoal: 3,
+  focusCategories: [],
+  dataRetentionDays: null,
+  shareAnonymousData: false,
+};
+
+const getUserProfileFn = httpsCallable<void, { profile: UserProfile }>(
+  functions,
+  'getUserProfile'
+);
+
+const updateUserProfileFn = httpsCallable<
+  Partial<UserProfile>,
+  { success: boolean }
+>(functions, 'updateUserProfile');
+
+const deleteUserDataFn = httpsCallable<
+  { deleteAuth?: boolean },
+  { success: boolean }
+>(functions, 'deleteUserData');
+
+const exportUserDataFn = httpsCallable<
+  void,
+  { data: Record<string, unknown> }
+>(functions, 'exportUserData');
+
+/**
+ * Get the authenticated user's profile
+ */
+export async function getUserProfile(): Promise<UserProfile> {
+  const result = await getUserProfileFn();
+  return result.data.profile;
+}
+
+/**
+ * Update profile fields (partial update)
+ */
+export async function updateUserProfile(
+  updates: Partial<UserProfile>
+): Promise<void> {
+  await updateUserProfileFn(updates);
+}
+
+/**
+ * Delete all user data from Neo4j (and optionally Firebase Auth)
+ */
+export async function deleteUserData(
+  deleteAuth = false
+): Promise<void> {
+  await deleteUserDataFn({ deleteAuth });
+}
+
+/**
+ * Export all user data as JSON
+ */
+export async function exportUserData(): Promise<Record<string, unknown>> {
+  const result = await exportUserDataFn();
+  return result.data.data;
+}
+
+// ============================================
 // REMOVED - These were for direct Neo4j access
 // ============================================
 // The following functions are no longer needed since we don't connect directly:
