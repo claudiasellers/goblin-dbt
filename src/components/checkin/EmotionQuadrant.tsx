@@ -43,28 +43,37 @@ export function EmotionQuadrant({ onSelect }: EmotionQuadrantProps) {
         Tap the color that best describes your current state
       </p>
 
-      <div className="grid grid-cols-2 gap-4">
-        {quadrants.map((quadrant) => (
-          <button
-            key={quadrant.id}
-            onClick={() => onSelect(quadrant.id)}
-            className={`
-              ${quadrant.color} ${quadrant.textColor}
-              aspect-square rounded-3xl p-4
-              flex flex-col items-center justify-center
-              shadow-lg hover:shadow-xl
-              transform hover:scale-[1.02] active:scale-[0.98]
-              transition-all duration-200
-            `}
-          >
-            <span className="font-semibold text-center whitespace-pre-line text-lg mb-2">
-              {quadrant.label}
-            </span>
-            <span className="text-xs opacity-80 text-center">
-              {quadrant.examples}
-            </span>
-          </button>
-        ))}
+      <div className="max-w-xs mx-auto">
+        <div className="grid grid-cols-2 gap-3">
+          {quadrants.map((quadrant) => (
+            <button
+              key={quadrant.id}
+              onClick={() => onSelect(quadrant.id)}
+              className={`
+                ${quadrant.color} ${quadrant.textColor}
+                aspect-square rounded-3xl p-3
+                flex flex-col items-center justify-center
+                shadow-lg hover:shadow-xl
+                transform hover:scale-[1.02] active:scale-[0.98]
+                transition-all duration-200
+              `}
+            >
+              <span className="font-semibold text-center whitespace-pre-line text-base mb-1">
+                {quadrant.label}
+              </span>
+              <span className="text-xs opacity-80 text-center leading-tight">
+                {quadrant.examples}
+              </span>
+            </button>
+          ))}
+        </div>
+        {/* Axis labels */}
+        <div className="relative mt-3">
+          <div className="flex justify-between text-xs text-[var(--color-sage-500)] px-1">
+            <span>Unpleasant</span>
+            <span>Pleasant</span>
+          </div>
+        </div>
       </div>
     </div>
   );
