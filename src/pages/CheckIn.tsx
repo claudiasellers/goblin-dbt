@@ -109,14 +109,27 @@ export function CheckIn() {
       setStep('result');
     } catch (error) {
       console.error('Failed to analyze state:', error);
-      setAnalyzeError('Unable to analyze right now. Please try again.');
-      // Fall back to previous step
-      if (checkInData.bodySensations.length > 0) {
-        setStep('body');
-      } else if (checkInData.emotions.length > 0) {
-        setStep('emotion');
-      } else {
-        setStep('quadrant');
+      // Analysis unavailable — skip straight to saving the check-in
+      setAnalyzeError(null);
+      setStateResult(null);
+      setStep('saving');
+      try {
+        if (user) {
+          await ensureUserExists(user.uid, user.email || '');
+          await saveCheckIn(user.uid, {
+            emotion: checkInData.emotions.join(', ') || checkInData.quadrant!,
+            quadrant: checkInData.quadrant!,
+            intensity: checkInData.intensity || { x: 0.5, y: 0.5 },
+            bodySensations: checkInData.bodySensations,
+            note: checkInData.note,
+            timestamp: new Date(),
+          });
+        }
+        setStep('complete');
+      } catch (saveErr) {
+        console.error('Failed to save check-in:', saveErr);
+        setSaveError('Check-in recorded locally but could not sync.');
+        setStep('complete');
       }
     }
   }
