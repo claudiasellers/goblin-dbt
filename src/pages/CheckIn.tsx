@@ -3,7 +3,6 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { EmotionQuadrant } from '../components/checkin/EmotionQuadrant';
 import { EmotionGrid } from '../components/checkin/EmotionGrid';
-import { IntensityGrid } from '../components/checkin/IntensityGrid';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
 import { StateResult } from '../components/checkin/StateResult';
@@ -14,12 +13,11 @@ import {
   type StateResult as StateResultType 
 } from '../services/neo4j';
 
-type CheckInStep = 
-  | 'quadrant' 
-  | 'emotion' 
-  | 'intensity' 
-  | 'body' 
-  | 'sensation' 
+type CheckInStep =
+  | 'quadrant'
+  | 'emotion'
+  | 'body'
+  | 'sensation'
   | 'analyzing'
   | 'result'
   | 'saving'
@@ -115,8 +113,6 @@ export function CheckIn() {
       // Fall back to previous step
       if (checkInData.bodySensations.length > 0) {
         setStep('body');
-      } else if (checkInData.intensity) {
-        setStep('intensity');
       } else if (checkInData.emotions.length > 0) {
         setStep('emotion');
       } else {
@@ -139,11 +135,6 @@ export function CheckIn() {
 
   function handleEmotionSelect(emotions: string[]) {
     setCheckInData(prev => ({ ...prev, emotions }));
-    setStep('intensity');
-  }
-
-  function handleIntensitySelect(intensity: { x: number; y: number }) {
-    setCheckInData(prev => ({ ...prev, intensity }));
     setStep('body');
   }
 
@@ -209,8 +200,6 @@ export function CheckIn() {
     // Go back to the next unfilled step
     if (checkInData.emotions.length === 0) {
       setStep('emotion');
-    } else if (!checkInData.intensity) {
-      setStep('intensity');
     } else {
       setStep('body');
     }
@@ -237,18 +226,14 @@ export function CheckIn() {
       case 'emotion':
         setStep('quadrant');
         break;
-      case 'intensity':
-        setStep('emotion');
-        break;
       case 'body':
-        setStep('intensity');
+        setStep('emotion');
         break;
       case 'sensation':
         setCurrentSensation(null);
         setStep('body');
         break;
       case 'result':
-        // Allow going back to add more detail
         handleAddMoreDetail();
         break;
       case 'complete':
@@ -258,7 +243,7 @@ export function CheckIn() {
   }
 
   // Calculate progress for the stepper
-  const stepOrder = ['quadrant', 'emotion', 'intensity', 'body'];
+  const stepOrder = ['quadrant', 'emotion', 'body'];
   const currentStepIndex = stepOrder.indexOf(step);
   const showProgress = currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
 
@@ -318,13 +303,6 @@ export function CheckIn() {
         />
       )}
 
-      {step === 'intensity' && (
-        <IntensityGrid 
-          onSelect={handleIntensitySelect}
-          onHelpMeNow={handleHelpMeNow}
-        />
-      )}
-
       {step === 'body' && (
         <BodyMap 
           onTap={handleBodyTap}
@@ -360,7 +338,7 @@ export function CheckIn() {
           onDone={handleResultDone}
           onAddMoreDetail={
             // Only show "add more detail" if they haven't completed all steps
-            (!checkInData.emotions.length || !checkInData.intensity || !checkInData.bodySensations.length)
+            (!checkInData.emotions.length || !checkInData.bodySensations.length)
               ? handleAddMoreDetail
               : undefined
           }
