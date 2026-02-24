@@ -9,36 +9,31 @@ interface EmotionGridProps {
   showRelated?: boolean;
 }
 
-// Bubble size classes — vary by name length for visual rhythm
-function getBubbleSize(name: string): string {
-  const len = name.length;
-  if (len <= 3) return 'w-16 h-16 text-xs';
-  if (len <= 5) return 'w-20 h-20 text-sm';
-  if (len <= 8) return 'w-24 h-24 text-sm';
-  return 'w-28 h-28 text-xs';
-}
-
-// Quadrant-specific gradient backgrounds for bubbles
-const quadrantBubbleStyles: Record<string, { base: string; selected: string; text: string }> = {
+// Quadrant-specific styles for bubbles
+const quadrantBubbleStyles: Record<string, { base: string; selected: string; text: string; selectedText: string }> = {
   'high-unpleasant': {
-    base: 'bg-gradient-to-br from-red-300 to-rose-400',
-    selected: 'bg-gradient-to-br from-red-500 to-rose-600 ring-2 ring-red-700 ring-offset-2',
-    text: 'text-white',
+    base: 'bg-red-100 border-2 border-red-300',
+    selected: 'bg-red-500 border-2 border-red-600 shadow-lg',
+    text: 'text-red-700',
+    selectedText: 'text-white',
   },
   'high-pleasant': {
-    base: 'bg-gradient-to-br from-yellow-300 to-amber-400',
-    selected: 'bg-gradient-to-br from-yellow-400 to-amber-500 ring-2 ring-amber-700 ring-offset-2',
-    text: 'text-amber-900',
+    base: 'bg-amber-100 border-2 border-amber-300',
+    selected: 'bg-amber-500 border-2 border-amber-600 shadow-lg',
+    text: 'text-amber-800',
+    selectedText: 'text-white',
   },
   'low-unpleasant': {
-    base: 'bg-gradient-to-br from-blue-300 to-indigo-400',
-    selected: 'bg-gradient-to-br from-blue-500 to-indigo-600 ring-2 ring-indigo-700 ring-offset-2',
-    text: 'text-white',
+    base: 'bg-blue-100 border-2 border-blue-300',
+    selected: 'bg-blue-500 border-2 border-blue-600 shadow-lg',
+    text: 'text-blue-700',
+    selectedText: 'text-white',
   },
   'low-pleasant': {
-    base: 'bg-gradient-to-br from-emerald-300 to-teal-400',
-    selected: 'bg-gradient-to-br from-emerald-500 to-teal-600 ring-2 ring-teal-700 ring-offset-2',
-    text: 'text-white',
+    base: 'bg-emerald-100 border-2 border-emerald-300',
+    selected: 'bg-emerald-500 border-2 border-emerald-600 shadow-lg',
+    text: 'text-emerald-700',
+    selectedText: 'text-white',
   },
 };
 
@@ -234,27 +229,26 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
       </div>
 
       {/* Emotion bubbles — How We Feel style */}
-      <div className="flex flex-wrap justify-center items-center gap-2 max-h-[340px] overflow-y-auto py-2 px-1">
+      <div className="flex flex-wrap justify-center gap-2 max-h-[340px] overflow-y-auto py-2">
         {filteredEmotions.map((emotion) => {
           const isSelected = selectedEmotions.includes(emotion.name);
-          const sizeClass = getBubbleSize(emotion.name);
           return (
             <button
               key={emotion.id}
+              type="button"
               onClick={() => toggleEmotion(emotion.name)}
               className={`
-                ${sizeClass}
-                ${isSelected ? bubbleStyle.selected : bubbleStyle.base}
-                ${bubbleStyle.text}
-                rounded-full
-                flex items-center justify-center
-                font-medium leading-tight text-center
-                hover:brightness-110 active:scale-95
-                transition-all duration-200
-                ${isSelected ? 'shadow-lg scale-105' : 'shadow-md hover:shadow-lg opacity-85 hover:opacity-100'}
+                py-3 px-5 rounded-full text-sm font-medium
+                cursor-pointer select-none
+                transition-all duration-150
+                active:scale-95
+                ${isSelected
+                  ? `${bubbleStyle.selected} ${bubbleStyle.selectedText}`
+                  : `${bubbleStyle.base} ${bubbleStyle.text} hover:shadow-md`
+                }
               `}
             >
-              <span className="px-1">{emotion.name}</span>
+              {emotion.name}
             </button>
           );
         })}
