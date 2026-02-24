@@ -779,10 +779,36 @@ export const getStateAndTools = onCall(
         };
       }
 
-      const patternResult = await session.run(patternQuery, queryParams);
+      let patternResult = await session.run(patternQuery, queryParams);
       
+      // If emotion-matching found nothing, fall back to intensity-based heuristics
+      if (patternResult.records.length === 0 && input.emotions && input.emotions.length > 0) {
+        const intensityY = input.intensity?.y ?? 0.5;
+        const fallbackQuery = `
+          MATCH (p:ActivationPattern)
+          WHERE p.id IN $candidatePatterns
+          WITH p,
+               CASE 
+                 WHEN $intensityY > 0.7 AND p.id IN ['acute_alarm', 'emotional_flooding'] THEN 0.8
+                 WHEN $intensityY > 0.7 AND p.id IN ['chronic_vigilance', 'social_threat_shame'] THEN 0.6
+                 WHEN $intensityY < 0.3 AND p.id IN ['conservation_freeze', 'reward_drive_low'] THEN 0.8
+                 WHEN $intensityY < 0.3 AND p.id IN ['dissociation_overmodulation', 'rumination_loop'] THEN 0.6
+                 ELSE 0.5
+               END as confidence
+          RETURN p.id as id,
+                 p.userFacingLabel as userFacingLabel,
+                 p.description as description,
+                 p.evidenceGrade as evidenceGrade,
+                 p.safetyConstraints as safetyConstraints,
+                 p.clinicalNotes as clinicalNotes,
+                 confidence
+          ORDER BY confidence DESC
+          LIMIT 1
+        `;
+        patternResult = await session.run(fallbackQuery, { candidatePatterns, intensityY });
+      }
+
       if (patternResult.records.length === 0) {
-        // Log which patterns were searched for debugging
         console.error('No patterns found. Searched for:', candidatePatterns, 'Quadrant:', input.quadrant);
         throw new HttpsError('not-found', `No matching pattern found for quadrant: ${input.quadrant}. Patterns searched: ${candidatePatterns.join(', ')}`);
       }
