@@ -1,4 +1,6 @@
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
+import { getMicroStep, type MicroStep } from '../../data/microSteps';
 import type { StateResult, ToolRecommendation } from '../../services/neo4j';
 
 interface StateResultProps {
@@ -15,11 +17,113 @@ interface StateResultProps {
  * 
  * The user came in feeling a vague soup of bad. We give them language for it
  * (affect labeling), and immediately follow with "here's what to do."
+ * 
+ * === BAILOUT FLOW ===
+ * If even the recommended tools feel too overwhelming, a "That feels like too much
+ * right now" button at the bottom swaps the entire screen for a single, massive,
+ * dead-simple micro-step that is clinically matched to their neural activation pattern.
+ * 
+ * This ensures the app never becomes another source of guilt/failure — there is
+ * always something small enough that anyone can do it.
  */
 export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProps) {
   const { pattern, tools, safetyFlag } = result;
 
-  // Handle safety-critical states first
+  // === Bailout state ===
+  const [bailoutStep, setBailoutStep] = useState<MicroStep | null>(null);
+  const [bailoutIndex, setBailoutIndex] = useState<number | null>(null);
+  const [isCompleting, setIsCompleting] = useState(false);
+
+  const handleBailoutComplete = useCallback(() => {
+    setIsCompleting(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isCompleting) return;
+    const timer = setTimeout(() => {
+      onDone();
+    }, 1800);
+    return () => clearTimeout(timer);
+  }, [isCompleting, onDone]);
+
+  function handleBailout() {
+    const { step, index } = getMicroStep(pattern.id);
+    setBailoutStep(step);
+    setBailoutIndex(index);
+  }
+
+  function handleShowAnother() {
+    if (bailoutIndex === null) return;
+    const { step, index } = getMicroStep(pattern.id, bailoutIndex);
+    setBailoutStep(step);
+    setBailoutIndex(index);
+  }
+
+  // ===========================================
+  // RENDER: Completion confirmation
+  // Brief, warm, non-patronizing acknowledgment
+  // ===========================================
+  if (isCompleting) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh] px-6">
+        <div className="text-center animate-fade-in">
+          <p className="text-xl text-[var(--color-sage-700)] font-medium leading-relaxed">
+            That counts.
+          </p>
+          <p className="text-xl text-[var(--color-sage-700)] font-medium leading-relaxed">
+            You did something.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ===========================================
+  // RENDER: Bailout micro-step (full-screen takeover)
+  // Maximum simplicity. One instruction. One action.
+  // ===========================================
+  if (bailoutStep) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
+        {/* Compassionate header — small, gentle, not attention-competing */}
+        <p className="text-sm text-[var(--color-sage-500)] mb-8">
+          That's okay. Let's go smaller.
+        </p>
+
+        {/* THE INSTRUCTION — the only thing that matters on this screen */}
+        <div className="text-center mb-12 max-w-sm">
+          <p className="text-2xl sm:text-3xl font-semibold text-[var(--color-sage-800)] leading-snug mb-4">
+            {bailoutStep.text}
+          </p>
+          {bailoutStep.subtext && (
+            <p className="text-base text-[var(--color-sage-500)] leading-relaxed">
+              {bailoutStep.subtext}
+            </p>
+          )}
+        </div>
+
+        {/* Single primary action */}
+        <button
+          onClick={handleBailoutComplete}
+          className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium text-lg transition-colors"
+        >
+          I did it
+        </button>
+
+        {/* Subtle cycle option — for accessibility (e.g., step requires cold water but user is in bed) */}
+        <button
+          onClick={handleShowAnother}
+          className="mt-4 text-sm text-[var(--color-sage-400)] hover:text-[var(--color-sage-600)] transition-colors"
+        >
+          Show me something else
+        </button>
+      </div>
+    );
+  }
+
+  // ===========================================
+  // RENDER: Crisis safety flag — NO bailout button here
+  // ===========================================
   if (safetyFlag && safetyFlag.type === 'crisis') {
     return (
       <div className="text-center py-6">
@@ -48,7 +152,9 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
     );
   }
 
-  // Positive state - no intervention needed
+  // ===========================================
+  // RENDER: Positive state — NO bailout button here
+  // ===========================================
   if (pattern.id === 'positive_state') {
     return (
       <div className="text-center py-6">
@@ -69,6 +175,10 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
     );
   }
 
+  // ===========================================
+  // RENDER: Standard intervention view
+  // State label -> tools -> actions -> bailout escape hatch
+  // ===========================================
   return (
     <div className="py-4">
       {/* The State Summary - one cohesive sentence */}
@@ -81,7 +191,6 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
           {pattern.userFacingLabel}
         </h2>
         
-        {/* Confidence indicator - subtle, not distracting */}
         {pattern.confidence < 0.6 && (
           <p className="text-sm text-[var(--color-sage-500)] mb-2">
             Based on what you've shared
@@ -113,7 +222,7 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
         </div>
       )}
 
-      {/* Actions */}
+      {/* Primary actions */}
       <div className="space-y-3">
         <button
           onClick={onDone}
@@ -131,13 +240,49 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
           </button>
         )}
       </div>
+
+      {/* === THE BAILOUT BUTTON === 
+          Lowest-emphasis element on screen. Below Done, below Add More Detail.
+          This is an escape hatch, not a primary action.
+          
+          Wording: "too much" not "too hard" — 
+          "hard" implies failure, "too much" normalizes that their 
+          nervous system is overwhelmed, which is the actual truth. */}
+      {tools.length > 0 && (
+        <div className="mt-6 text-center">
+          <button
+            onClick={handleBailout}
+            className="text-sm text-[var(--color-sage-400)] hover:text-[var(--color-sage-600)] transition-colors"
+          >
+            That feels like too much right now
+          </button>
+        </div>
+      )}
     </div>
   );
 }
 
-/**
- * A single tool card - minimal, actionable
- */
+function getPatternEmoji(patternId: string): string {
+  const map: Record<string, string> = {
+    acute_alarm: '\u26A1',
+    chronic_vigilance: '\uD83D\uDD0D',
+    emotional_flooding: '\uD83C\uDF0A',
+    conservation_freeze: '\uD83E\uDDCA',
+    dissociation_overmodulation: '\uD83C\uDF2B\uFE0F',
+    rumination_loop: '\uD83D\uDD04',
+    reward_drive_low: '\uD83E\uDEAB',
+    social_threat_shame: '\uD83E\uDEE3',
+    grief_yearning: '\uD83D\uDC94',
+    reactive_aggression: '\uD83D\uDD25',
+    positive_state: '\u2728',
+  };
+  return map[patternId] || '\uD83E\uDDE0';
+}
+
+function getToolPath(toolId: string): string {
+  return `/tool/${toolId}`;
+}
+
 function ToolCard({ tool, isPrimary }: { tool: ToolRecommendation; isPrimary: boolean }) {
   const toolPath = getToolPath(tool.id);
   
@@ -147,69 +292,52 @@ function ToolCard({ tool, isPrimary }: { tool: ToolRecommendation; isPrimary: bo
       className={`
         block p-4 rounded-xl transition-all
         ${isPrimary 
-          ? 'bg-[var(--color-sage-600)] text-white shadow-lg hover:shadow-xl hover:bg-[var(--color-sage-700)]' 
-          : 'bg-[var(--color-sage-100)] text-[var(--color-sage-800)] hover:bg-[var(--color-sage-200)]'
+          ? 'bg-[var(--color-sage-100)] border-2 border-[var(--color-sage-300)] hover:border-[var(--color-sage-400)]' 
+          : 'bg-[var(--color-sage-50)] border border-[var(--color-sage-200)] hover:border-[var(--color-sage-300)]'
         }
       `}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className={`font-semibold ${isPrimary ? 'text-white' : 'text-[var(--color-sage-800)]'}`}>
-            {formatToolName(tool.name || tool.id)}
+      <div className="flex items-start gap-3">
+        <div className="text-xl flex-shrink-0 mt-0.5">
+          {getToolEmoji(tool.id)}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className={`font-semibold text-[var(--color-sage-800)] ${isPrimary ? 'text-base' : 'text-sm'}`}>
+            {tool.name}
           </h3>
-          {tool.whenToUse && (
-            <p className={`text-sm mt-1 ${isPrimary ? 'text-white/80' : 'text-[var(--color-sage-600)]'}`}>
-              {truncate(tool.whenToUse, 60)}
+          <p className="text-sm text-[var(--color-sage-600)] mt-0.5 line-clamp-2">
+            {tool.description || tool.whenToUse}
+          </p>
+          {isPrimary && tool.relevance && (
+            <p className="text-xs text-[var(--color-sage-500)] mt-1 italic">
+              {tool.relevance}
             </p>
           )}
         </div>
-        <span className={`text-xl ${isPrimary ? 'text-white/80' : 'text-[var(--color-sage-400)]'}`}>
-          →
-        </span>
+        <span className="text-[var(--color-sage-400)] flex-shrink-0 mt-1">\u2192</span>
       </div>
     </Link>
   );
 }
 
-// Helper functions
-function getPatternEmoji(patternId: string): string {
-  const emojiMap: Record<string, string> = {
-    'acute_alarm': '⚡',
-    'chronic_vigilance': '👁️',
-    'emotional_flooding': '🌊',
-    'conservation_freeze': '🧊',
-    'dissociation_overmodulation': '☁️',
-    'rumination_loop': '🔄',
-    'reward_drive_low': '🔋',
-    'social_threat_shame': '🙈',
-    'positive_state': '✨',
+function getToolEmoji(toolId: string): string {
+  const map: Record<string, string> = {
+    'cool-down': '\uD83E\uDDCA',
+    'five-senses': '\uD83D\uDC41\uFE0F',
+    'pause': '\u270B',
+    'urge-surfing': '\uD83C\uDF0A',
+    'name-it': '\uD83C\uDFF7\uFE0F',
+    'opposite-action': '\u21A9\uFE0F',
+    'radical-acceptance': '\uD83D\uDE4F',
+    'pleasant-activities': '\uD83C\uDF31',
+    'dear-man': '\uD83D\uDCAC',
+    'boundaries': '\uD83D\uDEE1\uFE0F',
+    'repair': '\uD83E\uDD1D',
+    'validation': '\uD83D\uDC9B',
+    'mindful-breathing': '\uD83E\uDEC1',
+    'body-scan': '\uD83D\uDCE1',
+    'wise-mind': '\uD83E\uDDD8',
+    'observe-describe': '\uD83D\uDC40',
   };
-  return emojiMap[patternId] || '💭';
-}
-
-function formatToolName(name: string): string {
-  // Convert dbt_tipp to "TIPP", dbt_opposite_action to "Opposite Action"
-  return name
-    .replace(/^dbt_/, '')
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, c => c.toUpperCase())
-    .replace(/Tipp/i, 'TIPP');
-}
-
-function getToolPath(toolId: string): string {
-  // Map therapy concept IDs to actual tool routes
-  const pathMap: Record<string, string> = {
-    'dbt_tipp': '/tools/cool-down',
-    'dbt_grounding': '/tools/five-senses',
-    'dbt_opposite_action': '/tools/opposite-action',
-    'dbt_paced_breathing': '/tools/pause',
-    'dbt_behavioral_activation': '/tools/one-good-thing',
-    'dbt_pleasant_activities': '/tools/one-good-thing',
-  };
-  return pathMap[toolId] || `/tools/${toolId.replace('dbt_', '')}`;
-}
-
-function truncate(text: string, maxLength: number): string {
-  if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength).trim() + '...';
+  return map[toolId] || '\uD83D\uDD27';
 }
