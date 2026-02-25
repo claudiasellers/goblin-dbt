@@ -1,7 +1,7 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
-import neo4j, { Driver } from 'neo4j-driver';
+import neo4j, { Driver, Record as Neo4jRecord } from 'neo4j-driver';
 
 // Initialize Firebase Admin (for updating Auth profiles)
 if (!admin.apps.length) {
@@ -161,7 +161,7 @@ export const getCheckInsByUser = onCall(
         { userId, limit: neo4j.int(limit) }
       );
 
-      const checkIns = result.records.map((record) => {
+      const checkIns = result.records.map((record: Neo4jRecord) => {
         const checkIn = record.get('checkIn');
         const bodySensations = record.get('bodySensations');
         return {
@@ -507,7 +507,7 @@ export const exportUserData = onCall(
         { userId }
       );
 
-      const checkIns = checkInsResult.records.map((record) => ({
+      const checkIns = checkInsResult.records.map((record: Neo4jRecord) => ({
         ...record.get('checkIn'),
         bodySensations: record.get('sensations'),
       }));
@@ -852,7 +852,7 @@ export const getStateAndTools = onCall(
 
       const toolsResult = await session.run(toolsQuery, { patternId: pattern.id });
       
-      const tools: ToolRecommendation[] = toolsResult.records.map(rec => ({
+      const tools: ToolRecommendation[] = toolsResult.records.map((rec: Neo4jRecord) => ({
         id: rec.get('id'),
         name: rec.get('name') || rec.get('id').replace('dbt_', '').replace(/_/g, ' '),
         description: rec.get('description') || '',
@@ -953,7 +953,7 @@ export const getRelatedEmotions = onCall(
 
       const result = await session.run(query, { emotionId, quadrant });
 
-      const relatedEmotions = result.records.map(rec => ({
+      const relatedEmotions = result.records.map((rec: Neo4jRecord) => ({
         id: rec.get('id'),
         name: rec.get('name') || rec.get('id').replace(/_/g, ' '),
         reason: rec.get('reason'),
@@ -1026,7 +1026,7 @@ export const getQuickTools = onCall(
 
       const result = await session.run(query, { toolIds });
 
-      const tools: ToolRecommendation[] = result.records.map(rec => ({
+      const tools: ToolRecommendation[] = result.records.map((rec: Neo4jRecord) => ({
         id: rec.get('id'),
         name: rec.get('name') || rec.get('id').replace('dbt_', '').replace(/_/g, ' '),
         description: rec.get('description') || '',

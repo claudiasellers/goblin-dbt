@@ -524,7 +524,7 @@ exports.getWeeklyToolUsageCount = (0, https_1.onCall)({ secrets: [neo4jUri, neo4
  * This is the main "What's happening right now" query
  */
 exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const input = request.data;
     if (!input.quadrant) {
         throw new https_1.HttpsError('invalid-argument', 'Quadrant is required');
@@ -626,9 +626,34 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
                 intensityY,
             };
         }
-        const patternResult = await session.run(patternQuery, queryParams);
+        let patternResult = await session.run(patternQuery, queryParams);
+        // If emotion-matching found nothing, fall back to intensity-based heuristics
+        if (patternResult.records.length === 0 && input.emotions && input.emotions.length > 0) {
+            const intensityY = (_d = (_c = input.intensity) === null || _c === void 0 ? void 0 : _c.y) !== null && _d !== void 0 ? _d : 0.5;
+            const fallbackQuery = `
+          MATCH (p:ActivationPattern)
+          WHERE p.id IN $candidatePatterns
+          WITH p,
+               CASE 
+                 WHEN $intensityY > 0.7 AND p.id IN ['acute_alarm', 'emotional_flooding'] THEN 0.8
+                 WHEN $intensityY > 0.7 AND p.id IN ['chronic_vigilance', 'social_threat_shame'] THEN 0.6
+                 WHEN $intensityY < 0.3 AND p.id IN ['conservation_freeze', 'reward_drive_low'] THEN 0.8
+                 WHEN $intensityY < 0.3 AND p.id IN ['dissociation_overmodulation', 'rumination_loop'] THEN 0.6
+                 ELSE 0.5
+               END as confidence
+          RETURN p.id as id,
+                 p.userFacingLabel as userFacingLabel,
+                 p.description as description,
+                 p.evidenceGrade as evidenceGrade,
+                 p.safetyConstraints as safetyConstraints,
+                 p.clinicalNotes as clinicalNotes,
+                 confidence
+          ORDER BY confidence DESC
+          LIMIT 1
+        `;
+            patternResult = await session.run(fallbackQuery, { candidatePatterns, intensityY });
+        }
         if (patternResult.records.length === 0) {
-            // Log which patterns were searched for debugging
             console.error('No patterns found. Searched for:', candidatePatterns, 'Quadrant:', input.quadrant);
             throw new https_1.HttpsError('not-found', `No matching pattern found for quadrant: ${input.quadrant}. Patterns searched: ${candidatePatterns.join(', ')}`);
         }
@@ -668,7 +693,7 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
                END as relevance
       `;
         const toolsResult = await session.run(toolsQuery, { patternId: pattern.id });
-        const tools = toolsResult.records.map(rec => ({
+        const tools = toolsResult.records.map((rec) => ({
             id: rec.get('id'),
             name: rec.get('name') || rec.get('id').replace('dbt_', '').replace(/_/g, ' '),
             description: rec.get('description') || '',
@@ -758,7 +783,7 @@ exports.getRelatedEmotions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
         LIMIT 3
       `;
         const result = await session.run(query, { emotionId, quadrant });
-        const relatedEmotions = result.records.map(rec => ({
+        const relatedEmotions = result.records.map((rec) => ({
             id: rec.get('id'),
             name: rec.get('name') || rec.get('id').replace(/_/g, ' '),
             reason: rec.get('reason'),
@@ -821,7 +846,7 @@ exports.getQuickTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo
                tc.dbtBasis as dbtBasis
       `;
         const result = await session.run(query, { toolIds });
-        const tools = result.records.map(rec => ({
+        const tools = result.records.map((rec) => ({
             id: rec.get('id'),
             name: rec.get('name') || rec.get('id').replace('dbt_', '').replace(/_/g, ' '),
             description: rec.get('description') || '',
