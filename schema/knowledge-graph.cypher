@@ -3430,3 +3430,35 @@ CREATE (clinical_referral_severe_dissociation:SafetyFlag {
   action: "Gentle grounding only; redirect to professional support",
   doNot: "Push interoceptive exposure or trauma processing"
 })
+
+
+// ============================================================
+// ADDITIONAL EMOTIONS (for Opposite Emotion mapping)
+// ============================================================
+
+CREATE (apathy:Emotion {
+  id: "apathy",
+  name: "Apathy",
+  description: "Lack of interest, enthusiasm, or concern; flat affect",
+  valence: "negative",
+  arousal: "low",
+  quadrant: "low-unpleasant"
+})
+
+CREATE (hostility:Emotion {
+  id: "hostility",
+  name: "Hostility",
+  description: "Antagonistic state involving opposition or resistance",
+  valence: "negative",
+  arousal: "high",
+  quadrant: "high-unpleasant"
+})
+
+CREATE (humility:Emotion {
+  id: "humility",
+  name: "Humility",
+  description: "Modest view of one's importance; freedom from pride or arrogance",
+  valence: "positive",
+  arousal: "low",
+  quadrant: "low-pleasant"
+})
