@@ -32,6 +32,7 @@ export const emotions: Emotion[] = [
   { id: 'uneasy', name: 'Uneasy', quadrant: 'high-unpleasant' },
   { id: 'pressured', name: 'Pressured', quadrant: 'high-unpleasant' },
   { id: 'angsty', name: 'Angsty', quadrant: 'high-unpleasant' },
+  { id: 'hostile', name: 'Hostile', quadrant: 'high-unpleasant' },
 
   // High Energy Pleasant (Yellow/Gold)
   { id: 'excited', name: 'Excited', quadrant: 'high-pleasant' },
@@ -76,6 +77,7 @@ export const emotions: Emotion[] = [
   { id: 'guilty', name: 'Guilty', quadrant: 'low-unpleasant' },
   { id: 'ashamed', name: 'Ashamed', quadrant: 'low-unpleasant' },
   { id: 'depleted', name: 'Depleted', quadrant: 'low-unpleasant' },
+  { id: 'apathetic', name: 'Apathetic', quadrant: 'low-unpleasant' },
 
   // Low Energy Pleasant (Green/Teal)
   { id: 'calm', name: 'Calm', quadrant: 'low-pleasant' },
@@ -98,6 +100,7 @@ export const emotions: Emotion[] = [
   { id: 'grounded', name: 'Grounded', quadrant: 'low-pleasant' },
   { id: 'tender', name: 'Tender', quadrant: 'low-pleasant' },
   { id: 'cozy', name: 'Cozy', quadrant: 'low-pleasant' },
+  { id: 'humble', name: 'Humble', quadrant: 'low-pleasant' },
 ];
 
 export function getEmotionsByQuadrant(quadrant: string): Emotion[] {
