@@ -915,40 +915,67 @@ export const getRelatedEmotions = onCall(
 
     const session = getDriver().session();
     try {
-      // Find emotions that share brain structure activations (neural substrates)
-      // This is the graph traversal: Emotion ← ACTIVATES_DURING ← BrainStructure → ACTIVATES_DURING → OtherEmotion
       const query = `
-        // Start with the selected emotion
         MATCH (e1:Emotion {id: $emotionId})
-        
-        // Find brain structures that activate during this emotion
-        MATCH (bs:BrainStructure)-[:ACTIVATES_DURING]->(e1)
-        
-        // Find other emotions activated by the same structures
-        MATCH (bs)-[:ACTIVATES_DURING]->(e2:Emotion)
-        WHERE e2.id <> e1.id
-          ${quadrant ? 'AND e2.quadrant = $quadrant' : ''}
-        
-        // Count shared substrates and get the structure names
-        WITH e2, collect(DISTINCT bs.name) as sharedStructures, count(DISTINCT bs) as sharedCount
-        WHERE sharedCount >= 1
-        
-        // Also check if they appear in same activation patterns
-        OPTIONAL MATCH (p:ActivationPattern)-[:ASSOCIATED_WITH]->(e1)
-        OPTIONAL MATCH (p)-[:ASSOCIATED_WITH]->(e2)
-        WITH e2, sharedStructures, sharedCount, count(DISTINCT p) as patternOverlap
-        
-        RETURN e2.id as id,
-               e2.name as name,
-               CASE 
-                 WHEN patternOverlap > 0 AND sharedCount > 1 
-                   THEN 'often occurs together'
-                 WHEN sharedCount > 1 
-                   THEN 'similar body response'
-                 ELSE 'related feeling'
-               END as reason
-        ORDER BY (sharedCount + patternOverlap) DESC
-        LIMIT 3
+
+        // 1) Explicit opposite relationships
+        OPTIONAL MATCH (e1)-[:OPPOSITE_OF]-(opp:Emotion)
+        WHERE opp.id <> e1.id
+          ${quadrant ? 'AND opp.quadrant = $quadrant' : ''}
+        WITH e1, collect(DISTINCT {
+          id: opp.id,
+          name: opp.name,
+          reason: 'opposite emotion',
+          score: 5
+        }) AS oppositeRows
+
+        // 2) Explicit related relationships (same wheel branch, etc.)
+        OPTIONAL MATCH (e1)-[:RELATED_TO]-(rel:Emotion)
+        WHERE rel.id <> e1.id
+          ${quadrant ? 'AND rel.quadrant = $quadrant' : ''}
+        WITH e1, oppositeRows, collect(DISTINCT {
+          id: rel.id,
+          name: rel.name,
+          reason: 'related feeling',
+          score: 4
+        }) AS relatedRows
+
+        // 3) Neural-substrate overlap fallback
+        CALL {
+          WITH e1
+          OPTIONAL MATCH (bs:BrainStructure)-[:ACTIVATES_DURING]->(e1)
+          OPTIONAL MATCH (bs)-[:ACTIVATES_DURING]->(e2:Emotion)
+          WHERE e2.id <> e1.id
+            ${quadrant ? 'AND e2.quadrant = $quadrant' : ''}
+          WITH e1, e2, count(DISTINCT bs) AS sharedCount
+          WHERE e2 IS NOT NULL AND sharedCount >= 1
+          OPTIONAL MATCH (p:ActivationPattern)-[:ASSOCIATED_WITH]->(e1)
+          OPTIONAL MATCH (p)-[:ASSOCIATED_WITH]->(e2)
+          WITH e2, sharedCount, count(DISTINCT p) AS patternOverlap
+          RETURN collect(DISTINCT {
+            id: e2.id,
+            name: e2.name,
+            reason: CASE
+              WHEN patternOverlap > 0 AND sharedCount > 1 THEN 'often occurs together'
+              WHEN sharedCount > 1 THEN 'similar body response'
+              ELSE 'related feeling'
+            END,
+            score: CASE
+              WHEN patternOverlap > 0 AND sharedCount > 1 THEN 3
+              WHEN sharedCount > 1 THEN 2
+              ELSE 1
+            END
+          }) AS neuralRows
+        }
+
+        WITH oppositeRows + relatedRows + coalesce(neuralRows, []) AS allRows
+        UNWIND allRows AS row
+        WITH row
+        WHERE row.id IS NOT NULL
+        WITH row.id AS id, row.name AS name, row.reason AS reason, max(row.score) AS score
+        ORDER BY score DESC, name ASC
+        RETURN id, name, reason
+        LIMIT 6
       `;
 
       const result = await session.run(query, { emotionId, quadrant });

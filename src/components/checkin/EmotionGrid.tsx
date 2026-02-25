@@ -1,5 +1,12 @@
 import { useState, useMemo, useEffect } from 'react';
-import { getEmotionsByQuadrant, quadrantColors } from '../../data/emotions';
+import {
+  getEmotionsByQuadrant,
+  getEmotionById,
+  getEmotionByName,
+  getOppositeEmotionIds,
+  getRelatedEmotionIds,
+  quadrantColors,
+} from '../../data/emotions';
 import { getRelatedEmotions, type RelatedEmotion } from '../../services/neo4j';
 
 interface EmotionGridProps {
@@ -41,7 +48,6 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
   const [search, setSearch] = useState('');
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
   const [relatedEmotions, setRelatedEmotions] = useState<RelatedEmotion[]>([]);
-  const [loadingRelated, setLoadingRelated] = useState(false);
 
   const emotions = useMemo(() => getEmotionsByQuadrant(quadrant), [quadrant]);
   const colors = quadrantColors[quadrant];
@@ -50,29 +56,50 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
   // Fetch related emotions when the first emotion is selected
   useEffect(() => {
     if (!showRelated || selectedEmotions.length === 0) {
-      setRelatedEmotions([]);
       return;
     }
 
     const firstEmotion = selectedEmotions[0];
-    const emotionId = firstEmotion.toLowerCase().replace(/\s+/g, '_');
+    const selectedEmotion = getEmotionByName(firstEmotion);
+    const emotionId = selectedEmotion?.id ?? firstEmotion.toLowerCase().replace(/\s+/g, '_');
+    const localRelatedIds = getRelatedEmotionIds(emotionId);
+    const localOppositeIds = getOppositeEmotionIds(emotionId);
+    const localSuggestions: RelatedEmotion[] = [
+      ...localRelatedIds.map(id => {
+        const emotion = getEmotionById(id);
+        return {
+          id,
+          name: emotion?.name ?? id.replace(/_/g, ' '),
+          reason: 'related feeling',
+        };
+      }),
+      ...localOppositeIds.map(id => {
+        const emotion = getEmotionById(id);
+        return {
+          id,
+          name: emotion?.name ?? id.replace(/_/g, ' '),
+          reason: 'opposite emotion',
+        };
+      }),
+    ];
 
-    setLoadingRelated(true);
     getRelatedEmotions(emotionId, quadrant)
       .then(related => {
-        const filtered = related.filter(
-          r => !selectedEmotions.some(
-            s => s.toLowerCase() === r.name.toLowerCase()
-          )
+        const merged = [...localSuggestions, ...related];
+        const deduped = Array.from(
+          new Map(merged.map(item => [item.id, item])).values()
         );
+        const filtered = deduped.filter(r => {
+          const formattedName = formatEmotionName(r.name);
+          return !selectedEmotions.some(
+            s => s.toLowerCase() === formattedName.toLowerCase()
+          );
+        });
         setRelatedEmotions(filtered);
       })
       .catch(err => {
         console.error('Failed to get related emotions:', err);
-        setRelatedEmotions([]);
-      })
-      .finally(() => {
-        setLoadingRelated(false);
+        setRelatedEmotions(localSuggestions);
       });
   }, [selectedEmotions, showRelated, quadrant]);
 
@@ -165,13 +192,7 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
       {/* Related emotions suggestion */}
       {showRelated && selectedEmotions.length > 0 && (
         <div className="mb-4">
-          {loadingRelated ? (
-            <div className="p-3 rounded-lg bg-[var(--color-sage-50)] border border-[var(--color-sage-200)]">
-              <p className="text-sm text-[var(--color-sage-500)] text-center">
-                Finding related feelings...
-              </p>
-            </div>
-          ) : relatedEmotions.length > 0 ? (
+          {relatedEmotions.length > 0 ? (
             <div className="p-3 rounded-lg bg-[var(--color-sage-50)] border border-[var(--color-sage-200)]">
               <p className="text-sm text-[var(--color-sage-600)] mb-2">
                 Some people who feel <strong>{selectedEmotions[0].toLowerCase()}</strong> also describe:

@@ -14,9 +14,10 @@ interface BodyMapProps {
   onSkip: () => void;
   onComplete: () => void;
   sensations: BodySensation[];
+  isSomaticEntry?: boolean;
 }
 
-export function BodyMap({ onTap, onSkip, onComplete, sensations }: BodyMapProps) {
+export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry = false }: BodyMapProps) {
   const svgRef = useRef<SVGSVGElement>(null);
 
   function handleTap(e: React.MouseEvent | React.TouchEvent) {
@@ -45,10 +46,16 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations }: BodyMapProps)
   return (
     <div>
       <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
-        Where do you notice a physical sensation?
+        {isSomaticEntry
+          ? "Let's start with your body"
+          : 'Where do you notice a physical sensation?'
+        }
       </h2>
       <p className="text-sm text-[var(--color-sage-600)] text-center mb-6">
-        Tap anywhere on the body, or skip this step
+        {isSomaticEntry
+          ? "Tap where you feel something \u2014 I'll help figure out the rest"
+          : 'Tap anywhere on the body, or skip this step'
+        }
       </p>
 
       {/* Body SVG */}
@@ -122,7 +129,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations }: BodyMapProps)
             onClick={onComplete}
             className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
           >
-            Continue
+            {isSomaticEntry ? 'Help me identify my feelings' : 'Continue'}
           </button>
         )}
         
@@ -130,7 +137,10 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations }: BodyMapProps)
           onClick={onSkip}
           className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
         >
-          {sensations.length > 0 ? 'Done adding sensations' : 'Skip this step'}
+          {sensations.length > 0
+            ? 'Done adding sensations'
+            : (isSomaticEntry ? 'Pick emotions instead' : 'Skip this step')
+          }
         </button>
       </div>
     </div>

@@ -1,5 +1,6 @@
 interface EmotionQuadrantProps {
   onSelect: (quadrant: string) => void;
+  onSomaticEntry?: () => void;
 }
 
 const quadrants = [
@@ -33,7 +34,7 @@ const quadrants = [
   },
 ];
 
-export function EmotionQuadrant({ onSelect }: EmotionQuadrantProps) {
+export function EmotionQuadrant({ onSelect, onSomaticEntry }: EmotionQuadrantProps) {
   return (
     <div>
       <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
@@ -74,6 +75,21 @@ export function EmotionQuadrant({ onSelect }: EmotionQuadrantProps) {
             <span>Pleasant</span>
           </div>
         </div>
+
+        {onSomaticEntry && (
+          <button
+            onClick={onSomaticEntry}
+            className="
+              w-full mt-6 py-3 px-4 rounded-xl
+              border-2 border-dashed border-[var(--color-sage-300)]
+              text-[var(--color-sage-600)] font-medium text-sm
+              hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-400)]
+              transition-all duration-200
+            "
+          >
+            I don't know &mdash; start with my body instead
+          </button>
+        )}
       </div>
     </div>
   );

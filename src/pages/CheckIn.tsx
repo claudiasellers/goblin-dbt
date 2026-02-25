@@ -6,6 +6,7 @@ import { EmotionGrid } from '../components/checkin/EmotionGrid';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
 import { StateResult } from '../components/checkin/StateResult';
+import { EmotionSuggestion } from '../components/checkin/EmotionSuggestion';
 import { 
   saveCheckIn, 
   ensureUserExists, 
@@ -13,11 +14,14 @@ import {
   type StateResult as StateResultType 
 } from '../services/neo4j';
 
+type EntryPoint = 'standard' | 'somatic';
+
 type CheckInStep =
   | 'quadrant'
   | 'emotion'
   | 'body'
   | 'sensation'
+  | 'suggestion'
   | 'analyzing'
   | 'result'
   | 'saving'
@@ -43,6 +47,7 @@ export interface CheckInData {
 export function CheckIn() {
   const { user } = useAuth();
   const [step, setStep] = useState<CheckInStep>('quadrant');
+  const [entryPoint, setEntryPoint] = useState<EntryPoint>('standard');
   const [checkInData, setCheckInData] = useState<CheckInData>({
     quadrant: null,
     emotions: [],
@@ -86,19 +91,22 @@ export function CheckIn() {
   }
 
   /**
-   * Analyze the current state and get recommendations
-   * Can be called at any step - progressive disclosure means any data is enough
+   * Analyze the current state and get recommendations.
+   * Accepts optional overrides so callers that just called setState
+   * (which won't have flushed yet) can pass the fresh values directly.
    */
-  async function analyzeAndShowResult() {
-    if (!checkInData.quadrant) return;
+  async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[] }) {
+    const quadrant = overrides?.quadrant ?? checkInData.quadrant;
+    const emotions = overrides?.emotions ?? checkInData.emotions;
+    if (!quadrant) return;
     
     setStep('analyzing');
     setAnalyzeError(null);
 
     try {
       const result = await getStateAndTools({
-        quadrant: checkInData.quadrant,
-        emotions: checkInData.emotions.length > 0 ? checkInData.emotions : undefined,
+        quadrant,
+        emotions: emotions.length > 0 ? emotions : undefined,
         intensity: checkInData.intensity || undefined,
         bodySensations: checkInData.bodySensations.length > 0 
           ? checkInData.bodySensations.map(s => ({ region: s.region, tags: s.tags }))
@@ -109,7 +117,6 @@ export function CheckIn() {
       setStep('result');
     } catch (error) {
       console.error('Failed to analyze state:', error);
-      // Analysis unavailable — skip straight to saving the check-in
       setAnalyzeError(null);
       setStateResult(null);
       setStep('saving');
@@ -117,8 +124,8 @@ export function CheckIn() {
         if (user) {
           await ensureUserExists(user.uid, user.email || '');
           await saveCheckIn(user.uid, {
-            emotion: checkInData.emotions.join(', ') || checkInData.quadrant!,
-            quadrant: checkInData.quadrant!,
+            emotion: emotions.join(', ') || quadrant,
+            quadrant,
             intensity: checkInData.intensity || { x: 0.5, y: 0.5 },
             bodySensations: checkInData.bodySensations,
             note: checkInData.note,
@@ -146,6 +153,43 @@ export function CheckIn() {
     analyzeAndShowResult();
   }
 
+  /**
+   * "I don't know how I feel" - start with body sensations instead
+   */
+  function handleSomaticEntry() {
+    setEntryPoint('somatic');
+    setStep('body');
+  }
+
+  /**
+   * User selected emotions from the somatic suggestion screen
+   */
+  function handleSuggestionSelect(emotions: string[], quadrant: string) {
+    setCheckInData(prev => ({ ...prev, emotions, quadrant }));
+    analyzeAndShowResult({ quadrant, emotions });
+  }
+
+  /**
+   * User wants to browse the full emotion list instead of using suggestions
+   */
+  function handleShowAllEmotions() {
+    if (!checkInData.quadrant) {
+      setStep('quadrant');
+      setEntryPoint('standard');
+    } else {
+      setStep('emotion');
+    }
+  }
+
+  /**
+   * Skip from suggestion straight to analysis with body data only
+   */
+  function handleSuggestionSkip() {
+    const quadrant = checkInData.quadrant || 'high-unpleasant';
+    setCheckInData(prev => ({ ...prev, quadrant }));
+    analyzeAndShowResult({ quadrant });
+  }
+
   function handleEmotionSelect(emotions: string[]) {
     setCheckInData(prev => ({ ...prev, emotions }));
     setStep('body');
@@ -166,12 +210,19 @@ export function CheckIn() {
   }
 
   async function handleSkipBody() {
-    // Instead of saving, go to analysis
+    if (entryPoint === 'somatic') {
+      // No sensations recorded in somatic flow — go to full emotion picker
+      handleShowAllEmotions();
+      return;
+    }
     await analyzeAndShowResult();
   }
 
   async function handleBodyComplete() {
-    // Instead of saving, go to analysis
+    if (entryPoint === 'somatic') {
+      setStep('suggestion');
+      return;
+    }
     await analyzeAndShowResult();
   }
 
@@ -219,7 +270,6 @@ export function CheckIn() {
   }
 
   function handleComplete() {
-    // Reset for new check-in
     setCheckInData({
       quadrant: null,
       emotions: [],
@@ -231,6 +281,7 @@ export function CheckIn() {
     setSaveError(null);
     setStateResult(null);
     setAnalyzeError(null);
+    setEntryPoint('standard');
     setStep('quadrant');
   }
 
@@ -240,10 +291,18 @@ export function CheckIn() {
         setStep('quadrant');
         break;
       case 'body':
-        setStep('emotion');
+        if (entryPoint === 'somatic') {
+          setEntryPoint('standard');
+          setStep('quadrant');
+        } else {
+          setStep('emotion');
+        }
         break;
       case 'sensation':
         setCurrentSensation(null);
+        setStep('body');
+        break;
+      case 'suggestion':
         setStep('body');
         break;
       case 'result':
@@ -255,8 +314,9 @@ export function CheckIn() {
     }
   }
 
-  // Calculate progress for the stepper
-  const stepOrder = ['quadrant', 'emotion', 'body'];
+  const stepOrder = entryPoint === 'somatic'
+    ? ['body', 'suggestion']
+    : ['quadrant', 'emotion', 'body'];
   const currentStepIndex = stepOrder.indexOf(step);
   const showProgress = currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
 
@@ -278,9 +338,10 @@ export function CheckIn() {
             ))}
           </div>
           <p className="text-xs text-center text-[var(--color-sage-500)] mt-2">
-            {currentStepIndex === 0 
-              ? 'Required' 
-              : 'Optional — tap "Help me now" anytime'}
+            {entryPoint === 'somatic'
+              ? (currentStepIndex === 0 ? 'Start here' : 'Almost there')
+              : (currentStepIndex === 0 ? 'Required' : 'Optional \u2014 tap "Help me now" anytime')
+            }
           </p>
         </div>
       )}
@@ -304,7 +365,10 @@ export function CheckIn() {
       )}
 
       {step === 'quadrant' && (
-        <EmotionQuadrant onSelect={handleQuadrantSelect} />
+        <EmotionQuadrant
+          onSelect={handleQuadrantSelect}
+          onSomaticEntry={handleSomaticEntry}
+        />
       )}
 
       {step === 'emotion' && checkInData.quadrant && (
@@ -322,6 +386,16 @@ export function CheckIn() {
           onSkip={handleSkipBody}
           onComplete={handleBodyComplete}
           sensations={checkInData.bodySensations}
+          isSomaticEntry={entryPoint === 'somatic'}
+        />
+      )}
+
+      {step === 'suggestion' && (
+        <EmotionSuggestion
+          bodySensations={checkInData.bodySensations}
+          onSelect={handleSuggestionSelect}
+          onShowAllEmotions={handleShowAllEmotions}
+          onSkip={handleSuggestionSkip}
         />
       )}
 
