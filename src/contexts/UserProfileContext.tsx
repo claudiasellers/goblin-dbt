@@ -15,6 +15,23 @@ import {
   type UserProfile,
 } from '../services/neo4j';
 
+const PROFILE_CACHE_KEY = 'goblin-dbt-profile-cache';
+
+function loadCachedProfile(userId: string): UserProfile | null {
+  try {
+    const raw = localStorage.getItem(`${PROFILE_CACHE_KEY}-${userId}`);
+    return raw ? (JSON.parse(raw) as UserProfile) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveCachedProfile(userId: string, profile: UserProfile) {
+  try {
+    localStorage.setItem(`${PROFILE_CACHE_KEY}-${userId}`, JSON.stringify(profile));
+  } catch { /* ignore */ }
+}
+
 interface UserProfileContextType {
   profile: UserProfile;
   loading: boolean;
@@ -50,21 +67,31 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
       return;
     }
 
+    // Seed from cache immediately to avoid loading flash
+    const cached = loadCachedProfile(user.uid);
+    if (cached) {
+      setProfile(cached);
+      document.documentElement.dataset.theme = cached.theme;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
       const fetchedProfile = await getUserProfile();
       setProfile(fetchedProfile);
+      saveCachedProfile(user.uid, fetchedProfile);
     } catch (err) {
       // If the cloud function doesn't exist yet, fall back to defaults
       console.warn('Could not load profile, using defaults:', err);
-      setProfile({
-        ...DEFAULT_PROFILE,
-        displayName: user.displayName || null,
-        email: user.email || '',
-        photoURL: user.photoURL || null,
-      });
+      if (!cached) {
+        setProfile({
+          ...DEFAULT_PROFILE,
+          displayName: user.displayName || null,
+          email: user.email || '',
+          photoURL: user.photoURL || null,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -83,7 +110,11 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
       setError(null);
       try {
         await updateProfileApi(updates);
-        setProfile((prev) => ({ ...prev, ...updates }));
+        setProfile((prev) => {
+          const next = { ...prev, ...updates };
+          if (user) saveCachedProfile(user.uid, next);
+          return next;
+        });
       } catch (err) {
         const message =
           err instanceof Error ? err.message : 'Failed to update profile';
@@ -91,7 +122,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
         throw err;
       }
     },
-    []
+    [user]
   );
 
   // ============================================
