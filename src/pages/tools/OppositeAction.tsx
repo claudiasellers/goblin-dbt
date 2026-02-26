@@ -31,35 +31,109 @@ const familyOrder = ['fearful', 'angry', 'sad', 'disgusted', 'bad', 'happy', 'su
 
 export function OppositeAction() {
   const [phase, setPhase] = useState<Phase>('intro');
-  const [selectedEmotionId, setSelectedEmotionId] = useState<string | null>(null);
+  const [selectedEmotionIds, setSelectedEmotionIds] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [showPleasant, setShowPleasant] = useState(false);
-  const [selectedUrge, setSelectedUrge] = useState<ActionUrge | null>(null);
+  const [selectedUrges, setSelectedUrges] = useState<ActionUrge[]>([]);
   const [customUrge, setCustomUrge] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [effectiveParent, setEffectiveParent] = useState<DBTParentEmotion | null>(null);
-  const [chosenSize, setChosenSize] = useState<'small' | 'medium' | 'bigger' | null>(null);
+  const [parentOverrides, setParentOverrides] = useState<Partial<Record<DBTParentEmotion, DBTParentEmotion>>>({});
+  const [chosenSizes, setChosenSizes] = useState<Record<string, 'small' | 'medium' | 'bigger'>>({});
+  const [guiltFitsNote, setGuiltFitsNote] = useState<string | null>(null);
 
-  const selectedEmotion = selectedEmotionId ? getEmotionById(selectedEmotionId) : null;
-  const mapping = selectedEmotionId ? getMapping(selectedEmotionId) : null;
-  const parent = effectiveParent || mapping?.primary || null;
-  const protocol = parent ? getProtocol(parent) : undefined;
-  const urgeSet = parent ? getUrgesForParent(parent) : undefined;
-  const urgeLabel = selectedUrge?.label || customUrge;
+  // ── Derived data ──
 
-  // For show-opposites: use matched urge data, or fall back to defaults
-  const matchedUrge = selectedUrge && urgeSet?.urges.find(u => u.id === selectedUrge.id)
-    ? selectedUrge : null;
-  const opposites = matchedUrge
-    ? { small: matchedUrge.small, medium: matchedUrge.medium, bigger: matchedUrge.bigger }
-    : urgeSet?.defaultOpposites ?? null;
+  const { applicableIds, nonApplicable } = useMemo(() => {
+    const all = selectedEmotionIds.map(id => ({ id, mapping: getMapping(id) }));
+    return {
+      applicableIds: all.filter(m => m.mapping?.oppositeActionApplicable).map(m => m.id),
+      nonApplicable: all.filter(m => m.mapping && !m.mapping.oppositeActionApplicable),
+    };
+  }, [selectedEmotionIds]);
 
+  // Unique parents from applicable emotions, with overrides applied
+  const parents = useMemo(() => {
+    const raw = [...new Set(
+      applicableIds
+        .map(id => getMapping(id)?.primary)
+        .filter((p): p is DBTParentEmotion => p != null)
+    )];
+    return [...new Set(raw.map(p => parentOverrides[p] ?? p))] as DBTParentEmotion[];
+  }, [applicableIds, parentOverrides]);
+
+  // Protocols and urge sets for all parents
+  const parentData = useMemo(() =>
+    parents.map(p => ({
+      parent: p,
+      protocol: getProtocol(p),
+      urgeSet: getUrgesForParent(p),
+    })),
+    [parents]
+  );
+
+  // All available urges, grouped by parent
+  const allAvailableUrges = useMemo(() =>
+    parentData
+      .filter(pd => pd.urgeSet)
+      .map(pd => ({
+        parent: pd.parent,
+        parentLabel: pd.protocol?.label ?? pd.parent,
+        urges: pd.urgeSet!.urges,
+      })),
+    [parentData]
+  );
+
+  // Display labels for selected urges
+  const urgeLabels = useMemo(() => {
+    const labels = selectedUrges.map(u => u.label);
+    if (customUrge.trim()) labels.push(customUrge.trim());
+    return labels;
+  }, [selectedUrges, customUrge]);
+
+  // For show-opposites: each selected urge mapped to its opposites
+  const urgeOppositesList = useMemo(() => {
+    const result: { key: string; label: string; opposites: { small: string; medium: string; bigger: string } }[] = [];
+    for (const urge of selectedUrges) {
+      result.push({
+        key: urge.id,
+        label: urge.label,
+        opposites: { small: urge.small, medium: urge.medium, bigger: urge.bigger },
+      });
+    }
+    if (customUrge.trim()) {
+      const defaults = parentData[0]?.urgeSet?.defaultOpposites;
+      if (defaults) {
+        result.push({ key: 'custom', label: customUrge.trim(), opposites: defaults });
+      }
+    }
+    return result;
+  }, [selectedUrges, customUrge, parentData]);
+
+  // Body opposites from all parents
+  const bodyOpposites = useMemo(() =>
+    parentData
+      .filter(pd => pd.urgeSet?.bodyOpposite)
+      .map(pd => ({ parent: pd.parent, label: pd.protocol?.label ?? pd.parent, text: pd.urgeSet!.bodyOpposite })),
+    [parentData]
+  );
+
+  // Acknowledgments from all parents
+  const acknowledgments = useMemo(() =>
+    parentData
+      .filter(pd => pd.urgeSet?.acknowledgment)
+      .map(pd => pd.urgeSet!.acknowledgment),
+    [parentData]
+  );
+
+  // All sizes chosen?
+  const allSizesChosen = urgeOppositesList.length > 0 && urgeOppositesList.every(u => chosenSizes[u.key]);
+
+  // Grouped emotions for identify phase
   const grouped = useMemo(() => {
     const q = search.toLowerCase().trim();
     const filtered = q
       ? emotions.filter(e => e.name.toLowerCase().includes(q))
       : emotions;
-
     const unpleasant = ['fearful', 'angry', 'sad', 'disgusted', 'bad'];
     const groups: Record<string, typeof emotions> = {};
     for (const fam of familyOrder) {
@@ -70,37 +144,56 @@ export function OppositeAction() {
     return groups;
   }, [search, showPleasant]);
 
-  const selectEmotion = (id: string) => {
-    setSelectedEmotionId(id);
-    const m = getMapping(id);
-    if (!m || !m.oppositeActionApplicable) {
-      setPhase('redirect');
-    } else {
-      setPhase('name-urge');
-    }
+  // ── Actions ──
+
+  const toggleEmotion = (id: string) => {
+    setSelectedEmotionIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
   };
 
-  const reset = () => {
-    setPhase('intro');
-    setSelectedEmotionId(null);
-    setSearch('');
-    setShowPleasant(false);
-    setSelectedUrge(null);
-    setCustomUrge('');
-    setShowCustomInput(false);
-    setEffectiveParent(null);
-    setChosenSize(null);
+  const toggleUrge = (urge: ActionUrge) => {
+    setSelectedUrges(prev =>
+      prev.some(u => u.id === urge.id)
+        ? prev.filter(u => u.id !== urge.id)
+        : [...prev, urge]
+    );
+  };
+
+  const continueFromIdentify = () => {
+    setPhase(applicableIds.length === 0 ? 'redirect' : 'name-urge');
   };
 
   const goToCheckFacts = () => setPhase('check-facts');
 
   const goToOpposites = () => {
-    const p = effectiveParent || mapping?.primary;
-    if (p === 'shame' || p === 'guilt') {
+    setGuiltFitsNote(null);
+    if (parents.some(p => p === 'shame' || p === 'guilt')) {
       setPhase('guilt-fork');
     } else {
       setPhase('show-opposites');
     }
+  };
+
+  const reset = () => {
+    setPhase('intro');
+    setSelectedEmotionIds([]);
+    setSearch('');
+    setShowPleasant(false);
+    setSelectedUrges([]);
+    setCustomUrge('');
+    setShowCustomInput(false);
+    setParentOverrides({});
+    setChosenSizes({});
+    setGuiltFitsNote(null);
+  };
+
+  // ── Helpers ──
+
+  const emotionNameList = (ids: string[]) => {
+    const names = ids.map(id => getEmotionById(id)?.name?.toLowerCase()).filter(Boolean) as string[];
+    if (names.length <= 2) return names.join(' and ');
+    return names.slice(0, -1).join(', ') + ', and ' + names[names.length - 1];
   };
 
   // ─── INTRO ───
@@ -114,7 +207,7 @@ export function OppositeAction() {
           <ul className="space-y-2 text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
             <li>• Every emotion comes with an <strong>action urge</strong> — what it pushes you to do</li>
             <li>• The opposite isn't to the emotion — it's to the <strong>urge</strong></li>
-            <li>• We'll figure out what your emotion wants you to do, check if that's actually helpful, and find the right-sized opposite</li>
+            <li>• We'll figure out what your emotions want you to do, check if that's actually helpful, and find the right-sized opposite</li>
           </ul>
         </div>
         <button
@@ -132,7 +225,8 @@ export function OppositeAction() {
     return (
       <div className="space-y-5">
         <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
-          What are you feeling right now?
+          What are you feeling right now?{' '}
+          <span className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">Select all that apply.</span>
         </p>
 
         <input
@@ -150,15 +244,22 @@ export function OppositeAction() {
                 {familyLabels[family] ?? family}
               </h4>
               <div className="flex flex-wrap gap-2">
-                {members.map(e => (
-                  <button
-                    key={e.id}
-                    onClick={() => selectEmotion(e.id)}
-                    className="px-3 py-1.5 text-sm rounded-full border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-200)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
-                  >
-                    {e.name}
-                  </button>
-                ))}
+                {members.map(e => {
+                  const selected = selectedEmotionIds.includes(e.id);
+                  return (
+                    <button
+                      key={e.id}
+                      onClick={() => toggleEmotion(e.id)}
+                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                        selected
+                          ? 'bg-[var(--color-sage-600)] border-[var(--color-sage-600)] text-white'
+                          : 'border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-200)] dark:hover:bg-[var(--color-sage-700)]'
+                      }`}
+                    >
+                      {e.name}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -172,13 +273,23 @@ export function OppositeAction() {
             + Show pleasant emotions too
           </button>
         )}
+
+        {selectedEmotionIds.length > 0 && (
+          <button
+            onClick={continueFromIdentify}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          >
+            Continue with {selectedEmotionIds.length === 1
+              ? getEmotionById(selectedEmotionIds[0])?.name
+              : `${selectedEmotionIds.length} emotions`}
+          </button>
+        )}
       </div>
     );
   }
 
   // ─── REDIRECT (not OA applicable) ───
   if (phase === 'redirect') {
-    const altSkill = mapping?.alternativeSkill;
     const altNames: Record<string, string> = {
       'mindfulness-emotions': 'Sit With It (Mindfulness)',
       'please-skill': 'PLEASE (Self-Care Basics)',
@@ -186,37 +297,39 @@ export function OppositeAction() {
       'name-it': 'Name It',
       'body-scan': 'Body Scan',
     };
+    const notApplicableNames = nonApplicable.map(m => getEmotionById(m.id)?.name).filter(Boolean);
+    const uniqueAlts = [...new Set(nonApplicable.map(m => m.mapping?.alternativeSkill).filter(Boolean))] as string[];
 
     return (
       <div className="space-y-6">
         <div className="p-6 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
           <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
-            Opposite Action isn't the best fit for "{selectedEmotion?.name}"
+            Opposite Action isn't the best fit for {notApplicableNames.length === 1
+              ? `"${notApplicableNames[0]}"`
+              : 'these emotions'}
           </h3>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-2">
-            {mapping?.clinicalNote}
-          </p>
-          {altSkill && (
-            <p className="text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
-              A better tool for this:
+          {nonApplicable.map(m => (
+            <p key={m.id} className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-2">
+              {m.mapping?.clinicalNote}
             </p>
-          )}
+          ))}
         </div>
 
-        {altSkill && (
+        {uniqueAlts.map(alt => (
           <Link
-            to={`/tool/${altSkill}`}
+            key={alt}
+            to={`/tool/${alt}`}
             className="block w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors text-center"
           >
-            Try {altNames[altSkill] ?? altSkill}
+            Try {altNames[alt] ?? alt}
           </Link>
-        )}
+        ))}
 
         <button
-          onClick={() => { setPhase('identify'); setSelectedEmotionId(null); }}
+          onClick={() => { setPhase('identify'); setSelectedEmotionIds([]); }}
           className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
         >
-          Pick a different emotion
+          Pick different emotions
         </button>
       </div>
     );
@@ -224,35 +337,54 @@ export function OppositeAction() {
 
   // ─── NAME THE URGE ───
   if (phase === 'name-urge') {
-    const emotionName = selectedEmotion?.name?.toLowerCase() ?? 'this';
+    const emotionLabel = applicableIds.length === 1
+      ? getEmotionById(applicableIds[0])?.name?.toLowerCase() ?? 'this'
+      : 'these feelings';
+    const skippedNames = nonApplicable.map(m => getEmotionById(m.id)?.name).filter(Boolean);
 
     return (
       <div className="space-y-6">
+        {skippedNames.length > 0 && (
+          <div className="p-4 rounded-lg bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)] text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+            Opposite Action works best for {emotionNameList(applicableIds)}.
+            {' '}{skippedNames.join(', ')} {skippedNames.length === 1 ? 'is' : 'are'} better addressed with other tools.
+          </div>
+        )}
+
         <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
           <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-2">
-            What is {emotionName} making you want to do?
+            What is {emotionLabel} making you want to do?
           </h3>
           <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
-            Not what you think you <em>should</em> do — what's the pull?
+            Not what you think you <em>should</em> do — what's the pull? Select all that apply.
           </p>
         </div>
 
-        <div className="space-y-2">
-          {urgeSet?.urges.map(urge => (
-            <button
-              key={urge.id}
-              onClick={() => {
-                setSelectedUrge(urge);
-                setCustomUrge('');
-                setShowCustomInput(false);
-                goToCheckFacts();
-              }}
-              className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-200)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
-            >
-              {urge.label}
-            </button>
-          ))}
-        </div>
+        {allAvailableUrges.map(({ parent, parentLabel, urges }) => (
+          <div key={parent} className="space-y-2">
+            {allAvailableUrges.length > 1 && (
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">
+                {parentLabel} urges
+              </h4>
+            )}
+            {urges.map(urge => {
+              const selected = selectedUrges.some(u => u.id === urge.id);
+              return (
+                <button
+                  key={urge.id}
+                  onClick={() => toggleUrge(urge)}
+                  className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                    selected
+                      ? 'bg-[var(--color-sage-600)] border-[var(--color-sage-600)] text-white'
+                      : 'border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-200)] dark:hover:bg-[var(--color-sage-700)]'
+                  }`}
+                >
+                  {urge.label}
+                </button>
+              );
+            })}
+          </div>
+        ))}
 
         {!showCustomInput ? (
           <button
@@ -262,27 +394,23 @@ export function OppositeAction() {
             + Something else
           </button>
         ) : (
-          <div className="space-y-3">
-            <input
-              type="text"
-              placeholder="What's the urge? e.g., 'snap at everyone'"
-              value={customUrge}
-              onChange={e => setCustomUrge(e.target.value)}
-              autoFocus
-              className="w-full p-3 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] bg-white dark:bg-[var(--color-sage-900)] text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] placeholder:text-[var(--color-sage-400)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sage-400)]"
-            />
-            {customUrge.trim() && (
-              <button
-                onClick={() => {
-                  setSelectedUrge(null);
-                  goToCheckFacts();
-                }}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
-              >
-                Continue
-              </button>
-            )}
-          </div>
+          <input
+            type="text"
+            placeholder="What's the urge? e.g., 'snap at everyone'"
+            value={customUrge}
+            onChange={e => setCustomUrge(e.target.value)}
+            autoFocus
+            className="w-full p-3 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] bg-white dark:bg-[var(--color-sage-900)] text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] placeholder:text-[var(--color-sage-400)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sage-400)]"
+          />
+        )}
+
+        {(selectedUrges.length > 0 || customUrge.trim()) && (
+          <button
+            onClick={goToCheckFacts}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          >
+            Continue
+          </button>
         )}
       </div>
     );
@@ -290,8 +418,19 @@ export function OppositeAction() {
 
   // ─── CHECK THE FACTS ───
   if (phase === 'check-facts') {
-    const emotionName = selectedEmotion?.name?.toLowerCase() ?? 'this emotion';
-    const fitsItems = parent ? getFitsTheFactsWhen(parent) : [];
+    const emotionLabel = applicableIds.length === 1
+      ? getEmotionById(applicableIds[0])?.name?.toLowerCase() ?? 'this emotion'
+      : 'these feelings';
+    const urgeDisplay = urgeLabels.length === 1
+      ? urgeLabels[0].toLowerCase()
+      : urgeLabels.map(l => l.toLowerCase()).join(', ');
+
+    // Group fits-the-facts items by parent
+    const groupedByParent = parents.map(p => ({
+      parent: p,
+      label: getProtocol(p)?.label ?? p,
+      items: getFitsTheFactsWhen(p),
+    })).filter(g => g.items.length > 0);
 
     return (
       <div className="space-y-6">
@@ -300,24 +439,31 @@ export function OppositeAction() {
             Check the facts
           </h3>
           <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
-            You're feeling <strong>{emotionName}</strong> and it's pushing you to <strong>{urgeLabel?.toLowerCase()}</strong>.
+            You're feeling <strong>{emotionLabel}</strong> and it's pushing you to <strong>{urgeDisplay}</strong>.
           </p>
           <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mt-3">
             Does any of this apply right now?
           </p>
         </div>
 
-        <div className="space-y-2">
-          {fitsItems.map((item, i) => (
-            <button
-              key={i}
-              onClick={() => setPhase('fits-facts')}
-              className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
-            >
-              {item}
-            </button>
-          ))}
-        </div>
+        {groupedByParent.map(({ parent, label, items }) => (
+          <div key={parent} className="space-y-2">
+            {groupedByParent.length > 1 && (
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">
+                {label}
+              </h4>
+            )}
+            {items.map((item, i) => (
+              <button
+                key={i}
+                onClick={() => setPhase('fits-facts')}
+                className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        ))}
 
         <div className="space-y-2 pt-2 border-t border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
           <button
@@ -339,16 +485,29 @@ export function OppositeAction() {
 
   // ─── FITS FACTS ───
   if (phase === 'fits-facts') {
+    const guidances = parentData
+      .filter(pd => pd.protocol?.fitsFactsGuidance)
+      .map(pd => ({ label: pd.protocol!.label, text: pd.protocol!.fitsFactsGuidance }));
+
     return (
       <div className="space-y-6">
         <div className="p-6 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
           <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
             Your emotion fits the situation
           </h3>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-4">
-            {protocol?.fitsFactsGuidance}
-          </p>
-          <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+          {guidances.map((g, i) => (
+            <div key={i} className={i > 0 ? 'mt-4' : ''}>
+              {guidances.length > 1 && (
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] mb-1">
+                  {g.label}
+                </p>
+              )}
+              <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+                {g.text}
+              </p>
+            </div>
+          ))}
+          <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mt-4">
             When the emotion fits, it's giving you useful information. The move here is to address the situation, not to act opposite.
           </p>
         </div>
@@ -372,9 +531,11 @@ export function OppositeAction() {
 
   // ─── GUILT / SHAME FORK ───
   if (phase === 'guilt-fork') {
-    const p = mapping?.primary;
+    const hasShame = parents.includes('shame');
+    const hasGuilt = parents.includes('guilt');
+    const otherParents = parents.filter(p => p !== 'shame' && p !== 'guilt');
 
-    if (p === 'shame') {
+    if (hasShame) {
       return (
         <div className="space-y-6">
           <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
@@ -391,7 +552,7 @@ export function OppositeAction() {
 
           <button
             onClick={() => {
-              setEffectiveParent('shame');
+              setParentOverrides(prev => ({ ...prev, shame: 'shame' }));
               setPhase('show-opposites');
             }}
             className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
@@ -400,7 +561,7 @@ export function OppositeAction() {
           </button>
           <button
             onClick={() => {
-              setEffectiveParent('guilt');
+              setParentOverrides(prev => ({ ...prev, shame: 'guilt' }));
               setPhase('show-opposites');
             }}
             className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
@@ -411,109 +572,150 @@ export function OppositeAction() {
       );
     }
 
-    // Guilt parent
-    return (
-      <div className="space-y-6">
-        <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-          <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
-            One more question about guilt
-          </h3>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
-            Did what you did actually go against your <strong>own deeply-held values</strong>?
-          </p>
-          <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mt-2">
-            Not what others think you should feel guilty about — what <em>you</em> believe matters.
-          </p>
-        </div>
+    // Guilt parent (no shame)
+    if (hasGuilt) {
+      return (
+        <div className="space-y-6">
+          <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
+            <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+              One more question about guilt
+            </h3>
+            <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+              Did what you did actually go against your <strong>own deeply-held values</strong>?
+            </p>
+            <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mt-2">
+              Not what others think you should feel guilty about — what <em>you</em> believe matters.
+            </p>
+          </div>
 
-        <button
-          onClick={() => {
-            setEffectiveParent('guilt');
-            setPhase('fits-facts');
-          }}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
-        >
-          Yes, I violated my values
-        </button>
-        <button
-          onClick={() => {
-            setEffectiveParent('guilt');
-            setPhase('show-opposites');
-          }}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
-        >
-          No, I didn't
-        </button>
-      </div>
-    );
+          <button
+            onClick={() => {
+              if (otherParents.length === 0) {
+                // Guilt is the only parent — it fits the facts
+                setPhase('fits-facts');
+              } else {
+                // Other parents still need opposites; note the guilt guidance
+                setGuiltFitsNote(getProtocol('guilt')?.fitsFactsGuidance ?? null);
+                setPhase('show-opposites');
+              }
+            }}
+            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
+          >
+            Yes, I violated my values
+          </button>
+          <button
+            onClick={() => setPhase('show-opposites')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          >
+            No, I didn't
+          </button>
+        </div>
+      );
+    }
+
+    // Shouldn't reach here — fallback
+    setPhase('show-opposites');
+    return null;
   }
 
   // ─── SHOW OPPOSITES (validation + graduated choices) ───
-  if (phase === 'show-opposites' && urgeSet && opposites) {
-    const emotionName = selectedEmotion?.name?.toLowerCase() ?? 'this emotion';
+  if (phase === 'show-opposites' && urgeOppositesList.length > 0) {
+    const emotionLabel = applicableIds.length === 1
+      ? getEmotionById(applicableIds[0])?.name?.toLowerCase() ?? 'this emotion'
+      : 'these feelings';
+    const urgeDisplay = urgeLabels.map(l => l.toLowerCase()).join(', ');
 
     return (
       <div className="space-y-6">
+        {/* Guilt fits note — when guilt fits the facts but other parents don't */}
+        {guiltFitsNote && (
+          <div className="p-4 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
+            <p className="text-sm font-medium text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-1">
+              About the guilt
+            </p>
+            <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+              {guiltFitsNote} For the rest of what you're feeling, here are the opposites:
+            </p>
+          </div>
+        )}
+
         {/* Validation */}
         <div className="p-5 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
           <p className="text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)]">
-            Your {emotionName} wants you to <strong>{urgeLabel?.toLowerCase()}</strong>.
-            {' '}That makes sense — {urgeSet.acknowledgment.charAt(0).toLowerCase()}{urgeSet.acknowledgment.slice(1)}
+            Your {emotionLabel} {applicableIds.length === 1 ? 'wants' : 'want'} you to <strong>{urgeDisplay}</strong>.
+            {acknowledgments.length > 0 && (
+              <> That makes sense — {acknowledgments[0].charAt(0).toLowerCase()}{acknowledgments[0].slice(1)}</>
+            )}
           </p>
           <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mt-3">
-            But acting on that urge right now will probably keep the {emotionName} going.
+            But acting on {urgeLabels.length === 1 ? 'that urge' : 'those urges'} right now will probably keep the {emotionLabel} going.
             Moving opposite — even a little — can shift things.
           </p>
         </div>
 
-        {/* Graduated choices */}
-        <div>
-          <p className="text-sm font-medium text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mb-3">
-            Pick what feels doable:
-          </p>
-          <div className="space-y-2">
-            {(['small', 'medium', 'bigger'] as const).map(size => {
-              const labels = { small: 'Small step', medium: 'Medium step', bigger: 'Bigger step' };
-              const colors = {
-                small: 'border-emerald-300 dark:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
-                medium: 'border-emerald-400 dark:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
-                bigger: 'border-emerald-500 dark:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
-              };
-              const selected = chosenSize === size;
+        {/* Graduated choices per urge */}
+        {urgeOppositesList.map(({ key, label, opposites }) => (
+          <div key={key}>
+            {urgeOppositesList.length > 1 ? (
+              <p className="text-sm font-medium text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mb-2">
+                Instead of <em>{label.toLowerCase()}</em>:
+              </p>
+            ) : (
+              <p className="text-sm font-medium text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mb-3">
+                Pick what feels doable:
+              </p>
+            )}
+            <div className="space-y-2">
+              {(['small', 'medium', 'bigger'] as const).map(size => {
+                const labels = { small: 'Small step', medium: 'Medium step', bigger: 'Bigger step' };
+                const colors = {
+                  small: 'border-emerald-300 dark:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
+                  medium: 'border-emerald-400 dark:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
+                  bigger: 'border-emerald-500 dark:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
+                };
+                const selected = chosenSizes[key] === size;
 
-              return (
-                <button
-                  key={size}
-                  onClick={() => setChosenSize(size)}
-                  className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
-                    selected
-                      ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30'
-                      : colors[size]
-                  }`}
-                >
-                  <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
-                    {labels[size]}
-                  </span>
-                  <p className="text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mt-1">
-                    {opposites[size]}
-                  </p>
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={size}
+                    onClick={() => setChosenSizes(prev => ({ ...prev, [key]: size }))}
+                    className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
+                      selected
+                        ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30'
+                        : colors[size]
+                    }`}
+                  >
+                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                      {labels[size]}
+                    </span>
+                    <p className="text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mt-1">
+                      {opposites[size]}
+                    </p>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        ))}
 
-        {/* Body opposite */}
-        <div className="p-4 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-          <p className="text-sm font-medium text-[var(--color-calm-700)] dark:text-[var(--color-calm-300)] mb-1">
-            Your body too
-          </p>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
-            {urgeSet.bodyOpposite}
-          </p>
-        </div>
+        {/* Body opposites */}
+        {bodyOpposites.length > 0 && (
+          <div className="p-4 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
+            <p className="text-sm font-medium text-[var(--color-calm-700)] dark:text-[var(--color-calm-300)] mb-1">
+              Your body too
+            </p>
+            {bodyOpposites.map((bo, i) => (
+              <p key={i} className={`text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]${i > 0 ? ' mt-2' : ''}`}>
+                {bodyOpposites.length > 1 && (
+                  <span className="text-xs font-medium text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">{bo.label}: </span>
+                )}
+                {bo.text}
+              </p>
+            ))}
+          </div>
+        )}
 
-        {chosenSize && (
+        {allSizesChosen && (
           <button
             onClick={() => setPhase('complete')}
             className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
@@ -526,24 +728,34 @@ export function OppositeAction() {
   }
 
   // ─── COMPLETE ───
-  if (phase === 'complete' && opposites && chosenSize) {
+  if (phase === 'complete') {
+    const chosenActions = urgeOppositesList
+      .filter(u => chosenSizes[u.key])
+      .map(u => u.opposites[chosenSizes[u.key]!]);
+
+    const whyItWorks = [...new Set(
+      parentData.map(pd => pd.protocol?.whyItWorks).filter(Boolean)
+    )] as string[];
+
     return (
       <div className="text-center p-8 rounded-xl bg-[var(--color-sage-100)] dark:bg-[var(--color-sage-800)]">
         <span className="text-4xl mb-4 block" role="img" aria-hidden="true">🔄</span>
         <h3 className="text-xl font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
           That counts
         </h3>
-        <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-200)] p-3 rounded-lg bg-[var(--color-sage-200)] dark:bg-[var(--color-sage-700)] mb-4">
-          "{opposites[chosenSize]}"
-        </p>
-        {protocol?.whyItWorks && (
-          <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-300)] mb-4">
-            {protocol.whyItWorks}
+        {chosenActions.map((action, i) => (
+          <p key={i} className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-200)] p-3 rounded-lg bg-[var(--color-sage-200)] dark:bg-[var(--color-sage-700)] mb-2">
+            "{action}"
           </p>
-        )}
-        {urgeSet && (
+        ))}
+        {whyItWorks.map((why, i) => (
+          <p key={i} className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-300)] mb-2">
+            {why}
+          </p>
+        ))}
+        {bodyOpposites.length > 0 && (
           <p className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] mb-6">
-            And remember: {urgeSet.bodyOpposite.split('.')[0].toLowerCase()}.
+            And remember: {bodyOpposites.map(bo => bo.text.split('.')[0].toLowerCase()).join('. ')}.
           </p>
         )}
         <button
