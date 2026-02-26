@@ -27,28 +27,23 @@ export function DashboardCard({
       className={`
         ${colClass} ${rowClass}
         bg-[var(--color-bg-card)] border border-[var(--color-border)]
-        rounded-xl overflow-hidden
-        transition-colors duration-150
-        hover:border-[var(--color-border-accent)]
+        rounded-2xl overflow-hidden backdrop-blur-xl
+        transition-all duration-200
+        hover:border-[var(--color-border-accent)] hover:bg-[var(--color-bg-card-hover)]
+        hover:shadow-[0_14px_32px_rgba(8,8,22,0.38)]
       `}
     >
-      {/* Card header */}
       <div className="flex items-center justify-between px-5 pt-4 pb-3">
         <div className="flex items-center gap-2">
-          {icon && (
-            <span className="text-[var(--color-accent)] text-sm">{icon}</span>
-          )}
-          <h3 className="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wide">
+          {icon && <span className="text-[var(--color-accent)] text-sm">{icon}</span>}
+          <h3 className="text-xs font-semibold text-[var(--color-text-secondary)] uppercase tracking-[0.16em]">
             {title}
           </h3>
         </div>
         {action && <div>{action}</div>}
       </div>
 
-      {/* Card content */}
-      <div className={noPadding ? '' : 'px-5 pb-5'}>
-        {children}
-      </div>
+      <div className={noPadding ? '' : 'px-5 pb-5'}>{children}</div>
     </div>
   );
 }

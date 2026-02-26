@@ -13,79 +13,72 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-16 hover:w-48 bg-[var(--color-sidebar-bg)] border-r border-[var(--color-sidebar-border)] flex-col z-40 transition-all duration-200 group overflow-hidden">
-        {/* Logo */}
+      <aside className="hidden md:flex fixed left-4 top-4 bottom-4 w-16 hover:w-52 bg-[var(--color-sidebar-bg)] border border-[var(--color-sidebar-border)] rounded-3xl flex-col z-40 transition-all duration-300 group overflow-hidden backdrop-blur-xl shadow-[0_20px_45px_rgba(6,6,20,0.55)]">
         <div className="flex items-center h-16 px-4 border-b border-[var(--color-sidebar-border)]">
           <span className="text-2xl flex-shrink-0">🌿</span>
-          <span className="ml-3 font-semibold text-[var(--color-text-primary)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <span className="ml-3 font-semibold text-[var(--color-text-primary)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             Goblin
           </span>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-4 flex flex-col gap-1">
+        <nav className="flex-1 py-4 flex flex-col gap-1.5 px-2">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === '/'}
               className={({ isActive }) => `
-                flex items-center h-11 mx-2 px-3 rounded-lg transition-all duration-150
+                flex items-center h-11 px-3 rounded-xl transition-all duration-200
                 ${isActive
-                  ? 'bg-[var(--color-sidebar-active)] text-[var(--color-accent)]'
-                  : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-card)]'
+                  ? 'bg-gradient-to-r from-[#8b5cf62f] to-[#22d3ee2a] text-[var(--color-text-primary)] border border-[var(--color-border-accent)]'
+                  : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-card)]/80 border border-transparent'
                 }
               `}
             >
               <item.icon className="w-5 h-5 flex-shrink-0" />
-              <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+              <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 {item.label}
               </span>
             </NavLink>
           ))}
         </nav>
 
-        {/* Bottom section: Profile */}
-        <div className="py-4 border-t border-[var(--color-sidebar-border)] flex flex-col gap-1">
+        <div className="py-4 border-t border-[var(--color-sidebar-border)] flex flex-col gap-1.5 px-2">
           <NavLink
             to="/profile"
             className={({ isActive }) => `
-              flex items-center h-11 mx-2 px-3 rounded-lg transition-all duration-150
+              flex items-center h-11 px-3 rounded-xl transition-all duration-200
               ${isActive
-                ? 'bg-[var(--color-sidebar-active)] text-[var(--color-accent)]'
-                : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-card)]'
+                ? 'bg-gradient-to-r from-[#8b5cf62f] to-[#22d3ee2a] text-[var(--color-text-primary)] border border-[var(--color-border-accent)]'
+                : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-card)]/80 border border-transparent'
               }
             `}
           >
             {user ? (
-              <div className="w-5 h-5 rounded-full bg-[var(--color-accent)] flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-[var(--color-bg-primary)]">
-                  {(user.displayName || user.email || '?')[0].toUpperCase()}
-                </span>
+              <div className="w-5 h-5 rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#22d3ee] flex items-center justify-center flex-shrink-0 text-white">
+                <span className="text-xs font-bold">{(user.displayName || user.email || '?')[0].toUpperCase()}</span>
               </div>
             ) : (
               <ProfileIcon className="w-5 h-5 flex-shrink-0" />
             )}
-            <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               Profile
             </span>
           </NavLink>
         </div>
       </aside>
 
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-sidebar-bg)] border-t border-[var(--color-sidebar-border)] z-40">
-        <div className="flex">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-sidebar-bg)]/95 backdrop-blur-xl border-t border-[var(--color-sidebar-border)] z-40">
+        <div className="flex px-1.5 py-1">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === '/'}
               className={({ isActive }) => `
-                flex-1 flex flex-col items-center py-2.5 transition-colors
+                flex-1 flex flex-col items-center py-2 rounded-xl transition-colors
                 ${isActive
-                  ? 'text-[var(--color-accent)]'
+                  ? 'text-[var(--color-text-primary)] bg-[var(--color-sidebar-active)]'
                   : 'text-[var(--color-text-muted)]'
                 }
               `}
@@ -97,9 +90,9 @@ export function Sidebar() {
           <NavLink
             to="/profile"
             className={({ isActive }) => `
-              flex-1 flex flex-col items-center py-2.5 transition-colors
+              flex-1 flex flex-col items-center py-2 rounded-xl transition-colors
               ${isActive
-                ? 'text-[var(--color-accent)]'
+                ? 'text-[var(--color-text-primary)] bg-[var(--color-sidebar-active)]'
                 : 'text-[var(--color-text-muted)]'
               }
             `}
@@ -112,10 +105,6 @@ export function Sidebar() {
     </>
   );
 }
-
-// ============================================
-// Inline SVG icons (no external dependencies)
-// ============================================
 
 function DashboardIcon({ className }: { className?: string }) {
   return (
