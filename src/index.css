@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/*
+  Wire Tailwind's dark: variant to data-theme attribute.
+  Without this, dark: uses prefers-color-scheme and ignores
+  the theme the user selected in the app.
+*/
+@custom-variant dark (
+  &:where([data-theme="dark"], [data-theme="dark"] *),
+  @media (prefers-color-scheme: dark) {
+    &:where([data-theme="system"], [data-theme="system"] *)
+  }
+);
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }

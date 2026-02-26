@@ -10,6 +10,7 @@ import { CoolDown } from './tools/CoolDown';
 import { FiveSenses } from './tools/FiveSenses';
 import { Pause } from './tools/Pause';
 import { UrgeSurfing } from './tools/UrgeSurfing';
+import { OppositeAction } from './tools/OppositeAction';
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -17,6 +18,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'five-senses': FiveSenses,
   'pause': Pause,
   'urge-surfing': UrgeSurfing,
+  'opposite-action': OppositeAction,
 };
 
 export function ToolPage() {
