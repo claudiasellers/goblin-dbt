@@ -4,6 +4,7 @@ import { emotions, getEmotionById } from '../../data/emotions';
 import { getMapping, type DBTParentEmotion } from '../../data/dbt-parent-mapping';
 import { getProtocol } from '../../data/oppositeActionProtocols';
 import { getUrgesForParent, type ActionUrge } from '../../data/urgeOpposites';
+import { getFitsTheFactsWhen } from '../../data/emotion-regulation-content';
 
 type Phase =
   | 'intro'
@@ -290,6 +291,7 @@ export function OppositeAction() {
   // ─── CHECK THE FACTS ───
   if (phase === 'check-facts') {
     const emotionName = selectedEmotion?.name?.toLowerCase() ?? 'this emotion';
+    const fitsItems = parent ? getFitsTheFactsWhen(parent) : [];
 
     return (
       <div className="space-y-6">
@@ -301,22 +303,28 @@ export function OppositeAction() {
             You're feeling <strong>{emotionName}</strong> and it's pushing you to <strong>{urgeLabel?.toLowerCase()}</strong>.
           </p>
           <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mt-3">
-            Is this emotion fitting what's actually happening right now — or is it bigger or different than the situation?
+            Does any of this apply right now?
           </p>
         </div>
 
-        <div className="space-y-3">
-          <button
-            onClick={() => setPhase('fits-facts')}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
-          >
-            It fits — this is a real situation
-          </button>
+        <div className="space-y-2">
+          {fitsItems.map((item, i) => (
+            <button
+              key={i}
+              onClick={() => setPhase('fits-facts')}
+              className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-2 pt-2 border-t border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
           <button
             onClick={goToOpposites}
             className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
           >
-            It's bigger than the situation
+            None of these — it's bigger than the situation
           </button>
           <button
             onClick={goToOpposites}
