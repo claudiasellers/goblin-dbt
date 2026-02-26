@@ -96,15 +96,7 @@ Interactive tool components live in `src/pages/tools/` and are registered in the
 
 Emotion nodes in the graph have a `dbtParent` property that maps child emotions to their DBT parent category (e.g., `anxiety` → `fear`, `irritation` → `anger`). The 9 DBT parent emotions are: **fear, anger, disgust, envy, jealousy, love, sadness, shame, guilt**.
 
-`EmotionRegulationContent` nodes (one per DBT parent) are linked via `HAS_REGULATION_CONTENT` and contain:
-
-- `fitsTheFactsWhen` — array of first-person statements (humanized, not clinical)
-- `commonActionUrges` — array of what the emotion pushes you to do
-- `oppositeActionsBasic` — small/medium graduated steps
-- `oppositeActionsAllTheWay` — full opposite action (Linehan Handout 11)
-- `problemSolveActions` — what to do if the emotion fits the facts
-
-All content is written in conversational first-person voice ("Something important to me is being blocked" not "An important goal is being blocked or frustrated"). The user should immediately recognize their experience.
+`EmotionRegulationContent` nodes (one per DBT parent) are linked via `HAS_REGULATION_CONTENT`. They hold `label` and `fitsTheFactsWhen` (array of first-person "when this emotion fits the facts" statements). The Opposite Action tool uses a single source of truth: **ActionUrge** nodes (linked via `HAS_ACTION_URGE`) supply urge labels and graduated opposite steps (small/medium/bigger); protocol metadata on `EmotionRegulationContent` (from `schema/opposite-action-data.cypher`) supplies `fitsFactsGuidance`, `whyItWorks`, `acknowledgment`, `bodyOpposite`, and default opposite steps. All content is written in conversational first-person voice so the user immediately recognizes their experience.
 
 ## Data: Micro-Steps
 
@@ -129,7 +121,8 @@ All content is written in conversational first-person voice ("Something importan
 | `functions/src/index.ts` | All Cloud Functions (graph queries, check-in CRUD) |
 | `schema/knowledge-graph.cypher` | Full graph schema (nodes) |
 | `schema/relationships.cypher` | All graph relationships |
-| `schema/emotion-regulation-content-humanized.cypher` | EmotionRegulationContent nodes (humanized) |
+| `schema/emotion-regulation-content.cypher` | EmotionRegulationContent base (label, fitsTheFactsWhen) |
+| `schema/opposite-action-data.cypher` | Protocol metadata + ActionUrge nodes (OA tool source of truth) |
 
 ---
 
