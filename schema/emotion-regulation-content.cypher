@@ -1,317 +1,321 @@
 // ============================================================
-// EMOTION REGULATION CONTENT (Check the Facts, Opposite Action, Problem Solve)
-// Linehan-sourced: Handouts 6, 8a, 11, 13 (DBT Skills Training Handouts and Worksheets, 2e)
+// EMOTION REGULATION CONTENT — HUMANIZED
+// Linehan-sourced: Handouts 6, 8a, 11, 13
+// (DBT Skills Training Handouts and Worksheets, 2e)
+//
+// Voice principle: preserve clinical meaning exactly,
+// but write how someone would describe it to a friend.
+// First person, plain language, recognition-triggering.
 // ============================================================
-// Creates/updates EmotionRegulationContent nodes (one per DBT parent emotion)
-// and links them to existing Emotion nodes where id matches dbtParent.
-// Use this for Step 3 — Check the Facts: show fitsTheFactsWhen as tappable items.
-// ============================================================
+
 
 // --- FEAR ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'fear'})
 SET c.label = 'Fear',
     c.fitsTheFactsWhen = [
-      "There's a real threat to my life or someone I care about.",
-      "There's a real threat to my health or someone I care about.",
-      "There's a real threat to my well-being or someone I care about."
+      "I'm in actual danger — something could hurt me or someone I care about.",
+      "My health or someone else's health is genuinely at risk right now.",
+      "Something is seriously threatening my safety or well-being."
     ],
     c.commonActionUrges = [
-      'Run away or avoid.',
-      'Freeze or try not to move.',
-      'Escape the situation.',
-      'Plead or cry for help.',
-      'Hide from what I fear.'
+      "Get out of here — leave, escape, avoid it entirely.",
+      "Freeze up. Don't move, don't speak.",
+      "Talk myself out of doing the thing I'm scared of.",
+      "Hide or stay away from what's scaring me.",
+      "Call for help or cling to someone safe."
     ],
     c.oppositeActionsBasic = [
-      'Do what you are afraid of doing … over and over.',
-      'Approach events, places, tasks, activities, and people you are afraid of.',
-      'Do things to give yourself a sense of control and mastery over your fears.'
+      "Do the thing you're afraid of — even a small version of it.",
+      "Move toward what scares you instead of away from it.",
+      "Do something that gives you a sense of 'I can handle this.'"
     ],
     c.oppositeActionsAllTheWay = [
-      'Keep your eyes and ears open and focused on the feared event. Look around slowly; explore.',
-      'Take in the information from the situation (notice that you are safe).',
-      'Change posture and keep a confident voice tone. Head and eyes up, shoulders back but relaxed. Assertive body posture.',
-      'Change your body chemistry: paced breathing — breathe in deeply, breathe out slowly.'
+      "Look directly at the situation. Don't close your eyes or look away — take it in slowly.",
+      "Notice the evidence that you're actually safe right now.",
+      "Stand tall. Head up, shoulders back, voice steady. Take up space.",
+      "Slow your breathing: deep breath in, long slow breath out."
     ],
     c.problemSolveActions = [
-      'Freeze or run if danger is near.',
-      'Remove the threatening event.',
-      'Do what gives you a sense of control and mastery of the fearful event.',
-      'Avoid the threatening event.'
+      "Get to safety if the danger is real and immediate.",
+      "Remove or get away from the actual threat.",
+      "Take steps to protect yourself — make a plan.",
+      "Avoid the genuinely dangerous situation."
     ];
 
 MATCH (e:Emotion {id: 'fear'})
 MATCH (c:EmotionRegulationContent {dbtParent: 'fear'})
 MERGE (e)-[:HAS_REGULATION_CONTENT]->(c);
 
+
 // --- ANGER ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'anger'})
 SET c.label = 'Anger',
     c.fitsTheFactsWhen = [
-      'An important goal is blocked or a desired activity is interrupted or prevented.',
-      'I or someone I care about is attacked or hurt by others.',
-      'I or someone I care about is insulted or threatened by others.',
-      'The integrity or status of my social group is offended or threatened.'
+      "Something important to me is being blocked or taken away.",
+      "Someone hurt me or someone I care about — physically or emotionally.",
+      "Someone insulted, disrespected, or threatened me or someone I care about.",
+      "My people are being treated unfairly or disrespected."
     ],
     c.commonActionUrges = [
-      'Attack (physically or verbally).',
-      'Make aggressive or threatening gestures.',
-      'Criticize or complain.',
-      'Walk out or slam doors.',
-      'Use a loud, quarrelsome, or sarcastic voice.'
+      "Lash out — say something cutting or hurtful.",
+      "Get loud, argue, or be sarcastic.",
+      "Criticize, blame, or complain.",
+      "Storm off, slam a door, shut someone out.",
+      "Hit something, throw something, break something."
     ],
     c.oppositeActionsBasic = [
-      'Gently avoid the person you are angry with (rather than attacking).',
-      'Take a time out; breathe in and out deeply and slowly.',
-      'Be kind (rather than mean or insulting).'
+      "Give yourself some space from the person — gently, not aggressively.",
+      "Take a pause. Breathe slowly and deeply before you respond.",
+      "Do something kind instead of mean — even something small."
     ],
     c.oppositeActionsAllTheWay = [
-      'Imagine understanding and empathy for the other person. Step into their shoes. See the situation from their point of view. Imagine really good reasons for what has happened.',
-      'Change your posture: unclench hands, palms up, fingers relaxed (willing hands). Relax chest and stomach. Unclench teeth. Relax facial muscles. Half-smile.',
-      'Change your body chemistry: paced breathing, or run or engage in another physically energetic, nonviolent activity.'
+      "Try to imagine their side. What if there's a reason you're not seeing? Step into their shoes for a moment.",
+      "Unclench. Open your hands, palms up. Relax your jaw. Let your face soften. Try a half-smile.",
+      "Move your body: go for a run, walk fast, do something physical and nonviolent to burn off the energy."
     ],
     c.problemSolveActions = [
-      'Fight back when being attacked, if you have nothing to lose by fighting.',
-      'Overcome obstacles to goals.',
-      'Work to stop further attacks, insults, and threats.',
-      'Avoid or walk out on people who are threatening.'
+      "Stand up for yourself if you need to.",
+      "Work to remove what's blocking your goal.",
+      "Set a boundary — tell them to stop.",
+      "Walk away from someone who's genuinely threatening you."
     ];
 
 MATCH (e:Emotion {id: 'anger'})
 MATCH (c:EmotionRegulationContent {dbtParent: 'anger'})
 MERGE (e)-[:HAS_REGULATION_CONTENT]->(c);
 
+
 // --- DISGUST ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'disgust'})
 SET c.label = 'Disgust',
     c.fitsTheFactsWhen = [
-      'Something I am in contact with could poison or contaminate me.',
-      'Somebody I deeply dislike is touching me or someone I care about.',
-      "I'm around a person or group whose behavior or thinking could seriously damage or harmfully influence me or the group I'm part of."
+      "Something I'm in contact with could actually make me sick or contaminate me.",
+      "Someone who has seriously wronged me is physically too close.",
+      "I'm around people whose behavior could genuinely harm me or my community."
     ],
     c.commonActionUrges = [
-      'Push or kick away; run away.',
-      'Vomit, spit out, wash or scrub.',
-      'Avoid eating or drinking.',
-      'Treat with disdain or disrespect.',
-      'Close eyes, look away.'
+      "Push it away, get away from it.",
+      "Scrub, clean, wash — get it off me.",
+      "Refuse to eat or drink.",
+      "Treat someone with contempt or look down on them.",
+      "Close my eyes, look away, shut it out."
     ],
     c.oppositeActionsBasic = [
-      'Move close. Eat, drink, stand near, or embrace what you found disgusting.',
-      "Be kind to those you feel contempt for; step into the other person's shoes."
+      "Move closer instead of pulling away. Stay with the discomfort.",
+      "Try seeing the person as human — look for what you might have in common."
     ],
     c.oppositeActionsAllTheWay = [
-      'Imagine understanding and empathy for the person you feel disgust or contempt for. See the situation from their point of view. Imagine really good reasons for how they are behaving or looking.',
-      'Take in what feels repulsive. Be sensual (inhaling, looking at, touching, listening, tasting).',
-      'Change your posture: unclench hands, palms up, fingers relaxed. Relax chest and stomach. Unclench teeth. Relax facial muscles. Half-smile.',
-      'Change your body chemistry: paced breathing.'
+      "Imagine what it's like to be them. What would make someone act that way? Look for reasons, not excuses.",
+      "Let yourself take in what feels repulsive instead of blocking it out.",
+      "Unclench. Open your hands, relax your face, soften your jaw. Try a half-smile.",
+      "Slow your breathing: deep breath in, long slow breath out."
     ],
     c.problemSolveActions = [
-      'Remove or clean up revolting things.',
-      'Influence others to stop harmful actions or things that contaminate your community.',
-      'Avoid or push away harmful people or things.',
-      'Imagine understanding a person who has done disgusting things.'
+      "Clean up or remove the thing that's actually harmful.",
+      "Speak up to stop genuinely harmful behavior in your community.",
+      "Distance yourself from people or situations that are truly toxic.",
+      "Try to understand what led someone to act in a way you find repulsive."
     ];
 
 MATCH (e:Emotion {id: 'disgust'})
 MATCH (c:EmotionRegulationContent {dbtParent: 'disgust'})
 MERGE (e)-[:HAS_REGULATION_CONTENT]->(c);
 
+
 // --- ENVY ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'envy'})
 SET c.label = 'Envy',
     c.fitsTheFactsWhen = [
-      "Another person or group has what I want or need but don't have."
+      "Someone has something I genuinely need or want — and I don't have it."
     ],
     c.commonActionUrges = [
-      'Try to take away or ruin what the other person has.',
-      'Attack or criticize the other person.',
-      'Do something to get even or make them fail.',
-      'Say mean things about them or make them look bad.',
-      'Avoid people who have what I want.'
+      "Tear down what they have or sabotage it.",
+      "Criticize them or find flaws to feel better.",
+      "Do something to get even or make them fail.",
+      "Talk badly about them to others.",
+      "Avoid anyone who has more than me."
     ],
     c.oppositeActionsBasic = [
-      'Inhibit destroying what the other person has.',
-      'Count your blessings. Make a list of the things you are thankful for.'
+      "Stop yourself from tearing down what someone else has.",
+      "Name what you DO have. Actually list it."
     ],
     c.oppositeActionsAllTheWay = [
-      'Count all your blessings. Avoid discounting some; avoid exaggerating your deprivations.',
-      "Stop exaggerating others' net worth or value; check the facts.",
-      'Change your posture: unclench hands, palms up, fingers relaxed. Relax chest and stomach. Unclench teeth. Relax facial muscles. Half-smile.',
-      'Change your body chemistry: paced breathing.'
+      "Really count your blessings — all of them. Don't discount the small ones or exaggerate what you're missing.",
+      "Reality-check how much the other person actually has. Are you inflating it?",
+      "Unclench. Open your hands, relax your face, soften your jaw. Try a half-smile.",
+      "Slow your breathing: deep breath in, long slow breath out."
     ],
     c.problemSolveActions = [
-      'Improve yourself and your life.',
-      'Get others to be fair.',
-      "Devalue what others have that you don't have.",
-      "Put on rose-colored glasses.",
-      'Avoid people who have more than you.'
+      "Channel it: work to improve your own life.",
+      "Advocate for fairness if the situation is genuinely unfair.",
+      "Ask yourself how much what they have actually matters to you.",
+      "Focus on your own path. Their lane isn't yours."
     ];
+
 
 // --- JEALOUSY ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'jealousy'})
 SET c.label = 'Jealousy',
     c.fitsTheFactsWhen = [
-      'A very important and desired relationship or object in my life is in danger of being damaged or lost.',
-      "Someone is threatening to take a valued relationship or object away from me."
+      "A relationship or something I deeply value is genuinely at risk of being lost or damaged.",
+      "Someone is actually trying to take away a person or thing that matters to me."
     ],
     c.commonActionUrges = [
-      'Control the person; restrict their freedom.',
-      'Spy on or interrogate the person.',
-      'Demand accounting of time or activities.',
-      'Cling; become more dependent.',
-      'Accuse them of disloyalty or unfaithfulness.'
+      "Control them — check their phone, restrict who they see.",
+      "Interrogate: 'Where were you? Who were you with?'",
+      "Spy, snoop, or collect evidence.",
+      "Cling harder. Be more dependent.",
+      "Accuse them of being unfaithful or disloyal."
     ],
     c.oppositeActionsBasic = [
-      "Let go of controlling others' actions.",
-      'Share the things and people you have in your life.'
+      "Let go of trying to control what they do.",
+      "Practice sharing the people and things in your life."
     ],
     c.oppositeActionsAllTheWay = [
-      'Stop spying or snooping. Suppress probing questions. Fire your "private detective."',
-      'No avoiding. Listen to all the details. Focus on sensations. Keep your eyes open; look around. Take in all the information about the situation.',
-      'Change your posture: unclench hands, palms up, fingers relaxed. Relax chest and stomach. Unclench teeth. Relax facial muscles. Half-smile.',
-      'Change your body chemistry: paced breathing.'
+      "Stop the detective work. No checking their phone, no probing questions, no snooping.",
+      "Don't avoid the uncomfortable parts — let yourself hear the details. Stay present with the information instead of shutting down.",
+      "Unclench. Open your hands, relax your face, soften your jaw. Try a half-smile.",
+      "Slow your breathing: deep breath in, long slow breath out."
     ],
     c.problemSolveActions = [
-      'Protect what you have.',
-      'Work at being more desirable to the person(s) you want to be in a relationship with; fight for the relationship.',
-      'Leave the relationship.'
+      "Protect what you have — invest in the relationship.",
+      "Show up as the person you want to be in this relationship.",
+      "If the relationship is genuinely over, let yourself grieve and move forward."
     ];
 
-// --- LOVE ---
+
+// --- LOVE (when it doesn't fit / isn't effective) ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'love'})
 SET c.label = 'Love',
     c.fitsTheFactsWhen = [
-      'Loving this person, animal, or object enhances quality of life for me or those I care about.',
-      'Loving them increases my chances of attaining my own personal goals.'
+      "Being with this person genuinely makes my life better.",
+      "This relationship helps me become who I want to be."
     ],
     c.commonActionUrges = [
-      'Seek out the person; spend time with them.',
-      'Express love; say "I love you."',
-      'Touch, hug, hold; want physical or emotional closeness.',
-      'Do things they want or need.'
+      "Seek them out — text, call, show up.",
+      "Say 'I love you.' Express how I feel.",
+      "Get close — touch, hug, hold on.",
+      "Do whatever they need or want."
     ],
     c.oppositeActionsBasic = [
-      'Avoid the person, animal, or object you love.',
-      'Distract yourself from thoughts of the person, animal, or object.',
-      'Remind yourself of why love is not justified (rehearse the "cons" of loving) when loving thoughts do arise.'
+      "Create distance. Stop reaching out.",
+      "When thoughts of them come up, redirect your attention to something else.",
+      "Remind yourself specifically why this love isn't good for you right now."
     ],
     c.oppositeActionsAllTheWay = [
-      'Avoid contact with everything that reminds you of the person: pictures, messages, belongings, mementos, places you were together. No following, waiting for, or looking for the person.',
-      'Stop expressing love for the person, even to friends. Be unfriendly (e.g., unfriend on social media).',
-      'If you are around the person: no leaning toward them, no getting close enough to touch, no sighing or gazing.'
+      "Remove the reminders: photos, messages, mementos, the places you went together. Stop looking for them. Stop waiting.",
+      "Stop talking about them — even to friends. Unfollow, unfriend, create a real break.",
+      "If you're around them: don't lean in, don't get close enough to touch, don't stare or sigh."
     ],
     c.problemSolveActions = [
-      'Be with the person, animal, or thing that you love.',
-      'Touch, hold, etc., the beloved.',
-      'Avoid separations when possible.',
-      'If the beloved is lost, fight to find or get the beloved back (if it may be possible).'
+      "Be with the person you love. Show up.",
+      "Express your love through touch, presence, words.",
+      "Minimize unnecessary separations.",
+      "If you've lost them and there's a real chance — fight to reconnect."
     ];
 
 MATCH (e:Emotion {id: 'love'})
 MATCH (c:EmotionRegulationContent {dbtParent: 'love'})
 MERGE (e)-[:HAS_REGULATION_CONTENT]->(c);
 
+
 // --- SADNESS ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'sadness'})
 SET c.label = 'Sadness',
     c.fitsTheFactsWhen = [
-      'I have lost something or someone permanently.',
-      "Things are not the way I wanted or expected and hoped them to be."
+      "I've lost something or someone — and they're not coming back.",
+      "Things didn't turn out how I hoped or expected."
     ],
     c.commonActionUrges = [
-      'Withdraw; avoid people and activities.',
-      'Stay in bed; be inactive.',
-      'Give up and stop trying to improve.',
-      'Talk little or not at all; use a quiet, slow voice.'
+      "Pull away from everyone. Cancel plans.",
+      "Stay in bed. Do nothing.",
+      "Give up on trying to make things better.",
+      "Go quiet — stop talking, stop reaching out."
     ],
     c.oppositeActionsBasic = [
-      'Get active; approach.',
-      'Avoid avoiding.',
-      'Build mastery: do things that make you feel competent and self-confident.',
-      'Increase pleasant events.'
+      "Do something — anything. Get moving, even a little.",
+      "Don't cancel. Show up even when you don't feel like it.",
+      "Do one thing that makes you feel capable or competent.",
+      "Add something small and pleasant to your day."
     ],
     c.oppositeActionsAllTheWay = [
-      'Pay attention to the present moment. Be mindful of your environment — each detail as it unfolds. Experience new or positive activities you are engaging in.',
-      'Change your posture: adopt a "bright" body posture — head up, eyes open, shoulders back. Keep an upbeat voice tone.',
-      'Change your body chemistry: increase physical movement (run, jog, walk, or other active exercise).'
+      "Be here right now. Notice what's around you — the details, the textures, the sounds. Stay in this moment instead of replaying the loss.",
+      "Stand up straight. Head up, eyes open, shoulders back. Use a brighter voice than you feel.",
+      "Move your body: walk, jog, stretch, dance — anything that gets you physically activated."
     ],
     c.problemSolveActions = [
-      "Grieve; have a memorial service; visit the cemetery (but don't build a house at the cemetery).",
-      'Retrieve or replace what is lost.',
-      'Plan how to rebuild a life worth living without the beloved or expected outcomes.',
-      'Accumulate positives.',
-      'Build mastery: do things that make you feel competent and self-confident.',
-      'Communicate need for help. Accept help offered.',
-      'Put on rose-colored glasses.'
+      "Let yourself grieve — but don't move in with the grief permanently.",
+      "Look for ways to rebuild or replace what was lost.",
+      "Start planning a life that works without what you lost.",
+      "Build up good things, even small ones.",
+      "Ask for help. Accept it when it's offered."
     ];
 
 MATCH (e:Emotion {id: 'sadness'})
 MATCH (c:EmotionRegulationContent {dbtParent: 'sadness'})
 MERGE (e)-[:HAS_REGULATION_CONTENT]->(c);
 
+
 // --- SHAME ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'shame'})
 SET c.label = 'Shame',
     c.fitsTheFactsWhen = [
-      "I will be rejected by a person or group I care about if characteristics of myself or my behavior are made public."
+      "If people I care about found out about this, they would actually reject me — not just disapprove, but leave."
     ],
     c.commonActionUrges = [
-      'Hide behavior or characteristics from others.',
-      'Avoid the person I have harmed or who have criticized me.',
-      'Withdraw; cover my face.',
-      'Apologize over and over.',
-      'Look down and away from others.'
+      "Hide it. Make sure no one finds out.",
+      "Avoid the person I hurt or who saw what I did.",
+      "Disappear — withdraw, cover my face, shrink.",
+      "Apologize over and over and over.",
+      "Can't look anyone in the eye."
     ],
     c.oppositeActionsBasic = [
-      "Make public your personal characteristics or your behavior (with people who won't reject you).",
-      "Repeat the behavior that sets off shame over and over (without hiding the behavior from those who won't reject you)."
+      "Tell someone safe. Share the thing you're hiding — with someone you trust not to reject you.",
+      "Do the thing that triggers the shame again — openly, around people who accept you."
     ],
     c.oppositeActionsAllTheWay = [
-      'No apologizing or trying to make up for a perceived transgression.',
-      'Take in all the information from the situation.',
-      'Change your body posture: look innocent and proud. Lift your head; "puff up" your chest; maintain eye contact. Keep your voice tone steady and clear.'
+      "Stop over-apologizing. You don't need to keep making up for something that doesn't warrant it.",
+      "Take in the full picture — not just the worst-case version your shame is showing you.",
+      "Stand tall. Head up, chest open, eyes forward. Speak clearly and steadily."
     ],
     c.problemSolveActions = [
-      'Hide what will get you rejected.',
-      'Appease those offended.',
-      'Change your behavior or personal characteristics to fit in.',
-      'Avoid groups who disapprove of you.',
-      'Find a new group that fits your values or that likes your personal characteristics.',
-      "Work to change society's or a person's values."
+      "Protect yourself from groups that would genuinely reject you unfairly.",
+      "Find people who share your values and accept you.",
+      "Work to change the norms that are causing the rejection.",
+      "If you did violate your own values: apologize, repair the damage, commit to doing better, then forgive yourself and move on."
     ];
 
-// Link hot_shame and cold_shame to the same shame content
 MATCH (c:EmotionRegulationContent {dbtParent: 'shame'})
 MATCH (e:Emotion) WHERE e.id IN ['hot_shame', 'cold_shame']
 MERGE (e)-[:HAS_REGULATION_CONTENT]->(c);
+
 
 // --- GUILT ---
 MERGE (c:EmotionRegulationContent {dbtParent: 'guilt'})
 SET c.label = 'Guilt',
     c.fitsTheFactsWhen = [
-      'My own behavior violates my own values or moral code.'
+      "What I did actually goes against my own values — not someone else's rules, but mine."
     ],
     c.commonActionUrges = [
-      'Try to repair the harm; make amends; fix the damage.',
-      'Ask for forgiveness; apologize; confess.',
-      'Give gifts or make sacrifices to try to make up for the transgression.',
-      'Bow my head; kneel before the person.'
+      "Fix it, undo it, make it right.",
+      "Confess. Apologize. Beg forgiveness.",
+      "Give something up to make up for it.",
+      "Punish myself."
     ],
     c.oppositeActionsBasic = [
-      "Make public your personal characteristics or your behavior (with people who won't reject you).",
-      "Repeat the behavior that sets off guilt over and over (without hiding from those who won't reject you)."
+      "Tell someone safe what you did — someone who won't reject you for it.",
+      "Do the thing that triggered the guilt again, without hiding, around people who accept you."
     ],
     c.oppositeActionsAllTheWay = [
-      'No apologizing or trying to make up for a perceived transgression.',
-      'Take in all the information from the situation.',
-      'Change your body posture: look innocent and proud. Lift your head; "puff up" your chest; maintain eye contact. Keep your voice tone steady and clear.'
+      "Stop the apology loop. You've said sorry — now stop.",
+      "Look at the full picture: what actually happened, what you actually did, what the real impact was.",
+      "Stand tall. Head up, chest open, eyes forward. You made a mistake — you're not the mistake."
     ],
     c.problemSolveActions = [
-      'Seek forgiveness.',
-      'Repair the harm; make things better (or, if not possible, work to prevent or repair similar harm for others).',
-      'Accept the consequences gracefully.',
-      'Commit to avoiding behaviors that violate your moral values in the future.'
+      "Make it right if you can — apologize sincerely, repair the damage.",
+      "If you can't undo it, do something to prevent similar harm in the future.",
+      "Accept the consequences without spiraling.",
+      "Commit to doing differently next time — then actually follow through."
     ];
 
 MATCH (e:Emotion {id: 'guilt'})

@@ -996,6 +996,140 @@ export const getRelatedEmotions = onCall(
   }
 );
 
+// ============================================
+// OPPOSITE ACTION CONTENT
+// Queries the graph for everything the Opposite Action tool needs.
+// ============================================
+
+interface OppositeActionEmotionResult {
+  emotionId: string;
+  applicable: boolean;
+  dbtParent: string | null;
+  clinicalNote: string;
+  alternativeSkill: string | null;
+}
+
+interface ActionUrgeResult {
+  id: string;
+  label: string;
+  small: string;
+  medium: string;
+  bigger: string;
+}
+
+interface ParentProtocol {
+  label: string;
+  fitsTheFactsWhen: string[];
+  fitsFactsGuidance: string;
+  whyItWorks: string;
+  acknowledgment: string;
+  bodyOpposite: string;
+  defaultOpposites: { small: string; medium: string; bigger: string };
+  urges: ActionUrgeResult[];
+}
+
+interface OppositeActionContentResult {
+  emotions: OppositeActionEmotionResult[];
+  parents: Record<string, ParentProtocol>;
+}
+
+/**
+ * Get opposite action content for a set of emotions.
+ * Returns per-emotion OA applicability + per-parent protocol data.
+ * No auth required — this is public emotion knowledge.
+ */
+export const getOppositeActionContent = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request): Promise<OppositeActionContentResult> => {
+    const { emotionIds } = request.data as { emotionIds: string[] };
+
+    if (!emotionIds || !Array.isArray(emotionIds) || emotionIds.length === 0) {
+      throw new HttpsError('invalid-argument', 'emotionIds array is required');
+    }
+
+    const session = getDriver().session();
+    try {
+      const result = await session.run(
+        `
+        MATCH (e:Emotion) WHERE e.id IN $emotionIds
+        OPTIONAL MATCH (e)-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
+        OPTIONAL MATCH (c)-[:HAS_ACTION_URGE]->(u:ActionUrge)
+        RETURN e.id AS emotionId,
+               coalesce(e.oppositeActionApplicable, false) AS applicable,
+               e.oaClinicalNote AS clinicalNote,
+               e.oaAlternativeSkill AS alternativeSkill,
+               c.dbtParent AS dbtParent,
+               c.label AS parentLabel,
+               c.fitsTheFactsWhen AS fitsTheFactsWhen,
+               c.fitsFactsGuidance AS fitsFactsGuidance,
+               c.whyItWorks AS whyItWorks,
+               c.acknowledgment AS acknowledgment,
+               c.bodyOpposite AS bodyOpposite,
+               c.defaultOppositeSmall AS defaultOppositeSmall,
+               c.defaultOppositeMedium AS defaultOppositeMedium,
+               c.defaultOppositeBigger AS defaultOppositeBigger,
+               collect(DISTINCT u { .id, .label, .small, .medium, .bigger }) AS urges
+        `,
+        { emotionIds }
+      );
+
+      const emotions: OppositeActionEmotionResult[] = [];
+      const parents: Record<string, ParentProtocol> = {};
+
+      for (const record of result.records) {
+        const emotionId = record.get('emotionId');
+        const applicable = record.get('applicable');
+        const dbtParent = record.get('dbtParent');
+
+        emotions.push({
+          emotionId,
+          applicable,
+          dbtParent: dbtParent || null,
+          clinicalNote: record.get('clinicalNote') || '',
+          alternativeSkill: record.get('alternativeSkill') || null,
+        });
+
+        // Build parent protocol data (deduplicated by dbtParent key)
+        if (applicable && dbtParent && !parents[dbtParent]) {
+          const urgesRaw = record.get('urges') || [];
+          // Filter out empty urge objects (from OPTIONAL MATCH with no ActionUrge)
+          const urges: ActionUrgeResult[] = urgesRaw
+            .filter((u: Record<string, unknown>) => u.id != null)
+            .map((u: Record<string, unknown>) => ({
+              id: u.id as string,
+              label: u.label as string,
+              small: u.small as string,
+              medium: u.medium as string,
+              bigger: u.bigger as string,
+            }));
+
+          parents[dbtParent] = {
+            label: record.get('parentLabel') || dbtParent,
+            fitsTheFactsWhen: record.get('fitsTheFactsWhen') || [],
+            fitsFactsGuidance: record.get('fitsFactsGuidance') || '',
+            whyItWorks: record.get('whyItWorks') || '',
+            acknowledgment: record.get('acknowledgment') || '',
+            bodyOpposite: record.get('bodyOpposite') || '',
+            defaultOpposites: {
+              small: record.get('defaultOppositeSmall') || '',
+              medium: record.get('defaultOppositeMedium') || '',
+              bigger: record.get('defaultOppositeBigger') || '',
+            },
+            urges,
+          };
+        }
+      }
+
+      return { emotions, parents };
+    } catch (error) {
+      console.error('Error getting opposite action content:', error);
+      throw new HttpsError('internal', 'Failed to get opposite action content');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
 /**
  * Get fallback tools based on quadrant when no specific pattern match
  * Used for the "Help me now" minimal-input path

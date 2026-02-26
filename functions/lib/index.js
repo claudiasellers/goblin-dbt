@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getQuickTools = exports.getRelatedEmotions = exports.getStateAndTools = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
+exports.getQuickTools = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getStateAndTools = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -820,6 +820,90 @@ exports.getRelatedEmotions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
     catch (error) {
         console.error('Error getting related emotions:', error);
         throw new https_1.HttpsError('internal', 'Failed to find related emotions');
+    }
+    finally {
+        await session.close();
+    }
+});
+/**
+ * Get opposite action content for a set of emotions.
+ * Returns per-emotion OA applicability + per-parent protocol data.
+ * No auth required — this is public emotion knowledge.
+ */
+exports.getOppositeActionContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    const { emotionIds } = request.data;
+    if (!emotionIds || !Array.isArray(emotionIds) || emotionIds.length === 0) {
+        throw new https_1.HttpsError('invalid-argument', 'emotionIds array is required');
+    }
+    const session = getDriver().session();
+    try {
+        const result = await session.run(`
+        MATCH (e:Emotion) WHERE e.id IN $emotionIds
+        OPTIONAL MATCH (e)-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
+        OPTIONAL MATCH (c)-[:HAS_ACTION_URGE]->(u:ActionUrge)
+        RETURN e.id AS emotionId,
+               coalesce(e.oppositeActionApplicable, false) AS applicable,
+               e.oaClinicalNote AS clinicalNote,
+               e.oaAlternativeSkill AS alternativeSkill,
+               c.dbtParent AS dbtParent,
+               c.label AS parentLabel,
+               c.fitsTheFactsWhen AS fitsTheFactsWhen,
+               c.fitsFactsGuidance AS fitsFactsGuidance,
+               c.whyItWorks AS whyItWorks,
+               c.acknowledgment AS acknowledgment,
+               c.bodyOpposite AS bodyOpposite,
+               c.defaultOppositeSmall AS defaultOppositeSmall,
+               c.defaultOppositeMedium AS defaultOppositeMedium,
+               c.defaultOppositeBigger AS defaultOppositeBigger,
+               collect(DISTINCT u { .id, .label, .small, .medium, .bigger }) AS urges
+        `, { emotionIds });
+        const emotions = [];
+        const parents = {};
+        for (const record of result.records) {
+            const emotionId = record.get('emotionId');
+            const applicable = record.get('applicable');
+            const dbtParent = record.get('dbtParent');
+            emotions.push({
+                emotionId,
+                applicable,
+                dbtParent: dbtParent || null,
+                clinicalNote: record.get('clinicalNote') || '',
+                alternativeSkill: record.get('alternativeSkill') || null,
+            });
+            // Build parent protocol data (deduplicated by dbtParent key)
+            if (applicable && dbtParent && !parents[dbtParent]) {
+                const urgesRaw = record.get('urges') || [];
+                // Filter out empty urge objects (from OPTIONAL MATCH with no ActionUrge)
+                const urges = urgesRaw
+                    .filter((u) => u.id != null)
+                    .map((u) => ({
+                    id: u.id,
+                    label: u.label,
+                    small: u.small,
+                    medium: u.medium,
+                    bigger: u.bigger,
+                }));
+                parents[dbtParent] = {
+                    label: record.get('parentLabel') || dbtParent,
+                    fitsTheFactsWhen: record.get('fitsTheFactsWhen') || [],
+                    fitsFactsGuidance: record.get('fitsFactsGuidance') || '',
+                    whyItWorks: record.get('whyItWorks') || '',
+                    acknowledgment: record.get('acknowledgment') || '',
+                    bodyOpposite: record.get('bodyOpposite') || '',
+                    defaultOpposites: {
+                        small: record.get('defaultOppositeSmall') || '',
+                        medium: record.get('defaultOppositeMedium') || '',
+                        bigger: record.get('defaultOppositeBigger') || '',
+                    },
+                    urges,
+                };
+            }
+        }
+        return { emotions, parents };
+    }
+    catch (error) {
+        console.error('Error getting opposite action content:', error);
+        throw new https_1.HttpsError('internal', 'Failed to get opposite action content');
     }
     finally {
         await session.close();

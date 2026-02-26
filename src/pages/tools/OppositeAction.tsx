@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { emotions, getEmotionById } from '../../data/emotions';
-import { getMapping, type DBTParentEmotion } from '../../data/dbt-parent-mapping';
-import { getProtocol } from '../../data/oppositeActionProtocols';
-import { getUrgesForParent, type ActionUrge } from '../../data/urgeOpposites';
-import { getFitsTheFactsWhen } from '../../data/emotion-regulation-content';
+import {
+  getOppositeActionContent,
+  type OppositeActionContent,
+  type ActionUrgeData,
+} from '../../services/neo4j';
 
 type Phase =
   | 'intro'
@@ -34,51 +35,61 @@ export function OppositeAction() {
   const [selectedEmotionIds, setSelectedEmotionIds] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [showPleasant, setShowPleasant] = useState(false);
-  const [selectedUrges, setSelectedUrges] = useState<ActionUrge[]>([]);
+  const [selectedUrges, setSelectedUrges] = useState<ActionUrgeData[]>([]);
   const [customUrge, setCustomUrge] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [parentOverrides, setParentOverrides] = useState<Partial<Record<DBTParentEmotion, DBTParentEmotion>>>({});
+  const [parentOverrides, setParentOverrides] = useState<Record<string, string>>({});
   const [chosenSizes, setChosenSizes] = useState<Record<string, 'small' | 'medium' | 'bigger'>>({});
   const [guiltFitsNote, setGuiltFitsNote] = useState<string | null>(null);
 
-  // ── Derived data ──
+  // Graph data — fetched after emotion selection
+  const [oaData, setOaData] = useState<OppositeActionContent | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const { applicableIds, nonApplicable } = useMemo(() => {
-    const all = selectedEmotionIds.map(id => ({ id, mapping: getMapping(id) }));
-    return {
-      applicableIds: all.filter(m => m.mapping?.oppositeActionApplicable).map(m => m.id),
-      nonApplicable: all.filter(m => m.mapping && !m.mapping.oppositeActionApplicable),
-    };
-  }, [selectedEmotionIds]);
+  // ── Derived from graph data ──
+
+  const applicableEmotions = useMemo(
+    () => oaData?.emotions.filter(e => e.applicable) ?? [],
+    [oaData]
+  );
+
+  const nonApplicable = useMemo(
+    () => oaData?.emotions.filter(e => !e.applicable) ?? [],
+    [oaData]
+  );
+
+  const applicableIds = useMemo(
+    () => applicableEmotions.map(e => e.emotionId),
+    [applicableEmotions]
+  );
 
   // Unique parents from applicable emotions, with overrides applied
   const parents = useMemo(() => {
     const raw = [...new Set(
-      applicableIds
-        .map(id => getMapping(id)?.primary)
-        .filter((p): p is DBTParentEmotion => p != null)
+      applicableEmotions
+        .map(e => e.dbtParent)
+        .filter((p): p is string => p != null)
     )];
-    return [...new Set(raw.map(p => parentOverrides[p] ?? p))] as DBTParentEmotion[];
-  }, [applicableIds, parentOverrides]);
+    return [...new Set(raw.map(p => parentOverrides[p] ?? p))];
+  }, [applicableEmotions, parentOverrides]);
 
-  // Protocols and urge sets for all parents
+  // Parent protocol data from the graph
   const parentData = useMemo(() =>
-    parents.map(p => ({
-      parent: p,
-      protocol: getProtocol(p),
-      urgeSet: getUrgesForParent(p),
-    })),
-    [parents]
+    parents
+      .filter(p => oaData?.parents[p])
+      .map(p => ({ parent: p, ...oaData!.parents[p] })),
+    [parents, oaData]
   );
 
   // All available urges, grouped by parent
   const allAvailableUrges = useMemo(() =>
     parentData
-      .filter(pd => pd.urgeSet)
+      .filter(pd => pd.urges.length > 0)
       .map(pd => ({
         parent: pd.parent,
-        parentLabel: pd.protocol?.label ?? pd.parent,
-        urges: pd.urgeSet!.urges,
+        parentLabel: pd.label,
+        urges: pd.urges,
       })),
     [parentData]
   );
@@ -100,11 +111,8 @@ export function OppositeAction() {
         opposites: { small: urge.small, medium: urge.medium, bigger: urge.bigger },
       });
     }
-    if (customUrge.trim()) {
-      const defaults = parentData[0]?.urgeSet?.defaultOpposites;
-      if (defaults) {
-        result.push({ key: 'custom', label: customUrge.trim(), opposites: defaults });
-      }
+    if (customUrge.trim() && parentData[0]?.defaultOpposites) {
+      result.push({ key: 'custom', label: customUrge.trim(), opposites: parentData[0].defaultOpposites });
     }
     return result;
   }, [selectedUrges, customUrge, parentData]);
@@ -112,16 +120,14 @@ export function OppositeAction() {
   // Body opposites from all parents
   const bodyOpposites = useMemo(() =>
     parentData
-      .filter(pd => pd.urgeSet?.bodyOpposite)
-      .map(pd => ({ parent: pd.parent, label: pd.protocol?.label ?? pd.parent, text: pd.urgeSet!.bodyOpposite })),
+      .filter(pd => pd.bodyOpposite)
+      .map(pd => ({ parent: pd.parent, label: pd.label, text: pd.bodyOpposite })),
     [parentData]
   );
 
   // Acknowledgments from all parents
   const acknowledgments = useMemo(() =>
-    parentData
-      .filter(pd => pd.urgeSet?.acknowledgment)
-      .map(pd => pd.urgeSet!.acknowledgment),
+    parentData.filter(pd => pd.acknowledgment).map(pd => pd.acknowledgment),
     [parentData]
   );
 
@@ -152,7 +158,7 @@ export function OppositeAction() {
     );
   };
 
-  const toggleUrge = (urge: ActionUrge) => {
+  const toggleUrge = (urge: ActionUrgeData) => {
     setSelectedUrges(prev =>
       prev.some(u => u.id === urge.id)
         ? prev.filter(u => u.id !== urge.id)
@@ -160,9 +166,20 @@ export function OppositeAction() {
     );
   };
 
-  const continueFromIdentify = () => {
-    setPhase(applicableIds.length === 0 ? 'redirect' : 'name-urge');
-  };
+  const continueFromIdentify = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getOppositeActionContent(selectedEmotionIds);
+      setOaData(data);
+      const hasApplicable = data.emotions.some(e => e.applicable);
+      setPhase(hasApplicable ? 'name-urge' : 'redirect');
+    } catch {
+      setError('Could not load opposite action data. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  }, [selectedEmotionIds]);
 
   const goToCheckFacts = () => setPhase('check-facts');
 
@@ -186,6 +203,8 @@ export function OppositeAction() {
     setParentOverrides({});
     setChosenSizes({});
     setGuiltFitsNote(null);
+    setOaData(null);
+    setError(null);
   };
 
   // ── Helpers ──
@@ -250,6 +269,7 @@ export function OppositeAction() {
                     <button
                       key={e.id}
                       onClick={() => toggleEmotion(e.id)}
+                      disabled={loading}
                       className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                         selected
                           ? 'bg-[var(--color-sage-600)] border-[var(--color-sage-600)] text-white'
@@ -274,14 +294,21 @@ export function OppositeAction() {
           </button>
         )}
 
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        )}
+
         {selectedEmotionIds.length > 0 && (
           <button
             onClick={continueFromIdentify}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            disabled={loading}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors disabled:opacity-50"
           >
-            Continue with {selectedEmotionIds.length === 1
-              ? getEmotionById(selectedEmotionIds[0])?.name
-              : `${selectedEmotionIds.length} emotions`}
+            {loading
+              ? 'Loading...'
+              : `Continue with ${selectedEmotionIds.length === 1
+                  ? getEmotionById(selectedEmotionIds[0])?.name
+                  : `${selectedEmotionIds.length} emotions`}`}
           </button>
         )}
       </div>
@@ -297,8 +324,8 @@ export function OppositeAction() {
       'name-it': 'Name It',
       'body-scan': 'Body Scan',
     };
-    const notApplicableNames = nonApplicable.map(m => getEmotionById(m.id)?.name).filter(Boolean);
-    const uniqueAlts = [...new Set(nonApplicable.map(m => m.mapping?.alternativeSkill).filter(Boolean))] as string[];
+    const notApplicableNames = nonApplicable.map(m => getEmotionById(m.emotionId)?.name).filter(Boolean);
+    const uniqueAlts = [...new Set(nonApplicable.map(m => m.alternativeSkill).filter(Boolean))] as string[];
 
     return (
       <div className="space-y-6">
@@ -309,8 +336,8 @@ export function OppositeAction() {
               : 'these emotions'}
           </h3>
           {nonApplicable.map(m => (
-            <p key={m.id} className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-2">
-              {m.mapping?.clinicalNote}
+            <p key={m.emotionId} className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-2">
+              {m.clinicalNote}
             </p>
           ))}
         </div>
@@ -326,7 +353,7 @@ export function OppositeAction() {
         ))}
 
         <button
-          onClick={() => { setPhase('identify'); setSelectedEmotionIds([]); }}
+          onClick={() => { setPhase('identify'); setSelectedEmotionIds([]); setOaData(null); }}
           className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
         >
           Pick different emotions
@@ -340,7 +367,7 @@ export function OppositeAction() {
     const emotionLabel = applicableIds.length === 1
       ? getEmotionById(applicableIds[0])?.name?.toLowerCase() ?? 'this'
       : 'these feelings';
-    const skippedNames = nonApplicable.map(m => getEmotionById(m.id)?.name).filter(Boolean);
+    const skippedNames = nonApplicable.map(m => getEmotionById(m.emotionId)?.name).filter(Boolean);
 
     return (
       <div className="space-y-6">
@@ -426,11 +453,9 @@ export function OppositeAction() {
       : urgeLabels.map(l => l.toLowerCase()).join(', ');
 
     // Group fits-the-facts items by parent
-    const groupedByParent = parents.map(p => ({
-      parent: p,
-      label: getProtocol(p)?.label ?? p,
-      items: getFitsTheFactsWhen(p),
-    })).filter(g => g.items.length > 0);
+    const groupedByParent = parentData
+      .filter(pd => pd.fitsTheFactsWhen?.length > 0)
+      .map(pd => ({ parent: pd.parent, label: pd.label, items: pd.fitsTheFactsWhen }));
 
     return (
       <div className="space-y-6">
@@ -486,8 +511,8 @@ export function OppositeAction() {
   // ─── FITS FACTS ───
   if (phase === 'fits-facts') {
     const guidances = parentData
-      .filter(pd => pd.protocol?.fitsFactsGuidance)
-      .map(pd => ({ label: pd.protocol!.label, text: pd.protocol!.fitsFactsGuidance }));
+      .filter(pd => pd.fitsFactsGuidance)
+      .map(pd => ({ label: pd.label, text: pd.fitsFactsGuidance }));
 
     return (
       <div className="space-y-6">
@@ -591,11 +616,9 @@ export function OppositeAction() {
           <button
             onClick={() => {
               if (otherParents.length === 0) {
-                // Guilt is the only parent — it fits the facts
                 setPhase('fits-facts');
               } else {
-                // Other parents still need opposites; note the guilt guidance
-                setGuiltFitsNote(getProtocol('guilt')?.fitsFactsGuidance ?? null);
+                setGuiltFitsNote(oaData?.parents['guilt']?.fitsFactsGuidance ?? null);
                 setPhase('show-opposites');
               }
             }}
@@ -734,8 +757,8 @@ export function OppositeAction() {
       .map(u => u.opposites[chosenSizes[u.key]!]);
 
     const whyItWorks = [...new Set(
-      parentData.map(pd => pd.protocol?.whyItWorks).filter(Boolean)
-    )] as string[];
+      parentData.map(pd => pd.whyItWorks).filter(Boolean)
+    )];
 
     return (
       <div className="text-center p-8 rounded-xl bg-[var(--color-sage-100)] dark:bg-[var(--color-sage-800)]">

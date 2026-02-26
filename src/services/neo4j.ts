@@ -218,6 +218,59 @@ export async function getQuickTools(
 }
 
 // ============================================
+// OPPOSITE ACTION CONTENT
+// ============================================
+
+export interface ActionUrgeData {
+  id: string;
+  label: string;
+  small: string;
+  medium: string;
+  bigger: string;
+}
+
+export interface ParentProtocol {
+  label: string;
+  fitsTheFactsWhen: string[];
+  fitsFactsGuidance: string;
+  whyItWorks: string;
+  acknowledgment: string;
+  bodyOpposite: string;
+  defaultOpposites: { small: string; medium: string; bigger: string };
+  urges: ActionUrgeData[];
+}
+
+export interface OppositeActionEmotionMapping {
+  emotionId: string;
+  applicable: boolean;
+  dbtParent: string | null;
+  clinicalNote: string;
+  alternativeSkill: string | null;
+}
+
+export interface OppositeActionContent {
+  emotions: OppositeActionEmotionMapping[];
+  parents: Record<string, ParentProtocol>;
+}
+
+const getOppositeActionContentFn = httpsCallable<
+  { emotionIds: string[] },
+  OppositeActionContent
+>(functions, 'getOppositeActionContent');
+
+/**
+ * Get opposite action content for a set of emotions.
+ * Returns per-emotion OA applicability + per-parent protocol data
+ * including fits-the-facts criteria, graduated urge opposites, etc.
+ */
+export async function getOppositeActionContent(
+  emotionIds: string[]
+): Promise<OppositeActionContent> {
+  const result = await getOppositeActionContentFn({ emotionIds });
+  return result.data;
+}
+
+// ============================================
 // TOOL USAGE TRACKING
 // ============================================
 
