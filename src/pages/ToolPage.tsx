@@ -35,6 +35,7 @@ export function ToolPage() {
     : undefined;
   const category = tool ? getCategoryById(tool.categoryId) : undefined;
 
+  // Track tool usage when the page mounts (fire-and-forget); use resolved tool id when available
   const idToTrack = tool?.id ?? toolId;
   useEffect(() => {
     if (user && idToTrack) {
