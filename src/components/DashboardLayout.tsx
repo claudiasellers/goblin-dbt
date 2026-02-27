@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
+import { DashboardStatsPanel } from './dashboard/DashboardStatsPanel';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 
@@ -16,18 +17,16 @@ export function DashboardLayout() {
     day: 'numeric',
   });
 
-  // Read from profile context so name updates instantly when saved
   const displayName = profile.displayName || user?.email?.split('@')[0] || 'Friend';
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg-primary)]">
-      {/* Sidebar (desktop) + bottom nav (mobile) */}
+    <div className="h-screen flex overflow-hidden">
+      {/* Sidebar on the left (desktop) + bottom nav (mobile) */}
       <Sidebar />
 
-      {/* Main content area -- offset by sidebar on desktop, bottom padding on mobile */}
-      <div className="md:ml-16 pb-16 md:pb-0 flex flex-col min-h-screen">
-        {/* Header */}
-        <header className="sticky top-0 z-30 bg-[var(--color-bg-primary)]/80 backdrop-blur-md border-b border-[var(--color-border-subtle)]">
+      {/* Center column: header + main content — scrolls independently */}
+      <div className="flex-1 min-w-0 flex flex-col h-screen md:ml-16 pb-16 md:pb-0 overflow-hidden">
+        <header className="flex-shrink-0 z-30 bg-[var(--color-glass-panel)] backdrop-blur-xl border-b border-[var(--color-glass-border)]">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-[var(--color-text-tertiary)]">
@@ -37,8 +36,6 @@ export function DashboardLayout() {
                 {greeting}, {displayName}
               </h1>
             </div>
-
-            {/* Right side actions */}
             <div className="flex items-center gap-3">
               {!user && (
                 <a
@@ -52,13 +49,13 @@ export function DashboardLayout() {
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 md:px-6 py-6">
-          <Outlet />
+        <main className="flex-1 min-h-0 overflow-y-auto">
+          <div className="max-w-7xl w-full mx-auto px-4 md:px-6 py-6">
+            <Outlet />
+          </div>
         </main>
 
-        {/* Footer -- hidden on mobile since bottom nav takes that space */}
-        <footer className="hidden md:block border-t border-[var(--color-border-subtle)] mt-auto">
+        <footer className="hidden md:block flex-shrink-0 border-t border-[var(--color-border-subtle)]">
           <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
             <p className="text-xs text-[var(--color-text-muted)]">
               Simple tools for when things feel too big.
@@ -69,6 +66,13 @@ export function DashboardLayout() {
           </div>
         </footer>
       </div>
+
+      {/* Right column: dashboard stats — hidden on mobile, scrolls independently */}
+      <aside className="hidden md:flex flex-col flex-shrink-0 w-[280px] h-screen border-l border-[var(--color-glass-border)] bg-[var(--color-glass-panel)] backdrop-blur-xl overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-y-auto p-4">
+          <DashboardStatsPanel />
+        </div>
+      </aside>
     </div>
   );
 }

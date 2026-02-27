@@ -26,7 +26,7 @@ export function DashboardCard({
     <div
       className={`
         ${colClass} ${rowClass}
-        bg-[var(--color-bg-card)] border border-[var(--color-border)]
+        bg-[var(--color-glass-card)] backdrop-blur-md border border-[var(--color-glass-border)]
         rounded-xl overflow-hidden
         transition-colors duration-150
         hover:border-[var(--color-border-accent)]
