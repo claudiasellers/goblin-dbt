@@ -13,18 +13,18 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-16 hover:w-48 bg-[var(--color-sidebar-bg)] border-r border-[var(--color-sidebar-border)] flex-col z-40 transition-all duration-200 group overflow-hidden">
+      {/* Desktop sidebar — fixed on the left */}
+      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-16 hover:w-48 h-screen bg-[var(--color-glass-panel)] backdrop-blur-xl border-r border-[var(--color-glass-border)] flex-col z-40 transition-all duration-200 group overflow-hidden">
         {/* Logo */}
-        <div className="flex items-center h-16 px-4 border-b border-[var(--color-sidebar-border)]">
+        <div className="flex items-center flex-shrink-0 h-16 px-4 border-b border-[var(--color-sidebar-border)]">
           <span className="text-2xl flex-shrink-0">🌿</span>
           <span className="ml-3 font-semibold text-[var(--color-text-primary)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
             Goblin
           </span>
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-4 flex flex-col gap-1">
+        {/* Navigation — scrolls independently */}
+        <nav className="flex-1 min-h-0 overflow-y-auto py-4 flex flex-col gap-1">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
@@ -47,7 +47,7 @@ export function Sidebar() {
         </nav>
 
         {/* Bottom section: Profile */}
-        <div className="py-4 border-t border-[var(--color-sidebar-border)] flex flex-col gap-1">
+        <div className="flex-shrink-0 py-4 border-t border-[var(--color-sidebar-border)] flex flex-col gap-1">
           <NavLink
             to="/profile"
             className={({ isActive }) => `
