@@ -1,6 +1,6 @@
-import { useState, useMemo, useCallback } from 'react';
-import { Link } from 'react-router-dom';
-import { emotions, getEmotionById } from '../../data/emotions';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { Link, useLocation } from 'react-router-dom';
+import { emotions, getEmotionById, getEmotionByName } from '../../data/emotions';
 import {
   getOppositeActionContent,
   type OppositeActionContent,
@@ -31,8 +31,19 @@ const familyLabels: Record<string, string> = {
 const familyOrder = ['fearful', 'angry', 'sad', 'disgusted', 'bad', 'happy', 'surprised'];
 
 export function OppositeAction() {
+  const location = useLocation();
+  const rawCheckinEmotions = (location.state as { checkinEmotions?: string[] } | null)?.checkinEmotions;
+  // Check-in stores emotion names ("Rejected"); OA uses IDs ("rejected"). Convert.
+  const checkinEmotionIds = useMemo(() => {
+    if (!rawCheckinEmotions?.length) return undefined;
+    return rawCheckinEmotions
+      .map(name => getEmotionByName(name)?.id ?? getEmotionById(name)?.id)
+      .filter((id): id is string => id != null);
+  }, [rawCheckinEmotions]);
+  const didAutoLoad = useRef(false);
+
   const [phase, setPhase] = useState<Phase>('intro');
-  const [selectedEmotionIds, setSelectedEmotionIds] = useState<string[]>([]);
+  const [selectedEmotionIds, setSelectedEmotionIds] = useState<string[]>(checkinEmotionIds ?? []);
   const [search, setSearch] = useState('');
   const [showPleasant, setShowPleasant] = useState(false);
   const [selectedUrges, setSelectedUrges] = useState<ActionUrgeData[]>([]);
@@ -46,6 +57,30 @@ export function OppositeAction() {
   const [oaData, setOaData] = useState<OppositeActionContent | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-load OA data when arriving from check-in with pre-selected emotions
+  useEffect(() => {
+    if (!checkinEmotionIds?.length || didAutoLoad.current) return;
+    didAutoLoad.current = true;
+
+    async function loadFromCheckin() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getOppositeActionContent(checkinEmotionIds!);
+        setOaData(data);
+        const hasApplicable = data.emotions.some(e => e.applicable);
+        setPhase(hasApplicable ? 'name-urge' : 'redirect');
+      } catch {
+        setError('Could not load opposite action data. Please try again.');
+        setPhase('identify');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadFromCheckin();
+  }, [checkinEmotionIds]);
 
   // ── Derived from graph data ──
 
@@ -214,6 +249,18 @@ export function OppositeAction() {
     if (names.length <= 2) return names.join(' and ');
     return names.slice(0, -1).join(', ') + ', and ' + names[names.length - 1];
   };
+
+  // ─── LOADING FROM CHECK-IN ───
+  if (loading && phase === 'intro') {
+    return (
+      <div className="text-center py-12">
+        <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
+        <p className="text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+          Loading for {emotionNameList(selectedEmotionIds)}...
+        </p>
+      </div>
+    );
+  }
 
   // ─── INTRO ───
   if (phase === 'intro') {
@@ -439,6 +486,13 @@ export function OppositeAction() {
             Continue
           </button>
         )}
+
+        <button
+          onClick={() => { setPhase('identify'); setOaData(null); setSelectedUrges([]); setCustomUrge(''); setShowCustomInput(false); }}
+          className="w-full text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] hover:text-[var(--color-sage-700)] dark:hover:text-[var(--color-sage-300)] transition-colors"
+        >
+          Change emotions
+        </button>
       </div>
     );
   }

@@ -429,6 +429,7 @@ export function CheckIn() {
               ? handleAddMoreDetail
               : undefined
           }
+          checkinEmotions={checkInData.emotions}
         />
       )}
 

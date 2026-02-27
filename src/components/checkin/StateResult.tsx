@@ -7,6 +7,7 @@ interface StateResultProps {
   result: StateResult;
   onDone: () => void;
   onAddMoreDetail?: () => void;
+  checkinEmotions?: string[];
 }
 
 /**
@@ -26,7 +27,7 @@ interface StateResultProps {
  * This ensures the app never becomes another source of guilt/failure — there is
  * always something small enough that anyone can do it.
  */
-export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProps) {
+export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }: StateResultProps) {
   const { pattern, tools, safetyFlag } = result;
 
   // === Bailout state ===
@@ -216,7 +217,7 @@ export function StateResult({ result, onDone, onAddMoreDetail }: StateResultProp
           
           <div className="space-y-3">
             {tools.slice(0, 2).map((tool, index) => (
-              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} />
+              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} />
             ))}
           </div>
         </div>
@@ -283,12 +284,13 @@ function getToolPath(toolId: string): string {
   return `/tool/${toolId}`;
 }
 
-function ToolCard({ tool, isPrimary }: { tool: ToolRecommendation; isPrimary: boolean }) {
+function ToolCard({ tool, isPrimary, checkinEmotions }: { tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[] }) {
   const toolPath = getToolPath(tool.id);
-  
+
   return (
     <Link
       to={toolPath}
+      state={checkinEmotions?.length ? { checkinEmotions } : undefined}
       className={`
         block p-4 rounded-xl transition-all
         ${isPrimary 

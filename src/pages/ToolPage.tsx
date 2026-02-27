@@ -21,18 +21,26 @@ const toolComponents: Record<string, React.ComponentType> = {
   'opposite-action': OppositeAction,
 };
 
+/** Normalize graph TherapyConcept ids (e.g. dbt_opposite_action) to frontend tool ids (opposite-action). */
+function normalizeGraphToolId(graphId: string): string {
+  if (!graphId) return graphId;
+  return graphId.replace(/^dbt_/, '').replace(/_/g, '-');
+}
+
 export function ToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
   const { user } = useAuth();
-  const tool = toolId ? getToolById(toolId) : undefined;
+  const tool = toolId
+    ? getToolById(toolId) ?? getToolById(normalizeGraphToolId(toolId))
+    : undefined;
   const category = tool ? getCategoryById(tool.categoryId) : undefined;
 
-  // Track tool usage when the page mounts (fire-and-forget)
+  const idToTrack = tool?.id ?? toolId;
   useEffect(() => {
-    if (user && toolId) {
-      trackToolUsage(toolId);
+    if (user && idToTrack) {
+      trackToolUsage(idToTrack);
     }
-  }, [user, toolId]);
+  }, [user, idToTrack]);
 
   if (!tool || !category) {
     return (
