@@ -6,10 +6,10 @@ export function Tools() {
     <div>
       {/* Hero section */}
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
           Tools
         </h1>
-        <p className="text-[var(--color-sage-600)]">
+        <p className="text-[var(--color-text-secondary)]">
           Simple tools for when things feel too big.
         </p>
       </div>

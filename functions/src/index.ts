@@ -272,7 +272,7 @@ export const initializeSchema = onCall(
 const PROFILE_DEFAULTS = {
   displayName: null,
   photoURL: null,
-  theme: 'dark',
+  theme: 'light',
   checkInReminder: false,
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],

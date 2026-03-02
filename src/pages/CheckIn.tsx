@@ -66,22 +66,22 @@ export function CheckIn() {
     return (
       <div className="text-center py-12">
         <span className="text-5xl mb-4 block">💭</span>
-        <h1 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
           Check in with yourself
         </h1>
-        <p className="text-[var(--color-sage-600)] mb-6">
+        <p className="text-[var(--color-text-secondary)] mb-6">
           Create an account to start tracking your emotions and body sensations.
         </p>
         <div className="space-y-3">
           <Link
             to="/signup"
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             Create account
           </Link>
           <Link
             to="/login"
-            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Log in
           </Link>
@@ -331,13 +331,13 @@ export function CheckIn() {
                 key={s}
                 className={`
                   h-1.5 rounded-full transition-all duration-300
-                  ${i <= currentStepIndex ? 'bg-[var(--color-sage-600)]' : 'bg-[var(--color-sage-200)]'}
+                  ${i <= currentStepIndex ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-bg-secondary)]'}
                   ${i === currentStepIndex ? 'w-8' : 'w-4'}
                 `}
               />
             ))}
           </div>
-          <p className="text-xs text-center text-[var(--color-sage-500)] mt-2">
+          <p className="text-xs text-center text-[var(--color-text-tertiary)] mt-2">
             {entryPoint === 'somatic'
               ? (currentStepIndex === 0 ? 'Start here' : 'Almost there')
               : (currentStepIndex === 0 ? 'Required' : 'Optional \u2014 tap "Help me now" anytime')
@@ -350,7 +350,7 @@ export function CheckIn() {
       {step !== 'quadrant' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-[var(--color-sage-600)] hover:text-[var(--color-sage-800)] mb-4 transition-colors"
+          className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4 transition-colors"
         >
           <span>←</span>
           <span className="text-sm font-medium">Back</span>
@@ -359,120 +359,122 @@ export function CheckIn() {
 
       {/* Error display */}
       {analyzeError && (
-        <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+        <div className="mb-4 p-3 rounded-lg bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)] text-sm">
           {analyzeError}
         </div>
       )}
 
-      {step === 'quadrant' && (
-        <EmotionQuadrant
-          onSelect={handleQuadrantSelect}
-          onSomaticEntry={handleSomaticEntry}
-        />
-      )}
+      <div key={step} className="step-enter">
+        {step === 'quadrant' && (
+          <EmotionQuadrant
+            onSelect={handleQuadrantSelect}
+            onSomaticEntry={handleSomaticEntry}
+          />
+        )}
 
-      {step === 'emotion' && checkInData.quadrant && (
-        <EmotionGrid 
-          quadrant={checkInData.quadrant} 
-          onSelect={handleEmotionSelect}
-          onHelpMeNow={handleHelpMeNow}
-          showRelated={true}
-        />
-      )}
+        {step === 'emotion' && checkInData.quadrant && (
+          <EmotionGrid
+            quadrant={checkInData.quadrant}
+            onSelect={handleEmotionSelect}
+            onHelpMeNow={handleHelpMeNow}
+            showRelated={true}
+          />
+        )}
 
-      {step === 'body' && (
-        <BodyMap 
-          onTap={handleBodyTap}
-          onSkip={handleSkipBody}
-          onComplete={handleBodyComplete}
-          sensations={checkInData.bodySensations}
-          isSomaticEntry={entryPoint === 'somatic'}
-        />
-      )}
+        {step === 'body' && (
+          <BodyMap
+            onTap={handleBodyTap}
+            onSkip={handleSkipBody}
+            onComplete={handleBodyComplete}
+            sensations={checkInData.bodySensations}
+            isSomaticEntry={entryPoint === 'somatic'}
+          />
+        )}
 
-      {step === 'suggestion' && (
-        <EmotionSuggestion
-          bodySensations={checkInData.bodySensations}
-          onSelect={handleSuggestionSelect}
-          onShowAllEmotions={handleShowAllEmotions}
-          onSkip={handleSuggestionSkip}
-        />
-      )}
+        {step === 'suggestion' && (
+          <EmotionSuggestion
+            bodySensations={checkInData.bodySensations}
+            onSelect={handleSuggestionSelect}
+            onShowAllEmotions={handleShowAllEmotions}
+            onSkip={handleSuggestionSkip}
+          />
+        )}
 
-      {step === 'sensation' && currentSensation && (
-        <SensationDetails
-          x={currentSensation.x!}
-          y={currentSensation.y!}
-          region={currentSensation.region!}
-          onComplete={handleSensationComplete}
-          onCancel={() => {
-            setCurrentSensation(null);
-            setStep('body');
-          }}
-        />
-      )}
+        {step === 'sensation' && currentSensation && (
+          <SensationDetails
+            x={currentSensation.x!}
+            y={currentSensation.y!}
+            region={currentSensation.region!}
+            onComplete={handleSensationComplete}
+            onCancel={() => {
+              setCurrentSensation(null);
+              setStep('body');
+            }}
+          />
+        )}
 
-      {step === 'analyzing' && (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
-          <p className="text-[var(--color-sage-600)]">Understanding what's happening...</p>
-        </div>
-      )}
-
-      {step === 'result' && stateResult && (
-        <StateResult
-          result={stateResult}
-          onDone={handleResultDone}
-          onAddMoreDetail={
-            // Only show "add more detail" if they haven't completed all steps
-            (!checkInData.emotions.length || !checkInData.bodySensations.length)
-              ? handleAddMoreDetail
-              : undefined
-          }
-          checkinEmotions={checkInData.emotions}
-        />
-      )}
-
-      {step === 'saving' && (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
-          <p className="text-[var(--color-sage-600)]">Saving your check-in...</p>
-        </div>
-      )}
-
-      {step === 'complete' && (
-        <div className="text-center py-8">
-          <span className="text-5xl mb-4 block">✨</span>
-          <h2 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
-            Check-in saved
-          </h2>
-          <p className="text-[var(--color-sage-600)] mb-6">
-            Your check-in has been recorded.
-          </p>
-
-          {saveError && (
-            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-amber-700 text-sm mb-6">
-              {saveError}
-            </div>
-          )}
-          
-          <div className="space-y-3">
-            <button
-              onClick={handleComplete}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
-            >
-              Done
-            </button>
-            
-            <Link
-              to="/history"
-              className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
-            >
-              View history →
-            </Link>
+        {step === 'analyzing' && (
+          <div className="text-center py-12">
+            <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4"></div>
+            <p className="text-[var(--color-text-secondary)]">Understanding what's happening...</p>
           </div>
-        </div>
-      )}
+        )}
+
+        {step === 'result' && stateResult && (
+          <StateResult
+            result={stateResult}
+            onDone={handleResultDone}
+            onAddMoreDetail={
+              // Only show "add more detail" if they haven't completed all steps
+              (!checkInData.emotions.length || !checkInData.bodySensations.length)
+                ? handleAddMoreDetail
+                : undefined
+            }
+            checkinEmotions={checkInData.emotions}
+          />
+        )}
+
+        {step === 'saving' && (
+          <div className="text-center py-12">
+            <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4"></div>
+            <p className="text-[var(--color-text-secondary)]">Saving your check-in...</p>
+          </div>
+        )}
+
+        {step === 'complete' && (
+          <div className="text-center py-8">
+            <span className="text-5xl mb-4 block">✨</span>
+            <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
+              Check-in saved
+            </h2>
+            <p className="text-[var(--color-text-secondary)] mb-6">
+              Your check-in has been recorded.
+            </p>
+
+            {saveError && (
+              <div className="p-3 rounded-lg bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)] text-[var(--color-q-hp-text)] text-sm mb-6">
+                {saveError}
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <button
+                onClick={handleComplete}
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              >
+                Done
+              </button>
+
+              <Link
+                to="/history"
+                className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
+              >
+                View history →
+              </Link>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

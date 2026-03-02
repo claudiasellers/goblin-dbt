@@ -45,13 +45,13 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
+      <h2 className="text-xl font-bold text-[var(--color-text-primary)] text-center mb-2">
         {isSomaticEntry
           ? "Let's start with your body"
           : 'Where do you notice a physical sensation?'
         }
       </h2>
-      <p className="text-sm text-[var(--color-sage-600)] text-center mb-6">
+      <p className="text-sm text-[var(--color-text-secondary)] text-center mb-6">
         {isSomaticEntry
           ? "Tap where you feel something \u2014 I'll help figure out the rest"
           : 'Tap anywhere on the body, or skip this step'
@@ -68,7 +68,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
           onTouchStart={handleTap}
         >
           {/* Simple human body outline */}
-          <g fill="none" stroke="var(--color-sage-400)" strokeWidth="2">
+          <g fill="none" stroke="var(--color-text-muted)" strokeWidth="2">
             {/* Head */}
             <ellipse cx="100" cy="30" rx="25" ry="28" />
             
@@ -101,7 +101,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
                 cx={sensation.x * 200}
                 cy={sensation.y * 400}
                 r="10"
-                fill="var(--color-sage-600)"
+                fill="var(--color-accent)"
                 fillOpacity="0.8"
               />
               <circle
@@ -117,7 +117,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
 
       {/* Sensation count */}
       {sensations.length > 0 && (
-        <p className="text-center text-sm text-[var(--color-sage-600)] mb-4">
+        <p className="text-center text-sm text-[var(--color-text-secondary)] mb-4">
           {sensations.length} sensation{sensations.length > 1 ? 's' : ''} added
         </p>
       )}
@@ -127,7 +127,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
         {sensations.length > 0 && (
           <button
             onClick={onComplete}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             {isSomaticEntry ? 'Help me identify my feelings' : 'Continue'}
           </button>
@@ -135,7 +135,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
         
         <button
           onClick={onSkip}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+          className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
         >
           {sensations.length > 0
             ? 'Done adding sensations'

@@ -327,7 +327,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   displayName: null,
   email: '',
   photoURL: null,
-  theme: 'dark',
+  theme: 'light',
   checkInReminder: false,
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],

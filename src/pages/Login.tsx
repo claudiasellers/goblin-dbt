@@ -27,21 +27,21 @@ export function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--color-warm-50)]">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--color-bg-primary)]">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <span className="text-4xl mb-4 block">🌿</span>
-          <h1 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+          <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
             Welcome back
           </h1>
-          <p className="text-[var(--color-sage-600)]">
+          <p className="text-[var(--color-text-secondary)]">
             Log in to continue your journey
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-sm">
+            <div className="p-3 rounded-lg bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)] text-sm">
               {error}
             </div>
           )}
@@ -49,7 +49,7 @@ export function Login() {
           <div>
             <label 
               htmlFor="email" 
-              className="block text-sm font-medium text-[var(--color-sage-700)] mb-1"
+              className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
             >
               Email
             </label>
@@ -59,7 +59,7 @@ export function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full p-3 rounded-lg border border-[var(--color-sage-300)] bg-white text-[var(--color-sage-800)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sage-400)]"
+              className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
               placeholder="you@example.com"
             />
           </div>
@@ -67,7 +67,7 @@ export function Login() {
           <div>
             <label 
               htmlFor="password" 
-              className="block text-sm font-medium text-[var(--color-sage-700)] mb-1"
+              className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1"
             >
               Password
             </label>
@@ -77,7 +77,7 @@ export function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full p-3 rounded-lg border border-[var(--color-sage-300)] bg-white text-[var(--color-sage-800)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sage-400)]"
+              className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
               placeholder="••••••••"
             />
           </div>
@@ -85,17 +85,17 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Logging in...' : 'Log in'}
           </button>
         </form>
 
-        <p className="mt-6 text-center text-sm text-[var(--color-sage-600)]">
+        <p className="mt-6 text-center text-sm text-[var(--color-text-secondary)]">
           Don't have an account?{' '}
           <Link 
             to="/signup" 
-            className="text-[var(--color-sage-700)] font-medium hover:underline"
+            className="text-[var(--color-text-secondary)] font-medium hover:underline"
           >
             Sign up
           </Link>
@@ -104,7 +104,7 @@ export function Login() {
         <p className="mt-4 text-center">
           <Link 
             to="/tools" 
-            className="text-sm text-[var(--color-sage-500)] hover:underline"
+            className="text-sm text-[var(--color-text-tertiary)] hover:underline"
           >
             Continue without an account →
           </Link>

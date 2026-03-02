@@ -230,8 +230,8 @@ export function getOppositeEmotionIds(emotionId: string): string[] {
 }
 
 export const quadrantColors: Record<string, { bg: string; text: string }> = {
-  'high-unpleasant': { bg: 'bg-red-400', text: 'text-white' },
-  'high-pleasant': { bg: 'bg-yellow-400', text: 'text-black' },
-  'low-unpleasant': { bg: 'bg-blue-400', text: 'text-white' },
-  'low-pleasant': { bg: 'bg-emerald-400', text: 'text-black' },
+  'high-unpleasant': { bg: 'bg-[var(--color-q-hu-fill)]', text: 'text-white' },
+  'high-pleasant': { bg: 'bg-[var(--color-q-hp-fill)]', text: 'text-[var(--color-text-primary)]' },
+  'low-unpleasant': { bg: 'bg-[var(--color-q-lu-fill)]', text: 'text-white' },
+  'low-pleasant': { bg: 'bg-[var(--color-q-lp-fill)]', text: 'text-[var(--color-text-primary)]' },
 };

@@ -254,8 +254,8 @@ export function OppositeAction() {
   if (loading && phase === 'intro') {
     return (
       <div className="text-center py-12">
-        <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
-        <p className="text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+        <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4"></div>
+        <p className="text-[var(--color-text-secondary)]">
           Loading for {emotionNameList(selectedEmotionIds)}...
         </p>
       </div>
@@ -266,11 +266,11 @@ export function OppositeAction() {
   if (phase === 'intro') {
     return (
       <div className="space-y-6">
-        <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-          <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
             How this works
           </h3>
-          <ul className="space-y-2 text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+          <ul className="space-y-2 text-[var(--color-text-secondary)]">
             <li>• Every emotion comes with an <strong>action urge</strong> — what it pushes you to do</li>
             <li>• The opposite isn't to the emotion — it's to the <strong>urge</strong></li>
             <li>• We'll figure out what your emotions want you to do, check if that's actually helpful, and find the right-sized opposite</li>
@@ -278,7 +278,7 @@ export function OppositeAction() {
         </div>
         <button
           onClick={() => setPhase('identify')}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
         >
           Let's start
         </button>
@@ -290,9 +290,9 @@ export function OppositeAction() {
   if (phase === 'identify') {
     return (
       <div className="space-y-5">
-        <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+        <p className="text-[var(--color-text-secondary)]">
           What are you feeling right now?{' '}
-          <span className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">Select all that apply.</span>
+          <span className="text-sm text-[var(--color-text-tertiary)]">Select all that apply.</span>
         </p>
 
         <input
@@ -300,13 +300,13 @@ export function OppositeAction() {
           placeholder="Search emotions..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full p-3 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] bg-white dark:bg-[var(--color-sage-900)] text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] placeholder:text-[var(--color-sage-400)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sage-400)]"
+          className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
         />
 
         <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
           {Object.entries(grouped).map(([family, members]) => (
             <div key={family}>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] mb-2">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-2">
                 {familyLabels[family] ?? family}
               </h4>
               <div className="flex flex-wrap gap-2">
@@ -319,8 +319,8 @@ export function OppositeAction() {
                       disabled={loading}
                       className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                         selected
-                          ? 'bg-[var(--color-sage-600)] border-[var(--color-sage-600)] text-white'
-                          : 'border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-200)] dark:hover:bg-[var(--color-sage-700)]'
+                          ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                          : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                       }`}
                     >
                       {e.name}
@@ -335,21 +335,21 @@ export function OppositeAction() {
         {!search && !showPleasant && (
           <button
             onClick={() => setShowPleasant(true)}
-            className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] hover:text-[var(--color-sage-700)] dark:hover:text-[var(--color-sage-300)] transition-colors"
+            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
           >
             + Show pleasant emotions too
           </button>
         )}
 
         {error && (
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <p className="text-sm text-[var(--color-danger)]">{error}</p>
         )}
 
         {selectedEmotionIds.length > 0 && (
           <button
             onClick={continueFromIdentify}
             disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors disabled:opacity-50"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50"
           >
             {loading
               ? 'Loading...'
@@ -376,14 +376,14 @@ export function OppositeAction() {
 
     return (
       <div className="space-y-6">
-        <div className="p-6 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
-          <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
             Opposite Action isn't the best fit for {notApplicableNames.length === 1
               ? `"${notApplicableNames[0]}"`
               : 'these emotions'}
           </h3>
           {nonApplicable.map(m => (
-            <p key={m.emotionId} className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-2">
+            <p key={m.emotionId} className="text-[var(--color-text-secondary)] mb-2">
               {m.clinicalNote}
             </p>
           ))}
@@ -393,7 +393,7 @@ export function OppositeAction() {
           <Link
             key={alt}
             to={`/tool/${alt}`}
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors text-center"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
           >
             Try {altNames[alt] ?? alt}
           </Link>
@@ -401,7 +401,7 @@ export function OppositeAction() {
 
         <button
           onClick={() => { setPhase('identify'); setSelectedEmotionIds([]); setOaData(null); }}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
+          className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
         >
           Pick different emotions
         </button>
@@ -419,17 +419,17 @@ export function OppositeAction() {
     return (
       <div className="space-y-6">
         {skippedNames.length > 0 && (
-          <div className="p-4 rounded-lg bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)] text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+          <div className="p-4 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-sm text-[var(--color-text-secondary)]">
             Opposite Action works best for {emotionNameList(applicableIds)}.
             {' '}{skippedNames.join(', ')} {skippedNames.length === 1 ? 'is' : 'are'} better addressed with other tools.
           </div>
         )}
 
-        <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-          <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-2">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)] mb-2">
             What is {emotionLabel} making you want to do?
           </h3>
-          <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+          <p className="text-sm text-[var(--color-text-secondary)]">
             Not what you think you <em>should</em> do — what's the pull? Select all that apply.
           </p>
         </div>
@@ -437,7 +437,7 @@ export function OppositeAction() {
         {allAvailableUrges.map(({ parent, parentLabel, urges }) => (
           <div key={parent} className="space-y-2">
             {allAvailableUrges.length > 1 && (
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
                 {parentLabel} urges
               </h4>
             )}
@@ -449,8 +449,8 @@ export function OppositeAction() {
                   onClick={() => toggleUrge(urge)}
                   className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                     selected
-                      ? 'bg-[var(--color-sage-600)] border-[var(--color-sage-600)] text-white'
-                      : 'border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-200)] dark:hover:bg-[var(--color-sage-700)]'
+                      ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                   }`}
                 >
                   {urge.label}
@@ -463,7 +463,7 @@ export function OppositeAction() {
         {!showCustomInput ? (
           <button
             onClick={() => setShowCustomInput(true)}
-            className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] hover:text-[var(--color-sage-700)] dark:hover:text-[var(--color-sage-300)] transition-colors"
+            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
           >
             + Something else
           </button>
@@ -474,14 +474,14 @@ export function OppositeAction() {
             value={customUrge}
             onChange={e => setCustomUrge(e.target.value)}
             autoFocus
-            className="w-full p-3 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] bg-white dark:bg-[var(--color-sage-900)] text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] placeholder:text-[var(--color-sage-400)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sage-400)]"
+            className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           />
         )}
 
         {(selectedUrges.length > 0 || customUrge.trim()) && (
           <button
             onClick={goToCheckFacts}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             Continue
           </button>
@@ -489,7 +489,7 @@ export function OppositeAction() {
 
         <button
           onClick={() => { setPhase('identify'); setOaData(null); setSelectedUrges([]); setCustomUrge(''); setShowCustomInput(false); }}
-          className="w-full text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] hover:text-[var(--color-sage-700)] dark:hover:text-[var(--color-sage-300)] transition-colors"
+          className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
         >
           Change emotions
         </button>
@@ -513,14 +513,14 @@ export function OppositeAction() {
 
     return (
       <div className="space-y-6">
-        <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-          <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
             Check the facts
           </h3>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+          <p className="text-[var(--color-text-secondary)]">
             You're feeling <strong>{emotionLabel}</strong> and it's pushing you to <strong>{urgeDisplay}</strong>.
           </p>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mt-3">
+          <p className="text-[var(--color-text-secondary)] mt-3">
             Does any of this apply right now?
           </p>
         </div>
@@ -528,7 +528,7 @@ export function OppositeAction() {
         {groupedByParent.map(({ parent, label, items }) => (
           <div key={parent} className="space-y-2">
             {groupedByParent.length > 1 && (
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
                 {label}
               </h4>
             )}
@@ -536,7 +536,7 @@ export function OppositeAction() {
               <button
                 key={i}
                 onClick={() => setPhase('fits-facts')}
-                className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
+                className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary"
               >
                 {item}
               </button>
@@ -544,16 +544,16 @@ export function OppositeAction() {
           </div>
         ))}
 
-        <div className="space-y-2 pt-2 border-t border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
+        <div className="space-y-2 pt-2 border-t border-[var(--color-border-subtle)]">
           <button
             onClick={goToOpposites}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             None of these — it's bigger than the situation
           </button>
           <button
             onClick={goToOpposites}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
+            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-tertiary)] lift-secondary"
           >
             I'm not sure
           </button>
@@ -570,37 +570,37 @@ export function OppositeAction() {
 
     return (
       <div className="space-y-6">
-        <div className="p-6 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
-          <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
             Your emotion fits the situation
           </h3>
           {guidances.map((g, i) => (
             <div key={i} className={i > 0 ? 'mt-4' : ''}>
               {guidances.length > 1 && (
-                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] mb-1">
+                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-1">
                   {g.label}
                 </p>
               )}
-              <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+              <p className="text-[var(--color-text-secondary)]">
                 {g.text}
               </p>
             </div>
           ))}
-          <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mt-4">
+          <p className="text-sm text-[var(--color-text-secondary)] mt-4">
             When the emotion fits, it's giving you useful information. The move here is to address the situation, not to act opposite.
           </p>
         </div>
 
         <Link
           to="/tool/problem-solve"
-          className="block w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors text-center"
+          className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
         >
           Try Problem Solve instead
         </Link>
 
         <button
           onClick={() => setPhase('check-facts')}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
+          className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
         >
           Actually, let me reconsider
         </button>
@@ -617,14 +617,14 @@ export function OppositeAction() {
     if (hasShame) {
       return (
         <div className="space-y-6">
-          <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-            <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
               Let's look at this more closely
             </h3>
-            <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+            <p className="text-[var(--color-text-secondary)]">
               Shame says <em>"I am bad."</em> Guilt says <em>"I did something bad."</em> They feel similar but need different responses.
             </p>
-            <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mt-3">
+            <p className="text-[var(--color-text-secondary)] mt-3">
               Is this feeling about <strong>who you are</strong> as a person, or about <strong>something specific you did</strong>?
             </p>
           </div>
@@ -634,7 +634,7 @@ export function OppositeAction() {
               setParentOverrides(prev => ({ ...prev, shame: 'shame' }));
               setPhase('show-opposites');
             }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             Who I am as a person
           </button>
@@ -643,7 +643,7 @@ export function OppositeAction() {
               setParentOverrides(prev => ({ ...prev, shame: 'guilt' }));
               setPhase('show-opposites');
             }}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Something specific I did
           </button>
@@ -655,14 +655,14 @@ export function OppositeAction() {
     if (hasGuilt) {
       return (
         <div className="space-y-6">
-          <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-            <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
               One more question about guilt
             </h3>
-            <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+            <p className="text-[var(--color-text-secondary)]">
               Did what you did actually go against your <strong>own deeply-held values</strong>?
             </p>
-            <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mt-2">
+            <p className="text-sm text-[var(--color-text-secondary)] mt-2">
               Not what others think you should feel guilty about — what <em>you</em> believe matters.
             </p>
           </div>
@@ -676,13 +676,13 @@ export function OppositeAction() {
                 setPhase('show-opposites');
               }
             }}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Yes, I violated my values
           </button>
           <button
             onClick={() => setPhase('show-opposites')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             No, I didn't
           </button>
@@ -706,25 +706,25 @@ export function OppositeAction() {
       <div className="space-y-6">
         {/* Guilt fits note — when guilt fits the facts but other parents don't */}
         {guiltFitsNote && (
-          <div className="p-4 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
-            <p className="text-sm font-medium text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-1">
+          <div className="p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+            <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-1">
               About the guilt
             </p>
-            <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+            <p className="text-sm text-[var(--color-text-secondary)]">
               {guiltFitsNote} For the rest of what you're feeling, here are the opposites:
             </p>
           </div>
         )}
 
         {/* Validation */}
-        <div className="p-5 rounded-xl bg-[var(--color-warm-100)] dark:bg-[var(--color-sage-800)] border border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)]">
-          <p className="text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)]">
+        <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+          <p className="text-[var(--color-text-primary)]">
             Your {emotionLabel} {applicableIds.length === 1 ? 'wants' : 'want'} you to <strong>{urgeDisplay}</strong>.
             {acknowledgments.length > 0 && (
               <> That makes sense — {acknowledgments[0].charAt(0).toLowerCase()}{acknowledgments[0].slice(1)}</>
             )}
           </p>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mt-3">
+          <p className="text-[var(--color-text-secondary)] mt-3">
             But acting on {urgeLabels.length === 1 ? 'that urge' : 'those urges'} right now will probably keep the {emotionLabel} going.
             Moving opposite — even a little — can shift things.
           </p>
@@ -734,11 +734,11 @@ export function OppositeAction() {
         {urgeOppositesList.map(({ key, label, opposites }) => (
           <div key={key}>
             {urgeOppositesList.length > 1 ? (
-              <p className="text-sm font-medium text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mb-2">
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-2">
                 Instead of <em>{label.toLowerCase()}</em>:
               </p>
             ) : (
-              <p className="text-sm font-medium text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] mb-3">
+              <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-3">
                 Pick what feels doable:
               </p>
             )}
@@ -746,9 +746,9 @@ export function OppositeAction() {
               {(['small', 'medium', 'bigger'] as const).map(size => {
                 const labels = { small: 'Small step', medium: 'Medium step', bigger: 'Bigger step' };
                 const colors = {
-                  small: 'border-emerald-300 dark:border-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
-                  medium: 'border-emerald-400 dark:border-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
-                  bigger: 'border-emerald-500 dark:border-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20',
+                  small: 'border-[var(--color-border)] lift-secondary',
+                  medium: 'border-[var(--color-border-accent)] lift-secondary',
+                  bigger: 'border-[var(--color-accent)] lift-secondary',
                 };
                 const selected = chosenSizes[key] === size;
 
@@ -758,14 +758,14 @@ export function OppositeAction() {
                     onClick={() => setChosenSizes(prev => ({ ...prev, [key]: size }))}
                     className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
                       selected
-                        ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/30'
+                        ? 'border-[var(--color-accent)] bg-[var(--color-bg-elevated)]'
                         : colors[size]
                     }`}
                   >
-                    <span className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+                    <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-accent)]">
                       {labels[size]}
                     </span>
-                    <p className="text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mt-1">
+                    <p className="text-[var(--color-text-primary)] mt-1">
                       {opposites[size]}
                     </p>
                   </button>
@@ -777,14 +777,14 @@ export function OppositeAction() {
 
         {/* Body opposites */}
         {bodyOpposites.length > 0 && (
-          <div className="p-4 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-            <p className="text-sm font-medium text-[var(--color-calm-700)] dark:text-[var(--color-calm-300)] mb-1">
+          <div className="p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <p className="text-sm font-medium text-[var(--color-accent)] mb-1">
               Your body too
             </p>
             {bodyOpposites.map((bo, i) => (
-              <p key={i} className={`text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]${i > 0 ? ' mt-2' : ''}`}>
+              <p key={i} className={`text-[var(--color-text-secondary)]${i > 0 ? ' mt-2' : ''}`}>
                 {bodyOpposites.length > 1 && (
-                  <span className="text-xs font-medium text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">{bo.label}: </span>
+                  <span className="text-xs font-medium text-[var(--color-text-tertiary)]">{bo.label}: </span>
                 )}
                 {bo.text}
               </p>
@@ -795,7 +795,7 @@ export function OppositeAction() {
         {allSizesChosen && (
           <button
             onClick={() => setPhase('complete')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             I'm going to do this
           </button>
@@ -815,29 +815,29 @@ export function OppositeAction() {
     )];
 
     return (
-      <div className="text-center p-8 rounded-xl bg-[var(--color-sage-100)] dark:bg-[var(--color-sage-800)]">
+      <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)]">
         <span className="text-4xl mb-4 block" role="img" aria-hidden="true">🔄</span>
-        <h3 className="text-xl font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+        <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-3">
           That counts
         </h3>
         {chosenActions.map((action, i) => (
-          <p key={i} className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-200)] p-3 rounded-lg bg-[var(--color-sage-200)] dark:bg-[var(--color-sage-700)] mb-2">
+          <p key={i} className="text-[var(--color-text-secondary)] p-3 rounded-lg bg-[var(--color-bg-secondary)] mb-2">
             "{action}"
           </p>
         ))}
         {whyItWorks.map((why, i) => (
-          <p key={i} className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-300)] mb-2">
+          <p key={i} className="text-sm text-[var(--color-text-secondary)] mb-2">
             {why}
           </p>
         ))}
         {bodyOpposites.length > 0 && (
-          <p className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] mb-6">
+          <p className="text-sm text-[var(--color-text-tertiary)] mb-6">
             And remember: {bodyOpposites.map(bo => bo.text.split('.')[0].toLowerCase()).join('. ')}.
           </p>
         )}
         <button
           onClick={reset}
-          className="py-2 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-200)] dark:hover:bg-[var(--color-sage-700)] transition-colors"
+          className="py-2 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary"
         >
           Start over
         </button>

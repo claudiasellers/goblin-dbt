@@ -6,10 +6,10 @@ export function Home() {
     <div>
       {/* Hero section */}
       <div className="text-center mb-12">
-        <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-4">
+        <h1 className="text-3xl sm:text-4xl font-bold text-[var(--color-text-primary)] mb-4">
           DBT Tools
         </h1>
-        <p className="text-lg text-[var(--color-sage-600)] dark:text-[var(--color-sage-300)] max-w-2xl mx-auto">
+        <p className="text-lg text-[var(--color-text-secondary)] max-w-2xl mx-auto">
           A collection of small, simple tools for when things feel too big or complicated.
         </p>
       </div>
@@ -23,7 +23,7 @@ export function Home() {
 
       {/* Subtle help text */}
       <div className="mt-12 text-center">
-        <p className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">
+        <p className="text-sm text-[var(--color-text-tertiary)]">
           Pick wherever feels right for you right now. There's no wrong place to start.
         </p>
       </div>

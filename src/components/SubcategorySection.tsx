@@ -11,10 +11,10 @@ export function SubcategorySection({ subcategory, tools }: SubcategorySectionPro
   return (
     <section className="mb-8">
       <div className="mb-4">
-        <h3 className="text-lg font-semibold text-[var(--color-sage-700)] dark:text-[var(--color-warm-200)]">
+        <h3 className="text-lg font-semibold text-[var(--color-text-secondary)]">
           {subcategory.name}
         </h3>
-        <p className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)]">
+        <p className="text-sm text-[var(--color-text-tertiary)]">
           {subcategory.description}
         </p>
       </div>
@@ -26,8 +26,8 @@ export function SubcategorySection({ subcategory, tools }: SubcategorySectionPro
           ))}
         </div>
       ) : (
-        <div className="p-4 rounded-xl border border-dashed border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-center">
-          <p className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] italic">
+        <div className="p-4 rounded-xl border border-dashed border-[var(--color-border)] text-center">
+          <p className="text-sm text-[var(--color-text-tertiary)] italic">
             Tools coming soon...
           </p>
         </div>

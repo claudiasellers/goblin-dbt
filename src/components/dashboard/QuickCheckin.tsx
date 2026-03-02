@@ -45,7 +45,7 @@ export function QuickCheckin() {
 
         <button
           onClick={() => navigate('/checkin')}
-          className="w-full py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] text-sm font-semibold hover:bg-[var(--color-accent-hover)] transition-colors"
+          className="w-full py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] text-sm font-semibold lift-primary"
         >
           Full Check-in
         </button>

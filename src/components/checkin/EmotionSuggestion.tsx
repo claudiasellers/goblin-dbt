@@ -50,52 +50,72 @@ export function EmotionSuggestion({
     onSelect(emotions, quadrant);
   }
 
+  const chipStyles: Record<string, { base: string; selected: string; borderHover: string; shadow: string }> = {
+    'high-unpleasant': {
+      base: 'bg-[var(--color-q-hu-bg)] border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)]',
+      selected: 'bg-[var(--color-quadrant-high-unpleasant)] border-[var(--color-quadrant-high-unpleasant)] text-white',
+      borderHover: 'var(--color-q-hu-border-hover)',
+      shadow: 'var(--color-q-hu-shadow)',
+    },
+    'high-pleasant': {
+      base: 'bg-[var(--color-q-hp-bg)] border-[var(--color-q-hp-border)] text-[var(--color-q-hp-text)]',
+      selected: 'bg-[var(--color-quadrant-high-pleasant)] border-[var(--color-quadrant-high-pleasant)] text-white',
+      borderHover: 'var(--color-q-hp-border-hover)',
+      shadow: 'var(--color-q-hp-shadow)',
+    },
+    'low-unpleasant': {
+      base: 'bg-[var(--color-q-lu-bg)] border-[var(--color-q-lu-border)] text-[var(--color-q-lu-text)]',
+      selected: 'bg-[var(--color-quadrant-low-unpleasant)] border-[var(--color-quadrant-low-unpleasant)] text-white',
+      borderHover: 'var(--color-q-lu-border-hover)',
+      shadow: 'var(--color-q-lu-shadow)',
+    },
+    'low-pleasant': {
+      base: 'bg-[var(--color-q-lp-bg)] border-[var(--color-q-lp-border)] text-[var(--color-q-lp-text)]',
+      selected: 'bg-[var(--color-quadrant-low-pleasant)] border-[var(--color-quadrant-low-pleasant)] text-white',
+      borderHover: 'var(--color-q-lp-border-hover)',
+      shadow: 'var(--color-q-lp-shadow)',
+    },
+  };
+
   function chipStyle(suggestion: ScoredEmotion) {
     const isSelected = selectedIds.has(suggestion.emotion.id);
     const q = suggestion.emotion.quadrant;
-    const styles: Record<string, { base: string; selected: string }> = {
-      'high-unpleasant': {
-        base: 'bg-red-50 border-red-300 text-red-700',
-        selected: 'bg-red-500 border-red-600 text-white shadow-lg',
-      },
-      'high-pleasant': {
-        base: 'bg-amber-50 border-amber-300 text-amber-800',
-        selected: 'bg-amber-500 border-amber-600 text-white shadow-lg',
-      },
-      'low-unpleasant': {
-        base: 'bg-blue-50 border-blue-300 text-blue-700',
-        selected: 'bg-blue-500 border-blue-600 text-white shadow-lg',
-      },
-      'low-pleasant': {
-        base: 'bg-emerald-50 border-emerald-300 text-emerald-700',
-        selected: 'bg-emerald-500 border-emerald-600 text-white shadow-lg',
-      },
-    };
-    const s = styles[q] ?? styles['high-unpleasant'];
+    const s = chipStyles[q] ?? chipStyles['high-unpleasant'];
     return isSelected ? s.selected : s.base;
+  }
+
+  function chipHoverVars(suggestion: ScoredEmotion): React.CSSProperties | undefined {
+    const isSelected = selectedIds.has(suggestion.emotion.id);
+    if (isSelected) return undefined;
+    const q = suggestion.emotion.quadrant;
+    const s = chipStyles[q] ?? chipStyles['high-unpleasant'];
+    return {
+      ['--chip-border-hover' as string]: s.borderHover,
+      ['--chip-shadow' as string]: s.shadow,
+    };
   }
 
   if (suggestions.length === 0) {
     return (
       <div className="text-center py-8">
         <span className="text-4xl mb-3 block">🤔</span>
-        <h2 className="text-xl font-bold text-[var(--color-sage-800)] mb-2">
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-2">
           Hmm, I'm not sure yet
         </h2>
-        <p className="text-sm text-[var(--color-sage-600)] mb-6">
+        <p className="text-sm text-[var(--color-text-secondary)] mb-6">
           Your body is telling you something, but I need a bit more to go on.
           Try picking from the full emotion list instead.
         </p>
         <div className="space-y-3">
           <button
             onClick={onShowAllEmotions}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             Browse all emotions
           </button>
           <button
             onClick={onSkip}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Skip and get help now
           </button>
@@ -106,10 +126,10 @@ export function EmotionSuggestion({
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
+      <h2 className="text-xl font-bold text-[var(--color-text-primary)] text-center mb-2">
         Based on what your body is telling you...
       </h2>
-      <p className="text-sm text-[var(--color-sage-600)] text-center mb-6">
+      <p className="text-sm text-[var(--color-text-secondary)] text-center mb-6">
         These emotions often show up with those sensations. Tap any that resonate.
       </p>
 
@@ -120,10 +140,11 @@ export function EmotionSuggestion({
             <button
               key={suggestion.emotion.id}
               onClick={() => toggleEmotion(suggestion.emotion.id)}
+              style={chipHoverVars(suggestion)}
               className={`
-                w-full text-left p-4 rounded-xl border-2 transition-all duration-150
-                active:scale-[0.98]
+                w-full text-left p-4 rounded-xl border
                 ${chipStyle(suggestion)}
+                ${selectedIds.has(suggestion.emotion.id) ? 'transition-colors duration-150' : 'lift-chip'}
               `}
             >
               <div className="flex items-center justify-between">
@@ -160,10 +181,10 @@ export function EmotionSuggestion({
           onClick={handleContinue}
           disabled={selectedIds.size === 0}
           className={`
-            w-full py-3 px-4 rounded-lg font-medium transition-colors
+            w-full py-3 px-4 rounded-lg font-medium
             ${selectedIds.size > 0
-              ? 'bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white'
-              : 'bg-[var(--color-sage-200)] text-[var(--color-sage-500)] cursor-not-allowed'
+              ? 'bg-[var(--color-accent)] text-white lift-primary'
+              : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] cursor-not-allowed transition-colors'
             }
           `}
         >
@@ -175,14 +196,14 @@ export function EmotionSuggestion({
 
         <button
           onClick={onShowAllEmotions}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+          className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
         >
           I feel something else
         </button>
 
         <button
           onClick={onSkip}
-          className="w-full py-2 text-sm text-[var(--color-sage-500)] hover:text-[var(--color-sage-700)] transition-colors"
+          className="w-full py-2 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
         >
           Skip — just help me now
         </button>

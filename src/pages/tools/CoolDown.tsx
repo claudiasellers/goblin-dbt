@@ -85,7 +85,7 @@ export function CoolDown() {
 
   return (
     <div className="space-y-6">
-      <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)]">
+      <p className="text-[var(--color-text-secondary)]">
         Cold temperature can quickly calm your body when emotions are intense. Choose a technique:
       </p>
 
@@ -101,12 +101,12 @@ export function CoolDown() {
             className={`
               p-4 rounded-xl border-2 text-left transition-all
               ${selectedTechnique === technique.id
-                ? 'border-[var(--color-calm-500)] bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20'
-                : 'border-[var(--color-sage-200)] dark:border-[var(--color-sage-700)] hover:border-[var(--color-sage-400)]'
+                ? 'border-[var(--color-accent)] bg-[var(--color-bg-elevated)]'
+                : 'border-[var(--color-border-subtle)] hover:border-[var(--color-border-accent)]'
               }
             `}
           >
-            <span className="font-medium text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)]">
+            <span className="font-medium text-[var(--color-text-primary)]">
               {technique.title}
             </span>
           </button>
@@ -115,14 +115,14 @@ export function CoolDown() {
 
       {/* Selected technique details */}
       {selected && (
-        <div className="p-6 rounded-xl bg-[var(--color-calm-50)] dark:bg-[var(--color-calm-900)]/20 border border-[var(--color-calm-200)] dark:border-[var(--color-calm-800)]">
-          <h3 className="font-semibold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)] mb-3">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
             {selected.title}
           </h3>
-          <p className="text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] mb-4">
+          <p className="text-[var(--color-text-secondary)] mb-4">
             {selected.instruction}
           </p>
-          <p className="text-sm text-[var(--color-sage-500)] dark:text-[var(--color-sage-400)] italic mb-4">
+          <p className="text-sm text-[var(--color-text-tertiary)] italic mb-4">
             💡 {selected.tip}
           </p>
 
@@ -131,12 +131,12 @@ export function CoolDown() {
             <div className="text-center mb-4">
               <div className={`text-5xl font-bold mb-2 ${
                 timerState === 'complete' 
-                  ? 'text-[var(--color-sage-500)]' 
-                  : 'text-[var(--color-calm-600)] dark:text-[var(--color-calm-400)]'
+                  ? 'text-[var(--color-text-tertiary)]' 
+                  : 'text-[var(--color-accent)]'
               }`}>
                 {timer}
               </div>
-              <p className="text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+              <p className="text-sm text-[var(--color-text-secondary)]">
                 {timerState === 'complete' 
                   ? 'Done! Great job.' 
                   : timerState === 'paused'
@@ -152,7 +152,7 @@ export function CoolDown() {
             {timerState === 'idle' && (
               <button
                 onClick={startTimer}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-calm-500)] hover:bg-[var(--color-calm-600)] text-white font-medium transition-colors"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
               >
                 Start 30-second timer
               </button>
@@ -162,13 +162,13 @@ export function CoolDown() {
               <div className="flex gap-2">
                 <button
                   onClick={pauseTimer}
-                  className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-warm-300)] hover:bg-[var(--color-warm-400)] text-[var(--color-sage-800)] font-medium transition-colors"
+                  className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-bg-secondary)] text-[var(--color-text-primary)] font-medium lift-secondary"
                 >
                   Pause
                 </button>
                 <button
                   onClick={stopTimer}
-                  className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
+                  className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
                 >
                   Stop
                 </button>
@@ -179,13 +179,13 @@ export function CoolDown() {
               <div className="flex gap-2">
                 <button
                   onClick={resumeTimer}
-                  className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-calm-500)] hover:bg-[var(--color-calm-600)] text-white font-medium transition-colors"
+                  className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
                 >
                   Resume
                 </button>
                 <button
                   onClick={stopTimer}
-                  className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-sage-300)] dark:border-[var(--color-sage-600)] text-[var(--color-sage-700)] dark:text-[var(--color-sage-300)] hover:bg-[var(--color-sage-100)] dark:hover:bg-[var(--color-sage-700)] font-medium transition-colors"
+                  className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
                 >
                   Stop
                 </button>
@@ -195,7 +195,7 @@ export function CoolDown() {
             {timerState === 'complete' && (
               <button
                 onClick={startTimer}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-calm-500)] hover:bg-[var(--color-calm-600)] text-white font-medium transition-colors"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
               >
                 Do it again
               </button>

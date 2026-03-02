@@ -57,17 +57,17 @@ export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: Intens
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
+      <h2 className="text-xl font-bold text-[var(--color-text-primary)] text-center mb-2">
         How intense is this feeling?
       </h2>
-      <p className="text-sm text-[var(--color-sage-600)] text-center mb-6">
+      <p className="text-sm text-[var(--color-text-secondary)] text-center mb-6">
         Drag to position on the grid
       </p>
 
       {/* Grid container */}
       <div className="relative mb-6">
         {/* Y-axis label */}
-        <div className="absolute -left-2 top-0 bottom-0 flex flex-col justify-between text-xs text-[var(--color-sage-500)] -translate-x-full pr-2">
+        <div className="absolute -left-2 top-0 bottom-0 flex flex-col justify-between text-xs text-[var(--color-text-tertiary)] -translate-x-full pr-2">
           <span>High intensity</span>
           <span>Low intensity</span>
         </div>
@@ -75,7 +75,7 @@ export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: Intens
         {/* The grid */}
         <div
           ref={gridRef}
-          className="relative aspect-square bg-[var(--color-sage-100)] rounded-2xl overflow-hidden cursor-crosshair touch-none"
+          className="relative aspect-square bg-[var(--color-bg-elevated)] rounded-2xl overflow-hidden cursor-crosshair touch-none"
           onMouseDown={handleStart}
           onMouseMove={handleMove}
           onMouseUp={handleEnd}
@@ -89,7 +89,7 @@ export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: Intens
             <div 
               className="w-full h-full"
               style={{
-                backgroundImage: `radial-gradient(circle, var(--color-sage-300) 2px, transparent 2px)`,
+                backgroundImage: `radial-gradient(circle, var(--color-border) 2px, transparent 2px)`,
                 backgroundSize: '24px 24px',
               }}
             />
@@ -103,12 +103,12 @@ export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: Intens
               bottom: `${position.y * 100}%`,
             }}
           >
-            <div className="w-full h-full rounded-full bg-[var(--color-sage-700)] border-4 border-white shadow-lg" />
+            <div className="w-full h-full rounded-full bg-[var(--color-accent-hover)] border-4 border-white shadow-lg" />
           </div>
         </div>
 
         {/* X-axis label */}
-        <div className="flex justify-between text-xs text-[var(--color-sage-500)] mt-2 px-2">
+        <div className="flex justify-between text-xs text-[var(--color-text-tertiary)] mt-2 px-2">
           <span>Unpleasant</span>
           <span>Pleasant</span>
         </div>
@@ -116,7 +116,7 @@ export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: Intens
 
       {/* Current selection display */}
       <div className="text-center mb-6">
-        <p className="text-lg font-medium text-[var(--color-sage-700)]">
+        <p className="text-lg font-medium text-[var(--color-text-secondary)]">
           {intensityLabel} intensity · {pleasantnessLabel}
         </p>
       </div>
@@ -126,14 +126,14 @@ export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: Intens
         {onHelpMeNow && (
           <button
             onClick={onHelpMeNow}
-            className="flex-1 py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
+            className="flex-1 py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-border-accent)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Help me now
           </button>
         )}
         <button
           onClick={handleConfirm}
-          className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
         >
           Add more detail
         </button>

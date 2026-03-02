@@ -16,31 +16,42 @@ interface EmotionGridProps {
   showRelated?: boolean;
 }
 
-// Quadrant-specific styles for bubbles
-const quadrantBubbleStyles: Record<string, { base: string; selected: string; text: string; selectedText: string }> = {
+// Quadrant-specific styles for bubbles (uses CSS variables for theme consistency)
+const quadrantBubbleStyles: Record<string, {
+  base: string; selected: string; text: string; selectedText: string;
+  borderHover: string; shadow: string;
+}> = {
   'high-unpleasant': {
-    base: 'bg-red-100 border-2 border-red-300',
-    selected: 'bg-red-500 border-2 border-red-600 shadow-lg',
-    text: 'text-red-700',
+    base: 'bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]',
+    selected: 'bg-[var(--color-quadrant-high-unpleasant)] border border-transparent',
+    text: 'text-[var(--color-q-hu-text)]',
     selectedText: 'text-white',
+    borderHover: 'var(--color-q-hu-border-hover)',
+    shadow: 'var(--color-q-hu-shadow)',
   },
   'high-pleasant': {
-    base: 'bg-amber-100 border-2 border-amber-300',
-    selected: 'bg-amber-500 border-2 border-amber-600 shadow-lg',
-    text: 'text-amber-800',
+    base: 'bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]',
+    selected: 'bg-[var(--color-quadrant-high-pleasant)] border border-transparent',
+    text: 'text-[var(--color-q-hp-text)]',
     selectedText: 'text-white',
+    borderHover: 'var(--color-q-hp-border-hover)',
+    shadow: 'var(--color-q-hp-shadow)',
   },
   'low-unpleasant': {
-    base: 'bg-blue-100 border-2 border-blue-300',
-    selected: 'bg-blue-500 border-2 border-blue-600 shadow-lg',
-    text: 'text-blue-700',
+    base: 'bg-[var(--color-q-lu-bg)] border border-[var(--color-q-lu-border)]',
+    selected: 'bg-[var(--color-quadrant-low-unpleasant)] border border-transparent',
+    text: 'text-[var(--color-q-lu-text)]',
     selectedText: 'text-white',
+    borderHover: 'var(--color-q-lu-border-hover)',
+    shadow: 'var(--color-q-lu-shadow)',
   },
   'low-pleasant': {
-    base: 'bg-emerald-100 border-2 border-emerald-300',
-    selected: 'bg-emerald-500 border-2 border-emerald-600 shadow-lg',
-    text: 'text-emerald-700',
+    base: 'bg-[var(--color-q-lp-bg)] border border-[var(--color-q-lp-border)]',
+    selected: 'bg-[var(--color-quadrant-low-pleasant)] border border-transparent',
+    text: 'text-[var(--color-q-lp-text)]',
     selectedText: 'text-white',
+    borderHover: 'var(--color-q-lp-border-hover)',
+    shadow: 'var(--color-q-lp-shadow)',
   },
 };
 
@@ -157,16 +168,16 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
+      <h2 className="text-xl font-bold text-[var(--color-text-primary)] text-center mb-2">
         What emotions fit best?
       </h2>
-      <p className="text-sm text-[var(--color-sage-600)] text-center mb-4">
+      <p className="text-sm text-[var(--color-text-secondary)] text-center mb-4">
         Tap all that apply
       </p>
 
       {/* Selected emotions chips */}
       {selectedEmotions.length > 0 && (
-        <div className="flex flex-wrap gap-2 mb-4 p-3 bg-[var(--color-sage-100)] rounded-lg">
+        <div className="flex flex-wrap gap-2 mb-4 p-3 bg-[var(--color-bg-elevated)] rounded-lg">
           {selectedEmotions.map((emotion) => (
             <span
               key={emotion}
@@ -193,8 +204,8 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
       {showRelated && selectedEmotions.length > 0 && (
         <div className="mb-4">
           {relatedEmotions.length > 0 ? (
-            <div className="p-3 rounded-lg bg-[var(--color-sage-50)] border border-[var(--color-sage-200)]">
-              <p className="text-sm text-[var(--color-sage-600)] mb-2">
+            <div className="p-3 rounded-lg bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)]">
+              <p className="text-sm text-[var(--color-text-secondary)] mb-2">
                 Some people who feel <strong>{selectedEmotions[0].toLowerCase()}</strong> also describe:
               </p>
               <div className="flex flex-wrap gap-2">
@@ -203,18 +214,17 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
                     key={related.id}
                     onClick={() => addRelatedEmotion(related)}
                     className="group flex items-center gap-1 py-1.5 px-3 rounded-full text-sm
-                      bg-white border border-[var(--color-sage-300)] text-[var(--color-sage-700)]
-                      hover:bg-[var(--color-sage-100)] hover:border-[var(--color-sage-400)]
-                      transition-colors"
+                      bg-[var(--color-bg-card)] border border-[var(--color-border)] text-[var(--color-text-secondary)]
+                      lift-secondary"
                   >
                     <span>{formatEmotionName(related.name)}</span>
-                    <span className="text-[var(--color-sage-400)] group-hover:text-[var(--color-sage-600)]">
+                    <span className="text-[var(--color-text-muted)] group-hover:text-[var(--color-text-secondary)]">
                       +
                     </span>
                   </button>
                 ))}
               </div>
-              <p className="text-xs text-[var(--color-sage-500)] mt-2">
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-2">
                 Tap to add · {relatedEmotions[0]?.reason}
               </p>
             </div>
@@ -231,19 +241,19 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full p-3 pr-20 rounded-lg border border-[var(--color-sage-300)] bg-white text-[var(--color-sage-800)] focus:outline-none focus:ring-2 focus:ring-[var(--color-sage-400)]"
+            className="w-full p-3 pr-20 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
           />
           {search.trim() && !searchMatchesExisting && (
             <button
               onClick={handleAddCustom}
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-sm bg-[var(--color-sage-600)] text-white rounded-md hover:bg-[var(--color-sage-700)] transition-colors"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-sm bg-[var(--color-accent)] text-white rounded-md lift-primary"
             >
               Add
             </button>
           )}
         </div>
         {search.trim() && !searchMatchesExisting && (
-          <p className="text-xs text-[var(--color-sage-500)] mt-1">
+          <p className="text-xs text-[var(--color-text-tertiary)] mt-1">
             Press Enter to add "{search.trim()}"
           </p>
         )}
@@ -258,14 +268,16 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
               key={emotion.id}
               type="button"
               onClick={() => toggleEmotion(emotion.name)}
+              style={!isSelected ? {
+                ['--chip-border-hover' as string]: bubbleStyle.borderHover,
+                ['--chip-shadow' as string]: bubbleStyle.shadow,
+              } : undefined}
               className={`
                 py-3 px-5 rounded-full text-sm font-medium
                 cursor-pointer select-none
-                transition-all duration-150
-                active:scale-95
                 ${isSelected
-                  ? `${bubbleStyle.selected} ${bubbleStyle.selectedText}`
-                  : `${bubbleStyle.base} ${bubbleStyle.text} hover:shadow-md`
+                  ? `${bubbleStyle.selected} ${bubbleStyle.selectedText} transition-colors duration-150`
+                  : `${bubbleStyle.base} ${bubbleStyle.text} lift-chip`
                 }
               `}
             >
@@ -276,13 +288,13 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
       </div>
 
       {filteredEmotions.length === 0 && !search.trim() && (
-        <p className="text-center text-[var(--color-sage-500)] mt-4">
+        <p className="text-center text-[var(--color-text-tertiary)] mt-4">
           No emotions in this category
         </p>
       )}
 
       {filteredEmotions.length === 0 && search.trim() && (
-        <p className="text-center text-[var(--color-sage-500)] mt-4">
+        <p className="text-center text-[var(--color-text-tertiary)] mt-4">
           No matches — click Add to use "{search}"
         </p>
       )}
@@ -292,7 +304,7 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
         {onHelpMeNow && (
           <button
             onClick={onHelpMeNow}
-            className="flex-1 py-3 px-4 rounded-lg border-2 border-dashed border-[var(--color-sage-400)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] hover:border-[var(--color-sage-500)] transition-colors"
+            className="flex-1 py-3 px-4 rounded-lg border border-dashed border-[var(--color-border-accent)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Help me now
           </button>
@@ -300,10 +312,10 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
         <button
           onClick={handleContinue}
           className={`
-            flex-1 py-3 px-4 rounded-lg font-medium transition-colors
+            flex-1 py-3 px-4 rounded-lg font-medium
             ${selectedEmotions.length > 0
-              ? 'bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white'
-              : 'bg-[var(--color-sage-200)] text-[var(--color-sage-500)]'}
+              ? 'bg-[var(--color-accent)] text-white lift-primary'
+              : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] transition-colors'}
           `}
         >
           Continue

@@ -68,10 +68,10 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
     return (
       <div className="flex items-center justify-center min-h-[60vh] px-6">
         <div className="text-center animate-fade-in">
-          <p className="text-xl text-[var(--color-sage-700)] font-medium leading-relaxed">
+          <p className="text-xl text-[var(--color-text-secondary)] font-medium leading-relaxed">
             That counts.
           </p>
-          <p className="text-xl text-[var(--color-sage-700)] font-medium leading-relaxed">
+          <p className="text-xl text-[var(--color-text-secondary)] font-medium leading-relaxed">
             You did something.
           </p>
         </div>
@@ -87,17 +87,17 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
         {/* Compassionate header — small, gentle, not attention-competing */}
-        <p className="text-sm text-[var(--color-sage-500)] mb-8">
+        <p className="text-sm text-[var(--color-text-tertiary)] mb-8">
           That's okay. Let's go smaller.
         </p>
 
         {/* THE INSTRUCTION — the only thing that matters on this screen */}
         <div className="text-center mb-12 max-w-sm">
-          <p className="text-2xl sm:text-3xl font-semibold text-[var(--color-sage-800)] leading-snug mb-4">
+          <p className="text-2xl sm:text-3xl font-semibold text-[var(--color-text-primary)] leading-snug mb-4">
             {bailoutStep.text}
           </p>
           {bailoutStep.subtext && (
-            <p className="text-base text-[var(--color-sage-500)] leading-relaxed">
+            <p className="text-base text-[var(--color-text-tertiary)] leading-relaxed">
               {bailoutStep.subtext}
             </p>
           )}
@@ -106,7 +106,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         {/* Single primary action */}
         <button
           onClick={handleBailoutComplete}
-          className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium text-lg transition-colors"
+          className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent)] text-white font-medium text-lg lift-primary"
         >
           I did it
         </button>
@@ -114,7 +114,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         {/* Subtle cycle option — for accessibility (e.g., step requires cold water but user is in bed) */}
         <button
           onClick={handleShowAnother}
-          className="mt-4 text-sm text-[var(--color-sage-400)] hover:text-[var(--color-sage-600)] transition-colors"
+          className="mt-4 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
         >
           Show me something else
         </button>
@@ -128,23 +128,23 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
   if (safetyFlag && safetyFlag.type === 'crisis') {
     return (
       <div className="text-center py-6">
-        <div className="mb-6 p-4 rounded-2xl bg-red-50 border border-red-200">
+        <div className="mb-6 p-4 rounded-2xl bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]">
           <span className="text-3xl mb-3 block">🆘</span>
-          <h2 className="text-xl font-bold text-red-800 mb-2">
+          <h2 className="text-xl font-bold text-[var(--color-q-hu-text)] mb-2">
             We hear you
           </h2>
-          <p className="text-red-700 mb-4">
+          <p className="text-[var(--color-q-hu-text)] mb-4">
             {safetyFlag.action}
           </p>
           <a
             href="tel:988"
-            className="inline-block w-full py-3 px-4 rounded-lg bg-red-600 hover:bg-red-700 text-white font-medium transition-colors mb-3"
+            className="inline-block w-full py-3 px-4 rounded-lg bg-[var(--color-danger)] hover:opacity-90 text-white font-medium transition-colors mb-3"
           >
             Call 988 (Suicide & Crisis Lifeline)
           </a>
           <a
             href="sms:741741?body=HELLO"
-            className="inline-block w-full py-3 px-4 rounded-lg border border-red-300 text-red-700 font-medium hover:bg-red-50 transition-colors"
+            className="inline-block w-full py-3 px-4 rounded-lg border border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)] font-medium hover:bg-[var(--color-q-hu-bg)] transition-colors"
           >
             Text HOME to 741741
           </a>
@@ -160,15 +160,15 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
     return (
       <div className="text-center py-6">
         <span className="text-5xl mb-4 block">✨</span>
-        <h2 className="text-2xl font-bold text-[var(--color-sage-800)] mb-3">
+        <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-3">
           {pattern.userFacingLabel}
         </h2>
-        <p className="text-[var(--color-sage-600)] mb-8">
+        <p className="text-[var(--color-text-secondary)] mb-8">
           No action needed right now. Enjoy this moment.
         </p>
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
         >
           Done
         </button>
@@ -184,16 +184,16 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
     <div className="py-4">
       {/* The State Summary - one cohesive sentence */}
       <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-sage-100)] mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-bg-elevated)] mb-4">
           <span className="text-2xl">{getPatternEmoji(pattern.id)}</span>
         </div>
         
-        <h2 className="text-xl font-bold text-[var(--color-sage-800)] mb-3 leading-relaxed">
+        <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-3 leading-relaxed">
           {pattern.userFacingLabel}
         </h2>
         
         {pattern.confidence < 0.6 && (
-          <p className="text-sm text-[var(--color-sage-500)] mb-2">
+          <p className="text-sm text-[var(--color-text-tertiary)] mb-2">
             Based on what you've shared
           </p>
         )}
@@ -201,8 +201,8 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
 
       {/* Clinical referral warning if needed */}
       {safetyFlag && safetyFlag.type === 'clinical_referral' && (
-        <div className="mb-6 p-4 rounded-xl bg-amber-50 border border-amber-200">
-          <p className="text-amber-800 text-sm">
+        <div className="mb-6 p-4 rounded-xl bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]">
+          <p className="text-[var(--color-q-hp-text)] text-sm">
             <strong>Note:</strong> If this feeling persists, consider reaching out to a mental health professional.
           </p>
         </div>
@@ -211,7 +211,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
       {/* The Tools - 1-2 options, that's it */}
       {tools.length > 0 && (
         <div className="mb-8">
-          <p className="text-sm text-[var(--color-sage-600)] text-center mb-4">
+          <p className="text-sm text-[var(--color-text-secondary)] text-center mb-4">
             Here's what might help right now
           </p>
           
@@ -227,7 +227,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
       <div className="space-y-3">
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
         >
           Done
         </button>
@@ -235,7 +235,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         {onAddMoreDetail && (
           <button
             onClick={onAddMoreDetail}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-600)] font-medium hover:bg-[var(--color-sage-50)] transition-colors text-sm"
+            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-sm"
           >
             Add more detail to refine this
           </button>
@@ -253,7 +253,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         <div className="mt-6 text-center">
           <button
             onClick={handleBailout}
-            className="text-sm text-[var(--color-sage-400)] hover:text-[var(--color-sage-600)] transition-colors"
+            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
           >
             That feels like too much right now
           </button>
@@ -294,8 +294,8 @@ function ToolCard({ tool, isPrimary, checkinEmotions }: { tool: ToolRecommendati
       className={`
         block p-4 rounded-xl transition-all
         ${isPrimary 
-          ? 'bg-[var(--color-sage-100)] border-2 border-[var(--color-sage-300)] hover:border-[var(--color-sage-400)]' 
-          : 'bg-[var(--color-sage-50)] border border-[var(--color-sage-200)] hover:border-[var(--color-sage-300)]'
+          ? 'bg-[var(--color-bg-elevated)] border-2 border-[var(--color-border)] hover:border-[var(--color-border-accent)]' 
+          : 'bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)]'
         }
       `}
     >
@@ -304,19 +304,19 @@ function ToolCard({ tool, isPrimary, checkinEmotions }: { tool: ToolRecommendati
           {getToolEmoji(tool.id)}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className={`font-semibold text-[var(--color-sage-800)] ${isPrimary ? 'text-base' : 'text-sm'}`}>
+          <h3 className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-base' : 'text-sm'}`}>
             {tool.name}
           </h3>
-          <p className="text-sm text-[var(--color-sage-600)] mt-0.5 line-clamp-2">
+          <p className="text-sm text-[var(--color-text-secondary)] mt-0.5 line-clamp-2">
             {tool.description || tool.whenToUse}
           </p>
           {isPrimary && tool.relevance && (
-            <p className="text-xs text-[var(--color-sage-500)] mt-1 italic">
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-1 italic">
               {tool.relevance}
             </p>
           )}
         </div>
-        <span className="text-[var(--color-sage-400)] flex-shrink-0 mt-1">\u2192</span>
+        <span className="text-[var(--color-text-muted)] flex-shrink-0 mt-1">\u2192</span>
       </div>
     </Link>
   );

@@ -10,12 +10,12 @@ export function CategoryPage() {
   if (!category) {
     return (
       <div className="text-center py-12">
-        <p className="text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)]">
+        <p className="text-[var(--color-text-secondary)]">
           Category not found.
         </p>
         <Link 
           to="/" 
-          className="mt-4 inline-block text-[var(--color-sage-600)] dark:text-[var(--color-sage-300)] underline hover:no-underline"
+          className="mt-4 inline-block text-[var(--color-text-secondary)] underline hover:no-underline"
         >
           ← Back home
         </Link>
@@ -28,7 +28,7 @@ export function CategoryPage() {
       {/* Back link */}
       <Link 
         to="/" 
-        className="inline-flex items-center gap-1 text-sm text-[var(--color-sage-600)] dark:text-[var(--color-sage-400)] hover:text-[var(--color-sage-800)] dark:hover:text-[var(--color-warm-100)] transition-colors mb-6"
+        className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-6"
       >
         <span>←</span>
         <span>All categories</span>
@@ -40,11 +40,11 @@ export function CategoryPage() {
           <span className="text-3xl" role="img" aria-hidden="true">
             {category.emoji}
           </span>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-sage-800)] dark:text-[var(--color-warm-100)]">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[var(--color-text-primary)]">
             {category.name}
           </h1>
         </div>
-        <p className="text-[var(--color-sage-600)] dark:text-[var(--color-sage-300)]">
+        <p className="text-[var(--color-text-secondary)]">
           {category.description}
         </p>
       </div>

@@ -41,10 +41,10 @@ export function SensationDetails({ x, y, region, onComplete, onCancel }: Sensati
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-[var(--color-sage-800)] text-center mb-2">
+      <h2 className="text-xl font-bold text-[var(--color-text-primary)] text-center mb-2">
         My {region} feels...
       </h2>
-      <p className="text-sm text-[var(--color-sage-600)] text-center mb-6">
+      <p className="text-sm text-[var(--color-text-secondary)] text-center mb-6">
         What words describe this sensation?
       </p>
 
@@ -56,8 +56,8 @@ export function SensationDetails({ x, y, region, onComplete, onCancel }: Sensati
             className={`
               py-2 px-4 rounded-full text-sm font-medium transition-all
               ${selectedTags.includes(tag)
-                ? 'bg-[var(--color-sage-600)] text-white'
-                : 'bg-[var(--color-sage-100)] text-[var(--color-sage-700)] hover:bg-[var(--color-sage-200)]'
+                ? 'bg-[var(--color-accent)] text-white'
+                : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] lift-secondary'
               }
             `}
           >
@@ -69,14 +69,14 @@ export function SensationDetails({ x, y, region, onComplete, onCancel }: Sensati
       <div className="space-y-3">
         <button
           onClick={handleComplete}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
         >
           Add sensation
         </button>
 
         <button
           onClick={onCancel}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+          className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
         >
           Cancel
         </button>

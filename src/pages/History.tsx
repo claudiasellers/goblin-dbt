@@ -35,22 +35,22 @@ export function History() {
     return (
       <div className="text-center py-12">
         <span className="text-5xl mb-4 block">📊</span>
-        <h1 className="text-2xl font-bold text-[var(--color-sage-800)] mb-2">
+        <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
           Your history
         </h1>
-        <p className="text-[var(--color-sage-600)] mb-6">
+        <p className="text-[var(--color-text-secondary)] mb-6">
           Log in to see your check-in history and patterns over time.
         </p>
         <div className="space-y-3">
           <Link
             to="/signup"
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             Create account
           </Link>
           <Link
             to="/login"
-            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-sage-300)] text-[var(--color-sage-700)] font-medium hover:bg-[var(--color-sage-100)] transition-colors"
+            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Log in
           </Link>
@@ -62,8 +62,8 @@ export function History() {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block w-8 h-8 border-4 border-[var(--color-sage-300)] border-t-[var(--color-sage-600)] rounded-full animate-spin mb-4"></div>
-        <p className="text-[var(--color-sage-600)]">Loading your history...</p>
+        <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4"></div>
+        <p className="text-[var(--color-text-secondary)]">Loading your history...</p>
       </div>
     );
   }
@@ -72,10 +72,10 @@ export function History() {
     return (
       <div className="text-center py-12">
         <span className="text-4xl mb-4 block">😕</span>
-        <p className="text-[var(--color-sage-600)] mb-4">{error}</p>
+        <p className="text-[var(--color-text-secondary)] mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="inline-block py-2 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+          className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
         >
           Try again
         </button>
@@ -85,19 +85,19 @@ export function History() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-[var(--color-sage-800)] mb-6">
+      <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-6">
         Your History
       </h1>
 
       {checkIns.length === 0 ? (
         <div className="text-center py-12">
           <span className="text-4xl mb-4 block">📝</span>
-          <p className="text-[var(--color-sage-600)] mb-4">
+          <p className="text-[var(--color-text-secondary)] mb-4">
             No check-ins yet. Start by checking in with how you're feeling.
           </p>
           <Link
             to="/"
-            className="inline-block py-2 px-4 rounded-lg bg-[var(--color-sage-600)] hover:bg-[var(--color-sage-700)] text-white font-medium transition-colors"
+            className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
             Check in now
           </Link>
@@ -130,7 +130,7 @@ function CheckInCard({ checkIn }: { checkIn: CheckInRecord }) {
 
   return (
     <div
-      className="bg-white rounded-xl p-4 shadow-sm border border-[var(--color-sage-200)] cursor-pointer hover:shadow-md transition-shadow"
+      className="bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border-subtle)] cursor-pointer lift-card"
       onClick={() => setExpanded(!expanded)}
     >
       <div className="flex items-center gap-3">
@@ -143,21 +143,21 @@ function CheckInCard({ checkIn }: { checkIn: CheckInRecord }) {
         </span>
 
         {/* Date */}
-        <span className="text-sm text-[var(--color-sage-500)] ml-auto">
+        <span className="text-sm text-[var(--color-text-tertiary)] ml-auto">
           {formattedDate}
         </span>
       </div>
 
       {expanded && (
-        <div className="mt-4 pt-4 border-t border-[var(--color-sage-100)]">
+        <div className="mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-[var(--color-sage-500)]">Intensity</span>
-              <p className="font-medium text-[var(--color-sage-700)]">{intensityLabel}</p>
+              <span className="text-[var(--color-text-tertiary)]">Intensity</span>
+              <p className="font-medium text-[var(--color-text-secondary)]">{intensityLabel}</p>
             </div>
             <div>
-              <span className="text-[var(--color-sage-500)]">Body sensations</span>
-              <p className="font-medium text-[var(--color-sage-700)]">
+              <span className="text-[var(--color-text-tertiary)]">Body sensations</span>
+              <p className="font-medium text-[var(--color-text-secondary)]">
                 {checkIn.bodySensations.length || 'None'}
               </p>
             </div>
@@ -165,12 +165,12 @@ function CheckInCard({ checkIn }: { checkIn: CheckInRecord }) {
 
           {checkIn.bodySensations.length > 0 && (
             <div className="mt-3">
-              <span className="text-sm text-[var(--color-sage-500)]">Sensations:</span>
+              <span className="text-sm text-[var(--color-text-tertiary)]">Sensations:</span>
               <div className="flex flex-wrap gap-2 mt-1">
                 {checkIn.bodySensations.map((sensation, i) => (
                   <span
                     key={i}
-                    className="text-xs px-2 py-1 rounded-full bg-[var(--color-sage-100)] text-[var(--color-sage-600)]"
+                    className="text-xs px-2 py-1 rounded-full bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)]"
                   >
                     {sensation.region}
                     {sensation.tags.length > 0 && `: ${sensation.tags.join(', ')}`}
@@ -182,8 +182,8 @@ function CheckInCard({ checkIn }: { checkIn: CheckInRecord }) {
 
           {checkIn.note && (
             <div className="mt-3">
-              <span className="text-sm text-[var(--color-sage-500)]">Note:</span>
-              <p className="text-sm text-[var(--color-sage-700)] mt-1">{checkIn.note}</p>
+              <span className="text-sm text-[var(--color-text-tertiary)]">Note:</span>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1">{checkIn.note}</p>
             </div>
           )}
         </div>

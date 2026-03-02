@@ -19,7 +19,7 @@ export function Profile() {
         </p>
         <a
           href="#/login"
-          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] font-semibold text-sm hover:bg-[var(--color-accent-hover)] transition-colors"
+          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] font-semibold text-sm lift-primary"
         >
           Sign In
         </a>
@@ -169,7 +169,7 @@ function BasicInfoSection({
           <button
             onClick={handleSave}
             disabled={saving || name === (displayName || '')}
-            className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] text-sm font-medium hover:bg-[var(--color-accent-hover)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>

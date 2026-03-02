@@ -3,7 +3,7 @@ import { TabBar } from './TabBar';
 
 export function TabLayout() {
   return (
-    <div className="min-h-screen bg-[var(--color-warm-50)] pb-20">
+    <div className="min-h-screen bg-[var(--color-bg-primary)] pb-20">
       {/* Main content */}
       <main className="max-w-lg mx-auto px-4 py-6">
         <Outlet />
