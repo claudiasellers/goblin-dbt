@@ -394,6 +394,37 @@ export async function exportUserData(): Promise<Record<string, unknown>> {
 }
 
 // ============================================
+// DEAR MAN CONTENT + SESSION
+// ============================================
+
+import type { DearManContentResult, DearManSessionData } from '../data/dearManTypes';
+export type { DearManContentResult, DearManSessionData };
+
+const getDearManContentFn = httpsCallable<void, DearManContentResult>(
+  functions, 'getDearManContent'
+);
+
+/**
+ * Get all DEAR MAN content from the graph in one call.
+ * Returns situation types, curated options, coaching content, etc.
+ */
+export async function getDearManContent(): Promise<DearManContentResult> {
+  const result = await getDearManContentFn();
+  return result.data;
+}
+
+const saveDearManSessionFn = httpsCallable<
+  DearManSessionData,
+  { success: boolean }
+>(functions, 'saveDearManSession');
+
+export async function saveDearManSession(
+  data: DearManSessionData
+): Promise<void> {
+  await saveDearManSessionFn(data);
+}
+
+// ============================================
 // REMOVED - These were for direct Neo4j access
 // ============================================
 // The following functions are no longer needed since we don't connect directly:

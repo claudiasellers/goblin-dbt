@@ -11,6 +11,7 @@ import { FiveSenses } from './tools/FiveSenses';
 import { Pause } from './tools/Pause';
 import { UrgeSurfing } from './tools/UrgeSurfing';
 import { OppositeAction } from './tools/OppositeAction';
+import { DearMan } from './tools/DearMan';
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -19,6 +20,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'pause': Pause,
   'urge-surfing': UrgeSurfing,
   'opposite-action': OppositeAction,
+  'dear-man': DearMan,
 };
 
 /** Normalize graph TherapyConcept ids (e.g. dbt_opposite_action) to frontend tool ids (opposite-action). */

@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getQuickTools = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getStateAndTools = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
+exports.getQuickTools = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getStateAndTools = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -904,6 +904,289 @@ exports.getOppositeActionContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo
     catch (error) {
         console.error('Error getting opposite action content:', error);
         throw new https_1.HttpsError('internal', 'Failed to get opposite action content');
+    }
+    finally {
+        await session.close();
+    }
+});
+// ============================================
+// DEAR MAN CONTENT + SESSION
+// ============================================
+/**
+ * Get all DEAR MAN content from the graph in one call.
+ * No auth required — this is public therapeutic content (same as OA).
+ */
+exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async () => {
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    const session = getDriver().session();
+    try {
+        // 1. Situation types
+        const sitResult = await session.run(`
+        MATCH (s:DearManSituationType)
+        RETURN s.id AS id, s.label AS label, s.sublabel AS sublabel,
+               s.emoji AS emoji, s.sortOrder AS sortOrder
+        ORDER BY s.sortOrder
+      `);
+        // 2. Describe options with situation type
+        const descResult = await session.run(`
+        MATCH (d:DearManDescribeOption)-[:FOR_SITUATION]->(s:DearManSituationType)
+        RETURN d.id AS id, d.label AS label, d.sortOrder AS sortOrder,
+               s.id AS situationId
+        ORDER BY d.sortOrder
+      `);
+        // 3. Assert options with situation type
+        const assertResult = await session.run(`
+        MATCH (a:DearManAssertOption)-[:FOR_SITUATION]->(s:DearManSituationType)
+        RETURN a.id AS id, a.label AS label, a.hasPlaceholder AS hasPlaceholder,
+               a.sortOrder AS sortOrder, s.id AS situationId
+        ORDER BY a.sortOrder
+      `);
+        // 4. Reinforce options
+        const reinfResult = await session.run(`
+        MATCH (r:DearManReinforceOption)
+        RETURN r.id AS id, r.label AS label, r.sortOrder AS sortOrder
+        ORDER BY r.sortOrder
+      `);
+        // 5. Barriers + coaching
+        const barrierResult = await session.run(`
+        MATCH (b:DearManBarrier)
+        OPTIONAL MATCH (c:DearManBarrierCoaching)-[:ADDRESSES]->(b)
+        RETURN b.id AS barrierId, b.label AS barrierLabel,
+               c.id AS coachingId, c.title AS coachingTitle, c.body AS coachingBody
+      `);
+        // 6. Default coaching
+        const defaultCoachResult = await session.run(`
+        MATCH (c:DearManBarrierCoaching {isDefault: true})
+        RETURN c.title AS title, c.body AS body
+      `);
+        // 7. Anchor phrases
+        const anchorResult = await session.run(`
+        MATCH (a:DearManAnchorPhrase)
+        RETURN a.id AS id, a.label AS label
+        ORDER BY a.sortOrder
+      `);
+        // 8. Negotiate options
+        const negResult = await session.run(`
+        MATCH (n:DearManNegotiateOption)
+        RETURN n.id AS id, n.label AS label, n.type AS type
+        ORDER BY n.sortOrder
+      `);
+        // 9. Feeling chips
+        const feelResult = await session.run(`
+        MATCH (f:DearManFeelingChip)
+        RETURN f.id AS id, f.label AS label
+        ORDER BY f.sortOrder
+      `);
+        // 10. Step insights
+        const insightResult = await session.run(`
+        MATCH (i:DearManStepInsight)
+        RETURN i.step AS step, i.text AS text
+      `);
+        // 11. Debrief options
+        const debriefResult = await session.run(`
+        MATCH (d:DearManDebriefOption)
+        RETURN d.id AS id, d.label AS label, d.type AS type
+        ORDER BY d.sortOrder
+      `);
+        // 12. Reveal text + coaching from TherapyConcept
+        const tcResult = await session.run(`
+        MATCH (tc:TherapyConcept {id: 'dbt_dear_man'})
+        RETURN tc.revealText AS revealText,
+               tc.confidentCoaching AS confidentCoaching,
+               tc.confidentBarrierNoRight AS confidentBarrierNoRight,
+               tc.assertBarrierGuilty AS assertBarrierGuilty,
+               tc.negotiateHintObjective AS hintObjective,
+               tc.negotiateHintRelationship AS hintRelationship,
+               tc.negotiateHintSelfRespect AS hintSelfRespect
+      `);
+        // --- Shape the response ---
+        const situationTypes = sitResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                sublabel: r.get('sublabel'),
+                emoji: r.get('emoji'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        });
+        const describeOptions = {};
+        for (const r of descResult.records) {
+            const sitId = r.get('situationId');
+            if (!describeOptions[sitId])
+                describeOptions[sitId] = [];
+            describeOptions[sitId].push({
+                id: r.get('id'),
+                label: r.get('label'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        }
+        const assertOptions = {};
+        for (const r of assertResult.records) {
+            const sitId = r.get('situationId');
+            if (!assertOptions[sitId])
+                assertOptions[sitId] = [];
+            assertOptions[sitId].push({
+                id: r.get('id'),
+                label: r.get('label'),
+                hasPlaceholder: (_b = r.get('hasPlaceholder')) !== null && _b !== void 0 ? _b : false,
+                sortOrder: (_c = toNumber(r.get('sortOrder'))) !== null && _c !== void 0 ? _c : 0,
+            });
+        }
+        const reinforceOptions = reinfResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        });
+        const barriers = [];
+        const barrierCoaching = {};
+        const seenBarriers = new Set();
+        for (const r of barrierResult.records) {
+            const bid = r.get('barrierId');
+            if (!seenBarriers.has(bid)) {
+                seenBarriers.add(bid);
+                barriers.push({ id: bid, label: r.get('barrierLabel') });
+            }
+            if (r.get('coachingId')) {
+                barrierCoaching[bid] = {
+                    title: r.get('coachingTitle'),
+                    body: r.get('coachingBody'),
+                };
+            }
+        }
+        const defaultCoachRec = defaultCoachResult.records[0];
+        const defaultCoaching = {
+            title: (_d = defaultCoachRec === null || defaultCoachRec === void 0 ? void 0 : defaultCoachRec.get('title')) !== null && _d !== void 0 ? _d : 'Staying present',
+            body: (_e = defaultCoachRec === null || defaultCoachRec === void 0 ? void 0 : defaultCoachRec.get('body')) !== null && _e !== void 0 ? _e : '',
+        };
+        const anchorPhrases = anchorResult.records.map((r) => ({
+            id: r.get('id'),
+            label: r.get('label'),
+        }));
+        const middleGround = [];
+        const walkAway = [];
+        for (const r of negResult.records) {
+            const item = { id: r.get('id'), label: r.get('label') };
+            if (r.get('type') === 'middle_ground')
+                middleGround.push(item);
+            else
+                walkAway.push(item);
+        }
+        const feelingChips = feelResult.records.map((r) => ({
+            id: r.get('id'),
+            label: r.get('label'),
+        }));
+        const stepInsights = {};
+        for (const r of insightResult.records) {
+            stepInsights[r.get('step')] = r.get('text');
+        }
+        const wentWell = [];
+        const toChange = [];
+        for (const r of debriefResult.records) {
+            const item = { id: r.get('id'), label: r.get('label') };
+            if (r.get('type') === 'went_well')
+                wentWell.push(item);
+            else
+                toChange.push(item);
+        }
+        const tc = tcResult.records[0];
+        return {
+            situationTypes,
+            describeOptions,
+            assertOptions,
+            reinforceOptions,
+            barriers,
+            barrierCoaching,
+            defaultCoaching,
+            anchorPhrases,
+            negotiateOptions: { middleGround, walkAway },
+            negotiateHints: {
+                objective: (_f = tc === null || tc === void 0 ? void 0 : tc.get('hintObjective')) !== null && _f !== void 0 ? _f : '',
+                relationship: (_g = tc === null || tc === void 0 ? void 0 : tc.get('hintRelationship')) !== null && _g !== void 0 ? _g : '',
+                'self-respect': (_h = tc === null || tc === void 0 ? void 0 : tc.get('hintSelfRespect')) !== null && _h !== void 0 ? _h : '',
+            },
+            feelingChips,
+            stepInsights,
+            debriefOptions: { wentWell, toChange },
+            revealText: (_j = tc === null || tc === void 0 ? void 0 : tc.get('revealText')) !== null && _j !== void 0 ? _j : '',
+            confidentCoaching: (_k = tc === null || tc === void 0 ? void 0 : tc.get('confidentCoaching')) !== null && _k !== void 0 ? _k : '',
+            confidentBarrierNoRight: (_l = tc === null || tc === void 0 ? void 0 : tc.get('confidentBarrierNoRight')) !== null && _l !== void 0 ? _l : '',
+            assertBarrierGuilty: (_m = tc === null || tc === void 0 ? void 0 : tc.get('assertBarrierGuilty')) !== null && _m !== void 0 ? _m : '',
+        };
+    }
+    catch (error) {
+        console.error('Error fetching DEAR MAN content:', error);
+        throw new https_1.HttpsError('internal', 'Failed to fetch DEAR MAN content');
+    }
+    finally {
+        await session.close();
+    }
+});
+exports.saveDearManSession = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError('unauthenticated', 'User must be logged in');
+    }
+    const userId = request.auth.uid;
+    const data = request.data;
+    const session = getDriver().session();
+    try {
+        await session.run(`
+        MATCH (u:User {id: $userId})
+        CREATE (s:DearManSession {
+          id: randomUUID(),
+          type: $type,
+          relationshipType: $relationshipType,
+          situationType: $situationType,
+          priorities: $priorities,
+          barriers: $barriers,
+          describeId: $describeId,
+          describeCustom: $describeCustom,
+          feelings: $feelings,
+          assertId: $assertId,
+          assertCustom: $assertCustom,
+          reinforceIds: $reinforceIds,
+          anchorPhrase: $anchorPhrase,
+          middleGroundId: $middleGroundId,
+          middleGroundCustom: $middleGroundCustom,
+          walkAwayId: $walkAwayId,
+          walkAwayCustom: $walkAwayCustom,
+          debriefOverall: $debriefOverall,
+          debriefWentWell: $debriefWentWell,
+          debriefToChange: $debriefToChange,
+          createdAt: datetime()
+        })
+        MERGE (u)-[:COMPLETED_SESSION]->(s)
+        RETURN s.id AS id
+        `, {
+            userId,
+            type: data.type,
+            relationshipType: data.relationshipType || '',
+            situationType: data.situationType || '',
+            priorities: data.priorities || [],
+            barriers: data.barriers || [],
+            describeId: data.describeId || null,
+            describeCustom: data.describeCustom || '',
+            feelings: data.feelings || [],
+            assertId: data.assertId || null,
+            assertCustom: data.assertCustom || '',
+            reinforceIds: data.reinforceIds || [],
+            anchorPhrase: data.anchorPhrase || '',
+            middleGroundId: data.middleGroundId || null,
+            middleGroundCustom: data.middleGroundCustom || '',
+            walkAwayId: data.walkAwayId || null,
+            walkAwayCustom: data.walkAwayCustom || '',
+            debriefOverall: data.debriefOverall || null,
+            debriefWentWell: data.debriefWentWell || [],
+            debriefToChange: data.debriefToChange || [],
+        });
+        return { success: true };
+    }
+    catch (error) {
+        console.error('Error saving DEAR MAN session:', error);
+        throw new https_1.HttpsError('internal', 'Failed to save session');
     }
     finally {
         await session.close();

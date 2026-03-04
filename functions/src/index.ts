@@ -1130,6 +1130,334 @@ export const getOppositeActionContent = onCall(
   }
 );
 
+// ============================================
+// DEAR MAN CONTENT + SESSION
+// ============================================
+
+/**
+ * Get all DEAR MAN content from the graph in one call.
+ * No auth required — this is public therapeutic content (same as OA).
+ */
+export const getDearManContent = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async () => {
+    const session = getDriver().session();
+    try {
+      // 1. Situation types
+      const sitResult = await session.run(`
+        MATCH (s:DearManSituationType)
+        RETURN s.id AS id, s.label AS label, s.sublabel AS sublabel,
+               s.emoji AS emoji, s.sortOrder AS sortOrder
+        ORDER BY s.sortOrder
+      `);
+
+      // 2. Describe options with situation type
+      const descResult = await session.run(`
+        MATCH (d:DearManDescribeOption)-[:FOR_SITUATION]->(s:DearManSituationType)
+        RETURN d.id AS id, d.label AS label, d.sortOrder AS sortOrder,
+               s.id AS situationId
+        ORDER BY d.sortOrder
+      `);
+
+      // 3. Assert options with situation type
+      const assertResult = await session.run(`
+        MATCH (a:DearManAssertOption)-[:FOR_SITUATION]->(s:DearManSituationType)
+        RETURN a.id AS id, a.label AS label, a.hasPlaceholder AS hasPlaceholder,
+               a.sortOrder AS sortOrder, s.id AS situationId
+        ORDER BY a.sortOrder
+      `);
+
+      // 4. Reinforce options
+      const reinfResult = await session.run(`
+        MATCH (r:DearManReinforceOption)
+        RETURN r.id AS id, r.label AS label, r.sortOrder AS sortOrder
+        ORDER BY r.sortOrder
+      `);
+
+      // 5. Barriers + coaching
+      const barrierResult = await session.run(`
+        MATCH (b:DearManBarrier)
+        OPTIONAL MATCH (c:DearManBarrierCoaching)-[:ADDRESSES]->(b)
+        RETURN b.id AS barrierId, b.label AS barrierLabel,
+               c.id AS coachingId, c.title AS coachingTitle, c.body AS coachingBody
+      `);
+
+      // 6. Default coaching
+      const defaultCoachResult = await session.run(`
+        MATCH (c:DearManBarrierCoaching {isDefault: true})
+        RETURN c.title AS title, c.body AS body
+      `);
+
+      // 7. Anchor phrases
+      const anchorResult = await session.run(`
+        MATCH (a:DearManAnchorPhrase)
+        RETURN a.id AS id, a.label AS label
+        ORDER BY a.sortOrder
+      `);
+
+      // 8. Negotiate options
+      const negResult = await session.run(`
+        MATCH (n:DearManNegotiateOption)
+        RETURN n.id AS id, n.label AS label, n.type AS type
+        ORDER BY n.sortOrder
+      `);
+
+      // 9. Feeling chips
+      const feelResult = await session.run(`
+        MATCH (f:DearManFeelingChip)
+        RETURN f.id AS id, f.label AS label
+        ORDER BY f.sortOrder
+      `);
+
+      // 10. Step insights
+      const insightResult = await session.run(`
+        MATCH (i:DearManStepInsight)
+        RETURN i.step AS step, i.text AS text
+      `);
+
+      // 11. Debrief options
+      const debriefResult = await session.run(`
+        MATCH (d:DearManDebriefOption)
+        RETURN d.id AS id, d.label AS label, d.type AS type
+        ORDER BY d.sortOrder
+      `);
+
+      // 12. Reveal text + coaching from TherapyConcept
+      const tcResult = await session.run(`
+        MATCH (tc:TherapyConcept {id: 'dbt_dear_man'})
+        RETURN tc.revealText AS revealText,
+               tc.confidentCoaching AS confidentCoaching,
+               tc.confidentBarrierNoRight AS confidentBarrierNoRight,
+               tc.assertBarrierGuilty AS assertBarrierGuilty,
+               tc.negotiateHintObjective AS hintObjective,
+               tc.negotiateHintRelationship AS hintRelationship,
+               tc.negotiateHintSelfRespect AS hintSelfRespect
+      `);
+
+      // --- Shape the response ---
+
+      const situationTypes = sitResult.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        label: r.get('label'),
+        sublabel: r.get('sublabel'),
+        emoji: r.get('emoji'),
+        sortOrder: toNumber(r.get('sortOrder')) ?? 0,
+      }));
+
+      const describeOptions: Record<string, Array<{ id: string; label: string; sortOrder: number }>> = {};
+      for (const r of descResult.records) {
+        const sitId = r.get('situationId');
+        if (!describeOptions[sitId]) describeOptions[sitId] = [];
+        describeOptions[sitId].push({
+          id: r.get('id'),
+          label: r.get('label'),
+          sortOrder: toNumber(r.get('sortOrder')) ?? 0,
+        });
+      }
+
+      const assertOptions: Record<string, Array<{ id: string; label: string; hasPlaceholder: boolean; sortOrder: number }>> = {};
+      for (const r of assertResult.records) {
+        const sitId = r.get('situationId');
+        if (!assertOptions[sitId]) assertOptions[sitId] = [];
+        assertOptions[sitId].push({
+          id: r.get('id'),
+          label: r.get('label'),
+          hasPlaceholder: r.get('hasPlaceholder') ?? false,
+          sortOrder: toNumber(r.get('sortOrder')) ?? 0,
+        });
+      }
+
+      const reinforceOptions = reinfResult.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        label: r.get('label'),
+        sortOrder: toNumber(r.get('sortOrder')) ?? 0,
+      }));
+
+      const barriers: Array<{ id: string; label: string }> = [];
+      const barrierCoaching: Record<string, { title: string; body: string }> = {};
+      const seenBarriers = new Set<string>();
+      for (const r of barrierResult.records) {
+        const bid = r.get('barrierId');
+        if (!seenBarriers.has(bid)) {
+          seenBarriers.add(bid);
+          barriers.push({ id: bid, label: r.get('barrierLabel') });
+        }
+        if (r.get('coachingId')) {
+          barrierCoaching[bid] = {
+            title: r.get('coachingTitle'),
+            body: r.get('coachingBody'),
+          };
+        }
+      }
+
+      const defaultCoachRec = defaultCoachResult.records[0];
+      const defaultCoaching = {
+        title: defaultCoachRec?.get('title') ?? 'Staying present',
+        body: defaultCoachRec?.get('body') ?? '',
+      };
+
+      const anchorPhrases = anchorResult.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        label: r.get('label'),
+      }));
+
+      const middleGround: Array<{ id: string; label: string }> = [];
+      const walkAway: Array<{ id: string; label: string }> = [];
+      for (const r of negResult.records) {
+        const item = { id: r.get('id'), label: r.get('label') };
+        if (r.get('type') === 'middle_ground') middleGround.push(item);
+        else walkAway.push(item);
+      }
+
+      const feelingChips = feelResult.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        label: r.get('label'),
+      }));
+
+      const stepInsights: Record<string, string> = {};
+      for (const r of insightResult.records) {
+        stepInsights[r.get('step')] = r.get('text');
+      }
+
+      const wentWell: Array<{ id: string; label: string }> = [];
+      const toChange: Array<{ id: string; label: string }> = [];
+      for (const r of debriefResult.records) {
+        const item = { id: r.get('id'), label: r.get('label') };
+        if (r.get('type') === 'went_well') wentWell.push(item);
+        else toChange.push(item);
+      }
+
+      const tc = tcResult.records[0];
+
+      return {
+        situationTypes,
+        describeOptions,
+        assertOptions,
+        reinforceOptions,
+        barriers,
+        barrierCoaching,
+        defaultCoaching,
+        anchorPhrases,
+        negotiateOptions: { middleGround, walkAway },
+        negotiateHints: {
+          objective: tc?.get('hintObjective') ?? '',
+          relationship: tc?.get('hintRelationship') ?? '',
+          'self-respect': tc?.get('hintSelfRespect') ?? '',
+        },
+        feelingChips,
+        stepInsights,
+        debriefOptions: { wentWell, toChange },
+        revealText: tc?.get('revealText') ?? '',
+        confidentCoaching: tc?.get('confidentCoaching') ?? '',
+        confidentBarrierNoRight: tc?.get('confidentBarrierNoRight') ?? '',
+        assertBarrierGuilty: tc?.get('assertBarrierGuilty') ?? '',
+      };
+    } catch (error) {
+      console.error('Error fetching DEAR MAN content:', error);
+      throw new HttpsError('internal', 'Failed to fetch DEAR MAN content');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+interface DearManSessionData {
+  type: 'prep' | 'debrief';
+  relationshipType: string;
+  situationType: string;
+  priorities: string[];
+  barriers: string[];
+  describeId: string | null;
+  describeCustom: string;
+  feelings: string[];
+  assertId: string | null;
+  assertCustom: string;
+  reinforceIds: string[];
+  anchorPhrase: string;
+  middleGroundId: string | null;
+  middleGroundCustom: string;
+  walkAwayId: string | null;
+  walkAwayCustom: string;
+  debriefOverall?: string;
+  debriefWentWell?: string[];
+  debriefToChange?: string[];
+}
+
+export const saveDearManSession = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+    const data = request.data as DearManSessionData;
+
+    const session = getDriver().session();
+    try {
+      await session.run(
+        `
+        MATCH (u:User {id: $userId})
+        CREATE (s:DearManSession {
+          id: randomUUID(),
+          type: $type,
+          relationshipType: $relationshipType,
+          situationType: $situationType,
+          priorities: $priorities,
+          barriers: $barriers,
+          describeId: $describeId,
+          describeCustom: $describeCustom,
+          feelings: $feelings,
+          assertId: $assertId,
+          assertCustom: $assertCustom,
+          reinforceIds: $reinforceIds,
+          anchorPhrase: $anchorPhrase,
+          middleGroundId: $middleGroundId,
+          middleGroundCustom: $middleGroundCustom,
+          walkAwayId: $walkAwayId,
+          walkAwayCustom: $walkAwayCustom,
+          debriefOverall: $debriefOverall,
+          debriefWentWell: $debriefWentWell,
+          debriefToChange: $debriefToChange,
+          createdAt: datetime()
+        })
+        MERGE (u)-[:COMPLETED_SESSION]->(s)
+        RETURN s.id AS id
+        `,
+        {
+          userId,
+          type: data.type,
+          relationshipType: data.relationshipType || '',
+          situationType: data.situationType || '',
+          priorities: data.priorities || [],
+          barriers: data.barriers || [],
+          describeId: data.describeId || null,
+          describeCustom: data.describeCustom || '',
+          feelings: data.feelings || [],
+          assertId: data.assertId || null,
+          assertCustom: data.assertCustom || '',
+          reinforceIds: data.reinforceIds || [],
+          anchorPhrase: data.anchorPhrase || '',
+          middleGroundId: data.middleGroundId || null,
+          middleGroundCustom: data.middleGroundCustom || '',
+          walkAwayId: data.walkAwayId || null,
+          walkAwayCustom: data.walkAwayCustom || '',
+          debriefOverall: data.debriefOverall || null,
+          debriefWentWell: data.debriefWentWell || [],
+          debriefToChange: data.debriefToChange || [],
+        }
+      );
+
+      return { success: true };
+    } catch (error) {
+      console.error('Error saving DEAR MAN session:', error);
+      throw new HttpsError('internal', 'Failed to save session');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
 /**
  * Get fallback tools based on quadrant when no specific pattern match
  * Used for the "Help me now" minimal-input path

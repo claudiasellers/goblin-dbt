@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Goblin DBT is a neuroscience-informed DBT (Dialectical Behavior Therapy) app. It is NOT an emotion tracker — it is solutions-focused. The user is feeling something, and the app helps them (1) develop better language for their experience (affect labeling, which itself is therapeutic), and (2) find tools that target underlying neural mechanisms, not just surface symptoms.
 The knowledge graph is the brain of the app. It encodes relationships between emotions, brain structures, functional networks, neurochemical systems, therapy concepts, and tools across multiple modalities (DBT, IFS, CBT, ACT, EMDR, Somatic Experiencing, CPT, MBCT, Polyvagal Theory).
 
+As a general guiding principle, every phase and tool should lead with curated, tappable options based on what they've already told us, with "add your own" as an escape hatch — not the other way around.
 
 ## Architecture
 
