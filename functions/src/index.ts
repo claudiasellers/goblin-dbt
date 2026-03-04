@@ -893,8 +893,11 @@ export const getStateAndTools = onCall(
             };
           }
 
-          // Swap primary/secondary if the graph says to
-          if (graphPrimaryId !== primaryId && secondaryPattern) {
+          // Swap primary/secondary if the graph says to AND the scores are close
+          // enough to indicate genuine co-occurrence (not one pattern dominating).
+          // Only swap when the secondary scored at least 60% of the primary.
+          const scoreRatio = secondaryScore / primaryScore;
+          if (graphPrimaryId !== primaryId && secondaryPattern && scoreRatio >= 0.6) {
             const temp = pattern;
             pattern = { ...secondaryPattern, confidence: Math.min(primaryScore, 1.0) };
             secondaryPattern = { ...temp, confidence: Math.min(secondaryScore, 1.0) };
@@ -937,23 +940,28 @@ export const getStateAndTools = onCall(
       }));
 
       // ============================================
-      // PHASE 5: Safety flags
+      // PHASE 5: Safety flags (skip for low-unpleasant — these patterns
+      // should never route to crisis resources)
       // ============================================
 
-      const safetyQuery = `
-        MATCH (p:ActivationPattern {id: $patternId})-[:TRIGGERS_SAFETY]->(sf:SafetyFlag)
-        RETURN sf.id as id, sf.type as type, sf.trigger as trigger, sf.action as action
-        LIMIT 1
-      `;
+      let safetyFlag: { id: string; type: string; trigger: string; action: string } | undefined;
 
-      const safetyResult = await session.run(safetyQuery, { patternId: pattern.id });
+      if (input.quadrant !== 'low-unpleasant') {
+        const safetyQuery = `
+          MATCH (p:ActivationPattern {id: $patternId})-[:TRIGGERS_SAFETY]->(sf:SafetyFlag)
+          RETURN sf.id as id, sf.type as type, sf.trigger as trigger, sf.action as action
+          LIMIT 1
+        `;
 
-      const safetyFlag = safetyResult.records.length > 0 ? {
-        id: safetyResult.records[0].get('id'),
-        type: safetyResult.records[0].get('type'),
-        trigger: safetyResult.records[0].get('trigger'),
-        action: safetyResult.records[0].get('action'),
-      } : undefined;
+        const safetyResult = await session.run(safetyQuery, { patternId: pattern.id });
+
+        safetyFlag = safetyResult.records.length > 0 ? {
+          id: safetyResult.records[0].get('id'),
+          type: safetyResult.records[0].get('type'),
+          trigger: safetyResult.records[0].get('trigger'),
+          action: safetyResult.records[0].get('action'),
+        } : undefined;
+      }
 
       // ============================================
       // PHASE 6: Guided activity mapping (low-unpleasant only)
@@ -962,7 +970,7 @@ export const getStateAndTools = onCall(
 
       let guidedActivity: GuidedActivityRecommendation | undefined;
 
-      if (input.quadrant === 'low-unpleasant' && !safetyFlag) {
+      if (input.quadrant === 'low-unpleasant') {
         const activityMap: Record<string, string> = {
           conservation_freeze: 'gentle-movement',
           dissociation_overmodulation: 'sensory-anchor',

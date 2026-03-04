@@ -69,42 +69,42 @@ const ACTIVITIES: Record<string, ActivityDefinition> = {
       {
         instruction: 'Wiggle your toes.',
         guidance: 'Just your toes. Small movements.',
-        durationSeconds: 10,
+        durationSeconds: 5,
         visual: 'pulse',
       },
       {
         instruction: 'Now move your fingers.',
         guidance: 'Open and close, one at a time if you like.',
-        durationSeconds: 12,
+        durationSeconds: 6,
         visual: 'pulse',
       },
       {
         instruction: 'Roll your ankles in a circle.',
         guidance: 'One direction, then the other.',
-        durationSeconds: 12,
+        durationSeconds: 6,
         visual: 'ripple',
       },
       {
         instruction: 'Rub your hands together.',
         guidance: 'Feel the warmth building between your palms.',
-        durationSeconds: 12,
+        durationSeconds: 6,
         visual: 'pulse',
       },
       {
         instruction: 'Gently roll your shoulders.',
         guidance: 'Forward a few times, then backward.',
-        durationSeconds: 15,
+        durationSeconds: 7,
         visual: 'ripple',
       },
       {
         instruction: 'Take a stretch — any direction.',
         guidance: "Whatever your body wants. There's no wrong way.",
-        durationSeconds: 16,
+        durationSeconds: 8,
         visual: 'breathing_circle',
       },
     ],
     completionMessage: 'Your body is starting to come back online.',
-    estimatedSeconds: 77,
+    estimatedSeconds: 38,
   },
 
   // =====================================================
@@ -129,19 +129,19 @@ const ACTIVITIES: Record<string, ActivityDefinition> = {
       {
         instruction: 'Press your feet into the floor.',
         guidance: 'Feel the pressure. Feel the ground holding you.',
-        durationSeconds: 12,
+        durationSeconds: 6,
         visual: 'pulse',
       },
       {
         instruction: 'Rub your thumb across your fingertips.',
         guidance: 'Slowly. Notice each texture.',
-        durationSeconds: 15,
+        durationSeconds: 7,
         visual: 'ripple',
       },
       {
         instruction: 'Put your hand on your chest.',
         guidance: "Feel the warmth of your hand. You're here.",
-        durationSeconds: 15,
+        durationSeconds: 7,
         visual: 'breathing_circle',
       },
       {
@@ -152,7 +152,7 @@ const ACTIVITIES: Record<string, ActivityDefinition> = {
       },
     ],
     completionMessage: "You're a little more here now. That's real.",
-    estimatedSeconds: 64,
+    estimatedSeconds: 25,
   },
 
   // =====================================================
@@ -184,13 +184,13 @@ const ACTIVITIES: Record<string, ActivityDefinition> = {
       {
         instruction: 'Listen. What\'s the farthest sound you can hear?',
         guidance: 'Give it a few seconds. Let your ears reach out.',
-        durationSeconds: 15,
+        durationSeconds: 8,
         visual: 'ripple',
       },
       {
-        instruction: 'Count backwards from 10.',
+        instruction: 'Count backwards from 7.',
         guidance: 'Out loud or in your head. Take your time.',
-        durationSeconds: 15,
+        durationSeconds: 8,
         visual: 'count_down',
       },
       {
@@ -201,7 +201,7 @@ const ACTIVITIES: Record<string, ActivityDefinition> = {
       },
     ],
     completionMessage: 'Your attention moved. The loop loosened a little.',
-    estimatedSeconds: 75,
+    estimatedSeconds: 20,
   },
 
   // =====================================================
@@ -237,7 +237,7 @@ const ACTIVITIES: Record<string, ActivityDefinition> = {
       },
     ],
     completionMessage: "Three things done. Your brain noticed. That's how momentum starts.",
-    estimatedSeconds: 30,
+    estimatedSeconds: 10,
   },
 };
 
