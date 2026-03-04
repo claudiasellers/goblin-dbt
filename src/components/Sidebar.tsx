@@ -2,9 +2,9 @@ import { NavLink } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const navItems = [
-  { path: '/', label: 'Dashboard', icon: DashboardIcon },
-  { path: '/checkin', label: 'Check-in', icon: CheckInIcon },
+  { path: '/', label: 'Check-in', icon: CheckInIcon },
   { path: '/tools', label: 'Tools', icon: ToolsIcon },
+  { path: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
   { path: '/history', label: 'History', icon: HistoryIcon },
 ];
 

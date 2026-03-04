@@ -14,28 +14,28 @@ export function QuickCheckin() {
         {/* Quick quadrant buttons */}
         <div className="grid grid-cols-2 gap-2">
           <button
-            onClick={() => navigate('/checkin')}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-left hover:border-[var(--color-quadrant-high-unpleasant)]/40 transition-colors group"
           >
             <div className="w-2 h-2 rounded-full bg-[var(--color-quadrant-high-unpleasant)]" />
             <span className="text-xs text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)]">Stressed</span>
           </button>
           <button
-            onClick={() => navigate('/checkin')}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-left hover:border-[var(--color-quadrant-high-pleasant)]/40 transition-colors group"
           >
             <div className="w-2 h-2 rounded-full bg-[var(--color-quadrant-high-pleasant)]" />
             <span className="text-xs text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)]">Excited</span>
           </button>
           <button
-            onClick={() => navigate('/checkin')}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-left hover:border-[var(--color-quadrant-low-unpleasant)]/40 transition-colors group"
           >
             <div className="w-2 h-2 rounded-full bg-[var(--color-quadrant-low-unpleasant)]" />
             <span className="text-xs text-[var(--color-text-tertiary)] group-hover:text-[var(--color-text-secondary)]">Down</span>
           </button>
           <button
-            onClick={() => navigate('/checkin')}
+            onClick={() => navigate('/')}
             className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-left hover:border-[var(--color-quadrant-low-pleasant)]/40 transition-colors group"
           >
             <div className="w-2 h-2 rounded-full bg-[var(--color-quadrant-low-pleasant)]" />
@@ -44,7 +44,7 @@ export function QuickCheckin() {
         </div>
 
         <button
-          onClick={() => navigate('/checkin')}
+          onClick={() => navigate('/')}
           className="w-full py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] text-sm font-semibold lift-primary"
         >
           Full Check-in

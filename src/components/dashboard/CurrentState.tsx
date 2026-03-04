@@ -98,7 +98,7 @@ export function CurrentState() {
         <div className="text-center py-4">
           <p className="text-[var(--color-text-muted)] text-sm">No check-ins yet</p>
           <a
-            href="#/checkin"
+            href="#/"
             className="inline-block mt-2 text-xs font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)]"
           >
             Start your first check-in

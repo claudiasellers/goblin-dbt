@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { getCheckInsByUser, type CheckInRecord } from '../services/neo4j';
 import { quadrantColors } from '../data/emotions';
+import { HistoryInsights } from '../components/history/HistoryInsights';
 
 export function History() {
   const { user } = useAuth();
@@ -103,11 +104,14 @@ export function History() {
           </Link>
         </div>
       ) : (
+        <>
+        <HistoryInsights checkIns={checkIns} />
         <div className="space-y-4">
           {checkIns.map((checkIn) => (
             <CheckInCard key={checkIn.id} checkIn={checkIn} />
           ))}
         </div>
+        </>
       )}
     </div>
   );
