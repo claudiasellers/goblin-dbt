@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import type { DiscriminatingQuestion } from '../../services/neo4j';
 
 interface DiscriminatingQuestionsProps {
@@ -20,6 +20,7 @@ export function DiscriminatingQuestions({
   const [answers, setAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [transitioning, setTransitioning] = useState(false);
+  const shouldSkip = useRef(false);
 
   // Find the current question to display
   const getActiveQuestion = useCallback((): DiscriminatingQuestion | null => {
@@ -41,6 +42,13 @@ export function DiscriminatingQuestions({
 
   const activeQuestion = getActiveQuestion();
 
+  // Handle missing question via effect (not during render)
+  useEffect(() => {
+    if (!activeQuestion && shouldSkip.current) {
+      onSkip();
+    }
+  }, [activeQuestion, onSkip]);
+
   function handleResponseSelect(questionId: string, responseId: string) {
     const newAnswers = [...answers, { questionId, responseId }];
     setAnswers(newAnswers);
@@ -51,6 +59,7 @@ export function DiscriminatingQuestions({
 
     if (response?.triggersNextQuestionId) {
       // Transition to Q2
+      shouldSkip.current = true;
       setTransitioning(true);
       setTimeout(() => {
         setCurrentQuestionIndex(1);
@@ -63,8 +72,6 @@ export function DiscriminatingQuestions({
   }
 
   if (!activeQuestion) {
-    // Shouldn't happen, but graceful fallback
-    onSkip();
     return null;
   }
 

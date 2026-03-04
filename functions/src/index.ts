@@ -806,6 +806,11 @@ export const getStateAndTools = onCall(
       // PHASE 2: Select primary (and secondary) pattern
       // ============================================
 
+      console.log('Pattern scores after all evidence:', JSON.stringify(patternScores));
+      if (input.discriminatingAnswers) {
+        console.log('Discriminating answers received:', JSON.stringify(input.discriminatingAnswers));
+      }
+
       const sortedPatterns = Object.entries(patternScores)
         .sort(([, a], [, b]) => b - a);
 
@@ -969,6 +974,15 @@ export const getStateAndTools = onCall(
           guidedActivity = { activityId, patternId: pattern.id };
         }
       }
+
+      console.log('Returning result:', {
+        patternId: pattern.id,
+        confidence: pattern.confidence,
+        hasGuidedActivity: !!guidedActivity,
+        guidedActivity,
+        hasCoOccurrence: !!coOccurrence,
+        hasSafetyFlag: !!safetyFlag,
+      });
 
       return { pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity };
     } catch (error) {
