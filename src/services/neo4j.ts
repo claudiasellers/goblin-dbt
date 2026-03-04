@@ -146,10 +146,44 @@ export interface SafetyFlag {
   action: string;
 }
 
+export interface CoOccurrence {
+  clinicalLabel: string;
+  combinedUserFacingLabel: string;
+  primaryPatternId: string;
+  frequency: string;
+  sequencingNote: string;
+}
+
+export interface GuidedActivityRecommendation {
+  activityId: string;
+  patternId: string;
+}
+
 export interface StateResult {
   pattern: ActivationPatternResult;
   tools: ToolRecommendation[];
   safetyFlag?: SafetyFlag;
+  secondaryPattern?: ActivationPatternResult;
+  coOccurrence?: CoOccurrence;
+  guidedActivity?: GuidedActivityRecommendation;
+}
+
+export interface DiscriminatingQuestion {
+  id: string;
+  text: string;
+  subtext: string;
+  order: number;
+  required: boolean;
+  responses: DiscriminatingResponse[];
+}
+
+export interface DiscriminatingResponse {
+  id: string;
+  label: string;
+  subtext: string;
+  order: number;
+  isEscapeHatch: boolean;
+  triggersNextQuestionId?: string;
 }
 
 export interface RelatedEmotion {
@@ -165,9 +199,15 @@ const getStateAndToolsFn = httpsCallable<
     emotions?: string[];
     intensity?: { x: number; y: number };
     bodySensations?: Array<{ region: string; tags?: string[] }>;
+    discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
   },
   StateResult
 >(functions, 'getStateAndTools');
+
+const getDiscriminatingQuestionsFn = httpsCallable<
+  { quadrant: string },
+  { questions: DiscriminatingQuestion[] }
+>(functions, 'getDiscriminatingQuestions');
 
 const getRelatedEmotionsFn = httpsCallable<
   { emotionId: string; quadrant?: string },
@@ -188,9 +228,21 @@ export async function getStateAndTools(input: {
   emotions?: string[];
   intensity?: { x: number; y: number };
   bodySensations?: Array<{ region: string; tags?: string[] }>;
+  discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
 }): Promise<StateResult> {
   const result = await getStateAndToolsFn(input);
   return result.data;
+}
+
+/**
+ * Get discriminating questions for a quadrant.
+ * Used to differentiate between activation patterns within the same quadrant.
+ */
+export async function getDiscriminatingQuestions(
+  quadrant: string
+): Promise<DiscriminatingQuestion[]> {
+  const result = await getDiscriminatingQuestionsFn({ quadrant });
+  return result.data.questions;
 }
 
 /**

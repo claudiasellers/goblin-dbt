@@ -541,6 +541,33 @@ body {
   animation: stepEnter 400ms var(--ease-enter) forwards;
 }
 
+/* ── Guided Activity animations ── */
+@keyframes breathing {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.3); opacity: 0.5; }
+}
+.animate-breathing {
+  animation: breathing 4s ease-in-out infinite;
+}
+
+@keyframes ripple {
+  0% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.15); opacity: 0.15; }
+  100% { transform: scale(1); opacity: 0.3; }
+}
+.animate-ripple {
+  animation: ripple 2s ease-in-out infinite;
+}
+
+@keyframes bloom {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.2); opacity: 0.3; }
+  100% { transform: scale(1); opacity: 0.2; }
+}
+.animate-bloom {
+  animation: bloom 1.2s ease-out forwards;
+}
+
 /* ── Lift hover utilities ── */
 
 /* Quadrant buttons — bg shift + border sharpens + shadow lift */

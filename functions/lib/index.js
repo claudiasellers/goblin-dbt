@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getQuickTools = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getStateAndTools = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
+exports.getQuickTools = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getDiscriminatingQuestions = exports.getStateAndTools = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -524,7 +524,7 @@ exports.getWeeklyToolUsageCount = (0, https_1.onCall)({ secrets: [neo4jUri, neo4
  * This is the main "What's happening right now" query
  */
 exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
-    var _a, _b, _c, _d;
+    var _a, _b;
     const input = request.data;
     if (!input.quadrant) {
         throw new https_1.HttpsError('invalid-argument', 'Quadrant is required');
@@ -532,15 +532,14 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
     const session = getDriver().session();
     try {
         // Map quadrant to likely patterns with base scores
-        // This is the "minimal input" path - just from quadrant selection
         const quadrantPatternMap = {
             'high-unpleasant': ['acute_alarm', 'chronic_vigilance', 'emotional_flooding', 'social_threat_shame'],
             'low-unpleasant': ['conservation_freeze', 'dissociation_overmodulation', 'rumination_loop', 'reward_drive_low'],
-            'high-pleasant': [], // Positive states - no intervention needed
-            'low-pleasant': [], // Calm states - no intervention needed
+            'high-pleasant': [],
+            'low-pleasant': [],
         };
         const candidatePatterns = quadrantPatternMap[input.quadrant] || [];
-        // If positive quadrant, return a "you're doing well" response
+        // Positive quadrant — no intervention needed
         if (candidatePatterns.length === 0) {
             return {
                 pattern: {
@@ -555,138 +554,182 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
                 tools: [],
             };
         }
-        // Build the pattern matching query
-        // If emotions provided, match patterns associated with those emotions
-        // If not, use quadrant-based heuristics
-        let patternQuery;
-        let queryParams;
+        // ============================================
+        // PHASE 1: Build per-pattern confidence scores
+        // Start from emotion-based evidence, then layer
+        // discriminating question evidence on top.
+        // ============================================
+        // Initialize scores for all candidate patterns
+        const patternScores = {};
+        for (const pid of candidatePatterns) {
+            patternScores[pid] = 0.25; // base score
+        }
+        // --- Emotion-based scoring ---
         if (input.emotions && input.emotions.length > 0) {
-            // Convert emotion names to lowercase IDs for matching
             const emotionIds = input.emotions.map(e => e.toLowerCase().replace(/\s+/g, '_'));
-            patternQuery = `
-          // Find patterns associated with the user's reported emotions
+            const emotionQuery = `
           MATCH (p:ActivationPattern)-[r:ASSOCIATED_WITH]->(e:Emotion)
           WHERE p.id IN $candidatePatterns
             AND e.id IN $emotionIds
-          WITH p, count(r) as emotionMatches, collect(r.strength) as strengths
-          
-          // Calculate confidence based on emotion matches and strength
-          WITH p, emotionMatches,
-               CASE 
-                 WHEN 'strong' IN strengths THEN 0.3
-                 WHEN 'moderate' IN strengths THEN 0.2
-                 ELSE 0.1
-               END as strengthBonus
-          
-          // Get pattern details
-          RETURN p.id as id,
-                 p.userFacingLabel as userFacingLabel,
-                 p.description as description,
-                 p.evidenceGrade as evidenceGrade,
-                 p.safetyConstraints as safetyConstraints,
-                 p.clinicalNotes as clinicalNotes,
-                 (toFloat(emotionMatches) / $emotionCount + strengthBonus) as confidence
-          ORDER BY confidence DESC
-          LIMIT 1
+          WITH p.id as patternId, count(r) as matches, collect(r.strength) as strengths
+          RETURN patternId, matches,
+                 CASE
+                   WHEN 'strong' IN strengths THEN 0.3
+                   WHEN 'moderate' IN strengths THEN 0.2
+                   ELSE 0.1
+                 END as strengthBonus
         `;
-            queryParams = {
+            const emotionResult = await session.run(emotionQuery, {
                 candidatePatterns,
                 emotionIds,
-                emotionCount: emotionIds.length,
-            };
+            });
+            for (const rec of emotionResult.records) {
+                const pid = rec.get('patternId');
+                const matches = rec.get('matches');
+                const matchCount = typeof matches === 'object' && matches.toNumber ? matches.toNumber() : Number(matches);
+                const bonus = rec.get('strengthBonus');
+                const strengthBonus = typeof bonus === 'object' && bonus.toNumber ? bonus.toNumber() : Number(bonus);
+                patternScores[pid] = (patternScores[pid] || 0) +
+                    (matchCount / emotionIds.length) * 0.4 + strengthBonus;
+            }
         }
         else {
-            // No emotions provided - use intensity-based heuristics
-            // High intensity + high-unpleasant → more likely acute_alarm or emotional_flooding
-            // Low intensity + low-unpleasant → more likely conservation_freeze or reward_drive_low
+            // No emotions — use intensity heuristic
             const intensityY = (_b = (_a = input.intensity) === null || _a === void 0 ? void 0 : _a.y) !== null && _b !== void 0 ? _b : 0.5;
-            patternQuery = `
-          MATCH (p:ActivationPattern)
-          WHERE p.id IN $candidatePatterns
-          WITH p,
-               CASE 
-                 WHEN $intensityY > 0.7 AND p.id IN ['acute_alarm', 'emotional_flooding'] THEN 0.8
-                 WHEN $intensityY > 0.7 AND p.id IN ['chronic_vigilance', 'social_threat_shame'] THEN 0.6
-                 WHEN $intensityY < 0.3 AND p.id IN ['conservation_freeze', 'reward_drive_low'] THEN 0.8
-                 WHEN $intensityY < 0.3 AND p.id IN ['dissociation_overmodulation', 'rumination_loop'] THEN 0.6
-                 ELSE 0.5
-               END as confidence
-          RETURN p.id as id,
-                 p.userFacingLabel as userFacingLabel,
-                 p.description as description,
-                 p.evidenceGrade as evidenceGrade,
-                 p.safetyConstraints as safetyConstraints,
-                 p.clinicalNotes as clinicalNotes,
-                 confidence
-          ORDER BY confidence DESC
-          LIMIT 1
+            for (const pid of candidatePatterns) {
+                if (intensityY > 0.7 && ['acute_alarm', 'emotional_flooding'].includes(pid)) {
+                    patternScores[pid] += 0.3;
+                }
+                else if (intensityY > 0.7 && ['chronic_vigilance', 'social_threat_shame'].includes(pid)) {
+                    patternScores[pid] += 0.15;
+                }
+                else if (intensityY < 0.3 && ['conservation_freeze', 'reward_drive_low'].includes(pid)) {
+                    patternScores[pid] += 0.3;
+                }
+                else if (intensityY < 0.3 && ['dissociation_overmodulation', 'rumination_loop'].includes(pid)) {
+                    patternScores[pid] += 0.15;
+                }
+            }
+        }
+        // --- Discriminating question evidence (weighted ~2x emotion evidence) ---
+        if (input.discriminatingAnswers && input.discriminatingAnswers.length > 0) {
+            const responseIds = input.discriminatingAnswers.map(a => a.responseId);
+            const evidenceQuery = `
+          MATCH (r:QuestionResponse)-[e:EVIDENCE_FOR]->(p:ActivationPattern)
+          WHERE r.id IN $responseIds
+            AND p.id IN $candidatePatterns
+          RETURN p.id as patternId, sum(e.weight) as totalWeight
         `;
-            queryParams = {
+            const evidenceResult = await session.run(evidenceQuery, {
+                responseIds,
                 candidatePatterns,
-                intensityY,
-            };
+            });
+            for (const rec of evidenceResult.records) {
+                const pid = rec.get('patternId');
+                const weight = rec.get('totalWeight');
+                const totalWeight = typeof weight === 'object' && weight.toNumber ? weight.toNumber() : Number(weight);
+                // Weight discriminating evidence at ~2x
+                patternScores[pid] = (patternScores[pid] || 0) + totalWeight * 2.0;
+            }
         }
-        let patternResult = await session.run(patternQuery, queryParams);
-        // If emotion-matching found nothing, fall back to intensity-based heuristics
-        if (patternResult.records.length === 0 && input.emotions && input.emotions.length > 0) {
-            const intensityY = (_d = (_c = input.intensity) === null || _c === void 0 ? void 0 : _c.y) !== null && _d !== void 0 ? _d : 0.5;
-            const fallbackQuery = `
-          MATCH (p:ActivationPattern)
-          WHERE p.id IN $candidatePatterns
-          WITH p,
-               CASE 
-                 WHEN $intensityY > 0.7 AND p.id IN ['acute_alarm', 'emotional_flooding'] THEN 0.8
-                 WHEN $intensityY > 0.7 AND p.id IN ['chronic_vigilance', 'social_threat_shame'] THEN 0.6
-                 WHEN $intensityY < 0.3 AND p.id IN ['conservation_freeze', 'reward_drive_low'] THEN 0.8
-                 WHEN $intensityY < 0.3 AND p.id IN ['dissociation_overmodulation', 'rumination_loop'] THEN 0.6
-                 ELSE 0.5
-               END as confidence
-          RETURN p.id as id,
-                 p.userFacingLabel as userFacingLabel,
-                 p.description as description,
-                 p.evidenceGrade as evidenceGrade,
-                 p.safetyConstraints as safetyConstraints,
-                 p.clinicalNotes as clinicalNotes,
-                 confidence
-          ORDER BY confidence DESC
+        // ============================================
+        // PHASE 2: Select primary (and secondary) pattern
+        // ============================================
+        const sortedPatterns = Object.entries(patternScores)
+            .sort(([, a], [, b]) => b - a);
+        const primaryId = sortedPatterns[0][0];
+        const primaryScore = sortedPatterns[0][1];
+        const secondaryId = sortedPatterns.length > 1 ? sortedPatterns[1][0] : null;
+        const secondaryScore = sortedPatterns.length > 1 ? sortedPatterns[1][1] : 0;
+        // Fetch primary pattern details
+        const patternDetailQuery = `
+        MATCH (p:ActivationPattern {id: $patternId})
+        RETURN p.id as id,
+               p.userFacingLabel as userFacingLabel,
+               p.description as description,
+               p.evidenceGrade as evidenceGrade,
+               p.safetyConstraints as safetyConstraints,
+               p.clinicalNotes as clinicalNotes
+      `;
+        const primaryResult = await session.run(patternDetailQuery, { patternId: primaryId });
+        if (primaryResult.records.length === 0) {
+            throw new https_1.HttpsError('not-found', `No matching pattern found for quadrant: ${input.quadrant}`);
+        }
+        const pRec = primaryResult.records[0];
+        let pattern = {
+            id: pRec.get('id'),
+            userFacingLabel: pRec.get('userFacingLabel'),
+            description: pRec.get('description'),
+            evidenceGrade: pRec.get('evidenceGrade'),
+            safetyConstraints: pRec.get('safetyConstraints') || [],
+            clinicalNotes: pRec.get('clinicalNotes') || '',
+            confidence: Math.min(primaryScore, 1.0),
+        };
+        // ============================================
+        // PHASE 3: Co-occurrence detection
+        // ============================================
+        let secondaryPattern;
+        let coOccurrence;
+        if (secondaryId && secondaryScore > 0.35) {
+            // Check for CO_OCCURS_WITH relationship (bidirectional check)
+            const coQuery = `
+          MATCH (p1:ActivationPattern {id: $pid1})-[r:CO_OCCURS_WITH]-(p2:ActivationPattern {id: $pid2})
+          RETURN r.clinicalLabel as clinicalLabel,
+                 r.combinedUserFacingLabel as combinedUserFacingLabel,
+                 r.primaryPatternId as primaryPatternId,
+                 r.frequency as frequency,
+                 r.sequencingNote as sequencingNote
           LIMIT 1
         `;
-            patternResult = await session.run(fallbackQuery, { candidatePatterns, intensityY });
+            const coResult = await session.run(coQuery, { pid1: primaryId, pid2: secondaryId });
+            if (coResult.records.length > 0) {
+                const coRec = coResult.records[0];
+                const graphPrimaryId = coRec.get('primaryPatternId');
+                coOccurrence = {
+                    clinicalLabel: coRec.get('clinicalLabel'),
+                    combinedUserFacingLabel: coRec.get('combinedUserFacingLabel'),
+                    primaryPatternId: graphPrimaryId,
+                    frequency: coRec.get('frequency'),
+                    sequencingNote: coRec.get('sequencingNote'),
+                };
+                // Fetch secondary pattern details
+                const secResult = await session.run(patternDetailQuery, { patternId: secondaryId });
+                if (secResult.records.length > 0) {
+                    const sRec = secResult.records[0];
+                    secondaryPattern = {
+                        id: sRec.get('id'),
+                        userFacingLabel: sRec.get('userFacingLabel'),
+                        description: sRec.get('description'),
+                        evidenceGrade: sRec.get('evidenceGrade'),
+                        safetyConstraints: sRec.get('safetyConstraints') || [],
+                        clinicalNotes: sRec.get('clinicalNotes') || '',
+                        confidence: Math.min(secondaryScore, 1.0),
+                    };
+                }
+                // Swap primary/secondary if the graph says to
+                if (graphPrimaryId !== primaryId && secondaryPattern) {
+                    const temp = pattern;
+                    pattern = Object.assign(Object.assign({}, secondaryPattern), { confidence: Math.min(primaryScore, 1.0) });
+                    secondaryPattern = Object.assign(Object.assign({}, temp), { confidence: Math.min(secondaryScore, 1.0) });
+                }
+            }
         }
-        if (patternResult.records.length === 0) {
-            console.error('No patterns found. Searched for:', candidatePatterns, 'Quadrant:', input.quadrant);
-            throw new https_1.HttpsError('not-found', `No matching pattern found for quadrant: ${input.quadrant}. Patterns searched: ${candidatePatterns.join(', ')}`);
-        }
-        const record = patternResult.records[0];
-        const pattern = {
-            id: record.get('id'),
-            userFacingLabel: record.get('userFacingLabel'),
-            description: record.get('description'),
-            evidenceGrade: record.get('evidenceGrade'),
-            safetyConstraints: record.get('safetyConstraints') || [],
-            clinicalNotes: record.get('clinicalNotes') || '',
-            confidence: record.get('confidence'),
-        };
-        // Now get recommended tools for this pattern
-        // Tools are linked via TherapyConcept → ADDRESSES/REDUCES → Emotion ← ASSOCIATED_WITH ← Pattern
+        // ============================================
+        // PHASE 4: Get recommended tools
+        // ============================================
         const toolsQuery = `
-        // Find emotions associated with this pattern
         MATCH (p:ActivationPattern {id: $patternId})-[:ASSOCIATED_WITH]->(e:Emotion)
-        
-        // Find therapy concepts that address these emotions
         MATCH (tc:TherapyConcept)-[r:ADDRESSES|REDUCES|TARGETS]->(e)
         WHERE tc.id STARTS WITH 'dbt_'
-        
         WITH tc, count(DISTINCT e) as relevanceScore
         ORDER BY relevanceScore DESC
         LIMIT 2
-        
         RETURN tc.id as id,
                tc.name as name,
                tc.description as description,
                tc.whenToUse as whenToUse,
                tc.dbtBasis as dbtBasis,
-               CASE 
+               CASE
                  WHEN relevanceScore > 2 THEN 'high'
                  WHEN relevanceScore > 1 THEN 'medium'
                  ELSE 'relevant'
@@ -701,7 +744,9 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
             dbtBasis: rec.get('dbtBasis'),
             relevance: rec.get('relevance'),
         }));
-        // Check for safety flags
+        // ============================================
+        // PHASE 5: Safety flags
+        // ============================================
         const safetyQuery = `
         MATCH (p:ActivationPattern {id: $patternId})-[:TRIGGERS_SAFETY]->(sf:SafetyFlag)
         RETURN sf.id as id, sf.type as type, sf.trigger as trigger, sf.action as action
@@ -714,10 +759,26 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
             trigger: safetyResult.records[0].get('trigger'),
             action: safetyResult.records[0].get('action'),
         } : undefined;
-        return { pattern, tools, safetyFlag };
+        // ============================================
+        // PHASE 6: Guided activity mapping (low-unpleasant only)
+        // Safety flag overrides — omit guided activity if present
+        // ============================================
+        let guidedActivity;
+        if (input.quadrant === 'low-unpleasant' && !safetyFlag) {
+            const activityMap = {
+                conservation_freeze: 'gentle-movement',
+                dissociation_overmodulation: 'sensory-anchor',
+                rumination_loop: 'attention-shift',
+                reward_drive_low: 'micro-win',
+            };
+            const activityId = activityMap[pattern.id];
+            if (activityId) {
+                guidedActivity = { activityId, patternId: pattern.id };
+            }
+        }
+        return { pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity };
     }
     catch (error) {
-        // Enhanced error logging for debugging
         const errorMessage = error instanceof Error ? error.message : String(error);
         const errorStack = error instanceof Error ? error.stack : '';
         console.error('Error getting state and tools:', {
@@ -726,11 +787,75 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
             quadrant: input.quadrant,
             emotions: input.emotions,
         });
-        // Re-throw HttpsError as-is, wrap others
         if (error instanceof https_1.HttpsError) {
             throw error;
         }
         throw new https_1.HttpsError('internal', `Failed to analyze emotional state: ${errorMessage}`);
+    }
+    finally {
+        await session.close();
+    }
+});
+/**
+ * Get discriminating questions for a quadrant.
+ * Returns questions with their responses and conditional flow (TRIGGERS_NEXT).
+ */
+exports.getDiscriminatingQuestions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    const { quadrant } = request.data;
+    if (!quadrant) {
+        throw new https_1.HttpsError('invalid-argument', 'Quadrant is required');
+    }
+    const session = getDriver().session();
+    try {
+        const query = `
+        MATCH (q:DiscriminatingQuestion)-[hr:HAS_RESPONSE]->(r:QuestionResponse)
+        WHERE $quadrant IN q.applicableQuadrants
+        OPTIONAL MATCH (r)-[:TRIGGERS_NEXT]->(nextQ:DiscriminatingQuestion)
+        RETURN q.id as questionId,
+               q.text as questionText,
+               q.subtext as questionSubtext,
+               q.order as questionOrder,
+               q.required as questionRequired,
+               r.id as responseId,
+               r.label as responseLabel,
+               r.subtext as responseSubtext,
+               r.order as responseOrder,
+               r.isEscapeHatch as isEscapeHatch,
+               nextQ.id as triggersNextQuestionId
+        ORDER BY q.order, r.order
+      `;
+        const result = await session.run(query, { quadrant });
+        // Group by question
+        const questionsMap = new Map();
+        for (const rec of result.records) {
+            const qId = rec.get('questionId');
+            if (!questionsMap.has(qId)) {
+                questionsMap.set(qId, {
+                    id: qId,
+                    text: rec.get('questionText'),
+                    subtext: rec.get('questionSubtext'),
+                    order: typeof rec.get('questionOrder') === 'object'
+                        ? rec.get('questionOrder').toNumber()
+                        : Number(rec.get('questionOrder')),
+                    required: rec.get('questionRequired'),
+                    responses: [],
+                });
+            }
+            const nextQId = rec.get('triggersNextQuestionId');
+            questionsMap.get(qId).responses.push(Object.assign({ id: rec.get('responseId'), label: rec.get('responseLabel'), subtext: rec.get('responseSubtext'), order: typeof rec.get('responseOrder') === 'object'
+                    ? rec.get('responseOrder').toNumber()
+                    : Number(rec.get('responseOrder')), isEscapeHatch: rec.get('isEscapeHatch') }, (nextQId ? { triggersNextQuestionId: nextQId } : {})));
+        }
+        const questions = Array.from(questionsMap.values())
+            .sort((a, b) => a.order - b.order);
+        return { questions };
+    }
+    catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error('Error getting discriminating questions:', errorMessage);
+        if (error instanceof https_1.HttpsError)
+            throw error;
+        throw new https_1.HttpsError('internal', `Failed to get discriminating questions: ${errorMessage}`);
     }
     finally {
         await session.close();

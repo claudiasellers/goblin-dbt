@@ -6,12 +6,16 @@ import { EmotionGrid } from '../components/checkin/EmotionGrid';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
 import { StateResult } from '../components/checkin/StateResult';
+import { LowEnergyStateResult } from '../components/checkin/LowEnergyStateResult';
 import { EmotionSuggestion } from '../components/checkin/EmotionSuggestion';
-import { 
-  saveCheckIn, 
-  ensureUserExists, 
+import { DiscriminatingQuestions } from '../components/checkin/DiscriminatingQuestions';
+import {
+  saveCheckIn,
+  ensureUserExists,
   getStateAndTools,
-  type StateResult as StateResultType 
+  getDiscriminatingQuestions,
+  type StateResult as StateResultType,
+  type DiscriminatingQuestion,
 } from '../services/neo4j';
 
 type EntryPoint = 'standard' | 'somatic';
@@ -19,6 +23,7 @@ type EntryPoint = 'standard' | 'somatic';
 type CheckInStep =
   | 'quadrant'
   | 'emotion'
+  | 'discriminating'
   | 'body'
   | 'sensation'
   | 'suggestion'
@@ -60,6 +65,8 @@ export function CheckIn() {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
+  const [discriminatingQuestions, setDiscriminatingQuestions] = useState<DiscriminatingQuestion[]>([]);
+  const [discriminatingAnswers, setDiscriminatingAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
 
   // If not logged in, show prompt
   if (!user) {
@@ -95,11 +102,12 @@ export function CheckIn() {
    * Accepts optional overrides so callers that just called setState
    * (which won't have flushed yet) can pass the fresh values directly.
    */
-  async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[] }) {
+  async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[]; discAnswers?: Array<{ questionId: string; responseId: string }> }) {
     const quadrant = overrides?.quadrant ?? checkInData.quadrant;
     const emotions = overrides?.emotions ?? checkInData.emotions;
+    const discAnsw = overrides?.discAnswers ?? discriminatingAnswers;
     if (!quadrant) return;
-    
+
     setStep('analyzing');
     setAnalyzeError(null);
 
@@ -108,9 +116,10 @@ export function CheckIn() {
         quadrant,
         emotions: emotions.length > 0 ? emotions : undefined,
         intensity: checkInData.intensity || undefined,
-        bodySensations: checkInData.bodySensations.length > 0 
+        bodySensations: checkInData.bodySensations.length > 0
           ? checkInData.bodySensations.map(s => ({ region: s.region, tags: s.tags }))
           : undefined,
+        discriminatingAnswers: discAnsw.length > 0 ? discAnsw : undefined,
       });
       
       setStateResult(result);
@@ -190,8 +199,32 @@ export function CheckIn() {
     analyzeAndShowResult({ quadrant });
   }
 
-  function handleEmotionSelect(emotions: string[]) {
+  async function handleEmotionSelect(emotions: string[]) {
     setCheckInData(prev => ({ ...prev, emotions }));
+
+    // For low-unpleasant, try to fetch discriminating questions
+    if (checkInData.quadrant === 'low-unpleasant') {
+      try {
+        const questions = await getDiscriminatingQuestions('low-unpleasant');
+        if (questions.length > 0) {
+          setDiscriminatingQuestions(questions);
+          setStep('discriminating');
+          return;
+        }
+      } catch (err) {
+        console.error('Failed to fetch discriminating questions, skipping:', err);
+      }
+    }
+
+    setStep('body');
+  }
+
+  function handleDiscriminatingComplete(answers: Array<{ questionId: string; responseId: string }>) {
+    setDiscriminatingAnswers(answers);
+    setStep('body');
+  }
+
+  function handleDiscriminatingSkip() {
     setStep('body');
   }
 
@@ -282,6 +315,8 @@ export function CheckIn() {
     setStateResult(null);
     setAnalyzeError(null);
     setEntryPoint('standard');
+    setDiscriminatingQuestions([]);
+    setDiscriminatingAnswers([]);
     setStep('quadrant');
   }
 
@@ -290,10 +325,15 @@ export function CheckIn() {
       case 'emotion':
         setStep('quadrant');
         break;
+      case 'discriminating':
+        setStep('emotion');
+        break;
       case 'body':
         if (entryPoint === 'somatic') {
           setEntryPoint('standard');
           setStep('quadrant');
+        } else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') {
+          setStep('discriminating');
         } else {
           setStep('emotion');
         }
@@ -316,7 +356,9 @@ export function CheckIn() {
 
   const stepOrder = entryPoint === 'somatic'
     ? ['body', 'suggestion']
-    : ['quadrant', 'emotion', 'body'];
+    : discriminatingQuestions.length > 0
+      ? ['quadrant', 'emotion', 'discriminating', 'body']
+      : ['quadrant', 'emotion', 'body'];
   const currentStepIndex = stepOrder.indexOf(step);
   const showProgress = currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
 
@@ -400,6 +442,14 @@ export function CheckIn() {
           />
         )}
 
+        {step === 'discriminating' && discriminatingQuestions.length > 0 && (
+          <DiscriminatingQuestions
+            questions={discriminatingQuestions}
+            onComplete={handleDiscriminatingComplete}
+            onSkip={handleDiscriminatingSkip}
+          />
+        )}
+
         {step === 'sensation' && currentSensation && (
           <SensationDetails
             x={currentSensation.x!}
@@ -421,17 +471,29 @@ export function CheckIn() {
         )}
 
         {step === 'result' && stateResult && (
-          <StateResult
-            result={stateResult}
-            onDone={handleResultDone}
-            onAddMoreDetail={
-              // Only show "add more detail" if they haven't completed all steps
-              (!checkInData.emotions.length || !checkInData.bodySensations.length)
-                ? handleAddMoreDetail
-                : undefined
-            }
-            checkinEmotions={checkInData.emotions}
-          />
+          stateResult.guidedActivity && checkInData.quadrant === 'low-unpleasant' ? (
+            <LowEnergyStateResult
+              result={stateResult}
+              onDone={handleResultDone}
+              onAddMoreDetail={
+                (!checkInData.emotions.length || !checkInData.bodySensations.length)
+                  ? handleAddMoreDetail
+                  : undefined
+              }
+              checkinEmotions={checkInData.emotions}
+            />
+          ) : (
+            <StateResult
+              result={stateResult}
+              onDone={handleResultDone}
+              onAddMoreDetail={
+                (!checkInData.emotions.length || !checkInData.bodySensations.length)
+                  ? handleAddMoreDetail
+                  : undefined
+              }
+              checkinEmotions={checkInData.emotions}
+            />
+          )
         )}
 
         {step === 'saving' && (
