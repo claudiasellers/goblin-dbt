@@ -4,20 +4,43 @@ import { tools as toolsData } from '../../data/tools';
 import type { FormulationInsight } from '../../services/neo4j';
 
 interface Props {
-  formulation: FormulationInsight;
+  formulation: FormulationInsight | null;
+  totalCheckIns: number;
   delay?: number;
 }
 
-export function FormulationCard({ formulation, delay = 0 }: Props) {
+export function FormulationCard({ formulation, totalCheckIns, delay = 0 }: Props) {
+  const cardClass =
+    'rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-7 shadow-sm';
+
+  if (!formulation) {
+    const needsMoreData = totalCheckIns < 1;
+    return (
+      <div className={cardClass} style={{ animation: `fadeIn 0.5s var(--ease-default) ${delay}s both` }}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-[var(--color-bg-elevated)] flex items-center justify-center text-lg">
+            🧠
+          </div>
+          <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+            Your pattern
+          </span>
+        </div>
+        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+          {needsMoreData
+            ? "Once you check in, patterns in your nervous system will start to show up here — what it tends to do, and why certain tools help."
+            : "Your recent check-ins don't show a dominant pattern right now. That's not a bad thing — it can mean your nervous system is responding to different situations in different ways."}
+        </p>
+      </div>
+    );
+  }
+
   const patternMeta = activationPatterns[formulation.primaryPatternId];
   const emoji = patternMeta?.emoji || '🧠';
 
   return (
     <div
-      className="rounded-2xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-7 shadow-sm"
-      style={{
-        animation: `fadeIn 0.5s var(--ease-default) ${delay}s both`,
-      }}
+      className={cardClass}
+      style={{ animation: `fadeIn 0.5s var(--ease-default) ${delay}s both` }}
     >
       {/* Icon + label */}
       <div className="flex items-center gap-3 mb-4">

@@ -32,43 +32,23 @@ export function Insights() {
   }, [user]);
 
   if (loading) return <InsightSkeleton />;
-
-  // Show empty state if no meaningful data
-  const hasContent = data && (
-    data.formulation ||
-    data.proactiveAlert ||
-    data.growthEvidence ||
-    data.somaticCorrelation ||
-    data.toolEffectiveness
-  );
-
-  if (!hasContent) return <InsightEmptyState />;
+  if (!user || !data) return <InsightEmptyState />;
 
   let delayIndex = 0;
   const nextDelay = () => (delayIndex++) * 0.07;
 
   return (
     <div className="space-y-4">
-      {data.formulation && (
-        <FormulationCard formulation={data.formulation} delay={nextDelay()} />
-      )}
+      <FormulationCard formulation={data.formulation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
 
       {data.proactiveAlert && (
         <ProactiveAlert alert={data.proactiveAlert} delay={nextDelay()} />
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {data.growthEvidence && (
-          <GrowthEvidence data={data.growthEvidence} delay={nextDelay()} />
-        )}
-
-        {data.somaticCorrelation && (
-          <SomaticCorrelation data={data.somaticCorrelation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
-        )}
-
-        {data.toolEffectiveness && (
-          <ToolEffectiveness data={data.toolEffectiveness} delay={nextDelay()} />
-        )}
+        <GrowthEvidence data={data.growthEvidence} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
+        <SomaticCorrelation data={data.somaticCorrelation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
+        <ToolEffectiveness data={data.toolEffectiveness} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
       </div>
     </div>
   );

@@ -43,12 +43,41 @@ function capitalize(s: string) {
 }
 
 interface Props {
-  data: SomaticCorrelationData;
+  data: SomaticCorrelationData | null;
   totalCheckIns?: number;
   delay?: number;
 }
 
 export function SomaticCorrelation({ data, totalCheckIns, delay = 0 }: Props) {
+  const cardClass =
+    'rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-6';
+
+  if (!data) {
+    return (
+      <div
+        className={cardClass}
+        style={{ animation: `fadeIn 0.5s var(--ease-default) ${delay}s both` }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <div
+              className="w-2 h-2 rounded-full"
+              style={{ background: 'var(--color-text-muted)' }}
+            />
+            <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+              Body signal
+            </p>
+          </div>
+        </div>
+        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+          {(totalCheckIns ?? 0) < 2
+            ? "When you tag body sensations during check-ins, patterns will show up here — like which regions light up before certain emotional states."
+            : "No strong body-emotion connections yet. Try tagging where you feel things in your body during check-ins — the signal builds over time."}
+        </p>
+      </div>
+    );
+  }
+
   const topCorrelations = data.correlations.slice(0, 3);
   // Build the narrative text
   const patternId = topCorrelations[0]?.patternId;
@@ -69,10 +98,8 @@ export function SomaticCorrelation({ data, totalCheckIns, delay = 0 }: Props) {
 
   return (
     <div
-      className="rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-6"
-      style={{
-        animation: `fadeIn 0.5s var(--ease-default) ${delay}s both`,
-      }}
+      className={cardClass}
+      style={{ animation: `fadeIn 0.5s var(--ease-default) ${delay}s both` }}
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
