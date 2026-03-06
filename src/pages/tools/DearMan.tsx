@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { getDearManContent, saveDearManSession } from '../../services/neo4j';
-import type { DearManContentResult } from '../../data/dearManTypes';
+import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
+import type { DearManContentResult, DearManDebriefContentResult, DearManReflectionResult } from '../../data/dearManTypes';
+import type { StateResult as StateResultType } from '../../services/neo4j';
+import { getEmotionByName } from '../../data/emotions';
+import { getToolById } from '../../data/tools';
 
 type Phase =
   | 'entry'
@@ -14,9 +17,19 @@ type Phase =
   | 'confident'
   | 'negotiate'
   | 'summary'
-  | 'debrief-intro'
-  | 'debrief-review'
-  | 'complete';
+  | 'debrief-checkin'
+  | 'debrief-who'
+  | 'debrief-overall'
+  | 'debrief-moment'
+  | 'debrief-response'
+  | 'debrief-body'
+  | 'debrief-thought'
+  | 'debrief-underneath'
+  | 'debrief-reflection'
+  | 'debrief-cope-select'
+  | 'debrief-rehearsal'
+  | 'debrief-moment-plan'
+  | 'debrief-route';
 
 // UI-only labels (not therapeutic content)
 const relationshipTypes = [
@@ -93,8 +106,23 @@ export function DearMan() {
 
   // ── Debrief data ──
   const [debriefOverall, setDebriefOverall] = useState<string | null>(null);
-  const [debriefWentWell, setDebriefWentWell] = useState<string[]>([]);
-  const [debriefToChange, setDebriefToChange] = useState<string[]>([]);
+
+  // ── Debrief chain analysis data ──
+  const [debriefContent, setDebriefContent] = useState<DearManDebriefContentResult | null>(null);
+  const [debriefCurrentFeelings, setDebriefCurrentFeelings] = useState<string[]>([]);
+  const [debriefRelationshipType, setDebriefRelationshipType] = useState<string | null>(null);
+  const [turningPointIds, setTurningPointIds] = useState<string[]>([]);
+  const [momentResponseIds, setMomentResponseIds] = useState<string[]>([]);
+  const [bodySignalIds, setBodySignalIds] = useState<string[]>([]);
+  const [thoughtPatternIds, setThoughtPatternIds] = useState<string[]>([]);
+  const [thoughtCustom, setThoughtCustom] = useState('');
+  const [underneathIds, setUnderneathIds] = useState<string[]>([]);
+  const [reflectionData, setReflectionData] = useState<DearManReflectionResult | null>(null);
+  const [selectedCopeAheadId, setSelectedCopeAheadId] = useState<string | null>(null);
+  const [reflectionLanded, setReflectionLanded] = useState<'yes' | 'sort_of' | 'not_really' | null>(null);
+  const [debriefSaving, setDebriefSaving] = useState(false);
+  const [debriefSaved, setDebriefSaved] = useState(false);
+  const [stateResult, setStateResult] = useState<StateResultType | null>(null);
 
   // ── UI state ──
   const [saving, setSaving] = useState(false);
@@ -118,6 +146,45 @@ export function DearMan() {
       if (matchedIds.length) setFeelings(matchedIds);
     }
   }, [content, checkinEmotions]);
+
+  // ── Resolve quadrant from debrief feelings and trigger analysis ──
+  useEffect(() => {
+    if (phase !== 'debrief-route' || stateResult || !debriefCurrentFeelings.length || !content) return;
+
+    // Resolve majority quadrant from selected feelings
+    const counts: Record<string, number> = {};
+    for (const id of debriefCurrentFeelings) {
+      const label = content.feelingChips.find((f: { id: string; label: string }) => f.id === id)?.label;
+      if (label) {
+        const emotion = getEmotionByName(label);
+        if (emotion) counts[emotion.quadrant] = (counts[emotion.quadrant] || 0) + 1;
+      }
+    }
+    const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+    const quadrant = sorted[0]?.[0] || 'high-unpleasant';
+
+    const emotionIds = debriefCurrentFeelings
+      .map(id => content.feelingChips.find((f: { id: string; label: string }) => f.id === id)?.label?.toLowerCase())
+      .filter((l): l is string => Boolean(l));
+
+    // Get recommendations
+    getStateAndTools({ quadrant, emotions: emotionIds })
+      .then(result => {
+        setStateResult(result);
+        // Save check-in with activation pattern
+        saveCheckIn('', {
+          emotion: emotionIds.join(', '),
+          quadrant,
+          intensity: { x: 0.5, y: 0.5 },
+          bodySensations: [],
+          note: 'From DEAR MAN debrief',
+          timestamp: new Date(),
+          activationPatternId: result.pattern?.id,
+          confidence: result.pattern?.confidence,
+        }).catch(() => {});
+      })
+      .catch(() => {});
+  }, [phase]);
 
   // ── Loading / Error states ──
   if (loading) {
@@ -152,7 +219,19 @@ export function DearMan() {
       case 'confident': setPhase('mindful'); break;
       case 'negotiate': setPhase('confident'); break;
       case 'summary': setPhase('negotiate'); break;
-      case 'debrief-review': setPhase('debrief-intro'); break;
+      case 'debrief-checkin': setPhase('entry'); break;
+      case 'debrief-who': setPhase('debrief-checkin'); break;
+      case 'debrief-overall': setPhase('debrief-who'); break;
+      case 'debrief-moment': setPhase('debrief-overall'); break;
+      case 'debrief-response': setPhase('debrief-moment'); break;
+      case 'debrief-body': setPhase('debrief-response'); break;
+      case 'debrief-thought': setPhase('debrief-body'); break;
+      case 'debrief-underneath': setPhase('debrief-thought'); break;
+      case 'debrief-reflection': setPhase('debrief-underneath'); break;
+      case 'debrief-cope-select': setPhase('debrief-reflection'); break;
+      case 'debrief-rehearsal': setPhase('debrief-cope-select'); break;
+      case 'debrief-moment-plan': setPhase('debrief-rehearsal'); break;
+      case 'debrief-route': setPhase('debrief-moment-plan'); break;
     }
   };
 
@@ -318,7 +397,13 @@ export function DearMan() {
     setAnchorPhrase('');
     setMiddleGroundId(null); setMiddleGroundCustom(''); setShowMiddleGroundCustom(false);
     setWalkAwayId(null); setWalkAwayCustom(''); setShowWalkAwayCustom(false);
-    setDebriefOverall(null); setDebriefWentWell([]); setDebriefToChange([]);
+    setDebriefOverall(null);
+    setDebriefCurrentFeelings([]); setDebriefRelationshipType(null);
+    setTurningPointIds([]); setMomentResponseIds([]);
+    setBodySignalIds([]); setThoughtPatternIds([]); setThoughtCustom('');
+    setUnderneathIds([]); setReflectionData(null);
+    setSelectedCopeAheadId(null); setReflectionLanded(null);
+    setDebriefSaving(false); setDebriefSaved(false);
     setSaved(false);
   };
 
@@ -341,7 +426,12 @@ export function DearMan() {
           </p>
         </button>
         <button
-          onClick={() => setPhase('debrief-intro')}
+          onClick={() => {
+            if (!debriefContent) {
+              getDearManDebriefContent().then(setDebriefContent).catch(() => {});
+            }
+            setPhase('debrief-checkin');
+          }}
           className="w-full text-left p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] cursor-pointer transition-colors"
         >
           <p className="font-medium text-[var(--color-text-primary)]">
@@ -917,7 +1007,12 @@ export function DearMan() {
           </details>
         )}
 
-        <button onClick={() => setPhase('debrief-intro')}
+        <button onClick={() => {
+            if (!debriefContent) {
+              getDearManDebriefContent().then(setDebriefContent).catch(() => {});
+            }
+            setPhase('debrief-checkin');
+          }}
           className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
           After the conversation &rarr; How did it go?
         </button>
@@ -925,15 +1020,151 @@ export function DearMan() {
     );
   }
 
-  // ─── DEBRIEF INTRO ───
-  if (phase === 'debrief-intro') {
+  // ─── Helper: resolve labels from debrief content ───
+  const resolveBodySignalLabel = (id: string) =>
+    debriefContent?.bodySignals.find(b => b.id === id)?.label ?? '';
+  const resolveThoughtLabel = () => {
+    const labels = thoughtPatternIds
+      .filter(id => id !== 'thought_something_else')
+      .map(id => debriefContent?.thoughtPatterns.find(t => t.id === id)?.label)
+      .filter(Boolean);
+    if (thoughtPatternIds.includes('thought_something_else') && thoughtCustom) {
+      labels.push(thoughtCustom);
+    }
+    return labels.join(', ') || '';
+  };
+  const resolveCopeAheadLabel = () =>
+    reflectionData?.copeAheadOptions.find(c => c.id === selectedCopeAheadId)?.label ?? '';
+
+  const handleDebriefSave = async () => {
+    setDebriefSaving(true);
+    try {
+      await saveDearManSession({
+        type: 'debrief',
+        relationshipType: debriefRelationshipType || '',
+        situationType: '',
+        priorities: [],
+        barriers: [],
+        describeId: null,
+        describeCustom: '',
+        feelings: [],
+        assertId: null,
+        assertCustom: '',
+        reinforceIds: [],
+        anchorPhrase: '',
+        middleGroundId: null,
+        middleGroundCustom: '',
+        walkAwayId: null,
+        walkAwayCustom: '',
+        debriefOverall: debriefOverall || undefined,
+        debriefCurrentFeelings: debriefCurrentFeelings,
+        turningPointIds,
+        momentResponseIds,
+        bodySignalIds,
+        thoughtPatternIds,
+        underneathIds,
+        copeAheadId: selectedCopeAheadId || undefined,
+        reflectionLanded: reflectionLanded || undefined,
+      });
+      setDebriefSaved(true);
+    } catch {
+      // Silently fail
+    } finally {
+      setDebriefSaving(false);
+    }
+  };
+
+  // TP → barrier mapping for "prepare to try again" carry-forward
+  const tpToBarrierMap: Record<string, string> = {
+    tp_defensive: 'barrier_angry',
+    tp_crying_shutdown: 'barrier_emotional',
+    tp_apologized: 'barrier_guilty',
+    tp_no_words: 'barrier_dont_know',
+  };
+
+  // ─── DEBRIEF: CHECK-IN ───
+  if (phase === 'debrief-checkin') {
+    const highActivation = debriefCurrentFeelings.some(f => f === 'shaky' || f === 'wound_up');
     return (
       <div className="space-y-6">
-        <button onClick={() => setPhase('entry')}
-          className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-4">
-          <span>&larr;</span><span>Back</span>
-        </button>
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How did it go?</h3>
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Before we look at the conversation &mdash; how are you feeling right now?</h3>
+        <div className="flex flex-wrap gap-2">
+          {content.feelingChips.map(f => {
+            const selected = debriefCurrentFeelings.includes(f.id);
+            return (
+              <button key={f.id}
+                onClick={() => toggleChip(f.id, debriefCurrentFeelings, setDebriefCurrentFeelings)}
+                className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+                  selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                }`}>
+                {f.label}
+              </button>
+            );
+          })}
+        </div>
+        {highActivation && (
+          <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+            <p className="text-sm text-amber-800 dark:text-amber-200">
+              It sounds like your body is still activated. Want to do a quick cool-down first?
+            </p>
+            <div className="flex gap-2 mt-3">
+              <button onClick={() => navigate('/tool/tipp')}
+                className="px-4 py-2 rounded-lg text-sm bg-amber-100 dark:bg-amber-800/40 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
+                Cool down first
+              </button>
+              <button onClick={() => setPhase('debrief-who')}
+                className="px-4 py-2 rounded-lg text-sm text-[var(--color-text-secondary)]">
+                I&apos;m okay to continue
+              </button>
+            </div>
+          </div>
+        )}
+        {!highActivation && debriefCurrentFeelings.length > 0 && (
+          <button onClick={() => setPhase('debrief-who')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: WHO ───
+  if (phase === 'debrief-who') {
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Who was this conversation with?</h3>
+        <div className="flex flex-wrap gap-2">
+          {relationshipTypes.map(r => (
+            <button key={r.id}
+              onClick={() => { setDebriefRelationshipType(r.id); setPhase('debrief-overall'); }}
+              className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+                debriefRelationshipType === r.id
+                  ? 'bg-[var(--color-accent)] text-white border-transparent'
+                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+              }`}>
+              {r.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: OVERALL ───
+  if (phase === 'debrief-overall') {
+    const overallMap: Record<string, string> = {
+      better: debriefContent?.overallResponses.good ?? '',
+      mixed: debriefContent?.overallResponses.mixed ?? '',
+      not_well: debriefContent?.overallResponses.bad ?? '',
+      didnt_have: debriefContent?.overallResponses.notYet ?? '',
+    };
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How did it go overall?</h3>
         <div className="space-y-3">
           {debriefOverallOptions.map(opt => (
             <button key={opt.id}
@@ -947,64 +1178,447 @@ export function DearMan() {
             </button>
           ))}
         </div>
-        <button onClick={() => setPhase('debrief-review')} disabled={!debriefOverall}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
-          Continue
+        {debriefOverall && overallMap[debriefOverall] && (
+          <p className="text-sm text-[var(--color-text-secondary)] italic px-1">{overallMap[debriefOverall]}</p>
+        )}
+        {debriefOverall === 'didnt_have' && (
+          <div className="flex gap-3">
+            <button onClick={() => {
+              if (debriefRelationshipType) setRelationshipType(debriefRelationshipType);
+              setSceneStep(0); setPhase('scene');
+            }}
+              className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+              Prepare for it
+            </button>
+            <button onClick={() => setPhase('debrief-moment')}
+              className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
+              Walk through what worries me
+            </button>
+          </div>
+        )}
+        {debriefOverall && debriefOverall !== 'didnt_have' && (
+          <button onClick={() => setPhase('debrief-moment')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: MOMENT (turning point) ───
+  if (phase === 'debrief-moment') {
+    if (!debriefContent) {
+      return (
+        <div className="text-center py-12">
+          <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4" />
+          <p className="text-[var(--color-text-secondary)]">Loading...</p>
+        </div>
+      );
+    }
+    const lastSelectedTp = turningPointIds.length > 0
+      ? debriefContent.turningPoints.find(t => t.id === turningPointIds[turningPointIds.length - 1])
+      : null;
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Was there a moment where things shifted?</h3>
+        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+        <div className="space-y-3">
+          {debriefContent.turningPoints.map(tp => {
+            const selected = turningPointIds.includes(tp.id);
+            return (
+              <button key={tp.id}
+                onClick={() => {
+                  // "went okay" is exclusive — deselect others
+                  if (tp.id === 'tp_went_okay') {
+                    setTurningPointIds(selected ? [] : ['tp_went_okay']);
+                  } else {
+                    const without = turningPointIds.filter(id => id !== 'tp_went_okay');
+                    setTurningPointIds(
+                      selected ? without.filter(id => id !== tp.id) : [...without, tp.id]
+                    );
+                  }
+                  setReflectionData(null);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                  selected
+                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                }`}>
+                {tp.label}
+              </button>
+            );
+          })}
+        </div>
+        {lastSelectedTp && (
+          <p className="text-sm text-[var(--color-text-secondary)] italic px-1">{lastSelectedTp.validationText}</p>
+        )}
+        {turningPointIds.length > 0 && (
+          <button onClick={() => {
+            if (turningPointIds.length === 1 && turningPointIds[0] === 'tp_went_okay') {
+              // Skip response selection — go straight to body
+              setMomentResponseIds(['mr_stayed_course']);
+              getDearManReflection(['tp_went_okay'], ['mr_stayed_course'])
+                .then(setReflectionData).catch(() => {});
+              setPhase('debrief-body');
+            } else {
+              setPhase('debrief-response');
+            }
+          }}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: RESPONSE (what did you do in that moment) ───
+  if (phase === 'debrief-response') {
+    if (!debriefContent) return null;
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What did you do in that moment?</h3>
+        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+        <div className="space-y-3">
+          {debriefContent.momentResponses.map(mr => {
+            const selected = momentResponseIds.includes(mr.id);
+            return (
+              <button key={mr.id}
+                onClick={() => {
+                  setMomentResponseIds(
+                    selected ? momentResponseIds.filter(id => id !== mr.id) : [...momentResponseIds, mr.id]
+                  );
+                  setReflectionData(null);
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                  selected
+                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                }`}>
+                {mr.label}
+              </button>
+            );
+          })}
+        </div>
+        {momentResponseIds.length > 0 && (
+          <button onClick={() => {
+            if (turningPointIds.length && momentResponseIds.length) {
+              getDearManReflection(turningPointIds, momentResponseIds)
+                .then(setReflectionData).catch(() => {});
+            }
+            setPhase('debrief-body');
+          }}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: BODY ───
+  if (phase === 'debrief-body') {
+    if (!debriefContent) return null;
+    const selectedNone = bodySignalIds.includes('bs_none');
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What was happening in your body?</h3>
+        <p className="text-sm text-[var(--color-text-secondary)]">Right before or during that moment.</p>
+        <div className="flex flex-wrap gap-2">
+          {debriefContent.bodySignals.map(bs => {
+            const selected = bodySignalIds.includes(bs.id);
+            return (
+              <button key={bs.id}
+                onClick={() => {
+                  if (bs.id === 'bs_none') {
+                    setBodySignalIds(['bs_none']);
+                  } else {
+                    const filtered = bodySignalIds.filter(id => id !== 'bs_none');
+                    setBodySignalIds(
+                      filtered.includes(bs.id)
+                        ? filtered.filter(id => id !== bs.id)
+                        : [...filtered, bs.id]
+                    );
+                  }
+                }}
+                className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+                  selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                }`}>
+                {bs.label}
+              </button>
+            );
+          })}
+        </div>
+        {selectedNone && (
+          <p className="text-sm text-[var(--color-text-secondary)] italic px-1">
+            That&apos;s okay. Noticing &ldquo;nothing&rdquo; is still noticing. Over time, you might start catching subtler signals.
+          </p>
+        )}
+        {bodySignalIds.length > 0 && (
+          <button onClick={() => setPhase('debrief-thought')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: THOUGHT ───
+  if (phase === 'debrief-thought') {
+    if (!debriefContent) return null;
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What thoughts showed up?</h3>
+        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+        <div className="space-y-3">
+          {debriefContent.thoughtPatterns.map(tp => {
+            const selected = thoughtPatternIds.includes(tp.id);
+            return (
+              <div key={tp.id}>
+                <button
+                  onClick={() => setThoughtPatternIds(
+                    selected ? thoughtPatternIds.filter(id => id !== tp.id) : [...thoughtPatternIds, tp.id]
+                  )}
+                  className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                    selected
+                      ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                  }`}>
+                  {tp.label}
+                </button>
+                {tp.id === 'thought_something_else' && selected && (
+                  <input
+                    type="text"
+                    value={thoughtCustom}
+                    onChange={e => setThoughtCustom(e.target.value)}
+                    placeholder="What was the thought?"
+                    className="w-full mt-2 px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] placeholder-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-accent)]"
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
+        {thoughtPatternIds.length > 0 && (!thoughtPatternIds.includes('thought_something_else') || thoughtCustom.trim()) && (
+          <button onClick={() => setPhase('debrief-underneath')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: UNDERNEATH ───
+  if (phase === 'debrief-underneath') {
+    if (!debriefContent) return null;
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Underneath that &mdash; what was the deeper feeling?</h3>
+        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+        <div className="space-y-3">
+          {debriefContent.underneathEmotions.map(u => {
+            const selected = underneathIds.includes(u.id);
+            return (
+              <button key={u.id}
+                onClick={() => {
+                  // "not sure" is exclusive
+                  if (u.id === 'under_not_sure') {
+                    setUnderneathIds(selected ? [] : ['under_not_sure']);
+                  } else {
+                    const without = underneathIds.filter(id => id !== 'under_not_sure');
+                    setUnderneathIds(
+                      selected ? without.filter(id => id !== u.id) : [...without, u.id]
+                    );
+                  }
+                }}
+                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                  selected
+                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                }`}>
+                {u.label}
+              </button>
+            );
+          })}
+        </div>
+        {underneathIds.length > 0 && (
+          <button onClick={() => setPhase('debrief-reflection')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: REFLECTION ───
+  if (phase === 'debrief-reflection') {
+    if (!reflectionData) {
+      return (
+        <div className="text-center py-12">
+          <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4" />
+          <p className="text-[var(--color-text-secondary)]">Putting something together for you...</p>
+        </div>
+      );
+    }
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] space-y-3">
+          {reflectionData.reflection.split('\n\n').map((para, i) => (
+            <p key={i} className="text-[var(--color-text-primary)] leading-relaxed">{para}</p>
+          ))}
+        </div>
+        <p className="text-sm text-[var(--color-text-secondary)]">Does that land?</p>
+        <div className="flex gap-3">
+          {([
+            { id: 'yes' as const, label: "Yeah, that's it" },
+            { id: 'sort_of' as const, label: 'Sort of' },
+            { id: 'not_really' as const, label: 'Not really' },
+          ]).map(opt => (
+            <button key={opt.id}
+              onClick={() => { setReflectionLanded(opt.id); setPhase('debrief-cope-select'); }}
+              className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary hover:border-[var(--color-border-accent)] transition-colors">
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: COPE-AHEAD SELECT ───
+  if (phase === 'debrief-cope-select') {
+    if (!reflectionData) return null;
+    const bodyLabel = bodySignalIds.filter(id => id !== 'bs_none').map(resolveBodySignalLabel).filter(Boolean).join(', ');
+    const thoughtLabel = resolveThoughtLabel();
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Let&apos;s build a plan for next time.</h3>
+        {(bodyLabel || thoughtLabel) && (
+          <p className="text-sm text-[var(--color-text-secondary)]">
+            When you notice{bodyLabel ? ` "${bodyLabel.toLowerCase()}"` : ''}{bodyLabel && thoughtLabel ? ' and' : ''}{thoughtLabel ? ` the thought "${thoughtLabel}"` : ''} &mdash; what could you try?
+          </p>
+        )}
+        <div className="space-y-3">
+          {reflectionData.copeAheadOptions.map(ca => (
+            <button key={ca.id}
+              onClick={() => { setSelectedCopeAheadId(ca.id); setPhase('debrief-rehearsal'); }}
+              className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                selectedCopeAheadId === ca.id
+                  ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+              }`}>
+              {ca.label}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ─── DEBRIEF: REHEARSAL ───
+  if (phase === 'debrief-rehearsal') {
+    const selectedCa = reflectionData?.copeAheadOptions.find(c => c.id === selectedCopeAheadId);
+    if (!selectedCa) return null;
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{selectedCa.label}</h3>
+        <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <p className="text-[var(--color-text-primary)] leading-relaxed">{selectedCa.rehearsal}</p>
+        </div>
+        <button onClick={() => setPhase('debrief-moment-plan')}
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+          I tried it
         </button>
       </div>
     );
   }
 
-  // ─── DEBRIEF REVIEW ───
-  if (phase === 'debrief-review') {
+  // ─── DEBRIEF: MOMENT PLAN ───
+  if (phase === 'debrief-moment-plan') {
+    const bodyLabel = bodySignalIds.filter(id => id !== 'bs_none').map(resolveBodySignalLabel).filter(Boolean).join(' or ');
+    const thoughtLabel = resolveThoughtLabel();
+    const copeLabel = resolveCopeAheadLabel();
     return (
       <div className="space-y-6">
         <BackButton />
+        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Your moment plan</h3>
+        <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <p className="text-[var(--color-text-primary)] leading-relaxed">
+            When I feel{bodyLabel ? ` ${bodyLabel.toLowerCase()}` : ' the signal'} and the thought &ldquo;{thoughtLabel || '...'}&rdquo; shows up, I&apos;m going to: &ldquo;{copeLabel || '...'}&rdquo;
+          </p>
+        </div>
+        <button
+          onClick={handleDebriefSave}
+          disabled={debriefSaving || debriefSaved}
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
+          {debriefSaved ? 'Saved' : debriefSaving ? 'Saving...' : 'Save my moment plan'}
+        </button>
+        {debriefSaved && (
+          <button onClick={() => setPhase('debrief-route')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Continue
+          </button>
+        )}
+      </div>
+    );
+  }
 
-        {/* What went well */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What worked?</h3>
-          <p className="text-sm text-[var(--color-text-secondary)]">Even if it didn&apos;t go perfectly, was there anything that went okay?</p>
-          <div className="flex flex-wrap gap-2">
-            {content.debriefOptions.wentWell.map(opt => {
-              const selected = debriefWentWell.includes(opt.id);
+  // ─── DEBRIEF: ROUTE ───
+  if (phase === 'debrief-route') {
+    const topTools = stateResult?.tools?.slice(0, 2) || [];
+    return (
+      <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)] space-y-4">
+        <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">That took courage.</h3>
+        <p className="text-[var(--color-text-secondary)]">Whether it went well or not, you showed up.</p>
+
+        {topTools.length > 0 && (
+          <div className="pt-2 space-y-2">
+            <p className="text-sm text-[var(--color-text-secondary)]">Based on how you're feeling, this might help:</p>
+            {topTools.map(tool => {
+              const meta = getToolById(tool.id);
               return (
-                <button key={opt.id}
-                  onClick={() => toggleChip(opt.id, debriefWentWell, setDebriefWentWell)}
-                  className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                    selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-                  }`}>
-                  {opt.label}
+                <button
+                  key={tool.id}
+                  onClick={() => navigate(`/tool/${tool.id}`)}
+                  className="w-full text-left p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] hover:border-[var(--color-accent)] transition-colors"
+                >
+                  <span className="font-medium text-[var(--color-text-primary)]">
+                    {meta?.emoji ? `${meta.emoji} ` : ''}{meta?.name || tool.name}
+                  </span>
+                  <span className="block text-sm text-[var(--color-text-secondary)] mt-0.5">
+                    {meta?.tagline || tool.description}
+                  </span>
                 </button>
               );
             })}
           </div>
-        </div>
+        )}
 
-        {/* What to try differently */}
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What would you do differently?</h3>
-          <p className="text-sm text-[var(--color-text-secondary)]">Not what you did wrong &mdash; just what you&apos;d try next time.</p>
-          <div className="flex flex-wrap gap-2">
-            {content.debriefOptions.toChange.map(opt => {
-              const selected = debriefToChange.includes(opt.id);
-              return (
-                <button key={opt.id}
-                  onClick={() => toggleChip(opt.id, debriefToChange, setDebriefToChange)}
-                  className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                    selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-                  }`}>
-                  {opt.label}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="flex gap-3">
+        <div className="flex flex-col gap-3 pt-2">
           <button
             onClick={() => {
+              // Carry context into prep flow
+              if (debriefRelationshipType) setRelationshipType(debriefRelationshipType);
+              // Map TP to barriers
+              const mappedBarriers = turningPointIds
+                .map(id => tpToBarrierMap[id])
+                .filter(Boolean);
+              if (mappedBarriers.length) setBarriers(mappedBarriers);
+              // Reset prep-specific fields
               setSceneStep(0);
+              setSituationType(null);
               setDescribeId(null); setDescribeCustom(''); setShowDescribeCustom(false);
               setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false);
               setAssertId(null); setAssertCustom(''); setShowAssertCustom(false);
@@ -1015,28 +1629,14 @@ export function DearMan() {
               setSaved(false);
               setPhase('scene');
             }}
-            className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
-            Try again with a new approach
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            Prepare to try again
           </button>
-          <button onClick={() => setPhase('complete')}
-            className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
-            Done
+          <button onClick={() => navigate('/category/better-relationships')}
+            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
+            Done for now
           </button>
         </div>
-      </div>
-    );
-  }
-
-  // ─── COMPLETE ───
-  if (phase === 'complete') {
-    return (
-      <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)]">
-        <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-3">That took courage.</h3>
-        <p className="text-[var(--color-text-secondary)] mb-6">Whether it went well or not, you showed up.</p>
-        <button onClick={() => navigate('/category/better-relationships')}
-          className="py-3 px-6 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
-          Done
-        </button>
       </div>
     );
   }

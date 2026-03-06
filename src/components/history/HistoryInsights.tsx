@@ -6,6 +6,7 @@ import { MoodTimeline } from './MoodTimeline';
 import { QuadrantDistribution } from './QuadrantDistribution';
 import { TopEmotions } from './TopEmotions';
 import { BodyRegionFrequency } from './BodyRegionFrequency';
+import { CalendarView } from './CalendarView';
 
 interface HistoryInsightsProps {
   checkIns: CheckInRecord[];
@@ -28,6 +29,7 @@ export function HistoryInsights({ checkIns }: HistoryInsightsProps) {
         </p>
       ) : (
         <div className="space-y-4">
+          <CalendarView checkIns={filtered} range={range} />
           <MoodTimeline checkIns={filtered} />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <QuadrantDistribution checkIns={filtered} />

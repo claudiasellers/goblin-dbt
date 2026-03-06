@@ -281,6 +281,8 @@ export function CheckIn() {
         bodySensations: checkInData.bodySensations,
         note: checkInData.note,
         timestamp: new Date(),
+        activationPatternId: stateResult?.pattern?.id,
+        confidence: stateResult?.pattern?.confidence,
       });
       setStep('complete');
     } catch (error) {

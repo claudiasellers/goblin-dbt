@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 const navItems = [
   { path: '/', label: 'Check-in', icon: CheckInIcon },
   { path: '/tools', label: 'Tools', icon: ToolsIcon },
-  { path: '/dashboard', label: 'Dashboard', icon: DashboardIcon },
+  { path: '/insights', label: 'Insights', icon: InsightsIcon },
   { path: '/history', label: 'History', icon: HistoryIcon },
 ];
 
@@ -117,13 +117,11 @@ export function Sidebar() {
 // Inline SVG icons (no external dependencies)
 // ============================================
 
-function DashboardIcon({ className }: { className?: string }) {
+function InsightsIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="7" height="7" rx="1" />
-      <rect x="14" y="3" width="7" height="4" rx="1" />
-      <rect x="14" y="11" width="7" height="10" rx="1" />
-      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+      <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }

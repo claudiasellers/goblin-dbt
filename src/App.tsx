@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import { DashboardLayout } from './components/DashboardLayout';
 import { CheckIn } from './pages/CheckIn';
-import { Dashboard } from './pages/Dashboard';
+import { Insights } from './pages/Insights';
 import { Tools } from './pages/Tools';
 import { History } from './pages/History';
 import { Login } from './pages/Login';
@@ -20,7 +20,7 @@ function App() {
       {/* Main app with dashboard layout (sidebar + header) */}
       <Route element={<DashboardLayout />}>
         <Route index element={<CheckIn />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/insights" element={<Insights />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/history" element={<History />} />
         <Route path="/profile" element={<Profile />} />

@@ -106,6 +106,7 @@ export function History() {
       ) : (
         <>
         <HistoryInsights checkIns={checkIns} />
+        <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Feed</h2>
         <div className="space-y-4">
           {checkIns.map((checkIn) => (
             <CheckInCard key={checkIn.id} checkIn={checkIn} />

@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
-import { DashboardStatsPanel } from './dashboard/DashboardStatsPanel';
+import { InsightsSidePanel } from './insights/InsightsSidePanel';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 
@@ -50,8 +50,15 @@ export function DashboardLayout() {
         </header>
 
         <main className="flex-1 min-h-0 overflow-y-auto">
-          <div className="max-w-7xl w-full mx-auto px-4 md:px-6 py-6">
-            <Outlet />
+          <div className="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex gap-6">
+            <div className="flex-1 min-w-0">
+              <Outlet />
+            </div>
+            <aside className="hidden lg:block w-[280px] flex-shrink-0">
+              <div className="sticky top-0">
+                <InsightsSidePanel />
+              </div>
+            </aside>
           </div>
         </main>
 
@@ -67,12 +74,6 @@ export function DashboardLayout() {
         </footer>
       </div>
 
-      {/* Right column: dashboard stats — hidden on mobile, scrolls independently */}
-      <aside className="hidden md:flex flex-col flex-shrink-0 w-[280px] h-screen border-l border-[var(--color-glass-border)] bg-[var(--color-glass-panel)] backdrop-blur-xl overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-y-auto p-4">
-          <DashboardStatsPanel />
-        </div>
-      </aside>
     </div>
   );
 }

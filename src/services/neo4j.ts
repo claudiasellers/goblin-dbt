@@ -11,6 +11,8 @@ export interface CheckInRecord {
   bodySensations: BodySensationRecord[];
   note: string;
   timestamp: Date;
+  activationPatternId?: string | null;
+  confidence?: number | null;
 }
 
 export interface BodySensationRecord {
@@ -23,7 +25,7 @@ export interface BodySensationRecord {
 
 // Cloud Function references
 const saveCheckInFn = httpsCallable<
-  Omit<CheckInRecord, 'id' | 'userId' | 'timestamp'> & { timestamp: string },
+  Omit<CheckInRecord, 'id' | 'userId' | 'timestamp'> & { timestamp: string; activationPatternId?: string; confidence?: number },
   { id: string }
 >(functions, 'saveCheckIn');
 
@@ -37,6 +39,8 @@ interface CheckInResponse {
   bodySensations: BodySensationRecord[];
   note: string;
   timestamp: string; // ISO string from server
+  activationPatternId?: string | null;
+  confidence?: number | null;
 }
 
 const getCheckInsByUserFn = httpsCallable<
@@ -73,6 +77,8 @@ export async function saveCheckIn(
     bodySensations: checkIn.bodySensations,
     note: checkIn.note,
     timestamp: checkIn.timestamp.toISOString(),
+    ...(checkIn.activationPatternId && { activationPatternId: checkIn.activationPatternId }),
+    ...(checkIn.confidence != null && { confidence: checkIn.confidence }),
   });
 
   return result.data.id;
@@ -449,8 +455,8 @@ export async function exportUserData(): Promise<Record<string, unknown>> {
 // DEAR MAN CONTENT + SESSION
 // ============================================
 
-import type { DearManContentResult, DearManSessionData } from '../data/dearManTypes';
-export type { DearManContentResult, DearManSessionData };
+import type { DearManContentResult, DearManSessionData, DearManDebriefContentResult, DearManReflectionResult } from '../data/dearManTypes';
+export type { DearManContentResult, DearManSessionData, DearManDebriefContentResult, DearManReflectionResult };
 
 const getDearManContentFn = httpsCallable<void, DearManContentResult>(
   functions, 'getDearManContent'
@@ -476,13 +482,106 @@ export async function saveDearManSession(
   await saveDearManSessionFn(data);
 }
 
+const getDearManDebriefContentFn = httpsCallable<void, DearManDebriefContentResult>(
+  functions, 'getDearManDebriefContent'
+);
+
+export async function getDearManDebriefContent(): Promise<DearManDebriefContentResult> {
+  const result = await getDearManDebriefContentFn();
+  return result.data;
+}
+
+const getDearManReflectionFn = httpsCallable<
+  { turningPointIds: string[]; momentResponseIds: string[] },
+  DearManReflectionResult
+>(functions, 'getDearManReflection');
+
+export async function getDearManReflection(
+  turningPointIds: string[],
+  momentResponseIds: string[]
+): Promise<DearManReflectionResult> {
+  const result = await getDearManReflectionFn({ turningPointIds, momentResponseIds });
+  return result.data;
+}
+
 // ============================================
-// REMOVED - These were for direct Neo4j access
+// INSIGHTS DATA
 // ============================================
-// The following functions are no longer needed since we don't connect directly:
-// - getDriver()
-// - getSession()
-// - closeDriver()
-//
-// Neo4j credentials are now securely stored as Firebase secrets
-// and only accessible to Cloud Functions running on the server.
+
+export interface FormulationInsight {
+  type: 'single' | 'co_occurrence';
+  primaryPatternId: string;
+  secondaryPatternId: string | null;
+  headline: string;
+  body: string;
+  mechanism: string;
+  effectiveTools: string[];
+  episodeCount: number;
+}
+
+export interface ProactiveAlert {
+  narrative: string;
+  suggestedTool: string;
+  sourcePatternId: string;
+  targetPatternId: string;
+}
+
+export interface GrowthEvidenceInsight {
+  insights: Array<{ key: string; text: string }>;
+}
+
+export interface SomaticCorrelationData {
+  correlations: Array<{ region: string; patternId: string; count: number }>;
+}
+
+export interface ToolEffectivenessData {
+  tools: Array<{ toolId: string; helpedPct: number; totalUses: number }>;
+}
+
+export interface ContinuityPrompt {
+  toolId: string;
+  timestamp: string;
+}
+
+export interface PatternFrequency {
+  patternId: string;
+  count: number;
+}
+
+export interface InsightsPayload {
+  formulation: FormulationInsight | null;
+  proactiveAlert: ProactiveAlert | null;
+  growthEvidence: GrowthEvidenceInsight | null;
+  somaticCorrelation: SomaticCorrelationData | null;
+  toolEffectiveness: ToolEffectivenessData | null;
+  continuityPrompt: ContinuityPrompt | null;
+  patternFrequencies: PatternFrequency[];
+  totalCheckIns: number;
+}
+
+const getInsightsDataFn = httpsCallable<void, InsightsPayload>(
+  functions,
+  'getInsightsData'
+);
+
+const recordToolOutcomeFn = httpsCallable<
+  { outcome: 'helped' | 'somewhat' | 'not_really' },
+  { success: boolean }
+>(functions, 'recordToolOutcome');
+
+/**
+ * Get all insights data for the Insights page
+ */
+export async function getInsightsData(): Promise<InsightsPayload> {
+  const result = await getInsightsDataFn();
+  return result.data;
+}
+
+/**
+ * Record outcome of most recent tool usage
+ */
+export async function recordToolOutcome(
+  outcome: 'helped' | 'somewhat' | 'not_really'
+): Promise<void> {
+  await recordToolOutcomeFn({ outcome });
+}

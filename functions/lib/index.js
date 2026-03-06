@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getQuickTools = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getDiscriminatingQuestions = exports.getStateAndTools = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
+exports.getQuickTools = exports.getDearManReflection = exports.getDearManDebriefContent = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getDiscriminatingQuestions = exports.getStateAndTools = exports.getInsightsData = exports.recordToolOutcome = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -64,7 +64,7 @@ function getDriver() {
  * Save a new check-in for the authenticated user
  */
 exports.saveCheckIn = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     // Verify user is authenticated
     if (!request.auth) {
         throw new https_1.HttpsError('unauthenticated', 'User must be logged in');
@@ -85,11 +85,18 @@ exports.saveCheckIn = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4j
           quadrant: $quadrant,
           intensityX: $intensityX,
           intensityY: $intensityY,
-          note: $note
+          note: $note,
+          activationPatternId: $activationPatternId,
+          confidence: $confidence
         })
         WITH c
         MATCH (u:User {id: $userId})
         MERGE (u)-[:LOGGED]->(c)
+        WITH c
+        FOREACH (_ IN CASE WHEN $activationPatternId IS NOT NULL THEN [1] ELSE [] END |
+          MERGE (ap:ActivationPattern {id: $activationPatternId})
+          MERGE (c)-[:MATCHED_PATTERN]->(ap)
+        )
         WITH c
         UNWIND $bodySensations AS sensation
         CREATE (s:BodySensation {
@@ -111,8 +118,10 @@ exports.saveCheckIn = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4j
             intensityY: (_d = (_c = checkIn.intensity) === null || _c === void 0 ? void 0 : _c.y) !== null && _d !== void 0 ? _d : 0,
             note: checkIn.note || '',
             bodySensations: checkIn.bodySensations || [],
+            activationPatternId: checkIn.activationPatternId || null,
+            confidence: (_e = checkIn.confidence) !== null && _e !== void 0 ? _e : null,
         });
-        const id = ((_e = result.records[0]) === null || _e === void 0 ? void 0 : _e.get('id')) || '';
+        const id = ((_f = result.records[0]) === null || _f === void 0 ? void 0 : _f.get('id')) || '';
         return { id };
     }
     catch (error) {
@@ -147,6 +156,8 @@ exports.getCheckInsByUser = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
           .emotion,
           .quadrant,
           .note,
+          .activationPatternId,
+          .confidence,
           timestamp: toString(c.timestamp),
           intensity: {x: c.intensityX, y: c.intensityY}
         } AS checkIn,
@@ -159,6 +170,7 @@ exports.getCheckInsByUser = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
         }] AS bodySensations
         `, { userId, limit: neo4j_driver_1.default.int(limit) });
         const checkIns = result.records.map((record) => {
+            var _a;
             const checkIn = record.get('checkIn');
             const bodySensations = record.get('bodySensations');
             return {
@@ -170,6 +182,8 @@ exports.getCheckInsByUser = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
                 bodySensations: bodySensations || [],
                 note: checkIn.note,
                 timestamp: checkIn.timestamp,
+                activationPatternId: checkIn.activationPatternId || null,
+                confidence: (_a = checkIn.confidence) !== null && _a !== void 0 ? _a : null,
             };
         });
         return { checkIns };
@@ -481,6 +495,13 @@ exports.trackToolUsage = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, ne
           timestamp: datetime()
         })
         MERGE (u)-[:USED_TOOL]->(tu)
+        WITH u, tu
+        OPTIONAL MATCH (u)-[:LOGGED]->(c:CheckIn)
+        WHERE c.timestamp <= tu.timestamp
+        WITH tu, c ORDER BY c.timestamp DESC LIMIT 1
+        FOREACH (_ IN CASE WHEN c IS NOT NULL THEN [1] ELSE [] END |
+          MERGE (tu)-[:FOLLOWED_CHECKIN]->(c)
+        )
         `, { userId, toolId });
         return { success: true };
     }
@@ -519,6 +540,406 @@ exports.getWeeklyToolUsageCount = (0, https_1.onCall)({ secrets: [neo4jUri, neo4
         await session.close();
     }
 });
+// ============================================
+// TOOL OUTCOME RECORDING
+// ============================================
+/**
+ * Record the outcome of a tool usage (did it help?)
+ * Finds the user's most recent ToolUsage with null outcome.
+ */
+exports.recordToolOutcome = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError('unauthenticated', 'User must be logged in');
+    }
+    const userId = request.auth.uid;
+    const { outcome } = request.data;
+    if (!outcome || !['helped', 'somewhat', 'not_really'].includes(outcome)) {
+        throw new https_1.HttpsError('invalid-argument', 'outcome must be helped, somewhat, or not_really');
+    }
+    const session = getDriver().session();
+    try {
+        await session.run(`
+        MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
+        WHERE tu.outcome IS NULL
+        WITH tu ORDER BY tu.timestamp DESC LIMIT 1
+        SET tu.outcome = $outcome, tu.outcomeTimestamp = datetime()
+        WITH tu
+        WHERE NOT (tu)-[:FOLLOWED_CHECKIN]->()
+        OPTIONAL MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
+        WHERE c.timestamp <= tu.timestamp
+        WITH tu, c ORDER BY c.timestamp DESC LIMIT 1
+        FOREACH (_ IN CASE WHEN c IS NOT NULL THEN [1] ELSE [] END |
+          MERGE (tu)-[:FOLLOWED_CHECKIN]->(c)
+        )
+        `, { userId, outcome });
+        return { success: true };
+    }
+    catch (error) {
+        console.error('Error recording tool outcome:', error);
+        throw new https_1.HttpsError('internal', 'Failed to record tool outcome');
+    }
+    finally {
+        await session.close();
+    }
+});
+// ============================================
+// INSIGHTS DATA
+// ============================================
+/**
+ * Get all insights data for the Insights page in a single call.
+ * Computes formulation, proactive alert, growth evidence, somatic correlation,
+ * tool effectiveness, and continuity prompt.
+ */
+exports.getInsightsData = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    var _a;
+    if (!request.auth) {
+        throw new https_1.HttpsError('unauthenticated', 'User must be logged in');
+    }
+    const userId = request.auth.uid;
+    const driver = getDriver();
+    // Neo4j sessions can only run one query at a time, so use separate sessions for parallel queries
+    const session1 = driver.session();
+    const session2 = driver.session();
+    const session3 = driver.session();
+    let seqSession = null;
+    try {
+        // Run parallel queries for raw data
+        const [checkInsResult, toolUsageResult, continuityResult] = await Promise.all([
+            // 1. Recent check-ins (last 30 days)
+            session1.run(`
+          MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
+          WHERE c.timestamp >= datetime() - duration({days: 30})
+          OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
+          WITH c, collect(s.region) AS bodyRegions
+          ORDER BY c.timestamp DESC
+          RETURN c.id AS id,
+                 toString(c.timestamp) AS timestamp,
+                 c.emotion AS emotion,
+                 c.quadrant AS quadrant,
+                 c.intensityX AS intensityX,
+                 c.intensityY AS intensityY,
+                 c.activationPatternId AS activationPatternId,
+                 bodyRegions
+          `, { userId }),
+            // 2. Tool usage with outcomes (last 30 days)
+            session2.run(`
+          MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
+          WHERE tu.timestamp >= datetime() - duration({days: 30})
+          OPTIONAL MATCH (tu)-[:FOLLOWED_CHECKIN]->(c:CheckIn)
+          RETURN tu.toolId AS toolId,
+                 tu.outcome AS outcome,
+                 toString(tu.timestamp) AS timestamp,
+                 c.activationPatternId AS patternId
+          ORDER BY tu.timestamp DESC
+          `, { userId }),
+            // 3. Continuity prompt — most recent ToolUsage with null outcome
+            session3.run(`
+          MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
+          WHERE tu.outcome IS NULL
+          RETURN tu.toolId AS toolId, toString(tu.timestamp) AS timestamp
+          ORDER BY tu.timestamp DESC
+          LIMIT 1
+          `, { userId }),
+        ]);
+        // Parse check-ins
+        const checkIns = checkInsResult.records.map((r) => {
+            var _a, _b;
+            return ({
+                id: r.get('id'),
+                timestamp: r.get('timestamp'),
+                emotion: r.get('emotion'),
+                quadrant: r.get('quadrant'),
+                intensityX: (_a = toNumber(r.get('intensityX'))) !== null && _a !== void 0 ? _a : 0,
+                intensityY: (_b = toNumber(r.get('intensityY'))) !== null && _b !== void 0 ? _b : 0,
+                activationPatternId: r.get('activationPatternId') || null,
+                bodyRegions: (r.get('bodyRegions') || []).filter(Boolean),
+            });
+        });
+        // Parse tool usage
+        const toolUsages = toolUsageResult.records.map((r) => ({
+            toolId: r.get('toolId'),
+            outcome: r.get('outcome') || null,
+            timestamp: r.get('timestamp'),
+            patternId: r.get('patternId') || null,
+        }));
+        // Parse continuity
+        const continuityRec = continuityResult.records[0];
+        const continuityPrompt = continuityRec ? {
+            toolId: continuityRec.get('toolId'),
+            timestamp: continuityRec.get('timestamp'),
+        } : null;
+        // Close parallel sessions, open one for sequential follow-up queries
+        await Promise.all([session1.close(), session2.close(), session3.close()]);
+        const session = driver.session();
+        seqSession = session;
+        // ── Compute pattern frequencies ──
+        const patternCounts = {};
+        for (const ci of checkIns) {
+            if (ci.activationPatternId) {
+                patternCounts[ci.activationPatternId] = (patternCounts[ci.activationPatternId] || 0) + 1;
+            }
+        }
+        const patternFrequencies = Object.entries(patternCounts)
+            .map(([patternId, count]) => ({ patternId, count }))
+            .sort((a, b) => b.count - a.count);
+        // ── Compute formulation ──
+        // Use full 30-day window. Show formulation if ANY pattern exists (even 1 check-in).
+        const sortedPatterns = Object.entries(patternCounts).sort((a, b) => b[1] - a[1]);
+        const dominantPattern = sortedPatterns[0]; // may be count=1
+        const secondaryPattern = sortedPatterns[1];
+        let formulation = null;
+        // Co-occurrence: both patterns appear 2+ times
+        if (dominantPattern && secondaryPattern && dominantPattern[1] >= 2 && secondaryPattern[1] >= 2) {
+            const coResult = await session.run(`
+          MATCH (p1:ActivationPattern {id: $pid1})-[r:CO_OCCURS_WITH]-(p2:ActivationPattern {id: $pid2})
+          RETURN r.combined_formulation_headline AS headline,
+                 r.combined_formulation_body AS body,
+                 r.combined_mechanism_narrative AS mechanism
+          LIMIT 1
+          `, { pid1: dominantPattern[0], pid2: secondaryPattern[0] });
+            if (coResult.records.length > 0 && coResult.records[0].get('headline')) {
+                const rec = coResult.records[0];
+                const effectiveTools = getEffectiveToolsForPattern(toolUsages, dominantPattern[0]);
+                formulation = {
+                    type: 'co_occurrence',
+                    primaryPatternId: dominantPattern[0],
+                    secondaryPatternId: secondaryPattern[0],
+                    headline: rec.get('headline'),
+                    body: rec.get('body'),
+                    mechanism: rec.get('mechanism'),
+                    effectiveTools,
+                    episodeCount: dominantPattern[1],
+                };
+            }
+        }
+        // Single pattern formulation — show for ANY pattern, even count=1
+        // Use dominant if 2+, otherwise use most recent check-in's pattern
+        if (!formulation && dominantPattern) {
+            const patternIdToUse = dominantPattern[1] >= 2
+                ? dominantPattern[0]
+                : (((_a = checkIns.find(ci => ci.activationPatternId)) === null || _a === void 0 ? void 0 : _a.activationPatternId) || dominantPattern[0]);
+            const patResult = await session.run(`
+          MATCH (p:ActivationPattern {id: $patternId})
+          RETURN p.formulation_headline AS headline,
+                 p.formulation_body AS body,
+                 p.mechanism_narrative AS mechanism
+          `, { patternId: patternIdToUse });
+            if (patResult.records.length > 0 && patResult.records[0].get('headline')) {
+                const rec = patResult.records[0];
+                const effectiveTools = getEffectiveToolsForPattern(toolUsages, patternIdToUse);
+                const count = patternCounts[patternIdToUse] || 1;
+                formulation = {
+                    type: 'single',
+                    primaryPatternId: patternIdToUse,
+                    secondaryPatternId: null,
+                    headline: rec.get('headline'),
+                    body: rec.get('body'),
+                    mechanism: rec.get('mechanism'),
+                    effectiveTools,
+                    episodeCount: count,
+                };
+            }
+        }
+        // ── Compute proactive alert ──
+        let proactiveAlert = null;
+        if (dominantPattern) {
+            // Check for escalation path from the dominant (or most recent) pattern
+            const escResult = await session.run(`
+          MATCH (p1:ActivationPattern {id: $patternId})-[r:CAN_ESCALATE_TO]->(p2:ActivationPattern)
+          RETURN r.escalation_narrative AS narrative,
+                 r.escalation_suggested_tool AS suggestedTool,
+                 p2.id AS targetPatternId
+          LIMIT 1
+          `, { patternId: dominantPattern[0] });
+            if (escResult.records.length > 0 && escResult.records[0].get('narrative')) {
+                const rec = escResult.records[0];
+                // Check intensity trend (are recent check-ins getting more intense?)
+                const patternCheckIns = checkIns
+                    .filter(ci => ci.activationPatternId === dominantPattern[0])
+                    .slice(0, 4);
+                let intensityTrending = false;
+                if (patternCheckIns.length >= 2) {
+                    const recentAvg = patternCheckIns.slice(0, 2).reduce((s, ci) => s + ci.intensityY, 0) / 2;
+                    const olderAvg = patternCheckIns.slice(-2).reduce((s, ci) => s + ci.intensityY, 0) / 2;
+                    intensityTrending = recentAvg > olderAvg + 0.05;
+                }
+                if (intensityTrending || dominantPattern[1] >= 2) {
+                    proactiveAlert = {
+                        narrative: rec.get('narrative'),
+                        suggestedTool: rec.get('suggestedTool'),
+                        sourcePatternId: dominantPattern[0],
+                        targetPatternId: rec.get('targetPatternId'),
+                    };
+                }
+            }
+        }
+        // ── Compute growth evidence ──
+        // Split check-ins into two halves (older vs newer). Needs 4+ total over 5+ days.
+        let growthEvidence = null;
+        if (checkIns.length >= 4) {
+            const sorted = [...checkIns].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+            const firstTs = new Date(sorted[0].timestamp).getTime();
+            const lastTs = new Date(sorted[sorted.length - 1].timestamp).getTime();
+            const daySpan = (lastTs - firstTs) / (1000 * 60 * 60 * 24);
+            if (daySpan >= 5) {
+                // Split into older half and newer half
+                const mid = Math.floor(sorted.length / 2);
+                const olderHalf = sorted.slice(0, mid);
+                const newerHalf = sorted.slice(mid);
+                if (olderHalf.length >= 2 && newerHalf.length >= 2) {
+                    const recentAvgIntensity = newerHalf.reduce((s, ci) => s + ci.intensityY, 0) / newerHalf.length;
+                    const priorAvgIntensity = olderHalf.reduce((s, ci) => s + ci.intensityY, 0) / olderHalf.length;
+                    const intensityChange = priorAvgIntensity - recentAvgIntensity;
+                    const recentEarlyPct = newerHalf.filter(ci => ci.intensityY < 0.4).length / newerHalf.length;
+                    const priorEarlyPct = olderHalf.filter(ci => ci.intensityY < 0.4).length / olderHalf.length;
+                    const insights = [];
+                    if (intensityChange > 0.08) {
+                        insights.push({
+                            key: 'lower-intensity',
+                            text: `Your average intensity dropped from ${Math.round(priorAvgIntensity * 100)}% to ${Math.round(recentAvgIntensity * 100)}% in your recent check-ins. You're catching things earlier.`,
+                        });
+                    }
+                    if (recentEarlyPct - priorEarlyPct > 0.1) {
+                        insights.push({
+                            key: 'early-intervention',
+                            text: `${Math.round(recentEarlyPct * 100)}% of your recent check-ins were at low intensity, up from ${Math.round(priorEarlyPct * 100)}%. You're reaching for tools before things escalate.`,
+                        });
+                    }
+                    if (newerHalf.length > olderHalf.length) {
+                        insights.push({
+                            key: 'more-checkins',
+                            text: `You've been checking in more frequently recently. More awareness means more opportunities to intervene early.`,
+                        });
+                    }
+                    // Body awareness growth
+                    const olderBodyAvg = olderHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / olderHalf.length;
+                    const recentBodyAvg = newerHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / newerHalf.length;
+                    if (recentBodyAvg > olderBodyAvg + 0.3 && recentBodyAvg > 0.5) {
+                        insights.push({
+                            key: 'body-awareness',
+                            text: "You're getting more specific about what your body is telling you. That kind of interoceptive awareness is a real skill you're developing.",
+                        });
+                    }
+                    if (insights.length > 0) {
+                        growthEvidence = { insights };
+                    }
+                }
+            }
+        }
+        // ── Compute somatic correlation ──
+        // Threshold: 2+ check-ins with body data. Uses pattern if available, falls back to quadrant.
+        let somaticCorrelation = null;
+        const checkInsWithBody = checkIns.filter(ci => ci.bodyRegions.length > 0);
+        if (checkInsWithBody.length >= 2) {
+            const regionKeyMap = {};
+            for (const ci of checkInsWithBody) {
+                // Use pattern if available, otherwise use quadrant as grouping key
+                const key = ci.activationPatternId || ci.quadrant;
+                for (const region of ci.bodyRegions) {
+                    if (!regionKeyMap[region])
+                        regionKeyMap[region] = {};
+                    regionKeyMap[region][key] = (regionKeyMap[region][key] || 0) + 1;
+                }
+            }
+            const correlations = [];
+            for (const [region, keys] of Object.entries(regionKeyMap)) {
+                const top = Object.entries(keys).sort((a, b) => b[1] - a[1])[0];
+                if (top && top[1] >= 2) {
+                    correlations.push({ region, patternId: top[0], count: top[1] });
+                }
+            }
+            // If strict 2+ threshold finds nothing, show any region that appears 2+ times total
+            if (correlations.length === 0 && checkInsWithBody.length >= 3) {
+                const regionTotals = {};
+                for (const ci of checkInsWithBody) {
+                    for (const region of ci.bodyRegions) {
+                        regionTotals[region] = (regionTotals[region] || 0) + 1;
+                    }
+                }
+                for (const [region, count] of Object.entries(regionTotals)) {
+                    if (count >= 2) {
+                        // Find most common quadrant for this region
+                        const quadrantCounts = {};
+                        for (const ci of checkInsWithBody) {
+                            if (ci.bodyRegions.includes(region)) {
+                                quadrantCounts[ci.quadrant] = (quadrantCounts[ci.quadrant] || 0) + 1;
+                            }
+                        }
+                        const topQ = Object.entries(quadrantCounts).sort((a, b) => b[1] - a[1])[0];
+                        correlations.push({ region, patternId: topQ[0], count });
+                    }
+                }
+            }
+            if (correlations.length > 0) {
+                somaticCorrelation = {
+                    correlations: correlations.sort((a, b) => b.count - a.count).slice(0, 3),
+                };
+            }
+        }
+        // ── Compute tool effectiveness ──
+        let toolEffectiveness = null;
+        const usagesWithOutcome = toolUsages.filter(tu => tu.outcome);
+        if (usagesWithOutcome.length >= 1) {
+            const toolOutcomes = {};
+            for (const tu of usagesWithOutcome) {
+                if (!toolOutcomes[tu.toolId]) {
+                    toolOutcomes[tu.toolId] = { helped: 0, somewhat: 0, not_really: 0, total: 0 };
+                }
+                toolOutcomes[tu.toolId][tu.outcome]++;
+                toolOutcomes[tu.toolId].total++;
+            }
+            const tools = Object.entries(toolOutcomes)
+                .filter(([, data]) => data.total >= 1)
+                .map(([toolId, data]) => ({
+                toolId,
+                helpedPct: Math.round(((data.helped + data.somewhat * 0.5) / data.total) * 100),
+                totalUses: data.total,
+            }))
+                .sort((a, b) => b.helpedPct - a.helpedPct)
+                .slice(0, 4);
+            if (tools.length > 0) {
+                toolEffectiveness = { tools };
+            }
+        }
+        return {
+            formulation,
+            proactiveAlert,
+            growthEvidence,
+            somaticCorrelation,
+            toolEffectiveness,
+            continuityPrompt,
+            patternFrequencies,
+            totalCheckIns: checkIns.length,
+        };
+    }
+    catch (error) {
+        console.error('Error getting insights data:', error);
+        throw new https_1.HttpsError('internal', 'Failed to get insights data');
+    }
+    finally {
+        await Promise.all([
+            session1.close().catch(() => { }),
+            session2.close().catch(() => { }),
+            session3.close().catch(() => { }),
+            seqSession === null || seqSession === void 0 ? void 0 : seqSession.close().catch(() => { }),
+        ]);
+    }
+});
+/** Helper: find tools that helped for a given pattern */
+function getEffectiveToolsForPattern(toolUsages, patternId) {
+    const toolScores = {};
+    for (const tu of toolUsages) {
+        if (tu.patternId === patternId && tu.outcome) {
+            const score = tu.outcome === 'helped' ? 1 : tu.outcome === 'somewhat' ? 0.5 : 0;
+            toolScores[tu.toolId] = (toolScores[tu.toolId] || 0) + score;
+        }
+    }
+    return Object.entries(toolScores)
+        .filter(([, score]) => score > 0)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([toolId]) => toolId);
+}
 /**
  * Get the activation pattern and recommended tools based on check-in data
  * This is the main "What's happening right now" query
@@ -1300,6 +1721,14 @@ exports.saveDearManSession = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
           debriefOverall: $debriefOverall,
           debriefWentWell: $debriefWentWell,
           debriefToChange: $debriefToChange,
+          debriefCurrentFeelings: $debriefCurrentFeelings,
+          turningPointIds: $turningPointIds,
+          momentResponseIds: $momentResponseIds,
+          bodySignalIds: $bodySignalIds,
+          thoughtPatternIds: $thoughtPatternIds,
+          underneathIds: $underneathIds,
+          copeAheadId: $copeAheadId,
+          reflectionLanded: $reflectionLanded,
           createdAt: datetime()
         })
         MERGE (u)-[:COMPLETED_SESSION]->(s)
@@ -1325,12 +1754,177 @@ exports.saveDearManSession = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
             debriefOverall: data.debriefOverall || null,
             debriefWentWell: data.debriefWentWell || [],
             debriefToChange: data.debriefToChange || [],
+            debriefCurrentFeelings: data.debriefCurrentFeelings || [],
+            turningPointIds: data.turningPointIds || [],
+            momentResponseIds: data.momentResponseIds || [],
+            bodySignalIds: data.bodySignalIds || [],
+            thoughtPatternIds: data.thoughtPatternIds || [],
+            underneathIds: data.underneathIds || [],
+            copeAheadId: data.copeAheadId || null,
+            reflectionLanded: data.reflectionLanded || null,
         });
         return { success: true };
     }
     catch (error) {
         console.error('Error saving DEAR MAN session:', error);
         throw new https_1.HttpsError('internal', 'Failed to save session');
+    }
+    finally {
+        await session.close();
+    }
+});
+/**
+ * Get all DEAR MAN debrief content from the graph in one call.
+ * Returns turning points, moment responses, body signals, thought patterns,
+ * underneath emotions, and overall response text.
+ */
+exports.getDearManDebriefContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async () => {
+    var _a, _b, _c, _d;
+    const session = getDriver().session();
+    try {
+        const tpResult = await session.run(`
+        MATCH (tp:TurningPoint)
+        RETURN tp.id AS id, tp.label AS label, tp.validationText AS validationText, tp.sortOrder AS sortOrder
+        ORDER BY tp.sortOrder
+      `);
+        const mrResult = await session.run(`
+        MATCH (mr:MomentResponse)
+        RETURN mr.id AS id, mr.label AS label, mr.sortOrder AS sortOrder
+        ORDER BY mr.sortOrder
+      `);
+        const bsResult = await session.run(`
+        MATCH (bs:BodySignal)
+        RETURN bs.id AS id, bs.label AS label, bs.sortOrder AS sortOrder
+        ORDER BY bs.sortOrder
+      `);
+        const tpattResult = await session.run(`
+        MATCH (tp:ThoughtPattern)
+        RETURN tp.id AS id, tp.label AS label, tp.theme AS theme, tp.sortOrder AS sortOrder
+        ORDER BY tp.sortOrder
+      `);
+        const undResult = await session.run(`
+        MATCH (u:Underneath)
+        RETURN u.id AS id, u.label AS label, u.sortOrder AS sortOrder
+        ORDER BY u.sortOrder
+      `);
+        const tcResult = await session.run(`
+        MATCH (tc:TherapyConcept {id: 'dbt_dear_man'})
+        RETURN tc.debriefResponseBad AS bad,
+               tc.debriefResponseMixed AS mixed,
+               tc.debriefResponseGood AS good,
+               tc.debriefResponseNotYet AS notYet
+      `);
+        const turningPoints = tpResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                validationText: r.get('validationText'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        });
+        const momentResponses = mrResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        });
+        const bodySignals = bsResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        });
+        const thoughtPatterns = tpattResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                theme: r.get('theme'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        });
+        const underneathEmotions = undResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+            });
+        });
+        const tc = tcResult.records[0];
+        const overallResponses = {
+            bad: (_a = tc === null || tc === void 0 ? void 0 : tc.get('bad')) !== null && _a !== void 0 ? _a : '',
+            mixed: (_b = tc === null || tc === void 0 ? void 0 : tc.get('mixed')) !== null && _b !== void 0 ? _b : '',
+            good: (_c = tc === null || tc === void 0 ? void 0 : tc.get('good')) !== null && _c !== void 0 ? _c : '',
+            notYet: (_d = tc === null || tc === void 0 ? void 0 : tc.get('notYet')) !== null && _d !== void 0 ? _d : '',
+        };
+        return {
+            turningPoints,
+            momentResponses,
+            bodySignals,
+            thoughtPatterns,
+            underneathEmotions,
+            overallResponses,
+        };
+    }
+    catch (error) {
+        console.error('Error fetching DEAR MAN debrief content:', error);
+        throw new https_1.HttpsError('internal', 'Failed to fetch debrief content');
+    }
+    finally {
+        await session.close();
+    }
+});
+/**
+ * Get a personalized reflection and cope-ahead options for a
+ * turning-point + moment-response combination.
+ */
+exports.getDearManReflection = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    const { turningPointIds, momentResponseIds } = request.data;
+    if (!(turningPointIds === null || turningPointIds === void 0 ? void 0 : turningPointIds.length) || !(momentResponseIds === null || momentResponseIds === void 0 ? void 0 : momentResponseIds.length)) {
+        throw new https_1.HttpsError('invalid-argument', 'turningPointIds and momentResponseIds are required');
+    }
+    const session = getDriver().session();
+    try {
+        // Try specific reflections matching any TP × any Response combo, fall back to default
+        const refResult = await session.run(`
+        OPTIONAL MATCH (r:Reflection)-[:REFLECTS_ON]->(tp:TurningPoint)
+        WHERE tp.id IN $turningPointIds
+          AND ANY(mrid IN $momentResponseIds WHERE (r)-[:FOR_RESPONSE]->(:MomentResponse {id: mrid}))
+        WITH collect(DISTINCT r.text) AS texts
+        OPTIONAL MATCH (d:Reflection {isDefault: true})
+        WITH CASE WHEN size(texts) > 0 THEN texts ELSE [d.text] END AS allTexts
+        UNWIND allTexts AS reflection
+        RETURN reflection
+      `, { turningPointIds, momentResponseIds });
+        // Cope-ahead: specific to any selected response + universals
+        const caResult = await session.run(`
+        MATCH (ca:CopeAhead)
+        WHERE ca.isUniversal = true
+           OR ANY(mrid IN $momentResponseIds WHERE (ca)-[:FOR_RESPONSE]->(:MomentResponse {id: mrid}))
+        RETURN DISTINCT ca.id AS id, ca.label AS label, ca.rehearsal AS rehearsal
+      `, { momentResponseIds });
+        const reflections = refResult.records
+            .map((r) => r.get('reflection'))
+            .filter((t) => t != null);
+        const reflection = reflections.length > 0
+            ? reflections.join('\n\n')
+            : 'Whatever happened in that moment, your nervous system was doing its best with what it had. Let\'s build something you can reach for next time.';
+        const copeAheadOptions = caResult.records.map((r) => ({
+            id: r.get('id'),
+            label: r.get('label'),
+            rehearsal: r.get('rehearsal'),
+        }));
+        return { reflection, copeAheadOptions };
+    }
+    catch (error) {
+        console.error('Error fetching DEAR MAN reflection:', error);
+        throw new https_1.HttpsError('internal', 'Failed to fetch reflection');
     }
     finally {
         await session.close();

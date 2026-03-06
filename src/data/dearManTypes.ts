@@ -70,4 +70,27 @@ export interface DearManSessionData {
   debriefOverall?: string;
   debriefWentWell?: string[];
   debriefToChange?: string[];
+  // Debrief chain analysis fields
+  debriefCurrentFeelings?: string[];
+  turningPointIds?: string[];
+  momentResponseIds?: string[];
+  bodySignalIds?: string[];
+  thoughtPatternIds?: string[];
+  underneathIds?: string[];
+  copeAheadId?: string;
+  reflectionLanded?: 'yes' | 'sort_of' | 'not_really';
+}
+
+export interface DearManDebriefContentResult {
+  turningPoints: Array<{ id: string; label: string; validationText: string; sortOrder: number }>;
+  momentResponses: Array<{ id: string; label: string; sortOrder: number }>;
+  bodySignals: Array<{ id: string; label: string; sortOrder: number }>;
+  thoughtPatterns: Array<{ id: string; label: string; theme: string; sortOrder: number }>;
+  underneathEmotions: Array<{ id: string; label: string; sortOrder: number }>;
+  overallResponses: { bad: string; mixed: string; good: string; notYet: string };
+}
+
+export interface DearManReflectionResult {
+  reflection: string;
+  copeAheadOptions: Array<{ id: string; label: string; rehearsal: string }>;
 }
