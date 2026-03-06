@@ -106,93 +106,119 @@ export function History() {
       ) : (
         <>
         <HistoryInsights checkIns={checkIns} />
-        <h2 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4">Feed</h2>
-        <div className="space-y-4">
-          {checkIns.map((checkIn) => (
-            <CheckInCard key={checkIn.id} checkIn={checkIn} />
-          ))}
-        </div>
+        <CheckInFeed checkIns={checkIns} />
         </>
       )}
     </div>
   );
 }
 
-function CheckInCard({ checkIn }: { checkIn: CheckInRecord }) {
+const quadrantDotColor: Record<string, string> = {
+  'high-unpleasant': 'var(--color-q-hu-fill)',
+  'high-pleasant': 'var(--color-q-hp-fill)',
+  'low-unpleasant': 'var(--color-q-lu-fill)',
+  'low-pleasant': 'var(--color-q-lp-fill)',
+};
+
+function groupByDate(checkIns: CheckInRecord[]): { label: string; key: string; items: CheckInRecord[] }[] {
+  const fmt = new Intl.DateTimeFormat('en-US', { weekday: 'long', month: 'short', day: 'numeric' });
+  const groups: { label: string; key: string; items: CheckInRecord[] }[] = [];
+
+  for (const ci of checkIns) {
+    const key = `${ci.timestamp.getFullYear()}-${ci.timestamp.getMonth()}-${ci.timestamp.getDate()}`;
+    const last = groups[groups.length - 1];
+    if (last && last.key === key) {
+      last.items.push(ci);
+    } else {
+      groups.push({ label: fmt.format(ci.timestamp), key, items: [ci] });
+    }
+  }
+  return groups;
+}
+
+function CheckInFeed({ checkIns }: { checkIns: CheckInRecord[] }) {
+  const groups = groupByDate(checkIns);
+  const timeFmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
+
+  return (
+    <div className="bg-[var(--color-glass-card)] backdrop-blur-md border border-[var(--color-glass-border)] rounded-xl p-4">
+      <h3 className="text-sm font-medium text-[var(--color-text-tertiary)] mb-3">Feed</h3>
+
+      <div className="space-y-5 max-h-96 overflow-y-auto pr-1">
+        {groups.map((group) => (
+          <div key={group.key}>
+            {/* Date header */}
+            <p className="text-[10px] font-medium text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1.5">
+              {group.label}
+            </p>
+
+            {/* Timeline for this day */}
+            <div className="relative pl-5">
+              {/* Vertical line */}
+              <div className="absolute left-[7px] top-2 bottom-2 w-px bg-[var(--color-border-subtle)]" />
+
+              <div className="space-y-1">
+                {group.items.map((ci) => (
+                  <FeedItem key={ci.id} checkIn={ci} timeFmt={timeFmt} />
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function FeedItem({ checkIn, timeFmt }: { checkIn: CheckInRecord; timeFmt: Intl.DateTimeFormat }) {
   const [expanded, setExpanded] = useState(false);
   const colors = quadrantColors[checkIn.quadrant] || { bg: 'bg-gray-200', text: 'text-gray-800' };
-
-  const formattedDate = new Intl.DateTimeFormat('en-US', {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(checkIn.timestamp);
-
-  // Convert intensity to labels
+  const dotColor = quadrantDotColor[checkIn.quadrant] || 'var(--color-text-tertiary)';
   const intensityLabel = checkIn.intensity.y > 0.66 ? 'High' : checkIn.intensity.y > 0.33 ? 'Medium' : 'Low';
 
   return (
     <div
-      className="bg-[var(--color-bg-card)] rounded-xl p-4 border border-[var(--color-border-subtle)] cursor-pointer lift-card"
+      className="relative flex items-start gap-3 py-2 cursor-pointer group"
       onClick={() => setExpanded(!expanded)}
     >
-      <div className="flex items-center gap-3">
-        {/* Emotion badge */}
-        <span className={`
-          px-3 py-1 rounded-full text-sm font-medium
-          ${colors.bg} ${colors.text}
-        `}>
-          {checkIn.emotion}
-        </span>
+      {/* Timeline dot */}
+      <div
+        className="absolute -left-5 top-[14px] w-[9px] h-[9px] rounded-full ring-2 ring-[var(--color-bg-primary)] z-10"
+        style={{ backgroundColor: dotColor }}
+      />
 
-        {/* Date */}
-        <span className="text-sm text-[var(--color-text-tertiary)] ml-auto">
-          {formattedDate}
-        </span>
-      </div>
-
-      {expanded && (
-        <div className="mt-4 pt-4 border-t border-[var(--color-border-subtle)]">
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-[var(--color-text-tertiary)]">Intensity</span>
-              <p className="font-medium text-[var(--color-text-secondary)]">{intensityLabel}</p>
-            </div>
-            <div>
-              <span className="text-[var(--color-text-tertiary)]">Body sensations</span>
-              <p className="font-medium text-[var(--color-text-secondary)]">
-                {checkIn.bodySensations.length || 'None'}
-              </p>
-            </div>
-          </div>
-
-          {checkIn.bodySensations.length > 0 && (
-            <div className="mt-3">
-              <span className="text-sm text-[var(--color-text-tertiary)]">Sensations:</span>
-              <div className="flex flex-wrap gap-2 mt-1">
-                {checkIn.bodySensations.map((sensation, i) => (
-                  <span
-                    key={i}
-                    className="text-xs px-2 py-1 rounded-full bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)]"
-                  >
-                    {sensation.region}
-                    {sensation.tags.length > 0 && `: ${sensation.tags.join(', ')}`}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {checkIn.note && (
-            <div className="mt-3">
-              <span className="text-sm text-[var(--color-text-tertiary)]">Note:</span>
-              <p className="text-sm text-[var(--color-text-secondary)] mt-1">{checkIn.note}</p>
-            </div>
-          )}
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <span className={`
+            px-2.5 py-0.5 rounded-full text-xs font-medium
+            ${colors.bg} ${colors.text}
+          `}>
+            {checkIn.emotion}
+          </span>
+          <span className="text-xs text-[var(--color-text-tertiary)] ml-auto shrink-0">
+            {timeFmt.format(checkIn.timestamp)}
+          </span>
         </div>
-      )}
+
+        {expanded && (
+          <div className="mt-2 ml-0.5 text-sm space-y-2">
+            <div className="flex gap-4 text-xs">
+              <span className="text-[var(--color-text-tertiary)]">
+                Intensity: <span className="text-[var(--color-text-secondary)] font-medium">{intensityLabel}</span>
+              </span>
+              {checkIn.bodySensations.length > 0 && (
+                <span className="text-[var(--color-text-tertiary)]">
+                  Body: <span className="text-[var(--color-text-secondary)] font-medium">{checkIn.bodySensations.map(s => s.region).join(', ')}</span>
+                </span>
+              )}
+            </div>
+            {checkIn.note && (
+              <p className="text-xs text-[var(--color-text-secondary)] italic">"{checkIn.note}"</p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

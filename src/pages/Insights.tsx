@@ -63,7 +63,7 @@ export function Insights() {
         )}
 
         {data.somaticCorrelation && (
-          <SomaticCorrelation data={data.somaticCorrelation} delay={nextDelay()} />
+          <SomaticCorrelation data={data.somaticCorrelation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
         )}
 
         {data.toolEffectiveness && (
