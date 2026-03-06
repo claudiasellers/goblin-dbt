@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { EmotionQuadrant } from '../components/checkin/EmotionQuadrant';
-import { EmotionGrid } from '../components/checkin/EmotionGrid';
+import { EmotionPlane } from '../components/checkin/EmotionPlane';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
 import { StateResult } from '../components/checkin/StateResult';
@@ -17,6 +17,7 @@ import {
   type StateResult as StateResultType,
   type DiscriminatingQuestion,
 } from '../services/neo4j';
+import { getEmotionByName } from '../data/emotions';
 
 type EntryPoint = 'standard' | 'somatic';
 
@@ -199,11 +200,33 @@ export function CheckIn() {
     analyzeAndShowResult({ quadrant });
   }
 
+  function inferQuadrant(selectedEmotions: string[]): string {
+    const counts: Record<string, number> = {};
+    for (const name of selectedEmotions) {
+      const emotion = getEmotionByName(name);
+      if (emotion) {
+        counts[emotion.quadrant] = (counts[emotion.quadrant] || 0) + 1;
+      }
+    }
+    // Tie-break: unpleasant wins (distress tools more relevant), high wins
+    const priority = ['high-unpleasant', 'low-unpleasant', 'high-pleasant', 'low-pleasant'];
+    let best = priority[0];
+    let bestCount = 0;
+    for (const q of priority) {
+      if ((counts[q] || 0) > bestCount) {
+        best = q;
+        bestCount = counts[q] || 0;
+      }
+    }
+    return best;
+  }
+
   async function handleEmotionSelect(emotions: string[]) {
-    setCheckInData(prev => ({ ...prev, emotions }));
+    const inferredQuadrant = inferQuadrant(emotions);
+    setCheckInData(prev => ({ ...prev, emotions, quadrant: inferredQuadrant }));
 
     // For low-unpleasant, try to fetch discriminating questions
-    if (checkInData.quadrant === 'low-unpleasant') {
+    if (inferredQuadrant === 'low-unpleasant') {
       try {
         const questions = await getDiscriminatingQuestions('low-unpleasant');
         if (questions.length > 0) {
@@ -416,12 +439,11 @@ export function CheckIn() {
           />
         )}
 
-        {step === 'emotion' && checkInData.quadrant && (
-          <EmotionGrid
-            quadrant={checkInData.quadrant}
+        {step === 'emotion' && (
+          <EmotionPlane
+            initialQuadrant={checkInData.quadrant || 'high-unpleasant'}
             onSelect={handleEmotionSelect}
             onHelpMeNow={handleHelpMeNow}
-            showRelated={true}
           />
         )}
 

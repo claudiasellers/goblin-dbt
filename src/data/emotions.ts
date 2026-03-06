@@ -229,6 +229,85 @@ export function getOppositeEmotionIds(emotionId: string): string[] {
     .map(e => e.id);
 }
 
+/**
+ * Core emotions for the 2D Emotion Plane grid.
+ * 6 rows × 6 cols. Rows 0–2 = high energy, 3–5 = low energy.
+ * Cols 0–2 = unpleasant, 3–5 = pleasant.
+ * Tweak positions here to adjust the visual layout.
+ */
+const CORE_GRID_POSITIONS: Record<string, { row: number; col: number }> = {
+  // Row 0 — Highest energy
+  furious:     { row: 0, col: 0 },
+  angry:       { row: 0, col: 1 },
+  anxious:     { row: 0, col: 2 },
+  excited:     { row: 0, col: 3 },
+  energetic:   { row: 0, col: 4 },
+  joyful:      { row: 0, col: 5 },
+  // Row 1
+  scared:      { row: 1, col: 0 },
+  frustrated:  { row: 1, col: 1 },
+  stressed:    { row: 1, col: 2 },
+  curious:     { row: 1, col: 3 },
+  playful:     { row: 1, col: 4 },
+  proud:       { row: 1, col: 5 },
+  // Row 2
+  nervous:     { row: 2, col: 0 },
+  overwhelmed: { row: 2, col: 1 },
+  worried:     { row: 2, col: 2 },
+  hopeful:     { row: 2, col: 3 },
+  confident:   { row: 2, col: 4 },
+  inspired:    { row: 2, col: 5 },
+  // Row 3 — Low energy starts
+  hurt:        { row: 3, col: 0 },
+  lonely:      { row: 3, col: 1 },
+  guilty:      { row: 3, col: 2 },
+  content:     { row: 3, col: 3 },
+  loving:      { row: 3, col: 4 },
+  thankful:    { row: 3, col: 5 },
+  // Row 4
+  depressed:   { row: 4, col: 0 },
+  sad:         { row: 4, col: 1 },
+  tired:       { row: 4, col: 2 },
+  peaceful:    { row: 4, col: 3 },
+  relaxed:     { row: 4, col: 4 },
+  calm:        { row: 4, col: 5 },
+  // Row 5 — Lowest energy
+  empty:       { row: 5, col: 0 },
+  numb:        { row: 5, col: 1 },
+  bored:       { row: 5, col: 2 },
+  serene:      { row: 5, col: 3 },
+  comfortable: { row: 5, col: 4 },
+  grounded:    { row: 5, col: 5 },
+};
+
+export const GRID_ROWS = 6;
+export const GRID_COLS = 6;
+
+export interface CoreEmotion extends Emotion {
+  gridPosition: { row: number; col: number };
+}
+
+export function getCoreEmotions(): CoreEmotion[] {
+  return Object.entries(CORE_GRID_POSITIONS)
+    .map(([id, gridPosition]) => {
+      const emotion = emotionById.get(id);
+      return emotion ? { ...emotion, gridPosition } : null;
+    })
+    .filter((e): e is CoreEmotion => e !== null)
+    .sort((a, b) =>
+      a.gridPosition.row * GRID_COLS + a.gridPosition.col
+      - (b.gridPosition.row * GRID_COLS + b.gridPosition.col)
+    );
+}
+
+export function isCoreEmotion(id: string): boolean {
+  return id in CORE_GRID_POSITIONS;
+}
+
+export function getNonCoreEmotions(): Emotion[] {
+  return emotions.filter(e => !isCoreEmotion(e.id));
+}
+
 export const quadrantColors: Record<string, { bg: string; text: string }> = {
   'high-unpleasant': { bg: 'bg-[var(--color-q-hu-fill)]', text: 'text-white' },
   'high-pleasant': { bg: 'bg-[var(--color-q-hp-fill)]', text: 'text-[var(--color-text-primary)]' },
