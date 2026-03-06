@@ -3,13 +3,14 @@ import {
   emotions as allEmotions,
   getEmotionByName,
   getEmotionById,
+  getEmotionsByQuadrant,
   getRelatedEmotionIds,
   getOppositeEmotionIds,
   getCoreEmotions,
-  getNonCoreEmotions,
   GRID_ROWS,
   GRID_COLS,
   type CoreEmotion,
+  type Emotion,
 } from '../../data/emotions';
 import { getRelatedEmotions, type RelatedEmotion } from '../../services/neo4j';
 import { bilinearInterpolate } from '../../utils/colorInterpolation';
@@ -19,45 +20,6 @@ interface EmotionPlaneProps {
   onSelect: (emotions: string[]) => void;
   onHelpMeNow?: () => void;
 }
-
-// Quadrant bubble styles for the "show more" overflow pills
-const quadrantBubbleStyles: Record<string, {
-  base: string; selected: string; text: string; selectedText: string;
-  borderHover: string; shadow: string;
-}> = {
-  'high-unpleasant': {
-    base: 'bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]',
-    selected: 'bg-[var(--color-quadrant-high-unpleasant)] border border-transparent',
-    text: 'text-[var(--color-q-hu-text)]',
-    selectedText: 'text-white',
-    borderHover: 'var(--color-q-hu-border-hover)',
-    shadow: 'var(--color-q-hu-shadow)',
-  },
-  'high-pleasant': {
-    base: 'bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]',
-    selected: 'bg-[var(--color-quadrant-high-pleasant)] border border-transparent',
-    text: 'text-[var(--color-q-hp-text)]',
-    selectedText: 'text-white',
-    borderHover: 'var(--color-q-hp-border-hover)',
-    shadow: 'var(--color-q-hp-shadow)',
-  },
-  'low-unpleasant': {
-    base: 'bg-[var(--color-q-lu-bg)] border border-[var(--color-q-lu-border)]',
-    selected: 'bg-[var(--color-quadrant-low-unpleasant)] border border-transparent',
-    text: 'text-[var(--color-q-lu-text)]',
-    selectedText: 'text-white',
-    borderHover: 'var(--color-q-lu-border-hover)',
-    shadow: 'var(--color-q-lu-shadow)',
-  },
-  'low-pleasant': {
-    base: 'bg-[var(--color-q-lp-bg)] border border-[var(--color-q-lp-border)]',
-    selected: 'bg-[var(--color-quadrant-low-pleasant)] border border-transparent',
-    text: 'text-[var(--color-q-lp-text)]',
-    selectedText: 'text-white',
-    borderHover: 'var(--color-q-lp-border-hover)',
-    shadow: 'var(--color-q-lp-shadow)',
-  },
-};
 
 const quadrantChipStyles: Record<string, { bg: string; text: string }> = {
   'high-unpleasant': { bg: 'bg-[var(--color-quadrant-high-unpleasant)]', text: 'text-white' },
@@ -73,10 +35,9 @@ const quadrantLabels: Record<string, string> = {
   'low-pleasant': 'Low Energy Pleasant',
 };
 
-/**
- * Rank related emotion candidates by neural relevance + quadrant proportion
- * from user's current selections. Returns top 3.
- */
+// Ordered for layout: preserve energy axis (high before low)
+const quadrantOrder = ['high-unpleasant', 'high-pleasant', 'low-unpleasant', 'low-pleasant'] as const;
+
 function rankRelatedEmotions(
   candidates: RelatedEmotion[],
   selectedEmotions: string[],
@@ -126,9 +87,10 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
   const [search, setSearch] = useState('');
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
   const [relatedEmotions, setRelatedEmotions] = useState<RelatedEmotion[]>([]);
-  const [showMore, setShowMore] = useState(false);
+  const [expandedQuadrant, setExpandedQuadrant] = useState<string | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const expandedRef = useRef<HTMLDivElement>(null);
 
   // Track theme for color re-computation
   const [theme, setTheme] = useState(
@@ -146,7 +108,6 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
     return () => observer.disconnect();
   }, []);
 
-  // Read corner colors from CSS variables (reactive to theme)
   const corners = useMemo(() => {
     const style = getComputedStyle(document.documentElement);
     return {
@@ -159,7 +120,15 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
   }, [theme]);
 
   const coreGrid = useMemo(() => getCoreEmotions(), []);
-  const nonCoreEmotions = useMemo(() => getNonCoreEmotions(), []);
+
+  // All emotions by quadrant (for zoom mode)
+  const allByQuadrant = useMemo(() => {
+    const grouped: Record<string, Emotion[]> = {};
+    for (const q of quadrantOrder) {
+      grouped[q] = getEmotionsByQuadrant(q);
+    }
+    return grouped;
+  }, []);
 
   // Compute interpolated color for each core grid cell
   const cellColors = useMemo(() => {
@@ -179,7 +148,6 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
   useEffect(() => {
     if (!scrollRef.current || !gridRef.current) return;
     requestAnimationFrame(() => {
-      // Scroll the grid into view, biased toward the initial quadrant
       const isTop = initialQuadrant.startsWith('high');
       if (gridRef.current) {
         gridRef.current.scrollIntoView({
@@ -189,6 +157,15 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
       }
     });
   }, [initialQuadrant]);
+
+  // Scroll expanded zone into view when zooming
+  useEffect(() => {
+    if (expandedQuadrant && expandedRef.current) {
+      requestAnimationFrame(() => {
+        expandedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [expandedQuadrant]);
 
   // Fetch and rank related emotions
   useEffect(() => {
@@ -225,36 +202,33 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
   // Search filtering
   const searchQuery = search.toLowerCase().trim();
 
-  const filteredCore = useMemo(() => {
-    if (!searchQuery) return coreGrid;
-    return coreGrid.filter(e => e.name.toLowerCase().includes(searchQuery));
+  const filteredCoreIds = useMemo(() => {
+    if (!searchQuery) return null; // null = no filter active
+    return new Set(
+      coreGrid.filter(e => e.name.toLowerCase().includes(searchQuery)).map(e => e.id)
+    );
   }, [coreGrid, searchQuery]);
 
-  const filteredCoreIds = useMemo(
-    () => new Set(filteredCore.map(e => e.id)),
-    [filteredCore],
-  );
-
-  // Non-core search results (only shown when searching)
-  const nonCoreSearchResults = useMemo(() => {
+  // Search results from ALL emotions (for search mode)
+  const allSearchResults = useMemo(() => {
     if (!searchQuery) return [];
-    return nonCoreEmotions.filter(e => e.name.toLowerCase().includes(searchQuery));
-  }, [nonCoreEmotions, searchQuery]);
+    return allEmotions.filter(e => e.name.toLowerCase().includes(searchQuery));
+  }, [searchQuery]);
 
   const searchMatchesExisting = useMemo(() => {
     if (!search.trim()) return true;
     return allEmotions.some(e => e.name.toLowerCase() === search.trim().toLowerCase());
   }, [search]);
 
-  // Non-core emotions grouped by quadrant (for "show more")
-  const nonCoreByQuadrant = useMemo(() => {
-    const grouped: Record<string, typeof nonCoreEmotions> = {};
-    for (const e of nonCoreEmotions) {
-      if (!grouped[e.quadrant]) grouped[e.quadrant] = [];
-      grouped[e.quadrant].push(e);
+  // Count selected per quadrant (for badges)
+  const selectedCountByQuadrant = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const name of selectedEmotions) {
+      const e = getEmotionByName(name);
+      if (e) counts[e.quadrant] = (counts[e.quadrant] || 0) + 1;
     }
-    return grouped;
-  }, [nonCoreEmotions]);
+    return counts;
+  }, [selectedEmotions]);
 
   function toggleEmotion(emotionName: string) {
     setSelectedEmotions(prev =>
@@ -292,8 +266,19 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
     }
   }
 
-  // Render a single core grid circle
-  function renderCircle(item: CoreEmotion, dimmed: boolean) {
+  // Get the quadrant color for a given quadrant ID
+  function getQuadrantColor(quadrant: string): string {
+    const map: Record<string, string> = {
+      'high-unpleasant': corners.tl,
+      'high-pleasant': corners.tr,
+      'low-unpleasant': corners.bl,
+      'low-pleasant': corners.br,
+    };
+    return map[quadrant] || '#888';
+  }
+
+  // Render a core grid circle (overview mode)
+  function renderCoreCircle(item: CoreEmotion, dimmed: boolean) {
     const color = cellColors.get(item.id) || '#888';
     const isSelected = selectedEmotions.includes(item.name);
 
@@ -321,9 +306,108 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
     );
   }
 
-  // Split core grid into top half (rows 0-2) and bottom half (rows 3-5)
+  // Render a smaller circle for zoom mode
+  function renderZoomCircle(emotion: Emotion, quadrantColor: string) {
+    const isSelected = selectedEmotions.includes(emotion.name);
+    const dimmed = !!searchQuery && !emotion.name.toLowerCase().includes(searchQuery);
+
+    return (
+      <button
+        key={emotion.id}
+        type="button"
+        onClick={() => toggleEmotion(emotion.name)}
+        style={{
+          backgroundColor: isSelected ? quadrantColor : `${quadrantColor}18`,
+          borderColor: isSelected ? 'transparent' : `${quadrantColor}40`,
+          color: isSelected ? 'white' : quadrantColor,
+          opacity: dimmed ? 0.2 : 1,
+        }}
+        className={`
+          w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center
+          text-[9px] sm:text-[10px] font-semibold text-center leading-tight
+          border transition-all duration-150 p-0.5
+          ${isSelected ? 'scale-105 shadow-md ring-2 ring-white/30' : 'hover:brightness-110'}
+          ${dimmed ? 'pointer-events-none' : 'cursor-pointer'}
+        `}
+      >
+        {emotion.name}
+      </button>
+    );
+  }
+
+  // Render a collapsed quadrant header (zoom mode)
+  function renderCollapsedHeader(quadrant: string) {
+    const count = selectedCountByQuadrant[quadrant] || 0;
+    const dotColor = getQuadrantColor(quadrant);
+
+    return (
+      <button
+        key={quadrant}
+        onClick={() => setExpandedQuadrant(quadrant)}
+        className="
+          w-full flex items-center gap-3 px-4 py-3
+          text-left transition-colors
+          hover:bg-[var(--color-bg-card-hover)]
+          border-b border-[var(--color-border-subtle)]
+        "
+      >
+        <span
+          className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+          style={{ background: dotColor }}
+        />
+        <span className="text-sm font-medium text-[var(--color-text-secondary)] flex-1">
+          {quadrantLabels[quadrant]}
+        </span>
+        {count > 0 && (
+          <span className="text-xs text-[var(--color-text-tertiary)] bg-[var(--color-bg-elevated)] px-2 py-0.5 rounded-full">
+            {count} selected
+          </span>
+        )}
+        <span className="text-[var(--color-text-muted)] text-xs">▸</span>
+      </button>
+    );
+  }
+
+  // Render the expanded quadrant zone (zoom mode)
+  function renderExpandedZone(quadrant: string) {
+    const emotions = allByQuadrant[quadrant] || [];
+    const color = getQuadrantColor(quadrant);
+    const dotColor = color;
+
+    return (
+      <div key={quadrant} ref={expandedRef} className="flex-1 min-h-0 flex flex-col">
+        {/* Expanded header */}
+        <div className="flex items-center gap-3 px-4 py-3 border-b border-[var(--color-border-subtle)]">
+          <span
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            style={{ background: dotColor }}
+          />
+          <span className="text-sm font-medium flex-1" style={{ color: dotColor }}>
+            {quadrantLabels[quadrant]}
+          </span>
+          <button
+            onClick={() => setExpandedQuadrant(null)}
+            className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+          >
+            Show less ↑
+          </button>
+        </div>
+
+        {/* Emotion circles — wrapped flow */}
+        <div className="flex-1 overflow-y-auto p-3">
+          <div className="flex flex-wrap gap-1.5 sm:gap-2 justify-center">
+            {emotions.map(e => renderZoomCircle(e, color))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Split core grid into quadrant zones for overview "+more" buttons
   const topHalf = coreGrid.filter(e => e.gridPosition.row < 3);
   const bottomHalf = coreGrid.filter(e => e.gridPosition.row >= 3);
+
+  const isOverview = expandedQuadrant === null;
 
   return (
     <div className="flex flex-col" style={{ maxHeight: 'calc(100vh - 160px)' }}>
@@ -376,11 +460,7 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
           <div className="flex flex-wrap gap-2">
             {relatedEmotions.map((related) => {
               const emotion = getEmotionByName(formatEmotionName(related.name)) || getEmotionById(related.id);
-              const dotColor = emotion
-                ? getComputedStyle(document.documentElement)
-                    .getPropertyValue(`--color-quadrant-${emotion.quadrant}`)
-                    .trim()
-                : undefined;
+              const dotColor = emotion ? getQuadrantColor(emotion.quadrant) : undefined;
               return (
                 <button
                   key={related.id}
@@ -437,146 +517,152 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
       </div>
 
       {/* Scrollable content area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto min-h-0 pb-2">
-        {/* Axis label: High Energy */}
-        <div className="text-center mb-1.5">
-          <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
-            ↑ High Energy
-          </span>
-        </div>
+      <div ref={scrollRef} className="flex-1 overflow-y-auto min-h-0 pb-2 flex flex-col">
 
-        {/* 6×6 Structured Grid */}
-        <div ref={gridRef} className="relative px-2">
-          {/* Vertical center divider */}
-          <div
-            className="absolute top-0 bottom-0 w-px pointer-events-none z-0"
-            style={{
-              left: '50%',
-              transform: 'translateX(-50%)',
-              background: 'var(--color-border-subtle)',
-              opacity: 0.5,
-            }}
-          />
-
-          {/* Top half — high energy (rows 0–2) */}
-          <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
-            {topHalf.map(item => renderCircle(item, !!searchQuery && !filteredCoreIds.has(item.id)))}
-          </div>
-
-          {/* Horizontal center divider */}
-          <div className="flex items-center my-1.5 sm:my-2">
-            <div
-              className="flex-1 h-px"
-              style={{ background: 'var(--color-border-subtle)', opacity: 0.5 }}
-            />
-          </div>
-
-          {/* Bottom half — low energy (rows 3–5) */}
-          <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
-            {bottomHalf.map(item => renderCircle(item, !!searchQuery && !filteredCoreIds.has(item.id)))}
-          </div>
-        </div>
-
-        {/* Axis labels */}
-        <div className="text-center mt-1.5 mb-1">
-          <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
-            ↓ Low Energy
-          </span>
-        </div>
-        <div className="flex justify-between px-4 mb-3">
-          <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
-            ← Unpleasant
-          </span>
-          <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
-            Pleasant →
-          </span>
-        </div>
-
-        {/* Non-core search results */}
-        {searchQuery && nonCoreSearchResults.length > 0 && (
-          <div className="mt-2 px-2">
-            <p className="text-xs text-[var(--color-text-tertiary)] mb-2">More matches:</p>
-            <div className="flex flex-wrap gap-1.5">
-              {nonCoreSearchResults.map(emotion => {
-                const isSelected = selectedEmotions.includes(emotion.name);
-                const bubbleStyle = quadrantBubbleStyles[emotion.quadrant];
-                return (
-                  <button
-                    key={emotion.id}
-                    type="button"
-                    onClick={() => toggleEmotion(emotion.name)}
-                    className={`
-                      py-1.5 px-3 rounded-full text-xs font-medium cursor-pointer select-none
-                      ${isSelected
-                        ? `${bubbleStyle.selected} ${bubbleStyle.selectedText}`
-                        : `${bubbleStyle.base} ${bubbleStyle.text}`
-                      }
-                    `}
-                  >
-                    {emotion.name}
-                  </button>
-                );
-              })}
+        {/* ========== OVERVIEW MODE ========== */}
+        {isOverview && (
+          <>
+            {/* Axis label: High Energy */}
+            <div className="text-center mb-1.5">
+              <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
+                ↑ High Energy
+              </span>
             </div>
-          </div>
-        )}
 
-        {searchQuery && filteredCore.length === 0 && nonCoreSearchResults.length === 0 && (
-          <p className="text-center text-[var(--color-text-tertiary)] mt-2 text-sm">
-            No matches — click Add to use &ldquo;{search}&rdquo;
-          </p>
-        )}
+            {/* 6×6 Structured Grid */}
+            <div ref={gridRef} className="relative px-2">
+              {/* Vertical center divider */}
+              <div
+                className="absolute top-0 bottom-0 w-px pointer-events-none z-0"
+                style={{
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  background: 'var(--color-border-subtle)',
+                  opacity: 0.5,
+                }}
+              />
 
-        {/* Show more / expand */}
-        {!searchQuery && (
-          <div className="mt-2 px-2">
-            <button
-              onClick={() => setShowMore(prev => !prev)}
-              className="w-full py-2 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
-            >
-              {showMore ? 'Show fewer emotions ↑' : 'Show more emotions ↓'}
-            </button>
-
-            {showMore && (
-              <div className="mt-2 space-y-4">
-                {(['high-unpleasant', 'high-pleasant', 'low-unpleasant', 'low-pleasant'] as const).map(q => {
-                  const qEmotions = nonCoreByQuadrant[q];
-                  if (!qEmotions || qEmotions.length === 0) return null;
-                  const bubbleStyle = quadrantBubbleStyles[q];
-                  return (
-                    <div key={q}>
-                      <p className="text-xs font-medium text-[var(--color-text-tertiary)] mb-1.5">
-                        {quadrantLabels[q]}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {qEmotions.map(emotion => {
-                          const isSelected = selectedEmotions.includes(emotion.name);
-                          return (
-                            <button
-                              key={emotion.id}
-                              type="button"
-                              onClick={() => toggleEmotion(emotion.name)}
-                              style={!isSelected ? {
-                                ['--chip-border-hover' as string]: bubbleStyle.borderHover,
-                                ['--chip-shadow' as string]: bubbleStyle.shadow,
-                              } : undefined}
-                              className={`
-                                py-1 px-2.5 rounded-full text-xs font-medium cursor-pointer select-none
-                                ${isSelected
-                                  ? `${bubbleStyle.selected} ${bubbleStyle.selectedText}`
-                                  : `${bubbleStyle.base} ${bubbleStyle.text} lift-chip`
-                                }
-                              `}
-                            >
-                              {emotion.name}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })}
+              {/* Top half — high energy (rows 0–2) */}
+              <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+                {topHalf.map(item =>
+                  renderCoreCircle(item, !!filteredCoreIds && !filteredCoreIds.has(item.id))
+                )}
               </div>
+
+              {/* +more buttons for top quadrants */}
+              <div className="grid grid-cols-2 mt-1">
+                <button
+                  onClick={() => setExpandedQuadrant('high-unpleasant')}
+                  className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors text-left pl-1 py-1"
+                >
+                  + more
+                </button>
+                <button
+                  onClick={() => setExpandedQuadrant('high-pleasant')}
+                  className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors text-right pr-1 py-1"
+                >
+                  + more
+                </button>
+              </div>
+
+              {/* Horizontal center divider */}
+              <div className="flex items-center my-1 sm:my-1.5">
+                <div
+                  className="flex-1 h-px"
+                  style={{ background: 'var(--color-border-subtle)', opacity: 0.5 }}
+                />
+              </div>
+
+              {/* Bottom half — low energy (rows 3–5) */}
+              <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
+                {bottomHalf.map(item =>
+                  renderCoreCircle(item, !!filteredCoreIds && !filteredCoreIds.has(item.id))
+                )}
+              </div>
+
+              {/* +more buttons for bottom quadrants */}
+              <div className="grid grid-cols-2 mt-1">
+                <button
+                  onClick={() => setExpandedQuadrant('low-unpleasant')}
+                  className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors text-left pl-1 py-1"
+                >
+                  + more
+                </button>
+                <button
+                  onClick={() => setExpandedQuadrant('low-pleasant')}
+                  className="text-[10px] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors text-right pr-1 py-1"
+                >
+                  + more
+                </button>
+              </div>
+            </div>
+
+            {/* Axis labels */}
+            <div className="text-center mt-1.5 mb-1">
+              <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
+                ↓ Low Energy
+              </span>
+            </div>
+            <div className="flex justify-between px-4 mb-3">
+              <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
+                ← Unpleasant
+              </span>
+              <span className="text-[10px] text-[var(--color-text-muted)] tracking-wide uppercase">
+                Pleasant →
+              </span>
+            </div>
+
+            {/* Non-core search results (overview mode) */}
+            {searchQuery && allSearchResults.length > 0 && (
+              <div className="mt-1 px-2">
+                <p className="text-xs text-[var(--color-text-tertiary)] mb-2">
+                  {filteredCoreIds && filteredCoreIds.size > 0 ? 'More matches:' : 'Matches:'}
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {allSearchResults
+                    .filter(e => !filteredCoreIds || !filteredCoreIds.has(e.id))
+                    .map(emotion => {
+                      const isSelected = selectedEmotions.includes(emotion.name);
+                      const color = getQuadrantColor(emotion.quadrant);
+                      return (
+                        <button
+                          key={emotion.id}
+                          type="button"
+                          onClick={() => toggleEmotion(emotion.name)}
+                          style={{
+                            backgroundColor: isSelected ? color : `${color}18`,
+                            borderColor: isSelected ? 'transparent' : `${color}40`,
+                            color: isSelected ? 'white' : color,
+                          }}
+                          className={`
+                            py-1.5 px-3 rounded-full text-xs font-medium cursor-pointer select-none
+                            border transition-all duration-150
+                            ${isSelected ? 'ring-2 ring-white/30' : 'hover:brightness-110'}
+                          `}
+                        >
+                          {emotion.name}
+                        </button>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+
+            {searchQuery && allSearchResults.length === 0 && (
+              <p className="text-center text-[var(--color-text-tertiary)] mt-2 text-sm">
+                No matches — click Add to use &ldquo;{search}&rdquo;
+              </p>
+            )}
+          </>
+        )}
+
+        {/* ========== ZOOM MODE ========== */}
+        {!isOverview && (
+          <div className="flex flex-col flex-1 min-h-0 rounded-lg border border-[var(--color-border-subtle)] overflow-hidden">
+            {quadrantOrder.map(q =>
+              q === expandedQuadrant
+                ? renderExpandedZone(q)
+                : renderCollapsedHeader(q)
             )}
           </div>
         )}
