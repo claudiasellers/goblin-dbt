@@ -4,6 +4,7 @@ export interface Emotion {
   quadrant: string;
   family?: string;
   oppositeIds?: string[];
+  core?: boolean;
 }
 
 const FAMILY_OPPOSITE: Record<string, string> = {
@@ -20,13 +21,15 @@ function makeEmotion(
   id: string,
   name: string,
   quadrant: string,
-  family: string
+  family: string,
+  core?: boolean
 ): Emotion {
   return {
     id,
     name,
     quadrant,
     family,
+    ...(core ? { core: true } : {}),
   };
 }
 
@@ -34,15 +37,15 @@ function makeEmotion(
 export const emotions: Emotion[] = [
   // High Energy Unpleasant
   makeEmotion('fearful', 'Fearful', 'high-unpleasant', 'fearful'),
-  makeEmotion('scared', 'Scared', 'high-unpleasant', 'fearful'),
-  makeEmotion('anxious', 'Anxious', 'high-unpleasant', 'fearful'),
+  makeEmotion('scared', 'Scared', 'high-unpleasant', 'fearful', true),
+  makeEmotion('anxious', 'Anxious', 'high-unpleasant', 'fearful', true),
   makeEmotion('insecure', 'Insecure', 'high-unpleasant', 'fearful'),
   makeEmotion('weak', 'Weak', 'high-unpleasant', 'fearful'),
   makeEmotion('rejected', 'Rejected', 'high-unpleasant', 'fearful'),
   makeEmotion('helpless', 'Helpless', 'high-unpleasant', 'fearful'),
   makeEmotion('frightened', 'Frightened', 'high-unpleasant', 'fearful'),
-  makeEmotion('worried', 'Worried', 'high-unpleasant', 'fearful'),
-  makeEmotion('overwhelmed', 'Overwhelmed', 'high-unpleasant', 'fearful'),
+  makeEmotion('worried', 'Worried', 'high-unpleasant', 'fearful', true),
+  makeEmotion('overwhelmed', 'Overwhelmed', 'high-unpleasant', 'fearful', true),
   makeEmotion('inadequate', 'Inadequate', 'high-unpleasant', 'fearful'),
   makeEmotion('inferior', 'Inferior', 'high-unpleasant', 'fearful'),
   makeEmotion('worthless', 'Worthless', 'high-unpleasant', 'fearful'),
@@ -52,14 +55,14 @@ export const emotions: Emotion[] = [
   makeEmotion('nervous', 'Nervous', 'high-unpleasant', 'fearful'),
   makeEmotion('exposed', 'Exposed', 'high-unpleasant', 'fearful'),
 
-  makeEmotion('angry', 'Angry', 'high-unpleasant', 'angry'),
+  makeEmotion('angry', 'Angry', 'high-unpleasant', 'angry', true),
   makeEmotion('threatened', 'Threatened', 'high-unpleasant', 'angry'),
   makeEmotion('let_down', 'Let down', 'high-unpleasant', 'angry'),
   makeEmotion('humiliated', 'Humiliated', 'high-unpleasant', 'angry'),
   makeEmotion('bitter', 'Bitter', 'high-unpleasant', 'angry'),
   makeEmotion('mad', 'Mad', 'high-unpleasant', 'angry'),
   makeEmotion('aggressive', 'Aggressive', 'high-unpleasant', 'angry'),
-  makeEmotion('frustrated', 'Frustrated', 'high-unpleasant', 'angry'),
+  makeEmotion('frustrated', 'Frustrated', 'high-unpleasant', 'angry', true),
   makeEmotion('distant', 'Distant', 'high-unpleasant', 'angry'),
   makeEmotion('critical', 'Critical', 'high-unpleasant', 'angry'),
   makeEmotion('betrayed', 'Betrayed', 'high-unpleasant', 'angry'),
@@ -68,7 +71,7 @@ export const emotions: Emotion[] = [
   makeEmotion('ridiculed', 'Ridiculed', 'high-unpleasant', 'angry'),
   makeEmotion('indignant', 'Indignant', 'high-unpleasant', 'angry'),
   makeEmotion('violated', 'Violated', 'high-unpleasant', 'angry'),
-  makeEmotion('furious', 'Furious', 'high-unpleasant', 'angry'),
+  makeEmotion('furious', 'Furious', 'high-unpleasant', 'angry', true),
   makeEmotion('jealous', 'Jealous', 'high-unpleasant', 'angry'),
   makeEmotion('provoked', 'Provoked', 'high-unpleasant', 'angry'),
   makeEmotion('hostile', 'Hostile', 'high-unpleasant', 'angry'),
@@ -78,7 +81,7 @@ export const emotions: Emotion[] = [
   makeEmotion('numb', 'Numb', 'high-unpleasant', 'angry'),
   makeEmotion('skeptical', 'Skeptical', 'high-unpleasant', 'angry'),
   makeEmotion('dismissive', 'Dismissive', 'high-unpleasant', 'angry'),
-  makeEmotion('stressed', 'Stressed', 'high-unpleasant', 'bad'),
+  makeEmotion('stressed', 'Stressed', 'high-unpleasant', 'bad', true),
   makeEmotion('busy', 'Busy', 'high-unpleasant', 'bad'),
   makeEmotion('rushed', 'Rushed', 'high-unpleasant', 'bad'),
   makeEmotion('pressured', 'Pressured', 'high-unpleasant', 'bad'),
@@ -86,31 +89,31 @@ export const emotions: Emotion[] = [
 
   // High Energy Pleasant
   makeEmotion('happy', 'Happy', 'high-pleasant', 'happy'),
-  makeEmotion('playful', 'Playful', 'high-pleasant', 'happy'),
+  makeEmotion('playful', 'Playful', 'high-pleasant', 'happy', true),
   makeEmotion('interested', 'Interested', 'high-pleasant', 'happy'),
-  makeEmotion('proud', 'Proud', 'high-pleasant', 'happy'),
+  makeEmotion('proud', 'Proud', 'high-pleasant', 'happy', true),
   makeEmotion('accepted', 'Accepted', 'high-pleasant', 'happy'),
   makeEmotion('powerful', 'Powerful', 'high-pleasant', 'happy'),
   makeEmotion('optimistic', 'Optimistic', 'high-pleasant', 'happy'),
   makeEmotion('aroused', 'Aroused', 'high-pleasant', 'happy'),
   makeEmotion('cheeky', 'Cheeky', 'high-pleasant', 'happy'),
-  makeEmotion('joyful', 'Joyful', 'high-pleasant', 'happy'),
-  makeEmotion('curious', 'Curious', 'high-pleasant', 'happy'),
+  makeEmotion('joyful', 'Joyful', 'high-pleasant', 'happy', true),
+  makeEmotion('curious', 'Curious', 'high-pleasant', 'happy', true),
   makeEmotion('inquisitive', 'Inquisitive', 'high-pleasant', 'happy'),
   makeEmotion('successful', 'Successful', 'high-pleasant', 'happy'),
-  makeEmotion('confident', 'Confident', 'high-pleasant', 'happy'),
+  makeEmotion('confident', 'Confident', 'high-pleasant', 'happy', true),
   makeEmotion('respected', 'Respected', 'high-pleasant', 'happy'),
   makeEmotion('valued', 'Valued', 'high-pleasant', 'happy'),
   makeEmotion('courageous', 'Courageous', 'high-pleasant', 'happy'),
   makeEmotion('creative', 'Creative', 'high-pleasant', 'happy'),
-  makeEmotion('hopeful', 'Hopeful', 'high-pleasant', 'happy'),
+  makeEmotion('hopeful', 'Hopeful', 'high-pleasant', 'happy', true),
   makeEmotion('inspired', 'Inspired', 'high-pleasant', 'happy'),
 
   makeEmotion('surprised', 'Surprised', 'high-pleasant', 'surprised'),
   makeEmotion('startled', 'Startled', 'high-pleasant', 'surprised'),
   makeEmotion('confused', 'Confused', 'high-pleasant', 'surprised'),
   makeEmotion('amazed', 'Amazed', 'high-pleasant', 'surprised'),
-  makeEmotion('excited', 'Excited', 'high-pleasant', 'surprised'),
+  makeEmotion('excited', 'Excited', 'high-pleasant', 'surprised', true),
   makeEmotion('shocked', 'Shocked', 'high-pleasant', 'surprised'),
   makeEmotion('dismayed', 'Dismayed', 'high-pleasant', 'surprised'),
   makeEmotion('disillusioned', 'Disillusioned', 'high-pleasant', 'surprised'),
@@ -118,12 +121,12 @@ export const emotions: Emotion[] = [
   makeEmotion('astonished', 'Astonished', 'high-pleasant', 'surprised'),
   makeEmotion('awe', 'Awe', 'high-pleasant', 'surprised'),
   makeEmotion('eager', 'Eager', 'high-pleasant', 'surprised'),
-  makeEmotion('energetic', 'Energetic', 'high-pleasant', 'surprised'),
+  makeEmotion('energetic', 'Energetic', 'high-pleasant', 'surprised', true),
 
   // Low Energy Unpleasant
   makeEmotion('bad', 'Bad', 'low-unpleasant', 'bad'),
-  makeEmotion('tired', 'Tired', 'low-unpleasant', 'bad'),
-  makeEmotion('bored', 'Bored', 'low-unpleasant', 'bad'),
+  makeEmotion('tired', 'Tired', 'low-unpleasant', 'bad', true),
+  makeEmotion('bored', 'Bored', 'low-unpleasant', 'bad', true),
   makeEmotion('sleepy', 'Sleepy', 'low-unpleasant', 'bad'),
   makeEmotion('unfocused', 'Unfocused', 'low-unpleasant', 'bad'),
   makeEmotion('apathetic', 'Apathetic', 'low-unpleasant', 'bad'),
@@ -131,7 +134,7 @@ export const emotions: Emotion[] = [
 
   makeEmotion('disgusted', 'Disgusted', 'low-unpleasant', 'disgusted'),
   makeEmotion('disapproving', 'Disapproving', 'low-unpleasant', 'disgusted'),
-  makeEmotion('disappointed', 'Disappointed', 'low-unpleasant', 'disgusted'),
+  makeEmotion('disappointed', 'Disappointed', 'low-unpleasant', 'disgusted', true),
   makeEmotion('awful', 'Awful', 'low-unpleasant', 'disgusted'),
   makeEmotion('repelled', 'Repelled', 'low-unpleasant', 'disgusted'),
   makeEmotion('judgmental', 'Judgmental', 'low-unpleasant', 'disgusted'),
@@ -143,12 +146,12 @@ export const emotions: Emotion[] = [
   makeEmotion('horrified', 'Horrified', 'low-unpleasant', 'disgusted'),
   makeEmotion('hesitant', 'Hesitant', 'low-unpleasant', 'disgusted'),
 
-  makeEmotion('sad', 'Sad', 'low-unpleasant', 'sad'),
-  makeEmotion('lonely', 'Lonely', 'low-unpleasant', 'sad'),
+  makeEmotion('sad', 'Sad', 'low-unpleasant', 'sad', true),
+  makeEmotion('lonely', 'Lonely', 'low-unpleasant', 'sad', true),
   makeEmotion('vulnerable', 'Vulnerable', 'low-unpleasant', 'sad'),
   makeEmotion('despair', 'Despair', 'low-unpleasant', 'sad'),
-  makeEmotion('guilty', 'Guilty', 'low-unpleasant', 'sad'),
-  makeEmotion('depressed', 'Depressed', 'low-unpleasant', 'sad'),
+  makeEmotion('guilty', 'Guilty', 'low-unpleasant', 'sad', true),
+  makeEmotion('depressed', 'Depressed', 'low-unpleasant', 'sad', true),
   makeEmotion('hurt', 'Hurt', 'low-unpleasant', 'sad'),
   makeEmotion('isolated', 'Isolated', 'low-unpleasant', 'sad'),
   makeEmotion('abandoned', 'Abandoned', 'low-unpleasant', 'sad'),
@@ -158,25 +161,25 @@ export const emotions: Emotion[] = [
   makeEmotion('powerless', 'Powerless', 'low-unpleasant', 'sad'),
   makeEmotion('ashamed', 'Ashamed', 'low-unpleasant', 'sad'),
   makeEmotion('remorseful', 'Remorseful', 'low-unpleasant', 'sad'),
-  makeEmotion('empty', 'Empty', 'low-unpleasant', 'sad'),
+  makeEmotion('empty', 'Empty', 'low-unpleasant', 'sad', true),
 
   // Low Energy Pleasant
-  makeEmotion('calm', 'Calm', 'low-pleasant', 'happy'),
-  makeEmotion('relaxed', 'Relaxed', 'low-pleasant', 'happy'),
-  makeEmotion('peaceful', 'Peaceful', 'low-pleasant', 'happy'),
-  makeEmotion('content', 'Content', 'low-pleasant', 'happy'),
+  makeEmotion('calm', 'Calm', 'low-pleasant', 'happy', true),
+  makeEmotion('relaxed', 'Relaxed', 'low-pleasant', 'happy', true),
+  makeEmotion('peaceful', 'Peaceful', 'low-pleasant', 'happy', true),
+  makeEmotion('content', 'Content', 'low-pleasant', 'happy', true),
   makeEmotion('trusting', 'Trusting', 'low-pleasant', 'happy'),
   makeEmotion('sensitive', 'Sensitive', 'low-pleasant', 'happy'),
   makeEmotion('intimate', 'Intimate', 'low-pleasant', 'happy'),
-  makeEmotion('loving', 'Loving', 'low-pleasant', 'happy'),
-  makeEmotion('thankful', 'Thankful', 'low-pleasant', 'happy'),
+  makeEmotion('loving', 'Loving', 'low-pleasant', 'happy', true),
+  makeEmotion('thankful', 'Thankful', 'low-pleasant', 'happy', true),
   makeEmotion('good', 'Good', 'low-pleasant', 'happy'),
   makeEmotion('chill', 'Chill', 'low-pleasant', 'happy'),
-  makeEmotion('comfortable', 'Comfortable', 'low-pleasant', 'happy'),
+  makeEmotion('comfortable', 'Comfortable', 'low-pleasant', 'happy', true),
   makeEmotion('thoughtful', 'Thoughtful', 'low-pleasant', 'happy'),
   makeEmotion('mellow', 'Mellow', 'low-pleasant', 'happy'),
   makeEmotion('sympathetic', 'Sympathetic', 'low-pleasant', 'happy'),
-  makeEmotion('serene', 'Serene', 'low-pleasant', 'happy'),
+  makeEmotion('serene', 'Serene', 'low-pleasant', 'happy', true),
   makeEmotion('secure', 'Secure', 'low-pleasant', 'happy'),
   makeEmotion('satisfied', 'Satisfied', 'low-pleasant', 'happy'),
   makeEmotion('restful', 'Restful', 'low-pleasant', 'happy'),
@@ -229,83 +232,17 @@ export function getOppositeEmotionIds(emotionId: string): string[] {
     .map(e => e.id);
 }
 
-/**
- * Core emotions for the 2D Emotion Plane grid.
- * 6 rows × 6 cols. Rows 0–2 = high energy, 3–5 = low energy.
- * Cols 0–2 = unpleasant, 3–5 = pleasant.
- * Tweak positions here to adjust the visual layout.
- */
-const CORE_GRID_POSITIONS: Record<string, { row: number; col: number }> = {
-  // Row 0 — Highest energy
-  furious:     { row: 0, col: 0 },
-  angry:       { row: 0, col: 1 },
-  anxious:     { row: 0, col: 2 },
-  excited:     { row: 0, col: 3 },
-  energetic:   { row: 0, col: 4 },
-  joyful:      { row: 0, col: 5 },
-  // Row 1
-  scared:      { row: 1, col: 0 },
-  frustrated:  { row: 1, col: 1 },
-  stressed:    { row: 1, col: 2 },
-  curious:     { row: 1, col: 3 },
-  playful:     { row: 1, col: 4 },
-  proud:       { row: 1, col: 5 },
-  // Row 2
-  nervous:     { row: 2, col: 0 },
-  overwhelmed: { row: 2, col: 1 },
-  worried:     { row: 2, col: 2 },
-  hopeful:     { row: 2, col: 3 },
-  confident:   { row: 2, col: 4 },
-  inspired:    { row: 2, col: 5 },
-  // Row 3 — Low energy starts
-  hurt:        { row: 3, col: 0 },
-  lonely:      { row: 3, col: 1 },
-  guilty:      { row: 3, col: 2 },
-  content:     { row: 3, col: 3 },
-  loving:      { row: 3, col: 4 },
-  thankful:    { row: 3, col: 5 },
-  // Row 4
-  depressed:   { row: 4, col: 0 },
-  sad:         { row: 4, col: 1 },
-  tired:       { row: 4, col: 2 },
-  peaceful:    { row: 4, col: 3 },
-  relaxed:     { row: 4, col: 4 },
-  calm:        { row: 4, col: 5 },
-  // Row 5 — Lowest energy
-  empty:       { row: 5, col: 0 },
-  numb:        { row: 5, col: 1 },
-  bored:       { row: 5, col: 2 },
-  serene:      { row: 5, col: 3 },
-  comfortable: { row: 5, col: 4 },
-  grounded:    { row: 5, col: 5 },
-};
-
-export const GRID_ROWS = 6;
-export const GRID_COLS = 6;
-
-export interface CoreEmotion extends Emotion {
-  gridPosition: { row: number; col: number };
+export function getCoreEmotions(): Emotion[] {
+  return emotions.filter(e => e.core);
 }
 
-export function getCoreEmotions(): CoreEmotion[] {
-  return Object.entries(CORE_GRID_POSITIONS)
-    .map(([id, gridPosition]) => {
-      const emotion = emotionById.get(id);
-      return emotion ? { ...emotion, gridPosition } : null;
-    })
-    .filter((e): e is CoreEmotion => e !== null)
-    .sort((a, b) =>
-      a.gridPosition.row * GRID_COLS + a.gridPosition.col
-      - (b.gridPosition.row * GRID_COLS + b.gridPosition.col)
-    );
+export function getCoreEmotionsByQuadrant(quadrant: string): Emotion[] {
+  return emotions.filter(e => e.core && e.quadrant === quadrant);
 }
 
 export function isCoreEmotion(id: string): boolean {
-  return id in CORE_GRID_POSITIONS;
-}
-
-export function getNonCoreEmotions(): Emotion[] {
-  return emotions.filter(e => !isCoreEmotion(e.id));
+  const e = emotionById.get(id);
+  return !!e?.core;
 }
 
 export const quadrantColors: Record<string, { bg: string; text: string }> = {

@@ -504,6 +504,45 @@ export async function getDearManReflection(
   return result.data;
 }
 
+// Saved session record returned from getDearManSessions
+export interface DearManSessionRecord {
+  id: string;
+  type: 'prep' | 'debrief';
+  relationshipType: string;
+  situationType: string;
+  priorities: string[];
+  barriers: string[];
+  describeId: string | null;
+  describeCustom: string;
+  feelings: string[];
+  assertId: string | null;
+  assertCustom: string;
+  reinforceIds: string[];
+  anchorPhrase: string;
+  middleGroundId: string | null;
+  middleGroundCustom: string;
+  walkAwayId: string | null;
+  walkAwayCustom: string;
+  debriefOverall: string | null;
+  debriefWentWell: string[];
+  debriefToChange: string[];
+  debriefCurrentFeelings: string[];
+  createdAt: Date;
+}
+
+const getDearManSessionsFn = httpsCallable<
+  { limit?: number },
+  { sessions: Array<Omit<DearManSessionRecord, 'createdAt'> & { createdAt: string }> }
+>(functions, 'getDearManSessions');
+
+export async function getDearManSessions(limit = 20): Promise<DearManSessionRecord[]> {
+  const result = await getDearManSessionsFn({ limit });
+  return result.data.sessions.map((s) => ({
+    ...s,
+    createdAt: new Date(s.createdAt),
+  }));
+}
+
 // ============================================
 // INSIGHTS DATA
 // ============================================
@@ -527,7 +566,7 @@ export interface ProactiveAlert {
 }
 
 export interface GrowthEvidenceInsight {
-  insights: Array<{ key: string; text: string }>;
+  insights: Array<{ key: string; text: string; data: Record<string, number> }>;
 }
 
 export interface SomaticCorrelationData {

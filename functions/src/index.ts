@@ -727,7 +727,9 @@ export const getInsightsData = onCall(
           MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
           WHERE c.timestamp >= datetime() - duration({days: 30})
           OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-          WITH c, collect(s.region) AS bodyRegions
+          WITH c, collect(DISTINCT s.region) AS bodyRegions, collect(s.tags) AS tagArrays
+          OPTIONAL MATCH (e:Emotion {id: c.emotion})
+          WITH c, bodyRegions, tagArrays, e.dbtParent AS dbtParent
           ORDER BY c.timestamp DESC
           RETURN c.id AS id,
                  toString(c.timestamp) AS timestamp,
@@ -736,7 +738,9 @@ export const getInsightsData = onCall(
                  c.intensityX AS intensityX,
                  c.intensityY AS intensityY,
                  c.activationPatternId AS activationPatternId,
-                 bodyRegions
+                 bodyRegions,
+                 tagArrays,
+                 dbtParent
           `,
           { userId }
         ),
@@ -749,7 +753,8 @@ export const getInsightsData = onCall(
           RETURN tu.toolId AS toolId,
                  tu.outcome AS outcome,
                  toString(tu.timestamp) AS timestamp,
-                 c.activationPatternId AS patternId
+                 c.activationPatternId AS patternId,
+                 c.id AS checkInId
           ORDER BY tu.timestamp DESC
           `,
           { userId }
@@ -777,6 +782,8 @@ export const getInsightsData = onCall(
         intensityY: toNumber(r.get('intensityY')) ?? 0,
         activationPatternId: r.get('activationPatternId') || null,
         bodyRegions: (r.get('bodyRegions') || []).filter(Boolean) as string[],
+        sensationTags: ((r.get('tagArrays') || []) as string[][]).flat().filter(Boolean) as string[],
+        dbtParent: r.get('dbtParent') || null,
       }));
 
       // Parse tool usage
@@ -785,6 +792,7 @@ export const getInsightsData = onCall(
         outcome: r.get('outcome') || null,
         timestamp: r.get('timestamp'),
         patternId: r.get('patternId') || null,
+        checkInId: r.get('checkInId') || null,
       }));
 
       // Parse continuity
@@ -933,50 +941,124 @@ export const getInsightsData = onCall(
         const daySpan = (lastTs - firstTs) / (1000 * 60 * 60 * 24);
 
         if (daySpan >= 5) {
-          // Split into older half and newer half
           const mid = Math.floor(sorted.length / 2);
           const olderHalf = sorted.slice(0, mid);
           const newerHalf = sorted.slice(mid);
+          const midTimestamp = sorted[mid].timestamp;
 
           if (olderHalf.length >= 2 && newerHalf.length >= 2) {
+            const insights: Array<{ key: string; text: string; data: Record<string, number> }> = [];
+
+            // 1. Emotional vocabulary expanding
+            const olderEmotions = new Set(olderHalf.map(ci => ci.emotion));
+            const newerEmotions = new Set(newerHalf.map(ci => ci.emotion));
+            if (newerEmotions.size > olderEmotions.size && newerEmotions.size >= 3) {
+              insights.push({
+                key: 'emotion-vocabulary',
+                text: 'Naming emotions precisely is itself a regulation skill.',
+                data: { current: newerEmotions.size, previous: olderEmotions.size },
+              });
+            }
+
+            // 2. Emotion family breadth
+            const olderFamilies = new Set(olderHalf.map(ci => ci.dbtParent).filter(Boolean));
+            const newerFamilies = new Set(newerHalf.map(ci => ci.dbtParent).filter(Boolean));
+            if (newerFamilies.size > olderFamilies.size && newerFamilies.size >= 3) {
+              insights.push({
+                key: 'emotion-family-breadth',
+                text: "You're not collapsing everything into one feeling.",
+                data: { current: newerFamilies.size, previous: olderFamilies.size },
+              });
+            }
+
+            // 3. Catching it earlier (intensity drop)
             const recentAvgIntensity = newerHalf.reduce((s, ci) => s + ci.intensityY, 0) / newerHalf.length;
             const priorAvgIntensity = olderHalf.reduce((s, ci) => s + ci.intensityY, 0) / olderHalf.length;
-            const intensityChange = priorAvgIntensity - recentAvgIntensity;
-
-            const recentEarlyPct = newerHalf.filter(ci => ci.intensityY < 0.4).length / newerHalf.length;
-            const priorEarlyPct = olderHalf.filter(ci => ci.intensityY < 0.4).length / olderHalf.length;
-
-            const insights: Array<{ key: string; text: string }> = [];
-
-            if (intensityChange > 0.08) {
+            if (priorAvgIntensity - recentAvgIntensity > 0.08) {
               insights.push({
-                key: 'lower-intensity',
-                text: `Your average intensity dropped from ${Math.round(priorAvgIntensity * 100)}% to ${Math.round(recentAvgIntensity * 100)}% in your recent check-ins. You're catching things earlier.`,
+                key: 'catching-earlier',
+                text: "You're catching things before they escalate.",
+                data: { current: Math.round(recentAvgIntensity * 100), previous: Math.round(priorAvgIntensity * 100) },
               });
             }
 
-            if (recentEarlyPct - priorEarlyPct > 0.1) {
+            // 4. Activation pattern diversity
+            const olderPatterns = new Set(olderHalf.map(ci => ci.activationPatternId).filter(Boolean));
+            const newerPatterns = new Set(newerHalf.map(ci => ci.activationPatternId).filter(Boolean));
+            if (olderPatterns.size <= 2 && newerPatterns.size > olderPatterns.size) {
               insights.push({
-                key: 'early-intervention',
-                text: `${Math.round(recentEarlyPct * 100)}% of your recent check-ins were at low intensity, up from ${Math.round(priorEarlyPct * 100)}%. You're reaching for tools before things escalate.`,
+                key: 'pattern-diversity',
+                text: "You're reading your internal signals more accurately.",
+                data: { current: newerPatterns.size, previous: olderPatterns.size },
               });
             }
 
-            if (newerHalf.length > olderHalf.length) {
+            // 5. Body sensation richness (tag variety)
+            const olderTags = new Set(olderHalf.flatMap(ci => ci.sensationTags));
+            const newerTags = new Set(newerHalf.flatMap(ci => ci.sensationTags));
+            if (newerTags.size > olderTags.size + 2 && newerTags.size >= 3) {
               insights.push({
-                key: 'more-checkins',
-                text: `You've been checking in more frequently recently. More awareness means more opportunities to intervene early.`,
+                key: 'sensation-richness',
+                text: "More body detail means earlier warning signals.",
+                data: { current: newerTags.size, previous: olderTags.size },
               });
             }
 
-            // Body awareness growth
+            // 6. Body region awareness
             const olderBodyAvg = olderHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / olderHalf.length;
             const recentBodyAvg = newerHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / newerHalf.length;
             if (recentBodyAvg > olderBodyAvg + 0.3 && recentBodyAvg > 0.5) {
               insights.push({
                 key: 'body-awareness',
-                text: "You're getting more specific about what your body is telling you. That kind of interoceptive awareness is a real skill you're developing.",
+                text: "Growing body awareness gives you a head start.",
+                data: { current: Math.round(recentBodyAvg * 10) / 10, previous: Math.round(olderBodyAvg * 10) / 10 },
               });
+            }
+
+            // 7. Tool follow-through (check-ins that led to tool use)
+            const checkInIds = new Set(checkIns.map(ci => ci.id));
+            const checkInsWithToolFollow = new Set(
+              toolUsages.filter(tu => tu.checkInId && checkInIds.has(tu.checkInId)).map(tu => tu.checkInId)
+            );
+            const followThroughRate = checkInsWithToolFollow.size / checkIns.length;
+            if (followThroughRate >= 0.4 && checkInsWithToolFollow.size >= 3) {
+              insights.push({
+                key: 'tool-follow-through',
+                text: "Notice it, then do something about it — that's the whole loop.",
+                data: { numerator: checkInsWithToolFollow.size, denominator: checkIns.length },
+              });
+            }
+
+            // 8. Tool repertoire broadening
+            const olderToolIds = new Set(
+              toolUsages.filter(tu => tu.timestamp < midTimestamp).map(tu => tu.toolId)
+            );
+            const newerToolIds = new Set(
+              toolUsages.filter(tu => tu.timestamp >= midTimestamp).map(tu => tu.toolId)
+            );
+            if (newerToolIds.size > olderToolIds.size && newerToolIds.size >= 3) {
+              insights.push({
+                key: 'tool-repertoire',
+                text: "More options for different situations.",
+                data: { current: newerToolIds.size, previous: olderToolIds.size },
+              });
+            }
+
+            // 9. Positive outcomes increasing
+            const olderOutcomes = toolUsages.filter(tu => tu.timestamp < midTimestamp && tu.outcome);
+            const newerOutcomes = toolUsages.filter(tu => tu.timestamp >= midTimestamp && tu.outcome);
+            if (newerOutcomes.length >= 2) {
+              const newerPositiveRate = newerOutcomes.filter(tu => tu.outcome === 'helped').length / newerOutcomes.length;
+              const olderPositiveRate = olderOutcomes.length >= 2
+                ? olderOutcomes.filter(tu => tu.outcome === 'helped').length / olderOutcomes.length
+                : 0;
+              if (newerPositiveRate > olderPositiveRate && newerPositiveRate >= 0.5) {
+                insights.push({
+                  key: 'positive-outcomes',
+                  text: "What you're doing is working.",
+                  data: { current: Math.round(newerPositiveRate * 100), previous: Math.round(olderPositiveRate * 100) },
+                });
+              }
             }
 
             if (insights.length > 0) {
@@ -2433,6 +2515,88 @@ export const getQuickTools = onCall(
     } catch (error) {
       console.error('Error getting quick tools:', error);
       throw new HttpsError('internal', 'Failed to get tools');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/**
+ * Get saved DEAR MAN sessions for the authenticated user.
+ * Returns sessions sorted by createdAt descending.
+ */
+export const getDearManSessions = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+    const limit = (request.data as { limit?: number })?.limit ?? 20;
+
+    const session = getDriver().session();
+    try {
+      const result = await session.run(
+        `
+        MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:DearManSession)
+        RETURN s.id AS id,
+               s.type AS type,
+               s.relationshipType AS relationshipType,
+               s.situationType AS situationType,
+               s.priorities AS priorities,
+               s.barriers AS barriers,
+               s.describeId AS describeId,
+               s.describeCustom AS describeCustom,
+               s.feelings AS feelings,
+               s.assertId AS assertId,
+               s.assertCustom AS assertCustom,
+               s.reinforceIds AS reinforceIds,
+               s.anchorPhrase AS anchorPhrase,
+               s.middleGroundId AS middleGroundId,
+               s.middleGroundCustom AS middleGroundCustom,
+               s.walkAwayId AS walkAwayId,
+               s.walkAwayCustom AS walkAwayCustom,
+               s.debriefOverall AS debriefOverall,
+               s.debriefWentWell AS debriefWentWell,
+               s.debriefToChange AS debriefToChange,
+               s.debriefCurrentFeelings AS debriefCurrentFeelings,
+               s.createdAt AS createdAt
+        ORDER BY s.createdAt DESC
+        LIMIT $limit
+        `,
+        { userId, limit: Number(limit) }
+      );
+
+      const sessions = result.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        type: r.get('type'),
+        relationshipType: r.get('relationshipType') || '',
+        situationType: r.get('situationType') || '',
+        priorities: r.get('priorities') || [],
+        barriers: r.get('barriers') || [],
+        describeId: r.get('describeId'),
+        describeCustom: r.get('describeCustom') || '',
+        feelings: r.get('feelings') || [],
+        assertId: r.get('assertId'),
+        assertCustom: r.get('assertCustom') || '',
+        reinforceIds: r.get('reinforceIds') || [],
+        anchorPhrase: r.get('anchorPhrase') || '',
+        middleGroundId: r.get('middleGroundId'),
+        middleGroundCustom: r.get('middleGroundCustom') || '',
+        walkAwayId: r.get('walkAwayId'),
+        walkAwayCustom: r.get('walkAwayCustom') || '',
+        debriefOverall: r.get('debriefOverall'),
+        debriefWentWell: r.get('debriefWentWell') || [],
+        debriefToChange: r.get('debriefToChange') || [],
+        debriefCurrentFeelings: r.get('debriefCurrentFeelings') || [],
+        createdAt: r.get('createdAt')?.toString() || new Date().toISOString(),
+      }));
+
+      return { sessions };
+    } catch (error) {
+      console.error('Error fetching DEAR MAN sessions:', error);
+      throw new HttpsError('internal', 'Failed to fetch sessions');
     } finally {
       await session.close();
     }

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { emotions, getEmotionById, getEmotionByName } from '../../data/emotions';
 import {
   getOppositeActionContent,
+  recordToolOutcome,
   type OppositeActionContent,
   type ActionUrgeData,
 } from '../../services/neo4j';
@@ -52,6 +53,7 @@ export function OppositeAction() {
   const [parentOverrides, setParentOverrides] = useState<Record<string, string>>({});
   const [chosenSizes, setChosenSizes] = useState<Record<string, 'small' | 'medium' | 'bigger'>>({});
   const [guiltFitsNote, setGuiltFitsNote] = useState<string | null>(null);
+  const [outcomeState, setOutcomeState] = useState<'pending' | 'submitting' | 'done'>('pending');
 
   // Graph data — fetched after emotion selection
   const [oaData, setOaData] = useState<OppositeActionContent | null>(null);
@@ -238,6 +240,7 @@ export function OppositeAction() {
     setParentOverrides({});
     setChosenSizes({});
     setGuiltFitsNote(null);
+    setOutcomeState('pending');
     setOaData(null);
     setError(null);
   };
@@ -814,6 +817,16 @@ export function OppositeAction() {
       parentData.map(pd => pd.whyItWorks).filter(Boolean)
     )];
 
+    const handleOutcome = async (outcome: 'helped' | 'somewhat' | 'not_really') => {
+      setOutcomeState('submitting');
+      try {
+        await recordToolOutcome(outcome);
+      } catch {
+        // Don't block on failure
+      }
+      setOutcomeState('done');
+    };
+
     return (
       <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)]">
         <span className="text-4xl mb-4 block" role="img" aria-hidden="true">🔄</span>
@@ -835,9 +848,45 @@ export function OppositeAction() {
             And remember: {bodyOpposites.map(bo => bo.text.split('.')[0].toLowerCase()).join('. ')}.
           </p>
         )}
+
+        {outcomeState === 'pending' && (
+          <div className="mt-6 pt-5 border-t border-[var(--color-border-subtle)]">
+            <p className="text-sm text-[var(--color-text-secondary)] mb-3">
+              How did this feel?
+            </p>
+            <div className="flex gap-2">
+              {([
+                { value: 'helped' as const, label: 'Helpful' },
+                { value: 'somewhat' as const, label: 'Somewhat' },
+                { value: 'not_really' as const, label: 'Not really' },
+              ]).map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleOutcome(opt.value)}
+                  className="flex-1 py-2 rounded-lg text-xs font-medium border border-[var(--color-border-subtle)] text-[var(--color-text-secondary)] hover:border-[var(--color-accent)] hover:text-[var(--color-accent)] transition-colors"
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {outcomeState === 'submitting' && (
+          <div className="mt-6 pt-5 border-t border-[var(--color-border-subtle)]">
+            <div className="inline-block w-5 h-5 border-2 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin"></div>
+          </div>
+        )}
+
+        {outcomeState === 'done' && (
+          <p className="mt-6 pt-5 border-t border-[var(--color-border-subtle)] text-sm text-[var(--color-text-tertiary)]">
+            Noted — this helps your insights get smarter.
+          </p>
+        )}
+
         <button
           onClick={reset}
-          className="py-2 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary"
+          className="mt-4 py-2 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary"
         >
           Start over
         </button>
