@@ -127,6 +127,7 @@ export function DearMan() {
   // ── UI state ──
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(false);
 
   // ── Load content from graph on mount ──
   useEffect(() => {
@@ -355,6 +356,7 @@ export function DearMan() {
 
   const handleSave = async () => {
     setSaving(true);
+    setSaveError(false);
     try {
       await saveDearManSession({
         type: 'prep',
@@ -375,8 +377,9 @@ export function DearMan() {
         walkAwayCustom,
       });
       setSaved(true);
-    } catch {
-      // Silently fail
+    } catch (err) {
+      console.error('Failed to save DEAR MAN session:', err);
+      setSaveError(true);
     } finally {
       setSaving(false);
     }
@@ -404,7 +407,7 @@ export function DearMan() {
     setUnderneathIds([]); setReflectionData(null);
     setSelectedCopeAheadId(null); setReflectionLanded(null);
     setDebriefSaving(false); setDebriefSaved(false);
-    setSaved(false);
+    setSaved(false); setSaveError(false);
   };
 
   // ─── ENTRY ───
@@ -985,13 +988,16 @@ export function DearMan() {
           <div className="flex gap-3">
             <button onClick={handleSave} disabled={saving || saved}
               className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
-              {saved ? 'Saved' : saving ? 'Saving...' : 'Save this plan'}
+              {saved ? 'Saved' : saving ? 'Saving...' : saveError ? 'Try again' : 'Save this plan'}
             </button>
             <button onClick={reset}
               className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
               Start over
             </button>
           </div>
+          {saveError && (
+            <p className="text-red-500 text-sm mt-2 text-center">Something went wrong saving your plan. Please try again.</p>
+          )}
         </div>
 
         {/* DEAR MAN reveal */}
@@ -1038,6 +1044,7 @@ export function DearMan() {
 
   const handleDebriefSave = async () => {
     setDebriefSaving(true);
+    setSaveError(false);
     try {
       await saveDearManSession({
         type: 'debrief',
@@ -1067,8 +1074,9 @@ export function DearMan() {
         reflectionLanded: reflectionLanded || undefined,
       });
       setDebriefSaved(true);
-    } catch {
-      // Silently fail
+    } catch (err) {
+      console.error('Failed to save DEAR MAN debrief:', err);
+      setSaveError(true);
     } finally {
       setDebriefSaving(false);
     }

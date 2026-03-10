@@ -329,6 +329,92 @@ export async function getOppositeActionContent(
 }
 
 // ============================================
+// PROBLEM SOLVE CONTENT
+// ============================================
+
+export interface SolutionDirectionData {
+  id: string;
+  label: string;
+  description: string;
+  small: string;
+  medium: string;
+  bigger: string;
+  linkedToolId: string | null;
+  sortOrder: number;
+}
+
+export interface ProblemTypeData {
+  id: string;
+  label: string;
+  description: string;
+  recognitionPrompt: string;
+  sortOrder: number;
+  solutionDirections: SolutionDirectionData[];
+}
+
+export interface ProblemSolveParentProtocol {
+  label: string;
+  psAcknowledgment: string;
+  problemDefinitionPrompts: string[];
+  cannotChangeGuidance: string;
+  psInterpersonalHint: string | null;
+  ruminationRiskLevel: string;
+  ruminationGuardMessage: string | null;
+  psCompanionTools: string[];
+  problemTypes: ProblemTypeData[];
+}
+
+export interface ProblemSolveEmotionMapping {
+  emotionId: string;
+  applicable: boolean;
+  dbtParent: string | null;
+  clinicalNote: string;
+  alternativeSkill: string | null;
+}
+
+export interface ProblemSolveProtocol {
+  readinessCheck: string;
+  readinessRedirectMessage: string;
+  readinessRedirectTools: string[];
+  changeabilityQuestions: string[];
+  nothingCanChangeMessage: string;
+  nothingCanChangeTools: string[];
+  everythingIsPilingUpMessage: string;
+  interpersonalDetectionPrompt: string;
+  interpersonalRedirectTools: string[];
+  notMyProblemPrompt: string;
+  commitmentFraming: string[];
+  commitmentValidation: string;
+  completionAcknowledgment: string;
+  completionFollowUp: string;
+  copeAheadBridge: string;
+  copeAheadBridgeToolId: string;
+}
+
+export interface ProblemSolveContent {
+  emotions: ProblemSolveEmotionMapping[];
+  parents: Record<string, ProblemSolveParentProtocol>;
+  protocol: ProblemSolveProtocol;
+}
+
+const getProblemSolveContentFn = httpsCallable<
+  { emotionIds: string[] },
+  ProblemSolveContent
+>(functions, 'getProblemSolveContent');
+
+/**
+ * Get problem solve content for a set of emotions.
+ * Returns per-emotion PS applicability, per-parent protocol data
+ * with problem types and solution directions, plus the cross-cutting protocol.
+ */
+export async function getProblemSolveContent(
+  emotionIds: string[]
+): Promise<ProblemSolveContent> {
+  const result = await getProblemSolveContentFn({ emotionIds });
+  return result.data;
+}
+
+// ============================================
 // TOOL USAGE TRACKING
 // ============================================
 

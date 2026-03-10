@@ -820,7 +820,11 @@ export const getInsightsData = onCall(
 
       // ── Compute formulation ──
       // Use full 30-day window. Show formulation if ANY pattern exists (even 1 check-in).
-      const sortedPatterns = Object.entries(patternCounts).sort((a, b) => b[1] - a[1]);
+      // Filter out positive_state — it's a fallback for pleasant quadrants, not a clinical
+      // pattern in the graph. Leaving it in blocks formulation when it's the dominant count.
+      const sortedPatterns = Object.entries(patternCounts)
+        .filter(([id]) => id !== 'positive_state')
+        .sort((a, b) => b[1] - a[1]);
       const dominantPattern = sortedPatterns[0]; // may be count=1
       const secondaryPattern = sortedPatterns[1];
 
@@ -2565,7 +2569,7 @@ export const getDearManSessions = onCall(
         ORDER BY s.createdAt DESC
         LIMIT $limit
         `,
-        { userId, limit: Number(limit) }
+        { userId, limit: neo4j.int(limit) }
       );
 
       const sessions = result.records.map((r: Neo4jRecord) => ({
@@ -2597,6 +2601,241 @@ export const getDearManSessions = onCall(
     } catch (error) {
       console.error('Error fetching DEAR MAN sessions:', error);
       throw new HttpsError('internal', 'Failed to fetch sessions');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+// ============================================
+// PROBLEM SOLVE CONTENT
+// ============================================
+
+interface ProblemSolveEmotionResult {
+  emotionId: string;
+  applicable: boolean;
+  dbtParent: string | null;
+  clinicalNote: string;
+  alternativeSkill: string | null;
+}
+
+interface SolutionDirectionResult {
+  id: string;
+  label: string;
+  description: string;
+  small: string;
+  medium: string;
+  bigger: string;
+  linkedToolId: string | null;
+  sortOrder: number;
+}
+
+interface ProblemTypeResult {
+  id: string;
+  label: string;
+  description: string;
+  recognitionPrompt: string;
+  sortOrder: number;
+  solutionDirections: SolutionDirectionResult[];
+}
+
+interface ProblemSolveParentProtocol {
+  label: string;
+  psAcknowledgment: string;
+  problemDefinitionPrompts: string[];
+  cannotChangeGuidance: string;
+  psInterpersonalHint: string | null;
+  ruminationRiskLevel: string;
+  ruminationGuardMessage: string | null;
+  psCompanionTools: string[];
+  problemTypes: ProblemTypeResult[];
+}
+
+interface ProblemSolveProtocolResult {
+  readinessCheck: string;
+  readinessRedirectMessage: string;
+  readinessRedirectTools: string[];
+  changeabilityQuestions: string[];
+  nothingCanChangeMessage: string;
+  nothingCanChangeTools: string[];
+  everythingIsPilingUpMessage: string;
+  interpersonalDetectionPrompt: string;
+  interpersonalRedirectTools: string[];
+  notMyProblemPrompt: string;
+  commitmentFraming: string[];
+  commitmentValidation: string;
+  completionAcknowledgment: string;
+  completionFollowUp: string;
+  copeAheadBridge: string;
+  copeAheadBridgeToolId: string;
+}
+
+interface ProblemSolveContentResult {
+  emotions: ProblemSolveEmotionResult[];
+  parents: Record<string, ProblemSolveParentProtocol>;
+  protocol: ProblemSolveProtocolResult;
+}
+
+/**
+ * Get problem solve content for a set of emotions.
+ * Returns per-emotion PS applicability, per-parent protocol data
+ * with problem types and solution directions, plus the singleton protocol node.
+ * No auth required — this is public emotion knowledge.
+ */
+export const getProblemSolveContent = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request): Promise<ProblemSolveContentResult> => {
+    const { emotionIds } = request.data as { emotionIds: string[] };
+
+    if (!emotionIds || !Array.isArray(emotionIds) || emotionIds.length === 0) {
+      throw new HttpsError('invalid-argument', 'emotionIds array is required');
+    }
+
+    const session = getDriver().session();
+    try {
+      // Query 1: Per-emotion + per-parent content with problem types and solution directions
+      const contentResult = await session.run(
+        `
+        MATCH (e:Emotion) WHERE e.id IN $emotionIds
+        OPTIONAL MATCH (e)-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
+        OPTIONAL MATCH (c)-[:HAS_PROBLEM_TYPE]->(pt:ProblemType)
+        OPTIONAL MATCH (pt)-[:HAS_SOLUTION_DIRECTION]->(sd:SolutionDirection)
+        RETURN e.id AS emotionId,
+               coalesce(e.problemSolveApplicable, false) AS applicable,
+               e.psClinicalNote AS clinicalNote,
+               e.psAlternativeSkill AS alternativeSkill,
+               e.dbtParent AS emotionDbtParent,
+               c.dbtParent AS dbtParent,
+               c.label AS parentLabel,
+               c.psAcknowledgment AS psAcknowledgment,
+               c.problemDefinitionPrompts AS problemDefinitionPrompts,
+               c.cannotChangeGuidance AS cannotChangeGuidance,
+               c.psInterpersonalHint AS psInterpersonalHint,
+               c.ruminationRiskLevel AS ruminationRiskLevel,
+               c.ruminationGuardMessage AS ruminationGuardMessage,
+               c.psCompanionTools AS psCompanionTools,
+               c.psRedirectGuidance AS psRedirectGuidance,
+               pt.id AS problemTypeId,
+               pt.label AS problemTypeLabel,
+               pt.description AS problemTypeDescription,
+               pt.recognitionPrompt AS problemTypeRecognitionPrompt,
+               pt.sortOrder AS problemTypeSortOrder,
+               collect(DISTINCT sd {
+                 .id, .label, .description,
+                 .small, .medium, .bigger,
+                 .linkedToolId, .sortOrder
+               }) AS solutionDirections
+        `,
+        { emotionIds }
+      );
+
+      // Query 2: Protocol singleton node
+      const protocolResult = await session.run(
+        `MATCH (ps:ProblemSolveProtocol {id: 'problem_solve_protocol'}) RETURN ps {.*} AS protocol`
+      );
+
+      // Shape emotions array
+      const emotions: ProblemSolveEmotionResult[] = [];
+      const seenEmotions = new Set<string>();
+      const parents: Record<string, ProblemSolveParentProtocol> = {};
+
+      for (const record of contentResult.records) {
+        const emotionId = record.get('emotionId');
+        const applicable = record.get('applicable');
+        const dbtParent = record.get('dbtParent');
+
+        // Deduplicate emotions (multiple records per emotion due to JOINs)
+        if (!seenEmotions.has(emotionId)) {
+          seenEmotions.add(emotionId);
+          emotions.push({
+            emotionId,
+            applicable,
+            dbtParent: dbtParent || null,
+            clinicalNote: record.get('clinicalNote') || '',
+            alternativeSkill: record.get('alternativeSkill') || null,
+          });
+        }
+
+        // Build parent protocol data (deduplicated by dbtParent key)
+        if (applicable && dbtParent && !parents[dbtParent]) {
+          parents[dbtParent] = {
+            label: record.get('parentLabel') || dbtParent,
+            psAcknowledgment: record.get('psAcknowledgment') || '',
+            problemDefinitionPrompts: record.get('problemDefinitionPrompts') || [],
+            cannotChangeGuidance: record.get('cannotChangeGuidance') || '',
+            psInterpersonalHint: record.get('psInterpersonalHint') || null,
+            ruminationRiskLevel: record.get('ruminationRiskLevel') || 'low',
+            ruminationGuardMessage: record.get('ruminationGuardMessage') || null,
+            psCompanionTools: record.get('psCompanionTools') || [],
+            problemTypes: [],
+          };
+        }
+
+        // Collect problem types per parent (deduplicated)
+        if (applicable && dbtParent && parents[dbtParent]) {
+          const ptId = record.get('problemTypeId');
+          if (ptId && !parents[dbtParent].problemTypes.some(pt => pt.id === ptId)) {
+            const sdRaw = record.get('solutionDirections') || [];
+            const solutionDirections: SolutionDirectionResult[] = sdRaw
+              .filter((sd: Record<string, unknown>) => sd.id != null)
+              .map((sd: Record<string, unknown>) => ({
+                id: sd.id as string,
+                label: sd.label as string,
+                description: sd.description as string,
+                small: sd.small as string,
+                medium: sd.medium as string,
+                bigger: sd.bigger as string,
+                linkedToolId: (sd.linkedToolId as string) || null,
+                sortOrder: typeof sd.sortOrder === 'object' && sd.sortOrder !== null
+                  ? (sd.sortOrder as { low: number }).low ?? 0
+                  : (sd.sortOrder as number) ?? 0,
+              }))
+              .sort((a: SolutionDirectionResult, b: SolutionDirectionResult) => a.sortOrder - b.sortOrder);
+
+            parents[dbtParent].problemTypes.push({
+              id: ptId,
+              label: record.get('problemTypeLabel') || '',
+              description: record.get('problemTypeDescription') || '',
+              recognitionPrompt: record.get('problemTypeRecognitionPrompt') || '',
+              sortOrder: typeof record.get('problemTypeSortOrder') === 'object'
+                ? record.get('problemTypeSortOrder')?.low ?? 0
+                : record.get('problemTypeSortOrder') ?? 0,
+              solutionDirections,
+            });
+          }
+        }
+      }
+
+      // Sort problem types by sortOrder within each parent
+      for (const parent of Object.values(parents)) {
+        parent.problemTypes.sort((a, b) => a.sortOrder - b.sortOrder);
+      }
+
+      // Shape protocol
+      const protocolRaw = protocolResult.records[0]?.get('protocol') || {};
+      const protocol: ProblemSolveProtocolResult = {
+        readinessCheck: protocolRaw.readinessCheck || '',
+        readinessRedirectMessage: protocolRaw.readinessRedirectMessage || '',
+        readinessRedirectTools: protocolRaw.readinessRedirectTools || [],
+        changeabilityQuestions: protocolRaw.changeabilityQuestions || [],
+        nothingCanChangeMessage: protocolRaw.nothingCanChangeMessage || '',
+        nothingCanChangeTools: protocolRaw.nothingCanChangeTools || [],
+        everythingIsPilingUpMessage: protocolRaw.everythingIsPilingUpMessage || '',
+        interpersonalDetectionPrompt: protocolRaw.interpersonalDetectionPrompt || '',
+        interpersonalRedirectTools: protocolRaw.interpersonalRedirectTools || [],
+        notMyProblemPrompt: protocolRaw.notMyProblemPrompt || '',
+        commitmentFraming: protocolRaw.commitmentFraming || [],
+        commitmentValidation: protocolRaw.commitmentValidation || '',
+        completionAcknowledgment: protocolRaw.completionAcknowledgment || '',
+        completionFollowUp: protocolRaw.completionFollowUp || '',
+        copeAheadBridge: protocolRaw.copeAheadBridge || '',
+        copeAheadBridgeToolId: protocolRaw.copeAheadBridgeToolId || 'cope-ahead',
+      };
+
+      return { emotions, parents, protocol };
+    } catch (error) {
+      console.error('Error getting problem solve content:', error);
+      throw new HttpsError('internal', 'Failed to get problem solve content');
     } finally {
       await session.close();
     }

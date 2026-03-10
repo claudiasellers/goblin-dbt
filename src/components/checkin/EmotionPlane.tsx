@@ -1,20 +1,20 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   emotions as allEmotions,
   getEmotionByName,
   getEmotionById,
   getEmotionsByQuadrant,
+  getCoreEmotionsByQuadrant,
   getRelatedEmotionIds,
   getOppositeEmotionIds,
-  getCoreEmotionsByQuadrant,
   type Emotion,
 } from '../../data/emotions';
 import { getRelatedEmotions, type RelatedEmotion } from '../../services/neo4j';
 
 interface EmotionPlaneProps {
-  initialQuadrant: string;
   onSelect: (emotions: string[]) => void;
   onHelpMeNow?: () => void;
+  onSomaticEntry?: () => void;
 }
 
 const quadrantOrder = ['high-unpleasant', 'high-pleasant', 'low-unpleasant', 'low-pleasant'] as const;
@@ -34,29 +34,11 @@ const quadrantShortLabels: Record<string, string> = {
 };
 
 // CSS variable mappings per quadrant
-const quadrantStyles: Record<string, {
-  fill: string; text: string; border: string;
-}> = {
-  'high-unpleasant': {
-    fill: 'var(--color-q-hu-fill)',
-    text: 'var(--color-q-hu-text)',
-    border: 'var(--color-q-hu-border)',
-  },
-  'high-pleasant': {
-    fill: 'var(--color-q-hp-fill)',
-    text: 'var(--color-q-hp-text)',
-    border: 'var(--color-q-hp-border)',
-  },
-  'low-unpleasant': {
-    fill: 'var(--color-q-lu-fill)',
-    text: 'var(--color-q-lu-text)',
-    border: 'var(--color-q-lu-border)',
-  },
-  'low-pleasant': {
-    fill: 'var(--color-q-lp-fill)',
-    text: 'var(--color-q-lp-text)',
-    border: 'var(--color-q-lp-border)',
-  },
+const quadrantColors: Record<string, { fill: string; text: string }> = {
+  'high-unpleasant': { fill: 'var(--color-q-hu-fill)', text: 'var(--color-q-hu-text)' },
+  'high-pleasant': { fill: 'var(--color-q-hp-fill)', text: 'var(--color-q-hp-text)' },
+  'low-unpleasant': { fill: 'var(--color-q-lu-fill)', text: 'var(--color-q-lu-text)' },
+  'low-pleasant': { fill: 'var(--color-q-lp-fill)', text: 'var(--color-q-lp-text)' },
 };
 
 const quadrantChipStyles: Record<string, { bg: string; text: string }> = {
@@ -70,6 +52,7 @@ const neutralChipStyle = {
   bg: 'bg-[var(--color-bg-elevated)]',
   text: 'text-[var(--color-text-secondary)]',
 };
+
 
 function formatEmotionName(name: string): string {
   return name.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
@@ -116,13 +99,64 @@ function rankRelatedEmotions(
   return scored.slice(0, 3);
 }
 
-export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: EmotionPlaneProps) {
-  const [bloomedQuadrant, setBloomedQuadrant] = useState<string | null>(null);
+/**
+ * Arrange N items in an evenly-spaced grid within a bounding box.
+ * Returns array of {left, top} as percentages (0-100).
+ * Items are sorted by their y (energy) then x before placement,
+ * so spatial meaning is preserved in the grid ordering.
+ */
+function gridLayout(
+  emotions: Emotion[],
+  bounds: { xMin: number; xMax: number; yMin: number; yMax: number },
+): { emotion: Emotion; left: number; top: number }[] {
+  const n = emotions.length;
+  if (n === 0) return [];
+
+  // Sort: high energy first (descending y), then left-to-right (ascending x)
+  const sorted = [...emotions].sort((a, b) => {
+    const yDiff = (b.y ?? 0.5) - (a.y ?? 0.5);
+    if (Math.abs(yDiff) > 0.05) return yDiff;
+    return (a.x ?? 0.5) - (b.x ?? 0.5);
+  });
+
+  // Compute grid dimensions
+  const width = bounds.xMax - bounds.xMin;
+  const height = bounds.yMax - bounds.yMin;
+  const aspect = width / height;
+  const cols = Math.ceil(Math.sqrt(n * aspect));
+  const rows = Math.ceil(n / cols);
+
+  // Padding from edges (as fraction of bounds)
+  const padX = width * 0.08;
+  const padY = height * 0.08;
+  const innerW = width - 2 * padX;
+  const innerH = height - 2 * padY;
+
+  return sorted.map((emotion, i) => {
+    const col = i % cols;
+    const row = Math.floor(i / cols);
+    const colsInRow = row < rows - 1 ? cols : n - row * cols; // last row may have fewer
+    const colOffset = (cols - colsInRow) / 2; // center the last row
+
+    const x = bounds.xMin + padX + ((col + colOffset + 0.5) / cols) * innerW;
+    const y = bounds.yMin + padY + ((row + 0.5) / rows) * innerH;
+
+    return {
+      emotion,
+      left: x * 100,
+      top: y * 100,
+    };
+  });
+}
+
+export function EmotionPlane({ onSelect, onHelpMeNow, onSomaticEntry }: EmotionPlaneProps) {
+  const [zoomedQuadrant, setZoomedQuadrant] = useState<string | null>(null);
   const [selectedEmotions, setSelectedEmotions] = useState<string[]>([]);
   const [search, setSearch] = useState('');
   const [relatedEmotions, setRelatedEmotions] = useState<RelatedEmotion[]>([]);
+  const planeRef = useRef<HTMLDivElement>(null);
 
-  // Precompute data
+  // Precompute
   const coreByQuadrant = useMemo(() => {
     const map: Record<string, Emotion[]> = {};
     for (const q of quadrantOrder) {
@@ -138,16 +172,6 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
     }
     return map;
   }, []);
-
-  // Scroll initially tapped quadrant into view
-  useEffect(() => {
-    const el = document.getElementById(`zone-${initialQuadrant}`);
-    if (el) {
-      requestAnimationFrame(() => {
-        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      });
-    }
-  }, [initialQuadrant]);
 
   // Fetch related emotions
   useEffect(() => {
@@ -194,29 +218,6 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
     return allEmotions.some(e => e.name.toLowerCase() === search.trim().toLowerCase());
   }, [search]);
 
-  // Search matches by quadrant (for bloom hint)
-  const searchMatchCountByQuadrant = useMemo(() => {
-    if (!searchQuery) return {};
-    const counts: Record<string, number> = {};
-    for (const e of allSearchResults) {
-      counts[e.quadrant] = (counts[e.quadrant] || 0) + 1;
-    }
-    return counts;
-  }, [searchQuery, allSearchResults]);
-
-  // Selected per quadrant
-  const selectedByQuadrant = useMemo(() => {
-    const map: Record<string, string[]> = {};
-    for (const name of selectedEmotions) {
-      const e = getEmotionByName(name);
-      if (e) {
-        if (!map[e.quadrant]) map[e.quadrant] = [];
-        map[e.quadrant].push(name);
-      }
-    }
-    return map;
-  }, [selectedEmotions]);
-
   function toggleEmotion(emotionName: string) {
     setSelectedEmotions(prev =>
       prev.includes(emotionName)
@@ -253,217 +254,73 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
     }
   }
 
-  const isDefault = bloomedQuadrant === null;
-
-  // --- Circle renderer ---
-  function renderCircle(emotion: Emotion, size: 'default' | 'bloomed') {
-    const qStyles = quadrantStyles[emotion.quadrant];
-    const isSelected = selectedEmotions.includes(emotion.name);
-    const dimmed = !!searchQuery && !emotion.name.toLowerCase().includes(searchQuery);
-
-    // Default: big bold circles. Bloomed: slightly smaller to fit more.
-    const diameter = size === 'default' ? 72 : 56;
-    const fontSize = size === 'default' ? 11 : 10;
-
-    return (
-      <button
-        key={emotion.id}
-        type="button"
-        onClick={() => toggleEmotion(emotion.name)}
-        style={{
-          width: diameter,
-          height: diameter,
-          backgroundColor: isSelected
-            ? qStyles.fill
-            : `color-mix(in srgb, ${qStyles.fill} 30%, transparent)`,
-          color: isSelected ? 'white' : qStyles.text,
-          fontSize,
-          opacity: dimmed ? 0.15 : 1,
-          boxShadow: isSelected
-            ? `0 2px 8px color-mix(in srgb, ${qStyles.fill} 40%, transparent)`
-            : 'none',
-        }}
-        className={`
-          rounded-full flex items-center justify-center
-          font-semibold text-center leading-tight
-          transition-all duration-150 select-none flex-shrink-0
-          ${isSelected ? 'scale-110 ring-2 ring-white/40' : 'hover:scale-105 active:scale-95'}
-          ${dimmed ? 'pointer-events-none' : 'cursor-pointer'}
-        `}
-      >
-        <span className="px-1">{emotion.name}</span>
-      </button>
-    );
+  // Tap on a quadrant region in zoomed-out mode
+  function handlePlaneClick(e: React.MouseEvent) {
+    if (zoomedQuadrant || !planeRef.current) return;
+    const rect = planeRef.current.getBoundingClientRect();
+    const relX = (e.clientX - rect.left) / rect.width;
+    const relY = (e.clientY - rect.top) / rect.height;
+    const isLeft = relX < 0.5;
+    const isTop = relY < 0.5;
+    if (isTop && isLeft) setZoomedQuadrant('high-unpleasant');
+    else if (isTop && !isLeft) setZoomedQuadrant('high-pleasant');
+    else if (!isTop && isLeft) setZoomedQuadrant('low-unpleasant');
+    else setZoomedQuadrant('low-pleasant');
   }
 
-  // --- Header bar for collapsed quadrants in bloom mode ---
-  function renderHeaderBar(quadrant: string) {
-    const qStyles = quadrantStyles[quadrant];
-    const selected = selectedByQuadrant[quadrant] || [];
+  function handleZoomOut() {
+    setZoomedQuadrant(null);
+  }
 
-    let selectionText = '';
-    if (selected.length === 1) {
-      selectionText = selected[0];
-    } else if (selected.length === 2) {
-      selectionText = selected.join(', ');
-    } else if (selected.length > 2) {
-      selectionText = `${selected[0]}, +${selected.length - 1} more`;
+  const isZoomed = zoomedQuadrant !== null;
+
+  // Quadrant bounding boxes in CSS coordinates (top-left = 0,0)
+  const quadrantBounds: Record<string, { xMin: number; xMax: number; yMin: number; yMax: number }> = {
+    'high-unpleasant': { xMin: 0.02, xMax: 0.47, yMin: 0.02, yMax: 0.47 },
+    'high-pleasant':   { xMin: 0.53, xMax: 0.98, yMin: 0.02, yMax: 0.47 },
+    'low-unpleasant':  { xMin: 0.02, xMax: 0.47, yMin: 0.53, yMax: 0.98 },
+    'low-pleasant':    { xMin: 0.53, xMax: 0.98, yMin: 0.53, yMax: 0.98 },
+  };
+
+  // Compute positioned emotions for the current view
+  const positionedEmotions = useMemo(() => {
+    if (!isZoomed) {
+      // Zoomed out: core emotions in grid layout within each quadrant
+      return quadrantOrder.flatMap(q =>
+        gridLayout(coreByQuadrant[q] || [], quadrantBounds[q])
+      );
     }
 
-    return (
-      <button
-        key={quadrant}
-        onClick={() => setBloomedQuadrant(quadrant)}
-        style={{
-          background: `color-mix(in srgb, ${qStyles.fill} 15%, var(--color-bg-card))`,
-          borderLeft: `3px solid ${qStyles.fill}`,
-        }}
-        className="
-          w-full flex items-center gap-3 px-4 py-3.5
-          rounded-lg transition-all duration-200
-          hover:brightness-95 active:brightness-90
-        "
-      >
-        <span
-          className="w-3 h-3 rounded-full flex-shrink-0"
-          style={{ background: qStyles.fill }}
-        />
-        <span className="text-sm font-semibold text-[var(--color-text-primary)] flex-1 text-left">
-          {quadrantShortLabels[quadrant]}
-        </span>
-        {selectionText && (
-          <span className="text-xs text-[var(--color-text-secondary)] truncate max-w-[140px]">
-            {selectionText}
-          </span>
-        )}
-        <span className="text-[var(--color-text-muted)] text-sm">&rsaquo;</span>
-      </button>
-    );
-  }
+    // Zoomed in: all emotions in a grid filling the full container
+    const emotions = allByQuadrant[zoomedQuadrant!] || [];
+    return gridLayout(emotions, { xMin: 0.02, xMax: 0.98, yMin: 0.04, yMax: 0.96 });
+  }, [isZoomed, zoomedQuadrant, coreByQuadrant, allByQuadrant]);
 
-  // --- Default 2x2 zone ---
-  function renderZone(quadrant: string) {
-    const qStyles = quadrantStyles[quadrant];
-    const coreEmotions = coreByQuadrant[quadrant] || [];
+  // Background gradient
+  const planeBackground = isZoomed
+    ? `radial-gradient(ellipse at 50% 50%, color-mix(in srgb, ${quadrantColors[zoomedQuadrant!].fill} 12%, transparent) 0%, color-mix(in srgb, ${quadrantColors[zoomedQuadrant!].fill} 4%, transparent) 100%), var(--color-bg-card)`
+    : `
+      radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--color-q-hu-fill) 15%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse at 100% 0%, color-mix(in srgb, var(--color-q-hp-fill) 15%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse at 0% 100%, color-mix(in srgb, var(--color-q-lu-fill) 15%, transparent) 0%, transparent 70%),
+      radial-gradient(ellipse at 100% 100%, color-mix(in srgb, var(--color-q-lp-fill) 15%, transparent) 0%, transparent 70%),
+      var(--color-bg-card)
+    `;
 
-    return (
-      <div
-        key={quadrant}
-        id={`zone-${quadrant}`}
-        className="rounded-2xl p-3 pb-2 flex flex-col"
-        style={{
-          background: `color-mix(in srgb, ${qStyles.fill} 8%, var(--color-bg-card))`,
-        }}
-      >
-        {/* Zone header — minimal */}
-        <div className="flex items-center gap-1.5 mb-2">
-          <span
-            className="w-2 h-2 rounded-full flex-shrink-0"
-            style={{ background: qStyles.fill }}
-          />
-          <span
-            className="text-[10px] font-semibold uppercase tracking-wider"
-            style={{ color: qStyles.text, opacity: 0.7 }}
-          >
-            {quadrantShortLabels[quadrant]}
-          </span>
-        </div>
-
-        {/* Emotion circles in a grid — 4 columns on mobile, adapts */}
-        <div
-          className="grid gap-2 justify-items-center"
-          style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(68px, 1fr))' }}
-        >
-          {coreEmotions.map(e => renderCircle(e, 'default'))}
-        </div>
-
-        {/* Explore affordance */}
-        <button
-          onClick={() => setBloomedQuadrant(quadrant)}
-          className="text-[11px] mt-2 py-1 self-center transition-colors"
-          style={{ color: qStyles.text, opacity: 0.5 }}
-          onMouseEnter={e => { (e.target as HTMLElement).style.opacity = '0.8'; }}
-          onMouseLeave={e => { (e.target as HTMLElement).style.opacity = '0.5'; }}
-        >
-          explore all &rarr;
-        </button>
-      </div>
-    );
-  }
-
-  // --- Bloomed expanded zone ---
-  function renderExpandedZone(quadrant: string) {
-    const qStyles = quadrantStyles[quadrant];
-    const emotionsList = allByQuadrant[quadrant] || [];
-
-    // Search hint for other quadrants
-    const otherQuadrantHints = searchQuery
-      ? quadrantOrder
-          .filter(q => q !== quadrant && (searchMatchCountByQuadrant[q] || 0) > 0)
-          .map(q => ({ quadrant: q, count: searchMatchCountByQuadrant[q] }))
-      : [];
-
-    return (
-      <div
-        key={quadrant}
-        className="rounded-2xl flex-1 min-h-0 flex flex-col overflow-hidden"
-        style={{
-          background: `color-mix(in srgb, ${qStyles.fill} 6%, var(--color-bg-card))`,
-          borderLeft: `3px solid ${qStyles.fill}`,
-        }}
-      >
-        {/* Expanded header */}
-        <div className="flex items-center gap-2 px-4 py-3">
-          <span
-            className="w-3 h-3 rounded-full flex-shrink-0"
-            style={{ background: qStyles.fill }}
-          />
-          <span className="text-sm font-semibold flex-1" style={{ color: qStyles.text }}>
-            {quadrantLabels[quadrant]}
-          </span>
-          <button
-            onClick={() => setBloomedQuadrant(null)}
-            className="text-xs text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors py-1 px-2"
-          >
-            show less &uarr;
-          </button>
-        </div>
-
-        {/* All emotion circles */}
-        <div className="flex-1 overflow-y-auto px-3 pb-3">
-          <div className="flex flex-wrap gap-2.5 justify-center">
-            {emotionsList.map(e => renderCircle(e, 'bloomed'))}
-          </div>
-
-          {/* Search hint for other quadrants */}
-          {otherQuadrantHints.length > 0 && (
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-3 text-center">
-              Also in:{' '}
-              {otherQuadrantHints.map((h, i) => (
-                <span key={h.quadrant}>
-                  {i > 0 && ', '}
-                  <button
-                    onClick={() => setBloomedQuadrant(h.quadrant)}
-                    className="underline hover:text-[var(--color-text-secondary)]"
-                  >
-                    {quadrantLabels[h.quadrant]} ({h.count})
-                  </button>
-                </span>
-              ))}
-            </p>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // Sizes: smaller in zoomed-out to prevent overlap, bigger in zoomed-in to fill space
+  const circleSize = isZoomed ? 64 : 40;
+  const fontSize = isZoomed ? 10 : 8;
 
   return (
-    <div className="flex flex-col" style={{ maxHeight: 'calc(100vh - 160px)' }}>
+    <div className="flex flex-col" style={{ maxHeight: 'calc(100vh - 140px)' }}>
       <h2 className="text-xl font-bold text-[var(--color-text-primary)] text-center mb-1">
         What emotions fit best?
       </h2>
       <p className="text-sm text-[var(--color-text-secondary)] text-center mb-3">
-        Tap all that apply — from any quadrant
+        {isZoomed
+          ? `${quadrantLabels[zoomedQuadrant!]} — tap to select`
+          : 'Tap a region to explore'
+        }
       </p>
 
       {/* Search input */}
@@ -535,7 +392,7 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
           <div className="flex flex-wrap gap-2">
             {relatedEmotions.map((related) => {
               const emotion = getEmotionByName(formatEmotionName(related.name)) || getEmotionById(related.id);
-              const dotColor = emotion ? quadrantStyles[emotion.quadrant]?.fill : undefined;
+              const dotColor = emotion ? quadrantColors[emotion.quadrant]?.fill : undefined;
               return (
                 <button
                   key={related.id}
@@ -564,81 +421,206 @@ export function EmotionPlane({ initialQuadrant, onSelect, onHelpMeNow }: Emotion
         </div>
       )}
 
-      {/* Scrollable content area */}
-      <div className="flex-1 overflow-y-auto min-h-0 pb-2 flex flex-col">
-
-        {/* ========== DEFAULT VIEW: 2×2 Grid ========== */}
-        {isDefault && (
-          <div className="flex flex-col gap-2">
-            {/* Top row: HU + HP */}
-            <div className="grid grid-cols-2 gap-2">
-              {renderZone('high-unpleasant')}
-              {renderZone('high-pleasant')}
+      {/* Search results (shown instead of plane when searching) */}
+      {searchQuery ? (
+        <div className="flex-1 overflow-y-auto min-h-0 pb-2 px-1">
+          {allSearchResults.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {allSearchResults.map(emotion => {
+                const isSelected = selectedEmotions.includes(emotion.name);
+                const qc = quadrantColors[emotion.quadrant];
+                return (
+                  <button
+                    key={emotion.id}
+                    type="button"
+                    onClick={() => toggleEmotion(emotion.name)}
+                    style={{
+                      backgroundColor: isSelected
+                        ? qc.fill
+                        : `color-mix(in srgb, ${qc.fill} 25%, transparent)`,
+                      color: isSelected ? 'white' : qc.text,
+                    }}
+                    className={`
+                      py-1.5 px-3.5 rounded-full text-xs font-semibold cursor-pointer select-none
+                      transition-all duration-150
+                      ${isSelected ? 'ring-2 ring-white/30 shadow-md' : 'hover:brightness-110'}
+                    `}
+                  >
+                    {emotion.name}
+                  </button>
+                );
+              })}
             </div>
+          ) : (
+            <p className="text-center text-[var(--color-text-tertiary)] mt-4 text-sm">
+              No matches — click Add to use &ldquo;{search}&rdquo;
+            </p>
+          )}
+        </div>
+      ) : (
+        /* ========== THE 2D EMOTION PLANE ========== */
+        <div className="flex-1 min-h-0 flex flex-col">
+          {/* Zoom-out button */}
+          {isZoomed && (
+            <button
+              onClick={handleZoomOut}
+              className="self-start mb-2 flex items-center gap-1.5 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+            >
+              <span>←</span>
+              <span>All emotions</span>
+            </button>
+          )}
 
-            {/* Bottom row: LU + LP */}
-            <div className="grid grid-cols-2 gap-2">
-              {renderZone('low-unpleasant')}
-              {renderZone('low-pleasant')}
-            </div>
+          {/* The plane container */}
+          <div
+            className="relative w-full rounded-2xl overflow-hidden"
+            style={{
+              aspectRatio: isZoomed ? undefined : '1',
+              maxHeight: isZoomed ? undefined : '420px',
+              height: isZoomed ? '500px' : undefined,
+              flexShrink: isZoomed ? 0 : 1,
+              background: planeBackground,
+              cursor: isZoomed ? 'default' : 'pointer',
+            }}
+            ref={planeRef}
+            onClick={!isZoomed ? handlePlaneClick : undefined}
+          >
+            {/* Axis labels — zoomed-out only */}
+            {!isZoomed && (
+              <>
+                <span className="absolute top-2 left-1/2 -translate-x-1/2 text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)] pointer-events-none select-none z-20">
+                  High Energy
+                </span>
+                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)] pointer-events-none select-none z-20">
+                  Low Energy
+                </span>
+                <span className="absolute left-2 top-1/2 text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)] pointer-events-none select-none z-20"
+                  style={{ writingMode: 'vertical-lr', transform: 'translateY(-50%) rotate(180deg)' }}
+                >
+                  Unpleasant
+                </span>
+                <span className="absolute right-2 top-1/2 text-[10px] font-medium uppercase tracking-wider text-[var(--color-text-muted)] pointer-events-none select-none z-20"
+                  style={{ writingMode: 'vertical-lr', transform: 'translateY(-50%)' }}
+                >
+                  Pleasant
+                </span>
 
-            {/* Non-core search results */}
-            {searchQuery && allSearchResults.length > 0 && (
-              <div className="mt-1 px-1">
-                <p className="text-xs text-[var(--color-text-tertiary)] mb-2">
-                  More matches:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {allSearchResults.map(emotion => {
-                    const isSelected = selectedEmotions.includes(emotion.name);
-                    const qStyles = quadrantStyles[emotion.quadrant];
-                    return (
-                      <button
-                        key={emotion.id}
-                        type="button"
-                        onClick={() => toggleEmotion(emotion.name)}
-                        style={{
-                          backgroundColor: isSelected
-                            ? qStyles.fill
-                            : `color-mix(in srgb, ${qStyles.fill} 25%, transparent)`,
-                          color: isSelected ? 'white' : qStyles.text,
-                        }}
-                        className={`
-                          py-1.5 px-3.5 rounded-full text-xs font-semibold cursor-pointer select-none
-                          transition-all duration-150
-                          ${isSelected ? 'ring-2 ring-white/30 shadow-md' : 'hover:brightness-110'}
-                        `}
-                      >
-                        {emotion.name}
-                      </button>
-                    );
-                  })}
-                </div>
+                {/* Subtle crosshairs */}
+                <div className="absolute left-0 right-0 top-1/2 h-px bg-[var(--color-border)] opacity-15 pointer-events-none" />
+                <div className="absolute top-0 bottom-0 left-1/2 w-px bg-[var(--color-border)] opacity-15 pointer-events-none" />
+              </>
+            )}
+
+            {/* Quadrant label overlay when zoomed */}
+            {isZoomed && (
+              <div className="absolute top-3 left-3 flex items-center gap-2 pointer-events-none z-20">
+                <span
+                  className="w-2.5 h-2.5 rounded-full"
+                  style={{ background: quadrantColors[zoomedQuadrant!].fill }}
+                />
+                <span
+                  className="text-xs font-semibold uppercase tracking-wider"
+                  style={{ color: quadrantColors[zoomedQuadrant!].text, opacity: 0.7 }}
+                >
+                  {quadrantLabels[zoomedQuadrant!]}
+                </span>
               </div>
             )}
 
-            {searchQuery && allSearchResults.length === 0 && (
-              <p className="text-center text-[var(--color-text-tertiary)] mt-2 text-sm">
-                No matches — click Add to use &ldquo;{search}&rdquo;
-              </p>
-            )}
-          </div>
-        )}
+            {/* Emotion circles */}
+            {positionedEmotions.map(({ emotion, left, top }) => {
+              const qc = quadrantColors[emotion.quadrant];
+              const isSelected = selectedEmotions.includes(emotion.name);
 
-        {/* ========== BLOOMED VIEW ========== */}
-        {!isDefault && (
-          <div className="flex flex-col gap-2 flex-1 min-h-0">
-            {quadrantOrder.map(q =>
-              q === bloomedQuadrant
-                ? renderExpandedZone(q)
-                : renderHeaderBar(q)
-            )}
+              return (
+                <button
+                  key={emotion.id}
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isZoomed) {
+                      toggleEmotion(emotion.name);
+                    } else {
+                      toggleEmotion(emotion.name);
+                      setZoomedQuadrant(emotion.quadrant);
+                    }
+                  }}
+                  style={{
+                    position: 'absolute',
+                    left: `${left}%`,
+                    top: `${top}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: circleSize,
+                    height: circleSize,
+                    fontSize,
+                    backgroundColor: isSelected
+                      ? qc.fill
+                      : `color-mix(in srgb, ${qc.fill} 28%, transparent)`,
+                    color: isSelected ? 'white' : qc.text,
+                    boxShadow: isSelected
+                      ? `0 2px 8px color-mix(in srgb, ${qc.fill} 50%, transparent)`
+                      : 'none',
+                    zIndex: isSelected ? 10 : 1,
+                  }}
+                  className={`
+                    rounded-full flex items-center justify-center
+                    font-semibold text-center leading-tight
+                    transition-all duration-200 select-none
+                    ${isSelected ? 'ring-2 ring-white/40 scale-110' : 'hover:scale-105 active:scale-95'}
+                    cursor-pointer
+                  `}
+                >
+                  <span className="px-0.5" style={{ lineHeight: '1.1' }}>{emotion.name}</span>
+                </button>
+              );
+            })}
           </div>
-        )}
-      </div>
+
+          {/* Quadrant quick-switch tabs when zoomed */}
+          {isZoomed && (
+            <div className="flex gap-1.5 mt-2 justify-center">
+              {quadrantOrder.map(q => (
+                <button
+                  key={q}
+                  onClick={() => setZoomedQuadrant(q)}
+                  className={`
+                    flex items-center gap-1.5 py-1.5 px-3 rounded-full text-xs font-medium
+                    transition-all duration-200
+                    ${q === zoomedQuadrant
+                      ? 'bg-[var(--color-bg-card)] shadow-sm border border-[var(--color-border)]'
+                      : 'text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)]'
+                    }
+                  `}
+                >
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: quadrantColors[q].fill }}
+                  />
+                  {q === zoomedQuadrant && (
+                    <span className="text-[var(--color-text-secondary)]">
+                      {quadrantShortLabels[q]}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Somatic entry link */}
+      {onSomaticEntry && (
+        <button
+          onClick={onSomaticEntry}
+          className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors py-2 text-center"
+          style={{ flexShrink: 0 }}
+        >
+          I don't know — start with my body
+        </button>
+      )}
 
       {/* Action buttons — sticky bottom */}
-      <div className="mt-3 flex gap-3" style={{ flexShrink: 0 }}>
+      <div className="mt-1 flex gap-3" style={{ flexShrink: 0 }}>
         {onHelpMeNow && (
           <button
             onClick={onHelpMeNow}

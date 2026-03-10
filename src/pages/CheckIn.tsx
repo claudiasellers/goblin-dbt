@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { EmotionQuadrant } from '../components/checkin/EmotionQuadrant';
 import { EmotionPlane } from '../components/checkin/EmotionPlane';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
@@ -22,7 +21,6 @@ import { getEmotionByName } from '../data/emotions';
 type EntryPoint = 'standard' | 'somatic';
 
 type CheckInStep =
-  | 'quadrant'
   | 'emotion'
   | 'discriminating'
   | 'body'
@@ -52,7 +50,7 @@ export interface CheckInData {
 
 export function CheckIn() {
   const { user } = useAuth();
-  const [step, setStep] = useState<CheckInStep>('quadrant');
+  const [step, setStep] = useState<CheckInStep>('emotion');
   const [entryPoint, setEntryPoint] = useState<EntryPoint>('standard');
   const [checkInData, setCheckInData] = useState<CheckInData>({
     quadrant: null,
@@ -151,11 +149,6 @@ export function CheckIn() {
     }
   }
 
-  function handleQuadrantSelect(quadrant: string) {
-    setCheckInData(prev => ({ ...prev, quadrant }));
-    setStep('emotion');
-  }
-
   /**
    * "Help me now" - skip to analysis with just quadrant
    */
@@ -183,12 +176,8 @@ export function CheckIn() {
    * User wants to browse the full emotion list instead of using suggestions
    */
   function handleShowAllEmotions() {
-    if (!checkInData.quadrant) {
-      setStep('quadrant');
-      setEntryPoint('standard');
-    } else {
-      setStep('emotion');
-    }
+    setEntryPoint('standard');
+    setStep('emotion');
   }
 
   /**
@@ -342,21 +331,18 @@ export function CheckIn() {
     setEntryPoint('standard');
     setDiscriminatingQuestions([]);
     setDiscriminatingAnswers([]);
-    setStep('quadrant');
+    setStep('emotion');
   }
 
   function handleBack() {
     switch (step) {
-      case 'emotion':
-        setStep('quadrant');
-        break;
       case 'discriminating':
         setStep('emotion');
         break;
       case 'body':
         if (entryPoint === 'somatic') {
           setEntryPoint('standard');
-          setStep('quadrant');
+          setStep('emotion');
         } else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') {
           setStep('discriminating');
         } else {
@@ -382,8 +368,8 @@ export function CheckIn() {
   const stepOrder = entryPoint === 'somatic'
     ? ['body', 'suggestion']
     : discriminatingQuestions.length > 0
-      ? ['quadrant', 'emotion', 'discriminating', 'body']
-      : ['quadrant', 'emotion', 'body'];
+      ? ['emotion', 'discriminating', 'body']
+      : ['emotion', 'body'];
   const currentStepIndex = stepOrder.indexOf(step);
   const showProgress = currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
 
@@ -407,14 +393,14 @@ export function CheckIn() {
           <p className="text-xs text-center text-[var(--color-text-tertiary)] mt-2">
             {entryPoint === 'somatic'
               ? (currentStepIndex === 0 ? 'Start here' : 'Almost there')
-              : (currentStepIndex === 0 ? 'Required' : 'Optional \u2014 tap "Help me now" anytime')
+              : (currentStepIndex === 0 ? 'Start here' : 'Optional — tap "Help me now" anytime')
             }
           </p>
         </div>
       )}
 
       {/* Back button for steps after first */}
-      {step !== 'quadrant' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
+      {step !== 'emotion' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
         <button
           onClick={handleBack}
           className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4 transition-colors"
@@ -432,18 +418,11 @@ export function CheckIn() {
       )}
 
       <div key={step} className="step-enter">
-        {step === 'quadrant' && (
-          <EmotionQuadrant
-            onSelect={handleQuadrantSelect}
-            onSomaticEntry={handleSomaticEntry}
-          />
-        )}
-
         {step === 'emotion' && (
           <EmotionPlane
-            initialQuadrant={checkInData.quadrant || 'high-unpleasant'}
             onSelect={handleEmotionSelect}
             onHelpMeNow={handleHelpMeNow}
+            onSomaticEntry={handleSomaticEntry}
           />
         )}
 

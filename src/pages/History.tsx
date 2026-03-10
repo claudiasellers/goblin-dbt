@@ -165,7 +165,7 @@ export function History() {
                 No DEAR MAN scripts yet. Use the DEAR MAN tool to prep for or debrief a conversation.
               </p>
               <Link
-                to="/tools/dear-man"
+                to="/tool/dear-man"
                 className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
               >
                 Try DEAR MAN
@@ -246,7 +246,56 @@ const situationTypeLabels: Record<string, string> = {
   'saying_no': 'Saying no',
   'expressing_feelings': 'Expressing feelings',
   'resolving_conflict': 'Resolving conflict',
+  'boundary': 'Setting a boundary',
+  'ask': 'Making a request',
 };
+
+const feelingLabels: Record<string, string> = {
+  feel_angry: 'Angry', feel_hurt: 'Hurt', feel_frustrated: 'Frustrated',
+  feel_anxious: 'Anxious', feel_sad: 'Sad', feel_lonely: 'Lonely',
+  feel_overwhelmed: 'Overwhelmed', feel_scared: 'Scared', feel_disappointed: 'Disappointed',
+  feel_resentful: 'Resentful', feel_embarrassed: 'Embarrassed', feel_disrespected: 'Disrespected',
+  feel_unheard: 'Unheard', feel_invisible: 'Invisible', feel_confused: 'Confused',
+  feel_helpless: 'Helpless', feel_exhausted: 'Exhausted', feel_trapped: 'Trapped',
+};
+
+const priorityLabels: Record<string, string> = {
+  objective: 'Getting what I need',
+  relationship: 'Keeping the relationship strong',
+  'self-respect': 'Keeping my self-respect intact',
+};
+
+const overallLabels: Record<string, string> = {
+  went_well: 'It went well',
+  mixed: 'Mixed',
+  not_well: "It didn't go well",
+};
+
+const debriefOptionLabels: Record<string, string> = {
+  debrief_stayed_calm: 'I stayed calm',
+  debrief_said_it: 'I said what I needed to say',
+  debrief_they_listened: 'They actually listened',
+  debrief_didnt_back_down: "I didn't back down",
+  debrief_kept_facts: 'I kept it about the facts',
+  debrief_compromised: 'We found a compromise',
+  debrief_no_over_apologize: "I didn't apologize for having needs",
+  debrief_used_anchor: 'I used my anchor phrase',
+  debrief_more_specific: 'Get more specific about what I need',
+  debrief_name_feelings: 'Name my feelings earlier',
+  debrief_stay_with_defense: 'Stay with it when they got defensive',
+  debrief_no_old_stuff: 'Not bring up old stuff',
+  debrief_better_time: 'Pick a better time',
+  debrief_less_apologizing: 'Not apologize so much',
+  debrief_plan_b: 'Have a plan B ready',
+  debrief_breathe: 'Take a breath when I felt overwhelmed',
+};
+
+/** Resolve an ID to a human label, falling back to humanizing the ID itself */
+function humanize(id: string, labelMap?: Record<string, string>): string {
+  if (labelMap?.[id]) return labelMap[id];
+  // Strip common prefixes and convert underscores to spaces
+  return id.replace(/^(feel_|debrief_)/, '').replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+}
 
 function DearManFeed({ sessions }: { sessions: DearManSessionRecord[] }) {
   const dateFmt = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -316,7 +365,7 @@ function DearManSessionCard({
       {/* Debrief overall preview */}
       {!isPrep && session.debriefOverall && (
         <p className="text-sm text-[var(--color-text-secondary)] mt-2">
-          How it went: <span className="font-medium text-[var(--color-text-primary)]">{session.debriefOverall}</span>
+          How it went: <span className="font-medium text-[var(--color-text-primary)]">{overallLabels[session.debriefOverall] || session.debriefOverall}</span>
         </p>
       )}
 
@@ -332,7 +381,7 @@ function DearManSessionCard({
                 <Detail label="Assert" value={session.assertCustom} />
               )}
               {session.feelings.length > 0 && (
-                <Detail label="Feelings" value={session.feelings.join(', ')} />
+                <Detail label="Feelings" value={session.feelings.map(f => humanize(f, feelingLabels)).join(', ')} />
               )}
               {session.middleGroundCustom && (
                 <Detail label="Middle ground" value={session.middleGroundCustom} />
@@ -341,19 +390,19 @@ function DearManSessionCard({
                 <Detail label="Walk-away point" value={session.walkAwayCustom} />
               )}
               {session.priorities.length > 0 && (
-                <Detail label="Priorities" value={session.priorities.join(', ')} />
+                <Detail label="Priorities" value={session.priorities.map(p => humanize(p, priorityLabels)).join(', ')} />
               )}
             </>
           ) : (
             <>
               {session.debriefWentWell.length > 0 && (
-                <Detail label="Went well" value={session.debriefWentWell.join(', ')} />
+                <Detail label="Went well" value={session.debriefWentWell.map(d => humanize(d, debriefOptionLabels)).join(', ')} />
               )}
               {session.debriefToChange.length > 0 && (
-                <Detail label="To change" value={session.debriefToChange.join(', ')} />
+                <Detail label="To change" value={session.debriefToChange.map(d => humanize(d, debriefOptionLabels)).join(', ')} />
               )}
               {session.debriefCurrentFeelings.length > 0 && (
-                <Detail label="Feeling now" value={session.debriefCurrentFeelings.join(', ')} />
+                <Detail label="Feeling now" value={session.debriefCurrentFeelings.map(f => humanize(f, feelingLabels)).join(', ')} />
               )}
             </>
           )}

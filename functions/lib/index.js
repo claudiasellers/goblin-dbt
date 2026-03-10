@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDearManSessions = exports.getQuickTools = exports.getDearManReflection = exports.getDearManDebriefContent = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getDiscriminatingQuestions = exports.getStateAndTools = exports.getInsightsData = exports.recordToolOutcome = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
+exports.getProblemSolveContent = exports.getDearManSessions = exports.getQuickTools = exports.getDearManReflection = exports.getDearManDebriefContent = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getDiscriminatingQuestions = exports.getStateAndTools = exports.getInsightsData = exports.recordToolOutcome = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -692,7 +692,11 @@ exports.getInsightsData = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, n
             .sort((a, b) => b.count - a.count);
         // ── Compute formulation ──
         // Use full 30-day window. Show formulation if ANY pattern exists (even 1 check-in).
-        const sortedPatterns = Object.entries(patternCounts).sort((a, b) => b[1] - a[1]);
+        // Filter out positive_state — it's a fallback for pleasant quadrants, not a clinical
+        // pattern in the graph. Leaving it in blocks formulation when it's the dominant count.
+        const sortedPatterns = Object.entries(patternCounts)
+            .filter(([id]) => id !== 'positive_state')
+            .sort((a, b) => b[1] - a[1]);
         const dominantPattern = sortedPatterns[0]; // may be count=1
         const secondaryPattern = sortedPatterns[1];
         let formulation = null;
@@ -2108,7 +2112,7 @@ exports.getDearManSessions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
                s.createdAt AS createdAt
         ORDER BY s.createdAt DESC
         LIMIT $limit
-        `, { userId, limit: Number(limit) });
+        `, { userId, limit: neo4j_driver_1.default.int(limit) });
         const sessions = result.records.map((r) => {
             var _a;
             return ({
@@ -2141,6 +2145,157 @@ exports.getDearManSessions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
     catch (error) {
         console.error('Error fetching DEAR MAN sessions:', error);
         throw new https_1.HttpsError('internal', 'Failed to fetch sessions');
+    }
+    finally {
+        await session.close();
+    }
+});
+/**
+ * Get problem solve content for a set of emotions.
+ * Returns per-emotion PS applicability, per-parent protocol data
+ * with problem types and solution directions, plus the singleton protocol node.
+ * No auth required — this is public emotion knowledge.
+ */
+exports.getProblemSolveContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    var _a, _b, _c, _d;
+    const { emotionIds } = request.data;
+    if (!emotionIds || !Array.isArray(emotionIds) || emotionIds.length === 0) {
+        throw new https_1.HttpsError('invalid-argument', 'emotionIds array is required');
+    }
+    const session = getDriver().session();
+    try {
+        // Query 1: Per-emotion + per-parent content with problem types and solution directions
+        const contentResult = await session.run(`
+        MATCH (e:Emotion) WHERE e.id IN $emotionIds
+        OPTIONAL MATCH (e)-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
+        OPTIONAL MATCH (c)-[:HAS_PROBLEM_TYPE]->(pt:ProblemType)
+        OPTIONAL MATCH (pt)-[:HAS_SOLUTION_DIRECTION]->(sd:SolutionDirection)
+        RETURN e.id AS emotionId,
+               coalesce(e.problemSolveApplicable, false) AS applicable,
+               e.psClinicalNote AS clinicalNote,
+               e.psAlternativeSkill AS alternativeSkill,
+               e.dbtParent AS emotionDbtParent,
+               c.dbtParent AS dbtParent,
+               c.label AS parentLabel,
+               c.psAcknowledgment AS psAcknowledgment,
+               c.problemDefinitionPrompts AS problemDefinitionPrompts,
+               c.cannotChangeGuidance AS cannotChangeGuidance,
+               c.psInterpersonalHint AS psInterpersonalHint,
+               c.ruminationRiskLevel AS ruminationRiskLevel,
+               c.ruminationGuardMessage AS ruminationGuardMessage,
+               c.psCompanionTools AS psCompanionTools,
+               c.psRedirectGuidance AS psRedirectGuidance,
+               pt.id AS problemTypeId,
+               pt.label AS problemTypeLabel,
+               pt.description AS problemTypeDescription,
+               pt.recognitionPrompt AS problemTypeRecognitionPrompt,
+               pt.sortOrder AS problemTypeSortOrder,
+               collect(DISTINCT sd {
+                 .id, .label, .description,
+                 .small, .medium, .bigger,
+                 .linkedToolId, .sortOrder
+               }) AS solutionDirections
+        `, { emotionIds });
+        // Query 2: Protocol singleton node
+        const protocolResult = await session.run(`MATCH (ps:ProblemSolveProtocol {id: 'problem_solve_protocol'}) RETURN ps {.*} AS protocol`);
+        // Shape emotions array
+        const emotions = [];
+        const seenEmotions = new Set();
+        const parents = {};
+        for (const record of contentResult.records) {
+            const emotionId = record.get('emotionId');
+            const applicable = record.get('applicable');
+            const dbtParent = record.get('dbtParent');
+            // Deduplicate emotions (multiple records per emotion due to JOINs)
+            if (!seenEmotions.has(emotionId)) {
+                seenEmotions.add(emotionId);
+                emotions.push({
+                    emotionId,
+                    applicable,
+                    dbtParent: dbtParent || null,
+                    clinicalNote: record.get('clinicalNote') || '',
+                    alternativeSkill: record.get('alternativeSkill') || null,
+                });
+            }
+            // Build parent protocol data (deduplicated by dbtParent key)
+            if (applicable && dbtParent && !parents[dbtParent]) {
+                parents[dbtParent] = {
+                    label: record.get('parentLabel') || dbtParent,
+                    psAcknowledgment: record.get('psAcknowledgment') || '',
+                    problemDefinitionPrompts: record.get('problemDefinitionPrompts') || [],
+                    cannotChangeGuidance: record.get('cannotChangeGuidance') || '',
+                    psInterpersonalHint: record.get('psInterpersonalHint') || null,
+                    ruminationRiskLevel: record.get('ruminationRiskLevel') || 'low',
+                    ruminationGuardMessage: record.get('ruminationGuardMessage') || null,
+                    psCompanionTools: record.get('psCompanionTools') || [],
+                    problemTypes: [],
+                };
+            }
+            // Collect problem types per parent (deduplicated)
+            if (applicable && dbtParent && parents[dbtParent]) {
+                const ptId = record.get('problemTypeId');
+                if (ptId && !parents[dbtParent].problemTypes.some(pt => pt.id === ptId)) {
+                    const sdRaw = record.get('solutionDirections') || [];
+                    const solutionDirections = sdRaw
+                        .filter((sd) => sd.id != null)
+                        .map((sd) => {
+                        var _a, _b;
+                        return ({
+                            id: sd.id,
+                            label: sd.label,
+                            description: sd.description,
+                            small: sd.small,
+                            medium: sd.medium,
+                            bigger: sd.bigger,
+                            linkedToolId: sd.linkedToolId || null,
+                            sortOrder: typeof sd.sortOrder === 'object' && sd.sortOrder !== null
+                                ? (_a = sd.sortOrder.low) !== null && _a !== void 0 ? _a : 0
+                                : (_b = sd.sortOrder) !== null && _b !== void 0 ? _b : 0,
+                        });
+                    })
+                        .sort((a, b) => a.sortOrder - b.sortOrder);
+                    parents[dbtParent].problemTypes.push({
+                        id: ptId,
+                        label: record.get('problemTypeLabel') || '',
+                        description: record.get('problemTypeDescription') || '',
+                        recognitionPrompt: record.get('problemTypeRecognitionPrompt') || '',
+                        sortOrder: typeof record.get('problemTypeSortOrder') === 'object'
+                            ? (_b = (_a = record.get('problemTypeSortOrder')) === null || _a === void 0 ? void 0 : _a.low) !== null && _b !== void 0 ? _b : 0
+                            : (_c = record.get('problemTypeSortOrder')) !== null && _c !== void 0 ? _c : 0,
+                        solutionDirections,
+                    });
+                }
+            }
+        }
+        // Sort problem types by sortOrder within each parent
+        for (const parent of Object.values(parents)) {
+            parent.problemTypes.sort((a, b) => a.sortOrder - b.sortOrder);
+        }
+        // Shape protocol
+        const protocolRaw = ((_d = protocolResult.records[0]) === null || _d === void 0 ? void 0 : _d.get('protocol')) || {};
+        const protocol = {
+            readinessCheck: protocolRaw.readinessCheck || '',
+            readinessRedirectMessage: protocolRaw.readinessRedirectMessage || '',
+            readinessRedirectTools: protocolRaw.readinessRedirectTools || [],
+            changeabilityQuestions: protocolRaw.changeabilityQuestions || [],
+            nothingCanChangeMessage: protocolRaw.nothingCanChangeMessage || '',
+            nothingCanChangeTools: protocolRaw.nothingCanChangeTools || [],
+            everythingIsPilingUpMessage: protocolRaw.everythingIsPilingUpMessage || '',
+            interpersonalDetectionPrompt: protocolRaw.interpersonalDetectionPrompt || '',
+            interpersonalRedirectTools: protocolRaw.interpersonalRedirectTools || [],
+            notMyProblemPrompt: protocolRaw.notMyProblemPrompt || '',
+            commitmentFraming: protocolRaw.commitmentFraming || [],
+            commitmentValidation: protocolRaw.commitmentValidation || '',
+            completionAcknowledgment: protocolRaw.completionAcknowledgment || '',
+            completionFollowUp: protocolRaw.completionFollowUp || '',
+            copeAheadBridge: protocolRaw.copeAheadBridge || '',
+            copeAheadBridgeToolId: protocolRaw.copeAheadBridgeToolId || 'cope-ahead',
+        };
+        return { emotions, parents, protocol };
+    }
+    catch (error) {
+        console.error('Error getting problem solve content:', error);
+        throw new https_1.HttpsError('internal', 'Failed to get problem solve content');
     }
     finally {
         await session.close();

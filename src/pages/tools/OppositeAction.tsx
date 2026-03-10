@@ -596,6 +596,7 @@ export function OppositeAction() {
 
         <Link
           to="/tool/problem-solve"
+          state={{ checkinEmotions: selectedEmotionIds }}
           className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
         >
           Try Problem Solve instead
