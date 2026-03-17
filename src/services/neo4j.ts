@@ -343,6 +343,13 @@ export interface SolutionDirectionData {
   sortOrder: number;
 }
 
+export interface DecompositionAspectData {
+  id: string;
+  label: string;
+  defaultBucket: string;
+  sortOrder: number;
+}
+
 export interface ProblemTypeData {
   id: string;
   label: string;
@@ -350,6 +357,7 @@ export interface ProblemTypeData {
   recognitionPrompt: string;
   sortOrder: number;
   solutionDirections: SolutionDirectionData[];
+  decompositionAspects: DecompositionAspectData[];
 }
 
 export interface ProblemSolveParentProtocol {
@@ -372,29 +380,77 @@ export interface ProblemSolveEmotionMapping {
   alternativeSkill: string | null;
 }
 
+export interface AmbivalenceOptionData {
+  id: string;
+  label: string;
+  therapeuticFollow: string;
+  redirectToolId: string | null;
+  sortOrder: number;
+}
+
+export interface BarrierSubResponseData {
+  id: string;
+  label: string;
+  therapeuticResponse: string;
+  redirectToolId: string | null;
+  redirectToolIdSecondary: string | null;
+  sortOrder: number;
+  triggersAmbivalenceExploration: boolean;
+  triggersConfidenceRuler: boolean;
+  routesToSolutions: boolean;
+  solutionSizeHint: string | null;
+  ambivalenceOptions: AmbivalenceOptionData[];
+}
+
+export interface BarrierTypeData {
+  id: string;
+  label: string;
+  description: string;
+  sortOrder: number;
+  skipsSolutions: boolean;
+  subResponses: BarrierSubResponseData[];
+}
+
 export interface ProblemSolveProtocol {
   readinessCheck: string;
   readinessRedirectMessage: string;
   readinessRedirectTools: string[];
-  changeabilityQuestions: string[];
-  nothingCanChangeMessage: string;
   nothingCanChangeTools: string[];
   everythingIsPilingUpMessage: string;
-  interpersonalDetectionPrompt: string;
-  interpersonalRedirectTools: string[];
-  notMyProblemPrompt: string;
   commitmentFraming: string[];
   commitmentValidation: string;
   completionAcknowledgment: string;
   completionFollowUp: string;
   copeAheadBridge: string;
   copeAheadBridgeToolId: string;
+  barrierQuestion: string;
+  barrierQuestionSubtext: string;
+  confidenceRulerIntro: string;
+  confidenceHigh: string;
+  confidenceHighResponse: string;
+  confidenceHighTools: string[];
+  confidenceMedium: string;
+  confidenceMediumResponse: string;
+  confidenceLow: string;
+  confidenceLowResponse: string;
+  confidenceLowTools: string[];
+  confidenceNone: string;
+  confidenceNoneResponse: string;
+  confidenceNoneTools: string[];
+  demoralizationValidation: string;
+  decompositionIntro: string;
+  decompositionFactsLabel: string;
+  decompositionOthersLabel: string;
+  decompositionYoursLabel: string;
+  decompositionNothingInYoursMessage: string;
+  decompositionSomethingInYoursMessage: string;
 }
 
 export interface ProblemSolveContent {
   emotions: ProblemSolveEmotionMapping[];
   parents: Record<string, ProblemSolveParentProtocol>;
   protocol: ProblemSolveProtocol;
+  barrierTypes: BarrierTypeData[];
 }
 
 const getProblemSolveContentFn = httpsCallable<
@@ -665,7 +721,9 @@ export interface ToolEffectivenessData {
 
 export interface ContinuityPrompt {
   toolId: string;
-  timestamp: string;
+  toolTimestamp: string;
+  checkInEmotion: string;
+  checkInTimestamp: string;
 }
 
 export interface PatternFrequency {

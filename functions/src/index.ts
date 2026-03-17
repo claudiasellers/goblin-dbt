@@ -759,14 +759,14 @@ export const getInsightsData = onCall(
           `,
           { userId }
         ),
-        // 3. Continuity prompt — most recent ToolUsage with null outcome
+        // 3. Continuity prompt — most recent unrated ToolUsage with a linked check-in
         session3.run(
           `
-          MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
+          MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)-[:FOLLOWED_CHECKIN]->(c:CheckIn)
           WHERE tu.outcome IS NULL
-          RETURN tu.toolId AS toolId, toString(tu.timestamp) AS timestamp
-          ORDER BY tu.timestamp DESC
-          LIMIT 1
+          WITH c, tu ORDER BY tu.timestamp DESC LIMIT 1
+          RETURN tu.toolId AS toolId, toString(tu.timestamp) AS toolTimestamp,
+                 c.emotion AS checkInEmotion, toString(c.timestamp) AS checkInTimestamp
           `,
           { userId }
         ),
@@ -799,7 +799,9 @@ export const getInsightsData = onCall(
       const continuityRec = continuityResult.records[0];
       const continuityPrompt = continuityRec ? {
         toolId: continuityRec.get('toolId'),
-        timestamp: continuityRec.get('timestamp'),
+        toolTimestamp: continuityRec.get('toolTimestamp'),
+        checkInEmotion: continuityRec.get('checkInEmotion'),
+        checkInTimestamp: continuityRec.get('checkInTimestamp'),
       } : null;
 
       // Close parallel sessions, open one for sequential follow-up queries
@@ -2630,6 +2632,13 @@ interface SolutionDirectionResult {
   sortOrder: number;
 }
 
+interface DecompositionAspectResult {
+  id: string;
+  label: string;
+  defaultBucket: string;
+  sortOrder: number;
+}
+
 interface ProblemTypeResult {
   id: string;
   label: string;
@@ -2637,6 +2646,7 @@ interface ProblemTypeResult {
   recognitionPrompt: string;
   sortOrder: number;
   solutionDirections: SolutionDirectionResult[];
+  decompositionAspects: DecompositionAspectResult[];
 }
 
 interface ProblemSolveParentProtocol {
@@ -2651,29 +2661,77 @@ interface ProblemSolveParentProtocol {
   problemTypes: ProblemTypeResult[];
 }
 
+interface AmbivalenceOptionResult {
+  id: string;
+  label: string;
+  therapeuticFollow: string;
+  redirectToolId: string | null;
+  sortOrder: number;
+}
+
+interface BarrierSubResponseResult {
+  id: string;
+  label: string;
+  therapeuticResponse: string;
+  redirectToolId: string | null;
+  redirectToolIdSecondary: string | null;
+  sortOrder: number;
+  triggersAmbivalenceExploration: boolean;
+  triggersConfidenceRuler: boolean;
+  routesToSolutions: boolean;
+  solutionSizeHint: string | null;
+  ambivalenceOptions: AmbivalenceOptionResult[];
+}
+
+interface BarrierTypeResult {
+  id: string;
+  label: string;
+  description: string;
+  sortOrder: number;
+  skipsSolutions: boolean;
+  subResponses: BarrierSubResponseResult[];
+}
+
 interface ProblemSolveProtocolResult {
   readinessCheck: string;
   readinessRedirectMessage: string;
   readinessRedirectTools: string[];
-  changeabilityQuestions: string[];
-  nothingCanChangeMessage: string;
   nothingCanChangeTools: string[];
   everythingIsPilingUpMessage: string;
-  interpersonalDetectionPrompt: string;
-  interpersonalRedirectTools: string[];
-  notMyProblemPrompt: string;
   commitmentFraming: string[];
   commitmentValidation: string;
   completionAcknowledgment: string;
   completionFollowUp: string;
   copeAheadBridge: string;
   copeAheadBridgeToolId: string;
+  barrierQuestion: string;
+  barrierQuestionSubtext: string;
+  confidenceRulerIntro: string;
+  confidenceHigh: string;
+  confidenceHighResponse: string;
+  confidenceHighTools: string[];
+  confidenceMedium: string;
+  confidenceMediumResponse: string;
+  confidenceLow: string;
+  confidenceLowResponse: string;
+  confidenceLowTools: string[];
+  confidenceNone: string;
+  confidenceNoneResponse: string;
+  confidenceNoneTools: string[];
+  demoralizationValidation: string;
+  decompositionIntro: string;
+  decompositionFactsLabel: string;
+  decompositionOthersLabel: string;
+  decompositionYoursLabel: string;
+  decompositionNothingInYoursMessage: string;
+  decompositionSomethingInYoursMessage: string;
 }
 
 interface ProblemSolveContentResult {
   emotions: ProblemSolveEmotionResult[];
   parents: Record<string, ProblemSolveParentProtocol>;
   protocol: ProblemSolveProtocolResult;
+  barrierTypes: BarrierTypeResult[];
 }
 
 /**
@@ -2693,13 +2751,14 @@ export const getProblemSolveContent = onCall(
 
     const session = getDriver().session();
     try {
-      // Query 1: Per-emotion + per-parent content with problem types and solution directions
+      // Query 1: Per-emotion + per-parent content with problem types, solution directions, and decomposition aspects
       const contentResult = await session.run(
         `
         MATCH (e:Emotion) WHERE e.id IN $emotionIds
         OPTIONAL MATCH (e)-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
         OPTIONAL MATCH (c)-[:HAS_PROBLEM_TYPE]->(pt:ProblemType)
         OPTIONAL MATCH (pt)-[:HAS_SOLUTION_DIRECTION]->(sd:SolutionDirection)
+        OPTIONAL MATCH (pt)-[:HAS_DECOMPOSITION_ASPECT]->(da:DecompositionAspect)
         RETURN e.id AS emotionId,
                coalesce(e.problemSolveApplicable, false) AS applicable,
                e.psClinicalNote AS clinicalNote,
@@ -2724,7 +2783,10 @@ export const getProblemSolveContent = onCall(
                  .id, .label, .description,
                  .small, .medium, .bigger,
                  .linkedToolId, .sortOrder
-               }) AS solutionDirections
+               }) AS solutionDirections,
+               collect(DISTINCT da {
+                 .id, .label, .defaultBucket, .sortOrder
+               }) AS decompositionAspects
         `,
         { emotionIds }
       );
@@ -2732,6 +2794,28 @@ export const getProblemSolveContent = onCall(
       // Query 2: Protocol singleton node
       const protocolResult = await session.run(
         `MATCH (ps:ProblemSolveProtocol {id: 'problem_solve_protocol'}) RETURN ps {.*} AS protocol`
+      );
+
+      // Query 3: Barrier types with sub-responses
+      const barrierResult = await session.run(
+        `MATCH (ps:ProblemSolveProtocol {id: 'problem_solve_protocol'})-[:HAS_BARRIER_TYPE]->(bt:BarrierType)
+         OPTIONAL MATCH (bt)-[:HAS_SUB_RESPONSE]->(sr:BarrierSubResponse)
+         RETURN bt.id AS btId, bt.label AS btLabel, bt.description AS btDesc,
+                bt.sortOrder AS btSort, bt.skipsSolutions AS skipsSolutions,
+                collect(DISTINCT sr {
+                  .id, .label, .therapeuticResponse, .redirectToolId,
+                  .redirectToolIdSecondary, .sortOrder,
+                  .triggersAmbivalenceExploration, .triggersConfidenceRuler,
+                  .routesToSolutions, .solutionSizeHint
+                }) AS subResponses
+         ORDER BY bt.sortOrder`
+      );
+
+      // Query 4: Ambivalence options
+      const ambivalenceResult = await session.run(
+        `MATCH (sr:BarrierSubResponse {id: 'cant-ambivalent'})-[:HAS_AMBIVALENCE_OPTION]->(a:AmbivalenceOption)
+         RETURN a { .id, .label, .therapeuticFollow, .redirectToolId, .sortOrder } AS option
+         ORDER BY a.sortOrder`
       );
 
       // Shape emotions array
@@ -2792,6 +2876,19 @@ export const getProblemSolveContent = onCall(
               }))
               .sort((a: SolutionDirectionResult, b: SolutionDirectionResult) => a.sortOrder - b.sortOrder);
 
+            const daRaw = record.get('decompositionAspects') || [];
+            const decompositionAspects: DecompositionAspectResult[] = daRaw
+              .filter((da: Record<string, unknown>) => da.id != null)
+              .map((da: Record<string, unknown>) => ({
+                id: da.id as string,
+                label: da.label as string,
+                defaultBucket: (da.defaultBucket as string) || 'fact',
+                sortOrder: typeof da.sortOrder === 'object' && da.sortOrder !== null
+                  ? (da.sortOrder as { low: number }).low ?? 0
+                  : (da.sortOrder as number) ?? 0,
+              }))
+              .sort((a: DecompositionAspectResult, b: DecompositionAspectResult) => a.sortOrder - b.sortOrder);
+
             parents[dbtParent].problemTypes.push({
               id: ptId,
               label: record.get('problemTypeLabel') || '',
@@ -2801,6 +2898,7 @@ export const getProblemSolveContent = onCall(
                 ? record.get('problemTypeSortOrder')?.low ?? 0
                 : record.get('problemTypeSortOrder') ?? 0,
               solutionDirections,
+              decompositionAspects,
             });
           }
         }
@@ -2817,22 +2915,86 @@ export const getProblemSolveContent = onCall(
         readinessCheck: protocolRaw.readinessCheck || '',
         readinessRedirectMessage: protocolRaw.readinessRedirectMessage || '',
         readinessRedirectTools: protocolRaw.readinessRedirectTools || [],
-        changeabilityQuestions: protocolRaw.changeabilityQuestions || [],
-        nothingCanChangeMessage: protocolRaw.nothingCanChangeMessage || '',
         nothingCanChangeTools: protocolRaw.nothingCanChangeTools || [],
         everythingIsPilingUpMessage: protocolRaw.everythingIsPilingUpMessage || '',
-        interpersonalDetectionPrompt: protocolRaw.interpersonalDetectionPrompt || '',
-        interpersonalRedirectTools: protocolRaw.interpersonalRedirectTools || [],
-        notMyProblemPrompt: protocolRaw.notMyProblemPrompt || '',
         commitmentFraming: protocolRaw.commitmentFraming || [],
         commitmentValidation: protocolRaw.commitmentValidation || '',
         completionAcknowledgment: protocolRaw.completionAcknowledgment || '',
         completionFollowUp: protocolRaw.completionFollowUp || '',
         copeAheadBridge: protocolRaw.copeAheadBridge || '',
         copeAheadBridgeToolId: protocolRaw.copeAheadBridgeToolId || 'cope-ahead',
+        barrierQuestion: protocolRaw.barrierQuestion || '',
+        barrierQuestionSubtext: protocolRaw.barrierQuestionSubtext || '',
+        confidenceRulerIntro: protocolRaw.confidenceRulerIntro || '',
+        confidenceHigh: protocolRaw.confidenceHigh || '',
+        confidenceHighResponse: protocolRaw.confidenceHighResponse || '',
+        confidenceHighTools: protocolRaw.confidenceHighTools || [],
+        confidenceMedium: protocolRaw.confidenceMedium || '',
+        confidenceMediumResponse: protocolRaw.confidenceMediumResponse || '',
+        confidenceLow: protocolRaw.confidenceLow || '',
+        confidenceLowResponse: protocolRaw.confidenceLowResponse || '',
+        confidenceLowTools: protocolRaw.confidenceLowTools || [],
+        confidenceNone: protocolRaw.confidenceNone || '',
+        confidenceNoneResponse: protocolRaw.confidenceNoneResponse || '',
+        confidenceNoneTools: protocolRaw.confidenceNoneTools || [],
+        demoralizationValidation: protocolRaw.demoralizationValidation || '',
+        decompositionIntro: protocolRaw.decompositionIntro || '',
+        decompositionFactsLabel: protocolRaw.decompositionFactsLabel || '',
+        decompositionOthersLabel: protocolRaw.decompositionOthersLabel || '',
+        decompositionYoursLabel: protocolRaw.decompositionYoursLabel || '',
+        decompositionNothingInYoursMessage: protocolRaw.decompositionNothingInYoursMessage || '',
+        decompositionSomethingInYoursMessage: protocolRaw.decompositionSomethingInYoursMessage || '',
       };
 
-      return { emotions, parents, protocol };
+      // Shape barrier types with sub-responses
+      const ambivalenceOptions: AmbivalenceOptionResult[] = ambivalenceResult.records.map(r => {
+        const opt = r.get('option');
+        return {
+          id: opt.id as string,
+          label: opt.label as string,
+          therapeuticFollow: opt.therapeuticFollow as string,
+          redirectToolId: (opt.redirectToolId as string) || null,
+          sortOrder: typeof opt.sortOrder === 'object' && opt.sortOrder !== null
+            ? (opt.sortOrder as { low: number }).low ?? 0
+            : (opt.sortOrder as number) ?? 0,
+        };
+      });
+
+      const barrierTypes: BarrierTypeResult[] = barrierResult.records.map(record => {
+        const srRaw = record.get('subResponses') || [];
+        const subResponses: BarrierSubResponseResult[] = srRaw
+          .filter((sr: Record<string, unknown>) => sr.id != null)
+          .map((sr: Record<string, unknown>) => ({
+            id: sr.id as string,
+            label: sr.label as string,
+            therapeuticResponse: (sr.therapeuticResponse as string) || '',
+            redirectToolId: (sr.redirectToolId as string) || null,
+            redirectToolIdSecondary: (sr.redirectToolIdSecondary as string) || null,
+            sortOrder: typeof sr.sortOrder === 'object' && sr.sortOrder !== null
+              ? (sr.sortOrder as { low: number }).low ?? 0
+              : (sr.sortOrder as number) ?? 0,
+            triggersAmbivalenceExploration: sr.triggersAmbivalenceExploration === true,
+            triggersConfidenceRuler: sr.triggersConfidenceRuler === true,
+            routesToSolutions: sr.routesToSolutions === true,
+            solutionSizeHint: (sr.solutionSizeHint as string) || null,
+            ambivalenceOptions: sr.triggersAmbivalenceExploration === true ? ambivalenceOptions : [],
+          }))
+          .sort((a: BarrierSubResponseResult, b: BarrierSubResponseResult) => a.sortOrder - b.sortOrder);
+
+        const btSort = record.get('btSort');
+        return {
+          id: record.get('btId') as string,
+          label: record.get('btLabel') as string,
+          description: record.get('btDesc') as string,
+          sortOrder: typeof btSort === 'object' && btSort !== null
+            ? (btSort as { low: number }).low ?? 0
+            : (btSort as number) ?? 0,
+          skipsSolutions: record.get('skipsSolutions') === true,
+          subResponses,
+        };
+      });
+
+      return { emotions, parents, protocol, barrierTypes };
     } catch (error) {
       console.error('Error getting problem solve content:', error);
       throw new HttpsError('internal', 'Failed to get problem solve content');

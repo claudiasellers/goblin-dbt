@@ -311,6 +311,17 @@ export function EmotionPlane({ onSelect, onHelpMeNow, onSomaticEntry }: EmotionP
   const circleSize = isZoomed ? 64 : 40;
   const fontSize = isZoomed ? 10 : 8;
 
+  // Compute required container height for zoomed-in view based on grid rows
+  const zoomedContainerHeight = useMemo(() => {
+    if (!isZoomed) return undefined;
+    const n = (allByQuadrant[zoomedQuadrant!] || []).length;
+    const aspect = 1; // roughly square container
+    const cols = Math.ceil(Math.sqrt(n * aspect));
+    const rows = Math.ceil(n / cols);
+    const cellHeight = circleSize + 14; // circle + gap
+    return rows * cellHeight + 40; // + padding
+  }, [isZoomed, zoomedQuadrant, allByQuadrant, circleSize]);
+
   return (
     <div className="flex flex-col" style={{ maxHeight: 'calc(100vh - 140px)' }}>
       <h2 className="text-xl font-bold text-[var(--color-text-primary)] text-center mb-1">
@@ -477,7 +488,7 @@ export function EmotionPlane({ onSelect, onHelpMeNow, onSomaticEntry }: EmotionP
             style={{
               aspectRatio: isZoomed ? undefined : '1',
               maxHeight: isZoomed ? undefined : '420px',
-              height: isZoomed ? '500px' : undefined,
+              height: isZoomed ? `${zoomedContainerHeight}px` : undefined,
               flexShrink: isZoomed ? 0 : 1,
               background: planeBackground,
               cursor: isZoomed ? 'default' : 'pointer',

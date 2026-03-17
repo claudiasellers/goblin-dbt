@@ -7,10 +7,36 @@ interface Props {
   prompt: ContinuityPrompt;
 }
 
+function formatRelativeTime(isoTimestamp: string): string {
+  const date = new Date(isoTimestamp);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays === 1) return 'yesterday';
+  return `${diffDays} days ago`;
+}
+
+function formatEmotions(emotionStr: string): string {
+  const emotions = emotionStr.split(',').map(e => e.trim()).filter(Boolean);
+  if (emotions.length <= 2) return emotions.join(', ');
+  return emotions.slice(0, 2).join(', ');
+}
+
 export function ContinuityCard({ prompt }: Props) {
   const [state, setState] = useState<'asking' | 'submitting' | 'done'>('asking');
   const tool = toolsData.find((t) => t.id === prompt.toolId);
   const toolName = tool?.name || 'that tool';
+
+  const emotions = formatEmotions(prompt.checkInEmotion);
+  const relativeTime = formatRelativeTime(prompt.checkInTimestamp);
 
   if (state === 'done') {
     return (
@@ -34,13 +60,19 @@ export function ContinuityCard({ prompt }: Props) {
 
   return (
     <div className="rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-5">
+      <p className="text-base font-semibold text-[var(--color-text-primary)] mb-1">
+        {emotions}
+      </p>
+      <p className="text-sm text-[var(--color-accent)] mb-3">
+        {relativeTime}
+      </p>
       <p className="text-sm text-[var(--color-text-secondary)] mb-3">
-        You've been using {tool?.emoji} <span className="font-medium text-[var(--color-text-primary)]">{toolName}</span> lately — does it feel like a good fit?
+        You used {toolName} after this check-in. Did it shift anything?
       </p>
       <div className="flex gap-2">
         {([
-          { value: 'helped' as const, label: 'Yeah, it lands' },
-          { value: 'somewhat' as const, label: 'Sometimes' },
+          { value: 'helped' as const, label: 'Yes' },
+          { value: 'somewhat' as const, label: 'A little' },
           { value: 'not_really' as const, label: 'Not really' },
         ]).map((opt) => (
           <button

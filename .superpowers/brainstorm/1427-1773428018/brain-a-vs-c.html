@@ -1,0 +1,119 @@
+<h2>A vs C — Same Data, Different Feel</h2>
+<p class="subtitle">Both show the same "Acute Alarm" state. Which one feels more like Goblin DBT?</p>
+
+<div class="split" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 2rem;">
+
+  <!-- Option A -->
+  <div class="card" data-choice="final-a" onclick="toggleSelect(this)" style="background: #1a1a2e; border: 2px solid #333; border-radius: 16px; overflow: hidden; cursor: pointer;">
+    <div style="text-align: center; padding: 1rem 0 0; color: #888; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;">A — Abstract Network</div>
+    <div class="card-image" style="padding: 1rem; display: flex; align-items: center; justify-content: center;">
+      <svg viewBox="0 0 360 280" width="100%" height="260">
+        <defs>
+          <radialGradient id="ga1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff6b6b" stop-opacity="0.3"/><stop offset="100%" stop-color="#ff6b6b" stop-opacity="0"/></radialGradient>
+          <radialGradient id="ga2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#4ecdc4" stop-opacity="0.2"/><stop offset="100%" stop-color="#4ecdc4" stop-opacity="0"/></radialGradient>
+          <filter id="ba"><feGaussianBlur stdDeviation="2"/></filter>
+        </defs>
+        <circle cx="140" cy="120" r="80" fill="url(#ga1)"/>
+        <circle cx="240" cy="100" r="60" fill="url(#ga2)"/>
+        <!-- Connections -->
+        <line x1="140" y1="120" x2="190" y2="80" stroke="#ff6b6b" stroke-width="2" opacity="0.5"/>
+        <line x1="140" y1="120" x2="170" y2="170" stroke="#ff6b6b" stroke-width="2.5" opacity="0.6"/>
+        <line x1="170" y1="170" x2="220" y2="150" stroke="#ff6b6b" stroke-width="1.5" opacity="0.35"/>
+        <line x1="190" y1="80" x2="240" y2="100" stroke="#4ecdc4" stroke-width="1.5" opacity="0.3"/>
+        <line x1="240" y1="100" x2="280" y2="80" stroke="#4ecdc4" stroke-width="1" opacity="0.2"/>
+        <line x1="100" y1="90" x2="140" y2="120" stroke="#ff6b6b" stroke-width="1.5" opacity="0.4"/>
+        <line x1="80" y1="160" x2="140" y2="120" stroke="#888" stroke-width="1" opacity="0.15"/>
+        <!-- Nodes -->
+        <circle cx="140" cy="120" r="16" fill="#ff6b6b" opacity="0.8" filter="url(#ba)"/>
+        <circle cx="140" cy="120" r="10" fill="#ff6b6b"/>
+        <circle cx="170" cy="170" r="12" fill="#ff6b6b" opacity="0.6" filter="url(#ba)"/>
+        <circle cx="170" cy="170" r="7" fill="#ff6b6b" opacity="0.8"/>
+        <circle cx="190" cy="80" r="9" fill="#ff6b6b" opacity="0.5" filter="url(#ba)"/>
+        <circle cx="190" cy="80" r="6" fill="#ff6b6b" opacity="0.6"/>
+        <circle cx="240" cy="100" r="11" fill="#4ecdc4" opacity="0.3" filter="url(#ba)"/>
+        <circle cx="240" cy="100" r="7" fill="#4ecdc4" opacity="0.4"/>
+        <circle cx="280" cy="80" r="6" fill="#4ecdc4" opacity="0.2"/>
+        <circle cx="100" cy="90" r="7" fill="#ff6b6b" opacity="0.5"/>
+        <circle cx="80" cy="160" r="5" fill="#888" opacity="0.2"/>
+        <!-- Labels -->
+        <text x="140" y="102" fill="#ff6b6b" font-size="9" text-anchor="middle" font-family="system-ui" opacity="0.9">Amygdala</text>
+        <text x="170" y="192" fill="#ff6b6b" font-size="8" text-anchor="middle" font-family="system-ui" opacity="0.7">Insula</text>
+        <text x="190" y="70" fill="#ff6b6b" font-size="8" text-anchor="middle" font-family="system-ui" opacity="0.6">Hypothalamus</text>
+        <text x="240" y="88" fill="#4ecdc4" font-size="9" text-anchor="middle" font-family="system-ui" opacity="0.5">PFC</text>
+        <!-- Info bar -->
+        <rect x="60" y="225" rx="12" ry="12" width="240" height="26" fill="#ff6b6b" opacity="0.08" stroke="#ff6b6b" stroke-width="1" opacity="0.2"/>
+        <text x="180" y="243" fill="#ff6b6b" font-size="11" text-anchor="middle" font-family="system-ui" opacity="0.7">Salience Network — overactive</text>
+      </svg>
+    </div>
+    <div style="padding: 1rem 1.5rem 1.5rem; background: #111; border-top: 1px solid #222;">
+      <p style="color: #999; margin: 0; font-size: 0.85rem;"><strong style="color: #ccc;">Pros:</strong> Feels unique, modern, app-native. No one else has this. Nodes can animate (pulse, grow). Works great on mobile — no tiny anatomical details.</p>
+      <p style="color: #999; margin: 0.5rem 0 0; font-size: 0.85rem;"><strong style="color: #ccc;">Cons:</strong> Users won't know where these structures physically are. Less educational about actual brain anatomy. Could feel too abstract for some users.</p>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div class="card" data-choice="final-c" onclick="toggleSelect(this)" style="background: #1a1a2e; border: 2px solid #333; border-radius: 16px; overflow: hidden; cursor: pointer;">
+    <div style="text-align: center; padding: 1rem 0 0; color: #888; font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;">C — Hybrid (Brain + Network)</div>
+    <div class="card-image" style="padding: 1rem; display: flex; align-items: center; justify-content: center;">
+      <svg viewBox="0 0 360 280" width="100%" height="260">
+        <defs>
+          <radialGradient id="gc1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#ff6b6b" stop-opacity="0.25"/><stop offset="100%" stop-color="#ff6b6b" stop-opacity="0"/></radialGradient>
+          <radialGradient id="gc2" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#4ecdc4" stop-opacity="0.15"/><stop offset="100%" stop-color="#4ecdc4" stop-opacity="0"/></radialGradient>
+          <filter id="bc"><feGaussianBlur stdDeviation="2.5"/></filter>
+        </defs>
+        <!-- Brain outline -->
+        <path d="M100,170 C82,170 55,145 50,120 C46,95 55,70 76,53 C97,36 130,28 165,32 C200,28 233,36 254,53 C275,70 282,95 278,120 C274,145 257,163 240,170 C228,177 216,183 208,195 C204,203 196,207 183,207 L147,207 C134,207 126,203 122,195 C114,183 105,177 100,170 Z" fill="none" stroke="#2a2a3e" stroke-width="1.5" opacity="0.5"/>
+        <!-- Folds -->
+        <path d="M108,155 C116,140 128,136 140,140" fill="none" stroke="#2a2a3e" stroke-width="0.8" opacity="0.3"/>
+        <path d="M140,140 C152,136 160,128 165,117" fill="none" stroke="#2a2a3e" stroke-width="0.8" opacity="0.3"/>
+        <path d="M165,117 C173,105 184,101 194,105" fill="none" stroke="#2a2a3e" stroke-width="0.8" opacity="0.3"/>
+        <path d="M125,105 C136,97 152,94 165,98" fill="none" stroke="#2a2a3e" stroke-width="0.8" opacity="0.25"/>
+        <!-- Glow areas -->
+        <circle cx="135" cy="158" r="45" fill="url(#gc1)"/>
+        <circle cx="108" cy="105" r="40" fill="url(#gc2)"/>
+        <!-- Connections overlaid -->
+        <line x1="135" y1="158" x2="158" y2="133" stroke="#ff6b6b" stroke-width="2.5" opacity="0.5"/>
+        <line x1="135" y1="158" x2="183" y2="148" stroke="#ff6b6b" stroke-width="2" opacity="0.4"/>
+        <line x1="158" y1="133" x2="198" y2="115" stroke="#888" stroke-width="1.5" opacity="0.2"/>
+        <line x1="108" y1="105" x2="158" y2="133" stroke="#4ecdc4" stroke-width="1.5" opacity="0.3"/>
+        <line x1="108" y1="105" x2="135" y2="158" stroke="#4ecdc4" stroke-width="1.5" opacity="0.2"/>
+        <!-- Nodes at anatomical positions -->
+        <circle cx="135" cy="158" r="13" fill="#ff6b6b" opacity="0.7" filter="url(#bc)"/>
+        <circle cx="135" cy="158" r="8" fill="#ff6b6b" opacity="0.9"/>
+        <circle cx="158" cy="133" r="10" fill="#ff6b6b" opacity="0.5" filter="url(#bc)"/>
+        <circle cx="158" cy="133" r="6" fill="#ff6b6b" opacity="0.7"/>
+        <circle cx="183" cy="148" r="8" fill="#ff6b6b" opacity="0.4" filter="url(#bc)"/>
+        <circle cx="183" cy="148" r="5" fill="#ff6b6b" opacity="0.5"/>
+        <circle cx="108" cy="105" r="11" fill="#4ecdc4" opacity="0.3" filter="url(#bc)"/>
+        <circle cx="108" cy="105" r="7" fill="#4ecdc4" opacity="0.4"/>
+        <circle cx="198" cy="115" r="6" fill="#888" opacity="0.2"/>
+        <!-- Labels -->
+        <text x="135" y="145" fill="#ff6b6b" font-size="8" text-anchor="middle" font-family="system-ui" opacity="0.9">Amygdala</text>
+        <text x="172" y="127" fill="#ff6b6b" font-size="7.5" text-anchor="start" font-family="system-ui" opacity="0.7">Insula</text>
+        <text x="183" y="140" fill="#ff6b6b" font-size="7" text-anchor="start" font-family="system-ui" opacity="0.5" dx="8">Hypothal.</text>
+        <text x="93" y="95" fill="#4ecdc4" font-size="8" text-anchor="middle" font-family="system-ui" opacity="0.5">PFC</text>
+        <!-- Info bar -->
+        <rect x="60" y="225" rx="12" ry="12" width="240" height="26" fill="#ff6b6b" opacity="0.08" stroke="#ff6b6b" stroke-width="1" opacity="0.2"/>
+        <text x="180" y="243" fill="#ff6b6b" font-size="11" text-anchor="middle" font-family="system-ui" opacity="0.7">Salience Network — overactive</text>
+      </svg>
+    </div>
+    <div style="padding: 1rem 1.5rem 1.5rem; background: #111; border-top: 1px solid #222;">
+      <p style="color: #999; margin: 0; font-size: 0.85rem;"><strong style="color: #ccc;">Pros:</strong> Users learn where things are in their brain. Feels grounded in real science. The outline gives context without being textbook-y. Still has the network glow.</p>
+      <p style="color: #999; margin: 0.5rem 0 0; font-size: 0.85rem;"><strong style="color: #ccc;">Cons:</strong> Brain outline can feel clinical. Harder to render well on small screens. Labels get cramped in anatomical positions. Less "wow" factor.</p>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top: 2.5rem; padding: 1.5rem; background: #1a1a2e; border-radius: 12px; border: 1px solid #333;">
+  <h3 style="color: #eee; margin: 0 0 0.75rem;">My recommendation: A</h3>
+  <p style="color: #bbb; margin: 0; font-size: 0.95rem; line-height: 1.6;">
+    The brain outline in C adds anatomical grounding, but at the cost of <strong>cramped labels on mobile</strong> and a slightly more clinical feel. Since you're building the standalone "My Brain" explorer as a separate feature, that's where the anatomical detail can really shine — with room to zoom, tap, and explore.
+  </p>
+  <p style="color: #bbb; margin: 0.75rem 0 0; font-size: 0.95rem; line-height: 1.6;">
+    The post-check-in moment is about <strong>quick emotional insight, not anatomy class</strong>. Option A gives you a clean, animated, mobile-friendly visualization that says "here's what's active in your brain right now" without requiring the user to parse a brain diagram while they're in distress. The info bar underneath ("Salience Network — overactive") does the heavy lifting. And it looks like nothing else out there.
+  </p>
+  <p style="color: #bbb; margin: 0.75rem 0 0; font-size: 0.95rem; line-height: 1.6;">
+    <strong>Use A for post-check-in, save the anatomical detail for the explorer.</strong>
+  </p>
+</div>
