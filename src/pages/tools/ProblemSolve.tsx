@@ -218,7 +218,7 @@ export function ProblemSolve() {
     setPsData(null);
     setError(null);
     setProblemDescription('');
-    setSelectedProblemType(null);
+    setSelectedProblemTypes([]);
     setSelectedBarrier(null);
     setSelectedSubResponse(null);
     setShowTherapeuticResponse(false);

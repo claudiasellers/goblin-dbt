@@ -174,12 +174,15 @@ export function SomaticCorrelation({ data, totalCheckIns, delay = 0 }: Props) {
         </div>
 
         {/* Narrative */}
-        <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex-1">
-          <span className="font-semibold text-[var(--color-text-primary)]">{boldNames}</span>
-          {topCorrelations.length === 1 ? ' shows' : ' show'} up in almost all your {stateLabel} check-ins.
-          {' '}These tend to appear <em>before</em> you report feeling overwhelmed — your body is signaling first.
-          {' '}Noticing that sensation early is how you catch the escalation.
-        </p>
+        <div className="text-sm text-[var(--color-text-secondary)] leading-relaxed flex-1">
+          <p className="mb-2">
+            <span className="font-semibold text-[var(--color-text-primary)]">{boldNames}</span>
+            {topCorrelations.length === 1 ? ' shows' : ' show'} up in almost all your {stateLabel} check-ins.
+          </p>
+          {data.narrative && (
+            <p>{data.narrative}</p>
+          )}
+        </div>
       </div>
     </div>
   );

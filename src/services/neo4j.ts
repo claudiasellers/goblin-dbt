@@ -713,6 +713,7 @@ export interface GrowthEvidenceInsight {
 
 export interface SomaticCorrelationData {
   correlations: Array<{ region: string; patternId: string; count: number }>;
+  narrative: string;
 }
 
 export interface ToolEffectivenessData {

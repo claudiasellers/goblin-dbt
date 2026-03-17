@@ -950,8 +950,20 @@ exports.getInsightsData = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, n
                 }
             }
             if (correlations.length > 0) {
+                const sorted = correlations.sort((a, b) => b.count - a.count).slice(0, 3);
+                const topPatternId = sorted[0].patternId;
+                // Query somatic narrative from graph — try ActivationPattern first, fall back to SomaticQuadrantNarrative
+                let somaticNarrative = "";
+                const narrativeResult = await session.run(`OPTIONAL MATCH (ap:ActivationPattern {id: $pid})
+             OPTIONAL MATCH (sq:SomaticQuadrantNarrative {id: $pid})
+             RETURN ap.somatic_narrative AS patternNarrative, sq.narrative AS quadrantNarrative`, { pid: topPatternId });
+                if (narrativeResult.records.length > 0) {
+                    const rec = narrativeResult.records[0];
+                    somaticNarrative = rec.get("patternNarrative") || rec.get("quadrantNarrative") || "";
+                }
                 somaticCorrelation = {
-                    correlations: correlations.sort((a, b) => b.count - a.count).slice(0, 3),
+                    correlations: sorted,
+                    narrative: somaticNarrative,
                 };
             }
         }
