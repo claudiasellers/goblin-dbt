@@ -7,6 +7,10 @@ import {
   type ProblemSolveContent,
   type ProblemTypeData,
   type SolutionDirectionData,
+  type BarrierTypeData,
+  type BarrierSubResponseData,
+  type AmbivalenceOptionData,
+  type DecompositionAspectData,
 } from '../../services/neo4j';
 
 type Phase =
@@ -17,7 +21,11 @@ type Phase =
   | 'redirect'
   | 'define-problem'
   | 'triage'
-  | 'changeability'
+  | 'barrier-assessment'
+  | 'barrier-sub'
+  | 'ambivalence'
+  | 'confidence-ruler'
+  | 'decompose'
   | 'solutions'
   | 'commit'
   | 'complete';
@@ -33,9 +41,6 @@ const familyLabels: Record<string, string> = {
 };
 
 const familyOrder = ['fearful', 'angry', 'sad', 'disgusted', 'bad', 'happy', 'surprised'];
-
-// Parents that are inherently interpersonal (always show interpersonal hint)
-const interpersonalParents = new Set(['anger', 'jealousy', 'love']);
 
 export function ProblemSolve() {
   const location = useLocation();
@@ -60,13 +65,25 @@ export function ProblemSolve() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // User input state
+  // Problem definition
   const [problemDescription, setProblemDescription] = useState('');
-  const [selectedProblemType, setSelectedProblemType] = useState<ProblemTypeData | null>(null);
-  const [changeabilityAnswer, setChangeabilityAnswer] = useState<'yes' | 'some' | 'no' | null>(null);
+  const [selectedProblemTypes, setSelectedProblemTypes] = useState<ProblemTypeData[]>([]);
+
+  // Barrier assessment (MI)
+  const [selectedBarrier, setSelectedBarrier] = useState<BarrierTypeData | null>(null);
+  const [selectedSubResponse, setSelectedSubResponse] = useState<BarrierSubResponseData | null>(null);
+  const [showTherapeuticResponse, setShowTherapeuticResponse] = useState(false);
+  const [selectedAmbivalence, setSelectedAmbivalence] = useState<AmbivalenceOptionData | null>(null);
+  const [confidenceLevel, setConfidenceLevel] = useState<'high' | 'medium' | 'low' | 'none' | null>(null);
+
+  // Decomposition (outside-control path)
+  const [aspectBuckets, setAspectBuckets] = useState<Record<string, 'fact' | 'others' | 'yours'>>({});
+  const [decompositionDone, setDecompositionDone] = useState(false);
+
+  // Solutions + commit
   const [selectedDirection, setSelectedDirection] = useState<SolutionDirectionData | null>(null);
   const [chosenSize, setChosenSize] = useState<'small' | 'medium' | 'bigger' | null>(null);
-  const [showInterpersonalHint, setShowInterpersonalHint] = useState(true);
+  const [solutionSizeHint, setSolutionSizeHint] = useState<string | null>(null);
 
   // Rumination guard
   const [defineEntryCount, setDefineEntryCount] = useState(0);
@@ -75,6 +92,9 @@ export function ProblemSolve() {
 
   // Readiness redirect
   const [showReadinessRedirect, setShowReadinessRedirect] = useState(false);
+
+  // Know-but-cant commit (user supplies their own step)
+  const [customStepText, setCustomStepText] = useState('');
 
   // ── Load content ──
 
@@ -124,20 +144,6 @@ export function ProblemSolve() {
       .map(p => ({ key: p, ...psData!.parents[p] }));
   }, [applicableEmotions, psData]);
 
-  // Auto-advance from changeability to solutions when no interpersonal hint
-  useEffect(() => {
-    if (phase !== 'changeability' || !psData) return;
-    if (changeabilityAnswer !== 'yes' && changeabilityAnswer !== 'some') return;
-    const firstParent = applicableParents[0];
-    const hasInterpersonal = showInterpersonalHint && firstParent?.psInterpersonalHint && (
-      interpersonalParents.has(firstParent.key) || problemDescription.trim().length > 0
-    );
-    if (!hasInterpersonal) {
-      setPhase('solutions');
-    }
-  }, [phase, changeabilityAnswer, psData, applicableParents, showInterpersonalHint, problemDescription]);
-
-  // All problem types across applicable parents
   const allProblemTypes = useMemo(
     () => applicableParents.flatMap(p => p.problemTypes),
     [applicableParents]
@@ -158,6 +164,17 @@ export function ProblemSolve() {
     }
     return groups;
   }, [search, showPleasant]);
+
+  // Decomposition aspects for selected problem type
+  const decompositionAspects = useMemo((): DecompositionAspectData[] => {
+    if (selectedProblemTypes.length > 0) {
+      const aspects = selectedProblemTypes.flatMap(pt => pt.decompositionAspects ?? []);
+      if (aspects.length > 0) return aspects;
+    }
+    // Fall back to first problem type if user typed own description
+    const firstPt = applicableParents[0]?.problemTypes[0];
+    return firstPt?.decompositionAspects ?? [];
+  }, [selectedProblemTypes, applicableParents]);
 
   // ── Actions ──
 
@@ -202,14 +219,21 @@ export function ProblemSolve() {
     setError(null);
     setProblemDescription('');
     setSelectedProblemType(null);
-    setChangeabilityAnswer(null);
+    setSelectedBarrier(null);
+    setSelectedSubResponse(null);
+    setShowTherapeuticResponse(false);
+    setSelectedAmbivalence(null);
+    setConfidenceLevel(null);
+    setAspectBuckets({});
+    setDecompositionDone(false);
     setSelectedDirection(null);
     setChosenSize(null);
-    setShowInterpersonalHint(true);
+    setSolutionSizeHint(null);
     setDefineEntryCount(0);
     setShowRuminationGuard(false);
     setRuminationDismissed(false);
     setShowReadinessRedirect(false);
+    setCustomStepText('');
   };
 
   // ── Helpers ──
@@ -217,6 +241,33 @@ export function ProblemSolve() {
   const toolName = (id: string) => {
     const t = getToolById(id);
     return t ? `${t.emoji} ${t.name}` : id;
+  };
+
+  const handleBarrierSelect = (barrier: BarrierTypeData) => {
+    setSelectedBarrier(barrier);
+    setSelectedSubResponse(null);
+    setShowTherapeuticResponse(false);
+
+    switch (barrier.id) {
+      case 'know-but-cant':
+      case 'involves-person':
+      case 'tried-nothing-works':
+        setPhase('barrier-sub');
+        break;
+      case 'not-sure-what':
+        setPhase('solutions');
+        break;
+      case 'outside-control':
+        // Initialize aspect buckets with defaults
+        const buckets: Record<string, 'fact' | 'others' | 'yours'> = {};
+        for (const a of decompositionAspects) {
+          buckets[a.id] = a.defaultBucket as 'fact' | 'others' | 'yours';
+        }
+        setAspectBuckets(buckets);
+        setDecompositionDone(false);
+        setPhase('decompose');
+        break;
+    }
   };
 
   // ─── LOADING FROM CHECK-IN ───
@@ -242,7 +293,7 @@ export function ProblemSolve() {
             How this works
           </h3>
           <p className="text-[var(--color-text-secondary)]">
-            This tool helps when your emotion is telling you something real — there's an actual problem to address. We'll figure out what the problem is, what you can change, and pick one concrete next step.
+            This tool helps when your emotion is telling you something real — there's an actual problem to address. We'll figure out what the problem is, what's blocking you, and pick one concrete next step.
           </p>
         </div>
         <button
@@ -508,11 +559,13 @@ export function ProblemSolve() {
                 Which of these sounds closest?
               </p>
               {allProblemTypes.map(pt => {
-                const selected = selectedProblemType?.id === pt.id;
+                const selected = selectedProblemTypes.some(s => s.id === pt.id);
                 return (
                   <button
                     key={pt.id}
-                    onClick={() => setSelectedProblemType(selected ? null : pt)}
+                    onClick={() => setSelectedProblemTypes(prev =>
+                      selected ? prev.filter(s => s.id !== pt.id) : [...prev, pt]
+                    )}
                     className={`w-full text-left p-4 rounded-lg border transition-colors ${
                       selected
                         ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
@@ -553,9 +606,9 @@ export function ProblemSolve() {
             </button>
 
             {/* Continue */}
-            {(selectedProblemType || problemDescription.trim()) && (
+            {(selectedProblemTypes.length > 0 || problemDescription.trim()) && (
               <button
-                onClick={() => setPhase('changeability')}
+                onClick={() => setPhase('barrier-assessment')}
                 className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
               >
                 Continue
@@ -593,8 +646,8 @@ export function ProblemSolve() {
             <button
               key={pt.id}
               onClick={() => {
-                setSelectedProblemType(pt);
-                setPhase('changeability');
+                setSelectedProblemTypes([pt]);
+                setPhase('barrier-assessment');
               }}
               className="w-full text-left p-4 rounded-lg border border-[var(--color-border)] lift-secondary transition-colors"
             >
@@ -614,114 +667,473 @@ export function ProblemSolve() {
     );
   }
 
-  // ─── CHANGEABILITY ───
-  if (phase === 'changeability' && psData) {
-    const firstParent = applicableParents[0];
-    const showInterpersonal = showInterpersonalHint && firstParent && firstParent.psInterpersonalHint && (
-      interpersonalParents.has(firstParent.key) || problemDescription.trim().length > 0
-    );
+  // ─── BARRIER ASSESSMENT (MI CORE) ───
+  if (phase === 'barrier-assessment' && psData) {
+    return (
+      <div className="space-y-6">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)] mb-2">
+            {psData.protocol.barrierQuestion}
+          </h3>
+          <p className="text-sm text-[var(--color-text-secondary)]">
+            {psData.protocol.barrierQuestionSubtext}
+          </p>
+        </div>
 
-    // If "no" was selected, show acceptance tools
-    if (changeabilityAnswer === 'no') {
+        <div className="space-y-2">
+          {psData.barrierTypes
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map(bt => (
+              <button
+                key={bt.id}
+                onClick={() => handleBarrierSelect(bt)}
+                className="w-full text-left p-4 rounded-lg border border-[var(--color-border)] lift-secondary transition-colors"
+              >
+                <p className="font-medium text-[var(--color-text-primary)]">{bt.label}</p>
+              </button>
+            ))}
+        </div>
+
+        <button
+          onClick={() => setPhase('define-problem')}
+          className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+        >
+          Go back
+        </button>
+      </div>
+    );
+  }
+
+  // ─── BARRIER SUB-RESPONSES ───
+  if (phase === 'barrier-sub' && psData && selectedBarrier) {
+    // Show therapeutic response after sub-response is selected
+    if (showTherapeuticResponse && selectedSubResponse) {
+      return (
+        <div className="space-y-6">
+          {/* Therapeutic response */}
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <p className="text-[var(--color-text-primary)]">
+              {selectedSubResponse.therapeuticResponse}
+            </p>
+          </div>
+
+          {/* Route based on sub-response properties */}
+          {selectedSubResponse.redirectToolId && (
+            <Link
+              to={`/tool/${selectedSubResponse.redirectToolId}`}
+              state={{ checkinEmotions: selectedEmotionIds }}
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+            >
+              {toolName(selectedSubResponse.redirectToolId)}
+            </Link>
+          )}
+
+          {selectedSubResponse.redirectToolIdSecondary && (
+            <Link
+              to={`/tool/${selectedSubResponse.redirectToolIdSecondary}`}
+              state={{ checkinEmotions: selectedEmotionIds }}
+              className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-center"
+            >
+              {toolName(selectedSubResponse.redirectToolIdSecondary)}
+            </Link>
+          )}
+
+          {selectedSubResponse.triggersAmbivalenceExploration && (
+            <button
+              onClick={() => setPhase('ambivalence')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            >
+              Let's look at that
+            </button>
+          )}
+
+          {selectedSubResponse.triggersConfidenceRuler && (
+            <button
+              onClick={() => setPhase('confidence-ruler')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            >
+              Let's find out
+            </button>
+          )}
+
+          {selectedSubResponse.routesToSolutions && (
+            <button
+              onClick={() => {
+                setSolutionSizeHint(selectedSubResponse.solutionSizeHint);
+                setPhase('solutions');
+              }}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            >
+              Show me some options
+            </button>
+          )}
+
+          {/* Always offer "continue problem-solving" if redirecting to a tool */}
+          {(selectedSubResponse.redirectToolId && !selectedSubResponse.routesToSolutions) && (
+            <button
+              onClick={() => {
+                setSolutionSizeHint(selectedSubResponse.solutionSizeHint);
+                setPhase('solutions');
+              }}
+              className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
+            >
+              Continue problem-solving instead
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // Show sub-response options
+    return (
+      <div className="space-y-6">
+        {/* Demoralization validation for tried-nothing-works */}
+        {selectedBarrier.id === 'tried-nothing-works' && (
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <p className="text-[var(--color-text-primary)]">
+              {psData.protocol.demoralizationValidation}
+            </p>
+          </div>
+        )}
+
+        <p className="text-sm font-medium text-[var(--color-text-secondary)]">
+          Can you tell me more?
+        </p>
+
+        <div className="space-y-2">
+          {selectedBarrier.subResponses
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map(sr => (
+              <button
+                key={sr.id}
+                onClick={() => {
+                  setSelectedSubResponse(sr);
+                  setShowTherapeuticResponse(true);
+                }}
+                className="w-full text-left p-4 rounded-lg border border-[var(--color-border)] lift-secondary transition-colors"
+              >
+                <p className="font-medium text-[var(--color-text-primary)]">{sr.label}</p>
+              </button>
+            ))}
+        </div>
+
+        <button
+          onClick={() => { setSelectedBarrier(null); setPhase('barrier-assessment'); }}
+          className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+        >
+          Go back
+        </button>
+      </div>
+    );
+  }
+
+  // ─── AMBIVALENCE EXPLORATION ───
+  if (phase === 'ambivalence' && psData && selectedSubResponse) {
+    if (selectedAmbivalence) {
       return (
         <div className="space-y-6">
           <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
             <p className="text-[var(--color-text-primary)]">
-              {psData.protocol.nothingCanChangeMessage}
+              {selectedAmbivalence.therapeuticFollow}
             </p>
           </div>
-          {psData.protocol.nothingCanChangeTools.map(toolId => (
+
+          {selectedAmbivalence.redirectToolId && (
             <Link
-              key={toolId}
-              to={`/tool/${toolId}`}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+              to={`/tool/${selectedAmbivalence.redirectToolId}`}
+              state={{ checkinEmotions: selectedEmotionIds }}
+              className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-center"
             >
-              {toolName(toolId)}
+              {toolName(selectedAmbivalence.redirectToolId)}
             </Link>
-          ))}
+          )}
+
           <button
-            onClick={() => { setChangeabilityAnswer(null); }}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
+            onClick={() => setPhase('solutions')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
           >
-            Actually, let me reconsider
+            Let's keep going
           </button>
         </div>
       );
     }
 
-    // If answered yes/some, show interpersonal check then go to solutions
-    if (changeabilityAnswer === 'yes' || changeabilityAnswer === 'some') {
-      if (showInterpersonal) {
-        return (
-          <div className="space-y-6">
-            {changeabilityAnswer === 'some' && firstParent && (
-              <div className="p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
-                <p className="text-sm text-[var(--color-text-secondary)]">
-                  {firstParent.cannotChangeGuidance}
-                </p>
-              </div>
-            )}
-            <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
-              <p className="text-[var(--color-text-primary)]">
-                {firstParent!.psInterpersonalHint}
-              </p>
-            </div>
+    return (
+      <div className="space-y-6">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)]">
+            What does staying the same protect you from?
+          </h3>
+        </div>
+
+        <div className="space-y-2">
+          {selectedSubResponse.ambivalenceOptions
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map(opt => (
+              <button
+                key={opt.id}
+                onClick={() => setSelectedAmbivalence(opt)}
+                className="w-full text-left p-4 rounded-lg border border-[var(--color-border)] lift-secondary transition-colors"
+              >
+                <p className="font-medium text-[var(--color-text-primary)]">{opt.label}</p>
+              </button>
+            ))}
+        </div>
+
+        <button
+          onClick={() => { setPhase('barrier-sub'); setShowTherapeuticResponse(true); }}
+          className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+        >
+          Go back
+        </button>
+      </div>
+    );
+  }
+
+  // ─── CONFIDENCE RULER ───
+  if (phase === 'confidence-ruler' && psData) {
+    if (confidenceLevel) {
+      const responseMap: Record<string, { response: string; tools: string[] }> = {
+        high: { response: psData.protocol.confidenceHighResponse, tools: psData.protocol.confidenceHighTools },
+        medium: { response: psData.protocol.confidenceMediumResponse, tools: [] },
+        low: { response: psData.protocol.confidenceLowResponse, tools: psData.protocol.confidenceLowTools },
+        none: { response: psData.protocol.confidenceNoneResponse, tools: psData.protocol.confidenceNoneTools },
+      };
+      const { response, tools } = responseMap[confidenceLevel];
+
+      return (
+        <div className="space-y-6">
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <p className="text-[var(--color-text-primary)]">
+              {response}
+            </p>
+          </div>
+
+          {tools.map(toolId => (
             <Link
-              to={`/tool/${psData.protocol.interpersonalRedirectTools[0] ?? 'dear-man'}`}
+              key={toolId}
+              to={`/tool/${toolId}`}
               state={{ checkinEmotions: selectedEmotionIds }}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+              className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-center"
             >
-              Work on the conversation instead
+              {toolName(toolId)}
             </Link>
+          ))}
+
+          {confidenceLevel === 'high' && (
             <button
-              onClick={() => { setShowInterpersonalHint(false); setPhase('solutions'); }}
+              onClick={() => setPhase('commit')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            >
+              I'm going to do it
+            </button>
+          )}
+
+          {confidenceLevel === 'medium' && (
+            <button
+              onClick={() => { setSolutionSizeHint('small'); setPhase('solutions'); }}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            >
+              Show me the smallest version
+            </button>
+          )}
+
+          {(confidenceLevel === 'low' || confidenceLevel === 'none') && (
+            <button
+              onClick={() => setPhase('solutions')}
               className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
             >
-              No, I want to problem-solve this
+              Continue problem-solving anyway
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <h3 className="font-semibold text-[var(--color-text-primary)]">
+            {psData.protocol.confidenceRulerIntro}
+          </h3>
+        </div>
+
+        <div className="space-y-2">
+          {([
+            { level: 'high' as const, label: psData.protocol.confidenceHigh },
+            { level: 'medium' as const, label: psData.protocol.confidenceMedium },
+            { level: 'low' as const, label: psData.protocol.confidenceLow },
+            { level: 'none' as const, label: psData.protocol.confidenceNone },
+          ]).map(({ level, label }) => (
+            <button
+              key={level}
+              onClick={() => setConfidenceLevel(level)}
+              className="w-full text-left p-4 rounded-lg border border-[var(--color-border)] lift-secondary transition-colors"
+            >
+              <p className="font-medium text-[var(--color-text-primary)]">{label}</p>
+            </button>
+          ))}
+        </div>
+
+        <button
+          onClick={() => { setPhase('barrier-sub'); setShowTherapeuticResponse(true); }}
+          className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
+        >
+          Go back
+        </button>
+      </div>
+    );
+  }
+
+  // ─── DECOMPOSE ───
+  if (phase === 'decompose' && psData) {
+    if (decompositionDone) {
+      const yoursAspects = decompositionAspects.filter(a => aspectBuckets[a.id] === 'yours');
+      const othersAspects = decompositionAspects.filter(a => aspectBuckets[a.id] === 'others');
+      const firstParent = applicableParents[0];
+
+      if (yoursAspects.length === 0 && othersAspects.length === 0) {
+        // Pure acceptance
+        return (
+          <div className="space-y-6">
+            <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+              <p className="text-[var(--color-text-primary)]">
+                {psData.protocol.decompositionNothingInYoursMessage}
+              </p>
+            </div>
+            {psData.protocol.nothingCanChangeTools.map(toolId => (
+              <Link
+                key={toolId}
+                to={`/tool/${toolId}`}
+                className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+              >
+                {toolName(toolId)}
+              </Link>
+            ))}
+            <button
+              onClick={() => { setDecompositionDone(false); }}
+              className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
+            >
+              Let me reconsider
             </button>
           </div>
         );
       }
 
+      if (yoursAspects.length === 0 && othersAspects.length > 0 && firstParent?.psInterpersonalHint) {
+        // Nothing in yours, but involves others
+        return (
+          <div className="space-y-6">
+            <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+              <p className="text-[var(--color-text-primary)]">
+                {firstParent.psInterpersonalHint}
+              </p>
+            </div>
+            <Link
+              to="/tool/dear-man"
+              state={{ checkinEmotions: selectedEmotionIds }}
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+            >
+              {toolName('dear-man')}
+            </Link>
+            <Link
+              to="/tool/give"
+              state={{ checkinEmotions: selectedEmotionIds }}
+              className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-center"
+            >
+              {toolName('give')}
+            </Link>
+            <button
+              onClick={() => setPhase('solutions')}
+              className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
+            >
+              Continue to solutions
+            </button>
+          </div>
+        );
+      }
+
+      // Something in yours — go to solutions
+      return (
+        <div className="space-y-6">
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <p className="text-[var(--color-text-primary)]">
+              {psData.protocol.decompositionSomethingInYoursMessage}
+            </p>
+          </div>
+          <button
+            onClick={() => setPhase('solutions')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          >
+            Let's work with that
+          </button>
+        </div>
+      );
     }
 
-    // Default: show changeability questions
+    // Sorting interface
+    const allAssigned = decompositionAspects.every(a => aspectBuckets[a.id]);
+    const bucketLabels = {
+      fact: 'Fact',
+      others: 'Others',
+      yours: 'Mine',
+    };
+
     return (
       <div className="space-y-6">
         <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
-          <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">
-            What can change here?
-          </h3>
-          <ul className="space-y-2">
-            {psData.protocol.changeabilityQuestions.map((q, i) => (
-              <li key={i} className="text-[var(--color-text-secondary)]">
-                {q}
-              </li>
-            ))}
-          </ul>
+          <p className="text-[var(--color-text-primary)]">
+            {psData.protocol.decompositionIntro}
+          </p>
         </div>
 
-        <button
-          onClick={() => setChangeabilityAnswer('yes')}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
-        >
-          Yes, I can change some of this
-        </button>
-        <button
-          onClick={() => setChangeabilityAnswer('some')}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
-        >
-          Parts of it, not all
-        </button>
-        <button
-          onClick={() => setChangeabilityAnswer('no')}
-          className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-tertiary)] font-medium lift-secondary"
-        >
-          No, nothing can change
-        </button>
+        <div className="space-y-3">
+          {decompositionAspects
+            .sort((a, b) => a.sortOrder - b.sortOrder)
+            .map(aspect => {
+              const currentBucket = aspectBuckets[aspect.id];
+              return (
+                <div key={aspect.id} className="p-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)]">
+                  <p className="text-sm text-[var(--color-text-primary)] mb-3">
+                    {aspect.label}
+                  </p>
+                  <div className="flex gap-2">
+                    {(['fact', 'others', 'yours'] as const).map(bucket => {
+                      const isSelected = currentBucket === bucket;
+                      const isDefault = aspect.defaultBucket === bucket && !currentBucket;
+                      return (
+                        <button
+                          key={bucket}
+                          onClick={() => setAspectBuckets(prev => ({ ...prev, [aspect.id]: bucket }))}
+                          className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-full border transition-colors ${
+                            isSelected
+                              ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                              : isDefault
+                                ? 'border-[var(--color-accent)]/30 text-[var(--color-text-secondary)]'
+                                : 'border-[var(--color-border)] text-[var(--color-text-tertiary)]'
+                          }`}
+                        >
+                          {bucketLabels[bucket]}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
+
+        {allAssigned && (
+          <button
+            onClick={() => setDecompositionDone(true)}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          >
+            Continue
+          </button>
+        )}
 
         <button
-          onClick={() => { setPhase('define-problem'); }}
+          onClick={() => { setSelectedBarrier(null); setPhase('barrier-assessment'); }}
           className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
         >
           Go back
@@ -733,18 +1145,25 @@ export function ProblemSolve() {
   // ─── SOLUTIONS ───
   if (phase === 'solutions' && psData) {
     const firstParent = applicableParents[0];
-    // Use selected problem type's directions, or fall back to first problem type's
-    const directions = selectedProblemType?.solutionDirections
-      ?? firstParent?.problemTypes[0]?.solutionDirections
+    const directions = selectedProblemTypes.length > 0
+      ? [...new Map(selectedProblemTypes.flatMap(pt => pt.solutionDirections).map(d => [d.id, d])).values()]
+      : firstParent?.problemTypes[0]?.solutionDirections
       ?? [];
 
     return (
       <div className="space-y-6">
-        {/* Cannot-change banner for "some" */}
-        {changeabilityAnswer === 'some' && firstParent && (
-          <div className="p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+        {solutionSizeHint === 'small' && (
+          <div className="p-4 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
             <p className="text-sm text-[var(--color-text-secondary)]">
-              {firstParent.cannotChangeGuidance}
+              Let's start with the smallest version.
+            </p>
+          </div>
+        )}
+
+        {selectedBarrier?.id === 'outside-control' && (
+          <div className="p-4 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              Focused on the parts within your hands.
             </p>
           </div>
         )}
@@ -754,35 +1173,35 @@ export function ProblemSolve() {
         </p>
 
         <div className="space-y-2">
-          {directions.map(dir => {
-            const selected = selectedDirection?.id === dir.id;
-            return (
-              <button
-                key={dir.id}
-                onClick={() => {
-                  setSelectedDirection(dir);
-                  setPhase('commit');
-                }}
-                className={`w-full text-left p-4 rounded-lg border transition-colors ${
-                  selected
-                    ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
-                    : 'border-[var(--color-border)] lift-secondary'
-                }`}
-              >
-                <p className="font-medium text-[var(--color-text-primary)]">{dir.label}</p>
-                <p className="text-sm text-[var(--color-text-secondary)] mt-1">{dir.description}</p>
-                {dir.linkedToolId && (
-                  <span className="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)]">
-                    Uses {getToolById(dir.linkedToolId)?.name ?? dir.linkedToolId}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+          {directions.map(dir => (
+            <button
+              key={dir.id}
+              onClick={() => {
+                setSelectedDirection(dir);
+                setPhase('commit');
+              }}
+              className="w-full text-left p-4 rounded-lg border border-[var(--color-border)] lift-secondary transition-colors"
+            >
+              <p className="font-medium text-[var(--color-text-primary)]">{dir.label}</p>
+              <p className="text-sm text-[var(--color-text-secondary)] mt-1">{dir.description}</p>
+              {dir.linkedToolId && (
+                <span className="inline-block mt-2 px-2 py-0.5 text-xs rounded-full bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)]">
+                  Uses {getToolById(dir.linkedToolId)?.name ?? dir.linkedToolId}
+                </span>
+              )}
+            </button>
+          ))}
         </div>
 
         <button
-          onClick={() => { setPhase('define-problem'); }}
+          onClick={() => {
+            setSolutionSizeHint(null);
+            if (selectedBarrier) {
+              setPhase('barrier-assessment');
+            } else {
+              setPhase('define-problem');
+            }
+          }}
           className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
         >
           Go back
@@ -792,8 +1211,73 @@ export function ProblemSolve() {
   }
 
   // ─── COMMIT ───
-  if (phase === 'commit' && psData && selectedDirection) {
+  if (phase === 'commit' && psData) {
     const framingLabels = psData.protocol.commitmentFraming;
+
+    // Special case: know-but-cant path where user didn't go through solutions
+    const isKnowButCantDirect = selectedBarrier?.id === 'know-but-cant' && !selectedDirection;
+    if (isKnowButCantDirect) {
+      return (
+        <div className="space-y-6">
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <h3 className="font-semibold text-[var(--color-text-primary)] mb-2">
+              What's the step you already know you need to take?
+            </h3>
+            <textarea
+              value={customStepText}
+              onChange={e => setCustomStepText(e.target.value)}
+              placeholder="The thing I need to do..."
+              rows={2}
+              className="w-full mt-3 p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-none"
+            />
+          </div>
+
+          <div className="space-y-2">
+            {(['small', 'medium', 'bigger'] as const).map((size, i) => {
+              const sizeLabels = { small: 'Small version', medium: 'Medium version', bigger: 'Full version' };
+              const colors = {
+                small: 'border-[var(--color-border)] lift-secondary',
+                medium: 'border-[var(--color-border-accent)] lift-secondary',
+                bigger: 'border-[var(--color-accent)] lift-secondary',
+              };
+              const selected = chosenSize === size;
+
+              return (
+                <button
+                  key={size}
+                  onClick={() => setChosenSize(size)}
+                  className={`w-full text-left p-4 rounded-lg border-2 transition-colors ${
+                    selected
+                      ? 'border-[var(--color-accent)] bg-[var(--color-bg-elevated)]'
+                      : colors[size]
+                  }`}
+                >
+                  <span className="text-xs font-semibold uppercase tracking-wider text-[var(--color-accent)]">
+                    {framingLabels[i] || sizeLabels[size]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            {psData.protocol.commitmentValidation}
+          </p>
+
+          {chosenSize && customStepText.trim() && (
+            <button
+              onClick={() => setPhase('complete')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            >
+              I'm going to do this
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // Standard commit with selected direction
+    if (!selectedDirection) return null;
 
     return (
       <div className="space-y-6">
@@ -861,13 +1345,16 @@ export function ProblemSolve() {
   }
 
   // ─── COMPLETE ───
-  if (phase === 'complete' && psData && selectedDirection && chosenSize) {
-    const stepText = selectedDirection[chosenSize];
+  if (phase === 'complete' && psData && chosenSize) {
+    const isKnowButCantDirect = selectedBarrier?.id === 'know-but-cant' && !selectedDirection;
+    const stepText = isKnowButCantDirect
+      ? customStepText
+      : selectedDirection?.[chosenSize] ?? '';
     const showCopeAhead = chosenSize === 'medium' || chosenSize === 'bigger';
 
     return (
       <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)]">
-        <span className="text-4xl mb-4 block" role="img" aria-hidden="true">🛠️</span>
+        <span className="text-4xl mb-4 block" role="img" aria-hidden="true">&#x1F6E0;&#xFE0F;</span>
         <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-3">
           {psData.protocol.completionAcknowledgment}
         </h3>
@@ -881,13 +1368,13 @@ export function ProblemSolve() {
           </p>
         </div>
 
-        {selectedDirection.linkedToolId && (
+        {selectedDirection?.linkedToolId && (
           <Link
             to={`/tool/${selectedDirection.linkedToolId}`}
             state={{ checkinEmotions: selectedEmotionIds }}
             className="inline-block mb-4 text-sm text-[var(--color-accent)] hover:underline"
           >
-            This step uses {getToolById(selectedDirection.linkedToolId)?.name ?? selectedDirection.linkedToolId} →
+            This step uses {getToolById(selectedDirection.linkedToolId)?.name ?? selectedDirection.linkedToolId} &rarr;
           </Link>
         )}
 
