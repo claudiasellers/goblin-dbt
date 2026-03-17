@@ -1,15 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { getCheckInsByUser, type CheckInRecord } from '../services/neo4j';
+import { getCheckInsByUser, getDearManSessions, type CheckInRecord, type DearManSessionRecord } from '../services/neo4j';
 import { quadrantColors } from '../data/emotions';
 import { HistoryInsights } from '../components/history/HistoryInsights';
 
 export function History() {
   const { user } = useAuth();
   const [checkIns, setCheckIns] = useState<CheckInRecord[]>([]);
+  const [dearManSessions, setDearManSessions] = useState<DearManSessionRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'checkins' | 'dearman'>('checkins');
 
   useEffect(() => {
     async function fetchHistory() {
@@ -19,11 +21,27 @@ export function History() {
       }
 
       try {
-        const data = await getCheckInsByUser(user.uid);
-        setCheckIns(data);
+        const [checkInResult, dearManResult] = await Promise.allSettled([
+          getCheckInsByUser(user.uid),
+          getDearManSessions(),
+        ]);
+
+        if (checkInResult.status === 'fulfilled') {
+          setCheckIns(checkInResult.value);
+        } else {
+          console.error('Failed to fetch check-ins:', checkInResult.reason);
+          setError('Failed to load your check-in history.');
+        }
+
+        if (dearManResult.status === 'fulfilled') {
+          setDearManSessions(dearManResult.value);
+        } else {
+          console.error('Failed to fetch DEAR MAN sessions:', dearManResult.reason);
+          // Don't set error — check-ins can still show
+        }
       } catch (err) {
         console.error('Failed to fetch history:', err);
-        setError('Failed to load your check-in history.');
+        setError('Failed to load your history.');
       } finally {
         setLoading(false);
       }
@@ -90,23 +108,72 @@ export function History() {
         Your History
       </h1>
 
-      {checkIns.length === 0 ? (
-        <div className="text-center py-12">
-          <span className="text-4xl mb-4 block">📝</span>
-          <p className="text-[var(--color-text-secondary)] mb-4">
-            No check-ins yet. Start by checking in with how you're feeling.
-          </p>
-          <Link
-            to="/"
-            className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
-          >
-            Check in now
-          </Link>
-        </div>
-      ) : (
+      {/* Tabs */}
+      <div className="flex gap-1 mb-5 bg-[var(--color-glass-card)] rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab('checkins')}
+          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'checkins'
+              ? 'bg-[var(--color-accent)] text-white'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+          }`}
+        >
+          Check-ins
+        </button>
+        <button
+          onClick={() => setActiveTab('dearman')}
+          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'dearman'
+              ? 'bg-[var(--color-accent)] text-white'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+          }`}
+        >
+          DEAR MAN{dearManSessions.length > 0 ? ` (${dearManSessions.length})` : ''}
+        </button>
+      </div>
+
+      {activeTab === 'checkins' && (
         <>
-        <HistoryInsights checkIns={checkIns} />
-        <CheckInFeed checkIns={checkIns} />
+          {checkIns.length === 0 ? (
+            <div className="text-center py-12">
+              <span className="text-4xl mb-4 block">📝</span>
+              <p className="text-[var(--color-text-secondary)] mb-4">
+                No check-ins yet. Start by checking in with how you're feeling.
+              </p>
+              <Link
+                to="/"
+                className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              >
+                Check in now
+              </Link>
+            </div>
+          ) : (
+            <>
+              <HistoryInsights checkIns={checkIns} />
+              <CheckInFeed checkIns={checkIns} />
+            </>
+          )}
+        </>
+      )}
+
+      {activeTab === 'dearman' && (
+        <>
+          {dearManSessions.length === 0 ? (
+            <div className="text-center py-12">
+              <span className="text-4xl mb-4 block">🗣️</span>
+              <p className="text-[var(--color-text-secondary)] mb-4">
+                No DEAR MAN scripts yet. Use the DEAR MAN tool to prep for or debrief a conversation.
+              </p>
+              <Link
+                to="/tool/dear-man"
+                className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              >
+                Try DEAR MAN
+              </Link>
+            </div>
+          ) : (
+            <DearManFeed sessions={dearManSessions} />
+          )}
         </>
       )}
     </div>
@@ -166,6 +233,190 @@ function CheckInFeed({ checkIns }: { checkIns: CheckInRecord[] }) {
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// ============================================
+// DEAR MAN FEED
+// ============================================
+
+const situationTypeLabels: Record<string, string> = {
+  'asking_for_something': 'Asking for something',
+  'saying_no': 'Saying no',
+  'expressing_feelings': 'Expressing feelings',
+  'resolving_conflict': 'Resolving conflict',
+  'boundary': 'Setting a boundary',
+  'ask': 'Making a request',
+};
+
+const feelingLabels: Record<string, string> = {
+  feel_angry: 'Angry', feel_hurt: 'Hurt', feel_frustrated: 'Frustrated',
+  feel_anxious: 'Anxious', feel_sad: 'Sad', feel_lonely: 'Lonely',
+  feel_overwhelmed: 'Overwhelmed', feel_scared: 'Scared', feel_disappointed: 'Disappointed',
+  feel_resentful: 'Resentful', feel_embarrassed: 'Embarrassed', feel_disrespected: 'Disrespected',
+  feel_unheard: 'Unheard', feel_invisible: 'Invisible', feel_confused: 'Confused',
+  feel_helpless: 'Helpless', feel_exhausted: 'Exhausted', feel_trapped: 'Trapped',
+};
+
+const priorityLabels: Record<string, string> = {
+  objective: 'Getting what I need',
+  relationship: 'Keeping the relationship strong',
+  'self-respect': 'Keeping my self-respect intact',
+};
+
+const overallLabels: Record<string, string> = {
+  went_well: 'It went well',
+  mixed: 'Mixed',
+  not_well: "It didn't go well",
+};
+
+const debriefOptionLabels: Record<string, string> = {
+  debrief_stayed_calm: 'I stayed calm',
+  debrief_said_it: 'I said what I needed to say',
+  debrief_they_listened: 'They actually listened',
+  debrief_didnt_back_down: "I didn't back down",
+  debrief_kept_facts: 'I kept it about the facts',
+  debrief_compromised: 'We found a compromise',
+  debrief_no_over_apologize: "I didn't apologize for having needs",
+  debrief_used_anchor: 'I used my anchor phrase',
+  debrief_more_specific: 'Get more specific about what I need',
+  debrief_name_feelings: 'Name my feelings earlier',
+  debrief_stay_with_defense: 'Stay with it when they got defensive',
+  debrief_no_old_stuff: 'Not bring up old stuff',
+  debrief_better_time: 'Pick a better time',
+  debrief_less_apologizing: 'Not apologize so much',
+  debrief_plan_b: 'Have a plan B ready',
+  debrief_breathe: 'Take a breath when I felt overwhelmed',
+};
+
+/** Resolve an ID to a human label, falling back to humanizing the ID itself */
+function humanize(id: string, labelMap?: Record<string, string>): string {
+  if (labelMap?.[id]) return labelMap[id];
+  // Strip common prefixes and convert underscores to spaces
+  return id.replace(/^(feel_|debrief_)/, '').replace(/_/g, ' ').replace(/^\w/, c => c.toUpperCase());
+}
+
+function DearManFeed({ sessions }: { sessions: DearManSessionRecord[] }) {
+  const dateFmt = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+  const timeFmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
+
+  return (
+    <div className="space-y-3">
+      {sessions.map((session) => (
+        <DearManSessionCard
+          key={session.id}
+          session={session}
+          dateFmt={dateFmt}
+          timeFmt={timeFmt}
+        />
+      ))}
+    </div>
+  );
+}
+
+function DearManSessionCard({
+  session,
+  dateFmt,
+  timeFmt,
+}: {
+  session: DearManSessionRecord;
+  dateFmt: Intl.DateTimeFormat;
+  timeFmt: Intl.DateTimeFormat;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const isPrep = session.type === 'prep';
+
+  return (
+    <div
+      className="bg-[var(--color-glass-card)] backdrop-blur-md border border-[var(--color-glass-border)] rounded-xl p-4 cursor-pointer"
+      onClick={() => setExpanded(!expanded)}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center gap-2">
+          <span className={`
+            px-2.5 py-0.5 rounded-full text-xs font-medium
+            ${isPrep
+              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+              : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+            }
+          `}>
+            {isPrep ? 'Prep' : 'Debrief'}
+          </span>
+          {session.situationType && (
+            <span className="text-xs text-[var(--color-text-secondary)]">
+              {situationTypeLabels[session.situationType] || session.situationType}
+            </span>
+          )}
+        </div>
+        <span className="text-xs text-[var(--color-text-tertiary)]">
+          {dateFmt.format(session.createdAt)} · {timeFmt.format(session.createdAt)}
+        </span>
+      </div>
+
+      {/* Anchor phrase preview */}
+      {isPrep && session.anchorPhrase && (
+        <p className="text-sm text-[var(--color-text-primary)] mt-2 italic">
+          "{session.anchorPhrase}"
+        </p>
+      )}
+
+      {/* Debrief overall preview */}
+      {!isPrep && session.debriefOverall && (
+        <p className="text-sm text-[var(--color-text-secondary)] mt-2">
+          How it went: <span className="font-medium text-[var(--color-text-primary)]">{overallLabels[session.debriefOverall] || session.debriefOverall}</span>
+        </p>
+      )}
+
+      {/* Expanded details */}
+      {expanded && (
+        <div className="mt-3 pt-3 border-t border-[var(--color-border-subtle)] space-y-2 text-sm">
+          {isPrep ? (
+            <>
+              {session.describeCustom && (
+                <Detail label="Describe" value={session.describeCustom} />
+              )}
+              {session.assertCustom && (
+                <Detail label="Assert" value={session.assertCustom} />
+              )}
+              {session.feelings.length > 0 && (
+                <Detail label="Feelings" value={session.feelings.map(f => humanize(f, feelingLabels)).join(', ')} />
+              )}
+              {session.middleGroundCustom && (
+                <Detail label="Middle ground" value={session.middleGroundCustom} />
+              )}
+              {session.walkAwayCustom && (
+                <Detail label="Walk-away point" value={session.walkAwayCustom} />
+              )}
+              {session.priorities.length > 0 && (
+                <Detail label="Priorities" value={session.priorities.map(p => humanize(p, priorityLabels)).join(', ')} />
+              )}
+            </>
+          ) : (
+            <>
+              {session.debriefWentWell.length > 0 && (
+                <Detail label="Went well" value={session.debriefWentWell.map(d => humanize(d, debriefOptionLabels)).join(', ')} />
+              )}
+              {session.debriefToChange.length > 0 && (
+                <Detail label="To change" value={session.debriefToChange.map(d => humanize(d, debriefOptionLabels)).join(', ')} />
+              )}
+              {session.debriefCurrentFeelings.length > 0 && (
+                <Detail label="Feeling now" value={session.debriefCurrentFeelings.map(f => humanize(f, feelingLabels)).join(', ')} />
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Detail({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <span className="text-xs text-[var(--color-text-tertiary)]">{label}: </span>
+      <span className="text-xs text-[var(--color-text-secondary)]">{value}</span>
     </div>
   );
 }

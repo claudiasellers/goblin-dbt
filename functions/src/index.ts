@@ -727,7 +727,9 @@ export const getInsightsData = onCall(
           MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
           WHERE c.timestamp >= datetime() - duration({days: 30})
           OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-          WITH c, collect(s.region) AS bodyRegions
+          WITH c, collect(DISTINCT s.region) AS bodyRegions, collect(s.tags) AS tagArrays
+          OPTIONAL MATCH (e:Emotion {id: c.emotion})
+          WITH c, bodyRegions, tagArrays, e.dbtParent AS dbtParent
           ORDER BY c.timestamp DESC
           RETURN c.id AS id,
                  toString(c.timestamp) AS timestamp,
@@ -736,7 +738,9 @@ export const getInsightsData = onCall(
                  c.intensityX AS intensityX,
                  c.intensityY AS intensityY,
                  c.activationPatternId AS activationPatternId,
-                 bodyRegions
+                 bodyRegions,
+                 tagArrays,
+                 dbtParent
           `,
           { userId }
         ),
@@ -749,7 +753,8 @@ export const getInsightsData = onCall(
           RETURN tu.toolId AS toolId,
                  tu.outcome AS outcome,
                  toString(tu.timestamp) AS timestamp,
-                 c.activationPatternId AS patternId
+                 c.activationPatternId AS patternId,
+                 c.id AS checkInId
           ORDER BY tu.timestamp DESC
           `,
           { userId }
@@ -777,6 +782,8 @@ export const getInsightsData = onCall(
         intensityY: toNumber(r.get('intensityY')) ?? 0,
         activationPatternId: r.get('activationPatternId') || null,
         bodyRegions: (r.get('bodyRegions') || []).filter(Boolean) as string[],
+        sensationTags: ((r.get('tagArrays') || []) as string[][]).flat().filter(Boolean) as string[],
+        dbtParent: r.get('dbtParent') || null,
       }));
 
       // Parse tool usage
@@ -785,6 +792,7 @@ export const getInsightsData = onCall(
         outcome: r.get('outcome') || null,
         timestamp: r.get('timestamp'),
         patternId: r.get('patternId') || null,
+        checkInId: r.get('checkInId') || null,
       }));
 
       // Parse continuity
@@ -812,7 +820,11 @@ export const getInsightsData = onCall(
 
       // ── Compute formulation ──
       // Use full 30-day window. Show formulation if ANY pattern exists (even 1 check-in).
-      const sortedPatterns = Object.entries(patternCounts).sort((a, b) => b[1] - a[1]);
+      // Filter out positive_state — it's a fallback for pleasant quadrants, not a clinical
+      // pattern in the graph. Leaving it in blocks formulation when it's the dominant count.
+      const sortedPatterns = Object.entries(patternCounts)
+        .filter(([id]) => id !== 'positive_state')
+        .sort((a, b) => b[1] - a[1]);
       const dominantPattern = sortedPatterns[0]; // may be count=1
       const secondaryPattern = sortedPatterns[1];
 
@@ -933,50 +945,124 @@ export const getInsightsData = onCall(
         const daySpan = (lastTs - firstTs) / (1000 * 60 * 60 * 24);
 
         if (daySpan >= 5) {
-          // Split into older half and newer half
           const mid = Math.floor(sorted.length / 2);
           const olderHalf = sorted.slice(0, mid);
           const newerHalf = sorted.slice(mid);
+          const midTimestamp = sorted[mid].timestamp;
 
           if (olderHalf.length >= 2 && newerHalf.length >= 2) {
+            const insights: Array<{ key: string; text: string; data: Record<string, number> }> = [];
+
+            // 1. Emotional vocabulary expanding
+            const olderEmotions = new Set(olderHalf.map(ci => ci.emotion));
+            const newerEmotions = new Set(newerHalf.map(ci => ci.emotion));
+            if (newerEmotions.size > olderEmotions.size && newerEmotions.size >= 3) {
+              insights.push({
+                key: 'emotion-vocabulary',
+                text: 'Naming emotions precisely is itself a regulation skill.',
+                data: { current: newerEmotions.size, previous: olderEmotions.size },
+              });
+            }
+
+            // 2. Emotion family breadth
+            const olderFamilies = new Set(olderHalf.map(ci => ci.dbtParent).filter(Boolean));
+            const newerFamilies = new Set(newerHalf.map(ci => ci.dbtParent).filter(Boolean));
+            if (newerFamilies.size > olderFamilies.size && newerFamilies.size >= 3) {
+              insights.push({
+                key: 'emotion-family-breadth',
+                text: "You're not collapsing everything into one feeling.",
+                data: { current: newerFamilies.size, previous: olderFamilies.size },
+              });
+            }
+
+            // 3. Catching it earlier (intensity drop)
             const recentAvgIntensity = newerHalf.reduce((s, ci) => s + ci.intensityY, 0) / newerHalf.length;
             const priorAvgIntensity = olderHalf.reduce((s, ci) => s + ci.intensityY, 0) / olderHalf.length;
-            const intensityChange = priorAvgIntensity - recentAvgIntensity;
-
-            const recentEarlyPct = newerHalf.filter(ci => ci.intensityY < 0.4).length / newerHalf.length;
-            const priorEarlyPct = olderHalf.filter(ci => ci.intensityY < 0.4).length / olderHalf.length;
-
-            const insights: Array<{ key: string; text: string }> = [];
-
-            if (intensityChange > 0.08) {
+            if (priorAvgIntensity - recentAvgIntensity > 0.08) {
               insights.push({
-                key: 'lower-intensity',
-                text: `Your average intensity dropped from ${Math.round(priorAvgIntensity * 100)}% to ${Math.round(recentAvgIntensity * 100)}% in your recent check-ins. You're catching things earlier.`,
+                key: 'catching-earlier',
+                text: "You're catching things before they escalate.",
+                data: { current: Math.round(recentAvgIntensity * 100), previous: Math.round(priorAvgIntensity * 100) },
               });
             }
 
-            if (recentEarlyPct - priorEarlyPct > 0.1) {
+            // 4. Activation pattern diversity
+            const olderPatterns = new Set(olderHalf.map(ci => ci.activationPatternId).filter(Boolean));
+            const newerPatterns = new Set(newerHalf.map(ci => ci.activationPatternId).filter(Boolean));
+            if (olderPatterns.size <= 2 && newerPatterns.size > olderPatterns.size) {
               insights.push({
-                key: 'early-intervention',
-                text: `${Math.round(recentEarlyPct * 100)}% of your recent check-ins were at low intensity, up from ${Math.round(priorEarlyPct * 100)}%. You're reaching for tools before things escalate.`,
+                key: 'pattern-diversity',
+                text: "You're reading your internal signals more accurately.",
+                data: { current: newerPatterns.size, previous: olderPatterns.size },
               });
             }
 
-            if (newerHalf.length > olderHalf.length) {
+            // 5. Body sensation richness (tag variety)
+            const olderTags = new Set(olderHalf.flatMap(ci => ci.sensationTags));
+            const newerTags = new Set(newerHalf.flatMap(ci => ci.sensationTags));
+            if (newerTags.size > olderTags.size + 2 && newerTags.size >= 3) {
               insights.push({
-                key: 'more-checkins',
-                text: `You've been checking in more frequently recently. More awareness means more opportunities to intervene early.`,
+                key: 'sensation-richness',
+                text: "More body detail means earlier warning signals.",
+                data: { current: newerTags.size, previous: olderTags.size },
               });
             }
 
-            // Body awareness growth
+            // 6. Body region awareness
             const olderBodyAvg = olderHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / olderHalf.length;
             const recentBodyAvg = newerHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / newerHalf.length;
             if (recentBodyAvg > olderBodyAvg + 0.3 && recentBodyAvg > 0.5) {
               insights.push({
                 key: 'body-awareness',
-                text: "You're getting more specific about what your body is telling you. That kind of interoceptive awareness is a real skill you're developing.",
+                text: "Growing body awareness gives you a head start.",
+                data: { current: Math.round(recentBodyAvg * 10) / 10, previous: Math.round(olderBodyAvg * 10) / 10 },
               });
+            }
+
+            // 7. Tool follow-through (check-ins that led to tool use)
+            const checkInIds = new Set(checkIns.map(ci => ci.id));
+            const checkInsWithToolFollow = new Set(
+              toolUsages.filter(tu => tu.checkInId && checkInIds.has(tu.checkInId)).map(tu => tu.checkInId)
+            );
+            const followThroughRate = checkInsWithToolFollow.size / checkIns.length;
+            if (followThroughRate >= 0.4 && checkInsWithToolFollow.size >= 3) {
+              insights.push({
+                key: 'tool-follow-through',
+                text: "Notice it, then do something about it — that's the whole loop.",
+                data: { numerator: checkInsWithToolFollow.size, denominator: checkIns.length },
+              });
+            }
+
+            // 8. Tool repertoire broadening
+            const olderToolIds = new Set(
+              toolUsages.filter(tu => tu.timestamp < midTimestamp).map(tu => tu.toolId)
+            );
+            const newerToolIds = new Set(
+              toolUsages.filter(tu => tu.timestamp >= midTimestamp).map(tu => tu.toolId)
+            );
+            if (newerToolIds.size > olderToolIds.size && newerToolIds.size >= 3) {
+              insights.push({
+                key: 'tool-repertoire',
+                text: "More options for different situations.",
+                data: { current: newerToolIds.size, previous: olderToolIds.size },
+              });
+            }
+
+            // 9. Positive outcomes increasing
+            const olderOutcomes = toolUsages.filter(tu => tu.timestamp < midTimestamp && tu.outcome);
+            const newerOutcomes = toolUsages.filter(tu => tu.timestamp >= midTimestamp && tu.outcome);
+            if (newerOutcomes.length >= 2) {
+              const newerPositiveRate = newerOutcomes.filter(tu => tu.outcome === 'helped').length / newerOutcomes.length;
+              const olderPositiveRate = olderOutcomes.length >= 2
+                ? olderOutcomes.filter(tu => tu.outcome === 'helped').length / olderOutcomes.length
+                : 0;
+              if (newerPositiveRate > olderPositiveRate && newerPositiveRate >= 0.5) {
+                insights.push({
+                  key: 'positive-outcomes',
+                  text: "What you're doing is working.",
+                  data: { current: Math.round(newerPositiveRate * 100), previous: Math.round(olderPositiveRate * 100) },
+                });
+              }
             }
 
             if (insights.length > 0) {
@@ -2433,6 +2519,323 @@ export const getQuickTools = onCall(
     } catch (error) {
       console.error('Error getting quick tools:', error);
       throw new HttpsError('internal', 'Failed to get tools');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/**
+ * Get saved DEAR MAN sessions for the authenticated user.
+ * Returns sessions sorted by createdAt descending.
+ */
+export const getDearManSessions = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError('unauthenticated', 'User must be logged in');
+    }
+
+    const userId = request.auth.uid;
+    const limit = (request.data as { limit?: number })?.limit ?? 20;
+
+    const session = getDriver().session();
+    try {
+      const result = await session.run(
+        `
+        MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:DearManSession)
+        RETURN s.id AS id,
+               s.type AS type,
+               s.relationshipType AS relationshipType,
+               s.situationType AS situationType,
+               s.priorities AS priorities,
+               s.barriers AS barriers,
+               s.describeId AS describeId,
+               s.describeCustom AS describeCustom,
+               s.feelings AS feelings,
+               s.assertId AS assertId,
+               s.assertCustom AS assertCustom,
+               s.reinforceIds AS reinforceIds,
+               s.anchorPhrase AS anchorPhrase,
+               s.middleGroundId AS middleGroundId,
+               s.middleGroundCustom AS middleGroundCustom,
+               s.walkAwayId AS walkAwayId,
+               s.walkAwayCustom AS walkAwayCustom,
+               s.debriefOverall AS debriefOverall,
+               s.debriefWentWell AS debriefWentWell,
+               s.debriefToChange AS debriefToChange,
+               s.debriefCurrentFeelings AS debriefCurrentFeelings,
+               s.createdAt AS createdAt
+        ORDER BY s.createdAt DESC
+        LIMIT $limit
+        `,
+        { userId, limit: neo4j.int(limit) }
+      );
+
+      const sessions = result.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        type: r.get('type'),
+        relationshipType: r.get('relationshipType') || '',
+        situationType: r.get('situationType') || '',
+        priorities: r.get('priorities') || [],
+        barriers: r.get('barriers') || [],
+        describeId: r.get('describeId'),
+        describeCustom: r.get('describeCustom') || '',
+        feelings: r.get('feelings') || [],
+        assertId: r.get('assertId'),
+        assertCustom: r.get('assertCustom') || '',
+        reinforceIds: r.get('reinforceIds') || [],
+        anchorPhrase: r.get('anchorPhrase') || '',
+        middleGroundId: r.get('middleGroundId'),
+        middleGroundCustom: r.get('middleGroundCustom') || '',
+        walkAwayId: r.get('walkAwayId'),
+        walkAwayCustom: r.get('walkAwayCustom') || '',
+        debriefOverall: r.get('debriefOverall'),
+        debriefWentWell: r.get('debriefWentWell') || [],
+        debriefToChange: r.get('debriefToChange') || [],
+        debriefCurrentFeelings: r.get('debriefCurrentFeelings') || [],
+        createdAt: r.get('createdAt')?.toString() || new Date().toISOString(),
+      }));
+
+      return { sessions };
+    } catch (error) {
+      console.error('Error fetching DEAR MAN sessions:', error);
+      throw new HttpsError('internal', 'Failed to fetch sessions');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+// ============================================
+// PROBLEM SOLVE CONTENT
+// ============================================
+
+interface ProblemSolveEmotionResult {
+  emotionId: string;
+  applicable: boolean;
+  dbtParent: string | null;
+  clinicalNote: string;
+  alternativeSkill: string | null;
+}
+
+interface SolutionDirectionResult {
+  id: string;
+  label: string;
+  description: string;
+  small: string;
+  medium: string;
+  bigger: string;
+  linkedToolId: string | null;
+  sortOrder: number;
+}
+
+interface ProblemTypeResult {
+  id: string;
+  label: string;
+  description: string;
+  recognitionPrompt: string;
+  sortOrder: number;
+  solutionDirections: SolutionDirectionResult[];
+}
+
+interface ProblemSolveParentProtocol {
+  label: string;
+  psAcknowledgment: string;
+  problemDefinitionPrompts: string[];
+  cannotChangeGuidance: string;
+  psInterpersonalHint: string | null;
+  ruminationRiskLevel: string;
+  ruminationGuardMessage: string | null;
+  psCompanionTools: string[];
+  problemTypes: ProblemTypeResult[];
+}
+
+interface ProblemSolveProtocolResult {
+  readinessCheck: string;
+  readinessRedirectMessage: string;
+  readinessRedirectTools: string[];
+  changeabilityQuestions: string[];
+  nothingCanChangeMessage: string;
+  nothingCanChangeTools: string[];
+  everythingIsPilingUpMessage: string;
+  interpersonalDetectionPrompt: string;
+  interpersonalRedirectTools: string[];
+  notMyProblemPrompt: string;
+  commitmentFraming: string[];
+  commitmentValidation: string;
+  completionAcknowledgment: string;
+  completionFollowUp: string;
+  copeAheadBridge: string;
+  copeAheadBridgeToolId: string;
+}
+
+interface ProblemSolveContentResult {
+  emotions: ProblemSolveEmotionResult[];
+  parents: Record<string, ProblemSolveParentProtocol>;
+  protocol: ProblemSolveProtocolResult;
+}
+
+/**
+ * Get problem solve content for a set of emotions.
+ * Returns per-emotion PS applicability, per-parent protocol data
+ * with problem types and solution directions, plus the singleton protocol node.
+ * No auth required — this is public emotion knowledge.
+ */
+export const getProblemSolveContent = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request): Promise<ProblemSolveContentResult> => {
+    const { emotionIds } = request.data as { emotionIds: string[] };
+
+    if (!emotionIds || !Array.isArray(emotionIds) || emotionIds.length === 0) {
+      throw new HttpsError('invalid-argument', 'emotionIds array is required');
+    }
+
+    const session = getDriver().session();
+    try {
+      // Query 1: Per-emotion + per-parent content with problem types and solution directions
+      const contentResult = await session.run(
+        `
+        MATCH (e:Emotion) WHERE e.id IN $emotionIds
+        OPTIONAL MATCH (e)-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
+        OPTIONAL MATCH (c)-[:HAS_PROBLEM_TYPE]->(pt:ProblemType)
+        OPTIONAL MATCH (pt)-[:HAS_SOLUTION_DIRECTION]->(sd:SolutionDirection)
+        RETURN e.id AS emotionId,
+               coalesce(e.problemSolveApplicable, false) AS applicable,
+               e.psClinicalNote AS clinicalNote,
+               e.psAlternativeSkill AS alternativeSkill,
+               e.dbtParent AS emotionDbtParent,
+               c.dbtParent AS dbtParent,
+               c.label AS parentLabel,
+               c.psAcknowledgment AS psAcknowledgment,
+               c.problemDefinitionPrompts AS problemDefinitionPrompts,
+               c.cannotChangeGuidance AS cannotChangeGuidance,
+               c.psInterpersonalHint AS psInterpersonalHint,
+               c.ruminationRiskLevel AS ruminationRiskLevel,
+               c.ruminationGuardMessage AS ruminationGuardMessage,
+               c.psCompanionTools AS psCompanionTools,
+               c.psRedirectGuidance AS psRedirectGuidance,
+               pt.id AS problemTypeId,
+               pt.label AS problemTypeLabel,
+               pt.description AS problemTypeDescription,
+               pt.recognitionPrompt AS problemTypeRecognitionPrompt,
+               pt.sortOrder AS problemTypeSortOrder,
+               collect(DISTINCT sd {
+                 .id, .label, .description,
+                 .small, .medium, .bigger,
+                 .linkedToolId, .sortOrder
+               }) AS solutionDirections
+        `,
+        { emotionIds }
+      );
+
+      // Query 2: Protocol singleton node
+      const protocolResult = await session.run(
+        `MATCH (ps:ProblemSolveProtocol {id: 'problem_solve_protocol'}) RETURN ps {.*} AS protocol`
+      );
+
+      // Shape emotions array
+      const emotions: ProblemSolveEmotionResult[] = [];
+      const seenEmotions = new Set<string>();
+      const parents: Record<string, ProblemSolveParentProtocol> = {};
+
+      for (const record of contentResult.records) {
+        const emotionId = record.get('emotionId');
+        const applicable = record.get('applicable');
+        const dbtParent = record.get('dbtParent');
+
+        // Deduplicate emotions (multiple records per emotion due to JOINs)
+        if (!seenEmotions.has(emotionId)) {
+          seenEmotions.add(emotionId);
+          emotions.push({
+            emotionId,
+            applicable,
+            dbtParent: dbtParent || null,
+            clinicalNote: record.get('clinicalNote') || '',
+            alternativeSkill: record.get('alternativeSkill') || null,
+          });
+        }
+
+        // Build parent protocol data (deduplicated by dbtParent key)
+        if (applicable && dbtParent && !parents[dbtParent]) {
+          parents[dbtParent] = {
+            label: record.get('parentLabel') || dbtParent,
+            psAcknowledgment: record.get('psAcknowledgment') || '',
+            problemDefinitionPrompts: record.get('problemDefinitionPrompts') || [],
+            cannotChangeGuidance: record.get('cannotChangeGuidance') || '',
+            psInterpersonalHint: record.get('psInterpersonalHint') || null,
+            ruminationRiskLevel: record.get('ruminationRiskLevel') || 'low',
+            ruminationGuardMessage: record.get('ruminationGuardMessage') || null,
+            psCompanionTools: record.get('psCompanionTools') || [],
+            problemTypes: [],
+          };
+        }
+
+        // Collect problem types per parent (deduplicated)
+        if (applicable && dbtParent && parents[dbtParent]) {
+          const ptId = record.get('problemTypeId');
+          if (ptId && !parents[dbtParent].problemTypes.some(pt => pt.id === ptId)) {
+            const sdRaw = record.get('solutionDirections') || [];
+            const solutionDirections: SolutionDirectionResult[] = sdRaw
+              .filter((sd: Record<string, unknown>) => sd.id != null)
+              .map((sd: Record<string, unknown>) => ({
+                id: sd.id as string,
+                label: sd.label as string,
+                description: sd.description as string,
+                small: sd.small as string,
+                medium: sd.medium as string,
+                bigger: sd.bigger as string,
+                linkedToolId: (sd.linkedToolId as string) || null,
+                sortOrder: typeof sd.sortOrder === 'object' && sd.sortOrder !== null
+                  ? (sd.sortOrder as { low: number }).low ?? 0
+                  : (sd.sortOrder as number) ?? 0,
+              }))
+              .sort((a: SolutionDirectionResult, b: SolutionDirectionResult) => a.sortOrder - b.sortOrder);
+
+            parents[dbtParent].problemTypes.push({
+              id: ptId,
+              label: record.get('problemTypeLabel') || '',
+              description: record.get('problemTypeDescription') || '',
+              recognitionPrompt: record.get('problemTypeRecognitionPrompt') || '',
+              sortOrder: typeof record.get('problemTypeSortOrder') === 'object'
+                ? record.get('problemTypeSortOrder')?.low ?? 0
+                : record.get('problemTypeSortOrder') ?? 0,
+              solutionDirections,
+            });
+          }
+        }
+      }
+
+      // Sort problem types by sortOrder within each parent
+      for (const parent of Object.values(parents)) {
+        parent.problemTypes.sort((a, b) => a.sortOrder - b.sortOrder);
+      }
+
+      // Shape protocol
+      const protocolRaw = protocolResult.records[0]?.get('protocol') || {};
+      const protocol: ProblemSolveProtocolResult = {
+        readinessCheck: protocolRaw.readinessCheck || '',
+        readinessRedirectMessage: protocolRaw.readinessRedirectMessage || '',
+        readinessRedirectTools: protocolRaw.readinessRedirectTools || [],
+        changeabilityQuestions: protocolRaw.changeabilityQuestions || [],
+        nothingCanChangeMessage: protocolRaw.nothingCanChangeMessage || '',
+        nothingCanChangeTools: protocolRaw.nothingCanChangeTools || [],
+        everythingIsPilingUpMessage: protocolRaw.everythingIsPilingUpMessage || '',
+        interpersonalDetectionPrompt: protocolRaw.interpersonalDetectionPrompt || '',
+        interpersonalRedirectTools: protocolRaw.interpersonalRedirectTools || [],
+        notMyProblemPrompt: protocolRaw.notMyProblemPrompt || '',
+        commitmentFraming: protocolRaw.commitmentFraming || [],
+        commitmentValidation: protocolRaw.commitmentValidation || '',
+        completionAcknowledgment: protocolRaw.completionAcknowledgment || '',
+        completionFollowUp: protocolRaw.completionFollowUp || '',
+        copeAheadBridge: protocolRaw.copeAheadBridge || '',
+        copeAheadBridgeToolId: protocolRaw.copeAheadBridgeToolId || 'cope-ahead',
+      };
+
+      return { emotions, parents, protocol };
+    } catch (error) {
+      console.error('Error getting problem solve content:', error);
+      throw new HttpsError('internal', 'Failed to get problem solve content');
     } finally {
       await session.close();
     }

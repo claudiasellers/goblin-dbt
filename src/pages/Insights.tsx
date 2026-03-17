@@ -1,13 +1,31 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getInsightsData, type InsightsPayload } from '../services/neo4j';
 import { InsightSkeleton } from '../components/insights/InsightSkeleton';
-import { InsightEmptyState } from '../components/insights/InsightEmptyState';
 import { FormulationCard } from '../components/insights/FormulationCard';
 import { ProactiveAlert } from '../components/insights/ProactiveAlert';
 import { GrowthEvidence } from '../components/insights/GrowthEvidence';
 import { SomaticCorrelation } from '../components/insights/SomaticCorrelation';
 import { ToolEffectiveness } from '../components/insights/ToolEffectiveness';
+
+function InsightPlaceholder({ icon, title, description, delay = 0 }: {
+  icon: string;
+  title: string;
+  description: string;
+  delay?: number;
+}) {
+  return (
+    <div
+      className="rounded-xl bg-[var(--color-bg-card)] border border-dashed border-[var(--color-border-subtle)] p-6 text-center opacity-70"
+      style={{ animation: `fadeIn 0.5s var(--ease-default) ${delay}s both` }}
+    >
+      <div className="text-2xl mb-2">{icon}</div>
+      <h3 className="text-sm font-semibold text-[var(--color-text-primary)] mb-1">{title}</h3>
+      <p className="text-xs text-[var(--color-text-secondary)] max-w-xs mx-auto">{description}</p>
+    </div>
+  );
+}
 
 export function Insights() {
   const { user } = useAuth();
@@ -41,8 +59,15 @@ export function Insights() {
     <div className="space-y-4">
       <FormulationCard formulation={data.formulation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
 
-      {data.proactiveAlert && (
+      {data.proactiveAlert ? (
         <ProactiveAlert alert={data.proactiveAlert} delay={nextDelay()} />
+      ) : (
+        <InsightPlaceholder
+          icon="🔔"
+          title="Heads up"
+          description="When we spot a pattern that tends to escalate, we'll flag it here with a tool to try before it builds."
+          delay={nextDelay()}
+        />
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

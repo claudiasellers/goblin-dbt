@@ -15,7 +15,7 @@ export function GrowthEvidence({ data, totalCheckIns, delay = 0 }: Props) {
       className={cardClass}
       style={{ animation: `fadeIn 0.5s var(--ease-default) ${delay}s both` }}
     >
-      <div className="flex items-center gap-2 mb-3">
+      <div className="flex items-center gap-2 mb-4">
         <div
           className="w-2 h-2 rounded-full"
           style={{ background: data ? 'var(--color-accent)' : 'var(--color-text-muted)' }}
