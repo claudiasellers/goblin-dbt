@@ -50,38 +50,14 @@ export function Insights() {
   }, [user]);
 
   if (loading) return <InsightSkeleton />;
-
-  if (!data) {
-    return (
-      <div className="space-y-4 text-center py-8">
-        <p className="text-[var(--color-text-secondary)]">
-          Something went wrong loading insights.
-        </p>
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium lift-primary"
-        >
-          Check in now
-        </Link>
-      </div>
-    );
-  }
+  if (!user || !data) return <InsightEmptyState />;
 
   let delayIndex = 0;
   const nextDelay = () => (delayIndex++) * 0.07;
 
   return (
     <div className="space-y-4">
-      {data.formulation ? (
-        <FormulationCard formulation={data.formulation} delay={nextDelay()} />
-      ) : (
-        <InsightPlaceholder
-          icon="🧠"
-          title="Your pattern"
-          description="We're still building a picture of your dominant nervous system pattern. Keep checking in — this will fill in soon."
-          delay={nextDelay()}
-        />
-      )}
+      <FormulationCard formulation={data.formulation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
 
       {data.proactiveAlert ? (
         <ProactiveAlert alert={data.proactiveAlert} delay={nextDelay()} />
@@ -95,38 +71,9 @@ export function Insights() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {data.growthEvidence ? (
-          <GrowthEvidence data={data.growthEvidence} delay={nextDelay()} />
-        ) : (
-          <InsightPlaceholder
-            icon="📈"
-            title="Your growth"
-            description="We need a few more check-ins across different days to start tracking how your skills are developing."
-            delay={nextDelay()}
-          />
-        )}
-
-        {data.somaticCorrelation ? (
-          <SomaticCorrelation data={data.somaticCorrelation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
-        ) : (
-          <InsightPlaceholder
-            icon="🫀"
-            title="Body signals"
-            description="Select body regions during check-ins and we'll map which areas light up for different states."
-            delay={nextDelay()}
-          />
-        )}
-
-        {data.toolEffectiveness ? (
-          <ToolEffectiveness data={data.toolEffectiveness} delay={nextDelay()} />
-        ) : (
-          <InsightPlaceholder
-            icon="🛠️"
-            title="What's working"
-            description="Try a tool and rate how it went — we'll track which ones help most."
-            delay={nextDelay()}
-          />
-        )}
+        <GrowthEvidence data={data.growthEvidence} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
+        <SomaticCorrelation data={data.somaticCorrelation} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
+        <ToolEffectiveness data={data.toolEffectiveness} totalCheckIns={data.totalCheckIns} delay={nextDelay()} />
       </div>
     </div>
   );
