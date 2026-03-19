@@ -52,14 +52,7 @@ Each quadrant operates independently. At any point, different quadrants can be a
 
 ### Quadrant Colors
 
-Using existing CSS custom properties from the design system:
-
-| Quadrant | Fill | Background |
-|----------|------|------------|
-| High Unpleasant | `rgba(196,112,122,0.5)` | `rgba(196,112,122,0.12)` |
-| High Pleasant | `rgba(201,165,90,0.5)` | `rgba(201,165,90,0.12)` |
-| Low Unpleasant | `rgba(123,142,196,0.5)` | `rgba(123,142,196,0.12)` |
-| Low Pleasant | `rgba(107,168,154,0.5)` | `rgba(107,168,154,0.12)` |
+Use existing CSS custom properties from the design system (`var(--color-q-hu-fill)`, `var(--color-q-hu-bg)`, etc.). Do not hardcode rgba values.
 
 ### Selected Emotions Bar
 
@@ -87,6 +80,16 @@ Appears below the selected bar, above "Show all emotions," when 1+ emotions are 
 3. Related emotions panel (hidden if nothing selected)
 4. "Show all emotions" / "Hide all emotions" toggle button
 5. 2×2 quadrant grid
+6. "Continue with N emotions" button (appears when 1+ emotions selected)
+7. Secondary links: "I don't know — start with my body" (somatic entry) and "Help me now" (bail out)
+
+### Existing Entry Points
+
+The current EmotionPlane exposes `onHelpMeNow` and `onSomaticEntry` callbacks. These must carry over to the new design:
+
+- **"Help me now"** — Remains available below the grid. Calls `onHelpMeNow` to skip directly to analysis with whatever data exists.
+- **"I don't know — start with my body"** — Remains available below the grid. Calls `onSomaticEntry` to switch to the body map flow.
+- **"Continue"** — Calls `onSelect(selectedEmotions)` to proceed to the next check-in step. Enabled when 1+ emotions are selected.
 
 ### No Search
 
@@ -100,8 +103,8 @@ Definitions were considered but rejected to keep the UI uncluttered. The affect 
 
 ### New Components
 
-- **`QuadrantGrid`** — The accordion grid managing four quadrant cells with independent level state
-- **`QuadrantCell`** — Individual quadrant cell handling L0/L1/L2 display, expand/collapse
+- **`QuadrantGrid`** — The accordion grid managing four quadrant cells with independent level state. Props: `selectedEmotions`, `onToggleEmotion`, `relatedEmotions`, `onAddRelated`, `onHelpMeNow`, `onSomaticEntry`, `onSelect`
+- **`QuadrantCell`** — Individual quadrant cell handling L0/L1/L2 display, expand/collapse. Accessibility: carry forward `aria-label` patterns from existing EmotionPlane (e.g., on remove buttons, emotion circles).
 
 ### Modified Components
 
@@ -121,11 +124,24 @@ Definitions were considered but rejected to keep the UI uncluttered. The affect 
 
 ### Core vs. Non-Core Emotions
 
-The existing `core: true` flag on emotions in `src/data/emotions.ts` determines which emotions appear at Level 1 vs. Level 2. Currently ~36 emotions are marked core (~9 per quadrant). These should be reviewed:
+The existing `core: true` flag on emotions in `src/data/emotions.ts` determines which emotions appear at Level 1 vs. Level 2. Currently 32 emotions are marked core (8 per quadrant). These should be reviewed:
 
 - Level 1 should show the most universally recognized emotions per quadrant
 - 6-9 per quadrant is the target (fits well in a half-width grid cell)
 - The remaining emotions appear only at Level 2
+
+### Emotion Count Asymmetry
+
+Quadrants have significantly different total emotion counts:
+
+| Quadrant | Total | Core |
+|----------|-------|------|
+| High Unpleasant | 49 | 8 |
+| High Pleasant | 33 | 8 |
+| Low Unpleasant | 36 | 8 |
+| Low Pleasant | 26 | 8 |
+
+At Level 2, the High Unpleasant quadrant will have nearly double the circles of Low Pleasant. This is acceptable — the grid cells grow naturally, and the asymmetry reflects real emotional vocabulary (unpleasant states genuinely have more nuanced language). No rebalancing needed, but implementers should verify the layout looks reasonable at Level 2 with the largest quadrant (49 circles in a half-width cell).
 
 ### No New Data Needed
 
