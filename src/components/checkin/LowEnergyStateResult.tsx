@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
 import { getActivityDefinition, PATTERN_CONTEXT } from '../../data/guidedActivities';
 import { GuidedActivity } from '../activities/GuidedActivity';
+import { getToolById } from '../../data/tools';
 import type { StateResult, ToolRecommendation } from '../../services/neo4j';
 
 interface LowEnergyStateResultProps {
@@ -258,24 +259,6 @@ function ToolCardCompact({
   checkinEmotions?: string[];
 }) {
   const toolPath = `/tool/${tool.id}`;
-  const toolEmoji: Record<string, string> = {
-    'cool-down': '\uD83E\uDDCA',
-    'five-senses': '\uD83D\uDC41\uFE0F',
-    'pause': '\u270B',
-    'urge-surfing': '\uD83C\uDF0A',
-    'name-it': '\uD83C\uDFF7\uFE0F',
-    'opposite-action': '\u21A9\uFE0F',
-    'radical-acceptance': '\uD83D\uDE4F',
-    'pleasant-activities': '\uD83C\uDF31',
-    'dear-man': '\uD83D\uDCAC',
-    'boundaries': '\uD83D\uDEE1\uFE0F',
-    'repair': '\uD83E\uDD1D',
-    'validation': '\uD83D\uDC9B',
-    'mindful-breathing': '\uD83E\uDEC1',
-    'body-scan': '\uD83D\uDCE1',
-    'wise-mind': '\uD83E\uDDD8',
-    'observe-describe': '\uD83D\uDC40',
-  };
 
   return (
     <Link
@@ -284,7 +267,7 @@ function ToolCardCompact({
       className="block p-3 rounded-lg bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] transition-all"
     >
       <div className="flex items-center gap-3">
-        <span className="text-lg flex-shrink-0">{toolEmoji[tool.id] || '\uD83D\uDD27'}</span>
+        <span className="text-lg flex-shrink-0">{getToolById(tool.id)?.emoji || '🔧'}</span>
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{tool.name}</h3>
           <p className="text-xs text-[var(--color-text-tertiary)] line-clamp-1">

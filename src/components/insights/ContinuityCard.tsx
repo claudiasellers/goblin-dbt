@@ -33,7 +33,7 @@ function formatEmotions(emotionStr: string): string {
 export function ContinuityCard({ prompt }: Props) {
   const [state, setState] = useState<'asking' | 'submitting' | 'done'>('asking');
   const tool = toolsData.find((t) => t.id === prompt.toolId);
-  const toolName = tool?.name || 'that tool';
+  const toolName = tool?.name || prompt.toolId;
 
   const emotions = formatEmotions(prompt.checkInEmotion);
   const relativeTime = formatRelativeTime(prompt.checkInTimestamp);

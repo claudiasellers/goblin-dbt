@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getToolById } from '../data/tools';
-import { getCategoryById } from '../data/categories';
 import { useAuth } from '../contexts/AuthContext';
 import { trackToolUsage } from '../services/neo4j';
 
@@ -25,19 +24,10 @@ const toolComponents: Record<string, React.ComponentType> = {
   'problem-solve': ProblemSolve,
 };
 
-/** Normalize graph TherapyConcept ids (e.g. dbt_opposite_action) to frontend tool ids (opposite-action). */
-function normalizeGraphToolId(graphId: string): string {
-  if (!graphId) return graphId;
-  return graphId.replace(/^dbt_/, '').replace(/_/g, '-');
-}
-
 export function ToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
   const { user } = useAuth();
-  const tool = toolId
-    ? getToolById(toolId) ?? getToolById(normalizeGraphToolId(toolId))
-    : undefined;
-  const category = tool ? getCategoryById(tool.categoryId) : undefined;
+  const tool = toolId ? getToolById(toolId) : undefined;
 
   // Track tool usage when the page mounts (fire-and-forget); use resolved tool id when available
   const idToTrack = tool?.id ?? toolId;
@@ -47,17 +37,17 @@ export function ToolPage() {
     }
   }, [user, idToTrack]);
 
-  if (!tool || !category) {
+  if (!tool) {
     return (
       <div className="text-center py-12">
         <p className="text-[var(--color-text-secondary)]">
           Tool not found.
         </p>
-        <Link 
-          to="/" 
+        <Link
+          to="/tools"
           className="mt-4 inline-block text-[var(--color-text-secondary)] underline hover:no-underline"
         >
-          ← Back home
+          ← Tools
         </Link>
       </div>
     );
@@ -68,12 +58,12 @@ export function ToolPage() {
   return (
     <div className="max-w-2xl mx-auto">
       {/* Back link */}
-      <Link 
-        to={`/category/${category.id}`}
+      <Link
+        to="/tools"
         className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-6"
       >
         <span>←</span>
-        <span>{category.name}</span>
+        <span>Tools</span>
       </Link>
 
       {/* Tool header */}

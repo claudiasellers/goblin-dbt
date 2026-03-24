@@ -29,13 +29,13 @@ export function ProactiveAlert({ alert, delay = 0 }: Props) {
           <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed mb-3">
             {alert.narrative}
           </p>
-          {tool && (
+          {alert.suggestedTool && (
             <Link
               to={`/tool/${alert.suggestedTool}`}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-bg-card)] border border-[var(--color-q-lu-border)] text-sm font-medium text-[var(--color-text-primary)] hover:border-[var(--color-q-lu-border-hover)] transition-colors"
             >
-              <span>{tool.emoji}</span>
-              <span>Try {tool.name}</span>
+              <span>{tool?.emoji || '🔧'}</span>
+              <span>Try {tool?.name || alert.suggestedTool}</span>
             </Link>
           )}
         </div>

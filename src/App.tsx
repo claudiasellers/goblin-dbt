@@ -5,7 +5,6 @@ import { Tools } from './pages/Tools';
 import { History } from './pages/History';
 import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
-import { CategoryPage } from './pages/CategoryPage';
 import { ToolPage } from './pages/ToolPage';
 import { Profile } from './pages/Profile';
 
@@ -23,7 +22,6 @@ function App() {
         <Route path="/tools" element={<Tools />} />
         <Route path="/history" element={<History />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/category/:categoryId" element={<CategoryPage />} />
         <Route path="/tool/:toolId" element={<ToolPage />} />
       </Route>
     </Routes>

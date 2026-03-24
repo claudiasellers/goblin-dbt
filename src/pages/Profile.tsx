@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
-import { categories } from '../data/categories';
+import { modules } from '../data/modules';
 import { exportUserData, deleteUserData } from '../services/neo4j';
 
 export function Profile() {
@@ -366,23 +366,22 @@ function GoalsSection({
           Focus Categories
         </label>
         <div className="flex flex-wrap gap-2">
-          {categories.map((cat) => (
+          {modules.map((mod) => (
             <button
-              key={cat.id}
+              key={mod.id}
               onClick={() => {
-                const newCats = focusCategories.includes(cat.id)
-                  ? focusCategories.filter((c) => c !== cat.id)
-                  : [...focusCategories, cat.id];
+                const newCats = focusCategories.includes(mod.id)
+                  ? focusCategories.filter((c) => c !== mod.id)
+                  : [...focusCategories, mod.id];
                 onUpdate({ focusCategories: newCats });
               }}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                focusCategories.includes(cat.id)
+                focusCategories.includes(mod.id)
                   ? 'bg-[var(--color-accent-muted)] border-[var(--color-accent)] text-[var(--color-accent)]'
                   : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border-accent)]'
               }`}
             >
-              <span>{cat.emoji}</span>
-              {cat.name}
+              {mod.name}
             </button>
           ))}
         </div>

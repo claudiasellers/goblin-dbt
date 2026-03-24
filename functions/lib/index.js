@@ -57,6 +57,12 @@ function getDriver() {
     }
     return driver;
 }
+/** Convert graph tool IDs (dbt_opposite_action) to frontend format (opposite-action). */
+function normalizeToolId(graphId) {
+    if (!graphId)
+        return graphId;
+    return graphId.replace(/^dbt_/, '').replace(/_/g, '-');
+}
 // ============================================
 // CLOUD FUNCTIONS
 // ============================================
@@ -852,7 +858,7 @@ exports.getInsightsData = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, n
                 if (intensityTrending || dominantPattern[1] >= thresholds.dominantRepeatMin) {
                     proactiveAlert = {
                         narrative: rec.get('narrative'),
-                        suggestedTool: rec.get('suggestedTool'),
+                        suggestedTool: normalizeToolId(rec.get('suggestedTool')),
                         sourcePatternId: dominantPattern[0],
                         targetPatternId: rec.get('targetPatternId'),
                     };
@@ -1328,8 +1334,8 @@ exports.getStateAndTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, 
       `;
         const toolsResult = await session.run(toolsQuery, { patternId: pattern.id });
         const tools = toolsResult.records.map((rec) => ({
-            id: rec.get('id'),
-            name: rec.get('name') || rec.get('id').replace('dbt_', '').replace(/_/g, ' '),
+            id: normalizeToolId(rec.get('id')),
+            name: rec.get('name') || normalizeToolId(rec.get('id')).replace(/-/g, ' '),
             description: rec.get('description') || '',
             whenToUse: rec.get('whenToUse') || '',
             dbtBasis: rec.get('dbtBasis'),
@@ -2142,8 +2148,8 @@ exports.getQuickTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo
       `;
         const result = await session.run(query, { toolIds });
         const tools = result.records.map((rec) => ({
-            id: rec.get('id'),
-            name: rec.get('name') || rec.get('id').replace('dbt_', '').replace(/_/g, ' '),
+            id: normalizeToolId(rec.get('id')),
+            name: rec.get('name') || normalizeToolId(rec.get('id')).replace(/-/g, ' '),
             description: rec.get('description') || '',
             whenToUse: rec.get('whenToUse') || '',
             dbtBasis: rec.get('dbtBasis'),
