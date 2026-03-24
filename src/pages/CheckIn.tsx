@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { EmotionPlane } from '../components/checkin/EmotionPlane';
+import { QuadrantGrid } from '../components/checkin/QuadrantGrid';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
 import { StateResult } from '../components/checkin/StateResult';
@@ -419,7 +419,7 @@ export function CheckIn() {
 
       <div key={step} className="step-enter">
         {step === 'emotion' && (
-          <EmotionPlane
+          <QuadrantGrid
             onSelect={handleEmotionSelect}
             onHelpMeNow={handleHelpMeNow}
             onSomaticEntry={handleSomaticEntry}

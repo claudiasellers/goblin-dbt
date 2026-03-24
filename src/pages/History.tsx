@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { getCheckInsByUser, getDearManSessions, type CheckInRecord, type DearManSessionRecord } from '../services/neo4j';
 import { quadrantColors } from '../data/emotions';
 import { HistoryInsights } from '../components/history/HistoryInsights';
+import { Insights } from './Insights';
 
 export function History() {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ export function History() {
   const [dearManSessions, setDearManSessions] = useState<DearManSessionRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'checkins' | 'dearman'>('checkins');
+  const [activeTab, setActiveTab] = useState<'insights' | 'checkins' | 'dearman'>('insights');
 
   useEffect(() => {
     async function fetchHistory() {
@@ -105,11 +106,21 @@ export function History() {
   return (
     <div>
       <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-6">
-        Your History
+        Reflect
       </h1>
 
       {/* Tabs */}
       <div className="flex gap-1 mb-5 bg-[var(--color-glass-card)] rounded-lg p-1">
+        <button
+          onClick={() => setActiveTab('insights')}
+          className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
+            activeTab === 'insights'
+              ? 'bg-[var(--color-accent)] text-white'
+              : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
+          }`}
+        >
+          Insights
+        </button>
         <button
           onClick={() => setActiveTab('checkins')}
           className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
@@ -118,7 +129,7 @@ export function History() {
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
-          Check-ins
+          History
         </button>
         <button
           onClick={() => setActiveTab('dearman')}
@@ -131,6 +142,8 @@ export function History() {
           DEAR MAN{dearManSessions.length > 0 ? ` (${dearManSessions.length})` : ''}
         </button>
       </div>
+
+      {activeTab === 'insights' && <Insights />}
 
       {activeTab === 'checkins' && (
         <>

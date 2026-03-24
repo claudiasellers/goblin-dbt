@@ -710,6 +710,7 @@ export const getInsightsData = onCall(
     }
 
     const userId = request.auth.uid;
+    const timeRange: string = request.data?.timeRange || '30d';
     const driver = getDriver();
 
     // Neo4j sessions can only run one query at a time, so use separate sessions for parallel queries
@@ -720,12 +721,21 @@ export const getInsightsData = onCall(
 
     try {
       // Run parallel queries for raw data
+      // Build time filter clause based on timeRange parameter
+      const timeFilterDays = timeRange === '7d' ? 7 : timeRange === 'all' ? null : 30;
+      const checkInTimeFilter = timeFilterDays !== null
+        ? `WHERE c.timestamp >= datetime() - duration({days: ${timeFilterDays}})`
+        : '';
+      const toolTimeFilter = timeFilterDays !== null
+        ? `WHERE tu.timestamp >= datetime() - duration({days: ${timeFilterDays}})`
+        : '';
+
       const [checkInsResult, toolUsageResult, continuityResult] = await Promise.all([
-        // 1. Recent check-ins (last 30 days)
+        // 1. Recent check-ins (filtered by time range)
         session1.run(
           `
           MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-          WHERE c.timestamp >= datetime() - duration({days: 30})
+          ${checkInTimeFilter}
           OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
           WITH c, collect(DISTINCT s.region) AS bodyRegions, collect(s.tags) AS tagArrays
           OPTIONAL MATCH (e:Emotion {id: c.emotion})
@@ -744,11 +754,11 @@ export const getInsightsData = onCall(
           `,
           { userId }
         ),
-        // 2. Tool usage with outcomes (last 30 days)
+        // 2. Tool usage with outcomes (filtered by time range)
         session2.run(
           `
           MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
-          WHERE tu.timestamp >= datetime() - duration({days: 30})
+          ${toolTimeFilter}
           OPTIONAL MATCH (tu)-[:FOLLOWED_CHECKIN]->(c:CheckIn)
           RETURN tu.toolId AS toolId,
                  tu.outcome AS outcome,
@@ -809,6 +819,70 @@ export const getInsightsData = onCall(
       const session = driver.session();
       seqSession = session;
 
+      // ── Thresholds scaled by time range ──
+      const thresholds = timeRange === '7d' ? {
+        coOccurrenceMin: 1,        // patterns appear 1+ times each
+        dominantRepeatMin: 1,      // show alert / use dominant at 1+
+        growthCheckIns: 2,         // need 2+ check-ins
+        growthDaySpan: 2,          // across 2+ days
+        growthHalfMin: 1,          // each half needs 1+
+        emotionVocabMin: 2,        // emotion count threshold
+        emotionFamilyMin: 2,       // family count threshold
+        intensityDropMin: 0.05,    // smaller intensity drop is meaningful
+        sensationTagDelta: 1,      // tags gained threshold
+        sensationTagMin: 2,        // minimum tag count
+        bodyAvgDelta: 0.2,         // body region avg delta
+        bodyAvgMin: 0.3,           // minimum body avg
+        followThroughRate: 0.3,    // lower bar for follow-through
+        followThroughCount: 1,     // 1+ tool uses
+        toolRepertoireMin: 2,      // 2+ tools
+        outcomeCountMin: 1,        // 1+ rated outcome
+        somaticCheckInMin: 1,      // 1+ check-in with body data
+        somaticRegionCount: 1,     // region appears 1+ time
+        somaticFallbackMin: 2,     // fallback threshold
+      } : timeRange === 'all' ? {
+        coOccurrenceMin: 4,
+        dominantRepeatMin: 3,
+        growthCheckIns: 8,
+        growthDaySpan: 14,
+        growthHalfMin: 3,
+        emotionVocabMin: 5,
+        emotionFamilyMin: 4,
+        intensityDropMin: 0.10,
+        sensationTagDelta: 3,
+        sensationTagMin: 5,
+        bodyAvgDelta: 0.5,
+        bodyAvgMin: 0.8,
+        followThroughRate: 0.4,
+        followThroughCount: 5,
+        toolRepertoireMin: 4,
+        outcomeCountMin: 3,
+        somaticCheckInMin: 3,
+        somaticRegionCount: 3,
+        somaticFallbackMin: 4,
+      } : {
+        // 30d — current defaults
+        coOccurrenceMin: 2,
+        dominantRepeatMin: 2,
+        growthCheckIns: 4,
+        growthDaySpan: 5,
+        growthHalfMin: 2,
+        emotionVocabMin: 3,
+        emotionFamilyMin: 3,
+        intensityDropMin: 0.08,
+        sensationTagDelta: 2,
+        sensationTagMin: 3,
+        bodyAvgDelta: 0.3,
+        bodyAvgMin: 0.5,
+        followThroughRate: 0.4,
+        followThroughCount: 3,
+        toolRepertoireMin: 3,
+        outcomeCountMin: 2,
+        somaticCheckInMin: 2,
+        somaticRegionCount: 2,
+        somaticFallbackMin: 3,
+      };
+
       // ── Compute pattern frequencies ──
       const patternCounts: Record<string, number> = {};
       for (const ci of checkIns) {
@@ -821,7 +895,7 @@ export const getInsightsData = onCall(
         .sort((a, b) => b.count - a.count);
 
       // ── Compute formulation ──
-      // Use full 30-day window. Show formulation if ANY pattern exists (even 1 check-in).
+      // Use selected time window. Show formulation if ANY pattern exists (even 1 check-in).
       // Filter out positive_state — it's a fallback for pleasant quadrants, not a clinical
       // pattern in the graph. Leaving it in blocks formulation when it's the dominant count.
       const sortedPatterns = Object.entries(patternCounts)
@@ -832,8 +906,8 @@ export const getInsightsData = onCall(
 
       let formulation = null;
 
-      // Co-occurrence: both patterns appear 2+ times
-      if (dominantPattern && secondaryPattern && dominantPattern[1] >= 2 && secondaryPattern[1] >= 2) {
+      // Co-occurrence: both patterns appear enough times
+      if (dominantPattern && secondaryPattern && dominantPattern[1] >= thresholds.coOccurrenceMin && secondaryPattern[1] >= thresholds.coOccurrenceMin) {
         const coResult = await session.run(
           `
           MATCH (p1:ActivationPattern {id: $pid1})-[r:CO_OCCURS_WITH]-(p2:ActivationPattern {id: $pid2})
@@ -864,7 +938,7 @@ export const getInsightsData = onCall(
       // Single pattern formulation — show for ANY pattern, even count=1
       // Use dominant if 2+, otherwise use most recent check-in's pattern
       if (!formulation && dominantPattern) {
-        const patternIdToUse = dominantPattern[1] >= 2
+        const patternIdToUse = dominantPattern[1] >= thresholds.dominantRepeatMin
           ? dominantPattern[0]
           : (checkIns.find(ci => ci.activationPatternId)?.activationPatternId || dominantPattern[0]);
 
@@ -925,7 +999,7 @@ export const getInsightsData = onCall(
             intensityTrending = recentAvg > olderAvg + 0.05;
           }
 
-          if (intensityTrending || dominantPattern[1] >= 2) {
+          if (intensityTrending || dominantPattern[1] >= thresholds.dominantRepeatMin) {
             proactiveAlert = {
               narrative: rec.get('narrative'),
               suggestedTool: rec.get('suggestedTool'),
@@ -940,25 +1014,25 @@ export const getInsightsData = onCall(
       // Split check-ins into two halves (older vs newer). Needs 4+ total over 5+ days.
       let growthEvidence = null;
 
-      if (checkIns.length >= 4) {
+      if (checkIns.length >= thresholds.growthCheckIns) {
         const sorted = [...checkIns].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
         const firstTs = new Date(sorted[0].timestamp).getTime();
         const lastTs = new Date(sorted[sorted.length - 1].timestamp).getTime();
         const daySpan = (lastTs - firstTs) / (1000 * 60 * 60 * 24);
 
-        if (daySpan >= 5) {
+        if (daySpan >= thresholds.growthDaySpan) {
           const mid = Math.floor(sorted.length / 2);
           const olderHalf = sorted.slice(0, mid);
           const newerHalf = sorted.slice(mid);
           const midTimestamp = sorted[mid].timestamp;
 
-          if (olderHalf.length >= 2 && newerHalf.length >= 2) {
+          if (olderHalf.length >= thresholds.growthHalfMin && newerHalf.length >= thresholds.growthHalfMin) {
             const insights: Array<{ key: string; text: string; data: Record<string, number> }> = [];
 
             // 1. Emotional vocabulary expanding
             const olderEmotions = new Set(olderHalf.map(ci => ci.emotion));
             const newerEmotions = new Set(newerHalf.map(ci => ci.emotion));
-            if (newerEmotions.size > olderEmotions.size && newerEmotions.size >= 3) {
+            if (newerEmotions.size > olderEmotions.size && newerEmotions.size >= thresholds.emotionVocabMin) {
               insights.push({
                 key: 'emotion-vocabulary',
                 text: 'Naming emotions precisely is itself a regulation skill.',
@@ -969,7 +1043,7 @@ export const getInsightsData = onCall(
             // 2. Emotion family breadth
             const olderFamilies = new Set(olderHalf.map(ci => ci.dbtParent).filter(Boolean));
             const newerFamilies = new Set(newerHalf.map(ci => ci.dbtParent).filter(Boolean));
-            if (newerFamilies.size > olderFamilies.size && newerFamilies.size >= 3) {
+            if (newerFamilies.size > olderFamilies.size && newerFamilies.size >= thresholds.emotionFamilyMin) {
               insights.push({
                 key: 'emotion-family-breadth',
                 text: "You're not collapsing everything into one feeling.",
@@ -980,7 +1054,7 @@ export const getInsightsData = onCall(
             // 3. Catching it earlier (intensity drop)
             const recentAvgIntensity = newerHalf.reduce((s, ci) => s + ci.intensityY, 0) / newerHalf.length;
             const priorAvgIntensity = olderHalf.reduce((s, ci) => s + ci.intensityY, 0) / olderHalf.length;
-            if (priorAvgIntensity - recentAvgIntensity > 0.08) {
+            if (priorAvgIntensity - recentAvgIntensity > thresholds.intensityDropMin) {
               insights.push({
                 key: 'catching-earlier',
                 text: "You're catching things before they escalate.",
@@ -1002,7 +1076,7 @@ export const getInsightsData = onCall(
             // 5. Body sensation richness (tag variety)
             const olderTags = new Set(olderHalf.flatMap(ci => ci.sensationTags));
             const newerTags = new Set(newerHalf.flatMap(ci => ci.sensationTags));
-            if (newerTags.size > olderTags.size + 2 && newerTags.size >= 3) {
+            if (newerTags.size > olderTags.size + thresholds.sensationTagDelta && newerTags.size >= thresholds.sensationTagMin) {
               insights.push({
                 key: 'sensation-richness',
                 text: "More body detail means earlier warning signals.",
@@ -1013,7 +1087,7 @@ export const getInsightsData = onCall(
             // 6. Body region awareness
             const olderBodyAvg = olderHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / olderHalf.length;
             const recentBodyAvg = newerHalf.reduce((s, ci) => s + ci.bodyRegions.length, 0) / newerHalf.length;
-            if (recentBodyAvg > olderBodyAvg + 0.3 && recentBodyAvg > 0.5) {
+            if (recentBodyAvg > olderBodyAvg + thresholds.bodyAvgDelta && recentBodyAvg > thresholds.bodyAvgMin) {
               insights.push({
                 key: 'body-awareness',
                 text: "Growing body awareness gives you a head start.",
@@ -1027,7 +1101,7 @@ export const getInsightsData = onCall(
               toolUsages.filter(tu => tu.checkInId && checkInIds.has(tu.checkInId)).map(tu => tu.checkInId)
             );
             const followThroughRate = checkInsWithToolFollow.size / checkIns.length;
-            if (followThroughRate >= 0.4 && checkInsWithToolFollow.size >= 3) {
+            if (followThroughRate >= thresholds.followThroughRate && checkInsWithToolFollow.size >= thresholds.followThroughCount) {
               insights.push({
                 key: 'tool-follow-through',
                 text: "Notice it, then do something about it — that's the whole loop.",
@@ -1042,7 +1116,7 @@ export const getInsightsData = onCall(
             const newerToolIds = new Set(
               toolUsages.filter(tu => tu.timestamp >= midTimestamp).map(tu => tu.toolId)
             );
-            if (newerToolIds.size > olderToolIds.size && newerToolIds.size >= 3) {
+            if (newerToolIds.size > olderToolIds.size && newerToolIds.size >= thresholds.toolRepertoireMin) {
               insights.push({
                 key: 'tool-repertoire',
                 text: "More options for different situations.",
@@ -1053,9 +1127,9 @@ export const getInsightsData = onCall(
             // 9. Positive outcomes increasing
             const olderOutcomes = toolUsages.filter(tu => tu.timestamp < midTimestamp && tu.outcome);
             const newerOutcomes = toolUsages.filter(tu => tu.timestamp >= midTimestamp && tu.outcome);
-            if (newerOutcomes.length >= 2) {
+            if (newerOutcomes.length >= thresholds.outcomeCountMin) {
               const newerPositiveRate = newerOutcomes.filter(tu => tu.outcome === 'helped').length / newerOutcomes.length;
-              const olderPositiveRate = olderOutcomes.length >= 2
+              const olderPositiveRate = olderOutcomes.length >= thresholds.outcomeCountMin
                 ? olderOutcomes.filter(tu => tu.outcome === 'helped').length / olderOutcomes.length
                 : 0;
               if (newerPositiveRate > olderPositiveRate && newerPositiveRate >= 0.5) {
@@ -1079,7 +1153,7 @@ export const getInsightsData = onCall(
       let somaticCorrelation = null;
 
       const checkInsWithBody = checkIns.filter(ci => ci.bodyRegions.length > 0);
-      if (checkInsWithBody.length >= 2) {
+      if (checkInsWithBody.length >= thresholds.somaticCheckInMin) {
         const regionKeyMap: Record<string, Record<string, number>> = {};
         for (const ci of checkInsWithBody) {
           // Use pattern if available, otherwise use quadrant as grouping key
@@ -1093,13 +1167,13 @@ export const getInsightsData = onCall(
         const correlations: Array<{ region: string; patternId: string; count: number }> = [];
         for (const [region, keys] of Object.entries(regionKeyMap)) {
           const top = Object.entries(keys).sort((a, b) => b[1] - a[1])[0];
-          if (top && top[1] >= 2) {
+          if (top && top[1] >= thresholds.somaticRegionCount) {
             correlations.push({ region, patternId: top[0], count: top[1] });
           }
         }
 
         // If strict 2+ threshold finds nothing, show any region that appears 2+ times total
-        if (correlations.length === 0 && checkInsWithBody.length >= 3) {
+        if (correlations.length === 0 && checkInsWithBody.length >= thresholds.somaticFallbackMin) {
           const regionTotals: Record<string, number> = {};
           for (const ci of checkInsWithBody) {
             for (const region of ci.bodyRegions) {
@@ -1107,7 +1181,7 @@ export const getInsightsData = onCall(
             }
           }
           for (const [region, count] of Object.entries(regionTotals)) {
-            if (count >= 2) {
+            if (count >= thresholds.somaticRegionCount) {
               // Find most common quadrant for this region
               const quadrantCounts: Record<string, number> = {};
               for (const ci of checkInsWithBody) {

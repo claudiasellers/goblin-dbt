@@ -743,10 +743,10 @@ export interface InsightsPayload {
   totalCheckIns: number;
 }
 
-const getInsightsDataFn = httpsCallable<void, InsightsPayload>(
-  functions,
-  'getInsightsData'
-);
+const getInsightsDataFn = httpsCallable<
+  { timeRange?: '7d' | '30d' | 'all' },
+  InsightsPayload
+>(functions, 'getInsightsData');
 
 const recordToolOutcomeFn = httpsCallable<
   { outcome: 'helped' | 'somewhat' | 'not_really' },
@@ -756,8 +756,10 @@ const recordToolOutcomeFn = httpsCallable<
 /**
  * Get all insights data for the Insights page
  */
-export async function getInsightsData(): Promise<InsightsPayload> {
-  const result = await getInsightsDataFn();
+export async function getInsightsData(
+  timeRange: '7d' | '30d' | 'all' = '30d'
+): Promise<InsightsPayload> {
+  const result = await getInsightsDataFn({ timeRange });
   return result.data;
 }
 

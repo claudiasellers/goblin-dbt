@@ -8,6 +8,8 @@ import { ProactiveAlert } from '../components/insights/ProactiveAlert';
 import { GrowthEvidence } from '../components/insights/GrowthEvidence';
 import { SomaticCorrelation } from '../components/insights/SomaticCorrelation';
 import { ToolEffectiveness } from '../components/insights/ToolEffectiveness';
+import { TimeFilter } from '../components/history/TimeFilter';
+import type { TimeRange } from '../components/history/useFilteredCheckIns';
 
 function InsightPlaceholder({ icon, title, description, delay = 0 }: {
   icon: string;
@@ -31,6 +33,7 @@ export function Insights() {
   const { user } = useAuth();
   const [data, setData] = useState<InsightsPayload | null>(null);
   const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<TimeRange>('30d');
 
   useEffect(() => {
     if (!user) {
@@ -38,7 +41,8 @@ export function Insights() {
       return;
     }
 
-    getInsightsData()
+    setLoading(true);
+    getInsightsData(timeRange)
       .then((result) => {
         console.log('[Insights] data received:', JSON.stringify(result, null, 2));
         setData(result);
@@ -47,7 +51,7 @@ export function Insights() {
         console.error('[Insights] error fetching data:', err);
       })
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user, timeRange]);
 
   if (loading) return <InsightSkeleton />;
 
@@ -72,6 +76,11 @@ export function Insights() {
 
   return (
     <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-[var(--color-text-primary)]">Insights</h2>
+        <TimeFilter value={timeRange} onChange={setTimeRange} />
+      </div>
+
       {data.formulation ? (
         <FormulationCard formulation={data.formulation} delay={nextDelay()} />
       ) : (

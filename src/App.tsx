@@ -1,7 +1,6 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { DashboardLayout } from './components/DashboardLayout';
 import { CheckIn } from './pages/CheckIn';
-import { Insights } from './pages/Insights';
 import { Tools } from './pages/Tools';
 import { History } from './pages/History';
 import { Login } from './pages/Login';
@@ -20,7 +19,7 @@ function App() {
       {/* Main app with dashboard layout (sidebar + header) */}
       <Route element={<DashboardLayout />}>
         <Route index element={<CheckIn />} />
-        <Route path="/insights" element={<Insights />} />
+        <Route path="/insights" element={<Navigate to="/history" replace />} />
         <Route path="/tools" element={<Tools />} />
         <Route path="/history" element={<History />} />
         <Route path="/profile" element={<Profile />} />
