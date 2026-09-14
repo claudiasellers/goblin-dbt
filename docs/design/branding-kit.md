@@ -343,43 +343,46 @@ if any single token is off.
 ### E. Giverny (from Claudia's references)
 
 *Translated 2026-09-14 from two Monet water-lily nail-art references
-Claudia supplied, taking the most vivid color in each hue band rather than
-the average: coral and gold across the top of the field, cobalt and
-turquoise-mint across the bottom, the gold foil as a copper action, cream
-nails as paper, deep pine as the dark ground. The reference's orchid is
-where the field's left edge blends; it is not a token. Sampled peaks
-(compressed thumbnails, so cleaned by eye): coral `#D4744C`, foil
-`#CE8346`, gold `#B48F3D`, lily green `#419458`, aqua `#6AA69D`, cobalt
-`#0D3165`, teal `#3F7581`, orchid `#865291`, plum `#88487E`.*
+Claudia supplied, weighted the way the nails are: greens, teals, blues and
+purples carry it; coral and gold are small. A first pass leaned warm
+(cream page, copper action) and was rejected for that reason. Sampled
+vivid peaks, cleaned by eye from compressed thumbnails: coral `#D4744C`,
+foil `#CE8346`, gold `#B48F3D`, lily green `#419458`, aqua `#6AA69D`,
+cobalt `#0D3165`, teal `#3F7581`, orchid `#865291`, plum `#88487E`.*
 
 | Token | Light | Dark |
 |---|---|---|
-| Page | `#EFEBE3` | `#141F22` |
-| Paper | `#FBF8F2` | `#1C2A2E` |
-| Ink | `#1B2A2A` | `#EAE4D8` |
-| Secondary text | `#5E6A66` | `#9DA9A4` |
-| Action (copper foil) | `#9A5A2E` | `#9A5A2E` |
+| Page (sea glass) | `#EAF1EC` | `#0F1F1E` |
+| Paper | `#F6FAF7` | `#17292A` |
+| Ink (pine) | `#12302C` | `#E6EFEA` |
+| Secondary text | `#4F6B64` | `#9DB5AE` |
+| Action (pond teal) | `#1B7A72` | `#1B7A72` |
 | Danger (crimson) | `#A8203F` | `#E0607A` |
-| Field ground | `#141F22` | `#141F22` |
+| Field ground | `#0F1F1E` | `#0F1F1E` |
 | HU coral | `#E8735A` (text `#9B3A22`) | `#F08A70` |
 | HP gold | `#E3A93C` (text `#7A5308`) | `#EDBB55` |
-| LU cobalt | `#3B63C4` (text `#2A4A9C`) | `#7A98E0` |
-| LP turquoise-mint | `#38B09A` (text `#1F6E5E`) | `#5FCDB4` |
+| LU orchid | `#9A4FA3` (text `#6E2F78`) | `#BE7FC6` |
+| LP lily-pad green | `#5FA85A` (text `#2E6B2A`) | `#84C77E` |
 
-Contrast: ink on page 12.5 (dark 13.3); white on action 5.4 both themes;
-white on danger 7.1 light; quadrant text on paper 5.7 to 7.7 light, 5.2 to
-8.3 dark. Copper (h30) sits between coral (h13) and gold (h40) in hue but
-well below both in lightness and chroma, so it separates by darkness the
-way C2's ink does; it does not touch the bottom edge, which blends through
-teal. If a purple is wanted anywhere it belongs to the LU corner in place
-of cobalt, not the action.
+Contrast: ink on page 12.3 (dark 14.5); white on action 5.2 both themes;
+white on danger 7.1 light; quadrant text on paper 6.1 to 8.5 light, 5.1 to
+8.5 dark.
 
-On the field: Signal-strength corners on a warm ground; the top edge is
-peach, the bottom teal, the left orchid. On a saved DEAR MAN plan card:
-cream paper, pine ink, one copper bar, the closest of the set to a
-physical notebook. Downside: cream paper is the ground the design plan
-warned reads as the current AI default, copper as "go" has to be learned,
-and the corners carry the same high-arousal question as Signal and D.
+Why orchid in the low-unpleasant corner: it is the reference's strongest
+cool color, and it keeps the teal action off the bottom edge. With cobalt
+there, the bottom edge (blue to green) blends through teal and the button
+disappears into the field; with orchid there, the edge blends through the
+water blue instead, and the left edge (coral to orchid) blends through the
+lily pink. The action separates from the field by lightness (L0.50 vs
+corners around L0.70), the same mechanism as D.
+
+On the field: a pond. Orchid and lily green below, coral and gold above,
+the water blue and the lily pink appearing at the seams, all on pine. On a
+saved DEAR MAN plan card: sea-glass page, near-white paper, pine type, one
+teal bar. Downside: teal is the color of every calm-app brand (Calm,
+Woebot, and the current Goblin accent), so the corners and the pine ink
+have to carry the identity; and a purple corner is a departure from the
+How We Feel convention users may already know.
 
 ## 5. How to choose, and a recommendation
 
