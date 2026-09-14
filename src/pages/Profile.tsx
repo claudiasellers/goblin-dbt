@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { modules } from '../data/modules';
@@ -55,8 +55,7 @@ export function Profile() {
       <AppearanceSection
         theme={profile.theme}
         palette={profile.palette ?? DEFAULT_PALETTE}
-        onChange={(theme) => updateProfile({ theme })}
-        onPaletteChange={(palette) => updateProfile({ palette })}
+        onSave={(changes) => updateProfile(changes)}
       />
 
       <NotificationsSection
@@ -190,18 +189,65 @@ function BasicInfoSection({
 }
 
 // --- Appearance ---
+type ThemeChoice = 'dark' | 'light' | 'system';
+
+/**
+ * Theme and palette are staged: picking an option previews it on the page
+ * immediately, but nothing is stored until Save. Leaving the page without
+ * saving puts the saved values back.
+ */
 function AppearanceSection({
   theme,
   palette,
-  onChange,
-  onPaletteChange,
+  onSave,
 }: {
-  theme: 'dark' | 'light' | 'system';
+  theme: ThemeChoice;
   palette: PaletteId;
-  onChange: (theme: 'dark' | 'light' | 'system') => Promise<void>;
-  onPaletteChange: (palette: PaletteId) => Promise<void>;
+  onSave: (changes: { theme: ThemeChoice; palette: PaletteId }) => Promise<void>;
 }) {
-  const options: { value: 'dark' | 'light' | 'system'; label: string }[] = [
+  const [draftTheme, setDraftTheme] = useState<ThemeChoice>(theme);
+  const [draftPalette, setDraftPalette] = useState<PaletteId>(palette);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const dirty = draftTheme !== theme || draftPalette !== palette;
+
+  // Keep drafts in step if the saved profile changes underneath (e.g. loads after mount)
+  useEffect(() => { setDraftTheme(theme); }, [theme]);
+  useEffect(() => { setDraftPalette(palette); }, [palette]);
+
+  // Live preview of the draft; restore the saved values on unmount
+  useEffect(() => {
+    document.documentElement.dataset.theme = draftTheme;
+    document.documentElement.dataset.palette = draftPalette;
+  }, [draftTheme, draftPalette]);
+  useEffect(() => {
+    return () => {
+      document.documentElement.dataset.theme = theme;
+      document.documentElement.dataset.palette = palette;
+    };
+  }, [theme, palette]);
+
+  useEffect(() => { if (dirty) setSaved(false); }, [dirty]);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await onSave({ theme: draftTheme, palette: draftPalette });
+      setSaved(true);
+    } catch {
+      // error handled by context
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function handleRevert() {
+    setDraftTheme(theme);
+    setDraftPalette(palette);
+  }
+
+  const themeOptions: { value: ThemeChoice; label: string }[] = [
     { value: 'dark', label: 'Dark' },
     { value: 'light', label: 'Light' },
     { value: 'system', label: 'System' },
@@ -214,12 +260,14 @@ function AppearanceSection({
           Theme
         </label>
         <div className="flex gap-2">
-          {options.map((opt) => (
+          {themeOptions.map((opt) => (
             <button
               key={opt.value}
-              onClick={() => onChange(opt.value)}
+              type="button"
+              onClick={() => setDraftTheme(opt.value)}
+              aria-pressed={draftTheme === opt.value}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
-                theme === opt.value
+                draftTheme === opt.value
                   ? 'bg-[var(--color-accent-muted)] border-[var(--color-accent)] text-[var(--color-accent)]'
                   : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border-accent)]'
               }`}
@@ -236,14 +284,14 @@ function AppearanceSection({
         </label>
         <div role="radiogroup" aria-labelledby="palette-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {palettes.map((p) => {
-            const selected = palette === p.id;
+            const selected = draftPalette === p.id;
             return (
               <button
                 key={p.id}
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => onPaletteChange(p.id)}
+                onClick={() => setDraftPalette(p.id)}
                 className={`flex items-center gap-3 text-left p-3 rounded-lg border transition-colors ${
                   selected
                     ? 'border-[var(--color-text-primary)] bg-[var(--color-bg-elevated)]'
@@ -271,6 +319,29 @@ function AppearanceSection({
             );
           })}
         </div>
+      </div>
+
+      <div className="flex items-center gap-3 pt-1">
+        <button
+          type="button"
+          onClick={handleSave}
+          disabled={saving || !dirty}
+          className="px-4 py-2 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {saving ? 'Saving...' : 'Save'}
+        </button>
+        {dirty && (
+          <button
+            type="button"
+            onClick={handleRevert}
+            className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors"
+          >
+            Undo changes
+          </button>
+        )}
+        <p role="status" className="text-sm text-[var(--color-text-tertiary)]">
+          {dirty ? 'Previewing. Save to keep it.' : saved ? 'Saved' : ''}
+        </p>
       </div>
     </SectionCard>
   );
