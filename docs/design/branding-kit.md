@@ -122,7 +122,7 @@ indistinguishable from any SaaS. Set `goblin` lowercase, Fraunces 600,
 `WONK` 1, optical size low, tracking -1%. DM Sans remains the type for
 everything else, including any tagline under the mark.
 
-## 4. Palettes (three originals, two added after review)
+## 4. Palettes (three originals, three added after review)
 
 Conventions: the field ground is named per palette (it is currently dark
 navy in both themes). Quadrant text tokens are used for chip labels on a
@@ -342,72 +342,117 @@ if any single token is off.
 
 ### E. Giverny (from Claudia's references)
 
-*Translated 2026-09-14 from two Monet water-lily nail-art references
-Claudia supplied, weighted the way the nails are: greens, teals, blues and
-purples carry it; coral and gold are small. A first pass leaned warm
-(cream page, copper action) and was rejected for that reason. Sampled
-vivid peaks, cleaned by eye from compressed thumbnails: coral `#D4744C`,
-foil `#CE8346`, gold `#B48F3D`, lily green `#419458`, aqua `#6AA69D`,
-cobalt `#0D3165`, teal `#3F7581`, orchid `#865291`, plum `#88487E`.*
+*Built 2026-09-14 from two Monet water-lily nail references: one warm
+(coral and mint on cream, rose-gold rims, dusty mauve behind) and one cool
+(orchid, lily green and lake blue on deep pine water, gold foil). Their
+shared structure, not their pixels, is the palette: analogous cools carry
+the weight, warm appears as small flecks, shadows go mauve rather than
+grey, and the gold is a rim, never a fill. Every token below is generated
+in OKLCH from that structure. A first draft sampled the brightest pixel
+per hue and was rejected for using the colours without relating them.*
+
+How the colours relate:
+
+- **The four corners are one family.** All four fills sit at L 0.70 and
+  the same chroma, 0.145, which is the most the gold hue can hold in sRGB
+  at that lightness; the other three are capped to match it. They are as
+  vivid as the reference gold allows and no corner shouts over another.
+  The dark-theme fills are the same hues at L 0.76, chroma 0.127.
+- **Blue holds the LU corner; orchid lives at the seam.** With lake blue
+  (h250) in LU, the left edge (coral h35 to blue) blends the short way
+  through `#C87ED3`, h322, which is the reference's orchid, and the bottom
+  edge blends through `#00B9BE`, the water. With orchid in LU instead, the
+  bottom edge (h320 to h145) is a 175-degree gap: one degree from the point
+  where OKLCH hue interpolation flips direction and the whole edge turns
+  orange. Blue is also the How We Feel convention. Orchid is not lost; it
+  is the colour that appears between sadness and anger, which is where
+  Monet put it.
+- **Neutrals are tints of the palette's own hues.** Ink is pine (h174,
+  chroma 0.03), the page is lake water at L 0.97, secondary text is the
+  same water hue at L 0.50, and the hairline is mauve (h328) so that the
+  only shadow in the system is the one the reference has.
+- **The action is the shadow under the lilies.** Deep water, L 0.42,
+  chroma 0.066, h178: the darkest colour in the cool painting. It separates
+  from the field by lightness (0.42 against corners at 0.70) and chroma
+  (0.066 against 0.145), not by hue. It shares a hue region with the bottom
+  edge, as D's moss does with the right edge, and that is the honest cost
+  of not using purple: on a four-edge field no hue is free, and the
+  reference's own dark is the least arbitrary place to stand.
+- **Danger is 30 degrees from HU and a lightness step below.** Crimson
+  at h5, L 0.50, against coral at h35, L 0.70; it is the lily-pink of the
+  reference pushed dark.
+- **The gold foil is a token, with one rule.** `#C69E58` may be a hairline
+  on the keepsake's edge and the wordmark on a dark ground (7.4:1 on the
+  dark page). It is 2.4:1 on light paper, so it is never text there, and
+  it is never a fill anywhere. That is what a rim is.
 
 | Token | Light | Dark |
 |---|---|---|
-| Page (sea glass) | `#EAF1EC` | `#0F1F1E` |
-| Paper | `#F6FAF7` | `#17292A` |
-| Ink (pine) | `#12302C` | `#E6EFEA` |
-| Secondary text | `#4F6B64` | `#9DB5AE` |
-| Action (pond teal) | `#1B7A72` | `#1B7A72` |
-| Danger (crimson) | `#A8203F` | `#E0607A` |
-| Field ground | `#0F1F1E` | `#0F1F1E` |
-| HU coral | `#E8735A` (text `#9B3A22`) | `#F08A70` |
-| HP gold | `#E3A93C` (text `#7A5308`) | `#EDBB55` |
-| LU orchid | `#9A4FA3` (text `#6E2F78`) | `#BE7FC6` |
-| LP lily-pad green | `#5FA85A` (text `#2E6B2A`) | `#84C77E` |
+| Page (lake water) | `#ECF6F5` | `#0A1615` |
+| Paper | `#F9FDFC` | `#152220` |
+| Ink (pine) | `#132923` | `#E4EDEC` |
+| Secondary text | `#506967` | `#90ABA7` |
+| Hairline (mauve) | `#DFD3DE` | `#453943` |
+| Action (deep water) | `#1B594D` | `#297163` |
+| Danger (lily crimson) | `#A82E57` | `#E97292` |
+| Foil (rim and wordmark only) | `#C69E58` | `#C69E58` |
+| Field ground (pine water) | `#112621` | `#112621` |
+| HU coral | `#EA7A5E` (text `#873B28`) | `#F69279` |
+| HP gold | `#CD9200` (text `#754C00`) | `#DBA748` |
+| LU lake blue | `#4FA3F4` (text `#1A588F`) | `#6FB6FF` |
+| LP lily green | `#5EB663` (text `#26652B`) | `#7BC67E` |
 
-Contrast: ink on page 12.3 (dark 14.5); white on action 5.2 both themes;
-white on danger 7.1 light; quadrant text on paper 6.1 to 8.5 light, 5.1 to
-8.5 dark.
+Contrast: ink on page 13.9 (dark 15.5); secondary on page 5.4 (dark 7.5);
+white on action 8.1 light, 5.8 dark, and the dark button stands off its
+page at 3.2; white on danger 6.6 light, danger on dark page 6.4; quadrant
+text on tint 6.3 to 6.9 light, 5.7 to 6.0 dark; light fills on the pine
+ground 5.6 to 6.3, so the corner words hold in both themes without a
+theme-specific override. Field midpoints (light fills): top `#E08435`
+(h57, C0.145), bottom `#00B9BE` (h198, C0.121), left `#C87ED3` (h322,
+C0.144), right `#A1A723` (h112, C0.145). No edge dips below chroma 0.12.
 
-Why orchid in the low-unpleasant corner: it is the reference's strongest
-cool color, and it keeps the teal action off the bottom edge. With cobalt
-there, the bottom edge (blue to green) blends through teal and the button
-disappears into the field; with orchid there, the edge blends through the
-water blue instead, and the left edge (coral to orchid) blends through the
-lily pink. The action separates from the field by lightness (L0.50 vs
-corners around L0.70), the same mechanism as D.
-
-On the field: a pond. Orchid and lily green below, coral and gold above,
-the water blue and the lily pink appearing at the seams, all on pine. On a
-saved DEAR MAN plan card: sea-glass page, near-white paper, pine type, one
-teal bar. Downside: teal is the color of every calm-app brand (Calm,
-Woebot, and the current Goblin accent), so the corners and the pine ink
-have to carry the identity; and a purple corner is a departure from the
-How We Feel convention users may already know.
+On the field: the cool painting. Lake blue and lily green below, coral
+and gold above, the water at the bottom seam and the orchid at the left
+one, all on pine; the corners glow at the same brightness, so the eye
+reads a place, not four signals. On a saved DEAR MAN plan card: near-white
+paper on lake-water page, pine type, a mauve hairline, a gold rim at the
+keepsake's edge, and one deep-water bar. Downside: this is the palette
+most dependent on discipline. The gold rim becomes gaudy the moment it is
+used twice on a screen, the mauve hairline reads as a mistake if any grey
+border survives elsewhere, and the deep-water action is still a dark
+teal-green, which is the neighbourhood Calm, Woebot and today's Goblin
+already live in; the pine ink and the four-corner family have to carry
+the identity.
 
 ## 5. How to choose, and a recommendation
 
 Slate & Spruce and the violet action are out, so the choice is among B,
-C2 and D. The one question that separates them is what the field should
-do at 8 out of 10: B keeps the corners at a murmur (raspberry, marigold,
-juniper, fern), and C2 and D put them at How We Feel strength with a
-vermilion top-left. The evidence, weak as it is, and the co-design studies
-lean toward B's murmur; the case for the stronger corners is that a
-person with alexithymia needs the four regions to be unmistakably four
-regions, and at arm's length B's corners can blur. Then: does the app want
-any warmth in its neutrals (B, D) or none (C2)?
+C2, D and E. Two questions separate them. First, what the field should do
+at 8 out of 10: B keeps the corners at a murmur; C2 and D put them at How
+We Feel strength with a vermilion top-left; E puts them at one shared
+brightness, vivid but even, so the field reads as a place rather than as
+four signals. The evidence, weak as it is, and the co-design studies lean
+toward B's murmur; the case for stronger corners is that a person with
+alexithymia needs four unmistakable regions. Second, where warmth lives:
+in the neutrals (B, D), nowhere (C2), or in the flecks against a cool
+ground (E).
 
-**Recommendation: D, Moss & Vermilion, with the deepened moss action and
-C2's ink button as the pre-approved fallback.** It keeps what the name
-asks for (green-grey paper, a warm dark, a green that is not teal), gives
-the field the four unmistakable regions and the vermilion HU Claudia
-wanted from Signal, and its crisis crimson is 25 degrees and a lightness
-step away from that vermilion. C2 is the right choice if the team decides
-warmth is not this brand's job; it is the most legible of the three and
-the cleanest system, at the cost of any "go" signal in the button. B stays
-the choice if a prototype at high arousal shows the saturated corners are
-too loud, which is the one test that should be run before any of this
-lands in `index.css`: the result screen at 8 out of 10, light and dark,
-with the real headline copy.
+**Recommendation: E, Giverny, with C2's ink button as the pre-approved
+fallback if the deep-water action reads as teal in a prototype.** It is
+the only palette derived from a picture Claudia chose rather than from a
+brief, and the derivation holds up under the checks that sank the first
+draft: one lightness and chroma for the corners, neutrals tinted from the
+palette's own hues, a danger colour placed by degrees, a dark theme
+derived from the light one, and orchid appearing at the seam because the
+geometry puts it there. Its corners are as vivid as D's but even, which
+answers both the alexithymia argument and the restraint argument at once.
+D remains the choice if the team wants a warm page and the vermilion
+top-left specifically; C2 if it wants the cleanest, coldest system; B if
+the high-arousal test says even E's corners are too much. That test is
+unchanged and should run before anything lands in `index.css`: the result
+screen at 8 out of 10, light and dark, with the real headline copy, and
+for E specifically, the keepsake with its gold rim beside a primary
+button, to see whether the rim survives contact with a real screen.
 
 ## Sources
 
