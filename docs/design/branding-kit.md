@@ -340,6 +340,45 @@ Downside: it is the palette with the most moving parts (warm neutrals,
 saturated hues, a cool crimson) and the one most likely to look assembled
 if any single token is off.
 
+### E. Giverny (from Claudia's references)
+
+*Translated 2026-09-14 from two Monet water-lily nail-art references
+Claudia supplied: cream nails as paper, the gold foil deepened to bronze
+for the one action, coral and peach-gold across the top of the field, lake
+blue and lily-pad mint across the bottom, deep pine as the dark ground.
+Sampled hexes are in the session notes; the tokens below are the cleaned
+set.*
+
+| Token | Light | Dark |
+|---|---|---|
+| Page | `#EFEBE3` | `#141F22` |
+| Paper | `#FBF8F2` | `#1C2A2E` |
+| Ink | `#1B2A2A` | `#EAE4D8` |
+| Secondary text | `#5E6A66` | `#9DA9A4` |
+| Action (bronze) | `#7A4E2A` | `#8F5E36` |
+| Danger (crimson) | `#A8203F` | `#E0607A` |
+| Field ground | `#141F22` | `#141F22` |
+| HU coral | `#D08A74` (text `#8F4530`) | `#E0A08C` |
+| HP gold | `#C9A24E` (text `#6E5313`) | `#D9B76A` |
+| LU lake blue | `#5F78AE` (text `#34508A`) | `#8A9FD0` |
+| LP lily-pad mint | `#6FAE98` (text `#2E6F5A`) | `#8CC5B0` |
+
+Contrast: ink on page 12.5 (dark 13.3); white on action 7.1 (dark 5.5);
+white on danger 7.1 light; quadrant text on paper 5.6 to 7.4 light, 5.6 to
+7.7 dark. Bronze (h28) sits between coral (h15) and gold (h40) in hue but
+two lightness steps below both, so it separates by darkness the way C2's
+ink does; it does not collide with the bottom edge, which blends through
+teal. The reference's orchid and plum are left out; if a purple is wanted
+anywhere it belongs to the LU corner, not the action.
+
+On the field: coral and gold across the top, lake and mint below, the left
+edge passing through the reference's dusty mauve. On a saved DEAR MAN plan
+card: cream paper, pine ink, one bronze bar, the closest of the set to a
+physical notebook. Downside: cream paper is the ground the design plan
+warned reads as the current AI default, and a bronze "go" has to be
+learned. It is the most decorative option and could read as a stationery
+brand before it reads as a tool.
+
 ## 5. How to choose, and a recommendation
 
 Slate & Spruce and the violet action are out, so the choice is among B,
