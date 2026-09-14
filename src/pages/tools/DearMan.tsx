@@ -308,6 +308,28 @@ export function DearMan() {
     setter(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
   };
 
+  // Barrier chips and the "What makes this hard?" text box stay in sync:
+  // tapping a chip adds its text as a line (or removes it), and typing a
+  // template's exact words lights up its chip.
+  const barrierLabel = (id: string) => content.barriers.find(b => b.id === id)?.label ?? '';
+  const toggleBarrier = (id: string) => {
+    const label = barrierLabel(id);
+    if (barriers.includes(id)) {
+      setBarriers(barriers.filter(x => x !== id));
+      setBarriersCustom(
+        barriersCustom.split('\n').filter(line => line.trim() !== label).join('\n').trim()
+      );
+    } else {
+      setBarriers([...barriers, id]);
+      const base = barriersCustom.trimEnd();
+      setBarriersCustom(base ? `${base}\n${label}` : label);
+    }
+  };
+  const handleBarriersText = (text: string) => {
+    setBarriersCustom(text);
+    setBarriers(content.barriers.filter(b => b.label && text.includes(b.label)).map(b => b.id));
+  };
+
   const getRelLabel = () =>
     relationshipTypes.find(r => r.id === relationshipType)?.label?.toLowerCase() ?? 'them';
 
@@ -615,7 +637,7 @@ export function DearMan() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What makes this hard?</h3>
             <textarea rows={3} value={barriersCustom}
-              onChange={e => setBarriersCustom(e.target.value)}
+              onChange={e => handleBarriersText(e.target.value)}
               placeholder="Type your answer…"
               className={textareaClass} />
             <p className="text-sm text-[var(--color-text-secondary)]">Or, start with a template / select options:</p>
@@ -624,7 +646,7 @@ export function DearMan() {
                 const selected = barriers.includes(b.id);
                 return (
                   <button key={b.id}
-                    onClick={() => toggleChip(b.id, barriers, setBarriers)}
+                    onClick={() => toggleBarrier(b.id)}
                     aria-pressed={selected}
                     className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
                       selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
@@ -1876,11 +1898,11 @@ export function DearMan() {
               const mappedBarriers = turningPointIds
                 .map(id => tpToBarrierMap[id])
                 .filter(Boolean);
-              if (mappedBarriers.length) setBarriers(mappedBarriers);
               // Reset prep-specific fields
               setSceneStep(0);
               setSituationType(null);
-              setBarriersCustom('');
+              setBarriers(mappedBarriers);
+              setBarriersCustom(mappedBarriers.map(barrierLabel).filter(Boolean).join('\n'));
               setDescribeId(null); setDescribeCustom('');
               setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false); setShowMirror(false);
               setAssertIds([]); setAssertDetails({}); setAssertCustom(''); setShowAssertCustom(false);

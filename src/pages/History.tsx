@@ -421,10 +421,9 @@ function DearManSessionCard({
               {(session.barriers.length > 0 || session.barriersCustom) && (
                 <Detail
                   label="What made it hard"
-                  value={[
-                    ...session.barriers.map(b => humanize(b.replace(/^barrier_/, ''))),
-                    ...(session.barriersCustom ? [session.barriersCustom] : []),
-                  ].join(', ')}
+                  value={session.barriersCustom
+                    ? session.barriersCustom.split('\n').filter(Boolean).join('; ')
+                    : session.barriers.map(b => humanize(b.replace(/^barrier_/, ''))).join('; ')}
                 />
               )}
             </>
