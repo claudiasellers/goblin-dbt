@@ -220,7 +220,7 @@ function ActivityVisualElement({
       );
     case 'color_shift':
       return (
-        <div className="w-12 h-12 rounded-full bg-blue-400 opacity-30 animate-pulse" />
+        <div className="w-12 h-12 rounded-full bg-[var(--color-info)] opacity-30 animate-pulse" />
       );
     case 'count_down':
       return (

@@ -14,6 +14,7 @@ import {
   DEFAULT_PROFILE,
   type UserProfile,
 } from '../services/neo4j';
+import { DEFAULT_PALETTE } from '../data/palettes';
 
 const PROFILE_CACHE_KEY = 'goblin-dbt-profile-cache';
 
@@ -72,6 +73,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
     if (cached) {
       setProfile(cached);
       document.documentElement.dataset.theme = cached.theme;
+      document.documentElement.dataset.palette = cached.palette ?? DEFAULT_PALETTE;
     }
 
     setLoading(true);
@@ -131,6 +133,13 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   useEffect(() => {
     document.documentElement.dataset.theme = profile.theme;
   }, [profile.theme]);
+
+  // ============================================
+  // Palette switching effect (see docs/design/2026-09-14-palette-picker.md)
+  // ============================================
+  useEffect(() => {
+    document.documentElement.dataset.palette = profile.palette ?? DEFAULT_PALETTE;
+  }, [profile.palette]);
 
   // ============================================
   // Check-in reminder effect (browser notifications)

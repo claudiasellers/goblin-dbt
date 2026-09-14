@@ -1,4 +1,5 @@
 import { httpsCallable } from 'firebase/functions';
+import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
 
 // Types (same as before, for consistency across the app)
@@ -515,6 +516,7 @@ export interface UserProfile {
   email: string;
   photoURL: string | null;
   theme: 'dark' | 'light' | 'system';
+  palette: PaletteId;
   checkInReminder: boolean;
   reminderTime: string;
   reminderDays: number[];
@@ -531,6 +533,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   email: '',
   photoURL: null,
   theme: 'light',
+  palette: DEFAULT_PALETTE,
   checkInReminder: false,
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { modules } from '../data/modules';
+import { palettes, DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { exportUserData, deleteUserData } from '../services/neo4j';
 
 export function Profile() {
@@ -53,7 +54,9 @@ export function Profile() {
 
       <AppearanceSection
         theme={profile.theme}
+        palette={profile.palette ?? DEFAULT_PALETTE}
         onChange={(theme) => updateProfile({ theme })}
+        onPaletteChange={(palette) => updateProfile({ palette })}
       />
 
       <NotificationsSection
@@ -189,10 +192,14 @@ function BasicInfoSection({
 // --- Appearance ---
 function AppearanceSection({
   theme,
+  palette,
   onChange,
+  onPaletteChange,
 }: {
   theme: 'dark' | 'light' | 'system';
+  palette: PaletteId;
   onChange: (theme: 'dark' | 'light' | 'system') => Promise<void>;
+  onPaletteChange: (palette: PaletteId) => Promise<void>;
 }) {
   const options: { value: 'dark' | 'light' | 'system'; label: string }[] = [
     { value: 'dark', label: 'Dark' },
@@ -220,6 +227,49 @@ function AppearanceSection({
               {opt.label}
             </button>
           ))}
+        </div>
+      </div>
+
+      <div>
+        <label id="palette-label" className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">
+          Color palette
+        </label>
+        <div role="radiogroup" aria-labelledby="palette-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {palettes.map((p) => {
+            const selected = palette === p.id;
+            return (
+              <button
+                key={p.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => onPaletteChange(p.id)}
+                className={`flex items-center gap-3 text-left p-3 rounded-lg border transition-colors ${
+                  selected
+                    ? 'border-[var(--color-text-primary)] bg-[var(--color-bg-elevated)]'
+                    : 'border-[var(--color-border)] hover:border-[var(--color-border-accent)]'
+                }`}
+                style={selected ? { borderWidth: '1.5px' } : undefined}
+              >
+                {/* Five-dot swatch: page, ink, action, high-unpleasant, low-pleasant (light values) */}
+                <span className="flex gap-1 shrink-0" aria-hidden="true">
+                  {p.swatch.map((hex, i) => (
+                    <span
+                      key={i}
+                      className="w-4 h-4 rounded-full border border-black/10"
+                      style={{ backgroundColor: hex }}
+                    />
+                  ))}
+                </span>
+                <span className="min-w-0">
+                  <span className={`block text-sm ${selected ? 'font-semibold' : 'font-medium'} text-[var(--color-text-primary)]`}>
+                    {p.name}
+                  </span>
+                  <span className="block text-xs text-[var(--color-text-tertiary)] truncate">{p.tagline}</span>
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </SectionCard>

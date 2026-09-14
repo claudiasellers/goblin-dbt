@@ -273,6 +273,7 @@ const PROFILE_DEFAULTS = {
     displayName: null,
     photoURL: null,
     theme: 'light',
+    palette: 'cool-steel',
     checkInReminder: false,
     reminderTime: '09:00',
     reminderDays: [1, 2, 3, 4, 5],
@@ -349,7 +350,7 @@ exports.updateUserProfile = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
     }
     // Whitelist allowed fields
     const allowedFields = [
-        'displayName', 'photoURL', 'theme',
+        'displayName', 'photoURL', 'theme', 'palette',
         'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
         'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories',
         'dataRetentionDays', 'shareAnonymousData',
@@ -359,6 +360,11 @@ exports.updateUserProfile = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
         if (key in updates) {
             cleanUpdates[key] = updates[key];
         }
+    }
+    // Palette is a closed set; the ids match the data-palette blocks in src/index.css
+    const allowedPalettes = ['cool-steel', 'slate-spruce', 'signal', 'giverny', 'clouds'];
+    if ('palette' in cleanUpdates && !allowedPalettes.includes(String(cleanUpdates.palette))) {
+        throw new https_1.HttpsError('invalid-argument', 'Unknown palette');
     }
     if (Object.keys(cleanUpdates).length === 0) {
         return { success: true };
@@ -1651,28 +1657,31 @@ exports.getOppositeActionContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo
  * No auth required — this is public therapeutic content (same as OA).
  */
 exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async () => {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s;
     const session = getDriver().session();
     try {
         // 1. Situation types
         const sitResult = await session.run(`
         MATCH (s:DearManSituationType)
         RETURN s.id AS id, s.label AS label, s.sublabel AS sublabel,
-               s.emoji AS emoji, s.sortOrder AS sortOrder
+               s.emoji AS emoji, s.sortOrder AS sortOrder,
+               s.mirrorText AS mirrorText, s.typicalFeelingIds AS typicalFeelingIds
         ORDER BY s.sortOrder
       `);
-        // 2. Describe options with situation type
+        // 2. Describe options with situation type (+ mirroring text)
         const descResult = await session.run(`
         MATCH (d:DearManDescribeOption)-[:FOR_SITUATION]->(s:DearManSituationType)
         RETURN d.id AS id, d.label AS label, d.sortOrder AS sortOrder,
-               s.id AS situationId
+               s.id AS situationId,
+               d.mirrorText AS mirrorText, d.typicalFeelingIds AS typicalFeelingIds
         ORDER BY d.sortOrder
       `);
-        // 3. Assert options with situation type
+        // 3. Assert options with situation type (+ elaboration prompt)
         const assertResult = await session.run(`
         MATCH (a:DearManAssertOption)-[:FOR_SITUATION]->(s:DearManSituationType)
         RETURN a.id AS id, a.label AS label, a.hasPlaceholder AS hasPlaceholder,
-               a.sortOrder AS sortOrder, s.id AS situationId
+               a.sortOrder AS sortOrder, s.id AS situationId,
+               a.elaboratePrompt AS elaboratePrompt
         ORDER BY a.sortOrder
       `);
         // 4. Reinforce options
@@ -1693,11 +1702,18 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
         MATCH (c:DearManBarrierCoaching {isDefault: true})
         RETURN c.title AS title, c.body AS body
       `);
-        // 7. Anchor phrases
+        // 7. Anchor phrases (tagged by need + barrier for the generator)
         const anchorResult = await session.run(`
         MATCH (a:DearManAnchorPhrase)
-        RETURN a.id AS id, a.label AS label
+        RETURN a.id AS id, a.label AS label,
+               a.needIds AS needIds, a.barrierIds AS barrierIds
         ORDER BY a.sortOrder
+      `);
+        // 7b. Anchor needs ("what do you need to hear when it gets hard?")
+        const needResult = await session.run(`
+        MATCH (n:DearManAnchorNeed)
+        RETURN n.id AS id, n.label AS label, n.barrierIds AS barrierIds
+        ORDER BY n.sortOrder
       `);
         // 8. Negotiate options
         const negResult = await session.run(`
@@ -1705,11 +1721,18 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
         RETURN n.id AS id, n.label AS label, n.type AS type
         ORDER BY n.sortOrder
       `);
-        // 9. Feeling chips
+        // 9. Feeling chips (+ color-coded group)
         const feelResult = await session.run(`
         MATCH (f:DearManFeelingChip)
-        RETURN f.id AS id, f.label AS label
+        OPTIONAL MATCH (f)-[:IN_GROUP]->(g:DearManFeelingGroup)
+        RETURN f.id AS id, f.label AS label, g.id AS groupId
         ORDER BY f.sortOrder
+      `);
+        // 9b. Feeling groups
+        const groupResult = await session.run(`
+        MATCH (g:DearManFeelingGroup)
+        RETURN g.id AS id, g.label AS label, g.colorKey AS colorKey
+        ORDER BY g.sortOrder
       `);
         // 10. Step insights
         const insightResult = await session.run(`
@@ -1731,17 +1754,21 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
                tc.assertBarrierGuilty AS assertBarrierGuilty,
                tc.negotiateHintObjective AS hintObjective,
                tc.negotiateHintRelationship AS hintRelationship,
-               tc.negotiateHintSelfRespect AS hintSelfRespect
+               tc.negotiateHintSelfRespect AS hintSelfRespect,
+               tc.anchorGeneratorIntro AS anchorGeneratorIntro,
+               tc.anchorGeneratorMakeItYours AS anchorGeneratorMakeItYours
       `);
         // --- Shape the response ---
         const situationTypes = sitResult.records.map((r) => {
-            var _a;
+            var _a, _b, _c;
             return ({
                 id: r.get('id'),
                 label: r.get('label'),
                 sublabel: r.get('sublabel'),
                 emoji: r.get('emoji'),
                 sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+                mirrorText: (_b = r.get('mirrorText')) !== null && _b !== void 0 ? _b : '',
+                typicalFeelingIds: (_c = r.get('typicalFeelingIds')) !== null && _c !== void 0 ? _c : [],
             });
         });
         const describeOptions = {};
@@ -1753,6 +1780,8 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
                 id: r.get('id'),
                 label: r.get('label'),
                 sortOrder: (_a = toNumber(r.get('sortOrder'))) !== null && _a !== void 0 ? _a : 0,
+                mirrorText: (_b = r.get('mirrorText')) !== null && _b !== void 0 ? _b : '',
+                typicalFeelingIds: (_c = r.get('typicalFeelingIds')) !== null && _c !== void 0 ? _c : [],
             });
         }
         const assertOptions = {};
@@ -1763,8 +1792,9 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
             assertOptions[sitId].push({
                 id: r.get('id'),
                 label: r.get('label'),
-                hasPlaceholder: (_b = r.get('hasPlaceholder')) !== null && _b !== void 0 ? _b : false,
-                sortOrder: (_c = toNumber(r.get('sortOrder'))) !== null && _c !== void 0 ? _c : 0,
+                hasPlaceholder: (_d = r.get('hasPlaceholder')) !== null && _d !== void 0 ? _d : false,
+                sortOrder: (_e = toNumber(r.get('sortOrder'))) !== null && _e !== void 0 ? _e : 0,
+                elaboratePrompt: (_f = r.get('elaboratePrompt')) !== null && _f !== void 0 ? _f : '',
             });
         }
         const reinforceOptions = reinfResult.records.map((r) => {
@@ -1793,13 +1823,26 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
         }
         const defaultCoachRec = defaultCoachResult.records[0];
         const defaultCoaching = {
-            title: (_d = defaultCoachRec === null || defaultCoachRec === void 0 ? void 0 : defaultCoachRec.get('title')) !== null && _d !== void 0 ? _d : 'Staying present',
-            body: (_e = defaultCoachRec === null || defaultCoachRec === void 0 ? void 0 : defaultCoachRec.get('body')) !== null && _e !== void 0 ? _e : '',
+            title: (_g = defaultCoachRec === null || defaultCoachRec === void 0 ? void 0 : defaultCoachRec.get('title')) !== null && _g !== void 0 ? _g : 'Staying present',
+            body: (_h = defaultCoachRec === null || defaultCoachRec === void 0 ? void 0 : defaultCoachRec.get('body')) !== null && _h !== void 0 ? _h : '',
         };
-        const anchorPhrases = anchorResult.records.map((r) => ({
-            id: r.get('id'),
-            label: r.get('label'),
-        }));
+        const anchorPhrases = anchorResult.records.map((r) => {
+            var _a, _b;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                needIds: (_a = r.get('needIds')) !== null && _a !== void 0 ? _a : [],
+                barrierIds: (_b = r.get('barrierIds')) !== null && _b !== void 0 ? _b : [],
+            });
+        });
+        const anchorNeeds = needResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                barrierIds: (_a = r.get('barrierIds')) !== null && _a !== void 0 ? _a : [],
+            });
+        });
         const middleGround = [];
         const walkAway = [];
         for (const r of negResult.records) {
@@ -1809,10 +1852,22 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
             else
                 walkAway.push(item);
         }
-        const feelingChips = feelResult.records.map((r) => ({
-            id: r.get('id'),
-            label: r.get('label'),
-        }));
+        const feelingChips = feelResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                groupId: (_a = r.get('groupId')) !== null && _a !== void 0 ? _a : null,
+            });
+        });
+        const feelingGroups = groupResult.records.map((r) => {
+            var _a;
+            return ({
+                id: r.get('id'),
+                label: r.get('label'),
+                colorKey: (_a = r.get('colorKey')) !== null && _a !== void 0 ? _a : 'neutral',
+            });
+        });
         const stepInsights = {};
         for (const r of insightResult.records) {
             stepInsights[r.get('step')] = r.get('text');
@@ -1836,19 +1891,23 @@ exports.getDearManContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser,
             barrierCoaching,
             defaultCoaching,
             anchorPhrases,
+            anchorNeeds,
+            anchorGeneratorIntro: (_j = tc === null || tc === void 0 ? void 0 : tc.get('anchorGeneratorIntro')) !== null && _j !== void 0 ? _j : '',
+            anchorGeneratorMakeItYours: (_k = tc === null || tc === void 0 ? void 0 : tc.get('anchorGeneratorMakeItYours')) !== null && _k !== void 0 ? _k : '',
             negotiateOptions: { middleGround, walkAway },
             negotiateHints: {
-                objective: (_f = tc === null || tc === void 0 ? void 0 : tc.get('hintObjective')) !== null && _f !== void 0 ? _f : '',
-                relationship: (_g = tc === null || tc === void 0 ? void 0 : tc.get('hintRelationship')) !== null && _g !== void 0 ? _g : '',
-                'self-respect': (_h = tc === null || tc === void 0 ? void 0 : tc.get('hintSelfRespect')) !== null && _h !== void 0 ? _h : '',
+                objective: (_l = tc === null || tc === void 0 ? void 0 : tc.get('hintObjective')) !== null && _l !== void 0 ? _l : '',
+                relationship: (_m = tc === null || tc === void 0 ? void 0 : tc.get('hintRelationship')) !== null && _m !== void 0 ? _m : '',
+                'self-respect': (_o = tc === null || tc === void 0 ? void 0 : tc.get('hintSelfRespect')) !== null && _o !== void 0 ? _o : '',
             },
             feelingChips,
+            feelingGroups,
             stepInsights,
             debriefOptions: { wentWell, toChange },
-            revealText: (_j = tc === null || tc === void 0 ? void 0 : tc.get('revealText')) !== null && _j !== void 0 ? _j : '',
-            confidentCoaching: (_k = tc === null || tc === void 0 ? void 0 : tc.get('confidentCoaching')) !== null && _k !== void 0 ? _k : '',
-            confidentBarrierNoRight: (_l = tc === null || tc === void 0 ? void 0 : tc.get('confidentBarrierNoRight')) !== null && _l !== void 0 ? _l : '',
-            assertBarrierGuilty: (_m = tc === null || tc === void 0 ? void 0 : tc.get('assertBarrierGuilty')) !== null && _m !== void 0 ? _m : '',
+            revealText: (_p = tc === null || tc === void 0 ? void 0 : tc.get('revealText')) !== null && _p !== void 0 ? _p : '',
+            confidentCoaching: (_q = tc === null || tc === void 0 ? void 0 : tc.get('confidentCoaching')) !== null && _q !== void 0 ? _q : '',
+            confidentBarrierNoRight: (_r = tc === null || tc === void 0 ? void 0 : tc.get('confidentBarrierNoRight')) !== null && _r !== void 0 ? _r : '',
+            assertBarrierGuilty: (_s = tc === null || tc === void 0 ? void 0 : tc.get('assertBarrierGuilty')) !== null && _s !== void 0 ? _s : '',
         };
     }
     catch (error) {
@@ -1876,10 +1935,13 @@ exports.saveDearManSession = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
           situationType: $situationType,
           priorities: $priorities,
           barriers: $barriers,
+          barriersCustom: $barriersCustom,
           describeId: $describeId,
           describeCustom: $describeCustom,
           feelings: $feelings,
           assertId: $assertId,
+          assertIds: $assertIds,
+          assertDetailsJson: $assertDetailsJson,
           assertCustom: $assertCustom,
           reinforceIds: $reinforceIds,
           anchorPhrase: $anchorPhrase,
@@ -1909,10 +1971,14 @@ exports.saveDearManSession = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
             situationType: data.situationType || '',
             priorities: data.priorities || [],
             barriers: data.barriers || [],
+            barriersCustom: data.barriersCustom || '',
             describeId: data.describeId || null,
             describeCustom: data.describeCustom || '',
             feelings: data.feelings || [],
             assertId: data.assertId || null,
+            assertIds: data.assertIds || [],
+            // Neo4j properties can't hold maps — store per-option detail as JSON
+            assertDetailsJson: JSON.stringify(data.assertDetails || {}),
             assertCustom: data.assertCustom || '',
             reinforceIds: data.reinforceIds || [],
             anchorPhrase: data.anchorPhrase || '',
@@ -2169,6 +2235,17 @@ exports.getQuickTools = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo
  * Get saved DEAR MAN sessions for the authenticated user.
  * Returns sessions sorted by createdAt descending.
  */
+function parseJsonObject(raw) {
+    if (typeof raw !== 'string' || !raw)
+        return {};
+    try {
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+    }
+    catch (_a) {
+        return {};
+    }
+}
 exports.getDearManSessions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
     var _a, _b;
     if (!request.auth) {
@@ -2186,10 +2263,13 @@ exports.getDearManSessions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
                s.situationType AS situationType,
                s.priorities AS priorities,
                s.barriers AS barriers,
+               s.barriersCustom AS barriersCustom,
                s.describeId AS describeId,
                s.describeCustom AS describeCustom,
                s.feelings AS feelings,
                s.assertId AS assertId,
+               s.assertIds AS assertIds,
+               s.assertDetailsJson AS assertDetailsJson,
                s.assertCustom AS assertCustom,
                s.reinforceIds AS reinforceIds,
                s.anchorPhrase AS anchorPhrase,
@@ -2214,10 +2294,13 @@ exports.getDearManSessions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
                 situationType: r.get('situationType') || '',
                 priorities: r.get('priorities') || [],
                 barriers: r.get('barriers') || [],
+                barriersCustom: r.get('barriersCustom') || '',
                 describeId: r.get('describeId'),
                 describeCustom: r.get('describeCustom') || '',
                 feelings: r.get('feelings') || [],
                 assertId: r.get('assertId'),
+                assertIds: r.get('assertIds') || [],
+                assertDetails: parseJsonObject(r.get('assertDetailsJson')),
                 assertCustom: r.get('assertCustom') || '',
                 reinforceIds: r.get('reinforceIds') || [],
                 anchorPhrase: r.get('anchorPhrase') || '',

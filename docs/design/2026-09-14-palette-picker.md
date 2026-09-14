@@ -1,6 +1,6 @@
 # Palette picker
 
-**Status:** Plan, awaiting approval. No `src/` changes yet.
+**Status:** Implemented 2026-09-14 (all three sequencing steps in one change). Decisions taken: Signal ships with the ink button (kit C2); Clouds keeps Claudia's rust hexes and the dark-theme crisis button uses ink text via the new `--color-on-danger` token. Cloud Functions must be deployed for the setting to persist server-side.
 **Decided 2026-09-14 by Claudia:** instead of choosing one palette, the app
 offers a few and the user picks. The choice maps onto the entire site,
 both themes.

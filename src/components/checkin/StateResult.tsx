@@ -139,7 +139,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
           </p>
           <a
             href="tel:988"
-            className="inline-block w-full py-3 px-4 rounded-lg bg-[var(--color-danger)] hover:opacity-90 text-white font-medium transition-colors mb-3"
+            className="inline-block w-full py-3 px-4 rounded-lg bg-[var(--color-danger)] hover:opacity-90 text-[var(--color-on-danger)] font-medium transition-colors mb-3"
           >
             Call 988 (Suicide & Crisis Lifeline)
           </a>

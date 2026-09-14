@@ -294,6 +294,7 @@ const PROFILE_DEFAULTS = {
   displayName: null,
   photoURL: null,
   theme: 'light',
+  palette: 'cool-steel',
   checkInReminder: false,
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],
@@ -398,7 +399,7 @@ export const updateUserProfile = onCall(
 
     // Whitelist allowed fields
     const allowedFields = [
-      'displayName', 'photoURL', 'theme',
+      'displayName', 'photoURL', 'theme', 'palette',
       'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
       'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories',
       'dataRetentionDays', 'shareAnonymousData',
@@ -409,6 +410,12 @@ export const updateUserProfile = onCall(
       if (key in updates) {
         cleanUpdates[key] = updates[key];
       }
+    }
+
+    // Palette is a closed set; the ids match the data-palette blocks in src/index.css
+    const allowedPalettes = ['cool-steel', 'slate-spruce', 'signal', 'giverny', 'clouds'];
+    if ('palette' in cleanUpdates && !allowedPalettes.includes(String(cleanUpdates.palette))) {
+      throw new HttpsError('invalid-argument', 'Unknown palette');
     }
 
     if (Object.keys(cleanUpdates).length === 0) {

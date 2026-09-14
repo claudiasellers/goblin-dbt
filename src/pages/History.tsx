@@ -354,8 +354,8 @@ function DearManSessionCard({
           <span className={`
             px-2.5 py-0.5 rounded-full text-xs font-medium
             ${isPrep
-              ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-              : 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+              ? 'bg-[var(--color-info-bg)] text-[var(--color-text-primary)]'
+              : 'bg-[var(--color-tag-purple-bg)] text-[var(--color-text-primary)]'
             }
           `}>
             {isPrep ? 'Prep' : 'Debrief'}

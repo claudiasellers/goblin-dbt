@@ -13,488 +13,491 @@
 );
 
 /* ============================================
-   "Quiet Intelligence" — Cool Steel Design System
+   Goblin color system: three layers
 
-   Light mode is DEFAULT. Cool blue-gray undertone throughout.
-   Color is earned — appears only when it carries meaning.
-   Almost monochromatic at rest. Typography and whitespace
-   create hierarchy, not color blocks and borders.
+   1. PALETTE layer. One block per palette (data-palette on <html>),
+      defining paired raw values --pal-*-light / --pal-*-dark. Nothing
+      in the app reads --pal-* directly. Adding a palette = one block.
+   2. THEME layer. Resolves every --color-* token to the light or dark
+      member of its pair, driven by data-theme (light | dark | system).
+      Written once; works for every palette.
+   3. DERIVED layer. Tints, borders, shadows and glass computed with
+      color-mix() from the resolved tokens. Written once.
 
-   Accent: refined teal #1A9A7A (10%)
-   Quadrants: desaturated ~40-50% saturation
+   Components only ever use --color-*. See
+   docs/design/2026-09-14-palette-picker.md.
    ============================================ */
 
+/* ── Palette: Cool Steel (default) ── */
+:root:not([data-palette]),
+:root[data-palette="cool-steel"] {
+  --pal-page-light: #F6F7FA;  --pal-page-dark: #0C0D12;
+  --pal-page2-light: #EDEEF3;  --pal-page2-dark: #111218;
+  --pal-card-light: #FFFFFF;  --pal-card-dark: #16171F;
+  --pal-card-hover-light: #F8F9FC;  --pal-card-hover-dark: #1C1D27;
+  --pal-elevated-light: #F0F1F6;  --pal-elevated-dark: #1E1F2A;
+  --pal-input-light: #FFFFFF;  --pal-input-dark: #1A1B24;
+  --pal-border-light: #E2E4EB;  --pal-border-dark: #2A2B36;
+  --pal-border-subtle-light: #ECEDF2;  --pal-border-subtle-dark: #1F2029;
+  --pal-border-accent-light: #D4D6DF;  --pal-border-accent-dark: #3A3B48;
+  --pal-ink-light: #1A1D27;  --pal-ink-dark: #E8EAF0;
+  --pal-text2-light: #5A5F72;  --pal-text2-dark: #9498A8;
+  --pal-text3-light: #6B7085;  --pal-text3-dark: #8E92A4;
+  --pal-text-muted-light: #8A8FA2;  --pal-text-muted-dark: #6B6F82;
+  --pal-accent-light: #127A5E;  --pal-accent-dark: #2BB494;
+  --pal-accent-hover-light: #0F6B52;  --pal-accent-hover-dark: #38CAAA;
+  --pal-accent-fill-light: #127A5E;  --pal-accent-fill-dark: #148567;
+  --pal-accent-fill-hover-light: #0F6B52;  --pal-accent-fill-hover-dark: #127A5E;
+  --pal-on-accent-light: #FFFFFF;  --pal-on-accent-dark: #FFFFFF;
+  --pal-accent-glow-light: #1A9A7A;  --pal-accent-glow-dark: #2BB494;
+  --pal-success-light: #1A9A7A;  --pal-success-dark: #2BB494;
+  --pal-warning-light: #C4933A;  --pal-warning-dark: #D4A34A;
+  --pal-danger-light: #C45454;  --pal-danger-dark: #D46464;
+  --pal-on-danger-light: #FFFFFF;  --pal-on-danger-dark: #FFFFFF;
+  --pal-info-light: #5B82C4;  --pal-info-dark: #6B92D4;
+  --pal-tag-purple-light: #8B7BC4;  --pal-tag-purple-dark: #9B8BD4;
+  --pal-tag-blue-light: #5B82C4;  --pal-tag-blue-dark: #6B92D4;
+  --pal-tag-orange-light: #C4873A;  --pal-tag-orange-dark: #D4974A;
+  --pal-tag-pink-light: #C47088;  --pal-tag-pink-dark: #D48098;
+  --pal-tag-teal-light: #4A9B8F;  --pal-tag-teal-dark: #5AABA0;
+  --pal-sidebar-light: #F0F1F6;  --pal-sidebar-dark: #0A0B10;
+  --pal-sidebar-border-light: #E2E4EB;  --pal-sidebar-border-dark: #1A1B24;
+  --pal-q-hu-light: #C4707A;  --pal-q-hu-dark: #D4808A;
+  --pal-q-hu-text-light: #9E4A54;  --pal-q-hu-text-dark: #D4808A;
+  --pal-q-hp-light: #C9A55A;  --pal-q-hp-dark: #D9B56A;
+  --pal-q-hp-text-light: #8A7030;  --pal-q-hp-text-dark: #D9B56A;
+  --pal-q-lu-light: #7B8EC4;  --pal-q-lu-dark: #8B9ED4;
+  --pal-q-lu-text-light: #4A5A8A;  --pal-q-lu-text-dark: #8B9ED4;
+  --pal-q-lp-light: #6BA89A;  --pal-q-lp-dark: #7BB8AA;
+  --pal-q-lp-text-light: #3A7A6A;  --pal-q-lp-text-dark: #7BB8AA;
+  --pal-field-light: #161A26;  --pal-field-dark: #161A26;
+  --pal-field-fg-light: #F2F3F7;  --pal-field-fg-dark: #F2F3F7;
+}
+
+/* ── Palette: Slate & Spruce ── */
+:root[data-palette="slate-spruce"] {
+  --pal-page-light: #F5F7F9;  --pal-page-dark: #0D1017;
+  --pal-page2-light: #ECEFF3;  --pal-page2-dark: #12161E;
+  --pal-card-light: #FFFFFF;  --pal-card-dark: #161B24;
+  --pal-card-hover-light: #F8FAFC;  --pal-card-hover-dark: #1B2029;
+  --pal-elevated-light: #EEF1F5;  --pal-elevated-dark: #1C212B;
+  --pal-input-light: #FFFFFF;  --pal-input-dark: #191E28;
+  --pal-border-light: #E0E4EA;  --pal-border-dark: #2A3040;
+  --pal-border-subtle-light: #EBEEF3;  --pal-border-subtle-dark: #1F2530;
+  --pal-border-accent-light: #D2D7E0;  --pal-border-accent-dark: #3A4152;
+  --pal-ink-light: #161B22;  --pal-ink-dark: #E6EAF0;
+  --pal-text2-light: #566072;  --pal-text2-dark: #98A1B3;
+  --pal-text3-light: #66707F;  --pal-text3-dark: #8B94A6;
+  --pal-text-muted-light: #8791A3;  --pal-text-muted-dark: #6A7386;
+  --pal-accent-light: #1F6B52;  --pal-accent-dark: #3A9B7D;
+  --pal-accent-hover-light: #1A5C46;  --pal-accent-hover-dark: #4AAE8F;
+  --pal-accent-fill-light: #1F6B52;  --pal-accent-fill-dark: #1E7A5D;
+  --pal-accent-fill-hover-light: #1A5C46;  --pal-accent-fill-hover-dark: #1A6B52;
+  --pal-on-accent-light: #FFFFFF;  --pal-on-accent-dark: #FFFFFF;
+  --pal-accent-glow-light: #1F6B52;  --pal-accent-glow-dark: #3A9B7D;
+  --pal-success-light: #1F6B52;  --pal-success-dark: #3A9B7D;
+  --pal-warning-light: #B8892E;  --pal-warning-dark: #D3B05A;
+  --pal-danger-light: #A02E45;  --pal-danger-dark: #DB6078;
+  --pal-on-danger-light: #FFFFFF;  --pal-on-danger-dark: #FFFFFF;
+  --pal-info-light: #5C74B4;  --pal-info-dark: #8FA1D6;
+  --pal-tag-purple-light: #8B7BC4;  --pal-tag-purple-dark: #9B8BD4;
+  --pal-tag-blue-light: #7B8FC9;  --pal-tag-blue-dark: #8FA1D6;
+  --pal-tag-orange-light: #D9805F;  --pal-tag-orange-dark: #E29272;
+  --pal-tag-pink-light: #C4707A;  --pal-tag-pink-dark: #D4808A;
+  --pal-tag-teal-light: #4A9B8F;  --pal-tag-teal-dark: #5AABA0;
+  --pal-sidebar-light: #EEF1F5;  --pal-sidebar-dark: #0A0D13;
+  --pal-sidebar-border-light: #E0E4EA;  --pal-sidebar-border-dark: #1A1F29;
+  --pal-q-hu-light: #D9805F;  --pal-q-hu-dark: #E29272;
+  --pal-q-hu-text-light: #9A4A2C;  --pal-q-hu-text-dark: #E29272;
+  --pal-q-hp-light: #D3B05A;  --pal-q-hp-dark: #DEBD6C;
+  --pal-q-hp-text-light: #7D6420;  --pal-q-hp-text-dark: #DEBD6C;
+  --pal-q-lu-light: #7B8FC9;  --pal-q-lu-dark: #8FA1D6;
+  --pal-q-lu-text-light: #44568F;  --pal-q-lu-text-dark: #8FA1D6;
+  --pal-q-lp-light: #6FAE98;  --pal-q-lp-dark: #7FBFAA;
+  --pal-q-lp-text-light: #2F6F5C;  --pal-q-lp-text-dark: #7FBFAA;
+  --pal-field-light: #0F1626;  --pal-field-dark: #0F1626;
+  --pal-field-fg-light: #F2F3F7;  --pal-field-fg-dark: #F2F3F7;
+}
+
+/* ── Palette: Signal ── */
+:root[data-palette="signal"] {
+  --pal-page-light: #F8F8F6;  --pal-page-dark: #0B0B10;
+  --pal-page2-light: #EFEFEC;  --pal-page2-dark: #101016;
+  --pal-card-light: #FFFFFF;  --pal-card-dark: #15151D;
+  --pal-card-hover-light: #F3F3F0;  --pal-card-hover-dark: #1A1A23;
+  --pal-elevated-light: #F0F0ED;  --pal-elevated-dark: #1A1A23;
+  --pal-input-light: #FFFFFF;  --pal-input-dark: #17171F;
+  --pal-border-light: #E0E0DB;  --pal-border-dark: #2A2A34;
+  --pal-border-subtle-light: #EAEAE6;  --pal-border-subtle-dark: #1F1F28;
+  --pal-border-accent-light: #CFCFC8;  --pal-border-accent-dark: #3A3A46;
+  --pal-ink-light: #101014;  --pal-ink-dark: #F2F2F5;
+  --pal-text2-light: #4B4F5C;  --pal-text2-dark: #A5A8B5;
+  --pal-text3-light: #5C6070;  --pal-text3-dark: #9497A6;
+  --pal-text-muted-light: #7E8291;  --pal-text-muted-dark: #6E7180;
+  --pal-accent-light: #16161C;  --pal-accent-dark: #ECECF1;
+  --pal-accent-hover-light: #2A2A33;  --pal-accent-hover-dark: #FFFFFF;
+  --pal-accent-fill-light: #16161C;  --pal-accent-fill-dark: #ECECF1;
+  --pal-accent-fill-hover-light: #2A2A33;  --pal-accent-fill-hover-dark: #FFFFFF;
+  --pal-on-accent-light: #FFFFFF;  --pal-on-accent-dark: #101014;
+  --pal-accent-glow-light: #16161C;  --pal-accent-glow-dark: #ECECF1;
+  --pal-success-light: #1D6E46;  --pal-success-dark: #4FC08A;
+  --pal-warning-light: #7A5600;  --pal-warning-dark: #F7C53F;
+  --pal-danger-light: #B01240;  --pal-danger-dark: #F0507A;
+  --pal-on-danger-light: #FFFFFF;  --pal-on-danger-dark: #FFFFFF;
+  --pal-info-light: #2B4FA3;  --pal-info-dark: #6E93E6;
+  --pal-tag-purple-light: #7B5EA8;  --pal-tag-purple-dark: #A98BE0;
+  --pal-tag-blue-light: #3F6FD6;  --pal-tag-blue-dark: #6E93E6;
+  --pal-tag-orange-light: #E8663A;  --pal-tag-orange-dark: #F27B52;
+  --pal-tag-pink-light: #D2467A;  --pal-tag-pink-dark: #F07AA6;
+  --pal-tag-teal-light: #1F8A80;  --pal-tag-teal-dark: #4FC0B0;
+  --pal-sidebar-light: #F0F0ED;  --pal-sidebar-dark: #08080C;
+  --pal-sidebar-border-light: #E0E0DB;  --pal-sidebar-border-dark: #1F1F28;
+  --pal-q-hu-light: #E8663A;  --pal-q-hu-dark: #F27B52;
+  --pal-q-hu-text-light: #9E3A14;  --pal-q-hu-text-dark: #F27B52;
+  --pal-q-hp-light: #F2B824;  --pal-q-hp-dark: #F7C53F;
+  --pal-q-hp-text-light: #7A5600;  --pal-q-hp-text-dark: #F7C53F;
+  --pal-q-lu-light: #3F6FD6;  --pal-q-lu-dark: #6E93E6;
+  --pal-q-lu-text-light: #2B4FA3;  --pal-q-lu-text-dark: #6E93E6;
+  --pal-q-lp-light: #2FA36B;  --pal-q-lp-dark: #4FC08A;
+  --pal-q-lp-text-light: #1D6E46;  --pal-q-lp-text-dark: #4FC08A;
+  --pal-field-light: #0B0B10;  --pal-field-dark: #0B0B10;
+  --pal-field-fg-light: #F2F2F5;  --pal-field-fg-dark: #F2F2F5;
+}
+
+/* ── Palette: Giverny ── */
+:root[data-palette="giverny"] {
+  --pal-page-light: #ECF6F5;  --pal-page-dark: #0A1615;
+  --pal-page2-light: #E2EEEC;  --pal-page2-dark: #0E1B19;
+  --pal-card-light: #F9FDFC;  --pal-card-dark: #152220;
+  --pal-card-hover-light: #F1F8F7;  --pal-card-hover-dark: #1A2A28;
+  --pal-elevated-light: #E6F1EF;  --pal-elevated-dark: #182725;
+  --pal-input-light: #F9FDFC;  --pal-input-dark: #132020;
+  --pal-border-light: #DFD3DE;  --pal-border-dark: #453943;
+  --pal-border-subtle-light: #E8E0E7;  --pal-border-subtle-dark: #3A303A;
+  --pal-border-accent-light: #C9BAC8;  --pal-border-accent-dark: #5A4C59;
+  --pal-ink-light: #132923;  --pal-ink-dark: #E4EDEC;
+  --pal-text2-light: #506967;  --pal-text2-dark: #90ABA7;
+  --pal-text3-light: #5F7876;  --pal-text3-dark: #82A09B;
+  --pal-text-muted-light: #7F9896;  --pal-text-muted-dark: #6A8783;
+  --pal-accent-light: #1B594D;  --pal-accent-dark: #3D8A7B;
+  --pal-accent-hover-light: #154A40;  --pal-accent-hover-dark: #4C9C8C;
+  --pal-accent-fill-light: #1B594D;  --pal-accent-fill-dark: #297163;
+  --pal-accent-fill-hover-light: #154A40;  --pal-accent-fill-hover-dark: #23625A;
+  --pal-on-accent-light: #FFFFFF;  --pal-on-accent-dark: #FFFFFF;
+  --pal-accent-glow-light: #1B594D;  --pal-accent-glow-dark: #297163;
+  --pal-success-light: #26652B;  --pal-success-dark: #7BC67E;
+  --pal-warning-light: #754C00;  --pal-warning-dark: #DBA748;
+  --pal-danger-light: #A82E57;  --pal-danger-dark: #E97292;
+  --pal-on-danger-light: #FFFFFF;  --pal-on-danger-dark: #FFFFFF;
+  --pal-info-light: #1A588F;  --pal-info-dark: #6FB6FF;
+  --pal-tag-purple-light: #8E5A91;  --pal-tag-purple-dark: #C87ED3;
+  --pal-tag-blue-light: #4FA3F4;  --pal-tag-blue-dark: #6FB6FF;
+  --pal-tag-orange-light: #EA7A5E;  --pal-tag-orange-dark: #F69279;
+  --pal-tag-pink-light: #D2688E;  --pal-tag-pink-dark: #F3A0BE;
+  --pal-tag-teal-light: #1B7A72;  --pal-tag-teal-dark: #5FCDB4;
+  --pal-sidebar-light: #E6F1EF;  --pal-sidebar-dark: #071110;
+  --pal-sidebar-border-light: #DFD3DE;  --pal-sidebar-border-dark: #2E2830;
+  --pal-q-hu-light: #EA7A5E;  --pal-q-hu-dark: #F69279;
+  --pal-q-hu-text-light: #873B28;  --pal-q-hu-text-dark: #F69279;
+  --pal-q-hp-light: #CD9200;  --pal-q-hp-dark: #DBA748;
+  --pal-q-hp-text-light: #754C00;  --pal-q-hp-text-dark: #DBA748;
+  --pal-q-lu-light: #4FA3F4;  --pal-q-lu-dark: #6FB6FF;
+  --pal-q-lu-text-light: #1A588F;  --pal-q-lu-text-dark: #6FB6FF;
+  --pal-q-lp-light: #5EB663;  --pal-q-lp-dark: #7BC67E;
+  --pal-q-lp-text-light: #26652B;  --pal-q-lp-text-dark: #7BC67E;
+  --pal-field-light: #112621;  --pal-field-dark: #112621;
+  --pal-field-fg-light: #E4EDEC;  --pal-field-fg-dark: #E4EDEC;
+}
+
+/* ── Palette: Water Lilies in the Clouds ── */
+:root[data-palette="clouds"] {
+  --pal-page-light: #EEF3F5;  --pal-page-dark: #1B2229;
+  --pal-page2-light: #E4EAEE;  --pal-page2-dark: #161C22;
+  --pal-card-light: #F8FAFC;  --pal-card-dark: #292F36;
+  --pal-card-hover-light: #F2F5F8;  --pal-card-hover-dark: #2F363E;
+  --pal-elevated-light: #E8EEF1;  --pal-elevated-dark: #262D34;
+  --pal-input-light: #F8FAFC;  --pal-input-dark: #232A31;
+  --pal-border-light: #D8DFE5;  --pal-border-dark: #3B434C;
+  --pal-border-subtle-light: #E3E9EE;  --pal-border-subtle-dark: #313941;
+  --pal-border-accent-light: #C6CFD8;  --pal-border-accent-dark: #4B545E;
+  --pal-ink-light: #232D37;  --pal-ink-dark: #F3F7F8;
+  --pal-text2-light: #4E5A66;  --pal-text2-dark: #B7C0C8;
+  --pal-text3-light: #5E6A76;  --pal-text3-dark: #A3ADB6;
+  --pal-text-muted-light: #7D8894;  --pal-text-muted-dark: #86909A;
+  --pal-accent-light: #303C4A;  --pal-accent-dark: #B7C7D8;
+  --pal-accent-hover-light: #3C4A5A;  --pal-accent-hover-dark: #CBD8E6;
+  --pal-accent-fill-light: #303C4A;  --pal-accent-fill-dark: #68717B;
+  --pal-accent-fill-hover-light: #3C4A5A;  --pal-accent-fill-hover-dark: #76808A;
+  --pal-on-accent-light: #FFFFFF;  --pal-on-accent-dark: #FFFFFF;
+  --pal-accent-glow-light: #303C4A;  --pal-accent-glow-dark: #9EA7B5;
+  --pal-success-light: #2A6650;  --pal-success-dark: #AFD6C4;
+  --pal-warning-light: #8A5A2A;  --pal-warning-dark: #F7D3BA;
+  --pal-danger-light: #C0613A;  --pal-danger-dark: #D08B6F;
+  --pal-on-danger-light: #FFFFFF;  --pal-on-danger-dark: #1B2229;
+  --pal-info-light: #4F6D9A;  --pal-info-dark: #9AB0D8;
+  --pal-tag-purple-light: #7C6F9A;  --pal-tag-purple-dark: #A99DC4;
+  --pal-tag-blue-light: #4F6D9A;  --pal-tag-blue-dark: #9AB0D8;
+  --pal-tag-orange-light: #C0613A;  --pal-tag-orange-dark: #D08B6F;
+  --pal-tag-pink-light: #B96D6C;  --pal-tag-pink-dark: #EFB3B2;
+  --pal-tag-teal-light: #5A9A8C;  --pal-tag-teal-dark: #AFD6C4;
+  --pal-sidebar-light: #E8EEF1;  --pal-sidebar-dark: #141A20;
+  --pal-sidebar-border-light: #D8DFE5;  --pal-sidebar-border-dark: #2B333B;
+  --pal-q-hu-light: #EFB3B2;  --pal-q-hu-dark: #EFB3B2;
+  --pal-q-hu-text-light: #8A3F3E;  --pal-q-hu-text-dark: #EFB3B2;
+  --pal-q-hp-light: #F7D3BA;  --pal-q-hp-dark: #F7D3BA;
+  --pal-q-hp-text-light: #7A4A22;  --pal-q-hp-text-dark: #F7D3BA;
+  --pal-q-lu-light: #4F6D9A;  --pal-q-lu-dark: #4F6D9A;
+  --pal-q-lu-text-light: #33507A;  --pal-q-lu-text-dark: #9AB0D8;
+  --pal-q-lp-light: #AFD6C4;  --pal-q-lp-dark: #AFD6C4;
+  --pal-q-lp-text-light: #2A6650;  --pal-q-lp-text-dark: #AFD6C4;
+  --pal-field-light: #303C4A;  --pal-field-dark: #303C4A;
+  --pal-field-fg-light: #F3F7F8;  --pal-field-fg-dark: #F3F7F8;
+}
 
 /* ============================================
-   Light Theme (DEFAULT)
-   Cool and airy. Blue-gray undertone, never warm/creamy.
-   Think morning fog, not parchment.
+   THEME layer
    ============================================ */
 
+/* Light (default) */
 :root {
-  /* ── Background layers ── */
-  --color-bg-primary: #F6F7FA;
-  --color-bg-secondary: #EDEEF3;
-  --color-bg-card: #FFFFFF;
-  --color-bg-card-hover: #F8F9FC;
-  --color-bg-elevated: #F0F1F6;
-  --color-bg-input: #FFFFFF;
+  --color-bg-primary: var(--pal-page-light);
+  --color-bg-secondary: var(--pal-page2-light);
+  --color-bg-card: var(--pal-card-light);
+  --color-bg-card-hover: var(--pal-card-hover-light);
+  --color-bg-elevated: var(--pal-elevated-light);
+  --color-bg-input: var(--pal-input-light);
+  --color-border: var(--pal-border-light);
+  --color-border-subtle: var(--pal-border-subtle-light);
+  --color-border-accent: var(--pal-border-accent-light);
+  --color-text-primary: var(--pal-ink-light);
+  --color-text-secondary: var(--pal-text2-light);
+  --color-text-tertiary: var(--pal-text3-light);
+  --color-text-muted: var(--pal-text-muted-light);
+  --color-accent: var(--pal-accent-light);
+  --color-accent-hover: var(--pal-accent-hover-light);
+  --color-accent-fill: var(--pal-accent-fill-light);
+  --color-accent-fill-hover: var(--pal-accent-fill-hover-light);
+  --color-on-accent: var(--pal-on-accent-light);
+  --color-accent-glow: var(--pal-accent-glow-light);
+  --color-success: var(--pal-success-light);
+  --color-warning: var(--pal-warning-light);
+  --color-danger: var(--pal-danger-light);
+  --color-on-danger: var(--pal-on-danger-light);
+  --color-info: var(--pal-info-light);
+  --color-tag-purple: var(--pal-tag-purple-light);
+  --color-tag-blue: var(--pal-tag-blue-light);
+  --color-tag-orange: var(--pal-tag-orange-light);
+  --color-tag-pink: var(--pal-tag-pink-light);
+  --color-tag-teal: var(--pal-tag-teal-light);
+  --color-sidebar-bg: var(--pal-sidebar-light);
+  --color-sidebar-border: var(--pal-sidebar-border-light);
+  --color-quadrant-high-unpleasant: var(--pal-q-hu-light);
+  --color-quadrant-high-pleasant: var(--pal-q-hp-light);
+  --color-quadrant-low-unpleasant: var(--pal-q-lu-light);
+  --color-quadrant-low-pleasant: var(--pal-q-lp-light);
+  --color-q-hu-fill: var(--pal-q-hu-light);
+  --color-q-hu-text: var(--pal-q-hu-text-light);
+  --color-q-hp-fill: var(--pal-q-hp-light);
+  --color-q-hp-text: var(--pal-q-hp-text-light);
+  --color-q-lu-fill: var(--pal-q-lu-light);
+  --color-q-lu-text: var(--pal-q-lu-text-light);
+  --color-q-lp-fill: var(--pal-q-lp-light);
+  --color-q-lp-text: var(--pal-q-lp-text-light);
+  --color-picker-field-bg: var(--pal-field-light);
+  --color-picker-field-fg: var(--pal-field-fg-light);
 
-  /* ── Borders — barely visible, structural only ── */
-  --color-border: #E2E4EB;
-  --color-border-subtle: #ECEDF2;
-  --color-border-accent: #D4D6DF;
+  /* alpha knobs for the derived layer */
+  --a-accent-muted: 8%;  --a-accent-subtle: 3%;  --a-sidebar-active: 6%;
+  --a-q-bg: 6%;  --a-q-bg-hover: 10%;  --a-glow-shadow: 15%;
+  --a-warning-bg: 12%;  --a-info-bg: 14%;
 
-  /* ── Text hierarchy — high contrast, cool neutrals ── */
-  --color-text-primary: #1A1D27;
-  --color-text-secondary: #5A5F72;
-  --color-text-tertiary: #6B7085;
-  --color-text-muted: #8A8FA2;
+  /* shadows: ink at low alpha in light, none in dark */
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  --shadow-md: 0 2px 8px color-mix(in srgb, var(--color-text-primary) 6%, transparent), 0 1px 2px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  --shadow-lg: 0 4px 16px color-mix(in srgb, var(--color-text-primary) 8%, transparent), 0 2px 4px color-mix(in srgb, var(--color-text-primary) 4%, transparent);
+  --shadow-secondary-hover: 0 2px 6px color-mix(in srgb, var(--color-text-primary) 6%, transparent);
+  --shadow-secondary-active: 0 1px 2px color-mix(in srgb, var(--color-text-primary) 6%, transparent);
 
-  /* ── Accent — refined teal ── */
-  --color-accent: #127A5E;
-  --color-accent-hover: #0F6B52;
-  --color-accent-muted: #1A9A7A15;
-  --color-accent-subtle: #1A9A7A08;
-  /* Filled controls: white text on these meets 4.5:1 (WCAG AA) */
-  --color-accent-fill: #127A5E;
-  --color-accent-fill-hover: #0F6B52;
-  --color-on-accent: #FFFFFF;
-
-  /* ── Status colors ── */
-  --color-success: #1A9A7A;
-  --color-warning: #C4933A;
-  --color-danger: #C45454;
-  --color-info: #5B82C4;
-
-  /* ── Tag/badge colors (desaturated) ── */
-  --color-tag-purple: #8B7BC4;
-  --color-tag-blue: #5B82C4;
-  --color-tag-orange: #C4873A;
-  --color-tag-pink: #C47088;
-  --color-tag-teal: #4A9B8F;
-
-  /* ── Sidebar ── */
-  --color-sidebar-bg: #F0F1F6;
-  --color-sidebar-border: #E2E4EB;
-  --color-sidebar-active: #1A9A7A10;
-
-  /* ── Glassmorphism ── */
-  --color-glass-panel: rgba(246, 247, 250, 0.8);
-  --color-glass-card: rgba(255, 255, 255, 0.7);
-  --color-glass-border: rgba(90, 95, 114, 0.12);
-
-  /* ── Shadows (light theme only) ── */
-  --shadow-sm: 0 1px 2px rgba(26, 29, 39, 0.04);
-  --shadow-md: 0 2px 8px rgba(26, 29, 39, 0.06), 0 1px 2px rgba(26, 29, 39, 0.04);
-  --shadow-lg: 0 4px 16px rgba(26, 29, 39, 0.08), 0 2px 4px rgba(26, 29, 39, 0.04);
+  /* glass (kept for History and the header until the design pass retires them) */
+  --color-glass-panel: color-mix(in srgb, var(--color-bg-primary) 80%, transparent);
+  --color-glass-card: color-mix(in srgb, var(--color-bg-card) 70%, transparent);
+  --color-glass-border: color-mix(in srgb, var(--color-text-secondary) 12%, transparent);
 
   /* ── Easing ── */
   --ease-default: cubic-bezier(0.25, 0.1, 0.25, 1.0);
   --ease-enter: cubic-bezier(0.0, 0.0, 0.2, 1.0);
   --ease-exit: cubic-bezier(0.4, 0.0, 1.0, 1.0);
-
-  /* ── Quadrant identity colors (desaturated ~40-50% saturation) ── */
-  --color-quadrant-high-unpleasant: #C4707A;
-  --color-quadrant-high-pleasant: #C9A55A;
-  --color-quadrant-low-unpleasant: #7B8EC4;
-  --color-quadrant-low-pleasant: #6BA89A;
-
-  /* ── Quadrant derived (light — tints over white) ── */
-  --color-q-hu-bg: #C4707A10;
-  --color-q-hu-bg-hover: #C4707A1A;
-  --color-q-hu-border: #C4707A30;
-  --color-q-hu-border-hover: #C4707A66;
-  --color-q-hu-shadow: #C4707A1F;
-  --color-q-hu-fill: #C4707A;
-  --color-q-hu-text: #9E4A54;
-  --color-q-hp-bg: #C9A55A10;
-  --color-q-hp-bg-hover: #C9A55A1A;
-  --color-q-hp-border: #C9A55A30;
-  --color-q-hp-border-hover: #C9A55A66;
-  --color-q-hp-shadow: #C9A55A1F;
-  --color-q-hp-fill: #C9A55A;
-  --color-q-hp-text: #8A7030;
-  --color-q-lu-bg: #7B8EC410;
-  --color-q-lu-bg-hover: #7B8EC41A;
-  --color-q-lu-border: #7B8EC430;
-  --color-q-lu-border-hover: #7B8EC466;
-  --color-q-lu-shadow: #7B8EC41F;
-  --color-q-lu-fill: #7B8EC4;
-  --color-q-lu-text: #4A5A8A;
-  --color-q-lp-bg: #6BA89A10;
-  --color-q-lp-bg-hover: #6BA89A1A;
-  --color-q-lp-border: #6BA89A30;
-  --color-q-lp-border-hover: #6BA89A66;
-  --color-q-lp-shadow: #6BA89A1F;
-  --color-q-lp-fill: #6BA89A;
-  --color-q-lp-text: #3A7A6A;
-
-  /* ── Hover shadows ── */
-  --shadow-accent-hover: 0 2px 10px #1A9A7A25;
-  --shadow-accent-active: 0 1px 4px #1A9A7A25;
-  --shadow-secondary-hover: 0 2px 6px rgba(26, 29, 39, 0.06);
-  --shadow-secondary-active: 0 1px 2px rgba(26, 29, 39, 0.06);
-
-  /* ── Category card colors (light — subtle tints) ── */
-  --color-cat-rose-bg: #C4707A08;
-  --color-cat-rose-border: #C4707A20;
-  --color-cat-rose-hover: #C4707A30;
-  --color-cat-emerald-bg: #6BA89A08;
-  --color-cat-emerald-border: #6BA89A20;
-  --color-cat-emerald-hover: #6BA89A30;
-  --color-cat-sky-bg: #5B82C408;
-  --color-cat-sky-border: #5B82C420;
-  --color-cat-sky-hover: #5B82C430;
-  --color-cat-violet-bg: #8B7BC408;
-  --color-cat-violet-border: #8B7BC420;
-  --color-cat-violet-hover: #8B7BC430;
-  --color-cat-amber-bg: #C9A55A08;
-  --color-cat-amber-border: #C9A55A20;
-  --color-cat-amber-hover: #C9A55A30;
-
 }
 
-
-/* ============================================
-   Dark Theme
-   Deep charcoal-navy base. Not pure black,
-   not warm gray. Think deep water at night.
-   ============================================ */
-
+/* Dark */
 :root[data-theme="dark"] {
-  /* ── Background layers ── */
-  --color-bg-primary: #0C0D12;
-  --color-bg-secondary: #111218;
-  --color-bg-card: #16171F;
-  --color-bg-card-hover: #1C1D27;
-  --color-bg-elevated: #1E1F2A;
-  --color-bg-input: #1A1B24;
+  --color-bg-primary: var(--pal-page-dark);
+  --color-bg-secondary: var(--pal-page2-dark);
+  --color-bg-card: var(--pal-card-dark);
+  --color-bg-card-hover: var(--pal-card-hover-dark);
+  --color-bg-elevated: var(--pal-elevated-dark);
+  --color-bg-input: var(--pal-input-dark);
+  --color-border: var(--pal-border-dark);
+  --color-border-subtle: var(--pal-border-subtle-dark);
+  --color-border-accent: var(--pal-border-accent-dark);
+  --color-text-primary: var(--pal-ink-dark);
+  --color-text-secondary: var(--pal-text2-dark);
+  --color-text-tertiary: var(--pal-text3-dark);
+  --color-text-muted: var(--pal-text-muted-dark);
+  --color-accent: var(--pal-accent-dark);
+  --color-accent-hover: var(--pal-accent-hover-dark);
+  --color-accent-fill: var(--pal-accent-fill-dark);
+  --color-accent-fill-hover: var(--pal-accent-fill-hover-dark);
+  --color-on-accent: var(--pal-on-accent-dark);
+  --color-accent-glow: var(--pal-accent-glow-dark);
+  --color-success: var(--pal-success-dark);
+  --color-warning: var(--pal-warning-dark);
+  --color-danger: var(--pal-danger-dark);
+  --color-on-danger: var(--pal-on-danger-dark);
+  --color-info: var(--pal-info-dark);
+  --color-tag-purple: var(--pal-tag-purple-dark);
+  --color-tag-blue: var(--pal-tag-blue-dark);
+  --color-tag-orange: var(--pal-tag-orange-dark);
+  --color-tag-pink: var(--pal-tag-pink-dark);
+  --color-tag-teal: var(--pal-tag-teal-dark);
+  --color-sidebar-bg: var(--pal-sidebar-dark);
+  --color-sidebar-border: var(--pal-sidebar-border-dark);
+  --color-quadrant-high-unpleasant: var(--pal-q-hu-dark);
+  --color-quadrant-high-pleasant: var(--pal-q-hp-dark);
+  --color-quadrant-low-unpleasant: var(--pal-q-lu-dark);
+  --color-quadrant-low-pleasant: var(--pal-q-lp-dark);
+  --color-q-hu-fill: var(--pal-q-hu-dark);
+  --color-q-hu-text: var(--pal-q-hu-text-dark);
+  --color-q-hp-fill: var(--pal-q-hp-dark);
+  --color-q-hp-text: var(--pal-q-hp-text-dark);
+  --color-q-lu-fill: var(--pal-q-lu-dark);
+  --color-q-lu-text: var(--pal-q-lu-text-dark);
+  --color-q-lp-fill: var(--pal-q-lp-dark);
+  --color-q-lp-text: var(--pal-q-lp-text-dark);
+  --color-picker-field-bg: var(--pal-field-dark);
+  --color-picker-field-fg: var(--pal-field-fg-dark);
 
-  /* ── Borders ── */
-  --color-border: #2A2B36;
-  --color-border-subtle: #1F2029;
-  --color-border-accent: #3A3B48;
+  --a-accent-muted: 12.5%;  --a-accent-subtle: 6%;  --a-sidebar-active: 9.5%;
+  --a-q-bg: 7%;  --a-q-bg-hover: 12.5%;  --a-glow-shadow: 19%;
+  --a-warning-bg: 16%;  --a-info-bg: 18%;
 
-  /* ── Text hierarchy ── */
-  --color-text-primary: #E8EAF0;
-  --color-text-secondary: #9498A8;
-  --color-text-tertiary: #8E92A4;
-  --color-text-muted: #6B6F82;
-
-  /* ── Accent — slightly brighter for dark mode contrast ── */
-  --color-accent: #2BB494;
-  --color-accent-hover: #38CAAA;
-  --color-accent-muted: #2BB49420;
-  --color-accent-subtle: #2BB49410;
-  --color-accent-fill: #148567;
-  --color-accent-fill-hover: #127A5E;
-  --color-on-accent: #FFFFFF;
-
-  /* ── Status ── */
-  --color-success: #2BB494;
-  --color-warning: #D4A34A;
-  --color-danger: #D46464;
-  --color-info: #6B92D4;
-
-  /* ── Tag/badge colors (dark — brighter) ── */
-  --color-tag-purple: #9B8BD4;
-  --color-tag-blue: #6B92D4;
-  --color-tag-orange: #D4974A;
-  --color-tag-pink: #D48098;
-  --color-tag-teal: #5AABA0;
-
-  /* ── Sidebar ── */
-  --color-sidebar-bg: #0A0B10;
-  --color-sidebar-border: #1A1B24;
-  --color-sidebar-active: #2BB49418;
-
-  /* ── Glassmorphism ── */
-  --color-glass-panel: rgba(22, 23, 31, 0.7);
-  --color-glass-card: rgba(22, 23, 31, 0.5);
-  --color-glass-border: rgba(107, 111, 130, 0.15);
-
-  /* ── Shadows — none in dark theme ── */
   --shadow-sm: none;
   --shadow-md: none;
   --shadow-lg: none;
-
-  /* ── Quadrant identity (slightly brighter for dark bg contrast) ── */
-  --color-quadrant-high-unpleasant: #D4808A;
-  --color-quadrant-high-pleasant: #D9B56A;
-  --color-quadrant-low-unpleasant: #8B9ED4;
-  --color-quadrant-low-pleasant: #7BB8AA;
-
-  /* ── Quadrant derived (dark — translucent on dark bg) ── */
-  --color-q-hu-bg: #D4808A12;
-  --color-q-hu-bg-hover: #D4808A20;
-  --color-q-hu-border: #D4808A30;
-  --color-q-hu-border-hover: #D4808A66;
-  --color-q-hu-shadow: #D4808A1F;
-  --color-q-hu-fill: #D4808A;
-  --color-q-hu-text: #D4808A;
-  --color-q-hp-bg: #D9B56A12;
-  --color-q-hp-bg-hover: #D9B56A20;
-  --color-q-hp-border: #D9B56A30;
-  --color-q-hp-border-hover: #D9B56A66;
-  --color-q-hp-shadow: #D9B56A1F;
-  --color-q-hp-fill: #D9B56A;
-  --color-q-hp-text: #D9B56A;
-  --color-q-lu-bg: #8B9ED412;
-  --color-q-lu-bg-hover: #8B9ED420;
-  --color-q-lu-border: #8B9ED430;
-  --color-q-lu-border-hover: #8B9ED466;
-  --color-q-lu-shadow: #8B9ED41F;
-  --color-q-lu-fill: #8B9ED4;
-  --color-q-lu-text: #8B9ED4;
-  --color-q-lp-bg: #7BB8AA12;
-  --color-q-lp-bg-hover: #7BB8AA20;
-  --color-q-lp-border: #7BB8AA30;
-  --color-q-lp-border-hover: #7BB8AA66;
-  --color-q-lp-shadow: #7BB8AA1F;
-  --color-q-lp-fill: #7BB8AA;
-  --color-q-lp-text: #7BB8AA;
-
-  /* ── Hover shadows ── */
-  --shadow-accent-hover: 0 2px 10px #2BB49430;
-  --shadow-accent-active: 0 1px 4px #2BB49430;
   --shadow-secondary-hover: 0 2px 6px rgba(0, 0, 0, 0.15);
   --shadow-secondary-active: 0 1px 2px rgba(0, 0, 0, 0.15);
 
-  /* ── Category card colors (dark — translucent) ── */
-  --color-cat-rose-bg: #D4808A08;
-  --color-cat-rose-border: #D4808A20;
-  --color-cat-rose-hover: #D4808A35;
-  --color-cat-emerald-bg: #7BB8AA08;
-  --color-cat-emerald-border: #7BB8AA20;
-  --color-cat-emerald-hover: #7BB8AA35;
-  --color-cat-sky-bg: #6B92D408;
-  --color-cat-sky-border: #6B92D420;
-  --color-cat-sky-hover: #6B92D435;
-  --color-cat-violet-bg: #9B8BD408;
-  --color-cat-violet-border: #9B8BD420;
-  --color-cat-violet-hover: #9B8BD435;
-  --color-cat-amber-bg: #D9B56A08;
-  --color-cat-amber-border: #D9B56A20;
-  --color-cat-amber-hover: #D9B56A35;
-
+  --color-glass-panel: color-mix(in srgb, var(--color-bg-card) 70%, transparent);
+  --color-glass-card: color-mix(in srgb, var(--color-bg-card) 50%, transparent);
+  --color-glass-border: color-mix(in srgb, var(--color-text-muted) 15%, transparent);
 }
 
-
-/* ── System theme: follow OS preference (light values) ── */
-@media (prefers-color-scheme: light) {
-  :root[data-theme="system"] {
-    --color-bg-primary: #F6F7FA;
-    --color-bg-secondary: #EDEEF3;
-    --color-bg-card: #FFFFFF;
-    --color-bg-card-hover: #F8F9FC;
-    --color-bg-elevated: #F0F1F6;
-    --color-bg-input: #FFFFFF;
-
-    --color-border: #E2E4EB;
-    --color-border-subtle: #ECEDF2;
-    --color-border-accent: #D4D6DF;
-
-    --color-text-primary: #1A1D27;
-    --color-text-secondary: #5A5F72;
-    --color-text-tertiary: #6B7085;
-    --color-text-muted: #8A8FA2;
-
-    --color-accent: #127A5E;
-    --color-accent-hover: #0F6B52;
-    --color-accent-muted: #1A9A7A15;
-    --color-accent-subtle: #1A9A7A08;
-    --color-accent-fill: #127A5E;
-    --color-accent-fill-hover: #0F6B52;
-    --color-on-accent: #FFFFFF;
-
-    --color-success: #1A9A7A;
-    --color-warning: #C4933A;
-    --color-danger: #C45454;
-    --color-info: #5B82C4;
-
-    --color-tag-purple: #8B7BC4;
-    --color-tag-blue: #5B82C4;
-    --color-tag-orange: #C4873A;
-    --color-tag-pink: #C47088;
-    --color-tag-teal: #4A9B8F;
-
-    --color-sidebar-bg: #F0F1F6;
-    --color-sidebar-border: #E2E4EB;
-    --color-sidebar-active: #1A9A7A10;
-
-    --color-glass-panel: rgba(246, 247, 250, 0.8);
-    --color-glass-card: rgba(255, 255, 255, 0.7);
-    --color-glass-border: rgba(90, 95, 114, 0.12);
-
-    --shadow-sm: 0 1px 2px rgba(26, 29, 39, 0.04);
-    --shadow-md: 0 2px 8px rgba(26, 29, 39, 0.06), 0 1px 2px rgba(26, 29, 39, 0.04);
-    --shadow-lg: 0 4px 16px rgba(26, 29, 39, 0.08), 0 2px 4px rgba(26, 29, 39, 0.04);
-
-    --color-quadrant-high-unpleasant: #C4707A;
-    --color-quadrant-high-pleasant: #C9A55A;
-    --color-quadrant-low-unpleasant: #7B8EC4;
-    --color-quadrant-low-pleasant: #6BA89A;
-
-    --color-q-hu-bg: #C4707A10;
-    --color-q-hu-bg-hover: #C4707A1A;
-    --color-q-hu-border: #C4707A30;
-    --color-q-hu-border-hover: #C4707A66;
-    --color-q-hu-shadow: #C4707A1F;
-    --color-q-hu-fill: #C4707A;
-    --color-q-hu-text: #9E4A54;
-    --color-q-hp-bg: #C9A55A10;
-    --color-q-hp-bg-hover: #C9A55A1A;
-    --color-q-hp-border: #C9A55A30;
-    --color-q-hp-border-hover: #C9A55A66;
-    --color-q-hp-shadow: #C9A55A1F;
-    --color-q-hp-fill: #C9A55A;
-    --color-q-hp-text: #8A7030;
-    --color-q-lu-bg: #7B8EC410;
-    --color-q-lu-bg-hover: #7B8EC41A;
-    --color-q-lu-border: #7B8EC430;
-    --color-q-lu-border-hover: #7B8EC466;
-    --color-q-lu-shadow: #7B8EC41F;
-    --color-q-lu-fill: #7B8EC4;
-    --color-q-lu-text: #4A5A8A;
-    --color-q-lp-bg: #6BA89A10;
-    --color-q-lp-bg-hover: #6BA89A1A;
-    --color-q-lp-border: #6BA89A30;
-    --color-q-lp-border-hover: #6BA89A66;
-    --color-q-lp-shadow: #6BA89A1F;
-    --color-q-lp-fill: #6BA89A;
-    --color-q-lp-text: #3A7A6A;
-
-    --shadow-accent-hover: 0 2px 10px #1A9A7A25;
-    --shadow-accent-active: 0 1px 4px #1A9A7A25;
-    --shadow-secondary-hover: 0 2px 6px rgba(26, 29, 39, 0.06);
-    --shadow-secondary-active: 0 1px 2px rgba(26, 29, 39, 0.06);
-
-    --color-cat-rose-bg: #C4707A08;
-    --color-cat-rose-border: #C4707A20;
-    --color-cat-rose-hover: #C4707A30;
-    --color-cat-emerald-bg: #6BA89A08;
-    --color-cat-emerald-border: #6BA89A20;
-    --color-cat-emerald-hover: #6BA89A30;
-    --color-cat-sky-bg: #5B82C408;
-    --color-cat-sky-border: #5B82C420;
-    --color-cat-sky-hover: #5B82C430;
-    --color-cat-violet-bg: #8B7BC408;
-    --color-cat-violet-border: #8B7BC420;
-    --color-cat-violet-hover: #8B7BC430;
-    --color-cat-amber-bg: #C9A55A08;
-    --color-cat-amber-border: #C9A55A20;
-    --color-cat-amber-hover: #C9A55A30;
-
-  }
-}
-
-/* ── System theme: dark values (inherits from :root[data-theme="dark"]) ── */
+/* System: follow the OS. Light values come from :root above. */
 @media (prefers-color-scheme: dark) {
   :root[data-theme="system"] {
-    --color-bg-primary: #0C0D12;
-    --color-bg-secondary: #111218;
-    --color-bg-card: #16171F;
-    --color-bg-card-hover: #1C1D27;
-    --color-bg-elevated: #1E1F2A;
-    --color-bg-input: #1A1B24;
+    --color-bg-primary: var(--pal-page-dark);
+    --color-bg-secondary: var(--pal-page2-dark);
+    --color-bg-card: var(--pal-card-dark);
+    --color-bg-card-hover: var(--pal-card-hover-dark);
+    --color-bg-elevated: var(--pal-elevated-dark);
+    --color-bg-input: var(--pal-input-dark);
+    --color-border: var(--pal-border-dark);
+    --color-border-subtle: var(--pal-border-subtle-dark);
+    --color-border-accent: var(--pal-border-accent-dark);
+    --color-text-primary: var(--pal-ink-dark);
+    --color-text-secondary: var(--pal-text2-dark);
+    --color-text-tertiary: var(--pal-text3-dark);
+    --color-text-muted: var(--pal-text-muted-dark);
+    --color-accent: var(--pal-accent-dark);
+    --color-accent-hover: var(--pal-accent-hover-dark);
+    --color-accent-fill: var(--pal-accent-fill-dark);
+    --color-accent-fill-hover: var(--pal-accent-fill-hover-dark);
+    --color-on-accent: var(--pal-on-accent-dark);
+    --color-accent-glow: var(--pal-accent-glow-dark);
+    --color-success: var(--pal-success-dark);
+    --color-warning: var(--pal-warning-dark);
+    --color-danger: var(--pal-danger-dark);
+    --color-on-danger: var(--pal-on-danger-dark);
+    --color-info: var(--pal-info-dark);
+    --color-tag-purple: var(--pal-tag-purple-dark);
+    --color-tag-blue: var(--pal-tag-blue-dark);
+    --color-tag-orange: var(--pal-tag-orange-dark);
+    --color-tag-pink: var(--pal-tag-pink-dark);
+    --color-tag-teal: var(--pal-tag-teal-dark);
+    --color-sidebar-bg: var(--pal-sidebar-dark);
+    --color-sidebar-border: var(--pal-sidebar-border-dark);
+    --color-quadrant-high-unpleasant: var(--pal-q-hu-dark);
+    --color-quadrant-high-pleasant: var(--pal-q-hp-dark);
+    --color-quadrant-low-unpleasant: var(--pal-q-lu-dark);
+    --color-quadrant-low-pleasant: var(--pal-q-lp-dark);
+    --color-q-hu-fill: var(--pal-q-hu-dark);
+    --color-q-hu-text: var(--pal-q-hu-text-dark);
+    --color-q-hp-fill: var(--pal-q-hp-dark);
+    --color-q-hp-text: var(--pal-q-hp-text-dark);
+    --color-q-lu-fill: var(--pal-q-lu-dark);
+    --color-q-lu-text: var(--pal-q-lu-text-dark);
+    --color-q-lp-fill: var(--pal-q-lp-dark);
+    --color-q-lp-text: var(--pal-q-lp-text-dark);
+    --color-picker-field-bg: var(--pal-field-dark);
+    --color-picker-field-fg: var(--pal-field-fg-dark);
 
-    --color-border: #2A2B36;
-    --color-border-subtle: #1F2029;
-    --color-border-accent: #3A3B48;
-
-    --color-text-primary: #E8EAF0;
-    --color-text-secondary: #9498A8;
-    --color-text-tertiary: #8E92A4;
-    --color-text-muted: #6B6F82;
-
-    --color-accent: #2BB494;
-    --color-accent-hover: #38CAAA;
-    --color-accent-muted: #2BB49420;
-    --color-accent-subtle: #2BB49410;
-    --color-accent-fill: #148567;
-    --color-accent-fill-hover: #127A5E;
-    --color-on-accent: #FFFFFF;
-
-    --color-success: #2BB494;
-    --color-warning: #D4A34A;
-    --color-danger: #D46464;
-    --color-info: #6B92D4;
-
-    --color-tag-purple: #9B8BD4;
-    --color-tag-blue: #6B92D4;
-    --color-tag-orange: #D4974A;
-    --color-tag-pink: #D48098;
-    --color-tag-teal: #5AABA0;
-
-    --color-sidebar-bg: #0A0B10;
-    --color-sidebar-border: #1A1B24;
-    --color-sidebar-active: #2BB49418;
-
-    --color-glass-panel: rgba(22, 23, 31, 0.7);
-    --color-glass-card: rgba(22, 23, 31, 0.5);
-    --color-glass-border: rgba(107, 111, 130, 0.15);
+    --a-accent-muted: 12.5%;  --a-accent-subtle: 6%;  --a-sidebar-active: 9.5%;
+    --a-q-bg: 7%;  --a-q-bg-hover: 12.5%;  --a-glow-shadow: 19%;
+    --a-warning-bg: 16%;  --a-info-bg: 18%;
 
     --shadow-sm: none;
     --shadow-md: none;
     --shadow-lg: none;
-
-    --color-quadrant-high-unpleasant: #D4808A;
-    --color-quadrant-high-pleasant: #D9B56A;
-    --color-quadrant-low-unpleasant: #8B9ED4;
-    --color-quadrant-low-pleasant: #7BB8AA;
-
-    --color-q-hu-bg: #D4808A12;
-    --color-q-hu-bg-hover: #D4808A20;
-    --color-q-hu-border: #D4808A30;
-    --color-q-hu-border-hover: #D4808A66;
-    --color-q-hu-shadow: #D4808A1F;
-    --color-q-hu-fill: #D4808A;
-    --color-q-hu-text: #D4808A;
-    --color-q-hp-bg: #D9B56A12;
-    --color-q-hp-bg-hover: #D9B56A20;
-    --color-q-hp-border: #D9B56A30;
-    --color-q-hp-border-hover: #D9B56A66;
-    --color-q-hp-shadow: #D9B56A1F;
-    --color-q-hp-fill: #D9B56A;
-    --color-q-hp-text: #D9B56A;
-    --color-q-lu-bg: #8B9ED412;
-    --color-q-lu-bg-hover: #8B9ED420;
-    --color-q-lu-border: #8B9ED430;
-    --color-q-lu-border-hover: #8B9ED466;
-    --color-q-lu-shadow: #8B9ED41F;
-    --color-q-lu-fill: #8B9ED4;
-    --color-q-lu-text: #8B9ED4;
-    --color-q-lp-bg: #7BB8AA12;
-    --color-q-lp-bg-hover: #7BB8AA20;
-    --color-q-lp-border: #7BB8AA30;
-    --color-q-lp-border-hover: #7BB8AA66;
-    --color-q-lp-shadow: #7BB8AA1F;
-    --color-q-lp-fill: #7BB8AA;
-    --color-q-lp-text: #7BB8AA;
-
-    --shadow-accent-hover: 0 2px 10px #2BB49430;
-    --shadow-accent-active: 0 1px 4px #2BB49430;
     --shadow-secondary-hover: 0 2px 6px rgba(0, 0, 0, 0.15);
     --shadow-secondary-active: 0 1px 2px rgba(0, 0, 0, 0.15);
 
-    --color-cat-rose-bg: #D4808A08;
-    --color-cat-rose-border: #D4808A20;
-    --color-cat-rose-hover: #D4808A35;
-    --color-cat-emerald-bg: #7BB8AA08;
-    --color-cat-emerald-border: #7BB8AA20;
-    --color-cat-emerald-hover: #7BB8AA35;
-    --color-cat-sky-bg: #6B92D408;
-    --color-cat-sky-border: #6B92D420;
-    --color-cat-sky-hover: #6B92D435;
-    --color-cat-violet-bg: #9B8BD408;
-    --color-cat-violet-border: #9B8BD420;
-    --color-cat-violet-hover: #9B8BD435;
-    --color-cat-amber-bg: #D9B56A08;
-    --color-cat-amber-border: #D9B56A20;
-    --color-cat-amber-hover: #D9B56A35;
-
+    --color-glass-panel: color-mix(in srgb, var(--color-bg-card) 70%, transparent);
+    --color-glass-card: color-mix(in srgb, var(--color-bg-card) 50%, transparent);
+    --color-glass-border: color-mix(in srgb, var(--color-text-muted) 15%, transparent);
   }
+}
+
+/* ============================================
+   DERIVED layer (theme-agnostic: reads resolved tokens + alpha knobs)
+   ============================================ */
+:root {
+  --color-accent-muted: color-mix(in srgb, var(--color-accent-glow) var(--a-accent-muted), transparent);
+  --color-accent-subtle: color-mix(in srgb, var(--color-accent-glow) var(--a-accent-subtle), transparent);
+  --color-sidebar-active: color-mix(in srgb, var(--color-accent-glow) var(--a-sidebar-active), transparent);
+  --shadow-accent-hover: 0 2px 10px color-mix(in srgb, var(--color-accent-glow) var(--a-glow-shadow), transparent);
+  --shadow-accent-active: 0 1px 4px color-mix(in srgb, var(--color-accent-glow) var(--a-glow-shadow), transparent);
+
+  /* status tints (replace hard-coded Tailwind amber/blue/purple in components) */
+  --color-warning-bg: color-mix(in srgb, var(--color-warning) var(--a-warning-bg), transparent);
+  --color-warning-border: color-mix(in srgb, var(--color-warning) 35%, transparent);
+  --color-info-bg: color-mix(in srgb, var(--color-info) var(--a-info-bg), transparent);
+  --color-tag-purple-bg: color-mix(in srgb, var(--color-tag-purple) var(--a-info-bg), transparent);
+
+  /* quadrant tints */
+  --color-q-hu-bg: color-mix(in srgb, var(--color-q-hu-fill) var(--a-q-bg), transparent);
+  --color-q-hu-bg-hover: color-mix(in srgb, var(--color-q-hu-fill) var(--a-q-bg-hover), transparent);
+  --color-q-hu-border: color-mix(in srgb, var(--color-q-hu-fill) 19%, transparent);
+  --color-q-hu-border-hover: color-mix(in srgb, var(--color-q-hu-fill) 40%, transparent);
+  --color-q-hu-shadow: color-mix(in srgb, var(--color-q-hu-fill) 12%, transparent);
+  --color-q-hp-bg: color-mix(in srgb, var(--color-q-hp-fill) var(--a-q-bg), transparent);
+  --color-q-hp-bg-hover: color-mix(in srgb, var(--color-q-hp-fill) var(--a-q-bg-hover), transparent);
+  --color-q-hp-border: color-mix(in srgb, var(--color-q-hp-fill) 19%, transparent);
+  --color-q-hp-border-hover: color-mix(in srgb, var(--color-q-hp-fill) 40%, transparent);
+  --color-q-hp-shadow: color-mix(in srgb, var(--color-q-hp-fill) 12%, transparent);
+  --color-q-lu-bg: color-mix(in srgb, var(--color-q-lu-fill) var(--a-q-bg), transparent);
+  --color-q-lu-bg-hover: color-mix(in srgb, var(--color-q-lu-fill) var(--a-q-bg-hover), transparent);
+  --color-q-lu-border: color-mix(in srgb, var(--color-q-lu-fill) 19%, transparent);
+  --color-q-lu-border-hover: color-mix(in srgb, var(--color-q-lu-fill) 40%, transparent);
+  --color-q-lu-shadow: color-mix(in srgb, var(--color-q-lu-fill) 12%, transparent);
+  --color-q-lp-bg: color-mix(in srgb, var(--color-q-lp-fill) var(--a-q-bg), transparent);
+  --color-q-lp-bg-hover: color-mix(in srgb, var(--color-q-lp-fill) var(--a-q-bg-hover), transparent);
+  --color-q-lp-border: color-mix(in srgb, var(--color-q-lp-fill) 19%, transparent);
+  --color-q-lp-border-hover: color-mix(in srgb, var(--color-q-lp-fill) 40%, transparent);
+  --color-q-lp-shadow: color-mix(in srgb, var(--color-q-lp-fill) 12%, transparent);
+
+  /* picker (How We Feel field) */
+  --color-picker-bubble-text: #1A1D27;
+  --color-picker-sheet-bg: var(--color-bg-card);
 }
 
 

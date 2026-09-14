@@ -1387,13 +1387,13 @@ export function DearMan() {
           })}
         </div>
         {highActivation && (
-          <div className="p-4 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
-            <p className="text-sm text-amber-800 dark:text-amber-200">
+          <div className="p-4 rounded-lg bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)]">
+            <p className="text-sm text-[var(--color-text-primary)]">
               It sounds like your body is still activated. Want to do a quick cool-down first?
             </p>
             <div className="flex gap-2 mt-3">
               <button onClick={() => navigate('/tool/tipp')}
-                className="px-4 py-2 rounded-lg text-sm bg-amber-100 dark:bg-amber-800/40 text-amber-800 dark:text-amber-200 border border-amber-300 dark:border-amber-700">
+                className="px-4 py-2 rounded-lg text-sm bg-[var(--color-warning-bg)] text-[var(--color-text-primary)] border border-[var(--color-warning-border)]">
                 Cool down first
               </button>
               <button onClick={() => setPhase('debrief-who')}
