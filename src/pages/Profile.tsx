@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { modules } from '../data/modules';
@@ -209,12 +209,17 @@ function AppearanceSection({
   const [draftPalette, setDraftPalette] = useState<PaletteId>(palette);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  // True once the user has picked something; a late profile load must not wipe their pick
+  const touched = useRef(false);
 
   const dirty = draftTheme !== theme || draftPalette !== palette;
 
-  // Keep drafts in step if the saved profile changes underneath (e.g. loads after mount)
-  useEffect(() => { setDraftTheme(theme); }, [theme]);
-  useEffect(() => { setDraftPalette(palette); }, [palette]);
+  // Keep drafts in step with the saved profile only while the user hasn't touched them
+  useEffect(() => { if (!touched.current) setDraftTheme(theme); }, [theme]);
+  useEffect(() => { if (!touched.current) setDraftPalette(palette); }, [palette]);
+
+  function pickTheme(value: ThemeChoice) { touched.current = true; setDraftTheme(value); }
+  function pickPalette(value: PaletteId) { touched.current = true; setDraftPalette(value); }
 
   // Live preview of the draft; restore the saved values on unmount
   useEffect(() => {
@@ -234,6 +239,7 @@ function AppearanceSection({
     setSaving(true);
     try {
       await onSave({ theme: draftTheme, palette: draftPalette });
+      touched.current = false;
       setSaved(true);
     } catch {
       // error handled by context
@@ -243,6 +249,7 @@ function AppearanceSection({
   }
 
   function handleRevert() {
+    touched.current = false;
     setDraftTheme(theme);
     setDraftPalette(palette);
   }
@@ -264,7 +271,7 @@ function AppearanceSection({
             <button
               key={opt.value}
               type="button"
-              onClick={() => setDraftTheme(opt.value)}
+              onClick={() => pickTheme(opt.value)}
               aria-pressed={draftTheme === opt.value}
               className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
                 draftTheme === opt.value
@@ -291,7 +298,7 @@ function AppearanceSection({
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                onClick={() => setDraftPalette(p.id)}
+                onClick={() => pickPalette(p.id)}
                 className={`flex items-center gap-3 text-left p-3 rounded-lg border transition-colors ${
                   selected
                     ? 'border-[var(--color-text-primary)] bg-[var(--color-bg-elevated)]'
