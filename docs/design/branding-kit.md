@@ -122,13 +122,22 @@ indistinguishable from any SaaS. Set `goblin` lowercase, Fraunces 600,
 `WONK` 1, optical size low, tracking -1%. DM Sans remains the type for
 everything else, including any tagline under the mark.
 
-## 4. Three palettes
+## 4. Palettes (three originals, two added after review)
 
 Conventions: the field ground is named per palette (it is currently dark
 navy in both themes). Quadrant text tokens are used for chip labels on a
 10% tint of the hue over paper (light) or the hue itself as text on a 14%
 tint over paper (dark). "Field midpoint" is the OKLCH blend of the two
 edge hues, to show the edge does not pass through grey.
+
+A correction added after the first round: the field has four edges, not
+two. The left edge (HU to LU) blends the short way round the hue circle,
+through magenta and violet, and the right edge (HP to LP) blends through
+yellow-green. Computed midpoints for Signal: top `#F38E17` (h61), bottom
+`#0096B2` (h217), left `#BB58B2` (h331), right `#99B43D` (h121). So no
+hue is free once all four edges blend; an action colour can only be
+distinct from the field by lightness and chroma, not by hue. That is the
+premise of the two palettes added below.
 
 ### A. Slate & Spruce
 
@@ -201,8 +210,9 @@ for someone at high arousal who needs to find it fast.
 ### C. Signal
 
 *High contrast and saturated: near-black ink, HWF-strength quadrant hues
-tuned so HU is vermilion-orange rather than red, and a violet action
-because purple is the only major hue the four quadrants do not use.*
+tuned so HU is vermilion-orange rather than red, and a violet action,
+chosen on the belief that purple was the one hue the quadrants leave free.
+That belief was wrong; see "Signal, revised" below.*
 
 | Token | Light | Dark |
 |---|---|---|
@@ -233,27 +243,127 @@ evidence and with what distressed users asked for; the top-left corner is
 the loudest object on screen exactly when the user is loudest, and violet
 as "go" has to be learned.
 
+### C2. Signal, ink
+
+*Everything in Signal except the button: near-black ink, high contrast,
+HWF-strength corners with a vermilion-orange HU, and an ink-colored action
+so that hue belongs to the quadrants and nothing else.*
+
+Candidates checked for the action (light theme; white text on each):
+
+| Candidate | Hex | OKLCH | White on it | Verdict |
+|---|---|---|---|---|
+| Ink | `#16161C` | L0.20 C0.01 h285 | 18.0 | **Chosen.** No hue to collide with anything |
+| Deep forest | `#1E4D3A` | L0.38 C0.06 h164 | 9.6 | Same hue as the LP corner (h158); reads "low-pleasant, darker" |
+| Ink-blue | `#1F2C5C` | L0.31 C0.09 h269 | 13.3 | Same hue as LU cobalt (h263), and navy is the generic choice |
+| Walnut | `#4B3B30` | L0.37 C0.03 h56 | 10.7 | Muddy; on a black-and-white page it reads as a disabled state |
+| Deep wine | `#5A1E33` | L0.33 C0.09 h2 | 12.6 | Eleven degrees from the crisis crimson (h13); the one collision that matters most |
+
+| Token | Light | Dark |
+|---|---|---|
+| Page | `#F8F8F6` | `#0B0B10` |
+| Paper | `#FFFFFF` | `#15151D` |
+| Ink | `#101014` | `#F2F2F5` |
+| Secondary text | `#4B4F5C` | `#A5A8B5` |
+| Action (ink) | `#16161C`, white text | `#ECECF1`, ink text `#101014` |
+| Danger (crimson) | `#B01240` | `#F0507A` |
+| Field ground | `#0B0B10` | `#0B0B10` |
+| HU vermilion | `#E8663A` (text `#9E3A14`) | `#F27B52` |
+| HP yellow | `#F2B824` (text `#7A5600`) | `#F7C53F` |
+| LU cobalt | `#3F6FD6` (text `#2B4FA3`) | `#6E93E6` |
+| LP green | `#2FA36B` (text `#1D6E46`) | `#4FC08A` |
+
+Contrast: white on action 18.0 light; in dark the button inverts to paper
+with ink text, 16.1, and stands off the page at 16.7. Everything else is
+as in Signal (ink on page 17.9 / 17.6, quadrant text on tint 5.6 to 6.7 /
+4.9 to 8.3, white on danger 7.0).
+
+On the inversion: the brief asked for white text on the filled button in
+both themes. A dark button on a `#0B0B10` page cannot do that and still be
+found: graphite `#3A3A46` gives white text 11.2 but sits at only 1.8
+against the page, which at 8 out of 10 is a button you have to hunt for.
+Inverting is what every stationery-grade dark theme does (a light bar on
+a dark page), and it keeps the one rule that matters: the action is the
+highest-contrast object on the screen. If the white-text rule is firm,
+graphite is the fallback and the loss is findability, not legibility.
+
+On the field: identical to Signal. On a saved DEAR MAN plan card: black
+type, white paper, one black bar; the only colour on the card is the
+quadrant chip. Downside: an ink button carries no warmth and no "go"
+signal of its own; it relies entirely on position and copy ("Save this
+plan") to say what it does, and the same rule that makes it work forbids
+any second dark bar on the screen.
+
+### D. Moss & Vermilion (B/C hybrid)
+
+*Moss & Lantern's page, paper, ink and moss action, with quadrant hues at
+Signal's saturation and Signal's vermilion-orange HU. The danger colour
+has to change: Moss & Lantern's brick (h34) is four degrees from vermilion
+(h38), so the crisis colour becomes Signal's crimson.*
+
+| Token | Light | Dark |
+|---|---|---|
+| Page | `#F1F3EE` | `#121611` |
+| Paper | `#FBFCF9` | `#1B211A` |
+| Ink | `#1B2420` | `#ECEDE6` |
+| Secondary text | `#5B665E` | `#A2AA9C` |
+| Action (moss, deepened) | `#4A5A18` | `#5F7520` |
+| Danger (crimson) | `#B01240` | `#F0507A` |
+| Field ground (moss night) | `#161B14` | `#161B14` |
+| HU vermilion | `#E26E4A` (text `#9C3E1E`) | `#EE8460` |
+| HP marigold | `#ECB232` (text `#7A5600`) | `#F2C24A` |
+| LU cobalt | `#4F79CC` (text `#2F519F`) | `#7A9BE0` |
+| LP green | `#48AE74` (text `#1F6E45`) | `#63C48E` |
+
+Contrast: ink on page 14.2 (dark 15.5); white on action 7.6 (dark 5.2);
+white on danger 7.0; quadrant text on tint 5.5 to 6.5 light, 4.7 to 7.1
+dark. Hues on moss night 4.1 (cobalt) to 9.1 (marigold); the LU corner's
+words should use the dark-theme `#7A9BE0` in both themes. Field midpoints:
+top `#EC8F33` (h61), bottom `#009EB4` (h212), left `#B864B1` (h330), right
+`#A1B545` (h119).
+
+Does the moss action hold up next to saturated corners? By the numbers,
+yes, with a caveat. Moss (h122) is the exact hue of the right edge's
+yellow-green midpoint, so the two are distinguished only by lightness
+(L0.44 vs L0.74) and chroma (0.09 vs 0.14). That is why the action here
+is one step darker than B's `#55671E`: it moves the button toward ink and
+away from the field. The risk is aesthetic rather than functional: a dark
+olive bar under a screen of marigold and fern can read as the field's
+muddy relative. Prototype it on the result screen; if it looks like mud,
+the ink button from C2 drops in with no other token change.
+
+On the field: Signal's corners on a warm dark ground instead of black;
+the top edge is orange, the left violet, and the whole thing reads as a
+lit window rather than a display. On a saved DEAR MAN plan card: B's
+notebook paper with one deeper moss bar and a vivid quadrant chip.
+Downside: it is the palette with the most moving parts (warm neutrals,
+saturated hues, a cool crimson) and the one most likely to look assembled
+if any single token is off.
+
 ## 5. How to choose, and a recommendation
 
-Pick by asking what the field should feel like at 8 out of 10 and what
-the plan card should feel like a week later. A keeps both where they are.
-C makes the first vivid and the second crisp, at the cost of the one thing
-the research does agree on. B makes the field feel like a place rather
-than an instrument and gives the plan card a paper quality the serif is
-already asking for.
+Slate & Spruce and the violet action are out, so the choice is among B,
+C2 and D. The one question that separates them is what the field should
+do at 8 out of 10: B keeps the corners at a murmur (raspberry, marigold,
+juniper, fern), and C2 and D put them at How We Feel strength with a
+vermilion top-left. The evidence, weak as it is, and the co-design studies
+lean toward B's murmur; the case for the stronger corners is that a
+person with alexithymia needs the four regions to be unmistakably four
+regions, and at arm's length B's corners can blur. Then: does the app want
+any warmth in its neutrals (B, D) or none (C2)?
 
-**Recommendation: B, Moss & Lantern.** It is the only one of the three
-that answers the name (a creature of the woods, a light in the dark), the
-only one warm without cream and terracotta, and the only one whose action
-colour is green without being teal, mint, or emerald. Its HU raspberry is
-off pure red, which is the one place the weak evidence and the user
-research agree. Two conditions: retheme the field ground from navy to moss
-night in both themes so the app does not carry two darks, and prototype
-the moss button on the result screen before committing, because that is
-where a high-arousal user has to find it. If the team wants minimum churn,
-A is the honest fallback and is a two-hour token swap; C should only win
-if a test with real users at high arousal shows the vivid corners help
-them pick a word faster.
+**Recommendation: D, Moss & Vermilion, with the deepened moss action and
+C2's ink button as the pre-approved fallback.** It keeps what the name
+asks for (green-grey paper, a warm dark, a green that is not teal), gives
+the field the four unmistakable regions and the vermilion HU Claudia
+wanted from Signal, and its crisis crimson is 25 degrees and a lightness
+step away from that vermilion. C2 is the right choice if the team decides
+warmth is not this brand's job; it is the most legible of the three and
+the cleanest system, at the cost of any "go" signal in the button. B stays
+the choice if a prototype at high arousal shows the saturated corners are
+too loud, which is the one test that should be run before any of this
+lands in `index.css`: the result screen at 8 out of 10, light and dark,
+with the real headline copy.
 
 ## Sources
 
