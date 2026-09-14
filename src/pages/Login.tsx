@@ -19,7 +19,7 @@ export function Login() {
       await logIn(email, password);
       navigate('/');
     } catch (err) {
-      setError('Failed to log in. Please check your email and password.');
+      setError('Could not sign in. Please check your email and password.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -35,7 +35,7 @@ export function Login() {
             Welcome back
           </h1>
           <p className="text-[var(--color-text-secondary)]">
-            Log in to continue your journey
+            Sign in to see your saved check-ins
           </p>
         </div>
 
@@ -85,9 +85,9 @@ export function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Logging in...' : 'Log in'}
+            {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
 
@@ -97,7 +97,7 @@ export function Login() {
             to="/signup" 
             className="text-[var(--color-text-secondary)] font-medium hover:underline"
           >
-            Sign up
+            Create account
           </Link>
         </p>
 

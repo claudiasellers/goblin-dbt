@@ -109,7 +109,7 @@ export function EmotionSuggestion({
         <div className="space-y-3">
           <button
             onClick={onShowAllEmotions}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             Browse all emotions
           </button>
@@ -183,7 +183,7 @@ export function EmotionSuggestion({
           className={`
             w-full py-3 px-4 rounded-lg font-medium
             ${selectedIds.size > 0
-              ? 'bg-[var(--color-accent)] text-white lift-primary'
+              ? 'bg-[var(--color-accent-fill)] text-white lift-primary'
               : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] cursor-not-allowed transition-colors'
             }
           `}

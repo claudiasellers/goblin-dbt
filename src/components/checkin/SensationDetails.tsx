@@ -56,7 +56,7 @@ export function SensationDetails({ x, y, region, onComplete, onCancel }: Sensati
             className={`
               py-2 px-4 rounded-full text-sm font-medium transition-all
               ${selectedTags.includes(tag)
-                ? 'bg-[var(--color-accent)] text-white'
+                ? 'bg-[var(--color-accent-fill)] text-white'
                 : 'bg-[var(--color-bg-elevated)] text-[var(--color-text-secondary)] lift-secondary'
               }
             `}
@@ -69,7 +69,7 @@ export function SensationDetails({ x, y, region, onComplete, onCancel }: Sensati
       <div className="space-y-3">
         <button
           onClick={handleComplete}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Add sensation
         </button>

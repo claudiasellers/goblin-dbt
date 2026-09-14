@@ -1,10 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
 import type { DearManContentResult, DearManDebriefContentResult, DearManReflectionResult } from '../../data/dearManTypes';
 import type { StateResult as StateResultType } from '../../services/neo4j';
 import { getEmotionByName } from '../../data/emotions';
 import { getToolById } from '../../data/tools';
+import { ToolLoadError } from '../../components/tools/ToolLoadError';
+import { ToolLoading } from '../../components/tools/ToolLoading';
 
 type Phase =
   | 'entry'
@@ -129,12 +131,20 @@ export function DearMan() {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(false);
 
-  // ── Load content from graph on mount ──
-  useEffect(() => {
+  // ── Load content from graph (on mount, and on explicit retry) ──
+  const loadInFlight = useRef(false);
+  const loadContent = useCallback(() => {
+    if (loadInFlight.current) return; // repeated retries can't overlap
+    loadInFlight.current = true;
+    setLoading(true);
+    setError(null);
     getDearManContent()
-      .then(data => { setContent(data); setLoading(false); })
-      .catch(() => { setError('Could not load. Please try again.'); setLoading(false); });
+      .then(data => { setContent(data); })
+      .catch(() => { setError("This tool couldn't load. Try again, or choose another tool."); })
+      .finally(() => { loadInFlight.current = false; setLoading(false); });
   }, []);
+
+  useEffect(() => { loadContent(); }, [loadContent]);
 
   // ── Pre-fill feelings from check-in emotions ──
   useEffect(() => {
@@ -188,20 +198,11 @@ export function DearMan() {
   }, [phase]);
 
   // ── Loading / Error states ──
-  if (loading) {
-    return (
-      <div className="text-center py-12">
-        <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4" />
-        <p className="text-[var(--color-text-secondary)]">Loading...</p>
-      </div>
-    );
+  if (loading && !content) {
+    return <ToolLoading label="Loading the conversation builder…" />;
   }
   if (error || !content) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-[var(--color-text-secondary)]">{error || 'Something went wrong.'}</p>
-      </div>
-    );
+    return <ToolLoadError onRetry={loadContent} retrying={loading} message={error ?? undefined} />;
   }
 
   // ── Helpers ──
@@ -253,9 +254,9 @@ export function DearMan() {
           key={i}
           className={`w-2 h-2 rounded-full transition-colors ${
             i === sceneStep
-              ? 'bg-[var(--color-accent)]'
+              ? 'bg-[var(--color-accent-fill)]'
               : i < sceneStep
-                ? 'bg-[var(--color-accent)] opacity-40'
+                ? 'bg-[var(--color-accent-fill)] opacity-40'
                 : 'bg-[var(--color-border)]'
           }`}
         />
@@ -468,7 +469,7 @@ export function DearMan() {
                   onClick={() => { setRelationshipType(r.id); setSceneStep(1); }}
                   className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
                     relationshipType === r.id
-                      ? 'bg-[var(--color-accent)] text-white border-transparent'
+                      ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
                       : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                   }`}
                 >
@@ -492,7 +493,7 @@ export function DearMan() {
                   onClick={() => { setSituationType(st.id); setSceneStep(2); }}
                   className={`w-full text-left p-4 rounded-xl border cursor-pointer transition-colors ${
                     situationType === st.id
-                      ? 'bg-[var(--color-accent)] text-white border-transparent'
+                      ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
                       : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] hover:border-[var(--color-border-accent)]'
                   }`}
                 >
@@ -552,7 +553,7 @@ export function DearMan() {
             <p className="text-sm text-[var(--color-text-muted)]">
               There&apos;s no wrong answer. This helps us focus advice on what you&apos;d protect if the conversation gets tough.
             </p>
-            <button onClick={() => setSceneStep(3)} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">Next</button>
+            <button onClick={() => setSceneStep(3)} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">Next</button>
           </div>
         )}
 
@@ -568,14 +569,14 @@ export function DearMan() {
                   <button key={b.id}
                     onClick={() => toggleChip(b.id, barriers, setBarriers)}
                     className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                      selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                      selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                     }`}>
                     {b.label}
                   </button>
                 );
               })}
             </div>
-            <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
               Let&apos;s build your script
             </button>
           </div>
@@ -598,7 +599,7 @@ export function DearMan() {
               onClick={() => { setDescribeId(opt.id); setShowDescribeCustom(false); setDescribeCustom(''); }}
               className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                 describeId === opt.id
-                  ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                   : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
               }`}>
               {opt.label}
@@ -618,9 +619,10 @@ export function DearMan() {
             className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-none" />
         )}
         <button onClick={() => setPhase('express')} disabled={!hasDescribe}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
           Next: How you feel
         </button>
+        {!hasDescribe && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Pick one above, or describe it yourself, to continue.</p>}
         {content.stepInsights.describe && (
           <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.describe}</p>
         )}
@@ -642,7 +644,7 @@ export function DearMan() {
               <button key={f.id}
                 onClick={() => toggleChip(f.id, feelings, setFeelings)}
                 className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                 }`}>
                 {f.label}
               </button>
@@ -662,9 +664,10 @@ export function DearMan() {
             className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
         )}
         <button onClick={() => setPhase('assert')} disabled={!hasExpress}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
           Next: What you need
         </button>
+        {!hasExpress && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Tap at least one feeling to continue.</p>}
         {content.stepInsights.express && (
           <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.express}</p>
         )}
@@ -696,7 +699,7 @@ export function DearMan() {
               onClick={() => { setAssertId(opt.id); setShowAssertCustom(false); if (!opt.hasPlaceholder) setAssertCustom(''); }}
               className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                 assertId === opt.id
-                  ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                   : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
               }`}>
               {opt.label}
@@ -730,9 +733,10 @@ export function DearMan() {
         )}
 
         <button onClick={() => setPhase('reinforce')} disabled={!hasAssert}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
           Next: Why it matters
         </button>
+        {!hasAssert && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Choose what you're asking for (and fill in any blank) to continue.</p>}
         {content.stepInsights.assert && (
           <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.assert}</p>
         )}
@@ -755,7 +759,7 @@ export function DearMan() {
               <button key={r.id}
                 onClick={() => toggleChip(r.id, reinforceIds, setReinforceIds)}
                 className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                 }`}>
                 {r.label}
               </button>
@@ -775,9 +779,10 @@ export function DearMan() {
             className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
         )}
         <button onClick={() => setPhase('mindful')} disabled={!hasReinforce}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
           Next: Getting ready
         </button>
+        {!hasReinforce && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Pick at least one reason to continue.</p>}
         {content.stepInsights.reinforce && (
           <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.reinforce}</p>
         )}
@@ -820,7 +825,7 @@ export function DearMan() {
             ))}
           </div>
         </div>
-        <button onClick={() => setPhase('confident')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+        <button onClick={() => setPhase('confident')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
           Almost there
         </button>
       </div>
@@ -839,7 +844,7 @@ export function DearMan() {
             <p className="text-sm text-[var(--color-text-secondary)] mt-3 italic">{content.confidentBarrierNoRight}</p>
           )}
         </div>
-        <button onClick={() => setPhase('negotiate')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+        <button onClick={() => setPhase('negotiate')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
           Last step
         </button>
       </div>
@@ -869,7 +874,7 @@ export function DearMan() {
                 onClick={() => { setMiddleGroundId(opt.id); setShowMiddleGroundCustom(false); setMiddleGroundCustom(''); }}
                 className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                   middleGroundId === opt.id
-                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                 }`}>
                 {opt.label}
@@ -899,7 +904,7 @@ export function DearMan() {
                 onClick={() => { setWalkAwayId(opt.id); setShowWalkAwayCustom(false); setWalkAwayCustom(''); }}
                 className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                   walkAwayId === opt.id
-                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                 }`}>
                 {opt.label}
@@ -920,7 +925,7 @@ export function DearMan() {
           )}
         </div>
 
-        <button onClick={() => setPhase('summary')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+        <button onClick={() => setPhase('summary')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
           See your plan
         </button>
       </div>
@@ -987,7 +992,7 @@ export function DearMan() {
 
           <div className="flex gap-3">
             <button onClick={handleSave} disabled={saving || saved}
-              className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
+              className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
               {saved ? 'Saved' : saving ? 'Saving...' : saveError ? 'Try again' : 'Save this plan'}
             </button>
             <button onClick={reset}
@@ -996,7 +1001,12 @@ export function DearMan() {
             </button>
           </div>
           {saveError && (
-            <p className="text-red-500 text-sm mt-2 text-center">Something went wrong saving your plan. Please try again.</p>
+            <p role="alert" className="text-[var(--color-danger)] text-sm mt-2 text-center">Your plan couldn't be saved. It's still here on this screen — you can try again.</p>
+          )}
+          {!saved && !saveError && (
+            <p className="text-xs text-[var(--color-text-tertiary)] mt-3 text-center">
+              Saving stores this plan with your account. Nothing is saved until you choose to.
+            </p>
           )}
         </div>
 
@@ -1104,7 +1114,7 @@ export function DearMan() {
               <button key={f.id}
                 onClick={() => toggleChip(f.id, debriefCurrentFeelings, setDebriefCurrentFeelings)}
                 className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                 }`}>
                 {f.label}
               </button>
@@ -1130,7 +1140,7 @@ export function DearMan() {
         )}
         {!highActivation && debriefCurrentFeelings.length > 0 && (
           <button onClick={() => setPhase('debrief-who')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1150,7 +1160,7 @@ export function DearMan() {
               onClick={() => { setDebriefRelationshipType(r.id); setPhase('debrief-overall'); }}
               className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
                 debriefRelationshipType === r.id
-                  ? 'bg-[var(--color-accent)] text-white border-transparent'
+                  ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
                   : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
               }`}>
               {r.label}
@@ -1179,7 +1189,7 @@ export function DearMan() {
               onClick={() => setDebriefOverall(opt.id)}
               className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                 debriefOverall === opt.id
-                  ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                   : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
               }`}>
               {opt.label}
@@ -1195,7 +1205,7 @@ export function DearMan() {
               if (debriefRelationshipType) setRelationshipType(debriefRelationshipType);
               setSceneStep(0); setPhase('scene');
             }}
-              className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+              className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
               Prepare for it
             </button>
             <button onClick={() => setPhase('debrief-moment')}
@@ -1206,7 +1216,7 @@ export function DearMan() {
         )}
         {debriefOverall && debriefOverall !== 'didnt_have' && (
           <button onClick={() => setPhase('debrief-moment')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1251,7 +1261,7 @@ export function DearMan() {
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                   selected
-                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                 }`}>
                 {tp.label}
@@ -1274,7 +1284,7 @@ export function DearMan() {
               setPhase('debrief-response');
             }
           }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1303,7 +1313,7 @@ export function DearMan() {
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                   selected
-                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                 }`}>
                 {mr.label}
@@ -1319,7 +1329,7 @@ export function DearMan() {
             }
             setPhase('debrief-body');
           }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1354,7 +1364,7 @@ export function DearMan() {
                   }
                 }}
                 className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                 }`}>
                 {bs.label}
               </button>
@@ -1368,7 +1378,7 @@ export function DearMan() {
         )}
         {bodySignalIds.length > 0 && (
           <button onClick={() => setPhase('debrief-thought')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1395,7 +1405,7 @@ export function DearMan() {
                   )}
                   className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                     selected
-                      ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                      ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                       : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                   }`}>
                   {tp.label}
@@ -1415,7 +1425,7 @@ export function DearMan() {
         </div>
         {thoughtPatternIds.length > 0 && (!thoughtPatternIds.includes('thought_something_else') || thoughtCustom.trim()) && (
           <button onClick={() => setPhase('debrief-underneath')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1449,7 +1459,7 @@ export function DearMan() {
                 }}
                 className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                   selected
-                    ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                 }`}>
                 {u.label}
@@ -1459,7 +1469,7 @@ export function DearMan() {
         </div>
         {underneathIds.length > 0 && (
           <button onClick={() => setPhase('debrief-reflection')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1523,7 +1533,7 @@ export function DearMan() {
               onClick={() => { setSelectedCopeAheadId(ca.id); setPhase('debrief-rehearsal'); }}
               className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                 selectedCopeAheadId === ca.id
-                  ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                   : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
               }`}>
               {ca.label}
@@ -1546,7 +1556,7 @@ export function DearMan() {
           <p className="text-[var(--color-text-primary)] leading-relaxed">{selectedCa.rehearsal}</p>
         </div>
         <button onClick={() => setPhase('debrief-moment-plan')}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
           I tried it
         </button>
       </div>
@@ -1570,12 +1580,12 @@ export function DearMan() {
         <button
           onClick={handleDebriefSave}
           disabled={debriefSaving || debriefSaved}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50">
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
           {debriefSaved ? 'Saved' : debriefSaving ? 'Saving...' : 'Save my moment plan'}
         </button>
         {debriefSaved && (
           <button onClick={() => setPhase('debrief-route')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Continue
           </button>
         )}
@@ -1637,7 +1647,7 @@ export function DearMan() {
               setSaved(false);
               setPhase('scene');
             }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary">
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
             Prepare to try again
           </button>
           <button onClick={() => navigate('/category/better-relationships')}

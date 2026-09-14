@@ -107,7 +107,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         {/* Single primary action */}
         <button
           onClick={handleBailoutComplete}
-          className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent)] text-white font-medium text-lg lift-primary"
+          className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary"
         >
           I did it
         </button>
@@ -169,7 +169,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         </p>
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Done
         </button>
@@ -228,7 +228,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
       <div className="space-y-3">
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Done
         </button>

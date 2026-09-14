@@ -47,7 +47,7 @@ function DayCell({
   return (
     <div
       className={`h-10 flex flex-col items-center justify-center rounded-md ${
-        isToday ? 'bg-[var(--color-accent)]/10' : ''
+        isToday ? 'bg-[var(--color-accent-fill)]/10' : ''
       }`}
     >
       <span

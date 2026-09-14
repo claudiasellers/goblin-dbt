@@ -268,7 +268,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
               transition: 'opacity 150ms ease',
             }}
           >
-            <span className="bg-[var(--color-accent)] text-white text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-md">
+            <span className="bg-[var(--color-accent-fill)] text-white text-xs font-medium px-2.5 py-1 rounded-lg whitespace-nowrap shadow-md">
               {hoveredRegion}
             </span>
           </div>
@@ -301,7 +301,7 @@ export function BodyMap({ onTap, onSkip, onComplete, sensations, isSomaticEntry 
         {sensations.length > 0 && (
           <button
             onClick={onComplete}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             {isSomaticEntry ? 'Help me identify my feelings' : 'Continue'}
           </button>

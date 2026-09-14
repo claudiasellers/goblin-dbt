@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { emotions, getEmotionById, getEmotionByName } from '../../data/emotions';
+import { getEmotionById, getEmotionByName } from '../../data/emotions';
+import { EmotionPicker } from '../../components/tools/EmotionPicker';
 import { getToolById } from '../../data/tools';
 import {
   getProblemSolveContent,
@@ -30,18 +31,6 @@ type Phase =
   | 'commit'
   | 'complete';
 
-const familyLabels: Record<string, string> = {
-  fearful: 'Fearful',
-  angry: 'Angry',
-  sad: 'Sad',
-  disgusted: 'Disgusted',
-  bad: 'Bad',
-  happy: 'Happy',
-  surprised: 'Surprised',
-};
-
-const familyOrder = ['fearful', 'angry', 'sad', 'disgusted', 'bad', 'happy', 'surprised'];
-
 export function ProblemSolve() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -57,8 +46,6 @@ export function ProblemSolve() {
   // Phase state
   const [phase, setPhase] = useState<Phase>('intro');
   const [selectedEmotionIds, setSelectedEmotionIds] = useState<string[]>(checkinEmotionIds ?? []);
-  const [search, setSearch] = useState('');
-  const [showPleasant, setShowPleasant] = useState(false);
 
   // Graph data
   const [psData, setPsData] = useState<ProblemSolveContent | null>(null);
@@ -107,7 +94,7 @@ export function ProblemSolve() {
       const hasApplicable = data.emotions.some(e => e.applicable);
       setPhase(hasApplicable ? 'readiness-check' : 'redirect');
     } catch {
-      setError('Could not load problem-solving content. Please try again.');
+      setError("This tool couldn't load. Try again, or choose another tool.");
       setPhase('identify');
     } finally {
       setLoading(false);
@@ -149,22 +136,6 @@ export function ProblemSolve() {
     [applicableParents]
   );
 
-  // Grouped emotions for identify phase
-  const grouped = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    const filtered = q
-      ? emotions.filter(e => e.name.toLowerCase().includes(q))
-      : emotions;
-    const unpleasant = ['fearful', 'angry', 'sad', 'disgusted', 'bad'];
-    const groups: Record<string, typeof emotions> = {};
-    for (const fam of familyOrder) {
-      if (!showPleasant && !q && !unpleasant.includes(fam)) continue;
-      const members = filtered.filter(e => e.family === fam);
-      if (members.length > 0) groups[fam] = members;
-    }
-    return groups;
-  }, [search, showPleasant]);
-
   // Decomposition aspects for selected problem type
   const decompositionAspects = useMemo((): DecompositionAspectData[] => {
     if (selectedProblemTypes.length > 0) {
@@ -178,12 +149,6 @@ export function ProblemSolve() {
 
   // ── Actions ──
 
-  const toggleEmotion = (id: string) => {
-    setSelectedEmotionIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-
   const continueFromIdentify = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -193,7 +158,7 @@ export function ProblemSolve() {
       const hasApplicable = data.emotions.some(e => e.applicable);
       setPhase(hasApplicable ? 'readiness-check' : 'redirect');
     } catch {
-      setError('Could not load problem-solving content. Please try again.');
+      setError("This tool couldn't load. Try again, or choose another tool.");
     } finally {
       setLoading(false);
     }
@@ -213,8 +178,6 @@ export function ProblemSolve() {
   const reset = () => {
     setPhase('intro');
     setSelectedEmotionIds([]);
-    setSearch('');
-    setShowPleasant(false);
     setPsData(null);
     setError(null);
     setProblemDescription('');
@@ -298,7 +261,7 @@ export function ProblemSolve() {
         </div>
         <button
           onClick={() => setPhase('identify')}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Let's start
         </button>
@@ -309,76 +272,13 @@ export function ProblemSolve() {
   // ─── IDENTIFY ───
   if (phase === 'identify') {
     return (
-      <div className="space-y-5">
-        <p className="text-[var(--color-text-secondary)]">
-          What are you feeling right now?{' '}
-          <span className="text-sm text-[var(--color-text-tertiary)]">Select all that apply.</span>
-        </p>
-
-        <input
-          type="text"
-          placeholder="Search emotions..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-        />
-
-        <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-          {Object.entries(grouped).map(([family, members]) => (
-            <div key={family}>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-2">
-                {familyLabels[family] ?? family}
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {members.map(e => {
-                  const selected = selectedEmotionIds.includes(e.id);
-                  return (
-                    <button
-                      key={e.id}
-                      onClick={() => toggleEmotion(e.id)}
-                      disabled={loading}
-                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
-                        selected
-                          ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
-                          : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-                      }`}
-                    >
-                      {e.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {!search && !showPleasant && (
-          <button
-            onClick={() => setShowPleasant(true)}
-            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
-          >
-            + Show pleasant emotions too
-          </button>
-        )}
-
-        {error && (
-          <p className="text-sm text-[var(--color-danger)]">{error}</p>
-        )}
-
-        {selectedEmotionIds.length > 0 && (
-          <button
-            onClick={continueFromIdentify}
-            disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50"
-          >
-            {loading
-              ? 'Loading...'
-              : `Continue with ${selectedEmotionIds.length === 1
-                  ? getEmotionById(selectedEmotionIds[0])?.name
-                  : `${selectedEmotionIds.length} emotions`}`}
-          </button>
-        )}
-      </div>
+      <EmotionPicker
+        selectedIds={selectedEmotionIds}
+        onChange={setSelectedEmotionIds}
+        onContinue={continueFromIdentify}
+        loading={loading}
+        error={error}
+      />
     );
   }
 
@@ -396,7 +296,7 @@ export function ProblemSolve() {
             <Link
               key={toolId}
               to={`/tool/${toolId}`}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
             >
               {toolName(toolId)}
             </Link>
@@ -420,7 +320,7 @@ export function ProblemSolve() {
         </div>
         <button
           onClick={goToDefine}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           I can think about this
         </button>
@@ -465,7 +365,7 @@ export function ProblemSolve() {
           <Link
             key={alt}
             to={`/tool/${alt}`}
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
           >
             Try {altNames[alt] ?? alt}
           </Link>
@@ -506,7 +406,7 @@ export function ProblemSolve() {
                     <Link
                       key={toolId}
                       to={`/tool/${toolId}`}
-                      className="py-2 px-3 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium lift-primary"
+                      className="py-2 px-3 rounded-lg bg-[var(--color-accent-fill)] text-white text-sm font-medium lift-primary"
                     >
                       {toolName(toolId)}
                     </Link>
@@ -568,7 +468,7 @@ export function ProblemSolve() {
                     )}
                     className={`w-full text-left p-4 rounded-lg border transition-colors ${
                       selected
-                        ? 'border-[var(--color-accent)] bg-[var(--color-accent)]/5'
+                        ? 'border-[var(--color-accent)] bg-[var(--color-accent-fill)]/5'
                         : 'border-[var(--color-border)] lift-secondary'
                     }`}
                   >
@@ -609,7 +509,7 @@ export function ProblemSolve() {
             {(selectedProblemTypes.length > 0 || problemDescription.trim()) && (
               <button
                 onClick={() => setPhase('barrier-assessment')}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
               >
                 Continue
               </button>
@@ -722,7 +622,7 @@ export function ProblemSolve() {
             <Link
               to={`/tool/${selectedSubResponse.redirectToolId}`}
               state={{ checkinEmotions: selectedEmotionIds }}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
             >
               {toolName(selectedSubResponse.redirectToolId)}
             </Link>
@@ -741,7 +641,7 @@ export function ProblemSolve() {
           {selectedSubResponse.triggersAmbivalenceExploration && (
             <button
               onClick={() => setPhase('ambivalence')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
             >
               Let's look at that
             </button>
@@ -750,7 +650,7 @@ export function ProblemSolve() {
           {selectedSubResponse.triggersConfidenceRuler && (
             <button
               onClick={() => setPhase('confidence-ruler')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
             >
               Let's find out
             </button>
@@ -762,7 +662,7 @@ export function ProblemSolve() {
                 setSolutionSizeHint(selectedSubResponse.solutionSizeHint);
                 setPhase('solutions');
               }}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
             >
               Show me some options
             </button>
@@ -850,7 +750,7 @@ export function ProblemSolve() {
 
           <button
             onClick={() => setPhase('solutions')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             Let's keep going
           </button>
@@ -923,7 +823,7 @@ export function ProblemSolve() {
           {confidenceLevel === 'high' && (
             <button
               onClick={() => setPhase('commit')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
             >
               I'm going to do it
             </button>
@@ -932,7 +832,7 @@ export function ProblemSolve() {
           {confidenceLevel === 'medium' && (
             <button
               onClick={() => { setSolutionSizeHint('small'); setPhase('solutions'); }}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
             >
               Show me the smallest version
             </button>
@@ -1005,7 +905,7 @@ export function ProblemSolve() {
               <Link
                 key={toolId}
                 to={`/tool/${toolId}`}
-                className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+                className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
               >
                 {toolName(toolId)}
               </Link>
@@ -1032,7 +932,7 @@ export function ProblemSolve() {
             <Link
               to="/tool/dear-man"
               state={{ checkinEmotions: selectedEmotionIds }}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
             >
               {toolName('dear-man')}
             </Link>
@@ -1063,7 +963,7 @@ export function ProblemSolve() {
           </div>
           <button
             onClick={() => setPhase('solutions')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             Let's work with that
           </button>
@@ -1107,7 +1007,7 @@ export function ProblemSolve() {
                           onClick={() => setAspectBuckets(prev => ({ ...prev, [aspect.id]: bucket }))}
                           className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-full border transition-colors ${
                             isSelected
-                              ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                              ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                               : isDefault
                                 ? 'border-[var(--color-accent)]/30 text-[var(--color-text-secondary)]'
                                 : 'border-[var(--color-border)] text-[var(--color-text-tertiary)]'
@@ -1126,7 +1026,7 @@ export function ProblemSolve() {
         {allAssigned && (
           <button
             onClick={() => setDecompositionDone(true)}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             Continue
           </button>
@@ -1267,7 +1167,7 @@ export function ProblemSolve() {
           {chosenSize && customStepText.trim() && (
             <button
               onClick={() => setPhase('complete')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
             >
               I'm going to do this
             </button>
@@ -1328,7 +1228,7 @@ export function ProblemSolve() {
         {chosenSize && (
           <button
             onClick={() => setPhase('complete')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             I'm going to do this
           </button>
@@ -1405,7 +1305,7 @@ export function ProblemSolve() {
           </button>
           <button
             onClick={() => navigate('/')}
-            className="py-2 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             Done
           </button>

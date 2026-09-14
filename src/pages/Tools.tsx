@@ -1,46 +1,66 @@
+import { Link } from 'react-router-dom';
 import { modules } from '../data/modules';
-import { getToolsByModule } from '../data/tools';
+import { getToolsByModule, intents } from '../data/tools';
 import { ToolCard } from '../components/ToolCard';
 
 export function Tools() {
+  // Only modules with at least one built tool appear in the actionable directory.
+  const populatedModules = modules
+    .map(mod => ({ mod, tools: getToolsByModule(mod.id) }))
+    .filter(({ tools }) => tools.length > 0);
+
   return (
-    <div>
+    <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
           Tools
         </h1>
         <p className="text-[var(--color-text-secondary)]">
-          Skills you can use right now
+          Skills you can use right now. No account needed.
         </p>
       </div>
 
-      {/* Module sections */}
-      <div className="space-y-8">
-        {modules.map(mod => {
-          const modTools = getToolsByModule(mod.id);
+      {/* Intent layer: plain-language needs → one tool each */}
+      <section aria-labelledby="intent-heading" className="mb-10">
+        <h2 id="intent-heading" className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3 px-1">
+          What do you need?
+        </h2>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {intents.map(intent => (
+            <li key={intent.id}>
+              <Link
+                to={`/tool/${intent.toolId}`}
+                className="flex items-center gap-3 min-h-14 px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] font-medium lift-card"
+              >
+                <span className="text-xl" aria-hidden="true">{intent.emoji}</span>
+                <span>{intent.label}</span>
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
 
-          return (
+      {/* Full directory, grouped by DBT module as secondary information */}
+      <section aria-labelledby="browse-heading">
+        <h2 id="browse-heading" className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-4 px-1">
+          Browse all tools
+        </h2>
+        <div className="space-y-8">
+          {populatedModules.map(({ mod, tools }) => (
             <div key={mod.id}>
-              <h2 className="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)] mb-3 px-1">
+              <h3 className="text-sm font-medium text-[var(--color-text-secondary)] mb-3 px-1">
                 {mod.name}
-              </h2>
-
-              {modTools.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {modTools.map(tool => (
-                    <ToolCard key={tool.id} tool={tool} />
-                  ))}
-                </div>
-              ) : (
-                <div className="p-4 rounded-xl border border-dashed border-[var(--color-border)] text-center">
-                  <span className="text-sm text-[var(--color-text-muted)]">Coming soon</span>
-                </div>
-              )}
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {tools.map(tool => (
+                  <ToolCard key={tool.id} tool={tool} />
+                ))}
+              </div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

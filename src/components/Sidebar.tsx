@@ -7,104 +7,121 @@ const navItems = [
   { path: '/history', label: 'Reflect', icon: HistoryIcon },
 ];
 
+export const SIDEBAR_WIDTH_CLASS = 'md:w-52';
+export const CONTENT_OFFSET_CLASS = 'md:ml-52';
+
+const desktopLinkClass = ({ isActive }: { isActive: boolean }) => `
+  relative flex items-center min-h-11 mx-2 px-3 rounded-lg transition-colors duration-150
+  ${isActive
+    ? 'bg-[var(--color-sidebar-active)] text-[var(--color-accent)] font-semibold'
+    : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-bg-card)]'
+  }
+`;
+
+const mobileLinkClass = ({ isActive }: { isActive: boolean }) => `
+  flex-1 flex flex-col items-center justify-center min-h-14 py-2 transition-colors
+  ${isActive
+    ? 'text-[var(--color-accent)] font-semibold'
+    : 'text-[var(--color-text-secondary)]'
+  }
+`;
+
+/**
+ * App navigation.
+ *
+ * Desktop (md+): a fixed, always-labeled sidebar. It never expands on hover,
+ * and DashboardLayout reserves matching space (CONTENT_OFFSET_CLASS) so it
+ * never covers content.
+ *
+ * Mobile (<md): a labeled bottom tab bar. DashboardLayout reserves bottom
+ * padding so content is never hidden behind it.
+ */
 export function Sidebar() {
   const { user } = useAuth();
 
   return (
     <>
-      {/* Desktop sidebar — fixed on the left */}
-      <aside className="hidden md:flex fixed left-0 top-0 bottom-0 w-16 hover:w-48 h-screen bg-[var(--color-glass-panel)] backdrop-blur-xl border-r border-[var(--color-glass-border)] flex-col z-40 transition-all duration-200 group overflow-hidden">
+      {/* Desktop sidebar — fixed on the left, labels always visible */}
+      <aside
+        className={`hidden md:flex fixed left-0 top-0 bottom-0 ${SIDEBAR_WIDTH_CLASS} h-screen bg-[var(--color-sidebar-bg)] border-r border-[var(--color-sidebar-border)] flex-col z-40`}
+      >
         {/* Logo */}
         <div className="flex items-center flex-shrink-0 h-16 px-4 border-b border-[var(--color-sidebar-border)]">
-          <span className="text-2xl flex-shrink-0">🌿</span>
-          <span className="ml-3 font-semibold text-[var(--color-text-primary)] whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+          <span className="text-2xl flex-shrink-0" aria-hidden="true">🌿</span>
+          <span className="ml-3 font-semibold text-[var(--color-text-primary)]">
             Goblin
           </span>
         </div>
 
         {/* Navigation — scrolls independently */}
-        <nav className="flex-1 min-h-0 overflow-y-auto py-4 flex flex-col gap-1">
+        <nav aria-label="Main" className="flex-1 min-h-0 overflow-y-auto py-4 flex flex-col gap-1">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === '/'}
-              className={({ isActive }) => `
-                flex items-center h-11 mx-2 px-3 rounded-lg transition-all duration-150
-                ${isActive
-                  ? 'bg-[var(--color-sidebar-active)] text-[var(--color-accent)]'
-                  : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-card)]'
-                }
-              `}
+              className={desktopLinkClass}
             >
-              <item.icon className="w-5 h-5 flex-shrink-0" />
-              <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                {item.label}
-              </span>
+              {({ isActive }) => (
+                <>
+                  {/* Non-color active indicator */}
+                  <span
+                    aria-hidden="true"
+                    className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-full ${isActive ? 'bg-[var(--color-accent)]' : 'bg-transparent'}`}
+                  />
+                  <item.icon className="w-5 h-5 flex-shrink-0" />
+                  <span className="ml-3 text-sm">{item.label}</span>
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
 
         {/* Bottom section: Profile */}
         <div className="flex-shrink-0 py-4 border-t border-[var(--color-sidebar-border)] flex flex-col gap-1">
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => `
-              flex items-center h-11 mx-2 px-3 rounded-lg transition-all duration-150
-              ${isActive
-                ? 'bg-[var(--color-sidebar-active)] text-[var(--color-accent)]'
-                : 'text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-card)]'
-              }
-            `}
-          >
-            {user ? (
-              <div className="w-5 h-5 rounded-full bg-[var(--color-accent)] flex items-center justify-center flex-shrink-0">
-                <span className="text-xs font-bold text-[var(--color-bg-primary)]">
-                  {(user.displayName || user.email || '?')[0].toUpperCase()}
-                </span>
-              </div>
-            ) : (
-              <ProfileIcon className="w-5 h-5 flex-shrink-0" />
+          <NavLink to="/profile" className={desktopLinkClass}>
+            {({ isActive }) => (
+              <>
+                <span
+                  aria-hidden="true"
+                  className={`absolute left-0 top-2 bottom-2 w-0.5 rounded-full ${isActive ? 'bg-[var(--color-accent)]' : 'bg-transparent'}`}
+                />
+                {user ? (
+                  <div className="w-5 h-5 rounded-full bg-[var(--color-accent-fill)] flex items-center justify-center flex-shrink-0" aria-hidden="true">
+                    <span className="text-xs font-bold text-[var(--color-on-accent)]">
+                      {(user.displayName || user.email || '?')[0].toUpperCase()}
+                    </span>
+                  </div>
+                ) : (
+                  <ProfileIcon className="w-5 h-5 flex-shrink-0" />
+                )}
+                <span className="ml-3 text-sm">Profile</span>
+              </>
             )}
-            <span className="ml-3 text-sm font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-              Profile
-            </span>
           </NavLink>
         </div>
       </aside>
 
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-sidebar-bg)] border-t border-[var(--color-sidebar-border)] z-40">
+      {/* Mobile bottom nav — always labeled */}
+      <nav
+        aria-label="Main"
+        className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-sidebar-bg)] border-t border-[var(--color-sidebar-border)] z-40"
+      >
         <div className="flex">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}
               end={item.path === '/'}
-              className={({ isActive }) => `
-                flex-1 flex flex-col items-center py-2.5 transition-colors
-                ${isActive
-                  ? 'text-[var(--color-accent)]'
-                  : 'text-[var(--color-text-muted)]'
-                }
-              `}
+              className={mobileLinkClass}
             >
               <item.icon className="w-5 h-5" />
-              <span className="text-[10px] font-medium mt-1">{item.label}</span>
+              <span className="text-[11px] font-medium mt-1">{item.label}</span>
             </NavLink>
           ))}
-          <NavLink
-            to="/profile"
-            className={({ isActive }) => `
-              flex-1 flex flex-col items-center py-2.5 transition-colors
-              ${isActive
-                ? 'text-[var(--color-accent)]'
-                : 'text-[var(--color-text-muted)]'
-              }
-            `}
-          >
+          <NavLink to="/profile" className={mobileLinkClass}>
             <ProfileIcon className="w-5 h-5" />
-            <span className="text-[10px] font-medium mt-1">Profile</span>
+            <span className="text-[11px] font-medium mt-1">Profile</span>
           </NavLink>
         </div>
       </nav>

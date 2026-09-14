@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { ExerciseProgress } from '../../components/tools/ExerciseProgress';
 
 const steps = [
   {
@@ -42,6 +43,10 @@ export function Pause() {
     }
   };
 
+  const handleBack = () => {
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
+  };
+
   const reset = () => {
     setCurrentStep(0);
     setResponses(['', '', '', '']);
@@ -60,25 +65,35 @@ export function Pause() {
         </p>
         <button
           onClick={reset}
-          className="py-2 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary"
+          className="py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary"
         >
           Start over
         </button>
+        <p className="mt-6 text-sm text-[var(--color-text-tertiary)]">
+          Nothing you wrote here is saved.
+        </p>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      <ExerciseProgress
+        current={currentStep + 1}
+        total={steps.length}
+        stageName={current.title}
+        onBack={currentStep > 0 ? handleBack : undefined}
+      />
+
       {/* STOP letters indicator */}
-      <div className="flex justify-center gap-2">
+      <div className="flex justify-center gap-2" aria-hidden="true">
         {steps.map((step, index) => (
           <div
             key={step.letter}
             className={`
               w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg transition-all
               ${index < currentStep
-                ? 'bg-[var(--color-accent)] text-white'
+                ? 'bg-[var(--color-accent-fill)] text-white'
                 : index === currentStep
                 ? 'bg-[var(--color-accent-hover)] text-white'
                 : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-muted)]'
@@ -108,10 +123,11 @@ export function Pause() {
         {/* Response input for O and P steps */}
         {(currentStep === 2 || currentStep === 3) && (
           <div className="mb-4">
-            <label className="block text-sm text-[var(--color-text-secondary)] mb-2">
-              {current.prompt}
+            <label htmlFor={`pause-response-${currentStep}`} className="block text-sm text-[var(--color-text-secondary)] mb-2">
+              {current.prompt} <span className="text-[var(--color-text-tertiary)]">(optional)</span>
             </label>
             <textarea
+              id={`pause-response-${currentStep}`}
               value={responses[currentStep]}
               onChange={(e) => {
                 const newResponses = [...responses];
@@ -120,14 +136,14 @@ export function Pause() {
               }}
               rows={3}
               className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-none"
-              placeholder="(optional)"
+              placeholder="Only if it helps to write it out"
             />
           </div>
         )}
 
         <button
           onClick={handleNext}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           {currentStep < steps.length - 1 ? `Next: ${steps[currentStep + 1].title}` : 'Done'}
         </button>

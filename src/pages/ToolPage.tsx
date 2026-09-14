@@ -60,10 +60,10 @@ export function ToolPage() {
       {/* Back link */}
       <Link
         to="/tools"
-        className="inline-flex items-center gap-1 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-6"
+        className="inline-flex items-center gap-1 min-h-11 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors mb-4"
       >
-        <span>←</span>
-        <span>Tools</span>
+        <span aria-hidden="true">←</span>
+        <span>All tools</span>
       </Link>
 
       {/* Tool header */}
@@ -107,9 +107,10 @@ export function ToolPage() {
       {/* DBT context (collapsible) */}
       {tool.dbtBasis && (
         <details className="group">
-          <summary className="cursor-pointer text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-            <span className="group-open:hidden">+ What this is based on</span>
-            <span className="hidden group-open:inline">− What this is based on</span>
+          <summary className="cursor-pointer inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors rounded">
+            <span aria-hidden="true" className="mr-1 group-open:hidden">+</span>
+            <span aria-hidden="true" className="mr-1 hidden group-open:inline">−</span>
+            What this is based on
           </summary>
           <div className="mt-2 p-4 rounded-lg bg-[var(--color-bg-elevated)]/50 text-sm text-[var(--color-text-secondary)]">
             <p>

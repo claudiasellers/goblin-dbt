@@ -44,7 +44,7 @@ function ComparisonBar({ current, previous, suffix = '' }: { current: number; pr
         </div>
         <div className="h-1.5 rounded-full bg-[var(--color-bg-elevated)] overflow-hidden">
           <div
-            className="h-full rounded-full bg-[var(--color-accent)] transition-all duration-700"
+            className="h-full rounded-full bg-[var(--color-accent-fill)] transition-all duration-700"
             style={{ width: `${(current / max) * 100}%` }}
           />
         </div>

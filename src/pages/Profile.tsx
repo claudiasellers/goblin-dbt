@@ -19,9 +19,9 @@ export function Profile() {
         </p>
         <a
           href="#/login"
-          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] font-semibold text-sm lift-primary"
+          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-bg-primary)] font-semibold text-sm lift-primary"
         >
-          Sign In
+          Sign in
         </a>
       </div>
     );
@@ -169,7 +169,7 @@ function BasicInfoSection({
           <button
             onClick={handleSave}
             disabled={saving || name === (displayName || '')}
-            className="px-4 py-2 rounded-lg bg-[var(--color-accent)] text-[var(--color-bg-primary)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-bg-primary)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
@@ -558,7 +558,7 @@ function ToggleRow({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative w-10 h-5.5 rounded-full transition-colors flex-shrink-0 ${
-          checked ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-border-accent)]'
+          checked ? 'bg-[var(--color-accent-fill)]' : 'bg-[var(--color-border-accent)]'
         }`}
       >
         <span

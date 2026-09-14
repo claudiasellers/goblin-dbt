@@ -63,7 +63,7 @@ export function Insights() {
         </p>
         <Link
           to="/"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-accent)] text-white text-sm font-medium lift-primary"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[var(--color-accent-fill)] text-white text-sm font-medium lift-primary"
         >
           Check in now
         </Link>

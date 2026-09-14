@@ -246,7 +246,7 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
           {search.trim() && !searchMatchesExisting && (
             <button
               onClick={handleAddCustom}
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-sm bg-[var(--color-accent)] text-white rounded-md lift-primary"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-sm bg-[var(--color-accent-fill)] text-white rounded-md lift-primary"
             >
               Add
             </button>
@@ -314,7 +314,7 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
           className={`
             flex-1 py-3 px-4 rounded-lg font-medium
             ${selectedEmotions.length > 0
-              ? 'bg-[var(--color-accent)] text-white lift-primary'
+              ? 'bg-[var(--color-accent-fill)] text-white lift-primary'
               : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] transition-colors'}
           `}
         >

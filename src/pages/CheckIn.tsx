@@ -67,31 +67,37 @@ export function CheckIn() {
   const [discriminatingQuestions, setDiscriminatingQuestions] = useState<DiscriminatingQuestion[]>([]);
   const [discriminatingAnswers, setDiscriminatingAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
 
-  // If not logged in, show prompt
+  // Signed-out entry: tools are available right now; an account only adds saved check-ins.
   if (!user) {
     return (
-      <div className="text-center py-12">
-        <span className="text-5xl mb-4 block">💭</span>
+      <div className="max-w-md mx-auto text-center py-12">
+        <span className="text-5xl mb-4 block" aria-hidden="true">🌿</span>
         <h1 className="text-2xl font-bold text-[var(--color-text-primary)] mb-2">
-          Check in with yourself
+          What would help right now?
         </h1>
         <p className="text-[var(--color-text-secondary)] mb-6">
-          Create an account to start tracking your emotions and body sensations.
+          Try a tool, or create an account to save your check-ins and notice patterns over time.
         </p>
         <div className="space-y-3">
           <Link
+            to="/tools"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
+          >
+            Find a tool
+          </Link>
+          <Link
             to="/signup"
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
           >
             Create account
           </Link>
-          <Link
-            to="/login"
-            className="block w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary"
-          >
-            Log in
-          </Link>
         </div>
+        <p className="mt-5 text-sm text-[var(--color-text-secondary)]">
+          Already have an account?{' '}
+          <Link to="/login" className="font-medium text-[var(--color-accent)] hover:underline">
+            Sign in
+          </Link>
+        </p>
       </div>
     );
   }
@@ -384,7 +390,7 @@ export function CheckIn() {
                 key={s}
                 className={`
                   h-1.5 rounded-full transition-all duration-300
-                  ${i <= currentStepIndex ? 'bg-[var(--color-accent)]' : 'bg-[var(--color-bg-secondary)]'}
+                  ${i <= currentStepIndex ? 'bg-[var(--color-accent-fill)]' : 'bg-[var(--color-bg-secondary)]'}
                   ${i === currentStepIndex ? 'w-8' : 'w-4'}
                 `}
               />
@@ -525,7 +531,7 @@ export function CheckIn() {
             <div className="space-y-3">
               <button
                 onClick={handleComplete}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
               >
                 Done
               </button>

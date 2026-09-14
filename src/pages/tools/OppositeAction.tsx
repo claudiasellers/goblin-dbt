@@ -1,6 +1,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { emotions, getEmotionById, getEmotionByName } from '../../data/emotions';
+import { getEmotionById, getEmotionByName } from '../../data/emotions';
+import { EmotionPicker } from '../../components/tools/EmotionPicker';
 import {
   getOppositeActionContent,
   recordToolOutcome,
@@ -19,18 +20,6 @@ type Phase =
   | 'show-opposites'
   | 'complete';
 
-const familyLabels: Record<string, string> = {
-  fearful: 'Fearful',
-  angry: 'Angry',
-  sad: 'Sad',
-  disgusted: 'Disgusted',
-  bad: 'Bad',
-  happy: 'Happy',
-  surprised: 'Surprised',
-};
-
-const familyOrder = ['fearful', 'angry', 'sad', 'disgusted', 'bad', 'happy', 'surprised'];
-
 export function OppositeAction() {
   const location = useLocation();
   const rawCheckinEmotions = (location.state as { checkinEmotions?: string[] } | null)?.checkinEmotions;
@@ -45,8 +34,6 @@ export function OppositeAction() {
 
   const [phase, setPhase] = useState<Phase>('intro');
   const [selectedEmotionIds, setSelectedEmotionIds] = useState<string[]>(checkinEmotionIds ?? []);
-  const [search, setSearch] = useState('');
-  const [showPleasant, setShowPleasant] = useState(false);
   const [selectedUrges, setSelectedUrges] = useState<ActionUrgeData[]>([]);
   const [customUrge, setCustomUrge] = useState('');
   const [showCustomInput, setShowCustomInput] = useState(false);
@@ -74,7 +61,7 @@ export function OppositeAction() {
         const hasApplicable = data.emotions.some(e => e.applicable);
         setPhase(hasApplicable ? 'name-urge' : 'redirect');
       } catch {
-        setError('Could not load opposite action data. Please try again.');
+        setError("This tool couldn't load. Try again, or choose another tool.");
         setPhase('identify');
       } finally {
         setLoading(false);
@@ -171,29 +158,7 @@ export function OppositeAction() {
   // All sizes chosen?
   const allSizesChosen = urgeOppositesList.length > 0 && urgeOppositesList.every(u => chosenSizes[u.key]);
 
-  // Grouped emotions for identify phase
-  const grouped = useMemo(() => {
-    const q = search.toLowerCase().trim();
-    const filtered = q
-      ? emotions.filter(e => e.name.toLowerCase().includes(q))
-      : emotions;
-    const unpleasant = ['fearful', 'angry', 'sad', 'disgusted', 'bad'];
-    const groups: Record<string, typeof emotions> = {};
-    for (const fam of familyOrder) {
-      if (!showPleasant && !q && !unpleasant.includes(fam)) continue;
-      const members = filtered.filter(e => e.family === fam);
-      if (members.length > 0) groups[fam] = members;
-    }
-    return groups;
-  }, [search, showPleasant]);
-
   // ── Actions ──
-
-  const toggleEmotion = (id: string) => {
-    setSelectedEmotionIds(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
 
   const toggleUrge = (urge: ActionUrgeData) => {
     setSelectedUrges(prev =>
@@ -212,7 +177,7 @@ export function OppositeAction() {
       const hasApplicable = data.emotions.some(e => e.applicable);
       setPhase(hasApplicable ? 'name-urge' : 'redirect');
     } catch {
-      setError('Could not load opposite action data. Please try again.');
+      setError("This tool couldn't load. Try again, or choose another tool.");
     } finally {
       setLoading(false);
     }
@@ -232,8 +197,6 @@ export function OppositeAction() {
   const reset = () => {
     setPhase('intro');
     setSelectedEmotionIds([]);
-    setSearch('');
-    setShowPleasant(false);
     setSelectedUrges([]);
     setCustomUrge('');
     setShowCustomInput(false);
@@ -281,7 +244,7 @@ export function OppositeAction() {
         </div>
         <button
           onClick={() => setPhase('identify')}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Let's start
         </button>
@@ -292,76 +255,13 @@ export function OppositeAction() {
   // ─── IDENTIFY ───
   if (phase === 'identify') {
     return (
-      <div className="space-y-5">
-        <p className="text-[var(--color-text-secondary)]">
-          What are you feeling right now?{' '}
-          <span className="text-sm text-[var(--color-text-tertiary)]">Select all that apply.</span>
-        </p>
-
-        <input
-          type="text"
-          placeholder="Search emotions..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
-        />
-
-        <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
-          {Object.entries(grouped).map(([family, members]) => (
-            <div key={family}>
-              <h4 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-2">
-                {familyLabels[family] ?? family}
-              </h4>
-              <div className="flex flex-wrap gap-2">
-                {members.map(e => {
-                  const selected = selectedEmotionIds.includes(e.id);
-                  return (
-                    <button
-                      key={e.id}
-                      onClick={() => toggleEmotion(e.id)}
-                      disabled={loading}
-                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
-                        selected
-                          ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
-                          : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-                      }`}
-                    >
-                      {e.name}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {!search && !showPleasant && (
-          <button
-            onClick={() => setShowPleasant(true)}
-            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
-          >
-            + Show pleasant emotions too
-          </button>
-        )}
-
-        {error && (
-          <p className="text-sm text-[var(--color-danger)]">{error}</p>
-        )}
-
-        {selectedEmotionIds.length > 0 && (
-          <button
-            onClick={continueFromIdentify}
-            disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50"
-          >
-            {loading
-              ? 'Loading...'
-              : `Continue with ${selectedEmotionIds.length === 1
-                  ? getEmotionById(selectedEmotionIds[0])?.name
-                  : `${selectedEmotionIds.length} emotions`}`}
-          </button>
-        )}
-      </div>
+      <EmotionPicker
+        selectedIds={selectedEmotionIds}
+        onChange={setSelectedEmotionIds}
+        onContinue={continueFromIdentify}
+        loading={loading}
+        error={error}
+      />
     );
   }
 
@@ -396,7 +296,7 @@ export function OppositeAction() {
           <Link
             key={alt}
             to={`/tool/${alt}`}
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
           >
             Try {altNames[alt] ?? alt}
           </Link>
@@ -452,7 +352,7 @@ export function OppositeAction() {
                   onClick={() => toggleUrge(urge)}
                   className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                     selected
-                      ? 'bg-[var(--color-accent)] border-[var(--color-accent)] text-white'
+                      ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                       : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                   }`}
                 >
@@ -484,7 +384,7 @@ export function OppositeAction() {
         {(selectedUrges.length > 0 || customUrge.trim()) && (
           <button
             onClick={goToCheckFacts}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             Continue
           </button>
@@ -550,7 +450,7 @@ export function OppositeAction() {
         <div className="space-y-2 pt-2 border-t border-[var(--color-border-subtle)]">
           <button
             onClick={goToOpposites}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             None of these — it's bigger than the situation
           </button>
@@ -597,7 +497,7 @@ export function OppositeAction() {
         <Link
           to="/tool/problem-solve"
           state={{ checkinEmotions: selectedEmotionIds }}
-          className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary text-center"
+          className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
         >
           Try Problem Solve instead
         </Link>
@@ -638,7 +538,7 @@ export function OppositeAction() {
               setParentOverrides(prev => ({ ...prev, shame: 'shame' }));
               setPhase('show-opposites');
             }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             Who I am as a person
           </button>
@@ -686,7 +586,7 @@ export function OppositeAction() {
           </button>
           <button
             onClick={() => setPhase('show-opposites')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             No, I didn't
           </button>
@@ -799,7 +699,7 @@ export function OppositeAction() {
         {allSizesChosen && (
           <button
             onClick={() => setPhase('complete')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
           >
             I'm going to do this
           </button>

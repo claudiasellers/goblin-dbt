@@ -77,14 +77,35 @@ export const tools: Tool[] = [
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
-    name: 'DEAR MAN',
-    tagline: 'Ask for what you need effectively',
+    name: 'Ask for what you need',
+    tagline: 'A step-by-step script for hard conversations (DEAR MAN)',
     description: 'A step-by-step framework: Describe the situation, Express feelings, Assert your need, Reinforce why it matters. Stay Mindful, Appear confident, Negotiate if needed.',
     whenToUse: 'When you need to ask for something important and want to be heard.',
     module: 'interpersonal-effectiveness',
     dbtBasis: 'DEAR MAN',
     emoji: '🗣️',
   },
+];
+
+/**
+ * Plain-language entry points. Each intent leads directly to an existing,
+ * appropriate tool — no assessment required. Presentation metadata only.
+ */
+export interface Intent {
+  id: string;
+  label: string;
+  toolId: string;
+  emoji: string;
+}
+
+export const intents: Intent[] = [
+  { id: 'calm-fast', label: 'Calm down fast', toolId: 'cool-down', emoji: '🧊' },
+  { id: 'pause', label: 'Pause before reacting', toolId: 'pause', emoji: '✋' },
+  { id: 'ground', label: 'Ground myself', toolId: 'five-senses', emoji: '👁️' },
+  { id: 'urge', label: 'Ride out an urge', toolId: 'urge-surfing', emoji: '🌊' },
+  { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
+  { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
+  { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
 ];
 
 export function getToolById(id: string): Tool | undefined {

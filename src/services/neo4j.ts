@@ -23,6 +23,9 @@ export interface BodySensationRecord {
   tags: string[];
 }
 
+/** Bounded timeout for content loads so a stalled request becomes a recoverable error. */
+const CONTENT_TIMEOUT_MS = 20_000;
+
 // Cloud Function references
 const saveCheckInFn = httpsCallable<
   Omit<CheckInRecord, 'id' | 'userId' | 'timestamp'> & { timestamp: string; activationPatternId?: string; confidence?: number },
@@ -314,7 +317,7 @@ export interface OppositeActionContent {
 const getOppositeActionContentFn = httpsCallable<
   { emotionIds: string[] },
   OppositeActionContent
->(functions, 'getOppositeActionContent');
+>(functions, 'getOppositeActionContent', { timeout: CONTENT_TIMEOUT_MS });
 
 /**
  * Get opposite action content for a set of emotions.
@@ -456,7 +459,7 @@ export interface ProblemSolveContent {
 const getProblemSolveContentFn = httpsCallable<
   { emotionIds: string[] },
   ProblemSolveContent
->(functions, 'getProblemSolveContent');
+>(functions, 'getProblemSolveContent', { timeout: CONTENT_TIMEOUT_MS });
 
 /**
  * Get problem solve content for a set of emotions.
@@ -601,7 +604,7 @@ import type { DearManContentResult, DearManSessionData, DearManDebriefContentRes
 export type { DearManContentResult, DearManSessionData, DearManDebriefContentResult, DearManReflectionResult };
 
 const getDearManContentFn = httpsCallable<void, DearManContentResult>(
-  functions, 'getDearManContent'
+  functions, 'getDearManContent', { timeout: CONTENT_TIMEOUT_MS }
 );
 
 /**
@@ -625,7 +628,7 @@ export async function saveDearManSession(
 }
 
 const getDearManDebriefContentFn = httpsCallable<void, DearManDebriefContentResult>(
-  functions, 'getDearManDebriefContent'
+  functions, 'getDearManDebriefContent', { timeout: CONTENT_TIMEOUT_MS }
 );
 
 export async function getDearManDebriefContent(): Promise<DearManDebriefContentResult> {

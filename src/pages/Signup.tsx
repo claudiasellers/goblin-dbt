@@ -47,7 +47,7 @@ export function Signup() {
             Create your account
           </h1>
           <p className="text-[var(--color-text-secondary)]">
-            Start tracking your emotional journey
+            Save your check-ins and notice patterns over time
           </p>
         </div>
 
@@ -115,9 +115,9 @@ export function Signup() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Creating account...' : 'Sign up'}
+            {loading ? 'Creating account...' : 'Create account'}
           </button>
         </form>
 
@@ -127,7 +127,7 @@ export function Signup() {
             to="/login" 
             className="text-[var(--color-text-secondary)] font-medium hover:underline"
           >
-            Log in
+            Sign in
           </Link>
         </p>
 

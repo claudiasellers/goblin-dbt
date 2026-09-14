@@ -81,7 +81,7 @@ export function UrgeSurfing() {
 
         <button
           onClick={startSurfing}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Start surfing 🌊
         </button>

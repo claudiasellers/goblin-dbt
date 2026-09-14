@@ -105,7 +105,7 @@ export function GuidedActivity({
     return (
       <div className="flex flex-col items-center justify-center min-h-[50vh] px-6 animate-fade-in">
         <div className={`mb-6 ${getVisualClass('completion_bloom')}`}>
-          <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] opacity-20" />
+          <div className="w-16 h-16 rounded-full bg-[var(--color-accent-fill)] opacity-20" />
         </div>
         <p className="text-lg text-[var(--color-text-secondary)] text-center font-medium leading-relaxed">
           {activity.completionMessage}
@@ -146,7 +146,7 @@ export function GuidedActivity({
       {currentStep.waitForTap && (
         <button
           onClick={handleTap}
-          className="w-full max-w-xs py-3.5 px-6 rounded-xl bg-[var(--color-accent)] text-white font-medium lift-primary mb-4"
+          className="w-full max-w-xs py-3.5 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium lift-primary mb-4"
         >
           Done
         </button>
@@ -159,9 +159,9 @@ export function GuidedActivity({
             key={i}
             className={`h-1.5 rounded-full transition-all duration-300 ${
               i < stepIndex
-                ? 'w-4 bg-[var(--color-accent)]'
+                ? 'w-4 bg-[var(--color-accent-fill)]'
                 : i === stepIndex
-                ? 'w-6 bg-[var(--color-accent)]'
+                ? 'w-6 bg-[var(--color-accent-fill)]'
                 : 'w-3 bg-[var(--color-bg-secondary)]'
             }`}
           />
@@ -208,7 +208,7 @@ function ActivityVisualElement({
   switch (visual) {
     case 'pulse':
       return (
-        <div className="w-12 h-12 rounded-full bg-[var(--color-accent)] opacity-30 animate-pulse" />
+        <div className="w-12 h-12 rounded-full bg-[var(--color-accent-fill)] opacity-30 animate-pulse" />
       );
     case 'breathing_circle':
       return (
@@ -216,7 +216,7 @@ function ActivityVisualElement({
       );
     case 'ripple':
       return (
-        <div className="w-12 h-12 rounded-full bg-[var(--color-accent)] opacity-20 animate-ripple" />
+        <div className="w-12 h-12 rounded-full bg-[var(--color-accent-fill)] opacity-20 animate-ripple" />
       );
     case 'color_shift':
       return (
@@ -232,7 +232,7 @@ function ActivityVisualElement({
       );
     case 'completion_bloom':
       return (
-        <div className="w-16 h-16 rounded-full bg-[var(--color-accent)] opacity-20 animate-bloom" />
+        <div className="w-16 h-16 rounded-full bg-[var(--color-accent-fill)] opacity-20 animate-bloom" />
       );
     default:
       return <div className="w-12 h-12" />;
