@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { getCheckInsByUser, getDearManSessions, type CheckInRecord, type DearManSessionRecord } from '../services/neo4j';
 import { quadrantColors } from '../data/emotions';
 import { HistoryInsights } from '../components/history/HistoryInsights';
@@ -8,11 +8,14 @@ import { Insights } from './Insights';
 
 export function History() {
   const { user } = useAuth();
+  const location = useLocation();
+  // Deep-link support: DEAR MAN's "See my plans" navigates here with { state: { tab: 'dearman' } }
+  const requestedTab = (location.state as { tab?: 'insights' | 'checkins' | 'dearman' } | null)?.tab;
   const [checkIns, setCheckIns] = useState<CheckInRecord[]>([]);
   const [dearManSessions, setDearManSessions] = useState<DearManSessionRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'insights' | 'checkins' | 'dearman'>('insights');
+  const [activeTab, setActiveTab] = useState<'insights' | 'checkins' | 'dearman'>(requestedTab ?? 'insights');
 
   useEffect(() => {
     async function fetchHistory() {
@@ -390,8 +393,18 @@ function DearManSessionCard({
               {session.describeCustom && (
                 <Detail label="Describe" value={session.describeCustom} />
               )}
-              {session.assertCustom && (
-                <Detail label="Assert" value={session.assertCustom} />
+              {(session.assertIds.length > 0 || session.assertCustom) && (
+                <Detail
+                  label="Asking for"
+                  value={[
+                    ...session.assertIds.map(id => {
+                      const detail = session.assertDetails[id]?.trim();
+                      const base = humanize(id);
+                      return detail ? `${base} (${detail})` : base;
+                    }),
+                    ...(session.assertCustom ? [session.assertCustom] : []),
+                  ].join('; ')}
+                />
               )}
               {session.feelings.length > 0 && (
                 <Detail label="Feelings" value={session.feelings.map(f => humanize(f, feelingLabels)).join(', ')} />
@@ -404,6 +417,14 @@ function DearManSessionCard({
               )}
               {session.priorities.length > 0 && (
                 <Detail label="Priorities" value={session.priorities.map(p => humanize(p, priorityLabels)).join(', ')} />
+              )}
+              {(session.barriers.length > 0 || session.barriersCustom) && (
+                <Detail
+                  label="What made it hard"
+                  value={session.barriersCustom
+                    ? session.barriersCustom.split('\n').filter(Boolean).join('; ')
+                    : session.barriers.map(b => humanize(b.replace(/^barrier_/, ''))).join('; ')}
+                />
               )}
             </>
           ) : (

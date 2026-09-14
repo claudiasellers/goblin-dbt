@@ -50,6 +50,20 @@ const priorityOptions = [
   { id: 'self-respect', label: 'Keeping my self-respect intact' },
 ];
 
+// Presentation-only: maps a feeling group's colorKey (from the graph) to a theme token
+const feelingGroupColors: Record<string, string> = {
+  pink: 'var(--color-tag-pink)',
+  rose: 'var(--color-q-hu-fill)',
+  orange: 'var(--color-tag-orange)',
+  blue: 'var(--color-q-lu-fill)',
+  purple: 'var(--color-tag-purple)',
+  teal: 'var(--color-tag-teal)',
+  neutral: 'var(--color-text-tertiary)',
+};
+
+const inputClass = 'w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]';
+const textareaClass = `${inputClass} resize-none`;
+
 const debriefOverallOptions = [
   { id: 'better', label: 'Better than I expected' },
   { id: 'mixed', label: 'Mixed' },
@@ -77,17 +91,21 @@ export function DearMan() {
   const [priorities, setPriorities] = useState<string[]>(priorityOptions.map(p => p.id));
   const [removedPriorities, setRemovedPriorities] = useState<string[]>([]);
   const [barriers, setBarriers] = useState<string[]>([]);
+  const [barriersCustom, setBarriersCustom] = useState('');
 
   // ── Script data (ID-based + custom escape hatches) ──
+  // Describe: the text box is always visible; tapping an option drops its text in as a template.
   const [describeId, setDescribeId] = useState<string | null>(null);
   const [describeCustom, setDescribeCustom] = useState('');
-  const [showDescribeCustom, setShowDescribeCustom] = useState(false);
 
   const [feelings, setFeelings] = useState<string[]>([]);
   const [feelingCustom, setFeelingCustom] = useState('');
   const [showFeelingCustom, setShowFeelingCustom] = useState(false);
+  const [showMirror, setShowMirror] = useState(false);
 
-  const [assertId, setAssertId] = useState<string | null>(null);
+  // Assert: multi-select, with an optional elaboration per selected option
+  const [assertIds, setAssertIds] = useState<string[]>([]);
+  const [assertDetails, setAssertDetails] = useState<Record<string, string>>({});
   const [assertCustom, setAssertCustom] = useState('');
   const [showAssertCustom, setShowAssertCustom] = useState(false);
 
@@ -97,6 +115,9 @@ export function DearMan() {
 
   // ── Prep data ──
   const [anchorPhrase, setAnchorPhrase] = useState('');
+  const [showAnchorGen, setShowAnchorGen] = useState(false);
+  const [anchorNeedId, setAnchorNeedId] = useState<string | null>(null);
+  const [anchorShowAll, setAnchorShowAll] = useState(false);
 
   const [middleGroundId, setMiddleGroundId] = useState<string | null>(null);
   const [middleGroundCustom, setMiddleGroundCustom] = useState('');
@@ -287,6 +308,28 @@ export function DearMan() {
     setter(selected.includes(id) ? selected.filter(x => x !== id) : [...selected, id]);
   };
 
+  // Barrier chips and the "What makes this hard?" text box stay in sync:
+  // tapping a chip adds its text as a line (or removes it), and typing a
+  // template's exact words lights up its chip.
+  const barrierLabel = (id: string) => content.barriers.find(b => b.id === id)?.label ?? '';
+  const toggleBarrier = (id: string) => {
+    const label = barrierLabel(id);
+    if (barriers.includes(id)) {
+      setBarriers(barriers.filter(x => x !== id));
+      setBarriersCustom(
+        barriersCustom.split('\n').filter(line => line.trim() !== label).join('\n').trim()
+      );
+    } else {
+      setBarriers([...barriers, id]);
+      const base = barriersCustom.trimEnd();
+      setBarriersCustom(base ? `${base}\n${label}` : label);
+    }
+  };
+  const handleBarriersText = (text: string) => {
+    setBarriersCustom(text);
+    setBarriers(content.barriers.filter(b => b.label && text.includes(b.label)).map(b => b.id));
+  };
+
   const getRelLabel = () =>
     relationshipTypes.find(r => r.id === relationshipType)?.label?.toLowerCase() ?? 'them';
 
@@ -297,12 +340,25 @@ export function DearMan() {
   const resolveLabel = (id: string | null, options: Array<{ id: string; label: string }>) =>
     options.find(o => o.id === id)?.label ?? '';
 
-  // Resolve selected describe text for summary
+  // Resolve describe text for summary — the (possibly edited) text box wins
   const resolveDescribe = () => {
+    if (describeCustom.trim()) return describeCustom.trim();
     if (describeId && situationType) {
       return resolveLabel(describeId, content.describeOptions[situationType] ?? []);
     }
-    return describeCustom;
+    return '';
+  };
+
+  // Mirroring text for the Express step: option-specific, else situation-level fallback
+  const resolveMirror = (): { text: string; feelingIds: string[] } | null => {
+    if (!situationType) return null;
+    const opt = describeId
+      ? (content.describeOptions[situationType] ?? []).find(o => o.id === describeId)
+      : undefined;
+    if (opt?.mirrorText) return { text: opt.mirrorText, feelingIds: opt.typicalFeelingIds ?? [] };
+    const sit = content.situationTypes.find(st => st.id === situationType);
+    if (sit?.mirrorText) return { text: sit.mirrorText, feelingIds: sit.typicalFeelingIds ?? [] };
+    return null;
   };
 
   // Resolve selected feelings for summary
@@ -312,18 +368,24 @@ export function DearMan() {
     return labels;
   };
 
-  // Resolve selected assert text for summary
-  const resolveAssert = () => {
-    if (assertId && situationType) {
-      const opt = (content.assertOptions[situationType] ?? []).find(o => o.id === assertId);
-      if (opt) {
-        if (opt.hasPlaceholder && assertCustom.trim()) {
-          return opt.label.replace(/\[.*?\]/g, assertCustom.trim());
-        }
-        return opt.label;
+  // Resolve every selected assert (with elaboration) for the summary
+  const resolveAsserts = (): string[] => {
+    const options = situationType ? (content.assertOptions[situationType] ?? []) : [];
+    const out: string[] = [];
+    for (const id of assertIds) {
+      const opt = options.find(o => o.id === id);
+      if (!opt) continue;
+      const detail = (assertDetails[id] ?? '').trim();
+      if (opt.hasPlaceholder && detail) {
+        out.push(opt.label.replace(/\[.*?\]/g, detail));
+      } else if (detail) {
+        out.push(`${opt.label} — ${detail}`);
+      } else {
+        out.push(opt.label);
       }
     }
-    return assertCustom;
+    if (assertCustom.trim()) out.push(assertCustom.trim());
+    return out;
   };
 
   // Resolve selected reinforcements for summary
@@ -343,15 +405,25 @@ export function DearMan() {
   const hasDescribe = describeId != null || describeCustom.trim().length > 0;
   // Can continue from express?
   const hasExpress = feelings.length > 0 || feelingCustom.trim().length > 0;
-  // Can continue from assert?
-  const hasAssert = (() => {
-    if (assertId) {
-      const opt = situationType ? (content.assertOptions[situationType] ?? []).find(o => o.id === assertId) : null;
-      if (opt?.hasPlaceholder) return assertCustom.trim().length > 0;
-      return true;
-    }
-    return assertCustom.trim().length > 0;
-  })();
+  // Can continue from assert? Every selected fill-in-the-blank option needs its blank filled.
+  const assertOptionsForSituation = situationType ? (content.assertOptions[situationType] ?? []) : [];
+  const assertBlankMissing = assertIds.some(id => {
+    const opt = assertOptionsForSituation.find(o => o.id === id);
+    return opt?.hasPlaceholder && !(assertDetails[id] ?? '').trim();
+  });
+  const hasAssert = !assertBlankMissing && (assertIds.length > 0 || assertCustom.trim().length > 0);
+
+  // Anchor phrases ranked by how well they match the barriers the user named
+  const barrierOverlap = (ids: string[] | undefined) =>
+    (ids ?? []).filter(id => barriers.includes(id)).length;
+  const rankedAnchorPhrases = [...content.anchorPhrases].sort(
+    (a, b) => barrierOverlap(b.barrierIds) - barrierOverlap(a.barrierIds)
+  );
+  const rankedAnchorNeeds = [...(content.anchorNeeds ?? [])].sort(
+    (a, b) => barrierOverlap(b.barrierIds) - barrierOverlap(a.barrierIds)
+  );
+  const phrasesForNeed = (needId: string) =>
+    rankedAnchorPhrases.filter(p => (p.needIds ?? []).includes(needId));
   // Can continue from reinforce?
   const hasReinforce = reinforceIds.length > 0 || reinforceCustom.trim().length > 0;
 
@@ -365,10 +437,13 @@ export function DearMan() {
         situationType: situationType || '',
         priorities,
         barriers,
+        barriersCustom,
         describeId,
         describeCustom,
         feelings,
-        assertId,
+        assertId: assertIds[0] ?? null,
+        assertIds,
+        assertDetails,
         assertCustom,
         reinforceIds,
         anchorPhrase,
@@ -393,12 +468,12 @@ export function DearMan() {
     setSituationType(null);
     setPriorities(priorityOptions.map(p => p.id));
     setRemovedPriorities([]);
-    setBarriers([]);
-    setDescribeId(null); setDescribeCustom(''); setShowDescribeCustom(false);
-    setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false);
-    setAssertId(null); setAssertCustom(''); setShowAssertCustom(false);
+    setBarriers([]); setBarriersCustom('');
+    setDescribeId(null); setDescribeCustom('');
+    setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false); setShowMirror(false);
+    setAssertIds([]); setAssertDetails({}); setAssertCustom(''); setShowAssertCustom(false);
     setReinforceIds([]); setReinforceCustom(''); setShowReinforceCustom(false);
-    setAnchorPhrase('');
+    setAnchorPhrase(''); setShowAnchorGen(false); setAnchorNeedId(null); setAnchorShowAll(false);
     setMiddleGroundId(null); setMiddleGroundCustom(''); setShowMiddleGroundCustom(false);
     setWalkAwayId(null); setWalkAwayCustom(''); setShowWalkAwayCustom(false);
     setDebriefOverall(null);
@@ -557,17 +632,22 @@ export function DearMan() {
           </div>
         )}
 
-        {/* Sub-step 3: Barriers (from graph) */}
+        {/* Sub-step 3: Barriers — free text first, curated options as a starting point */}
         {sceneStep === 3 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What makes this hard?</h3>
-            <p className="text-sm text-[var(--color-text-secondary)]">Pick everything that applies.</p>
+            <textarea rows={3} value={barriersCustom}
+              onChange={e => handleBarriersText(e.target.value)}
+              placeholder="Type your answer…"
+              className={textareaClass} />
+            <p className="text-sm text-[var(--color-text-secondary)]">Or, start with a template / select options:</p>
             <div className="flex flex-wrap gap-2">
               {content.barriers.map(b => {
                 const selected = barriers.includes(b.id);
                 return (
                   <button key={b.id}
-                    onClick={() => toggleChip(b.id, barriers, setBarriers)}
+                    onClick={() => toggleBarrier(b.id)}
+                    aria-pressed={selected}
                     className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
                       selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                     }`}>
@@ -592,11 +672,16 @@ export function DearMan() {
       <div className="space-y-6">
         <BackButton />
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What happened?</h3>
-        <p className="text-[var(--color-text-secondary)]">Pick the one that fits best.</p>
+        <textarea rows={3} value={describeCustom}
+          onChange={e => setDescribeCustom(e.target.value)}
+          placeholder="Type or answer… just the facts, like a camera would see it."
+          className={textareaClass} />
+        <p className="text-[var(--color-text-secondary)]">Or, start with a template / pick the one that fits best:</p>
         <div className="space-y-2">
           {options.map(opt => (
             <button key={opt.id}
-              onClick={() => { setDescribeId(opt.id); setShowDescribeCustom(false); setDescribeCustom(''); }}
+              onClick={() => { setDescribeId(opt.id); setDescribeCustom(opt.label); }}
+              aria-pressed={describeId === opt.id}
               className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                 describeId === opt.id
                   ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
@@ -606,23 +691,16 @@ export function DearMan() {
             </button>
           ))}
         </div>
-        {!showDescribeCustom ? (
-          <button onClick={() => { setShowDescribeCustom(true); setDescribeId(null); }}
-            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-            + None of these &mdash; I&apos;ll describe it myself
-          </button>
-        ) : (
-          <textarea rows={3} value={describeCustom}
-            onChange={e => setDescribeCustom(e.target.value)}
-            placeholder="Describe what happened..."
-            autoFocus
-            className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-none" />
+        {describeId && (
+          <p className="text-sm text-[var(--color-text-tertiary)]">
+            That&apos;s in the box above &mdash; edit it until it sounds like your situation.
+          </p>
         )}
         <button onClick={() => setPhase('express')} disabled={!hasDescribe}
           className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
           Next: How you feel
         </button>
-        {!hasDescribe && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Pick one above, or describe it yourself, to continue.</p>}
+        {!hasDescribe && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Write a line above, or pick a template, to continue.</p>}
         {content.stepInsights.describe && (
           <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.describe}</p>
         )}
@@ -632,25 +710,98 @@ export function DearMan() {
 
   // ─── EXPRESS ───
   if (phase === 'express') {
+    const mirror = resolveMirror();
+    const groups = content.feelingGroups ?? [];
+    // Group chips by their graph-assigned group; anything unassigned goes in a trailing "Other" bucket
+    const grouped: Array<{ id: string; label: string; color: string; chips: typeof content.feelingChips }> = groups.map(g => ({
+      id: g.id,
+      label: g.label,
+      color: feelingGroupColors[g.colorKey] ?? feelingGroupColors.neutral,
+      chips: content.feelingChips.filter(f => f.groupId === g.id),
+    })).filter(g => g.chips.length > 0);
+    const ungrouped = content.feelingChips.filter(f => !f.groupId || !groups.some(g => g.id === f.groupId));
+    if (ungrouped.length) {
+      grouped.push({ id: 'other', label: grouped.length ? 'Other' : '', color: feelingGroupColors.neutral, chips: ungrouped });
+    }
+    const typicalChips = mirror
+      ? mirror.feelingIds.map(id => content.feelingChips.find(f => f.id === id)).filter((f): f is typeof content.feelingChips[number] => f != null)
+      : [];
+    const colorFor = (chip: typeof content.feelingChips[number]) =>
+      grouped.find(g => g.chips.includes(chip))?.color ?? feelingGroupColors.neutral;
+
+    // Plain render helper (not a component) so chips don't remount on every state change
+    const renderFeelingChip = (chip: typeof content.feelingChips[number], color: string) => {
+      const selected = feelings.includes(chip.id);
+      return (
+        <button
+          key={chip.id}
+          onClick={() => toggleChip(chip.id, feelings, setFeelings)}
+          aria-pressed={selected}
+          style={selected
+            ? { backgroundColor: color, borderColor: 'transparent', color: '#fff' }
+            : { backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, borderColor: `color-mix(in srgb, ${color} 45%, transparent)` }}
+          className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+            selected ? '' : 'text-[var(--color-text-primary)] hover:brightness-95'
+          }`}>
+          {chip.label}
+        </button>
+      );
+    };
+
     return (
       <div className="space-y-6">
         <BackButton />
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How does this make you feel?</h3>
         <p className="text-[var(--color-text-secondary)]">Tap all that apply.</p>
-        <div className="flex flex-wrap gap-2">
-          {content.feelingChips.map(f => {
-            const selected = feelings.includes(f.id);
-            return (
-              <button key={f.id}
-                onClick={() => toggleChip(f.id, feelings, setFeelings)}
-                className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-                }`}>
-                {f.label}
-              </button>
-            );
-          })}
+
+        {/* Mirroring — an example of what this situation typically brings up */}
+        {mirror && (
+          <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
+            <button
+              onClick={() => setShowMirror(v => !v)}
+              aria-expanded={showMirror}
+              className="w-full text-left px-4 py-3 text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
+              {showMirror ? '−' : '+'} Not sure? See how this might typically make someone feel
+            </button>
+            {showMirror && (
+              <div className="px-4 pb-4 space-y-3">
+                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{mirror.text}</p>
+                {typicalChips.length > 0 && (
+                  <>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">Sound familiar? Tap any that fit</p>
+                    <div className="flex flex-wrap gap-2">
+                      {typicalChips.map(chip => renderFeelingChip(chip, colorFor(chip)))}
+                    </div>
+                    <button
+                      onClick={() => setFeelings(prev => Array.from(new Set([...prev, ...typicalChips.map(c => c.id)])))}
+                      className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                      + Add all of these
+                    </button>
+                  </>
+                )}
+                <p className="text-xs text-[var(--color-text-muted)]">This is what many people feel here &mdash; not what you&apos;re supposed to feel. Only keep what&apos;s true for you.</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Color-coded feeling groups */}
+        <div className="space-y-4">
+          {grouped.map(g => (
+            <div key={g.id} className="space-y-2">
+              {g.label && (
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                  <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: g.color }} />
+                  {g.label}
+                </p>
+              )}
+              <div className="flex flex-wrap gap-2">
+                {g.chips.map(chip => renderFeelingChip(chip, g.color))}
+              </div>
+            </div>
+          ))}
         </div>
+
         {!showFeelingCustom ? (
           <button onClick={() => setShowFeelingCustom(true)}
             className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
@@ -661,7 +812,7 @@ export function DearMan() {
             onChange={e => setFeelingCustom(e.target.value)}
             placeholder="I also feel..."
             autoFocus
-            className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+            className={inputClass} />
         )}
         <button onClick={() => setPhase('assert')} disabled={!hasExpress}
           className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
@@ -677,14 +828,14 @@ export function DearMan() {
 
   // ─── ASSERT ───
   if (phase === 'assert') {
-    const options = situationType ? (content.assertOptions[situationType] ?? []) : [];
-    const selectedOpt = options.find(o => o.id === assertId);
+    const options = assertOptionsForSituation;
     return (
       <div className="space-y-6">
         <BackButton />
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
           What specifically are you asking for &mdash; or saying no to?
         </h3>
+        <p className="text-[var(--color-text-secondary)]">Pick any that apply. You can add detail to each one.</p>
 
         {/* Barrier-specific coaching for guilty */}
         {barriers.includes('barrier_guilty') && content.assertBarrierGuilty && (
@@ -694,49 +845,71 @@ export function DearMan() {
         )}
 
         <div className="space-y-2">
-          {options.map(opt => (
-            <button key={opt.id}
-              onClick={() => { setAssertId(opt.id); setShowAssertCustom(false); if (!opt.hasPlaceholder) setAssertCustom(''); }}
-              className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                assertId === opt.id
-                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+          {options.map(opt => {
+            const selected = assertIds.includes(opt.id);
+            const detail = assertDetails[opt.id] ?? '';
+            const prompt = opt.hasPlaceholder
+              ? 'Fill in the blank:'
+              : (opt.elaboratePrompt || 'Want to add more detail? (optional)');
+            return (
+              <div key={opt.id} className={`rounded-lg border transition-colors ${
+                selected ? 'border-[var(--color-accent)] bg-[var(--color-accent-subtle)]' : 'border-[var(--color-border)]'
               }`}>
-              {opt.label}
-            </button>
-          ))}
+                <button
+                  onClick={() => toggleChip(opt.id, assertIds, setAssertIds)}
+                  aria-pressed={selected}
+                  className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                    selected ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] lift-secondary'
+                  }`}>
+                  <span className="flex items-start gap-3">
+                    <span aria-hidden="true" className={`mt-0.5 inline-flex w-5 h-5 shrink-0 items-center justify-center rounded-md border text-xs ${
+                      selected ? 'bg-[var(--color-accent-fill)] border-transparent text-white' : 'border-[var(--color-border)]'
+                    }`}>{selected ? '✓' : ''}</span>
+                    <span>{opt.label}</span>
+                  </span>
+                </button>
+                {selected && (
+                  <div className="px-4 pb-3 space-y-1.5">
+                    <label htmlFor={`assert-detail-${opt.id}`} className="block text-sm text-[var(--color-text-secondary)]">
+                      {prompt}
+                    </label>
+                    <textarea
+                      id={`assert-detail-${opt.id}`}
+                      rows={2}
+                      value={detail}
+                      onChange={e => setAssertDetails(prev => ({ ...prev, [opt.id]: e.target.value }))}
+                      placeholder={opt.hasPlaceholder ? 'Be specific...' : 'In your own words...'}
+                      className={textareaClass}
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Placeholder fill-in for selected option */}
-        {selectedOpt?.hasPlaceholder && (
-          <div className="space-y-2">
-            <p className="text-sm text-[var(--color-text-secondary)]">Fill in the specifics:</p>
-            <input type="text" value={assertCustom}
-              onChange={e => setAssertCustom(e.target.value)}
-              placeholder="Be specific..."
-              autoFocus
-              className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
-          </div>
-        )}
-
         {!showAssertCustom ? (
-          <button onClick={() => { setShowAssertCustom(true); setAssertId(null); setAssertCustom(''); }}
+          <button onClick={() => setShowAssertCustom(true)}
             className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-            + None of these &mdash; I&apos;ll say it myself
+            + Something else &mdash; I&apos;ll say it myself
           </button>
         ) : (
           <textarea rows={3} value={assertCustom}
             onChange={e => setAssertCustom(e.target.value)}
             placeholder="What are you asking for?"
             autoFocus
-            className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)] resize-none" />
+            className={textareaClass} />
         )}
 
         <button onClick={() => setPhase('reinforce')} disabled={!hasAssert}
           className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
           Next: Why it matters
         </button>
-        {!hasAssert && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Choose what you're asking for (and fill in any blank) to continue.</p>}
+        {!hasAssert && (
+          <p className="text-sm text-center text-[var(--color-text-tertiary)]">
+            {assertBlankMissing ? 'Fill in the blank on what you selected to continue.' : 'Choose at least one thing you’re asking for to continue.'}
+          </p>
+        )}
         {content.stepInsights.assert && (
           <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.assert}</p>
         )}
@@ -814,16 +987,95 @@ export function DearMan() {
           <input type="text" value={anchorPhrase}
             onChange={e => setAnchorPhrase(e.target.value)}
             placeholder="Your anchor phrase"
-            className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+            className={inputClass} />
+          {anchorPhrase && content.anchorGeneratorMakeItYours && (
+            <p className="text-xs text-[var(--color-text-muted)]">{content.anchorGeneratorMakeItYours}</p>
+          )}
+
+          {/* Quick picks: ranked by how well they match the barriers named earlier */}
           <p className="text-sm text-[var(--color-text-muted)]">Or pick one:</p>
           <div className="flex flex-wrap gap-2">
-            {content.anchorPhrases.map(a => (
+            {rankedAnchorPhrases.slice(0, 6).map(a => (
               <button key={a.id} onClick={() => setAnchorPhrase(a.label)}
-                className="px-3 py-1.5 text-sm rounded-full border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] transition-colors">
+                aria-pressed={anchorPhrase === a.label}
+                className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                  anchorPhrase === a.label
+                    ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
+                }`}>
                 {a.label}
               </button>
             ))}
           </div>
+
+          {/* Anchor phrase generator — inline sub-panel */}
+          {rankedAnchorNeeds.length > 0 && (
+            <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
+              <button
+                onClick={() => setShowAnchorGen(v => !v)}
+                aria-expanded={showAnchorGen}
+                className="w-full text-left px-4 py-3 text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
+                {showAnchorGen ? '\u2212' : '+'} Help me find my phrase
+              </button>
+              {showAnchorGen && (
+                <div className="px-4 pb-4 space-y-4">
+                  {content.anchorGeneratorIntro && (
+                    <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{content.anchorGeneratorIntro}</p>
+                  )}
+                  <div className="space-y-2">
+                    <p className="text-sm font-medium text-[var(--color-text-primary)]">When it gets hard, what do you most need to hear?</p>
+                    <div className="flex flex-wrap gap-2">
+                      {rankedAnchorNeeds.map(n => {
+                        const suggested = barrierOverlap(n.barrierIds) > 0;
+                        const selected = anchorNeedId === n.id;
+                        return (
+                          <button key={n.id}
+                            onClick={() => { setAnchorNeedId(n.id); setAnchorShowAll(false); }}
+                            aria-pressed={selected}
+                            className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                              selected
+                                ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
+                                : suggested
+                                  ? 'border-[var(--color-accent)] text-[var(--color-text-primary)] bg-[var(--color-accent-subtle)]'
+                                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
+                            }`}>
+                            {n.label}{suggested && !selected ? ' \u00b7 fits what you said' : ''}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {anchorNeedId && (() => {
+                    const matches = phrasesForNeed(anchorNeedId);
+                    const shown = anchorShowAll ? matches : matches.slice(0, 4);
+                    return (
+                      <div className="space-y-2">
+                        <p className="text-sm font-medium text-[var(--color-text-primary)]">Try one of these. Tap to use it, then edit it until it sounds like you.</p>
+                        {shown.length === 0 && (
+                          <p className="text-sm text-[var(--color-text-tertiary)]">Nothing matched yet &mdash; try another need, or write your own above.</p>
+                        )}
+                        <div className="space-y-2">
+                          {shown.map(pz => (
+                            <button key={pz.id}
+                              onClick={() => { setAnchorPhrase(pz.label); setShowAnchorGen(false); }}
+                              className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] lift-secondary hover:border-[var(--color-accent)] transition-colors">
+                              &ldquo;{pz.label}&rdquo;
+                            </button>
+                          ))}
+                        </div>
+                        {!anchorShowAll && matches.length > shown.length && (
+                          <button onClick={() => setAnchorShowAll(true)}
+                            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                            + Show {matches.length - shown.length} more
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+            </div>
+          )}
         </div>
         <button onClick={() => setPhase('confident')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
           Almost there
@@ -936,7 +1188,7 @@ export function DearMan() {
   if (phase === 'summary') {
     const describeText = resolveDescribe();
     const feelingsText = resolveFeelings();
-    const assertText = resolveAssert();
+    const assertTexts = resolveAsserts();
     const reinforceTexts = resolveReinforce();
     const mgText = resolveMiddleGround();
     const waText = resolveWalkAway();
@@ -960,7 +1212,13 @@ export function DearMan() {
 
           <div className="mb-4">
             <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">What I&apos;m Asking For</p>
-            <p className="text-[var(--color-text-primary)]">{assertText}</p>
+            {assertTexts.length === 1
+              ? <p className="text-[var(--color-text-primary)]">{assertTexts[0]}</p>
+              : (
+                <ul className="list-disc pl-5 space-y-1">
+                  {assertTexts.map((t, i) => <li key={i} className="text-[var(--color-text-primary)]">{t}</li>)}
+                </ul>
+              )}
           </div>
 
           <div className="mb-6">
@@ -1002,6 +1260,13 @@ export function DearMan() {
           </div>
           {saveError && (
             <p role="alert" className="text-[var(--color-danger)] text-sm mt-2 text-center">Your plan couldn't be saved. It's still here on this screen — you can try again.</p>
+          )}
+          {saved && (
+            <button
+              onClick={() => navigate('/history', { state: { tab: 'dearman' } })}
+              className="w-full mt-3 py-3 px-4 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] font-medium lift-secondary hover:bg-[var(--color-accent-subtle)] transition-colors">
+              See my plans &rarr;
+            </button>
           )}
           {!saved && !saveError && (
             <p className="text-xs text-[var(--color-text-tertiary)] mt-3 text-center">
@@ -1633,15 +1898,16 @@ export function DearMan() {
               const mappedBarriers = turningPointIds
                 .map(id => tpToBarrierMap[id])
                 .filter(Boolean);
-              if (mappedBarriers.length) setBarriers(mappedBarriers);
               // Reset prep-specific fields
               setSceneStep(0);
               setSituationType(null);
-              setDescribeId(null); setDescribeCustom(''); setShowDescribeCustom(false);
-              setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false);
-              setAssertId(null); setAssertCustom(''); setShowAssertCustom(false);
+              setBarriers(mappedBarriers);
+              setBarriersCustom(mappedBarriers.map(barrierLabel).filter(Boolean).join('\n'));
+              setDescribeId(null); setDescribeCustom('');
+              setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false); setShowMirror(false);
+              setAssertIds([]); setAssertDetails({}); setAssertCustom(''); setShowAssertCustom(false);
               setReinforceIds([]); setReinforceCustom(''); setShowReinforceCustom(false);
-              setAnchorPhrase('');
+              setAnchorPhrase(''); setShowAnchorGen(false); setAnchorNeedId(null); setAnchorShowAll(false);
               setMiddleGroundId(null); setMiddleGroundCustom(''); setShowMiddleGroundCustom(false);
               setWalkAwayId(null); setWalkAwayCustom(''); setShowWalkAwayCustom(false);
               setSaved(false);

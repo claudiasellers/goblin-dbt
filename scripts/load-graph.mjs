@@ -35,6 +35,7 @@ const LOAD_ORDER = [
   'problem-solve-data.cypher',                    // ProblemType / SolutionDirection / protocol
   'problem-solve-barriers.cypher',                // BarrierType / sub-responses / ambivalence
   'dear-man-content.cypher',
+  'dear-man-content-v2.cypher',            // feeling groups, mirroring, anchor generator
   'dear-man-debrief-content.cypher',
   'discriminating-questions.cypher',
   'pattern-co-occurrence.cypher',

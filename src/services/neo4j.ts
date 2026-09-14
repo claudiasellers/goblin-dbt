@@ -657,10 +657,13 @@ export interface DearManSessionRecord {
   situationType: string;
   priorities: string[];
   barriers: string[];
+  barriersCustom: string;
   describeId: string | null;
   describeCustom: string;
   feelings: string[];
   assertId: string | null;
+  assertIds: string[];
+  assertDetails: Record<string, string>;
   assertCustom: string;
   reinforceIds: string[];
   anchorPhrase: string;

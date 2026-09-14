@@ -2047,23 +2047,26 @@ export const getDearManContent = onCall(
       const sitResult = await session.run(`
         MATCH (s:DearManSituationType)
         RETURN s.id AS id, s.label AS label, s.sublabel AS sublabel,
-               s.emoji AS emoji, s.sortOrder AS sortOrder
+               s.emoji AS emoji, s.sortOrder AS sortOrder,
+               s.mirrorText AS mirrorText, s.typicalFeelingIds AS typicalFeelingIds
         ORDER BY s.sortOrder
       `);
 
-      // 2. Describe options with situation type
+      // 2. Describe options with situation type (+ mirroring text)
       const descResult = await session.run(`
         MATCH (d:DearManDescribeOption)-[:FOR_SITUATION]->(s:DearManSituationType)
         RETURN d.id AS id, d.label AS label, d.sortOrder AS sortOrder,
-               s.id AS situationId
+               s.id AS situationId,
+               d.mirrorText AS mirrorText, d.typicalFeelingIds AS typicalFeelingIds
         ORDER BY d.sortOrder
       `);
 
-      // 3. Assert options with situation type
+      // 3. Assert options with situation type (+ elaboration prompt)
       const assertResult = await session.run(`
         MATCH (a:DearManAssertOption)-[:FOR_SITUATION]->(s:DearManSituationType)
         RETURN a.id AS id, a.label AS label, a.hasPlaceholder AS hasPlaceholder,
-               a.sortOrder AS sortOrder, s.id AS situationId
+               a.sortOrder AS sortOrder, s.id AS situationId,
+               a.elaboratePrompt AS elaboratePrompt
         ORDER BY a.sortOrder
       `);
 
@@ -2088,11 +2091,19 @@ export const getDearManContent = onCall(
         RETURN c.title AS title, c.body AS body
       `);
 
-      // 7. Anchor phrases
+      // 7. Anchor phrases (tagged by need + barrier for the generator)
       const anchorResult = await session.run(`
         MATCH (a:DearManAnchorPhrase)
-        RETURN a.id AS id, a.label AS label
+        RETURN a.id AS id, a.label AS label,
+               a.needIds AS needIds, a.barrierIds AS barrierIds
         ORDER BY a.sortOrder
+      `);
+
+      // 7b. Anchor needs ("what do you need to hear when it gets hard?")
+      const needResult = await session.run(`
+        MATCH (n:DearManAnchorNeed)
+        RETURN n.id AS id, n.label AS label, n.barrierIds AS barrierIds
+        ORDER BY n.sortOrder
       `);
 
       // 8. Negotiate options
@@ -2102,11 +2113,19 @@ export const getDearManContent = onCall(
         ORDER BY n.sortOrder
       `);
 
-      // 9. Feeling chips
+      // 9. Feeling chips (+ color-coded group)
       const feelResult = await session.run(`
         MATCH (f:DearManFeelingChip)
-        RETURN f.id AS id, f.label AS label
+        OPTIONAL MATCH (f)-[:IN_GROUP]->(g:DearManFeelingGroup)
+        RETURN f.id AS id, f.label AS label, g.id AS groupId
         ORDER BY f.sortOrder
+      `);
+
+      // 9b. Feeling groups
+      const groupResult = await session.run(`
+        MATCH (g:DearManFeelingGroup)
+        RETURN g.id AS id, g.label AS label, g.colorKey AS colorKey
+        ORDER BY g.sortOrder
       `);
 
       // 10. Step insights
@@ -2131,7 +2150,9 @@ export const getDearManContent = onCall(
                tc.assertBarrierGuilty AS assertBarrierGuilty,
                tc.negotiateHintObjective AS hintObjective,
                tc.negotiateHintRelationship AS hintRelationship,
-               tc.negotiateHintSelfRespect AS hintSelfRespect
+               tc.negotiateHintSelfRespect AS hintSelfRespect,
+               tc.anchorGeneratorIntro AS anchorGeneratorIntro,
+               tc.anchorGeneratorMakeItYours AS anchorGeneratorMakeItYours
       `);
 
       // --- Shape the response ---
@@ -2142,9 +2163,11 @@ export const getDearManContent = onCall(
         sublabel: r.get('sublabel'),
         emoji: r.get('emoji'),
         sortOrder: toNumber(r.get('sortOrder')) ?? 0,
+        mirrorText: r.get('mirrorText') ?? '',
+        typicalFeelingIds: (r.get('typicalFeelingIds') as string[] | null) ?? [],
       }));
 
-      const describeOptions: Record<string, Array<{ id: string; label: string; sortOrder: number }>> = {};
+      const describeOptions: Record<string, Array<{ id: string; label: string; sortOrder: number; mirrorText: string; typicalFeelingIds: string[] }>> = {};
       for (const r of descResult.records) {
         const sitId = r.get('situationId');
         if (!describeOptions[sitId]) describeOptions[sitId] = [];
@@ -2152,10 +2175,12 @@ export const getDearManContent = onCall(
           id: r.get('id'),
           label: r.get('label'),
           sortOrder: toNumber(r.get('sortOrder')) ?? 0,
+          mirrorText: r.get('mirrorText') ?? '',
+          typicalFeelingIds: (r.get('typicalFeelingIds') as string[] | null) ?? [],
         });
       }
 
-      const assertOptions: Record<string, Array<{ id: string; label: string; hasPlaceholder: boolean; sortOrder: number }>> = {};
+      const assertOptions: Record<string, Array<{ id: string; label: string; hasPlaceholder: boolean; sortOrder: number; elaboratePrompt: string }>> = {};
       for (const r of assertResult.records) {
         const sitId = r.get('situationId');
         if (!assertOptions[sitId]) assertOptions[sitId] = [];
@@ -2164,6 +2189,7 @@ export const getDearManContent = onCall(
           label: r.get('label'),
           hasPlaceholder: r.get('hasPlaceholder') ?? false,
           sortOrder: toNumber(r.get('sortOrder')) ?? 0,
+          elaboratePrompt: r.get('elaboratePrompt') ?? '',
         });
       }
 
@@ -2199,6 +2225,14 @@ export const getDearManContent = onCall(
       const anchorPhrases = anchorResult.records.map((r: Neo4jRecord) => ({
         id: r.get('id'),
         label: r.get('label'),
+        needIds: (r.get('needIds') as string[] | null) ?? [],
+        barrierIds: (r.get('barrierIds') as string[] | null) ?? [],
+      }));
+
+      const anchorNeeds = needResult.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        label: r.get('label'),
+        barrierIds: (r.get('barrierIds') as string[] | null) ?? [],
       }));
 
       const middleGround: Array<{ id: string; label: string }> = [];
@@ -2212,6 +2246,13 @@ export const getDearManContent = onCall(
       const feelingChips = feelResult.records.map((r: Neo4jRecord) => ({
         id: r.get('id'),
         label: r.get('label'),
+        groupId: r.get('groupId') ?? null,
+      }));
+
+      const feelingGroups = groupResult.records.map((r: Neo4jRecord) => ({
+        id: r.get('id'),
+        label: r.get('label'),
+        colorKey: r.get('colorKey') ?? 'neutral',
       }));
 
       const stepInsights: Record<string, string> = {};
@@ -2238,6 +2279,9 @@ export const getDearManContent = onCall(
         barrierCoaching,
         defaultCoaching,
         anchorPhrases,
+        anchorNeeds,
+        anchorGeneratorIntro: tc?.get('anchorGeneratorIntro') ?? '',
+        anchorGeneratorMakeItYours: tc?.get('anchorGeneratorMakeItYours') ?? '',
         negotiateOptions: { middleGround, walkAway },
         negotiateHints: {
           objective: tc?.get('hintObjective') ?? '',
@@ -2245,6 +2289,7 @@ export const getDearManContent = onCall(
           'self-respect': tc?.get('hintSelfRespect') ?? '',
         },
         feelingChips,
+        feelingGroups,
         stepInsights,
         debriefOptions: { wentWell, toChange },
         revealText: tc?.get('revealText') ?? '',
@@ -2267,10 +2312,13 @@ interface DearManSessionData {
   situationType: string;
   priorities: string[];
   barriers: string[];
+  barriersCustom?: string;
   describeId: string | null;
   describeCustom: string;
   feelings: string[];
   assertId: string | null;
+  assertIds?: string[];
+  assertDetails?: Record<string, string>;
   assertCustom: string;
   reinforceIds: string[];
   anchorPhrase: string;
@@ -2313,10 +2361,13 @@ export const saveDearManSession = onCall(
           situationType: $situationType,
           priorities: $priorities,
           barriers: $barriers,
+          barriersCustom: $barriersCustom,
           describeId: $describeId,
           describeCustom: $describeCustom,
           feelings: $feelings,
           assertId: $assertId,
+          assertIds: $assertIds,
+          assertDetailsJson: $assertDetailsJson,
           assertCustom: $assertCustom,
           reinforceIds: $reinforceIds,
           anchorPhrase: $anchorPhrase,
@@ -2347,10 +2398,14 @@ export const saveDearManSession = onCall(
           situationType: data.situationType || '',
           priorities: data.priorities || [],
           barriers: data.barriers || [],
+          barriersCustom: data.barriersCustom || '',
           describeId: data.describeId || null,
           describeCustom: data.describeCustom || '',
           feelings: data.feelings || [],
           assertId: data.assertId || null,
+          assertIds: data.assertIds || [],
+          // Neo4j properties can't hold maps — store per-option detail as JSON
+          assertDetailsJson: JSON.stringify(data.assertDetails || {}),
           assertCustom: data.assertCustom || '',
           reinforceIds: data.reinforceIds || [],
           anchorPhrase: data.anchorPhrase || '',
@@ -2628,6 +2683,16 @@ export const getQuickTools = onCall(
  * Get saved DEAR MAN sessions for the authenticated user.
  * Returns sessions sorted by createdAt descending.
  */
+function parseJsonObject(raw: unknown): Record<string, string> {
+  if (typeof raw !== 'string' || !raw) return {};
+  try {
+    const parsed = JSON.parse(raw);
+    return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
 export const getDearManSessions = onCall(
   { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
   async (request) => {
@@ -2649,10 +2714,13 @@ export const getDearManSessions = onCall(
                s.situationType AS situationType,
                s.priorities AS priorities,
                s.barriers AS barriers,
+               s.barriersCustom AS barriersCustom,
                s.describeId AS describeId,
                s.describeCustom AS describeCustom,
                s.feelings AS feelings,
                s.assertId AS assertId,
+               s.assertIds AS assertIds,
+               s.assertDetailsJson AS assertDetailsJson,
                s.assertCustom AS assertCustom,
                s.reinforceIds AS reinforceIds,
                s.anchorPhrase AS anchorPhrase,
@@ -2678,10 +2746,13 @@ export const getDearManSessions = onCall(
         situationType: r.get('situationType') || '',
         priorities: r.get('priorities') || [],
         barriers: r.get('barriers') || [],
+        barriersCustom: r.get('barriersCustom') || '',
         describeId: r.get('describeId'),
         describeCustom: r.get('describeCustom') || '',
         feelings: r.get('feelings') || [],
         assertId: r.get('assertId'),
+        assertIds: r.get('assertIds') || [],
+        assertDetails: parseJsonObject(r.get('assertDetailsJson')),
         assertCustom: r.get('assertCustom') || '',
         reinforceIds: r.get('reinforceIds') || [],
         anchorPhrase: r.get('anchorPhrase') || '',
