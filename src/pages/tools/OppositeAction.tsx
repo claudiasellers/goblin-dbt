@@ -361,6 +361,7 @@ export function OppositeAction() {
           </p>
         </Card>
         <EmotionPicker
+          selectionMode="single"
           selectedIds={ids}
           onChange={(newIds) =>
             setIds(
