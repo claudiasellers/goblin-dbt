@@ -11,12 +11,13 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 ## Architecture
 
-**Three-tier: React frontend → Firebase Cloud Functions → Neo4j graph database**
+**Three-tier: React frontend → Firebase Cloud Functions → Neo4j + Firestore**
 
 - **Frontend** (`/src`): React 19 + TypeScript + Vite + Tailwind CSS. Uses HashRouter. State managed via Context API (`AuthContext`, `UserProfileContext`) — no Redux.
 - **Auth** Firebase Authentication (email/password)
-- **Cloud Functions** (`/functions/src/index.ts`): All backend logic in a single file (~1074 lines). Handles check-ins, user management, analysis/recommendations, and tool usage tracking. Neo4j driver uses lazy singleton pattern. User IDs extracted from Firebase Auth tokens server-side.
-- **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
+- **Cloud Functions** (`/functions/src/index.ts`): All backend logic in a single file. The join layer between user data (Firestore) and domain knowledge (Neo4j). User IDs extracted from Firebase Auth tokens server-side.
+- **User Data** (Firestore): All per-user behavioral data — check-ins, tool usage, DEAR MAN sessions, user profiles. Stored in `users/{userId}/` subcollections. This is time-series data that grows per user.
+- **Knowledge Graph** (`/schema/*.cypher`): Neo4j Aura — **read-only domain knowledge**. Emotions, brain structures, activation patterns, therapy concepts, tools, and their scientific relationships. Think of it as the "textbook." No user data lives here.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
 - **Deployment** firebase deploy
@@ -24,11 +25,13 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 ## Key Architecture Decisions
 
-1. **The frontend never connects to Neo4j directly.** All graph queries go through Firebase Cloud Functions. Neo4j credentials are stored as Firebase secrets (`NEO4J_URI`, `NEO4J_USER`, `NEO4J_PASSWORD`) and never exposed to the browser.
+1. **Two data stores, one join layer.** User data lives in Firestore (check-ins, tool usage, profiles). Domain knowledge lives in Neo4j (emotions, patterns, tools, brain structures). Cloud Functions query both and marry them at response time. The frontend never touches either database directly.
 
-2. **User identity is handled by Firebase Auth.** Cloud Functions extract the user ID from `request.auth.uid` — the frontend never sends user IDs as parameters.
+2. **Neo4j is a read-only knowledge graph.** It has zero user data. It's the "textbook" — static, science-backed domain knowledge that doesn't change because a user checked in. Neo4j credentials are stored as Firebase secrets and only used by knowledge-graph Cloud Functions.
 
-3. **The knowledge graph powers recommendations.** Check-in data → emotion nodes → brain structures (via `ACTIVATES_DURING`) → activation patterns → therapy concepts (via `MODULATES`) → tools (via `IMPLEMENTS`). This is the core traversal that makes the app work.
+3. **User identity is handled by Firebase Auth.** Cloud Functions extract the user ID from `request.auth.uid` — the frontend never sends user IDs as parameters.
+
+4. **The knowledge graph powers recommendations.** Check-in data → emotion nodes → brain structures (via `ACTIVATES_DURING`) → activation patterns → therapy concepts (via `MODULATES`) → tools (via `IMPLEMENTS`). This is the core traversal that makes the app work.
 
 4. **Incremental schema loading with MERGE.** All Cypher scripts use `MERGE` instead of `CREATE` so they're idempotent — safe to re-run without duplicating data. Properties are overwritten via `SET` after `MERGE`.
 
@@ -46,19 +49,35 @@ Tool names, emojis, taglines, category labels, descriptions, route mappings. Thi
 
 **The test:** Does this data describe *how to display something*? → `src/data/`
 
-### Neo4j graph (via Cloud Functions only) — All emotion and clinical knowledge
+### Firestore (`users/{userId}/...`) — All per-user data
 
-Relational, contextual knowledge that needs to be traversed or queried based on user state. The graph earns its keep when the answer requires following connections: emotion → brain structure → therapy concept → tool.
+Check-ins, tool usage, DEAR MAN sessions, user profiles. This is time-series behavioral data that grows per user and is queried by time range, sorted by date, aggregated for insights.
+
+**The test:** Does this data belong to *a specific user*? → Firestore.
+
+**Collections:**
+- `users/{userId}` — profile settings (theme, reminders, goals)
+- `users/{userId}/checkIns/{id}` — emotion, quadrant, intensity, body sensations (as array), activation pattern ID
+- `users/{userId}/toolUsages/{id}` — tool ID, outcome, linked check-in ID
+- `users/{userId}/dearManSessions/{id}` — all session fields
+
+### Neo4j graph (via Cloud Functions only) — Domain knowledge ONLY
+
+Relational, contextual knowledge that needs to be traversed or queried based on user state. The graph earns its keep when the answer requires following connections: emotion → brain structure → therapy concept → tool. **No user data lives here.**
 
 **The test:** Does this data describe *what an emotion IS* or *what to DO about it*? → Graph.
 
-### Cloud Functions (`functions/src/`) — The query layer
+### Cloud Functions (`functions/src/`) — The join layer
 
-Traverses the graph and returns shaped results to the frontend. The frontend calls these functions; it never touches Neo4j directly. When adding a new feature that needs graph data, add a new Cloud Function that queries for exactly what the component needs and returns it in one call.
+Queries Firestore for user data, queries Neo4j for domain knowledge, and marries them in the response. The frontend calls these functions; it never touches Firestore or Neo4j directly. User-data functions have no Neo4j secrets; knowledge-graph functions have secrets.
 
 ### The join pattern
 
-The graph recommends *which* tool (by ID). The frontend looks up *how to display it* from `src/data/tools.ts` using that ID. The graph owns the "what's clinically appropriate" decision, the frontend owns the presentation.
+1. The graph recommends *which* tool (by ID) based on the user's current state.
+2. The frontend looks up *how to display it* from `src/data/tools.ts` using that ID.
+3. For insights, Cloud Functions fetch user check-ins from Firestore, compute aggregates in JS, then enrich with Neo4j pattern narratives/formulations.
+
+The graph owns the "what's clinically appropriate" decision. Firestore owns the "what has this user done" history. The frontend owns the presentation.
 
 ### ⚠️ HARD RULE: Emotion knowledge lives in the graph. Nowhere else.
 

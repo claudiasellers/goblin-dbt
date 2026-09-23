@@ -121,26 +121,26 @@ CREATE (ai)-[:PARTICIPATES_IN]->(van);
 
 // Amygdala
 MATCH (amyg:BrainStructure {id: "amygdala"}), (fc:Function {id: "fear_conditioning"})
-CREATE (amyg)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(fc);
+CREATE (amyg)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(fc);
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (td:Function {id: "threat_detection"})
-CREATE (amyg)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(td);
+CREATE (amyg)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(td);
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (mc:Function {id: "memory_consolidation"})
 CREATE (amyg)-[:IMPLICATED_IN {role: "primary"}]->(mc);
 
 // PFC
 MATCH (pfc:BrainStructure {id: "pfc"}), (er:Function {id: "emotion_regulation"})
-CREATE (pfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "strong"}]->(er);
+CREATE (pfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "Strong"}]->(er);
 
 MATCH (vmpfc:BrainStructure {id: "vmpfc"}), (fe:Function {id: "fear_extinction"})
-CREATE (vmpfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "strong"}]->(fe);
+CREATE (vmpfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "Strong"}]->(fe);
 
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (wm:Function {id: "working_memory"})
-CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(wm);
+CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(wm);
 
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (cc:Function {id: "cognitive_control"})
-CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(cc);
+CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(cc);
 
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (ef:Function {id: "executive_function"})
 CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary"}]->(ef);
@@ -154,7 +154,7 @@ CREATE (dacc)-[:IMPLICATED_IN {role: "primary"}]->(er);
 
 // Insula
 MATCH (ins:BrainStructure {id: "insula"}), (int:Function {id: "interoception"})
-CREATE (ins)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(int);
+CREATE (ins)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(int);
 
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (er:Function {id: "emotion_regulation"})
 CREATE (ai)-[:IMPLICATED_IN {role: "primary"}]->(er);
@@ -170,13 +170,13 @@ CREATE (ss)-[:IMPLICATED_IN {role: "primary"}]->(ba);
 
 // Hippocampus
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (mc:Function {id: "memory_consolidation"})
-CREATE (hippo)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(mc);
+CREATE (hippo)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(mc);
 
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (fc:Function {id: "fear_conditioning"})
-CREATE (hippo)-[:IMPLICATED_IN {role: "contextual", evidence: "strong"}]->(fc);
+CREATE (hippo)-[:IMPLICATED_IN {role: "contextual", evidence: "Strong"}]->(fc);
 
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (fe:Function {id: "fear_extinction"})
-CREATE (hippo)-[:IMPLICATED_IN {role: "contextual", evidence: "strong"}]->(fe);
+CREATE (hippo)-[:IMPLICATED_IN {role: "contextual", evidence: "Strong"}]->(fe);
 
 // OFC
 MATCH (ofc:BrainStructure {id: "ofc"}), (ic:Function {id: "impulse_control"})
@@ -230,7 +230,7 @@ CREATE (tc)-[:IMPLICATED_IN {role: "primary"}]->(lp);
 // ============================================================
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (fear:Emotion {id: "fear"})
-CREATE (amyg)-[:ACTIVATES_DURING {direction: "increases", evidence: "strong"}]->(fear);
+CREATE (amyg)-[:ACTIVATES_DURING {direction: "increases", evidence: "Strong"}]->(fear);
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (anger:Emotion {id: "anger"})
 CREATE (amyg)-[:ACTIVATES_DURING {direction: "increases"}]->(anger);
@@ -1131,13 +1131,13 @@ CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "develops"}]->(b);
 // ============================================================
 
 MATCH (c:ClinicalConstruct {id: "ptsd"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation", evidence: "strong"}]->(b);
+CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation", evidence: "Strong"}]->(b);
 
 MATCH (c:ClinicalConstruct {id: "ptsd"}), (b:BrainStructure {id: "pfc"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hypoactivation", evidence: "moderate"}]->(b);
+CREATE (c)-[:ASSOCIATED_WITH {finding: "hypoactivation", evidence: "Moderate"}]->(b);
 
 MATCH (c:ClinicalConstruct {id: "ptsd"}), (b:BrainStructure {id: "hippocampus"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "reduced_volume", evidence: "strong"}]->(b);
+CREATE (c)-[:ASSOCIATED_WITH {finding: "reduced_volume", evidence: "Strong"}]->(b);
 
 MATCH (c:ClinicalConstruct {id: "bpd"}), (b:BrainStructure {id: "amygdala"})
 CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(b);
@@ -1602,7 +1602,7 @@ CREATE (atl)-[:PART_OF]->(tc);
 // ============================================================
 
 MATCH (vmpfc:BrainStructure {id: "vmpfc"}), (fe:Function {id: "fear_extinction"})
-CREATE (vmpfc)-[:HOMOLOGUE_OF {rodent_structure: "infralimbic cortex", evidence: "translational research"}]->(fe);
+CREATE (vmpfc)-[:HOMOLOGUE_OF {rodent_structure: "infralimbic cortex", evidence: "Moderate", method: "translational research"}]->(fe);
 
 MATCH (fe:Function {id: "fear_extinction"}), (da:NeurochemicalSystem {id: "dopamine"})
 CREATE (fe)-[:MEDIATED_BY {role: "reward learning"}]->(da);

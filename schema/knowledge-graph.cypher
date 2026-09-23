@@ -2204,15 +2204,15 @@ CREATE (anterior_insula)-[:PARTICIPATES_IN]->(van)
 // ============================================================
 
 // Amygdala
-CREATE (amygdala)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(fear_conditioning)
-CREATE (amygdala)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(threat_detection)
+CREATE (amygdala)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(fear_conditioning)
+CREATE (amygdala)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(threat_detection)
 CREATE (amygdala)-[:IMPLICATED_IN {role: "primary"}]->(memory_consolidation)
 
 // Prefrontal Cortex
-CREATE (pfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "strong"}]->(emotion_regulation)
-CREATE (vmpfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "strong"}]->(fear_extinction)
-CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(working_memory)
-CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(cognitive_control)
+CREATE (pfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "Strong"}]->(emotion_regulation)
+CREATE (vmpfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "Strong"}]->(fear_extinction)
+CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(working_memory)
+CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(cognitive_control)
 CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary"}]->(executive_function)
 
 // ACC
@@ -2220,16 +2220,16 @@ CREATE (acc)-[:IMPLICATED_IN {role: "monitoring"}]->(cognitive_control)
 CREATE (dacc)-[:IMPLICATED_IN {role: "primary"}]->(emotion_regulation)
 
 // Insula
-CREATE (insula)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(interoception)
+CREATE (insula)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(interoception)
 CREATE (anterior_insula)-[:IMPLICATED_IN {role: "primary"}]->(emotion_regulation)
 CREATE (anterior_insula)-[:IMPLICATED_IN {role: "primary"}]->(social_cognition)
 CREATE (posterior_insula)-[:IMPLICATED_IN {role: "primary"}]->(body_awareness)
 CREATE (somatosensory_cortex)-[:IMPLICATED_IN {role: "primary"}]->(body_awareness)
 
 // Hippocampus
-CREATE (hippocampus)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(memory_consolidation)
-CREATE (hippocampus)-[:IMPLICATED_IN {role: "contextual", evidence: "strong"}]->(fear_conditioning)
-CREATE (hippocampus)-[:IMPLICATED_IN {role: "contextual", evidence: "strong"}]->(fear_extinction)
+CREATE (hippocampus)-[:IMPLICATED_IN {role: "primary", evidence: "Strong"}]->(memory_consolidation)
+CREATE (hippocampus)-[:IMPLICATED_IN {role: "contextual", evidence: "Strong"}]->(fear_conditioning)
+CREATE (hippocampus)-[:IMPLICATED_IN {role: "contextual", evidence: "Strong"}]->(fear_extinction)
 
 // OFC
 CREATE (ofc)-[:IMPLICATED_IN {role: "primary"}]->(impulse_control)
@@ -2267,7 +2267,7 @@ CREATE (bed_nucleus)-[:IMPLICATED_IN {role: "primary"}]->(anxiety)
 // ============================================================
 
 // Amygdala activations
-CREATE (amygdala)-[:ACTIVATES_DURING {direction: "increases", evidence: "strong"}]->(fear)
+CREATE (amygdala)-[:ACTIVATES_DURING {direction: "increases", evidence: "Strong"}]->(fear)
 CREATE (amygdala)-[:ACTIVATES_DURING {direction: "increases"}]->(anger)
 CREATE (amygdala)-[:ACTIVATES_DURING {direction: "increases"}]->(anxiety)
 CREATE (amygdala)-[:ACTIVATES_DURING {direction: "increases"}]->(hot_shame)
@@ -2719,9 +2719,9 @@ CREATE (body_scan)-[:CONCEPTUALLY_RELATED_TO {type: "develops"}]->(interoception
 // ============================================================
 
 // PTSD
-CREATE (ptsd)-[:ASSOCIATED_WITH {finding: "hyperactivation", evidence: "strong"}]->(amygdala)
-CREATE (ptsd)-[:ASSOCIATED_WITH {finding: "hypoactivation", evidence: "moderate"}]->(pfc)
-CREATE (ptsd)-[:ASSOCIATED_WITH {finding: "reduced_volume", evidence: "strong"}]->(hippocampus)
+CREATE (ptsd)-[:ASSOCIATED_WITH {finding: "hyperactivation", evidence: "Strong"}]->(amygdala)
+CREATE (ptsd)-[:ASSOCIATED_WITH {finding: "hypoactivation", evidence: "Moderate"}]->(pfc)
+CREATE (ptsd)-[:ASSOCIATED_WITH {finding: "reduced_volume", evidence: "Strong"}]->(hippocampus)
 
 // BPD
 CREATE (bpd)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(amygdala)

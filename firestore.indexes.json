@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "toolUsages",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "outcome", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

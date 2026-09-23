@@ -8,6 +8,8 @@ if (!admin.apps.length) {
   admin.initializeApp();
 }
 
+const db = admin.firestore();
+
 // Define secrets - these are securely stored in Firebase and injected at runtime
 const neo4jUri = defineSecret('NEO4J_URI');
 const neo4jUser = defineSecret('NEO4J_USER');
@@ -60,78 +62,46 @@ function normalizeToolId(graphId: string): string {
  * Save a new check-in for the authenticated user
  */
 export const saveCheckIn = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
-    // Verify user is authenticated
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
     }
-
     const userId = request.auth.uid;
     const checkIn = request.data as CheckInData;
 
-    // Validate required fields
     if (!checkIn.emotion || !checkIn.quadrant) {
       throw new HttpsError('invalid-argument', 'Missing required fields');
     }
 
-    const session = getDriver().session();
     try {
-      const result = await session.run(
-        `
-        CREATE (c:CheckIn {
-          id: randomUUID(),
-          timestamp: datetime($timestamp),
-          emotion: $emotion,
-          quadrant: $quadrant,
-          intensityX: $intensityX,
-          intensityY: $intensityY,
-          note: $note,
-          activationPatternId: $activationPatternId,
-          confidence: $confidence
-        })
-        WITH c
-        MATCH (u:User {id: $userId})
-        MERGE (u)-[:LOGGED]->(c)
-        WITH c
-        FOREACH (_ IN CASE WHEN $activationPatternId IS NOT NULL THEN [1] ELSE [] END |
-          MERGE (ap:ActivationPattern {id: $activationPatternId})
-          MERGE (c)-[:MATCHED_PATTERN]->(ap)
-        )
-        WITH c
-        UNWIND $bodySensations AS sensation
-        CREATE (s:BodySensation {
-          x: sensation.x,
-          y: sensation.y,
-          region: sensation.region,
-          intensityX: sensation.intensity.x,
-          intensityY: sensation.intensity.y,
-          tags: sensation.tags
-        })
-        MERGE (c)-[:SENSED]->(s)
-        RETURN c.id AS id
-        `,
-        {
-          userId,
-          timestamp: checkIn.timestamp || new Date().toISOString(),
-          emotion: checkIn.emotion,
-          quadrant: checkIn.quadrant,
-          intensityX: checkIn.intensity?.x ?? 0,
-          intensityY: checkIn.intensity?.y ?? 0,
-          note: checkIn.note || '',
-          bodySensations: checkIn.bodySensations || [],
-          activationPatternId: checkIn.activationPatternId || null,
-          confidence: checkIn.confidence ?? null,
-        }
-      );
+      const docRef = db.collection(`users/${userId}/checkIns`).doc();
+      await docRef.set({
+        emotion: checkIn.emotion,
+        quadrant: checkIn.quadrant,
+        intensityX: checkIn.intensity?.x ?? 0,
+        intensityY: checkIn.intensity?.y ?? 0,
+        note: checkIn.note || '',
+        bodySensations: (checkIn.bodySensations || []).map(s => ({
+          x: s.x,
+          y: s.y,
+          region: s.region,
+          intensityX: s.intensity.x,
+          intensityY: s.intensity.y,
+          tags: s.tags,
+        })),
+        activationPatternId: checkIn.activationPatternId || null,
+        confidence: checkIn.confidence ?? null,
+        timestamp: admin.firestore.Timestamp.fromDate(
+          new Date(checkIn.timestamp || new Date().toISOString())
+        ),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
-      const id = result.records[0]?.get('id') || '';
-      return { id };
+      return { id: docRef.id };
     } catch (error) {
       console.error('Error saving check-in:', error);
       throw new HttpsError('internal', 'Failed to save check-in');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -140,7 +110,7 @@ export const saveCheckIn = onCall(
  * Get check-ins for the authenticated user
  */
 export const getCheckInsByUser = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     // Verify user is authenticated
     if (!request.auth) {
@@ -150,50 +120,33 @@ export const getCheckInsByUser = onCall(
     const userId = request.auth.uid;
     const limit = (request.data?.limit as number) || 50;
 
-    const session = getDriver().session();
     try {
-      const result = await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-        OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-        WITH c, collect(s) AS sensations
-        ORDER BY c.timestamp DESC
-        LIMIT $limit
-        RETURN c {
-          .id,
-          .emotion,
-          .quadrant,
-          .note,
-          .activationPatternId,
-          .confidence,
-          timestamp: toString(c.timestamp),
-          intensity: {x: c.intensityX, y: c.intensityY}
-        } AS checkIn,
-        [s IN sensations | {
-          x: s.x,
-          y: s.y,
-          region: s.region,
-          tags: s.tags,
-          intensity: {x: s.intensityX, y: s.intensityY}
-        }] AS bodySensations
-        `,
-        { userId, limit: neo4j.int(limit) }
-      );
+      const snap = await db
+        .collection(`users/${userId}/checkIns`)
+        .orderBy('timestamp', 'desc')
+        .limit(limit)
+        .get();
 
-      const checkIns = result.records.map((record: Neo4jRecord) => {
-        const checkIn = record.get('checkIn');
-        const bodySensations = record.get('bodySensations');
+      const checkIns = snap.docs.map(doc => {
+        const d = doc.data();
+        const ts = d.timestamp?.toDate?.() || new Date(d.timestamp);
         return {
-          id: checkIn.id,
+          id: doc.id,
           userId,
-          emotion: checkIn.emotion,
-          quadrant: checkIn.quadrant,
-          intensity: checkIn.intensity,
-          bodySensations: bodySensations || [],
-          note: checkIn.note,
-          timestamp: checkIn.timestamp,
-          activationPatternId: checkIn.activationPatternId || null,
-          confidence: checkIn.confidence ?? null,
+          emotion: d.emotion,
+          quadrant: d.quadrant,
+          intensity: { x: d.intensityX ?? 0, y: d.intensityY ?? 0 },
+          bodySensations: (d.bodySensations || []).map((s: Record<string, unknown>) => ({
+            x: s.x,
+            y: s.y,
+            region: s.region,
+            tags: s.tags || [],
+            intensity: { x: s.intensityX ?? 0, y: s.intensityY ?? 0 },
+          })),
+          note: d.note || '',
+          timestamp: ts.toISOString(),
+          activationPatternId: d.activationPatternId || null,
+          confidence: d.confidence ?? null,
         };
       });
 
@@ -201,8 +154,6 @@ export const getCheckInsByUser = onCall(
     } catch (error) {
       console.error('Error fetching check-ins:', error);
       throw new HttpsError('internal', 'Failed to fetch check-ins');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -211,33 +162,20 @@ export const getCheckInsByUser = onCall(
  * Ensure user exists in Neo4j (called after Firebase Auth signup/login)
  */
 export const ensureUserExists = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
-    // Verify user is authenticated
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
     }
-
     const userId = request.auth.uid;
     const email = request.auth.token.email || '';
 
-    const session = getDriver().session();
-    try {
-      await session.run(
-        `
-        MERGE (u:User {id: $userId})
-        ON CREATE SET u.email = $email, u.createdAt = datetime()
-        `,
-        { userId, email }
-      );
+    await db.doc(`users/${userId}`).set(
+      { email, createdAt: admin.firestore.FieldValue.serverTimestamp() },
+      { merge: true }
+    );
 
-      return { success: true };
-    } catch (error) {
-      console.error('Error ensuring user exists:', error);
-      throw new HttpsError('internal', 'Failed to create user');
-    } finally {
-      await session.close();
-    }
+    return { success: true };
   }
 );
 
@@ -309,7 +247,7 @@ const PROFILE_DEFAULTS = {
  * Get user profile -- returns User node properties merged with defaults
  */
 export const getUserProfile = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -318,53 +256,43 @@ export const getUserProfile = onCall(
     const userId = request.auth.uid;
     const email = request.auth.token.email || '';
 
-    const session = getDriver().session();
     try {
-      const result = await session.run(
-        `
-        MATCH (u:User {id: $userId})
-        RETURN u {.*} AS user
-        `,
-        { userId }
-      );
+      const userDoc = await db.doc(`users/${userId}`).get();
+      const userData = userDoc.data() || {};
 
-      const userNode = result.records[0]?.get('user') || {};
-
-      // Merge with defaults, ensuring all fields are present
       const profile = {
         ...PROFILE_DEFAULTS,
         email,
-        ...userNode,
-        // Clean up Neo4j integer types
-        dailyCheckInGoal: toNumber(userNode.dailyCheckInGoal) ?? PROFILE_DEFAULTS.dailyCheckInGoal,
-        weeklyToolGoal: toNumber(userNode.weeklyToolGoal) ?? PROFILE_DEFAULTS.weeklyToolGoal,
-        dataRetentionDays: userNode.dataRetentionDays != null ? toNumber(userNode.dataRetentionDays) : null,
-        reminderDays: userNode.reminderDays ?? PROFILE_DEFAULTS.reminderDays,
-        focusCategories: userNode.focusCategories ?? PROFILE_DEFAULTS.focusCategories,
+        ...userData,
+        dailyCheckInGoal: Number(userData.dailyCheckInGoal) || PROFILE_DEFAULTS.dailyCheckInGoal,
+        weeklyToolGoal: Number(userData.weeklyToolGoal) || PROFILE_DEFAULTS.weeklyToolGoal,
+        dataRetentionDays: userData.dataRetentionDays != null ? Number(userData.dataRetentionDays) : null,
+        reminderDays: userData.reminderDays ?? PROFILE_DEFAULTS.reminderDays,
+        focusCategories: userData.focusCategories ?? PROFILE_DEFAULTS.focusCategories,
       };
 
       // Remove internal fields
-      delete profile.id;
-      delete profile.createdAt;
+      delete (profile as Record<string, unknown>).createdAt;
+      delete (profile as Record<string, unknown>).updatedAt;
+      delete (profile as Record<string, unknown>).id;
 
-      // Enforce data retention: delete check-ins older than dataRetentionDays
-      const retentionDays = profile.dataRetentionDays != null
-        ? toNumber(profile.dataRetentionDays)
-        : null;
-
+      // Enforce data retention
+      const retentionDays = profile.dataRetentionDays;
       if (retentionDays != null && retentionDays > 0) {
         try {
-          await session.run(
-            `
-            MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-            WHERE c.timestamp < datetime() - duration({days: $days})
-            OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-            DETACH DELETE s, c
-            `,
-            { userId, days: neo4j.int(retentionDays) }
-          );
+          const cutoff = new Date();
+          cutoff.setDate(cutoff.getDate() - retentionDays);
+          const oldCheckIns = await db
+            .collection(`users/${userId}/checkIns`)
+            .where('timestamp', '<', cutoff)
+            .get();
+
+          for (let i = 0; i < oldCheckIns.docs.length; i += 500) {
+            const batch = db.batch();
+            oldCheckIns.docs.slice(i, i + 500).forEach(doc => batch.delete(doc.ref));
+            await batch.commit();
+          }
         } catch (cleanupErr) {
-          // Don't fail the profile load if cleanup fails
           console.warn('Data retention cleanup failed:', cleanupErr);
         }
       }
@@ -373,8 +301,6 @@ export const getUserProfile = onCall(
     } catch (error) {
       console.error('Error getting user profile:', error);
       throw new HttpsError('internal', 'Failed to get profile');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -383,12 +309,11 @@ export const getUserProfile = onCall(
  * Update user profile -- partial update of User node properties
  */
 export const updateUserProfile = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
     }
-
     const userId = request.auth.uid;
     const updates = request.data as Record<string, unknown>;
 
@@ -396,7 +321,6 @@ export const updateUserProfile = onCall(
       throw new HttpsError('invalid-argument', 'Updates must be an object');
     }
 
-    // Whitelist allowed fields
     const allowedFields = [
       'displayName', 'photoURL', 'theme',
       'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
@@ -415,22 +339,13 @@ export const updateUserProfile = onCall(
       return { success: true };
     }
 
-    const session = getDriver().session();
     try {
-      // Build SET clause dynamically
-      const setClauses = Object.keys(cleanUpdates)
-        .map((key) => `u.${key} = $${key}`)
-        .join(', ');
-
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})
-        SET ${setClauses}, u.updatedAt = datetime()
-        `,
-        { userId, ...cleanUpdates }
+      await db.doc(`users/${userId}`).set(
+        { ...cleanUpdates, updatedAt: admin.firestore.FieldValue.serverTimestamp() },
+        { merge: true }
       );
 
-      // Sync displayName/photoURL to Firebase Auth so it persists across sessions
+      // Sync displayName/photoURL to Firebase Auth
       const authUpdate: admin.auth.UpdateRequest = {};
       if ('displayName' in cleanUpdates) {
         authUpdate.displayName = cleanUpdates.displayName as string || undefined;
@@ -446,8 +361,6 @@ export const updateUserProfile = onCall(
     } catch (error) {
       console.error('Error updating user profile:', error);
       throw new HttpsError('internal', 'Failed to update profile');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -456,41 +369,30 @@ export const updateUserProfile = onCall(
  * Delete all user data from Neo4j
  */
 export const deleteUserData = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
     }
-
     const userId = request.auth.uid;
 
-    const session = getDriver().session();
     try {
-      // Delete all check-ins and their body sensations
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-        OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-        DETACH DELETE s, c
-        `,
-        { userId }
-      );
+      const subcollections = ['checkIns', 'toolUsages', 'dearManSessions'];
+      for (const sub of subcollections) {
+        const snap = await db.collection(`users/${userId}/${sub}`).get();
+        for (let i = 0; i < snap.docs.length; i += 500) {
+          const batch = db.batch();
+          snap.docs.slice(i, i + 500).forEach(doc => batch.delete(doc.ref));
+          await batch.commit();
+        }
+      }
 
-      // Delete the user node
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})
-        DETACH DELETE u
-        `,
-        { userId }
-      );
+      await db.doc(`users/${userId}`).delete();
 
       return { success: true };
     } catch (error) {
       console.error('Error deleting user data:', error);
       throw new HttpsError('internal', 'Failed to delete user data');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -499,7 +401,7 @@ export const deleteUserData = onCall(
  * Export all user data as JSON
  */
 export const exportUserData = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -507,30 +409,38 @@ export const exportUserData = onCall(
 
     const userId = request.auth.uid;
 
-    const session = getDriver().session();
     try {
-      // Get user profile
-      const profileResult = await session.run(
-        `MATCH (u:User {id: $userId}) RETURN u {.*} AS user`,
-        { userId }
-      );
-      const userProfile = profileResult.records[0]?.get('user') || {};
+      const userDoc = await db.doc(`users/${userId}`).get();
+      const userProfile = userDoc.data() || {};
 
-      // Get all check-ins with body sensations
-      const checkInsResult = await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-        OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-        WITH c, collect(s {.*}) AS sensations
-        ORDER BY c.timestamp DESC
-        RETURN c {.*} AS checkIn, sensations
-        `,
-        { userId }
-      );
+      const checkInsSnap = await db
+        .collection(`users/${userId}/checkIns`)
+        .orderBy('timestamp', 'desc')
+        .get();
 
-      const checkIns = checkInsResult.records.map((record: Neo4jRecord) => ({
-        ...record.get('checkIn'),
-        bodySensations: record.get('sensations'),
+      const checkIns = checkInsSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const toolSnap = await db
+        .collection(`users/${userId}/toolUsages`)
+        .orderBy('createdAt', 'desc')
+        .get();
+
+      const toolUsages = toolSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      const dearManSnap = await db
+        .collection(`users/${userId}/dearManSessions`)
+        .orderBy('createdAt', 'desc')
+        .get();
+
+      const dearManSessions = dearManSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
       }));
 
       return {
@@ -538,14 +448,14 @@ export const exportUserData = onCall(
           exportedAt: new Date().toISOString(),
           profile: userProfile,
           checkIns,
+          toolUsages,
+          dearManSessions,
           totalCheckIns: checkIns.length,
         },
       };
     } catch (error) {
       console.error('Error exporting user data:', error);
       throw new HttpsError('internal', 'Failed to export data');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -568,12 +478,11 @@ function toNumber(val: unknown): number | null {
  * Track that a user opened/used a tool
  */
 export const trackToolUsage = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
     }
-
     const userId = request.auth.uid;
     const { toolId } = request.data as { toolId: string };
 
@@ -581,34 +490,28 @@ export const trackToolUsage = onCall(
       throw new HttpsError('invalid-argument', 'toolId is required');
     }
 
-    const session = getDriver().session();
     try {
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})
-        CREATE (tu:ToolUsage {
-          id: randomUUID(),
-          toolId: $toolId,
-          timestamp: datetime()
-        })
-        MERGE (u)-[:USED_TOOL]->(tu)
-        WITH u, tu
-        OPTIONAL MATCH (u)-[:LOGGED]->(c:CheckIn)
-        WHERE c.timestamp <= tu.timestamp
-        WITH tu, c ORDER BY c.timestamp DESC LIMIT 1
-        FOREACH (_ IN CASE WHEN c IS NOT NULL THEN [1] ELSE [] END |
-          MERGE (tu)-[:FOLLOWED_CHECKIN]->(c)
-        )
-        `,
-        { userId, toolId }
-      );
+      const recentCheckIn = await db
+        .collection(`users/${userId}/checkIns`)
+        .orderBy('timestamp', 'desc')
+        .limit(1)
+        .get();
+
+      const linkedCheckInId = recentCheckIn.docs[0]?.id || null;
+
+      await db.collection(`users/${userId}/toolUsages`).add({
+        toolId,
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        outcome: null,
+        outcomeTimestamp: null,
+        linkedCheckInId,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
       return { success: true };
     } catch (error) {
       console.error('Error tracking tool usage:', error);
       throw new HttpsError('internal', 'Failed to track tool usage');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -617,7 +520,7 @@ export const trackToolUsage = onCall(
  * Get the count of tool usages in the last 7 days for the authenticated user
  */
 export const getWeeklyToolUsageCount = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -625,24 +528,19 @@ export const getWeeklyToolUsageCount = onCall(
 
     const userId = request.auth.uid;
 
-    const session = getDriver().session();
     try {
-      const result = await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
-        WHERE tu.timestamp >= datetime() - duration({days: 7})
-        RETURN count(tu) AS count
-        `,
-        { userId }
-      );
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-      const count = result.records[0]?.get('count');
-      return { count: toNumber(count) ?? 0 };
+      const snap = await db
+        .collection(`users/${userId}/toolUsages`)
+        .where('createdAt', '>=', sevenDaysAgo)
+        .get();
+
+      return { count: snap.size };
     } catch (error) {
       console.error('Error getting weekly tool usage:', error);
       throw new HttpsError('internal', 'Failed to get tool usage count');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -656,12 +554,11 @@ export const getWeeklyToolUsageCount = onCall(
  * Finds the user's most recent ToolUsage with null outcome.
  */
 export const recordToolOutcome = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
     }
-
     const userId = request.auth.uid;
     const { outcome } = request.data as { outcome: 'helped' | 'somewhat' | 'not_really' };
 
@@ -669,32 +566,25 @@ export const recordToolOutcome = onCall(
       throw new HttpsError('invalid-argument', 'outcome must be helped, somewhat, or not_really');
     }
 
-    const session = getDriver().session();
     try {
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
-        WHERE tu.outcome IS NULL
-        WITH tu ORDER BY tu.timestamp DESC LIMIT 1
-        SET tu.outcome = $outcome, tu.outcomeTimestamp = datetime()
-        WITH tu
-        WHERE NOT (tu)-[:FOLLOWED_CHECKIN]->()
-        OPTIONAL MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-        WHERE c.timestamp <= tu.timestamp
-        WITH tu, c ORDER BY c.timestamp DESC LIMIT 1
-        FOREACH (_ IN CASE WHEN c IS NOT NULL THEN [1] ELSE [] END |
-          MERGE (tu)-[:FOLLOWED_CHECKIN]->(c)
-        )
-        `,
-        { userId, outcome }
-      );
+      const unratedSnap = await db
+        .collection(`users/${userId}/toolUsages`)
+        .where('outcome', '==', null)
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (!unratedSnap.empty) {
+        await unratedSnap.docs[0].ref.update({
+          outcome,
+          outcomeTimestamp: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
 
       return { success: true };
     } catch (error) {
       console.error('Error recording tool outcome:', error);
       throw new HttpsError('internal', 'Failed to record tool outcome');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -717,113 +607,143 @@ export const getInsightsData = onCall(
 
     const userId = request.auth.uid;
     const timeRange: string = request.data?.timeRange || '30d';
-    const driver = getDriver();
-
-    // Neo4j sessions can only run one query at a time, so use separate sessions for parallel queries
-    const session1 = driver.session();
-    const session2 = driver.session();
-    const session3 = driver.session();
-    let seqSession: ReturnType<typeof driver.session> | null = null;
+    let session: ReturnType<ReturnType<typeof getDriver>['session']> | null = null;
 
     try {
-      // Run parallel queries for raw data
-      // Build time filter clause based on timeRange parameter
+      // Build time filter
       const timeFilterDays = timeRange === '7d' ? 7 : timeRange === 'all' ? null : 30;
-      const checkInTimeFilter = timeFilterDays !== null
-        ? `WHERE c.timestamp >= datetime() - duration({days: ${timeFilterDays}})`
-        : '';
-      const toolTimeFilter = timeFilterDays !== null
-        ? `WHERE tu.timestamp >= datetime() - duration({days: ${timeFilterDays}})`
-        : '';
+      const checkInsRef = db.collection(`users/${userId}/checkIns`);
+      const toolUsagesRef = db.collection(`users/${userId}/toolUsages`);
 
-      const [checkInsResult, toolUsageResult, continuityResult] = await Promise.all([
-        // 1. Recent check-ins (filtered by time range)
-        session1.run(
-          `
-          MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-          ${checkInTimeFilter}
-          OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-          WITH c, collect(DISTINCT s.region) AS bodyRegions, collect(s.tags) AS tagArrays
-          OPTIONAL MATCH (e:Emotion {id: c.emotion})
-          WITH c, bodyRegions, tagArrays, e.dbtParent AS dbtParent
-          ORDER BY c.timestamp DESC
-          RETURN c.id AS id,
-                 toString(c.timestamp) AS timestamp,
-                 c.emotion AS emotion,
-                 c.quadrant AS quadrant,
-                 c.intensityX AS intensityX,
-                 c.intensityY AS intensityY,
-                 c.activationPatternId AS activationPatternId,
-                 bodyRegions,
-                 tagArrays,
-                 dbtParent
-          `,
-          { userId }
-        ),
-        // 2. Tool usage with outcomes (filtered by time range)
-        session2.run(
-          `
-          MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
-          ${toolTimeFilter}
-          OPTIONAL MATCH (tu)-[:FOLLOWED_CHECKIN]->(c:CheckIn)
-          RETURN tu.toolId AS toolId,
-                 tu.outcome AS outcome,
-                 toString(tu.timestamp) AS timestamp,
-                 c.activationPatternId AS patternId,
-                 c.id AS checkInId
-          ORDER BY tu.timestamp DESC
-          `,
-          { userId }
-        ),
-        // 3. Continuity prompt — most recent unrated ToolUsage with a linked check-in
-        session3.run(
-          `
-          MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)-[:FOLLOWED_CHECKIN]->(c:CheckIn)
-          WHERE tu.outcome IS NULL
-          WITH c, tu ORDER BY tu.timestamp DESC LIMIT 1
-          RETURN tu.toolId AS toolId, toString(tu.timestamp) AS toolTimestamp,
-                 c.emotion AS checkInEmotion, toString(c.timestamp) AS checkInTimestamp
-          `,
-          { userId }
-        ),
+      let checkInsQuery: any;
+      let toolUsagesQuery: any;
+
+      if (timeFilterDays !== null) {
+        const cutoff = new Date();
+        cutoff.setDate(cutoff.getDate() - timeFilterDays);
+        checkInsQuery = checkInsRef.where('timestamp', '>=', cutoff).orderBy('timestamp', 'desc');
+        toolUsagesQuery = toolUsagesRef.where('createdAt', '>=', cutoff).orderBy('createdAt', 'desc');
+      } else {
+        checkInsQuery = checkInsRef.orderBy('timestamp', 'desc');
+        toolUsagesQuery = toolUsagesRef.orderBy('createdAt', 'desc');
+      }
+
+      const [checkInsSnap, toolUsagesSnap] = await Promise.all([
+        checkInsQuery.get(),
+        toolUsagesQuery.get(),
       ]);
 
-      // Parse check-ins
-      const checkIns = checkInsResult.records.map((r: Neo4jRecord) => ({
-        id: r.get('id'),
-        timestamp: r.get('timestamp'),
-        emotion: r.get('emotion'),
-        quadrant: r.get('quadrant'),
-        intensityX: toNumber(r.get('intensityX')) ?? 0,
-        intensityY: toNumber(r.get('intensityY')) ?? 0,
-        activationPatternId: r.get('activationPatternId') || null,
-        bodyRegions: (r.get('bodyRegions') || []).filter(Boolean) as string[],
-        sensationTags: ((r.get('tagArrays') || []) as string[][]).flat().filter(Boolean) as string[],
-        dbtParent: r.get('dbtParent') || null,
-      }));
+      // Parse check-ins from Firestore
+      const checkIns: Array<{
+        id: string;
+        timestamp: string;
+        emotion: string;
+        quadrant: string;
+        intensityX: number;
+        intensityY: number;
+        activationPatternId: string | null;
+        bodyRegions: string[];
+        sensationTags: string[];
+        dbtParent: string | null;
+      }> = checkInsSnap.docs.map((doc: any) => {
+        const d = doc.data();
+        const bodyRegions = (d.bodySensations || [])
+          .map((s: Record<string, unknown>) => s.region as string)
+          .filter(Boolean);
+        const sensationTags = (d.bodySensations || [])
+          .flatMap((s: Record<string, unknown>) => (s.tags as string[]) || [])
+          .filter(Boolean);
+        const ts = d.timestamp?.toDate?.() || new Date(d.timestamp);
 
-      // Parse tool usage
-      const toolUsages = toolUsageResult.records.map((r: Neo4jRecord) => ({
-        toolId: r.get('toolId'),
-        outcome: r.get('outcome') || null,
-        timestamp: r.get('timestamp'),
-        patternId: r.get('patternId') || null,
-        checkInId: r.get('checkInId') || null,
-      }));
+        return {
+          id: doc.id,
+          timestamp: ts.toISOString(),
+          emotion: d.emotion,
+          quadrant: d.quadrant,
+          intensityX: d.intensityX ?? 0,
+          intensityY: d.intensityY ?? 0,
+          activationPatternId: d.activationPatternId || null,
+          bodyRegions,
+          sensationTags,
+          dbtParent: null as string | null,
+        };
+      });
 
-      // Parse continuity
-      const continuityRec = continuityResult.records[0];
-      const continuityPrompt = continuityRec ? {
-        toolId: continuityRec.get('toolId'),
-        toolTimestamp: continuityRec.get('toolTimestamp'),
-        checkInEmotion: continuityRec.get('checkInEmotion'),
-        checkInTimestamp: continuityRec.get('checkInTimestamp'),
-      } : null;
+      // Parse tool usages from Firestore
+      const toolUsages: Array<{
+        toolId: string;
+        outcome: string | null;
+        timestamp: string;
+        patternId: string | null;
+        checkInId: string | null;
+      }> = toolUsagesSnap.docs.map((doc: any) => {
+        const d = doc.data();
+        const ts = d.createdAt?.toDate?.() || d.timestamp?.toDate?.() || null;
+        return {
+          toolId: d.toolId,
+          outcome: d.outcome || null,
+          timestamp: ts ? ts.toISOString() : '',
+          patternId: null as string | null,
+          checkInId: d.linkedCheckInId || null,
+        };
+      });
 
-      // Close parallel sessions, open one for sequential follow-up queries
-      await Promise.all([session1.close(), session2.close(), session3.close()]);
-      const session = driver.session();
-      seqSession = session;
+      // Continuity prompt: most recent unrated tool usage with a linked check-in
+      let continuityPrompt = null;
+      const unratedSnap = await db
+        .collection(`users/${userId}/toolUsages`)
+        .where('outcome', '==', null)
+        .orderBy('createdAt', 'desc')
+        .limit(1)
+        .get();
+
+      if (!unratedSnap.empty) {
+        const tuDoc = unratedSnap.docs[0].data();
+        if (tuDoc.linkedCheckInId) {
+          const ciDoc = await db.doc(`users/${userId}/checkIns/${tuDoc.linkedCheckInId}`).get();
+          if (ciDoc.exists) {
+            const ci = ciDoc.data()!;
+            const ciTs = ci.timestamp?.toDate?.() || new Date(ci.timestamp);
+            const tuTs = tuDoc.createdAt?.toDate?.() || new Date();
+            continuityPrompt = {
+              toolId: tuDoc.toolId,
+              toolTimestamp: tuTs.toISOString(),
+              checkInEmotion: ci.emotion,
+              checkInTimestamp: ciTs.toISOString(),
+            };
+          }
+        }
+      }
+
+      // Enrich tool usages with patternId from their linked check-in
+      const checkInMap = new Map(checkIns.map(ci => [ci.id, ci]));
+      for (const tu of toolUsages) {
+        if (tu.checkInId && checkInMap.has(tu.checkInId)) {
+          tu.patternId = checkInMap.get(tu.checkInId)!.activationPatternId;
+        }
+      }
+
+      // Open Neo4j session for knowledge graph enrichment only
+      session = getDriver().session();
+
+      // Enrich check-ins with dbtParent from Neo4j
+      const uniqueEmotions = [...new Set(checkIns.map(ci => ci.emotion).filter(Boolean))];
+      if (uniqueEmotions.length > 0) {
+        const emotionResult = await session.run(
+          `UNWIND $emotionIds AS eid
+           MATCH (e:Emotion {id: eid})
+           RETURN e.id AS id, e.dbtParent AS dbtParent`,
+          { emotionIds: uniqueEmotions }
+        );
+        const dbtParentMap = new Map<string, string>();
+        for (const rec of emotionResult.records) {
+          const parent = rec.get('dbtParent');
+          if (parent) dbtParentMap.set(rec.get('id'), parent);
+        }
+        for (const ci of checkIns) {
+          ci.dbtParent = dbtParentMap.get(ci.emotion) || null;
+        }
+      }
 
       // ── Thresholds scaled by time range ──
       const thresholds = timeRange === '7d' ? {
@@ -1268,12 +1188,7 @@ export const getInsightsData = onCall(
       console.error('Error getting insights data:', error);
       throw new HttpsError('internal', 'Failed to get insights data');
     } finally {
-      await Promise.all([
-        session1.close().catch(() => {}),
-        session2.close().catch(() => {}),
-        session3.close().catch(() => {}),
-        seqSession?.close().catch(() => {}),
-      ]);
+      if (session) await session.close().catch(() => {});
     }
   }
 );
@@ -2292,92 +2207,50 @@ interface DearManSessionData {
 }
 
 export const saveDearManSession = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
     }
-
     const userId = request.auth.uid;
     const data = request.data as DearManSessionData;
 
-    const session = getDriver().session();
     try {
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})
-        CREATE (s:DearManSession {
-          id: randomUUID(),
-          type: $type,
-          relationshipType: $relationshipType,
-          situationType: $situationType,
-          priorities: $priorities,
-          barriers: $barriers,
-          describeId: $describeId,
-          describeCustom: $describeCustom,
-          feelings: $feelings,
-          assertId: $assertId,
-          assertCustom: $assertCustom,
-          reinforceIds: $reinforceIds,
-          anchorPhrase: $anchorPhrase,
-          middleGroundId: $middleGroundId,
-          middleGroundCustom: $middleGroundCustom,
-          walkAwayId: $walkAwayId,
-          walkAwayCustom: $walkAwayCustom,
-          debriefOverall: $debriefOverall,
-          debriefWentWell: $debriefWentWell,
-          debriefToChange: $debriefToChange,
-          debriefCurrentFeelings: $debriefCurrentFeelings,
-          turningPointIds: $turningPointIds,
-          momentResponseIds: $momentResponseIds,
-          bodySignalIds: $bodySignalIds,
-          thoughtPatternIds: $thoughtPatternIds,
-          underneathIds: $underneathIds,
-          copeAheadId: $copeAheadId,
-          reflectionLanded: $reflectionLanded,
-          createdAt: datetime()
-        })
-        MERGE (u)-[:COMPLETED_SESSION]->(s)
-        RETURN s.id AS id
-        `,
-        {
-          userId,
-          type: data.type,
-          relationshipType: data.relationshipType || '',
-          situationType: data.situationType || '',
-          priorities: data.priorities || [],
-          barriers: data.barriers || [],
-          describeId: data.describeId || null,
-          describeCustom: data.describeCustom || '',
-          feelings: data.feelings || [],
-          assertId: data.assertId || null,
-          assertCustom: data.assertCustom || '',
-          reinforceIds: data.reinforceIds || [],
-          anchorPhrase: data.anchorPhrase || '',
-          middleGroundId: data.middleGroundId || null,
-          middleGroundCustom: data.middleGroundCustom || '',
-          walkAwayId: data.walkAwayId || null,
-          walkAwayCustom: data.walkAwayCustom || '',
-          debriefOverall: data.debriefOverall || null,
-          debriefWentWell: data.debriefWentWell || [],
-          debriefToChange: data.debriefToChange || [],
-          debriefCurrentFeelings: data.debriefCurrentFeelings || [],
-          turningPointIds: data.turningPointIds || [],
-          momentResponseIds: data.momentResponseIds || [],
-          bodySignalIds: data.bodySignalIds || [],
-          thoughtPatternIds: data.thoughtPatternIds || [],
-          underneathIds: data.underneathIds || [],
-          copeAheadId: data.copeAheadId || null,
-          reflectionLanded: data.reflectionLanded || null,
-        }
-      );
+      await db.collection(`users/${userId}/dearManSessions`).add({
+        type: data.type,
+        relationshipType: data.relationshipType || '',
+        situationType: data.situationType || '',
+        priorities: data.priorities || [],
+        barriers: data.barriers || [],
+        describeId: data.describeId || null,
+        describeCustom: data.describeCustom || '',
+        feelings: data.feelings || [],
+        assertId: data.assertId || null,
+        assertCustom: data.assertCustom || '',
+        reinforceIds: data.reinforceIds || [],
+        anchorPhrase: data.anchorPhrase || '',
+        middleGroundId: data.middleGroundId || null,
+        middleGroundCustom: data.middleGroundCustom || '',
+        walkAwayId: data.walkAwayId || null,
+        walkAwayCustom: data.walkAwayCustom || '',
+        debriefOverall: data.debriefOverall || null,
+        debriefWentWell: data.debriefWentWell || [],
+        debriefToChange: data.debriefToChange || [],
+        debriefCurrentFeelings: data.debriefCurrentFeelings || [],
+        turningPointIds: data.turningPointIds || [],
+        momentResponseIds: data.momentResponseIds || [],
+        bodySignalIds: data.bodySignalIds || [],
+        thoughtPatternIds: data.thoughtPatternIds || [],
+        underneathIds: data.underneathIds || [],
+        copeAheadId: data.copeAheadId || null,
+        reflectionLanded: data.reflectionLanded || null,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
       return { success: true };
     } catch (error) {
       console.error('Error saving DEAR MAN session:', error);
       throw new HttpsError('internal', 'Failed to save session');
-    } finally {
-      await session.close();
     }
   }
 );
@@ -2629,7 +2502,7 @@ export const getQuickTools = onCall(
  * Returns sessions sorted by createdAt descending.
  */
 export const getDearManSessions = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  {},
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -2638,70 +2511,45 @@ export const getDearManSessions = onCall(
     const userId = request.auth.uid;
     const limit = (request.data as { limit?: number })?.limit ?? 20;
 
-    const session = getDriver().session();
     try {
-      const result = await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:DearManSession)
-        RETURN s.id AS id,
-               s.type AS type,
-               s.relationshipType AS relationshipType,
-               s.situationType AS situationType,
-               s.priorities AS priorities,
-               s.barriers AS barriers,
-               s.describeId AS describeId,
-               s.describeCustom AS describeCustom,
-               s.feelings AS feelings,
-               s.assertId AS assertId,
-               s.assertCustom AS assertCustom,
-               s.reinforceIds AS reinforceIds,
-               s.anchorPhrase AS anchorPhrase,
-               s.middleGroundId AS middleGroundId,
-               s.middleGroundCustom AS middleGroundCustom,
-               s.walkAwayId AS walkAwayId,
-               s.walkAwayCustom AS walkAwayCustom,
-               s.debriefOverall AS debriefOverall,
-               s.debriefWentWell AS debriefWentWell,
-               s.debriefToChange AS debriefToChange,
-               s.debriefCurrentFeelings AS debriefCurrentFeelings,
-               s.createdAt AS createdAt
-        ORDER BY s.createdAt DESC
-        LIMIT $limit
-        `,
-        { userId, limit: neo4j.int(limit) }
-      );
+      const snap = await db
+        .collection(`users/${userId}/dearManSessions`)
+        .orderBy('createdAt', 'desc')
+        .limit(limit)
+        .get();
 
-      const sessions = result.records.map((r: Neo4jRecord) => ({
-        id: r.get('id'),
-        type: r.get('type'),
-        relationshipType: r.get('relationshipType') || '',
-        situationType: r.get('situationType') || '',
-        priorities: r.get('priorities') || [],
-        barriers: r.get('barriers') || [],
-        describeId: r.get('describeId'),
-        describeCustom: r.get('describeCustom') || '',
-        feelings: r.get('feelings') || [],
-        assertId: r.get('assertId'),
-        assertCustom: r.get('assertCustom') || '',
-        reinforceIds: r.get('reinforceIds') || [],
-        anchorPhrase: r.get('anchorPhrase') || '',
-        middleGroundId: r.get('middleGroundId'),
-        middleGroundCustom: r.get('middleGroundCustom') || '',
-        walkAwayId: r.get('walkAwayId'),
-        walkAwayCustom: r.get('walkAwayCustom') || '',
-        debriefOverall: r.get('debriefOverall'),
-        debriefWentWell: r.get('debriefWentWell') || [],
-        debriefToChange: r.get('debriefToChange') || [],
-        debriefCurrentFeelings: r.get('debriefCurrentFeelings') || [],
-        createdAt: r.get('createdAt')?.toString() || new Date().toISOString(),
-      }));
+      const sessions = snap.docs.map(doc => {
+        const d = doc.data();
+        return {
+          id: doc.id,
+          type: d.type,
+          relationshipType: d.relationshipType || '',
+          situationType: d.situationType || '',
+          priorities: d.priorities || [],
+          barriers: d.barriers || [],
+          describeId: d.describeId || null,
+          describeCustom: d.describeCustom || '',
+          feelings: d.feelings || [],
+          assertId: d.assertId || null,
+          assertCustom: d.assertCustom || '',
+          reinforceIds: d.reinforceIds || [],
+          anchorPhrase: d.anchorPhrase || '',
+          middleGroundId: d.middleGroundId || null,
+          middleGroundCustom: d.middleGroundCustom || '',
+          walkAwayId: d.walkAwayId || null,
+          walkAwayCustom: d.walkAwayCustom || '',
+          debriefOverall: d.debriefOverall || null,
+          debriefWentWell: d.debriefWentWell || [],
+          debriefToChange: d.debriefToChange || [],
+          debriefCurrentFeelings: d.debriefCurrentFeelings || [],
+          createdAt: d.createdAt?.toDate?.()?.toISOString() || new Date().toISOString(),
+        };
+      });
 
       return { sessions };
     } catch (error) {
       console.error('Error fetching DEAR MAN sessions:', error);
       throw new HttpsError('internal', 'Failed to fetch sessions');
-    } finally {
-      await session.close();
     }
   }
 );
