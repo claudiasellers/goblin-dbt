@@ -218,7 +218,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
           
           <div className="space-y-3">
             {tools.slice(0, 2).map((tool, index) => (
-              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} />
+              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} activationPatternId={pattern.id} />
             ))}
           </div>
         </div>
@@ -285,13 +285,13 @@ function getToolPath(toolId: string): string {
   return `/tool/${toolId}`;
 }
 
-function ToolCard({ tool, isPrimary, checkinEmotions }: { tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[] }) {
+function ToolCard({ tool, isPrimary, checkinEmotions, activationPatternId }: { tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[]; activationPatternId?: string }) {
   const toolPath = getToolPath(tool.id);
 
   return (
     <Link
       to={toolPath}
-      state={checkinEmotions?.length ? { checkinEmotions } : undefined}
+      state={toolLinkState(checkinEmotions, activationPatternId)}
       className={`
         block p-4 rounded-xl transition-all
         ${isPrimary 
@@ -323,3 +323,11 @@ function ToolCard({ tool, isPrimary, checkinEmotions }: { tool: ToolRecommendati
   );
 }
 
+/** Location state for tool links. Keeps the original { checkinEmotions } shape and adds the pattern id when known. */
+function toolLinkState(checkinEmotions?: string[], activationPatternId?: string) {
+  if (!checkinEmotions?.length && !activationPatternId) return undefined;
+  return {
+    ...(checkinEmotions?.length ? { checkinEmotions } : {}),
+    ...(activationPatternId ? { activationPatternId } : {}),
+  };
+}

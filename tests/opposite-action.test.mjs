@@ -131,6 +131,12 @@ test("malformed, uncertain, unsafe, and incomplete sessions are rejected", () =>
   for (const value of [null, [], "", undefined])
     assert.throws(() => validateOppositeActionSession(value));
 });
+test("flow migration is the guided v2 content", () => {
+  assert.equal(flow.version, "oa-guided-v2");
+  assert.match(cypher, /p\.version = 'oa-guided-v2'/);
+  assert.equal(flow.choices.willingness, undefined);
+  assert.ok(Array.isArray(flow.sourceIds) && flow.sourceIds.length > 0);
+});
 test("all clinical branches have graph copy and unique choice IDs", () => {
   for (const route of ["support", "opposite", "problem", "clarify"])
     assert.ok(flow.copy[route]);

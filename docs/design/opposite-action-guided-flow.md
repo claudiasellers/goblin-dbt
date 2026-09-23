@@ -48,3 +48,46 @@ Have the model return structured `insight`, `suggestedAdjustment`, `evidenceIds`
 - `npm run build` and `npm run build --prefix functions`.
 - Scoped ESLint on the new frontend files.
 - Chromium browser checks passed at 390px mobile and 1280px desktop widths: safety blocking, uncertainty, problem-solving, plan save, save failure/retry, practiced reflection, repeated attempt, and unsafe outcome. No horizontal overflow or runtime errors. Graph and save responses were mocked; live Firebase/Neo4j integration requires the staging smoke test above.
+
+## v2 (`oa-guided-v2`)
+
+The migration in `schema/opposite-action-flow.cypher` replaces the v1 flow content; `getOppositeActionContent` now accepts only `flow.version === 'oa-guided-v2'`.
+
+**What changed and why**
+- **Compression.** Roughly 10 screens became about 6 for someone in high distress: one decision per card, taps instead of typing, no required free text. Situation and snag planning are optional, and a backup plan is never required, even when the user picks a snag. The v1 willingness choice was removed. Safety runs first and the graph route table is unchanged: unsafe or unsure goes to support, and uncertain facts or effectiveness go to clarify or problem.
+- **Somatic circuit-breaker.** Before planning, the user holds at least one body cue for about 3 seconds (posture, face or muscle tension, which is the "all the way" part of opposite action). The cues come from the graph: `EmotionRegulationContent.somaticCues` per parent, plus optional urge-level cues on `ActionUrge`. `somaticCues` (a list) is shown before the parent defaults. When `somaticReplace` is true, only the urge's cues are shown: `fear-freeze` and `sad-bed` need up-regulation such as standing or sitting up, not relaxation. `getOppositeActionContent` returns `somaticCues` (default `[]`) and `somaticReplace` (default `false`) for each urge. An escape swaps in a smaller micro-step, which the user still holds.
+- **Urge metric.** The headline number is urge strength ("how strong is the pull to {urge}"), 0–10: `urgeBefore` → `urgeAfterBody` → `urgeAfter`. Emotion intensity is optional and secondary, and the readout never leads with a flat emotion number.
+- **Follow-up loop.** A plan for later is saved with a `dueAt` no more than 48h ahead. Home shows a follow-up card, and the user can download a content-free `.ics` reminder. The follow-up reflection (did / partly / didn't, with a reason) updates the same session.
+
+**New fields.** The session is `schemaVersion: 2` (see `src/data/oppositeActionTypes.ts` and `functions/src/oppositeActionValidation.ts`). New fields: `urgeLabel`, `urgeBefore`, `urgeAfterBody`, `urgeAfter`, `bodyCues[]`, `cueId` (`now|today|next_time`), `dueAt`, `missedReason` and `status: 'missed'`. `OppositeActionSession` nodes also store `schemaVersion`, `urgeBefore`, `urgeAfterBody`, `urgeAfter`, `missedReason`, `cueId`, and `dueAt` (a Neo4j `datetime`, indexed, or null). Scores (`urge*`, `intensity*`) and `schemaVersion` are stored on the node as Neo4j integers. The `dataJson` snapshot always carries the latest status and the server's `sourceIds`. The read callables return scores from `dataJson`, as JSON numbers, never from the node integers.
+
+**Save semantics.** The upsert key stays `${uid}:${id}`, inside one write transaction. It runs the same knowledge check as v1: the flow version matches, the emotion is applicable, the urge belongs to the parent unless it is custom, and the route is `opposite`. Allowed status transitions on the same node:
+- `planned` can move to `practiced` or `missed`.
+- `missed` can move to `practiced`, when the user did it later.
+- `practiced` is final.
+
+Any other transition, including any move back to `planned`, is rejected with `failed-precondition`. Payloads are never logged.
+
+**New callables.** All three require auth and return only the caller's own schema v2 sessions. Each item is the parsed `dataJson` with the node's `status`, `createdAt` and `updatedAt`. Unparseable records are skipped.
+- `getOppositeActionSessions({ limit?: 1..50 = 20 })` returns `{ sessions }`, newest `updatedAt` first.
+- `getOppositeActionSession({ id })` returns `{ session | null }`. It is used for follow-up deep links, and matches on key `${uid}:${id}`, so another user's ID resolves to null.
+- `getOppositeActionFollowUps({})` returns `{ sessions, copy }`:
+  - `sessions`: planned sessions whose `dueAt` is later than 7 days ago, soonest first, at most 10.
+  - `copy`: the `followUpCard*`, `notificationBody` and `calendar*` strings from the flow copy, or `{}` if the flow node is missing. Export and delete already cover `OppositeActionSession`.
+
+**Deployment order**
+1. Run `schema/opposite-action-flow.cypher` on Aura. It sets the v2 flow, somatic cues, urge overrides and the `dueAt` index.
+2. `firebase deploy --only functions`. This includes the updated `getOppositeActionContent` and `saveOppositeActionSession` and the new `getOppositeActionSessions`, `getOppositeActionSession` and `getOppositeActionFollowUps`.
+3. `firebase deploy --only hosting`.
+
+Between steps 1 and 3, saves from the v1 frontend fail with `failed-precondition`, because their `contentVersion` no longer matches the flow node. Deploy the three steps close together.
+
+**Not implemented yet.** Push notifications (FCM tokens plus a scheduled function that queries planned sessions by `dueAt`) are the next layer. Today the loop relies on the in-app follow-up card and the optional calendar file.
+
+**Verification.** `node --test tests/*.mjs` covers:
+- the v2 validator: valid planned-later, planned-now, practiced and missed sessions, rejection cases, and stripping of client-supplied `userId`/`sourceIds`
+- `urgeReadout`, `capacityDefaultSize`, `fill` and `urgePhrase`
+- follow-up timing and states
+- the `.ics` file containing no action or emotion text
+- the required copy keys, and a check that no copy overpromises
+- somatic cue coverage for all 9 parents, each urge override ID, `replace: true` on freeze and bed urges, and no relaxing cues on freeze

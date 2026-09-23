@@ -3,6 +3,7 @@ import { Sidebar, CONTENT_OFFSET_CLASS } from './Sidebar';
 import { InsightsSidePanel } from './insights/InsightsSidePanel';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
+import { OppositeActionFollowUpProvider } from '../contexts/OppositeActionFollowUpContext';
 
 /**
  * App shell: sidebar + header + scrolling main column.
@@ -77,7 +78,10 @@ export function DashboardLayout() {
         <main className="flex-1 min-h-0 overflow-y-auto">
           <div className="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex gap-6">
             <div className="flex-1 min-w-0">
-              <Outlet />
+              {/* App-level Opposite Action follow-ups: one fetch + in-tab reminder for every page */}
+              <OppositeActionFollowUpProvider>
+                <Outlet />
+              </OppositeActionFollowUpProvider>
             </div>
             {showSidePanel && (
               <aside className="hidden lg:block w-[280px] flex-shrink-0" aria-label="Recent patterns">
