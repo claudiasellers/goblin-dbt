@@ -1,3 +1,4 @@
+import { validateOppositeActionSession } from './oppositeActionValidation';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
@@ -483,6 +484,11 @@ export const deleteUserData = onCall(
         { userId }
       );
 
+      await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:OppositeActionSession)
+         DETACH DELETE s`, { userId }
+      );
+
       // Delete the user node
       await session.run(
         `
@@ -540,8 +546,13 @@ export const exportUserData = onCall(
         bodySensations: record.get('sensations'),
       }));
 
+      const oaResult = await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:OppositeActionSession)
+         RETURN s {.*} AS session ORDER BY s.updatedAt DESC`, { userId }
+      );
       return {
         data: {
+          oppositeActionSessions: oaResult.records.map((r: Neo4jRecord) => r.get('session')),
           exportedAt: new Date().toISOString(),
           profile: userProfile,
           checkIns,
@@ -1936,6 +1947,7 @@ interface ParentProtocol {
 }
 
 interface OppositeActionContentResult {
+  flow: Record<string, unknown>;
   emotions: OppositeActionEmotionResult[];
   parents: Record<string, ParentProtocol>;
 }
@@ -1950,7 +1962,7 @@ export const getOppositeActionContent = onCall(
   async (request): Promise<OppositeActionContentResult> => {
     const { emotionIds } = request.data as { emotionIds: string[] };
 
-    if (!emotionIds || !Array.isArray(emotionIds) || emotionIds.length === 0) {
+    if (!Array.isArray(emotionIds) || emotionIds.length === 0 || emotionIds.length > 20 || emotionIds.some(id => typeof id !== 'string' || id.length > 100)) {
       throw new HttpsError('invalid-argument', 'emotionIds array is required');
     }
 
@@ -2027,7 +2039,16 @@ export const getOppositeActionContent = onCall(
         }
       }
 
-      return { emotions, parents };
+      const flowResult = await session.run(
+        "MATCH (p:OppositeActionFlow {id: 'opposite_action_flow'}) RETURN p.contentJson AS content"
+      );
+      const raw = flowResult.records[0]?.get('content');
+      if (!raw) throw new HttpsError('failed-precondition', 'Opposite Action guided content migration is required');
+      const flow = JSON.parse(raw);
+      if (flow.version !== 'oa-guided-v1' || !flow.copy || !flow.choices || !flow.routes || !Array.isArray(flow.sourceIds)) {
+        throw new HttpsError('failed-precondition', 'Invalid Opposite Action flow content');
+      }
+      return { emotions, parents, flow };
     } catch (error) {
       console.error('Error getting opposite action content:', error);
       throw new HttpsError('internal', 'Failed to get opposite action content');
@@ -3176,5 +3197,70 @@ export const getProblemSolveContent = onCall(
     } finally {
       await session.close();
     }
+  }
+);
+
+
+/** Explicit opt-in save. No LLM call; typed private evidence for future retrieval. */
+export const saveOppositeActionSession = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to save');
+    let data: Record<string, unknown>;
+    try { data = validateOppositeActionSession(request.data); }
+    catch { throw new HttpsError('invalid-argument', 'Invalid Opposite Action session'); }
+    const userId = request.auth.uid;
+    const session = getDriver().session();
+    try {
+      await session.executeWrite(async tx => {
+        const knowledge = await tx.run(
+          `MATCH (e:Emotion {id: $emotionId})-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent {dbtParent: $parentId})
+           MATCH (p:OppositeActionFlow {id: 'opposite_action_flow', version: $contentVersion})
+           OPTIONAL MATCH (c)-[:HAS_ACTION_URGE]->(urge:ActionUrge {id: $urgeId})
+           WHERE e.oppositeActionApplicable = true
+           RETURN e.oppositeActionApplicable AS applicable, urge.id AS urgeId, p.contentJson AS flow`,
+          { emotionId: data.emotionId, parentId: data.parentId, contentVersion: data.contentVersion, urgeId: data.urgeId }
+        );
+        const record = knowledge.records[0];
+        if (!record || !record.get('applicable') || (data.urgeId !== 'custom' && !record.get('urgeId'))) {
+          throw new HttpsError('failed-precondition', 'Content changed; start a new exercise');
+        }
+        const flow = JSON.parse(record.get('flow'));
+        if (flow.routes[`${data.facts}:${data.effectiveness}`] !== 'opposite') {
+          throw new HttpsError('invalid-argument', 'This session does not route to opposite action');
+        }
+        const snapshot = { ...data, sourceIds: flow.sourceIds };
+        await tx.run(
+          `MERGE (u:User {id: $userId})
+           MERGE (s:OppositeActionSession {key: $key})
+           ON CREATE SET s.createdAt = datetime(), s.id = $id
+           SET s.updatedAt = datetime(), s.status = $status, s.emotionId = $emotionId,
+               s.urgeId = $urgeId, s.contentVersion = $contentVersion, s.dataJson = $dataJson,
+               s.intensityBefore = $intensityBefore, s.intensityAfter = $intensityAfter,
+               s.outcome = $outcome
+           MERGE (u)-[:COMPLETED_SESSION]->(s)
+           WITH s
+           OPTIONAL MATCH (s)-[old:FOCUSED_ON|TARGETED_URGE]->()
+           DELETE old
+           WITH DISTINCT s
+           MATCH (e:Emotion {id: $emotionId})
+           MERGE (s)-[:FOCUSED_ON]->(e)
+           WITH s
+           MATCH (p:OppositeActionFlow {id: 'opposite_action_flow'})
+           MERGE (s)-[:USED_PROTOCOL]->(p)
+           WITH s
+           OPTIONAL MATCH (urge:ActionUrge {id: $urgeId})
+           FOREACH (n IN CASE WHEN urge IS NULL THEN [] ELSE [urge] END | MERGE (s)-[:TARGETED_URGE]->(n))`,
+          { userId, key: `${userId}:${data.id}`, id: data.id, status: data.status, emotionId: data.emotionId,
+            urgeId: data.urgeId, contentVersion: data.contentVersion, dataJson: JSON.stringify(snapshot),
+            intensityBefore: data.intensityBefore, intensityAfter: data.intensityAfter, outcome: data.outcome }
+        );
+      });
+      return { success: true };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      // Do not log therapy text or request payloads.
+      throw new HttpsError('internal', 'Could not save the exercise');
+    } finally { await session.close(); }
   }
 );

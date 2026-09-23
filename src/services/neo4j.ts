@@ -1,3 +1,4 @@
+import type { OppositeActionFlow, OppositeActionSession } from '../data/oppositeActionTypes';
 import { httpsCallable } from 'firebase/functions';
 import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
@@ -311,6 +312,7 @@ export interface OppositeActionEmotionMapping {
 }
 
 export interface OppositeActionContent {
+  flow?: OppositeActionFlow;
   emotions: OppositeActionEmotionMapping[];
   parents: Record<string, ParentProtocol>;
 }
@@ -779,4 +781,11 @@ export async function recordToolOutcome(
   outcome: 'helped' | 'somewhat' | 'not_really'
 ): Promise<void> {
   await recordToolOutcomeFn({ outcome });
+}
+
+const saveOppositeActionSessionFn = httpsCallable<OppositeActionSession, { success: boolean }>(
+  functions, 'saveOppositeActionSession', { timeout: CONTENT_TIMEOUT_MS }
+);
+export async function saveOppositeActionSession(data: OppositeActionSession): Promise<void> {
+  await saveOppositeActionSessionFn(data);
 }
