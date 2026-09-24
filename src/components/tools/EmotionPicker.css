@@ -1,0 +1,60 @@
+.emotion-picker-category {
+  background: var(--color-bg-card);
+  background: color-mix(in srgb, var(--emotion-tint) 9%, var(--color-bg-card));
+  border-inline-start: 3px solid var(--emotion-tint);
+}
+.emotion-picker-disclosure {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 220ms ease-out,
+    opacity 180ms ease-out,
+    visibility 220ms;
+}
+.emotion-picker-disclosure[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+}
+.emotion-picker-disclosure-inner {
+  overflow: hidden;
+  min-height: 0;
+}
+.emotion-picker-indicator {
+  transition: transform 180ms ease-out;
+}
+.emotion-picker-indicator[data-open="true"] {
+  transform: rotate(45deg);
+}
+.emotion-picker-chip,
+.emotion-picker-continue {
+  transition:
+    background-color 180ms ease-out,
+    border-color 180ms ease-out,
+    transform 120ms ease-out;
+}
+.emotion-picker-chip:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.emotion-picker button:disabled {
+  cursor: not-allowed;
+}
+.emotion-picker button:focus-visible,
+.emotion-picker input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .emotion-picker *,
+  .emotion-picker *::before,
+  .emotion-picker *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  .emotion-picker-chip:active:not(:disabled) {
+    transform: none;
+  }
+}

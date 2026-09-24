@@ -1,3 +1,4 @@
+import type { OppositeActionFlow, OppositeActionSession, SavedOppositeActionSession } from '../data/oppositeActionTypes';
 import { httpsCallable } from 'firebase/functions';
 import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
@@ -289,6 +290,10 @@ export interface ActionUrgeData {
   small: string;
   medium: string;
   bigger: string;
+  /** Urge-specific body cues, shown before the parent defaults. */
+  somaticCues?: string[];
+  /** When true, ONLY the urge's cues are shown (e.g. freeze needs up-regulation). */
+  somaticReplace?: boolean;
 }
 
 export interface ParentProtocol {
@@ -299,6 +304,8 @@ export interface ParentProtocol {
   acknowledgment: string;
   bodyOpposite: string;
   defaultOpposites: { small: string; medium: string; bigger: string };
+  /** Atomic do-it-now body cues for the somatic circuit-breaker (graph: c.somaticCues). */
+  somaticCues: string[];
   urges: ActionUrgeData[];
 }
 
@@ -311,6 +318,7 @@ export interface OppositeActionEmotionMapping {
 }
 
 export interface OppositeActionContent {
+  flow?: OppositeActionFlow;
   emotions: OppositeActionEmotionMapping[];
   parents: Record<string, ParentProtocol>;
 }
@@ -779,4 +787,57 @@ export async function recordToolOutcome(
   outcome: 'helped' | 'somewhat' | 'not_really'
 ): Promise<void> {
   await recordToolOutcomeFn({ outcome });
+}
+
+const saveOppositeActionSessionFn = httpsCallable<OppositeActionSession, { success: boolean }>(
+  functions, 'saveOppositeActionSession', { timeout: CONTENT_TIMEOUT_MS }
+);
+export async function saveOppositeActionSession(data: OppositeActionSession): Promise<void> {
+  await saveOppositeActionSessionFn(data);
+}
+
+const getOppositeActionSessionsFn = httpsCallable<
+  { limit?: number },
+  { sessions: SavedOppositeActionSession[] }
+>(functions, 'getOppositeActionSessions', { timeout: CONTENT_TIMEOUT_MS });
+
+/**
+ * The signed-in user's recent Opposite Action sessions (newest first, schema v2 only).
+ * Used for follow-up check-ins on plans tried later and per-urge trends.
+ */
+export async function getOppositeActionSessions(
+  limit = 20
+): Promise<SavedOppositeActionSession[]> {
+  const result = await getOppositeActionSessionsFn({ limit });
+  return result.data.sessions;
+}
+
+const getOppositeActionSessionFn = httpsCallable<
+  { id: string },
+  { session: SavedOppositeActionSession | null }
+>(functions, 'getOppositeActionSession', { timeout: CONTENT_TIMEOUT_MS });
+
+/** One of the signed-in user's sessions by id (for follow-up deep links), or null. */
+export async function getOppositeActionSession(
+  id: string
+): Promise<SavedOppositeActionSession | null> {
+  const result = await getOppositeActionSessionFn({ id });
+  return result.data.session;
+}
+
+const getOppositeActionFollowUpsFn = httpsCallable<
+  Record<string, never>,
+  { sessions: SavedOppositeActionSession[]; copy: Record<string, string> }
+>(functions, 'getOppositeActionFollowUps', { timeout: CONTENT_TIMEOUT_MS });
+
+/**
+ * Planned (not yet reflected) sessions that have a follow-up time, soonest first,
+ * plus the small set of graph copy the home card and reminders need.
+ */
+export async function getOppositeActionFollowUps(): Promise<{
+  sessions: SavedOppositeActionSession[];
+  copy: Record<string, string>;
+}> {
+  const result = await getOppositeActionFollowUpsFn({});
+  return result.data;
 }

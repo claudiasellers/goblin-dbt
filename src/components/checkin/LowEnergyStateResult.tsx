@@ -197,7 +197,7 @@ export function LowEnergyStateResult({
           </p>
           <div className="space-y-2">
             {tools.slice(0, 2).map(tool => (
-              <ToolCardCompact key={tool.id} tool={tool} checkinEmotions={checkinEmotions} />
+              <ToolCardCompact key={tool.id} tool={tool} checkinEmotions={checkinEmotions} activationPatternId={pattern.id} />
             ))}
           </div>
         </div>
@@ -254,16 +254,18 @@ function getPatternEmoji(patternId: string): string {
 function ToolCardCompact({
   tool,
   checkinEmotions,
+  activationPatternId,
 }: {
   tool: ToolRecommendation;
   checkinEmotions?: string[];
+  activationPatternId?: string;
 }) {
   const toolPath = `/tool/${tool.id}`;
 
   return (
     <Link
       to={toolPath}
-      state={checkinEmotions?.length ? { checkinEmotions } : undefined}
+      state={toolLinkState(checkinEmotions, activationPatternId)}
       className="block p-3 rounded-lg bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] transition-all"
     >
       <div className="flex items-center gap-3">
@@ -278,4 +280,13 @@ function ToolCardCompact({
       </div>
     </Link>
   );
+}
+
+/** Location state for tool links. Keeps the original { checkinEmotions } shape and adds the pattern id when known. */
+function toolLinkState(checkinEmotions?: string[], activationPatternId?: string) {
+  if (!checkinEmotions?.length && !activationPatternId) return undefined;
+  return {
+    ...(checkinEmotions?.length ? { checkinEmotions } : {}),
+    ...(activationPatternId ? { activationPatternId } : {}),
+  };
 }

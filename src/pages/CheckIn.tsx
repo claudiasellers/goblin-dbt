@@ -17,6 +17,8 @@ import {
   type DiscriminatingQuestion,
 } from '../services/neo4j';
 import { getEmotionByName } from '../data/emotions';
+import { useOppositeActionFollowUpsContext } from '../hooks/useOppositeActionFollowUps';
+import { OppositeActionFollowUpCard } from '../components/tools/oppositeAction/OppositeActionFollowUpCard';
 
 type EntryPoint = 'standard' | 'somatic';
 
@@ -66,6 +68,8 @@ export function CheckIn() {
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [discriminatingQuestions, setDiscriminatingQuestions] = useState<DiscriminatingQuestion[]>([]);
   const [discriminatingAnswers, setDiscriminatingAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
+  // Opposite Action plans made for later (app-level, shared with the in-tab reminder).
+  const followUps = useOppositeActionFollowUpsContext();
 
   // Signed-out entry: tools are available right now; an account only adds saved check-ins.
   if (!user) {
@@ -381,6 +385,11 @@ export function CheckIn() {
 
   return (
     <div>
+      {/* Follow-up on an Opposite Action plan, only before a new check-in starts */}
+      {step === 'emotion' && followUps.pending.length > 0 && followUps.ready && (
+        <OppositeActionFollowUpCard pending={followUps.pending} copy={followUps.copy} />
+      )}
+
       {/* Progress indicator - subtle, shows optionality */}
       {showProgress && (
         <div className="mb-6">
