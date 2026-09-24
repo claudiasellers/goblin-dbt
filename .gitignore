@@ -30,3 +30,6 @@ dist-ssr
 
 # Superpowers brainstorming sessions
 .superpowers/
+
+# Firebase Functions build output (rebuilt by the predeploy step)
+functions/lib/
