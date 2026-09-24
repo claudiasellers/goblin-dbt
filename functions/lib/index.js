@@ -36,7 +36,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getProblemSolveContent = exports.getDearManSessions = exports.getQuickTools = exports.getDearManReflection = exports.getDearManDebriefContent = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getDiscriminatingQuestions = exports.getStateAndTools = exports.getInsightsData = exports.recordToolOutcome = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
+exports.saveOppositeActionSession = exports.getProblemSolveContent = exports.getDearManSessions = exports.getQuickTools = exports.getDearManReflection = exports.getDearManDebriefContent = exports.saveDearManSession = exports.getDearManContent = exports.getOppositeActionContent = exports.getRelatedEmotions = exports.getDiscriminatingQuestions = exports.getStateAndTools = exports.getInsightsData = exports.recordToolOutcome = exports.getWeeklyToolUsageCount = exports.trackToolUsage = exports.exportUserData = exports.deleteUserData = exports.updateUserProfile = exports.getUserProfile = exports.initializeSchema = exports.ensureUserExists = exports.getCheckInsByUser = exports.saveCheckIn = void 0;
+const oppositeActionValidation_1 = require("./oppositeActionValidation");
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -416,6 +417,8 @@ exports.deleteUserData = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, ne
         OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
         DETACH DELETE s, c
         `, { userId });
+        await session.run(`MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:OppositeActionSession)
+         DETACH DELETE s`, { userId });
         // Delete the user node
         await session.run(`
         MATCH (u:User {id: $userId})
@@ -454,8 +457,11 @@ exports.exportUserData = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, ne
         RETURN c {.*} AS checkIn, sensations
         `, { userId });
         const checkIns = checkInsResult.records.map((record) => (Object.assign(Object.assign({}, record.get('checkIn')), { bodySensations: record.get('sensations') })));
+        const oaResult = await session.run(`MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:OppositeActionSession)
+         RETURN s {.*} AS session ORDER BY s.updatedAt DESC`, { userId });
         return {
             data: {
+                oppositeActionSessions: oaResult.records.map((r) => r.get('session')),
                 exportedAt: new Date().toISOString(),
                 profile: userProfile,
                 checkIns,
@@ -1571,8 +1577,9 @@ exports.getRelatedEmotions = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser
  * No auth required — this is public emotion knowledge.
  */
 exports.getOppositeActionContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    var _a;
     const { emotionIds } = request.data;
-    if (!emotionIds || !Array.isArray(emotionIds) || emotionIds.length === 0) {
+    if (!Array.isArray(emotionIds) || emotionIds.length === 0 || emotionIds.length > 20 || emotionIds.some(id => typeof id !== 'string' || id.length > 100)) {
         throw new https_1.HttpsError('invalid-argument', 'emotionIds array is required');
     }
     const session = getDriver().session();
@@ -1639,7 +1646,15 @@ exports.getOppositeActionContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo
                 };
             }
         }
-        return { emotions, parents };
+        const flowResult = await session.run("MATCH (p:OppositeActionFlow {id: 'opposite_action_flow'}) RETURN p.contentJson AS content");
+        const raw = (_a = flowResult.records[0]) === null || _a === void 0 ? void 0 : _a.get('content');
+        if (!raw)
+            throw new https_1.HttpsError('failed-precondition', 'Opposite Action guided content migration is required');
+        const flow = JSON.parse(raw);
+        if (flow.version !== 'oa-guided-v1' || !flow.copy || !flow.choices || !flow.routes || !Array.isArray(flow.sourceIds)) {
+            throw new https_1.HttpsError('failed-precondition', 'Invalid Opposite Action flow content');
+        }
+        return { emotions, parents, flow };
     }
     catch (error) {
         console.error('Error getting opposite action content:', error);
@@ -2573,6 +2588,70 @@ exports.getProblemSolveContent = (0, https_1.onCall)({ secrets: [neo4jUri, neo4j
     catch (error) {
         console.error('Error getting problem solve content:', error);
         throw new https_1.HttpsError('internal', 'Failed to get problem solve content');
+    }
+    finally {
+        await session.close();
+    }
+});
+/** Explicit opt-in save. No LLM call; typed private evidence for future retrieval. */
+exports.saveOppositeActionSession = (0, https_1.onCall)({ secrets: [neo4jUri, neo4jUser, neo4jPassword] }, async (request) => {
+    if (!request.auth)
+        throw new https_1.HttpsError('unauthenticated', 'Sign in to save');
+    let data;
+    try {
+        data = (0, oppositeActionValidation_1.validateOppositeActionSession)(request.data);
+    }
+    catch (_a) {
+        throw new https_1.HttpsError('invalid-argument', 'Invalid Opposite Action session');
+    }
+    const userId = request.auth.uid;
+    const session = getDriver().session();
+    try {
+        await session.executeWrite(async (tx) => {
+            const knowledge = await tx.run(`MATCH (e:Emotion {id: $emotionId})-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent {dbtParent: $parentId})
+           MATCH (p:OppositeActionFlow {id: 'opposite_action_flow', version: $contentVersion})
+           OPTIONAL MATCH (c)-[:HAS_ACTION_URGE]->(urge:ActionUrge {id: $urgeId})
+           WHERE e.oppositeActionApplicable = true
+           RETURN e.oppositeActionApplicable AS applicable, urge.id AS urgeId, p.contentJson AS flow`, { emotionId: data.emotionId, parentId: data.parentId, contentVersion: data.contentVersion, urgeId: data.urgeId });
+            const record = knowledge.records[0];
+            if (!record || !record.get('applicable') || (data.urgeId !== 'custom' && !record.get('urgeId'))) {
+                throw new https_1.HttpsError('failed-precondition', 'Content changed; start a new exercise');
+            }
+            const flow = JSON.parse(record.get('flow'));
+            if (flow.routes[`${data.facts}:${data.effectiveness}`] !== 'opposite') {
+                throw new https_1.HttpsError('invalid-argument', 'This session does not route to opposite action');
+            }
+            const snapshot = Object.assign(Object.assign({}, data), { sourceIds: flow.sourceIds });
+            await tx.run(`MERGE (u:User {id: $userId})
+           MERGE (s:OppositeActionSession {key: $key})
+           ON CREATE SET s.createdAt = datetime(), s.id = $id
+           SET s.updatedAt = datetime(), s.status = $status, s.emotionId = $emotionId,
+               s.urgeId = $urgeId, s.contentVersion = $contentVersion, s.dataJson = $dataJson,
+               s.intensityBefore = $intensityBefore, s.intensityAfter = $intensityAfter,
+               s.outcome = $outcome
+           MERGE (u)-[:COMPLETED_SESSION]->(s)
+           WITH s
+           OPTIONAL MATCH (s)-[old:FOCUSED_ON|TARGETED_URGE]->()
+           DELETE old
+           WITH DISTINCT s
+           MATCH (e:Emotion {id: $emotionId})
+           MERGE (s)-[:FOCUSED_ON]->(e)
+           WITH s
+           MATCH (p:OppositeActionFlow {id: 'opposite_action_flow'})
+           MERGE (s)-[:USED_PROTOCOL]->(p)
+           WITH s
+           OPTIONAL MATCH (urge:ActionUrge {id: $urgeId})
+           FOREACH (n IN CASE WHEN urge IS NULL THEN [] ELSE [urge] END | MERGE (s)-[:TARGETED_URGE]->(n))`, { userId, key: `${userId}:${data.id}`, id: data.id, status: data.status, emotionId: data.emotionId,
+                urgeId: data.urgeId, contentVersion: data.contentVersion, dataJson: JSON.stringify(snapshot),
+                intensityBefore: data.intensityBefore, intensityAfter: data.intensityAfter, outcome: data.outcome });
+        });
+        return { success: true };
+    }
+    catch (error) {
+        if (error instanceof https_1.HttpsError)
+            throw error;
+        // Do not log therapy text or request payloads.
+        throw new https_1.HttpsError('internal', 'Could not save the exercise');
     }
     finally {
         await session.close();
