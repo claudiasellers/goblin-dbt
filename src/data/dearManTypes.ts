@@ -62,9 +62,12 @@ export interface DearManSafetyCopy {
   rerateQuestion?: string;
   rerateHint?: string;
   oneMessageOnly?: string;
-  planLocked?: string;
-  planUnlocked?: string;
-  planLockedHeading?: string;
+  hotHeading?: string;
+  hotBody?: string;
+  hotCoolDown?: string;
+  hotReady?: string;
+  hotBodyCue?: string;
+  hotCooled?: string;
 }
 
 export interface SituationType {

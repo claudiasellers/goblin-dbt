@@ -417,7 +417,7 @@ function ExitStep({ c, exitId, exit, pull, need, social, feeling, tooHot, waitMi
               ))}
             </ul>
           </div>
-          <button type="button" className={primaryButton} onClick={() => onDone({ skills: ['request', 'wait_lock'] })}>{c.ask.cta}</button>
+          <button type="button" className={primaryButton} onClick={() => onDone({ skills: ['request'] })}>{c.ask.cta}</button>
         </div>
       )}
       {exitId === 'land' && <LetItLand c={c.land} pull={pull} tooHot={tooHot} elsewhere={{ ...social[need.social], social: need.social }} onDone={onDone} />}

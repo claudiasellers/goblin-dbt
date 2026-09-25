@@ -13,8 +13,8 @@ export interface DearManGateThresholds {
 
 /**
  * Where a 0–10 intensity rating lands:
- * - 'downshift': at or above downshiftAt → settle the body before planning
- * - 'wait':      above askMax → plan now, but the finished plan sits behind a wait lock
+ * - 'downshift': at or above downshiftAt → offer to settle the body before planning
+ * - 'wait':      above askMax → plan now; the finished plan opens with a heads-up (never a lock)
  * - 'clear':     at or under askMax (or no rating / no gates) → no gate
  */
 export type DearManGateState = 'downshift' | 'wait' | 'clear';
@@ -42,20 +42,15 @@ export function nextAfterRating(
 }
 
 /**
- * Minutes the Summary stays locked, or null for no lock.
- * A handoff always carries its own wait (the user chose to ask from a hurtful moment);
- * otherwise the latest rating above askMax locks the plan for gates.waitMinutes.
+ * Whether the Summary opens with a heads-up: the latest rating is still above askMax.
+ * The plan is never locked or hidden. The person worked for it; the heads-up names the risk
+ * ("this won't come out the way you mean it") and offers a quick way to take the edge off.
  */
-export function summaryWaitMinutes(opts: {
-  handoff: DearManHandoff | null;
+export function summaryHeadsUp(opts: {
   latestIntensity: number | null;
   gates: DearManGateThresholds | null | undefined;
-}): number | null {
-  const { handoff, latestIntensity, gates } = opts;
-  if (handoff) return handoff.waitMinutes > 0 ? handoff.waitMinutes : null;
-  if (!gates || latestIntensity == null) return null;
-  const state = dearManGateState(latestIntensity, gates);
-  return state === 'clear' || gates.waitMinutes <= 0 ? null : gates.waitMinutes;
+}): boolean {
+  return dearManGateState(opts.latestIntensity, opts.gates) !== 'clear';
 }
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/[_-]+/g, ' ');

@@ -84,7 +84,7 @@ NEEDS = [
   ("say", "To have a say", "control"),
 ]
 EXITS = [
-  ("ask", "Ask them to hear you", "Take this into Ask for what you need. Your feeling and need come with you.", "One calm message, after a wait. Only one.", ["dbt_dear_man","dbt_give","dbt_fast"]),
+  ("ask", "Ask them to hear you", "Take this into Ask for what you need. Your feeling and need come with you.", "One calm message. Only one.", ["dbt_dear_man","dbt_give","dbt_fast"]),
   ("land", "Let it land, meet the need elsewhere", "Grieve what you didn't get, set a boundary if you need one, then get the need met another way.", None, ["dbt_radical_acceptance","dbt_fast","need_restoration"]),
   ("opposite", "Do the opposite of the urge", "One small step against the urge.", None, ["dbt_opposite_action"]),
   ("park", "Park the replay", "Give the replay a set time tonight. Until then, back to your day.", None, ["rumination_postponement"]),
@@ -171,7 +171,7 @@ C["label"].update({"other": "Another word", "pickerPrompt": "Which word fits bes
 C["loadError"] = "This tool couldn't load. Try again, or choose another tool."
 
 C["ask"] = {"title": "Ask them to hear you", "sub": "Asking is its own skill. We'll hand what you told us to Ask for what you need.",
-  "carry": ["The feeling: {feeling}", "What you needed: {need}", "A {minutes}-minute wait before anything gets sent"],
+  "carry": ["The feeling: {feeling}", "What you needed: {need}"],
   "carryHeading": "Coming with you", "cta": "Continue", "finish": "Continue to Ask for what you need"}
 TOOL_NAME = "Recover from a hurtful moment"
 C["orient"]["skip"] = "I can't do this right now · skip"

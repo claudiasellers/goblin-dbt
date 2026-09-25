@@ -24,7 +24,7 @@ The flow runs through fixed stages, body first. It is written for the moment rig
 ## Rules and where they live
 
 - **All wording and clinical content lives in the graph.** `schema/invalidation-recovery.cypher` is generated from `scripts/invalidation-recovery/content.py` by `build.py`. Edit `content.py`, never the `.cypher` file. A test fails if the two drift apart.
-- **Thresholds live in `flow.gates`:** downshift at 7, cold reset at 9, asking allowed at 5 or under, a 20-minute wait lock (60 after chasing), certainty cut-offs of 80 and 40.
+- **Thresholds live in `flow.gates`:** downshift at 7, cold reset at 9, asking allowed at 5 or under, a 60-minute wait when the chosen opposite action is waiting instead of chasing (a timer the person opts into), certainty cut-offs of 80 and 40. `waitMinutes` (20) is no longer used to lock anything: DEAR MAN never locks the plan. If the latest rating is still above `askMax`, the plan opens with a heads-up ("it won't come out the way you mean it") and an optional 30-second breath (dear-man-safety-v2).
   - `gateFor()` (client) and `expectedRecoveryGate()` (server) implement the same rule, and a test checks they agree.
   - The save callable recomputes the gate. It also rejects an ask when the rating before the exit was above `askMax`, when the person isn't safe or has refused twice, or when a mocking state is deliberate.
 - **Ask hands off to DEAR MAN.** The handoff carries the emotion, the need, the close intensity, the wait minutes, whether it's one message only, and the wait copy (`src/data/dearManHandoff.ts`).
@@ -86,7 +86,7 @@ The flow runs through fixed stages, body first. It is written for the moment rig
    - one path per exit saves once
    - a second save returns `already-exists`
    - export and delete include the new session types
-   - DEAR MAN handoff shows the wait lock
+   - DEAR MAN plan opens with the "still loud" heads-up when the latest rating is above askMax (never locked)
 
 ## Not done on this branch
 

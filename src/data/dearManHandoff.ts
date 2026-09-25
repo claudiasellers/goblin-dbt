@@ -13,11 +13,11 @@ export interface DearManHandoff {
   needLabel: string;
   /** Latest 0–10 intensity when they chose to ask (always ≤ askMax: asking was unlocked). */
   intensity: number;
-  /** Minutes before the plan's message can be copied/sent (graph flow.gates). */
+  /** Suggested wait from the recovery flow. DEAR MAN no longer locks the plan; kept for session/analytics compatibility. */
   waitMinutes: number;
   /** True when the pull was to chase: one message only. */
   oneMessageOnly: boolean;
-  /** Graph copy for the wait lock, so DEAR MAN can lock the plan even if its own gate content is missing. */
+  /** Legacy: wait-lock copy from the recovery flow. Unused by DEAR MAN since the plan lock was removed. */
   waitCopy?: WaitLockCopy;
 }
 

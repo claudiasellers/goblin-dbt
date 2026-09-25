@@ -10,11 +10,10 @@ import { ToolLoading } from '../../components/tools/ToolLoading';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { isDearManHandoff, type DearManHandoff } from '../../data/dearManHandoff';
 import { UrgeScale } from '../../components/tools/oppositeAction/UrgeScale';
-import { WaitLock } from '../../components/tools/regulation/WaitLock';
 import { BreathOrb } from '../../components/tools/regulation/body';
 import { linkButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 import { fill } from '../../lib/invalidationRecovery';
-import { handoffPrefill, nextAfterRating, summaryWaitMinutes } from '../../lib/dearManSafety';
+import { handoffPrefill, nextAfterRating, summaryHeadsUp } from '../../lib/dearManSafety';
 
 type Phase =
   | 'entry'
@@ -168,10 +167,8 @@ export function DearMan() {
   const [checkStep, setCheckStep] = useState<'rate' | 'breathe' | 'rerate'>('rate');
   const [intensity, setIntensity] = useState<number | null>(null);
   const [downshifted, setDownshifted] = useState(false);
-  const [lockStartedAt, setLockStartedAt] = useState<number | null>(null);
-  /** Minutes left on the plan lock when the Summary was entered; null = no lock shown. */
-  const [lockMinutes, setLockMinutes] = useState<number | null>(null);
-  const [planUnlocked, setPlanUnlocked] = useState(false);
+  /** Heads-up on the Summary when it's still loud: offered, breathing, cooled, or waved off. Never a lock. */
+  const [headsUp, setHeadsUp] = useState<'offer' | 'breathing' | 'cooled' | 'dismissed'>('offer');
 
   // ── UI state ──
   const [saving, setSaving] = useState(false);
@@ -336,20 +333,7 @@ export function DearMan() {
     }
   };
 
-  // Written now, used later: the lock deadline is fixed the first time the plan is shown.
-  const enterSummary = () => {
-    const wait = summaryWaitMinutes({ handoff, latestIntensity: intensity, gates: gateThresholds });
-    if (wait == null || planUnlocked) {
-      setLockMinutes(null);
-    } else {
-      const now = Date.now();
-      const start = lockStartedAt ?? now;
-      if (lockStartedAt == null) setLockStartedAt(now);
-      const left = start + wait * 60_000 - now;
-      if (left <= 0) { setPlanUnlocked(true); setLockMinutes(null); } else setLockMinutes(left / 60_000);
-    }
-    setPhase('summary');
-  };
+  const enterSummary = () => setPhase('summary');
 
   const lowerFirst = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
   const carryCard = handoff && showCarry && sc.carriedOver ? (
@@ -593,7 +577,7 @@ export function DearMan() {
     setSaved(false); setSaveError(false);
     setHandoff(null); setShowCarry(true);
     setCheckStep('rate'); setIntensity(null); setDownshifted(false);
-    setLockStartedAt(null); setLockMinutes(null); setPlanUnlocked(false);
+    setHeadsUp('offer');
   };
 
   // ─── ENTRY ───
@@ -1334,32 +1318,48 @@ export function DearMan() {
     const reinforceTexts = resolveReinforce();
     const mgText = resolveMiddleGround();
     const waText = resolveWalkAway();
-    // No single assembled message on this screen, so the lock is a plain wait (text=null) above the plan.
-    // A handoff carries its own wait copy, so its lock never depends on this tool's gate content.
-    const waitCopy = safetyGates?.waitCopy ?? handoff?.waitCopy;
-    const planLocked = lockMinutes != null && !planUnlocked;
-    const lockTotal = summaryWaitMinutes({ handoff, latestIntensity: intensity, gates: gateThresholds });
+    const hot = summaryHeadsUp({ latestIntensity: intensity, gates: gateThresholds }) && Boolean(sc.hotHeading);
+    const b = safetyGates?.breatheCopy;
 
     return (
       <div className="space-y-6">
         <BackButton />
         {carryCard}
-        {lockMinutes != null && waitCopy && (
-          <div className="space-y-3">
-            {sc.planLockedHeading && lockTotal != null && (
-              <p className="font-semibold text-[var(--color-text-primary)]">{fill(sc.planLockedHeading, { minutes: lockTotal })}</p>
+        {hot && headsUp !== 'dismissed' && (
+          <div className="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] space-y-3" role="note">
+            {headsUp === 'cooled' ? (
+              <p className="text-[var(--color-text-primary)]">{sc.hotCooled}</p>
+            ) : (
+              <>
+                <p className="font-semibold text-[var(--color-text-primary)]">{sc.hotHeading}</p>
+                <p className={secondaryText}>{sc.hotBody}</p>
+                {headsUp === 'breathing' && b ? (
+                  <LazyMotion features={domAnimation}>
+                    <BreathOrb phases={b.phases} cycles={b.cycles} compact
+                      startLabel={fill(b.start, { seconds: Math.round(b.cycles * b.phases.reduce((t, p) => t + p.ms, 0) / 1000) })}
+                      skipLabel={b.skip} doneLabel={b.done}
+                      onDone={done => setHeadsUp(done ? 'cooled' : 'dismissed')} />
+                  </LazyMotion>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {b && (
+                      <button type="button" onClick={() => setHeadsUp('breathing')}
+                        className="py-2.5 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+                        {sc.hotCoolDown}
+                      </button>
+                    )}
+                    <button type="button" onClick={() => setHeadsUp('dismissed')} className={linkButton}>{sc.hotReady}</button>
+                  </div>
+                )}
+                {sc.hotBodyCue && <p className={secondaryText}>{sc.hotBodyCue}</p>}
+              </>
             )}
-            <LazyMotion features={domAnimation}>
-              <WaitLock minutes={lockMinutes} text={null}
-                c={{ ...waitCopy, waiting: sc.planLocked ?? waitCopy.waiting, done: sc.planUnlocked ?? waitCopy.done }}
-                onUnlocked={() => setPlanUnlocked(true)} />
-            </LazyMotion>
           </div>
         )}
         {handoff?.oneMessageOnly && sc.oneMessageOnly && (
           <p className={`${secondaryText} p-3 rounded-xl bg-[var(--color-bg-secondary)]`}>{sc.oneMessageOnly}</p>
         )}
-        <div className={`p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] ${planLocked ? 'select-none blur-[5px]' : ''}`} aria-hidden={planLocked || undefined}>
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">Your Conversation Plan</h3>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6">with your {getRelLabel()}</p>
 

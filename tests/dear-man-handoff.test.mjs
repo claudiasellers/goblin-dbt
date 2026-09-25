@@ -15,7 +15,7 @@ async function importTs(path) {
   );
 }
 
-const { dearManGateState, nextAfterRating, summaryWaitMinutes, handoffPrefill } =
+const { dearManGateState, nextAfterRating, summaryHeadsUp, handoffPrefill } =
   await importTs("src/lib/dearManSafety.ts");
 const { isDearManHandoff } = await importTs("src/data/dearManHandoff.ts");
 
@@ -57,14 +57,13 @@ test("downshift is offered once, then the flow continues", () => {
   assert.equal(nextAfterRating(9, null, false), "scene");
 });
 
-test("summary wait: handoff always waits; own entry waits only above askMax", () => {
-  assert.equal(summaryWaitMinutes({ handoff, latestIntensity: null, gates }), 20);
-  assert.equal(summaryWaitMinutes({ handoff: { ...handoff, waitMinutes: 0 }, latestIntensity: null, gates }), null);
-  assert.equal(summaryWaitMinutes({ handoff: null, latestIntensity: gates.askMax + 1, gates }), gates.waitMinutes);
-  assert.equal(summaryWaitMinutes({ handoff: null, latestIntensity: 10, gates }), gates.waitMinutes);
-  assert.equal(summaryWaitMinutes({ handoff: null, latestIntensity: gates.askMax, gates }), null);
-  assert.equal(summaryWaitMinutes({ handoff: null, latestIntensity: null, gates }), null);
-  assert.equal(summaryWaitMinutes({ handoff: null, latestIntensity: 10, gates: null }), null);
+test("summary heads-up: shown only while it's still loud; the plan is never locked", () => {
+  assert.equal(summaryHeadsUp({ latestIntensity: gates.askMax + 1, gates }), true);
+  assert.equal(summaryHeadsUp({ latestIntensity: 10, gates }), true);
+  assert.equal(summaryHeadsUp({ latestIntensity: gates.askMax, gates }), false);
+  assert.equal(summaryHeadsUp({ latestIntensity: null, gates }), false);
+  assert.equal(summaryHeadsUp({ latestIntensity: 10, gates: null }), false);
+  assert.doesNotMatch(tsx, /WaitLock|blur-\[|planLocked/, "DEAR MAN must not lock or hide the plan");
 });
 
 test("handoff prefill matches feeling chips by label and verifies the situation id", () => {
