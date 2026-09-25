@@ -62,7 +62,7 @@ The rooms are made of separable mechanics that other tools can use:
 |---|---|
 | Check-in intensity grid (`IntensityGrid`, x = pleasantness, y = intensity) | Capacity band. `y` is written from `bandIntensity` (steady 0.35 / stirred 0.6 / flooded 0.85); `x` comes from the chosen emotion's quadrant. New option: "I can't tell what I'm feeling" → short Find the feeling → emotion id + band |
 | Opposite Action `UrgeScale` 0–10 before/after | Urge loop on the person's own object; close is then-vs-now comparison |
-| DEAR MAN intensity check + `dearManSafety` 0–10 gates | Capacity band; `gateFor(band)` replaces `gateFor(number)` |
+| DEAR MAN intensity check + `dearManSafety` 0–10 gates | Capacity band; `gateFor(band)` replaces `gateFor(number)`. The plan is never locked (shipped: `dear-man-safety-v2` heads-up); the Angry part card becomes the heads-up's default for *fire back* |
 | Urge Surfing 1–10 slider | The urge as a moving object that visibly peaks and fades; "still here / fading / gone" |
 | Recover from a hurtful moment 0–10 readings, rerate | Capacity band + Stage; see recovery-v2 |
 
@@ -73,6 +73,21 @@ inside the flooded regulation step ("still too hot to think?") rather than a num
 Analytics note: growth insights ("catching it earlier") average `intensityY`. Bands keep them working but
 coarser (three levels). The replacement signal is the then-vs-now close, which is a better outcome measure
 anyway; add it to the insight queries in phase 1.
+
+## Never lock people out
+
+A lock on something the person just built (a plan, a message) punishes the effort and pushes them to act without it. Anywhere a gate existed, the pattern is a **heads-up plus a choice**: the thing stays visible and usable, one plain line names the risk ("it won't come out the way you mean it"), and the cool path is made the easy path. Shipped first in DEAR MAN (`dear-man-safety-v2`). Safety blocks, such as never offering Ask for a person marked unsafe, are a different thing and stay.
+
+## Anger: the angry part (IFS envelope)
+
+The default cool-down for the *fire back* urge once someone is out of the flooded band (flooded still goes body-first). Four screens, about 45 seconds, one decision each:
+
+1. **Unblend.** "A part of you is furious right now." The word sits beside a small figure, set apart from *you*. (Stage room: the part is its own little figure on the stage.)
+2. **What it protects.** "It's trying to protect something. What?" Chips: *being brushed off · being made small · being left out · not mattering · being laughed at · being alone in this*.
+3. **Vote of confidence.** Distanced self-talk in the person's own name, held for 4 s: "[Name], this part is angry because being taken seriously matters to you. You don't have to let it drive, and you don't have to leave it behind. [Name] can handle this conversation."
+4. **Speak for it, not from it.** The plan's *I felt…* line swaps the anger word for the hurt ("I felt brushed off").
+
+Why IFS is the envelope: it makes three separate techniques one move. Unblending is the distance (Kross 2014; Mischkowski, Kross & Bushman 2012 found self-distancing in the heat of the moment reduced angry feelings, aggressive thoughts and aggressive behaviour after provocation). Protector and exile is the hurt under the anger. Self-energy is the vote of confidence. Rage often comes from a part that believes the person is a complete victim with no power; the vote of confidence answers that directly and restores control through a prosocial route. Guardrail: protector level only, never the hurt's memories, never unburdening (IFS evidence is Preliminary; solo exile work can flood). Breathing stays as the alternative; venting and "burn it off" exercise stay out. Content (`PartsCopy`, `ProtectedHurt` → existing Emotion ids) lives in the graph. Spec: the Interpersonal-Wound PRD, §5 *Angry part*.
 
 ## One collection, three views
 
