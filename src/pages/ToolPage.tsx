@@ -12,6 +12,7 @@ import { UrgeSurfing } from './tools/UrgeSurfing';
 import { OppositeAction } from './tools/OppositeAction';
 import { DearMan } from './tools/DearMan';
 import { ProblemSolve } from './tools/ProblemSolve';
+import { InvalidationRecovery } from './tools/InvalidationRecovery';
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -22,6 +23,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'opposite-action': OppositeAction,
   'dear-man': DearMan,
   'problem-solve': ProblemSolve,
+  'recovering-from-invalidation': InvalidationRecovery,
 };
 
 export function ToolPage() {

@@ -1,4 +1,5 @@
 import type { OppositeActionFlow, OppositeActionSession, SavedOppositeActionSession } from '../data/oppositeActionTypes';
+import type { InvalidationRecoveryContent, InvalidationRecoveryProgress, InvalidationRecoverySession } from '../data/invalidationRecoveryTypes';
 import { httpsCallable } from 'firebase/functions';
 import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
@@ -840,4 +841,31 @@ export async function getOppositeActionFollowUps(): Promise<{
 }> {
   const result = await getOppositeActionFollowUpsFn({});
   return result.data;
+}
+
+// ============================================
+// INVALIDATION RECOVERY ("Recover from a hurtful moment")
+// ============================================
+
+const getInvalidationRecoveryContentFn = httpsCallable<void, InvalidationRecoveryContent>(
+  functions, 'getInvalidationRecoveryContent', { timeout: CONTENT_TIMEOUT_MS }
+);
+/** All graph content for the flow: states, protocols, needs, exits, skill deck and the flow document. */
+export async function getInvalidationRecoveryContent(): Promise<InvalidationRecoveryContent> {
+  return (await getInvalidationRecoveryContentFn()).data;
+}
+
+const saveInvalidationRecoverySessionFn = httpsCallable<InvalidationRecoverySession, { success: boolean }>(
+  functions, 'saveInvalidationRecoverySession', { timeout: CONTENT_TIMEOUT_MS }
+);
+/** Explicit save at close. No free text is sent. */
+export async function saveInvalidationRecoverySession(data: InvalidationRecoverySession): Promise<void> {
+  await saveInvalidationRecoverySessionFn(data);
+}
+
+const getInvalidationRecoveryProgressFn = httpsCallable<void, InvalidationRecoveryProgress>(
+  functions, 'getInvalidationRecoveryProgress', { timeout: CONTENT_TIMEOUT_MS }
+);
+export async function getInvalidationRecoveryProgress(): Promise<InvalidationRecoveryProgress> {
+  return (await getInvalidationRecoveryProgressFn()).data;
 }

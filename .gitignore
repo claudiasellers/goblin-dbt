@@ -33,3 +33,6 @@ dist-ssr
 
 # Firebase Functions build output (rebuilt by the predeploy step)
 functions/lib/
+
+# Python bytecode (scripts/invalidation-recovery)
+__pycache__/

@@ -31,6 +31,7 @@ const LOAD_ORDER = [
   'low-unpleasant-associations-patch.cypher',     // Emotion ↔ ActivationPattern patch
   'emotion-regulation-content.cypher',            // EmotionRegulationContent (per DBT parent)
   'opposite-action-data.cypher',                  // ActionUrge + OA protocol metadata
+  'opposite-action-flow.cypher',                  // OA guided-v2 flow document + somatic cues (needs OA data above)
   'remove-deprecated-regulation-properties.cypher',
   'problem-solve-data.cypher',                    // ProblemType / SolutionDirection / protocol
   'problem-solve-barriers.cypher',                // BarrierType / sub-responses / ambivalence
@@ -41,6 +42,9 @@ const LOAD_ORDER = [
   'pattern-co-occurrence.cypher',
   'insight-narratives.cypher',
   'somatic-narratives.cypher',
+  'invalidation-recovery.cypher',                    // "Recover from a hurtful moment": events / protocols / exits / skill deck / skill deck
+  'dear-man-safety-gates.cypher',                  // DEAR MAN arousal-gate copy (reads gates from the recovery flow)
+  'find-the-feeling.cypher',                       // Find the feeling (Shape it / Tune it): word signatures, urge routing, appToolId join keys
 ];
 
 // Constraints/indexes the app relies on (mirrors the initializeSchema Cloud Function).

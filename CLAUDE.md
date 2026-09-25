@@ -113,6 +113,11 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 | `src/components/StateResult.tsx` | Shows activation pattern + recommended tools after check-in |
 | `src/pages/tools/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
+| `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
+| `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
+| `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |
+| `scripts/find-the-feeling/content.py` | Editable source for `schema/find-the-feeling.cypher` (Find the feeling: word signatures, urge routing, `appToolId`); regenerate with `build.py` |
+| `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
 | `src/data/tools.ts` | Tool display metadata (names, emojis, categories) |
 | `src/data/microSteps.ts` | Activation-pattern-keyed micro-interventions |
 | `src/services/neo4j.ts` | Cloud Function call wrappers |

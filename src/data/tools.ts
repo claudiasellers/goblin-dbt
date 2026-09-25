@@ -85,6 +85,16 @@ export const tools: Tool[] = [
     dbtBasis: 'DEAR MAN',
     emoji: '🗣️',
   },
+  {
+    id: 'recovering-from-invalidation',
+    name: 'Recover from a hurtful moment',
+    tagline: 'When someone brushed you off, mocked you, left you out, or pulled away',
+    description: 'Settle your body first, name what hit, give yourself the validation you didn\'t get, then choose: ask them, let it land, or do the opposite of the urge.',
+    whenToUse: 'Right after someone dismissed you, made you feel small, left you out, or pulled away.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'Walking the Middle Path: recovering from invalidation (with STOP, TIPP, Opposite Action and DEAR MAN)',
+    emoji: '💬',
+  },
 ];
 
 /**
@@ -99,6 +109,7 @@ export interface Intent {
 }
 
 export const intents: Intent[] = [
+  { id: 'hurt', label: 'Recover from a hurtful moment', toolId: 'recovering-from-invalidation', emoji: '💬' },
   { id: 'calm-fast', label: 'Calm down fast', toolId: 'cool-down', emoji: '🧊' },
   { id: 'pause', label: 'Pause before reacting', toolId: 'pause', emoji: '✋' },
   { id: 'ground', label: 'Ground myself', toolId: 'five-senses', emoji: '👁️' },
