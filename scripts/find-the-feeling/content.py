@@ -70,18 +70,11 @@ URGES = [
     ("blank", "Nothing. I'm blank", "numb, heavy, far away", [("se_orienting", 0)]),
 ]
 
-# Map graph concepts to the app's tool ids. normalizeToolId() gets several of these wrong today
-# (dbt_tipp -> "tipp", dbt_stop -> "stop", dbt_problem_solving -> "problem-solving"); see the design doc.
+# App tool ids for the concepts this migration creates. Existing concepts get theirs from
+# schema/app-tool-ids.cypher (loaded earlier); routing only ever targets concepts with an appToolId.
 APP_TOOL_IDS = {
-    "dbt_tipp": "cool-down",
-    "dbt_stop": "pause",
-    "se_orienting": "five-senses",
-    "urge_surfing": "urge-surfing",
-    "dbt_opposite_action": "opposite-action",
-    "dbt_problem_solving": "problem-solve",
-    "dbt_dear_man": "dear-man",
-    "dbt_recovering_from_invalidation": "recovering-from-invalidation",
     "dbt_find_the_feeling": "find-the-feeling",
+    "urge_surfing": "urge-surfing",
 }
 
 NEW_CONCEPTS = [
@@ -129,6 +122,8 @@ FLOW = {
         "activateUrges": ["blank"],             # blank alone -> activating step, never calming
         "floodedBlank": "regulate_then_orient_no_label",  # numb-but-activated: down-regulate, then orient, NO word step
         "maxWordsOffered": 3,
+        # Flooded + blank skips the word; "where to next" offers regulation tools only (app tool ids).
+        "floodedBlankRoutes": ["cool-down", "five-senses"],
         "slowStrokePxPerSec": [45, 380],
         "fastStrokePxPerSec": 600,
         "breathHoldMs": 2800,
@@ -148,14 +143,16 @@ FLOW = {
             "intro": "Something's there. Before words, let's give it a shape.",
             "round": "Which is closer to what's inside?", "cantTell": "can't tell",
             "rounds": [["sharp", "soft"], ["hot", "cool"], ["heavy", "light"], ["buzzing", "still"], ["clenched", "hollow"]],
-            "smooth": {"title": "Smooth it down. Slowly.", "tooFast": "Slower, like stroking a sleeping cat.", "hold": "Or press and hold here", "enough": "That's enough for now"},
-            "warm": {"title": "Warm it up.", "sub": "Rub it briskly, like cold hands.", "hold": "Or press and hold here"},
+            "begin": "Begin",
+            "smooth": {"title": "Smooth it down. Slowly.", "sub": "Stroke it gently with your finger.", "tooFast": "Slower, like stroking a sleeping cat.", "hold": "Or press and hold here", "enough": "That's enough for now"},
+            "warm": {"title": "Warm it up.", "sub": "Rub it briskly, like cold hands.", "hold": "Or press and hold here", "enough": "That's enough for now"},
             "wordLead": "Things shaped like this are often called",
             "shelf": "Your shelf",
         },
         "tune": {
             "intro": "Something's there. Let's find how it sounds in there.",
             "search": "Is this closer to how it feels, or further?", "closer": "Closer", "further": "Further", "thatsIt": "That's it",
+            "begin": "Begin", "sound": "Sound", "continue": "Continue",
             "breathe": {"title": "Breathe them back into tune.", "sub": "Hold anywhere while you breathe in. Let go to breathe out.", "tooQuick": "A little slower. Let the breath fill up.", "done": "Hear it? The throb is slow and soft now."},
             "wake": {"title": "Wake the strings.", "sub": "Pluck them. Each one a bit brighter."},
             "wordLead": "Sounds like this often get called…",
@@ -163,11 +160,13 @@ FLOW = {
         },
         "capacity": {"prompt": "If someone asked you for a favour right now, you'd…", "incoming": "hey, could you help me with something?", "options": {"steady": "Say yes like normal", "stirred": "Say yes, but with an edge", "flooded": "Couldn't answer, or would regret it"}},
         "pull": {"title": "What does it want to do?"},
-        "word": {"yes": "Yes", "close": "Close", "no": "Not that", "none": "Not knowing the word is fine. You found its shape, and that counts.", "floodedBlank": "Let's skip the word today. Getting back into the room is the whole job right now."},
-        "setOff": {"title": "Do you know what set it off?", "optional": True, "notSure": "Not sure", "someone": "Something with someone", "situation": "A situation", "body": "Tired, hungry or sore", "nothing": "Nothing I can see"},
-        "close": {"prompt": "Which is closer to how you feel right now?", "options": {"louder": "Then", "same": "Somewhere between", "quieter": "Now", "much": "Now, and even calmer"}},
-        "next": {"title": "Where to next", "sub": "Based on what you found.", "none": "Nothing else needed. Finding it was the work."},
-        "collection": {"title": "Your collection", "new": "“{word}” joins the others. Naming a feeling is a skill, and you just used it.", "rooms": {"shelf": "Shelf", "harp": "Strings", "scenes": "Scenes"}},
+        "word": {"yes": "Yes", "close": "Close", "no": "Not that", "none": "Not knowing the word is fine. You found it without one, and that counts.", "floodedBlank": "Let's skip the word today. Getting back into the room is the whole job right now."},
+        "setOff": {"title": "Do you know what set it off?", "optional": True, "not_sure": "Not sure", "skip": "Skip", "someone": "Something with someone", "situation": "A situation", "body": "Tired, hungry or sore", "nothing": "Nothing I can see"},
+        "close": {"prompt": "Which is closer to how you feel right now?", "then": "Then", "now": "Now", "options": {"louder": "Then", "same": "Somewhere between", "quieter": "Now", "much": "Now, and even calmer"}},
+        "orient": {"title": "Come back into the room", "sub": "Before any words. Just get your bearings.", "look": "Look around slowly. Each time something catches your eye, tap a circle.", "move": "Stand up and shake out your hands", "moveSeconds": 20, "startMove": "Start", "skip": "Skip this", "seen": "{n} of 3 found"},
+        "next": {"title": "Where to next", "sub": "Based on what you found.", "none": "Nothing else needed. Finding it was the work.", "open": "Open", "done": "Finish"},
+        "collection": {"title": "Your collection", "new": "“{word}” joins the others. Naming a feeling is a skill, and you just used it.", "empty": "Every word you find lands here.", "noWord": "No new word this time. You still found it, and that counts.", "again": "Start again", "saving": "Saving…", "saved": "Saved", "saveError": "Couldn't save. Try again?", "retry": "Try again", "signedOut": "Sign in to keep your collection.", "rooms": {"shelf": "Shelf", "harp": "Strings", "scenes": "Scenes"}},
+        "nav": {"back": "Back", "skip": "Skip this"},
     },
     "sourceIds": ["linehan_skills_2015", "nummenmaa_2014", "juslin_laukka_2003", "palmer_2013", "lieberman_2007", "kashdan_2015", "brewer_2016", "loken_2009", "lehrer_gevirtz_2014", "bernardi_2006"],
 }

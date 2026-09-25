@@ -1,0 +1,68 @@
+/*
+  Tune room palette: linen by day, near-black at night. Dark follows the app's data-theme
+  ("dark", or "system"/unset with a dark OS preference). Contrast pairs checked for WCAG AA:
+  ink-2 on bg-2 >= 5:1, accent-text on bg-2 >= 4.5:1.
+*/
+.ftf-tune {
+  --t-dark: 0;
+  --t-bg: #EFE8DC; --t-bg-2: #E2D6C4;
+  --t-ink: #231F1B; --t-ink-2: #5E5448;
+  --t-str-a: #2B2521; --t-str-b: #2E4A7A; --t-warm: #C0532A; --t-gold: #B7862F;
+  --t-accent: #C9502A; --t-accent-text: #9A3A18;
+  --t-key: rgba(255, 251, 244, .72); --t-key-line: rgba(35, 31, 27, .22);
+  --t-card: rgba(255, 251, 244, .8);
+  --t-engrave: 0 1px 0 rgba(255, 255, 255, .75), 0 -1px 0 rgba(60, 40, 20, .18);
+  --t-focus: #2E4A7A;
+  background: var(--t-bg);
+  color: var(--t-ink);
+  font-family: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root[data-theme="dark"] .ftf-tune {
+  --t-dark: 1;
+  --t-bg: #100F0D; --t-bg-2: #060605;
+  --t-ink: #F1EADF; --t-ink-2: #B3AA9D;
+  --t-str-a: #F6E7CB; --t-str-b: #9ED6E6; --t-warm: #FFAE6B; --t-gold: #FFD27A;
+  --t-accent: #FF7A3D; --t-accent-text: #FF8A52;
+  --t-key: rgba(255, 245, 230, .06); --t-key-line: rgba(241, 234, 223, .24);
+  --t-card: rgba(24, 22, 19, .82);
+  --t-engrave: 0 0 22px rgba(255, 190, 120, .35);
+  --t-focus: #9ED6E6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .ftf-tune {
+    --t-dark: 1;
+    --t-bg: #100F0D; --t-bg-2: #060605;
+    --t-ink: #F1EADF; --t-ink-2: #B3AA9D;
+    --t-str-a: #F6E7CB; --t-str-b: #9ED6E6; --t-warm: #FFAE6B; --t-gold: #FFD27A;
+    --t-accent: #FF7A3D; --t-accent-text: #FF8A52;
+    --t-key: rgba(255, 245, 230, .06); --t-key-line: rgba(241, 234, 223, .24);
+    --t-card: rgba(24, 22, 19, .82);
+    --t-engrave: 0 0 22px rgba(255, 190, 120, .35);
+    --t-focus: #9ED6E6;
+  }
+}
+
+.ftf-tune .tune-key {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.ftf-tune .tune-led {
+  width: 6px; height: 6px; border-radius: 99px;
+  background: var(--t-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--t-accent) 18%, transparent), 0 0 10px var(--t-accent);
+}
+
+.ftf-tune :focus-visible,
+.ftf-tune .tune-focus:focus-visible {
+  outline: 2px solid var(--t-focus);
+  outline-offset: 2px;
+}
+
+.ftf-tune .tune-focus:focus-visible { outline-offset: -6px; border-radius: 18px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ftf-tune * { scroll-behavior: auto; }
+}

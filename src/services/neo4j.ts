@@ -3,6 +3,7 @@ import type { InvalidationRecoveryContent, InvalidationRecoveryProgress, Invalid
 import { httpsCallable } from 'firebase/functions';
 import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
+import type { CollectedWord, FindTheFeelingContent, FindTheFeelingSession } from '../data/findTheFeelingTypes';
 
 // Types (same as before, for consistency across the app)
 export interface CheckInRecord {
@@ -868,4 +869,28 @@ const getInvalidationRecoveryProgressFn = httpsCallable<void, InvalidationRecove
 );
 export async function getInvalidationRecoveryProgress(): Promise<InvalidationRecoveryProgress> {
   return (await getInvalidationRecoveryProgressFn()).data;
+}
+
+// ── Find the feeling (Shape it / Tune it) ──
+
+const getFindTheFeelingContentFn = httpsCallable<void, FindTheFeelingContent>(
+  functions, 'getFindTheFeelingContent', { timeout: CONTENT_TIMEOUT_MS }
+);
+export async function getFindTheFeelingContent(): Promise<FindTheFeelingContent> {
+  return (await getFindTheFeelingContentFn()).data;
+}
+
+const saveFindTheFeelingSessionFn = httpsCallable<FindTheFeelingSession, { success: boolean }>(
+  functions, 'saveFindTheFeelingSession', { timeout: CONTENT_TIMEOUT_MS }
+);
+/** Explicit save at the end. No free text is sent. */
+export async function saveFindTheFeelingSession(data: FindTheFeelingSession): Promise<void> {
+  await saveFindTheFeelingSessionFn(data);
+}
+
+const getFeelingCollectionFn = httpsCallable<void, { words: CollectedWord[] }>(
+  functions, 'getFeelingCollection', { timeout: CONTENT_TIMEOUT_MS }
+);
+export async function getFeelingCollection(): Promise<CollectedWord[]> {
+  return (await getFeelingCollectionFn()).data.words;
 }

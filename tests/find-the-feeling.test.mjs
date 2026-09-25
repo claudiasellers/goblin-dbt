@@ -53,9 +53,29 @@ test("routing and USES targets exist; every urge routes somewhere", () => {
 
 test("appToolId values point at real app tools (except the one this change adds)", () => {
   const tools = readFileSync("src/data/tools.ts", "utf8");
-  const rows = JSON.parse(`[${[...cypher.matchAll(/\{c: "[a-z_]+", t: "([a-z-]+)"\}/g)].map((m) => `"${m[1]}"`).join(",")}]`);
-  assert.ok(rows.length >= 8);
-  for (const t of rows) if (t !== "find-the-feeling") assert.match(tools, new RegExp(`id: '${t}'`), t);
+  const src = read("app-tool-ids") + cypher;
+  const rows = [...src.matchAll(/\{c: "([a-z_]+)", t: "([a-z-]+)"\}/g)].map((m) => [m[1], m[2]]);
+  assert.ok(rows.length >= 9);
+  for (const [c, t] of rows) {
+    assert.ok(conceptIds.has(c), `unknown concept ${c}`);
+    if (t !== "find-the-feeling") assert.match(tools, new RegExp(`id: '${t}'`), t);
+  }
+  // Every urge route target must have an app tool id, or the card would point nowhere.
+  const withApp = new Set(rows.map(([c]) => c));
+  for (const m of cypher.matchAll(/UNWIND (\[[^\]]*\]) AS row\nMATCH \(u:FeelingUrge/g)) {
+    for (const c of [...m[1].matchAll(/c: "([a-z_]+)"/g)].map((x) => x[1])) assert.ok(withApp.has(c), `route target ${c} has no appToolId`);
+  }
+});
+
+test("loader runs app-tool-ids before find-the-feeling", () => {
+  const order = [...readFileSync("scripts/load-graph.mjs", "utf8").matchAll(/^\s*'([a-z0-9-]+\.cypher)'/gm)].map((m) => m[1]);
+  assert.ok(order.indexOf("app-tool-ids.cypher") >= 0 && order.indexOf("app-tool-ids.cypher") < order.indexOf("find-the-feeling.cypher"));
+});
+
+test("functions prefer appToolId over string normalization", () => {
+  const fn = readFileSync("functions/src/index.ts", "utf8");
+  assert.equal((fn.match(/tc\.appToolId as appToolId/g) || []).length, 2);
+  assert.match(fn, /suggestedAppTool/);
 });
 
 test("never recommended for dissociation/flooding states where labelling must wait", () => {

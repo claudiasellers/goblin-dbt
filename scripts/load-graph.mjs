@@ -44,6 +44,7 @@ const LOAD_ORDER = [
   'somatic-narratives.cypher',
   'invalidation-recovery.cypher',                    // "Recover from a hurtful moment": events / protocols / exits / skill deck / skill deck
   'dear-man-safety-gates.cypher',                  // DEAR MAN arousal-gate copy (reads gates from the recovery flow)
+  'app-tool-ids.cypher',                           // TherapyConcept.appToolId join keys (fixes tipp/stop/problem-solving cards)
   'find-the-feeling.cypher',                       // Find the feeling (Shape it / Tune it): word signatures, urge routing, appToolId join keys
 ];
 

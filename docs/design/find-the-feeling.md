@@ -1,6 +1,6 @@
 # Find the feeling (Shape it / Tune it)
 
-Status: graph migration written (`schema/find-the-feeling.cypher`), app not built.
+Status: built on `feat/someone-got-to-me` (tool, Cloud Functions, collection, check-in entry). Not deployed. Needs real-phone checks and clinical sign-off before release.
 Umbrella: [alexithymia-first-interaction.md](alexithymia-first-interaction.md).
 Prototype: `prototypes/goblin-lab/src/directions/Shape` and `.../Tune`.
 
@@ -178,11 +178,19 @@ interface FindTheFeelingSession {
 
 ## Deploy order
 
-1. Deploy functions.
-2. `node scripts/load-graph.mjs --only find-the-feeling` in the same release as hosting. Once it's loaded,
-   `getStateAndTools` can recommend `find-the-feeling` for the four "can't tell" emotions, which a frontend
-   without the tool can't open.
-3. Deploy hosting.
+1. `npm install` (adds three / @react-three/fiber / @react-three/drei), then deploy functions:
+   `firebase deploy --only functions:getFindTheFeelingContent,functions:saveFindTheFeelingSession,functions:getFeelingCollection,functions:getStateAndTools,functions:getQuickTools,functions:getInsightsData,functions:exportUserData,functions:deleteUserData`
+   (`getStateAndTools` and `getQuickTools` use the appToolId join; `getInsightsData` uses it for the proactive alert).
+2. Graph, in the same release as hosting:
+   `node scripts/load-graph.mjs --only app-tool-ids` then `node scripts/load-graph.mjs --only find-the-feeling`.
+   `app-tool-ids` is safe on its own and fixes the tipp / stop / problem-solving cards immediately.
+3. `firebase deploy --only hosting`.
+
+## Developing the rooms
+
+`npx vite build --config dev/vite.harness.config.ts && (cd dev-dist && python3 -m http.server 4321)`, then open
+`http://localhost:4321/dev/find-the-feeling.html?way=shape` (or `way=tune`, `entry=checkin`, `name=…`). The harness uses the
+fixture payload and the real reducer; `window.__ftf` exposes state and dispatch.
 
 ## Open questions
 

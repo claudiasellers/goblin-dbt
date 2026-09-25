@@ -52,7 +52,7 @@ A("MATCH (:TherapyConcept {id: 'dbt_find_the_feeling'})-[r:USES|ADDRESSES]->() D
 A(f"UNWIND {q(USES)} AS cid\nMATCH (t:TherapyConcept {{id: 'dbt_find_the_feeling'}}), (c:TherapyConcept {{id: cid}})\nMERGE (t)-[:USES]->(c);")
 A(f"UNWIND {q(ADDRESSES)} AS eid\nMATCH (t:TherapyConcept {{id: 'dbt_find_the_feeling'}}), (e:Emotion {{id: eid}})\nMERGE (t)-[:ADDRESSES]->(e);")
 
-A("\n// --- App tool ids (join key for the frontend; replaces guessing via normalizeToolId) ---")
+A("\n// --- App tool ids for the concepts created here (existing concepts: app-tool-ids.cypher) ---")
 rows = "[" + ", ".join("{c: %s, t: %s}" % (q(c), q(t)) for c, t in APP_TOOL_IDS.items()) + "]"
 A(f"UNWIND {rows} AS row\nMATCH (c:TherapyConcept {{id: row.c}})\nSET c.appToolId = row.t;")
 

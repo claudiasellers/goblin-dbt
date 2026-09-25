@@ -117,6 +117,9 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 | `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
 | `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |
 | `scripts/find-the-feeling/content.py` | Editable source for `schema/find-the-feeling.cypher` (Find the feeling: word signatures, urge routing, `appToolId`); regenerate with `build.py` |
+| `src/pages/tools/FindTheFeeling.tsx` | "Find the feeling" (Shape it / Tune it): page shell, save, routing, check-in handoff; rooms in `src/components/tools/findTheFeeling/{shape,tune}` (lazy, three.js / Web Audio); logic in `src/lib/findTheFeeling*.ts`; spec `docs/design/find-the-feeling.md` |
+| `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
+| `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
 | `src/data/tools.ts` | Tool display metadata (names, emojis, categories) |
 | `src/data/microSteps.ts` | Activation-pattern-keyed micro-interventions |

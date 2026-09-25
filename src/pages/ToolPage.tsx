@@ -13,6 +13,7 @@ import { OppositeAction } from './tools/OppositeAction';
 import { DearMan } from './tools/DearMan';
 import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
+import { FindTheFeeling } from './tools/FindTheFeeling';
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -24,6 +25,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'dear-man': DearMan,
   'problem-solve': ProblemSolve,
   'recovering-from-invalidation': InvalidationRecovery,
+  'find-the-feeling': FindTheFeeling,
 };
 
 export function ToolPage() {
