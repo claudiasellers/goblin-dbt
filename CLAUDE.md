@@ -135,6 +135,17 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 
 ---
 
+## Product Changelog (Obsidian)
+
+The product-level record of every change and the thinking behind it lives in Claudia's Obsidian vault:
+`~/Obsidian/Claudia-mac-mini/Goblin DBT/Product Changelog.md` (newest first, template at the bottom).
+When a chat changes the product (a feature, a reversal, a new principle), add or update an entry there before
+the chat ends: what changed, why, the thinking (including what was rejected), open questions, commit/PR, and
+status (`planned` / `built` / `shipped` / `reverted`). If the vault isn't reachable from the session, say so and
+give Claudia the entry text to paste.
+
+---
+
 ## Neo4j Conventions
 
 - All Cypher files use `MERGE` for idempotency — safe to re-run
