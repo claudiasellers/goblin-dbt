@@ -29,6 +29,45 @@ export interface DearManContentResult {
   confidentCoaching: string;
   confidentBarrierNoRight: string;
   assertBarrierGuilty: string;
+  /** Arousal gates read from the recovery flow document; null on an older graph (gates skipped). */
+  safetyGates?: DearManSafetyGates | null;
+  /** DEAR MAN-specific gate copy (DearManSafetyCopy node); null on an older graph. */
+  safetyCopy?: DearManSafetyCopy | null;
+}
+
+export interface DearManSafetyGates {
+  gates: { downshiftAt: number; askMax: number; waitMinutes: number; [k: string]: number };
+  /** WaitLockCopy strings (flow.copy.wait). */
+  waitCopy: {
+    locked: string; unlocked: string; unlockedShort: string;
+    waiting: string; done: string; copy: string; copied: string;
+  };
+  /** Breathing pacer copy (flow.copy.breathe). */
+  breatheCopy: {
+    phases: Array<{ key: 'in' | 'sip' | 'out'; label: string; ms: number }>;
+    cycles: number; start: string; skip: string; done: string; title: string; sub: string;
+  };
+}
+
+/** DEAR MAN-specific gate copy (schema/dear-man-safety-gates.cypher). {emotion}/{need}/{minutes} are filled client-side. */
+export interface DearManSafetyCopy {
+  handoffSituationId?: string;
+  carriedOver?: string;
+  carriedOverDismiss?: string;
+  intensityQuestion?: string;
+  intensityHint?: string;
+  intensityLow?: string;
+  intensityHigh?: string;
+  downshiftLead?: string;
+  rerateQuestion?: string;
+  rerateHint?: string;
+  oneMessageOnly?: string;
+  hotHeading?: string;
+  hotBody?: string;
+  hotCoolDown?: string;
+  hotReady?: string;
+  hotBodyCue?: string;
+  hotCooled?: string;
 }
 
 export interface SituationType {

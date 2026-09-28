@@ -7,9 +7,17 @@ import { getEmotionByName } from '../../data/emotions';
 import { getToolById } from '../../data/tools';
 import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { ToolLoading } from '../../components/tools/ToolLoading';
+import { LazyMotion, domAnimation } from 'motion/react';
+import { isDearManHandoff, type DearManHandoff } from '../../data/dearManHandoff';
+import { UrgeScale } from '../../components/tools/oppositeAction/UrgeScale';
+import { BreathOrb } from '../../components/tools/regulation/body';
+import { linkButton, secondaryText } from '../../components/tools/oppositeAction/styles';
+import { fill } from '../../lib/invalidationRecovery';
+import { handoffPrefill, nextAfterRating, summaryHeadsUp } from '../../lib/dearManSafety';
 
 type Phase =
   | 'entry'
+  | 'check'
   | 'scene'
   | 'describe'
   | 'express'
@@ -74,7 +82,14 @@ const debriefOverallOptions = [
 export function DearMan() {
   const location = useLocation();
   const navigate = useNavigate();
-  const checkinEmotions = (location.state as { checkinEmotions?: string[] } | null)?.checkinEmotions;
+  const routeState = location.state as { checkinEmotions?: string[]; dearManHandoff?: unknown } | null;
+  const checkinEmotions = routeState?.checkinEmotions;
+  // Handoff from "Recover from a hurtful moment": already-answered context, read once on mount.
+  const routeHandoff = routeState?.dearManHandoff;
+  const [handoff, setHandoff] = useState<DearManHandoff | null>(() => (isDearManHandoff(routeHandoff) ? routeHandoff : null));
+  const initialHandoff = useRef(handoff);
+  /** Captured once: the check-in hand-over only affects the first screen. */
+  const cameFromCheckin = useRef(Boolean(checkinEmotions?.length));
 
   // ── Graph content (loaded once) ──
   const [content, setContent] = useState<DearManContentResult | null>(null);
@@ -82,7 +97,7 @@ export function DearMan() {
   const [error, setError] = useState<string | null>(null);
 
   // ── Phase state ──
-  const [phase, setPhase] = useState<Phase>(checkinEmotions?.length ? 'scene' : 'entry');
+  const [phase, setPhase] = useState<Phase>(handoff || checkinEmotions?.length ? 'scene' : 'entry');
   const [sceneStep, setSceneStep] = useState(0);
 
   // ── Scene data ──
@@ -147,6 +162,14 @@ export function DearMan() {
   const [debriefSaved, setDebriefSaved] = useState(false);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
 
+  // ── Safety gates (thresholds + copy from the graph; skipped silently when absent) ──
+  const [showCarry, setShowCarry] = useState(true);
+  const [checkStep, setCheckStep] = useState<'rate' | 'breathe' | 'rerate'>('rate');
+  const [intensity, setIntensity] = useState<number | null>(null);
+  const [downshifted, setDownshifted] = useState(false);
+  /** Heads-up on the Summary when it's still loud: offered, breathing, cooled, or waved off. Never a lock. */
+  const [headsUp, setHeadsUp] = useState<'offer' | 'breathing' | 'cooled' | 'dismissed'>('offer');
+
   // ── UI state ──
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -160,7 +183,30 @@ export function DearMan() {
     setLoading(true);
     setError(null);
     getDearManContent()
-      .then(data => { setContent(data); })
+      .then(data => {
+        setContent(data);
+        // Prefill from a handoff: situation type (graph-named, verified to exist) + the feeling
+        const h = initialHandoff.current;
+        const gates = data.safetyGates?.gates;
+        const canCheck = Boolean(gates && data.safetyCopy?.intensityQuestion && data.safetyCopy?.rerateQuestion);
+        if (h) {
+          const pre = handoffPrefill(h, data, data.safetyCopy?.handoffSituationId);
+          if (pre.situationType) setSituationType(pre.situationType);
+          if (pre.feelings.length) setFeelings(pre.feelings);
+          if (pre.feelingCustom) { setFeelingCustom(pre.feelingCustom); setShowFeelingCustom(true); }
+          initialHandoff.current = null;
+          // The close rating can be higher than when "Ask them" unlocked: settle again first.
+          if (canCheck && gates && h.intensity > gates.askMax) {
+            setIntensity(h.intensity);
+            setCheckStep(h.intensity >= gates.downshiftAt ? 'breathe' : 'rerate');
+            setPhase('check');
+          }
+        } else if (cameFromCheckin.current && canCheck) {
+          // Check-in is the most common way in: it gets the same intensity check as the entry button.
+          setCheckStep('rate');
+          setPhase('check');
+        }
+      })
       .catch(() => { setError("This tool couldn't load. Try again, or choose another tool."); })
       .finally(() => { loadInFlight.current = false; setLoading(false); });
   }, []);
@@ -230,6 +276,10 @@ export function DearMan() {
 
   const goBack = () => {
     switch (phase) {
+      case 'check':
+        if (checkStep === 'rate') setPhase('entry');
+        else setCheckStep('rate');
+        break;
       case 'scene':
         if (sceneStep > 0) setSceneStep(sceneStep - 1);
         else setPhase('entry');
@@ -257,6 +307,47 @@ export function DearMan() {
       case 'debrief-route': setPhase('debrief-moment-plan'); break;
     }
   };
+
+  // ── Safety gate helpers ──
+  const sc = content.safetyCopy ?? {};
+  const safetyGates = content.safetyGates ?? null;
+  const gateThresholds = safetyGates?.gates ?? null;
+
+  const startPrep = () => {
+    if (safetyGates && sc.intensityQuestion && sc.rerateQuestion) {
+      setCheckStep('rate');
+      setPhase('check');
+    } else {
+      setPhase('scene');
+    }
+  };
+
+  const rate = (n: number | null) => {
+    if (n == null) return;
+    setIntensity(n);
+    if (nextAfterRating(n, gateThresholds, checkStep === 'rerate' || downshifted) === 'breathe') {
+      setCheckStep('breathe');
+    } else {
+      setSceneStep(0);
+      setPhase('scene');
+    }
+  };
+
+  const enterSummary = () => setPhase('summary');
+
+  const lowerFirst = (t: string) => t.charAt(0).toLowerCase() + t.slice(1);
+  const carryCard = handoff && showCarry && sc.carriedOver ? (
+    <div className="flex items-start gap-3 p-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
+      <p className={`flex-1 ${secondaryText}`}>
+        {fill(sc.carriedOver, { emotion: handoff.emotionName, need: lowerFirst(handoff.needLabel) })}
+      </p>
+      {sc.carriedOverDismiss && (
+        <button type="button" onClick={() => setShowCarry(false)} className={linkButton}>
+          {sc.carriedOverDismiss}
+        </button>
+      )}
+    </div>
+  ) : null;
 
   const BackButton = () => (
     <button
@@ -484,6 +575,9 @@ export function DearMan() {
     setSelectedCopeAheadId(null); setReflectionLanded(null);
     setDebriefSaving(false); setDebriefSaved(false);
     setSaved(false); setSaveError(false);
+    setHandoff(null); setShowCarry(true);
+    setCheckStep('rate'); setIntensity(null); setDownshifted(false);
+    setHeadsUp('offer');
   };
 
   // ─── ENTRY ───
@@ -494,7 +588,7 @@ export function DearMan() {
           What brings you here?
         </h3>
         <button
-          onClick={() => setPhase('scene')}
+          onClick={startPrep}
           className="w-full text-left p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] cursor-pointer transition-colors"
         >
           <p className="font-medium text-[var(--color-text-primary)]">
@@ -524,10 +618,41 @@ export function DearMan() {
     );
   }
 
+  // ─── INTENSITY CHECK (own entry only; skipped when the graph has no gates) ───
+  if (phase === 'check' && safetyGates) {
+    const b = safetyGates.breatheCopy;
+    const breathSeconds = Math.round(b.cycles * b.phases.reduce((t, p) => t + p.ms, 0) / 1000);
+    return (
+      <div className="space-y-6">
+        <BackButton />
+        {checkStep === 'breathe' ? (
+          <div className="space-y-4">
+            {sc.downshiftLead && <p className={secondaryText}>{sc.downshiftLead}</p>}
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{b.title}</h3>
+            <p className={secondaryText}>{b.sub}</p>
+            <LazyMotion features={domAnimation}>
+              <BreathOrb phases={b.phases} cycles={b.cycles}
+                startLabel={fill(b.start, { seconds: breathSeconds })}
+                skipLabel={b.skip} doneLabel={b.done}
+                onDone={() => { setDownshifted(true); setCheckStep('rerate'); }} />
+            </LazyMotion>
+          </div>
+        ) : (
+          <UrgeScale key={checkStep}
+            label={(checkStep === 'rate' ? sc.intensityQuestion : sc.rerateQuestion) ?? ''}
+            hint={checkStep === 'rate' ? sc.intensityHint : sc.rerateHint}
+            value={null} onChange={rate}
+            lowLabel={sc.intensityLow} highLabel={sc.intensityHigh} />
+        )}
+      </div>
+    );
+  }
+
   // ─── SCENE ───
   if (phase === 'scene') {
     return (
       <div className="space-y-6">
+        {carryCard}
         {sceneStep > 0 && <BackButton />}
         <SceneDots />
 
@@ -750,6 +875,7 @@ export function DearMan() {
 
     return (
       <div className="space-y-6">
+        {carryCard}
         <BackButton />
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How does this make you feel?</h3>
         <p className="text-[var(--color-text-secondary)]">Tap all that apply.</p>
@@ -1177,7 +1303,7 @@ export function DearMan() {
           )}
         </div>
 
-        <button onClick={() => setPhase('summary')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+        <button onClick={enterSummary} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
           See your plan
         </button>
       </div>
@@ -1192,10 +1318,47 @@ export function DearMan() {
     const reinforceTexts = resolveReinforce();
     const mgText = resolveMiddleGround();
     const waText = resolveWalkAway();
+    const hot = summaryHeadsUp({ latestIntensity: intensity, gates: gateThresholds }) && Boolean(sc.hotHeading);
+    const b = safetyGates?.breatheCopy;
 
     return (
       <div className="space-y-6">
         <BackButton />
+        {carryCard}
+        {hot && headsUp !== 'dismissed' && (
+          <div className="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] space-y-3" role="note">
+            {headsUp === 'cooled' ? (
+              <p className="text-[var(--color-text-primary)]">{sc.hotCooled}</p>
+            ) : (
+              <>
+                <p className="font-semibold text-[var(--color-text-primary)]">{sc.hotHeading}</p>
+                <p className={secondaryText}>{sc.hotBody}</p>
+                {headsUp === 'breathing' && b ? (
+                  <LazyMotion features={domAnimation}>
+                    <BreathOrb phases={b.phases} cycles={b.cycles} compact
+                      startLabel={fill(b.start, { seconds: Math.round(b.cycles * b.phases.reduce((t, p) => t + p.ms, 0) / 1000) })}
+                      skipLabel={b.skip} doneLabel={b.done}
+                      onDone={done => setHeadsUp(done ? 'cooled' : 'dismissed')} />
+                  </LazyMotion>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {b && (
+                      <button type="button" onClick={() => setHeadsUp('breathing')}
+                        className="py-2.5 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+                        {sc.hotCoolDown}
+                      </button>
+                    )}
+                    <button type="button" onClick={() => setHeadsUp('dismissed')} className={linkButton}>{sc.hotReady}</button>
+                  </div>
+                )}
+                {sc.hotBodyCue && <p className={secondaryText}>{sc.hotBodyCue}</p>}
+              </>
+            )}
+          </div>
+        )}
+        {handoff?.oneMessageOnly && sc.oneMessageOnly && (
+          <p className={`${secondaryText} p-3 rounded-xl bg-[var(--color-bg-secondary)]`}>{sc.oneMessageOnly}</p>
+        )}
         <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">Your Conversation Plan</h3>
           <p className="text-sm text-[var(--color-text-secondary)] mb-6">with your {getRelLabel()}</p>

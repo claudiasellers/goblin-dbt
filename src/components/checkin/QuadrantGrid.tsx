@@ -12,6 +12,8 @@ interface QuadrantGridProps {
   onSelect: (emotions: string[]) => void;
   onHelpMeNow?: () => void;
   onSomaticEntry?: () => void;
+  /** "I can't tell what I'm feeling": opens Find the feeling (by shape or by ear). */
+  onCantTell?: () => void;
 }
 
 const quadrantOrder = [
@@ -83,6 +85,7 @@ export function QuadrantGrid({
   onSelect,
   onHelpMeNow,
   onSomaticEntry,
+  onCantTell,
 }: QuadrantGridProps) {
   const [levels, setLevels] = useState<Record<string, 0 | 1 | 2>>({
     'high-unpleasant': 0,
@@ -309,6 +312,14 @@ export function QuadrantGrid({
 
       {/* Secondary links */}
       <div className="flex flex-col items-center gap-2 mt-1">
+        {onCantTell && (
+          <button
+            className="text-xs text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] underline underline-offset-4 bg-transparent border-none cursor-pointer transition-colors"
+            onClick={onCantTell}
+          >
+            I can't tell what I'm feeling
+          </button>
+        )}
         {onSomaticEntry && (
           <button
             className="text-xs text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] bg-transparent border-none cursor-pointer transition-colors"

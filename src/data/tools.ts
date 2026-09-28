@@ -65,6 +65,16 @@ export const tools: Tool[] = [
     emoji: '🔄',
   },
   {
+    id: 'find-the-feeling',
+    name: 'Find the feeling',
+    tagline: 'When something\'s there but you can\'t tell what',
+    description: 'No words needed to start. Match what\'s inside to a shape you can see, or a sound you can hear, and the word comes to you as a guess you can keep or refuse.',
+    whenToUse: 'When you feel something but can\'t name it, or everything feels like one big blur.',
+    module: 'emotion-regulation',
+    dbtBasis: 'Observing, describing and naming emotions',
+    emoji: '🫧',
+  },
+  {
     id: 'problem-solve',
     name: 'Problem Solve',
     tagline: 'Address the cause of distress',
@@ -85,6 +95,16 @@ export const tools: Tool[] = [
     dbtBasis: 'DEAR MAN',
     emoji: '🗣️',
   },
+  {
+    id: 'recovering-from-invalidation',
+    name: 'Recover from a hurtful moment',
+    tagline: 'When someone brushed you off, mocked you, left you out, or pulled away',
+    description: 'Settle your body first, name what hit, give yourself the validation you didn\'t get, then choose: ask them, let it land, or do the opposite of the urge.',
+    whenToUse: 'Right after someone dismissed you, made you feel small, left you out, or pulled away.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'Walking the Middle Path: recovering from invalidation (with STOP, TIPP, Opposite Action and DEAR MAN)',
+    emoji: '💬',
+  },
 ];
 
 /**
@@ -99,6 +119,8 @@ export interface Intent {
 }
 
 export const intents: Intent[] = [
+  { id: 'cant-tell', label: 'I can\'t tell what I\'m feeling', toolId: 'find-the-feeling', emoji: '🫧' },
+  { id: 'hurt', label: 'Recover from a hurtful moment', toolId: 'recovering-from-invalidation', emoji: '💬' },
   { id: 'calm-fast', label: 'Calm down fast', toolId: 'cool-down', emoji: '🧊' },
   { id: 'pause', label: 'Pause before reacting', toolId: 'pause', emoji: '✋' },
   { id: 'ground', label: 'Ground myself', toolId: 'five-senses', emoji: '👁️' },

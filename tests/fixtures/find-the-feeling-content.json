@@ -1,0 +1,831 @@
+{
+ "version": "find-v1",
+ "flow": {
+  "version": "find-v1",
+  "ways": [
+   "shape",
+   "tune"
+  ],
+  "defaultWay": "shape",
+  "gates": {
+   "regulateBands": [
+    "flooded"
+   ],
+   "activateUrges": [
+    "blank"
+   ],
+   "floodedBlank": "regulate_then_orient_no_label",
+   "maxWordsOffered": 3,
+   "floodedBlankRoutes": [
+    "cool-down",
+    "five-senses"
+   ],
+   "slowStrokePxPerSec": [
+    45,
+    380
+   ],
+   "fastStrokePxPerSec": 600,
+   "breathHoldMs": 2800,
+   "breathsToSettle": 5,
+   "plucksToWake": 6,
+   "regulationEscapeSeconds": 20,
+   "ambientDescent": {
+    "perStep": 0.08,
+    "maxTotal": 0.45,
+    "startAfter": "capacity",
+    "blankDirection": "brighten",
+    "floodedBlankDirection": "calm"
+   }
+  },
+  "bandIntensity": {
+   "steady": 0.35,
+   "stirred": 0.6,
+   "flooded": 0.85
+  },
+  "copy": {
+   "entry": {
+    "checkInLabel": "I can't tell what I'm feeling",
+    "title": "Find the feeling",
+    "sub": "No words needed yet.",
+    "shape": "By shape",
+    "tune": "By ear",
+    "tuneHint": "Headphones help. It works silently too.",
+    "switchToTune": "Try it by ear instead",
+    "switchToShape": "Try it by shape instead"
+   },
+   "shape": {
+    "intro": "Something's there. Before words, let's give it a shape.",
+    "round": "Which is closer to what's inside?",
+    "cantTell": "can't tell",
+    "rounds": [
+     [
+      "sharp",
+      "soft"
+     ],
+     [
+      "hot",
+      "cool"
+     ],
+     [
+      "heavy",
+      "light"
+     ],
+     [
+      "buzzing",
+      "still"
+     ],
+     [
+      "clenched",
+      "hollow"
+     ]
+    ],
+    "begin": "Begin",
+    "smooth": {
+     "title": "Smooth it down. Slowly.",
+     "sub": "Stroke it gently with your finger.",
+     "tooFast": "Slower, like stroking a sleeping cat.",
+     "hold": "Or press and hold here",
+     "enough": "That's enough for now"
+    },
+    "warm": {
+     "title": "Warm it up.",
+     "sub": "Rub it briskly, like cold hands.",
+     "hold": "Or press and hold here",
+     "enough": "That's enough for now"
+    },
+    "wordLead": "Things shaped like this are often called",
+    "shelf": "Your shelf"
+   },
+   "tune": {
+    "intro": "Something's there. Let's find how it sounds in there.",
+    "search": "Is this closer to how it feels, or further?",
+    "closer": "Closer",
+    "further": "Further",
+    "thatsIt": "That's it",
+    "begin": "Begin",
+    "sound": "Sound",
+    "continue": "Continue",
+    "breathe": {
+     "title": "Breathe them back into tune.",
+     "sub": "Hold anywhere while you breathe in. Let go to breathe out.",
+     "tooQuick": "A little slower. Let the breath fill up.",
+     "done": "Hear it? The throb is slow and soft now."
+    },
+    "wake": {
+     "title": "Wake the strings.",
+     "sub": "Pluck them. Each one a bit brighter."
+    },
+    "wordLead": "Sounds like this often get called…",
+    "harp": "Your strings"
+   },
+   "capacity": {
+    "prompt": "If someone asked you for a favour right now, you'd…",
+    "incoming": "hey, could you help me with something?",
+    "options": {
+     "steady": "Say yes like normal",
+     "stirred": "Say yes, but with an edge",
+     "flooded": "Couldn't answer, or would regret it"
+    }
+   },
+   "pull": {
+    "title": "What does it want to do?"
+   },
+   "word": {
+    "yes": "Yes",
+    "close": "Close",
+    "no": "Not that",
+    "none": "Not knowing the word is fine. You found it without one, and that counts.",
+    "floodedBlank": "Let's skip the word today. Getting back into the room is the whole job right now."
+   },
+   "setOff": {
+    "title": "Do you know what set it off?",
+    "optional": true,
+    "not_sure": "Not sure",
+    "skip": "Skip",
+    "someone": "Something with someone",
+    "situation": "A situation",
+    "body": "Tired, hungry or sore",
+    "nothing": "Nothing I can see"
+   },
+   "close": {
+    "prompt": "Which is closer to how you feel right now?",
+    "then": "Then",
+    "now": "Now",
+    "options": {
+     "louder": "Then",
+     "same": "Somewhere between",
+     "quieter": "Now",
+     "much": "Now, and even calmer"
+    }
+   },
+   "orient": {
+    "title": "Come back into the room",
+    "sub": "Before any words. Just get your bearings.",
+    "look": "Look around slowly. Each time something catches your eye, tap a circle.",
+    "move": "Stand up and shake out your hands",
+    "moveSeconds": 20,
+    "startMove": "Start",
+    "skip": "Skip this",
+    "seen": "{n} of 3 found"
+   },
+   "next": {
+    "title": "Where to next",
+    "sub": "Based on what you found.",
+    "none": "Nothing else needed. Finding it was the work.",
+    "open": "Open",
+    "done": "Finish"
+   },
+   "collection": {
+    "title": "Your collection",
+    "new": "“{word}” joins the others. Naming a feeling is a skill, and you just used it.",
+    "empty": "Every word you find lands here.",
+    "noWord": "No new word this time. You still found it, and that counts.",
+    "again": "Start again",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "saveError": "Couldn't save. Try again?",
+    "retry": "Try again",
+    "signedOut": "Sign in to keep your collection.",
+    "rooms": {
+     "shelf": "Shelf",
+     "harp": "Strings",
+     "scenes": "Scenes"
+    }
+   },
+   "nav": {
+    "back": "Back",
+    "skip": "Skip this"
+   }
+  },
+  "sourceIds": [
+   "linehan_skills_2015",
+   "nummenmaa_2014",
+   "juslin_laukka_2003",
+   "palmer_2013",
+   "lieberman_2007",
+   "kashdan_2015",
+   "brewer_2016",
+   "loken_2009",
+   "lehrer_gevirtz_2014",
+   "bernardi_2006"
+  ]
+ },
+ "families": [
+  {
+   "id": "heat_edge",
+   "label": "Hot and sharp",
+   "order": 0,
+   "words": [
+    {
+     "emotionId": "frustrated",
+     "name": "Frustrated",
+     "shape": [
+      0.6,
+      0.55,
+      0.0,
+      0.55,
+      0.1
+     ],
+     "sound": [
+      0.75,
+      0.7,
+      0.5,
+      0.65
+     ],
+     "offer": 0,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "furious",
+     "name": "Furious",
+     "shape": [
+      0.95,
+      0.95,
+      0.0,
+      0.8,
+      0.3
+     ],
+     "sound": [
+      0.9,
+      0.9,
+      0.5,
+      0.85
+     ],
+     "offer": 1,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "resentful",
+     "name": "Resentful",
+     "shape": [
+      0.55,
+      0.45,
+      0.45,
+      -0.1,
+      0.4
+     ],
+     "sound": [
+      0.6,
+      0.7,
+      0.25,
+      0.3
+     ],
+     "offer": 2,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "disrespected",
+     "name": "Disrespected",
+     "shape": [
+      0.5,
+      0.6,
+      0.2,
+      0.35,
+      0.0
+     ],
+     "sound": [
+      0.7,
+      0.55,
+      0.4,
+      0.5
+     ],
+     "offer": 3,
+     "addressedBy": []
+    }
+   ]
+  },
+  {
+   "id": "heat_weight",
+   "label": "Hot and heavy",
+   "order": 1,
+   "words": [
+    {
+     "emotionId": "humiliated",
+     "name": "Humiliated",
+     "shape": [
+      0.15,
+      0.75,
+      0.75,
+      0.0,
+      -0.2
+     ],
+     "sound": [
+      0.8,
+      0.35,
+      0.15,
+      0.2
+     ],
+     "offer": 0,
+     "addressedBy": [
+      "recovering-from-invalidation"
+     ]
+    },
+    {
+     "emotionId": "embarrassed",
+     "name": "Embarrassed",
+     "shape": [
+      0.0,
+      0.6,
+      0.35,
+      0.35,
+      0.0
+     ],
+     "sound": [
+      0.55,
+      0.25,
+      0.55,
+      0.45
+     ],
+     "offer": 1,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "rejected",
+     "name": "Rejected",
+     "shape": [
+      0.0,
+      0.3,
+      0.6,
+      -0.2,
+      -0.4
+     ],
+     "sound": [
+      0.65,
+      0.3,
+      0.2,
+      0.15
+     ],
+     "offer": 2,
+     "addressedBy": [
+      "recovering-from-invalidation"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "cool_weight",
+   "label": "Cool and heavy",
+   "order": 2,
+   "words": [
+    {
+     "emotionId": "hurt",
+     "name": "Hurt",
+     "shape": [
+      0.0,
+      -0.35,
+      0.6,
+      -0.5,
+      -0.3
+     ],
+     "sound": [
+      0.7,
+      0.2,
+      0.2,
+      0.12
+     ],
+     "offer": 0,
+     "addressedBy": [
+      "recovering-from-invalidation"
+     ]
+    },
+    {
+     "emotionId": "ashamed",
+     "name": "Ashamed",
+     "shape": [
+      0.0,
+      -0.15,
+      0.85,
+      -0.45,
+      0.35
+     ],
+     "sound": [
+      0.35,
+      0.8,
+      0.12,
+      0.15
+     ],
+     "offer": 1,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "inferior",
+     "name": "Inferior",
+     "shape": [
+      -0.2,
+      -0.3,
+      0.7,
+      -0.3,
+      0.5
+     ],
+     "sound": [
+      0.3,
+      0.75,
+      0.15,
+      0.15
+     ],
+     "offer": 2,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "sad",
+     "name": "Sad",
+     "shape": [
+      -0.4,
+      -0.45,
+      0.7,
+      -0.65,
+      0.0
+     ],
+     "sound": [
+      0.3,
+      0.1,
+      0.15,
+      0.08
+     ],
+     "offer": 3,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "disappointed",
+     "name": "Disappointed",
+     "shape": [
+      -0.2,
+      -0.3,
+      0.5,
+      -0.5,
+      0.0
+     ],
+     "sound": [
+      0.35,
+      0.2,
+      0.3,
+      0.1
+     ],
+     "offer": 4,
+     "addressedBy": []
+    }
+   ]
+  },
+  {
+   "id": "tight_buzz",
+   "label": "Tight and buzzing",
+   "order": 3,
+   "words": [
+    {
+     "emotionId": "anxious",
+     "name": "Anxious",
+     "shape": [
+      0.3,
+      -0.3,
+      0.0,
+      0.7,
+      0.55
+     ],
+     "sound": [
+      0.45,
+      0.3,
+      0.85,
+      0.85
+     ],
+     "offer": 0,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "scared",
+     "name": "Scared",
+     "shape": [
+      0.0,
+      -0.6,
+      -0.2,
+      0.8,
+      0.85
+     ],
+     "sound": [
+      0.5,
+      0.35,
+      0.9,
+      0.9
+     ],
+     "offer": 1,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "overwhelmed",
+     "name": "Overwhelmed",
+     "shape": [
+      0.4,
+      0.2,
+      0.5,
+      0.9,
+      0.0
+     ],
+     "sound": [
+      0.7,
+      0.6,
+      0.6,
+      0.95
+     ],
+     "offer": 2,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "insecure",
+     "name": "Insecure",
+     "shape": [
+      0.0,
+      -0.35,
+      0.1,
+      0.4,
+      0.5
+     ],
+     "sound": [
+      0.35,
+      0.2,
+      0.7,
+      0.6
+     ],
+     "offer": 3,
+     "addressedBy": []
+    }
+   ]
+  },
+  {
+   "id": "hollow",
+   "label": "Hollow and still",
+   "order": 4,
+   "words": [
+    {
+     "emotionId": "lonely",
+     "name": "Lonely",
+     "shape": [
+      0.0,
+      -0.6,
+      0.2,
+      -0.6,
+      -0.8
+     ],
+     "sound": [
+      0.1,
+      0.08,
+      0.18,
+      0.12
+     ],
+     "offer": 0,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "abandoned",
+     "name": "Abandoned",
+     "shape": [
+      0.0,
+      -0.45,
+      0.55,
+      -0.3,
+      -0.7
+     ],
+     "sound": [
+      0.25,
+      0.1,
+      0.12,
+      0.2
+     ],
+     "offer": 1,
+     "addressedBy": [
+      "recovering-from-invalidation"
+     ]
+    },
+    {
+     "emotionId": "excluded",
+     "name": "Excluded",
+     "shape": [
+      0.15,
+      -0.4,
+      0.1,
+      -0.2,
+      -0.6
+     ],
+     "sound": [
+      0.3,
+      0.15,
+      0.3,
+      0.2
+     ],
+     "offer": 2,
+     "addressedBy": [
+      "recovering-from-invalidation"
+     ]
+    },
+    {
+     "emotionId": "insignificant",
+     "name": "Insignificant",
+     "shape": [
+      0.0,
+      -0.7,
+      -0.5,
+      -0.8,
+      -0.9
+     ],
+     "sound": [
+      0.05,
+      0.05,
+      0.35,
+      0.05
+     ],
+     "offer": 3,
+     "addressedBy": []
+    }
+   ]
+  },
+  {
+   "id": "dim",
+   "label": "Dim and far away",
+   "order": 5,
+   "words": [
+    {
+     "emotionId": "tired",
+     "name": "Tired",
+     "shape": [
+      -0.5,
+      -0.2,
+      0.95,
+      -0.9,
+      0.0
+     ],
+     "sound": [
+      0.1,
+      0.15,
+      0.1,
+      0.02
+     ],
+     "offer": 0,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "empty",
+     "name": "Empty",
+     "shape": [
+      0.0,
+      -0.8,
+      0.0,
+      -0.95,
+      -0.95
+     ],
+     "sound": [
+      0.02,
+      0.02,
+      0.25,
+      0.0
+     ],
+     "offer": 1,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "numb",
+     "name": "Numb",
+     "shape": [
+      -0.2,
+      -0.9,
+      0.3,
+      -1.0,
+      -0.3
+     ],
+     "sound": [
+      0.0,
+      0.05,
+      0.2,
+      0.0
+     ],
+     "offer": 2,
+     "addressedBy": []
+    }
+   ]
+  },
+  {
+   "id": "warm_light",
+   "label": "Warm and light",
+   "order": 6,
+   "words": [
+    {
+     "emotionId": "content",
+     "name": "Content",
+     "shape": [
+      -0.7,
+      0.35,
+      -0.2,
+      -0.5,
+      0.0
+     ],
+     "sound": [
+      0.04,
+      0.05,
+      0.45,
+      0.1
+     ],
+     "offer": 0,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "peaceful",
+     "name": "Peaceful",
+     "shape": [
+      -0.9,
+      0.2,
+      -0.3,
+      -0.8,
+      -0.1
+     ],
+     "sound": [
+      0.0,
+      0.0,
+      0.4,
+      0.05
+     ],
+     "offer": 1,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "hopeful",
+     "name": "Hopeful",
+     "shape": [
+      -0.5,
+      0.4,
+      -0.6,
+      0.2,
+      0.0
+     ],
+     "sound": [
+      0.08,
+      0.05,
+      0.7,
+      0.3
+     ],
+     "offer": 2,
+     "addressedBy": []
+    },
+    {
+     "emotionId": "excited",
+     "name": "Excited",
+     "shape": [
+      0.1,
+      0.6,
+      -0.7,
+      0.8,
+      0.0
+     ],
+     "sound": [
+      0.2,
+      0.2,
+      0.8,
+      0.8
+     ],
+     "offer": 3,
+     "addressedBy": []
+    }
+   ]
+  }
+ ],
+ "urges": [
+  {
+   "id": "fight",
+   "label": "Say something sharp",
+   "sub": "prove them wrong, snap",
+   "order": 0,
+   "routes": [
+    "pause",
+    "opposite-action"
+   ]
+  },
+  {
+   "id": "chase",
+   "label": "Text someone a lot",
+   "sub": "explain, fix it, now",
+   "order": 1,
+   "routes": [
+    "urge-surfing",
+    "pause"
+   ]
+  },
+  {
+   "id": "hide",
+   "label": "Disappear",
+   "sub": "cancel, go quiet",
+   "order": 2,
+   "routes": [
+    "opposite-action"
+   ]
+  },
+  {
+   "id": "blank",
+   "label": "Nothing. I'm blank",
+   "sub": "numb, heavy, far away",
+   "order": 3,
+   "routes": [
+    "five-senses"
+   ]
+  }
+ ],
+ "floodedBlankRoutes": [
+  "cool-down",
+  "five-senses"
+ ]
+}

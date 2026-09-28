@@ -113,6 +113,14 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 | `src/components/StateResult.tsx` | Shows activation pattern + recommended tools after check-in |
 | `src/pages/tools/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
+| `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
+| `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
+| `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |
+| `scripts/find-the-feeling/content.py` | Editable source for `schema/find-the-feeling.cypher` (Find the feeling: word signatures, urge routing, `appToolId`); regenerate with `build.py` |
+| `src/pages/tools/FindTheFeeling.tsx` | "Find the feeling" (Shape it / Tune it): page shell, save, routing, check-in handoff; rooms in `src/components/tools/findTheFeeling/{shape,tune}` (lazy, three.js / Web Audio); logic in `src/lib/findTheFeeling*.ts`; spec `docs/design/find-the-feeling.md` |
+| `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
+| `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
+| `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
 | `src/data/tools.ts` | Tool display metadata (names, emojis, categories) |
 | `src/data/microSteps.ts` | Activation-pattern-keyed micro-interventions |
 | `src/services/neo4j.ts` | Cloud Function call wrappers |
@@ -124,6 +132,17 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 | `schema/relationships.cypher` | All graph relationships |
 | `schema/emotion-regulation-content.cypher` | EmotionRegulationContent base (label, fitsTheFactsWhen) |
 | `schema/opposite-action-data.cypher` | Protocol metadata + ActionUrge nodes (OA tool source of truth) |
+
+---
+
+## Product Changelog (Obsidian)
+
+The product-level record of every change and the thinking behind it lives in Claudia's Obsidian vault:
+`~/Obsidian/Claudia-mac-mini/Goblin DBT/Product Changelog.md` (newest first, template at the bottom).
+When a chat changes the product (a feature, a reversal, a new principle), add or update an entry there before
+the chat ends: what changed, why, the thinking (including what was rejected), open questions, commit/PR, and
+status (`planned` / `built` / `shipped` / `reverted`). If the vault isn't reachable from the session, say so and
+give Claudia the entry text to paste.
 
 ---
 

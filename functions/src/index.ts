@@ -1,4 +1,6 @@
 import { validateOppositeActionSession } from './oppositeActionValidation';
+import { validateInvalidationRecoverySession, expectedRecoveryGate, type RecoveryGates } from './invalidationRecoveryValidation';
+import { validateFindTheFeelingSession, checkFindTheFeelingGates, type FindTheFeelingGates } from './findTheFeelingValidation';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
@@ -51,6 +53,16 @@ interface CheckInData {
 function normalizeToolId(graphId: string): string {
   if (!graphId) return graphId;
   return graphId.replace(/^dbt_/, '').replace(/_/g, '-');
+}
+
+/**
+ * App tool id for a graph concept. `TherapyConcept.appToolId` (schema/app-tool-ids.cypher) is the
+ * join key to src/data/tools.ts; the string normalization is only a fallback for concepts without it
+ * (it turns dbt_tipp into "tipp", which isn't an app tool).
+ */
+function appToolId(rec: Neo4jRecord): string {
+  const explicit = rec.get('appToolId') as string | null | undefined;
+  return explicit || normalizeToolId(rec.get('id'));
 }
 
 // ============================================
@@ -489,6 +501,26 @@ export const deleteUserData = onCall(
          DETACH DELETE s`, { userId }
       );
 
+      await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:InvalidationRecoverySession)
+         DETACH DELETE s`, { userId }
+      );
+
+      await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:DearManSession)
+         DETACH DELETE s`, { userId }
+      );
+
+      await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:FindTheFeelingSession)
+         DETACH DELETE s`, { userId }
+      );
+
+      await session.run(
+        `MATCH (u:User {id: $userId})-[:USED_TOOL]->(t:ToolUsage)
+         DETACH DELETE t`, { userId }
+      );
+
       // Delete the user node
       await session.run(
         `
@@ -552,10 +584,57 @@ export const exportUserData = onCall(
                 toString(s.updatedAt) AS updatedAt, s.status AS status
          ORDER BY s.updatedAt DESC`, { userId }
       );
+      const recoveryResult = await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:InvalidationRecoverySession)
+         RETURN s.dataJson AS dataJson, toString(s.createdAt) AS createdAt
+         ORDER BY s.createdAt DESC`, { userId }
+      );
+      const invalidationRecoverySessions = recoveryResult.records.flatMap((r: Neo4jRecord) => {
+        try { return [{ ...JSON.parse(r.get('dataJson')), createdAt: r.get('createdAt') }]; }
+        catch { return []; }
+      });
+      const dearManResult = await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:DearManSession)
+         RETURN s {.*, createdAt: toString(s.createdAt)} AS s
+         ORDER BY s.createdAt DESC`, { userId }
+      );
+      // Plain JSON only: Neo4j Integers become numbers, other driver types become strings.
+      const plain = (v: unknown): unknown =>
+        neo4j.isInt(v) ? (v as { toNumber: () => number }).toNumber()
+          : Array.isArray(v) ? v.map(plain)
+            : v !== null && typeof v === 'object' && v.constructor === Object
+              ? Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, plain(x)]))
+              : v !== null && typeof v === 'object' ? String(v) : v;
+      const dearManSessions = dearManResult.records.map((r: Neo4jRecord) => plain(r.get('s')));
+      const toolUsageResult = await session.run(
+        `MATCH (u:User {id: $userId})-[:USED_TOOL]->(t:ToolUsage)
+         RETURN t {.*, timestamp: toString(t.timestamp)} AS t`, { userId }
+      );
+      const toolUsage = toolUsageResult.records.map((r: Neo4jRecord) => plain(r.get('t')));
+      const findResult = await session.run(
+        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:FindTheFeelingSession)
+         RETURN s.dataJson AS dataJson, toString(s.createdAt) AS createdAt
+         ORDER BY s.createdAt DESC`, { userId }
+      );
+      const findTheFeelingSessions = findResult.records.flatMap((r: Neo4jRecord) => {
+        try { return [{ ...JSON.parse(r.get('dataJson')), createdAt: r.get('createdAt') }]; }
+        catch { return []; }
+      });
+      const wordsResult = await session.run(
+        `MATCH (u:User {id: $userId})-[fw:FOUND_WORD]->(e:Emotion)
+         RETURN e.id AS emotionId, fw.count AS count, fw.ways AS ways,
+                toString(fw.firstAt) AS firstAt, toString(fw.lastAt) AS lastAt`, { userId }
+      );
+      const feelingCollection = wordsResult.records.map((r: Neo4jRecord) => plain(r.toObject()));
       return {
         data: {
           // Export the plain JSON snapshot (not raw Neo4j Integer/DateTime objects).
           oppositeActionSessions: oaResult.records.map(toSavedOppositeActionSession).filter(Boolean),
+          invalidationRecoverySessions,
+          dearManSessions,
+          findTheFeelingSessions,
+          feelingCollection,
+          toolUsage,
           exportedAt: new Date().toISOString(),
           profile: userProfile,
           checkIns,
@@ -1004,9 +1083,11 @@ export const getInsightsData = onCall(
         const escResult = await session.run(
           `
           MATCH (p1:ActivationPattern {id: $patternId})-[r:CAN_ESCALATE_TO]->(p2:ActivationPattern)
+          OPTIONAL MATCH (tc:TherapyConcept {id: r.escalation_suggested_tool})
           RETURN r.escalation_narrative AS narrative,
                  r.escalation_suggested_tool AS suggestedTool,
-                 p2.id AS targetPatternId
+                 p2.id AS targetPatternId,
+                 tc.appToolId AS suggestedAppTool
           LIMIT 1
           `,
           { patternId: dominantPattern[0] }
@@ -1029,7 +1110,7 @@ export const getInsightsData = onCall(
           if (intensityTrending || dominantPattern[1] >= thresholds.dominantRepeatMin) {
             proactiveAlert = {
               narrative: rec.get('narrative'),
-              suggestedTool: normalizeToolId(rec.get('suggestedTool')),
+              suggestedTool: rec.get('suggestedAppTool') || normalizeToolId(rec.get('suggestedTool')),
               sourcePatternId: dominantPattern[0],
               targetPatternId: rec.get('targetPatternId'),
             };
@@ -1616,6 +1697,7 @@ export const getStateAndTools = onCall(
         ORDER BY relevanceScore DESC
         LIMIT 2
         RETURN tc.id as id,
+               tc.appToolId as appToolId,
                tc.name as name,
                tc.description as description,
                tc.whenToUse as whenToUse,
@@ -1630,8 +1712,8 @@ export const getStateAndTools = onCall(
       const toolsResult = await session.run(toolsQuery, { patternId: pattern.id });
 
       const tools: ToolRecommendation[] = toolsResult.records.map((rec: Neo4jRecord) => ({
-        id: normalizeToolId(rec.get('id')),
-        name: rec.get('name') || normalizeToolId(rec.get('id')).replace(/-/g, ' '),
+        id: appToolId(rec),
+        name: rec.get('name') || appToolId(rec).replace(/-/g, ' '),
         description: rec.get('description') || '',
         whenToUse: rec.get('whenToUse') || '',
         dbtBasis: rec.get('dbtBasis'),
@@ -2085,6 +2167,36 @@ export const getOppositeActionContent = onCall(
 export const getDearManContent = onCall(
   { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
   async () => {
+    interface DearManSafetyGatesResult {
+      gates: { downshiftAt: number; askMax: number; waitMinutes: number; [k: string]: number };
+      waitCopy: Record<string, string>;
+      breatheCopy: Record<string, unknown>;
+    }
+
+    /**
+     * Pull the arousal gates + shared wait/breathe copy out of the recovery flow document.
+     * Returns null (gates skipped in the UI) when the node is absent or its JSON is unusable.
+     */
+    function parseDearManSafetyGates(raw: unknown): DearManSafetyGatesResult | null {
+      if (typeof raw !== 'string' || !raw) return null;
+      try {
+        const flow = JSON.parse(raw);
+        const g = flow?.gates;
+        const wait = flow?.copy?.wait;
+        const breathe = flow?.copy?.breathe;
+        const nums = ['downshiftAt', 'askMax', 'waitMinutes'];
+        if (!g || typeof g !== 'object' || !nums.every(k => typeof g[k] === 'number' && Number.isFinite(g[k]))) return null;
+        if (!wait || typeof wait !== 'object' || !breathe || typeof breathe !== 'object'
+          || !Array.isArray(breathe.phases) || typeof breathe.cycles !== 'number') return null;
+        const gates = Object.fromEntries(
+          Object.entries(g).filter((e): e is [string, number] => typeof e[1] === 'number')
+        ) as DearManSafetyGatesResult['gates'];
+        return { gates, waitCopy: wait, breatheCopy: breathe };
+      } catch {
+        return null;
+      }
+    }
+
     const session = getDriver().session();
     try {
       // 1. Situation types
@@ -2197,6 +2309,19 @@ export const getDearManContent = onCall(
                tc.negotiateHintSelfRespect AS hintSelfRespect,
                tc.anchorGeneratorIntro AS anchorGeneratorIntro,
                tc.anchorGeneratorMakeItYours AS anchorGeneratorMakeItYours
+      `);
+
+      // 13. Safety gates: thresholds + shared wait/breathe copy live on the recovery flow
+      //     document. OPTIONAL MATCH so an older graph (no flow) still loads DEAR MAN.
+      const gateResult = await session.run(`
+        OPTIONAL MATCH (f:InvalidationRecoveryFlow {id: 'invalidation_recovery_flow'})
+        RETURN f.contentJson AS content
+      `);
+
+      // 14. DEAR MAN-specific safety copy (schema/dear-man-safety-gates.cypher)
+      const safetyCopyResult = await session.run(`
+        OPTIONAL MATCH (c:DearManSafetyCopy {id: 'dear_man_safety_copy'})
+        RETURN c { .* } AS copy
       `);
 
       // --- Shape the response ---
@@ -2314,6 +2439,12 @@ export const getDearManContent = onCall(
 
       const tc = tcResult.records[0];
 
+      const safetyGates = parseDearManSafetyGates(gateResult.records[0]?.get('content'));
+      const rawSafetyCopy = safetyCopyResult.records[0]?.get('copy') as Record<string, unknown> | null | undefined;
+      const safetyCopy: Record<string, string> | null = rawSafetyCopy
+        ? Object.fromEntries(Object.entries(rawSafetyCopy).filter((e): e is [string, string] => typeof e[1] === 'string'))
+        : null;
+
       return {
         situationTypes,
         describeOptions,
@@ -2340,6 +2471,8 @@ export const getDearManContent = onCall(
         confidentCoaching: tc?.get('confidentCoaching') ?? '',
         confidentBarrierNoRight: tc?.get('confidentBarrierNoRight') ?? '',
         assertBarrierGuilty: tc?.get('assertBarrierGuilty') ?? '',
+        safetyGates,
+        safetyCopy,
       };
     } catch (error) {
       console.error('Error fetching DEAR MAN content:', error);
@@ -2696,6 +2829,7 @@ export const getQuickTools = onCall(
         MATCH (tc:TherapyConcept)
         WHERE tc.id IN $toolIds
         RETURN tc.id as id,
+               tc.appToolId as appToolId,
                tc.name as name,
                tc.description as description,
                tc.whenToUse as whenToUse,
@@ -2705,8 +2839,8 @@ export const getQuickTools = onCall(
       const result = await session.run(query, { toolIds });
 
       const tools: ToolRecommendation[] = result.records.map((rec: Neo4jRecord) => ({
-        id: normalizeToolId(rec.get('id')),
-        name: rec.get('name') || normalizeToolId(rec.get('id')).replace(/-/g, ' '),
+        id: appToolId(rec),
+        name: rec.get('name') || appToolId(rec).replace(/-/g, ' '),
         description: rec.get('description') || '',
         whenToUse: rec.get('whenToUse') || '',
         dbtBasis: rec.get('dbtBasis'),
@@ -3457,6 +3591,413 @@ export const getOppositeActionFollowUps = onCall(
     } catch (error) {
       if (error instanceof HttpsError) throw error;
       throw new HttpsError('internal', 'Could not load follow-ups');
+    } finally { await session.close(); }
+  }
+);
+
+// ============================================
+// INVALIDATION RECOVERY ("Recover from a hurtful moment", Walking the Middle Path) — recovery-v1
+// Content lives in schema/invalidation-recovery.cypher. The client owns only
+// presentation and the pure gate/routing functions, which read thresholds
+// from the flow document returned here.
+// ============================================
+
+const RECOVERY_FLOW_VERSION = 'recovery-v1';
+
+/** Neo4j Integer | number -> number (0 stays 0, unlike toNumber()). */
+function int(v: unknown): number {
+  if (typeof v === 'number') return v;
+  if (v && typeof v === 'object' && 'toNumber' in v) return (v as { toNumber: () => number }).toNumber();
+  return Number.NaN;
+}
+
+interface RecoveryFlowDoc {
+  version: string;
+  gates: RecoveryGates;
+  pulls: { id: string }[];
+  copy: { follow: { options: { id: string }[] } };
+}
+
+function parseRecoveryFlow(raw: unknown): RecoveryFlowDoc {
+  let flow: RecoveryFlowDoc | null = null;
+  try { flow = typeof raw === 'string' ? JSON.parse(raw) : null; } catch { flow = null; }
+  if (!flow || flow.version !== RECOVERY_FLOW_VERSION || !flow.gates || !Array.isArray(flow.pulls) || !Array.isArray(flow.copy?.follow?.options)) {
+    throw new HttpsError('failed-precondition', 'Invalid invalidation recovery flow content');
+  }
+  return flow;
+}
+
+/** All content for the flow in one call. Public therapeutic content (same as OA / DEAR MAN). */
+export const getInvalidationRecoveryContent = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async () => {
+    const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
+    try {
+      // One read transaction; queries run sequentially (a session can't run concurrent transactions).
+      const [flowRes, stateRes, protoRes, needRes, exitRes, skillRes] = await session.executeRead(async tx => [
+        await tx.run(
+          `MATCH (f:InvalidationRecoveryFlow {id: 'invalidation_recovery_flow'})
+           RETURN f.version AS version, f.contentJson AS content`),
+        await tx.run(
+          `MATCH (w:InvalidationEvent)-[:HAS_PROTOCOL {primary: true}]->(p:RecoveryProtocol)
+           WITH w, collect(p.id)[0] AS protocol
+           OPTIONAL MATCH (w)-[:HAS_PROTOCOL {primary: false}]->(p2:RecoveryProtocol)
+           WITH w, protocol, collect(p2.id)[0] AS secondaryProtocol
+           OPTIONAL MATCH (w)-[of:OFTEN_FEELS]->(e:Emotion)
+           WITH w, protocol, secondaryProtocol,
+                collect({id: e.id, name: coalesce(e.name, e.id), rank: of.rank}) AS emotions
+           OPTIONAL MATCH (w)-[:SIGNALS]->(a:ActivationPattern)
+           RETURN w { .id, .label, .phrase, .covers, .highRisk, .lowArousal } AS state, w.order AS ord,
+                  protocol, secondaryProtocol, emotions, collect(DISTINCT a.id) AS patterns
+           ORDER BY ord`),
+        await tx.run(
+          `MATCH (p:RecoveryProtocol) RETURN p.id AS id, p.label AS label, p.validationLines AS lines`),
+        await tx.run(
+          `MATCH (n:UnmetNeed)-[:THREATENS]->(s:SocialNeed)
+           RETURN n { .id, .label } AS need, s { .id, .elsewhereTitle, .elsewhereAct, .practiceSkill } AS social,
+                  n.order AS ord
+           ORDER BY ord`),
+        await tx.run(
+          `MATCH (x:RecoveryExit) RETURN x { .id, .title, .sub, .chaseSub } AS exit, x.order AS ord ORDER BY ord`),
+        await tx.run(
+          `MATCH (k:PracticeSkill)
+           OPTIONAL MATCH (k)-[:SUPPORTED_BY]->(s:ClinicalSource)
+           WITH k, collect(s { .id, .title, .url }) AS sources
+           RETURN k { .id, .name, .evidenceGrade, .evidenceBasis, .family, .why, sources: sources } AS skill,
+                  k.order AS ord
+           ORDER BY ord`),
+      ]);
+
+      const flowRecord = flowRes.records[0];
+      if (!flowRecord || flowRecord.get('version') !== RECOVERY_FLOW_VERSION) {
+        throw new HttpsError('failed-precondition', 'Interpersonal wound content migration is required');
+      }
+      const flow = parseRecoveryFlow(flowRecord.get('content'));
+
+      const states = stateRes.records.map(r => ({
+        ...r.get('state'),
+        protocol: r.get('protocol'),
+        secondaryProtocol: r.get('secondaryProtocol') ?? null,
+        emotions: (r.get('emotions') as { id: string | null; name: string; rank: unknown }[])
+          .filter(e => e.id)
+          .sort((a, b) => int(a.rank) - int(b.rank))
+          .map(({ id, name }) => ({ id, name })),
+        patterns: r.get('patterns'),
+      }));
+      const protocols = Object.fromEntries(protoRes.records.map(r => [
+        r.get('id'), { label: r.get('label'), validationLines: r.get('lines') ?? [] },
+      ]));
+      const needs = needRes.records.map(r => ({ ...r.get('need'), social: r.get('social').id }));
+      const social = Object.fromEntries(needRes.records.map(r => {
+        const s = r.get('social');
+        return [s.id, { title: s.elsewhereTitle, act: s.elsewhereAct, skill: s.practiceSkill }];
+      }));
+      const exits = exitRes.records.map(r => r.get('exit'));
+      const skills = skillRes.records.map(r => r.get('skill'));
+
+      if (!states.length || !needs.length || !exits.length) {
+        throw new HttpsError('failed-precondition', 'Interpersonal wound content is incomplete');
+      }
+      return { version: RECOVERY_FLOW_VERSION, flow, states, protocols, needs, social, exits, skills };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error('Error getting invalidation recovery content:', error);
+      throw new HttpsError('internal', 'Failed to get invalidation recovery content');
+    } finally {
+      await session.close();
+    }
+  }
+);
+
+/** Explicit save at the end of a session. Ids and clinical gates are verified against the graph; no free text is stored. */
+export const saveInvalidationRecoverySession = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to save');
+    let data: ReturnType<typeof validateInvalidationRecoverySession>;
+    try { data = validateInvalidationRecoverySession(request.data); }
+    catch { throw new HttpsError('invalid-argument', 'Invalid session'); }
+    const userId = request.auth.uid;
+    const key = `${userId}:${data.id}`;
+    const session = getDriver().session();
+    try {
+      await session.executeWrite(async tx => {
+        // Every id must exist at the flow version the client used. Any Emotion node is accepted
+        // (curated chips plus "add your own"), not only the state's OFTEN_FEELS emotions.
+        const check = await tx.run(
+          `MATCH (f:InvalidationRecoveryFlow {id: 'invalidation_recovery_flow', version: $contentVersion})
+           MATCH (w:InvalidationEvent {id: $stateId})
+           MATCH (:Emotion {id: $emotionId})
+           MATCH (:UnmetNeed {id: $needId})
+           MATCH (:RecoveryExit {id: $exitId})
+           OPTIONAL MATCH (k:PracticeSkill) WHERE k.id IN $skills
+           RETURN f.contentJson AS flow, w.highRisk AS highRisk, w.lowArousal AS lowArousal,
+                  count(DISTINCT k) AS knownSkills`,
+          {
+            contentVersion: data.contentVersion, stateId: data.stateId, emotionId: data.emotionId,
+            needId: data.needId, exitId: data.exitId, skills: data.skills,
+          }
+        );
+        const rec = check.records[0];
+        if (!rec || int(rec.get('knownSkills')) !== data.skills.length) {
+          throw new HttpsError('failed-precondition', 'Content changed; start a new exercise');
+        }
+        const flow = parseRecoveryFlow(rec.get('flow'));
+        const followIds = flow.copy.follow.options.map(o => o.id);
+        if (!flow.pulls.some(p => p.id === data.pull) || data.followUps.some(f => !followIds.includes(f))) {
+          throw new HttpsError('invalid-argument', 'Invalid session');
+        }
+        // The same clinical gates the client applies, from the same thresholds.
+        const expectedGate = expectedRecoveryGate(
+          data.startIntensity, data.pull,
+          { highRisk: rec.get('highRisk') === true, lowArousal: rec.get('lowArousal') === true },
+          flow.gates,
+        );
+        const ratingBeforeExit = data.readings[data.readings.length - 2];
+        const askTooHot = data.exitId === 'ask' && ratingBeforeExit > flow.gates.askMax;
+        const askDeliberate = data.exitId === 'ask' && data.zone === 'real' && rec.get('highRisk') === true;
+        if (data.gate !== expectedGate || askTooHot || askDeliberate) {
+          throw new HttpsError('invalid-argument', 'Session does not match the protocol');
+        }
+
+        const written = await tx.run(
+          `MATCH (f:InvalidationRecoveryFlow {id: 'invalidation_recovery_flow'}),
+                 (w:InvalidationEvent {id: $stateId}), (e:Emotion {id: $emotionId}),
+                 (n:UnmetNeed {id: $needId}), (x:RecoveryExit {id: $exitId})
+           MERGE (u:User {id: $userId})
+           CREATE (s:InvalidationRecoverySession {key: $key})
+           SET s.id = $id, s.createdAt = datetime(), s.contentVersion = $contentVersion,
+               s.stateId = $stateId, s.exitId = $exitId, s.pull = $pull, s.gate = $gate,
+               s.startIntensity = $startIntensity, s.endIntensity = $endIntensity,
+               s.startUrge = $startUrge, s.endUrge = $endUrge,
+               s.skills = $skills, s.dataJson = $dataJson
+           CREATE (u)-[:COMPLETED_SESSION]->(s),
+                  (s)-[:ABOUT]->(w), (s)-[:FOCUSED_ON]->(e), (s)-[:NAMED_NEED]->(n),
+                  (s)-[:TOOK_EXIT]->(x), (s)-[:USED_PROTOCOL]->(f)
+           WITH s
+           OPTIONAL MATCH (k:PracticeSkill) WHERE k.id IN $skills
+           FOREACH (kk IN CASE WHEN k IS NULL THEN [] ELSE [k] END | CREATE (s)-[:PRACTICED]->(kk))
+           RETURN count(DISTINCT s) AS created`,
+          {
+            userId, key, id: data.id, contentVersion: data.contentVersion,
+            stateId: data.stateId, emotionId: data.emotionId, needId: data.needId, exitId: data.exitId,
+            pull: data.pull, gate: data.gate,
+            startIntensity: neo4j.int(data.startIntensity), endIntensity: neo4j.int(data.endIntensity),
+            startUrge: neo4j.int(data.startUrge), endUrge: neo4j.int(data.endUrge),
+            skills: data.skills, dataJson: JSON.stringify(data),
+          }
+        );
+        // All targets are matched before anything is created, so this is 1 or nothing was written.
+        if (int(written.records[0]?.get('created')) !== 1) {
+          throw new HttpsError('failed-precondition', 'Content changed; start a new exercise');
+        }
+      });
+      return { success: true };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      const code = (error as { code?: string })?.code;
+      // A double tap or retry races the uniqueness constraint on key: the first save won.
+      if (code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
+        throw new HttpsError('already-exists', 'This session is already saved');
+      }
+      console.error('saveInvalidationRecoverySession failed', code ?? 'unknown'); // error code only, never the payload
+      throw new HttpsError('internal', 'Could not save the exercise');
+    } finally { await session.close(); }
+  }
+);
+
+/** Practice view: recent sessions plus skill-use counts (mastery levels are computed client-side). */
+export const getInvalidationRecoveryProgress = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see your practice');
+    const userId = request.auth.uid;
+    const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
+    try {
+      const [recent, uses] = await session.executeRead(async tx => [
+        await tx.run(
+          `MATCH (:User {id: $userId})-[:COMPLETED_SESSION]->(s:InvalidationRecoverySession)
+           RETURN s.dataJson AS dataJson, toString(s.createdAt) AS createdAt
+           ORDER BY s.createdAt DESC LIMIT 30`, { userId }),
+        await tx.run(
+          `MATCH (:User {id: $userId})-[:COMPLETED_SESSION]->(:InvalidationRecoverySession)-[:PRACTICED]->(k:PracticeSkill)
+           RETURN k.id AS id, count(*) AS uses`, { userId }),
+      ]);
+      const sessions = recent.records.flatMap(r => {
+        try { return [{ ...JSON.parse(r.get('dataJson')), createdAt: r.get('createdAt') }]; }
+        catch { return []; }
+      });
+      const skillUses = Object.fromEntries(uses.records.map(r => [r.get('id'), int(r.get('uses'))]));
+      return { sessions, skillUses };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error('getInvalidationRecoveryProgress failed', (error as { code?: string })?.code ?? 'unknown');
+      throw new HttpsError('internal', 'Could not load practice');
+    } finally { await session.close(); }
+  }
+);
+
+// ============================================
+// FIND THE FEELING (Shape it / Tune it)
+// ============================================
+
+const FIND_FLOW_VERSION = 'find-v1';
+
+interface FindFlowDoc {
+  version: string;
+  gates: FindTheFeelingGates & { [k: string]: unknown };
+  copy: Record<string, unknown>;
+  [k: string]: unknown;
+}
+
+function parseFindFlow(raw: unknown): FindFlowDoc {
+  let flow: FindFlowDoc | null = null;
+  try { flow = typeof raw === 'string' ? JSON.parse(raw) : null; } catch { flow = null; }
+  const g = flow?.gates;
+  if (!flow || flow.version !== FIND_FLOW_VERSION || !g || !Array.isArray(g.regulateBands) || !Array.isArray(g.activateUrges)
+    || typeof g.maxWordsOffered !== 'number' || !Array.isArray(g.floodedBlankRoutes) || !flow.copy) {
+    throw new HttpsError('failed-precondition', 'Invalid find-the-feeling flow content');
+  }
+  return flow;
+}
+
+/** Families + signatures, urges + routes, and the flow document. Public therapeutic content. */
+async function readFindContent(tx: { run: (q: string, p?: Record<string, unknown>) => Promise<{ records: Neo4jRecord[] }> }) {
+  const flowRes = await tx.run(
+    `MATCH (f:FindTheFeelingFlow {id: 'find_the_feeling_flow'}) RETURN f.version AS version, f.contentJson AS content`);
+  const famRes = await tx.run(
+    `MATCH (fam:FeelingFamily)-[i:INCLUDES]->(g:FeelingSignature)<-[:HAS_FEELING_SIGNATURE]-(e:Emotion)
+     OPTIONAL MATCH (tc:TherapyConcept)-[:ADDRESSES]->(e) WHERE tc.appToolId IS NOT NULL
+     WITH fam, i, g, e, tc ORDER BY tc.appToolId
+     WITH fam, i, g, e, collect(DISTINCT tc.appToolId) AS addressedBy
+     ORDER BY fam.order, i.offer
+     WITH fam, collect({ emotionId: e.id, name: coalesce(e.name, e.id), shape: g.shape, sound: g.sound,
+                         offer: i.offer, addressedBy: addressedBy }) AS words
+     RETURN fam { .id, .label, .order } AS family, words
+     ORDER BY family.order`);
+  const urgeRes = await tx.run(
+    `MATCH (u:FeelingUrge)
+     OPTIONAL MATCH (u)-[r:ROUTES_TO]->(tc:TherapyConcept) WHERE tc.appToolId IS NOT NULL
+     WITH u, r, tc ORDER BY r.rank
+     RETURN u { .id, .label, .sub, .order } AS urge, [x IN collect(tc.appToolId) WHERE x IS NOT NULL] AS routes
+     ORDER BY urge.order`);
+  const rec = flowRes.records[0];
+  if (!rec || rec.get('version') !== FIND_FLOW_VERSION) {
+    throw new HttpsError('failed-precondition', 'Find the feeling content migration is required');
+  }
+  const flow = parseFindFlow(rec.get('content'));
+  const families = famRes.records.map(r => ({
+    ...r.get('family'), order: int(r.get('family').order),
+    words: (r.get('words') as Array<Record<string, unknown>>).map(w => ({ ...w, offer: int(w.offer) })),
+  }));
+  const urges = urgeRes.records.map(r => ({ ...r.get('urge'), order: int(r.get('urge').order), routes: r.get('routes') }));
+  if (!families.length || urges.length !== 4) throw new HttpsError('failed-precondition', 'Find the feeling content is incomplete');
+  return { flow, families, urges };
+}
+
+export const getFindTheFeelingContent = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async () => {
+    const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
+    try {
+      const { flow, families, urges } = await session.executeRead(tx => readFindContent(tx));
+      return { version: FIND_FLOW_VERSION, flow, families, urges, floodedBlankRoutes: flow.gates.floodedBlankRoutes };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error('getFindTheFeelingContent failed', (error as { code?: string })?.code ?? 'unknown');
+      throw new HttpsError('internal', 'Failed to get find-the-feeling content');
+    } finally { await session.close(); }
+  }
+);
+
+/**
+ * Explicit save. Words and routes are checked against the graph; the clinical gates are re-checked
+ * from the same flow document the client used. Accepted words join the user's collection (FOUND_WORD).
+ */
+export const saveFindTheFeelingSession = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to save');
+    let data: ReturnType<typeof validateFindTheFeelingSession>;
+    try { data = validateFindTheFeelingSession(request.data); }
+    catch { throw new HttpsError('invalid-argument', 'Invalid session'); }
+    const userId = request.auth.uid;
+    const key = `${userId}:${data.id}`;
+    const session = getDriver().session();
+    try {
+      await session.executeWrite(async tx => {
+        if (data.contentVersion !== FIND_FLOW_VERSION) throw new HttpsError('failed-precondition', 'Content changed; start again');
+        const { flow, families, urges } = await readFindContent(tx);
+        if (checkFindTheFeelingGates(data, flow.gates)) throw new HttpsError('invalid-argument', 'Session does not match the protocol');
+        const words = families.flatMap(f => f.words as Array<{ emotionId: string; addressedBy: string[] }>);
+        const known = new Set(words.map(w => w.emotionId));
+        if (!data.offered.every(w => known.has(w))) throw new HttpsError('failed-precondition', 'Content changed; start again');
+        const allowed = new Set<string>(flow.gates.floodedBlankRoutes);
+        for (const w of words) for (const t of w.addressedBy) allowed.add(t);
+        for (const u of urges) for (const t of u.routes as string[]) allowed.add(t);
+        if (!data.routedTo.every(t => allowed.has(t))) throw new HttpsError('invalid-argument', 'Invalid session');
+
+        const written = await tx.run(
+          `MATCH (f:FindTheFeelingFlow {id: 'find_the_feeling_flow'})
+           MERGE (u:User {id: $userId})
+           CREATE (s:FindTheFeelingSession {key: $key})
+           SET s.id = $id, s.createdAt = datetime(), s.contentVersion = $contentVersion, s.entry = $entry,
+               s.way = $way, s.band = $band, s.pull = $pull, s.regulation = $regulation, s.word = $word,
+               s.close = $close, s.ambientDescent = $ambientDescent, s.dataJson = $dataJson
+           CREATE (u)-[:COMPLETED_SESSION]->(s), (s)-[:USED_FLOW]->(f)
+           WITH u, s
+           OPTIONAL MATCH (e:Emotion {id: $word})
+           FOREACH (ee IN CASE WHEN e IS NULL THEN [] ELSE [e] END |
+             CREATE (s)-[:FOUND]->(ee)
+             MERGE (u)-[fw:FOUND_WORD]->(ee)
+             ON CREATE SET fw.firstAt = datetime(), fw.count = 0, fw.ways = []
+             SET fw.lastAt = datetime(), fw.count = fw.count + 1,
+                 fw.ways = CASE WHEN $way IN fw.ways THEN fw.ways ELSE fw.ways + $way END)
+           RETURN count(DISTINCT s) AS created`,
+          {
+            userId, key, id: data.id, contentVersion: data.contentVersion, entry: data.entry, way: data.way,
+            band: data.band, pull: data.pull, regulation: data.regulation, word: data.word, close: data.close,
+            ambientDescent: data.ambientDescent, dataJson: JSON.stringify(data),
+          }
+        );
+        if (int(written.records[0]?.get('created')) !== 1) throw new HttpsError('failed-precondition', 'Content changed; start again');
+      });
+      return { success: true };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      const code = (error as { code?: string })?.code;
+      if (code === 'Neo.ClientError.Schema.ConstraintValidationFailed') {
+        throw new HttpsError('already-exists', 'This session is already saved');
+      }
+      console.error('saveFindTheFeelingSession failed', code ?? 'unknown'); // error code only, never the payload
+      throw new HttpsError('internal', 'Could not save');
+    } finally { await session.close(); }
+  }
+);
+
+/** The user's word collection (shelf / strings), with each word's signature for rendering. */
+export const getFeelingCollection = onCall(
+  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  async (request) => {
+    if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see your collection');
+    const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
+    try {
+      const res = await session.executeRead(tx => tx.run(
+        `MATCH (:User {id: $userId})-[fw:FOUND_WORD]->(e:Emotion)
+         OPTIONAL MATCH (e)-[:HAS_FEELING_SIGNATURE]->(g:FeelingSignature)
+         RETURN e.id AS emotionId, coalesce(e.name, e.id) AS name, g.shape AS shape, g.sound AS sound,
+                fw.count AS count, fw.ways AS ways, toString(fw.firstAt) AS firstAt
+         ORDER BY fw.firstAt`, { userId: request.auth!.uid }));
+      return {
+        words: res.records.map(r => ({
+          emotionId: r.get('emotionId'), name: r.get('name'), shape: r.get('shape') ?? null, sound: r.get('sound') ?? null,
+          count: int(r.get('count')), ways: r.get('ways') ?? [], firstAt: r.get('firstAt'),
+        })),
+      };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error('getFeelingCollection failed', (error as { code?: string })?.code ?? 'unknown');
+      throw new HttpsError('internal', 'Could not load your collection');
     } finally { await session.close(); }
   }
 );

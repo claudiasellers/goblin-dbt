@@ -16,7 +16,8 @@ import {
   type StateResult as StateResultType,
   type DiscriminatingQuestion,
 } from '../services/neo4j';
-import { getEmotionByName } from '../data/emotions';
+import { getEmotionById, getEmotionByName } from '../data/emotions';
+import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
 import { useOppositeActionFollowUpsContext } from '../hooks/useOppositeActionFollowUps';
 import { OppositeActionFollowUpCard } from '../components/tools/oppositeAction/OppositeActionFollowUpCard';
 
@@ -24,6 +25,7 @@ type EntryPoint = 'standard' | 'somatic';
 
 type CheckInStep =
   | 'emotion'
+  | 'find'
   | 'discriminating'
   | 'body'
   | 'sensation'
@@ -172,6 +174,23 @@ export function CheckIn() {
   function handleSomaticEntry() {
     setEntryPoint('somatic');
     setStep('body');
+  }
+
+  /**
+   * Back from Find the feeling (check-in mode). A found word becomes the check-in emotion and the
+   * capacity band sets intensity; no word falls back to the body-first path.
+   */
+  function handleFound(r: FindTheFeelingResult) {
+    const emotion = r.emotionId ? getEmotionById(r.emotionId) : undefined;
+    if (!emotion) {
+      setCheckInData(prev => ({ ...prev, intensity: { x: 0.5, y: r.intensityY } }));
+      setEntryPoint('somatic');
+      setStep('body');
+      return;
+    }
+    const intensity = { x: emotion.x ?? 0.5, y: r.intensityY };
+    setCheckInData(prev => ({ ...prev, intensity }));
+    void handleEmotionSelect([emotion.name]);
   }
 
   /**
@@ -438,7 +457,18 @@ export function CheckIn() {
             onSelect={handleEmotionSelect}
             onHelpMeNow={handleHelpMeNow}
             onSomaticEntry={handleSomaticEntry}
+            onCantTell={() => setStep('find')}
           />
+        )}
+
+        {step === 'find' && (
+          <div className="space-y-3">
+            <button type="button" onClick={() => setStep('emotion')}
+              className="min-h-11 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
+              <span aria-hidden="true">← </span>Back to feelings
+            </button>
+            <FindTheFeeling entry="checkin" onHandoff={handleFound} />
+          </div>
         )}
 
         {step === 'body' && (
