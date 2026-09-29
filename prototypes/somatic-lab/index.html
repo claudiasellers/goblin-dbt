@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Somatic Lab</title>
+<style>
+:root{--bg:#14121a;--panel:#1f1c28;--ink:#efe9f7;--muted:#a79fb8;--accent:#9fd8c3;--warm:#f0b37a;--cool:#8fb3ff;--line:#2f2a3b}
+*{box-sizing:border-box;margin:0}
+html,body{background:var(--bg);color:var(--ink);font-family:ui-rounded,-apple-system,system-ui,"Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent}
+body{max-width:560px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 16px calc(20px + env(safe-area-inset-bottom))}
+.hero{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+svg{width:72px;height:72px;flex:none}
+h1{font-size:30px;font-weight:700}
+.sub{color:var(--muted);line-height:1.45;margin:6px 0 16px}
+.note{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:12px 16px;color:var(--ink);font-size:15px;line-height:1.4;margin-bottom:18px}
+ol{list-style:none;padding:0;display:flex;flex-direction:column;gap:10px}
+a.card{display:flex;gap:14px;align-items:flex-start;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:14px 16px;color:inherit;text-decoration:none;min-height:64px}
+a.card:hover,a.card:focus-visible{border-color:var(--accent);outline:none}
+.n{flex:none;width:32px;height:32px;border-radius:50%;background:#2a2636;color:var(--accent);display:grid;place-items:center;font-weight:700;font-size:15px}
+.c b{display:block;font-size:17px;margin-bottom:3px}
+.c span{display:block;color:var(--muted);font-size:14px;line-height:1.4}
+.who{display:inline-block!important;margin-top:6px;font-size:12px!important;color:var(--warm)!important;border:1px solid #4a3a2c;border-radius:999px;padding:2px 10px}
+footer{font-size:11px;color:#6f6880;text-align:center;margin-top:22px;line-height:1.5}
+</style></head><body>
+<div class="hero">
+<svg viewBox="0 0 100 100" aria-hidden="true"><ellipse cx="30" cy="30" rx="8" ry="16" fill="#9fd8c3" opacity=".8" transform="rotate(-25 30 30)"/><ellipse cx="70" cy="30" rx="8" ry="16" fill="#9fd8c3" opacity=".8" transform="rotate(25 70 30)"/><path d="M20 58C18 28 82 28 80 58C79 82 21 82 20 58Z" fill="#9fd8c3"><animate attributeName="d" dur="5s" repeatCount="indefinite" values="M20 58C18 28 82 28 80 58C79 82 21 82 20 58Z;M19 57C19 26 81 26 81 57C80 84 20 84 19 57Z;M20 58C18 28 82 28 80 58C79 82 21 82 20 58Z"/></path><circle cx="40" cy="56" r="3.5" fill="#14121a"/><circle cx="60" cy="56" r="3.5" fill="#14121a"/><path d="M45 66Q50 70 55 66" stroke="#14121a" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
+<div><h1>Somatic Lab</h1></div>
+</div>
+<p class="sub">Nine small, clickable sketches of the Wave-1 body tools for Goblin DBT. Reference only: feel them, poke them, tell us what's off.</p>
+<div class="note">Best on your phone. Sensors (mic, motion) ask first and have touch fallbacks.</div>
+<ol>
+<li><a class="card" href="01-press-and-push.html"><div class="n">1</div><div class="c"><b>Press and push</b><span>Press the phone between your palms, or push a wall, then feel the release.</span><span class="who">flooded · flooded + blank (step 1) · blank (fast) · far away</span></div></a></li>
+<li><a class="card" href="02-hand-on-heart.html"><div class="n">2</div><div class="c"><b>Hand on heart</b><span>A warm hand on your chest (or a mug, or your thighs), with slow soothing strokes.</span><span class="who">stirred · flooded · flooded + blank</span></div></a></li>
+<li><a class="card" href="03-squeeze-and-drop.html"><div class="n">3</div><div class="c"><b>Squeeze and drop</b><span>Tighten a spot on purpose, then let go, and notice tight vs loose.</span><span class="who">stirred · flooded (release) · blank (tense)</span></div></a></li>
+<li><a class="card" href="04-voice-room.html"><div class="n">4</div><div class="c"><b>Voice room</b><span>Hum to grow a moss creature, buzz like a hive, or siren up to wake things.</span><span class="who">stirred · flooded (hum) · blank (siren)</span></div></a></li>
+<li><a class="card" href="05-outside-in-scan.html"><div class="n">5</div><div class="c"><b>Outside-in scan</b><span>Start at your feet and the things you touch, then try a guess word: does this fit?</span><span class="who">steady · stirred · far away (contact points)</span></div></a></li>
+<li><a class="card" href="06-shake-and-stomp.html"><div class="n">6</div><div class="c"><b>Shake and stomp</b><span>Short bursts of shaking and stomping, then watch it settle.</span><span class="who">blank / heavy · stirred</span></div></a></li>
+<li><a class="card" href="07-pocket-stone.html"><div class="n">7</div><div class="c"><b>Pocket stone</b><span>Find something slightly okay, polish it into a stone, keep it, hold it later.</span><span class="who">steady · stirred (to make) · anyone (to hold)</span></div></a></li>
+<li><a class="card" href="08-sound-compass-edge-glow.html"><div class="n">8</div><div class="c"><b>Sound compass + Edge glow</b><span>Find soft chimes around you, then let your eyes widen to the screen's edges.</span><span class="who">everyone · safe default for flooded + blank and far away</span></div></a></li>
+<li><a class="card" href="09-yuck-or-queasy.html"><div class="n">9</div><div class="c"><b>Yuck or queasy?</b><span>Tell apart gross, sick and hungry, try a guess word, then push it away.</span><span class="who">steady · stirred</span></div></a></li>
+</ol>
+<footer>Prototype · copy and gates are placeholders; production reads from the graph<br>Mic is analysed on the phone only, never recorded or sent.</footer>
+</body></html>

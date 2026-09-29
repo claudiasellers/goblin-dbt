@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hand on Heart</title>
+<style>
+:root{--bg:#14121a;--panel:#1f1c28;--ink:#efe9f7;--muted:#a79fb8;--accent:#9fd8c3;--warm:#f0b37a;--cool:#8fb3ff;--line:#2f2a3b}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--ink);font:16px/1.45 ui-rounded,-apple-system,system-ui,sans-serif;transition:background 2s linear}
+#app{height:100%;display:flex;flex-direction:column;max-width:480px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) 16px max(10px,env(safe-area-inset-bottom))}
+header{display:flex;align-items:center;gap:8px;min-height:48px}
+header a,.ghost{color:var(--muted);text-decoration:none;background:none;border:0;font:inherit;padding:12px 8px;min-height:48px;cursor:pointer}
+header .sp{flex:1}
+.step{display:none;flex:1;flex-direction:column;gap:12px;min-height:0}
+.step.on{display:flex;animation:f .5s}
+@keyframes f{from{opacity:0}}
+h1{font-size:24px;line-height:1.25;font-weight:650}
+p{color:var(--muted)}
+.big{color:var(--ink);font-size:19px}
+.btn{min-height:50px;border-radius:18px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:17px;padding:11px 16px;cursor:pointer;text-align:left}
+.btn.pri{background:var(--accent);color:#14121a;border:0;text-align:center;font-weight:650}
+.col{display:flex;flex-direction:column;gap:9px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.panel{background:var(--panel);border-radius:20px;padding:16px}
+.stage{flex:1;min-height:0;position:relative;border-radius:20px;background:var(--panel);touch-action:none;user-select:none;-webkit-user-select:none;overflow:hidden}
+canvas{width:100%;height:100%;display:block}
+.cue{position:absolute;left:12px;right:12px;bottom:16px;text-align:center;font-size:18px;color:var(--ink);pointer-events:none}
+footer{font-size:12px;color:var(--muted);text-align:center;padding-top:8px;opacity:.7}
+details{color:var(--muted);font-size:13px}pre{white-space:pre-wrap;word-break:break-word;max-height:30vh;overflow:auto;background:var(--panel);border-radius:12px;padding:8px;margin-top:6px}
+@media (prefers-reduced-motion:reduce){.step.on{animation:none}}
+</style></head>
+<body><div id="app">
+<header><a href="index.html">← Lab</a><span class="sp"></span><button class="ghost" id="snd">Sound off</button><button class="ghost" id="stop">Stop</button></header>
+
+<section class="step on" id="s0">
+  <h1>What's heavy right now?</h1>
+  <p>Optional. Pick the closest, or none.</p>
+  <div class="col" id="heavy">
+    <button class="btn" data-h="shame">Wanting to hide (shame)</button>
+    <button class="btn" data-h="lonely">Lonely</button>
+    <button class="btn" data-h="grief">Missing someone (grief)</button>
+    <button class="btn" data-h="guilt">Wishing I'd done it differently (guilt)</button>
+    <button class="btn" data-h="ns">Not sure</button>
+  </div>
+  <button class="ghost" data-h="skip" id="skip0" style="align-self:flex-start">Skip</button>
+</section>
+
+<section class="step" id="s1">
+  <h1 id="ack">It makes sense this hurts.</h1>
+  <p class="big">A hand here, if you like. Or a warm mug.</p>
+  <div class="col" id="ways">
+    <button class="btn" data-w="chest">Hand on my chest</button>
+    <button class="btn" data-w="cheek">Hand on my cheek</button>
+    <button class="btn" data-w="arm">Slow strokes down my arm</button>
+    <button class="btn" data-w="screen">Stroke the screen instead</button>
+    <button class="btn" data-w="alt">Warm mug, soft thing, or hands on my thighs</button>
+  </div>
+  <button class="btn" id="sndOn" style="margin-top:auto">Turn sound on (a warm, low hum)</button>
+</section>
+
+<section class="step" id="s2">
+  <p class="big" id="how">Rest your hand on your chest. Let the phone sit in your lap.</p>
+  <div class="stage" id="st"><canvas id="cv"></canvas><div class="cue" id="cue"></div></div>
+  <div class="grid"><button class="btn" id="mot" style="text-align:center;font-size:15px">Use motion</button><button class="btn pri" id="done">That's enough</button></div>
+</section>
+
+<section class="step" id="s3">
+  <h1>Compared with when you started, the heavy feeling is…</h1>
+  <div class="col" id="tvn"></div>
+</section>
+
+<section class="step" id="s4">
+  <h1>Could any of these be close?</h1>
+  <p>Only a guess. None of them is fine too.</p>
+  <div class="col" id="wl"></div>
+</section>
+
+<section class="step" id="s5">
+  <h1>That counts.</h1>
+  <div class="panel col" id="sum"></div>
+  <details><summary>What we'd log</summary><pre id="log"></pre></details>
+  <div class="col" style="margin-top:auto"><button class="btn" onclick="location.reload()">Start again</button></div>
+</section>
+
+<footer>Prototype · copy and gates are placeholders; production reads from the graph</footer>
+</div>
+<script>
+const $=q=>document.querySelector(q),$$=q=>[...document.querySelectorAll(q)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches,T0=performance.now();
+const PXCM=38; // ~CSS px per cm
+let H='ns',WAY='chest',cur=0,stopped=false,tStart=0;
+const L={heavy:null,way:null,motion:false,strokes:0,inBand:0,tooFast:0,stillness:null,seconds:0,thenVsNow:null,word:null};
+const ACK={shame:"Wanting to hide makes sense. You don't have to look at it right now.",
+ lonely:"Being alone with it is hard. It makes sense this hurts.",
+ grief:"Missing someone hurts this much because they mattered.",
+ guilt:"Wishing it had gone differently is heavy to carry.",
+ ns:"It makes sense this hurts, even without a name for it.",skip:"It makes sense this hurts."};
+const WORDS={shame:['exposed','small','embarrassed'],lonely:['lonely','left out','missing someone'],grief:['sad','missing','empty'],guilt:['sorry','regret','heavy'],ns:['sad','tender','tired'],skip:['sad','tender','tired']};
+const HOW={chest:"Rest one hand flat on your chest. Let the phone sit in your lap. Just the hand is enough.",
+ cheek:"Rest a hand softly on your cheek, like you would for a friend. Phone in your lap.",
+ arm:"Stroke down your upper arm, shoulder to elbow, slowly, like brushing off sand. Follow the feather.",
+ screen:"Stroke down the screen with one finger, slowly, like brushing off sand. Follow the feather's pace.",
+ alt:"Hold something warm or soft, or rest your hands on your thighs. Just notice the weight."};
+function go(n){$$('.step').forEach(s=>s.classList.remove('on'));$('#s'+n).classList.add('on');cur=n;if(n==2){size();tStart=performance.now()}}
+
+$$('[data-h]').forEach(b=>b.onclick=()=>{H=b.dataset.h;L.heavy=H;$('#ack').textContent=ACK[H];go(1)});
+$$('#ways .btn').forEach(b=>b.onclick=()=>{WAY=b.dataset.w;L.way=WAY;$('#how').textContent=HOW[WAY];
+ $('#mot').textContent=WAY==='screen'?'Hand instead':WAY==='arm'?'Phone in stroking hand':'Phone under my hand';audio();go(2)});
+
+/* audio: warm hum with slow soft pulse */
+let AC,M,F,hum,muted=false;
+function audio(){if(AC)return;AC=new(window.AudioContext||window.webkitAudioContext)();M=AC.createGain();M.gain.value=.8;
+ F=AC.createBiquadFilter();F.type='lowpass';F.frequency.value=700;F.connect(M);M.connect(AC.destination);
+ hum=AC.createGain();hum.gain.value=0;hum.connect(F);
+ [[110,.35],[110.8,.3],[165,.12],[220,.06]].forEach(([f,v])=>{const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(hum);o.start()});
+ $('#snd').textContent='Mute';$('#sndOn').textContent='Sound is on'}
+$('#snd').onclick=()=>{if(!AC){audio();return}muted=!muted;M.gain.setTargetAtTime(muted?0:.8,AC.currentTime,.1);$('#snd').textContent=muted?'Sound off':'Mute'};
+$('#sndOn').onclick=audio;
+function humTo(v,tc){if(hum)hum.gain.setTargetAtTime(v*.28,AC.currentTime,tc||.25)}
+
+/* ambient: calmer over time */
+setInterval(()=>{const a=Math.min(1,(performance.now()-T0)/180000);document.body.style.background=`rgb(${Math.round(20-4*a)},${Math.round(18-3*a)},${Math.round(26-4*a)})`;if(F)F.frequency.setTargetAtTime(700-250*a,AC.currentTime,2)},2000);
+
+/* motion (optional) */
+let mv=0,la=null;
+$('#mot').onclick=async()=>{
+ if(WAY==='screen'){WAY='chest';L.way='chest';$('#how').textContent=HOW.chest;$('#mot').textContent='Phone under my hand';return}
+ try{if(typeof DeviceMotionEvent==='undefined')throw 0;if(DeviceMotionEvent.requestPermission&&await DeviceMotionEvent.requestPermission()!=='granted')throw 0;
+  addEventListener('devicemotion',e=>{const a=e.accelerationIncludingGravity;if(!a||a.x==null)return;if(la){const d=Math.hypot(a.x-la.x,a.y-la.y,a.z-la.z);mv=mv*.95+d*.05}la={x:a.x,y:a.y,z:a.z}});
+  L.motion=true;$('#mot').textContent='Motion on';
+ }catch(e){$('#mot').textContent='No motion here: the feather is enough'}};
+
+/* stage */
+const cv=$('#cv'),st=$('#st');
+function size(){const r=cv.getBoundingClientRect(),d=devicePixelRatio||1;cv.width=r.width*d;cv.height=r.height*d;cv.getContext('2d').setTransform(d,0,0,d,0,0)}
+addEventListener('resize',size);
+let drag=null,glow=.2,warmth=0,lastSpeed=0,strokeTrail=[];
+st.addEventListener('pointerdown',e=>{if(WAY!=='screen')return;st.setPointerCapture(e.pointerId);drag={y0:e.clientY,t0:performance.now(),x:e.clientX,y:e.clientY,t:performance.now(),dist:0};strokeTrail=[]});
+st.addEventListener('pointermove',e=>{if(!drag)return;const now=performance.now(),dt=(now-drag.t)/1000,d=Math.hypot(e.clientX-drag.x,e.clientY-drag.y);
+ if(dt>0.01){const cms=d/PXCM/dt;lastSpeed=lastSpeed*.8+cms*.2;drag.dist+=d;drag.x=e.clientX;drag.y=e.clientY;drag.t=now;
+  const r=st.getBoundingClientRect();strokeTrail.push([e.clientX-r.left,e.clientY-r.top,now]);if(strokeTrail.length>40)strokeTrail.shift()}});
+function endDrag(){if(!drag)return;if(drag.dist>PXCM*2){L.strokes++;const s=drag.dist/PXCM/((performance.now()-drag.t0)/1000);if(s>=1.5&&s<=7)L.inBand++;else if(s>7)L.tooFast++}drag=null;lastSpeed=0}
+st.addEventListener('pointerup',endDrag);st.addEventListener('pointercancel',endDrag);
+
+$('#done').onclick=()=>{L.seconds=Math.round((performance.now()-tStart)/1000);humTo(0,1);buildTvn();go(3)};
+
+let lt=performance.now(),phase=0,bpm=58;
+function frame(now){const dt=Math.min(50,now-lt)/1000;lt=now;if(cur===2)draw(now,dt);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+
+function draw(now,dt){const x=cv.getContext('2d'),w=cv.clientWidth,h=cv.clientHeight;x.clearRect(0,0,w,h);
+ const el=(now-tStart)/1000;bpm=Math.max(48,58-el/8); // slows below notice
+ let target,cue='';const cx=w/2,cy=h*.42,R=Math.min(w,h)*.22;
+ // feather track for stroke modes
+ const trackTop=h*.14,trackBot=h*.8,trackX=WAY==='screen'?w*.82:w*.86;
+ const fSpeed=4*PXCM,fLen=trackBot-trackTop,fT=fLen/fSpeed+1.2,fp=((el)%fT)/fT,fy=trackTop+Math.min(1,fp*fT*fSpeed/fLen)*fLen,fGoing=fp*fT*fSpeed<fLen;
+ if(WAY==='screen'){
+  const s=lastSpeed,inBand=drag&&s>1.5&&s<7;target=drag?(inBand?1:.45):.25;
+  cue=!drag?(L.strokes?'Again, whenever you like':'Stroke down slowly'):s>7?'Slower is fine… like brushing off sand':'Just like that';
+  humTo(drag?(inBand?1:.5):.3,.4);
+ }else if(WAY==='arm'){
+  const pulse=fGoing?Math.sin(Math.PI*fp*fT*fSpeed/fLen):0;target=.35+.65*pulse;humTo(.35+.65*pulse,.3);
+  if(L.motion&&mv>.02){target=Math.min(1,target*(mv<.6?1.1:.7));} cue=fGoing?'Down… slowly':'Lift, and start at the shoulder';
+ }else{
+  phase+=dt*bpm/60;const p=phase%1,beat=Math.exp(-p*7)+.6*Math.exp(-Math.max(0,p-.18)*9)*(p>.18?1:0);
+  target=.45+.35*beat;humTo(.55+.45*beat,.05);
+  if(L.motion){const still=mv<.15;target*=still?1.15:.9;L.stillness=still?'steady':'moving'}
+  cue=WAY==='alt'?'Notice the warmth or the weight':'Just the hand is enough';
+ }
+ glow+=(target-glow)*(RM?.05:.1);warmth=Math.min(1,warmth+dt/90);
+ $('#cue').textContent=cue;
+ // glow creature
+ const t=RM?0:now/1400,rr=R*(1+.08*glow*(RM?0:1));
+ const g=x.createRadialGradient(cx,cy,0,cx,cy,rr*2.6);const a=.12+.35*glow;
+ g.addColorStop(0,`rgba(240,${170+20*warmth},${110},${a})`);g.addColorStop(1,'rgba(240,179,122,0)');x.fillStyle=g;x.fillRect(0,0,w,h);
+ x.beginPath();for(let i=0;i<=48;i++){const an=i/48*Math.PI*2,r=rr*(1+Math.sin(an*3+t)*.05+Math.sin(an*2-t*.6)*.04),px=cx+Math.cos(an)*r,py=cy+Math.sin(an)*r*.92;i?x.lineTo(px,py):x.moveTo(px,py)}x.closePath();
+ const bg=x.createRadialGradient(cx-rr*.3,cy-rr*.3,rr*.1,cx,cy,rr*1.2);bg.addColorStop(0,`rgb(255,${210+20*glow},${160+20*glow})`);bg.addColorStop(1,`rgb(${200+30*glow},${120+20*glow},90)`);x.fillStyle=bg;x.fill();
+ // sleepy face
+ x.strokeStyle='#3a2320';x.lineWidth=2.5;x.lineCap='round';x.beginPath();x.arc(cx-rr*.3,cy-rr*.05,6,.15*Math.PI,.85*Math.PI);x.moveTo(cx+rr*.3+6*Math.cos(.15*Math.PI),cy-rr*.05+6*Math.sin(.15*Math.PI));x.arc(cx+rr*.3,cy-rr*.05,6,.15*Math.PI,.85*Math.PI);x.stroke();
+ x.fillStyle='rgba(240,120,110,.35)';x.beginPath();x.arc(cx-rr*.48,cy+rr*.15,8,0,7);x.arc(cx+rr*.48,cy+rr*.15,8,0,7);x.fill();
+ // little hand on heart for hold modes
+ if(WAY==='chest'||WAY==='cheek'){const hx=cx+(WAY==='cheek'?rr*.62:-rr*.1),hy=cy+(WAY==='cheek'?rr*.12:rr*.78);x.save();x.translate(hx,hy);x.rotate(WAY==='cheek'?-1.1:-.25);x.fillStyle='rgba(255,236,214,.95)';
+  x.beginPath();x.ellipse(0,0,rr*.2,rr*.16,0,0,7);x.fill();for(let k=0;k<4;k++){x.beginPath();x.ellipse(-rr*.13+k*rr*.085,-rr*.2,rr*.04,rr*.1,0,0,7);x.fill()}
+  x.beginPath();x.ellipse(rr*.2,-rr*.02,rr*.1,rr*.045,-.6,0,7);x.fill();x.restore()}
+ // feather + track
+ if(WAY==='arm'||WAY==='screen'){x.strokeStyle='rgba(167,159,184,.25)';x.lineWidth=2;x.setLineDash([4,8]);x.beginPath();x.moveTo(trackX,trackTop);x.lineTo(trackX,trackBot);x.stroke();x.setLineDash([]);
+  x.save();x.translate(trackX+(RM?0:Math.sin(now/300)*3),fy);x.globalAlpha=fGoing?1:.35;x.rotate(-.5);x.fillStyle='#efe9f7';x.beginPath();x.ellipse(0,0,6,18,0,0,7);x.fill();x.strokeStyle='#a79fb8';x.beginPath();x.moveTo(0,-18);x.lineTo(0,22);x.stroke();x.restore()}
+ if(WAY==='screen'&&strokeTrail.length>1){x.strokeStyle='rgba(240,179,122,.5)';x.lineWidth=10;x.lineCap='round';x.beginPath();strokeTrail.forEach(([px,py],i)=>i?x.lineTo(px,py):x.moveTo(px,py));x.stroke();
+  if(!drag&&now-strokeTrail[strokeTrail.length-1][2]>900)strokeTrail=[]}
+}
+
+function buildTvn(){$('#tvn').innerHTML='';['Louder','About the same','Quieter','Much quieter'].forEach(o=>{const b=document.createElement('button');b.className='btn';b.textContent=o;b.onclick=()=>{L.thenVsNow=o;buildWords();go(4)};$('#tvn').append(b)});
+ const s=document.createElement('button');s.className='ghost';s.textContent='Skip';s.onclick=()=>{buildWords();go(4)};$('#tvn').append(s)}
+function buildWords(){$('#wl').innerHTML='';[...WORDS[H],'Not sure'].forEach(w=>{const b=document.createElement('button');b.className='btn';b.textContent=w;b.onclick=()=>{L.word=w==='Not sure'?null:w;end()};$('#wl').append(b)});
+ const s=document.createElement('button');s.className='ghost';s.textContent='Skip';s.onclick=end;$('#wl').append(s)}
+function end(){L.stopped=stopped;humTo(0,1);const o=[];
+ const wayTxt={chest:'Hand on the chest',cheek:'Hand on the cheek',arm:'Slow strokes down the arm',screen:'Slow strokes on the screen',alt:'Something warm or soft'}[L.way]||'Didn\'t get to the hand part';
+ o.push(`${wayTxt}${L.seconds?(L.seconds<40?', for a short while':L.seconds<120?', for a minute or so':', for a good while'):''}.`);
+ if(L.way==='screen'&&L.strokes)o.push(L.inBand>=L.strokes/2?'Most strokes were in the slow, soft range.':'Strokes were mostly on the quick side. That\'s fine.');
+ if(L.stillness)o.push(L.stillness==='steady'?'The phone felt steady under your hand.':'There was some movement under your hand.');
+ o.push(L.thenVsNow?`Then vs now: ${L.thenVsNow.toLowerCase()}.`:'Then vs now: skipped.');
+ o.push(L.word?`A guess word: "${L.word}".`:'No word today.');
+ if(stopped)o.push('Stopped early. Stopping still counts.');
+ $('#sum').innerHTML=o.map(s=>`<p class="big" style="font-size:17px">${s}</p>`).join('');$('#log').textContent=JSON.stringify(L,null,1);go(5)}
+$('#stop').onclick=()=>{if(cur===5)return;stopped=true;if(cur===2)L.seconds=Math.round((performance.now()-tStart)/1000);end()};
+</script>
+</body></html>

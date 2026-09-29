@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shake and Stomp</title>
+<style>
+:root{--bg:#14121a;--panel:#1f1c28;--ink:#efe9f7;--muted:#a79fb8;--accent:#9fd8c3;--warm:#f0b37a;--cool:#8fb3ff;--line:#2f2a3b}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:ui-rounded,-apple-system,system-ui,"Segoe UI",sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+body{display:flex;flex-direction:column;height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);transition:background 3s}
+header{display:flex;justify-content:space-between;align-items:center;padding:4px 12px;flex:none}
+.back{color:var(--muted);text-decoration:none;min-height:48px;display:inline-flex;align-items:center;padding:0 6px;font-size:16px}
+.hr{display:flex;gap:8px}
+.pill{min-height:48px;min-width:48px;border-radius:24px;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:15px;padding:0 16px;cursor:pointer}
+.pill[aria-pressed=true]{color:var(--warm);border-color:var(--warm)}
+main{flex:1;position:relative;min-height:0}
+.step{position:absolute;inset:0;display:none;flex-direction:column;padding:6px 20px 10px;gap:12px;overflow:hidden}
+.step.on{display:flex;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:26px;line-height:1.2;margin:4px 0 0;font-weight:650}
+p{color:var(--muted);line-height:1.45;margin:0;font-size:16px}
+.panel{background:var(--panel);border-radius:20px;padding:16px 18px}
+.col{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px}.row .btn{flex:1}
+.btn{min-height:52px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:17px;padding:12px 14px;cursor:pointer}
+.btn.pri{background:var(--warm);color:#2a1606;border:0;font-weight:650}
+.btn.ghost{background:transparent;color:var(--muted);border:0}
+.btn.sel{border-color:var(--warm);color:var(--warm)}
+.btn:active{transform:scale(.98)}
+.small{font-size:13px;color:var(--muted)}
+footer{font-size:11px;color:var(--muted);opacity:.65;text-align:center;padding:4px 16px 8px;flex:none}
+.grow{flex:1;min-height:0;position:relative}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+#phase{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--warm);text-align:center}
+#cue{text-align:center;font-size:20px;min-height:52px;color:var(--ink);line-height:1.3}
+#note{text-align:center;font-size:13px;color:var(--muted);min-height:18px}
+details{background:var(--panel);border-radius:16px;padding:10px 14px}
+summary{cursor:pointer;color:var(--muted);min-height:32px}
+pre{font-size:11px;white-space:pre-wrap;color:var(--muted);max-height:28vh;overflow:auto;margin:6px 0 0}
+.done{font-size:18px;color:var(--ink);line-height:1.5}
+@media (prefers-reduced-motion:reduce){.step.on{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html">← Lab</a>
+  <div class="hr"><button class="pill" id="snd" aria-pressed="false">Sound off</button><button class="pill" id="stop">Stop</button></div>
+</header>
+<main>
+  <section class="step on" id="s0">
+    <h1>Shake it awake</h1>
+    <p>Feeling far away, flat or blank? That makes sense. Sometimes the body turns the volume down to cope.</p>
+    <p style="color:var(--ink)">Let's turn it up a little. Shake the snow globe, stomp out a beat, then watch the snow land.</p>
+    <div class="panel col">
+      <p class="small">Pick a sound (this turns sound on)</p>
+      <div class="row" id="flav"><button class="btn" data-f="rattle">Rattle</button><button class="btn" data-f="maraca">Maraca</button><button class="btn" data-f="thunder">Thunder</button></div>
+    </div>
+    <div style="flex:1"></div>
+    <div class="col">
+      <button class="btn pri" id="useMotion">Shake the phone</button>
+      <button class="btn" id="useTouch">Scribble on the screen instead</button>
+      <p class="small" style="text-align:center">Hold on tight. If you feel flooded and wired, a calmer room may fit better.</p>
+    </div>
+  </section>
+
+  <section class="step" id="s1">
+    <div id="phase">Shake</div>
+    <div class="grow"><canvas id="cv"></canvas></div>
+    <div id="cue"></div>
+    <div id="note"></div>
+    <div class="row"><button class="btn" id="nextBtn">Next</button><button class="btn ghost" id="doneBtn">I'm done</button></div>
+  </section>
+
+  <section class="step" id="s2">
+    <h1>Then vs now</h1>
+    <p>No right answer. Compared with when you started, you feel…</p>
+    <div style="flex:1"></div>
+    <div class="col" id="tvn">
+      <button class="btn">Still far away</button><button class="btn">About the same</button><button class="btn">A bit more here</button><button class="btn">Much more here</button>
+    </div>
+    <button class="btn ghost" id="tvnSkip">Skip</button>
+  </section>
+
+  <section class="step" id="s3">
+    <h1>Nice noise</h1>
+    <div class="panel done" id="summary"></div>
+    <div style="flex:1"></div>
+    <details><summary>What we'd log</summary><pre id="log"></pre></details>
+    <button class="btn" onclick="location.reload()">Again</button>
+  </section>
+</main>
+<footer>Prototype · copy and gates are placeholders; production reads from the graph</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function show(id){document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on',s.id===id))}
+/* ---------- audio ---------- */
+let AC=null,master=null,soundOn=false,flavor='rattle',noiseBuf=null,thun=null;
+function ensureAC(){
+  if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=0;master.connect(AC.destination);
+    noiseBuf=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+    try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}}
+  if(AC.state==='suspended')AC.resume();
+}
+function setSound(on){ensureAC();soundOn=on;master.gain.setTargetAtTime(on?0.9:0,AC.currentTime,.05);$('#snd').textContent=on?'Sound on':'Sound off';$('#snd').setAttribute('aria-pressed',on)}
+$('#snd').onclick=()=>setSound(!soundOn);
+document.querySelectorAll('#flav .btn').forEach(b=>b.onclick=()=>{flavor=b.dataset.f;document.querySelectorAll('#flav .btn').forEach(x=>x.classList.toggle('sel',x===b));setSound(true);grain(0.8)});
+const bright=()=>1+round*0.06; /* ambient BRIGHTEN: everything nudges up each round */
+function grain(amt){
+  if(!AC||!soundOn)return;const t=AC.currentTime,s=AC.createBufferSource();s.buffer=noiseBuf;s.playbackRate.value=0.8+Math.random()*.4;
+  const f=AC.createBiquadFilter(),g=AC.createGain();
+  if(flavor==='thunder'){f.type='lowpass';f.frequency.value=(180+amt*500)*bright();f.Q.value=.7;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.5*amt,t+.04);g.gain.exponentialRampToValueAtTime(.001,t+.5+amt*.4)}
+  else if(flavor==='maraca'){f.type='bandpass';f.frequency.value=5200*bright();f.Q.value=1.2;g.gain.setValueAtTime(.35*amt,t);g.gain.exponentialRampToValueAtTime(.001,t+.07)}
+  else{f.type='bandpass';f.frequency.value=(2400+Math.random()*1600)*bright();f.Q.value=3;g.gain.setValueAtTime(.45*amt,t);g.gain.exponentialRampToValueAtTime(.001,t+.03)}
+  s.connect(f);f.connect(g);g.connect(master);s.start(t,Math.random()*.5,1);
+}
+function drum(strong,onBeat){
+  if(!AC||!soundOn)return;const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+  o.frequency.setValueAtTime(160*bright(),t);o.frequency.exponentialRampToValueAtTime(48,t+.16);g.gain.setValueAtTime(.9*strong,t);g.gain.exponentialRampToValueAtTime(.001,t+.4);
+  o.connect(g);g.connect(master);o.start(t);o.stop(t+.45);grain(.6*strong);
+  if(onBeat){const b=AC.createOscillator(),bg=AC.createGain();b.type='triangle';b.frequency.value=880*bright();bg.gain.setValueAtTime(.18,t);bg.gain.exponentialRampToValueAtTime(.001,t+.35);b.connect(bg);bg.connect(master);b.start(t);b.stop(t+.4)}
+}
+function tick(){if(!AC||!soundOn)return;const t=AC.currentTime,s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=noiseBuf;f.type='highpass';f.frequency.value=7000;g.gain.setValueAtTime(.08,t);g.gain.exponentialRampToValueAtTime(.001,t+.04);s.connect(f);f.connect(g);g.connect(master);s.start(t,0,.1)}
+function chime(){if(!AC||!soundOn)return;const t=AC.currentTime;[523,659,784].forEach((f,i)=>{const o=AC.createOscillator(),g=AC.createGain();o.type='triangle';o.frequency.value=f*bright();g.gain.setValueAtTime(0,t+i*.09);g.gain.linearRampToValueAtTime(.12,t+i*.09+.02);g.gain.exponentialRampToValueAtTime(.001,t+i*.09+.8);o.connect(g);g.connect(master);o.start(t+i*.09);o.stop(t+i*.09+.9)})}
+function vib(ms){if(navigator.vibrate)try{navigator.vibrate(ms)}catch(e){}}
+
+/* ---------- sensing: motion + touch fallback (both always live) ---------- */
+let energy=0,rawE=0,lastMove=0,motionSeen=false,lastAcc=null,lastHit=0;
+function onMotion(e){
+  const a=e.acceleration&&e.acceleration.x!=null?e.acceleration:null,ag=e.accelerationIncludingGravity;
+  let m;if(a)m=Math.hypot(a.x||0,a.y||0,a.z||0);
+  else if(ag&&ag.x!=null){const v=[ag.x||0,ag.y||0,ag.z||0];m=lastAcc?Math.hypot(v[0]-lastAcc[0],v[1]-lastAcc[1],v[2]-lastAcc[2]):0;lastAcc=v}else return;
+  motionSeen=true;rawE=Math.max(rawE,Math.min(1.5,m/14));if(m>2.5)lastMove=performance.now();
+  if(phase==='stomp'&&m>16&&performance.now()-lastHit>260)hit(Math.min(1,m/30));
+}
+async function startMotion(){
+  try{if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function'){const r=await DeviceMotionEvent.requestPermission();if(r!=='granted')throw 0}
+    addEventListener('devicemotion',onMotion)}catch(e){input='touch'}
+}
+const cv=$('#cv'),cx=cv.getContext('2d');let W=0,H=0,DPR=1,px=null,pt=0;
+cv.addEventListener('pointermove',e=>{const now=performance.now();if(px){const d=Math.hypot(e.clientX-px[0],e.clientY-px[1]),dt=Math.max(8,now-pt);
+  if(e.buttons||e.pointerType==='touch'){rawE=Math.max(rawE,Math.min(1.5,d/dt/2.2));if(d/dt>.25)lastMove=now}}px=[e.clientX,e.clientY];pt=now});
+cv.addEventListener('pointerdown',e=>{px=[e.clientX,e.clientY];pt=performance.now();lastMove=pt;
+  if(phase==='stomp'){const f=e.pressure&&e.pressure!==.5?e.pressure:(e.width>30?1:.8);hit(Math.max(.6,f))}});
+cv.addEventListener('pointerup',()=>{px=null});
+
+/* ---------- scene ---------- */
+function fit(){DPR=Math.min(2,devicePixelRatio||1);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',fit);
+const P=Array.from({length:210},()=>({x:(Math.random()-.5)*.8,y:.55+Math.random()*.35,vx:0,vy:0,s:1.4+Math.random()*2.4,c:Math.random()}));
+let jolt=0,joltV=0,dance=0,flash=0,beatPulse=0,T=0;
+function colorFor(c,b){const cols=[[143,179,255],[159,216,195],[240,179,122],[255,233,160],[245,160,200]];const i=Math.floor(c*cols.length*.999);const k=Math.min(1,b);
+  const base=cols[i],w=[255,245,210];return base.map((v,j)=>Math.round(v+(w[j]-v)*k*.35))}
+function draw(dt){
+  T+=dt;const S=Math.min(W,H*.85),R=S*.42,cxm=W/2,cym=H*.47+jolt*(RM?0:1);
+  cx.clearRect(0,0,W,H);
+  const lift=Math.min(1,round*.25+litT*.01);
+  const glow=cx.createRadialGradient(cxm,cym,R*.2,cxm,cym,Math.min(R*1.5,W*.5));
+  glow.addColorStop(0,`rgba(240,179,122,${.10+lift*.15+flash*.25})`);glow.addColorStop(1,'rgba(20,18,26,0)');cx.fillStyle=glow;cx.fillRect(0,0,W,H);
+  // base
+  cx.fillStyle='#6b4a36';cx.beginPath();cx.moveTo(cxm-R*.72,cym+R*.78);cx.lineTo(cxm+R*.72,cym+R*.78);cx.lineTo(cxm+R*.85,cym+R*1.08);cx.lineTo(cxm-R*.85,cym+R*1.08);cx.closePath();cx.fill();
+  cx.fillStyle='#f0b37a';cx.fillRect(cxm-R*.85,cym+R*1.04,R*1.7,R*.07);
+  // glass
+  cx.save();cx.beginPath();cx.arc(cxm,cym,R,0,6.29);cx.clip();
+  const gg=cx.createRadialGradient(cxm-R*.3,cym-R*.4,R*.1,cxm,cym,R);gg.addColorStop(0,`rgba(${60+lift*40},${60+lift*30},${90+lift*20},.9)`);gg.addColorStop(1,'rgba(30,26,42,.95)');
+  cx.fillStyle=gg;cx.fillRect(cxm-R,cym-R,R*2,R*2);
+  // beat ring
+  if(beatPulse>0){cx.strokeStyle=`rgba(240,179,122,${beatPulse*.35})`;cx.lineWidth=3;cx.beginPath();cx.arc(cxm,cym,R*(.95-beatPulse*.08),0,6.29);cx.stroke()}
+  // ground + goblin
+  cx.fillStyle='#2e3b35';cx.beginPath();cx.ellipse(cxm,cym+R*.88,R*.95,R*.28,0,0,6.29);cx.fill();
+  const gy=cym+R*.62-Math.abs(Math.sin(T*9))*dance*R*.12*(RM?.3:1),gx=cxm+Math.sin(T*4.5)*dance*R*.06*(RM?.3:1);
+  cx.fillStyle='#9fd8c3';cx.beginPath();cx.ellipse(gx,gy,R*.17,R*.15,Math.sin(T*9)*dance*.2,0,6.29);cx.fill();
+  cx.beginPath();cx.moveTo(gx-R*.14,gy-R*.06);cx.lineTo(gx-R*.26,gy-R*.2);cx.lineTo(gx-R*.08,gy-R*.12);cx.fill();
+  cx.beginPath();cx.moveTo(gx+R*.14,gy-R*.06);cx.lineTo(gx+R*.26,gy-R*.2);cx.lineTo(gx+R*.08,gy-R*.12);cx.fill();
+  cx.fillStyle='#16131c';const eo=.035+.02*Math.min(1,lift+dance);
+  cx.beginPath();cx.arc(gx-R*.06,gy-R*.02,R*eo,0,6.29);cx.arc(gx+R*.06,gy-R*.02,R*eo,0,6.29);cx.fill();
+  cx.fillStyle='#efe9f7';cx.beginPath();cx.arc(gx-R*.05,gy-R*.035,R*.012,0,6.29);cx.arc(gx+R*.07,gy-R*.035,R*.012,0,6.29);cx.fill();
+  cx.strokeStyle='#16131c';cx.lineWidth=2;cx.beginPath();cx.arc(gx,gy+R*.03,R*(.03+dance*.03),.2,Math.PI-.2);cx.stroke();
+  // snow
+  const floorY=.72,sp=RM?.45:1;
+  for(const p of P){
+    const e=energy*sp;
+    p.vx+=((Math.random()-.5)*e*16-p.y*e*2.2)*dt;p.vy+=((Math.random()-.5)*e*16+p.x*e*2.2-e*(p.y>.3?1.6:.5))*dt;
+    p.vy+=(phase==="settle"||phase==="after"?.4:.7-.1*lift)*dt;p.vx*=1-dt*1.6;p.vy*=1-dt*(1.4+.2*round);
+    p.x+=p.vx*dt;p.y+=p.vy*dt;const r=Math.hypot(p.x,p.y);if(r>.94){p.x*=.94/r;p.y*=.94/r;p.vx*=-.3;p.vy*=-.3}
+    const fl=floorY+.12*(1-Math.min(1,Math.abs(p.x)/.9)**2)*.3;if(p.y>fl){p.y=fl;p.vy=0;p.vx*=.8}
+    const c=colorFor(p.c,lift);cx.fillStyle=`rgba(${c},${.75+.25*lift})`;cx.beginPath();cx.arc(cxm+p.x*R,cym+p.y*R,p.s*(1+lift*.3),0,6.29);cx.fill()}
+  cx.restore();
+  cx.strokeStyle='rgba(239,233,247,.25)';cx.lineWidth=2;cx.beginPath();cx.arc(cxm,cym,R,0,6.29);cx.stroke();
+  cx.strokeStyle='rgba(239,233,247,.35)';cx.lineWidth=5;cx.lineCap='round';cx.beginPath();cx.arc(cxm,cym,R*.86,Math.PI*1.1,Math.PI*1.35);cx.stroke();
+  if(flash>0){cx.strokeStyle=`rgba(255,233,160,${flash*.6})`;cx.lineWidth=6;cx.beginPath();cx.arc(cxm,cym,R+6+(1-flash)*20*(RM?0:1),0,6.29);cx.stroke()}
+}
+function motionness(){let s=0;for(const p of P)s+=Math.abs(p.vy)+Math.abs(p.vx);return s/P.length}
+
+/* ---------- phases ---------- */
+let phase='idle',input='motion',round=0,rounds=[],cur=null,phaseT=0,litT=0,beatT=0,bpm=92,stopped=false,stillSince=0,settled=false,grainAcc=0,shakeVib=0;
+function setPhase(p){
+  phase=p;phaseT=0;const ph=$('#phase'),cue=$('#cue'),nb=$('#nextBtn');nb.hidden=false;
+  const touch=!motionSeen;
+  if(p==='shake'){ph.textContent='Shake · round '+['one','two','three'][round];cue.textContent=touch?'Scribble fast on the globe!':'Shake it! Hands, arms, whole body.';nb.textContent='Next: stomp';
+    $('#note').textContent=touch?'Rub and scribble, fast and messy.':''}
+  if(p==='stomp'){ph.textContent='Stomp';cue.textContent=touch?'Tap the globe hard, like a drum.':'Stomp your feet, or thump the phone in your hand.';nb.textContent='Next: settle';$('#note').textContent='Try to land on the beat.';bpm=92+round*5;beatT=0}
+  if(p==='settle'){ph.textContent='Time to settle';cue.textContent='Hold still and watch the snow land.';nb.hidden=true;$('#note').textContent='';stillSince=0;settled=false}
+}
+function hit(f){
+  lastHit=performance.now();const period=60/bpm,ph=beatT%period,off=Math.min(ph,period-ph),on=off<.13;
+  cur.stomps++;if(on)cur.on_beat++;drum(f,on);vib(on?[30,40,30]:40);
+  joltV+=(RM?0:180)*f;flash=1;dance=Math.min(1.4,dance+(on?.7:.4));
+  for(const p of P){p.vy-=(on?.9:.6)*f*(.3+Math.random())*(p.y>0?1:.3);p.vx+=(Math.random()-.5)*f*1.2}
+  if(cur.stomps>=12){setTimeout(()=>{if(phase==='stomp')setPhase('settle')},500)}
+}
+$('#nextBtn').onclick=()=>{if(phase==='shake')setPhase('stomp');else if(phase==='stomp')setPhase('settle');else if(phase==='after')newRound()};
+$('#doneBtn').onclick=()=>finish(false);
+function newRound(){if(cur)rounds.push(cur);round=Math.min(round+1,2);cur={shake_active_s:0,stomps:0,on_beat:0,settle_s:null};setPhase('shake');$('#doneBtn').textContent="I'm done"}
+let last=performance.now(),running=false;
+function loop(now){
+  if(!running)return;const dt=Math.min(.05,(now-last)/1000);last=now;phaseT+=dt;litT+=dt;
+  energy+=(rawE-energy)*Math.min(1,dt*(rawE>energy?12:3));rawE*=Math.pow(.02,dt);
+  if(phase==='shake'){
+    if(energy>.15){cur.shake_active_s+=dt;grainAcc+=dt*energy*(flavor==='maraca'?14:28);while(grainAcc>1){grainAcc--;grain(Math.min(1,.3+energy))}
+      shakeVib+=dt;if(shakeVib>.5&&energy>.5){shakeVib=0;vib(15)}}
+    if(cur.shake_active_s>18&&!cur.dosed){cur.dosed=1;$('#cue').textContent="That's a good shake. Now stomp!";setTimeout(()=>{if(phase==='shake')setPhase('stomp')},1300)}
+  }
+  if(phase==='stomp'){const period=60/bpm;const b0=Math.floor(beatT/period);beatT+=dt;if(Math.floor(beatT/period)>b0){tick();beatPulse=1}
+    if(phaseT>28)setPhase('settle')}
+  if(phase==='settle'){
+    const still=now-lastMove>600&&energy<.12;
+    if(still){if(!stillSince)stillSince=now}else stillSince=0;
+    if(!settled&&stillSince&&now-stillSince>1500&&motionness()<.02){settled=true;cur.settle_s=+phaseT.toFixed(1);
+      chime();vib(20);$('#cue').textContent='Landed. What feels more awake now? Hands, face, feet?';$('#phase').textContent='Settled';
+      phase='after';const nb=$('#nextBtn');nb.hidden=round>=2;nb.textContent='One more round';$('#doneBtn').textContent="I'm done";}
+  }
+  const k=-joltV*0-jolt*260;joltV+=(k-joltV*14)*dt;jolt+=joltV*dt;if(Math.abs(jolt)<.05&&Math.abs(joltV)<.05){jolt=0;joltV=0}
+  flash=Math.max(0,flash-dt*2.5);dance=Math.max(0,dance-dt*.8);beatPulse=Math.max(0,beatPulse-dt*3);
+  document.body.style.background=`rgb(${20+round*6},${18+round*4},${26+round*2})`;
+  draw(dt);requestAnimationFrame(loop);
+}
+async function begin(mode){
+  ensureAC();if(mode==='motion')await startMotion();else input='touch';
+  show('s1');fit();cur={shake_active_s:0,stomps:0,on_beat:0,settle_s:null};setPhase('shake');
+  running=true;last=performance.now();requestAnimationFrame(loop);
+  if(mode==='motion')setTimeout(()=>{if(!motionSeen){input='touch';$('#note').textContent='No motion sensor here. Scribble on the globe instead.';if(phase==='shake')$('#cue').textContent='Scribble fast on the globe!'}else input='motion'},1500);
+}
+$('#useMotion').onclick=()=>begin('motion');
+$('#useTouch').onclick=()=>begin('touch');
+function finish(isStop){if(cur){rounds.push(cur);cur=null}running=false;if(isStop)stopped=true;show('s2')}
+$('#stop').onclick=()=>{if($('#s3.on'))return;stopped=true;if($('#s1.on'))return finish(true);summarize(null)};
+document.querySelectorAll('#tvn .btn').forEach(b=>b.onclick=()=>summarize(b.textContent));
+$('#tvnSkip').onclick=()=>summarize(null);
+function summarize(t){
+  const L=[],done=rounds.filter(r=>r.shake_active_s>1||r.stomps>0);
+  if(!done.length)L.push('You showed up and gave it a look. That counts.');
+  else{L.push(done.length>1?'You shook it up and stomped it out '+(done.length===2?'twice':'three times')+'.':'You shook it up and stomped it out.');
+    const st=done.reduce((a,r)=>a+r.stomps,0),ob=done.reduce((a,r)=>a+r.on_beat,0);
+    if(st>=4)L.push(ob/st>.4?'Lots of your stomps landed right on the beat.':'You found your own rhythm, not the app\'s. That works too.');
+    const s=done.filter(r=>r.settle_s!=null);
+    if(s.length>=2){const a=s[0].settle_s,b=s[s.length-1].settle_s;L.push(b<a*.8?'You came to stillness faster the second time.':b>a*1.2?'Stillness took a bit longer later on. Plenty of energy left.':'You came to stillness at about the same speed each time.')}
+    else if(s.length===1)L.push('You watched the snow land all the way down.')}
+  if(t)L.push('You said you feel: '+t.toLowerCase()+'.');
+  if(stopped)L.push('You stopped when you wanted to. Stopping still counts.');
+  $('#summary').innerHTML=L.map(x=>'<div>'+x+'</div>').join('');
+  $('#log').textContent=JSON.stringify({tool:'M17 snow globe + M32 stomp',input,sound:soundOn?flavor:'off',rounds:rounds.map(r=>({shake_active_s:+r.shake_active_s.toFixed(1),stomps:r.stomps,on_beat:r.on_beat,settle_s:r.settle_s})),then_vs_now:t,stopped},null,1);
+  show('s3');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Voice Room</title>
+<style>
+:root{--bg:#14121a;--panel:#1f1c28;--ink:#efe9f7;--muted:#a79fb8;--accent:#9fd8c3;--warm:#f0b37a;--cool:#8fb3ff;--line:#2f2a3b}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:ui-rounded,-apple-system,system-ui,"Segoe UI",sans-serif;overflow:hidden;-webkit-tap-highlight-color:transparent}
+body{display:flex;flex-direction:column;height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+header{display:flex;justify-content:space-between;align-items:center;padding:4px 12px;flex:none}
+.back{color:var(--muted);text-decoration:none;min-height:48px;display:inline-flex;align-items:center;padding:0 6px;font-size:16px}
+.hr{display:flex;gap:8px}
+.pill{min-height:48px;min-width:48px;border-radius:24px;border:1px solid var(--line);background:transparent;color:var(--muted);font:inherit;font-size:15px;padding:0 16px;cursor:pointer}
+.pill[aria-pressed=true]{color:var(--accent);border-color:var(--accent)}
+main{flex:1;position:relative;min-height:0}
+.step{position:absolute;inset:0;display:none;flex-direction:column;padding:6px 20px 10px;gap:14px;overflow:hidden}
+.step.on{display:flex;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+h1{font-size:26px;line-height:1.2;margin:4px 0 0;font-weight:650}
+h2{font-size:21px;margin:0;font-weight:600}
+p{color:var(--muted);line-height:1.45;margin:0;font-size:16px}
+.panel{background:var(--panel);border-radius:20px;padding:18px}
+.col{display:flex;flex-direction:column;gap:10px}
+.btn{min-height:52px;border-radius:16px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font:inherit;font-size:17px;padding:12px 18px;cursor:pointer;text-align:center}
+.btn.pri{background:var(--accent);color:#10231c;border:0;font-weight:650}
+.btn:active{transform:scale(.98)}
+.small{font-size:13px;color:var(--muted)}
+.grow{flex:1;min-height:0;position:relative}
+canvas{width:100%;height:100%;display:block;touch-action:none}
+footer{font-size:11px;color:var(--muted);opacity:.65;text-align:center;padding:4px 16px 8px;flex:none}
+#cue{text-align:center;min-height:46px;font-size:18px;color:var(--ink);transition:opacity .6s}
+#status{text-align:center;font-size:13px;color:var(--muted);min-height:18px}
+#hum{touch-action:none;user-select:none;-webkit-user-select:none;min-height:72px;font-size:19px;border-radius:36px;background:#24303a;border:1px solid #3c5a52;color:var(--accent)}
+#hum.held{background:var(--accent);color:#10231c}
+.row{display:flex;gap:10px}.row .btn{flex:1}
+details{background:var(--panel);border-radius:16px;padding:10px 14px}
+summary{cursor:pointer;color:var(--muted);min-height:32px}
+pre{font-size:11px;white-space:pre-wrap;color:var(--muted);max-height:28vh;overflow:auto;margin:6px 0 0}
+.done{font-size:18px;color:var(--ink);line-height:1.5}
+@media (prefers-reduced-motion:reduce){.step.on{animation:none}}
+</style>
+</head>
+<body>
+<header>
+  <a class="back" href="index.html">← Lab</a>
+  <div class="hr"><button class="pill" id="snd" aria-pressed="false">Sound off</button><button class="pill" id="stop">Stop</button></div>
+</header>
+<main>
+  <section class="step on" id="s0">
+    <h1>A buzz you can feel</h1>
+    <p>Lots going on inside? That's a lot to carry. Let's try something with your voice instead of your thoughts.</p>
+    <div class="panel col">
+      <p style="color:var(--ink)">Make a low <b>"voooo"</b> or a hum, like a bee. Feel it buzz in your lips, face and chest. The moss hive grows while you hum, and the bees come home.</p>
+      <p class="small">Lips closed works too, if you want it quieter.</p>
+    </div>
+    <div style="flex:1"></div>
+    <div class="col">
+      <button class="btn pri" id="useMic">Use my mic</button>
+      <p class="small" style="text-align:center">Your mic is listened to only on this phone. Nothing is recorded or sent.</p>
+      <button class="btn" id="useBtn">Use a hum button instead (plays a hum)</button>
+    </div>
+  </section>
+
+  <section class="step" id="s1">
+    <div class="grow"><canvas id="cv"></canvas></div>
+    <div id="status"></div>
+    <div id="cue">Whenever you're ready: a low voooo.</div>
+    <button class="btn" id="hum" hidden>Hold to hum</button>
+    <div class="row"><button class="btn" id="swap">Use hum button</button><button class="btn" id="enough">I'm done</button></div>
+  </section>
+
+  <section class="step" id="s2">
+    <h1>Then vs now</h1>
+    <p>No right answer. Compared with when you started, the busy feeling inside is…</p>
+    <div style="flex:1"></div>
+    <div class="col" id="tvn">
+      <button class="btn">Louder</button><button class="btn">About the same</button><button class="btn">Quieter</button><button class="btn">Much quieter</button>
+    </div>
+    <button class="btn" id="tvnSkip" style="background:transparent">Skip</button>
+  </section>
+
+  <section class="step" id="s3">
+    <h1>Thanks for humming</h1>
+    <div class="panel done" id="summary"></div>
+    <div style="flex:1"></div>
+    <details><summary>What we'd log</summary><pre id="log"></pre></details>
+    <button class="btn" onclick="location.reload()">Again</button>
+  </section>
+</main>
+<footer>Prototype · copy and gates are placeholders; production reads from the graph</footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+let AC=null,master=null,soundOn=false,mode=null,stopped=false,t0=performance.now();
+function ensureAC(){
+  if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();master=AC.createGain();master.gain.value=0;master.connect(AC.destination)}
+  if(AC.state==='suspended')AC.resume();
+}
+function setSound(on){ensureAC();soundOn=on;master.gain.setTargetAtTime(on?0.9:0,AC.currentTime,.08);$('#snd').textContent=on?'Sound on':'Sound off';$('#snd').setAttribute('aria-pressed',on)}
+$('#snd').onclick=()=>setSound(!soundOn);
+function show(id){document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on',s.id===id))}
+
+/* ---- pad (harmony a fifth below the hum; root drifts down slowly = ambient descent) ---- */
+let pad=null;const ROOT0=98,ROOT1=87;
+function padRoot(){const k=Math.min((performance.now()-t0)/180000,1);return ROOT0+(ROOT1-ROOT0)*k}
+function makePad(){
+  if(pad||!AC)return;const g=AC.createGain();g.gain.value=0;
+  const f=AC.createBiquadFilter();f.type='lowpass';f.frequency.value=700;f.connect(g);g.connect(master);
+  const o1=AC.createOscillator(),o2=AC.createOscillator(),o3=AC.createOscillator();
+  o1.type='triangle';o2.type='sine';o3.type='sine';o3.detune.value=6;
+  [o1,o2,o3].forEach(o=>{o.connect(f);o.start()});pad={g,o1,o2,o3};
+}
+function padUpdate(level){
+  if(!pad)return;const r=padRoot(),t=AC.currentTime;
+  pad.o1.frequency.setTargetAtTime(r,t,.5);pad.o2.frequency.setTargetAtTime(r*2,t,.5);pad.o3.frequency.setTargetAtTime(r,t,.5);
+  pad.g.gain.setTargetAtTime(level*0.10,t,level>0?.6:1.2);
+}
+/* ---- synthesized hum for the button path ---- */
+let hs=null;
+function humStart(){
+  ensureAC();makePad();const t=AC.currentTime,f=padRoot()*1.5;
+  const o=AC.createOscillator();o.type='sawtooth';o.frequency.value=f;
+  const lfo=AC.createOscillator(),lg=AC.createGain();lfo.frequency.value=5;lg.gain.value=1.2;lfo.connect(lg);lg.connect(o.frequency);
+  const lp=AC.createBiquadFilter();lp.type='lowpass';lp.frequency.value=520;lp.Q.value=4;
+  const g=AC.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.35);
+  o.connect(lp);lp.connect(g);g.connect(master);o.start();lfo.start();hs={o,lfo,g};
+}
+function humStop(){if(!hs)return;const t=AC.currentTime,h=hs;hs=null;h.g.gain.cancelScheduledValues(t);h.g.gain.setTargetAtTime(0,t,.15);setTimeout(()=>{try{h.o.stop();h.lfo.stop()}catch(e){}},900)}
+
+/* ---- voice sensing: RMS + autocorrelation pitch (plain JS) ---- */
+let an=null,buf=null,stream=null,noise=0.004;
+function detectPitch(b,sr){
+  const N=b.length;let rms=0;for(let i=0;i<N;i++)rms+=b[i]*b[i];rms=Math.sqrt(rms/N);
+  const minL=Math.floor(sr/420),maxL=Math.floor(sr/70),M=N-maxL;let r0=0;for(let i=0;i<M;i++)r0+=b[i]*b[i];
+  if(r0<=0)return{rms,f:0};
+  let best=-1,bl=0;const c=new Float32Array(maxL+2);
+  for(let l=minL;l<=maxL+1;l++){let s=0;for(let i=0;i<M;i++)s+=b[i]*b[i+l];c[l]=s/r0;if(c[l]>best){best=c[l];bl=l}}
+  if(best<0.55)return{rms,f:0};
+  // prefer the shortest lag that is nearly as good (avoid octave-down errors)
+  for(let l=minL+1;l<bl;l++){if(c[l]>0.9*best&&c[l]>=c[l-1]&&c[l]>=c[l+1]){bl=l;break}}
+  const a=c[bl-1]||0,m=c[bl],z=c[bl+1]||0,d=(a-z)/(2*(a-2*m+z)||1);
+  return{rms,f:sr/(bl+(isFinite(d)?d:0))};
+}
+async function startMic(){
+  ensureAC();try{if(navigator.audioSession)navigator.audioSession.type='play-and-record'}catch(e){}
+  stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false}});
+  const src=AC.createMediaStreamSource(stream);an=AC.createAnalyser();an.fftSize=2048;src.connect(an);buf=new Float32Array(an.fftSize);
+}
+
+/* ---- hum tracking ---- */
+let g=0.05,humOn=false,humT0=0,lastV=0,pitches=[],hums=[],level=0,heldSince=0,held=false,frame=0,lastF=0;
+function endHum(now){
+  humOn=false;const d=(lastV-humT0)/1000;
+  if(d>0.6&&pitches.length){const m=pitches.reduce((a,b)=>a+b,0)/pitches.length;const sd=Math.sqrt(pitches.reduce((a,b)=>a+(b-m)*(b-m),0)/pitches.length);
+    hums.push({dur_s:+d.toFixed(2),pitch_hz_mean:Math.round(m),jitter:+(sd/m).toFixed(3)})}
+  pitches=[];
+}
+function sense(now,dt){
+  let voiced=false,f=0;
+  if(mode==='mic'&&an){
+    if(frame++%2===0){an.getFloatTimeDomainData(buf);const r=detectPitch(buf,AC.sampleRate);
+      if(!humOn&&r.rms<noise*4)noise=noise*0.98+r.rms*0.02;
+      voiced=r.rms>Math.max(0.012,noise*3.5)&&r.f>0&&r.f<420;f=r.f;lastF=voiced?f:0}
+    else{voiced=lastF>0;f=lastF}
+  }else if(held){voiced=true;const hd=(now-heldSince)/1000;f=padRoot()*1.5*(1+(Math.random()-.5)*0.06/(1+hd))}
+  if(voiced){if(!humOn){humOn=true;humT0=now;pitches=[]}lastV=now;if(f)pitches.push(f);if(pitches.length>400)pitches.shift()}
+  else if(humOn&&now-lastV>260)endHum(now);
+  const active=humOn&&now-lastV<260;
+  level+=((active?1:0)-level)*Math.min(1,dt*4);
+  if(active&&pitches.length>2){
+    const rec=pitches.slice(-12),m=rec.reduce((a,b)=>a+b,0)/rec.length,sd=Math.sqrt(rec.reduce((a,b)=>a+(b-m)*(b-m),0)/rec.length);
+    const low=Math.max(0,Math.min(1,(320-m)/200)),steady=Math.max(0,Math.min(1,1-(sd/m)*12)),long=Math.min(((now-humT0)/1000)/5,1);
+    const rate=0.03*(0.35+low)*(0.35+steady)*(0.4+long);
+    g=Math.min(1.25,g+rate*dt);warmth=0.5*low+0.5*steady;
+  }
+  if(soundOn)padUpdate(active?1:0);
+  return active;
+}
+let warmth=0;
+
+/* ---- moss hive visual ---- */
+const cv=$('#cv'),cx=cv.getContext('2d');let W=0,H=0,DPR=1;
+function fit(){DPR=Math.min(2,devicePixelRatio||1);const r=cv.getBoundingClientRect();W=r.width;H=r.height;cv.width=W*DPR;cv.height=H*DPR;cx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',fit);
+const bees=Array.from({length:12},(_,i)=>({a:Math.random()*6.28,r:1.6+Math.random()*.8,s:(.4+Math.random()*.5)*(Math.random()<.5?-1:1),p:Math.random()*6.28,home:0,spot:Math.random()}));
+function mix(a,b,k){return a.map((v,i)=>Math.round(v+(b[i]-v)*k))}
+let tAnim=0,blink=0;
+function draw(dt,active){
+  tAnim+=dt*(RM?.35:1);cx.clearRect(0,0,W,H);
+  const S=Math.min(W,H),mx=W/2,my=H*0.62,gg=Math.min(g,1),R=S*(0.16+gg*0.17);
+  // glow
+  const gl=cx.createRadialGradient(mx,my,R*.3,mx,my,Math.min(R*2.4,W*.5,H*.6));
+  const gc=mix([159,216,195],[240,179,122],warmth*gg*.6);
+  gl.addColorStop(0,`rgba(${gc},${0.10+0.22*level+0.12*gg})`);gl.addColorStop(1,'rgba(20,18,26,0)');cx.fillStyle=gl;cx.fillRect(0,0,W,H);
+  // vibration rings (visual twin of the haptic buzz)
+  if(level>0.05){for(let k=0;k<3;k++){const ph=((tAnim*.9+k/3)%1);cx.beginPath();cx.ellipse(mx,my,R*(1.1+ph*.9),R*(0.8+ph*.7),0,Math.PI*1.05,Math.PI*1.95);
+    cx.strokeStyle=`rgba(159,216,195,${(1-ph)*.35*level})`;cx.lineWidth=2;cx.stroke()}}
+  // ground
+  cx.fillStyle='#1b1823';cx.beginPath();cx.ellipse(mx,my+R*.55,R*1.5,R*.22,0,0,6.29);cx.fill();
+  // mound body
+  const pts=[],n=64,wob=RM?0.2:1;
+  for(let i=0;i<n;i++){const a=Math.PI+i/(n-1)*Math.PI;const rr=R*(1+0.05*Math.sin(a*5+tAnim*.7)*wob+0.03*Math.sin(a*9-tAnim)*wob+level*0.02*Math.sin(tAnim*30+a*3)*wob);
+    pts.push([mx+Math.cos(a)*rr*1.1,my+Math.sin(a)*rr*1.12])}
+  const base=mix([74,110,86],[120,150,90],warmth*gg),top=mix([120,170,140],[200,200,130],warmth*gg);
+  const bg=cx.createLinearGradient(0,my-R,0,my+R*.5);bg.addColorStop(0,`rgb(${top})`);bg.addColorStop(1,`rgb(${base})`);
+  cx.fillStyle=bg;cx.beginPath();cx.moveTo(pts[0][0],my+R*.5);pts.forEach(p=>cx.lineTo(p[0],p[1]));cx.lineTo(pts[n-1][0],my+R*.5);
+  cx.quadraticCurveTo(mx,my+R*.72,pts[0][0],my+R*.5);cx.fill();
+  // fuzz
+  const fz=Math.floor(60+gg*140),fl=3+gg*13+level*4;cx.lineCap='round';
+  for(let i=0;i<fz;i++){const u=i/fz,a=Math.PI+u*Math.PI,rr=R*(1+0.05*Math.sin(a*5+tAnim*.7)*wob);
+    const x=mx+Math.cos(a)*rr*1.1,y=my+Math.sin(a)*rr*1.12,sw=Math.sin(tAnim*2+i)*0.35*wob+level*Math.sin(tAnim*25+i)*.2;
+    const ang=a+sw*.4,len=fl*(0.6+0.4*Math.sin(i*7.3));
+    cx.strokeStyle=`rgba(${mix([140,200,160],[230,210,140],warmth*gg*((i%3)/2))},${0.55+0.3*gg})`;cx.lineWidth=1.6;
+    cx.beginPath();cx.moveTo(x,y);cx.lineTo(x+Math.cos(ang)*len,y+Math.sin(ang)*len);cx.stroke()}
+  // moss speckles
+  for(let i=0;i<30;i++){const a=Math.PI+((i*0.618)%1)*Math.PI,rr=R*(0.25+0.65*((i*0.371)%1));
+    cx.fillStyle=`rgba(40,70,50,${.35})`;cx.beginPath();cx.arc(mx+Math.cos(a)*rr*1.1,my+Math.sin(a)*rr*.9,2+(i%3),0,6.29);cx.fill()}
+  // door
+  cx.fillStyle='#16131c';cx.beginPath();cx.ellipse(mx,my+R*.36,R*.2,R*.16,0,Math.PI,0);cx.lineTo(mx+R*.2,my+R*.5);cx.lineTo(mx-R*.2,my+R*.5);cx.fill();
+  // eyes
+  blink-=dt;if(blink<-3.5-Math.random()*3)blink=.14;
+  const ey=my-R*.25,ex=R*.3;cx.strokeStyle='#16131c';cx.fillStyle='#16131c';cx.lineWidth=3;
+  for(const s of[-1,1]){cx.beginPath();if(level>.4){cx.arc(mx+s*ex,ey+3,R*.08,Math.PI*1.1,Math.PI*1.9);cx.stroke()}
+    else if(blink>0){cx.moveTo(mx+s*ex-R*.07,ey);cx.lineTo(mx+s*ex+R*.07,ey);cx.stroke()}
+    else{cx.ellipse(mx+s*ex,ey,R*.06,R*.08,0,0,6.29);cx.fill();cx.fillStyle='#efe9f7';cx.beginPath();cx.arc(mx+s*ex+2,ey-3,R*.02,0,6.29);cx.fill();cx.fillStyle='#16131c'}}
+  // flowers once grown
+  const fN=Math.floor(Math.max(0,g-.45)*14);
+  for(let i=0;i<fN;i++){const a=Math.PI*1.12+((i*0.414)%1)*Math.PI*.76,x=mx+Math.cos(a)*R*1.1,y=my+Math.sin(a)*R*1.1;
+    cx.fillStyle=`rgba(240,179,122,${.8})`;cx.beginPath();cx.arc(x,y-4,3.2+Math.sin(tAnim+i)*.6*wob,0,6.29);cx.fill()}
+  // bees
+  const nb=3+Math.floor(gg*9);
+  for(let i=0;i<nb;i++){const b=bees[i];b.home+=((level>.5?1:0)-b.home)*dt*(level>.5?0.35:0.12);
+    b.a+=b.s*dt*(1-b.home*.6)*(RM?.4:1);const orb=R*b.r*(1-b.home*.55);
+    const hx=mx+(b.spot-.5)*R*1.5,hy=my-R*(.5+.5*((b.spot*7.7)%1)*(1-Math.abs(b.spot-.5)*1.4));
+    let x=mx+Math.cos(b.a)*orb*1.2,y=my-R*.3+Math.sin(b.a)*orb*.55+Math.sin(tAnim*3+b.p)*6*wob;
+    x+=(hx-x)*b.home*b.home;y+=(hy-y)*b.home*b.home;
+    const j=level*(RM?0:1.5);x+=Math.sin(tAnim*40+i)*j;y+=Math.cos(tAnim*37+i)*j;
+    cx.fillStyle='rgba(239,233,247,.55)';cx.beginPath();cx.ellipse(x-1,y-5,4,2.6,-.5+Math.sin(tAnim*50+i)*.4*wob,0,6.29);cx.fill();
+    cx.fillStyle='#f0b37a';cx.beginPath();cx.ellipse(x,y,6,4.2,0,0,6.29);cx.fill();
+    cx.fillStyle='#16131c';cx.fillRect(x-1.6,y-4,1.6,8);cx.fillRect(x+2,y-3.4,1.4,6.8)}
+}
+
+/* ---- cues ---- */
+const CUES=['Notice where the buzz is.','Lips? Cheeks? Chest?','Lower and slower feeds the moss.','Longer hums bring the bees home.','Let the sound rumble, not the breath.','Feel it in the bones of your face.','Lips closed is fine. Quieter still works.'];
+let ci=0,cueT=0,quietT=0;
+function cues(dt,active){
+  cueT+=dt;quietT=active?0:quietT+dt;
+  const st=mode==='mic'?(active?'hearing your hum':'listening…'):(active?'humming':'');
+  if($('#status').textContent!==st)$('#status').textContent=st;
+  const want=quietT>6?"Whenever you're ready: a low voooo.":null;
+  if(want&&$('#cue').textContent!==want){$('#cue').textContent=want;cueT=0}
+  else if(active&&cueT>7){cueT=0;ci=(ci+1)%CUES.length;$('#cue').style.opacity=0;setTimeout(()=>{$('#cue').textContent=CUES[ci];$('#cue').style.opacity=1},500)}
+}
+/* haptic twin: short pulses while growing, matched by vibration rings + pad swell */
+let vibT=0;function haptic(dt,active){vibT+=dt;if(active&&vibT>1.2){vibT=0;if(navigator.vibrate)try{navigator.vibrate(18)}catch(e){}}}
+
+let last=performance.now(),running=false;
+function loop(now){if(!running)return;const dt=Math.min(.05,(now-last)/1000);last=now;const a=sense(now,dt);draw(dt,a);cues(dt,a);haptic(dt,a);requestAnimationFrame(loop)}
+function enter(m){
+  mode=m;show('s1');fit();
+  $('#hum').hidden=m!=='btn';$('#swap').hidden=m!=='mic';
+  if(m==='btn'){$('#cue').textContent='Hold the button and hum along, or just listen to it.'}
+  if(!running){running=true;last=performance.now();requestAnimationFrame(loop)}
+}
+$('#useMic').onclick=async()=>{
+  ensureAC();
+  try{await startMic();enter('mic')}
+  catch(e){$('#useMic').textContent='Mic not available. Try the button';$('#useMic').disabled=true}
+};
+$('#useBtn').onclick=()=>{setSound(true);makePad();enter('btn')};
+$('#swap').onclick=()=>{if(stream)stream.getTracks().forEach(t=>t.stop());an=null;if(humOn)endHum(performance.now());if(!soundOn)setSound(true);makePad();enter('btn')};
+const hb=$('#hum');
+function press(e){e.preventDefault();if(held)return;held=true;heldSince=performance.now();hb.classList.add('held');hb.textContent='Humming… (let go to rest)';humStart()}
+function release(){if(!held)return;held=false;hb.classList.remove('held');hb.textContent='Hold to hum';humStop()}
+hb.addEventListener('pointerdown',press);['pointerup','pointercancel','pointerleave'].forEach(ev=>hb.addEventListener(ev,release));
+hb.addEventListener('contextmenu',e=>e.preventDefault());
+
+function finish(){release();if(humOn)endHum(performance.now());running=false;if(stream)stream.getTracks().forEach(t=>t.stop());if(pad)padUpdate(0);show('s2')}
+$('#enough').onclick=finish;
+$('#stop').onclick=()=>{if(document.querySelector('#s3.on'))return;stopped=true;if(document.querySelector('#s2.on'))return summarize(null);if(document.querySelector('#s0.on'))return summarize(null);finish()};
+document.querySelectorAll('#tvn .btn').forEach(b=>b.onclick=()=>summarize(b.textContent));
+$('#tvnSkip').onclick=()=>summarize(null);
+
+function avg(a){return a.reduce((x,y)=>x+y,0)/(a.length||1)}
+function summarize(tvn){
+  const L=[];
+  if(hums.length>=2){const h=Math.ceil(hums.length/2),A=hums.slice(0,h),B=hums.slice(h);
+    const dA=avg(A.map(x=>x.dur_s)),dB=avg(B.map(x=>x.dur_s));
+    L.push(dB>dA*1.15?'Your hums got longer as you went.':dB<dA*.85?'Your hums got shorter as you went. Some rounds are like that.':'Your hums stayed about the same length.');
+    if(mode==='mic'){const pA=avg(A.map(x=>x.pitch_hz_mean)),pB=avg(B.map(x=>x.pitch_hz_mean)),jA=avg(A.map(x=>x.jitter)),jB=avg(B.map(x=>x.jitter));
+      const lower=pB<pA*.97,steadier=jB<jA*.85;
+      if(lower||steadier)L.push('Your voice settled '+(lower&&steadier?'lower and steadier':lower?'a little lower':'a little steadier')+'.')}
+  }else if(hums.length===1)L.push('You made one good long hum.');
+  else L.push('You gave it a look. That counts.');
+  L.push(g>0.8?'The moss hive grew big and fuzzy, and the bees came home.':g>0.35?'The moss hive grew, and some bees came home.':'The moss hive is still small. It will be here next time.');
+  if(tvn)L.push('You said the busy feeling is: '+tvn.toLowerCase()+'.');
+  if(stopped)L.push('You stopped when you wanted to. Stopping still counts.');
+  $('#summary').innerHTML=L.map(x=>'<div>'+x+'</div>').join('');
+  $('#log').textContent=JSON.stringify({tool:'M10+M11 voo / bee hive',input:mode||'none',hums,growth:+g.toFixed(2),then_vs_now:tvn,stopped,session_s:Math.round((performance.now()-t0)/1000)},null,1);
+  show('s3');
+}
+</script>
+</body>
+</html>
