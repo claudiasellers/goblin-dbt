@@ -28,6 +28,7 @@ import {
   type CheckInSource,
 } from '../lib/spine/checkInPayload';
 import type { CapacityReading } from '../data/capacityTypes';
+import { recordToolSession } from '../services/spine';
 
 type EntryPoint = 'standard' | 'somatic';
 
@@ -386,7 +387,29 @@ export function CheckIn() {
     setSaveError(null);
     const ok = await recordNextAction(next);
     if (!ok) setSaveError('Failed to save your check-in. It will be stored locally.');
+    recordOneShot(next);
     setStep('complete');
+  }
+
+  /** Micro-steps and guided activities are practice too: a one-shot ToolSession (PR-S3). No rep yet. */
+  function recordOneShot(next: CheckInNextAction) {
+    const patternId = stateResult?.pattern?.id;
+    const core: Record<string, string> = {};
+    if (patternId) core.patternId = patternId;
+    if (next.kind === 'micro_step') {
+      if (next.microStepId) core.microStepId = next.microStepId;
+      void recordToolSession({
+        id: newId(), toolId: 'micro-step', entry: 'checkin_result', checkInId, status: 'completed',
+        ...(patternId ? { patternId } : {}), ext: { core },
+      }).catch(() => { /* best effort */ });
+    } else if (next.kind === 'activity' || next.kind === 'activity_partial') {
+      if (next.activityId) core.activityId = next.activityId;
+      void recordToolSession({
+        id: newId(), toolId: 'guided-activity', entry: 'checkin_result', checkInId,
+        status: next.kind === 'activity' ? 'completed' : 'exited_early',
+        ...(patternId ? { patternId } : {}), ext: { core },
+      }).catch(() => { /* best effort */ });
+    }
   }
 
   /**

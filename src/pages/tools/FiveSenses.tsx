@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { ExerciseProgress } from '../../components/tools/ExerciseProgress';
+import { useToolSession } from '../../hooks/useToolSession';
+import { SessionClose } from '../../components/spine/SessionClose';
 
 const senses = [
   { count: 5, name: 'See', prompt: 'things you can see', singular: 'Thing you can see', emoji: '👁️' },
@@ -20,6 +22,7 @@ export function FiveSenses() {
   const [writing, setWriting] = useState(false);
   const [skipped, setSkipped] = useState<boolean[]>(senses.map(() => false));
   const [isComplete, setIsComplete] = useState(false);
+  const session = useToolSession();
 
   const current = senses[currentStep];
   const isLast = currentStep === senses.length - 1;
@@ -32,14 +35,23 @@ export function FiveSenses() {
     });
   };
 
-  const advance = () => {
-    if (isLast) setIsComplete(true);
-    else setCurrentStep(currentStep + 1);
+  const advance = (noticed = true) => {
+    // Practice spine (PR-S3): the first sense advanced starts the skill. Stores sense ids only.
+    const done = senses.filter((_, i) => (i < currentStep && !skipped[i]) || (i === currentStep && noticed));
+    if (done.length) session.markPracticed();
+    session.setExt({ dt: { sensesDone: done.map(x => x.name.toLowerCase()) } });
+    if (isLast) {
+      session.markComplete();
+      setIsComplete(true);
+    } else {
+      session.setStep(`sense_${senses[currentStep + 1].name.toLowerCase()}`);
+      setCurrentStep(currentStep + 1);
+    }
   };
 
   const skipSense = () => {
     setSkipped(prev => prev.map((v, i) => (i === currentStep ? true : v)));
-    advance();
+    advance(false);
   };
 
   const goBack = () => {
@@ -75,6 +87,7 @@ export function FiveSenses() {
         <p className="mt-6 text-sm text-[var(--color-text-tertiary)]">
           Nothing you wrote here is saved.
         </p>
+        <SessionClose />
       </div>
     );
   }
@@ -102,7 +115,7 @@ export function FiveSenses() {
       {/* Primary action: noticing is enough */}
       <button
         type="button"
-        onClick={advance}
+        onClick={() => advance()}
         className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
       >
         {isLast ? "I've noticed it — finish" : "I've noticed them — continue"}

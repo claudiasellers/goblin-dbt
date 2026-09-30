@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { coolDownView, coolDownTimerAllowed, type ColdCheck } from '../../lib/coolDown';
+import { useToolSession } from '../../hooks/useToolSession';
+import { SessionClose } from '../../components/spine/SessionClose';
 
 // Interim frontend copy (D-06). DT-01 moves this to graph Intervention nodes
 // plus the BodySafetyFlags profile slice.
@@ -50,6 +52,12 @@ export function CoolDown() {
   const [timer, setTimer] = useState(30);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const view = coolDownView(selectedTechnique, coldCheck);
+  const session = useToolSession();
+
+  // Practice spine (PR-S3): the rep is cold, or the exhale when cold was skipped.
+  useEffect(() => {
+    if (timerState === 'complete') session.markComplete();
+  }, [timerState, session]);
 
   // Clean up interval on unmount
   useEffect(() => {
@@ -89,6 +97,11 @@ export function CoolDown() {
 
   const startTimer = () => {
     if (!coolDownTimerAllowed(view)) return;
+    const techniqueId = view === 'exhale' ? 'exhale' : (selectedTechnique ?? 'unknown');
+    session.setStep('timer');
+    session.markPracticed();
+    session.setExt({ dt: { techniqueId } });
+    session.setSkillIds(view === 'exhale' ? ['sigh'] : ['cold']);
     setTimer(30);
     setTimerState('running');
   };
@@ -258,6 +271,7 @@ export function CoolDown() {
               </button>
             )}
           </div>
+          {timerState === 'complete' && <SessionClose />}
         </div>
       )}
     </div>

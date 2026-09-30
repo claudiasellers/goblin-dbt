@@ -35,6 +35,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `problemSolve/` | `getProblemSolveContent` |
 | `invalidationRecovery/` | `getInvalidationRecoveryContent`, `saveInvalidationRecoverySession`, `getInvalidationRecoveryProgress` |
 | `findTheFeeling/` | `getFindTheFeelingContent`, `saveFindTheFeelingSession`, `getFeelingCollection` |
+| `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `getSpineContent` (public); `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
 | `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
 
 `userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
@@ -160,6 +161,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/pages/tools/FindTheFeeling.tsx` | "Find the feeling" (Shape it / Tune it): page shell, save, routing, check-in handoff; rooms in `src/components/tools/findTheFeeling/{shape,tune}` (lazy, three.js / Web Audio); logic in `src/lib/findTheFeeling*.ts`; spec `docs/design/find-the-feeling.md` |
 | `scripts/practice-spine/content.py` | Editable source for `schema/practice-spine.cypher`: `FollowUpType` registry, `SessionCloseFlow` (then-vs-now copy per direction), `PracticeSkill.defaultFor` / `displayLabel`; regenerate with `build.py` |
 | `scripts/capacity/content.py` | Editable source for `schema/capacity.cypher` (probe wordings, hand-off copy, primitives, `BandRule`s) and for FTF's probe copy (FTF's `content.py` imports it); regenerate both with their `build.py` |
+| `src/contexts/ToolSessionContext.tsx`, `src/hooks/useToolSession.ts` | One `ToolSession` per tool visit (ToolPage mounts the provider); tools call `useToolSession()` (`setStep`, `markPracticed`, `markComplete`, `setExt`, `close`, `linkTo`). A new tool declares its close kind in `functions/src/spine/tools.ts` + `src/lib/spine/close.ts` (a test enforces it) |
+| `src/components/spine/SessionClose.tsx` | The one-tap close question (graph copy, skip always there) |
 | `src/lib/band.ts`, `src/lib/resumeToken.ts` | Capacity band logic (freshness, hand-off plan, reread) and device-only resume tokens |
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |

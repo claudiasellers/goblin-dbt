@@ -126,6 +126,9 @@ test("the Cypher guards encode the same rules", () => {
 // Writers that update an existing log record must use the guard (grows with each PR).
 const GUARDED_WRITERS = [
   ["functions/src/toolUsage/index.ts", "GUARDS.ToolUsage.outcome"],
+  ["functions/src/checkin/index.ts", "GUARDS.CheckIn.upsert"],
+  ["functions/src/spine/toolSession.ts", "GUARDS.ToolSession.close"],
+  ["functions/src/spine/toolSession.ts", "GUARDS.ToolUsage.outcome"],
 ];
 test("writers that update log records use the lifecycle guards", () => {
   for (const [file, guard] of GUARDED_WRITERS) assert.ok(readFileSync(file, "utf8").includes(guard), `${file} lacks ${guard}`);

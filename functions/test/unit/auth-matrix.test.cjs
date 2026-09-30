@@ -13,13 +13,14 @@ const AUTHED = [
   'getDearManSessions', 'getFeelingCollection', 'getInsightsData', 'getInvalidationRecoveryProgress',
   'getOppositeActionFollowUps', 'getOppositeActionSession', 'getOppositeActionSessions', 'getUserProfile',
   'recordToolOutcome', 'saveCheckIn', 'setCheckInNextAction',
+  'startToolSession', 'closeToolSession', 'recordToolSession',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
 ];
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools', 'getCapacityContent',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools', 'getCapacityContent', 'getSpineContent',
 ];
 
 // Background triggers (not callables): auth lifecycle events carry their own uid.
