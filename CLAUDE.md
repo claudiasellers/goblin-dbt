@@ -15,11 +15,28 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 - **Frontend** (`/src`): React 19 + TypeScript + Vite + Tailwind CSS. Uses HashRouter. State managed via Context API (`AuthContext`, `UserProfileContext`) — no Redux.
 - **Auth** Firebase Authentication (email/password)
-- **Cloud Functions** (`/functions/src/index.ts`): All backend logic in a single file (~1074 lines). Handles check-ins, user management, analysis/recommendations, and tool usage tracking. Neo4j driver uses lazy singleton pattern. User IDs extracted from Firebase Auth tokens server-side.
+- **Cloud Functions** (`/functions/src`, Node 22): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the 30 deployed callables by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
 - **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
-- **Deployment** firebase deploy
+- **Deployment** `firebase deploy` (`--only functions` / `--only hosting`; hosting's `predeploy` runs the build). There is no `npm run deploy` (the old gh-pages script is gone).
+
+Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `capacity/`, `witness/`, `spine/`, `profile/`, `userdata/`, `safety/`):
+
+| Module | Callables |
+|---|---|
+| `checkin/` | `saveCheckIn`, `getCheckInsByUser` |
+| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData`, `exportUserData` (settings-style profile; `profile/` is reserved for the three-layer "Me") |
+| `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
+| `insights/` | `getInsightsData` |
+| `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` |
+| `oppositeAction/` | `getOppositeActionContent`, `saveOppositeActionSession`, `getOppositeActionSessions`, `getOppositeActionSession`, `getOppositeActionFollowUps` |
+| `dearMan/` | `getDearManContent`, `saveDearManSession`, `getDearManDebriefContent`, `getDearManReflection`, `getDearManSessions` |
+| `problemSolve/` | `getProblemSolveContent` |
+| `invalidationRecovery/` | `getInvalidationRecoveryContent`, `saveInvalidationRecoverySession`, `getInvalidationRecoveryProgress` |
+| `findTheFeeling/` | `getFindTheFeelingContent`, `saveFindTheFeelingSession`, `getFeelingCollection` |
+
+Adding a callable: export it from its domain module, add one line to `functions/src/index.ts`, add it to `functions/test/fixtures/endpoints.json` and the auth matrix (`functions/test/unit/auth-matrix.test.cjs`). Prefer `callable({ auth, label }, handler)` from `shared/callable.ts`.
 
 
 ## Key Architecture Decisions
@@ -28,11 +45,11 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 2. **User identity is handled by Firebase Auth.** Cloud Functions extract the user ID from `request.auth.uid` — the frontend never sends user IDs as parameters.
 
-3. **The knowledge graph powers recommendations.** Check-in data → emotion nodes → brain structures (via `ACTIVATES_DURING`) → activation patterns → therapy concepts (via `MODULATES`) → tools (via `IMPLEMENTS`). This is the core traversal that makes the app work.
+3. **The knowledge graph powers recommendations.** What `getStateAndTools` (`functions/src/recommendation/index.ts`) actually runs: the quadrant picks 4 candidate patterns (high-unpleasant: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`; low-unpleasant: `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`; pleasant quadrants return a synthetic `positive_state` with no query). Each candidate is scored from `(ActivationPattern)-[:ASSOCIATED_WITH]->(Emotion)` for the check-in's emotion ids plus `(QuestionResponse)-[:EVIDENCE_FOR]->(ActivationPattern)` for discriminating answers; `CO_OCCURS_WITH` may add a secondary pattern. Tools are the top 2 `TherapyConcept`s (`id STARTS WITH 'dbt_'`) ranked by how many of the pattern's emotions they reach via `ADDRESSES|REDUCES|TARGETS`, joined to app tools via `TherapyConcept.appToolId`. A `TRIGGERS_SAFETY` crisis flag (skipped for low-unpleasant) shows the crisis banner above the result; low-unpleasant adds a guided activity. Known gap (plan F1, fixed in E4-6): the grid sends lower-cased display names (`anxious`) that no pattern edge uses (`anxiety`), so grid emotions don't move the pattern yet. E4-3 replaces the tool step with pattern × band → `RECOMMENDED_FOR`.
 
-4. **Incremental schema loading with MERGE.** All Cypher scripts use `MERGE` instead of `CREATE` so they're idempotent — safe to re-run without duplicating data. Properties are overwritten via `SET` after `MERGE`.
+4. **Idempotent schema loading with MERGE.** Every loaded Cypher file is MERGE-only (enforced by `tests/schema-idempotency.test.mjs`), so a full load is safe to re-run and two runs give identical totals. Conventions are under Neo4j Conventions below.
 
-5. **8 activation patterns** drive the recommendation engine: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `reactive_aggression`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, `social_threat_shame`. Each maps to specific brain structures (overactive/suppressed) and specific tool recommendations.
+5. **Activation patterns** drive the recommendation engine. The graph has 10 `ActivationPattern` nodes: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, plus Phase-2 `grief_yearning` and `reactive_aggression`. The engine's quadrant map considers the first 8, so `grief_yearning` and `reactive_aggression` are never selected. `positive_state` is not a graph pattern: it is the synthetic pleasant-quadrant result (and `saveCheckIn` MERGEs a stub node for it). Each pattern maps to brain structures (overactive/suppressed) and tool recommendations.
 
 ---
 
@@ -95,7 +112,7 @@ Interactive tool components live in `src/pages/tools/` and are registered in the
 
 ## Data: Emotions
 
-Emotion nodes in the graph have a `dbtParent` property that maps child emotions to their DBT parent category (e.g., `anxiety` → `fear`, `irritation` → `anger`). The 9 DBT parent emotions are: **fear, anger, disgust, envy, jealousy, love, sadness, shame, guilt**.
+Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `irritation` → `anger`) through `(Emotion)-[:HAS_REGULATION_CONTENT]->(EmotionRegulationContent {dbtParent})`. No schema file sets an `Emotion.dbtParent` property, so don't read one (plan F12). The 9 DBT parent emotions are: **fear, anger, disgust, envy, jealousy, love, sadness, shame, guilt**; `shame`, `envy` and `jealousy` aren't `Emotion` nodes in the base schema (`shame` is `hot_shame`/`cold_shame`).
 
 `EmotionRegulationContent` nodes (one per DBT parent) are linked via `HAS_REGULATION_CONTENT`. They hold `label` and `fitsTheFactsWhen` (array of first-person "when this emotion fits the facts" statements). The Opposite Action tool uses a single source of truth: **ActionUrge** nodes (linked via `HAS_ACTION_URGE`) supply urge labels and graduated opposite steps (small/medium/bigger); protocol metadata on `EmotionRegulationContent` (from `schema/opposite-action-data.cypher`) supplies `fitsFactsGuidance`, `whyItWorks`, `acknowledgment`, `bodyOpposite`, and default opposite steps. All content is written in conversational first-person voice so the user immediately recognizes their experience.
 
@@ -109,8 +126,9 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 
 | File | Purpose |
 |------|---------|
-| `src/pages/CheckIn.tsx` | Multi-step check-in flow (quadrant → emotion → intensity → body) |
-| `src/components/StateResult.tsx` | Shows activation pattern + recommended tools after check-in |
+| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → body → sensation → suggestion → analyzing → result |
+| `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant) |
+| `src/components/safety/CrisisBanner.tsx` | Crisis resources as a non-blocking banner above the normal result (never a replacement screen) |
 | `src/pages/tools/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
 | `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
@@ -127,11 +145,27 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 | `src/services/firebase.ts` | Firebase init, auth functions |
 | `src/contexts/AuthContext.tsx` | Firebase auth state provider |
 | `src/contexts/UserProfileContext.tsx` | User profile with caching |
-| `functions/src/index.ts` | All Cloud Functions (graph queries, check-in CRUD) |
-| `schema/knowledge-graph.cypher` | Full graph schema (nodes) |
-| `schema/relationships.cypher` | All graph relationships |
+| `functions/src/index.ts` | The deploy surface: named re-exports of every callable (module table above) |
+| `functions/src/shared/` | Driver + sessions (`neo4j.ts`), `auth.ts`, `validate.ts`, `errors.ts`, `callable.ts` |
+| `functions/test/` | Unit tests (fake driver), pinned `fixtures/endpoints.json`, emulator golden suite, local Neo4j compose file |
+| `schema/constraints.cypher` | Every constraint and index; loaded first |
+| `schema/knowledge-graph.cypher` | Base graph nodes (MERGE by id; no relationships) |
+| `schema/relationships.cypher` | Base graph relationships |
+| `schema/maintenance/` | Dedupe dry run + relationship-only apply (run by hand, never loaded) |
+| `scripts/load-graph.mjs` | Loads `schema/` in `LOAD_ORDER`; `--verify`, `--only`, `--file`, `--dry-run` |
+| `scripts/verify-live-routing.mjs` | Read-only live-graph routing check; `--compare tests/fixtures/live-routing-2026-09-30.json` |
 | `schema/emotion-regulation-content.cypher` | EmotionRegulationContent base (label, fitsTheFactsWhen) |
 | `schema/opposite-action-data.cypher` | Protocol metadata + ActionUrge nodes (OA tool source of truth) |
+
+---
+
+## Testing
+
+- `npm test`: Tier 1, no network: `node --test tests/*.test.mjs` (pure logic, schema and content checks; two freshness tests shell out to `python3`) then `npm --prefix functions test` (builds, then the fake-driver unit tests in `functions/test/unit/`: pinned exports + deploy manifest, auth matrix, handler pins, shared helpers). `node --test tests/` does NOT work on Node 22; use the glob.
+- `npm run test:emulator`: Tier 2 goldens against the Auth + Functions emulators and a local Neo4j. Needs Docker: `npm run graph:test:up`, `npm run graph:test:load`, `cp functions/.secret.local.example functions/.secret.local`. Record with `UPDATE_GOLDEN=1`.
+- Lint: `npx eslint .` still reports 7 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
+- Cypher syntax: `npx -y -p @neo4j-cypher/language-support@2.0.0-next.6 node scripts/lint-cypher.mjs`.
+- CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 22, no secrets).
 
 ---
 
@@ -148,10 +182,13 @@ give Claudia the entry text to paste.
 
 ## Neo4j Conventions
 
-- All Cypher files use `MERGE` for idempotency — safe to re-run
-- Properties overwritten via `SET` after `MERGE`
+- Every loaded Cypher file is MERGE-only, safe to re-run (tests enforce it; no `CREATE (`)
+- Nodes: `MERGE (x:Label {id: "…"}) SET x += {…};` Always `+=`, never `=`: later files add properties (`TherapyConcept.appToolId`, `ActivationPattern.formulation_*`, …) that `=` would wipe. Merge on exactly one key, `id` (or `key` for user data); the one natural-key exception is `EmotionRegulationContent {dbtParent}`
+- Relationships: `MATCH (a:A {id: "…"}), (b:B {id: "…"}) MERGE (a)-[r:TYPE]->(b) SET r += {…};` The merge key is `(a, TYPE, b)`; only `FELT_AS` also merges on `{region}` (a real multi-edge). No other property ever goes inside a MERGE pattern
+- Every label MERGEd by `id`/`key` has a uniqueness constraint in `schema/constraints.cypher` (loaded first; the loader stops with exit 3 if one can't be created). New files add their constraints there and their name to `LOAD_ORDER`
+- Load with `node scripts/load-graph.mjs [--verify]` (full load; `--verify` fails on duplicates). Never `--only knowledge-graph` (it refuses without `--force`): later files override its properties. One-off migrations go in `schema/migrations/` and run with `--file`
 - Node labels are PascalCase (`BrainStructure`, `ActivationPattern`)
 - Relationship types are SCREAMING_SNAKE (`ACTIVATES_DURING`, `MODULATES`, `FELT_AS`)
-- Every node has an `id` property (snake_case) used for `MATCH`
+- Every content node has an `id` property (snake_case) used for `MATCH` (`EmotionRegulationContent` is matched by `dbtParent`; session records by `key`)
 - Evidence grades: `"Strong"`, `"Moderate"`, `"Preliminary"`
 - Schema files are chunked and self-contained (no assumed variable persistence across executions — Aura requirement)
