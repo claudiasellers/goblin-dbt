@@ -43,3 +43,6 @@ scripts/.verify-live-routing-*.json
 
 # Local graph backups (graph-export.mjs; contain user data, never commit)
 backups/
+
+# Phase A rehearsal (scripts/rehearsal/): worktrees, log, report
+.rehearsal/
