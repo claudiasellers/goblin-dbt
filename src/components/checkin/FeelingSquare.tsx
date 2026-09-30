@@ -5,9 +5,10 @@ const round3 = (n: number) => Math.round(n * 1000) / 1000;
 
 interface FeelingSquareProps {
   point: SquarePoint | null;
-  /** Called while the finger or cursor moves (and on arrow keys). */
+  /** Called when the point is placed or moved: press, drag, lift, and arrow keys. */
   onMove?: (p: SquarePoint) => void;
-  /** Called when the touch lifts, or on Enter / Space. */
+  /** Enter / Space on the focused square. Lifting a finger does not commit, so the point can be
+   *  nudged as many times as needed before the screen's own "That's about right" button. */
   onCommit?: (p: SquarePoint) => void;
   /** Small, label-free version used as a reminder on later screens. */
   small?: boolean;
@@ -19,14 +20,14 @@ interface FeelingSquareProps {
  * right, energy bottom to top, and the colours are the room's own quadrant fills blended across
  * the whole surface, so there are no borders to be on the wrong side of.
  *
- * Pointer: press, drag to adjust, lift to commit. Keyboard: arrows move (Shift for bigger steps),
- * Enter or Space commits. The per-room look (halo, centre shade, Tinted's glaze, dot) comes from
+ * Pointer: press or drag to place the dot; lifting leaves it there, and a new press moves it.
+ * Keyboard: arrows move (Shift for bigger steps), Enter or Space commits. The per-room look (halo, centre shade, Tinted's glaze, dot) comes from
  * the --square-* tokens in src/index.css.
  */
 export function FeelingSquare({ point, onMove, onCommit, small = false, className = '' }: FeelingSquareProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
-  const interactive = Boolean(onCommit);
+  const interactive = Boolean(onMove);
 
   function pointFromEvent(e: PointerEvent<HTMLDivElement>): SquarePoint {
     const r = ref.current!.getBoundingClientRect();
@@ -48,9 +49,7 @@ export function FeelingSquare({ point, onMove, onCommit, small = false, classNam
   function handleUp(e: PointerEvent<HTMLDivElement>) {
     if (!dragging) return;
     setDragging(false);
-    const p = pointFromEvent(e);
-    onMove?.(p);
-    onCommit?.(p);
+    onMove?.(pointFromEvent(e));
   }
 
   function handleKey(e: KeyboardEvent<HTMLDivElement>) {

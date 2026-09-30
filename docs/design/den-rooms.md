@@ -76,10 +76,13 @@ continuous square. Pleasantness runs left to right and energy bottom to top.
 The colour is the room's four quadrant fills blended across the whole
 surface, so there are no box borders to land on the wrong side of.
 
-- **Touch, drag, lift.** Lifting commits the point. It sets
-  `intensity {x, y}`, the dot settles for about 380 ms, and the words screen
-  opens. Keyboard: the arrow keys move the point (hold Shift for bigger
-  steps), and Enter or Space commits. `src/components/checkin/FeelingSquare.tsx`.
+- **Place, adjust, then confirm.** Touching places the dot and lifting
+  leaves it there; touch or drag again to move it as often as you like. The
+  caption reads the place back in plain words as it moves, and "That's about
+  right" (its space reserved, so nothing jumps) sets `intensity {x, y}` and
+  opens the words. Keyboard: the arrow keys move the point (hold Shift for
+  bigger steps), and Enter or Space confirms.
+  `src/components/checkin/FeelingSquare.tsx`.
 - **The room takes the colour of the touch.** A wash from the top of the
   page, `.feeling-tint`, is mixed in CSS from the room's fills (`squareColor`
   in `src/lib/feelingSquare.ts`). It stays on for the rest of the check-in.
