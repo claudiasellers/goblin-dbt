@@ -8,6 +8,8 @@ import { RecommendationCards } from './RecommendationCards';
 import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
 import type { Band } from '../../data/capacityTypes';
 import { WitnessBeat } from '../witness/WitnessBeat';
+import { getEmotionByName } from '../../data/emotions';
+import { QUADRANT_ABBR } from '../../lib/feelingSquare';
 import { beatBand, beatVariant, showsWitnessBeat, type WitnessHandlers } from '../../lib/witness';
 
 interface StateResultProps {
@@ -165,18 +167,18 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
   // ===========================================
   if (pattern.id === 'positive_state') {
     return (
-      <div className="text-center py-6">
+      <div className="max-w-md mx-auto text-center py-2">
         {has('crisis_banner') && <CrisisBanner />}
-        <span className="text-5xl mb-4 block">✨</span>
-        <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-3">
+        <CheckInWords words={checkinEmotions} />
+        <h2 className="mt-5 mb-0 text-[2rem] leading-[1.08] text-[var(--color-text-primary)] [text-wrap:balance]">
           {pattern.userFacingLabel}
         </h2>
-        <p className="text-[var(--color-text-secondary)] mb-8">
+        <p className="mt-3 text-[16.5px] leading-relaxed text-[var(--color-text-secondary)]">
           No action needed right now. Enjoy this moment.
         </p>
         <button
           onClick={() => onDone({ kind: 'done' })}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
+          className="mt-8 w-full min-h-[56px] px-4 rounded-[18px] bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-[17px] font-bold lift-primary"
         >
           Done
         </button>
@@ -189,24 +191,17 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
   // [crisis banner] -> state label -> tools -> actions -> bailout escape hatch
   // ===========================================
   return (
-    <div className="py-4">
+    <div className="max-w-md mx-auto py-2">
       {/* Crisis resources: a banner above the result, never instead of it */}
       {has('crisis_banner') && <CrisisBanner />}
 
-      {/* The State Summary - one cohesive sentence */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-bg-elevated)] mb-4">
-          <span className="text-2xl">{getPatternEmoji(pattern.id)}</span>
-        </div>
-        
-        <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-3 leading-relaxed">
+      {/* The State Summary - one cohesive sentence. The witness beat below echoes the words. */}
+      <div className="text-center mb-6">
+        <h2 className="m-0 text-[2rem] leading-[1.08] text-[var(--color-text-primary)] [text-wrap:balance]">
           {pattern.userFacingLabel}
         </h2>
-        
         {pattern.confidence < 0.6 && (
-          <p className="text-sm text-[var(--color-text-tertiary)] mb-2">
-            Based on what you've shared
-          </p>
+          <p className="mt-3 text-[15px] text-[var(--color-text-tertiary)]">Based on what you’ve shared</p>
         )}
       </div>
 
@@ -229,8 +224,8 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
       {/* The tools: one recommendation and one swap (E4-4), below the banner and the beat */}
       {has('tools') && (
         <div className="mb-8">
-          <p className="text-sm text-[var(--color-text-secondary)] text-center mb-4">
-            Here's what might help right now
+          <p className="m-0 mb-3 font-serif italic text-[17px] text-[var(--color-text-secondary)]">
+            Here’s what might help right now
           </p>
           <RecommendationCards cards={cards} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
             checkInId={checkInId} onOpen={(toolId) => onToolOpen?.(toolId)} />
@@ -238,19 +233,15 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
       )}
 
       {/* Primary actions */}
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <button
           onClick={() => onDone({ kind: 'done' })}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
+          className="w-full min-h-[56px] px-4 rounded-[18px] bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-[17px] font-bold lift-primary"
         >
           Done
         </button>
-        
         {has('add_detail') && onAddMoreDetail && (
-          <button
-            onClick={onAddMoreDetail}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-sm"
-          >
+          <button onClick={onAddMoreDetail} className="den-chip w-full">
             Add more detail to refine this
           </button>
         )}
@@ -264,10 +255,10 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
           "hard" implies failure, "too much" normalizes that their 
           nervous system is overwhelmed, which is the actual truth. */}
       {has('bailout') && (
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
           <button
             onClick={handleBailout}
-            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+            className="min-h-11 px-2 text-[15px] text-[var(--color-text-secondary)] underline underline-offset-4 bg-transparent border-none cursor-pointer hover:text-[var(--color-text-primary)] transition-colors"
           >
             That feels like too much right now
           </button>
@@ -277,19 +268,26 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
   );
 }
 
-function getPatternEmoji(patternId: string): string {
-  const map: Record<string, string> = {
-    acute_alarm: '\u26A1',
-    chronic_vigilance: '\uD83D\uDD0D',
-    emotional_flooding: '\uD83C\uDF0A',
-    conservation_freeze: '\uD83E\uDDCA',
-    dissociation_overmodulation: '\uD83C\uDF2B\uFE0F',
-    rumination_loop: '\uD83D\uDD04',
-    reward_drive_low: '\uD83E\uDEAB',
-    social_threat_shame: '\uD83E\uDEE3',
-    grief_yearning: '\uD83D\uDC94',
-    reactive_aggression: '\uD83D\uDD25',
-    positive_state: '\u2728',
-  };
-  return map[patternId] || '\uD83E\uDDE0';
+/** The words picked in the check-in, each in its own quadrant colour (positive result; elsewhere the witness beat echoes them). */
+function CheckInWords({ words }: { words?: string[] }) {
+  if (!words?.length) return null;
+  return (
+    <div className="flex flex-wrap justify-center gap-2" aria-label="Your words">
+      {words.map((w) => {
+        const q = getEmotionByName(w)?.quadrant;
+        const abbr = q ? QUADRANT_ABBR[q] : null;
+        return (
+          <span
+            key={w}
+            className="inline-flex items-center min-h-[34px] px-3.5 rounded-full font-serif italic text-[17px]"
+            style={abbr
+              ? { background: `var(--color-q-${abbr}-fill)`, color: 'var(--color-on-quadrant)' }
+              : { background: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)' }}
+          >
+            {w.toLowerCase()}
+          </span>
+        );
+      })}
+    </div>
+  );
 }

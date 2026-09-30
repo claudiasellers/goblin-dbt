@@ -1,6 +1,11 @@
 import { Link } from 'react-router-dom';
 import { fromCheckIn } from '../../lib/spine/toolLink';
 import type { RecommendationCard } from '../../lib/recommendation';
+import { familyForTool } from '../../data/skillFamilies';
+
+const Chevron = ({ className }: { className: string }) => (
+  <svg className={className} width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
+);
 
 interface RecommendationCardsProps {
   /** From `recommendationCards(result)`: known tools only, ≤ 2, labels already decided. */
@@ -17,7 +22,9 @@ interface RecommendationCardsProps {
 /**
  * The check-in result's cards (plan E4-4): one recommendation and at most one swap. Name, emoji and
  * tagline come from src/data/tools.ts (join pattern); nothing from the graph is shown, including
- * relevance words. Side labels (WMP-04 v0) head a card when the engine returned them.
+ * relevance words. Side labels (WMP-04 v0) head a card when the engine returned them. Standard cards
+ * are tinted by skill family (src/data/skillFamilies.ts: teal get through it, lavender shift it, rose
+ * with other people).
  */
 export function RecommendationCards({ cards, variant = 'standard', checkInId, checkinEmotions, activationPatternId, onOpen }: RecommendationCardsProps) {
   if (cards.length === 0) return null;
@@ -27,10 +34,11 @@ export function RecommendationCards({ cards, variant = 'standard', checkInId, ch
       {cards.map((card, index) => {
         const isPrimary = index === 0;
         const { tool } = card;
+        const family = compact ? null : familyForTool(tool.id);
         return (
           <div key={tool.id}>
             {card.label && (
-              <p className={`${compact ? 'text-xs' : 'text-sm'} text-[var(--color-text-tertiary)] ${index > 0 ? 'mt-3' : ''} mb-1.5`}>
+              <p className={`${compact ? 'text-xs' : 'text-[13px] font-bold'} text-[var(--color-text-tertiary)] ${index > 0 ? 'mt-3' : ''} mb-1.5`}>
                 {card.label}
               </p>
             )}
@@ -40,26 +48,28 @@ export function RecommendationCards({ cards, variant = 'standard', checkInId, ch
               onClick={() => onOpen?.(tool.id, card.slot)}
               className={compact
                 ? 'block p-3 rounded-lg bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] transition-all'
-                : `block p-4 rounded-xl transition-all ${isPrimary
-                  ? 'bg-[var(--color-bg-elevated)] border-2 border-[var(--color-border)] hover:border-[var(--color-border-accent)]'
-                  : 'bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)]'}`}
+                : 'tool-card'}
+              data-family={family?.key ?? undefined}
             >
-              <div className={`flex ${compact ? 'items-center' : 'items-start'} gap-3`}>
-                <span className={`${compact ? 'text-lg' : 'text-xl mt-0.5'} flex-shrink-0`} aria-hidden="true">{tool.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <h3 className={compact
-                    ? 'text-sm font-medium text-[var(--color-text-primary)]'
-                    : `font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-base' : 'text-sm'}`}>
-                    {tool.name}
-                  </h3>
-                  <p className={compact
-                    ? 'text-xs text-[var(--color-text-tertiary)] line-clamp-1'
-                    : 'text-sm text-[var(--color-text-secondary)] mt-0.5 line-clamp-2'}>
-                    {tool.tagline}
-                  </p>
+              {compact ? (
+                <div className="flex items-center gap-3">
+                  <span className="text-lg flex-shrink-0" aria-hidden="true">{tool.emoji}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{tool.name}</h3>
+                    <p className="text-xs text-[var(--color-text-tertiary)] line-clamp-1">{tool.tagline}</p>
+                  </div>
+                  <Chevron className="text-[var(--color-text-muted)] flex-shrink-0" />
                 </div>
-                <span className={`text-[var(--color-text-muted)] flex-shrink-0 ${compact ? '' : 'mt-1'}`} aria-hidden="true">{'→'}</span>
-              </div>
+              ) : (
+                <>
+                  <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+                    {family && <span className="tool-card__family">{family.label}</span>}
+                    <span className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-lg' : 'text-base'}`}>{tool.name}</span>
+                    <span className="text-[15px] leading-snug text-[var(--color-text-secondary)] line-clamp-2">{tool.tagline}</span>
+                  </span>
+                  <Chevron className="tool-card__chevron" />
+                </>
+              )}
             </Link>
           </div>
         );
