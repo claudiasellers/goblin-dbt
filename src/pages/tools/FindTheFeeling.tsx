@@ -31,6 +31,8 @@ type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
 /** Check-in handoff. intensityY is the band's graph-defined intensity (no scale is ever shown). */
 export interface FindTheFeelingResult {
   emotionId: string | null; band: Band; intensityY: number;
+  /** The pull was `blank` (E4-4): the check-in's routing never offers a calming tool then. */
+  blank?: boolean;
   /** The embedded ToolSession (PR-S4); the check-in links it with EMBEDDED. */
   toolSessionId?: string | null;
 }
@@ -117,7 +119,7 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
     savedFor.current = sessionId.current;
     const embedId = state.step === 'handoff' && user ? newId() : null;
     doSave(embedId);
-    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band!, intensityY: content.flow.bandIntensity[state.band!], toolSessionId: embedId });
+    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band!, intensityY: content.flow.bandIntensity[state.band!], blank: state.pull === 'blank', toolSessionId: embedId });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 

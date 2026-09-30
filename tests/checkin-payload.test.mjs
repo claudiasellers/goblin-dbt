@@ -99,9 +99,10 @@ test("server validator: an implausible client timestamp falls back to the server
 });
 
 test("both result screens render the arrow as a character, not the literal \\\\u2192 (F13)", () => {
-  for (const f of ["src/components/checkin/StateResult.tsx", "src/components/checkin/LowEnergyStateResult.tsx"]) {
+  // E4-4: both screens render their cards through RecommendationCards, which builds the link state.
+  for (const f of ["src/components/checkin/StateResult.tsx", "src/components/checkin/LowEnergyStateResult.tsx", "src/components/checkin/RecommendationCards.tsx"]) {
     const src = readFileSync(f, "utf8");
     assert.doesNotMatch(src, />\\u2192</, f);
-    assert.match(src, /fromCheckIn\(checkInId/, f);
   }
+  assert.match(readFileSync("src/components/checkin/RecommendationCards.tsx", "utf8"), /fromCheckIn\(checkInId/);
 });

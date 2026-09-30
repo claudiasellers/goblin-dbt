@@ -39,6 +39,11 @@ import { profileCache } from '../lib/profileCache';
 
 type EntryPoint = 'standard' | 'somatic';
 
+/** The routing band's source (E4-3 accepts probe · ftf · carried; hand-offs etc. count as carried). */
+function routingBandSource(r: CapacityReading): 'probe' | 'ftf' | 'carried' {
+  return r.source === 'probe' || r.source === 'ftf' ? r.source : 'carried';
+}
+
 type CheckInStep =
   | 'emotion'
   | 'help_now'
@@ -108,6 +113,8 @@ export function CheckIn() {
   const afterCapacity = useRef<{ then: 'body' | 'analyze'; overrides?: { quadrant?: string; emotions?: string[] } }>({ then: 'body' });
   useEffect(() => { if (user) band.load(); }, [user, band]);
   const [knownEmotionIds, setKnownEmotionIds] = useState<string[]>([]);
+  /** Find the feeling's pull was `blank` (E4-4): the engine never offers a calming tool then. */
+  const ftfBlank = useRef(false);
   const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
   /** The render save in flight: resolves true when saved. Next actions chain after it. */
   const savePromise = useRef<Promise<boolean> | null>(null);
@@ -251,7 +258,9 @@ export function CheckIn() {
           ? checkInData.bodySensations.map(s => ({ region: s.region, tags: s.tags }))
           : undefined,
         discriminatingAnswers: discAnsw.length > 0 ? discAnsw : undefined,
-        ...(cap ? { band: cap.value, bandViaCantTell: cap.viaCantTell } : {}),
+        ...(cap ? { band: cap.value, bandViaCantTell: cap.viaCantTell, bandSource: routingBandSource(cap) } : {}),
+        ...(ftfBlank.current ? { blank: true } : {}),
+        surface: 'checkin',
       });
       
       setStateResult(result);
@@ -300,6 +309,7 @@ export function CheckIn() {
   function handleFound(r: FindTheFeelingResult) {
     // FTF's band is this check-in's capacity answer (kept, not just turned into intensity).
     setSource('ftf');
+    ftfBlank.current = r.blank === true;
     // FTF recorded its answer in the band store (context 'checkin'); use that reading so its id
     // matches, else build the same reading here.
     const current = band.current();
@@ -514,6 +524,7 @@ export function CheckIn() {
     afterCapacity.current = { then: 'body' };
     setKnownEmotionIds([]);
     setEmbeddedIds([]);
+    ftfBlank.current = false;
     setCheckInData({
       quadrant: null,
       emotions: [],
@@ -634,7 +645,7 @@ export function CheckIn() {
       <div key={step} className="step-enter">
         {step === 'emotion' && (
           <QuadrantGrid
-            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); void handleEmotionSelect(emotions); }}
+            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); ftfBlank.current = false; void handleEmotionSelect(emotions); }}
             onHelpMeNow={handleHelpMeNow}
             onSomaticEntry={handleSomaticEntry}
             onCantTell={() => { setStartedAt(new Date()); setStep('find'); }}

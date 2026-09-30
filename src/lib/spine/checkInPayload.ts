@@ -6,6 +6,7 @@
 import { getEmotionByName } from '../../data/emotions';
 import type { CapacityReading } from '../../data/capacityTypes';
 import { isCrisisFlag } from '../crisisBanner';
+import { shownToolIds } from '../recommendation';
 
 export type CheckInSource = 'grid' | 'ftf' | 'body' | 'dear_man_debrief';
 
@@ -30,6 +31,10 @@ export interface SaveCheckInRequest {
   capacity?: CapacityReading;
   discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
   recommendedToolIds?: string[];
+  /** E4-4: how the result was routed ('rf-v1' | 'legacy') and on which band (R1: kept apart from `band*`). */
+  routingVersion?: string;
+  routingBand?: 'steady' | 'stirred' | 'flooded';
+  routingBandSource?: 'probe' | 'ftf' | 'carried' | 'inferred';
   secondaryPatternId?: string;
   coOccurrenceLabel?: string;
   guidedActivityId?: string;
@@ -47,6 +52,7 @@ export interface ResultLike {
   secondaryPattern?: { id: string } | null;
   coOccurrence?: { clinicalLabel?: string } | null;
   guidedActivity?: { activityId: string } | null;
+  routing?: { version: string; band: 'steady' | 'stirred' | 'flooded'; bandSource: 'probe' | 'ftf' | 'carried' | 'inferred' } | null;
 }
 
 export interface CheckInState {
@@ -75,8 +81,6 @@ export function emotionIdsFor(emotions: string[], known: string[] = []): string[
   return [...out];
 }
 
-/** How many tools the result renders (both result screens show at most two). */
-export const RENDERED_TOOLS = 2;
 
 /**
  * The save for a check-in whose result rendered (`result` set) or whose analysis failed (null).
@@ -101,7 +105,13 @@ export function buildCheckInPayload(s: CheckInState, result: ResultLike | null, 
     req.resultShown = true;
     req.activationPatternId = result.pattern.id;
     if (result.pattern.confidence != null) req.confidence = result.pattern.confidence;
-    req.recommendedToolIds = result.tools.slice(0, RENDERED_TOOLS).map((t) => t.id);
+    // What rendered (E4-4): known tools only, ≤ 2, crisis-banner results included.
+    req.recommendedToolIds = shownToolIds(result);
+    if (result.routing) {
+      req.routingVersion = result.routing.version;
+      req.routingBand = result.routing.band;
+      req.routingBandSource = result.routing.bandSource;
+    }
     if (result.secondaryPattern?.id) req.secondaryPatternId = result.secondaryPattern.id;
     if (result.coOccurrence?.clinicalLabel) req.coOccurrenceLabel = result.coOccurrence.clinicalLabel;
     if (result.guidedActivity?.activityId) req.guidedActivityId = result.guidedActivity.activityId;

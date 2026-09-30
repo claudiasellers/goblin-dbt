@@ -2,13 +2,13 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
 import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
+import { recommendationCards } from '../../lib/recommendation';
 import { newId } from '../../lib/spine/ids';
 import { useToolSession } from '../../hooks/useToolSession';
 import { dearManRepSource } from '../../lib/spine/wrap';
 import type { DearManContentResult, DearManDebriefContentResult, DearManReflectionResult } from '../../data/dearManTypes';
 import type { StateResult as StateResultType } from '../../services/neo4j';
 import { getEmotionByName } from '../../data/emotions';
-import { getToolById } from '../../data/tools';
 import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { ToolLoading } from '../../components/tools/ToolLoading';
 import { LazyMotion, domAnimation } from 'motion/react';
@@ -306,7 +306,7 @@ export function DearMan() {
       .filter((l): l is string => Boolean(l));
 
     // Get recommendations
-    getStateAndTools({ quadrant, emotions: emotionIds })
+    getStateAndTools({ quadrant, emotions: emotionIds, surface: 'dear_man_debrief' })
       .then(result => {
         setStateResult(result);
         // Save the debrief's check-in (PR-C1): its own id, source dear_man_debrief, emotion ids,
@@ -2114,7 +2114,8 @@ export function DearMan() {
 
     // ─── DEBRIEF: ROUTE ───
     if (phase === 'debrief-route') {
-      const topTools = stateResult?.tools?.slice(0, 2) || [];
+      // E4-4: the same cards as the check-in result (known tools only, names from tools.ts).
+      const topTools = recommendationCards(stateResult).map((c) => c.tool);
       return (
         <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)] space-y-4">
           <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">That took courage.</h3>
@@ -2123,23 +2124,20 @@ export function DearMan() {
           {topTools.length > 0 && (
             <div className="pt-2 space-y-2">
               <p className="text-sm text-[var(--color-text-secondary)]">Based on how you're feeling, this might help:</p>
-              {topTools.map(tool => {
-                const meta = getToolById(tool.id);
-                return (
-                  <button
-                    key={tool.id}
-                    onClick={() => navigate(`/tool/${tool.id}`)}
-                    className="w-full text-left p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] hover:border-[var(--color-accent)] transition-colors"
-                  >
-                    <span className="font-medium text-[var(--color-text-primary)]">
-                      {meta?.emoji ? `${meta.emoji} ` : ''}{meta?.name || tool.name}
-                    </span>
-                    <span className="block text-sm text-[var(--color-text-secondary)] mt-0.5">
-                      {meta?.tagline || tool.description}
-                    </span>
-                  </button>
-                );
-              })}
+              {topTools.map(tool => (
+                <button
+                  key={tool.id}
+                  onClick={() => navigate(`/tool/${tool.id}`)}
+                  className="w-full text-left p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] hover:border-[var(--color-accent)] transition-colors"
+                >
+                  <span className="font-medium text-[var(--color-text-primary)]">
+                    {tool.emoji} {tool.name}
+                  </span>
+                  <span className="block text-sm text-[var(--color-text-secondary)] mt-0.5">
+                    {tool.tagline}
+                  </span>
+                </button>
+              ))}
             </div>
           )}
 

@@ -13,18 +13,28 @@ export interface SpineLinkState {
   followUpId?: string;
 }
 
+/** Which result card was tapped (E4-4). Carried for WMP-04 v1 (`ToolSession.routing`); read by nothing yet. */
+export interface RoutingLinkState {
+  slot: 'primary' | 'swap';
+  ruleId?: string;
+}
+
 export interface ToolLinkState {
   checkinEmotions?: string[];
   activationPatternId?: string;
   spine?: SpineLinkState;
+  routing?: RoutingLinkState;
 }
 
 /** A tool opened from a check-in result. */
-export function fromCheckIn(checkInId: string | null | undefined, checkinEmotions?: string[], activationPatternId?: string): ToolLinkState {
+export function fromCheckIn(
+  checkInId: string | null | undefined, checkinEmotions?: string[], activationPatternId?: string, routing?: RoutingLinkState,
+): ToolLinkState {
   return {
     ...(checkinEmotions?.length ? { checkinEmotions } : {}),
     ...(activationPatternId ? { activationPatternId } : {}),
     spine: { entry: 'checkin_result', ...(checkInId ? { checkInId } : {}) },
+    ...(routing ? { routing: { slot: routing.slot, ...(routing.ruleId ? { ruleId: routing.ruleId } : {}) } } : {}),
   };
 }
 
