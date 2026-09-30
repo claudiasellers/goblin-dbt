@@ -39,7 +39,7 @@ test("every one of the 85 unpleasant grid words has 1–2 aliases into the live 
     for (const t of targets) {
       assert.ok(vocabulary.has(t), `${g.sent} → ${t} is not pattern vocabulary`);
       assert.ok(graph.emotions[t], `${t} is an Emotion node`);
-      assert.match(cypher, new RegExp(`\\{id: "${g.sent}>${t}", w: "${g.sent}", e: "${t}", review: "draft", why: "[^"]+"\\}`));
+      assert.match(cypher, new RegExp(`\\{id: "${g.sent}>${t}", w: "${g.sent}", e: "${t}", review: "(?:draft|approved)", why: "[^"]+"\\}`));
     }
   }
   const pleasant = grid.filter((g) => !CANDIDATES[g.quadrant]);

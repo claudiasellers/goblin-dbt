@@ -6,7 +6,11 @@ import { importTs } from "./importTs.mjs";
 
 const safety = await importTs("functions/src/safety/checkinSafetyFlag.ts");
 
-export const graph = JSON.parse(readFileSync("tests/fixtures/recommendation-graph.json", "utf8"));
+/** The fixture exactly as generated (reflects content.py, incl. whether the policy is enabled). */
+export const rawGraph = JSON.parse(readFileSync("tests/fixtures/recommendation-graph.json", "utf8"));
+/** The policy-OFF baseline the routing tests pin (legacy ranker); `withPolicyOn(graph)` is the flip. Independent of
+ *  whether Claudia has enabled the policy in content.py, so signing off and enabling never breaks the pins. */
+export const graph = { ...rawGraph, routingPolicy: { ...rawGraph.routingPolicy, enabled: false } };
 
 /** Words a sent id scores as: itself plus its SCORES_AS aliases (E4-6), when the graph has any. */
 export function scoringTargets(g, sent) {

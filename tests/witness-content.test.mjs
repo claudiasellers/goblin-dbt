@@ -126,12 +126,12 @@ test("host drafts (OA, Problem Solve, DEAR MAN debrief) are drafts, one per fami
     const d = draftsFor(moment);
     assert.equal(d.length, 9, moment);
     assert.deepEqual(d.flatMap((r) => targetsOf("VALIDATES_FAMILY", r.id)).sort(), ["anger", "disgust", "envy", "fear", "guilt", "jealousy", "love", "sadness", "shame"]);
-    for (const r of d) assert.equal(r.status, "draft", r.id);
+    for (const r of d) assert.ok(r.status === "draft" || (r.status === "live" && r.reviewStatus === "reviewed"), r.id);
   }
   assert.ok(draftsFor("oa_start").every((r) => r.kind === "function"));
   const dm = draftsFor("debrief_turning_point");
   assert.equal(dm.length, 8);
-  assert.ok(dm.every((r) => r.status === "draft" && targetsOf("FOR_SITUATION", r.id).length === 1));
+  assert.ok(dm.every((r) => (r.status === "draft" || (r.status === "live" && r.reviewStatus === "reviewed")) && targetsOf("FOR_SITUATION", r.id).length === 1));
 });
 
 test("lines dropped from the source are retired, never deleted", () => {
@@ -143,8 +143,7 @@ test("check-in corpus (A5-4): ~84 drafts, every family at levels 4 and 5, floode
   const ci = rows.filter((r) => targetsOf("FOR_MOMENT", r.id).includes("checkin_result"));
   assert.equal(ci.length, 84);
   for (const r of ci) {
-    assert.equal(r.status, "draft", `${r.id}: not live until Claudia signs it off`);
-    assert.equal(r.reviewStatus, "draft", r.id);
+    assert.ok(r.status === "draft" ? r.reviewStatus === "draft" : r.status === "live" && r.reviewStatus === "reviewed", `${r.id}: drafts stay drafts until signed off (SIGNED_OFF), then live + reviewed`);
     assert.doesNotMatch(r.text, /\{/, `${r.id}: no slots on the check-in (the echo carries the word)`);
   }
   for (const fam of ["fear", "anger", "disgust", "envy", "jealousy", "love", "sadness", "shame", "guilt"]) {
@@ -170,10 +169,10 @@ test("check-in corpus (A5-4): ~84 drafts, every family at levels 4 and 5, floode
   assert.equal(new Set(texts).size, texts.length);
 });
 
-test("sign-off map: a line id in SIGNED_OFF goes live with its review date; empty until Claudia reviews", (t) => {
+test("sign-off map: a line id in SIGNED_OFF goes live with its review date (works whatever is already signed off)", (t) => {
   const src = readFileSync("scripts/witness/content.py", "utf8");
-  assert.match(src, /^SIGNED_OFF = \{\}$/m, "no check-in line is signed off by the builder");
-  const probe = src.replace(/^SIGNED_OFF = \{\}$/m, 'SIGNED_OFF = {"ci_fear_l5_1": "2026-10-05"}')
+  assert.match(src, /^SIGNED_OFF = \{.*\}/m, "the sign-off map is a one-line dict literal");
+  const probe = src.replace(/^SIGNED_OFF = (\{.*?\})(.*)$/m, 'SIGNED_OFF = {**$1, "ci_fear_l5_1": "2026-10-05"}$2')
     + '\nimport json\nprint(json.dumps([l for l in LINES if l["id"] == "ci_fear_l5_1"][0]))\n';
   let out;
   try { out = execFileSync("python3", ["-"], { input: probe, encoding: "utf8" }); } catch { t.skip("python3 unavailable"); return; }

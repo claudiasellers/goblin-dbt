@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { LOAD_ORDER, splitStatements } from "../scripts/load-graph.mjs";
-import { graph } from "./lib/recommendationFixture.mjs";
+import { graph, rawGraph } from "./lib/recommendationFixture.mjs";
 
 const cypher = readFileSync("schema/recommended-for.cypher", "utf8");
 const stmts = splitStatements(cypher);
@@ -36,12 +36,16 @@ test("55 rows: 9 patterns × 3 bands (47 cells' rows) + 8 emotion-gated rows, ev
   assert.ok(!patterns.has("grief_yearning"));
 });
 
-test("every row is a draft for Claudia's review; the policy ships switched off (R7, D-02)", () => {
-  assert.ok(rows.every((r) => r.reviewStatus === "draft"));
-  assert.deepEqual(graph.routingPolicy, {
-    version: "rf-v1", enabled: false, maxCards: 2, fallbackConceptId: "se_orienting", defaultBand: "stirred",
-    floodedPatterns: ["emotional_flooding"], reviewStatus: "draft",
-  });
+test("rows are drafts until signed off; the policy can only be enabled once every active row is approved (R7, D-02)", () => {
+  assert.ok(rows.every((r) => ["draft", "approved"].includes(r.reviewStatus)), "reviewStatus comes from SIGNED_OFF in content.py");
+  const p = rawGraph.routingPolicy;
+  const { enabled, reviewStatus, ...shape } = p;
+  assert.deepEqual(shape, { version: "rf-v1", maxCards: 2, fallbackConceptId: "se_orienting", defaultBand: "stirred", floodedPatterns: ["emotional_flooding"] });
+  assert.ok(["draft", "approved"].includes(reviewStatus));
+  if (enabled) {
+    assert.equal(reviewStatus, "approved", "sign the policy off (SIGNED_OFF['checkin_result']) before enabling it");
+    for (const r of rawGraph.recommendedFor.filter((x) => x.active !== false)) assert.equal(r.reviewStatus, "approved", `${r.id} is active but still a draft`);
+  }
 });
 
 test("D-02 defaults: Urge Surfing inactive, no DEAR MAN rows, reactive_aggression authored, Pause active", () => {

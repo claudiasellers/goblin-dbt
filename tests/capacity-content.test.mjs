@@ -59,5 +59,5 @@ test("loads after the files it links to; no DDL in the file (R13)", () => {
   const i = LOAD_ORDER.indexOf("capacity.cypher");
   assert.ok(i > LOAD_ORDER.indexOf("find-the-feeling.cypher") && i > LOAD_ORDER.indexOf("invalidation-recovery.cypher"));
   assert.ok(!stmts.some((s) => /^CREATE (CONSTRAINT|INDEX)/.test(s)));
-  assert.match(cypher, /p\.reviewStatus = "draft"/);
+  assert.match(cypher, /p\.reviewStatus = "(draft|reviewed|approved)"/);
 });

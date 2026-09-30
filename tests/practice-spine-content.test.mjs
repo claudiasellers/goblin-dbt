@@ -38,7 +38,7 @@ test("every Phase A follow-up type exists; reserved ones are off", () => {
   assert.deepEqual(types.recover_rehearse.content.window, { kind: "at_local", days: 2, time: "18:00" });
   assert.deepEqual(types.recover_log.content.window, { kind: "at_local", days: 3, time: "18:00" });
   for (const t of followUpTypes()) {
-    assert.match(t.s, /t\.reviewStatus = "draft"/, t.id);
+    assert.match(t.s, /t\.reviewStatus = "(draft|reviewed|approved)"/, t.id);
     assert.doesNotMatch(t.content.notification, /!/, t.id);
   }
 });
@@ -55,7 +55,7 @@ test("close copy is the canonical then-vs-now per direction (R3)", () => {
   assert.ok(!("regulation_up" in f.kinds), "up wording is reserved for DT");
   assert.deepEqual(ids("urge"), ["no", "partly", "yes"]);
   assert.deepEqual(f.byTool.pause.urge.choices.map((c) => c.id), ["no", "yes", "not_yet"]);
-  assert.match(cypher, /SessionCloseFlow \{id: 'session_close'\}\)\nSET f\.version = "spine-v1", f\.reviewStatus = "draft"/);
+  assert.match(cypher, /SessionCloseFlow \{id: 'session_close'\}\)\nSET f\.version = "spine-v1", f\.reviewStatus = "(draft|reviewed|approved)"/);
 });
 
 test("PracticeSkill defaultFor names real app tools; new skills link to existing concepts", () => {

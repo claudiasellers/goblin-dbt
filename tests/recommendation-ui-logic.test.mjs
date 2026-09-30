@@ -22,7 +22,7 @@ test("side labels (WMP-04 v0): change + acceptance → both; same side / both �
   assert.deepEqual(rec.cardLabels([{ side: "acceptance" }, { side: "change", sequence: "after_primary" }]), [null, "Once you've moved a little"]);
   assert.deepEqual(rec.cardLabels([{}, {}]), [null, null], "legacy results carry no side");
   assert.deepEqual(rec.cardLabels([{ side: "change" }]), [null]);
-  assert.equal(ROUTING_LABELS.reviewStatus, "draft");
+  assert.ok(["draft", "approved"].includes(ROUTING_LABELS.reviewStatus));
 });
 
 test("cards: names, emoji and tagline from tools.ts; unknown ids dropped; ≤ 2; no graph name, no relevance word", () => {
