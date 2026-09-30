@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const read = (f) => readFileSync(`schema/${f}.cypher`, "utf8");
@@ -73,7 +73,12 @@ test("loader runs app-tool-ids before find-the-feeling", () => {
 });
 
 test("functions prefer appToolId over string normalization", () => {
-  const fn = readFileSync("functions/src/index.ts", "utf8");
+  // All function sources (split into functions/src/<domain>/ in A1-2): both hits are in
+  // recommendation/, suggestedAppTool is in insights/.
+  const fn = readdirSync("functions/src", { recursive: true })
+    .filter((f) => f.endsWith(".ts"))
+    .map((f) => readFileSync(`functions/src/${f}`, "utf8"))
+    .join("\n");
   assert.equal((fn.match(/tc\.appToolId as appToolId/g) || []).length, 2);
   assert.match(fn, /suggestedAppTool/);
 });

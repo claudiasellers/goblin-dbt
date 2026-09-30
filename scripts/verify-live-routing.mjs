@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * READ-ONLY check of the live Neo4j graph against the check-in routing logic
- * in functions/src/index.ts (getStateAndTools, emotion scoring ~L1515-1545).
+ * in functions/src/recommendation/index.ts (getStateAndTools, emotion scoring; functions/src/index.ts ~L1515-1545 before the A1-2 split).
  * Opens a READ session; never writes. Credentials come from .env (same as load-graph.mjs); never printed.
  * Usage (repo root):  node scripts/verify-live-routing.mjs
  *   --compare <file>   compare routing with an earlier report or a committed summary
@@ -110,7 +110,7 @@ try {
     RETURN labels, count(*) AS duplicatedIds, sum(c - 1) AS extraNodes ORDER BY extraNodes DESC`))
     .map(r => ({ labels: r.labels, duplicatedIds: toNum(r.duplicatedIds), extraNodes: toNum(r.extraNodes) }));
   report.nodeTotals = (await q(`MATCH (n) UNWIND labels(n) AS l RETURN l AS label, count(*) AS n ORDER BY n DESC`)).map(r => ({ label: r.label, n: toNum(r.n) }));
-  // What each pattern recommends today (exact production tools query, functions/src/index.ts ~L1692)
+  // What each pattern recommends today (exact production tools query, functions/src/recommendation/index.ts)
   report.toolsByPattern = {};
   for (const pid of report.patterns) {
     report.toolsByPattern[pid] = (await q(`
