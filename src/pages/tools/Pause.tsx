@@ -5,14 +5,14 @@ const steps = [
   {
     letter: 'S',
     title: 'Stop',
-    instruction: 'Freeze. Don\'t move. Don\'t react yet.',
+    instruction: 'Stop. Hands still for a moment. Don\'t react yet.',
     prompt: 'Take a moment to just stop what you\'re doing.',
   },
   {
     letter: 'T',
-    title: 'Take a breath',
-    instruction: 'Breathe slowly and deeply. In through your nose, out through your mouth.',
-    prompt: 'Take 3 slow, deep breaths.',
+    title: 'Take a step back',
+    instruction: 'Step back from the situation, even just in your head. Let one long, slow breath out. You don\'t have to decide anything yet.',
+    prompt: 'One long, slow breath out.',
   },
   {
     letter: 'O',

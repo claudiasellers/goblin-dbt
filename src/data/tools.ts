@@ -18,7 +18,7 @@ export const tools: Tool[] = [
     name: 'Cool Down',
     tagline: 'Use temperature to calm fast',
     description: 'Cold water or ice can quickly shift your body out of crisis mode by triggering your dive reflex.',
-    whenToUse: 'When emotions are at a 7+ out of 10 and you need fast relief.',
+    whenToUse: 'When your body is too loud to think.',
     module: 'distress-tolerance',
     dbtBasis: 'TIP - Temperature',
     emoji: '🧊',
