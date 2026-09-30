@@ -95,7 +95,7 @@ export function FiveSenses() {
           Notice {current.count} {current.prompt}
         </h3>
         <p className="mt-2 text-[var(--color-text-secondary)]">
-          Look around, or close your eyes and notice. You don't need to write anything down.
+          Look around and notice, eyes open. You don't need to write anything down.
         </p>
       </div>
 

@@ -5,6 +5,8 @@ import { getActivityDefinition, PATTERN_CONTEXT } from '../../data/guidedActivit
 import { GuidedActivity } from '../activities/GuidedActivity';
 import { getToolById } from '../../data/tools';
 import type { StateResult, ToolRecommendation } from '../../services/neo4j';
+import { CrisisBanner } from '../safety/CrisisBanner';
+import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
 
 interface LowEnergyStateResultProps {
   result: StateResult;
@@ -18,6 +20,11 @@ interface LowEnergyStateResultProps {
  * Shows pattern-specific context, guided activity CTA,
  * and de-emphasized tool cards. Used only for low-unpleasant
  * quadrant when a guided activity is available.
+ *
+ * A crisis safety flag adds <CrisisBanner /> above the result and the
+ * micro-step screen, as in StateResult (layout from src/lib/crisisBanner.ts).
+ * Today the server skips safety flags for low-unpleasant, so the banner can't
+ * show here yet; it's wired so it can't regress into a dead end.
  */
 export function LowEnergyStateResult({
   result,
@@ -26,6 +33,15 @@ export function LowEnergyStateResult({
   checkinEmotions,
 }: LowEnergyStateResultProps) {
   const { pattern, tools, safetyFlag, coOccurrence, guidedActivity } = result;
+  const sections = resultSections({
+    variant: 'low_energy',
+    safetyFlag,
+    patternId: pattern.id,
+    toolCount: tools.length,
+    hasGuidedActivity: !!guidedActivity,
+    canAddMoreDetail: !!onAddMoreDetail,
+  });
+  const has = (section: ResultSection) => sections.includes(section);
 
   const [showActivity, setShowActivity] = useState(false);
   const [bailoutStep, setBailoutStep] = useState<MicroStep | null>(null);
@@ -41,31 +57,6 @@ export function LowEnergyStateResult({
     const timer = setTimeout(() => onDone(), 1800);
     return () => clearTimeout(timer);
   }, [isCompleting, onDone]);
-
-  // ========== SAFETY FLAG — identical to StateResult ==========
-  if (safetyFlag && safetyFlag.type === 'crisis') {
-    return (
-      <div className="text-center py-6">
-        <div className="mb-6 p-4 rounded-2xl bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]">
-          <span className="text-3xl mb-3 block">🆘</span>
-          <h2 className="text-xl font-bold text-[var(--color-q-hu-text)] mb-2">We hear you</h2>
-          <p className="text-[var(--color-q-hu-text)] mb-4">{safetyFlag.action}</p>
-          <a
-            href="tel:988"
-            className="inline-block w-full py-3 px-4 rounded-lg bg-[var(--color-danger)] hover:opacity-90 text-[var(--color-on-danger)] font-medium transition-colors mb-3"
-          >
-            Call 988 (Suicide & Crisis Lifeline)
-          </a>
-          <a
-            href="sms:741741?body=HELLO"
-            className="inline-block w-full py-3 px-4 rounded-lg border border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)] font-medium hover:bg-[var(--color-q-hu-bg)] transition-colors"
-          >
-            Text HOME to 741741
-          </a>
-        </div>
-      </div>
-    );
-  }
 
   // ========== GUIDED ACTIVITY OVERLAY ==========
   if (showActivity && guidedActivity) {
@@ -102,37 +93,40 @@ export function LowEnergyStateResult({
   // ========== BAILOUT MICRO-STEP ==========
   if (bailoutStep) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
-        <p className="text-sm text-[var(--color-text-tertiary)] mb-8">
-          That's okay. Let's go smaller.
-        </p>
-        <div className="text-center mb-12 max-w-sm">
-          <p className="text-2xl sm:text-3xl font-semibold text-[var(--color-text-primary)] leading-snug mb-4">
-            {bailoutStep.text}
+      <div>
+        {bailoutSections(safetyFlag).includes('crisis_banner') && <CrisisBanner />}
+        <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
+          <p className="text-sm text-[var(--color-text-tertiary)] mb-8">
+            That's okay. Let's go smaller.
           </p>
-          {bailoutStep.subtext && (
-            <p className="text-base text-[var(--color-text-tertiary)] leading-relaxed">
-              {bailoutStep.subtext}
+          <div className="text-center mb-12 max-w-sm">
+            <p className="text-2xl sm:text-3xl font-semibold text-[var(--color-text-primary)] leading-snug mb-4">
+              {bailoutStep.text}
             </p>
-          )}
+            {bailoutStep.subtext && (
+              <p className="text-base text-[var(--color-text-tertiary)] leading-relaxed">
+                {bailoutStep.subtext}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={handleBailoutComplete}
+            className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary"
+          >
+            I did it
+          </button>
+          <button
+            onClick={() => {
+              if (bailoutIndex === null) return;
+              const { step, index } = getMicroStep(pattern.id, bailoutIndex);
+              setBailoutStep(step);
+              setBailoutIndex(index);
+            }}
+            className="mt-4 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+          >
+            Show me something else
+          </button>
         </div>
-        <button
-          onClick={handleBailoutComplete}
-          className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary"
-        >
-          I did it
-        </button>
-        <button
-          onClick={() => {
-            if (bailoutIndex === null) return;
-            const { step, index } = getMicroStep(pattern.id, bailoutIndex);
-            setBailoutStep(step);
-            setBailoutIndex(index);
-          }}
-          className="mt-4 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
-        >
-          Show me something else
-        </button>
       </div>
     );
   }
@@ -145,6 +139,9 @@ export function LowEnergyStateResult({
 
   return (
     <div className="py-4">
+      {/* Crisis resources: a banner above the result, never instead of it */}
+      {has('crisis_banner') && <CrisisBanner />}
+
       {/* Pattern label — larger, lighter weight, fades in */}
       <div className="text-center mb-6 animate-fade-in">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-bg-elevated)] mb-4">
@@ -169,7 +166,7 @@ export function LowEnergyStateResult({
       </div>
 
       {/* Clinical referral */}
-      {safetyFlag && safetyFlag.type === 'clinical_referral' && (
+      {has('clinical_note') && (
         <div className="mb-6 p-4 rounded-xl bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]">
           <p className="text-[var(--color-q-hp-text)] text-sm">
             <strong>Note:</strong> If this feeling persists, consider reaching out to a mental health professional.
@@ -178,7 +175,7 @@ export function LowEnergyStateResult({
       )}
 
       {/* "Try something small" — primary CTA */}
-      {guidedActivity && (
+      {has('guided_activity') && (
         <div className="mb-6">
           <button
             onClick={() => setShowActivity(true)}
@@ -190,7 +187,7 @@ export function LowEnergyStateResult({
       )}
 
       {/* Tool cards — deprioritized visually */}
-      {tools.length > 0 && (
+      {has('tools') && (
         <div className="mb-6">
           <p className="text-xs text-[var(--color-text-muted)] text-center mb-3">
             Or explore a tool
@@ -212,7 +209,7 @@ export function LowEnergyStateResult({
           Done
         </button>
 
-        {onAddMoreDetail && (
+        {has('add_detail') && onAddMoreDetail && (
           <button
             onClick={onAddMoreDetail}
             className="w-full py-2.5 px-4 rounded-lg text-[var(--color-text-tertiary)] text-sm"
@@ -223,7 +220,7 @@ export function LowEnergyStateResult({
       </div>
 
       {/* Bailout */}
-      {(tools.length > 0 || guidedActivity) && (
+      {has('bailout') && (
         <div className="mt-6 text-center">
           <button
             onClick={() => {
