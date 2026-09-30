@@ -23,6 +23,7 @@ import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
 import { newId } from '../lib/spine/ids';
 import {
   buildCheckInPayload,
+  emotionIdsFor,
   ftfReading,
   type CheckInNextAction,
   type CheckInSource,
@@ -32,6 +33,9 @@ import { recordToolSession } from '../services/spine';
 import { useBand } from '../hooks/useBand';
 import { BandGate } from '../components/capacity/BandGate';
 import { bandStepFor, checkInIntensity } from '../lib/checkInBand';
+import { beatBand, beatRequest, type WitnessHandlers } from '../lib/witness';
+import { recordWitnessBeat } from '../services/witness';
+import { profileCache } from '../lib/profileCache';
 
 type EntryPoint = 'standard' | 'somatic';
 
@@ -142,15 +146,36 @@ export function CheckIn() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, step, stateResult]);
 
+  // === Witness beat (A5-3) ===
+  // The beat's log is queued behind the render save (R4: it keys on the check-in id) and ahead of
+  // the next action, which finalises the check-in (R2: a final check-in takes no new SHOWED_LINE).
+  const beatQueue = useRef<Promise<void>>(Promise.resolve());
+  function logBeat(...[result, lines]: Parameters<WitnessHandlers['onDone']>) {
+    if (!user || !checkInData.quadrant) return;
+    const req = beatRequest({
+      checkInId, moment: 'checkin_result', band: beatBand(capacity?.value), lines, result,
+      emotionIds: emotionIdsFor(checkInData.emotions, knownEmotionIds),
+    });
+    const saved = savePromise.current ?? Promise.resolve(false);
+    beatQueue.current = beatQueue.current
+      .then(() => saved)
+      .then((ok) => (ok ? recordWitnessBeat(req) : null))
+      .then((r) => { if (r?.profileVersion != null) profileCache.bump(r.profileVersion); })
+      .catch((err) => { console.error('Failed to record the witness beat:', err); });
+  }
+  const witness: WitnessHandlers = { onShown: logBeat, onDone: logBeat };
+
   /**
-   * Record the next action once the render save settled. If that save failed, save again with the
-   * next action inline (same id, so nothing duplicates). Resolves true when recorded.
+   * Record the next action once the render save settled (and any queued beat log). If that save
+   * failed, save again with the next action inline (same id, so nothing duplicates). Resolves true
+   * when recorded.
    */
   function recordNextAction(next: CheckInNextAction): Promise<boolean> {
     const id = checkInId;
     const state = payloadState();
     const result = stateResult;
-    const pending = savePromise.current ?? Promise.resolve(false);
+    const beats = beatQueue.current;
+    const pending = (savePromise.current ?? Promise.resolve(false)).then((saved) => beats.then(() => saved));
     return pending.then((saved) => (saved
       ? setCheckInNextAction(id, next)
       : saveCheckIn(buildCheckInPayload(state, result, next)).then(() => undefined)))
@@ -693,6 +718,8 @@ export function CheckIn() {
               }
               checkinEmotions={checkInData.emotions}
               band={capacity?.value ?? null}
+              emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              witness={witness}
             />
           ) : (
             <StateResult
@@ -707,6 +734,8 @@ export function CheckIn() {
               }
               checkinEmotions={checkInData.emotions}
               band={capacity?.value ?? null}
+              emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              witness={witness}
             />
           )
         )}

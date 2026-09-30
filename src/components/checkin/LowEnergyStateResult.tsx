@@ -10,6 +10,8 @@ import { bailoutSections, resultSections, type ResultSection } from '../../lib/c
 import { fromCheckIn } from '../../lib/spine/toolLink';
 import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
 import type { Band } from '../../data/capacityTypes';
+import { WitnessBeat } from '../witness/WitnessBeat';
+import { beatBand, beatVariant, showsWitnessBeat, type WitnessHandlers } from '../../lib/witness';
 
 interface LowEnergyStateResultProps {
   result: StateResult;
@@ -23,6 +25,10 @@ interface LowEnergyStateResultProps {
   checkinEmotions?: string[];
   /** The check-in's band (A4-3): read by the witness beat (A5-3); routing reads it from E4-3. */
   band?: Band | null;
+  /** Graph ids of the check-in's words (the beat's family / word match). */
+  emotionIds?: string[];
+  /** The witness beat's log (A5-3): the host queues recordWitnessBeat until the check-in is saved. */
+  witness?: WitnessHandlers;
 }
 
 /**
@@ -43,6 +49,9 @@ export function LowEnergyStateResult({
   checkinEmotions,
   checkInId,
   onToolOpen,
+  band,
+  emotionIds,
+  witness,
 }: LowEnergyStateResultProps) {
   const { pattern, tools, safetyFlag, coOccurrence, guidedActivity } = result;
   const sections = resultSections({
@@ -178,6 +187,13 @@ export function LowEnergyStateResult({
           </p>
         )}
       </div>
+
+      {/* The witness beat (A5-3, R21): below the banner, above the activity and tools; it never gates them */}
+      {showsWitnessBeat(pattern.id) && (
+        <WitnessBeat hostToolId="checkin" moment="checkin_result" band={beatBand(band)} variant={beatVariant(beatBand(band))}
+          words={checkinEmotions ?? []} emotionIds={emotionIds}
+          onShown={witness?.onShown} onDone={(r, lines) => witness?.onDone(r, lines)} />
+      )}
 
       {/* Clinical referral */}
       {has('clinical_note') && (

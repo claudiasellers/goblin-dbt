@@ -152,7 +152,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | File | Purpose |
 |------|---------|
 | `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → capacity (band probe, unpleasant only, asked once: a current reading is carried; `src/lib/checkInBand.ts`) → body → sensation → suggestion → analyzing → result. Saves the check-in when the result renders (PR-C1); Today stack above the grid (PR-S5); Help me now → `HelpNowInterim` (PR-C2: safe step + Cool Down / 5-4-3-2-1, no check-in, no routing call) |
-| `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant) |
+| `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant); the witness beat renders under the label, below the crisis banner, above the tools (R21) |
+| `src/components/witness/WitnessBeat.tsx`, `src/lib/witness.ts` | The receive beat (WMP-01): echo of the user's word(s), one witness line from `getWitnessLines`, optional *did that land?*, always skip · none of these fit · say it my way, explicit keep. Never gates the host. The check-in logs it via `recordWitnessBeat`, queued after the render save and before the next action (`CheckIn.tsx` `beatQueue`) |
 | `src/components/safety/CrisisBanner.tsx` | Crisis resources as a non-blocking banner above the normal result (never a replacement screen) |
 | `src/pages/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
