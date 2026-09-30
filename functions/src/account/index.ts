@@ -43,51 +43,6 @@ export const ensureUserExists = onCall(
   }
 );
 
-/**
- * Initialize Neo4j schema (admin function - run once during setup)
- * In production, you might want to restrict this to admin users
- */
-export const initializeSchema = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
-  async (request) => {
-    // Verify user is authenticated
-    if (!request.auth) {
-      throw new HttpsError('unauthenticated', 'User must be logged in');
-    }
-
-    const session = getDriver().session();
-    try {
-      // Create constraints and indexes
-      await session.run(`
-        CREATE CONSTRAINT user_id IF NOT EXISTS
-        FOR (u:User) REQUIRE u.id IS UNIQUE
-      `);
-
-      await session.run(`
-        CREATE CONSTRAINT checkin_id IF NOT EXISTS
-        FOR (c:CheckIn) REQUIRE c.id IS UNIQUE
-      `);
-
-      await session.run(`
-        CREATE INDEX checkin_timestamp IF NOT EXISTS
-        FOR (c:CheckIn) ON (c.timestamp)
-      `);
-
-      await session.run(`
-        CREATE CONSTRAINT emotion_id IF NOT EXISTS
-        FOR (e:Emotion) REQUIRE e.id IS UNIQUE
-      `);
-
-      return { success: true, message: 'Schema initialized successfully' };
-    } catch (error) {
-      console.error('Error initializing schema:', error);
-      throw new HttpsError('internal', 'Failed to initialize schema');
-    } finally {
-      await session.close();
-    }
-  }
-);
-
 // ============================================
 // USER PROFILE FUNCTIONS
 // ============================================

@@ -53,7 +53,7 @@ export const NOT_LOADED = [
   'validation-queries.cypher',
 ];
 
-// Constraints/indexes the app relies on (mirrors the initializeSchema Cloud Function).
+// Constraints/indexes the app relies on.
 const CONSTRAINTS = [
   'CREATE CONSTRAINT user_id IF NOT EXISTS FOR (u:User) REQUIRE u.id IS UNIQUE',
   'CREATE CONSTRAINT checkin_id IF NOT EXISTS FOR (c:CheckIn) REQUIRE c.id IS UNIQUE',

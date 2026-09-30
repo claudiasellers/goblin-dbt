@@ -73,13 +73,13 @@ test("loader runs app-tool-ids before find-the-feeling", () => {
 });
 
 test("functions prefer appToolId over string normalization", () => {
-  // All function sources (split into functions/src/<domain>/ in A1-2): both hits are in
-  // recommendation/, suggestedAppTool is in insights/.
+  // All function sources (split into functions/src/<domain>/ in A1-2): the tools query in
+  // recommendation/ (getQuickTools, the second hit, was removed in A1-7); suggestedAppTool is in insights/.
   const fn = readdirSync("functions/src", { recursive: true })
     .filter((f) => f.endsWith(".ts"))
     .map((f) => readFileSync(`functions/src/${f}`, "utf8"))
     .join("\n");
-  assert.equal((fn.match(/tc\.appToolId as appToolId/g) || []).length, 2);
+  assert.equal((fn.match(/tc\.appToolId as appToolId/g) || []).length, 1);
   assert.match(fn, /suggestedAppTool/);
 });
 

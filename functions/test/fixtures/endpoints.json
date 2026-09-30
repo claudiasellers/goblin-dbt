@@ -455,30 +455,6 @@
     "labels": {},
     "callableTrigger": {}
   },
-  "getQuickTools": {
-    "availableMemoryMb": null,
-    "timeoutSeconds": null,
-    "minInstances": null,
-    "maxInstances": null,
-    "ingressSettings": null,
-    "concurrency": null,
-    "serviceAccountEmail": null,
-    "vpc": null,
-    "platform": "gcfv2",
-    "secretEnvironmentVariables": [
-      {
-        "key": "NEO4J_URI"
-      },
-      {
-        "key": "NEO4J_USER"
-      },
-      {
-        "key": "NEO4J_PASSWORD"
-      }
-    ],
-    "labels": {},
-    "callableTrigger": {}
-  },
   "getRelatedEmotions": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
@@ -528,54 +504,6 @@
     "callableTrigger": {}
   },
   "getUserProfile": {
-    "availableMemoryMb": null,
-    "timeoutSeconds": null,
-    "minInstances": null,
-    "maxInstances": null,
-    "ingressSettings": null,
-    "concurrency": null,
-    "serviceAccountEmail": null,
-    "vpc": null,
-    "platform": "gcfv2",
-    "secretEnvironmentVariables": [
-      {
-        "key": "NEO4J_URI"
-      },
-      {
-        "key": "NEO4J_USER"
-      },
-      {
-        "key": "NEO4J_PASSWORD"
-      }
-    ],
-    "labels": {},
-    "callableTrigger": {}
-  },
-  "getWeeklyToolUsageCount": {
-    "availableMemoryMb": null,
-    "timeoutSeconds": null,
-    "minInstances": null,
-    "maxInstances": null,
-    "ingressSettings": null,
-    "concurrency": null,
-    "serviceAccountEmail": null,
-    "vpc": null,
-    "platform": "gcfv2",
-    "secretEnvironmentVariables": [
-      {
-        "key": "NEO4J_URI"
-      },
-      {
-        "key": "NEO4J_USER"
-      },
-      {
-        "key": "NEO4J_PASSWORD"
-      }
-    ],
-    "labels": {},
-    "callableTrigger": {}
-  },
-  "initializeSchema": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
     "minInstances": null,

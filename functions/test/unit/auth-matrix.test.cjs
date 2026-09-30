@@ -12,14 +12,14 @@ const AUTHED = [
   'deleteUserData', 'ensureUserExists', 'exportUserData', 'getCheckInsByUser',
   'getDearManSessions', 'getFeelingCollection', 'getInsightsData', 'getInvalidationRecoveryProgress',
   'getOppositeActionFollowUps', 'getOppositeActionSession', 'getOppositeActionSessions', 'getUserProfile',
-  'getWeeklyToolUsageCount', 'initializeSchema', 'recordToolOutcome', 'saveCheckIn',
+  'recordToolOutcome', 'saveCheckIn',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
 ];
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getQuickTools', 'getRelatedEmotions', 'getStateAndTools',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools',
 ];
 
 const { fns, setDriver } = loadFunctions();

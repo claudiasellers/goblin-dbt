@@ -4,7 +4,6 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
-import { toNumber } from '../shared/values';
 
 // ============================================
 // TOOL USAGE TRACKING
@@ -53,40 +52,6 @@ export const trackToolUsage = onCall(
     } catch (error) {
       console.error('Error tracking tool usage:', error);
       throw new HttpsError('internal', 'Failed to track tool usage');
-    } finally {
-      await session.close();
-    }
-  }
-);
-
-/**
- * Get the count of tool usages in the last 7 days for the authenticated user
- */
-export const getWeeklyToolUsageCount = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
-  async (request) => {
-    if (!request.auth) {
-      throw new HttpsError('unauthenticated', 'User must be logged in');
-    }
-
-    const userId = request.auth.uid;
-
-    const session = getDriver().session();
-    try {
-      const result = await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
-        WHERE tu.timestamp >= datetime() - duration({days: 7})
-        RETURN count(tu) AS count
-        `,
-        { userId }
-      );
-
-      const count = result.records[0]?.get('count');
-      return { count: toNumber(count) ?? 0 };
-    } catch (error) {
-      console.error('Error getting weekly tool usage:', error);
-      throw new HttpsError('internal', 'Failed to get tool usage count');
     } finally {
       await session.close();
     }

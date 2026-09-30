@@ -7,10 +7,10 @@
 import './shared/admin'; // initialise firebase-admin once, before any callable module loads
 
 export { saveCheckIn, getCheckInsByUser } from './checkin';
-export { ensureUserExists, initializeSchema, getUserProfile, updateUserProfile, deleteUserData, exportUserData } from './account';
-export { trackToolUsage, getWeeklyToolUsageCount, recordToolOutcome } from './toolUsage';
+export { ensureUserExists, getUserProfile, updateUserProfile, deleteUserData, exportUserData } from './account';
+export { trackToolUsage, recordToolOutcome } from './toolUsage';
 export { getInsightsData } from './insights';
-export { getStateAndTools, getDiscriminatingQuestions, getRelatedEmotions, getQuickTools } from './recommendation';
+export { getStateAndTools, getDiscriminatingQuestions, getRelatedEmotions } from './recommendation';
 export { getOppositeActionContent, saveOppositeActionSession, getOppositeActionSessions, getOppositeActionSession, getOppositeActionFollowUps } from './oppositeAction';
 export { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, getDearManSessions } from './dearMan';
 export { getProblemSolveContent } from './problemSolve';
