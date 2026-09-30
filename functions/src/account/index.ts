@@ -3,9 +3,10 @@
  * Moved verbatim from the single-file functions/src/index.ts (A1-2); deploy names are the export names.
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import neo4j, { Record as Neo4jRecord } from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
-import { admin } from '../shared/admin';
+import { Record as Neo4jRecord } from 'neo4j-driver';
+import { getDriver, neo4jUri, neo4jUser, neo4jPassword, withSession } from '../shared/neo4j';
+import { admin, authAdmin } from '../shared/admin';
+import { applyRetention, deleteUserGraph, exportUserRecords, plain } from '../userdata/exportDelete';
 import { toNumber } from '../shared/values';
 import { toSavedOppositeActionSession } from '../oppositeAction';
 
@@ -47,6 +48,21 @@ export const ensureUserExists = onCall(
 // USER PROFILE FUNCTIONS
 // ============================================
 
+/**
+ * An IANA time zone this runtime can use. Checked by constructing a formatter, not against
+ * Intl.supportedValuesOf: that list holds one canonical name per zone and omits aliases browsers
+ * report today (Node 22 lists Asia/Calcutta and Europe/Kiev, Chrome sends Asia/Kolkata and Europe/Kyiv).
+ */
+export function isTimeZone(v: unknown): v is string {
+  if (typeof v !== 'string' || v.length > 64 || !/^[A-Za-z][A-Za-z0-9_+\-/]*$/.test(v)) return false;
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: v });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 const PROFILE_DEFAULTS = {
   displayName: null,
   photoURL: null,
@@ -56,11 +72,9 @@ const PROFILE_DEFAULTS = {
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],
   weeklyDigest: false,
-  dailyCheckInGoal: 1,
-  weeklyToolGoal: 3,
-  focusCategories: [],
   dataRetentionDays: null,
   shareAnonymousData: false,
+  timeZone: null,
 };
 
 /**
@@ -94,16 +108,17 @@ export const getUserProfile = onCall(
         email,
         ...userNode,
         // Clean up Neo4j integer types
-        dailyCheckInGoal: toNumber(userNode.dailyCheckInGoal) ?? PROFILE_DEFAULTS.dailyCheckInGoal,
-        weeklyToolGoal: toNumber(userNode.weeklyToolGoal) ?? PROFILE_DEFAULTS.weeklyToolGoal,
         dataRetentionDays: userNode.dataRetentionDays != null ? toNumber(userNode.dataRetentionDays) : null,
         reminderDays: userNode.reminderDays ?? PROFILE_DEFAULTS.reminderDays,
-        focusCategories: userNode.focusCategories ?? PROFILE_DEFAULTS.focusCategories,
       };
 
-      // Remove internal fields
-      delete profile.id;
-      delete profile.createdAt;
+      // Remove internal fields. The settings profile is cached in localStorage for the theme paint:
+      // it never carries profile-layer or system fields (PR-P2), nor the retired goal fields
+      // (removed from User by schema/migrations/2026-10-remove-goal-fields.cypher).
+      for (const k of ['id', 'createdAt', 'updatedAt', 'profileVersion', 'patternsEvaluatedAt',
+        'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories']) {
+        delete (profile as Record<string, unknown>)[k];
+      }
 
       // Enforce data retention: delete check-ins older than dataRetentionDays
       const retentionDays = profile.dataRetentionDays != null
@@ -112,15 +127,8 @@ export const getUserProfile = onCall(
 
       if (retentionDays != null && retentionDays > 0) {
         try {
-          await session.run(
-            `
-            MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-            WHERE c.timestamp < datetime() - duration({days: $days})
-            OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-            DETACH DELETE s, c
-            `,
-            { userId, days: neo4j.int(retentionDays) }
-          );
+          // D-10: every log record older than the window; profile items never expire.
+          await applyRetention(session, userId, retentionDays);
         } catch (cleanupErr) {
           // Don't fail the profile load if cleanup fails
           console.warn('Data retention cleanup failed:', cleanupErr);
@@ -158,8 +166,7 @@ export const updateUserProfile = onCall(
     const allowedFields = [
       'displayName', 'photoURL', 'theme', 'palette',
       'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
-      'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories',
-      'dataRetentionDays', 'shareAnonymousData',
+      'dataRetentionDays', 'shareAnonymousData', 'timeZone',
     ];
 
     const cleanUpdates: Record<string, unknown> = {};
@@ -175,6 +182,11 @@ export const updateUserProfile = onCall(
       throw new HttpsError('invalid-argument', 'Unknown palette');
     }
 
+    // IANA time zone (follow-up windows, quiet hours, later push). Unknown zones are dropped.
+    if ('timeZone' in cleanUpdates && !isTimeZone(cleanUpdates.timeZone)) {
+      delete cleanUpdates.timeZone;
+    }
+
     if (Object.keys(cleanUpdates).length === 0) {
       return { success: true };
     }
@@ -188,10 +200,11 @@ export const updateUserProfile = onCall(
 
       await session.run(
         `
-        MATCH (u:User {id: $userId})
-        SET ${setClauses}, u.updatedAt = datetime()
+        MERGE (u:User {id: $userId})
+        ON CREATE SET u.createdAt = datetime(), u.email = $email
+        SET ${setClauses}, u.updatedAt = datetime()${'displayName' in cleanUpdates ? ', u.profileVersion = coalesce(u.profileVersion, 0) + 1' : ''}
         `,
-        { userId, ...cleanUpdates }
+        { userId, email: request.auth.token.email || null, ...cleanUpdates }
       );
 
       // Sync displayName/photoURL to Firebase Auth so it persists across sessions
@@ -217,7 +230,9 @@ export const updateUserProfile = onCall(
 );
 
 /**
- * Delete all user data from Neo4j
+ * Delete all user data from Neo4j and, when `deleteAuth` is true (Delete Account), the Firebase
+ * Auth user too (F2: the flag used to be ignored, leaving a live login). The graph goes first, so a
+ * failed Auth delete can be retried; onUserDeleted also runs the (idempotent) graph delete.
  */
 export const deleteUserData = onCall(
   { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
@@ -227,60 +242,25 @@ export const deleteUserData = onCall(
     }
 
     const userId = request.auth.uid;
+    const deleteAuth = (request.data as { deleteAuth?: unknown } | null | undefined)?.deleteAuth === true;
 
-    const session = getDriver().session();
     try {
-      // Delete all check-ins and their body sensations
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-        OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-        DETACH DELETE s, c
-        `,
-        { userId }
-      );
-
-      await session.run(
-        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:OppositeActionSession)
-         DETACH DELETE s`, { userId }
-      );
-
-      await session.run(
-        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:InvalidationRecoverySession)
-         DETACH DELETE s`, { userId }
-      );
-
-      await session.run(
-        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:DearManSession)
-         DETACH DELETE s`, { userId }
-      );
-
-      await session.run(
-        `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:FindTheFeelingSession)
-         DETACH DELETE s`, { userId }
-      );
-
-      await session.run(
-        `MATCH (u:User {id: $userId})-[:USED_TOOL]->(t:ToolUsage)
-         DETACH DELETE t`, { userId }
-      );
-
-      // Delete the user node
-      await session.run(
-        `
-        MATCH (u:User {id: $userId})
-        DETACH DELETE u
-        `,
-        { userId }
-      );
-
-      return { success: true };
+      await withSession((session) => deleteUserGraph(session, userId));
     } catch (error) {
-      console.error('Error deleting user data:', error);
+      console.error('Error deleting user data:', (error as { code?: string })?.code ?? 'unknown');
       throw new HttpsError('internal', 'Failed to delete user data');
-    } finally {
-      await session.close();
     }
+    if (deleteAuth) {
+      try {
+        await authAdmin().deleteUser(userId);
+      } catch (error) {
+        if ((error as { code?: string })?.code !== 'auth/user-not-found') {
+          console.error('Error deleting auth user:', (error as { code?: string })?.code ?? 'unknown');
+          throw new HttpsError('internal', 'Your data was deleted, but the sign-in could not be removed. Try again.');
+        }
+      }
+    }
+    return { success: true, authDeleted: deleteAuth };
   }
 );
 
@@ -342,13 +322,6 @@ export const exportUserData = onCall(
          RETURN s {.*, createdAt: toString(s.createdAt)} AS s
          ORDER BY s.createdAt DESC`, { userId }
       );
-      // Plain JSON only: Neo4j Integers become numbers, other driver types become strings.
-      const plain = (v: unknown): unknown =>
-        neo4j.isInt(v) ? (v as { toNumber: () => number }).toNumber()
-          : Array.isArray(v) ? v.map(plain)
-            : v !== null && typeof v === 'object' && v.constructor === Object
-              ? Object.fromEntries(Object.entries(v as Record<string, unknown>).map(([k, x]) => [k, plain(x)]))
-              : v !== null && typeof v === 'object' ? String(v) : v;
       const dearManSessions = dearManResult.records.map((r: Neo4jRecord) => plain(r.get('s')));
       const toolUsageResult = await session.run(
         `MATCH (u:User {id: $userId})-[:USED_TOOL]->(t:ToolUsage)
@@ -370,8 +343,14 @@ export const exportUserData = onCall(
                 toString(fw.firstAt) AS firstAt, toString(fw.lastAt) AS lastAt`, { userId }
       );
       const feelingCollection = wordsResult.records.map((r: Neo4jRecord) => plain(r.toObject()));
+      // Generic part (PR-S1): every :UserData label, grouped by the registry's exportAs, plus links.
+      // The legacy keys above stay for format stability.
+      const generic = await exportUserRecords(session, userId);
       return {
         data: {
+          formatVersion: generic.formatVersion,
+          records: generic.records,
+          links: generic.links,
           // Export the plain JSON snapshot (not raw Neo4j Integer/DateTime objects).
           oppositeActionSessions: oaResult.records.map(toSavedOppositeActionSession).filter(Boolean),
           invalidationRecoverySessions,

@@ -15,7 +15,7 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 - **Frontend** (`/src`): React 19 + TypeScript + Vite + Tailwind CSS. Uses HashRouter. State managed via Context API (`AuthContext`, `UserProfileContext`) — no Redux.
 - **Auth** Firebase Authentication (email/password)
-- **Cloud Functions** (`/functions/src`, Node 22): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the 30 deployed callables by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
+- **Cloud Functions** (`/functions/src`, Node 22): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the deployed functions by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
 - **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
@@ -25,8 +25,8 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 
 | Module | Callables |
 |---|---|
-| `checkin/` | `saveCheckIn`, `getCheckInsByUser` |
-| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData`, `exportUserData` (settings-style profile; `profile/` is reserved for the three-layer "Me") |
+| `checkin/` | `saveCheckIn` (idempotent upsert by client id; saved when the result renders), `setCheckInNextAction`, `getCheckInsByUser`; `validation.ts` |
+| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; triggers `onUserCreated` / `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
 | `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
 | `insights/` | `getInsightsData` |
 | `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` |
@@ -35,6 +35,11 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `problemSolve/` | `getProblemSolveContent` |
 | `invalidationRecovery/` | `getInvalidationRecoveryContent`, `saveInvalidationRecoverySession`, `getInvalidationRecoveryProgress` |
 | `findTheFeeling/` | `getFindTheFeelingContent`, `saveFindTheFeelingSession`, `getFeelingCollection` |
+| `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `answerToolOutcome`, `scheduleFollowUp`, `resolveFollowUp`, `snoozeFollowUp`, `getToday`, `getSpineContent` (public); `todayOrder.ts` (derived due/stale/upcoming + ordering), `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
+| `profile/` | `getProfileContext` (the single profile read path: only the slices `PROFILE_NEEDS` declares per tool, in code), `getMe`, `upsertProfileFact`, `confirmProfileItem`, `setAsideProfileItem`, `restoreProfileItem`, `answerPatternOffer` (the only writer of `MyPattern`); `slices.ts` resolvers never read a `:LogRecord` (test-enforced) |
+| `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
+
+`userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
 
 Adding a callable: export it from its domain module, add one line to `functions/src/index.ts`, add it to `functions/test/fixtures/endpoints.json` and the auth matrix (`functions/test/unit/auth-matrix.test.cjs`). Prefer `callable({ auth, label }, handler)` from `shared/callable.ts`.
 
@@ -49,7 +54,7 @@ Adding a callable: export it from its domain module, add one line to `functions/
 
 4. **Idempotent schema loading with MERGE.** Every loaded Cypher file is MERGE-only (enforced by `tests/schema-idempotency.test.mjs`), so a full load is safe to re-run and two runs give identical totals. Conventions are under Neo4j Conventions below.
 
-5. **Activation patterns** drive the recommendation engine. The graph has 10 `ActivationPattern` nodes: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, plus Phase-2 `grief_yearning` and `reactive_aggression`. The engine's quadrant map considers the first 8, so `grief_yearning` and `reactive_aggression` are never selected. `positive_state` is not a graph pattern: it is the synthetic pleasant-quadrant result (and `saveCheckIn` MERGEs a stub node for it). Each pattern maps to brain structures (overactive/suppressed) and tool recommendations.
+5. **Activation patterns** drive the recommendation engine. The graph has 10 `ActivationPattern` nodes: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, plus Phase-2 `grief_yearning` and `reactive_aggression`. The engine's quadrant map considers the first 8, so `grief_yearning` and `reactive_aggression` are never selected. `positive_state` is not a graph pattern: it is the synthetic pleasant-quadrant result (`saveCheckIn` stores it as `activationPatternId` only; it never creates content nodes). Each pattern maps to brain structures (overactive/suppressed) and tool recommendations.
 
 ---
 
@@ -99,6 +104,25 @@ This includes:
 
 ---
 
+## Data layers
+
+Every piece of user data belongs to exactly one layer. The registry is `functions/src/userdata/layers.ts`; `tests/user-data-layers.test.mjs` enforces it.
+
+| Layer | Stored as | Rule | Read by |
+|---|---|---|---|
+| **Ask-fresh** | Fields on a log record only (`ASK_FRESH_FIELDS`: `band*`, `thenVsNow`, `thenVsNowDir`, `actedOnUrge`, `urgeIds`, `fitsFacts`, `wiseMindAnswer`, `readiness`, `eventIds`) | Changes within a day → always asked, never pre-filled from memory. The one carry is the client-only `band.current()` (≤20 min, never read back from the server) | Aggregates only |
+| **Log** | `:<Label>:UserData:LogRecord` | Describes a moment. Append-only and **finalise-once** (`userdata/lifecycle.ts`: upsert by `key` only during its episode, forward only, then frozen; writers put `GUARDS.<Label>.<op>` in their `WHERE`) | Aggregates (Insights, Today, review). Never used to pre-fill a live flow |
+| **Profile** | `:<Label>:UserData:ProfileItem`, or a profile edge to graph content carrying `confirmedAt` + `source` | Would make the user re-answer next time → profile, pre-filled with "still true?". Nothing moves log → profile without the user's yes | `getProfileContext(toolId)` and the Me surface only |
+| (system) | `:<Label>:UserData:System` | App infrastructure (push tokens) | Deleted with the user, never exported |
+
+- Every `:UserData` node has `id` (client UUID unless noted), `ownerId` (Firebase uid), `key = ownerId + ':' + id` (unique per label in `schema/constraints.cypher`), `createdAt`, `schemaVersion`. Writes `MERGE` on `key`, never on `id`, and start with `MERGE (u:User {id: $uid})` (`userdata/ownership.ts`).
+- Ownership edges run `User → UserData` and `UserData → UserData`. User data may point at graph content; graph content never points at user data. Schema files never write user data.
+- A new user-data label: register it in `layers.ts` with its `exportAs`, add its `<label>_key` constraint, write it with its layer label. Export (`records.<exportAs>`, `formatVersion: 2`, `links` with edge properties) and delete (`DETACH DELETE` by `ownerId`, then the Auth user when `deleteAuth`) cover it automatically (`userdata/exportDelete.ts`). Retention deletes log records only, never profile items.
+- `FOUND_WORD` (User → Emotion) is a log aggregate, not a profile edge: it accumulates without a yes.
+- Pre-convention nodes (`CheckIn`, `BodySensation`, `ToolUsage`, the 4 session labels) were adopted by `schema/migrations/2026-10-user-data-backfill.cypher` (D-16 a).
+
+---
+
 ## Data: Tools
 
 Tools are defined in `src/data/tools.ts`. Each tool has:
@@ -126,7 +150,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 
 | File | Purpose |
 |------|---------|
-| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → body → sensation → suggestion → analyzing → result |
+| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → body → sensation → suggestion → analyzing → result. Saves the check-in when the result renders (PR-C1); Today stack above the grid (PR-S5); Help me now → `HelpNowInterim` (PR-C2: safe step + Cool Down / 5-4-3-2-1, no check-in, no routing call) |
 | `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant) |
 | `src/components/safety/CrisisBanner.tsx` | Crisis resources as a non-blocking banner above the normal result (never a replacement screen) |
 | `src/pages/ToolPage.tsx` | Tool detail page with interactive component routing |
@@ -136,6 +160,15 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |
 | `scripts/find-the-feeling/content.py` | Editable source for `schema/find-the-feeling.cypher` (Find the feeling: word signatures, urge routing, `appToolId`); regenerate with `build.py` |
 | `src/pages/tools/FindTheFeeling.tsx` | "Find the feeling" (Shape it / Tune it): page shell, save, routing, check-in handoff; rooms in `src/components/tools/findTheFeeling/{shape,tune}` (lazy, three.js / Web Audio); logic in `src/lib/findTheFeeling*.ts`; spec `docs/design/find-the-feeling.md` |
+| `scripts/practice-spine/content.py` | Editable source for `schema/practice-spine.cypher`: `FollowUpType` registry, `SessionCloseFlow` (then-vs-now copy per direction), `PracticeSkill.defaultFor` / `displayLabel`; regenerate with `build.py` |
+| `scripts/capacity/content.py` | Editable source for `schema/capacity.cypher` (probe wordings, hand-off copy, primitives, `BandRule`s) and for FTF's probe copy (FTF's `content.py` imports it); regenerate both with their `build.py` |
+| `src/contexts/ToolSessionContext.tsx`, `src/hooks/useToolSession.ts` | One `ToolSession` per tool visit (ToolPage mounts the provider); tools call `useToolSession()` (`setStep`, `markPracticed`, `markComplete`, `setExt`, `close`, `linkTo`). A new tool declares its close kind in `functions/src/spine/tools.ts` + `src/lib/spine/close.ts` (a test enforces it) |
+| `src/components/today/TodayStack.tsx`, `src/contexts/TodayContext.tsx` | Today stack on the check-in screen (≤3 cards + more; OA plans via OA's own card; flooded collapses); the desktop `ContinuityCard` reads the same `tool_outcome` item |
+| `src/lib/spine/wrap.ts` | How OA / Recover / DEAR MAN / FTF sessions join the spine: their own session nodes and readers are unchanged; the `ToolSession` links to them with `DETAIL`, reps and Recover's follow-ups ride on the close, OA plans are mirrored server-side as `FollowUp oa_plan` |
+| `src/components/spine/SessionClose.tsx` | The one-tap close question (graph copy, skip always there) |
+| `scripts/profile-layer/content.py` | Editable source for `schema/profile-layer.cypher`: Me areas, `ProfileKind` (still-true copy, revisit days), `PatternRule` (off until reviewed) |
+| `src/hooks/useProfileContext.ts` | How a tool reads the profile: `useProfileContext(toolId).slices` (in-memory cache, never localStorage). A new tool declares `PROFILE_NEEDS[toolId]` |
+| `src/lib/band.ts`, `src/lib/resumeToken.ts` | Capacity band logic (freshness, hand-off plan, reread) and device-only resume tokens |
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
@@ -144,9 +177,12 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/services/neo4j.ts` | Cloud Function call wrappers |
 | `src/services/firebase.ts` | Firebase init, auth functions |
 | `src/contexts/AuthContext.tsx` | Firebase auth state provider |
-| `src/contexts/UserProfileContext.tsx` | User profile with caching |
+| `src/contexts/UserProfileContext.tsx` | App settings (theme, palette, reminders, retention, displayName) with a localStorage cache for the theme paint. Settings only: profile-layer data never goes here |
+| `src/pages/Profile.tsx` + `src/components/me/` | "Me" (nav label, D-10): the profile layer (About me, My body: quiet hours, My words: found words read-only, My patterns once an offer exists; still-true, set aside / restore, pattern offers) above the settings |
 | `functions/src/index.ts` | The deploy surface: named re-exports of every callable (module table above) |
 | `functions/src/shared/` | Driver + sessions (`neo4j.ts`), `auth.ts`, `validate.ts`, `errors.ts`, `callable.ts` |
+| `functions/src/userdata/` | Data layers: `layers.ts` (registry), `ownership.ts`, `lifecycle.ts` (finalise-once guards), `exportDelete.ts` |
+| `schema/migrations/` | One-off data migrations, run with `--file` (never loaded): `2026-10-user-data-backfill.cypher` |
 | `functions/test/` | Unit tests (fake driver), pinned `fixtures/endpoints.json`, emulator golden suite, local Neo4j compose file |
 | `schema/constraints.cypher` | Every constraint and index; loaded first |
 | `schema/knowledge-graph.cypher` | Base graph nodes (MERGE by id; no relationships) |
@@ -163,7 +199,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 
 - `npm test`: Tier 1, no network: `node --test tests/*.test.mjs` (pure logic, schema and content checks; two freshness tests shell out to `python3`) then `npm --prefix functions test` (builds, then the fake-driver unit tests in `functions/test/unit/`: pinned exports + deploy manifest, auth matrix, handler pins, shared helpers). `node --test tests/` does NOT work on Node 22; use the glob.
 - `npm run test:emulator`: Tier 2 goldens against the Auth + Functions emulators and a local Neo4j. Needs Docker: `npm run graph:test:up`, `npm run graph:test:load`, `cp functions/.secret.local.example functions/.secret.local`. Record with `UPDATE_GOLDEN=1`.
-- Lint: `npx eslint .` still reports 7 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
+- Lint: `npx eslint .` still reports 5 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
 - Cypher syntax: `npx -y -p @neo4j-cypher/language-support@2.0.0-next.6 node scripts/lint-cypher.mjs`.
 - CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 22, no secrets).
 

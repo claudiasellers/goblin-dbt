@@ -1,178 +1,192 @@
 /**
- * Check-ins: save and list.
- * Moved verbatim from the single-file functions/src/index.ts (A1-2); deploy names are the export names.
+ * Check-ins: save (idempotent upsert by key), next action, list. PR-C1 (CORE-05).
+ *
+ * The client saves when the result renders (crisis-banner results included) and again, by the same
+ * id, after "add more detail"; then records what the user did next with setCheckInNextAction.
+ * A CheckIn is finalise-once (userdata/lifecycle.ts): writable until its next action is set or 2 h
+ * after the result showed; after that a replayed save returns the id and changes nothing.
  */
-import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import neo4j, { Record as Neo4jRecord } from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { randomUUID } from 'node:crypto';
+import neo4j, { ManagedTransaction, Record as Neo4jRecord } from 'neo4j-driver';
+import { callable } from '../shared/callable';
+import { readTx, writeTx } from '../shared/neo4j';
+import { invalid, parseOrInvalid } from '../shared/errors';
+import { obj, uuid } from '../shared/validate';
+import { GUARDS } from '../userdata/lifecycle';
+import { MERGE_USER, userKey } from '../userdata/ownership';
+import { readingProps } from '../capacity/reading';
+import { nextActionParams, parseNextAction, validateSaveCheckIn, type CheckInNextAction } from './validation';
 
-// Types
-interface BodySensation {
-  x: number;
-  y: number;
-  region: string;
-  intensity: { x: number; y: number };
-  tags: string[];
-}
+export interface SaveCheckInResponse { id: string }
 
-interface CheckInData {
-  emotion: string;
-  quadrant: string;
-  intensity: { x: number; y: number };
-  bodySensations: BodySensation[];
-  note: string;
-  timestamp: string; // ISO string from frontend
-  activationPatternId?: string;
-  confidence?: number;
+/** Only ids that exist as Emotion nodes are kept (unknown ids are dropped, never fatal). */
+async function knownEmotionIds(tx: ManagedTransaction, raw: string[]): Promise<string[]> {
+  if (raw.length === 0) return [];
+  const res = await tx.run(`MATCH (e:Emotion) WHERE e.id IN $raw RETURN collect(e.id) AS ids`, { raw });
+  const found = new Set((res.records[0]?.get('ids') as string[] | undefined) ?? []);
+  return raw.filter((id) => found.has(id));
 }
 
 /**
- * Save a new check-in for the authenticated user
+ * Save (upsert) a check-in. Old clients without `id` still work: the server mints one.
+ * Always returns a non-empty id (F3: `UNWIND []` used to drop the row and return '').
  */
-export const saveCheckIn = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
-  async (request) => {
-    // Verify user is authenticated
-    if (!request.auth) {
-      throw new HttpsError('unauthenticated', 'User must be logged in');
-    }
-
-    const userId = request.auth.uid;
-    const checkIn = request.data as CheckInData;
-
-    // Validate required fields
-    if (!checkIn.emotion || !checkIn.quadrant) {
-      throw new HttpsError('invalid-argument', 'Missing required fields');
-    }
-
-    const session = getDriver().session();
-    try {
-      const result = await session.run(
-        `
-        CREATE (c:CheckIn {
-          id: randomUUID(),
-          timestamp: datetime($timestamp),
-          emotion: $emotion,
-          quadrant: $quadrant,
-          intensityX: $intensityX,
-          intensityY: $intensityY,
-          note: $note,
-          activationPatternId: $activationPatternId,
-          confidence: $confidence
-        })
-        WITH c
-        MATCH (u:User {id: $userId})
-        MERGE (u)-[:LOGGED]->(c)
-        WITH c
-        FOREACH (_ IN CASE WHEN $activationPatternId IS NOT NULL THEN [1] ELSE [] END |
-          MERGE (ap:ActivationPattern {id: $activationPatternId})
-          MERGE (c)-[:MATCHED_PATTERN]->(ap)
-        )
-        WITH c
-        UNWIND $bodySensations AS sensation
-        CREATE (s:BodySensation {
-          x: sensation.x,
-          y: sensation.y,
-          region: sensation.region,
-          intensityX: sensation.intensity.x,
-          intensityY: sensation.intensity.y,
-          tags: sensation.tags
-        })
-        MERGE (c)-[:SENSED]->(s)
-        RETURN c.id AS id
-        `,
-        {
-          userId,
-          timestamp: checkIn.timestamp || new Date().toISOString(),
-          emotion: checkIn.emotion,
-          quadrant: checkIn.quadrant,
-          intensityX: checkIn.intensity?.x ?? 0,
-          intensityY: checkIn.intensity?.y ?? 0,
-          note: checkIn.note || '',
-          bodySensations: checkIn.bodySensations || [],
-          activationPatternId: checkIn.activationPatternId || null,
-          confidence: checkIn.confidence ?? null,
-        }
+export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
+  { auth: 'required', label: 'saveCheckIn', errorMessage: 'Failed to save check-in' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateSaveCheckIn(data, new Date()), 'Missing required fields');
+    const id = input.id ?? randomUUID();
+    const key = userKey(uid as string, id);
+    const email = request.auth?.token?.email ?? null;
+    await writeTx(async (tx) => {
+      // 1. The user and the check-in exist (a missing User is created, never an orphan: F3/F4).
+      const head = await tx.run(
+        `${MERGE_USER}
+         MERGE (c:CheckIn {key: $key})
+         ON CREATE SET c:UserData:LogRecord, c.id = $id, c.ownerId = $uid, c.createdAt = datetime(),
+                       c.timestamp = CASE WHEN $timestamp IS NULL THEN datetime() ELSE datetime($timestamp) END,
+                       c.schemaVersion = 2
+         MERGE (u)-[:LOGGED]->(c)
+         RETURN ${GUARDS.CheckIn.upsert('c')} AS open`,
+        { uid, email, key, id, timestamp: input.timestamp },
       );
+      if (head.records[0]?.get('open') !== true) return; // finalised: the save is a no-op
+      const emotionIds = await knownEmotionIds(tx, input.emotionIds);
+      const band = readingProps('band', input.capacity);
+      const next = nextActionParams(input.nextAction);
+      // 2. Every result field (re-analysis overwrites them); a next-action stub keeps its next action.
+      await tx.run(
+        `MATCH (u:User {id: $uid})-[:LOGGED]->(c:CheckIn {key: $key})
+         WITH c, c.nextActionKind IS NULL AS noNext
+         SET c.emotion = $emotion, c.quadrant = $quadrant, c.intensityX = $intensityX, c.intensityY = $intensityY,
+             c.note = $note, c.activationPatternId = $activationPatternId, c.confidence = $confidence,
+             c.source = $source, c.emotionIds = $emotionIds,
+             c.discQuestionIds = $discQuestionIds, c.discResponseIds = $discResponseIds,
+             c.recommendedToolIds = $recommendedToolIds, c.secondaryPatternId = $secondaryPatternId,
+             c.coOccurrenceLabel = $coOccurrenceLabel, c.guidedActivityId = $guidedActivityId,
+             c.safetyFlagId = $safetyFlagId,
+             c.resultShownAt = CASE WHEN $resultShown THEN coalesce(c.resultShownAt, datetime()) ELSE c.resultShownAt END,
+             c.nextActionKind = CASE WHEN noNext THEN $nextKind ELSE c.nextActionKind END,
+             c.nextActionToolId = CASE WHEN noNext THEN $nextToolId ELSE c.nextActionToolId END,
+             c.nextActionAt = CASE WHEN noNext AND $nextKind IS NOT NULL THEN datetime() ELSE c.nextActionAt END,
+             c.updatedAt = datetime()
+         FOREACH (_ IN CASE WHEN $band IS NULL THEN [] ELSE [1] END |
+           SET c.band = $band, c.bandSource = $bandSource, c.bandViaCantTell = $bandViaCantTell,
+               c.bandAt = datetime($bandAt), c.bandJson = $bandJson)
+         REMOVE c.pendingFullSave
+         WITH c
+         OPTIONAL MATCH (c)-[oldp:MATCHED_PATTERN]->()
+         DELETE oldp
+         WITH DISTINCT c
+         OPTIONAL MATCH (ap:ActivationPattern {id: $activationPatternId})
+         FOREACH (x IN CASE WHEN ap IS NULL THEN [] ELSE [ap] END | MERGE (c)-[:MATCHED_PATTERN]->(x))
+         WITH DISTINCT c
+         OPTIONAL MATCH (c)-[:SENSED]->(old:BodySensation)
+         DETACH DELETE old
+         WITH DISTINCT c
+         FOREACH (s IN $bodySensations |
+           CREATE (b:BodySensation:UserData:LogRecord {id: s.id, key: $uid + ':' + s.id, ownerId: $uid,
+                   createdAt: datetime(), schemaVersion: 1, x: s.x, y: s.y, region: s.region,
+                   intensityX: s.intensityX, intensityY: s.intensityY, tags: s.tags})
+           MERGE (c)-[:SENSED]->(b))
+         WITH DISTINCT c
+         OPTIONAL MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession) WHERE ts.key IN $embeddedKeys
+         FOREACH (x IN CASE WHEN ts IS NULL THEN [] ELSE [ts] END | MERGE (c)-[:EMBEDDED]->(x))`,
+        {
+          uid, key,
+          emotion: input.emotion, quadrant: input.quadrant, intensityX: input.intensityX, intensityY: input.intensityY,
+          note: input.note, activationPatternId: input.activationPatternId, confidence: input.confidence,
+          source: input.source, emotionIds,
+          discQuestionIds: input.discQuestionIds, discResponseIds: input.discResponseIds,
+          recommendedToolIds: input.recommendedToolIds, secondaryPatternId: input.secondaryPatternId,
+          coOccurrenceLabel: input.coOccurrenceLabel, guidedActivityId: input.guidedActivityId,
+          safetyFlagId: input.safetyFlagId, resultShown: input.resultShown,
+          ...next,
+          ...band,
+          bodySensations: input.bodySensations.map((s) => ({ ...s, id: randomUUID() })),
+          embeddedKeys: input.embeddedToolSessionIds.map((t) => userKey(uid as string, t)),
+        },
+      );
+    });
+    return { id };
+  },
+);
 
-      const id = result.records[0]?.get('id') || '';
-      return { id };
-    } catch (error) {
-      console.error('Error saving check-in:', error);
-      throw new HttpsError('internal', 'Failed to save check-in');
-    } finally {
-      await session.close();
-    }
-  }
+export interface SetCheckInNextActionResponse { ok: true }
+
+/**
+ * What the user did after the result: a tool, a micro-step, a guided activity (or its early exit),
+ * or Done. The first next action is the terminal event (finalise-once). A MERGE, so it can't lose
+ * a race with the render save: a stub (pendingFullSave) waits for the full save to fill it.
+ */
+export const setCheckInNextAction = callable<unknown, SetCheckInNextActionResponse>(
+  { auth: 'required', label: 'setCheckInNextAction', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const d = obj(data);
+    const checkInId = parseOrInvalid(() => uuid(d.checkInId), 'Invalid check-in');
+    const action: CheckInNextAction | null = parseNextAction(d.nextAction);
+    if (!action) throw invalid('Invalid next action');
+    const { nextKind, nextToolId } = nextActionParams(action);
+    const email = request.auth?.token?.email ?? null;
+    await writeTx((tx) => tx.run(
+      `${MERGE_USER}
+       MERGE (c:CheckIn {key: $key})
+       ON CREATE SET c:UserData:LogRecord, c.id = $id, c.ownerId = $uid, c.createdAt = datetime(),
+                     c.timestamp = datetime(), c.schemaVersion = 2, c.pendingFullSave = true
+       MERGE (u)-[:LOGGED]->(c)
+       WITH c
+       WHERE ${GUARDS.CheckIn.upsert('c')} AND c.nextActionKind IS NULL
+       SET c.nextActionKind = $nextKind, c.nextActionToolId = $nextToolId, c.nextActionAt = datetime(),
+           c.updatedAt = datetime()`,
+      { uid, email, key: userKey(uid as string, checkInId), id: checkInId, nextKind, nextToolId },
+    ));
+    return { ok: true };
+  },
 );
 
 /**
- * Get check-ins for the authenticated user
+ * Get check-ins for the authenticated user (next-action stubs without a full save are skipped).
  */
-export const getCheckInsByUser = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
-  async (request) => {
-    // Verify user is authenticated
-    if (!request.auth) {
-      throw new HttpsError('unauthenticated', 'User must be logged in');
-    }
-
-    const userId = request.auth.uid;
-    const limit = (request.data?.limit as number) || 50;
-
-    const session = getDriver().session();
-    try {
-      const result = await session.run(
-        `
-        MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-        OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-        WITH c, collect(s) AS sensations
-        ORDER BY c.timestamp DESC
-        LIMIT $limit
-        RETURN c {
-          .id,
-          .emotion,
-          .quadrant,
-          .note,
-          .activationPatternId,
-          .confidence,
-          timestamp: toString(c.timestamp),
-          intensity: {x: c.intensityX, y: c.intensityY}
-        } AS checkIn,
-        [s IN sensations | {
-          x: s.x,
-          y: s.y,
-          region: s.region,
-          tags: s.tags,
-          intensity: {x: s.intensityX, y: s.intensityY}
-        }] AS bodySensations
-        `,
-        { userId, limit: neo4j.int(limit) }
-      );
-
-      const checkIns = result.records.map((record: Neo4jRecord) => {
-        const checkIn = record.get('checkIn');
-        const bodySensations = record.get('bodySensations');
-        return {
-          id: checkIn.id,
-          userId,
-          emotion: checkIn.emotion,
-          quadrant: checkIn.quadrant,
-          intensity: checkIn.intensity,
-          bodySensations: bodySensations || [],
-          note: checkIn.note,
-          timestamp: checkIn.timestamp,
-          activationPatternId: checkIn.activationPatternId || null,
-          confidence: checkIn.confidence ?? null,
-        };
-      });
-
-      return { checkIns };
-    } catch (error) {
-      console.error('Error fetching check-ins:', error);
-      throw new HttpsError('internal', 'Failed to fetch check-ins');
-    } finally {
-      await session.close();
-    }
-  }
+export const getCheckInsByUser = callable<unknown, { checkIns: unknown[] }>(
+  { auth: 'required', label: 'getCheckInsByUser', errorMessage: 'Failed to fetch check-ins' },
+  async ({ uid, data }) => {
+    const raw = (data as { limit?: unknown } | null | undefined)?.limit;
+    const limit = typeof raw === 'number' && Number.isInteger(raw) && raw > 0 && raw <= 500 ? raw : 50;
+    const result = await readTx((tx) => tx.run(
+      `MATCH (u:User {id: $uid})-[:LOGGED]->(c:CheckIn)
+       WHERE c.quadrant IS NOT NULL
+       OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
+       WITH c, collect(s) AS sensations
+       ORDER BY c.timestamp DESC
+       LIMIT $limit
+       RETURN c {
+         .id, .emotion, .quadrant, .note, .activationPatternId, .confidence,
+         .emotionIds, .source, .band, .nextActionKind, .nextActionToolId,
+         timestamp: toString(c.timestamp),
+         intensity: {x: c.intensityX, y: c.intensityY}
+       } AS checkIn,
+       [s IN sensations | {x: s.x, y: s.y, region: s.region, tags: s.tags, intensity: {x: s.intensityX, y: s.intensityY}}] AS bodySensations`,
+      { uid, limit: neo4j.int(limit) },
+    ));
+    const checkIns = result.records.map((record: Neo4jRecord) => {
+      const c = record.get('checkIn');
+      return {
+        id: c.id,
+        userId: uid,
+        emotion: c.emotion,
+        quadrant: c.quadrant,
+        intensity: c.intensity,
+        bodySensations: record.get('bodySensations') || [],
+        note: c.note,
+        timestamp: c.timestamp,
+        activationPatternId: c.activationPatternId || null,
+        confidence: c.confidence ?? null,
+        emotionIds: c.emotionIds ?? [],
+        source: c.source ?? null,
+        band: c.band ?? null,
+        nextAction: c.nextActionKind ? { kind: c.nextActionKind, toolId: c.nextActionToolId ?? null } : null,
+      };
+    });
+    return { checkIns };
+  },
 );

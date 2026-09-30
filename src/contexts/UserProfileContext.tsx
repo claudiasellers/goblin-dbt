@@ -15,8 +15,17 @@ import {
   type UserProfile,
 } from '../services/neo4j';
 import { DEFAULT_PALETTE } from '../data/palettes';
+import { profileCache } from '../lib/profileCache';
 
 const PROFILE_CACHE_KEY = 'goblin-dbt-profile-cache';
+
+function browserTimeZone(): string | null {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+  } catch {
+    return null;
+  }
+}
 
 function loadCachedProfile(userId: string): UserProfile | null {
   try {
@@ -83,6 +92,13 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
       const fetchedProfile = await getUserProfile();
       setProfile(fetchedProfile);
       saveCachedProfile(user.uid, fetchedProfile);
+      // Keep User.timeZone in step with this device (follow-up windows, quiet hours).
+      const zone = browserTimeZone();
+      if (zone && fetchedProfile.timeZone !== zone) {
+        updateProfileApi({ timeZone: zone })
+          .then(() => setProfile((prev) => ({ ...prev, timeZone: zone })))
+          .catch(() => { /* next load retries */ });
+      }
     } catch (err) {
       // If the cloud function doesn't exist yet, fall back to defaults
       console.warn('Could not load profile, using defaults:', err);
@@ -110,6 +126,8 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   const updateProfile = useCallback(
     async (updates: Partial<UserProfile>) => {
       setError(null);
+      // The name is a profile slice (PR-P1): drop cached slices so tools re-read it.
+      if ('displayName' in updates) profileCache.clear();
       try {
         await updateProfileApi(updates);
         setProfile((prev) => {

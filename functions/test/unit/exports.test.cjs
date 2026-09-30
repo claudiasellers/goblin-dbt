@@ -16,9 +16,9 @@ test('exported callables are exactly the pinned set', () => {
   assert.deepEqual(Object.keys(fns).sort(), Object.keys(endpoints).sort());
 });
 
-test('every export is a callable whose deploy manifest matches the fixture', () => {
+test('every export is a function whose deploy manifest matches the fixture', () => {
   for (const [name, expected] of Object.entries(endpoints)) {
-    assert.equal(typeof fns[name]?.run, 'function', `${name} is not a callable`);
+    assert.equal(typeof fns[name]?.run, 'function', `${name} is not a deployable function`);
     assert.deepEqual(JSON.parse(JSON.stringify(fns[name].__endpoint)), expected, name);
   }
 });

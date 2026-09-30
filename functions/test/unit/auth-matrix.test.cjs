@@ -12,21 +12,28 @@ const AUTHED = [
   'deleteUserData', 'ensureUserExists', 'exportUserData', 'getCheckInsByUser',
   'getDearManSessions', 'getFeelingCollection', 'getInsightsData', 'getInvalidationRecoveryProgress',
   'getOppositeActionFollowUps', 'getOppositeActionSession', 'getOppositeActionSessions', 'getUserProfile',
-  'recordToolOutcome', 'saveCheckIn',
+  'recordToolOutcome', 'saveCheckIn', 'setCheckInNextAction',
+  'startToolSession', 'closeToolSession', 'recordToolSession', 'answerToolOutcome',
+  'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday',
+  'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
+  'restoreProfileItem', 'answerPatternOffer',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
 ];
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools', 'getCapacityContent', 'getSpineContent',
 ];
+
+// Background triggers (not callables): auth lifecycle events carry their own uid.
+const TRIGGERS = ['onUserCreated', 'onUserDeleted'];
 
 const { fns, setDriver } = loadFunctions();
 
 test('the matrix covers every export exactly once', () => {
-  assert.deepEqual([...AUTHED, ...PUBLIC].sort(), Object.keys(fns).sort());
-  assert.equal(new Set([...AUTHED, ...PUBLIC]).size, AUTHED.length + PUBLIC.length);
+  assert.deepEqual([...AUTHED, ...PUBLIC, ...TRIGGERS].sort(), Object.keys(fns).sort());
+  assert.equal(new Set([...AUTHED, ...PUBLIC, ...TRIGGERS]).size, AUTHED.length + PUBLIC.length + TRIGGERS.length);
 });
 
 for (const name of AUTHED) {

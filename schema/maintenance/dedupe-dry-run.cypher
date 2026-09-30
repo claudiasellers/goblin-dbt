@@ -13,8 +13,8 @@
 // Not in LOAD_ORDER.
 // ============================================================
 
-// 1. Duplicate nodes: same label + id (EmotionRegulationContent: + dbtParent)
-MATCH (n) WHERE n.id IS NOT NULL OR n:EmotionRegulationContent
+// 1. Duplicate nodes: same label + id (EmotionRegulationContent: + dbtParent); user data excluded (PR-S1)
+MATCH (n) WHERE (n.id IS NOT NULL OR n:EmotionRegulationContent) AND NOT n:UserData
 UNWIND labels(n) AS label
 WITH label, CASE WHEN label = 'EmotionRegulationContent' THEN n.dbtParent ELSE n.id END AS key, count(*) AS copies
 WHERE key IS NOT NULL AND copies > 1

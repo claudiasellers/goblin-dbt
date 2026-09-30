@@ -379,9 +379,10 @@ export const saveDearManSession = onCall(
 
     const session = getDriver().session();
     try {
-      await session.run(
+      const written = await session.run(
         `
-        MATCH (u:User {id: $userId})
+        MERGE (u:User {id: $userId})
+        ON CREATE SET u.createdAt = datetime(), u.email = $email
         CREATE (s:DearManSession {
           id: randomUUID(),
           type: $type,
@@ -416,11 +417,13 @@ export const saveDearManSession = onCall(
           reflectionLanded: $reflectionLanded,
           createdAt: datetime()
         })
+        SET s:UserData:LogRecord, s.ownerId = $userId, s.key = $userId + ':' + s.id, s.schemaVersion = 1
         MERGE (u)-[:COMPLETED_SESSION]->(s)
         RETURN s.id AS id
         `,
         {
           userId,
+          email: request.auth.token.email || null,
           type: data.type,
           relationshipType: data.relationshipType || '',
           situationType: data.situationType || '',
@@ -455,7 +458,8 @@ export const saveDearManSession = onCall(
         }
       );
 
-      return { success: true };
+      // PR-S4: the id links the session to its ToolSession (DETAIL) and its reps.
+      return { success: true, id: (written.records[0]?.get('id') as string | undefined) ?? null };
     } catch (error) {
       console.error('Error saving DEAR MAN session:', error);
       throw new HttpsError('internal', 'Failed to save session');

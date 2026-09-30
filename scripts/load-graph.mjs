@@ -55,6 +55,9 @@ export const LOAD_ORDER = [
   'dear-man-safety-gates.cypher',                  // DEAR MAN arousal-gate copy (reads gates from the recovery flow)
   'app-tool-ids.cypher',                           // TherapyConcept.appToolId join keys (fixes tipp/stop/problem-solving cards)
   'find-the-feeling.cypher',                       // Find the feeling (Shape it / Tune it): word signatures, urge routing, appToolId join keys
+  'practice-spine.cypher',                         // FollowUpType, SessionCloseFlow, PracticeSkill defaultFor (needs urge_surfing above)
+  'profile-layer.cypher',                          // ProfileArea / ProfileKind / PatternRule (Me surface content)
+  'capacity.cypher',                               // Capacity probe, hand-off primitives, band rules (needs Recover's cyclic_sighing)
 ];
 
 // schema/*.cypher files that are deliberately never loaded (reference queries, not data).

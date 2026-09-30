@@ -94,7 +94,23 @@ CREATE CONSTRAINT feeling_signature_id IF NOT EXISTS FOR (fs:FeelingSignature) R
 CREATE CONSTRAINT feeling_family_id IF NOT EXISTS FOR (ff:FeelingFamily) REQUIRE ff.id IS UNIQUE;
 CREATE CONSTRAINT feeling_urge_id IF NOT EXISTS FOR (fu:FeelingUrge) REQUIRE fu.id IS UNIQUE;
 
-// --- User data (written by Cloud Functions, never by schema files). PR-S1 adds the :UserData labels here. ---
+// --- Practice spine content (PR-S2, schema/practice-spine.cypher) ---
+CREATE CONSTRAINT follow_up_type_id IF NOT EXISTS FOR (n:FollowUpType) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT session_close_flow_id IF NOT EXISTS FOR (n:SessionCloseFlow) REQUIRE n.id IS UNIQUE;
+
+// --- Profile layer content (PR-P1, schema/profile-layer.cypher) ---
+CREATE CONSTRAINT profile_area_id IF NOT EXISTS FOR (n:ProfileArea) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT profile_kind_id IF NOT EXISTS FOR (n:ProfileKind) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT pattern_rule_id IF NOT EXISTS FOR (n:PatternRule) REQUIRE n.id IS UNIQUE;
+
+// --- Capacity band content (A4-1, schema/capacity.cypher) ---
+CREATE CONSTRAINT capacity_probe_id IF NOT EXISTS FOR (n:CapacityProbe) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT handoff_primitive_id IF NOT EXISTS FOR (n:HandoffPrimitive) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT band_rule_id IF NOT EXISTS FOR (n:BandRule) REQUIRE n.id IS UNIQUE;
+
+// --- User data (written by Cloud Functions, never by schema files) ---
+// PR-S1 conventions (functions/src/userdata/layers.ts): every :UserData label has a unique `key`
+// (= ownerId + ':' + id; writes MERGE on key), and every :UserData node is indexed on ownerId.
 CREATE CONSTRAINT user_id IF NOT EXISTS FOR (u:User) REQUIRE u.id IS UNIQUE;
 CREATE CONSTRAINT checkin_id IF NOT EXISTS FOR (ci:CheckIn) REQUIRE ci.id IS UNIQUE;
 CREATE INDEX checkin_timestamp IF NOT EXISTS FOR (ci:CheckIn) ON (ci.timestamp);
@@ -105,3 +121,17 @@ CREATE CONSTRAINT invalidation_recovery_session_key IF NOT EXISTS FOR (irs:Inval
 CREATE INDEX invalidation_recovery_session_created IF NOT EXISTS FOR (irs:InvalidationRecoverySession) ON (irs.createdAt);
 CREATE CONSTRAINT find_the_feeling_session_key IF NOT EXISTS FOR (ftfs:FindTheFeelingSession) REQUIRE ftfs.key IS UNIQUE;
 CREATE INDEX find_the_feeling_session_created IF NOT EXISTS FOR (ftfs:FindTheFeelingSession) ON (ftfs.createdAt);
+CREATE CONSTRAINT checkin_key IF NOT EXISTS FOR (n:CheckIn) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT body_sensation_key IF NOT EXISTS FOR (n:BodySensation) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT tool_usage_key IF NOT EXISTS FOR (n:ToolUsage) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT dearman_session_key IF NOT EXISTS FOR (n:DearManSession) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT tool_session_key IF NOT EXISTS FOR (n:ToolSession) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT skill_practice_key IF NOT EXISTS FOR (n:SkillPractice) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT follow_up_key IF NOT EXISTS FOR (n:FollowUp) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT pattern_offer_key IF NOT EXISTS FOR (n:PatternOffer) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT profile_fact_key IF NOT EXISTS FOR (n:ProfileFact) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT my_pattern_key IF NOT EXISTS FOR (n:MyPattern) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT push_token_key IF NOT EXISTS FOR (n:PushToken) REQUIRE n.key IS UNIQUE;
+CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
+CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
+CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);

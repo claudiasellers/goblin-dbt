@@ -275,7 +275,7 @@ MERGE (x)-[:IMPLEMENTS]->(c);
 
 // --- Practice skill deck (grades follow the project's Strong/Moderate/Preliminary scale;
 // evidenceBasis says why a skill is Preliminary) ---
-MATCH (:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() DELETE r;
+MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN ["sigh", "stop", "cold", "orient", "label", "validate", "compassion", "secure", "need", "request", "wait_lock", "accept", "opposite", "park", "values", "validating_other", "one_thing", "mattering", "must_prefer"] DELETE r;
 MERGE (k:PracticeSkill {id: "sigh"})
 SET k.name = "Cyclic sigh", k.evidenceGrade = "Moderate", k.evidenceBasis = null, k.family = "body", k.why = "A long exhale slows your breathing and your heart. Daily practice beat mindfulness on mood in a 28-day trial.", k.order = 0;
 MATCH (k:PracticeSkill {id: "sigh"}), (c:TherapyConcept {id: "cyclic_sighing"})

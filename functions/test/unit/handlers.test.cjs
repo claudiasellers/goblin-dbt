@@ -18,16 +18,17 @@ const quiet = async (fn) => {
 
 test.after(() => setDriver(null));
 
-test('saveCheckIn takes the user id from auth, never from the payload', async () => {
-  const f = fakeDriver(() => [{ id: 'checkin-1' }]);
+test('saveCheckIn takes the user id from auth, never from the payload, and always returns an id', async () => {
+  const f = fakeDriver((q) => (/RETURN .* AS open/s.test(q) ? [{ open: true }] : []));
   setDriver(f.driver);
   const out = await fns.saveCheckIn.run({
     auth: auth('real-user'),
     data: { emotion: 'anxious', quadrant: 'high-unpleasant', userId: 'someone-else', bodySensations: [] },
   });
-  assert.deepEqual(out, { id: 'checkin-1' });
-  assert.equal(f.calls.length, 1);
-  assert.equal(f.calls[0].params.userId, 'real-user');
+  assert.match(out.id, /^[0-9a-f-]{36}$/, 'PR-C1: non-empty even without body data (F3)');
+  assert.ok(f.calls.every((c) => !('userId' in c.params) || c.params.userId === 'real-user'));
+  assert.equal(f.calls[0].params.uid, 'real-user');
+  assert.equal(f.calls[0].params.key, `real-user:${out.id}`);
   assert.ok(f.allClosed());
 });
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { QuadrantGrid } from '../components/checkin/QuadrantGrid';
@@ -10,7 +10,7 @@ import { EmotionSuggestion } from '../components/checkin/EmotionSuggestion';
 import { DiscriminatingQuestions } from '../components/checkin/DiscriminatingQuestions';
 import {
   saveCheckIn,
-  ensureUserExists,
+  setCheckInNextAction,
   getStateAndTools,
   getDiscriminatingQuestions,
   type StateResult as StateResultType,
@@ -18,13 +18,23 @@ import {
 } from '../services/neo4j';
 import { getEmotionById, getEmotionByName } from '../data/emotions';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
-import { useOppositeActionFollowUpsContext } from '../hooks/useOppositeActionFollowUps';
-import { OppositeActionFollowUpCard } from '../components/tools/oppositeAction/OppositeActionFollowUpCard';
+import { TodayStack } from '../components/today/TodayStack';
+import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
+import { newId } from '../lib/spine/ids';
+import {
+  buildCheckInPayload,
+  ftfReading,
+  type CheckInNextAction,
+  type CheckInSource,
+} from '../lib/spine/checkInPayload';
+import type { CapacityReading } from '../data/capacityTypes';
+import { recordToolSession } from '../services/spine';
 
 type EntryPoint = 'standard' | 'somatic';
 
 type CheckInStep =
   | 'emotion'
+  | 'help_now'
   | 'find'
   | 'discriminating'
   | 'body'
@@ -70,8 +80,74 @@ export function CheckIn() {
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [discriminatingQuestions, setDiscriminatingQuestions] = useState<DiscriminatingQuestion[]>([]);
   const [discriminatingAnswers, setDiscriminatingAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
-  // Opposite Action plans made for later (app-level, shared with the in-tab reminder).
-  const followUps = useOppositeActionFollowUpsContext();
+
+  // === Continuity (PR-C1) ===
+  // One client id per check-in, minted when the flow starts and reset in handleComplete. The result
+  // is saved when it renders (crisis-banner results included) and re-saved by the same id after
+  // "add more detail"; what the user does next is recorded against it (setCheckInNextAction).
+  const [checkInId, setCheckInId] = useState<string>(() => newId());
+  const [startedAt, setStartedAt] = useState<Date>(() => new Date());
+  const [source, setSource] = useState<CheckInSource>('grid');
+  const [capacity, setCapacity] = useState<CapacityReading | null>(null);
+  const [knownEmotionIds, setKnownEmotionIds] = useState<string[]>([]);
+  const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
+  /** The render save in flight: resolves true when saved. Next actions chain after it. */
+  const savePromise = useRef<Promise<boolean> | null>(null);
+  const savedResult = useRef<StateResultType | null>(null);
+
+  const payloadState = () => ({
+    id: checkInId,
+    quadrant: checkInData.quadrant ?? 'high-unpleasant',
+    emotions: checkInData.emotions,
+    emotionIds: knownEmotionIds,
+    intensity: checkInData.intensity,
+    bodySensations: checkInData.bodySensations,
+    note: checkInData.note,
+    startedAt,
+    source,
+    capacity,
+    discriminatingAnswers,
+    embeddedToolSessionIds: embeddedIds,
+  });
+
+  // Save on result render, before any tool can open (R4: every downstream write keys on this id).
+  useEffect(() => {
+    if (!user || step !== 'result' || !stateResult || !checkInData.quadrant) return;
+    if (savedResult.current === stateResult) return;
+    savedResult.current = stateResult;
+    savePromise.current = saveCheckIn(buildCheckInPayload(payloadState(), stateResult))
+      .then(() => true)
+      .catch((err) => {
+        console.error('Failed to save check-in:', err);
+        return false;
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, step, stateResult]);
+
+  /**
+   * Record the next action once the render save settled. If that save failed, save again with the
+   * next action inline (same id, so nothing duplicates). Resolves true when recorded.
+   */
+  function recordNextAction(next: CheckInNextAction): Promise<boolean> {
+    const id = checkInId;
+    const state = payloadState();
+    const result = stateResult;
+    const pending = savePromise.current ?? Promise.resolve(false);
+    return pending.then((saved) => (saved
+      ? setCheckInNextAction(id, next)
+      : saveCheckIn(buildCheckInPayload(state, result, next)).then(() => undefined)))
+      .then(() => true)
+      .catch((err) => {
+        console.error('Failed to record next action:', err);
+        return false;
+      });
+  }
+
+  /** A tool card tap: fire-and-forget; navigation never waits. */
+  function handleToolOpen(toolId: string) {
+    if (!user || !checkInData.quadrant) return;
+    void recordNextAction({ kind: 'tool', toolId });
+  }
 
   // Signed-out entry: tools are available right now; an account only adds saved check-ins.
   if (!user) {
@@ -142,15 +218,8 @@ export function CheckIn() {
       setStep('saving');
       try {
         if (user) {
-          await ensureUserExists(user.uid, user.email || '');
-          await saveCheckIn(user.uid, {
-            emotion: emotions.join(', ') || quadrant,
-            quadrant,
-            intensity: checkInData.intensity || { x: 0.5, y: 0.5 },
-            bodySensations: checkInData.bodySensations,
-            note: checkInData.note,
-            timestamp: new Date(),
-          });
+          // Analysis failed: save what the user told us, without a pattern (idempotent by id).
+          await saveCheckIn(buildCheckInPayload({ ...payloadState(), quadrant, emotions }, null, { kind: 'done' }));
         }
         setStep('complete');
       } catch (saveErr) {
@@ -162,16 +231,19 @@ export function CheckIn() {
   }
 
   /**
-   * "Help me now" - skip to analysis with just quadrant
+   * "Help me now" (PR-C2, D-08 interim): a safe body step and two quiet links. No check-in and no
+   * routing call: nothing was said about the feeling, so nothing is guessed.
    */
   function handleHelpMeNow() {
-    analyzeAndShowResult();
+    setStep('help_now');
   }
 
   /**
    * "I don't know how I feel" - start with body sensations instead
    */
   function handleSomaticEntry() {
+    setStartedAt(new Date()); // the check-in's time is when it starts, not when the screen mounted
+    setSource('body');
     setEntryPoint('somatic');
     setStep('body');
   }
@@ -181,7 +253,12 @@ export function CheckIn() {
    * capacity band sets intensity; no word falls back to the body-first path.
    */
   function handleFound(r: FindTheFeelingResult) {
+    // FTF's band is this check-in's capacity answer (kept, not just turned into intensity).
+    setSource('ftf');
+    setCapacity(ftfReading(newId(), r.band));
+    if (r.toolSessionId) setEmbeddedIds([r.toolSessionId]);
     const emotion = r.emotionId ? getEmotionById(r.emotionId) : undefined;
+    if (emotion) setKnownEmotionIds([emotion.id]);
     if (!emotion) {
       setCheckInData(prev => ({ ...prev, intensity: { x: 0.5, y: r.intensityY } }));
       setEntryPoint('somatic');
@@ -301,35 +378,41 @@ export function CheckIn() {
   }
 
   /**
-   * After seeing the result, optionally save the check-in
+   * Done, micro-step done, or guided activity done / exited early. The check-in was saved when the
+   * result rendered; this records what happened next, then shows the saved screen.
    */
-  async function handleResultDone() {
+  async function handleResultDone(next: CheckInNextAction = { kind: 'done' }) {
     if (!user || !checkInData.quadrant) {
       handleComplete();
       return;
     }
 
-    // Save the check-in in the background
     setStep('saving');
     setSaveError(null);
+    const ok = await recordNextAction(next);
+    if (!ok) setSaveError('Failed to save your check-in. It will be stored locally.');
+    recordOneShot(next);
+    setStep('complete');
+  }
 
-    try {
-      await ensureUserExists(user.uid, user.email || '');
-      await saveCheckIn(user.uid, {
-        emotion: checkInData.emotions.join(', ') || checkInData.quadrant,
-        quadrant: checkInData.quadrant,
-        intensity: checkInData.intensity || { x: 0.5, y: 0.5 },
-        bodySensations: checkInData.bodySensations,
-        note: checkInData.note,
-        timestamp: new Date(),
-        activationPatternId: stateResult?.pattern?.id,
-        confidence: stateResult?.pattern?.confidence,
-      });
-      setStep('complete');
-    } catch (error) {
-      console.error('Failed to save check-in:', error);
-      setSaveError('Failed to save your check-in. It will be stored locally.');
-      setStep('complete');
+  /** Micro-steps and guided activities are practice too: a one-shot ToolSession (PR-S3). No rep yet. */
+  function recordOneShot(next: CheckInNextAction) {
+    const patternId = stateResult?.pattern?.id;
+    const core: Record<string, string> = {};
+    if (patternId) core.patternId = patternId;
+    if (next.kind === 'micro_step') {
+      if (next.microStepId) core.microStepId = next.microStepId;
+      void recordToolSession({
+        id: newId(), toolId: 'micro-step', entry: 'checkin_result', checkInId, status: 'completed',
+        ...(patternId ? { patternId } : {}), ext: { core },
+      }).catch(() => { /* best effort */ });
+    } else if (next.kind === 'activity' || next.kind === 'activity_partial') {
+      if (next.activityId) core.activityId = next.activityId;
+      void recordToolSession({
+        id: newId(), toolId: 'guided-activity', entry: 'checkin_result', checkInId,
+        status: next.kind === 'activity' ? 'completed' : 'exited_early',
+        ...(patternId ? { patternId } : {}), ext: { core },
+      }).catch(() => { /* best effort */ });
     }
   }
 
@@ -346,6 +429,14 @@ export function CheckIn() {
   }
 
   function handleComplete() {
+    setCheckInId(newId());
+    setStartedAt(new Date());
+    savePromise.current = null;
+    savedResult.current = null;
+    setSource('grid');
+    setCapacity(null);
+    setKnownEmotionIds([]);
+    setEmbeddedIds([]);
     setCheckInData({
       quadrant: null,
       emotions: [],
@@ -365,6 +456,9 @@ export function CheckIn() {
 
   function handleBack() {
     switch (step) {
+      case 'help_now':
+        setStep('emotion');
+        break;
       case 'discriminating':
         setStep('emotion');
         break;
@@ -404,10 +498,9 @@ export function CheckIn() {
 
   return (
     <div>
-      {/* Follow-up on an Opposite Action plan, only before a new check-in starts */}
-      {step === 'emotion' && followUps.pending.length > 0 && followUps.ready && (
-        <OppositeActionFollowUpCard pending={followUps.pending} copy={followUps.copy} />
-      )}
+      {/* Today (PR-S5): follow-ups, "did it help?", OA plans. Only before a new check-in starts,
+          so never beside a result or the crisis banner. */}
+      {step === 'emotion' && <TodayStack />}
 
       {/* Progress indicator - subtle, shows optionality */}
       {showProgress && (
@@ -454,12 +547,14 @@ export function CheckIn() {
       <div key={step} className="step-enter">
         {step === 'emotion' && (
           <QuadrantGrid
-            onSelect={handleEmotionSelect}
+            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); setCapacity(null); void handleEmotionSelect(emotions); }}
             onHelpMeNow={handleHelpMeNow}
             onSomaticEntry={handleSomaticEntry}
-            onCantTell={() => setStep('find')}
+            onCantTell={() => { setStartedAt(new Date()); setStep('find'); }}
           />
         )}
+
+        {step === 'help_now' && <HelpNowInterim onDone={() => setStep('emotion')} />}
 
         {step === 'find' && (
           <div className="space-y-3">
@@ -522,6 +617,8 @@ export function CheckIn() {
           stateResult.guidedActivity && checkInData.quadrant === 'low-unpleasant' ? (
             <LowEnergyStateResult
               result={stateResult}
+              checkInId={checkInId}
+              onToolOpen={handleToolOpen}
               onDone={handleResultDone}
               onAddMoreDetail={
                 (!checkInData.emotions.length || !checkInData.bodySensations.length)
@@ -533,6 +630,8 @@ export function CheckIn() {
           ) : (
             <StateResult
               result={stateResult}
+              checkInId={checkInId}
+              onToolOpen={handleToolOpen}
               onDone={handleResultDone}
               onAddMoreDetail={
                 (!checkInData.emotions.length || !checkInData.bodySensations.length)

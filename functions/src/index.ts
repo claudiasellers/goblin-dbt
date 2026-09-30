@@ -6,8 +6,9 @@
  */
 import './shared/admin'; // initialise firebase-admin once, before any callable module loads
 
-export { saveCheckIn, getCheckInsByUser } from './checkin';
+export { saveCheckIn, setCheckInNextAction, getCheckInsByUser } from './checkin';
 export { ensureUserExists, getUserProfile, updateUserProfile, deleteUserData, exportUserData } from './account';
+export { onUserCreated, onUserDeleted } from './account/triggers';
 export { trackToolUsage, recordToolOutcome } from './toolUsage';
 export { getInsightsData } from './insights';
 export { getStateAndTools, getDiscriminatingQuestions, getRelatedEmotions } from './recommendation';
@@ -16,3 +17,12 @@ export { getDearManContent, saveDearManSession, getDearManDebriefContent, getDea
 export { getProblemSolveContent } from './problemSolve';
 export { getInvalidationRecoveryContent, saveInvalidationRecoverySession, getInvalidationRecoveryProgress } from './invalidationRecovery';
 export { getFindTheFeelingContent, saveFindTheFeelingSession, getFeelingCollection } from './findTheFeeling';
+export { getCapacityContent } from './capacity';
+export {
+  startToolSession, closeToolSession, recordToolSession, answerToolOutcome, getSpineContent,
+  scheduleFollowUp, resolveFollowUp, snoozeFollowUp, getToday,
+} from './spine';
+export {
+  getProfileContext, getMe, upsertProfileFact, confirmProfileItem, setAsideProfileItem, restoreProfileItem,
+  answerPatternOffer,
+} from './profile';

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
-import { modules } from '../data/modules';
+import { MeSection } from '../components/me/MeSection';
 import { palettes, DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { exportUserData, deleteUserData } from '../services/neo4j';
 
@@ -13,10 +13,10 @@ export function Profile() {
     return (
       <div className="max-w-2xl mx-auto py-12 text-center">
         <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-4">
-          Profile Settings
+          Me
         </h2>
         <p className="text-[var(--color-text-secondary)] mb-6">
-          Sign in to access your profile settings.
+          Sign in to see what the app keeps for you, and your settings.
         </p>
         <a
           href="#/login"
@@ -42,8 +42,14 @@ export function Profile() {
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
+      {/* Me (PR-P2, D-10): what the app keeps about you, in one place; settings below on the same page */}
       <h2 className="text-xl font-bold text-[var(--color-text-primary)]">
-        Profile Settings
+        Me
+      </h2>
+      <MeSection />
+
+      <h2 className="pt-4 text-lg font-semibold text-[var(--color-text-primary)]">
+        Settings
       </h2>
 
       <BasicInfoSection
@@ -63,13 +69,6 @@ export function Profile() {
         reminderTime={profile.reminderTime}
         reminderDays={profile.reminderDays}
         weeklyDigest={profile.weeklyDigest}
-        onUpdate={updateProfile}
-      />
-
-      <GoalsSection
-        dailyCheckInGoal={profile.dailyCheckInGoal}
-        weeklyToolGoal={profile.weeklyToolGoal}
-        focusCategories={profile.focusCategories}
         onUpdate={updateProfile}
       />
 
@@ -378,7 +377,7 @@ function NotificationsSection({
   }
 
   return (
-    <SectionCard title="Notifications" defaultOpen={false}>
+    <SectionCard title="Reminders" defaultOpen={false}>
       <ToggleRow
         label="Check-in Reminders"
         description="Get reminded to check in with yourself"
@@ -429,91 +428,6 @@ function NotificationsSection({
         checked={weeklyDigest}
         onChange={(val) => onUpdate({ weeklyDigest: val })}
       />
-    </SectionCard>
-  );
-}
-
-// --- Goals ---
-function GoalsSection({
-  dailyCheckInGoal,
-  weeklyToolGoal,
-  focusCategories,
-  onUpdate,
-}: {
-  dailyCheckInGoal: number;
-  weeklyToolGoal: number;
-  focusCategories: string[];
-  onUpdate: (updates: Record<string, unknown>) => Promise<void>;
-}) {
-  return (
-    <SectionCard title="Goals" defaultOpen={false}>
-      <div>
-        <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-1.5">
-          Daily Check-in Goal
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="1"
-            max="5"
-            value={dailyCheckInGoal}
-            onChange={(e) =>
-              onUpdate({ dailyCheckInGoal: parseInt(e.target.value) })
-            }
-            className="flex-1 accent-[var(--color-accent)]"
-          />
-          <span className="text-sm font-medium text-[var(--color-text-primary)] w-8 text-center">
-            {dailyCheckInGoal}
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-1.5">
-          Weekly Tool Usage Goal
-        </label>
-        <div className="flex items-center gap-3">
-          <input
-            type="range"
-            min="1"
-            max="14"
-            value={weeklyToolGoal}
-            onChange={(e) =>
-              onUpdate({ weeklyToolGoal: parseInt(e.target.value) })
-            }
-            className="flex-1 accent-[var(--color-accent)]"
-          />
-          <span className="text-sm font-medium text-[var(--color-text-primary)] w-8 text-center">
-            {weeklyToolGoal}
-          </span>
-        </div>
-      </div>
-
-      <div>
-        <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">
-          Focus Categories
-        </label>
-        <div className="flex flex-wrap gap-2">
-          {modules.map((mod) => (
-            <button
-              key={mod.id}
-              onClick={() => {
-                const newCats = focusCategories.includes(mod.id)
-                  ? focusCategories.filter((c) => c !== mod.id)
-                  : [...focusCategories, mod.id];
-                onUpdate({ focusCategories: newCats });
-              }}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
-                focusCategories.includes(mod.id)
-                  ? 'bg-[var(--color-accent-muted)] border-[var(--color-accent)] text-[var(--color-accent)]'
-                  : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border-accent)]'
-              }`}
-            >
-              {mod.name}
-            </button>
-          ))}
-        </div>
-      </div>
     </SectionCard>
   );
 }

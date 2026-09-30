@@ -4,6 +4,7 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { GUARDS } from '../userdata/lifecycle';
 
 // ============================================
 // TOOL USAGE TRACKING
@@ -30,12 +31,15 @@ export const trackToolUsage = onCall(
     try {
       await session.run(
         `
-        MATCH (u:User {id: $userId})
+        MERGE (u:User {id: $userId})
+        ON CREATE SET u.createdAt = datetime(), u.email = $email
         CREATE (tu:ToolUsage {
           id: randomUUID(),
           toolId: $toolId,
           timestamp: datetime()
         })
+        SET tu:UserData:LogRecord, tu.ownerId = $userId, tu.key = $userId + ':' + tu.id,
+            tu.createdAt = tu.timestamp, tu.schemaVersion = 1
         MERGE (u)-[:USED_TOOL]->(tu)
         WITH u, tu
         OPTIONAL MATCH (u)-[:LOGGED]->(c:CheckIn)
@@ -45,7 +49,7 @@ export const trackToolUsage = onCall(
           MERGE (tu)-[:FOLLOWED_CHECKIN]->(c)
         )
         `,
-        { userId, toolId }
+        { userId, toolId, email: request.auth.token.email || null }
       );
 
       return { success: true };
@@ -74,18 +78,33 @@ export const recordToolOutcome = onCall(
     }
 
     const userId = request.auth.uid;
-    const { outcome } = request.data as { outcome: 'helped' | 'somewhat' | 'not_really' };
+    const { outcome, toolUsageId } = request.data as { outcome: 'helped' | 'somewhat' | 'not_really'; toolUsageId?: unknown };
 
     if (!outcome || !['helped', 'somewhat', 'not_really'].includes(outcome)) {
       throw new HttpsError('invalid-argument', 'outcome must be helped, somewhat, or not_really');
     }
 
+    if (toolUsageId !== undefined && (typeof toolUsageId !== 'string' || !/^[0-9a-f-]{36}(:usage)?$/i.test(toolUsageId))) {
+      throw new HttpsError('invalid-argument', 'Invalid toolUsageId');
+    }
+
     const session = getDriver().session();
     try {
+      // PR-S5: with an id, answer exactly that row (F6: the card showed one row and wrote another).
+      if (typeof toolUsageId === 'string') {
+        await session.run(
+          `MATCH (:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage {id: $toolUsageId})
+           WHERE ${GUARDS.ToolUsage.outcome('tu')}
+           SET tu.outcome = $outcome, tu.outcomeTimestamp = datetime()`,
+          { userId, toolUsageId, outcome }
+        );
+        return { success: true };
+      }
+      // Legacy clients (no id): the latest unrated row, as before.
       await session.run(
         `
         MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
-        WHERE tu.outcome IS NULL
+        WHERE ${GUARDS.ToolUsage.outcome('tu')}
         WITH tu ORDER BY tu.timestamp DESC LIMIT 1
         SET tu.outcome = $outcome, tu.outcomeTimestamp = datetime()
         WITH tu

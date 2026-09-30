@@ -4,6 +4,8 @@ import { httpsCallable } from 'firebase/functions';
 import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
 import type { CollectedWord, FindTheFeelingContent, FindTheFeelingSession } from '../data/findTheFeelingTypes';
+import type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
+export type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
 
 // Types (same as before, for consistency across the app)
 export interface CheckInRecord {
@@ -17,6 +19,10 @@ export interface CheckInRecord {
   timestamp: Date;
   activationPatternId?: string | null;
   confidence?: number | null;
+  emotionIds?: string[];
+  source?: string | null;
+  band?: string | null;
+  nextAction?: { kind: string; toolId: string | null } | null;
 }
 
 export interface BodySensationRecord {
@@ -31,10 +37,9 @@ export interface BodySensationRecord {
 const CONTENT_TIMEOUT_MS = 20_000;
 
 // Cloud Function references
-const saveCheckInFn = httpsCallable<
-  Omit<CheckInRecord, 'id' | 'userId' | 'timestamp'> & { timestamp: string; activationPatternId?: string; confidence?: number },
-  { id: string }
->(functions, 'saveCheckIn');
+const saveCheckInFn = httpsCallable<SaveCheckInRequest, { id: string }>(functions, 'saveCheckIn');
+const setCheckInNextActionFn = httpsCallable<{ checkInId: string; nextAction: CheckInNextAction }, { ok: true }>(
+  functions, 'setCheckInNextAction');
 
 // Response type from the Cloud Function
 interface CheckInResponse {
@@ -48,6 +53,10 @@ interface CheckInResponse {
   timestamp: string; // ISO string from server
   activationPatternId?: string | null;
   confidence?: number | null;
+  emotionIds?: string[];
+  source?: string | null;
+  band?: string | null;
+  nextAction?: { kind: string; toolId: string | null } | null;
 }
 
 const getCheckInsByUserFn = httpsCallable<
@@ -65,25 +74,18 @@ const ensureUserExistsFn = httpsCallable<void, { success: boolean }>(
 // ============================================
 
 /**
- * Save a check-in via Cloud Function
- * The user ID is automatically extracted from Firebase Auth on the server
+ * Save (upsert) a check-in via Cloud Function (PR-C1). Idempotent by `id`: the check-in page saves
+ * when the result renders and again, with the same id, after "add more detail". Always resolves to
+ * the saved id. The user ID comes from Firebase Auth on the server.
  */
-export async function saveCheckIn(
-  _userId: string, // Kept for API compatibility, but not used (server gets it from auth)
-  checkIn: Omit<CheckInRecord, 'id' | 'userId'>
-): Promise<string> {
-  const result = await saveCheckInFn({
-    emotion: checkIn.emotion,
-    quadrant: checkIn.quadrant,
-    intensity: checkIn.intensity,
-    bodySensations: checkIn.bodySensations,
-    note: checkIn.note,
-    timestamp: checkIn.timestamp.toISOString(),
-    ...(checkIn.activationPatternId && { activationPatternId: checkIn.activationPatternId }),
-    ...(checkIn.confidence != null && { confidence: checkIn.confidence }),
-  });
-
+export async function saveCheckIn(request: SaveCheckInRequest): Promise<string> {
+  const result = await saveCheckInFn(request);
   return result.data.id;
+}
+
+/** What the user did after the result (the check-in's terminal event; the first one wins). */
+export async function setCheckInNextAction(checkInId: string, nextAction: CheckInNextAction): Promise<void> {
+  await setCheckInNextActionFn({ checkInId, nextAction });
 }
 
 /**
@@ -104,13 +106,10 @@ export async function getCheckInsByUser(
 }
 
 /**
- * Ensure user exists in Neo4j via Cloud Function
- * Called after signup/login - the server extracts user info from Firebase Auth
+ * Ensure the user's graph node exists. AuthContext calls it once per signed-in uid per page load
+ * (belt and braces with the onUserCreated trigger); the server extracts the user from Firebase Auth.
  */
-export async function ensureUserExists(
-  _userId: string, // Kept for API compatibility, but not used
-  _email: string // Kept for API compatibility, but not used
-): Promise<void> {
+export async function ensureUserExists(): Promise<void> {
   await ensureUserExistsFn();
 }
 
@@ -488,11 +487,10 @@ export interface UserProfile {
   reminderTime: string;
   reminderDays: number[];
   weeklyDigest: boolean;
-  dailyCheckInGoal: number;
-  weeklyToolGoal: number;
-  focusCategories: string[];
   dataRetentionDays: number | null;
   shareAnonymousData: boolean;
+  /** IANA zone, synced from the browser (follow-up windows, quiet hours). */
+  timeZone: string | null;
 }
 
 export const DEFAULT_PROFILE: UserProfile = {
@@ -505,11 +503,9 @@ export const DEFAULT_PROFILE: UserProfile = {
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],
   weeklyDigest: false,
-  dailyCheckInGoal: 1,
-  weeklyToolGoal: 3,
-  focusCategories: [],
   dataRetentionDays: null,
   shareAnonymousData: false,
+  timeZone: null,
 };
 
 const getUserProfileFn = httpsCallable<void, { profile: UserProfile }>(
@@ -588,13 +584,15 @@ export async function getDearManContent(): Promise<DearManContentResult> {
 
 const saveDearManSessionFn = httpsCallable<
   DearManSessionData,
-  { success: boolean }
+  { success: boolean; id?: string | null }
 >(functions, 'saveDearManSession');
 
+/** Resolves to the saved session's id (PR-S4; null from an older server). */
 export async function saveDearManSession(
   data: DearManSessionData
-): Promise<void> {
-  await saveDearManSessionFn(data);
+): Promise<string | null> {
+  const result = await saveDearManSessionFn(data);
+  return result.data.id ?? null;
 }
 
 const getDearManDebriefContentFn = httpsCallable<void, DearManDebriefContentResult>(

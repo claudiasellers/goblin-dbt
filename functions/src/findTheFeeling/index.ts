@@ -112,7 +112,8 @@ export const saveFindTheFeelingSession = onCall(
           `MATCH (f:FindTheFeelingFlow {id: 'find_the_feeling_flow'})
            MERGE (u:User {id: $userId})
            CREATE (s:FindTheFeelingSession {key: $key})
-           SET s.id = $id, s.createdAt = datetime(), s.contentVersion = $contentVersion, s.entry = $entry,
+           SET s:UserData:LogRecord, s.id = $id, s.ownerId = $userId, s.schemaVersion = 1,
+               s.createdAt = datetime(), s.contentVersion = $contentVersion, s.entry = $entry,
                s.way = $way, s.band = $band, s.pull = $pull, s.regulation = $regulation, s.word = $word,
                s.close = $close, s.ambientDescent = $ambientDescent, s.dataJson = $dataJson
            CREATE (u)-[:COMPLETED_SESSION]->(s), (s)-[:USED_FLOW]->(f)

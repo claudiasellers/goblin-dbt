@@ -1,0 +1,127 @@
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import { useAuth } from './AuthContext';
+import { ToolSessionContext, type ToolSessionApi, type ToolSessionCloseInput } from '../hooks/useToolSession';
+import { closeToolSession, startToolSession, type SessionExt } from '../services/spine';
+import { newId } from '../lib/spine/ids';
+import { spineFrom } from '../lib/spine/toolLink';
+import { closeKindFor, durationSec } from '../lib/spine/close';
+import { useToday } from '../hooks/useToday';
+
+/**
+ * One ToolSession per tool visit (PR-S3; mounted by ToolPage with `key={location.key}`).
+ *
+ * Starts the session at mount (status 'open', R19) when signed in; closes it when the tool calls
+ * `close()` or, failing that, when the page unmounts: completed if the tool reached its completion
+ * screen, else exited early. A killed tab leaves it open, which reads as abandoned (derived).
+ */
+export function ToolSessionProvider({ toolId, children }: { toolId: string; children: ReactNode }) {
+  const { user } = useAuth();
+  const location = useLocation();
+  const [id] = useState(() => newId());
+  const [link] = useState(() => {
+    const spine = spineFrom(location.state);
+    const followUp = new URLSearchParams(location.search).get('followUp');
+    const patternId = (location.state as { activationPatternId?: unknown } | null)?.activationPatternId;
+    return {
+      entry: spine?.entry ?? 'direct',
+      checkInId: spine?.checkInId,
+      hostSessionId: spine?.hostSessionId,
+      followUpId: spine?.followUpId ?? (followUp && /^[0-9a-f-]{36}$/i.test(followUp) ? followUp : undefined),
+      patternId: typeof patternId === 'string' ? patternId : undefined,
+    } as const;
+  });
+  const uid = user?.uid ?? null;
+  // E2 §A3.6: Today refetches after any close (a skipped close question, Recover's follow-ups, ps_step).
+  const { refresh: refreshToday } = useToday();
+
+  const started = useRef<Promise<boolean> | null>(null);
+  const startedAt = useRef(0);
+  const step = useRef<string | undefined>(undefined);
+  const practiced = useRef(false);
+  const complete = useRef(false);
+  const ext = useRef<SessionExt>({});
+  const skills = useRef<string[]>([]);
+  const closed = useRef(false);
+  const mounted = useRef(false);
+
+  useEffect(() => {
+    if (!uid || started.current) return;
+    startedAt.current = Date.now();
+    started.current = startToolSession({
+      id, toolId, entry: link.entry,
+      ...(link.checkInId ? { checkInId: link.checkInId } : {}),
+      ...(link.hostSessionId ? { hostSessionId: link.hostSessionId } : {}),
+      ...(link.followUpId ? { followUpId: link.followUpId } : {}),
+      ...(link.patternId ? { patternId: link.patternId } : {}),
+    }).then(() => true).catch(() => false);
+  }, [uid, id, toolId, link]);
+
+  const api = useMemo<ToolSessionApi>(() => {
+    const close = async (input: ToolSessionCloseInput = {}) => {
+      if (closed.current) return null;
+      closed.current = true;
+      const ok = started.current ? await started.current : false;
+      if (!ok) return null;
+      const mergedExt: SessionExt = { ...ext.current };
+      for (const [ns, v] of Object.entries(input.ext ?? {})) mergedExt[ns] = { ...mergedExt[ns], ...v };
+      try {
+        const res = await closeToolSession({
+          id,
+          status: input.status ?? (complete.current ? 'completed' : 'exited_early'),
+          ...(step.current ? { exitStep: step.current } : {}),
+          practiced: practiced.current,
+          durationSec: durationSec(startedAt.current, Date.now()),
+          ...(Object.keys(mergedExt).length ? { ext: mergedExt } : {}),
+          ...(input.thenVsNow ? { thenVsNow: input.thenVsNow } : {}),
+          ...(input.actedOnUrge ? { actedOnUrge: input.actedOnUrge } : {}),
+          ...(input.bandAtEnd ? { bandAtEnd: input.bandAtEnd } : {}),
+          ...(input.urgeIds?.length ? { urgeIds: input.urgeIds } : {}),
+          ...(input.detail ? { detail: input.detail } : {}),
+          ...((input.skillIds ?? skills.current).length ? { skillIds: input.skillIds ?? skills.current } : {}),
+          ...(input.repSource ? { repSource: input.repSource } : {}),
+          ...(input.schedule?.length ? { schedule: input.schedule } : {}),
+        });
+        refreshToday();
+        return res;
+      } catch {
+        return null;
+      }
+    };
+    return {
+      id,
+      toolId,
+      entry: link.entry,
+      checkInId: link.checkInId,
+      hostSessionId: link.hostSessionId,
+      followUpId: link.followUpId,
+      closeKind: closeKindFor(toolId),
+      persisted: uid !== null,
+      setStep: (s) => { step.current = s; },
+      markPracticed: () => { practiced.current = true; },
+      markComplete: () => { complete.current = true; },
+      setExt: (e) => {
+        for (const [ns, v] of Object.entries(e)) ext.current[ns] = { ...ext.current[ns], ...v };
+      },
+      setSkillIds: (ids) => { skills.current = ids; },
+      close,
+      linkTo: (target, state) => ({
+        pathname: `/tool/${target}`,
+        state: { ...state, spine: { entry: 'handoff', hostSessionId: id } },
+      }),
+    };
+  }, [id, toolId, link, uid, refreshToday]);
+
+  // Close on leave. Deferred a tick so StrictMode's dev-only unmount/remount doesn't close it.
+  const apiRef = useRef(api);
+  useEffect(() => { apiRef.current = api; }, [api]);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+      setTimeout(() => { if (!mounted.current) void apiRef.current.close(); }, 0);
+    };
+  }, []);
+
+  return <ToolSessionContext.Provider value={api}>{children}</ToolSessionContext.Provider>;
+}
