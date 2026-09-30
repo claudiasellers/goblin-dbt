@@ -1,31 +1,22 @@
+// DEAR MAN's band gate (A4-4) and the hand-off from Recover. The 0–10 rating and Recover's numeric
+// thresholds are gone from DEAR MAN; the band decides (graph BandRule dear-man:*).
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import ts from "typescript";
+import { importTs } from "./lib/importTs.mjs";
 
-async function importTs(path) {
-  const source = ts.transpileModule(readFileSync(path, "utf8"), {
-    compilerOptions: {
-      module: ts.ModuleKind.ESNext,
-      target: ts.ScriptTarget.ES2022,
-    },
-  }).outputText;
-  return import(
-    `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`
-  );
-}
-
-const { dearManGateState, nextAfterRating, summaryHeadsUp, handoffPrefill } =
-  await importTs("src/lib/dearManSafety.ts");
+const { dearManBandGate, summaryHeadsUpForBand, handoffPrefill, withBand } = await importTs("src/lib/dearManSafety.ts");
 const { isDearManHandoff } = await importTs("src/data/dearManHandoff.ts");
+const resume = await importTs("src/lib/dearManResume.ts");
 
 const safetyCypher = readFileSync("schema/dear-man-safety-gates.cypher", "utf8");
 const dearManCypher = readFileSync("schema/dear-man-content.cypher", "utf8");
 const recoveryCypher = readFileSync("schema/invalidation-recovery.cypher", "utf8");
 const loader = readFileSync("scripts/load-graph.mjs", "utf8");
 const tsx = readFileSync("src/pages/tools/DearMan.tsx", "utf8");
+const capacity = JSON.parse(readFileSync("tests/fixtures/capacity-content.json", "utf8"));
 
-// Thresholds come from the graph, not from this test.
+// Recover's thresholds still exist (Recover reads them until WMP-02); DEAR MAN only derives a band.
 const flow = JSON.parse(JSON.parse(recoveryCypher.match(/f\.contentJson = (".*");/)[1]));
 const gates = flow.gates;
 
@@ -39,31 +30,54 @@ const handoff = {
   oneMessageOnly: true,
 };
 
-test("gate state follows the graph thresholds", () => {
-  assert.equal(dearManGateState(gates.downshiftAt, gates), "downshift");
-  assert.equal(dearManGateState(10, gates), "downshift");
-  assert.equal(dearManGateState(gates.askMax + 1, gates), gates.askMax + 1 >= gates.downshiftAt ? "downshift" : "wait");
-  assert.equal(dearManGateState(gates.askMax, gates), "clear");
-  assert.equal(dearManGateState(0, gates), "clear");
-  // Older graph / no rating: gates are skipped.
-  assert.equal(dearManGateState(10, null), "clear");
-  assert.equal(dearManGateState(null, gates), "clear");
+test("band gate follows the graph's BandRule rows: steady clear · stirred heads-up · flooded hand-off", () => {
+  const rules = capacity.bandRules;
+  assert.equal(dearManBandGate("steady", rules), "clear");
+  assert.equal(dearManBandGate("stirred", rules), "headsUp");
+  assert.equal(dearManBandGate("flooded", rules), "handoff");
+  // No band (not asked, content unavailable): no gate. No rules loaded: the same mapping.
+  assert.equal(dearManBandGate(null, rules), "clear");
+  assert.equal(dearManBandGate("flooded", null), "handoff");
+  assert.equal(dearManBandGate("stirred", []), "headsUp");
+  // A content change moves the gate (flooded → full, no heads-up).
+  assert.equal(dearManBandGate("flooded", [{ skillId: "dear-man", band: "flooded", mode: "full" }]), "clear");
 });
 
-test("downshift is offered once, then the flow continues", () => {
-  assert.equal(nextAfterRating(9, gates, false), "breathe");
-  assert.equal(nextAfterRating(9, gates, true), "scene");
-  assert.equal(nextAfterRating(3, gates, false), "scene");
-  assert.equal(nextAfterRating(9, null, false), "scene");
-});
-
-test("summary heads-up: shown only while it's still loud; the plan is never locked", () => {
-  assert.equal(summaryHeadsUp({ latestIntensity: gates.askMax + 1, gates }), true);
-  assert.equal(summaryHeadsUp({ latestIntensity: 10, gates }), true);
-  assert.equal(summaryHeadsUp({ latestIntensity: gates.askMax, gates }), false);
-  assert.equal(summaryHeadsUp({ latestIntensity: null, gates }), false);
-  assert.equal(summaryHeadsUp({ latestIntensity: 10, gates: null }), false);
+test("summary heads-up when the band isn't steady; the plan is never locked; no 0–10 anywhere", () => {
+  assert.equal(summaryHeadsUpForBand("stirred"), true);
+  assert.equal(summaryHeadsUpForBand("flooded"), true);
+  assert.equal(summaryHeadsUpForBand("steady"), false);
+  assert.equal(summaryHeadsUpForBand(null), false);
   assert.doesNotMatch(tsx, /WaitLock|blur-\[|planLocked/, "DEAR MAN must not lock or hide the plan");
+  assert.doesNotMatch(tsx, /UrgeScale|checkStep|downshifted|safetyGates|intensityQuestion|rerateQuestion/);
+  assert.match(tsx, /<BandGate context="dear-man" wording="relational" force=\{gateForce\} reaskIfFlooded/);
+  assert.match(tsx, /<BreakdownHandoff host="dear-man"/);
+  assert.match(tsx, /<TooMuchLink host="dear-man"/);
+  assert.match(tsx, /session\.setBandAtStart\(r\)/);
+  assert.match(tsx, /er: \{ handoffs: handoffExt\(handoffs\.current\) \}/);
+});
+
+test("Recover hands over a band derived from its own gates (bandFromLegacyScore)", () => {
+  const at = new Date("2026-10-01T12:00:00Z");
+  assert.equal(withBand({ ...handoff, intensity: gates.askMax }, gates, at).band, "steady");
+  assert.equal(withBand({ ...handoff, intensity: gates.askMax + 1 }, gates, at).band, gates.askMax + 1 >= gates.downshiftAt ? "flooded" : "stirred");
+  assert.equal(withBand({ ...handoff, intensity: gates.downshiftAt }, gates, at).band, "flooded");
+  assert.equal(withBand(handoff, gates, at).bandAt, at.toISOString());
+  assert.match(readFileSync("src/pages/tools/InvalidationRecovery.tsx", "utf8"), /dearManHandoff: withBand\(/);
+});
+
+test("resume draft: step ids round-trip; unknown ids resume at the scene; draft guard", () => {
+  for (const st of [{ phase: "scene", sceneStep: 2 }, { phase: "assert", sceneStep: 0 }, { phase: "summary", sceneStep: 0 }]) {
+    assert.deepEqual(resume.dearManStepFromId(resume.dearManStepId(st)), st);
+  }
+  assert.deepEqual(resume.dearManStepFromId("debrief-route"), { phase: "scene", sceneStep: 0 });
+  assert.deepEqual(resume.dearManStepFromId(null), { phase: "scene", sceneStep: 0 });
+  const d = resume.dearManDraftOf({ relationshipType: "boss", situationType: "ask", priorities: ["objective"], barriers: [], barriersCustom: "",
+    describeId: null, describeCustom: "they moved the deadline", feelings: ["feel_hurt"], feelingCustom: "", assertIds: [], assertDetails: {},
+    assertCustom: "", reinforceIds: [], reinforceCustom: "", anchorPhrase: "", middleGroundId: null, middleGroundCustom: "", walkAwayId: null, walkAwayCustom: "" });
+  assert.equal(resume.isDearManDraft(d), true);
+  assert.equal(resume.isDearManDraft({ ...d, v: 2 }), false);
+  assert.equal(resume.isDearManDraft({ ...d, feelings: "x" }), false);
 });
 
 test("handoff prefill matches feeling chips by label and verifies the situation id", () => {
@@ -86,8 +100,11 @@ test("handoff prefill matches feeling chips by label and verifies the situation 
   assert.equal(handoffPrefill(handoff, content, undefined).situationType, null);
 });
 
-test("the handoff guard accepts the documented shape only", () => {
+test("the handoff guard accepts the documented shape only (band optional)", () => {
   assert.equal(isDearManHandoff(handoff), true);
+  assert.equal(isDearManHandoff({ ...handoff, band: "stirred", bandAt: "2026-10-01T12:00:00Z" }), true);
+  assert.equal(isDearManHandoff({ ...handoff, band: "7" }), false);
+  assert.equal(isDearManHandoff({ ...handoff, band: "flooded", bandAt: "later" }), false);
   assert.equal(isDearManHandoff({ ...handoff, source: "elsewhere" }), false);
   assert.equal(isDearManHandoff({ ...handoff, waitMinutes: "20" }), false);
   assert.equal(isDearManHandoff(null), false);
@@ -96,6 +113,11 @@ test("the handoff guard accepts the documented shape only", () => {
 test("safety cypher is idempotent: MERGE only, no bare CREATE", () => {
   assert.doesNotMatch(safetyCypher.replace(/CREATE (CONSTRAINT|INDEX)/g, ""), /\bCREATE\b/);
   assert.match(safetyCypher, /MERGE \(c:DearManSafetyCopy \{id: 'dear_man_safety_copy'\}\)/);
+  assert.match(safetyCypher, /c\.version = 'dear-man-safety-v3'/);
+  for (const k of ["intensityQuestion", "intensityHint", "intensityLow", "intensityHigh", "downshiftLead", "rerateQuestion", "rerateHint"]) {
+    assert.doesNotMatch(safetyCypher, new RegExp(`c\\.${k} = `), `${k} is no longer set`);
+    assert.match(safetyCypher, new RegExp(`REMOVE[^;]*c\\.${k}`), `${k} is removed from the live node`);
+  }
 });
 
 test("every safety copy key the page reads exists in the cypher", () => {
@@ -111,7 +133,7 @@ test("the handoff situation id exists as a DEAR MAN situation type", () => {
   assert.match(dearManCypher, new RegExp(`MERGE \\(s:DearManSituationType \\{id: '${id}'\\}\\)`));
 });
 
-test("the gates and shared copy the page relies on exist in the recovery flow", () => {
+test("Recover's own gates and copy still exist in its flow (read by Recover until WMP-02)", () => {
   for (const k of ["downshiftAt", "askMax", "waitMinutes"]) assert.equal(typeof gates[k], "number", k);
   for (const k of ["locked", "unlocked", "unlockedShort", "waiting", "done", "copy", "copied"]) {
     assert.equal(typeof flow.copy.wait[k], "string", `wait.${k}`);

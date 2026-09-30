@@ -126,6 +126,9 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
      FOREACH (_ IN CASE WHEN $bandAtEnd IS NULL THEN [] ELSE [1] END |
        SET ts.bandAtEnd = $bandAtEnd, ts.bandAtEndSource = $bandAtEndSource, ts.bandAtEndViaCantTell = $bandAtEndViaCantTell,
            ts.bandAtEndAt = datetime($bandAtEndAt), ts.bandAtEndJson = $bandAtEndJson)
+     FOREACH (_ IN CASE WHEN $bandAtStart IS NULL OR ts.bandAtStart IS NOT NULL THEN [] ELSE [1] END |
+       SET ts.bandAtStart = $bandAtStart, ts.bandAtStartSource = $bandAtStartSource, ts.bandAtStartViaCantTell = $bandAtStartViaCantTell,
+           ts.bandAtStartAt = datetime($bandAtStartAt), ts.bandAtStartJson = $bandAtStartJson)
      WITH u, ts
      OPTIONAL MATCH (u)-[:COMPLETED_SESSION]->(d {key: $detailKey})
        WHERE $detailLabel IS NOT NULL AND $detailLabel IN labels(d)
@@ -138,6 +141,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       uid, key, status: c.status, exitStep: c.exitStep, practiced: c.practiced,
       thenVsNow, thenVsNowDir: thenVsNow ? dir : null, actedOnUrge, answered,
       urgeIds: c.urgeIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
+      ...readingProps('bandAtStart', c.bandAtStart),
       detailKey: c.detail ? userKey(uid, c.detail.id) : null, detailLabel,
       legacyOutcome: legacyOutcome(thenVsNow),
     },

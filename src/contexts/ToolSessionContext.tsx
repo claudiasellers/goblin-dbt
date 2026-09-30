@@ -7,6 +7,7 @@ import { newId } from '../lib/spine/ids';
 import { spineFrom } from '../lib/spine/toolLink';
 import { closeKindFor, durationSec } from '../lib/spine/close';
 import { useToday } from '../hooks/useToday';
+import type { CapacityReading } from '../data/capacityTypes';
 
 /**
  * One ToolSession per tool visit (PR-S3; mounted by ToolPage with `key={location.key}`).
@@ -42,6 +43,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
   const complete = useRef(false);
   const ext = useRef<SessionExt>({});
   const skills = useRef<string[]>([]);
+  const bandAtStart = useRef<CapacityReading | null>(null);
   const closed = useRef(false);
   const mounted = useRef(false);
 
@@ -75,6 +77,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
           ...(Object.keys(mergedExt).length ? { ext: mergedExt } : {}),
           ...(input.thenVsNow ? { thenVsNow: input.thenVsNow } : {}),
           ...(input.actedOnUrge ? { actedOnUrge: input.actedOnUrge } : {}),
+          ...((input.bandAtStart ?? bandAtStart.current) ? { bandAtStart: input.bandAtStart ?? bandAtStart.current ?? undefined } : {}),
           ...(input.bandAtEnd ? { bandAtEnd: input.bandAtEnd } : {}),
           ...(input.urgeIds?.length ? { urgeIds: input.urgeIds } : {}),
           ...(input.detail ? { detail: input.detail } : {}),
@@ -104,6 +107,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
         for (const [ns, v] of Object.entries(e)) ext.current[ns] = { ...ext.current[ns], ...v };
       },
       setSkillIds: (ids) => { skills.current = ids; },
+      setBandAtStart: (r) => { bandAtStart.current = r; },
       close,
       linkTo: (target, state) => ({
         pathname: `/tool/${target}`,

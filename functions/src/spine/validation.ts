@@ -69,6 +69,8 @@ export interface CloseInput {
   practiced: boolean;
   thenVsNow: ThenVsNow | null;
   actedOnUrge: ActedOnUrge | null;
+  /** A band asked after the session opened (e.g. DEAR MAN's gate, A4-4): set once, only if start had none. */
+  bandAtStart: CapacityReading | null;
   bandAtEnd: CapacityReading | null;
   urgeIds: string[];
   durationSec: number | null;
@@ -100,6 +102,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
     practiced: d.practiced === true,
     thenVsNow,
     actedOnUrge,
+    bandAtStart: reading(d.bandAtStart, now),
     bandAtEnd: reading(d.bandAtEnd, now),
     urgeIds: ids(d.urgeIds, 10),
     durationSec: opt(d.durationSec, (x) => intIn(x, { min: 0, max: 86_400 })),

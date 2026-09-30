@@ -107,6 +107,26 @@ test('closeToolSession: detail labels come from a whitelist, matched by the call
   assert.match(f.calls[1].query, /\(u\)-\[:COMPLETED_SESSION\]->\(d \{key: \$detailKey\}\)/);
 });
 
+test('closeToolSession: a band asked after the open is set once, only when the start had none (A4-4)', async () => {
+  const f = closeDriver({ closeKind: 'plan' });
+  setDriver(f.driver);
+  const at = new Date().toISOString();
+  const reading = { id: CI, value: 'flooded', viaCantTell: false, source: 'probe', framing: 'now', wording: 'relational',
+    context: 'dear-man', probeVersion: 'capacity-v1', at };
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early', bandAtStart: reading,
+    ext: { er: { handoffs: [{ primitiveId: 'sigh', completed: true, durationSec: 30, thenVsNow: 'better', resumed: true, overridden: false }] } } } });
+  const close = f.calls.find((c) => /SET ts\.status = \$status/.test(c.query));
+  assert.match(close.query, /WHEN \$bandAtStart IS NULL OR ts\.bandAtStart IS NOT NULL THEN \[\] ELSE \[1\]/);
+  assert.equal(close.params.bandAtStart, 'flooded');
+  assert.equal(close.params.bandAtStartSource, 'probe');
+  assert.equal(JSON.parse(close.params.ext).er.handoffs[0].primitiveId, 'sigh');
+  // No band given: nothing to set.
+  const g = closeDriver({ closeKind: 'plan' });
+  setDriver(g.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early' } });
+  assert.equal(g.calls.find((c) => /SET ts\.status = \$status/.test(c.query)).params.bandAtStart, null);
+});
+
 test('closeToolSession on an unknown session is not-found', async () => {
   setDriver(fakeDriver(() => []).driver);
   await assert.rejects(fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed' } }), (e) => e.code === 'not-found');

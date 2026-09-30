@@ -24,6 +24,7 @@ import { BreathOrb, ColdReset, Orient } from '../../components/tools/regulation/
 import { CertaintyDial, CompassionBreak, SecurityPrime, ValidationPick } from '../../components/tools/invalidationRecovery/mind';
 import { LetItLand, MustPrefer, OppositeStep, ParkIt, type ExitResult } from '../../components/tools/invalidationRecovery/exits';
 import type { DearManHandoff } from '../../data/dearManHandoff';
+import { withBand } from '../../lib/dearManSafety';
 import { FollowUps, RepsRing, SkillCard, UrgeWave } from '../../components/tools/invalidationRecovery/closeout';
 import { useToolSession } from '../../hooks/useToolSession';
 import { getSpineContent, type SpineContent } from '../../services/spine';
@@ -265,7 +266,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               onNext={() => dispatch({ type: 'go', step: 'follow' })}
               onFinished={endIntensity => (handoff
                 // Hand over the close rating: DEAR MAN re-gates if it went back up.
-                ? navigate('/tool/dear-man', { state: { dearManHandoff: { ...handoff, intensity: endIntensity ?? handoff.intensity } } })
+                ? navigate('/tool/dear-man', { state: { dearManHandoff: withBand({ ...handoff, intensity: endIntensity ?? handoff.intensity }, g) } })
                 : dispatch({ type: 'reset' }))} />
           )}
         </m.section>

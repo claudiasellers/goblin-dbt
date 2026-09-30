@@ -37,19 +37,17 @@ export function saveResumeToken(t: ResumeToken, storage: StorageLike | null = de
   }
 }
 
-/** Take (read + remove) a valid, unexpired token for this tool and host session; else null. */
-export function takeResumeToken(
+/** Read a valid, unexpired token for this tool and host session without removing it; else null. */
+export function peekResumeToken(
   toolId: string,
   hostSessionId: string,
   now: number = Date.now(),
   storage: StorageLike | null = defaultStorage(),
 ): ResumeToken | null {
   if (!storage) return null;
-  const key = RESUME_PREFIX + hostSessionId;
   let raw: string | null = null;
   try {
-    raw = storage.getItem(key);
-    storage.removeItem(key);
+    raw = storage.getItem(RESUME_PREFIX + hostSessionId);
   } catch {
     return null;
   }
@@ -63,6 +61,28 @@ export function takeResumeToken(
   } catch {
     return null;
   }
+}
+
+/** Remove one host session's token (after the host restored it). */
+export function dropResumeToken(hostSessionId: string, storage: StorageLike | null = defaultStorage()): void {
+  if (!storage) return;
+  try {
+    storage.removeItem(RESUME_PREFIX + hostSessionId);
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/** Take (read + remove) a valid, unexpired token for this tool and host session; else null. */
+export function takeResumeToken(
+  toolId: string,
+  hostSessionId: string,
+  now: number = Date.now(),
+  storage: StorageLike | null = defaultStorage(),
+): ResumeToken | null {
+  const t = peekResumeToken(toolId, hostSessionId, now, storage);
+  dropResumeToken(hostSessionId, storage);
+  return t;
 }
 
 /** Remove every resume token (sign-out). */
