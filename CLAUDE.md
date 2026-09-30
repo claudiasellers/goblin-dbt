@@ -171,6 +171,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/lib/band.ts`, `src/lib/resumeToken.ts` | Capacity band logic (freshness, hand-off plan, reread) and device-only resume tokens |
 | `src/contexts/BandContext.tsx`, `src/hooks/useBand.ts`, `src/lib/bandStore.ts` | The band store: `useBand()` (`current`, `record`, `carry`, content). Client-only (R1): memory + `sessionStorage` `goblin.band.v1`, 20 min, per uid, cleared with resume tokens on sign-out |
 | `src/components/capacity/` | `CapacityProbe`, `BandGate` (`band.ask()`: carries a current reading or asks; `reaskIfFlooded` per D-07), `BreakdownHandoff` (P2: card → sigh / orient → reread → resume or come back later; never a lock), `TooMuchLink` (P2 as an overlay; host stays mounted). A tool that gates on the band wraps its first screen in `BandGate` and puts `TooMuchLink` on its screens; DEAR MAN is the first host (A4-4: `src/lib/dearManSafety.ts` `dearManBandGate`, device-only resume draft `src/lib/dearManResume.ts`, `?resume=<sessionId>`) |
+| `scripts/witness/content.py` | Editable source for `schema/witness.cypher`: the witness corpus (`ValidationLine` levels 1–6, `ToolMoment`, `VoiceRule`). Recover's `RecoveryProtocol.validationLines` is a projection of its `recover_validate` lines (Recover's `content.py` imports them), so rebuild both. `status: live` needs `reviewStatus: reviewed` + `reviewedAt`; drafts are loaded but never served |
+| `scripts/voice-lint.mjs`, `scripts/witness/voice-rules.json` | The voice contract (flat, warm witness; no cheer, should, just, but, diagnosis or physiology on validation lines; ≤90 chars; flooded ≤8 words at level 1–2). Runs in `npm test` and gates `load-graph.mjs` (exit 5; `--skip-voice-lint`); `npm run lint:voice` reports legacy copy. Flow-doc copy is checked against the shrink-only `scripts/witness/voice-baseline.json`. Never lints what the user writes |
 | `dev/capacity.html` | Dev-only harness for the probe, gate, P2 and the too-much overlay (`tests/fixtures/capacity-content.json`, regenerate with `scripts/capacity/fixture.py`) |
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
@@ -191,7 +193,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `schema/knowledge-graph.cypher` | Base graph nodes (MERGE by id; no relationships) |
 | `schema/relationships.cypher` | Base graph relationships |
 | `schema/maintenance/` | Dedupe dry run + relationship-only apply (run by hand, never loaded) |
-| `scripts/load-graph.mjs` | Loads `schema/` in `LOAD_ORDER`; `--verify`, `--only`, `--file`, `--dry-run` |
+| `scripts/load-graph.mjs` | Loads `schema/` in `LOAD_ORDER`; `--verify`, `--only`, `--file`, `--dry-run`; voice-lints the witness corpus and flow docs before sending (`--skip-voice-lint`) |
 | `scripts/verify-live-routing.mjs` | Read-only live-graph routing check; `--compare tests/fixtures/live-routing-2026-09-30.json` |
 | `schema/emotion-regulation-content.cypher` | EmotionRegulationContent base (label, fitsTheFactsWhen) |
 | `schema/opposite-action-data.cypher` | Protocol metadata + ActionUrge nodes (OA tool source of truth) |
