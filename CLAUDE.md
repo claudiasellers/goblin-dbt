@@ -38,6 +38,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `answerToolOutcome`, `scheduleFollowUp`, `resolveFollowUp`, `snoozeFollowUp`, `getToday`, `getSpineContent` (public); `todayOrder.ts` (derived due/stale/upcoming + ordering), `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
 | `profile/` | `getProfileContext` (the single profile read path: only the slices `PROFILE_NEEDS` declares per tool, in code), `getMe`, `upsertProfileFact`, `confirmProfileItem`, `setAsideProfileItem`, `restoreProfileItem`, `answerPatternOffer` (the only writer of `MyPattern`); `slices.ts` resolvers never read a `:LogRecord` (test-enforced) |
 | `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
+| `witness/` | `getWitnessLines` (public; signed in it also reads own / kept lines via `readProfileSlices(tx, uid, 'witness')` and the `SHOWED_LINE` history), `recordWitnessBeat` (host must be the caller's, found by key; `SHOWED_LINE` follows the host's lifecycle guard; `OwnLine` / `SAVED_LINE` are profile writes); `rank.ts` (pure ranking, fade stage, when to ask "did that land?"), `types.ts` (mirrored in `src/data/witnessTypes.ts`), `validation.ts` (own-line text is length-checked only, never linted) |
 
 `userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
 
@@ -150,8 +151,9 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 
 | File | Purpose |
 |------|---------|
-| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → body → sensation → suggestion → analyzing → result. Saves the check-in when the result renders (PR-C1); Today stack above the grid (PR-S5); Help me now → `HelpNowInterim` (PR-C2: safe step + Cool Down / 5-4-3-2-1, no check-in, no routing call) |
-| `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant) |
+| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → capacity (band probe, unpleasant only, asked once: a current reading is carried; `src/lib/checkInBand.ts`) → body → sensation → suggestion → analyzing → result. Saves the check-in when the result renders (PR-C1); Today stack above the grid (PR-S5); Help me now → `HelpNowInterim` (PR-C2: safe step + Cool Down / 5-4-3-2-1, no check-in, no routing call) |
+| `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant); the witness beat renders under the label, below the crisis banner, above the tools (R21) |
+| `src/components/witness/WitnessBeat.tsx`, `src/lib/witness.ts` | The receive beat (WMP-01): echo of the user's word(s), one witness line from `getWitnessLines`, optional *did that land?*, always skip · none of these fit · say it my way, explicit keep. Never gates the host. The check-in logs it via `recordWitnessBeat`, queued after the render save and before the next action (`CheckIn.tsx` `beatQueue`) |
 | `src/components/safety/CrisisBanner.tsx` | Crisis resources as a non-blocking banner above the normal result (never a replacement screen) |
 | `src/pages/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
@@ -169,6 +171,11 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `scripts/profile-layer/content.py` | Editable source for `schema/profile-layer.cypher`: Me areas, `ProfileKind` (still-true copy, revisit days), `PatternRule` (off until reviewed) |
 | `src/hooks/useProfileContext.ts` | How a tool reads the profile: `useProfileContext(toolId).slices` (in-memory cache, never localStorage). A new tool declares `PROFILE_NEEDS[toolId]` |
 | `src/lib/band.ts`, `src/lib/resumeToken.ts` | Capacity band logic (freshness, hand-off plan, reread) and device-only resume tokens |
+| `src/contexts/BandContext.tsx`, `src/hooks/useBand.ts`, `src/lib/bandStore.ts` | The band store: `useBand()` (`current`, `record`, `carry`, content). Client-only (R1): memory + `sessionStorage` `goblin.band.v1`, 20 min, per uid, cleared with resume tokens on sign-out |
+| `src/components/capacity/` | `CapacityProbe`, `BandGate` (`band.ask()`: carries a current reading or asks; `reaskIfFlooded` per D-07), `BreakdownHandoff` (P2: card → sigh / orient → reread → resume or come back later; never a lock), `TooMuchLink` (P2 as an overlay; host stays mounted). A tool that gates on the band wraps its first screen in `BandGate` and puts `TooMuchLink` on its screens; DEAR MAN is the first host (A4-4: `src/lib/dearManSafety.ts` `dearManBandGate`, device-only resume draft `src/lib/dearManResume.ts`, `?resume=<sessionId>`) |
+| `scripts/witness/content.py` | Editable source for `schema/witness.cypher`: the witness corpus (`ValidationLine` levels 1–6, `ToolMoment`, `VoiceRule`). Recover's `RecoveryProtocol.validationLines` is a projection of its `recover_validate` lines (Recover's `content.py` imports them), so rebuild both. `status: live` needs `reviewStatus: reviewed` + `reviewedAt`; drafts are loaded but never served. Sign a draft off by adding its id to `SIGNED_OFF` (id → review date) and rebuilding. `scripts/witness/report.cypher`: landed share per line (retirement stays a human edit) |
+| `scripts/voice-lint.mjs`, `scripts/witness/voice-rules.json` | The voice contract (flat, warm witness; no cheer, should, just, but, diagnosis or physiology on validation lines; ≤90 chars; flooded ≤8 words at level 1–2). Runs in `npm test` and gates `load-graph.mjs` (exit 5; `--skip-voice-lint`); `npm run lint:voice` reports legacy copy. Flow-doc copy is checked against the shrink-only `scripts/witness/voice-baseline.json`. Never lints what the user writes |
+| `dev/capacity.html` | Dev-only harness for the probe, gate, P2 and the too-much overlay (`tests/fixtures/capacity-content.json`, regenerate with `scripts/capacity/fixture.py`) |
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
@@ -188,7 +195,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `schema/knowledge-graph.cypher` | Base graph nodes (MERGE by id; no relationships) |
 | `schema/relationships.cypher` | Base graph relationships |
 | `schema/maintenance/` | Dedupe dry run + relationship-only apply (run by hand, never loaded) |
-| `scripts/load-graph.mjs` | Loads `schema/` in `LOAD_ORDER`; `--verify`, `--only`, `--file`, `--dry-run` |
+| `scripts/load-graph.mjs` | Loads `schema/` in `LOAD_ORDER`; `--verify`, `--only`, `--file`, `--dry-run`; voice-lints the witness corpus and flow docs before sending (`--skip-voice-lint`) |
 | `scripts/verify-live-routing.mjs` | Read-only live-graph routing check; `--compare tests/fixtures/live-routing-2026-09-30.json` |
 | `schema/emotion-regulation-content.cypher` | EmotionRegulationContent base (label, fitsTheFactsWhen) |
 | `schema/opposite-action-data.cypher` | Protocol metadata + ActionUrge nodes (OA tool source of truth) |

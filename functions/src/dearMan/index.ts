@@ -162,8 +162,10 @@ export const getDearManContent = onCall(
                tc.anchorGeneratorMakeItYours AS anchorGeneratorMakeItYours
       `);
 
-      // 13. Safety gates: thresholds + shared wait/breathe copy live on the recovery flow
-      //     document. OPTIONAL MATCH so an older graph (no flow) still loads DEAR MAN.
+      // 13. DEPRECATED (A4-4): DEAR MAN gates on the capacity band now (BandRule dear-man:*, read
+      //     client-side from getCapacityContent). `safetyGates` (Recover's numeric thresholds +
+      //     wait/breathe copy) is still returned for one release so cached PWA clients keep working;
+      //     WMP-02 removes it with Recover's own move to bands. OPTIONAL MATCH: an older graph loads.
       const gateResult = await session.run(`
         OPTIONAL MATCH (f:InvalidationRecoveryFlow {id: 'invalidation_recovery_flow'})
         RETURN f.contentJson AS content

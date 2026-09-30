@@ -37,6 +37,9 @@ export const GUARDS = {
     answer: (v: string) =>
       `(${v}.answeredAt IS NULL AND coalesce(${v}.outcomeAskDismissed, false) = false` +
       ` AND coalesce(${v}.endedAt, ${v}.startedAt) > datetime() - duration({hours: ${TOOL_SESSION_ANSWER_HOURS}}))`,
+    /** recordWitnessBeat (SHOWED_LINE, a queued beat): while open, or within 12 h of the end. */
+    showLine: (v: string) =>
+      `(${v}.status = 'open' OR coalesce(${v}.endedAt, ${v}.startedAt) > datetime() - duration({hours: ${TOOL_SESSION_ANSWER_HOURS}}))`,
   },
   FollowUp: {
     /** resolve / snooze / notify: only while scheduled. */
@@ -78,6 +81,11 @@ export function writable(
       if (op === 'close') return p.status === 'open';
       if (op === 'answer') {
         if (p.answeredAt != null || p.outcomeAskDismissed === true) return false;
+        const end = ms(p.endedAt) ?? ms(p.startedAt);
+        return end !== null && end > now - TOOL_SESSION_ANSWER_HOURS * HOUR;
+      }
+      if (op === 'showLine') {
+        if (p.status === 'open') return true;
         const end = ms(p.endedAt) ?? ms(p.startedAt);
         return end !== null && end > now - TOOL_SESSION_ANSWER_HOURS * HOUR;
       }

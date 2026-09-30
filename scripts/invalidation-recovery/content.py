@@ -51,11 +51,20 @@ SOURCES = [
   ("watkins_2012", "Watkins et al. (2012), Psychological Medicine — guided self-help concreteness training for depression, Phase II RCT", "https://doi.org/10.1017/S0033291711002480"),
   ("mcgowan_behar_2013", "McGowan & Behar (2013), Behavior Modification — stimulus control training (worry postponement), preliminary RCT", "https://doi.org/10.1177/0145445512455661"),
 ]
+# Validation lines are a projection of the witness corpus (plan A5-1): edit them in
+# scripts/witness/content.py (the recover_validate lines), then rebuild both files.
+def _witness():
+  import importlib.util, os
+  spec = importlib.util.spec_from_file_location("witness_content", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "witness", "content.py"))
+  mod = importlib.util.module_from_spec(spec)
+  spec.loader.exec_module(mod)
+  return mod.witness_lines
+witness_lines = _witness()
 PROTOCOLS = {
-  "not_received": ("Not received", ["{N}, of course that stung. You were trying to be heard and got {phrase}.", "Anyone who wanted to be understood would feel this.", "{N}'s hurt makes sense. The story about it might not.", "{N} can know this hurt without needing them to be the villain."], ["self_validation", "affect_labeling", "distanced_self_talk", "dbt_dear_man"]),
-  "diminished_self": ("Diminished self", ["{N}, this is a moment of hurt. Being {phrase} hurts anyone.", "{N}'s feeling is real. It isn't a verdict on {N}.", "Feeling small right now doesn't make {N} small.", "Both can be true: {N} is sensitive to this, and it was unkind."], ["self_validation", "self_compassion_break", "act_values", "dbt_opposite_action"]),
-  "blocked_wronged": ("Blocked or wronged", ["{N}, it makes sense you're furious. Something mattered and got {phrase}.", "{N} can know this was unfair without replaying it all night.", "It's understandable {N} is angry. {N} chooses the next move.", "Both can be true: this was wrong, and {N} gets to decide what to do with it."], ["self_validation", "dbt_stop", "cbt_should_statements", "rumination_postponement"]),
-  "attachment_alarm": ("Attachment alarm", ["{N}, of course you're scared. Losing connection sets off a real alarm.", "This is real pain, not oversensitivity. Rejection sets off alarm systems that overlap with physical pain.", "{N} can hold this fear without chasing.", "The alarm is loud. That doesn't mean the relationship is over."], ["self_validation", "security_priming", "dbt_opposite_action"]),
+  "not_received": ("Not received", witness_lines("recover_validate", "not_received"), ["self_validation", "affect_labeling", "distanced_self_talk", "dbt_dear_man"]),
+  "diminished_self": ("Diminished self", witness_lines("recover_validate", "diminished_self"), ["self_validation", "self_compassion_break", "act_values", "dbt_opposite_action"]),
+  "blocked_wronged": ("Blocked or wronged", witness_lines("recover_validate", "blocked_wronged"), ["self_validation", "dbt_stop", "cbt_should_statements", "rumination_postponement"]),
+  "attachment_alarm": ("Attachment alarm", witness_lines("recover_validate", "attachment_alarm"), ["self_validation", "security_priming", "dbt_opposite_action"]),
 }
 # id, label, covers, protocol, also, phrase, highRisk, lowArousal, emotions(ranked, first=default), patterns
 STATES = [

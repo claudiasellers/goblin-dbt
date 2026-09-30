@@ -2,6 +2,7 @@
  * Insights dashboard data.
  * Moved verbatim from the single-file functions/src/index.ts (A1-2); deploy names are the export names.
  */
+import { intensityDrop, intensityTrending } from './intensity';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { Record as Neo4jRecord } from 'neo4j-driver';
 import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
@@ -65,6 +66,7 @@ export const getInsightsData = onCall(
                  c.quadrant AS quadrant,
                  c.intensityX AS intensityX,
                  c.intensityY AS intensityY,
+                 c.band AS band,
                  c.activationPatternId AS activationPatternId,
                  bodyRegions,
                  tagArrays,
@@ -108,6 +110,7 @@ export const getInsightsData = onCall(
         quadrant: r.get('quadrant'),
         intensityX: toNumber(r.get('intensityX')) ?? 0,
         intensityY: toNumber(r.get('intensityY')) ?? 0,
+        band: (r.get('band') as string | null) ?? null,
         activationPatternId: r.get('activationPatternId') || null,
         bodyRegions: (r.get('bodyRegions') || []).filter(Boolean) as string[],
         sensationTags: ((r.get('tagArrays') || []) as string[][]).flat().filter(Boolean) as string[],
@@ -309,17 +312,12 @@ export const getInsightsData = onCall(
           const rec = escResult.records[0];
           // Check intensity trend (are recent check-ins getting more intense?)
           const patternCheckIns = checkIns
-            .filter(ci => ci.activationPatternId === dominantPattern[0])
-            .slice(0, 4);
+            .filter(ci => ci.activationPatternId === dominantPattern[0]);
 
-          let intensityTrending = false;
-          if (patternCheckIns.length >= 2) {
-            const recentAvg = patternCheckIns.slice(0, 2).reduce((s, ci) => s + ci.intensityY, 0) / 2;
-            const olderAvg = patternCheckIns.slice(-2).reduce((s, ci) => s + ci.intensityY, 0) / 2;
-            intensityTrending = recentAvg > olderAvg + 0.05;
-          }
+          // Banded check-ins only (A4-3): the old constant 0.5 must not read as a trend.
+          const trending = intensityTrending(patternCheckIns);
 
-          if (intensityTrending || dominantPattern[1] >= thresholds.dominantRepeatMin) {
+          if (trending || dominantPattern[1] >= thresholds.dominantRepeatMin) {
             proactiveAlert = {
               narrative: rec.get('narrative'),
               suggestedTool: rec.get('suggestedAppTool') || normalizeToolId(rec.get('suggestedTool')),
@@ -372,13 +370,13 @@ export const getInsightsData = onCall(
             }
 
             // 3. Catching it earlier (intensity drop)
-            const recentAvgIntensity = newerHalf.reduce((s, ci) => s + ci.intensityY, 0) / newerHalf.length;
-            const priorAvgIntensity = olderHalf.reduce((s, ci) => s + ci.intensityY, 0) / olderHalf.length;
-            if (priorAvgIntensity - recentAvgIntensity > thresholds.intensityDropMin) {
+            // Banded check-ins only, ≥2 per half (A4-3); otherwise the metric is skipped.
+            const drop = intensityDrop(olderHalf, newerHalf, thresholds.intensityDropMin);
+            if (drop) {
               insights.push({
                 key: 'catching-earlier',
                 text: "You're catching things before they escalate.",
-                data: { current: Math.round(recentAvgIntensity * 100), previous: Math.round(priorAvgIntensity * 100) },
+                data: { current: Math.round(drop.current * 100), previous: Math.round(drop.previous * 100) },
               });
             }
 

@@ -28,7 +28,7 @@ test("every registered label has a layer; every non-system label an exportAs, un
   assert.equal(new Set(keys).size, keys.length);
   assert.equal(exportKeyFor(["CheckIn", "UserData", "LogRecord"]), "checkIns");
   assert.equal(exportKeyFor(["PushToken", "UserData", "System"]), null);
-  assert.deepEqual(labelsOf("profile").sort(), ["MyPattern", "ProfileFact"]);
+  assert.deepEqual(labelsOf("profile").sort(), ["MyPattern", "OwnLine", "ProfileFact"]);
   assert.deepEqual(LAYER_LABEL, { log: "LogRecord", profile: "ProfileItem", system: "System" });
 });
 
@@ -107,6 +107,9 @@ test("finalise-once: ToolSession, FollowUp, PatternOffer, ToolUsage, SkillPracti
   assert.equal(writable("ToolUsage", "outcome", { outcome: null }, now), true);
   assert.equal(writable("ToolUsage", "outcome", { outcome: "helped" }, now), false);
   assert.equal(writable("SkillPractice", "any", {}, now), false);
+  assert.equal(writable("ToolSession", "showLine", { status: "open", startedAt: iso(-30) }, now), true, "a beat inside an open session");
+  assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-11) }, now), true);
+  assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-13) }, now), false);
   assert.equal(toolSessionState({ status: "open", startedAt: iso(-3) }, now), "abandoned");
   assert.equal(toolSessionState({ status: "open", startedAt: iso(-1) }, now), "open");
   assert.equal(toolSessionState({ status: "exited_early" }, now), "exited_early");
@@ -118,6 +121,7 @@ test("the Cypher guards encode the same rules", () => {
   assert.match(GUARDS.CheckIn.upsert("c"), /duration\(\{hours: 2\}\)/);
   assert.equal(GUARDS.ToolSession.close("ts"), "ts.status = 'open'");
   assert.match(GUARDS.ToolSession.answer("ts"), /duration\(\{hours: 12\}\)/);
+  assert.match(GUARDS.ToolSession.showLine("ts"), /^\(ts\.status = 'open' OR [\s\S]*duration\(\{hours: 12\}\)\)$/);
   assert.equal(GUARDS.FollowUp.update("f"), "f.status = 'scheduled'");
   assert.equal(GUARDS.PatternOffer.answer("o"), "o.status = 'offered'");
   assert.equal(GUARDS.ToolUsage.outcome("tu"), "tu.outcome IS NULL");
@@ -132,6 +136,8 @@ const GUARDED_WRITERS = [
   ["functions/src/spine/toolSession.ts", "GUARDS.ToolSession.answer"],
   ["functions/src/spine/followUp.ts", "GUARDS.FollowUp.update"],
   ["functions/src/profile/patternOffers.ts", "GUARDS.PatternOffer.answer"],
+  ["functions/src/witness/index.ts", "GUARDS.CheckIn.upsert"],
+  ["functions/src/witness/index.ts", "GUARDS.ToolSession.showLine"],
 ];
 test("writers that update log records use the lifecycle guards", () => {
   for (const [file, guard] of GUARDED_WRITERS) assert.ok(readFileSync(file, "utf8").includes(guard), `${file} lacks ${guard}`);

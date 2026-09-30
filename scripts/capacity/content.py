@@ -14,6 +14,9 @@ FRESH_MINUTES = 20  # Index §5.1 #9: a reading is "current" for 20 minutes (cli
 
 BANDS = ["steady", "stirred", "flooded"]
 
+# Display words for a stored band (History, A4-3). Presentation of the answer, never a score.
+BAND_LABELS = {"steady": "Steady", "stirred": "Stirred", "flooded": "Flooded"}
+
 # CheckIn.intensityY compatibility (FTF precedent; getStateAndTools' y-heuristic until E4-3).
 BAND_INTENSITY = {"steady": 0.35, "stirred": 0.6, "flooded": 0.85}
 

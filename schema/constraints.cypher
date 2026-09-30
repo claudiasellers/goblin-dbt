@@ -108,6 +108,12 @@ CREATE CONSTRAINT capacity_probe_id IF NOT EXISTS FOR (n:CapacityProbe) REQUIRE 
 CREATE CONSTRAINT handoff_primitive_id IF NOT EXISTS FOR (n:HandoffPrimitive) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT band_rule_id IF NOT EXISTS FOR (n:BandRule) REQUIRE n.id IS UNIQUE;
 
+// --- Witness corpus (A5-1, schema/witness.cypher) ---
+CREATE CONSTRAINT validation_line_id IF NOT EXISTS FOR (n:ValidationLine) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT tool_moment_id IF NOT EXISTS FOR (n:ToolMoment) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT voice_rule_id IF NOT EXISTS FOR (n:VoiceRule) REQUIRE n.id IS UNIQUE;
+CREATE INDEX validation_line_status IF NOT EXISTS FOR (n:ValidationLine) ON (n.status);
+
 // --- User data (written by Cloud Functions, never by schema files) ---
 // PR-S1 conventions (functions/src/userdata/layers.ts): every :UserData label has a unique `key`
 // (= ownerId + ':' + id; writes MERGE on key), and every :UserData node is indexed on ownerId.
@@ -131,6 +137,7 @@ CREATE CONSTRAINT follow_up_key IF NOT EXISTS FOR (n:FollowUp) REQUIRE n.key IS 
 CREATE CONSTRAINT pattern_offer_key IF NOT EXISTS FOR (n:PatternOffer) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT profile_fact_key IF NOT EXISTS FOR (n:ProfileFact) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT my_pattern_key IF NOT EXISTS FOR (n:MyPattern) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT own_line_key IF NOT EXISTS FOR (n:OwnLine) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT push_token_key IF NOT EXISTS FOR (n:PushToken) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);

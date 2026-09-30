@@ -12,6 +12,7 @@ def q(s): return json.dumps(s, ensure_ascii=False)  # Cypher accepts JSON-style 
 def js(o): return q(json.dumps(o, ensure_ascii=False))
 
 def check():
+    assert list(BAND_LABELS) == BANDS
     assert list(BAND_INTENSITY) == BANDS and list(PROBE_DEFAULT["options"]) == BANDS
     assert list(PROBE_RELATIONAL["options"]) == BANDS
     assert list(HANDOFF["reread"]["options"]) == THEN_VS_NOW
@@ -25,6 +26,7 @@ CONTENT = {
     "version": VERSION,
     "freshMinutes": FRESH_MINUTES,
     "bandIntensity": BAND_INTENSITY,
+    "bandLabels": BAND_LABELS,
     "probe": {"wordings": {"default": PROBE_DEFAULT, "relational": PROBE_RELATIONAL}, "cantTell": CANT_TELL},
     "handoff": HANDOFF,
 }

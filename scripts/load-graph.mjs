@@ -14,10 +14,17 @@
  *   node scripts/load-graph.mjs --dry-run    # only parse + count statements
  *   node scripts/load-graph.mjs --only dear-man-content   # files whose name contains this
  *   node scripts/load-graph.mjs --file schema/maintenance/x.cypher  # one file outside LOAD_ORDER (prints results)
+ *   node scripts/load-graph.mjs --only witness --skip-voice-lint     # bypass the voice gate (don't)
+ *
+ * Voice gate (plan A5-1): before anything is sent, the witness corpus and the generated flow
+ * documents in the selection are checked with scripts/voice-lint.mjs (the same module npm test
+ * runs). Corpus errors, or flow-doc copy outside the voice contract that isn't in the baseline,
+ * abort the load (exit 5) unless --skip-voice-lint is passed.
  *
  * `--only knowledge-graph` refuses without --force: later files override Emotion / TherapyConcept
  * properties, so the base file alone would revert them until a full load.
- * Exit codes: 1 setup, 2 statement failures, 3 constraint failure, 4 duplicates after --verify.
+ * Exit codes: 1 setup, 2 statement failures, 3 constraint failure, 4 duplicates after --verify,
+ * 5 voice lint.
  *
  * Credentials are read from env vars, or from a .env file in the repo root
  * (NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD). Uses functions/node_modules/neo4j-driver.
@@ -27,6 +34,7 @@ import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { SCHEMA_REL_TYPES, DUPLICATE_NODES_QUERY, DUPLICATE_RELS_QUERY } from './lib/schemaDuplicates.mjs';
+import { gateProblems } from './voice-lint.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(resolve(root, 'functions/package.json'));
@@ -58,6 +66,7 @@ export const LOAD_ORDER = [
   'practice-spine.cypher',                         // FollowUpType, SessionCloseFlow, PracticeSkill defaultFor (needs urge_surfing above)
   'profile-layer.cypher',                          // ProfileArea / ProfileKind / PatternRule (Me surface content)
   'capacity.cypher',                               // Capacity probe, hand-off primitives, band rules (needs Recover's cyclic_sighing)
+  'witness.cypher',                                // Witness corpus: ValidationLine, ToolMoment, VoiceRule (needs Recover, OA, DEAR MAN debrief, regulation content)
 ];
 
 // schema/*.cypher files that are deliberately never loaded (reference queries, not data).
@@ -118,6 +127,11 @@ export function splitStatements(source) {
   return out;
 }
 
+/** Voice-lint problems for the selected files (names as in LOAD_ORDER; --file paths by basename). */
+export function voiceGate(names) {
+  return gateProblems(names.map(n => n.replace(/^.*[\\/]/, '')));
+}
+
 function loadEnv() {
   const envPath = resolve(root, '.env');
   if (existsSync(envPath)) {
@@ -170,6 +184,16 @@ async function main() {
   let total = 0;
   for (const p of plan) { total += p.statements.length; console.log(`${p.file.padEnd(48)} ${String(p.statements.length).padStart(4)} statements`); }
   console.log(`${'TOTAL'.padEnd(48)} ${String(total).padStart(4)} statements`);
+
+  const voice = voiceGate(files.map(f => f.name));
+  if (voice.length) {
+    console.error(`\nVoice lint: ${voice.length} problem(s) in the files about to load:`);
+    for (const v of voice) console.error(`  ✗ ${v}`);
+    if (flag('--skip-voice-lint')) console.warn('  --skip-voice-lint: loading anyway.');
+    else { console.error('  Fix the source (content.py) and rebuild, or pass --skip-voice-lint.'); process.exit(5); }
+  } else {
+    console.log('\nVoice lint: clean');
+  }
   if (dryRun) return;
 
   const { uri, user, password } = loadEnv();

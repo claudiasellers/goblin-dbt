@@ -743,6 +743,30 @@
     "labels": {},
     "callableTrigger": {}
   },
+  "getWitnessLines": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
   "onUserCreated": {
     "platform": "gcfv1",
     "availableMemoryMb": null,
@@ -826,6 +850,30 @@
     "callableTrigger": {}
   },
   "recordToolSession": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "recordWitnessBeat": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
     "minInstances": null,

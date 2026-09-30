@@ -1,56 +1,46 @@
 /**
- * Pure logic for DEAR MAN's arousal gates and the handoff from "Recover from a hurtful moment".
- * Thresholds and copy come from the graph (getDearManContent → safetyGates / safetyCopy);
- * nothing clinical is hard-coded here. Type-only imports keep this file dependency-free for tests.
+ * Pure logic for DEAR MAN's band gate and the handoff from "Recover from a hurtful moment".
+ * Band rules and copy come from the graph (getCapacityContent → bandRules; getDearManContent →
+ * safetyCopy). Type-only imports keep this file dependency-free for tests.
  */
 import type { DearManHandoff } from '../data/dearManHandoff';
+import type { Band, BandRule, ThenVsNow } from '../data/capacityTypes';
+import { bandFromLegacyScore } from './band';
 
-export interface DearManGateThresholds {
-  downshiftAt: number;
-  askMax: number;
-  waitMinutes: number;
+/**
+ * DEAR MAN on the band (A4-4, ER-01 BandRule dear-man:*). Replaces the 0–10 rating and the
+ * thresholds DEAR MAN used to borrow from Recover's flow document (F10):
+ * - 'handoff': flooded → P2 (body first, then back to the same step)
+ * - 'headsUp': stirred → plan now; the finished plan opens with a heads-up (never a lock)
+ * - 'clear':   steady, or no band (not asked / content unavailable) → no gate
+ * The graph's BandRule rows say the same (steady full · stirred full + summary heads-up · flooded
+ * handoff); `dearManBandGate` follows them when given, so a content change moves the gate.
+ */
+export type DearManBandGate = 'handoff' | 'headsUp' | 'clear';
+
+export function dearManBandGate(
+  band: Band | null | undefined,
+  rules?: Array<Pick<BandRule, 'skillId' | 'band' | 'mode' | 'headsUp'>> | null,
+): DearManBandGate {
+  if (!band) return 'clear';
+  const rule = rules?.find((r) => r.skillId === 'dear-man' && r.band === band);
+  if (rule) {
+    if (rule.mode === 'handoff') return 'handoff';
+    return rule.headsUp === 'summary' ? 'headsUp' : 'clear';
+  }
+  return band === 'flooded' ? 'handoff' : band === 'stirred' ? 'headsUp' : 'clear';
 }
 
 /**
- * Where a 0–10 intensity rating lands:
- * - 'downshift': at or above downshiftAt → offer to settle the body before planning
- * - 'wait':      above askMax → plan now; the finished plan opens with a heads-up (never a lock)
- * - 'clear':     at or under askMax (or no rating / no gates) → no gate
+ * Whether the Summary opens with the heads-up: the band isn't steady. The plan is never locked or
+ * hidden. The person worked for it; the heads-up names the risk and offers a quick way to take the
+ * edge off. No band (not asked) → no heads-up. When the user's latest P2 reread said "much
+ * quieter", the start band is no longer what they told us, so "it's still loud in there" would
+ * contradict them (then-vs-now, R3): no heads-up.
  */
-export type DearManGateState = 'downshift' | 'wait' | 'clear';
-
-export function dearManGateState(
-  intensity: number | null | undefined,
-  gates: DearManGateThresholds | null | undefined,
-): DearManGateState {
-  if (!gates || intensity == null || !Number.isFinite(intensity)) return 'clear';
-  if (intensity >= gates.downshiftAt) return 'downshift';
-  if (intensity > gates.askMax) return 'wait';
-  return 'clear';
-}
-
-/**
- * After a rating, what comes next. The downshift is offered once: a re-rate that is
- * still high continues to the plan (with the wait lock) instead of looping.
- */
-export function nextAfterRating(
-  intensity: number,
-  gates: DearManGateThresholds | null | undefined,
-  alreadyDownshifted: boolean,
-): 'breathe' | 'scene' {
-  return dearManGateState(intensity, gates) === 'downshift' && !alreadyDownshifted ? 'breathe' : 'scene';
-}
-
-/**
- * Whether the Summary opens with a heads-up: the latest rating is still above askMax.
- * The plan is never locked or hidden. The person worked for it; the heads-up names the risk
- * ("this won't come out the way you mean it") and offers a quick way to take the edge off.
- */
-export function summaryHeadsUp(opts: {
-  latestIntensity: number | null;
-  gates: DearManGateThresholds | null | undefined;
-}): boolean {
-  return dearManGateState(opts.latestIntensity, opts.gates) !== 'clear';
+export function summaryHeadsUpForBand(band: Band | null | undefined, lastThenVsNow?: ThenVsNow | null): boolean {
+  if (lastThenVsNow === 'much_better') return false;
+  return !!band && band !== 'steady';
 }
 
 const norm = (s: string) => s.trim().toLowerCase().replace(/[_-]+/g, ' ');
@@ -85,4 +75,13 @@ export function handoffPrefill(
   return chip
     ? { situationType, feelings: [chip.id], feelingCustom: '' }
     : { situationType, feelings: [], feelingCustom: handoff.emotionName.trim() };
+}
+
+/**
+ * Recover → DEAR MAN (A4-4): the hand-off carries the band as well as the number, derived from
+ * Recover's own gates (bandFromLegacyScore: ≥ downshiftAt flooded, > askMax stirred, else steady)
+ * until WMP-02 moves Recover onto the band. DEAR MAN reads only the band.
+ */
+export function withBand(h: DearManHandoff, gates: { downshiftAt: number; askMax: number }, at: Date = new Date()): DearManHandoff {
+  return { ...h, band: bandFromLegacyScore(h.intensity, gates), bandAt: at.toISOString() };
 }

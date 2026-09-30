@@ -15,7 +15,7 @@ import { HHMM } from './meta';
 export interface ProfileWriteResponse { version: number }
 
 /** Profile item labels an item ref may name (a whitelist: the label is interpolated into Cypher). */
-export const ITEM_LABELS = { ProfileFact: 'HAS_PROFILE_FACT', MyPattern: 'HAS_PATTERN' } as const;
+export const ITEM_LABELS = { ProfileFact: 'HAS_PROFILE_FACT', MyPattern: 'HAS_PATTERN', OwnLine: 'HAS_OWN_LINE' } as const;
 type ItemLabel = keyof typeof ITEM_LABELS;
 
 /** Phase A fact kinds and their value validators. */

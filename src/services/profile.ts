@@ -4,7 +4,7 @@ import { functions } from './firebase';
 import type { ClientProfileConsumer, GetProfileContextResponse, PatternOfferAnswer, ProfileAreaId, ProfileItemMeta, QuietHours } from '../data/profileTypes';
 
 export interface MeItem {
-  label: 'ProfileFact' | 'MyPattern';
+  label: 'ProfileFact' | 'MyPattern' | 'OwnLine';
   meta: ProfileItemMeta;
   title: string;
   summary: string;
@@ -19,10 +19,13 @@ export interface GetMeResponse {
   staleCount: number;
   name: { firstName: string | null };
   areas: Array<{ id: ProfileAreaId; label: string; blurb: string; items: MeItem[]; kinds: Array<{ id: string; label: string }> }>;
-  readOnly: { foundWords: Array<{ emotionId: string; name: string | null; count: number }> };
+  readOnly: {
+    foundWords: Array<{ emotionId: string; name: string | null; count: number }>;
+    savedLines: Array<{ lineId: string; text: string }>;
+  };
   offers: Array<{ id: string; statement: string; offerCopy: string; toolId: string | null; evidenceCount: number }>;
 }
-export interface ProfileItemRef { id: string; label: 'ProfileFact' | 'MyPattern' }
+export interface ProfileItemRef { id: string; label: 'ProfileFact' | 'MyPattern' | 'OwnLine' }
 
 const ctxFn = httpsCallable<{ toolId: ClientProfileConsumer }, GetProfileContextResponse>(functions, 'getProfileContext');
 const meFn = httpsCallable<void, GetMeResponse>(functions, 'getMe');

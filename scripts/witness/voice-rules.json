@@ -1,0 +1,79 @@
+{
+  "version": "voice-v1",
+  "about": "The witness voice contract (WMP-01 A, E3 §A5.2.4). Regex rules live here; structural rules (length, slots, levels, review) are in scripts/voice-lint.mjs. Severity per scope: validation (ValidationLine text), feeling_copy (copy that answers a feeling), user_copy (other app copy). 'report' never fails. Nothing the user writes is ever linted.",
+  "rules": [
+    {
+      "id": "no_interpretation",
+      "pattern": "\\byou're right\\b|\\bthey were wrong\\b|\\bit was (unkind|wrong)\\b|\\bthis was wrong\\b|\\bthey don't care\\b|\\bthey meant\\b",
+      "flags": "i",
+      "severity": { "validation": "error" },
+      "message": "Validate the feeling, never an interpretation or another person's intent."
+    },
+    {
+      "id": "no_cheer",
+      "pattern": "great job|amazing|proud of you|awesome|well done|!",
+      "flags": "i",
+      "severity": { "validation": "error", "feeling_copy": "error", "user_copy": "warn" },
+      "message": "Flat, warm witness: no cheer on feelings, no exclamation marks."
+    },
+    {
+      "id": "no_emoji",
+      "pattern": "[\\u{1F000}-\\u{1FAFF}\\u{2600}-\\u{27BF}\\u{2B50}\\u{2728}]",
+      "flags": "u",
+      "severity": { "validation": "error", "feeling_copy": "error" },
+      "message": "No emoji in validation or feeling copy."
+    },
+    {
+      "id": "and_not_but",
+      "pattern": "[,.;:] but\\b",
+      "flags": "i",
+      "severity": { "validation": "error" },
+      "message": "And, not but: a second clause never takes the first one back."
+    },
+    {
+      "id": "no_minimising",
+      "pattern": "\\bat least\\b|\\bdon't worry\\b|\\bjust\\b|\\beverything happens\\b|\\bit'll be fine\\b|\\bcalm down\\b",
+      "flags": "i",
+      "severity": { "validation": "error" },
+      "message": "No minimising or reassurance."
+    },
+    {
+      "id": "no_should",
+      "pattern": "\\bshould\\b",
+      "flags": "i",
+      "severity": { "validation": "error", "feeling_copy": "warn", "user_copy": "warn" },
+      "message": "No shoulds."
+    },
+    {
+      "id": "no_diagnosis",
+      "pattern": "\\boverreact\\w*|\\boversensitiv\\w*",
+      "flags": "i",
+      "severity": { "validation": "error" },
+      "message": "No diagnosis words."
+    },
+    {
+      "id": "no_physiology",
+      "pattern": "\\bvag(us|al)\\b|\\bventral\\b|\\bdorsal\\b|\\boffline\\b|\\bhijack\\w*|\\bamygdala\\b|\\bcortex\\b|\\bnervous system\\b|\\bneuroscience\\b|\\blanguage cent(er|re)s\\b|\\balarm systems?\\b",
+      "flags": "i",
+      "severity": { "validation": "error", "feeling_copy": "report", "user_copy": "report" },
+      "message": "No physiology claims in validation lines (D-04: report-only elsewhere)."
+    },
+    {
+      "id": "voice_distance",
+      "pattern": "\\bI\\b|\\b[Mm]y\\b|\\b[Mm]e\\b|\\bI'(m|ve|ll|d)\\b",
+      "flags": "",
+      "severity": { "validation": "error" },
+      "message": "App lines speak as a witness (you, or the user's name); first person only in lines the user writes."
+    }
+  ],
+  "structural": [
+    { "id": "max_length", "severity": { "validation": "error" }, "message": "At most 90 characters (slots count as 8)." },
+    { "id": "flooded_short", "severity": { "validation": "error" }, "message": "A line allowed at flooded is level 1-2 and at most 8 words." },
+    { "id": "slots", "severity": { "validation": "error" }, "message": "Only {N} {word} {phrase} {need}; textNamed has {N} exactly when voice is name; text never has {N}." },
+    { "id": "level3_tentative", "severity": { "validation": "error" }, "message": "Level 3 is a guess: tentative, with at least one UNDERNEATH emotion." },
+    { "id": "level6_capacity", "severity": { "validation": "error" }, "message": "Level 6 is about capacity, never worth or flattery." },
+    { "id": "reviewed_live", "severity": { "validation": "error" }, "message": "A live line has been reviewed (reviewStatus reviewed, reviewedAt set)." },
+    { "id": "receive_before_change", "severity": { "flow": "error" }, "message": "In a flow that declares step kinds, a receive step precedes any change step." },
+    { "id": "skip_always", "severity": { "component": "error" }, "message": "The receive beat always renders skip, none of these fit and say it my way." }
+  ]
+}

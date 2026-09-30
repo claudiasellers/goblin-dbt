@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { TodayContext, type TodayValue } from '../hooks/useToday';
 import { getToday, type GetTodayResponse } from '../services/spine';
+import { useBand } from '../hooks/useBand';
 
 const FOCUS_REFETCH_MS = 5 * 60_000;
 const MAX_NOTIFY_DELAY_MS = 24 * 3_600_000;
@@ -18,6 +19,9 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const uid = user?.uid ?? null;
+  // A fresh band (client-only, R1) goes to getToday so a `flooded` answer collapses the stack to
+  // "Your plans will keep" (E2 GetTodayRequest). Refetched when the current band changes.
+  const bandValue = useBand().current()?.value;
   const [data, setData] = useState<{ uid: string; res: GetTodayResponse } | null>(null);
   const [dropped, setDropped] = useState<Set<string>>(new Set());
   const [reloadKey, setReloadKey] = useState(0);
@@ -27,11 +31,11 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     if (!uid) return;
     let live = true;
     lastFetch.current = Date.now();
-    getToday()
+    getToday(bandValue)
       .then((res) => { if (live) { setData({ uid, res }); setDropped(new Set()); } })
       .catch(() => { if (live) setData({ uid, res: { items: [], more: [], holding: false, nextInTab: null } }); });
     return () => { live = false; };
-  }, [uid, reloadKey]);
+  }, [uid, reloadKey, bandValue]);
 
   const refresh = useCallback(() => setReloadKey((k) => k + 1), []);
   const drop = useCallback((id: string) => setDropped((prev) => new Set(prev).add(id)), []);

@@ -9,6 +9,8 @@ export interface ToolSessionCloseInput {
   status?: CloseStatus;
   thenVsNow?: ThenVsNow;
   actedOnUrge?: ActedOnUrge;
+  /** The band the tool asked after it opened (e.g. BandGate on its first screen). */
+  bandAtStart?: CapacityReading;
   bandAtEnd?: CapacityReading;
   urgeIds?: string[];
   detail?: { kind: DetailKind; id: string };
@@ -43,6 +45,8 @@ export interface ToolSessionApi {
   markComplete(): void;
   /** Tool detail sent at close, namespaced by module (R18). Merged per namespace. */
   setExt(ext: SessionExt): void;
+  /** The band asked on the tool's first screen (A4-4): sent with whichever close happens. */
+  setBandAtStart(r: CapacityReading): void;
   /** The skills this visit practised, when not the tool's PracticeSkill.defaultFor (e.g. Cool Down's exhale). */
   setSkillIds(ids: string[]): void;
   /** Close once (later calls resolve null). Resolves null when nothing was written. */
@@ -61,6 +65,7 @@ export const NO_SESSION: ToolSessionApi = {
   markPracticed: () => {},
   markComplete: () => {},
   setExt: () => {},
+  setBandAtStart: () => {},
   setSkillIds: () => {},
   close: async () => null,
   linkTo: (toolId, state) => ({ pathname: `/tool/${toolId}`, state: { ...state, spine: { entry: 'handoff' } } }),

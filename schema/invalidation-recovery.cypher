@@ -94,17 +94,17 @@ UNWIND ["self_validation", "affect_labeling", "distanced_self_talk", "dbt_dear_m
 MATCH (p:RecoveryProtocol {id: "not_received"}), (c:TherapyConcept {id: cid})
 MERGE (p)-[:DRAWS_ON]->(c);
 MERGE (p:RecoveryProtocol {id: "diminished_self"})
-SET p.label = "Diminished self", p.validationLines = ["{N}, this is a moment of hurt. Being {phrase} hurts anyone.", "{N}'s feeling is real. It isn't a verdict on {N}.", "Feeling small right now doesn't make {N} small.", "Both can be true: {N} is sensitive to this, and it was unkind."];
+SET p.label = "Diminished self", p.validationLines = ["{N}, this is a moment of hurt. Being {phrase} hurts anyone.", "{N}'s feeling is real. It isn't a verdict on {N}.", "Feeling small right now doesn't make {N} small.", "Both can be true: {N} is sensitive to this, and it hurt."];
 UNWIND ["self_validation", "self_compassion_break", "act_values", "dbt_opposite_action"] AS cid
 MATCH (p:RecoveryProtocol {id: "diminished_self"}), (c:TherapyConcept {id: cid})
 MERGE (p)-[:DRAWS_ON]->(c);
 MERGE (p:RecoveryProtocol {id: "blocked_wronged"})
-SET p.label = "Blocked or wronged", p.validationLines = ["{N}, it makes sense you're furious. Something mattered and got {phrase}.", "{N} can know this was unfair without replaying it all night.", "It's understandable {N} is angry. {N} chooses the next move.", "Both can be true: this was wrong, and {N} gets to decide what to do with it."];
+SET p.label = "Blocked or wronged", p.validationLines = ["{N}, it makes sense you're furious. Something mattered and got {phrase}.", "{N} can know this was unfair without replaying it all night.", "It's understandable {N} is angry. {N} chooses the next move.", "Both can be true: this felt wrong, and {N} gets to decide what happens next."];
 UNWIND ["self_validation", "dbt_stop", "cbt_should_statements", "rumination_postponement"] AS cid
 MATCH (p:RecoveryProtocol {id: "blocked_wronged"}), (c:TherapyConcept {id: cid})
 MERGE (p)-[:DRAWS_ON]->(c);
 MERGE (p:RecoveryProtocol {id: "attachment_alarm"})
-SET p.label = "Attachment alarm", p.validationLines = ["{N}, of course you're scared. Losing connection sets off a real alarm.", "This is real pain, not oversensitivity. Rejection sets off alarm systems that overlap with physical pain.", "{N} can hold this fear without chasing.", "The alarm is loud. That doesn't mean the relationship is over."];
+SET p.label = "Attachment alarm", p.validationLines = ["{N}, of course you're scared. Losing connection sets off a real alarm.", "This is real pain. Being pushed away hurts anyone.", "{N} can hold this fear without chasing.", "The alarm is loud. That doesn't mean the relationship is over."];
 UNWIND ["self_validation", "security_priming", "dbt_opposite_action"] AS cid
 MATCH (p:RecoveryProtocol {id: "attachment_alarm"}), (c:TherapyConcept {id: cid})
 MERGE (p)-[:DRAWS_ON]->(c);

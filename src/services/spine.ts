@@ -27,6 +27,8 @@ export interface CloseToolSessionRequest {
   practiced?: boolean;
   thenVsNow?: ThenVsNow;
   actedOnUrge?: ActedOnUrge;
+  /** A band asked after the session opened (set once, only if the start had none). */
+  bandAtStart?: CapacityReading;
   bandAtEnd?: CapacityReading;
   urgeIds?: string[];
   durationSec?: number;

@@ -29,7 +29,10 @@ export interface DearManContentResult {
   confidentCoaching: string;
   confidentBarrierNoRight: string;
   assertBarrierGuilty: string;
-  /** Arousal gates read from the recovery flow document; null on an older graph (gates skipped). */
+  /**
+   * DEPRECATED (A4-4): Recover's numeric gates. DEAR MAN reads the band (getCapacityContent) and
+   * never these; kept on the wire for one release, removed with WMP-02.
+   */
   safetyGates?: DearManSafetyGates | null;
   /** DEAR MAN-specific gate copy (DearManSafetyCopy node); null on an older graph. */
   safetyCopy?: DearManSafetyCopy | null;
@@ -54,13 +57,6 @@ export interface DearManSafetyCopy {
   handoffSituationId?: string;
   carriedOver?: string;
   carriedOverDismiss?: string;
-  intensityQuestion?: string;
-  intensityHint?: string;
-  intensityLow?: string;
-  intensityHigh?: string;
-  downshiftLead?: string;
-  rerateQuestion?: string;
-  rerateHint?: string;
   oneMessageOnly?: string;
   hotHeading?: string;
   hotBody?: string;
