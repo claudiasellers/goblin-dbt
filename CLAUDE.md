@@ -169,6 +169,9 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `scripts/profile-layer/content.py` | Editable source for `schema/profile-layer.cypher`: Me areas, `ProfileKind` (still-true copy, revisit days), `PatternRule` (off until reviewed) |
 | `src/hooks/useProfileContext.ts` | How a tool reads the profile: `useProfileContext(toolId).slices` (in-memory cache, never localStorage). A new tool declares `PROFILE_NEEDS[toolId]` |
 | `src/lib/band.ts`, `src/lib/resumeToken.ts` | Capacity band logic (freshness, hand-off plan, reread) and device-only resume tokens |
+| `src/contexts/BandContext.tsx`, `src/hooks/useBand.ts`, `src/lib/bandStore.ts` | The band store: `useBand()` (`current`, `record`, `carry`, content). Client-only (R1): memory + `sessionStorage` `goblin.band.v1`, 20 min, per uid, cleared with resume tokens on sign-out |
+| `src/components/capacity/` | `CapacityProbe`, `BandGate` (`band.ask()`: carries a current reading or asks; `reaskIfFlooded` per D-07), `BreakdownHandoff` (P2: card → sigh / orient → reread → resume or come back later; never a lock), `TooMuchLink` (P2 as an overlay; host stays mounted). A tool that gates on the band wraps its first screen in `BandGate` and puts `TooMuchLink` on its screens |
+| `dev/capacity.html` | Dev-only harness for the probe, gate, P2 and the too-much overlay (`tests/fixtures/capacity-content.json`, regenerate with `scripts/capacity/fixture.py`) |
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |

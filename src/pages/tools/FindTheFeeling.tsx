@@ -15,6 +15,7 @@ import { linkButton, primaryButton, secondaryText } from '../../components/tools
 import { useToolSession } from '../../hooks/useToolSession';
 import { recordToolSession } from '../../services/spine';
 import { thenVsNowFromFtf } from '../../lib/band';
+import { useBand } from '../../hooks/useBand';
 import { newId } from '../../lib/spine/ids';
 import type { RoomProps } from '../../components/tools/findTheFeeling/roomTypes';
 
@@ -62,6 +63,15 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   const reducer = useMemo(() => makeFlowReducer(content), [content]);
   const [history, dispatch] = useReducer(reducer, undefined, (): History => ({ stack: [initialFlow(content, entry)] }));
   const state = history.stack[history.stack.length - 1];
+
+  // FTF's capacity answer is a band reading like any other (A4-2): recorded so the check-in and the
+  // next tool within 20 minutes carry it instead of asking again. Rooms and save payload unchanged.
+  const band = useBand();
+  useEffect(() => {
+    if (!state.band) return;
+    band.record({ value: state.band, source: 'ftf', framing: 'now', wording: 'default', context: entry === 'checkin' ? 'checkin' : 'find-the-feeling' });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.band]);
 
   const [collection, setCollection] = useState<CollectedWord[]>([]);
   useEffect(() => {

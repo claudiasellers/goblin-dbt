@@ -1,0 +1,154 @@
+{
+ "version": "capacity-v1",
+ "freshMinutes": 20,
+ "bandIntensity": {
+  "steady": 0.35,
+  "stirred": 0.6,
+  "flooded": 0.85
+ },
+ "probe": {
+  "wordings": {
+   "default": {
+    "prompt": "If someone asked you for a favour right now, you'd…",
+    "incoming": "hey, could you help me with something?",
+    "options": {
+     "steady": "Say yes like normal",
+     "stirred": "Say yes, but with an edge",
+     "flooded": "Couldn't answer, or would regret it"
+    }
+   },
+   "relational": {
+    "prompt": "If {label} texted you right now, you'd…",
+    "someone": "If they texted you right now, you'd…",
+    "incoming": "hey, can we talk?",
+    "options": {
+     "steady": "Reply like normal",
+     "stirred": "Reply with an edge",
+     "flooded": "Couldn't reply, or would regret it"
+    }
+   }
+  },
+  "cantTell": "I can't tell"
+ },
+ "handoff": {
+  "card": {
+   "body": "This is a body moment, not a thinking moment. That's not you failing; it's what brains do when they're this loud.",
+   "start": "Start",
+   "keepGoing": "Keep going anyway",
+   "keepGoingHeadsUp": "Thinking may feel slippery right now. Short answers are fine."
+  },
+  "reread": {
+   "prompt": "Compared to a minute ago, it's…",
+   "options": {
+    "worse": "Louder",
+    "same": "About the same",
+    "better": "Quieter",
+    "much_better": "Much quieter"
+   }
+  },
+  "resumeLine": "Picking up where we were.",
+  "secondLead": "One more, a different way.",
+  "resumeStale": "You were in the middle of something earlier.",
+  "later": {
+   "offer": "Come back to this later",
+   "options": [
+    {
+     "id": "1h",
+     "label": "In an hour"
+    },
+    {
+     "id": "evening",
+     "label": "This evening"
+    },
+    {
+     "id": "tomorrow",
+     "label": "Tomorrow"
+    }
+   ],
+   "scheduled": "Saved for later. It will keep.",
+   "holding": "You can stop here. Nothing is lost."
+  },
+  "tooMuchLink": "This is too much right now"
+ },
+ "primitives": [
+  {
+   "id": "sigh",
+   "component": "breath_orb",
+   "direction": "calm",
+   "bands": [
+    "steady",
+    "stirred",
+    "flooded"
+   ],
+   "blank": "any",
+   "rank": 0,
+   "conceptId": "cyclic_sighing",
+   "copy": {
+    "title": "Let the air out slowly",
+    "sub": "Two breaths in through the nose, then a long exhale through the mouth. Three rounds.",
+    "phases": [
+     {
+      "key": "in",
+      "label": "In through your nose",
+      "ms": 2200
+     },
+     {
+      "key": "sip",
+      "label": "Sip a little more",
+      "ms": 900
+     },
+     {
+      "key": "out",
+      "label": "Long, slow exhale",
+      "ms": 5600
+     }
+    ],
+    "cycles": 3,
+    "start": "Start · about {seconds} seconds",
+    "skip": "I'm calmer, skip ahead",
+    "done": "Good."
+   }
+  },
+  {
+   "id": "orient",
+   "component": "orient",
+   "direction": "orient",
+   "bands": [
+    "steady",
+    "stirred",
+    "flooded"
+   ],
+   "blank": "any",
+   "rank": 1,
+   "conceptId": "se_orienting",
+   "copy": {
+    "title": "Come back into the room",
+    "sub": "Before any words. Just get your bearings.",
+    "look": "Look around slowly. Each time something catches your eye, tap a circle.",
+    "move": "Stand up and shake out your hands",
+    "moveSeconds": 20,
+    "startMove": "Start",
+    "skip": "Skip this",
+    "seen": "{n} of 3 found"
+   }
+  }
+ ],
+ "bandRules": [
+  {
+   "skillId": "dear-man",
+   "band": "flooded",
+   "mode": "handoff"
+  },
+  {
+   "skillId": "dear-man",
+   "band": "steady",
+   "mode": "full"
+  },
+  {
+   "skillId": "dear-man",
+   "band": "stirred",
+   "mode": "full",
+   "headsUp": "summary"
+  }
+ ]
+}
