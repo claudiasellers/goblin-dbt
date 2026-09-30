@@ -76,7 +76,8 @@ for i, (id_, title, sub, chaseSub, concepts) in enumerate(EXITS):
 
 A("\n// --- Practice skill deck (grades follow the project's Strong/Moderate/Preliminary scale;")
 A("// evidenceBasis says why a skill is Preliminary) ---")
-A("MATCH (:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() DELETE r;")
+# Scoped to Recover's own skills: other modules add PracticeSkills too (plan F5, PR-S2).
+A(f"MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN {q([s[0] for s in SKILLS])} DELETE r;")
 for i, (id_, name, grade, fam, concept, why) in enumerate(SKILLS):
     basis = "Clinical consensus" if grade == "Clinical consensus" else ("Limited trials" if grade == "Preliminary" else None)
     g = "Preliminary" if grade == "Clinical consensus" else grade

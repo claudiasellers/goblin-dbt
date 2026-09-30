@@ -94,6 +94,10 @@ CREATE CONSTRAINT feeling_signature_id IF NOT EXISTS FOR (fs:FeelingSignature) R
 CREATE CONSTRAINT feeling_family_id IF NOT EXISTS FOR (ff:FeelingFamily) REQUIRE ff.id IS UNIQUE;
 CREATE CONSTRAINT feeling_urge_id IF NOT EXISTS FOR (fu:FeelingUrge) REQUIRE fu.id IS UNIQUE;
 
+// --- Practice spine content (PR-S2, schema/practice-spine.cypher) ---
+CREATE CONSTRAINT follow_up_type_id IF NOT EXISTS FOR (n:FollowUpType) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT session_close_flow_id IF NOT EXISTS FOR (n:SessionCloseFlow) REQUIRE n.id IS UNIQUE;
+
 // --- User data (written by Cloud Functions, never by schema files) ---
 // PR-S1 conventions (functions/src/userdata/layers.ts): every :UserData label has a unique `key`
 // (= ownerId + ':' + id; writes MERGE on key), and every :UserData node is indexed on ownerId.
