@@ -242,14 +242,15 @@ async function main() {
   } finally {
     await session.close();
     await driver.close();
+    // Report statement failures even when a constraint (3) or --verify (4) failure decides the exit code.
+    if (failures.length) {
+      console.error(`\n${failures.length} statement(s) failed:`);
+      for (const f of failures) console.error(`  ${f.file} #${f.index}: ${f.message.split('\n')[0]}\n    ${f.preview}…`);
+    }
     if (exitCode) process.exit(exitCode);
   }
 
-  if (failures.length) {
-    console.error(`\n${failures.length} statement(s) failed:`);
-    for (const f of failures) console.error(`  ${f.file} #${f.index}: ${f.message.split('\n')[0]}\n    ${f.preview}…`);
-    process.exit(2);
-  }
+  if (failures.length) process.exit(2);
   console.log(verify ? '\nDone. Graph loaded and verified.' : '\nDone. Graph loaded.');
 }
 

@@ -18,7 +18,14 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const PKG = '@neo4j-cypher/language-support';
 
 function loadLinter() {
-  const bases = [import.meta.url, join(process.cwd(), 'noop.js'), ...(process.env.NODE_PATH || '').split(delimiter).filter(Boolean).map((d) => join(d, '..', 'noop.js'))];
+  // `npx -p <pkg> node …` puts <npx cache>/node_modules/.bin on PATH (not NODE_PATH), so look there too.
+  const npxBins = (process.env.PATH || '').split(delimiter).filter((d) => /node_modules[\\/]\.bin$/.test(d));
+  const bases = [
+    import.meta.url,
+    join(process.cwd(), 'noop.js'),
+    ...npxBins.map((d) => join(d, '..', 'noop.js')),
+    ...(process.env.NODE_PATH || '').split(delimiter).filter(Boolean).map((d) => join(d, '..', 'noop.js')),
+  ];
   for (const b of bases) {
     try { return createRequire(b)(PKG); } catch { /* try the next base */ }
   }

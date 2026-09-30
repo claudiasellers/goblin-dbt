@@ -129,7 +129,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → body → sensation → suggestion → analyzing → result |
 | `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant) |
 | `src/components/safety/CrisisBanner.tsx` | Crisis resources as a non-blocking banner above the normal result (never a replacement screen) |
-| `src/pages/tools/ToolPage.tsx` | Tool detail page with interactive component routing |
+| `src/pages/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
 | `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
 | `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
