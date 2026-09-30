@@ -7,20 +7,28 @@
     <meta name="description" content="Simple DBT tools for when things feel too big or complicated" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..700;1,400..600&family=Newsreader:ital,opsz,wght@0,6..72,300..600;1,6..72,300..600&family=DM+Sans:opsz,wght@9..40,300..600&display=swap" rel="stylesheet">
     <title>DBT Tools</title>
-    <!-- Paint the saved theme and palette before React mounts so there is no flash of the defaults.
-         Reads the same profile cache UserProfileContext writes; skips if more than one account is cached. -->
+    <!-- Paint the saved room before React mounts so there is no flash of the default.
+         Reads the same profile cache UserProfileContext writes; skips if more than one account is cached.
+         A room owns its light/dark mode. Keep ROOM_MODES, LEGACY and the default in step with
+         src/data/palettes.ts. -->
     <script>
       (function () {
+        var ROOM_MODES = { velvet: 'dark', dusk: 'dark', tinted: 'light', pastel: 'light', 'pastel-mix': 'light', daylight: 'light' };
+        var LEGACY = { 'cool-steel': 'tinted', 'slate-spruce': 'dusk', signal: 'daylight', giverny: 'pastel-mix', clouds: 'pastel' };
+        var room = 'velvet';
         try {
           var keys = Object.keys(localStorage).filter(function (k) { return k.indexOf('goblin-dbt-profile-cache-') === 0; });
-          if (keys.length !== 1) return;
-          var p = JSON.parse(localStorage.getItem(keys[0]));
-          if (!p) return;
-          if (p.theme) document.documentElement.dataset.theme = p.theme;
-          if (p.palette) document.documentElement.dataset.palette = p.palette;
+          if (keys.length === 1) {
+            var p = JSON.parse(localStorage.getItem(keys[0]));
+            var saved = p && p.palette;
+            if (saved && ROOM_MODES[saved]) room = saved;
+            else if (saved && LEGACY[saved]) room = LEGACY[saved];
+          }
         } catch (e) { /* ignore */ }
+        document.documentElement.dataset.palette = room;
+        document.documentElement.dataset.theme = ROOM_MODES[room];
       })();
     </script>
   </head>

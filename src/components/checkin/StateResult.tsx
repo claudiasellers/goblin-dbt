@@ -143,7 +143,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
           {/* Single primary action */}
           <button
             onClick={() => handleBailoutComplete(bailoutStep.id)}
-            className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary"
+            className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium text-lg lift-primary"
           >
             I did it
           </button>
@@ -176,7 +176,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
         </p>
         <button
           onClick={() => onDone({ kind: 'done' })}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
         >
           Done
         </button>
@@ -241,7 +241,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
       <div className="space-y-3">
         <button
           onClick={() => onDone({ kind: 'done' })}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
         >
           Done
         </button>

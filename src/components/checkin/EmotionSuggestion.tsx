@@ -53,25 +53,25 @@ export function EmotionSuggestion({
   const chipStyles: Record<string, { base: string; selected: string; borderHover: string; shadow: string }> = {
     'high-unpleasant': {
       base: 'bg-[var(--color-q-hu-bg)] border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)]',
-      selected: 'bg-[var(--color-quadrant-high-unpleasant)] border-[var(--color-quadrant-high-unpleasant)] text-white',
+      selected: 'bg-[var(--color-quadrant-high-unpleasant)] border-[var(--color-quadrant-high-unpleasant)] text-[var(--color-on-quadrant)]',
       borderHover: 'var(--color-q-hu-border-hover)',
       shadow: 'var(--color-q-hu-shadow)',
     },
     'high-pleasant': {
       base: 'bg-[var(--color-q-hp-bg)] border-[var(--color-q-hp-border)] text-[var(--color-q-hp-text)]',
-      selected: 'bg-[var(--color-quadrant-high-pleasant)] border-[var(--color-quadrant-high-pleasant)] text-white',
+      selected: 'bg-[var(--color-quadrant-high-pleasant)] border-[var(--color-quadrant-high-pleasant)] text-[var(--color-on-quadrant)]',
       borderHover: 'var(--color-q-hp-border-hover)',
       shadow: 'var(--color-q-hp-shadow)',
     },
     'low-unpleasant': {
       base: 'bg-[var(--color-q-lu-bg)] border-[var(--color-q-lu-border)] text-[var(--color-q-lu-text)]',
-      selected: 'bg-[var(--color-quadrant-low-unpleasant)] border-[var(--color-quadrant-low-unpleasant)] text-white',
+      selected: 'bg-[var(--color-quadrant-low-unpleasant)] border-[var(--color-quadrant-low-unpleasant)] text-[var(--color-on-quadrant)]',
       borderHover: 'var(--color-q-lu-border-hover)',
       shadow: 'var(--color-q-lu-shadow)',
     },
     'low-pleasant': {
       base: 'bg-[var(--color-q-lp-bg)] border-[var(--color-q-lp-border)] text-[var(--color-q-lp-text)]',
-      selected: 'bg-[var(--color-quadrant-low-pleasant)] border-[var(--color-quadrant-low-pleasant)] text-white',
+      selected: 'bg-[var(--color-quadrant-low-pleasant)] border-[var(--color-quadrant-low-pleasant)] text-[var(--color-on-quadrant)]',
       borderHover: 'var(--color-q-lp-border-hover)',
       shadow: 'var(--color-q-lp-shadow)',
     },
@@ -109,7 +109,7 @@ export function EmotionSuggestion({
         <div className="space-y-3">
           <button
             onClick={onShowAllEmotions}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
           >
             Browse all emotions
           </button>
@@ -183,7 +183,7 @@ export function EmotionSuggestion({
           className={`
             w-full py-3 px-4 rounded-lg font-medium
             ${selectedIds.size > 0
-              ? 'bg-[var(--color-accent-fill)] text-white lift-primary'
+              ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] lift-primary'
               : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] cursor-not-allowed transition-colors'
             }
           `}

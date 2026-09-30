@@ -49,7 +49,7 @@ export function HelpNowInterim({ onDone }: { onDone: () => void }) {
         {pick.step.subtext && <p className="text-base text-[var(--color-text-tertiary)] leading-relaxed">{pick.step.subtext}</p>}
       </div>
       <button type="button" onClick={() => { record('completed'); setDone(true); }}
-        className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary">
+        className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium text-lg lift-primary">
         I did it
       </button>
       <button type="button" onClick={() => setPick(getMicroStep(HELP_NOW_MICRO_STEP_SET, pick.index))}

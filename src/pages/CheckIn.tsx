@@ -759,7 +759,7 @@ export function CheckIn() {
             <div className="space-y-3">
               <button
                 onClick={handleComplete}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
               >
                 Done
               </button>
