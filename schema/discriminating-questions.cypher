@@ -576,7 +576,7 @@ MERGE (r:QuestionResponse {id: "hu_body_unclear"})
 SET r.label = "I can't tell — it's all too much",
     r.subtext = "Everything's activated and I can't sort it out.",
     r.order = 5,
-    r.clinicalSignal = "Interoceptive discrimination failure under high arousal. Most consistent with PFC compromise (flooding) or extreme LC-NE activation (severe alarm). Inability to parse body state is itself a signal of regulatory system overload.",
+    r.clinicalSignal = "Overwhelm: high activation the person can't yet sort into discrete body signals. Common in alexithymia; treated as acute alarm, not flooding, unless another answer points to flooding.",
     r.isEscapeHatch = true;
 
 
@@ -961,21 +961,23 @@ SET e.weight = 0.15,
     e.strength = "weak",
     e.rationale = "Flushing can occur in acute alarm (vasodilation component of fight-or-flight), but the 'want to hide' action tendency is shame-specific. If present, social threat is much more likely.";
 
-// "I can't tell, it's all too much" → emotional_flooding (moderate)
+// "I can't tell, it's all too much" → emotional_flooding (weak)
+// Down-weighted 2026-09-30 (Claudia): this is the alexithymic escape hatch and
+// should read as overwhelmed, not as a flooding/crisis signal on its own.
 MATCH (r:QuestionResponse {id: "hu_body_unclear"})
 MATCH (p:ActivationPattern {id: "emotional_flooding"})
 MERGE (r)-[e:EVIDENCE_FOR]->(p)
-SET e.weight = 0.50,
-    e.strength = "moderate",
-    e.rationale = "Inability to parse body state under high arousal most consistent with PFC compromise and interoceptive discrimination failure. SN overload degrades the ability to differentiate discrete somatic signals.";
+SET e.weight = 0.05,
+    e.strength = "weak",
+    e.rationale = "Not being able to sort body signals is common in alexithymia and in ordinary overwhelm; on its own it is not evidence of flooding. Flooding needs its own answer (everything hitting at once).";
 
-// "I can't tell, it's all too much" → acute_alarm (weak)
+// "I can't tell, it's all too much" → acute_alarm (moderate)
 MATCH (r:QuestionResponse {id: "hu_body_unclear"})
 MATCH (p:ActivationPattern {id: "acute_alarm"})
 MERGE (r)-[e:EVIDENCE_FOR]->(p)
-SET e.weight = 0.25,
+SET e.weight = 0.20,
     e.strength = "weak",
-    e.rationale = "Extreme LC-NE activation can degrade interoceptive discrimination, but person typically retains awareness of cardiac acceleration even when other signals are muddled.";
+    e.rationale = "Tie-breaker only: the emotion word decides the pattern. Reads as overwhelm: high activation the person can't yet sort into discrete signals. acute_alarm's own vocabulary includes overwhelm, and its tools (body-first when flooded) fit without implying crisis.";
 
 
 // ============================================================

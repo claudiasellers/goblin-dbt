@@ -512,12 +512,12 @@
   {
    "responseId": "hu_body_unclear",
    "patternId": "acute_alarm",
-   "weight": 0.25
+   "weight": 0.2
   },
   {
    "responseId": "hu_body_unclear",
    "patternId": "emotional_flooding",
-   "weight": 0.5
+   "weight": 0.05
   },
   {
    "responseId": "hu_exp_alarm",

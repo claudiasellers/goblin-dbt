@@ -174,3 +174,16 @@ test("the check-in asks high-unpleasant discriminating questions too; the DEAR M
   const banner = route.indexOf("{isCrisisFlag(stateResult?.safetyFlag) && <CrisisBanner />}");
   assert.ok(banner > 0 && banner < route.indexOf("{topTools.length > 0 && ("), "banner above the debrief's tools");
 });
+
+test("\"I can't tell — it's all too much\" reads as overwhelm, not crisis: it never raises the banner or overrides the word (Claudia, 2026-09-30)", async () => {
+  const unclear = { questionId: "hu_body_activation", responseId: "hu_body_unclear" };
+  const high = unpleasant.filter((g) => g.quadrant === "high-unpleasant");
+  const ev = graph.evidence.filter((e) => e.responseId === "hu_body_unclear");
+  assert.deepEqual(Object.fromEntries(ev.map((e) => [e.patternId, e.weight])), { acute_alarm: 0.2, emotional_flooding: 0.05 }, "tie-breaker weights (update deliberately)");
+  for (const w of high) {
+    const alone = await run({ quadrant: "high-unpleasant", emotions: [w.name] }, on);
+    const withUnclear = await run({ quadrant: "high-unpleasant", emotions: [w.name], discriminatingAnswers: [unclear] }, on);
+    assert.equal(withUnclear.pattern.id, alone.pattern.id, `${w.name}: the escape-hatch answer must not override the word`);
+    assert.notEqual(withUnclear.safetyFlag?.type, "crisis", `${w.name}: "I can't tell" alone must not raise the crisis banner`);
+  }
+});
