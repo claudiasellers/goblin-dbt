@@ -279,7 +279,7 @@ export function ProblemSolve() {
         </div>
         <button
           onClick={() => setPhase('identify')}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
         >
           Let's start
         </button>
@@ -314,7 +314,7 @@ export function ProblemSolve() {
             <Link
               key={toolId}
               to={`/tool/${toolId}`}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary text-center"
             >
               {toolName(toolId)}
             </Link>
@@ -338,7 +338,7 @@ export function ProblemSolve() {
         </div>
         <button
           onClick={goToDefine}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
         >
           I can think about this
         </button>
@@ -383,7 +383,7 @@ export function ProblemSolve() {
           <Link
             key={alt}
             to={`/tool/${alt}`}
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary text-center"
           >
             Try {altNames[alt] ?? alt}
           </Link>
@@ -424,7 +424,7 @@ export function ProblemSolve() {
                     <Link
                       key={toolId}
                       to={`/tool/${toolId}`}
-                      className="py-2 px-3 rounded-lg bg-[var(--color-accent-fill)] text-white text-sm font-medium lift-primary"
+                      className="py-2 px-3 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-sm font-medium lift-primary"
                     >
                       {toolName(toolId)}
                     </Link>
@@ -527,7 +527,7 @@ export function ProblemSolve() {
             {(selectedProblemTypes.length > 0 || problemDescription.trim()) && (
               <button
                 onClick={() => setPhase('barrier-assessment')}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
               >
                 Continue
               </button>
@@ -640,7 +640,7 @@ export function ProblemSolve() {
             <Link
               to={`/tool/${selectedSubResponse.redirectToolId}`}
               state={{ checkinEmotions: selectedEmotionIds }}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary text-center"
             >
               {toolName(selectedSubResponse.redirectToolId)}
             </Link>
@@ -659,7 +659,7 @@ export function ProblemSolve() {
           {selectedSubResponse.triggersAmbivalenceExploration && (
             <button
               onClick={() => setPhase('ambivalence')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
             >
               Let's look at that
             </button>
@@ -668,7 +668,7 @@ export function ProblemSolve() {
           {selectedSubResponse.triggersConfidenceRuler && (
             <button
               onClick={() => setPhase('confidence-ruler')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
             >
               Let's find out
             </button>
@@ -680,7 +680,7 @@ export function ProblemSolve() {
                 setSolutionSizeHint(selectedSubResponse.solutionSizeHint);
                 setPhase('solutions');
               }}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
             >
               Show me some options
             </button>
@@ -768,7 +768,7 @@ export function ProblemSolve() {
 
           <button
             onClick={() => setPhase('solutions')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
           >
             Let's keep going
           </button>
@@ -841,7 +841,7 @@ export function ProblemSolve() {
           {confidenceLevel === 'high' && (
             <button
               onClick={() => setPhase('commit')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
             >
               I'm going to do it
             </button>
@@ -850,7 +850,7 @@ export function ProblemSolve() {
           {confidenceLevel === 'medium' && (
             <button
               onClick={() => { setSolutionSizeHint('small'); setPhase('solutions'); }}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
             >
               Show me the smallest version
             </button>
@@ -923,7 +923,7 @@ export function ProblemSolve() {
               <Link
                 key={toolId}
                 to={`/tool/${toolId}`}
-                className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
+                className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary text-center"
               >
                 {toolName(toolId)}
               </Link>
@@ -950,7 +950,7 @@ export function ProblemSolve() {
             <Link
               to="/tool/dear-man"
               state={{ checkinEmotions: selectedEmotionIds }}
-              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary text-center"
+              className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary text-center"
             >
               {toolName('dear-man')}
             </Link>
@@ -981,7 +981,7 @@ export function ProblemSolve() {
           </div>
           <button
             onClick={() => setPhase('solutions')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
           >
             Let's work with that
           </button>
@@ -1025,7 +1025,7 @@ export function ProblemSolve() {
                           onClick={() => setAspectBuckets(prev => ({ ...prev, [aspect.id]: bucket }))}
                           className={`flex-1 py-1.5 px-2 text-xs font-medium rounded-full border transition-colors ${
                             isSelected
-                              ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                              ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-[var(--color-on-accent)]'
                               : isDefault
                                 ? 'border-[var(--color-accent)]/30 text-[var(--color-text-secondary)]'
                                 : 'border-[var(--color-border)] text-[var(--color-text-tertiary)]'
@@ -1044,7 +1044,7 @@ export function ProblemSolve() {
         {allAssigned && (
           <button
             onClick={() => setDecompositionDone(true)}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
           >
             Continue
           </button>
@@ -1185,7 +1185,7 @@ export function ProblemSolve() {
           {chosenSize && customStepText.trim() && (
             <button
               onClick={() => setPhase('complete')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
             >
               I'm going to do this
             </button>
@@ -1246,7 +1246,7 @@ export function ProblemSolve() {
         {chosenSize && (
           <button
             onClick={() => setPhase('complete')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
           >
             I'm going to do this
           </button>
@@ -1326,7 +1326,7 @@ export function ProblemSolve() {
           </button>
           <button
             onClick={() => navigate('/')}
-            className="py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+            className="py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
           >
             Done
           </button>

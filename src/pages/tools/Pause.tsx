@@ -101,9 +101,9 @@ export function Pause() {
             className={`
               w-10 h-10 rounded-lg flex items-center justify-center font-bold text-lg transition-all
               ${index < currentStep
-                ? 'bg-[var(--color-accent-fill)] text-white'
+                ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)]'
                 : index === currentStep
-                ? 'bg-[var(--color-accent-hover)] text-white'
+                ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] ring-2 ring-offset-2 ring-[var(--color-accent-fill)] ring-offset-[var(--color-bg-primary)]'
                 : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-muted)]'
               }
             `}
@@ -151,7 +151,7 @@ export function Pause() {
 
         <button
           onClick={handleNext}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
         >
           {currentStep < steps.length - 1 ? `Next: ${steps[currentStep + 1].title}` : 'Done'}
         </button>

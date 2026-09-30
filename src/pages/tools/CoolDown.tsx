@@ -169,7 +169,7 @@ export function CoolDown() {
           <div className="space-y-2">
             <button
               onClick={() => setColdCheck('clear')}
-              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
             >
               {COLD_FACE_CHECK.clear}
             </button>
@@ -222,7 +222,7 @@ export function CoolDown() {
             {timerState === 'idle' && (
               <button
                 onClick={startTimer}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
               >
                 Start 30-second timer
               </button>
@@ -249,7 +249,7 @@ export function CoolDown() {
               <div className="flex gap-2">
                 <button
                   onClick={resumeTimer}
-                  className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+                  className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
                 >
                   Resume
                 </button>
@@ -265,7 +265,7 @@ export function CoolDown() {
             {timerState === 'complete' && (
               <button
                 onClick={startTimer}
-                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+                className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
               >
                 Do it again
               </button>

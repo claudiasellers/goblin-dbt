@@ -1,67 +1,115 @@
 /**
- * Color palettes the user can choose in Profile > Appearance.
+ * Rooms: the look the user picks in Profile > Appearance.
  *
- * Presentation metadata only. The actual token values live in
- * src/index.css under `:root[data-palette="<id>"]`; the swatches here are
- * the light-theme page, ink, action, high-unpleasant and low-pleasant
- * colors, copied so the picker can preview every palette without
- * switching the page. Keep them in sync with index.css.
+ * A room is a complete, contrast-checked colour set. Each room owns its
+ * light/dark mode (Velvet and Dusk are dark rooms; the rest are light), so
+ * applying a room sets both `data-palette` and `data-theme` on <html>. The
+ * saved `theme` field on the profile is kept for compatibility but no longer
+ * drives the page.
  *
- * See docs/design/2026-09-14-palette-picker.md and docs/design/branding-kit.md.
+ * Presentation metadata only. Token values live in src/index.css under
+ * `:root[data-palette="<id>"]`; the swatches here are copied from those blocks
+ * (page, ink, action, high-unpleasant, low-pleasant) so the picker can preview
+ * every room without switching the page. Keep them in sync with index.css,
+ * with ROOM_MODES in index.html, and with the allow-list in
+ * functions/src/account/index.ts (updateUserProfile).
+ *
+ * Design source: the "Goblin UI directions" canvas (The Den and its rooms).
  */
 
-export type PaletteId = 'cool-steel' | 'slate-spruce' | 'signal' | 'giverny' | 'clouds';
+export type PaletteId = 'velvet' | 'dusk' | 'tinted' | 'pastel' | 'pastel-mix' | 'daylight';
+
+export type RoomMode = 'light' | 'dark';
 
 export interface Palette {
   id: PaletteId;
   name: string;
   /** One line, shown under the name in the picker. */
   tagline: string;
-  /** Light-theme preview colors: page, ink, action, high-unpleasant, low-pleasant. */
+  mode: RoomMode;
+  /** Preview colors: page, ink, action, high-unpleasant, low-pleasant. */
   swatch: [string, string, string, string, string];
 }
 
-export const DEFAULT_PALETTE: PaletteId = 'cool-steel';
+export const DEFAULT_PALETTE: PaletteId = 'velvet';
 
 export const palettes: Palette[] = [
   {
-    id: 'cool-steel',
-    name: 'Cool Steel',
-    tagline: 'Fog grey and teal. The original.',
-    swatch: ['#F6F7FA', '#1A1D27', '#127A5E', '#C4707A', '#6BA89A'],
+    id: 'velvet',
+    name: 'Velvet',
+    tagline: 'Deep plum walls and warm lamp light.',
+    mode: 'dark',
+    swatch: ['#231827', '#F5EBDF', '#E8B56E', '#EE6A55', '#3FBF8E'],
   },
   {
-    id: 'slate-spruce',
-    name: 'Slate & Spruce',
-    tagline: 'Steel neutrals, spruce green, coral and sage.',
-    swatch: ['#F5F7F9', '#161B22', '#1F6B52', '#D9805F', '#6FAE98'],
+    id: 'dusk',
+    name: 'Dusk',
+    tagline: 'Cool slate, soft colour, one brass light.',
+    mode: 'dark',
+    swatch: ['#2E3542', '#EEF2F5', '#D8B48C', '#C98C7C', '#8DB5A2'],
   },
   {
-    id: 'signal',
-    name: 'Signal',
-    tagline: 'Near-black ink, vivid corners, an ink button.',
-    swatch: ['#F8F8F6', '#101014', '#16161C', '#E8663A', '#2FA36B'],
+    id: 'tinted',
+    name: 'Tinted',
+    tagline: 'Warm plaster with colour at the edges.',
+    mode: 'light',
+    swatch: ['#E8DFD1', '#2A241D', '#7A5B2E', '#C4705A', '#7CA886'],
   },
   {
-    id: 'giverny',
-    name: 'Giverny',
-    tagline: 'Water-lily blues and greens, pine ink, a mauve hairline.',
-    swatch: ['#ECF6F5', '#132923', '#1B594D', '#EA7A5E', '#5EB663'],
+    id: 'pastel',
+    name: 'Pastel',
+    tagline: 'Blush into sky, candy corners.',
+    mode: 'light',
+    swatch: ['#F6E6F0', '#2A2742', '#FFA898', '#FFA898', '#A2E3C0'],
   },
   {
-    id: 'clouds',
-    name: 'Water Lilies in the Clouds',
-    tagline: 'Pale sky, navy ink, pink and peach, steel blue and mint.',
-    swatch: ['#EEF3F5', '#232D37', '#303C4A', '#EFB3B2', '#AFD6C4'],
+    id: 'pastel-mix',
+    name: 'Pastel mix',
+    tagline: 'Warm and cool pastels together.',
+    mode: 'light',
+    swatch: ['#F6EEF0', '#2A2742', '#B3C1FF', '#FFA898', '#A2E3C0'],
+  },
+  {
+    id: 'daylight',
+    name: 'Daylight',
+    tagline: 'Bright and clear, full-strength colour.',
+    mode: 'light',
+    swatch: ['#E6ECFD', '#191C35', '#2F3FA8', '#EE6A55', '#3FBF8E'],
   },
 ];
 
 export const PALETTE_IDS = palettes.map((p) => p.id);
 
+/** Palettes from before rooms, mapped to the nearest room so saved choices still land somewhere sensible. */
+const LEGACY_PALETTES: Record<string, PaletteId> = {
+  'cool-steel': 'tinted',
+  'slate-spruce': 'dusk',
+  signal: 'daylight',
+  giverny: 'pastel-mix',
+  clouds: 'pastel',
+};
+
 export function isPaletteId(value: unknown): value is PaletteId {
   return typeof value === 'string' && (PALETTE_IDS as string[]).includes(value);
 }
 
+/** Any stored value (current id, legacy id, missing) to a room id. */
+export function resolvePalette(value: unknown): PaletteId {
+  if (isPaletteId(value)) return value;
+  if (typeof value === 'string' && value in LEGACY_PALETTES) return LEGACY_PALETTES[value];
+  return DEFAULT_PALETTE;
+}
+
 export function getPaletteById(id: string): Palette | undefined {
   return palettes.find((p) => p.id === id);
+}
+
+/** Put a room on the page: sets data-palette and the room's own light/dark mode. */
+export function applyRoom(value: unknown): PaletteId {
+  const id = resolvePalette(value);
+  const room = getPaletteById(id);
+  const root = document.documentElement;
+  root.dataset.palette = id;
+  root.dataset.theme = room?.mode ?? 'dark';
+  return id;
 }

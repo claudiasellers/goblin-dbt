@@ -85,7 +85,8 @@ test("Today card: a tool_outcome choice is a then-vs-now or an urge answer; {too
 
 test("the stack renders on the check-in screen before a check-in starts; the desktop card reads the same item", () => {
   const checkIn = readFileSync("src/pages/CheckIn.tsx", "utf8");
-  assert.match(checkIn, /\{step === 'emotion' && <TodayStack \/>\}/);
+  // Hidden while a second or third spot is placed on the feeling square (the check-in has started).
+  assert.match(checkIn, /\{step === 'emotion' && active === 0 && <TodayStack \/>\}/);
   assert.match(readFileSync("src/components/DashboardLayout.tsx", "utf8"), /<TodayProvider>/);
   const cc = readFileSync("src/components/insights/ContinuityCard.tsx", "utf8");
   assert.match(cc, /answerToolOutcome\(sessionId/);

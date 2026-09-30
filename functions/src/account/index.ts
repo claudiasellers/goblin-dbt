@@ -67,7 +67,7 @@ const PROFILE_DEFAULTS = {
   displayName: null,
   photoURL: null,
   theme: 'light',
-  palette: 'cool-steel',
+  palette: 'velvet',
   checkInReminder: false,
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],
@@ -177,7 +177,7 @@ export const updateUserProfile = onCall(
     }
 
     // Palette is a closed set; the ids match the data-palette blocks in src/index.css
-    const allowedPalettes = ['cool-steel', 'slate-spruce', 'signal', 'giverny', 'clouds'];
+    const allowedPalettes = ['velvet', 'dusk', 'tinted', 'pastel', 'pastel-mix', 'daylight'];
     if ('palette' in cleanUpdates && !allowedPalettes.includes(String(cleanUpdates.palette))) {
       throw new HttpsError('invalid-argument', 'Unknown palette');
     }

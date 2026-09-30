@@ -25,7 +25,7 @@ const quadrantBubbleStyles: Record<string, {
     base: 'bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]',
     selected: 'bg-[var(--color-quadrant-high-unpleasant)] border border-transparent',
     text: 'text-[var(--color-q-hu-text)]',
-    selectedText: 'text-white',
+    selectedText: 'text-[var(--color-on-quadrant)]',
     borderHover: 'var(--color-q-hu-border-hover)',
     shadow: 'var(--color-q-hu-shadow)',
   },
@@ -33,7 +33,7 @@ const quadrantBubbleStyles: Record<string, {
     base: 'bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]',
     selected: 'bg-[var(--color-quadrant-high-pleasant)] border border-transparent',
     text: 'text-[var(--color-q-hp-text)]',
-    selectedText: 'text-white',
+    selectedText: 'text-[var(--color-on-quadrant)]',
     borderHover: 'var(--color-q-hp-border-hover)',
     shadow: 'var(--color-q-hp-shadow)',
   },
@@ -41,7 +41,7 @@ const quadrantBubbleStyles: Record<string, {
     base: 'bg-[var(--color-q-lu-bg)] border border-[var(--color-q-lu-border)]',
     selected: 'bg-[var(--color-quadrant-low-unpleasant)] border border-transparent',
     text: 'text-[var(--color-q-lu-text)]',
-    selectedText: 'text-white',
+    selectedText: 'text-[var(--color-on-quadrant)]',
     borderHover: 'var(--color-q-lu-border-hover)',
     shadow: 'var(--color-q-lu-shadow)',
   },
@@ -49,7 +49,7 @@ const quadrantBubbleStyles: Record<string, {
     base: 'bg-[var(--color-q-lp-bg)] border border-[var(--color-q-lp-border)]',
     selected: 'bg-[var(--color-quadrant-low-pleasant)] border border-transparent',
     text: 'text-[var(--color-q-lp-text)]',
-    selectedText: 'text-white',
+    selectedText: 'text-[var(--color-on-quadrant)]',
     borderHover: 'var(--color-q-lp-border-hover)',
     shadow: 'var(--color-q-lp-shadow)',
   },
@@ -246,7 +246,7 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
           {search.trim() && !searchMatchesExisting && (
             <button
               onClick={handleAddCustom}
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-sm bg-[var(--color-accent-fill)] text-white rounded-md lift-primary"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 text-sm bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] rounded-md lift-primary"
             >
               Add
             </button>
@@ -314,7 +314,7 @@ export function EmotionGrid({ quadrant, onSelect, onHelpMeNow, showRelated = fal
           className={`
             flex-1 py-3 px-4 rounded-lg font-medium
             ${selectedEmotions.length > 0
-              ? 'bg-[var(--color-accent-fill)] text-white lift-primary'
+              ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] lift-primary'
               : 'bg-[var(--color-bg-secondary)] text-[var(--color-text-tertiary)] transition-colors'}
           `}
         >

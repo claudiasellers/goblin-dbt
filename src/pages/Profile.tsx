@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { MeSection } from '../components/me/MeSection';
-import { palettes, DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
+import { palettes, applyRoom, resolvePalette, type PaletteId } from '../data/palettes';
 import { exportUserData, deleteUserData } from '../services/neo4j';
 
 export function Profile() {
@@ -20,7 +20,7 @@ export function Profile() {
         </p>
         <a
           href="#/login"
-          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-bg-primary)] font-semibold text-sm lift-primary"
+          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-semibold text-sm lift-primary"
         >
           Sign in
         </a>
@@ -59,8 +59,7 @@ export function Profile() {
       />
 
       <AppearanceSection
-        theme={profile.theme}
-        palette={profile.palette ?? DEFAULT_PALETTE}
+        palette={resolvePalette(profile.palette)}
         onSave={(changes) => updateProfile(changes)}
       />
 
@@ -141,13 +140,15 @@ function BasicInfoSection({
 }) {
   const [name, setName] = useState(displayName || '');
   const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function handleSave() {
     setSaving(true);
+    setFailed(false);
     try {
       await onSave(name);
     } catch {
-      // error handled by context
+      setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -170,11 +171,14 @@ function BasicInfoSection({
           <button
             onClick={handleSave}
             disabled={saving || name === (displayName || '')}
-            className="px-4 py-2 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-bg-primary)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
         </div>
+        {failed && (
+          <p role="status" className="mt-1.5 text-sm text-[var(--color-danger)]">Couldn’t save your name. Try again.</p>
+        )}
       </div>
 
       <div>
@@ -188,60 +192,56 @@ function BasicInfoSection({
 }
 
 // --- Appearance ---
-type ThemeChoice = 'dark' | 'light' | 'system';
 
 /**
- * Theme and palette are staged: picking an option previews it on the page
- * immediately, but nothing is stored until Save. Leaving the page without
- * saving puts the saved values back.
+ * The room is staged: picking one previews it on the page immediately, but
+ * nothing is stored until Save. Leaving the page without saving puts the saved
+ * room back. Each room owns its light/dark mode, so there is no separate theme
+ * choice (see src/data/palettes.ts).
  */
 function AppearanceSection({
-  theme,
   palette,
   onSave,
 }: {
-  theme: ThemeChoice;
   palette: PaletteId;
-  onSave: (changes: { theme: ThemeChoice; palette: PaletteId }) => Promise<void>;
+  onSave: (changes: { palette: PaletteId }) => Promise<void>;
 }) {
-  const [draftTheme, setDraftTheme] = useState<ThemeChoice>(theme);
   const [draftPalette, setDraftPalette] = useState<PaletteId>(palette);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [failed, setFailed] = useState(false);
   // True once the user has picked something; a late profile load must not wipe their pick
   const touched = useRef(false);
 
-  const dirty = draftTheme !== theme || draftPalette !== palette;
+  const dirty = draftPalette !== palette;
 
-  // Keep drafts in step with the saved profile only while the user hasn't touched them
-  useEffect(() => { if (!touched.current) setDraftTheme(theme); }, [theme]);
+  // Keep the draft in step with the saved profile only while the user hasn't touched it
   useEffect(() => { if (!touched.current) setDraftPalette(palette); }, [palette]);
 
-  function pickTheme(value: ThemeChoice) { touched.current = true; setDraftTheme(value); }
   function pickPalette(value: PaletteId) { touched.current = true; setDraftPalette(value); }
 
-  // Live preview of the draft; restore the saved values on unmount
+  // Live preview of the draft; restore the saved room on unmount
   useEffect(() => {
-    document.documentElement.dataset.theme = draftTheme;
-    document.documentElement.dataset.palette = draftPalette;
-  }, [draftTheme, draftPalette]);
+    applyRoom(draftPalette);
+  }, [draftPalette]);
   useEffect(() => {
     return () => {
-      document.documentElement.dataset.theme = theme;
-      document.documentElement.dataset.palette = palette;
+      applyRoom(palette);
     };
-  }, [theme, palette]);
+  }, [palette]);
 
   useEffect(() => { if (dirty) setSaved(false); }, [dirty]);
 
   async function handleSave() {
     setSaving(true);
+    setFailed(false);
     try {
-      await onSave({ theme: draftTheme, palette: draftPalette });
+      await onSave({ palette: draftPalette });
       touched.current = false;
       setSaved(true);
     } catch {
-      // error handled by context
+      // Keep the preview so they can try again; say so instead of looking like it's still previewing.
+      setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -249,44 +249,15 @@ function AppearanceSection({
 
   function handleRevert() {
     touched.current = false;
-    setDraftTheme(theme);
+    setFailed(false);
     setDraftPalette(palette);
   }
-
-  const themeOptions: { value: ThemeChoice; label: string }[] = [
-    { value: 'dark', label: 'Dark' },
-    { value: 'light', label: 'Light' },
-    { value: 'system', label: 'System' },
-  ];
 
   return (
     <SectionCard title="Appearance">
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">
-          Theme
-        </label>
-        <div className="flex gap-2">
-          {themeOptions.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => pickTheme(opt.value)}
-              aria-pressed={draftTheme === opt.value}
-              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
-                draftTheme === opt.value
-                  ? 'bg-[var(--color-accent-muted)] border-[var(--color-accent)] text-[var(--color-accent)]'
-                  : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border-accent)]'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
         <label id="palette-label" className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">
-          Color palette
+          Room
         </label>
         <div role="radiogroup" aria-labelledby="palette-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {palettes.map((p) => {
@@ -305,7 +276,7 @@ function AppearanceSection({
                 }`}
                 style={selected ? { borderWidth: '1.5px' } : undefined}
               >
-                {/* Five-dot swatch: page, ink, action, high-unpleasant, low-pleasant (light values) */}
+                {/* Five-dot swatch: page, ink, action, high-unpleasant, low-pleasant */}
                 <span className="flex gap-1 shrink-0" aria-hidden="true">
                   {p.swatch.map((hex, i) => (
                     <span
@@ -345,8 +316,8 @@ function AppearanceSection({
             Undo changes
           </button>
         )}
-        <p role="status" className="text-sm text-[var(--color-text-tertiary)]">
-          {dirty ? 'Previewing. Save to keep it.' : saved ? 'Saved' : ''}
+        <p role="status" className={`text-sm ${failed ? 'text-[var(--color-danger)]' : 'text-[var(--color-text-tertiary)]'}`}>
+          {failed ? 'Couldn’t save your room. Try again.' : dirty ? 'Previewing. Save to keep it.' : saved ? 'Saved' : ''}
         </p>
       </div>
     </SectionCard>
@@ -542,7 +513,7 @@ function PrivacySection({
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="px-3 py-1.5 rounded-lg bg-[var(--color-danger)] text-white text-xs font-medium hover:bg-[var(--color-danger)]/80 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-[var(--color-danger)] text-[var(--color-on-danger)] text-xs font-medium hover:bg-[var(--color-danger)]/80 disabled:opacity-40 transition-colors"
             >
               {deleting ? 'Deleting...' : 'Yes, Delete'}
             </button>
