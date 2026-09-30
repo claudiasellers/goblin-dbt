@@ -4,6 +4,8 @@ import { useAuth } from './AuthContext';
 import { TodayContext, type TodayValue } from '../hooks/useToday';
 import { getToday, type GetTodayResponse } from '../services/spine';
 import { useBand } from '../hooks/useBand';
+import { useProfileContext } from '../hooks/useProfileContext';
+import { inQuietHours } from '../lib/quietHours';
 
 const FOCUS_REFETCH_MS = 5 * 60_000;
 const MAX_NOTIFY_DELAY_MS = 24 * 3_600_000;
@@ -22,6 +24,8 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   // A fresh band (client-only, R1) goes to getToday so a `flooded` answer collapses the stack to
   // "Your plans will keep" (E2 GetTodayRequest). Refetched when the current band changes.
   const bandValue = useBand().current()?.value;
+  // Quiet hours from Me (PROFILE_NEEDS.today): no in-tab reminder inside the window (Codex, #20).
+  const quiet = useProfileContext('today').slices?.quietHours ?? null;
   const [data, setData] = useState<{ uid: string; res: GetTodayResponse } | null>(null);
   const [dropped, setDropped] = useState<Set<string>>(new Set());
   const [reloadKey, setReloadKey] = useState(0);
@@ -58,6 +62,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     const timer = window.setTimeout(() => {
       refresh();
       if (!('Notification' in window) || Notification.permission !== 'granted' || !next.body) return;
+      if (inQuietHours(new Date(), quiet)) return;
       const show = async () => {
         // Android Chrome only allows notifications through a service worker registration.
         const reg = 'serviceWorker' in navigator ? await navigator.serviceWorker.getRegistration() : undefined;
@@ -71,7 +76,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
       show().catch(() => { /* notifications are best effort */ });
     }, Math.max(0, delay));
     return () => window.clearTimeout(timer);
-  }, [next, navigate, refresh]);
+  }, [next, navigate, refresh, quiet]);
 
   const value = useMemo<TodayValue>(() => ({
     items: (current?.items ?? []).filter((i) => !dropped.has(i.id)),

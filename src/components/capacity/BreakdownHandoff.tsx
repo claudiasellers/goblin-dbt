@@ -60,6 +60,7 @@ export function BreakdownHandoff({
   const plan = useMemo(() => (content ? planHandoff({ band: bandValue, blank }, content.primitives) : []), [content, bandValue, blank]);
 
   const [stage, setStage] = useState<Stage>(() => (startWithPrimitive ? { k: 'primitive', i: 0, startedAt: Date.now() } : { k: 'card' }));
+  const [scheduling, setScheduling] = useState(false);
   const runs = useRef<HandoffResult['primitivesRun']>([]);
   const lastReread = useRef<ThenVsNow | null>(null);
   const resolved = useRef(false);
@@ -176,14 +177,17 @@ export function BreakdownHandoff({
                 <div className="flex flex-wrap gap-2">
                   {h.later.options.map((o) => (
                     <button key={o.id} type="button" className="min-h-11 px-4 rounded-full border border-[var(--color-border)] text-sm lift-secondary"
+                      disabled={scheduling}
                       onClick={() => {
+                        if (scheduling) return; // one follow-up per tap, however slow (Codex, #20)
+                        setScheduling(true);
                         persist();
                         void onScheduleLater(o.id).then((id) => {
                           if (id) deferredId.current = id;
                           resolved.current = true;
                           setStage({ k: 'later', scheduled: true });
                           onLater?.(result(false, false));
-                        }).catch(() => { /* the draft is saved on the device either way */ });
+                        }).catch(() => { setScheduling(false); /* the draft is saved on the device either way */ });
                       }}>{o.label}</button>
                   ))}
                 </div>
