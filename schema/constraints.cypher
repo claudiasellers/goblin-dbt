@@ -98,6 +98,11 @@ CREATE CONSTRAINT feeling_urge_id IF NOT EXISTS FOR (fu:FeelingUrge) REQUIRE fu.
 CREATE CONSTRAINT follow_up_type_id IF NOT EXISTS FOR (n:FollowUpType) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT session_close_flow_id IF NOT EXISTS FOR (n:SessionCloseFlow) REQUIRE n.id IS UNIQUE;
 
+// --- Capacity band content (A4-1, schema/capacity.cypher) ---
+CREATE CONSTRAINT capacity_probe_id IF NOT EXISTS FOR (n:CapacityProbe) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT handoff_primitive_id IF NOT EXISTS FOR (n:HandoffPrimitive) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT band_rule_id IF NOT EXISTS FOR (n:BandRule) REQUIRE n.id IS UNIQUE;
+
 // --- User data (written by Cloud Functions, never by schema files) ---
 // PR-S1 conventions (functions/src/userdata/layers.ts): every :UserData label has a unique `key`
 // (= ownerId + ':' + id; writes MERGE on key), and every :UserData node is indexed on ownerId.

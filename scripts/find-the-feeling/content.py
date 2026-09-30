@@ -3,6 +3,13 @@
 # Signatures are hypotheses for OFFERING a word, never for diagnosing one. reviewStatus stays
 # "needs_clinical_review" until signed off.
 
+# The capacity probe copy and band -> intensity map have one editable source: scripts/capacity/content.py
+# (plan A4-1). Loaded by path because both generators name their module `content`.
+import importlib.util as _ilu, os as _os
+_spec = _ilu.spec_from_file_location("capacity_content", _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "capacity", "content.py"))
+_capacity = _ilu.module_from_spec(_spec)
+_spec.loader.exec_module(_capacity)
+
 # ---------------------------------------------------------------------------
 # Word signatures. Only existing Emotion ids (schema/emotion-wheel-sync.cypher).
 #   shape: sharp, heat, weight, buzz, clench    each -1..1 (0 = neutral grey clay)
@@ -136,7 +143,7 @@ FLOW = {
         # shape the person actually found. For blank (shutdown) it runs the other way: brighter and warmer.
         "ambientDescent": {"perStep": 0.08, "maxTotal": 0.45, "startAfter": "capacity", "blankDirection": "brighten", "floodedBlankDirection": "calm"},
     },
-    "bandIntensity": {"steady": 0.35, "stirred": 0.6, "flooded": 0.85},  # for check-in -> getStateAndTools
+    "bandIntensity": _capacity.BAND_INTENSITY,  # for check-in -> getStateAndTools
     "copy": {
         "entry": {"checkInLabel": "I can't tell what I'm feeling", "title": "Find the feeling", "sub": "No words needed yet.", "shape": "By shape", "tune": "By ear", "tuneHint": "Headphones help. It works silently too.", "switchToTune": "Try it by ear instead", "switchToShape": "Try it by shape instead"},
         "shape": {
@@ -158,7 +165,7 @@ FLOW = {
             "wordLead": "Sounds like this often get called…",
             "harp": "Your strings",
         },
-        "capacity": {"prompt": "If someone asked you for a favour right now, you'd…", "incoming": "hey, could you help me with something?", "options": {"steady": "Say yes like normal", "stirred": "Say yes, but with an edge", "flooded": "Couldn't answer, or would regret it"}},
+        "capacity": _capacity.PROBE_DEFAULT,
         "pull": {"title": "What does it want to do?"},
         "word": {"yes": "Yes", "close": "Close", "no": "Not that", "none": "Not knowing the word is fine. You found it without one, and that counts.", "floodedBlank": "Let's skip the word today. Getting back into the room is the whole job right now."},
         "setOff": {"title": "Do you know what set it off?", "optional": True, "not_sure": "Not sure", "skip": "Skip", "someone": "Something with someone", "situation": "A situation", "body": "Tired, hungry or sore", "nothing": "Nothing I can see"},

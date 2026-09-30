@@ -19,7 +19,7 @@ const AUTHED = [
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools', 'getCapacityContent',
 ];
 
 // Background triggers (not callables): auth lifecycle events carry their own uid.

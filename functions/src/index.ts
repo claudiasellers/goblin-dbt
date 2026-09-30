@@ -17,3 +17,4 @@ export { getDearManContent, saveDearManSession, getDearManDebriefContent, getDea
 export { getProblemSolveContent } from './problemSolve';
 export { getInvalidationRecoveryContent, saveInvalidationRecoverySession, getInvalidationRecoveryProgress } from './invalidationRecovery';
 export { getFindTheFeelingContent, saveFindTheFeelingSession, getFeelingCollection } from './findTheFeeling';
+export { getCapacityContent } from './capacity';
