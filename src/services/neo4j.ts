@@ -60,11 +60,6 @@ const ensureUserExistsFn = httpsCallable<void, { success: boolean }>(
   'ensureUserExists'
 );
 
-const initializeSchemaFn = httpsCallable<void, { success: boolean; message: string }>(
-  functions,
-  'initializeSchema'
-);
-
 // ============================================
 // API FUNCTIONS (call Cloud Functions)
 // ============================================
@@ -117,14 +112,6 @@ export async function ensureUserExists(
   _email: string // Kept for API compatibility, but not used
 ): Promise<void> {
   await ensureUserExistsFn();
-}
-
-/**
- * Initialize Neo4j schema via Cloud Function
- * Run once during initial setup
- */
-export async function initializeSchema(): Promise<void> {
-  await initializeSchemaFn();
 }
 
 // ============================================
@@ -227,11 +214,6 @@ const getRelatedEmotionsFn = httpsCallable<
   { relatedEmotions: RelatedEmotion[] }
 >(functions, 'getRelatedEmotions');
 
-const getQuickToolsFn = httpsCallable<
-  { quadrant: string; intensity?: { x: number; y: number } },
-  { tools: ToolRecommendation[]; message: string }
->(functions, 'getQuickTools');
-
 /**
  * Get the activation pattern and recommended tools based on check-in data
  * This is the main "What's happening right now" query
@@ -268,18 +250,6 @@ export async function getRelatedEmotions(
 ): Promise<RelatedEmotion[]> {
   const result = await getRelatedEmotionsFn({ emotionId, quadrant });
   return result.data.relatedEmotions;
-}
-
-/**
- * Get quick tools based on just quadrant and intensity
- * Used for the "Help me now" minimal-input path
- */
-export async function getQuickTools(
-  quadrant: string,
-  intensity?: { x: number; y: number }
-): Promise<{ tools: ToolRecommendation[]; message: string }> {
-  const result = await getQuickToolsFn({ quadrant, intensity });
-  return result.data;
 }
 
 // ============================================
@@ -493,11 +463,6 @@ const trackToolUsageFn = httpsCallable<
   { success: boolean }
 >(functions, 'trackToolUsage');
 
-const getWeeklyToolUsageCountFn = httpsCallable<
-  void,
-  { count: number }
->(functions, 'getWeeklyToolUsageCount');
-
 /**
  * Track that the user opened/used a tool (fire-and-forget)
  */
@@ -507,14 +472,6 @@ export async function trackToolUsage(toolId: string): Promise<void> {
   } catch {
     // Silently fail -- don't break the tool experience
   }
-}
-
-/**
- * Get how many tools the user has used in the last 7 days
- */
-export async function getWeeklyToolUsageCount(): Promise<number> {
-  const result = await getWeeklyToolUsageCountFn();
-  return result.data.count;
 }
 
 // ============================================

@@ -1,16 +1,16 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 
 const read = (f) => readFileSync(`schema/${f}.cypher`, "utf8");
 const cypher = read("find-the-feeling");
 const flow = JSON.parse(JSON.parse(cypher.match(/f\.contentJson = (".*");/)[1]));
-const baseGraph = ["knowledge-graph", "incremental-update", "emotion-wheel-sync", "invalidation-recovery"].map(read).join("\n");
+const baseGraph = ["knowledge-graph", "emotion-wheel-sync", "invalidation-recovery"].map(read).join("\n");
 
-/** Emotion ids declared anywhere in the base graph (CREATE blocks + emotion-wheel-sync rows). */
+/** Emotion ids declared anywhere in the base graph (MERGE statements + emotion-wheel-sync rows). */
 const emotionIds = (() => {
-  const ids = new Set([...baseGraph.matchAll(/CREATE \(\w+:Emotion \{\s*id: "([a-z_]+)"/g)].map((m) => m[1]));
+  const ids = new Set([...baseGraph.matchAll(/MERGE \(\w+:Emotion \{\s*id: "([a-z_]+)"/g)].map((m) => m[1]));
   for (const m of read("emotion-wheel-sync").matchAll(/\{id: "([a-z_]+)", name:/g)) ids.add(m[1]);
   return ids;
 })();
@@ -73,8 +73,13 @@ test("loader runs app-tool-ids before find-the-feeling", () => {
 });
 
 test("functions prefer appToolId over string normalization", () => {
-  const fn = readFileSync("functions/src/index.ts", "utf8");
-  assert.equal((fn.match(/tc\.appToolId as appToolId/g) || []).length, 2);
+  // All function sources (split into functions/src/<domain>/ in A1-2): the tools query in
+  // recommendation/ (getQuickTools, the second hit, was removed in A1-7); suggestedAppTool is in insights/.
+  const fn = readdirSync("functions/src", { recursive: true })
+    .filter((f) => f.endsWith(".ts"))
+    .map((f) => readFileSync(`functions/src/${f}`, "utf8"))
+    .join("\n");
+  assert.equal((fn.match(/tc\.appToolId as appToolId/g) || []).length, 1);
   assert.match(fn, /suggestedAppTool/);
 });
 

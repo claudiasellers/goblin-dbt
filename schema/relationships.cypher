@@ -2,6 +2,7 @@
 // RELATIONSHIPS FILE
 // Run AFTER all nodes have been created
 // Uses MATCH to find existing nodes by their id property
+// MERGE on (start, TYPE, end), FELT_AS also on region; other properties via SET r += {…} (A1-4)
 // ============================================================
 
 
@@ -10,37 +11,37 @@
 // ============================================================
 
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (pfc:BrainStructure {id: "pfc"})
-CREATE (dlpfc)-[:PART_OF]->(pfc);
+MERGE (dlpfc)-[:PART_OF]->(pfc);
 
 MATCH (vmpfc:BrainStructure {id: "vmpfc"}), (pfc:BrainStructure {id: "pfc"})
-CREATE (vmpfc)-[:PART_OF]->(pfc);
+MERGE (vmpfc)-[:PART_OF]->(pfc);
 
 MATCH (ofc:BrainStructure {id: "ofc"}), (pfc:BrainStructure {id: "pfc"})
-CREATE (ofc)-[:PART_OF]->(pfc);
+MERGE (ofc)-[:PART_OF]->(pfc);
 
 MATCH (mpfc:BrainStructure {id: "mpfc"}), (pfc:BrainStructure {id: "pfc"})
-CREATE (mpfc)-[:PART_OF]->(pfc);
+MERGE (mpfc)-[:PART_OF]->(pfc);
 
 MATCH (dacc:BrainStructure {id: "dacc"}), (acc:BrainStructure {id: "acc"})
-CREATE (dacc)-[:PART_OF]->(acc);
+MERGE (dacc)-[:PART_OF]->(acc);
 
 MATCH (vacc:BrainStructure {id: "vacc"}), (acc:BrainStructure {id: "acc"})
-CREATE (vacc)-[:PART_OF]->(acc);
+MERGE (vacc)-[:PART_OF]->(acc);
 
 MATCH (anterior_insula:BrainStructure {id: "anterior_insula"}), (insula:BrainStructure {id: "insula"})
-CREATE (anterior_insula)-[:PART_OF]->(insula);
+MERGE (anterior_insula)-[:PART_OF]->(insula);
 
 MATCH (posterior_insula:BrainStructure {id: "posterior_insula"}), (insula:BrainStructure {id: "insula"})
-CREATE (posterior_insula)-[:PART_OF]->(insula);
+MERGE (posterior_insula)-[:PART_OF]->(insula);
 
 MATCH (bla:BrainStructure {id: "bla"}), (amygdala:BrainStructure {id: "amygdala"})
-CREATE (bla)-[:PART_OF]->(amygdala);
+MERGE (bla)-[:PART_OF]->(amygdala);
 
 MATCH (cea:BrainStructure {id: "cea"}), (amygdala:BrainStructure {id: "amygdala"})
-CREATE (cea)-[:PART_OF]->(amygdala);
+MERGE (cea)-[:PART_OF]->(amygdala);
 
 MATCH (nacc:BrainStructure {id: "nucleus_accumbens"}), (bg:BrainStructure {id: "basal_ganglia"})
-CREATE (nacc)-[:PART_OF]->(bg);
+MERGE (nacc)-[:PART_OF]->(bg);
 
 
 // ============================================================
@@ -49,70 +50,70 @@ CREATE (nacc)-[:PART_OF]->(bg);
 
 // Default Mode Network
 MATCH (mpfc:BrainStructure {id: "mpfc"}), (dmn:FunctionalNetwork {id: "dmn"})
-CREATE (mpfc)-[:PARTICIPATES_IN]->(dmn);
+MERGE (mpfc)-[:PARTICIPATES_IN]->(dmn);
 
 MATCH (pcc:BrainStructure {id: "pcc"}), (dmn:FunctionalNetwork {id: "dmn"})
-CREATE (pcc)-[:PARTICIPATES_IN]->(dmn);
+MERGE (pcc)-[:PARTICIPATES_IN]->(dmn);
 
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (dmn:FunctionalNetwork {id: "dmn"})
-CREATE (hippo)-[:PARTICIPATES_IN]->(dmn);
+MERGE (hippo)-[:PARTICIPATES_IN]->(dmn);
 
 MATCH (ag:BrainStructure {id: "angular_gyrus"}), (dmn:FunctionalNetwork {id: "dmn"})
-CREATE (ag)-[:PARTICIPATES_IN]->(dmn);
+MERGE (ag)-[:PARTICIPATES_IN]->(dmn);
 
 // Salience Network
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (sn:FunctionalNetwork {id: "salience_network"})
-CREATE (ai)-[:PARTICIPATES_IN]->(sn);
+MERGE (ai)-[:PARTICIPATES_IN]->(sn);
 
 MATCH (dacc:BrainStructure {id: "dacc"}), (sn:FunctionalNetwork {id: "salience_network"})
-CREATE (dacc)-[:PARTICIPATES_IN]->(sn);
+MERGE (dacc)-[:PARTICIPATES_IN]->(sn);
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (sn:FunctionalNetwork {id: "salience_network"})
-CREATE (amyg)-[:PARTICIPATES_IN]->(sn);
+MERGE (amyg)-[:PARTICIPATES_IN]->(sn);
 
 // Central Executive Network
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (cen:FunctionalNetwork {id: "cen"})
-CREATE (dlpfc)-[:PARTICIPATES_IN]->(cen);
+MERGE (dlpfc)-[:PARTICIPATES_IN]->(cen);
 
 MATCH (pc:BrainStructure {id: "parietal_cortex"}), (cen:FunctionalNetwork {id: "cen"})
-CREATE (pc)-[:PARTICIPATES_IN]->(cen);
+MERGE (pc)-[:PARTICIPATES_IN]->(cen);
 
 // Limbic Network
 MATCH (amyg:BrainStructure {id: "amygdala"}), (ln:FunctionalNetwork {id: "limbic_network"})
-CREATE (amyg)-[:PARTICIPATES_IN]->(ln);
+MERGE (amyg)-[:PARTICIPATES_IN]->(ln);
 
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (ln:FunctionalNetwork {id: "limbic_network"})
-CREATE (hippo)-[:PARTICIPATES_IN]->(ln);
+MERGE (hippo)-[:PARTICIPATES_IN]->(ln);
 
 MATCH (hypo:BrainStructure {id: "hypothalamus"}), (ln:FunctionalNetwork {id: "limbic_network"})
-CREATE (hypo)-[:PARTICIPATES_IN]->(ln);
+MERGE (hypo)-[:PARTICIPATES_IN]->(ln);
 
 MATCH (ofc:BrainStructure {id: "ofc"}), (ln:FunctionalNetwork {id: "limbic_network"})
-CREATE (ofc)-[:PARTICIPATES_IN]->(ln);
+MERGE (ofc)-[:PARTICIPATES_IN]->(ln);
 
 // Sensorimotor Network
 MATCH (mc:BrainStructure {id: "motor_cortex"}), (smn:FunctionalNetwork {id: "sensorimotor_network"})
-CREATE (mc)-[:PARTICIPATES_IN]->(smn);
+MERGE (mc)-[:PARTICIPATES_IN]->(smn);
 
 MATCH (sc:BrainStructure {id: "somatosensory_cortex"}), (smn:FunctionalNetwork {id: "sensorimotor_network"})
-CREATE (sc)-[:PARTICIPATES_IN]->(smn);
+MERGE (sc)-[:PARTICIPATES_IN]->(smn);
 
 MATCH (bg:BrainStructure {id: "basal_ganglia"}), (smn:FunctionalNetwork {id: "sensorimotor_network"})
-CREATE (bg)-[:PARTICIPATES_IN]->(smn);
+MERGE (bg)-[:PARTICIPATES_IN]->(smn);
 
 // Dorsal Attention Network
 MATCH (fef:BrainStructure {id: "fef"}), (dan:FunctionalNetwork {id: "dan"})
-CREATE (fef)-[:PARTICIPATES_IN]->(dan);
+MERGE (fef)-[:PARTICIPATES_IN]->(dan);
 
 MATCH (ips:BrainStructure {id: "ips"}), (dan:FunctionalNetwork {id: "dan"})
-CREATE (ips)-[:PARTICIPATES_IN]->(dan);
+MERGE (ips)-[:PARTICIPATES_IN]->(dan);
 
 // Ventral Attention Network
 MATCH (tpj:BrainStructure {id: "tpj"}), (van:FunctionalNetwork {id: "van"})
-CREATE (tpj)-[:PARTICIPATES_IN]->(van);
+MERGE (tpj)-[:PARTICIPATES_IN]->(van);
 
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (van:FunctionalNetwork {id: "van"})
-CREATE (ai)-[:PARTICIPATES_IN]->(van);
+MERGE (ai)-[:PARTICIPATES_IN]->(van);
 
 
 // ============================================================
@@ -121,108 +122,139 @@ CREATE (ai)-[:PARTICIPATES_IN]->(van);
 
 // Amygdala
 MATCH (amyg:BrainStructure {id: "amygdala"}), (fc:Function {id: "fear_conditioning"})
-CREATE (amyg)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(fc);
+MERGE (amyg)-[r:IMPLICATED_IN]->(fc)
+SET r += {role: "primary", evidence: "strong"};
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (td:Function {id: "threat_detection"})
-CREATE (amyg)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(td);
+MERGE (amyg)-[r:IMPLICATED_IN]->(td)
+SET r += {role: "primary", evidence: "strong"};
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (mc:Function {id: "memory_consolidation"})
-CREATE (amyg)-[:IMPLICATED_IN {role: "primary"}]->(mc);
+MERGE (amyg)-[r:IMPLICATED_IN]->(mc)
+SET r += {role: "primary"};
 
 // PFC
 MATCH (pfc:BrainStructure {id: "pfc"}), (er:Function {id: "emotion_regulation"})
-CREATE (pfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "strong"}]->(er);
+MERGE (pfc)-[r:IMPLICATED_IN]->(er)
+SET r += {role: "regulatory", evidence: "strong"};
 
 MATCH (vmpfc:BrainStructure {id: "vmpfc"}), (fe:Function {id: "fear_extinction"})
-CREATE (vmpfc)-[:IMPLICATED_IN {role: "regulatory", evidence: "strong"}]->(fe);
+MERGE (vmpfc)-[r:IMPLICATED_IN]->(fe)
+SET r += {role: "regulatory", evidence: "strong"};
 
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (wm:Function {id: "working_memory"})
-CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(wm);
+MERGE (dlpfc)-[r:IMPLICATED_IN]->(wm)
+SET r += {role: "primary", evidence: "strong"};
 
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (cc:Function {id: "cognitive_control"})
-CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(cc);
+MERGE (dlpfc)-[r:IMPLICATED_IN]->(cc)
+SET r += {role: "primary", evidence: "strong"};
 
 MATCH (dlpfc:BrainStructure {id: "dlpfc"}), (ef:Function {id: "executive_function"})
-CREATE (dlpfc)-[:IMPLICATED_IN {role: "primary"}]->(ef);
+MERGE (dlpfc)-[r:IMPLICATED_IN]->(ef)
+SET r += {role: "primary"};
 
 // ACC
 MATCH (acc:BrainStructure {id: "acc"}), (cc:Function {id: "cognitive_control"})
-CREATE (acc)-[:IMPLICATED_IN {role: "monitoring"}]->(cc);
+MERGE (acc)-[r:IMPLICATED_IN]->(cc)
+SET r += {role: "monitoring"};
 
 MATCH (dacc:BrainStructure {id: "dacc"}), (er:Function {id: "emotion_regulation"})
-CREATE (dacc)-[:IMPLICATED_IN {role: "primary"}]->(er);
+MERGE (dacc)-[r:IMPLICATED_IN]->(er)
+SET r += {role: "primary"};
 
 // Insula
 MATCH (ins:BrainStructure {id: "insula"}), (int:Function {id: "interoception"})
-CREATE (ins)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(int);
+MERGE (ins)-[r:IMPLICATED_IN]->(int)
+SET r += {role: "primary", evidence: "strong"};
 
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (er:Function {id: "emotion_regulation"})
-CREATE (ai)-[:IMPLICATED_IN {role: "primary"}]->(er);
+MERGE (ai)-[r:IMPLICATED_IN]->(er)
+SET r += {role: "primary"};
 
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (sc:Function {id: "social_cognition"})
-CREATE (ai)-[:IMPLICATED_IN {role: "primary"}]->(sc);
+MERGE (ai)-[r:IMPLICATED_IN]->(sc)
+SET r += {role: "primary"};
 
 MATCH (pi:BrainStructure {id: "posterior_insula"}), (ba:Function {id: "body_awareness"})
-CREATE (pi)-[:IMPLICATED_IN {role: "primary"}]->(ba);
+MERGE (pi)-[r:IMPLICATED_IN]->(ba)
+SET r += {role: "primary"};
 
 MATCH (ss:BrainStructure {id: "somatosensory_cortex"}), (ba:Function {id: "body_awareness"})
-CREATE (ss)-[:IMPLICATED_IN {role: "primary"}]->(ba);
+MERGE (ss)-[r:IMPLICATED_IN]->(ba)
+SET r += {role: "primary"};
 
 // Hippocampus
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (mc:Function {id: "memory_consolidation"})
-CREATE (hippo)-[:IMPLICATED_IN {role: "primary", evidence: "strong"}]->(mc);
+MERGE (hippo)-[r:IMPLICATED_IN]->(mc)
+SET r += {role: "primary", evidence: "strong"};
 
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (fc:Function {id: "fear_conditioning"})
-CREATE (hippo)-[:IMPLICATED_IN {role: "contextual", evidence: "strong"}]->(fc);
+MERGE (hippo)-[r:IMPLICATED_IN]->(fc)
+SET r += {role: "contextual", evidence: "strong"};
 
 MATCH (hippo:BrainStructure {id: "hippocampus"}), (fe:Function {id: "fear_extinction"})
-CREATE (hippo)-[:IMPLICATED_IN {role: "contextual", evidence: "strong"}]->(fe);
+MERGE (hippo)-[r:IMPLICATED_IN]->(fe)
+SET r += {role: "contextual", evidence: "strong"};
 
 // OFC
 MATCH (ofc:BrainStructure {id: "ofc"}), (ic:Function {id: "impulse_control"})
-CREATE (ofc)-[:IMPLICATED_IN {role: "primary"}]->(ic);
+MERGE (ofc)-[r:IMPLICATED_IN]->(ic)
+SET r += {role: "primary"};
 
 MATCH (ofc:BrainStructure {id: "ofc"}), (rp:Function {id: "reward_processing"})
-CREATE (ofc)-[:IMPLICATED_IN {role: "primary"}]->(rp);
+MERGE (ofc)-[r:IMPLICATED_IN]->(rp)
+SET r += {role: "primary"};
 
 // Reward system
 MATCH (nacc:BrainStructure {id: "nucleus_accumbens"}), (rp:Function {id: "reward_processing"})
-CREATE (nacc)-[:IMPLICATED_IN {role: "primary"}]->(rp);
+MERGE (nacc)-[r:IMPLICATED_IN]->(rp)
+SET r += {role: "primary"};
 
 MATCH (nacc:BrainStructure {id: "nucleus_accumbens"}), (m:Function {id: "motivation"})
-CREATE (nacc)-[:IMPLICATED_IN {role: "primary"}]->(m);
+MERGE (nacc)-[r:IMPLICATED_IN]->(m)
+SET r += {role: "primary"};
 
 MATCH (vta:BrainStructure {id: "vta"}), (rp:Function {id: "reward_processing"})
-CREATE (vta)-[:IMPLICATED_IN {role: "primary"}]->(rp);
+MERGE (vta)-[r:IMPLICATED_IN]->(rp)
+SET r += {role: "primary"};
 
 MATCH (vta:BrainStructure {id: "vta"}), (m:Function {id: "motivation"})
-CREATE (vta)-[:IMPLICATED_IN {role: "primary"}]->(m);
+MERGE (vta)-[r:IMPLICATED_IN]->(m)
+SET r += {role: "primary"};
 
 // Self-referential
 MATCH (mpfc:BrainStructure {id: "mpfc"}), (sr:Function {id: "self_referential"})
-CREATE (mpfc)-[:IMPLICATED_IN {role: "primary"}]->(sr);
+MERGE (mpfc)-[r:IMPLICATED_IN]->(sr)
+SET r += {role: "primary"};
 
 MATCH (mpfc:BrainStructure {id: "mpfc"}), (sc:Function {id: "social_cognition"})
-CREATE (mpfc)-[:IMPLICATED_IN {role: "primary"}]->(sc);
+MERGE (mpfc)-[r:IMPLICATED_IN]->(sc)
+SET r += {role: "primary"};
 
 // Stress
 MATCH (hypo:BrainStructure {id: "hypothalamus"}), (stress:Function {id: "stress_response"})
-CREATE (hypo)-[:IMPLICATED_IN {role: "primary"}]->(stress);
+MERGE (hypo)-[r:IMPLICATED_IN]->(stress)
+SET r += {role: "primary"};
 
 MATCH (lc:BrainStructure {id: "locus_coeruleus"}), (stress:Function {id: "stress_response"})
-CREATE (lc)-[:IMPLICATED_IN {role: "modulatory"}]->(stress);
+MERGE (lc)-[r:IMPLICATED_IN]->(stress)
+SET r += {role: "modulatory"};
 
 // Thalamus
 MATCH (thal:BrainStructure {id: "thalamus"}), (att:Function {id: "attention"})
-CREATE (thal)-[:IMPLICATED_IN {role: "gating"}]->(att);
+MERGE (thal)-[r:IMPLICATED_IN]->(att)
+SET r += {role: "gating"};
 
 // Basal ganglia
 MATCH (bg:BrainStructure {id: "basal_ganglia"}), (hf:Function {id: "habit_formation"})
-CREATE (bg)-[:IMPLICATED_IN {role: "primary"}]->(hf);
+MERGE (bg)-[r:IMPLICATED_IN]->(hf)
+SET r += {role: "primary"};
 
 // Temporal cortex
 MATCH (tc:BrainStructure {id: "temporal_cortex"}), (lp:Function {id: "language_processing"})
-CREATE (tc)-[:IMPLICATED_IN {role: "primary"}]->(lp);
+MERGE (tc)-[r:IMPLICATED_IN]->(lp)
+SET r += {role: "primary"};
 
 
 // ============================================================
@@ -230,49 +262,64 @@ CREATE (tc)-[:IMPLICATED_IN {role: "primary"}]->(lp);
 // ============================================================
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (fear:Emotion {id: "fear"})
-CREATE (amyg)-[:ACTIVATES_DURING {direction: "increases", evidence: "strong"}]->(fear);
+MERGE (amyg)-[r:ACTIVATES_DURING]->(fear)
+SET r += {direction: "increases", evidence: "strong"};
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (anger:Emotion {id: "anger"})
-CREATE (amyg)-[:ACTIVATES_DURING {direction: "increases"}]->(anger);
+MERGE (amyg)-[r:ACTIVATES_DURING]->(anger)
+SET r += {direction: "increases"};
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (anx:Emotion {id: "anxiety"})
-CREATE (amyg)-[:ACTIVATES_DURING {direction: "increases"}]->(anx);
+MERGE (amyg)-[r:ACTIVATES_DURING]->(anx)
+SET r += {direction: "increases"};
 
 MATCH (amyg:BrainStructure {id: "amygdala"}), (hs:Emotion {id: "hot_shame"})
-CREATE (amyg)-[:ACTIVATES_DURING {direction: "increases"}]->(hs);
+MERGE (amyg)-[r:ACTIVATES_DURING]->(hs)
+SET r += {direction: "increases"};
 
 MATCH (bnst:BrainStructure {id: "bnst"}), (anx:Emotion {id: "anxiety"})
-CREATE (bnst)-[:ACTIVATES_DURING {direction: "increases", notes: "sustained/anticipatory anxiety"}]->(anx);
+MERGE (bnst)-[r:ACTIVATES_DURING]->(anx)
+SET r += {direction: "increases", notes: "sustained/anticipatory anxiety"};
 
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (disg:Emotion {id: "disgust"})
-CREATE (ai)-[:ACTIVATES_DURING {direction: "increases"}]->(disg);
+MERGE (ai)-[r:ACTIVATES_DURING]->(disg)
+SET r += {direction: "increases"};
 
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (anx:Emotion {id: "anxiety"})
-CREATE (ai)-[:ACTIVATES_DURING {direction: "increases"}]->(anx);
+MERGE (ai)-[r:ACTIVATES_DURING]->(anx)
+SET r += {direction: "increases"};
 
 MATCH (ai:BrainStructure {id: "anterior_insula"}), (comp:Emotion {id: "compassion"})
-CREATE (ai)-[:ACTIVATES_DURING {direction: "increases"}]->(comp);
+MERGE (ai)-[r:ACTIVATES_DURING]->(comp)
+SET r += {direction: "increases"};
 
 MATCH (mpfc:BrainStructure {id: "mpfc"}), (hs:Emotion {id: "hot_shame"})
-CREATE (mpfc)-[:ACTIVATES_DURING {direction: "increases"}]->(hs);
+MERGE (mpfc)-[r:ACTIVATES_DURING]->(hs)
+SET r += {direction: "increases"};
 
 MATCH (mpfc:BrainStructure {id: "mpfc"}), (cs:Emotion {id: "cold_shame"})
-CREATE (mpfc)-[:ACTIVATES_DURING {direction: "increases"}]->(cs);
+MERGE (mpfc)-[r:ACTIVATES_DURING]->(cs)
+SET r += {direction: "increases"};
 
 MATCH (mpfc:BrainStructure {id: "mpfc"}), (guilt:Emotion {id: "guilt"})
-CREATE (mpfc)-[:ACTIVATES_DURING {direction: "increases"}]->(guilt);
+MERGE (mpfc)-[r:ACTIVATES_DURING]->(guilt)
+SET r += {direction: "increases"};
 
 MATCH (vacc:BrainStructure {id: "vacc"}), (sad:Emotion {id: "sadness"})
-CREATE (vacc)-[:ACTIVATES_DURING {direction: "increases"}]->(sad);
+MERGE (vacc)-[r:ACTIVATES_DURING]->(sad)
+SET r += {direction: "increases"};
 
 MATCH (nacc:BrainStructure {id: "nucleus_accumbens"}), (joy:Emotion {id: "joy"})
-CREATE (nacc)-[:ACTIVATES_DURING {direction: "increases"}]->(joy);
+MERGE (nacc)-[r:ACTIVATES_DURING]->(joy)
+SET r += {direction: "increases"};
 
 MATCH (nacc:BrainStructure {id: "nucleus_accumbens"}), (exc:Emotion {id: "excitement"})
-CREATE (nacc)-[:ACTIVATES_DURING {direction: "increases"}]->(exc);
+MERGE (nacc)-[r:ACTIVATES_DURING]->(exc)
+SET r += {direction: "increases"};
 
 MATCH (pag:BrainStructure {id: "pag"}), (panic:Emotion {id: "panic"})
-CREATE (pag)-[:ACTIVATES_DURING {direction: "increases"}]->(panic);
+MERGE (pag)-[r:ACTIVATES_DURING]->(panic)
+SET r += {direction: "increases"};
 
 
 // ============================================================
@@ -280,19 +327,19 @@ CREATE (pag)-[:ACTIVATES_DURING {direction: "increases"}]->(panic);
 // ============================================================
 
 MATCH (vta:BrainStructure {id: "vta"}), (da:NeurochemicalSystem {id: "dopamine"})
-CREATE (vta)-[:PRODUCES]->(da);
+MERGE (vta)-[:PRODUCES]->(da);
 
 MATCH (raphe:BrainStructure {id: "raphe_nuclei"}), (ser:NeurochemicalSystem {id: "serotonin"})
-CREATE (raphe)-[:PRODUCES]->(ser);
+MERGE (raphe)-[:PRODUCES]->(ser);
 
 MATCH (lc:BrainStructure {id: "locus_coeruleus"}), (ne:NeurochemicalSystem {id: "norepinephrine"})
-CREATE (lc)-[:PRODUCES]->(ne);
+MERGE (lc)-[:PRODUCES]->(ne);
 
 MATCH (hypo:BrainStructure {id: "hypothalamus"}), (cort:NeurochemicalSystem {id: "cortisol"})
-CREATE (hypo)-[:PRODUCES]->(cort);
+MERGE (hypo)-[:PRODUCES]->(cort);
 
 MATCH (hypo:BrainStructure {id: "hypothalamus"}), (oxy:NeurochemicalSystem {id: "oxytocin"})
-CREATE (hypo)-[:PRODUCES]->(oxy);
+MERGE (hypo)-[:PRODUCES]->(oxy);
 
 
 // ============================================================
@@ -300,58 +347,62 @@ CREATE (hypo)-[:PRODUCES]->(oxy);
 // ============================================================
 
 MATCH (da:NeurochemicalSystem {id: "dopamine"}), (rp:Function {id: "reward_processing"})
-CREATE (da)-[:MODULATES]->(rp);
+MERGE (da)-[:MODULATES]->(rp);
 
 MATCH (da:NeurochemicalSystem {id: "dopamine"}), (m:Function {id: "motivation"})
-CREATE (da)-[:MODULATES]->(m);
+MERGE (da)-[:MODULATES]->(m);
 
 MATCH (ser:NeurochemicalSystem {id: "serotonin"}), (er:Function {id: "emotion_regulation"})
-CREATE (ser)-[:MODULATES]->(er);
+MERGE (ser)-[:MODULATES]->(er);
 
 MATCH (ser:NeurochemicalSystem {id: "serotonin"}), (anx:Emotion {id: "anxiety"})
-CREATE (ser)-[:MODULATES {direction: "reduces"}]->(anx);
+MERGE (ser)-[r:MODULATES]->(anx)
+SET r += {direction: "reduces"};
 
 MATCH (ne:NeurochemicalSystem {id: "norepinephrine"}), (att:Function {id: "attention"})
-CREATE (ne)-[:MODULATES]->(att);
+MERGE (ne)-[:MODULATES]->(att);
 
 MATCH (ne:NeurochemicalSystem {id: "norepinephrine"}), (stress:Function {id: "stress_response"})
-CREATE (ne)-[:MODULATES]->(stress);
+MERGE (ne)-[:MODULATES]->(stress);
 
 MATCH (gaba:NeurochemicalSystem {id: "gaba"}), (anx:Emotion {id: "anxiety"})
-CREATE (gaba)-[:MODULATES {direction: "inhibits"}]->(anx);
+MERGE (gaba)-[r:MODULATES]->(anx)
+SET r += {direction: "inhibits"};
 
 MATCH (gaba:NeurochemicalSystem {id: "gaba"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (gaba)-[:MODULATES {direction: "inhibits"}]->(amyg);
+MERGE (gaba)-[r:MODULATES]->(amyg)
+SET r += {direction: "inhibits"};
 
 MATCH (glu:NeurochemicalSystem {id: "glutamate"}), (mc:Function {id: "memory_consolidation"})
-CREATE (glu)-[:MODULATES]->(mc);
+MERGE (glu)-[:MODULATES]->(mc);
 
 MATCH (glu:NeurochemicalSystem {id: "glutamate"}), (fc:Function {id: "fear_conditioning"})
-CREATE (glu)-[:MODULATES]->(fc);
+MERGE (glu)-[:MODULATES]->(fc);
 
 MATCH (ach:NeurochemicalSystem {id: "acetylcholine"}), (att:Function {id: "attention"})
-CREATE (ach)-[:MODULATES]->(att);
+MERGE (ach)-[:MODULATES]->(att);
 
 MATCH (ach:NeurochemicalSystem {id: "acetylcholine"}), (mc:Function {id: "memory_consolidation"})
-CREATE (ach)-[:MODULATES]->(mc);
+MERGE (ach)-[:MODULATES]->(mc);
 
 MATCH (endo:NeurochemicalSystem {id: "endorphin"}), (stress:Function {id: "stress_response"})
-CREATE (endo)-[:MODULATES {direction: "reduces"}]->(stress);
+MERGE (endo)-[r:MODULATES]->(stress)
+SET r += {direction: "reduces"};
 
 MATCH (endo:NeurochemicalSystem {id: "endorphin"}), (rp:Function {id: "reward_processing"})
-CREATE (endo)-[:MODULATES]->(rp);
+MERGE (endo)-[:MODULATES]->(rp);
 
 MATCH (cort:NeurochemicalSystem {id: "cortisol"}), (stress:Function {id: "stress_response"})
-CREATE (cort)-[:MODULATES]->(stress);
+MERGE (cort)-[:MODULATES]->(stress);
 
 MATCH (cort:NeurochemicalSystem {id: "cortisol"}), (mc:Function {id: "memory_consolidation"})
-CREATE (cort)-[:MODULATES]->(mc);
+MERGE (cort)-[:MODULATES]->(mc);
 
 MATCH (oxy:NeurochemicalSystem {id: "oxytocin"}), (trust:Emotion {id: "trust"})
-CREATE (oxy)-[:MODULATES]->(trust);
+MERGE (oxy)-[:MODULATES]->(trust);
 
 MATCH (oxy:NeurochemicalSystem {id: "oxytocin"}), (sc:Function {id: "social_cognition"})
-CREATE (oxy)-[:MODULATES]->(sc);
+MERGE (oxy)-[:MODULATES]->(sc);
 
 
 // ============================================================
@@ -360,325 +411,325 @@ CREATE (oxy)-[:MODULATES]->(sc);
 
 // IFS
 MATCH (c:TherapyConcept {id: "ifs_exile"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_firefighter"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_manager"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_self"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_protector"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_unburdening"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_blending"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_unblending"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "ifs_trailhead"}), (m:TherapyModality {id: "ifs"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // IFS part hierarchy
 MATCH (ff:TherapyConcept {id: "ifs_firefighter"}), (p:TherapyConcept {id: "ifs_protector"})
-CREATE (ff)-[:TYPE_OF]->(p);
+MERGE (ff)-[:TYPE_OF]->(p);
 
 MATCH (mgr:TherapyConcept {id: "ifs_manager"}), (p:TherapyConcept {id: "ifs_protector"})
-CREATE (mgr)-[:TYPE_OF]->(p);
+MERGE (mgr)-[:TYPE_OF]->(p);
 
 // DBT Modules -> DBT
 MATCH (c:TherapyConcept {id: "dbt_mindfulness_module"}), (m:TherapyModality {id: "dbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "dbt_distress_tolerance"}), (m:TherapyModality {id: "dbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "dbt_emotion_regulation_module"}), (m:TherapyModality {id: "dbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "dbt_interpersonal_effectiveness"}), (m:TherapyModality {id: "dbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // DBT Mindfulness Skills -> Module
 MATCH (c:TherapyConcept {id: "dbt_wise_mind"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_emotional_mind"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_reasonable_mind"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_observe"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_describe"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_participate"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_nonjudgmental"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_one_mindfully"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_effectively"}), (mod:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 // DBT Distress Tolerance Skills -> Module
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_stop"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_accepts"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_improve"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_pros_cons"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_radical_acceptance"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_turning_mind"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_willingness"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_half_smile"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_willing_hands"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (mod:TherapyConcept {id: "dbt_distress_tolerance"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 // DBT Emotion Regulation Skills -> Module
 MATCH (c:TherapyConcept {id: "dbt_reducing_vulnerability"}), (mod:TherapyConcept {id: "dbt_emotion_regulation_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_check_facts"}), (mod:TherapyConcept {id: "dbt_emotion_regulation_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_opposite_action"}), (mod:TherapyConcept {id: "dbt_emotion_regulation_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_problem_solving"}), (mod:TherapyConcept {id: "dbt_emotion_regulation_module"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 // Reducing Vulnerability sub-skills
 MATCH (c:TherapyConcept {id: "dbt_abc_please"}), (rv:TherapyConcept {id: "dbt_reducing_vulnerability"})
-CREATE (c)-[:PART_OF]->(rv);
+MERGE (c)-[:PART_OF]->(rv);
 
 MATCH (c:TherapyConcept {id: "dbt_accumulate_positives"}), (rv:TherapyConcept {id: "dbt_reducing_vulnerability"})
-CREATE (c)-[:PART_OF]->(rv);
+MERGE (c)-[:PART_OF]->(rv);
 
 MATCH (c:TherapyConcept {id: "dbt_build_mastery"}), (rv:TherapyConcept {id: "dbt_reducing_vulnerability"})
-CREATE (c)-[:PART_OF]->(rv);
+MERGE (c)-[:PART_OF]->(rv);
 
 MATCH (c:TherapyConcept {id: "dbt_cope_ahead"}), (rv:TherapyConcept {id: "dbt_reducing_vulnerability"})
-CREATE (c)-[:PART_OF]->(rv);
+MERGE (c)-[:PART_OF]->(rv);
 
 MATCH (c:TherapyConcept {id: "dbt_please"}), (rv:TherapyConcept {id: "dbt_reducing_vulnerability"})
-CREATE (c)-[:PART_OF]->(rv);
+MERGE (c)-[:PART_OF]->(rv);
 
 // DBT IE Skills -> Module
 MATCH (c:TherapyConcept {id: "dbt_dear_man"}), (mod:TherapyConcept {id: "dbt_interpersonal_effectiveness"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_give"}), (mod:TherapyConcept {id: "dbt_interpersonal_effectiveness"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 MATCH (c:TherapyConcept {id: "dbt_fast"}), (mod:TherapyConcept {id: "dbt_interpersonal_effectiveness"})
-CREATE (c)-[:PART_OF]->(mod);
+MERGE (c)-[:PART_OF]->(mod);
 
 // CBT
 MATCH (c:TherapyConcept {id: "cbt_cognitive_distortion"}), (m:TherapyModality {id: "cbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cbt_thought_record"}), (m:TherapyModality {id: "cbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cbt_behavioral_activation"}), (m:TherapyModality {id: "cbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cbt_exposure"}), (m:TherapyModality {id: "cbt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // Cognitive distortion types
 MATCH (c:TherapyConcept {id: "cbt_catastrophizing"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_black_white"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_mind_reading"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_fortune_telling"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_should_statements"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_personalization"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_labeling"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_emotional_reasoning"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 MATCH (c:TherapyConcept {id: "cbt_mental_filter"}), (cd:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TYPE_OF]->(cd);
+MERGE (c)-[:TYPE_OF]->(cd);
 
 // ACT
 MATCH (c:TherapyConcept {id: "act_psych_flexibility"}), (m:TherapyModality {id: "act"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "act_defusion"}), (m:TherapyModality {id: "act"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "act_acceptance"}), (m:TherapyModality {id: "act"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "act_present_moment"}), (m:TherapyModality {id: "act"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "act_self_context"}), (m:TherapyModality {id: "act"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "act_values"}), (m:TherapyModality {id: "act"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "act_committed_action"}), (m:TherapyModality {id: "act"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // EMDR
 MATCH (c:TherapyConcept {id: "emdr_aip"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "emdr_bilateral"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "emdr_target"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "emdr_nc"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "emdr_pc"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "emdr_suds"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "emdr_voc"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "emdr_phases"}), (m:TherapyModality {id: "emdr"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // Somatic Experiencing
 MATCH (c:TherapyConcept {id: "se_felt_sense"}), (m:TherapyModality {id: "se"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "se_titration"}), (m:TherapyModality {id: "se"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "se_pendulation"}), (m:TherapyModality {id: "se"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "se_discharge"}), (m:TherapyModality {id: "se"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "se_resourcing"}), (m:TherapyModality {id: "se"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "se_orienting"}), (m:TherapyModality {id: "se"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "se_defensive"}), (m:TherapyModality {id: "se"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // CPT
 MATCH (c:TherapyConcept {id: "cpt_stuck_point"}), (m:TherapyModality {id: "cpt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cpt_assimilation"}), (m:TherapyModality {id: "cpt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cpt_overaccommodation"}), (m:TherapyModality {id: "cpt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cpt_accommodation"}), (m:TherapyModality {id: "cpt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cpt_abc"}), (m:TherapyModality {id: "cpt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cpt_challenging"}), (m:TherapyModality {id: "cpt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "cpt_themes"}), (m:TherapyModality {id: "cpt"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // MBCT
 MATCH (c:TherapyConcept {id: "mbct_decentering"}), (m:TherapyModality {id: "mbct"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "mbct_body_scan"}), (m:TherapyModality {id: "mbct"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "mbct_sitting"}), (m:TherapyModality {id: "mbct"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "mbct_movement"}), (m:TherapyModality {id: "mbct"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "mbct_3min"}), (m:TherapyModality {id: "mbct"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "mbct_relapse"}), (m:TherapyModality {id: "mbct"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 // Polyvagal
 MATCH (c:TherapyConcept {id: "pv_ventral_vagal"}), (m:TherapyModality {id: "polyvagal"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "pv_sympathetic"}), (m:TherapyModality {id: "polyvagal"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "pv_dorsal_vagal"}), (m:TherapyModality {id: "polyvagal"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "pv_neuroception"}), (m:TherapyModality {id: "polyvagal"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "pv_coregulation"}), (m:TherapyModality {id: "polyvagal"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "pv_vagal_brake"}), (m:TherapyModality {id: "polyvagal"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 MATCH (c:TherapyConcept {id: "pv_social_engagement"}), (m:TherapyModality {id: "polyvagal"})
-CREATE (c)-[:BELONGS_TO]->(m);
+MERGE (c)-[:BELONGS_TO]->(m);
 
 
 // ============================================================
@@ -686,64 +737,64 @@ CREATE (c)-[:BELONGS_TO]->(m);
 // ============================================================
 
 MATCH (m:TherapyModality {id: "dbt"}), (c:ClinicalConstruct {id: "bpd"})
-CREATE (m)-[:DEVELOPED_FOR]->(c);
+MERGE (m)-[:DEVELOPED_FOR]->(c);
 
 MATCH (m:TherapyModality {id: "dbt"}), (c:ClinicalConstruct {id: "emotional_dysregulation"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "dbt"}), (c:ClinicalConstruct {id: "ptsd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "cbt"}), (c:ClinicalConstruct {id: "mdd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "cbt"}), (c:ClinicalConstruct {id: "gad"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "cbt"}), (c:ClinicalConstruct {id: "panic_disorder"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "cbt"}), (c:ClinicalConstruct {id: "social_anxiety"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "cbt"}), (c:ClinicalConstruct {id: "ocd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "act"}), (c:ClinicalConstruct {id: "mdd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "act"}), (c:ClinicalConstruct {id: "gad"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "emdr"}), (c:ClinicalConstruct {id: "ptsd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "emdr"}), (c:ClinicalConstruct {id: "cptsd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "cpt"}), (c:ClinicalConstruct {id: "ptsd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "ifs"}), (c:ClinicalConstruct {id: "cptsd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "ifs"}), (c:ClinicalConstruct {id: "dissociation"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "ifs"}), (c:ClinicalConstruct {id: "bpd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "se"}), (c:ClinicalConstruct {id: "ptsd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "se"}), (c:ClinicalConstruct {id: "cptsd"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "mbct"}), (c:ClinicalConstruct {id: "mdd"})
-CREATE (m)-[:DEVELOPED_FOR]->(c);
+MERGE (m)-[:DEVELOPED_FOR]->(c);
 
 MATCH (m:TherapyModality {id: "mbct"}), (c:ClinicalConstruct {id: "rumination"})
-CREATE (m)-[:TREATS]->(c);
+MERGE (m)-[:TREATS]->(c);
 
 
 // ============================================================
@@ -751,37 +802,38 @@ CREATE (m)-[:TREATS]->(c);
 // ============================================================
 
 MATCH (c:TherapyConcept {id: "dbt_distress_tolerance"}), (t:ClinicalConstruct {id: "emotional_dysregulation"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (t:ClinicalConstruct {id: "emotional_dysregulation"})
-CREATE (c)-[:TARGETS {mechanism: "activates parasympathetic via dive reflex"}]->(t);
+MERGE (c)-[r:TARGETS]->(t)
+SET r += {mechanism: "activates parasympathetic via dive reflex"};
 
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (t:Emotion {id: "panic"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "dbt_opposite_action"}), (t:ClinicalConstruct {id: "avoidance"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "cbt_exposure"}), (t:ClinicalConstruct {id: "avoidance"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "cbt_exposure"}), (t:Emotion {id: "fear"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "dbt_radical_acceptance"}), (t:ClinicalConstruct {id: "rumination"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "act_defusion"}), (t:ClinicalConstruct {id: "rumination"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "cbt_behavioral_activation"}), (t:ClinicalConstruct {id: "mdd"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "dbt_check_facts"}), (t:TherapyConcept {id: "cbt_catastrophizing"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 MATCH (c:TherapyConcept {id: "cbt_thought_record"}), (t:TherapyConcept {id: "cbt_cognitive_distortion"})
-CREATE (c)-[:TARGETS]->(t);
+MERGE (c)-[:TARGETS]->(t);
 
 
 // ============================================================
@@ -789,34 +841,34 @@ CREATE (c)-[:TARGETS]->(t);
 // ============================================================
 
 MATCH (c:TherapyConcept {id: "ifs_exile"}), (e:Emotion {id: "cold_shame"})
-CREATE (c)-[:CARRIES]->(e);
+MERGE (c)-[:CARRIES]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_exile"}), (e:Emotion {id: "fear"})
-CREATE (c)-[:CARRIES]->(e);
+MERGE (c)-[:CARRIES]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_exile"}), (e:Emotion {id: "loneliness"})
-CREATE (c)-[:CARRIES]->(e);
+MERGE (c)-[:CARRIES]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_exile"}), (e:Emotion {id: "sadness"})
-CREATE (c)-[:CARRIES]->(e);
+MERGE (c)-[:CARRIES]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_firefighter"}), (e:Emotion {id: "fear"})
-CREATE (c)-[:RESPONDS_TO]->(e);
+MERGE (c)-[:RESPONDS_TO]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_firefighter"}), (e:Emotion {id: "cold_shame"})
-CREATE (c)-[:RESPONDS_TO]->(e);
+MERGE (c)-[:RESPONDS_TO]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_firefighter"}), (e:Emotion {id: "overwhelm"})
-CREATE (c)-[:RESPONDS_TO]->(e);
+MERGE (c)-[:RESPONDS_TO]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_manager"}), (e:Emotion {id: "cold_shame"})
-CREATE (c)-[:PREVENTS]->(e);
+MERGE (c)-[:PREVENTS]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_manager"}), (e:Emotion {id: "fear"})
-CREATE (c)-[:PREVENTS]->(e);
+MERGE (c)-[:PREVENTS]->(e);
 
 MATCH (c:TherapyConcept {id: "ifs_manager"}), (e:Emotion {id: "rejection"})
-CREATE (c)-[:PREVENTS]->(e);
+MERGE (c)-[:PREVENTS]->(e);
 
 
 // ============================================================
@@ -824,38 +876,38 @@ CREATE (c)-[:PREVENTS]->(e);
 // ============================================================
 
 MATCH (c:TherapyConcept {id: "dbt_opposite_action"}), (e:Emotion {id: "fear"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_opposite_action"}), (e:Emotion {id: "cold_shame"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_opposite_action"}), (e:Emotion {id: "sadness"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_opposite_action"}), (e:Emotion {id: "anger"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (e:Emotion {id: "panic"})
-CREATE (c)-[:REDUCES]->(e);
+MERGE (c)-[:REDUCES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (e:Emotion {id: "overwhelm"})
-CREATE (c)-[:REDUCES]->(e);
+MERGE (c)-[:REDUCES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (e:Emotion {id: "anger"})
-CREATE (c)-[:REDUCES]->(e);
+MERGE (c)-[:REDUCES]->(e);
 
 // Alternate Rebellion - channel rebellious urges into non-destructive outlets
 MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "angsty"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "anger"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "frustration"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 MATCH (c:TherapyConcept {id: "dbt_alternate_rebellion"}), (e:Emotion {id: "irritation"})
-CREATE (c)-[:ADDRESSES]->(e);
+MERGE (c)-[:ADDRESSES]->(e);
 
 
 // ============================================================
@@ -863,22 +915,28 @@ CREATE (c)-[:ADDRESSES]->(e);
 // ============================================================
 
 MATCH (c:TherapyConcept {id: "dbt_tipp"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:MODULATES {direction: "down-regulates", mechanism: "dive reflex, vagal activation"}]->(b);
+MERGE (c)-[r:MODULATES]->(b)
+SET r += {direction: "down-regulates", mechanism: "dive reflex, vagal activation"};
 
 MATCH (c:TherapyConcept {id: "cbt_exposure"}), (f:Function {id: "fear_extinction"})
-CREATE (c)-[:MODULATES {direction: "promotes", mechanism: "extinction learning"}]->(f);
+MERGE (c)-[r:MODULATES]->(f)
+SET r += {direction: "promotes", mechanism: "extinction learning"};
 
 MATCH (c:TherapyConcept {id: "mindfulness"}), (b:BrainStructure {id: "insula"})
-CREATE (c)-[:MODULATES {direction: "strengthens"}]->(b);
+MERGE (c)-[r:MODULATES]->(b)
+SET r += {direction: "strengthens"};
 
 MATCH (c:TherapyConcept {id: "mindfulness"}), (b:BrainStructure {id: "pfc"})
-CREATE (c)-[:MODULATES {direction: "strengthens"}]->(b);
+MERGE (c)-[r:MODULATES]->(b)
+SET r += {direction: "strengthens"};
 
 MATCH (c:TherapyConcept {id: "mindfulness"}), (f:Function {id: "interoception"})
-CREATE (c)-[:MODULATES {direction: "increases"}]->(f);
+MERGE (c)-[r:MODULATES]->(f)
+SET r += {direction: "increases"};
 
 MATCH (c:TherapyConcept {id: "cbt_behavioral_activation"}), (n:NeurochemicalSystem {id: "dopamine"})
-CREATE (c)-[:MODULATES {direction: "increases"}]->(n);
+MERGE (c)-[r:MODULATES]->(n)
+SET r += {direction: "increases"};
 
 
 // ============================================================
@@ -886,37 +944,37 @@ CREATE (c)-[:MODULATES {direction: "increases"}]->(n);
 // ============================================================
 
 MATCH (c:TherapyConcept {id: "pv_ventral_vagal"}), (e:Emotion {id: "safety"})
-CREATE (c)-[:ASSOCIATED_WITH]->(e);
+MERGE (c)-[:ASSOCIATED_WITH]->(e);
 
 MATCH (c:TherapyConcept {id: "pv_ventral_vagal"}), (e:Emotion {id: "calm"})
-CREATE (c)-[:ASSOCIATED_WITH]->(e);
+MERGE (c)-[:ASSOCIATED_WITH]->(e);
 
 MATCH (c:TherapyConcept {id: "pv_ventral_vagal"}), (coreg:TherapyConcept {id: "pv_coregulation"})
-CREATE (c)-[:ENABLES]->(coreg);
+MERGE (c)-[:ENABLES]->(coreg);
 
 MATCH (c:TherapyConcept {id: "pv_sympathetic"}), (e:Emotion {id: "fear"})
-CREATE (c)-[:ASSOCIATED_WITH]->(e);
+MERGE (c)-[:ASSOCIATED_WITH]->(e);
 
 MATCH (c:TherapyConcept {id: "pv_sympathetic"}), (e:Emotion {id: "anger"})
-CREATE (c)-[:ASSOCIATED_WITH]->(e);
+MERGE (c)-[:ASSOCIATED_WITH]->(e);
 
 MATCH (c:TherapyConcept {id: "pv_sympathetic"}), (e:Emotion {id: "anxiety"})
-CREATE (c)-[:ASSOCIATED_WITH]->(e);
+MERGE (c)-[:ASSOCIATED_WITH]->(e);
 
 MATCH (c:TherapyConcept {id: "pv_dorsal_vagal"}), (e:Emotion {id: "numbness"})
-CREATE (c)-[:ASSOCIATED_WITH]->(e);
+MERGE (c)-[:ASSOCIATED_WITH]->(e);
 
 MATCH (c:TherapyConcept {id: "pv_dorsal_vagal"}), (e:Emotion {id: "hopelessness"})
-CREATE (c)-[:ASSOCIATED_WITH]->(e);
+MERGE (c)-[:ASSOCIATED_WITH]->(e);
 
 MATCH (c:TherapyConcept {id: "pv_dorsal_vagal"}), (cc:ClinicalConstruct {id: "dissociation"})
-CREATE (c)-[:ASSOCIATED_WITH]->(cc);
+MERGE (c)-[:ASSOCIATED_WITH]->(cc);
 
 MATCH (c:TherapyConcept {id: "pv_neuroception"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:INVOLVES]->(b);
+MERGE (c)-[:INVOLVES]->(b);
 
 MATCH (c:TherapyConcept {id: "pv_neuroception"}), (b:BrainStructure {id: "insula"})
-CREATE (c)-[:INVOLVES]->(b);
+MERGE (c)-[:INVOLVES]->(b);
 
 
 // ============================================================
@@ -925,116 +983,116 @@ CREATE (c)-[:INVOLVES]->(b);
 
 // Anxiety
 MATCH (e:Emotion {id: "anxiety"}), (s:SensationType {id: "constriction"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "anxiety"}), (s:SensationType {id: "racing_heart"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "anxiety"}), (s:SensationType {id: "butterflies"})
-CREATE (e)-[:FELT_AS {region: "stomach"}]->(s);
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 MATCH (e:Emotion {id: "anxiety"}), (s:SensationType {id: "tension"})
-CREATE (e)-[:FELT_AS {region: "shoulders"}]->(s);
+MERGE (e)-[:FELT_AS {region: "shoulders"}]->(s);
 
 // Fear
 MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "racing_heart"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[:FELT_AS {region: "stomach"}]->(s);
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "cold_sensation"})
-CREATE (e)-[:FELT_AS {region: "body"}]->(s);
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "weakness"})
-CREATE (e)-[:FELT_AS {region: "legs"}]->(s);
+MERGE (e)-[:FELT_AS {region: "legs"}]->(s);
 
 MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "shaking"})
-CREATE (e)-[:FELT_AS {region: "body"}]->(s);
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 // Panic
 MATCH (e:Emotion {id: "panic"}), (s:SensationType {id: "racing_heart"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "panic"}), (s:SensationType {id: "constriction"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "panic"}), (s:SensationType {id: "shaking"})
-CREATE (e)-[:FELT_AS {region: "body"}]->(s);
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "panic"}), (s:SensationType {id: "numbness_sensation"})
-CREATE (e)-[:FELT_AS {region: "hands"}]->(s);
+MERGE (e)-[:FELT_AS {region: "hands"}]->(s);
 
 // Anger
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "pressure"})
-CREATE (e)-[:FELT_AS {region: "head"}]->(s);
+MERGE (e)-[:FELT_AS {region: "head"}]->(s);
 
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "heat"})
-CREATE (e)-[:FELT_AS {region: "head"}]->(s);
+MERGE (e)-[:FELT_AS {region: "head"}]->(s);
 
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "heat"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "tension"})
-CREATE (e)-[:FELT_AS {region: "arms"}]->(s);
+MERGE (e)-[:FELT_AS {region: "arms"}]->(s);
 
 // Sadness
 MATCH (e:Emotion {id: "sadness"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "sadness"}), (s:SensationType {id: "constriction"})
-CREATE (e)-[:FELT_AS {region: "throat"}]->(s);
+MERGE (e)-[:FELT_AS {region: "throat"}]->(s);
 
 // Shame
 MATCH (e:Emotion {id: "hot_shame"}), (s:SensationType {id: "heat"})
-CREATE (e)-[:FELT_AS {region: "face"}]->(s);
+MERGE (e)-[:FELT_AS {region: "face"}]->(s);
 
 MATCH (e:Emotion {id: "hot_shame"}), (s:SensationType {id: "heat"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "cold_shame"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[:FELT_AS {region: "stomach"}]->(s);
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 MATCH (e:Emotion {id: "cold_shame"}), (s:SensationType {id: "weakness"})
-CREATE (e)-[:FELT_AS {region: "body"}]->(s);
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 // Joy
 MATCH (e:Emotion {id: "joy"}), (s:SensationType {id: "expansion"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "joy"}), (s:SensationType {id: "lightness"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 // Calm
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "lightness"})
-CREATE (e)-[:FELT_AS {region: "body"}]->(s);
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "groundedness"})
-CREATE (e)-[:FELT_AS {region: "legs"}]->(s);
+MERGE (e)-[:FELT_AS {region: "legs"}]->(s);
 
 // Love/compassion
 MATCH (e:Emotion {id: "love"}), (s:SensationType {id: "expansion"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "compassion"}), (s:SensationType {id: "expansion"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 // Stress
 MATCH (e:Emotion {id: "stress"}), (s:SensationType {id: "tension"})
-CREATE (e)-[:FELT_AS {region: "shoulders"}]->(s);
+MERGE (e)-[:FELT_AS {region: "shoulders"}]->(s);
 
 MATCH (e:Emotion {id: "stress"}), (s:SensationType {id: "tension"})
-CREATE (e)-[:FELT_AS {region: "back"}]->(s);
+MERGE (e)-[:FELT_AS {region: "back"}]->(s);
 
 // Excitement
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "butterflies"})
-CREATE (e)-[:FELT_AS {region: "stomach"}]->(s);
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "racing_heart"})
-CREATE (e)-[:FELT_AS {region: "chest"}]->(s);
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "restlessness"})
-CREATE (e)-[:FELT_AS {region: "body"}]->(s);
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 
 // ============================================================
@@ -1043,87 +1101,111 @@ CREATE (e)-[:FELT_AS {region: "body"}]->(s);
 
 // Self/Observer parallels
 MATCH (a:TherapyConcept {id: "ifs_self"}), (b:TherapyConcept {id: "dbt_wise_mind"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "ifs_self"}), (b:TherapyConcept {id: "pv_ventral_vagal"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "act_self_context"}), (b:TherapyConcept {id: "ifs_self"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "act_self_context"}), (b:TherapyConcept {id: "dbt_wise_mind"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 // Acceptance parallels
 MATCH (a:TherapyConcept {id: "dbt_radical_acceptance"}), (b:TherapyConcept {id: "act_acceptance"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 // Defusion/Unblending/Decentering
 MATCH (a:TherapyConcept {id: "ifs_unblending"}), (b:TherapyConcept {id: "act_defusion"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "mbct_decentering"}), (b:TherapyConcept {id: "act_defusion"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "mbct_decentering"}), (b:TherapyConcept {id: "ifs_unblending"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 // Present moment/Mindfulness parallels
 MATCH (a:TherapyConcept {id: "act_present_moment"}), (b:TherapyConcept {id: "dbt_observe"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "act_present_moment"}), (b:TherapyConcept {id: "mindfulness"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 // Mindfulness as shared foundation
 MATCH (a:TherapyConcept {id: "mindfulness"}), (b:TherapyConcept {id: "dbt_mindfulness_module"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "shared_foundation"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "shared_foundation"};
 
 MATCH (a:TherapyConcept {id: "mindfulness"}), (b:TherapyModality {id: "mbct"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "shared_foundation"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "shared_foundation"};
 
 MATCH (a:TherapyConcept {id: "mindfulness"}), (b:TherapyModality {id: "act"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "shared_foundation"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "shared_foundation"};
 
 // Parts/States parallels
 MATCH (a:TherapyConcept {id: "ifs_exile"}), (b:TherapyConcept {id: "pv_dorsal_vagal"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "state_parallel"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "state_parallel"};
 
 MATCH (a:TherapyConcept {id: "ifs_firefighter"}), (b:TherapyConcept {id: "pv_sympathetic"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "state_parallel"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "state_parallel"};
 
 MATCH (a:TherapyConcept {id: "ifs_manager"}), (b:FunctionalNetwork {id: "cen"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_parallel"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_parallel"};
 
 // Trailhead/Neuroception
 MATCH (a:TherapyConcept {id: "pv_neuroception"}), (b:TherapyConcept {id: "ifs_trailhead"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_parallel"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_parallel"};
 
 // Co-regulation/IE
 MATCH (a:TherapyConcept {id: "pv_coregulation"}), (b:TherapyConcept {id: "dbt_interpersonal_effectiveness"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_parallel"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_parallel"};
 
 // Cognitive restructuring tools
 MATCH (a:TherapyConcept {id: "dbt_check_facts"}), (b:TherapyConcept {id: "cbt_thought_record"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "cpt_challenging"}), (b:TherapyConcept {id: "cbt_thought_record"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 // Action despite emotion
 MATCH (a:TherapyConcept {id: "act_committed_action"}), (b:TherapyConcept {id: "dbt_opposite_action"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_parallel"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_parallel"};
 
 // Emotional dysregulation
 MATCH (a:TherapyConcept {id: "ifs_exile"}), (b:ClinicalConstruct {id: "emotional_dysregulation"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "overlapping_construct"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "overlapping_construct"};
 
 // Body awareness
 MATCH (a:TherapyConcept {id: "se_felt_sense"}), (b:Function {id: "interoception"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "functional_equivalent"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "functional_equivalent"};
 
 MATCH (a:TherapyConcept {id: "mbct_body_scan"}), (b:Function {id: "interoception"})
-CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "develops"}]->(b);
+MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
+SET r += {type: "develops"};
 
 
 // ============================================================
@@ -1131,58 +1213,76 @@ CREATE (a)-[:CONCEPTUALLY_RELATED_TO {type: "develops"}]->(b);
 // ============================================================
 
 MATCH (c:ClinicalConstruct {id: "ptsd"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation", evidence: "strong"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation", evidence: "strong"};
 
 MATCH (c:ClinicalConstruct {id: "ptsd"}), (b:BrainStructure {id: "pfc"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hypoactivation", evidence: "moderate"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hypoactivation", evidence: "moderate"};
 
 MATCH (c:ClinicalConstruct {id: "ptsd"}), (b:BrainStructure {id: "hippocampus"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "reduced_volume", evidence: "strong"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "reduced_volume", evidence: "strong"};
 
 MATCH (c:ClinicalConstruct {id: "bpd"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation"};
 
 MATCH (c:ClinicalConstruct {id: "bpd"}), (b:BrainStructure {id: "pfc"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "reduced_connectivity"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "reduced_connectivity"};
 
 MATCH (c:ClinicalConstruct {id: "mdd"}), (n:FunctionalNetwork {id: "dmn"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(n);
+MERGE (c)-[r:ASSOCIATED_WITH]->(n)
+SET r += {finding: "hyperactivation"};
 
 MATCH (c:ClinicalConstruct {id: "mdd"}), (b:BrainStructure {id: "dlpfc"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hypoactivation"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hypoactivation"};
 
 MATCH (c:ClinicalConstruct {id: "mdd"}), (n:NeurochemicalSystem {id: "serotonin"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "dysregulation"}]->(n);
+MERGE (c)-[r:ASSOCIATED_WITH]->(n)
+SET r += {finding: "dysregulation"};
 
 MATCH (c:ClinicalConstruct {id: "gad"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation"};
 
 MATCH (c:ClinicalConstruct {id: "gad"}), (b:BrainStructure {id: "bnst"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation"};
 
 MATCH (c:ClinicalConstruct {id: "adhd"}), (b:BrainStructure {id: "pfc"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hypoactivation"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hypoactivation"};
 
 MATCH (c:ClinicalConstruct {id: "adhd"}), (n:NeurochemicalSystem {id: "dopamine"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "dysregulation"}]->(n);
+MERGE (c)-[r:ASSOCIATED_WITH]->(n)
+SET r += {finding: "dysregulation"};
 
 MATCH (c:ClinicalConstruct {id: "ocd"}), (b:BrainStructure {id: "acc"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation", notes: "error signal that won't turn off"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation", notes: "error signal that won't turn off"};
 
 MATCH (c:ClinicalConstruct {id: "ocd"}), (b:BrainStructure {id: "ofc"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation", notes: "OFC-striatal loop"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation", notes: "OFC-striatal loop"};
 
 MATCH (c:ClinicalConstruct {id: "panic_disorder"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation"};
 
 MATCH (c:ClinicalConstruct {id: "panic_disorder"}), (b:BrainStructure {id: "pag"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation", notes: "suffocation alarm theory"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation", notes: "suffocation alarm theory"};
 
 MATCH (c:ClinicalConstruct {id: "social_anxiety"}), (b:BrainStructure {id: "amygdala"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "hyperactivation"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "hyperactivation"};
 
 MATCH (c:ClinicalConstruct {id: "dissociation"}), (b:BrainStructure {id: "insula"})
-CREATE (c)-[:ASSOCIATED_WITH {finding: "altered_connectivity"}]->(b);
+MERGE (c)-[r:ASSOCIATED_WITH]->(b)
+SET r += {finding: "altered_connectivity"};
 
 
 // ============================================================
@@ -1191,71 +1291,72 @@ CREATE (c)-[:ASSOCIATED_WITH {finding: "altered_connectivity"}]->(b);
 
 // P-Factor to Spectra
 MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (int)-[:CONTRIBUTES_TO]->(pf);
+MERGE (int)-[:CONTRIBUTES_TO]->(pf);
 
 MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (ext:HiTOPConstruct {id: "hitop_externalizing"})
-CREATE (ext)-[:CONTRIBUTES_TO]->(pf);
+MERGE (ext)-[:CONTRIBUTES_TO]->(pf);
 
 MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (td:HiTOPConstruct {id: "hitop_thought_disorder"})
-CREATE (td)-[:CONTRIBUTES_TO]->(pf);
+MERGE (td)-[:CONTRIBUTES_TO]->(pf);
 
 MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (som:HiTOPConstruct {id: "hitop_somatoform"})
-CREATE (som)-[:CONTRIBUTES_TO]->(pf);
+MERGE (som)-[:CONTRIBUTES_TO]->(pf);
 
 MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (det:HiTOPConstruct {id: "hitop_detachment"})
-CREATE (det)-[:CONTRIBUTES_TO]->(pf);
+MERGE (det)-[:CONTRIBUTES_TO]->(pf);
 
 // P-Factor Neural Correlates
 MATCH (pf:HiTOPConstruct {id: "hitop_p_factor"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (pf)-[:ASSOCIATED_WITH {finding: "dysregulation"}]->(mpfc);
+MERGE (pf)-[r:ASSOCIATED_WITH]->(mpfc)
+SET r += {finding: "dysregulation"};
 
 // Subfactors to Spectra
 MATCH (dist:HiTOPConstruct {id: "hitop_distress"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (dist)-[:PART_OF]->(int);
+MERGE (dist)-[:PART_OF]->(int);
 
 MATCH (fear:HiTOPConstruct {id: "hitop_fear"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (fear)-[:PART_OF]->(int);
+MERGE (fear)-[:PART_OF]->(int);
 
 // Clinical Constructs to HiTOP Spectra
 MATCH (mdd:ClinicalConstruct {id: "mdd"}), (dist:HiTOPConstruct {id: "hitop_distress"})
-CREATE (mdd)-[:MAPS_TO]->(dist);
+MERGE (mdd)-[:MAPS_TO]->(dist);
 
 MATCH (gad:ClinicalConstruct {id: "gad"}), (dist:HiTOPConstruct {id: "hitop_distress"})
-CREATE (gad)-[:MAPS_TO]->(dist);
+MERGE (gad)-[:MAPS_TO]->(dist);
 
 MATCH (ptsd:ClinicalConstruct {id: "ptsd"}), (int:HiTOPConstruct {id: "hitop_internalizing"})
-CREATE (ptsd)-[:MAPS_TO]->(int);
+MERGE (ptsd)-[:MAPS_TO]->(int);
 
 MATCH (panic:ClinicalConstruct {id: "panic_disorder"}), (fear:HiTOPConstruct {id: "hitop_fear"})
-CREATE (panic)-[:MAPS_TO]->(fear);
+MERGE (panic)-[:MAPS_TO]->(fear);
 
 MATCH (sad:ClinicalConstruct {id: "social_anxiety"}), (fear:HiTOPConstruct {id: "hitop_fear"})
-CREATE (sad)-[:MAPS_TO]->(fear);
+MERGE (sad)-[:MAPS_TO]->(fear);
 
 MATCH (adhd:ClinicalConstruct {id: "adhd"}), (ext:HiTOPConstruct {id: "hitop_externalizing"})
-CREATE (adhd)-[:MAPS_TO]->(ext);
+MERGE (adhd)-[:MAPS_TO]->(ext);
 
 // HiTOP Spectra to Neural Circuitry
 MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (int)-[:KEY_CIRCUIT]->(amyg);
+MERGE (int)-[:KEY_CIRCUIT]->(amyg);
 
 MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (int)-[:KEY_CIRCUIT]->(mpfc);
+MERGE (int)-[:KEY_CIRCUIT]->(mpfc);
 
 MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (int)-[:KEY_CIRCUIT]->(dacc);
+MERGE (int)-[:KEY_CIRCUIT]->(dacc);
 
 MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (ins:BrainStructure {id: "insula"})
-CREATE (int)-[:KEY_CIRCUIT]->(ins);
+MERGE (int)-[:KEY_CIRCUIT]->(ins);
 
 MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (nacc:BrainStructure {id: "nucleus_accumbens"})
-CREATE (ext)-[:KEY_CIRCUIT]->(nacc);
+MERGE (ext)-[:KEY_CIRCUIT]->(nacc);
 
 MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (dlpfc:BrainStructure {id: "dlpfc"})
-CREATE (ext)-[:KEY_CIRCUIT]->(dlpfc);
+MERGE (ext)-[:KEY_CIRCUIT]->(dlpfc);
 
 MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (ofc:BrainStructure {id: "ofc"})
-CREATE (ext)-[:KEY_CIRCUIT]->(ofc);
+MERGE (ext)-[:KEY_CIRCUIT]->(ofc);
 
 
 // ============================================================
@@ -1264,61 +1365,61 @@ CREATE (ext)-[:KEY_CIRCUIT]->(ofc);
 
 // Constructs to Domains
 MATCH (at:RDoCConstruct {id: "rdoc_acute_threat"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (at)-[:BELONGS_TO]->(nv);
+MERGE (at)-[:BELONGS_TO]->(nv);
 
 MATCH (pt:RDoCConstruct {id: "rdoc_potential_threat"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (pt)-[:BELONGS_TO]->(nv);
+MERGE (pt)-[:BELONGS_TO]->(nv);
 
 MATCH (loss:RDoCConstruct {id: "rdoc_loss"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (loss)-[:BELONGS_TO]->(nv);
+MERGE (loss)-[:BELONGS_TO]->(nv);
 
 MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (soc:RDoCDomain {id: "rdoc_social"})
-CREATE (sp)-[:BELONGS_TO]->(soc);
+MERGE (sp)-[:BELONGS_TO]->(soc);
 
 MATCH (aff:RDoCConstruct {id: "rdoc_affiliation"}), (soc:RDoCDomain {id: "rdoc_social"})
-CREATE (aff)-[:BELONGS_TO]->(soc);
+MERGE (aff)-[:BELONGS_TO]->(soc);
 
 // RDoC Constructs to Neural Circuits
 MATCH (at:RDoCConstruct {id: "rdoc_acute_threat"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (at)-[:PRIMARY_CIRCUIT]->(amyg);
+MERGE (at)-[:PRIMARY_CIRCUIT]->(amyg);
 
 MATCH (at:RDoCConstruct {id: "rdoc_acute_threat"}), (pag:BrainStructure {id: "pag"})
-CREATE (at)-[:PRIMARY_CIRCUIT]->(pag);
+MERGE (at)-[:PRIMARY_CIRCUIT]->(pag);
 
 MATCH (pt:RDoCConstruct {id: "rdoc_potential_threat"}), (bnst:BrainStructure {id: "bnst"})
-CREATE (pt)-[:PRIMARY_CIRCUIT]->(bnst);
+MERGE (pt)-[:PRIMARY_CIRCUIT]->(bnst);
 
 MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (sp)-[:PRIMARY_CIRCUIT]->(mpfc);
+MERGE (sp)-[:PRIMARY_CIRCUIT]->(mpfc);
 
 MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (pcc:BrainStructure {id: "pcc"})
-CREATE (sp)-[:PRIMARY_CIRCUIT]->(pcc);
+MERGE (sp)-[:PRIMARY_CIRCUIT]->(pcc);
 
 MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (ins:BrainStructure {id: "insula"})
-CREATE (sp)-[:PRIMARY_CIRCUIT]->(ins);
+MERGE (sp)-[:PRIMARY_CIRCUIT]->(ins);
 
 // RDoC to Therapy Concepts (Self-perception as anchor for Self/Wise Mind/Observer Self)
 MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (self:TherapyConcept {id: "ifs_self"})
-CREATE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(self);
+MERGE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(self);
 
 MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (wm:TherapyConcept {id: "dbt_wise_mind"})
-CREATE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(wm);
+MERGE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(wm);
 
 MATCH (sp:RDoCConstruct {id: "rdoc_self_perception"}), (sac:TherapyConcept {id: "act_self_context"})
-CREATE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(sac);
+MERGE (sp)-[:NEUROBIOLOGICAL_ANCHOR_FOR]->(sac);
 
 // RDoC-HiTOP Cross-references
 MATCH (int:HiTOPConstruct {id: "hitop_internalizing"}), (nv:RDoCDomain {id: "rdoc_negative_valence"})
-CREATE (int)-[:RDOC_DOMAIN_ASSOCIATION]->(nv);
+MERGE (int)-[:RDOC_DOMAIN_ASSOCIATION]->(nv);
 
 MATCH (ext:HiTOPConstruct {id: "hitop_externalizing"}), (pv:RDoCDomain {id: "rdoc_positive_valence"})
-CREATE (ext)-[:RDOC_DOMAIN_ASSOCIATION]->(pv);
+MERGE (ext)-[:RDOC_DOMAIN_ASSOCIATION]->(pv);
 
 MATCH (td:HiTOPConstruct {id: "hitop_thought_disorder"}), (cog:RDoCDomain {id: "rdoc_cognitive"})
-CREATE (td)-[:RDOC_DOMAIN_ASSOCIATION]->(cog);
+MERGE (td)-[:RDOC_DOMAIN_ASSOCIATION]->(cog);
 
 MATCH (som:HiTOPConstruct {id: "hitop_somatoform"}), (ar:RDoCDomain {id: "rdoc_arousal"})
-CREATE (som)-[:RDOC_DOMAIN_ASSOCIATION]->(ar);
+MERGE (som)-[:RDOC_DOMAIN_ASSOCIATION]->(ar);
 
 
 // ============================================================
@@ -1327,61 +1428,61 @@ CREATE (som)-[:RDOC_DOMAIN_ASSOCIATION]->(ar);
 
 // Zone to Polyvagal State
 MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (vv:TherapyConcept {id: "pv_ventral_vagal"})
-CREATE (opt)-[:CORRESPONDS_TO]->(vv);
+MERGE (opt)-[:CORRESPONDS_TO]->(vv);
 
 MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (symp:TherapyConcept {id: "pv_sympathetic"})
-CREATE (hyper)-[:CORRESPONDS_TO]->(symp);
+MERGE (hyper)-[:CORRESPONDS_TO]->(symp);
 
 MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (dv:TherapyConcept {id: "pv_dorsal_vagal"})
-CREATE (hypo)-[:CORRESPONDS_TO]->(dv);
+MERGE (hypo)-[:CORRESPONDS_TO]->(dv);
 
 // Zones to Neural Activity
 MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (cen:FunctionalNetwork {id: "cen"})
-CREATE (opt)-[:ACTIVATES]->(cen);
+MERGE (opt)-[:ACTIVATES]->(cen);
 
 MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (opt)-[:ENGAGES]->(mpfc);
+MERGE (opt)-[:ENGAGES]->(mpfc);
 
 MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (hyper)-[:ACTIVATES]->(amyg);
+MERGE (hyper)-[:ACTIVATES]->(amyg);
 
 MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (pfc:BrainStructure {id: "pfc"})
-CREATE (hyper)-[:DEACTIVATES]->(pfc);
+MERGE (hyper)-[:DEACTIVATES]->(pfc);
 
 MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (thal:BrainStructure {id: "thalamus"})
-CREATE (hypo)-[:DEACTIVATES]->(thal);
+MERGE (hypo)-[:DEACTIVATES]->(thal);
 
 // Zones to Emotions
 MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (cur:Emotion {id: "curiosity"})
-CREATE (opt)-[:ENABLES]->(cur);
+MERGE (opt)-[:ENABLES]->(cur);
 
 MATCH (opt:TherapyConcept {id: "wot_optimal_zone"}), (calm:Emotion {id: "calm"})
-CREATE (opt)-[:ENABLES]->(calm);
+MERGE (opt)-[:ENABLES]->(calm);
 
 MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (panic:Emotion {id: "panic"})
-CREATE (hyper)-[:ASSOCIATED_WITH]->(panic);
+MERGE (hyper)-[:ASSOCIATED_WITH]->(panic);
 
 MATCH (hyper:TherapyConcept {id: "wot_hyperarousal"}), (anger:Emotion {id: "anger"})
-CREATE (hyper)-[:ASSOCIATED_WITH]->(anger);
+MERGE (hyper)-[:ASSOCIATED_WITH]->(anger);
 
 MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (numb:Emotion {id: "numbness"})
-CREATE (hypo)-[:ASSOCIATED_WITH]->(numb);
+MERGE (hypo)-[:ASSOCIATED_WITH]->(numb);
 
 MATCH (hypo:TherapyConcept {id: "wot_hypoarousal"}), (diss:ClinicalConstruct {id: "dissociation"})
-CREATE (hypo)-[:ASSOCIATED_WITH]->(diss);
+MERGE (hypo)-[:ASSOCIATED_WITH]->(diss);
 
 // Window of Tolerance as container
 MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (opt:TherapyConcept {id: "wot_optimal_zone"})
-CREATE (opt)-[:PART_OF]->(wot);
+MERGE (opt)-[:PART_OF]->(wot);
 
 MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (hyper:TherapyConcept {id: "wot_hyperarousal"})
-CREATE (hyper)-[:PART_OF]->(wot);
+MERGE (hyper)-[:PART_OF]->(wot);
 
 MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (hypo:TherapyConcept {id: "wot_hypoarousal"})
-CREATE (hypo)-[:PART_OF]->(wot);
+MERGE (hypo)-[:PART_OF]->(wot);
 
 MATCH (wot:TherapyConcept {id: "window_of_tolerance"}), (ff:TherapyConcept {id: "wot_frozen_flight"})
-CREATE (ff)-[:PART_OF]->(wot);
+MERGE (ff)-[:PART_OF]->(wot);
 
 
 // ============================================================
@@ -1389,37 +1490,40 @@ CREATE (ff)-[:PART_OF]->(wot);
 // ============================================================
 
 MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (aip:TherapyConcept {id: "emdr_aip"})
-CREATE (consol)-[:MECHANISM_OF]->(aip);
+MERGE (consol)-[:MECHANISM_OF]->(aip);
 
 MATCH (gamma:TherapyConcept {id: "emdr_gamma"}), (consol:TherapyConcept {id: "emdr_consolidation"})
-CREATE (gamma)-[:MEDIATES]->(consol);
+MERGE (gamma)-[:MEDIATES]->(consol);
 
 MATCH (recon:TherapyConcept {id: "emdr_reconsolidation"}), (consol:TherapyConcept {id: "emdr_consolidation"})
-CREATE (recon)-[:ENABLES]->(consol);
+MERGE (recon)-[:ENABLES]->(consol);
 
 // Consolidation to Brain Structures
 MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (hippo:BrainStructure {id: "hippocampus"})
-CREATE (consol)-[:INVOLVES {role: "source"}]->(hippo);
+MERGE (consol)-[r:INVOLVES]->(hippo)
+SET r += {role: "source"};
 
 MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (consol)-[:INVOLVES {role: "unbinding_from"}]->(amyg);
+MERGE (consol)-[r:INVOLVES]->(amyg)
+SET r += {role: "unbinding_from"};
 
 MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (consol)-[:INVOLVES {role: "linking_to"}]->(mpfc);
+MERGE (consol)-[r:INVOLVES]->(mpfc)
+SET r += {role: "linking_to"};
 
 // Gamma oscillations to memory consolidation
 MATCH (gamma:TherapyConcept {id: "emdr_gamma"}), (mc:Function {id: "memory_consolidation"})
-CREATE (gamma)-[:MODULATES]->(mc);
+MERGE (gamma)-[:MODULATES]->(mc);
 
 // EMDR modality connections
 MATCH (consol:TherapyConcept {id: "emdr_consolidation"}), (emdr:TherapyModality {id: "emdr"})
-CREATE (consol)-[:BELONGS_TO]->(emdr);
+MERGE (consol)-[:BELONGS_TO]->(emdr);
 
 MATCH (gamma:TherapyConcept {id: "emdr_gamma"}), (emdr:TherapyModality {id: "emdr"})
-CREATE (gamma)-[:BELONGS_TO]->(emdr);
+MERGE (gamma)-[:BELONGS_TO]->(emdr);
 
 MATCH (recon:TherapyConcept {id: "emdr_reconsolidation"}), (emdr:TherapyModality {id: "emdr"})
-CREATE (recon)-[:BELONGS_TO]->(emdr);
+MERGE (recon)-[:BELONGS_TO]->(emdr);
 
 
 // ============================================================
@@ -1428,44 +1532,48 @@ CREATE (recon)-[:BELONGS_TO]->(emdr);
 
 // Titration to mPFC-Amygdala modulation
 MATCH (tit:TherapyConcept {id: "se_titration"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (tit)-[:ENGAGES {mechanism: "maintains mPFC online during trauma processing"}]->(mpfc);
+MERGE (tit)-[r:ENGAGES]->(mpfc)
+SET r += {mechanism: "maintains mPFC online during trauma processing"};
 
 MATCH (tit:TherapyConcept {id: "se_titration"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (tit)-[:MODULATES {direction: "prevents_overwhelm"}]->(amyg);
+MERGE (tit)-[r:MODULATES]->(amyg)
+SET r += {direction: "prevents_overwhelm"};
 
 // Titration keeps client in Window of Tolerance
 MATCH (tit:TherapyConcept {id: "se_titration"}), (opt:TherapyConcept {id: "wot_optimal_zone"})
-CREATE (tit)-[:MAINTAINS]->(opt);
+MERGE (tit)-[:MAINTAINS]->(opt);
 
 // Pendulation to Insula (interoceptive awareness)
 MATCH (pend:TherapyConcept {id: "se_pendulation"}), (ins:BrainStructure {id: "insula"})
-CREATE (pend)-[:MEDIATED_BY {mechanism: "insular interoceptive awareness"}]->(ins);
+MERGE (pend)-[r:MEDIATED_BY]->(ins)
+SET r += {mechanism: "insular interoceptive awareness"};
 
 // Pendulation to Vagal Brake
 MATCH (pend:TherapyConcept {id: "se_pendulation"}), (vb:TherapyConcept {id: "pv_vagal_brake"})
-CREATE (pend)-[:UTILIZES]->(vb);
+MERGE (pend)-[:UTILIZES]->(vb);
 
 // Pendulation to Salience Network
 MATCH (pend:TherapyConcept {id: "se_pendulation"}), (sn:FunctionalNetwork {id: "salience_network"})
-CREATE (pend)-[:REWIRES]->(sn);
+MERGE (pend)-[:REWIRES]->(sn);
 
 // Resourcing to Reward System
 MATCH (res:TherapyConcept {id: "se_resourcing"}), (nacc:BrainStructure {id: "nucleus_accumbens"})
-CREATE (res)-[:ACTIVATES]->(nacc);
+MERGE (res)-[:ACTIVATES]->(nacc);
 
 MATCH (res:TherapyConcept {id: "se_resourcing"}), (oxy:NeurochemicalSystem {id: "oxytocin"})
-CREATE (res)-[:PROMOTES]->(oxy);
+MERGE (res)-[:PROMOTES]->(oxy);
 
 // Discharge to Motor System
 MATCH (disch:TherapyConcept {id: "se_discharge"}), (mc:BrainStructure {id: "motor_cortex"})
-CREATE (disch)-[:INVOLVES {mechanism: "motor system completion"}]->(mc);
+MERGE (disch)-[r:INVOLVES]->(mc)
+SET r += {mechanism: "motor system completion"};
 
 // Felt Sense to Interoception
 MATCH (fs:TherapyConcept {id: "se_felt_sense"}), (int:Function {id: "interoception"})
-CREATE (fs)-[:ENGAGES]->(int);
+MERGE (fs)-[:ENGAGES]->(int);
 
 MATCH (fs:TherapyConcept {id: "se_felt_sense"}), (ai:BrainStructure {id: "anterior_insula"})
-CREATE (fs)-[:PRIMARY_CIRCUIT]->(ai);
+MERGE (fs)-[:PRIMARY_CIRCUIT]->(ai);
 
 
 // ============================================================
@@ -1474,63 +1582,68 @@ CREATE (fs)-[:PRIMARY_CIRCUIT]->(ai);
 
 // Shame Neural Signature connections
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (dlpfc:BrainStructure {id: "dlpfc"})
-CREATE (sns)-[:PRIMARY_HUB]->(dlpfc);
+MERGE (sns)-[:PRIMARY_HUB]->(dlpfc);
 
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (pcc:BrainStructure {id: "pcc"})
-CREATE (sns)-[:PRIMARY_HUB]->(pcc);
+MERGE (sns)-[:PRIMARY_HUB]->(pcc);
 
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (sns)-[:PRIMARY_HUB]->(dacc);
+MERGE (sns)-[:PRIMARY_HUB]->(dacc);
 
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (sc:BrainStructure {id: "somatosensory_cortex"})
-CREATE (sns)-[:PRIMARY_HUB]->(sc);
+MERGE (sns)-[:PRIMARY_HUB]->(sc);
 
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (sns)-[:SUBCORTICAL_ACTIVATION {finding: "hypersensitivity in MDD"}]->(amyg);
+MERGE (sns)-[r:SUBCORTICAL_ACTIVATION]->(amyg)
+SET r += {finding: "hypersensitivity in MDD"};
 
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (pi:BrainStructure {id: "posterior_insula"})
-CREATE (sns)-[:SUBCORTICAL_ACTIVATION]->(pi);
+MERGE (sns)-[:SUBCORTICAL_ACTIVATION]->(pi);
 
 // Link shame neural signature to shame emotions
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (hs:Emotion {id: "hot_shame"})
-CREATE (sns)-[:SIGNATURE_OF]->(hs);
+MERGE (sns)-[:SIGNATURE_OF]->(hs);
 
 MATCH (sns:NeuralSignature {id: "shame_neural"}), (cs:Emotion {id: "cold_shame"})
-CREATE (sns)-[:SIGNATURE_OF]->(cs);
+MERGE (sns)-[:SIGNATURE_OF]->(cs);
 
 // Guilt Neural Signature connections
 MATCH (gns:NeuralSignature {id: "guilt_neural"}), (tpj:BrainStructure {id: "tpj"})
-CREATE (gns)-[:PRIMARY_HUB {function: "theory of mind, other perspective"}]->(tpj);
+MERGE (gns)-[r:PRIMARY_HUB]->(tpj)
+SET r += {function: "theory of mind, other perspective"};
 
 MATCH (gns:NeuralSignature {id: "guilt_neural"}), (atl:BrainStructure {id: "atl"})
-CREATE (gns)-[:PRIMARY_HUB {function: "social semantic knowledge"}]->(atl);
+MERGE (gns)-[r:PRIMARY_HUB]->(atl)
+SET r += {function: "social semantic knowledge"};
 
 MATCH (gns:NeuralSignature {id: "guilt_neural"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (gns)-[:PRIMARY_HUB]->(mpfc);
+MERGE (gns)-[:PRIMARY_HUB]->(mpfc);
 
 // Shared core for both shame and guilt
 MATCH (gns:NeuralSignature {id: "guilt_neural"}), (ai:BrainStructure {id: "anterior_insula"})
-CREATE (gns)-[:SHARED_CORE {notes: "emotional awareness"}]->(ai);
+MERGE (gns)-[r:SHARED_CORE]->(ai)
+SET r += {notes: "emotional awareness"};
 
 MATCH (gns:NeuralSignature {id: "guilt_neural"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (gns)-[:SHARED_CORE {notes: "negative affect/conflict"}]->(dacc);
+MERGE (gns)-[r:SHARED_CORE]->(dacc)
+SET r += {notes: "negative affect/conflict"};
 
 // Link guilt neural signature to guilt emotion
 MATCH (gns:NeuralSignature {id: "guilt_neural"}), (guilt:Emotion {id: "guilt"})
-CREATE (gns)-[:SIGNATURE_OF]->(guilt);
+MERGE (gns)-[:SIGNATURE_OF]->(guilt);
 
 // Social Pain signature connections
 MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (dacc:BrainStructure {id: "dacc"})
-CREATE (sp)-[:PRIMARY_HUB]->(dacc);
+MERGE (sp)-[:PRIMARY_HUB]->(dacc);
 
 MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (ai:BrainStructure {id: "anterior_insula"})
-CREATE (sp)-[:PRIMARY_HUB]->(ai);
+MERGE (sp)-[:PRIMARY_HUB]->(ai);
 
 MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (thal:BrainStructure {id: "thalamus"})
-CREATE (sp)-[:PRIMARY_HUB]->(thal);
+MERGE (sp)-[:PRIMARY_HUB]->(thal);
 
 MATCH (sp:NeuralSignature {id: "social_pain_neural"}), (rej:Emotion {id: "rejection"})
-CREATE (sp)-[:SIGNATURE_OF]->(rej);
+MERGE (sp)-[:SIGNATURE_OF]->(rej);
 
 
 // ============================================================
@@ -1538,24 +1651,26 @@ CREATE (sp)-[:SIGNATURE_OF]->(rej);
 // ============================================================
 
 MATCH (ret:TherapyConcept {id: "cpt_retrieval"}), (dlpfc:BrainStructure {id: "dlpfc"})
-CREATE (ret)-[:NEURAL_HUB {side: "left", brodmann_area: "9/46"}]->(dlpfc);
+MERGE (ret)-[r:NEURAL_HUB]->(dlpfc)
+SET r += {side: "left", brodmann_area: "9/46"};
 
 MATCH (ctrl:TherapyConcept {id: "cpt_control"}), (acc:BrainStructure {id: "acc"})
-CREATE (ctrl)-[:NEURAL_HUB {side: "left", brodmann_area: "24/32"}]->(acc);
+MERGE (ctrl)-[r:NEURAL_HUB]->(acc)
+SET r += {side: "left", brodmann_area: "24/32"};
 
 // CPT concepts belong to CPT modality
 MATCH (ret:TherapyConcept {id: "cpt_retrieval"}), (cpt:TherapyModality {id: "cpt"})
-CREATE (ret)-[:BELONGS_TO]->(cpt);
+MERGE (ret)-[:BELONGS_TO]->(cpt);
 
 MATCH (ctrl:TherapyConcept {id: "cpt_control"}), (cpt:TherapyModality {id: "cpt"})
-CREATE (ctrl)-[:BELONGS_TO]->(cpt);
+MERGE (ctrl)-[:BELONGS_TO]->(cpt);
 
 // Link to stuck points
 MATCH (ret:TherapyConcept {id: "cpt_retrieval"}), (sp:TherapyConcept {id: "cpt_stuck_point"})
-CREATE (ret)-[:ADDRESSES]->(sp);
+MERGE (ret)-[:ADDRESSES]->(sp);
 
 MATCH (ctrl:TherapyConcept {id: "cpt_control"}), (sp:TherapyConcept {id: "cpt_stuck_point"})
-CREATE (ctrl)-[:ADDRESSES]->(sp);
+MERGE (ctrl)-[:ADDRESSES]->(sp);
 
 
 // ============================================================
@@ -1564,25 +1679,30 @@ CREATE (ctrl)-[:ADDRESSES]->(sp);
 
 // Self to mPFC (primary hub)
 MATCH (self:TherapyConcept {id: "ifs_self"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (self)-[:NEURAL_HUB {mechanism: "metacognitive magic, balances neurochemicals"}]->(mpfc);
+MERGE (self)-[r:NEURAL_HUB]->(mpfc)
+SET r += {mechanism: "metacognitive magic, balances neurochemicals"};
 
 // Self to neurochemicals
 MATCH (self:TherapyConcept {id: "ifs_self"}), (ser:NeurochemicalSystem {id: "serotonin"})
-CREATE (self)-[:ASSOCIATED_WITH {role: "calm stabilizer"}]->(ser);
+MERGE (self)-[r:ASSOCIATED_WITH]->(ser)
+SET r += {role: "calm stabilizer"};
 
 MATCH (self:TherapyConcept {id: "ifs_self"}), (oxy:NeurochemicalSystem {id: "oxytocin"})
-CREATE (self)-[:ASSOCIATED_WITH {role: "trust between Self and parts"}]->(oxy);
+MERGE (self)-[r:ASSOCIATED_WITH]->(oxy)
+SET r += {role: "trust between Self and parts"};
 
 // Self inhibits amygdala
 MATCH (self:TherapyConcept {id: "ifs_self"}), (amyg:BrainStructure {id: "amygdala"})
-CREATE (self)-[:INHIBITS {mechanism: "inhibitory signals quiet alarm system"}]->(amyg);
+MERGE (self)-[r:INHIBITS]->(amyg)
+SET r += {mechanism: "inhibitory signals quiet alarm system"};
 
 // Unblending engages mPFC-ACC axis
 MATCH (unb:TherapyConcept {id: "ifs_unblending"}), (mpfc:BrainStructure {id: "mpfc"})
-CREATE (unb)-[:ACTIVATES]->(mpfc);
+MERGE (unb)-[:ACTIVATES]->(mpfc);
 
 MATCH (unb:TherapyConcept {id: "ifs_unblending"}), (acc:BrainStructure {id: "acc"})
-CREATE (unb)-[:ACTIVATES {role: "conflict manager, releases serotonin"}]->(acc);
+MERGE (unb)-[r:ACTIVATES]->(acc)
+SET r += {role: "conflict manager, releases serotonin"};
 
 
 // ============================================================
@@ -1590,10 +1710,11 @@ CREATE (unb)-[:ACTIVATES {role: "conflict manager, releases serotonin"}]->(acc);
 // ============================================================
 
 MATCH (atl:BrainStructure {id: "atl"}), (sc:Function {id: "social_cognition"})
-CREATE (atl)-[:IMPLICATED_IN {role: "social semantic knowledge"}]->(sc);
+MERGE (atl)-[r:IMPLICATED_IN]->(sc)
+SET r += {role: "social semantic knowledge"};
 
 MATCH (atl:BrainStructure {id: "atl"}), (tc:BrainStructure {id: "temporal_cortex"})
-CREATE (atl)-[:PART_OF]->(tc);
+MERGE (atl)-[:PART_OF]->(tc);
 
 
 // ============================================================
@@ -1602,16 +1723,18 @@ CREATE (atl)-[:PART_OF]->(tc);
 // ============================================================
 
 MATCH (vmpfc:BrainStructure {id: "vmpfc"}), (fe:Function {id: "fear_extinction"})
-CREATE (vmpfc)-[:HOMOLOGUE_OF {rodent_structure: "infralimbic cortex", evidence: "translational research"}]->(fe);
+MERGE (vmpfc)-[r:HOMOLOGUE_OF]->(fe)
+SET r += {rodent_structure: "infralimbic cortex", evidence: "translational research"};
 
 MATCH (fe:Function {id: "fear_extinction"}), (da:NeurochemicalSystem {id: "dopamine"})
-CREATE (fe)-[:MEDIATED_BY {role: "reward learning"}]->(da);
+MERGE (fe)-[r:MEDIATED_BY]->(da)
+SET r += {role: "reward learning"};
 
 MATCH (fe:Function {id: "fear_extinction"}), (hippo:BrainStructure {id: "hippocampus"})
-CREATE (fe)-[:CONTEXT_DEPENDENT_ON]->(hippo);
+MERGE (fe)-[:CONTEXT_DEPENDENT_ON]->(hippo);
 
 MATCH (fe:Function {id: "fear_extinction"}), (cereb:BrainStructure {id: "cerebellum"})
-CREATE (fe)-[:INVOLVES]->(cereb);
+MERGE (fe)-[:INVOLVES]->(cereb);
 
 
 // ============================================================
@@ -1626,16 +1749,16 @@ CREATE (fe)-[:INVOLVES]->(cereb);
 // ============================================================
 
 MATCH (dlpag:BrainStructure {id: "dlpag"}), (pag:BrainStructure {id: "pag"})
-CREATE (dlpag)-[:PART_OF]->(pag);
+MERGE (dlpag)-[:PART_OF]->(pag);
 
 MATCH (vlpag:BrainStructure {id: "vlpag"}), (pag:BrainStructure {id: "pag"})
-CREATE (vlpag)-[:PART_OF]->(pag);
+MERGE (vlpag)-[:PART_OF]->(pag);
 
 MATCH (dorsal:BrainStructure {id: "dorsal_striatum"}), (bg:BrainStructure {id: "basal_ganglia"})
-CREATE (dorsal)-[:PART_OF]->(bg);
+MERGE (dorsal)-[:PART_OF]->(bg);
 
 MATCH (precuneus:BrainStructure {id: "precuneus"}), (dmn:FunctionalNetwork {id: "dmn"})
-CREATE (precuneus)-[:PARTICIPATES_IN]->(dmn);
+MERGE (precuneus)-[:PARTICIPATES_IN]->(dmn);
 
 
 // ============================================================
@@ -1643,28 +1766,36 @@ CREATE (precuneus)-[:PARTICIPATES_IN]->(dmn);
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "amygdala"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "anterior_insula"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "dacc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "locus_coeruleus"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "arousal_amplifier"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "arousal_amplifier"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "bnst"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", conditional: "increases with sustained/uncertain threat"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", conditional: "increases with sustained/uncertain threat"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "dlpfc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "vmpfc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (b:BrainStructure {id: "hippocampus"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "contextual safety signaling less effective"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong", notes: "contextual safety signaling less effective"};
 
 
 // ============================================================
@@ -1672,19 +1803,24 @@ CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: 
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "bnst"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "primary_driver"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "primary_driver"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "amygdala"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "sustained_support"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "sustained_support"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "ips"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", network: "DAN"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", network: "DAN"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "fef"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", network: "DAN"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", network: "DAN"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (b:BrainStructure {id: "locus_coeruleus"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "tonic_arousal"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "tonic_arousal"};
 
 
 // ============================================================
@@ -1692,25 +1828,32 @@ CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "amygdala"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "anterior_insula"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dacc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dlpag"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "active_defense_component"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Moderate", role: "active_defense_component"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "dlpfc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "essentially_offline"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong", notes: "essentially_offline"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "ofc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate-Strong", role: "key_differentiator"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Moderate-Strong", role: "key_differentiator"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (b:BrainStructure {id: "vmpfc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong"};
 
 
 // ============================================================
@@ -1718,13 +1861,16 @@ CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "vlpag"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "passive_defense_coordinator"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Moderate", role: "passive_defense_coordinator"};
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "thalamus"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", role: "sensory_relay_reduced"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Moderate", role: "sensory_relay_reduced"};
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (b:BrainStructure {id: "motor_cortex"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Moderate"};
 
 
 // ============================================================
@@ -1732,19 +1878,24 @@ CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b)
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "vmpfc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "over_inhibitory_control"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "over_inhibitory_control"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "pcc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "precuneus"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", notes: "depersonalization"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "amygdala"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "emotional_numbing_via_top_down"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong", notes: "emotional_numbing_via_top_down"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (b:BrainStructure {id: "thalamus"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Moderate"};
 
 
 // ============================================================
@@ -1752,22 +1903,28 @@ CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate"}]->(b)
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "mpfc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "pcc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "precuneus"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "DMN_core"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "vacc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "affective_coloring", notes: "sgACC coupling creates caustic compound with DMN"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "affective_coloring", notes: "sgACC coupling creates caustic compound with DMN"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "dlpfc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", conditional: "stronger in depressive rumination; variable in anxious worry"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong", conditional: "stronger in depressive rumination; variable in anxious worry"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (b:BrainStructure {id: "hippocampus"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong"};
 
 
 // ============================================================
@@ -1775,16 +1932,20 @@ CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong"}]->(b);
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "vacc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "overlap_with_rumination", confidence: "low"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Moderate", role: "overlap_with_rumination", confidence: "low"};
 
 MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "nucleus_accumbens"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "blunted_reactivity"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong", notes: "blunted_reactivity"};
 
 MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "vta"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", notes: "DA_signaling_reduced"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong", notes: "DA_signaling_reduced"};
 
 MATCH (p:ActivationPattern {id: "reward_drive_low"}), (b:BrainStructure {id: "dorsal_striatum"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes: "goal_initiation"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Moderate", notes: "goal_initiation"};
 
 
 // ============================================================
@@ -1792,28 +1953,36 @@ CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "dacc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "social_pain_alarm"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "social_pain_alarm"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "anterior_insula"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "mpfc"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Strong", role: "self_evaluation"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Strong", role: "self_evaluation"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "tpj"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "mentalizing_guilt_specific"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Moderate", role: "mentalizing_guilt_specific"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "premotor_cortex"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "ifg"})
-CREATE (p)-[:INVOLVES {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "overactive", evidenceGrade: "Moderate", role: "behavioral_inhibition_hide"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "vmpfc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Strong", conditional: "state-dependent, not a fixed deficit"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Strong", conditional: "state-dependent, not a fixed deficit"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (b:BrainStructure {id: "pcc"})
-CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes: "reduced_in_shame_vs_active_in_guilt"}]->(b);
+MERGE (p)-[r:INVOLVES]->(b)
+SET r += {direction: "suppressed", evidenceGrade: "Moderate", notes: "reduced_in_shame_vs_active_in_guilt"};
 
 
 // ============================================================
@@ -1821,24 +1990,30 @@ CREATE (p)-[:INVOLVES {direction: "suppressed", evidenceGrade: "Moderate", notes
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (n:FunctionalNetwork {id: "salience_network"})
-CREATE (p)-[:DOMINANT_NETWORK {state: "hyper_engaged", evidenceGrade: "Strong"}]->(n);
+MERGE (p)-[r:DOMINANT_NETWORK]->(n)
+SET r += {state: "hyper_engaged", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (n:FunctionalNetwork {id: "dan"})
-CREATE (p)-[:DOMINANT_NETWORK {evidenceGrade: "Strong"}]->(n);
+MERGE (p)-[r:DOMINANT_NETWORK]->(n)
+SET r += {evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (n:FunctionalNetwork {id: "salience_network"})
-CREATE (p)-[:DOMINANT_NETWORK {evidenceGrade: "Strong"}]->(n);
+MERGE (p)-[r:DOMINANT_NETWORK]->(n)
+SET r += {evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (n:FunctionalNetwork {id: "salience_network"})
-CREATE (p)-[:DOMINANT_NETWORK {state: "overloaded_high_gain", evidenceGrade: "Strong"}]->(n);
+MERGE (p)-[r:DOMINANT_NETWORK]->(n)
+SET r += {state: "overloaded_high_gain", evidenceGrade: "Strong"};
 
 // conservation_freeze: "Global dampening — no single dominant network" - intentionally no edge
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (n:FunctionalNetwork {id: "dmn"})
-CREATE (p)-[:DOMINANT_NETWORK {state: "altered", evidenceGrade: "Strong"}]->(n);
+MERGE (p)-[r:DOMINANT_NETWORK]->(n)
+SET r += {state: "altered", evidenceGrade: "Strong"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (n:FunctionalNetwork {id: "dmn"})
-CREATE (p)-[:DOMINANT_NETWORK {state: "dominant_with_altered_CEN_coupling", evidenceGrade: "Strong"}]->(n);
+MERGE (p)-[r:DOMINANT_NETWORK]->(n)
+SET r += {state: "dominant_with_altered_CEN_coupling", evidenceGrade: "Strong"};
 
 
 // ============================================================
@@ -1847,74 +2022,95 @@ CREATE (p)-[:DOMINANT_NETWORK {state: "dominant_with_altered_CEN_coupling", evid
 
 // Acute Alarm emotions
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "anxiety"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "panic"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "overwhelm"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (e:Emotion {id: "fear"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 // Chronic Vigilance emotions
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (e:Emotion {id: "anxiety"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", quality: "watchful"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong", quality: "watchful"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (e:Emotion {id: "stress"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 // Emotional Flooding emotions
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "overwhelm"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "anger"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", quality: "explosive"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "moderate", quality: "explosive"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (e:Emotion {id: "sadness"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", quality: "cant_stop_crying"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "moderate", quality: "cant_stop_crying"};
 
 // Conservation/Freeze emotions
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (e:Emotion {id: "numbness"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (e:Emotion {id: "emptiness"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 // Dissociation emotions
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (e:Emotion {id: "numbness"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", quality: "numb_but_alert"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong", quality: "numb_but_alert"};
 
 // Rumination Loop emotions
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "sadness"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "depressive_brooding"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong", subtype: "depressive_brooding"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "anxiety"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate", subtype: "anxious_worry"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "moderate", subtype: "anxious_worry"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (e:Emotion {id: "guilt"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "moderate"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "moderate"};
 
 // Reward Drive Low emotions
 MATCH (p:ActivationPattern {id: "reward_drive_low"}), (e:Emotion {id: "boredom"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "reward_drive_low"}), (e:Emotion {id: "emptiness"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 // Social Threat/Shame emotions
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "hot_shame"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "cold_shame"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "guilt"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "guilt"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong", subtype: "guilt"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (e:Emotion {id: "rejection"})
-CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "social_rejection"}]->(e);
+MERGE (p)-[r:ASSOCIATED_WITH]->(e)
+SET r += {strength: "strong", subtype: "social_rejection"};
 
 
 // ============================================================
@@ -1924,39 +2120,50 @@ CREATE (p)-[:ASSOCIATED_WITH {strength: "strong", subtype: "social_rejection"}]-
 
 // Sleep Loss affects arousal-related patterns
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (m:StateModulator {id: "sleep_loss_sensitization"})
-CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (m:StateModulator {id: "sleep_loss_sensitization"})
-CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (m:StateModulator {id: "sleep_loss_sensitization"})
-CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (m:StateModulator {id: "sleep_loss_sensitization"})
-CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"};
 
 MATCH (p:ActivationPattern {id: "social_threat_shame"}), (m:StateModulator {id: "sleep_loss_sensitization"})
-CREATE (p)-[:MODULATED_BY {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "amplifies_pattern", toolSequencingChange: "address_sleep_first"};
 
 // Acute Stress affects prefrontal-dependent patterns
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (m:StateModulator {id: "acute_stress_catecholamine"})
-CREATE (p)-[:MODULATED_BY {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (m:StateModulator {id: "acute_stress_catecholamine"})
-CREATE (p)-[:MODULATED_BY {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (m:StateModulator {id: "acute_stress_catecholamine"})
-CREATE (p)-[:MODULATED_BY {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "degrades_top_down_control", toolSequencingChange: "reduce_stress_before_cognitive_tools"};
 
 // Interoceptive Threat Bias affects body-signal-sensitive patterns
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (m:StateModulator {id: "interoceptive_threat_bias"})
-CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"};
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (m:StateModulator {id: "interoceptive_threat_bias"})
-CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (m:StateModulator {id: "interoceptive_threat_bias"})
-CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"}]->(m);
+MERGE (p)-[r:MODULATED_BY]->(m)
+SET r += {effect: "body_signals_interpreted_as_threats", toolSequencingChange: "interoceptive_recalibration"};
 
 
 // ============================================================
@@ -1964,22 +2171,28 @@ CREATE (p)-[:MODULATED_BY {effect: "body_signals_interpreted_as_threats", toolSe
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (s:SafetyFlag {id: "crisis_self_harm"})
-CREATE (p)-[:TRIGGERS_SAFETY {condition: "out_of_control_with_intent_language", threshold: "immediate"}]->(s);
+MERGE (p)-[r:TRIGGERS_SAFETY]->(s)
+SET r += {condition: "out_of_control_with_intent_language", threshold: "immediate"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (s:SafetyFlag {id: "crisis_suicidal"})
-CREATE (p)-[:TRIGGERS_SAFETY {condition: "dissociation_plus_suicidal_ideation", threshold: "immediate"}]->(s);
+MERGE (p)-[r:TRIGGERS_SAFETY]->(s)
+SET r += {condition: "dissociation_plus_suicidal_ideation", threshold: "immediate"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (s:SafetyFlag {id: "clinical_referral_severe_dissociation"})
-CREATE (p)-[:TRIGGERS_SAFETY {condition: "cannot_orient_to_present", threshold: "immediate"}]->(s);
+MERGE (p)-[r:TRIGGERS_SAFETY]->(s)
+SET r += {condition: "cannot_orient_to_present", threshold: "immediate"};
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (s:SafetyFlag {id: "clinical_referral_shutdown"})
-CREATE (p)-[:TRIGGERS_SAFETY {condition: "7_plus_consecutive_days", threshold: "persistent"}]->(s);
+MERGE (p)-[r:TRIGGERS_SAFETY]->(s)
+SET r += {condition: "7_plus_consecutive_days", threshold: "persistent"};
 
 MATCH (p:ActivationPattern {id: "rumination_loop"}), (s:SafetyFlag {id: "crisis_suicidal"})
-CREATE (p)-[:TRIGGERS_SAFETY {condition: "ruminative_content_involves_suicidal_ideation", threshold: "immediate"}]->(s);
+MERGE (p)-[r:TRIGGERS_SAFETY]->(s)
+SET r += {condition: "ruminative_content_involves_suicidal_ideation", threshold: "immediate"};
 
 MATCH (p:ActivationPattern {id: "reward_drive_low"}), (s:SafetyFlag {id: "clinical_referral_shutdown"})
-CREATE (p)-[:TRIGGERS_SAFETY {condition: "pervasive_anhedonia_multiple_checkins", threshold: "persistent"}]->(s);
+MERGE (p)-[r:TRIGGERS_SAFETY]->(s)
+SET r += {condition: "pervasive_anhedonia_multiple_checkins", threshold: "persistent"};
 
 
 // ============================================================
@@ -1988,15 +2201,18 @@ CREATE (p)-[:TRIGGERS_SAFETY {condition: "pervasive_anhedonia_multiple_checkins"
 
 // Social threat can escalate to reactive aggression
 MATCH (p1:ActivationPattern {id: "social_threat_shame"}), (p2:ActivationPattern {id: "reactive_aggression"})
-CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "regain_social_status", weight: "weak"}]->(p2);
+MERGE (p1)-[r:CAN_ESCALATE_TO]->(p2)
+SET r += {mechanism: "regain_social_status", weight: "weak"};
 
 // Conservation freeze rebound
 MATCH (p1:ActivationPattern {id: "conservation_freeze"}), (p2:ActivationPattern {id: "acute_alarm"})
-CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "rebound_from_pulling_out_too_quickly", weight: "moderate"}]->(p2);
+MERGE (p1)-[r:CAN_ESCALATE_TO]->(p2)
+SET r += {mechanism: "rebound_from_pulling_out_too_quickly", weight: "moderate"};
 
 // Acute alarm to flooding
 MATCH (p1:ActivationPattern {id: "acute_alarm"}), (p2:ActivationPattern {id: "emotional_flooding"})
-CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "regulatory_failure", weight: "moderate"}]->(p2);
+MERGE (p1)-[r:CAN_ESCALATE_TO]->(p2)
+SET r += {mechanism: "regulatory_failure", weight: "moderate"};
 
 
 // ============================================================
@@ -2004,22 +2220,28 @@ CREATE (p1)-[:CAN_ESCALATE_TO {mechanism: "regulatory_failure", weight: "moderat
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
-CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
+MERGE (p)-[r:MAPS_TO_WOT_ZONE]->(wot)
+SET r += {correspondence: "primary"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
-CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
+MERGE (p)-[r:MAPS_TO_WOT_ZONE]->(wot)
+SET r += {correspondence: "primary"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (wot:TherapyConcept {id: "wot_hyperarousal"})
-CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "extreme"}]->(wot);
+MERGE (p)-[r:MAPS_TO_WOT_ZONE]->(wot)
+SET r += {correspondence: "extreme"};
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (wot:TherapyConcept {id: "wot_hypoarousal"})
-CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "primary"}]->(wot);
+MERGE (p)-[r:MAPS_TO_WOT_ZONE]->(wot)
+SET r += {correspondence: "primary"};
 
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (wot:TherapyConcept {id: "wot_frozen_flight"})
-CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "subtype_freeze_high_arousal"}]->(wot);
+MERGE (p)-[r:MAPS_TO_WOT_ZONE]->(wot)
+SET r += {correspondence: "subtype_freeze_high_arousal"};
 
 MATCH (p:ActivationPattern {id: "dissociation_overmodulation"}), (wot:TherapyConcept {id: "wot_hypoarousal"})
-CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "distinct_mechanism"}]->(wot);
+MERGE (p)-[r:MAPS_TO_WOT_ZONE]->(wot)
+SET r += {correspondence: "distinct_mechanism"};
 
 
 // ============================================================
@@ -2027,17 +2249,21 @@ CREATE (p)-[:MAPS_TO_WOT_ZONE {correspondence: "distinct_mechanism"}]->(wot);
 // ============================================================
 
 MATCH (p:ActivationPattern {id: "acute_alarm"}), (pv:TherapyConcept {id: "pv_sympathetic"})
-CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong"}]->(pv);
+MERGE (p)-[r:CORRESPONDS_TO_ANS_STATE]->(pv)
+SET r += {evidence: "Strong"};
 
 MATCH (p:ActivationPattern {id: "chronic_vigilance"}), (pv:TherapyConcept {id: "pv_sympathetic"})
-CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong", notes: "sustained_mobilization"}]->(pv);
+MERGE (p)-[r:CORRESPONDS_TO_ANS_STATE]->(pv)
+SET r += {evidence: "Strong", notes: "sustained_mobilization"};
 
 MATCH (p:ActivationPattern {id: "emotional_flooding"}), (pv:TherapyConcept {id: "pv_sympathetic"})
-CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Strong", notes: "extreme_mobilization"}]->(pv);
+MERGE (p)-[r:CORRESPONDS_TO_ANS_STATE]->(pv)
+SET r += {evidence: "Strong", notes: "extreme_mobilization"};
 
 // Note: conservation_freeze linked to PAG, NOT "dorsal vagal" per expert consensus
 MATCH (p:ActivationPattern {id: "conservation_freeze"}), (pv:TherapyConcept {id: "pv_dorsal_vagal"})
-CREATE (p)-[:CORRESPONDS_TO_ANS_STATE {evidence: "Moderate", notes: "use_PAG_centered_framing_not_polyvagal_language", caveat: "polyvagal_framing_contested_4_of_4_experts"}]->(pv);
+MERGE (p)-[r:CORRESPONDS_TO_ANS_STATE]->(pv)
+SET r += {evidence: "Moderate", notes: "use_PAG_centered_framing_not_polyvagal_language", caveat: "polyvagal_framing_contested_4_of_4_experts"};
 
 
 // ============================================================
@@ -2102,3 +2328,30 @@ MERGE (inspiration)-[:OPPOSITE_OF]->(apathy) MERGE (apathy)-[:OPPOSITE_OF]->(ins
 
 MATCH (frustration:Emotion {id: "frustration"}), (amusement:Emotion {id: "amusement"})
 MERGE (frustration)-[:OPPOSITE_OF]->(amusement) MERGE (amusement)-[:OPPOSITE_OF]->(frustration);
+
+
+// ============================================================
+// MOVED FROM knowledge-graph.cypher (relationships only it declared; A1-4)
+// ============================================================
+
+MATCH (bed_nucleus:BrainStructure {id: "bnst"}), (anxiety:Emotion {id: "anxiety"})
+MERGE (bed_nucleus)-[r:IMPLICATED_IN]->(anxiety)
+SET r += {role: "primary"};
+
+MATCH (anxiety:Emotion {id: "anxiety"}), (constriction:SensationType {id: "constriction"})
+MERGE (anxiety)-[:FELT_AS {region: "throat"}]->(constriction);
+
+MATCH (anger:Emotion {id: "anger"}), (tension:SensationType {id: "tension"})
+MERGE (anger)-[:FELT_AS {region: "jaw"}]->(tension);
+
+MATCH (sadness:Emotion {id: "sadness"}), (heaviness:SensationType {id: "heaviness"})
+MERGE (sadness)-[:FELT_AS {region: "body"}]->(heaviness);
+
+MATCH (joy:Emotion {id: "joy"}), (lightness:SensationType {id: "lightness"})
+MERGE (joy)-[:FELT_AS {region: "body"}]->(lightness);
+
+MATCH (calm:Emotion {id: "calm"}), (lightness:SensationType {id: "lightness"})
+MERGE (calm)-[:FELT_AS {region: "shoulders"}]->(lightness);
+
+MATCH (stress:Emotion {id: "stress"}), (tension:SensationType {id: "tension"})
+MERGE (stress)-[:FELT_AS {region: "neck"}]->(tension);

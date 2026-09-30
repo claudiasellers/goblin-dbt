@@ -1,0 +1,10 @@
+# Local, disposable Neo4j for Tier-2 tests and schema/migration rehearsals (never production).
+#   npm run graph:test:up     # start
+#   npm run graph:test:load   # load schema/ into it
+#   docker compose -f functions/test/neo4j/docker-compose.yml down -v   # throw it away
+services:
+  neo4j:
+    image: neo4j:5-community        # pin to the Aura instance's version tag once known (plan §3a "still unverified")
+    ports: ["7474:7474", "7687:7687"]
+    environment:
+      NEO4J_AUTH: neo4j/goblin-test-pw
