@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
+import { startWave, updateWave } from '../../lib/urgeSurfing';
 
 export function UrgeSurfing() {
   const [phase, setPhase] = useState<'intro' | 'surfing' | 'complete'>('intro');
   const [intensity, setIntensity] = useState(7);
   const [elapsed, setElapsed] = useState(0);
-  const [peakIntensity, setPeakIntensity] = useState(7);
+  const [peakIntensity, setPeakIntensity] = useState(intensity);
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -23,13 +24,16 @@ export function UrgeSurfing() {
   };
 
   const handleIntensityChange = (newIntensity: number) => {
-    setIntensity(newIntensity);
-    if (newIntensity > peakIntensity) {
-      setPeakIntensity(newIntensity);
-    }
+    const wave = updateWave({ current: intensity, peak: peakIntensity }, newIntensity);
+    setIntensity(wave.current);
+    setPeakIntensity(wave.peak);
   };
 
   const startSurfing = () => {
+    // Peak starts at the reading the user started with, not a fixed 7.
+    const wave = startWave(intensity);
+    setIntensity(wave.current);
+    setPeakIntensity(wave.peak);
     setPhase('surfing');
     setElapsed(0);
   };
@@ -40,9 +44,10 @@ export function UrgeSurfing() {
 
   const reset = () => {
     setPhase('intro');
-    setIntensity(7);
+    const wave = startWave(7);
+    setIntensity(wave.current);
     setElapsed(0);
-    setPeakIntensity(7);
+    setPeakIntensity(wave.peak);
   };
 
   if (phase === 'intro') {
@@ -54,7 +59,6 @@ export function UrgeSurfing() {
           </h3>
           <ul className="space-y-2 text-[var(--color-text-secondary)]">
             <li>• Urges are like waves—they rise, peak, and then fall</li>
-            <li>• Most urges pass within 20-30 minutes if you don't act on them</li>
             <li>• Your job is to observe the urge without fighting it or giving in</li>
             <li>• You're just riding the wave until it passes</li>
           </ul>
@@ -159,14 +163,11 @@ export function UrgeSurfing() {
       <h3 className="text-xl font-semibold text-[var(--color-text-primary)] mb-2">
         You rode the wave
       </h3>
-      <div className="text-[var(--color-text-secondary)] mb-4 space-y-1">
+      <div className="text-[var(--color-text-secondary)] mb-6 space-y-1">
         <p>Time: <strong>{formatTime(elapsed)}</strong></p>
         <p>Peak intensity: <strong>{peakIntensity}/10</strong></p>
         <p>Final intensity: <strong>{intensity}/10</strong></p>
       </div>
-      <p className="text-sm text-[var(--color-text-tertiary)] mb-6">
-        Every wave you ride without acting on the urge makes you stronger.
-      </p>
       <button
         onClick={reset}
         className="py-2 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary"

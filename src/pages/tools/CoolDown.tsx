@@ -40,12 +40,6 @@ const techniques = [
     instruction: 'Hold ice cubes in your hands or press them against your wrists or neck.',
     tip: 'The cold sensation can help interrupt intense emotions.',
   },
-  {
-    id: 'cold-shower',
-    title: 'Cold shower or splash',
-    instruction: 'Take a brief cold shower, or splash cold water on your arms and face.',
-    tip: 'Even 30 seconds of cold water can shift your nervous system.',
-  },
 ];
 
 export function CoolDown() {

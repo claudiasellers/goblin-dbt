@@ -221,3 +221,56 @@ test("Five senses keeps eyes open", () => {
   assert.doesNotMatch(src, /close your eyes/i);
   assert.match(src, /eyes open/);
 });
+
+// ------------------------------------------------------ A0-2: DT copy fixes
+
+const { startWave, updateWave } = await importTs("src/lib/urgeSurfing.ts");
+
+test("Urge Surfing: the peak starts at the entered reading and only rises", () => {
+  // Old bug: peak initialised at 7 whatever the user entered.
+  let wave = startWave(3);
+  assert.deepEqual(wave, { current: 3, peak: 3 });
+  wave = updateWave(wave, 5);
+  assert.deepEqual(wave, { current: 5, peak: 5 });
+  wave = updateWave(wave, 2);
+  assert.deepEqual(wave, { current: 2, peak: 5 });
+  assert.ok(wave.peak >= wave.current);
+  assert.deepEqual(updateWave(startWave(9), 4), { current: 4, peak: 9 });
+});
+
+test("Urge Surfing: no duration promise or praise; peak state comes from startWave/updateWave", () => {
+  const src = read("src/pages/tools/UrgeSurfing.tsx");
+  assert.doesNotMatch(src, /20-30 minutes/);
+  assert.doesNotMatch(src, /makes you stronger/);
+  assert.match(src, /startWave\(intensity\)/);
+  assert.match(src, /updateWave\(/);
+  assert.doesNotMatch(src, /setPeakIntensity\(\d+\)/);
+});
+
+test("Pause: T is 'Take a step back', S is 'Stop. Hands still', one long slow breath out", () => {
+  const src = read("src/pages/tools/Pause.tsx");
+  assert.match(src, /title: 'Take a step back'/);
+  assert.match(src, /Stop\. Hands still for a moment\./);
+  assert.match(src, /one long, slow breath out/i);
+  assert.doesNotMatch(src, /Freeze/);
+  assert.doesNotMatch(src, /deep breaths?/i);
+  assert.doesNotMatch(src, /title: 'Take a breath'/);
+});
+
+test("Cool Down: no cold shower option, whenToUse has no numbers", async () => {
+  const src = read("src/pages/tools/CoolDown.tsx");
+  assert.doesNotMatch(src, /cold-shower|cold shower/i);
+  const { tools } = await importTs("src/data/tools.ts");
+  const coolDown = tools.find((t) => t.id === "cool-down");
+  assert.ok(coolDown);
+  assert.doesNotMatch(coolDown.whenToUse, /\d/);
+  assert.equal(coolDown.whenToUse, "When your body is too loud to think.");
+});
+
+test("DEAR MAN debrief 'Cool down first' goes to an existing tool", async () => {
+  const src = read("src/pages/tools/DearMan.tsx");
+  assert.doesNotMatch(src, /\/tool\/tipp/);
+  assert.match(src, /navigate\('\/tool\/cool-down'\)/);
+  const { tools } = await importTs("src/data/tools.ts");
+  assert.ok(tools.some((t) => t.id === "cool-down"));
+});

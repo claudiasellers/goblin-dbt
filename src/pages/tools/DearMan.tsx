@@ -1555,7 +1555,7 @@ export function DearMan() {
               It sounds like your body is still activated. Want to do a quick cool-down first?
             </p>
             <div className="flex gap-2 mt-3">
-              <button onClick={() => navigate('/tool/tipp')}
+              <button onClick={() => navigate('/tool/cool-down')}
                 className="px-4 py-2 rounded-lg text-sm bg-[var(--color-warning-bg)] text-[var(--color-text-primary)] border border-[var(--color-warning-border)]">
                 Cool down first
               </button>
