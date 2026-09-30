@@ -93,9 +93,12 @@ export function CheckIn() {
     note: '',
     timestamp: new Date(),
   });
-  // Places on the feeling square and the words picked for each (one spot for now).
+  // Places on the feeling square (one per part of a mixed feeling, up to MAX_SPOTS) and the words
+  // picked for each.
   const [spots, setSpots] = useState<Spot[]>([emptySpot()]);
   const [active, setActive] = useState(0);
+  // Where "Never mind" on a newly added spot returns to.
+  const [spotReturn, setSpotReturn] = useState<'emotion' | 'word'>('emotion');
   const point = spots[active]?.point ?? null;
   const [currentSensation, setCurrentSensation] = useState<Partial<BodySensation> | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -316,6 +319,34 @@ export function CheckIn() {
 
   function handleToggleWord(name: string) {
     updateActive(s => ({ ...s, words: s.words.includes(name) ? s.words.filter(w => w !== name) : [...s.words, name] }));
+  }
+
+  /** Take a word off another spot; a spot left with no words goes too. */
+  function handleRemoveWord(index: number, name: string) {
+    const next = spots.map((s, i) => (i === index ? { ...s, words: s.words.filter(w => w !== name) } : s));
+    if (next[index].words.length === 0 && index !== active) {
+      setSpots(next.filter((_, i) => i !== index));
+      if (index < active) setActive(active - 1);
+    } else {
+      setSpots(next);
+    }
+  }
+
+  /** Keep this spot and place another (up to MAX_SPOTS). */
+  function handleAddSpot() {
+    setSpotReturn(step === 'word' ? 'word' : 'emotion');
+    setSpots(prev => [...prev, emptySpot()]);
+    setActive(spots.length);
+    setStep('emotion');
+  }
+
+  /** Leave a just-added spot. With no words it is dropped; with words it is kept. */
+  function handleCancelSpot() {
+    if (spots[active].words.length === 0) {
+      setSpots(prev => prev.filter((_, i) => i !== active));
+    }
+    setActive(Math.max(0, active - 1));
+    setStep(spotReturn);
   }
 
   /**
@@ -646,7 +677,7 @@ export function CheckIn() {
 
       {/* Today (PR-S5): follow-ups, "did it help?", OA plans. Only before a new check-in starts,
           so never beside a result or the crisis banner. */}
-      {step === 'emotion' && <TodayStack />}
+      {step === 'emotion' && active === 0 && <TodayStack />}
 
       {/* Progress indicator - subtle, shows optionality */}
       {showProgress && (
@@ -699,6 +730,8 @@ export function CheckIn() {
             onToggleWord={handleToggleWord}
             onSeeMore={() => setStep('word')}
             onContinue={handleWordsContinue}
+            onAddSpot={handleAddSpot}
+            onCancelSpot={handleCancelSpot}
             onHelpNow={handleHelpMeNow}
             onCantTell={() => { setStartedAt(new Date()); setStep('find'); }}
             onStartWithBody={handleSomaticEntry}
@@ -710,8 +743,10 @@ export function CheckIn() {
             spots={spots}
             active={active}
             onToggleWord={handleToggleWord}
+            onRemoveWord={handleRemoveWord}
             onContinue={handleWordsContinue}
             onMovePoint={() => setStep('emotion')}
+            onAddSpot={handleAddSpot}
             onNoneFit={() => { setStartedAt(new Date()); setStep('find'); }}
             onHelpNow={handleHelpMeNow}
           />

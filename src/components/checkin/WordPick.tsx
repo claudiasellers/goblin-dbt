@@ -10,12 +10,12 @@ interface WordPickProps {
   /** Pick or unpick a word for the active spot. */
   onToggleWord: (name: string) => void;
   /** Take a word off another spot (removing the spot if it was its last word). */
-  onRemoveWord?: (spot: number, name: string) => void;
+  onRemoveWord: (spot: number, name: string) => void;
   onContinue: () => void;
   /** Tap the little square to move the active point. */
   onMovePoint: () => void;
   /** Keep this spot and place another on the square. */
-  onAddSpot?: () => void;
+  onAddSpot: () => void;
   onNoneFit: () => void;
   onHelpNow: () => void;
 }
@@ -50,7 +50,7 @@ export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue
     .filter(({ s, i }) => i !== active && s.point)
     .map(({ s }) => ({ point: s.point as SquarePoint }));
   const otherSpots = spots.map((s, i) => ({ s, i })).filter(({ s, i }) => i !== active && s.words.length > 0);
-  const canAddSpot = !!onAddSpot && spot.words.length > 0 && spots.length < MAX_SPOTS;
+  const canAddSpot = spot.words.length > 0 && spots.length < MAX_SPOTS;
   const lastPick = spot.words[spot.words.length - 1];
 
   return (
@@ -80,7 +80,7 @@ export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue
                   aria-pressed
                   aria-label={`Remove ${w}`}
                   style={{ ['--chip-on' as string]: `var(--color-q-${QUADRANT_ABBR[getEmotionByName(w)?.quadrant ?? 'high-unpleasant']}-fill)` }}
-                  onClick={() => onRemoveWord?.(i, w)}
+                  onClick={() => onRemoveWord(i, w)}
                 >
                   {w}
                   <span aria-hidden="true">×</span>

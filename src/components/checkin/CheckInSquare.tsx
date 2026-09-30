@@ -21,10 +21,10 @@ interface CheckInSquareProps {
   onSeeMore: () => void;
   /** Done: carry on with every picked word. */
   onContinue: () => void;
-  /** Keep this spot and place another. Without it, there is one spot. */
-  onAddSpot?: () => void;
+  /** Keep this spot and place another. */
+  onAddSpot: () => void;
   /** Leave a spot that was just added (shown from the second spot on). */
-  onCancelSpot?: () => void;
+  onCancelSpot: () => void;
   onHelpNow: () => void;
   onCantTell: () => void;
   onStartWithBody: () => void;
@@ -73,7 +73,7 @@ export function CheckInSquare({
     : [];
   const peek = [...nearest, ...spot.words.filter((w) => !nearest.includes(w))];
   const lastPick = spot.words[spot.words.length - 1];
-  const canAddSpot = !!onAddSpot && spot.words.length > 0 && spots.length < MAX_SPOTS;
+  const canAddSpot = spot.words.length > 0 && spots.length < MAX_SPOTS;
   const isExtra = active > 0;
 
   return (
