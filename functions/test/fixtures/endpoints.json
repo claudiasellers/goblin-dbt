@@ -527,6 +527,35 @@
     "labels": {},
     "callableTrigger": {}
   },
+  "onUserDeleted": {
+    "platform": "gcfv1",
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "eventTrigger": {
+      "eventType": "providers/firebase.auth/eventTypes/user.delete",
+      "eventFilters": {
+        "resource": "projects/demo-goblindbt"
+      },
+      "retry": false
+    },
+    "labels": {}
+  },
   "recordToolOutcome": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,

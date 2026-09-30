@@ -259,7 +259,7 @@ export const saveOppositeActionSession = onCall(
         await tx.run(
           `MERGE (u:User {id: $userId})
            MERGE (s:OppositeActionSession {key: $key})
-           ON CREATE SET s.createdAt = datetime(), s.id = $id
+           ON CREATE SET s:UserData:LogRecord, s.createdAt = datetime(), s.id = $id, s.ownerId = $userId
            SET s.updatedAt = datetime(), s.status = $status, s.emotionId = $emotionId,
                s.urgeId = $urgeId, s.contentVersion = $contentVersion, s.dataJson = $dataJson,
                s.intensityBefore = $intensityBefore, s.intensityAfter = $intensityAfter,

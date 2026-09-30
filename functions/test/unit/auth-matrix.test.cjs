@@ -22,11 +22,14 @@ const PUBLIC = [
   'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools',
 ];
 
+// Background triggers (not callables): auth lifecycle events carry their own uid.
+const TRIGGERS = ['onUserDeleted'];
+
 const { fns, setDriver } = loadFunctions();
 
 test('the matrix covers every export exactly once', () => {
-  assert.deepEqual([...AUTHED, ...PUBLIC].sort(), Object.keys(fns).sort());
-  assert.equal(new Set([...AUTHED, ...PUBLIC]).size, AUTHED.length + PUBLIC.length);
+  assert.deepEqual([...AUTHED, ...PUBLIC, ...TRIGGERS].sort(), Object.keys(fns).sort());
+  assert.equal(new Set([...AUTHED, ...PUBLIC, ...TRIGGERS]).size, AUTHED.length + PUBLIC.length + TRIGGERS.length);
 });
 
 for (const name of AUTHED) {

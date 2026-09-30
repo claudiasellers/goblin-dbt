@@ -416,6 +416,7 @@ export const saveDearManSession = onCall(
           reflectionLanded: $reflectionLanded,
           createdAt: datetime()
         })
+        SET s:UserData:LogRecord, s.ownerId = $userId, s.key = $userId + ':' + s.id, s.schemaVersion = 1
         MERGE (u)-[:COMPLETED_SESSION]->(s)
         RETURN s.id AS id
         `,

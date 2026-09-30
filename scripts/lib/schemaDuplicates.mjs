@@ -20,9 +20,13 @@ export const SCHEMA_REL_TYPES = [
   'TARGETS', 'TREATS', 'TRIGGERS_NEXT', 'TRIGGERS_SAFETY', 'TYPE_OF', 'UTILIZES',
 ];
 
-/** Duplicate nodes: same label + same id (or same dbtParent for EmotionRegulationContent). */
+/**
+ * Duplicate nodes: same label + same id (or same dbtParent for EmotionRegulationContent).
+ * User data is excluded: its ids are only unique per owner (the unique key is `ownerId:id`, and
+ * e.g. ProfileFact ids are kinds), and schema files never write it (PR-S1).
+ */
 export const DUPLICATE_NODES_QUERY = `
-MATCH (n) WHERE n.id IS NOT NULL OR n:EmotionRegulationContent
+MATCH (n) WHERE (n.id IS NOT NULL OR n:EmotionRegulationContent) AND NOT n:UserData
 UNWIND labels(n) AS label
 WITH label, CASE WHEN label = 'EmotionRegulationContent' THEN n.dbtParent ELSE n.id END AS key, count(*) AS copies
 WHERE key IS NOT NULL AND copies > 1

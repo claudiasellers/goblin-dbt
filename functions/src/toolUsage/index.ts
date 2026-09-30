@@ -4,6 +4,7 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { GUARDS } from '../userdata/lifecycle';
 
 // ============================================
 // TOOL USAGE TRACKING
@@ -36,6 +37,8 @@ export const trackToolUsage = onCall(
           toolId: $toolId,
           timestamp: datetime()
         })
+        SET tu:UserData:LogRecord, tu.ownerId = $userId, tu.key = $userId + ':' + tu.id,
+            tu.createdAt = tu.timestamp, tu.schemaVersion = 1
         MERGE (u)-[:USED_TOOL]->(tu)
         WITH u, tu
         OPTIONAL MATCH (u)-[:LOGGED]->(c:CheckIn)
@@ -85,7 +88,7 @@ export const recordToolOutcome = onCall(
       await session.run(
         `
         MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
-        WHERE tu.outcome IS NULL
+        WHERE ${GUARDS.ToolUsage.outcome('tu')}
         WITH tu ORDER BY tu.timestamp DESC LIMIT 1
         SET tu.outcome = $outcome, tu.outcomeTimestamp = datetime()
         WITH tu

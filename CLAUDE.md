@@ -15,7 +15,7 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 - **Frontend** (`/src`): React 19 + TypeScript + Vite + Tailwind CSS. Uses HashRouter. State managed via Context API (`AuthContext`, `UserProfileContext`) — no Redux.
 - **Auth** Firebase Authentication (email/password)
-- **Cloud Functions** (`/functions/src`, Node 22): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the 30 deployed callables by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
+- **Cloud Functions** (`/functions/src`, Node 22): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the deployed functions by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
 - **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
@@ -26,7 +26,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | Module | Callables |
 |---|---|
 | `checkin/` | `saveCheckIn`, `getCheckInsByUser` |
-| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData`, `exportUserData` (settings-style profile; `profile/` is reserved for the three-layer "Me") |
+| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; trigger `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
 | `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
 | `insights/` | `getInsightsData` |
 | `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` |
@@ -35,6 +35,8 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `problemSolve/` | `getProblemSolveContent` |
 | `invalidationRecovery/` | `getInvalidationRecoveryContent`, `saveInvalidationRecoverySession`, `getInvalidationRecoveryProgress` |
 | `findTheFeeling/` | `getFindTheFeelingContent`, `saveFindTheFeelingSession`, `getFeelingCollection` |
+
+`userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
 
 Adding a callable: export it from its domain module, add one line to `functions/src/index.ts`, add it to `functions/test/fixtures/endpoints.json` and the auth matrix (`functions/test/unit/auth-matrix.test.cjs`). Prefer `callable({ auth, label }, handler)` from `shared/callable.ts`.
 
@@ -99,6 +101,25 @@ This includes:
 
 ---
 
+## Data layers
+
+Every piece of user data belongs to exactly one layer. The registry is `functions/src/userdata/layers.ts`; `tests/user-data-layers.test.mjs` enforces it.
+
+| Layer | Stored as | Rule | Read by |
+|---|---|---|---|
+| **Ask-fresh** | Fields on a log record only (`ASK_FRESH_FIELDS`: `band*`, `thenVsNow`, `thenVsNowDir`, `actedOnUrge`, `urgeIds`, `fitsFacts`, `wiseMindAnswer`, `readiness`, `eventIds`) | Changes within a day → always asked, never pre-filled from memory. The one carry is the client-only `band.current()` (≤20 min, never read back from the server) | Aggregates only |
+| **Log** | `:<Label>:UserData:LogRecord` | Describes a moment. Append-only and **finalise-once** (`userdata/lifecycle.ts`: upsert by `key` only during its episode, forward only, then frozen; writers put `GUARDS.<Label>.<op>` in their `WHERE`) | Aggregates (Insights, Today, review). Never used to pre-fill a live flow |
+| **Profile** | `:<Label>:UserData:ProfileItem`, or a profile edge to graph content carrying `confirmedAt` + `source` | Would make the user re-answer next time → profile, pre-filled with "still true?". Nothing moves log → profile without the user's yes | `getProfileContext(toolId)` and the Me surface only |
+| (system) | `:<Label>:UserData:System` | App infrastructure (push tokens) | Deleted with the user, never exported |
+
+- Every `:UserData` node has `id` (client UUID unless noted), `ownerId` (Firebase uid), `key = ownerId + ':' + id` (unique per label in `schema/constraints.cypher`), `createdAt`, `schemaVersion`. Writes `MERGE` on `key`, never on `id`, and start with `MERGE (u:User {id: $uid})` (`userdata/ownership.ts`).
+- Ownership edges run `User → UserData` and `UserData → UserData`. User data may point at graph content; graph content never points at user data. Schema files never write user data.
+- A new user-data label: register it in `layers.ts` with its `exportAs`, add its `<label>_key` constraint, write it with its layer label. Export (`records.<exportAs>`, `formatVersion: 2`, `links` with edge properties) and delete (`DETACH DELETE` by `ownerId`, then the Auth user when `deleteAuth`) cover it automatically (`userdata/exportDelete.ts`). Retention deletes log records only, never profile items.
+- `FOUND_WORD` (User → Emotion) is a log aggregate, not a profile edge: it accumulates without a yes.
+- Pre-convention nodes (`CheckIn`, `BodySensation`, `ToolUsage`, the 4 session labels) were adopted by `schema/migrations/2026-10-user-data-backfill.cypher` (D-16 a).
+
+---
+
 ## Data: Tools
 
 Tools are defined in `src/data/tools.ts`. Each tool has:
@@ -147,6 +168,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/contexts/UserProfileContext.tsx` | User profile with caching |
 | `functions/src/index.ts` | The deploy surface: named re-exports of every callable (module table above) |
 | `functions/src/shared/` | Driver + sessions (`neo4j.ts`), `auth.ts`, `validate.ts`, `errors.ts`, `callable.ts` |
+| `functions/src/userdata/` | Data layers: `layers.ts` (registry), `ownership.ts`, `lifecycle.ts` (finalise-once guards), `exportDelete.ts` |
+| `schema/migrations/` | One-off data migrations, run with `--file` (never loaded): `2026-10-user-data-backfill.cypher` |
 | `functions/test/` | Unit tests (fake driver), pinned `fixtures/endpoints.json`, emulator golden suite, local Neo4j compose file |
 | `schema/constraints.cypher` | Every constraint and index; loaded first |
 | `schema/knowledge-graph.cypher` | Base graph nodes (MERGE by id; no relationships) |

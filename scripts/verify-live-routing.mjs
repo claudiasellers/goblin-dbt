@@ -105,7 +105,7 @@ try {
   report.relationshipTotals = (await q(`MATCH ()-[r]->() RETURN type(r) AS type, count(*) AS n ORDER BY n DESC`)).map(r => ({ type: r.type, n: toNum(r.n) }));
   // Duplicate nodes (same label set + same id)
   report.duplicateNodes = (await q(`
-    MATCH (n) WHERE n.id IS NOT NULL
+    MATCH (n) WHERE n.id IS NOT NULL AND NOT n:UserData
     WITH labels(n) AS labels, n.id AS id, count(*) AS c WHERE c > 1
     RETURN labels, count(*) AS duplicatedIds, sum(c - 1) AS extraNodes ORDER BY extraNodes DESC`))
     .map(r => ({ labels: r.labels, duplicatedIds: toNum(r.duplicatedIds), extraNodes: toNum(r.extraNodes) }));

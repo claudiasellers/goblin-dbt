@@ -172,7 +172,8 @@ export const saveInvalidationRecoverySession = onCall(
                  (n:UnmetNeed {id: $needId}), (x:RecoveryExit {id: $exitId})
            MERGE (u:User {id: $userId})
            CREATE (s:InvalidationRecoverySession {key: $key})
-           SET s.id = $id, s.createdAt = datetime(), s.contentVersion = $contentVersion,
+           SET s:UserData:LogRecord, s.id = $id, s.ownerId = $userId, s.schemaVersion = 1,
+               s.createdAt = datetime(), s.contentVersion = $contentVersion,
                s.stateId = $stateId, s.exitId = $exitId, s.pull = $pull, s.gate = $gate,
                s.startIntensity = $startIntensity, s.endIntensity = $endIntensity,
                s.startUrge = $startUrge, s.endUrge = $endUrge,
