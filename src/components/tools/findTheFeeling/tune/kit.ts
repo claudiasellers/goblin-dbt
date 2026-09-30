@@ -34,7 +34,6 @@ export const SLOW = 0.6;
 export const LAYOUT: Record<Step, Layout> = {
   intro: { cy: 0.47, gap: 96, amp: 1 },
   find: { cy: 0.45, gap: 100, amp: 1 },
-  capacity: { cy: 0.34, gap: 64, amp: 0.75 },
   pull: { cy: 0.25, gap: 44, amp: 0.5 },
   regulate: { cy: 0.46, gap: 100, amp: 1 },
   orient: { cy: 0.27, gap: 40, amp: 0.4 },

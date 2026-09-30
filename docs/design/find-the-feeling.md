@@ -1,5 +1,7 @@
 # Find the feeling (Shape it / Tune it)
 
+> **30 Sep 2026:** the capacity question ("If someone asked you for a favour right now…") is removed from every flow until there is a better way to ask it; see CLAUDE.md, "The capacity question is out". The Capacity step below is historical.
+
 Status: built on `feat/someone-got-to-me` (tool, Cloud Functions, collection, check-in entry). Not deployed. Needs real-phone checks and clinical sign-off before release.
 Umbrella: [alexithymia-first-interaction.md](alexithymia-first-interaction.md).
 Prototype: `prototypes/goblin-lab/src/directions/Shape` and `.../Tune`.

@@ -68,13 +68,13 @@ export function regulate(b: Feel, kind: RegKind, p: number): Feel {
 
 /** Which regulation this run calls for (from the graph gates), even after it was skipped. */
 export function regKindFor(s: FlowState, gates: FindTheFeelingGates): RegKind | null {
-  if (!s.band || !s.pull) return null;
+  if (!s.pull) return null;
   const r = regulationFor(s.way, s.band, s.pull, gates);
   return r === 'smooth' || r === 'warm' ? r : null;
 }
 
 /**
- * The object as currently displayed, from capacity onward: the found snapshot, its reaction to
+ * The object as currently displayed, from the pull onward: the found snapshot, its reaction to
  * band/urge, regulation (full once done, partial if skipped), then ambient descent.
  */
 export function displayedFeel(s: FlowState, gates: FindTheFeelingGates, regProgress: number, pickedPull: UrgeId | null): Feel {

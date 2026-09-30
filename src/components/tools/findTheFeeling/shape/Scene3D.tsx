@@ -13,7 +13,6 @@ const HIGH: Pose = { pos: [0, 0.5, 6.4], look: [0, -0.9, 0] };
 const POSES: Record<Step, Pose> = {
   intro: { pos: [0, 0.9, 4.9], look: [0, 0.12, 0] },
   find: { pos: [0, 1.25, 5.9], look: [0, -0.28, 0.55] },
-  capacity: { pos: [0, 0.75, 5.2], look: [0, -0.35, 0] },
   pull: { pos: [0, 1.35, 5.9], look: [0, -0.42, 0.6] },
   regulate: { pos: [0, 0.7, 3.5], look: [0, 0.25, 0] },
   orient: HIGH,

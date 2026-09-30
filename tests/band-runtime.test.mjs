@@ -1,5 +1,5 @@
 // A4-2: the band runtime. Pure store logic (make / carry / persist / gate decision / hand-off ext),
-// server-rendered smoke tests of the probe, gate, P2 and too-much link against the fixture content,
+// server-rendered smoke tests of the gate, P2 and too-much link against the fixture content,
 // the fixture's freshness, and static guards (provider mounted, no numbers, no locks).
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -11,7 +11,6 @@ import { importTs } from "./lib/importTs.mjs";
 
 const store = await importTs("src/lib/bandStore.ts");
 const { BandProvider } = await importTs("src/contexts/BandContext.tsx");
-const { CapacityProbe } = await importTs("src/components/capacity/CapacityProbe.tsx");
 const { BandGate } = await importTs("src/components/capacity/BandGate.tsx");
 const { BreakdownHandoff } = await importTs("src/components/capacity/BreakdownHandoff.tsx");
 const { TooMuchLink } = await importTs("src/components/capacity/TooMuchLink.tsx");
@@ -112,19 +111,10 @@ test("probePrompt: relational uses the label, else the someone fallback (Phase A
 // ---- server-rendered smoke tests (no DOM; effects don't run) ----
 const wrap = (el) => renderToStaticMarkup(h(BandProvider, { owner: null, content: fixture }, el));
 
-test("CapacityProbe renders three answers and I can't tell, no number anywhere", () => {
-  const html = renderToStaticMarkup(h(CapacityProbe, { probe: fixture.probe, onAnswer: () => {} }));
-  for (const b of ["steady", "stirred", "flooded", "cant-tell"]) assert.match(html, new RegExp(`data-band="${b}"`));
-  assert.match(html, /hey, could you help me with something\?/);
-  assert.doesNotMatch(html.replace(/<[^>]+>/g, " ").replace(/&[#a-z0-9]+;/gi, " "), /\d/, "no digits in the probe's visible text");
-  const noCant = renderToStaticMarkup(h(CapacityProbe, { probe: fixture.probe, allowCantTell: false, onAnswer: () => {} }));
-  assert.doesNotMatch(noCant, /cant-tell/);
-});
-
-test("BandGate with no current reading renders the probe (relational someone form)", () => {
-  const html = wrap(h(BandGate, { context: "dear-man", wording: "relational", onBand: () => {} }));
-  assert.match(html, /data-testid="capacity-probe"/);
-  assert.match(html, /If they texted you right now/);
+test("BandGate never asks (the probe is out, 30 Sep): with no current reading it renders nothing", () => {
+  const html = wrap(h(BandGate, { context: "dear-man", onBand: () => {} }));
+  assert.equal(html, "");
+  assert.doesNotMatch(readFileSync("src/components/capacity/BandGate.tsx", "utf8"), /CapacityProbe/);
 });
 
 test("BreakdownHandoff opens on the card with Start and Keep going anyway; skipping the card shows the sigh first", () => {
@@ -170,7 +160,7 @@ test("BandProvider is mounted inside AuthProvider; FTF records its band; P2 neve
   const main = readFileSync("src/main.tsx", "utf8");
   assert.ok(main.indexOf("<AuthProvider>") < main.indexOf("<AuthBandProvider>"));
   assert.match(readFileSync("src/pages/tools/FindTheFeeling.tsx", "utf8"), /band\.record\(\{ value: state\.band, source: 'ftf'/);
-  for (const f of ["BreakdownHandoff", "TooMuchLink", "BandGate", "CapacityProbe"]) {
+  for (const f of ["BreakdownHandoff", "TooMuchLink", "BandGate"]) {
     const src = readFileSync(`src/components/capacity/${f}.tsx`, "utf8");
     assert.doesNotMatch(src, /WaitLock|UrgeScale|type="range"|\/ ?10\b|blur-\[/, f);
   }

@@ -64,84 +64,118 @@ test("'no' jumps family; three refusals end with no word", () => {
   assert.equal(new Set(fams).size, 3, "each refusal moves to another family");
 });
 
-test("steady, no urge to regulate: find → capacity → pull → word → setOff → close → next", () => {
-  const h = run([
-    { t: "begin" }, { t: "found", found: furious }, { t: "band", band: "steady" }, { t: "pull", pull: "fight" },
-  ]);
+/**
+ * The capacity step is out (Claudia, 30 Sep): nothing in the flow sets a band. The band gates stay
+ * (for when a band question comes back), so the flooded paths seed one on the initial state.
+ */
+function runWithBand(band, actions, entry = "tool", way = "shape") {
+  const reducer = flowLib.makeFlowReducer(content);
+  let h = { stack: [{ ...flowLib.initialFlow(content, entry, way), band }] };
+  for (const a of actions) h = reducer(h, a);
+  return h;
+}
+const SID = "3f2c9a0e-1b2c-4d5e-8f90-123456789abc";
+
+test("no capacity step: find → pull → word → setOff → close → next, no band recorded", () => {
+  assert.equal(flowLib.STEP_ORDER.includes("capacity"), false);
+  const found = cur(run([{ t: "begin" }, { t: "found", found: furious }]));
+  assert.equal(found.step, "pull", "the pull follows the find directly");
+  assert.equal(found.band, null);
+  const h = run([{ t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "fight" }]);
   assert.equal(cur(h).step, "word");
+  assert.equal(cur(h).regulation, "none", "no band: a fight pull is never calmed first");
   const h2 = run([
-    { t: "begin" }, { t: "found", found: furious }, { t: "band", band: "steady" }, { t: "pull", pull: "fight" },
+    { t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "fight" },
     { t: "word", answer: "yes" }, { t: "setOff", value: "someone" }, { t: "close", value: "quieter" },
   ]);
   const s = cur(h2);
   assert.equal(s.step, "next");
   assert.equal(s.word, "furious");
   assert.deepEqual(s.routedTo, ["pause", "opposite-action"]);
-  const session = flowLib.toSession(s, "3f2c9a0e-1b2c-4d5e-8f90-123456789abc", content.version);
+  const session = flowLib.toSession(s, SID, content.version);
+  assert.equal(session.band, null);
   assert.equal(checkFindTheFeelingGates(validate(session), g), null);
 });
 
-test("flooded regulates before the word (smooth for shape, tune for tune)", () => {
-  const s = cur(run([{ t: "begin" }, { t: "found", found: furious }, { t: "band", band: "flooded" }, { t: "pull", pull: "fight" }]));
+test("a band 'action' is no longer part of the flow", () => {
+  const h = run([{ t: "begin" }, { t: "found", found: furious }, { t: "band", band: "flooded" }]);
+  assert.equal(cur(h).band, null);
+  assert.equal(cur(h).step, "pull");
+});
+
+test("flooded regulates before the word when a band is present (smooth for shape, tune for tune)", () => {
+  const s = cur(runWithBand("flooded", [{ t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "fight" }]));
   assert.equal(s.step, "regulate");
   assert.equal(s.regulation, "smooth");
-  const t = cur(run([{ t: "begin" }, { t: "found", found: lonelySound }, { t: "band", band: "flooded" }, { t: "pull", pull: "chase" }], "tool", "tune"));
+  const t = cur(runWithBand("flooded", [{ t: "begin" }, { t: "found", found: lonelySound }, { t: "pull", pull: "chase" }], "tool", "tune"));
   assert.equal(t.regulation, "tune");
+  assert.equal(lib.regulationFor("shape", null, "fight", g), "none");
 });
 
-test("blank alone activates (never calms)", () => {
-  const s = cur(run([{ t: "begin" }, { t: "found", found: furious }, { t: "band", band: "stirred" }, { t: "pull", pull: "blank" }]));
+test("blank alone activates (never calms), with or without a band", () => {
+  const s = cur(run([{ t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "blank" }]));
   assert.equal(s.regulation, "warm");
-  const { direction } = lib.ambientDescent({ stepsSinceStart: 3, band: "stirred", pull: "blank", gates: g, enabled: true });
-  assert.equal(direction, "brighten");
+  const t = cur(run([{ t: "begin" }, { t: "found", found: lonelySound }, { t: "pull", pull: "blank" }], "tool", "tune"));
+  assert.equal(t.regulation, "wake");
+  assert.equal(lib.regulationFor("shape", "stirred", "blank", g), "warm");
+  assert.equal(lib.ambientDescent({ stepsSinceStart: 3, band: null, pull: "blank", gates: g, enabled: true }).direction, "brighten");
+  assert.equal(lib.ambientDescent({ stepsSinceStart: 3, band: "stirred", pull: "blank", gates: g, enabled: true }).direction, "brighten");
+  const session = validate(flowLib.toSession(cur(run([
+    { t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "blank" }, { t: "regulated", skipped: false },
+    { t: "word", answer: "yes" }, { t: "setOff", value: null }, { t: "close", value: "same" },
+  ])), SID, content.version));
+  assert.equal(session.regulation, "warm");
+  assert.equal(checkFindTheFeelingGates(session, g), null);
 });
 
-test("flooded + blank: regulate → orient → no word → regulation routes only", () => {
-  const h = run([
-    { t: "begin" }, { t: "found", found: furious }, { t: "band", band: "flooded" }, { t: "pull", pull: "blank" },
-    { t: "regulated", skipped: false },
+test("flooded + blank (band present): regulate → orient → no word → regulation routes only", () => {
+  const h = runWithBand("flooded", [
+    { t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "blank" }, { t: "regulated", skipped: false },
   ]);
   assert.equal(cur(h).step, "orient");
-  const h2 = run([
-    { t: "begin" }, { t: "found", found: furious }, { t: "band", band: "flooded" }, { t: "pull", pull: "blank" },
+  const s = cur(runWithBand("flooded", [
+    { t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "blank" },
     { t: "regulated", skipped: false }, { t: "oriented" }, { t: "setOff", value: null }, { t: "close", value: "same" },
-  ]);
-  const s = cur(h2);
+  ]));
   assert.equal(s.word, null);
   assert.deepEqual(s.offer.offered, []);
   assert.deepEqual(s.routedTo, content.floodedBlankRoutes);
   assert.equal(lib.ambientDescent({ stepsSinceStart: 2, band: "flooded", pull: "blank", gates: g, enabled: true }).direction, "calm");
-  const session = validate(flowLib.toSession(s, "3f2c9a0e-1b2c-4d5e-8f90-123456789abc", content.version));
+  const session = validate(flowLib.toSession(s, SID, content.version));
   assert.equal(checkFindTheFeelingGates(session, g), null);
   assert.equal(checkFindTheFeelingGates({ ...session, offered: ["numb"], word: "numb", wordAccepted: true }, g), "floodedBlankWord");
+  assert.equal(checkFindTheFeelingGates({ ...session, routedTo: ["opposite-action"] }, g), "floodedBlankRoutes", "server keeps flooded+blank routes to regulation tools");
 });
 
 test("word routes come first, unless nothing set it off", () => {
   const hurtShape = { way: "shape", vec: byId.hurt.shape };
-  const base = [{ t: "begin" }, { t: "found", found: hurtShape }, { t: "band", band: "steady" }, { t: "pull", pull: "hide" }, { t: "word", answer: "yes" }];
+  const base = [{ t: "begin" }, { t: "found", found: hurtShape }, { t: "pull", pull: "hide" }, { t: "word", answer: "yes" }];
   assert.deepEqual(cur(run([...base, { t: "setOff", value: "someone" }, { t: "close", value: "quieter" }])).routedTo, ["recovering-from-invalidation", "opposite-action"]);
   assert.deepEqual(cur(run([...base, { t: "setOff", value: "nothing" }, { t: "close", value: "quieter" }])).routedTo, ["opposite-action"]);
 });
 
 test("check-in entry ends at handoff after the word, with nothing else recorded", () => {
-  const s = cur(run([{ t: "begin" }, { t: "found", found: furious }, { t: "band", band: "steady" }, { t: "pull", pull: "fight" }, { t: "word", answer: "close" }], "checkin"));
+  const s = cur(run([{ t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "fight" }, { t: "word", answer: "close" }], "checkin"));
   assert.equal(s.step, "handoff");
-  const session = validate(flowLib.toSession(s, "3f2c9a0e-1b2c-4d5e-8f90-123456789abc", content.version));
+  const session = validate(flowLib.toSession(s, SID, content.version));
   assert.equal(session.close, null);
+  assert.equal(session.band, null);
   assert.deepEqual(session.routedTo, []);
 });
 
 test("back restores the previous step; switching way is only possible before finding", () => {
-  const h = run([{ t: "begin" }, { t: "found", found: furious }, { t: "band", band: "steady" }, { t: "back" }]);
-  assert.equal(cur(h).step, "capacity");
+  const h = run([{ t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "fight" }, { t: "back" }]);
+  assert.equal(cur(h).step, "pull");
+  assert.equal(cur(run([{ t: "begin" }, { t: "found", found: furious }, { t: "back" }])).step, "find");
   assert.equal(cur(run([{ t: "begin" }, { t: "switchWay", way: "tune" }])).way, "tune");
   assert.equal(cur(run([{ t: "begin" }, { t: "found", found: furious }, { t: "switchWay", way: "tune" }])).way, "shape");
 });
 
 test("ambient descent never touches the found snapshot and is capped", () => {
-  const h = run([{ t: "begin" }, { t: "found", found: furious }, { t: "band", band: "stirred" }, { t: "pull", pull: "fight" }, { t: "word", answer: "yes" }, { t: "setOff", value: null }]);
+  const h = run([{ t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "fight" }, { t: "word", answer: "yes" }, { t: "setOff", value: null }]);
   const s = cur(h);
   assert.deepEqual(s.found.vec, byId.furious.shape);
+  assert.ok(s.stepsSinceStart > 0, "descent counts from the find now that there's no capacity step");
   const a = lib.ambientDescent({ stepsSinceStart: 99, band: s.band, pull: s.pull, gates: g, enabled: true });
   assert.equal(a.level, g.ambientDescent.maxTotal);
   const drifted = lib.driftShape(s.found.vec, a.level, a.direction);
@@ -161,7 +195,10 @@ test("validator rejects mismatched vectors, unoffered words and missing closes",
   assert.throws(() => validate({ ...ok, word: "furious" }));
   assert.throws(() => validate({ ...ok, close: null }));
   assert.throws(() => validate({ ...ok, routedTo: ["a", "b", "c"] }));
-  assert.equal(checkFindTheFeelingGates(validate({ ...ok, band: "flooded" }), g), "regulation");
+  assert.throws(() => validate({ ...ok, band: "loud" }));
+  assert.equal(validate({ ...ok, band: null }).band, null, "no band: the capacity question isn't asked");
+  assert.equal(checkFindTheFeelingGates(validate({ ...ok, band: null }), g), null);
+  assert.equal(checkFindTheFeelingGates(validate({ ...ok, band: "flooded" }), g), "regulation", "sessions saved with a band still check");
   assert.equal(checkFindTheFeelingGates(validate({ ...ok, band: "flooded", regulation: "skipped" }), g), null);
 });
 
@@ -174,21 +211,12 @@ test("every urge and word route points at a real app tool", () => {
 
 test("late or duplicate actions are ignored (no extra offers, no pull after Back)", () => {
   const h = run([
-    { t: "begin" }, { t: "found", found: furious }, { t: "band", band: "stirred" }, { t: "pull", pull: "fight" },
+    { t: "begin" }, { t: "found", found: furious }, { t: "pull", pull: "fight" },
     { t: "word", answer: "no" }, { t: "word", answer: "no" }, { t: "word", answer: "no" }, { t: "word", answer: "no" },
   ]);
   assert.equal(cur(h).step, "setOff");
   assert.equal(cur(h).offer.offered.length, 3);
-  const b = run([{ t: "begin" }, { t: "found", found: furious }, { t: "band", band: "stirred" }, { t: "back" }, { t: "pull", pull: "fight" }]);
-  assert.equal(cur(b).step, "capacity");
+  const b = run([{ t: "begin" }, { t: "found", found: furious }, { t: "back" }, { t: "pull", pull: "fight" }]);
+  assert.equal(cur(b).step, "find");
   assert.equal(cur(b).pull, null);
-});
-
-test("server keeps flooded+blank routes to regulation tools", () => {
-  const s = cur(run([
-    { t: "begin" }, { t: "found", found: furious }, { t: "band", band: "flooded" }, { t: "pull", pull: "blank" },
-    { t: "regulated", skipped: false }, { t: "oriented" }, { t: "setOff", value: null }, { t: "close", value: "same" },
-  ]));
-  const session = validate(flowLib.toSession(s, "3f2c9a0e-1b2c-4d5e-8f90-123456789abc", content.version));
-  assert.equal(checkFindTheFeelingGates({ ...session, routedTo: ["opposite-action"] }, g), "floodedBlankRoutes");
 });

@@ -24,19 +24,20 @@ export function isFloodedBlank(band: Band | null, pull: UrgeId | null): boolean 
 
 /**
  * Which regulation step, if any. Flooded always calms first (bottom-up), including flooded+blank.
- * Blank alone activates and is never calmed.
+ * Blank alone activates and is never calmed. No band (the capacity question isn't asked): only the
+ * pull decides.
  */
 export function regulationFor(
-  way: Way, band: Band, pull: UrgeId, gates: Pick<FindTheFeelingGates, 'regulateBands' | 'activateUrges'>,
+  way: Way, band: Band | null, pull: UrgeId, gates: Pick<FindTheFeelingGates, 'regulateBands' | 'activateUrges'>,
 ): Exclude<Regulation, 'skipped'> {
-  if (gates.regulateBands.includes(band)) return way === 'shape' ? 'smooth' : 'tune';
+  if (band && gates.regulateBands.includes(band)) return way === 'shape' ? 'smooth' : 'tune';
   if (gates.activateUrges.includes(pull)) return way === 'shape' ? 'warm' : 'wake';
   return 'none';
 }
 
 /** The regulation values a finished session may record for this band/pull (server re-checks the same). */
 export function allowedRegulations(
-  way: Way, band: Band, pull: UrgeId, gates: Pick<FindTheFeelingGates, 'regulateBands' | 'activateUrges'>,
+  way: Way, band: Band | null, pull: UrgeId, gates: Pick<FindTheFeelingGates, 'regulateBands' | 'activateUrges'>,
 ): Regulation[] {
   const r = regulationFor(way, band, pull, gates);
   return r === 'none' ? ['none'] : [r, 'skipped'];
@@ -93,7 +94,7 @@ export function answerOffer(
  * regulation tools only. Steady with no word route and a quiet urge may route nowhere.
  */
 export function routeNext(opts: {
-  band: Band; pull: UrgeId; word: FeelingWord | null; setOff: string | null;
+  band: Band | null; pull: UrgeId; word: FeelingWord | null; setOff: string | null;
   urgeRoutes: Record<string, string[]>; floodedBlankRoutes: string[]; exclude?: string[];
 }): string[] {
   const { band, pull, word, setOff, urgeRoutes, floodedBlankRoutes, exclude = ['find-the-feeling'] } = opts;

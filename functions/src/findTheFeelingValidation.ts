@@ -16,7 +16,8 @@ export interface FindTheFeelingSessionInput {
   switchedWay: boolean;
   shape: number[] | null;
   sound: number[] | null;
-  band: Band;
+  /** null: the capacity question wasn't asked (removed 30 Sep; sessions before that carry one). */
+  band: Band | null;
   pull: UrgeId;
   regulation: Regulation;
   offered: string[];
@@ -65,8 +66,8 @@ function ids(v: unknown, key: string, max: number, re: RegExp): string[] {
 }
 
 /** The regulation a session must record: same rule as the client (lib/findTheFeeling regulationFor). */
-export function expectedRegulation(way: Way, band: Band, pull: UrgeId, gates: FindTheFeelingGates): Regulation {
-  if (gates.regulateBands.includes(band)) return way === 'shape' ? 'smooth' : 'tune';
+export function expectedRegulation(way: Way, band: Band | null, pull: UrgeId, gates: FindTheFeelingGates): Regulation {
+  if (band && gates.regulateBands.includes(band)) return way === 'shape' ? 'smooth' : 'tune';
   if (gates.activateUrges.includes(pull)) return way === 'shape' ? 'warm' : 'wake';
   return 'none';
 }
@@ -86,7 +87,7 @@ export function validateFindTheFeelingSession(input: unknown): FindTheFeelingSes
   const shape = way === 'shape' ? vec(raw.shape, 5, -1, 1, 'shape') : null;
   const sound = way === 'tune' ? vec(raw.sound, 4, 0, 1, 'sound') : null;
   if ((way === 'shape' && raw.sound !== null) || (way === 'tune' && raw.shape !== null)) throw new Error('Vector does not match way');
-  const band = oneOf(BANDS, raw.band, 'band');
+  const band = raw.band === null ? null : oneOf(BANDS, raw.band, 'band');
   const pull = oneOf(URGES, raw.pull, 'pull');
   const regulation = oneOf(REGULATIONS, raw.regulation, 'regulation');
   const offered = ids(raw.offered, 'offered', 8, ID);

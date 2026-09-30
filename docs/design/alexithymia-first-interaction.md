@@ -1,5 +1,7 @@
 # Alexithymia-first interaction: Stage, Shape, Tune
 
+> **30 Sep 2026:** the capacity question ("If someone asked you for a favour right now…") is removed from every flow until there is a better way to ask it; see CLAUDE.md, "The capacity question is out". The Capacity step below is historical.
+
 Status: agreed direction, not built. Prototypes: `prototypes/goblin-lab/` (run with `npm i && npx vite`).
 Tool specs: [find-the-feeling.md](find-the-feeling.md) (Shape it + Tune it) and
 [recover-from-invalidation.md](recover-from-invalidation.md#v2-stage-it) (Stage it).

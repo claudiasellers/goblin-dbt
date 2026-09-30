@@ -12,7 +12,6 @@ const HIGH: Anchor = { x: 50, y: 25, size: 'min(36vw,150px)', show: true };
 const ANCHORS: Record<Step, Anchor> = {
   intro: { x: 50, y: 42, size: 'min(74vw,320px)', show: true },
   find: { x: 50, y: 40, size: 'min(52vw,230px)', show: true },
-  capacity: { x: 50, y: 50, size: 'min(60vw,260px)', show: true },
   pull: { x: 50, y: 118, size: 'min(40vw,160px)', show: false },
   regulate: { x: 50, y: 60, size: 'min(78vw,340px)', show: true },
   orient: HIGH,

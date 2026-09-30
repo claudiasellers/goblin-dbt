@@ -131,7 +131,8 @@ export interface FindTheFeelingSession {
   switchedWay: boolean;
   shape: ShapeVec | null;
   sound: SoundVec | null;
-  band: Band;
+  /** null: the capacity question isn't asked (removed 30 Sep). */
+  band: Band | null;
   pull: UrgeId;
   regulation: Regulation;
   offered: string[];
