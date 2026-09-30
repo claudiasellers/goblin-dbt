@@ -67,7 +67,7 @@ export function History() {
         <div className="space-y-3">
           <Link
             to="/signup"
-            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+            className="block w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
           >
             Create account
           </Link>
@@ -98,7 +98,7 @@ export function History() {
         <p className="text-[var(--color-text-secondary)] mb-4">{error}</p>
         <button
           onClick={() => window.location.reload()}
-          className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+          className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
         >
           Try again
         </button>
@@ -118,7 +118,7 @@ export function History() {
           onClick={() => setActiveTab('insights')}
           className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'insights'
-              ? 'bg-[var(--color-accent-fill)] text-white'
+              ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)]'
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
@@ -128,7 +128,7 @@ export function History() {
           onClick={() => setActiveTab('checkins')}
           className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'checkins'
-              ? 'bg-[var(--color-accent-fill)] text-white'
+              ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)]'
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
@@ -138,7 +138,7 @@ export function History() {
           onClick={() => setActiveTab('dearman')}
           className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-colors ${
             activeTab === 'dearman'
-              ? 'bg-[var(--color-accent-fill)] text-white'
+              ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)]'
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >
@@ -158,7 +158,7 @@ export function History() {
               </p>
               <Link
                 to="/"
-                className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+                className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
               >
                 Check in now
               </Link>
@@ -182,7 +182,7 @@ export function History() {
               </p>
               <Link
                 to="/tool/dear-man"
-                className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+                className="inline-block py-2 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
               >
                 Try DEAR MAN
               </Link>

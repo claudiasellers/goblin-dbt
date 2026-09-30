@@ -20,7 +20,7 @@ export function TimeFilter({ value, onChange }: TimeFilterProps) {
           onClick={() => onChange(opt.value)}
           className={`px-3 py-1 rounded-md text-sm font-medium transition-colors ${
             value === opt.value
-              ? 'bg-[var(--color-accent-fill)] text-white'
+              ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)]'
               : 'text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]'
           }`}
         >

@@ -302,7 +302,7 @@ export function QuadrantGrid({
       {/* Continue button */}
       {selectedEmotions.length > 0 && (
         <button
-          className="w-full py-3 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 bg-[var(--color-accent-fill)] text-white border-none lift-primary"
+          className="w-full py-3 rounded-xl text-sm font-medium cursor-pointer transition-all duration-200 bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none lift-primary"
           onClick={() => onSelect(selectedEmotions)}
         >
           Continue with {selectedEmotions.length} emotion

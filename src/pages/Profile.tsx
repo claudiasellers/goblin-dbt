@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { modules } from '../data/modules';
-import { palettes, DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
+import { palettes, applyRoom, resolvePalette, type PaletteId } from '../data/palettes';
 import { exportUserData, deleteUserData } from '../services/neo4j';
 
 export function Profile() {
@@ -53,8 +53,7 @@ export function Profile() {
       />
 
       <AppearanceSection
-        theme={profile.theme}
-        palette={profile.palette ?? DEFAULT_PALETTE}
+        palette={resolvePalette(profile.palette)}
         onSave={(changes) => updateProfile(changes)}
       />
 
@@ -189,56 +188,49 @@ function BasicInfoSection({
 }
 
 // --- Appearance ---
-type ThemeChoice = 'dark' | 'light' | 'system';
 
 /**
- * Theme and palette are staged: picking an option previews it on the page
- * immediately, but nothing is stored until Save. Leaving the page without
- * saving puts the saved values back.
+ * The room is staged: picking one previews it on the page immediately, but
+ * nothing is stored until Save. Leaving the page without saving puts the saved
+ * room back. Each room owns its light/dark mode, so there is no separate theme
+ * choice (see src/data/palettes.ts).
  */
 function AppearanceSection({
-  theme,
   palette,
   onSave,
 }: {
-  theme: ThemeChoice;
   palette: PaletteId;
-  onSave: (changes: { theme: ThemeChoice; palette: PaletteId }) => Promise<void>;
+  onSave: (changes: { palette: PaletteId }) => Promise<void>;
 }) {
-  const [draftTheme, setDraftTheme] = useState<ThemeChoice>(theme);
   const [draftPalette, setDraftPalette] = useState<PaletteId>(palette);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   // True once the user has picked something; a late profile load must not wipe their pick
   const touched = useRef(false);
 
-  const dirty = draftTheme !== theme || draftPalette !== palette;
+  const dirty = draftPalette !== palette;
 
-  // Keep drafts in step with the saved profile only while the user hasn't touched them
-  useEffect(() => { if (!touched.current) setDraftTheme(theme); }, [theme]);
+  // Keep the draft in step with the saved profile only while the user hasn't touched it
   useEffect(() => { if (!touched.current) setDraftPalette(palette); }, [palette]);
 
-  function pickTheme(value: ThemeChoice) { touched.current = true; setDraftTheme(value); }
   function pickPalette(value: PaletteId) { touched.current = true; setDraftPalette(value); }
 
-  // Live preview of the draft; restore the saved values on unmount
+  // Live preview of the draft; restore the saved room on unmount
   useEffect(() => {
-    document.documentElement.dataset.theme = draftTheme;
-    document.documentElement.dataset.palette = draftPalette;
-  }, [draftTheme, draftPalette]);
+    applyRoom(draftPalette);
+  }, [draftPalette]);
   useEffect(() => {
     return () => {
-      document.documentElement.dataset.theme = theme;
-      document.documentElement.dataset.palette = palette;
+      applyRoom(palette);
     };
-  }, [theme, palette]);
+  }, [palette]);
 
   useEffect(() => { if (dirty) setSaved(false); }, [dirty]);
 
   async function handleSave() {
     setSaving(true);
     try {
-      await onSave({ theme: draftTheme, palette: draftPalette });
+      await onSave({ palette: draftPalette });
       touched.current = false;
       setSaved(true);
     } catch {
@@ -250,44 +242,14 @@ function AppearanceSection({
 
   function handleRevert() {
     touched.current = false;
-    setDraftTheme(theme);
     setDraftPalette(palette);
   }
-
-  const themeOptions: { value: ThemeChoice; label: string }[] = [
-    { value: 'dark', label: 'Dark' },
-    { value: 'light', label: 'Light' },
-    { value: 'system', label: 'System' },
-  ];
 
   return (
     <SectionCard title="Appearance">
       <div>
-        <label className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">
-          Theme
-        </label>
-        <div className="flex gap-2">
-          {themeOptions.map((opt) => (
-            <button
-              key={opt.value}
-              type="button"
-              onClick={() => pickTheme(opt.value)}
-              aria-pressed={draftTheme === opt.value}
-              className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium border transition-colors ${
-                draftTheme === opt.value
-                  ? 'bg-[var(--color-accent-muted)] border-[var(--color-accent)] text-[var(--color-accent)]'
-                  : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] text-[var(--color-text-tertiary)] hover:border-[var(--color-border-accent)]'
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div>
         <label id="palette-label" className="block text-xs font-medium text-[var(--color-text-tertiary)] mb-2">
-          Color palette
+          Room
         </label>
         <div role="radiogroup" aria-labelledby="palette-label" className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {palettes.map((p) => {
@@ -306,7 +268,7 @@ function AppearanceSection({
                 }`}
                 style={selected ? { borderWidth: '1.5px' } : undefined}
               >
-                {/* Five-dot swatch: page, ink, action, high-unpleasant, low-pleasant (light values) */}
+                {/* Five-dot swatch: page, ink, action, high-unpleasant, low-pleasant */}
                 <span className="flex gap-1 shrink-0" aria-hidden="true">
                   {p.swatch.map((hex, i) => (
                     <span
@@ -628,7 +590,7 @@ function PrivacySection({
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="px-3 py-1.5 rounded-lg bg-[var(--color-danger)] text-white text-xs font-medium hover:bg-[var(--color-danger)]/80 disabled:opacity-40 transition-colors"
+              className="px-3 py-1.5 rounded-lg bg-[var(--color-danger)] text-[var(--color-on-danger)] text-xs font-medium hover:bg-[var(--color-danger)]/80 disabled:opacity-40 transition-colors"
             >
               {deleting ? 'Deleting...' : 'Yes, Delete'}
             </button>

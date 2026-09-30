@@ -14,7 +14,7 @@ import {
   DEFAULT_PROFILE,
   type UserProfile,
 } from '../services/neo4j';
-import { DEFAULT_PALETTE } from '../data/palettes';
+import { applyRoom } from '../data/palettes';
 
 const PROFILE_CACHE_KEY = 'goblin-dbt-profile-cache';
 
@@ -72,8 +72,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
     const cached = loadCachedProfile(user.uid);
     if (cached) {
       setProfile(cached);
-      document.documentElement.dataset.theme = cached.theme;
-      document.documentElement.dataset.palette = cached.palette ?? DEFAULT_PALETTE;
+      applyRoom(cached.palette);
     }
 
     setLoading(true);
@@ -128,17 +127,11 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   );
 
   // ============================================
-  // Theme switching effect
+  // Room switching effect. A room sets both data-palette and its own
+  // light/dark data-theme (see src/data/palettes.ts).
   // ============================================
   useEffect(() => {
-    document.documentElement.dataset.theme = profile.theme;
-  }, [profile.theme]);
-
-  // ============================================
-  // Palette switching effect (see docs/design/2026-09-14-palette-picker.md)
-  // ============================================
-  useEffect(() => {
-    document.documentElement.dataset.palette = profile.palette ?? DEFAULT_PALETTE;
+    applyRoom(profile.palette);
   }, [profile.palette]);
 
   // ============================================

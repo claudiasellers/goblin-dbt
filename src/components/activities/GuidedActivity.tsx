@@ -146,7 +146,7 @@ export function GuidedActivity({
       {currentStep.waitForTap && (
         <button
           onClick={handleTap}
-          className="w-full max-w-xs py-3.5 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium lift-primary mb-4"
+          className="w-full max-w-xs py-3.5 px-6 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary mb-4"
         >
           Done
         </button>

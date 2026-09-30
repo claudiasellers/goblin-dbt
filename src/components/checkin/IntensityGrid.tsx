@@ -133,7 +133,7 @@ export function IntensityGrid({ onSelect, onHelpMeNow, initialPosition }: Intens
         )}
         <button
           onClick={handleConfirm}
-          className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
+          className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
         >
           Add more detail
         </button>

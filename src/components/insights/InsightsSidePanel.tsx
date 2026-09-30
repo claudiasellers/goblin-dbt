@@ -29,7 +29,7 @@ export function InsightsSidePanel() {
       <RecentPatterns patterns={patternFrequencies} totalCheckIns={totalCheckIns} />
       <Link
         to="/"
-        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[var(--color-accent-fill)] text-white text-sm font-medium lift-primary"
+        className="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-sm font-medium lift-primary"
       >
         Check in now
       </Link>
