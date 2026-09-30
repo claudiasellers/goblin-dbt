@@ -196,7 +196,9 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `schema/relationships.cypher` | Base graph relationships |
 | `schema/maintenance/` | Dedupe dry run + relationship-only apply (run by hand, never loaded) |
 | `scripts/load-graph.mjs` | Loads `schema/` in `LOAD_ORDER`; `--verify`, `--only`, `--file`, `--dry-run`; voice-lints the witness corpus and flow docs before sending (`--skip-voice-lint`) |
-| `scripts/verify-live-routing.mjs` | Read-only live-graph routing check; `--compare tests/fixtures/live-routing-2026-09-30.json` |
+| `scripts/verify-live-routing.mjs` | Read-only live-graph routing check; `--compare tests/fixtures/live-routing-2026-09-30.json` (a committed live summary) or `--compare tests/fixtures/recommendation-graph.json` (what the schema says) |
+| `functions/src/recommendation/` | The check-in engine. `handler.ts` is pure orchestration over an injected query layer (`queries.ts` in production); `patternScoring.ts` (pattern selection), `legacy.ts` (today's tool ranker); the crisis flag is one seam, `functions/src/safety/checkinSafetyFlag.ts` |
+| `scripts/recommendations/schema_graph.py`, `fixture.py` | Replays `schema/*.cypher` (LOAD_ORDER) in memory and writes `tests/fixtures/recommendation-graph.json`, the graph slice routing reads. Regenerate after any schema change that touches patterns, concepts, emotions or evidence; `tests/recommendation-*.test.mjs` run whole check-ins over it (`tests/lib/recommendationFixture.mjs`) and check it against the live summary |
 | `schema/emotion-regulation-content.cypher` | EmotionRegulationContent base (label, fitsTheFactsWhen) |
 | `schema/opposite-action-data.cypher` | Protocol metadata + ActionUrge nodes (OA tool source of truth) |
 

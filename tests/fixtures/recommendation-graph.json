@@ -1,0 +1,1471 @@
+{
+ "kind": "recommendation-graph",
+ "generatedBy": "scripts/recommendations/fixture.py (replays schema/*.cypher in LOAD_ORDER)",
+ "patterns": {
+  "acute_alarm": {
+   "userFacingLabel": "Your brain's alarm system is activated right now",
+   "description": "Phasic/immediate threat response with amygdala-driven arousal and suppressed prefrontal regulation",
+   "evidenceGrade": "Strong",
+   "safetyConstraints": [
+    "Do not say 'amygdala hijacking'",
+    "Frame as current state not trait",
+    "Use 'right now' not 'you tend to'"
+   ],
+   "clinicalNotes": "BNST involvement scales with sustained/uncertain threat. LC-NE amplifies arousal. Hippocampus suppression = contextual safety signaling less effective.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "anxiety",
+     "strength": "strong"
+    },
+    {
+     "id": "fear",
+     "strength": "strong"
+    },
+    {
+     "id": "overwhelm",
+     "strength": "strong"
+    },
+    {
+     "id": "panic",
+     "strength": "strong"
+    }
+   ]
+  },
+  "chronic_vigilance": {
+   "userFacingLabel": "Your attention is locked onto what could go wrong",
+   "description": "Sustained/anticipatory threat processing with BNST as primary driver; radar stuck on mode",
+   "evidenceGrade": "Moderate-Strong",
+   "safetyConstraints": [
+    "Superior colliculus REJECTED as core node - sparse human fMRI evidence"
+   ],
+   "clinicalNotes": "BNST specialized for defensive distance. Treatment levers: attentional retraining and safety-signal conditioning vs autonomic downshift for acute alarm.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "anxiety",
+     "strength": "strong"
+    },
+    {
+     "id": "hopelessness",
+     "strength": "moderate"
+    },
+    {
+     "id": "loneliness",
+     "strength": "weak"
+    },
+    {
+     "id": "stress",
+     "strength": "strong"
+    }
+   ]
+  },
+  "conservation_freeze": {
+   "userFacingLabel": "Your system is conserving energy right now",
+   "description": "PAG-centered shutdown/freeze; global dampening with no single dominant network",
+   "evidenceGrade": "Moderate",
+   "safetyConstraints": [
+    "CRITICAL: Traditional calming tools may worsen state",
+    "Do NOT recommend deep breathing or meditation",
+    "Favor gentle up-regulation: cold water, proprioceptive input, micro-movements",
+    "Pulling out too quickly can trigger rebound panic"
+   ],
+   "clinicalNotes": "Model PAG as coordinator NOT 'Dorsal Vagal Complex'. Use neutral ANS terminology. Thalamic suppression reduces sensory bandwidth contributing to dissociative experiences.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "apathy",
+     "strength": "moderate"
+    },
+    {
+     "id": "cold_shame",
+     "strength": "moderate"
+    },
+    {
+     "id": "emptiness",
+     "strength": "strong"
+    },
+    {
+     "id": "hopelessness",
+     "strength": "strong"
+    },
+    {
+     "id": "loneliness",
+     "strength": "weak"
+    },
+    {
+     "id": "numbness",
+     "strength": "strong"
+    },
+    {
+     "id": "sadness",
+     "strength": "moderate"
+    }
+   ]
+  },
+  "dissociation_overmodulation": {
+   "userFacingLabel": "Your mind is protecting you by disconnecting",
+   "description": "PFC OVER-active suppressing limbic response; distinct from global dampening of conservation_freeze",
+   "evidenceGrade": "Strong within PTSD-dissociative subtype; Moderate for broader DPDR",
+   "safetyConstraints": [
+    "Dissociation + suicidal ideation = escalation pathway",
+    "Do NOT suggest heavy interoceptive exposure without titration",
+    "Somatic Experiencing and gentle proprioceptive input are safer entry points"
+   ],
+   "clinicalNotes": "Control tower actively silencing alarms. Needs interoceptive reconnection - slowly re-establishing contact with suppressed body signals. Amygdala SUPPRESSION is defining feature.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "cold_shame",
+     "strength": "weak"
+    },
+    {
+     "id": "emptiness",
+     "strength": "strong"
+    },
+    {
+     "id": "hopelessness",
+     "strength": "moderate"
+    },
+    {
+     "id": "loneliness",
+     "strength": "moderate"
+    },
+    {
+     "id": "numbness",
+     "strength": "strong"
+    }
+   ]
+  },
+  "emotional_flooding": {
+   "userFacingLabel": "Your feelings are hitting all at once",
+   "description": "PFC essentially offline; salience network overloaded; cognitive tools will fail in this state",
+   "evidenceGrade": "Moderate-Strong",
+   "safetyConstraints": [
+    "Screen for self-harm risk when 'out of control' reported",
+    "Emergency state - present tools immediately with minimal cognitive demand",
+    "No browsing, 1-2 options max"
+   ],
+   "clinicalNotes": "OFC suppression is key differentiator - cannot reason about emotion. MUST recommend bottom-up autonomic tools: cold water, paced breathing, PMR. dlPAG involvement (active defense) included with moderate evidence.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "anger",
+     "strength": "moderate"
+    },
+    {
+     "id": "fear",
+     "strength": "moderate"
+    },
+    {
+     "id": "guilt",
+     "strength": "weak"
+    },
+    {
+     "id": "overwhelm",
+     "strength": "strong"
+    },
+    {
+     "id": "panic",
+     "strength": "moderate"
+    },
+    {
+     "id": "sadness",
+     "strength": "moderate"
+    }
+   ]
+  },
+  "grief_yearning": {
+   "userFacingLabel": "Your attachment system is reaching for who is gone",
+   "description": "NAc/ventral striatum yearning/craving, PCC autobiographical memory, amygdala distress",
+   "evidenceGrade": "Moderate",
+   "safetyConstraints": [
+    "Never use 'moving on' language",
+    "Focus on integrated memory and meaning-making",
+    "Do not pathologize normal grief trajectories"
+   ],
+   "clinicalNotes": "NAc findings specific to PROLONGED/COMPLICATED grief. Do not generalize to all grief.",
+   "blank": null,
+   "emotions": []
+  },
+  "reactive_aggression": {
+   "userFacingLabel": "Your protection system is translating stress into anger",
+   "description": "Amygdala-hypothalamus-PAG attack circuit with suppressed regulatory PFC nodes",
+   "evidenceGrade": "Moderate-Strong",
+   "safetyConstraints": [
+    "Proactive/instrumental aggression REJECTED for all releases",
+    "Only reactive aggression modeled",
+    "Requires careful tool sequencing to avoid escalation"
+   ],
+   "clinicalNotes": "Higher safety complexity. Tools must discharge sympathetic energy safely before cognitive tools. Affect labeling re-engages vlPFC. High association with hostile attribution bias.",
+   "blank": null,
+   "emotions": []
+  },
+  "reward_drive_low": {
+   "userFacingLabel": "Your motivation system is idling right now",
+   "description": "Ventral striatal blunting with reduced dopamine signaling; positive valence system under-engaged",
+   "evidenceGrade": "Strong for ventral striatal blunting; Moderate for inflammation mechanism",
+   "safetyConstraints": [
+    "Screen for MDE if anhedonia pervasive across multiple check-ins",
+    "Consider fatigue/inflammation screening if persistent",
+    "Do NOT imply 'not trying hard enough'"
+   ],
+   "clinicalNotes": "Frame as 'reward system under-engaged' not single-cause. Inflammation→dopamine suppression is emerging evidence only - NOT inferable from self-report. High-effort goal setting may backfire. Recommend low-friction behavioral activation with small immediate sensory rewards.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "apathy",
+     "strength": "strong"
+    },
+    {
+     "id": "boredom",
+     "strength": "strong"
+    },
+    {
+     "id": "disappointment",
+     "strength": "moderate"
+    },
+    {
+     "id": "emptiness",
+     "strength": "strong"
+    },
+    {
+     "id": "hopelessness",
+     "strength": "strong"
+    },
+    {
+     "id": "loneliness",
+     "strength": "moderate"
+    },
+    {
+     "id": "sadness",
+     "strength": "moderate"
+    }
+   ]
+  },
+  "rumination_loop": {
+   "userFacingLabel": "Your mind is stuck on replay",
+   "description": "DMN hyperactivity with sgACC coupling; self-referential processing infused with negative valence",
+   "evidenceGrade": "Strong for depressive rumination; Moderate for anxious worry",
+   "safetyConstraints": [
+    "If ruminative content involves suicidal ideation trigger crisis pathways",
+    "Do not use 'brain is broken' framing"
+   ],
+   "clinicalNotes": "DMN and sgPFC create caustic compound when functionally linked. dlPFC suppression NOT universal - may be active but failing in anxious worry. Break the link via task-positive activities requiring external focus. Mindfulness can backfire by increasing internal focus.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "anxiety",
+     "strength": "moderate"
+    },
+    {
+     "id": "cold_shame",
+     "strength": "moderate"
+    },
+    {
+     "id": "disappointment",
+     "strength": "moderate"
+    },
+    {
+     "id": "guilt",
+     "strength": "moderate"
+    },
+    {
+     "id": "hopelessness",
+     "strength": "strong"
+    },
+    {
+     "id": "loneliness",
+     "strength": "moderate"
+    },
+    {
+     "id": "sadness",
+     "strength": "strong"
+    }
+   ]
+  },
+  "social_threat_shame": {
+   "userFacingLabel": "Your brain is treating social evaluation like danger",
+   "description": "Self-evaluation-forward rather than amygdala-forward; intense Theory-of-Mind engagement modeling negative gaze of others",
+   "evidenceGrade": "Moderate-Strong",
+   "safetyConstraints": [
+    "Emphasize self-compassion and common humanity",
+    "Avoid tools that increase self-focus (journaling may amplify shame)",
+    "Do not suggest hopelessness/worthlessness as co-occurring without extreme care"
+   ],
+   "clinicalNotes": "Shame activates behavioral inhibition (hide/freeze). Guilt activates TPJ/reparative action. Social rejection activates dACC/insula pain. vmPFC suppression is state-dependent. Can trigger reactive aggression to regain social status.",
+   "blank": null,
+   "emotions": [
+    {
+     "id": "anger",
+     "strength": "weak"
+    },
+    {
+     "id": "anxiety",
+     "strength": "moderate"
+    },
+    {
+     "id": "cold_shame",
+     "strength": "strong"
+    },
+    {
+     "id": "disgust",
+     "strength": "weak"
+    },
+    {
+     "id": "guilt",
+     "strength": "strong"
+    },
+    {
+     "id": "hot_shame",
+     "strength": "strong"
+    },
+    {
+     "id": "loneliness",
+     "strength": "moderate"
+    },
+    {
+     "id": "rejection",
+     "strength": "strong"
+    }
+   ]
+  }
+ },
+ "concepts": {
+  "cbt_exposure": {
+   "appToolId": null,
+   "name": "Exposure",
+   "description": "Gradually facing feared situations to reduce anxiety through extinction learning",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": [
+    "fear"
+   ]
+  },
+  "dbt_alternate_rebellion": {
+   "appToolId": null,
+   "name": "Alternate Rebellion",
+   "description": "Finding non-destructive ways to rebel when feeling controlled or wanting to act against expectations; channel rebellious urges into harmless or even positive actions",
+   "whenToUse": "When feeling controlled, wanting to defy expectations, or having urges to do something destructive just to rebel",
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": [
+    "anger",
+    "angsty",
+    "frustration",
+    "irritation"
+   ]
+  },
+  "dbt_dear_man": {
+   "appToolId": "dear-man",
+   "name": "DEAR MAN",
+   "description": "Describe, Express, Assert, Reinforce, Mindful, Appear confident, Negotiate",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
+  "dbt_find_the_feeling": {
+   "appToolId": "find-the-feeling",
+   "name": "Find the Feeling",
+   "description": "Identify and name an emotion without introspective rating: match it to a shape or a sound, then accept or refuse an offered word",
+   "whenToUse": "When you can tell something's there but not what it is",
+   "dbtBasis": "Emotion Regulation: observing, describing and naming emotions (with Mindfulness Describe), without numeric rating",
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": [
+    "apathetic",
+    "confused",
+    "indifferent",
+    "perplexed"
+   ]
+  },
+  "dbt_opposite_action": {
+   "appToolId": "opposite-action",
+   "name": "Opposite Action",
+   "description": "Acting opposite to emotion urge when emotion doesn't fit facts or isn't effective",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": [
+    "anger",
+    "cold_shame",
+    "fear",
+    "sadness"
+   ]
+  },
+  "dbt_problem_solving": {
+   "appToolId": "problem-solve",
+   "name": "Problem Solving",
+   "description": "Changing the situation when emotion fits the facts",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
+  "dbt_recovering_from_invalidation": {
+   "appToolId": "recovering-from-invalidation",
+   "name": "Recovering from Invalidation",
+   "description": "Body-first sequence after someone dismisses, mocks, excludes or pulls away: settle, name it, self-validate, name the need, then ask (DEAR MAN), let it land, or act opposite",
+   "whenToUse": "When someone brushed you off, mocked you, left you out, or pulled away",
+   "dbtBasis": "Walking the Middle Path (validation, recovering from invalidation) with STOP, TIPP, Opposite Action and Radical Acceptance; asking hands off to DEAR MAN",
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": [
+    "abandoned",
+    "excluded",
+    "hot_shame",
+    "humiliated",
+    "hurt",
+    "rejected",
+    "rejection"
+   ]
+  },
+  "dbt_stop": {
+   "appToolId": "pause",
+   "name": "STOP",
+   "description": "Stop, Take a step back, Observe, Proceed mindfully",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
+  "dbt_tipp": {
+   "appToolId": "cool-down",
+   "name": "TIPP",
+   "description": "Temperature, Intense exercise, Paced breathing, Paired muscle relaxation",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": [
+    "anger",
+    "overwhelm",
+    "panic"
+   ]
+  },
+  "se_orienting": {
+   "appToolId": "five-senses",
+   "name": "Orienting",
+   "description": "Natural scanning of environment that was interrupted during trauma",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
+  "urge_surfing": {
+   "appToolId": "urge-surfing",
+   "name": "Urge Surfing",
+   "description": "Watching an urge rise, peak and fall without acting on it",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  }
+ },
+ "evidence": [
+  {
+   "responseId": "hu_body_overwhelmed",
+   "patternId": "emotional_flooding",
+   "weight": 0.8
+  },
+  {
+   "responseId": "hu_body_racing",
+   "patternId": "acute_alarm",
+   "weight": 0.8
+  },
+  {
+   "responseId": "hu_body_shame",
+   "patternId": "acute_alarm",
+   "weight": 0.15
+  },
+  {
+   "responseId": "hu_body_shame",
+   "patternId": "social_threat_shame",
+   "weight": 0.75
+  },
+  {
+   "responseId": "hu_body_tense",
+   "patternId": "chronic_vigilance",
+   "weight": 0.8
+  },
+  {
+   "responseId": "hu_body_unclear",
+   "patternId": "acute_alarm",
+   "weight": 0.25
+  },
+  {
+   "responseId": "hu_body_unclear",
+   "patternId": "emotional_flooding",
+   "weight": 0.5
+  },
+  {
+   "responseId": "hu_exp_alarm",
+   "patternId": "acute_alarm",
+   "weight": 0.7
+  },
+  {
+   "responseId": "hu_exp_alarm",
+   "patternId": "emotional_flooding",
+   "weight": 0.2
+  },
+  {
+   "responseId": "hu_exp_flooding",
+   "patternId": "emotional_flooding",
+   "weight": 0.85
+  },
+  {
+   "responseId": "hu_exp_social",
+   "patternId": "social_threat_shame",
+   "weight": 0.85
+  },
+  {
+   "responseId": "hu_exp_unsure",
+   "patternId": "acute_alarm",
+   "weight": 0.3
+  },
+  {
+   "responseId": "hu_exp_unsure",
+   "patternId": "chronic_vigilance",
+   "weight": 0.3
+  },
+  {
+   "responseId": "hu_exp_unsure",
+   "patternId": "emotional_flooding",
+   "weight": 0.2
+  },
+  {
+   "responseId": "hu_exp_vigilance",
+   "patternId": "chronic_vigilance",
+   "weight": 0.85
+  },
+  {
+   "responseId": "lu_body_flat",
+   "patternId": "reward_drive_low",
+   "weight": 0.8
+  },
+  {
+   "responseId": "lu_body_heavy",
+   "patternId": "conservation_freeze",
+   "weight": 0.85
+  },
+  {
+   "responseId": "lu_body_numb",
+   "patternId": "conservation_freeze",
+   "weight": 0.2
+  },
+  {
+   "responseId": "lu_body_numb",
+   "patternId": "dissociation_overmodulation",
+   "weight": 0.8
+  },
+  {
+   "responseId": "lu_body_unclear",
+   "patternId": "conservation_freeze",
+   "weight": 0.4
+  },
+  {
+   "responseId": "lu_body_unclear",
+   "patternId": "dissociation_overmodulation",
+   "weight": 0.35
+  },
+  {
+   "responseId": "lu_body_unclear",
+   "patternId": "reward_drive_low",
+   "weight": 0.15
+  },
+  {
+   "responseId": "lu_mind_blank",
+   "patternId": "conservation_freeze",
+   "weight": 0.45
+  },
+  {
+   "responseId": "lu_mind_blank",
+   "patternId": "reward_drive_low",
+   "weight": 0.45
+  },
+  {
+   "responseId": "lu_mind_faraway",
+   "patternId": "conservation_freeze",
+   "weight": 0.15
+  },
+  {
+   "responseId": "lu_mind_faraway",
+   "patternId": "dissociation_overmodulation",
+   "weight": 0.8
+  },
+  {
+   "responseId": "lu_mind_looping",
+   "patternId": "rumination_loop",
+   "weight": 0.85
+  },
+  {
+   "responseId": "lu_mind_unsure",
+   "patternId": "conservation_freeze",
+   "weight": 0.35
+  },
+  {
+   "responseId": "lu_mind_unsure",
+   "patternId": "dissociation_overmodulation",
+   "weight": 0.25
+  },
+  {
+   "responseId": "lu_mind_unsure",
+   "patternId": "reward_drive_low",
+   "weight": 0.15
+  }
+ ],
+ "questions": {
+  "high-unpleasant": [
+   "hu_experience_quality",
+   "hu_body_activation"
+  ],
+  "low-unpleasant": [
+   "lu_mind_quality",
+   "lu_body_quality"
+  ]
+ },
+ "coOccurrence": [
+  {
+   "a": "acute_alarm",
+   "b": "dissociation_overmodulation",
+   "clinicalLabel": "peritraumatic_dissociation",
+   "combinedUserFacingLabel": "Your alarm system activated and your mind pulled away at the same time — that's a protective response",
+   "primaryPatternId": "acute_alarm",
+   "frequency": "occasional",
+   "sequencingNote": "Grounding and safety-signal conditioning first (alarm protocol — orient to present safety). Once alarm subsides, dissociation often resolves spontaneously since it was protective. If dissociation persists after alarm resolves, then gentle sensory reconnection. Do NOT process the triggering event while either pattern is active."
+  },
+  {
+   "a": "chronic_vigilance",
+   "b": "conservation_freeze",
+   "clinicalLabel": "exhaustion_collapse",
+   "combinedUserFacingLabel": "Your system has been on guard for a long time and is running out of fuel",
+   "primaryPatternId": "conservation_freeze",
+   "frequency": "occasional",
+   "sequencingNote": "Gentle proprioceptive up-regulation first (restore baseline body awareness and minimal sense of agency). The system is resource-depleted — demanding cognitive or regulatory effort will fail. Once body is minimally mobilized, then safety-signal conditioning and autonomic settling (vigilance protocol). Also: address sleep and basic needs as top priority."
+  },
+  {
+   "a": "chronic_vigilance",
+   "b": "reward_drive_low",
+   "clinicalLabel": "vigilant_anhedonia",
+   "combinedUserFacingLabel": "Your alarm system is running in the background, and it's draining your ability to enjoy things",
+   "primaryPatternId": "chronic_vigilance",
+   "frequency": "common",
+   "sequencingNote": "Autonomic down-regulation + safety-signal conditioning first (vigilance protocol) to reduce threat bias that is actively suppressing reward system. Once body settles, micro-behavioral-activation (reward protocol). Behavioral activation fails while threat-scanning is active — person cannot engage with rewarding activities while on guard."
+  },
+  {
+   "a": "chronic_vigilance",
+   "b": "rumination_loop",
+   "clinicalLabel": "worried_rumination",
+   "combinedUserFacingLabel": "Your alarm system is scanning for threats, and your mind is building worst-case scenarios",
+   "primaryPatternId": "chronic_vigilance",
+   "frequency": "very_common",
+   "sequencingNote": "Autonomic down-regulation first (grounding, paced breathing, safety-signal conditioning) to reduce tonic sympathetic activation. This lowers SN threat bias and starves the worry loop. Then attention redirection (rumination protocol). Note: calming tools ARE appropriate here — vigilance is high-arousal, unlike freeze."
+  },
+  {
+   "a": "conservation_freeze",
+   "b": "dissociation_overmodulation",
+   "clinicalLabel": "shutdown_with_disconnection",
+   "combinedUserFacingLabel": "Your system has gone very still, and your connection to your body is faint right now",
+   "primaryPatternId": "conservation_freeze",
+   "frequency": "occasional",
+   "sequencingNote": "Proprioceptive grounding first (micro-movements, warmth, bilateral input) to restore bottom-up sensory signals through thalamus. Only then titrated interoceptive reconnection (dissociation protocol). Asking someone to 'notice body sensations' during freeze fails because signals aren't getting through."
+  },
+  {
+   "a": "dissociation_overmodulation",
+   "b": "rumination_loop",
+   "clinicalLabel": "depersonalized_rumination",
+   "combinedUserFacingLabel": "Your mind is looping, but it feels like you're watching it from a distance",
+   "primaryPatternId": "dissociation_overmodulation",
+   "frequency": "less_common",
+   "sequencingNote": "Gentle sensory reconnection first (dissociation protocol) to re-establish body-brain signal path. This may briefly intensify emotional experience of ruminative content — that is expected and necessary. Once reconnected, external-focus tasks (rumination protocol) become effective. Do NOT start with attention redirection — person is already 'distant' from experience."
+  },
+  {
+   "a": "emotional_flooding",
+   "b": "dissociation_overmodulation",
+   "clinicalLabel": "flooding_triggered_shutdown",
+   "combinedUserFacingLabel": "Your body is activated, but your mind has pulled away to protect you",
+   "primaryPatternId": "emotional_flooding",
+   "frequency": "common",
+   "sequencingNote": "Autonomic down-regulation first (cold water, paced breathing, bilateral stimulation — bottom-up only, NO cognitive tools). Once body activation subsides, then gentle sensory reconnection (dissociation protocol). Do NOT start with interoceptive reconnection — opening the gate to the body while it's flooded risks re-flooding."
+  },
+  {
+   "a": "reward_drive_low",
+   "b": "rumination_loop",
+   "clinicalLabel": "anhedonic_rumination",
+   "combinedUserFacingLabel": "Your motivation system is idling, and your mind is trying to figure out why",
+   "primaryPatternId": "reward_drive_low",
+   "frequency": "common",
+   "sequencingNote": "Micro-behavioral-activation first (tiniest possible rewarding action to generate dopamine signal), then attention redirection if rumination persists. Rumination diminishes when something rewarding is available. Do NOT start with external-focus tasks — nothing is salient enough to redirect to."
+  },
+  {
+   "a": "rumination_loop",
+   "b": "conservation_freeze",
+   "clinicalLabel": "ruminative_collapse",
+   "combinedUserFacingLabel": "Your mind is stuck on replay, and your body has gone still to protect you",
+   "primaryPatternId": "conservation_freeze",
+   "frequency": "common",
+   "sequencingNote": "Proprioceptive up-regulation first (restore motor system and baseline CEN capacity), then external-focus attention tasks (rumination protocol). CEN engagement requires arousal that freeze suppresses."
+  },
+  {
+   "a": "social_threat_shame",
+   "b": "conservation_freeze",
+   "clinicalLabel": "shame_collapse",
+   "combinedUserFacingLabel": "The weight of being seen has made your whole system go still",
+   "primaryPatternId": "conservation_freeze",
+   "frequency": "common",
+   "sequencingNote": "Gentle proprioceptive up-regulation first (restore minimal body engagement). Once minimally mobilized, self-compassion touch + outward sensory contact (social threat protocol). Do NOT start with self-focused tools (amplifies shame) or social engagement demands (behavioral inhibition system is blocking this). Warmth is especially helpful — warm beverage, blanket — signals safety without social demand."
+  },
+  {
+   "a": "social_threat_shame",
+   "b": "rumination_loop",
+   "clinicalLabel": "shame_rumination",
+   "combinedUserFacingLabel": "You're replaying a social moment, and the shame is keeping the loop going",
+   "primaryPatternId": "social_threat_shame",
+   "frequency": "common",
+   "sequencingNote": "Outward-directed sensory contact + self-compassion touch first (social threat protocol). This breaks self-focused attention that feeds both shame-body and ruminative loop. Once shame activation decreases, ruminative content loses emotional charge. Then external-focus tasks if loop persists."
+  }
+ ],
+ "safety": {
+  "emotional_flooding": [
+   {
+    "id": "crisis_self_harm",
+    "type": "crisis",
+    "trigger": "Self-harm urges + 'out of control'",
+    "action": "Safety anchor (crisis line, emergency contact) BEFORE any tool"
+   }
+  ],
+  "dissociation_overmodulation": [
+   {
+    "id": "crisis_suicidal",
+    "type": "crisis",
+    "trigger": "Suicidal ideation in any pattern",
+    "action": "Immediate cessation of tool recommendation; present safety resources"
+   },
+   {
+    "id": "clinical_referral_severe_dissociation",
+    "type": "clinical_referral",
+    "trigger": "Severe dissociation (user cannot orient to present)",
+    "action": "Gentle grounding only; redirect to professional support"
+   }
+  ],
+  "conservation_freeze": [
+   {
+    "id": "clinical_referral_shutdown",
+    "type": "clinical_referral",
+    "trigger": "Persistent shutdown (7+ consecutive days of numb/empty)",
+    "action": "Flag potential chronic dysfunction; recommend professional evaluation"
+   }
+  ],
+  "rumination_loop": [
+   {
+    "id": "crisis_suicidal",
+    "type": "crisis",
+    "trigger": "Suicidal ideation in any pattern",
+    "action": "Immediate cessation of tool recommendation; present safety resources"
+   }
+  ],
+  "reward_drive_low": [
+   {
+    "id": "clinical_referral_shutdown",
+    "type": "clinical_referral",
+    "trigger": "Persistent shutdown (7+ consecutive days of numb/empty)",
+    "action": "Flag potential chronic dysfunction; recommend professional evaluation"
+   }
+  ]
+ },
+ "emotions": {
+  "abandoned": {
+   "name": "Abandoned",
+   "quadrant": "low-unpleasant"
+  },
+  "accepted": {
+   "name": "Accepted",
+   "quadrant": "high-pleasant"
+  },
+  "aggressive": {
+   "name": "Aggressive",
+   "quadrant": "high-unpleasant"
+  },
+  "amazed": {
+   "name": "Amazed",
+   "quadrant": "high-pleasant"
+  },
+  "amusement": {
+   "name": "Amusement",
+   "quadrant": "high-pleasant"
+  },
+  "anger": {
+   "name": "Anger",
+   "quadrant": "high-unpleasant"
+  },
+  "angry": {
+   "name": "Angry",
+   "quadrant": "high-unpleasant"
+  },
+  "angsty": {
+   "name": "Angsty",
+   "quadrant": "high-unpleasant"
+  },
+  "annoyed": {
+   "name": "Annoyed",
+   "quadrant": "high-unpleasant"
+  },
+  "anxiety": {
+   "name": "Anxiety",
+   "quadrant": "high-unpleasant"
+  },
+  "anxious": {
+   "name": "Anxious",
+   "quadrant": "high-unpleasant"
+  },
+  "apathetic": {
+   "name": "Apathetic",
+   "quadrant": "low-unpleasant"
+  },
+  "apathy": {
+   "name": "Apathy",
+   "quadrant": "low-unpleasant"
+  },
+  "appalled": {
+   "name": "Appalled",
+   "quadrant": "low-unpleasant"
+  },
+  "aroused": {
+   "name": "Aroused",
+   "quadrant": "high-pleasant"
+  },
+  "ashamed": {
+   "name": "Ashamed",
+   "quadrant": "low-unpleasant"
+  },
+  "astonished": {
+   "name": "Astonished",
+   "quadrant": "high-pleasant"
+  },
+  "awe": {
+   "name": "Awe",
+   "quadrant": "high-pleasant"
+  },
+  "awful": {
+   "name": "Awful",
+   "quadrant": "low-unpleasant"
+  },
+  "bad": {
+   "name": "Bad",
+   "quadrant": "low-unpleasant"
+  },
+  "betrayed": {
+   "name": "Betrayed",
+   "quadrant": "high-unpleasant"
+  },
+  "bitter": {
+   "name": "Bitter",
+   "quadrant": "high-unpleasant"
+  },
+  "bored": {
+   "name": "Bored",
+   "quadrant": "low-unpleasant"
+  },
+  "boredom": {
+   "name": "Boredom",
+   "quadrant": "low-unpleasant"
+  },
+  "busy": {
+   "name": "Busy",
+   "quadrant": "high-unpleasant"
+  },
+  "calm": {
+   "name": "Calm",
+   "quadrant": "low-pleasant"
+  },
+  "cheeky": {
+   "name": "Cheeky",
+   "quadrant": "high-pleasant"
+  },
+  "cold_shame": {
+   "name": "Cold Shame",
+   "quadrant": "low-unpleasant"
+  },
+  "compassion": {
+   "name": "Compassion",
+   "quadrant": "low-pleasant"
+  },
+  "confident": {
+   "name": "Confident",
+   "quadrant": "high-pleasant"
+  },
+  "confused": {
+   "name": "Confused",
+   "quadrant": "high-pleasant"
+  },
+  "content": {
+   "name": "Content",
+   "quadrant": "low-pleasant"
+  },
+  "contentment": {
+   "name": "Contentment",
+   "quadrant": "low-pleasant"
+  },
+  "courageous": {
+   "name": "Courageous",
+   "quadrant": "high-pleasant"
+  },
+  "creative": {
+   "name": "Creative",
+   "quadrant": "high-pleasant"
+  },
+  "critical": {
+   "name": "Critical",
+   "quadrant": "high-unpleasant"
+  },
+  "curiosity": {
+   "name": "Curiosity",
+   "quadrant": "high-pleasant"
+  },
+  "curious": {
+   "name": "Curious",
+   "quadrant": "high-pleasant"
+  },
+  "depressed": {
+   "name": "Depressed",
+   "quadrant": "low-unpleasant"
+  },
+  "despair": {
+   "name": "Despair",
+   "quadrant": "low-unpleasant"
+  },
+  "detestable": {
+   "name": "Detestable",
+   "quadrant": "low-unpleasant"
+  },
+  "disappointed": {
+   "name": "Disappointed",
+   "quadrant": "low-unpleasant"
+  },
+  "disappointment": {
+   "name": "Disappointment",
+   "quadrant": "low-unpleasant"
+  },
+  "disapproving": {
+   "name": "Disapproving",
+   "quadrant": "low-unpleasant"
+  },
+  "disgust": {
+   "name": "Disgust",
+   "quadrant": "low-unpleasant"
+  },
+  "disgusted": {
+   "name": "Disgusted",
+   "quadrant": "low-unpleasant"
+  },
+  "disillusioned": {
+   "name": "Disillusioned",
+   "quadrant": "high-pleasant"
+  },
+  "dismayed": {
+   "name": "Dismayed",
+   "quadrant": "high-pleasant"
+  },
+  "dismissive": {
+   "name": "Dismissive",
+   "quadrant": "high-unpleasant"
+  },
+  "disrespected": {
+   "name": "Disrespected",
+   "quadrant": "high-unpleasant"
+  },
+  "distant": {
+   "name": "Distant",
+   "quadrant": "high-unpleasant"
+  },
+  "eager": {
+   "name": "Eager",
+   "quadrant": "high-pleasant"
+  },
+  "embarrassed": {
+   "name": "Embarrassed",
+   "quadrant": "low-unpleasant"
+  },
+  "emptiness": {
+   "name": "Emptiness",
+   "quadrant": "low-unpleasant"
+  },
+  "empty": {
+   "name": "Empty",
+   "quadrant": "low-unpleasant"
+  },
+  "energetic": {
+   "name": "Energetic",
+   "quadrant": "high-pleasant"
+  },
+  "enthusiasm": {
+   "name": "Enthusiasm",
+   "quadrant": "high-pleasant"
+  },
+  "excited": {
+   "name": "Excited",
+   "quadrant": "high-pleasant"
+  },
+  "excitement": {
+   "name": "Excitement",
+   "quadrant": "high-pleasant"
+  },
+  "excluded": {
+   "name": "Excluded",
+   "quadrant": "high-unpleasant"
+  },
+  "exposed": {
+   "name": "Exposed",
+   "quadrant": "high-unpleasant"
+  },
+  "fear": {
+   "name": "Fear",
+   "quadrant": "high-unpleasant"
+  },
+  "fearful": {
+   "name": "Fearful",
+   "quadrant": "high-unpleasant"
+  },
+  "fragile": {
+   "name": "Fragile",
+   "quadrant": "low-unpleasant"
+  },
+  "free": {
+   "name": "Free",
+   "quadrant": "low-pleasant"
+  },
+  "frightened": {
+   "name": "Frightened",
+   "quadrant": "high-unpleasant"
+  },
+  "frustrated": {
+   "name": "Frustrated",
+   "quadrant": "high-unpleasant"
+  },
+  "frustration": {
+   "name": "Frustration",
+   "quadrant": "high-unpleasant"
+  },
+  "furious": {
+   "name": "Furious",
+   "quadrant": "high-unpleasant"
+  },
+  "gratitude": {
+   "name": "Gratitude",
+   "quadrant": "low-pleasant"
+  },
+  "grief": {
+   "name": "Grief",
+   "quadrant": "low-unpleasant"
+  },
+  "guilt": {
+   "name": "Guilt",
+   "quadrant": "low-unpleasant"
+  },
+  "guilty": {
+   "name": "Guilty",
+   "quadrant": "low-unpleasant"
+  },
+  "happy": {
+   "name": "Happy",
+   "quadrant": "high-pleasant"
+  },
+  "helpless": {
+   "name": "Helpless",
+   "quadrant": "high-unpleasant"
+  },
+  "hesitant": {
+   "name": "Hesitant",
+   "quadrant": "low-unpleasant"
+  },
+  "hope": {
+   "name": "Hope",
+   "quadrant": "high-pleasant"
+  },
+  "hopeful": {
+   "name": "Hopeful",
+   "quadrant": "high-pleasant"
+  },
+  "hopelessness": {
+   "name": "Hopelessness",
+   "quadrant": "low-unpleasant"
+  },
+  "horrified": {
+   "name": "Horrified",
+   "quadrant": "low-unpleasant"
+  },
+  "hostile": {
+   "name": "Hostile",
+   "quadrant": "high-unpleasant"
+  },
+  "hostility": {
+   "name": "Hostility",
+   "quadrant": "high-unpleasant"
+  },
+  "hot_shame": {
+   "name": "Hot Shame",
+   "quadrant": "high-unpleasant"
+  },
+  "humiliated": {
+   "name": "Humiliated",
+   "quadrant": "high-unpleasant"
+  },
+  "humility": {
+   "name": "Humility",
+   "quadrant": "low-pleasant"
+  },
+  "hurt": {
+   "name": "Hurt",
+   "quadrant": "low-unpleasant"
+  },
+  "inadequate": {
+   "name": "Inadequate",
+   "quadrant": "high-unpleasant"
+  },
+  "indifferent": {
+   "name": "Indifferent",
+   "quadrant": "low-unpleasant"
+  },
+  "indignant": {
+   "name": "Indignant",
+   "quadrant": "high-unpleasant"
+  },
+  "inferior": {
+   "name": "Inferior",
+   "quadrant": "high-unpleasant"
+  },
+  "infuriated": {
+   "name": "Infuriated",
+   "quadrant": "high-unpleasant"
+  },
+  "inquisitive": {
+   "name": "Inquisitive",
+   "quadrant": "high-pleasant"
+  },
+  "insecure": {
+   "name": "Insecure",
+   "quadrant": "high-unpleasant"
+  },
+  "insignificant": {
+   "name": "Insignificant",
+   "quadrant": "high-unpleasant"
+  },
+  "inspiration": {
+   "name": "Inspiration",
+   "quadrant": "high-pleasant"
+  },
+  "inspired": {
+   "name": "Inspired",
+   "quadrant": "high-pleasant"
+  },
+  "interested": {
+   "name": "Interested",
+   "quadrant": "high-pleasant"
+  },
+  "intimate": {
+   "name": "Intimate",
+   "quadrant": "low-pleasant"
+  },
+  "irritation": {
+   "name": "Irritation",
+   "quadrant": "high-unpleasant"
+  },
+  "isolated": {
+   "name": "Isolated",
+   "quadrant": "low-unpleasant"
+  },
+  "jealous": {
+   "name": "Jealous",
+   "quadrant": "high-unpleasant"
+  },
+  "joy": {
+   "name": "Joy",
+   "quadrant": "high-pleasant"
+  },
+  "joyful": {
+   "name": "Joyful",
+   "quadrant": "high-pleasant"
+  },
+  "judgmental": {
+   "name": "Judgmental",
+   "quadrant": "low-unpleasant"
+  },
+  "let_down": {
+   "name": "Let down",
+   "quadrant": "high-unpleasant"
+  },
+  "loneliness": {
+   "name": "Loneliness",
+   "quadrant": "low-unpleasant"
+  },
+  "lonely": {
+   "name": "Lonely",
+   "quadrant": "low-unpleasant"
+  },
+  "love": {
+   "name": "Love",
+   "quadrant": "low-pleasant"
+  },
+  "loving": {
+   "name": "Loving",
+   "quadrant": "low-pleasant"
+  },
+  "mad": {
+   "name": "Mad",
+   "quadrant": "high-unpleasant"
+  },
+  "nauseated": {
+   "name": "Nauseated",
+   "quadrant": "low-unpleasant"
+  },
+  "nervous": {
+   "name": "Nervous",
+   "quadrant": "high-unpleasant"
+  },
+  "numb": {
+   "name": "Numb",
+   "quadrant": "high-unpleasant"
+  },
+  "numbness": {
+   "name": "Numbness",
+   "quadrant": "low-unpleasant"
+  },
+  "optimistic": {
+   "name": "Optimistic",
+   "quadrant": "high-pleasant"
+  },
+  "out_of_control": {
+   "name": "Out of control",
+   "quadrant": "high-unpleasant"
+  },
+  "overwhelm": {
+   "name": "Overwhelm",
+   "quadrant": "high-unpleasant"
+  },
+  "overwhelmed": {
+   "name": "Overwhelmed",
+   "quadrant": "high-unpleasant"
+  },
+  "panic": {
+   "name": "Panic",
+   "quadrant": "high-unpleasant"
+  },
+  "peaceful": {
+   "name": "Peaceful",
+   "quadrant": "low-pleasant"
+  },
+  "perplexed": {
+   "name": "Perplexed",
+   "quadrant": "high-pleasant"
+  },
+  "persecuted": {
+   "name": "Persecuted",
+   "quadrant": "high-unpleasant"
+  },
+  "playful": {
+   "name": "Playful",
+   "quadrant": "high-pleasant"
+  },
+  "powerful": {
+   "name": "Powerful",
+   "quadrant": "high-pleasant"
+  },
+  "powerless": {
+   "name": "Powerless",
+   "quadrant": "low-unpleasant"
+  },
+  "pressured": {
+   "name": "Pressured",
+   "quadrant": "high-unpleasant"
+  },
+  "pride": {
+   "name": "Pride",
+   "quadrant": "high-pleasant"
+  },
+  "proud": {
+   "name": "Proud",
+   "quadrant": "high-pleasant"
+  },
+  "provoked": {
+   "name": "Provoked",
+   "quadrant": "high-unpleasant"
+  },
+  "rejected": {
+   "name": "Rejected",
+   "quadrant": "high-unpleasant"
+  },
+  "rejection": {
+   "name": "Rejection",
+   "quadrant": "high-unpleasant"
+  },
+  "relief": {
+   "name": "Relief",
+   "quadrant": "low-pleasant"
+  },
+  "remorseful": {
+   "name": "Remorseful",
+   "quadrant": "low-unpleasant"
+  },
+  "repelled": {
+   "name": "Repelled",
+   "quadrant": "low-unpleasant"
+  },
+  "resentful": {
+   "name": "Resentful",
+   "quadrant": "high-unpleasant"
+  },
+  "respected": {
+   "name": "Respected",
+   "quadrant": "high-pleasant"
+  },
+  "revolted": {
+   "name": "Revolted",
+   "quadrant": "low-unpleasant"
+  },
+  "ridiculed": {
+   "name": "Ridiculed",
+   "quadrant": "high-unpleasant"
+  },
+  "rushed": {
+   "name": "Rushed",
+   "quadrant": "high-unpleasant"
+  },
+  "sad": {
+   "name": "Sad",
+   "quadrant": "low-unpleasant"
+  },
+  "sadness": {
+   "name": "Sadness",
+   "quadrant": "low-unpleasant"
+  },
+  "safety": {
+   "name": "Safety",
+   "quadrant": "low-pleasant"
+  },
+  "scared": {
+   "name": "Scared",
+   "quadrant": "high-unpleasant"
+  },
+  "sensitive": {
+   "name": "Sensitive",
+   "quadrant": "low-pleasant"
+  },
+  "serenity": {
+   "name": "Serenity",
+   "quadrant": "low-pleasant"
+  },
+  "shocked": {
+   "name": "Shocked",
+   "quadrant": "high-pleasant"
+  },
+  "skeptical": {
+   "name": "Skeptical",
+   "quadrant": "high-unpleasant"
+  },
+  "sleepy": {
+   "name": "Sleepy",
+   "quadrant": "low-unpleasant"
+  },
+  "startled": {
+   "name": "Startled",
+   "quadrant": "high-pleasant"
+  },
+  "stress": {
+   "name": "Stress",
+   "quadrant": "high-unpleasant"
+  },
+  "stressed": {
+   "name": "Stressed",
+   "quadrant": "high-unpleasant"
+  },
+  "successful": {
+   "name": "Successful",
+   "quadrant": "high-pleasant"
+  },
+  "surprised": {
+   "name": "Surprised",
+   "quadrant": "high-pleasant"
+  },
+  "thankful": {
+   "name": "Thankful",
+   "quadrant": "low-pleasant"
+  },
+  "threatened": {
+   "name": "Threatened",
+   "quadrant": "high-unpleasant"
+  },
+  "tired": {
+   "name": "Tired",
+   "quadrant": "low-unpleasant"
+  },
+  "trust": {
+   "name": "Trust",
+   "quadrant": "low-pleasant"
+  },
+  "trusting": {
+   "name": "Trusting",
+   "quadrant": "low-pleasant"
+  },
+  "unfocused": {
+   "name": "Unfocused",
+   "quadrant": "low-unpleasant"
+  },
+  "valued": {
+   "name": "Valued",
+   "quadrant": "high-pleasant"
+  },
+  "victimized": {
+   "name": "Victimized",
+   "quadrant": "low-unpleasant"
+  },
+  "violated": {
+   "name": "Violated",
+   "quadrant": "high-unpleasant"
+  },
+  "vulnerable": {
+   "name": "Vulnerable",
+   "quadrant": "low-unpleasant"
+  },
+  "weak": {
+   "name": "Weak",
+   "quadrant": "high-unpleasant"
+  },
+  "withdrawn": {
+   "name": "Withdrawn",
+   "quadrant": "high-unpleasant"
+  },
+  "worried": {
+   "name": "Worried",
+   "quadrant": "high-unpleasant"
+  },
+  "worthless": {
+   "name": "Worthless",
+   "quadrant": "high-unpleasant"
+  }
+ },
+ "aliases": {},
+ "recommendedFor": [],
+ "contraindicated": [],
+ "routingPolicy": null
+}
