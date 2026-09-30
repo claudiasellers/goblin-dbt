@@ -9,6 +9,7 @@ import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
 import { fromCheckIn } from '../../lib/spine/toolLink';
 import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
+import type { Band } from '../../data/capacityTypes';
 
 interface LowEnergyStateResultProps {
   result: StateResult;
@@ -20,6 +21,8 @@ interface LowEnergyStateResultProps {
   onToolOpen?: (toolId: string) => void;
   onAddMoreDetail?: () => void;
   checkinEmotions?: string[];
+  /** The check-in's band (A4-3): read by the witness beat (A5-3); routing reads it from E4-3. */
+  band?: Band | null;
 }
 
 /**

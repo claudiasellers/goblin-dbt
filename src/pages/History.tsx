@@ -5,6 +5,8 @@ import { getCheckInsByUser, getDearManSessions, type CheckInRecord, type DearMan
 import { quadrantColors } from '../data/emotions';
 import { HistoryInsights } from '../components/history/HistoryInsights';
 import { Insights } from './Insights';
+import { useBand } from '../hooks/useBand';
+import { historyBandLabel } from '../lib/checkInBand';
 
 export function History() {
   const { user } = useAuth();
@@ -220,6 +222,10 @@ function groupByDate(checkIns: CheckInRecord[]): { label: string; key: string; i
 }
 
 function CheckInFeed({ checkIns }: { checkIns: CheckInRecord[] }) {
+  // Band display words come from the graph's capacity content (A4-3); loaded once per page load.
+  const band = useBand();
+  useEffect(() => { if (checkIns.some((c) => c.band)) band.load(); }, [checkIns, band]);
+  const bandLabels = band.content?.bandLabels ?? null;
   const groups = groupByDate(checkIns);
   const timeFmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
 
@@ -242,7 +248,7 @@ function CheckInFeed({ checkIns }: { checkIns: CheckInRecord[] }) {
 
               <div className="space-y-1">
                 {group.items.map((ci) => (
-                  <FeedItem key={ci.id} checkIn={ci} timeFmt={timeFmt} />
+                  <FeedItem key={ci.id} checkIn={ci} timeFmt={timeFmt} bandLabels={bandLabels} />
                 ))}
               </div>
             </div>
@@ -455,11 +461,13 @@ function Detail({ label, value }: { label: string; value: string }) {
   );
 }
 
-function FeedItem({ checkIn, timeFmt }: { checkIn: CheckInRecord; timeFmt: Intl.DateTimeFormat }) {
+function FeedItem({ checkIn, timeFmt, bandLabels }: { checkIn: CheckInRecord; timeFmt: Intl.DateTimeFormat; bandLabels: Record<string, string> | null }) {
   const [expanded, setExpanded] = useState(false);
   const colors = quadrantColors[checkIn.quadrant] || { bg: 'bg-gray-200', text: 'text-gray-800' };
   const dotColor = quadrantDotColor[checkIn.quadrant] || 'var(--color-text-tertiary)';
-  const intensityLabel = checkIn.intensity.y > 0.66 ? 'High' : checkIn.intensity.y > 0.33 ? 'Medium' : 'Low';
+  // A banded check-in shows the word the user chose (steady · stirred · flooded); older ones keep
+  // the legacy intensity word.
+  const level = historyBandLabel(checkIn, bandLabels);
 
   return (
     <div
@@ -490,7 +498,7 @@ function FeedItem({ checkIn, timeFmt }: { checkIn: CheckInRecord; timeFmt: Intl.
           <div className="mt-2 ml-0.5 text-sm space-y-2">
             <div className="flex gap-4 text-xs">
               <span className="text-[var(--color-text-tertiary)]">
-                Intensity: <span className="text-[var(--color-text-secondary)] font-medium">{intensityLabel}</span>
+                {level.kind === 'legacy' && 'Intensity: '}<span className="text-[var(--color-text-secondary)] font-medium" data-band={checkIn.band ?? undefined}>{level.text}</span>
               </span>
               {checkIn.bodySensations.length > 0 && (
                 <span className="text-[var(--color-text-tertiary)]">

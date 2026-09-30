@@ -199,6 +199,8 @@ const getStateAndToolsFn = httpsCallable<
     intensity?: { x: number; y: number };
     bodySensations?: Array<{ region: string; tags?: string[] }>;
     discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
+    band?: 'steady' | 'stirred' | 'flooded';
+    bandViaCantTell?: boolean;
   },
   StateResult
 >(functions, 'getStateAndTools');
@@ -223,6 +225,9 @@ export async function getStateAndTools(input: {
   intensity?: { x: number; y: number };
   bodySensations?: Array<{ region: string; tags?: string[] }>;
   discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
+  /** The check-in's band (A4-3). The engine reads it from E4-3 on; until then it's ignored. */
+  band?: 'steady' | 'stirred' | 'flooded';
+  bandViaCantTell?: boolean;
 }): Promise<StateResult> {
   const result = await getStateAndToolsFn(input);
   return result.data;

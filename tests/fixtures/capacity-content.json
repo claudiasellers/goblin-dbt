@@ -6,6 +6,11 @@
   "stirred": 0.6,
   "flooded": 0.85
  },
+ "bandLabels": {
+  "steady": "Steady",
+  "stirred": "Stirred",
+  "flooded": "Flooded"
+ },
  "probe": {
   "wordings": {
    "default": {

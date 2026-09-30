@@ -65,6 +65,7 @@ export interface CapacityContent {
   version: 'capacity-v1';
   freshMinutes: number;                       // 20
   bandIntensity: Record<Band, number>;        // CheckIn.intensityY compatibility
+  bandLabels: Record<Band, string>;           // display word for a stored band (History)
   probe: {
     wordings: Record<ProbeWording, ProbeWordingCopy>;
     cantTell: string;

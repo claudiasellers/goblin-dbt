@@ -6,7 +6,7 @@ content.py without a database. Used by unit tests and the dev harness (dev/capac
 import json, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
-from content import (VERSION, FRESH_MINUTES, BAND_INTENSITY, PROBE_DEFAULT, PROBE_RELATIONAL, CANT_TELL,  # noqa: E402
+from content import (VERSION, FRESH_MINUTES, BAND_INTENSITY, BAND_LABELS, PROBE_DEFAULT, PROBE_RELATIONAL, CANT_TELL,  # noqa: E402
                      HANDOFF, PRIMITIVES, BAND_RULES)
 root = os.path.dirname(os.path.dirname(here))
 
@@ -14,6 +14,7 @@ payload = {
     "version": VERSION,
     "freshMinutes": FRESH_MINUTES,
     "bandIntensity": BAND_INTENSITY,
+    "bandLabels": BAND_LABELS,
     "probe": {"wordings": {"default": PROBE_DEFAULT, "relational": PROBE_RELATIONAL}, "cantTell": CANT_TELL},
     "handoff": HANDOFF,
     "primitives": [{"id": pid, "component": comp, "direction": d, "bands": bands, "blank": blank, "rank": rank,
