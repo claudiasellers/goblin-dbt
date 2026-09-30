@@ -55,7 +55,7 @@ test("summary heads-up when the band isn't steady; the plan is never locked; no 
   // Claudia, 30 Sep: no band question and no breathing hand-off before planning or debriefing.
   assert.doesNotMatch(tsx, /<BandGate/, "DEAR MAN doesn't open with the band question");
   assert.match(tsx, /if \(phase === 'check'\) return null;/);
-  assert.match(tsx, /if \(phase !== 'check'\) return;\s*const t = afterGate\.current;\s*setSceneStep\(t\.sceneStep\);\s*setPhase\(t\.phase\);/);
+  assert.match(tsx, /if \(phase !== 'check'\) return;\s*const t = afterGate\.current;[\s\S]{0,300}setSceneStep\(t\.sceneStep\);\s*setPhase\(t\.phase\);/);
   assert.match(tsx, /<TooMuchLink host="dear-man"/);
   assert.match(tsx, /session\.setBandAtStart\(r\)/);
   assert.match(tsx, /er: \{ handoffs: handoffExt\(handoffs\.current\) \}/);

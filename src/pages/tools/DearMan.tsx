@@ -205,6 +205,8 @@ export function DearMan() {
   useEffect(() => {
     if (phase !== 'check') return;
     const t = afterGate.current;
+    // "Picking up where we were." was keyed to 'check'; move it to where we land (Codex, #21).
+    setResumeNote((n) => (n && n.phase === 'check' ? { ...n, phase: t.phase } : n));
     setSceneStep(t.sceneStep);
     setPhase(t.phase);
   }, [phase]);
@@ -256,10 +258,10 @@ export function DearMan() {
           if (pre.feelings.length) setFeelings(pre.feelings);
           if (pre.feelingCustom) { setFeelingCustom(pre.feelingCustom); setShowFeelingCustom(true); }
           initialHandoff.current = null;
-          // Recover's band comes over as a `handoff` reading. Flooded (or no band from an older
-          // page): ask here first; D-07 re-asks a carried flooded once rather than opening P2 unasked.
+          // Recover's band comes over as a `handoff` reading, flooded included: DEAR MAN no longer
+          // asks, so the carried value is what drives the Summary's "still loud" note (Codex, #21).
           const fresh = h.band && h.bandAt && Date.now() - Date.parse(h.bandAt) <= (band.content?.freshMinutes ?? 20) * 60_000;
-          if (h.band && h.bandAt && fresh && h.band !== 'flooded') {
+          if (h.band && h.bandAt && fresh) {
             const r = makeReading({
               value: h.band, source: 'handoff', context: 'dear-man', hostSessionId: session.id || undefined,
               carriedFrom: { readingId: newId(), context: 'recovering-from-invalidation', at: h.bandAt },

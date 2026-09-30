@@ -45,7 +45,8 @@ export function ContinuityCard({ item, onAnswered }: Props) {
     try {
       await answerToolOutcome(sessionId, a);
     } catch {
-      // Don't block on failure
+      setState('asking'); // keep the card so it can be answered again (Codex, #20)
+      return;
     }
     setState('done');
     onAnswered?.();
