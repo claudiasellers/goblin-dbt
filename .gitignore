@@ -37,3 +37,12 @@ functions/lib/
 # Python bytecode (scripts/invalidation-recovery)
 __pycache__/
 dev-dist
+
+# Live-graph check output (names the Aura host; scripts/verify-live-routing.mjs)
+scripts/.verify-live-routing-*.json
+
+# Local graph backups (graph-export.mjs; contain user data, never commit)
+backups/
+
+# Phase A rehearsal (scripts/rehearsal/): worktrees, log, report
+.rehearsal/

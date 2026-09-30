@@ -1,8 +1,6 @@
-import { useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { getToolById } from '../data/tools';
-import { useAuth } from '../contexts/AuthContext';
-import { trackToolUsage } from '../services/neo4j';
+import { ToolSessionProvider } from '../contexts/ToolSessionContext';
 
 // Import tool components
 import { CoolDown } from './tools/CoolDown';
@@ -30,16 +28,8 @@ const toolComponents: Record<string, React.ComponentType> = {
 
 export function ToolPage() {
   const { toolId } = useParams<{ toolId: string }>();
-  const { user } = useAuth();
+  const location = useLocation();
   const tool = toolId ? getToolById(toolId) : undefined;
-
-  // Track tool usage when the page mounts (fire-and-forget); use resolved tool id when available
-  const idToTrack = tool?.id ?? toolId;
-  useEffect(() => {
-    if (user && idToTrack) {
-      trackToolUsage(idToTrack);
-    }
-  }, [user, idToTrack]);
 
   if (!tool) {
     return (
@@ -98,7 +88,11 @@ export function ToolPage() {
       {/* Interactive tool component */}
       <div className="mb-8">
         {ToolComponent ? (
-          <ToolComponent />
+          // One ToolSession per visit (PR-S3). It replaces trackToolUsage: startToolSession writes the
+          // compat ToolUsage at the same moment, linked to the check-in the tool was opened from.
+          <ToolSessionProvider key={location.key} toolId={tool.id}>
+            <ToolComponent />
+          </ToolSessionProvider>
         ) : (
           <div className="p-8 rounded-xl border border-dashed border-[var(--color-border)] text-center">
             <p className="text-[var(--color-text-tertiary)] italic">

@@ -7,5 +7,5 @@ export default defineConfig({
   root: resolve(__dirname, '..'),
   base: './',
   plugins: [react(), tailwindcss()],
-  build: { outDir: resolve(__dirname, '../dev-dist'), emptyOutDir: true, rollupOptions: { input: resolve(__dirname, 'find-the-feeling.html') } },
+  build: { outDir: resolve(__dirname, '../dev-dist'), emptyOutDir: true, rollupOptions: { input: { ftf: resolve(__dirname, 'find-the-feeling.html'), capacity: resolve(__dirname, 'capacity.html') } } },
 });

@@ -1,15 +1,19 @@
 // ============================================================
-// DEAR MAN SAFETY GATES — copy for the arousal gates in DEAR MAN
+// DEAR MAN SAFETY GATES — copy for the band gate in DEAR MAN
 //
-//   Numeric thresholds (downshiftAt, askMax, waitMinutes) and the
-//   shared wait-lock / breathing copy are NOT duplicated here: they
-//   are read from (:InvalidationRecoveryFlow {id: 'invalidation_recovery_flow'})
-//   by getDearManContent. This file holds only the DEAR MAN-specific
-//   lines: the carried-over context card, the intensity check, the
-//   re-rate prompt, the one-message note and the "still loud" heads-up.
+//   dear-man-safety-v3 (A4-4): DEAR MAN no longer asks a 0–10 rating
+//   and no longer reads Recover's numeric thresholds. It gates on the
+//   capacity band (schema/capacity.cypher: BandRule dear-man:steady
+//   full · stirred full + summary heads-up · flooded P2 hand-off),
+//   asked with the relational probe or carried from a check-in within
+//   20 minutes. The intensity / re-rate / downshift copy is removed
+//   below. This file holds only the DEAR MAN-specific lines: the
+//   carried-over context card, the one-message note and the "still
+//   loud" heads-up on the finished plan (shown when the band isn't
+//   steady).
 //
 //   The plan is never locked. Someone who worked through the whole
-//   plan while angry gets a heads-up that it won't land the way they
+//   plan while stirred gets a heads-up that it won't land the way they
 //   mean it, and an optional 30-second breath to take the edge off.
 //   (v1 locked the plan for 20 minutes; that punished the effort and
 //   pushed people to send without the plan.)
@@ -35,17 +39,10 @@ FOR (c:DearManSafetyCopy) REQUIRE c.id IS UNIQUE;
 // ============================================================
 
 MERGE (c:DearManSafetyCopy {id: 'dear_man_safety_copy'})
-SET c.version = 'dear-man-safety-v2',
+SET c.version = 'dear-man-safety-v3',
     c.handoffSituationId = 'address',
     c.carriedOver = 'Carried over: {emotion} · you needed {need}',
     c.carriedOverDismiss = 'Hide',
-    c.intensityQuestion = 'Before we plan: how loud is it right now?',
-    c.intensityHint = "Just a number. Planning goes better when it's quieter.",
-    c.intensityLow = 'Quiet',
-    c.intensityHigh = 'Too loud to think',
-    c.downshiftLead = "That's loud. At this level, words come out sharper than we mean them. Settle your body first, then we'll plan.",
-    c.rerateQuestion = 'How loud is it now?',
-    c.rerateHint = 'One more number, then we build your plan.',
     c.oneMessageOnly = 'One message only. Say it once, then give them room to answer.',
     c.hotHeading = "Your plan is ready. Heads up: it's still loud in there.",
     c.hotBody = "When you're this angry or worked up, even a good plan comes out sharper than you mean it, and they'll hear the anger before they hear the ask. Taking the edge off first makes it more likely you get what you're asking for.",
@@ -54,6 +51,10 @@ SET c.version = 'dear-man-safety-v2',
     c.hotBodyCue = 'Unclench your jaw and drop your shoulders while you read it through.',
     c.hotCooled = "That's the edge off. Read your plan once more, out loud if you can, then go when it feels right."
 REMOVE c.planLocked, c.planUnlocked, c.planLockedHeading;
+// The old number-scale copy (intensityQuestion, intensityHint, intensityLow, intensityHigh,
+// downshiftLead, rerateQuestion, rerateHint) is no longer set, but stays on the live node for one
+// release: a tab still running the pre-M3 page skips DEAR MAN's arousal check without it (Codex,
+// PR #17). Remove it in the next content release.
 
 
 // ============================================================

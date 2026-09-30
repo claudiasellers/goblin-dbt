@@ -4,6 +4,8 @@ import { httpsCallable } from 'firebase/functions';
 import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
 import type { CollectedWord, FindTheFeelingContent, FindTheFeelingSession } from '../data/findTheFeelingTypes';
+import type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
+export type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
 
 // Types (same as before, for consistency across the app)
 export interface CheckInRecord {
@@ -17,6 +19,10 @@ export interface CheckInRecord {
   timestamp: Date;
   activationPatternId?: string | null;
   confidence?: number | null;
+  emotionIds?: string[];
+  source?: string | null;
+  band?: string | null;
+  nextAction?: { kind: string; toolId: string | null } | null;
 }
 
 export interface BodySensationRecord {
@@ -31,10 +37,9 @@ export interface BodySensationRecord {
 const CONTENT_TIMEOUT_MS = 20_000;
 
 // Cloud Function references
-const saveCheckInFn = httpsCallable<
-  Omit<CheckInRecord, 'id' | 'userId' | 'timestamp'> & { timestamp: string; activationPatternId?: string; confidence?: number },
-  { id: string }
->(functions, 'saveCheckIn');
+const saveCheckInFn = httpsCallable<SaveCheckInRequest, { id: string }>(functions, 'saveCheckIn');
+const setCheckInNextActionFn = httpsCallable<{ checkInId: string; nextAction: CheckInNextAction }, { ok: true }>(
+  functions, 'setCheckInNextAction');
 
 // Response type from the Cloud Function
 interface CheckInResponse {
@@ -48,6 +53,10 @@ interface CheckInResponse {
   timestamp: string; // ISO string from server
   activationPatternId?: string | null;
   confidence?: number | null;
+  emotionIds?: string[];
+  source?: string | null;
+  band?: string | null;
+  nextAction?: { kind: string; toolId: string | null } | null;
 }
 
 const getCheckInsByUserFn = httpsCallable<
@@ -60,35 +69,23 @@ const ensureUserExistsFn = httpsCallable<void, { success: boolean }>(
   'ensureUserExists'
 );
 
-const initializeSchemaFn = httpsCallable<void, { success: boolean; message: string }>(
-  functions,
-  'initializeSchema'
-);
-
 // ============================================
 // API FUNCTIONS (call Cloud Functions)
 // ============================================
 
 /**
- * Save a check-in via Cloud Function
- * The user ID is automatically extracted from Firebase Auth on the server
+ * Save (upsert) a check-in via Cloud Function (PR-C1). Idempotent by `id`: the check-in page saves
+ * when the result renders and again, with the same id, after "add more detail". Always resolves to
+ * the saved id. The user ID comes from Firebase Auth on the server.
  */
-export async function saveCheckIn(
-  _userId: string, // Kept for API compatibility, but not used (server gets it from auth)
-  checkIn: Omit<CheckInRecord, 'id' | 'userId'>
-): Promise<string> {
-  const result = await saveCheckInFn({
-    emotion: checkIn.emotion,
-    quadrant: checkIn.quadrant,
-    intensity: checkIn.intensity,
-    bodySensations: checkIn.bodySensations,
-    note: checkIn.note,
-    timestamp: checkIn.timestamp.toISOString(),
-    ...(checkIn.activationPatternId && { activationPatternId: checkIn.activationPatternId }),
-    ...(checkIn.confidence != null && { confidence: checkIn.confidence }),
-  });
-
+export async function saveCheckIn(request: SaveCheckInRequest): Promise<string> {
+  const result = await saveCheckInFn(request);
   return result.data.id;
+}
+
+/** What the user did after the result (the check-in's terminal event; the first one wins). */
+export async function setCheckInNextAction(checkInId: string, nextAction: CheckInNextAction): Promise<void> {
+  await setCheckInNextActionFn({ checkInId, nextAction });
 }
 
 /**
@@ -109,22 +106,11 @@ export async function getCheckInsByUser(
 }
 
 /**
- * Ensure user exists in Neo4j via Cloud Function
- * Called after signup/login - the server extracts user info from Firebase Auth
+ * Ensure the user's graph node exists. AuthContext calls it once per signed-in uid per page load
+ * (belt and braces with the onUserCreated trigger); the server extracts the user from Firebase Auth.
  */
-export async function ensureUserExists(
-  _userId: string, // Kept for API compatibility, but not used
-  _email: string // Kept for API compatibility, but not used
-): Promise<void> {
+export async function ensureUserExists(): Promise<void> {
   await ensureUserExistsFn();
-}
-
-/**
- * Initialize Neo4j schema via Cloud Function
- * Run once during initial setup
- */
-export async function initializeSchema(): Promise<void> {
-  await initializeSchemaFn();
 }
 
 // ============================================
@@ -143,13 +129,40 @@ export interface ActivationPatternResult {
   confidence: number;
 }
 
+export type RoutingSide = 'acceptance' | 'change' | 'both';
+export type RoutingDirection = 'down' | 'up' | 'orient' | 'neutral';
+export type RoutingSkillKind = 'body' | 'orient' | 'hold' | 'change' | 'naming' | 'relational';
+
+/** Mirrors functions/src/recommendation/types.ts. Cards are named from src/data/tools.ts, never from here. */
 export interface ToolRecommendation {
   id: string;
+  /** The graph concept's name ("TIPP"): compat only, never shown. */
   name: string;
   description: string;
   whenToUse: string;
-  dbtBasis?: string;
+  dbtBasis?: string | null;
+  /** Legacy 'high' | 'medium' | 'relevant', or the rf-v1 slot. Never shown (E4-4). */
   relevance: string;
+  slot?: 'primary' | 'swap';
+  side?: RoutingSide;
+  skillKind?: RoutingSkillKind;
+  direction?: RoutingDirection;
+  sequence?: 'after_primary';
+  ruleId?: string;
+  reason?: 'pattern_band' | 'emotion_gate' | 'fallback';
+}
+
+/** How the result was routed (E4-3); absent on positive_state. */
+export interface Routing {
+  version: string;
+  band: 'steady' | 'stirred' | 'flooded';
+  bandSource: 'probe' | 'ftf' | 'carried' | 'inferred';
+  blank: boolean;
+  recommendedToolIds: string[];
+  ruleIds: string[];
+  filtered: Array<{ toolId: string; ruleId: string; reason: string }>;
+  receiveFirst: boolean;
+  surface: 'checkin' | 'dear_man_debrief';
 }
 
 export interface SafetyFlag {
@@ -179,6 +192,7 @@ export interface StateResult {
   secondaryPattern?: ActivationPatternResult;
   coOccurrence?: CoOccurrence;
   guidedActivity?: GuidedActivityRecommendation;
+  routing?: Routing;
 }
 
 export interface DiscriminatingQuestion {
@@ -213,6 +227,11 @@ const getStateAndToolsFn = httpsCallable<
     intensity?: { x: number; y: number };
     bodySensations?: Array<{ region: string; tags?: string[] }>;
     discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
+    band?: 'steady' | 'stirred' | 'flooded';
+    bandViaCantTell?: boolean;
+    bandSource?: 'probe' | 'ftf' | 'carried';
+    blank?: boolean;
+    surface?: 'checkin' | 'dear_man_debrief';
   },
   StateResult
 >(functions, 'getStateAndTools');
@@ -227,11 +246,6 @@ const getRelatedEmotionsFn = httpsCallable<
   { relatedEmotions: RelatedEmotion[] }
 >(functions, 'getRelatedEmotions');
 
-const getQuickToolsFn = httpsCallable<
-  { quadrant: string; intensity?: { x: number; y: number } },
-  { tools: ToolRecommendation[]; message: string }
->(functions, 'getQuickTools');
-
 /**
  * Get the activation pattern and recommended tools based on check-in data
  * This is the main "What's happening right now" query
@@ -242,6 +256,14 @@ export async function getStateAndTools(input: {
   intensity?: { x: number; y: number };
   bodySensations?: Array<{ region: string; tags?: string[] }>;
   discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
+  /** The check-in's band (A4-3): the engine routes by pattern × band (E4-3). */
+  band?: 'steady' | 'stirred' | 'flooded';
+  bandViaCantTell?: boolean;
+  /** Where the band came from (the reading's source; `handoff` etc. are sent as `carried`). */
+  bandSource?: 'probe' | 'ftf' | 'carried';
+  /** Find the feeling's pull was `blank`: never calm this state. */
+  blank?: boolean;
+  surface?: 'checkin' | 'dear_man_debrief';
 }): Promise<StateResult> {
   const result = await getStateAndToolsFn(input);
   return result.data;
@@ -268,18 +290,6 @@ export async function getRelatedEmotions(
 ): Promise<RelatedEmotion[]> {
   const result = await getRelatedEmotionsFn({ emotionId, quadrant });
   return result.data.relatedEmotions;
-}
-
-/**
- * Get quick tools based on just quadrant and intensity
- * Used for the "Help me now" minimal-input path
- */
-export async function getQuickTools(
-  quadrant: string,
-  intensity?: { x: number; y: number }
-): Promise<{ tools: ToolRecommendation[]; message: string }> {
-  const result = await getQuickToolsFn({ quadrant, intensity });
-  return result.data;
 }
 
 // ============================================
@@ -493,11 +503,6 @@ const trackToolUsageFn = httpsCallable<
   { success: boolean }
 >(functions, 'trackToolUsage');
 
-const getWeeklyToolUsageCountFn = httpsCallable<
-  void,
-  { count: number }
->(functions, 'getWeeklyToolUsageCount');
-
 /**
  * Track that the user opened/used a tool (fire-and-forget)
  */
@@ -507,14 +512,6 @@ export async function trackToolUsage(toolId: string): Promise<void> {
   } catch {
     // Silently fail -- don't break the tool experience
   }
-}
-
-/**
- * Get how many tools the user has used in the last 7 days
- */
-export async function getWeeklyToolUsageCount(): Promise<number> {
-  const result = await getWeeklyToolUsageCountFn();
-  return result.data.count;
 }
 
 // ============================================
@@ -531,11 +528,10 @@ export interface UserProfile {
   reminderTime: string;
   reminderDays: number[];
   weeklyDigest: boolean;
-  dailyCheckInGoal: number;
-  weeklyToolGoal: number;
-  focusCategories: string[];
   dataRetentionDays: number | null;
   shareAnonymousData: boolean;
+  /** IANA zone, synced from the browser (follow-up windows, quiet hours). */
+  timeZone: string | null;
 }
 
 export const DEFAULT_PROFILE: UserProfile = {
@@ -548,11 +544,9 @@ export const DEFAULT_PROFILE: UserProfile = {
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],
   weeklyDigest: false,
-  dailyCheckInGoal: 1,
-  weeklyToolGoal: 3,
-  focusCategories: [],
   dataRetentionDays: null,
   shareAnonymousData: false,
+  timeZone: null,
 };
 
 const getUserProfileFn = httpsCallable<void, { profile: UserProfile }>(
@@ -631,13 +625,15 @@ export async function getDearManContent(): Promise<DearManContentResult> {
 
 const saveDearManSessionFn = httpsCallable<
   DearManSessionData,
-  { success: boolean }
+  { success: boolean; id?: string | null }
 >(functions, 'saveDearManSession');
 
+/** Resolves to the saved session's id (PR-S4; null from an older server). */
 export async function saveDearManSession(
   data: DearManSessionData
-): Promise<void> {
-  await saveDearManSessionFn(data);
+): Promise<string | null> {
+  const result = await saveDearManSessionFn(data);
+  return result.data.id ?? null;
 }
 
 const getDearManDebriefContentFn = httpsCallable<void, DearManDebriefContentResult>(

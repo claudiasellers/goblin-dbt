@@ -1,18 +1,33 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
 import { getActivityDefinition, PATTERN_CONTEXT } from '../../data/guidedActivities';
 import { GuidedActivity } from '../activities/GuidedActivity';
-import { getToolById } from '../../data/tools';
-import type { StateResult, ToolRecommendation } from '../../services/neo4j';
+import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
+import { recommendationCards } from '../../lib/recommendation';
+import { RecommendationCards } from './RecommendationCards';
+import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
+import type { Band } from '../../data/capacityTypes';
+import { WitnessBeat } from '../witness/WitnessBeat';
+import { beatBand, beatVariant, showsWitnessBeat, type WitnessHandlers } from '../../lib/witness';
 
 interface LowEnergyStateResultProps {
   result: StateResult;
-  onDone: () => void;
+  /** Called with what the user did (Done, a micro-step, a guided activity); Done when omitted. */
+  onDone: (next?: CheckInNextAction) => void;
+  /** The saved check-in (PR-C1): tool links carry it so the tool session links back to it. */
+  checkInId?: string;
+  /** A tool card tap (recorded as the check-in's next action; navigation doesn't wait). */
+  onToolOpen?: (toolId: string) => void;
   onAddMoreDetail?: () => void;
   checkinEmotions?: string[];
+  /** The check-in's band (A4-3): read by the witness beat (A5-3); routing reads it from E4-3. */
+  band?: Band | null;
+  /** Graph ids of the check-in's words (the beat's family / word match). */
+  emotionIds?: string[];
+  /** The witness beat's log (A5-3): the host queues recordWitnessBeat until the check-in is saved. */
+  witness?: WitnessHandlers;
 }
 
 /**
@@ -31,13 +46,19 @@ export function LowEnergyStateResult({
   onDone,
   onAddMoreDetail,
   checkinEmotions,
+  checkInId,
+  onToolOpen,
+  band,
+  emotionIds,
+  witness,
 }: LowEnergyStateResultProps) {
-  const { pattern, tools, safetyFlag, coOccurrence, guidedActivity } = result;
+  const { pattern, safetyFlag, coOccurrence, guidedActivity } = result;
+  const cards = recommendationCards(result);
   const sections = resultSections({
     variant: 'low_energy',
     safetyFlag,
     patternId: pattern.id,
-    toolCount: tools.length,
+    toolCount: cards.length,
     hasGuidedActivity: !!guidedActivity,
     canAddMoreDetail: !!onAddMoreDetail,
   });
@@ -47,16 +68,18 @@ export function LowEnergyStateResult({
   const [bailoutStep, setBailoutStep] = useState<MicroStep | null>(null);
   const [bailoutIndex, setBailoutIndex] = useState<number | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [completedStepId, setCompletedStepId] = useState<string | undefined>(undefined);
 
-  const handleBailoutComplete = useCallback(() => {
+  const handleBailoutComplete = useCallback((stepId?: string) => {
+    setCompletedStepId(stepId);
     setIsCompleting(true);
   }, []);
 
   useEffect(() => {
     if (!isCompleting) return;
-    const timer = setTimeout(() => onDone(), 1800);
+    const timer = setTimeout(() => onDone({ kind: 'micro_step', microStepId: completedStepId }), 1800);
     return () => clearTimeout(timer);
-  }, [isCompleting, onDone]);
+  }, [isCompleting, onDone, completedStepId]);
 
   // ========== GUIDED ACTIVITY OVERLAY ==========
   if (showActivity && guidedActivity) {
@@ -67,8 +90,8 @@ export function LowEnergyStateResult({
           activity={activityDef}
           patternId={guidedActivity.patternId}
           secondaryPatternId={result.secondaryPattern?.id}
-          onComplete={onDone}
-          onEarlyExit={onDone}
+          onComplete={() => onDone({ kind: 'activity', activityId: guidedActivity.activityId })}
+          onEarlyExit={() => onDone({ kind: 'activity_partial', activityId: guidedActivity.activityId })}
         />
       );
     }
@@ -110,7 +133,7 @@ export function LowEnergyStateResult({
             )}
           </div>
           <button
-            onClick={handleBailoutComplete}
+            onClick={() => handleBailoutComplete(bailoutStep.id)}
             className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary"
           >
             I did it
@@ -165,6 +188,13 @@ export function LowEnergyStateResult({
         )}
       </div>
 
+      {/* The witness beat (A5-3, R21): below the banner, above the activity and tools; it never gates them */}
+      {showsWitnessBeat(pattern.id) && (
+        <WitnessBeat hostToolId="checkin" moment="checkin_result" band={beatBand(band)} variant={beatVariant(beatBand(band))}
+          words={checkinEmotions ?? []} emotionIds={emotionIds}
+          onShown={witness?.onShown} onDone={(r, lines) => witness?.onDone(r, lines)} />
+      )}
+
       {/* Clinical referral */}
       {has('clinical_note') && (
         <div className="mb-6 p-4 rounded-xl bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]">
@@ -192,18 +222,15 @@ export function LowEnergyStateResult({
           <p className="text-xs text-[var(--color-text-muted)] text-center mb-3">
             Or explore a tool
           </p>
-          <div className="space-y-2">
-            {tools.slice(0, 2).map(tool => (
-              <ToolCardCompact key={tool.id} tool={tool} checkinEmotions={checkinEmotions} activationPatternId={pattern.id} />
-            ))}
-          </div>
+          <RecommendationCards variant="compact" cards={cards} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
+            checkInId={checkInId} onOpen={(toolId) => onToolOpen?.(toolId)} />
         </div>
       )}
 
       {/* Actions */}
       <div className="space-y-3">
         <button
-          onClick={onDone}
+          onClick={() => onDone({ kind: 'done' })}
           className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-sm"
         >
           Done
@@ -246,44 +273,4 @@ function getPatternEmoji(patternId: string): string {
     reward_drive_low: '\uD83E\uDEAB',
   };
   return map[patternId] || '\uD83E\uDDE0';
-}
-
-function ToolCardCompact({
-  tool,
-  checkinEmotions,
-  activationPatternId,
-}: {
-  tool: ToolRecommendation;
-  checkinEmotions?: string[];
-  activationPatternId?: string;
-}) {
-  const toolPath = `/tool/${tool.id}`;
-
-  return (
-    <Link
-      to={toolPath}
-      state={toolLinkState(checkinEmotions, activationPatternId)}
-      className="block p-3 rounded-lg bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] transition-all"
-    >
-      <div className="flex items-center gap-3">
-        <span className="text-lg flex-shrink-0">{getToolById(tool.id)?.emoji || '🔧'}</span>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{tool.name}</h3>
-          <p className="text-xs text-[var(--color-text-tertiary)] line-clamp-1">
-            {tool.description || tool.whenToUse}
-          </p>
-        </div>
-        <span className="text-[var(--color-text-muted)] flex-shrink-0">\u2192</span>
-      </div>
-    </Link>
-  );
-}
-
-/** Location state for tool links. Keeps the original { checkinEmotions } shape and adds the pattern id when known. */
-function toolLinkState(checkinEmotions?: string[], activationPatternId?: string) {
-  if (!checkinEmotions?.length && !activationPatternId) return undefined;
-  return {
-    ...(checkinEmotions?.length ? { checkinEmotions } : {}),
-    ...(activationPatternId ? { activationPatternId } : {}),
-  };
 }

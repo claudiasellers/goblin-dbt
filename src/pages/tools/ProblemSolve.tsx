@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getEmotionById, getEmotionByName } from '../../data/emotions';
 import { EmotionPicker } from '../../components/tools/EmotionPicker';
 import { getToolById } from '../../data/tools';
+import { useToolSession } from '../../hooks/useToolSession';
+import { SessionClose } from '../../components/spine/SessionClose';
 import {
   getProblemSolveContent,
   type ProblemSolveContent,
@@ -82,6 +84,22 @@ export function ProblemSolve() {
 
   // Know-but-cant commit (user supplies their own step)
   const [customStepText, setCustomStepText] = useState('');
+
+  // Practice spine (PR-S3): step, practiced (the problem is being defined), ids of what was chosen.
+  // Free text (the problem, the custom step) never leaves the page.
+  const session = useToolSession();
+  useEffect(() => {
+    session.setStep(phase.replace(/-/g, '_'));
+    if (phase === 'define-problem') session.markPracticed();
+    if (phase === 'complete') session.markComplete();
+  }, [phase, session]);
+  useEffect(() => {
+    const er: Record<string, string> = {};
+    if (selectedProblemTypes[0]?.id) er.problemTypeId = selectedProblemTypes[0].id;
+    if (selectedDirection?.id) er.directionId = selectedDirection.id;
+    if (chosenSize) er.size = chosenSize;
+    if (Object.keys(er).length) session.setExt({ er });
+  }, [selectedProblemTypes, selectedDirection, chosenSize, session]);
 
   // ── Load content ──
 
@@ -1268,10 +1286,13 @@ export function ProblemSolve() {
           </p>
         </div>
 
+        {/* PR-S5: when will you take it? -> a ps_step follow-up in Today ("did it · did part · didn't") */}
+        <SessionClose planType="ps_step" />
+
         {selectedDirection?.linkedToolId && (
           <Link
-            to={`/tool/${selectedDirection.linkedToolId}`}
-            state={{ checkinEmotions: selectedEmotionIds }}
+            to={session.linkTo(selectedDirection.linkedToolId).pathname}
+            state={session.linkTo(selectedDirection.linkedToolId, { checkinEmotions: selectedEmotionIds }).state}
             className="inline-block mb-4 text-sm text-[var(--color-accent)] hover:underline"
           >
             This step uses {getToolById(selectedDirection.linkedToolId)?.name ?? selectedDirection.linkedToolId} &rarr;

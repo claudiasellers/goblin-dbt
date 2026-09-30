@@ -159,20 +159,16 @@ SET r.strength = "moderate",
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "hopelessness"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "hopelessness"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r2:FELT_AS]->(s)
-SET r2.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "hopelessness"}), (s:SensationType {id: "weakness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "hopelessness"}), (s:SensationType {id: "pressure"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 
 // --------------------------------------------------------
@@ -180,16 +176,13 @@ SET r.region = "chest";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "emptiness"}), (s:SensationType {id: "numbness_sensation"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "emptiness"}), (s:SensationType {id: "numbness_sensation"})
-CREATE (e)-[r2:FELT_AS]->(s)
-SET r2.region = "stomach";
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 MATCH (e:Emotion {id: "emptiness"}), (s:SensationType {id: "cold_sensation"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 
 // --------------------------------------------------------
@@ -197,20 +190,16 @@ SET r.region = "chest";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "numbness"}), (s:SensationType {id: "numbness_sensation"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "numbness"}), (s:SensationType {id: "numbness_sensation"})
-CREATE (e)-[r2:FELT_AS]->(s)
-SET r2.region = "hands";
+MERGE (e)-[:FELT_AS {region: "hands"}]->(s);
 
 MATCH (e:Emotion {id: "numbness"}), (s:SensationType {id: "cold_sensation"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "numbness"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 
 // --------------------------------------------------------
@@ -218,16 +207,13 @@ SET r.region = "body";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "loneliness"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "loneliness"}), (s:SensationType {id: "cold_sensation"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "loneliness"}), (s:SensationType {id: "constriction"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "throat";
+MERGE (e)-[:FELT_AS {region: "throat"}]->(s);
 
 
 // --------------------------------------------------------
@@ -235,12 +221,10 @@ SET r.region = "throat";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "apathy"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "apathy"}), (s:SensationType {id: "weakness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 
 // --------------------------------------------------------
@@ -248,12 +232,10 @@ SET r.region = "body";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "boredom"}), (s:SensationType {id: "restlessness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 MATCH (e:Emotion {id: "boredom"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "body";
+MERGE (e)-[:FELT_AS {region: "body"}]->(s);
 
 
 // --------------------------------------------------------
@@ -261,16 +243,13 @@ SET r.region = "body";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "disappointment"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "disappointment"}), (s:SensationType {id: "constriction"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "throat";
+MERGE (e)-[:FELT_AS {region: "throat"}]->(s);
 
 MATCH (e:Emotion {id: "disappointment"}), (s:SensationType {id: "pressure"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "stomach";
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 
 // --------------------------------------------------------
@@ -278,16 +257,13 @@ SET r.region = "stomach";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "heaviness"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "stomach";
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "constriction"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "chest";
+MERGE (e)-[:FELT_AS {region: "chest"}]->(s);
 
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "heat"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "face";
+MERGE (e)-[:FELT_AS {region: "face"}]->(s);
 
 
 // --------------------------------------------------------
@@ -295,12 +271,10 @@ SET r.region = "face";
 // --------------------------------------------------------
 
 MATCH (e:Emotion {id: "disgust"}), (s:SensationType {id: "constriction"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "throat";
+MERGE (e)-[:FELT_AS {region: "throat"}]->(s);
 
 MATCH (e:Emotion {id: "disgust"}), (s:SensationType {id: "pressure"})
-CREATE (e)-[r:FELT_AS]->(s)
-SET r.region = "stomach";
+MERGE (e)-[:FELT_AS {region: "stomach"}]->(s);
 
 
 // ============================================================

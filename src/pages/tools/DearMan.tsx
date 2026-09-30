@@ -1,23 +1,38 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
+import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
+import { recommendationCards } from '../../lib/recommendation';
+import { isCrisisFlag } from '../../lib/crisisBanner';
+import { CrisisBanner } from '../../components/safety/CrisisBanner';
+import { newId } from '../../lib/spine/ids';
+import { useToolSession } from '../../hooks/useToolSession';
+import { dearManRepSource } from '../../lib/spine/wrap';
 import type { DearManContentResult, DearManDebriefContentResult, DearManReflectionResult } from '../../data/dearManTypes';
 import type { StateResult as StateResultType } from '../../services/neo4j';
 import { getEmotionByName } from '../../data/emotions';
-import { getToolById } from '../../data/tools';
 import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { ToolLoading } from '../../components/tools/ToolLoading';
 import { LazyMotion, domAnimation } from 'motion/react';
 import { isDearManHandoff, type DearManHandoff } from '../../data/dearManHandoff';
-import { UrgeScale } from '../../components/tools/oppositeAction/UrgeScale';
-import { BreathOrb } from '../../components/tools/regulation/body';
+import { BreathOrb, type BreathPhase } from '../../components/tools/regulation/body';
 import { linkButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 import { fill } from '../../lib/invalidationRecovery';
-import { handoffPrefill, nextAfterRating, summaryHeadsUp } from '../../lib/dearManSafety';
+import { dearManBandGate, handoffPrefill, summaryHeadsUpForBand } from '../../lib/dearManSafety';
+import type { CapacityReading, HandoffResult } from '../../data/capacityTypes';
+import { useBand } from '../../hooks/useBand';
+import { BandGate } from '../../components/capacity/BandGate';
+import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
+import { TooMuchLink } from '../../components/capacity/TooMuchLink';
+import { handoffExt, makeReading } from '../../lib/bandStore';
+import { dropResumeToken, peekResumeToken } from '../../lib/resumeToken';
+import { scheduleResumeLater } from '../../services/capacity';
+import { dearManDraftOf, dearManStepFromId, dearManStepId, isDearManDraft, TOO_MUCH_PHASES, type DearManDraft, type DearManStep } from '../../lib/dearManResume';
 
 type Phase =
   | 'entry'
   | 'check'
+  | 'handoff'
   | 'scene'
   | 'describe'
   | 'express'
@@ -80,6 +95,10 @@ const debriefOverallOptions = [
 ];
 
 export function DearMan() {
+  const session = useToolSession();
+  // One id per debrief check-in, minted once: StrictMode's double effect (dev) or a re-run upserts
+  // the same CheckIn instead of creating a second one (PR-C1 idempotency).
+  const [debriefCheckInId] = useState(() => newId());
   const location = useLocation();
   const navigate = useNavigate();
   const routeState = location.state as { checkinEmotions?: string[]; dearManHandoff?: unknown } | null;
@@ -88,8 +107,15 @@ export function DearMan() {
   const routeHandoff = routeState?.dearManHandoff;
   const [handoff, setHandoff] = useState<DearManHandoff | null>(() => (isDearManHandoff(routeHandoff) ? routeHandoff : null));
   const initialHandoff = useRef(handoff);
-  /** Captured once: the check-in hand-over only affects the first screen. */
-  const cameFromCheckin = useRef(Boolean(checkinEmotions?.length));
+  // "Come back to this later" (P2): /tool/dear-man?resume=<the earlier session id>. The draft lives
+  // only on this device; peeked here (StrictMode-safe) and dropped after mount.
+  const resumeId = new URLSearchParams(location.search).get('resume');
+  const [resumed] = useState(() => {
+    if (!resumeId || !/^[0-9a-f-]{36}$/i.test(resumeId)) return null;
+    const t = peekResumeToken('dear-man', resumeId);
+    return { token: t && isDearManDraft(t.draft) ? t : null };
+  });
+  useEffect(() => { if (resumeId) dropResumeToken(resumeId); }, [resumeId]);
 
   // ── Graph content (loaded once) ──
   const [content, setContent] = useState<DearManContentResult | null>(null);
@@ -97,7 +123,10 @@ export function DearMan() {
   const [error, setError] = useState<string | null>(null);
 
   // ── Phase state ──
-  const [phase, setPhase] = useState<Phase>(handoff || checkinEmotions?.length ? 'scene' : 'entry');
+  // Check-in entry: the band gate carries the check-in's band silently (no second question). A
+  // resumed draft goes through the gate too (the band it left on is stale by now).
+  const [phase, setPhase] = useState<Phase>(
+    resumed?.token ? 'check' : handoff ? 'scene' : checkinEmotions?.length ? 'check' : 'entry');
   const [sceneStep, setSceneStep] = useState(0);
 
   // ── Scene data ──
@@ -162,11 +191,18 @@ export function DearMan() {
   const [debriefSaved, setDebriefSaved] = useState(false);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
 
-  // ── Safety gates (thresholds + copy from the graph; skipped silently when absent) ──
+  // ── The band (A4-4): asked on the first screen (BandGate), carried within 20 min; flooded → P2 ──
+  const band = useBand();
   const [showCarry, setShowCarry] = useState(true);
-  const [checkStep, setCheckStep] = useState<'rate' | 'breathe' | 'rerate'>('rate');
-  const [intensity, setIntensity] = useState<number | null>(null);
-  const [downshifted, setDownshifted] = useState(false);
+  const [bandReading, setBandReading] = useState<CapacityReading | null>(null);
+  /** Ask even if a reading is current (a flooded hand-off from Recover is re-asked once, D-07). */
+  const [gateForce, setGateForce] = useState(false);
+  /** Where the gate (and P2) goes next: the scene by default, or the step a resumed draft left on. */
+  const afterGate = useRef<DearManStep>(resumed?.token ? dearManStepFromId(resumed.token.stepId) : { phase: 'scene', sceneStep: 0 });
+  const handoffs = useRef<HandoffResult[]>([]);
+  /** "Picking up where we were." / "You were in the middle of something earlier.", on one screen. */
+  const [resumeNote, setResumeNote] = useState<{ kind: 'resumed' | 'stale'; phase: Phase } | null>(() => (
+    resumed ? (resumed.token ? { kind: 'resumed', phase: 'check' } : { kind: 'stale', phase: 'entry' }) : null));
   /** Heads-up on the Summary when it's still loud: offered, breathing, cooled, or waved off. Never a lock. */
   const [headsUp, setHeadsUp] = useState<'offer' | 'breathing' | 'cooled' | 'dismissed'>('offer');
 
@@ -174,6 +210,25 @@ export function DearMan() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(false);
+
+  // ── P2 resume draft (device-only) ──
+  const applyDraft = (d: DearManDraft) => {
+    setRelationshipType(d.relationshipType); setSituationType(d.situationType);
+    if (d.priorities.length) setPriorities(d.priorities);
+    setBarriers(d.barriers); setBarriersCustom(d.barriersCustom);
+    setDescribeId(d.describeId); setDescribeCustom(d.describeCustom);
+    setFeelings(d.feelings); setFeelingCustom(d.feelingCustom); setShowFeelingCustom(Boolean(d.feelingCustom));
+    setAssertIds(d.assertIds); setAssertDetails(d.assertDetails); setAssertCustom(d.assertCustom);
+    setReinforceIds(d.reinforceIds); setReinforceCustom(d.reinforceCustom);
+    setAnchorPhrase(d.anchorPhrase);
+    setMiddleGroundId(d.middleGroundId); setMiddleGroundCustom(d.middleGroundCustom);
+    setWalkAwayId(d.walkAwayId); setWalkAwayCustom(d.walkAwayCustom);
+  };
+  const draftOf = (): DearManDraft => dearManDraftOf({
+    relationshipType, situationType, priorities, barriers, barriersCustom, describeId, describeCustom,
+    feelings, feelingCustom, assertIds, assertDetails, assertCustom, reinforceIds, reinforceCustom,
+    anchorPhrase, middleGroundId, middleGroundCustom, walkAwayId, walkAwayCustom,
+  });
 
   // ── Load content from graph (on mount, and on explicit retry) ──
   const loadInFlight = useRef(false);
@@ -187,31 +242,38 @@ export function DearMan() {
         setContent(data);
         // Prefill from a handoff: situation type (graph-named, verified to exist) + the feeling
         const h = initialHandoff.current;
-        const gates = data.safetyGates?.gates;
-        const canCheck = Boolean(gates && data.safetyCopy?.intensityQuestion && data.safetyCopy?.rerateQuestion);
         if (h) {
           const pre = handoffPrefill(h, data, data.safetyCopy?.handoffSituationId);
           if (pre.situationType) setSituationType(pre.situationType);
           if (pre.feelings.length) setFeelings(pre.feelings);
           if (pre.feelingCustom) { setFeelingCustom(pre.feelingCustom); setShowFeelingCustom(true); }
           initialHandoff.current = null;
-          // The close rating can be higher than when "Ask them" unlocked: settle again first.
-          if (canCheck && gates && h.intensity > gates.askMax) {
-            setIntensity(h.intensity);
-            setCheckStep(h.intensity >= gates.downshiftAt ? 'breathe' : 'rerate');
+          // Recover's band comes over as a `handoff` reading. Flooded (or no band from an older
+          // page): ask here first; D-07 re-asks a carried flooded once rather than opening P2 unasked.
+          const fresh = h.band && h.bandAt && Date.now() - Date.parse(h.bandAt) <= (band.content?.freshMinutes ?? 20) * 60_000;
+          if (h.band && h.bandAt && fresh && h.band !== 'flooded') {
+            const r = makeReading({
+              value: h.band, source: 'handoff', context: 'dear-man', hostSessionId: session.id || undefined,
+              carriedFrom: { readingId: newId(), context: 'recovering-from-invalidation', at: h.bandAt },
+            }, newId(), new Date());
+            setBandReading(r);
+            session.setBandAtStart(r);
+          } else {
+            setGateForce(h.band === 'flooded');
             setPhase('check');
           }
-        } else if (cameFromCheckin.current && canCheck) {
-          // Check-in is the most common way in: it gets the same intensity check as the entry button.
-          setCheckStep('rate');
-          setPhase('check');
+        } else if (resumed?.token && isDearManDraft(resumed.token.draft)) {
+          applyDraft(resumed.token.draft);
         }
       })
       .catch(() => { setError("This tool couldn't load. Try again, or choose another tool."); })
       .finally(() => { loadInFlight.current = false; setLoading(false); });
+  // Mount-time hand-over only: the session id, route state and resume draft are fixed for this visit.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => { loadContent(); }, [loadContent]);
+  useEffect(() => { band.load(); }, [band]);
 
   // ── Pre-fill feelings from check-in emotions ──
   useEffect(() => {
@@ -246,20 +308,21 @@ export function DearMan() {
       .filter((l): l is string => Boolean(l));
 
     // Get recommendations
-    getStateAndTools({ quadrant, emotions: emotionIds })
+    getStateAndTools({ quadrant, emotions: emotionIds, surface: 'dear_man_debrief' })
       .then(result => {
         setStateResult(result);
-        // Save check-in with activation pattern
-        saveCheckIn('', {
-          emotion: emotionIds.join(', '),
+        // Save the debrief's check-in (PR-C1): its own id, source dear_man_debrief, emotion ids,
+        // what rendered. Idempotent by id; a signed-out debrief simply isn't saved.
+        saveCheckIn(buildCheckInPayload({
+          id: debriefCheckInId,
           quadrant,
+          emotions: emotionIds,
           intensity: { x: 0.5, y: 0.5 },
           bodySensations: [],
           note: 'From DEAR MAN debrief',
-          timestamp: new Date(),
-          activationPatternId: result.pattern?.id,
-          confidence: result.pattern?.confidence,
-        }).catch(() => {});
+          startedAt: new Date(),
+          source: 'dear_man_debrief',
+        }, result)).catch(() => {});
       })
       .catch(() => {});
   }, [phase]);
@@ -277,8 +340,8 @@ export function DearMan() {
   const goBack = () => {
     switch (phase) {
       case 'check':
-        if (checkStep === 'rate') setPhase('entry');
-        else setCheckStep('rate');
+      case 'handoff':
+        setPhase('entry');
         break;
       case 'scene':
         if (sceneStep > 0) setSceneStep(sceneStep - 1);
@@ -308,30 +371,44 @@ export function DearMan() {
     }
   };
 
-  // ── Safety gate helpers ──
+  // ── Band gate helpers (A4-4) ──
   const sc = content.safetyCopy ?? {};
-  const safetyGates = content.safetyGates ?? null;
-  const gateThresholds = safetyGates?.gates ?? null;
+  const hc = band.content?.handoff ?? null;
 
   const startPrep = () => {
-    if (safetyGates && sc.intensityQuestion && sc.rerateQuestion) {
-      setCheckStep('rate');
-      setPhase('check');
-    } else {
-      setPhase('scene');
-    }
+    afterGate.current = { phase: 'scene', sceneStep: 0 };
+    setGateForce(false);
+    setPhase('check');
   };
 
-  const rate = (n: number | null) => {
-    if (n == null) return;
-    setIntensity(n);
-    if (nextAfterRating(n, gateThresholds, checkStep === 'rerate' || downshifted) === 'breathe') {
-      setCheckStep('breathe');
-    } else {
-      setSceneStep(0);
-      setPhase('scene');
-    }
+  const goAfterGate = () => {
+    const t = afterGate.current;
+    setSceneStep(t.sceneStep);
+    setPhase(t.phase);
   };
+
+  /** The gate answered (or carried): flooded → P2; "I can't tell" → the P2 card, skippable; else plan. */
+  const onBand = (r: CapacityReading | null) => {
+    setBandReading(r);
+    if (r) session.setBandAtStart(r);
+    if (r && (dearManBandGate(r.value, band.content?.bandRules) === 'handoff' || r.viaCantTell)) {
+      setPhase('handoff');
+      return;
+    }
+    goAfterGate();
+  };
+
+  /** P2 results ride on this visit's ToolSession (ext.er.handoffs, R18). */
+  const recordHandoff = (r: HandoffResult) => {
+    handoffs.current = [...handoffs.current, r];
+    session.setExt({ er: { handoffs: handoffExt(handoffs.current) } });
+  };
+  const canDefer = session.persisted && Boolean(session.id);
+  const resumeDraft = (step: DearManStep) => (canDefer ? { hostSessionId: session.id, stepId: dearManStepId(step), draft: draftOf() } : undefined);
+  const scheduleLater = canDefer ? (chip: '1h' | 'evening' | 'tomorrow') => scheduleResumeLater('dear-man', session.id, chip) : undefined;
+  const noteLine = resumeNote && resumeNote.phase === phase && hc
+    ? <p className={secondaryText} data-testid="resume-note">{resumeNote.kind === 'resumed' ? hc.resumeLine : hc.resumeStale}</p>
+    : null;
 
   const enterSummary = () => setPhase('summary');
 
@@ -522,7 +599,7 @@ export function DearMan() {
     setSaving(true);
     setSaveError(false);
     try {
-      await saveDearManSession({
+      const savedId = await saveDearManSession({
         type: 'prep',
         relationshipType: relationshipType || '',
         situationType: situationType || '',
@@ -544,6 +621,8 @@ export function DearMan() {
         walkAwayCustom,
       });
       setSaved(true);
+      // PR-S4: the visit is a rep of `request`, linked to its DearManSession.
+      if (savedId) void session.close({ status: 'completed', detail: { kind: 'dear_man', id: savedId }, repSource: dearManRepSource('prep') });
     } catch (err) {
       console.error('Failed to save DEAR MAN session:', err);
       setSaveError(true);
@@ -576,1261 +655,1131 @@ export function DearMan() {
     setDebriefSaving(false); setDebriefSaved(false);
     setSaved(false); setSaveError(false);
     setHandoff(null); setShowCarry(true);
-    setCheckStep('rate'); setIntensity(null); setDownshifted(false);
+    setBandReading(null); setGateForce(false); setResumeNote(null);
+    afterGate.current = { phase: 'scene', sceneStep: 0 };
     setHeadsUp('offer');
   };
 
-  // ─── ENTRY ───
-  if (phase === 'entry') {
-    return (
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">
-          What brings you here?
-        </h3>
-        <button
-          onClick={startPrep}
-          className="w-full text-left p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] cursor-pointer transition-colors"
-        >
-          <p className="font-medium text-[var(--color-text-primary)]">
-            I have a conversation coming up
-          </p>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            and I want to prepare
-          </p>
-        </button>
-        <button
-          onClick={() => {
-            if (!debriefContent) {
-              getDearManDebriefContent().then(setDebriefContent).catch(() => {});
-            }
-            setPhase('debrief-checkin');
-          }}
-          className="w-full text-left p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] cursor-pointer transition-colors"
-        >
-          <p className="font-medium text-[var(--color-text-primary)]">
-            I just had a conversation
-          </p>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-1">
-            and want to think through it
-          </p>
-        </button>
-      </div>
-    );
-  }
+  // Every phase renders from here; "This is too much right now" sits under the plan steps (an
+  // overlay: the step stays mounted underneath and the user comes back to it).
+  const renderPhase = (): React.ReactNode => {
+    // ─── ENTRY ───
+    if (phase === 'entry') {
+      return (
+        <div className="space-y-4">
+          {noteLine}
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-2">
+            What brings you here?
+          </h3>
+          <button
+            onClick={startPrep}
+            className="w-full text-left p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] cursor-pointer transition-colors"
+          >
+            <p className="font-medium text-[var(--color-text-primary)]">
+              I have a conversation coming up
+            </p>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+              and I want to prepare
+            </p>
+          </button>
+          <button
+            onClick={() => {
+              if (!debriefContent) {
+                getDearManDebriefContent().then(setDebriefContent).catch(() => {});
+              }
+              setPhase('debrief-checkin');
+            }}
+            className="w-full text-left p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] cursor-pointer transition-colors"
+          >
+            <p className="font-medium text-[var(--color-text-primary)]">
+              I just had a conversation
+            </p>
+            <p className="text-sm text-[var(--color-text-secondary)] mt-1">
+              and want to think through it
+            </p>
+          </button>
+        </div>
+      );
+    }
 
-  // ─── INTENSITY CHECK (own entry only; skipped when the graph has no gates) ───
-  if (phase === 'check' && safetyGates) {
-    const b = safetyGates.breatheCopy;
-    const breathSeconds = Math.round(b.cycles * b.phases.reduce((t, p) => t + p.ms, 0) / 1000);
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        {checkStep === 'breathe' ? (
-          <div className="space-y-4">
-            {sc.downshiftLead && <p className={secondaryText}>{sc.downshiftLead}</p>}
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{b.title}</h3>
-            <p className={secondaryText}>{b.sub}</p>
-            <LazyMotion features={domAnimation}>
-              <BreathOrb phases={b.phases} cycles={b.cycles}
-                startLabel={fill(b.start, { seconds: breathSeconds })}
-                skipLabel={b.skip} doneLabel={b.done}
-                onDone={() => { setDownshifted(true); setCheckStep('rerate'); }} />
-            </LazyMotion>
+    // ─── BAND CHECK (A4-4): one relational question, carried within 20 min; no number ───
+    if (phase === 'check') {
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          {noteLine}
+          <BandGate context="dear-man" wording="relational" force={gateForce} reaskIfFlooded
+            hostSessionId={session.id || undefined} onBand={onBand} />
+        </div>
+      );
+    }
+
+    // ─── P2: body first, then back to the same step ───
+    if (phase === 'handoff' && bandReading) {
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <BreakdownHandoff host="dear-man" band={bandReading.value} blank={false}
+            resume={resumeDraft(afterGate.current)} onScheduleLater={scheduleLater}
+            onResume={(r) => {
+              recordHandoff(r);
+              // "Picking up where we were." only when there is something to pick up (a resumed draft
+              // or a later step), not on the first screen of a plan that hadn't started.
+              const t = afterGate.current;
+              if (resumed?.token || t.phase !== 'scene' || t.sceneStep > 0) setResumeNote({ kind: 'resumed', phase: t.phase });
+              goAfterGate();
+            }}
+            onLater={recordHandoff} />
+        </div>
+      );
+    }
+
+    // ─── SCENE ───
+    if (phase === 'scene') {
+      return (
+        <div className="space-y-6">
+          {carryCard}
+          {noteLine}
+          {sceneStep > 0 && <BackButton />}
+          <SceneDots />
+
+          {/* Sub-step 0: Relationship type */}
+          {sceneStep === 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                Who is this conversation with?
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {relationshipTypes.map(r => (
+                  <button
+                    key={r.id}
+                    onClick={() => { setRelationshipType(r.id); setSceneStep(1); }}
+                    className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+                      relationshipType === r.id
+                        ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
+                        : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-step 1: Situation type (from graph) */}
+          {sceneStep === 1 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                What kind of conversation is this?
+              </h3>
+              <div className="space-y-3">
+                {content.situationTypes.map(st => (
+                  <button
+                    key={st.id}
+                    onClick={() => { setSituationType(st.id); setSceneStep(2); }}
+                    className={`w-full text-left p-4 rounded-xl border cursor-pointer transition-colors ${
+                      situationType === st.id
+                        ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
+                        : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] hover:border-[var(--color-border-accent)]'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl" role="img" aria-hidden="true">{st.emoji}</span>
+                      <div>
+                        <p className={`font-medium ${situationType === st.id ? 'text-white' : 'text-[var(--color-text-primary)]'}`}>
+                          {st.label}
+                        </p>
+                        <p className={`text-sm mt-0.5 ${situationType === st.id ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
+                          {st.sublabel}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Sub-step 2: Priorities */}
+          {sceneStep === 2 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                What matters most to you here?
+              </h3>
+              <p className="text-sm text-[var(--color-text-secondary)]">
+                Rank in order of importance &mdash; or remove any that don&apos;t apply.
+              </p>
+              <div className="space-y-2">
+                {priorities.map((id, index) => (
+                  <div key={id} className="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+                    <span className="text-sm font-medium text-[var(--color-text-tertiary)] w-5">{index + 1}.</span>
+                    <span className="flex-1 text-[var(--color-text-primary)]">{getPriorityLabel(id)}</span>
+                    <button onClick={() => movePriority(index, -1)} disabled={index === 0}
+                      className="w-8 h-8 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] disabled:opacity-30">&uarr;</button>
+                    <button onClick={() => movePriority(index, 1)} disabled={index === priorities.length - 1}
+                      className="w-8 h-8 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] disabled:opacity-30">&darr;</button>
+                    <button onClick={() => removePriority(id)} disabled={priorities.length <= 1}
+                      className="w-8 h-8 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] disabled:opacity-30">&times;</button>
+                  </div>
+                ))}
+              </div>
+              {removedPriorities.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">Not a priority here</p>
+                  <div className="flex flex-wrap gap-2">
+                    {removedPriorities.map(id => (
+                      <button key={id} onClick={() => restorePriority(id)}
+                        className="px-3 py-1.5 text-sm rounded-full border border-dashed border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors">
+                        + {getPriorityLabel(id)}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <p className="text-sm text-[var(--color-text-muted)]">
+                There&apos;s no wrong answer. This helps us focus advice on what you&apos;d protect if the conversation gets tough.
+              </p>
+              <button onClick={() => setSceneStep(3)} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">Next</button>
+            </div>
+          )}
+
+          {/* Sub-step 3: Barriers — free text first, curated options as a starting point */}
+          {sceneStep === 3 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What makes this hard?</h3>
+              <textarea rows={3} value={barriersCustom}
+                onChange={e => handleBarriersText(e.target.value)}
+                placeholder="Type your answer…"
+                className={textareaClass} />
+              <p className="text-sm text-[var(--color-text-secondary)]">Or, start with a template / select options:</p>
+              <div className="flex flex-wrap gap-2">
+                {content.barriers.map(b => {
+                  const selected = barriers.includes(b.id);
+                  return (
+                    <button key={b.id}
+                      onClick={() => toggleBarrier(b.id)}
+                      aria-pressed={selected}
+                      className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+                        selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                      }`}>
+                      {b.label}
+                    </button>
+                  );
+                })}
+              </div>
+              <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+                Let&apos;s build your script
+              </button>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── DESCRIBE ───
+    if (phase === 'describe') {
+      const options = situationType ? (content.describeOptions[situationType] ?? []) : [];
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What happened?</h3>
+          <textarea rows={3} value={describeCustom}
+            onChange={e => setDescribeCustom(e.target.value)}
+            placeholder="Type or answer… just the facts, like a camera would see it."
+            className={textareaClass} />
+          <p className="text-[var(--color-text-secondary)]">Or, start with a template / pick the one that fits best:</p>
+          <div className="space-y-2">
+            {options.map(opt => (
+              <button key={opt.id}
+                onClick={() => { setDescribeId(opt.id); setDescribeCustom(opt.label); }}
+                aria-pressed={describeId === opt.id}
+                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                  describeId === opt.id
+                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                }`}>
+                {opt.label}
+              </button>
+            ))}
           </div>
-        ) : (
-          <UrgeScale key={checkStep}
-            label={(checkStep === 'rate' ? sc.intensityQuestion : sc.rerateQuestion) ?? ''}
-            hint={checkStep === 'rate' ? sc.intensityHint : sc.rerateHint}
-            value={null} onChange={rate}
-            lowLabel={sc.intensityLow} highLabel={sc.intensityHigh} />
-        )}
-      </div>
-    );
-  }
+          {describeId && (
+            <p className="text-sm text-[var(--color-text-tertiary)]">
+              That&apos;s in the box above &mdash; edit it until it sounds like your situation.
+            </p>
+          )}
+          <button onClick={() => setPhase('express')} disabled={!hasDescribe}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
+            Next: How you feel
+          </button>
+          {!hasDescribe && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Write a line above, or pick a template, to continue.</p>}
+          {content.stepInsights.describe && (
+            <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.describe}</p>
+          )}
+        </div>
+      );
+    }
 
-  // ─── SCENE ───
-  if (phase === 'scene') {
-    return (
-      <div className="space-y-6">
-        {carryCard}
-        {sceneStep > 0 && <BackButton />}
-        <SceneDots />
+    // ─── EXPRESS ───
+    if (phase === 'express') {
+      const mirror = resolveMirror();
+      const groups = content.feelingGroups ?? [];
+      // Group chips by their graph-assigned group; anything unassigned goes in a trailing "Other" bucket
+      const grouped: Array<{ id: string; label: string; color: string; chips: typeof content.feelingChips }> = groups.map(g => ({
+        id: g.id,
+        label: g.label,
+        color: feelingGroupColors[g.colorKey] ?? feelingGroupColors.neutral,
+        chips: content.feelingChips.filter(f => f.groupId === g.id),
+      })).filter(g => g.chips.length > 0);
+      const ungrouped = content.feelingChips.filter(f => !f.groupId || !groups.some(g => g.id === f.groupId));
+      if (ungrouped.length) {
+        grouped.push({ id: 'other', label: grouped.length ? 'Other' : '', color: feelingGroupColors.neutral, chips: ungrouped });
+      }
+      const typicalChips = mirror
+        ? mirror.feelingIds.map(id => content.feelingChips.find(f => f.id === id)).filter((f): f is typeof content.feelingChips[number] => f != null)
+        : [];
+      const colorFor = (chip: typeof content.feelingChips[number]) =>
+        grouped.find(g => g.chips.includes(chip))?.color ?? feelingGroupColors.neutral;
 
-        {/* Sub-step 0: Relationship type */}
-        {sceneStep === 0 && (
+      // Plain render helper (not a component) so chips don't remount on every state change
+      const renderFeelingChip = (chip: typeof content.feelingChips[number], color: string) => {
+        const selected = feelings.includes(chip.id);
+        return (
+          <button
+            key={chip.id}
+            onClick={() => toggleChip(chip.id, feelings, setFeelings)}
+            aria-pressed={selected}
+            style={selected
+              ? { backgroundColor: color, borderColor: 'transparent', color: '#fff' }
+              : { backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, borderColor: `color-mix(in srgb, ${color} 45%, transparent)` }}
+            className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+              selected ? '' : 'text-[var(--color-text-primary)] hover:brightness-95'
+            }`}>
+            {chip.label}
+          </button>
+        );
+      };
+
+      return (
+        <div className="space-y-6">
+          {carryCard}
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How does this make you feel?</h3>
+          <p className="text-[var(--color-text-secondary)]">Tap all that apply.</p>
+
+          {/* Mirroring — an example of what this situation typically brings up */}
+          {mirror && (
+            <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
+              <button
+                onClick={() => setShowMirror(v => !v)}
+                aria-expanded={showMirror}
+                className="w-full text-left px-4 py-3 text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
+                {showMirror ? '−' : '+'} Not sure? See how this might typically make someone feel
+              </button>
+              {showMirror && (
+                <div className="px-4 pb-4 space-y-3">
+                  <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{mirror.text}</p>
+                  {typicalChips.length > 0 && (
+                    <>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">Sound familiar? Tap any that fit</p>
+                      <div className="flex flex-wrap gap-2">
+                        {typicalChips.map(chip => renderFeelingChip(chip, colorFor(chip)))}
+                      </div>
+                      <button
+                        onClick={() => setFeelings(prev => Array.from(new Set([...prev, ...typicalChips.map(c => c.id)])))}
+                        className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                        + Add all of these
+                      </button>
+                    </>
+                  )}
+                  <p className="text-xs text-[var(--color-text-muted)]">This is what many people feel here &mdash; not what you&apos;re supposed to feel. Only keep what&apos;s true for you.</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Color-coded feeling groups */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-              Who is this conversation with?
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {relationshipTypes.map(r => (
-                <button
-                  key={r.id}
-                  onClick={() => { setRelationshipType(r.id); setSceneStep(1); }}
+            {grouped.map(g => (
+              <div key={g.id} className="space-y-2">
+                {g.label && (
+                  <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
+                    <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: g.color }} />
+                    {g.label}
+                  </p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  {g.chips.map(chip => renderFeelingChip(chip, g.color))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {!showFeelingCustom ? (
+            <button onClick={() => setShowFeelingCustom(true)}
+              className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+              + Something else
+            </button>
+          ) : (
+            <input type="text" value={feelingCustom}
+              onChange={e => setFeelingCustom(e.target.value)}
+              placeholder="I also feel..."
+              autoFocus
+              className={inputClass} />
+          )}
+          <button onClick={() => setPhase('assert')} disabled={!hasExpress}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
+            Next: What you need
+          </button>
+          {!hasExpress && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Tap at least one feeling to continue.</p>}
+          {content.stepInsights.express && (
+            <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.express}</p>
+          )}
+        </div>
+      );
+    }
+
+    // ─── ASSERT ───
+    if (phase === 'assert') {
+      const options = assertOptionsForSituation;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            What specifically are you asking for &mdash; or saying no to?
+          </h3>
+          <p className="text-[var(--color-text-secondary)]">Pick any that apply. You can add detail to each one.</p>
+
+          {/* Barrier-specific coaching for guilty */}
+          {barriers.includes('barrier_guilty') && content.assertBarrierGuilty && (
+            <div className="bg-[var(--color-accent-muted)] rounded-lg p-3 text-sm text-[var(--color-text-secondary)]">
+              {content.assertBarrierGuilty}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            {options.map(opt => {
+              const selected = assertIds.includes(opt.id);
+              const detail = assertDetails[opt.id] ?? '';
+              const prompt = opt.hasPlaceholder
+                ? 'Fill in the blank:'
+                : (opt.elaboratePrompt || 'Want to add more detail? (optional)');
+              return (
+                <div key={opt.id} className={`rounded-lg border transition-colors ${
+                  selected ? 'border-[var(--color-accent)] bg-[var(--color-accent-subtle)]' : 'border-[var(--color-border)]'
+                }`}>
+                  <button
+                    onClick={() => toggleChip(opt.id, assertIds, setAssertIds)}
+                    aria-pressed={selected}
+                    className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
+                      selected ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] lift-secondary'
+                    }`}>
+                    <span className="flex items-start gap-3">
+                      <span aria-hidden="true" className={`mt-0.5 inline-flex w-5 h-5 shrink-0 items-center justify-center rounded-md border text-xs ${
+                        selected ? 'bg-[var(--color-accent-fill)] border-transparent text-white' : 'border-[var(--color-border)]'
+                      }`}>{selected ? '✓' : ''}</span>
+                      <span>{opt.label}</span>
+                    </span>
+                  </button>
+                  {selected && (
+                    <div className="px-4 pb-3 space-y-1.5">
+                      <label htmlFor={`assert-detail-${opt.id}`} className="block text-sm text-[var(--color-text-secondary)]">
+                        {prompt}
+                      </label>
+                      <textarea
+                        id={`assert-detail-${opt.id}`}
+                        rows={2}
+                        value={detail}
+                        onChange={e => setAssertDetails(prev => ({ ...prev, [opt.id]: e.target.value }))}
+                        placeholder={opt.hasPlaceholder ? 'Be specific...' : 'In your own words...'}
+                        className={textareaClass}
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {!showAssertCustom ? (
+            <button onClick={() => setShowAssertCustom(true)}
+              className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+              + Something else &mdash; I&apos;ll say it myself
+            </button>
+          ) : (
+            <textarea rows={3} value={assertCustom}
+              onChange={e => setAssertCustom(e.target.value)}
+              placeholder="What are you asking for?"
+              autoFocus
+              className={textareaClass} />
+          )}
+
+          <button onClick={() => setPhase('reinforce')} disabled={!hasAssert}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
+            Next: Why it matters
+          </button>
+          {!hasAssert && (
+            <p className="text-sm text-center text-[var(--color-text-tertiary)]">
+              {assertBlankMissing ? 'Fill in the blank on what you selected to continue.' : 'Choose at least one thing you’re asking for to continue.'}
+            </p>
+          )}
+          {content.stepInsights.assert && (
+            <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.assert}</p>
+          )}
+        </div>
+      );
+    }
+
+    // ─── REINFORCE ───
+    if (phase === 'reinforce') {
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+            What&apos;s in it for them &mdash; or for the relationship &mdash; if this goes well?
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {content.reinforceOptions.map(r => {
+              const selected = reinforceIds.includes(r.id);
+              return (
+                <button key={r.id}
+                  onClick={() => toggleChip(r.id, reinforceIds, setReinforceIds)}
                   className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                    relationshipType === r.id
-                      ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
-                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-                  }`}
-                >
+                    selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  }`}>
                   {r.label}
                 </button>
-              ))}
-            </div>
+              );
+            })}
           </div>
-        )}
+          {!showReinforceCustom ? (
+            <button onClick={() => setShowReinforceCustom(true)}
+              className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+              + Something else
+            </button>
+          ) : (
+            <input type="text" value={reinforceCustom}
+              onChange={e => setReinforceCustom(e.target.value)}
+              placeholder="Why it would help..."
+              autoFocus
+              className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+          )}
+          <button onClick={() => setPhase('mindful')} disabled={!hasReinforce}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
+            Next: Getting ready
+          </button>
+          {!hasReinforce && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Pick at least one reason to continue.</p>}
+          {content.stepInsights.reinforce && (
+            <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.reinforce}</p>
+          )}
+        </div>
+      );
+    }
 
-        {/* Sub-step 1: Situation type (from graph) */}
-        {sceneStep === 1 && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-              What kind of conversation is this?
-            </h3>
-            <div className="space-y-3">
-              {content.situationTypes.map(st => (
-                <button
-                  key={st.id}
-                  onClick={() => { setSituationType(st.id); setSceneStep(2); }}
-                  className={`w-full text-left p-4 rounded-xl border cursor-pointer transition-colors ${
-                    situationType === st.id
+    // ─── MINDFUL ───
+    if (phase === 'mindful') {
+      const coachingCards = barriers.length > 0
+        ? barriers
+            .filter(b => content.barrierCoaching[b])
+            .slice(0, 3)
+            .map(b => content.barrierCoaching[b])
+        : [content.defaultCoaching];
+
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What might pull you off track?</h3>
+          {coachingCards.map((card, i) => (
+            <div key={i} className="p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+              <p className="font-medium text-[var(--color-text-primary)] mb-1">{card.title}</p>
+              <p className="text-sm text-[var(--color-text-secondary)]">{card.body}</p>
+            </div>
+          ))}
+          <div className="space-y-3">
+            <p className="text-[var(--color-text-secondary)]">What&apos;s one thing you can tell yourself if it gets hard?</p>
+            <input type="text" value={anchorPhrase}
+              onChange={e => setAnchorPhrase(e.target.value)}
+              placeholder="Your anchor phrase"
+              className={inputClass} />
+            {anchorPhrase && content.anchorGeneratorMakeItYours && (
+              <p className="text-xs text-[var(--color-text-muted)]">{content.anchorGeneratorMakeItYours}</p>
+            )}
+
+            {/* Quick picks: ranked by how well they match the barriers named earlier */}
+            <p className="text-sm text-[var(--color-text-muted)]">Or pick one:</p>
+            <div className="flex flex-wrap gap-2">
+              {rankedAnchorPhrases.slice(0, 6).map(a => (
+                <button key={a.id} onClick={() => setAnchorPhrase(a.label)}
+                  aria-pressed={anchorPhrase === a.label}
+                  className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                    anchorPhrase === a.label
                       ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
-                      : 'bg-[var(--color-bg-elevated)] border-[var(--color-border)] hover:border-[var(--color-border-accent)]'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <span className="text-xl" role="img" aria-hidden="true">{st.emoji}</span>
-                    <div>
-                      <p className={`font-medium ${situationType === st.id ? 'text-white' : 'text-[var(--color-text-primary)]'}`}>
-                        {st.label}
-                      </p>
-                      <p className={`text-sm mt-0.5 ${situationType === st.id ? 'text-white/80' : 'text-[var(--color-text-secondary)]'}`}>
-                        {st.sublabel}
-                      </p>
-                    </div>
-                  </div>
+                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
+                  }`}>
+                  {a.label}
                 </button>
               ))}
             </div>
-          </div>
-        )}
 
-        {/* Sub-step 2: Priorities */}
-        {sceneStep === 2 && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-              What matters most to you here?
-            </h3>
-            <p className="text-sm text-[var(--color-text-secondary)]">
-              Rank in order of importance &mdash; or remove any that don&apos;t apply.
-            </p>
-            <div className="space-y-2">
-              {priorities.map((id, index) => (
-                <div key={id} className="flex items-center gap-2 p-3 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
-                  <span className="text-sm font-medium text-[var(--color-text-tertiary)] w-5">{index + 1}.</span>
-                  <span className="flex-1 text-[var(--color-text-primary)]">{getPriorityLabel(id)}</span>
-                  <button onClick={() => movePriority(index, -1)} disabled={index === 0}
-                    className="w-8 h-8 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] disabled:opacity-30">&uarr;</button>
-                  <button onClick={() => movePriority(index, 1)} disabled={index === priorities.length - 1}
-                    className="w-8 h-8 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] disabled:opacity-30">&darr;</button>
-                  <button onClick={() => removePriority(id)} disabled={priorities.length <= 1}
-                    className="w-8 h-8 rounded flex items-center justify-center text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-secondary)] disabled:opacity-30">&times;</button>
-                </div>
-              ))}
-            </div>
-            {removedPriorities.length > 0 && (
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">Not a priority here</p>
-                <div className="flex flex-wrap gap-2">
-                  {removedPriorities.map(id => (
-                    <button key={id} onClick={() => restorePriority(id)}
-                      className="px-3 py-1.5 text-sm rounded-full border border-dashed border-[var(--color-border)] text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors">
-                      + {getPriorityLabel(id)}
-                    </button>
-                  ))}
-                </div>
+            {/* Anchor phrase generator — inline sub-panel */}
+            {rankedAnchorNeeds.length > 0 && (
+              <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
+                <button
+                  onClick={() => setShowAnchorGen(v => !v)}
+                  aria-expanded={showAnchorGen}
+                  className="w-full text-left px-4 py-3 text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
+                  {showAnchorGen ? '\u2212' : '+'} Help me find my phrase
+                </button>
+                {showAnchorGen && (
+                  <div className="px-4 pb-4 space-y-4">
+                    {content.anchorGeneratorIntro && (
+                      <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{content.anchorGeneratorIntro}</p>
+                    )}
+                    <div className="space-y-2">
+                      <p className="text-sm font-medium text-[var(--color-text-primary)]">When it gets hard, what do you most need to hear?</p>
+                      <div className="flex flex-wrap gap-2">
+                        {rankedAnchorNeeds.map(n => {
+                          const suggested = barrierOverlap(n.barrierIds) > 0;
+                          const selected = anchorNeedId === n.id;
+                          return (
+                            <button key={n.id}
+                              onClick={() => { setAnchorNeedId(n.id); setAnchorShowAll(false); }}
+                              aria-pressed={selected}
+                              className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
+                                selected
+                                  ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
+                                  : suggested
+                                    ? 'border-[var(--color-accent)] text-[var(--color-text-primary)] bg-[var(--color-accent-subtle)]'
+                                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
+                              }`}>
+                              {n.label}{suggested && !selected ? ' \u00b7 fits what you said' : ''}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    {anchorNeedId && (() => {
+                      const matches = phrasesForNeed(anchorNeedId);
+                      const shown = anchorShowAll ? matches : matches.slice(0, 4);
+                      return (
+                        <div className="space-y-2">
+                          <p className="text-sm font-medium text-[var(--color-text-primary)]">Try one of these. Tap to use it, then edit it until it sounds like you.</p>
+                          {shown.length === 0 && (
+                            <p className="text-sm text-[var(--color-text-tertiary)]">Nothing matched yet &mdash; try another need, or write your own above.</p>
+                          )}
+                          <div className="space-y-2">
+                            {shown.map(pz => (
+                              <button key={pz.id}
+                                onClick={() => { setAnchorPhrase(pz.label); setShowAnchorGen(false); }}
+                                className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] lift-secondary hover:border-[var(--color-accent)] transition-colors">
+                                &ldquo;{pz.label}&rdquo;
+                              </button>
+                            ))}
+                          </div>
+                          {!anchorShowAll && matches.length > shown.length && (
+                            <button onClick={() => setAnchorShowAll(true)}
+                              className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                              + Show {matches.length - shown.length} more
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                )}
               </div>
             )}
-            <p className="text-sm text-[var(--color-text-muted)]">
-              There&apos;s no wrong answer. This helps us focus advice on what you&apos;d protect if the conversation gets tough.
-            </p>
-            <button onClick={() => setSceneStep(3)} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">Next</button>
           </div>
-        )}
-
-        {/* Sub-step 3: Barriers — free text first, curated options as a starting point */}
-        {sceneStep === 3 && (
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What makes this hard?</h3>
-            <textarea rows={3} value={barriersCustom}
-              onChange={e => handleBarriersText(e.target.value)}
-              placeholder="Type your answer…"
-              className={textareaClass} />
-            <p className="text-sm text-[var(--color-text-secondary)]">Or, start with a template / select options:</p>
-            <div className="flex flex-wrap gap-2">
-              {content.barriers.map(b => {
-                const selected = barriers.includes(b.id);
-                return (
-                  <button key={b.id}
-                    onClick={() => toggleBarrier(b.id)}
-                    aria-pressed={selected}
-                    className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                      selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-                    }`}>
-                    {b.label}
-                  </button>
-                );
-              })}
-            </div>
-            <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-              Let&apos;s build your script
-            </button>
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DESCRIBE ───
-  if (phase === 'describe') {
-    const options = situationType ? (content.describeOptions[situationType] ?? []) : [];
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What happened?</h3>
-        <textarea rows={3} value={describeCustom}
-          onChange={e => setDescribeCustom(e.target.value)}
-          placeholder="Type or answer… just the facts, like a camera would see it."
-          className={textareaClass} />
-        <p className="text-[var(--color-text-secondary)]">Or, start with a template / pick the one that fits best:</p>
-        <div className="space-y-2">
-          {options.map(opt => (
-            <button key={opt.id}
-              onClick={() => { setDescribeId(opt.id); setDescribeCustom(opt.label); }}
-              aria-pressed={describeId === opt.id}
-              className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                describeId === opt.id
-                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-              }`}>
-              {opt.label}
-            </button>
-          ))}
+          <button onClick={() => setPhase('confident')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+            Almost there
+          </button>
         </div>
-        {describeId && (
-          <p className="text-sm text-[var(--color-text-tertiary)]">
-            That&apos;s in the box above &mdash; edit it until it sounds like your situation.
-          </p>
-        )}
-        <button onClick={() => setPhase('express')} disabled={!hasDescribe}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
-          Next: How you feel
-        </button>
-        {!hasDescribe && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Write a line above, or pick a template, to continue.</p>}
-        {content.stepInsights.describe && (
-          <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.describe}</p>
-        )}
-      </div>
-    );
-  }
-
-  // ─── EXPRESS ───
-  if (phase === 'express') {
-    const mirror = resolveMirror();
-    const groups = content.feelingGroups ?? [];
-    // Group chips by their graph-assigned group; anything unassigned goes in a trailing "Other" bucket
-    const grouped: Array<{ id: string; label: string; color: string; chips: typeof content.feelingChips }> = groups.map(g => ({
-      id: g.id,
-      label: g.label,
-      color: feelingGroupColors[g.colorKey] ?? feelingGroupColors.neutral,
-      chips: content.feelingChips.filter(f => f.groupId === g.id),
-    })).filter(g => g.chips.length > 0);
-    const ungrouped = content.feelingChips.filter(f => !f.groupId || !groups.some(g => g.id === f.groupId));
-    if (ungrouped.length) {
-      grouped.push({ id: 'other', label: grouped.length ? 'Other' : '', color: feelingGroupColors.neutral, chips: ungrouped });
-    }
-    const typicalChips = mirror
-      ? mirror.feelingIds.map(id => content.feelingChips.find(f => f.id === id)).filter((f): f is typeof content.feelingChips[number] => f != null)
-      : [];
-    const colorFor = (chip: typeof content.feelingChips[number]) =>
-      grouped.find(g => g.chips.includes(chip))?.color ?? feelingGroupColors.neutral;
-
-    // Plain render helper (not a component) so chips don't remount on every state change
-    const renderFeelingChip = (chip: typeof content.feelingChips[number], color: string) => {
-      const selected = feelings.includes(chip.id);
-      return (
-        <button
-          key={chip.id}
-          onClick={() => toggleChip(chip.id, feelings, setFeelings)}
-          aria-pressed={selected}
-          style={selected
-            ? { backgroundColor: color, borderColor: 'transparent', color: '#fff' }
-            : { backgroundColor: `color-mix(in srgb, ${color} 12%, transparent)`, borderColor: `color-mix(in srgb, ${color} 45%, transparent)` }}
-          className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-            selected ? '' : 'text-[var(--color-text-primary)] hover:brightness-95'
-          }`}>
-          {chip.label}
-        </button>
       );
+    }
+
+    // ─── CONFIDENT ───
+    if (phase === 'confident') {
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+            <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">Before the conversation</h3>
+            <p className="text-[var(--color-text-secondary)]">{content.confidentCoaching}</p>
+            {barriers.includes('barrier_no_right') && content.confidentBarrierNoRight && (
+              <p className="text-sm text-[var(--color-text-secondary)] mt-3 italic">{content.confidentBarrierNoRight}</p>
+            )}
+          </div>
+          <button onClick={() => setPhase('negotiate')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+            Last step
+          </button>
+        </div>
+      );
+    }
+
+    // ─── NEGOTIATE ───
+    if (phase === 'negotiate') {
+      const topPriority = priorities[0];
+      const hint = topPriority ? content.negotiateHints[topPriority] : null;
+
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">If they say no &mdash; or push back</h3>
+          <div className="p-3 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-sm text-[var(--color-text-secondary)]">
+            Negotiating doesn&apos;t mean caving. It means being willing to find a solution that works for both of you &mdash; without giving up what matters most.
+          </div>
+          {hint && <p className="text-sm text-[var(--color-text-secondary)] italic">{hint}</p>}
+
+          {/* Middle ground */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-[var(--color-text-secondary)]">What&apos;s a middle ground you could live with?</p>
+            <div className="space-y-2">
+              {content.negotiateOptions.middleGround.map(opt => (
+                <button key={opt.id}
+                  onClick={() => { setMiddleGroundId(opt.id); setShowMiddleGroundCustom(false); setMiddleGroundCustom(''); }}
+                  className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                    middleGroundId === opt.id
+                      ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                  }`}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {!showMiddleGroundCustom ? (
+              <button onClick={() => { setShowMiddleGroundCustom(true); setMiddleGroundId(null); }}
+                className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                + Something else
+              </button>
+            ) : (
+              <input type="text" value={middleGroundCustom}
+                onChange={e => setMiddleGroundCustom(e.target.value)}
+                placeholder="A compromise I could accept..."
+                autoFocus
+                className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+            )}
+          </div>
+
+          {/* Walk-away */}
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-[var(--color-text-secondary)]">What won&apos;t you compromise on?</p>
+            <div className="space-y-2">
+              {content.negotiateOptions.walkAway.map(opt => (
+                <button key={opt.id}
+                  onClick={() => { setWalkAwayId(opt.id); setShowWalkAwayCustom(false); setWalkAwayCustom(''); }}
+                  className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                    walkAwayId === opt.id
+                      ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                  }`}>
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+            {!showWalkAwayCustom ? (
+              <button onClick={() => { setShowWalkAwayCustom(true); setWalkAwayId(null); }}
+                className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                + Something else
+              </button>
+            ) : (
+              <input type="text" value={walkAwayCustom}
+                onChange={e => setWalkAwayCustom(e.target.value)}
+                placeholder="My non-negotiable..."
+                autoFocus
+                className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
+            )}
+          </div>
+
+          <button onClick={enterSummary} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+            See your plan
+          </button>
+        </div>
+      );
+    }
+
+    // ─── SUMMARY ───
+    if (phase === 'summary') {
+      const describeText = resolveDescribe();
+      const feelingsText = resolveFeelings();
+      const assertTexts = resolveAsserts();
+      const reinforceTexts = resolveReinforce();
+      const mgText = resolveMiddleGround();
+      const waText = resolveWalkAway();
+      const lastReread = [...handoffs.current].reverse().find(r => r.thenVsNow)?.thenVsNow ?? null;
+      const hot = summaryHeadsUpForBand(bandReading?.value, lastReread) && Boolean(sc.hotHeading);
+      // The heads-up's breath is P2's sigh primitive (graph HandoffPrimitive copy), not Recover's gates.
+      const sigh = band.content?.primitives.find(p => p.id === 'sigh')?.copy as
+        { title: string; sub: string; phases: BreathPhase[]; cycles: number; start: string; skip: string; done: string } | undefined;
+      const b = sigh && Array.isArray(sigh.phases) ? sigh : undefined;
+
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          {carryCard}
+          {hot && headsUp !== 'dismissed' && (
+            <div className="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] space-y-3" role="note">
+              {headsUp === 'cooled' ? (
+                <p className="text-[var(--color-text-primary)]">{sc.hotCooled}</p>
+              ) : (
+                <>
+                  <p className="font-semibold text-[var(--color-text-primary)]">{sc.hotHeading}</p>
+                  <p className={secondaryText}>{sc.hotBody}</p>
+                  {headsUp === 'breathing' && b ? (
+                    <LazyMotion features={domAnimation}>
+                      <BreathOrb phases={b.phases} cycles={b.cycles} compact
+                        startLabel={fill(b.start, { seconds: Math.round(b.cycles * b.phases.reduce((t, p) => t + p.ms, 0) / 1000) })}
+                        skipLabel={b.skip} doneLabel={b.done}
+                        onDone={done => setHeadsUp(done ? 'cooled' : 'dismissed')} />
+                    </LazyMotion>
+                  ) : (
+                    <div className="flex flex-wrap gap-2">
+                      {b && (
+                        <button type="button" onClick={() => setHeadsUp('breathing')}
+                          className="py-2.5 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+                          {sc.hotCoolDown}
+                        </button>
+                      )}
+                      <button type="button" onClick={() => setHeadsUp('dismissed')} className={linkButton}>{sc.hotReady}</button>
+                    </div>
+                  )}
+                  {sc.hotBodyCue && <p className={secondaryText}>{sc.hotBodyCue}</p>}
+                </>
+              )}
+            </div>
+          )}
+          {handoff?.oneMessageOnly && sc.oneMessageOnly && (
+            <p className={`${secondaryText} p-3 rounded-xl bg-[var(--color-bg-secondary)]`}>{sc.oneMessageOnly}</p>
+          )}
+          <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+            <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">Your Conversation Plan</h3>
+            <p className="text-sm text-[var(--color-text-secondary)] mb-6">with your {getRelLabel()}</p>
+
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">The Situation</p>
+              <p className="text-[var(--color-text-primary)]">{describeText}</p>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">How I Feel</p>
+              <p className="text-[var(--color-text-primary)]">{feelingsText.join(', ')}</p>
+            </div>
+
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">What I&apos;m Asking For</p>
+              {assertTexts.length === 1
+                ? <p className="text-[var(--color-text-primary)]">{assertTexts[0]}</p>
+                : (
+                  <ul className="list-disc pl-5 space-y-1">
+                    {assertTexts.map((t, i) => <li key={i} className="text-[var(--color-text-primary)]">{t}</li>)}
+                  </ul>
+                )}
+            </div>
+
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">Why It Matters</p>
+              {reinforceTexts.map((t, i) => <p key={i} className="text-[var(--color-text-primary)]">{t}</p>)}
+            </div>
+
+            <hr className="border-[var(--color-border-subtle)] mb-6" />
+
+            {anchorPhrase && (
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">My Anchor</p>
+                <p className="text-[var(--color-text-primary)] italic">&ldquo;{anchorPhrase}&rdquo;</p>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">If They Push Back</p>
+              {mgText && <p className="text-[var(--color-text-primary)]"><span className="text-[var(--color-text-secondary)]">Middle ground:</span> {mgText}</p>}
+              {waText && <p className="text-[var(--color-text-primary)]"><span className="text-[var(--color-text-secondary)]">I won&apos;t compromise on:</span> {waText}</p>}
+            </div>
+
+            <div className="mb-6">
+              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">Body Reminder</p>
+              <p className="text-[var(--color-text-secondary)] text-sm">Shoulders back, steady voice, feet on the ground.</p>
+            </div>
+
+            <hr className="border-[var(--color-border-subtle)] mb-6" />
+
+            <div className="flex gap-3">
+              <button onClick={handleSave} disabled={saving || saved}
+                className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
+                {saved ? 'Saved' : saving ? 'Saving...' : saveError ? 'Try again' : 'Save this plan'}
+              </button>
+              <button onClick={reset}
+                className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
+                Start over
+              </button>
+            </div>
+            {saveError && (
+              <p role="alert" className="text-[var(--color-danger)] text-sm mt-2 text-center">Your plan couldn't be saved. It's still here on this screen — you can try again.</p>
+            )}
+            {saved && (
+              <button
+                onClick={() => navigate('/history', { state: { tab: 'dearman' } })}
+                className="w-full mt-3 py-3 px-4 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] font-medium lift-secondary hover:bg-[var(--color-accent-subtle)] transition-colors">
+                See my plans &rarr;
+              </button>
+            )}
+            {!saved && !saveError && (
+              <p className="text-xs text-[var(--color-text-tertiary)] mt-3 text-center">
+                Saving stores this plan with your account. Nothing is saved until you choose to.
+              </p>
+            )}
+          </div>
+
+          {/* DEAR MAN reveal */}
+          {content.revealText && (
+            <details className="group">
+              <summary className="cursor-pointer text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+                <span className="group-open:hidden">+ By the way &mdash; you just used DEAR MAN.</span>
+                <span className="hidden group-open:inline">&minus; By the way &mdash; you just used DEAR MAN.</span>
+              </summary>
+              <div className="mt-2 p-4 rounded-lg bg-[var(--color-bg-elevated)]/50 text-sm text-[var(--color-text-secondary)]">
+                <p>{content.revealText}</p>
+              </div>
+            </details>
+          )}
+
+          <button onClick={() => {
+              if (!debriefContent) {
+                getDearManDebriefContent().then(setDebriefContent).catch(() => {});
+              }
+              setPhase('debrief-checkin');
+            }}
+            className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+            After the conversation &rarr; How did it go?
+          </button>
+        </div>
+      );
+    }
+
+    // ─── Helper: resolve labels from debrief content ───
+    const resolveBodySignalLabel = (id: string) =>
+      debriefContent?.bodySignals.find(b => b.id === id)?.label ?? '';
+    const resolveThoughtLabel = () => {
+      const labels = thoughtPatternIds
+        .filter(id => id !== 'thought_something_else')
+        .map(id => debriefContent?.thoughtPatterns.find(t => t.id === id)?.label)
+        .filter(Boolean);
+      if (thoughtPatternIds.includes('thought_something_else') && thoughtCustom) {
+        labels.push(thoughtCustom);
+      }
+      return labels.join(', ') || '';
+    };
+    const resolveCopeAheadLabel = () =>
+      reflectionData?.copeAheadOptions.find(c => c.id === selectedCopeAheadId)?.label ?? '';
+
+    const handleDebriefSave = async () => {
+      setDebriefSaving(true);
+      setSaveError(false);
+      try {
+        const savedId = await saveDearManSession({
+          type: 'debrief',
+          relationshipType: debriefRelationshipType || '',
+          situationType: '',
+          priorities: [],
+          barriers: [],
+          describeId: null,
+          describeCustom: '',
+          feelings: [],
+          assertId: null,
+          assertCustom: '',
+          reinforceIds: [],
+          anchorPhrase: '',
+          middleGroundId: null,
+          middleGroundCustom: '',
+          walkAwayId: null,
+          walkAwayCustom: '',
+          debriefOverall: debriefOverall || undefined,
+          debriefCurrentFeelings: debriefCurrentFeelings,
+          turningPointIds,
+          momentResponseIds,
+          bodySignalIds,
+          thoughtPatternIds,
+          underneathIds,
+          copeAheadId: selectedCopeAheadId || undefined,
+          reflectionLanded: reflectionLanded || undefined,
+        });
+        setDebriefSaved(true);
+        // PR-S4 (D-09): the conversation itself happened off the phone: a self-reported rep.
+        if (savedId) void session.close({ status: 'completed', detail: { kind: 'dear_man', id: savedId }, repSource: dearManRepSource('debrief') });
+      } catch (err) {
+        console.error('Failed to save DEAR MAN debrief:', err);
+        setSaveError(true);
+      } finally {
+        setDebriefSaving(false);
+      }
     };
 
-    return (
-      <div className="space-y-6">
-        {carryCard}
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How does this make you feel?</h3>
-        <p className="text-[var(--color-text-secondary)]">Tap all that apply.</p>
+    // TP → barrier mapping for "prepare to try again" carry-forward
+    const tpToBarrierMap: Record<string, string> = {
+      tp_defensive: 'barrier_angry',
+      tp_crying_shutdown: 'barrier_emotional',
+      tp_apologized: 'barrier_guilty',
+      tp_no_words: 'barrier_dont_know',
+    };
 
-        {/* Mirroring — an example of what this situation typically brings up */}
-        {mirror && (
-          <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
-            <button
-              onClick={() => setShowMirror(v => !v)}
-              aria-expanded={showMirror}
-              className="w-full text-left px-4 py-3 text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
-              {showMirror ? '−' : '+'} Not sure? See how this might typically make someone feel
-            </button>
-            {showMirror && (
-              <div className="px-4 pb-4 space-y-3">
-                <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{mirror.text}</p>
-                {typicalChips.length > 0 && (
-                  <>
-                    <p className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">Sound familiar? Tap any that fit</p>
-                    <div className="flex flex-wrap gap-2">
-                      {typicalChips.map(chip => renderFeelingChip(chip, colorFor(chip)))}
-                    </div>
-                    <button
-                      onClick={() => setFeelings(prev => Array.from(new Set([...prev, ...typicalChips.map(c => c.id)])))}
-                      className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-                      + Add all of these
-                    </button>
-                  </>
-                )}
-                <p className="text-xs text-[var(--color-text-muted)]">This is what many people feel here &mdash; not what you&apos;re supposed to feel. Only keep what&apos;s true for you.</p>
-              </div>
-            )}
+    // ─── DEBRIEF: CHECK-IN ───
+    if (phase === 'debrief-checkin') {
+      const highActivation = debriefCurrentFeelings.some(f => f === 'shaky' || f === 'wound_up');
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Before we look at the conversation &mdash; how are you feeling right now?</h3>
+          <div className="flex flex-wrap gap-2">
+            {content.feelingChips.map(f => {
+              const selected = debriefCurrentFeelings.includes(f.id);
+              return (
+                <button key={f.id}
+                  onClick={() => toggleChip(f.id, debriefCurrentFeelings, setDebriefCurrentFeelings)}
+                  className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+                    selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  }`}>
+                  {f.label}
+                </button>
+              );
+            })}
           </div>
-        )}
-
-        {/* Color-coded feeling groups */}
-        <div className="space-y-4">
-          {grouped.map(g => (
-            <div key={g.id} className="space-y-2">
-              {g.label && (
-                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)]">
-                  <span aria-hidden="true" className="inline-block w-2 h-2 rounded-full" style={{ backgroundColor: g.color }} />
-                  {g.label}
-                </p>
-              )}
-              <div className="flex flex-wrap gap-2">
-                {g.chips.map(chip => renderFeelingChip(chip, g.color))}
+          {highActivation && (
+            <div className="p-4 rounded-lg bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)]">
+              <p className="text-sm text-[var(--color-text-primary)]">
+                It sounds like your body is still activated. Want to do a quick cool-down first?
+              </p>
+              <div className="flex gap-2 mt-3">
+                <button onClick={() => navigate('/tool/cool-down')}
+                  className="px-4 py-2 rounded-lg text-sm bg-[var(--color-warning-bg)] text-[var(--color-text-primary)] border border-[var(--color-warning-border)]">
+                  Cool down first
+                </button>
+                <button onClick={() => setPhase('debrief-who')}
+                  className="px-4 py-2 rounded-lg text-sm text-[var(--color-text-secondary)]">
+                  I&apos;m okay to continue
+                </button>
               </div>
             </div>
-          ))}
+          )}
+          {!highActivation && debriefCurrentFeelings.length > 0 && (
+            <button onClick={() => setPhase('debrief-who')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
         </div>
+      );
+    }
 
-        {!showFeelingCustom ? (
-          <button onClick={() => setShowFeelingCustom(true)}
-            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-            + Something else
-          </button>
-        ) : (
-          <input type="text" value={feelingCustom}
-            onChange={e => setFeelingCustom(e.target.value)}
-            placeholder="I also feel..."
-            autoFocus
-            className={inputClass} />
-        )}
-        <button onClick={() => setPhase('assert')} disabled={!hasExpress}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
-          Next: What you need
-        </button>
-        {!hasExpress && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Tap at least one feeling to continue.</p>}
-        {content.stepInsights.express && (
-          <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.express}</p>
-        )}
-      </div>
-    );
-  }
-
-  // ─── ASSERT ───
-  if (phase === 'assert') {
-    const options = assertOptionsForSituation;
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-          What specifically are you asking for &mdash; or saying no to?
-        </h3>
-        <p className="text-[var(--color-text-secondary)]">Pick any that apply. You can add detail to each one.</p>
-
-        {/* Barrier-specific coaching for guilty */}
-        {barriers.includes('barrier_guilty') && content.assertBarrierGuilty && (
-          <div className="bg-[var(--color-accent-muted)] rounded-lg p-3 text-sm text-[var(--color-text-secondary)]">
-            {content.assertBarrierGuilty}
-          </div>
-        )}
-
-        <div className="space-y-2">
-          {options.map(opt => {
-            const selected = assertIds.includes(opt.id);
-            const detail = assertDetails[opt.id] ?? '';
-            const prompt = opt.hasPlaceholder
-              ? 'Fill in the blank:'
-              : (opt.elaboratePrompt || 'Want to add more detail? (optional)');
-            return (
-              <div key={opt.id} className={`rounded-lg border transition-colors ${
-                selected ? 'border-[var(--color-accent)] bg-[var(--color-accent-subtle)]' : 'border-[var(--color-border)]'
-              }`}>
-                <button
-                  onClick={() => toggleChip(opt.id, assertIds, setAssertIds)}
-                  aria-pressed={selected}
-                  className={`w-full text-left py-3 px-4 rounded-lg transition-colors ${
-                    selected ? 'text-[var(--color-text-primary)] font-medium' : 'text-[var(--color-text-secondary)] lift-secondary'
-                  }`}>
-                  <span className="flex items-start gap-3">
-                    <span aria-hidden="true" className={`mt-0.5 inline-flex w-5 h-5 shrink-0 items-center justify-center rounded-md border text-xs ${
-                      selected ? 'bg-[var(--color-accent-fill)] border-transparent text-white' : 'border-[var(--color-border)]'
-                    }`}>{selected ? '✓' : ''}</span>
-                    <span>{opt.label}</span>
-                  </span>
-                </button>
-                {selected && (
-                  <div className="px-4 pb-3 space-y-1.5">
-                    <label htmlFor={`assert-detail-${opt.id}`} className="block text-sm text-[var(--color-text-secondary)]">
-                      {prompt}
-                    </label>
-                    <textarea
-                      id={`assert-detail-${opt.id}`}
-                      rows={2}
-                      value={detail}
-                      onChange={e => setAssertDetails(prev => ({ ...prev, [opt.id]: e.target.value }))}
-                      placeholder={opt.hasPlaceholder ? 'Be specific...' : 'In your own words...'}
-                      className={textareaClass}
-                    />
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        {!showAssertCustom ? (
-          <button onClick={() => setShowAssertCustom(true)}
-            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-            + Something else &mdash; I&apos;ll say it myself
-          </button>
-        ) : (
-          <textarea rows={3} value={assertCustom}
-            onChange={e => setAssertCustom(e.target.value)}
-            placeholder="What are you asking for?"
-            autoFocus
-            className={textareaClass} />
-        )}
-
-        <button onClick={() => setPhase('reinforce')} disabled={!hasAssert}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
-          Next: Why it matters
-        </button>
-        {!hasAssert && (
-          <p className="text-sm text-center text-[var(--color-text-tertiary)]">
-            {assertBlankMissing ? 'Fill in the blank on what you selected to continue.' : 'Choose at least one thing you’re asking for to continue.'}
-          </p>
-        )}
-        {content.stepInsights.assert && (
-          <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.assert}</p>
-        )}
-      </div>
-    );
-  }
-
-  // ─── REINFORCE ───
-  if (phase === 'reinforce') {
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
-          What&apos;s in it for them &mdash; or for the relationship &mdash; if this goes well?
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {content.reinforceOptions.map(r => {
-            const selected = reinforceIds.includes(r.id);
-            return (
+    // ─── DEBRIEF: WHO ───
+    if (phase === 'debrief-who') {
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Who was this conversation with?</h3>
+          <div className="flex flex-wrap gap-2">
+            {relationshipTypes.map(r => (
               <button key={r.id}
-                onClick={() => toggleChip(r.id, reinforceIds, setReinforceIds)}
+                onClick={() => { setDebriefRelationshipType(r.id); setPhase('debrief-overall'); }}
                 className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  debriefRelationshipType === r.id
+                    ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
                 }`}>
                 {r.label}
               </button>
-            );
-          })}
-        </div>
-        {!showReinforceCustom ? (
-          <button onClick={() => setShowReinforceCustom(true)}
-            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-            + Something else
-          </button>
-        ) : (
-          <input type="text" value={reinforceCustom}
-            onChange={e => setReinforceCustom(e.target.value)}
-            placeholder="Why it would help..."
-            autoFocus
-            className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
-        )}
-        <button onClick={() => setPhase('mindful')} disabled={!hasReinforce}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
-          Next: Getting ready
-        </button>
-        {!hasReinforce && <p className="text-sm text-center text-[var(--color-text-tertiary)]">Pick at least one reason to continue.</p>}
-        {content.stepInsights.reinforce && (
-          <p className="text-sm text-[var(--color-text-tertiary)] italic">{content.stepInsights.reinforce}</p>
-        )}
-      </div>
-    );
-  }
-
-  // ─── MINDFUL ───
-  if (phase === 'mindful') {
-    const coachingCards = barriers.length > 0
-      ? barriers
-          .filter(b => content.barrierCoaching[b])
-          .slice(0, 3)
-          .map(b => content.barrierCoaching[b])
-      : [content.defaultCoaching];
-
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What might pull you off track?</h3>
-        {coachingCards.map((card, i) => (
-          <div key={i} className="p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
-            <p className="font-medium text-[var(--color-text-primary)] mb-1">{card.title}</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">{card.body}</p>
-          </div>
-        ))}
-        <div className="space-y-3">
-          <p className="text-[var(--color-text-secondary)]">What&apos;s one thing you can tell yourself if it gets hard?</p>
-          <input type="text" value={anchorPhrase}
-            onChange={e => setAnchorPhrase(e.target.value)}
-            placeholder="Your anchor phrase"
-            className={inputClass} />
-          {anchorPhrase && content.anchorGeneratorMakeItYours && (
-            <p className="text-xs text-[var(--color-text-muted)]">{content.anchorGeneratorMakeItYours}</p>
-          )}
-
-          {/* Quick picks: ranked by how well they match the barriers named earlier */}
-          <p className="text-sm text-[var(--color-text-muted)]">Or pick one:</p>
-          <div className="flex flex-wrap gap-2">
-            {rankedAnchorPhrases.slice(0, 6).map(a => (
-              <button key={a.id} onClick={() => setAnchorPhrase(a.label)}
-                aria-pressed={anchorPhrase === a.label}
-                className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
-                  anchorPhrase === a.label
-                    ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
-                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
-                }`}>
-                {a.label}
-              </button>
             ))}
           </div>
-
-          {/* Anchor phrase generator — inline sub-panel */}
-          {rankedAnchorNeeds.length > 0 && (
-            <div className="rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
-              <button
-                onClick={() => setShowAnchorGen(v => !v)}
-                aria-expanded={showAnchorGen}
-                className="w-full text-left px-4 py-3 text-sm font-medium text-[var(--color-accent)] hover:text-[var(--color-accent-hover)] transition-colors">
-                {showAnchorGen ? '\u2212' : '+'} Help me find my phrase
-              </button>
-              {showAnchorGen && (
-                <div className="px-4 pb-4 space-y-4">
-                  {content.anchorGeneratorIntro && (
-                    <p className="text-sm text-[var(--color-text-secondary)] leading-relaxed">{content.anchorGeneratorIntro}</p>
-                  )}
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-[var(--color-text-primary)]">When it gets hard, what do you most need to hear?</p>
-                    <div className="flex flex-wrap gap-2">
-                      {rankedAnchorNeeds.map(n => {
-                        const suggested = barrierOverlap(n.barrierIds) > 0;
-                        const selected = anchorNeedId === n.id;
-                        return (
-                          <button key={n.id}
-                            onClick={() => { setAnchorNeedId(n.id); setAnchorShowAll(false); }}
-                            aria-pressed={selected}
-                            className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
-                              selected
-                                ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
-                                : suggested
-                                  ? 'border-[var(--color-accent)] text-[var(--color-text-primary)] bg-[var(--color-accent-subtle)]'
-                                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]'
-                            }`}>
-                            {n.label}{suggested && !selected ? ' \u00b7 fits what you said' : ''}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  {anchorNeedId && (() => {
-                    const matches = phrasesForNeed(anchorNeedId);
-                    const shown = anchorShowAll ? matches : matches.slice(0, 4);
-                    return (
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium text-[var(--color-text-primary)]">Try one of these. Tap to use it, then edit it until it sounds like you.</p>
-                        {shown.length === 0 && (
-                          <p className="text-sm text-[var(--color-text-tertiary)]">Nothing matched yet &mdash; try another need, or write your own above.</p>
-                        )}
-                        <div className="space-y-2">
-                          {shown.map(pz => (
-                            <button key={pz.id}
-                              onClick={() => { setAnchorPhrase(pz.label); setShowAnchorGen(false); }}
-                              className="w-full text-left py-3 px-4 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] text-[var(--color-text-primary)] lift-secondary hover:border-[var(--color-accent)] transition-colors">
-                              &ldquo;{pz.label}&rdquo;
-                            </button>
-                          ))}
-                        </div>
-                        {!anchorShowAll && matches.length > shown.length && (
-                          <button onClick={() => setAnchorShowAll(true)}
-                            className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-                            + Show {matches.length - shown.length} more
-                          </button>
-                        )}
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-        <button onClick={() => setPhase('confident')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-          Almost there
-        </button>
-      </div>
-    );
-  }
-
-  // ─── CONFIDENT ───
-  if (phase === 'confident') {
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
-          <h3 className="font-semibold text-[var(--color-text-primary)] mb-3">Before the conversation</h3>
-          <p className="text-[var(--color-text-secondary)]">{content.confidentCoaching}</p>
-          {barriers.includes('barrier_no_right') && content.confidentBarrierNoRight && (
-            <p className="text-sm text-[var(--color-text-secondary)] mt-3 italic">{content.confidentBarrierNoRight}</p>
-          )}
-        </div>
-        <button onClick={() => setPhase('negotiate')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-          Last step
-        </button>
-      </div>
-    );
-  }
-
-  // ─── NEGOTIATE ───
-  if (phase === 'negotiate') {
-    const topPriority = priorities[0];
-    const hint = topPriority ? content.negotiateHints[topPriority] : null;
-
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">If they say no &mdash; or push back</h3>
-        <div className="p-3 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)] text-sm text-[var(--color-text-secondary)]">
-          Negotiating doesn&apos;t mean caving. It means being willing to find a solution that works for both of you &mdash; without giving up what matters most.
-        </div>
-        {hint && <p className="text-sm text-[var(--color-text-secondary)] italic">{hint}</p>}
-
-        {/* Middle ground */}
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-[var(--color-text-secondary)]">What&apos;s a middle ground you could live with?</p>
-          <div className="space-y-2">
-            {content.negotiateOptions.middleGround.map(opt => (
-              <button key={opt.id}
-                onClick={() => { setMiddleGroundId(opt.id); setShowMiddleGroundCustom(false); setMiddleGroundCustom(''); }}
-                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                  middleGroundId === opt.id
-                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-                }`}>
-                {opt.label}
-              </button>
-            ))}
-          </div>
-          {!showMiddleGroundCustom ? (
-            <button onClick={() => { setShowMiddleGroundCustom(true); setMiddleGroundId(null); }}
-              className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-              + Something else
-            </button>
-          ) : (
-            <input type="text" value={middleGroundCustom}
-              onChange={e => setMiddleGroundCustom(e.target.value)}
-              placeholder="A compromise I could accept..."
-              autoFocus
-              className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
-          )}
-        </div>
-
-        {/* Walk-away */}
-        <div className="space-y-3">
-          <p className="text-sm font-medium text-[var(--color-text-secondary)]">What won&apos;t you compromise on?</p>
-          <div className="space-y-2">
-            {content.negotiateOptions.walkAway.map(opt => (
-              <button key={opt.id}
-                onClick={() => { setWalkAwayId(opt.id); setShowWalkAwayCustom(false); setWalkAwayCustom(''); }}
-                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                  walkAwayId === opt.id
-                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-                }`}>
-                {opt.label}
-              </button>
-            ))}
-          </div>
-          {!showWalkAwayCustom ? (
-            <button onClick={() => { setShowWalkAwayCustom(true); setWalkAwayId(null); }}
-              className="text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-              + Something else
-            </button>
-          ) : (
-            <input type="text" value={walkAwayCustom}
-              onChange={e => setWalkAwayCustom(e.target.value)}
-              placeholder="My non-negotiable..."
-              autoFocus
-              className="w-full p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] placeholder:text-[var(--color-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]" />
-          )}
-        </div>
-
-        <button onClick={enterSummary} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-          See your plan
-        </button>
-      </div>
-    );
-  }
-
-  // ─── SUMMARY ───
-  if (phase === 'summary') {
-    const describeText = resolveDescribe();
-    const feelingsText = resolveFeelings();
-    const assertTexts = resolveAsserts();
-    const reinforceTexts = resolveReinforce();
-    const mgText = resolveMiddleGround();
-    const waText = resolveWalkAway();
-    const hot = summaryHeadsUp({ latestIntensity: intensity, gates: gateThresholds }) && Boolean(sc.hotHeading);
-    const b = safetyGates?.breatheCopy;
-
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        {carryCard}
-        {hot && headsUp !== 'dismissed' && (
-          <div className="p-5 rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] space-y-3" role="note">
-            {headsUp === 'cooled' ? (
-              <p className="text-[var(--color-text-primary)]">{sc.hotCooled}</p>
-            ) : (
-              <>
-                <p className="font-semibold text-[var(--color-text-primary)]">{sc.hotHeading}</p>
-                <p className={secondaryText}>{sc.hotBody}</p>
-                {headsUp === 'breathing' && b ? (
-                  <LazyMotion features={domAnimation}>
-                    <BreathOrb phases={b.phases} cycles={b.cycles} compact
-                      startLabel={fill(b.start, { seconds: Math.round(b.cycles * b.phases.reduce((t, p) => t + p.ms, 0) / 1000) })}
-                      skipLabel={b.skip} doneLabel={b.done}
-                      onDone={done => setHeadsUp(done ? 'cooled' : 'dismissed')} />
-                  </LazyMotion>
-                ) : (
-                  <div className="flex flex-wrap gap-2">
-                    {b && (
-                      <button type="button" onClick={() => setHeadsUp('breathing')}
-                        className="py-2.5 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-                        {sc.hotCoolDown}
-                      </button>
-                    )}
-                    <button type="button" onClick={() => setHeadsUp('dismissed')} className={linkButton}>{sc.hotReady}</button>
-                  </div>
-                )}
-                {sc.hotBodyCue && <p className={secondaryText}>{sc.hotBodyCue}</p>}
-              </>
-            )}
-          </div>
-        )}
-        {handoff?.oneMessageOnly && sc.oneMessageOnly && (
-          <p className={`${secondaryText} p-3 rounded-xl bg-[var(--color-bg-secondary)]`}>{sc.oneMessageOnly}</p>
-        )}
-        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
-          <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">Your Conversation Plan</h3>
-          <p className="text-sm text-[var(--color-text-secondary)] mb-6">with your {getRelLabel()}</p>
-
-          <div className="mb-4">
-            <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">The Situation</p>
-            <p className="text-[var(--color-text-primary)]">{describeText}</p>
-          </div>
-
-          <div className="mb-4">
-            <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">How I Feel</p>
-            <p className="text-[var(--color-text-primary)]">{feelingsText.join(', ')}</p>
-          </div>
-
-          <div className="mb-4">
-            <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">What I&apos;m Asking For</p>
-            {assertTexts.length === 1
-              ? <p className="text-[var(--color-text-primary)]">{assertTexts[0]}</p>
-              : (
-                <ul className="list-disc pl-5 space-y-1">
-                  {assertTexts.map((t, i) => <li key={i} className="text-[var(--color-text-primary)]">{t}</li>)}
-                </ul>
-              )}
-          </div>
-
-          <div className="mb-6">
-            <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">Why It Matters</p>
-            {reinforceTexts.map((t, i) => <p key={i} className="text-[var(--color-text-primary)]">{t}</p>)}
-          </div>
-
-          <hr className="border-[var(--color-border-subtle)] mb-6" />
-
-          {anchorPhrase && (
-            <div className="mb-4">
-              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">My Anchor</p>
-              <p className="text-[var(--color-text-primary)] italic">&ldquo;{anchorPhrase}&rdquo;</p>
-            </div>
-          )}
-
-          <div className="mb-4">
-            <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">If They Push Back</p>
-            {mgText && <p className="text-[var(--color-text-primary)]"><span className="text-[var(--color-text-secondary)]">Middle ground:</span> {mgText}</p>}
-            {waText && <p className="text-[var(--color-text-primary)]"><span className="text-[var(--color-text-secondary)]">I won&apos;t compromise on:</span> {waText}</p>}
-          </div>
-
-          <div className="mb-6">
-            <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">Body Reminder</p>
-            <p className="text-[var(--color-text-secondary)] text-sm">Shoulders back, steady voice, feet on the ground.</p>
-          </div>
-
-          <hr className="border-[var(--color-border-subtle)] mb-6" />
-
-          <div className="flex gap-3">
-            <button onClick={handleSave} disabled={saving || saved}
-              className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
-              {saved ? 'Saved' : saving ? 'Saving...' : saveError ? 'Try again' : 'Save this plan'}
-            </button>
-            <button onClick={reset}
-              className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
-              Start over
-            </button>
-          </div>
-          {saveError && (
-            <p role="alert" className="text-[var(--color-danger)] text-sm mt-2 text-center">Your plan couldn't be saved. It's still here on this screen — you can try again.</p>
-          )}
-          {saved && (
-            <button
-              onClick={() => navigate('/history', { state: { tab: 'dearman' } })}
-              className="w-full mt-3 py-3 px-4 rounded-lg border border-[var(--color-accent)] text-[var(--color-accent)] font-medium lift-secondary hover:bg-[var(--color-accent-subtle)] transition-colors">
-              See my plans &rarr;
-            </button>
-          )}
-          {!saved && !saveError && (
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-3 text-center">
-              Saving stores this plan with your account. Nothing is saved until you choose to.
-            </p>
-          )}
-        </div>
-
-        {/* DEAR MAN reveal */}
-        {content.revealText && (
-          <details className="group">
-            <summary className="cursor-pointer text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-              <span className="group-open:hidden">+ By the way &mdash; you just used DEAR MAN.</span>
-              <span className="hidden group-open:inline">&minus; By the way &mdash; you just used DEAR MAN.</span>
-            </summary>
-            <div className="mt-2 p-4 rounded-lg bg-[var(--color-bg-elevated)]/50 text-sm text-[var(--color-text-secondary)]">
-              <p>{content.revealText}</p>
-            </div>
-          </details>
-        )}
-
-        <button onClick={() => {
-            if (!debriefContent) {
-              getDearManDebriefContent().then(setDebriefContent).catch(() => {});
-            }
-            setPhase('debrief-checkin');
-          }}
-          className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
-          After the conversation &rarr; How did it go?
-        </button>
-      </div>
-    );
-  }
-
-  // ─── Helper: resolve labels from debrief content ───
-  const resolveBodySignalLabel = (id: string) =>
-    debriefContent?.bodySignals.find(b => b.id === id)?.label ?? '';
-  const resolveThoughtLabel = () => {
-    const labels = thoughtPatternIds
-      .filter(id => id !== 'thought_something_else')
-      .map(id => debriefContent?.thoughtPatterns.find(t => t.id === id)?.label)
-      .filter(Boolean);
-    if (thoughtPatternIds.includes('thought_something_else') && thoughtCustom) {
-      labels.push(thoughtCustom);
-    }
-    return labels.join(', ') || '';
-  };
-  const resolveCopeAheadLabel = () =>
-    reflectionData?.copeAheadOptions.find(c => c.id === selectedCopeAheadId)?.label ?? '';
-
-  const handleDebriefSave = async () => {
-    setDebriefSaving(true);
-    setSaveError(false);
-    try {
-      await saveDearManSession({
-        type: 'debrief',
-        relationshipType: debriefRelationshipType || '',
-        situationType: '',
-        priorities: [],
-        barriers: [],
-        describeId: null,
-        describeCustom: '',
-        feelings: [],
-        assertId: null,
-        assertCustom: '',
-        reinforceIds: [],
-        anchorPhrase: '',
-        middleGroundId: null,
-        middleGroundCustom: '',
-        walkAwayId: null,
-        walkAwayCustom: '',
-        debriefOverall: debriefOverall || undefined,
-        debriefCurrentFeelings: debriefCurrentFeelings,
-        turningPointIds,
-        momentResponseIds,
-        bodySignalIds,
-        thoughtPatternIds,
-        underneathIds,
-        copeAheadId: selectedCopeAheadId || undefined,
-        reflectionLanded: reflectionLanded || undefined,
-      });
-      setDebriefSaved(true);
-    } catch (err) {
-      console.error('Failed to save DEAR MAN debrief:', err);
-      setSaveError(true);
-    } finally {
-      setDebriefSaving(false);
-    }
-  };
-
-  // TP → barrier mapping for "prepare to try again" carry-forward
-  const tpToBarrierMap: Record<string, string> = {
-    tp_defensive: 'barrier_angry',
-    tp_crying_shutdown: 'barrier_emotional',
-    tp_apologized: 'barrier_guilty',
-    tp_no_words: 'barrier_dont_know',
-  };
-
-  // ─── DEBRIEF: CHECK-IN ───
-  if (phase === 'debrief-checkin') {
-    const highActivation = debriefCurrentFeelings.some(f => f === 'shaky' || f === 'wound_up');
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Before we look at the conversation &mdash; how are you feeling right now?</h3>
-        <div className="flex flex-wrap gap-2">
-          {content.feelingChips.map(f => {
-            const selected = debriefCurrentFeelings.includes(f.id);
-            return (
-              <button key={f.id}
-                onClick={() => toggleChip(f.id, debriefCurrentFeelings, setDebriefCurrentFeelings)}
-                className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-                }`}>
-                {f.label}
-              </button>
-            );
-          })}
-        </div>
-        {highActivation && (
-          <div className="p-4 rounded-lg bg-[var(--color-warning-bg)] border border-[var(--color-warning-border)]">
-            <p className="text-sm text-[var(--color-text-primary)]">
-              It sounds like your body is still activated. Want to do a quick cool-down first?
-            </p>
-            <div className="flex gap-2 mt-3">
-              <button onClick={() => navigate('/tool/cool-down')}
-                className="px-4 py-2 rounded-lg text-sm bg-[var(--color-warning-bg)] text-[var(--color-text-primary)] border border-[var(--color-warning-border)]">
-                Cool down first
-              </button>
-              <button onClick={() => setPhase('debrief-who')}
-                className="px-4 py-2 rounded-lg text-sm text-[var(--color-text-secondary)]">
-                I&apos;m okay to continue
-              </button>
-            </div>
-          </div>
-        )}
-        {!highActivation && debriefCurrentFeelings.length > 0 && (
-          <button onClick={() => setPhase('debrief-who')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: WHO ───
-  if (phase === 'debrief-who') {
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Who was this conversation with?</h3>
-        <div className="flex flex-wrap gap-2">
-          {relationshipTypes.map(r => (
-            <button key={r.id}
-              onClick={() => { setDebriefRelationshipType(r.id); setPhase('debrief-overall'); }}
-              className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                debriefRelationshipType === r.id
-                  ? 'bg-[var(--color-accent-fill)] text-white border-transparent'
-                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-              }`}>
-              {r.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: OVERALL ───
-  if (phase === 'debrief-overall') {
-    const overallMap: Record<string, string> = {
-      better: debriefContent?.overallResponses.good ?? '',
-      mixed: debriefContent?.overallResponses.mixed ?? '',
-      not_well: debriefContent?.overallResponses.bad ?? '',
-      didnt_have: debriefContent?.overallResponses.notYet ?? '',
-    };
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How did it go overall?</h3>
-        <div className="space-y-3">
-          {debriefOverallOptions.map(opt => (
-            <button key={opt.id}
-              onClick={() => setDebriefOverall(opt.id)}
-              className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                debriefOverall === opt.id
-                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-              }`}>
-              {opt.label}
-            </button>
-          ))}
-        </div>
-        {debriefOverall && overallMap[debriefOverall] && (
-          <p className="text-sm text-[var(--color-text-secondary)] italic px-1">{overallMap[debriefOverall]}</p>
-        )}
-        {debriefOverall === 'didnt_have' && (
-          <div className="flex gap-3">
-            <button onClick={() => {
-              if (debriefRelationshipType) setRelationshipType(debriefRelationshipType);
-              setSceneStep(0); setPhase('scene');
-            }}
-              className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-              Prepare for it
-            </button>
-            <button onClick={() => setPhase('debrief-moment')}
-              className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
-              Walk through what worries me
-            </button>
-          </div>
-        )}
-        {debriefOverall && debriefOverall !== 'didnt_have' && (
-          <button onClick={() => setPhase('debrief-moment')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: MOMENT (turning point) ───
-  if (phase === 'debrief-moment') {
-    if (!debriefContent) {
-      return (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4" />
-          <p className="text-[var(--color-text-secondary)]">Loading...</p>
         </div>
       );
     }
-    const lastSelectedTp = turningPointIds.length > 0
-      ? debriefContent.turningPoints.find(t => t.id === turningPointIds[turningPointIds.length - 1])
-      : null;
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Was there a moment where things shifted?</h3>
-        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
-        <div className="space-y-3">
-          {debriefContent.turningPoints.map(tp => {
-            const selected = turningPointIds.includes(tp.id);
-            return (
-              <button key={tp.id}
-                onClick={() => {
-                  // "went okay" is exclusive — deselect others
-                  if (tp.id === 'tp_went_okay') {
-                    setTurningPointIds(selected ? [] : ['tp_went_okay']);
-                  } else {
-                    const without = turningPointIds.filter(id => id !== 'tp_went_okay');
-                    setTurningPointIds(
-                      selected ? without.filter(id => id !== tp.id) : [...without, tp.id]
-                    );
-                  }
-                  setReflectionData(null);
-                }}
+
+    // ─── DEBRIEF: OVERALL ───
+    if (phase === 'debrief-overall') {
+      const overallMap: Record<string, string> = {
+        better: debriefContent?.overallResponses.good ?? '',
+        mixed: debriefContent?.overallResponses.mixed ?? '',
+        not_well: debriefContent?.overallResponses.bad ?? '',
+        didnt_have: debriefContent?.overallResponses.notYet ?? '',
+      };
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How did it go overall?</h3>
+          <div className="space-y-3">
+            {debriefOverallOptions.map(opt => (
+              <button key={opt.id}
+                onClick={() => setDebriefOverall(opt.id)}
                 className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                  selected
+                  debriefOverall === opt.id
                     ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
                     : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
                 }`}>
-                {tp.label}
+                {opt.label}
               </button>
-            );
-          })}
-        </div>
-        {lastSelectedTp && (
-          <p className="text-sm text-[var(--color-text-secondary)] italic px-1">{lastSelectedTp.validationText}</p>
-        )}
-        {turningPointIds.length > 0 && (
-          <button onClick={() => {
-            if (turningPointIds.length === 1 && turningPointIds[0] === 'tp_went_okay') {
-              // Skip response selection — go straight to body
-              setMomentResponseIds(['mr_stayed_course']);
-              getDearManReflection(['tp_went_okay'], ['mr_stayed_course'])
-                .then(setReflectionData).catch(() => {});
-              setPhase('debrief-body');
-            } else {
-              setPhase('debrief-response');
-            }
-          }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: RESPONSE (what did you do in that moment) ───
-  if (phase === 'debrief-response') {
-    if (!debriefContent) return null;
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What did you do in that moment?</h3>
-        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
-        <div className="space-y-3">
-          {debriefContent.momentResponses.map(mr => {
-            const selected = momentResponseIds.includes(mr.id);
-            return (
-              <button key={mr.id}
-                onClick={() => {
-                  setMomentResponseIds(
-                    selected ? momentResponseIds.filter(id => id !== mr.id) : [...momentResponseIds, mr.id]
-                  );
-                  setReflectionData(null);
-                }}
-                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                  selected
-                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-                }`}>
-                {mr.label}
+            ))}
+          </div>
+          {debriefOverall && overallMap[debriefOverall] && (
+            <p className="text-sm text-[var(--color-text-secondary)] italic px-1">{overallMap[debriefOverall]}</p>
+          )}
+          {debriefOverall === 'didnt_have' && (
+            <div className="flex gap-3">
+              <button onClick={() => {
+                if (debriefRelationshipType) setRelationshipType(debriefRelationshipType);
+                setSceneStep(0); setPhase('scene');
+              }}
+                className="flex-1 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+                Prepare for it
               </button>
-            );
-          })}
-        </div>
-        {momentResponseIds.length > 0 && (
-          <button onClick={() => {
-            if (turningPointIds.length && momentResponseIds.length) {
-              getDearManReflection(turningPointIds, momentResponseIds)
-                .then(setReflectionData).catch(() => {});
-            }
-            setPhase('debrief-body');
-          }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: BODY ───
-  if (phase === 'debrief-body') {
-    if (!debriefContent) return null;
-    const selectedNone = bodySignalIds.includes('bs_none');
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What was happening in your body?</h3>
-        <p className="text-sm text-[var(--color-text-secondary)]">Right before or during that moment.</p>
-        <div className="flex flex-wrap gap-2">
-          {debriefContent.bodySignals.map(bs => {
-            const selected = bodySignalIds.includes(bs.id);
-            return (
-              <button key={bs.id}
-                onClick={() => {
-                  if (bs.id === 'bs_none') {
-                    setBodySignalIds(['bs_none']);
-                  } else {
-                    const filtered = bodySignalIds.filter(id => id !== 'bs_none');
-                    setBodySignalIds(
-                      filtered.includes(bs.id)
-                        ? filtered.filter(id => id !== bs.id)
-                        : [...filtered, bs.id]
-                    );
-                  }
-                }}
-                className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
-                  selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
-                }`}>
-                {bs.label}
+              <button onClick={() => setPhase('debrief-moment')}
+                className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
+                Walk through what worries me
               </button>
-            );
-          })}
+            </div>
+          )}
+          {debriefOverall && debriefOverall !== 'didnt_have' && (
+            <button onClick={() => setPhase('debrief-moment')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
         </div>
-        {selectedNone && (
-          <p className="text-sm text-[var(--color-text-secondary)] italic px-1">
-            That&apos;s okay. Noticing &ldquo;nothing&rdquo; is still noticing. Over time, you might start catching subtler signals.
-          </p>
-        )}
-        {bodySignalIds.length > 0 && (
-          <button onClick={() => setPhase('debrief-thought')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
+      );
+    }
 
-  // ─── DEBRIEF: THOUGHT ───
-  if (phase === 'debrief-thought') {
-    if (!debriefContent) return null;
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What thoughts showed up?</h3>
-        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
-        <div className="space-y-3">
-          {debriefContent.thoughtPatterns.map(tp => {
-            const selected = thoughtPatternIds.includes(tp.id);
-            return (
-              <div key={tp.id}>
-                <button
-                  onClick={() => setThoughtPatternIds(
-                    selected ? thoughtPatternIds.filter(id => id !== tp.id) : [...thoughtPatternIds, tp.id]
-                  )}
+    // ─── DEBRIEF: MOMENT (turning point) ───
+    if (phase === 'debrief-moment') {
+      if (!debriefContent) {
+        return (
+          <div className="text-center py-12">
+            <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4" />
+            <p className="text-[var(--color-text-secondary)]">Loading...</p>
+          </div>
+        );
+      }
+      const lastSelectedTp = turningPointIds.length > 0
+        ? debriefContent.turningPoints.find(t => t.id === turningPointIds[turningPointIds.length - 1])
+        : null;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Was there a moment where things shifted?</h3>
+          <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+          <div className="space-y-3">
+            {debriefContent.turningPoints.map(tp => {
+              const selected = turningPointIds.includes(tp.id);
+              return (
+                <button key={tp.id}
+                  onClick={() => {
+                    // "went okay" is exclusive — deselect others
+                    if (tp.id === 'tp_went_okay') {
+                      setTurningPointIds(selected ? [] : ['tp_went_okay']);
+                    } else {
+                      const without = turningPointIds.filter(id => id !== 'tp_went_okay');
+                      setTurningPointIds(
+                        selected ? without.filter(id => id !== tp.id) : [...without, tp.id]
+                      );
+                    }
+                    setReflectionData(null);
+                  }}
                   className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
                     selected
                       ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
@@ -1838,255 +1787,415 @@ export function DearMan() {
                   }`}>
                   {tp.label}
                 </button>
-                {tp.id === 'thought_something_else' && selected && (
-                  <input
-                    type="text"
-                    value={thoughtCustom}
-                    onChange={e => setThoughtCustom(e.target.value)}
-                    placeholder="What was the thought?"
-                    className="w-full mt-2 px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] placeholder-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-accent)]"
-                  />
-                )}
-              </div>
-            );
-          })}
-        </div>
-        {thoughtPatternIds.length > 0 && (!thoughtPatternIds.includes('thought_something_else') || thoughtCustom.trim()) && (
-          <button onClick={() => setPhase('debrief-underneath')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: UNDERNEATH ───
-  if (phase === 'debrief-underneath') {
-    if (!debriefContent) return null;
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Underneath that &mdash; what was the deeper feeling?</h3>
-        <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
-        <div className="space-y-3">
-          {debriefContent.underneathEmotions.map(u => {
-            const selected = underneathIds.includes(u.id);
-            return (
-              <button key={u.id}
-                onClick={() => {
-                  // "not sure" is exclusive
-                  if (u.id === 'under_not_sure') {
-                    setUnderneathIds(selected ? [] : ['under_not_sure']);
-                  } else {
-                    const without = underneathIds.filter(id => id !== 'under_not_sure');
-                    setUnderneathIds(
-                      selected ? without.filter(id => id !== u.id) : [...without, u.id]
-                    );
-                  }
-                }}
-                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                  selected
-                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-                }`}>
-                {u.label}
-              </button>
-            );
-          })}
-        </div>
-        {underneathIds.length > 0 && (
-          <button onClick={() => setPhase('debrief-reflection')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: REFLECTION ───
-  if (phase === 'debrief-reflection') {
-    if (!reflectionData) {
-      return (
-        <div className="text-center py-12">
-          <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4" />
-          <p className="text-[var(--color-text-secondary)]">Putting something together for you...</p>
+              );
+            })}
+          </div>
+          {lastSelectedTp && (
+            <p className="text-sm text-[var(--color-text-secondary)] italic px-1">{lastSelectedTp.validationText}</p>
+          )}
+          {turningPointIds.length > 0 && (
+            <button onClick={() => {
+              if (turningPointIds.length === 1 && turningPointIds[0] === 'tp_went_okay') {
+                // Skip response selection — go straight to body
+                setMomentResponseIds(['mr_stayed_course']);
+                getDearManReflection(['tp_went_okay'], ['mr_stayed_course'])
+                  .then(setReflectionData).catch(() => {});
+                setPhase('debrief-body');
+              } else {
+                setPhase('debrief-response');
+              }
+            }}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
         </div>
       );
     }
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] space-y-3">
-          {reflectionData.reflection.split('\n\n').map((para, i) => (
-            <p key={i} className="text-[var(--color-text-primary)] leading-relaxed">{para}</p>
-          ))}
-        </div>
-        <p className="text-sm text-[var(--color-text-secondary)]">Does that land?</p>
-        <div className="flex gap-3">
-          {([
-            { id: 'yes' as const, label: "Yeah, that's it" },
-            { id: 'sort_of' as const, label: 'Sort of' },
-            { id: 'not_really' as const, label: 'Not really' },
-          ]).map(opt => (
-            <button key={opt.id}
-              onClick={() => { setReflectionLanded(opt.id); setPhase('debrief-cope-select'); }}
-              className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary hover:border-[var(--color-border-accent)] transition-colors">
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
-  // ─── DEBRIEF: COPE-AHEAD SELECT ───
-  if (phase === 'debrief-cope-select') {
-    if (!reflectionData) return null;
-    const bodyLabel = bodySignalIds.filter(id => id !== 'bs_none').map(resolveBodySignalLabel).filter(Boolean).join(', ');
-    const thoughtLabel = resolveThoughtLabel();
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Let&apos;s build a plan for next time.</h3>
-        {(bodyLabel || thoughtLabel) && (
-          <p className="text-sm text-[var(--color-text-secondary)]">
-            When you notice{bodyLabel ? ` "${bodyLabel.toLowerCase()}"` : ''}{bodyLabel && thoughtLabel ? ' and' : ''}{thoughtLabel ? ` the thought "${thoughtLabel}"` : ''} &mdash; what could you try?
-          </p>
-        )}
-        <div className="space-y-3">
-          {reflectionData.copeAheadOptions.map(ca => (
-            <button key={ca.id}
-              onClick={() => { setSelectedCopeAheadId(ca.id); setPhase('debrief-rehearsal'); }}
-              className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
-                selectedCopeAheadId === ca.id
-                  ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
-                  : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
-              }`}>
-              {ca.label}
-            </button>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: REHEARSAL ───
-  if (phase === 'debrief-rehearsal') {
-    const selectedCa = reflectionData?.copeAheadOptions.find(c => c.id === selectedCopeAheadId);
-    if (!selectedCa) return null;
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{selectedCa.label}</h3>
-        <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
-          <p className="text-[var(--color-text-primary)] leading-relaxed">{selectedCa.rehearsal}</p>
-        </div>
-        <button onClick={() => setPhase('debrief-moment-plan')}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-          I tried it
-        </button>
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: MOMENT PLAN ───
-  if (phase === 'debrief-moment-plan') {
-    const bodyLabel = bodySignalIds.filter(id => id !== 'bs_none').map(resolveBodySignalLabel).filter(Boolean).join(' or ');
-    const thoughtLabel = resolveThoughtLabel();
-    const copeLabel = resolveCopeAheadLabel();
-    return (
-      <div className="space-y-6">
-        <BackButton />
-        <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Your moment plan</h3>
-        <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
-          <p className="text-[var(--color-text-primary)] leading-relaxed">
-            When I feel{bodyLabel ? ` ${bodyLabel.toLowerCase()}` : ' the signal'} and the thought &ldquo;{thoughtLabel || '...'}&rdquo; shows up, I&apos;m going to: &ldquo;{copeLabel || '...'}&rdquo;
-          </p>
-        </div>
-        <button
-          onClick={handleDebriefSave}
-          disabled={debriefSaving || debriefSaved}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
-          {debriefSaved ? 'Saved' : debriefSaving ? 'Saving...' : 'Save my moment plan'}
-        </button>
-        {debriefSaved && (
-          <button onClick={() => setPhase('debrief-route')}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Continue
-          </button>
-        )}
-      </div>
-    );
-  }
-
-  // ─── DEBRIEF: ROUTE ───
-  if (phase === 'debrief-route') {
-    const topTools = stateResult?.tools?.slice(0, 2) || [];
-    return (
-      <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)] space-y-4">
-        <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">That took courage.</h3>
-        <p className="text-[var(--color-text-secondary)]">Whether it went well or not, you showed up.</p>
-
-        {topTools.length > 0 && (
-          <div className="pt-2 space-y-2">
-            <p className="text-sm text-[var(--color-text-secondary)]">Based on how you're feeling, this might help:</p>
-            {topTools.map(tool => {
-              const meta = getToolById(tool.id);
+    // ─── DEBRIEF: RESPONSE (what did you do in that moment) ───
+    if (phase === 'debrief-response') {
+      if (!debriefContent) return null;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What did you do in that moment?</h3>
+          <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+          <div className="space-y-3">
+            {debriefContent.momentResponses.map(mr => {
+              const selected = momentResponseIds.includes(mr.id);
               return (
+                <button key={mr.id}
+                  onClick={() => {
+                    setMomentResponseIds(
+                      selected ? momentResponseIds.filter(id => id !== mr.id) : [...momentResponseIds, mr.id]
+                    );
+                    setReflectionData(null);
+                  }}
+                  className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                    selected
+                      ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                  }`}>
+                  {mr.label}
+                </button>
+              );
+            })}
+          </div>
+          {momentResponseIds.length > 0 && (
+            <button onClick={() => {
+              if (turningPointIds.length && momentResponseIds.length) {
+                getDearManReflection(turningPointIds, momentResponseIds)
+                  .then(setReflectionData).catch(() => {});
+              }
+              setPhase('debrief-body');
+            }}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: BODY ───
+    if (phase === 'debrief-body') {
+      if (!debriefContent) return null;
+      const selectedNone = bodySignalIds.includes('bs_none');
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What was happening in your body?</h3>
+          <p className="text-sm text-[var(--color-text-secondary)]">Right before or during that moment.</p>
+          <div className="flex flex-wrap gap-2">
+            {debriefContent.bodySignals.map(bs => {
+              const selected = bodySignalIds.includes(bs.id);
+              return (
+                <button key={bs.id}
+                  onClick={() => {
+                    if (bs.id === 'bs_none') {
+                      setBodySignalIds(['bs_none']);
+                    } else {
+                      const filtered = bodySignalIds.filter(id => id !== 'bs_none');
+                      setBodySignalIds(
+                        filtered.includes(bs.id)
+                          ? filtered.filter(id => id !== bs.id)
+                          : [...filtered, bs.id]
+                      );
+                    }
+                  }}
+                  className={`px-4 py-2 rounded-full border cursor-pointer transition-all ${
+                    selected ? 'bg-[var(--color-accent-fill)] text-white border-transparent' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'
+                  }`}>
+                  {bs.label}
+                </button>
+              );
+            })}
+          </div>
+          {selectedNone && (
+            <p className="text-sm text-[var(--color-text-secondary)] italic px-1">
+              That&apos;s okay. Noticing &ldquo;nothing&rdquo; is still noticing. Over time, you might start catching subtler signals.
+            </p>
+          )}
+          {bodySignalIds.length > 0 && (
+            <button onClick={() => setPhase('debrief-thought')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: THOUGHT ───
+    if (phase === 'debrief-thought') {
+      if (!debriefContent) return null;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">What thoughts showed up?</h3>
+          <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+          <div className="space-y-3">
+            {debriefContent.thoughtPatterns.map(tp => {
+              const selected = thoughtPatternIds.includes(tp.id);
+              return (
+                <div key={tp.id}>
+                  <button
+                    onClick={() => setThoughtPatternIds(
+                      selected ? thoughtPatternIds.filter(id => id !== tp.id) : [...thoughtPatternIds, tp.id]
+                    )}
+                    className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                      selected
+                        ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                        : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                    }`}>
+                    {tp.label}
+                  </button>
+                  {tp.id === 'thought_something_else' && selected && (
+                    <input
+                      type="text"
+                      value={thoughtCustom}
+                      onChange={e => setThoughtCustom(e.target.value)}
+                      placeholder="What was the thought?"
+                      className="w-full mt-2 px-4 py-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] placeholder-[var(--color-text-tertiary)] focus:outline-none focus:border-[var(--color-accent)]"
+                    />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {thoughtPatternIds.length > 0 && (!thoughtPatternIds.includes('thought_something_else') || thoughtCustom.trim()) && (
+            <button onClick={() => setPhase('debrief-underneath')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: UNDERNEATH ───
+    if (phase === 'debrief-underneath') {
+      if (!debriefContent) return null;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Underneath that &mdash; what was the deeper feeling?</h3>
+          <p className="text-sm text-[var(--color-text-secondary)]">Select all that apply.</p>
+          <div className="space-y-3">
+            {debriefContent.underneathEmotions.map(u => {
+              const selected = underneathIds.includes(u.id);
+              return (
+                <button key={u.id}
+                  onClick={() => {
+                    // "not sure" is exclusive
+                    if (u.id === 'under_not_sure') {
+                      setUnderneathIds(selected ? [] : ['under_not_sure']);
+                    } else {
+                      const without = underneathIds.filter(id => id !== 'under_not_sure');
+                      setUnderneathIds(
+                        selected ? without.filter(id => id !== u.id) : [...without, u.id]
+                      );
+                    }
+                  }}
+                  className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                    selected
+                      ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                      : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                  }`}>
+                  {u.label}
+                </button>
+              );
+            })}
+          </div>
+          {underneathIds.length > 0 && (
+            <button onClick={() => setPhase('debrief-reflection')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: REFLECTION ───
+    if (phase === 'debrief-reflection') {
+      if (!reflectionData) {
+        return (
+          <div className="text-center py-12">
+            <div className="inline-block w-8 h-8 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full animate-spin mb-4" />
+            <p className="text-[var(--color-text-secondary)]">Putting something together for you...</p>
+          </div>
+        );
+      }
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)] space-y-3">
+            {reflectionData.reflection.split('\n\n').map((para, i) => (
+              <p key={i} className="text-[var(--color-text-primary)] leading-relaxed">{para}</p>
+            ))}
+          </div>
+          <p className="text-sm text-[var(--color-text-secondary)]">Does that land?</p>
+          <div className="flex gap-3">
+            {([
+              { id: 'yes' as const, label: "Yeah, that's it" },
+              { id: 'sort_of' as const, label: 'Sort of' },
+              { id: 'not_really' as const, label: 'Not really' },
+            ]).map(opt => (
+              <button key={opt.id}
+                onClick={() => { setReflectionLanded(opt.id); setPhase('debrief-cope-select'); }}
+                className="flex-1 py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary hover:border-[var(--color-border-accent)] transition-colors">
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: COPE-AHEAD SELECT ───
+    if (phase === 'debrief-cope-select') {
+      if (!reflectionData) return null;
+      const bodyLabel = bodySignalIds.filter(id => id !== 'bs_none').map(resolveBodySignalLabel).filter(Boolean).join(', ');
+      const thoughtLabel = resolveThoughtLabel();
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Let&apos;s build a plan for next time.</h3>
+          {(bodyLabel || thoughtLabel) && (
+            <p className="text-sm text-[var(--color-text-secondary)]">
+              When you notice{bodyLabel ? ` "${bodyLabel.toLowerCase()}"` : ''}{bodyLabel && thoughtLabel ? ' and' : ''}{thoughtLabel ? ` the thought "${thoughtLabel}"` : ''} &mdash; what could you try?
+            </p>
+          )}
+          <div className="space-y-3">
+            {reflectionData.copeAheadOptions.map(ca => (
+              <button key={ca.id}
+                onClick={() => { setSelectedCopeAheadId(ca.id); setPhase('debrief-rehearsal'); }}
+                className={`w-full text-left py-3 px-4 rounded-lg border transition-colors ${
+                  selectedCopeAheadId === ca.id
+                    ? 'bg-[var(--color-accent-fill)] border-[var(--color-accent)] text-white'
+                    : 'border-[var(--color-border)] text-[var(--color-text-secondary)] lift-secondary'
+                }`}>
+                {ca.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: REHEARSAL ───
+    if (phase === 'debrief-rehearsal') {
+      const selectedCa = reflectionData?.copeAheadOptions.find(c => c.id === selectedCopeAheadId);
+      if (!selectedCa) return null;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{selectedCa.label}</h3>
+          <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <p className="text-[var(--color-text-primary)] leading-relaxed">{selectedCa.rehearsal}</p>
+          </div>
+          <button onClick={() => setPhase('debrief-moment-plan')}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+            I tried it
+          </button>
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: MOMENT PLAN ───
+    if (phase === 'debrief-moment-plan') {
+      const bodyLabel = bodySignalIds.filter(id => id !== 'bs_none').map(resolveBodySignalLabel).filter(Boolean).join(' or ');
+      const thoughtLabel = resolveThoughtLabel();
+      const copeLabel = resolveCopeAheadLabel();
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">Your moment plan</h3>
+          <div className="p-5 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+            <p className="text-[var(--color-text-primary)] leading-relaxed">
+              When I feel{bodyLabel ? ` ${bodyLabel.toLowerCase()}` : ' the signal'} and the thought &ldquo;{thoughtLabel || '...'}&rdquo; shows up, I&apos;m going to: &ldquo;{copeLabel || '...'}&rdquo;
+            </p>
+          </div>
+          <button
+            onClick={handleDebriefSave}
+            disabled={debriefSaving || debriefSaved}
+            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary disabled:opacity-50">
+            {debriefSaved ? 'Saved' : debriefSaving ? 'Saving...' : 'Save my moment plan'}
+          </button>
+          {debriefSaved && (
+            <button onClick={() => setPhase('debrief-route')}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Continue
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: ROUTE ───
+    if (phase === 'debrief-route') {
+      // E4-4: the same cards as the check-in result (known tools only, names from tools.ts).
+      const topTools = recommendationCards(stateResult).map((c) => c.tool);
+      return (
+        <div className="text-center p-8 rounded-xl bg-[var(--color-bg-elevated)] space-y-4">
+          <h3 className="text-xl font-semibold text-[var(--color-text-primary)]">That took courage.</h3>
+          <p className="text-[var(--color-text-secondary)]">Whether it went well or not, you showed up.</p>
+
+          {/* E4-6 (F11): a crisis flag shows the same non-blocking banner as the check-in, above the tools */}
+          {isCrisisFlag(stateResult?.safetyFlag) && <CrisisBanner />}
+
+          {topTools.length > 0 && (
+            <div className="pt-2 space-y-2">
+              <p className="text-sm text-[var(--color-text-secondary)]">Based on how you're feeling, this might help:</p>
+              {topTools.map(tool => (
                 <button
                   key={tool.id}
                   onClick={() => navigate(`/tool/${tool.id}`)}
                   className="w-full text-left p-3 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-primary)] hover:border-[var(--color-accent)] transition-colors"
                 >
                   <span className="font-medium text-[var(--color-text-primary)]">
-                    {meta?.emoji ? `${meta.emoji} ` : ''}{meta?.name || tool.name}
+                    {tool.emoji} {tool.name}
                   </span>
                   <span className="block text-sm text-[var(--color-text-secondary)] mt-0.5">
-                    {meta?.tagline || tool.description}
+                    {tool.tagline}
                   </span>
                 </button>
-              );
-            })}
+              ))}
+            </div>
+          )}
+
+          <div className="flex flex-col gap-3 pt-2">
+            <button
+              onClick={() => {
+                // Carry context into prep flow
+                if (debriefRelationshipType) setRelationshipType(debriefRelationshipType);
+                // Map TP to barriers
+                const mappedBarriers = turningPointIds
+                  .map(id => tpToBarrierMap[id])
+                  .filter(Boolean);
+                // Reset prep-specific fields
+                setSceneStep(0);
+                setSituationType(null);
+                setBarriers(mappedBarriers);
+                setBarriersCustom(mappedBarriers.map(barrierLabel).filter(Boolean).join('\n'));
+                setDescribeId(null); setDescribeCustom('');
+                setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false); setShowMirror(false);
+                setAssertIds([]); setAssertDetails({}); setAssertCustom(''); setShowAssertCustom(false);
+                setReinforceIds([]); setReinforceCustom(''); setShowReinforceCustom(false);
+                setAnchorPhrase(''); setShowAnchorGen(false); setAnchorNeedId(null); setAnchorShowAll(false);
+                setMiddleGroundId(null); setMiddleGroundCustom(''); setShowMiddleGroundCustom(false);
+                setWalkAwayId(null); setWalkAwayCustom(''); setShowWalkAwayCustom(false);
+                setSaved(false);
+                setPhase('scene');
+              }}
+              className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
+              Prepare to try again
+            </button>
+            <button onClick={() => navigate('/category/better-relationships')}
+              className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
+              Done for now
+            </button>
           </div>
-        )}
-
-        <div className="flex flex-col gap-3 pt-2">
-          <button
-            onClick={() => {
-              // Carry context into prep flow
-              if (debriefRelationshipType) setRelationshipType(debriefRelationshipType);
-              // Map TP to barriers
-              const mappedBarriers = turningPointIds
-                .map(id => tpToBarrierMap[id])
-                .filter(Boolean);
-              // Reset prep-specific fields
-              setSceneStep(0);
-              setSituationType(null);
-              setBarriers(mappedBarriers);
-              setBarriersCustom(mappedBarriers.map(barrierLabel).filter(Boolean).join('\n'));
-              setDescribeId(null); setDescribeCustom('');
-              setFeelings([]); setFeelingCustom(''); setShowFeelingCustom(false); setShowMirror(false);
-              setAssertIds([]); setAssertDetails({}); setAssertCustom(''); setShowAssertCustom(false);
-              setReinforceIds([]); setReinforceCustom(''); setShowReinforceCustom(false);
-              setAnchorPhrase(''); setShowAnchorGen(false); setAnchorNeedId(null); setAnchorShowAll(false);
-              setMiddleGroundId(null); setMiddleGroundCustom(''); setShowMiddleGroundCustom(false);
-              setWalkAwayId(null); setWalkAwayCustom(''); setShowWalkAwayCustom(false);
-              setSaved(false);
-              setPhase('scene');
-            }}
-            className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary">
-            Prepare to try again
-          </button>
-          <button onClick={() => navigate('/category/better-relationships')}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
-            Done for now
-          </button>
         </div>
-      </div>
-    );
-  }
+      );
+    }
 
-  return null;
+    return null;
+  };
+
+  const view = renderPhase();
+  const planStep = (TOO_MUCH_PHASES as readonly string[]).includes(phase);
+  return (
+    <>
+      {view}
+      {planStep && (
+        <div className="mt-8 text-center">
+          <TooMuchLink host="dear-man" onScheduleLater={scheduleLater} onResult={recordHandoff}
+            resume={() => resumeDraft({ phase: phase as DearManStep['phase'], sceneStep })} />
+        </div>
+      )}
+    </>
+  );
 }

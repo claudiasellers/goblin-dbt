@@ -51,6 +51,8 @@ import {
   followUpUrl,
   type DueWindow,
 } from "../../lib/oppositeActionFollowUp";
+import { useToolSession } from "../../hooks/useToolSession";
+import { oaSkillIds } from "../../lib/spine/wrap";
 
 const FLOW_VERSION = "oa-guided-v2";
 
@@ -253,6 +255,7 @@ export function OppositeAction() {
   const followUpId = searchParams.get("followUp");
   const { user, loading: authLoading } = useAuth();
   const { refresh: refreshFollowUps } = useOppositeActionFollowUpsContext();
+  const toolSession = useToolSession();
   const patternId =
     (location.state as { activationPatternId?: string } | null)
       ?.activationPatternId ?? "fallback";
@@ -551,6 +554,13 @@ export function OppositeAction() {
       await saveOppositeActionSession(payload);
       if (draftId.current === d.id) setSaveState("saved");
       refreshFollowUps?.();
+      // PR-S4: link this visit to the saved session; practising it is a rep of opposite action.
+      // (The server mirrors a plan's due time as FollowUp oa_plan in the same save.)
+      void toolSession.close({
+        status: "completed",
+        detail: { kind: "opposite_action", id: fresh.id },
+        ...(oaSkillIds(fresh.status) ? { skillIds: oaSkillIds(fresh.status) } : {}),
+      });
       return fresh;
     } catch {
       if (draftId.current === d.id) setSaveState("error");

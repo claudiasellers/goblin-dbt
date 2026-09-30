@@ -576,7 +576,7 @@ MERGE (r:QuestionResponse {id: "hu_body_unclear"})
 SET r.label = "I can't tell — it's all too much",
     r.subtext = "Everything's activated and I can't sort it out.",
     r.order = 5,
-    r.clinicalSignal = "Interoceptive discrimination failure under high arousal. Most consistent with PFC compromise (flooding) or extreme LC-NE activation (severe alarm). Inability to parse body state is itself a signal of regulatory system overload.",
+    r.clinicalSignal = "Overwhelm: high activation the person can't yet sort into discrete body signals. Common in alexithymia; treated as acute alarm, not flooding, unless another answer points to flooding.",
     r.isEscapeHatch = true;
 
 
@@ -593,78 +593,96 @@ SET r.label = "I can't tell — it's all too much",
 // --- Low-unpleasant Q1 → responses ---
 MATCH (q:DiscriminatingQuestion {id: "lu_mind_quality"})
 MATCH (r:QuestionResponse {id: "lu_mind_looping"})
-MERGE (q)-[:HAS_RESPONSE {order: 1}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 1;
 
 MATCH (q:DiscriminatingQuestion {id: "lu_mind_quality"})
 MATCH (r:QuestionResponse {id: "lu_mind_blank"})
-MERGE (q)-[:HAS_RESPONSE {order: 2}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 2;
 
 MATCH (q:DiscriminatingQuestion {id: "lu_mind_quality"})
 MATCH (r:QuestionResponse {id: "lu_mind_faraway"})
-MERGE (q)-[:HAS_RESPONSE {order: 3}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 3;
 
 MATCH (q:DiscriminatingQuestion {id: "lu_mind_quality"})
 MATCH (r:QuestionResponse {id: "lu_mind_unsure"})
-MERGE (q)-[:HAS_RESPONSE {order: 4}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 4;
 
 // --- Low-unpleasant Q2 → responses ---
 MATCH (q:DiscriminatingQuestion {id: "lu_body_quality"})
 MATCH (r:QuestionResponse {id: "lu_body_heavy"})
-MERGE (q)-[:HAS_RESPONSE {order: 1}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 1;
 
 MATCH (q:DiscriminatingQuestion {id: "lu_body_quality"})
 MATCH (r:QuestionResponse {id: "lu_body_flat"})
-MERGE (q)-[:HAS_RESPONSE {order: 2}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 2;
 
 MATCH (q:DiscriminatingQuestion {id: "lu_body_quality"})
 MATCH (r:QuestionResponse {id: "lu_body_numb"})
-MERGE (q)-[:HAS_RESPONSE {order: 3}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 3;
 
 MATCH (q:DiscriminatingQuestion {id: "lu_body_quality"})
 MATCH (r:QuestionResponse {id: "lu_body_unclear"})
-MERGE (q)-[:HAS_RESPONSE {order: 4}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 4;
 
 // --- High-unpleasant Q1 → responses ---
 MATCH (q:DiscriminatingQuestion {id: "hu_experience_quality"})
 MATCH (r:QuestionResponse {id: "hu_exp_alarm"})
-MERGE (q)-[:HAS_RESPONSE {order: 1}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 1;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_experience_quality"})
 MATCH (r:QuestionResponse {id: "hu_exp_vigilance"})
-MERGE (q)-[:HAS_RESPONSE {order: 2}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 2;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_experience_quality"})
 MATCH (r:QuestionResponse {id: "hu_exp_social"})
-MERGE (q)-[:HAS_RESPONSE {order: 3}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 3;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_experience_quality"})
 MATCH (r:QuestionResponse {id: "hu_exp_flooding"})
-MERGE (q)-[:HAS_RESPONSE {order: 4}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 4;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_experience_quality"})
 MATCH (r:QuestionResponse {id: "hu_exp_unsure"})
-MERGE (q)-[:HAS_RESPONSE {order: 5}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 5;
 
 // --- High-unpleasant Q2 → responses ---
 MATCH (q:DiscriminatingQuestion {id: "hu_body_activation"})
 MATCH (r:QuestionResponse {id: "hu_body_racing"})
-MERGE (q)-[:HAS_RESPONSE {order: 1}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 1;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_body_activation"})
 MATCH (r:QuestionResponse {id: "hu_body_tense"})
-MERGE (q)-[:HAS_RESPONSE {order: 2}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 2;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_body_activation"})
 MATCH (r:QuestionResponse {id: "hu_body_overwhelmed"})
-MERGE (q)-[:HAS_RESPONSE {order: 3}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 3;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_body_activation"})
 MATCH (r:QuestionResponse {id: "hu_body_shame"})
-MERGE (q)-[:HAS_RESPONSE {order: 4}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 4;
 
 MATCH (q:DiscriminatingQuestion {id: "hu_body_activation"})
 MATCH (r:QuestionResponse {id: "hu_body_unclear"})
-MERGE (q)-[:HAS_RESPONSE {order: 5}]->(r);
+MERGE (q)-[h:HAS_RESPONSE]->(r)
+SET h.order = 5;
 
 
 // ============================================================
@@ -943,21 +961,23 @@ SET e.weight = 0.15,
     e.strength = "weak",
     e.rationale = "Flushing can occur in acute alarm (vasodilation component of fight-or-flight), but the 'want to hide' action tendency is shame-specific. If present, social threat is much more likely.";
 
-// "I can't tell, it's all too much" → emotional_flooding (moderate)
+// "I can't tell, it's all too much" → emotional_flooding (weak)
+// Down-weighted 2026-09-30 (Claudia): this is the alexithymic escape hatch and
+// should read as overwhelmed, not as a flooding/crisis signal on its own.
 MATCH (r:QuestionResponse {id: "hu_body_unclear"})
 MATCH (p:ActivationPattern {id: "emotional_flooding"})
 MERGE (r)-[e:EVIDENCE_FOR]->(p)
-SET e.weight = 0.50,
-    e.strength = "moderate",
-    e.rationale = "Inability to parse body state under high arousal most consistent with PFC compromise and interoceptive discrimination failure. SN overload degrades the ability to differentiate discrete somatic signals.";
+SET e.weight = 0.05,
+    e.strength = "weak",
+    e.rationale = "Not being able to sort body signals is common in alexithymia and in ordinary overwhelm; on its own it is not evidence of flooding. Flooding needs its own answer (everything hitting at once).";
 
-// "I can't tell, it's all too much" → acute_alarm (weak)
+// "I can't tell, it's all too much" → acute_alarm (moderate)
 MATCH (r:QuestionResponse {id: "hu_body_unclear"})
 MATCH (p:ActivationPattern {id: "acute_alarm"})
 MERGE (r)-[e:EVIDENCE_FOR]->(p)
-SET e.weight = 0.25,
+SET e.weight = 0.20,
     e.strength = "weak",
-    e.rationale = "Extreme LC-NE activation can degrade interoceptive discrimination, but person typically retains awareness of cardiac acceleration even when other signals are muddled.";
+    e.rationale = "Tie-breaker only: the emotion word decides the pattern. Reads as overwhelm: high activation the person can't yet sort into discrete signals. acute_alarm's own vocabulary includes overwhelm, and its tools (body-first when flooded) fit without implying crisis.";
 
 
 // ============================================================
@@ -996,16 +1016,14 @@ SET e.weight = 0.25,
 // "Quiet or blank" triggers body quality question
 MATCH (r:QuestionResponse {id: "lu_mind_blank"})
 MATCH (q:DiscriminatingQuestion {id: "lu_body_quality"})
-MERGE (r)-[:TRIGGERS_NEXT {
-    reason: "Ambiguous between conservation_freeze and reward_drive_low — body experience resolves the can't-vs-don't-want-to distinction"
-}]->(q);
+MERGE (r)-[t:TRIGGERS_NEXT]->(q)
+SET t.reason = "Ambiguous between conservation_freeze and reward_drive_low — body experience resolves the can't-vs-don't-want-to distinction";
 
 // "I'm not sure" triggers body quality question
 MATCH (r:QuestionResponse {id: "lu_mind_unsure"})
 MATCH (q:DiscriminatingQuestion {id: "lu_body_quality"})
-MERGE (r)-[:TRIGGERS_NEXT {
-    reason: "Impaired metacognition ambiguous between freeze and dissociation — body experience provides alternative access to discriminating information"
-}]->(q);
+MERGE (r)-[t:TRIGGERS_NEXT]->(q)
+SET t.reason = "Impaired metacognition ambiguous between freeze and dissociation — body experience provides alternative access to discriminating information";
 
 // --- High-unpleasant: responses that trigger Q2 ---
 
@@ -1013,16 +1031,14 @@ MERGE (r)-[:TRIGGERS_NEXT {
 // (0.70 for alarm is strong but not sufficient — could be early flooding)
 MATCH (r:QuestionResponse {id: "hu_exp_alarm"})
 MATCH (q:DiscriminatingQuestion {id: "hu_body_activation"})
-MERGE (r)-[:TRIGGERS_NEXT {
-    reason: "Phasic trigger at 0.70 confidence — strong lean toward acute_alarm but intense trigger can also initiate flooding. Body state disambiguates activation-with-control (alarm) from activation-with-overflow (flooding)"
-}]->(q);
+MERGE (r)-[t:TRIGGERS_NEXT]->(q)
+SET t.reason = "Phasic trigger at 0.70 confidence — strong lean toward acute_alarm but intense trigger can also initiate flooding. Body state disambiguates activation-with-control (alarm) from activation-with-overflow (flooding)";
 
 // "I don't know what triggered it" triggers body activation question
 MATCH (r:QuestionResponse {id: "hu_exp_unsure"})
 MATCH (q:DiscriminatingQuestion {id: "hu_body_activation"})
-MERGE (r)-[:TRIGGERS_NEXT {
-    reason: "Ambiguous trigger — body signals more accessible than metacognition in high-arousal states. Interoception survives PFC compromise better than executive appraisal"
-}]->(q);
+MERGE (r)-[t:TRIGGERS_NEXT]->(q)
+SET t.reason = "Ambiguous trigger — body signals more accessible than metacognition in high-arousal states. Interoception survives PFC compromise better than executive appraisal";
 
 
 // ============================================================

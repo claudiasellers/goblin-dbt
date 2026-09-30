@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { ExerciseProgress } from '../../components/tools/ExerciseProgress';
+import { useToolSession } from '../../hooks/useToolSession';
+import { SessionClose } from '../../components/spine/SessionClose';
 
 const steps = [
   {
@@ -32,13 +34,18 @@ export function Pause() {
   const [currentStep, setCurrentStep] = useState(0);
   const [responses, setResponses] = useState<string[]>(['', '', '', '']);
   const [isComplete, setIsComplete] = useState(false);
+  const session = useToolSession();
 
   const current = steps[currentStep];
 
   const handleNext = () => {
+    // Practice spine (PR-S3): the skill has begun once the user is past Stop.
+    session.markPracticed();
     if (currentStep < steps.length - 1) {
+      session.setStep(`step_${steps[currentStep + 1].letter.toLowerCase()}`);
       setCurrentStep(currentStep + 1);
     } else {
+      session.markComplete();
       setIsComplete(true);
     }
   };
@@ -72,6 +79,7 @@ export function Pause() {
         <p className="mt-6 text-sm text-[var(--color-text-tertiary)]">
           Nothing you wrote here is saved.
         </p>
+        <SessionClose />
       </div>
     );
   }

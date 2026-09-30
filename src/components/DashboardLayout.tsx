@@ -4,6 +4,7 @@ import { InsightsSidePanel } from './insights/InsightsSidePanel';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { OppositeActionFollowUpProvider } from '../contexts/OppositeActionFollowUpContext';
+import { TodayProvider } from '../contexts/TodayContext';
 
 /**
  * App shell: sidebar + header + scrolling main column.
@@ -76,6 +77,8 @@ export function DashboardLayout() {
         </header>
 
         <main className="flex-1 min-h-0 overflow-y-auto">
+          {/* Today (PR-S5): one fetch shared by the check-in screen's stack and the desktop panel */}
+          <TodayProvider>
           <div className="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex gap-6">
             <div className="flex-1 min-w-0">
               {/* App-level Opposite Action follow-ups: one fetch + in-tab reminder for every page */}
@@ -91,6 +94,7 @@ export function DashboardLayout() {
               </aside>
             )}
           </div>
+          </TodayProvider>
         </main>
 
         {!isExercise && (

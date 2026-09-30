@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getInsightsData } from '../../services/neo4j';
-import type { ContinuityPrompt, PatternFrequency } from '../../services/neo4j';
+import type { PatternFrequency } from '../../services/neo4j';
+import { useToday, useToolOutcomeItem } from '../../hooks/useToday';
 import { ContinuityCard } from './ContinuityCard';
 import { RecentPatterns } from './RecentPatterns';
 
 export function InsightsSidePanel() {
   const { user } = useAuth();
-  const [continuityPrompt, setContinuityPrompt] = useState<ContinuityPrompt | null>(null);
+  // "Did it help?" comes from Today (PR-S5): the same item and callable as the phone's stack.
+  const outcomeItem = useToolOutcomeItem();
+  const today = useToday();
   const [patternFrequencies, setPatternFrequencies] = useState<PatternFrequency[]>([]);
   const [totalCheckIns, setTotalCheckIns] = useState(0);
 
@@ -16,7 +19,6 @@ export function InsightsSidePanel() {
     if (!user) return;
     getInsightsData()
       .then((data) => {
-        setContinuityPrompt(data.continuityPrompt);
         setPatternFrequencies(data.patternFrequencies);
         setTotalCheckIns(data.totalCheckIns);
       })
@@ -25,7 +27,7 @@ export function InsightsSidePanel() {
 
   return (
     <div className="space-y-4">
-      {continuityPrompt && <ContinuityCard prompt={continuityPrompt} />}
+      {outcomeItem && <ContinuityCard key={outcomeItem.id} item={outcomeItem} onAnswered={() => { window.setTimeout(today.refresh, 1500); }} />}
       <RecentPatterns patterns={patternFrequencies} totalCheckIns={totalCheckIns} />
       <Link
         to="/"

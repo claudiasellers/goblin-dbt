@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { QuadrantGrid } from '../components/checkin/QuadrantGrid';
@@ -10,7 +10,7 @@ import { EmotionSuggestion } from '../components/checkin/EmotionSuggestion';
 import { DiscriminatingQuestions } from '../components/checkin/DiscriminatingQuestions';
 import {
   saveCheckIn,
-  ensureUserExists,
+  setCheckInNextAction,
   getStateAndTools,
   getDiscriminatingQuestions,
   type StateResult as StateResultType,
@@ -18,15 +18,43 @@ import {
 } from '../services/neo4j';
 import { getEmotionById, getEmotionByName } from '../data/emotions';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
-import { useOppositeActionFollowUpsContext } from '../hooks/useOppositeActionFollowUps';
-import { OppositeActionFollowUpCard } from '../components/tools/oppositeAction/OppositeActionFollowUpCard';
+import { TodayStack } from '../components/today/TodayStack';
+import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
+import { newId } from '../lib/spine/ids';
+import {
+  buildCheckInPayload,
+  emotionIdsFor,
+  ftfReading,
+  type CheckInNextAction,
+  type CheckInSource,
+} from '../lib/spine/checkInPayload';
+import type { CapacityReading } from '../data/capacityTypes';
+import { recordToolSession } from '../services/spine';
+import { useBand } from '../hooks/useBand';
+import { BandGate } from '../components/capacity/BandGate';
+import { bandStepFor, checkInIntensity } from '../lib/checkInBand';
+import { beatBand, beatRequest, type WitnessHandlers } from '../lib/witness';
+import { recordWitnessBeat } from '../services/witness';
+import { profileCache } from '../lib/profileCache';
 
 type EntryPoint = 'standard' | 'somatic';
 
+/** Quadrants whose check-ins get the discriminating questions (E4-6: both unpleasant quadrants). */
+function asksDiscriminatingQuestions(quadrant: string | null): quadrant is 'high-unpleasant' | 'low-unpleasant' {
+  return quadrant === 'high-unpleasant' || quadrant === 'low-unpleasant';
+}
+
+/** The routing band's source (E4-3 accepts probe · ftf · carried; hand-offs etc. count as carried). */
+function routingBandSource(r: CapacityReading): 'probe' | 'ftf' | 'carried' {
+  return r.source === 'probe' || r.source === 'ftf' ? r.source : 'carried';
+}
+
 type CheckInStep =
   | 'emotion'
+  | 'help_now'
   | 'find'
   | 'discriminating'
+  | 'capacity'
   | 'body'
   | 'sensation'
   | 'suggestion'
@@ -70,8 +98,116 @@ export function CheckIn() {
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [discriminatingQuestions, setDiscriminatingQuestions] = useState<DiscriminatingQuestion[]>([]);
   const [discriminatingAnswers, setDiscriminatingAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
-  // Opposite Action plans made for later (app-level, shared with the in-tab reminder).
-  const followUps = useOppositeActionFollowUpsContext();
+
+  // === Continuity (PR-C1) ===
+  // One client id per check-in, minted when the flow starts and reset in handleComplete. The result
+  // is saved when it renders (crisis-banner results included) and re-saved by the same id after
+  // "add more detail"; what the user does next is recorded against it (setCheckInNextAction).
+  const [checkInId, setCheckInId] = useState<string>(() => newId());
+  const [startedAt, setStartedAt] = useState<Date>(() => new Date());
+  const [source, setSource] = useState<CheckInSource>('grid');
+  const [capacity, setCapacityState] = useState<CapacityReading | null>(null);
+  // === Band (A4-3) ===
+  // Unpleasant check-ins carry a band: this check-in's own answer, or a current one carried
+  // (≤ 20 min, e.g. from Find the feeling), else the probe step asks. Pleasant: no band (D-07).
+  const band = useBand();
+  const capacityRef = useRef<CapacityReading | null>(null);
+  const setCapacity = (r: CapacityReading | null) => { capacityRef.current = r; setCapacityState(r); };
+  const [askedCapacity, setAskedCapacity] = useState(false);
+  /** Where the probe step goes next: the body map (standard) or straight to analysis (somatic). */
+  const afterCapacity = useRef<{ then: 'body' | 'analyze'; overrides?: { quadrant?: string; emotions?: string[] } }>({ then: 'body' });
+  useEffect(() => { if (user) band.load(); }, [user, band]);
+  const [knownEmotionIds, setKnownEmotionIds] = useState<string[]>([]);
+  /** Find the feeling's pull was `blank` (E4-4): the engine never offers a calming tool then. */
+  const ftfBlank = useRef(false);
+  const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
+  /** The render save in flight: resolves true when saved. Next actions chain after it. */
+  const savePromise = useRef<Promise<boolean> | null>(null);
+  const savedResult = useRef<StateResultType | null>(null);
+
+  const emotionX = (emotions: string[]) => (emotions.length ? getEmotionByName(emotions[0])?.x : undefined);
+  const intensityFor = (cap: CapacityReading | null, emotions: string[]) =>
+    checkInIntensity(cap, band.content, emotionX(emotions), checkInData.intensity);
+
+  const payloadState = () => ({
+    id: checkInId,
+    quadrant: checkInData.quadrant ?? 'high-unpleasant',
+    emotions: checkInData.emotions,
+    emotionIds: knownEmotionIds,
+    intensity: intensityFor(capacity, checkInData.emotions),
+    bodySensations: checkInData.bodySensations,
+    note: checkInData.note,
+    startedAt,
+    source,
+    capacity,
+    discriminatingAnswers,
+    embeddedToolSessionIds: embeddedIds,
+  });
+
+  // Save on result render, before any tool can open (R4: every downstream write keys on this id).
+  useEffect(() => {
+    if (!user || step !== 'result' || !stateResult || !checkInData.quadrant) return;
+    if (savedResult.current === stateResult) return;
+    savedResult.current = stateResult;
+    // A re-save ("add more detail") waits for the one in flight, so an earlier snapshot can never
+    // land after a newer one (Codex, PR #16). The payload is taken now, not when it runs.
+    const payload = buildCheckInPayload(payloadState(), stateResult);
+    const prev = savePromise.current ?? Promise.resolve(true);
+    savePromise.current = prev
+      .then(() => saveCheckIn(payload))
+      .then(() => true)
+      .catch((err) => {
+        console.error('Failed to save check-in:', err);
+        return false;
+      });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, step, stateResult]);
+
+  // === Witness beat (A5-3) ===
+  // The beat's log is queued behind the render save (R4: it keys on the check-in id) and ahead of
+  // the next action, which finalises the check-in (R2: a final check-in takes no new SHOWED_LINE).
+  const beatQueue = useRef<Promise<void>>(Promise.resolve());
+  function logBeat(...[result, lines]: Parameters<WitnessHandlers['onDone']>) {
+    if (!user || !checkInData.quadrant) return;
+    const req = beatRequest({
+      checkInId, moment: 'checkin_result', band: beatBand(capacity?.value), lines, result,
+      emotionIds: emotionIdsFor(checkInData.emotions, knownEmotionIds),
+    });
+    const saved = savePromise.current ?? Promise.resolve(false);
+    beatQueue.current = beatQueue.current
+      .then(() => saved)
+      .then((ok) => (ok ? recordWitnessBeat(req) : null))
+      .then((r) => { if (r?.profileVersion != null) profileCache.bump(r.profileVersion); })
+      .catch((err) => { console.error('Failed to record the witness beat:', err); });
+  }
+  const witness: WitnessHandlers = { onShown: logBeat, onDone: logBeat };
+
+  /**
+   * Record the next action once the render save settled (and any queued beat log). If that save
+   * failed, save again with the next action inline (same id, so nothing duplicates). Resolves true
+   * when recorded.
+   */
+  function recordNextAction(next: CheckInNextAction): Promise<boolean> {
+    const id = checkInId;
+    const state = payloadState();
+    const result = stateResult;
+    const beats = beatQueue.current;
+    const pending = (savePromise.current ?? Promise.resolve(false)).then((saved) => beats.then(() => saved));
+    return pending.then((saved) => (saved
+      ? setCheckInNextAction(id, next)
+      : saveCheckIn(buildCheckInPayload(state, result, next)).then(() => undefined)))
+      .then(() => true)
+      .catch((err) => {
+        console.error('Failed to record next action:', err);
+        return false;
+      });
+  }
+
+  /** A tool card tap: fire-and-forget; navigation never waits. */
+  function handleToolOpen(toolId: string) {
+    if (!user || !checkInData.quadrant) return;
+    void recordNextAction({ kind: 'tool', toolId });
+  }
 
   // Signed-out entry: tools are available right now; an account only adds saved check-ins.
   if (!user) {
@@ -113,10 +249,11 @@ export function CheckIn() {
    * Accepts optional overrides so callers that just called setState
    * (which won't have flushed yet) can pass the fresh values directly.
    */
-  async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[]; discAnswers?: Array<{ questionId: string; responseId: string }> }) {
+  async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[]; discAnswers?: Array<{ questionId: string; responseId: string }>; capacity?: CapacityReading | null }) {
     const quadrant = overrides?.quadrant ?? checkInData.quadrant;
     const emotions = overrides?.emotions ?? checkInData.emotions;
     const discAnsw = overrides?.discAnswers ?? discriminatingAnswers;
+    const cap = overrides && 'capacity' in overrides ? overrides.capacity ?? null : capacityRef.current;
     if (!quadrant) return;
 
     setStep('analyzing');
@@ -126,11 +263,14 @@ export function CheckIn() {
       const result = await getStateAndTools({
         quadrant,
         emotions: emotions.length > 0 ? emotions : undefined,
-        intensity: checkInData.intensity || undefined,
+        intensity: intensityFor(cap, emotions) || undefined,
         bodySensations: checkInData.bodySensations.length > 0
           ? checkInData.bodySensations.map(s => ({ region: s.region, tags: s.tags }))
           : undefined,
         discriminatingAnswers: discAnsw.length > 0 ? discAnsw : undefined,
+        ...(cap ? { band: cap.value, bandViaCantTell: cap.viaCantTell, bandSource: routingBandSource(cap) } : {}),
+        ...(ftfBlank.current ? { blank: true } : {}),
+        surface: 'checkin',
       });
       
       setStateResult(result);
@@ -142,15 +282,8 @@ export function CheckIn() {
       setStep('saving');
       try {
         if (user) {
-          await ensureUserExists(user.uid, user.email || '');
-          await saveCheckIn(user.uid, {
-            emotion: emotions.join(', ') || quadrant,
-            quadrant,
-            intensity: checkInData.intensity || { x: 0.5, y: 0.5 },
-            bodySensations: checkInData.bodySensations,
-            note: checkInData.note,
-            timestamp: new Date(),
-          });
+          // Analysis failed: save what the user told us, without a pattern (idempotent by id).
+          await saveCheckIn(buildCheckInPayload({ ...payloadState(), quadrant, emotions }, null, { kind: 'done' }));
         }
         setStep('complete');
       } catch (saveErr) {
@@ -162,16 +295,19 @@ export function CheckIn() {
   }
 
   /**
-   * "Help me now" - skip to analysis with just quadrant
+   * "Help me now" (PR-C2, D-08 interim): a safe body step and two quiet links. No check-in and no
+   * routing call: nothing was said about the feeling, so nothing is guessed.
    */
   function handleHelpMeNow() {
-    analyzeAndShowResult();
+    setStep('help_now');
   }
 
   /**
    * "I don't know how I feel" - start with body sensations instead
    */
   function handleSomaticEntry() {
+    setStartedAt(new Date()); // the check-in's time is when it starts, not when the screen mounted
+    setSource('body');
     setEntryPoint('somatic');
     setStep('body');
   }
@@ -181,7 +317,17 @@ export function CheckIn() {
    * capacity band sets intensity; no word falls back to the body-first path.
    */
   function handleFound(r: FindTheFeelingResult) {
+    // FTF's band is this check-in's capacity answer (kept, not just turned into intensity).
+    setSource('ftf');
+    ftfBlank.current = r.blank === true;
+    // FTF recorded its answer in the band store (context 'checkin'); use that reading so its id
+    // matches, else build the same reading here.
+    const current = band.current();
+    const fromFtf = current && current.source === 'ftf' && current.context === 'checkin' && current.value === r.band ? current : null;
+    setCapacity(fromFtf ?? ftfReading(newId(), r.band));
+    if (r.toolSessionId) setEmbeddedIds([r.toolSessionId]);
     const emotion = r.emotionId ? getEmotionById(r.emotionId) : undefined;
+    if (emotion) setKnownEmotionIds([emotion.id]);
     if (!emotion) {
       setCheckInData(prev => ({ ...prev, intensity: { x: 0.5, y: r.intensityY } }));
       setEntryPoint('somatic');
@@ -198,7 +344,7 @@ export function CheckIn() {
    */
   function handleSuggestionSelect(emotions: string[], quadrant: string) {
     setCheckInData(prev => ({ ...prev, emotions, quadrant }));
-    analyzeAndShowResult({ quadrant, emotions });
+    afterFeelings(quadrant, 'analyze', { quadrant, emotions });
   }
 
   /**
@@ -215,7 +361,33 @@ export function CheckIn() {
   function handleSuggestionSkip() {
     const quadrant = checkInData.quadrant || 'high-unpleasant';
     setCheckInData(prev => ({ ...prev, quadrant }));
-    analyzeAndShowResult({ quadrant });
+    afterFeelings(quadrant, 'analyze', { quadrant });
+  }
+
+  /**
+   * The feelings are in (grid, discriminating questions or somatic suggestions). Unpleasant: keep this
+   * check-in's band, carry a current one, or ask (the `capacity` step). Then the body map (standard)
+   * or the analysis (somatic, which has already been through the body map).
+   */
+  function afterFeelings(quadrant: string | null, then: 'body' | 'analyze', overrides?: { quadrant?: string; emotions?: string[] }) {
+    const d = bandStepFor(quadrant, capacityRef.current, band.current());
+    if (d.next === 'capacity') {
+      afterCapacity.current = { then, overrides };
+      setAskedCapacity(true);
+      setStep('capacity');
+      return;
+    }
+    const cap = d.carry ? band.carry('checkin') : d.keep;
+    setCapacity(cap);
+    if (then === 'body') setStep('body');
+    else void analyzeAndShowResult({ ...overrides, capacity: cap });
+  }
+
+  function handleBand(r: CapacityReading | null) {
+    setCapacity(r);
+    const { then, overrides } = afterCapacity.current;
+    if (then === 'body') setStep('body');
+    else void analyzeAndShowResult({ ...overrides, capacity: r });
   }
 
   function inferQuadrant(selectedEmotions: string[]): string {
@@ -243,10 +415,11 @@ export function CheckIn() {
     const inferredQuadrant = inferQuadrant(emotions);
     setCheckInData(prev => ({ ...prev, emotions, quadrant: inferredQuadrant }));
 
-    // For low-unpleasant, try to fetch discriminating questions
-    if (inferredQuadrant === 'low-unpleasant') {
+    // Unpleasant check-ins: fetch the quadrant's discriminating questions (E4-6: high-unpleasant
+    // too; the graph has them, they were never asked). Skippable; skipping keeps today's scoring.
+    if (asksDiscriminatingQuestions(inferredQuadrant)) {
       try {
-        const questions = await getDiscriminatingQuestions('low-unpleasant');
+        const questions = await getDiscriminatingQuestions(inferredQuadrant);
         if (questions.length > 0) {
           setDiscriminatingQuestions(questions);
           setStep('discriminating');
@@ -257,16 +430,16 @@ export function CheckIn() {
       }
     }
 
-    setStep('body');
+    afterFeelings(inferredQuadrant, 'body');
   }
 
   function handleDiscriminatingComplete(answers: Array<{ questionId: string; responseId: string }>) {
     setDiscriminatingAnswers(answers);
-    setStep('body');
+    afterFeelings(checkInData.quadrant, 'body');
   }
 
   function handleDiscriminatingSkip() {
-    setStep('body');
+    afterFeelings(checkInData.quadrant, 'body');
   }
 
   function handleBodyTap(x: number, y: number, region: string) {
@@ -301,35 +474,41 @@ export function CheckIn() {
   }
 
   /**
-   * After seeing the result, optionally save the check-in
+   * Done, micro-step done, or guided activity done / exited early. The check-in was saved when the
+   * result rendered; this records what happened next, then shows the saved screen.
    */
-  async function handleResultDone() {
+  async function handleResultDone(next: CheckInNextAction = { kind: 'done' }) {
     if (!user || !checkInData.quadrant) {
       handleComplete();
       return;
     }
 
-    // Save the check-in in the background
     setStep('saving');
     setSaveError(null);
+    const ok = await recordNextAction(next);
+    if (!ok) setSaveError('Failed to save your check-in. It will be stored locally.');
+    recordOneShot(next);
+    setStep('complete');
+  }
 
-    try {
-      await ensureUserExists(user.uid, user.email || '');
-      await saveCheckIn(user.uid, {
-        emotion: checkInData.emotions.join(', ') || checkInData.quadrant,
-        quadrant: checkInData.quadrant,
-        intensity: checkInData.intensity || { x: 0.5, y: 0.5 },
-        bodySensations: checkInData.bodySensations,
-        note: checkInData.note,
-        timestamp: new Date(),
-        activationPatternId: stateResult?.pattern?.id,
-        confidence: stateResult?.pattern?.confidence,
-      });
-      setStep('complete');
-    } catch (error) {
-      console.error('Failed to save check-in:', error);
-      setSaveError('Failed to save your check-in. It will be stored locally.');
-      setStep('complete');
+  /** Micro-steps and guided activities are practice too: a one-shot ToolSession (PR-S3). No rep yet. */
+  function recordOneShot(next: CheckInNextAction) {
+    const patternId = stateResult?.pattern?.id;
+    const core: Record<string, string> = {};
+    if (patternId) core.patternId = patternId;
+    if (next.kind === 'micro_step') {
+      if (next.microStepId) core.microStepId = next.microStepId;
+      void recordToolSession({
+        id: newId(), toolId: 'micro-step', entry: 'checkin_result', checkInId, status: 'completed',
+        ...(patternId ? { patternId } : {}), ext: { core },
+      }).catch(() => { /* best effort */ });
+    } else if (next.kind === 'activity' || next.kind === 'activity_partial') {
+      if (next.activityId) core.activityId = next.activityId;
+      void recordToolSession({
+        id: newId(), toolId: 'guided-activity', entry: 'checkin_result', checkInId,
+        status: next.kind === 'activity' ? 'completed' : 'exited_early',
+        ...(patternId ? { patternId } : {}), ext: { core },
+      }).catch(() => { /* best effort */ });
     }
   }
 
@@ -346,6 +525,17 @@ export function CheckIn() {
   }
 
   function handleComplete() {
+    setCheckInId(newId());
+    setStartedAt(new Date());
+    savePromise.current = null;
+    savedResult.current = null;
+    setSource('grid');
+    setCapacity(null);
+    setAskedCapacity(false);
+    afterCapacity.current = { then: 'body' };
+    setKnownEmotionIds([]);
+    setEmbeddedIds([]);
+    ftfBlank.current = false;
     setCheckInData({
       quadrant: null,
       emotions: [],
@@ -365,14 +555,24 @@ export function CheckIn() {
 
   function handleBack() {
     switch (step) {
+      case 'help_now':
+        setStep('emotion');
+        break;
       case 'discriminating':
         setStep('emotion');
         break;
+      case 'capacity':
+        if (afterCapacity.current.then === 'analyze') setStep('suggestion');
+        else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) setStep('discriminating');
+        else setStep('emotion');
+        break;
       case 'body':
-        if (entryPoint === 'somatic') {
+        if (entryPoint !== 'somatic' && askedCapacity && capacity?.source === 'probe') {
+          setStep('capacity');
+        } else if (entryPoint === 'somatic') {
           setEntryPoint('standard');
           setStep('emotion');
-        } else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') {
+        } else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) {
           setStep('discriminating');
         } else {
           setStep('emotion');
@@ -395,19 +595,21 @@ export function CheckIn() {
   }
 
   const stepOrder = entryPoint === 'somatic'
-    ? ['body', 'suggestion']
-    : discriminatingQuestions.length > 0
-      ? ['emotion', 'discriminating', 'body']
-      : ['emotion', 'body'];
+    ? ['body', 'suggestion', ...(askedCapacity ? ['capacity'] : [])]
+    : [
+      'emotion',
+      ...(discriminatingQuestions.length > 0 ? ['discriminating'] : []),
+      ...(askedCapacity ? ['capacity'] : []),
+      'body',
+    ];
   const currentStepIndex = stepOrder.indexOf(step);
   const showProgress = currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
 
   return (
     <div>
-      {/* Follow-up on an Opposite Action plan, only before a new check-in starts */}
-      {step === 'emotion' && followUps.pending.length > 0 && followUps.ready && (
-        <OppositeActionFollowUpCard pending={followUps.pending} copy={followUps.copy} />
-      )}
+      {/* Today (PR-S5): follow-ups, "did it help?", OA plans. Only before a new check-in starts,
+          so never beside a result or the crisis banner. */}
+      {step === 'emotion' && <TodayStack />}
 
       {/* Progress indicator - subtle, shows optionality */}
       {showProgress && (
@@ -454,12 +656,14 @@ export function CheckIn() {
       <div key={step} className="step-enter">
         {step === 'emotion' && (
           <QuadrantGrid
-            onSelect={handleEmotionSelect}
+            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); ftfBlank.current = false; void handleEmotionSelect(emotions); }}
             onHelpMeNow={handleHelpMeNow}
             onSomaticEntry={handleSomaticEntry}
-            onCantTell={() => setStep('find')}
+            onCantTell={() => { setStartedAt(new Date()); setStep('find'); }}
           />
         )}
+
+        {step === 'help_now' && <HelpNowInterim onDone={() => setStep('emotion')} />}
 
         {step === 'find' && (
           <div className="space-y-3">
@@ -469,6 +673,10 @@ export function CheckIn() {
             </button>
             <FindTheFeeling entry="checkin" onHandoff={handleFound} />
           </div>
+        )}
+
+        {step === 'capacity' && (
+          <BandGate context="checkin" force onBand={(r) => handleBand(r)} />
         )}
 
         {step === 'body' && (
@@ -522,6 +730,8 @@ export function CheckIn() {
           stateResult.guidedActivity && checkInData.quadrant === 'low-unpleasant' ? (
             <LowEnergyStateResult
               result={stateResult}
+              checkInId={checkInId}
+              onToolOpen={handleToolOpen}
               onDone={handleResultDone}
               onAddMoreDetail={
                 (!checkInData.emotions.length || !checkInData.bodySensations.length)
@@ -529,10 +739,15 @@ export function CheckIn() {
                   : undefined
               }
               checkinEmotions={checkInData.emotions}
+              band={capacity?.value ?? null}
+              emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              witness={witness}
             />
           ) : (
             <StateResult
               result={stateResult}
+              checkInId={checkInId}
+              onToolOpen={handleToolOpen}
               onDone={handleResultDone}
               onAddMoreDetail={
                 (!checkInData.emotions.length || !checkInData.bodySensations.length)
@@ -540,6 +755,9 @@ export function CheckIn() {
                   : undefined
               }
               checkinEmotions={checkInData.emotions}
+              band={capacity?.value ?? null}
+              emotionIds={emotionIdsFor(checkInData.emotions, knownEmotionIds)}
+              witness={witness}
             />
           )
         )}

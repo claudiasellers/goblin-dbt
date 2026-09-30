@@ -1,16 +1,31 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
-import { getToolById } from '../../data/tools';
-import type { StateResult, ToolRecommendation } from '../../services/neo4j';
+import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
+import { recommendationCards } from '../../lib/recommendation';
+import { RecommendationCards } from './RecommendationCards';
+import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
+import type { Band } from '../../data/capacityTypes';
+import { WitnessBeat } from '../witness/WitnessBeat';
+import { beatBand, beatVariant, showsWitnessBeat, type WitnessHandlers } from '../../lib/witness';
 
 interface StateResultProps {
   result: StateResult;
-  onDone: () => void;
+  /** Called with what the user did (Done, a micro-step, a guided activity); Done when omitted. */
+  onDone: (next?: CheckInNextAction) => void;
+  /** The saved check-in (PR-C1): tool links carry it so the tool session links back to it. */
+  checkInId?: string;
+  /** A tool card tap (recorded as the check-in's next action; navigation doesn't wait). */
+  onToolOpen?: (toolId: string) => void;
   onAddMoreDetail?: () => void;
   checkinEmotions?: string[];
+  /** The check-in's band (A4-3): read by the witness beat (A5-3); routing reads it from E4-3. */
+  band?: Band | null;
+  /** Graph ids of the check-in's words (the beat's family / word match). */
+  emotionIds?: string[];
+  /** The witness beat's log (A5-3): the host queues recordWitnessBeat until the check-in is saved. */
+  witness?: WitnessHandlers;
 }
 
 /**
@@ -35,13 +50,15 @@ interface StateResultProps {
  * the micro-step screen). Everything else still renders below it. Layout comes
  * from `resultSections` / `bailoutSections` in src/lib/crisisBanner.ts.
  */
-export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }: StateResultProps) {
-  const { pattern, tools, safetyFlag } = result;
+export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, checkInId, onToolOpen, band, emotionIds, witness }: StateResultProps) {
+  const { pattern, safetyFlag } = result;
+  // E4-4: one recommendation + one swap, named from src/data/tools.ts; unknown ids never render.
+  const cards = recommendationCards(result);
   const sections = resultSections({
     variant: 'standard',
     safetyFlag,
     patternId: pattern.id,
-    toolCount: tools.length,
+    toolCount: cards.length,
     canAddMoreDetail: !!onAddMoreDetail,
   });
   const has = (section: ResultSection) => sections.includes(section);
@@ -50,18 +67,20 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
   const [bailoutStep, setBailoutStep] = useState<MicroStep | null>(null);
   const [bailoutIndex, setBailoutIndex] = useState<number | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [completedStepId, setCompletedStepId] = useState<string | undefined>(undefined);
 
-  const handleBailoutComplete = useCallback(() => {
+  const handleBailoutComplete = useCallback((stepId?: string) => {
+    setCompletedStepId(stepId);
     setIsCompleting(true);
   }, []);
 
   useEffect(() => {
     if (!isCompleting) return;
     const timer = setTimeout(() => {
-      onDone();
+      onDone({ kind: 'micro_step', microStepId: completedStepId });
     }, 1800);
     return () => clearTimeout(timer);
-  }, [isCompleting, onDone]);
+  }, [isCompleting, onDone, completedStepId]);
 
   function handleBailout() {
     const { step, index } = getMicroStep(pattern.id);
@@ -123,7 +142,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
 
           {/* Single primary action */}
           <button
-            onClick={handleBailoutComplete}
+            onClick={() => handleBailoutComplete(bailoutStep.id)}
             className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary"
           >
             I did it
@@ -156,7 +175,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
           No action needed right now. Enjoy this moment.
         </p>
         <button
-          onClick={onDone}
+          onClick={() => onDone({ kind: 'done' })}
           className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Done
@@ -191,6 +210,13 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         )}
       </div>
 
+      {/* The witness beat (A5-3, R21): below the banner, above the tools; it never gates them */}
+      {showsWitnessBeat(pattern.id) && (
+        <WitnessBeat hostToolId="checkin" moment="checkin_result" band={beatBand(band)} variant={beatVariant(beatBand(band))}
+          words={checkinEmotions ?? []} emotionIds={emotionIds}
+          onShown={witness?.onShown} onDone={(r, lines) => witness?.onDone(r, lines)} />
+      )}
+
       {/* Clinical referral warning if needed */}
       {has('clinical_note') && (
         <div className="mb-6 p-4 rounded-xl bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]">
@@ -200,25 +226,21 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
         </div>
       )}
 
-      {/* The Tools - 1-2 options, that's it */}
+      {/* The tools: one recommendation and one swap (E4-4), below the banner and the beat */}
       {has('tools') && (
         <div className="mb-8">
           <p className="text-sm text-[var(--color-text-secondary)] text-center mb-4">
             Here's what might help right now
           </p>
-          
-          <div className="space-y-3">
-            {tools.slice(0, 2).map((tool, index) => (
-              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} activationPatternId={pattern.id} />
-            ))}
-          </div>
+          <RecommendationCards cards={cards} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
+            checkInId={checkInId} onOpen={(toolId) => onToolOpen?.(toolId)} />
         </div>
       )}
 
       {/* Primary actions */}
       <div className="space-y-3">
         <button
-          onClick={onDone}
+          onClick={() => onDone({ kind: 'done' })}
           className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Done
@@ -270,55 +292,4 @@ function getPatternEmoji(patternId: string): string {
     positive_state: '\u2728',
   };
   return map[patternId] || '\uD83E\uDDE0';
-}
-
-function getToolPath(toolId: string): string {
-  return `/tool/${toolId}`;
-}
-
-function ToolCard({ tool, isPrimary, checkinEmotions, activationPatternId }: { tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[]; activationPatternId?: string }) {
-  const toolPath = getToolPath(tool.id);
-
-  return (
-    <Link
-      to={toolPath}
-      state={toolLinkState(checkinEmotions, activationPatternId)}
-      className={`
-        block p-4 rounded-xl transition-all
-        ${isPrimary 
-          ? 'bg-[var(--color-bg-elevated)] border-2 border-[var(--color-border)] hover:border-[var(--color-border-accent)]' 
-          : 'bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)]'
-        }
-      `}
-    >
-      <div className="flex items-start gap-3">
-        <div className="text-xl flex-shrink-0 mt-0.5">
-          {getToolById(tool.id)?.emoji || '🔧'}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-base' : 'text-sm'}`}>
-            {tool.name}
-          </h3>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-0.5 line-clamp-2">
-            {tool.description || tool.whenToUse}
-          </p>
-          {isPrimary && tool.relevance && (
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-1 italic">
-              {tool.relevance}
-            </p>
-          )}
-        </div>
-        <span className="text-[var(--color-text-muted)] flex-shrink-0 mt-1">\u2192</span>
-      </div>
-    </Link>
-  );
-}
-
-/** Location state for tool links. Keeps the original { checkinEmotions } shape and adds the pattern id when known. */
-function toolLinkState(checkinEmotions?: string[], activationPatternId?: string) {
-  if (!checkinEmotions?.length && !activationPatternId) return undefined;
-  return {
-    ...(checkinEmotions?.length ? { checkinEmotions } : {}),
-    ...(activationPatternId ? { activationPatternId } : {}),
-  };
 }

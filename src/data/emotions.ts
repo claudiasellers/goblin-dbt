@@ -86,7 +86,6 @@ export const emotions: Emotion[] = [
   makeEmotion('infuriated', 'Infuriated', 'high-unpleasant', 'angry', 0.04, 0.98),
   makeEmotion('annoyed', 'Annoyed', 'high-unpleasant', 'angry', 0.28, 0.65),
   makeEmotion('withdrawn', 'Withdrawn', 'high-unpleasant', 'angry', 0.42, 0.58),
-  makeEmotion('numb', 'Numb', 'high-unpleasant', 'angry', 0.45, 0.55),
   makeEmotion('skeptical', 'Skeptical', 'high-unpleasant', 'angry', 0.38, 0.65),
   makeEmotion('dismissive', 'Dismissive', 'high-unpleasant', 'angry', 0.35, 0.68),
 
@@ -177,6 +176,9 @@ export const emotions: Emotion[] = [
   makeEmotion('ashamed', 'Ashamed', 'low-unpleasant', 'sad', 0.12, 0.32),
   makeEmotion('remorseful', 'Remorseful', 'low-unpleasant', 'sad', 0.25, 0.26),
   makeEmotion('empty', 'Empty', 'low-unpleasant', 'sad', 0.12, 0.05, true),
+  // E4-5 (D-14): numb moved from high- to low-unpleasant so it routes to freeze / dissociation;
+  // its family stays 'angry' (the wheel position) until ER-10 revisits it.
+  makeEmotion('numb', 'Numb', 'low-unpleasant', 'angry', 0.45, 0.45),
 
   // Low Energy Pleasant
   // Happy family — x ∈ [0.55, 0.98], y ∈ [0.02, 0.45]

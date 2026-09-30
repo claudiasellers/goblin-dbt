@@ -1,0 +1,342 @@
+{
+  "kind": "live-routing-summary",
+  "checkedAt": "2026-09-30T02:05:50.482Z",
+  "patterns": [
+    "acute_alarm",
+    "chronic_vigilance",
+    "conservation_freeze",
+    "dissociation_overmodulation",
+    "emotional_flooding",
+    "grief_yearning",
+    "reactive_aggression",
+    "reward_drive_low",
+    "rumination_loop",
+    "social_threat_shame"
+  ],
+  "emotionNodeCount": 167,
+  "associatedWith": {
+    "edges": 48,
+    "distinctPairs": 48
+  },
+  "patternEmotionVocabulary": {
+    "acute_alarm": [
+      "anxiety",
+      "fear",
+      "overwhelm",
+      "panic"
+    ],
+    "chronic_vigilance": [
+      "anxiety",
+      "hopelessness",
+      "loneliness",
+      "stress"
+    ],
+    "emotional_flooding": [
+      "anger",
+      "fear",
+      "guilt",
+      "overwhelm",
+      "panic",
+      "sadness"
+    ],
+    "conservation_freeze": [
+      "apathy",
+      "cold_shame",
+      "emptiness",
+      "hopelessness",
+      "loneliness",
+      "numbness",
+      "sadness"
+    ],
+    "dissociation_overmodulation": [
+      "cold_shame",
+      "emptiness",
+      "hopelessness",
+      "loneliness",
+      "numbness"
+    ],
+    "rumination_loop": [
+      "anxiety",
+      "cold_shame",
+      "disappointment",
+      "guilt",
+      "hopelessness",
+      "loneliness",
+      "sadness"
+    ],
+    "reward_drive_low": [
+      "apathy",
+      "boredom",
+      "disappointment",
+      "emptiness",
+      "hopelessness",
+      "loneliness",
+      "sadness"
+    ],
+    "social_threat_shame": [
+      "anger",
+      "anxiety",
+      "cold_shame",
+      "disgust",
+      "guilt",
+      "hot_shame",
+      "loneliness",
+      "rejection"
+    ]
+  },
+  "grid": {
+    "unpleasantNames": 85,
+    "namesThatExistAsEmotionNodes": 85,
+    "namesWithAnyPatternEdge": [],
+    "winnerDistribution": {
+      "high-unpleasant → acute_alarm": 49,
+      "low-unpleasant → conservation_freeze": 36
+    },
+    "winners": {
+      "high-unpleasant:aggressive": "acute_alarm",
+      "high-unpleasant:angry": "acute_alarm",
+      "high-unpleasant:annoyed": "acute_alarm",
+      "high-unpleasant:anxious": "acute_alarm",
+      "high-unpleasant:betrayed": "acute_alarm",
+      "high-unpleasant:bitter": "acute_alarm",
+      "high-unpleasant:busy": "acute_alarm",
+      "high-unpleasant:critical": "acute_alarm",
+      "high-unpleasant:dismissive": "acute_alarm",
+      "high-unpleasant:disrespected": "acute_alarm",
+      "high-unpleasant:distant": "acute_alarm",
+      "high-unpleasant:excluded": "acute_alarm",
+      "high-unpleasant:exposed": "acute_alarm",
+      "high-unpleasant:fearful": "acute_alarm",
+      "high-unpleasant:frightened": "acute_alarm",
+      "high-unpleasant:frustrated": "acute_alarm",
+      "high-unpleasant:furious": "acute_alarm",
+      "high-unpleasant:helpless": "acute_alarm",
+      "high-unpleasant:hostile": "acute_alarm",
+      "high-unpleasant:humiliated": "acute_alarm",
+      "high-unpleasant:inadequate": "acute_alarm",
+      "high-unpleasant:indignant": "acute_alarm",
+      "high-unpleasant:inferior": "acute_alarm",
+      "high-unpleasant:infuriated": "acute_alarm",
+      "high-unpleasant:insecure": "acute_alarm",
+      "high-unpleasant:insignificant": "acute_alarm",
+      "high-unpleasant:jealous": "acute_alarm",
+      "high-unpleasant:let_down": "acute_alarm",
+      "high-unpleasant:mad": "acute_alarm",
+      "high-unpleasant:nervous": "acute_alarm",
+      "high-unpleasant:numb": "acute_alarm",
+      "high-unpleasant:out_of_control": "acute_alarm",
+      "high-unpleasant:overwhelmed": "acute_alarm",
+      "high-unpleasant:persecuted": "acute_alarm",
+      "high-unpleasant:pressured": "acute_alarm",
+      "high-unpleasant:provoked": "acute_alarm",
+      "high-unpleasant:rejected": "acute_alarm",
+      "high-unpleasant:resentful": "acute_alarm",
+      "high-unpleasant:ridiculed": "acute_alarm",
+      "high-unpleasant:rushed": "acute_alarm",
+      "high-unpleasant:scared": "acute_alarm",
+      "high-unpleasant:skeptical": "acute_alarm",
+      "high-unpleasant:stressed": "acute_alarm",
+      "high-unpleasant:threatened": "acute_alarm",
+      "high-unpleasant:violated": "acute_alarm",
+      "high-unpleasant:weak": "acute_alarm",
+      "high-unpleasant:withdrawn": "acute_alarm",
+      "high-unpleasant:worried": "acute_alarm",
+      "high-unpleasant:worthless": "acute_alarm",
+      "low-unpleasant:abandoned": "conservation_freeze",
+      "low-unpleasant:apathetic": "conservation_freeze",
+      "low-unpleasant:appalled": "conservation_freeze",
+      "low-unpleasant:ashamed": "conservation_freeze",
+      "low-unpleasant:awful": "conservation_freeze",
+      "low-unpleasant:bad": "conservation_freeze",
+      "low-unpleasant:bored": "conservation_freeze",
+      "low-unpleasant:depressed": "conservation_freeze",
+      "low-unpleasant:despair": "conservation_freeze",
+      "low-unpleasant:detestable": "conservation_freeze",
+      "low-unpleasant:disappointed": "conservation_freeze",
+      "low-unpleasant:disapproving": "conservation_freeze",
+      "low-unpleasant:disgusted": "conservation_freeze",
+      "low-unpleasant:embarrassed": "conservation_freeze",
+      "low-unpleasant:empty": "conservation_freeze",
+      "low-unpleasant:fragile": "conservation_freeze",
+      "low-unpleasant:grief": "conservation_freeze",
+      "low-unpleasant:guilty": "conservation_freeze",
+      "low-unpleasant:hesitant": "conservation_freeze",
+      "low-unpleasant:horrified": "conservation_freeze",
+      "low-unpleasant:hurt": "conservation_freeze",
+      "low-unpleasant:indifferent": "conservation_freeze",
+      "low-unpleasant:isolated": "conservation_freeze",
+      "low-unpleasant:judgmental": "conservation_freeze",
+      "low-unpleasant:lonely": "conservation_freeze",
+      "low-unpleasant:nauseated": "conservation_freeze",
+      "low-unpleasant:powerless": "conservation_freeze",
+      "low-unpleasant:remorseful": "conservation_freeze",
+      "low-unpleasant:repelled": "conservation_freeze",
+      "low-unpleasant:revolted": "conservation_freeze",
+      "low-unpleasant:sad": "conservation_freeze",
+      "low-unpleasant:sleepy": "conservation_freeze",
+      "low-unpleasant:tired": "conservation_freeze",
+      "low-unpleasant:unfocused": "conservation_freeze",
+      "low-unpleasant:victimized": "conservation_freeze",
+      "low-unpleasant:vulnerable": "conservation_freeze"
+    }
+  },
+  "toolsByPattern": {
+    "acute_alarm": [
+      {
+        "id": "dbt_tipp",
+        "appToolId": "cool-down",
+        "score": 2
+      },
+      {
+        "id": "dbt_opposite_action",
+        "appToolId": "opposite-action",
+        "score": 1
+      }
+    ],
+    "chronic_vigilance": [],
+    "conservation_freeze": [
+      {
+        "id": "dbt_opposite_action",
+        "appToolId": "opposite-action",
+        "score": 2
+      }
+    ],
+    "dissociation_overmodulation": [
+      {
+        "id": "dbt_opposite_action",
+        "appToolId": "opposite-action",
+        "score": 1
+      }
+    ],
+    "emotional_flooding": [
+      {
+        "id": "dbt_opposite_action",
+        "appToolId": "opposite-action",
+        "score": 3
+      },
+      {
+        "id": "dbt_tipp",
+        "appToolId": "cool-down",
+        "score": 3
+      }
+    ],
+    "grief_yearning": [],
+    "reactive_aggression": [],
+    "reward_drive_low": [
+      {
+        "id": "dbt_opposite_action",
+        "appToolId": "opposite-action",
+        "score": 1
+      }
+    ],
+    "rumination_loop": [
+      {
+        "id": "dbt_opposite_action",
+        "appToolId": "opposite-action",
+        "score": 2
+      }
+    ],
+    "social_threat_shame": [
+      {
+        "id": "dbt_opposite_action",
+        "appToolId": "opposite-action",
+        "score": 2
+      },
+      {
+        "id": "dbt_recovering_from_invalidation",
+        "appToolId": "recovering-from-invalidation",
+        "score": 2
+      }
+    ]
+  },
+  "safetyTriggers": [
+    {
+      "pattern": "conservation_freeze",
+      "type": "clinical_referral",
+      "edges": 1
+    },
+    {
+      "pattern": "dissociation_overmodulation",
+      "type": "clinical_referral",
+      "edges": 1
+    },
+    {
+      "pattern": "dissociation_overmodulation",
+      "type": "crisis",
+      "edges": 1
+    },
+    {
+      "pattern": "emotional_flooding",
+      "type": "crisis",
+      "edges": 1
+    },
+    {
+      "pattern": "reward_drive_low",
+      "type": "clinical_referral",
+      "edges": 1
+    },
+    {
+      "pattern": "rumination_loop",
+      "type": "crisis",
+      "edges": 1
+    }
+  ],
+  "discriminatingEvidence": [
+    {
+      "pattern": "acute_alarm",
+      "edges": 5
+    },
+    {
+      "pattern": "chronic_vigilance",
+      "edges": 3
+    },
+    {
+      "pattern": "conservation_freeze",
+      "edges": 6
+    },
+    {
+      "pattern": "dissociation_overmodulation",
+      "edges": 4
+    },
+    {
+      "pattern": "emotional_flooding",
+      "edges": 5
+    },
+    {
+      "pattern": "reward_drive_low",
+      "edges": 4
+    },
+    {
+      "pattern": "rumination_loop",
+      "edges": 1
+    },
+    {
+      "pattern": "social_threat_shame",
+      "edges": 2
+    }
+  ],
+  "relatedPathEmotionsWithEdges": [
+    "anger",
+    "anxiety",
+    "apathy",
+    "boredom",
+    "cold_shame",
+    "disappointment",
+    "disgust",
+    "emptiness",
+    "fear",
+    "guilt",
+    "hopelessness",
+    "hot_shame",
+    "loneliness",
+    "numbness",
+    "overwhelm",
+    "panic",
+    "rejection",
+    "sadness",
+    "stress"
+  ],
+  "duplicateRelationshipsByEndpoints": 354,
+  "duplicateRelationshipsKeyed": null,
+  "duplicateNodes": 0
+}

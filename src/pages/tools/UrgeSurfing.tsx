@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { startWave, updateWave } from '../../lib/urgeSurfing';
+import { useToolSession } from '../../hooks/useToolSession';
+import { SessionClose } from '../../components/spine/SessionClose';
 
 export function UrgeSurfing() {
   const [phase, setPhase] = useState<'intro' | 'surfing' | 'complete'>('intro');
   const [intensity, setIntensity] = useState(7);
   const [elapsed, setElapsed] = useState(0);
   const [peakIntensity, setPeakIntensity] = useState(intensity);
+  // Practice spine (PR-S3). The slider's numbers are never stored (plan: no scale values on sessions).
+  const session = useToolSession();
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -36,9 +40,12 @@ export function UrgeSurfing() {
     setPeakIntensity(wave.peak);
     setPhase('surfing');
     setElapsed(0);
+    session.setStep('surfing');
+    session.markPracticed();
   };
 
   const finish = () => {
+    session.markComplete();
     setPhase('complete');
   };
 
@@ -174,6 +181,7 @@ export function UrgeSurfing() {
       >
         Start over
       </button>
+      <SessionClose />
     </div>
   );
 }

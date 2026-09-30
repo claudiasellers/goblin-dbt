@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect, useMemo, useReducer, useRef, useState, type 
 import { useReducedMotion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useUserProfile } from '../../contexts/UserProfileContext';
+import { useProfileContext } from '../../hooks/useProfileContext';
 import { getFeelingCollection, getFindTheFeelingContent, saveFindTheFeelingSession } from '../../services/neo4j';
 import type { Band, CollectedWord, Entry, FindTheFeelingContent, Way } from '../../data/findTheFeelingTypes';
 import { getToolById } from '../../data/tools';
@@ -12,6 +12,11 @@ import { ToolLoading } from '../../components/tools/ToolLoading';
 import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { Orient } from '../../components/tools/regulation/body';
 import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
+import { useToolSession } from '../../hooks/useToolSession';
+import { recordToolSession } from '../../services/spine';
+import { thenVsNowFromFtf } from '../../lib/band';
+import { useBand } from '../../hooks/useBand';
+import { newId } from '../../lib/spine/ids';
 import type { RoomProps } from '../../components/tools/findTheFeeling/roomTypes';
 
 // Rooms carry three.js / Web Audio: loaded only when the tool opens, one room at a time.
@@ -20,20 +25,17 @@ const rooms: Record<Way, React.LazyExoticComponent<ComponentType<RoomProps>>> = 
   tune: lazy(() => import('../../components/tools/findTheFeeling/tune/TuneRoom')),
 };
 
-/** crypto.randomUUID needs a secure context; fall back for plain-http testing on a LAN. */
-function newId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
-  const b = crypto.getRandomValues(new Uint8Array(16));
-  b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
-  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
-  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
-}
-
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: FindTheFeelingContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
 
 /** Check-in handoff. intensityY is the band's graph-defined intensity (no scale is ever shown). */
-export interface FindTheFeelingResult { emotionId: string | null; band: Band; intensityY: number }
+export interface FindTheFeelingResult {
+  emotionId: string | null; band: Band; intensityY: number;
+  /** The pull was `blank` (E4-4): the check-in's routing never offers a calming tool then. */
+  blank?: boolean;
+  /** The embedded ToolSession (PR-S4); the check-in links it with EMBEDDED. */
+  toolSessionId?: string | null;
+}
 
 /** Tool page and check-in embed. `entry="checkin"` ends after the word and calls onHandoff. */
 export function FindTheFeeling({ entry = 'tool', onHandoff }: { entry?: Entry; onHandoff?: (r: FindTheFeelingResult) => void } = {}) {
@@ -54,8 +56,8 @@ export function FindTheFeeling({ entry = 'tool', onHandoff }: { entry?: Entry; o
 
 function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; entry: Entry; onHandoff?: (r: FindTheFeelingResult) => void }) {
   const { user } = useAuth();
-  const { profile } = useUserProfile();
-  const name = profile.displayName?.trim().split(/\s+/)[0] || null;
+  // The single profile read path (PR-P1); null while loading, as before.
+  const name = useProfileContext('find-the-feeling').slices?.name.firstName ?? null;
   const reduced = useReducedMotion() ?? false;
   const navigate = useNavigate();
   const c = content.flow.copy;
@@ -63,6 +65,15 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   const reducer = useMemo(() => makeFlowReducer(content), [content]);
   const [history, dispatch] = useReducer(reducer, undefined, (): History => ({ stack: [initialFlow(content, entry)] }));
   const state = history.stack[history.stack.length - 1];
+
+  // FTF's capacity answer is a band reading like any other (A4-2): recorded so the check-in and the
+  // next tool within 20 minutes carry it instead of asking again. Rooms and save payload unchanged.
+  const band = useBand();
+  useEffect(() => {
+    if (!state.band) return;
+    band.record({ value: state.band, source: 'ftf', framing: 'now', wording: 'default', context: entry === 'checkin' ? 'checkin' : 'find-the-feeling' });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.band]);
 
   const [collection, setCollection] = useState<CollectedWord[]>([]);
   useEffect(() => {
@@ -77,21 +88,38 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   const sessionId = useRef<string>('');
   if (!sessionId.current) sessionId.current = newId();
   const savedFor = useRef<string | null>(null);
-  const doSave = () => {
+  const toolSession = useToolSession();
+  /** PR-S4: link the run to its spine session once the FTF session is saved (DETAIL needs it). */
+  const wrap = (embedId: string | null) => {
+    const detail = { kind: 'find_the_feeling' as const, id: sessionId.current };
+    const skills = state.word ? {} : { skillIds: [] as string[] }; // a rep of `label` only when a word was accepted
+    if (embedId) {
+      // Inside the check-in there is no tool page: a one-shot embedded session the check-in links to.
+      void recordToolSession({ id: embedId, toolId: 'find-the-feeling', entry: 'embedded', status: 'completed', detail, ...skills })
+        .catch(() => { /* best effort */ });
+      return;
+    }
+    const tvn = thenVsNowFromFtf(state.close);
+    void toolSession.close({ status: 'completed', detail, ...(tvn ? { thenVsNow: tvn.thenVsNow } : {}), ...skills });
+  };
+  const doSave = (embedId: string | null = null) => {
     const session = toSession(state, sessionId.current, content.version);
     if (!session) return;
     if (!user) { setSave('signed-out'); return; }
     setSave('saving');
     saveFindTheFeelingSession(session)
-      .then(() => setSave('saved'))
-      .catch((e: { code?: string }) => setSave(e?.code === 'functions/already-exists' ? 'saved' : 'error'));
+      .then(() => { setSave('saved'); wrap(embedId); })
+      .catch((e: { code?: string }) => {
+        if (e?.code === 'functions/already-exists') { setSave('saved'); wrap(embedId); } else setSave('error');
+      });
   };
   const finished = state.step === 'next' || state.step === 'collection' || state.step === 'handoff';
   useEffect(() => {
     if (!finished || savedFor.current === sessionId.current) return;
     savedFor.current = sessionId.current;
-    doSave();
-    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band!, intensityY: content.flow.bandIntensity[state.band!] });
+    const embedId = state.step === 'handoff' && user ? newId() : null;
+    doSave(embedId);
+    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band!, intensityY: content.flow.bandIntensity[state.band!], blank: state.pull === 'blank', toolSessionId: embedId });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
@@ -134,7 +162,7 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
         {save === 'error' && (
           <div className="flex items-center gap-2">
             <p className={secondaryText}>{c.collection.saveError}</p>
-            <button type="button" className={linkButton} onClick={doSave}>{c.collection.retry}</button>
+            <button type="button" className={linkButton} onClick={() => doSave()}>{c.collection.retry}</button>
           </div>
         )}
         <button type="button" className={linkButton} onClick={restart}>{c.collection.again}</button>

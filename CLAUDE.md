@@ -15,11 +15,34 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 - **Frontend** (`/src`): React 19 + TypeScript + Vite + Tailwind CSS. Uses HashRouter. State managed via Context API (`AuthContext`, `UserProfileContext`) — no Redux.
 - **Auth** Firebase Authentication (email/password)
-- **Cloud Functions** (`/functions/src/index.ts`): All backend logic in a single file (~1074 lines). Handles check-ins, user management, analysis/recommendations, and tool usage tracking. Neo4j driver uses lazy singleton pattern. User IDs extracted from Firebase Auth tokens server-side.
+- **Cloud Functions** (`/functions/src`, Node 22): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the deployed functions by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
 - **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
-- **Deployment** firebase deploy
+- **Deployment** `firebase deploy` (`--only functions` / `--only hosting`; hosting's `predeploy` runs the build). There is no `npm run deploy` (the old gh-pages script is gone).
+
+Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `capacity/`, `witness/`, `spine/`, `profile/`, `userdata/`, `safety/`):
+
+| Module | Callables |
+|---|---|
+| `checkin/` | `saveCheckIn` (idempotent upsert by client id; saved when the result renders), `setCheckInNextAction`, `getCheckInsByUser`; `validation.ts` |
+| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; triggers `onUserCreated` / `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
+| `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
+| `insights/` | `getInsightsData` |
+| `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` |
+| `oppositeAction/` | `getOppositeActionContent`, `saveOppositeActionSession`, `getOppositeActionSessions`, `getOppositeActionSession`, `getOppositeActionFollowUps` |
+| `dearMan/` | `getDearManContent`, `saveDearManSession`, `getDearManDebriefContent`, `getDearManReflection`, `getDearManSessions` |
+| `problemSolve/` | `getProblemSolveContent` |
+| `invalidationRecovery/` | `getInvalidationRecoveryContent`, `saveInvalidationRecoverySession`, `getInvalidationRecoveryProgress` |
+| `findTheFeeling/` | `getFindTheFeelingContent`, `saveFindTheFeelingSession`, `getFeelingCollection` |
+| `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `answerToolOutcome`, `scheduleFollowUp`, `resolveFollowUp`, `snoozeFollowUp`, `getToday`, `getSpineContent` (public); `todayOrder.ts` (derived due/stale/upcoming + ordering), `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
+| `profile/` | `getProfileContext` (the single profile read path: only the slices `PROFILE_NEEDS` declares per tool, in code), `getMe`, `upsertProfileFact`, `confirmProfileItem`, `setAsideProfileItem`, `restoreProfileItem`, `answerPatternOffer` (the only writer of `MyPattern`); `slices.ts` resolvers never read a `:LogRecord` (test-enforced) |
+| `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
+| `witness/` | `getWitnessLines` (public; signed in it also reads own / kept lines via `readProfileSlices(tx, uid, 'witness')` and the `SHOWED_LINE` history), `recordWitnessBeat` (host must be the caller's, found by key; `SHOWED_LINE` follows the host's lifecycle guard; `OwnLine` / `SAVED_LINE` are profile writes); `rank.ts` (pure ranking, fade stage, when to ask "did that land?"), `types.ts` (mirrored in `src/data/witnessTypes.ts`), `validation.ts` (own-line text is length-checked only, never linted) |
+
+`userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
+
+Adding a callable: export it from its domain module, add one line to `functions/src/index.ts`, add it to `functions/test/fixtures/endpoints.json` and the auth matrix (`functions/test/unit/auth-matrix.test.cjs`). Prefer `callable({ auth, label }, handler)` from `shared/callable.ts`.
 
 
 ## Key Architecture Decisions
@@ -28,11 +51,11 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 2. **User identity is handled by Firebase Auth.** Cloud Functions extract the user ID from `request.auth.uid` — the frontend never sends user IDs as parameters.
 
-3. **The knowledge graph powers recommendations.** Check-in data → emotion nodes → brain structures (via `ACTIVATES_DURING`) → activation patterns → therapy concepts (via `MODULATES`) → tools (via `IMPLEMENTS`). This is the core traversal that makes the app work.
+3. **The knowledge graph powers recommendations: pattern × band → `RECOMMENDED_FOR` → concept `appToolId`.** What `getStateAndTools` (signed-in only; `functions/src/recommendation/`) runs: the quadrant picks 4 candidate patterns (high-unpleasant: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`; low-unpleasant: `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`; pleasant quadrants return a synthetic `positive_state` with no query). Each candidate is scored from `(ActivationPattern)-[:ASSOCIATED_WITH]->(Emotion)` for the check-in's emotion ids plus `(QuestionResponse)-[:EVIDENCE_FOR]->(ActivationPattern)` for discriminating answers; `CO_OCCURS_WITH` may add a secondary pattern (`patternScoring.ts`). The tool step (`select.ts`): the winning pattern's `(TherapyConcept)-[:RECOMMENDED_FOR {bands, priority, emotionGate, requiresPrior, active}]->(ActivationPattern)` rows for the check-in's capacity band (the request's band, else inferred: `flooded` for flooding, else `stirred`) → emotion gates → hard filters (flooded: body/orient only; blank patterns: nothing `down`; the `CONTRAINDICATED_FOR` hook) → one card plus one swap of a different `skillKind` (never two change skills), ranked by priority then emotion overlap; the concept's `appToolId` is the card id. All of that is graph content from `scripts/recommendations/content.py`. `RoutingPolicy {id: 'checkin_result'}.enabled` is the kill switch: off (or missing) runs the legacy ranker (`legacy.ts`: top 2 `dbt_*` concepts by how many of the pattern's emotions they reach via `ADDRESSES|REDUCES|TARGETS`). Every non-positive result carries `routing` (version, band, bandSource, blank, ruleIds, filtered, receiveFirst). A `TRIGGERS_SAFETY` crisis flag (skipped for low-unpleasant; one seam, `functions/src/safety/checkinSafetyFlag.ts`) shows the crisis banner above the result; low-unpleasant adds a guided activity. Grid words (sent as lower-cased display names, `anxious`, `let_down`) reach the pattern vocabulary (`anxiety`, `rejection`) through `(:Emotion)-[:SCORES_AS]->(:Emotion)` aliases the scoring query reads (E4-6, `scripts/recommendations/vocabulary.py`; before it, plan F1, no grid word moved the pattern); plain anger words are held (no alias), so one anger word never lands on crisis-flagged `emotional_flooding`. Both unpleasant quadrants ask their discriminating questions. The aliases and the high-unpleasant answers count only while `RoutingPolicy` is enabled, so the kill switch restores today's routing whole.
 
-4. **Incremental schema loading with MERGE.** All Cypher scripts use `MERGE` instead of `CREATE` so they're idempotent — safe to re-run without duplicating data. Properties are overwritten via `SET` after `MERGE`.
+4. **Idempotent schema loading with MERGE.** Every loaded Cypher file is MERGE-only (enforced by `tests/schema-idempotency.test.mjs`), so a full load is safe to re-run and two runs give identical totals. Conventions are under Neo4j Conventions below.
 
-5. **8 activation patterns** drive the recommendation engine: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `reactive_aggression`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, `social_threat_shame`. Each maps to specific brain structures (overactive/suppressed) and specific tool recommendations.
+5. **Activation patterns** drive the recommendation engine. The graph has 10 `ActivationPattern` nodes: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, plus Phase-2 `grief_yearning` and `reactive_aggression`. The engine's quadrant map considers the first 8, so `grief_yearning` and `reactive_aggression` are never selected. `positive_state` is not a graph pattern: it is the synthetic pleasant-quadrant result (`saveCheckIn` stores it as `activationPatternId` only; it never creates content nodes). Each pattern maps to brain structures (overactive/suppressed) and tool recommendations.
 
 ---
 
@@ -82,6 +105,25 @@ This includes:
 
 ---
 
+## Data layers
+
+Every piece of user data belongs to exactly one layer. The registry is `functions/src/userdata/layers.ts`; `tests/user-data-layers.test.mjs` enforces it.
+
+| Layer | Stored as | Rule | Read by |
+|---|---|---|---|
+| **Ask-fresh** | Fields on a log record only (`ASK_FRESH_FIELDS`: `band*`, `thenVsNow`, `thenVsNowDir`, `actedOnUrge`, `urgeIds`, `fitsFacts`, `wiseMindAnswer`, `readiness`, `eventIds`) | Changes within a day → always asked, never pre-filled from memory. The one carry is the client-only `band.current()` (≤20 min, never read back from the server) | Aggregates only |
+| **Log** | `:<Label>:UserData:LogRecord` | Describes a moment. Append-only and **finalise-once** (`userdata/lifecycle.ts`: upsert by `key` only during its episode, forward only, then frozen; writers put `GUARDS.<Label>.<op>` in their `WHERE`) | Aggregates (Insights, Today, review). Never used to pre-fill a live flow |
+| **Profile** | `:<Label>:UserData:ProfileItem`, or a profile edge to graph content carrying `confirmedAt` + `source` | Would make the user re-answer next time → profile, pre-filled with "still true?". Nothing moves log → profile without the user's yes | `getProfileContext(toolId)` and the Me surface only |
+| (system) | `:<Label>:UserData:System` | App infrastructure (push tokens) | Deleted with the user, never exported |
+
+- Every `:UserData` node has `id` (client UUID unless noted), `ownerId` (Firebase uid), `key = ownerId + ':' + id` (unique per label in `schema/constraints.cypher`), `createdAt`, `schemaVersion`. Writes `MERGE` on `key`, never on `id`, and start with `MERGE (u:User {id: $uid})` (`userdata/ownership.ts`).
+- Ownership edges run `User → UserData` and `UserData → UserData`. User data may point at graph content; graph content never points at user data. Schema files never write user data.
+- A new user-data label: register it in `layers.ts` with its `exportAs`, add its `<label>_key` constraint, write it with its layer label. Export (`records.<exportAs>`, `formatVersion: 2`, `links` with edge properties) and delete (`DETACH DELETE` by `ownerId`, then the Auth user when `deleteAuth`) cover it automatically (`userdata/exportDelete.ts`). Retention deletes log records only, never profile items.
+- `FOUND_WORD` (User → Emotion) is a log aggregate, not a profile edge: it accumulates without a yes.
+- Pre-convention nodes (`CheckIn`, `BodySensation`, `ToolUsage`, the 4 session labels) were adopted by `schema/migrations/2026-10-user-data-backfill.cypher` (D-16 a).
+
+---
+
 ## Data: Tools
 
 Tools are defined in `src/data/tools.ts`. Each tool has:
@@ -95,7 +137,7 @@ Interactive tool components live in `src/pages/tools/` and are registered in the
 
 ## Data: Emotions
 
-Emotion nodes in the graph have a `dbtParent` property that maps child emotions to their DBT parent category (e.g., `anxiety` → `fear`, `irritation` → `anger`). The 9 DBT parent emotions are: **fear, anger, disgust, envy, jealousy, love, sadness, shame, guilt**.
+Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `irritation` → `anger`) through `(Emotion)-[:HAS_REGULATION_CONTENT]->(EmotionRegulationContent {dbtParent})`. No schema file sets an `Emotion.dbtParent` property, so don't read one (plan F12). The 9 DBT parent emotions are: **fear, anger, disgust, envy, jealousy, love, sadness, shame, guilt**; `shame`, `envy` and `jealousy` aren't `Emotion` nodes in the base schema (`shame` is `hot_shame`/`cold_shame`).
 
 `EmotionRegulationContent` nodes (one per DBT parent) are linked via `HAS_REGULATION_CONTENT`. They hold `label` and `fitsTheFactsWhen` (array of first-person "when this emotion fits the facts" statements). The Opposite Action tool uses a single source of truth: **ActionUrge** nodes (linked via `HAS_ACTION_URGE`) supply urge labels and graduated opposite steps (small/medium/bigger); protocol metadata on `EmotionRegulationContent` (from `schema/opposite-action-data.cypher`) supplies `fitsFactsGuidance`, `whyItWorks`, `acknowledgment`, `bodyOpposite`, and default opposite steps. All content is written in conversational first-person voice so the user immediately recognizes their experience.
 
@@ -109,15 +151,32 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 
 | File | Purpose |
 |------|---------|
-| `src/pages/CheckIn.tsx` | Multi-step check-in flow (quadrant → emotion → intensity → body) |
-| `src/components/StateResult.tsx` | Shows activation pattern + recommended tools after check-in |
-| `src/pages/tools/ToolPage.tsx` | Tool detail page with interactive component routing |
+| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (quadrant grid) → find → discriminating → capacity (band probe, unpleasant only, asked once: a current reading is carried; `src/lib/checkInBand.ts`) → body → sensation → suggestion → analyzing → result. Saves the check-in when the result renders (PR-C1); Today stack above the grid (PR-S5); Help me now → `HelpNowInterim` (PR-C2: safe step + Cool Down / 5-4-3-2-1, no check-in, no routing call) |
+| `src/components/checkin/StateResult.tsx` | Shows activation pattern + recommended tools after check-in (`LowEnergyStateResult.tsx` for low-unpleasant); the witness beat renders under the label, below the crisis banner, above the tools (R21) |
+| `src/components/checkin/RecommendationCards.tsx`, `src/lib/recommendation.ts`, `src/data/routingLabels.ts` | The result's cards (E4-4): one recommendation + one swap, named from `src/data/tools.ts` (unknown ids dropped, no graph names or relevance words), WMP-04 v0 side labels. `shownToolIds` is what the check-in stores as `recommendedToolIds` (with `routingVersion`, `routingBand`, `routingBandSource`); used by both result screens and the DEAR MAN debrief |
+| `src/components/witness/WitnessBeat.tsx`, `src/lib/witness.ts` | The receive beat (WMP-01): echo of the user's word(s), one witness line from `getWitnessLines`, optional *did that land?*, always skip · none of these fit · say it my way, explicit keep. Never gates the host. The check-in logs it via `recordWitnessBeat`, queued after the render save and before the next action (`CheckIn.tsx` `beatQueue`) |
+| `src/components/safety/CrisisBanner.tsx` | Crisis resources as a non-blocking banner above the normal result (never a replacement screen) |
+| `src/pages/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
 | `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
 | `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
 | `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |
 | `scripts/find-the-feeling/content.py` | Editable source for `schema/find-the-feeling.cypher` (Find the feeling: word signatures, urge routing, `appToolId`); regenerate with `build.py` |
 | `src/pages/tools/FindTheFeeling.tsx` | "Find the feeling" (Shape it / Tune it): page shell, save, routing, check-in handoff; rooms in `src/components/tools/findTheFeeling/{shape,tune}` (lazy, three.js / Web Audio); logic in `src/lib/findTheFeeling*.ts`; spec `docs/design/find-the-feeling.md` |
+| `scripts/practice-spine/content.py` | Editable source for `schema/practice-spine.cypher`: `FollowUpType` registry, `SessionCloseFlow` (then-vs-now copy per direction), `PracticeSkill.defaultFor` / `displayLabel`; regenerate with `build.py` |
+| `scripts/capacity/content.py` | Editable source for `schema/capacity.cypher` (probe wordings, hand-off copy, primitives, `BandRule`s) and for FTF's probe copy (FTF's `content.py` imports it); regenerate both with their `build.py` |
+| `src/contexts/ToolSessionContext.tsx`, `src/hooks/useToolSession.ts` | One `ToolSession` per tool visit (ToolPage mounts the provider); tools call `useToolSession()` (`setStep`, `markPracticed`, `markComplete`, `setExt`, `close`, `linkTo`). A new tool declares its close kind in `functions/src/spine/tools.ts` + `src/lib/spine/close.ts` (a test enforces it) |
+| `src/components/today/TodayStack.tsx`, `src/contexts/TodayContext.tsx` | Today stack on the check-in screen (≤3 cards + more; OA plans via OA's own card; flooded collapses); the desktop `ContinuityCard` reads the same `tool_outcome` item |
+| `src/lib/spine/wrap.ts` | How OA / Recover / DEAR MAN / FTF sessions join the spine: their own session nodes and readers are unchanged; the `ToolSession` links to them with `DETAIL`, reps and Recover's follow-ups ride on the close, OA plans are mirrored server-side as `FollowUp oa_plan` |
+| `src/components/spine/SessionClose.tsx` | The one-tap close question (graph copy, skip always there) |
+| `scripts/profile-layer/content.py` | Editable source for `schema/profile-layer.cypher`: Me areas, `ProfileKind` (still-true copy, revisit days), `PatternRule` (off until reviewed) |
+| `src/hooks/useProfileContext.ts` | How a tool reads the profile: `useProfileContext(toolId).slices` (in-memory cache, never localStorage). A new tool declares `PROFILE_NEEDS[toolId]` |
+| `src/lib/band.ts`, `src/lib/resumeToken.ts` | Capacity band logic (freshness, hand-off plan, reread) and device-only resume tokens |
+| `src/contexts/BandContext.tsx`, `src/hooks/useBand.ts`, `src/lib/bandStore.ts` | The band store: `useBand()` (`current`, `record`, `carry`, content). Client-only (R1): memory + `sessionStorage` `goblin.band.v1`, 20 min, per uid, cleared with resume tokens on sign-out |
+| `src/components/capacity/` | `CapacityProbe`, `BandGate` (`band.ask()`: carries a current reading or asks; `reaskIfFlooded` per D-07), `BreakdownHandoff` (P2: card → sigh / orient → reread → resume or come back later; never a lock), `TooMuchLink` (P2 as an overlay; host stays mounted). A tool that gates on the band wraps its first screen in `BandGate` and puts `TooMuchLink` on its screens; DEAR MAN is the first host (A4-4: `src/lib/dearManSafety.ts` `dearManBandGate`, device-only resume draft `src/lib/dearManResume.ts`, `?resume=<sessionId>`) |
+| `scripts/witness/content.py` | Editable source for `schema/witness.cypher`: the witness corpus (`ValidationLine` levels 1–6, `ToolMoment`, `VoiceRule`). Recover's `RecoveryProtocol.validationLines` is a projection of its `recover_validate` lines (Recover's `content.py` imports them), so rebuild both. `status: live` needs `reviewStatus: reviewed` + `reviewedAt`; drafts are loaded but never served. Sign a draft off by adding its id to `SIGNED_OFF` (id → review date) and rebuilding. `scripts/witness/report.cypher`: landed share per line (retirement stays a human edit) |
+| `scripts/voice-lint.mjs`, `scripts/witness/voice-rules.json` | The voice contract (flat, warm witness; no cheer, should, just, but, diagnosis or physiology on validation lines; ≤90 chars; flooded ≤8 words at level 1–2). Runs in `npm test` and gates `load-graph.mjs` (exit 5; `--skip-voice-lint`); `npm run lint:voice` reports legacy copy. Flow-doc copy is checked against the shrink-only `scripts/witness/voice-baseline.json`. Never lints what the user writes |
+| `dev/capacity.html` | Dev-only harness for the probe, gate, P2 and the too-much overlay (`tests/fixtures/capacity-content.json`, regenerate with `scripts/capacity/fixture.py`) |
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
@@ -126,12 +185,36 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 | `src/services/neo4j.ts` | Cloud Function call wrappers |
 | `src/services/firebase.ts` | Firebase init, auth functions |
 | `src/contexts/AuthContext.tsx` | Firebase auth state provider |
-| `src/contexts/UserProfileContext.tsx` | User profile with caching |
-| `functions/src/index.ts` | All Cloud Functions (graph queries, check-in CRUD) |
-| `schema/knowledge-graph.cypher` | Full graph schema (nodes) |
-| `schema/relationships.cypher` | All graph relationships |
+| `src/contexts/UserProfileContext.tsx` | App settings (theme, palette, reminders, retention, displayName) with a localStorage cache for the theme paint. Settings only: profile-layer data never goes here |
+| `src/pages/Profile.tsx` + `src/components/me/` | "Me" (nav label, D-10): the profile layer (About me, My body: quiet hours, My words: found words read-only, My patterns once an offer exists; still-true, set aside / restore, pattern offers) above the settings |
+| `functions/src/index.ts` | The deploy surface: named re-exports of every callable (module table above) |
+| `functions/src/shared/` | Driver + sessions (`neo4j.ts`), `auth.ts`, `validate.ts`, `errors.ts`, `callable.ts` |
+| `functions/src/userdata/` | Data layers: `layers.ts` (registry), `ownership.ts`, `lifecycle.ts` (finalise-once guards), `exportDelete.ts` |
+| `schema/migrations/` | One-off data migrations, run with `--file` (never loaded): `2026-10-user-data-backfill.cypher`, then after the M2 deploy `2026-10-remove-goal-fields.cypher` and `2026-10-remove-positive-state-stub.cypher` (the bare `ActivationPattern {id:'positive_state'}` the pre-PR-C1 `saveCheckIn` MERGEd on pleasant check-ins) |
+| `functions/test/` | Unit tests (fake driver), pinned `fixtures/endpoints.json`, emulator golden suite, local Neo4j compose file |
+| `schema/constraints.cypher` | Every constraint and index; loaded first |
+| `schema/knowledge-graph.cypher` | Base graph nodes (MERGE by id; no relationships) |
+| `schema/relationships.cypher` | Base graph relationships |
+| `schema/maintenance/` | Dedupe dry run + relationship-only apply (run by hand, never loaded) |
+| `scripts/load-graph.mjs` | Loads `schema/` in `LOAD_ORDER`; `--verify`, `--only`, `--file`, `--dry-run`; voice-lints the witness corpus and flow docs before sending (`--skip-voice-lint`) |
+| `scripts/verify-live-routing.mjs` | Read-only live-graph routing check; `--compare tests/fixtures/live-routing-2026-09-30.json` (a committed live summary) or `--compare tests/fixtures/recommendation-graph.json` (what the schema says) |
+| `functions/src/recommendation/` | The check-in engine. `handler.ts` is pure orchestration over an injected query layer (`queries.ts` in production); `patternScoring.ts` (pattern selection), `band.ts` (routing band), `select.ts` (pattern × band selector, hard filters, diversity rule, WMP-04 v0 `receiveFirst`), `legacy.ts` (the kill-switch ranker), `validation.ts`; the crisis flag is one seam, `functions/src/safety/checkinSafetyFlag.ts` |
+| `scripts/recommendations/content.py` | Editable source for `schema/recommended-for.cypher` (regenerate with `build.py`, then `fixture.py`): the pattern × band `RECOMMENDED_FOR` table, emotion-gated rows, concept tags (`side`, `skillKind`, `direction`), blank patterns and the `RoutingPolicy` kill switch (`enabled`). Rows are drafts until listed in `SIGNED_OFF`; `build.py` refuses to enable the policy while an active row is a draft. A new tool becomes recommendable by adding its tags and rows here, no engine code |
+| `scripts/recommendations/vocabulary.py` | Editable source for the `SCORES_AS` aliases in `schema/recommended-for.cypher` (same `build.py`): every unpleasant grid word → its 1–2 closest pattern-vocabulary emotions, with a rationale, or `HELD` (no alias yet, with a reason); drafts until listed in `SIGNED_OFF`. `tests/recommendation-reachability.test.mjs` pins the held words, that every other word reaches a pattern, and the one-word distribution |
+| `scripts/recommendations/schema_graph.py`, `fixture.py` | Replays `schema/*.cypher` (LOAD_ORDER) in memory and writes `tests/fixtures/recommendation-graph.json`, the graph slice routing reads. Regenerate after any schema change that touches patterns, concepts, emotions or evidence; `tests/recommendation-*.test.mjs` run whole check-ins over it (`tests/lib/recommendationFixture.mjs`) and check it against the live summary |
 | `schema/emotion-regulation-content.cypher` | EmotionRegulationContent base (label, fitsTheFactsWhen) |
 | `schema/opposite-action-data.cypher` | Protocol metadata + ActionUrge nodes (OA tool source of truth) |
+
+---
+
+## Testing
+
+- `npm test`: Tier 1, no network: `node --test tests/*.test.mjs` (pure logic, schema and content checks; two freshness tests shell out to `python3`) then `npm --prefix functions test` (builds, then the fake-driver unit tests in `functions/test/unit/`: pinned exports + deploy manifest, auth matrix, handler pins, shared helpers). `node --test tests/` does NOT work on Node 22; use the glob.
+- `npm run test:emulator`: Tier 2 goldens against the Auth + Functions emulators and a local Neo4j. Needs Docker: `npm run graph:test:up`, `npm run graph:test:load`, `cp functions/.secret.local.example functions/.secret.local`. Record with `UPDATE_GOLDEN=1`.
+- Phase A rehearsal (Docker, runbook §0b): `node scripts/rehearsal/rehearse-phase-a.mjs [--goldens] [--keep]` from a worktree of `phase-a/m4-engine` at `.rehearsal/runner`. Copies production into the local Neo4j (Aura opened READ-only), replays M1–M4's migrations and loads on the copy, `--goldens` records the Tier-2 goldens. Every write and child process is pinned to `bolt://127.0.0.1:7687` (`scripts/rehearsal/lib.mjs`, pinned by `tests/rehearsal.test.mjs`). Output: `.rehearsal/report.json`, `.rehearsal/rehearsal.log` (gitignored)
+- Lint: `npx eslint .` still reports 5 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
+- Cypher syntax: `npx -y -p @neo4j-cypher/language-support@2.0.0-next.6 node scripts/lint-cypher.mjs`.
+- CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 22, no secrets).
 
 ---
 
@@ -148,10 +231,13 @@ give Claudia the entry text to paste.
 
 ## Neo4j Conventions
 
-- All Cypher files use `MERGE` for idempotency — safe to re-run
-- Properties overwritten via `SET` after `MERGE`
+- Every loaded Cypher file is MERGE-only, safe to re-run (tests enforce it; no `CREATE (`)
+- Nodes: `MERGE (x:Label {id: "…"}) SET x += {…};` Always `+=`, never `=`: later files add properties (`TherapyConcept.appToolId`, `ActivationPattern.formulation_*`, …) that `=` would wipe. Merge on exactly one key, `id` (or `key` for user data); the one natural-key exception is `EmotionRegulationContent {dbtParent}`
+- Relationships: `MATCH (a:A {id: "…"}), (b:B {id: "…"}) MERGE (a)-[r:TYPE]->(b) SET r += {…};` The merge key is `(a, TYPE, b)`; only `FELT_AS` also merges on `{region}` (a real multi-edge). No other property ever goes inside a MERGE pattern
+- Every label MERGEd by `id`/`key` has a uniqueness constraint in `schema/constraints.cypher` (loaded first; the loader stops with exit 3 if one can't be created). New files add their constraints there and their name to `LOAD_ORDER`
+- Load with `node scripts/load-graph.mjs [--verify]` (full load; `--verify` fails on duplicates). Never `--only knowledge-graph` (it refuses without `--force`): later files override its properties. One-off migrations go in `schema/migrations/` and run with `--file`
 - Node labels are PascalCase (`BrainStructure`, `ActivationPattern`)
 - Relationship types are SCREAMING_SNAKE (`ACTIVATES_DURING`, `MODULATES`, `FELT_AS`)
-- Every node has an `id` property (snake_case) used for `MATCH`
+- Every content node has an `id` property (snake_case) used for `MATCH` (`EmotionRegulationContent` is matched by `dbtParent`; session records by `key`)
 - Evidence grades: `"Strong"`, `"Moderate"`, `"Preliminary"`
 - Schema files are chunked and self-contained (no assumed variable persistence across executions — Aura requirement)

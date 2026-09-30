@@ -1,15 +1,30 @@
 #!/usr/bin/env node
 /**
- * Rebuild the Goblin knowledge graph in Neo4j from schema/*.cypher.
+ * Load the Goblin knowledge graph into Neo4j from schema/*.cypher.
  *
- * Every schema file uses MERGE + SET, so this is idempotent: safe to run
- * against an empty Aura instance or an existing one.
+ * Every loaded schema file is MERGE-only (tests/schema-idempotency.test.mjs), so a full load is
+ * idempotent: safe against an empty instance or an existing one, and two runs in a row give the
+ * same totals. constraints.cypher loads first; a constraint that can't be created stops the load
+ * (exit 3), because MERGE against duplicated nodes would multiply edges.
  *
  * Usage:
  *   NEO4J_URI=neo4j+s://xxxx.databases.neo4j.io NEO4J_USER=neo4j NEO4J_PASSWORD=... \
- *     node scripts/load-graph.mjs            # load everything
+ *     node scripts/load-graph.mjs            # load everything in LOAD_ORDER
+ *   node scripts/load-graph.mjs --verify     # load everything, then fail (exit 4) on duplicates
  *   node scripts/load-graph.mjs --dry-run    # only parse + count statements
- *   node scripts/load-graph.mjs --only dear-man-content   # one file (substring match)
+ *   node scripts/load-graph.mjs --only dear-man-content   # files whose name contains this
+ *   node scripts/load-graph.mjs --file schema/maintenance/x.cypher  # one file outside LOAD_ORDER (prints results)
+ *   node scripts/load-graph.mjs --only witness --skip-voice-lint     # bypass the voice gate (don't)
+ *
+ * Voice gate (plan A5-1): before anything is sent, the witness corpus and the generated flow
+ * documents in the selection are checked with scripts/voice-lint.mjs (the same module npm test
+ * runs). Corpus errors, or flow-doc copy outside the voice contract that isn't in the baseline,
+ * abort the load (exit 5) unless --skip-voice-lint is passed.
+ *
+ * `--only knowledge-graph` refuses without --force: later files override Emotion / TherapyConcept
+ * properties, so the base file alone would revert them until a full load.
+ * Exit codes: 1 setup, 2 statement failures, 3 constraint failure, 4 duplicates after --verify,
+ * 5 voice lint.
  *
  * Credentials are read from env vars, or from a .env file in the repo root
  * (NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD). Uses functions/node_modules/neo4j-driver.
@@ -17,16 +32,18 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { SCHEMA_REL_TYPES, DUPLICATE_NODES_QUERY, DUPLICATE_RELS_QUERY } from './lib/schemaDuplicates.mjs';
+import { gateProblems } from './voice-lint.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(resolve(root, 'functions/package.json'));
 
 // ---- Load order: derived from which labels each file MATCHes vs MERGEs ----
-const LOAD_ORDER = [
+export const LOAD_ORDER = [
+  'constraints.cypher',                           // every constraint + index; first (R13)
   'knowledge-graph.cypher',                       // all base nodes
   'relationships.cypher',                         // base relationships
-  'incremental-update.cypher',                    // extra Emotion nodes + OPPOSITE_OF
   'emotion-wheel-sync.cypher',                    // wheel vocabulary sync (Emotion)
   'low-unpleasant-associations-patch.cypher',     // Emotion ↔ ActivationPattern patch
   'emotion-regulation-content.cypher',            // EmotionRegulationContent (per DBT parent)
@@ -46,24 +63,28 @@ const LOAD_ORDER = [
   'dear-man-safety-gates.cypher',                  // DEAR MAN arousal-gate copy (reads gates from the recovery flow)
   'app-tool-ids.cypher',                           // TherapyConcept.appToolId join keys (fixes tipp/stop/problem-solving cards)
   'find-the-feeling.cypher',                       // Find the feeling (Shape it / Tune it): word signatures, urge routing, appToolId join keys
+  'practice-spine.cypher',                         // FollowUpType, SessionCloseFlow, PracticeSkill defaultFor (needs urge_surfing above)
+  'profile-layer.cypher',                          // ProfileArea / ProfileKind / PatternRule (Me surface content)
+  'capacity.cypher',                               // Capacity probe, hand-off primitives, band rules (needs Recover's cyclic_sighing)
+  'witness.cypher',                                // Witness corpus: ValidationLine, ToolMoment, VoiceRule (needs Recover, OA, DEAR MAN debrief, regulation content)
+  'recommended-for.cypher',                        // Check-in routing: RECOMMENDED_FOR pattern × band, concept tags, RoutingPolicy (needs urge_surfing, dbt_find_the_feeling)
 ];
 
-// Constraints/indexes the app relies on (mirrors the initializeSchema Cloud Function).
-const CONSTRAINTS = [
-  'CREATE CONSTRAINT user_id IF NOT EXISTS FOR (u:User) REQUIRE u.id IS UNIQUE',
-  'CREATE CONSTRAINT checkin_id IF NOT EXISTS FOR (c:CheckIn) REQUIRE c.id IS UNIQUE',
-  'CREATE INDEX checkin_timestamp IF NOT EXISTS FOR (c:CheckIn) ON (c.timestamp)',
-  'CREATE CONSTRAINT emotion_id IF NOT EXISTS FOR (e:Emotion) REQUIRE e.id IS UNIQUE',
-  'CREATE CONSTRAINT brain_id IF NOT EXISTS FOR (b:BrainStructure) REQUIRE b.id IS UNIQUE',
-  'CREATE CONSTRAINT therapy_concept_id IF NOT EXISTS FOR (c:TherapyConcept) REQUIRE c.id IS UNIQUE',
-  'CREATE CONSTRAINT activation_pattern_id IF NOT EXISTS FOR (a:ActivationPattern) REQUIRE a.id IS UNIQUE',
+// schema/*.cypher files that are deliberately never loaded (reference queries, not data).
+// One-off migrations (schema/migrations/) and maintenance queries (schema/maintenance/) are
+// never in LOAD_ORDER; run them with --file.
+export const NOT_LOADED = [
+  'validation-queries.cypher',
 ];
+
+/** A schema DDL statement (CREATE/DROP CONSTRAINT/INDEX). */
+export const isDdl = (stmt) => /^\s*(CREATE|DROP)\s+(CONSTRAINT|INDEX|RANGE INDEX|TEXT INDEX|POINT INDEX|FULLTEXT INDEX|LOOKUP INDEX|VECTOR INDEX)\b/i.test(stmt);
 
 /**
  * Split a .cypher file into statements on ';' — but only outside of
  * string literals ('…' / "…" / `…`) and comments (// … / /* … *\/).
  */
-function splitStatements(source) {
+export function splitStatements(source) {
   const out = [];
   let cur = '';
   let i = 0;
@@ -107,6 +128,11 @@ function splitStatements(source) {
   return out;
 }
 
+/** Voice-lint problems for the selected files (names as in LOAD_ORDER; --file paths by basename). */
+export function voiceGate(names) {
+  return gateProblems(names.map(n => n.replace(/^.*[\\/]/, '')));
+}
+
 function loadEnv() {
   const envPath = resolve(root, '.env');
   if (existsSync(envPath)) {
@@ -123,18 +149,52 @@ function loadEnv() {
   return { uri, user, password };
 }
 
+/**
+ * Which files a run loads. `only` is a substring filter on LOAD_ORDER; `file` is one path
+ * outside it. Throws (message for the user) on an unsafe or empty selection.
+ */
+export function selectFiles({ only = null, file = null, force = false } = {}) {
+  if (file) return [{ name: file, path: resolve(process.cwd(), file) }];
+  const names = LOAD_ORDER.filter(f => !only || f.includes(only));
+  if (!names.length) throw new Error(`--only ${only} matches no file in LOAD_ORDER`);
+  if (only && names.includes('knowledge-graph.cypher') && !force) {
+    throw new Error('--only selects knowledge-graph.cypher: later files (emotion-wheel-sync, the low-unpleasant patch, '
+      + 'find-the-feeling, invalidation-recovery, …) override its Emotion / TherapyConcept properties, so loading it '
+      + 'alone reverts them. Run a full load, or pass --force if you really mean it.');
+  }
+  return names.map(name => ({ name, path: resolve(root, 'schema', name) }));
+}
+
 async function main() {
   const args = process.argv.slice(2);
-  const dryRun = args.includes('--dry-run');
-  const onlyIdx = args.indexOf('--only');
-  const only = onlyIdx >= 0 ? args[onlyIdx + 1] : null;
+  const flag = (f) => args.includes(f);
+  const value = (f) => (args.indexOf(f) >= 0 ? args[args.indexOf(f) + 1] : null);
+  const dryRun = flag('--dry-run');
+  const verify = flag('--verify');
+  const printResults = Boolean(value('--file'));
 
-  const files = LOAD_ORDER.filter(f => !only || f.includes(only));
-  const plan = files.map(f => ({ file: f, statements: splitStatements(readFileSync(resolve(root, 'schema', f), 'utf8')) }));
+  let files;
+  try {
+    files = selectFiles({ only: value('--only'), file: value('--file'), force: flag('--force') });
+  } catch (e) {
+    console.error(e.message);
+    process.exit(1);
+  }
+  const plan = files.map(f => ({ file: f.name, statements: splitStatements(readFileSync(f.path, 'utf8')) }));
 
   let total = 0;
   for (const p of plan) { total += p.statements.length; console.log(`${p.file.padEnd(48)} ${String(p.statements.length).padStart(4)} statements`); }
   console.log(`${'TOTAL'.padEnd(48)} ${String(total).padStart(4)} statements`);
+
+  const voice = voiceGate(files.map(f => f.name));
+  if (voice.length) {
+    console.error(`\nVoice lint: ${voice.length} problem(s) in the files about to load:`);
+    for (const v of voice) console.error(`  ✗ ${v}`);
+    if (flag('--skip-voice-lint')) console.warn('  --skip-voice-lint: loading anyway.');
+    else { console.error('  Fix the source (content.py) and rebuild, or pass --skip-voice-lint.'); process.exit(5); }
+  } else {
+    console.log('\nVoice lint: clean');
+  }
   if (dryRun) return;
 
   const { uri, user, password } = loadEnv();
@@ -146,35 +206,35 @@ async function main() {
   const neo4j = require('neo4j-driver');
   const driver = neo4j.driver(uri, neo4j.auth.basic(user, password));
   await driver.verifyConnectivity();
-  console.log(`\nConnected to ${uri}\n`);
+  console.log(`\nConnected to ${uri.replace(/^(\w+(\+\w+)?:\/\/)([^.:]{3})[^.:]*/, '$1$3…')}\n`);
 
   const session = driver.session();
   const failures = [];
+  let exitCode = 0;
   try {
-    console.log('Constraints & indexes');
-    for (const c of CONSTRAINTS) {
-      try { await session.run(c); } catch (e) { console.warn(`  skipped: ${c}\n    ${e.message}`); }
-    }
-
     for (const p of plan) {
-      // knowledge-graph.cypher uses CREATE (one large query of base nodes). It is
-      // only safe on an empty graph; skip it when base nodes already exist.
-      if (p.file === 'knowledge-graph.cypher') {
-        const existing = await session.run('MATCH (b:BrainStructure) RETURN count(b) AS c');
-        const c = existing.records[0].get('c').toNumber();
-        if (c > 0) {
-          console.log(`↷ ${p.file.padEnd(46)} skipped (${c} BrainStructure nodes already exist)`);
-          continue;
-        }
-      }
       const t0 = Date.now();
       let ok = 0;
       for (let k = 0; k < p.statements.length; k++) {
         const stmt = p.statements[k];
         try {
-          await session.run(stmt);
+          const res = await session.run(stmt);
           ok++;
+          if (printResults && res.records.length) {
+            // --file runs (maintenance / migration queries): show what each query returned
+            const toPlain = (_k, v) => (v && typeof v === 'object' && typeof v.toNumber === 'function' && 'low' in v ? v.toString() : v);
+            console.log(`  #${k + 1} → ${res.records.length} row(s)`);
+            for (const r of res.records.slice(0, 50)) console.log(`    ${JSON.stringify(r.toObject(), toPlain)}`);
+          }
         } catch (e) {
+          if (isDdl(stmt)) {
+            // Never MERGE on top of duplicates: a missing uniqueness constraint lets MERGE match
+            // several copies and cross-multiply edges.
+            console.error(`\n✗ ${p.file} #${k + 1}: could not create a constraint/index:\n  ${e.message.split('\n')[0]}`);
+            console.error('  Duplicates probably exist. Run schema/maintenance/dedupe-dry-run.cypher, then the dedupe, then load again.');
+            exitCode = 3;
+            return;
+          }
           failures.push({ file: p.file, index: k + 1, message: e.message, preview: stmt.slice(0, 120).replace(/\s+/g, ' ') });
           console.error(`  ✗ ${p.file} #${k + 1}: ${e.message.split('\n')[0]}`);
         }
@@ -183,21 +243,46 @@ async function main() {
     }
 
     console.log('\nNode counts by label:');
-    const res = await session.run('MATCH (n) UNWIND labels(n) AS l RETURN l AS label, count(*) AS c ORDER BY c DESC');
+    const res = await session.run('MATCH (n) UNWIND labels(n) AS l RETURN l AS label, count(*) AS c ORDER BY c DESC, label');
     for (const r of res.records) console.log(`  ${r.get('label').padEnd(32)} ${r.get('c').toString()}`);
-    const rels = await session.run('MATCH ()-[r]->() RETURN count(r) AS c');
-    console.log(`  relationships${' '.repeat(19)} ${rels.records[0].get('c').toString()}`);
+    const totals = await session.run('MATCH (n) WITH count(n) AS nodes OPTIONAL MATCH ()-[r]->() RETURN nodes, count(r) AS rels');
+    const nodes = totals.records[0].get('nodes').toString();
+    const rels = totals.records[0].get('rels').toString();
+    console.log(`  relationships${' '.repeat(19)} ${rels}`);
+    console.log(`\nTOTALS nodes=${nodes} relationships=${rels}`);
+
+    if (verify) {
+      console.log('\nVerify: duplicates');
+      const dupNodes = (await session.run(DUPLICATE_NODES_QUERY)).records.map(r => r.toObject());
+      const dupRels = (await session.run(DUPLICATE_RELS_QUERY)).records.map(r => r.toObject());
+      const schemaDupRels = dupRels.filter(r => SCHEMA_REL_TYPES.includes(r.type));
+      const otherDupRels = dupRels.filter(r => !SCHEMA_REL_TYPES.includes(r.type));
+      for (const r of dupNodes) console.error(`  ✗ nodes ${r.label}: ${r.extraNodes} extra (${r.sampleKeys.join(', ')})`);
+      for (const r of schemaDupRels) console.error(`  ✗ relationships ${r.type}: ${r.extraRels} extra (worst ×${r.worstMultiplicity})`);
+      for (const r of otherDupRels) console.warn(`  ! relationships ${r.type} (not a schema type; not deduplicated): ${r.extraRels} extra`);
+      if (dupNodes.length || schemaDupRels.length) {
+        console.error('\nDuplicates remain. See schema/maintenance/ (dry run, then dedupe-apply-rels.cypher).');
+        exitCode = 4;
+      } else {
+        console.log('  none for schema types ✓');
+      }
+    }
   } finally {
     await session.close();
     await driver.close();
+    // Report statement failures even when a constraint (3) or --verify (4) failure decides the exit code.
+    if (failures.length) {
+      console.error(`\n${failures.length} statement(s) failed:`);
+      for (const f of failures) console.error(`  ${f.file} #${f.index}: ${f.message.split('\n')[0]}\n    ${f.preview}…`);
+    }
+    if (exitCode) process.exit(exitCode);
   }
 
-  if (failures.length) {
-    console.error(`\n${failures.length} statement(s) failed:`);
-    for (const f of failures) console.error(`  ${f.file} #${f.index}: ${f.message.split('\n')[0]}\n    ${f.preview}…`);
-    process.exit(2);
-  }
-  console.log('\nDone. Graph rebuilt.');
+  if (failures.length) process.exit(2);
+  console.log(verify ? '\nDone. Graph loaded and verified.' : '\nDone. Graph loaded.');
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+// Run only when executed directly, so tests can import LOAD_ORDER / splitStatements.
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  main().catch(e => { console.error(e); process.exit(1); });
+}
