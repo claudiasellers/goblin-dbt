@@ -77,7 +77,7 @@ export function Sidebar() {
           ))}
         </nav>
 
-        {/* Bottom section: Profile */}
+        {/* Bottom section: Me (D-10: nav "Profile" -> "Me"; settings on the same page) */}
         <div className="flex-shrink-0 py-4 border-t border-[var(--color-sidebar-border)] flex flex-col gap-1">
           <NavLink to="/profile" className={desktopLinkClass}>
             {({ isActive }) => (
@@ -95,7 +95,7 @@ export function Sidebar() {
                 ) : (
                   <ProfileIcon className="w-5 h-5 flex-shrink-0" />
                 )}
-                <span className="ml-3 text-sm">Profile</span>
+                <span className="ml-3 text-sm">Me</span>
               </>
             )}
           </NavLink>
@@ -121,7 +121,7 @@ export function Sidebar() {
           ))}
           <NavLink to="/profile" className={mobileLinkClass}>
             <ProfileIcon className="w-5 h-5" />
-            <span className="text-[11px] font-medium mt-1">Profile</span>
+            <span className="text-[11px] font-medium mt-1">Me</span>
           </NavLink>
         </div>
       </nav>

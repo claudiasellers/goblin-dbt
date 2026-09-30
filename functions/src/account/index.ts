@@ -68,9 +68,6 @@ const PROFILE_DEFAULTS = {
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],
   weeklyDigest: false,
-  dailyCheckInGoal: 1,
-  weeklyToolGoal: 3,
-  focusCategories: [],
   dataRetentionDays: null,
   shareAnonymousData: false,
   timeZone: null,
@@ -107,16 +104,17 @@ export const getUserProfile = onCall(
         email,
         ...userNode,
         // Clean up Neo4j integer types
-        dailyCheckInGoal: toNumber(userNode.dailyCheckInGoal) ?? PROFILE_DEFAULTS.dailyCheckInGoal,
-        weeklyToolGoal: toNumber(userNode.weeklyToolGoal) ?? PROFILE_DEFAULTS.weeklyToolGoal,
         dataRetentionDays: userNode.dataRetentionDays != null ? toNumber(userNode.dataRetentionDays) : null,
         reminderDays: userNode.reminderDays ?? PROFILE_DEFAULTS.reminderDays,
-        focusCategories: userNode.focusCategories ?? PROFILE_DEFAULTS.focusCategories,
       };
 
-      // Remove internal fields
-      delete profile.id;
-      delete profile.createdAt;
+      // Remove internal fields. The settings profile is cached in localStorage for the theme paint:
+      // it never carries profile-layer or system fields (PR-P2), nor the retired goal fields
+      // (removed from User by schema/migrations/2026-10-remove-goal-fields.cypher).
+      for (const k of ['id', 'createdAt', 'updatedAt', 'profileVersion', 'patternsEvaluatedAt',
+        'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories']) {
+        delete (profile as Record<string, unknown>)[k];
+      }
 
       // Enforce data retention: delete check-ins older than dataRetentionDays
       const retentionDays = profile.dataRetentionDays != null
@@ -164,7 +162,6 @@ export const updateUserProfile = onCall(
     const allowedFields = [
       'displayName', 'photoURL', 'theme', 'palette',
       'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
-      'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories',
       'dataRetentionDays', 'shareAnonymousData', 'timeZone',
     ];
 

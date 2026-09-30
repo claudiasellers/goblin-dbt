@@ -487,9 +487,6 @@ export interface UserProfile {
   reminderTime: string;
   reminderDays: number[];
   weeklyDigest: boolean;
-  dailyCheckInGoal: number;
-  weeklyToolGoal: number;
-  focusCategories: string[];
   dataRetentionDays: number | null;
   shareAnonymousData: boolean;
   /** IANA zone, synced from the browser (follow-up windows, quiet hours). */
@@ -506,9 +503,6 @@ export const DEFAULT_PROFILE: UserProfile = {
   reminderTime: '09:00',
   reminderDays: [1, 2, 3, 4, 5],
   weeklyDigest: false,
-  dailyCheckInGoal: 1,
-  weeklyToolGoal: 3,
-  focusCategories: [],
   dataRetentionDays: null,
   shareAnonymousData: false,
   timeZone: null,

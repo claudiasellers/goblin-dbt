@@ -106,3 +106,18 @@ test('getMe: areas with items (set-aside kept), found words read-only, stale cou
   assert.deepEqual(me.readOnly.foundWords, [{ emotionId: 'hurt', name: 'Hurt', count: 2 }]);
   assert.deepEqual([me.version, me.name.firstName], [2, 'C']);
 });
+
+test('getUserProfile (settings) strips internal, profile-layer and retired goal fields', async () => {
+  setDriver(fakeDriver((q) => (/RETURN u \{\.\*\} AS user/.test(q)
+    ? [{ user: { id: 'u1', theme: 'dark', profileVersion: 4, patternsEvaluatedAt: 'x', dailyCheckInGoal: 2, focusCategories: ['dt'], timeZone: 'Europe/London' } }] : [])).driver);
+  const { profile } = await fns.getUserProfile.run({ auth: auth(), data: {} });
+  for (const k of ['id', 'profileVersion', 'patternsEvaluatedAt', 'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories']) assert.ok(!(k in profile), k);
+  assert.deepEqual([profile.theme, profile.timeZone], ['dark', 'Europe/London']);
+});
+
+test('updateUserProfile ignores the retired goal fields', async () => {
+  const f = fakeDriver(() => []);
+  setDriver(f.driver);
+  await fns.updateUserProfile.run({ auth: auth(), data: { dailyCheckInGoal: 3, focusCategories: ['dt'] } });
+  assert.equal(f.calls.length, 0, 'nothing whitelisted, nothing written');
+});

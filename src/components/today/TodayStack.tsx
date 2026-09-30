@@ -3,6 +3,7 @@ import { useToday } from '../../hooks/useToday';
 import { useOppositeActionFollowUpsContext } from '../../hooks/useOppositeActionFollowUps';
 import { OppositeActionFollowUpCard } from '../tools/oppositeAction/OppositeActionFollowUpCard';
 import { TodayCard } from './TodayCard';
+import { PatternOfferCard } from '../me/PatternOfferCard';
 import type { TodayItem } from '../../services/spine';
 
 /** The number of cards shown before "N more". */
@@ -14,7 +15,8 @@ const VISIBLE = 3;
  * only before a check-in starts, so never beside a result or the crisis banner. A flooded band
  * collapses it: "Your plans will keep", nothing hidden.
  *
- * `renderItem` lets other modules draw their kinds (PR-P2's pattern offer); unknown kinds are skipped.
+ * Pattern offers (PR-P2) render as PatternOfferCard. `renderItem` lets other modules draw new kinds;
+ * unknown kinds are skipped.
  */
 export function TodayStack({ renderItem }: { renderItem?: (item: TodayItem, done: (id: string) => void) => ReactNode | null }) {
   const today = useToday();
@@ -27,6 +29,12 @@ export function TodayStack({ renderItem }: { renderItem?: (item: TodayItem, done
     const custom = renderItem?.(item, done);
     if (custom !== undefined && custom !== null) return <div key={item.id}>{custom}</div>;
     if (item.kind === 'follow_up' || item.kind === 'tool_outcome') return <TodayCard key={item.id} item={item} onDone={done} />;
+    if (item.kind === 'pattern_offer') {
+      return (
+        <PatternOfferCard key={item.id} id={item.id} statement={item.copy.title} offerCopy={item.copy.body}
+          toolId={item.source?.toolId} choices={item.choices} onDone={() => done(item.id)} />
+      );
+    }
     return null;
   };
 

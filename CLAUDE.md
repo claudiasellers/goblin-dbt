@@ -177,7 +177,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/services/neo4j.ts` | Cloud Function call wrappers |
 | `src/services/firebase.ts` | Firebase init, auth functions |
 | `src/contexts/AuthContext.tsx` | Firebase auth state provider |
-| `src/contexts/UserProfileContext.tsx` | User profile with caching |
+| `src/contexts/UserProfileContext.tsx` | App settings (theme, palette, reminders, retention, displayName) with a localStorage cache for the theme paint. Settings only: profile-layer data never goes here |
+| `src/pages/Profile.tsx` + `src/components/me/` | "Me" (nav label, D-10): the profile layer (About me, My body: quiet hours, My words: found words read-only, My patterns once an offer exists; still-true, set aside / restore, pattern offers) above the settings |
 | `functions/src/index.ts` | The deploy surface: named re-exports of every callable (module table above) |
 | `functions/src/shared/` | Driver + sessions (`neo4j.ts`), `auth.ts`, `validate.ts`, `errors.ts`, `callable.ts` |
 | `functions/src/userdata/` | Data layers: `layers.ts` (registry), `ownership.ts`, `lifecycle.ts` (finalise-once guards), `exportDelete.ts` |
