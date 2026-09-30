@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { QuadrantGrid } from '../components/checkin/QuadrantGrid';
+import { CheckInSquare } from '../components/checkin/CheckInSquare';
+import { WordPick } from '../components/checkin/WordPick';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
 import { StateResult } from '../components/checkin/StateResult';
@@ -17,6 +18,7 @@ import {
   type DiscriminatingQuestion,
 } from '../services/neo4j';
 import { getEmotionById, getEmotionByName } from '../data/emotions';
+import { allWords, emptySpot, leadSpot, quadrantAt, squareColor, type SquarePoint, type Spot } from '../lib/feelingSquare';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
 import { TodayStack } from '../components/today/TodayStack';
 import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
@@ -50,6 +52,7 @@ function routingBandSource(r: CapacityReading): 'probe' | 'ftf' | 'carried' {
 
 type CheckInStep =
   | 'emotion'
+  | 'word'
   | 'help_now'
   | 'find'
   | 'discriminating'
@@ -90,6 +93,10 @@ export function CheckIn() {
     note: '',
     timestamp: new Date(),
   });
+  // Places on the feeling square and the words picked for each (one spot for now).
+  const [spots, setSpots] = useState<Spot[]>([emptySpot()]);
+  const [active, setActive] = useState(0);
+  const point = spots[active]?.point ?? null;
   const [currentSensation, setCurrentSensation] = useState<Partial<BodySensation> | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
@@ -298,6 +305,44 @@ export function CheckIn() {
     setStep('help_now');
   }
 
+  // ── The square and its spots ──
+  function updateActive(change: (s: Spot) => Spot) {
+    setSpots(prev => prev.map((s, i) => (i === active ? change(s) : s)));
+  }
+
+  function handleMovePoint(p: SquarePoint) {
+    updateActive(s => ({ ...s, point: p }));
+  }
+
+  function handleToggleWord(name: string) {
+    updateActive(s => ({ ...s, words: s.words.includes(name) ? s.words.filter(w => w !== name) : [...s.words, name] }));
+  }
+
+  /**
+   * Done with the square: every picked word goes forward. The routing quadrant comes from the words
+   * (inferQuadrant), and intensity from the spot those words sit in. Spots without words are dropped.
+   * No words ("Continue without a word"): the quadrant and intensity come from the point.
+   */
+  function handleWordsContinue() {
+    setStartedAt(new Date());
+    setSource('grid');
+    setKnownEmotionIds([]);
+    ftfBlank.current = false;
+    const filled = spots.filter(s => s.point && s.words.length > 0);
+    const all = allWords(filled);
+    if (all.length === 0) {
+      const p = point ?? { x: 0.5, y: 0.5 };
+      setCheckInData(prev => ({ ...prev, intensity: { x: p.x, y: p.y } }));
+      void handleEmotionSelect([], quadrantAt(p));
+      return;
+    }
+    const lead = leadSpot(filled, inferQuadrant(all))?.point ?? point ?? { x: 0.5, y: 0.5 };
+    setSpots(filled);
+    setActive(Math.min(active, filled.length - 1));
+    setCheckInData(prev => ({ ...prev, intensity: { x: lead.x, y: lead.y } }));
+    void handleEmotionSelect(all);
+  }
+
   /**
    * "I don't know how I feel" - start with body sensations instead
    */
@@ -333,6 +378,8 @@ export function CheckIn() {
       return;
     }
     const intensity = { x: emotion.x ?? 0.5, y };
+    setSpots([{ point: intensity, words: [emotion.name] }]);
+    setActive(0);
     setCheckInData(prev => ({ ...prev, intensity }));
     void handleEmotionSelect([emotion.name]);
   }
@@ -396,8 +443,8 @@ export function CheckIn() {
     return best;
   }
 
-  async function handleEmotionSelect(emotions: string[]) {
-    const inferredQuadrant = inferQuadrant(emotions);
+  async function handleEmotionSelect(emotions: string[], fallbackQuadrant?: string) {
+    const inferredQuadrant = emotions.length > 0 || !fallbackQuadrant ? inferQuadrant(emotions) : fallbackQuadrant;
     setCheckInData(prev => ({ ...prev, emotions, quadrant: inferredQuadrant }));
 
     // Unpleasant check-ins: fetch the quadrant's discriminating questions (E4-6: high-unpleasant
@@ -533,16 +580,20 @@ export function CheckIn() {
     setEntryPoint('standard');
     setDiscriminatingQuestions([]);
     setDiscriminatingAnswers([]);
+    setSpots([emptySpot()]);
+    setActive(0);
     setStep('emotion');
   }
 
   function handleBack() {
+    const wordsOrSquare = point ? 'word' : 'emotion';
     switch (step) {
       case 'help_now':
+      case 'word':
         setStep('emotion');
         break;
       case 'discriminating':
-        setStep('emotion');
+        setStep(wordsOrSquare);
         break;
       case 'body':
         if (entryPoint === 'somatic') {
@@ -551,7 +602,7 @@ export function CheckIn() {
         } else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) {
           setStep('discriminating');
         } else {
-          setStep('emotion');
+          setStep(wordsOrSquare);
         }
         break;
       case 'sensation':
@@ -574,14 +625,25 @@ export function CheckIn() {
     ? ['body', 'suggestion']
     : [
       'emotion',
+      'word',
       ...(discriminatingQuestions.length > 0 ? ['discriminating'] : []),
       'body',
     ];
   const currentStepIndex = stepOrder.indexOf(step);
-  const showProgress = currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
+  // The square is the whole first screen; progress only shows once there is something behind you.
+  const showProgress = step !== 'emotion' && step !== 'word' && currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
+  // The room takes the colour of where the square was touched, for the rest of the check-in.
+  const tintPoint = point ?? spots.find(s => s.point)?.point ?? null;
+  const tintOn = tintPoint !== null && step !== 'complete' && step !== 'saving' && step !== 'help_now';
 
   return (
     <div>
+      <div
+        aria-hidden="true"
+        className={`feeling-tint${tintOn ? ' is-on' : ''}`}
+        style={tintPoint ? ({ ['--tint' as string]: squareColor(tintPoint) }) : undefined}
+      />
+
       {/* Today (PR-S5): follow-ups, "did it help?", OA plans. Only before a new check-in starts,
           so never beside a result or the crisis banner. */}
       {step === 'emotion' && <TodayStack />}
@@ -604,20 +666,20 @@ export function CheckIn() {
           <p className="text-xs text-center text-[var(--color-text-tertiary)] mt-2">
             {entryPoint === 'somatic'
               ? (currentStepIndex === 0 ? 'Start here' : 'Almost there')
-              : (currentStepIndex === 0 ? 'Start here' : 'Optional — tap "Help me now" anytime')
+              : (currentStepIndex === 0 ? 'Start here' : 'Optional. Skip anytime.')
             }
           </p>
         </div>
       )}
 
       {/* Back button for steps after first */}
-      {step !== 'emotion' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
+      {step !== 'emotion' && step !== 'find' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4 transition-colors"
+          className={`${step === 'word' ? 'max-w-md mx-auto w-full ' : ''}flex items-center gap-1 min-h-11 -ml-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-3 transition-colors bg-transparent border-none cursor-pointer`}
         >
-          <span>←</span>
-          <span className="text-sm font-medium">Back</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+          <span className="text-[15px] font-semibold">Back</span>
         </button>
       )}
 
@@ -630,11 +692,28 @@ export function CheckIn() {
 
       <div key={step} className="step-enter">
         {step === 'emotion' && (
-          <QuadrantGrid
-            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); ftfBlank.current = false; void handleEmotionSelect(emotions); }}
-            onHelpMeNow={handleHelpMeNow}
-            onSomaticEntry={handleSomaticEntry}
+          <CheckInSquare
+            spots={spots}
+            active={active}
+            onMove={handleMovePoint}
+            onToggleWord={handleToggleWord}
+            onSeeMore={() => setStep('word')}
+            onContinue={handleWordsContinue}
+            onHelpNow={handleHelpMeNow}
             onCantTell={() => { setStartedAt(new Date()); setStep('find'); }}
+            onStartWithBody={handleSomaticEntry}
+          />
+        )}
+
+        {step === 'word' && point && (
+          <WordPick
+            spots={spots}
+            active={active}
+            onToggleWord={handleToggleWord}
+            onContinue={handleWordsContinue}
+            onMovePoint={() => setStep('emotion')}
+            onNoneFit={() => { setStartedAt(new Date()); setStep('find'); }}
+            onHelpNow={handleHelpMeNow}
           />
         )}
 
@@ -642,9 +721,10 @@ export function CheckIn() {
 
         {step === 'find' && (
           <div className="space-y-3">
-            <button type="button" onClick={() => setStep('emotion')}
-              className="min-h-11 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
-              <span aria-hidden="true">← </span>Back to feelings
+            <button type="button" onClick={() => setStep(point ? 'word' : 'emotion')}
+              className="flex items-center gap-1 min-h-11 -ml-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] bg-transparent border-none cursor-pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+              <span className="text-[15px] font-semibold">{point ? 'Back to the words' : 'Back to the square'}</span>
             </button>
             <FindTheFeeling entry="checkin" onHandoff={handleFound} />
           </div>

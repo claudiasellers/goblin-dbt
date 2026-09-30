@@ -106,6 +106,13 @@
   --color-fam-ie: #4A2A3A;
   --color-fam-ie-text: #F5BCD1;
   --color-fam-ie-lip: #2A1520;
+  --square-halo: 0.55;
+  --square-shade: rgba(28, 16, 32, 0.30);
+  --square-art: none;
+  --square-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -18px 40px rgba(0, 0, 0, 0.18);
+  --square-dot: #FFFFFF;
+  --square-dot-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35), 0 0 18px 6px rgba(255, 255, 255, 0.55);
+  --square-tint: 0.34;
 }
 
 /* ── Room: Dusk (dark): cool slate, muted colour, one warm brass light ── */
@@ -165,6 +172,13 @@
   --color-fam-ie: #594452;
   --color-fam-ie-text: #F0C9D6;
   --color-fam-ie-lip: #382A33;
+  --square-halo: 0.35;
+  --square-shade: rgba(230, 236, 244, 0.14);
+  --square-art: none;
+  --square-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -18px 40px rgba(0, 0, 0, 0.18);
+  --square-dot: #FFFFFF;
+  --square-dot-shadow: 0 0 0 4px rgba(255, 255, 255, 0.35), 0 0 18px 6px rgba(255, 255, 255, 0.55);
+  --square-tint: 0.28;
 }
 
 /* ── Room: Tinted (light): warm plaster, colour washing in from the corners ── */
@@ -224,6 +238,13 @@
   --color-fam-ie: #F4E0E6;
   --color-fam-ie-text: #853A55;
   --color-fam-ie-lip: #E5B7C5;
+  --square-halo: 0;
+  --square-shade: transparent;
+  --square-art: radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-q-hu-fill) 66%, transparent), transparent 56%), radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-q-hp-fill) 66%, transparent), transparent 56%), radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--color-q-lu-fill) 66%, transparent), transparent 56%), radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--color-q-lp-fill) 66%, transparent), transparent 56%), radial-gradient(closest-side, rgba(255, 251, 244, 0.7), rgba(255, 251, 244, 0)), #F1EADF;
+  --square-edge: inset 0 3px 8px rgba(70, 52, 34, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.7), 0 1px 0 rgba(255, 255, 255, 0.8);
+  --square-dot: var(--color-text-primary);
+  --square-dot-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85), 0 4px 12px rgba(42, 39, 66, 0.35);
+  --square-tint: 0.38;
 }
 
 /* ── Room: Pastel (light): blush into sky, candy corners, coral action ── */
@@ -283,6 +304,13 @@
   --color-fam-ie: #FFE9F1;
   --color-fam-ie-text: #9A2F5C;
   --color-fam-ie-lip: #F2A9C4;
+  --square-halo: 0.5;
+  --square-shade: rgba(255, 255, 255, 0.35);
+  --square-art: none;
+  --square-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -18px 40px rgba(0, 0, 0, 0.18);
+  --square-dot: var(--color-text-primary);
+  --square-dot-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85), 0 4px 12px rgba(42, 39, 66, 0.35);
+  --square-tint: 0.45;
 }
 
 /* ── Room: Pastel mix (light): warm and cool pastels on every screen, periwinkle action ── */
@@ -342,6 +370,13 @@
   --color-fam-ie: #FFE9F1;
   --color-fam-ie-text: #9A2F5C;
   --color-fam-ie-lip: #F2A9C4;
+  --square-halo: 0.5;
+  --square-shade: rgba(255, 255, 255, 0.35);
+  --square-art: none;
+  --square-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -18px 40px rgba(0, 0, 0, 0.18);
+  --square-dot: var(--color-text-primary);
+  --square-dot-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85), 0 4px 12px rgba(42, 39, 66, 0.35);
+  --square-tint: 0.45;
 }
 
 /* ── Room: Daylight (light): bright and clear, full-strength colour, indigo action ── */
@@ -401,6 +436,13 @@
   --color-fam-ie: #FBE3EC;
   --color-fam-ie-text: #96305C;
   --color-fam-ie-lip: #EDB3C8;
+  --square-halo: 0.42;
+  --square-shade: rgba(255, 255, 255, 0.2);
+  --square-art: none;
+  --square-edge: inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -18px 40px rgba(0, 0, 0, 0.18);
+  --square-dot: var(--color-text-primary);
+  --square-dot-shadow: 0 0 0 4px rgba(255, 255, 255, 0.85), 0 4px 12px rgba(42, 39, 66, 0.35);
+  --square-tint: 0.3;
 }
 /* ROOMS:END */
 
@@ -844,6 +886,258 @@ h1.uppercase, h2.uppercase {
 
 @media (prefers-reduced-motion: reduce) {
   .lift-primary:active:not(:disabled), .lift-secondary:active:not(:disabled) { transform: none; }
+}
+
+/* ── The feeling square (check-in) ──
+   One continuous field from the room's quadrant fills: low row blends LU→LP, the high row HU→HP
+   fades in toward the top. Per-room look lives in the --square-* tokens (ROOMS block above). */
+.feeling-square {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+  border-radius: 26px;
+  isolation: isolate;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: crosshair;
+  outline: none;
+}
+.feeling-square[aria-hidden] { cursor: inherit; }
+.feeling-square.is-small { border-radius: 18px; }
+.feeling-square > i { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; }
+.feeling-square > .fs-halo {
+  inset: 6%;
+  z-index: -1;
+  border-radius: 40px;
+  filter: blur(34px);
+  opacity: var(--square-halo, 0.5);
+  background: linear-gradient(90deg, var(--color-q-hu-fill), var(--color-q-hp-fill));
+}
+.feeling-square > .fs-halo--low {
+  background: linear-gradient(90deg, var(--color-q-lu-fill), var(--color-q-lp-fill));
+  -webkit-mask-image: linear-gradient(180deg, transparent 40%, #000);
+  mask-image: linear-gradient(180deg, transparent 40%, #000);
+}
+.feeling-square.is-small > .fs-halo { display: none; }
+.feeling-square > .fs-lo { background: linear-gradient(90deg, var(--color-q-lu-fill), var(--color-q-lp-fill)); }
+.feeling-square > .fs-hi {
+  background: linear-gradient(90deg, var(--color-q-hu-fill), var(--color-q-hp-fill));
+  -webkit-mask-image: linear-gradient(180deg, #000 8%, transparent 92%);
+  mask-image: linear-gradient(180deg, #000 8%, transparent 92%);
+}
+.feeling-square > .fs-shade { background: radial-gradient(closest-side, var(--square-shade, transparent), transparent); }
+.feeling-square > .fs-art { background: var(--square-art, none); box-shadow: var(--square-edge); }
+.feeling-square:focus-visible { box-shadow: 0 0 0 3px var(--color-bg-primary), 0 0 0 6px var(--color-accent); }
+.fs-axis {
+  position: absolute;
+  z-index: 1;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  color: var(--color-on-quadrant);
+  pointer-events: none;
+}
+.fs-axis--top { top: 12px; left: 50%; transform: translateX(-50%); }
+.fs-axis--bottom { bottom: 12px; left: 50%; transform: translateX(-50%); }
+.fs-axis--left { left: 20px; top: 50%; transform: translate(-50%, -50%) rotate(-90deg); }
+.fs-axis--right { right: 20px; top: 50%; transform: translate(50%, -50%) rotate(90deg); }
+.fs-dot {
+  position: absolute;
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: var(--square-dot, #fff);
+  box-shadow: var(--square-dot-shadow);
+  pointer-events: none;
+  animation: popIn 180ms var(--ease-enter) backwards;
+  transition: left 80ms linear, top 80ms linear;
+}
+.feeling-square.is-dragging .fs-dot { transition: none; }
+.fs-dot--other { z-index: 1; width: 16px; height: 16px; margin: -8px 0 0 -8px; opacity: 0.72; animation: none; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35); }
+.fs-tag {
+  position: absolute;
+  z-index: 1;
+  transform: translate(14px, -50%);
+  padding: 2px 9px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #1B121F;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.fs-tag--left { transform: translate(calc(-100% - 14px), -50%); }
+.feeling-square.is-small .fs-dot {
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
+}
+.feeling-square.is-small .fs-dot--other { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
+
+/* The room takes the colour of where the square was touched (a wash from the top, behind everything). */
+.feeling-tint {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(120% 65% at 50% -12%, var(--tint, transparent), transparent 72%);
+  opacity: 0;
+  transition: opacity 700ms var(--ease-default);
+}
+.feeling-tint.is-on { opacity: var(--square-tint, 0.35); }
+
+/* ── Den chips: big pressable choices sitting on a lip ── */
+.den-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 54px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--color-text-primary);
+  background: linear-gradient(180deg, var(--color-bg-card-hover), var(--color-bg-elevated));
+  box-shadow: 0 4px 0 var(--color-lip), 0 10px 20px -14px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: transform 120ms var(--ease-default), box-shadow 120ms var(--ease-default), background-color 160ms var(--ease-default);
+}
+.den-chip:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--color-lip); }
+.den-chip:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.den-chip[aria-pressed='true'] {
+  background: var(--chip-on, var(--color-accent-fill));
+  color: var(--color-on-quadrant);
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--chip-on, var(--color-accent-fill)) 55%, #000), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+}
+.den-chip--small { min-height: 44px; padding: 0 14px; font-size: 14.5px; border-radius: 14px; box-shadow: 0 3px 0 var(--color-lip); }
+.den-chip .qd { width: 9px; height: 9px; border-radius: 50%; flex: none; }
+.den-chip .gd {
+  width: 10px;
+  height: 10px;
+  flex: none;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.75;
+  box-shadow: inset 0 -2px 3px rgba(0, 0, 0, 0.18), inset 0 2px 2px rgba(255, 255, 255, 0.5);
+}
+.den-chip--er { background: var(--color-fam-er); color: var(--color-fam-er-text); box-shadow: 0 4px 0 var(--color-fam-er-lip), 0 10px 20px -14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.den-chip--dt { background: var(--color-fam-dt); color: var(--color-fam-dt-text); box-shadow: 0 4px 0 var(--color-fam-dt-lip), 0 10px 20px -14px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25); }
+.den-chip--er:active { box-shadow: 0 1px 0 var(--color-fam-er-lip); }
+.den-chip--dt:active { box-shadow: 0 1px 0 var(--color-fam-dt-lip); }
+
+/* ── Tool cards, colour-coded by skill family (data-family = dt | er | ie; none = neutral) ── */
+.tool-card {
+  --fam: var(--color-bg-elevated);
+  --fam-lip: var(--color-lip);
+  --fam-text: var(--color-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 16px 18px;
+  border-radius: 18px;
+  background: var(--fam);
+  box-shadow: 0 4px 0 var(--fam-lip), 0 12px 22px -16px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  text-decoration: none;
+  transition: transform 120ms var(--ease-default), box-shadow 120ms var(--ease-default);
+}
+.tool-card[data-family='dt'] { --fam: var(--color-fam-dt); --fam-lip: var(--color-fam-dt-lip); --fam-text: var(--color-fam-dt-text); }
+.tool-card[data-family='er'] { --fam: var(--color-fam-er); --fam-lip: var(--color-fam-er-lip); --fam-text: var(--color-fam-er-text); }
+.tool-card[data-family='ie'] { --fam: var(--color-fam-ie); --fam-lip: var(--color-fam-ie-lip); --fam-text: var(--color-fam-ie-text); }
+.tool-card:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--fam-lip); }
+.tool-card:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.tool-card__family { font-size: 13px; font-weight: 700; color: var(--fam-text); }
+.tool-card__chevron { flex: none; color: var(--fam-text); }
+@media (prefers-reduced-motion: reduce) { .tool-card:active { transform: none; } }
+
+/* "Something else in there too?": a dashed invitation to place another spot on the square. */
+.add-spot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1.5px dashed var(--color-border-accent);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.add-spot:hover { border-color: var(--color-accent); }
+.add-spot:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.add-spot__plus {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 22px;
+  font-weight: 400;
+}
+
+/* A primary action that stays reachable while a list scrolls under it: frosted like the header. */
+.action-dock {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  margin: 20px -16px 0;
+  padding: 16px 16px 12px;
+  background: var(--color-glass-panel);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 16px);
+  mask-image: linear-gradient(180deg, transparent, #000 16px);
+}
+@media (min-width: 768px) {
+  .action-dock { position: static; margin: 24px 0 0; padding: 0; background: none; -webkit-backdrop-filter: none; backdrop-filter: none; -webkit-mask-image: none; mask-image: none; }
+}
+
+/* Help now: always the same outlined pill, so it is findable at a glance. */
+.help-now {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  color: var(--color-accent);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.help-now::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 8px currentColor;
+}
+.help-now:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .den-chip:active, .den-chip[aria-pressed='true'] { transform: none; }
+  .feeling-tint { transition: none; }
 }
 
 /* Emotion chips (unselected) — border sharpens + tiny shadow */
