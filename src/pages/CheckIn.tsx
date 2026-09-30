@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
-import { QuadrantGrid } from '../components/checkin/QuadrantGrid';
+import { CheckInSquare } from '../components/checkin/CheckInSquare';
+import { WordPick } from '../components/checkin/WordPick';
 import { BodyMap } from '../components/checkin/BodyMap';
 import { SensationDetails } from '../components/checkin/SensationDetails';
 import { StateResult } from '../components/checkin/StateResult';
@@ -17,6 +18,7 @@ import {
   type DiscriminatingQuestion,
 } from '../services/neo4j';
 import { getEmotionById, getEmotionByName } from '../data/emotions';
+import { quadrantAt, squareColor, type SquarePoint } from '../lib/feelingSquare';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
 import { useOppositeActionFollowUpsContext } from '../hooks/useOppositeActionFollowUps';
 import { OppositeActionFollowUpCard } from '../components/tools/oppositeAction/OppositeActionFollowUpCard';
@@ -25,6 +27,7 @@ type EntryPoint = 'standard' | 'somatic';
 
 type CheckInStep =
   | 'emotion'
+  | 'word'
   | 'find'
   | 'discriminating'
   | 'body'
@@ -64,6 +67,9 @@ export function CheckIn() {
     note: '',
     timestamp: new Date(),
   });
+  // Where the touch landed on the feeling square, and the words picked for it.
+  const [point, setPoint] = useState<SquarePoint | null>(null);
+  const [words, setWords] = useState<string[]>([]);
   const [currentSensation, setCurrentSensation] = useState<Partial<BodySensation> | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
@@ -113,9 +119,10 @@ export function CheckIn() {
    * Accepts optional overrides so callers that just called setState
    * (which won't have flushed yet) can pass the fresh values directly.
    */
-  async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[]; discAnswers?: Array<{ questionId: string; responseId: string }> }) {
+  async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[]; intensity?: { x: number; y: number }; discAnswers?: Array<{ questionId: string; responseId: string }> }) {
     const quadrant = overrides?.quadrant ?? checkInData.quadrant;
     const emotions = overrides?.emotions ?? checkInData.emotions;
+    const intensity = overrides?.intensity ?? checkInData.intensity;
     const discAnsw = overrides?.discAnswers ?? discriminatingAnswers;
     if (!quadrant) return;
 
@@ -126,7 +133,7 @@ export function CheckIn() {
       const result = await getStateAndTools({
         quadrant,
         emotions: emotions.length > 0 ? emotions : undefined,
-        intensity: checkInData.intensity || undefined,
+        intensity: intensity || undefined,
         bodySensations: checkInData.bodySensations.length > 0
           ? checkInData.bodySensations.map(s => ({ region: s.region, tags: s.tags }))
           : undefined,
@@ -146,7 +153,7 @@ export function CheckIn() {
           await saveCheckIn(user.uid, {
             emotion: emotions.join(', ') || quadrant,
             quadrant,
-            intensity: checkInData.intensity || { x: 0.5, y: 0.5 },
+            intensity: intensity || { x: 0.5, y: 0.5 },
             bodySensations: checkInData.bodySensations,
             note: checkInData.note,
             timestamp: new Date(),
@@ -162,10 +169,27 @@ export function CheckIn() {
   }
 
   /**
-   * "Help me now" - skip to analysis with just quadrant
+   * "Help now": skip straight to tools. Uses whatever is known so far (picked words, else where the
+   * square was touched). With nothing yet, assume the loud end: that is when people reach for it.
    */
   function handleHelpMeNow() {
-    analyzeAndShowResult();
+    const quadrant = words.length > 0
+      ? inferQuadrant(words)
+      : checkInData.quadrant ?? (point ? quadrantAt(point) : 'high-unpleasant');
+    const intensity = point ? { x: point.x, y: point.y } : checkInData.intensity ?? { x: 0.2, y: 0.85 };
+    setCheckInData(prev => ({ ...prev, quadrant, emotions: words, intensity }));
+    analyzeAndShowResult({ quadrant, emotions: words, intensity });
+  }
+
+  /** The touch landed on the square: remember it and move to the words. */
+  function handlePlace(p: SquarePoint) {
+    setPoint(p);
+    setCheckInData(prev => ({ ...prev, intensity: { x: p.x, y: p.y } }));
+    setStep('word');
+  }
+
+  function handleWordsContinue() {
+    void handleEmotionSelect(words, point ? quadrantAt(point) : undefined);
   }
 
   /**
@@ -189,6 +213,8 @@ export function CheckIn() {
       return;
     }
     const intensity = { x: emotion.x ?? 0.5, y: r.intensityY };
+    setPoint(intensity);
+    setWords([emotion.name]);
     setCheckInData(prev => ({ ...prev, intensity }));
     void handleEmotionSelect([emotion.name]);
   }
@@ -239,8 +265,8 @@ export function CheckIn() {
     return best;
   }
 
-  async function handleEmotionSelect(emotions: string[]) {
-    const inferredQuadrant = inferQuadrant(emotions);
+  async function handleEmotionSelect(emotions: string[], fallbackQuadrant?: string) {
+    const inferredQuadrant = emotions.length > 0 || !fallbackQuadrant ? inferQuadrant(emotions) : fallbackQuadrant;
     setCheckInData(prev => ({ ...prev, emotions, quadrant: inferredQuadrant }));
 
     // For low-unpleasant, try to fetch discriminating questions
@@ -360,13 +386,19 @@ export function CheckIn() {
     setEntryPoint('standard');
     setDiscriminatingQuestions([]);
     setDiscriminatingAnswers([]);
+    setPoint(null);
+    setWords([]);
     setStep('emotion');
   }
 
   function handleBack() {
+    const wordsOrSquare = point ? 'word' : 'emotion';
     switch (step) {
-      case 'discriminating':
+      case 'word':
         setStep('emotion');
+        break;
+      case 'discriminating':
+        setStep(wordsOrSquare);
         break;
       case 'body':
         if (entryPoint === 'somatic') {
@@ -375,7 +407,7 @@ export function CheckIn() {
         } else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') {
           setStep('discriminating');
         } else {
-          setStep('emotion');
+          setStep(wordsOrSquare);
         }
         break;
       case 'sensation':
@@ -397,13 +429,22 @@ export function CheckIn() {
   const stepOrder = entryPoint === 'somatic'
     ? ['body', 'suggestion']
     : discriminatingQuestions.length > 0
-      ? ['emotion', 'discriminating', 'body']
-      : ['emotion', 'body'];
+      ? ['emotion', 'word', 'discriminating', 'body']
+      : ['emotion', 'word', 'body'];
   const currentStepIndex = stepOrder.indexOf(step);
-  const showProgress = currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
+  // The square is the whole first screen; progress only shows once there is something behind you.
+  const showProgress = step !== 'emotion' && step !== 'word' && currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
+  // The room takes the colour of where the square was touched, for the rest of the check-in.
+  const tintOn = point !== null && step !== 'complete' && step !== 'saving';
 
   return (
     <div>
+      <div
+        aria-hidden="true"
+        className={`feeling-tint${tintOn ? ' is-on' : ''}`}
+        style={point ? ({ ['--tint' as string]: squareColor(point) }) : undefined}
+      />
+
       {/* Follow-up on an Opposite Action plan, only before a new check-in starts */}
       {step === 'emotion' && followUps.pending.length > 0 && followUps.ready && (
         <OppositeActionFollowUpCard pending={followUps.pending} copy={followUps.copy} />
@@ -427,20 +468,20 @@ export function CheckIn() {
           <p className="text-xs text-center text-[var(--color-text-tertiary)] mt-2">
             {entryPoint === 'somatic'
               ? (currentStepIndex === 0 ? 'Start here' : 'Almost there')
-              : (currentStepIndex === 0 ? 'Start here' : 'Optional — tap "Help me now" anytime')
+              : (currentStepIndex === 0 ? 'Start here' : 'Optional. Skip anytime.')
             }
           </p>
         </div>
       )}
 
       {/* Back button for steps after first */}
-      {step !== 'emotion' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
+      {step !== 'emotion' && step !== 'find' && step !== 'analyzing' && step !== 'saving' && step !== 'complete' && (
         <button
           onClick={handleBack}
-          className="flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-4 transition-colors"
+          className={`${step === 'word' ? 'max-w-md mx-auto w-full ' : ''}flex items-center gap-1 min-h-11 -ml-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] mb-3 transition-colors bg-transparent border-none cursor-pointer`}
         >
-          <span>←</span>
-          <span className="text-sm font-medium">Back</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+          <span className="text-[15px] font-semibold">Back</span>
         </button>
       )}
 
@@ -453,19 +494,34 @@ export function CheckIn() {
 
       <div key={step} className="step-enter">
         {step === 'emotion' && (
-          <QuadrantGrid
-            onSelect={handleEmotionSelect}
-            onHelpMeNow={handleHelpMeNow}
-            onSomaticEntry={handleSomaticEntry}
+          <CheckInSquare
+            point={point}
+            onMove={setPoint}
+            onPlace={handlePlace}
+            onHelpNow={handleHelpMeNow}
             onCantTell={() => setStep('find')}
+            onStartWithBody={handleSomaticEntry}
+          />
+        )}
+
+        {step === 'word' && point && (
+          <WordPick
+            point={point}
+            selected={words}
+            onChange={setWords}
+            onContinue={handleWordsContinue}
+            onMovePoint={() => setStep('emotion')}
+            onNoneFit={() => setStep('find')}
+            onHelpNow={handleHelpMeNow}
           />
         )}
 
         {step === 'find' && (
           <div className="space-y-3">
-            <button type="button" onClick={() => setStep('emotion')}
-              className="min-h-11 text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
-              <span aria-hidden="true">← </span>Back to feelings
+            <button type="button" onClick={() => setStep(point ? 'word' : 'emotion')}
+              className="flex items-center gap-1 min-h-11 -ml-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] bg-transparent border-none cursor-pointer">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
+              <span className="text-[15px] font-semibold">{point ? 'Back to the words' : 'Back to the square'}</span>
             </button>
             <FindTheFeeling entry="checkin" onHandoff={handleFound} />
           </div>

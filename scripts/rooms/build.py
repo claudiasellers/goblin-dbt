@@ -15,6 +15,23 @@ TOK = ['page', 'page2', 'card', 'card-hover', 'elevated', 'input', 'border', 'bo
        'tag-pink', 'tag-teal', 'sidebar', 'sidebar-border', 'q-hu', 'q-hu-text', 'q-hp', 'q-hp-text', 'q-lu', 'q-lu-text',
        'q-lp', 'q-lp-text', 'field', 'field-fg']
 
+# The feeling square (check-in): halo opacity, centre shade, optional art layer over the colour
+# (Tinted's glaze), edge light, the dot, and how strongly the page tints after a touch.
+# Emitted as-is (keys starting with "--" skip the --color- prefix).
+EDGE_GLASS = 'inset 0 0 0 1px rgba(255, 255, 255, 0.22), inset 0 2px 0 rgba(255, 255, 255, 0.25), inset 0 -18px 40px rgba(0, 0, 0, 0.18)'
+SQUARE_DARK = {'--square-halo': '0.55', '--square-shade': 'rgba(28, 16, 32, 0.30)', '--square-art': 'none', '--square-edge': EDGE_GLASS,
+               '--square-dot': '#FFFFFF', '--square-dot-shadow': '0 0 0 4px rgba(255, 255, 255, 0.35), 0 0 18px 6px rgba(255, 255, 255, 0.55)',
+               '--square-tint': '0.34'}
+SQUARE_LIGHT = {'--square-halo': '0.5', '--square-shade': 'rgba(255, 255, 255, 0.35)', '--square-art': 'none', '--square-edge': EDGE_GLASS,
+                '--square-dot': 'var(--color-text-primary)', '--square-dot-shadow': '0 0 0 4px rgba(255, 255, 255, 0.85), 0 4px 12px rgba(42, 39, 66, 0.35)',
+                '--square-tint': '0.45'}
+# Tinted: plaster glaze with the four colours washing in from the corners (built from the room's own fills).
+GLAZE = ('radial-gradient(circle at 0% 0%, color-mix(in srgb, var(--color-q-hu-fill) 66%, transparent), transparent 56%), '
+         'radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--color-q-hp-fill) 66%, transparent), transparent 56%), '
+         'radial-gradient(circle at 0% 100%, color-mix(in srgb, var(--color-q-lu-fill) 66%, transparent), transparent 56%), '
+         'radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--color-q-lp-fill) 66%, transparent), transparent 56%), '
+         'radial-gradient(closest-side, rgba(255, 251, 244, 0.7), rgba(255, 251, 244, 0)), #F1EADF')
+
 ROOMS = {}
 
 ROOMS['velvet'] = dict(
@@ -33,7 +50,8 @@ ROOMS['velvet'] = dict(
            'accent-lip': '#8E6128', 'lip': '#120A15',
            'fam-dt': '#2B4A4D', 'fam-dt-text': '#A6E0D8', 'fam-dt-lip': '#132A2C',
            'fam-er': '#3A3160', 'fam-er-text': '#D3C9FF', 'fam-er-lip': '#211B3C',
-           'fam-ie': '#4A2A3A', 'fam-ie-text': '#F5BCD1', 'fam-ie-lip': '#2A1520'})
+           'fam-ie': '#4A2A3A', 'fam-ie-text': '#F5BCD1', 'fam-ie-lip': '#2A1520',
+           **SQUARE_DARK})
 
 ROOMS['dusk'] = dict(
     title='Dusk (dark): cool slate, muted colour, one warm brass light',
@@ -51,7 +69,8 @@ ROOMS['dusk'] = dict(
            'accent-lip': '#7A5A3B', 'lip': '#161A22',
            'fam-dt': '#3A5558', 'fam-dt-text': '#BDE6E0', 'fam-dt-lip': '#243638',
            'fam-er': '#4A4766', 'fam-er-text': '#D9D4F2', 'fam-er-lip': '#2E2C42',
-           'fam-ie': '#594452', 'fam-ie-text': '#F0C9D6', 'fam-ie-lip': '#382A33'})
+           'fam-ie': '#594452', 'fam-ie-text': '#F0C9D6', 'fam-ie-lip': '#382A33',
+           **dict(SQUARE_DARK, **{'--square-halo': '0.35', '--square-shade': 'rgba(230, 236, 244, 0.14)', '--square-tint': '0.28'})})
 
 ROOMS['tinted'] = dict(
     title='Tinted (light): warm plaster, colour washing in from the corners',
@@ -69,7 +88,9 @@ ROOMS['tinted'] = dict(
            'accent-lip': '#46321A', 'lip': '#CDBEA8',
            'fam-dt': '#DCEBEA', 'fam-dt-text': '#2A5F64', 'fam-dt-lip': '#A8CDCB',
            'fam-er': '#E7E3F2', 'fam-er-text': '#524686', 'fam-er-lip': '#C7BFE2',
-           'fam-ie': '#F4E0E6', 'fam-ie-text': '#853A55', 'fam-ie-lip': '#E5B7C5'})
+           'fam-ie': '#F4E0E6', 'fam-ie-text': '#853A55', 'fam-ie-lip': '#E5B7C5',
+           **dict(SQUARE_LIGHT, **{'--square-halo': '0', '--square-art': GLAZE, '--square-shade': 'transparent', '--square-tint': '0.38',
+              '--square-edge': 'inset 0 3px 8px rgba(70, 52, 34, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.7), 0 1px 0 rgba(255, 255, 255, 0.8)'})})
 
 PASTEL_Q = {'q-hu': '#FFA898', 'q-hu-text': '#A33E2E', 'q-hp': '#FFDC7E', 'q-hp-text': '#7A5600', 'q-lu': '#A5BCFF', 'q-lu-text': '#34498F',
             'q-lp': '#A2E3C0', 'q-lp-text': '#276B48'}
@@ -88,7 +109,8 @@ ROOMS['pastel'] = dict(
            'accent-lip': '#D8766A', 'lip': '#EDBBA7',
            'fam-dt': '#DDF7F3', 'fam-dt-text': '#1E6B66', 'fam-dt-lip': '#93D5CC',
            'fam-er': '#EEE8FF', 'fam-er-text': '#4E3F99', 'fam-er-lip': '#BCAEF2',
-           'fam-ie': '#FFE9F1', 'fam-ie-text': '#9A2F5C', 'fam-ie-lip': '#F2A9C4'})
+           'fam-ie': '#FFE9F1', 'fam-ie-text': '#9A2F5C', 'fam-ie-lip': '#F2A9C4',
+           **SQUARE_LIGHT})
 
 ROOMS['pastel-mix'] = dict(
     title='Pastel mix (light): warm and cool pastels on every screen, periwinkle action',
@@ -104,7 +126,8 @@ ROOMS['pastel-mix'] = dict(
            'accent-lip': '#6E83DA', 'lip': '#DCD0E2',
            'fam-dt': '#DDF7F3', 'fam-dt-text': '#1E6B66', 'fam-dt-lip': '#93D5CC',
            'fam-er': '#EEE8FF', 'fam-er-text': '#4E3F99', 'fam-er-lip': '#BCAEF2',
-           'fam-ie': '#FFE9F1', 'fam-ie-text': '#9A2F5C', 'fam-ie-lip': '#F2A9C4'})
+           'fam-ie': '#FFE9F1', 'fam-ie-text': '#9A2F5C', 'fam-ie-lip': '#F2A9C4',
+           **SQUARE_LIGHT})
 
 ROOMS['daylight'] = dict(
     title='Daylight (light): bright and clear, full-strength colour, indigo action',
@@ -122,7 +145,8 @@ ROOMS['daylight'] = dict(
            'accent-lip': '#161F5E', 'lip': '#B7C2E2',
            'fam-dt': '#DDF3F0', 'fam-dt-text': '#1F6B66', 'fam-dt-lip': '#A8D8D1',
            'fam-er': '#E7E4FA', 'fam-er-text': '#4B3F9E', 'fam-er-lip': '#C3BAF0',
-           'fam-ie': '#FBE3EC', 'fam-ie-text': '#96305C', 'fam-ie-lip': '#EDB3C8'})
+           'fam-ie': '#FBE3EC', 'fam-ie-text': '#96305C', 'fam-ie-lip': '#EDB3C8',
+           **dict(SQUARE_LIGHT, **{'--square-halo': '0.42', '--square-shade': 'rgba(255, 255, 255, 0.2)', '--square-tint': '0.3'})})
 
 
 def lum(h):
@@ -146,6 +170,8 @@ for rid, r in ROOMS.items():
               ('on-danger/danger', p['on-danger'], p['danger'])]
     checks += [('%s/card' % q, p['%s-text' % q], p['card']) for q in ('q-hu', 'q-hp', 'q-lu', 'q-lp')]
     checks += [('%s text/tile' % f, e['%s-text' % f], e[f]) for f in ('fam-dt', 'fam-er', 'fam-ie')]
+    # Tool cards put the room's ink and secondary text on the family tile too.
+    checks += [('%s/%s tile' % (t, f), p[t], e[f]) for f in ('fam-dt', 'fam-er', 'fam-ie') for t in ('ink', 'text2')]
     checks += [('on-quadrant/%s' % q, e['on-quadrant'], p[q]) for q in ('q-hu', 'q-hp', 'q-lu', 'q-lp')]
     for name, fg, bg in checks:
         r_ = ratio(fg, bg)
@@ -166,7 +192,7 @@ for rid, r in ROOMS.items():
         out.append('  --pal-%s-light: %s;  --pal-%s-dark: %s;' % (t, p[t], t, p[t]))
     out.append('  /* room-only tokens (a room has one mode, so these skip the light/dark pairing) */')
     for k, v in e.items():
-        out.append('  --color-%s: %s;' % (k, v))
+        out.append('  %s: %s;' % (k, v) if k.startswith('--') else '  --color-%s: %s;' % (k, v))
     out.append('}')
     out.append('')
 if fail:

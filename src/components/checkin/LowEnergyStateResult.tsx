@@ -276,7 +276,7 @@ function ToolCardCompact({
             {tool.description || tool.whenToUse}
           </p>
         </div>
-        <span className="text-[var(--color-text-muted)] flex-shrink-0">\u2192</span>
+        <svg className="text-[var(--color-text-muted)] flex-shrink-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
       </div>
     </Link>
   );

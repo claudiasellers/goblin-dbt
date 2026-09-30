@@ -109,7 +109,10 @@ Emotion nodes in the graph have a `dbtParent` property that maps child emotions 
 
 | File | Purpose |
 |------|---------|
-| `src/pages/CheckIn.tsx` | Multi-step check-in flow (quadrant → emotion → intensity → body) |
+| `src/pages/CheckIn.tsx` | Multi-step check-in flow (feeling square → word → body → result; Help now from the first two screens) |
+| `src/components/checkin/FeelingSquare.tsx` | The continuous check-in square (touch, drag, lift; arrow keys); `CheckInSquare.tsx` and `WordPick.tsx` are its two screens; logic in `src/lib/feelingSquare.ts`; see `docs/design/den-rooms.md` |
+| `src/data/skillFamilies.ts` | Skill-family label and colour key per tool module (teal get through it, lavender shift it, rose with other people) |
+| `scripts/rooms/build.py` | Source for the room colour blocks in `src/index.css` (six rooms, `--square-*` tokens, contrast check) |
 | `src/components/StateResult.tsx` | Shows activation pattern + recommended tools after check-in |
 | `src/pages/tools/ToolPage.tsx` | Tool detail page with interactive component routing |
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |

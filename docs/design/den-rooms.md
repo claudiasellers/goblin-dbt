@@ -1,4 +1,4 @@
-# The Den: rooms, type and pressable controls (PR 1 of 3)
+# The Den: rooms, type, pressable controls and the square
 
 Branch `design/den-rooms`. Design source: the "Goblin UI directions" canvas
 (direction D, The Den, and its rooms). This is the token pass only: colour,
@@ -63,8 +63,50 @@ saving a room from Profile is rejected server-side ("Unknown palette").
   skill family (`data-category`); tint the room from the check-in
   (`data-quadrant`); retire tracked-caps eyebrows; fix the literal `→`
   on the result cards.
-- **PR 3, the square:** the continuous gradient field replaces the four
-  quadrant boxes, with the pick-a-word, result and before/now screens.
+- **PR 3, the square:** built on this branch (see below), except the
+  before/now screen.
 - **Later, comfort settings:** day room and night room, tint-with-my-check-in
   on/off, quieter colour, reduce motion, text size, pinned tools. Each is an
   attribute next to `data-palette`.
+
+## PR 3: the check-in square
+
+The check-in's first screen is one question ("How is it in there?") and one
+continuous square. Pleasantness runs left to right and energy bottom to top.
+The colour is the room's four quadrant fills blended across the whole
+surface, so there are no box borders to land on the wrong side of.
+
+- **Touch, drag, lift.** Lifting commits the point. It sets
+  `intensity {x, y}`, the dot settles for about 380 ms, and the words screen
+  opens. Keyboard: the arrow keys move the point (hold Shift for bigger
+  steps), and Enter or Space commits. `src/components/checkin/FeelingSquare.tsx`.
+- **The room takes the colour of the touch.** A wash from the top of the
+  page, `.feeling-tint`, is mixed in CSS from the room's fills (`squareColor`
+  in `src/lib/feelingSquare.ts`). It stays on for the rest of the check-in.
+- **Which word is closest?** Eight words, nearest the point first, ranked by
+  the x/y already in `src/data/emotions.ts`. Common (`core`) words are pulled
+  a little closer. A picked chip takes its own quadrant's fill.
+  - After the first pick, the graph's related words appear as small "+"
+    chips.
+  - "More words" pages outward. "None of these fit" opens Find the feeling.
+  - "Continue without a word" is allowed; the quadrant then comes from the
+    point.
+  - A small copy of the square at the top reads the place back in plain words
+    (`describePlace`). Tapping it moves the point.
+- **Two ways out** on the first screen:
+  - "I can't tell" is lavender and opens Find the feeling.
+  - "Start with my body" is teal and starts the body-first path.
+- **Help now** is on both screens.
+  - It fixes a bug: it used to do nothing on the first screen, because there
+    was no quadrant yet.
+  - It now uses the picked words, else the point, else assumes the loud end
+    (high-unpleasant). That is when people reach for it.
+- **Result.** Your words show as pills in their quadrant colours, then the
+  pattern label in the serif. The one or two tools are colour-coded by skill
+  family (`src/data/skillFamilies.ts`, `.tool-card[data-family]`). This also
+  fixes the literal `\u2192` that showed on the tool cards.
+- **Removed:** `QuadrantGrid` and `QuadrantCell` (the four boxes).
+
+Per-room look of the square (halo, centre shade, Tinted's glaze, dot, tint
+strength) is a set of `--square-*` tokens in `scripts/rooms/build.py`. The
+build now also checks ink and secondary text on the family tiles.

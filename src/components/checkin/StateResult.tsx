@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
-import { getToolById } from '../../data/tools';
+import { familyForTool } from '../../data/skillFamilies';
+import { getEmotionByName } from '../../data/emotions';
+import { QUADRANT_ABBR } from '../../lib/feelingSquare';
 import type { StateResult, ToolRecommendation } from '../../services/neo4j';
 
 interface StateResultProps {
@@ -159,17 +161,17 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
   // ===========================================
   if (pattern.id === 'positive_state') {
     return (
-      <div className="text-center py-6">
-        <span className="text-5xl mb-4 block">✨</span>
-        <h2 className="text-2xl font-bold text-[var(--color-text-primary)] mb-3">
+      <div className="max-w-md mx-auto py-2">
+        <CheckInWords words={checkinEmotions} />
+        <h2 className="mt-5 mb-0 text-[2rem] leading-[1.08] text-[var(--color-text-primary)] [text-wrap:pretty]">
           {pattern.userFacingLabel}
         </h2>
-        <p className="text-[var(--color-text-secondary)] mb-8">
+        <p className="mt-3 text-[16.5px] leading-relaxed text-[var(--color-text-secondary)]">
           No action needed right now. Enjoy this moment.
         </p>
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
+          className="mt-8 w-full min-h-[56px] px-4 rounded-[18px] bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-[17px] font-bold lift-primary"
         >
           Done
         </button>
@@ -179,30 +181,22 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
 
   // ===========================================
   // RENDER: Standard intervention view
-  // State label -> tools -> actions -> bailout escape hatch
+  // Your words -> what is happening -> tools (colour-coded by family) -> actions -> bailout
   // ===========================================
   return (
-    <div className="py-4">
-      {/* The State Summary - one cohesive sentence */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[var(--color-bg-elevated)] mb-4">
-          <span className="text-2xl">{getPatternEmoji(pattern.id)}</span>
-        </div>
-        
-        <h2 className="text-xl font-bold text-[var(--color-text-primary)] mb-3 leading-relaxed">
-          {pattern.userFacingLabel}
-        </h2>
-        
-        {pattern.confidence < 0.6 && (
-          <p className="text-sm text-[var(--color-text-tertiary)] mb-2">
-            Based on what you've shared
-          </p>
-        )}
-      </div>
+    <div className="max-w-md mx-auto py-2">
+      <CheckInWords words={checkinEmotions} />
+
+      <h2 className="mt-5 mb-0 text-[2rem] leading-[1.08] text-[var(--color-text-primary)] [text-wrap:pretty]">
+        {pattern.userFacingLabel}
+      </h2>
+      {pattern.confidence < 0.6 && (
+        <p className="mt-3 text-[15px] text-[var(--color-text-tertiary)]">Based on what you’ve shared</p>
+      )}
 
       {/* Clinical referral warning if needed */}
       {safetyFlag && safetyFlag.type === 'clinical_referral' && (
-        <div className="mb-6 p-4 rounded-xl bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]">
+        <div className="mt-5 p-4 rounded-xl bg-[var(--color-q-hp-bg)] border border-[var(--color-q-hp-border)]">
           <p className="text-[var(--color-q-hp-text)] text-sm">
             <strong>Note:</strong> If this feeling persists, consider reaching out to a mental health professional.
           </p>
@@ -211,12 +205,11 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
 
       {/* The Tools - 1-2 options, that's it */}
       {tools.length > 0 && (
-        <div className="mb-8">
-          <p className="text-sm text-[var(--color-text-secondary)] text-center mb-4">
-            Here's what might help right now
+        <div className="mt-7">
+          <p className="m-0 mb-3 font-serif italic text-[17px] text-[var(--color-text-secondary)]">
+            Here’s what might help right now
           </p>
-          
-          <div className="space-y-3">
+          <div className="flex flex-col gap-3">
             {tools.slice(0, 2).map((tool, index) => (
               <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} activationPatternId={pattern.id} />
             ))}
@@ -225,36 +218,32 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
       )}
 
       {/* Primary actions */}
-      <div className="space-y-3">
+      <div className="mt-8 flex flex-col gap-3">
         <button
           onClick={onDone}
-          className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary"
+          className="w-full min-h-[56px] px-4 rounded-[18px] bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-[17px] font-bold lift-primary"
         >
           Done
         </button>
-        
         {onAddMoreDetail && (
-          <button
-            onClick={onAddMoreDetail}
-            className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary text-sm"
-          >
+          <button onClick={onAddMoreDetail} className="den-chip w-full">
             Add more detail to refine this
           </button>
         )}
       </div>
 
-      {/* === THE BAILOUT BUTTON === 
+      {/* === THE BAILOUT BUTTON ===
           Lowest-emphasis element on screen. Below Done, below Add More Detail.
           This is an escape hatch, not a primary action.
-          
-          Wording: "too much" not "too hard" — 
-          "hard" implies failure, "too much" normalizes that their 
+
+          Wording: "too much" not "too hard" —
+          "hard" implies failure, "too much" normalizes that their
           nervous system is overwhelmed, which is the actual truth. */}
       {tools.length > 0 && (
-        <div className="mt-6 text-center">
+        <div className="mt-4 text-center">
           <button
             onClick={handleBailout}
-            className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
+            className="min-h-11 px-2 text-[15px] text-[var(--color-text-secondary)] underline underline-offset-4 bg-transparent border-none cursor-pointer hover:text-[var(--color-text-primary)] transition-colors"
           >
             That feels like too much right now
           </button>
@@ -264,61 +253,52 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
   );
 }
 
-function getPatternEmoji(patternId: string): string {
-  const map: Record<string, string> = {
-    acute_alarm: '\u26A1',
-    chronic_vigilance: '\uD83D\uDD0D',
-    emotional_flooding: '\uD83C\uDF0A',
-    conservation_freeze: '\uD83E\uDDCA',
-    dissociation_overmodulation: '\uD83C\uDF2B\uFE0F',
-    rumination_loop: '\uD83D\uDD04',
-    reward_drive_low: '\uD83E\uDEAB',
-    social_threat_shame: '\uD83E\uDEE3',
-    grief_yearning: '\uD83D\uDC94',
-    reactive_aggression: '\uD83D\uDD25',
-    positive_state: '\u2728',
-  };
-  return map[patternId] || '\uD83E\uDDE0';
+/** The words picked in the check-in, each in its own quadrant colour. */
+function CheckInWords({ words }: { words?: string[] }) {
+  if (!words?.length) return null;
+  return (
+    <div className="flex flex-wrap gap-2" aria-label="Your words">
+      {words.map((w) => {
+        const q = getEmotionByName(w)?.quadrant;
+        const abbr = q ? QUADRANT_ABBR[q] : null;
+        return (
+          <span
+            key={w}
+            className="inline-flex items-center min-h-[34px] px-3.5 rounded-full font-serif italic text-[17px]"
+            style={abbr
+              ? { background: `var(--color-q-${abbr}-fill)`, color: 'var(--color-on-quadrant)' }
+              : { background: 'var(--color-bg-elevated)', color: 'var(--color-text-primary)' }}
+          >
+            {w.toLowerCase()}
+          </span>
+        );
+      })}
+    </div>
+  );
 }
 
 function getToolPath(toolId: string): string {
   return `/tool/${toolId}`;
 }
 
+/** A recommended tool, tinted by its skill family (teal get through it, lavender shift it, rose with other people). */
 function ToolCard({ tool, isPrimary, checkinEmotions, activationPatternId }: { tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[]; activationPatternId?: string }) {
-  const toolPath = getToolPath(tool.id);
-
+  const family = familyForTool(tool.id);
   return (
     <Link
-      to={toolPath}
+      to={getToolPath(tool.id)}
       state={toolLinkState(checkinEmotions, activationPatternId)}
-      className={`
-        block p-4 rounded-xl transition-all
-        ${isPrimary 
-          ? 'bg-[var(--color-bg-elevated)] border-2 border-[var(--color-border)] hover:border-[var(--color-border-accent)]' 
-          : 'bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)]'
-        }
-      `}
+      className="tool-card"
+      data-family={family?.key ?? undefined}
     >
-      <div className="flex items-start gap-3">
-        <div className="text-xl flex-shrink-0 mt-0.5">
-          {getToolById(tool.id)?.emoji || '🔧'}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-base' : 'text-sm'}`}>
-            {tool.name}
-          </h3>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-0.5 line-clamp-2">
-            {tool.description || tool.whenToUse}
-          </p>
-          {isPrimary && tool.relevance && (
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-1 italic">
-              {tool.relevance}
-            </p>
-          )}
-        </div>
-        <span className="text-[var(--color-text-muted)] flex-shrink-0 mt-1">\u2192</span>
-      </div>
+      <span className="flex-1 min-w-0 flex flex-col gap-0.5">
+        {family && <span className="tool-card__family">{family.label}</span>}
+        <span className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-lg' : 'text-base'}`}>{tool.name}</span>
+        <span className="text-[15px] leading-snug text-[var(--color-text-secondary)] line-clamp-2">
+          {tool.description || tool.whenToUse}
+        </span>
+      </span>
+      <svg className="tool-card__chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7" /></svg>
     </Link>
   );
 }
