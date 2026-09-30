@@ -1464,7 +1464,288 @@
    "quadrant": "high-unpleasant"
   }
  },
- "aliases": {},
+ "aliases": {
+  "abandoned": [
+   "loneliness",
+   "rejection"
+  ],
+  "aggressive": [
+   "anger"
+  ],
+  "angry": [
+   "anger"
+  ],
+  "annoyed": [
+   "anger",
+   "stress"
+  ],
+  "anxious": [
+   "anxiety"
+  ],
+  "apathetic": [
+   "apathy"
+  ],
+  "appalled": [
+   "disappointment",
+   "disgust"
+  ],
+  "ashamed": [
+   "cold_shame"
+  ],
+  "awful": [
+   "disgust",
+   "sadness"
+  ],
+  "bad": [
+   "sadness"
+  ],
+  "betrayed": [
+   "anger",
+   "rejection"
+  ],
+  "bitter": [
+   "anger",
+   "rejection"
+  ],
+  "bored": [
+   "boredom"
+  ],
+  "busy": [
+   "stress"
+  ],
+  "critical": [
+   "disgust"
+  ],
+  "depressed": [
+   "hopelessness",
+   "sadness"
+  ],
+  "despair": [
+   "hopelessness"
+  ],
+  "detestable": [
+   "cold_shame"
+  ],
+  "disappointed": [
+   "disappointment"
+  ],
+  "disapproving": [
+   "disappointment",
+   "disgust"
+  ],
+  "disgusted": [
+   "disappointment",
+   "disgust"
+  ],
+  "dismissive": [
+   "disgust"
+  ],
+  "disrespected": [
+   "anger",
+   "hot_shame"
+  ],
+  "distant": [
+   "loneliness",
+   "numbness"
+  ],
+  "embarrassed": [
+   "cold_shame",
+   "hot_shame"
+  ],
+  "empty": [
+   "emptiness"
+  ],
+  "excluded": [
+   "rejection"
+  ],
+  "exposed": [
+   "hot_shame"
+  ],
+  "fearful": [
+   "fear"
+  ],
+  "fragile": [
+   "sadness"
+  ],
+  "frightened": [
+   "fear"
+  ],
+  "frustrated": [
+   "anger",
+   "stress"
+  ],
+  "furious": [
+   "anger"
+  ],
+  "grief": [
+   "sadness"
+  ],
+  "guilty": [
+   "guilt"
+  ],
+  "helpless": [
+   "hopelessness"
+  ],
+  "hesitant": [
+   "anxiety"
+  ],
+  "horrified": [
+   "anxiety",
+   "fear"
+  ],
+  "hostile": [
+   "anger"
+  ],
+  "humiliated": [
+   "hot_shame"
+  ],
+  "hurt": [
+   "rejection",
+   "sadness"
+  ],
+  "inadequate": [
+   "cold_shame"
+  ],
+  "indifferent": [
+   "apathy"
+  ],
+  "indignant": [
+   "anger",
+   "rejection"
+  ],
+  "inferior": [
+   "cold_shame"
+  ],
+  "infuriated": [
+   "anger"
+  ],
+  "insecure": [
+   "anxiety"
+  ],
+  "insignificant": [
+   "cold_shame"
+  ],
+  "isolated": [
+   "loneliness"
+  ],
+  "jealous": [
+   "anger",
+   "rejection"
+  ],
+  "judgmental": [
+   "disappointment",
+   "disgust"
+  ],
+  "let_down": [
+   "disappointment",
+   "rejection"
+  ],
+  "lonely": [
+   "loneliness"
+  ],
+  "mad": [
+   "anger"
+  ],
+  "nauseated": [
+   "anxiety",
+   "disgust"
+  ],
+  "nervous": [
+   "anxiety"
+  ],
+  "numb": [
+   "numbness"
+  ],
+  "out_of_control": [
+   "overwhelm"
+  ],
+  "overwhelmed": [
+   "overwhelm"
+  ],
+  "persecuted": [
+   "fear"
+  ],
+  "powerless": [
+   "hopelessness"
+  ],
+  "pressured": [
+   "stress"
+  ],
+  "provoked": [
+   "anger"
+  ],
+  "rejected": [
+   "rejection"
+  ],
+  "remorseful": [
+   "guilt"
+  ],
+  "repelled": [
+   "disappointment",
+   "disgust"
+  ],
+  "resentful": [
+   "anger",
+   "rejection"
+  ],
+  "revolted": [
+   "disappointment",
+   "disgust"
+  ],
+  "ridiculed": [
+   "hot_shame"
+  ],
+  "rushed": [
+   "stress"
+  ],
+  "sad": [
+   "sadness"
+  ],
+  "scared": [
+   "fear"
+  ],
+  "skeptical": [
+   "disgust"
+  ],
+  "sleepy": [
+   "apathy"
+  ],
+  "stressed": [
+   "stress"
+  ],
+  "threatened": [
+   "fear"
+  ],
+  "tired": [
+   "apathy"
+  ],
+  "unfocused": [
+   "apathy"
+  ],
+  "victimized": [
+   "hopelessness"
+  ],
+  "violated": [
+   "anger",
+   "fear"
+  ],
+  "vulnerable": [
+   "anxiety"
+  ],
+  "weak": [
+   "cold_shame"
+  ],
+  "withdrawn": [
+   "loneliness",
+   "numbness"
+  ],
+  "worried": [
+   "anxiety"
+  ],
+  "worthless": [
+   "cold_shame"
+  ]
+ },
  "recommendedFor": [
   {
    "id": "rf_acute_alarm_addresses_recovering-from-invalidation",

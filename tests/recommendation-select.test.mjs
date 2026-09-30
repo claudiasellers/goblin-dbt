@@ -55,12 +55,24 @@ test("#1–3 Anxious → acute_alarm: no band → stirred (inferred): 5-4-3-2-1 
   assert.equal(r3.safetyFlag, undefined);
 });
 
-test("#4 a wound word leads to Recover: Humiliated steady → Recover + OA; stirred → Recover + 5-4-3-2-1", async () => {
+test("#4 a wound word leads to Recover (E4-6: grid words now move the pattern)", async () => {
+  // Humiliated now scores as hot_shame → social_threat_shame, whose own rows put OA first when steady
+  // and Recover first when stirred (sts has no gate row: Recover is already in its table).
   const s = await run(hu({ emotions: ["Humiliated"], band: "steady" }));
-  assert.deepEqual(ids(s), ["recovering-from-invalidation", "opposite-action"]);
-  assert.equal(s.tools[0].reason, "emotion_gate");
-  assert.equal(s.tools[0].ruleId, "rf_acute_alarm_addresses_recovering-from-invalidation");
-  assert.deepEqual(ids(await run(hu({ emotions: ["Humiliated"], band: "stirred" }))), ["recovering-from-invalidation", "five-senses"]);
+  assert.equal(s.pattern.id, "social_threat_shame");
+  assert.deepEqual(ids(s), ["opposite-action", "recovering-from-invalidation"]);
+  assert.deepEqual(ids(await run(hu({ emotions: ["Humiliated"], band: "stirred" }))), ["recovering-from-invalidation", "pause"]);
+  // Where the pattern has no Recover row, the wound gate leads (a word that lands on acute_alarm).
+  const gated = await run(hu({ emotions: ["Humiliated"], band: "steady" }), { ...on, aliases: {} });
+  assert.equal(gated.pattern.id, "acute_alarm");
+  assert.deepEqual(ids(gated), ["recovering-from-invalidation", "opposite-action"]);
+  assert.equal(gated.tools[0].reason, "emotion_gate");
+  assert.equal(gated.tools[0].ruleId, "rf_acute_alarm_addresses_recovering-from-invalidation");
+  // Hurt alone scores rumination first, and the graph's ruminative-collapse co-occurrence makes
+  // freeze primary; freeze has no Recover row, so the wound gate doesn't fire (a D-02 review point).
+  const hurt = await run(lu({ emotions: ["Hurt"], band: "steady" }));
+  assert.equal(hurt.pattern.id, "conservation_freeze");
+  assert.deepEqual(ids(hurt), ["five-senses", "opposite-action"]);
 });
 
 test("#5 nothing named (somatic skip), steady → OA + Find the feeling", async () => {

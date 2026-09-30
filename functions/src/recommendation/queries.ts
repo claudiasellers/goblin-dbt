@@ -17,12 +17,19 @@ export function toNum(v: unknown): number {
   return Number(v);
 }
 
-/** One row per (pattern, matched word, edge): the pure scorer counts words and picks the bonus. */
+/**
+ * One row per (pattern, matched word, edge): the pure scorer counts words and picks the bonus.
+ * E4-6: a word matches a pattern emotion directly or through its SCORES_AS aliases (grid words →
+ * pattern vocabulary, scripts/recommendations/vocabulary.py). `emotionId` is always the word as sent.
+ */
 export const EMOTION_EVIDENCE_QUERY = `
+  UNWIND $emotionIds AS sent
+  OPTIONAL MATCH (:Emotion {id: sent})-[:SCORES_AS]->(alias:Emotion)
+  WITH sent, [sent] + collect(DISTINCT alias.id) AS targets
   MATCH (p:ActivationPattern)-[r:ASSOCIATED_WITH]->(e:Emotion)
   WHERE p.id IN $candidatePatterns
-    AND e.id IN $emotionIds
-  RETURN p.id AS patternId, e.id AS emotionId, r.strength AS strength
+    AND e.id IN targets
+  RETURN p.id AS patternId, sent AS emotionId, r.strength AS strength
 `;
 
 export const RESPONSE_EVIDENCE_QUERY = `

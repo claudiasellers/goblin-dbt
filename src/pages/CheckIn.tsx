@@ -39,6 +39,11 @@ import { profileCache } from '../lib/profileCache';
 
 type EntryPoint = 'standard' | 'somatic';
 
+/** Quadrants whose check-ins get the discriminating questions (E4-6: both unpleasant quadrants). */
+function asksDiscriminatingQuestions(quadrant: string | null): quadrant is 'high-unpleasant' | 'low-unpleasant' {
+  return quadrant === 'high-unpleasant' || quadrant === 'low-unpleasant';
+}
+
 /** The routing band's source (E4-3 accepts probe · ftf · carried; hand-offs etc. count as carried). */
 function routingBandSource(r: CapacityReading): 'probe' | 'ftf' | 'carried' {
   return r.source === 'probe' || r.source === 'ftf' ? r.source : 'carried';
@@ -405,10 +410,11 @@ export function CheckIn() {
     const inferredQuadrant = inferQuadrant(emotions);
     setCheckInData(prev => ({ ...prev, emotions, quadrant: inferredQuadrant }));
 
-    // For low-unpleasant, try to fetch discriminating questions
-    if (inferredQuadrant === 'low-unpleasant') {
+    // Unpleasant check-ins: fetch the quadrant's discriminating questions (E4-6: high-unpleasant
+    // too; the graph has them, they were never asked). Skippable; skipping keeps today's scoring.
+    if (asksDiscriminatingQuestions(inferredQuadrant)) {
       try {
-        const questions = await getDiscriminatingQuestions('low-unpleasant');
+        const questions = await getDiscriminatingQuestions(inferredQuadrant);
         if (questions.length > 0) {
           setDiscriminatingQuestions(questions);
           setStep('discriminating');
@@ -552,7 +558,7 @@ export function CheckIn() {
         break;
       case 'capacity':
         if (afterCapacity.current.then === 'analyze') setStep('suggestion');
-        else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') setStep('discriminating');
+        else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) setStep('discriminating');
         else setStep('emotion');
         break;
       case 'body':
@@ -561,7 +567,7 @@ export function CheckIn() {
         } else if (entryPoint === 'somatic') {
           setEntryPoint('standard');
           setStep('emotion');
-        } else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') {
+        } else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) {
           setStep('discriminating');
         } else {
           setStep('emotion');

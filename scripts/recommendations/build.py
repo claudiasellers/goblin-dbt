@@ -8,6 +8,7 @@ Then run: node --test tests/recommendation-content.test.mjs
 import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import content as C  # noqa: E402
+import vocabulary as V  # noqa: E402
 
 
 def q(s):
@@ -58,9 +59,18 @@ def check(rows):
         assert "checkin_result" in C.SIGNED_OFF, "sign the policy off too (SIGNED_OFF['checkin_result'])"
 
 
+def check_vocabulary():
+    for word, (targets, why) in V.VOCABULARY.items():
+        assert 1 <= len(targets) <= 2 and len(set(targets)) == len(targets), f"{word}: 1-2 distinct targets"
+        assert set(targets) <= set(V.PATTERN_VOCABULARY), f"{word}: {targets} not in the pattern vocabulary"
+        assert word not in V.PATTERN_VOCABULARY, f"{word} is already pattern vocabulary"
+        assert why and why.strip(), f"{word}: rationale"
+
+
 def main():
     rows = C.rows()
     check(rows)
+    check_vocabulary()
     L = []
     A = L.append
     A(f"""// ============================================================
@@ -72,6 +82,8 @@ def main():
 // Run AFTER find-the-feeling.cypher (urge_surfing, dbt_find_the_feeling) and app-tool-ids.cypher.
 // Idempotent: MERGE + SET only; stale {C.VERSION} rows are pruned by id at the end.
 // Constraints (RoutingPolicy.id) live in constraints.cypher.
+// Section 6 (plan E4-6) is generated from scripts/recommendations/vocabulary.py: SCORES_AS aliases
+// from the check-in's grid words to the pattern vocabulary, read by the pattern-scoring query.
 // ============================================================
 """)
 
@@ -111,6 +123,17 @@ def main():
     A("\n// --- 5. Prune rows removed from content.py (idempotent) ---")
     A("MATCH (:TherapyConcept)-[r:RECOMMENDED_FOR]->(:ActivationPattern)\n"
       f"WHERE r.version = {q(C.VERSION)} AND NOT r.id IN {lit([r['id'] for r in rows])}\nDELETE r;")
+    A(f"\n// --- 6. Grid vocabulary → pattern vocabulary (SCORES_AS aliases, {V.VERSION}; E4-6) ---")
+    al = V.aliases()
+    items = [{"id": f"{w}>{t}", "w": w, "e": t, "review": r, "why": why} for w, t, why, r in al]
+    for k in range(0, len(items), 40):
+        chunk = items[k:k + 40]
+        A("UNWIND [\n  " + ",\n  ".join(lit(i) for i in chunk) + "\n] AS row\n"
+          "MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})\n"
+          "MERGE (w)-[r:SCORES_AS]->(e)\n"
+          f"SET r.id = row.id, r.version = {q(V.VERSION)}, r.reviewStatus = row.review, r.rationale = row.why;")
+    A("MATCH (:Emotion)-[r:SCORES_AS]->(:Emotion)\n"
+      f"WHERE r.version = {q(V.VERSION)} AND NOT r.id IN {lit([i['id'] for i in items])}\nDELETE r;")
     print("\n".join(L))
 
 

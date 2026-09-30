@@ -27,8 +27,11 @@ export function parseGrid(emotionsTsSource) {
  * The winning pattern for a one-word check-in without discriminating answers. `hits`: the pattern
  * edges the word reaches ([{ p, s }] pattern id + edge strength), directly or through SCORES_AS
  * aliases. Base 0.25; + (1 word / 1) × 0.4 + the strongest edge's bonus; ties keep candidate order.
+ * `coOccurs` ([{ a, b, primaryPatternId }]): when the runner-up scores > 0.35 and ≥ 60% of the
+ * leader and a CO_OCCURS_WITH edge joins them, the edge's primaryPatternId wins (as in
+ * functions/src/recommendation/patternScoring.ts). Without aliases no runner-up passes 0.35.
  */
-export function singleEmotionWinner(quadrant, hits) {
+export function singleEmotionWinner(quadrant, hits, coOccurs = []) {
   const cands = CANDIDATES[quadrant];
   const scores = Object.fromEntries(cands.map((c) => [c, 0.25]));
   const byP = {};
@@ -36,7 +39,41 @@ export function singleEmotionWinner(quadrant, hits) {
   for (const [p, ss] of Object.entries(byP)) {
     scores[p] += 0.4 + (ss.includes('strong') ? 0.3 : ss.includes('moderate') ? 0.2 : 0.1);
   }
-  return Object.entries(scores).sort(([, a], [, b]) => b - a)[0][0];
+  const sorted = Object.entries(scores).sort(([, a], [, b]) => b - a);
+  const [[first, top], [second, next]] = sorted;
+  if (next > 0.35) {
+    const co = coOccurs.find((c) => (c.a === first && c.b === second) || (c.a === second && c.b === first));
+    if (co && co.primaryPatternId !== first && next / top >= 0.6) return second;
+  }
+  return first;
+}
+
+/**
+ * E4-6: one-word grid check-ins scored through SCORES_AS aliases (what the scoring query does since
+ * E4-6). `pairs`: pattern edges [{ p, e, s }]; `aliases`: { word: [targets] }; `coOccurs` as in
+ * singleEmotionWinner. A word reaches a pattern when the word or one of its targets is one of the
+ * pattern's emotions (once per pattern).
+ */
+export function gridViaAliases(grid, pairs, aliases, coOccurs = []) {
+  const byEmotion = {};
+  for (const a of pairs) (byEmotion[a.e] ??= []).push(a);
+  const unpleasant = grid.filter((g) => CANDIDATES[g.quadrant]);
+  const per = unpleasant.map((g) => {
+    const targets = [g.sent, ...(aliases[g.sent] || [])];
+    const hits = targets.flatMap((t) => byEmotion[t] || []).filter((h) => CANDIDATES[g.quadrant].includes(h.p));
+    return { ...g, targets: aliases[g.sent] || [], hits, winner: singleEmotionWinner(g.quadrant, hits, coOccurs) };
+  });
+  const won = {};
+  for (const x of per) (won[x.quadrant] ??= new Set()).add(x.winner);
+  return {
+    aliasEdges: Object.values(aliases).reduce((n, t) => n + t.length, 0),
+    namesWithAlias: per.filter((x) => x.targets.length).length,
+    namesReachingACandidate: per.filter((x) => x.hits.length).length,
+    namesNotReaching: per.filter((x) => !x.hits.length).map((x) => x.name).sort(),
+    winnerDistribution: Object.fromEntries(Object.entries(per.reduce((m, x) => ((m[`${x.quadrant} → ${x.winner}`] = (m[`${x.quadrant} → ${x.winner}`] || 0) + 1), m), {})).sort(([a], [b]) => a.localeCompare(b))),
+    patternsWon: Object.fromEntries(Object.entries(won).map(([q, set]) => [q, [...set].sort()]).sort(([a], [b]) => a.localeCompare(b))),
+    winners: Object.fromEntries(per.map((x) => [`${x.quadrant}:${x.sent}`, x.winner]).sort(([a], [b]) => a.localeCompare(b))),
+  };
 }
 
 /** Today's tool step over a recommendation-graph fixture: top two dbt_* concepts, ties by id. */
@@ -84,6 +121,7 @@ function summaryFromGraph(graph, grid) {
       winnerDistribution: perEmotion.reduce((m, x) => ((m[`${x.quadrant} → ${x.winner}`] = (m[`${x.quadrant} → ${x.winner}`] || 0) + 1), m), {}),
       winners: Object.fromEntries(perEmotion.map((e) => [`${e.quadrant}:${e.sent}`, e.winner]).sort(([a], [b]) => a.localeCompare(b))),
     },
+    gridViaAliases: gridViaAliases(grid, pairs, graph.aliases || {}, graph.coOccurrence || []),
     toolsByPattern: Object.fromEntries(patterns.map((p) => [p, legacyToolsFromGraph(graph, p)])),
     safetyTriggers: safety.sort(byPatternType),
     discriminatingEvidence: Object.keys(evidence).sort().map((pattern) => ({ pattern, edges: evidence[pattern] })),
@@ -119,6 +157,8 @@ export function routingSummary(report, opts = {}) {
       winnerDistribution: report.grid?.winnerDistribution,
       winners: Object.fromEntries((report.grid?.perEmotion || []).map((e) => [`${e.quadrant}:${e.sent}`, e.winner]).sort(([a], [b]) => a.localeCompare(b))),
     },
+    // E4-6 reports only (null before the aliases were loaded / for older reports)
+    gridViaAliases: report.gridViaAliases ?? null,
     toolsByPattern: tools,
     safetyTriggers: [...(report.safetyTriggers || [])].sort(byPatternType),
     discriminatingEvidence: report.discriminatingEvidence,
@@ -155,6 +195,16 @@ export function diffRouting(baseline, current, opts = {}) {
   }
   if (!same(a.grid.winnerDistribution, b.grid.winnerDistribution)) {
     changes.push({ what: 'grid.winnerDistribution', before: a.grid.winnerDistribution, after: b.grid.winnerDistribution });
+  }
+  if (a.gridViaAliases && b.gridViaAliases) {
+    const wa = a.gridViaAliases.winners;
+    const wb = b.gridViaAliases.winners;
+    for (const key of new Set([...Object.keys(wa), ...Object.keys(wb)])) {
+      if (wa[key] !== wb[key]) changes.push({ what: `gridViaAliases.winner ${key}`, before: wa[key] ?? null, after: wb[key] ?? null });
+    }
+    if (!same(a.gridViaAliases.namesNotReaching, b.gridViaAliases.namesNotReaching)) {
+      changes.push({ what: 'gridViaAliases.namesNotReaching', before: a.gridViaAliases.namesNotReaching, after: b.gridViaAliases.namesNotReaching });
+    }
   }
   for (const key of new Set([...Object.keys(a.grid.winners), ...Object.keys(b.grid.winners)])) {
     if (a.grid.winners[key] !== b.grid.winners[key]) changes.push({ what: `grid.winner ${key}`, before: a.grid.winners[key] ?? null, after: b.grid.winners[key] ?? null });

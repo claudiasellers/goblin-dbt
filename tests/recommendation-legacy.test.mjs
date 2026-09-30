@@ -40,11 +40,12 @@ test("the schema-derived fixture routes exactly like the live graph did on 2026-
   assert.deepEqual(s.grid.winnerDistribution, { "high-unpleasant → acute_alarm": 48, "low-unpleasant → conservation_freeze": 37 });
 });
 
-test("the TS engine agrees with the live check for every one-word grid check-in (85 names)", async () => {
+test("the TS engine agrees with the live check for every one-word grid check-in (85 names; no aliases, as live)", async () => {
   const unpleasant = grid.filter((g) => g.quadrant.endsWith("unpleasant"));
   assert.equal(unpleasant.length, 85);
+  const asLive = { ...graph, aliases: {} }; // live had no SCORES_AS aliases on 2026-09-30 (E4-6 adds them)
   for (const g of unpleasant) {
-    const r = await run({ quadrant: g.quadrant, emotions: [g.name] });
+    const r = await run({ quadrant: g.quadrant, emotions: [g.name] }, asLive);
     assert.equal(r.pattern.id, expectedWinner(`${g.quadrant}:${g.sent}`), g.name);
     assert.equal(r.pattern.confidence, 0.25, `${g.name}: no word reaches a pattern (F1)`);
   }

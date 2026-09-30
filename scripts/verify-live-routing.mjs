@@ -14,7 +14,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { routingSummary, diffRouting, parseGrid, singleEmotionWinner, CANDIDATES } from './lib/liveRoutingReport.mjs';
+import { routingSummary, diffRouting, parseGrid, singleEmotionWinner, gridViaAliases, CANDIDATES } from './lib/liveRoutingReport.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(resolve(root, 'functions/package.json'));
 const neo4j = require('neo4j-driver');
@@ -71,6 +71,13 @@ try {
     winnerDistribution: perEmotion.reduce((m, x) => ((m[`${x.quadrant} → ${x.winner}`] = (m[`${x.quadrant} → ${x.winner}`] || 0) + 1), m), {}),
     perEmotion,
   };
+  // E4-6: the same one-word check-ins through the SCORES_AS aliases (what the scoring query reads
+  // since E4-6). Before the aliases are loaded this reports aliasEdges 0 and every name not reaching.
+  const aliasRows = await q(`MATCH (w:Emotion)-[:SCORES_AS]->(a:Emotion) RETURN w.id AS w, a.id AS a ORDER BY w, a`);
+  report.aliases = {};
+  for (const r of aliasRows) (report.aliases[r.w] ??= []).push(r.a);
+  const coOccurs = await q(`MATCH (a:ActivationPattern)-[r:CO_OCCURS_WITH]->(b:ActivationPattern) RETURN a.id AS a, b.id AS b, r.primaryPatternId AS primaryPatternId ORDER BY a, b`);
+  report.gridViaAliases = gridViaAliases(grid, assoc, report.aliases, coOccurs);
   report.safetyTriggers = await q(`MATCH (p:ActivationPattern)-[:TRIGGERS_SAFETY]->(s:SafetyFlag) RETURN p.id AS pattern, s.type AS type, count(*) AS edges ORDER BY pattern`);
   report.safetyTriggers = report.safetyTriggers.map(r => ({ ...r, edges: toNum(r.edges) }));
   report.discriminatingEvidence = (await q(`MATCH (r:QuestionResponse)-[e:EVIDENCE_FOR]->(p:ActivationPattern) RETURN p.id AS pattern, count(e) AS edges ORDER BY pattern`)).map(r => ({ ...r, edges: toNum(r.edges) }));
@@ -139,6 +146,11 @@ if (report.error) { console.error('Error:', report.error); process.exit(1); }
 console.log(`Patterns in live graph: ${report.patterns.length}`);
 console.log(`Unpleasant grid names: ${report.grid.unpleasantNames}; exist as Emotion nodes: ${report.grid.namesThatExistAsEmotionNodes}; have any pattern edge: ${report.grid.namesWithAnyPatternEdge.length}`);
 console.log('Single-emotion check-in → winning pattern:', report.grid.winnerDistribution);
+const ga = report.gridViaAliases;
+console.log(`Through SCORES_AS aliases (E4-6): ${ga.aliasEdges} alias edges; ${ga.namesReachingACandidate}/${report.grid.unpleasantNames} names reach a pattern` +
+  (ga.namesNotReaching.length ? ` (not: ${ga.namesNotReaching.join(', ')})` : ''));
+console.log('  winning pattern via aliases:', ga.winnerDistribution);
+console.log('  patterns reachable by one grid word:', ga.patternsWon);
 console.log('ASSOCIATED_WITH edges:', report.associatedWith);
 console.log('Duplicate relationships:', report.duplicateRelationships.length ? report.duplicateRelationships : 'none');
 console.log('Duplicate nodes:', report.duplicateNodes.length ? report.duplicateNodes : 'none');

@@ -88,7 +88,7 @@ test("loads last (after the concepts it tags); MERGE-only; prunes stale rf-v1 id
   assert.ok(LOAD_ORDER.indexOf("recommended-for.cypher") > LOAD_ORDER.indexOf("find-the-feeling.cypher"));
   assert.ok(!stmts.some((s) => /^CREATE\b/.test(s)));
   assert.match(readFileSync("schema/constraints.cypher", "utf8"), /routing_policy_id IF NOT EXISTS FOR \(rp:RoutingPolicy\) REQUIRE rp\.id IS UNIQUE/);
-  const prune = stmts.at(-1);
+  const prune = stmts.find((s) => s.startsWith("MATCH (:TherapyConcept)-[r:RECOMMENDED_FOR]"));
   assert.match(prune, /WHERE r\.version = "rf-v1" AND NOT r\.id IN \[/);
   const kept = JSON.parse(prune.match(/NOT r\.id IN (\[.*\])/s)[1]);
   assert.deepEqual(kept.sort(), rows.map((r) => r.id).sort());
