@@ -26,7 +26,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | Module | Callables |
 |---|---|
 | `checkin/` | `saveCheckIn` (idempotent upsert by client id; saved when the result renders), `setCheckInNextAction`, `getCheckInsByUser`; `validation.ts` |
-| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData` (no auth triggers: they only exist as 1st-gen functions, which can't run on Node 24; `ensureUserExists` on sign-in creates the User) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
+| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; triggers `onUserCreated` / `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
 | `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
 | `insights/` | `getInsightsData` |
 | `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` |

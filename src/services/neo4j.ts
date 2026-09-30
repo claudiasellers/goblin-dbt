@@ -107,8 +107,7 @@ export async function getCheckInsByUser(
 
 /**
  * Ensure the user's graph node exists. AuthContext calls it once per signed-in uid per page load
- * (sign-up signs in too, so a new account gets its User here); the server extracts the user from
- * Firebase Auth.
+ * (belt and braces with the onUserCreated trigger); the server extracts the user from Firebase Auth.
  */
 export async function ensureUserExists(): Promise<void> {
   await ensureUserExistsFn();

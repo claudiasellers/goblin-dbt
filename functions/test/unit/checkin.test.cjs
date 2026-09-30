@@ -130,6 +130,14 @@ test('getCheckInsByUser skips next-action stubs and returns the new fields', asy
   assert.equal(checkIns[0].band, 'stirred');
 });
 
+test('onUserCreated MERGEs the User at sign-up', async () => {
+  const f = fakeDriver(() => []);
+  setDriver(f.driver);
+  await fns.onUserCreated.run({ uid: 'new-user', email: 'n@example.test' }, {});
+  assert.match(f.calls[0].query, /MERGE \(u:User \{id: \$uid\}\)/);
+  assert.deepEqual(f.calls[0].params, { uid: 'new-user', email: 'n@example.test' });
+});
+
 test('writes before the first check-in MERGE the user (F4): profile, tool usage, DEAR MAN', async () => {
   const f = fakeDriver(() => []);
   setDriver(f.driver);
