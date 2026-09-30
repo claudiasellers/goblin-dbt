@@ -56,11 +56,26 @@ export function fingerprintDiff(a, b) {
 }
 
 /**
- * M4 with the policy off must route exactly as live did on 2026-09-30, except `numb`, which E4-5 moves
- * from the high-unpleasant to the low-unpleasant quadrant on purpose. Returns the changes that are NOT that.
+ * The one difference production may show before M2 that isn't routing: the pre-PR-C1 saveCheckIn MERGEd
+ * ActivationPattern {id: 'positive_state'} on a pleasant check-in, so `patterns` gains exactly that id.
+ * schema/migrations/2026-10-remove-positive-state-stub.cypher removes it after the M2 deploy.
  */
-export function unexpectedRoutingChanges(changes) {
+export function isPositiveStateStub(c) {
+  if (c.what !== 'patterns' || !Array.isArray(c.before) || !Array.isArray(c.after)) return false;
+  const added = c.after.filter((p) => !c.before.includes(p));
+  const removed = c.before.filter((p) => !c.after.includes(p));
+  return removed.length === 0 && added.length === 1 && added[0] === 'positive_state';
+}
+
+/**
+ * The changes that are NOT expected. Always allowed: nothing. With `numbMove` (M4): `numb` moving from the
+ * high-unpleasant to the low-unpleasant quadrant, which E4-5 does on purpose. With `positiveStateStub`
+ * (M1, before the M2 cleanup): the stub pattern above.
+ */
+export function unexpectedRoutingChanges(changes, { numbMove = true, positiveStateStub = false } = {}) {
   return changes.filter((c) => {
+    if (positiveStateStub && isPositiveStateStub(c)) return false;
+    if (!numbMove) return true;
     // Winner keys are `<quadrant>:<word>`, so the move shows as numb leaving high-unpleasant (acute_alarm → null)
     // and arriving in low-unpleasant (null → conservation_freeze).
     if (c.what === 'grid.winner high-unpleasant:numb') return !(c.before === 'acute_alarm' && c.after == null);

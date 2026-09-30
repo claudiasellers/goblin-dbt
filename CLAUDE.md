@@ -190,7 +190,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `functions/src/index.ts` | The deploy surface: named re-exports of every callable (module table above) |
 | `functions/src/shared/` | Driver + sessions (`neo4j.ts`), `auth.ts`, `validate.ts`, `errors.ts`, `callable.ts` |
 | `functions/src/userdata/` | Data layers: `layers.ts` (registry), `ownership.ts`, `lifecycle.ts` (finalise-once guards), `exportDelete.ts` |
-| `schema/migrations/` | One-off data migrations, run with `--file` (never loaded): `2026-10-user-data-backfill.cypher` |
+| `schema/migrations/` | One-off data migrations, run with `--file` (never loaded): `2026-10-user-data-backfill.cypher`, then after the M2 deploy `2026-10-remove-goal-fields.cypher` and `2026-10-remove-positive-state-stub.cypher` (the bare `ActivationPattern {id:'positive_state'}` the pre-PR-C1 `saveCheckIn` MERGEd on pleasant check-ins) |
 | `functions/test/` | Unit tests (fake driver), pinned `fixtures/endpoints.json`, emulator golden suite, local Neo4j compose file |
 | `schema/constraints.cypher` | Every constraint and index; loaded first |
 | `schema/knowledge-graph.cypher` | Base graph nodes (MERGE by id; no relationships) |

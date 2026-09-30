@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   isLocalUri, assertLocalUri, ident, groupBy, chunks, dedupeAllowList, fingerprintDiff, unexpectedRoutingChanges, parseEnv,
+  isPositiveStateStub,
 } from '../scripts/rehearsal/lib.mjs';
 
 test('only a Neo4j on this machine counts as local', () => {
@@ -71,6 +72,22 @@ test('M4: only numb moving from high- to low-unpleasant is expected', () => {
   assert.deepEqual(unexpectedRoutingChanges([bigger]), [bigger]);
   const safety = { what: 'safetyTriggers', before: [], after: ['x'] };
   assert.deepEqual(unexpectedRoutingChanges([safety]), [safety]);
+});
+
+test('M1: the positive_state stub is the only extra pattern allowed, and only when asked for', () => {
+  const live = ['acute_alarm', 'chronic_vigilance', 'conservation_freeze'];
+  const stub = { what: 'patterns', before: live, after: [...live, 'positive_state'].sort() };
+  assert.equal(isPositiveStateStub(stub), true);
+  assert.deepEqual(unexpectedRoutingChanges([stub], { numbMove: false, positiveStateStub: true }), []);
+  assert.deepEqual(unexpectedRoutingChanges([stub], { numbMove: false }), [stub]);
+  assert.deepEqual(unexpectedRoutingChanges([stub]), [stub], 'M4 no longer allows it: M2 removes the stub');
+  const other = { what: 'patterns', before: live, after: [...live, 'grief_yearning'] };
+  const lost = { what: 'patterns', before: [...live, 'positive_state'], after: live };
+  const both = { what: 'patterns', before: live, after: [...live, 'positive_state', 'x'] };
+  for (const c of [other, lost, both]) assert.deepEqual(unexpectedRoutingChanges([c], { numbMove: false, positiveStateStub: true }), [c]);
+  // The numb move is not allowed at M1.
+  const numb = { what: 'grid.winner high-unpleasant:numb', before: 'acute_alarm', after: null };
+  assert.deepEqual(unexpectedRoutingChanges([numb], { numbMove: false, positiveStateStub: true }), [numb]);
 });
 
 test('the committed live baseline vs the schema view differs only by the numb move', async () => {

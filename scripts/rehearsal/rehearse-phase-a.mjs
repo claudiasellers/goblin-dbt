@@ -9,9 +9,11 @@
  *      Also copies Aura's constraints and indexes, and reports both Neo4j versions.
  *   3. Replays the runbook on the copy, milestone by milestone, each with THAT milestone's own files
  *      (a detached git worktree per branch under .rehearsal/):
- *        M1  dedupe dry run + apply, full load twice (must be identical), routing unchanged
+ *        M1  dedupe dry run + apply, full load twice (must be identical), routing unchanged (the
+ *            positive_state stub the old saveCheckIn created is the one allowed difference)
  *        M2  constraints, backfill twice (second run must change nothing), full load, goal-field
- *            cleanup, backfill again; every legacy user record adopted
+ *            cleanup, positive_state stub removed (twice, second changes nothing), backfill again;
+ *            every legacy user record adopted
  *        M3  full load (voice lint included)
  *        M4  full load twice; routing identical to live except numb's intended move; policy off;
  *            differences from the schema-only view recorded for review
@@ -221,7 +223,7 @@ async function rehearseM1(d, dir) {
   step('M1 dedupe is idempotent (second apply deletes nothing)', again.allowed && secondDiff.length === 0,
     again.allowed ? secondDiff.slice(0, 5).join('; ') : `exit ${again.status}: ${tail(again.out)}`);
   await fullLoadTwice(d, dir, 'M1');
-  await routingCompare(dir, 'M1', 'tests/fixtures/live-routing-2026-09-30.json', { allowNumbMove: false });
+  await routingCompare(dir, 'M1', 'tests/fixtures/live-routing-2026-09-30.json', { allowPositiveStateStub: true });
 }
 
 async function fullLoadTwice(d, dir, tag) {
@@ -237,15 +239,18 @@ async function fullLoadTwice(d, dir, tag) {
 /** verify-live-routing.mjs against the local copy (the child only ever sees LOCAL_ENV). Exit 3 = routing differs. */
 /** The same diff verify-live-routing.mjs prints, recomputed from the report it just wrote (that milestone's code). */
 async function routingDiff(dir, baseline) {
-  const { diffRouting, parseGrid } = await import(pathToFileURL(join(dir, 'scripts', 'lib', 'liveRoutingReport.mjs')).href);
+  // Each milestone's own library: M1–M3's diffRouting(baseline, current) predates parseGrid (E4-6).
+  const lib = await import(pathToFileURL(join(dir, 'scripts', 'lib', 'liveRoutingReport.mjs')).href);
   const current = JSON.parse(readFileSync(join(dir, 'scripts', '.verify-live-routing-report.json'), 'utf8'));
   const base = JSON.parse(readFileSync(join(dir, baseline), 'utf8'));
-  const grid = parseGrid(readFileSync(join(dir, 'src', 'data', 'emotions.ts'), 'utf8'));
-  const { changes, warnings = [] } = diffRouting(base, current, { grid });
+  const opts = typeof lib.parseGrid === 'function'
+    ? { grid: lib.parseGrid(readFileSync(join(dir, 'src', 'data', 'emotions.ts'), 'utf8')) }
+    : undefined;
+  const { changes, warnings = [] } = lib.diffRouting(base, current, opts);
   return { changes, warnings };
 }
 
-async function routingCompare(dir, tag, baseline, { allowNumbMove = false, info = false } = {}) {
+async function routingCompare(dir, tag, baseline, { allowNumbMove = false, allowPositiveStateStub = false, info = false } = {}) {
   const r = run('node', ['scripts/verify-live-routing.mjs', '--compare', baseline], { cwd: dir, allow: [0, 3] });
   if (!r.allowed) return step(`${tag} routing check runs`, false, `exit ${r.status}: ${tail(r.out)}`);
   const { changes, warnings } = await routingDiff(dir, baseline);
@@ -255,10 +260,10 @@ async function routingCompare(dir, tag, baseline, { allowNumbMove = false, info 
     return undefined;
   }
   if (r.status === 0) return step(`${tag} routing identical to ${baseline}`, true, warnings.length ? `${warnings.length} tie-order warning(s), see report` : '');
-  if (!allowNumbMove) return step(`${tag} routing identical to ${baseline}`, false, JSON.stringify(changes).slice(0, 400));
-  const bad = unexpectedRoutingChanges(changes);
-  return step(`${tag} routing identical to live except numb's intended move`, bad.length === 0,
-    bad.length ? JSON.stringify(bad).slice(0, 400) : `${changes.length} expected change(s)`);
+  const allowed = [allowNumbMove && "numb's intended move", allowPositiveStateStub && 'the positive_state stub (removed after M2)'].filter(Boolean);
+  const bad = unexpectedRoutingChanges(changes, { numbMove: allowNumbMove, positiveStateStub: allowPositiveStateStub });
+  return step(`${tag} routing identical to ${baseline}${allowed.length ? ` except ${allowed.join(' and ')}` : ''}`, bad.length === 0,
+    bad.length ? JSON.stringify(bad).slice(0, 600) : `${changes.length} expected change(s): ${changes.map((c) => c.what).join(', ')}`);
 }
 
 async function rehearseM2(d, dir) {
@@ -274,6 +279,15 @@ async function rehearseM2(d, dir) {
   step('M2 full load --verify', load.allowed, load.allowed ? '' : `exit ${load.status}: ${tail(load.out)}`);
   const g = run('node', ['scripts/load-graph.mjs', '--file', 'schema/migrations/2026-10-remove-goal-fields.cypher'], { cwd: dir });
   step('M2 remove goal fields', g.allowed, g.allowed ? '' : tail(g.out));
+  const stubFile = 'schema/migrations/2026-10-remove-positive-state-stub.cypher';
+  const st1 = run('node', ['scripts/load-graph.mjs', '--file', stubFile], { cwd: dir });
+  step('M2 remove the positive_state stub', st1.allowed, st1.allowed ? tail(st1.out, 4) : tail(st1.out));
+  const [stub] = await q(d, "MATCH (p:ActivationPattern {id: 'positive_state'}) RETURN count(p) AS c");
+  step('M2 no positive_state pattern left', num(stub.c) === 0, `${num(stub.c)} left`);
+  const fpStub = await fingerprint(d);
+  const st2 = run('node', ['scripts/load-graph.mjs', '--file', stubFile], { cwd: dir });
+  const stubDiff = fingerprintDiff(fpStub, await fingerprint(d));
+  step('M2 stub cleanup second run changes nothing', st2.allowed && stubDiff.length === 0, stubDiff.slice(0, 5).join('; '));
   const b3 = run('node', ['scripts/load-graph.mjs', '--file', 'schema/migrations/2026-10-user-data-backfill.cypher'], { cwd: dir });
   step('M2 backfill after deploy', b3.allowed, b3.allowed ? '' : tail(b3.out));
   const [un] = await q(d, 'MATCH (n) WHERE any(l IN labels(n) WHERE l IN $adopted) AND (n.ownerId IS NULL OR n.key IS NULL OR NOT n:UserData) RETURN count(n) AS c', { adopted: ADOPTED });
