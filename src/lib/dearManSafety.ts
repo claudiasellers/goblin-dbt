@@ -4,7 +4,7 @@
  * safetyCopy). Type-only imports keep this file dependency-free for tests.
  */
 import type { DearManHandoff } from '../data/dearManHandoff';
-import type { Band, BandRule } from '../data/capacityTypes';
+import type { Band, BandRule, ThenVsNow } from '../data/capacityTypes';
 import { bandFromLegacyScore } from './band';
 
 /**
@@ -34,9 +34,12 @@ export function dearManBandGate(
 /**
  * Whether the Summary opens with the heads-up: the band isn't steady. The plan is never locked or
  * hidden. The person worked for it; the heads-up names the risk and offers a quick way to take the
- * edge off. No band (not asked) → no heads-up.
+ * edge off. No band (not asked) → no heads-up. When the user's latest P2 reread said "much
+ * quieter", the start band is no longer what they told us, so "it's still loud in there" would
+ * contradict them (then-vs-now, R3): no heads-up.
  */
-export function summaryHeadsUpForBand(band: Band | null | undefined): boolean {
+export function summaryHeadsUpForBand(band: Band | null | undefined, lastThenVsNow?: ThenVsNow | null): boolean {
+  if (lastThenVsNow === 'much_better') return false;
   return !!band && band !== 'steady';
 }
 

@@ -719,7 +719,14 @@ export function DearMan() {
           <BackButton />
           <BreakdownHandoff host="dear-man" band={bandReading.value} blank={false}
             resume={resumeDraft(afterGate.current)} onScheduleLater={scheduleLater}
-            onResume={(r) => { recordHandoff(r); setResumeNote({ kind: 'resumed', phase: afterGate.current.phase }); goAfterGate(); }}
+            onResume={(r) => {
+              recordHandoff(r);
+              // "Picking up where we were." only when there is something to pick up (a resumed draft
+              // or a later step), not on the first screen of a plan that hadn't started.
+              const t = afterGate.current;
+              if (resumed?.token || t.phase !== 'scene' || t.sceneStep > 0) setResumeNote({ kind: 'resumed', phase: t.phase });
+              goAfterGate();
+            }}
             onLater={recordHandoff} />
         </div>
       );
@@ -1396,7 +1403,8 @@ export function DearMan() {
       const reinforceTexts = resolveReinforce();
       const mgText = resolveMiddleGround();
       const waText = resolveWalkAway();
-      const hot = summaryHeadsUpForBand(bandReading?.value) && Boolean(sc.hotHeading);
+      const lastReread = [...handoffs.current].reverse().find(r => r.thenVsNow)?.thenVsNow ?? null;
+      const hot = summaryHeadsUpForBand(bandReading?.value, lastReread) && Boolean(sc.hotHeading);
       // The heads-up's breath is P2's sigh primitive (graph HandoffPrimitive copy), not Recover's gates.
       const sigh = band.content?.primitives.find(p => p.id === 'sigh')?.copy as
         { title: string; sub: string; phases: BreathPhase[]; cycles: number; start: string; skip: string; done: string } | undefined;

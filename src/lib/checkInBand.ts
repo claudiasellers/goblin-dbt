@@ -20,6 +20,9 @@ export type BandStep =
 /**
  * After the feelings are in: ask (`capacity`), or skip keeping this check-in's own reading, carrying
  * the current one (`carry: true`: the caller mints the carried reading), or with no band (pleasant).
+ * A current `flooded` is asked again rather than carried (D-07, as in BandGate's reaskIfFlooded):
+ * a new check-in inside 20 minutes is exactly when that may have changed, and a stale flooded
+ * would set this check-in's band, beat and (from E4) its routing without the user saying so.
  */
 export function bandStepFor(
   quadrant: string | null | undefined,
@@ -28,7 +31,7 @@ export function bandStepFor(
 ): BandStep {
   if (!asksBand(quadrant)) return { next: 'skip', keep: null, carry: false };
   if (own) return { next: 'skip', keep: own, carry: false };
-  if (current) return { next: 'skip', keep: null, carry: true };
+  if (current && current.value !== 'flooded') return { next: 'skip', keep: null, carry: true };
   return { next: 'capacity' };
 }
 

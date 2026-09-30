@@ -18,6 +18,7 @@ test("bandStepFor: unpleasant asks once; own reading kept; current carried; plea
   const own = reading({ value: "flooded" });
   assert.deepEqual(cb.bandStepFor("high-unpleasant", own, reading()), { next: "skip", keep: own, carry: false });
   assert.deepEqual(cb.bandStepFor("low-unpleasant", null, reading()), { next: "skip", keep: null, carry: true });
+  assert.deepEqual(cb.bandStepFor("high-unpleasant", null, reading({ value: "flooded" })), { next: "capacity" }, "a current flooded is re-asked (D-07)");
   for (const q of ["high-pleasant", "low-pleasant", null]) {
     assert.deepEqual(cb.bandStepFor(q, own, reading()), { next: "skip", keep: null, carry: false }, String(q));
   }

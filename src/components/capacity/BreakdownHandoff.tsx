@@ -34,12 +34,17 @@ type Stage =
  * `onSafety` renders the "I'm not safe" link when the safety batch passes `safety.open`.
  */
 export function BreakdownHandoff({
-  host, band: bandValue, blank = false, resume, startWithPrimitive, onResume, onLater, onScheduleLater, onSafety, safetyLabel,
+  host, band: bandValue, blank = false, resume, dismissedRef, startWithPrimitive, onResume, onLater, onScheduleLater, onSafety, safetyLabel,
 }: {
   host: string;
   band: Band;
   blank?: boolean;
   resume?: HandoffResumeDraft;
+  /**
+   * Set to true by a host that closes P2 in place (the too-much overlay's close button): the user
+   * is back on the same step, not leaving, so the draft is not written to this device.
+   */
+  dismissedRef?: { current: boolean };
   /** Skip the card (the user asked for this via "too much"). */
   startWithPrimitive?: boolean;
   onResume: (r: HandoffResult) => void;
@@ -87,7 +92,7 @@ export function BreakdownHandoff({
     alive.current = true;
     return () => {
       alive.current = false;
-      setTimeout(() => { if (!alive.current && !resolved.current) persistRef.current(); }, 0);
+      setTimeout(() => { if (!alive.current && !resolved.current && !dismissedRef?.current) persistRef.current(); }, 0);
     };
   }, []);
 
@@ -135,6 +140,8 @@ export function BreakdownHandoff({
         <div className="space-y-4" data-testid={`primitive-${p.id}`}>
           {stage.i > 0 && <p className={secondaryText}>{h.secondLead}</p>}
           <Primitive p={p} onDone={done} />
+          {/* Never a lock: the breath shows no skip until it starts, so the way out stays here too. */}
+          <div className="text-center">{keepGoing}</div>
         </div>
       );
     }

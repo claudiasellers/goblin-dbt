@@ -48,6 +48,8 @@ test("summary heads-up when the band isn't steady; the plan is never locked; no 
   assert.equal(summaryHeadsUpForBand("flooded"), true);
   assert.equal(summaryHeadsUpForBand("steady"), false);
   assert.equal(summaryHeadsUpForBand(null), false);
+  assert.equal(summaryHeadsUpForBand("flooded", "much_better"), false, "the user said much quieter: no 'still loud'");
+  assert.equal(summaryHeadsUpForBand("flooded", "better"), true);
   assert.doesNotMatch(tsx, /WaitLock|blur-\[|planLocked/, "DEAR MAN must not lock or hide the plan");
   assert.doesNotMatch(tsx, /UrgeScale|checkStep|downshifted|safetyGates|intensityQuestion|rerateQuestion/);
   assert.match(tsx, /<BandGate context="dear-man" wording="relational" force=\{gateForce\} reaskIfFlooded/);

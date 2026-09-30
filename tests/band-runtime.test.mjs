@@ -136,6 +136,14 @@ test("BreakdownHandoff opens on the card with Start and Keep going anyway; skipp
   assert.match(prim, /data-testid="primitive-sigh"/);
   const blank = wrap(h(BreakdownHandoff, { host: "dear-man", band: "stirred", blank: true, startWithPrimitive: true, onResume: () => {} }));
   assert.match(blank, /data-testid="primitive-orient"/, "blank and not flooded: orient first");
+  assert.match(prim, /data-testid="keep-going"/, "never a lock: the way out is there before the breath starts");
+});
+
+test("closing the too-much overlay is not leaving: P2 doesn't write the draft to the device", () => {
+  const link = readFileSync("src/components/capacity/TooMuchLink.tsx", "utf8");
+  assert.match(link, /dismissedRef=\{dismissed\}/);
+  assert.match(link, /const close = \(\) => \{ dismissed\.current = true; setOpen\(null\); \}/);
+  assert.match(readFileSync("src/components/capacity/BreakdownHandoff.tsx", "utf8"), /!resolved\.current && !dismissedRef\?\.current\) persistRef\.current\(\)/);
 });
 
 test("TooMuchLink renders the graph's quiet link, closed by default", () => {
@@ -167,4 +175,5 @@ test("BandProvider is mounted inside AuthProvider; FTF records its band; P2 neve
     assert.doesNotMatch(src, /WaitLock|UrgeScale|type="range"|\/ ?10\b|blur-\[/, f);
   }
   assert.match(readFileSync("dev/vite.harness.config.ts", "utf8"), /capacity\.html/);
+  assert.match(readFileSync("src/contexts/TodayContext.tsx", "utf8"), /getToday\(bandValue\)/, "Today gets the fresh band (E2 GetTodayRequest)");
 });
