@@ -66,7 +66,7 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
     if (!t) continue;
     const dueAt = r.get('dueAt') as string;
     const vars = { detailId: r.get('detailId') as string | null, sourceToolId: r.get('sourceToolId') as string | null,
-      sourceSessionId: r.get('sourceSessionId') as string | null };
+      sourceSessionId: r.get('sourceSessionId') as string | null, followUpId: r.get('id') as string | null };
     const deepLink = t.resolveMode === 'deeplink' ? fillDeepLink(t.deepLinkTemplate, vars) : null;
     const state = followUpState(dueAt, t.staleAfterHours, now.getTime());
     if (state) {

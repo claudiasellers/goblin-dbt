@@ -51,15 +51,23 @@ async function startTx(tx: ManagedTransaction, uid: string, email: string | null
        ts.bandAtStart = $bandAtStart, ts.bandAtStartSource = $bandAtStartSource,
        ts.bandAtStartViaCantTell = $bandAtStartViaCantTell,
        ts.bandAtStartAt = CASE WHEN $bandAtStartAt IS NULL THEN null ELSE datetime($bandAtStartAt) END,
-       ts.bandAtStartJson = $bandAtStartJson
+       ts.bandAtStartJson = $bandAtStartJson, ts.checkInId = $checkInId
      MERGE (u)-[:HAS_TOOL_SESSION]->(ts)
      WITH u, ts
+     // A check-in that embedded this session (FTF inside the check-in) and was saved first.
+     OPTIONAL MATCH (u)-[:LOGGED]->(ec:CheckIn) WHERE $id IN coalesce(ec.embeddedToolSessionIds, [])
+     FOREACH (x IN CASE WHEN ec IS NULL THEN [] ELSE [ec] END | MERGE (x)-[:EMBEDDED]->(ts))
+     WITH DISTINCT u, ts
      OPTIONAL MATCH (u)-[:LOGGED]->(c:CheckIn {key: $checkInKey})
      OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(h:ToolSession {key: $hostKey})
      OPTIONAL MATCH (u)-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $followUpKey})
      FOREACH (x IN CASE WHEN c IS NULL THEN [] ELSE [c] END | MERGE (ts)-[:FROM_CHECKIN]->(x))
      FOREACH (x IN CASE WHEN h IS NULL OR h = ts THEN [] ELSE [h] END | MERGE (ts)-[:HANDED_OFF_FROM]->(x))
      FOREACH (x IN CASE WHEN f IS NULL THEN [] ELSE [f] END | MERGE (ts)-[:RESOLVING]->(x))
+     // Opening a "come back to this later" link is the resolution (Codex, PR #17); other deep-link
+     // types are resolved by their own tool (oa_plan by Opposite Action).
+     FOREACH (x IN CASE WHEN f IS NOT NULL AND f.type = 'resume_skill' AND ${GUARDS.FollowUp.update('f')} THEN [f] ELSE [] END |
+       SET x.status = 'done', x.resolvedAt = datetime(), x.updatedAt = datetime())
      WITH u, ts
      MERGE (tu:ToolUsage {key: $usageKey})
      ON CREATE SET tu:UserData:LogRecord, tu.id = $usageId, tu.ownerId = $uid, tu.toolId = $toolId,
@@ -70,17 +78,19 @@ async function startTx(tx: ManagedTransaction, uid: string, email: string | null
     {
       uid, email, key: userKey(uid, s.id), id: s.id, toolId: s.toolId, module: s.module, closeKind: s.closeKind,
       flowVersion: s.flowVersion, entry: s.entry, patternId: s.patternId, emotionIds: s.emotionIds, ...band,
-      checkInKey: k(s.checkInId), hostKey: k(s.hostSessionId), followUpKey: k(s.followUpId),
+      checkInId: s.checkInId ?? null, checkInKey: k(s.checkInId), hostKey: k(s.hostSessionId), followUpKey: k(s.followUpId),
       usageKey: userKey(uid, `${s.id}:usage`), usageId: `${s.id}:usage`,
     },
   );
   // The compat row follows the check-in it came from (F6), else the latest one before now, once.
+  // When the session names a check-in that isn't saved yet (the render save still in flight), it
+  // waits: saveCheckIn links it (never the previous check-in by mistake; Codex, PR #16).
   await tx.run(
     `MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})-[:COMPAT_USAGE]->(tu:ToolUsage)
      WHERE NOT (tu)-[:FOLLOWED_CHECKIN]->()
      OPTIONAL MATCH (ts)-[:FROM_CHECKIN]->(given:CheckIn)
      OPTIONAL MATCH (u)-[:LOGGED]->(latest:CheckIn)
-       WHERE given IS NULL AND latest.timestamp <= tu.timestamp AND latest.quadrant IS NOT NULL
+       WHERE given IS NULL AND ts.checkInId IS NULL AND latest.timestamp <= tu.timestamp AND latest.quadrant IS NOT NULL
      WITH tu, given, latest ORDER BY latest.timestamp DESC LIMIT 1
      WITH tu, coalesce(given, latest) AS link
      FOREACH (x IN CASE WHEN link IS NULL THEN [] ELSE [link] END | MERGE (tu)-[:FOLLOWED_CHECKIN]->(x))`,

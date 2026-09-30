@@ -118,7 +118,8 @@ test("safety cypher is idempotent: MERGE only, no bare CREATE", () => {
   assert.match(safetyCypher, /c\.version = 'dear-man-safety-v3'/);
   for (const k of ["intensityQuestion", "intensityHint", "intensityLow", "intensityHigh", "downshiftLead", "rerateQuestion", "rerateHint"]) {
     assert.doesNotMatch(safetyCypher, new RegExp(`c\\.${k} = `), `${k} is no longer set`);
-    assert.match(safetyCypher, new RegExp(`REMOVE[^;]*c\\.${k}`), `${k} is removed from the live node`);
+    // Kept on the live node for one release, for tabs still running the pre-M3 page (Codex, PR #17).
+    assert.doesNotMatch(safetyCypher, new RegExp(`REMOVE[^;]*c\\.${k}`), `${k} stays on the live node for now`);
   }
 });
 

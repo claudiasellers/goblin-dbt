@@ -149,7 +149,12 @@ export function CheckIn() {
     if (!user || step !== 'result' || !stateResult || !checkInData.quadrant) return;
     if (savedResult.current === stateResult) return;
     savedResult.current = stateResult;
-    savePromise.current = saveCheckIn(buildCheckInPayload(payloadState(), stateResult))
+    // A re-save ("add more detail") waits for the one in flight, so an earlier snapshot can never
+    // land after a newer one (Codex, PR #16). The payload is taken now, not when it runs.
+    const payload = buildCheckInPayload(payloadState(), stateResult);
+    const prev = savePromise.current ?? Promise.resolve(true);
+    savePromise.current = prev
+      .then(() => saveCheckIn(payload))
       .then(() => true)
       .catch((err) => {
         console.error('Failed to save check-in:', err);

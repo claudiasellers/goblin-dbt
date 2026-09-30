@@ -160,7 +160,7 @@ FOLLOW_UP_TYPES = [
     {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).
         "id": "resume_skill", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
-        "deepLinkTemplate": "/tool/{sourceToolId}?resume={sourceSessionId}",
+        "deepLinkTemplate": "/tool/{sourceToolId}?resume={sourceSessionId}&followUp={followUpId}",
         "window": {"kind": "chip", "chips": {"1h": {"kind": "after", "minutes": 60},
                                              "evening": {"kind": "at_local", "days": 0, "time": "19:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "10:00"}}},

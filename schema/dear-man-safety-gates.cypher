@@ -50,9 +50,11 @@ SET c.version = 'dear-man-safety-v3',
     c.hotReady = "I'm good to go",
     c.hotBodyCue = 'Unclench your jaw and drop your shoulders while you read it through.',
     c.hotCooled = "That's the edge off. Read your plan once more, out loud if you can, then go when it feels right."
-REMOVE c.planLocked, c.planUnlocked, c.planLockedHeading,
-       c.intensityQuestion, c.intensityHint, c.intensityLow, c.intensityHigh,
-       c.downshiftLead, c.rerateQuestion, c.rerateHint;
+REMOVE c.planLocked, c.planUnlocked, c.planLockedHeading;
+// The old number-scale copy (intensityQuestion, intensityHint, intensityLow, intensityHigh,
+// downshiftLead, rerateQuestion, rerateHint) is no longer set, but stays on the live node for one
+// release: a tab still running the pre-M3 page skips DEAR MAN's arousal check without it (Codex,
+// PR #17). Remove it in the next content release.
 
 
 // ============================================================
