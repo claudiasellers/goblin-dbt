@@ -18,10 +18,9 @@ import { isDearManHandoff, type DearManHandoff } from '../../data/dearManHandoff
 import { BreathOrb, type BreathPhase } from '../../components/tools/regulation/body';
 import { linkButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 import { fill } from '../../lib/invalidationRecovery';
-import { dearManBandGate, handoffPrefill, summaryHeadsUpForBand } from '../../lib/dearManSafety';
+import { handoffPrefill, summaryHeadsUpForBand } from '../../lib/dearManSafety';
 import type { CapacityReading, HandoffResult } from '../../data/capacityTypes';
 import { useBand } from '../../hooks/useBand';
-import { BandGate } from '../../components/capacity/BandGate';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
 import { handoffExt, makeReading } from '../../lib/bandStore';
@@ -196,10 +195,19 @@ export function DearMan() {
   const [showCarry, setShowCarry] = useState(true);
   const [bandReading, setBandReading] = useState<CapacityReading | null>(null);
   /** Ask even if a reading is current (a flooded hand-off from Recover is re-asked once, D-07). */
-  const [gateForce, setGateForce] = useState(false);
+  const [, setGateForce] = useState(false);
   /** Where the gate (and P2) goes next: the scene by default, or the step a resumed draft left on. */
   const afterGate = useRef<DearManStep>(resumed?.token ? dearManStepFromId(resumed.token.stepId) : { phase: 'scene', sceneStep: 0 });
   const handoffs = useRef<HandoffResult[]>([]);
+  // Claudia, 30 Sep: DEAR MAN doesn't open with the band question or the breathing hand-off. Planning
+  // or debriefing a conversation is a thinking moment. Every route into 'check' goes straight on to
+  // the planned step; the "still loud" heads-up on the Summary and the too-much link stay.
+  useEffect(() => {
+    if (phase !== 'check') return;
+    const t = afterGate.current;
+    setSceneStep(t.sceneStep);
+    setPhase(t.phase);
+  }, [phase]);
   /** "Picking up where we were." / "You were in the middle of something earlier.", on one screen. */
   const [resumeNote, setResumeNote] = useState<{ kind: 'resumed' | 'stale'; phase: Phase } | null>(() => (
     resumed ? (resumed.token ? { kind: 'resumed', phase: 'check' } : { kind: 'stale', phase: 'entry' }) : null));
@@ -387,16 +395,6 @@ export function DearMan() {
     setPhase(t.phase);
   };
 
-  /** The gate answered (or carried): flooded → P2; "I can't tell" → the P2 card, skippable; else plan. */
-  const onBand = (r: CapacityReading | null) => {
-    setBandReading(r);
-    if (r) session.setBandAtStart(r);
-    if (r && (dearManBandGate(r.value, band.content?.bandRules) === 'handoff' || r.viaCantTell)) {
-      setPhase('handoff');
-      return;
-    }
-    goAfterGate();
-  };
 
   /** P2 results ride on this visit's ToolSession (ext.er.handoffs, R18). */
   const recordHandoff = (r: HandoffResult) => {
@@ -702,17 +700,8 @@ export function DearMan() {
       );
     }
 
-    // ─── BAND CHECK (A4-4): one relational question, carried within 20 min; no number ───
-    if (phase === 'check') {
-      return (
-        <div className="space-y-6">
-          <BackButton />
-          {noteLine}
-          <BandGate context="dear-man" wording="relational" force={gateForce} reaskIfFlooded
-            hostSessionId={session.id || undefined} onBand={onBand} />
-        </div>
-      );
-    }
+    // ─── 'check' is a pass-through now (no band question in DEAR MAN; see the effect at the top) ───
+    if (phase === 'check') return null;
 
     // ─── P2: body first, then back to the same step ───
     if (phase === 'handoff' && bandReading) {

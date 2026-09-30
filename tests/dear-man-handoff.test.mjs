@@ -52,8 +52,10 @@ test("summary heads-up when the band isn't steady; the plan is never locked; no 
   assert.equal(summaryHeadsUpForBand("flooded", "better"), true);
   assert.doesNotMatch(tsx, /WaitLock|blur-\[|planLocked/, "DEAR MAN must not lock or hide the plan");
   assert.doesNotMatch(tsx, /UrgeScale|checkStep|downshifted|safetyGates|intensityQuestion|rerateQuestion/);
-  assert.match(tsx, /<BandGate context="dear-man" wording="relational" force=\{gateForce\} reaskIfFlooded/);
-  assert.match(tsx, /<BreakdownHandoff host="dear-man"/);
+  // Claudia, 30 Sep: no band question and no breathing hand-off before planning or debriefing.
+  assert.doesNotMatch(tsx, /<BandGate/, "DEAR MAN doesn't open with the band question");
+  assert.match(tsx, /if \(phase === 'check'\) return null;/);
+  assert.match(tsx, /if \(phase !== 'check'\) return;\s*const t = afterGate\.current;\s*setSceneStep\(t\.sceneStep\);\s*setPhase\(t\.phase\);/);
   assert.match(tsx, /<TooMuchLink host="dear-man"/);
   assert.match(tsx, /session\.setBandAtStart\(r\)/);
   assert.match(tsx, /er: \{ handoffs: handoffExt\(handoffs\.current\) \}/);

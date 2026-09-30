@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { ToolSessionContext, type ToolSessionApi, type ToolSessionCloseInput } from '../hooks/useToolSession';
-import { closeToolSession, startToolSession, type SessionExt } from '../services/spine';
+import { closeToolSession, getSpineContent, startToolSession, type SessionExt } from '../services/spine';
 import { newId } from '../lib/spine/ids';
 import { spineFrom } from '../lib/spine/toolLink';
 import { closeKindFor, durationSec } from '../lib/spine/close';
@@ -33,6 +33,9 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
     } as const;
   });
   const uid = user?.uid ?? null;
+  // Fetch the close question's copy when the tool opens, not when it ends, so the question is ready
+  // the moment the tool finishes (it used to wait on a cold server call). Cached per page load.
+  useEffect(() => { getSpineContent().catch(() => { /* the close is optional */ }); }, []);
   // E2 §A3.6: Today refetches after any close (a skipped close question, Recover's follow-ups, ps_step).
   const { refresh: refreshToday } = useToday();
 
