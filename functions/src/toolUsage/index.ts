@@ -31,7 +31,8 @@ export const trackToolUsage = onCall(
     try {
       await session.run(
         `
-        MATCH (u:User {id: $userId})
+        MERGE (u:User {id: $userId})
+        ON CREATE SET u.createdAt = datetime(), u.email = $email
         CREATE (tu:ToolUsage {
           id: randomUUID(),
           toolId: $toolId,
@@ -48,7 +49,7 @@ export const trackToolUsage = onCall(
           MERGE (tu)-[:FOLLOWED_CHECKIN]->(c)
         )
         `,
-        { userId, toolId }
+        { userId, toolId, email: request.auth.token.email || null }
       );
 
       return { success: true };

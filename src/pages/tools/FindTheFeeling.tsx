@@ -12,6 +12,7 @@ import { ToolLoading } from '../../components/tools/ToolLoading';
 import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { Orient } from '../../components/tools/regulation/body';
 import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
+import { newId } from '../../lib/spine/ids';
 import type { RoomProps } from '../../components/tools/findTheFeeling/roomTypes';
 
 // Rooms carry three.js / Web Audio: loaded only when the tool opens, one room at a time.
@@ -19,15 +20,6 @@ const rooms: Record<Way, React.LazyExoticComponent<ComponentType<RoomProps>>> = 
   shape: lazy(() => import('../../components/tools/findTheFeeling/shape/ShapeRoom')),
   tune: lazy(() => import('../../components/tools/findTheFeeling/tune/TuneRoom')),
 };
-
-/** crypto.randomUUID needs a secure context; fall back for plain-http testing on a LAN. */
-function newId(): string {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') return crypto.randomUUID();
-  const b = crypto.getRandomValues(new Uint8Array(16));
-  b[6] = (b[6] & 0x0f) | 0x40; b[8] = (b[8] & 0x3f) | 0x80;
-  const h = [...b].map(x => x.toString(16).padStart(2, '0')).join('');
-  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
-}
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: FindTheFeelingContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';

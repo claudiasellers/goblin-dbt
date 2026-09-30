@@ -48,6 +48,17 @@ export const ensureUserExists = onCall(
 // USER PROFILE FUNCTIONS
 // ============================================
 
+/** An IANA time zone this runtime knows (Intl.supportedValuesOf omits UTC aliases). */
+export function isTimeZone(v: unknown): v is string {
+  if (typeof v !== 'string' || v.length > 64) return false;
+  if (v === 'UTC' || v === 'Etc/UTC') return true;
+  try {
+    return (Intl as unknown as { supportedValuesOf(k: string): string[] }).supportedValuesOf('timeZone').includes(v);
+  } catch {
+    return false;
+  }
+}
+
 const PROFILE_DEFAULTS = {
   displayName: null,
   photoURL: null,
@@ -62,6 +73,7 @@ const PROFILE_DEFAULTS = {
   focusCategories: [],
   dataRetentionDays: null,
   shareAnonymousData: false,
+  timeZone: null,
 };
 
 /**
@@ -153,7 +165,7 @@ export const updateUserProfile = onCall(
       'displayName', 'photoURL', 'theme', 'palette',
       'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
       'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories',
-      'dataRetentionDays', 'shareAnonymousData',
+      'dataRetentionDays', 'shareAnonymousData', 'timeZone',
     ];
 
     const cleanUpdates: Record<string, unknown> = {};
@@ -169,6 +181,11 @@ export const updateUserProfile = onCall(
       throw new HttpsError('invalid-argument', 'Unknown palette');
     }
 
+    // IANA time zone (follow-up windows, quiet hours, later push). Unknown zones are dropped.
+    if ('timeZone' in cleanUpdates && !isTimeZone(cleanUpdates.timeZone)) {
+      delete cleanUpdates.timeZone;
+    }
+
     if (Object.keys(cleanUpdates).length === 0) {
       return { success: true };
     }
@@ -182,10 +199,11 @@ export const updateUserProfile = onCall(
 
       await session.run(
         `
-        MATCH (u:User {id: $userId})
+        MERGE (u:User {id: $userId})
+        ON CREATE SET u.createdAt = datetime(), u.email = $email
         SET ${setClauses}, u.updatedAt = datetime()
         `,
-        { userId, ...cleanUpdates }
+        { userId, email: request.auth.token.email || null, ...cleanUpdates }
       );
 
       // Sync displayName/photoURL to Firebase Auth so it persists across sessions

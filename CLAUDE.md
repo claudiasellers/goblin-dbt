@@ -25,8 +25,8 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 
 | Module | Callables |
 |---|---|
-| `checkin/` | `saveCheckIn`, `getCheckInsByUser` |
-| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; trigger `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
+| `checkin/` | `saveCheckIn` (idempotent upsert by client id; saved when the result renders), `setCheckInNextAction`, `getCheckInsByUser`; `validation.ts` |
+| `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; triggers `onUserCreated` / `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
 | `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
 | `insights/` | `getInsightsData` |
 | `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` |
@@ -52,7 +52,7 @@ Adding a callable: export it from its domain module, add one line to `functions/
 
 4. **Idempotent schema loading with MERGE.** Every loaded Cypher file is MERGE-only (enforced by `tests/schema-idempotency.test.mjs`), so a full load is safe to re-run and two runs give identical totals. Conventions are under Neo4j Conventions below.
 
-5. **Activation patterns** drive the recommendation engine. The graph has 10 `ActivationPattern` nodes: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, plus Phase-2 `grief_yearning` and `reactive_aggression`. The engine's quadrant map considers the first 8, so `grief_yearning` and `reactive_aggression` are never selected. `positive_state` is not a graph pattern: it is the synthetic pleasant-quadrant result (and `saveCheckIn` MERGEs a stub node for it). Each pattern maps to brain structures (overactive/suppressed) and tool recommendations.
+5. **Activation patterns** drive the recommendation engine. The graph has 10 `ActivationPattern` nodes: `acute_alarm`, `chronic_vigilance`, `emotional_flooding`, `social_threat_shame`, `conservation_freeze`, `dissociation_overmodulation`, `rumination_loop`, `reward_drive_low`, plus Phase-2 `grief_yearning` and `reactive_aggression`. The engine's quadrant map considers the first 8, so `grief_yearning` and `reactive_aggression` are never selected. `positive_state` is not a graph pattern: it is the synthetic pleasant-quadrant result (`saveCheckIn` stores it as `activationPatternId` only; it never creates content nodes). Each pattern maps to brain structures (overactive/suppressed) and tool recommendations.
 
 ---
 
@@ -190,7 +190,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 
 - `npm test`: Tier 1, no network: `node --test tests/*.test.mjs` (pure logic, schema and content checks; two freshness tests shell out to `python3`) then `npm --prefix functions test` (builds, then the fake-driver unit tests in `functions/test/unit/`: pinned exports + deploy manifest, auth matrix, handler pins, shared helpers). `node --test tests/` does NOT work on Node 22; use the glob.
 - `npm run test:emulator`: Tier 2 goldens against the Auth + Functions emulators and a local Neo4j. Needs Docker: `npm run graph:test:up`, `npm run graph:test:load`, `cp functions/.secret.local.example functions/.secret.local`. Record with `UPDATE_GOLDEN=1`.
-- Lint: `npx eslint .` still reports 7 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
+- Lint: `npx eslint .` still reports 5 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
 - Cypher syntax: `npx -y -p @neo4j-cypher/language-support@2.0.0-next.6 node scripts/lint-cypher.mjs`.
 - CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 22, no secrets).
 

@@ -50,11 +50,14 @@ export const getInsightsData = onCall(
         session1.run(
           `
           MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
-          ${checkInTimeFilter}
+          ${checkInTimeFilter ? `${checkInTimeFilter} AND c.quadrant IS NOT NULL` : 'WHERE c.quadrant IS NOT NULL'}
           OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
           WITH c, collect(DISTINCT s.region) AS bodyRegions, collect(s.tags) AS tagArrays
-          OPTIONAL MATCH (e:Emotion {id: c.emotion})
-          WITH c, bodyRegions, tagArrays, e.dbtParent AS dbtParent
+          // Emotion families from the saved emotion ids (PR-C1; F12: c.emotion is a display string,
+          // and no schema sets Emotion.dbtParent): DBT parent via HAS_REGULATION_CONTENT, else wheel family.
+          OPTIONAL MATCH (e:Emotion) WHERE e.id IN coalesce(c.emotionIds, [])
+          OPTIONAL MATCH (e)-[:HAS_REGULATION_CONTENT]->(rc:EmotionRegulationContent)
+          WITH c, bodyRegions, tagArrays, collect(DISTINCT coalesce(e.dbtParent, rc.dbtParent, e.family)) AS families
           ORDER BY c.timestamp DESC
           RETURN c.id AS id,
                  toString(c.timestamp) AS timestamp,
@@ -65,7 +68,7 @@ export const getInsightsData = onCall(
                  c.activationPatternId AS activationPatternId,
                  bodyRegions,
                  tagArrays,
-                 dbtParent
+                 families
           `,
           { userId }
         ),
@@ -108,7 +111,7 @@ export const getInsightsData = onCall(
         activationPatternId: r.get('activationPatternId') || null,
         bodyRegions: (r.get('bodyRegions') || []).filter(Boolean) as string[],
         sensationTags: ((r.get('tagArrays') || []) as string[][]).flat().filter(Boolean) as string[],
-        dbtParent: r.get('dbtParent') || null,
+        families: ((r.get('families') || []) as Array<string | null>).filter(Boolean) as string[],
       }));
 
       // Parse tool usage
@@ -358,8 +361,8 @@ export const getInsightsData = onCall(
             }
 
             // 2. Emotion family breadth
-            const olderFamilies = new Set(olderHalf.map(ci => ci.dbtParent).filter(Boolean));
-            const newerFamilies = new Set(newerHalf.map(ci => ci.dbtParent).filter(Boolean));
+            const olderFamilies = new Set(olderHalf.flatMap(ci => ci.families));
+            const newerFamilies = new Set(newerHalf.flatMap(ci => ci.families));
             if (newerFamilies.size > olderFamilies.size && newerFamilies.size >= thresholds.emotionFamilyMin) {
               insights.push({
                 key: 'emotion-family-breadth',

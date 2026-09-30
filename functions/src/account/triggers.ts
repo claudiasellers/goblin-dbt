@@ -16,3 +16,20 @@ export const onUserDeleted = functionsV1
   .onDelete(async (user) => {
     await withSession((session) => deleteUserGraph(session, user.uid));
   });
+
+/**
+ * A User node from sign-up (F4): before PR-C1 it only appeared at the first check-in save, so
+ * profile updates, tool usage and DEAR MAN saves silently dropped writes for new users. The client
+ * also calls ensureUserExists after sign-in, and every write MERGEs the user, so a missed trigger
+ * costs nothing.
+ */
+export const onUserCreated = functionsV1
+  .runWith({ secrets: NEO4J_SECRETS })
+  .auth.user()
+  .onCreate(async (user) => {
+    await withSession((session) => session.run(
+      `MERGE (u:User {id: $uid})
+       ON CREATE SET u.email = $email, u.createdAt = datetime(), u.timeZone = null`,
+      { uid: user.uid, email: user.email ?? null },
+    ));
+  });

@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
+import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
+import { newId } from '../../lib/spine/ids';
 import type { DearManContentResult, DearManDebriefContentResult, DearManReflectionResult } from '../../data/dearManTypes';
 import type { StateResult as StateResultType } from '../../services/neo4j';
 import { getEmotionByName } from '../../data/emotions';
@@ -249,17 +251,18 @@ export function DearMan() {
     getStateAndTools({ quadrant, emotions: emotionIds })
       .then(result => {
         setStateResult(result);
-        // Save check-in with activation pattern
-        saveCheckIn('', {
-          emotion: emotionIds.join(', '),
+        // Save the debrief's check-in (PR-C1): its own id, source dear_man_debrief, emotion ids,
+        // what rendered. Idempotent by id; a signed-out debrief simply isn't saved.
+        saveCheckIn(buildCheckInPayload({
+          id: newId(),
           quadrant,
+          emotions: emotionIds,
           intensity: { x: 0.5, y: 0.5 },
           bodySensations: [],
           note: 'From DEAR MAN debrief',
-          timestamp: new Date(),
-          activationPatternId: result.pattern?.id,
-          confidence: result.pattern?.confidence,
-        }).catch(() => {});
+          startedAt: new Date(),
+          source: 'dear_man_debrief',
+        }, result)).catch(() => {});
       })
       .catch(() => {});
   }, [phase]);

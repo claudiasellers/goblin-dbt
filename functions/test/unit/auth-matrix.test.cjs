@@ -12,7 +12,7 @@ const AUTHED = [
   'deleteUserData', 'ensureUserExists', 'exportUserData', 'getCheckInsByUser',
   'getDearManSessions', 'getFeelingCollection', 'getInsightsData', 'getInvalidationRecoveryProgress',
   'getOppositeActionFollowUps', 'getOppositeActionSession', 'getOppositeActionSessions', 'getUserProfile',
-  'recordToolOutcome', 'saveCheckIn',
+  'recordToolOutcome', 'saveCheckIn', 'setCheckInNextAction',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
 ];
@@ -23,7 +23,7 @@ const PUBLIC = [
 ];
 
 // Background triggers (not callables): auth lifecycle events carry their own uid.
-const TRIGGERS = ['onUserDeleted'];
+const TRIGGERS = ['onUserCreated', 'onUserDeleted'];
 
 const { fns, setDriver } = loadFunctions();
 

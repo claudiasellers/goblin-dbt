@@ -5,10 +5,17 @@ import { getToolById } from '../../data/tools';
 import type { StateResult, ToolRecommendation } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
+import { fromCheckIn } from '../../lib/spine/toolLink';
+import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
 
 interface StateResultProps {
   result: StateResult;
-  onDone: () => void;
+  /** Called with what the user did (Done, a micro-step, a guided activity); Done when omitted. */
+  onDone: (next?: CheckInNextAction) => void;
+  /** The saved check-in (PR-C1): tool links carry it so the tool session links back to it. */
+  checkInId?: string;
+  /** A tool card tap (recorded as the check-in's next action; navigation doesn't wait). */
+  onToolOpen?: (toolId: string) => void;
   onAddMoreDetail?: () => void;
   checkinEmotions?: string[];
 }
@@ -35,7 +42,7 @@ interface StateResultProps {
  * the micro-step screen). Everything else still renders below it. Layout comes
  * from `resultSections` / `bailoutSections` in src/lib/crisisBanner.ts.
  */
-export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }: StateResultProps) {
+export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, checkInId, onToolOpen }: StateResultProps) {
   const { pattern, tools, safetyFlag } = result;
   const sections = resultSections({
     variant: 'standard',
@@ -50,18 +57,20 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
   const [bailoutStep, setBailoutStep] = useState<MicroStep | null>(null);
   const [bailoutIndex, setBailoutIndex] = useState<number | null>(null);
   const [isCompleting, setIsCompleting] = useState(false);
+  const [completedStepId, setCompletedStepId] = useState<string | undefined>(undefined);
 
-  const handleBailoutComplete = useCallback(() => {
+  const handleBailoutComplete = useCallback((stepId?: string) => {
+    setCompletedStepId(stepId);
     setIsCompleting(true);
   }, []);
 
   useEffect(() => {
     if (!isCompleting) return;
     const timer = setTimeout(() => {
-      onDone();
+      onDone({ kind: 'micro_step', microStepId: completedStepId });
     }, 1800);
     return () => clearTimeout(timer);
-  }, [isCompleting, onDone]);
+  }, [isCompleting, onDone, completedStepId]);
 
   function handleBailout() {
     const { step, index } = getMicroStep(pattern.id);
@@ -123,7 +132,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
 
           {/* Single primary action */}
           <button
-            onClick={handleBailoutComplete}
+            onClick={() => handleBailoutComplete(bailoutStep.id)}
             className="w-full max-w-xs py-4 px-6 rounded-xl bg-[var(--color-accent-fill)] text-white font-medium text-lg lift-primary"
           >
             I did it
@@ -156,7 +165,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
           No action needed right now. Enjoy this moment.
         </p>
         <button
-          onClick={onDone}
+          onClick={() => onDone({ kind: 'done' })}
           className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Done
@@ -209,7 +218,8 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
           
           <div className="space-y-3">
             {tools.slice(0, 2).map((tool, index) => (
-              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} activationPatternId={pattern.id} />
+              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
+                checkInId={checkInId} onOpen={onToolOpen} />
             ))}
           </div>
         </div>
@@ -218,7 +228,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions }
       {/* Primary actions */}
       <div className="space-y-3">
         <button
-          onClick={onDone}
+          onClick={() => onDone({ kind: 'done' })}
           className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-white font-medium lift-primary"
         >
           Done
@@ -276,13 +286,17 @@ function getToolPath(toolId: string): string {
   return `/tool/${toolId}`;
 }
 
-function ToolCard({ tool, isPrimary, checkinEmotions, activationPatternId }: { tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[]; activationPatternId?: string }) {
+function ToolCard({ tool, isPrimary, checkinEmotions, activationPatternId, checkInId, onOpen }: {
+  tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[]; activationPatternId?: string;
+  checkInId?: string; onOpen?: (toolId: string) => void;
+}) {
   const toolPath = getToolPath(tool.id);
 
   return (
     <Link
       to={toolPath}
-      state={toolLinkState(checkinEmotions, activationPatternId)}
+      state={fromCheckIn(checkInId, checkinEmotions, activationPatternId)}
+      onClick={() => onOpen?.(tool.id)}
       className={`
         block p-4 rounded-xl transition-all
         ${isPrimary 
@@ -308,17 +322,8 @@ function ToolCard({ tool, isPrimary, checkinEmotions, activationPatternId }: { t
             </p>
           )}
         </div>
-        <span className="text-[var(--color-text-muted)] flex-shrink-0 mt-1">\u2192</span>
+        <span className="text-[var(--color-text-muted)] flex-shrink-0 mt-1" aria-hidden="true">{'\u2192'}</span>
       </div>
     </Link>
   );
-}
-
-/** Location state for tool links. Keeps the original { checkinEmotions } shape and adds the pattern id when known. */
-function toolLinkState(checkinEmotions?: string[], activationPatternId?: string) {
-  if (!checkinEmotions?.length && !activationPatternId) return undefined;
-  return {
-    ...(checkinEmotions?.length ? { checkinEmotions } : {}),
-    ...(activationPatternId ? { activationPatternId } : {}),
-  };
 }

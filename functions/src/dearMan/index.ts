@@ -381,7 +381,8 @@ export const saveDearManSession = onCall(
     try {
       await session.run(
         `
-        MATCH (u:User {id: $userId})
+        MERGE (u:User {id: $userId})
+        ON CREATE SET u.createdAt = datetime(), u.email = $email
         CREATE (s:DearManSession {
           id: randomUUID(),
           type: $type,
@@ -422,6 +423,7 @@ export const saveDearManSession = onCall(
         `,
         {
           userId,
+          email: request.auth.token.email || null,
           type: data.type,
           relationshipType: data.relationshipType || '',
           situationType: data.situationType || '',
