@@ -5,25 +5,10 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { LOAD_ORDER, splitStatements } from "../scripts/load-graph.mjs";
+import { followUpTypes, closeFlow } from "./lib/practiceSpine.mjs";
 
 const cypher = readFileSync("schema/practice-spine.cypher", "utf8");
-const stmts = splitStatements(cypher);
 const toolIds = new Set([...readFileSync("src/data/tools.ts", "utf8").matchAll(/^\s{4}id: '([a-z-]+)',$/gm)].map((m) => m[1]));
-
-/** FollowUpType rows as {id, props, content}. */
-export function followUpTypes(src = cypher) {
-  return splitStatements(src).filter((s) => s.startsWith("MERGE (t:FollowUpType")).map((s) => {
-    const id = s.match(/\{id: "([a-z_]+)"\}/)[1];
-    const content = JSON.parse(JSON.parse(s.match(/t\.contentJson = (".*");?$/s)[1]));
-    const flag = (k) => new RegExp(`t\\.${k} = true`).test(s);
-    return { id, enabled: flag("enabled"), reserved: flag("reserved"), mode: s.match(/t\.resolveMode = "(\w+)"/)[1],
-      tier: s.match(/t\.hierarchyTier = "(\w+)"/)[1], content, s };
-  });
-}
-export function closeFlow(src = cypher) {
-  const s = splitStatements(src).find((x) => x.startsWith("MERGE (f:SessionCloseFlow"));
-  return JSON.parse(JSON.parse(s.match(/f\.contentJson = (".*")$/s)[1]));
-}
 
 test("generated file is fresh (python3 scripts/practice-spine/build.py)", (t) => {
   let out;

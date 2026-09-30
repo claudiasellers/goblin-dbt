@@ -590,13 +590,15 @@ export async function getDearManContent(): Promise<DearManContentResult> {
 
 const saveDearManSessionFn = httpsCallable<
   DearManSessionData,
-  { success: boolean }
+  { success: boolean; id?: string | null }
 >(functions, 'saveDearManSession');
 
+/** Resolves to the saved session's id (PR-S4; null from an older server). */
 export async function saveDearManSession(
   data: DearManSessionData
-): Promise<void> {
-  await saveDearManSessionFn(data);
+): Promise<string | null> {
+  const result = await saveDearManSessionFn(data);
+  return result.data.id ?? null;
 }
 
 const getDearManDebriefContentFn = httpsCallable<void, DearManDebriefContentResult>(

@@ -25,6 +25,9 @@ import { CertaintyDial, CompassionBreak, SecurityPrime, ValidationPick } from '.
 import { LetItLand, MustPrefer, OppositeStep, ParkIt, type ExitResult } from '../../components/tools/invalidationRecovery/exits';
 import type { DearManHandoff } from '../../data/dearManHandoff';
 import { FollowUps, RepsRing, SkillCard, UrgeWave } from '../../components/tools/invalidationRecovery/closeout';
+import { useToolSession } from '../../hooks/useToolSession';
+import { getSpineContent, type SpineContent } from '../../services/spine';
+import { recoverSchedule } from '../../lib/spine/wrap';
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: InvalidationRecoveryContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
@@ -440,6 +443,25 @@ function CloseStep({ c, d, urgeLabel, skills, progress, contentVersion, signedIn
   const [sessionId] = useState(() => crypto.randomUUID());
   const used = useMemo(() => [...new Set(d.skills)], [d.skills]);
   const [lastFollowUps, setLastFollowUps] = useState<string[]>([]);
+  const toolSession = useToolSession();
+
+  // PR-S4: link the visit to the saved session, log the skills used as reps, and schedule the
+  // follow-ups the user picked (they used to be stored as ids and never fire; D-09 windows).
+  // Loaded ahead so the close is sent synchronously (before the page can unmount).
+  const [spine, setSpine] = useState<SpineContent | null>(null);
+  useEffect(() => {
+    let live = true;
+    getSpineContent().then((c) => { if (live) setSpine(c); }).catch(() => { /* follow-ups need it; the close doesn't */ });
+    return () => { live = false; };
+  }, []);
+  const closeSpine = (followUps: string[]) => {
+    void toolSession.close({
+      status: 'completed',
+      detail: { kind: 'invalidation_recovery', id: sessionId },
+      skillIds: used,
+      schedule: recoverSchedule(followUps, spine, new Date()),
+    });
+  };
 
   const doSave = (followUps: string[]) => {
     setLastFollowUps(followUps);
@@ -451,9 +473,9 @@ function CloseStep({ c, d, urgeLabel, skills, progress, contentVersion, signedIn
       zone: d.zone, safe: d.safe, asks: d.asks,
       startIntensity: d.intensity!, startUrge: d.urge!, readings: readingsFor(d, endI),
       endIntensity: endI, endUrge: endU, skills: used, followUps,
-    }).then(() => { setSave('saved'); onFinished(endI); })
+    }).then(() => { setSave('saved'); closeSpine(followUps); onFinished(endI); })
       .catch((e: { code?: string }) => {
-        if (e?.code === 'functions/already-exists') { setSave('saved'); onFinished(endI); } else setSave('error');
+        if (e?.code === 'functions/already-exists') { setSave('saved'); closeSpine(followUps); onFinished(endI); } else setSave('error');
       });
   };
 

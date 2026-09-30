@@ -12,6 +12,9 @@ import { ToolLoading } from '../../components/tools/ToolLoading';
 import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { Orient } from '../../components/tools/regulation/body';
 import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
+import { useToolSession } from '../../hooks/useToolSession';
+import { recordToolSession } from '../../services/spine';
+import { thenVsNowFromFtf } from '../../lib/band';
 import { newId } from '../../lib/spine/ids';
 import type { RoomProps } from '../../components/tools/findTheFeeling/roomTypes';
 
@@ -25,7 +28,11 @@ type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; con
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
 
 /** Check-in handoff. intensityY is the band's graph-defined intensity (no scale is ever shown). */
-export interface FindTheFeelingResult { emotionId: string | null; band: Band; intensityY: number }
+export interface FindTheFeelingResult {
+  emotionId: string | null; band: Band; intensityY: number;
+  /** The embedded ToolSession (PR-S4); the check-in links it with EMBEDDED. */
+  toolSessionId?: string | null;
+}
 
 /** Tool page and check-in embed. `entry="checkin"` ends after the word and calls onHandoff. */
 export function FindTheFeeling({ entry = 'tool', onHandoff }: { entry?: Entry; onHandoff?: (r: FindTheFeelingResult) => void } = {}) {
@@ -69,21 +76,38 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   const sessionId = useRef<string>('');
   if (!sessionId.current) sessionId.current = newId();
   const savedFor = useRef<string | null>(null);
-  const doSave = () => {
+  const toolSession = useToolSession();
+  /** PR-S4: link the run to its spine session once the FTF session is saved (DETAIL needs it). */
+  const wrap = (embedId: string | null) => {
+    const detail = { kind: 'find_the_feeling' as const, id: sessionId.current };
+    const skills = state.word ? {} : { skillIds: [] as string[] }; // a rep of `label` only when a word was accepted
+    if (embedId) {
+      // Inside the check-in there is no tool page: a one-shot embedded session the check-in links to.
+      void recordToolSession({ id: embedId, toolId: 'find-the-feeling', entry: 'embedded', status: 'completed', detail, ...skills })
+        .catch(() => { /* best effort */ });
+      return;
+    }
+    const tvn = thenVsNowFromFtf(state.close);
+    void toolSession.close({ status: 'completed', detail, ...(tvn ? { thenVsNow: tvn.thenVsNow } : {}), ...skills });
+  };
+  const doSave = (embedId: string | null = null) => {
     const session = toSession(state, sessionId.current, content.version);
     if (!session) return;
     if (!user) { setSave('signed-out'); return; }
     setSave('saving');
     saveFindTheFeelingSession(session)
-      .then(() => setSave('saved'))
-      .catch((e: { code?: string }) => setSave(e?.code === 'functions/already-exists' ? 'saved' : 'error'));
+      .then(() => { setSave('saved'); wrap(embedId); })
+      .catch((e: { code?: string }) => {
+        if (e?.code === 'functions/already-exists') { setSave('saved'); wrap(embedId); } else setSave('error');
+      });
   };
   const finished = state.step === 'next' || state.step === 'collection' || state.step === 'handoff';
   useEffect(() => {
     if (!finished || savedFor.current === sessionId.current) return;
     savedFor.current = sessionId.current;
-    doSave();
-    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band!, intensityY: content.flow.bandIntensity[state.band!] });
+    const embedId = state.step === 'handoff' && user ? newId() : null;
+    doSave(embedId);
+    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band!, intensityY: content.flow.bandIntensity[state.band!], toolSessionId: embedId });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
@@ -126,7 +150,7 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
         {save === 'error' && (
           <div className="flex items-center gap-2">
             <p className={secondaryText}>{c.collection.saveError}</p>
-            <button type="button" className={linkButton} onClick={doSave}>{c.collection.retry}</button>
+            <button type="button" className={linkButton} onClick={() => doSave()}>{c.collection.retry}</button>
           </div>
         )}
         <button type="button" className={linkButton} onClick={restart}>{c.collection.again}</button>

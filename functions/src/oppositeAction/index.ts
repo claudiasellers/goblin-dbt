@@ -282,6 +282,31 @@ export const saveOppositeActionSession = onCall(
            FOREACH (n IN CASE WHEN urge IS NULL THEN [] ELSE [urge] END | MERGE (s)-[:TARGETED_URGE]->(n))`,
           params
         );
+        // PR-S4: a plan with a due time is mirrored as FollowUp oa_plan (same id as the session), in the
+        // same transaction. Its status follows OA's own enforced machine: planned -> scheduled,
+        // practiced -> done (partial -> partly), missed -> didnt + reason. OA's screen stays the resolver.
+        if (isV2) {
+          await tx.run(
+            `MATCH (u:User {id: $userId})-[:COMPLETED_SESSION]->(s:OppositeActionSession {key: $key})
+             WHERE s.dueAt IS NOT NULL
+             MERGE (f:FollowUp {key: $key})
+             ON CREATE SET f:UserData:LogRecord, f.id = $id, f.ownerId = $userId, f.type = 'oa_plan', f.ownerModule = 'er',
+                           f.sourceToolId = 'opposite-action', f.sourceSessionId = $id, f.priorityTier = 'quality',
+                           f.createdAt = datetime(), f.attempts = 0, f.notifyInTab = true, f.notifyPush = false,
+                           f.notifyIcs = false, f.schemaVersion = 1
+             SET f.dueAt = s.dueAt, f.cueId = s.cueId,
+                 f.status = CASE $status WHEN 'planned' THEN 'scheduled'
+                              WHEN 'practiced' THEN CASE $outcome WHEN 'partial' THEN 'partly' ELSE 'done' END
+                              ELSE 'didnt' END,
+                 f.missedReason = CASE WHEN $status = 'missed' THEN $missedReason ELSE null END,
+                 f.outcome = CASE WHEN $outcome = '' THEN null ELSE $outcome END,
+                 f.resolvedAt = CASE WHEN $status = 'planned' THEN null ELSE datetime() END,
+                 f.updatedAt = datetime()
+             MERGE (u)-[:HAS_FOLLOW_UP]->(f)
+             MERGE (f)-[:DETAIL]->(s)`,
+            { userId, key, id: data.id, status: data.status, outcome: data.outcome ?? '', missedReason: data.missedReason ?? '' },
+          );
+        }
       });
       return { success: true };
     } catch (error) {

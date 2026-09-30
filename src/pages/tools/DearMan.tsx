@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
 import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
 import { newId } from '../../lib/spine/ids';
+import { useToolSession } from '../../hooks/useToolSession';
+import { dearManRepSource } from '../../lib/spine/wrap';
 import type { DearManContentResult, DearManDebriefContentResult, DearManReflectionResult } from '../../data/dearManTypes';
 import type { StateResult as StateResultType } from '../../services/neo4j';
 import { getEmotionByName } from '../../data/emotions';
@@ -82,6 +84,7 @@ const debriefOverallOptions = [
 ];
 
 export function DearMan() {
+  const session = useToolSession();
   const location = useLocation();
   const navigate = useNavigate();
   const routeState = location.state as { checkinEmotions?: string[]; dearManHandoff?: unknown } | null;
@@ -525,7 +528,7 @@ export function DearMan() {
     setSaving(true);
     setSaveError(false);
     try {
-      await saveDearManSession({
+      const savedId = await saveDearManSession({
         type: 'prep',
         relationshipType: relationshipType || '',
         situationType: situationType || '',
@@ -547,6 +550,8 @@ export function DearMan() {
         walkAwayCustom,
       });
       setSaved(true);
+      // PR-S4: the visit is a rep of `request`, linked to its DearManSession.
+      if (savedId) void session.close({ status: 'completed', detail: { kind: 'dear_man', id: savedId }, repSource: dearManRepSource('prep') });
     } catch (err) {
       console.error('Failed to save DEAR MAN session:', err);
       setSaveError(true);
@@ -1487,7 +1492,7 @@ export function DearMan() {
     setDebriefSaving(true);
     setSaveError(false);
     try {
-      await saveDearManSession({
+      const savedId = await saveDearManSession({
         type: 'debrief',
         relationshipType: debriefRelationshipType || '',
         situationType: '',
@@ -1515,6 +1520,8 @@ export function DearMan() {
         reflectionLanded: reflectionLanded || undefined,
       });
       setDebriefSaved(true);
+      // PR-S4 (D-09): the conversation itself happened off the phone: a self-reported rep.
+      if (savedId) void session.close({ status: 'completed', detail: { kind: 'dear_man', id: savedId }, repSource: dearManRepSource('debrief') });
     } catch (err) {
       console.error('Failed to save DEAR MAN debrief:', err);
       setSaveError(true);

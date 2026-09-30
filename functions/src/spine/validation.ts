@@ -73,7 +73,8 @@ export interface CloseInput {
   urgeIds: string[];
   durationSec: number | null;
   detail: { kind: DetailKind; id: string } | null;
-  skillIds: string[];
+  /** null → the tool's PracticeSkill.defaultFor; [] → no rep (e.g. FTF without a word). */
+  skillIds: string[] | null;
   repSource: RepSource;
   ext: string | null;
   schedule: ScheduleInput[];
@@ -103,7 +104,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
     urgeIds: ids(d.urgeIds, 10),
     durationSec: opt(d.durationSec, (x) => intIn(x, { min: 0, max: 86_400 })),
     detail,
-    skillIds: ids(d.skillIds, 20),
+    skillIds: d.skillIds === undefined || d.skillIds === null ? null : ids(d.skillIds, 20),
     repSource: oneOf(d.repSource ?? 'standalone', REP_SOURCES),
     ext: validateExt(d.ext),
     schedule: validateSchedule(d.schedule, now),

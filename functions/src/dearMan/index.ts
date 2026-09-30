@@ -379,7 +379,7 @@ export const saveDearManSession = onCall(
 
     const session = getDriver().session();
     try {
-      await session.run(
+      const written = await session.run(
         `
         MERGE (u:User {id: $userId})
         ON CREATE SET u.createdAt = datetime(), u.email = $email
@@ -458,7 +458,8 @@ export const saveDearManSession = onCall(
         }
       );
 
-      return { success: true };
+      // PR-S4: the id links the session to its ToolSession (DETAIL) and its reps.
+      return { success: true, id: (written.records[0]?.get('id') as string | undefined) ?? null };
     } catch (error) {
       console.error('Error saving DEAR MAN session:', error);
       throw new HttpsError('internal', 'Failed to save session');

@@ -88,6 +88,7 @@ export function CheckIn() {
   const [source, setSource] = useState<CheckInSource>('grid');
   const [capacity, setCapacity] = useState<CapacityReading | null>(null);
   const [knownEmotionIds, setKnownEmotionIds] = useState<string[]>([]);
+  const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
   /** The render save in flight: resolves true when saved. Next actions chain after it. */
   const savePromise = useRef<Promise<boolean> | null>(null);
   const savedResult = useRef<StateResultType | null>(null);
@@ -104,6 +105,7 @@ export function CheckIn() {
     source,
     capacity,
     discriminatingAnswers,
+    embeddedToolSessionIds: embeddedIds,
   });
 
   // Save on result render, before any tool can open (R4: every downstream write keys on this id).
@@ -250,6 +252,7 @@ export function CheckIn() {
     // FTF's band is this check-in's capacity answer (kept, not just turned into intensity).
     setSource('ftf');
     setCapacity(ftfReading(newId(), r.band));
+    if (r.toolSessionId) setEmbeddedIds([r.toolSessionId]);
     const emotion = r.emotionId ? getEmotionById(r.emotionId) : undefined;
     if (emotion) setKnownEmotionIds([emotion.id]);
     if (!emotion) {
@@ -429,6 +432,7 @@ export function CheckIn() {
     setSource('grid');
     setCapacity(null);
     setKnownEmotionIds([]);
+    setEmbeddedIds([]);
     setCheckInData({
       quadrant: null,
       emotions: [],

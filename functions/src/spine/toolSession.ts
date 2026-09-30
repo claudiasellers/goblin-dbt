@@ -140,12 +140,12 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
   );
   const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
   const practiced = rec.get('practiced') === true || c.practiced;
-  if (c.status !== 'completed' && !practiced) return { reps: [], followUps };
+  if ((c.status !== 'completed' && !practiced) || (c.skillIds !== null && c.skillIds.length === 0)) return { reps: [], followUps };
   const offPhone = c.repSource === 'followup_offphone';
   const reps = await tx.run(
     `MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
      MATCH (k:PracticeSkill)
-     WHERE (size($skillIds) > 0 AND k.id IN $skillIds) OR (size($skillIds) = 0 AND ts.toolId IN coalesce(k.defaultFor, []))
+     WHERE ($skillIds IS NOT NULL AND k.id IN $skillIds) OR ($skillIds IS NULL AND ts.toolId IN coalesce(k.defaultFor, []))
      MERGE (sp:SkillPractice {key: $uid + ':' + $id + ':' + k.id})
      ON CREATE SET sp:UserData:LogRecord, sp.id = $id + ':' + k.id, sp.ownerId = $uid, sp.createdAt = datetime(),
        sp.schemaVersion = 1, sp.at = datetime(), sp.skillIds = [k.id], sp.practiceId = ts.toolId, sp.module = ts.module,
