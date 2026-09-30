@@ -23,7 +23,7 @@ RETURN "Orphaned Emotion" AS issue_type, e.id AS node_id, e.name AS node_name;
 
 // Orphaned TherapyConcepts (should belong to a modality)
 MATCH (tc:TherapyConcept)
-WHERE NOT (tc)-[:BELONGS_TO|:PART_OF]->()
+WHERE NOT (tc)-[:BELONGS_TO|PART_OF]->()
 RETURN "Orphaned TherapyConcept (no modality)" AS issue_type, tc.id AS node_id, tc.name AS node_name;
 
 // Orphaned ClinicalConstructs (should have brain associations or therapy treatments)
@@ -215,7 +215,7 @@ RETURN "Emotion missing body sensation mapping" AS issue_type,
 // ============================================================
 
 MATCH (tm:TherapyModality)
-OPTIONAL MATCH (tc:TherapyConcept)-[:BELONGS_TO|:PART_OF*]->(tm)
+OPTIONAL MATCH (tc:TherapyConcept)-[:BELONGS_TO|PART_OF*]->(tm)
 WITH tm, count(tc) AS concept_count
 WHERE concept_count < 3 // Minimum expected concepts per modality
 RETURN "Therapy modality has few concepts" AS issue_type,

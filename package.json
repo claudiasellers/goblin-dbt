@@ -12,7 +12,7 @@
     "test:unit": "node --test tests/*.test.mjs",
     "test:emulator": "npm --prefix functions run test:emulator",
     "graph:test:up": "docker compose -f functions/test/neo4j/docker-compose.yml up -d",
-    "graph:test:load": "NEO4J_URI=bolt://127.0.0.1:7687 NEO4J_USER=neo4j NEO4J_PASSWORD=goblin-test-pw node scripts/load-graph.mjs",
+    "graph:test:load": "NEO4J_URI=bolt://127.0.0.1:7687 NEO4J_USER=neo4j NEO4J_PASSWORD=goblin-test-pw node scripts/load-graph.mjs --verify",
     "check:palettes": "node scripts/check-palettes.mjs",
     "preview": "vite preview",
     "predeploy": "npm run build",

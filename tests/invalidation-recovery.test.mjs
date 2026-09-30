@@ -16,10 +16,10 @@ const { validateInvalidationRecoverySession: validate, expectedRecoveryGate } = 
 const cypher = readFileSync("schema/invalidation-recovery.cypher", "utf8");
 const flow = JSON.parse(JSON.parse(cypher.match(/f\.contentJson = (".*");/)[1]));
 const read = (f) => readFileSync(`schema/${f}.cypher`, "utf8");
-const baseGraph = ["knowledge-graph", "incremental-update", "emotion-wheel-sync"].map(read).join("\n");
-/** Ids declared for one label: `CREATE (x:Label {\n id: "..."` blocks, plus emotion-wheel-sync rows. */
+const baseGraph = ["knowledge-graph", "emotion-wheel-sync"].map(read).join("\n");
+/** Ids declared for one label: `MERGE (x:Label {id: "..."})` statements, plus emotion-wheel-sync rows. */
 const idsOf = (label) => {
-  const ids = new Set([...baseGraph.matchAll(new RegExp(`CREATE \\(\\w+:${label} \\{\\s*id: "([a-z_]+)"`, "g"))].map((m) => m[1]));
+  const ids = new Set([...baseGraph.matchAll(new RegExp(`MERGE \\(\\w+:${label} \\{\\s*id: "([a-z_]+)"`, "g"))].map((m) => m[1]));
   if (label === "Emotion") {
     const rows = read("emotion-wheel-sync").split("MERGE (e:Emotion")[0];
     for (const m of rows.matchAll(/\{id: "([a-z_]+)", name:/g)) ids.add(m[1]);

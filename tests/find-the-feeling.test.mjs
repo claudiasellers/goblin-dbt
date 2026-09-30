@@ -6,11 +6,11 @@ import { execFileSync } from "node:child_process";
 const read = (f) => readFileSync(`schema/${f}.cypher`, "utf8");
 const cypher = read("find-the-feeling");
 const flow = JSON.parse(JSON.parse(cypher.match(/f\.contentJson = (".*");/)[1]));
-const baseGraph = ["knowledge-graph", "incremental-update", "emotion-wheel-sync", "invalidation-recovery"].map(read).join("\n");
+const baseGraph = ["knowledge-graph", "emotion-wheel-sync", "invalidation-recovery"].map(read).join("\n");
 
-/** Emotion ids declared anywhere in the base graph (CREATE blocks + emotion-wheel-sync rows). */
+/** Emotion ids declared anywhere in the base graph (MERGE statements + emotion-wheel-sync rows). */
 const emotionIds = (() => {
-  const ids = new Set([...baseGraph.matchAll(/CREATE \(\w+:Emotion \{\s*id: "([a-z_]+)"/g)].map((m) => m[1]));
+  const ids = new Set([...baseGraph.matchAll(/MERGE \(\w+:Emotion \{\s*id: "([a-z_]+)"/g)].map((m) => m[1]));
   for (const m of read("emotion-wheel-sync").matchAll(/\{id: "([a-z_]+)", name:/g)) ids.add(m[1]);
   return ids;
 })();
