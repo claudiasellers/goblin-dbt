@@ -232,7 +232,9 @@ export const updateUserProfile = onCall(
 /**
  * Delete all user data from Neo4j and, when `deleteAuth` is true (Delete Account), the Firebase
  * Auth user too (F2: the flag used to be ignored, leaving a live login). The graph goes first, so a
- * failed Auth delete can be retried; onUserDeleted also runs the (idempotent) graph delete.
+ * failed Auth delete can be retried. A user deleted in the Firebase console instead leaves their graph
+ * data behind (there is no auth trigger: 1st-gen only, and the functions run on Node 24); run this
+ * callable's delete for them, or DETACH DELETE by ownerId.
  */
 export const deleteUserData = onCall(
   { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
