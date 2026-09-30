@@ -2,31 +2,13 @@ import { validateOppositeActionSession } from './oppositeActionValidation';
 import { validateInvalidationRecoverySession, expectedRecoveryGate, type RecoveryGates } from './invalidationRecoveryValidation';
 import { validateFindTheFeelingSession, checkFindTheFeelingGates, type FindTheFeelingGates } from './findTheFeelingValidation';
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { defineSecret } from 'firebase-functions/params';
 import * as admin from 'firebase-admin';
-import neo4j, { Driver, Record as Neo4jRecord } from 'neo4j-driver';
+import neo4j, { Record as Neo4jRecord } from 'neo4j-driver';
+import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from './shared/neo4j';
 
 // Initialize Firebase Admin (for updating Auth profiles)
 if (!admin.apps.length) {
   admin.initializeApp();
-}
-
-// Define secrets - these are securely stored in Firebase and injected at runtime
-const neo4jUri = defineSecret('NEO4J_URI');
-const neo4jUser = defineSecret('NEO4J_USER');
-const neo4jPassword = defineSecret('NEO4J_PASSWORD');
-
-// Neo4j driver singleton
-let driver: Driver | null = null;
-
-function getDriver(): Driver {
-  if (!driver) {
-    driver = neo4j.driver(
-      neo4jUri.value(),
-      neo4j.auth.basic(neo4jUser.value(), neo4jPassword.value())
-    );
-  }
-  return driver;
 }
 
 // Types

@@ -17,13 +17,13 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(resolve(root, 'functions/package.json'));
 
 // ---- Load order: derived from which labels each file MATCHes vs MERGEs ----
-const LOAD_ORDER = [
+export const LOAD_ORDER = [
   'knowledge-graph.cypher',                       // all base nodes
   'relationships.cypher',                         // base relationships
   'incremental-update.cypher',                    // extra Emotion nodes + OPPOSITE_OF
@@ -48,6 +48,11 @@ const LOAD_ORDER = [
   'find-the-feeling.cypher',                       // Find the feeling (Shape it / Tune it): word signatures, urge routing, appToolId join keys
 ];
 
+// schema/*.cypher files that are deliberately never loaded (reference queries, not data).
+export const NOT_LOADED = [
+  'validation-queries.cypher',
+];
+
 // Constraints/indexes the app relies on (mirrors the initializeSchema Cloud Function).
 const CONSTRAINTS = [
   'CREATE CONSTRAINT user_id IF NOT EXISTS FOR (u:User) REQUIRE u.id IS UNIQUE',
@@ -63,7 +68,7 @@ const CONSTRAINTS = [
  * Split a .cypher file into statements on ';' — but only outside of
  * string literals ('…' / "…" / `…`) and comments (// … / /* … *\/).
  */
-function splitStatements(source) {
+export function splitStatements(source) {
   const out = [];
   let cur = '';
   let i = 0;
@@ -200,4 +205,7 @@ async function main() {
   console.log('\nDone. Graph rebuilt.');
 }
 
-main().catch(e => { console.error(e); process.exit(1); });
+// Run only when executed directly, so tests can import LOAD_ORDER / splitStatements.
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  main().catch(e => { console.error(e); process.exit(1); });
+}

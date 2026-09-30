@@ -1,0 +1,44 @@
+# Tier-1 checks on every PR and push to main (D-12). No secrets: nothing here talks to
+# Firebase or Neo4j. Tier 2 (emulators + local Neo4j) runs on Claudia's machine.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'   # generator-freshness tests shell out to python3
+      - name: Install (root)
+        run: npm ci
+      - name: Install (functions)
+        run: npm ci --prefix functions
+      - name: Build (frontend)
+        run: npm run build
+      - name: Build (functions)
+        run: npm --prefix functions run build
+      - name: Test
+        run: npm test
+      - name: Lint (no new errors)
+        run: node scripts/ci/lint-budget.mjs
