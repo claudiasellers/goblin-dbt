@@ -98,6 +98,11 @@ CREATE CONSTRAINT feeling_urge_id IF NOT EXISTS FOR (fu:FeelingUrge) REQUIRE fu.
 CREATE CONSTRAINT follow_up_type_id IF NOT EXISTS FOR (n:FollowUpType) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT session_close_flow_id IF NOT EXISTS FOR (n:SessionCloseFlow) REQUIRE n.id IS UNIQUE;
 
+// --- Profile layer content (PR-P1, schema/profile-layer.cypher) ---
+CREATE CONSTRAINT profile_area_id IF NOT EXISTS FOR (n:ProfileArea) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT profile_kind_id IF NOT EXISTS FOR (n:ProfileKind) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT pattern_rule_id IF NOT EXISTS FOR (n:PatternRule) REQUIRE n.id IS UNIQUE;
+
 // --- Capacity band content (A4-1, schema/capacity.cypher) ---
 CREATE CONSTRAINT capacity_probe_id IF NOT EXISTS FOR (n:CapacityProbe) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT handoff_primitive_id IF NOT EXISTS FOR (n:HandoffPrimitive) REQUIRE n.id IS UNIQUE;

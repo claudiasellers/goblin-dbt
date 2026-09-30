@@ -201,7 +201,7 @@ export const updateUserProfile = onCall(
         `
         MERGE (u:User {id: $userId})
         ON CREATE SET u.createdAt = datetime(), u.email = $email
-        SET ${setClauses}, u.updatedAt = datetime()
+        SET ${setClauses}, u.updatedAt = datetime()${'displayName' in cleanUpdates ? ', u.profileVersion = coalesce(u.profileVersion, 0) + 1' : ''}
         `,
         { userId, email: request.auth.token.email || null, ...cleanUpdates }
       );

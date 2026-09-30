@@ -15,6 +15,8 @@ const AUTHED = [
   'recordToolOutcome', 'saveCheckIn', 'setCheckInNextAction',
   'startToolSession', 'closeToolSession', 'recordToolSession', 'answerToolOutcome',
   'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday',
+  'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
+  'restoreProfileItem', 'answerPatternOffer',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
 ];

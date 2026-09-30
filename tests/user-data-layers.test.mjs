@@ -131,6 +131,7 @@ const GUARDED_WRITERS = [
   ["functions/src/spine/toolSession.ts", "GUARDS.ToolUsage.outcome"],
   ["functions/src/spine/toolSession.ts", "GUARDS.ToolSession.answer"],
   ["functions/src/spine/followUp.ts", "GUARDS.FollowUp.update"],
+  ["functions/src/profile/patternOffers.ts", "GUARDS.PatternOffer.answer"],
 ];
 test("writers that update log records use the lifecycle guards", () => {
   for (const [file, guard] of GUARDED_WRITERS) assert.ok(readFileSync(file, "utf8").includes(guard), `${file} lacks ${guard}`);

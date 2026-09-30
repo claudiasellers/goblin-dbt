@@ -1,4 +1,28 @@
 {
+  "answerPatternOffer": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
   "answerToolOutcome": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
@@ -24,6 +48,30 @@
     "callableTrigger": {}
   },
   "closeToolSession": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "confirmProfileItem": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
     "minInstances": null,
@@ -407,6 +455,30 @@
     "labels": {},
     "callableTrigger": {}
   },
+  "getMe": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
   "getOppositeActionContent": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
@@ -504,6 +576,30 @@
     "callableTrigger": {}
   },
   "getProblemSolveContent": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "getProfileContext": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
     "minInstances": null,
@@ -777,6 +873,30 @@
     "labels": {},
     "callableTrigger": {}
   },
+  "restoreProfileItem": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
   "saveCheckIn": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
@@ -921,6 +1041,30 @@
     "labels": {},
     "callableTrigger": {}
   },
+  "setAsideProfileItem": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
   "setCheckInNextAction": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
@@ -1018,6 +1162,30 @@
     "callableTrigger": {}
   },
   "updateUserProfile": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "upsertProfileFact": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,
     "minInstances": null,

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useReducer, useState, type ReactNode }
 import { useNavigate } from 'react-router-dom';
 import { getEmotionById } from '../../data/emotions';
 import { useAuth } from '../../contexts/AuthContext';
-import { useUserProfile } from '../../contexts/UserProfileContext';
+import { useProfileContext } from '../../hooks/useProfileContext';
 import {
   getInvalidationRecoveryContent, getInvalidationRecoveryProgress, saveInvalidationRecoverySession,
 } from '../../services/neo4j';
@@ -60,8 +60,9 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
   const g = flow.gates;
   const reduce = useReducedMotion();
   const { user } = useAuth();
-  const { profile } = useUserProfile();
-  const firstName = profile.displayName?.trim().split(/\s+/)[0] || null;
+  // The single profile read path (PR-P1): only the slices this tool declared. null while loading,
+  // as before (distanced self-talk falls back to "you").
+  const firstName = useProfileContext('recovering-from-invalidation').slices?.name.firstName ?? null;
 
   const [history, dispatch] = useReducer(flowReducer, undefined, initialHistory);
   const { step, data: d } = history.stack[history.stack.length - 1];

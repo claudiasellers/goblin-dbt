@@ -22,3 +22,7 @@ export {
   startToolSession, closeToolSession, recordToolSession, answerToolOutcome, getSpineContent,
   scheduleFollowUp, resolveFollowUp, snoozeFollowUp, getToday,
 } from './spine';
+export {
+  getProfileContext, getMe, upsertProfileFact, confirmProfileItem, setAsideProfileItem, restoreProfileItem,
+  answerPatternOffer,
+} from './profile';

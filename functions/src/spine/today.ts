@@ -35,6 +35,16 @@ export function registerTodaySource(s: TodaySource): void {
   if (!extraSources.includes(s)) extraSources.push(s);
 }
 
+/**
+ * Write steps that run before Today is read (PR-P1: lazy pattern-offer evaluation, at most once a
+ * day). A failing step never blocks Today.
+ */
+export type TodayPrepare = (uid: string, now: Date) => Promise<void>;
+const preparers: TodayPrepare[] = [];
+export function registerTodayPrepare(p: TodayPrepare): void {
+  if (!preparers.includes(p)) preparers.push(p);
+}
+
 async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<string, FollowUpTypeContent>, now: Date) {
   const res = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {status: 'scheduled'})
@@ -118,6 +128,9 @@ export const getToday = callable<unknown, GetTodayResponse>(
     const raw = (data as { band?: unknown } | null | undefined)?.band;
     const band = typeof raw === 'string' && (BANDS as readonly string[]).includes(raw) ? (raw as Band) : null;
     const now = new Date();
+    for (const p of preparers) {
+      try { await p(uid as string, now); } catch (e) { console.error('getToday prepare', (e as { code?: string })?.code ?? 'unknown'); }
+    }
     return readTx(async (tx) => {
       const types = new Map((await readFollowUpTypes(tx)).map((t) => [t.id, t]));
       const flowRes = await tx.run(`MATCH (f:SessionCloseFlow {id: 'session_close'}) RETURN f.contentJson AS content`);

@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect, useMemo, useReducer, useRef, useState, type 
 import { useReducedMotion } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useUserProfile } from '../../contexts/UserProfileContext';
+import { useProfileContext } from '../../hooks/useProfileContext';
 import { getFeelingCollection, getFindTheFeelingContent, saveFindTheFeelingSession } from '../../services/neo4j';
 import type { Band, CollectedWord, Entry, FindTheFeelingContent, Way } from '../../data/findTheFeelingTypes';
 import { getToolById } from '../../data/tools';
@@ -53,8 +53,8 @@ export function FindTheFeeling({ entry = 'tool', onHandoff }: { entry?: Entry; o
 
 function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; entry: Entry; onHandoff?: (r: FindTheFeelingResult) => void }) {
   const { user } = useAuth();
-  const { profile } = useUserProfile();
-  const name = profile.displayName?.trim().split(/\s+/)[0] || null;
+  // The single profile read path (PR-P1); null while loading, as before.
+  const name = useProfileContext('find-the-feeling').slices?.name.firstName ?? null;
   const reduced = useReducedMotion() ?? false;
   const navigate = useNavigate();
   const c = content.flow.copy;

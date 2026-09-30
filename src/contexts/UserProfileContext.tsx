@@ -15,6 +15,7 @@ import {
   type UserProfile,
 } from '../services/neo4j';
 import { DEFAULT_PALETTE } from '../data/palettes';
+import { profileCache } from '../lib/profileCache';
 
 const PROFILE_CACHE_KEY = 'goblin-dbt-profile-cache';
 
@@ -125,6 +126,8 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   const updateProfile = useCallback(
     async (updates: Partial<UserProfile>) => {
       setError(null);
+      // The name is a profile slice (PR-P1): drop cached slices so tools re-read it.
+      if ('displayName' in updates) profileCache.clear();
       try {
         await updateProfileApi(updates);
         setProfile((prev) => {

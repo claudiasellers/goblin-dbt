@@ -36,6 +36,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `invalidationRecovery/` | `getInvalidationRecoveryContent`, `saveInvalidationRecoverySession`, `getInvalidationRecoveryProgress` |
 | `findTheFeeling/` | `getFindTheFeelingContent`, `saveFindTheFeelingSession`, `getFeelingCollection` |
 | `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `answerToolOutcome`, `scheduleFollowUp`, `resolveFollowUp`, `snoozeFollowUp`, `getToday`, `getSpineContent` (public); `todayOrder.ts` (derived due/stale/upcoming + ordering), `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
+| `profile/` | `getProfileContext` (the single profile read path: only the slices `PROFILE_NEEDS` declares per tool, in code), `getMe`, `upsertProfileFact`, `confirmProfileItem`, `setAsideProfileItem`, `restoreProfileItem`, `answerPatternOffer` (the only writer of `MyPattern`); `slices.ts` resolvers never read a `:LogRecord` (test-enforced) |
 | `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
 
 `userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
@@ -165,6 +166,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/components/today/TodayStack.tsx`, `src/contexts/TodayContext.tsx` | Today stack on the check-in screen (≤3 cards + more; OA plans via OA's own card; flooded collapses); the desktop `ContinuityCard` reads the same `tool_outcome` item |
 | `src/lib/spine/wrap.ts` | How OA / Recover / DEAR MAN / FTF sessions join the spine: their own session nodes and readers are unchanged; the `ToolSession` links to them with `DETAIL`, reps and Recover's follow-ups ride on the close, OA plans are mirrored server-side as `FollowUp oa_plan` |
 | `src/components/spine/SessionClose.tsx` | The one-tap close question (graph copy, skip always there) |
+| `scripts/profile-layer/content.py` | Editable source for `schema/profile-layer.cypher`: Me areas, `ProfileKind` (still-true copy, revisit days), `PatternRule` (off until reviewed) |
+| `src/hooks/useProfileContext.ts` | How a tool reads the profile: `useProfileContext(toolId).slices` (in-memory cache, never localStorage). A new tool declares `PROFILE_NEEDS[toolId]` |
 | `src/lib/band.ts`, `src/lib/resumeToken.ts` | Capacity band logic (freshness, hand-off plan, reread) and device-only resume tokens |
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
