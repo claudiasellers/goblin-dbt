@@ -19,6 +19,7 @@ import {
 import { getEmotionById, getEmotionByName } from '../data/emotions';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
 import { TodayStack } from '../components/today/TodayStack';
+import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
 import { newId } from '../lib/spine/ids';
 import {
   buildCheckInPayload,
@@ -33,6 +34,7 @@ type EntryPoint = 'standard' | 'somatic';
 
 type CheckInStep =
   | 'emotion'
+  | 'help_now'
   | 'find'
   | 'discriminating'
   | 'body'
@@ -229,10 +231,11 @@ export function CheckIn() {
   }
 
   /**
-   * "Help me now" - skip to analysis with just quadrant
+   * "Help me now" (PR-C2, D-08 interim): a safe body step and two quiet links. No check-in and no
+   * routing call: nothing was said about the feeling, so nothing is guessed.
    */
   function handleHelpMeNow() {
-    analyzeAndShowResult();
+    setStep('help_now');
   }
 
   /**
@@ -452,6 +455,9 @@ export function CheckIn() {
 
   function handleBack() {
     switch (step) {
+      case 'help_now':
+        setStep('emotion');
+        break;
       case 'discriminating':
         setStep('emotion');
         break;
@@ -546,6 +552,8 @@ export function CheckIn() {
             onCantTell={() => setStep('find')}
           />
         )}
+
+        {step === 'help_now' && <HelpNowInterim onDone={() => setStep('emotion')} />}
 
         {step === 'find' && (
           <div className="space-y-3">
