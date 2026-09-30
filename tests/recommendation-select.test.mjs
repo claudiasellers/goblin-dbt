@@ -254,3 +254,16 @@ test("request validation: bad band / source / blank / surface / quadrant are err
     discriminatingAnswers: [{ questionId: "hu_experience_quality", responseId: "hu_exp_alarm" }],
   });
 });
+
+test("#19 Numb (E4-5, D-14): a low-unpleasant word now; with its body answer → dissociation → 5-4-3-2-1 only", async () => {
+  const numb = grid.find((g) => g.id === "numb");
+  assert.equal(numb.quadrant, "low-unpleasant");
+  assert.match(readFileSync("src/data/emotions.ts", "utf8"), /makeEmotion\('numb', 'Numb', 'low-unpleasant', 'angry'/, "family kept");
+  assert.match(readFileSync("schema/emotion-wheel-sync.cypher", "utf8"), /\{id: "numb", name: "Numb", quadrant: "low-unpleasant", family: "angry"\}/);
+  assert.equal(graph.emotions.numb.quadrant, "low-unpleasant");
+  const r = await run(lu({ emotions: ["Numb"], discriminatingAnswers: ans("lu_body_numb") }));
+  assert.equal(r.pattern.id, "dissociation_overmodulation");
+  assert.deepEqual(ids(r), ["five-senses"]);
+  assert.equal(r.safetyFlag, undefined);
+  assert.equal(r.guidedActivity.activityId, "sensory-anchor");
+});

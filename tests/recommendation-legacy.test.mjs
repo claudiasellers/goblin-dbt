@@ -24,13 +24,20 @@ test("the fixture is fresh: scripts/recommendations/fixture.py replays the schem
   assert.equal(out, readFileSync("tests/fixtures/recommendation-graph.json", "utf8"));
 });
 
-test("the schema-derived fixture routes exactly like the live graph did on 2026-09-30", () => {
+// Deliberate grid changes since the live check (each with its plan id). Everything else must match.
+const MOVED = { "high-unpleasant:numb": ["acute_alarm", null], "low-unpleasant:numb": [null, "conservation_freeze"] }; // E4-5
+const expectedWinner = (key) => (key in MOVED ? MOVED[key][1] : live.grid.winners[key]);
+
+test("the schema-derived fixture routes exactly like the live graph did on 2026-09-30 (bar the deliberate moves)", () => {
   const { changes, warnings } = diffRouting(live, graph, { grid });
-  assert.deepEqual(changes, []);
+  const unexpected = changes.filter((c) => !(c.what === "grid.winnerDistribution" || c.what.replace("grid.winner ", "") in MOVED));
+  assert.deepEqual(unexpected, []);
+  assert.deepEqual(changes.filter((c) => c.what.startsWith("grid.winner ")).map((c) => [c.what, c.before, c.after]),
+    Object.entries(MOVED).map(([k, [a, b]]) => [`grid.winner ${k}`, a, b]));
   assert.deepEqual(warnings, [], "tie order is pinned (concept id), and matches live");
   const s = routingSummary(graph, { grid });
   assert.equal(s.emotionNodeCount, live.emotionNodeCount);
-  assert.deepEqual(s.grid.winnerDistribution, { "high-unpleasant → acute_alarm": 49, "low-unpleasant → conservation_freeze": 36 });
+  assert.deepEqual(s.grid.winnerDistribution, { "high-unpleasant → acute_alarm": 48, "low-unpleasant → conservation_freeze": 37 });
 });
 
 test("the TS engine agrees with the live check for every one-word grid check-in (85 names)", async () => {
@@ -38,7 +45,7 @@ test("the TS engine agrees with the live check for every one-word grid check-in 
   assert.equal(unpleasant.length, 85);
   for (const g of unpleasant) {
     const r = await run({ quadrant: g.quadrant, emotions: [g.name] });
-    assert.equal(r.pattern.id, live.grid.winners[`${g.quadrant}:${g.sent}`], g.name);
+    assert.equal(r.pattern.id, expectedWinner(`${g.quadrant}:${g.sent}`), g.name);
     assert.equal(r.pattern.confidence, 0.25, `${g.name}: no word reaches a pattern (F1)`);
   }
 });
