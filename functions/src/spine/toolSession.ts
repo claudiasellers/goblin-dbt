@@ -20,8 +20,9 @@ import { parseOrInvalid } from '../shared/errors';
 import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import { legacyOutcome, readingProps } from '../capacity/reading';
-import { validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
+import { validateAnswer, validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
 import type { CloseKind, DetailKind } from './types';
+import { scheduleTx } from './followUp';
 
 /** Detail node labels by kind (a whitelist: the label is interpolated into Cypher). */
 export const DETAIL_LABELS: Record<DetailKind, string> = {
@@ -88,19 +89,21 @@ async function startTx(tx: ManagedTransaction, uid: string, email: string | null
   return res.records[0]?.get('toolUsageId') as string;
 }
 
-/** Close an open session (no-op + existing ids when already closed). Returns the rep ids. */
-async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Promise<string[]> {
+/** Close an open session (no-op + existing ids when already closed). Returns rep and follow-up ids. */
+async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Promise<{ reps: string[]; followUps: string[] }> {
   const key = userKey(uid, c.id);
   const head = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
      OPTIONAL MATCH (ts)-[:LOGGED_REP]->(sp:SkillPractice)
+     WITH ts, collect(sp.id) AS reps
+     OPTIONAL MATCH (ts)-[:SCHEDULED]->(f:FollowUp)
      RETURN ${GUARDS.ToolSession.close('ts')} AS open, ts.closeKind AS closeKind, ts.practiced AS practiced,
-            collect(sp.id) AS reps`,
+            ts.toolId AS toolId, reps, collect(f.id) AS followUps`,
     { uid, key },
   );
   const rec = head.records[0];
   if (!rec) throw new HttpsError('not-found', 'Session not found');
-  if (rec.get('open') !== true) return rec.get('reps') as string[];
+  if (rec.get('open') !== true) return { reps: rec.get('reps') as string[], followUps: rec.get('followUps') as string[] };
   const closeKind = rec.get('closeKind') as CloseKind;
   // An answer the tool doesn't ask is dropped (the stored closeKind is authoritative).
   const dir = closeKind === 'regulation_down' ? 'down' : closeKind === 'orienting' ? 'orient' : null;
@@ -135,8 +138,9 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       legacyOutcome: legacyOutcome(thenVsNow),
     },
   );
+  const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
   const practiced = rec.get('practiced') === true || c.practiced;
-  if (c.status !== 'completed' && !practiced) return [];
+  if (c.status !== 'completed' && !practiced) return { reps: [], followUps };
   const offPhone = c.repSource === 'followup_offphone';
   const reps = await tx.run(
     `MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
@@ -161,7 +165,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       durationSec: c.durationSec, offPhone, logged: offPhone ? 'self_report' : 'in_app',
     },
   );
-  return (reps.records[0]?.get('ids') as string[] | undefined) ?? [];
+  return { reps: (reps.records[0]?.get('ids') as string[] | undefined) ?? [], followUps };
 }
 
 export const startToolSession = callable<unknown, StartToolSessionResponse>(
@@ -177,8 +181,8 @@ export const closeToolSession = callable<unknown, CloseToolSessionResponse>(
   { auth: 'required', label: 'closeToolSession', errorMessage: 'Could not save the session' },
   async ({ uid, data }) => {
     const c = parseOrInvalid(() => validateClose(data, new Date()), 'Invalid session');
-    const skillPracticeIds = await writeTx((tx) => closeTx(tx, uid as string, c));
-    return { id: c.id, skillPracticeIds, followUpIds: [] };
+    const out = await writeTx((tx) => closeTx(tx, uid as string, c));
+    return { id: c.id, skillPracticeIds: out.reps, followUpIds: out.followUps };
   },
 );
 
@@ -188,9 +192,44 @@ export const recordToolSession = callable<unknown, CloseToolSessionResponse & { 
     const { start, close } = parseOrInvalid(() => validateRecord(data, new Date()), 'Invalid session');
     const out = await writeTx(async (tx) => {
       const toolUsageId = await startTx(tx, uid as string, request.auth?.token?.email ?? null, start);
-      const skillPracticeIds = await closeTx(tx, uid as string, close);
-      return { toolUsageId, skillPracticeIds };
+      const closed = await closeTx(tx, uid as string, close);
+      return { toolUsageId, skillPracticeIds: closed.reps, followUpIds: closed.followUps };
     });
-    return { id: start.id, ...out, followUpIds: [] };
+    return { id: start.id, ...out };
+  },
+);
+
+/**
+ * "Did it help?" for a session closed without an answer (Today's tool_outcome card, the desktop
+ * ContinuityCard). Resolved by tool session id, never "the latest" (F6). Once, within 12 h
+ * (GUARDS.ToolSession.answer); a dismissal is remembered so Today stops asking.
+ */
+export const answerToolOutcome = callable<unknown, { ok: true; recorded: boolean }>(
+  { auth: 'required', label: 'answerToolOutcome', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const a = parseOrInvalid(() => validateAnswer(data), 'Invalid answer');
+    const res = await writeTx((tx) => tx.run(
+      `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
+       WHERE ${GUARDS.ToolSession.answer('ts')}
+       WITH ts, CASE ts.closeKind WHEN 'regulation_down' THEN 'down' WHEN 'orienting' THEN 'orient' ELSE null END AS dir
+       WITH ts, dir,
+            CASE WHEN dir IS NULL THEN null ELSE $thenVsNow END AS tvn,
+            CASE WHEN ts.closeKind = 'urge' THEN $actedOnUrge ELSE null END AS acted
+       SET ts.outcomeAskDismissed = CASE WHEN $dismissed AND tvn IS NULL AND acted IS NULL THEN true ELSE ts.outcomeAskDismissed END,
+           ts.thenVsNow = coalesce(tvn, ts.thenVsNow),
+           ts.thenVsNowDir = CASE WHEN tvn IS NULL THEN ts.thenVsNowDir ELSE dir END,
+           ts.actedOnUrge = coalesce(acted, ts.actedOnUrge),
+           ts.answeredAt = CASE WHEN tvn IS NULL AND acted IS NULL THEN ts.answeredAt ELSE datetime() END,
+           ts.updatedAt = datetime()
+       WITH ts, tvn
+       OPTIONAL MATCH (ts)-[:COMPAT_USAGE]->(tu:ToolUsage) WHERE ${GUARDS.ToolUsage.outcome('tu')}
+       WITH ts, tvn, tu, CASE tvn WHEN 'much_better' THEN 'helped' WHEN 'better' THEN 'somewhat'
+                              WHEN 'same' THEN 'not_really' WHEN 'worse' THEN 'not_really' ELSE null END AS legacy
+       FOREACH (x IN CASE WHEN tu IS NULL OR legacy IS NULL THEN [] ELSE [tu] END |
+         SET x.outcome = legacy, x.outcomeTimestamp = datetime())
+       RETURN ts.id AS id`,
+      { uid, key: userKey(uid as string, a.toolSessionId), thenVsNow: a.thenVsNow, actedOnUrge: a.actedOnUrge, dismissed: a.dismissed },
+    ));
+    return { ok: true, recorded: res.records.length > 0 };
   },
 );

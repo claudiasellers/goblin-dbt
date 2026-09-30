@@ -36,7 +36,7 @@ test('startToolSession rejects an unknown tool before any query', async () => {
 
 function closeDriver({ open = true, closeKind = 'regulation_down', practiced = false, reps = [] } = {}) {
   return fakeDriver((q) => {
-    if (/AS open/.test(q)) return [{ open, closeKind, practiced, reps }];
+    if (/AS open/.test(q)) return [{ open, closeKind, practiced, reps, toolId: 'cool-down', followUps: [] }];
     if (/RETURN collect\(sp\.id\) AS ids/.test(q)) return [{ ids: [`${ID}:cold`] }];
     return [];
   });
@@ -103,7 +103,7 @@ test('closeToolSession on an unknown session is not-found', async () => {
 test('recordToolSession runs start and close in one transaction', async () => {
   const f = fakeDriver((q) => {
     if (/RETURN tu\.id AS toolUsageId/.test(q)) return [{ toolUsageId: 'x' }];
-    if (/AS open/.test(q)) return [{ open: true, closeKind: 'none', practiced: false, reps: [] }];
+    if (/AS open/.test(q)) return [{ open: true, closeKind: 'none', practiced: false, reps: [], toolId: 'micro-step', followUps: [] }];
     return [{ ids: [] }];
   });
   setDriver(f.driver);

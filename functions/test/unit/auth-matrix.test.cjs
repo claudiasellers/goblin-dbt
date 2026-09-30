@@ -13,7 +13,8 @@ const AUTHED = [
   'getDearManSessions', 'getFeelingCollection', 'getInsightsData', 'getInvalidationRecoveryProgress',
   'getOppositeActionFollowUps', 'getOppositeActionSession', 'getOppositeActionSessions', 'getUserProfile',
   'recordToolOutcome', 'saveCheckIn', 'setCheckInNextAction',
-  'startToolSession', 'closeToolSession', 'recordToolSession',
+  'startToolSession', 'closeToolSession', 'recordToolSession', 'answerToolOutcome',
+  'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
 ];

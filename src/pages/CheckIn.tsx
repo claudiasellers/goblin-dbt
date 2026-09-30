@@ -18,8 +18,7 @@ import {
 } from '../services/neo4j';
 import { getEmotionById, getEmotionByName } from '../data/emotions';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
-import { useOppositeActionFollowUpsContext } from '../hooks/useOppositeActionFollowUps';
-import { OppositeActionFollowUpCard } from '../components/tools/oppositeAction/OppositeActionFollowUpCard';
+import { TodayStack } from '../components/today/TodayStack';
 import { newId } from '../lib/spine/ids';
 import {
   buildCheckInPayload,
@@ -79,8 +78,6 @@ export function CheckIn() {
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [discriminatingQuestions, setDiscriminatingQuestions] = useState<DiscriminatingQuestion[]>([]);
   const [discriminatingAnswers, setDiscriminatingAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
-  // Opposite Action plans made for later (app-level, shared with the in-tab reminder).
-  const followUps = useOppositeActionFollowUpsContext();
 
   // === Continuity (PR-C1) ===
   // One client id per check-in, minted when the flow starts and reset in handleComplete. The result
@@ -490,10 +487,9 @@ export function CheckIn() {
 
   return (
     <div>
-      {/* Follow-up on an Opposite Action plan, only before a new check-in starts */}
-      {step === 'emotion' && followUps.pending.length > 0 && followUps.ready && (
-        <OppositeActionFollowUpCard pending={followUps.pending} copy={followUps.copy} />
-      )}
+      {/* Today (PR-S5): follow-ups, "did it help?", OA plans. Only before a new check-in starts,
+          so never beside a result or the crisis banner. */}
+      {step === 'emotion' && <TodayStack />}
 
       {/* Progress indicator - subtle, shows optionality */}
       {showProgress && (

@@ -77,6 +77,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
           ...(input.detail ? { detail: input.detail } : {}),
           ...((input.skillIds ?? skills.current).length ? { skillIds: input.skillIds ?? skills.current } : {}),
           ...(input.repSource ? { repSource: input.repSource } : {}),
+          ...(input.schedule?.length ? { schedule: input.schedule } : {}),
         });
       } catch {
         return null;

@@ -34,6 +34,8 @@ export interface CloseToolSessionRequest {
   skillIds?: string[];
   repSource?: RepSource;
   ext?: SessionExt;
+  /** Follow-ups this close schedules (≤5; e.g. Problem Solve's ps_step, Recover's three). */
+  schedule?: ScheduleFollowUpInput[];
 }
 
 export interface CloseToolSessionResponse { id: string; skillPracticeIds: string[]; followUpIds: string[] }
@@ -95,4 +97,61 @@ export function getSpineContent(): Promise<SpineContent> {
     });
   }
   return spineContent;
+}
+
+// ---- Follow-ups and Today (PR-S5) ----
+
+export type TodayState = 'due' | 'stale' | 'upcoming';
+export interface TodayItem {
+  id: string;
+  kind: 'follow_up' | 'tool_outcome' | 'pattern_offer' | 'profile_revisit';
+  type: string;
+  tier: 'safety' | 'practice' | 'quality' | 'skills';
+  state: TodayState;
+  dueAt: string | null;
+  resolveMode: 'inline' | 'deeplink';
+  deepLink: string | null;
+  choices: Array<{ id: string; label: string; status?: 'done' | 'partly' | 'didnt' | 'dismissed'; snoozeHours?: number }>;
+  /** May contain {toolName}: fill it from src/data/tools.ts. */
+  copy: { title: string; body?: string };
+  source?: { toolId?: string; toolSessionId?: string; detailId?: string };
+}
+export interface GetTodayResponse {
+  items: TodayItem[];
+  more: TodayItem[];
+  holding: boolean;
+  nextInTab: { at: string; body: string; deepLink: string } | null;
+}
+export interface ScheduleFollowUpInput {
+  id: string;
+  type: string;
+  dueAt: string;
+  window?: string;
+  cueId?: string;
+  notify?: { push?: boolean; inTab?: boolean; ics?: boolean };
+}
+
+const getTodayFn = httpsCallable<{ band?: string }, GetTodayResponse>(functions, 'getToday');
+const resolveFn = httpsCallable<{ id: string; choiceId?: string; status?: string }, { next: null | 'missing_links'; status: string | null }>(functions, 'resolveFollowUp');
+const snoozeFn = httpsCallable<{ id: string; until: string }, { ok: true }>(functions, 'snoozeFollowUp');
+const answerFn = httpsCallable<{ toolSessionId: string; thenVsNow?: ThenVsNow; actedOnUrge?: ActedOnUrge; dismissed?: boolean }, { ok: true; recorded: boolean }>(functions, 'answerToolOutcome');
+const scheduleFn = httpsCallable<{ items: ScheduleFollowUpInput[]; sourceSessionId?: string; sourceToolId?: string }, { ids: string[] }>(functions, 'scheduleFollowUp');
+
+export async function getToday(band?: string): Promise<GetTodayResponse> {
+  return (await getTodayFn(band ? { band } : {})).data;
+}
+export async function resolveFollowUp(id: string, choiceId: string): Promise<void> {
+  await resolveFn({ id, choiceId });
+}
+export async function dismissFollowUp(id: string): Promise<void> {
+  await resolveFn({ id, status: 'dismissed' });
+}
+export async function snoozeFollowUp(id: string, until: Date): Promise<void> {
+  await snoozeFn({ id, until: until.toISOString() });
+}
+export async function answerToolOutcome(toolSessionId: string, answer: { thenVsNow?: ThenVsNow; actedOnUrge?: ActedOnUrge; dismissed?: boolean }): Promise<boolean> {
+  return (await answerFn({ toolSessionId, ...answer })).data.recorded;
+}
+export async function scheduleFollowUps(items: ScheduleFollowUpInput[], source?: { sourceSessionId?: string; sourceToolId?: string }): Promise<string[]> {
+  return (await scheduleFn({ items, ...source })).data.ids;
 }

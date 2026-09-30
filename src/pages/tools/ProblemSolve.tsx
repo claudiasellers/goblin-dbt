@@ -4,6 +4,7 @@ import { getEmotionById, getEmotionByName } from '../../data/emotions';
 import { EmotionPicker } from '../../components/tools/EmotionPicker';
 import { getToolById } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
+import { SessionClose } from '../../components/spine/SessionClose';
 import {
   getProblemSolveContent,
   type ProblemSolveContent,
@@ -1284,6 +1285,9 @@ export function ProblemSolve() {
             "{stepText}"
           </p>
         </div>
+
+        {/* PR-S5: when will you take it? -> a ps_step follow-up in Today ("did it · did part · didn't") */}
+        <SessionClose planType="ps_step" />
 
         {selectedDirection?.linkedToolId && (
           <Link

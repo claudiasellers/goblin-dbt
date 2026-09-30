@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { CapacityReading, ThenVsNow } from '../data/capacityTypes';
 import type { ActedOnUrge, CloseKind, CloseStatus, DetailKind, RepSource, ToolEntry } from '../data/spineTypes';
-import type { CloseToolSessionResponse, SessionExt } from '../services/spine';
+import type { CloseToolSessionResponse, ScheduleFollowUpInput, SessionExt } from '../services/spine';
 import type { ToolLinkState } from '../lib/spine/toolLink';
 
 /** What a tool may add when it closes (the provider fills status, step, practiced, duration, ext). */
@@ -15,6 +15,8 @@ export interface ToolSessionCloseInput {
   skillIds?: string[];
   repSource?: RepSource;
   ext?: SessionExt;
+  /** Follow-ups to schedule with the close (≤5), e.g. Problem Solve's ps_step. */
+  schedule?: ScheduleFollowUpInput[];
 }
 
 /**

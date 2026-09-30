@@ -78,14 +78,29 @@ export const recordToolOutcome = onCall(
     }
 
     const userId = request.auth.uid;
-    const { outcome } = request.data as { outcome: 'helped' | 'somewhat' | 'not_really' };
+    const { outcome, toolUsageId } = request.data as { outcome: 'helped' | 'somewhat' | 'not_really'; toolUsageId?: unknown };
 
     if (!outcome || !['helped', 'somewhat', 'not_really'].includes(outcome)) {
       throw new HttpsError('invalid-argument', 'outcome must be helped, somewhat, or not_really');
     }
 
+    if (toolUsageId !== undefined && (typeof toolUsageId !== 'string' || !/^[0-9a-f-]{36}(:usage)?$/i.test(toolUsageId))) {
+      throw new HttpsError('invalid-argument', 'Invalid toolUsageId');
+    }
+
     const session = getDriver().session();
     try {
+      // PR-S5: with an id, answer exactly that row (F6: the card showed one row and wrote another).
+      if (typeof toolUsageId === 'string') {
+        await session.run(
+          `MATCH (:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage {id: $toolUsageId})
+           WHERE ${GUARDS.ToolUsage.outcome('tu')}
+           SET tu.outcome = $outcome, tu.outcomeTimestamp = datetime()`,
+          { userId, toolUsageId, outcome }
+        );
+        return { success: true };
+      }
+      // Legacy clients (no id): the latest unrated row, as before.
       await session.run(
         `
         MATCH (u:User {id: $userId})-[:USED_TOOL]->(tu:ToolUsage)
