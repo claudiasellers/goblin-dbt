@@ -191,7 +191,8 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
   // [crisis banner] -> state label -> tools -> actions -> bailout escape hatch
   // ===========================================
   return (
-    <div className="max-w-md mx-auto py-2">
+    <div className="max-w-md mx-auto">
+    <div className="py-4">
       {/* Crisis resources: a banner above the result, never instead of it */}
       {has('crisis_banner') && <CrisisBanner />}
 
@@ -264,6 +265,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
           </button>
         </div>
       )}
+    </div>
     </div>
   );
 }

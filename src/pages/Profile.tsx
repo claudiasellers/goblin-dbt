@@ -20,7 +20,7 @@ export function Profile() {
         </p>
         <a
           href="#/login"
-          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-bg-primary)] font-semibold text-sm lift-primary"
+          className="inline-block px-6 py-2.5 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-semibold text-sm lift-primary"
         >
           Sign in
         </a>
@@ -140,13 +140,15 @@ function BasicInfoSection({
 }) {
   const [name, setName] = useState(displayName || '');
   const [saving, setSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
 
   async function handleSave() {
     setSaving(true);
+    setFailed(false);
     try {
       await onSave(name);
     } catch {
-      // error handled by context
+      setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -169,11 +171,14 @@ function BasicInfoSection({
           <button
             onClick={handleSave}
             disabled={saving || name === (displayName || '')}
-            className="px-4 py-2 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-bg-primary)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] text-sm font-medium lift-primary disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? 'Saving...' : 'Save'}
           </button>
         </div>
+        {failed && (
+          <p role="status" className="mt-1.5 text-sm text-[var(--color-danger)]">Couldn’t save your name. Try again.</p>
+        )}
       </div>
 
       <div>
@@ -204,6 +209,7 @@ function AppearanceSection({
   const [draftPalette, setDraftPalette] = useState<PaletteId>(palette);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [failed, setFailed] = useState(false);
   // True once the user has picked something; a late profile load must not wipe their pick
   const touched = useRef(false);
 
@@ -228,12 +234,14 @@ function AppearanceSection({
 
   async function handleSave() {
     setSaving(true);
+    setFailed(false);
     try {
       await onSave({ palette: draftPalette });
       touched.current = false;
       setSaved(true);
     } catch {
-      // error handled by context
+      // Keep the preview so they can try again; say so instead of looking like it's still previewing.
+      setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -241,6 +249,7 @@ function AppearanceSection({
 
   function handleRevert() {
     touched.current = false;
+    setFailed(false);
     setDraftPalette(palette);
   }
 
@@ -307,8 +316,8 @@ function AppearanceSection({
             Undo changes
           </button>
         )}
-        <p role="status" className="text-sm text-[var(--color-text-tertiary)]">
-          {dirty ? 'Previewing. Save to keep it.' : saved ? 'Saved' : ''}
+        <p role="status" className={`text-sm ${failed ? 'text-[var(--color-danger)]' : 'text-[var(--color-text-tertiary)]'}`}>
+          {failed ? 'Couldn’t save your room. Try again.' : dirty ? 'Previewing. Save to keep it.' : saved ? 'Saved' : ''}
         </p>
       </div>
     </SectionCard>

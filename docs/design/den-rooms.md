@@ -47,13 +47,18 @@ text pair drops under 4.5:1 (ink, secondary and tertiary text, text on the
 action colour, quadrant text on cards, family text on its tile, and the
 on-quadrant colour on each quadrant fill). Then update the swatch in
 `src/data/palettes.ts`, `ROOM_MODES` in `index.html` if you add a room, and
-the allow-list in `functions/src/index.ts` (`updateUserProfile`).
+the allow-list in `functions/src/account/index.ts` (`updateUserProfile`).
 `npm run check:palettes` still runs over the result.
 
 ## Deploy note
 
-Frontend and functions must ship together. Without the functions deploy,
-saving a room from Profile is rejected server-side ("Unknown palette").
+Frontend and functions must ship together: `firebase deploy --only functions`,
+then `firebase deploy --only hosting`. Until the functions deploy, saving a room
+is rejected server-side ("Unknown palette"), including from `npm run dev`, which
+calls the live functions; Appearance says "Couldn't save your room" when that
+happens. Don't widen the live allow-list to room ids ahead of the frontend: the
+old frontend has no CSS block for them, so an account that saved one would load
+with no palette.
 
 ## Next
 
@@ -115,15 +120,15 @@ surface, so there are no box borders to land on the wrong side of.
 - **Two ways out** on the first screen:
   - "I can't tell" is lavender and opens Find the feeling.
   - "Start with my body" is teal and starts the body-first path.
-- **Help now** is on both screens.
-  - It fixes a bug: it used to do nothing on the first screen, because there
-    was no quadrant yet.
-  - It now uses the picked words, else the point, else assumes the loud end
-    (high-unpleasant). That is when people reach for it.
-- **Result.** Your words show as pills in their quadrant colours, then the
-  pattern label in the serif. The one or two tools are colour-coded by skill
-  family (`src/data/skillFamilies.ts`, `.tool-card[data-family]`). This also
-  fixes the literal `\u2192` that showed on the tool cards.
+- **Help now** is on both screens. It opens `HelpNowInterim` (PR-C2, D-08):
+  a safe body step plus Cool Down and 5-4-3-2-1, with no check-in and no
+  routing call. Nothing is guessed from the words or the point.
+- **Result.** The pattern label in the serif, then the witness beat (which
+  echoes the words), then the tools. The one recommendation and one swap
+  (`RecommendationCards.tsx`) are colour-coded by skill family
+  (`src/data/skillFamilies.ts`, `.tool-card[data-family]`) and name the family
+  on the card. Words show as pills in their quadrant colours only on the
+  positive result, which has no witness beat.
 - **Removed:** `QuadrantGrid` and `QuadrantCell` (the four boxes).
 
 Per-room look of the square (halo, centre shade, Tinted's glaze, dot, tint

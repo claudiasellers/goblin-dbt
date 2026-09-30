@@ -12,7 +12,7 @@
  * (page, ink, action, high-unpleasant, low-pleasant) so the picker can preview
  * every room without switching the page. Keep them in sync with index.css,
  * with ROOM_MODES in index.html, and with the allow-list in
- * functions/src/index.ts (updateUserProfile).
+ * functions/src/account/index.ts (updateUserProfile).
  *
  * Design source: the "Goblin UI directions" canvas (The Den and its rooms).
  */
