@@ -89,6 +89,15 @@ test("server validator: only the quadrant (and legacy emotion) is required; bad 
   assert.deepEqual(v.nextActionParams({ kind: "micro_step", microStepId: "x" }), { nextKind: "micro_step", nextToolId: null });
 });
 
+test("server validator: an implausible client timestamp falls back to the server clock", () => {
+  const now = new Date("2026-10-01T12:00:00.000Z");
+  const at = (ts) => v.validateSaveCheckIn({ emotion: "x", quadrant: "low-unpleasant", timestamp: ts }, now).timestamp;
+  assert.equal(at("2026-10-01T11:40:00.000Z"), "2026-10-01T11:40:00.000Z");
+  assert.equal(at("2026-09-30T20:00:00.000Z"), null, "older than 12 h (a check-in screen left open all day)");
+  assert.equal(at("2026-10-01T12:30:00.000Z"), null, "in the future");
+  assert.equal(at("1970-01-01T00:00:00.000Z"), null);
+});
+
 test("both result screens render the arrow as a character, not the literal \\\\u2192 (F13)", () => {
   for (const f of ["src/components/checkin/StateResult.tsx", "src/components/checkin/LowEnergyStateResult.tsx"]) {
     const src = readFileSync(f, "utf8");

@@ -64,6 +64,14 @@ const ids = (v: unknown, re: RegExp, max: number): string[] =>
   Array.isArray(v) ? [...new Set(v.filter((x): x is string => typeof x === 'string' && re.test(x)))].slice(0, max) : [];
 const ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:\d{2})$/;
 const iso = (v: unknown): string | null => (typeof v === 'string' && ISO.test(v) && !Number.isNaN(Date.parse(v)) ? v : null);
+/** The client's check-in time, only when plausible ([now − 12 h, now + 5 min]); else null → the server's clock. */
+export const TIMESTAMP_MAX_AGE_MS = 12 * 3_600_000;
+const checkInTime = (v: unknown, now: Date): string | null => {
+  const t = iso(v);
+  if (!t) return null;
+  const ms = Date.parse(t);
+  return ms >= now.getTime() - TIMESTAMP_MAX_AGE_MS && ms <= now.getTime() + 5 * 60_000 ? t : null;
+};
 
 export function parseNextAction(raw: unknown): CheckInNextAction | null {
   if (!isObj(raw)) return null;
@@ -126,7 +134,7 @@ export function validateSaveCheckIn(raw: unknown, now: Date): SaveCheckInInput {
     bodySensations: (Array.isArray(raw.bodySensations) ? raw.bodySensations.slice(0, 30) : [])
       .map(sensation).filter((s): s is SensationInput => s !== null),
     note: text(raw.note, 2000),
-    timestamp: iso(raw.timestamp),
+    timestamp: checkInTime(raw.timestamp, now),
     activationPatternId: id(raw.activationPatternId, GRAPH_ID),
     confidence,
     source: typeof raw.source === 'string' && (CHECKIN_SOURCES as readonly string[]).includes(raw.source) ? (raw.source as CheckInSource) : null,

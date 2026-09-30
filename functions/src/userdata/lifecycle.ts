@@ -8,7 +8,7 @@
  *
  * Every writer that updates an existing log record puts the matching GUARD in its WHERE clause, so
  * a late or replayed write is a no-op rather than a rewrite of history. `writable()` is the same
- * rule in TypeScript; tests/user-data-lifecycle.test.mjs keeps the two in step and checks that the
+ * rule in TypeScript; tests/user-data-layers.test.mjs keeps the two in step and checks that the
  * writers use the guards.
  */
 

@@ -111,13 +111,17 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
   const actedOnUrge = closeKind === 'urge' ? c.actedOnUrge : null;
   const answered = Boolean(thenVsNow || actedOnUrge);
   const detailLabel = c.detail ? DETAIL_LABELS[c.detail.kind] : null;
+  // An answer already given in Today (an abandoned session answered before its late close) is final
+  // (R2): the close never overwrites it. answeredAt is set last, so the items before it read the old value.
   await tx.run(
     `MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
      WHERE ${GUARDS.ToolSession.close('ts')}
      SET ts.status = $status, ts.endedAt = datetime(), ts.exitStep = $exitStep,
          ts.practiced = coalesce(ts.practiced, false) OR $practiced,
-         ts.thenVsNow = $thenVsNow, ts.thenVsNowDir = $thenVsNowDir, ts.actedOnUrge = $actedOnUrge,
-         ts.answeredAt = CASE WHEN $answered THEN datetime() ELSE null END,
+         ts.thenVsNow = CASE WHEN ts.answeredAt IS NULL THEN $thenVsNow ELSE ts.thenVsNow END,
+         ts.thenVsNowDir = CASE WHEN ts.answeredAt IS NULL THEN $thenVsNowDir ELSE ts.thenVsNowDir END,
+         ts.actedOnUrge = CASE WHEN ts.answeredAt IS NULL THEN $actedOnUrge ELSE ts.actedOnUrge END,
+         ts.answeredAt = CASE WHEN ts.answeredAt IS NULL AND $answered THEN datetime() ELSE ts.answeredAt END,
          ts.urgeIds = $urgeIds, ts.durationSec = $durationSec, ts.ext = $ext, ts.updatedAt = datetime()
      FOREACH (_ IN CASE WHEN $bandAtEnd IS NULL THEN [] ELSE [1] END |
        SET ts.bandAtEnd = $bandAtEnd, ts.bandAtEndSource = $bandAtEndSource, ts.bandAtEndViaCantTell = $bandAtEndViaCantTell,

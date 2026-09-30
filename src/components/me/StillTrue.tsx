@@ -16,7 +16,7 @@ export function StillTrue({ meta, question, onYes, onNotAnyMore, onChange }: {
   const [busy, setBusy] = useState(false);
   const run = async (fn: () => Promise<void>) => {
     setBusy(true);
-    try { await fn(); } finally { setBusy(false); }
+    try { await fn(); } catch { /* unchanged; Me reloads on the next visit */ } finally { setBusy(false); }
   };
   if (meta.status !== 'active') return null;
   if (meta.prompt === 'ask') {

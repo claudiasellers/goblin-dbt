@@ -242,6 +242,7 @@ export function CheckIn() {
    * "I don't know how I feel" - start with body sensations instead
    */
   function handleSomaticEntry() {
+    setStartedAt(new Date()); // the check-in's time is when it starts, not when the screen mounted
     setSource('body');
     setEntryPoint('somatic');
     setStep('body');
@@ -546,10 +547,10 @@ export function CheckIn() {
       <div key={step} className="step-enter">
         {step === 'emotion' && (
           <QuadrantGrid
-            onSelect={(emotions) => { setSource('grid'); setKnownEmotionIds([]); setCapacity(null); void handleEmotionSelect(emotions); }}
+            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); setCapacity(null); void handleEmotionSelect(emotions); }}
             onHelpMeNow={handleHelpMeNow}
             onSomaticEntry={handleSomaticEntry}
-            onCantTell={() => setStep('find')}
+            onCantTell={() => { setStartedAt(new Date()); setStep('find'); }}
           />
         )}
 

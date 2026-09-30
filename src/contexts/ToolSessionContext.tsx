@@ -6,6 +6,7 @@ import { closeToolSession, startToolSession, type SessionExt } from '../services
 import { newId } from '../lib/spine/ids';
 import { spineFrom } from '../lib/spine/toolLink';
 import { closeKindFor, durationSec } from '../lib/spine/close';
+import { useToday } from '../hooks/useToday';
 
 /**
  * One ToolSession per tool visit (PR-S3; mounted by ToolPage with `key={location.key}`).
@@ -31,6 +32,8 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
     } as const;
   });
   const uid = user?.uid ?? null;
+  // E2 §A3.6: Today refetches after any close (a skipped close question, Recover's follow-ups, ps_step).
+  const { refresh: refreshToday } = useToday();
 
   const started = useRef<Promise<boolean> | null>(null);
   const startedAt = useRef(0);
@@ -63,7 +66,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
       const mergedExt: SessionExt = { ...ext.current };
       for (const [ns, v] of Object.entries(input.ext ?? {})) mergedExt[ns] = { ...mergedExt[ns], ...v };
       try {
-        return await closeToolSession({
+        const res = await closeToolSession({
           id,
           status: input.status ?? (complete.current ? 'completed' : 'exited_early'),
           ...(step.current ? { exitStep: step.current } : {}),
@@ -79,6 +82,8 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
           ...(input.repSource ? { repSource: input.repSource } : {}),
           ...(input.schedule?.length ? { schedule: input.schedule } : {}),
         });
+        refreshToday();
+        return res;
       } catch {
         return null;
       }
@@ -105,7 +110,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
         state: { ...state, spine: { entry: 'handoff', hostSessionId: id } },
       }),
     };
-  }, [id, toolId, link, uid]);
+  }, [id, toolId, link, uid, refreshToday]);
 
   // Close on leave. Deferred a tick so StrictMode's dev-only unmount/remount doesn't close it.
   const apiRef = useRef(api);

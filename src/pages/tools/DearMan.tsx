@@ -85,6 +85,9 @@ const debriefOverallOptions = [
 
 export function DearMan() {
   const session = useToolSession();
+  // One id per debrief check-in, minted once: StrictMode's double effect (dev) or a re-run upserts
+  // the same CheckIn instead of creating a second one (PR-C1 idempotency).
+  const [debriefCheckInId] = useState(() => newId());
   const location = useLocation();
   const navigate = useNavigate();
   const routeState = location.state as { checkinEmotions?: string[]; dearManHandoff?: unknown } | null;
@@ -257,7 +260,7 @@ export function DearMan() {
         // Save the debrief's check-in (PR-C1): its own id, source dear_man_debrief, emotion ids,
         // what rendered. Idempotent by id; a signed-out debrief simply isn't saved.
         saveCheckIn(buildCheckInPayload({
-          id: newId(),
+          id: debriefCheckInId,
           quadrant,
           emotions: emotionIds,
           intensity: { x: 0.5, y: 0.5 },

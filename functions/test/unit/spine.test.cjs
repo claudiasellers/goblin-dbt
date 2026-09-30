@@ -70,6 +70,18 @@ test('closeToolSession: an answer the stored kind does not ask is dropped; orien
   assert.deepEqual([f.calls[1].params.thenVsNowDir, f.calls[1].params.legacyOutcome], ['orient', 'somewhat']);
 });
 
+test('closeToolSession never overwrites an answer given in Today before the (late) close (R2)', async () => {
+  const f = closeDriver();
+  setDriver(f.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early' } });
+  const set = f.calls[1].query;
+  for (const field of ['thenVsNow', 'thenVsNowDir', 'actedOnUrge']) {
+    assert.match(set, new RegExp(`ts\\.${field} = CASE WHEN ts\\.answeredAt IS NULL THEN \\$${field} ELSE ts\\.${field} END`), field);
+  }
+  assert.match(set, /ts\.answeredAt = CASE WHEN ts\.answeredAt IS NULL AND \$answered THEN datetime\(\) ELSE ts\.answeredAt END/);
+  assert.ok(set.indexOf('ts.answeredAt = ') > set.indexOf('ts.actedOnUrge = '), 'answeredAt is set last (the lines above read the old value)');
+});
+
 test('closeToolSession: exited early without practice writes no rep; a replay returns the existing reps', async () => {
   let f = closeDriver();
   setDriver(f.driver);

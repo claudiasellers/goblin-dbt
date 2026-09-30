@@ -115,6 +115,22 @@ test('getUserProfile (settings) strips internal, profile-layer and retired goal 
   assert.deepEqual([profile.theme, profile.timeZone], ['dark', 'Europe/London']);
 });
 
+test('updateUserProfile stores the zone browsers report (aliases included) and drops unknown ones', async () => {
+  for (const zone of ['Asia/Kolkata', 'Europe/Kyiv', 'UTC', 'America/New_York']) {
+    const f = fakeDriver(() => []);
+    setDriver(f.driver);
+    await fns.updateUserProfile.run({ auth: auth(), data: { timeZone: zone } });
+    assert.equal(f.calls.length, 1, zone);
+    assert.equal(f.calls[0].params.timeZone, zone);
+  }
+  for (const bad of ['Not/AZone', 'Europe/London; DROP', 42]) {
+    const f = fakeDriver(() => []);
+    setDriver(f.driver);
+    await fns.updateUserProfile.run({ auth: auth(), data: { timeZone: bad } });
+    assert.equal(f.calls.length, 0, String(bad));
+  }
+});
+
 test('updateUserProfile ignores the retired goal fields', async () => {
   const f = fakeDriver(() => []);
   setDriver(f.driver);

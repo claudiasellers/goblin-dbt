@@ -59,7 +59,7 @@ export function MeSection() {
             {i.meta.status === 'set_aside' && <p className="text-xs text-[var(--color-text-tertiary)]">Set aside</p>}
           </div>
           {i.meta.status === 'set_aside' && (
-            <button type="button" onClick={() => after(restoreProfileItem(ref(i)))}
+            <button type="button" onClick={() => { after(restoreProfileItem(ref(i))).catch(() => { /* stays set aside */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
               Restore
             </button>

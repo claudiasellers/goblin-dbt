@@ -48,12 +48,16 @@ export const ensureUserExists = onCall(
 // USER PROFILE FUNCTIONS
 // ============================================
 
-/** An IANA time zone this runtime knows (Intl.supportedValuesOf omits UTC aliases). */
+/**
+ * An IANA time zone this runtime can use. Checked by constructing a formatter, not against
+ * Intl.supportedValuesOf: that list holds one canonical name per zone and omits aliases browsers
+ * report today (Node 22 lists Asia/Calcutta and Europe/Kiev, Chrome sends Asia/Kolkata and Europe/Kyiv).
+ */
 export function isTimeZone(v: unknown): v is string {
-  if (typeof v !== 'string' || v.length > 64) return false;
-  if (v === 'UTC' || v === 'Etc/UTC') return true;
+  if (typeof v !== 'string' || v.length > 64 || !/^[A-Za-z][A-Za-z0-9_+\-/]*$/.test(v)) return false;
   try {
-    return (Intl as unknown as { supportedValuesOf(k: string): string[] }).supportedValuesOf('timeZone').includes(v);
+    new Intl.DateTimeFormat('en-US', { timeZone: v });
+    return true;
   } catch {
     return false;
   }
