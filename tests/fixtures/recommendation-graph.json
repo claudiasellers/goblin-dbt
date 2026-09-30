@@ -1469,14 +1469,7 @@
    "loneliness",
    "rejection"
   ],
-  "aggressive": [
-   "anger"
-  ],
-  "angry": [
-   "anger"
-  ],
   "annoyed": [
-   "anger",
    "stress"
   ],
   "anxious": [
@@ -1500,11 +1493,9 @@
    "sadness"
   ],
   "betrayed": [
-   "anger",
    "rejection"
   ],
   "bitter": [
-   "anger",
    "rejection"
   ],
   "bored": [
@@ -1541,7 +1532,6 @@
    "disgust"
   ],
   "disrespected": [
-   "anger",
    "hot_shame"
   ],
   "distant": [
@@ -1571,11 +1561,7 @@
    "fear"
   ],
   "frustrated": [
-   "anger",
    "stress"
-  ],
-  "furious": [
-   "anger"
   ],
   "grief": [
    "sadness"
@@ -1593,9 +1579,6 @@
    "anxiety",
    "fear"
   ],
-  "hostile": [
-   "anger"
-  ],
   "humiliated": [
    "hot_shame"
   ],
@@ -1610,14 +1593,10 @@
    "apathy"
   ],
   "indignant": [
-   "anger",
    "rejection"
   ],
   "inferior": [
    "cold_shame"
-  ],
-  "infuriated": [
-   "anger"
   ],
   "insecure": [
    "anxiety"
@@ -1629,7 +1608,6 @@
    "loneliness"
   ],
   "jealous": [
-   "anger",
    "rejection"
   ],
   "judgmental": [
@@ -1642,9 +1620,6 @@
   ],
   "lonely": [
    "loneliness"
-  ],
-  "mad": [
-   "anger"
   ],
   "nauseated": [
    "anxiety",
@@ -1671,9 +1646,6 @@
   "pressured": [
    "stress"
   ],
-  "provoked": [
-   "anger"
-  ],
   "rejected": [
    "rejection"
   ],
@@ -1685,7 +1657,6 @@
    "disgust"
   ],
   "resentful": [
-   "anger",
    "rejection"
   ],
   "revolted": [
@@ -1726,7 +1697,6 @@
    "hopelessness"
   ],
   "violated": [
-   "anger",
    "fear"
   ],
   "vulnerable": [

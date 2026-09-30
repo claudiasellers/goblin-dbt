@@ -162,6 +162,7 @@ WHERE r.version = "rf-v1" AND NOT r.id IN ["rf_acute_alarm_steady_opposite-actio
 DELETE r;
 
 // --- 6. Grid vocabulary → pattern vocabulary (SCORES_AS aliases, vocab-v1; E4-6) ---
+// Held (no alias yet; vocabulary.py HELD): aggressive, angry, furious, hostile, infuriated, mad, provoked
 UNWIND [
   {id: "fearful>fear", w: "fearful", e: "fear", review: "draft", why: "Same emotion."},
   {id: "scared>fear", w: "scared", e: "fear", review: "draft", why: "Same emotion."},
@@ -181,41 +182,20 @@ UNWIND [
   {id: "excluded>rejection", w: "excluded", e: "rejection", review: "draft", why: "Left out: rejection by a group."},
   {id: "persecuted>fear", w: "persecuted", e: "fear", review: "draft", why: "Under threat from others."},
   {id: "exposed>hot_shame", w: "exposed", e: "hot_shame", review: "draft", why: "Being seen when you don't want to be is the core appraisal of shame."},
-  {id: "angry>anger", w: "angry", e: "anger", review: "draft", why: "Same emotion."},
-  {id: "mad>anger", w: "mad", e: "anger", review: "draft", why: "Same emotion."},
-  {id: "furious>anger", w: "furious", e: "anger", review: "draft", why: "Intense anger."},
-  {id: "infuriated>anger", w: "infuriated", e: "anger", review: "draft", why: "Intense anger."},
-  {id: "hostile>anger", w: "hostile", e: "anger", review: "draft", why: "Anger turned outward."},
-  {id: "aggressive>anger", w: "aggressive", e: "anger", review: "draft", why: "Anger with an urge to attack."},
-  {id: "provoked>anger", w: "provoked", e: "anger", review: "draft", why: "Anger in response to a trigger."},
-  {id: "annoyed>anger", w: "annoyed", e: "anger", review: "draft", why: "Low-grade anger; irritability reads as strain (keeps mild anger off flooding)."},
-  {id: "annoyed>stress", w: "annoyed", e: "stress", review: "draft", why: "Low-grade anger; irritability reads as strain (keeps mild anger off flooding)."},
-  {id: "frustrated>anger", w: "frustrated", e: "anger", review: "draft", why: "Blocked-goal anger with strain (keeps mild anger off flooding)."},
-  {id: "frustrated>stress", w: "frustrated", e: "stress", review: "draft", why: "Blocked-goal anger with strain (keeps mild anger off flooding)."},
-  {id: "indignant>anger", w: "indignant", e: "anger", review: "draft", why: "Anger at being treated unfairly by others."},
-  {id: "indignant>rejection", w: "indignant", e: "rejection", review: "draft", why: "Anger at being treated unfairly by others."},
-  {id: "resentful>anger", w: "resentful", e: "anger", review: "draft", why: "Lasting anger at having been wronged."},
-  {id: "resentful>rejection", w: "resentful", e: "rejection", review: "draft", why: "Lasting anger at having been wronged."},
-  {id: "bitter>anger", w: "bitter", e: "anger", review: "draft", why: "Resentment that has settled."},
-  {id: "bitter>rejection", w: "bitter", e: "rejection", review: "draft", why: "Resentment that has settled."},
-  {id: "betrayed>anger", w: "betrayed", e: "anger", review: "draft", why: "Hurt and anger at a broken trust."},
-  {id: "betrayed>rejection", w: "betrayed", e: "rejection", review: "draft", why: "Hurt and anger at a broken trust."},
-  {id: "jealous>rejection", w: "jealous", e: "rejection", review: "draft", why: "Fear of losing someone to a rival, with anger."},
-  {id: "jealous>anger", w: "jealous", e: "anger", review: "draft", why: "Fear of losing someone to a rival, with anger."},
-  {id: "let_down>disappointment", w: "let_down", e: "disappointment", review: "draft", why: "Disappointed by someone who mattered."}
-] AS row
-MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
-MERGE (w)-[r:SCORES_AS]->(e)
-SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
-UNWIND [
+  {id: "annoyed>stress", w: "annoyed", e: "stress", review: "draft", why: "Low-grade anger; irritability reads as strain (anger itself is a held target, see HELD_TARGETS)."},
+  {id: "frustrated>stress", w: "frustrated", e: "stress", review: "draft", why: "Blocked-goal anger read as strain (anger itself is a held target)."},
+  {id: "indignant>rejection", w: "indignant", e: "rejection", review: "draft", why: "Anger at being treated unfairly by others: the social wound carries it (anger held)."},
+  {id: "resentful>rejection", w: "resentful", e: "rejection", review: "draft", why: "Lasting anger at having been wronged: the social wound carries it (anger held)."},
+  {id: "bitter>rejection", w: "bitter", e: "rejection", review: "draft", why: "Resentment that has settled: the social wound carries it (anger held)."},
+  {id: "betrayed>rejection", w: "betrayed", e: "rejection", review: "draft", why: "Hurt and anger at a broken trust: the social wound carries it (anger held)."},
+  {id: "jealous>rejection", w: "jealous", e: "rejection", review: "draft", why: "Fear of losing someone to a rival (anger held)."},
+  {id: "let_down>disappointment", w: "let_down", e: "disappointment", review: "draft", why: "Disappointed by someone who mattered."},
   {id: "let_down>rejection", w: "let_down", e: "rejection", review: "draft", why: "Disappointed by someone who mattered."},
   {id: "humiliated>hot_shame", w: "humiliated", e: "hot_shame", review: "draft", why: "Shamed in front of others: hot shame."},
   {id: "ridiculed>hot_shame", w: "ridiculed", e: "hot_shame", review: "draft", why: "Mocked: hot shame."},
-  {id: "disrespected>hot_shame", w: "disrespected", e: "hot_shame", review: "draft", why: "Put down by someone, with anger."},
-  {id: "disrespected>anger", w: "disrespected", e: "anger", review: "draft", why: "Put down by someone, with anger."},
+  {id: "disrespected>hot_shame", w: "disrespected", e: "hot_shame", review: "draft", why: "Put down by someone (anger held)."},
   {id: "threatened>fear", w: "threatened", e: "fear", review: "draft", why: "Sensing danger."},
-  {id: "violated>anger", w: "violated", e: "anger", review: "draft", why: "A boundary crossed: anger and fear."},
-  {id: "violated>fear", w: "violated", e: "fear", review: "draft", why: "A boundary crossed: anger and fear."},
+  {id: "violated>fear", w: "violated", e: "fear", review: "draft", why: "A boundary crossed: threat (anger held)."},
   {id: "critical>disgust", w: "critical", e: "disgust", review: "draft", why: "Judging others: the contempt side of disgust."},
   {id: "skeptical>disgust", w: "skeptical", e: "disgust", review: "draft", why: "Wheel branch critical → skeptical: distrust / contempt."},
   {id: "dismissive>disgust", w: "dismissive", e: "disgust", review: "draft", why: "Wheel branch critical → dismissive: contempt."},
@@ -223,7 +203,12 @@ UNWIND [
   {id: "distant>numbness", w: "distant", e: "numbness", review: "draft", why: "Cut off from others; feelings muted."},
   {id: "withdrawn>loneliness", w: "withdrawn", e: "loneliness", review: "draft", why: "Pulling away from others; feelings muted."},
   {id: "withdrawn>numbness", w: "withdrawn", e: "numbness", review: "draft", why: "Pulling away from others; feelings muted."},
-  {id: "stressed>stress", w: "stressed", e: "stress", review: "draft", why: "Same state."},
+  {id: "stressed>stress", w: "stressed", e: "stress", review: "draft", why: "Same state."}
+] AS row
+MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
+MERGE (w)-[r:SCORES_AS]->(e)
+SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
+UNWIND [
   {id: "pressured>stress", w: "pressured", e: "stress", review: "draft", why: "Stress from demands."},
   {id: "rushed>stress", w: "rushed", e: "stress", review: "draft", why: "Stress from time pressure."},
   {id: "busy>stress", w: "busy", e: "stress", review: "draft", why: "Load and demand."},
@@ -247,12 +232,7 @@ UNWIND [
   {id: "revolted>disgust", w: "revolted", e: "disgust", review: "draft", why: "Strong aversion, with disappointment."},
   {id: "revolted>disappointment", w: "revolted", e: "disappointment", review: "draft", why: "Strong aversion, with disappointment."},
   {id: "repelled>disgust", w: "repelled", e: "disgust", review: "draft", why: "Aversion, with disappointment."},
-  {id: "repelled>disappointment", w: "repelled", e: "disappointment", review: "draft", why: "Aversion, with disappointment."}
-] AS row
-MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
-MERGE (w)-[r:SCORES_AS]->(e)
-SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
-UNWIND [
+  {id: "repelled>disappointment", w: "repelled", e: "disappointment", review: "draft", why: "Aversion, with disappointment."},
   {id: "awful>sadness", w: "awful", e: "sadness", review: "draft", why: "Feeling awful: low mood with aversion."},
   {id: "awful>disgust", w: "awful", e: "disgust", review: "draft", why: "Feeling awful: low mood with aversion."},
   {id: "nauseated>disgust", w: "nauseated", e: "disgust", review: "draft", why: "Bodily disgust; nausea often comes with anxiety."},
@@ -268,7 +248,12 @@ UNWIND [
   {id: "fragile>sadness", w: "fragile", e: "sadness", review: "draft", why: "Low and easily hurt."},
   {id: "hurt>sadness", w: "hurt", e: "sadness", review: "draft", why: "Emotional pain, usually from someone."},
   {id: "hurt>rejection", w: "hurt", e: "rejection", review: "draft", why: "Emotional pain, usually from someone."},
-  {id: "lonely>loneliness", w: "lonely", e: "loneliness", review: "draft", why: "Same emotion."},
+  {id: "lonely>loneliness", w: "lonely", e: "loneliness", review: "draft", why: "Same emotion."}
+] AS row
+MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
+MERGE (w)-[r:SCORES_AS]->(e)
+SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
+UNWIND [
   {id: "isolated>loneliness", w: "isolated", e: "loneliness", review: "draft", why: "Cut off from others."},
   {id: "abandoned>loneliness", w: "abandoned", e: "loneliness", review: "draft", why: "Left by someone who mattered."},
   {id: "abandoned>rejection", w: "abandoned", e: "rejection", review: "draft", why: "Left by someone who mattered."},
@@ -288,5 +273,5 @@ MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
 MERGE (w)-[r:SCORES_AS]->(e)
 SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
 MATCH (:Emotion)-[r:SCORES_AS]->(:Emotion)
-WHERE r.version = "vocab-v1" AND NOT r.id IN ["fearful>fear", "scared>fear", "frightened>fear", "anxious>anxiety", "nervous>anxiety", "worried>anxiety", "insecure>anxiety", "overwhelmed>overwhelm", "helpless>hopelessness", "weak>cold_shame", "worthless>cold_shame", "insignificant>cold_shame", "inadequate>cold_shame", "inferior>cold_shame", "rejected>rejection", "excluded>rejection", "persecuted>fear", "exposed>hot_shame", "angry>anger", "mad>anger", "furious>anger", "infuriated>anger", "hostile>anger", "aggressive>anger", "provoked>anger", "annoyed>anger", "annoyed>stress", "frustrated>anger", "frustrated>stress", "indignant>anger", "indignant>rejection", "resentful>anger", "resentful>rejection", "bitter>anger", "bitter>rejection", "betrayed>anger", "betrayed>rejection", "jealous>rejection", "jealous>anger", "let_down>disappointment", "let_down>rejection", "humiliated>hot_shame", "ridiculed>hot_shame", "disrespected>hot_shame", "disrespected>anger", "threatened>fear", "violated>anger", "violated>fear", "critical>disgust", "skeptical>disgust", "dismissive>disgust", "distant>loneliness", "distant>numbness", "withdrawn>loneliness", "withdrawn>numbness", "stressed>stress", "pressured>stress", "rushed>stress", "busy>stress", "out_of_control>overwhelm", "bad>sadness", "tired>apathy", "sleepy>apathy", "unfocused>apathy", "bored>boredom", "apathetic>apathy", "indifferent>apathy", "disgusted>disgust", "disgusted>disappointment", "disapproving>disgust", "disapproving>disappointment", "judgmental>disgust", "judgmental>disappointment", "disappointed>disappointment", "appalled>disgust", "appalled>disappointment", "revolted>disgust", "revolted>disappointment", "repelled>disgust", "repelled>disappointment", "awful>sadness", "awful>disgust", "nauseated>disgust", "nauseated>anxiety", "detestable>cold_shame", "horrified>fear", "horrified>anxiety", "hesitant>anxiety", "embarrassed>hot_shame", "embarrassed>cold_shame", "sad>sadness", "grief>sadness", "fragile>sadness", "hurt>sadness", "hurt>rejection", "lonely>loneliness", "isolated>loneliness", "abandoned>loneliness", "abandoned>rejection", "vulnerable>anxiety", "despair>hopelessness", "powerless>hopelessness", "victimized>hopelessness", "depressed>sadness", "depressed>hopelessness", "guilty>guilt", "remorseful>guilt", "ashamed>cold_shame", "empty>emptiness", "numb>numbness"]
+WHERE r.version = "vocab-v1" AND NOT r.id IN ["fearful>fear", "scared>fear", "frightened>fear", "anxious>anxiety", "nervous>anxiety", "worried>anxiety", "insecure>anxiety", "overwhelmed>overwhelm", "helpless>hopelessness", "weak>cold_shame", "worthless>cold_shame", "insignificant>cold_shame", "inadequate>cold_shame", "inferior>cold_shame", "rejected>rejection", "excluded>rejection", "persecuted>fear", "exposed>hot_shame", "annoyed>stress", "frustrated>stress", "indignant>rejection", "resentful>rejection", "bitter>rejection", "betrayed>rejection", "jealous>rejection", "let_down>disappointment", "let_down>rejection", "humiliated>hot_shame", "ridiculed>hot_shame", "disrespected>hot_shame", "threatened>fear", "violated>fear", "critical>disgust", "skeptical>disgust", "dismissive>disgust", "distant>loneliness", "distant>numbness", "withdrawn>loneliness", "withdrawn>numbness", "stressed>stress", "pressured>stress", "rushed>stress", "busy>stress", "out_of_control>overwhelm", "bad>sadness", "tired>apathy", "sleepy>apathy", "unfocused>apathy", "bored>boredom", "apathetic>apathy", "indifferent>apathy", "disgusted>disgust", "disgusted>disappointment", "disapproving>disgust", "disapproving>disappointment", "judgmental>disgust", "judgmental>disappointment", "disappointed>disappointment", "appalled>disgust", "appalled>disappointment", "revolted>disgust", "revolted>disappointment", "repelled>disgust", "repelled>disappointment", "awful>sadness", "awful>disgust", "nauseated>disgust", "nauseated>anxiety", "detestable>cold_shame", "horrified>fear", "horrified>anxiety", "hesitant>anxiety", "embarrassed>hot_shame", "embarrassed>cold_shame", "sad>sadness", "grief>sadness", "fragile>sadness", "hurt>sadness", "hurt>rejection", "lonely>loneliness", "isolated>loneliness", "abandoned>loneliness", "abandoned>rejection", "vulnerable>anxiety", "despair>hopelessness", "powerless>hopelessness", "victimized>hopelessness", "depressed>sadness", "depressed>hopelessness", "guilty>guilt", "remorseful>guilt", "ashamed>cold_shame", "empty>emptiness", "numb>numbness"]
 DELETE r;

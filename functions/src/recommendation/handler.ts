@@ -18,7 +18,8 @@ import type {
 } from './types';
 
 export interface StateDeps {
-  emotionEvidence(candidates: string[], emotionIds: string[]): Promise<EmotionEvidenceRow[]>;
+  /** `useAliases`: also match through the words' SCORES_AS aliases (E4-6; only while the policy is on). */
+  emotionEvidence(candidates: string[], emotionIds: string[], useAliases: boolean): Promise<EmotionEvidenceRow[]>;
   responseEvidence(candidates: string[], responseIds: string[]): Promise<ResponseEvidenceRow[]>;
   patternDetail(patternId: string): Promise<PatternDetail | null>;
   coOccurrence(a: string, b: string): Promise<CoOccurrence | null>;
@@ -46,10 +47,23 @@ export interface PatternSelection {
   emotionIds: string[];
 }
 
-export async function selectPattern(input: CheckInInput, candidates: string[], deps: StateDeps): Promise<PatternSelection> {
+/**
+ * What E4-6 adds to pattern selection (SCORES_AS aliases, high-unpleasant answers). The handler turns
+ * both on only while RoutingPolicy is enabled, so the kill switch restores today's routing whole:
+ * with the legacy ranker, newly reachable patterns would get no card (chronic_vigilance) or the
+ * flooding banner with OA.
+ */
+export interface Reachability { aliases: boolean; highUnpleasantAnswers: boolean }
+export const FULL_REACH: Reachability = { aliases: true, highUnpleasantAnswers: true };
+export const NO_REACH: Reachability = { aliases: false, highUnpleasantAnswers: false };
+
+export async function selectPattern(
+  input: CheckInInput, candidates: string[], deps: StateDeps, reach: Reachability = FULL_REACH,
+): Promise<PatternSelection> {
   const emotionIds = (input.emotions ?? []).map(normaliseEmotionId);
-  const emotionRows = emotionIds.length > 0 ? await deps.emotionEvidence(candidates, emotionIds) : [];
-  const responseIds = (input.discriminatingAnswers ?? []).map((a) => a.responseId);
+  const emotionRows = emotionIds.length > 0 ? await deps.emotionEvidence(candidates, emotionIds, reach.aliases) : [];
+  const answers = input.quadrant === 'high-unpleasant' && !reach.highUnpleasantAnswers ? [] : (input.discriminatingAnswers ?? []);
+  const responseIds = answers.map((a) => a.responseId);
   const responseRows = responseIds.length > 0 ? await deps.responseEvidence(candidates, responseIds) : [];
   const ranked = rankPatterns(scorePatterns({
     candidates, emotionIds, intensityY: input.intensity?.y, emotionRows, responseRows,
@@ -106,8 +120,10 @@ export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDe
   const candidates = candidatesFor(input.quadrant);
   if (candidates.length === 0) return { pattern: POSITIVE_STATE, tools: [] };
 
-  const { pattern, secondaryPattern, coOccurrence, emotionIds } = await selectPattern(input, candidates, deps);
   const { policy, fallback } = await deps.routingPolicy();
+  const { pattern, secondaryPattern, coOccurrence, emotionIds } = await selectPattern(
+    input, candidates, deps, policy?.enabled ? FULL_REACH : NO_REACH,
+  );
   const { band, bandSource } = resolveBand(input, pattern.id, policy);
   const surface = input.surface ?? 'checkin';
 

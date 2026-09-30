@@ -19,12 +19,14 @@ export function toNum(v: unknown): number {
 
 /**
  * One row per (pattern, matched word, edge): the pure scorer counts words and picks the bonus.
- * E4-6: a word matches a pattern emotion directly or through its SCORES_AS aliases (grid words →
- * pattern vocabulary, scripts/recommendations/vocabulary.py). `emotionId` is always the word as sent.
+ * E4-6: a word matches a pattern emotion directly or, when `$useAliases` (RoutingPolicy on), through
+ * its SCORES_AS aliases (grid words → pattern vocabulary, scripts/recommendations/vocabulary.py).
+ * `emotionId` is always the word as sent.
  */
 export const EMOTION_EVIDENCE_QUERY = `
   UNWIND $emotionIds AS sent
   OPTIONAL MATCH (:Emotion {id: sent})-[:SCORES_AS]->(alias:Emotion)
+  WHERE $useAliases
   WITH sent, [sent] + collect(DISTINCT alias.id) AS targets
   MATCH (p:ActivationPattern)-[r:ASSOCIATED_WITH]->(e:Emotion)
   WHERE p.id IN $candidatePatterns
@@ -162,8 +164,8 @@ export function toRoutingPolicy(p: Obj | null | undefined): RoutingPolicy | null
 
 export function graphDeps(tx: QueryRunner): StateDeps {
   return {
-    async emotionEvidence(candidatePatterns, emotionIds): Promise<EmotionEvidenceRow[]> {
-      const res = await tx.run(EMOTION_EVIDENCE_QUERY, { candidatePatterns, emotionIds });
+    async emotionEvidence(candidatePatterns, emotionIds, useAliases): Promise<EmotionEvidenceRow[]> {
+      const res = await tx.run(EMOTION_EVIDENCE_QUERY, { candidatePatterns, emotionIds, useAliases });
       return res.records.map((r) => ({
         patternId: r.get('patternId') as string,
         emotionId: r.get('emotionId') as string,

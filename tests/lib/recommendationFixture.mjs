@@ -16,13 +16,13 @@ export function scoringTargets(g, sent) {
 export function fixtureDeps(g = graph, calls = []) {
   const log = (name, ...args) => calls.push([name, ...args]);
   return {
-    async emotionEvidence(candidates, emotionIds) {
-      log("emotionEvidence", candidates, emotionIds);
+    async emotionEvidence(candidates, emotionIds, useAliases = true) {
+      log("emotionEvidence", candidates, emotionIds, useAliases);
       const rows = [];
       for (const pid of candidates) {
         for (const e of g.patterns[pid]?.emotions || []) {
           for (const sent of new Set(emotionIds)) {
-            if (scoringTargets(g, sent).includes(e.id)) rows.push({ patternId: pid, emotionId: sent, strength: e.strength ?? null });
+            if ((useAliases ? scoringTargets(g, sent) : [sent]).includes(e.id)) rows.push({ patternId: pid, emotionId: sent, strength: e.strength ?? null });
           }
         }
       }

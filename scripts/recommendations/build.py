@@ -64,7 +64,11 @@ def check_vocabulary():
         assert 1 <= len(targets) <= 2 and len(set(targets)) == len(targets), f"{word}: 1-2 distinct targets"
         assert set(targets) <= set(V.PATTERN_VOCABULARY), f"{word}: {targets} not in the pattern vocabulary"
         assert word not in V.PATTERN_VOCABULARY, f"{word} is already pattern vocabulary"
+        assert not set(targets) & V.HELD_TARGETS, f"{word}: {sorted(set(targets) & V.HELD_TARGETS)} is a held target"
         assert why and why.strip(), f"{word}: rationale"
+    for word, why in V.HELD.items():
+        assert word not in V.VOCABULARY, f"{word} is both held and aliased"
+        assert why and why.strip(), f"{word}: held without a reason"
 
 
 def main():
@@ -124,6 +128,7 @@ def main():
     A("MATCH (:TherapyConcept)-[r:RECOMMENDED_FOR]->(:ActivationPattern)\n"
       f"WHERE r.version = {q(C.VERSION)} AND NOT r.id IN {lit([r['id'] for r in rows])}\nDELETE r;")
     A(f"\n// --- 6. Grid vocabulary → pattern vocabulary (SCORES_AS aliases, {V.VERSION}; E4-6) ---")
+    A("// Held (no alias yet; vocabulary.py HELD): " + ", ".join(sorted(V.HELD)))
     al = V.aliases()
     items = [{"id": f"{w}>{t}", "w": w, "e": t, "review": r, "why": why} for w, t, why, r in al]
     for k in range(0, len(items), 40):

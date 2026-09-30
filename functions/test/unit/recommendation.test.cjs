@@ -53,6 +53,7 @@ test('getStateAndTools: one read transaction; legacy tools ranked by score; rele
   assert.ok(f.allClosed());
   const ev = f.calls.find((c) => /candidatePatterns/.test(c.query) && /ASSOCIATED_WITH/.test(c.query));
   assert.deepEqual(ev.params.emotionIds, ['anxious'], 'display names are normalised');
+  assert.equal(ev.params.useAliases, false, 'no SCORES_AS aliases while the policy is off (E4-6 reach follows the kill switch)');
 });
 
 test('getStateAndTools: the safety seam queries only for non-low-unpleasant results', async () => {
@@ -109,6 +110,7 @@ test('getStateAndTools: policy on → pattern × band rows from the slice query 
   const f = fakeDriver(responder({ policy, slice }));
   setDriver(f.driver);
   const out = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', emotions: ['Anxious'], band: 'steady', bandSource: 'probe', surface: 'checkin' } }));
+  assert.equal(f.calls.find((c) => /SCORES_AS/.test(c.query)).params.useAliases, true, 'aliases count once the policy is on');
   assert.deepEqual(out.tools.map((t) => [t.id, t.slot, t.side, t.ruleId]), [
     ['opposite-action', 'primary', 'change', 'rf_acute_alarm_steady_opposite-action'],
     ['five-senses', 'swap', 'acceptance', 'rf_acute_alarm_steady_five-senses'],

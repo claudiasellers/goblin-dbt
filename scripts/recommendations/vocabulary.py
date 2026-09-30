@@ -13,12 +13,18 @@
 # signs it off (add the word to SIGNED_OFF). Mapping rule: each word → the 1–2 closest emotions in
 # PATTERN_VOCABULARY (the only ids that move scoring); a second target only when the word has two
 # plain components. Points to look at first:
-#   - Anger words: `anger` is linked to emotional_flooding (moderate) and social_threat_shame (weak)
-#     only; reactive_aggression isn't a candidate yet (D-02). So "Angry", "Mad", "Furious",
-#     "Infuriated", "Hostile", "Aggressive", "Provoked" now resolve to emotional_flooding, which
-#     carries the crisis banner (non-blocking, D-01). Milder anger is mapped away from flooding on
-#     purpose: annoyed / frustrated → anger + stress (irritability as strain → chronic_vigilance);
-#     bitter / resentful / indignant / betrayed / jealous → anger + rejection (social_threat_shame).
+#   - Plain anger words are HELD (no alias; see HELD below). `anger`'s only strong high-unpleasant
+#     edge is emotional_flooding (moderate; social_threat_shame weak) and reactive_aggression isn't a
+#     candidate yet (D-02), so an alias to `anger` would put "Angry", "Mad", "Furious", "Infuriated",
+#     "Hostile", "Aggressive" and "Provoked" on flooding, whose TRIGGERS_SAFETY flag (crisis_self_harm,
+#     condition "self-harm urges + out of control", not evaluated until the safety batch) shows 988 on
+#     one anger word. Held, they keep today's result (acute_alarm: the threat system's fight response,
+#     body-first cards) and flooding stays reachable through what the user endorses (the high-unpleasant
+#     answers "Everything hitting at once" / "Shaking, crying, or overwhelmed"). Revisit when
+#     reactive_aggression becomes a candidate or the safety batch evaluates the flag's condition.
+#     `anger` is also a held target (HELD_TARGETS): annoyed / frustrated → stress (irritability as
+#     strain → chronic_vigilance); bitter / resentful / indignant / betrayed / jealous → rejection and
+#     disrespected → hot_shame (social_threat_shame); violated → fear (acute_alarm).
 #   - The low-unpleasant disgust family has no low-energy pattern edge for `disgust`; its second
 #     target (disappointment or anxiety) carries it (disappointment → reward_drive_low, below).
 #   - Words now reach several patterns, so CO_OCCURS_WITH starts to matter (a runner-up above 0.35
@@ -43,6 +49,24 @@ PATTERN_VOCABULARY = [
     "sadness", "stress",
 ]
 
+# Pattern-vocabulary ids no alias may target yet. `anger`'s only high-unpleasant edges are
+# emotional_flooding (moderate, crisis-flagged) and social_threat_shame (weak), so an anger target
+# only ever adds flooding: alone it wins ("Angry" → the crisis banner), and with an answer such as
+# "I don't know what triggered it" it overtakes the word's own pattern ("Resentful" → flooding).
+# Every word that carried `anger` next to another target keeps that target; its one-word result is
+# unchanged. Revisit with reactive_aggression (D-02) or the safety batch's condition check.
+HELD_TARGETS = {"anger"}
+
+# Unpleasant grid words deliberately given no alias yet: word → why. They score as they do live today
+# (no pattern edge → the quadrant's candidates tie → acute_alarm), and the discriminating answers
+# decide. A word is either here or in VOCABULARY (build.py and the reachability test check it).
+HELD = {
+    w: "Anger alone is not flooding: until reactive_aggression is a candidate (D-02) or the safety batch "
+       "evaluates crisis_self_harm's condition, one anger word must not raise the crisis banner. "
+       "Today's acute_alarm (fight response, body-first cards) stands; flooding comes from the answers."
+    for w in ["angry", "mad", "furious", "infuriated", "hostile", "aggressive", "provoked"]
+}
+
 # word (as sent) → ([targets], rationale). Grouped as in src/data/emotions.ts.
 VOCABULARY = {
     # --- High-unpleasant · fearful family ---
@@ -65,26 +89,19 @@ VOCABULARY = {
     "persecuted":    (["fear"], "Under threat from others."),
     "exposed":       (["hot_shame"], "Being seen when you don't want to be is the core appraisal of shame."),
     # --- High-unpleasant · angry family ---
-    "angry":         (["anger"], "Same emotion."),
-    "mad":           (["anger"], "Same emotion."),
-    "furious":       (["anger"], "Intense anger."),
-    "infuriated":    (["anger"], "Intense anger."),
-    "hostile":       (["anger"], "Anger turned outward."),
-    "aggressive":    (["anger"], "Anger with an urge to attack."),
-    "provoked":      (["anger"], "Anger in response to a trigger."),
-    "annoyed":       (["anger", "stress"], "Low-grade anger; irritability reads as strain (keeps mild anger off flooding)."),
-    "frustrated":    (["anger", "stress"], "Blocked-goal anger with strain (keeps mild anger off flooding)."),
-    "indignant":     (["anger", "rejection"], "Anger at being treated unfairly by others."),
-    "resentful":     (["anger", "rejection"], "Lasting anger at having been wronged."),
-    "bitter":        (["anger", "rejection"], "Resentment that has settled."),
-    "betrayed":      (["anger", "rejection"], "Hurt and anger at a broken trust."),
-    "jealous":       (["rejection", "anger"], "Fear of losing someone to a rival, with anger."),
+    "annoyed":       (["stress"], "Low-grade anger; irritability reads as strain (anger itself is a held target, see HELD_TARGETS)."),
+    "frustrated":    (["stress"], "Blocked-goal anger read as strain (anger itself is a held target)."),
+    "indignant":     (["rejection"], "Anger at being treated unfairly by others: the social wound carries it (anger held)."),
+    "resentful":     (["rejection"], "Lasting anger at having been wronged: the social wound carries it (anger held)."),
+    "bitter":        (["rejection"], "Resentment that has settled: the social wound carries it (anger held)."),
+    "betrayed":      (["rejection"], "Hurt and anger at a broken trust: the social wound carries it (anger held)."),
+    "jealous":       (["rejection"], "Fear of losing someone to a rival (anger held)."),
     "let_down":      (["disappointment", "rejection"], "Disappointed by someone who mattered."),
     "humiliated":    (["hot_shame"], "Shamed in front of others: hot shame."),
     "ridiculed":     (["hot_shame"], "Mocked: hot shame."),
-    "disrespected":  (["hot_shame", "anger"], "Put down by someone, with anger."),
+    "disrespected":  (["hot_shame"], "Put down by someone (anger held)."),
     "threatened":    (["fear"], "Sensing danger."),
-    "violated":      (["anger", "fear"], "A boundary crossed: anger and fear."),
+    "violated":      (["fear"], "A boundary crossed: threat (anger held)."),
     "critical":      (["disgust"], "Judging others: the contempt side of disgust."),
     "skeptical":     (["disgust"], "Wheel branch critical → skeptical: distrust / contempt."),
     "dismissive":    (["disgust"], "Wheel branch critical → dismissive: contempt."),
