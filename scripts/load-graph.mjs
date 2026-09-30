@@ -13,7 +13,7 @@
  *   node scripts/load-graph.mjs --verify     # load everything, then fail (exit 4) on duplicates
  *   node scripts/load-graph.mjs --dry-run    # only parse + count statements
  *   node scripts/load-graph.mjs --only dear-man-content   # files whose name contains this
- *   node scripts/load-graph.mjs --file schema/migrations/x.cypher   # one file outside LOAD_ORDER
+ *   node scripts/load-graph.mjs --file schema/maintenance/x.cypher  # one file outside LOAD_ORDER (prints results)
  *
  * `--only knowledge-graph` refuses without --force: later files override Emotion / TherapyConcept
  * properties, so the base file alone would revert them until a full load.
@@ -153,6 +153,7 @@ async function main() {
   const value = (f) => (args.indexOf(f) >= 0 ? args[args.indexOf(f) + 1] : null);
   const dryRun = flag('--dry-run');
   const verify = flag('--verify');
+  const printResults = Boolean(value('--file'));
 
   let files;
   try {
@@ -189,8 +190,14 @@ async function main() {
       for (let k = 0; k < p.statements.length; k++) {
         const stmt = p.statements[k];
         try {
-          await session.run(stmt);
+          const res = await session.run(stmt);
           ok++;
+          if (printResults && res.records.length) {
+            // --file runs (maintenance / migration queries): show what each query returned
+            const toPlain = (_k, v) => (v && typeof v === 'object' && typeof v.toNumber === 'function' && 'low' in v ? v.toString() : v);
+            console.log(`  #${k + 1} → ${res.records.length} row(s)`);
+            for (const r of res.records.slice(0, 50)) console.log(`    ${JSON.stringify(r.toObject(), toPlain)}`);
+          }
         } catch (e) {
           if (isDdl(stmt)) {
             // Never MERGE on top of duplicates: a missing uniqueness constraint lets MERGE match
