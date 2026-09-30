@@ -15,7 +15,7 @@ As a general guiding principle, every phase and tool should lead with curated, t
 
 - **Frontend** (`/src`): React 19 + TypeScript + Vite + Tailwind CSS. Uses HashRouter. State managed via Context API (`AuthContext`, `UserProfileContext`) — no Redux.
 - **Auth** Firebase Authentication (email/password)
-- **Cloud Functions** (`/functions/src`, Node 22): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the deployed functions by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
+- **Cloud Functions** (`/functions/src`, Node 24, 2nd gen only): one directory per domain, each `index.ts` exporting its callables (table below). `functions/src/index.ts` only re-exports the deployed functions by name (never `export *`); the export name is the deploy name. Shared helpers live in `functions/src/shared/` (Neo4j driver singleton + `withSession`/`readTx`/`writeTx`, `requireUid`, pure validators, error mapping, and `callable()` for new callables). Input validation for the tool sessions sits in `functions/src/*Validation.ts`. User IDs come from Firebase Auth tokens server-side (`request.auth.uid`).
 - **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
@@ -201,7 +201,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 - `npm run test:emulator`: Tier 2 goldens against the Auth + Functions emulators and a local Neo4j. Needs Docker: `npm run graph:test:up`, `npm run graph:test:load`, `cp functions/.secret.local.example functions/.secret.local`. Record with `UPDATE_GOLDEN=1`.
 - Lint: `npx eslint .` still reports 5 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
 - Cypher syntax: `npx -y -p @neo4j-cypher/language-support@2.0.0-next.6 node scripts/lint-cypher.mjs`.
-- CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 22, no secrets).
+- CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 24, no secrets).
 
 ---
 
