@@ -33,8 +33,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     const unsubscribe = onAuthChange((user) => {
       setUser(user);
       setLoading(false);
-      // The graph User exists before any write (F4). Once per uid per page load, sign-up included;
-      // every write also MERGEs the user, so a failure here is harmless.
+      // The graph User exists before any write (F4). Once per uid per page load; the onUserCreated
+      // trigger covers new accounts and every write MERGEs the user, so a failure here is harmless.
       if (user && ensured.current !== user.uid) {
         ensured.current = user.uid;
         ensureUserExists().catch(() => { ensured.current = null; });

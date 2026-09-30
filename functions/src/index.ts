@@ -8,6 +8,7 @@ import './shared/admin'; // initialise firebase-admin once, before any callable 
 
 export { saveCheckIn, setCheckInNextAction, getCheckInsByUser } from './checkin';
 export { ensureUserExists, getUserProfile, updateUserProfile, deleteUserData, exportUserData } from './account';
+export { onUserCreated, onUserDeleted } from './account/triggers';
 export { trackToolUsage, recordToolOutcome } from './toolUsage';
 export { getInsightsData } from './insights';
 export { getStateAndTools, getDiscriminatingQuestions, getRelatedEmotions } from './recommendation';
