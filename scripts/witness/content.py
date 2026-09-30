@@ -55,11 +55,18 @@ FAMILIES = ("fear", "anger", "disgust", "envy", "jealousy", "love", "sadness", "
 
 LINES = []
 
+# Sign-off (A5-4): Claudia's review of draft lines. A line id here goes live with this reviewedAt on
+# the next build (status "live", reviewStatus "reviewed"); remove it to take the line back to draft.
+# e.g. SIGNED_OFF = {"ci_fear_l5_1": "2026-10-05", "ci_flooded_1": "2026-10-05"}
+SIGNED_OFF = {}
+
 
 def line(id, text, level, kind="receive", *, named=None, bands=("steady", "stirred"), moments=(), situations=(),
          words=(), families=(), underneath=(), urges=(), for_other=False, status="live", review="reviewed",
          reviewed_at=None, note=None):
     voice = "name" if named else ("you" if _has_you(text) else "none")
+    if id in SIGNED_OFF:
+        status, review, reviewed_at = "live", "reviewed", SIGNED_OFF[id]
     LINES.append({
         "id": id, "text": text, "textNamed": named, "level": level, "voice": voice, "bands": list(bands),
         "kind": kind, "forOther": for_other, "tentative": level == 3, "status": status,
@@ -192,3 +199,149 @@ for _tp, _lvl, _kind, _text in [
 ]:
     line(f"dm_{_tp}", _text, _lvl, _kind, moments=["debrief_turning_point"], situations=[("TurningPoint", _tp)],
          note="IE draft from TurningPoint.validationText", **_DRAFT)
+
+
+# ---------------------------------------------------------------------------------------------
+# Check-in result corpus (plan A5-4, E3 §A5.2.5): ~84 lines for the beat under the pattern label.
+# Drafted by the Phase A builder under the voice lint; every line is reviewStatus "draft" and
+# status "draft" (loaded, never served) until Claudia signs it off: set status="live",
+# review="reviewed", reviewed_at="<date>" per line, rebuild, then `--only witness`.
+# No slots: the echo above the line already carries the user's own word(s).
+#
+#   9 DBT families x (level 4 x3, level 5 x3)   54   steady + stirred
+#   level 3 guesses (UNDERNEATH), steady only    6
+#   level 6 capacity, steady only                6
+#   flooded, level 1-2, <= 8 words              12
+#   generic level 4/5 (no family, or several)    6
+# ---------------------------------------------------------------------------------------------
+_CI = dict(moments=["checkin_result"], status="draft", review="draft")
+
+_FAMILY_LINES = {
+    "fear": (
+        ["If things have gone wrong before, of course you're bracing now.",
+         "When you've been caught off guard before, fear shows up early. That makes sense.",
+         "Some people sense danger faster than others. Your fear is doing its job."],
+        ["Anyone facing something this uncertain could feel scared.",
+         "Fear makes sense when something matters and you can't control it.",
+         "Of course you're on edge. Something feels unsafe or unsure."],
+    ),
+    "anger": (
+        ["If you've had to fight to be heard before, this anger makes sense.",
+         "When something unfair keeps happening, anger comes fast.",
+         "You've had reasons to protect yourself. The anger makes sense."],
+        ["Anger makes sense when something you care about gets blocked.",
+         "Anyone in your spot could feel this angry.",
+         "Of course you're angry. Something mattered to you."],
+    ),
+    "sadness": (
+        ["After everything you've carried, sadness makes sense.",
+         "If you've lost things before, a new loss can bring the old ones with it.",
+         "When hope has been let down before, sadness can come on heavy."],
+        ["Sadness makes sense when something that mattered is gone or out of reach.",
+         "Anyone missing something important could feel this sad.",
+         "Of course this hurts. It mattered to you."],
+    ),
+    "disgust": (
+        ["If something like this has hurt you before, pulling away makes sense.",
+         "You know what crosses a line for you. The disgust makes sense.",
+         "When your values have been pushed on before, disgust can come up fast."],
+        ["Disgust makes sense when something feels wrong to take in.",
+         "Anyone who ran into this could want to pull back.",
+         "Of course you want some distance from this."],
+    ),
+    "shame": (
+        ["If you've been judged harshly before, shame can show up fast.",
+         "Shame often grows where someone was made to feel small. It makes sense here.",
+         "When you learned early to hide, wanting to hide now makes sense."],
+        ["Wanting to hide makes sense when you feel exposed.",
+         "Anyone who felt seen at their lowest could feel this.",
+         "Shame is a painful feeling. It makes sense that it's this heavy."],
+    ),
+    "guilt": (
+        ["You care about doing right. That's part of why this guilt shows up.",
+         "If you've worked hard to be good to people, guilt can hit hard.",
+         "When you hold yourself to a high standard, guilt comes easily."],
+        ["Guilt makes sense when something doesn't sit right with your values.",
+         "Anyone who cares about the people around them could feel this.",
+         "Of course this weighs on you. It matters to you."],
+    ),
+    "envy": (
+        ["If you've gone without for a while, envy makes sense.",
+         "When you've wanted something for a long time, seeing it elsewhere stings.",
+         "Envy often grows where a want has gone unmet. That fits here."],
+        ["Envy makes sense when someone has something you want.",
+         "Anyone who wants this could feel envy.",
+         "Of course it stings to see someone else have it."],
+    ),
+    "jealousy": (
+        ["If you've been left or let down before, jealousy makes sense.",
+         "When a connection has slipped away before, holding on tighter makes sense.",
+         "Jealousy often grows where trust has been hurt. It fits here."],
+        ["Jealousy makes sense when a relationship matters and feels at risk.",
+         "Anyone who could lose someone important could feel this.",
+         "Of course you want to hold on. They matter to you."],
+    ),
+    "love": (
+        ["If this person has meant a lot to you, the pull toward them makes sense.",
+         "When someone has been part of your life, love doesn't switch off.",
+         "Love that's been there a long time runs deep. That makes sense."],
+        ["Love makes sense. This person matters to you.",
+         "Anyone who cares this much could feel this.",
+         "Of course you feel pulled toward them."],
+    ),
+}
+for _fam, (_l4, _l5) in _FAMILY_LINES.items():
+    for _i, _text in enumerate(_l4, 1):
+        line(f"ci_{_fam}_l4_{_i}", _text, 4, families=[_fam], **_CI)
+    for _i, _text in enumerate(_l5, 1):
+        line(f"ci_{_fam}_l5_{_i}", _text, 5, families=[_fam], **_CI)
+
+# Level 3: a tentative guess at what's underneath, served with "close · not that", steady only.
+for _id, _text, _targets, _under in [
+    ("ci_l3_anger_hurt", "Maybe some of this anger is hurt underneath.", dict(families=["anger"]), ["hurt"]),
+    ("ci_l3_anger_fear", "There might be some fear under the anger too.", dict(families=["anger"]), ["fear"]),
+    ("ci_l3_shame_rejection", "Maybe part of this is a fear of being pushed away.", dict(families=["shame"]), ["rejection"]),
+    ("ci_l3_numb_overwhelm", "Maybe numb is what too much at once feels like.", dict(words=["numb", "numbness"]), ["overwhelm"]),
+    ("ci_l3_jealousy_fear", "Maybe under the jealousy is a fear of losing them.", dict(families=["jealousy"]), ["fear"]),
+    ("ci_l3_envy_sadness", "Maybe some of this is sadness about what's been missing.", dict(families=["envy"]), ["sadness"]),
+]:
+    line(_id, _text, 3, bands=("steady",), underneath=_under, **_targets, **_CI)
+
+# Level 6: treated as capable. Tone, never flattery or worth; steady only.
+for _i, _text in enumerate([
+    "You can feel this and still choose your next step.",
+    "You can let this be here for a few minutes.",
+    "You know yourself. You can pick what helps from here.",
+    "You've gotten through hard moments before. You can meet this one.",
+    "You can take this one small step at a time.",
+    "This is hard, and you can handle hard things.",
+], 1):
+    line(f"ci_l6_{_i}", _text, 6, bands=("steady",), **_CI)
+
+# Flooded: pace and echo only, at most 8 words, merged into the result's header. No question.
+for _i, (_lvl, _text) in enumerate([
+    (1, "A lot, right now."),
+    (1, "This is a lot."),
+    (1, "No rush here."),
+    (1, "Nothing to figure out yet."),
+    (1, "It can be loud for a moment."),
+    (1, "Slow is fine here."),
+    (2, "It feels like too much."),
+    (2, "Big and fast, all at once."),
+    (2, "Hard to think right now."),
+    (2, "Everything is turned up right now."),
+    (2, "So much, so fast."),
+    (2, "Loud inside, right now."),
+], 1):
+    line(f"ci_flooded_{_i}", _text, _lvl, bands=("flooded",), **_CI)
+
+# Generic level 4/5: no DBT family (tired, numb at stirred, …) or several at once.
+for _id, _lvl, _text in [
+    ("ci_generic_l4_1", 4, "With what you've been through, this feeling makes sense."),
+    ("ci_generic_l4_2", 4, "Some people feel things fast and big. That's how you're built."),
+    ("ci_generic_l4_3", 4, "Feelings like this often have a long history. This one makes sense."),
+    ("ci_generic_l5_1", 5, "What you're feeling makes sense."),
+    ("ci_generic_l5_2", 5, "Anyone in your spot could feel this."),
+    ("ci_generic_l5_3", 5, "It makes sense to feel more than one thing at once."),
+]:
+    line(_id, _text, _lvl, **_CI)

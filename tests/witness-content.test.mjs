@@ -138,3 +138,45 @@ test("lines dropped from the source are retired, never deleted", () => {
   assert.ok(stmts.some((s) => /^MATCH \(l:ValidationLine\) WHERE NOT l\.id IN \[.*\]\nSET l\.status = 'retired'$/s.test(s)));
   assert.ok(!stmts.some((s) => /DELETE l\b|DETACH DELETE/.test(s)));
 });
+
+test("check-in corpus (A5-4): ~84 drafts, every family at levels 4 and 5, flooded short lines, guesses and capacity at steady", () => {
+  const ci = rows.filter((r) => targetsOf("FOR_MOMENT", r.id).includes("checkin_result"));
+  assert.equal(ci.length, 84);
+  for (const r of ci) {
+    assert.equal(r.status, "draft", `${r.id}: not live until Claudia signs it off`);
+    assert.equal(r.reviewStatus, "draft", r.id);
+    assert.doesNotMatch(r.text, /\{/, `${r.id}: no slots on the check-in (the echo carries the word)`);
+  }
+  for (const fam of ["fear", "anger", "disgust", "envy", "jealousy", "love", "sadness", "shame", "guilt"]) {
+    for (const level of [4, 5]) {
+      const n = ci.filter((r) => r.level === level && targetsOf("VALIDATES_FAMILY", r.id).includes(fam)).length;
+      assert.equal(n, 3, `${fam} L${level}`);
+    }
+  }
+  const flooded = ci.filter((r) => r.bands.includes("flooded"));
+  assert.equal(flooded.length, 12);
+  assert.ok(flooded.every((r) => r.level <= 2 && r.bands.length === 1));
+  const l3 = ci.filter((r) => r.level === 3);
+  assert.equal(l3.length, 6);
+  assert.ok(l3.every((r) => r.tentative && r.underneath.length === 1 && r.bands.join() === "steady"));
+  assert.deepEqual(l3.flatMap((r) => targetsOf("UNDERNEATH", r.id)).sort(), ["fear", "fear", "hurt", "overwhelm", "rejection", "sadness"]);
+  const l6 = ci.filter((r) => r.level === 6);
+  assert.equal(l6.length, 6);
+  assert.ok(l6.every((r) => r.bands.join() === "steady"));
+  const generic = ci.filter((r) => [4, 5].includes(r.level) && !["VALIDATES_FAMILY", "VALIDATES", "FOR_SITUATION", "FOR_URGE"].some((t) => targetsOf(t, r.id).length));
+  assert.equal(generic.length, 6);
+  // Rotation needs distinct lines: no two lines in the corpus read the same.
+  const texts = rows.map((r) => r.text.toLowerCase());
+  assert.equal(new Set(texts).size, texts.length);
+});
+
+test("sign-off map: a line id in SIGNED_OFF goes live with its review date; empty until Claudia reviews", (t) => {
+  const src = readFileSync("scripts/witness/content.py", "utf8");
+  assert.match(src, /^SIGNED_OFF = \{\}$/m, "no check-in line is signed off by the builder");
+  const probe = src.replace(/^SIGNED_OFF = \{\}$/m, 'SIGNED_OFF = {"ci_fear_l5_1": "2026-10-05"}')
+    + '\nimport json\nprint(json.dumps([l for l in LINES if l["id"] == "ci_fear_l5_1"][0]))\n';
+  let out;
+  try { out = execFileSync("python3", ["-"], { input: probe, encoding: "utf8" }); } catch { t.skip("python3 unavailable"); return; }
+  const l = JSON.parse(out);
+  assert.deepEqual([l.status, l.reviewStatus, l.reviewedAt], ["live", "reviewed", "2026-10-05"]);
+});
