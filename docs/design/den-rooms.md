@@ -90,7 +90,9 @@ surface, so there are no box borders to land on the wrong side of.
   appear under it and can be picked right there. Each pick brings up the
   words the graph relates to it (`getRelatedEmotions`, via
   `src/hooks/useRelatedWords.ts`) as "+" chips. From here: "View more words"
-  (the full list), "+ Add another spot", or "Continue with …".
+  (the full list), "+ Add another spot", or "Continue with …". Continue only
+  appears once a word is picked, so it never duplicates "View more words"
+  (Enter on the focused square also opens the full list).
 - **More than one feeling.** A check-in holds up to three spots
   (`Spot` in `src/lib/feelingSquare.ts`), each a point plus its words.
   - "+ Add another spot" (under the square, and as "Something else in there

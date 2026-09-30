@@ -115,7 +115,7 @@ export function CheckInSquare({
       {point && (
         <div className="mt-4">
           <p className="m-0 mb-2 text-[13px] font-bold text-[var(--color-text-secondary)] text-center">
-            {spot.words.length ? 'Your words here' : 'Near here'}
+            {spot.words.length ? 'Your words here' : 'Near here. Tap one that fits.'}
           </p>
           <div className="flex flex-wrap justify-center gap-2" role="group" aria-label="Words near the dot">
             {peek.map((w) => (
@@ -146,14 +146,16 @@ export function CheckInSquare({
         </div>
       )}
 
-      {point && (
+      {/* Continue only once there is a word to carry: before that, the words under the square and
+          "View more words" are the way forward, so there is no second button doing the same thing. */}
+      {point && everyWord.length > 0 && (
         <div className="action-dock">
           <button
             type="button"
-            onClick={spot.words.length ? onContinue : onSeeMore}
+            onClick={onContinue}
             className="w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer lift-primary"
           >
-            {spot.words.length ? `Continue with ${listWords(everyWord)}` : 'That’s about right'}
+            {`Continue with ${listWords(everyWord)}`}
           </button>
         </div>
       )}
