@@ -1,7 +1,7 @@
 'use strict';
 /**
  * PR-S1: generic export / delete over :UserData, Delete Account removes the Auth user (F2),
- * the onUserDeleted trigger, retention over log records (D-10), ownership labels on legacy writers.
+ * retention over log records (D-10), ownership labels on legacy writers.
  */
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -56,15 +56,6 @@ test('an already-deleted Auth user is not an error; any other Auth failure is', 
   try {
     await assert.rejects(fns.deleteUserData.run({ auth: auth(), data: { deleteAuth: true } }), (e) => e.code === 'internal');
   } finally { console.error = orig; }
-});
-
-test('onUserDeleted runs the same graph delete for the deleted uid', async () => {
-  const f = fakeDriver(() => []);
-  setDriver(f.driver);
-  await fns.onUserDeleted.run({ uid: 'console-deleted' }, {});
-  assert.match(f.calls[0].query, /MATCH \(n:UserData \{ownerId: \$uid\}\)/);
-  assert.ok(f.calls.every((c) => c.params.uid === 'console-deleted'));
-  assert.ok(f.allClosed());
 });
 
 test('exportUserData adds formatVersion 2, records grouped by exportAs, and links with edge properties', async () => {
