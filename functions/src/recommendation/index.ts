@@ -5,10 +5,12 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { Record as Neo4jRecord } from 'neo4j-driver';
 import { getDriver, neo4jUri, neo4jUser, neo4jPassword, readTx } from '../shared/neo4j';
-import { ValidationError } from '../shared/validate';
+import { callable } from '../shared/callable';
+import { parseOrInvalid } from '../shared/errors';
 import { getStateAndToolsHandler, PatternNotFoundError } from './handler';
 import { graphDeps } from './queries';
-import type { CheckInInput, StateResult } from './types';
+import { parseStateRequest } from './validation';
+import type { StateResult } from './types';
 
 // ============================================
 // KNOWLEDGE GRAPH QUERY FUNCTIONS
@@ -19,37 +21,41 @@ import type { CheckInInput, StateResult } from './types';
  * Get the activation pattern and recommended tools based on check-in data
  * This is the main "What's happening right now" query.
  *
- * Plan E4-1: the logic lives in pure modules (patternScoring.ts, legacy.ts, the safety seam in
- * ../safety/checkinSafetyFlag.ts) behind getStateAndToolsHandler; this callable only supplies the
- * query layer (queries.ts) in one read transaction. Behaviour unchanged.
+ * The logic lives in pure modules behind getStateAndToolsHandler (E4-1): pattern selection
+ * (patternScoring.ts), the tool step (select.ts by pattern × band when RoutingPolicy is enabled,
+ * else the legacy ranker in legacy.ts: the kill switch), the crisis-flag seam
+ * (../safety/checkinSafetyFlag.ts, unchanged). This callable validates, then supplies the query
+ * layer (queries.ts) in one read transaction. Signed-in only since E4-3 (plan F9, D-12).
  */
-export const getStateAndTools = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
-  async (request): Promise<StateResult> => {
-    const input = (request.data ?? {}) as CheckInInput;
-    if (!input.quadrant) {
-      throw new HttpsError('invalid-argument', 'Quadrant is required');
-    }
+export const getStateAndTools = callable<unknown, StateResult>(
+  { auth: 'required', label: 'getStateAndTools', errorMessage: 'Failed to analyze emotional state' },
+  async ({ data }) => {
+    const input = parseOrInvalid(() => parseStateRequest(data), 'Invalid check-in');
+    let result: StateResult;
     try {
-      const result = await readTx((tx) => getStateAndToolsHandler(input, graphDeps(tx)));
-      console.log('getStateAndTools result:', {
-        patternId: result.pattern.id,
-        confidence: result.pattern.confidence,
-        toolIds: result.tools.map((t) => t.id),
-        hasGuidedActivity: !!result.guidedActivity,
-        hasCoOccurrence: !!result.coOccurrence,
-        hasSafetyFlag: !!result.safetyFlag,
-      });
-      return result;
+      result = await readTx((tx) => getStateAndToolsHandler(input, graphDeps(tx)));
     } catch (error) {
-      if (error instanceof HttpsError) throw error;
-      if (error instanceof ValidationError) throw new HttpsError('invalid-argument', error.message);
       if (error instanceof PatternNotFoundError) throw new HttpsError('not-found', error.message);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Error getting state and tools:', { message: errorMessage, quadrant: input.quadrant });
-      throw new HttpsError('internal', `Failed to analyze emotional state: ${errorMessage}`);
+      throw error;
     }
-  }
+    // One structured line per result: what was routed and why (ids and enums only, never the words).
+    const r = result.routing;
+    console.log('getStateAndTools', JSON.stringify({
+      patternId: result.pattern.id,
+      secondaryPatternId: result.secondaryPattern?.id ?? null,
+      version: r?.version ?? null,
+      band: r?.band ?? null,
+      bandSource: r?.bandSource ?? null,
+      blank: r?.blank ?? null,
+      surface: r?.surface ?? null,
+      toolIds: result.tools.map((t) => t.id),
+      ruleIds: r?.ruleIds ?? [],
+      filtered: r?.filtered ?? [],
+      receiveFirst: r?.receiveFirst ?? null,
+      safetyFlag: result.safetyFlag?.type ?? null,
+    }));
+    return result;
+  },
 );
 
 /**

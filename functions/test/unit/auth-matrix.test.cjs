@@ -19,11 +19,12 @@ const AUTHED = [
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
+  'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in
 ];
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getRelatedEmotions', 'getStateAndTools', 'getCapacityContent', 'getSpineContent',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getCapacityContent', 'getSpineContent',
   'getWitnessLines', // public content; reads the caller's own lines only when signed in
 ];
 

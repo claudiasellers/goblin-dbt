@@ -9,9 +9,12 @@ import {
   scorePatterns, wantsCoOccurrence, withConfidence,
 } from './patternScoring';
 import { legacyTools } from './legacy';
+import { resolveBand } from './band';
+import { selectRecommendations, type RoutingPick } from './select';
 import type {
   ActivationPatternResult, CheckInInput, CoOccurrence, EmotionEvidenceRow, GuidedActivityRecommendation,
-  LegacyToolRow, PatternDetail, ResponseEvidenceRow, SafetyFlag, StateResult,
+  LegacyToolRow, PatternDetail, PatternSlice, ResponseEvidenceRow, Routing, RoutingConcept, RoutingPolicy, SafetyFlag,
+  StateResult, ToolRecommendation,
 } from './types';
 
 export interface StateDeps {
@@ -22,6 +25,10 @@ export interface StateDeps {
   legacyTools(patternId: string): Promise<LegacyToolRow[]>;
   /** The safety seam (functions/src/safety/checkinSafetyFlag.ts). */
   safetyFlag(patternId: string, quadrant: string): Promise<SafetyFlag | undefined>;
+  /** E4-3: RoutingPolicy {id: 'checkin_result'} and its fallback concept (both null if not loaded). */
+  routingPolicy(): Promise<{ policy: RoutingPolicy | null; fallback: RoutingConcept | null }>;
+  /** E4-3: RECOMMENDED_FOR rows (+ concept tags, addresses, contraindications) for these patterns. */
+  routingSlice(patternIds: string[]): Promise<PatternSlice[]>;
 }
 
 export class PatternNotFoundError extends Error {
@@ -72,14 +79,64 @@ export function guidedActivityFor(quadrant: string, patternId: string): GuidedAc
   return activityId ? { activityId, patternId } : undefined;
 }
 
+/** A pick as a result card (graph name etc. kept for compat; the UI names tools from src/data/tools.ts). */
+export function toToolRecommendation(p: RoutingPick): ToolRecommendation {
+  const c = p.concept;
+  return {
+    id: c.appToolId,
+    name: c.name || c.appToolId.replace(/-/g, ' '),
+    description: c.description || '',
+    whenToUse: c.whenToUse || '',
+    dbtBasis: c.dbtBasis ?? null,
+    relevance: p.slot,
+    slot: p.slot,
+    side: p.side,
+    skillKind: p.skillKind,
+    direction: p.direction,
+    ...(p.sequence ? { sequence: p.sequence } : {}),
+    ruleId: p.ruleId,
+    reason: p.reason,
+  };
+}
+
+const emptySlice = (id: string): PatternSlice => ({ id, blank: false, emotions: [], rows: [] });
+
 export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDeps): Promise<StateResult> {
   if (!input || !input.quadrant) throw new ValidationError('Quadrant is required');
   const candidates = candidatesFor(input.quadrant);
   if (candidates.length === 0) return { pattern: POSITIVE_STATE, tools: [] };
 
-  const { pattern, secondaryPattern, coOccurrence } = await selectPattern(input, candidates, deps);
-  const tools = legacyTools(await deps.legacyTools(pattern.id));
+  const { pattern, secondaryPattern, coOccurrence, emotionIds } = await selectPattern(input, candidates, deps);
+  const { policy, fallback } = await deps.routingPolicy();
+  const { band, bandSource } = resolveBand(input, pattern.id, policy);
+  const surface = input.surface ?? 'checkin';
+
+  let tools: ToolRecommendation[];
+  let routing: Routing;
+  if (!policy || !policy.enabled) {
+    // Kill switch: today's ranker, unchanged (E4-1 pins).
+    tools = legacyTools(await deps.legacyTools(pattern.id));
+    routing = {
+      version: 'legacy', band, bandSource, blank: input.blank === true,
+      recommendedToolIds: tools.map((t) => t.id), ruleIds: tools.map(() => 'legacy'), filtered: [], receiveFirst: false, surface,
+    };
+  } else {
+    const slices = await deps.routingSlice(secondaryPattern ? [pattern.id, secondaryPattern.id] : [pattern.id]);
+    const primary = slices.find((x) => x.id === pattern.id) ?? emptySlice(pattern.id);
+    const secondary = secondaryPattern ? slices.find((x) => x.id === secondaryPattern.id) ?? null : null;
+    const blank = primary.blank || input.blank === true || (!!coOccurrence && !!secondary?.blank);
+    const sel = selectRecommendations({
+      primary, secondary, band, blank, userEmotionIds: emotionIds, policy, fallback, medicalFlags: [],
+    });
+    tools = sel.picks.map(toToolRecommendation);
+    routing = {
+      version: policy.version, band, bandSource, blank,
+      recommendedToolIds: tools.map((t) => t.id), ruleIds: sel.picks.map((p) => p.ruleId),
+      filtered: sel.filtered, receiveFirst: sel.receiveFirst, surface,
+    };
+  }
+
   const safetyFlag = await deps.safetyFlag(pattern.id, input.quadrant);
   const guidedActivity = guidedActivityFor(input.quadrant, pattern.id);
-  return { pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity };
+  return { pattern, tools, safetyFlag, secondaryPattern, coOccurrence, guidedActivity, routing };
 }

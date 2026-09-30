@@ -4,7 +4,10 @@
  */
 import { evaluateSafetyFlag, type QueryRunner } from '../safety/checkinSafetyFlag';
 import type { StateDeps } from './handler';
-import type { CoOccurrence, EmotionEvidenceRow, LegacyToolRow, PatternDetail, ResponseEvidenceRow } from './types';
+import type {
+  Band, CoOccurrence, Direction, EmotionEvidenceRow, LegacyToolRow, PatternDetail, PatternSlice, ResponseEvidenceRow,
+  RoutingConcept, RoutingPolicy, RoutingRow, Side, SkillKind,
+} from './types';
 
 /** Neo4j Integer / float / null → number. */
 export function toNum(v: unknown): number {
@@ -59,7 +62,96 @@ export const LEGACY_TOOLS_QUERY = `
          tc.whenToUse AS whenToUse, tc.dbtBasis AS dbtBasis, relevanceScore
 `;
 
+/** RoutingPolicy + its fallback concept (E4-3). One row, nulls when the policy isn't loaded. */
+export const ROUTING_POLICY_QUERY = `
+  OPTIONAL MATCH (rp:RoutingPolicy {id: 'checkin_result'})
+  OPTIONAL MATCH (fb:TherapyConcept {id: rp.fallbackConceptId})
+  RETURN rp { .version, .enabled, .maxCards, .fallbackConceptId, .defaultBand, .floodedPatterns } AS policy,
+         fb { .id, .appToolId, .name, .description, .whenToUse, .dbtBasis, .side, .skillKind, .direction } AS fallback
+`;
+
+/**
+ * The routing slice (E4 §4.2): per pattern, its blank flag and emotions, and every active
+ * `checkin_result` RECOMMENDED_FOR row with its concept's tags, the emotions the concept addresses
+ * and its CONTRAINDICATED_FOR targets (the hook; nothing authored in Phase A).
+ */
+export const ROUTING_SLICE_QUERY = `
+  MATCH (p:ActivationPattern) WHERE p.id IN $patternIds
+  OPTIONAL MATCH (p)-[:ASSOCIATED_WITH]->(pe:Emotion)
+  WITH p, collect(DISTINCT pe.id) AS patternEmotions
+  OPTIONAL MATCH (tc:TherapyConcept)-[r:RECOMMENDED_FOR]->(p)
+    WHERE tc.appToolId IS NOT NULL AND coalesce(r.active, true)
+      AND 'checkin_result' IN coalesce(r.surface, ['checkin_result'])
+  OPTIONAL MATCH (tc)-[:ADDRESSES|REDUCES|TARGETS]->(e:Emotion)
+  WITH p, patternEmotions, tc, r, collect(DISTINCT e.id) AS addresses
+  OPTIONAL MATCH (tc)-[:CONTRAINDICATED_FOR]->(cp:ActivationPattern)
+  WITH p, patternEmotions, tc, r, addresses, collect(DISTINCT cp.id) AS contraPatterns
+  OPTIONAL MATCH (tc)-[:CONTRAINDICATED_FOR]->(mf:MedicalFlag)
+  RETURN p.id AS patternId, coalesce(p.blank, false) AS blank, patternEmotions,
+         tc { .id, .appToolId, .name, .description, .whenToUse, .dbtBasis, .side, .skillKind, .direction } AS concept,
+         CASE WHEN r IS NULL THEN null ELSE r { .id, .bands, .direction, .side, .requiresPrior, .emotionGate, .active, priority: toFloat(r.priority) } END AS edge,
+         addresses, contraPatterns, collect(DISTINCT mf.id) AS contraFlags
+`;
+
 const str = (v: unknown): string | null => (typeof v === 'string' ? v : null);
+const strs = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
+type Obj = Record<string, unknown>;
+
+/** A concept map from the graph → RoutingConcept (null when it has no app tool id). Untagged concepts are neutral. */
+export function toRoutingConcept(c: Obj | null | undefined, extra: { addresses?: unknown; contraPatterns?: unknown; contraFlags?: unknown } = {}): RoutingConcept | null {
+  if (!c || typeof c.appToolId !== 'string' || typeof c.id !== 'string') return null;
+  return {
+    id: c.id, appToolId: c.appToolId,
+    name: str(c.name), description: str(c.description), whenToUse: str(c.whenToUse), dbtBasis: str(c.dbtBasis),
+    side: (str(c.side) ?? 'both') as Side,
+    skillKind: (str(c.skillKind) ?? 'change') as SkillKind,
+    direction: (str(c.direction) ?? 'neutral') as Direction,
+    addresses: strs(extra.addresses), contraPatterns: strs(extra.contraPatterns), contraFlags: strs(extra.contraFlags),
+  };
+}
+
+export function toRoutingRow(e: Obj): RoutingRow {
+  const gate = str(e.emotionGate);
+  return {
+    id: String(e.id),
+    bands: strs(e.bands) as Band[],
+    priority: toNum(e.priority),
+    direction: str(e.direction) as Direction | null,
+    side: str(e.side) as Side | null,
+    requiresPrior: str(e.requiresPrior),
+    emotionGate: gate === 'addresses' || gate === 'none_named' ? gate : null,
+    active: e.active !== false,
+  };
+}
+
+/** Slice query records → one PatternSlice per pattern (rows without a concept or edge are skipped). */
+export function toGraphSlice(records: Array<{ get(key: string): unknown }>): PatternSlice[] {
+  const byId = new Map<string, PatternSlice>();
+  for (const r of records) {
+    const id = r.get('patternId') as string;
+    const slice = byId.get(id) ?? { id, blank: r.get('blank') === true, emotions: strs(r.get('patternEmotions')), rows: [] };
+    byId.set(id, slice);
+    const edge = r.get('edge') as Obj | null;
+    const concept = toRoutingConcept(r.get('concept') as Obj | null, {
+      addresses: r.get('addresses'), contraPatterns: r.get('contraPatterns'), contraFlags: r.get('contraFlags'),
+    });
+    if (edge && concept) slice.rows.push({ row: toRoutingRow(edge), concept });
+  }
+  return [...byId.values()];
+}
+
+export function toRoutingPolicy(p: Obj | null | undefined): RoutingPolicy | null {
+  if (!p || typeof p.version !== 'string') return null;
+  const band = str(p.defaultBand);
+  return {
+    version: p.version,
+    enabled: p.enabled === true,
+    maxCards: p.maxCards == null ? 2 : toNum(p.maxCards),
+    fallbackConceptId: str(p.fallbackConceptId) ?? 'se_orienting',
+    defaultBand: (band === 'steady' || band === 'stirred' || band === 'flooded' ? band : 'stirred'),
+    floodedPatterns: strs(p.floodedPatterns),
+  };
+}
 
 export function graphDeps(tx: QueryRunner): StateDeps {
   return {
@@ -113,5 +205,15 @@ export function graphDeps(tx: QueryRunner): StateDeps {
       }));
     },
     safetyFlag: (patternId, quadrant) => evaluateSafetyFlag(tx, patternId, quadrant),
+    async routingPolicy() {
+      const res = await tx.run(ROUTING_POLICY_QUERY, {});
+      const r = res.records[0];
+      if (!r) return { policy: null, fallback: null };
+      return { policy: toRoutingPolicy(r.get('policy') as Obj | null), fallback: toRoutingConcept(r.get('fallback') as Obj | null) };
+    },
+    async routingSlice(patternIds) {
+      const res = await tx.run(ROUTING_SLICE_QUERY, { patternIds });
+      return toGraphSlice(res.records);
+    },
   };
 }

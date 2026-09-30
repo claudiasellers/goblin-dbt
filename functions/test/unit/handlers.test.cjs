@@ -42,7 +42,7 @@ test('saveCheckIn rejects a payload without emotion or quadrant before any query
 test('getStateAndTools answers high-pleasant with positive_state without querying', async () => {
   const f = fakeDriver();
   setDriver(f.driver);
-  const out = await fns.getStateAndTools.run({ data: { quadrant: 'high-pleasant', emotionIds: ['joyful'] } });
+  const out = await fns.getStateAndTools.run({ auth: auth(), data: { quadrant: 'high-pleasant', emotionIds: ['joyful'] } });
   assert.equal(out.pattern.id, 'positive_state');
   assert.equal(f.calls.length, 0);
 });

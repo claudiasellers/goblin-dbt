@@ -33,6 +33,8 @@ function responder(extra = {}) {
       ];
     }
     if (/TRIGGERS_SAFETY/.test(q)) return extra.safety ?? [];
+    if (/RoutingPolicy \{id: 'checkin_result'\}/.test(q)) return extra.policy ?? [];
+    if (/RECOMMENDED_FOR/.test(q)) return extra.slice ?? [];
     return [];
   };
 }
@@ -66,13 +68,57 @@ test('getStateAndTools: the safety seam queries only for non-low-unpleasant resu
   assert.ok(!g.calls.some((c) => /TRIGGERS_SAFETY/.test(c.query)));
 });
 
-test('getStateAndTools: missing quadrant → invalid-argument before any session; missing pattern → not-found', async () => {
+test('getStateAndTools: signed out, missing quadrant or a bad band → rejected before any session; missing pattern → not-found', async () => {
   const f = fakeDriver(responder());
   setDriver(f.driver);
+  await assert.rejects(fns.getStateAndTools.run({ data: { quadrant: 'high-unpleasant' } }), (e) => e.code === 'unauthenticated');
   await assert.rejects(fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: {} }), (e) => e.code === 'invalid-argument');
+  await assert.rejects(fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', band: 'calm' } }), (e) => e.code === 'invalid-argument');
   assert.equal(f.sessions.length, 0);
   const g = fakeDriver(responder({ detail: [] }));
   setDriver(g.driver);
   await assert.rejects(fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant' } }), (e) => e.code === 'not-found');
   assert.ok(g.allClosed());
+});
+
+const TAGS = { side: 'acceptance', skillKind: 'orient', direction: 'orient' };
+const concept = (id, appToolId, tags) => ({ id, appToolId, name: id, description: 'd', whenToUse: 'w', dbtBasis: null, ...tags });
+const edge = (id, bands, priority) => ({ id, bands, direction: null, side: null, requiresPrior: null, emotionGate: null, active: true, priority });
+
+test('getStateAndTools: policy missing → legacy ranker, routing version legacy', async () => {
+  const f = fakeDriver(responder());
+  setDriver(f.driver);
+  const out = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', emotions: ['Anxious'] } }));
+  assert.equal(out.routing.version, 'legacy');
+  assert.deepEqual(out.routing.recommendedToolIds, ['cool-down', 'opposite-action']);
+  assert.deepEqual([out.routing.band, out.routing.bandSource], ['stirred', 'inferred']);
+  assert.ok(!f.calls.some((c) => /RECOMMENDED_FOR/.test(c.query)), 'no slice query while the switch is off');
+});
+
+test('getStateAndTools: policy on → pattern × band rows from the slice query (Integer priorities, tags)', async () => {
+  const policy = [{
+    policy: { version: 'rf-v1', enabled: true, maxCards: int(2), fallbackConceptId: 'se_orienting', defaultBand: 'stirred', floodedPatterns: ['emotional_flooding'] },
+    fallback: concept('se_orienting', 'five-senses', TAGS),
+  }];
+  const slice = [
+    { patternId: 'acute_alarm', blank: false, patternEmotions: ['anxiety'], concept: concept('se_orienting', 'five-senses', TAGS),
+      edge: edge('rf_acute_alarm_steady_five-senses', ['steady'], 2), addresses: [], contraPatterns: [], contraFlags: [] },
+    { patternId: 'acute_alarm', blank: false, patternEmotions: ['anxiety'], concept: concept('dbt_opposite_action', 'opposite-action', { side: 'change', skillKind: 'change', direction: 'neutral' }),
+      edge: edge('rf_acute_alarm_steady_opposite-action', ['steady'], 1), addresses: ['fear'], contraPatterns: [], contraFlags: [] },
+  ];
+  const f = fakeDriver(responder({ policy, slice }));
+  setDriver(f.driver);
+  const out = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', emotions: ['Anxious'], band: 'steady', bandSource: 'probe', surface: 'checkin' } }));
+  assert.deepEqual(out.tools.map((t) => [t.id, t.slot, t.side, t.ruleId]), [
+    ['opposite-action', 'primary', 'change', 'rf_acute_alarm_steady_opposite-action'],
+    ['five-senses', 'swap', 'acceptance', 'rf_acute_alarm_steady_five-senses'],
+  ]);
+  assert.deepEqual(out.routing, {
+    version: 'rf-v1', band: 'steady', bandSource: 'probe', blank: false,
+    recommendedToolIds: ['opposite-action', 'five-senses'], ruleIds: ['rf_acute_alarm_steady_opposite-action', 'rf_acute_alarm_steady_five-senses'],
+    filtered: [], receiveFirst: true, surface: 'checkin',
+  });
+  const sliceCall = f.calls.find((c) => /RECOMMENDED_FOR/.test(c.query));
+  assert.deepEqual(sliceCall.params.patternIds, ['acute_alarm']);
+  assert.equal(f.sessions.length, 1);
 });

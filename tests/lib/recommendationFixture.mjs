@@ -68,5 +68,56 @@ export function fixtureDeps(g = graph, calls = []) {
       log("safetyFlag", patternId, quadrant);
       return safety.safetyFlagFor(quadrant, g.safety[patternId] || []);
     },
+    async routingPolicy() {
+      log("routingPolicy");
+      const p = g.routingPolicy;
+      if (!p) return { policy: null, fallback: null };
+      const policy = {
+        version: p.version, enabled: p.enabled === true, maxCards: p.maxCards ?? 2, fallbackConceptId: p.fallbackConceptId,
+        defaultBand: p.defaultBand, floodedPatterns: p.floodedPatterns || [],
+      };
+      return { policy, fallback: routingConcept(g, p.fallbackConceptId, { withAddresses: false }) };
+    },
+    async routingSlice(patternIds) {
+      log("routingSlice", patternIds);
+      return patternIds.filter((id) => g.patterns[id]).map((id) => ({
+        id,
+        blank: g.patterns[id].blank === true,
+        emotions: g.patterns[id].emotions.map((e) => e.id),
+        rows: g.recommendedFor
+          .filter((r) => r.patternId === id && r.active !== false && (r.surface || ["checkin_result"]).includes("checkin_result"))
+          .map((r) => ({ row: routingRow(r), concept: routingConcept(g, r.conceptId) }))
+          .filter((x) => x.concept),
+      }));
+    },
   };
+}
+
+/** A fixture concept as the slice query returns it (untagged concepts read as neutral). */
+export function routingConcept(g, conceptId, { withAddresses = true } = {}) {
+  const c = g.concepts[conceptId];
+  if (!c || !c.appToolId) return null;
+  const contra = (g.contraindicated || []).filter((x) => x.conceptId === conceptId);
+  return {
+    id: conceptId, appToolId: c.appToolId, name: c.name ?? null, description: c.description ?? null,
+    whenToUse: c.whenToUse ?? null, dbtBasis: c.dbtBasis ?? null,
+    side: c.side ?? "both", skillKind: c.skillKind ?? "change", direction: c.direction ?? "neutral",
+    addresses: withAddresses ? [...c.addresses] : [],
+    contraPatterns: withAddresses ? contra.filter((x) => g.patterns[x.targetId]).map((x) => x.targetId) : [],
+    contraFlags: withAddresses ? contra.filter((x) => !g.patterns[x.targetId]).map((x) => x.targetId) : [],
+  };
+}
+
+function routingRow(r) {
+  return {
+    id: r.id, bands: [...r.bands], priority: r.priority, direction: r.direction ?? null, side: r.side ?? null,
+    requiresPrior: r.requiresPrior ?? null, emotionGate: r.emotionGate ?? null, active: r.active !== false,
+  };
+}
+
+/** A copy of the fixture with the routing policy switched on (what the D-02 flip does). */
+export function withPolicyOn(g = graph) {
+  const copy = structuredClone(g);
+  copy.routingPolicy = { ...copy.routingPolicy, enabled: true };
+  return copy;
 }
