@@ -76,11 +76,15 @@ test("every MERGEd label has a uniqueness constraint on its merge key in constra
   assert.deepEqual(missing, []);
 });
 
-test("relationship MERGEs carry inline properties only as FELT_AS {region}", () => {
+test("relationship MERGEs carry inline properties only as FELT_AS {region} or RECOMMENDED_FOR {id}", () => {
+  // RECOMMENDED_FOR (E4-2): several rows can join the same concept and pattern (one per band), so
+  // each edge is keyed by its own stable id.
   for (const { f, s } of all()) {
     for (const m of code(s).matchAll(/\bMERGE\s*\([^()]*\)\s*<?-\s*\[\s*\w*\s*:\s*(\w+)\s*(\{[^}]*\})?\s*\]/g)) {
       if (!m[2]) continue;
-      assert.ok(m[1] === "FELT_AS" && /^\{\s*region\s*:\s*""\s*\}$/.test(m[2]), `${f}: ${m[0]}`);
+      const ok = (m[1] === "FELT_AS" && /^\{\s*region\s*:\s*""\s*\}$/.test(m[2]))
+        || (m[1] === "RECOMMENDED_FOR" && /^\{\s*id\s*:\s*row\.id\s*\}$/.test(m[2]));
+      assert.ok(ok, `${f}: ${m[0]}`);
     }
   }
 });

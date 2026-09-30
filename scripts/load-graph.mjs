@@ -67,6 +67,7 @@ export const LOAD_ORDER = [
   'profile-layer.cypher',                          // ProfileArea / ProfileKind / PatternRule (Me surface content)
   'capacity.cypher',                               // Capacity probe, hand-off primitives, band rules (needs Recover's cyclic_sighing)
   'witness.cypher',                                // Witness corpus: ValidationLine, ToolMoment, VoiceRule (needs Recover, OA, DEAR MAN debrief, regulation content)
+  'recommended-for.cypher',                        // Check-in routing: RECOMMENDED_FOR pattern × band, concept tags, RoutingPolicy (needs urge_surfing, dbt_find_the_feeling)
 ];
 
 // schema/*.cypher files that are deliberately never loaded (reference queries, not data).
