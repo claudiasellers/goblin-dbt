@@ -31,7 +31,6 @@ import {
 import type { CapacityReading } from '../data/capacityTypes';
 import { recordToolSession } from '../services/spine';
 import { useBand } from '../hooks/useBand';
-import { BandGate } from '../components/capacity/BandGate';
 import { bandStepFor, checkInIntensity } from '../lib/checkInBand';
 import { beatBand, beatRequest, type WitnessHandlers } from '../lib/witness';
 import { recordWitnessBeat } from '../services/witness';
@@ -54,7 +53,6 @@ type CheckInStep =
   | 'help_now'
   | 'find'
   | 'discriminating'
-  | 'capacity'
   | 'body'
   | 'sensation'
   | 'suggestion'
@@ -108,14 +106,12 @@ export function CheckIn() {
   const [source, setSource] = useState<CheckInSource>('grid');
   const [capacity, setCapacityState] = useState<CapacityReading | null>(null);
   // === Band (A4-3) ===
-  // Unpleasant check-ins carry a band: this check-in's own answer, or a current one carried
-  // (≤ 20 min, e.g. from Find the feeling), else the probe step asks. Pleasant: no band (D-07).
+  // The check-in no longer asks the band question (Claudia, 30 Sep: the favour probe is out until
+  // there is a better way to ask it). An unpleasant check-in carries a current reading (≤ 20 min,
+  // not flooded); otherwise it has no band and the engine infers one. Pleasant: no band (D-07).
   const band = useBand();
   const capacityRef = useRef<CapacityReading | null>(null);
   const setCapacity = (r: CapacityReading | null) => { capacityRef.current = r; setCapacityState(r); };
-  const [askedCapacity, setAskedCapacity] = useState(false);
-  /** Where the probe step goes next: the body map (standard) or straight to analysis (somatic). */
-  const afterCapacity = useRef<{ then: 'body' | 'analyze'; overrides?: { quadrant?: string; emotions?: string[] } }>({ then: 'body' });
   useEffect(() => { if (user) band.load(); }, [user, band]);
   const [knownEmotionIds, setKnownEmotionIds] = useState<string[]>([]);
   /** Find the feeling's pull was `blank` (E4-4): the engine never offers a calming tool then. */
@@ -313,8 +309,9 @@ export function CheckIn() {
   }
 
   /**
-   * Back from Find the feeling (check-in mode). A found word becomes the check-in emotion and the
-   * capacity band sets intensity; no word falls back to the body-first path.
+   * Back from Find the feeling (check-in mode). A found word becomes the check-in emotion and FTF's
+   * band (when it has one) sets intensity; no word falls back to the body-first path. FTF no longer
+   * asks the capacity question, so today the band is null: no capacity, unbanded intensity (0.5).
    */
   function handleFound(r: FindTheFeelingResult) {
     // FTF's band is this check-in's capacity answer (kept, not just turned into intensity).
@@ -323,18 +320,19 @@ export function CheckIn() {
     // FTF recorded its answer in the band store (context 'checkin'); use that reading so its id
     // matches, else build the same reading here.
     const current = band.current();
-    const fromFtf = current && current.source === 'ftf' && current.context === 'checkin' && current.value === r.band ? current : null;
-    setCapacity(fromFtf ?? ftfReading(newId(), r.band));
+    const fromFtf = r.band && current && current.source === 'ftf' && current.context === 'checkin' && current.value === r.band ? current : null;
+    setCapacity(r.band ? fromFtf ?? ftfReading(newId(), r.band) : null);
+    const y = r.intensityY ?? 0.5;
     if (r.toolSessionId) setEmbeddedIds([r.toolSessionId]);
     const emotion = r.emotionId ? getEmotionById(r.emotionId) : undefined;
     if (emotion) setKnownEmotionIds([emotion.id]);
     if (!emotion) {
-      setCheckInData(prev => ({ ...prev, intensity: { x: 0.5, y: r.intensityY } }));
+      setCheckInData(prev => ({ ...prev, intensity: { x: 0.5, y } }));
       setEntryPoint('somatic');
       setStep('body');
       return;
     }
-    const intensity = { x: emotion.x ?? 0.5, y: r.intensityY };
+    const intensity = { x: emotion.x ?? 0.5, y };
     setCheckInData(prev => ({ ...prev, intensity }));
     void handleEmotionSelect([emotion.name]);
   }
@@ -366,28 +364,15 @@ export function CheckIn() {
 
   /**
    * The feelings are in (grid, discriminating questions or somatic suggestions). Unpleasant: keep this
-   * check-in's band, carry a current one, or ask (the `capacity` step). Then the body map (standard)
-   * or the analysis (somatic, which has already been through the body map).
+   * check-in's band or carry a current one; nothing is asked. Then the body map (standard) or the
+   * analysis (somatic, which has already been through the body map).
    */
   function afterFeelings(quadrant: string | null, then: 'body' | 'analyze', overrides?: { quadrant?: string; emotions?: string[] }) {
     const d = bandStepFor(quadrant, capacityRef.current, band.current());
-    if (d.next === 'capacity') {
-      afterCapacity.current = { then, overrides };
-      setAskedCapacity(true);
-      setStep('capacity');
-      return;
-    }
     const cap = d.carry ? band.carry('checkin') : d.keep;
     setCapacity(cap);
     if (then === 'body') setStep('body');
     else void analyzeAndShowResult({ ...overrides, capacity: cap });
-  }
-
-  function handleBand(r: CapacityReading | null) {
-    setCapacity(r);
-    const { then, overrides } = afterCapacity.current;
-    if (then === 'body') setStep('body');
-    else void analyzeAndShowResult({ ...overrides, capacity: r });
   }
 
   function inferQuadrant(selectedEmotions: string[]): string {
@@ -531,8 +516,6 @@ export function CheckIn() {
     savedResult.current = null;
     setSource('grid');
     setCapacity(null);
-    setAskedCapacity(false);
-    afterCapacity.current = { then: 'body' };
     setKnownEmotionIds([]);
     setEmbeddedIds([]);
     ftfBlank.current = false;
@@ -561,15 +544,8 @@ export function CheckIn() {
       case 'discriminating':
         setStep('emotion');
         break;
-      case 'capacity':
-        if (afterCapacity.current.then === 'analyze') setStep('suggestion');
-        else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) setStep('discriminating');
-        else setStep('emotion');
-        break;
       case 'body':
-        if (entryPoint !== 'somatic' && askedCapacity && capacity?.source === 'probe') {
-          setStep('capacity');
-        } else if (entryPoint === 'somatic') {
+        if (entryPoint === 'somatic') {
           setEntryPoint('standard');
           setStep('emotion');
         } else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) {
@@ -595,11 +571,10 @@ export function CheckIn() {
   }
 
   const stepOrder = entryPoint === 'somatic'
-    ? ['body', 'suggestion', ...(askedCapacity ? ['capacity'] : [])]
+    ? ['body', 'suggestion']
     : [
       'emotion',
       ...(discriminatingQuestions.length > 0 ? ['discriminating'] : []),
-      ...(askedCapacity ? ['capacity'] : []),
       'body',
     ];
   const currentStepIndex = stepOrder.indexOf(step);
@@ -673,10 +648,6 @@ export function CheckIn() {
             </button>
             <FindTheFeeling entry="checkin" onHandoff={handleFound} />
           </div>
-        )}
-
-        {step === 'capacity' && (
-          <BandGate context="checkin" force onBand={(r) => handleBand(r)} />
         )}
 
         {step === 'body' && (

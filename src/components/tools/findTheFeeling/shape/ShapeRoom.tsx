@@ -1,6 +1,6 @@
 import { AnimatePresence, LazyMotion, domAnimation, m } from 'motion/react';
 import { Component, Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import type { Band, Close, SetOff, ShapeVec, UrgeId } from '../../../../data/findTheFeelingTypes';
+import type { Close, SetOff, ShapeVec, UrgeId } from '../../../../data/findTheFeelingTypes';
 import { NEUTRAL_SHAPE, SHAPE_DIMS, clampShape, fill } from '../../../../lib/findTheFeeling';
 import { wordOnOffer, type FlowState } from '../../../../lib/findTheFeelingFlow';
 import type { RoomProps } from '../roomTypes';
@@ -94,14 +94,12 @@ function Room({ content, state, dispatch, name, collection, reducedMotion: reduc
   const [round, setRound] = useState(0);
   const [findVec, setFindVec] = useState<ShapeVec>(NEUTRAL_SHAPE);
   const [busy, setBusy] = useState(false);
-  const [notif, setNotif] = useState(false);
-  const [bandPicked, setBandPicked] = useState<Band | null>(null);
   const [picked, setPicked] = useState<UrgeId | null>(null);
   const [accepting, setAccepting] = useState(false);
   const [prevStep, setPrevStep] = useState(step);
   if (prevStep !== step) {
     setPrevStep(step);
-    setBusy(false); setNotif(false); setBandPicked(null); setPicked(null); setAccepting(false);
+    setBusy(false); setPicked(null); setAccepting(false);
     if (step === 'find') { setRound(0); setFindVec(NEUTRAL_SHAPE); }
   }
 
@@ -147,19 +145,6 @@ function Room({ content, state, dispatch, name, collection, reducedMotion: reduc
     if (busy || step !== 'find') return;
     setBusy(true);
     laterOn('find', () => advance(findVec), 250);
-  };
-
-  // ── capacity: the message arrives, the object flinches ──
-  useEffect(() => {
-    if (step !== 'capacity') return;
-    const id = window.setTimeout(() => { setNotif(true); store.flinch(1); vibrate([12, 60, 12]); }, reduce ? 50 : 900);
-    return () => window.clearTimeout(id);
-  }, [step, reduce, store]);
-  const onBand = (b: Band) => {
-    if (bandPicked) return;
-    setBandPicked(b);
-    if (b === 'flooded') store.flinch(0.8);
-    laterOn('capacity', () => dispatch({ t: 'band', band: b }), reduce ? 150 : 450);
   };
 
   const onPull = (id: UrgeId) => {
@@ -247,38 +232,6 @@ function Room({ content, state, dispatch, name, collection, reducedMotion: reduc
               <button type="button" aria-disabled={busy} onClick={onCantTell} className="sr-quiet" data-testid="cant-tell">{t(c.shape.cantTell)}</button>
               <button type="button" onClick={() => dispatch({ t: 'switchWay', way: 'tune' })} className="sr-quiet" data-testid="switch-tune">{t(c.entry.switchToTune)}</button>
             </div>
-          </m.div>
-        )}
-
-        {step === 'capacity' && (
-          <m.div key="capacity" style={{ display: 'contents' }} exit={{ opacity: 0 }}>
-            <AnimatePresence>
-              {notif && (
-                <m.div className="sr-notif" role="status"
-                  initial={{ y: reduce ? 0 : -120, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: reduce ? 0 : -120, opacity: 0 }}
-                  transition={reduce ? { duration: 0.2 } : { type: 'spring', stiffness: 420, damping: 30 }}
-                  style={{ background: dark ? 'rgba(48,40,50,.92)' : 'rgba(255,252,247,.92)' }}>
-                  <span className="sr-notif-icon" aria-hidden>
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={pal.onBrass} strokeWidth="2"><path d="M4 5h16v11H9l-5 4z" strokeLinejoin="round" /></svg>
-                  </span>
-                  <span className="sr-notif-text">{t(c.capacity.incoming)}</span>
-                </m.div>
-              )}
-            </AnimatePresence>
-            {notif && (
-              <>
-                <Top reduce={reduce} title={<span className="sr-cap-prompt" style={{ display: 'block' }}>{t(c.capacity.prompt)}</span>} />
-                <Bottom reduce={reduce}>
-                  <div className="sr-stack">
-                    {(Object.keys(c.capacity.options) as Band[]).map(b => (
-                      <Plaque key={b} onClick={() => onBand(b)} testid={`band-${b}`} disabled={!!bandPicked && bandPicked !== b}>
-                        {t(c.capacity.options[b])}
-                      </Plaque>
-                    ))}
-                  </div>
-                </Bottom>
-              </>
-            )}
           </m.div>
         )}
 

@@ -4,7 +4,7 @@
  */
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { AnimatePresence, m } from 'motion/react';
-import type { Band, SetOff, SoundVec } from '../../../../data/findTheFeelingTypes';
+import type { SetOff, SoundVec } from '../../../../data/findTheFeelingTypes';
 import { answerOffer, rankFamilies } from '../../../../lib/findTheFeeling';
 import { wordOnOffer } from '../../../../lib/findTheFeelingFlow';
 import { MiniString } from './MiniString';
@@ -15,7 +15,6 @@ import { Search, baseFreq, breathSound, detuned, harpFreq, soundFrom, wakeSound 
 import { Beads, Choice, Head, Key, Quiet, SlotCard, SoundGlyph, SwitchTrack } from './ui';
 
 const ease = [0.22, 1, 0.36, 1] as const;
-const BANDS: Band[] = ['steady', 'stirred', 'flooded'];
 const SET_OFFS: SetOff[] = ['someone', 'situation', 'body', 'nothing', 'not_sure'];
 
 /** Bottom block: controls sit low, over the lower part of the body. */
@@ -90,56 +89,6 @@ export function FindStep({ kit }: { kit: Kit }) {
           <Quiet onClick={() => room.dispatch({ t: 'switchWay', way: 'shape' })}>{copy.entry.switchToShape}</Quiet>
         </div>
       </Bottom>
-    </>
-  );
-}
-
-// ─── capacity: the message lands, the strings flinch ─────────────────────
-
-export function CapacityStep({ kit }: { kit: Kit }) {
-  const { copy, room, apply, instRef, audioRef, base, reduced, t } = kit;
-  const [notif, setNotif] = useState(false);
-  const later = useLater();
-  const baseAtStart = useRef(base);
-
-  useEffect(() => {
-    const b = baseAtStart.current;
-    later(() => {
-      setNotif(true);
-      instRef.current.twitch(); audioRef.current?.twitch();
-      try { navigator.vibrate?.(8); } catch { /* not supported */ }
-      apply({ ...b, rough: Math.min(1, b.rough + 0.25), loud: Math.min(1, b.loud + 0.2) }, 0.2);
-      later(() => apply(b, SLOW), 700);
-    }, reduced ? 120 : 650);
-  }, [later, apply, instRef, audioRef, reduced]);
-
-  return (
-    <>
-      <div className="px-5 pt-1 min-h-[76px]">
-        <AnimatePresence>
-          {notif && (
-            <m.div initial={reduced ? { opacity: 0 } : { y: -60, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-              transition={reduced ? { duration: 0.2 } : { type: 'spring', stiffness: 320, damping: 26 }}
-              className="tune-key rounded-[18px] border px-4 py-3 flex items-center gap-3 shadow-[0_12px_30px_-14px_rgba(0,0,0,.35)]"
-              style={{ background: 'var(--t-card)', borderColor: 'var(--t-key-line)' }} role="status">
-              <span className="size-9 rounded-full grid place-items-center shrink-0 border" style={{ borderColor: 'var(--t-key-line)' }} aria-hidden>
-                <svg width="16" height="14" viewBox="0 0 16 14" fill="none" stroke="currentColor" strokeWidth="1.4" style={{ color: 'var(--t-ink-2)' }}>
-                  <path d="M2 2h12v8H6l-3 2.5V10H2z" strokeLinejoin="round" />
-                </svg>
-              </span>
-              <span className="text-[15px] leading-snug">{copy.capacity.incoming}</span>
-            </m.div>
-          )}
-        </AnimatePresence>
-      </div>
-      <div className="flex-1" />
-      <m.div className="px-5 pb-6 flex flex-col gap-2.5" initial={{ opacity: 0 }} animate={{ opacity: notif ? 1 : 0 }}
-        transition={{ delay: reduced ? 0 : 0.5, duration: reduced ? 0.2 : 0.5 }}>
-        <p className="px-1 pb-1 text-[20px] leading-snug font-medium tracking-[-0.01em]" style={{ textWrap: 'balance' }}>{t(copy.capacity.prompt)}</p>
-        {BANDS.map(b => (
-          <Choice key={b} label={copy.capacity.options[b]} disabled={!notif} onClick={() => room.dispatch({ t: 'band', band: b })} />
-        ))}
-      </m.div>
     </>
   );
 }

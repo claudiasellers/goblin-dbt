@@ -12,15 +12,16 @@ const fixture = JSON.parse(readFileSync("tests/fixtures/capacity-content.json", 
 const reading = (o = {}) => ({ id: "3f2c9a0e-1b2c-4d5e-8f90-123456789abc", value: "stirred", viaCantTell: false, source: "probe",
   framing: "now", wording: "default", context: "checkin", probeVersion: "capacity-v1", at: "2026-10-01T12:00:00Z", ...o });
 
-test("bandStepFor: unpleasant asks once; own reading kept; current carried; pleasant has no band (D-07)", () => {
-  assert.deepEqual(cb.bandStepFor("high-unpleasant", null, null), { next: "capacity" });
-  assert.deepEqual(cb.bandStepFor("low-unpleasant", null, null), { next: "capacity" });
+test("bandStepFor: nothing is ever asked; own reading kept; current carried unless flooded; pleasant has no band (D-07)", () => {
+  const none = { next: "skip", keep: null, carry: false };
+  assert.deepEqual(cb.bandStepFor("high-unpleasant", null, null), none);
+  assert.deepEqual(cb.bandStepFor("low-unpleasant", null, null), none);
   const own = reading({ value: "flooded" });
   assert.deepEqual(cb.bandStepFor("high-unpleasant", own, reading()), { next: "skip", keep: own, carry: false });
   assert.deepEqual(cb.bandStepFor("low-unpleasant", null, reading()), { next: "skip", keep: null, carry: true });
-  assert.deepEqual(cb.bandStepFor("high-unpleasant", null, reading({ value: "flooded" })), { next: "capacity" }, "a current flooded is re-asked (D-07)");
+  assert.deepEqual(cb.bandStepFor("high-unpleasant", null, reading({ value: "flooded" })), none, "a current flooded is not carried (D-07); the engine infers");
   for (const q of ["high-pleasant", "low-pleasant", null]) {
-    assert.deepEqual(cb.bandStepFor(q, own, reading()), { next: "skip", keep: null, carry: false }, String(q));
+    assert.deepEqual(cb.bandStepFor(q, own, reading()), none, String(q));
   }
 });
 
@@ -59,10 +60,10 @@ test("Insights guard: 'catching it earlier' needs ≥2 banded check-ins per half
   assert.equal(guard.intensityDrop([pt(0.6), pt(0.6)], [pt(0.6), pt(0.6)], 0.05), null);
 });
 
-test("wiring: probe step in the check-in, band to the engine and the result screens; IntensityGrid gone", () => {
+test("wiring: no probe step in the check-in (removed 30 Sep); band to the engine and the result screens; IntensityGrid gone", () => {
   const ci = readFileSync("src/pages/CheckIn.tsx", "utf8");
-  assert.match(ci, /\| 'capacity'/);
-  assert.match(ci, /<BandGate context="checkin" force/);
+  assert.doesNotMatch(ci, /\| 'capacity'/);
+  assert.doesNotMatch(ci, /BandGate|CapacityProbe/);
   assert.match(ci, /band: cap\.value, bandViaCantTell: cap\.viaCantTell/);
   assert.equal((ci.match(/band=\{capacity\?\.value \?\? null\}/g) ?? []).length, 2, "both result screens get the band");
   assert.doesNotMatch(ci, /setCapacity\(null\); void handleEmotionSelect/, "re-picking a word keeps this check-in's answer");

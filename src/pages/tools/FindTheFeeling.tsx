@@ -28,9 +28,12 @@ const rooms: Record<Way, React.LazyExoticComponent<ComponentType<RoomProps>>> = 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: FindTheFeelingContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
 
-/** Check-in handoff. intensityY is the band's graph-defined intensity (no scale is ever shown). */
+/**
+ * Check-in handoff. intensityY is the band's graph-defined intensity (no scale is ever shown).
+ * Both are null now that the capacity question isn't asked (Claudia, 30 Sep).
+ */
 export interface FindTheFeelingResult {
-  emotionId: string | null; band: Band; intensityY: number;
+  emotionId: string | null; band: Band | null; intensityY: number | null;
   /** The pull was `blank` (E4-4): the check-in's routing never offers a calming tool then. */
   blank?: boolean;
   /** The embedded ToolSession (PR-S4); the check-in links it with EMBEDDED. */
@@ -67,7 +70,8 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   const state = history.stack[history.stack.length - 1];
 
   // FTF's capacity answer is a band reading like any other (A4-2): recorded so the check-in and the
-  // next tool within 20 minutes carry it instead of asking again. Rooms and save payload unchanged.
+  // next tool within 20 minutes carry it. The capacity step is out for now, so this doesn't fire;
+  // kept for when a band question comes back.
   const band = useBand();
   useEffect(() => {
     if (!state.band) return;
@@ -119,7 +123,7 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
     savedFor.current = sessionId.current;
     const embedId = state.step === 'handoff' && user ? newId() : null;
     doSave(embedId);
-    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band!, intensityY: content.flow.bandIntensity[state.band!], blank: state.pull === 'blank', toolSessionId: embedId });
+    if (state.step === 'handoff') onHandoff?.({ emotionId: state.word, band: state.band, intensityY: state.band ? content.flow.bandIntensity[state.band] : null, blank: state.pull === 'blank', toolSessionId: embedId });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 

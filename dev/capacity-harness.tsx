@@ -1,28 +1,26 @@
 /**
- * Dev-only harness for the capacity band (A4-2): the probe (both wordings), BandGate carry / re-ask,
- * P2 (BreakdownHandoff) and the "too much" overlay, with the fixture content and no Firebase.
+ * Dev-only harness for the capacity band (A4-2): BandGate carry (it never asks: the probe is out,
+ * 30 Sep), P2 (BreakdownHandoff) and the "too much" overlay, with the fixture content and no Firebase.
  * Not part of the app build.
  *   python3 scripts/capacity/fixture.py   # after editing scripts/capacity/content.py
  *   npx vite build --config dev/vite.harness.config.ts && (cd dev-dist && python3 -m http.server 4321)
  *   then open http://localhost:4321/dev/capacity.html
- * URL params: ?view=probe|gate|handoff|toomuch&wording=default|relational&label=Sam&band=flooded&blank=1
+ * URL params: ?view=gate|handoff|toomuch&band=flooded&blank=1
  */
 import { StrictMode, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../src/index.css';
 import fixture from '../tests/fixtures/capacity-content.json';
-import type { Band, CapacityContent, HandoffResult, ProbeWording } from '../src/data/capacityTypes';
+import type { Band, CapacityContent, HandoffResult } from '../src/data/capacityTypes';
 import { BandProvider } from '../src/contexts/BandContext';
 import { useBand } from '../src/hooks/useBand';
-import { CapacityProbe } from '../src/components/capacity/CapacityProbe';
 import { BandGate } from '../src/components/capacity/BandGate';
 import { BreakdownHandoff } from '../src/components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../src/components/capacity/TooMuchLink';
 
 const content = fixture as unknown as CapacityContent;
 const q = new URLSearchParams(location.search);
-const view = q.get('view') || 'probe';
-const wording = (q.get('wording') as ProbeWording) || 'default';
+const view = q.get('view') || 'gate';
 const band = (q.get('band') as Band) || 'flooded';
 const blank = q.get('blank') === '1';
 const btn = 'min-h-11 px-3 rounded-lg border border-[var(--color-border)] text-sm';
@@ -39,7 +37,7 @@ function Harness() {
   const [done, setDone] = useState<HandoffResult | null>(null);
   const nav = (
     <nav className="flex flex-wrap gap-2 mb-6 text-sm">
-      {['probe', 'gate', 'handoff', 'toomuch'].map((v) => <a key={v} className={btn} href={`?view=${v}&wording=${wording}&band=${band}${blank ? '&blank=1' : ''}`}>{v}</a>)}
+      {['gate', 'handoff', 'toomuch'].map((v) => <a key={v} className={btn} href={`?view=${v}&band=${band}${blank ? '&blank=1' : ''}`}>{v}</a>)}
       <button className={btn} onClick={() => { b.clear(); push('cleared'); }}>clear band</button>
       <span className="self-center" data-testid="current">current: {b.current()?.value ?? 'none'}</span>
     </nav>
@@ -47,11 +45,10 @@ function Harness() {
   return (
     <div className="max-w-md mx-auto p-4">
       {nav}
-      {view === 'probe' && <CapacityProbe probe={content.probe} wording={wording} personLabel={q.get('label')} onAnswer={(v, c) => push({ v, cantTell: c })} />}
       {view === 'gate' && (
         <div className="space-y-4">
-          <BandGate key={gateKey} context="dear-man" wording={wording} reaskIfFlooded onBand={(r, how) => push({ how, value: r?.value, source: r?.source })} />
-          <button className={btn} onClick={() => setGateKey((k) => k + 1)}>remount gate (carries a fresh reading; re-asks flooded)</button>
+          <BandGate key={gateKey} context="dear-man" reaskIfFlooded onBand={(r, how) => push({ how, value: r?.value, source: r?.source })} />
+          <button className={btn} onClick={() => setGateKey((k) => k + 1)}>remount gate (carries a fresh reading; never carries flooded)</button>
         </div>
       )}
       {view === 'handoff' && (done

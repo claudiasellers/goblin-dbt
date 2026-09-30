@@ -18,7 +18,7 @@ import { InstState } from './instState';
 import { LAYOUT, type Kit, type RegHandlers, SLOW } from './kit';
 import { NEUTRAL, settled, soundFrom, woken, type Search, type Sound } from './sound';
 import {
-  BreatheStep, CapacityStep, CloseStep, CollectionStep, FindStep, HandoffStep, IntroStep, NextStep, OrientStep,
+  BreatheStep, CloseStep, CollectionStep, FindStep, HandoffStep, IntroStep, NextStep, OrientStep,
   PullStep, SetOffStep, WakeStep, WordStep,
 } from './steps';
 import { SoundGlyph, SwitchTrack } from './ui';
@@ -27,7 +27,7 @@ import './tune.css';
 const ease = [0.22, 1, 0.36, 1] as const;
 
 /** Steps whose sound the room sets from the scene; the others set their own on entry. */
-const SCENE_STEPS = new Set<FlowState['step']>(['intro', 'capacity', 'pull', 'orient', 'setOff', 'next', 'handoff']);
+const SCENE_STEPS = new Set<FlowState['step']>(['intro', 'pull', 'orient', 'setOff', 'next', 'handoff']);
 
 /**
  * The scene sound: the found sound with ambient descent applied (display/playback only; the
@@ -106,7 +106,6 @@ export default function TuneRoom(room: RoomProps) {
   switch (step) {
     case 'intro': body = <IntroStep kit={kit} soundOn={soundOn} toggleSound={toggleSound} />; break;
     case 'find': body = <FindStep kit={kit} />; break;
-    case 'capacity': body = <CapacityStep kit={kit} />; break;
     case 'pull': body = <PullStep kit={kit} />; break;
     case 'regulate': body = state.regulation === 'wake' ? <WakeStep kit={kit} /> : <BreatheStep kit={kit} />; break;
     case 'orient': body = <OrientStep kit={kit} />; break;

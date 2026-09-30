@@ -11,7 +11,7 @@ import {
 } from './findTheFeeling';
 
 export type Step =
-  | 'intro' | 'find' | 'capacity' | 'pull' | 'regulate' | 'orient' | 'word'
+  | 'intro' | 'find' | 'pull' | 'regulate' | 'orient' | 'word'
   | 'setOff' | 'close' | 'next' | 'collection' | 'handoff';
 
 export interface FlowState {
@@ -20,6 +20,11 @@ export interface FlowState {
   switchedWay: boolean;
   step: Step;
   found: Found | null;
+  /**
+   * Always null now: the capacity question ("If someone asked you for a favour…") is out
+   * (Claudia, 30 Sep) until there is a better way to ask it. Kept so the gates and the session
+   * shape don't change when a band comes back.
+   */
   band: Band | null;
   pull: UrgeId | null;
   regulation: Regulation;
@@ -29,7 +34,7 @@ export interface FlowState {
   setOff: SetOff | null;
   close: Close | null;
   routedTo: string[];
-  /** Transitions since the capacity step: drives ambient descent. */
+  /** Transitions since the shape/sound was found: drives ambient descent. */
   stepsSinceStart: number;
   ambientDescent: boolean;
 }
@@ -38,7 +43,6 @@ export type Action =
   | { t: 'begin' }
   | { t: 'switchWay'; way: Way }
   | { t: 'found'; found: Found }
-  | { t: 'band'; band: Band }
   | { t: 'pull'; pull: UrgeId }
   | { t: 'regulated'; skipped: boolean }
   | { t: 'oriented' }
@@ -68,7 +72,7 @@ export function makeFlowReducer(content: FindTheFeelingContent) {
 
   const step = (s: FlowState, next: Step, patch: Partial<FlowState> = {}): FlowState => ({
     ...s, ...patch, step: next,
-    stepsSinceStart: s.band || patch.band ? s.stepsSinceStart + 1 : 0,
+    stepsSinceStart: s.found || patch.found ? s.stepsSinceStart + 1 : 0,
   });
 
   /** Every action belongs to one step; late taps (fade-outs, double taps, delayed dispatches after Back) are ignored. */
@@ -80,11 +84,10 @@ export function makeFlowReducer(content: FindTheFeelingContent) {
         return { ...s, way: a.way, switchedWay: true, found: null };
       case 'found':
         if (s.step !== 'find' || a.found.way !== s.way) return s;
-        return { ...s, found: a.found, step: 'capacity' };
-      case 'band': return s.step === 'capacity' ? step(s, 'pull', { band: a.band }) : s;
+        return { ...s, found: a.found, step: 'pull' };
       case 'pull': {
-        if (s.step !== 'pull' || !s.band) return s;
-        const reg = regulationFor(s.way, s.band!, a.pull, g);
+        if (s.step !== 'pull') return s;
+        const reg = regulationFor(s.way, s.band, a.pull, g);
         if (reg !== 'none') return step(s, 'regulate', { pull: a.pull, regulation: reg });
         return step(s, 'word', { pull: a.pull, regulation: 'none' });
       }
@@ -107,13 +110,14 @@ export function makeFlowReducer(content: FindTheFeelingContent) {
         if (s.step !== 'close') return s;
         const word = s.word ? allWords.find(w => w.emotionId === s.word) ?? null : null;
         const routedTo = routeNext({
-          band: s.band!, pull: s.pull!, word, setOff: s.setOff, urgeRoutes, floodedBlankRoutes: content.floodedBlankRoutes,
+          band: s.band, pull: s.pull!, word, setOff: s.setOff, urgeRoutes, floodedBlankRoutes: content.floodedBlankRoutes,
         });
         return step(s, 'next', { close: a.value, routedTo });
       }
       case 'nextDone': return s.step === 'next' ? step(s, 'collection') : s;
       case 'back': return s; // handled by the history wrapper
       case 'restart': return initialFlow(content, s.entry, s.way, s.ambientDescent);
+      default: return s; // unknown actions (e.g. the retired 'band') are ignored
     }
   }
 
@@ -137,7 +141,7 @@ export function wordOnOffer(content: FindTheFeelingContent, s: FlowState) {
 
 /** Session record for saveFindTheFeelingSession. Only valid once the flow has reached its end. */
 export function toSession(s: FlowState, id: string, contentVersion: string): FindTheFeelingSession | null {
-  if (!s.found || !s.band || !s.pull) return null;
+  if (!s.found || !s.pull) return null;
   if (s.entry !== 'checkin' && !s.close) return null;
   return {
     schemaVersion: 1, id, contentVersion, entry: s.entry, way: s.way, switchedWay: s.switchedWay,
@@ -149,4 +153,4 @@ export function toSession(s: FlowState, id: string, contentVersion: string): Fin
   };
 }
 
-export const STEP_ORDER: Step[] = ['intro', 'find', 'capacity', 'pull', 'regulate', 'orient', 'word', 'setOff', 'close', 'next', 'collection'];
+export const STEP_ORDER: Step[] = ['intro', 'find', 'pull', 'regulate', 'orient', 'word', 'setOff', 'close', 'next', 'collection'];
