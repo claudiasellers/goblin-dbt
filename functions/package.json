@@ -13,7 +13,7 @@
     "test:emulator": "npm run build && firebase emulators:exec --only auth,functions --project demo-goblindbt \"node --test test/emulator/*.test.cjs\""
   },
   "engines": {
-    "node": "24"
+    "node": "22"
   },
   "main": "lib/index.js",
   "dependencies": {
