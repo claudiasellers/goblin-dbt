@@ -958,12 +958,29 @@ h1.uppercase, h2.uppercase {
   transition: left 80ms linear, top 80ms linear;
 }
 .feeling-square.is-dragging .fs-dot { transition: none; }
+.fs-dot--other { z-index: 1; width: 16px; height: 16px; margin: -8px 0 0 -8px; opacity: 0.72; animation: none; box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.35); }
+.fs-tag {
+  position: absolute;
+  z-index: 1;
+  transform: translate(14px, -50%);
+  padding: 2px 9px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.82);
+  color: #1B121F;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.fs-tag--left { transform: translate(calc(-100% - 14px), -50%); }
 .feeling-square.is-small .fs-dot {
   width: 12px;
   height: 12px;
   margin: -6px 0 0 -6px;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.6);
 }
+.feeling-square.is-small .fs-dot--other { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; }
 
 /* The room takes the colour of where the square was touched (a wash from the top, behind everything). */
 .feeling-tint {
@@ -1045,6 +1062,35 @@ h1.uppercase, h2.uppercase {
 .tool-card__family { font-size: 13px; font-weight: 700; color: var(--fam-text); }
 .tool-card__chevron { flex: none; color: var(--fam-text); }
 @media (prefers-reduced-motion: reduce) { .tool-card:active { transform: none; } }
+
+/* "Something else in there too?": a dashed invitation to place another spot on the square. */
+.add-spot {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1.5px dashed var(--color-border-accent);
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
+}
+.add-spot:hover { border-color: var(--color-accent); }
+.add-spot:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
+.add-spot__plus {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-elevated);
+  color: var(--color-text-primary);
+  font-size: 22px;
+  font-weight: 400;
+}
 
 /* A primary action that stays reachable while a list scrolls under it: frosted like the header. */
 .action-dock {

@@ -10,6 +10,8 @@ interface FeelingSquareProps {
   /** Enter / Space on the focused square. Lifting a finger does not commit, so the point can be
    *  nudged as many times as needed before the screen's own "That's about right" button. */
   onCommit?: (p: SquarePoint) => void;
+  /** Other spots already on the square (dimmer), each optionally tagged with its first word. */
+  others?: Array<{ point: SquarePoint; label?: string }>;
   /** Small, label-free version used as a reminder on later screens. */
   small?: boolean;
   className?: string;
@@ -24,7 +26,7 @@ interface FeelingSquareProps {
  * Keyboard: arrows move (Shift for bigger steps), Enter or Space commits. The per-room look (halo, centre shade, Tinted's glaze, dot) comes from
  * the --square-* tokens in src/index.css.
  */
-export function FeelingSquare({ point, onMove, onCommit, small = false, className = '' }: FeelingSquareProps) {
+export function FeelingSquare({ point, onMove, onCommit, others = [], small = false, className = '' }: FeelingSquareProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const interactive = Boolean(onMove);
@@ -106,6 +108,16 @@ export function FeelingSquare({ point, onMove, onCommit, small = false, classNam
           <span className="fs-axis fs-axis--right">pleasant</span>
         </>
       )}
+      {others.map((o, i) => (
+        <span key={i}>
+          <span className="fs-dot fs-dot--other" style={{ left: `${o.point.x * 100}%`, top: `${(1 - o.point.y) * 100}%` }} />
+          {o.label && !small && (
+            <span className={`fs-tag${o.point.x > 0.6 ? ' fs-tag--left' : ''}`} style={{ left: `${o.point.x * 100}%`, top: `${(1 - o.point.y) * 100}%` }}>
+              {o.label}
+            </span>
+          )}
+        </span>
+      ))}
       {point && (
         <span
           className="fs-dot"

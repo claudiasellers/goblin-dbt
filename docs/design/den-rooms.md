@@ -86,16 +86,30 @@ surface, so there are no box borders to land on the wrong side of.
 - **The room takes the colour of the touch.** A wash from the top of the
   page, `.feeling-tint`, is mixed in CSS from the room's fills (`squareColor`
   in `src/lib/feelingSquare.ts`). It stays on for the rest of the check-in.
-- **Which word is closest?** Eight words, nearest the point first, ranked by
-  the x/y already in `src/data/emotions.ts`. Common (`core`) words are pulled
-  a little closer. A picked chip takes its own quadrant's fill.
-  - After the first pick, the graph's related words appear as small "+"
-    chips.
-  - "More words" pages outward. "None of these fit" opens Find the feeling.
-  - "Continue without a word" is allowed; the quadrant then comes from the
-    point.
-  - A small copy of the square at the top reads the place back in plain words
-    (`describePlace`). Tapping it moves the point.
+- **Words under the square.** Once the dot is down, the three nearest words
+  appear under it and can be picked right there. Each pick brings up the
+  words the graph relates to it (`getRelatedEmotions`, via
+  `src/hooks/useRelatedWords.ts`) as "+" chips. From here: "View more words"
+  (the full list), "+ Add another spot", or "Continue with …".
+- **More than one feeling.** A check-in holds up to three spots
+  (`Spot` in `src/lib/feelingSquare.ts`), each a point plus its words.
+  - "+ Add another spot" (under the square, and as "Something else in there
+    too?" on the words screen) keeps the current spot and asks "And the other
+    part?". Earlier spots stay on the square, dimmer, tagged with their first
+    word. "Never mind" drops a new spot that has no words.
+  - On the words screen, other spots' words sit above as removable pills; a
+    spot whose last word is removed goes too.
+  - Continuing sends every word. The routing quadrant still comes from the
+    words (`inferQuadrant`: unpleasant, then high energy, wins ties), and
+    intensity comes from the spot those words sit in (`leadSpot`). Spots
+    without words are dropped.
+- **Which word is closest?** (the full list) Eight words, nearest the point
+  first, ranked by the x/y already in `src/data/emotions.ts`. Common (`core`)
+  words are pulled a little closer. A picked chip takes its own quadrant's
+  fill. "More words" pages outward. "None of these fit" opens Find the
+  feeling. "Continue without a word" is allowed; the quadrant then comes from
+  the point. The small square at the top reads the place back in plain words
+  (`describePlace`); tapping it goes back to move the point.
 - **Two ways out** on the first screen:
   - "I can't tell" is lavender and opens Find the feeling.
   - "Start with my body" is teal and starts the body-first path.

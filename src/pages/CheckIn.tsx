@@ -18,7 +18,7 @@ import {
   type DiscriminatingQuestion,
 } from '../services/neo4j';
 import { getEmotionById, getEmotionByName } from '../data/emotions';
-import { quadrantAt, squareColor, type SquarePoint } from '../lib/feelingSquare';
+import { allWords, emptySpot, leadSpot, quadrantAt, squareColor, type SquarePoint, type Spot } from '../lib/feelingSquare';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
 import { useOppositeActionFollowUpsContext } from '../hooks/useOppositeActionFollowUps';
 import { OppositeActionFollowUpCard } from '../components/tools/oppositeAction/OppositeActionFollowUpCard';
@@ -67,9 +67,13 @@ export function CheckIn() {
     note: '',
     timestamp: new Date(),
   });
-  // Where the touch landed on the feeling square, and the words picked for it.
-  const [point, setPoint] = useState<SquarePoint | null>(null);
-  const [words, setWords] = useState<string[]>([]);
+  // Places on the feeling square (one per part of a mixed feeling) and the words picked for each.
+  const [spots, setSpots] = useState<Spot[]>([emptySpot()]);
+  const [active, setActive] = useState(0);
+  // Where "Never mind" on a newly added spot returns to.
+  const [spotReturn, setSpotReturn] = useState<'emotion' | 'word'>('emotion');
+  const point = spots[active]?.point ?? null;
+  const words = allWords(spots);
   const [currentSensation, setCurrentSensation] = useState<Partial<BodySensation> | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
@@ -181,15 +185,65 @@ export function CheckIn() {
     analyzeAndShowResult({ quadrant, emotions: words, intensity });
   }
 
-  /** The touch landed on the square: remember it and move to the words. */
-  function handlePlace(p: SquarePoint) {
-    setPoint(p);
-    setCheckInData(prev => ({ ...prev, intensity: { x: p.x, y: p.y } }));
-    setStep('word');
+  // ── The square and its spots ──
+  function updateActive(change: (s: Spot) => Spot) {
+    setSpots(prev => prev.map((s, i) => (i === active ? change(s) : s)));
   }
 
+  function handleMovePoint(p: SquarePoint) {
+    updateActive(s => ({ ...s, point: p }));
+  }
+
+  function handleToggleWord(name: string) {
+    updateActive(s => ({ ...s, words: s.words.includes(name) ? s.words.filter(w => w !== name) : [...s.words, name] }));
+  }
+
+  /** Take a word off another spot; a spot left with no words goes too. */
+  function handleRemoveWord(index: number, name: string) {
+    const next = spots.map((s, i) => (i === index ? { ...s, words: s.words.filter(w => w !== name) } : s));
+    if (next[index].words.length === 0 && index !== active) {
+      setSpots(next.filter((_, i) => i !== index));
+      if (index < active) setActive(active - 1);
+    } else {
+      setSpots(next);
+    }
+  }
+
+  /** Keep this spot and place another (up to MAX_SPOTS). */
+  function handleAddSpot() {
+    setSpotReturn(step === 'word' ? 'word' : 'emotion');
+    setSpots(prev => [...prev, emptySpot()]);
+    setActive(spots.length);
+    setStep('emotion');
+  }
+
+  /** Leave a just-added spot. With no words it is dropped; with words it is kept. */
+  function handleCancelSpot() {
+    if (spots[active].words.length === 0) {
+      setSpots(prev => prev.filter((_, i) => i !== active));
+    }
+    setActive(Math.max(0, active - 1));
+    setStep(spotReturn);
+  }
+
+  /**
+   * Done with the square: every picked word goes forward. The routing quadrant comes from the words
+   * (inferQuadrant), and intensity from the spot those words sit in. Spots without words are dropped.
+   */
   function handleWordsContinue() {
-    void handleEmotionSelect(words, point ? quadrantAt(point) : undefined);
+    const filled = spots.filter(s => s.point && s.words.length > 0);
+    const all = allWords(filled);
+    if (all.length === 0) {
+      const p = point ?? { x: 0.5, y: 0.5 };
+      setCheckInData(prev => ({ ...prev, intensity: { x: p.x, y: p.y } }));
+      void handleEmotionSelect([], quadrantAt(p));
+      return;
+    }
+    const lead = leadSpot(filled, inferQuadrant(all))?.point ?? point ?? { x: 0.5, y: 0.5 };
+    setSpots(filled);
+    setActive(Math.min(active, filled.length - 1));
+    setCheckInData(prev => ({ ...prev, intensity: { x: lead.x, y: lead.y } }));
+    void handleEmotionSelect(all);
   }
 
   /**
@@ -213,8 +267,8 @@ export function CheckIn() {
       return;
     }
     const intensity = { x: emotion.x ?? 0.5, y: r.intensityY };
-    setPoint(intensity);
-    setWords([emotion.name]);
+    setSpots([{ point: intensity, words: [emotion.name] }]);
+    setActive(0);
     setCheckInData(prev => ({ ...prev, intensity }));
     void handleEmotionSelect([emotion.name]);
   }
@@ -386,8 +440,8 @@ export function CheckIn() {
     setEntryPoint('standard');
     setDiscriminatingQuestions([]);
     setDiscriminatingAnswers([]);
-    setPoint(null);
-    setWords([]);
+    setSpots([emptySpot()]);
+    setActive(0);
     setStep('emotion');
   }
 
@@ -435,14 +489,15 @@ export function CheckIn() {
   // The square is the whole first screen; progress only shows once there is something behind you.
   const showProgress = step !== 'emotion' && step !== 'word' && currentStepIndex >= 0 && currentStepIndex < stepOrder.length;
   // The room takes the colour of where the square was touched, for the rest of the check-in.
-  const tintOn = point !== null && step !== 'complete' && step !== 'saving';
+  const tintPoint = point ?? spots.find(s => s.point)?.point ?? null;
+  const tintOn = tintPoint !== null && step !== 'complete' && step !== 'saving';
 
   return (
     <div>
       <div
         aria-hidden="true"
         className={`feeling-tint${tintOn ? ' is-on' : ''}`}
-        style={point ? ({ ['--tint' as string]: squareColor(point) }) : undefined}
+        style={tintPoint ? ({ ['--tint' as string]: squareColor(tintPoint) }) : undefined}
       />
 
       {/* Follow-up on an Opposite Action plan, only before a new check-in starts */}
@@ -495,9 +550,14 @@ export function CheckIn() {
       <div key={step} className="step-enter">
         {step === 'emotion' && (
           <CheckInSquare
-            point={point}
-            onMove={setPoint}
-            onPlace={handlePlace}
+            spots={spots}
+            active={active}
+            onMove={handleMovePoint}
+            onToggleWord={handleToggleWord}
+            onSeeMore={() => setStep('word')}
+            onContinue={handleWordsContinue}
+            onAddSpot={handleAddSpot}
+            onCancelSpot={handleCancelSpot}
             onHelpNow={handleHelpMeNow}
             onCantTell={() => setStep('find')}
             onStartWithBody={handleSomaticEntry}
@@ -506,11 +566,13 @@ export function CheckIn() {
 
         {step === 'word' && point && (
           <WordPick
-            point={point}
-            selected={words}
-            onChange={setWords}
+            spots={spots}
+            active={active}
+            onToggleWord={handleToggleWord}
+            onRemoveWord={handleRemoveWord}
             onContinue={handleWordsContinue}
             onMovePoint={() => setStep('emotion')}
+            onAddSpot={handleAddSpot}
             onNoneFit={() => setStep('find')}
             onHelpNow={handleHelpMeNow}
           />

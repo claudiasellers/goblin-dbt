@@ -107,9 +107,9 @@ export function formatEmotionName(name: string): string {
 
 /**
  * Related words (graph results plus same-family neighbours), deduped, minus what is already chosen,
- * nudged toward the quadrants the person has picked from. Top three.
+ * nudged toward the quadrants the person has picked from. Top `limit` (default three).
  */
-export function rankRelatedEmotions(candidates: RelatedEmotion[], selected: string[]): RelatedEmotion[] {
+export function rankRelatedEmotions(candidates: RelatedEmotion[], selected: string[], limit = 3): RelatedEmotion[] {
   const seen = new Set<string>();
   const selectedLower = new Set(selected.map((s) => s.toLowerCase()));
   const deduped = candidates.filter((c) => {
@@ -135,6 +135,41 @@ export function rankRelatedEmotions(candidates: RelatedEmotion[], selected: stri
       return { c, score: Math.max(0, 1 - i * 0.15) + boost };
     })
     .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
+    .slice(0, limit)
     .map((r) => r.c);
+}
+
+/**
+ * One place on the square and the words picked for it. A check-in can hold up to MAX_SPOTS spots,
+ * for feelings that sit in different parts of the square at once (anxious and excited, say).
+ */
+export interface Spot {
+  point: SquarePoint | null;
+  words: string[];
+}
+
+export const MAX_SPOTS = 3;
+
+export const emptySpot = (): Spot => ({ point: null, words: [] });
+
+/** Every picked word across spots, first-picked first, no repeats. */
+export function allWords(spots: Spot[]): string[] {
+  return [...new Set(spots.flatMap((s) => s.words))];
+}
+
+/**
+ * The spot whose words sit in the quadrant the check-in is routed on, so intensity comes from the
+ * same place as the recommendation. Falls back to the first spot with a point.
+ */
+export function leadSpot(spots: Spot[], quadrant: string): Spot | undefined {
+  return (
+    spots.find((s) => s.point && s.words.some((w) => getEmotionByName(w)?.quadrant === quadrant)) ??
+    spots.find((s) => s.point)
+  );
+}
+
+export function listWords(words: string[]): string {
+  const lower = words.map((w) => w.toLowerCase());
+  if (lower.length <= 2) return lower.join(' and ');
+  return `${lower[0]} +${lower.length - 1}`;
 }

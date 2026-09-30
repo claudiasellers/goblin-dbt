@@ -1,80 +1,57 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { FeelingSquare } from './FeelingSquare';
-import {
-  QUADRANT_ABBR,
-  describePlace,
-  formatEmotionName,
-  rankRelatedEmotions,
-  wordsNear,
-  type SquarePoint,
-} from '../../lib/feelingSquare';
-import { getEmotionById, getEmotionByName, getOppositeEmotionIds, getRelatedEmotionIds } from '../../data/emotions';
-import { getRelatedEmotions, type RelatedEmotion } from '../../services/neo4j';
+import { RelatedRow, WordChip } from './WordChips';
+import { getEmotionByName } from '../../data/emotions';
+import { MAX_SPOTS, QUADRANT_ABBR, allWords, describePlace, listWords, wordsNear, type SquarePoint, type Spot } from '../../lib/feelingSquare';
 
 interface WordPickProps {
-  point: SquarePoint;
-  selected: string[];
-  onChange: (words: string[]) => void;
+  spots: Spot[];
+  active: number;
+  /** Pick or unpick a word for the active spot. */
+  onToggleWord: (name: string) => void;
+  /** Take a word off another spot (removing the spot if it was its last word). */
+  onRemoveWord: (spot: number, name: string) => void;
   onContinue: () => void;
-  /** Tap the little square to move the point. */
+  /** Tap the little square to move the active point. */
   onMovePoint: () => void;
+  /** Keep this spot and place another on the square. */
+  onAddSpot: () => void;
   onNoneFit: () => void;
   onHelpNow: () => void;
 }
 
 const PAGE = 8;
 
-function listWords(words: string[]): string {
-  const lower = words.map((w) => w.toLowerCase());
-  if (lower.length <= 2) return lower.join(' and ');
-  return `${lower[0]}, ${lower[1]} and ${lower.length - 2} more`;
-}
-
 /**
- * Second screen: the words nearest where the touch landed, as big pressable chips. A picked chip
- * takes its own quadrant's colour. After the first pick, the graph's related words are offered as
- * small "+" chips. "More words" pages outward; "None of these fit" goes to Find the feeling.
+ * The full word list for the active spot: nearest first, as big pressable chips in their quadrant
+ * colours. Words already picked for other spots sit above as small removable pills. After a pick,
+ * the graph's related words appear as "+" chips. "More words" pages outward, "Add another spot"
+ * goes back to the square for a second or third place, "None of these fit" opens Find the feeling.
  */
-export function WordPick({ point, selected, onChange, onContinue, onMovePoint, onNoneFit, onHelpNow }: WordPickProps) {
+export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue, onMovePoint, onAddSpot, onNoneFit, onHelpNow }: WordPickProps) {
   const [shown, setShown] = useState(PAGE);
-  const [related, setRelated] = useState<RelatedEmotion[]>([]);
+  const spot = spots[active];
+  const point = spot.point as SquarePoint;
+  const everyWord = allWords(spots);
+  const elsewhereKey = spots.flatMap((s, i) => (i === active ? [] : s.words)).join('|');
 
-  const ranked = useMemo(() => wordsNear(point), [point]);
+  const ranked = useMemo(() => {
+    const elsewhere = elsewhereKey.split('|');
+    return wordsNear(point).map((e) => e.name).filter((n) => !elsewhere.includes(n));
+  }, [point, elsewhereKey]);
   const words = useMemo(() => {
-    const near = ranked.slice(0, shown).map((e) => e.name);
+    const near = ranked.slice(0, shown);
     // Words picked from the related row stay visible even when they are not near the point.
-    const extra = selected.filter((w) => !near.includes(w));
-    return [...near, ...extra];
-  }, [ranked, shown, selected]);
+    return [...near, ...spot.words.filter((w) => !near.includes(w))];
+  }, [ranked, shown, spot.words]);
 
-  const first = selected[0];
-  useEffect(() => {
-    if (!first) {
-      setRelated([]);
-      return;
-    }
-    let live = true;
-    const e = getEmotionByName(first);
-    const id = e?.id ?? first.toLowerCase().replace(/\s+/g, '_');
-    const local = [
-      ...getRelatedEmotionIds(id).map((rid) => ({ id: rid, name: getEmotionById(rid)?.name ?? rid, reason: 'related feeling' })),
-      ...getOppositeEmotionIds(id).map((rid) => ({ id: rid, name: getEmotionById(rid)?.name ?? rid, reason: 'opposite emotion' })),
-    ];
-    getRelatedEmotions(id)
-      .then((graph) => live && setRelated(rankRelatedEmotions([...graph, ...local], selected)))
-      .catch(() => live && setRelated(rankRelatedEmotions(local, selected)));
-    return () => {
-      live = false;
-    };
-    // Re-rank only when the first word changes; later picks just filter the list below.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [first]);
-
-  const relatedToShow = related.filter((r) => !selected.includes(formatEmotionName(r.name)) && !words.includes(formatEmotionName(r.name)));
-
-  function toggle(name: string) {
-    onChange(selected.includes(name) ? selected.filter((w) => w !== name) : [...selected, name]);
-  }
+  const others = spots
+    .map((s, i) => ({ s, i }))
+    .filter(({ s, i }) => i !== active && s.point)
+    .map(({ s }) => ({ point: s.point as SquarePoint }));
+  const otherSpots = spots.map((s, i) => ({ s, i })).filter(({ s, i }) => i !== active && s.words.length > 0);
+  const canAddSpot = spot.words.length > 0 && spots.length < MAX_SPOTS;
+  const lastPick = spot.words[spot.words.length - 1];
 
   return (
     <div className="max-w-md mx-auto flex flex-col">
@@ -85,15 +62,39 @@ export function WordPick({ point, selected, onChange, onContinue, onMovePoint, o
           className="shrink-0 w-[76px] rounded-[18px] cursor-pointer bg-transparent border-none p-0"
           aria-label="Move the point on the square"
         >
-          <FeelingSquare point={point} small />
+          <FeelingSquare point={point} others={others} small />
         </button>
-        <p className="m-0 font-serif text-[17px] leading-[1.35] text-[var(--color-text-secondary)]">
-          {describePlace(point)}
-        </p>
+        <p className="m-0 font-serif text-[17px] leading-[1.35] text-[var(--color-text-secondary)]">{describePlace(point)}</p>
       </div>
 
+      {otherSpots.length > 0 && (
+        <div className="mt-5 flex flex-col gap-2" aria-label="Words from your other spots">
+          {otherSpots.map(({ s, i }, n) => (
+            <div key={i} className="flex flex-wrap items-center gap-2 px-3.5 py-2.5 rounded-2xl bg-[var(--color-bg-elevated)]">
+              <span className="text-[13px] font-bold text-[var(--color-text-secondary)] mr-1">Spot {n + 1}</span>
+              {s.words.map((w) => (
+                <button
+                  key={w}
+                  type="button"
+                  className="den-chip den-chip--small"
+                  aria-pressed
+                  aria-label={`Remove ${w}`}
+                  style={{ ['--chip-on' as string]: `var(--color-q-${QUADRANT_ABBR[getEmotionByName(w)?.quadrant ?? 'high-unpleasant']}-fill)` }}
+                  onClick={() => onRemoveWord(i, w)}
+                >
+                  {w}
+                  <span aria-hidden="true">×</span>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mt-7 flex items-start justify-between gap-4">
-        <h1 className="text-[2rem] leading-[1.08] text-[var(--color-text-primary)] m-0 [text-wrap:balance]">Which word is closest?</h1>
+        <h1 className="text-[2rem] leading-[1.08] text-[var(--color-text-primary)] m-0 [text-wrap:balance]">
+          {otherSpots.length ? 'And this part?' : 'Which word is closest?'}
+        </h1>
         <button type="button" className="help-now shrink-0 mt-1" onClick={onHelpNow}>
           Help now
         </button>
@@ -101,51 +102,12 @@ export function WordPick({ point, selected, onChange, onContinue, onMovePoint, o
       <p className="mt-2 text-[15px] text-[var(--color-text-secondary)]">Pick one or a few. “Sort of” counts.</p>
 
       <div className="mt-4 grid grid-cols-2 gap-3" role="group" aria-label="Feeling words">
-        {words.map((name) => {
-          const e = getEmotionByName(name);
-          const abbr = e ? QUADRANT_ABBR[e.quadrant] : 'hu';
-          const on = selected.includes(name);
-          return (
-            <button
-              key={name}
-              type="button"
-              aria-pressed={on}
-              className="den-chip"
-              style={{ ['--chip-on' as string]: `var(--color-q-${abbr}-fill)` }}
-              onClick={() => toggle(name)}
-            >
-              {name}
-            </button>
-          );
-        })}
+        {words.map((name) => (
+          <WordChip key={name} name={name} on={spot.words.includes(name)} onClick={() => onToggleWord(name)} />
+        ))}
       </div>
 
-      {relatedToShow.length > 0 && (
-        <div className="mt-5">
-          <p className="m-0 mb-2 font-serif italic text-[16px] text-[var(--color-text-secondary)]">
-            Often alongside {first.toLowerCase()}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {relatedToShow.map((r) => {
-              const name = formatEmotionName(r.name);
-              const e = getEmotionByName(name) || getEmotionById(r.id);
-              const abbr = e ? QUADRANT_ABBR[e.quadrant] : 'hu';
-              return (
-                <button
-                  key={r.id}
-                  type="button"
-                  className="den-chip den-chip--small"
-                  onClick={() => onChange([...selected, e?.name ?? name])}
-                >
-                  <span className="qd" style={{ background: `var(--color-q-${abbr}-fill)` }} aria-hidden="true" />
-                  {e?.name ?? name}
-                  <span aria-hidden="true" className="text-[var(--color-text-tertiary)]">+</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      <RelatedRow to={lastPick} exclude={[...everyWord, ...words]} onAdd={onToggleWord} />
 
       <div className="mt-4 flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
         {shown < ranked.length && (
@@ -166,13 +128,23 @@ export function WordPick({ point, selected, onChange, onContinue, onMovePoint, o
         </button>
       </div>
 
+      {canAddSpot && (
+        <button type="button" className="add-spot mt-4" onClick={onAddSpot}>
+          <span className="add-spot__plus" aria-hidden="true">+</span>
+          <span className="flex flex-col gap-0.5 text-left">
+            <span className="text-[15.5px] font-bold text-[var(--color-text-primary)]">Something else in there too?</span>
+            <span className="text-[13.5px] text-[var(--color-text-secondary)]">Add another spot on the square</span>
+          </span>
+        </button>
+      )}
+
       <div className="action-dock">
         <button
           type="button"
           onClick={onContinue}
           className="w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer lift-primary"
         >
-          {selected.length > 0 ? `Continue with ${listWords(selected)}` : 'Continue without a word'}
+          {everyWord.length > 0 ? `Continue with ${listWords(everyWord)}` : 'Continue without a word'}
         </button>
       </div>
     </div>
