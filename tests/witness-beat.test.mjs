@@ -117,3 +117,14 @@ test("CheckIn: the beat's log waits for the render save, and the next action wai
   assert.match(src, /const pending = \(savePromise\.current \?\? Promise\.resolve\(false\)\)\.then\(\(saved\) => beats\.then\(\(\) => saved\)\)/);
   assert.equal((src.match(/witness=\{witness\}/g) ?? []).length, 2);
 });
+
+test("check-in re-saves are serialized: 'add more detail' waits for the save in flight (Codex, PR #16)", () => {
+  const src = readFileSync("src/pages/CheckIn.tsx", "utf8");
+  assert.match(src, /const payload = buildCheckInPayload\(payloadState\(\), stateResult\);\s*const prev = savePromise\.current \?\? Promise\.resolve\(true\);\s*savePromise\.current = prev\s*\.then\(\(\) => saveCheckIn\(payload\)\)/);
+});
+
+test("the resume_skill deep link carries its follow-up id, so opening it resolves the card (Codex, PR #17)", () => {
+  const cy = readFileSync("schema/practice-spine.cypher", "utf8");
+  assert.match(cy, /\/tool\/\{sourceToolId\}\?resume=\{sourceSessionId\}&followUp=\{followUpId\}/);
+  assert.match(readFileSync("functions/src/spine/today.ts", "utf8"), /followUpId: r\.get\('id'\)/);
+});

@@ -5,7 +5,7 @@ import { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { LOAD_ORDER, splitStatements } from "../scripts/load-graph.mjs";
 import { SCHEMA_REL_TYPES, DUPLICATE_NODES_QUERY, DUPLICATE_RELS_QUERY } from "../scripts/lib/schemaDuplicates.mjs";
-import { toJson } from "../scripts/graph-export.mjs";
+import { toJson, missingEndpoints } from "../scripts/graph-export.mjs";
 
 const read = (f) => readFileSync(`schema/maintenance/${f}`, "utf8");
 const code = (s) => s.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, '""');
@@ -61,4 +61,12 @@ test("graph export is read-only, gitignored, and serialises driver values", () =
     toJson({ n: neo4j.int(5), big: neo4j.int("9007199254740993"), at: dt, list: [neo4j.int(1), "x"], nested: { d: new neo4j.types.Date(2026, 9, 30) }, nil: null }, neo4j),
     { n: 5, big: "9007199254740993", at: dt.toString(), list: [1, "x"], nested: { d: "2026-09-30" }, nil: null },
   );
+});
+
+test("the backup fetches relationship endpoints written between its two reads (Codex, PR #15)", () => {
+  const nodes = [{ elementId: "a" }, { elementId: "b" }];
+  assert.deepEqual(missingEndpoints(nodes, [{ start: "a", end: "b" }]), []);
+  assert.deepEqual(missingEndpoints(nodes, [{ start: "a", end: "c" }, { start: "c", end: "d" }, { start: "b", end: "a" }]), ["c", "d"]);
+  const src = readFileSync("scripts/graph-export.mjs", "utf8");
+  assert.match(src, /missingEndpoints\(data\.nodes, data\.relationships\)[\s\S]*elementId\(n\) IN \$ids[\s\S]*backup incomplete/);
 });

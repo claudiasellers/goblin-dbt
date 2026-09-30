@@ -159,3 +159,25 @@ test('getSpineContent parses the close flow and the non-reserved follow-up types
   assert.equal(out.followUpTypes[0].tier, 'quality');
   assert.match(f.calls[1].query, /coalesce\(t\.reserved, false\) = false/);
 });
+
+test('startToolSession survives the render-save race: claims its check-in, never falls back to the previous one (Codex, PR #16)', async () => {
+  const f = fakeDriver((q) => (/RETURN tu\.id AS toolUsageId/.test(q) ? [{ toolUsageId: `${ID}:usage` }] : []));
+  setDriver(f.driver);
+  await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'cool-down', entry: 'checkin_result', checkInId: CI } });
+  const [q1, q2] = f.calls;
+  assert.match(q1.query, /ts\.checkInId = \$checkInId/);
+  assert.equal(q1.params.checkInId, CI);
+  // An FTF session the check-in already embedded (saved first) is linked from this side.
+  assert.match(q1.query, /\$id IN coalesce\(ec\.embeddedToolSessionIds, \[\]\)[\s\S]*MERGE \(x\)-\[:EMBEDDED\]->\(ts\)/);
+  // The latest-check-in fallback only applies to sessions that name no check-in.
+  assert.match(q2.query, /given IS NULL AND ts\.checkInId IS NULL AND latest\.timestamp <= tu\.timestamp/);
+});
+
+test('startToolSession resolves a resume_skill follow-up when its link is opened; other types are left to their tool (Codex, PR #17)', async () => {
+  const f = fakeDriver((q) => (/RETURN tu\.id AS toolUsageId/.test(q) ? [{ toolUsageId: `${ID}:usage` }] : []));
+  setDriver(f.driver);
+  await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'dear-man', entry: 'today', followUpId: CI } });
+  const q1 = f.calls[0].query;
+  assert.match(q1, /f\.type = 'resume_skill' AND f\.status = 'scheduled' THEN \[f\][\s\S]*SET x\.status = 'done', x\.resolvedAt = datetime\(\)/);
+  assert.equal(f.calls[0].params.followUpKey, `u1:${CI}`);
+});

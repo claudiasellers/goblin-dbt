@@ -165,3 +165,17 @@ test('Insights reads emotion families from emotionIds and skips stubs (F12)', as
   assert.match(q, /AND c\.quadrant IS NOT NULL/);
   assert.doesNotMatch(q, /Emotion \{id: c\.emotion\}/);
 });
+
+test('saveCheckIn links tool sessions opened before it landed, and stores what it embeds (Codex, PR #16)', async () => {
+  const f = driver();
+  setDriver(f.driver);
+  const FTF = '22222222-1b2c-4d5e-8f90-123456789abc';
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...base(), embeddedToolSessionIds: [FTF] } });
+  const q = f.calls.find((c) => /FROM_CHECKIN/.test(c.query));
+  assert.ok(q, 'the result save links late tool sessions');
+  assert.match(q.query, /c\.embeddedToolSessionIds = \$embeddedIds/);
+  assert.deepEqual(q.params.embeddedIds, [FTF]);
+  assert.equal(q.params.id, ID);
+  assert.match(q.query, /\(ts2:ToolSession \{checkInId: \$id\}\)[\s\S]*WHERE NOT \(ts2\)-\[:FROM_CHECKIN\]->\(\)[\s\S]*MERGE \(x\)-\[:FROM_CHECKIN\]->\(c\)/);
+  assert.match(q.query, /\(:ToolSession \{checkInId: \$id\}\)-\[:COMPAT_USAGE\]->\(tu:ToolUsage\)[\s\S]*WHERE NOT \(tu\)-\[:FOLLOWED_CHECKIN\]->\(\)[\s\S]*MERGE \(x\)-\[:FOLLOWED_CHECKIN\]->\(c\)/);
+});

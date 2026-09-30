@@ -34,6 +34,14 @@ export function toJson(v, neo4j) {
   return v;
 }
 
+/** Relationship endpoints that aren't among the exported nodes (a restorable backup has none). */
+export function missingEndpoints(nodes, relationships) {
+  const have = new Set(nodes.map((n) => n.elementId));
+  const out = new Set();
+  for (const r of relationships) for (const id of [r.start, r.end]) if (!have.has(id)) out.add(id);
+  return [...out];
+}
+
 async function main() {
   const args = process.argv.slice(2);
   const out = args.includes('--out') ? resolve(process.cwd(), args[args.indexOf('--out') + 1])
@@ -52,8 +60,8 @@ async function main() {
   const driver = neo4j.driver(uri, neo4j.auth.basic(user, pw));
   const session = driver.session({ defaultAccessMode: neo4j.session.READ });
   try {
-    const nodes = await session.executeRead((tx) => tx.run(
-      'MATCH (n) RETURN elementId(n) AS elementId, labels(n) AS labels, properties(n) AS props ORDER BY elementId'));
+    const NODE_COLS = 'elementId(n) AS elementId, labels(n) AS labels, properties(n) AS props';
+    const nodes = await session.executeRead((tx) => tx.run(`MATCH (n) RETURN ${NODE_COLS} ORDER BY elementId`));
     const rels = await session.executeRead((tx) => tx.run(
       'MATCH (a)-[r]->(b) RETURN elementId(r) AS elementId, type(r) AS type, elementId(a) AS start, elementId(b) AS end, properties(r) AS props ORDER BY elementId'));
     const data = {
@@ -61,6 +69,18 @@ async function main() {
       nodes: nodes.records.map((r) => toJson(r.toObject(), neo4j)),
       relationships: rels.records.map((r) => toJson(r.toObject(), neo4j)),
     };
+    // The two reads aren't one snapshot: a node written between them (a check-in saved mid-export)
+    // can appear as a relationship endpoint without being in `nodes`. Fetch any such endpoints so
+    // every relationship in the backup can be restored. (A node deleted in between takes its
+    // relationships with it, so the reverse can't happen.)
+    const missing = missingEndpoints(data.nodes, data.relationships);
+    if (missing.length) {
+      const extra = await session.executeRead((tx) => tx.run(
+        `MATCH (n) WHERE elementId(n) IN $ids RETURN ${NODE_COLS}`, { ids: missing }));
+      data.nodes.push(...extra.records.map((r) => toJson(r.toObject(), neo4j)));
+    }
+    const still = missingEndpoints(data.nodes, data.relationships);
+    if (still.length) throw new Error(`backup incomplete: ${still.length} relationship endpoint(s) missing; run it again`);
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, JSON.stringify(data));
     console.log(`Exported ${data.nodes.length} nodes and ${data.relationships.length} relationships to ${out}`);

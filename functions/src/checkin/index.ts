@@ -65,7 +65,7 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
              c.recommendedToolIds = $recommendedToolIds, c.secondaryPatternId = $secondaryPatternId,
              c.routingVersion = $routingVersion, c.routingBand = $routingBand, c.routingBandSource = $routingBandSource,
              c.coOccurrenceLabel = $coOccurrenceLabel, c.guidedActivityId = $guidedActivityId,
-             c.safetyFlagId = $safetyFlagId,
+             c.safetyFlagId = $safetyFlagId, c.embeddedToolSessionIds = $embeddedIds,
              c.resultShownAt = CASE WHEN $resultShown THEN coalesce(c.resultShownAt, datetime()) ELSE c.resultShownAt END,
              c.nextActionKind = CASE WHEN noNext THEN $nextKind ELSE c.nextActionKind END,
              c.nextActionToolId = CASE WHEN noNext THEN $nextToolId ELSE c.nextActionToolId END,
@@ -92,7 +92,17 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
            MERGE (c)-[:SENSED]->(b))
          WITH DISTINCT c
          OPTIONAL MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession) WHERE ts.key IN $embeddedKeys
-         FOREACH (x IN CASE WHEN ts IS NULL THEN [] ELSE [ts] END | MERGE (c)-[:EMBEDDED]->(x))`,
+         FOREACH (x IN CASE WHEN ts IS NULL THEN [] ELSE [ts] END | MERGE (c)-[:EMBEDDED]->(x))
+         // Tool sessions opened from this result before this save landed (they carry its id): link
+         // them and their compat usage now. Either side may commit first (Codex, PR #16).
+         WITH DISTINCT c
+         OPTIONAL MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts2:ToolSession {checkInId: $id})
+           WHERE NOT (ts2)-[:FROM_CHECKIN]->()
+         FOREACH (x IN CASE WHEN ts2 IS NULL THEN [] ELSE [ts2] END | MERGE (x)-[:FROM_CHECKIN]->(c))
+         WITH DISTINCT c
+         OPTIONAL MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(:ToolSession {checkInId: $id})-[:COMPAT_USAGE]->(tu:ToolUsage)
+           WHERE NOT (tu)-[:FOLLOWED_CHECKIN]->()
+         FOREACH (x IN CASE WHEN tu IS NULL THEN [] ELSE [tu] END | MERGE (x)-[:FOLLOWED_CHECKIN]->(c))`,
         {
           uid, key,
           emotion: input.emotion, quadrant: input.quadrant, intensityX: input.intensityX, intensityY: input.intensityY,
@@ -107,6 +117,7 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
           ...band,
           bodySensations: input.bodySensations.map((s) => ({ ...s, id: randomUUID() })),
           embeddedKeys: input.embeddedToolSessionIds.map((t) => userKey(uid as string, t)),
+          embeddedIds: input.embeddedToolSessionIds, id,
         },
       );
     });
