@@ -39,6 +39,16 @@ import { profileCache } from '../lib/profileCache';
 
 type EntryPoint = 'standard' | 'somatic';
 
+/** Quadrants whose check-ins get the discriminating questions (E4-6: both unpleasant quadrants). */
+function asksDiscriminatingQuestions(quadrant: string | null): quadrant is 'high-unpleasant' | 'low-unpleasant' {
+  return quadrant === 'high-unpleasant' || quadrant === 'low-unpleasant';
+}
+
+/** The routing band's source (E4-3 accepts probe · ftf · carried; hand-offs etc. count as carried). */
+function routingBandSource(r: CapacityReading): 'probe' | 'ftf' | 'carried' {
+  return r.source === 'probe' || r.source === 'ftf' ? r.source : 'carried';
+}
+
 type CheckInStep =
   | 'emotion'
   | 'help_now'
@@ -108,6 +118,8 @@ export function CheckIn() {
   const afterCapacity = useRef<{ then: 'body' | 'analyze'; overrides?: { quadrant?: string; emotions?: string[] } }>({ then: 'body' });
   useEffect(() => { if (user) band.load(); }, [user, band]);
   const [knownEmotionIds, setKnownEmotionIds] = useState<string[]>([]);
+  /** Find the feeling's pull was `blank` (E4-4): the engine never offers a calming tool then. */
+  const ftfBlank = useRef(false);
   const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
   /** The render save in flight: resolves true when saved. Next actions chain after it. */
   const savePromise = useRef<Promise<boolean> | null>(null);
@@ -251,7 +263,9 @@ export function CheckIn() {
           ? checkInData.bodySensations.map(s => ({ region: s.region, tags: s.tags }))
           : undefined,
         discriminatingAnswers: discAnsw.length > 0 ? discAnsw : undefined,
-        ...(cap ? { band: cap.value, bandViaCantTell: cap.viaCantTell } : {}),
+        ...(cap ? { band: cap.value, bandViaCantTell: cap.viaCantTell, bandSource: routingBandSource(cap) } : {}),
+        ...(ftfBlank.current ? { blank: true } : {}),
+        surface: 'checkin',
       });
       
       setStateResult(result);
@@ -300,6 +314,7 @@ export function CheckIn() {
   function handleFound(r: FindTheFeelingResult) {
     // FTF's band is this check-in's capacity answer (kept, not just turned into intensity).
     setSource('ftf');
+    ftfBlank.current = r.blank === true;
     // FTF recorded its answer in the band store (context 'checkin'); use that reading so its id
     // matches, else build the same reading here.
     const current = band.current();
@@ -395,10 +410,11 @@ export function CheckIn() {
     const inferredQuadrant = inferQuadrant(emotions);
     setCheckInData(prev => ({ ...prev, emotions, quadrant: inferredQuadrant }));
 
-    // For low-unpleasant, try to fetch discriminating questions
-    if (inferredQuadrant === 'low-unpleasant') {
+    // Unpleasant check-ins: fetch the quadrant's discriminating questions (E4-6: high-unpleasant
+    // too; the graph has them, they were never asked). Skippable; skipping keeps today's scoring.
+    if (asksDiscriminatingQuestions(inferredQuadrant)) {
       try {
-        const questions = await getDiscriminatingQuestions('low-unpleasant');
+        const questions = await getDiscriminatingQuestions(inferredQuadrant);
         if (questions.length > 0) {
           setDiscriminatingQuestions(questions);
           setStep('discriminating');
@@ -514,6 +530,7 @@ export function CheckIn() {
     afterCapacity.current = { then: 'body' };
     setKnownEmotionIds([]);
     setEmbeddedIds([]);
+    ftfBlank.current = false;
     setCheckInData({
       quadrant: null,
       emotions: [],
@@ -541,7 +558,7 @@ export function CheckIn() {
         break;
       case 'capacity':
         if (afterCapacity.current.then === 'analyze') setStep('suggestion');
-        else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') setStep('discriminating');
+        else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) setStep('discriminating');
         else setStep('emotion');
         break;
       case 'body':
@@ -550,7 +567,7 @@ export function CheckIn() {
         } else if (entryPoint === 'somatic') {
           setEntryPoint('standard');
           setStep('emotion');
-        } else if (discriminatingQuestions.length > 0 && checkInData.quadrant === 'low-unpleasant') {
+        } else if (discriminatingQuestions.length > 0 && asksDiscriminatingQuestions(checkInData.quadrant)) {
           setStep('discriminating');
         } else {
           setStep('emotion');
@@ -634,7 +651,7 @@ export function CheckIn() {
       <div key={step} className="step-enter">
         {step === 'emotion' && (
           <QuadrantGrid
-            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); void handleEmotionSelect(emotions); }}
+            onSelect={(emotions) => { setStartedAt(new Date()); setSource('grid'); setKnownEmotionIds([]); ftfBlank.current = false; void handleEmotionSelect(emotions); }}
             onHelpMeNow={handleHelpMeNow}
             onSomaticEntry={handleSomaticEntry}
             onCantTell={() => { setStartedAt(new Date()); setStep('find'); }}

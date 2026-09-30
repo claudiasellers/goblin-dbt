@@ -1,11 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
-import { getToolById } from '../../data/tools';
-import type { StateResult, ToolRecommendation } from '../../services/neo4j';
+import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
-import { fromCheckIn } from '../../lib/spine/toolLink';
+import { recommendationCards } from '../../lib/recommendation';
+import { RecommendationCards } from './RecommendationCards';
 import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
 import type { Band } from '../../data/capacityTypes';
 import { WitnessBeat } from '../witness/WitnessBeat';
@@ -52,12 +51,14 @@ interface StateResultProps {
  * from `resultSections` / `bailoutSections` in src/lib/crisisBanner.ts.
  */
 export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, checkInId, onToolOpen, band, emotionIds, witness }: StateResultProps) {
-  const { pattern, tools, safetyFlag } = result;
+  const { pattern, safetyFlag } = result;
+  // E4-4: one recommendation + one swap, named from src/data/tools.ts; unknown ids never render.
+  const cards = recommendationCards(result);
   const sections = resultSections({
     variant: 'standard',
     safetyFlag,
     patternId: pattern.id,
-    toolCount: tools.length,
+    toolCount: cards.length,
     canAddMoreDetail: !!onAddMoreDetail,
   });
   const has = (section: ResultSection) => sections.includes(section);
@@ -225,19 +226,14 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
         </div>
       )}
 
-      {/* The Tools - 1-2 options, that's it */}
+      {/* The tools: one recommendation and one swap (E4-4), below the banner and the beat */}
       {has('tools') && (
         <div className="mb-8">
           <p className="text-sm text-[var(--color-text-secondary)] text-center mb-4">
             Here's what might help right now
           </p>
-          
-          <div className="space-y-3">
-            {tools.slice(0, 2).map((tool, index) => (
-              <ToolCard key={tool.id} tool={tool} isPrimary={index === 0} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
-                checkInId={checkInId} onOpen={onToolOpen} />
-            ))}
-          </div>
+          <RecommendationCards cards={cards} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
+            checkInId={checkInId} onOpen={(toolId) => onToolOpen?.(toolId)} />
         </div>
       )}
 
@@ -296,50 +292,4 @@ function getPatternEmoji(patternId: string): string {
     positive_state: '\u2728',
   };
   return map[patternId] || '\uD83E\uDDE0';
-}
-
-function getToolPath(toolId: string): string {
-  return `/tool/${toolId}`;
-}
-
-function ToolCard({ tool, isPrimary, checkinEmotions, activationPatternId, checkInId, onOpen }: {
-  tool: ToolRecommendation; isPrimary: boolean; checkinEmotions?: string[]; activationPatternId?: string;
-  checkInId?: string; onOpen?: (toolId: string) => void;
-}) {
-  const toolPath = getToolPath(tool.id);
-
-  return (
-    <Link
-      to={toolPath}
-      state={fromCheckIn(checkInId, checkinEmotions, activationPatternId)}
-      onClick={() => onOpen?.(tool.id)}
-      className={`
-        block p-4 rounded-xl transition-all
-        ${isPrimary 
-          ? 'bg-[var(--color-bg-elevated)] border-2 border-[var(--color-border)] hover:border-[var(--color-border-accent)]' 
-          : 'bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)]'
-        }
-      `}
-    >
-      <div className="flex items-start gap-3">
-        <div className="text-xl flex-shrink-0 mt-0.5">
-          {getToolById(tool.id)?.emoji || '🔧'}
-        </div>
-        <div className="flex-1 min-w-0">
-          <h3 className={`font-semibold text-[var(--color-text-primary)] ${isPrimary ? 'text-base' : 'text-sm'}`}>
-            {tool.name}
-          </h3>
-          <p className="text-sm text-[var(--color-text-secondary)] mt-0.5 line-clamp-2">
-            {tool.description || tool.whenToUse}
-          </p>
-          {isPrimary && tool.relevance && (
-            <p className="text-xs text-[var(--color-text-tertiary)] mt-1 italic">
-              {tool.relevance}
-            </p>
-          )}
-        </div>
-        <span className="text-[var(--color-text-muted)] flex-shrink-0 mt-1" aria-hidden="true">{'\u2192'}</span>
-      </div>
-    </Link>
-  );
 }

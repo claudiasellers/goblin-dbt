@@ -1,13 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
 import { getActivityDefinition, PATTERN_CONTEXT } from '../../data/guidedActivities';
 import { GuidedActivity } from '../activities/GuidedActivity';
-import { getToolById } from '../../data/tools';
-import type { StateResult, ToolRecommendation } from '../../services/neo4j';
+import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
-import { fromCheckIn } from '../../lib/spine/toolLink';
+import { recommendationCards } from '../../lib/recommendation';
+import { RecommendationCards } from './RecommendationCards';
 import type { CheckInNextAction } from '../../lib/spine/checkInPayload';
 import type { Band } from '../../data/capacityTypes';
 import { WitnessBeat } from '../witness/WitnessBeat';
@@ -53,12 +52,13 @@ export function LowEnergyStateResult({
   emotionIds,
   witness,
 }: LowEnergyStateResultProps) {
-  const { pattern, tools, safetyFlag, coOccurrence, guidedActivity } = result;
+  const { pattern, safetyFlag, coOccurrence, guidedActivity } = result;
+  const cards = recommendationCards(result);
   const sections = resultSections({
     variant: 'low_energy',
     safetyFlag,
     patternId: pattern.id,
-    toolCount: tools.length,
+    toolCount: cards.length,
     hasGuidedActivity: !!guidedActivity,
     canAddMoreDetail: !!onAddMoreDetail,
   });
@@ -222,12 +222,8 @@ export function LowEnergyStateResult({
           <p className="text-xs text-[var(--color-text-muted)] text-center mb-3">
             Or explore a tool
           </p>
-          <div className="space-y-2">
-            {tools.slice(0, 2).map(tool => (
-              <ToolCardCompact key={tool.id} tool={tool} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
-                checkInId={checkInId} onOpen={onToolOpen} />
-            ))}
-          </div>
+          <RecommendationCards variant="compact" cards={cards} checkinEmotions={checkinEmotions} activationPatternId={pattern.id}
+            checkInId={checkInId} onOpen={(toolId) => onToolOpen?.(toolId)} />
         </div>
       )}
 
@@ -277,40 +273,4 @@ function getPatternEmoji(patternId: string): string {
     reward_drive_low: '\uD83E\uDEAB',
   };
   return map[patternId] || '\uD83E\uDDE0';
-}
-
-function ToolCardCompact({
-  tool,
-  checkinEmotions,
-  activationPatternId,
-  checkInId,
-  onOpen,
-}: {
-  tool: ToolRecommendation;
-  checkinEmotions?: string[];
-  activationPatternId?: string;
-  checkInId?: string;
-  onOpen?: (toolId: string) => void;
-}) {
-  const toolPath = `/tool/${tool.id}`;
-
-  return (
-    <Link
-      to={toolPath}
-      state={fromCheckIn(checkInId, checkinEmotions, activationPatternId)}
-      onClick={() => onOpen?.(tool.id)}
-      className="block p-3 rounded-lg bg-[var(--color-bg-card-hover)] border border-[var(--color-border-subtle)] hover:border-[var(--color-border)] transition-all"
-    >
-      <div className="flex items-center gap-3">
-        <span className="text-lg flex-shrink-0">{getToolById(tool.id)?.emoji || '🔧'}</span>
-        <div className="flex-1 min-w-0">
-          <h3 className="text-sm font-medium text-[var(--color-text-primary)]">{tool.name}</h3>
-          <p className="text-xs text-[var(--color-text-tertiary)] line-clamp-1">
-            {tool.description || tool.whenToUse}
-          </p>
-        </div>
-        <span className="text-[var(--color-text-muted)] flex-shrink-0" aria-hidden="true">{'\u2192'}</span>
-      </div>
-    </Link>
-  );
 }

@@ -114,6 +114,10 @@ CREATE CONSTRAINT tool_moment_id IF NOT EXISTS FOR (n:ToolMoment) REQUIRE n.id I
 CREATE CONSTRAINT voice_rule_id IF NOT EXISTS FOR (n:VoiceRule) REQUIRE n.id IS UNIQUE;
 CREATE INDEX validation_line_status IF NOT EXISTS FOR (n:ValidationLine) ON (n.status);
 
+// --- Check-in routing (recommended-for.cypher, plan E4-2). RECOMMENDED_FOR edges MERGE on their
+// own `id` (relationship key constraints are Enterprise-only; the MATCHed endpoints are indexed). ---
+CREATE CONSTRAINT routing_policy_id IF NOT EXISTS FOR (rp:RoutingPolicy) REQUIRE rp.id IS UNIQUE;
+
 // --- User data (written by Cloud Functions, never by schema files) ---
 // PR-S1 conventions (functions/src/userdata/layers.ts): every :UserData label has a unique `key`
 // (= ownerId + ':' + id; writes MERGE on key), and every :UserData node is indexed on ownerId.

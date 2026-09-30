@@ -22,6 +22,11 @@ export type CheckInNextAction =
   | { kind: 'activity' | 'activity_partial'; activityId?: string }
   | { kind: 'done' };
 
+const ROUTING_VERSION = /^[a-z0-9][a-z0-9.-]{0,19}$/;
+const ROUTING_BANDS = ['steady', 'stirred', 'flooded'];
+const ROUTING_BAND_SOURCES = ['probe', 'ftf', 'carried', 'inferred'];
+const oneOfOrNull = (v: unknown, allowed: string[]): string | null => (typeof v === 'string' && allowed.includes(v) ? v : null);
+
 /** App tool ids (kebab-case) and reserved spine tool ids. */
 export const APP_TOOL_ID = /^[a-z][a-z0-9-]{0,63}$/;
 const STEP_ID = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
@@ -47,6 +52,9 @@ export interface SaveCheckInInput {
   discQuestionIds: string[];
   discResponseIds: string[];
   recommendedToolIds: string[];
+  routingVersion: string | null;           // E4-4: 'rf-v1' | 'legacy'
+  routingBand: string | null;              // the engine's band (may be inferred; never stored as band*, R1)
+  routingBandSource: string | null;
   secondaryPatternId: string | null;
   coOccurrenceLabel: string | null;
   guidedActivityId: string | null;
@@ -143,6 +151,9 @@ export function validateSaveCheckIn(raw: unknown, now: Date): SaveCheckInInput {
     discQuestionIds: pairs.map((p) => p[0]),
     discResponseIds: pairs.map((p) => p[1]),
     recommendedToolIds: ids(raw.recommendedToolIds, APP_TOOL_ID, 2),
+    routingVersion: id(raw.routingVersion, ROUTING_VERSION),
+    routingBand: oneOfOrNull(raw.routingBand, ROUTING_BANDS),
+    routingBandSource: oneOfOrNull(raw.routingBandSource, ROUTING_BAND_SOURCES),
     secondaryPatternId: id(raw.secondaryPatternId, GRAPH_ID),
     coOccurrenceLabel: typeof raw.coOccurrenceLabel === 'string' && raw.coOccurrenceLabel ? raw.coOccurrenceLabel.slice(0, 200) : null,
     guidedActivityId: id(raw.guidedActivityId, STEP_ID),

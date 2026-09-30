@@ -37,9 +37,13 @@ const STATE_INPUTS = {
   'low-pleasant-calm': { quadrant: 'low-pleasant', emotions: ['calm'] },
 };
 
-test('content and recommendation callables (public)', async (t) => {
+test('content and recommendation callables (public; getStateAndTools signed in since E4-3)', async (t) => {
+  // E4-3 put requireUid on getStateAndTools and added `routing` to its result: re-record these
+  // goldens (UPDATE_GOLDEN=1) as a deliberate fixture change.
+  const { idToken } = await signUp(`state-${Date.now()}@example.test`);
+  await t.test('getStateAndTools signed out', async () => assert.deepEqual(await outcome('getStateAndTools', STATE_INPUTS['high-unpleasant-anxious']), { error: 'UNAUTHENTICATED' }));
   for (const [name, input] of Object.entries(STATE_INPUTS)) {
-    await t.test(`getStateAndTools ${name}`, async () => golden(`getStateAndTools.${name}`, normalise(await outcome('getStateAndTools', input))));
+    await t.test(`getStateAndTools ${name}`, async () => golden(`getStateAndTools.${name}`, normalise(await outcome('getStateAndTools', input, idToken))));
   }
   for (const q of ['high-unpleasant', 'low-unpleasant']) {
     await t.test(`getDiscriminatingQuestions ${q}`, async () => golden(`getDiscriminatingQuestions.${q}`, normalise(await outcome('getDiscriminatingQuestions', { quadrant: q }))));

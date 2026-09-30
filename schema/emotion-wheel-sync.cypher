@@ -108,7 +108,7 @@ UNWIND [
   {id: "infuriated", name: "Infuriated", quadrant: "high-unpleasant", family: "angry"},
   {id: "annoyed", name: "Annoyed", quadrant: "high-unpleasant", family: "angry"},
   {id: "withdrawn", name: "Withdrawn", quadrant: "high-unpleasant", family: "angry"},
-  {id: "numb", name: "Numb", quadrant: "high-unpleasant", family: "angry"},
+  {id: "numb", name: "Numb", quadrant: "low-unpleasant", family: "angry"},
   {id: "skeptical", name: "Skeptical", quadrant: "high-unpleasant", family: "angry"},
   {id: "dismissive", name: "Dismissive", quadrant: "high-unpleasant", family: "angry"},
 

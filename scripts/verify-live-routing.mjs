@@ -4,8 +4,9 @@
  * in functions/src/recommendation/index.ts (getStateAndTools, emotion scoring; functions/src/index.ts ~L1515-1545 before the A1-2 split).
  * Opens a READ session; never writes. Credentials come from .env (same as load-graph.mjs); never printed.
  * Usage (repo root):  node scripts/verify-live-routing.mjs
- *   --compare <file>   compare routing with an earlier report or a committed summary
- *                      (e.g. tests/fixtures/live-routing-2026-09-30.json); exit 3 if routing moved
+ *   --compare <file>   compare routing with an earlier report, a committed summary
+ *                      (e.g. tests/fixtures/live-routing-2026-09-30.json) or the schema-derived
+ *                      tests/fixtures/recommendation-graph.json (E4-1); exit 3 if routing moved
  *   --summary <file>   also write the routing summary (no host, no user data; safe to commit)
  * Writes: scripts/.verify-live-routing-report.json (gitignored: it names the host)
  */
@@ -13,7 +14,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { routingSummary, diffRouting } from './lib/liveRoutingReport.mjs';
+import { routingSummary, diffRouting, parseGrid, singleEmotionWinner, gridViaAliases, CANDIDATES } from './lib/liveRoutingReport.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(resolve(root, 'functions/package.json'));
 const neo4j = require('neo4j-driver');
@@ -23,6 +24,7 @@ const argAfter = (flag) => { const i = argv.indexOf(flag); return i >= 0 ? argv[
 const comparePath = argAfter('--compare');
 const summaryPath = argAfter('--summary');
 // Read the baseline before this run overwrites the default report path.
+// A committed summary, an earlier report, or tests/fixtures/recommendation-graph.json (the schema's view).
 const baseline = comparePath ? JSON.parse(readFileSync(resolve(process.cwd(), comparePath), 'utf8')) : null;
 
 for (const line of (existsSync(resolve(root, '.env')) ? readFileSync(resolve(root, '.env'), 'utf8') : '').split('\n')) {
@@ -34,12 +36,7 @@ if (!uri || !pw) { console.error('Missing NEO4J_URI / NEO4J_PASSWORD in .env'); 
 
 // Grid vocabulary exactly as the check-in sends it: display name, lower-cased, spaces -> underscores
 const src = readFileSync(resolve(root, 'src/data/emotions.ts'), 'utf8');
-const grid = [...src.matchAll(/makeEmotion\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'/g)]
-  .map(([, id, name, quadrant]) => ({ id, name, quadrant, sent: name.toLowerCase().replace(/\s+/g, '_') }));
-const CANDIDATES = {
-  'high-unpleasant': ['acute_alarm', 'chronic_vigilance', 'emotional_flooding', 'social_threat_shame'],
-  'low-unpleasant': ['conservation_freeze', 'dissociation_overmodulation', 'rumination_loop', 'reward_drive_low'],
-};
+const grid = parseGrid(src);
 const toNum = v => (v && typeof v.toNumber === 'function' ? v.toNumber() : Number(v));
 
 const driver = neo4j.driver(uri, neo4j.auth.basic(user, pw));
@@ -64,17 +61,8 @@ try {
 
   // Replicate the production scoring for a single-emotion check-in (no discriminating answers)
   const perEmotion = unpleasant.map(g => {
-    const cands = CANDIDATES[g.quadrant];
-    const scores = Object.fromEntries(cands.map(c => [c, 0.25]));
-    const hits = (assocByEmotion[g.sent] || []).filter(a => cands.includes(a.p));
-    const byP = {};
-    for (const h of hits) (byP[h.p] ??= []).push(h.s);
-    for (const [p, ss] of Object.entries(byP)) {
-      const bonus = ss.includes('strong') ? 0.3 : ss.includes('moderate') ? 0.2 : 0.1;
-      scores[p] += (ss.length / 1) * 0.4 + bonus; // count(r)/emotionIds.length * 0.4 + strengthBonus
-    }
-    const winner = Object.entries(scores).sort(([, a], [, b]) => b - a)[0][0];
-    return { name: g.name, sent: g.sent, quadrant: g.quadrant, emotionNodeExists: existing.has(g.sent), patternEdges: hits.length, winner };
+    const hits = (assocByEmotion[g.sent] || []).filter(a => CANDIDATES[g.quadrant].includes(a.p));
+    return { name: g.name, sent: g.sent, quadrant: g.quadrant, emotionNodeExists: existing.has(g.sent), patternEdges: hits.length, winner: singleEmotionWinner(g.quadrant, hits) };
   });
   report.grid = {
     unpleasantNames: perEmotion.length,
@@ -83,6 +71,13 @@ try {
     winnerDistribution: perEmotion.reduce((m, x) => ((m[`${x.quadrant} → ${x.winner}`] = (m[`${x.quadrant} → ${x.winner}`] || 0) + 1), m), {}),
     perEmotion,
   };
+  // E4-6: the same one-word check-ins through the SCORES_AS aliases (what the scoring query reads
+  // since E4-6). Before the aliases are loaded this reports aliasEdges 0 and every name not reaching.
+  const aliasRows = await q(`MATCH (w:Emotion)-[:SCORES_AS]->(a:Emotion) RETURN w.id AS w, a.id AS a ORDER BY w, a`);
+  report.aliases = {};
+  for (const r of aliasRows) (report.aliases[r.w] ??= []).push(r.a);
+  const coOccurs = await q(`MATCH (a:ActivationPattern)-[r:CO_OCCURS_WITH]->(b:ActivationPattern) RETURN a.id AS a, b.id AS b, r.primaryPatternId AS primaryPatternId ORDER BY a, b`);
+  report.gridViaAliases = gridViaAliases(grid, assoc, report.aliases, coOccurs);
   report.safetyTriggers = await q(`MATCH (p:ActivationPattern)-[:TRIGGERS_SAFETY]->(s:SafetyFlag) RETURN p.id AS pattern, s.type AS type, count(*) AS edges ORDER BY pattern`);
   report.safetyTriggers = report.safetyTriggers.map(r => ({ ...r, edges: toNum(r.edges) }));
   report.discriminatingEvidence = (await q(`MATCH (r:QuestionResponse)-[e:EVIDENCE_FOR]->(p:ActivationPattern) RETURN p.id AS pattern, count(e) AS edges ORDER BY pattern`)).map(r => ({ ...r, edges: toNum(r.edges) }));
@@ -151,6 +146,11 @@ if (report.error) { console.error('Error:', report.error); process.exit(1); }
 console.log(`Patterns in live graph: ${report.patterns.length}`);
 console.log(`Unpleasant grid names: ${report.grid.unpleasantNames}; exist as Emotion nodes: ${report.grid.namesThatExistAsEmotionNodes}; have any pattern edge: ${report.grid.namesWithAnyPatternEdge.length}`);
 console.log('Single-emotion check-in → winning pattern:', report.grid.winnerDistribution);
+const ga = report.gridViaAliases;
+console.log(`Through SCORES_AS aliases (E4-6): ${ga.aliasEdges} alias edges; ${ga.namesReachingACandidate}/${report.grid.unpleasantNames} names reach a pattern` +
+  (ga.namesNotReaching.length ? ` (not: ${ga.namesNotReaching.join(', ')})` : ''));
+console.log('  winning pattern via aliases:', ga.winnerDistribution);
+console.log('  patterns reachable by one grid word:', ga.patternsWon);
 console.log('ASSOCIATED_WITH edges:', report.associatedWith);
 console.log('Duplicate relationships:', report.duplicateRelationships.length ? report.duplicateRelationships : 'none');
 console.log('Duplicate nodes:', report.duplicateNodes.length ? report.duplicateNodes : 'none');
@@ -164,7 +164,7 @@ if (summaryPath) {
   console.log(`Routing summary written to ${summaryPath}`);
 }
 if (baseline) {
-  const { changes, warnings } = diffRouting(baseline, report);
+  const { changes, warnings } = diffRouting(baseline, report, { grid });
   for (const w of warnings) console.log(`~ ${w.what}: ${w.note}`);
   if (changes.length) {
     console.error(`\nRouting differs from ${comparePath} (${changes.length}):`);

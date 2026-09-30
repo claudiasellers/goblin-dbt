@@ -129,13 +129,40 @@ export interface ActivationPatternResult {
   confidence: number;
 }
 
+export type RoutingSide = 'acceptance' | 'change' | 'both';
+export type RoutingDirection = 'down' | 'up' | 'orient' | 'neutral';
+export type RoutingSkillKind = 'body' | 'orient' | 'hold' | 'change' | 'naming' | 'relational';
+
+/** Mirrors functions/src/recommendation/types.ts. Cards are named from src/data/tools.ts, never from here. */
 export interface ToolRecommendation {
   id: string;
+  /** The graph concept's name ("TIPP"): compat only, never shown. */
   name: string;
   description: string;
   whenToUse: string;
-  dbtBasis?: string;
+  dbtBasis?: string | null;
+  /** Legacy 'high' | 'medium' | 'relevant', or the rf-v1 slot. Never shown (E4-4). */
   relevance: string;
+  slot?: 'primary' | 'swap';
+  side?: RoutingSide;
+  skillKind?: RoutingSkillKind;
+  direction?: RoutingDirection;
+  sequence?: 'after_primary';
+  ruleId?: string;
+  reason?: 'pattern_band' | 'emotion_gate' | 'fallback';
+}
+
+/** How the result was routed (E4-3); absent on positive_state. */
+export interface Routing {
+  version: string;
+  band: 'steady' | 'stirred' | 'flooded';
+  bandSource: 'probe' | 'ftf' | 'carried' | 'inferred';
+  blank: boolean;
+  recommendedToolIds: string[];
+  ruleIds: string[];
+  filtered: Array<{ toolId: string; ruleId: string; reason: string }>;
+  receiveFirst: boolean;
+  surface: 'checkin' | 'dear_man_debrief';
 }
 
 export interface SafetyFlag {
@@ -165,6 +192,7 @@ export interface StateResult {
   secondaryPattern?: ActivationPatternResult;
   coOccurrence?: CoOccurrence;
   guidedActivity?: GuidedActivityRecommendation;
+  routing?: Routing;
 }
 
 export interface DiscriminatingQuestion {
@@ -201,6 +229,9 @@ const getStateAndToolsFn = httpsCallable<
     discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
     band?: 'steady' | 'stirred' | 'flooded';
     bandViaCantTell?: boolean;
+    bandSource?: 'probe' | 'ftf' | 'carried';
+    blank?: boolean;
+    surface?: 'checkin' | 'dear_man_debrief';
   },
   StateResult
 >(functions, 'getStateAndTools');
@@ -225,9 +256,14 @@ export async function getStateAndTools(input: {
   intensity?: { x: number; y: number };
   bodySensations?: Array<{ region: string; tags?: string[] }>;
   discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
-  /** The check-in's band (A4-3). The engine reads it from E4-3 on; until then it's ignored. */
+  /** The check-in's band (A4-3): the engine routes by pattern × band (E4-3). */
   band?: 'steady' | 'stirred' | 'flooded';
   bandViaCantTell?: boolean;
+  /** Where the band came from (the reading's source; `handoff` etc. are sent as `carried`). */
+  bandSource?: 'probe' | 'ftf' | 'carried';
+  /** Find the feeling's pull was `blank`: never calm this state. */
+  blank?: boolean;
+  surface?: 'checkin' | 'dear_man_debrief';
 }): Promise<StateResult> {
   const result = await getStateAndToolsFn(input);
   return result.data;
