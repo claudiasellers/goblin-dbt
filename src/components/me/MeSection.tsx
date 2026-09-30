@@ -17,7 +17,8 @@ const PHASE_A_AREAS: ProfileAreaId[] = ['about_me', 'my_body', 'my_words', 'my_p
 /**
  * The Me surface (PR-P2): everything the app keeps about you, in one place, registry-driven from
  * getMe. Stale items float to the top ("A few things to check"). Found words are read-only (a log
- * aggregate, D-10). Settings stay below on the same page.
+ * aggregate, D-10). My words also lists lines in the user's own words (A5-2; set aside / restore)
+ * and witness lines they kept. Settings stay below on the same page.
  */
 export function MeSection() {
   const [me, setMe] = useState<GetMeResponse | null>(null);
@@ -62,6 +63,12 @@ export function MeSection() {
             <button type="button" onClick={() => { after(restoreProfileItem(ref(i))).catch(() => { /* stays set aside */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
               Restore
+            </button>
+          )}
+          {i.label === 'OwnLine' && i.meta.status === 'active' && (
+            <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
+              className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
+              Set aside
             </button>
           )}
         </div>
@@ -111,6 +118,16 @@ export function MeSection() {
                 Words you've found: {me.readOnly.foundWords.map((w) => w.name ?? w.emotionId).join(', ')}
               </p>
             ) : <p className="text-sm text-[var(--color-text-tertiary)]">Words you find with Find the feeling land here.</p>
+          )}
+          {a.id === 'my_words' && me.readOnly.savedLines.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs text-[var(--color-text-tertiary)]">Lines you kept</p>
+              <ul className="mt-1 space-y-1">
+                {me.readOnly.savedLines.map((l) => (
+                  <li key={l.lineId} className="text-sm text-[var(--color-text-secondary)]">{l.text}</li>
+                ))}
+              </ul>
+            </div>
           )}
           {a.id === 'my_patterns' && me.offers.map((o) => (
             <div key={o.id} className="mt-2">

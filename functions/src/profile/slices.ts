@@ -20,12 +20,17 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   patterns: `MATCH (:User {id: $uid})-[:HAS_PATTERN]->(m:MyPattern {status: 'active'})
     RETURN m {.id, .kind, .area, .status, .source, .patternKind, .toolId, .patternId,
               confirmedAt: toString(m.confirmedAt), revisitAt: toString(m.revisitAt)} AS m`,
+  ownLines: `MATCH (:User {id: $uid})-[:HAS_OWN_LINE]->(o:OwnLine {status: 'active'})
+    WITH o ORDER BY o.createdAt DESC LIMIT 50
+    RETURN o {.id, .kind, .area, .status, .source, .text, .emotionIds, .situationId, .moment, .uses,
+              lastUsedAt: toString(o.lastUsedAt), confirmedAt: toString(o.confirmedAt), revisitAt: toString(o.revisitAt)} AS o`,
+  savedLines: `MATCH (:User {id: $uid})-[k:SAVED_LINE]->(l:ValidationLine)
+    RETURN l.id AS lineId, toString(k.confirmedAt) AS confirmedAt ORDER BY k.lastAt DESC LIMIT 50`,
 };
 
 type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: number) => Promise<ProfileSlices[K]>;
 
 const EMPTY: { [K in SliceId]?: () => ProfileSlices[K] } = {
-  ownLines: () => [], savedLines: () => [],
   people: () => [], bodyFlags: () => null, values: () => [], goals: () => [], copeAheadPlans: () => [],
   boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}), ownWords: () => [],
   thingsILike: () => [], crisisKit: () => null, safetyPlan: () => null, country: () => null,
@@ -56,9 +61,24 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
         patternId: (m.patternId as string | null) ?? null, meta: metaFrom(m, now) };
     });
   },
+  ownLines: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.ownLines!, { uid });
+    return r.records.map((rec) => {
+      const o = rec.get('o') as Record<string, unknown>;
+      return {
+        id: String(o.id), text: String(o.text ?? ''), emotionIds: (o.emotionIds as string[] | null) ?? [],
+        situationId: (o.situationId as string | null) ?? null, moment: (o.moment as string | null) ?? null,
+        uses: o.uses == null ? 0 : int(o.uses), lastUsedAt: (o.lastUsedAt as string | null) ?? null, meta: metaFrom(o, now),
+      };
+    });
+  },
+  savedLines: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.savedLines!, { uid });
+    return r.records.map((rec) => ({ lineId: String(rec.get('lineId')), confirmedAt: (rec.get('confirmedAt') as string | null) ?? null }));
+  },
 };
 
-/** Register a resolver for a reserved slice (its owner's PR, e.g. A5-2 ownLines / savedLines). */
+/** Register a resolver for a reserved slice (its owner's PR; A5-2's ownLines / savedLines live above). */
 export function registerSliceResolver<K extends SliceId>(id: K, r: Resolver<K>): void {
   (RESOLVERS as Record<string, unknown>)[id] = r;
 }

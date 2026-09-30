@@ -137,6 +137,7 @@ CREATE CONSTRAINT follow_up_key IF NOT EXISTS FOR (n:FollowUp) REQUIRE n.key IS 
 CREATE CONSTRAINT pattern_offer_key IF NOT EXISTS FOR (n:PatternOffer) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT profile_fact_key IF NOT EXISTS FOR (n:ProfileFact) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT my_pattern_key IF NOT EXISTS FOR (n:MyPattern) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT own_line_key IF NOT EXISTS FOR (n:OwnLine) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT push_token_key IF NOT EXISTS FOR (n:PushToken) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);

@@ -56,6 +56,7 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   // ---- profile ----
   ProfileFact: { layer: 'profile', rel: 'HAS_PROFILE_FACT', exportAs: 'profileFacts' },
   MyPattern: { layer: 'profile', rel: 'HAS_PATTERN', exportAs: 'myPatterns' },
+  OwnLine: { layer: 'profile', rel: 'HAS_OWN_LINE', exportAs: 'ownLines' }, // A5-2 (R16): say it my way
   // ---- system ----
   PushToken: { layer: 'system', rel: 'HAS_PUSH_TOKEN' },
 };
@@ -65,7 +66,7 @@ export const USER_DATA: Record<string, UserDataLabel> = {
  * FOUND_WORD is NOT one: it accumulates without the user's yes, so it is a log aggregate (D-10),
  * shown read-only in Me → My words and exported under `links`.
  */
-export const PROFILE_EDGES: readonly string[] = [];
+export const PROFILE_EDGES: readonly string[] = ['SAVED_LINE']; // A5-2 (R16): User → ValidationLine on an explicit keep
 
 /** User → graph-content edges that are log aggregates (exported under `links`, deleted with the user). */
 export const LOG_AGGREGATE_EDGES: readonly string[] = ['FOUND_WORD'];

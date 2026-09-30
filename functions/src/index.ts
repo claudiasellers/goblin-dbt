@@ -18,6 +18,7 @@ export { getProblemSolveContent } from './problemSolve';
 export { getInvalidationRecoveryContent, saveInvalidationRecoverySession, getInvalidationRecoveryProgress } from './invalidationRecovery';
 export { getFindTheFeelingContent, saveFindTheFeelingSession, getFeelingCollection } from './findTheFeeling';
 export { getCapacityContent } from './capacity';
+export { getWitnessLines, recordWitnessBeat } from './witness';
 export {
   startToolSession, closeToolSession, recordToolSession, answerToolOutcome, getSpineContent,
   scheduleFollowUp, resolveFollowUp, snoozeFollowUp, getToday,

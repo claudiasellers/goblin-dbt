@@ -11,7 +11,7 @@ import { readProfileSlices, readProfileVersion } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
 
 export interface MeItem {
-  label: 'ProfileFact' | 'MyPattern';
+  label: 'ProfileFact' | 'MyPattern' | 'OwnLine';
   meta: ProfileItemMeta;
   /** Graph copy for the kind ("Quiet hours", "What helps"). */
   title: string;
@@ -29,7 +29,11 @@ export interface GetMeResponse {
   staleCount: number;
   name: { firstName: string | null };
   areas: Array<{ id: ProfileAreaId; label: string; blurb: string; items: MeItem[]; kinds: Array<{ id: string; label: string }> }>;
-  readOnly: { foundWords: Array<{ emotionId: string; name: string | null; count: number }> };
+  readOnly: {
+    foundWords: Array<{ emotionId: string; name: string | null; count: number }>;
+    /** Witness lines the user kept (SAVED_LINE, A5-2), in the you-voice. */
+    savedLines: Array<{ lineId: string; text: string }>;
+  };
   offers: Array<{ id: string; statement: string; offerCopy: string; toolId: string | null; evidenceCount: number }>;
 }
 
@@ -40,17 +44,21 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
      WITH a, collect(k {.id, .label}) AS kinds
      RETURN a.id AS id, a.label AS label, a.blurb AS blurb, kinds ORDER BY a.order`);
   const itemsRes = await tx.run(
-    `MATCH (:User {id: $uid})-[r:HAS_PROFILE_FACT|HAS_PATTERN]->(p:ProfileItem)
+    `MATCH (:User {id: $uid})-[r:HAS_PROFILE_FACT|HAS_PATTERN|HAS_OWN_LINE]->(p:ProfileItem)
      OPTIONAL MATCH (k:ProfileKind {id: p.kind})
      OPTIONAL MATCH (rule:PatternRule {id: p.statementId})
-     RETURN CASE type(r) WHEN 'HAS_PROFILE_FACT' THEN 'ProfileFact' ELSE 'MyPattern' END AS label,
-            p {.id, .kind, .area, .status, .source, .valueJson, .toolId,
+     RETURN CASE type(r) WHEN 'HAS_PROFILE_FACT' THEN 'ProfileFact' WHEN 'HAS_OWN_LINE' THEN 'OwnLine' ELSE 'MyPattern' END AS label,
+            p {.id, .kind, .area, .status, .source, .valueJson, .toolId, .text,
                confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p,
             k.label AS title, k.stillTrueCopy AS stillTrue, k.setAsideCopy AS setAside, rule.statementTemplate AS statement`,
     { uid });
   const words = await tx.run(
     `MATCH (:User {id: $uid})-[w:FOUND_WORD]->(e:Emotion)
      RETURN e.id AS emotionId, e.name AS name, w.count AS count ORDER BY w.lastAt DESC LIMIT 50`,
+    { uid });
+  const saved = await tx.run(
+    `MATCH (:User {id: $uid})-[k:SAVED_LINE]->(l:ValidationLine)
+     RETURN l.id AS lineId, l.text AS text ORDER BY k.lastAt DESC LIMIT 50`,
     { uid });
   const offers = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_PATTERN_OFFER]->(o:PatternOffer {status: 'offered'})
@@ -71,6 +79,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     }
     if (meta.kind === 'quiet_hours' && value) summary = `${value.start}–${value.end}`;
     if (r.get('label') === 'MyPattern') summary = (r.get('statement') as string | null) ?? '';
+    if (r.get('label') === 'OwnLine') summary = String(p.text ?? '');
     const item: MeItem = {
       label: r.get('label'), meta, title: (r.get('title') as string | null) ?? meta.kind, summary,
       editor: meta.kind === 'quiet_hours' ? 'quiet_hours' : null,
@@ -90,7 +99,10 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       items: byArea.get(r.get('id') as string) ?? [],
       kinds: (r.get('kinds') as Array<{ id: string; label: string }>).filter((k) => k.id),
     })),
-    readOnly: { foundWords: words.records.map((r) => ({ emotionId: r.get('emotionId'), name: r.get('name') ?? null, count: int(r.get('count')) })) },
+    readOnly: {
+      foundWords: words.records.map((r) => ({ emotionId: r.get('emotionId'), name: r.get('name') ?? null, count: int(r.get('count')) })),
+      savedLines: saved.records.map((r) => ({ lineId: String(r.get('lineId')), text: String(r.get('text') ?? '') })),
+    },
     offers: offers.records.map((r) => ({
       id: r.get('id'), statement: r.get('statement') ?? '', offerCopy: r.get('offerCopy') ?? '',
       toolId: r.get('toolId') ?? null, evidenceCount: int(r.get('evidenceCount')),

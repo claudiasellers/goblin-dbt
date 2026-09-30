@@ -36,7 +36,11 @@ export interface ProfileSlices {
   name: { firstName: string | null };
   quietHours: (QuietHours & { meta: ProfileItemMeta }) | null;
   patterns: Array<{ id: string; patternKind: 'what_helps'; toolId: string | null; patternId: string | null; meta: ProfileItemMeta }>;
-  ownLines: Array<{ id: string; text: string; meta: ProfileItemMeta }>;
+  /** "Say it my way" lines (A5-2): stored as written, never linted or interpreted. */
+  ownLines: Array<{
+    id: string; text: string; emotionIds: string[]; situationId: string | null; moment: string | null;
+    uses: number; lastUsedAt: string | null; meta: ProfileItemMeta;
+  }>;
   savedLines: Array<{ lineId: string; confirmedAt: string | null }>;
   people: never[];
   bodyFlags: null;
