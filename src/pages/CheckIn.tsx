@@ -99,6 +99,8 @@ export function CheckIn() {
   const [active, setActive] = useState(0);
   // Where "Never mind" on a newly added spot returns to.
   const [spotReturn, setSpotReturn] = useState<'emotion' | 'word'>('emotion');
+  // Where Help now goes back to (the square or the words).
+  const [helpReturn, setHelpReturn] = useState<'emotion' | 'word'>('emotion');
   const point = spots[active]?.point ?? null;
   const [currentSensation, setCurrentSensation] = useState<Partial<BodySensation> | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -305,6 +307,7 @@ export function CheckIn() {
    * routing call: nothing was said about the feeling, so nothing is guessed.
    */
   function handleHelpMeNow() {
+    setHelpReturn(step === 'word' ? 'word' : 'emotion');
     setStep('help_now');
   }
 
@@ -620,6 +623,8 @@ export function CheckIn() {
     const wordsOrSquare = point ? 'word' : 'emotion';
     switch (step) {
       case 'help_now':
+        setStep(helpReturn);
+        break;
       case 'word':
         setStep('emotion');
         break;
@@ -752,7 +757,7 @@ export function CheckIn() {
           />
         )}
 
-        {step === 'help_now' && <HelpNowInterim onDone={() => setStep('emotion')} />}
+        {step === 'help_now' && <HelpNowInterim onDone={() => setStep(helpReturn)} />}
 
         {step === 'find' && (
           <div className="space-y-3">

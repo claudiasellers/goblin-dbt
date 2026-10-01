@@ -80,7 +80,12 @@ export const palettes: Palette[] = [
 
 export const PALETTE_IDS = palettes.map((p) => p.id);
 
-/** Palettes from before rooms, mapped to the nearest room so saved choices still land somewhere sensible. */
+/**
+ * Palettes from before rooms, mapped to the nearest room so saved choices still land somewhere
+ * sensible. Before rooms, light/dark was a separate saved `theme`, so a legacy palette saved with a
+ * dark theme goes to the nearest dark room (Velvet, or Dusk for slate-spruce). Keep in step with
+ * LEGACY / LEGACY_DARK in index.html.
+ */
 const LEGACY_PALETTES: Record<string, PaletteId> = {
   'cool-steel': 'tinted',
   'slate-spruce': 'dusk',
@@ -88,15 +93,38 @@ const LEGACY_PALETTES: Record<string, PaletteId> = {
   giverny: 'pastel-mix',
   clouds: 'pastel',
 };
+const LEGACY_DARK: Record<string, PaletteId> = {
+  'cool-steel': 'velvet',
+  'slate-spruce': 'dusk',
+  signal: 'velvet',
+  giverny: 'velvet',
+  clouds: 'velvet',
+};
+
+/** The pre-room theme was dark: 'dark', or 'system' on a device that prefers dark. */
+function legacyThemeIsDark(theme: unknown): boolean {
+  if (theme === 'dark') return true;
+  if (theme !== 'system') return false;
+  try {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+  } catch {
+    return false;
+  }
+}
 
 export function isPaletteId(value: unknown): value is PaletteId {
   return typeof value === 'string' && (PALETTE_IDS as string[]).includes(value);
 }
 
-/** Any stored value (current id, legacy id, missing) to a room id. */
-export function resolvePalette(value: unknown): PaletteId {
+/**
+ * Any stored value (current id, legacy id, missing) to a room id. `theme` is the profile's saved
+ * pre-room theme; it only matters for legacy ids (a room owns its own mode).
+ */
+export function resolvePalette(value: unknown, theme?: unknown): PaletteId {
   if (isPaletteId(value)) return value;
-  if (typeof value === 'string' && value in LEGACY_PALETTES) return LEGACY_PALETTES[value];
+  if (typeof value === 'string' && value in LEGACY_PALETTES) {
+    return legacyThemeIsDark(theme) ? LEGACY_DARK[value] : LEGACY_PALETTES[value];
+  }
   return DEFAULT_PALETTE;
 }
 
@@ -105,8 +133,8 @@ export function getPaletteById(id: string): Palette | undefined {
 }
 
 /** Put a room on the page: sets data-palette and the room's own light/dark mode. */
-export function applyRoom(value: unknown): PaletteId {
-  const id = resolvePalette(value);
+export function applyRoom(value: unknown, theme?: unknown): PaletteId {
+  const id = resolvePalette(value, theme);
   const room = getPaletteById(id);
   const root = document.documentElement;
   root.dataset.palette = id;

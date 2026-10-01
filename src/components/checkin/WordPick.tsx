@@ -77,7 +77,6 @@ export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue
                   key={w}
                   type="button"
                   className="den-chip den-chip--small"
-                  aria-pressed
                   aria-label={`Remove ${w}`}
                   style={{ ['--chip-on' as string]: `var(--color-q-${QUADRANT_ABBR[getEmotionByName(w)?.quadrant ?? 'high-unpleasant']}-fill)` }}
                   onClick={() => onRemoveWord(i, w)}

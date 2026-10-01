@@ -14,7 +14,7 @@ import {
   DEFAULT_PROFILE,
   type UserProfile,
 } from '../services/neo4j';
-import { applyRoom } from '../data/palettes';
+import { applyRoom, isPaletteId } from '../data/palettes';
 import { profileCache } from '../lib/profileCache';
 
 const PROFILE_CACHE_KEY = 'goblin-dbt-profile-cache';
@@ -81,7 +81,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
     const cached = loadCachedProfile(user.uid);
     if (cached) {
       setProfile(cached);
-      applyRoom(cached.palette);
+      applyRoom(cached.palette, cached.theme);
     }
 
     setLoading(true);
@@ -149,8 +149,16 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   // light/dark data-theme (see src/data/palettes.ts).
   // ============================================
   useEffect(() => {
-    applyRoom(profile.palette);
-  }, [profile.palette]);
+    applyRoom(profile.palette, profile.theme);
+    // A legacy palette saved with the 'system' theme follows the device's light/dark setting
+    // (as the old data-theme="system" CSS did) until a room is saved.
+    if (profile.theme !== 'system' || isPaletteId(profile.palette)) return;
+    const mq = typeof window.matchMedia === 'function' ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+    if (!mq) return;
+    const follow = () => applyRoom(profile.palette, profile.theme);
+    mq.addEventListener('change', follow);
+    return () => mq.removeEventListener('change', follow);
+  }, [profile.palette, profile.theme]);
 
   // ============================================
   // Check-in reminder effect (browser notifications)
