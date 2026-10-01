@@ -11,12 +11,14 @@
     <title>DBT Tools</title>
     <!-- Paint the saved room before React mounts so there is no flash of the default.
          Reads the same profile cache UserProfileContext writes; skips if more than one account is cached.
-         A room owns its light/dark mode. Keep ROOM_MODES, LEGACY and the default in step with
+         A room owns its light/dark mode. Keep ROOM_MODES, LEGACY, LEGACY_DARK and the default in step with
          src/data/palettes.ts. -->
     <script>
       (function () {
         var ROOM_MODES = { velvet: 'dark', dusk: 'dark', tinted: 'light', pastel: 'light', 'pastel-mix': 'light', daylight: 'light' };
         var LEGACY = { 'cool-steel': 'tinted', 'slate-spruce': 'dusk', signal: 'daylight', giverny: 'pastel-mix', clouds: 'pastel' };
+        // Before rooms, light/dark was a separate saved theme: a legacy palette saved dark goes to a dark room.
+        var LEGACY_DARK = { 'cool-steel': 'velvet', 'slate-spruce': 'dusk', signal: 'velvet', giverny: 'velvet', clouds: 'velvet' };
         var room = 'velvet';
         try {
           var keys = Object.keys(localStorage).filter(function (k) { return k.indexOf('goblin-dbt-profile-cache-') === 0; });
@@ -24,7 +26,10 @@
             var p = JSON.parse(localStorage.getItem(keys[0]));
             var saved = p && p.palette;
             if (saved && ROOM_MODES[saved]) room = saved;
-            else if (saved && LEGACY[saved]) room = LEGACY[saved];
+            else if (saved && LEGACY[saved]) {
+              var dark = p.theme === 'dark' || (p.theme === 'system' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+              room = dark ? LEGACY_DARK[saved] : LEGACY[saved];
+            }
           }
         } catch (e) { /* ignore */ }
         document.documentElement.dataset.palette = room;

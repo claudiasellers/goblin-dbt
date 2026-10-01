@@ -7,8 +7,8 @@ interface FeelingSquareProps {
   point: SquarePoint | null;
   /** Called when the point is placed or moved: press, drag, lift, and arrow keys. */
   onMove?: (p: SquarePoint) => void;
-  /** Enter / Space on the focused square. Lifting a finger does not commit, so the point can be
-   *  nudged as many times as needed before the screen's own "That's about right" button. */
+  /** Enter / Space on the focused square once a point is down (the screen opens the full word
+   *  list). Lifting a finger does not commit, so the point can be nudged as many times as needed. */
   onCommit?: (p: SquarePoint) => void;
   /** Other spots already on the square (dimmer), each optionally tagged with its first word. */
   others?: Array<{ point: SquarePoint; label?: string }>;
@@ -23,7 +23,7 @@ interface FeelingSquareProps {
  * the whole surface, so there are no borders to be on the wrong side of.
  *
  * Pointer: press or drag to place the dot; lifting leaves it there, and a new press moves it.
- * Keyboard: arrows move (Shift for bigger steps), Enter or Space commits. The per-room look (halo, centre shade, Tinted's glaze, dot) comes from
+ * Keyboard: arrows move (Shift for bigger steps), Enter or Space places the dot in the middle, then chooses. The per-room look (halo, centre shade, Tinted's glaze, dot) comes from
  * the --square-* tokens in src/index.css.
  */
 export function FeelingSquare({ point, onMove, onCommit, others = [], small = false, className = '' }: FeelingSquareProps) {
@@ -63,9 +63,11 @@ export function FeelingSquare({ point, onMove, onCommit, others = [], small = fa
     else if (e.key === 'ArrowRight') next = { x: round3(clamp01(p.x + step)), y: p.y };
     else if (e.key === 'ArrowUp') next = { x: p.x, y: round3(clamp01(p.y + step)) };
     else if (e.key === 'ArrowDown') next = { x: p.x, y: round3(clamp01(p.y - step)) };
-    else if ((e.key === 'Enter' || e.key === ' ') && point) {
+    else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      onCommit?.(point);
+      // No dot yet: place it in the middle; with one, choose it.
+      if (point) onCommit?.(point);
+      else onMove?.(p);
       return;
     }
     if (next) {

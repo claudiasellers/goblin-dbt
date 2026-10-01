@@ -26,7 +26,9 @@ test("Help me now opens the interim; it never saves a check-in or calls the rout
   const fn = checkIn.slice(checkIn.indexOf("function handleHelpMeNow()"), checkIn.indexOf("function handleSomaticEntry()"));
   assert.match(fn, /setStep\('help_now'\)/);
   assert.doesNotMatch(fn, /analyzeAndShowResult|getStateAndTools|saveCheckIn/);
-  assert.match(checkIn, /\{step === 'help_now' && <HelpNowInterim onDone=\{\(\) => setStep\('emotion'\)\} \/>\}/);
+  // Done goes back to the screen Help now was opened from (the square or the words).
+  assert.match(checkIn, /\{step === 'help_now' && <HelpNowInterim onDone=\{\(\) => setStep\(helpReturn\)\} \/>\}/);
+  assert.match(fn, /setHelpReturn\(step === 'word' \? 'word' : 'emotion'\)/);
   const comp = readFileSync("src/components/checkin/HelpNowInterim.tsx", "utf8");
   assert.doesNotMatch(comp, /getStateAndTools|saveCheckIn|CrisisBanner/);
   assert.match(comp, /toolId: 'help-now', entry: 'checkin_grid'/);

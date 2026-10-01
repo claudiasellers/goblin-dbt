@@ -81,7 +81,7 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
     const cached = loadCachedProfile(user.uid);
     if (cached) {
       setProfile(cached);
-      applyRoom(cached.palette);
+      applyRoom(cached.palette, cached.theme);
     }
 
     setLoading(true);
@@ -149,8 +149,8 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
   // light/dark data-theme (see src/data/palettes.ts).
   // ============================================
   useEffect(() => {
-    applyRoom(profile.palette);
-  }, [profile.palette]);
+    applyRoom(profile.palette, profile.theme);
+  }, [profile.palette, profile.theme]);
 
   // ============================================
   // Check-in reminder effect (browser notifications)

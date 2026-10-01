@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { FeelingSquare } from './FeelingSquare';
 import { RelatedRow, WordChip } from './WordChips';
 import {
@@ -76,6 +77,14 @@ export function CheckInSquare({
   const canAddSpot = spot.words.length > 0 && spots.length < MAX_SPOTS;
   const isExtra = active > 0;
 
+  // Screen readers hear the place once the dot settles, not on every step of a drag.
+  const place = point ? describePlace(point) : '';
+  const [announced, setAnnounced] = useState('');
+  useEffect(() => {
+    const t = setTimeout(() => setAnnounced(place), 450);
+    return () => clearTimeout(t);
+  }, [place]);
+
   return (
     <div className="max-w-md mx-auto flex flex-col">
       {isExtra && (
@@ -103,14 +112,14 @@ export function CheckInSquare({
 
       <p
         className={`mt-5 text-center ${point ? 'font-serif text-[17px] leading-[1.35] text-[var(--color-text-primary)]' : 'text-[15px] text-[var(--color-text-secondary)]'}`}
-        aria-live="polite"
       >
         {point
-          ? describePlace(point)
+          ? place
           : isExtra
             ? 'Touch where the other part sits. Mixed is normal.'
             : 'Touch where it sits. Close is enough.'}
       </p>
+      <p className="sr-only" aria-live="polite">{announced}</p>
 
       {point && (
         <div className="mt-4">

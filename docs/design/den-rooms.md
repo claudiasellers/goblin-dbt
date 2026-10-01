@@ -11,11 +11,14 @@ type and shape change everywhere, layouts and flows do not.
   Daylight are light. Applying a room sets both `data-palette` and
   `data-theme` on `<html>` (`applyRoom` in `src/data/palettes.ts`), so the
   Find the feeling rooms, which read `data-theme`, match the app. The saved
-  `theme` field is kept for compatibility but no longer drives the page, and
-  the Theme buttons are gone from Profile > Appearance.
+  `theme` field is kept (it only steers legacy palettes, below), and the
+  Theme buttons are gone from Profile > Appearance.
 - **Legacy palettes map to rooms** on read: cool-steel → Tinted,
   slate-spruce → Dusk, signal → Daylight, giverny → Pastel mix,
-  clouds → Pastel. The Cloud Function now accepts only room ids on write.
+  clouds → Pastel. Saved with a dark theme (or `system` on a dark device),
+  they go to a dark room instead: slate-spruce → Dusk, the rest → Velvet
+  (`resolvePalette(palette, theme)` and the pre-paint script in
+  `index.html`). The Cloud Function now accepts only room ids on write.
 - **Type.** Hanken Grotesk is the tool talking (body, buttons, labels);
   Newsreader is the voice (every `h1`/`h2`, weight 400). All-caps headings
   stay in the sans. DM Sans is still loaded for the Tune room's own CSS.
@@ -81,12 +84,15 @@ continuous square. Pleasantness runs left to right and energy bottom to top.
 The colour is the room's four quadrant fills blended across the whole
 surface, so there are no box borders to land on the wrong side of.
 
-- **Place, adjust, then confirm.** Touching places the dot and lifting
-  leaves it there; touch or drag again to move it as often as you like. The
-  caption reads the place back in plain words as it moves, and "That's about
-  right" (its space reserved, so nothing jumps) sets `intensity {x, y}` and
-  opens the words. Keyboard: the arrow keys move the point (hold Shift for
-  bigger steps), and Enter or Space confirms.
+- **Place, then adjust.** Touching places the dot and lifting leaves it
+  there; touch or drag again to move it as often as you like. The caption
+  reads the place back in plain words as it moves (screen readers hear it
+  once the dot settles). The point is the check-in's `intensity {x, y}`; the
+  words under it are the way forward. Keyboard: the arrow keys move the point
+  (hold Shift for bigger steps); Enter or Space places the dot in the middle,
+  then opens the full word list. Exactly on a centre line routes as
+  unpleasant and high energy (`quadrantAt`), the same tie rule as
+  `inferQuadrant`.
   `src/components/checkin/FeelingSquare.tsx`.
 - **The room takes the colour of the touch.** A wash from the top of the
   page, `.feeling-tint`, is mixed in CSS from the room's fills (`squareColor`
@@ -123,6 +129,7 @@ surface, so there are no box borders to land on the wrong side of.
 - **Help now** is on both screens. It opens `HelpNowInterim` (PR-C2, D-08):
   a safe body step plus Cool Down and 5-4-3-2-1, with no check-in and no
   routing call. Nothing is guessed from the words or the point.
+  Done or Back returns to the screen it was opened from.
 - **Result.** The pattern label in the serif, then the witness beat (which
   echoes the words), then the tools. The one recommendation and one swap
   (`RecommendationCards.tsx`) are colour-coded by skill family

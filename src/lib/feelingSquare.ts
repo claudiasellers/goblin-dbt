@@ -29,9 +29,10 @@ export const QUADRANT_ABBR: Record<string, 'hu' | 'hp' | 'lu' | 'lp'> = {
 
 export const clamp01 = (n: number) => Math.min(1, Math.max(0, n));
 
+/** Exactly on a centre line: unpleasant wins (as in inferQuadrant), and so does high energy. */
 export function quadrantAt(p: SquarePoint): Quadrant {
   const high = p.y >= 0.5;
-  const pleasant = p.x >= 0.5;
+  const pleasant = p.x > 0.5;
   if (high) return pleasant ? 'high-pleasant' : 'high-unpleasant';
   return pleasant ? 'low-pleasant' : 'low-unpleasant';
 }
@@ -61,13 +62,13 @@ export function describePlace(p: SquarePoint): string {
         ? 'Some energy'
         : y > 0.25
           ? 'Not much energy'
-          : x >= 0.5
+          : x > 0.5
             ? 'Slow and quiet'
             : 'Running very low';
   const feel =
     x < 0.25
       ? 'and it doesn’t feel good'
-      : x < 0.5
+      : x <= 0.5
         ? 'and it feels a bit off'
         : x < 0.75
           ? 'and it feels okay'

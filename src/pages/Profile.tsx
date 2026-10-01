@@ -59,7 +59,7 @@ export function Profile() {
       />
 
       <AppearanceSection
-        palette={resolvePalette(profile.palette)}
+        palette={resolvePalette(profile.palette, profile.theme)}
         onSave={(changes) => updateProfile(changes)}
       />
 
