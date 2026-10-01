@@ -1,7 +1,9 @@
 #!/usr/bin/env node
 /**
- * The witness voice lint (WMP-01 A, E3 §A5.2.4). One implementation, imported by the tests and by
- * scripts/load-graph.mjs; the Python build scripts don't re-implement the rules.
+ * The witness voice lint (WMP-01 A, E3 §A5.2.4). A check you run, not a gate: nothing blocks a load
+ * on it (the loader's gate and the flow-doc baseline were removed 2026-10-01, Claudia). npm test
+ * keeps one corpus check (no errors in schema/witness.cypher: rule 4, diagnosis words, slots,
+ * unsigned live lines).
  *
  *   lintText(text, ctx)       regex rules for one string in a scope (validation | feeling_copy | user_copy)
  *   lintLine(row)             one ValidationLine: text + textNamed + structural rules
@@ -10,26 +12,22 @@
  *   flowDocStrings(src, file) every string in a generated file's contentJson / copyJson, with a path
  *   lintFlowDocs(files)       those strings as user copy → findings [{file, path, rule, severity}]
  *   lintFlowOrder(steps)      receive_before_change for a flow that declares steps[].kind (none do yet)
- *   gateProblems(fileNames)   what scripts/load-graph.mjs refuses to send
  *
- * CLI:
- *   node scripts/voice-lint.mjs            lint the committed corpus + flow docs; exit 1 on errors or new flow-doc findings
- *   node scripts/voice-lint.mjs --write-baseline   regenerate scripts/witness/voice-baseline.json from today's flow docs
- *                                          (only ever to shrink it: new findings are fixed in the source, not baselined)
- *   node scripts/voice-lint.mjs --report   also print a table over src/**\/*.tsx JSX text and hand-written schema copy
- *                                          (acknowledgment, psAcknowledgment, validationText, userFacingLabel …); never fails
+ * CLI (prints, never fails):
+ *   node scripts/voice-lint.mjs            the committed corpus + flow docs
+ *   node scripts/voice-lint.mjs --report   also src/**\/*.tsx JSX text and hand-written schema copy
+ *                                          (acknowledgment, psAcknowledgment, validationText, userFacingLabel …)
  *
  * Never linted: anything the user writes (OwnLine text).
  */
-import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const RULES_FILE = join(root, 'scripts/witness/voice-rules.json');
-export const BASELINE_FILE = join(root, 'scripts/witness/voice-baseline.json');
 export const WITNESS_FILE = join(root, 'schema/witness.cypher');
-/** Generated flow documents whose user copy is linted against the baseline (E3 §A5.2.4 (c)). */
+/** Generated flow documents whose user copy the CLI reports on (E3 §A5.2.4 (c)). */
 export const FLOW_DOC_FILES = [
   'schema/find-the-feeling.cypher', 'schema/invalidation-recovery.cypher', 'schema/capacity.cypher',
   'schema/opposite-action-flow.cypher', 'schema/practice-spine.cypher',
@@ -164,39 +162,6 @@ export function lintFlowDocOrder(files = FLOW_DOC_FILES) {
   return out;
 }
 
-export const findingKey = (f) => `${f.file}|${f.path}|${f.rule}`;
-
-/** Flow-doc findings not in the baseline, and baseline entries that no longer fail (both must be empty). */
-export function compareBaseline(findings, baseline = JSON.parse(readFileSync(BASELINE_FILE, 'utf8'))) {
-  const have = new Set(findings.map(findingKey));
-  const base = new Set(baseline.entries.map(findingKey));
-  return {
-    fresh: findings.filter((f) => !base.has(findingKey(f))),
-    stale: baseline.entries.filter((e) => !have.has(findingKey(e))),
-  };
-}
-
-/**
- * The loader's gate (scripts/load-graph.mjs): errors in the corpus, or new flow-doc findings, in
- * the files about to load. Returns human-readable problems ([] = go).
- */
-export function gateProblems(fileNames) {
-  const problems = [];
-  if (fileNames.includes('witness.cypher')) {
-    for (const f of lintCorpus(corpusFromCypher(readFileSync(WITNESS_FILE, 'utf8')))) {
-      if (f.severity === 'error') problems.push(`witness ${f.id} ${f.field}: ${f.rule} (${f.match ?? ''}) ${f.message}`);
-    }
-  }
-  const flow = FLOW_DOC_FILES.filter((f) => fileNames.includes(f.replace(/^schema\//, '')));
-  if (flow.length) {
-    const { fresh } = compareBaseline(lintFlowDocs(flow).filter((f) => flow.includes(f.file)),
-      { entries: JSON.parse(readFileSync(BASELINE_FILE, 'utf8')).entries.filter((e) => flow.includes(e.file)) });
-    for (const f of fresh) problems.push(`${f.file} ${f.path}: ${f.rule} (${f.match}) — new copy outside the voice contract`);
-    for (const f of lintFlowDocOrder(flow)) problems.push(`${f.file}: ${f.rule} (${f.match}) ${f.message}`);
-  }
-  return problems;
-}
-
 // ---- report over legacy copy (never fails) ----
 const REPORT_PROPS = ['acknowledgment', 'psAcknowledgment', 'validationText', 'userFacingLabel', 'combinedUserFacingLabel'];
 
@@ -247,26 +212,14 @@ async function report() {
 }
 
 async function main() {
-  if (process.argv.includes('--write-baseline')) {
-    const entries = lintFlowDocs().map(({ file, path, rule }) => ({ file, path, rule }));
-    writeFileSync(BASELINE_FILE, `${JSON.stringify({
-      about: 'Flow-document copy that broke the voice contract when the lint landed (A5-1). Only ever shrinks: fix the source, then remove the entry (npm test fails on a stale entry).',
-      entries,
-    }, null, 2)}\n`);
-    console.log(`wrote ${relative(root, BASELINE_FILE)}: ${entries.length} entr(ies)`);
-    return;
-  }
   const rows = corpusFromCypher(readFileSync(WITNESS_FILE, 'utf8'));
-  const corpus = lintCorpus(rows).filter((f) => f.severity === 'error');
-  for (const f of corpus) console.error(`✗ ${f.id} ${f.field}: ${f.rule} (${f.match ?? ''}) ${f.message}`);
-  const { fresh, stale } = compareBaseline(lintFlowDocs());
-  for (const f of fresh) console.error(`✗ ${f.file} ${f.path}: ${f.rule} (${f.match}) new copy outside the voice contract`);
-  for (const e of stale) console.error(`! baseline entry no longer fails, remove it: ${findingKey(e)}`);
-  const order = lintFlowDocOrder();
-  for (const f of order) console.error(`✗ ${f.file}: ${f.rule} (${f.match}) ${f.message}`);
-  console.log(`voice lint: ${rows.length} lines, ${corpus.length} corpus error(s), ${fresh.length} new flow-doc finding(s), ${stale.length} stale baseline entr(ies)`);
+  const corpus = lintCorpus(rows).filter((f) => f.severity !== 'report');
+  for (const f of corpus) console.log(`${f.severity === 'error' ? '✗' : '!'} ${f.id} ${f.field}: ${f.rule} (${f.match ?? ''}) ${f.message}`);
+  const flow = lintFlowDocs();
+  for (const f of flow) console.log(`! ${f.file} ${f.path}: ${f.rule} (${f.match})`);
+  for (const f of lintFlowDocOrder()) console.log(`! ${f.file}: ${f.rule} (${f.match}) ${f.message}`);
+  console.log(`voice lint: ${rows.length} lines, ${corpus.length} corpus finding(s), ${flow.length} flow-doc finding(s)`);
   if (process.argv.includes('--report')) await report();
-  if (corpus.length || fresh.length || stale.length || order.length) process.exitCode = 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

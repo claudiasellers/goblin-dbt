@@ -55,7 +55,7 @@ A(f"""// ============================================================
 // ValidationLine: the validation layer's lines, level 1-6, tagged by band, kind and target
 // (word, DBT family, situation, urge, tool moment). getWitnessLines serves only status "live";
 // "draft" lines are loaded for review and never served. VoiceRule mirrors the voice contract
-// (scripts/witness/voice-rules.json), which the loader lints this file against before sending it.
+// (scripts/witness/voice-rules.json); `node scripts/voice-lint.mjs` checks it, nothing gates the load.
 // Run AFTER invalidation-recovery.cypher (RecoveryProtocol, ClinicalSource), emotion-regulation-
 // content.cypher (EmotionRegulationContent), opposite-action-data.cypher (ActionUrge) and
 // dear-man-debrief-content.cypher (TurningPoint). Idempotent: MERGE + SET; constraints live in

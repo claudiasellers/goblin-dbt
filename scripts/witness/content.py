@@ -3,8 +3,8 @@
 # too when a Recover line changes (Recover's RecoveryProtocol.validationLines is a projection of the
 # recover_validate lines below; scripts/invalidation-recovery/content.py imports witness_lines()).
 #
-# THE LINT (scripts/witness/voice-rules.json; runs in npm test and before every load). Blocks a load:
-#   negative-intensity words (ban 4 below), diagnosis words ("oversensitive", "overreacting"), and broken
+# THE LINT (scripts/witness/voice-rules.json; `node scripts/voice-lint.mjs` prints it, nothing blocks a load).
+#   npm test fails only on: negative-intensity words (ban 4 below), diagnosis words ("oversensitive", "overreacting"), and broken
 #   structure (unknown slots, a level-3 line with nothing underneath, a live line nobody signed off).
 #   Warns: "!", emoji, "should", "I/my", and intensity words that could go either way
 #   (massive, intense, extreme). Reports only: "but", interpreting the other person.

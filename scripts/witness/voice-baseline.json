@@ -1,4 +1,0 @@
-{
-  "about": "Flow-document copy that broke the voice contract when the lint landed (A5-1). Only ever shrinks: fix the source, then remove the entry (npm test fails on a stale entry).",
-  "entries": []
-}

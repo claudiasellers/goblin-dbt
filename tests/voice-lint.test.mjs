@@ -1,13 +1,11 @@
-// A5-1: the witness voice lint (scripts/voice-lint.mjs). Every rule has a pass and a fail fixture;
-// the committed corpus passes; flow-document copy has no findings beyond the (shrink-only) baseline.
+// A5-1: the witness voice lint (scripts/voice-lint.mjs). Every rule has a pass and a fail fixture,
+// and the committed corpus has no errors. Nothing gates a load on it (removed 2026-10-01).
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
-  RULESET, lintText, lintLine, lintCorpus, corpusFromCypher, lintFlowDocs, compareBaseline,
-  lintFlowOrder, lintFlowDocOrder, gateProblems, FLOW_DOC_FILES,
+  RULESET, lintText, lintLine, lintCorpus, corpusFromCypher, lintFlowOrder, lintFlowDocOrder,
 } from "../scripts/voice-lint.mjs";
-import { LOAD_ORDER, voiceGate } from "../scripts/load-graph.mjs";
 
 const rules = (text, scope = "validation") => lintText(text, { scope }).map((f) => f.rule);
 const lineRules = (row) => lintLine({ voice: "you", bands: ["steady", "stirred"], level: 5, tentative: false, status: "draft", reviewStatus: "draft", underneath: [], ...row }).map((f) => f.rule);
@@ -53,7 +51,7 @@ test("negative-intensity words are an error on witness lines; pleasant intensity
   assert.equal(sev("It's too loud in here", "feeling_copy"), "report");
 });
 
-test("lightened 2026-10-01: only diagnosis words block; the other style rules warn or report (Claudia)", () => {
+test("lightened 2026-10-01: diagnosis words are errors; the other style rules warn or report (Claudia)", () => {
   const sev = (text, rule) => lintText(text, { scope: "validation" }).find((f) => f.rule === rule)?.severity;
   assert.equal(sev("This is real pain, not oversensitivity.", "no_diagnosis"), "error");
   assert.equal(sev("It hurt, but you can choose.", "and_not_but"), "report");
@@ -119,19 +117,9 @@ test("the committed corpus passes (schema/witness.cypher)", () => {
   assert.deepEqual(lintCorpus(rows).filter((f) => f.severity === "error"), []);
 });
 
-test("flow-document copy: nothing new beyond the baseline, and the baseline has no stale entries", () => {
-  const { fresh, stale } = compareBaseline(lintFlowDocs());
-  assert.deepEqual(fresh, []);
-  assert.deepEqual(stale, [], "a baseline entry no longer fails: remove it (the baseline only shrinks)");
-  for (const f of FLOW_DOC_FILES) assert.ok(LOAD_ORDER.includes(f.replace("schema/", "")), f);
-});
-
-test("the loader's voice gate is clean for a full load and runs on the corpus", () => {
-  assert.deepEqual(voiceGate(LOAD_ORDER), []);
-  assert.deepEqual(gateProblems(["witness.cypher"]), []);
+test("the loader has no voice gate (Claudia, 2026-10-01)", () => {
   const loader = readFileSync("scripts/load-graph.mjs", "utf8");
-  assert.match(loader, /--skip-voice-lint/);
-  assert.match(loader, /process\.exit\(5\)/);
+  assert.doesNotMatch(loader, /voice-lint|skip-voice-lint|process\.exit\(5\)/);
 });
 
 test("VoiceRule nodes mirror voice-rules.json", () => {

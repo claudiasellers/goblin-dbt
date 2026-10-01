@@ -1,6 +1,6 @@
 {
   "version": "voice-v1",
-  "about": "The witness voice contract (WMP-01 A, E3 §A5.2.4). Regex rules live here; structural rules (length, slots, levels, review) are in scripts/voice-lint.mjs. Severity per scope: validation (ValidationLine text), feeling_copy (copy that answers a feeling), user_copy (other app copy). 'report' never fails. Nothing the user writes is ever linted. Lightened 2026-10-01 (Claudia): only no_diagnosis and the structural rules (slots, level 3 shape, reviewed_live) block a load; the rest warn or report. Claudia's own bans live in scripts/witness/content.py.",
+  "about": "The witness voice contract (WMP-01 A, E3 §A5.2.4). Regex rules live here; structural rules (length, slots, levels, review) are in scripts/voice-lint.mjs. Severity per scope: validation (ValidationLine text), feeling_copy (copy that answers a feeling), user_copy (other app copy). Nothing the user writes is ever linted. Lightened 2026-10-01 (Claudia): nothing blocks a load; npm test fails only on errors in the witness corpus (no_magnitude, no_diagnosis, slots, level 3 shape, reviewed_live); the rest warn or report. Claudia's own bans live in scripts/witness/content.py.",
   "rules": [
     {
       "id": "no_interpretation",
