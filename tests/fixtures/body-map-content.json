@@ -1052,11 +1052,11 @@
    "id": "excitement",
    "label": "Excitement",
    "wordIds": [
-    "playful",
-    "cheeky",
     "excited",
     "eager",
-    "energetic"
+    "energetic",
+    "playful",
+    "cheeky"
    ],
    "status": "draft",
    "places": [

@@ -176,8 +176,12 @@ live).
   glow fainter.
 - `suggestEmotionsFromBody` (pure scoring in `functions/src/bodyMap/suggest.ts`): each mark counts
   once per map against its best place × weight (same place and word 1, word elsewhere 0.4, place
-  alone 0.25); the strongest 3 maps with their words. `EmotionSuggestion` merges maps offered for
-  the same places into one section.
+  alone 0.25); the strongest 3 maps with their words. `EmotionSuggestion` stays small, because
+  someone who starts with their body usually can't find words yet: one best guess ("That often goes
+  with fear and worry.", with the places it's based on above it) and its three most common words,
+  one word from each of the next two maps under "Or maybe", and the full list behind "Something
+  else". At most five chips. A map's first common word stands for it, so `content.py` lists the
+  most representative word first.
 - The migration maps the old figure's Thigh / Knee / Calf to `legs` and Hips to `lower_back`, and
   keeps the old name as `legacyRegion`.
 - **Deploy order:** load the graph (`--only constraints`, then `--only body-map`), deploy

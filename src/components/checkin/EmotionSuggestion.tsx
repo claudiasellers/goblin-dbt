@@ -13,34 +13,23 @@ interface EmotionSuggestionProps {
   onSkip: () => void;
 }
 
-/** Words offered per map: the common ones first, then the rest, up to this many. */
-const WORDS_PER_MAP = 6;
+/** The best guess offers this many words; each other map offers one ("Or maybe"). */
+const LEAD_WORDS = 3;
 
-function wordsFor(s: BodySuggestion) {
+function wordsFor(s: BodySuggestion, n: number) {
   const known = s.wordIds.map((id) => getEmotionById(id)).filter((e): e is NonNullable<typeof e> => Boolean(e));
-  return [...known.filter((e) => e.core), ...known.filter((e) => !e.core)].slice(0, WORDS_PER_MAP);
+  return [...known.filter((e) => e.core), ...known.filter((e) => !e.core)].slice(0, n);
 }
 
 function becauseText(s: BodySuggestion) {
-  return s.because.map((b) => `${regionLabel(b.region).toLowerCase()} ${b.label.toLowerCase()}`).join(', ');
-}
-
-/** Maps offered for the same places read as one section ("Often with chest racing"), strongest first. */
-function sections(suggestions: BodySuggestion[]) {
-  const out: Array<{ because: string; words: ReturnType<typeof wordsFor> }> = [];
-  for (const s of suggestions) {
-    const because = becauseText(s);
-    const words = wordsFor(s);
-    const same = out.find((x) => x.because === because);
-    if (same) same.words.push(...words.filter((w) => !same.words.some((x) => x.id === w.id)));
-    else out.push({ because, words });
-  }
-  return out;
+  return s.because.map((b) => `${regionLabel(b.region).toLowerCase()} ${b.label.toLowerCase()}`).join(' · ');
 }
 
 /**
- * Body-first entry, after the body step: the feelings the marked places often go with, from the
- * graph's body maps (suggestEmotionsFromBody), grouped by map. Tap any that fit.
+ * Body-first entry, after the body step. Someone who started with their body usually can't find
+ * words yet, so this stays small: one best guess from the graph's body maps (suggestEmotionsFromBody)
+ * with three words, one word from each of the next two maps ("Or maybe"), and the full list behind
+ * "Something else". At most five chips.
  */
 export function EmotionSuggestion({ bodySensations, onSelect, onShowAllEmotions, onSkip }: EmotionSuggestionProps) {
   const [suggestions, setSuggestions] = useState<BodySuggestion[] | null>(null);
@@ -86,34 +75,39 @@ export function EmotionSuggestion({ bodySensations, onSelect, onShowAllEmotions,
     );
   }
 
+  const [lead, ...rest] = suggestions;
+  const leadWords = wordsFor(lead, LEAD_WORDS);
+  const maybe = rest.map((r) => wordsFor(r, 1)[0]).filter((e): e is NonNullable<typeof e> => Boolean(e) && !leadWords.some((w) => w.id === e!.id));
+
+  const chip = (e: NonNullable<ReturnType<typeof getEmotionById>>) => (
+    <button key={e.id} type="button" className="den-chip den-chip--small" aria-pressed={picked.includes(e.id)}
+      style={{ ['--chip-on' as string]: `var(--color-q-${QUADRANT_ABBR[e.quadrant] ?? 'hu'}-fill)` }}
+      onClick={() => toggle(e.id)}>
+      {e.name}
+    </button>
+  );
+
   return (
     <div className="max-w-md mx-auto flex flex-col">
-      <h2 className="m-0 text-[2rem] leading-[1.08] text-[var(--color-text-primary)] [text-wrap:balance]">
-        These often go with what you noticed
+      <p className="m-0 text-[13px] font-bold text-[var(--color-text-secondary)]">{becauseText(lead)}</p>
+      <h2 className="mt-2 mb-0 text-[2rem] leading-[1.1] text-[var(--color-text-primary)] [text-wrap:balance]">
+        That often goes with {lead.label.toLowerCase()}.
       </h2>
-      <p className="mt-2 text-[15px] text-[var(--color-text-secondary)]">Tap any that fit. “Sort of” counts.</p>
+      <p className="mt-2 text-[15px] text-[var(--color-text-secondary)]">Does any of this fit? “Sort of” counts.</p>
 
-      {sections(suggestions).map((sec) => (
-        <section key={sec.because} className="mt-5" aria-label={`Often with ${sec.because}`}>
-          <p className="m-0 mb-2 text-[13px] font-bold text-[var(--color-text-secondary)]">
-            Often with {sec.because}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {sec.words.map((e) => (
-              <button key={e.id} type="button" className="den-chip den-chip--small" aria-pressed={picked.includes(e.id)}
-                style={{ ['--chip-on' as string]: `var(--color-q-${QUADRANT_ABBR[e.quadrant] ?? 'hu'}-fill)` }}
-                onClick={() => toggle(e.id)}>
-                {e.name}
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
+      <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={lead.label}>{leadWords.map(chip)}</div>
+
+      {maybe.length > 0 && (
+        <div className="mt-5">
+          <p className="m-0 mb-2 text-[13px] font-bold text-[var(--color-text-secondary)]">Or maybe</p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Or maybe">{maybe.map(chip)}</div>
+        </div>
+      )}
 
       <div className="mt-5 flex justify-center">
         <button type="button" onClick={onShowAllEmotions}
           className="min-h-11 px-2 text-[15px] font-semibold text-[var(--color-accent)] bg-transparent border-none cursor-pointer">
-          I feel something else
+          Something else
         </button>
       </div>
 

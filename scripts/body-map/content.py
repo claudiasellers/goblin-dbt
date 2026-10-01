@@ -147,7 +147,7 @@ MAPS = {
     "excitement": ("Excitement", [
         ("stomach", "fizzy", 1.0), ("chest", "racing_heart", 0.8), ("hands", "tingly", 0.7),
         ("legs", "bouncy", 0.7), ("body", "energised", 0.6),
-    ], ["playful", "cheeky", "excited", "eager", "energetic"]),
+    ], ["excited", "eager", "energetic", "playful", "cheeky"]),
     "surprise": ("Surprise", [
         ("chest", "racing_heart", 0.8), ("head", "buzzing", 0.7), ("stomach", "butterflies", 0.6),
     ], ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"]),

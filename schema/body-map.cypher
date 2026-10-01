@@ -372,7 +372,7 @@ MERGE (m)-[:SHOWS]->(p);
 MATCH (p:BodyMapPlace {id: "joy:legs:bouncy"}), (s:SensationType {id: "bouncy"})
 MERGE (p)-[:FEELS_AS]->(s);
 MERGE (m:BodyMap {id: "excitement"})
-SET m += {label: "Excitement", rank: 9, wordIds: ["playful", "cheeky", "excited", "eager", "energetic"], status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v1"};
+SET m += {label: "Excitement", rank: 9, wordIds: ["excited", "eager", "energetic", "playful", "cheeky"], status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v1"};
 MERGE (p:BodyMapPlace {id: "excitement:stomach:fizzy"})
 SET p += {region: "stomach", weight: 1.0};
 MATCH (m:BodyMap {id: "excitement"}), (p:BodyMapPlace {id: "excitement:stomach:fizzy"})
