@@ -90,6 +90,9 @@ for rank, (mid, (label, places, grid_words)) in enumerate(MAPS.items()):
         A(f"MATCH (m:BodyMap {{id: {q(mid)}}}), (p:BodyMapPlace {{id: {q(pid)}}})\nMERGE (m)-[:SHOWS]->(p);")
         A(f"MATCH (p:BodyMapPlace {{id: {q(pid)}}}), (s:SensationType {{id: {q(wid)}}})\nMERGE (p)-[:FEELS_AS]->(s);")
 
+A("\n// --- Retire pad words removed from content.py (the SensationType stays; it's shared with FELT_AS) ---")
+A(f"MATCH (s:SensationType) WHERE s.padStatus IS NOT NULL AND NOT s.id IN {q([w[0] for w in PAD_WORDS])}\nSET s.padStatus = 'retired';")
+
 A("\n// --- Prune places and maps removed from content.py ---")
 A(f"MATCH (p:BodyMapPlace) WHERE NOT p.id IN {q(place_ids)}\nDETACH DELETE p;")
 A(f"MATCH (m:BodyMap) WHERE NOT m.id IN {q(list(MAPS))}\nDETACH DELETE m;")

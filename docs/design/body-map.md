@@ -62,12 +62,13 @@ editable source, `scripts/body-map/content.py`, which generates `schema/body-map
    `legs`, `feet`, `body` (whole body). They're stored on `BodyMapContent.regions`. From step 2 a
    test checks that every graph region exists in the figure, and the reverse. Geometry and "paired"
    stay in the frontend because they are presentation. The old `FELT_AS` region strings (`back`,
-   `hands` …) are left alone until step 6 rebuilds the body-first suggestions.
+   `hands` …) are left alone; nothing new reads them.
 2. **Pad words.** `SensationType` grows from 15 to 40 (the 15 existing ids keep their `name`), each with
    `padLabel` ("Tight", "Raised up", "Fluttery", "Settled"), `zones` (which pad quadrants it
    belongs to: `hu`, `hp`, `lu`, `lp`), an optional `regions` restriction (e.g. "Raised up" only for
    shoulders), `energy` (`more` / `less`) and `padRank` (pad order). Every place has at least one
-   word in every quarter of the pad (build check).
+   word in every quarter of the pad (build check). A word removed from `content.py` is marked
+   `padStatus: 'retired'` (the shared node stays) and is never served.
 3. **Body maps (the mirror).** Twelve `(:BodyMap {id, label, wordIds})` nodes: `fear`, `anger`,
    `sadness`, `shame`, `guilt`, `disgust`, `depleted` ("Drained or numb"), `love`, `joy`,
    `excitement`, `surprise`, `calm`.
@@ -80,7 +81,7 @@ editable source, `scripts/body-map/content.py`, which generates `schema/body-map
      is in exactly one map (test), including pleasant words and the held anger words, which
      `SCORES_AS` can't reach. It's a list, not edges: 18 calm-side grid words (*relaxed*, *cozy* …)
      aren't `Emotion` nodes in the graph.
-   - The existing `FELT_AS` edges informed the maps and stay in place for the body-first path.
+   - The existing `FELT_AS` edges informed the maps and are left as they are.
 
 **Callable:** `getBodyMapContent({ emotionIds? })` in a new `functions/src/bodyMap/` module (public,
 like `getCapacityContent`). It returns
@@ -96,13 +97,18 @@ client caches the pad words for the session. Follow the callable checklist in CL
   - `region` becomes a region id (`shoulders`).
   - `intensity` is the pad point. It's stored for real now, as `intensityX` (pleasant) and
     `intensityY` (intensity).
-  - `tags` are the picked pad words' labels.
-- `validation.ts`: `side` is optional (default `both`) and `fromMirror` is optional. Old clients and
-  old records are unchanged. The `BodySensation` write sets both new fields. It stays a log record
-  (append-only, no profile).
-- Readers map new ids to their old hotspots and keep the old Title Case names working: `shoulders`
-  with `both` lights both shoulders, and `left` lights one. One shared map lives in
-  `src/data/bodyFigure.ts`.
+  - `tags` are the picked pad words' labels (for display), and a new `sensationIds` holds their
+    stable `SensationType` ids (for any graph lookup; labels are copy and can change). Old records
+    keep tags only. Nothing reads sensation ids from history: suggestions use the check-in in
+    progress.
+- `validation.ts`: `side`, `fromMirror` and `sensationIds` are optional (`side` defaults to `both`).
+  Old clients are unchanged. It stays a log record (append-only, no profile).
+- Old records move to the new names once, with a migration
+  (`schema/migrations/2026-10-body-regions.cypher`, run with step 2's deploy): `Left Shoulder` →
+  `shoulders` + `left`, `Chest` → `chest`, and so on. The Insights query already counts each region
+  once per check-in (`collect(DISTINCT s.region)`), so a check-in that had both shoulders counts
+  once. Readers then only know the new ids: `shoulders` with `both` lights both shoulders, `left`
+  lights one (`src/data/bodyFigure.ts`).
 
 ### Frontend
 
@@ -132,26 +138,26 @@ step reads it.
      and the callable (fake driver).
    - **Claudia:** review the maps and pad words (a readable list, like the witness lines).
    - Deploy: load the graph (`--only body-map`), then functions.
-2. **Heat figure and both sides.**
-   - Build `bodyFigure.ts`, `HeatFigure` and `BodyStep`. Tapping a place still uses the current tag
-     list.
-   - Save region ids with `side`. Update the validation and the three readers.
-   - Deploy functions, then hosting.
+2. **Heat figure, both sides, and body-first suggestions from the graph.** These ship together:
+   the new place names and pad words no longer match `sensationMappings.ts`, so the "Start with my
+   body" suggestions would break in between.
+   - Build `bodyFigure.ts`, `HeatFigure` and `BodyStep`. Tapping a place shows the graph's pad
+     words for that place as plain chips (the pad square comes in step 3).
+   - Save region ids with `side`, and `sensationIds`. Update the validation and the readers, and run
+     the region migration.
+   - A `suggestEmotionsFromBody` callable: the marks (region + sensation id) scored against each
+     map's places, returning maps with their words; `EmotionSuggestion` uses it. Delete
+     `sensationMappings.ts`, closing the CLAUDE.md tech debt.
+   - Deploy: functions, the migration, then hosting.
 3. **Sensation pad.**
-   - `SensationPad` replaces the tag list: chips from the graph, real intensity, mark colour from the
-     pad, Both / Left / Right.
+   - `SensationPad` adds the small square: real intensity, chips filtered by the pad's quarter,
+     mark colour from the pad, Both / Left / Right.
 4. **Body mirror, one map.**
    - A ghost layer for the routing group's map, a pre-filled pad on tap, "Add all of these", and
      `fromMirror` saved.
 5. **Several feelings.**
    - Tabs per map (max 3) in the words' colours, and Together stripes.
    - Marks stay put across tabs and never take a tab's colour.
-6. **Body-first suggestions from the graph.**
-   - A `suggestEmotionsFromBody` callable (reverse `SHOWS` / `wordIds` and `FELT_AS`) for
-     `EmotionSuggestion`.
-   - Delete `sensationMappings.ts`, closing the CLAUDE.md tech debt.
-   - It has to come after step 2: the new region ids and pad words no longer match that file's
-     keys, so until then the body-first path keeps the old tag list.
 
 A dev harness, `dev/body-map.html` with fixture content, shows the figure, pad and mirror without
 signing in, in the way `dev/find-the-feeling.html` does.

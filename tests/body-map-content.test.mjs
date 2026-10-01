@@ -74,6 +74,15 @@ test("nothing is live without sign-off (SIGNED_OFF in content.py)", () => {
   }
 });
 
+test("pad words removed from content.py are retired, never served (shared SensationType kept)", () => {
+  const retire = stmts.find((x) => /SET s\.padStatus = 'retired'/.test(x));
+  assert.ok(retire, "retire statement");
+  const ids = JSON.parse(retire.match(/NOT s\.id IN (\[.*\])/)[1]);
+  assert.deepEqual(ids.sort(), fixture.padWords.map((w) => w.id).sort());
+  assert.doesNotMatch(retire, /DELETE/);
+  assert.match(readFileSync("functions/src/bodyMap/index.ts", "utf8"), /s\.padStatus = 'live'/);
+});
+
 test("loads after knowledge-graph (SensationType); no DDL; constraints for every new label", () => {
   assert.ok(LOAD_ORDER.indexOf("body-map.cypher") > LOAD_ORDER.indexOf("knowledge-graph.cypher"));
   assert.ok(!stmts.some((s) => /^CREATE (CONSTRAINT|INDEX)/.test(s)));
