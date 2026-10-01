@@ -1,0 +1,1200 @@
+{
+ "version": "body-map-v1",
+ "regions": [
+  "head",
+  "face",
+  "jaw",
+  "throat",
+  "neck",
+  "shoulders",
+  "chest",
+  "upper_back",
+  "stomach",
+  "lower_back",
+  "arms",
+  "hands",
+  "legs",
+  "feet",
+  "body"
+ ],
+ "padWords": [
+  {
+   "id": "tension",
+   "label": "Tight",
+   "zones": [
+    "hu"
+   ],
+   "regions": [],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "pressure",
+   "label": "Pressure",
+   "zones": [
+    "hu"
+   ],
+   "regions": [],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "raised_up",
+   "label": "Raised up",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "shoulders"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "clenched",
+   "label": "Clenched",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "jaw",
+    "hands",
+    "stomach"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "racing_heart",
+   "label": "Racing",
+   "zones": [
+    "hu",
+    "hp"
+   ],
+   "regions": [
+    "chest"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "pounding",
+   "label": "Pounding",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "chest",
+    "head"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "heat",
+   "label": "Hot",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "head",
+    "face",
+    "chest",
+    "body"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "burning",
+   "label": "Burning",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "face",
+    "throat",
+    "chest",
+    "stomach"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "constriction",
+   "label": "Closing up",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "throat",
+    "chest"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "shaking",
+   "label": "Shaky",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "hands",
+    "arms",
+    "legs",
+    "body"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "restlessness",
+   "label": "Restless",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "hands",
+    "legs",
+    "feet",
+    "body"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "knotted",
+   "label": "Knotted",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "stomach",
+    "upper_back",
+    "lower_back"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "churning",
+   "label": "Churning",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "stomach"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "buzzing",
+   "label": "Buzzing",
+   "zones": [
+    "hu"
+   ],
+   "regions": [
+    "head",
+    "hands",
+    "body"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "achy",
+   "label": "Achy",
+   "zones": [
+    "hu",
+    "lu"
+   ],
+   "regions": [],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "heaviness",
+   "label": "Heavy",
+   "zones": [
+    "lu"
+   ],
+   "regions": [],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "numbness_sensation",
+   "label": "Numb",
+   "zones": [
+    "lu"
+   ],
+   "regions": [],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "drained",
+   "label": "Drained",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "arms",
+    "legs",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "weakness",
+   "label": "Weak",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "arms",
+    "legs",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "cold_sensation",
+   "label": "Cold",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "hands",
+    "feet",
+    "chest",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "hollow",
+   "label": "Hollow",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "chest",
+    "stomach"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "sinking",
+   "label": "Sinking",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "chest",
+    "stomach"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "foggy",
+   "label": "Foggy",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "head"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "lump",
+   "label": "A lump",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "throat"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "slumped",
+   "label": "Slumped",
+   "zones": [
+    "lu"
+   ],
+   "regions": [
+    "shoulders",
+    "upper_back",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "butterflies",
+   "label": "Fluttery",
+   "zones": [
+    "hu",
+    "hp"
+   ],
+   "regions": [
+    "chest",
+    "stomach"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "tingly",
+   "label": "Tingly",
+   "zones": [
+    "hp"
+   ],
+   "regions": [],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "lightness",
+   "label": "Light",
+   "zones": [
+    "hp",
+    "lp"
+   ],
+   "regions": [],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "warmth",
+   "label": "Warm",
+   "zones": [
+    "hp",
+    "lp"
+   ],
+   "regions": [
+    "face",
+    "chest",
+    "stomach",
+    "hands",
+    "body"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "expansion",
+   "label": "Open",
+   "zones": [
+    "hp",
+    "lp"
+   ],
+   "regions": [
+    "throat",
+    "shoulders",
+    "chest"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "fizzy",
+   "label": "Fizzy",
+   "zones": [
+    "hp"
+   ],
+   "regions": [
+    "chest",
+    "stomach",
+    "body"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "bouncy",
+   "label": "Bouncy",
+   "zones": [
+    "hp"
+   ],
+   "regions": [
+    "legs",
+    "feet"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "smiling",
+   "label": "Smiling",
+   "zones": [
+    "hp",
+    "lp"
+   ],
+   "regions": [
+    "face"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "energised",
+   "label": "Energised",
+   "zones": [
+    "hp"
+   ],
+   "regions": [
+    "arms",
+    "legs",
+    "body"
+   ],
+   "energy": "more",
+   "status": "draft"
+  },
+  {
+   "id": "settled",
+   "label": "Settled",
+   "zones": [
+    "lp"
+   ],
+   "regions": [
+    "chest",
+    "stomach",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "loose",
+   "label": "Loose",
+   "zones": [
+    "lp"
+   ],
+   "regions": [
+    "jaw",
+    "neck",
+    "shoulders",
+    "upper_back",
+    "lower_back",
+    "arms",
+    "hands",
+    "legs"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "soft",
+   "label": "Soft",
+   "zones": [
+    "lp"
+   ],
+   "regions": [
+    "face",
+    "jaw",
+    "stomach",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "groundedness",
+   "label": "Grounded",
+   "zones": [
+    "lp"
+   ],
+   "regions": [
+    "legs",
+    "feet",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "easy_breathing",
+   "label": "Breathing easy",
+   "zones": [
+    "lp"
+   ],
+   "regions": [
+    "throat",
+    "chest"
+   ],
+   "energy": "less",
+   "status": "draft"
+  },
+  {
+   "id": "rested",
+   "label": "Rested",
+   "zones": [
+    "lp"
+   ],
+   "regions": [
+    "head",
+    "body"
+   ],
+   "energy": "less",
+   "status": "draft"
+  }
+ ],
+ "maps": [
+  {
+   "id": "fear",
+   "label": "Fear and worry",
+   "wordIds": [
+    "fearful",
+    "scared",
+    "anxious",
+    "insecure",
+    "helpless",
+    "frightened",
+    "worried",
+    "overwhelmed",
+    "persecuted",
+    "nervous",
+    "threatened",
+    "stressed",
+    "busy",
+    "rushed",
+    "pressured",
+    "out_of_control",
+    "hesitant"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "chest",
+     "sensationId": "racing_heart",
+     "label": "Racing",
+     "energy": "more",
+     "weight": 1.0
+    },
+    {
+     "region": "stomach",
+     "sensationId": "butterflies",
+     "label": "Fluttery",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "throat",
+     "sensationId": "constriction",
+     "label": "Closing up",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "shoulders",
+     "sensationId": "raised_up",
+     "label": "Raised up",
+     "energy": "more",
+     "weight": 0.7
+    },
+    {
+     "region": "hands",
+     "sensationId": "shaking",
+     "label": "Shaky",
+     "energy": "more",
+     "weight": 0.6
+    },
+    {
+     "region": "legs",
+     "sensationId": "weakness",
+     "label": "Weak",
+     "energy": "less",
+     "weight": 0.5
+    }
+   ]
+  },
+  {
+   "id": "anger",
+   "label": "Anger",
+   "wordIds": [
+    "angry",
+    "bitter",
+    "mad",
+    "aggressive",
+    "frustrated",
+    "betrayed",
+    "resentful",
+    "disrespected",
+    "indignant",
+    "violated",
+    "furious",
+    "jealous",
+    "provoked",
+    "hostile",
+    "infuriated",
+    "annoyed"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "head",
+     "sensationId": "heat",
+     "label": "Hot",
+     "energy": "more",
+     "weight": 1.0
+    },
+    {
+     "region": "face",
+     "sensationId": "heat",
+     "label": "Hot",
+     "energy": "more",
+     "weight": 0.9
+    },
+    {
+     "region": "jaw",
+     "sensationId": "clenched",
+     "label": "Clenched",
+     "energy": "more",
+     "weight": 0.9
+    },
+    {
+     "region": "hands",
+     "sensationId": "clenched",
+     "label": "Clenched",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "chest",
+     "sensationId": "pressure",
+     "label": "Pressure",
+     "energy": "more",
+     "weight": 0.7
+    },
+    {
+     "region": "arms",
+     "sensationId": "tension",
+     "label": "Tight",
+     "energy": "more",
+     "weight": 0.6
+    }
+   ]
+  },
+  {
+   "id": "sadness",
+   "label": "Sadness",
+   "wordIds": [
+    "rejected",
+    "excluded",
+    "let_down",
+    "dismayed",
+    "disillusioned",
+    "bad",
+    "disappointed",
+    "awful",
+    "sad",
+    "lonely",
+    "vulnerable",
+    "despair",
+    "depressed",
+    "hurt",
+    "isolated",
+    "abandoned",
+    "victimized",
+    "fragile",
+    "grief",
+    "powerless"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "chest",
+     "sensationId": "heaviness",
+     "label": "Heavy",
+     "energy": "less",
+     "weight": 1.0
+    },
+    {
+     "region": "throat",
+     "sensationId": "lump",
+     "label": "A lump",
+     "energy": "less",
+     "weight": 0.8
+    },
+    {
+     "region": "arms",
+     "sensationId": "heaviness",
+     "label": "Heavy",
+     "energy": "less",
+     "weight": 0.6
+    },
+    {
+     "region": "legs",
+     "sensationId": "heaviness",
+     "label": "Heavy",
+     "energy": "less",
+     "weight": 0.6
+    },
+    {
+     "region": "head",
+     "sensationId": "pressure",
+     "label": "Pressure",
+     "energy": "more",
+     "weight": 0.5
+    }
+   ]
+  },
+  {
+   "id": "shame",
+   "label": "Shame",
+   "wordIds": [
+    "inadequate",
+    "inferior",
+    "worthless",
+    "insignificant",
+    "exposed",
+    "humiliated",
+    "ridiculed",
+    "embarrassed",
+    "ashamed"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "face",
+     "sensationId": "heat",
+     "label": "Hot",
+     "energy": "more",
+     "weight": 1.0
+    },
+    {
+     "region": "chest",
+     "sensationId": "sinking",
+     "label": "Sinking",
+     "energy": "less",
+     "weight": 0.7
+    },
+    {
+     "region": "stomach",
+     "sensationId": "sinking",
+     "label": "Sinking",
+     "energy": "less",
+     "weight": 0.7
+    },
+    {
+     "region": "shoulders",
+     "sensationId": "slumped",
+     "label": "Slumped",
+     "energy": "less",
+     "weight": 0.6
+    }
+   ]
+  },
+  {
+   "id": "guilt",
+   "label": "Guilt",
+   "wordIds": [
+    "guilty",
+    "remorseful"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "chest",
+     "sensationId": "heaviness",
+     "label": "Heavy",
+     "energy": "less",
+     "weight": 0.9
+    },
+    {
+     "region": "stomach",
+     "sensationId": "knotted",
+     "label": "Knotted",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "shoulders",
+     "sensationId": "heaviness",
+     "label": "Heavy",
+     "energy": "less",
+     "weight": 0.6
+    },
+    {
+     "region": "head",
+     "sensationId": "pressure",
+     "label": "Pressure",
+     "energy": "more",
+     "weight": 0.5
+    }
+   ]
+  },
+  {
+   "id": "disgust",
+   "label": "Disgust",
+   "wordIds": [
+    "critical",
+    "skeptical",
+    "dismissive",
+    "disgusted",
+    "disapproving",
+    "repelled",
+    "judgmental",
+    "appalled",
+    "revolted",
+    "nauseated",
+    "detestable",
+    "horrified"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "stomach",
+     "sensationId": "churning",
+     "label": "Churning",
+     "energy": "more",
+     "weight": 1.0
+    },
+    {
+     "region": "throat",
+     "sensationId": "constriction",
+     "label": "Closing up",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "face",
+     "sensationId": "tension",
+     "label": "Tight",
+     "energy": "more",
+     "weight": 0.6
+    }
+   ]
+  },
+  {
+   "id": "depleted",
+   "label": "Drained or numb",
+   "wordIds": [
+    "weak",
+    "distant",
+    "withdrawn",
+    "tired",
+    "bored",
+    "sleepy",
+    "unfocused",
+    "apathetic",
+    "indifferent",
+    "empty",
+    "numb"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "body",
+     "sensationId": "drained",
+     "label": "Drained",
+     "energy": "less",
+     "weight": 1.0
+    },
+    {
+     "region": "head",
+     "sensationId": "foggy",
+     "label": "Foggy",
+     "energy": "less",
+     "weight": 0.8
+    },
+    {
+     "region": "arms",
+     "sensationId": "heaviness",
+     "label": "Heavy",
+     "energy": "less",
+     "weight": 0.7
+    },
+    {
+     "region": "legs",
+     "sensationId": "heaviness",
+     "label": "Heavy",
+     "energy": "less",
+     "weight": 0.7
+    },
+    {
+     "region": "chest",
+     "sensationId": "hollow",
+     "label": "Hollow",
+     "energy": "less",
+     "weight": 0.6
+    }
+   ]
+  },
+  {
+   "id": "love",
+   "label": "Love and warmth",
+   "wordIds": [
+    "aroused",
+    "trusting",
+    "sensitive",
+    "intimate",
+    "loving",
+    "thankful",
+    "sympathetic",
+    "appreciative",
+    "tender"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "chest",
+     "sensationId": "warmth",
+     "label": "Warm",
+     "energy": "more",
+     "weight": 1.0
+    },
+    {
+     "region": "face",
+     "sensationId": "warmth",
+     "label": "Warm",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "body",
+     "sensationId": "warmth",
+     "label": "Warm",
+     "energy": "more",
+     "weight": 0.6
+    },
+    {
+     "region": "stomach",
+     "sensationId": "butterflies",
+     "label": "Fluttery",
+     "energy": "more",
+     "weight": 0.6
+    },
+    {
+     "region": "hands",
+     "sensationId": "tingly",
+     "label": "Tingly",
+     "energy": "more",
+     "weight": 0.5
+    }
+   ]
+  },
+  {
+   "id": "joy",
+   "label": "Joy",
+   "wordIds": [
+    "happy",
+    "interested",
+    "proud",
+    "accepted",
+    "powerful",
+    "optimistic",
+    "joyful",
+    "curious",
+    "inquisitive",
+    "successful",
+    "confident",
+    "respected",
+    "valued",
+    "courageous",
+    "creative",
+    "hopeful",
+    "inspired",
+    "good"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "chest",
+     "sensationId": "lightness",
+     "label": "Light",
+     "energy": "more",
+     "weight": 1.0
+    },
+    {
+     "region": "face",
+     "sensationId": "smiling",
+     "label": "Smiling",
+     "energy": "more",
+     "weight": 0.9
+    },
+    {
+     "region": "body",
+     "sensationId": "lightness",
+     "label": "Light",
+     "energy": "more",
+     "weight": 0.7
+    },
+    {
+     "region": "arms",
+     "sensationId": "energised",
+     "label": "Energised",
+     "energy": "more",
+     "weight": 0.6
+    },
+    {
+     "region": "legs",
+     "sensationId": "bouncy",
+     "label": "Bouncy",
+     "energy": "more",
+     "weight": 0.5
+    }
+   ]
+  },
+  {
+   "id": "excitement",
+   "label": "Excitement",
+   "wordIds": [
+    "playful",
+    "cheeky",
+    "excited",
+    "eager",
+    "energetic"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "stomach",
+     "sensationId": "fizzy",
+     "label": "Fizzy",
+     "energy": "more",
+     "weight": 1.0
+    },
+    {
+     "region": "chest",
+     "sensationId": "racing_heart",
+     "label": "Racing",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "hands",
+     "sensationId": "tingly",
+     "label": "Tingly",
+     "energy": "more",
+     "weight": 0.7
+    },
+    {
+     "region": "legs",
+     "sensationId": "bouncy",
+     "label": "Bouncy",
+     "energy": "more",
+     "weight": 0.7
+    },
+    {
+     "region": "body",
+     "sensationId": "energised",
+     "label": "Energised",
+     "energy": "more",
+     "weight": 0.6
+    }
+   ]
+  },
+  {
+   "id": "surprise",
+   "label": "Surprise",
+   "wordIds": [
+    "surprised",
+    "startled",
+    "confused",
+    "amazed",
+    "shocked",
+    "perplexed",
+    "astonished",
+    "awe"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "chest",
+     "sensationId": "racing_heart",
+     "label": "Racing",
+     "energy": "more",
+     "weight": 0.8
+    },
+    {
+     "region": "head",
+     "sensationId": "buzzing",
+     "label": "Buzzing",
+     "energy": "more",
+     "weight": 0.7
+    },
+    {
+     "region": "stomach",
+     "sensationId": "butterflies",
+     "label": "Fluttery",
+     "energy": "more",
+     "weight": 0.6
+    }
+   ]
+  },
+  {
+   "id": "calm",
+   "label": "Calm",
+   "wordIds": [
+    "calm",
+    "relaxed",
+    "peaceful",
+    "content",
+    "chill",
+    "comfortable",
+    "thoughtful",
+    "mellow",
+    "serene",
+    "secure",
+    "satisfied",
+    "restful",
+    "at_ease",
+    "balanced",
+    "grounded",
+    "cozy",
+    "humble"
+   ],
+   "status": "draft",
+   "places": [
+    {
+     "region": "shoulders",
+     "sensationId": "loose",
+     "label": "Loose",
+     "energy": "less",
+     "weight": 1.0
+    },
+    {
+     "region": "chest",
+     "sensationId": "easy_breathing",
+     "label": "Breathing easy",
+     "energy": "less",
+     "weight": 0.9
+    },
+    {
+     "region": "stomach",
+     "sensationId": "settled",
+     "label": "Settled",
+     "energy": "less",
+     "weight": 0.8
+    },
+    {
+     "region": "feet",
+     "sensationId": "groundedness",
+     "label": "Grounded",
+     "energy": "less",
+     "weight": 0.6
+    },
+    {
+     "region": "jaw",
+     "sensationId": "loose",
+     "label": "Loose",
+     "energy": "less",
+     "weight": 0.6
+    }
+   ]
+  }
+ ]
+}
