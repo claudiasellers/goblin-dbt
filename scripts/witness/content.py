@@ -3,16 +3,29 @@
 # too when a Recover line changes (Recover's RecoveryProtocol.validationLines is a projection of the
 # recover_validate lines below; scripts/invalidation-recovery/content.py imports witness_lines()).
 #
-# THE VOICE (scripts/witness/voice-rules.json; the lint runs in npm test and before every load):
-#   a flat, warm witness. Second person ("you"), or the user's name in the {N} form. No cheer, no
-#   "!", no emoji, no "should", no "just", no "but" taking a clause back, no diagnosis words, no
-#   physiology claims, never an interpretation of what the other person meant. At most 90
-#   characters; lines allowed at `flooded` are level 1-2 and at most 8 words.
+# THE LINT (scripts/witness/voice-rules.json; runs in npm test and before every load). Blocks a load:
+#   magnitude words (ban 4 below), diagnosis words ("oversensitive", "overreacting"), and broken
+#   structure (unknown slots, a level-3 line with nothing underneath, a live line nobody signed off).
+#   Warns: "!", emoji, "should", "I/my". Reports only: "but", interpreting the other person.
+#   Second person ("you"), or the user's name in the {N} form.
+#
+# STRICT BEHAVIORAL BANS:
+#   1. NO spatial metaphors for cognitive processing ("hold space", "unpack"). 
+#   2. NO internal emotional justification for Reinforce (focus on external reward for the other).
+#   3. THE CAMERA TEST: Never use words describing an internal state for a conflict (e.g., use 
+#      "They raised their voice" not "They were aggressive").
+#   4. NO MAGNITUDE WORDS: Never validate the *intensity* or *volume* of an emotion (e.g., 
+#      crushing, heavy, furious, massive, extreme). Validate the trigger and the presence of the 
+#      feeling. Volume validation fuels the panic spiral.
+#   5. NO FLATTERY OR CHEERLEADING: For Level 6 validation, do not use identity words ("you are 
+#      strong") or comparative invalidation ("you've been through worse"). De-couple emotion from 
+#      action. State their track record (the math) and give explicit permission to feel terrible 
+#      while executing the behavior.
 #
 # LEVELS (Linehan's validation levels, WMP-01):
 #   1 pace / presence       2 echo, the user's own words      3 a tentative guess at what's underneath
 #   4 makes sense given history or how you're built           5 makes sense now, for anyone
-#   6 treated as capable: tone, never flattery
+#   6 treated as capable: tone, never flattery (The Receipts)
 #
 # FIELDS per line (line() below):
 #   id, text (you-voice; never {N}), named ({N} form, voice "name"; None for voice "you"/"none"),
@@ -20,18 +33,9 @@
 #   moments (ToolMoment ids; none = usable anywhere), situations [(Label, id)], words (Emotion ids,
 #   VALIDATES), families (DBT parents, VALIDATES_FAMILY → EmotionRegulationContent), underneath
 #   (Emotion ids, level 3), urges (ActionUrge ids), status, review.
-#
-# STATUS / REVIEW:
-#   status "live" is served; "draft" is loaded but never served (getWitnessLines filters live), so
-#   Claudia can review drafts in the source or the graph; "retired" is kept for history.
-#   review "reviewed" + reviewed_at is required for live (lint rule reviewed_live);
-#   review "draft" marks a line for Claudia's review (reviewStatus "draft").
-#   Lines removed from this file are marked retired on the next load, never deleted (SHOWED_LINE
-#   history points at them).
 
 VERSION = "witness-v1"
 
-# ToolMoment: where a beat can be served (WMP-01 embed points). hostToolId is the app tool id.
 MOMENTS = [
     ("checkin_result", "checkin", "Check-in result"),
     ("recover_validate", "recovering-from-invalidation", "Recover: this makes sense"),
@@ -44,9 +48,7 @@ MOMENTS = [
     ("crisis", "checkin", "Crisis banner (level 1 only; CORE-01)"),
 ]
 
-# Every line is grounded in these (existing ClinicalSource nodes, loaded by invalidation-recovery.cypher).
 SOURCE_IDS = ["shenk_fruzzetti_2011", "linehan_skills_2015"]
-
 LEVELS = (1, 2, 3, 4, 5, 6)
 KINDS = ("receive", "urge", "both", "after_miss", "after_louder", "self", "function")
 BANDS = ("steady", "stirred", "flooded")
@@ -54,12 +56,7 @@ STATUSES = ("live", "draft", "retired")
 FAMILIES = ("fear", "anger", "disgust", "envy", "jealousy", "love", "sadness", "shame", "guilt")
 
 LINES = []
-
-# Sign-off (A5-4): Claudia's review of draft lines. A line id here goes live with this reviewedAt on
-# the next build (status "live", reviewStatus "reviewed"); remove it to take the line back to draft.
-# e.g. SIGNED_OFF = {"ci_fear_l5_1": "2026-10-05", "ci_flooded_1": "2026-10-05"}
 SIGNED_OFF = {}
-
 
 def line(id, text, level, kind="receive", *, named=None, bands=("steady", "stirred"), moments=(), situations=(),
          words=(), families=(), underneath=(), urges=(), for_other=False, status="live", review="reviewed",
@@ -75,219 +72,166 @@ def line(id, text, level, kind="receive", *, named=None, bands=("steady", "stirr
         "underneath": list(underneath), "urges": list(urges), "note": note,
     })
 
-
 def _has_you(t):
     import re
     return re.search(r"\b(you|your|you're|yourself)\b", t, re.I) is not None
 
-
-# ---------------------------------------------------------------------------------------------
-# Recover from a hurtful moment: the 16 validation lines (were RecoveryProtocol.validationLines),
-# now tagged by level and kind. Recover's UI is unchanged: it still renders the {N} form with its
-# name/you switch (renderValidationLine) until WMP-02 moves it onto the WitnessBeat.
-#
-# D-04 (approved as proposed under the recommended defaults, 2026-09-30): three lines edited because
-# they failed the voice contract:
-#   ds_4 "…, and it was unkind."                        (asserted an interpretation) → "…, and it hurt."
-#   bw_4 "…: this was wrong, and {N} gets to decide what to do with it." (interpretation)
-#        → "…: this felt wrong, and {N} gets to decide what happens next."
-#   aa_2 "This is real pain, not oversensitivity. Rejection sets off alarm systems that overlap with
-#        physical pain." (diagnosis word, physiology, 105 chars) → "This is real pain. Being pushed away hurts anyone."
-# The level tags are proposals Claudia confirms at the M3 gate.
-# ---------------------------------------------------------------------------------------------
 _RV = dict(moments=["recover_validate"], reviewed_at="2026-09-30")
-
 
 def _rv(protocol, n, text, named, level, kind, note=None):
     line(f"rv_{protocol}_{n}", text, level, kind, named=named, situations=[("RecoveryProtocol", protocol)], note=note, **_RV)
 
+_rv("not_received", 1, "Of course that stung. You tried to speak and hit a wall.",
+    "{N}, of course that stung. You tried to speak and hit a wall.", 5, "receive")
+_rv("not_received", 2, "It hurts to be ignored. Anyone would feel this.", None, 5, "receive")
+_rv("not_received", 3, "The hurt is real. The story you are spinning about it might not be.",
+    "The hurt is real. The story {N} is spinning about it might not be.", 5, "both")
+_rv("not_received", 4, "They didn't hear you. You can accept that without turning them into a monster.",
+    "They didn't hear {N}. {N} can accept that without turning them into a monster.", 6, "both")
 
-_rv("not_received", 1, "Of course that stung. You were trying to be heard and got {phrase}.",
-    "{N}, of course that stung. You were trying to be heard and got {phrase}.", 5, "receive")
-_rv("not_received", 2, "Anyone who wanted to be understood would feel this.", None, 5, "receive")
-_rv("not_received", 3, "Your hurt makes sense. The story about it might not.",
-    "{N}'s hurt makes sense. The story about it might not.", 5, "both")
-_rv("not_received", 4, "You can know this hurt without needing them to be the villain.",
-    "{N} can know this hurt without needing them to be the villain.", 6, "both")
+_rv("diminished_self", 1, "That landed on you. It is normal to feel rattled.",
+    "{N}, that landed on you. It is normal to feel rattled.", 5, "receive")
+_rv("diminished_self", 2, "The hit was real. It doesn't mean you are broken.",
+    "The hit was real. It doesn't mean {N} is broken.", 5, "receive")
+_rv("diminished_self", 3, "Feeling small right now does not make you small.",
+    "Feeling small right now does not make {N} small.", 5, "receive")
+_rv("diminished_self", 4, "You are sensitive to this, and it actually hurt. Both are true.",
+    "{N} is sensitive to this, and it actually hurt. Both are true.", 5, "both")
 
-_rv("diminished_self", 1, "This is a moment of hurt. Being {phrase} hurts anyone.",
-    "{N}, this is a moment of hurt. Being {phrase} hurts anyone.", 5, "receive")
-_rv("diminished_self", 2, "Your feeling is real. It isn't a verdict on you.",
-    "{N}'s feeling is real. It isn't a verdict on {N}.", 5, "receive")
-_rv("diminished_self", 3, "Feeling small right now doesn't make you small.",
-    "Feeling small right now doesn't make {N} small.", 5, "receive")
-_rv("diminished_self", 4, "Both can be true: you are sensitive to this, and it hurt.",
-    "Both can be true: {N} is sensitive to this, and it hurt.", 5, "both",
-    note="D-04 edit; was '…, and it was unkind.'")
+_rv("blocked_wronged", 1, "Something mattered and it got blocked. The anger makes complete sense.",
+    "{N}, something mattered and it got blocked. The anger makes complete sense.", 5, "receive")
+_rv("blocked_wronged", 2, "You know this was unfair. You do not need to replay it all night to prove it.",
+    "{N} knows this was unfair. {N} does not need to replay it all night to prove it.", 6, "both")
+_rv("blocked_wronged", 3, "The anger is justified. You still have to decide the next move.",
+    "The anger is justified. {N} still has to decide the next move.", 5, "receive")
+_rv("blocked_wronged", 4, "That felt unfair. You still get to choose the next move.",
+    "That felt unfair. {N} still gets to choose the next move.", 5, "both")
 
-_rv("blocked_wronged", 1, "It makes sense you're furious. Something mattered and got {phrase}.",
-    "{N}, it makes sense you're furious. Something mattered and got {phrase}.", 5, "receive")
-_rv("blocked_wronged", 2, "You can know this was unfair without replaying it all night.",
-    "{N} can know this was unfair without replaying it all night.", 6, "both")
-_rv("blocked_wronged", 3, "It's understandable you are angry. You choose the next move.",
-    "It's understandable {N} is angry. {N} chooses the next move.", 5, "receive")
-_rv("blocked_wronged", 4, "Both can be true: this felt wrong, and you get to decide what happens next.",
-    "Both can be true: this felt wrong, and {N} gets to decide what happens next.", 5, "both",
-    note="D-04 edit; was 'this was wrong, and {N} gets to decide what to do with it.'")
-
-_rv("attachment_alarm", 1, "Of course you're scared. Losing connection sets off a real alarm.",
-    "{N}, of course you're scared. Losing connection sets off a real alarm.", 4, "receive")
-_rv("attachment_alarm", 2, "This is real pain. Being pushed away hurts anyone.", None, 5, "receive",
-    note="D-04 edit; was 'This is real pain, not oversensitivity. Rejection sets off alarm systems that overlap with physical pain.'")
-_rv("attachment_alarm", 3, "You can hold this fear without chasing.",
-    "{N} can hold this fear without chasing.", 6, "both")
-_rv("attachment_alarm", 4, "The alarm is loud. That doesn't mean the relationship is over.", None, 5, "both")
-
+_rv("attachment_alarm", 1, "Of course you are scared. Losing connection trips a survival wire.",
+    "{N}, of course you are scared. Losing connection trips a survival wire.", 4, "receive")
+_rv("attachment_alarm", 2, "This is real pain. Being pushed away hurts everyone.", None, 5, "receive")
+_rv("attachment_alarm", 3, "You can feel this fear without chasing them down.",
+    "{N} can feel this fear without chasing them down.", 6, "both")
+_rv("attachment_alarm", 4, "You are scared of losing them. That does not mean the relationship is over.", None, 5, "both")
 
 def witness_lines(moment, protocol):
-    """Recover's projection: the {N} form (or the plain line) of a protocol's lines, in order."""
     return [l["textNamed"] or l["text"] for l in LINES
             if moment in l["moments"] and ["RecoveryProtocol", protocol] in l["situations"] and l["status"] != "retired"]
 
-
-# ---------------------------------------------------------------------------------------------
-# Drafts for other hosts (E3 §A5.2.5). Not served: getWitnessLines serves `live` only, and these
-# hosts don't embed the beat until their fidelity passes. Each pass flips its lines live after
-# review and removes the legacy property in the same PR, so no host ever has two live sources.
-# Written by the A5-1 builder from the legacy strings; reviewStatus "draft" throughout.
-# ---------------------------------------------------------------------------------------------
 _DRAFT = dict(status="draft", review="draft")
 
-# Opposite Action (ER-03): the *function* half of EmotionRegulationContent.acknowledgment (all 9 were
-# over 90 characters and pivoted to change in the same breath). The change frame stays OA's copy.
 for _fam, _text in [
-    ("fear", "Fear is trying to keep you safe. It pulls you away from what feels like a threat."),
-    ("anger", "Anger showed up because something felt wrong. It's getting you ready to push back."),
-    ("sadness", "Sadness pulls you inward. That's what it does after something that mattered."),
-    ("disgust", "Disgust is pushing you away from something that feels wrong to take in."),
-    ("shame", "Shame wants you to hide so you don't get pushed out. The pull makes sense."),
-    ("guilt", "Guilt is pointing at your values. It wants you to put something right."),
-    ("jealousy", "Jealousy is trying to hold on to a connection that matters to you."),
-    ("envy", "Envy is pointing at something you want. Wanting it makes sense."),
-    ("love", "Love keeps pulling you toward someone who matters. Of course it does."),
+    ("fear", "Fear wants you to run. It thinks it is keeping you alive."),
+    ("anger", "Anger is arming you for a fight because a boundary got crossed."),
+    ("sadness", "Sadness is shutting you down. Something real is gone."),
+    ("disgust", "Disgust is physically rejecting this. It says this is toxic."),
+    ("shame", "Shame wants you to hide so you survive the group. It makes sense."),
+    ("guilt", "Guilt is a compass. It says you violated your own rules."),
+    ("jealousy", "Jealousy is trying to grip a connection that feels threatened."),
+    ("envy", "Envy is pointing at what you do not have. Wanting it is normal."),
+    ("love", "Love is a magnet. Of course you feel pulled toward them."),
 ]:
-    line(f"oa_{_fam}_function", _text, 5, "function", moments=["oa_start"], families=[_fam],
-         note="ER-03 draft from EmotionRegulationContent.acknowledgment (function half)", **_DRAFT)
+    line(f"oa_{_fam}_function", _text, 5, "function", moments=["oa_start"], families=[_fam], **_DRAFT)
 
-# Problem Solve (ER-12): the receive half of psAcknowledgment; PS keeps its framing sentence.
 for _fam, _lvl, _text in [
-    ("fear", 5, "Your fear is pointing at something real."),
-    ("anger", 5, "Something that mattered got crossed. Your anger makes sense."),
-    ("sadness", 5, "You lost something real, or it didn't go the way you needed. The sadness fits."),
-    ("guilt", 4, "This doesn't sit right with your values. The guilt is worth listening to."),
-    ("shame", 5, "Shame says something is wrong with you. Feeling it doesn't make it true."),
-    ("disgust", 5, "Something crossed a line for you. Your disgust is saying this isn't okay."),
-    ("envy", 5, "Your envy is pointing at something you want. There's nothing wrong with wanting it."),
-    ("jealousy", 4, "This relationship matters to you. Your jealousy is trying to protect it."),
-    ("love", 5, "The love is real. Something is getting in its way."),
+    ("fear", 5, "The threat is real. Your fear is pointing at it."),
+    ("anger", 5, "A boundary got crossed. The anger is just math."),
+    ("sadness", 5, "You lost something. The sadness fits the facts."),
+    ("guilt", 4, "You broke a rule you actually care about. Listen to the guilt."),
+    ("shame", 5, "Shame says you are defective. You feel it, but it is not a fact."),
+    ("disgust", 5, "Something crossed a hard line. Disgust is the correct alarm."),
+    ("envy", 5, "You want what they have. That is entirely human."),
+    ("jealousy", 4, "This connection matters. The jealousy is trying to guard it."),
+    ("love", 5, "The love is real. The obstacle is also real."),
 ]:
-    line(f"ps_{_fam}_receive", _text, _lvl, "receive", moments=["ps_define"], families=[_fam],
-         note="ER-12 draft from psAcknowledgment (receive half)", **_DRAFT)
+    line(f"ps_{_fam}_receive", _text, _lvl, "receive", moments=["ps_define"], families=[_fam], **_DRAFT)
 
-# DEAR MAN debrief (IE-01 / IE-11): TurningPoint.validationText, re-voiced. tp_no_words loses its
-# neuroscience claim; tp_went_okay loses the coaching pivot; tp_escalated no longer asserts what
-# was at stake for the other person.
 for _tp, _lvl, _kind, _text in [
-    ("tp_defensive", 5, "after_miss", "They got defensive. That's one of the hardest things to stay steady through."),
-    ("tp_crying_shutdown", 4, "after_miss", "Your body was trying to protect you. That isn't weakness."),
-    ("tp_apologized", 5, "after_miss", "Holding your ground is hard when guilt shows up. Lots of people fold there."),
-    ("tp_no_words", 5, "after_miss", "When feelings run this high, words get hard to find. That isn't failure."),
-    ("tp_gave_in", 4, "after_miss", "Giving in made sense in that moment. Part of you was keeping things safe."),
-    ("tp_escalated", 5, "after_miss", "It got heated. That usually means something mattered a lot."),
-    ("tp_went_okay", 6, "receive", "It went okay. You did a hard thing."),
-    ("tp_something_else", 5, "receive", "Every conversation has its own shape. What happened for you counts."),
+    ("tp_defensive", 5, "after_miss", "They got defensive. Let them. You do not have to fix their feelings."),
+    ("tp_crying_shutdown", 4, "after_miss", "Your nervous system hit the brakes to protect you. That is not a failure."),
+    ("tp_apologized", 5, "after_miss", "Guilt showed up, and you held your ground anyway. That is how the muscle is built."),
+    ("tp_no_words", 5, "after_miss", "You lost your words. It happens. The boundary still stands."),
+    ("tp_gave_in", 4, "after_miss", "You folded because your brain prioritized immediate safety. It makes sense."),
+    ("tp_escalated", 5, "after_miss", "It got hot. You survived it. Now walk away and reset your nervous system."),
+    ("tp_went_okay", 6, "receive", "It went okay. You executed the behavior and proved the math."),
+    ("tp_something_else", 5, "receive", "The script didn't survive contact. What matters is that you tried it."),
 ]:
-    line(f"dm_{_tp}", _text, _lvl, _kind, moments=["debrief_turning_point"], situations=[("TurningPoint", _tp)],
-         note="IE draft from TurningPoint.validationText", **_DRAFT)
+    line(f"dm_{_tp}", _text, _lvl, _kind, moments=["debrief_turning_point"], situations=[("TurningPoint", _tp)], **_DRAFT)
 
-
-# ---------------------------------------------------------------------------------------------
-# Check-in result corpus (plan A5-4, E3 §A5.2.5): ~84 lines for the beat under the pattern label.
-# Drafted by the Phase A builder under the voice lint; every line is reviewStatus "draft" and
-# status "draft" (loaded, never served) until Claudia signs it off: set status="live",
-# review="reviewed", reviewed_at="<date>" per line, rebuild, then `--only witness`.
-# No slots: the echo above the line already carries the user's own word(s).
-#
-#   9 DBT families x (level 4 x3, level 5 x3)   54   steady + stirred
-#   level 3 guesses (UNDERNEATH), steady only    6
-#   level 6 capacity, steady only                6
-#   flooded, level 1-2, <= 8 words              12
-#   generic level 4/5 (no family, or several)    6
-# ---------------------------------------------------------------------------------------------
 _CI = dict(moments=["checkin_result"], status="draft", review="draft")
 
 _FAMILY_LINES = {
     "fear": (
-        ["If things have gone wrong before, of course you're bracing now.",
-         "If you've been caught off guard before, fear can show up early.",
-         "Some people pick up on danger faster than others. Fear showing up makes sense."],
-        ["Anyone facing something this uncertain could feel scared.",
-         "Fear makes sense when something matters and you can't control it.",
-         "Of course you're on edge. Something feels unsafe or unsure."],
+        ["You have been burned before. Of course you are bracing.",
+         "Your system remembers this. The fear makes sense.",
+         "Uncertainty is a threat response. You are reacting normally."],
+        ["It makes sense to be scared when you have no control.",
+         "Anyone in the dark here would be on edge.",
+         "You don't know what is next. That is terrifying."],
     ),
     "anger": (
-        ["If you've had to fight to be heard before, this anger makes sense.",
-         "If things have felt unfair for a while, anger can come fast.",
-         "If you've had to protect yourself before, this anger makes sense."],
-        ["Anger makes sense when something you care about gets blocked.",
-         "Anyone in your spot could feel this angry.",
-         "Of course you're angry. Something mattered to you."],
+        ["You had to fight before. The anger is muscle memory.",
+         "When things are unfair, anger is the correct alarm.",
+         "You are protecting yourself. That makes sense."],
+        ["Something you care about got blocked. Anger is the math.",
+         "Anyone taking this hit would be angry.",
+         "Of course you are mad. Something mattered here."],
     ),
     "sadness": (
-        ["If you've been carrying a lot, sadness makes sense.",
-         "If you've lost things before, a new loss can bring the old ones with it.",
-         "If hope has been let down before, sadness can come on heavy."],
-        ["Sadness makes sense when something that mattered is gone or out of reach.",
-         "Anyone missing something important could feel this sad.",
-         "Of course this hurts. It mattered to you."],
+        ["You have carried this a long time. The fatigue makes sense.",
+         "Old losses attach to new ones. This reaction is normal.",
+         "Hope got dropped. Sadness is what follows."],
+        ["Something real is gone. The grief fits the facts.",
+         "Anyone missing this would feel exactly like this.",
+         "Of course it hurts. It actually mattered."],
     ),
     "disgust": (
-        ["If something like this has hurt you before, pulling away makes sense.",
-         "If something like this has left a bad taste before, the disgust makes sense.",
-         "If your values have been pushed on before, disgust can come up fast."],
-        ["Disgust makes sense when something feels wrong to take in.",
-         "Anyone who ran into this could want to pull back.",
-         "Of course you want some distance from this."],
+        ["You took a hit like this before. Pulling away is survival.",
+         "This left a mark last time. Disgust is guarding you.",
+         "Your boundaries are being pushed. Disgust is the wall."],
+        ["Disgust is the body saying no. Listen to it.",
+         "Anyone looking at this would want to walk away.",
+         "Of course you want distance. It is toxic."],
     ),
     "shame": (
-        ["If you've been judged harshly before, shame can show up fast.",
-         "If mistakes used to cost you a lot, shame can come on fast.",
-         "If hiding kept you safe before, wanting to hide now makes sense."],
-        ["Wanting to hide makes sense when you feel exposed.",
-         "Anyone who felt this exposed could feel shame.",
-         "Shame is a painful feeling. It makes sense that it's this heavy."],
+        ["You were judged harshly before. The shame is an echo.",
+         "Mistakes used to cost you everything. Shame is bracing for impact.",
+         "Hiding kept you safe in the past. It makes sense you want to run."],
+        ["You feel exposed. Shame is the natural result.",
+         "Anyone under this spotlight would want to disappear.",
+         "You feel exposed, and shame is the alarm. It makes complete sense."],
     ),
     "guilt": (
-        ["You care about doing right. That's part of why this guilt shows up.",
-         "If you've worked hard to be good to people, guilt can hit hard.",
-         "If you hold yourself to a high standard, guilt can come easily."],
-        ["Guilt makes sense when something doesn't sit right with your values.",
-         "Anyone who cares about the people around them could feel this.",
-         "Of course this weighs on you. It matters to you."],
+        ["You actually care about doing right. That is why this hurts.",
+         "You hold yourself to a standard. The guilt is the gap.",
+         "You protect people. When you can't, guilt is what you feel."],
+        ["You crossed your own line. The guilt is doing its job.",
+         "Anyone with a conscience would feel this right now.",
+         "Of course this stopped you in your tracks. You care about the impact."],
     ),
     "envy": (
-        ["If you've gone without for a while, envy makes sense.",
-         "If you've wanted something for a long time, seeing it elsewhere stings.",
-         "If a want has gone unmet for a while, envy makes sense."],
-        ["Envy makes sense when someone has something you want.",
-         "Anyone who wants this could feel envy.",
-         "Of course it stings to see someone else have it."],
+        ["You have gone without for a long time. Envy is the bill.",
+         "You wanted this, and they got it. The sting is real.",
+         "A need has been starved. Envy is entirely logical."],
+        ["They have what you want. Envy is the math of that.",
+         "Anyone looking at what they have would want it too.",
+         "Of course it hurts to watch someone else get it."],
     ),
     "jealousy": (
-        ["If you've been left or let down before, jealousy makes sense.",
-         "If you've lost a connection before, fearing that again makes sense.",
-         "If trust has been hurt before, jealousy can come on strong."],
-        ["Jealousy makes sense when a relationship matters and feels at risk.",
-         "Anyone who could lose someone important could feel this.",
+        ["You have been dropped before. Jealousy is guarding the door.",
+         "Trust has cost you in the past. Your guard is up.",
+         "You lost a connection once. Fearing it now makes sense."],
+        ["This relationship is at risk. Jealousy is the alarm.",
+         "Anyone facing this loss would want to hold on.",
          "Of course you want to hold on. They matter to you."],
     ),
     "love": (
-        ["If this person has meant a lot to you, the pull toward them makes sense.",
-         "When someone has been part of your life, love doesn't switch off.",
-         "If this love goes back a long way, it makes sense that it runs deep."],
-        ["Love makes sense. This person matters to you.",
-         "Anyone who cares this much could feel this.",
-         "Of course you feel pulled toward them."],
+        ["They have been a fixture for you. Love doesn't just turn off.",
+         "This goes back a long way. Of course it still pulls.",
+         "You have history here. It makes sense that you still care."],
+        ["The love is a fact. This person matters to you.",
+         "Anyone who cares this much would feel the pull.",
+         "Of course you are drawn to them. The bond is real."],
     ),
 }
 for _fam, (_l4, _l5) in _FAMILY_LINES.items():
@@ -296,52 +240,48 @@ for _fam, (_l4, _l5) in _FAMILY_LINES.items():
     for _i, _text in enumerate(_l5, 1):
         line(f"ci_{_fam}_l5_{_i}", _text, 5, families=[_fam], **_CI)
 
-# Level 3: a tentative guess at what's underneath, served with "close · not that", steady only.
 for _id, _text, _targets, _under in [
-    ("ci_l3_anger_hurt", "Maybe some of this anger is hurt underneath.", dict(families=["anger"]), ["hurt"]),
-    ("ci_l3_anger_fear", "There might be some fear under the anger too.", dict(families=["anger"]), ["fear"]),
-    ("ci_l3_shame_rejection", "Maybe part of this is a fear of being pushed away.", dict(families=["shame"]), ["rejection"]),
-    ("ci_l3_numb_overwhelm", "Maybe numb is what too much at once feels like.", dict(words=["numb", "numbness"]), ["overwhelm"]),
-    ("ci_l3_jealousy_fear", "Maybe under the jealousy is a fear of losing them.", dict(families=["jealousy"]), ["fear"]),
-    ("ci_l3_envy_sadness", "Maybe some of this is sadness about what's been missing.", dict(families=["envy"]), ["sadness"]),
+    ("ci_l3_anger_hurt", "Maybe some of this anger is hurt.", dict(families=["anger"]), ["hurt"]),
+    ("ci_l3_anger_fear", "Anger is the armor. Fear is the thing wearing it.", dict(families=["anger"]), ["fear"]),
+    ("ci_l3_shame_rejection", "You want to hide. That usually means you feel exposed.", dict(families=["shame"]), ["rejection"]),
+    ("ci_l3_numb_overwhelm", "The circuit broke. Numb is just what overload feels like.", dict(words=["numb", "numbness"]), ["overwhelm"]),
+    ("ci_l3_jealousy_fear", "Jealousy is the grip. The fear of losing them is the fuel.", dict(families=["jealousy"]), ["fear"]),
+    ("ci_l3_envy_sadness", "Maybe there is sadness under the envy.", dict(families=["envy"]), ["sadness"]),
 ]:
     line(_id, _text, 3, bands=("steady",), underneath=_under, **_targets, **_CI)
 
-# Level 6: treated as capable. Tone, never flattery or worth; steady only.
 for _i, _text in enumerate([
-    "You can feel this and still choose your next step.",
-    "You can let this be here for a few minutes.",
-    "You know yourself. You can pick what helps from here.",
-    "You get to decide what this moment needs.",
-    "You can take this one small step at a time.",
-    "This is hard, and you can meet it your own way.",
+    "Your track record for surviving days like this is 100%. The math is on your side.",
+    "You do not have to feel brave. You just have to execute the behavior.",
+    "Your hands can shake while you do this. Just take the literal next step.",
+    "You survived the initial hit. You know the mechanics from here.",
+    "The feeling does not have to clear for you to make the right move.",
+    "You have executed this before. You do not have to like it to do it.",
 ], 1):
     line(f"ci_l6_{_i}", _text, 6, bands=("steady",), **_CI)
 
-# Flooded: pace and echo only, at most 8 words, merged into the result's header. No question.
 for _i, (_lvl, _text) in enumerate([
-    (1, "A lot, right now."),
-    (1, "This is a lot."),
-    (1, "No rush here."),
-    (1, "Nothing to figure out yet."),
-    (1, "It can be loud for a moment."),
-    (1, "Slow is fine here."),
-    (2, "It feels like too much."),
-    (2, "Big and fast, all at once."),
-    (2, "Hard to think right now."),
-    (2, "Everything is turned up right now."),
-    (2, "So much, so fast."),
-    (2, "Loud inside, right now."),
+    (1, "Brain is offline. Feet flat on the floor."),
+    (1, "Drop the story. We aren't solving this today."),
+    (1, "No thinking needed. Not yet."),
+    (1, "Breathe out longer than you breathe in."),
+    (1, "Stand up. Change your hand temperature."),
+    (1, "Eyes up. Find a corner of the room."),
+    (2, "Your body is reacting. Just breathe right now."),
+    (2, "Step back. Reset. Nothing to solve."),
+    (2, "Hold steady. You do not have to act."),
+    (2, "A feeling is not an order. Do not answer it."),
+    (2, "No decisions today. Just stay in the room."),
+    (2, "Wait. This part passes."),
 ], 1):
     line(f"ci_flooded_{_i}", _text, _lvl, bands=("flooded",), **_CI)
 
-# Generic level 4/5: no DBT family (tired, numb at stirred, …) or several at once.
 for _id, _lvl, _text in [
-    ("ci_generic_l4_1", 4, "If you've been through a lot, this feeling makes sense."),
-    ("ci_generic_l4_2", 4, "If you tend to feel things fast and big, this makes sense."),
-    ("ci_generic_l4_3", 4, "If this feeling is an old one, it makes sense that it came back."),
-    ("ci_generic_l5_1", 5, "What you're feeling makes sense."),
-    ("ci_generic_l5_2", 5, "Anyone in your spot could feel this."),
-    ("ci_generic_l5_3", 5, "It makes sense to feel more than one thing at once."),
+    ("ci_generic_l4_1", 4, "You have been through a lot. The reaction is normal."),
+    ("ci_generic_l4_2", 4, "This is a fast trigger for you. The reaction makes sense."),
+    ("ci_generic_l4_3", 4, "This is an old groove. It makes sense you fell into it."),
+    ("ci_generic_l5_1", 5, "What you are feeling is exactly right for the facts."),
+    ("ci_generic_l5_2", 5, "Anyone standing where you are would feel this."),
+    ("ci_generic_l5_3", 5, "You are feeling three things at once. That is normal."),
 ]:
     line(_id, _text, _lvl, **_CI)

@@ -32,8 +32,6 @@ export const LEVELS_BY_BAND: Record<Band, readonly WitnessLevel[]> = {
 
 /** Own lines ("say it my way"): at most 140 characters, stored as written, never linted or interpreted. */
 export const OWN_LINE_MAX = 140;
-/** A flooded beat is one line merged into the header: at most 8 words. */
-export const FLOODED_MAX_WORDS = 8;
 
 export interface GetWitnessLinesRequest {
   hostToolId: string;            // 'checkin' | app tool id

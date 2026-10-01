@@ -14,7 +14,7 @@
  */
 import type { Band } from '../capacity/types';
 import {
-  FLOODED_MAX_WORDS, LEVELS_BY_BAND,
+  LEVELS_BY_BAND,
   type FadeStage, type LineKind, type WitnessLevel, type WitnessLine,
 } from './types';
 
@@ -87,11 +87,8 @@ export function askLandedOf(band: Band, h: UserHistory | null): boolean {
   return (h.serves + 1) % 5 === 0;
 }
 
-const wordCount = (t: string) => t.trim().split(/\s+/).filter(Boolean).length;
-
 /** Own lines that fit this beat: same situation, or a shared emotion, or (no target) the same moment. */
 function ownMatches(o: OwnCandidate, input: RankInput): boolean {
-  if (input.band === 'flooded' && wordCount(o.text) > FLOODED_MAX_WORDS) return false;
   if (input.excludeIds.includes(o.id)) return false;
   if (input.situationId && o.situationId === input.situationId) return true;
   if (o.emotionIds.some((e) => input.emotionIds.includes(e))) return true;
@@ -133,7 +130,6 @@ export function orderGraph(input: RankInput): GraphCandidate[] {
   ];
   return input.candidates
     .filter((c) => levels.includes(c.level) && !input.excludeIds.includes(c.id))
-    .filter((c) => input.band !== 'flooded' || wordCount(c.text) <= FLOODED_MAX_WORDS)
     .sort((a, b) => cmp(key(a), key(b)));
 }
 

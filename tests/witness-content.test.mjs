@@ -95,7 +95,7 @@ test("every line has a moment or a target (no accidental everywhere-lines)", () 
   }
 });
 
-test("Recover: 16 live, reviewed lines (4 per protocol) with the three D-04 edits", () => {
+test("Recover: 16 live, reviewed lines (4 per protocol), Claudia's rewrite (2026-10-01)", () => {
   const rv = rows.filter((r) => targetsOf("FOR_MOMENT", r.id).includes("recover_validate"));
   assert.equal(rv.length, 16);
   for (const r of rv) {
@@ -104,10 +104,9 @@ test("Recover: 16 live, reviewed lines (4 per protocol) with the three D-04 edit
     assert.equal(targetsOf("FOR_SITUATION", r.id).length, 1, r.id);
   }
   const texts = rv.map((r) => r.textNamed ?? r.text);
-  assert.ok(texts.includes("Both can be true: {N} is sensitive to this, and it hurt."));
-  assert.ok(texts.includes("Both can be true: this felt wrong, and {N} gets to decide what happens next."));
-  assert.ok(texts.includes("This is real pain. Being pushed away hurts anyone."));
-  assert.ok(!texts.some((t) => /unkind|this was wrong|oversensitiv|alarm systems/.test(t)));
+  assert.ok(texts.includes("{N}, of course that stung. You tried to speak and hit a wall."));
+  assert.ok(texts.includes("Something mattered and it got blocked. The anger makes complete sense.") || texts.includes("{N}, something mattered and it got blocked. The anger makes complete sense."));
+  assert.ok(!texts.some((t) => /unkind|this was wrong|oversensitiv|alarm systems|furious|completely unfair/.test(t)));
 });
 
 test("RecoveryProtocol.validationLines is the corpus projection, by id order", () => {

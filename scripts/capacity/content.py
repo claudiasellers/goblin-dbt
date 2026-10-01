@@ -42,7 +42,7 @@ REREAD_DOWN = {"worse": "Louder", "same": "About the same", "better": "Quieter",
 
 HANDOFF = {
     "card": {
-        "body": "This is a body moment, not a thinking moment. That's not you failing; it's what brains do when they're this loud.",
+        "body": "This is a body moment, not a thinking moment. That's not you failing.",
         "start": "Start",
         "keepGoing": "Keep going anyway",
         "keepGoingHeadsUp": "Thinking may feel slippery right now. Short answers are fine.",

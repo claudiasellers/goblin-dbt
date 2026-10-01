@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import {
   RULESET, lintText, lintLine, lintCorpus, corpusFromCypher, lintFlowDocs, compareBaseline,
-  lintFlowOrder, lintFlowDocOrder, gateProblems, FLOW_DOC_FILES, MAX_CHARS,
+  lintFlowOrder, lintFlowDocOrder, gateProblems, FLOW_DOC_FILES,
 } from "../scripts/voice-lint.mjs";
 import { LOAD_ORDER, voiceGate } from "../scripts/load-graph.mjs";
 
@@ -18,18 +18,17 @@ const REGEX_FIXTURES = [
   ["no_cheer", "You did a hard thing.", "You did it!"],
   ["no_emoji", "That was a lot.", "That was a lot 💛"],
   ["and_not_but", "It hurt, and you can choose what happens next.", "It hurt, but you can choose what happens next."],
-  ["no_minimising", "That was a lot to carry.", "At least it's over now."],
   ["no_should", "It makes sense you want to hide.", "You should feel proud of that."],
   ["no_diagnosis", "This is real pain.", "This is real pain, not oversensitivity."],
-  ["no_physiology", "Losing connection sets off a real alarm.", "Rejection sets off alarm systems that overlap with pain."],
   ["voice_distance", "Your hurt makes sense.", "My hurt makes sense to me."],
+  ["no_magnitude", "You feel exposed. Shame makes sense.", "Shame is crushing. Of course this is heavy."],
 ];
 
 test("every rule in voice-rules.json has fixtures here", () => {
   const regexIds = RULESET.rules.map((r) => r.id).sort();
   assert.deepEqual(REGEX_FIXTURES.map(([id]) => id).sort(), regexIds);
   const structural = RULESET.structural.map((r) => r.id).sort();
-  assert.deepEqual(structural, ["flooded_short", "level3_tentative", "level6_capacity", "max_length", "receive_before_change", "reviewed_live", "skip_always", "slots"]);
+  assert.deepEqual(structural, ["level3_tentative", "receive_before_change", "reviewed_live", "skip_always", "slots"]);
 });
 
 for (const [id, ok, bad] of REGEX_FIXTURES) {
@@ -43,26 +42,24 @@ test("curly apostrophes are normalised before matching", () => {
   assert.ok(rules("They don’t care about you.").includes("no_interpretation"));
 });
 
-test("scopes: physiology is an error on validation lines, report-only elsewhere (D-04)", () => {
-  const sev = (scope) => lintText("Your nervous system is loud.", { scope }).find((f) => f.rule === "no_physiology")?.severity;
-  assert.equal(sev("validation"), "error");
-  assert.equal(sev("user_copy"), "report");
+test("magnitude words are an error on witness lines, report-only in measurement copy (\"how loud is it?\", Louder/Quieter)", () => {
+  const sev = (text, scope) => lintText(text, { scope }).find((f) => f.rule === "no_magnitude")?.severity;
+  for (const t of ["Shame is crushing.", "Of course this is heavy.", "Of course you are furious.", "This is massive.", "Too loud to think."]) assert.equal(sev(t, "validation"), "error", t);
+  assert.equal(sev("How loud is it right now?", "feeling_copy"), "report");
+  assert.equal(sev("Louder", "user_copy"), "report");
+});
+
+test("lightened 2026-10-01: only diagnosis words block; the other style rules warn or report (Claudia)", () => {
+  const sev = (text, rule) => lintText(text, { scope: "validation" }).find((f) => f.rule === rule)?.severity;
+  assert.equal(sev("This is real pain, not oversensitivity.", "no_diagnosis"), "error");
+  assert.equal(sev("It hurt, but you can choose.", "and_not_but"), "report");
+  assert.equal(sev("They meant to hurt you.", "no_interpretation"), "report");
+  assert.equal(sev("You did it!", "no_cheer"), "warn");
+  assert.equal(sev("My hurt makes sense to me.", "voice_distance"), "warn");
   assert.equal(lintText("Great job!", { scope: "user_copy" }).find((f) => f.rule === "no_cheer").severity, "warn");
-});
-
-test("structural: max_length counts a slot as 8 characters", () => {
-  const at = (n) => "a".repeat(n);
-  assert.ok(!lineRules({ text: at(MAX_CHARS) }).includes("max_length"));
-  assert.ok(lineRules({ text: at(MAX_CHARS + 1) }).includes("max_length"));
-  assert.ok(lineRules({ text: `${at(MAX_CHARS - 7)}{phrase}` }).includes("max_length"));
-  assert.ok(!lineRules({ text: `${at(MAX_CHARS - 8)}{phrase}` }).includes("max_length"));
-});
-
-test("structural: flooded lines are level 1-2 and at most 8 words", () => {
-  const f = (text, level) => lineRules({ text, level, bands: ["flooded"] });
-  assert.ok(!f("A lot, right now.", 1).includes("flooded_short"));
-  assert.ok(f("A lot, right now.", 4).includes("flooded_short"));
-  assert.ok(f("This is a lot and it is all arriving at once.", 2).includes("flooded_short"));
+  // Gone: no physiology ban, no "just", no length or word limits, no level-6 word list.
+  const r = lintLine({ id: "x", text: "Your nervous system is reacting. You do not have to feel brave or strong right now, you just have to take the next step, and that is fine for today.", voice: "you", level: 6, bands: ["flooded"], tentative: false, underneath: [], status: "draft", reviewStatus: "draft" });
+  assert.deepEqual(r.filter((f) => f.severity === "error"), []);
 });
 
 test("structural: slots", () => {
@@ -79,12 +76,6 @@ test("structural: level 3 is a tentative guess with something underneath", () =>
   assert.ok(lineRules({ text: "Maybe some of this is hurt.", level: 3, tentative: true, underneath: [] }).includes("level3_tentative"));
   assert.ok(lineRules({ text: "Maybe some of this is hurt.", level: 3, tentative: false, underneath: ["hurt"] }).includes("level3_tentative"));
   assert.ok(lineRules({ text: "That hurt.", level: 5, tentative: true }).includes("level3_tentative"));
-});
-
-test("structural: level 6 is capacity, never worth", () => {
-  assert.ok(!lineRules({ text: "You can handle this.", level: 6 }).includes("level6_capacity"));
-  assert.ok(lineRules({ text: "You're so strong.", level: 6 }).includes("level6_capacity"));
-  assert.ok(lineRules({ text: "You deserve better.", level: 6 }).includes("level6_capacity"));
 });
 
 test("structural: a live line has been reviewed", () => {
@@ -114,14 +105,14 @@ test("the three original Recover lines fail and their D-04 replacements pass", (
   ];
   const errs = (t) => lintLine({ id: "x", text: t.replace(/\{N\}/g, "you"), textNamed: /\{N\}/.test(t) ? t : null, voice: /\{N\}/.test(t) ? "name" : "none", level: 5, bands: ["steady"], tentative: false, underneath: [], status: "draft", reviewStatus: "draft" });
   for (const t of originals) assert.ok(errs(t).length > 0, t);
-  assert.deepEqual(errs(originals[2]).map((f) => f.rule).sort(), ["max_length", "no_diagnosis", "no_physiology"]);
+  assert.ok(errs(originals[2]).some((f) => f.rule === "no_diagnosis"));
   for (const t of edits) assert.deepEqual(errs(t), [], t);
 });
 
 test("the committed corpus passes (schema/witness.cypher)", () => {
   const rows = corpusFromCypher(readFileSync("schema/witness.cypher", "utf8"));
   assert.ok(rows.length >= 16);
-  assert.deepEqual(lintCorpus(rows), []);
+  assert.deepEqual(lintCorpus(rows).filter((f) => f.severity === "error"), []);
 });
 
 test("flow-document copy: nothing new beyond the baseline, and the baseline has no stale entries", () => {

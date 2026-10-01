@@ -691,7 +691,7 @@ MATCH (p2:ActivationPattern {id: "conservation_freeze"})
 MERGE (p1)-[r:CO_OCCURS_WITH]->(p2)
 SET r.frequency = "common",
     r.clinicalLabel = "shame_collapse",
-    r.combinedUserFacingLabel = "The weight of being seen has made your whole system go still",
+    r.combinedUserFacingLabel = "Being seen set off shame, and your system went still",
     r.primaryRule = "address_freeze_first",
     r.primaryPatternId = "conservation_freeze",
     r.sequencingNote = "Gentle proprioceptive up-regulation first (restore minimal body engagement). Once minimally mobilized, self-compassion touch + outward sensory contact (social threat protocol). Do NOT start with self-focused tools (amplifies shame) or social engagement demands (behavioral inhibition system is blocking this). Warmth is especially helpful — warm beverage, blanket — signals safety without social demand.",

@@ -58,13 +58,13 @@ test("landed-first from fade stage 1 (and kept lines always), unless shown recen
   assert.equal(rank.orderGraph(input({ candidates: cands, history: hist({ savedIds: ["liked"] }) }))[0].id, "liked", "kept");
 });
 
-test("primary + alternate at a different level; flooded serves one short line", () => {
+test("primary + alternate at a different level; flooded serves one line, any length (no word cap since 2026-10-01)", () => {
   const cands = [c("a4", 4, 2), c("b4", 4, 1), c("c5", 5, 0)];
   const lines = rank.rankWitnessLines(input({ band: "stirred", candidates: cands }));
   assert.deepEqual(ids(lines), ["a4", "c5"]);
   assert.deepEqual(ids(rank.rankWitnessLines(input({ band: "stirred", candidates: cands, max: 1 }))), ["a4"]);
   const flooded = [c("long", 1, 1, { text: "one two three four five six seven eight nine" }), c("short", 2, 0, { text: "A lot, right now." })];
-  assert.deepEqual(ids(rank.rankWitnessLines(input({ band: "flooded", candidates: flooded, max: 3 }))), ["short"]);
+  assert.deepEqual(ids(rank.rankWitnessLines(input({ band: "flooded", candidates: flooded, max: 3 }))), ["long"]);
 });
 
 test("excluded ids are never served", () => {

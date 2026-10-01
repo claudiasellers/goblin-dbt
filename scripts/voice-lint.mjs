@@ -40,10 +40,7 @@ const REGEX = RULESET.rules.map((r) => ({ ...r, re: new RegExp(r.pattern, r.flag
 const STRUCT = Object.fromEntries(RULESET.structural.map((r) => [r.id, r]));
 
 export const SLOTS = ['N', 'word', 'phrase', 'need'];
-export const MAX_CHARS = 90;
-export const FLOODED_MAX_WORDS = 8;
 const SLOT_TOKEN = 'xxxxxxxx'; // a slot counts as 8 characters / one word
-const LEVEL6_WORTH = /\b(strong|brave|amazing|special|worthy|deserve\w*)\b/i;
 
 /** Curly quotes → straight, so the rules match what the user sees. */
 const norm = (t) => String(t).replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
@@ -78,14 +75,9 @@ export function lintLine(row) {
   const fields = [['text', row.text], ...(row.textNamed ? [['textNamed', row.textNamed]] : [])];
   for (const [field, t] of fields) {
     for (const f of lintText(t, { scope: 'validation' })) out.push({ ...f, field });
-    if (filled(t).length > MAX_CHARS) out.push(struct('max_length', { field, match: `${filled(t).length} chars` }));
     const slots = [...norm(t).matchAll(/\{(\w+)\}/g)].map((m) => m[1]);
     const bad = slots.filter((s) => !SLOTS.includes(s));
     if (bad.length) out.push(struct('slots', { field, match: bad.map((s) => `{${s}}`).join(' ') }));
-    if ((row.bands ?? []).includes('flooded') && (words(t) > FLOODED_MAX_WORDS || !(row.level <= 2))) {
-      out.push(struct('flooded_short', { field, match: `level ${row.level}, ${words(t)} words` }));
-    }
-    if (row.level === 6 && LEVEL6_WORTH.test(norm(t))) out.push(struct('level6_capacity', { field, match: norm(t).match(LEVEL6_WORTH)[0] }));
   }
   if (/\{N\}/.test(row.text)) out.push(struct('slots', { field: 'text', match: 'text has {N}' }));
   const namedHasN = row.textNamed ? /\{N\}/.test(row.textNamed) : false;
@@ -243,7 +235,6 @@ async function report() {
       for (const m of src.matchAll(new RegExp(`\\.${prop}\\s*=\\s*(['"])((?:\\\\.|(?!\\1).)*)\\1`, 'g'))) {
         const text = m[2];
         const findings = [...lintText(text, { scope: 'validation' })];
-        if (filled(text).length > MAX_CHARS) findings.push({ rule: 'max_length', severity: 'error' });
         for (const f of findings) rows.push({ where: `schema/${name} ${prop}`, rule: f.rule, severity: f.severity, text: text.slice(0, 80) });
       }
     }
