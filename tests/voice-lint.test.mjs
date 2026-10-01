@@ -22,6 +22,7 @@ const REGEX_FIXTURES = [
   ["no_diagnosis", "This is real pain.", "This is real pain, not oversensitivity."],
   ["voice_distance", "Your hurt makes sense.", "My hurt makes sense to me."],
   ["no_magnitude", "You feel exposed. Shame makes sense.", "Shame is crushing. Of course this is heavy."],
+  ["intensity_check", "Something good happened. Of course you feel it.", "That is a huge relief."],
 ];
 
 test("every rule in voice-rules.json has fixtures here", () => {
@@ -42,11 +43,14 @@ test("curly apostrophes are normalised before matching", () => {
   assert.ok(rules("They don’t care about you.").includes("no_interpretation"));
 });
 
-test("magnitude words are an error on witness lines, report-only in measurement copy (\"how loud is it?\", Louder/Quieter)", () => {
+test("negative-intensity words are an error on witness lines; pleasant intensity is fine; ambiguous intensifiers only warn; measurement copy (how loud is it?, Louder/Quieter) is never flagged", () => {
   const sev = (text, scope) => lintText(text, { scope }).find((f) => f.rule === "no_magnitude")?.severity;
-  for (const t of ["Shame is crushing.", "Of course this is heavy.", "Of course you are furious.", "This is massive.", "Too loud to think."]) assert.equal(sev(t, "validation"), "error", t);
-  assert.equal(sev("How loud is it right now?", "feeling_copy"), "report");
-  assert.equal(sev("Louder", "user_copy"), "report");
+  for (const t of ["Shame is crushing.", "Of course this is heavy.", "Of course you are furious.", "This is devastating.", "Too loud to think."]) assert.equal(sev(t, "validation"), "error", t);
+  assert.equal(sev("That is a huge relief.", "validation"), undefined, "pleasant intensity is not a magnitude error");
+  assert.equal(lintText("This is massive.", { scope: "validation" }).find((f) => f.rule === "intensity_check")?.severity, "warn");
+  assert.equal(sev("How loud is it right now?", "feeling_copy"), undefined, "asking about intensity is not validating it");
+  assert.equal(sev("Louder", "user_copy"), undefined);
+  assert.equal(sev("It's too loud in here", "feeling_copy"), "report");
 });
 
 test("lightened 2026-10-01: only diagnosis words block; the other style rules warn or report (Claudia)", () => {

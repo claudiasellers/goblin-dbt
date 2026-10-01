@@ -4,9 +4,10 @@
 # recover_validate lines below; scripts/invalidation-recovery/content.py imports witness_lines()).
 #
 # THE LINT (scripts/witness/voice-rules.json; runs in npm test and before every load). Blocks a load:
-#   magnitude words (ban 4 below), diagnosis words ("oversensitive", "overreacting"), and broken
+#   negative-intensity words (ban 4 below), diagnosis words ("oversensitive", "overreacting"), and broken
 #   structure (unknown slots, a level-3 line with nothing underneath, a live line nobody signed off).
-#   Warns: "!", emoji, "should", "I/my". Reports only: "but", interpreting the other person.
+#   Warns: "!", emoji, "should", "I/my", and intensity words that could go either way
+#   (massive, intense, extreme). Reports only: "but", interpreting the other person.
 #   Second person ("you"), or the user's name in the {N} form.
 #
 # STRICT BEHAVIORAL BANS:
@@ -14,9 +15,10 @@
 #   2. NO internal emotional justification for Reinforce (focus on external reward for the other).
 #   3. THE CAMERA TEST: Never use words describing an internal state for a conflict (e.g., use 
 #      "They raised their voice" not "They were aggressive").
-#   4. NO MAGNITUDE WORDS: Never validate the *intensity* or *volume* of an emotion (e.g., 
-#      crushing, heavy, furious, massive, extreme). Validate the trigger and the presence of the 
-#      feeling. Volume validation fuels the panic spiral.
+#   4. NO NEGATIVE-INTENSITY VALIDATION: Never validate the intensity of a negative-valence
+#      emotional experience (e.g., crushing, heavy, furious, devastating, unbearable). Validate the
+#      trigger and the presence of the feeling; amplifying a painful feeling fuels the panic spiral.
+#      The intensity of a pleasant feeling can be named.
 #   5. NO FLATTERY OR CHEERLEADING: For Level 6 validation, do not use identity words ("you are 
 #      strong") or comparative invalidation ("you've been through worse"). De-couple emotion from 
 #      action. State their track record (the math) and give explicit permission to feel terrible 
