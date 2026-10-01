@@ -263,9 +263,10 @@ export function isCoreEmotion(id: string): boolean {
   return !!e?.core;
 }
 
+/** Pills on a quadrant fill. --color-on-quadrant is each room's contrast-checked ink for all four fills. */
 export const quadrantColors: Record<string, { bg: string; text: string }> = {
-  'high-unpleasant': { bg: 'bg-[var(--color-q-hu-fill)]', text: 'text-white' },
-  'high-pleasant': { bg: 'bg-[var(--color-q-hp-fill)]', text: 'text-[var(--color-text-primary)]' },
-  'low-unpleasant': { bg: 'bg-[var(--color-q-lu-fill)]', text: 'text-white' },
-  'low-pleasant': { bg: 'bg-[var(--color-q-lp-fill)]', text: 'text-[var(--color-text-primary)]' },
+  'high-unpleasant': { bg: 'bg-[var(--color-q-hu-fill)]', text: 'text-[var(--color-on-quadrant)]' },
+  'high-pleasant': { bg: 'bg-[var(--color-q-hp-fill)]', text: 'text-[var(--color-on-quadrant)]' },
+  'low-unpleasant': { bg: 'bg-[var(--color-q-lu-fill)]', text: 'text-[var(--color-on-quadrant)]' },
+  'low-pleasant': { bg: 'bg-[var(--color-q-lp-fill)]', text: 'text-[var(--color-on-quadrant)]' },
 };
