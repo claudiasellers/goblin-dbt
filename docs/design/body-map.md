@@ -1,6 +1,6 @@
 # Body map: plan
 
-Status: **planned** (Oct 2026). Design source: the "Goblin UI directions" canvas, rows T to Z
+Status: **step 1 built** (content and function; nothing served until signed off). Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to Z
 (sensation pad W, body mirror X, heat figure Y, several feelings Z). Product record: Product
 Changelog, "Body step redesign: the sensation pad".
 
@@ -59,21 +59,28 @@ editable source, `scripts/body-map/content.py`, which generates `schema/body-map
 
 1. **Region vocabulary.** These are ids that the graph and the figure share: `head`, `face`, `jaw`,
    `throat`, `neck`, `shoulders`, `chest`, `upper_back`, `stomach`, `lower_back`, `arms`, `hands`,
-   `legs`, `feet`, `body` (whole body). Existing `FELT_AS` region strings are renamed onto these
-   (`back` becomes `upper_back`). A test checks that every graph region exists in the figure, and
-   the reverse. Geometry and "paired" stay in the frontend because they are presentation.
-2. **Pad words.** `SensationType` grows from 15 to about 40, each with
+   `legs`, `feet`, `body` (whole body). They're stored on `BodyMapContent.regions`. From step 2 a
+   test checks that every graph region exists in the figure, and the reverse. Geometry and "paired"
+   stay in the frontend because they are presentation. The old `FELT_AS` region strings (`back`,
+   `hands` …) are left alone until step 6 rebuilds the body-first suggestions.
+2. **Pad words.** `SensationType` grows from 15 to 40 (the 15 existing ids keep their `name`), each with
    `padLabel` ("Tight", "Raised up", "Fluttery", "Settled"), `zones` (which pad quadrants it
    belongs to: `hu`, `hp`, `lu`, `lp`), an optional `regions` restriction (e.g. "Raised up" only for
-   shoulders), and `energy` (`more` / `less`).
-3. **Body maps (the mirror).** New `(:BodyMap {id, label})` nodes, one per group: `fear`, `anger`,
-   `sadness`, `shame`, `guilt`, `disgust`, `love`, `joy`, `excitement`, `calm`, `surprise`.
-   - DBT parents are used where they exist, plus pleasant families, following Nummenmaa's 14 maps.
-   - `(:BodyMap)-[:SHOWS {region, weight, energy}]->(:SensationType)` holds 3 to 6 places per map.
-   - `(:Emotion)-[:MIRRORS]->(:BodyMap)` connects every grid word to exactly one map. That gives
-     every word a mirror, including pleasant words and the held anger words, which `SCORES_AS`
-     can't.
-   - The existing `FELT_AS` edges seed the maps. They stay in place for the body-first path.
+   shoulders), `energy` (`more` / `less`) and `padRank` (pad order). Every place has at least one
+   word in every quarter of the pad (build check).
+3. **Body maps (the mirror).** Twelve `(:BodyMap {id, label, wordIds})` nodes: `fear`, `anger`,
+   `sadness`, `shame`, `guilt`, `disgust`, `depleted` ("Drained or numb"), `love`, `joy`,
+   `excitement`, `surprise`, `calm`.
+   - DBT parents are used where they exist, plus pleasant families and a low-energy map, following
+     Nummenmaa's 14 maps (which include depression as its own cooled map).
+   - Each place is a node: `(:BodyMap)-[:SHOWS]->(:BodyMapPlace {id, region, weight})-[:FEELS_AS]->(:SensationType)`,
+     3 to 6 per map. A place can't be an edge keyed on its region: only `FELT_AS` may merge on a
+     property, and one map can show the same sensation in two places (anger: hot head, hot face).
+   - `wordIds` lists the grid words (`src/data/emotions.ts` ids) each map mirrors. Every grid word
+     is in exactly one map (test), including pleasant words and the held anger words, which
+     `SCORES_AS` can't reach. It's a list, not edges: 18 calm-side grid words (*relaxed*, *cozy* …)
+     aren't `Emotion` nodes in the graph.
+   - The existing `FELT_AS` edges informed the maps and stay in place for the body-first path.
 
 **Callable:** `getBodyMapContent({ emotionIds? })` in a new `functions/src/bodyMap/` module (public,
 like `getCapacityContent`). It returns
@@ -117,11 +124,12 @@ Each step renders on its own and goes in as its own PR. Content comes first, bec
 step reads it.
 
 1. **Content and function (no UI change).**
-   - Write the region vocabulary, pad words, body maps and `MIRRORS` in `content.py`, then
-     `build.py` and `fixture.py` (for `tests/fixtures/body-map-content.json`).
+   - Write the region vocabulary, pad words and body maps in `content.py`, then `build.py` and
+     `fixture.py` (for `tests/fixtures/body-map-content.json`).
    - Build `getBodyMapContent`.
-   - Tests: region parity, every grid word mirrors exactly one map, every map has 3 to 6 places,
-     voice lint on labels, and only signed-off rows are served.
+   - Tests: every grid word mirrors exactly one map, every map has 3 to 6 places on known regions,
+     every place has pad words in every quarter, only signed-off content is live, the type mirror,
+     and the callable (fake driver).
    - **Claudia:** review the maps and pad words (a readable list, like the witness lines).
    - Deploy: load the graph (`--only body-map`), then functions.
 2. **Heat figure and both sides.**
@@ -139,7 +147,7 @@ step reads it.
    - Tabs per map (max 3) in the words' colours, and Together stripes.
    - Marks stay put across tabs and never take a tab's colour.
 6. **Body-first suggestions from the graph.**
-   - A `suggestEmotionsFromBody` callable (reverse `MIRRORS`/`SHOWS` and `FELT_AS`) for
+   - A `suggestEmotionsFromBody` callable (reverse `SHOWS` / `wordIds` and `FELT_AS`) for
      `EmotionSuggestion`.
    - Delete `sensationMappings.ts`, closing the CLAUDE.md tech debt.
    - It has to come after step 2: the new region ids and pad words no longer match that file's

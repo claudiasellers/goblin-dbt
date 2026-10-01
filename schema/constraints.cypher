@@ -146,3 +146,8 @@ CREATE CONSTRAINT push_token_key IF NOT EXISTS FOR (n:PushToken) REQUIRE n.key I
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
 CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);
+
+// --- Body map (docs/design/body-map.md, schema/body-map.cypher) ---
+CREATE CONSTRAINT body_map_content_id IF NOT EXISTS FOR (n:BodyMapContent) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT body_map_id IF NOT EXISTS FOR (n:BodyMap) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT body_map_place_id IF NOT EXISTS FOR (n:BodyMapPlace) REQUIRE n.id IS UNIQUE;
