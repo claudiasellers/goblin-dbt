@@ -1135,6 +1135,68 @@ h1.uppercase, h2.uppercase {
 }
 .help-now:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 3px; }
 
+/* ── Body map (docs/design/body-map.md): heat figure, places, panel ── */
+.heat-figure { display: block; width: 100%; height: auto; overflow: visible; touch-action: manipulation; }
+.heat-figure__body { fill: color-mix(in oklab, var(--color-text-primary) 14%, var(--color-bg-primary)); }
+.heat-figure__hit {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 2;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: fill 160ms var(--ease-default), stroke 160ms var(--ease-default);
+}
+.heat-figure__hit:hover { fill: color-mix(in srgb, var(--color-text-primary) 8%, transparent); }
+.heat-figure__hit:focus-visible { outline: none; stroke: var(--color-accent); stroke-dasharray: 4 3; }
+.heat-figure__hit.is-selected { stroke: var(--color-text-primary); stroke-dasharray: 4 3; }
+.den-chip.is-marked::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--color-q-hu-fill), var(--color-q-hp-fill));
+}
+.body-mark-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 16px;
+  font: inherit;
+  font-size: 15.5px;
+  text-align: left;
+  background: var(--color-bg-elevated);
+  cursor: pointer;
+}
+.body-mark-row:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.body-mark-row__dot {
+  flex: none;
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--color-q-hu-fill), var(--color-q-hp-fill));
+}
+.body-panel { padding: 18px 16px 12px; border-radius: 22px; background: var(--color-bg-elevated); }
+.seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 13px; background: color-mix(in srgb, var(--color-text-primary) 8%, transparent); }
+.seg button {
+  min-height: 40px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  background: transparent;
+  cursor: pointer;
+}
+.seg button.is-on { color: var(--color-text-primary); background: var(--color-bg-card-hover); box-shadow: 0 2px 0 var(--color-lip); }
+.seg button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
 @media (prefers-reduced-motion: reduce) {
   .den-chip:active, .den-chip[aria-pressed='true'] { transform: none; }
   .feeling-tint { transition: none; }
