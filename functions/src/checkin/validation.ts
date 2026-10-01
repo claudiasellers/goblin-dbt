@@ -33,7 +33,14 @@ const STEP_ID = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
 
 export interface SensationInput {
   x: number; y: number; region: string; intensityX: number; intensityY: number; tags: string[];
+  /** Body map (docs/design/body-map.md): which side of a paired place; null from older clients. */
+  side: 'both' | 'left' | 'right' | null;
+  /** Stable SensationType ids of the picked pad words (tags are their display labels). */
+  sensationIds: string[];
 }
+
+const SIDES = ['both', 'left', 'right'] as const;
+const SENSATION_ID = /^[a-z][a-z0-9_]{0,63}$/;
 
 export interface SaveCheckInInput {
   id: string | null;                 // null → old client; the server mints one
@@ -113,6 +120,10 @@ function sensation(raw: unknown): SensationInput | null {
     x: num01(raw.x, 0.5), y: num01(raw.y, 0.5), region,
     intensityX: num01(intensity.x, 0.5), intensityY: num01(intensity.y, 0.5),
     tags: Array.isArray(raw.tags) ? raw.tags.filter((t): t is string => typeof t === 'string' && t.length > 0 && t.length <= 64).slice(0, 20) : [],
+    side: (SIDES as readonly unknown[]).includes(raw.side) ? (raw.side as SensationInput['side']) : null,
+    sensationIds: Array.isArray(raw.sensationIds)
+      ? [...new Set(raw.sensationIds.filter((t): t is string => typeof t === 'string' && SENSATION_ID.test(t)))].slice(0, 20)
+      : [],
   };
 }
 

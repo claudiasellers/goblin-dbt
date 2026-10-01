@@ -21,7 +21,10 @@ export interface SaveCheckInRequest {
   emotion: string;
   quadrant: string;
   intensity: { x: number; y: number };
-  bodySensations: Array<{ x: number; y: number; region: string; intensity: { x: number; y: number }; tags: string[] }>;
+  bodySensations: Array<{
+    x: number; y: number; region: string; side?: 'both' | 'left' | 'right'; intensity: { x: number; y: number };
+    tags: string[]; sensationIds?: string[];
+  }>;
   note: string;
   timestamp: string;
   activationPatternId?: string;

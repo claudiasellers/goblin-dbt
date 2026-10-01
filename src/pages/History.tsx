@@ -3,6 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link, useLocation } from 'react-router-dom';
 import { getCheckInsByUser, getDearManSessions, type CheckInRecord, type DearManSessionRecord } from '../services/neo4j';
 import { quadrantColors } from '../data/emotions';
+import { regionLabel } from '../data/bodyFigure';
 import { HistoryInsights } from '../components/history/HistoryInsights';
 import { Insights } from './Insights';
 import { useBand } from '../hooks/useBand';
@@ -502,7 +503,7 @@ function FeedItem({ checkIn, timeFmt, bandLabels }: { checkIn: CheckInRecord; ti
               </span>
               {checkIn.bodySensations.length > 0 && (
                 <span className="text-[var(--color-text-tertiary)]">
-                  Body: <span className="text-[var(--color-text-secondary)] font-medium">{checkIn.bodySensations.map(s => s.region).join(', ')}</span>
+                  Body: <span className="text-[var(--color-text-secondary)] font-medium">{checkIn.bodySensations.map(s => regionLabel(s.region, s.side)).join(', ')}</span>
                 </span>
               )}
             </div>
