@@ -45,3 +45,18 @@ export interface BodyMapContent {
   /** Signed-off maps for the sent words (none when no words were sent). */
   maps: BodyMirrorMap[];
 }
+
+/** A marked place sent for body-first suggestions. */
+export interface BodySuggestMark {
+  region: string;
+  sensationIds: string[];
+}
+
+/** A body-mirror map the marks look like, with its grid words and the places that matched. */
+export interface BodySuggestion {
+  mapId: string;
+  label: string;
+  wordIds: string[];
+  score: number;
+  because: Array<{ region: string; label: string }>;
+}

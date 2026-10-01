@@ -1,7 +1,7 @@
 /** Body map content (getBodyMapContent): pad words plus the body-mirror maps for the check-in's words. */
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
-import type { BodyMapContent } from '../data/bodyMapTypes';
+import type { BodyMapContent, BodySuggestion, BodySuggestMark } from '../data/bodyMapTypes';
 
 const getBodyMapContentFn = httpsCallable<{ emotionIds?: string[] }, BodyMapContent>(
   functions, 'getBodyMapContent', { timeout: 20_000 });
@@ -21,4 +21,14 @@ export function getBodyMapContent(emotionIds: string[] = []): Promise<BodyMapCon
     cache.set(key, p);
   }
   return p;
+}
+
+const suggestFn = httpsCallable<{ marks: BodySuggestMark[] }, { suggestions: BodySuggestion[] }>(
+  functions, 'suggestEmotionsFromBody', { timeout: 20_000 });
+
+/** Body-first entry: the body-mirror maps the marked places look like (strongest first, at most 3). */
+export async function suggestEmotionsFromBody(marks: BodySuggestMark[]): Promise<BodySuggestion[]> {
+  if (marks.length === 0) return [];
+  const r = await suggestFn({ marks });
+  return r.data.suggestions;
 }
