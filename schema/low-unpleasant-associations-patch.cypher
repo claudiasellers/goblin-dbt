@@ -2,9 +2,9 @@
 // LOW-UNPLEASANT ASSOCIATIONS PATCH
 // schema/low-unpleasant-associations-patch.cypher
 //
-// Fills missing ASSOCIATED_WITH (pattern → emotion) and
-// FELT_AS (emotion → body sensation) edges for the four
-// low-unpleasant activation patterns. Uses MERGE throughout
+// Fills missing ASSOCIATED_WITH (pattern → emotion) edges for the four
+// low-unpleasant activation patterns. (Its FELT_AS edges moved to
+// scripts/body-map/content.py in Oct 2026: the one source.) Uses MERGE throughout
 // for idempotency. Each chunk self-contained for Aura.
 // ============================================================
 

@@ -39,7 +39,7 @@ Changelog, "Body step redesign: the sensation pad".
 - **Rejected:** particle or point-cloud figures, anatomy-chart segments, and a single flat word list
   for every place.
 
-## What exists today
+## Before (Sep 2026, what this plan replaced)
 
 | Piece | Where | State |
 |---|---|---|
@@ -98,6 +98,17 @@ instead. Now:
      capped at 1, strongest first (`functions/src/bodyMap/places.ts`, mirrored by
      `scripts/body-map/places.py` for the fixture; a test checks they agree).
 
+   - **Size.** With drafts, a map has 3 to 14 places (fear and drained or numb are the largest);
+     the old 3-to-6 limit was for hand-written lists. The mirror (step 4) shows the strongest few.
+     Some grouped emotions have no `FELT_AS` rows yet (overwhelm, irritation, gratitude, relief…);
+     they mark family membership and add places once they get rows.
+   - **Word order.** `MIRRORS` carries `rank` (the order in `content.py`); the callables collect
+     words in that order, so a map's most representative word comes first.
+   - **Deploy (v2).** `--only emotion-wheel-sync` first (the 18 added words: `MIRRORS` matches
+     existing nodes and silently skips missing ones), then `--only body-map --verify`, then
+     `firebase deploy --only functions` straight after (the old functions expect `body-map-v1`, the
+     new ones `body-map-v2`).
+
 **Callable:** `getBodyMapContent({ emotionIds? })` in a new `functions/src/bodyMap/` module (public,
 like `getCapacityContent`). It returns
 `{ padWords: [{id, label, zones, regions, energy}], maps: [{id, label, emotionIds, places: [{region, sensationId, label, energy, weight}]}] }`.
@@ -108,8 +119,8 @@ client caches the pad words for the session. Follow the callable checklist in CL
 
 ### Saving
 
-- `BodySensation` keeps its shape and gains `side` (`both` | `left` | `right`) and `fromMirror`
-  (boolean: the user accepted a ghost).
+- `BodySensation` keeps its shape and gains `side` (`both` | `left` | `right`); step 4 adds
+  `fromMirror` (boolean: the user accepted a ghost; not built yet).
   - `region` becomes a region id (`shoulders`).
   - `strength` (0–1, or null when the bar wasn't used) is new in step 3. `intensity` keeps its
     shape but the body step no longer sets it (the pad is gone), so it stays 0.5 / 0.5.
@@ -117,7 +128,8 @@ client caches the pad words for the session. Follow the callable checklist in CL
     stable `SensationType` ids (for any graph lookup; labels are copy and can change). Old records
     keep tags only. Nothing reads sensation ids from history: suggestions use the check-in in
     progress.
-- `validation.ts`: `side`, `fromMirror` and `sensationIds` are optional (`side` defaults to `both`).
+- `validation.ts`: `side`, `sensationIds` and `strength` are optional (a missing `side` is saved as
+  null, which readers treat as both sides).
   Old clients are unchanged. It stays a log record (append-only, no profile).
 - Old records move to the new names once, with a migration
   (`schema/migrations/2026-10-body-regions.cypher`, run with step 2's deploy): `Left Shoulder` →
@@ -130,7 +142,7 @@ client caches the pad words for the session. Follow the callable checklist in CL
 
 | New | Replaces | What |
 |---|---|---|
-| `src/data/bodyFigure.ts` | `bodyRegions.ts` (kept for the legacy map) | Silhouette path, each region's hit area and centroid, `paired`, and the legacy-name map |
+| `src/data/bodyFigure.ts` | `bodyRegions.ts` (deleted) | Silhouette, each place's tap shapes and glows, `paired`, labels, `regionAt`. The old-name map lives in `functions/src/checkin/validation.ts` and the region migration |
 | `components/checkin/body/HeatFigure.tsx` | the `BodyMap` SVG | Silhouette and clip-path; drag to choose; one blurred glow per mark, warm / cool from its words, sized by strength; ghost layer (dashed, hatched); stripes for "Together" |
 | `components/checkin/body/StrengthBar.tsx` + the card in `BodyStep` | `SensationDetails` | The optional strength bar beside the body (step 3, replacing the pad); the chosen place's words in one row; Both / Left / Right for paired places; Done / Remove |
 | `components/checkin/body/BodyMirror.tsx` | none | "Not sure? See where *word* often shows up"; tabs per map (max 3) plus Together; ghost places; "Add all of these"; disclaimer |
@@ -202,9 +214,9 @@ live).
   check-in's old `sensation` step is gone). Places the front view can't show (jaw, back of the
   neck, upper and lower back, whole body) are a "More places" row. The place panel offers Both
   sides / Your left / Your right for paired places and the graph's words for that place, grouped
-  Uncomfortable / Comfortable; if the words can't load, the place can still be marked. One mark
-  per place. Until the pad (step 3), marks glow one warm mid-tone; places behind the front view
-  glow fainter.
+  Uncomfortable / Comfortable (step 3 replaced this with one row); if the words can't load, the
+  place can still be marked. One mark per place. Marks glowed one warm mid-tone until step 3 (colour
+  from the words); places behind the front view glow fainter.
 - `suggestEmotionsFromBody` (pure scoring in `functions/src/bodyMap/suggest.ts`): each mark counts
   once per map against its best place × weight (same place and word 1, word elsewhere 0.4, place
   alone 0.25); the strongest 3 maps with their words. `EmotionSuggestion` stays small, because

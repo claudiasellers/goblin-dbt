@@ -67,8 +67,9 @@ export const getBodyMapContent = callable<unknown, BodyMapContent>(
         const res = await tx.run(
           `MATCH (m:BodyMap {status: 'live'})-[:MIRRORS]->(w:Emotion) WHERE w.id IN $ids
            WITH DISTINCT m
-           MATCH (m)-[:MIRRORS]->(mw:Emotion)
-           WITH m, collect(DISTINCT mw.id) AS wordIds
+           MATCH (m)-[mr:MIRRORS]->(mw:Emotion)
+           WITH m, mr, mw ORDER BY mr.rank
+           WITH m, collect(mw.id) AS wordIds
            ${MAP_FELT}`,
           { ids: emotionIds });
         const first = (wordIds: string[]) => Math.min(...wordIds.map((w) => emotionIds.indexOf(w)).filter((i) => i >= 0));
@@ -122,8 +123,9 @@ export const suggestEmotionsFromBody = callable<unknown, { suggestions: BodySugg
     const maps = await readTx(async (tx) => {
       const res = await tx.run(
         `MATCH (m:BodyMap {status: 'live'})
-         OPTIONAL MATCH (m)-[:MIRRORS]->(mw:Emotion)
-         WITH m, collect(DISTINCT mw.id) AS wordIds
+         OPTIONAL MATCH (m)-[mr:MIRRORS]->(mw:Emotion)
+         WITH m, mr, mw ORDER BY mr.rank
+         WITH m, collect(mw.id) AS wordIds
          ${MAP_FELT}`);
       return res.records.map((r): ScorableMap => ({
         id: r.get('id') as string,

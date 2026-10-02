@@ -36,8 +36,8 @@ REGIONS = [
     "stomach", "lower_back", "arms", "hands", "legs", "feet", "body",
 ]
 
-# BodyRegion nodes (Oct 2026: replaced the 8 old regions in knowledge-graph.cypher; the old "back"
-# became upper_back / lower_back, see schema/migrations/2026-10-felt-as-regions.cypher).
+# BodyRegion nodes (Oct 2026: replaced the 8 old regions in knowledge-graph.cypher; the one FELT_AS
+# row on the old "back" (stress) became upper_back, and build.py prunes the old node and row).
 REGION_NAMES = {
     "head": ("Head", ["forehead", "temples", "scalp"]),
     "face": ("Face", ["eyes", "cheeks", "mouth"]),

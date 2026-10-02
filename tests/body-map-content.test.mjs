@@ -61,7 +61,7 @@ test("FELT_AS rows: known emotions, known places, a sensation word offered at th
 test("FELT_AS has one source: no other loaded schema file writes it, and BodyRegion lives only here", () => {
   for (const f of LOAD_ORDER.filter((x) => x !== "body-map.cypher")) {
     const stmts2 = splitStatements(schemaText(f));
-    assert.ok(!stmts2.some((x) => /\[:FELT_AS\b/.test(x) && /\bMERGE\b/.test(x)), `${f} writes FELT_AS`);
+    assert.ok(!stmts2.some((x) => /\[\w*:FELT_AS\b/.test(x) && /\bMERGE\b/.test(x)), `${f} writes FELT_AS`);
     assert.ok(!stmts2.some((x) => /MERGE \(\w*:BodyRegion\b/.test(x)), `${f} writes BodyRegion`);
   }
   assert.ok(stmts.some((x) => /MERGE \(e\)-\[r:FELT_AS \{region: /.test(x)));
@@ -81,6 +81,10 @@ test("maps: groups of real emotions, at least 3 places, and places computed the 
       m.places.map((p) => [p.region, p.sensationId, p.weight]), `${m.id}: places.py and places.ts agree`);
   }
   assert.ok(!stmts.some((x) => /BodyMapPlace/.test(x) && !/DETACH DELETE/.test(x)), "no stored places");
+  // Word order is content (the first word stands for the map): MIRRORS carries rank, both queries order by it.
+  assert.equal(stmts.filter((x) => /MERGE \(m\)-\[r:MIRRORS\]->\(w\)\nSET r\.rank = i/.test(x)).length, fixture.maps.length);
+  const fn = readFileSync("functions/src/bodyMap/index.ts", "utf8");
+  assert.equal((fn.match(/ORDER BY mr\.rank\s+WITH m, collect\(mw\.id\) AS wordIds/g) || []).length, 2);
 });
 
 test("pad words: every place has at least one word in every quarter of the pad", () => {

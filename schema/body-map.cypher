@@ -480,8 +480,11 @@ MATCH (m:BodyMap {id: "fear"}), (e:Emotion) WHERE e.id IN ["anxiety", "fear", "p
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "fear"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["anxiety", "fear", "panic", "stress", "overwhelm"]
 DELETE r;
-MATCH (m:BodyMap {id: "fear"}), (w:Emotion) WHERE w.id IN ["fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed", "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control", "hesitant"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 16) AS i
+WITH i, ["fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed", "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control", "hesitant"][i] AS wid
+MATCH (m:BodyMap {id: "fear"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "fear"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed", "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control", "hesitant"]
 DELETE r;
 MERGE (m:BodyMap {id: "anger"})
@@ -491,8 +494,11 @@ MATCH (m:BodyMap {id: "anger"}), (e:Emotion) WHERE e.id IN ["anger", "irritation
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "anger"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["anger", "irritation", "frustration", "hostility", "angsty"]
 DELETE r;
-MATCH (m:BodyMap {id: "anger"}), (w:Emotion) WHERE w.id IN ["angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 15) AS i
+WITH i, ["angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed"][i] AS wid
+MATCH (m:BodyMap {id: "anger"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "anger"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed"]
 DELETE r;
 MERGE (m:BodyMap {id: "sadness"})
@@ -502,8 +508,11 @@ MATCH (m:BodyMap {id: "sadness"}), (e:Emotion) WHERE e.id IN ["sadness", "disapp
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "sadness"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["sadness", "disappointment", "loneliness", "hopelessness", "rejection"]
 DELETE r;
-MATCH (m:BodyMap {id: "sadness"}), (w:Emotion) WHERE w.id IN ["rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful", "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned", "victimized", "fragile", "grief", "powerless"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 19) AS i
+WITH i, ["rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful", "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned", "victimized", "fragile", "grief", "powerless"][i] AS wid
+MATCH (m:BodyMap {id: "sadness"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "sadness"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful", "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned", "victimized", "fragile", "grief", "powerless"]
 DELETE r;
 MERGE (m:BodyMap {id: "shame"})
@@ -513,8 +522,11 @@ MATCH (m:BodyMap {id: "shame"}), (e:Emotion) WHERE e.id IN ["hot_shame", "cold_s
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "shame"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["hot_shame", "cold_shame"]
 DELETE r;
-MATCH (m:BodyMap {id: "shame"}), (w:Emotion) WHERE w.id IN ["inadequate", "inferior", "worthless", "insignificant", "exposed", "humiliated", "ridiculed", "embarrassed", "ashamed"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 8) AS i
+WITH i, ["inadequate", "inferior", "worthless", "insignificant", "exposed", "humiliated", "ridiculed", "embarrassed", "ashamed"][i] AS wid
+MATCH (m:BodyMap {id: "shame"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "shame"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["inadequate", "inferior", "worthless", "insignificant", "exposed", "humiliated", "ridiculed", "embarrassed", "ashamed"]
 DELETE r;
 MERGE (m:BodyMap {id: "guilt"})
@@ -524,8 +536,11 @@ MATCH (m:BodyMap {id: "guilt"}), (e:Emotion) WHERE e.id IN ["guilt"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "guilt"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["guilt"]
 DELETE r;
-MATCH (m:BodyMap {id: "guilt"}), (w:Emotion) WHERE w.id IN ["guilty", "remorseful"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 1) AS i
+WITH i, ["guilty", "remorseful"][i] AS wid
+MATCH (m:BodyMap {id: "guilt"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "guilt"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["guilty", "remorseful"]
 DELETE r;
 MERGE (m:BodyMap {id: "disgust"})
@@ -535,8 +550,11 @@ MATCH (m:BodyMap {id: "disgust"}), (e:Emotion) WHERE e.id IN ["disgust"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "disgust"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["disgust"]
 DELETE r;
-MATCH (m:BodyMap {id: "disgust"}), (w:Emotion) WHERE w.id IN ["critical", "skeptical", "dismissive", "disgusted", "disapproving", "repelled", "judgmental", "appalled", "revolted", "nauseated", "detestable", "horrified"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 11) AS i
+WITH i, ["critical", "skeptical", "dismissive", "disgusted", "disapproving", "repelled", "judgmental", "appalled", "revolted", "nauseated", "detestable", "horrified"][i] AS wid
+MATCH (m:BodyMap {id: "disgust"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "disgust"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["critical", "skeptical", "dismissive", "disgusted", "disapproving", "repelled", "judgmental", "appalled", "revolted", "nauseated", "detestable", "horrified"]
 DELETE r;
 MERGE (m:BodyMap {id: "depleted"})
@@ -546,8 +564,11 @@ MATCH (m:BodyMap {id: "depleted"}), (e:Emotion) WHERE e.id IN ["apathy", "boredo
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "depleted"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["apathy", "boredom", "emptiness", "numbness"]
 DELETE r;
-MATCH (m:BodyMap {id: "depleted"}), (w:Emotion) WHERE w.id IN ["weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent", "empty", "numb"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 10) AS i
+WITH i, ["weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent", "empty", "numb"][i] AS wid
+MATCH (m:BodyMap {id: "depleted"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "depleted"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent", "empty", "numb"]
 DELETE r;
 MERGE (m:BodyMap {id: "love"})
@@ -557,8 +578,11 @@ MATCH (m:BodyMap {id: "love"}), (e:Emotion) WHERE e.id IN ["love", "compassion",
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "love"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["love", "compassion", "gratitude", "trust"]
 DELETE r;
-MATCH (m:BodyMap {id: "love"}), (w:Emotion) WHERE w.id IN ["aroused", "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative", "tender"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 8) AS i
+WITH i, ["aroused", "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative", "tender"][i] AS wid
+MATCH (m:BodyMap {id: "love"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "love"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["aroused", "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative", "tender"]
 DELETE r;
 MERGE (m:BodyMap {id: "joy"})
@@ -568,8 +592,11 @@ MATCH (m:BodyMap {id: "joy"}), (e:Emotion) WHERE e.id IN ["joy", "pride", "hope"
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "joy"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["joy", "pride", "hope", "amusement", "inspiration"]
 DELETE r;
-MATCH (m:BodyMap {id: "joy"}), (w:Emotion) WHERE w.id IN ["happy", "interested", "proud", "accepted", "powerful", "optimistic", "joyful", "curious", "inquisitive", "successful", "confident", "respected", "valued", "courageous", "creative", "hopeful", "inspired", "good"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 17) AS i
+WITH i, ["happy", "interested", "proud", "accepted", "powerful", "optimistic", "joyful", "curious", "inquisitive", "successful", "confident", "respected", "valued", "courageous", "creative", "hopeful", "inspired", "good"][i] AS wid
+MATCH (m:BodyMap {id: "joy"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "joy"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["happy", "interested", "proud", "accepted", "powerful", "optimistic", "joyful", "curious", "inquisitive", "successful", "confident", "respected", "valued", "courageous", "creative", "hopeful", "inspired", "good"]
 DELETE r;
 MERGE (m:BodyMap {id: "excitement"})
@@ -579,8 +606,11 @@ MATCH (m:BodyMap {id: "excitement"}), (e:Emotion) WHERE e.id IN ["excitement", "
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "excitement"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["excitement", "enthusiasm", "curiosity"]
 DELETE r;
-MATCH (m:BodyMap {id: "excitement"}), (w:Emotion) WHERE w.id IN ["excited", "eager", "energetic", "playful", "cheeky"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 4) AS i
+WITH i, ["excited", "eager", "energetic", "playful", "cheeky"][i] AS wid
+MATCH (m:BodyMap {id: "excitement"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "excitement"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["excited", "eager", "energetic", "playful", "cheeky"]
 DELETE r;
 MERGE (m:BodyMap {id: "surprise"})
@@ -590,8 +620,11 @@ MATCH (m:BodyMap {id: "surprise"}), (e:Emotion) WHERE e.id IN ["surprised"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "surprise"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["surprised"]
 DELETE r;
-MATCH (m:BodyMap {id: "surprise"}), (w:Emotion) WHERE w.id IN ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 7) AS i
+WITH i, ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"][i] AS wid
+MATCH (m:BodyMap {id: "surprise"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "surprise"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"]
 DELETE r;
 MERGE (m:BodyMap {id: "calm"})
@@ -601,8 +634,11 @@ MATCH (m:BodyMap {id: "calm"}), (e:Emotion) WHERE e.id IN ["calm", "contentment"
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "calm"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["calm", "contentment", "serenity", "relief", "safety", "humility"]
 DELETE r;
-MATCH (m:BodyMap {id: "calm"}), (w:Emotion) WHERE w.id IN ["calm", "relaxed", "peaceful", "content", "chill", "comfortable", "thoughtful", "mellow", "serene", "secure", "satisfied", "restful", "at_ease", "balanced", "grounded", "cozy", "humble"]
-MERGE (m)-[:MIRRORS]->(w);
+UNWIND range(0, 16) AS i
+WITH i, ["calm", "relaxed", "peaceful", "content", "chill", "comfortable", "thoughtful", "mellow", "serene", "secure", "satisfied", "restful", "at_ease", "balanced", "grounded", "cozy", "humble"][i] AS wid
+MATCH (m:BodyMap {id: "calm"}), (w:Emotion {id: wid})
+MERGE (m)-[r:MIRRORS]->(w)
+SET r.rank = i;
 MATCH (m:BodyMap {id: "calm"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["calm", "relaxed", "peaceful", "content", "chill", "comfortable", "thoughtful", "mellow", "serene", "secure", "satisfied", "restful", "at_ease", "balanced", "grounded", "cozy", "humble"]
 DELETE r;
 

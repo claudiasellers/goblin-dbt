@@ -123,7 +123,9 @@ for rank, (mid, (label, groups, grid_words)) in enumerate(MAPS.items()):
       f"REMOVE m.wordIds;")
     A(f"MATCH (m:BodyMap {{id: {q(mid)}}}), (e:Emotion) WHERE e.id IN {q(groups)}\nMERGE (m)-[:GROUPS]->(e);")
     A(f"MATCH (m:BodyMap {{id: {q(mid)}}})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN {q(groups)}\nDELETE r;")
-    A(f"MATCH (m:BodyMap {{id: {q(mid)}}}), (w:Emotion) WHERE w.id IN {q(grid_words)}\nMERGE (m)-[:MIRRORS]->(w);")
+    # The word order matters (the most representative word stands for the map): rank on the edge.
+    A(f"UNWIND range(0, {len(grid_words) - 1}) AS i\nWITH i, {q(grid_words)}[i] AS wid\n"
+      f"MATCH (m:BodyMap {{id: {q(mid)}}}), (w:Emotion {{id: wid}})\nMERGE (m)-[r:MIRRORS]->(w)\nSET r.rank = i;")
     A(f"MATCH (m:BodyMap {{id: {q(mid)}}})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN {q(grid_words)}\nDELETE r;")
 
 A("\n// --- Prune maps removed from content.py, and the places maps used to store (body-map-v1) ---")
