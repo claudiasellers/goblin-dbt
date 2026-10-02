@@ -20,7 +20,7 @@ export interface FigureHover {
 
 interface HeatFigureProps {
   marks: FigureMark[];
-  /** The place being edited (outlined). */
+  /** The place being edited (aria-pressed on its button; nothing is drawn round it). */
   selected?: RegionId | null;
   /** Choosing a place: lifting a finger (or the mouse) on it, or Enter / Space on a focused place.
    *  Omit for a picture only. */
@@ -47,7 +47,7 @@ function Shape({ s, ...rest }: { s: HitShape } & React.SVGProps<SVGElement>) {
  * warm or cool from its words and as big and bright as its strength. Facing you: the person's left is on the figure's right.
  *
  * Drag (step 3): press anywhere on the figure and move; a glow follows the finger, the place under
- * it is outlined and reported through `onHover`, and lifting chooses it (a plain tap still works).
+ * it is reported through `onHover` (the step names it above the figure), and lifting chooses it (a plain tap still works).
  * Lifting off the body chooses nothing. Keyboard: each place is a button (Enter / Space).
  */
 export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColour, className = '' }: HeatFigureProps) {
@@ -60,7 +60,6 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
   // The live drag, read by the handlers: state alone can be one event behind (a quick tap's lift
   // arriving before the press has re-rendered).
   const drag = useRef<Finger | null>(null);
-  const [hover, setHover] = useState<RegionId | null>(null);
   const interactive = Boolean(onPick);
 
   // iOS Safari can still start a page scroll from a finger on the figure; while a drag is on, stop it.
@@ -114,12 +113,6 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
       if (!f) return;
       set(f);
       if (f.region !== prev.region) onHover?.({ region: f.region });
-      return;
-    }
-    // Mouse hover (no button): outline what a click would choose.
-    if (interactive && e.pointerType === 'mouse') {
-      const f = toFigure(e);
-      if ((f?.region ?? null) !== hover) setHover(f?.region ?? null);
     }
   }
 
@@ -138,7 +131,6 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
     onHover?.(null);
   }
 
-  const outlined = finger ? finger.region : hover;
 
   return (
     <div ref={wrapRef} className={`heat-figure-wrap${interactive ? ' is-interactive' : ''}`}
@@ -147,7 +139,6 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
         onPointerMove: handleMove,
         onPointerUp: handleUp,
         onPointerCancel: cancel,
-        onPointerLeave: () => { if (!drag.current) setHover(null); },
       } : {})}>
     <svg ref={svgRef} viewBox={FIGURE_VIEWBOX}
       className={`heat-figure${interactive ? ' is-interactive' : ''}${finger ? ' is-dragging' : ''} ${className}`}
@@ -178,7 +169,7 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
       </g>
       {interactive && REGION_IDS.flatMap((id) => REGIONS[id].hits.map((s, i) => (
         <Shape key={`${id}-${i}`} s={s}
-          className={`heat-figure__hit${selected === id ? ' is-selected' : ''}${outlined === id ? ' is-hover' : ''}`}
+          className="heat-figure__hit"
           role="button" tabIndex={i === 0 ? 0 : -1} aria-label={REGIONS[id].label}
           aria-pressed={selected === id}
           // Pointer input reaches the svg (hits have pointer-events: none); this is for assistive tech.

@@ -2,7 +2,7 @@ import { useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { strengthAt, strengthWord } from '../../../lib/bodyMark';
 
 interface StrengthBarProps {
-  /** 0–1; null = not set for this place yet (no thumb). */
+  /** 0–1; null = not set for this place yet (the thumb waits in the middle, softer). */
   value: number | null;
   onChange: (v: number) => void;
   /** No place chosen: the bar shows but can't be used. */
@@ -62,7 +62,8 @@ export function StrengthBar({ value, onChange, disabled = false, label }: Streng
       onKeyDown={key}>
       <span className="strength-bar__end" aria-hidden="true">strong</span>
       <span className="strength-bar__track" aria-hidden="true">
-        {value !== null && !disabled && <span className="strength-bar__thumb" style={{ top: `${(1 - value) * 100}%` }} />}
+        <span className={`strength-bar__thumb${value === null || disabled ? ' is-unset' : ''}`}
+          style={{ top: `${(1 - (disabled || value === null ? 0.5 : value)) * 100}%` }} />
       </span>
       <span className="strength-bar__end" aria-hidden="true">faint</span>
     </div>

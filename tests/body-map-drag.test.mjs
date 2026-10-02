@@ -76,5 +76,12 @@ test("the body step: drag to choose, the strength bar beside the body (shown by 
   assert.match(heat, /regionAt\(/);
   assert.match(heat, /className=\{`heat-figure-wrap/, "the drag is on a wrapper div");
   assert.doesNotMatch(heat, /\.getScreenCTM\(/, "box mapping, not getScreenCTM");
+  // No outlines drawn round places (Claudia, Oct 2); keyboard focus keeps its marker.
+  const css = readFileSync("src/index.css", "utf8");
+  assert.doesNotMatch(css, /\.heat-figure__hit\.is-(selected|hover)/);
+  assert.match(css, /\.heat-figure__hit:focus-visible/);
+  // The bar's thumb always shows: in the middle and softer until set.
+  const bar = readFileSync("src/components/checkin/body/StrengthBar.tsx", "utf8");
+  assert.match(bar, /<span className=\{`strength-bar__thumb\$\{value === null \|\| disabled \? ' is-unset' : ''\}`\}/);
   assert.match(heat, /glowLook\(m\.strength\)/);
 });

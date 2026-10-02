@@ -1143,14 +1143,11 @@ h1.uppercase, h2.uppercase {
   fill: transparent;
   stroke: transparent;
   stroke-width: 2;
-  pointer-events: none; /* the svg takes the pointer (drag); hits stay focusable for the keyboard */
-  transition: fill 160ms var(--ease-default), stroke 160ms var(--ease-default);
+  pointer-events: none; /* the wrapper takes the pointer (drag); hits stay focusable for the keyboard */
 }
-.heat-figure__hit.is-hover { fill: color-mix(in srgb, var(--color-text-primary) 8%, transparent); }
-.heat-figure.is-dragging .heat-figure__hit { transition: none; }
-.heat-figure.is-dragging .heat-figure__hit.is-hover { stroke: var(--color-text-primary); stroke-dasharray: 4 3; }
+/* No outlines on the figure: the glow and the place's name above it show where you are. The one
+   exception is keyboard focus, which needs a visible marker. */
 .heat-figure__hit:focus-visible { outline: none; stroke: var(--color-accent); stroke-dasharray: 4 3; }
-.heat-figure__hit.is-selected { stroke: var(--color-text-primary); stroke-dasharray: 4 3; }
 .den-chip.is-marked::before {
   content: '';
   width: 7px;
@@ -1236,6 +1233,8 @@ h1.uppercase, h2.uppercase {
   transition: top 80ms linear;
 }
 .strength-bar.is-dragging .strength-bar__thumb { transition: none; }
+/* Not set for this place yet (or no place chosen): the thumb waits in the middle, softer. */
+.strength-bar__thumb.is-unset { opacity: 0.6; box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-text-primary) 18%, transparent), 0 4px 10px rgba(0, 0, 0, 0.18); }
 .body-card { padding: 14px 0 12px 14px; border-radius: 20px; background: var(--color-bg-elevated); }
 .body-card__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-right: 14px; }
 .body-card__words {
