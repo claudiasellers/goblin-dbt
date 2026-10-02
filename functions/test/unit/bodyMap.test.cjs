@@ -56,8 +56,27 @@ test('getBodyMapContent rejects bad word ids and fails with failed-precondition 
   setDriver(fakeDriver(() => head).driver);
   await assert.rejects(fns.getBodyMapContent.run({ data: { emotionIds: ['Not An Id'] } }), (e) => e.code === 'invalid-argument');
   await assert.rejects(fns.getBodyMapContent.run({ data: { emotionIds: 'anxious' } }), (e) => e.code === 'invalid-argument');
-  setDriver(fakeDriver(() => []).driver);
-  await assert.rejects(fns.getBodyMapContent.run({ data: {} }), (e) => e.code === 'failed-precondition');
+  const logged = [];
+  const error = console.error;
+  console.error = (...a) => logged.push(a.join(' '));
+  try {
+    setDriver(fakeDriver(() => []).driver);
+    await assert.rejects(fns.getBodyMapContent.run({ data: {} }), (e) => e.code === 'failed-precondition');
+    setDriver(fakeDriver((q) => (/BodyMapContent/.test(q) ? [{ version: 'body-map-v1', regions: [] }] : [])).driver);
+    await assert.rejects(fns.getBodyMapContent.run({ data: {} }), (e) => e.code === 'failed-precondition');
+  } finally {
+    console.error = error;
+  }
+  assert.deepEqual(logged, [
+    'getBodyMapContent version mismatch graph=missing function=body-map-v2',
+    'getBodyMapContent version mismatch graph=body-map-v1 function=body-map-v2',
+  ], 'a version mismatch is logged (an HttpsError otherwise leaves no trace in functions:log)');
+});
+
+test('getBodyMapContent with zero live pad words (SIGNED_OFF empty) succeeds with an empty list, not an error', async () => {
+  setDriver(fakeDriver((q) => (/BodyMapContent/.test(q) ? head : [])).driver);
+  const out = await fns.getBodyMapContent.run({ data: {} });
+  assert.deepEqual(out, { version: 'body-map-v2', regions: ['chest', 'shoulders'], padWords: [], maps: [] });
 });
 
 // ---- Body-first suggestions (step 2) ----
