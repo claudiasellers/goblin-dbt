@@ -166,8 +166,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
 | `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
 | `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
-| `docs/design/body-map.md` | Body map plan (steps 1–2 built): heat figure, sensation pad, body mirror, several feelings; content in the graph (`BodyMap`, pad words), build order |
-| `src/data/bodyFigure.ts`, `src/components/checkin/body/` | The body step's figure: place ids (equal to the graph's, test-enforced), labels, paired places, tap shapes, glows; `HeatFigure` and `BodyStep`. Presentation only: words and typical maps come from the graph |
+| `docs/design/body-map.md` | Body map plan (steps 1–3 built): heat figure, sensation pad, body mirror, several feelings; content in the graph (`BodyMap`, pad words), build order |
+| `src/data/bodyFigure.ts`, `src/components/checkin/body/`, `src/lib/bodyPad.ts` | The body step's figure: place ids (equal to the graph's, test-enforced), labels, paired places, tap shapes, glows, `regionAt` (the drag); `HeatFigure` (drag to a place, lift to choose) and `BodyStep` (the place panel with the sensation pad: a `FeelingSquare`, up = intensity, right = comfort; words follow the dot's quarter; the mark glows in the pad's colour). Presentation only: words and typical maps come from the graph |
 | `schema/migrations/2026-10-body-regions.cypher` | One-off: old Title Case `BodySensation.region` names → place ids + `side` (run after step 2's functions deploy) |
 | `scripts/body-map/content.py` | Editable source for `schema/body-map.cypher` (regions, pad words on `SensationType`, `BodyMap` / `BodyMapPlace`); drafts until listed in `SIGNED_OFF`; regenerate with `build.py`, then `fixture.py` |
 | `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |

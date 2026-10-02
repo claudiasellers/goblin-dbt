@@ -1,6 +1,6 @@
 # Body map: plan
 
-Status: **steps 1–2 built** (content and function; heat figure, both sides, graph words, body-first suggestions). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to Z
+Status: **steps 1–3 built** (content and function; heat figure, both sides, graph words, body-first suggestions; drag on the body and the sensation pad). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to Z
 (sensation pad W, body mirror X, heat figure Y, several feelings Z). Product record: Product
 Changelog, "Body step redesign: the sensation pad".
 
@@ -149,9 +149,11 @@ step reads it.
      map's places, returning maps with their words; `EmotionSuggestion` uses it. Delete
      `sensationMappings.ts`, closing the CLAUDE.md tech debt.
    - Deploy: functions, the migration, then hosting.
-3. **Sensation pad.**
-   - `SensationPad` adds the small square: real intensity, chips filtered by the pad's quarter,
-     mark colour from the pad, Both / Left / Right.
+3. **Drag on the body, and the sensation pad.**
+   - Drag on the figure: a glow follows the finger, the place under it reads back live, lifting
+     chooses it.
+   - The pad adds the small square: real intensity, chips filtered by the pad's quarter, mark
+     colour from the pad, Both / Left / Right.
 4. **Body mirror, one map.**
    - A ghost layer for the routing group's map, a pre-filled pad on tap, "Add all of these", and
      `fromMirror` saved.
@@ -188,6 +190,37 @@ live).
   functions, run `schema/migrations/2026-10-body-regions.cypher`, then deploy hosting. The body
   step and suggestions show words only once the content is signed off; before that, places can
   be marked without words and "Start with my body" offers the full word list.
+
+### Step 3 as built
+
+- **Drag on the body** (`HeatFigure`): the svg takes the pointer (the tap shapes have
+  `pointer-events: none` and stay focusable buttons for the keyboard and screen readers). Pressing
+  anywhere on the figure and moving shows a glow under the finger, outlines the place it would
+  choose and names it above the figure ("Throat", or "Not on the body"); lifting chooses it, and a
+  plain tap still works. `regionAt(x, y)` in `bodyFigure.ts` is pure: where tap shapes overlap the
+  smaller place wins (a hand over the end of an arm, the face over the bottom of the head); off
+  every shape, the nearest within 14 units (the seams and the silhouette's edges); further out,
+  nothing. The figure blocks page scroll under the finger (`touch-action: none`), like the
+  check-in square; the page still scrolls beside it.
+- **The pad** (`PlacePanel`, `src/lib/bodyPad.ts`): the check-in's `FeelingSquare` at about 230px,
+  with its own axis words (stronger / fainter, uncomfortable / comfortable). Up is intensity, right
+  is comfort, so the quarters are the graph's pad zones (hu / lu / hp / lp). A read-back under it
+  ("Strong and uncomfortable", "Faint and comfortable", "Medium, not clearly either").
+- **Words follow the dot.** Before the dot is down, the panel asks for the dot and shows only
+  words already picked: the no-words input comes first, then words for it. Once it's down, the
+  words for this place in the dot's quarter show, that quarter first; within 0.12 of a middle line
+  the neighbouring quarter's words show too, so near the centre all of them do. Picked words never
+  disappear when the dot moves. Picked chips take the mark's colour.
+- **Colour.** A mark glows `squareColor(pad)`, the same blend as the check-in square, and the
+  figure updates live while the panel is open (side and colour). An untouched pad is saved as the
+  middle (0.5, 0.5), which reads as "not placed" and glows the warm mid-tone; a dot put exactly in
+  the middle on purpose is nudged to 0.501. The marks list says each mark back ("Chest strong and
+  uncomfortable · racing").
+- **Layout under the finger.** The word area only grows while a panel is open, and the scroller
+  doesn't anchor while one is open (`overflow-anchor: none`). Without both, the word list changing
+  as the dot moves scrolled the page (and the pad) under the finger at the bottom of the page.
+- Saved: `intensity` is the pad point (it was always 0.5 / 0.5 in step 2). No backend change.
+- **Deploy:** hosting only.
 
 ## Open questions (Claudia)
 
