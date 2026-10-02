@@ -37,6 +37,8 @@ export interface SensationInput {
   side: 'both' | 'left' | 'right' | null;
   /** Stable SensationType ids of the picked pad words (tags are their display labels). */
   sensationIds: string[];
+  /** Body map step 3: how strong, 0–1, from the optional strength bar; null when it wasn't used. */
+  strength: number | null;
 }
 
 const SIDES = ['both', 'left', 'right'] as const;
@@ -145,6 +147,8 @@ function sensation(raw: unknown): SensationInput | null {
     sensationIds: Array.isArray(raw.sensationIds)
       ? [...new Set(raw.sensationIds.filter((t): t is string => typeof t === 'string' && SENSATION_ID.test(t)))].slice(0, 20)
       : [],
+    strength: typeof raw.strength === 'number' && Number.isFinite(raw.strength) && raw.strength >= 0 && raw.strength <= 1
+      ? Math.round(raw.strength * 1000) / 1000 : null,
   };
 }
 

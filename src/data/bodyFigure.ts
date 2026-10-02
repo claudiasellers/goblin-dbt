@@ -102,6 +102,60 @@ export function glowFor(region: RegionId, side: Side = 'both') {
   return g;
 }
 
+/**
+ * Which place is under a point on the figure (viewBox units), for the drag. Where two tap targets
+ * overlap, the smaller, more specific place wins (a hand over the end of an arm, a face under the
+ * head). Off every target, the nearest one within `SNAP` units is taken, so the seams between
+ * targets and the silhouette's edges still land somewhere; further out is nothing.
+ */
+const HIT_PRIORITY: RegionId[] = ['hands', 'feet', 'face', 'throat', 'shoulders', 'head', 'chest', 'stomach', 'arms', 'legs'];
+export const SNAP = 14;
+
+function polygon(d: string): [number, number][] {
+  const n = (d.match(/-?\d+(?:\.\d+)?/g) ?? []).map(Number);
+  const pts: [number, number][] = [];
+  for (let i = 0; i + 1 < n.length; i += 2) pts.push([n[i], n[i + 1]]);
+  return pts;
+}
+
+function segDist(px: number, py: number, [ax, ay]: [number, number], [bx, by]: [number, number]) {
+  const dx = bx - ax, dy = by - ay;
+  const t = Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy || 1)));
+  return Math.hypot(px - (ax + t * dx), py - (ay + t * dy));
+}
+
+/** Distance from a point to a shape's edge; 0 inside. */
+export function distanceToShape(s: HitShape, x: number, y: number): number {
+  if (s.kind === 'ellipse') {
+    const k = Math.hypot((x - s.cx) / s.rx, (y - s.cy) / s.ry);
+    return k <= 1 ? 0 : (k - 1) * Math.min(s.rx, s.ry);
+  }
+  if (s.kind === 'rect') {
+    const dx = Math.max(s.x - x, 0, x - (s.x + s.w));
+    const dy = Math.max(s.y - y, 0, y - (s.y + s.h));
+    return Math.hypot(dx, dy);
+  }
+  const pts = polygon(s.d);
+  let inside = false;
+  for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+    const [xi, yi] = pts[i], [xj, yj] = pts[j];
+    if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside;
+  }
+  if (inside) return 0;
+  return Math.min(...pts.map((p, i) => segDist(x, y, p, pts[(i + 1) % pts.length])));
+}
+
+export function regionAt(x: number, y: number): RegionId | null {
+  let best: RegionId | null = null;
+  let bestD = SNAP;
+  for (const id of HIT_PRIORITY) {
+    const d = Math.min(...REGIONS[id].hits.map((s) => distanceToShape(s, x, y)));
+    if (d === 0) return id;
+    if (d < bestD) { best = id; bestD = d; }
+  }
+  return best;
+}
+
 /** The figure itself: silhouette shapes (also used as the clip path for the glow). */
 export const SILHOUETTE = {
   head: { cx: 100, cy: 44, rx: 26, ry: 30 },

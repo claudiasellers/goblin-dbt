@@ -1138,15 +1138,17 @@ h1.uppercase, h2.uppercase {
 /* ── Body map (docs/design/body-map.md): heat figure, places, panel ── */
 .heat-figure { display: block; width: 100%; height: auto; overflow: visible; touch-action: manipulation; }
 .heat-figure__body { fill: color-mix(in oklab, var(--color-text-primary) 14%, var(--color-bg-primary)); }
+.heat-figure.is-interactive { touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .heat-figure__hit {
   fill: transparent;
   stroke: transparent;
   stroke-width: 2;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
+  pointer-events: none; /* the svg takes the pointer (drag); hits stay focusable for the keyboard */
   transition: fill 160ms var(--ease-default), stroke 160ms var(--ease-default);
 }
-.heat-figure__hit:hover { fill: color-mix(in srgb, var(--color-text-primary) 8%, transparent); }
+.heat-figure__hit.is-hover { fill: color-mix(in srgb, var(--color-text-primary) 8%, transparent); }
+.heat-figure.is-dragging .heat-figure__hit { transition: none; }
+.heat-figure.is-dragging .heat-figure__hit.is-hover { stroke: var(--color-text-primary); stroke-dasharray: 4 3; }
 .heat-figure__hit:focus-visible { outline: none; stroke: var(--color-accent); stroke-dasharray: 4 3; }
 .heat-figure__hit.is-selected { stroke: var(--color-text-primary); stroke-dasharray: 4 3; }
 .den-chip.is-marked::before {
@@ -1154,33 +1156,100 @@ h1.uppercase, h2.uppercase {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: color-mix(in oklab, var(--color-q-hu-fill), var(--color-q-hp-fill));
+  background: var(--mark, color-mix(in oklab, var(--color-q-hu-fill), var(--color-q-hp-fill)));
 }
-.body-mark-row {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  width: 100%;
-  min-height: 48px;
-  padding: 12px 14px;
+.body-stage {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 172px) 56px;
+  grid-template-rows: auto auto;
+  justify-content: center;
+  align-items: center;
+  column-gap: 8px;
+  row-gap: 4px;
+}
+.body-stage__readback {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  min-height: 1.5em;
+  text-align: center;
+  white-space: nowrap;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+.body-stage__toggle { grid-column: 3; grid-row: 1; justify-self: end; }
+.body-stage__figure { grid-column: 2; grid-row: 2; }
+.body-stage__bar { grid-column: 3; grid-row: 2; align-self: stretch; display: flex; justify-content: center; }
+.strength-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 36px;
+  padding: 0 11px 0 8px;
   border: 0;
-  border-radius: 16px;
+  border-radius: 12px;
   font: inherit;
-  font-size: 15.5px;
-  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  color: var(--color-text-secondary);
   background: var(--color-bg-elevated);
+  box-shadow: 0 3px 0 var(--color-lip);
   cursor: pointer;
 }
-.body-mark-row:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
-.body-mark-row__dot {
-  flex: none;
-  align-self: center;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: color-mix(in oklab, var(--color-q-hu-fill), var(--color-q-hp-fill));
+.strength-toggle[aria-pressed='true'] { color: var(--color-on-accent); background: var(--color-accent-fill); box-shadow: 0 1px 0 var(--color-lip); transform: translateY(2px); }
+.strength-toggle:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.strength-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  width: 44px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: ns-resize;
+  outline: none;
 }
-.body-panel { padding: 18px 16px 12px; border-radius: 22px; background: var(--color-bg-elevated); }
+.strength-bar.is-disabled { cursor: default; opacity: 0.55; }
+.strength-bar:focus-visible .strength-bar__track { box-shadow: 0 0 0 3px var(--color-bg-primary), 0 0 0 6px var(--color-accent); }
+.strength-bar__end { font-size: 11px; font-weight: 700; color: var(--color-text-secondary); }
+.strength-bar__track {
+  position: relative;
+  flex: 1;
+  width: 14px;
+  border-radius: 7px;
+  background: linear-gradient(0deg, color-mix(in oklab, var(--color-q-hu-fill) 18%, transparent), var(--color-q-hu-fill));
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.18);
+}
+.strength-bar.is-disabled .strength-bar__track { background: color-mix(in srgb, var(--color-text-primary) 10%, transparent); }
+.strength-bar__thumb {
+  position: absolute;
+  left: 50%;
+  width: 30px;
+  height: 30px;
+  margin: -15px 0 0 -15px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-q-hu-fill) 55%, transparent), 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: top 80ms linear;
+}
+.strength-bar.is-dragging .strength-bar__thumb { transition: none; }
+.body-card { padding: 14px 0 12px 14px; border-radius: 20px; background: var(--color-bg-elevated); }
+.body-card__top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; padding-right: 14px; }
+.body-card__words {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 2px 14px 6px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent);
+  mask-image: linear-gradient(90deg, #000 85%, transparent);
+}
+.body-card__words::-webkit-scrollbar { display: none; }
+.body-card__words > * { flex: none; }
 .seg { display: inline-flex; gap: 2px; padding: 3px; border-radius: 13px; background: color-mix(in srgb, var(--color-text-primary) 8%, transparent); }
 .seg button {
   min-height: 40px;
@@ -1196,6 +1265,7 @@ h1.uppercase, h2.uppercase {
 }
 .seg button.is-on { color: var(--color-text-primary); background: var(--color-bg-card-hover); box-shadow: 0 2px 0 var(--color-lip); }
 .seg button:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.seg--small button { min-height: 34px; padding: 0 9px; font-size: 13px; }
 
 @media (prefers-reduced-motion: reduce) {
   .den-chip:active, .den-chip[aria-pressed='true'] { transform: none; }
