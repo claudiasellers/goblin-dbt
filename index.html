@@ -2,8 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- Home Screen app (Add to Home Screen / Install). Icons come from scripts/icons/build.py.
+         theme-color is the room's page colour: set below before paint, then by applyRoom (src/data/palettes.ts). -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#231827" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Goblin" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="description" content="Simple DBT tools for when things feel too big or complicated" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,11 +20,12 @@
     <title>DBT Tools</title>
     <!-- Paint the saved room before React mounts so there is no flash of the default.
          Reads the same profile cache UserProfileContext writes; skips if more than one account is cached.
-         A room owns its light/dark mode. Keep ROOM_MODES, LEGACY, LEGACY_DARK and the default in step with
-         src/data/palettes.ts. -->
+         A room owns its light/dark mode. Keep ROOM_MODES, ROOM_PAGE (each room's swatch[0]), LEGACY, LEGACY_DARK
+         and the default in step with src/data/palettes.ts. -->
     <script>
       (function () {
         var ROOM_MODES = { velvet: 'dark', dusk: 'dark', tinted: 'light', pastel: 'light', 'pastel-mix': 'light', daylight: 'light' };
+        var ROOM_PAGE = { velvet: '#231827', dusk: '#2E3542', tinted: '#E8DFD1', pastel: '#F6E6F0', 'pastel-mix': '#F6EEF0', daylight: '#E6ECFD' };
         var LEGACY = { 'cool-steel': 'tinted', 'slate-spruce': 'dusk', signal: 'daylight', giverny: 'pastel-mix', clouds: 'pastel' };
         // Before rooms, light/dark was a separate saved theme: a legacy palette saved dark goes to a dark room.
         var LEGACY_DARK = { 'cool-steel': 'velvet', 'slate-spruce': 'dusk', signal: 'velvet', giverny: 'velvet', clouds: 'velvet' };
@@ -34,6 +44,8 @@
         } catch (e) { /* ignore */ }
         document.documentElement.dataset.palette = room;
         document.documentElement.dataset.theme = ROOM_MODES[room];
+        var tc = document.querySelector('meta[name="theme-color"]');
+        if (tc) tc.setAttribute('content', ROOM_PAGE[room]);
       })();
     </script>
   </head>

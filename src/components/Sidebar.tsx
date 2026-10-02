@@ -7,8 +7,11 @@ const navItems = [
   { path: '/history', label: 'Reflect', icon: HistoryIcon },
 ];
 
-export const SIDEBAR_WIDTH_CLASS = 'md:w-52';
-export const CONTENT_OFFSET_CLASS = 'md:ml-52';
+// 13rem plus the left safe-area inset: installed to the Home Screen with viewport-fit=cover, a
+// landscape iPhone puts the notch on the left, so the sidebar grows by the inset and pads it out.
+// The inset is 0 everywhere else, so these are plain 13rem in a browser tab.
+export const SIDEBAR_WIDTH_CLASS = 'md:w-[calc(13rem_+_env(safe-area-inset-left))] md:pl-[env(safe-area-inset-left)]';
+export const CONTENT_OFFSET_CLASS = 'md:ml-[calc(13rem_+_env(safe-area-inset-left))] md:pr-[env(safe-area-inset-right)]';
 
 const desktopLinkClass = ({ isActive }: { isActive: boolean }) => `
   relative flex items-center min-h-11 mx-2 px-3 rounded-lg transition-colors duration-150
@@ -34,7 +37,8 @@ const mobileLinkClass = ({ isActive }: { isActive: boolean }) => `
  * never covers content.
  *
  * Mobile (<md): a labeled bottom tab bar. DashboardLayout reserves bottom
- * padding so content is never hidden behind it.
+ * padding so content is never hidden behind it. The bar pads itself by the
+ * bottom safe-area inset so it clears the home indicator when installed.
  */
 export function Sidebar() {
   const { user } = useAuth();
@@ -105,7 +109,7 @@ export function Sidebar() {
       {/* Mobile bottom nav — always labeled */}
       <nav
         aria-label="Main"
-        className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-sidebar-bg)] border-t border-[var(--color-sidebar-border)] z-40"
+        className="md:hidden fixed bottom-0 left-0 right-0 bg-[var(--color-sidebar-bg)] border-t border-[var(--color-sidebar-border)] z-40 pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)]"
       >
         <div className="flex">
           {navItems.map((item) => (
