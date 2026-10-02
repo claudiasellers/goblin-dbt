@@ -217,9 +217,9 @@ it the same day: the pad made the step something you scroll to. Rebuilt as one s
 - **Drag on the body** (`HeatFigure`): a wrapper div takes the pointer (`touch-action: none`, the
   finger mapped from the svg's box, not `getScreenCTM`, which was unreliable on phones; the tap shapes have
   `pointer-events: none` and stay focusable buttons for the keyboard and screen readers). Pressing
-  anywhere on the figure and moving shows a glow under the finger, outlines the place it would
-  choose and names it above the figure ("Throat", or "Not on the body"); lifting chooses it, and a
-  plain tap still works. `regionAt(x, y)` in `bodyFigure.ts` is pure: where tap shapes overlap the
+  anywhere on the figure and moving shows a glow under the finger and names the place it would
+  choose above the figure ("Throat", or "Not on the body"); lifting chooses it, and a plain tap
+  still works. No outline is drawn round places; only keyboard focus shows one. `regionAt(x, y)` in `bodyFigure.ts` is pure: where tap shapes overlap the
   smaller place wins (a hand over the end of an arm, the face over the bottom of the head); off
   every shape, the nearest within 14 units (the seams and the silhouette's edges); further out,
   nothing. The figure blocks page scroll under the finger (`touch-action: none`), like the
@@ -231,7 +231,8 @@ it the same day: the pad made the step something you scroll to. Rebuilt as one s
   (`goblin.body.strengthBarHidden` in this device's storage, a display preference, not profile
   data). Drag or press anywhere on it;
   arrows and Home / End from the keyboard (`role="slider"`, vertical). With no place chosen it
-  shows but can't be used. A place's strength stays null until the bar is touched for it.
+  shows but can't be used. The thumb always shows: in the middle and softer until the bar is
+  touched for this place; until then the place's strength is saved as null.
 - **The card**: "My chest feels…", Both / Your left / Your right for paired places, and the graph's
   words for the place in one row that swipes sideways (graph order; a saved word that's no longer
   served still shows so it can be taken off). Buttons: Cancel or Remove, and Add this place / Done.
