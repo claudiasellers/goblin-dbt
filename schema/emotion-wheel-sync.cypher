@@ -172,6 +172,19 @@ SET e.name = emotion.name,
     e.quadrant = emotion.quadrant,
     e.family = emotion.family;
 
+// Prune family links that no longer fit a word's family (a word that changes family, like
+// "overwhelmed" bad → fearful in Oct 2026, must not keep its old relatives and opposites). Only links
+// between two wheel words (both carry `family`); no other schema file links two wheel words
+// (tests/emotion-wheel-sync.test.mjs), so nothing else is touched. The MERGEs below rebuild the rest.
+MATCH (a:Emotion)-[r:RELATED_TO]->(b:Emotion)
+WHERE a.family IS NOT NULL AND b.family IS NOT NULL AND a.family <> b.family
+DELETE r;
+
+MATCH (a:Emotion)-[r:OPPOSITE_OF]->(b:Emotion)
+WHERE a.family IS NOT NULL AND b.family IS NOT NULL
+  AND NOT [a.family, b.family] IN [["happy", "sad"], ["sad", "happy"], ["surprised", "disgusted"], ["disgusted", "surprised"], ["fearful", "angry"], ["angry", "fearful"], ["bad", "happy"], ["happy", "bad"]]
+DELETE r;
+
 // Related emotions: tie each family to its core emotion.
 UNWIND [
   {family: "happy", core: "happy"},

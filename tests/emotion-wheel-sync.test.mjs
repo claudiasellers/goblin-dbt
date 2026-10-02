@@ -26,3 +26,23 @@ test("and the graph agrees with the app on its name, quadrant and family", () =>
   const diff = app.filter((w) => graph.has(w.id)).filter((w) => JSON.stringify(graph.get(w.id)) !== JSON.stringify(w));
   assert.deepEqual(diff.map((w) => ({ app: w, graph: graph.get(w.id) })), []);
 });
+
+test("a word that changes family loses its old relatives and opposites; nothing else links two wheel words", async () => {
+  const sync = readFileSync("schema/emotion-wheel-sync.cypher", "utf8");
+  assert.match(sync, /\[r:RELATED_TO\]->\(b:Emotion\)\s+WHERE a\.family IS NOT NULL AND b\.family IS NOT NULL AND a\.family <> b\.family\s+DELETE r;/);
+  assert.match(sync, /\[r:OPPOSITE_OF\]->\(b:Emotion\)\s+WHERE a\.family IS NOT NULL AND b\.family IS NOT NULL[\s\S]*?DELETE r;/);
+  // The prune list of opposite families equals the pairs the file builds.
+  const built = [...sync.matchAll(/\{left: "([a-z]+)", right: "([a-z]+)"\}/g)].flatMap(([, l, r]) => [`${l}>${r}`, `${r}>${l}`]).sort();
+  const kept = [...sync.match(/NOT \[a\.family, b\.family\] IN (\[.*\])/)[1].matchAll(/\["([a-z]+)", "([a-z]+)"\]/g)].map(([, a, b]) => `${a}>${b}`).sort();
+  assert.deepEqual(kept, built);
+  // Other loaded files never link two wheel words with these types (the prune would remove them).
+  const { LOAD_ORDER, splitStatements } = await import("../scripts/load-graph.mjs");
+  for (const f of LOAD_ORDER.filter((x) => x !== "emotion-wheel-sync.cypher")) {
+    for (const st of splitStatements(readFileSync(`schema/${f}`, "utf8"))) {
+      const ids = Object.fromEntries([...st.matchAll(/\((\w+):Emotion \{id: ["']([a-z_]+)["']\}\)/g)].map(([, v, id]) => [v, id]));
+      for (const [, a, b] of st.matchAll(/MERGE \((\w+)\)-\[\w*:(?:RELATED_TO|OPPOSITE_OF)\]->\((\w+)\)/g)) {
+        assert.ok(!(graph.has(ids[a]) && graph.has(ids[b])), `${f}: ${ids[a]} ↔ ${ids[b]} links two wheel words`);
+      }
+    }
+  }
+});
