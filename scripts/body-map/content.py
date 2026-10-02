@@ -10,7 +10,9 @@
 #   PAD_WORDS  the sensation chips. Each is a SensationType: `zones` says which quarter it belongs to
 #              (hu more intense + unpleasant, lu less intense + unpleasant, hp more intense + pleasant,
 #              lp less intense + pleasant); `regions` limits it to some places (None = anywhere);
-#              `energy` (more / less) makes a mark glow warm or cool.
+#              The first zone is the word's home quarter: a mark glows in that quarter's colour on the
+#              feeling square (so Settled reads calm green, not low blue). `energy` (more / less) is the
+#              word's arousal, kept for the mirror.
 #   FELT       where each emotion is typically felt: (Emotion)-[:FELT_AS {region, weight, status}]->
 #              (SensationType). THE one source of body-place knowledge in the graph (Oct 2026: it
 #              replaced the body maps' own place lists and the hand-written FELT_AS statements in
@@ -76,20 +78,20 @@ PAD_WORDS = [
     ("knotted", "Knotted", ["hu"], ["stomach", "upper_back", "lower_back"], "more"),
     ("churning", "Churning", ["hu"], ["stomach"], "more"),
     ("buzzing", "Buzzing", ["hu"], ["head", "hands", "body"], "more"),
-    ("achy", "Achy", ["hu", "lu"], None, "more"),
     # less intense, unpleasant
     ("heaviness", "Heavy", ["lu"], None, "less"),
     ("numbness_sensation", "Numb", ["lu"], None, "less"),
     ("drained", "Drained", ["lu"], ["arms", "legs", "body"], "less"),
     ("weakness", "Weak", ["lu"], ["arms", "legs", "body"], "less"),
-    ("cold_sensation", "Cold", ["lu"], ["hands", "feet", "chest", "body"], "less"),
+    ("cold_sensation", "Cold", ["lu", "hu"], ["hands", "feet", "chest", "body"], "less"),
     ("hollow", "Hollow", ["lu"], ["chest", "stomach"], "less"),
     ("sinking", "Sinking", ["lu"], ["chest", "stomach"], "less"),
     ("foggy", "Foggy", ["lu"], ["head"], "less"),
     ("lump", "A lump", ["lu"], ["throat"], "less"),
     ("slumped", "Slumped", ["lu"], ["shoulders", "upper_back", "body"], "less"),
+    ("achy", "Achy", ["lu"], None, "less"),  # a dull, lasting ache: low arousal (review 2 Oct 2026)
     # more intense, pleasant
-    ("butterflies", "Fluttery", ["hu", "hp"], ["chest", "stomach"], "more"),
+    ("butterflies", "Fluttery", ["hp", "hu"], ["chest", "stomach"], "more"),
     ("tingly", "Tingly", ["hp"], None, "more"),
     ("lightness", "Light", ["hp", "lp"], None, "more"),
     ("warmth", "Warm", ["hp", "lp"], ["face", "chest", "stomach", "hands", "body"], "more"),
@@ -115,7 +117,9 @@ FELT = {
     "anxiety": [("chest", "constriction", 0.6, BASE), ("chest", "racing_heart", 1.0, BASE), ("stomach", "butterflies", 0.8, BASE),
                 ("shoulders", "tension", 0.6, BASE), ("throat", "constriction", 0.8, BASE), ("shoulders", "raised_up", 0.7, NEW)],
     "fear": [("chest", "racing_heart", 1.0, BASE), ("stomach", "heaviness", 0.6, BASE), ("body", "cold_sensation", 0.6, BASE),
-             ("legs", "weakness", 0.5, BASE), ("body", "shaking", 0.6, BASE), ("hands", "shaking", 0.6, NEW)],
+             ("legs", "weakness", 0.5, BASE), ("body", "shaking", 0.6, BASE), ("hands", "shaking", 0.6, NEW),
+             # fight-or-flight pulls blood from the hands and feet: cold, clammy (review 2 Oct 2026)
+             ("hands", "cold_sensation", 0.7, NEW), ("feet", "cold_sensation", 0.5, NEW)],
     "panic": [("chest", "racing_heart", 1.0, BASE), ("chest", "constriction", 0.6, BASE), ("body", "shaking", 0.6, BASE),
               ("hands", "numbness_sensation", 0.6, BASE)],
     "stress": [("shoulders", "tension", 0.6, BASE), ("upper_back", "tension", 0.6, BASE), ("neck", "tension", 0.6, BASE)],
@@ -175,16 +179,16 @@ MAPS = {
     "fear": ("Fear and worry", ["anxiety", "fear", "panic", "stress", "overwhelm"], [
         "fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed",
         "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control",
-        "hesitant",
+        "hesitant", "jealous",
     ]),
     "anger": ("Anger", ["anger", "irritation", "frustration", "hostility", "angsty"], [
         "angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected",
-        "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed",
+        "indignant", "violated", "furious", "provoked", "hostile", "infuriated", "annoyed",
     ]),
     "sadness": ("Sadness", ["sadness", "disappointment", "loneliness", "hopelessness", "rejection"], [
         "rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful",
         "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned",
-        "victimized", "fragile", "grief", "powerless",
+        "victimized", "fragile", "grief",
     ]),
     "shame": ("Shame", ["hot_shame", "cold_shame"], [
         "inadequate", "inferior", "worthless", "insignificant", "exposed", "humiliated", "ridiculed",
@@ -197,10 +201,10 @@ MAPS = {
     ]),
     "depleted": ("Drained or numb", ["apathy", "boredom", "emptiness", "numbness"], [
         "weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent",
-        "empty", "numb",
+        "empty", "numb", "powerless",
     ]),
     "love": ("Love and warmth", ["love", "compassion", "gratitude", "trust"], [
-        "aroused", "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative",
+        "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative",
         "tender",
     ]),
     "joy": ("Joy", ["joy", "pride", "hope", "amusement", "inspiration"], [
@@ -208,7 +212,7 @@ MAPS = {
         "inquisitive", "successful", "confident", "respected", "valued", "courageous", "creative", "hopeful",
         "inspired", "good",
     ]),
-    "excitement": ("Excitement", ["excitement", "enthusiasm", "curiosity"], ["excited", "eager", "energetic", "playful", "cheeky"]),
+    "excitement": ("Excitement", ["excitement", "enthusiasm", "curiosity"], ["excited", "eager", "energetic", "playful", "cheeky", "aroused"]),
     "surprise": ("Surprise", ["surprised"], ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"]),
     "calm": ("Calm", ["calm", "contentment", "serenity", "relief", "safety", "humility"], [
         "calm", "relaxed", "peaceful", "content", "chill", "comfortable", "thoughtful", "mellow", "serene",
