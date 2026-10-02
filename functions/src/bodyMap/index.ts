@@ -48,6 +48,11 @@ export const getBodyMapContent = callable<unknown, BodyMapContent>(
         `MATCH (c:BodyMapContent {id: 'body_map'}) RETURN c.version AS version, c.regions AS regions`);
       const rec = head.records[0];
       if (!rec || rec.get('version') !== BODY_MAP_VERSION) {
+        // An HttpsError reaches the client as is and nothing else logs it (shared/errors.ts), so
+        // without this line a graph / function version mismatch never shows in functions:log.
+        // Public content only: the graph's version string, never request data.
+        console.error('getBodyMapContent', 'version mismatch', `graph=${rec ? String(rec.get('version')) : 'missing'}`,
+          `function=${BODY_MAP_VERSION}`);
         throw new HttpsError('failed-precondition', 'Body map content migration is required');
       }
       const words = await tx.run(
