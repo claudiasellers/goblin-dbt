@@ -38,7 +38,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `answerToolOutcome`, `scheduleFollowUp`, `resolveFollowUp`, `snoozeFollowUp`, `getToday`, `getSpineContent` (public); `todayOrder.ts` (derived due/stale/upcoming + ordering), `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
 | `profile/` | `getProfileContext` (the single profile read path: only the slices `PROFILE_NEEDS` declares per tool, in code), `getMe`, `upsertProfileFact`, `confirmProfileItem`, `setAsideProfileItem`, `restoreProfileItem`, `answerPatternOffer` (the only writer of `MyPattern`); `slices.ts` resolvers never read a `:LogRecord` (test-enforced) |
 | `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
-| `bodyMap/` | `getBodyMapContent` (public): signed-off pad words, and the body-mirror maps for the sent grid word ids in their order (`docs/design/body-map.md`); `types.ts` mirrored in `src/data/bodyMapTypes.ts` |
+| `bodyMap/` | `getBodyMapContent` (public): signed-off pad words, and the body-mirror maps for the sent grid word ids in their order (`docs/design/body-map.md`); `suggestEmotionsFromBody` (public): body-first suggestions, the marked places scored against the signed-off maps (`suggest.ts`, pure); `types.ts` mirrored in `src/data/bodyMapTypes.ts` |
 | `witness/` | `getWitnessLines` (public; signed in it also reads own / kept lines via `readProfileSlices(tx, uid, 'witness')` and the `SHOWED_LINE` history), `recordWitnessBeat` (host must be the caller's, found by key; `SHOWED_LINE` follows the host's lifecycle guard; `OwnLine` / `SAVED_LINE` are profile writes); `rank.ts` (pure ranking, fade stage, when to ask "did that land?"), `types.ts` (mirrored in `src/data/witnessTypes.ts`), `validation.ts` (own-line text is length-checked only, never linted) |
 
 `userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
@@ -106,10 +106,6 @@ This includes:
 
 **Frontend data files must NOT duplicate graph content.** If a component needs emotion knowledge, it calls a Cloud Function. No exceptions. Duplicate sources of truth will drift, cause bugs, and make content updates (like humanizing clinical language) fail silently.
 
-### Known tech debt (to be consolidated into graph)
-
-- **`src/data/sensationMappings.ts`** — Maps body sensations → emotions with frontend scoring logic. Duplicates the graph's `FELT_AS` relationships. Should be replaced by a Cloud Function.
-
 ---
 
 ## Data layers
@@ -158,7 +154,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 
 | File | Purpose |
 |------|---------|
-| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (feeling square) → word → find → discriminating → body → sensation → suggestion → analyzing → result. Saves the check-in when the result renders (PR-C1); Today stack above the square (PR-S5); Help me now → `HelpNowInterim` (PR-C2: safe step + Cool Down / 5-4-3-2-1, no check-in, no routing call) |
+| `src/pages/CheckIn.tsx` | Multi-step check-in flow: emotion (feeling square) → word → find → discriminating → body (`components/checkin/body/BodyStep.tsx`: heat figure + place panel) → suggestion (body-first: `suggestEmotionsFromBody`) → analyzing → result. Saves the check-in when the result renders (PR-C1); Today stack above the square (PR-S5); Help me now → `HelpNowInterim` (PR-C2: safe step + Cool Down / 5-4-3-2-1, no check-in, no routing call) |
 | `src/components/checkin/FeelingSquare.tsx` | The continuous check-in square (touch, drag, lift; arrow keys); `CheckInSquare.tsx` and `WordPick.tsx` are its two screens; logic in `src/lib/feelingSquare.ts`; see `docs/design/den-rooms.md` |
 | `src/data/skillFamilies.ts` | Skill-family label and colour key per tool module (teal get through it, lavender shift it, rose with other people); used by `RecommendationCards.tsx` |
 | `scripts/rooms/build.py` | Source for the room colour blocks in `src/index.css` (six rooms, `--square-*` tokens, contrast check) |
@@ -170,7 +166,9 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
 | `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
 | `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
-| `docs/design/body-map.md` | Body map plan (step 1 built): heat figure, sensation pad, body mirror, several feelings; content in the graph (`BodyMap`, pad words), build order |
+| `docs/design/body-map.md` | Body map plan (steps 1–2 built): heat figure, sensation pad, body mirror, several feelings; content in the graph (`BodyMap`, pad words), build order |
+| `src/data/bodyFigure.ts`, `src/components/checkin/body/` | The body step's figure: place ids (equal to the graph's, test-enforced), labels, paired places, tap shapes, glows; `HeatFigure` and `BodyStep`. Presentation only: words and typical maps come from the graph |
+| `schema/migrations/2026-10-body-regions.cypher` | One-off: old Title Case `BodySensation.region` names → place ids + `side` (run after step 2's functions deploy) |
 | `scripts/body-map/content.py` | Editable source for `schema/body-map.cypher` (regions, pad words on `SensationType`, `BodyMap` / `BodyMapPlace`); drafts until listed in `SIGNED_OFF`; regenerate with `build.py`, then `fixture.py` |
 | `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |
 | `scripts/find-the-feeling/content.py` | Editable source for `schema/find-the-feeling.cypher` (Find the feeling: word signatures, urge routing, `appToolId`); regenerate with `build.py` |

@@ -88,7 +88,8 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
          FOREACH (s IN $bodySensations |
            CREATE (b:BodySensation:UserData:LogRecord {id: s.id, key: $uid + ':' + s.id, ownerId: $uid,
                    createdAt: datetime(), schemaVersion: 1, x: s.x, y: s.y, region: s.region,
-                   intensityX: s.intensityX, intensityY: s.intensityY, tags: s.tags})
+                   intensityX: s.intensityX, intensityY: s.intensityY, tags: s.tags,
+                   side: s.side, sensationIds: s.sensationIds})
            MERGE (c)-[:SENSED]->(b))
          WITH DISTINCT c
          OPTIONAL MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession) WHERE ts.key IN $embeddedKeys
@@ -178,7 +179,8 @@ export const getCheckInsByUser = callable<unknown, { checkIns: unknown[] }>(
          timestamp: toString(c.timestamp),
          intensity: {x: c.intensityX, y: c.intensityY}
        } AS checkIn,
-       [s IN sensations | {x: s.x, y: s.y, region: s.region, tags: s.tags, intensity: {x: s.intensityX, y: s.intensityY}}] AS bodySensations`,
+       [s IN sensations | {x: s.x, y: s.y, region: s.region, side: s.side, tags: s.tags,
+         sensationIds: coalesce(s.sensationIds, []), intensity: {x: s.intensityX, y: s.intensityY}}] AS bodySensations`,
       { uid, limit: neo4j.int(limit) },
     ));
     const checkIns = result.records.map((record: Neo4jRecord) => {

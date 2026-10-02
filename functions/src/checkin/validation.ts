@@ -33,7 +33,14 @@ const STEP_ID = /^[a-z0-9][a-z0-9_-]{0,63}$/i;
 
 export interface SensationInput {
   x: number; y: number; region: string; intensityX: number; intensityY: number; tags: string[];
+  /** Body map (docs/design/body-map.md): which side of a paired place; null from older clients. */
+  side: 'both' | 'left' | 'right' | null;
+  /** Stable SensationType ids of the picked pad words (tags are their display labels). */
+  sensationIds: string[];
 }
+
+const SIDES = ['both', 'left', 'right'] as const;
+const SENSATION_ID = /^[a-z][a-z0-9_]{0,63}$/;
 
 export interface SaveCheckInInput {
   id: string | null;                 // null → old client; the server mints one
@@ -104,15 +111,40 @@ export function parseNextAction(raw: unknown): CheckInNextAction | null {
   }
 }
 
+/**
+ * The old body figure's names → place id + side. Applied on every save, so an old client still
+ * open in a tab can't write names outside the shared vocabulary. Same table as
+ * schema/migrations/2026-10-body-regions.cypher (which fixes records saved before; a test keeps
+ * the two identical).
+ */
+export const LEGACY_REGIONS: Record<string, [string, 'left' | 'right' | null]> = {
+  Head: ['head', null], Face: ['face', null], Neck: ['neck', null], Chest: ['chest', null],
+  Stomach: ['stomach', null], Hips: ['lower_back', null],
+  'Left Shoulder': ['shoulders', 'left'], 'Right Shoulder': ['shoulders', 'right'],
+  'Left Arm': ['arms', 'left'], 'Right Arm': ['arms', 'right'],
+  'Left Hand': ['hands', 'left'], 'Right Hand': ['hands', 'right'],
+  'Left Thigh': ['legs', 'left'], 'Right Thigh': ['legs', 'right'],
+  'Left Knee': ['legs', 'left'], 'Right Knee': ['legs', 'right'],
+  'Left Calf': ['legs', 'left'], 'Right Calf': ['legs', 'right'],
+  'Left Foot': ['feet', 'left'], 'Right Foot': ['feet', 'right'],
+};
+
 function sensation(raw: unknown): SensationInput | null {
   if (!isObj(raw)) return null;
-  const region = typeof raw.region === 'string' && raw.region.trim() ? raw.region.slice(0, 64) : null;
-  if (!region) return null;
+  const given = typeof raw.region === 'string' && raw.region.trim() ? raw.region.slice(0, 64) : null;
+  if (!given) return null;
+  const legacy = Object.prototype.hasOwnProperty.call(LEGACY_REGIONS, given) ? LEGACY_REGIONS[given] : null;
+  const region = legacy ? legacy[0] : given;
   const intensity = isObj(raw.intensity) ? raw.intensity : {};
   return {
     x: num01(raw.x, 0.5), y: num01(raw.y, 0.5), region,
     intensityX: num01(intensity.x, 0.5), intensityY: num01(intensity.y, 0.5),
     tags: Array.isArray(raw.tags) ? raw.tags.filter((t): t is string => typeof t === 'string' && t.length > 0 && t.length <= 64).slice(0, 20) : [],
+    side: legacy ? (legacy[1] ?? 'both')
+      : (SIDES as readonly unknown[]).includes(raw.side) ? (raw.side as SensationInput['side']) : null,
+    sensationIds: Array.isArray(raw.sensationIds)
+      ? [...new Set(raw.sensationIds.filter((t): t is string => typeof t === 'string' && SENSATION_ID.test(t)))].slice(0, 20)
+      : [],
   };
 }
 

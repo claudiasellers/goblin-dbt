@@ -109,6 +109,20 @@ test('body sensations are replaced wholesale and carry the user-data meta', asyn
   assert.match(w.params.bodySensations[0].id, /^[0-9a-f-]{36}$/);
 });
 
+test('body sensations: old figure names become place ids + side on save; new ids keep their side', async () => {
+  const f = driver();
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...base(), bodySensations: [
+    { region: 'Left Shoulder', tags: ['Tension'] },
+    { region: 'Chest', tags: [] },
+    { region: 'shoulders', side: 'right', sensationIds: ['tension', 'Bad Id', 'tension'] },
+    { region: 'toString', tags: [] },
+  ] } });
+  const b = f.calls.at(-1).params.bodySensations;
+  assert.deepEqual(b.map((s) => [s.region, s.side]), [['shoulders', 'left'], ['chest', 'both'], ['shoulders', 'right'], ['toString', null]]);
+  assert.deepEqual(b[2].sensationIds, ['tension']);
+});
+
 test('setCheckInNextAction: MERGE stub (pendingFullSave), guarded, first next action wins', async () => {
   const f = fakeDriver(() => []);
   setDriver(f.driver);

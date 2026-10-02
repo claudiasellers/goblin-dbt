@@ -3,8 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { CheckInSquare } from '../components/checkin/CheckInSquare';
 import { WordPick } from '../components/checkin/WordPick';
-import { BodyMap } from '../components/checkin/BodyMap';
-import { SensationDetails } from '../components/checkin/SensationDetails';
+import { BodyStep, type BodyMark } from '../components/checkin/body/BodyStep';
 import { StateResult } from '../components/checkin/StateResult';
 import { LowEnergyStateResult } from '../components/checkin/LowEnergyStateResult';
 import { EmotionSuggestion } from '../components/checkin/EmotionSuggestion';
@@ -57,20 +56,13 @@ type CheckInStep =
   | 'find'
   | 'discriminating'
   | 'body'
-  | 'sensation'
   | 'suggestion'
   | 'analyzing'
   | 'result'
   | 'saving'
   | 'complete';
 
-interface BodySensation {
-  x: number;
-  y: number;
-  region: string;
-  intensity: { x: number; y: number };
-  tags: string[];
-}
+type BodySensation = BodyMark;
 
 export interface CheckInData {
   quadrant: string | null;
@@ -102,7 +94,6 @@ export function CheckIn() {
   // Where Help now goes back to (the square or the words).
   const [helpReturn, setHelpReturn] = useState<'emotion' | 'word'>('emotion');
   const point = spots[active]?.point ?? null;
-  const [currentSensation, setCurrentSensation] = useState<Partial<BodySensation> | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
@@ -508,18 +499,9 @@ export function CheckIn() {
     afterFeelings(checkInData.quadrant, 'body');
   }
 
-  function handleBodyTap(x: number, y: number, region: string) {
-    setCurrentSensation({ x, y, region });
-    setStep('sensation');
-  }
-
-  function handleSensationComplete(sensation: BodySensation) {
-    setCheckInData(prev => ({
-      ...prev,
-      bodySensations: [...prev.bodySensations, sensation],
-    }));
-    setCurrentSensation(null);
-    setStep('body');
+  /** The body step's marks (one per place; both sides unless the user picked one). */
+  function handleBodyChange(bodySensations: BodySensation[]) {
+    setCheckInData(prev => ({ ...prev, bodySensations }));
   }
 
   async function handleSkipBody() {
@@ -640,10 +622,6 @@ export function CheckIn() {
         } else {
           setStep(wordsOrSquare);
         }
-        break;
-      case 'sensation':
-        setCurrentSensation(null);
-        setStep('body');
         break;
       case 'suggestion':
         setStep('body');
@@ -771,11 +749,11 @@ export function CheckIn() {
         )}
 
         {step === 'body' && (
-          <BodyMap
-            onTap={handleBodyTap}
+          <BodyStep
+            marks={checkInData.bodySensations}
+            onChange={handleBodyChange}
             onSkip={handleSkipBody}
             onComplete={handleBodyComplete}
-            sensations={checkInData.bodySensations}
             isSomaticEntry={entryPoint === 'somatic'}
           />
         )}
@@ -797,18 +775,6 @@ export function CheckIn() {
           />
         )}
 
-        {step === 'sensation' && currentSensation && (
-          <SensationDetails
-            x={currentSensation.x!}
-            y={currentSensation.y!}
-            region={currentSensation.region!}
-            onComplete={handleSensationComplete}
-            onCancel={() => {
-              setCurrentSensation(null);
-              setStep('body');
-            }}
-          />
-        )}
 
         {step === 'analyzing' && (
           <div className="text-center py-12">

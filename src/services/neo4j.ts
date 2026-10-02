@@ -28,9 +28,15 @@ export interface CheckInRecord {
 export interface BodySensationRecord {
   x: number;
   y: number;
+  /** A place id from src/data/bodyFigure.ts (older records were migrated to these). */
   region: string;
+  /** Which side of a paired place; null on records from before the body map. */
+  side?: 'both' | 'left' | 'right' | null;
   intensity: { x: number; y: number };
+  /** Display labels of the picked words. */
   tags: string[];
+  /** Stable SensationType ids of the picked words (empty on older records). */
+  sensationIds?: string[];
 }
 
 /** Bounded timeout for content loads so a stalled request becomes a recoverable error. */

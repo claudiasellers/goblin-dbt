@@ -1,28 +1,5 @@
 import type { CheckInRecord } from '../../services/neo4j';
-
-// Merge left/right body regions into a single label
-const regionMerge: Record<string, string> = {
-  'left-shoulder': 'Shoulders',
-  'right-shoulder': 'Shoulders',
-  'left-arm': 'Arms',
-  'right-arm': 'Arms',
-  'left-hand': 'Hands',
-  'right-hand': 'Hands',
-  'left-thigh': 'Thighs',
-  'right-thigh': 'Thighs',
-  'left-knee': 'Knees',
-  'right-knee': 'Knees',
-  'left-calf': 'Calves',
-  'right-calf': 'Calves',
-  'left-foot': 'Feet',
-  'right-foot': 'Feet',
-};
-
-function mergeRegionName(regionId: string): string {
-  if (regionMerge[regionId]) return regionMerge[regionId];
-  // Capitalize single-word regions
-  return regionId.charAt(0).toUpperCase() + regionId.slice(1);
-}
+import { regionLabel } from '../../data/bodyFigure';
 
 interface BodyRegionFrequencyProps {
   checkIns: CheckInRecord[];
@@ -31,8 +8,8 @@ interface BodyRegionFrequencyProps {
 export function BodyRegionFrequency({ checkIns }: BodyRegionFrequencyProps) {
   const counts: Record<string, number> = {};
   for (const ci of checkIns) {
-    for (const s of ci.bodySensations) {
-      const name = mergeRegionName(s.region);
+    // A place counts once per check-in (both shoulders, or a left and a right mark, are one place).
+    for (const name of new Set(ci.bodySensations.map((s) => regionLabel(s.region)))) {
       counts[name] = (counts[name] || 0) + 1;
     }
   }

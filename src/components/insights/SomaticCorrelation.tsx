@@ -1,5 +1,6 @@
 import { activationPatterns } from '../../data/activationPatterns';
 import type { SomaticCorrelationData } from '../../services/neo4j';
+import { isRegionId, regionLabel, type RegionId } from '../../data/bodyFigure';
 
 const quadrantLabels: Record<string, string> = {
   'high-unpleasant': 'high-energy distress',
@@ -8,39 +9,24 @@ const quadrantLabels: Record<string, string> = {
   'low-pleasant': 'low-energy calm states',
 };
 
-// Map body region IDs to SVG coordinates (cx, cy) within the 200x400 viewBox
-const regionHotspots: Record<string, { cx: number; cy: number }> = {
-  head: { cx: 100, cy: 25 },
-  face: { cx: 100, cy: 38 },
-  neck: { cx: 100, cy: 63 },
-  'left-shoulder': { cx: 55, cy: 78 },
-  'right-shoulder': { cx: 145, cy: 78 },
-  chest: { cx: 100, cy: 110 },
-  'left-arm': { cx: 25, cy: 145 },
-  'right-arm': { cx: 175, cy: 145 },
-  stomach: { cx: 100, cy: 155 },
-  'left-hand': { cx: 12, cy: 198 },
-  'right-hand': { cx: 188, cy: 198 },
-  hips: { cx: 100, cy: 195 },
-  'left-thigh': { cx: 80, cy: 245 },
-  'right-thigh': { cx: 120, cy: 245 },
-  'left-knee': { cx: 75, cy: 300 },
-  'right-knee': { cx: 125, cy: 300 },
-  'left-calf': { cx: 70, cy: 345 },
-  'right-calf': { cx: 130, cy: 345 },
-  'left-foot': { cx: 60, cy: 393 },
-  'right-foot': { cx: 140, cy: 393 },
+// Where each place sits on this card's small figure (200x400 viewBox). Paired places light both sides.
+const regionHotspots: Partial<Record<RegionId, Array<{ cx: number; cy: number }>>> = {
+  head: [{ cx: 100, cy: 25 }],
+  face: [{ cx: 100, cy: 38 }],
+  jaw: [{ cx: 100, cy: 50 }],
+  throat: [{ cx: 100, cy: 63 }],
+  neck: [{ cx: 100, cy: 63 }],
+  shoulders: [{ cx: 55, cy: 78 }, { cx: 145, cy: 78 }],
+  chest: [{ cx: 100, cy: 110 }],
+  upper_back: [{ cx: 100, cy: 100 }],
+  stomach: [{ cx: 100, cy: 155 }],
+  lower_back: [{ cx: 100, cy: 185 }],
+  arms: [{ cx: 25, cy: 145 }, { cx: 175, cy: 145 }],
+  hands: [{ cx: 12, cy: 198 }, { cx: 188, cy: 198 }],
+  legs: [{ cx: 78, cy: 290 }, { cx: 122, cy: 290 }],
+  feet: [{ cx: 60, cy: 393 }, { cx: 140, cy: 393 }],
+  body: [{ cx: 100, cy: 150 }],
 };
-
-// Normalize region name to the kebab-case id format used in the hotspot map
-// Backend stores names like "Chest", "Left Shoulder" — map keys are "chest", "left-shoulder"
-function toRegionKey(region: string) {
-  return region.toLowerCase().replace(/\s+/g, '-');
-}
-
-function capitalize(s: string) {
-  return s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-}
 
 interface Props {
   data: SomaticCorrelationData | null;
@@ -88,7 +74,7 @@ export function SomaticCorrelation({ data, totalCheckIns, delay = 0 }: Props) {
     patternId?.replace(/_/g, ' ').replace(/-/g, ' ') ||
     '';
 
-  const regionNames = topCorrelations.map((c) => capitalize(c.region));
+  const regionNames = topCorrelations.map((c) => regionLabel(c.region));
   const boldNames =
     regionNames.length === 1
       ? regionNames[0]
@@ -139,11 +125,10 @@ export function SomaticCorrelation({ data, totalCheckIns, delay = 0 }: Props) {
             </g>
 
             {/* Pulsing hotspot circles */}
-            {topCorrelations.map((corr, i) => {
-              const pos = regionHotspots[toRegionKey(corr.region)];
-              if (!pos) return null;
-              return (
-                <g key={corr.region}>
+            {topCorrelations.flatMap((corr, i) => {
+              const spots = isRegionId(corr.region) ? regionHotspots[corr.region] ?? [] : [];
+              return spots.map((pos, j) => (
+                <g key={`${corr.region}-${j}`}>
                   {/* Outer glow - pulsing */}
                   <circle
                     cx={pos.cx}
@@ -168,7 +153,7 @@ export function SomaticCorrelation({ data, totalCheckIns, delay = 0 }: Props) {
                     strokeOpacity="0.7"
                   />
                 </g>
-              );
+              ));
             })}
           </svg>
         </div>

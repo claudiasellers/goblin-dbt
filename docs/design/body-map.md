@@ -1,6 +1,6 @@
 # Body map: plan
 
-Status: **step 1 built** (content and function; nothing served until signed off). Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to Z
+Status: **steps 1–2 built** (content and function; heat figure, both sides, graph words, body-first suggestions). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to Z
 (sensation pad W, body mirror X, heat figure Y, several feelings Z). Product record: Product
 Changelog, "Body step redesign: the sensation pad".
 
@@ -159,8 +159,35 @@ step reads it.
    - Tabs per map (max 3) in the words' colours, and Together stripes.
    - Marks stay put across tabs and never take a tab's colour.
 
-A dev harness, `dev/body-map.html` with fixture content, shows the figure, pad and mirror without
-signing in, in the way `dev/find-the-feeling.html` does.
+Not built (yet): a `dev/body-map.html` harness like `dev/find-the-feeling.html`. Until the content is
+signed off, the step can be seen locally only with the content stubbed (the fixture treats drafts as
+live).
+
+### Step 2 as built
+
+- `src/data/bodyFigure.ts`: the place ids (a test keeps them equal to the graph's), labels, paired
+  places, tap shapes and glows on a front view (the person's left on the figure's right).
+- `components/checkin/body/HeatFigure.tsx` and `BodyStep.tsx`: the step is self-contained (the
+  check-in's old `sensation` step is gone). Places the front view can't show (jaw, back of the
+  neck, upper and lower back, whole body) are a "More places" row. The place panel offers Both
+  sides / Your left / Your right for paired places and the graph's words for that place, grouped
+  Uncomfortable / Comfortable; if the words can't load, the place can still be marked. One mark
+  per place. Until the pad (step 3), marks glow one warm mid-tone; places behind the front view
+  glow fainter.
+- `suggestEmotionsFromBody` (pure scoring in `functions/src/bodyMap/suggest.ts`): each mark counts
+  once per map against its best place × weight (same place and word 1, word elsewhere 0.4, place
+  alone 0.25); the strongest 3 maps with their words. `EmotionSuggestion` stays small, because
+  someone who starts with their body usually can't find words yet: one best guess ("That often goes
+  with fear and worry.", with the places it's based on above it) and its three most common words,
+  one word from each of the next two maps under "Or maybe", and the full list behind "Something
+  else". At most five chips. A map's first common word stands for it, so `content.py` lists the
+  most representative word first.
+- The migration maps the old figure's Thigh / Knee / Calf to `legs` and Hips to `lower_back`, and
+  keeps the old name as `legacyRegion`.
+- **Deploy order:** load the graph (`--only constraints`, then `--only body-map`), deploy
+  functions, run `schema/migrations/2026-10-body-regions.cypher`, then deploy hosting. The body
+  step and suggestions show words only once the content is signed off; before that, places can
+  be marked without words and "Start with my body" offers the full word list.
 
 ## Open questions (Claudia)
 

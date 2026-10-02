@@ -7,8 +7,9 @@ import { HttpsError } from 'firebase-functions/v2/https';
 import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
-import { graphId, strArray } from '../shared/validate';
-import type { BodyEnergy, BodyMapContent, BodyMapPlace, BodyMirrorMap, PadWord, PadZone } from './types';
+import { ValidationError, graphId, obj, str, strArray } from '../shared/validate';
+import type { BodyEnergy, BodyMapContent, BodyMapPlace, BodyMirrorMap, BodySuggestion, BodySuggestMark, PadWord, PadZone } from './types';
+import { scoreBodyMaps, type ScorableMap } from './suggest';
 
 export const BODY_MAP_VERSION = 'body-map-v1';
 
@@ -76,5 +77,51 @@ export const getBodyMapContent = callable<unknown, BodyMapContent>(
       }
       return { version: BODY_MAP_VERSION, regions: (rec.get('regions') ?? []) as string[], padWords, maps };
     });
+  },
+);
+
+const REGION = /^[a-z][a-z_]{0,31}$/;
+
+/** `marks`: the check-in's marked places (place id + picked sensation ids), at most 20. */
+export function validateSuggestRequest(raw: unknown): { marks: BodySuggestMark[] } {
+  const d = obj(raw ?? {});
+  if (!Array.isArray(d.marks)) return { marks: [] };
+  if (d.marks.length > 20) throw new ValidationError('Expected at most 20 items');
+  return {
+    marks: d.marks.map((m) => {
+      const o = obj(m);
+      return {
+        region: str(o.region, { max: 32, pattern: REGION }),
+        sensationIds: o.sensationIds === undefined ? [] : strArray(o.sensationIds, { max: 20, item: graphId }),
+      };
+    }),
+  };
+}
+
+/**
+ * Body-first entry ("Start with my body"): the signed-off body-mirror maps the marked places look like,
+ * strongest first (at most 3), each with its grid words. Replaces src/data/sensationMappings.ts.
+ */
+export const suggestEmotionsFromBody = callable<unknown, { suggestions: BodySuggestion[] }>(
+  { auth: 'public', label: 'suggestEmotionsFromBody', errorMessage: 'Could not load suggestions' },
+  async ({ data }) => {
+    const { marks } = validateSuggestRequest(data);
+    if (marks.length === 0) return { suggestions: [] };
+    const maps = await readTx(async (tx) => {
+      const res = await tx.run(
+        `MATCH (m:BodyMap {status: 'live'})-[:SHOWS]->(p:BodyMapPlace)-[:FEELS_AS]->(s:SensationType)
+         RETURN m.id AS id, m.label AS label, m.wordIds AS wordIds,
+                collect({region: p.region, sensationId: s.id, label: s.padLabel, weight: p.weight}) AS places`);
+      return res.records.map((r): ScorableMap => ({
+        id: r.get('id') as string,
+        label: r.get('label') as string,
+        wordIds: (r.get('wordIds') ?? []) as string[],
+        places: (r.get('places') as Array<Record<string, unknown>>).map((p) => ({
+          region: p.region as string, sensationId: p.sensationId as string, label: p.label as string,
+          weight: toNumber(p.weight) ?? 0,
+        })),
+      }));
+    });
+    return { suggestions: scoreBodyMaps(marks, maps) };
   },
 );
