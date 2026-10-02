@@ -40,9 +40,12 @@ export function DashboardLayout() {
       {/* Sidebar on the left (desktop) + bottom nav (mobile) */}
       <Sidebar />
 
-      {/* Center column: header + main content — scrolls independently */}
-      <div className={`flex-1 min-w-0 flex flex-col h-screen ${CONTENT_OFFSET_CLASS} pb-16 md:pb-0 overflow-hidden`}>
-        <header className="flex-shrink-0 z-30 bg-[var(--color-glass-panel)] backdrop-blur-xl border-b border-[var(--color-glass-border)]">
+      {/* Center column: header + main content — scrolls independently.
+          Bottom padding: mobile clears the tab bar + home indicator; md+ still clears the home indicator,
+          because a landscape iPhone (844–932px) is md-wide with a nonzero bottom inset when installed. */}
+      <div className={`flex-1 min-w-0 flex flex-col h-screen ${CONTENT_OFFSET_CLASS} pb-[calc(4rem_+_env(safe-area-inset-bottom))] md:pb-[env(safe-area-inset-bottom)] overflow-hidden`}>
+        {/* pt: the top safe-area inset (0 in a browser tab; the status bar / notch when installed) */}
+        <header className="flex-shrink-0 z-30 bg-[var(--color-glass-panel)] backdrop-blur-xl border-b border-[var(--color-glass-border)] pt-[env(safe-area-inset-top)]">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
             {focusedLayout ? (
               /* Compact bar: exercise pages keep their own title as the principal heading */
