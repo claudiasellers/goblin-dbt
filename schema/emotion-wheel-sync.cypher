@@ -1,6 +1,8 @@
 // ============================================================
 // EMOTION WHEEL SYNC
-// Syncs graph Emotion nodes to the frontend emotion wheel.
+// Syncs graph Emotion nodes to the frontend emotion wheel (src/data/emotions.ts): every word
+// there is an Emotion node here with the same name, quadrant and family
+// (tests/emotion-wheel-sync.test.mjs). Add a word to both in the same change.
 // Safe to run repeatedly (uses MERGE).
 // ============================================================
 
@@ -34,6 +36,26 @@ UNWIND [
   {id: "intimate", name: "Intimate", quadrant: "low-pleasant", family: "happy"},
   {id: "hopeful", name: "Hopeful", quadrant: "high-pleasant", family: "happy"},
   {id: "inspired", name: "Inspired", quadrant: "high-pleasant", family: "happy"},
+  // Calm side of the happy family (added Oct 2026: in the app's list, never synced before)
+  {id: "calm", name: "Calm", quadrant: "low-pleasant", family: "happy"},
+  {id: "relaxed", name: "Relaxed", quadrant: "low-pleasant", family: "happy"},
+  {id: "good", name: "Good", quadrant: "low-pleasant", family: "happy"},
+  {id: "chill", name: "Chill", quadrant: "low-pleasant", family: "happy"},
+  {id: "comfortable", name: "Comfortable", quadrant: "low-pleasant", family: "happy"},
+  {id: "thoughtful", name: "Thoughtful", quadrant: "low-pleasant", family: "happy"},
+  {id: "mellow", name: "Mellow", quadrant: "low-pleasant", family: "happy"},
+  {id: "sympathetic", name: "Sympathetic", quadrant: "low-pleasant", family: "happy"},
+  {id: "serene", name: "Serene", quadrant: "low-pleasant", family: "happy"},
+  {id: "secure", name: "Secure", quadrant: "low-pleasant", family: "happy"},
+  {id: "satisfied", name: "Satisfied", quadrant: "low-pleasant", family: "happy"},
+  {id: "restful", name: "Restful", quadrant: "low-pleasant", family: "happy"},
+  {id: "appreciative", name: "Appreciative", quadrant: "low-pleasant", family: "happy"},
+  {id: "at_ease", name: "At Ease", quadrant: "low-pleasant", family: "happy"},
+  {id: "balanced", name: "Balanced", quadrant: "low-pleasant", family: "happy"},
+  {id: "grounded", name: "Grounded", quadrant: "low-pleasant", family: "happy"},
+  {id: "tender", name: "Tender", quadrant: "low-pleasant", family: "happy"},
+  {id: "cozy", name: "Cozy", quadrant: "low-pleasant", family: "happy"},
+  {id: "humble", name: "Humble", quadrant: "low-pleasant", family: "happy"},
 
   // Surprised family
   {id: "surprised", name: "Surprised", quadrant: "high-pleasant", family: "surprised"},
@@ -59,7 +81,7 @@ UNWIND [
   {id: "sleepy", name: "Sleepy", quadrant: "low-unpleasant", family: "bad"},
   {id: "unfocused", name: "Unfocused", quadrant: "low-unpleasant", family: "bad"},
   {id: "out_of_control", name: "Out of control", quadrant: "high-unpleasant", family: "bad"},
-  {id: "overwhelmed", name: "Overwhelmed", quadrant: "high-unpleasant", family: "bad"},
+  {id: "overwhelmed", name: "Overwhelmed", quadrant: "high-unpleasant", family: "fearful"},
   {id: "rushed", name: "Rushed", quadrant: "high-unpleasant", family: "bad"},
   {id: "pressured", name: "Pressured", quadrant: "high-unpleasant", family: "bad"},
   {id: "apathetic", name: "Apathetic", quadrant: "low-unpleasant", family: "bad"},

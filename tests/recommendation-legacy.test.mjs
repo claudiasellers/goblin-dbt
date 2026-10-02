@@ -36,7 +36,9 @@ test("the schema-derived fixture routes exactly like the live graph did on 2026-
     Object.entries(MOVED).map(([k, [a, b]]) => [`grid.winner ${k}`, a, b]));
   assert.deepEqual(warnings, [], "tie order is pinned (concept id), and matches live");
   const s = routingSummary(graph, { grid });
-  assert.equal(s.emotionNodeCount, live.emotionNodeCount);
+  // + the 18 calm-side grid words synced into the graph in Oct 2026 (tests/emotion-wheel-sync.test.mjs);
+  // pleasant words never reach routing, so no winner moves.
+  assert.equal(s.emotionNodeCount, live.emotionNodeCount + 18);
   assert.deepEqual(s.grid.winnerDistribution, { "high-unpleasant → acute_alarm": 48, "low-unpleasant → conservation_freeze": 37 });
 });
 

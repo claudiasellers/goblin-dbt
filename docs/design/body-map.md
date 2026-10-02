@@ -1,6 +1,6 @@
 # Body map: plan
 
-Status: **steps 1–3 built** (content and function; heat figure, both sides, graph words, body-first suggestions; the one-screen body step: drag, optional strength bar, words in one row). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to AA
+Status: **steps 1–3 built; content rebuilt on `FELT_AS` (body-map-v2)** (content and function; heat figure, both sides, graph words, body-first suggestions; the one-screen body step: drag, optional strength bar, words in one row). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to AA
 (sensation pad W, body mirror X, heat figure Y, several feelings Z, one screen with a strength bar AA). Product record: Product
 Changelog, "Body step redesign: the sensation pad".
 
@@ -62,36 +62,47 @@ editable source, `scripts/body-map/content.py`, which generates `schema/body-map
 `build.py` (the same pattern as find-the-feeling, witness and recommendations). It has drafts and a
 `SIGNED_OFF` list like the witness corpus, so nothing is served until Claudia approves it.
 
-1. **Region vocabulary.** These are ids that the graph and the figure share: `head`, `face`, `jaw`,
-   `throat`, `neck`, `shoulders`, `chest`, `upper_back`, `stomach`, `lower_back`, `arms`, `hands`,
-   `legs`, `feet`, `body` (whole body). They're stored on `BodyMapContent.regions`. From step 2 a
-   test checks that every graph region exists in the figure, and the reverse. Geometry and "paired"
-   stay in the frontend because they are presentation. The old `FELT_AS` region strings (`back`,
-   `hands` …) are left alone; nothing new reads them.
-2. **Pad words.** `SensationType` grows from 15 to 40 (the 15 existing ids keep their `name`), each with
-   `padLabel` ("Tight", "Raised up", "Fluttery", "Settled"), `zones` (which pad quadrants it
-   belongs to: `hu`, `hp`, `lu`, `lp`), an optional `regions` restriction (e.g. "Raised up" only for
-   shoulders), `energy` (`more` / `less`) and `padRank` (pad order). Every place has at least one
-   word in every quarter of the pad (build check). A word removed from `content.py` is marked
-   `padStatus: 'retired'` (the shared node stays) and is never served.
-3. **Body maps (the mirror).** Twelve `(:BodyMap {id, label, wordIds})` nodes: `fear`, `anger`,
-   `sadness`, `shame`, `guilt`, `disgust`, `depleted` ("Drained or numb"), `love`, `joy`,
-   `excitement`, `surprise`, `calm`.
-   - DBT parents are used where they exist, plus pleasant families and a low-energy map, following
-     Nummenmaa's 14 maps (which include depression as its own cooled map).
-   - Each place is a node: `(:BodyMap)-[:SHOWS]->(:BodyMapPlace {id, region, weight})-[:FEELS_AS]->(:SensationType)`,
-     3 to 6 per map. A place can't be an edge keyed on its region: only `FELT_AS` may merge on a
-     property, and one map can show the same sensation in two places (anger: hot head, hot face).
-   - `wordIds` lists the grid words (`src/data/emotions.ts` ids) each map mirrors. Every grid word
-     is in exactly one map (test), including pleasant words and the held anger words, which
-     `SCORES_AS` can't reach. It's a list, not edges: 18 calm-side grid words (*relaxed*, *cozy* …)
-     aren't `Emotion` nodes in the graph.
-   - The existing `FELT_AS` edges informed the maps and are left as they are.
+**Rebuilt on `FELT_AS` (Oct 2, `body-map-v2`).** Step 1 gave the body maps their own place lists
+(`BodyMapPlace` nodes) and a word list, next to the graph's existing `FELT_AS` edges, so the graph
+said where each emotion is felt twice, and the two disagreed. Claudia's call: rework the graph to fit
+instead. Now:
+
+1. **Places.** The 15 ids the graph and the figure share (`head`, `face`, `jaw`, `throat`, `neck`,
+   `shoulders`, `chest`, `upper_back`, `stomach`, `lower_back`, `arms`, `hands`, `legs`, `feet`,
+   `body`) are `BodyRegion` nodes (they replace the 8 old ones in `knowledge-graph.cypher`; the old
+   `back` became `upper_back`) and `BodyMapContent.regions`. A test keeps them equal to the figure's.
+   Geometry and "paired" stay in the frontend because they are presentation.
+2. **Sensation words.** `SensationType` grows from 15 to 40 (the 15 existing ids keep their `name`),
+   each with `padLabel`, `zones` (`hu`, `hp`, `lu`, `lp`), an optional `regions` restriction,
+   `energy` (`more` / `less`) and `padRank`. Every place has a word in every quarter (build check).
+   A word removed from `content.py` is marked `padStatus: 'retired'` and never served.
+3. **`FELT_AS`: the one source of where each emotion is felt.**
+   `(:Emotion)-[:FELT_AS {region, weight, status, origin}]->(:SensationType)`. All of it is written
+   from `content.py` (`FELT`); `relationships.cypher` and the low-unpleasant patch no longer write
+   any (a test keeps it that way), and rows removed from `content.py` are removed from the graph.
+   The 66 rows the graph already had are `origin: base` and stay live; rows added for the body maps
+   are `origin: new`, drafts until signed off (`felt:<emotion>:<region>:<sensation>`). A row must use
+   a sensation word offered at that place. `weight` is how typical it is (0–1).
+4. **Body maps (the mirror): groupings only.** Twelve `BodyMap` nodes (`fear`, `anger`, `sadness`,
+   `shame`, `guilt`, `disgust`, `depleted` "Drained or numb", `love`, `joy`, `excitement`,
+   `surprise`, `calm`), following Nummenmaa's maps (which include depression as its own cooled map).
+   - `(:BodyMap)-[:GROUPS]->(:Emotion)`: the emotions whose `FELT_AS` give the map its places
+     (fear: anxiety, fear, panic, stress, overwhelm). A map stores no places. Surprise groups the
+     grid word *surprised*, the only surprise node in the graph.
+   - `(:BodyMap)-[:MIRRORS]->(:Emotion)`: the grid words it answers. Every grid word is an `Emotion`
+     node (`emotion-wheel-sync.cypher`; the 18 calm-side words missing until Oct 2026 were added,
+     and `tests/emotion-wheel-sync.test.mjs` keeps the app's list and the graph equal) and mirrors
+     exactly one map.
+   - A map's places are computed: every live `FELT_AS` row of its emotions (with a live sensation
+     word), per place and word the highest weight plus 0.1 for each further emotion sharing it,
+     capped at 1, strongest first (`functions/src/bodyMap/places.ts`, mirrored by
+     `scripts/body-map/places.py` for the fixture; a test checks they agree).
 
 **Callable:** `getBodyMapContent({ emotionIds? })` in a new `functions/src/bodyMap/` module (public,
 like `getCapacityContent`). It returns
 `{ padWords: [{id, label, zones, regions, energy}], maps: [{id, label, emotionIds, places: [{region, sensationId, label, energy, weight}]}] }`.
-The maps are only the ones reached from the given ids, in the order the client sends them. The
+The maps are only the ones reached from the given ids (through `MIRRORS`), in the order the client
+sends them; a map with no live places is left out. The
 client caches the pad words for the session. Follow the callable checklist in CLAUDE.md
 (`functions/src/index.ts`, `endpoints.json`, auth matrix).
 

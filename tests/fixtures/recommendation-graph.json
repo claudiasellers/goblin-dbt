@@ -851,6 +851,10 @@
    "name": "Appalled",
    "quadrant": "low-unpleasant"
   },
+  "appreciative": {
+   "name": "Appreciative",
+   "quadrant": "low-pleasant"
+  },
   "aroused": {
    "name": "Aroused",
    "quadrant": "high-pleasant"
@@ -863,6 +867,10 @@
    "name": "Astonished",
    "quadrant": "high-pleasant"
   },
+  "at_ease": {
+   "name": "At Ease",
+   "quadrant": "low-pleasant"
+  },
   "awe": {
    "name": "Awe",
    "quadrant": "high-pleasant"
@@ -874,6 +882,10 @@
   "bad": {
    "name": "Bad",
    "quadrant": "low-unpleasant"
+  },
+  "balanced": {
+   "name": "Balanced",
+   "quadrant": "low-pleasant"
   },
   "betrayed": {
    "name": "Betrayed",
@@ -903,9 +915,17 @@
    "name": "Cheeky",
    "quadrant": "high-pleasant"
   },
+  "chill": {
+   "name": "Chill",
+   "quadrant": "low-pleasant"
+  },
   "cold_shame": {
    "name": "Cold Shame",
    "quadrant": "low-unpleasant"
+  },
+  "comfortable": {
+   "name": "Comfortable",
+   "quadrant": "low-pleasant"
   },
   "compassion": {
    "name": "Compassion",
@@ -930,6 +950,10 @@
   "courageous": {
    "name": "Courageous",
    "quadrant": "high-pleasant"
+  },
+  "cozy": {
+   "name": "Cozy",
+   "quadrant": "low-pleasant"
   },
   "creative": {
    "name": "Creative",
@@ -1071,6 +1095,10 @@
    "name": "Furious",
    "quadrant": "high-unpleasant"
   },
+  "good": {
+   "name": "Good",
+   "quadrant": "low-pleasant"
+  },
   "gratitude": {
    "name": "Gratitude",
    "quadrant": "low-pleasant"
@@ -1078,6 +1106,10 @@
   "grief": {
    "name": "Grief",
    "quadrant": "low-unpleasant"
+  },
+  "grounded": {
+   "name": "Grounded",
+   "quadrant": "low-pleasant"
   },
   "guilt": {
    "name": "Guilt",
@@ -1126,6 +1158,10 @@
   "hot_shame": {
    "name": "Hot Shame",
    "quadrant": "high-unpleasant"
+  },
+  "humble": {
+   "name": "Humble",
+   "quadrant": "low-pleasant"
   },
   "humiliated": {
    "name": "Humiliated",
@@ -1235,6 +1271,10 @@
    "name": "Mad",
    "quadrant": "high-unpleasant"
   },
+  "mellow": {
+   "name": "Mellow",
+   "quadrant": "low-pleasant"
+  },
   "nauseated": {
    "name": "Nauseated",
    "quadrant": "low-unpleasant"
@@ -1319,6 +1359,10 @@
    "name": "Rejection",
    "quadrant": "high-unpleasant"
   },
+  "relaxed": {
+   "name": "Relaxed",
+   "quadrant": "low-pleasant"
+  },
   "relief": {
    "name": "Relief",
    "quadrant": "low-pleasant"
@@ -1338,6 +1382,10 @@
   "respected": {
    "name": "Respected",
    "quadrant": "high-pleasant"
+  },
+  "restful": {
+   "name": "Restful",
+   "quadrant": "low-pleasant"
   },
   "revolted": {
    "name": "Revolted",
@@ -1363,12 +1411,24 @@
    "name": "Safety",
    "quadrant": "low-pleasant"
   },
+  "satisfied": {
+   "name": "Satisfied",
+   "quadrant": "low-pleasant"
+  },
   "scared": {
    "name": "Scared",
    "quadrant": "high-unpleasant"
   },
+  "secure": {
+   "name": "Secure",
+   "quadrant": "low-pleasant"
+  },
   "sensitive": {
    "name": "Sensitive",
+   "quadrant": "low-pleasant"
+  },
+  "serene": {
+   "name": "Serene",
    "quadrant": "low-pleasant"
   },
   "serenity": {
@@ -1407,8 +1467,20 @@
    "name": "Surprised",
    "quadrant": "high-pleasant"
   },
+  "sympathetic": {
+   "name": "Sympathetic",
+   "quadrant": "low-pleasant"
+  },
+  "tender": {
+   "name": "Tender",
+   "quadrant": "low-pleasant"
+  },
   "thankful": {
    "name": "Thankful",
+   "quadrant": "low-pleasant"
+  },
+  "thoughtful": {
+   "name": "Thoughtful",
    "quadrant": "low-pleasant"
   },
   "threatened": {

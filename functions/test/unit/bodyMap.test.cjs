@@ -7,30 +7,35 @@ const { loadFunctions, fakeDriver } = require('./fakeDriver.cjs');
 const { fns, setDriver } = loadFunctions();
 test.after(() => setDriver(null));
 
-const head = [{ version: 'body-map-v1', regions: ['chest', 'shoulders'] }];
+const head = [{ version: 'body-map-v2', regions: ['chest', 'shoulders'] }];
 const pad = [{ id: 'tension', label: 'Tight', zones: ['hu'], regions: [], energy: 'more' }];
-const place = (region, sensationId, weight) => ({ region, sensationId, label: sensationId, energy: 'more', weight });
+const felt = (emotionId, region, sensationId, weight) => ({ emotionId, region, sensationId, label: sensationId, energy: 'more', weight });
+const NONE = { emotionId: null, region: null, sensationId: null, label: null, energy: null, weight: null };
 
-test('getBodyMapContent returns pad words, and maps in the order of the sent words, strongest place first', async () => {
+test('getBodyMapContent returns pad words, and maps in the order of the sent words, places from FELT_AS strongest first', async () => {
   const f = fakeDriver((q, params) => {
     if (/BodyMapContent/.test(q)) return head;
-    if (/padStatus/.test(q)) return pad;
+    if (/RETURN s\.id AS id, s\.padLabel/.test(q)) return pad;
     if (/BodyMap \{status: 'live'\}/.test(q)) {
       assert.deepEqual(params.ids, ['excited', 'anxious', 'worried']);
+      assert.match(q, /-\[:MIRRORS\]->/);
+      assert.match(q, /-\[:GROUPS\]->\(e:Emotion\)-\[f:FELT_AS \{status: 'live'\}\]->\(s:SensationType \{padStatus: 'live'\}\)/);
       return [
-        { id: 'fear', label: 'Fear and worry', wordIds: ['anxious', 'worried', 'scared'], places: [place('hands', 'shaking', 0.6), place('chest', 'racing_heart', 1)] },
-        { id: 'excitement', label: 'Excitement', wordIds: ['excited'], places: [place('stomach', 'fizzy', 1)] },
+        { id: 'fear', label: 'Fear and worry', wordIds: ['anxious', 'worried', 'scared'],
+          felt: [felt('fear', 'hands', 'shaking', 0.6), felt('anxiety', 'chest', 'racing_heart', 0.9), felt('panic', 'chest', 'racing_heart', 0.8)] },
+        { id: 'excitement', label: 'Excitement', wordIds: ['excited'], felt: [felt('excitement', 'stomach', 'fizzy', 1)] },
+        { id: 'empty', label: 'No live places yet', wordIds: ['worried'], felt: [NONE] },
       ];
     }
     return [];
   });
   setDriver(f.driver);
   const out = await fns.getBodyMapContent.run({ data: { emotionIds: ['excited', 'anxious', 'worried', 'anxious'] } });
-  assert.equal(out.version, 'body-map-v1');
+  assert.equal(out.version, 'body-map-v2');
   assert.deepEqual(out.padWords, pad);
-  assert.deepEqual(out.maps.map((m) => m.id), ['excitement', 'fear']);
+  assert.deepEqual(out.maps.map((m) => m.id), ['excitement', 'fear'], 'a map with no live places is left out');
   assert.deepEqual(out.maps[1].emotionIds, ['anxious', 'worried']);
-  assert.deepEqual(out.maps[1].places.map((p) => p.region), ['chest', 'hands']);
+  assert.deepEqual(out.maps[1].places.map((p) => [p.region, p.weight]), [['chest', 1], ['hands', 0.6]], 'shared by two emotions: 0.9 + 0.1');
   assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');
   assert.ok(f.allClosed());
 });
@@ -38,7 +43,7 @@ test('getBodyMapContent returns pad words, and maps in the order of the sent wor
 test('getBodyMapContent without words returns pad words only and never queries maps', async () => {
   const f = fakeDriver((q) => {
     if (/BodyMapContent/.test(q)) return head;
-    if (/padStatus/.test(q)) return pad;
+    if (/RETURN s\.id AS id, s\.padLabel/.test(q)) return pad;
     throw new Error('maps queried');
   });
   setDriver(f.driver);
@@ -94,7 +99,10 @@ test('scoreBodyMaps: one mark counts once per map, unmatched maps drop, at most 
 });
 
 test('suggestEmotionsFromBody reads live maps once and scores them; no marks never queries; bad input rejected', async () => {
-  const f = fakeDriver((q) => (/BodyMap \{status: 'live'\}/.test(q) ? maps.map((m) => ({ ...m, places: m.places })) : []));
+  const f = fakeDriver((q) => (/BodyMap \{status: 'live'\}/.test(q)
+    ? maps.map((m) => ({ id: m.id, label: m.label, wordIds: m.wordIds,
+        felt: m.places.map((p) => ({ emotionId: m.id, region: p.region, sensationId: p.sensationId, label: p.label, energy: 'more', weight: p.weight })) }))
+    : []));
   setDriver(f.driver);
   const out = await fns.suggestEmotionsFromBody.run({ data: { marks: [{ region: 'shoulders', sensationIds: ['raised_up'] }] } });
   assert.deepEqual(out.suggestions.map((s) => s.mapId), ['fear', 'calm']);
@@ -104,4 +112,25 @@ test('suggestEmotionsFromBody reads live maps once and scores them; no marks nev
   assert.deepEqual(await fns.suggestEmotionsFromBody.run({ data: { marks: [] } }), { suggestions: [] });
   await assert.rejects(fns.suggestEmotionsFromBody.run({ data: { marks: [{ region: 'Left Shoulder' }] } }), (e) => e.code === 'invalid-argument');
   await assert.rejects(fns.suggestEmotionsFromBody.run({ data: { marks: Array.from({ length: 21 }, () => ({ region: 'chest' })) } }), (e) => e.code === 'invalid-argument');
+});
+
+// ---- Places from FELT_AS ----
+const { placesFromFelt, SHARED_BONUS } = require('../../lib/bodyMap/places');
+
+test('placesFromFelt: highest weight per place and word, a bonus per further emotion sharing it, capped, strongest first', () => {
+  const rows = [
+    { emotionId: 'anxiety', region: 'chest', sensationId: 'racing_heart', label: 'Racing', energy: 'more', weight: 1 },
+    { emotionId: 'fear', region: 'chest', sensationId: 'racing_heart', label: 'Racing', energy: 'more', weight: 0.8 },
+    { emotionId: 'anxiety', region: 'throat', sensationId: 'constriction', label: 'Closing up', energy: 'more', weight: 0.6 },
+    { emotionId: 'panic', region: 'throat', sensationId: 'constriction', label: 'Closing up', energy: 'more', weight: 0.5 },
+    { emotionId: 'fear', region: 'body', sensationId: 'cold_sensation', label: 'Cold', energy: 'less', weight: 0.6 },
+    { emotionId: null, region: null, sensationId: null, label: null, energy: null, weight: null },
+  ];
+  assert.equal(SHARED_BONUS, 0.1);
+  assert.deepEqual(placesFromFelt(rows).map((p) => [p.region, p.sensationId, p.weight]), [
+    ['chest', 'racing_heart', 1],
+    ['throat', 'constriction', 0.7],
+    ['body', 'cold_sensation', 0.6],
+  ]);
+  assert.deepEqual(placesFromFelt([]), []);
 });

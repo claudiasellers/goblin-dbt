@@ -4,25 +4,30 @@
 #   python3 scripts/body-map/build.py > /tmp/bm.cypher && mv /tmp/bm.cypher schema/body-map.cypher
 #   python3 scripts/body-map/fixture.py
 #
-# Three kinds of content, all emotion knowledge, so they live in the graph:
-#   REGIONS    the places the figure and the graph share (ids only; geometry, labels and which
-#              places are paired are presentation, in src/data/bodyFigure.ts from build step 2).
-#   PAD_WORDS  the chips on the sensation pad. Each is a SensationType: `zones` says which quarter of
-#              the pad it shows in (hu more intense + unpleasant, lu less intense + unpleasant,
-#              hp more intense + pleasant, lp less intense + pleasant); `regions` limits it to some
-#              places (None = anywhere); `energy` (more / less) colours a ghost mark warm or cool.
-#   MAPS       the body mirror: where a family of feelings typically shows up (Nummenmaa et al.
-#              2014, Bodily maps of emotions, PNAS; the 14 maps include "less" states such as
-#              sadness and depression, shown as cooled limbs). Each map lists 3–6 places
-#              (region, pad word, weight 0–1) and the grid words (src/data/emotions.ts ids) it
-#              mirrors. Every grid word mirrors exactly one map.
+# Four kinds of content, all emotion knowledge, so they live in the graph:
+#   REGIONS    the places the figure and the graph share, as BodyRegion nodes (REGION_NAMES). Geometry,
+#              labels on screen and which places are paired are presentation (src/data/bodyFigure.ts).
+#   PAD_WORDS  the sensation chips. Each is a SensationType: `zones` says which quarter it belongs to
+#              (hu more intense + unpleasant, lu less intense + unpleasant, hp more intense + pleasant,
+#              lp less intense + pleasant); `regions` limits it to some places (None = anywhere);
+#              `energy` (more / less) makes a mark glow warm or cool.
+#   FELT       where each emotion is typically felt: (Emotion)-[:FELT_AS {region, weight, status}]->
+#              (SensationType). THE one source of body-place knowledge in the graph (Oct 2026: it
+#              replaced the body maps' own place lists and the hand-written FELT_AS statements in
+#              relationships.cypher and the low-unpleasant patch). BASE rows are those original edges
+#              (live); NEW rows are proposed additions (draft until signed off).
+#   MAPS       the body mirror: a family of feelings. Each map GROUPS the emotions whose FELT_AS it
+#              shows (its places are computed from them; nothing is stored on the map) and MIRRORS the
+#              grid words (src/data/emotions.ts ids, Emotion nodes from emotion-wheel-sync) it answers.
+#              Every grid word mirrors exactly one map. Grounding: Nummenmaa et al. 2014, Bodily maps
+#              of emotions (PNAS), where "less" states such as sadness and depression show as cooled limbs.
 #
-# REVIEW: everything is a draft and is never served until it's signed off. To sign off a map (its
-# places and its words) or a pad word, add its id to SIGNED_OFF with the review date and rebuild,
-# e.g. SIGNED_OFF = {"map:fear": "2026-10-05", "word:tension": "2026-10-05"}.
+# REVIEW: nothing new is served until it's signed off. Add the key to SIGNED_OFF with the review date
+# and rebuild: "map:fear" (the map: its emotions and words), "word:tension" (a sensation chip),
+# "felt:anxiety:shoulders:raised_up" (a NEW FELT_AS row; BASE rows are already live).
 # Voice: plain body words, no diagnosis, no "should", no exclamation marks.
 
-VERSION = "body-map-v1"
+VERSION = "body-map-v2"
 
 SIGNED_OFF = {}
 
@@ -30,6 +35,26 @@ REGIONS = [
     "head", "face", "jaw", "throat", "neck", "shoulders", "chest", "upper_back",
     "stomach", "lower_back", "arms", "hands", "legs", "feet", "body",
 ]
+
+# BodyRegion nodes (Oct 2026: replaced the 8 old regions in knowledge-graph.cypher; the old "back"
+# became upper_back / lower_back, see schema/migrations/2026-10-felt-as-regions.cypher).
+REGION_NAMES = {
+    "head": ("Head", ["forehead", "temples", "scalp"]),
+    "face": ("Face", ["eyes", "cheeks", "mouth"]),
+    "jaw": ("Jaw", ["jaw", "teeth"]),
+    "throat": ("Throat", ["throat"]),
+    "neck": ("Neck", ["back of the neck"]),
+    "shoulders": ("Shoulders", ["shoulders"]),
+    "chest": ("Chest", ["heart area", "lungs", "sternum"]),
+    "upper_back": ("Upper back", ["between the shoulder blades", "upper spine"]),
+    "stomach": ("Stomach", ["stomach", "solar plexus", "abdomen", "gut"]),
+    "lower_back": ("Lower back", ["lower back", "hips"]),
+    "arms": ("Arms", ["upper arms", "forearms"]),
+    "hands": ("Hands", ["hands", "fingers"]),
+    "legs": ("Legs", ["thighs", "knees", "calves"]),
+    "feet": ("Feet", ["feet", "toes"]),
+    "body": ("Whole body", ["all over"]),
+}
 
 ZONES = ["hu", "lu", "hp", "lp"]
 
@@ -82,79 +107,110 @@ PAD_WORDS = [
     ("rested", "Rested", ["lp"], ["head", "body"], "less"),
 ]
 
-# id: (label, places [(region, pad word id, weight)], grid words)
+BASE, NEW = "base", "new"
+
+# emotion id: [(region, sensation id, weight 0–1 = how typical, BASE | NEW)]
+FELT = {
+    # --- fear and worry ---
+    "anxiety": [("chest", "constriction", 0.6, BASE), ("chest", "racing_heart", 1.0, BASE), ("stomach", "butterflies", 0.8, BASE),
+                ("shoulders", "tension", 0.6, BASE), ("throat", "constriction", 0.8, BASE), ("shoulders", "raised_up", 0.7, NEW)],
+    "fear": [("chest", "racing_heart", 1.0, BASE), ("stomach", "heaviness", 0.6, BASE), ("body", "cold_sensation", 0.6, BASE),
+             ("legs", "weakness", 0.5, BASE), ("body", "shaking", 0.6, BASE), ("hands", "shaking", 0.6, NEW)],
+    "panic": [("chest", "racing_heart", 1.0, BASE), ("chest", "constriction", 0.6, BASE), ("body", "shaking", 0.6, BASE),
+              ("hands", "numbness_sensation", 0.6, BASE)],
+    "stress": [("shoulders", "tension", 0.6, BASE), ("upper_back", "tension", 0.6, BASE), ("neck", "tension", 0.6, BASE)],
+    # --- anger ---
+    "anger": [("head", "pressure", 0.5, BASE), ("head", "heat", 1.0, BASE), ("chest", "heat", 0.6, BASE), ("arms", "tension", 0.6, BASE),
+              ("jaw", "tension", 0.6, BASE), ("face", "heat", 0.9, NEW), ("jaw", "clenched", 0.9, NEW), ("hands", "clenched", 0.8, NEW),
+              ("chest", "pressure", 0.7, NEW)],
+    # --- sadness ---
+    "sadness": [("chest", "heaviness", 1.0, BASE), ("throat", "constriction", 0.8, BASE), ("body", "heaviness", 0.6, BASE),
+                ("throat", "lump", 0.8, NEW), ("arms", "heaviness", 0.6, NEW), ("legs", "heaviness", 0.6, NEW), ("head", "pressure", 0.5, NEW)],
+    "disappointment": [("chest", "heaviness", 0.8, BASE), ("throat", "constriction", 0.6, BASE), ("stomach", "pressure", 0.6, BASE)],
+    "loneliness": [("chest", "heaviness", 0.8, BASE), ("chest", "cold_sensation", 0.6, BASE), ("throat", "constriction", 0.6, BASE)],
+    "hopelessness": [("chest", "heaviness", 0.8, BASE), ("body", "heaviness", 0.6, BASE), ("body", "weakness", 0.6, BASE),
+                     ("chest", "pressure", 0.6, BASE)],
+    # --- shame ---
+    "hot_shame": [("face", "heat", 1.0, BASE), ("chest", "heat", 0.6, BASE)],
+    "cold_shame": [("stomach", "heaviness", 0.6, BASE), ("body", "weakness", 0.6, BASE), ("chest", "sinking", 0.7, NEW),
+                   ("stomach", "sinking", 0.7, NEW), ("shoulders", "slumped", 0.6, NEW)],
+    # --- guilt ---
+    "guilt": [("stomach", "heaviness", 0.6, BASE), ("chest", "constriction", 0.6, BASE), ("face", "heat", 0.6, BASE),
+              ("chest", "heaviness", 0.9, NEW), ("stomach", "knotted", 0.8, NEW), ("shoulders", "heaviness", 0.6, NEW), ("head", "pressure", 0.5, NEW)],
+    # --- disgust ---
+    "disgust": [("throat", "constriction", 0.8, BASE), ("stomach", "pressure", 0.6, BASE), ("stomach", "churning", 1.0, NEW),
+                ("face", "tension", 0.6, NEW)],
+    # --- drained or numb ---
+    "apathy": [("body", "heaviness", 0.6, BASE), ("body", "weakness", 0.6, BASE), ("body", "drained", 1.0, NEW),
+               ("arms", "heaviness", 0.7, NEW), ("legs", "heaviness", 0.7, NEW)],
+    "boredom": [("body", "restlessness", 0.6, BASE), ("body", "heaviness", 0.6, BASE)],
+    "emptiness": [("chest", "numbness_sensation", 0.6, BASE), ("stomach", "numbness_sensation", 0.6, BASE),
+                  ("chest", "cold_sensation", 0.6, BASE), ("chest", "hollow", 0.8, NEW)],
+    "numbness": [("body", "numbness_sensation", 0.8, BASE), ("hands", "numbness_sensation", 0.6, BASE), ("body", "cold_sensation", 0.6, BASE),
+                 ("body", "heaviness", 0.6, BASE), ("head", "foggy", 0.8, NEW)],
+    # --- love and warmth ---
+    "love": [("chest", "expansion", 0.6, BASE), ("chest", "warmth", 1.0, NEW), ("face", "warmth", 0.8, NEW), ("stomach", "butterflies", 0.6, NEW),
+             ("body", "warmth", 0.6, NEW), ("hands", "tingly", 0.5, NEW)],
+    "compassion": [("chest", "expansion", 0.7, BASE)],
+    # --- joy ---
+    "joy": [("chest", "expansion", 0.6, BASE), ("chest", "lightness", 1.0, BASE), ("body", "lightness", 0.7, BASE),
+            ("face", "smiling", 0.9, NEW), ("arms", "energised", 0.6, NEW), ("legs", "bouncy", 0.5, NEW)],
+    # --- excitement ---
+    "excitement": [("stomach", "butterflies", 0.8, BASE), ("chest", "racing_heart", 0.8, BASE), ("body", "restlessness", 0.6, BASE),
+                   ("stomach", "fizzy", 1.0, NEW), ("hands", "tingly", 0.7, NEW), ("legs", "bouncy", 0.7, NEW), ("body", "energised", 0.6, NEW)],
+    # --- surprise (no core Emotion node; the grid word "surprised" is one) ---
+    "surprised": [("chest", "racing_heart", 0.8, NEW), ("head", "buzzing", 0.7, NEW), ("stomach", "butterflies", 0.6, NEW)],
+    # --- calm ---
+    "calm": [("body", "lightness", 0.6, BASE), ("legs", "groundedness", 0.6, BASE), ("shoulders", "lightness", 0.6, BASE),
+             ("shoulders", "loose", 1.0, NEW), ("chest", "easy_breathing", 0.9, NEW), ("stomach", "settled", 0.8, NEW),
+             ("jaw", "loose", 0.6, NEW), ("feet", "groundedness", 0.6, NEW)],
+}
+
+# A map's places: every live FELT_AS row of the emotions it groups, per (place, sensation) the highest
+# weight plus SHARED_BONUS for each further emotion that shares it (capped at 1), strongest first.
+SHARED_BONUS = 0.1
+
+# id: (label, emotions it GROUPS (their FELT_AS gives its places), grid words it MIRRORS)
 MAPS = {
-    "fear": ("Fear and worry", [
-        ("chest", "racing_heart", 1.0), ("throat", "constriction", 0.8), ("stomach", "butterflies", 0.8),
-        ("shoulders", "raised_up", 0.7), ("hands", "shaking", 0.6), ("legs", "weakness", 0.5),
-    ], [
+    "fear": ("Fear and worry", ["anxiety", "fear", "panic", "stress", "overwhelm"], [
         "fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed",
         "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control",
         "hesitant",
     ]),
-    "anger": ("Anger", [
-        ("head", "heat", 1.0), ("face", "heat", 0.9), ("jaw", "clenched", 0.9), ("hands", "clenched", 0.8),
-        ("chest", "pressure", 0.7), ("arms", "tension", 0.6),
-    ], [
+    "anger": ("Anger", ["anger", "irritation", "frustration", "hostility", "angsty"], [
         "angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected",
         "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed",
     ]),
-    "sadness": ("Sadness", [
-        ("chest", "heaviness", 1.0), ("throat", "lump", 0.8), ("arms", "heaviness", 0.6),
-        ("legs", "heaviness", 0.6), ("head", "pressure", 0.5),
-    ], [
+    "sadness": ("Sadness", ["sadness", "disappointment", "loneliness", "hopelessness", "rejection"], [
         "rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful",
         "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned",
         "victimized", "fragile", "grief", "powerless",
     ]),
-    "shame": ("Shame", [
-        ("face", "heat", 1.0), ("chest", "sinking", 0.7), ("stomach", "sinking", 0.7), ("shoulders", "slumped", 0.6),
-    ], [
+    "shame": ("Shame", ["hot_shame", "cold_shame"], [
         "inadequate", "inferior", "worthless", "insignificant", "exposed", "humiliated", "ridiculed",
         "embarrassed", "ashamed",
     ]),
-    "guilt": ("Guilt", [
-        ("chest", "heaviness", 0.9), ("stomach", "knotted", 0.8), ("shoulders", "heaviness", 0.6), ("head", "pressure", 0.5),
-    ], ["guilty", "remorseful"]),
-    "disgust": ("Disgust", [
-        ("stomach", "churning", 1.0), ("throat", "constriction", 0.8), ("face", "tension", 0.6),
-    ], [
+    "guilt": ("Guilt", ["guilt"], ["guilty", "remorseful"]),
+    "disgust": ("Disgust", ["disgust"], [
         "critical", "skeptical", "dismissive", "disgusted", "disapproving", "repelled", "judgmental",
         "appalled", "revolted", "nauseated", "detestable", "horrified",
     ]),
-    "depleted": ("Drained or numb", [
-        ("body", "drained", 1.0), ("head", "foggy", 0.8), ("arms", "heaviness", 0.7),
-        ("legs", "heaviness", 0.7), ("chest", "hollow", 0.6),
-    ], [
+    "depleted": ("Drained or numb", ["apathy", "boredom", "emptiness", "numbness"], [
         "weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent",
         "empty", "numb",
     ]),
-    "love": ("Love and warmth", [
-        ("chest", "warmth", 1.0), ("face", "warmth", 0.8), ("stomach", "butterflies", 0.6),
-        ("body", "warmth", 0.6), ("hands", "tingly", 0.5),
-    ], [
+    "love": ("Love and warmth", ["love", "compassion", "gratitude", "trust"], [
         "aroused", "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative",
         "tender",
     ]),
-    "joy": ("Joy", [
-        ("chest", "lightness", 1.0), ("face", "smiling", 0.9), ("body", "lightness", 0.7),
-        ("arms", "energised", 0.6), ("legs", "bouncy", 0.5),
-    ], [
+    "joy": ("Joy", ["joy", "pride", "hope", "amusement", "inspiration"], [
         "happy", "interested", "proud", "accepted", "powerful", "optimistic", "joyful", "curious",
         "inquisitive", "successful", "confident", "respected", "valued", "courageous", "creative", "hopeful",
         "inspired", "good",
     ]),
-    "excitement": ("Excitement", [
-        ("stomach", "fizzy", 1.0), ("chest", "racing_heart", 0.8), ("hands", "tingly", 0.7),
-        ("legs", "bouncy", 0.7), ("body", "energised", 0.6),
-    ], ["excited", "eager", "energetic", "playful", "cheeky"]),
-    "surprise": ("Surprise", [
-        ("chest", "racing_heart", 0.8), ("head", "buzzing", 0.7), ("stomach", "butterflies", 0.6),
-    ], ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"]),
-    "calm": ("Calm", [
-        ("shoulders", "loose", 1.0), ("chest", "easy_breathing", 0.9), ("stomach", "settled", 0.8),
-        ("jaw", "loose", 0.6), ("feet", "groundedness", 0.6),
-    ], [
+    "excitement": ("Excitement", ["excitement", "enthusiasm", "curiosity"], ["excited", "eager", "energetic", "playful", "cheeky"]),
+    "surprise": ("Surprise", ["surprised"], ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"]),
+    "calm": ("Calm", ["calm", "contentment", "serenity", "relief", "safety", "humility"], [
         "calm", "relaxed", "peaceful", "content", "chill", "comfortable", "thoughtful", "mellow", "serene",
         "secure", "satisfied", "restful", "at_ease", "balanced", "grounded", "cozy", "humble",
     ]),

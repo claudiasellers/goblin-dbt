@@ -1,17 +1,35 @@
 /**
  * Body map content (docs/design/body-map.md, schema/body-map.cypher). Public content, no user data:
- * the sensation pad's words and the body-mirror maps for the check-in's words. Only signed-off
- * content (status "live") is served.
+ * the sensation words and the body-mirror maps for the check-in's words. A map's places come from
+ * FELT_AS (the one source of where each emotion is felt) through the emotions it GROUPS; the grid
+ * words it answers are the Emotion nodes it MIRRORS. Only signed-off content (status "live") is served.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
 import { ValidationError, graphId, obj, str, strArray } from '../shared/validate';
-import type { BodyEnergy, BodyMapContent, BodyMapPlace, BodyMirrorMap, BodySuggestion, BodySuggestMark, PadWord, PadZone } from './types';
+import type { BodyEnergy, BodyMapContent, BodyMirrorMap, BodySuggestion, BodySuggestMark, PadWord, PadZone } from './types';
 import { scoreBodyMaps, type ScorableMap } from './suggest';
+import { placesFromFelt, type FeltRow } from './places';
 
-export const BODY_MAP_VERSION = 'body-map-v1';
+export const BODY_MAP_VERSION = 'body-map-v2';
+
+/** The live FELT_AS rows of a map's emotions, collected per map (all-null rows when it has none). */
+const MAP_FELT = `OPTIONAL MATCH (m)-[:GROUPS]->(e:Emotion)-[f:FELT_AS {status: 'live'}]->(s:SensationType {padStatus: 'live'})
+       RETURN m.id AS id, m.label AS label, m.rank AS rank, wordIds,
+              collect({emotionId: e.id, region: f.region, sensationId: s.id, label: s.padLabel, energy: s.energy, weight: f.weight}) AS felt`;
+
+function feltRows(raw: unknown): FeltRow[] {
+  return ((raw ?? []) as Array<Record<string, unknown>>).map((f) => ({
+    emotionId: (f.emotionId as string | null) ?? null,
+    region: (f.region as string | null) ?? null,
+    sensationId: (f.sensationId as string | null) ?? null,
+    label: (f.label as string | null) ?? null,
+    energy: (f.energy as BodyEnergy | null) ?? null,
+    weight: f.weight === null || f.weight === undefined ? null : toNumber(f.weight),
+  }));
+}
 
 /** `emotionIds`: the check-in's grid word ids (optional, at most 20). */
 export function validateBodyMapRequest(raw: unknown): { emotionIds: string[] } {
@@ -47,31 +65,25 @@ export const getBodyMapContent = callable<unknown, BodyMapContent>(
       let maps: BodyMirrorMap[] = [];
       if (emotionIds.length > 0) {
         const res = await tx.run(
-          `MATCH (m:BodyMap {status: 'live'}) WHERE any(w IN m.wordIds WHERE w IN $ids)
-           MATCH (m)-[:SHOWS]->(p:BodyMapPlace)-[:FEELS_AS]->(s:SensationType)
-           RETURN m.id AS id, m.label AS label, m.wordIds AS wordIds,
-                  collect({region: p.region, sensationId: s.id, label: s.padLabel, energy: s.energy, weight: p.weight}) AS places`,
+          `MATCH (m:BodyMap {status: 'live'})-[:MIRRORS]->(w:Emotion) WHERE w.id IN $ids
+           WITH DISTINCT m
+           MATCH (m)-[:MIRRORS]->(mw:Emotion)
+           WITH m, collect(DISTINCT mw.id) AS wordIds
+           ${MAP_FELT}`,
           { ids: emotionIds });
         const first = (wordIds: string[]) => Math.min(...wordIds.map((w) => emotionIds.indexOf(w)).filter((i) => i >= 0));
         maps = res.records
           .map((r) => {
             const wordIds = (r.get('wordIds') ?? []) as string[];
-            const places = (r.get('places') as Array<Record<string, unknown>>).map((p): BodyMapPlace => ({
-              region: p.region as string,
-              sensationId: p.sensationId as string,
-              label: p.label as string,
-              energy: p.energy as BodyEnergy,
-              weight: toNumber(p.weight) ?? 0,
-            }));
-            places.sort((a, b) => b.weight - a.weight || a.region.localeCompare(b.region));
             const map: BodyMirrorMap = {
               id: r.get('id') as string,
               label: r.get('label') as string,
               emotionIds: emotionIds.filter((w) => wordIds.includes(w)),
-              places,
+              places: placesFromFelt(feltRows(r.get('felt'))),
             };
             return { map, order: first(wordIds) };
           })
+          .filter((x) => x.map.places.length > 0)
           .sort((a, b) => a.order - b.order)
           .map((x) => x.map);
       }
@@ -109,17 +121,15 @@ export const suggestEmotionsFromBody = callable<unknown, { suggestions: BodySugg
     if (marks.length === 0) return { suggestions: [] };
     const maps = await readTx(async (tx) => {
       const res = await tx.run(
-        `MATCH (m:BodyMap {status: 'live'})-[:SHOWS]->(p:BodyMapPlace)-[:FEELS_AS]->(s:SensationType)
-         RETURN m.id AS id, m.label AS label, m.wordIds AS wordIds,
-                collect({region: p.region, sensationId: s.id, label: s.padLabel, weight: p.weight}) AS places`);
+        `MATCH (m:BodyMap {status: 'live'})
+         OPTIONAL MATCH (m)-[:MIRRORS]->(mw:Emotion)
+         WITH m, collect(DISTINCT mw.id) AS wordIds
+         ${MAP_FELT}`);
       return res.records.map((r): ScorableMap => ({
         id: r.get('id') as string,
         label: r.get('label') as string,
         wordIds: (r.get('wordIds') ?? []) as string[],
-        places: (r.get('places') as Array<Record<string, unknown>>).map((p) => ({
-          region: p.region as string, sensationId: p.sensationId as string, label: p.label as string,
-          weight: toNumber(p.weight) ?? 0,
-        })),
+        places: placesFromFelt(feltRows(r.get('felt'))),
       }));
     });
     return { suggestions: scoreBodyMaps(marks, maps) };
