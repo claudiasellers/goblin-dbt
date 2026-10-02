@@ -32,13 +32,14 @@ interface BodyStepProps {
 
 const NO_INTENSITY = { x: 0.5, y: 0.5 };
 
-/** Whether the strength bar shows: a per-device preference, off until someone turns it on. */
-const BAR_KEY = 'goblin.body.strengthBar';
+/** Whether the strength bar shows: on by default; hiding it is a per-device preference. (A new
+ *  key: the first version stored "off unless turned on" under goblin.body.strengthBar.) */
+const BAR_HIDDEN_KEY = 'goblin.body.strengthBarHidden';
 function readBarPref(): boolean {
-  try { return localStorage.getItem(BAR_KEY) === '1'; } catch { return false; }
+  try { return localStorage.getItem(BAR_HIDDEN_KEY) !== '1'; } catch { return true; }
 }
 function writeBarPref(on: boolean) {
-  try { localStorage.setItem(BAR_KEY, on ? '1' : '0'); } catch { /* private mode: in memory only */ }
+  try { localStorage.setItem(BAR_HIDDEN_KEY, on ? '0' : '1'); } catch { /* private mode: in memory only */ }
 }
 
 /** The panel's unsaved state, shown live on the figure. */
@@ -54,8 +55,8 @@ function centre(region: RegionId, side: Side) {
 
 /**
  * The body step (docs/design/body-map.md, step 3; canvas row AA). One screen, nothing to scroll
- * to: the heat figure (drag to a place and lift, or tap), an optional strength bar beside it (the
- * "Strength" toggle, remembered on this device), and under it either the chosen place's words in
+ * to: the heat figure (drag to a place and lift, or tap), a strength bar beside it (shown by default;
+ * the "Strength" toggle hides it, remembered on this device), and under it either the chosen place's words in
  * one swipeable row or your marks and the places the figure can't show. A mark glows warm or cool
  * from its words and as strong as the bar says. Both sides by default; paired places offer your
  * left / your right. Marks belong to the whole check-in, never to a feeling.
@@ -125,7 +126,8 @@ export function BodyStep({ marks, onChange, onComplete, onSkip, isSomaticEntry =
   }
 
   function toggleBar() {
-    setBarOn((on) => { writeBarPref(!on); return !on; });
+    writeBarPref(!barOn);
+    setBarOn(!barOn);
   }
 
   const readback = hover ? (hover.region ? REGIONS[hover.region].label : 'Not on the body') : editing ? REGIONS[editing].label : ' ';

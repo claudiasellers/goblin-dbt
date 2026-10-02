@@ -228,6 +228,16 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 
 ---
 
+## After a PR merges: tell Claudia the deploy steps
+
+Claudia runs every deploy and graph load herself, on her Mac (`~/Documents/goblin-dbt`); sessions have
+no `.env` or bolt access. Every PR description ends with a **Deploy** section, and when she says a PR is
+merged, reply with the exact commands in order, even when the answer is "nothing to run":
+`git pull`, then any graph loads (`node scripts/load-graph.mjs --only <file>`, constraints first), then
+`firebase deploy --only functions` (before hosting whenever the server must accept something new), then
+any one-off migration (`--file schema/migrations/…`) the PR says runs after functions, then
+`firebase deploy --only hosting`. Say which steps are not needed, and why it matters if the order slips.
+
 ## Product Changelog (Obsidian)
 
 The product-level record of every change and the thinking behind it lives in Claudia's Obsidian vault:

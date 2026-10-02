@@ -11,6 +11,10 @@ const content = JSON.parse(readFileSync("tests/fixtures/body-map-content.json", 
 
 const centreOf = (s) => (s.kind === "ellipse" ? [s.cx, s.cy] : s.kind === "rect" ? [s.x + s.w / 2, s.y + s.h / 2] : null);
 
+test("the figure box matches the viewBox the figure draws in", () => {
+  assert.equal(fig.FIGURE_VIEWBOX, [fig.FIGURE_BOX.x, fig.FIGURE_BOX.y, fig.FIGURE_BOX.w, fig.FIGURE_BOX.h].join(" "));
+});
+
 test("every tap target's centre is its own place, on both sides", () => {
   for (const id of fig.REGION_IDS) {
     for (const s of fig.REGIONS[id].hits) {
@@ -59,16 +63,18 @@ test("strength: a bigger, brighter glow; not used is a middle glow; said back in
   assert.equal(mark.strengthAt(50, 200), 0.75);
 });
 
-test("the body step: drag to choose, the optional strength bar beside the body, words in one row, no pad", () => {
+test("the body step: drag to choose, the strength bar beside the body (shown by default), words in one row, no pad", () => {
   const step = readFileSync("src/components/checkin/body/BodyStep.tsx", "utf8");
   assert.doesNotMatch(step, /FeelingSquare/, "the pad is gone");
   assert.match(step, /<StrengthBar/);
-  assert.match(step, /\{barOn && \(/, "the bar only shows when turned on");
+  assert.match(step, /\{barOn && \(/, "the toggle hides the bar");
   assert.match(step, /useState\(readBarPref\)/);
-  assert.match(step, /localStorage\.getItem\(BAR_KEY\) === '1'/, "off unless turned on");
+  assert.match(step, /localStorage\.getItem\(BAR_HIDDEN_KEY\) !== '1'/, "shown unless hidden");
   assert.match(step, /strength: draft\.strength/);
   assert.match(step, /onHover=\{setHover\}/);
   const heat = readFileSync("src/components/checkin/body/HeatFigure.tsx", "utf8");
   assert.match(heat, /regionAt\(/);
+  assert.match(heat, /className=\{`heat-figure-wrap/, "the drag is on a wrapper div");
+  assert.doesNotMatch(heat, /\.getScreenCTM\(/, "box mapping, not getScreenCTM");
   assert.match(heat, /glowLook\(m\.strength\)/);
 });
