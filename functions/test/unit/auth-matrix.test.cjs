@@ -24,7 +24,7 @@ const AUTHED = [
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getRelatedEmotions', 'getCapacityContent', 'getSpineContent', 'getBodyMapContent', 'suggestEmotionsFromBody',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getCapacityContent', 'getPleaseContent', 'getSpineContent', 'getBodyMapContent', 'suggestEmotionsFromBody',
   'getWitnessLines', // public content; reads the caller's own lines only when signed in
 ];
 

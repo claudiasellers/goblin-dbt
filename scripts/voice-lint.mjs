@@ -32,7 +32,7 @@ export const WITNESS_FILE = join(root, 'schema/witness.cypher');
 /** Generated flow documents whose user copy is linted against the baseline (E3 §A5.2.4 (c)). */
 export const FLOW_DOC_FILES = [
   'schema/find-the-feeling.cypher', 'schema/invalidation-recovery.cypher', 'schema/capacity.cypher',
-  'schema/opposite-action-flow.cypher', 'schema/practice-spine.cypher',
+  'schema/opposite-action-flow.cypher', 'schema/practice-spine.cypher', 'schema/please.cypher',
 ];
 
 export const RULESET = JSON.parse(readFileSync(RULES_FILE, 'utf8'));

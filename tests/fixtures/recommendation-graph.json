@@ -404,6 +404,17 @@
     "sadness"
    ]
   },
+  "dbt_please": {
+   "appToolId": "please-skill",
+   "name": "PLEASE Skills",
+   "description": "Physical self-care: treat illness, balanced eating, avoid drugs, balanced sleep, exercise",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_problem_solving": {
    "appToolId": "problem-solve",
    "name": "Problem Solving",

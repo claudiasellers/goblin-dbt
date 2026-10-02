@@ -84,6 +84,16 @@ export const tools: Tool[] = [
     dbtBasis: 'Problem Solving',
     emoji: '🛠️',
   },
+  {
+    id: 'please-skill',
+    name: 'Running low',
+    tagline: 'When tired, hungry, sick or run down is making everything harder',
+    description: 'Check what your body is running low on, pick one small thing to do about it now, and protect tomorrow. For when the problem is the tank, not the feeling.',
+    whenToUse: 'When you\'re exhausted, depleted or run down, and everything feels harder than usual.',
+    module: 'emotion-regulation',
+    dbtBasis: 'PLEASE (reducing vulnerability), with check the facts and sleep hygiene',
+    emoji: '🔋',
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -127,6 +137,7 @@ export const intents: Intent[] = [
   { id: 'urge', label: 'Ride out an urge', toolId: 'urge-surfing', emoji: '🌊' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
+  { id: 'running-low', label: 'I\'m exhausted or run down', toolId: 'please-skill', emoji: '🔋' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
 ];
 

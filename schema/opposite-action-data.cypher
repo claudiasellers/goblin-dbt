@@ -316,12 +316,12 @@ UNWIND [
   {id: "busy",           applicable: false, parent: null,   note: "Activity state, not emotion — slow down",                  alt: "mindfulness-emotions"},
   {id: "rushed",         applicable: false, parent: null,   note: "Activity state — pause and ground",                        alt: "mindfulness-emotions"},
   {id: "bad",            applicable: false, parent: null,   note: "Too vague — identify the specific emotion",                alt: "name-it"},
-  {id: "tired",          applicable: false, parent: null,   note: "Physical depletion — address vulnerability factors",       alt: "please-skill"},
-  {id: "bored",          applicable: false, parent: null,   note: "Low engagement — address vulnerability factors",           alt: "please-skill"},
-  {id: "sleepy",         applicable: false, parent: null,   note: "Physical depletion — prioritize sleep",                    alt: "please-skill"},
-  {id: "unfocused",      applicable: false, parent: null,   note: "Cognitive state — address vulnerability factors",          alt: "please-skill"},
-  {id: "apathetic",      applicable: false, parent: null,   note: "Depletion/disengagement — address basics first",           alt: "please-skill"},
-  {id: "indifferent",    applicable: false, parent: null,   note: "Low activation — address vulnerability factors",           alt: "please-skill"}
+  {id: "tired",          applicable: false, parent: null,   note: "Tired isn't an emotion to act against. If your body is running low, rest fits the facts. Start with what it needs.", alt: "please-skill"},
+  {id: "bored",          applicable: false, parent: null,   note: "Bored often comes from a low tank or too little to engage with. Check the basics first.", alt: "please-skill"},
+  {id: "sleepy",         applicable: false, parent: null,   note: "Sleepy is your body asking for sleep, not an emotion to push against. Start with what it needs.", alt: "please-skill"},
+  {id: "unfocused",      applicable: false, parent: null,   note: "Hard to focus is often a body low on sleep, food or movement. Check the basics first.", alt: "please-skill"},
+  {id: "apathetic",      applicable: false, parent: null,   note: "Not caring can come from running on empty. Check the basics first; if they're fine, it may be a feeling underneath.", alt: "please-skill"},
+  {id: "indifferent",    applicable: false, parent: null,   note: "Flat and indifferent can come from running on empty. Check the basics first; if they're fine, it may be a feeling underneath.", alt: "please-skill"}
 ] AS m
 MATCH (e:Emotion {id: m.id})
 SET e.oppositeActionApplicable = m.applicable, e.oaClinicalNote = m.note, e.oaAlternativeSkill = m.alt

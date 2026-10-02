@@ -68,6 +68,7 @@ export const LOAD_ORDER = [
   'capacity.cypher',                               // Capacity probe, hand-off primitives, band rules (needs Recover's cyclic_sighing)
   'witness.cypher',                                // Witness corpus: ValidationLine, ToolMoment, VoiceRule (needs Recover, OA, DEAR MAN debrief, regulation content)
   'body-map.cypher',                               // Body map: pad words on SensationType, BodyMap / BodyMapPlace (the mirror); needs SensationType
+  'please.cypher',                                 // PLEASE ("Running low"): flow document, dbt_please appToolId (needs linehan_skills_2015)
   'recommended-for.cypher',                        // Check-in routing: RECOMMENDED_FOR pattern × band, concept tags, RoutingPolicy (needs urge_surfing, dbt_find_the_feeling)
 ];
 

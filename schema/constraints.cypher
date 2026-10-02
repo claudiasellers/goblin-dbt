@@ -105,6 +105,9 @@ CREATE CONSTRAINT pattern_rule_id IF NOT EXISTS FOR (n:PatternRule) REQUIRE n.id
 
 // --- Capacity band content (A4-1, schema/capacity.cypher) ---
 CREATE CONSTRAINT capacity_probe_id IF NOT EXISTS FOR (n:CapacityProbe) REQUIRE n.id IS UNIQUE;
+
+// --- PLEASE ("Running low", schema/please.cypher) ---
+CREATE CONSTRAINT please_flow_id IF NOT EXISTS FOR (n:PleaseFlow) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT handoff_primitive_id IF NOT EXISTS FOR (n:HandoffPrimitive) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT band_rule_id IF NOT EXISTS FOR (n:BandRule) REQUIRE n.id IS UNIQUE;
 

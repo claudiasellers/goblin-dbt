@@ -16,6 +16,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'pause': { module: 'dt', closeKind: 'urge' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
+  // Running low (PLEASE): ends on a plan the user keeps in their head; nothing to ask (yet).
+  'please-skill': { module: 'er', closeKind: 'none' },
   // FTF asks its own then-vs-now (stored `close`, mapped at read: R3).
   'find-the-feeling': { module: 'er', closeKind: 'regulation_down' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).

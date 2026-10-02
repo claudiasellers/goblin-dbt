@@ -12,6 +12,7 @@ import { DearMan } from './tools/DearMan';
 import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
+import { Please } from './tools/Please';
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -24,6 +25,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'problem-solve': ProblemSolve,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
+  'please-skill': Please,
 };
 
 export function ToolPage() {
