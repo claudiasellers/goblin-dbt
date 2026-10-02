@@ -8,6 +8,8 @@
 // `chest`), so History and Insights count one place, not two spellings. The Insights query
 // collects DISTINCT regions per check-in, so a check-in that had both shoulders counts once.
 // Thigh / knee / calf all become `legs`; Hips becomes `lower_back` (the nearest place).
+// saveCheckIn applies the same table on every save (LEGACY_REGIONS in functions/src/checkin/validation.ts;
+// a test keeps them identical), so an old client still open in a tab can't add old names afterwards.
 // Idempotent: a second run matches nothing. Not in LOAD_ORDER (it touches user data).
 // ============================================================
 

@@ -41,3 +41,14 @@ test("nothing in the app reads the retired frontend mappings", () => {
     assert.doesNotMatch(readFileSync(f, "utf8"), /sensationMappings|bodyRegions'/, f);
   }
 });
+
+test("saves map old region names the same way as the migration (old clients still open in a tab)", () => {
+  const ts = readFileSync("functions/src/checkin/validation.ts", "utf8");
+  const block = ts.match(/LEGACY_REGIONS[^=]*= \{([\s\S]*?)\n\};/)[1];
+  const fromTs = Object.fromEntries([...block.matchAll(/'?([A-Z][A-Za-z ]+)'?: \['([a-z_]+)', (null|'left'|'right')\]/g)]
+    .map((m) => [m[1], [m[2], m[3] === "null" ? null : m[3].replace(/'/g, "")]]));
+  const fromCypher = Object.fromEntries([...migration.matchAll(/`([A-Z][A-Za-z ]+)`: \['([a-z_]+)', (null|'left'|'right')\]/g)]
+    .map((m) => [m[1], [m[2], m[3] === "null" ? null : m[3].replace(/'/g, "")]]));
+  assert.ok(Object.keys(fromTs).length >= 20);
+  assert.deepEqual(fromTs, fromCypher);
+});
