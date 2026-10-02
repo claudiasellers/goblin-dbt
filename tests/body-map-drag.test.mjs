@@ -39,13 +39,17 @@ test("overlaps go to the smaller place; seams snap; off the body is nothing", ()
   assert.equal(fig.regionAt(-8, 300), null);
 });
 
-test("a mark's colour comes from its words: more is warm, less is cool, both is a blend, none the mid-tone", () => {
+test("a mark's colour is its words' home quarter on the feeling square: one quarter its colour, two a blend, none the mid-tone", () => {
   assert.equal(mark.markColour([]), mark.HEAT);
-  assert.equal(mark.markColour(["more", "more"]), mark.WARM);
-  assert.equal(mark.markColour(["less"]), mark.COOL);
-  assert.match(mark.markColour(["more", "less"]), /^color-mix\(in oklab, var\(--color-q-hu-fill\), var\(--color-q-lu-fill\)\)$/);
-  // Every pad word in the graph says which it is.
-  for (const w of content.padWords) assert.ok(["more", "less"].includes(w.energy), w.id);
+  assert.equal(mark.markColour(["hu", "hu"]), "var(--color-q-hu-fill)");
+  assert.equal(mark.markColour(["lp"]), "var(--color-q-lp-fill)");
+  assert.equal(mark.markColour(["hu", "lu", "hp"]), "color-mix(in oklab, var(--color-q-hu-fill), var(--color-q-lu-fill))");
+  const home = new Map(content.padWords.map((w) => [w.id, w.zones[0]]));
+  for (const w of content.padWords) assert.ok(["hu", "lu", "hp", "lp"].includes(home.get(w.id)), w.id);
+  // The calm words glow calm, not the drained colour (review 2 Oct 2026); the drained ones stay low-unpleasant.
+  for (const id of ["settled", "loose", "soft", "groundedness", "easy_breathing", "rested"]) assert.equal(home.get(id), "lp", id);
+  for (const id of ["heaviness", "numbness_sensation", "drained", "achy", "cold_sensation"]) assert.equal(home.get(id), "lu", id);
+  assert.equal(home.get("butterflies"), "hp");
 });
 
 test("strength: a bigger, brighter glow; not used is a middle glow; said back in a word", () => {

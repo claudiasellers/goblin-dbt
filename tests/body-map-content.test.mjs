@@ -100,7 +100,7 @@ test("pad words: every place has at least one word in every quarter of the pad",
 });
 
 test("nothing new is live without sign-off (SIGNED_OFF in content.py); the original FELT_AS rows stay live", () => {
-  const signed = readFileSync("scripts/body-map/content.py", "utf8").match(/^SIGNED_OFF = (\{.*\})$/m)[1];
+  const signed = readFileSync("scripts/body-map/content.py", "utf8").match(/^SIGNED_OFF = (\{[\s\S]*?^\})$/m)[1];
   const ids = [...signed.matchAll(/"([a-z_:]+)"\s*:/g)].map((m) => m[1]);
   const live = [
     ...fixture.maps.filter((m) => m.status === "live").map((m) => `map:${m.id}`),

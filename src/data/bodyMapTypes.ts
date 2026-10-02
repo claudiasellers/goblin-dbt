@@ -3,9 +3,9 @@
  * Mirror of functions/src/bodyMap/types.ts; tests/body-map-content.test.mjs asserts the two stay identical.
  */
 
-/** A quarter of the sensation pad: more / less intense × unpleasant / pleasant. */
+/** A quarter of the feeling square: more / less intense × unpleasant / pleasant. A word's first zone is its home (its mark colour). */
 export type PadZone = 'hu' | 'lu' | 'hp' | 'lp';
-/** How a sensation reads on the heat figure: warm (more energy) or cool (less). */
+/** A sensation's arousal: more energy or less (kept for the mirror; the colour comes from the home zone). */
 export type BodyEnergy = 'more' | 'less';
 
 /** A chip on the sensation pad (a SensationType). `regions` empty means anywhere. */

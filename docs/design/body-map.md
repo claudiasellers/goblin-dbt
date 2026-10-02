@@ -6,9 +6,11 @@ Changelog, "Body step redesign: the sensation pad".
 
 ## What we decided
 
-- **Figure: Heat.** A soft silhouette. Marks glow inside it like a heat map. Warm colours mean more
-  energy, cool colours mean less. That follows Nummenmaa et al. 2014 (*Bodily maps of emotions*,
-  PNAS), where "less" states such as sadness and depression show as cooled limbs.
+- **Figure: Heat.** A soft silhouette. Marks glow inside it like a heat map, in the colours of the
+  feeling square (2 Oct 2026, below). The colour is never skin temperature: cold hands in fear are
+  the word *Cold*, not a blue glow. Each word still carries its arousal (`energy`), following
+  Nummenmaa et al. 2014 (*Bodily maps of emotions*, PNAS), where "less" states such as sadness and
+  depression show as cooled limbs.
 - **Both sides by default.** Shoulders, arms, hands, legs and feet are one place each. Both / Left /
   Right appears only for those paired places, never for the midline.
 - **One screen, no pad (canvas row AA, Oct 2).** The sensation pad (a small feeling square in the
@@ -17,9 +19,11 @@ Changelog, "Body step redesign: the sensation pad".
   - The place's words sit in one swipeable row under the body.
   - An optional **strength bar** beside the body, as tall as the figure (strong at the top, faint at
     the bottom). Shown by default; a "Strength" toggle hides it, remembered per device.
-  - Colour comes from the words: each pad word is `more` (tight, racing) or `less` (heavy, numb), so
-    a mark glows warm, cool, or a blend of both; no words, a warm mid-tone. Strength sets how big
-    and bright the glow is.
+  - Colour comes from the words: each pad word has a home quarter on the feeling square (its first
+    zone), and a mark glows in that quarter's colour (Tight: intense-unpleasant, Heavy:
+    low-unpleasant, Fizzy: bright-pleasant, Settled: calm); two quarters blend; no words, a warm
+    mid-tone. Strength sets how big and bright the glow is. (Until 2 Oct it was warm for `more`
+    and cool for `less`, which painted Settled and Loose the same blue as Drained and Numb.)
 - **The body mirror.** It follows DEAR MAN's "Not sure? See how this might typically make someone
   feel". "Not sure? See where *anxious* often shows up" draws the typical map for the check-in's
   words as a ghost layer (dashed, hatched, labelled).
@@ -61,6 +65,14 @@ All of this is emotion knowledge, so it lives in the graph (CLAUDE.md hard rule)
 editable source, `scripts/body-map/content.py`, which generates `schema/body-map.cypher` through
 `build.py` (the same pattern as find-the-feeling, witness and recommendations). It has drafts and a
 `SIGNED_OFF` list like the witness corpus, so nothing is served until Claudia approves it.
+
+**Signed off 2 Oct 2026**: all 40 words, all 12 maps and every new `FELT_AS` row, after a physiology
+review: *Achy* moved to less intense, unpleasant (a dull, lasting ache is low arousal); fear gained
+cold hands and feet (fight-or-flight pulls blood from the extremities; *Shaky* stays, the tremor is
+real); *jealous* mirrors fear and worry (a threat to a bond), *powerless* drained or numb (blocked
+agency, collapse), *aroused* excitement (activation, not only intimacy). The review also asked for
+calm places to read warm, not cool: answered by the colour rule (calm words glow the square's calm
+colour). A new word or row is a draft again until it is added to `SIGNED_OFF`.
 
 **Rebuilt on `FELT_AS` (Oct 2, `body-map-v2`).** Step 1 gave the body maps their own place lists
 (`BodyMapPlace` nodes) and a word list, next to the graph's existing `FELT_AS` edges, so the graph
@@ -202,9 +214,8 @@ step reads it.
      routes on. A Together tab stripes the places two maps share.
    - Marks stay put across tabs and never take a tab's colour. Z4's summary is the marks row.
 
-Not built (yet): a `dev/body-map.html` harness like `dev/find-the-feeling.html`. Until the content is
-signed off, the step can be seen locally only with the content stubbed (the fixture treats drafts as
-live).
+Not built (yet): a `dev/body-map.html` harness like `dev/find-the-feeling.html`. Locally the step
+can be seen with the content stubbed from the fixture.
 
 ### Step 2 as built
 
@@ -259,8 +270,8 @@ it the same day: the pad made the step something you scroll to. Rebuilt as one s
 - **The card**: "My chest feels…", Both / Your left / Your right for paired places, and the graph's
   words for the place in one row that swipes sideways (graph order; a saved word that's no longer
   served still shows so it can be taken off). Buttons: Cancel or Remove, and Add this place / Done.
-- **Colour** (`src/lib/bodyMark.ts`): warm (`--color-q-hu-fill`) for `more` words, cool
-  (`--color-q-lu-fill`) for `less`, a blend for both, the warm mid-tone for none. Strength scales
+- **Colour** (`src/lib/bodyMark.ts`): each picked word's home quarter (`zones[0]`) gives
+  `--color-q-<zone>-fill`; words from two quarters blend the first two; none, the warm mid-tone. Strength scales
   the glow (0.6–1.1× size, 0.35–0.95 opacity); unset is a middle glow. Picked chips take the
   mark's colour. The figure follows the card live (side, words, strength).
 - **No scrolling**: with nothing chosen, your marks and the places the figure can't show share one
