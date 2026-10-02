@@ -10,8 +10,9 @@
  * Presentation metadata only. Token values live in src/index.css under
  * `:root[data-palette="<id>"]`; the swatches here are copied from those blocks
  * (page, ink, action, high-unpleasant, low-pleasant) so the picker can preview
- * every room without switching the page. Keep them in sync with index.css,
- * with ROOM_MODES in index.html, and with the allow-list in
+ * every room without switching the page. swatch[0] is also the theme-color
+ * applyRoom sets. Keep them in sync with index.css, with ROOM_MODES and
+ * ROOM_PAGE in index.html, and with the allow-list in
  * functions/src/account/index.ts (updateUserProfile).
  *
  * Design source: the "Goblin UI directions" canvas (The Den and its rooms).
@@ -139,5 +140,7 @@ export function applyRoom(value: unknown, theme?: unknown): PaletteId {
   const root = document.documentElement;
   root.dataset.palette = id;
   root.dataset.theme = room?.mode ?? 'dark';
+  // Browser chrome / installed-app status bar follows the room's page colour (swatch[0]).
+  if (room) document.querySelector('meta[name="theme-color"]')?.setAttribute('content', room.swatch[0]);
   return id;
 }
