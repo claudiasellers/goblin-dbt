@@ -14,14 +14,8 @@ interface FeelingSquareProps {
   others?: Array<{ point: SquarePoint; label?: string }>;
   /** Small, label-free version used as a reminder on later screens. */
   small?: boolean;
-  /** Axis words (top, bottom, left, right); the check-in's energy / pleasantness by default. */
-  axes?: readonly [string, string, string, string];
-  /** Spoken name, for a square used for something other than the check-in (the sensation pad). */
-  label?: string;
   className?: string;
 }
-
-const CHECKIN_AXES = ['more energy', 'less energy', 'unpleasant', 'pleasant'] as const;
 
 /**
  * The feeling square: one continuous field instead of four boxes. Pleasantness runs left to
@@ -32,7 +26,7 @@ const CHECKIN_AXES = ['more energy', 'less energy', 'unpleasant', 'pleasant'] as
  * Keyboard: arrows move (Shift for bigger steps), Enter or Space places the dot in the middle, then chooses. The per-room look (halo, centre shade, Tinted's glaze, dot) comes from
  * the --square-* tokens in src/index.css.
  */
-export function FeelingSquare({ point, onMove, onCommit, others = [], small = false, axes = CHECKIN_AXES, label, className = '' }: FeelingSquareProps) {
+export function FeelingSquare({ point, onMove, onCommit, others = [], small = false, className = '' }: FeelingSquareProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const interactive = Boolean(onMove);
@@ -91,10 +85,9 @@ export function FeelingSquare({ point, onMove, onCommit, others = [], small = fa
             role: 'application',
             tabIndex: 0,
             'aria-roledescription': 'feeling square',
-            'aria-label': label
-              ?? (point
-                ? `Feeling square, marked at ${placeLabel(point)}. Arrow keys move, Enter chooses.`
-                : 'Feeling square. Up is more energy, right is more pleasant. Arrow keys move, Enter chooses.'),
+            'aria-label': point
+              ? `Feeling square, marked at ${placeLabel(point)}. Arrow keys move, Enter chooses.`
+              : 'Feeling square. Up is more energy, right is more pleasant. Arrow keys move, Enter chooses.',
             onPointerDown: handleDown,
             onPointerMove: handleMove,
             onPointerUp: handleUp,
@@ -111,10 +104,10 @@ export function FeelingSquare({ point, onMove, onCommit, others = [], small = fa
       <i className="fs-art" />
       {!small && (
         <>
-          <span className="fs-axis fs-axis--top">{axes[0]}</span>
-          <span className="fs-axis fs-axis--bottom">{axes[1]}</span>
-          <span className="fs-axis fs-axis--left">{axes[2]}</span>
-          <span className="fs-axis fs-axis--right">{axes[3]}</span>
+          <span className="fs-axis fs-axis--top">more energy</span>
+          <span className="fs-axis fs-axis--bottom">less energy</span>
+          <span className="fs-axis fs-axis--left">unpleasant</span>
+          <span className="fs-axis fs-axis--right">pleasant</span>
         </>
       )}
       {others.map((o, i) => (

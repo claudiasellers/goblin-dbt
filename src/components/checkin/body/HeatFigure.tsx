@@ -1,4 +1,5 @@
 import { useId, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { glowLook } from '../../../lib/bodyMark';
 import { FIGURE_VIEWBOX, REGIONS, REGION_IDS, SILHOUETTE, glowFor, regionAt, type HitShape, type RegionId, type Side } from '../../../data/bodyFigure';
 
 export interface FigureMark {
@@ -6,6 +7,8 @@ export interface FigureMark {
   side: Side;
   /** CSS colour of the glow. */
   colour: string;
+  /** 0–1 from the strength bar (bigger and brighter); null / absent = a middle glow. */
+  strength?: number | null;
 }
 
 /** What is under the finger during a drag (null when off the body). */
@@ -39,7 +42,7 @@ function Shape({ s, ...rest }: { s: HitShape } & React.SVGProps<SVGElement>) {
 
 /**
  * The heat figure (canvas row Y): a soft silhouette; each mark glows inside it, clipped to the body,
- * in its pad colour. Facing you: the person's left is on the figure's right.
+ * warm or cool from its words and as big and bright as its strength. Facing you: the person's left is on the figure's right.
  *
  * Drag (step 3): press anywhere on the figure and move; a glow follows the finger, the place under
  * it is outlined and reported through `onHover`, and lifting chooses it (a plain tap still works).
@@ -133,10 +136,14 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
       <g className="heat-figure__body">{silhouette}</g>
       <g clipPath={`url(#${clip})`}>
         <g filter={`url(#${blur})`}>
-          {marks.flatMap((m) => glowFor(m.region, m.side).map((g, i) => (
-            <ellipse key={`${m.region}-${i}`} cx={g.cx} cy={g.cy} rx={g.rx} ry={g.ry} style={{ fill: m.colour }}
-              opacity={FAINT.has(m.region) ? 0.45 : 0.9} />
-          )))}
+          {marks.flatMap((m) => {
+            const look = glowLook(m.strength);
+            const opacity = FAINT.has(m.region) ? look.opacity / 2 : look.opacity;
+            return glowFor(m.region, m.side).map((g, i) => (
+              <ellipse key={`${m.region}-${i}`} cx={g.cx} cy={g.cy} rx={g.rx * look.scale} ry={g.ry * look.scale}
+                style={{ fill: m.colour }} opacity={opacity} />
+            ));
+          })}
           {finger && (
             <circle className="heat-figure__finger" cx={finger.x} cy={finger.y} r={20}
               style={{ fill: fingerColour }} opacity={finger.region ? 0.95 : 0.5} />

@@ -1,22 +1,23 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { HeatFigure, type FigureMark } from './HeatFigure';
-import { FeelingSquare } from '../FeelingSquare';
-import { MORE_PLACES, REGIONS, glowFor, isRegionId, type RegionId, type Side } from '../../../data/bodyFigure';
+import { StrengthBar } from './StrengthBar';
+import { MORE_PLACES, REGIONS, glowFor, isRegionId, regionLabel, type RegionId, type Side } from '../../../data/bodyFigure';
 import { getBodyMapContent } from '../../../services/bodyMap';
-import type { PadWord } from '../../../data/bodyMapTypes';
-import { HEAT, PAD_UNSET, describePad, isPadSet, markColour, wordsForPad } from '../../../lib/bodyPad';
-import type { SquarePoint } from '../../../lib/feelingSquare';
+import type { BodyEnergy, PadWord } from '../../../data/bodyMapTypes';
+import { HEAT, markColour } from '../../../lib/bodyMark';
 
-/** One marked place, as the check-in saves it. `intensity` is the sensation pad's dot (x: how
- *  comfortable, y: how intense); the middle (`PAD_UNSET`) means the pad wasn't touched. */
+/** One marked place, as the check-in saves it. */
 export interface BodyMark {
   x: number;
   y: number;
   region: string;
   side: Side;
+  /** Kept for the record's shape; the body step no longer sets it (the pad is gone). */
   intensity: { x: number; y: number };
   tags: string[];
   sensationIds: string[];
+  /** 0–1 from the optional strength bar; null when it wasn't used for this place. */
+  strength: number | null;
 }
 
 interface BodyStepProps {
@@ -29,10 +30,19 @@ interface BodyStepProps {
   isSomaticEntry?: boolean;
 }
 
-const PAD_AXES = ['stronger', 'fainter', 'uncomfortable', 'comfortable'] as const;
+const NO_INTENSITY = { x: 0.5, y: 0.5 };
+
+/** Whether the strength bar shows: a per-device preference, off until someone turns it on. */
+const BAR_KEY = 'goblin.body.strengthBar';
+function readBarPref(): boolean {
+  try { return localStorage.getItem(BAR_KEY) === '1'; } catch { return false; }
+}
+function writeBarPref(on: boolean) {
+  try { localStorage.setItem(BAR_KEY, on ? '1' : '0'); } catch { /* private mode: in memory only */ }
+}
 
 /** The panel's unsaved state, shown live on the figure. */
-interface Draft { side: Side; intensity: SquarePoint }
+interface Draft { side: Side; strength: number | null; sensationIds: string[] }
 
 /** Centre of a mark on the figure, normalised to the viewBox, for the record's x / y. */
 function centre(region: RegionId, side: Side) {
@@ -43,11 +53,12 @@ function centre(region: RegionId, side: Side) {
 }
 
 /**
- * The body step (docs/design/body-map.md, steps 2–3): the heat figure (drag to a place and lift, or
- * tap), the places it can't show as chips, and a panel for the chosen place: the sensation pad (how
- * intense, how comfortable) and the graph's words for that place and that quarter of the pad. The
- * mark's glow takes the pad's colour as the dot moves. Both sides by default; paired places offer
- * your left / your right. Marks belong to the whole check-in, never to a feeling.
+ * The body step (docs/design/body-map.md, step 3; canvas row AA). One screen, nothing to scroll
+ * to: the heat figure (drag to a place and lift, or tap), an optional strength bar beside it (the
+ * "Strength" toggle, remembered on this device), and under it either the chosen place's words in
+ * one swipeable row or your marks and the places the figure can't show. A mark glows warm or cool
+ * from its words and as strong as the bar says. Both sides by default; paired places offer your
+ * left / your right. Marks belong to the whole check-in, never to a feeling.
  */
 export function BodyStep({ marks, onChange, onComplete, onSkip, isSomaticEntry = false }: BodyStepProps) {
   const [words, setWords] = useState<PadWord[] | null>(null);
@@ -55,7 +66,9 @@ export function BodyStep({ marks, onChange, onComplete, onSkip, isSomaticEntry =
   const [editing, setEditing] = useState<RegionId | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [hover, setHover] = useState<{ region: RegionId | null } | null>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const [barOn, setBarOn] = useState(readBarPref);
+  const [morePlaces, setMorePlaces] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let live = true;
@@ -65,87 +78,125 @@ export function BodyStep({ marks, onChange, onComplete, onSkip, isSomaticEntry =
     return () => { live = false; };
   }, []);
 
+  // On a short phone the card can sit below the fold; bring it into view when a place is chosen.
   useEffect(() => {
-    if (editing) panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    if (editing) cardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [editing]);
 
+  const energyOf = useMemo(() => new Map((words ?? []).map((w) => [w.id, w.energy])), [words]);
+  const colourFor = (ids: string[]) => markColour(ids.map((id) => energyOf.get(id)).filter((e): e is BodyEnergy => Boolean(e)));
+
+  const existing = editing ? marks.find((m) => m.region === editing) ?? null : null;
   const figureMarks: FigureMark[] = marks
     .filter((m) => isRegionId(m.region) && m.region !== editing)
-    .map((m) => ({ region: m.region as RegionId, side: m.side, colour: markColour(m.intensity) }));
-  if (editing && draft) figureMarks.push({ region: editing, side: draft.side, colour: markColour(draft.intensity) });
-  const colourOf = new Map(marks.map((m) => [m.region, markColour(m.intensity)]));
+    .map((m) => ({ region: m.region as RegionId, side: m.side, colour: colourFor(m.sensationIds), strength: m.strength }));
+  if (editing && draft) {
+    figureMarks.push({ region: editing, side: draft.side, colour: colourFor(draft.sensationIds), strength: draft.strength });
+  }
 
   function choose(region: RegionId) {
-    setDraft(null);
+    const m = marks.find((x) => x.region === region);
+    setDraft({ side: m?.side ?? 'both', strength: m?.strength ?? null, sensationIds: m?.sensationIds ?? [] });
     setEditing(region);
   }
 
-  function save(mark: BodyMark | null, region: RegionId) {
-    const rest = marks.filter((m) => m.region !== region);
-    onChange(mark ? [...rest, mark] : rest);
+  function close() {
     setEditing(null);
     setDraft(null);
   }
 
-  function cancel() {
-    setEditing(null);
-    setDraft(null);
+  function done() {
+    if (!editing || !draft) return;
+    const byId = new Map((words ?? []).map((w) => [w.id, w]));
+    const ids = draft.sensationIds.filter((id) => byId.has(id) || existing?.sensationIds.includes(id));
+    const tags = ids.map((id) => byId.get(id)?.label ?? existing?.tags[existing.sensationIds.indexOf(id)] ?? id);
+    const mark: BodyMark = {
+      ...centre(editing, draft.side), region: editing, side: draft.side, intensity: existing?.intensity ?? NO_INTENSITY,
+      tags, sensationIds: ids, strength: draft.strength,
+    };
+    onChange([...marks.filter((m) => m.region !== editing), mark]);
+    close();
   }
 
-  const readback = hover
-    ? (hover.region ? REGIONS[hover.region].label : 'Not on the body')
-    : null;
+  function remove() {
+    if (!editing) return;
+    onChange(marks.filter((m) => m.region !== editing));
+    close();
+  }
+
+  function toggleBar() {
+    setBarOn((on) => { writeBarPref(!on); return !on; });
+  }
+
+  const readback = hover ? (hover.region ? REGIONS[hover.region].label : 'Not on the body') : editing ? REGIONS[editing].label : ' ';
 
   return (
     <div className="max-w-md mx-auto flex flex-col">
       <h1 className="text-[2rem] leading-[1.08] text-[var(--color-text-primary)] m-0 [text-wrap:balance]">
         {isSomaticEntry ? 'Let’s start with your body' : 'Where do you feel it?'}
       </h1>
-      <p className="mt-2 text-[15px] text-[var(--color-text-secondary)]">
-        {isSomaticEntry ? 'Touch and drag to where you feel something, then lift. I’ll help with the words after.' : 'Touch and drag to where you feel it, then lift. Skip if nothing stands out.'}
+      <p className="mt-1.5 mb-0 text-[15px] text-[var(--color-text-secondary)]">
+        {isSomaticEntry ? 'Touch and drag to where you feel something, then lift.' : 'Touch and drag to a place, then lift.'}
       </p>
 
-      <p className="body-readback mt-2 mb-0 text-center text-[17px] font-bold text-[var(--color-text-primary)]" aria-live="polite">
-        {readback ?? (editing ? REGIONS[editing].label : '\u00a0')}
-      </p>
-
-      <div className="mt-1 self-center w-full max-w-[190px]">
-        <HeatFigure marks={figureMarks} selected={editing} onPick={choose} onHover={setHover} fingerColour={HEAT} />
+      <div className="body-stage mt-2">
+        <p className="body-stage__readback" aria-live="polite">{readback}</p>
+        <button type="button" className="body-stage__toggle strength-toggle" aria-pressed={barOn} onClick={toggleBar}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+            <line x1="12" y1="3" x2="12" y2="21" /><circle cx="12" cy="9" r="3.2" fill="currentColor" stroke="none" />
+          </svg>
+          Strength
+        </button>
+        <div className="body-stage__figure">
+          <HeatFigure marks={figureMarks} selected={editing} onPick={choose} onHover={setHover} fingerColour={HEAT} />
+        </div>
+        <div className="body-stage__bar">
+          {barOn && (
+            <StrengthBar value={editing ? draft?.strength ?? null : null} disabled={!editing}
+              label={editing ? `How strong in your ${REGIONS[editing].label.toLowerCase()}` : 'How strong. Choose a place first.'}
+              onChange={(v) => setDraft((d) => (d ? { ...d, strength: v } : d))} />
+          )}
+        </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap justify-center gap-2" role="group" aria-label="More places">
-        {MORE_PLACES.map((id) => (
-          <button key={id} type="button" className={`den-chip den-chip--small${colourOf.has(id) ? ' is-marked' : ''}`}
-            style={colourOf.has(id) ? { ['--mark' as string]: colourOf.get(id) } : undefined}
-            aria-pressed={editing === id} onClick={() => choose(id)}>
-            {REGIONS[id].label}
-          </button>
-        ))}
-      </div>
-
-      {editing ? (
-        <div ref={panelRef}>
-          <PlacePanel key={editing} region={editing} words={words} failed={failed}
-            existing={marks.find((m) => m.region === editing) ?? null} onDraft={setDraft}
-            onDone={(m) => save(m, editing)} onRemove={() => save(null, editing)} onCancel={cancel} />
+      {editing && draft ? (
+        <div ref={cardRef}>
+          <PlaceCard region={editing} words={words} failed={failed} draft={draft} existing={existing}
+            colour={colourFor(draft.sensationIds)} onChange={setDraft} />
+          <div className="action-dock flex gap-3">
+            <button type="button" onClick={existing ? remove : close} className="den-chip min-h-[56px] px-5">
+              {existing ? 'Remove' : 'Cancel'}
+            </button>
+            <button type="button" onClick={done}
+              className="flex-1 min-h-[56px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer lift-primary">
+              {existing ? 'Done' : 'Add this place'}
+            </button>
+          </div>
         </div>
       ) : (
         <>
-          {marks.length > 0 && (
-            <ul className="mt-5 m-0 p-0 list-none flex flex-col gap-2" aria-label="Your marks">
-              {marks.map((m) => (
-                <li key={m.region}>
-                  <button type="button" className="body-mark-row" onClick={() => isRegionId(m.region) && choose(m.region)}>
-                    <span className="body-mark-row__dot" aria-hidden="true" style={{ ['--mark' as string]: markColour(m.intensity) }} />
-                    <span className="font-semibold text-[var(--color-text-primary)]">{placeName(m)}</span>
-                    <span className="text-[var(--color-text-secondary)]">
-                      {[isPadSet(m.intensity) ? describePad(m.intensity).toLowerCase() : '', m.tags.join(', ').toLowerCase()].filter(Boolean).join(' · ')}
-                    </span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
+          {/* One group so the screen doesn't scroll: your marks, then the places the figure can't
+              show (behind "More places" once something is marked). */}
+          <div className={`mt-3 flex flex-wrap gap-2${marks.length ? '' : ' justify-center'}`}>
+            {marks.map((m) => (
+              <button key={m.region} type="button" className="den-chip den-chip--small is-marked"
+                style={{ ['--mark' as string]: colourFor(m.sensationIds) }}
+                onClick={() => isRegionId(m.region) && choose(m.region)}>
+                {[regionLabel(m.region, m.side), m.tags.join(', ').toLowerCase()].filter(Boolean).join(' · ')}
+              </button>
+            ))}
+            {marks.length > 0 && !morePlaces ? (
+              <button type="button" className="den-chip den-chip--small" aria-expanded={false} onClick={() => setMorePlaces(true)}>
+                + More places
+              </button>
+            ) : (
+              MORE_PLACES.filter((id) => !marks.some((m) => m.region === id)).map((id) => (
+                <button key={id} type="button" className="den-chip den-chip--small" onClick={() => choose(id)}>
+                  {REGIONS[id].label}
+                </button>
+              ))
+            )}
+          </div>
           <div className="action-dock">
             {marks.length > 0 ? (
               <button type="button" onClick={onComplete}
@@ -164,143 +215,67 @@ export function BodyStep({ marks, onChange, onComplete, onSkip, isSomaticEntry =
   );
 }
 
-function placeName(m: BodyMark) {
-  if (!isRegionId(m.region)) return m.region;
-  const def = REGIONS[m.region];
-  if (def.paired && m.side === 'left') return `${def.label}, your left`;
-  if (def.paired && m.side === 'right') return `${def.label}, your right`;
-  return def.label;
-}
-
-interface PlacePanelProps {
+interface PlaceCardProps {
   region: RegionId;
   words: PadWord[] | null;
   failed: boolean;
+  draft: Draft;
   existing: BodyMark | null;
-  onDraft: (draft: Draft) => void;
-  onDone: (mark: BodyMark) => void;
-  onRemove: () => void;
-  onCancel: () => void;
+  /** The mark's colour, for picked chips. */
+  colour: string;
+  onChange: (d: Draft) => void;
 }
 
-/**
- * The chosen place: both sides or one, the sensation pad, and the graph's words for this place in
- * the pad's quarter (the dot's own quarter first; near the middle lines the neighbours show too;
- * picked words always stay).
- */
-function PlacePanel({ region, words, failed, existing, onDraft, onDone, onRemove, onCancel }: PlacePanelProps) {
+/** The chosen place: both sides or one, and the graph's words for it in one swipeable row. */
+function PlaceCard({ region, words, failed, draft, existing, colour, onChange }: PlaceCardProps) {
   const def = REGIONS[region];
-  const [side, setSide] = useState<Side>(existing?.side ?? 'both');
-  const [pad, setPad] = useState<SquarePoint | null>(isPadSet(existing?.intensity) ? existing!.intensity : null);
-  const [picked, setPicked] = useState<string[]>(existing?.sensationIds ?? []);
-
-  useEffect(() => { onDraft({ side, intensity: pad ?? PAD_UNSET }); }, [side, pad, onDraft]);
-
-  // Words follow the dot; before it's down only words already picked show (pad first, words after).
-  const shown = useMemo(
-    () => wordsForPad(words ?? [], region, pad, picked).filter((w) => pad || picked.includes(w.id)),
-    [words, region, pad, picked],
-  );
-  const anyHere = useMemo(() => wordsForPad(words ?? [], region, null).length > 0, [words, region]);
-
-  // The word area only grows while the panel is open: when the dot moves to a corner with fewer
-  // words, a shrinking panel would scroll the page (and the pad) under the finger.
-  const wordsRef = useRef<HTMLDivElement>(null);
-  const tallest = useRef(0);
-  useLayoutEffect(() => {
-    const el = wordsRef.current;
-    if (!el) return;
-    el.style.minHeight = '';
-    tallest.current = Math.max(tallest.current, el.offsetHeight);
-    el.style.minHeight = `${tallest.current}px`;
-  });
-
-  function movePad(p: SquarePoint) {
-    // The exact middle is the saved "not touched" value; a dot put there on purpose sits a hair off it.
-    setPad(p.x === PAD_UNSET.x && p.y === PAD_UNSET.y ? { x: 0.501, y: 0.5 } : p);
-  }
-
-  const byId = new Map((words ?? []).map((w) => [w.id, w]));
+  const here = useMemo(() => {
+    const list = (words ?? []).filter((w) => w.regions.length === 0 || w.regions.includes(region));
+    // A word saved on this mark that's no longer served still shows, so it can be taken off.
+    const gone = (existing?.sensationIds ?? [])
+      .filter((id) => !list.some((w) => w.id === id))
+      .map((id) => ({ id, label: existing!.tags[existing!.sensationIds.indexOf(id)] ?? id }));
+    return [...gone, ...list.map((w) => ({ id: w.id, label: w.label }))];
+  }, [words, region, existing]);
 
   function toggle(id: string) {
-    setPicked((p) => (p.includes(id) ? p.filter((x) => x !== id) : [...p, id]));
-  }
-
-  function done() {
-    const ids = picked.filter((id) => byId.has(id) || existing?.sensationIds.includes(id));
-    const tags = ids.map((id) => byId.get(id)?.label ?? existing?.tags[existing.sensationIds.indexOf(id)] ?? id);
-    onDone({ ...centre(region, side), region, side, intensity: pad ?? PAD_UNSET, tags, sensationIds: ids });
+    const ids = draft.sensationIds.includes(id) ? draft.sensationIds.filter((x) => x !== id) : [...draft.sensationIds, id];
+    onChange({ ...draft, sensationIds: ids });
   }
 
   return (
-    <section className="mt-5 body-panel" aria-label={def.label}>
-      <h2 className="m-0 text-[1.6rem] leading-[1.1] text-[var(--color-text-primary)]">
-        My {def.label.toLowerCase()} {def.plural ? 'feel' : 'feels'}…
-      </h2>
-
-      {def.paired && (
-        <div className="mt-3 seg" role="radiogroup" aria-label="Which side">
-          {([['both', 'Both sides'], ['left', 'Your left'], ['right', 'Your right']] as const).map(([v, label]) => (
-            <button key={v} type="button" role="radio" aria-checked={side === v} className={side === v ? 'is-on' : ''}
-              onClick={() => setSide(v)}>
-              {label}
+    <section className="body-card mt-3" aria-label={def.label}>
+      <div className="body-card__top">
+        <h2 className="m-0 text-[1.3rem] leading-[1.15] text-[var(--color-text-primary)]">
+          My {def.label.toLowerCase()} {def.plural ? 'feel' : 'feels'}…
+        </h2>
+        {def.paired && (
+          <div className="seg seg--small" role="radiogroup" aria-label="Which side">
+            {([['both', 'Both'], ['left', 'Your left'], ['right', 'Your right']] as const).map(([v, label]) => (
+              <button key={v} type="button" role="radio" aria-checked={draft.side === v} className={draft.side === v ? 'is-on' : ''}
+                onClick={() => onChange({ ...draft, side: v })}>
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      {words === null ? (
+        <p className="mt-2 mb-0 text-[15px] text-[var(--color-text-secondary)]">Loading words…</p>
+      ) : here.length === 0 ? (
+        <p className="mt-2 mb-0 text-[15px] text-[var(--color-text-secondary)]">
+          {failed ? 'Couldn’t load the words. ' : ''}You can still mark the place.
+        </p>
+      ) : (
+        <div className="body-card__words" role="group" aria-label="Words for it" style={{ ['--chip-on' as string]: colour }}>
+          {here.map((w) => (
+            <button key={w.id} type="button" className="den-chip den-chip--small" aria-pressed={draft.sensationIds.includes(w.id)}
+              onClick={() => toggle(w.id)}>
+              {w.label}
             </button>
           ))}
         </div>
       )}
-
-      <div className="mt-4 body-pad">
-        <FeelingSquare point={pad} onMove={movePad} axes={PAD_AXES}
-          label={`How it feels. Up is stronger, right is more comfortable. ${pad ? describePad(pad) : 'Not placed yet'}. Arrow keys move.`} />
-      </div>
-      <p className="body-readback mt-3 mb-0 text-center text-[15px] font-semibold text-[var(--color-text-primary)]" aria-live="polite">
-        {describePad(pad)}
-      </p>
-
-      <div ref={wordsRef} className="mt-4">
-        {words === null ? (
-          <p className="m-0 text-[15px] text-[var(--color-text-secondary)]">Loading words…</p>
-        ) : !anyHere ? (
-          <p className="m-0 text-[15px] text-[var(--color-text-secondary)]">
-            {failed ? 'Couldn’t load the words. ' : ''}You can still mark the place.
-          </p>
-        ) : (
-          <>
-            {!pad && <p className="m-0 mb-3 text-center text-[15px] text-[var(--color-text-secondary)]">Put the dot down and words for it show up here.</p>}
-            {pad && shown.length === 0 && <p className="m-0 text-center text-[15px] text-[var(--color-text-secondary)]">No words for this corner yet. Move the dot, or just mark the place.</p>}
-            {shown.length > 0 && (
-              <div className="flex flex-wrap gap-2" role="group" aria-label="Words for it"
-                style={{ ['--chip-on' as string]: markColour(pad) }}>
-                {shown.map((w) => (
-                  <button key={w.id} type="button" className="den-chip den-chip--small" aria-pressed={picked.includes(w.id)}
-                    onClick={() => toggle(w.id)}>
-                    {w.label}
-                  </button>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
-
-      <div className="mt-5 flex flex-col gap-2">
-        <button type="button" onClick={done}
-          className="w-full min-h-[56px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer lift-primary">
-          {existing ? 'Done' : 'Add this place'}
-        </button>
-        <div className="flex justify-center gap-6">
-          <button type="button" onClick={onCancel}
-            className="min-h-11 px-2 text-[15px] text-[var(--color-text-secondary)] bg-transparent border-none cursor-pointer">
-            Cancel
-          </button>
-          {existing && (
-            <button type="button" onClick={onRemove}
-              className="min-h-11 px-2 text-[15px] text-[var(--color-text-secondary)] underline underline-offset-4 bg-transparent border-none cursor-pointer">
-              Remove
-            </button>
-          )}
-        </div>
-      </div>
     </section>
   );
 }

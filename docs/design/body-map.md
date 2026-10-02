@@ -1,7 +1,7 @@
 # Body map: plan
 
-Status: **steps 1–3 built** (content and function; heat figure, both sides, graph words, body-first suggestions; drag on the body and the sensation pad). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to Z
-(sensation pad W, body mirror X, heat figure Y, several feelings Z). Product record: Product
+Status: **steps 1–3 built** (content and function; heat figure, both sides, graph words, body-first suggestions; the one-screen body step: drag, optional strength bar, words in one row). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to AA
+(sensation pad W, body mirror X, heat figure Y, several feelings Z, one screen with a strength bar AA). Product record: Product
 Changelog, "Body step redesign: the sensation pad".
 
 ## What we decided
@@ -11,15 +11,20 @@ Changelog, "Body step redesign: the sensation pad".
   PNAS), where "less" states such as sadness and depression show as cooled limbs.
 - **Both sides by default.** Shoulders, arms, hands, legs and feet are one place each. Both / Left /
   Right appears only for those paired places, never for the midline.
-- **The sensation pad.** Tapping a place opens a small feeling square under the figure. Its dot sets
-  how intense (up) and how pleasant (right) that sensation is. A line says it back ("More intense,
-  unpleasant"). Word chips follow the dot: tight, raised up or clenched in the unpleasant half;
-  settled, warm or loose in the pleasant half. The mark's colour on the body is the pad's colour
-  (`squareColor`), so the body uses the same colour language as the check-in square.
+- **One screen, no pad (canvas row AA, Oct 2).** The sensation pad (a small feeling square in the
+  place panel) was built and dropped: it made the step something you scroll to. Instead:
+  - Drag on the body to a place and lift (a tap still works).
+  - The place's words sit in one swipeable row under the body.
+  - An optional **strength bar** beside the body, as tall as the figure (strong at the top, faint at
+    the bottom), behind a "Strength" toggle that is off until turned on and remembered per device.
+  - Colour comes from the words: each pad word is `more` (tight, racing) or `less` (heavy, numb), so
+    a mark glows warm, cool, or a blend of both; no words, a warm mid-tone. Strength sets how big
+    and bright the glow is.
 - **The body mirror.** It follows DEAR MAN's "Not sure? See how this might typically make someone
   feel". "Not sure? See where *anxious* often shows up" draws the typical map for the check-in's
   words as a ghost layer (dashed, hatched, labelled).
-  - Tapping a ghost makes it yours (solid) and opens the pad pre-filled: "Change anything that
+  - Tapping a ghost makes it yours (solid) and opens the place's card pre-filled (its word picked,
+    and the strength bar set from the map's weight when the bar is on): "Change anything that
     isn't true for you."
   - "Add all of these" is there. The disclaimer is DEAR MAN's.
 - **Several feelings.**
@@ -29,7 +34,7 @@ Changelog, "Body step redesign: the sensation pad".
   - A "Together" tab stripes the places two maps share.
 - **Marks are never tied to a feeling.** With five feelings set, tense shoulders don't have to be
   "because of anxiety". Sensations belong to the whole check-in, and tabs are only hint views. A
-  mark's colour comes from the pad, not from a tab. Patterns come later, from co-occurrence across
+  mark's colour comes from its words, not from a tab. Patterns come later, from co-occurrence across
   check-ins.
 - **Rejected:** particle or point-cloud figures, anatomy-chart segments, and a single flat word list
   for every place.
@@ -95,8 +100,8 @@ client caches the pad words for the session. Follow the callable checklist in CL
 - `BodySensation` keeps its shape and gains `side` (`both` | `left` | `right`) and `fromMirror`
   (boolean: the user accepted a ghost).
   - `region` becomes a region id (`shoulders`).
-  - `intensity` is the pad point. It's stored for real now, as `intensityX` (pleasant) and
-    `intensityY` (intensity).
+  - `strength` (0–1, or null when the bar wasn't used) is new in step 3. `intensity` keeps its
+    shape but the body step no longer sets it (the pad is gone), so it stays 0.5 / 0.5.
   - `tags` are the picked pad words' labels (for display), and a new `sensationIds` holds their
     stable `SensationType` ids (for any graph lookup; labels are copy and can change). Old records
     keep tags only. Nothing reads sensation ids from history: suggestions use the check-in in
@@ -115,8 +120,8 @@ client caches the pad words for the session. Follow the callable checklist in CL
 | New | Replaces | What |
 |---|---|---|
 | `src/data/bodyFigure.ts` | `bodyRegions.ts` (kept for the legacy map) | Silhouette path, each region's hit area and centroid, `paired`, and the legacy-name map |
-| `components/checkin/body/HeatFigure.tsx` | the `BodyMap` SVG | Silhouette and clip-path; one blurred glow per mark in `squareColor(mark.pad)`; ghost layer (dashed, hatched); stripes for "Together"; zoom to a region when the pad is open |
-| `components/checkin/body/SensationPad.tsx` | `SensationDetails` | `FeelingSquare` at pad size (a `size` prop; today it's either full size or the label-free `small` reminder); the read-back line; chips filtered by the pad's quadrant and region; Both / Left / Right for paired places; Done / Remove |
+| `components/checkin/body/HeatFigure.tsx` | the `BodyMap` SVG | Silhouette and clip-path; drag to choose; one blurred glow per mark, warm / cool from its words, sized by strength; ghost layer (dashed, hatched); stripes for "Together" |
+| `components/checkin/body/StrengthBar.tsx` + the card in `BodyStep` | `SensationDetails` | The optional strength bar beside the body (step 3, replacing the pad); the chosen place's words in one row; Both / Left / Right for paired places; Done / Remove |
 | `components/checkin/body/BodyMirror.tsx` | none | "Not sure? See where *word* often shows up"; tabs per map (max 3) plus Together; ghost places; "Add all of these"; disclaimer |
 | `components/checkin/body/BodyStep.tsx` | `BodyMap` | The step: figure, list of your marks, mirror entry, Continue / Skip; same props contract as `BodyMap` so `CheckIn.tsx` barely changes |
 
@@ -149,17 +154,30 @@ step reads it.
      map's places, returning maps with their words; `EmotionSuggestion` uses it. Delete
      `sensationMappings.ts`, closing the CLAUDE.md tech debt.
    - Deploy: functions, the migration, then hosting.
-3. **Drag on the body, and the sensation pad.**
+3. **One screen: drag, the strength bar, words in one row** (canvas row AA).
    - Drag on the figure: a glow follows the finger, the place under it reads back live, lifting
      chooses it.
-   - The pad adds the small square: real intensity, chips filtered by the pad's quarter, mark
-     colour from the pad, Both / Left / Right.
-4. **Body mirror, one map.**
-   - A ghost layer for the routing group's map, a pre-filled pad on tap, "Add all of these", and
-     `fromMirror` saved.
-5. **Several feelings.**
-   - Tabs per map (max 3) in the words' colours, and Together stripes.
-   - Marks stay put across tabs and never take a tab's colour.
+   - The optional strength bar beside the body; the chosen place's words in one row; warm / cool
+     from the words; `strength` saved.
+   - Deploy: functions (the server accepts and stores `strength`), then hosting.
+4. **The body mirror, one map** (canvas Y1–Y3, fitted to the AA layout). Mock Y2 and Y3 in the
+   one-screen layout first: the mirror panel has to fit without scrolling too.
+   - Y1: under the body, "Not sure? See where *anxious* often shows up" (only when the check-in has
+     words; "Start with my body" has none yet). Y1's "It's all over" is the Whole body place;
+     "Nothing I notice" could replace "Skip this step".
+   - Y2: a ghost layer for the routing group's map, hatched and dashed with small labels ("tight
+     chest"); under the body, the mirror panel: one line about the map, "Sound familiar? Tap any that
+     fit" chips, "Add all of these", and DEAR MAN's disclaimer. The one line is new graph copy (a
+     `description` per map in `content.py`, signed off like the rest).
+   - Y3: tapping a ghost (or its chip) opens the place's card pre-filled: its word picked, the bar set
+     from the map's weight when the bar is on. "Filled in from how *anxious* often feels. Change
+     anything that isn't true for you." Saves `fromMirror`.
+   - Already covered: Y4 (cool is "less") by step 3's colour rule; Y5 (your body right now) by the
+     marks row under the body; Y6 (light room) by the rooms.
+5. **Several feelings** (canvas Z).
+   - Tabs per map (max 3) above the body, in the words' colours; the first is the group the check-in
+     routes on. A Together tab stripes the places two maps share.
+   - Marks stay put across tabs and never take a tab's colour. Z4's summary is the marks row.
 
 Not built (yet): a `dev/body-map.html` harness like `dev/find-the-feeling.html`. Until the content is
 signed off, the step can be seen locally only with the content stubbed (the fixture treats drafts as
@@ -191,7 +209,10 @@ live).
   step and suggestions show words only once the content is signed off; before that, places can
   be marked without words and "Start with my body" offers the full word list.
 
-### Step 3 as built
+### Step 3 as built (canvas row AA)
+
+Built first with the sensation pad (a small feeling square in the place panel). Claudia dropped
+it the same day: the pad made the step something you scroll to. Rebuilt as one screen.
 
 - **Drag on the body** (`HeatFigure`): the svg takes the pointer (the tap shapes have
   `pointer-events: none` and stay focusable buttons for the keyboard and screen readers). Pressing
@@ -201,30 +222,29 @@ live).
   smaller place wins (a hand over the end of an arm, the face over the bottom of the head); off
   every shape, the nearest within 14 units (the seams and the silhouette's edges); further out,
   nothing. The figure blocks page scroll under the finger (`touch-action: none`), like the
-  check-in square; the page still scrolls beside it.
-- **The pad** (`PlacePanel`, `src/lib/bodyPad.ts`): the check-in's `FeelingSquare` at about 230px,
-  with its own axis words (stronger / fainter, uncomfortable / comfortable). Up is intensity, right
-  is comfort, so the quarters are the graph's pad zones (hu / lu / hp / lp). A read-back under it
-  ("Strong and uncomfortable", "Faint and comfortable", "Medium, not clearly either").
-- **Words follow the dot.** Before the dot is down, the panel asks for the dot and shows only
-  words already picked: the no-words input comes first, then words for it. Once it's down, the
-  words for this place in the dot's quarter show, that quarter first; within 0.12 of a middle line
-  the neighbouring quarter's words show too, so near the centre all of them do. Picked words never
-  disappear when the dot moves. Picked chips take the mark's colour.
-- **Colour.** A mark glows `squareColor(pad)`, the same blend as the check-in square, and the
-  figure updates live while the panel is open (side and colour). An untouched pad is saved as the
-  middle (0.5, 0.5), which reads as "not placed" and glows the warm mid-tone; a dot put exactly in
-  the middle on purpose is nudged to 0.501. The marks list says each mark back ("Chest strong and
-  uncomfortable · racing").
-- **Layout under the finger.** The word area only grows while a panel is open, and the scroller
-  doesn't anchor while one is open (`overflow-anchor: none`). Without both, the word list changing
-  as the dot moves scrolled the page (and the pad) under the finger at the bottom of the page.
-- Saved: `intensity` is the pad point (it was always 0.5 / 0.5 in step 2). No backend change.
-- **Deploy:** hosting only.
+  check-in square.
+- **Layout** (`BodyStep`): a three-column grid, the figure in the middle (up to 172px wide) and the
+  bar's column on the right, so the bar spans the figure's full height and is centred on it. The
+  "Strength" toggle sits above the bar's column, level with the place read-back.
+- **The strength bar** (`StrengthBar`): off until the toggle is on (`goblin.body.strengthBar` in
+  this device's storage, a display preference, not profile data). Drag or press anywhere on it;
+  arrows and Home / End from the keyboard (`role="slider"`, vertical). With no place chosen it
+  shows but can't be used. A place's strength stays null until the bar is touched for it.
+- **The card**: "My chest feels…", Both / Your left / Your right for paired places, and the graph's
+  words for the place in one row that swipes sideways (graph order; a saved word that's no longer
+  served still shows so it can be taken off). Buttons: Cancel or Remove, and Add this place / Done.
+- **Colour** (`src/lib/bodyMark.ts`): warm (`--color-q-hu-fill`) for `more` words, cool
+  (`--color-q-lu-fill`) for `less`, a blend for both, the warm mid-tone for none. Strength scales
+  the glow (0.6–1.1× size, 0.35–0.95 opacity); unset is a middle glow. Picked chips take the
+  mark's colour. The figure follows the card live (side, words, strength).
+- **No scrolling**: with nothing chosen, your marks and the places the figure can't show share one
+  wrapping group; once something is marked, those places sit behind "+ More places".
+- **Saved**: `strength` on each `BodySensation` (0–1 or null). Old clients send none.
+- **Deploy:** functions, then hosting.
 
 ## Open questions (Claudia)
 
-1. **State names on the pad.** For example, "Braced for impact" for tight, raised shoulders. It would
+1. **State names** (canvas Y3's "Revving"). For example, "Braced for impact" for tight, raised shoulders. It would
    be graph content per (region, quadrant). Shipping without names first and adding them later is
    the lower-risk path.
 2. **Summary before Continue** (canvas Z4, "Your body right now"). It could be a step 5 add-on, or

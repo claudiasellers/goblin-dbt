@@ -115,12 +115,14 @@ test('body sensations: old figure names become place ids + side on save; new ids
   await fns.saveCheckIn.run({ auth: auth(), data: { ...base(), bodySensations: [
     { region: 'Left Shoulder', tags: ['Tension'] },
     { region: 'Chest', tags: [] },
-    { region: 'shoulders', side: 'right', sensationIds: ['tension', 'Bad Id', 'tension'] },
-    { region: 'toString', tags: [] },
+    { region: 'shoulders', side: 'right', sensationIds: ['tension', 'Bad Id', 'tension'], strength: 0.8 },
+    { region: 'toString', tags: [], strength: 1.5 },
   ] } });
   const b = f.calls.at(-1).params.bodySensations;
   assert.deepEqual(b.map((s) => [s.region, s.side]), [['shoulders', 'left'], ['chest', 'both'], ['shoulders', 'right'], ['toString', null]]);
   assert.deepEqual(b[2].sensationIds, ['tension']);
+  assert.deepEqual(b.map((s) => s.strength), [null, null, 0.8, null], 'strength: 0–1 or null');
+  assert.match(f.calls.at(-1).query, /strength: s\.strength/);
 });
 
 test('setCheckInNextAction: MERGE stub (pendingFullSave), guarded, first next action wins', async () => {

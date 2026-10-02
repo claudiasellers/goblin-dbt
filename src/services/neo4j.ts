@@ -37,6 +37,8 @@ export interface BodySensationRecord {
   tags: string[];
   /** Stable SensationType ids of the picked words (empty on older records). */
   sensationIds?: string[];
+  /** How strong, 0–1, from the body step's optional strength bar; null / absent when not used. */
+  strength?: number | null;
 }
 
 /** Bounded timeout for content loads so a stalled request becomes a recoverable error. */

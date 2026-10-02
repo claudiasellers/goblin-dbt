@@ -1,12 +1,12 @@
-// Body map step 3 (docs/design/body-map.md): the drag on the figure (regionAt) and the sensation
-// pad (src/lib/bodyPad.ts): which place is under the finger, which words the dot shows, the colour.
+// Body map step 3 (docs/design/body-map.md, canvas row AA): the drag on the figure (regionAt), and
+// how a mark looks (src/lib/bodyMark.ts): warm / cool from its words, glow from the strength bar.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 
 const fig = await importTs("src/data/bodyFigure.ts");
-const pad = await importTs("src/lib/bodyPad.ts");
+const mark = await importTs("src/lib/bodyMark.ts");
 const content = JSON.parse(readFileSync("tests/fixtures/body-map-content.json", "utf8"));
 
 const centreOf = (s) => (s.kind === "ellipse" ? [s.cx, s.cy] : s.kind === "rect" ? [s.x + s.w / 2, s.y + s.h / 2] : null);
@@ -35,56 +35,40 @@ test("overlaps go to the smaller place; seams snap; off the body is nothing", ()
   assert.equal(fig.regionAt(-8, 300), null);
 });
 
-test("an untouched pad is the middle: warm mid-tone, every quarter, a prompt", () => {
-  assert.equal(pad.isPadSet(pad.PAD_UNSET), false);
-  assert.equal(pad.isPadSet(null), false);
-  assert.equal(pad.markColour({ x: 0.5, y: 0.5 }), pad.HEAT);
-  assert.deepEqual(pad.padZones(null), ["hu", "lu", "hp", "lp"]);
-  assert.match(pad.describePad(null), /dot/);
-  assert.match(pad.markColour({ x: 0.2, y: 0.8 }), /^color-mix\(/);
-  assert.notEqual(pad.markColour({ x: 0.2, y: 0.8 }), pad.HEAT);
+test("a mark's colour comes from its words: more is warm, less is cool, both is a blend, none the mid-tone", () => {
+  assert.equal(mark.markColour([]), mark.HEAT);
+  assert.equal(mark.markColour(["more", "more"]), mark.WARM);
+  assert.equal(mark.markColour(["less"]), mark.COOL);
+  assert.match(mark.markColour(["more", "less"]), /^color-mix\(in oklab, var\(--color-q-hu-fill\), var\(--color-q-lu-fill\)\)$/);
+  // Every pad word in the graph says which it is.
+  for (const w of content.padWords) assert.ok(["more", "less"].includes(w.energy), w.id);
 });
 
-test("the dot's quarter first; near a middle line the neighbour too; all four near the centre", () => {
-  assert.deepEqual(pad.padZones({ x: 0.1, y: 0.9 }), ["hu"]);
-  assert.deepEqual(pad.padZones({ x: 0.9, y: 0.1 }), ["lp"]);
-  assert.deepEqual(pad.padZones({ x: 0.55, y: 0.9 }), ["hp", "hu"]);
-  assert.deepEqual(pad.padZones({ x: 0.1, y: 0.45 }), ["lu", "hu"]);
-  assert.deepEqual(new Set(pad.padZones({ x: 0.52, y: 0.48 })), new Set(["hu", "lu", "hp", "lp"]));
-  assert.equal(pad.padZones({ x: 0.52, y: 0.48 })[0], "lp");
+test("strength: a bigger, brighter glow; not used is a middle glow; said back in a word", () => {
+  assert.deepEqual(mark.glowLook(null), { scale: 1, opacity: 0.9 });
+  const faint = mark.glowLook(0), strong = mark.glowLook(1);
+  assert.ok(strong.scale > faint.scale && strong.opacity > faint.opacity);
+  assert.ok(strong.opacity <= 1);
+  assert.equal(mark.strengthWord(null), null);
+  assert.equal(mark.strengthWord(0.9), "strong");
+  assert.equal(mark.strengthWord(0.5), "medium");
+  assert.equal(mark.strengthWord(0.1), "faint");
+  assert.equal(mark.strengthAt(0, 200), 1);
+  assert.equal(mark.strengthAt(200, 200), 0);
+  assert.equal(mark.strengthAt(-30, 200), 1, "clamped above");
+  assert.equal(mark.strengthAt(50, 200), 0.75);
 });
 
-test("words follow the dot and the place; picked words never disappear", () => {
-  const words = content.padWords;
-  const ids = (p, region, picked) => pad.wordsForPad(words, region, p, picked).map((w) => w.id);
-  const chestHu = ids({ x: 0.1, y: 0.9 }, "chest");
-  assert.ok(chestHu.includes("racing_heart") && chestHu.includes("tension"));
-  assert.ok(!chestHu.includes("heaviness") && !chestHu.includes("warmth"), "no other quarter's words");
-  assert.ok(!chestHu.includes("clenched"), "clenched is jaw / hands / stomach only");
-  const stomachLp = ids({ x: 0.9, y: 0.1 }, "stomach");
-  assert.ok(stomachLp.includes("settled") && !stomachLp.includes("churning"));
-  // A picked word from another quarter stays, after the quarter's own words.
-  const kept = ids({ x: 0.9, y: 0.1 }, "stomach", ["churning"]);
-  assert.equal(kept.at(-1), "churning");
-  // Every word that shows is for this place (or anywhere).
-  for (const id of chestHu) {
-    const w = words.find((x) => x.id === id);
-    assert.ok(w.regions.length === 0 || w.regions.includes("chest"), id);
-  }
-});
-
-test("the read-back says strength, then comfort", () => {
-  assert.equal(pad.describePad({ x: 0.1, y: 0.9 }), "Strong and uncomfortable");
-  assert.equal(pad.describePad({ x: 0.9, y: 0.1 }), "Faint and comfortable");
-  assert.equal(pad.describePad({ x: 0.5, y: 0.5001 }), "Medium, not clearly either");
-});
-
-test("the body step uses the drag and the pad, and saves the pad point", () => {
+test("the body step: drag to choose, the optional strength bar beside the body, words in one row, no pad", () => {
   const step = readFileSync("src/components/checkin/body/BodyStep.tsx", "utf8");
-  assert.match(step, /<FeelingSquare[^>]*axes=\{PAD_AXES\}/);
-  assert.match(step, /intensity: pad \?\? PAD_UNSET/);
+  assert.doesNotMatch(step, /FeelingSquare/, "the pad is gone");
+  assert.match(step, /<StrengthBar/);
+  assert.match(step, /\{barOn && \(/, "the bar only shows when turned on");
+  assert.match(step, /useState\(readBarPref\)/);
+  assert.match(step, /localStorage\.getItem\(BAR_KEY\) === '1'/, "off unless turned on");
+  assert.match(step, /strength: draft\.strength/);
   assert.match(step, /onHover=\{setHover\}/);
   const heat = readFileSync("src/components/checkin/body/HeatFigure.tsx", "utf8");
   assert.match(heat, /regionAt\(/);
-  assert.match(heat, /onPointerUp: handleUp/);
+  assert.match(heat, /glowLook\(m\.strength\)/);
 });
