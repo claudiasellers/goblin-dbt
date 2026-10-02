@@ -26,7 +26,7 @@
    ],
    "regions": [],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "pressure",
@@ -36,7 +36,7 @@
    ],
    "regions": [],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "raised_up",
@@ -48,7 +48,7 @@
     "shoulders"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "clenched",
@@ -62,7 +62,7 @@
     "stomach"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "racing_heart",
@@ -75,7 +75,7 @@
     "chest"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "pounding",
@@ -88,7 +88,7 @@
     "head"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "heat",
@@ -103,7 +103,7 @@
     "body"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "burning",
@@ -118,7 +118,7 @@
     "stomach"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "constriction",
@@ -131,7 +131,7 @@
     "chest"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "shaking",
@@ -146,7 +146,7 @@
     "body"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "restlessness",
@@ -161,7 +161,7 @@
     "body"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "knotted",
@@ -175,7 +175,7 @@
     "lower_back"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "churning",
@@ -187,7 +187,7 @@
     "stomach"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "buzzing",
@@ -201,18 +201,7 @@
     "body"
    ],
    "energy": "more",
-   "status": "draft"
-  },
-  {
-   "id": "achy",
-   "label": "Achy",
-   "zones": [
-    "hu",
-    "lu"
-   ],
-   "regions": [],
-   "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "heaviness",
@@ -222,7 +211,7 @@
    ],
    "regions": [],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "numbness_sensation",
@@ -232,7 +221,7 @@
    ],
    "regions": [],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "drained",
@@ -246,7 +235,7 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "weakness",
@@ -260,13 +249,14 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "cold_sensation",
    "label": "Cold",
    "zones": [
-    "lu"
+    "lu",
+    "hu"
    ],
    "regions": [
     "hands",
@@ -275,7 +265,7 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "hollow",
@@ -288,7 +278,7 @@
     "stomach"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "sinking",
@@ -301,7 +291,7 @@
     "stomach"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "foggy",
@@ -313,7 +303,7 @@
     "head"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "lump",
@@ -325,7 +315,7 @@
     "throat"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "slumped",
@@ -339,21 +329,31 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
+  },
+  {
+   "id": "achy",
+   "label": "Achy",
+   "zones": [
+    "lu"
+   ],
+   "regions": [],
+   "energy": "less",
+   "status": "live"
   },
   {
    "id": "butterflies",
    "label": "Fluttery",
    "zones": [
-    "hu",
-    "hp"
+    "hp",
+    "hu"
    ],
    "regions": [
     "chest",
     "stomach"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "tingly",
@@ -363,7 +363,7 @@
    ],
    "regions": [],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "lightness",
@@ -374,7 +374,7 @@
    ],
    "regions": [],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "warmth",
@@ -391,7 +391,7 @@
     "body"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "expansion",
@@ -406,7 +406,7 @@
     "chest"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "fizzy",
@@ -420,7 +420,7 @@
     "body"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "bouncy",
@@ -433,7 +433,7 @@
     "feet"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "smiling",
@@ -446,7 +446,7 @@
     "face"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "energised",
@@ -460,7 +460,7 @@
     "body"
    ],
    "energy": "more",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "settled",
@@ -474,7 +474,7 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "loose",
@@ -493,7 +493,7 @@
     "legs"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "soft",
@@ -508,7 +508,7 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "groundedness",
@@ -522,7 +522,7 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "easy_breathing",
@@ -535,7 +535,7 @@
     "chest"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   },
   {
    "id": "rested",
@@ -548,7 +548,7 @@
     "body"
    ],
    "energy": "less",
-   "status": "draft"
+   "status": "live"
   }
  ],
  "felt": [
@@ -598,7 +598,7 @@
    "sensationId": "raised_up",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "fear",
@@ -646,7 +646,23 @@
    "sensationId": "shaking",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
+  },
+  {
+   "emotionId": "fear",
+   "region": "hands",
+   "sensationId": "cold_sensation",
+   "weight": 0.7,
+   "origin": "new",
+   "status": "live"
+  },
+  {
+   "emotionId": "fear",
+   "region": "feet",
+   "sensationId": "cold_sensation",
+   "weight": 0.5,
+   "origin": "new",
+   "status": "live"
   },
   {
    "emotionId": "panic",
@@ -750,7 +766,7 @@
    "sensationId": "heat",
    "weight": 0.9,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "anger",
@@ -758,7 +774,7 @@
    "sensationId": "clenched",
    "weight": 0.9,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "anger",
@@ -766,7 +782,7 @@
    "sensationId": "clenched",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "anger",
@@ -774,7 +790,7 @@
    "sensationId": "pressure",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "sadness",
@@ -806,7 +822,7 @@
    "sensationId": "lump",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "sadness",
@@ -814,7 +830,7 @@
    "sensationId": "heaviness",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "sadness",
@@ -822,7 +838,7 @@
    "sensationId": "heaviness",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "sadness",
@@ -830,7 +846,7 @@
    "sensationId": "pressure",
    "weight": 0.5,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "disappointment",
@@ -950,7 +966,7 @@
    "sensationId": "sinking",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "cold_shame",
@@ -958,7 +974,7 @@
    "sensationId": "sinking",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "cold_shame",
@@ -966,7 +982,7 @@
    "sensationId": "slumped",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "guilt",
@@ -998,7 +1014,7 @@
    "sensationId": "heaviness",
    "weight": 0.9,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "guilt",
@@ -1006,7 +1022,7 @@
    "sensationId": "knotted",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "guilt",
@@ -1014,7 +1030,7 @@
    "sensationId": "heaviness",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "guilt",
@@ -1022,7 +1038,7 @@
    "sensationId": "pressure",
    "weight": 0.5,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "disgust",
@@ -1046,7 +1062,7 @@
    "sensationId": "churning",
    "weight": 1.0,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "disgust",
@@ -1054,7 +1070,7 @@
    "sensationId": "tension",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "apathy",
@@ -1078,7 +1094,7 @@
    "sensationId": "drained",
    "weight": 1.0,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "apathy",
@@ -1086,7 +1102,7 @@
    "sensationId": "heaviness",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "apathy",
@@ -1094,7 +1110,7 @@
    "sensationId": "heaviness",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "boredom",
@@ -1142,7 +1158,7 @@
    "sensationId": "hollow",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "numbness",
@@ -1182,7 +1198,7 @@
    "sensationId": "foggy",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "love",
@@ -1198,7 +1214,7 @@
    "sensationId": "warmth",
    "weight": 1.0,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "love",
@@ -1206,7 +1222,7 @@
    "sensationId": "warmth",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "love",
@@ -1214,7 +1230,7 @@
    "sensationId": "butterflies",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "love",
@@ -1222,7 +1238,7 @@
    "sensationId": "warmth",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "love",
@@ -1230,7 +1246,7 @@
    "sensationId": "tingly",
    "weight": 0.5,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "compassion",
@@ -1270,7 +1286,7 @@
    "sensationId": "smiling",
    "weight": 0.9,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "joy",
@@ -1278,7 +1294,7 @@
    "sensationId": "energised",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "joy",
@@ -1286,7 +1302,7 @@
    "sensationId": "bouncy",
    "weight": 0.5,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "excitement",
@@ -1318,7 +1334,7 @@
    "sensationId": "fizzy",
    "weight": 1.0,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "excitement",
@@ -1326,7 +1342,7 @@
    "sensationId": "tingly",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "excitement",
@@ -1334,7 +1350,7 @@
    "sensationId": "bouncy",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "excitement",
@@ -1342,7 +1358,7 @@
    "sensationId": "energised",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "surprised",
@@ -1350,7 +1366,7 @@
    "sensationId": "racing_heart",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "surprised",
@@ -1358,7 +1374,7 @@
    "sensationId": "buzzing",
    "weight": 0.7,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "surprised",
@@ -1366,7 +1382,7 @@
    "sensationId": "butterflies",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "calm",
@@ -1398,7 +1414,7 @@
    "sensationId": "loose",
    "weight": 1.0,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "calm",
@@ -1406,7 +1422,7 @@
    "sensationId": "easy_breathing",
    "weight": 0.9,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "calm",
@@ -1414,7 +1430,7 @@
    "sensationId": "settled",
    "weight": 0.8,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "calm",
@@ -1422,7 +1438,7 @@
    "sensationId": "loose",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   },
   {
    "emotionId": "calm",
@@ -1430,7 +1446,7 @@
    "sensationId": "groundedness",
    "weight": 0.6,
    "origin": "new",
-   "status": "draft"
+   "status": "live"
   }
  ],
  "maps": [
@@ -1461,9 +1477,10 @@
     "rushed",
     "pressured",
     "out_of_control",
-    "hesitant"
+    "hesitant",
+    "jealous"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "chest",
@@ -1476,7 +1493,7 @@
       "fear",
       "panic"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -1487,7 +1504,7 @@
      "emotionIds": [
       "anxiety"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "throat",
@@ -1498,7 +1515,7 @@
      "emotionIds": [
       "anxiety"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -1510,7 +1527,7 @@
       "fear",
       "panic"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -1522,7 +1539,18 @@
       "anxiety",
       "panic"
      ],
-     "status": "draft"
+     "status": "live"
+    },
+    {
+     "region": "hands",
+     "sensationId": "cold_sensation",
+     "label": "Cold",
+     "energy": "less",
+     "weight": 0.7,
+     "emotionIds": [
+      "fear"
+     ],
+     "status": "live"
     },
     {
      "region": "shoulders",
@@ -1533,7 +1561,7 @@
      "emotionIds": [
       "anxiety"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "shoulders",
@@ -1545,7 +1573,7 @@
       "anxiety",
       "stress"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -1556,7 +1584,7 @@
      "emotionIds": [
       "fear"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "hands",
@@ -1567,7 +1595,7 @@
      "emotionIds": [
       "panic"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "hands",
@@ -1578,7 +1606,7 @@
      "emotionIds": [
       "fear"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "neck",
@@ -1589,7 +1617,7 @@
      "emotionIds": [
       "stress"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -1600,7 +1628,7 @@
      "emotionIds": [
       "fear"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "upper_back",
@@ -1611,7 +1639,18 @@
      "emotionIds": [
       "stress"
      ],
-     "status": "draft"
+     "status": "live"
+    },
+    {
+     "region": "feet",
+     "sensationId": "cold_sensation",
+     "label": "Cold",
+     "energy": "less",
+     "weight": 0.5,
+     "emotionIds": [
+      "fear"
+     ],
+     "status": "live"
     },
     {
      "region": "legs",
@@ -1622,7 +1661,7 @@
      "emotionIds": [
       "fear"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -1648,13 +1687,12 @@
     "indignant",
     "violated",
     "furious",
-    "jealous",
     "provoked",
     "hostile",
     "infuriated",
     "annoyed"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "head",
@@ -1665,7 +1703,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "face",
@@ -1676,7 +1714,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "jaw",
@@ -1687,7 +1725,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "hands",
@@ -1698,7 +1736,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -1709,7 +1747,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "arms",
@@ -1720,7 +1758,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -1731,7 +1769,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "jaw",
@@ -1742,7 +1780,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "head",
@@ -1753,7 +1791,7 @@
      "emotionIds": [
       "anger"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -1786,10 +1824,9 @@
     "abandoned",
     "victimized",
     "fragile",
-    "grief",
-    "powerless"
+    "grief"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "chest",
@@ -1803,7 +1840,7 @@
       "loneliness",
       "hopelessness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "throat",
@@ -1816,7 +1853,7 @@
       "disappointment",
       "loneliness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "throat",
@@ -1827,7 +1864,7 @@
      "emotionIds": [
       "sadness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -1839,7 +1876,7 @@
       "sadness",
       "hopelessness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "arms",
@@ -1850,7 +1887,7 @@
      "emotionIds": [
       "sadness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -1861,7 +1898,7 @@
      "emotionIds": [
       "hopelessness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -1872,7 +1909,7 @@
      "emotionIds": [
       "loneliness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -1883,7 +1920,7 @@
      "emotionIds": [
       "hopelessness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "legs",
@@ -1894,7 +1931,7 @@
      "emotionIds": [
       "sadness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -1905,7 +1942,7 @@
      "emotionIds": [
       "disappointment"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "head",
@@ -1916,7 +1953,7 @@
      "emotionIds": [
       "sadness"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -1938,7 +1975,7 @@
     "embarrassed",
     "ashamed"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "face",
@@ -1949,7 +1986,7 @@
      "emotionIds": [
       "hot_shame"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -1960,7 +1997,7 @@
      "emotionIds": [
       "cold_shame"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -1971,7 +2008,7 @@
      "emotionIds": [
       "cold_shame"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -1982,7 +2019,7 @@
      "emotionIds": [
       "cold_shame"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -1993,7 +2030,7 @@
      "emotionIds": [
       "hot_shame"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "shoulders",
@@ -2004,7 +2041,7 @@
      "emotionIds": [
       "cold_shame"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2015,7 +2052,7 @@
      "emotionIds": [
       "cold_shame"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2029,7 +2066,7 @@
     "guilty",
     "remorseful"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "chest",
@@ -2040,7 +2077,7 @@
      "emotionIds": [
       "guilt"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2051,7 +2088,7 @@
      "emotionIds": [
       "guilt"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2062,7 +2099,7 @@
      "emotionIds": [
       "guilt"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "face",
@@ -2073,7 +2110,7 @@
      "emotionIds": [
       "guilt"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "shoulders",
@@ -2084,7 +2121,7 @@
      "emotionIds": [
       "guilt"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2095,7 +2132,7 @@
      "emotionIds": [
       "guilt"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "head",
@@ -2106,7 +2143,7 @@
      "emotionIds": [
       "guilt"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2130,7 +2167,7 @@
     "detestable",
     "horrified"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "stomach",
@@ -2141,7 +2178,7 @@
      "emotionIds": [
       "disgust"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "throat",
@@ -2152,7 +2189,7 @@
      "emotionIds": [
       "disgust"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "face",
@@ -2163,7 +2200,7 @@
      "emotionIds": [
       "disgust"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2174,7 +2211,7 @@
      "emotionIds": [
       "disgust"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2198,9 +2235,10 @@
     "apathetic",
     "indifferent",
     "empty",
-    "numb"
+    "numb",
+    "powerless"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "body",
@@ -2211,7 +2249,7 @@
      "emotionIds": [
       "apathy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2224,7 +2262,7 @@
       "boredom",
       "numbness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2235,7 +2273,7 @@
      "emotionIds": [
       "numbness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2246,7 +2284,7 @@
      "emotionIds": [
       "emptiness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "head",
@@ -2257,7 +2295,7 @@
      "emotionIds": [
       "numbness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "arms",
@@ -2268,7 +2306,7 @@
      "emotionIds": [
       "apathy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "legs",
@@ -2279,7 +2317,7 @@
      "emotionIds": [
       "apathy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2290,7 +2328,7 @@
      "emotionIds": [
       "numbness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2301,7 +2339,7 @@
      "emotionIds": [
       "boredom"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2312,7 +2350,7 @@
      "emotionIds": [
       "apathy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2323,7 +2361,7 @@
      "emotionIds": [
       "emptiness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2334,7 +2372,7 @@
      "emotionIds": [
       "emptiness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "hands",
@@ -2345,7 +2383,7 @@
      "emotionIds": [
       "numbness"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2356,7 +2394,7 @@
      "emotionIds": [
       "emptiness"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2370,7 +2408,6 @@
     "trust"
    ],
    "wordIds": [
-    "aroused",
     "trusting",
     "sensitive",
     "intimate",
@@ -2380,7 +2417,7 @@
     "appreciative",
     "tender"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "chest",
@@ -2391,7 +2428,7 @@
      "emotionIds": [
       "love"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2403,7 +2440,7 @@
       "love",
       "compassion"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "face",
@@ -2414,7 +2451,7 @@
      "emotionIds": [
       "love"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2425,7 +2462,7 @@
      "emotionIds": [
       "love"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2436,7 +2473,7 @@
      "emotionIds": [
       "love"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "hands",
@@ -2447,7 +2484,7 @@
      "emotionIds": [
       "love"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2481,7 +2518,7 @@
     "inspired",
     "good"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "chest",
@@ -2492,7 +2529,7 @@
      "emotionIds": [
       "joy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "face",
@@ -2503,7 +2540,7 @@
      "emotionIds": [
       "joy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2514,7 +2551,7 @@
      "emotionIds": [
       "joy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "arms",
@@ -2525,7 +2562,7 @@
      "emotionIds": [
       "joy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2536,7 +2573,7 @@
      "emotionIds": [
       "joy"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "legs",
@@ -2547,7 +2584,7 @@
      "emotionIds": [
       "joy"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2564,9 +2601,10 @@
     "eager",
     "energetic",
     "playful",
-    "cheeky"
+    "cheeky",
+    "aroused"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "stomach",
@@ -2577,7 +2615,7 @@
      "emotionIds": [
       "excitement"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2588,7 +2626,7 @@
      "emotionIds": [
       "excitement"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2599,7 +2637,7 @@
      "emotionIds": [
       "excitement"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "hands",
@@ -2610,7 +2648,7 @@
      "emotionIds": [
       "excitement"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "legs",
@@ -2621,7 +2659,7 @@
      "emotionIds": [
       "excitement"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2632,7 +2670,7 @@
      "emotionIds": [
       "excitement"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2643,7 +2681,7 @@
      "emotionIds": [
       "excitement"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2663,7 +2701,7 @@
     "astonished",
     "awe"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "chest",
@@ -2674,7 +2712,7 @@
      "emotionIds": [
       "surprised"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "head",
@@ -2685,7 +2723,7 @@
      "emotionIds": [
       "surprised"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2696,7 +2734,7 @@
      "emotionIds": [
       "surprised"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   },
@@ -2730,7 +2768,7 @@
     "cozy",
     "humble"
    ],
-   "status": "draft",
+   "status": "live",
    "places": [
     {
      "region": "shoulders",
@@ -2741,7 +2779,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "chest",
@@ -2752,7 +2790,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "stomach",
@@ -2763,7 +2801,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "body",
@@ -2774,7 +2812,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "feet",
@@ -2785,7 +2823,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "jaw",
@@ -2796,7 +2834,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "legs",
@@ -2807,7 +2845,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     },
     {
      "region": "shoulders",
@@ -2818,7 +2856,7 @@
      "emotionIds": [
       "calm"
      ],
-     "status": "draft"
+     "status": "live"
     }
    ]
   }

@@ -44,7 +44,7 @@ function Shape({ s, ...rest }: { s: HitShape } & React.SVGProps<SVGElement>) {
 
 /**
  * The heat figure (canvas row Y): a soft silhouette; each mark glows inside it, clipped to the body,
- * warm or cool from its words and as big and bright as its strength. Facing you: the person's left is on the figure's right.
+ * in its words' square colour and as big and bright as its strength. Facing you: the person's left is on the figure's right.
  *
  * Drag (step 3): press anywhere on the figure and move; a glow follows the finger, the place under
  * it is reported through `onHover` (the step names it above the figure), and lifting chooses it (a plain tap still works).

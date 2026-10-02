@@ -31,7 +31,45 @@
 
 VERSION = "body-map-v2"
 
-SIGNED_OFF = {}
+REVIEWED = "2026-10-02"
+SIGNED_OFF = {
+    # Claudia, 2 Oct 2026: every word, map and new FELT_AS row, after the physiology review.
+    "map:fear": REVIEWED, "map:anger": REVIEWED, "map:sadness": REVIEWED, "map:shame": REVIEWED,
+    "map:guilt": REVIEWED, "map:disgust": REVIEWED, "map:depleted": REVIEWED, "map:love": REVIEWED,
+    "map:joy": REVIEWED, "map:excitement": REVIEWED, "map:surprise": REVIEWED, "map:calm": REVIEWED,
+    "word:tension": REVIEWED, "word:pressure": REVIEWED, "word:raised_up": REVIEWED, "word:clenched": REVIEWED,
+    "word:racing_heart": REVIEWED, "word:pounding": REVIEWED, "word:heat": REVIEWED, "word:burning": REVIEWED,
+    "word:constriction": REVIEWED, "word:shaking": REVIEWED, "word:restlessness": REVIEWED, "word:knotted": REVIEWED,
+    "word:churning": REVIEWED, "word:buzzing": REVIEWED, "word:heaviness": REVIEWED,
+    "word:numbness_sensation": REVIEWED, "word:drained": REVIEWED, "word:weakness": REVIEWED,
+    "word:cold_sensation": REVIEWED, "word:hollow": REVIEWED, "word:sinking": REVIEWED, "word:foggy": REVIEWED,
+    "word:lump": REVIEWED, "word:slumped": REVIEWED, "word:achy": REVIEWED, "word:butterflies": REVIEWED,
+    "word:tingly": REVIEWED, "word:lightness": REVIEWED, "word:warmth": REVIEWED, "word:expansion": REVIEWED,
+    "word:fizzy": REVIEWED, "word:bouncy": REVIEWED, "word:smiling": REVIEWED, "word:energised": REVIEWED,
+    "word:settled": REVIEWED, "word:loose": REVIEWED, "word:soft": REVIEWED, "word:groundedness": REVIEWED,
+    "word:easy_breathing": REVIEWED, "word:rested": REVIEWED,
+    "felt:anxiety:shoulders:raised_up": REVIEWED, "felt:fear:hands:shaking": REVIEWED,
+    "felt:fear:hands:cold_sensation": REVIEWED, "felt:fear:feet:cold_sensation": REVIEWED,
+    "felt:anger:face:heat": REVIEWED, "felt:anger:jaw:clenched": REVIEWED, "felt:anger:hands:clenched": REVIEWED,
+    "felt:anger:chest:pressure": REVIEWED, "felt:sadness:throat:lump": REVIEWED,
+    "felt:sadness:arms:heaviness": REVIEWED, "felt:sadness:legs:heaviness": REVIEWED,
+    "felt:sadness:head:pressure": REVIEWED, "felt:cold_shame:chest:sinking": REVIEWED,
+    "felt:cold_shame:stomach:sinking": REVIEWED, "felt:cold_shame:shoulders:slumped": REVIEWED,
+    "felt:guilt:chest:heaviness": REVIEWED, "felt:guilt:stomach:knotted": REVIEWED,
+    "felt:guilt:shoulders:heaviness": REVIEWED, "felt:guilt:head:pressure": REVIEWED,
+    "felt:disgust:stomach:churning": REVIEWED, "felt:disgust:face:tension": REVIEWED,
+    "felt:apathy:body:drained": REVIEWED, "felt:apathy:arms:heaviness": REVIEWED,
+    "felt:apathy:legs:heaviness": REVIEWED, "felt:emptiness:chest:hollow": REVIEWED,
+    "felt:numbness:head:foggy": REVIEWED, "felt:love:chest:warmth": REVIEWED, "felt:love:face:warmth": REVIEWED,
+    "felt:love:stomach:butterflies": REVIEWED, "felt:love:body:warmth": REVIEWED, "felt:love:hands:tingly": REVIEWED,
+    "felt:joy:face:smiling": REVIEWED, "felt:joy:arms:energised": REVIEWED, "felt:joy:legs:bouncy": REVIEWED,
+    "felt:excitement:stomach:fizzy": REVIEWED, "felt:excitement:hands:tingly": REVIEWED,
+    "felt:excitement:legs:bouncy": REVIEWED, "felt:excitement:body:energised": REVIEWED,
+    "felt:surprised:chest:racing_heart": REVIEWED, "felt:surprised:head:buzzing": REVIEWED,
+    "felt:surprised:stomach:butterflies": REVIEWED, "felt:calm:shoulders:loose": REVIEWED,
+    "felt:calm:chest:easy_breathing": REVIEWED, "felt:calm:stomach:settled": REVIEWED,
+    "felt:calm:jaw:loose": REVIEWED, "felt:calm:feet:groundedness": REVIEWED,
+}
 
 REGIONS = [
     "head", "face", "jaw", "throat", "neck", "shoulders", "chest", "upper_back",

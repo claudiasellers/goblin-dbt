@@ -52,88 +52,88 @@ DETACH DELETE r;
 
 // --- Pad words (SensationType) ---
 MERGE (s:SensationType {id: "tension"})
-SET s += {padLabel: "Tight", zones: ["hu"], regions: [], energy: "more", padRank: 0, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Tight", zones: ["hu"], regions: [], energy: "more", padRank: 0, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "pressure"})
-SET s += {padLabel: "Pressure", zones: ["hu"], regions: [], energy: "more", padRank: 1, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Pressure", zones: ["hu"], regions: [], energy: "more", padRank: 1, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "raised_up"})
-SET s += {padLabel: "Raised up", zones: ["hu"], regions: ["shoulders"], energy: "more", padRank: 2, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Raised up"};
+SET s += {padLabel: "Raised up", zones: ["hu"], regions: ["shoulders"], energy: "more", padRank: 2, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Raised up"};
 MERGE (s:SensationType {id: "clenched"})
-SET s += {padLabel: "Clenched", zones: ["hu"], regions: ["jaw", "hands", "stomach"], energy: "more", padRank: 3, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Clenched"};
+SET s += {padLabel: "Clenched", zones: ["hu"], regions: ["jaw", "hands", "stomach"], energy: "more", padRank: 3, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Clenched"};
 MERGE (s:SensationType {id: "racing_heart"})
-SET s += {padLabel: "Racing", zones: ["hu", "hp"], regions: ["chest"], energy: "more", padRank: 4, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Racing", zones: ["hu", "hp"], regions: ["chest"], energy: "more", padRank: 4, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "pounding"})
-SET s += {padLabel: "Pounding", zones: ["hu"], regions: ["chest", "head"], energy: "more", padRank: 5, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Pounding"};
+SET s += {padLabel: "Pounding", zones: ["hu"], regions: ["chest", "head"], energy: "more", padRank: 5, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Pounding"};
 MERGE (s:SensationType {id: "heat"})
-SET s += {padLabel: "Hot", zones: ["hu"], regions: ["head", "face", "chest", "body"], energy: "more", padRank: 6, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Hot", zones: ["hu"], regions: ["head", "face", "chest", "body"], energy: "more", padRank: 6, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "burning"})
-SET s += {padLabel: "Burning", zones: ["hu"], regions: ["face", "throat", "chest", "stomach"], energy: "more", padRank: 7, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Burning"};
+SET s += {padLabel: "Burning", zones: ["hu"], regions: ["face", "throat", "chest", "stomach"], energy: "more", padRank: 7, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Burning"};
 MERGE (s:SensationType {id: "constriction"})
-SET s += {padLabel: "Closing up", zones: ["hu"], regions: ["throat", "chest"], energy: "more", padRank: 8, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Closing up", zones: ["hu"], regions: ["throat", "chest"], energy: "more", padRank: 8, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "shaking"})
-SET s += {padLabel: "Shaky", zones: ["hu"], regions: ["hands", "arms", "legs", "body"], energy: "more", padRank: 9, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Shaky", zones: ["hu"], regions: ["hands", "arms", "legs", "body"], energy: "more", padRank: 9, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "restlessness"})
-SET s += {padLabel: "Restless", zones: ["hu"], regions: ["hands", "legs", "feet", "body"], energy: "more", padRank: 10, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Restless", zones: ["hu"], regions: ["hands", "legs", "feet", "body"], energy: "more", padRank: 10, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "knotted"})
-SET s += {padLabel: "Knotted", zones: ["hu"], regions: ["stomach", "upper_back", "lower_back"], energy: "more", padRank: 11, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Knotted"};
+SET s += {padLabel: "Knotted", zones: ["hu"], regions: ["stomach", "upper_back", "lower_back"], energy: "more", padRank: 11, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Knotted"};
 MERGE (s:SensationType {id: "churning"})
-SET s += {padLabel: "Churning", zones: ["hu"], regions: ["stomach"], energy: "more", padRank: 12, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Churning"};
+SET s += {padLabel: "Churning", zones: ["hu"], regions: ["stomach"], energy: "more", padRank: 12, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Churning"};
 MERGE (s:SensationType {id: "buzzing"})
-SET s += {padLabel: "Buzzing", zones: ["hu"], regions: ["head", "hands", "body"], energy: "more", padRank: 13, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Buzzing"};
-MERGE (s:SensationType {id: "achy"})
-SET s += {padLabel: "Achy", zones: ["hu", "lu"], regions: [], energy: "more", padRank: 14, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Achy"};
+SET s += {padLabel: "Buzzing", zones: ["hu"], regions: ["head", "hands", "body"], energy: "more", padRank: 13, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Buzzing"};
 MERGE (s:SensationType {id: "heaviness"})
-SET s += {padLabel: "Heavy", zones: ["lu"], regions: [], energy: "less", padRank: 15, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Heavy", zones: ["lu"], regions: [], energy: "less", padRank: 14, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "numbness_sensation"})
-SET s += {padLabel: "Numb", zones: ["lu"], regions: [], energy: "less", padRank: 16, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Numb", zones: ["lu"], regions: [], energy: "less", padRank: 15, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "drained"})
-SET s += {padLabel: "Drained", zones: ["lu"], regions: ["arms", "legs", "body"], energy: "less", padRank: 17, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Drained"};
+SET s += {padLabel: "Drained", zones: ["lu"], regions: ["arms", "legs", "body"], energy: "less", padRank: 16, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Drained"};
 MERGE (s:SensationType {id: "weakness"})
-SET s += {padLabel: "Weak", zones: ["lu"], regions: ["arms", "legs", "body"], energy: "less", padRank: 18, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Weak", zones: ["lu"], regions: ["arms", "legs", "body"], energy: "less", padRank: 17, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "cold_sensation"})
-SET s += {padLabel: "Cold", zones: ["lu"], regions: ["hands", "feet", "chest", "body"], energy: "less", padRank: 19, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Cold", zones: ["lu", "hu"], regions: ["hands", "feet", "chest", "body"], energy: "less", padRank: 18, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "hollow"})
-SET s += {padLabel: "Hollow", zones: ["lu"], regions: ["chest", "stomach"], energy: "less", padRank: 20, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Hollow"};
+SET s += {padLabel: "Hollow", zones: ["lu"], regions: ["chest", "stomach"], energy: "less", padRank: 19, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Hollow"};
 MERGE (s:SensationType {id: "sinking"})
-SET s += {padLabel: "Sinking", zones: ["lu"], regions: ["chest", "stomach"], energy: "less", padRank: 21, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Sinking"};
+SET s += {padLabel: "Sinking", zones: ["lu"], regions: ["chest", "stomach"], energy: "less", padRank: 20, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Sinking"};
 MERGE (s:SensationType {id: "foggy"})
-SET s += {padLabel: "Foggy", zones: ["lu"], regions: ["head"], energy: "less", padRank: 22, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Foggy"};
+SET s += {padLabel: "Foggy", zones: ["lu"], regions: ["head"], energy: "less", padRank: 21, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Foggy"};
 MERGE (s:SensationType {id: "lump"})
-SET s += {padLabel: "A lump", zones: ["lu"], regions: ["throat"], energy: "less", padRank: 23, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "A lump"};
+SET s += {padLabel: "A lump", zones: ["lu"], regions: ["throat"], energy: "less", padRank: 22, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "A lump"};
 MERGE (s:SensationType {id: "slumped"})
-SET s += {padLabel: "Slumped", zones: ["lu"], regions: ["shoulders", "upper_back", "body"], energy: "less", padRank: 24, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Slumped"};
+SET s += {padLabel: "Slumped", zones: ["lu"], regions: ["shoulders", "upper_back", "body"], energy: "less", padRank: 23, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Slumped"};
+MERGE (s:SensationType {id: "achy"})
+SET s += {padLabel: "Achy", zones: ["lu"], regions: [], energy: "less", padRank: 24, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Achy"};
 MERGE (s:SensationType {id: "butterflies"})
-SET s += {padLabel: "Fluttery", zones: ["hu", "hp"], regions: ["chest", "stomach"], energy: "more", padRank: 25, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Fluttery", zones: ["hp", "hu"], regions: ["chest", "stomach"], energy: "more", padRank: 25, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "tingly"})
-SET s += {padLabel: "Tingly", zones: ["hp"], regions: [], energy: "more", padRank: 26, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Tingly"};
+SET s += {padLabel: "Tingly", zones: ["hp"], regions: [], energy: "more", padRank: 26, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Tingly"};
 MERGE (s:SensationType {id: "lightness"})
-SET s += {padLabel: "Light", zones: ["hp", "lp"], regions: [], energy: "more", padRank: 27, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Light", zones: ["hp", "lp"], regions: [], energy: "more", padRank: 27, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "warmth"})
-SET s += {padLabel: "Warm", zones: ["hp", "lp"], regions: ["face", "chest", "stomach", "hands", "body"], energy: "more", padRank: 28, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Warm"};
+SET s += {padLabel: "Warm", zones: ["hp", "lp"], regions: ["face", "chest", "stomach", "hands", "body"], energy: "more", padRank: 28, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Warm"};
 MERGE (s:SensationType {id: "expansion"})
-SET s += {padLabel: "Open", zones: ["hp", "lp"], regions: ["throat", "shoulders", "chest"], energy: "more", padRank: 29, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Open", zones: ["hp", "lp"], regions: ["throat", "shoulders", "chest"], energy: "more", padRank: 29, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "fizzy"})
-SET s += {padLabel: "Fizzy", zones: ["hp"], regions: ["chest", "stomach", "body"], energy: "more", padRank: 30, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Fizzy"};
+SET s += {padLabel: "Fizzy", zones: ["hp"], regions: ["chest", "stomach", "body"], energy: "more", padRank: 30, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Fizzy"};
 MERGE (s:SensationType {id: "bouncy"})
-SET s += {padLabel: "Bouncy", zones: ["hp"], regions: ["legs", "feet"], energy: "more", padRank: 31, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Bouncy"};
+SET s += {padLabel: "Bouncy", zones: ["hp"], regions: ["legs", "feet"], energy: "more", padRank: 31, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Bouncy"};
 MERGE (s:SensationType {id: "smiling"})
-SET s += {padLabel: "Smiling", zones: ["hp", "lp"], regions: ["face"], energy: "more", padRank: 32, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Smiling"};
+SET s += {padLabel: "Smiling", zones: ["hp", "lp"], regions: ["face"], energy: "more", padRank: 32, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Smiling"};
 MERGE (s:SensationType {id: "energised"})
-SET s += {padLabel: "Energised", zones: ["hp"], regions: ["arms", "legs", "body"], energy: "more", padRank: 33, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Energised"};
+SET s += {padLabel: "Energised", zones: ["hp"], regions: ["arms", "legs", "body"], energy: "more", padRank: 33, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Energised"};
 MERGE (s:SensationType {id: "settled"})
-SET s += {padLabel: "Settled", zones: ["lp"], regions: ["chest", "stomach", "body"], energy: "less", padRank: 34, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Settled"};
+SET s += {padLabel: "Settled", zones: ["lp"], regions: ["chest", "stomach", "body"], energy: "less", padRank: 34, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Settled"};
 MERGE (s:SensationType {id: "loose"})
-SET s += {padLabel: "Loose", zones: ["lp"], regions: ["jaw", "neck", "shoulders", "upper_back", "lower_back", "arms", "hands", "legs"], energy: "less", padRank: 35, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Loose"};
+SET s += {padLabel: "Loose", zones: ["lp"], regions: ["jaw", "neck", "shoulders", "upper_back", "lower_back", "arms", "hands", "legs"], energy: "less", padRank: 35, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Loose"};
 MERGE (s:SensationType {id: "soft"})
-SET s += {padLabel: "Soft", zones: ["lp"], regions: ["face", "jaw", "stomach", "body"], energy: "less", padRank: 36, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Soft"};
+SET s += {padLabel: "Soft", zones: ["lp"], regions: ["face", "jaw", "stomach", "body"], energy: "less", padRank: 36, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Soft"};
 MERGE (s:SensationType {id: "groundedness"})
-SET s += {padLabel: "Grounded", zones: ["lp"], regions: ["legs", "feet", "body"], energy: "less", padRank: 37, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null};
+SET s += {padLabel: "Grounded", zones: ["lp"], regions: ["legs", "feet", "body"], energy: "less", padRank: 37, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02"};
 MERGE (s:SensationType {id: "easy_breathing"})
-SET s += {padLabel: "Breathing easy", zones: ["lp"], regions: ["throat", "chest"], energy: "less", padRank: 38, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Breathing easy"};
+SET s += {padLabel: "Breathing easy", zones: ["lp"], regions: ["throat", "chest"], energy: "less", padRank: 38, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Breathing easy"};
 MERGE (s:SensationType {id: "rested"})
-SET s += {padLabel: "Rested", zones: ["lp"], regions: ["head", "body"], energy: "less", padRank: 39, padStatus: "draft", padReviewStatus: "draft", padReviewedAt: null, name: "Rested"};
+SET s += {padLabel: "Rested", zones: ["lp"], regions: ["head", "body"], energy: "less", padRank: 39, padStatus: "live", padReviewStatus: "reviewed", padReviewedAt: "2026-10-02", name: "Rested"};
 
 // --- Retire pad words removed from content.py (the SensationType stays) ---
-MATCH (s:SensationType) WHERE s.padStatus IS NOT NULL AND NOT s.id IN ["tension", "pressure", "raised_up", "clenched", "racing_heart", "pounding", "heat", "burning", "constriction", "shaking", "restlessness", "knotted", "churning", "buzzing", "achy", "heaviness", "numbness_sensation", "drained", "weakness", "cold_sensation", "hollow", "sinking", "foggy", "lump", "slumped", "butterflies", "tingly", "lightness", "warmth", "expansion", "fizzy", "bouncy", "smiling", "energised", "settled", "loose", "soft", "groundedness", "easy_breathing", "rested"]
+MATCH (s:SensationType) WHERE s.padStatus IS NOT NULL AND NOT s.id IN ["tension", "pressure", "raised_up", "clenched", "racing_heart", "pounding", "heat", "burning", "constriction", "shaking", "restlessness", "knotted", "churning", "buzzing", "heaviness", "numbness_sensation", "drained", "weakness", "cold_sensation", "hollow", "sinking", "foggy", "lump", "slumped", "achy", "butterflies", "tingly", "lightness", "warmth", "expansion", "fizzy", "bouncy", "smiling", "energised", "settled", "loose", "soft", "groundedness", "easy_breathing", "rested"]
 SET s.padStatus = 'retired';
 
 // --- FELT_AS: where each emotion is felt ---
@@ -154,7 +154,7 @@ MERGE (e)-[r:FELT_AS {region: "throat"}]->(s)
 SET r += {weight: 0.8, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "anxiety"}), (s:SensationType {id: "raised_up"})
 MERGE (e)-[r:FELT_AS {region: "shoulders"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "racing_heart"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
 SET r += {weight: 1.0, status: "live", origin: "base", reviewedAt: null};
@@ -172,7 +172,13 @@ MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "shaking"})
 MERGE (e)-[r:FELT_AS {region: "hands"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
+MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "cold_sensation"})
+MERGE (e)-[r:FELT_AS {region: "hands"}]->(s)
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
+MATCH (e:Emotion {id: "fear"}), (s:SensationType {id: "cold_sensation"})
+MERGE (e)-[r:FELT_AS {region: "feet"}]->(s)
+SET r += {weight: 0.5, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "panic"}), (s:SensationType {id: "racing_heart"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
 SET r += {weight: 1.0, status: "live", origin: "base", reviewedAt: null};
@@ -211,16 +217,16 @@ MERGE (e)-[r:FELT_AS {region: "jaw"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "heat"})
 MERGE (e)-[r:FELT_AS {region: "face"}]->(s)
-SET r += {weight: 0.9, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.9, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "clenched"})
 MERGE (e)-[r:FELT_AS {region: "jaw"}]->(s)
-SET r += {weight: 0.9, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.9, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "clenched"})
 MERGE (e)-[r:FELT_AS {region: "hands"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "anger"}), (s:SensationType {id: "pressure"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "sadness"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
 SET r += {weight: 1.0, status: "live", origin: "base", reviewedAt: null};
@@ -232,16 +238,16 @@ MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "sadness"}), (s:SensationType {id: "lump"})
 MERGE (e)-[r:FELT_AS {region: "throat"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "sadness"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "arms"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "sadness"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "legs"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "sadness"}), (s:SensationType {id: "pressure"})
 MERGE (e)-[r:FELT_AS {region: "head"}]->(s)
-SET r += {weight: 0.5, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.5, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "disappointment"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
 SET r += {weight: 0.8, status: "live", origin: "base", reviewedAt: null};
@@ -286,13 +292,13 @@ MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "cold_shame"}), (s:SensationType {id: "sinking"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "cold_shame"}), (s:SensationType {id: "sinking"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "cold_shame"}), (s:SensationType {id: "slumped"})
 MERGE (e)-[r:FELT_AS {region: "shoulders"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
@@ -304,16 +310,16 @@ MERGE (e)-[r:FELT_AS {region: "face"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
-SET r += {weight: 0.9, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.9, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "knotted"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "shoulders"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "guilt"}), (s:SensationType {id: "pressure"})
 MERGE (e)-[r:FELT_AS {region: "head"}]->(s)
-SET r += {weight: 0.5, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.5, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "disgust"}), (s:SensationType {id: "constriction"})
 MERGE (e)-[r:FELT_AS {region: "throat"}]->(s)
 SET r += {weight: 0.8, status: "live", origin: "base", reviewedAt: null};
@@ -322,10 +328,10 @@ MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "disgust"}), (s:SensationType {id: "churning"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
-SET r += {weight: 1.0, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 1.0, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "disgust"}), (s:SensationType {id: "tension"})
 MERGE (e)-[r:FELT_AS {region: "face"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "apathy"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
@@ -334,13 +340,13 @@ MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "apathy"}), (s:SensationType {id: "drained"})
 MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
-SET r += {weight: 1.0, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 1.0, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "apathy"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "arms"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "apathy"}), (s:SensationType {id: "heaviness"})
 MERGE (e)-[r:FELT_AS {region: "legs"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "boredom"}), (s:SensationType {id: "restlessness"})
 MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
@@ -358,7 +364,7 @@ MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "emptiness"}), (s:SensationType {id: "hollow"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "numbness"}), (s:SensationType {id: "numbness_sensation"})
 MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.8, status: "live", origin: "base", reviewedAt: null};
@@ -373,25 +379,25 @@ MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "numbness"}), (s:SensationType {id: "foggy"})
 MERGE (e)-[r:FELT_AS {region: "head"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "love"}), (s:SensationType {id: "expansion"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "love"}), (s:SensationType {id: "warmth"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
-SET r += {weight: 1.0, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 1.0, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "love"}), (s:SensationType {id: "warmth"})
 MERGE (e)-[r:FELT_AS {region: "face"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "love"}), (s:SensationType {id: "butterflies"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "love"}), (s:SensationType {id: "warmth"})
 MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "love"}), (s:SensationType {id: "tingly"})
 MERGE (e)-[r:FELT_AS {region: "hands"}]->(s)
-SET r += {weight: 0.5, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.5, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "compassion"}), (s:SensationType {id: "expansion"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
 SET r += {weight: 0.7, status: "live", origin: "base", reviewedAt: null};
@@ -406,13 +412,13 @@ MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.7, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "joy"}), (s:SensationType {id: "smiling"})
 MERGE (e)-[r:FELT_AS {region: "face"}]->(s)
-SET r += {weight: 0.9, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.9, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "joy"}), (s:SensationType {id: "energised"})
 MERGE (e)-[r:FELT_AS {region: "arms"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "joy"}), (s:SensationType {id: "bouncy"})
 MERGE (e)-[r:FELT_AS {region: "legs"}]->(s)
-SET r += {weight: 0.5, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.5, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "butterflies"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
 SET r += {weight: 0.8, status: "live", origin: "base", reviewedAt: null};
@@ -424,25 +430,25 @@ MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "fizzy"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
-SET r += {weight: 1.0, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 1.0, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "tingly"})
 MERGE (e)-[r:FELT_AS {region: "hands"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "bouncy"})
 MERGE (e)-[r:FELT_AS {region: "legs"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "excitement"}), (s:SensationType {id: "energised"})
 MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "surprised"}), (s:SensationType {id: "racing_heart"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "surprised"}), (s:SensationType {id: "buzzing"})
 MERGE (e)-[r:FELT_AS {region: "head"}]->(s)
-SET r += {weight: 0.7, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.7, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "surprised"}), (s:SensationType {id: "butterflies"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "lightness"})
 MERGE (e)-[r:FELT_AS {region: "body"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
@@ -454,69 +460,69 @@ MERGE (e)-[r:FELT_AS {region: "shoulders"}]->(s)
 SET r += {weight: 0.6, status: "live", origin: "base", reviewedAt: null};
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "loose"})
 MERGE (e)-[r:FELT_AS {region: "shoulders"}]->(s)
-SET r += {weight: 1.0, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 1.0, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "easy_breathing"})
 MERGE (e)-[r:FELT_AS {region: "chest"}]->(s)
-SET r += {weight: 0.9, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.9, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "settled"})
 MERGE (e)-[r:FELT_AS {region: "stomach"}]->(s)
-SET r += {weight: 0.8, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.8, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "loose"})
 MERGE (e)-[r:FELT_AS {region: "jaw"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 MATCH (e:Emotion {id: "calm"}), (s:SensationType {id: "groundedness"})
 MERGE (e)-[r:FELT_AS {region: "feet"}]->(s)
-SET r += {weight: 0.6, status: "draft", origin: "new", reviewedAt: null};
+SET r += {weight: 0.6, status: "live", origin: "new", reviewedAt: "2026-10-02"};
 
 // --- Remove FELT_AS rows that are no longer in content.py (incl. the old region "back") ---
-MATCH (e:Emotion)-[r:FELT_AS]->(s:SensationType) WHERE NOT (e.id + ':' + r.region + ':' + s.id) IN ["anxiety:chest:constriction", "anxiety:chest:racing_heart", "anxiety:stomach:butterflies", "anxiety:shoulders:tension", "anxiety:throat:constriction", "anxiety:shoulders:raised_up", "fear:chest:racing_heart", "fear:stomach:heaviness", "fear:body:cold_sensation", "fear:legs:weakness", "fear:body:shaking", "fear:hands:shaking", "panic:chest:racing_heart", "panic:chest:constriction", "panic:body:shaking", "panic:hands:numbness_sensation", "stress:shoulders:tension", "stress:upper_back:tension", "stress:neck:tension", "anger:head:pressure", "anger:head:heat", "anger:chest:heat", "anger:arms:tension", "anger:jaw:tension", "anger:face:heat", "anger:jaw:clenched", "anger:hands:clenched", "anger:chest:pressure", "sadness:chest:heaviness", "sadness:throat:constriction", "sadness:body:heaviness", "sadness:throat:lump", "sadness:arms:heaviness", "sadness:legs:heaviness", "sadness:head:pressure", "disappointment:chest:heaviness", "disappointment:throat:constriction", "disappointment:stomach:pressure", "loneliness:chest:heaviness", "loneliness:chest:cold_sensation", "loneliness:throat:constriction", "hopelessness:chest:heaviness", "hopelessness:body:heaviness", "hopelessness:body:weakness", "hopelessness:chest:pressure", "hot_shame:face:heat", "hot_shame:chest:heat", "cold_shame:stomach:heaviness", "cold_shame:body:weakness", "cold_shame:chest:sinking", "cold_shame:stomach:sinking", "cold_shame:shoulders:slumped", "guilt:stomach:heaviness", "guilt:chest:constriction", "guilt:face:heat", "guilt:chest:heaviness", "guilt:stomach:knotted", "guilt:shoulders:heaviness", "guilt:head:pressure", "disgust:throat:constriction", "disgust:stomach:pressure", "disgust:stomach:churning", "disgust:face:tension", "apathy:body:heaviness", "apathy:body:weakness", "apathy:body:drained", "apathy:arms:heaviness", "apathy:legs:heaviness", "boredom:body:restlessness", "boredom:body:heaviness", "emptiness:chest:numbness_sensation", "emptiness:stomach:numbness_sensation", "emptiness:chest:cold_sensation", "emptiness:chest:hollow", "numbness:body:numbness_sensation", "numbness:hands:numbness_sensation", "numbness:body:cold_sensation", "numbness:body:heaviness", "numbness:head:foggy", "love:chest:expansion", "love:chest:warmth", "love:face:warmth", "love:stomach:butterflies", "love:body:warmth", "love:hands:tingly", "compassion:chest:expansion", "joy:chest:expansion", "joy:chest:lightness", "joy:body:lightness", "joy:face:smiling", "joy:arms:energised", "joy:legs:bouncy", "excitement:stomach:butterflies", "excitement:chest:racing_heart", "excitement:body:restlessness", "excitement:stomach:fizzy", "excitement:hands:tingly", "excitement:legs:bouncy", "excitement:body:energised", "surprised:chest:racing_heart", "surprised:head:buzzing", "surprised:stomach:butterflies", "calm:body:lightness", "calm:legs:groundedness", "calm:shoulders:lightness", "calm:shoulders:loose", "calm:chest:easy_breathing", "calm:stomach:settled", "calm:jaw:loose", "calm:feet:groundedness"]
+MATCH (e:Emotion)-[r:FELT_AS]->(s:SensationType) WHERE NOT (e.id + ':' + r.region + ':' + s.id) IN ["anxiety:chest:constriction", "anxiety:chest:racing_heart", "anxiety:stomach:butterflies", "anxiety:shoulders:tension", "anxiety:throat:constriction", "anxiety:shoulders:raised_up", "fear:chest:racing_heart", "fear:stomach:heaviness", "fear:body:cold_sensation", "fear:legs:weakness", "fear:body:shaking", "fear:hands:shaking", "fear:hands:cold_sensation", "fear:feet:cold_sensation", "panic:chest:racing_heart", "panic:chest:constriction", "panic:body:shaking", "panic:hands:numbness_sensation", "stress:shoulders:tension", "stress:upper_back:tension", "stress:neck:tension", "anger:head:pressure", "anger:head:heat", "anger:chest:heat", "anger:arms:tension", "anger:jaw:tension", "anger:face:heat", "anger:jaw:clenched", "anger:hands:clenched", "anger:chest:pressure", "sadness:chest:heaviness", "sadness:throat:constriction", "sadness:body:heaviness", "sadness:throat:lump", "sadness:arms:heaviness", "sadness:legs:heaviness", "sadness:head:pressure", "disappointment:chest:heaviness", "disappointment:throat:constriction", "disappointment:stomach:pressure", "loneliness:chest:heaviness", "loneliness:chest:cold_sensation", "loneliness:throat:constriction", "hopelessness:chest:heaviness", "hopelessness:body:heaviness", "hopelessness:body:weakness", "hopelessness:chest:pressure", "hot_shame:face:heat", "hot_shame:chest:heat", "cold_shame:stomach:heaviness", "cold_shame:body:weakness", "cold_shame:chest:sinking", "cold_shame:stomach:sinking", "cold_shame:shoulders:slumped", "guilt:stomach:heaviness", "guilt:chest:constriction", "guilt:face:heat", "guilt:chest:heaviness", "guilt:stomach:knotted", "guilt:shoulders:heaviness", "guilt:head:pressure", "disgust:throat:constriction", "disgust:stomach:pressure", "disgust:stomach:churning", "disgust:face:tension", "apathy:body:heaviness", "apathy:body:weakness", "apathy:body:drained", "apathy:arms:heaviness", "apathy:legs:heaviness", "boredom:body:restlessness", "boredom:body:heaviness", "emptiness:chest:numbness_sensation", "emptiness:stomach:numbness_sensation", "emptiness:chest:cold_sensation", "emptiness:chest:hollow", "numbness:body:numbness_sensation", "numbness:hands:numbness_sensation", "numbness:body:cold_sensation", "numbness:body:heaviness", "numbness:head:foggy", "love:chest:expansion", "love:chest:warmth", "love:face:warmth", "love:stomach:butterflies", "love:body:warmth", "love:hands:tingly", "compassion:chest:expansion", "joy:chest:expansion", "joy:chest:lightness", "joy:body:lightness", "joy:face:smiling", "joy:arms:energised", "joy:legs:bouncy", "excitement:stomach:butterflies", "excitement:chest:racing_heart", "excitement:body:restlessness", "excitement:stomach:fizzy", "excitement:hands:tingly", "excitement:legs:bouncy", "excitement:body:energised", "surprised:chest:racing_heart", "surprised:head:buzzing", "surprised:stomach:butterflies", "calm:body:lightness", "calm:legs:groundedness", "calm:shoulders:lightness", "calm:shoulders:loose", "calm:chest:easy_breathing", "calm:stomach:settled", "calm:jaw:loose", "calm:feet:groundedness"]
 DELETE r;
 
 // --- Body maps (the mirror): which emotions they group, which grid words they mirror ---
 MERGE (m:BodyMap {id: "fear"})
-SET m += {label: "Fear and worry", rank: 0, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Fear and worry", rank: 0, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "fear"}), (e:Emotion) WHERE e.id IN ["anxiety", "fear", "panic", "stress", "overwhelm"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "fear"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["anxiety", "fear", "panic", "stress", "overwhelm"]
 DELETE r;
-UNWIND range(0, 16) AS i
-WITH i, ["fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed", "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control", "hesitant"][i] AS wid
+UNWIND range(0, 17) AS i
+WITH i, ["fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed", "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control", "hesitant", "jealous"][i] AS wid
 MATCH (m:BodyMap {id: "fear"}), (w:Emotion {id: wid})
 MERGE (m)-[r:MIRRORS]->(w)
 SET r.rank = i;
-MATCH (m:BodyMap {id: "fear"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed", "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control", "hesitant"]
+MATCH (m:BodyMap {id: "fear"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["fearful", "scared", "anxious", "insecure", "helpless", "frightened", "worried", "overwhelmed", "persecuted", "nervous", "threatened", "stressed", "busy", "rushed", "pressured", "out_of_control", "hesitant", "jealous"]
 DELETE r;
 MERGE (m:BodyMap {id: "anger"})
-SET m += {label: "Anger", rank: 1, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Anger", rank: 1, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "anger"}), (e:Emotion) WHERE e.id IN ["anger", "irritation", "frustration", "hostility", "angsty"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "anger"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["anger", "irritation", "frustration", "hostility", "angsty"]
 DELETE r;
-UNWIND range(0, 15) AS i
-WITH i, ["angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed"][i] AS wid
+UNWIND range(0, 14) AS i
+WITH i, ["angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected", "indignant", "violated", "furious", "provoked", "hostile", "infuriated", "annoyed"][i] AS wid
 MATCH (m:BodyMap {id: "anger"}), (w:Emotion {id: wid})
 MERGE (m)-[r:MIRRORS]->(w)
 SET r.rank = i;
-MATCH (m:BodyMap {id: "anger"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected", "indignant", "violated", "furious", "jealous", "provoked", "hostile", "infuriated", "annoyed"]
+MATCH (m:BodyMap {id: "anger"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["angry", "bitter", "mad", "aggressive", "frustrated", "betrayed", "resentful", "disrespected", "indignant", "violated", "furious", "provoked", "hostile", "infuriated", "annoyed"]
 DELETE r;
 MERGE (m:BodyMap {id: "sadness"})
-SET m += {label: "Sadness", rank: 2, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Sadness", rank: 2, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "sadness"}), (e:Emotion) WHERE e.id IN ["sadness", "disappointment", "loneliness", "hopelessness", "rejection"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "sadness"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["sadness", "disappointment", "loneliness", "hopelessness", "rejection"]
 DELETE r;
-UNWIND range(0, 19) AS i
-WITH i, ["rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful", "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned", "victimized", "fragile", "grief", "powerless"][i] AS wid
+UNWIND range(0, 18) AS i
+WITH i, ["rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful", "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned", "victimized", "fragile", "grief"][i] AS wid
 MATCH (m:BodyMap {id: "sadness"}), (w:Emotion {id: wid})
 MERGE (m)-[r:MIRRORS]->(w)
 SET r.rank = i;
-MATCH (m:BodyMap {id: "sadness"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful", "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned", "victimized", "fragile", "grief", "powerless"]
+MATCH (m:BodyMap {id: "sadness"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["rejected", "excluded", "let_down", "dismayed", "disillusioned", "bad", "disappointed", "awful", "sad", "lonely", "vulnerable", "despair", "depressed", "hurt", "isolated", "abandoned", "victimized", "fragile", "grief"]
 DELETE r;
 MERGE (m:BodyMap {id: "shame"})
-SET m += {label: "Shame", rank: 3, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Shame", rank: 3, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "shame"}), (e:Emotion) WHERE e.id IN ["hot_shame", "cold_shame"]
 MERGE (m)-[:GROUPS]->(e);
@@ -530,7 +536,7 @@ SET r.rank = i;
 MATCH (m:BodyMap {id: "shame"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["inadequate", "inferior", "worthless", "insignificant", "exposed", "humiliated", "ridiculed", "embarrassed", "ashamed"]
 DELETE r;
 MERGE (m:BodyMap {id: "guilt"})
-SET m += {label: "Guilt", rank: 4, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Guilt", rank: 4, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "guilt"}), (e:Emotion) WHERE e.id IN ["guilt"]
 MERGE (m)-[:GROUPS]->(e);
@@ -544,7 +550,7 @@ SET r.rank = i;
 MATCH (m:BodyMap {id: "guilt"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["guilty", "remorseful"]
 DELETE r;
 MERGE (m:BodyMap {id: "disgust"})
-SET m += {label: "Disgust", rank: 5, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Disgust", rank: 5, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "disgust"}), (e:Emotion) WHERE e.id IN ["disgust"]
 MERGE (m)-[:GROUPS]->(e);
@@ -558,35 +564,35 @@ SET r.rank = i;
 MATCH (m:BodyMap {id: "disgust"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["critical", "skeptical", "dismissive", "disgusted", "disapproving", "repelled", "judgmental", "appalled", "revolted", "nauseated", "detestable", "horrified"]
 DELETE r;
 MERGE (m:BodyMap {id: "depleted"})
-SET m += {label: "Drained or numb", rank: 6, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Drained or numb", rank: 6, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "depleted"}), (e:Emotion) WHERE e.id IN ["apathy", "boredom", "emptiness", "numbness"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "depleted"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["apathy", "boredom", "emptiness", "numbness"]
 DELETE r;
-UNWIND range(0, 10) AS i
-WITH i, ["weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent", "empty", "numb"][i] AS wid
+UNWIND range(0, 11) AS i
+WITH i, ["weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent", "empty", "numb", "powerless"][i] AS wid
 MATCH (m:BodyMap {id: "depleted"}), (w:Emotion {id: wid})
 MERGE (m)-[r:MIRRORS]->(w)
 SET r.rank = i;
-MATCH (m:BodyMap {id: "depleted"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent", "empty", "numb"]
+MATCH (m:BodyMap {id: "depleted"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["weak", "distant", "withdrawn", "tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent", "empty", "numb", "powerless"]
 DELETE r;
 MERGE (m:BodyMap {id: "love"})
-SET m += {label: "Love and warmth", rank: 7, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Love and warmth", rank: 7, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "love"}), (e:Emotion) WHERE e.id IN ["love", "compassion", "gratitude", "trust"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "love"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["love", "compassion", "gratitude", "trust"]
 DELETE r;
-UNWIND range(0, 8) AS i
-WITH i, ["aroused", "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative", "tender"][i] AS wid
+UNWIND range(0, 7) AS i
+WITH i, ["trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative", "tender"][i] AS wid
 MATCH (m:BodyMap {id: "love"}), (w:Emotion {id: wid})
 MERGE (m)-[r:MIRRORS]->(w)
 SET r.rank = i;
-MATCH (m:BodyMap {id: "love"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["aroused", "trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative", "tender"]
+MATCH (m:BodyMap {id: "love"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["trusting", "sensitive", "intimate", "loving", "thankful", "sympathetic", "appreciative", "tender"]
 DELETE r;
 MERGE (m:BodyMap {id: "joy"})
-SET m += {label: "Joy", rank: 8, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Joy", rank: 8, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "joy"}), (e:Emotion) WHERE e.id IN ["joy", "pride", "hope", "amusement", "inspiration"]
 MERGE (m)-[:GROUPS]->(e);
@@ -600,21 +606,21 @@ SET r.rank = i;
 MATCH (m:BodyMap {id: "joy"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["happy", "interested", "proud", "accepted", "powerful", "optimistic", "joyful", "curious", "inquisitive", "successful", "confident", "respected", "valued", "courageous", "creative", "hopeful", "inspired", "good"]
 DELETE r;
 MERGE (m:BodyMap {id: "excitement"})
-SET m += {label: "Excitement", rank: 9, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Excitement", rank: 9, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "excitement"}), (e:Emotion) WHERE e.id IN ["excitement", "enthusiasm", "curiosity"]
 MERGE (m)-[:GROUPS]->(e);
 MATCH (m:BodyMap {id: "excitement"})-[r:GROUPS]->(e:Emotion) WHERE NOT e.id IN ["excitement", "enthusiasm", "curiosity"]
 DELETE r;
-UNWIND range(0, 4) AS i
-WITH i, ["excited", "eager", "energetic", "playful", "cheeky"][i] AS wid
+UNWIND range(0, 5) AS i
+WITH i, ["excited", "eager", "energetic", "playful", "cheeky", "aroused"][i] AS wid
 MATCH (m:BodyMap {id: "excitement"}), (w:Emotion {id: wid})
 MERGE (m)-[r:MIRRORS]->(w)
 SET r.rank = i;
-MATCH (m:BodyMap {id: "excitement"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["excited", "eager", "energetic", "playful", "cheeky"]
+MATCH (m:BodyMap {id: "excitement"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["excited", "eager", "energetic", "playful", "cheeky", "aroused"]
 DELETE r;
 MERGE (m:BodyMap {id: "surprise"})
-SET m += {label: "Surprise", rank: 10, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Surprise", rank: 10, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "surprise"}), (e:Emotion) WHERE e.id IN ["surprised"]
 MERGE (m)-[:GROUPS]->(e);
@@ -628,7 +634,7 @@ SET r.rank = i;
 MATCH (m:BodyMap {id: "surprise"})-[r:MIRRORS]->(w:Emotion) WHERE NOT w.id IN ["surprised", "startled", "confused", "amazed", "shocked", "perplexed", "astonished", "awe"]
 DELETE r;
 MERGE (m:BodyMap {id: "calm"})
-SET m += {label: "Calm", rank: 11, status: "draft", reviewStatus: "draft", reviewedAt: null, version: "body-map-v2"}
+SET m += {label: "Calm", rank: 11, status: "live", reviewStatus: "reviewed", reviewedAt: "2026-10-02", version: "body-map-v2"}
 REMOVE m.wordIds;
 MATCH (m:BodyMap {id: "calm"}), (e:Emotion) WHERE e.id IN ["calm", "contentment", "serenity", "relief", "safety", "humility"]
 MERGE (m)-[:GROUPS]->(e);
