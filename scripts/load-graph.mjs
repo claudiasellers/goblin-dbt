@@ -67,7 +67,7 @@ export const LOAD_ORDER = [
   'profile-layer.cypher',                          // ProfileArea / ProfileKind / PatternRule (Me surface content)
   'capacity.cypher',                               // Capacity probe, hand-off primitives, band rules (needs Recover's cyclic_sighing)
   'witness.cypher',                                // Witness corpus: ValidationLine, ToolMoment, VoiceRule (needs Recover, OA, DEAR MAN debrief, regulation content)
-  'body-map.cypher',                               // Body map: pad words on SensationType, BodyMap / BodyMapPlace (the mirror); needs SensationType
+  'body-map.cypher',                               // Body map: BodyRegion, sensation words on SensationType, ALL FELT_AS, BodyMap groupings; needs Emotion (incl. emotion-wheel-sync) + SensationType
   'recommended-for.cypher',                        // Check-in routing: RECOMMENDED_FOR pattern × band, concept tags, RoutingPolicy (needs urge_surfing, dbt_find_the_feeling)
 ];
 

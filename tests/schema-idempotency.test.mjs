@@ -113,7 +113,7 @@ function relKeys(f) {
 
 test("knowledge-graph.cypher is nodes only; count pins for the base files", () => {
   const kg = statements["knowledge-graph.cypher"];
-  assert.equal(kg.length, 316);
+  assert.equal(kg.length, 308, "316 until Oct 2026; the 8 old BodyRegion nodes moved to body-map.cypher");
   for (const s of kg) {
     assert.match(s, /^MERGE \(\w+:\w+ \{id: "[^"]+"\}\)\nSET \w+ \+= \{/, s.slice(0, 80));
     assert.doesNotMatch(code(s), /\]->|<-\[/, s.slice(0, 80));
@@ -122,17 +122,22 @@ test("knowledge-graph.cypher is nodes only; count pins for the base files", () =
   const opposite = statements["relationships.cypher"].filter((s) => /MERGE \(\w+\)-\[:OPPOSITE_OF\]->\(\w+\) MERGE/.test(s));
   assert.equal(opposite.length, 16);
   const nonOpposite = rels.filter((r) => r.type !== "OPPOSITE_OF");
-  assert.equal(new Set(nonOpposite.map((r) => r.key)).size, 575);
-  assert.equal(nonOpposite.length, 575, "no relationship declared twice");
-  assert.equal(statements["relationships.cypher"].length, 575 + 16);
+  // 575 until Oct 2026; the 40 FELT_AS edges moved to body-map.cypher (scripts/body-map/content.py).
+  assert.equal(new Set(nonOpposite.map((r) => r.key)).size, 535);
+  assert.equal(nonOpposite.length, 535, "no relationship declared twice");
+  assert.equal(statements["relationships.cypher"].length, 535 + 16);
 });
 
-test("FELT_AS region variants survive the conversion (66 keys)", () => {
-  const expected = JSON.parse(readFileSync("tests/fixtures/felt-as-keys.json", "utf8"));
-  const actual = [...relKeys("relationships.cypher"), ...relKeys("low-unpleasant-associations-patch.cypher")]
-    .filter((r) => r.type === "FELT_AS")
+test("FELT_AS region variants survive (the 66 original keys), now all in body-map.cypher", () => {
+  // The old region "back" became upper_back when FELT_AS moved to the body map's 15 places (Oct 2026).
+  const expected = JSON.parse(readFileSync("tests/fixtures/felt-as-keys.json", "utf8")).map((k) => k.replace("|back|", "|upper_back|"));
+  const actual = relKeys("body-map.cypher").filter((r) => r.type === "FELT_AS")
     .map((r) => { const [a, , region, b] = r.key.split("|"); return `${a}|${region}|${b}`; });
-  assert.deepEqual([...new Set(actual)].sort(), expected);
+  assert.equal(new Set(actual).size, actual.length, "no FELT_AS row declared twice");
+  assert.deepEqual(expected.filter((k) => !actual.includes(k)), [], "every original row is still there");
+  for (const f of ["relationships.cypher", "low-unpleasant-associations-patch.cypher"]) {
+    assert.deepEqual(relKeys(f).filter((r) => r.type === "FELT_AS"), [], `${f} no longer writes FELT_AS`);
+  }
 });
 
 test("the duplicate checks never touch user-data relationship types", () => {

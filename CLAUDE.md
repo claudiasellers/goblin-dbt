@@ -38,7 +38,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `answerToolOutcome`, `scheduleFollowUp`, `resolveFollowUp`, `snoozeFollowUp`, `getToday`, `getSpineContent` (public); `todayOrder.ts` (derived due/stale/upcoming + ordering), `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
 | `profile/` | `getProfileContext` (the single profile read path: only the slices `PROFILE_NEEDS` declares per tool, in code), `getMe`, `upsertProfileFact`, `confirmProfileItem`, `setAsideProfileItem`, `restoreProfileItem`, `answerPatternOffer` (the only writer of `MyPattern`); `slices.ts` resolvers never read a `:LogRecord` (test-enforced) |
 | `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
-| `bodyMap/` | `getBodyMapContent` (public): signed-off pad words, and the body-mirror maps for the sent grid word ids in their order (`docs/design/body-map.md`); `suggestEmotionsFromBody` (public): body-first suggestions, the marked places scored against the signed-off maps (`suggest.ts`, pure); `types.ts` mirrored in `src/data/bodyMapTypes.ts` |
+| `bodyMap/` | `getBodyMapContent` (public): signed-off sensation words, and the body-mirror maps the sent grid words `MIRRORS`, in their order, each with places computed from the `FELT_AS` rows of the emotions it `GROUPS` (`places.ts`, pure; `docs/design/body-map.md`); `suggestEmotionsFromBody` (public): body-first suggestions, the marked places scored against the signed-off maps (`suggest.ts`, pure); `types.ts` mirrored in `src/data/bodyMapTypes.ts` |
 | `witness/` | `getWitnessLines` (public; signed in it also reads own / kept lines via `readProfileSlices(tx, uid, 'witness')` and the `SHOWED_LINE` history), `recordWitnessBeat` (host must be the caller's, found by key; `SHOWED_LINE` follows the host's lifecycle guard; `OwnLine` / `SAVED_LINE` are profile writes); `rank.ts` (pure ranking, fade stage, when to ask "did that land?"), `types.ts` (mirrored in `src/data/witnessTypes.ts`), `validation.ts` (own-line text is length-checked only, never linted) |
 
 `userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
@@ -94,7 +94,7 @@ The graph recommends *which* tool (by ID). The frontend looks up *how to display
 
 This includes:
 
-- Body sensations (`FELT_AS` relationships)
+- Body sensations (`FELT_AS` relationships: one source, `scripts/body-map/content.py`)
 - Brain structures activated (`ACTIVATES_DURING`)
 - Activation patterns and their neural signatures
 - Opposite emotions (`OPPOSITE_OF`)
@@ -140,6 +140,8 @@ Interactive tool components live in `src/pages/tools/` and are registered in the
 
 ## Data: Emotions
 
+**Every check-in word is a graph node.** `src/data/emotions.ts` places the words on the square; each one is also an `Emotion` node with the same name, quadrant and family in `schema/emotion-wheel-sync.cypher` (`tests/emotion-wheel-sync.test.mjs`). A word the graph doesn't have is a word nothing can be said about (routing aliases, body maps, related words), so a new word goes into both in the same change.
+
 Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `irritation` → `anger`) through `(Emotion)-[:HAS_REGULATION_CONTENT]->(EmotionRegulationContent {dbtParent})`. No schema file sets an `Emotion.dbtParent` property, so don't read one (plan F12). The 9 DBT parent emotions are: **fear, anger, disgust, envy, jealousy, love, sadness, shame, guilt**; `shame`, `envy` and `jealousy` aren't `Emotion` nodes in the base schema (`shame` is `hot_shame`/`cold_shame`).
 
 `EmotionRegulationContent` nodes (one per DBT parent) are linked via `HAS_REGULATION_CONTENT`. They hold `label` and `fitsTheFactsWhen` (array of first-person "when this emotion fits the facts" statements). The Opposite Action tool uses a single source of truth: **ActionUrge** nodes (linked via `HAS_ACTION_URGE`) supply urge labels and graduated opposite steps (small/medium/bigger); protocol metadata on `EmotionRegulationContent` (from `schema/opposite-action-data.cypher`) supplies `fitsFactsGuidance`, `whyItWorks`, `acknowledgment`, `bodyOpposite`, and default opposite steps. All content is written in conversational first-person voice so the user immediately recognizes their experience.
@@ -166,10 +168,10 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `src/pages/tools/OppositeAction.tsx` | Interactive opposite action flow |
 | `src/pages/tools/InvalidationRecovery.tsx` | "Recover from a hurtful moment" (Walking the Middle Path); see `docs/design/recover-from-invalidation.md` |
 | `scripts/invalidation-recovery/content.py` | Editable source for `schema/invalidation-recovery.cypher` (regenerate with `build.py`) |
-| `docs/design/body-map.md` | Body map plan (steps 1–3 built): heat figure, sensation pad, body mirror, several feelings; content in the graph (`BodyMap`, pad words), build order |
-| `src/data/bodyFigure.ts`, `src/components/checkin/body/`, `src/lib/bodyMark.ts` | The body step's figure: place ids (equal to the graph's, test-enforced), labels, paired places, tap shapes, glows, `regionAt` (the drag); `HeatFigure` (drag to a place, lift to choose), `StrengthBar` (optional, beside the body, off until toggled; saves `strength`) and `BodyStep` (one screen: the chosen place's words in one row; a mark glows warm / cool from its words' `energy`, sized by strength). Presentation only: words and typical maps come from the graph |
+| `docs/design/body-map.md` | Body map plan (steps 1–3 built; content on `FELT_AS`, body-map-v2): heat figure, drag, strength bar, body mirror, several feelings; content in the graph (`FELT_AS`, sensation words, `BodyMap` groupings), build order |
+| `src/data/bodyFigure.ts`, `src/components/checkin/body/`, `src/lib/bodyMark.ts` | The body step's figure: place ids (equal to the graph's, test-enforced), labels, paired places, tap shapes, glows, `regionAt` (the drag); `HeatFigure` (drag to a place, lift to choose), `StrengthBar` (beside the body, shown by default, hidden with the Strength toggle; saves `strength`) and `BodyStep` (one screen: the chosen place's words in one row; a mark glows warm / cool from its words' `energy`, sized by strength). Presentation only: words and typical maps come from the graph |
 | `schema/migrations/2026-10-body-regions.cypher` | One-off: old Title Case `BodySensation.region` names → place ids + `side` (run after step 2's functions deploy) |
-| `scripts/body-map/content.py` | Editable source for `schema/body-map.cypher` (regions, pad words on `SensationType`, `BodyMap` / `BodyMapPlace`); drafts until listed in `SIGNED_OFF`; regenerate with `build.py`, then `fixture.py` |
+| `scripts/body-map/content.py` | Editable source for `schema/body-map.cypher`: `BodyRegion` (the 15 places), sensation words on `SensationType`, **all `FELT_AS`** (where each emotion is felt: the one source; no other schema file may write it, test-enforced), and `BodyMap` groupings (`GROUPS` emotions, `MIRRORS` grid words; no stored places). New rows are drafts until listed in `SIGNED_OFF`; regenerate with `build.py`, then `fixture.py` |
 | `docs/design/alexithymia-first-interaction.md` | Agreed direction: no rating scales anywhere; Stage / Shape / Tune rooms, shared mechanics, order of work |
 | `scripts/find-the-feeling/content.py` | Editable source for `schema/find-the-feeling.cypher` (Find the feeling: word signatures, urge routing, `appToolId`); regenerate with `build.py` |
 | `src/pages/tools/FindTheFeeling.tsx` | "Find the feeling" (Shape it / Tune it): page shell, save, routing, check-in handoff; rooms in `src/components/tools/findTheFeeling/{shape,tune}` (lazy, three.js / Web Audio); logic in `src/lib/findTheFeeling*.ts`; spec `docs/design/find-the-feeling.md` |

@@ -53,7 +53,7 @@ export const getInsightsData = onCall(
           MATCH (u:User {id: $userId})-[:LOGGED]->(c:CheckIn)
           ${checkInTimeFilter ? `${checkInTimeFilter} AND c.quadrant IS NOT NULL` : 'WHERE c.quadrant IS NOT NULL'}
           OPTIONAL MATCH (c)-[:SENSED]->(s:BodySensation)
-          WITH c, collect(DISTINCT s.region) AS bodyRegions, collect(s.tags) AS tagArrays
+          WITH c, collect(DISTINCT s.region) AS bodyRegions, collect(CASE WHEN size(coalesce(s.sensationIds, [])) > 0 THEN s.sensationIds ELSE s.tags END) AS tagArrays
           // Emotion families from the saved emotion ids (PR-C1; F12: c.emotion is a display string,
           // and no schema sets Emotion.dbtParent): DBT parent via HAS_REGULATION_CONTENT, else wheel family.
           OPTIONAL MATCH (e:Emotion) WHERE e.id IN coalesce(c.emotionIds, [])

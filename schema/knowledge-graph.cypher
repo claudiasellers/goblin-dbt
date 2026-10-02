@@ -799,57 +799,9 @@ SET trust += {
 
 
 // ============================================================
-// BODY REGIONS
+// BODY REGIONS: moved to scripts/body-map/content.py (REGION_NAMES) → schema/body-map.cypher, on the
+// 15 places the body step uses (Oct 2026).
 // ============================================================
-
-MERGE (head_region:BodyRegion {id: "head"})
-SET head_region += {
-  name: "Head",
-  includes: ["forehead", "temples", "scalp", "face"]
-};
-
-MERGE (throat_region:BodyRegion {id: "throat"})
-SET throat_region += {
-  name: "Throat/Neck",
-  includes: ["throat", "neck", "jaw"]
-};
-
-MERGE (chest_region:BodyRegion {id: "chest"})
-SET chest_region += {
-  name: "Chest",
-  includes: ["heart area", "lungs", "sternum"]
-};
-
-MERGE (stomach_region:BodyRegion {id: "stomach"})
-SET stomach_region += {
-  name: "Stomach/Gut",
-  includes: ["stomach", "solar plexus", "abdomen", "gut"]
-};
-
-MERGE (shoulders_region:BodyRegion {id: "shoulders"})
-SET shoulders_region += {
-  name: "Shoulders",
-  includes: ["shoulders", "upper back"]
-};
-
-MERGE (arms_region:BodyRegion {id: "arms"})
-SET arms_region += {
-  name: "Arms/Hands",
-  includes: ["arms", "hands", "fingers"]
-};
-
-MERGE (legs_region:BodyRegion {id: "legs"})
-SET legs_region += {
-  name: "Legs/Feet",
-  includes: ["legs", "knees", "feet", "toes"]
-};
-
-MERGE (back_region:BodyRegion {id: "back"})
-SET back_region += {
-  name: "Back",
-  includes: ["lower back", "mid back", "spine"]
-};
-
 
 // ============================================================
 // SENSATION TYPES

@@ -150,4 +150,3 @@ CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n
 // --- Body map (docs/design/body-map.md, schema/body-map.cypher) ---
 CREATE CONSTRAINT body_map_content_id IF NOT EXISTS FOR (n:BodyMapContent) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT body_map_id IF NOT EXISTS FOR (n:BodyMap) REQUIRE n.id IS UNIQUE;
-CREATE CONSTRAINT body_map_place_id IF NOT EXISTS FOR (n:BodyMapPlace) REQUIRE n.id IS UNIQUE;

@@ -1,6 +1,8 @@
 // ============================================================
 // EMOTION WHEEL SYNC
-// Syncs graph Emotion nodes to the frontend emotion wheel.
+// Syncs graph Emotion nodes to the frontend emotion wheel (src/data/emotions.ts): every word
+// there is an Emotion node here with the same name, quadrant and family
+// (tests/emotion-wheel-sync.test.mjs). Add a word to both in the same change.
 // Safe to run repeatedly (uses MERGE).
 // ============================================================
 
@@ -34,6 +36,26 @@ UNWIND [
   {id: "intimate", name: "Intimate", quadrant: "low-pleasant", family: "happy"},
   {id: "hopeful", name: "Hopeful", quadrant: "high-pleasant", family: "happy"},
   {id: "inspired", name: "Inspired", quadrant: "high-pleasant", family: "happy"},
+  // Calm side of the happy family (added Oct 2026: in the app's list, never synced before)
+  {id: "calm", name: "Calm", quadrant: "low-pleasant", family: "happy"},
+  {id: "relaxed", name: "Relaxed", quadrant: "low-pleasant", family: "happy"},
+  {id: "good", name: "Good", quadrant: "low-pleasant", family: "happy"},
+  {id: "chill", name: "Chill", quadrant: "low-pleasant", family: "happy"},
+  {id: "comfortable", name: "Comfortable", quadrant: "low-pleasant", family: "happy"},
+  {id: "thoughtful", name: "Thoughtful", quadrant: "low-pleasant", family: "happy"},
+  {id: "mellow", name: "Mellow", quadrant: "low-pleasant", family: "happy"},
+  {id: "sympathetic", name: "Sympathetic", quadrant: "low-pleasant", family: "happy"},
+  {id: "serene", name: "Serene", quadrant: "low-pleasant", family: "happy"},
+  {id: "secure", name: "Secure", quadrant: "low-pleasant", family: "happy"},
+  {id: "satisfied", name: "Satisfied", quadrant: "low-pleasant", family: "happy"},
+  {id: "restful", name: "Restful", quadrant: "low-pleasant", family: "happy"},
+  {id: "appreciative", name: "Appreciative", quadrant: "low-pleasant", family: "happy"},
+  {id: "at_ease", name: "At Ease", quadrant: "low-pleasant", family: "happy"},
+  {id: "balanced", name: "Balanced", quadrant: "low-pleasant", family: "happy"},
+  {id: "grounded", name: "Grounded", quadrant: "low-pleasant", family: "happy"},
+  {id: "tender", name: "Tender", quadrant: "low-pleasant", family: "happy"},
+  {id: "cozy", name: "Cozy", quadrant: "low-pleasant", family: "happy"},
+  {id: "humble", name: "Humble", quadrant: "low-pleasant", family: "happy"},
 
   // Surprised family
   {id: "surprised", name: "Surprised", quadrant: "high-pleasant", family: "surprised"},
@@ -59,7 +81,7 @@ UNWIND [
   {id: "sleepy", name: "Sleepy", quadrant: "low-unpleasant", family: "bad"},
   {id: "unfocused", name: "Unfocused", quadrant: "low-unpleasant", family: "bad"},
   {id: "out_of_control", name: "Out of control", quadrant: "high-unpleasant", family: "bad"},
-  {id: "overwhelmed", name: "Overwhelmed", quadrant: "high-unpleasant", family: "bad"},
+  {id: "overwhelmed", name: "Overwhelmed", quadrant: "high-unpleasant", family: "fearful"},
   {id: "rushed", name: "Rushed", quadrant: "high-unpleasant", family: "bad"},
   {id: "pressured", name: "Pressured", quadrant: "high-unpleasant", family: "bad"},
   {id: "apathetic", name: "Apathetic", quadrant: "low-unpleasant", family: "bad"},
@@ -149,6 +171,19 @@ MERGE (e:Emotion {id: emotion.id})
 SET e.name = emotion.name,
     e.quadrant = emotion.quadrant,
     e.family = emotion.family;
+
+// Prune family links that no longer fit a word's family (a word that changes family, like
+// "overwhelmed" bad → fearful in Oct 2026, must not keep its old relatives and opposites). Only links
+// between two wheel words (both carry `family`); no other schema file links two wheel words
+// (tests/emotion-wheel-sync.test.mjs), so nothing else is touched. The MERGEs below rebuild the rest.
+MATCH (a:Emotion)-[r:RELATED_TO]->(b:Emotion)
+WHERE a.family IS NOT NULL AND b.family IS NOT NULL AND a.family <> b.family
+DELETE r;
+
+MATCH (a:Emotion)-[r:OPPOSITE_OF]->(b:Emotion)
+WHERE a.family IS NOT NULL AND b.family IS NOT NULL
+  AND NOT [a.family, b.family] IN [["happy", "sad"], ["sad", "happy"], ["surprised", "disgusted"], ["disgusted", "surprised"], ["fearful", "angry"], ["angry", "fearful"], ["bad", "happy"], ["happy", "bad"]]
+DELETE r;
 
 // Related emotions: tie each family to its core emotion.
 UNWIND [
