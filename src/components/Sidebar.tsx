@@ -45,9 +45,10 @@ export function Sidebar() {
 
   return (
     <>
-      {/* Desktop sidebar — fixed on the left, labels always visible */}
+      {/* Desktop sidebar — fixed on the left, labels always visible. Top / bottom safe-area padding keeps the
+          logo out from under an installed iPad's status bar and "Me" clear of a landscape iPhone's home indicator. */}
       <aside
-        className={`hidden md:flex fixed left-0 top-0 bottom-0 ${SIDEBAR_WIDTH_CLASS} h-screen bg-[var(--color-sidebar-bg)] border-r border-[var(--color-sidebar-border)] flex-col z-40`}
+        className={`hidden md:flex fixed left-0 top-0 bottom-0 ${SIDEBAR_WIDTH_CLASS} md:pt-[env(safe-area-inset-top)] md:pb-[env(safe-area-inset-bottom)] h-screen bg-[var(--color-sidebar-bg)] border-r border-[var(--color-sidebar-border)] flex-col z-40`}
       >
         {/* Logo */}
         <div className="flex items-center flex-shrink-0 h-16 px-4 border-b border-[var(--color-sidebar-border)]">
