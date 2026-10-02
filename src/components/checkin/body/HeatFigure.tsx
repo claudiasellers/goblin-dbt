@@ -1,6 +1,8 @@
-import { useId, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
+import { useEffect, useId, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react';
 import { glowLook } from '../../../lib/bodyMark';
-import { FIGURE_VIEWBOX, REGIONS, REGION_IDS, SILHOUETTE, glowFor, regionAt, type HitShape, type RegionId, type Side } from '../../../data/bodyFigure';
+import { FIGURE_VIEWBOX, FIGURE_BOX, REGIONS, REGION_IDS, SILHOUETTE, glowFor, regionAt, type HitShape, type RegionId, type Side } from '../../../data/bodyFigure';
+
+interface Finger { x: number; y: number; region: RegionId | null }
 
 export interface FigureMark {
   region: RegionId;
@@ -53,9 +55,22 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
   const clip = `fig-${uid}`;
   const blur = `blur-${uid}`;
   const svgRef = useRef<SVGSVGElement>(null);
-  const [finger, setFinger] = useState<{ x: number; y: number; region: RegionId | null } | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const [finger, setFinger] = useState<Finger | null>(null);
+  // The live drag, read by the handlers: state alone can be one event behind (a quick tap's lift
+  // arriving before the press has re-rendered).
+  const drag = useRef<Finger | null>(null);
   const [hover, setHover] = useState<RegionId | null>(null);
   const interactive = Boolean(onPick);
+
+  // iOS Safari can still start a page scroll from a finger on the figure; while a drag is on, stop it.
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || !interactive) return;
+    const stop = (e: TouchEvent) => { if (drag.current) e.preventDefault(); };
+    el.addEventListener('touchmove', stop, { passive: false });
+    return () => el.removeEventListener('touchmove', stop);
+  }, [interactive]);
 
   const silhouette = (
     <>
@@ -67,31 +82,40 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
     </>
   );
 
-  function toFigure(e: ReactPointerEvent<SVGSVGElement>) {
-    const svg = svgRef.current;
-    const m = svg?.getScreenCTM();
-    if (!svg || !m) return null;
-    const pt = new DOMPoint(e.clientX, e.clientY).matrixTransform(m.inverse());
-    return { x: pt.x, y: pt.y, region: regionAt(pt.x, pt.y) };
+  /** The pointer in figure units, from the svg's box (its aspect ratio is the viewBox's, so the
+   *  mapping is exact; getScreenCTM has been unreliable in scrolled containers on Safari). */
+  function toFigure(e: ReactPointerEvent<HTMLDivElement>): Finger | null {
+    const r = svgRef.current?.getBoundingClientRect();
+    if (!r || !r.width || !r.height) return null;
+    const x = FIGURE_BOX.x + ((e.clientX - r.left) / r.width) * FIGURE_BOX.w;
+    const y = FIGURE_BOX.y + ((e.clientY - r.top) / r.height) * FIGURE_BOX.h;
+    return { x, y, region: regionAt(x, y) };
   }
 
-  function track(e: ReactPointerEvent<SVGSVGElement>) {
-    const f = toFigure(e);
+  function set(f: Finger | null) {
+    drag.current = f;
     setFinger(f);
-    if (f && f.region !== finger?.region) onHover?.({ region: f.region });
   }
 
-  function handleDown(e: ReactPointerEvent<SVGSVGElement>) {
-    if (!interactive || e.button !== 0) return;
+  function handleDown(e: ReactPointerEvent<HTMLDivElement>) {
+    if (!interactive || (e.pointerType === 'mouse' && e.button !== 0)) return;
     e.preventDefault();
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* not capturable: moves still bubble here */ }
     const f = toFigure(e);
-    setFinger(f);
-    onHover?.({ region: f?.region ?? null });
+    if (!f) return;
+    set(f);
+    onHover?.({ region: f.region });
   }
 
-  function handleMove(e: ReactPointerEvent<SVGSVGElement>) {
-    if (finger) { track(e); return; }
+  function handleMove(e: ReactPointerEvent<HTMLDivElement>) {
+    const prev = drag.current;
+    if (prev) {
+      const f = toFigure(e);
+      if (!f) return;
+      set(f);
+      if (f.region !== prev.region) onHover?.({ region: f.region });
+      return;
+    }
     // Mouse hover (no button): outline what a click would choose.
     if (interactive && e.pointerType === 'mouse') {
       const f = toFigure(e);
@@ -99,34 +123,36 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
     }
   }
 
-  function handleUp(e: ReactPointerEvent<SVGSVGElement>) {
-    if (!finger) return;
-    const f = toFigure(e) ?? finger;
-    setFinger(null);
+  function handleUp(e: ReactPointerEvent<HTMLDivElement>) {
+    const prev = drag.current;
+    if (!prev) return;
+    const f = toFigure(e) ?? prev;
+    set(null);
     onHover?.(null);
     if (f.region) onPick?.(f.region);
   }
 
   function cancel() {
-    if (!finger) return;
-    setFinger(null);
+    if (!drag.current) return;
+    set(null);
     onHover?.(null);
   }
 
   const outlined = finger ? finger.region : hover;
 
   return (
-    <svg ref={svgRef} viewBox={FIGURE_VIEWBOX}
-      className={`heat-figure${interactive ? ' is-interactive' : ''}${finger ? ' is-dragging' : ''} ${className}`}
-      role={interactive ? 'group' : 'img'}
-      aria-label={interactive ? 'Your body. Touch and drag to a place, then lift.' : 'Your body'}
+    <div ref={wrapRef} className={`heat-figure-wrap${interactive ? ' is-interactive' : ''}`}
       {...(interactive ? {
         onPointerDown: handleDown,
         onPointerMove: handleMove,
         onPointerUp: handleUp,
         onPointerCancel: cancel,
-        onPointerLeave: () => { if (!finger) setHover(null); },
+        onPointerLeave: () => { if (!drag.current) setHover(null); },
       } : {})}>
+    <svg ref={svgRef} viewBox={FIGURE_VIEWBOX}
+      className={`heat-figure${interactive ? ' is-interactive' : ''}${finger ? ' is-dragging' : ''} ${className}`}
+      role={interactive ? 'group' : 'img'}
+      aria-label={interactive ? 'Your body. Touch and drag to a place, then lift.' : 'Your body'}>
       <defs>
         <clipPath id={clip}>{silhouette}</clipPath>
         <filter id={blur} x="-100%" y="-100%" width="300%" height="300%">
@@ -162,5 +188,6 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
           }} />
       )))}
     </svg>
+    </div>
   );
 }

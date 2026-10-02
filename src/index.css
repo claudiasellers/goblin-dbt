@@ -1138,7 +1138,7 @@ h1.uppercase, h2.uppercase {
 /* ── Body map (docs/design/body-map.md): heat figure, places, panel ── */
 .heat-figure { display: block; width: 100%; height: auto; overflow: visible; touch-action: manipulation; }
 .heat-figure__body { fill: color-mix(in oklab, var(--color-text-primary) 14%, var(--color-bg-primary)); }
-.heat-figure.is-interactive { touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+.heat-figure-wrap.is-interactive, .heat-figure.is-interactive { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .heat-figure__hit {
   fill: transparent;
   stroke: transparent;

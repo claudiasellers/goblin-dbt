@@ -16,7 +16,7 @@ Changelog, "Body step redesign: the sensation pad".
   - Drag on the body to a place and lift (a tap still works).
   - The place's words sit in one swipeable row under the body.
   - An optional **strength bar** beside the body, as tall as the figure (strong at the top, faint at
-    the bottom), behind a "Strength" toggle that is off until turned on and remembered per device.
+    the bottom). Shown by default; a "Strength" toggle hides it, remembered per device.
   - Colour comes from the words: each pad word is `more` (tight, racing) or `less` (heavy, numb), so
     a mark glows warm, cool, or a blend of both; no words, a warm mid-tone. Strength sets how big
     and bright the glow is.
@@ -214,7 +214,8 @@ live).
 Built first with the sensation pad (a small feeling square in the place panel). Claudia dropped
 it the same day: the pad made the step something you scroll to. Rebuilt as one screen.
 
-- **Drag on the body** (`HeatFigure`): the svg takes the pointer (the tap shapes have
+- **Drag on the body** (`HeatFigure`): a wrapper div takes the pointer (`touch-action: none`, the
+  finger mapped from the svg's box, not `getScreenCTM`, which was unreliable on phones; the tap shapes have
   `pointer-events: none` and stay focusable buttons for the keyboard and screen readers). Pressing
   anywhere on the figure and moving shows a glow under the finger, outlines the place it would
   choose and names it above the figure ("Throat", or "Not on the body"); lifting chooses it, and a
@@ -226,8 +227,9 @@ it the same day: the pad made the step something you scroll to. Rebuilt as one s
 - **Layout** (`BodyStep`): a three-column grid, the figure in the middle (up to 172px wide) and the
   bar's column on the right, so the bar spans the figure's full height and is centred on it. The
   "Strength" toggle sits above the bar's column, level with the place read-back.
-- **The strength bar** (`StrengthBar`): off until the toggle is on (`goblin.body.strengthBar` in
-  this device's storage, a display preference, not profile data). Drag or press anywhere on it;
+- **The strength bar** (`StrengthBar`): shown by default; the toggle hides it
+  (`goblin.body.strengthBarHidden` in this device's storage, a display preference, not profile
+  data). Drag or press anywhere on it;
   arrows and Home / End from the keyboard (`role="slider"`, vertical). With no place chosen it
   shows but can't be used. A place's strength stays null until the bar is touched for it.
 - **The card**: "My chest feels…", Both / Your left / Your right for paired places, and the graph's

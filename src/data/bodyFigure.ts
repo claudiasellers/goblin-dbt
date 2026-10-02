@@ -17,6 +17,8 @@ export type RegionId = (typeof REGION_IDS)[number];
 export type Side = 'both' | 'left' | 'right';
 
 export const FIGURE_VIEWBOX = '-10 -6 220 432';
+/** The viewBox as numbers (x, y, width, height), for mapping a pointer onto the figure. */
+export const FIGURE_BOX = { x: -10, y: -6, w: 220, h: 432 } as const;
 
 /** A tappable shape on the figure. */
 export type HitShape =
