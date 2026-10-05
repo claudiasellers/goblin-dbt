@@ -15,6 +15,7 @@
  *   node scripts/load-graph.mjs --only dear-man-content   # files whose name contains this
  *   node scripts/load-graph.mjs --file schema/maintenance/x.cypher  # one file outside LOAD_ORDER (prints results)
  *   node scripts/load-graph.mjs --only witness --skip-voice-lint     # bypass the voice gate (don't)
+ *   node scripts/load-graph.mjs --no-content-refresh   # skip refreshing src/data/content/ afterwards
  *
  * Voice gate (plan A5-1): before anything is sent, the witness corpus and the generated flow
  * documents in the selection are checked with scripts/voice-lint.mjs (the same module npm test
@@ -24,12 +25,19 @@
  * `--only knowledge-graph` refuses without --force: later files override Emotion / TherapyConcept
  * properties, so the base file alone would revert them until a full load.
  * Exit codes: 1 setup, 2 statement failures, 3 constraint failure, 4 duplicates after --verify,
- * 5 voice lint.
+ * 5 voice lint, 6 loaded but the app content files could not be refreshed.
+ *
+ * App content files: after a successful load against Aura, the content the app ships
+ * (src/data/content/: related words, body map, Find the feeling) is refreshed from the graph just
+ * loaded (scripts/content-snapshot/refresh.mjs), so it can't fall behind. Skipped for --dry-run,
+ * --no-content-refresh, and a local graph (localhost / 127.0.0.1: the test graph and the Phase A
+ * rehearsal), which must never overwrite what ships.
  *
  * Credentials are read from env vars, or from a .env file in the repo root
  * (NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD). Uses functions/node_modules/neo4j-driver.
  */
 import { readFileSync, existsSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -281,6 +289,23 @@ async function main() {
 
   if (failures.length) process.exit(2);
   console.log(verify ? '\nDone. Graph loaded and verified.' : '\nDone. Graph loaded.');
+
+  if (flag('--no-content-refresh')) return;
+  if (isLocalUri(uri)) {
+    console.log('\nApp content files: not refreshed (local graph). They only ever come from Aura.');
+    return;
+  }
+  console.log('\nRefreshing the app content files from the graph just loaded…');
+  const refresh = spawnSync(process.execPath, [resolve(root, 'scripts/content-snapshot/refresh.mjs')], { stdio: 'inherit', cwd: root });
+  if (refresh.status !== 0) {
+    console.error('\n✗ The graph loaded, but src/data/content/ was NOT refreshed. Run: npm run content:refresh');
+    process.exit(6);
+  }
+}
+
+/** A local Neo4j (test graph, rehearsal): never the source of the files the app ships. */
+export function isLocalUri(uri) {
+  return /^[a-z0-9+]+:\/\/(localhost|127\.0\.0\.1|\[::1\])(:|\/|$)/i.test(uri || '');
 }
 
 // Run only when executed directly, so tests can import LOAD_ORDER / splitStatements.

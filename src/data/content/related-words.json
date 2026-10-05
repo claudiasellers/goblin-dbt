@@ -1,0 +1,2130 @@
+{
+  "source": {
+    "file": "graph-content-only-2026-10-05.json",
+    "exportedAt": "2026-10-05T04:16:06.437Z"
+  },
+  "content": {
+    "abandoned": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "accepted": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "aggressive": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "amazed": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "anger": [
+      {
+        "id": "anxiety",
+        "name": "Anxiety",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "fear",
+        "name": "Fear",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hot_shame",
+        "name": "Hot Shame",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "angry": [
+      {
+        "id": "aggressive",
+        "name": "Aggressive",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "annoyed",
+        "name": "Annoyed",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "betrayed",
+        "name": "Betrayed",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "bitter",
+        "name": "Bitter",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "critical",
+        "name": "Critical",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "dismissive",
+        "name": "Dismissive",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "disrespected",
+        "name": "Disrespected",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "distant",
+        "name": "Distant",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "frustrated",
+        "name": "Frustrated",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "furious",
+        "name": "Furious",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hostile",
+        "name": "Hostile",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "humiliated",
+        "name": "Humiliated",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "indignant",
+        "name": "Indignant",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "infuriated",
+        "name": "Infuriated",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "jealous",
+        "name": "Jealous",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "let_down",
+        "name": "Let down",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "mad",
+        "name": "Mad",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "numb",
+        "name": "Numb",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "provoked",
+        "name": "Provoked",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "resentful",
+        "name": "Resentful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "ridiculed",
+        "name": "Ridiculed",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "skeptical",
+        "name": "Skeptical",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "threatened",
+        "name": "Threatened",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "violated",
+        "name": "Violated",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "withdrawn",
+        "name": "Withdrawn",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "annoyed": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "anxiety": [
+      {
+        "id": "anger",
+        "name": "Anger",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "compassion",
+        "name": "Compassion",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "disgust",
+        "name": "Disgust",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "fear",
+        "name": "Fear",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hot_shame",
+        "name": "Hot Shame",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "anxious": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "apathetic": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "appalled": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "appreciative": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "aroused": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "ashamed": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "astonished": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "at_ease": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "awe": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "awful": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "bad": [
+      {
+        "id": "apathetic",
+        "name": "Apathetic",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "bored",
+        "name": "Bored",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "busy",
+        "name": "Busy",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "indifferent",
+        "name": "Indifferent",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "out_of_control",
+        "name": "Out of control",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "pressured",
+        "name": "Pressured",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "rushed",
+        "name": "Rushed",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "sleepy",
+        "name": "Sleepy",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "stressed",
+        "name": "Stressed",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "tired",
+        "name": "Tired",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "unfocused",
+        "name": "Unfocused",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "balanced": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "betrayed": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "bitter": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "bored": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "busy": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "calm": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "cheeky": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "chill": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "cold_shame": [
+      {
+        "id": "guilt",
+        "name": "Guilt",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hot_shame",
+        "name": "Hot Shame",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "comfortable": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "compassion": [
+      {
+        "id": "anxiety",
+        "name": "Anxiety",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "disgust",
+        "name": "Disgust",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "confident": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "confused": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "content": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "courageous": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "cozy": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "creative": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "critical": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "curious": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "depressed": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "despair": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "detestable": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "disappointed": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "disapproving": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "disgust": [
+      {
+        "id": "anxiety",
+        "name": "Anxiety",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "compassion",
+        "name": "Compassion",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "disgusted": [
+      {
+        "id": "appalled",
+        "name": "Appalled",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "awful",
+        "name": "Awful",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "detestable",
+        "name": "Detestable",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "disappointed",
+        "name": "Disappointed",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "disapproving",
+        "name": "Disapproving",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "embarrassed",
+        "name": "Embarrassed",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hesitant",
+        "name": "Hesitant",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "horrified",
+        "name": "Horrified",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "judgmental",
+        "name": "Judgmental",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "nauseated",
+        "name": "Nauseated",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "repelled",
+        "name": "Repelled",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "revolted",
+        "name": "Revolted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "disillusioned": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "dismayed": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "dismissive": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "disrespected": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "distant": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "eager": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "embarrassed": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "empty": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "energetic": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "excited": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "excitement": [
+      {
+        "id": "joy",
+        "name": "Joy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "excluded": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "exposed": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "fear": [
+      {
+        "id": "anger",
+        "name": "Anger",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "anxiety",
+        "name": "Anxiety",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hot_shame",
+        "name": "Hot Shame",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "fearful": [
+      {
+        "id": "anxious",
+        "name": "Anxious",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "excluded",
+        "name": "Excluded",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "exposed",
+        "name": "Exposed",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "frightened",
+        "name": "Frightened",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "helpless",
+        "name": "Helpless",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "inadequate",
+        "name": "Inadequate",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "inferior",
+        "name": "Inferior",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "insecure",
+        "name": "Insecure",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "insignificant",
+        "name": "Insignificant",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "nervous",
+        "name": "Nervous",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "overwhelmed",
+        "name": "Overwhelmed",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "persecuted",
+        "name": "Persecuted",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "rejected",
+        "name": "Rejected",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "scared",
+        "name": "Scared",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "weak",
+        "name": "Weak",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "worried",
+        "name": "Worried",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "worthless",
+        "name": "Worthless",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "fragile": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "free": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "frightened": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "frustrated": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "furious": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "good": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "grief": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "grounded": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "guilt": [
+      {
+        "id": "cold_shame",
+        "name": "Cold Shame",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hot_shame",
+        "name": "Hot Shame",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "guilty": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "happy": [
+      {
+        "id": "accepted",
+        "name": "Accepted",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "appreciative",
+        "name": "Appreciative",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "aroused",
+        "name": "Aroused",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "at_ease",
+        "name": "At Ease",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "balanced",
+        "name": "Balanced",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "calm",
+        "name": "Calm",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "cheeky",
+        "name": "Cheeky",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "chill",
+        "name": "Chill",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "comfortable",
+        "name": "Comfortable",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "confident",
+        "name": "Confident",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "content",
+        "name": "Content",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "courageous",
+        "name": "Courageous",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "cozy",
+        "name": "Cozy",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "creative",
+        "name": "Creative",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "curious",
+        "name": "Curious",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "free",
+        "name": "Free",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "good",
+        "name": "Good",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "grounded",
+        "name": "Grounded",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hopeful",
+        "name": "Hopeful",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "humble",
+        "name": "Humble",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "inquisitive",
+        "name": "Inquisitive",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "inspired",
+        "name": "Inspired",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "interested",
+        "name": "Interested",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "intimate",
+        "name": "Intimate",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "joyful",
+        "name": "Joyful",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "loving",
+        "name": "Loving",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "mellow",
+        "name": "Mellow",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "optimistic",
+        "name": "Optimistic",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "peaceful",
+        "name": "Peaceful",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "playful",
+        "name": "Playful",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "powerful",
+        "name": "Powerful",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "proud",
+        "name": "Proud",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "relaxed",
+        "name": "Relaxed",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "respected",
+        "name": "Respected",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "restful",
+        "name": "Restful",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "satisfied",
+        "name": "Satisfied",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "secure",
+        "name": "Secure",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "sensitive",
+        "name": "Sensitive",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "serene",
+        "name": "Serene",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "successful",
+        "name": "Successful",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "sympathetic",
+        "name": "Sympathetic",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "tender",
+        "name": "Tender",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "thankful",
+        "name": "Thankful",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "thoughtful",
+        "name": "Thoughtful",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "trusting",
+        "name": "Trusting",
+        "quadrant": "low-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "valued",
+        "name": "Valued",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "helpless": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "hesitant": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "hopeful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "horrified": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "hostile": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "hot_shame": [
+      {
+        "id": "anger",
+        "name": "Anger",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "anxiety",
+        "name": "Anxiety",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "cold_shame",
+        "name": "Cold Shame",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "fear",
+        "name": "Fear",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "guilt",
+        "name": "Guilt",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "humble": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "humiliated": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "hurt": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "inadequate": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "indifferent": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "indignant": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "inferior": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "infuriated": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "inquisitive": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "insecure": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "insignificant": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "inspired": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "interested": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "intimate": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "isolated": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "jealous": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "joy": [
+      {
+        "id": "excitement",
+        "name": "Excitement",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "joyful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "judgmental": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "let_down": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "lonely": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "loving": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "mad": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "mellow": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "nauseated": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "nervous": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "numb": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "optimistic": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "out_of_control": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "overwhelmed": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "peaceful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "perplexed": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "persecuted": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "playful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "powerful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "powerless": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "pressured": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "proud": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "provoked": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "rejected": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "relaxed": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "remorseful": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "repelled": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "resentful": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "respected": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "restful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "revolted": [
+      {
+        "id": "disgusted",
+        "name": "Disgusted",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "ridiculed": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "rushed": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "sad": [
+      {
+        "id": "abandoned",
+        "name": "Abandoned",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "ashamed",
+        "name": "Ashamed",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "depressed",
+        "name": "Depressed",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "despair",
+        "name": "Despair",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "empty",
+        "name": "Empty",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "fragile",
+        "name": "Fragile",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "grief",
+        "name": "Grief",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "guilty",
+        "name": "Guilty",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "hurt",
+        "name": "Hurt",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "isolated",
+        "name": "Isolated",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "lonely",
+        "name": "Lonely",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "powerless",
+        "name": "Powerless",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "remorseful",
+        "name": "Remorseful",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "victimized",
+        "name": "Victimized",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "vulnerable",
+        "name": "Vulnerable",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "satisfied": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "scared": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "secure": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "sensitive": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "serene": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "shocked": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "skeptical": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "sleepy": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "startled": [
+      {
+        "id": "surprised",
+        "name": "Surprised",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "stressed": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "successful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "surprised": [
+      {
+        "id": "amazed",
+        "name": "Amazed",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "astonished",
+        "name": "Astonished",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "awe",
+        "name": "Awe",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "confused",
+        "name": "Confused",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "disillusioned",
+        "name": "Disillusioned",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "dismayed",
+        "name": "Dismayed",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "eager",
+        "name": "Eager",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "energetic",
+        "name": "Energetic",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "excited",
+        "name": "Excited",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "perplexed",
+        "name": "Perplexed",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "shocked",
+        "name": "Shocked",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      },
+      {
+        "id": "startled",
+        "name": "Startled",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "sympathetic": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "tender": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "thankful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "thoughtful": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "threatened": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "tired": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "trusting": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "unfocused": [
+      {
+        "id": "bad",
+        "name": "Bad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "valued": [
+      {
+        "id": "happy",
+        "name": "Happy",
+        "quadrant": "high-pleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "victimized": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "violated": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "vulnerable": [
+      {
+        "id": "sad",
+        "name": "Sad",
+        "quadrant": "low-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "weak": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "withdrawn": [
+      {
+        "id": "angry",
+        "name": "Angry",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "worried": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ],
+    "worthless": [
+      {
+        "id": "fearful",
+        "name": "Fearful",
+        "quadrant": "high-unpleasant",
+        "reason": "related feeling"
+      }
+    ]
+  }
+}

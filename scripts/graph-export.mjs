@@ -5,6 +5,16 @@
  *
  *   node scripts/graph-export.mjs                 # → backups/graph-<YYYY-MM-DD>.json
  *   node scripts/graph-export.mjs --out file.json
+ *   node scripts/graph-export.mjs --no-profile    # everything except the profile layer
+ *   node scripts/graph-export.mjs --content-only  # the knowledge graph only: no User, no user data
+ *   add --pretty for indented JSON
+ *
+ * Scopes (`EXPORT_SCOPES`): `all` (the default, a restorable backup); `no-profile` leaves out
+ * `:ProfileItem` nodes (ProfileFact, MyPattern, OwnLine), the profile edges to graph content
+ * (`SAVED_LINE`, `PROFILE_EDGES` in functions/src/userdata/layers.ts) and every relationship that
+ * touches a ProfileItem; `content-only` leaves out `:User` and `:UserData` nodes and every
+ * relationship that touches one, so nothing in the file belongs to a person. The output file name
+ * carries the scope (graph-<scope>-<date>.json) unless --out is given.
  *
  * The file contains user data (Claudia's own, pre-launch): backups/ is gitignored; keep it local
  * and delete it after M1. Credentials come from env vars or the repo-root .env (as load-graph.mjs).
@@ -18,6 +28,33 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const require = createRequire(resolve(root, 'functions/package.json'));
+
+/** Mirrors PROFILE_EDGES in functions/src/userdata/layers.ts (tests/graph-dedupe.test.mjs pins it). */
+export const PROFILE_EDGES = ['SAVED_LINE'];
+
+/**
+ * What each scope leaves out, as Cypher predicates on a node `n` and on a relationship `r` from `a`
+ * to `b`. Relationships are filtered by their endpoints too, so every exported relationship's
+ * endpoints are exported nodes.
+ */
+export const EXPORT_SCOPES = {
+  all: { node: 'true', rel: 'true' },
+  'no-profile': {
+    node: 'NOT n:ProfileItem',
+    rel: 'NOT a:ProfileItem AND NOT b:ProfileItem AND NOT type(r) IN $profileEdges',
+  },
+  'content-only': {
+    node: 'NOT (n:User OR n:UserData)',
+    rel: 'NOT (a:User OR a:UserData OR b:User OR b:UserData)',
+  },
+};
+
+/** The scope named by the CLI flags (--no-profile, --content-only; at most one). */
+export function scopeFromArgs(args) {
+  const named = [['--no-profile', 'no-profile'], ['--content-only', 'content-only']].filter(([f]) => args.includes(f));
+  if (named.length > 1) throw new Error('Pick one of --no-profile or --content-only');
+  return named.length ? named[0][1] : 'all';
+}
 
 /** Neo4j driver values → plain JSON. */
 export function toJson(v, neo4j) {
@@ -44,8 +81,12 @@ export function missingEndpoints(nodes, relationships) {
 
 async function main() {
   const args = process.argv.slice(2);
+  const scope = scopeFromArgs(args);
+  const { node: nodeWhere, rel: relWhere } = EXPORT_SCOPES[scope];
+  const params = { profileEdges: PROFILE_EDGES };
+  const day = new Date().toISOString().slice(0, 10);
   const out = args.includes('--out') ? resolve(process.cwd(), args[args.indexOf('--out') + 1])
-    : resolve(root, 'backups', `graph-${new Date().toISOString().slice(0, 10)}.json`);
+    : resolve(root, 'backups', scope === 'all' ? `graph-${day}.json` : `graph-${scope}-${day}.json`);
   const envPath = resolve(root, '.env');
   if (existsSync(envPath)) {
     for (const line of readFileSync(envPath, 'utf8').split('\n')) {
@@ -61,11 +102,14 @@ async function main() {
   const session = driver.session({ defaultAccessMode: neo4j.session.READ });
   try {
     const NODE_COLS = 'elementId(n) AS elementId, labels(n) AS labels, properties(n) AS props';
-    const nodes = await session.executeRead((tx) => tx.run(`MATCH (n) RETURN ${NODE_COLS} ORDER BY elementId`));
+    const nodes = await session.executeRead((tx) => tx.run(
+      `MATCH (n) WHERE ${nodeWhere} RETURN ${NODE_COLS} ORDER BY elementId`, params));
     const rels = await session.executeRead((tx) => tx.run(
-      'MATCH (a)-[r]->(b) RETURN elementId(r) AS elementId, type(r) AS type, elementId(a) AS start, elementId(b) AS end, properties(r) AS props ORDER BY elementId'));
+      `MATCH (a)-[r]->(b) WHERE ${relWhere} RETURN elementId(r) AS elementId, type(r) AS type, elementId(a) AS start, elementId(b) AS end, properties(r) AS props ORDER BY elementId`,
+      params));
     const data = {
       exportedAt: new Date().toISOString(),
+      scope,
       nodes: nodes.records.map((r) => toJson(r.toObject(), neo4j)),
       relationships: rels.records.map((r) => toJson(r.toObject(), neo4j)),
     };
@@ -76,15 +120,17 @@ async function main() {
     const missing = missingEndpoints(data.nodes, data.relationships);
     if (missing.length) {
       const extra = await session.executeRead((tx) => tx.run(
-        `MATCH (n) WHERE elementId(n) IN $ids RETURN ${NODE_COLS}`, { ids: missing }));
+        `MATCH (n) WHERE elementId(n) IN $ids AND ${nodeWhere} RETURN ${NODE_COLS}`, { ...params, ids: missing }));
       data.nodes.push(...extra.records.map((r) => toJson(r.toObject(), neo4j)));
     }
     const still = missingEndpoints(data.nodes, data.relationships);
     if (still.length) throw new Error(`backup incomplete: ${still.length} relationship endpoint(s) missing; run it again`);
     mkdirSync(dirname(out), { recursive: true });
-    writeFileSync(out, JSON.stringify(data));
-    console.log(`Exported ${data.nodes.length} nodes and ${data.relationships.length} relationships to ${out}`);
-    console.log('Contains user data: keep it local (backups/ is gitignored) and delete it after M1.');
+    writeFileSync(out, args.includes('--pretty') ? JSON.stringify(data, null, 2) : JSON.stringify(data));
+    console.log(`Exported ${data.nodes.length} nodes and ${data.relationships.length} relationships (scope: ${scope}) to ${out}`);
+    console.log(scope === 'content-only'
+      ? 'No user data in this file.'
+      : 'Contains user data: keep it local (backups/ is gitignored).');
   } finally {
     await session.close();
     await driver.close();

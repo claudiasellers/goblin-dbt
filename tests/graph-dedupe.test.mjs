@@ -5,7 +5,8 @@ import { readFileSync, readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { LOAD_ORDER, splitStatements } from "../scripts/load-graph.mjs";
 import { SCHEMA_REL_TYPES, DUPLICATE_NODES_QUERY, DUPLICATE_RELS_QUERY } from "../scripts/lib/schemaDuplicates.mjs";
-import { toJson, missingEndpoints } from "../scripts/graph-export.mjs";
+import { toJson, missingEndpoints, PROFILE_EDGES, EXPORT_SCOPES, scopeFromArgs } from "../scripts/graph-export.mjs";
+import { importTs } from "./lib/importTs.mjs";
 
 const read = (f) => readFileSync(`schema/maintenance/${f}`, "utf8");
 const code = (s) => s.replace(/"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/g, '""');
@@ -69,4 +70,24 @@ test("the backup fetches relationship endpoints written between its two reads (C
   assert.deepEqual(missingEndpoints(nodes, [{ start: "a", end: "c" }, { start: "c", end: "d" }, { start: "b", end: "a" }]), ["c", "d"]);
   const src = readFileSync("scripts/graph-export.mjs", "utf8");
   assert.match(src, /missingEndpoints\(data\.nodes, data\.relationships\)[\s\S]*elementId\(n\) IN \$ids[\s\S]*backup incomplete/);
+});
+
+test("graph-export scopes: no-profile drops the profile layer, content-only drops every person's data", async () => {
+  const { PROFILE_EDGES: layerEdges, LAYER_LABEL } = await importTs("functions/src/userdata/layers.ts");
+  assert.deepEqual(PROFILE_EDGES, [...layerEdges], "PROFILE_EDGES mirrors layers.ts");
+  assert.equal(LAYER_LABEL.profile, "ProfileItem");
+  assert.deepEqual(EXPORT_SCOPES.all, { node: "true", rel: "true" });
+  assert.match(EXPORT_SCOPES["no-profile"].node, /NOT n:ProfileItem/);
+  for (const end of ["a", "b"]) assert.match(EXPORT_SCOPES["no-profile"].rel, new RegExp(`NOT ${end}:ProfileItem`));
+  assert.match(EXPORT_SCOPES["no-profile"].rel, /NOT type\(r\) IN \$profileEdges/);
+  for (const l of ["User", "UserData"]) {
+    assert.match(EXPORT_SCOPES["content-only"].node, new RegExp(`n:${l}\\b`));
+    for (const end of ["a", "b"]) assert.match(EXPORT_SCOPES["content-only"].rel, new RegExp(`${end}:${l}\\b`));
+  }
+  assert.equal(scopeFromArgs([]), "all");
+  assert.equal(scopeFromArgs(["--no-profile", "--pretty"]), "no-profile");
+  assert.equal(scopeFromArgs(["--content-only"]), "content-only");
+  assert.throws(() => scopeFromArgs(["--no-profile", "--content-only"]));
+  // the endpoint top-up keeps the scope, so it can't pull an excluded node back in
+  assert.match(readFileSync("scripts/graph-export.mjs", "utf8"), /elementId\(n\) IN \$ids AND \$\{nodeWhere\}/);
 });

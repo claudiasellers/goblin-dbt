@@ -1,0 +1,231 @@
+#!/usr/bin/env node
+/**
+ * Content snapshots: the read-only content three check-in screens used to fetch from the graph on
+ * every visit, written as files the app ships (src/data/content/). The graph stays the source; these
+ * are derived copies, regenerated after every graph load (scripts/content-snapshot/refresh.mjs), so
+ * nothing is hand-edited and nothing drifts.
+ *
+ *   node scripts/content-snapshot/build.mjs                       # newest backups/graph-content-only-*.json
+ *   node scripts/content-snapshot/build.mjs --from <export.json>
+ *
+ * Input: a `node scripts/graph-export.mjs --content-only` export. Anything else is refused: the
+ * files ship in the app bundle, where anyone can read them, so a single user-data node stops the
+ * build (exit 2) before anything is written.
+ *
+ * Output (each `{ source: { file, exportedAt }, content }`):
+ *   related-words.json     per Emotion id: the "Often alongside" candidates, the getRelatedEmotions
+ *                          query minus its opposite-emotion rows (OPPOSITE_OF is "the opposite", not
+ *                          "alongside": with them the row showed Abandoned / Apathetic / Ashamed for Restful)
+ *   body-map.json          getBodyMapContent for every live map (the app picks the maps for its words);
+ *                          places computed by the same functions/src/bodyMap/places.ts
+ *   find-the-feeling.json  getFindTheFeelingContent, exactly
+ * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
+ */
+import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
+import { resolve, dirname, basename, join } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { importTs } from '../../tests/lib/importTs.mjs';
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+export const OUT_DIR = resolve(root, 'src/data/content');
+export const BACKUPS_DIR = resolve(root, 'backups');
+/** Labels that mark a person's data (functions/src/userdata/layers.ts). None may reach the app. */
+export const USER_LABELS = ['User', 'UserData', 'LogRecord', 'ProfileItem', 'System'];
+
+const { placesFromFelt } = await importTs('functions/src/bodyMap/places.ts');
+
+/** A string constant from a source file, so a content / code version mismatch fails here, not in the app. */
+function constant(file, name) {
+  const m = readFileSync(resolve(root, file), 'utf8').match(new RegExp(`${name}\\s*=\\s*'([^']+)'`));
+  if (!m) throw new Error(`Cannot find ${name} in ${file}`);
+  return m[1];
+}
+export const BODY_MAP_VERSION = constant('functions/src/bodyMap/index.ts', 'BODY_MAP_VERSION');
+export const FIND_FLOW_VERSION = constant('functions/src/findTheFeeling/index.ts', 'FIND_FLOW_VERSION');
+
+/** Refuses anything but a content-only export with no user data and no dangling relationships. */
+export function assertContentOnly(exp) {
+  if (exp?.scope !== 'content-only') {
+    throw new Error(`Expected a --content-only export, got scope "${exp?.scope}". Run: node scripts/graph-export.mjs --content-only`);
+  }
+  const personal = exp.nodes.filter((n) => n.labels.some((l) => USER_LABELS.includes(l)));
+  if (personal.length) throw new Error(`Export contains ${personal.length} user-data node(s); refusing to build app files from it`);
+  const ids = new Set(exp.nodes.map((n) => n.elementId));
+  const dangling = exp.relationships.filter((r) => !ids.has(r.start) || !ids.has(r.end));
+  if (dangling.length) throw new Error(`Export has ${dangling.length} relationship(s) to nodes it doesn't contain`);
+}
+
+function indexGraph(exp) {
+  const byEl = new Map(exp.nodes.map((n) => [n.elementId, n]));
+  const has = (n, label) => n.labels.includes(label);
+  return {
+    nodes: (label) => exp.nodes.filter((n) => has(n, label)),
+    /** Relationships of a type, with endpoints resolved and optionally checked by label. */
+    rels: (type, fromLabel, toLabel) => exp.relationships
+      .filter((r) => r.type === type)
+      .map((r) => ({ props: r.props ?? {}, a: byEl.get(r.start), b: byEl.get(r.end) }))
+      .filter((r) => (!fromLabel || has(r.a, fromLabel)) && (!toLabel || has(r.b, toLabel))),
+  };
+}
+
+/** Cypher ORDER BY for numbers / strings ascending: nulls last. */
+const asc = (x, y) => (x == null ? (y == null ? 0 : 1) : y == null ? -1 : x < y ? -1 : x > y ? 1 : 0);
+const pushTo = (map, k, v) => { if (!map.has(k)) map.set(k, []); map.get(k).push(v); };
+
+/** getRelatedEmotions (functions/src/recommendation/index.ts) without the OPPOSITE_OF rows. */
+export function buildRelatedWords(g) {
+  const related = new Map();
+  for (const r of g.rels('RELATED_TO', 'Emotion', 'Emotion')) { pushTo(related, r.a, r.b); pushTo(related, r.b, r.a); }
+  const brainOf = new Map();
+  const emotionsOfBrain = new Map();
+  for (const r of g.rels('ACTIVATES_DURING', 'BrainStructure', 'Emotion')) { pushTo(brainOf, r.b, r.a); pushTo(emotionsOfBrain, r.a, r.b); }
+  const patternsOf = new Map();
+  for (const r of g.rels('ASSOCIATED_WITH', 'ActivationPattern', 'Emotion')) pushTo(patternsOf, r.b, r.a);
+
+  const out = {};
+  for (const e1 of g.nodes('Emotion').sort((a, b) => asc(a.props.id, b.props.id))) {
+    const rows = [];
+    const row = (e, reason, score) => rows.push({ id: e.props.id, name: e.props.name ?? null, quadrant: e.props.quadrant ?? null, reason, score });
+    for (const rel of new Set(related.get(e1) ?? [])) if (rel.props.id !== e1.props.id) row(rel, 'related feeling', 4);
+    // Neural-substrate overlap: emotions sharing a brain structure, and how many activation patterns too.
+    const shared = new Map();
+    for (const bs of new Set(brainOf.get(e1) ?? [])) {
+      for (const e2 of new Set(emotionsOfBrain.get(bs) ?? [])) {
+        if (e2.props.id !== e1.props.id) shared.set(e2, (shared.get(e2) ?? 0) + 1);
+      }
+    }
+    const p1 = new Set(patternsOf.get(e1) ?? []);
+    for (const [e2, sharedCount] of shared) {
+      const overlap = (patternsOf.get(e2) ?? []).filter((p) => p1.has(p)).length;
+      if (overlap > 0 && sharedCount > 1) row(e2, 'often occurs together', 3);
+      else if (sharedCount > 1) row(e2, 'similar body response', 2);
+      else row(e2, 'related feeling', 1);
+    }
+    // As the query: one row per (id, name, reason) at its best score, best first, then by name.
+    const best = new Map();
+    for (const r of rows) {
+      const k = `${r.id}\u0000${r.name}\u0000${r.reason}`;
+      if (!best.has(k) || best.get(k).score < r.score) best.set(k, r);
+    }
+    const list = [...best.values()].sort((a, b) => b.score - a.score || asc(a.name, b.name));
+    if (list.length) out[e1.props.id] = list.map(({ score: _score, ...r }) => r);
+  }
+  return out;
+}
+
+/** getBodyMapContent (functions/src/bodyMap/index.ts) for every live map. */
+export function buildBodyMap(g) {
+  const head = g.nodes('BodyMapContent').find((n) => n.props.id === 'body_map');
+  if (!head || head.props.version !== BODY_MAP_VERSION) {
+    throw new Error(`Body map content is ${head ? head.props.version : 'missing'}; the app expects ${BODY_MAP_VERSION}`);
+  }
+  const padWords = g.nodes('SensationType')
+    .filter((s) => s.props.padStatus === 'live')
+    .sort((a, b) => asc(a.props.padRank, b.props.padRank))
+    .map((s) => ({ id: s.props.id, label: s.props.padLabel, zones: s.props.zones ?? [], regions: s.props.regions ?? [], energy: s.props.energy }));
+
+  const mirrors = g.rels('MIRRORS', 'BodyMap', 'Emotion');
+  const groups = g.rels('GROUPS', 'BodyMap', 'Emotion');
+  const felt = g.rels('FELT_AS', 'Emotion', 'SensationType').filter((r) => r.props.status === 'live' && r.b.props.padStatus === 'live');
+  const maps = g.nodes('BodyMap')
+    .filter((m) => m.props.status === 'live')
+    .sort((a, b) => asc(a.props.rank, b.props.rank) || asc(a.props.id, b.props.id))
+    .map((m) => {
+      const wordIds = mirrors.filter((r) => r.a === m).sort((x, y) => asc(x.props.rank, y.props.rank)).map((r) => r.b.props.id);
+      const emotions = new Set(groups.filter((r) => r.a === m).map((r) => r.b));
+      const rows = felt.filter((r) => emotions.has(r.a)).map((r) => ({
+        emotionId: r.a.props.id, region: r.props.region ?? null, sensationId: r.b.props.id,
+        label: r.b.props.padLabel ?? null, energy: r.b.props.energy ?? null,
+        weight: typeof r.props.weight === 'number' ? r.props.weight : null,
+      }));
+      return { id: m.props.id, label: m.props.label, wordIds, places: placesFromFelt(rows) };
+    });
+  return { version: BODY_MAP_VERSION, regions: head.props.regions ?? [], padWords, maps };
+}
+
+/** getFindTheFeelingContent (functions/src/findTheFeeling/index.ts), with the same checks. */
+export function buildFindTheFeeling(g) {
+  const node = g.nodes('FindTheFeelingFlow').find((n) => n.props.id === 'find_the_feeling_flow');
+  if (!node || node.props.version !== FIND_FLOW_VERSION) {
+    throw new Error(`Find the feeling content is ${node ? node.props.version : 'missing'}; the app expects ${FIND_FLOW_VERSION}`);
+  }
+  const flow = JSON.parse(node.props.contentJson);
+  const gates = flow?.gates;
+  if (flow?.version !== FIND_FLOW_VERSION || !gates || !Array.isArray(gates.regulateBands) || !Array.isArray(gates.activateUrges)
+    || typeof gates.maxWordsOffered !== 'number' || !Array.isArray(gates.floodedBlankRoutes) || !flow.copy) {
+    throw new Error('Invalid find-the-feeling flow content');
+  }
+  const emotionsOfSignature = new Map();
+  for (const r of g.rels('HAS_FEELING_SIGNATURE', 'Emotion', 'FeelingSignature')) pushTo(emotionsOfSignature, r.b, r.a);
+  const toolsFor = new Map();
+  for (const r of g.rels('ADDRESSES', 'TherapyConcept', 'Emotion')) if (r.a.props.appToolId != null) pushTo(toolsFor, r.b, r.a.props.appToolId);
+
+  const byFamily = new Map();
+  for (const inc of g.rels('INCLUDES', 'FeelingFamily', 'FeelingSignature')) {
+    for (const e of emotionsOfSignature.get(inc.b) ?? []) {
+      pushTo(byFamily, inc.a, {
+        emotionId: e.props.id, name: e.props.name ?? e.props.id, shape: inc.b.props.shape, sound: inc.b.props.sound,
+        offer: inc.props.offer, addressedBy: [...new Set(toolsFor.get(e) ?? [])].sort(asc),
+      });
+    }
+  }
+  const families = [...byFamily.entries()]
+    .sort(([a], [b]) => asc(a.props.order, b.props.order))
+    .map(([fam, words]) => ({
+      id: fam.props.id, label: fam.props.label, order: fam.props.order,
+      words: words.sort((x, y) => asc(x.offer, y.offer)),
+    }));
+  const routes = g.rels('ROUTES_TO', 'FeelingUrge', 'TherapyConcept').filter((r) => r.b.props.appToolId != null);
+  const urges = g.nodes('FeelingUrge')
+    .sort((a, b) => asc(a.props.order, b.props.order))
+    .map((u) => ({
+      id: u.props.id, label: u.props.label, sub: u.props.sub ?? null, order: u.props.order,
+      routes: routes.filter((r) => r.a === u).sort((x, y) => asc(x.props.rank, y.props.rank)).map((r) => r.b.props.appToolId),
+    }));
+  if (!families.length || urges.length !== 4) throw new Error('Find the feeling content is incomplete');
+  return { version: FIND_FLOW_VERSION, flow, families, urges, floodedBlankRoutes: gates.floodedBlankRoutes };
+}
+
+/** All three snapshots from one export (pure apart from reading the version constants). */
+export function buildSnapshots(exp) {
+  assertContentOnly(exp);
+  const g = indexGraph(exp);
+  return {
+    'related-words.json': buildRelatedWords(g),
+    'body-map.json': buildBodyMap(g),
+    'find-the-feeling.json': buildFindTheFeeling(g),
+  };
+}
+
+/** The newest content-only export in backups/. */
+export function newestExport(dir = BACKUPS_DIR) {
+  const files = readdirSync(dir)
+    .filter((f) => /^graph-content-only-.*\.json$/.test(f))
+    .map((f) => join(dir, f))
+    .sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs);
+  if (!files.length) throw new Error(`No graph-content-only-*.json in ${dir}. Run: node scripts/graph-export.mjs --content-only`);
+  return files[0];
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  const from = args.includes('--from') ? resolve(args[args.indexOf('--from') + 1]) : newestExport();
+  const exp = JSON.parse(readFileSync(from, 'utf8'));
+  let snapshots;
+  try {
+    snapshots = buildSnapshots(exp);
+  } catch (e) {
+    console.error(`✗ ${e.message}\n  Nothing written.`);
+    process.exit(2);
+  }
+  mkdirSync(OUT_DIR, { recursive: true });
+  const source = { file: basename(from), exportedAt: exp.exportedAt };
+  for (const [name, content] of Object.entries(snapshots)) {
+    const text = `${JSON.stringify({ source, content }, null, 2)}\n`;
+    writeFileSync(join(OUT_DIR, name), text);
+    console.log(`✓ src/data/content/${name.padEnd(22)} ${(text.length / 1024).toFixed(1)} KB`);
+  }
+  console.log(`  from ${source.file} (exported ${source.exportedAt})`);
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main();

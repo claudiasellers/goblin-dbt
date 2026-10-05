@@ -29,16 +29,16 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; triggers `onUserCreated` / `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
 | `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
 | `insights/` | `getInsightsData` |
-| `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` |
+| `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` (still deployed; the app reads `src/data/content/related-words.json` instead) |
 | `oppositeAction/` | `getOppositeActionContent`, `saveOppositeActionSession`, `getOppositeActionSessions`, `getOppositeActionSession`, `getOppositeActionFollowUps` |
 | `dearMan/` | `getDearManContent`, `saveDearManSession`, `getDearManDebriefContent`, `getDearManReflection`, `getDearManSessions` |
 | `problemSolve/` | `getProblemSolveContent` |
 | `invalidationRecovery/` | `getInvalidationRecoveryContent`, `saveInvalidationRecoverySession`, `getInvalidationRecoveryProgress` |
-| `findTheFeeling/` | `getFindTheFeelingContent`, `saveFindTheFeelingSession`, `getFeelingCollection` |
+| `findTheFeeling/` | `getFindTheFeelingContent` (still deployed; the app reads `src/data/content/find-the-feeling.json`), `saveFindTheFeelingSession`, `getFeelingCollection` |
 | `spine/` | `startToolSession`, `closeToolSession`, `recordToolSession`, `answerToolOutcome`, `scheduleFollowUp`, `resolveFollowUp`, `snoozeFollowUp`, `getToday`, `getSpineContent` (public); `todayOrder.ts` (derived due/stale/upcoming + ordering), `tools.ts` (every tool's module + close kind; mirrored in `src/lib/spine/close.ts`), `extSchemas.ts` (namespaced `ToolSession.ext`, R18), `validation.ts` |
 | `profile/` | `getProfileContext` (the single profile read path: only the slices `PROFILE_NEEDS` declares per tool, in code), `getMe`, `upsertProfileFact`, `confirmProfileItem`, `setAsideProfileItem`, `restoreProfileItem`, `answerPatternOffer` (the only writer of `MyPattern`); `slices.ts` resolvers never read a `:LogRecord` (test-enforced) |
 | `capacity/` | `getCapacityContent` (public); `types.ts` (band, canonical then-vs-now R3, mirrored in `src/data/capacityTypes.ts`), `reading.ts` (`validateCapacityReading`, `readingProps`) |
-| `bodyMap/` | `getBodyMapContent` (public): signed-off sensation words, and the body-mirror maps the sent grid words `MIRRORS`, in their order, each with places computed from the `FELT_AS` rows of the emotions it `GROUPS` (`places.ts`, pure; `docs/design/body-map.md`); `suggestEmotionsFromBody` (public): body-first suggestions, the marked places scored against the signed-off maps (`suggest.ts`, pure); `types.ts` mirrored in `src/data/bodyMapTypes.ts` |
+| `bodyMap/` | `getBodyMapContent` (public): signed-off sensation words, and the body-mirror maps the sent grid words `MIRRORS`, in their order, each with places computed from the `FELT_AS` rows of the emotions it `GROUPS` (`places.ts`, pure; `docs/design/body-map.md`); `suggestEmotionsFromBody` (public): body-first suggestions, the marked places scored against the signed-off maps (`suggest.ts`, pure); `types.ts` mirrored in `src/data/bodyMapTypes.ts`. Both still deployed; the app reads `src/data/content/body-map.json` and scores with the same `suggest.ts` |
 | `witness/` | `getWitnessLines` (public; signed in it also reads own / kept lines via `readProfileSlices(tx, uid, 'witness')` and the `SHOWED_LINE` history), `recordWitnessBeat` (host must be the caller's, found by key; `SHOWED_LINE` follows the host's lifecycle guard; `OwnLine` / `SAVED_LINE` are profile writes); `rank.ts` (pure ranking, fade stage, when to ask "did that land?"), `types.ts` (mirrored in `src/data/witnessTypes.ts`), `validation.ts` (own-line text is length-checked only, never linted) |
 
 `userdata/` (no callables) holds the data-layer registry, ownership helpers, lifecycle guards and generic export/delete (see Data layers).
@@ -104,7 +104,17 @@ This includes:
 - Problem-solve actions (per-emotion)
 - Any other emotion-level clinical content
 
-**Frontend data files must NOT duplicate graph content.** If a component needs emotion knowledge, it calls a Cloud Function. No exceptions. Duplicate sources of truth will drift, cause bugs, and make content updates (like humanizing clinical language) fail silently.
+**Frontend data files must NOT duplicate graph content.** If a component needs emotion knowledge, it calls a Cloud Function. The one exception is generated files (below): never a hand-written copy. Duplicate sources of truth will drift, cause bugs, and make content updates (like humanizing clinical language) fail silently.
+
+### Generated content files (`src/data/content/`): graph content the app ships
+
+Read-only content that is the same for everyone can ship with the app as a file **generated from the graph**, so the screen never waits on a Cloud Function (a cold one took 2.8 s for "Often alongside"). Today: related words, body map (content + body-first suggestions), Find the feeling content. The graph stays the source; the files are derived copies, never edited by hand.
+
+- `scripts/content-snapshot/build.mjs` turns a `graph-export.mjs --content-only` export into the files, mirroring the Cypher of the function each replaces. It refuses any other export: a single `User` / `UserData` / `LogRecord` / `ProfileItem` / `System` node stops it (the files are public once deployed).
+- `scripts/load-graph.mjs` refreshes them after every successful load against Aura (`scripts/content-snapshot/refresh.mjs`: export, then build); never from a local graph, and not with `--dry-run` / `--no-content-refresh`. By hand: `npm run content:refresh`. Commit `src/data/content/` with the content change.
+- The app reads them in `src/services/neo4j.ts` (`getRelatedEmotions`, `getFindTheFeelingContent`) and `src/services/bodyMap.ts`, each file its own lazily loaded chunk. Body-first scoring is the functions' own `scoreBodyMaps` (imported, not copied).
+- `tests/content-snapshot.test.mjs` pins the guard, that related words never include `OPPOSITE_OF` rows, and that the shipped body map / Find the feeling content equals the `content.py` fixtures (a failure there: content.py changed without a graph load).
+- Not for: user data, anything per person, the recommendation engine and crisis flag (one versioned decision on the server, with a live kill switch), or anything that must change without a hosting deploy.
 
 ---
 
@@ -194,7 +204,8 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
 | `src/data/tools.ts` | Tool display metadata (names, emojis, categories) |
 | `src/data/microSteps.ts` | Activation-pattern-keyed micro-interventions |
-| `src/services/neo4j.ts` | Cloud Function call wrappers |
+| `src/services/neo4j.ts` | Cloud Function call wrappers (related words and Find the feeling content read `src/data/content/` instead) |
+| `scripts/content-snapshot/`, `src/data/content/` | Generated content files the app ships (see Generated content files): `build.mjs`, `refresh.mjs` (run by `load-graph.mjs`), `npm run content:refresh` |
 | `src/services/firebase.ts` | Firebase init, auth functions |
 | `src/contexts/AuthContext.tsx` | Firebase auth state provider |
 | `src/contexts/UserProfileContext.tsx` | App settings (theme, palette, reminders, retention, displayName) with a localStorage cache for the theme paint. Settings only: profile-layer data never goes here |
@@ -235,7 +246,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 Claudia runs every deploy and graph load herself, on her Mac (`~/Documents/goblin-dbt`); sessions have
 no `.env` or bolt access. Every PR description ends with a **Deploy** section, and when she says a PR is
 merged, reply with the exact commands in order, even when the answer is "nothing to run":
-`git pull`, then any graph loads (`node scripts/load-graph.mjs --only <file>`, constraints first), then
+`git pull`, then any graph loads (`node scripts/load-graph.mjs --only <file>`, constraints first; each load refreshes `src/data/content/`, so commit any change it makes there and deploy hosting), then
 `firebase deploy --only functions` (before hosting whenever the server must accept something new), then
 any one-off migration (`--file schema/migrations/…`) the PR says runs after functions, then
 `firebase deploy --only hosting`. Say which steps are not needed, and why it matters if the order slips.
