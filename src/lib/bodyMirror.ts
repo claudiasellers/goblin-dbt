@@ -111,8 +111,9 @@ export function listWords(words: string[]): string {
   return `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
 }
 
-/** The words the mirror's entry names: the first word of each tab, at most two; more is "your feelings". */
+/** The words the mirror's entry names: the check-in's words with a map (however the maps group
+ *  them), one or two of them; more is "your feelings" (null). */
 export function entryWords(tabs: MirrorTab[]): string[] | null {
-  const firsts = tabs.map((t) => t.words[0]).filter(Boolean);
-  return firsts.length === 0 || firsts.length > 2 ? null : firsts;
+  const words = [...new Set(tabs.flatMap((t) => t.words))].filter(Boolean);
+  return words.length === 0 || words.length > 2 ? null : words;
 }

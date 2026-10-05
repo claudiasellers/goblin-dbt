@@ -79,11 +79,14 @@ test("ghostsFor skips places the figure doesn't have and repeats of a place", ()
   assert.equal(mirror.ghostsFor({ ...map, places: Array.from({ length: 9 }, (_, i) => ({ ...map.places[0], region: fig.REGION_IDS[i] })) }).length, mirror.MAX_GHOSTS);
 });
 
-test("the entry names one or two feelings, else 'your feelings'", () => {
-  const t = (w) => ({ words: [w] });
+test("the entry names the check-in's one or two words (not one per map), else 'your feelings'", async () => {
+  const t = (...words) => ({ words });
   assert.deepEqual(mirror.entryWords([t("anxious")]), ["anxious"]);
   assert.deepEqual(mirror.entryWords([t("anxious"), t("excited")]), ["anxious", "excited"]);
+  assert.deepEqual(mirror.entryWords([t("anxious", "overwhelmed")]), ["anxious", "overwhelmed"], "two words, one map");
+  assert.equal(mirror.entryWords([t("anxious", "overwhelmed"), t("excited")]), null, "three words, two maps");
   assert.equal(mirror.entryWords([t("a"), t("b"), t("c")]), null);
+  assert.deepEqual(mirror.entryWords(await tabsFor(["anxious", "overwhelmed"])), ["anxious", "overwhelmed"]);
   assert.equal(mirror.listWords(["a", "b", "c"]), "a, b and c");
 });
 
@@ -92,5 +95,6 @@ test("the body step hands the mirror the check-in's words, never on the body-fir
   assert.match(checkIn, /emotionIds=\{entryPoint === 'somatic' \? \[\] : emotionIdsFor\(/);
   const step = readFileSync("src/components/checkin/body/BodyStep.tsx", "utf8");
   assert.match(step, /fromMirror: true/);
+  assert.doesNotMatch(step, /tab\.ghosts\.filter\(\(g\) => !marked\.has\(g\.region\)\)/, "Add all also fills places you've marked with other words");
   assert.doesNotMatch(step, /colour: zoneColour\(tab\.zone\)[^\n]*strength/, "a mark never takes a tab's colour");
 });

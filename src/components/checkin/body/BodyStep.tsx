@@ -156,17 +156,28 @@ export function BodyStep({ marks, onChange, onComplete, onSkip, isSomaticEntry =
     setEditing(ghost.region);
   }
 
-  /** "Add all of these": every typical place in the tab that isn't yours yet, as the map has it. */
+  /** "Add all of these": every typical place in the tab, as the map has it. A place you've already
+   *  marked keeps your side, strength and words and gains the map's word (the same places the panel
+   *  shows as still open). */
   function addAll(tab: MirrorTab) {
     const label = new Map((words ?? []).map((w) => [w.id, w.label]));
-    const added: BodyMark[] = tab.ghosts.filter((g) => !marked.has(g.region)).map((g) => {
-      const fill = prefillFrom(g, barOn);
-      return {
-        ...centre(g.region, fill.side), region: g.region, side: fill.side, intensity: NO_INTENSITY,
-        tags: [label.get(g.sensationId) ?? g.label], sensationIds: fill.sensationIds, strength: fill.strength, fromMirror: true,
-      };
-    });
-    if (added.length) onChange([...marks, ...added]);
+    const next = [...marks];
+    for (const g of tab.ghosts) {
+      const word = label.get(g.sensationId) ?? g.label;
+      const at = next.findIndex((m) => m.region === g.region);
+      if (at >= 0) {
+        const m = next[at];
+        if (m.sensationIds.includes(g.sensationId)) continue;
+        next[at] = { ...m, sensationIds: [...m.sensationIds, g.sensationId], tags: [...m.tags, word], fromMirror: true };
+      } else {
+        const fill = prefillFrom(g, barOn);
+        next.push({
+          ...centre(g.region, fill.side), region: g.region, side: fill.side, intensity: NO_INTENSITY,
+          tags: [word], sensationIds: fill.sensationIds, strength: fill.strength, fromMirror: true,
+        });
+      }
+    }
+    if (next.length !== marks.length || next.some((m, i) => m !== marks[i])) onChange(next);
   }
 
   function close() {
@@ -285,7 +296,7 @@ export function BodyStep({ marks, onChange, onComplete, onSkip, isSomaticEntry =
               onClose={() => setView(null)} />
           ) : tabs.length > 0 && (
             <button type="button" className="body-mirror__entry" onClick={() => setView(0)}>
-              + Not sure? See where <MirrorEntryWords tabs={tabs} /> often {tabs.length === 1 && tabs[0].words.length === 1 ? 'shows' : 'show'} up
+              + Not sure? See where <MirrorEntryWords tabs={tabs} /> often {entryWords(tabs)?.length === 1 ? 'shows' : 'show'} up
             </button>
           )}
           <div className="action-dock">
