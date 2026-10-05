@@ -70,7 +70,7 @@ export function TodayButton() {
               <span aria-hidden="true">✕</span>
             </button>
           </div>
-          <TodayStack />
+          {open && <TodayStack />}
         </div>
       </dialog>
     </>

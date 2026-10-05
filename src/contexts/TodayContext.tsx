@@ -30,6 +30,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   const [dropped, setDropped] = useState<Set<string>>(new Set());
   const [reloadKey, setReloadKey] = useState(0);
   const [hidden, setHidden] = useState(false);
+  const [oaHidden, setOaHidden] = useState<ReadonlySet<string>>(new Set());
   const lastFetch = useRef(0);
 
   useEffect(() => {
@@ -38,12 +39,14 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     lastFetch.current = Date.now();
     getToday(bandValue)
       .then((res) => { if (live) { setData({ uid, res }); setDropped(new Set()); } })
-      .catch(() => { if (live) setData({ uid, res: { items: [], more: [], holding: false, nextInTab: null } }); });
+      // A failed fetch (offline) keeps the items already shown; only a first fetch falls back to empty.
+      .catch(() => { if (live) setData((prev) => (prev && prev.uid === uid ? prev : { uid, res: { items: [], more: [], holding: false, nextInTab: null } })); });
     return () => { live = false; };
   }, [uid, reloadKey, bandValue]);
 
   const refresh = useCallback(() => setReloadKey((k) => k + 1), []);
   const drop = useCallback((id: string) => setDropped((prev) => new Set(prev).add(id)), []);
+  const hideOa = useCallback((ids: string[]) => setOaHidden((prev) => new Set([...prev, ...ids])), []);
 
   useEffect(() => {
     if (!uid) return;
@@ -88,7 +91,9 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     drop,
     hidden,
     setHidden,
-  }), [current, dropped, refresh, drop, hidden]);
+    oaHidden,
+    hideOa,
+  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa]);
 
   return <TodayContext.Provider value={value}>{children}</TodayContext.Provider>;
 }

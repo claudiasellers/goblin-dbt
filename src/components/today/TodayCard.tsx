@@ -11,13 +11,23 @@ import { fillToolName, LATER_HOURS, outcomeAnswer } from '../../lib/spine/todayC
  */
 export function TodayCard({ item, onDone, compact = false }: { item: TodayItem; onDone: (id: string) => void; compact?: boolean }) {
   const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
   const toolName = item.source?.toolId ? getToolById(item.source.toolId)?.name : null;
   const title = fillToolName(item.copy.title, toolName);
   const body = item.copy.body ? fillToolName(item.copy.body, toolName) : null;
 
+  // Only a saved answer removes the card. A failed write (offline, a cold function) keeps it here,
+  // answerable, with a quiet note: dropping it would lose it until a later fetch.
   const run = async (fn: () => Promise<unknown>) => {
     setBusy(true);
-    try { await fn(); } catch { /* the card comes back on the next fetch */ }
+    setFailed(false);
+    try {
+      await fn();
+    } catch {
+      setBusy(false);
+      setFailed(true);
+      return;
+    }
     onDone(item.id);
   };
 
@@ -63,6 +73,9 @@ export function TodayCard({ item, onDone, compact = false }: { item: TodayItem; 
             </button>
           ))}
         </div>
+      )}
+      {failed && (
+        <p role="status" className="mt-2 text-xs text-[var(--color-text-secondary)]">That didn't save. Try again when you're ready.</p>
       )}
       <div className="mt-1 flex justify-end gap-4">
         {item.kind === 'follow_up' && (

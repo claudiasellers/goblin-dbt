@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect } from 'react';
 import type { TodayItem } from '../services/spine';
+import type { PendingFollowUp } from './useOppositeActionFollowUps';
 
 export interface TodayValue {
   items: TodayItem[];
@@ -15,9 +16,12 @@ export interface TodayValue {
   /** A screen asked for Today to stay out of sight (a check-in in progress: D-09). */
   hidden: boolean;
   setHidden: (hidden: boolean) => void;
+  /** OA plan ids hidden with the OA card's "Hide for now" (this visit only; a new plan shows again). */
+  oaHidden: ReadonlySet<string>;
+  hideOa: (ids: string[]) => void;
 }
 
-const EMPTY: TodayValue = { items: [], more: [], holding: false, ready: false, refresh: () => {}, drop: () => {}, hidden: false, setHidden: () => {} };
+const EMPTY: TodayValue = { items: [], more: [], holding: false, ready: false, refresh: () => {}, drop: () => {}, hidden: false, setHidden: () => {}, oaHidden: new Set(), hideOa: () => {} };
 
 export const TodayContext = createContext<TodayValue | null>(null);
 
@@ -29,6 +33,11 @@ export function useToday(): TodayValue {
 /** The cards the stack draws itself (OA plans render through OA's own card instead). */
 export function todayCards(t: Pick<TodayValue, 'items' | 'more'>): TodayItem[] {
   return [...t.items, ...t.more].filter((i) => i.type !== 'oa_plan');
+}
+
+/** The OA plans the stack shows: all of them, unless every one was hidden with "Hide for now". */
+export function visibleOaPending(pending: PendingFollowUp[], oaHidden: ReadonlySet<string>): PendingFollowUp[] {
+  return pending.some((p) => !oaHidden.has(p.session.id)) ? pending : [];
 }
 
 /**

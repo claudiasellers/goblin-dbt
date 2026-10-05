@@ -1,4 +1,4 @@
-import { todayCards, useToday } from './useToday';
+import { todayCards, useToday, visibleOaPending } from './useToday';
 import { useOppositeActionFollowUpsContext } from './useOppositeActionFollowUps';
 
 /**
@@ -8,5 +8,5 @@ import { useOppositeActionFollowUpsContext } from './useOppositeActionFollowUps'
 export function useTodayCount(): number {
   const today = useToday();
   const oa = useOppositeActionFollowUpsContext();
-  return todayCards(today).length + (oa.ready ? oa.pending.length : 0);
+  return todayCards(today).length + (oa.ready ? visibleOaPending(oa.pending, today.oaHidden).length : 0);
 }

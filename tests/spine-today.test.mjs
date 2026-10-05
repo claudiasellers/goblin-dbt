@@ -99,6 +99,12 @@ test("Today lives off the check-in screen: side panel (lg+) and the header's Tod
   for (const f of ["src/components/today/TodayPanel.tsx", "src/components/today/TodayButton.tsx"]) {
     assert.match(readFileSync(f, "utf8"), /today\.hidden/, `${f} respects useHideToday`);
   }
+  // OA's "Hide for now" goes through Today, so the badge and both stacks drop it together (Codex, #45).
+  const oaCard = readFileSync("src/components/tools/oppositeAction/OppositeActionFollowUpCard.tsx", "utf8");
+  assert.doesNotMatch(oaCard, /setDismissed/);
+  assert.match(oaCard, /<DismissButton onClick=\{onDismiss\} \/>/);
+  assert.match(readFileSync("src/hooks/useTodayCount.ts", "utf8"), /visibleOaPending\(oa\.pending, today\.oaHidden\)/);
+  assert.match(readFileSync("src/components/today/TodayStack.tsx", "utf8"), /onDismiss=\{\(\) => today\.hideOa\(/);
   // "Did it help?" is answered for exactly the session it shows (F6), through the one card.
   const tc = readFileSync("src/components/today/TodayCard.tsx", "utf8");
   assert.match(tc, /answerToolOutcome\(item\.source!\.toolSessionId!, answer\)/);

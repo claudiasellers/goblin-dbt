@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { todayCards, useToday } from '../../hooks/useToday';
+import { todayCards, useToday, visibleOaPending } from '../../hooks/useToday';
 import { useOppositeActionFollowUpsContext } from '../../hooks/useOppositeActionFollowUps';
 import { OppositeActionFollowUpCard } from '../tools/oppositeAction/OppositeActionFollowUpCard';
 import { TodayCard } from './TodayCard';
@@ -44,7 +44,8 @@ export function TodayStack({ renderItem, compact = false, className = '' }: {
     return null;
   };
 
-  const showOa = oa.ready && oa.pending.length > 0;
+  const oaPending = oa.ready ? visibleOaPending(oa.pending, today.oaHidden) : [];
+  const showOa = oaPending.length > 0;
   const cards = todayCards(today);
   if (!showOa && cards.length === 0) return null;
 
@@ -65,7 +66,10 @@ export function TodayStack({ renderItem, compact = false, className = '' }: {
   const rest = cards.slice(room);
   return (
     <div className={`space-y-3 ${className}`} aria-label="Today">
-      {showOa && <OppositeActionFollowUpCard pending={oa.pending} copy={oa.copy} />}
+      {showOa && (
+        <OppositeActionFollowUpCard pending={oaPending} copy={oa.copy}
+          onDismiss={() => today.hideOa(oaPending.map((p) => p.session.id))} />
+      )}
       {visible.map(draw)}
       {rest.length > 0 && (
         <>
