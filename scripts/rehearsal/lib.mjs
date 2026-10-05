@@ -72,9 +72,24 @@ export function isPositiveStateStub(c) {
  * high-unpleasant to the low-unpleasant quadrant, which E4-5 does on purpose. With `positiveStateStub`
  * (M1, before the M2 cleanup): the stub pattern above.
  */
-export function unexpectedRoutingChanges(changes, { numbMove = true, positiveStateStub = false } = {}) {
+/**
+ * Oct 2026 (spiraling answer): "Shaking or crying, can't stop" also counts towards acute_alarm, so the
+ * discriminating evidence gains exactly one acute_alarm edge and nothing else moves.
+ */
+export function isSpiralingEvidenceChange(c) {
+  if (c.what !== 'discriminatingEvidence') return false;
+  const count = (list) => Object.fromEntries((list || []).map((x) => [x.pattern, x.edges]));
+  const b = count(c.before);
+  const a = count(c.after);
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  const delta = [...keys].map((k) => [k, (a[k] ?? 0) - (b[k] ?? 0)]).filter(([, d]) => d);
+  return delta.length === 1 && delta[0][0] === 'acute_alarm' && delta[0][1] === 1;
+}
+
+export function unexpectedRoutingChanges(changes, { numbMove = true, positiveStateStub = false, spiraling = true } = {}) {
   return changes.filter((c) => {
     if (positiveStateStub && isPositiveStateStub(c)) return false;
+    if (spiraling && isSpiralingEvidenceChange(c)) return false;
     if (!numbMove) return true;
     // Winner keys are `<quadrant>:<word>`, so the move shows as numb leaving high-unpleasant (acute_alarm → null)
     // and arriving in low-unpleasant (null → conservation_freeze).

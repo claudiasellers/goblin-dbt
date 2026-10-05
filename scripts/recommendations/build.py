@@ -5,7 +5,7 @@ Usage (repo root; write to a temp file first so a failed build never empties the
   python3 scripts/recommendations/fixture.py
 Then run: node --test tests/recommendation-content.test.mjs
 """
-import json, os, sys
+import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import content as C  # noqa: E402
 import vocabulary as V  # noqa: E402
@@ -46,7 +46,13 @@ def check(rows):
         assert r["tool"] not in C.NO_ROWS, f"{r['id']}: {C.NO_ROWS.get(r['tool'])}"
         assert set(r["bands"]) <= set(C.BANDS) and r["bands"], r["id"]
         assert r["direction"] in DIRECTIONS, r["id"]
-        assert r["emotionGate"] in (None, "addresses", "none_named"), r["id"]
+        assert r["emotionGate"] in (None, "addresses", "none_named", "words"), r["id"]
+        if r["emotionGate"] == "words":
+            assert r["words"], f"{r['id']}: a words gate names its words"
+            off = [w for w in r["words"] if V.SIGNALS.get(w, (None,))[0] != r["pattern"]]
+            assert not off, f"{r['id']}: {off} don't signal {r['pattern']}, so the rule could only fire beside another word"
+        else:
+            assert not r["words"], f"{r['id']}: words only go with a words gate"
         assert r["requiresPrior"] in (None, "up_regulation"), r["id"]
         assert r["side"] in (None, *SIDES), r["id"]
         if C.BLANK_PATTERNS.get(r["pattern"]):
@@ -57,6 +63,22 @@ def check(rows):
         drafts = [r["id"] for r in rows if r["active"] and r["reviewStatus"] != "approved"]
         assert not drafts, f"RoutingPolicy can't be enabled while active rows are drafts: {drafts[:5]}…"
         assert "checkin_result" in C.SIGNED_OFF, "sign the policy off too (SIGNED_OFF['checkin_result'])"
+
+
+def grid_words():
+    """src/data/emotions.ts → {id: quadrant}."""
+    src = open(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), "src/data/emotions.ts"), encoding="utf8").read()
+    return {m[0]: m[1] for m in re.findall(r"makeEmotion\('([a-z_]+)', '[^']+', '([a-z-]+)'", src)}
+
+
+def check_signals():
+    grid = grid_words()
+    unpleasant = {w for w, q in grid.items() if q in V.SIDE_PATTERNS}
+    assert set(V.SIGNALS) == unpleasant, f"every unpleasant grid word has one reviewed pattern: {sorted(unpleasant ^ set(V.SIGNALS))}"
+    for w, (p, why) in V.SIGNALS.items():
+        assert p in V.SIDE_PATTERNS[grid[w]], f"{w} ({grid[w]}) can't signal {p}: the square's side decides"
+        assert p != "emotional_flooding", f"{w}: no word signals Flooded (the crisis banner)"
+        assert why and why.strip(), f"{w}: rationale"
 
 
 def check_vocabulary():
@@ -75,6 +97,7 @@ def main():
     rows = C.rows()
     check(rows)
     check_vocabulary()
+    check_signals()
     L = []
     A = L.append
     A(f"""// ============================================================
@@ -114,19 +137,26 @@ def main():
         by_pattern.setdefault(r["pattern"], []).append(r)
     for pattern, rs in by_pattern.items():
         items = [{"id": r["id"], "c": concept[r["tool"]], "p": r["pattern"], "bands": r["bands"], "prio": r["priority"],
-                  "dir": r["direction"], "req": r["requiresPrior"], "side": r["side"], "gate": r["emotionGate"],
+                  "dir": r["direction"], "req": r["requiresPrior"], "side": r["side"], "gate": r["emotionGate"], "words": r["words"],
                   "active": r["active"], "review": r["reviewStatus"], "why": r["why"]} for r in rs]
         A(f"// {pattern}")
         A("UNWIND [\n  " + ",\n  ".join(lit(i) for i in items) + "\n] AS row\n"
           "MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})\n"
           "MERGE (tc)-[r:RECOMMENDED_FOR {id: row.id}]->(p)\n"
           "SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.requiresPrior = row.req,\n"
-          f"    r.side = row.side, r.emotionGate = row.gate, r.tier = \"quality_of_life\", r.surface = [\"checkin_result\"],\n"
+          f"    r.side = row.side, r.emotionGate = row.gate, r.words = row.words, r.tier = \"quality_of_life\", r.surface = [\"checkin_result\"],\n"
           f"    r.active = row.active, r.version = {q(C.VERSION)}, r.reviewStatus = row.review, r.rationale = row.why;")
+
+    A("\n// --- 4b. Contraindications (CONTRAINDICATED_FOR: the primary or the co-occurring pattern) ---")
+    contra = [{"c": C.CONCEPT_TAGS[t]["concept"], "p": p} for t, ps in C.CONTRAINDICATIONS.items() for p in ps]
+    A(f"UNWIND {lit(contra)} AS row\nMATCH (tc:TherapyConcept {{id: row.c}}), (p:ActivationPattern {{id: row.p}})\n"
+      "MERGE (tc)-[r:CONTRAINDICATED_FOR]->(p)\nSET r.source = \"recommended-for\";")
 
     A("\n// --- 5. Prune rows removed from content.py (idempotent) ---")
     A("MATCH (:TherapyConcept)-[r:RECOMMENDED_FOR]->(:ActivationPattern)\n"
       f"WHERE r.version = {q(C.VERSION)} AND NOT r.id IN {lit([r['id'] for r in rows])}\nDELETE r;")
+    for old in C.RETIRED_VERSIONS:
+        A(f"MATCH (:TherapyConcept)-[r:RECOMMENDED_FOR]->(:ActivationPattern)\nWHERE r.version = {q(old)}\nDELETE r;")
     A(f"\n// --- 6. Grid vocabulary → pattern vocabulary (SCORES_AS aliases, {V.VERSION}; E4-6) ---")
     A("// Held (no alias yet; vocabulary.py HELD): " + ", ".join(sorted(V.HELD)))
     al = V.aliases()
@@ -139,6 +169,16 @@ def main():
           f"SET r.id = row.id, r.version = {q(V.VERSION)}, r.reviewStatus = row.review, r.rationale = row.why;")
     A("MATCH (:Emotion)-[r:SCORES_AS]->(:Emotion)\n"
       f"WHERE r.version = {q(V.VERSION)} AND NOT r.id IN {lit([i['id'] for i in items])}\nDELETE r;")
+    A(f"\n// --- 7. Reviewed pattern per grid word (SIGNALS, {V.VERSION}; Oct 2026 review) ---")
+    A("// While the policy is on, a word with a reviewed pattern matches only that pattern (a strong edge).")
+    sig = [{"id": f"{w}>{p}", "w": w, "p": p, "review": r, "why": why} for w, p, why, r in V.signals()]
+    for k in range(0, len(sig), 40):
+        A("UNWIND [\n  " + ",\n  ".join(lit(i) for i in sig[k:k + 40]) + "\n] AS row\n"
+          "MATCH (w:Emotion {id: row.w}), (p:ActivationPattern {id: row.p})\n"
+          "MERGE (w)-[r:SIGNALS]->(p)\n"
+          f"SET r.id = row.id, r.version = {q(V.VERSION)}, r.reviewStatus = row.review, r.rationale = row.why;")
+    A("MATCH (:Emotion)-[r:SIGNALS]->(:ActivationPattern)\n"
+      f"WHERE NOT r.id IN {lit([i['id'] for i in sig])}\nDELETE r;")
     print("\n".join(L))
 
 

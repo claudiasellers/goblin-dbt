@@ -47,21 +47,25 @@ test("every one of the 85 unpleasant grid words has 1–2 aliases into the live 
   assert.ok(Object.values(graph.aliases).every((ts) => !ts.includes("anger")), "anger is a held target (it only ever adds crisis-flagged flooding)");
 });
 
-test("with the policy on, every unpleasant grid word but the held ones reaches ≥ 1 of its quadrant's patterns (was 0 of 85 live)", async () => {
+test("Oct 2026 review: every unpleasant grid word has one reviewed pattern on its own side (SIGNALS); with the policy on it lands there, and no one word raises the crisis banner", async () => {
+  const side = { "high-unpleasant": ["acute_alarm", "chronic_vigilance", "social_threat_shame", "reactive_aggression"], "low-unpleasant": ["conservation_freeze", "dissociation_overmodulation", "rumination_loop", "reward_drive_low"] };
+  assert.equal(Object.keys(graph.signals).length, 85);
   for (const g of unpleasant) {
+    const [p, ...more] = graph.signals[g.sent] || [];
+    assert.ok(p && more.length === 0, `${g.name}: exactly one reviewed pattern`);
+    assert.ok(side[g.quadrant].includes(p), `${g.name} → ${p}: the square's side decides`);
+    assert.match(cypher, new RegExp(`\\{id: "${g.sent}>${p}", w: "${g.sent}", p: "${p}", review: "(?:draft|approved)", why: "[^"]+"\\}`));
     const r = await run({ quadrant: g.quadrant, emotions: [g.name] }, on);
-    if (held.includes(g.sent)) {
-      assert.equal(r.pattern.id, "acute_alarm", `${g.name}: held → today's result`);
-      assert.equal(r.pattern.confidence, 0.25, g.name);
-      assert.equal(r.safetyFlag, undefined, `${g.name}: no crisis banner from one anger word`);
-    } else {
-      assert.ok(r.pattern.confidence > 0.25, `${g.name}: still at the base score`);
-    }
+    assert.equal(r.pattern.id, p, g.name);
+    assert.ok(r.pattern.confidence > 0.25, g.name);
+    assert.equal(r.safetyFlag, undefined, `${g.name}: no crisis banner from one word`);
   }
+  assert.ok(Object.values(graph.signals).flat().every((p) => p !== "emotional_flooding"), "no word signals Flooded");
   const s = routingSummary(graph, { grid }).gridViaAliases;
-  assert.equal(s.namesReachingACandidate, 78);
-  assert.deepEqual(s.namesNotReaching, ["Aggressive", "Angry", "Furious", "Hostile", "Infuriated", "Mad", "Provoked"]);
+  assert.equal(s.namesReachingACandidate, 85);
+  assert.deepEqual(s.namesNotReaching, []);
   assert.equal(s.aliasEdges, 94);
+  assert.equal(s.signalEdges, 85);
 });
 
 test("the kill switch covers reachability: policy off routes every grid word exactly as live did (no aliases, high-unpleasant answers ignored)", async () => {
@@ -82,34 +86,41 @@ test("the kill switch covers reachability: policy off routes every grid word exa
   assert.equal(lowAnswered.pattern.id, "rumination_loop", "low-unpleasant answers count as they do live");
 });
 
-test("with the policy on, all four high-unpleasant patterns (and all four low-unpleasant ones) are reachable; flooding through what the user endorses", async () => {
+test("with the policy on, all four high-unpleasant patterns plus Ready to fight (and all four low-unpleasant ones) are reachable; flooding only through spiraling", async () => {
   const won = { "high-unpleasant": new Set(), "low-unpleasant": new Set() };
   for (const g of unpleasant) won[g.quadrant].add((await run({ quadrant: g.quadrant, emotions: [g.name] }, on)).pattern.id);
-  assert.deepEqual([...won["high-unpleasant"]].sort(), ["acute_alarm", "chronic_vigilance", "social_threat_shame"], "no single word reaches the crisis-flagged pattern");
-  assert.deepEqual([...won["low-unpleasant"]].sort(), ["conservation_freeze", "dissociation_overmodulation", "reward_drive_low", "rumination_loop"]);
+  assert.deepEqual([...won["high-unpleasant"]].sort(), ["acute_alarm", "chronic_vigilance", "reactive_aggression", "social_threat_shame"], "no single word reaches the crisis-flagged pattern");
+  assert.deepEqual([...won["low-unpleasant"]].sort(), ["conservation_freeze", "reward_drive_low", "rumination_loop"]);
+  const diss = await run({ quadrant: "low-unpleasant", discriminatingAnswers: [{ questionId: "lu_mind_quality", responseId: "lu_mind_faraway" }] }, on);
+  assert.equal(diss.pattern.id, "dissociation_overmodulation", "Disconnected comes from the answers");
   // An answer that isn't about flooding never tips a word into it ("I don't know what triggered it").
   for (const g of unpleasant.filter((x) => x.quadrant === "high-unpleasant")) {
     const r = await run({ quadrant: g.quadrant, emotions: [g.name], discriminatingAnswers: [{ questionId: "hu_experience_quality", responseId: "hu_exp_unsure" }] }, on);
     assert.notEqual(r.pattern.id, "emotional_flooding", g.name);
   }
-  const flooded = await run({ quadrant: "high-unpleasant", emotions: ["Furious"], discriminatingAnswers: [{ questionId: "hu_experience_quality", responseId: "hu_exp_flooding" }] }, on);
-  assert.equal(flooded.pattern.id, "emotional_flooding");
-  const bodyOverwhelmed = await run({ quadrant: "high-unpleasant", emotions: ["Overwhelmed"], discriminatingAnswers: [{ questionId: "hu_body_activation", responseId: "hu_body_overwhelmed" }] }, on);
-  assert.equal(bodyOverwhelmed.pattern.id, "emotional_flooding");
+  const spiraling = { questionId: "hu_experience_quality", responseId: "hu_exp_flooding" };
+  const shaking = { questionId: "hu_body_activation", responseId: "hu_body_overwhelmed" };
+  assert.equal(graph.evidence.find((e) => e.responseId === "hu_exp_flooding" && e.patternId === "emotional_flooding").weight, 0.85);
+  for (const words of [[], ["Furious"], ["Overwhelmed"]]) {
+    const r = await run({ quadrant: "high-unpleasant", emotions: words, discriminatingAnswers: [spiraling] }, on);
+    assert.equal(r.pattern.id, "emotional_flooding", `spiraling + ${words}`);
+    assert.equal(r.safetyFlag.type, "crisis");
+  }
+  for (const words of [[], ["Overwhelmed"], ["Anxious"]]) {
+    const r = await run({ quadrant: "high-unpleasant", emotions: words, discriminatingAnswers: [shaking] }, on);
+    assert.notEqual(r.pattern.id, "emotional_flooding", `"Shaking or crying, can't stop" alone + ${words}: not Flooded`);
+  }
+  const both = await run({ quadrant: "high-unpleasant", discriminatingAnswers: [spiraling, shaking] }, on);
+  assert.equal(both.pattern.id, "emotional_flooding");
 });
 
 test("golden distribution of one-word check-ins (update deliberately when vocabulary.py changes)", () => {
   const s = routingSummary(graph, { grid }).gridViaAliases;
   assert.deepEqual(s.winnerDistribution, {
-    "high-unpleasant → acute_alarm": 19, "high-unpleasant → chronic_vigilance": 7,
-    "high-unpleasant → social_threat_shame": 22, "low-unpleasant → conservation_freeze": 15, "low-unpleasant → dissociation_overmodulation": 3,
-    "low-unpleasant → reward_drive_low": 13, "low-unpleasant → rumination_loop": 6,
+    "high-unpleasant → acute_alarm": 14, "high-unpleasant → chronic_vigilance": 9, "high-unpleasant → reactive_aggression": 10,
+    "high-unpleasant → social_threat_shame": 15, "low-unpleasant → conservation_freeze": 4,
+    "low-unpleasant → reward_drive_low": 14, "low-unpleasant → rumination_loop": 19,
   });
-  // CO_OCCURS_WITH now matters (runner-ups pass 0.35): sadness words score rumination first, and the
-  // graph's ruminative-collapse edge makes freeze primary; disappointment words tie rumination /
-  // reward and the edge makes reward primary.
-  assert.equal(s.winners["low-unpleasant:sad"], "conservation_freeze");
-  assert.equal(s.winners["low-unpleasant:disappointed"], "reward_drive_low");
   const floodingWords = Object.entries(s.winners).filter(([, p]) => p === "emotional_flooding").map(([k]) => k.split(":")[1]).sort();
   assert.deepEqual(floodingWords, [], "no one-word check-in lands on flooding (and its crisis banner)");
 });
@@ -133,32 +144,37 @@ test("a later live report with the aliases compares against this fixture word by
   assert.deepEqual(changes.map((c) => c.what), ["gridViaAliases.winner high-unpleasant:angry"]);
   const src = read("scripts/verify-live-routing.mjs");
   assert.match(src, /MATCH \(w:Emotion\)-\[:SCORES_AS\]->\(a:Emotion\)/);
-  assert.match(src, /gridViaAliases\(grid, assoc, report\.aliases, coOccurs\)/);
+  assert.match(src, /gridViaAliases\(grid, assoc, report\.aliases, coOccurs, report\.signals\)/);
+  assert.match(src, /MATCH \(w:Emotion\)-\[:SIGNALS\]->\(p:ActivationPattern\)/);
 });
 
-test("the scoring query reads the aliases only while the policy is on; a word counts once per pattern", () => {
-  assert.match(EMOTION_EVIDENCE_QUERY, /OPTIONAL MATCH \(:Emotion \{id: sent\}\)-\[:SCORES_AS\]->\(alias:Emotion\)\s+WHERE \$useAliases/);
-  assert.match(EMOTION_EVIDENCE_QUERY, /RETURN p\.id AS patternId, sent AS emotionId, r\.strength AS strength/);
+test("the scoring query reads reviewed patterns and aliases only while the policy is on; a reviewed pattern replaces the aliases; a word counts once per pattern", () => {
+  assert.match(EMOTION_EVIDENCE_QUERY, /OPTIONAL MATCH \(:Emotion \{id: sent\}\)-\[:SIGNALS\]->\(sp:ActivationPattern\)\s+WHERE \$useAliases/);
+  assert.match(EMOTION_EVIDENCE_QUERY, /OPTIONAL MATCH \(:Emotion \{id: sent\}\)-\[:SCORES_AS\]->\(alias:Emotion\)\s+WHERE \$useAliases AND size\(signalled\) = 0/);
+  assert.match(EMOTION_EVIDENCE_QUERY, /THEN \[x IN signalled WHERE x IN \$candidatePatterns \| \{p: x, s: 'strong'\}\]/);
+  assert.match(EMOTION_EVIDENCE_QUERY, /RETURN hit\.p AS patternId, sent AS emotionId, hit\.s AS strength/);
 });
 
-test("goldens after reachability: grid words move the pattern; flooding shows the banner with cards below (never a dead end)", async () => {
+test("goldens after reachability: grid words move the pattern; anger has its own pattern; flooding shows the banner with cards below (never a dead end)", async () => {
   const angry = await run({ quadrant: "high-unpleasant", emotions: ["Furious"] }, on);
-  assert.equal(angry.pattern.id, "acute_alarm", "held: one anger word keeps today's pattern");
+  assert.equal(angry.pattern.id, "reactive_aggression", "Ready to fight: no crisis flag");
   assert.equal(angry.safetyFlag, undefined);
-  assert.deepEqual(angry.tools.map((t) => t.id), ["five-senses", "cool-down"]);
+  assert.deepEqual(angry.tools.map((t) => t.id), ["pause", "cool-down"]);
   const flooding = await run({ quadrant: "high-unpleasant", emotions: ["Furious"], discriminatingAnswers: [{ questionId: "hu_experience_quality", responseId: "hu_exp_flooding" }] }, on);
   assert.equal(flooding.pattern.id, "emotional_flooding");
   assert.equal(flooding.safetyFlag.type, "crisis");
   assert.deepEqual(flooding.tools.map((t) => t.id), ["cool-down", "five-senses"]);
   const stressed = await run({ quadrant: "high-unpleasant", emotions: ["Stressed"], band: "steady" }, on);
-  assert.equal(stressed.pattern.id, "chronic_vigilance");
-  assert.deepEqual(stressed.tools.map((t) => t.id), ["five-senses", "problem-solve"]);
+  assert.equal(stressed.pattern.id, "acute_alarm");
+  assert.deepEqual(stressed.tools.map((t) => t.id), ["problem-solve", "cool-down"]);
   const rejected = await run({ quadrant: "high-unpleasant", emotions: ["Rejected"], band: "stirred" }, on);
   assert.equal(rejected.pattern.id, "social_threat_shame");
-  assert.deepEqual(rejected.tools.map((t) => t.id), ["recovering-from-invalidation", "pause"]);
+  assert.deepEqual(rejected.tools.map((t) => t.id), ["recovering-from-invalidation", "opposite-action"]);
   const legacyStressed = await run({ quadrant: "high-unpleasant", emotions: ["Stressed"] });
-  assert.equal(legacyStressed.pattern.id, "acute_alarm", "pattern selection's E4-6 reach is behind the policy flag");
+  assert.equal(legacyStressed.pattern.id, "acute_alarm", "pattern selection's reach is behind the policy flag");
   assert.deepEqual(legacyStressed.tools.map((t) => t.id), ["cool-down", "opposite-action"], "legacy ranker, as live today");
+  const legacyAngry = await run({ quadrant: "high-unpleasant", emotions: ["Furious"] });
+  assert.equal(legacyAngry.pattern.id, "acute_alarm", "Ready to fight is a candidate only while the policy is on");
   // Discriminating answers still dominate a word (evidence weighs ×2).
   const answered = await run({ quadrant: "high-unpleasant", emotions: ["Rejected"], discriminatingAnswers: [{ questionId: "hu_experience_quality", responseId: "hu_exp_vigilance" }] }, on);
   assert.equal(answered.pattern.id, "chronic_vigilance");

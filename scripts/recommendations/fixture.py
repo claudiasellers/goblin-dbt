@@ -18,13 +18,13 @@ OUT = os.path.join(ROOT, 'tests/fixtures/recommendation-graph.json')
 # Statements the interpreter skipped must not touch anything routing reads.
 ROUTING_TOKENS = re.compile(
     r'\[\w*:(ASSOCIATED_WITH|ADDRESSES|REDUCES|TARGETS|EVIDENCE_FOR|CO_OCCURS_WITH|TRIGGERS_SAFETY|HAS_RESPONSE|'
-    r'RECOMMENDED_FOR|SCORES_AS|CONTRAINDICATED_FOR)\b|\.appToolId\b|\.(side|skillKind|direction|blank)\s*=|'
+    r'RECOMMENDED_FOR|SCORES_AS|SIGNALS|CONTRAINDICATED_FOR)\b|\.appToolId\b|\.(side|skillKind|direction|blank)\s*=|'
     r':(ActivationPattern|SafetyFlag|DiscriminatingQuestion|QuestionResponse|RoutingPolicy)\b')
 TOOL_EDGES = ('ADDRESSES', 'REDUCES', 'TARGETS')
 PATTERN_FIELDS = ('userFacingLabel', 'description', 'evidenceGrade', 'safetyConstraints', 'clinicalNotes')
 CONCEPT_FIELDS = ('appToolId', 'name', 'description', 'whenToUse', 'dbtBasis', 'side', 'skillKind', 'direction')
 CO_FIELDS = ('clinicalLabel', 'combinedUserFacingLabel', 'primaryPatternId', 'frequency', 'sequencingNote')
-RF_FIELDS = ('bands', 'priority', 'direction', 'side', 'requiresPrior', 'emotionGate', 'tier', 'surface', 'active',
+RF_FIELDS = ('bands', 'priority', 'direction', 'side', 'requiresPrior', 'emotionGate', 'words', 'tier', 'surface', 'active',
              'version', 'reviewStatus', 'rationale')
 
 
@@ -77,6 +77,10 @@ def build(g):
     for r in sorted(g.rels('SCORES_AS', 'Emotion', 'Emotion'), key=lambda r: (pid(r.start), pid(r.end))):
         aliases.setdefault(pid(r.start), []).append(pid(r.end))
 
+    signals = {}
+    for r in sorted(g.rels('SIGNALS', 'Emotion', 'ActivationPattern'), key=lambda r: (pid(r.start), pid(r.end))):
+        signals.setdefault(pid(r.start), []).append(pid(r.end))
+
     rows = sorted((dict({'id': r.props.get('id'), 'conceptId': pid(r.start), 'patternId': pid(r.end)},
                         **{k: r.props.get(k) for k in RF_FIELDS})
                    for r in g.rels('RECOMMENDED_FOR', 'TherapyConcept', 'ActivationPattern')),
@@ -99,6 +103,7 @@ def build(g):
         'safety': safety,
         'emotions': emotions,
         'aliases': aliases,
+        'signals': signals,
         'recommendedFor': rows,
         'contraindicated': [{'conceptId': a, 'targetId': b} for a, b in contra],
         'routingPolicy': policy,

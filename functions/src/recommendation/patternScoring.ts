@@ -13,8 +13,16 @@ export const QUADRANT_CANDIDATES: Readonly<Record<string, readonly string[]>> = 
   'low-pleasant': [],
 };
 
-export function candidatesFor(quadrant: string): string[] {
-  return [...(QUADRANT_CANDIDATES[quadrant] ?? [])];
+/**
+ * Patterns that are candidates only while RoutingPolicy is on (Oct 2026 review): Ready to fight is
+ * where the plain anger words go, and it has no crisis flag. Off, the kill switch keeps today's four.
+ */
+export const ROUTED_CANDIDATES: Readonly<Record<string, readonly string[]>> = {
+  'high-unpleasant': ['reactive_aggression'],
+};
+
+export function candidatesFor(quadrant: string, routed = false): string[] {
+  return [...(QUADRANT_CANDIDATES[quadrant] ?? []), ...(routed ? ROUTED_CANDIDATES[quadrant] ?? [] : [])];
 }
 
 /** How the check-in's words become graph ids: display name lower-cased, whitespace runs → `_`. */

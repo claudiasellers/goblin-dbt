@@ -75,7 +75,6 @@ export interface SpineContent {
 const startFn = httpsCallable<StartToolSessionRequest, { id: string; toolUsageId: string }>(functions, 'startToolSession');
 const closeFn = httpsCallable<CloseToolSessionRequest, CloseToolSessionResponse>(functions, 'closeToolSession');
 const recordFn = httpsCallable<RecordToolSessionRequest, CloseToolSessionResponse & { toolUsageId: string }>(functions, 'recordToolSession');
-const contentFn = httpsCallable<void, SpineContent>(functions, 'getSpineContent', { timeout: 20_000 });
 
 export async function startToolSession(req: StartToolSessionRequest): Promise<{ id: string; toolUsageId: string }> {
   return (await startFn(req)).data;
@@ -90,10 +89,15 @@ export async function recordToolSession(req: RecordToolSessionRequest): Promise<
 }
 
 let spineContent: Promise<SpineContent> | null = null;
-/** Close copy + follow-up types, cached per page load (a failed load can be retried). */
+/**
+ * Close copy + follow-up types, read from the file the app ships (src/data/content/spine.json,
+ * generated from the graph by scripts/content-snapshot/build.mjs) instead of the getSpineContent Cloud
+ * Function. Fetched as its own chunk the first time it is needed, kept for the page's life; a failed
+ * fetch can be retried. The server still checks follow-up types itself (getToday, scheduleFollowUp).
+ */
 export function getSpineContent(): Promise<SpineContent> {
   if (!spineContent) {
-    spineContent = contentFn().then((r) => r.data).catch((e) => {
+    spineContent = import('../data/content/spine.json').then((m) => m.default.content as unknown as SpineContent).catch((e) => {
       spineContent = null;
       throw e;
     });

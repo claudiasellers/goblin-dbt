@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-10-05.json",
-    "exportedAt": "2026-10-05T04:16:06.437Z"
+    "exportedAt": "2026-10-05T07:40:26.314Z"
   },
   "content": {
     "high-unpleasant": [
@@ -36,8 +36,8 @@
           },
           {
             "id": "hu_exp_flooding",
-            "label": "Everything hitting at once",
-            "subtext": "I can't sort it out — too many feelings, can't think straight.",
+            "label": "I'm spiraling and can't stop it",
+            "subtext": "It keeps building and I can't slow it down.",
             "order": 4,
             "isEscapeHatch": false
           },
@@ -74,7 +74,7 @@
           },
           {
             "id": "hu_body_overwhelmed",
-            "label": "Shaking, crying, or overwhelmed",
+            "label": "Shaking or crying, can't stop",
             "subtext": "My body is doing things I can't control right now.",
             "order": 3,
             "isEscapeHatch": false

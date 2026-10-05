@@ -137,7 +137,13 @@ export interface RoutingRow {
   direction: Direction | null;
   side: Side | null;
   requiresPrior: string | null;
-  emotionGate: 'addresses' | 'none_named' | null;
+  /**
+   * `addresses`: a user word is in the concept's ADDRESSES set; `none_named`: no words;
+   * `words`: one of the user's words (as sent) is in `words` (a reviewed per-word rule, Oct 2026).
+   */
+  emotionGate: 'addresses' | 'none_named' | 'words' | null;
+  /** The words a `words` gate fires on (grid ids as sent); empty otherwise. */
+  words: string[];
   active: boolean;
 }
 

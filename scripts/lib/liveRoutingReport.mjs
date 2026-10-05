@@ -17,6 +17,13 @@ export const CANDIDATES = {
   'low-unpleasant': ['conservation_freeze', 'dissociation_overmodulation', 'rumination_loop', 'reward_drive_low'],
 };
 
+/** Candidates only while RoutingPolicy is on (patternScoring.ts ROUTED_CANDIDATES): Ready to fight. */
+export const ROUTED_CANDIDATES = {
+  'high-unpleasant': ['reactive_aggression'],
+  'low-unpleasant': [],
+};
+const routedCands = (q) => [...CANDIDATES[q], ...(ROUTED_CANDIDATES[q] || [])];
+
 /** Grid vocabulary exactly as the check-in sends it: display name, lower-cased, spaces → underscores. */
 export function parseGrid(emotionsTsSource) {
   return [...emotionsTsSource.matchAll(/makeEmotion\(\s*'([^']+)'\s*,\s*'([^']+)'\s*,\s*'([^']+)'/g)]
@@ -31,8 +38,7 @@ export function parseGrid(emotionsTsSource) {
  * leader and a CO_OCCURS_WITH edge joins them, the edge's primaryPatternId wins (as in
  * functions/src/recommendation/patternScoring.ts). Without aliases no runner-up passes 0.35.
  */
-export function singleEmotionWinner(quadrant, hits, coOccurs = []) {
-  const cands = CANDIDATES[quadrant];
+export function singleEmotionWinner(quadrant, hits, coOccurs = [], cands = CANDIDATES[quadrant]) {
   const scores = Object.fromEntries(cands.map((c) => [c, 0.25]));
   const byP = {};
   for (const h of hits.filter((x) => cands.includes(x.p))) (byP[h.p] ??= []).push(h.s);
@@ -54,19 +60,24 @@ export function singleEmotionWinner(quadrant, hits, coOccurs = []) {
  * singleEmotionWinner. A word reaches a pattern when the word or one of its targets is one of the
  * pattern's emotions (once per pattern).
  */
-export function gridViaAliases(grid, pairs, aliases, coOccurs = []) {
+export function gridViaAliases(grid, pairs, aliases, coOccurs = [], signals = {}) {
   const byEmotion = {};
   for (const a of pairs) (byEmotion[a.e] ??= []).push(a);
   const unpleasant = grid.filter((g) => CANDIDATES[g.quadrant]);
   const per = unpleasant.map((g) => {
+    const cands = routedCands(g.quadrant);
+    // Oct 2026: a word with a reviewed pattern (SIGNALS) matches only that pattern, as a strong edge.
+    const signalled = signals[g.sent] || [];
     const targets = [g.sent, ...(aliases[g.sent] || [])];
-    const hits = targets.flatMap((t) => byEmotion[t] || []).filter((h) => CANDIDATES[g.quadrant].includes(h.p));
-    return { ...g, targets: aliases[g.sent] || [], hits, winner: singleEmotionWinner(g.quadrant, hits, coOccurs) };
+    const hits = (signalled.length ? signalled.map((p) => ({ p, e: g.sent, s: 'strong' })) : targets.flatMap((t) => byEmotion[t] || []))
+      .filter((h) => cands.includes(h.p));
+    return { ...g, targets: aliases[g.sent] || [], hits, winner: singleEmotionWinner(g.quadrant, hits, coOccurs, cands) };
   });
   const won = {};
   for (const x of per) (won[x.quadrant] ??= new Set()).add(x.winner);
   return {
     aliasEdges: Object.values(aliases).reduce((n, t) => n + t.length, 0),
+    signalEdges: Object.values(signals).reduce((n, t) => n + t.length, 0),
     namesWithAlias: per.filter((x) => x.targets.length).length,
     namesReachingACandidate: per.filter((x) => x.hits.length).length,
     namesNotReaching: per.filter((x) => !x.hits.length).map((x) => x.name).sort(),
@@ -121,7 +132,7 @@ function summaryFromGraph(graph, grid) {
       winnerDistribution: perEmotion.reduce((m, x) => ((m[`${x.quadrant} → ${x.winner}`] = (m[`${x.quadrant} → ${x.winner}`] || 0) + 1), m), {}),
       winners: Object.fromEntries(perEmotion.map((e) => [`${e.quadrant}:${e.sent}`, e.winner]).sort(([a], [b]) => a.localeCompare(b))),
     },
-    gridViaAliases: gridViaAliases(grid, pairs, graph.aliases || {}, graph.coOccurrence || []),
+    gridViaAliases: gridViaAliases(grid, pairs, graph.aliases || {}, graph.coOccurrence || [], graph.signals || {}),
     toolsByPattern: Object.fromEntries(patterns.map((p) => [p, legacyToolsFromGraph(graph, p)])),
     safetyTriggers: safety.sort(byPatternType),
     discriminatingEvidence: Object.keys(evidence).sort().map((pattern) => ({ pattern, edges: evidence[pattern] })),

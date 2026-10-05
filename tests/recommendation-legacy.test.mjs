@@ -1,6 +1,7 @@
 // E4-1: today's check-in routing, pinned. The pure engine (functions/src/recommendation/*) runs over
 // a fixture replayed from schema/*.cypher, and that fixture is checked against the live graph's
 // committed summary (tests/fixtures/live-routing-2026-09-30.json, verified 2026-09-30).
+import { isSpiralingEvidenceChange } from "../scripts/rehearsal/lib.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -30,7 +31,7 @@ const expectedWinner = (key) => (key in MOVED ? MOVED[key][1] : live.grid.winner
 
 test("the schema-derived fixture routes exactly like the live graph did on 2026-09-30 (bar the deliberate moves)", () => {
   const { changes, warnings } = diffRouting(live, graph, { grid });
-  const unexpected = changes.filter((c) => !(c.what === "grid.winnerDistribution" || c.what.replace("grid.winner ", "") in MOVED));
+  const unexpected = changes.filter((c) => !(c.what === "grid.winnerDistribution" || c.what.replace("grid.winner ", "") in MOVED || isSpiralingEvidenceChange(c)));
   assert.deepEqual(unexpected, []);
   assert.deepEqual(changes.filter((c) => c.what.startsWith("grid.winner ")).map((c) => [c.what, c.before, c.after]),
     Object.entries(MOVED).map(([k, [a, b]]) => [`grid.winner ${k}`, a, b]));

@@ -24,7 +24,7 @@ const PATTERN = {
 
 function responder(extra = {}) {
   return (q) => {
-    if (/ASSOCIATED_WITH\]->\(e:Emotion\)\s+WHERE p\.id IN \$candidatePatterns/.test(q)) return extra.evidence ?? [];
+    if (/ASSOCIATED_WITH\]->\(e:Emotion\)\s+WHERE size\(signalled\) = 0 AND p\.id IN \$candidatePatterns/.test(q)) return extra.evidence ?? [];
     if (/MATCH \(p:ActivationPattern \{id: \$patternId\}\)\s+RETURN p\.id as id/.test(q)) return extra.detail ?? [PATTERN];
     if (/STARTS WITH 'dbt_'/.test(q)) {
       return [
@@ -69,6 +69,24 @@ test('getStateAndTools: the safety seam queries only for non-low-unpleasant resu
   assert.ok(!g.calls.some((c) => /TRIGGERS_SAFETY/.test(c.query)));
 });
 
+test('getStateAndTools { warm: true }: one trivial read, answers { warm: true }, routes and logs nothing; still needs sign-in', async () => {
+  const f = fakeDriver(responder());
+  setDriver(f.driver);
+  const logged = [];
+  const orig = console.log;
+  console.log = (...a) => logged.push(a);
+  let out;
+  try { out = await fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { warm: true } }); } finally { console.log = orig; }
+  assert.deepEqual(out, { warm: true });
+  assert.deepEqual(f.calls.map((c) => c.query), ['RETURN 1 AS ok']);
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');
+  assert.ok(f.allClosed());
+  assert.ok(!logged.some((a) => a[0] === 'getStateAndTools'), 'no routing log line for a warm-up');
+  await assert.rejects(fns.getStateAndTools.run({ data: { warm: true } }), (e) => e.code === 'unauthenticated');
+  // Only the exact warm request: anything with it still has to be a valid check-in.
+  await assert.rejects(fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { warm: true, emotions: ['Anxious'] } }), (e) => e.code === 'invalid-argument');
+});
+
 test('getStateAndTools: signed out, missing quadrant or a bad band → rejected before any session; missing pattern → not-found', async () => {
   const f = fakeDriver(responder());
   setDriver(f.driver);
@@ -110,7 +128,9 @@ test('getStateAndTools: policy on → pattern × band rows from the slice query 
   const f = fakeDriver(responder({ policy, slice }));
   setDriver(f.driver);
   const out = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', emotions: ['Anxious'], band: 'steady', bandSource: 'probe', surface: 'checkin' } }));
-  assert.equal(f.calls.find((c) => /SCORES_AS/.test(c.query)).params.useAliases, true, 'aliases count once the policy is on');
+  const ev = f.calls.find((c) => /SCORES_AS/.test(c.query));
+  assert.equal(ev.params.useAliases, true, 'aliases and reviewed patterns count once the policy is on');
+  assert.ok(ev.params.candidatePatterns.includes('reactive_aggression'), 'Ready to fight is a candidate while the policy is on');
   assert.deepEqual(out.tools.map((t) => [t.id, t.slot, t.side, t.ruleId]), [
     ['opposite-action', 'primary', 'change', 'rf_acute_alarm_steady_opposite-action'],
     ['five-senses', 'swap', 'acceptance', 'rf_acute_alarm_steady_five-senses'],
@@ -123,4 +143,33 @@ test('getStateAndTools: policy on → pattern × band rows from the slice query 
   const sliceCall = f.calls.find((c) => /RECOMMENDED_FOR/.test(c.query));
   assert.deepEqual(sliceCall.params.patternIds, ['acute_alarm']);
   assert.equal(f.sessions.length, 1);
+});
+
+test('getStateAndTools: a words-gated row (Oct 2026 review) comes through the slice query and fires only on its words', async () => {
+  const policy = [{
+    policy: { version: 'rf-v2', enabled: true, maxCards: int(2), fallbackConceptId: 'se_orienting', defaultBand: 'stirred', floodedPatterns: ['emotional_flooding'] },
+    fallback: concept('se_orienting', 'five-senses', TAGS),
+  }];
+  const wordRow = { ...edge('rf_acute_alarm_words_overwhelm_pause', ['steady', 'stirred'], 0.5), emotionGate: 'words', words: ['overwhelmed'] };
+  const slice = [
+    { patternId: 'acute_alarm', blank: false, patternEmotions: ['anxiety'], concept: concept('dbt_tipp', 'cool-down', { side: 'both', skillKind: 'body', direction: 'down' }),
+      edge: edge('rf_acute_alarm_default_cool-down', ['steady', 'stirred'], 1), addresses: [], contraPatterns: [], contraFlags: [] },
+    { patternId: 'acute_alarm', blank: false, patternEmotions: ['anxiety'], concept: concept('dbt_stop', 'pause', { side: 'both', skillKind: 'hold', direction: 'down' }),
+      edge: wordRow, addresses: [], contraPatterns: [], contraFlags: [] },
+  ];
+  for (const [emotions, expected] of [[['Overwhelmed'], ['pause', 'cool-down']], [['Scared'], ['cool-down']]]) {
+    const f = fakeDriver(responder({ policy, slice }));
+    setDriver(f.driver);
+    const out = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', emotions } }));
+    assert.deepEqual(out.tools.map((t) => t.id), expected, emotions.join());
+  }
+});
+
+test('getStateAndTools: policy off → Ready to fight is not a candidate (the kill switch keeps today\'s four)', async () => {
+  const f = fakeDriver(responder({}));
+  setDriver(f.driver);
+  await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', emotions: ['Angry'] } }));
+  const ev = f.calls.find((c) => /SCORES_AS/.test(c.query));
+  assert.equal(ev.params.useAliases, false);
+  assert.ok(!ev.params.candidatePatterns.includes('reactive_aggression'));
 });

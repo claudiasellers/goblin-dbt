@@ -50,7 +50,7 @@ test("related words keep RELATED_TO and shared-brain rows, never OPPOSITE_OF", (
 });
 
 test("shipped files carry their source, and related words has no opposites and covers every grid word", () => {
-  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json"]) {
+  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json", "capacity.json", "spine.json"]) {
     const f = shipped(name);
     assert.match(f.source.file, /^graph-content-only-.*\.json$/, name);
     assert.ok(!Number.isNaN(Date.parse(f.source.exportedAt)), name);
@@ -110,6 +110,22 @@ test("shipped follow-up questions: both unpleasant quadrants, no clinical notes,
   const responseIds = new Set(Object.values(shippedQs).flat().flatMap((q) => q.responses.map((r) => r.id)));
   const scored = [...new Set(fixture.evidence.map((e) => e.responseId))];
   assert.deepEqual(scored.filter((id) => !responseIds.has(id)), []);
+});
+
+test("shipped capacity content matches content.py", () => {
+  assert.deepEqual(shipped("capacity.json").content, JSON.parse(readFileSync("tests/fixtures/capacity-content.json", "utf8")));
+});
+
+test("shipped spine content: the close flow, and every non-reserved follow-up type the schema defines", () => {
+  const spine = shipped("spine.json").content;
+  assert.ok(spine.closeFlow?.kinds && spine.closeFlow.skip && spine.closeFlow.saved);
+  assert.ok(!("version" in spine.closeFlow), "the flow's own version is stripped, as getSpineContent does");
+  const schema = readFileSync("schema/practice-spine.cypher", "utf8");
+  const types = [...schema.matchAll(/MERGE \(t:FollowUpType \{id: "([a-z_]+)"\}\)\nSET [^\n]*t\.reserved = (true|false)/g)];
+  assert.ok(types.length >= 10, `${types.length} follow-up types read from the schema (guards the regex)`);
+  const defined = [...new Set(types.filter(([, , r]) => r === "false").map(([, id]) => id))].sort();
+  assert.deepEqual(spine.followUpTypes.map((t) => t.id), defined);
+  for (const t of spine.followUpTypes) assert.equal(typeof t.enabled, "boolean", t.id);
 });
 
 test("load-graph never refreshes the shipped files from a local graph", () => {
