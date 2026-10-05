@@ -9,16 +9,22 @@
  *
  * Both result screens ask this module what to render, so the "banner never
  * hides the way forward" rule is tested without a React test setup.
+ *
+ * Oct 2026 (schema/checkin-safety.cypher): a crisis flag with `level: 'line'` (flooding with no yes to
+ * the spiral path's self-harm question) shows the calm SafetyLine with 988 in the banner's place.
+ * No level, or 'banner', is the full banner, so an older server's flags still show it.
  */
 
 export interface SafetyFlagLike {
   type?: string | null;
+  level?: string | null;
 }
 
 export type ResultVariant = 'standard' | 'low_energy';
 
 export type ResultSection =
   | 'crisis_banner'
+  | 'safety_line'
   | 'pattern'
   | 'clinical_note'
   | 'guided_activity'
@@ -27,7 +33,7 @@ export type ResultSection =
   | 'add_detail'
   | 'bailout';
 
-export type BailoutSection = 'crisis_banner' | 'micro_step';
+export type BailoutSection = 'crisis_banner' | 'safety_line' | 'micro_step';
 
 export interface ResultLayoutInput {
   variant: ResultVariant;
@@ -38,8 +44,14 @@ export interface ResultLayoutInput {
   canAddMoreDetail?: boolean;
 }
 
+/** The full crisis banner: a crisis flag that isn't the calm-line level. */
 export function isCrisisFlag(flag?: SafetyFlagLike | null): boolean {
-  return !!flag && flag.type === 'crisis';
+  return !!flag && flag.type === 'crisis' && flag.level !== 'line';
+}
+
+/** The calm 988 line: a crisis flag whose signal wasn't given (flooding, no yes). */
+export function isSafetyLine(flag?: SafetyFlagLike | null): boolean {
+  return !!flag && flag.type === 'crisis' && flag.level === 'line';
 }
 
 /** Sections of the main result screen, top to bottom. */
@@ -47,6 +59,7 @@ export function resultSections(input: ResultLayoutInput): ResultSection[] {
   const { variant, safetyFlag, patternId, toolCount, hasGuidedActivity, canAddMoreDetail } = input;
   const sections: ResultSection[] = [];
   if (isCrisisFlag(safetyFlag)) sections.push('crisis_banner');
+  else if (isSafetyLine(safetyFlag)) sections.push('safety_line');
   sections.push('pattern');
 
   // Positive state: label and Done only (standard screen).
@@ -68,5 +81,7 @@ export function resultSections(input: ResultLayoutInput): ResultSection[] {
 
 /** Sections of the "too much right now" micro-step screen. The banner stays on top. */
 export function bailoutSections(safetyFlag?: SafetyFlagLike | null): BailoutSection[] {
-  return isCrisisFlag(safetyFlag) ? ['crisis_banner', 'micro_step'] : ['micro_step'];
+  if (isCrisisFlag(safetyFlag)) return ['crisis_banner', 'micro_step'];
+  if (isSafetyLine(safetyFlag)) return ['safety_line', 'micro_step'];
+  return ['micro_step'];
 }

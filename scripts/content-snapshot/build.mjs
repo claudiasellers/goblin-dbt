@@ -212,6 +212,7 @@ export function buildDiscriminatingQuestions(g) {
       .map((q) => ({
         id: q.props.id, text: q.props.text ?? null, subtext: q.props.subtext ?? null,
         order: Number(q.props.order), required: q.props.required ?? null,
+        ...(q.props.kind ? { kind: q.props.kind } : {}),
         // One row per (response, next question), as the query's OPTIONAL MATCH returns them.
         responses: (responsesOf.get(q) ?? [])
           .sort((a, b) => asc(a.props.order, b.props.order))

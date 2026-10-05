@@ -84,7 +84,7 @@ export const LEGACY_TOOLS_QUERY = `
 export const ROUTING_POLICY_QUERY = `
   OPTIONAL MATCH (rp:RoutingPolicy {id: 'checkin_result'})
   OPTIONAL MATCH (fb:TherapyConcept {id: rp.fallbackConceptId})
-  RETURN rp { .version, .enabled, .maxCards, .fallbackConceptId, .defaultBand, .floodedPatterns } AS policy,
+  RETURN rp { .version, .enabled, .maxCards, .fallbackConceptId, .defaultBand, .floodedPatterns, .answerWeight, .tieBreak } AS policy,
          fb { .id, .appToolId, .name, .description, .whenToUse, .dbtBasis, .side, .skillKind, .direction } AS fallback
 `;
 
@@ -169,7 +169,16 @@ export function toRoutingPolicy(p: Obj | null | undefined): RoutingPolicy | null
     fallbackConceptId: str(p.fallbackConceptId) ?? 'se_orienting',
     defaultBand: (band === 'steady' || band === 'stirred' || band === 'flooded' ? band : 'stirred'),
     floodedPatterns: strs(p.floodedPatterns),
+    ...(answerWeight(p.answerWeight) != null ? { answerWeight: answerWeight(p.answerWeight) as number } : {}),
+    ...(p.tieBreak === 'words' ? { tieBreak: 'words' as const } : {}),
   };
+}
+
+/** A usable answer weight (0 < w ≤ 4), else null: a bad value falls back to the default, never to 0. */
+function answerWeight(v: unknown): number | null {
+  if (v == null) return null;
+  const n = toNum(v);
+  return Number.isFinite(n) && n > 0 && n <= 4 ? n : null;
 }
 
 export function graphDeps(tx: QueryRunner): StateDeps {
@@ -223,7 +232,7 @@ export function graphDeps(tx: QueryRunner): StateDeps {
         score: toNum(r.get('relevanceScore')),
       }));
     },
-    safetyFlag: (patternId, quadrant) => evaluateSafetyFlag(tx, patternId, quadrant),
+    safetyFlag: (patternId, quadrant, responseIds) => evaluateSafetyFlag(tx, patternId, quadrant, responseIds),
     async routingPolicy() {
       const res = await tx.run(ROUTING_POLICY_QUERY, {});
       const r = res.records[0];

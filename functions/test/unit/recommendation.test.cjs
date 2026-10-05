@@ -32,6 +32,7 @@ function responder(extra = {}) {
         { id: 'dbt_tipp', appToolId: 'cool-down', name: 'TIPP', description: 'tipp', whenToUse: 'w', dbtBasis: 'TIP', relevanceScore: int(2) },
       ];
     }
+    if (/RAISES_SAFETY/.test(q)) return extra.raised ?? [];
     if (/TRIGGERS_SAFETY/.test(q)) return extra.safety ?? [];
     if (/RoutingPolicy \{id: 'checkin_result'\}/.test(q)) return extra.policy ?? [];
     if (/RECOMMENDED_FOR/.test(q)) return extra.slice ?? [];
@@ -58,15 +59,55 @@ test('getStateAndTools: one read transaction; legacy tools ranked by score; rele
 
 test('getStateAndTools: the safety seam queries only for non-low-unpleasant results', async () => {
   const flag = { id: 'crisis_self_harm', type: 'crisis', trigger: 't', action: 'a' };
-  const f = fakeDriver(responder({ safety: [flag] }));
+  const f = fakeDriver(responder({ safety: [{ ...flag, withoutSignal: null }] }));
   setDriver(f.driver);
   const hu = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-unpleasant', emotions: ['panic'] } }));
   assert.deepEqual(hu.safetyFlag, flag);
-  const g = fakeDriver(responder({ safety: [flag] }));
+  const g = fakeDriver(responder({ safety: [{ ...flag, withoutSignal: null }] }));
   setDriver(g.driver);
   const lu = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'low-unpleasant', emotions: ['Empty'] } }));
   assert.equal(lu.safetyFlag, undefined);
   assert.ok(!g.calls.some((c) => /TRIGGERS_SAFETY/.test(c.query)));
+});
+
+test('getStateAndTools: the spiral path\'s safety answer (checkin-safety.cypher) decides banner vs calm line', async () => {
+  const flag = { id: 'crisis_self_harm', type: 'crisis', trigger: 't', action: 'a' };
+  const ask = (answers, quadrant = 'high-unpleasant') => ({ auth: { uid: 'u1' }, data: {
+    quadrant, emotions: ['panic'], discriminatingAnswers: answers.map((responseId) => ({ questionId: 'q', responseId })),
+  } });
+
+  // No signal: flooding's edge says withoutSignal "line" → the calm line, and no answer query is run.
+  let f = fakeDriver(responder({ safety: [{ ...flag, withoutSignal: 'line' }] }));
+  setDriver(f.driver);
+  let out = await quiet(() => fns.getStateAndTools.run(ask([])));
+  assert.deepEqual(out.safetyFlag, { ...flag, level: 'line' });
+  assert.ok(!f.calls.some((c) => /RAISES_SAFETY/.test(c.query)), 'no answers, no answer query');
+
+  // Yes: the raised flag, as the banner (no level); the pattern's flag isn't even read.
+  f = fakeDriver(responder({ raised: [{ ...flag, withoutSignal: null }], safety: [{ ...flag, withoutSignal: 'line' }] }));
+  setDriver(f.driver);
+  out = await quiet(() => fns.getStateAndTools.run(ask(['hu_exp_flooding', 'hu_safety_yes'])));
+  assert.deepEqual(out.safetyFlag, flag);
+  const raisedCall = f.calls.find((c) => /RAISES_SAFETY/.test(c.query));
+  assert.deepEqual(raisedCall.params.responseIds, ['hu_exp_flooding', 'hu_safety_yes'], 'every answer as sent, including high-unpleasant ones the policy holds back');
+  assert.ok(!f.calls.some((c) => /TRIGGERS_SAFETY/.test(c.query)));
+
+  // A yes counts in low-unpleasant too (only pattern flags are skipped there).
+  f = fakeDriver(responder({ raised: [{ ...flag, withoutSignal: null }] }));
+  setDriver(f.driver);
+  out = await quiet(() => fns.getStateAndTools.run(ask(['hu_safety_yes'], 'low-unpleasant')));
+  assert.equal(out.safetyFlag?.type, 'crisis');
+
+  // The log line says which: ids and enums only, never the answer.
+  f = fakeDriver(responder({ safety: [{ ...flag, withoutSignal: 'line' }] }));
+  setDriver(f.driver);
+  const lines = [];
+  const orig = console.log;
+  console.log = (...a) => lines.push(a.join(' '));
+  try { await fns.getStateAndTools.run(ask(['hu_safety_no'])); } finally { console.log = orig; }
+  const logged = JSON.parse(lines.find((l) => l.startsWith('getStateAndTools')).slice('getStateAndTools '.length));
+  assert.equal(logged.safetyLevel, 'line');
+  assert.ok(!lines.join('').includes('hu_safety'), 'the answer is never logged');
 });
 
 test('getStateAndTools { warm: true }: one trivial read, answers { warm: true }, routes and logs nothing; still needs sign-in', async () => {

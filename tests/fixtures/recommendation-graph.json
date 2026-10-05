@@ -643,7 +643,8 @@
  "questions": {
   "high-unpleasant": [
    "hu_experience_quality",
-   "hu_body_activation"
+   "hu_body_activation",
+   "hu_safety_urge"
   ],
   "low-unpleasant": [
    "lu_mind_quality",
@@ -757,7 +758,8 @@
     "id": "crisis_self_harm",
     "type": "crisis",
     "trigger": "Self-harm urges + 'out of control'",
-    "action": "Safety anchor (crisis line, emergency contact) BEFORE any tool"
+    "action": "Safety anchor (crisis line, emergency contact) BEFORE any tool",
+    "withoutSignal": "line"
    }
   ],
   "dissociation_overmodulation": [
@@ -765,13 +767,15 @@
     "id": "crisis_suicidal",
     "type": "crisis",
     "trigger": "Suicidal ideation in any pattern",
-    "action": "Immediate cessation of tool recommendation; present safety resources"
+    "action": "Immediate cessation of tool recommendation; present safety resources",
+    "withoutSignal": null
    },
    {
     "id": "clinical_referral_severe_dissociation",
     "type": "clinical_referral",
     "trigger": "Severe dissociation (user cannot orient to present)",
-    "action": "Gentle grounding only; redirect to professional support"
+    "action": "Gentle grounding only; redirect to professional support",
+    "withoutSignal": null
    }
   ],
   "conservation_freeze": [
@@ -779,7 +783,8 @@
     "id": "clinical_referral_shutdown",
     "type": "clinical_referral",
     "trigger": "Persistent shutdown (7+ consecutive days of numb/empty)",
-    "action": "Flag potential chronic dysfunction; recommend professional evaluation"
+    "action": "Flag potential chronic dysfunction; recommend professional evaluation",
+    "withoutSignal": null
    }
   ],
   "rumination_loop": [
@@ -787,7 +792,8 @@
     "id": "crisis_suicidal",
     "type": "crisis",
     "trigger": "Suicidal ideation in any pattern",
-    "action": "Immediate cessation of tool recommendation; present safety resources"
+    "action": "Immediate cessation of tool recommendation; present safety resources",
+    "withoutSignal": null
    }
   ],
   "reward_drive_low": [
@@ -795,9 +801,38 @@
     "id": "clinical_referral_shutdown",
     "type": "clinical_referral",
     "trigger": "Persistent shutdown (7+ consecutive days of numb/empty)",
-    "action": "Flag potential chronic dysfunction; recommend professional evaluation"
+    "action": "Flag potential chronic dysfunction; recommend professional evaluation",
+    "withoutSignal": null
    }
   ]
+ },
+ "raisesSafety": {
+  "hu_safety_yes": [
+   {
+    "id": "crisis_self_harm",
+    "type": "crisis",
+    "trigger": "Self-harm urges + 'out of control'",
+    "action": "Safety anchor (crisis line, emergency contact) BEFORE any tool"
+   }
+  ],
+  "hu_safety_unsure": [
+   {
+    "id": "crisis_self_harm",
+    "type": "crisis",
+    "trigger": "Self-harm urges + 'out of control'",
+    "action": "Safety anchor (crisis line, emergency contact) BEFORE any tool"
+   }
+  ]
+ },
+ "triggersNext": {
+  "lu_mind_blank": "lu_body_quality",
+  "lu_mind_unsure": "lu_body_quality",
+  "hu_exp_alarm": "hu_body_activation",
+  "hu_exp_unsure": "hu_body_activation",
+  "hu_exp_flooding": "hu_safety_urge"
+ },
+ "questionKinds": {
+  "hu_safety_urge": "safety"
  },
  "emotions": {
   "abandoned": {
@@ -3928,7 +3963,7 @@
   }
  ],
  "routingPolicy": {
-  "version": "rf-v2",
+  "version": "rf-v2.1",
   "enabled": true,
   "maxCards": 2,
   "fallbackConceptId": "se_orienting",
@@ -3936,6 +3971,8 @@
   "floodedPatterns": [
    "emotional_flooding"
   ],
+  "answerWeight": 2,
+  "tieBreak": "words",
   "reviewStatus": "approved"
  }
 }

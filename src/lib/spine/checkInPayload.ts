@@ -86,6 +86,19 @@ export function emotionIdsFor(emotions: string[], known: string[] = []): string[
 
 
 /**
+ * The answers a check-in keeps: every follow-up answer except those to a `kind: "safety"` question
+ * (the spiral path's self-harm question, schema/checkin-safety.cypher). Those go to getStateAndTools,
+ * which raises the banner, and are never stored; `safetyFlagId` records that the banner showed.
+ */
+export function savedAnswers(
+  answers: Array<{ questionId: string; responseId: string }>,
+  questions: Array<{ id: string; kind?: string }>,
+): Array<{ questionId: string; responseId: string }> {
+  const safety = new Set(questions.filter((q) => q.kind === 'safety').map((q) => q.id));
+  return answers.filter((a) => !safety.has(a.questionId));
+}
+
+/**
  * The save for a check-in whose result rendered (`result` set) or whose analysis failed (null).
  * The crisis banner result is saved like any other; `safetyFlagId` records that it showed.
  */

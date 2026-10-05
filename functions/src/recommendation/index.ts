@@ -59,6 +59,7 @@ export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
       filtered: r?.filtered ?? [],
       receiveFirst: r?.receiveFirst ?? null,
       safetyFlag: result.safetyFlag?.type ?? null,
+      safetyLevel: result.safetyFlag ? (result.safetyFlag.level ?? 'banner') : null,
     }));
     return result;
   },
@@ -76,6 +77,8 @@ export const getDiscriminatingQuestions = onCall(
     subtext: string;
     order: number;
     required: boolean;
+    /** 'safety' for the spiral path's self-harm question: sent to getStateAndTools, never saved. */
+    kind?: string;
     responses: Array<{
       id: string;
       label: string;
@@ -102,6 +105,7 @@ export const getDiscriminatingQuestions = onCall(
                q.subtext as questionSubtext,
                q.order as questionOrder,
                q.required as questionRequired,
+               q.kind as questionKind,
                r.id as responseId,
                r.label as responseLabel,
                r.subtext as responseSubtext,
@@ -120,6 +124,7 @@ export const getDiscriminatingQuestions = onCall(
         subtext: string;
         order: number;
         required: boolean;
+        kind?: string;
         responses: Array<{
           id: string;
           label: string;
@@ -141,6 +146,7 @@ export const getDiscriminatingQuestions = onCall(
               ? (rec.get('questionOrder') as { toNumber: () => number }).toNumber()
               : Number(rec.get('questionOrder')),
             required: rec.get('questionRequired') as boolean,
+            ...(rec.get('questionKind') ? { kind: rec.get('questionKind') as string } : {}),
             responses: [],
           });
         }

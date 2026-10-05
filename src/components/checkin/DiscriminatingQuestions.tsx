@@ -10,7 +10,8 @@ interface DiscriminatingQuestionsProps {
 /**
  * 1-2 discriminating questions to differentiate activation patterns
  * within a quadrant. Shows Q1 (required), then conditionally Q2
- * if the selected response has a triggersNextQuestionId.
+ * if the selected response has a triggersNextQuestionId. Skip on Q1 skips
+ * them all; Skip on a follow-up completes with the answers so far.
  */
 export function DiscriminatingQuestions({
   questions,
@@ -111,7 +112,9 @@ export function DiscriminatingQuestions({
 
       <div className="text-center">
         <button
-          onClick={onSkip}
+          // Skip on a follow-up keeps what was already answered: skipping the spiral path's safety
+          // question must not throw away "I'm spiraling" (and with it the calm 988 line).
+          onClick={answers.length > 0 ? () => onComplete(answers) : onSkip}
           className="text-sm text-[var(--color-text-muted)] hover:text-[var(--color-text-secondary)] transition-colors"
         >
           Skip

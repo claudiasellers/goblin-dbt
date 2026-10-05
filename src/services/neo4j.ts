@@ -194,6 +194,8 @@ export interface SafetyFlag {
   type: string;
   trigger: string;
   action: string;
+  /** 'line': the calm 988 line instead of the crisis banner (functions/src/recommendation/types.ts). */
+  level?: 'banner' | 'line';
 }
 
 export interface CoOccurrence {
@@ -225,6 +227,8 @@ export interface DiscriminatingQuestion {
   subtext: string;
   order: number;
   required: boolean;
+  /** 'safety': the spiral path's self-harm question. Sent to getStateAndTools, never saved. */
+  kind?: string;
   responses: DiscriminatingResponse[];
 }
 

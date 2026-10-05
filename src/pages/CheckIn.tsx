@@ -26,6 +26,7 @@ import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
 import { newId } from '../lib/spine/ids';
 import {
   buildCheckInPayload,
+  savedAnswers,
   emotionIdsFor,
   ftfReading,
   type CheckInNextAction,
@@ -153,7 +154,8 @@ export function CheckIn() {
     startedAt,
     source,
     capacity,
-    discriminatingAnswers,
+    // The safety question's answer goes to the engine (analyzeAndShowResult), never into the saved check-in.
+    discriminatingAnswers: savedAnswers(discriminatingAnswers, discriminatingQuestions),
     embeddedToolSessionIds: embeddedIds,
   });
 

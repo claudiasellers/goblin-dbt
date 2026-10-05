@@ -1,7 +1,7 @@
 {
   "source": {
-    "file": "graph-content-only-2026-10-05.json",
-    "exportedAt": "2026-10-05T07:40:26.314Z"
+    "file": "graph-content-only-pending-load.json",
+    "exportedAt": "2026-10-05T22:41:27.154Z"
   },
   "content": {
     "high-unpleasant": [
@@ -39,7 +39,8 @@
             "label": "I'm spiraling and can't stop it",
             "subtext": "It keeps building and I can't slow it down.",
             "order": 4,
-            "isEscapeHatch": false
+            "isEscapeHatch": false,
+            "triggersNextQuestionId": "hu_safety_urge"
           },
           {
             "id": "hu_exp_unsure",
@@ -92,6 +93,37 @@
             "subtext": "Everything's activated and I can't sort it out.",
             "order": 5,
             "isEscapeHatch": true
+          }
+        ]
+      },
+      {
+        "id": "hu_safety_urge",
+        "text": "Are you having any thoughts of hurting yourself or ending your life?",
+        "subtext": "Any answer is okay. It only changes what we show you next.",
+        "order": 3,
+        "required": false,
+        "kind": "safety",
+        "responses": [
+          {
+            "id": "hu_safety_yes",
+            "label": "Yes",
+            "subtext": "Even a little, or on and off.",
+            "order": 1,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_safety_unsure",
+            "label": "I'm not sure",
+            "subtext": null,
+            "order": 2,
+            "isEscapeHatch": true
+          },
+          {
+            "id": "hu_safety_no",
+            "label": "No",
+            "subtext": null,
+            "order": 3,
+            "isEscapeHatch": false
           }
         ]
       }

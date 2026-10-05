@@ -3,8 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
 import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
 import { recommendationCards } from '../../lib/recommendation';
-import { isCrisisFlag } from '../../lib/crisisBanner';
+import { isCrisisFlag, isSafetyLine } from '../../lib/crisisBanner';
 import { CrisisBanner } from '../../components/safety/CrisisBanner';
+import { SafetyLine } from '../../components/safety/SafetyLine';
 import { newId } from '../../lib/spine/ids';
 import { useToolSession } from '../../hooks/useToolSession';
 import { dearManRepSource } from '../../lib/spine/wrap';
@@ -2116,6 +2117,7 @@ export function DearMan() {
 
           {/* E4-6 (F11): a crisis flag shows the same non-blocking banner as the check-in, above the tools */}
           {isCrisisFlag(stateResult?.safetyFlag) && <CrisisBanner />}
+          {isSafetyLine(stateResult?.safetyFlag) && <SafetyLine />}
 
           {topTools.length > 0 && (
             <div className="pt-2 space-y-2">

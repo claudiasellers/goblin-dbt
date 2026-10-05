@@ -42,21 +42,35 @@ function strengthBonus(strengths: Array<string | null>): number {
   return 0.1;
 }
 
+/** How much each discriminating answer counts: its EVIDENCE_FOR weight × this. Pre-rf-v2.1 (and the kill switch). */
+export const DEFAULT_ANSWER_WEIGHT = 2.0;
+
+/** Two scores this close are a tie (they're sums of decimal weights, so == would miss some). */
+export const SCORE_EPSILON = 1e-9;
+
+export interface PatternScores {
+  /** Total per candidate (the confidence before clipping). */
+  scores: Record<string, number>;
+  /** The part that came from the person's words (or the no-word intensity heuristic). */
+  wordScores: Record<string, number>;
+}
+
 /**
- * Per-pattern confidence. Emotions: each candidate gets (words that reach it / words sent) × 0.4
- * plus a strength bonus (strongest matched edge). No emotions: the intensity heuristic. Then the
- * discriminating answers' summed evidence weights × 2. Insertion order = candidate order (the stable
- * sort in `rankPatterns` breaks ties by it).
+ * Per-pattern confidence, with the words' share kept apart. Emotions: each candidate gets (words that
+ * reach it / words sent) × 0.4 plus a strength bonus (strongest matched edge). No emotions: the
+ * intensity heuristic. Then the discriminating answers' summed evidence weights × `answerWeight`
+ * (2 before rf-v2.1; the RoutingPolicy sets it). Insertion order = candidate order.
  */
-export function scorePatterns(o: {
+export function scorePatternParts(o: {
   candidates: readonly string[];
   emotionIds: readonly string[];
   intensityY?: number;
   emotionRows: readonly EmotionEvidenceRow[];
   responseRows: readonly ResponseEvidenceRow[];
-}): Record<string, number> {
-  const scores: Record<string, number> = {};
-  for (const pid of o.candidates) scores[pid] = BASE_SCORE;
+  answerWeight?: number;
+}): PatternScores {
+  const wordScores: Record<string, number> = {};
+  for (const pid of o.candidates) wordScores[pid] = 0;
 
   if (o.emotionIds.length > 0) {
     const byPattern = new Map<string, { words: Set<string>; strengths: Array<string | null> }>();
@@ -68,23 +82,31 @@ export function scorePatterns(o: {
       byPattern.set(r.patternId, e);
     }
     for (const [pid, e] of byPattern) {
-      scores[pid] = (scores[pid] || 0) + (e.words.size / o.emotionIds.length) * 0.4 + strengthBonus(e.strengths);
+      wordScores[pid] += (e.words.size / o.emotionIds.length) * 0.4 + strengthBonus(e.strengths);
     }
   } else {
     const y = o.intensityY ?? 0.5;
     for (const pid of o.candidates) {
-      if (y > 0.7 && ['acute_alarm', 'emotional_flooding'].includes(pid)) scores[pid] += 0.3;
-      else if (y > 0.7 && ['chronic_vigilance', 'social_threat_shame'].includes(pid)) scores[pid] += 0.15;
-      else if (y < 0.3 && ['conservation_freeze', 'reward_drive_low'].includes(pid)) scores[pid] += 0.3;
-      else if (y < 0.3 && ['dissociation_overmodulation', 'rumination_loop'].includes(pid)) scores[pid] += 0.15;
+      if (y > 0.7 && ['acute_alarm', 'emotional_flooding'].includes(pid)) wordScores[pid] += 0.3;
+      else if (y > 0.7 && ['chronic_vigilance', 'social_threat_shame'].includes(pid)) wordScores[pid] += 0.15;
+      else if (y < 0.3 && ['conservation_freeze', 'reward_drive_low'].includes(pid)) wordScores[pid] += 0.3;
+      else if (y < 0.3 && ['dissociation_overmodulation', 'rumination_loop'].includes(pid)) wordScores[pid] += 0.15;
     }
   }
 
+  const scores: Record<string, number> = {};
+  for (const pid of o.candidates) scores[pid] = BASE_SCORE + wordScores[pid];
+  const w = o.answerWeight ?? DEFAULT_ANSWER_WEIGHT;
   for (const r of o.responseRows) {
     if (!o.candidates.includes(r.patternId)) continue;
-    scores[r.patternId] = (scores[r.patternId] || 0) + r.weight * 2.0;
+    scores[r.patternId] += r.weight * w;
   }
-  return scores;
+  return { scores, wordScores };
+}
+
+/** Totals only (the pre-rf-v2.1 shape; tests and the legacy path use it). */
+export function scorePatterns(o: Parameters<typeof scorePatternParts>[0]): Record<string, number> {
+  return scorePatternParts(o).scores;
 }
 
 export interface RankedPatterns {
@@ -94,9 +116,18 @@ export interface RankedPatterns {
   secondaryScore: number;
 }
 
-/** Highest score first; ties keep candidate order (Array.prototype.sort is stable). */
-export function rankPatterns(scores: Record<string, number>): RankedPatterns {
-  const sorted = Object.entries(scores).sort(([, a], [, b]) => b - a);
+/**
+ * Highest score first. A tie (within SCORE_EPSILON) goes to whichever the person's words favour, when
+ * `tieBreak` is given (rf-v2.1: the RoutingPolicy's tieBreak "words"); otherwise, or when the words
+ * tie too, to candidate order (the stable sort), as before.
+ */
+export function rankPatterns(scores: Record<string, number>, tieBreak?: Record<string, number>): RankedPatterns {
+  const sorted = Object.entries(scores).sort(([pa, a], [pb, b]) => {
+    if (Math.abs(b - a) > SCORE_EPSILON) return b - a;
+    if (!tieBreak) return 0;
+    const d = (tieBreak[pb] ?? 0) - (tieBreak[pa] ?? 0);
+    return Math.abs(d) > SCORE_EPSILON ? d : 0;
+  });
   return {
     primaryId: sorted[0][0],
     primaryScore: sorted[0][1],

@@ -46,7 +46,7 @@ const pickIds = (sel) => sel.picks.map((p) => p.concept.appToolId);
 test("#1–3 Anxious → On guard (its reviewed pattern): Do the Opposite + 5-4-3-2-1 whatever the band but flooded; flooded: Cool Down + 5-4-3-2-1", async () => {
   const r1 = await run(hu({ emotions: ["Anxious"] }));
   assert.equal(r1.pattern.id, "chronic_vigilance");
-  assert.deepEqual([r1.routing.band, r1.routing.bandSource, r1.routing.version], ["stirred", "inferred", "rf-v2"]);
+  assert.deepEqual([r1.routing.band, r1.routing.bandSource, r1.routing.version], ["stirred", "inferred", "rf-v2.1"]);
   assert.deepEqual(ids(r1), ["opposite-action", "five-senses"]);
   assert.equal(r1.tools[0].ruleId, "rf_chronic_vigilance_words_anticipatory_opposite-action");
   assert.deepEqual(ids(await run(hu({ emotions: ["Anxious"], band: "steady", bandSource: "probe" }))), ["opposite-action", "five-senses"], "no capacity split");
