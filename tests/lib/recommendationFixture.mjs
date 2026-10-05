@@ -76,9 +76,10 @@ export function fixtureDeps(g = graph, calls = []) {
         }))
         .filter((r) => r.score > 0);
     },
-    async safetyFlag(patternId, quadrant) {
-      log("safetyFlag", patternId, quadrant);
-      return safety.safetyFlagFor(quadrant, g.safety[patternId] || []);
+    async safetyFlag(patternId, quadrant, responseIds = []) {
+      log("safetyFlag", patternId, quadrant, responseIds);
+      const raised = responseIds.flatMap((id) => (g.raisesSafety || {})[id] || []).sort((a, b) => a.id.localeCompare(b.id));
+      return safety.safetyFlagFor(quadrant, g.safety[patternId] || [], raised);
     },
     async routingPolicy() {
       log("routingPolicy");
@@ -87,6 +88,8 @@ export function fixtureDeps(g = graph, calls = []) {
       const policy = {
         version: p.version, enabled: p.enabled === true, maxCards: p.maxCards ?? 2, fallbackConceptId: p.fallbackConceptId,
         defaultBand: p.defaultBand, floodedPatterns: p.floodedPatterns || [],
+        ...(p.answerWeight != null ? { answerWeight: p.answerWeight } : {}),
+        ...(p.tieBreak === "words" ? { tieBreak: "words" } : {}),
       };
       return { policy, fallback: routingConcept(g, p.fallbackConceptId, { withAddresses: false }) };
     },

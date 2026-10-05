@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { getMicroStep, type MicroStep } from '../../data/microSteps';
 import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
+import { SafetyLine } from '../safety/SafetyLine';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
 import { recommendationCards } from '../../lib/recommendation';
 import { RecommendationCards } from './RecommendationCards';
@@ -124,6 +125,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
     return (
       <div>
         {bailoutSections(safetyFlag).includes('crisis_banner') && <CrisisBanner />}
+        {bailoutSections(safetyFlag).includes('safety_line') && <SafetyLine />}
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
           {/* Compassionate header — small, gentle, not attention-competing */}
           <p className="text-sm text-[var(--color-text-tertiary)] mb-8">
@@ -169,6 +171,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
     return (
       <div className="max-w-md mx-auto text-center py-2">
         {has('crisis_banner') && <CrisisBanner />}
+      {has('safety_line') && <SafetyLine />}
         <CheckInWords words={checkinEmotions} />
         <h2 className="mt-5 mb-0 text-[2rem] leading-[1.08] text-[var(--color-text-primary)] [text-wrap:balance]">
           {pattern.userFacingLabel}
@@ -195,6 +198,7 @@ export function StateResult({ result, onDone, onAddMoreDetail, checkinEmotions, 
     <div className="py-4">
       {/* Crisis resources: a banner above the result, never instead of it */}
       {has('crisis_banner') && <CrisisBanner />}
+      {has('safety_line') && <SafetyLine />}
 
       {/* The State Summary - one cohesive sentence. The witness beat below echoes the words. */}
       <div className="text-center mb-6">

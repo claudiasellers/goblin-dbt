@@ -8,6 +8,7 @@ import { StateResult } from '../components/checkin/StateResult';
 import { LowEnergyStateResult } from '../components/checkin/LowEnergyStateResult';
 import { EmotionSuggestion } from '../components/checkin/EmotionSuggestion';
 import { DiscriminatingQuestions } from '../components/checkin/DiscriminatingQuestions';
+import { CrisisBanner } from '../components/safety/CrisisBanner';
 import {
   saveCheckIn,
   setCheckInNextAction,
@@ -26,6 +27,8 @@ import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
 import { newId } from '../lib/spine/ids';
 import {
   buildCheckInPayload,
+  savedAnswers,
+  splitSafetyAnswer,
   emotionIdsFor,
   ftfReading,
   type CheckInNextAction,
@@ -105,6 +108,13 @@ export function CheckIn() {
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
   const [discriminatingQuestions, setDiscriminatingQuestions] = useState<DiscriminatingQuestion[]>([]);
   const [discriminatingAnswers, setDiscriminatingAnswers] = useState<Array<{ questionId: string; responseId: string }>>([]);
+  /**
+   * The spiral path's safety answer (schema/checkin-safety.cypher), kept apart for the whole check-in:
+   * always sent to the engine, never saved, kept if the person goes Back and changes words or answers
+   * other questions, cleared only by a new check-in or a new answer to that question. `raises`: the
+   * answer raises the crisis banner (Yes / Not sure), so the banner shows even if the analysis fails.
+   */
+  const safetyAnswer = useRef<{ questionId: string; responseId: string; raises: boolean } | null>(null);
 
   // === Continuity (PR-C1) ===
   // One client id per check-in, minted when the flow starts and reset in handleComplete. The result
@@ -153,7 +163,8 @@ export function CheckIn() {
     startedAt,
     source,
     capacity,
-    discriminatingAnswers,
+    // The safety question's answer goes to the engine (analyzeAndShowResult), never into the saved check-in.
+    discriminatingAnswers: savedAnswers(discriminatingAnswers, discriminatingQuestions),
     embeddedToolSessionIds: embeddedIds,
   });
 
@@ -265,7 +276,10 @@ export function CheckIn() {
   async function analyzeAndShowResult(overrides?: { quadrant?: string; emotions?: string[]; discAnswers?: Array<{ questionId: string; responseId: string }>; capacity?: CapacityReading | null }) {
     const quadrant = overrides?.quadrant ?? checkInData.quadrant;
     const emotions = overrides?.emotions ?? checkInData.emotions;
-    const discAnsw = overrides?.discAnswers ?? discriminatingAnswers;
+    const discAnsw = [
+      ...(overrides?.discAnswers ?? discriminatingAnswers),
+      ...(safetyAnswer.current ? [{ questionId: safetyAnswer.current.questionId, responseId: safetyAnswer.current.responseId }] : []),
+    ];
     const cap = overrides && 'capacity' in overrides ? overrides.capacity ?? null : capacityRef.current;
     if (!quadrant) return;
 
@@ -510,7 +524,9 @@ export function CheckIn() {
   }
 
   function handleDiscriminatingComplete(answers: Array<{ questionId: string; responseId: string }>) {
-    setDiscriminatingAnswers(answers);
+    const safety = splitSafetyAnswer(answers, discriminatingQuestions);
+    if (safety.answer) safetyAnswer.current = safety.answer;
+    setDiscriminatingAnswers(safety.rest);
     afterFeelings(checkInData.quadrant, 'body');
   }
 
@@ -615,6 +631,7 @@ export function CheckIn() {
     setEntryPoint('standard');
     setDiscriminatingQuestions([]);
     setDiscriminatingAnswers([]);
+    safetyAnswer.current = null;
     setSpots([emptySpot()]);
     setActive(0);
     setStep('emotion');
@@ -793,6 +810,9 @@ export function CheckIn() {
           />
         )}
 
+
+        {/* A yes to the safety question shows the banner even if the analysis is slow or fails. */}
+        {(step === 'analyzing' || step === 'saving' || step === 'complete') && safetyAnswer.current?.raises && <CrisisBanner />}
 
         {step === 'analyzing' && (
           <div className="text-center py-12">

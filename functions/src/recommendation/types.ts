@@ -86,6 +86,12 @@ export interface SafetyFlag {
   type: string;
   trigger: string;
   action: string;
+  /**
+   * How a `crisis` flag shows (checkin-safety.cypher). Absent or 'banner': the full CrisisBanner.
+   * 'line': the pattern's flag needs a signal it didn't get (flooding without a yes to the self-harm
+   * question), so a calm line with 988 instead. An app from before this field shows the banner.
+   */
+  level?: 'banner' | 'line';
 }
 
 export interface CoOccurrence {
@@ -161,6 +167,10 @@ export interface RoutingPolicy {
   fallbackConceptId: string;
   defaultBand: Band;
   floodedPatterns: string[];
+  /** rf-v2.1: each discriminating answer counts weight × this (absent → 2, the pre-rf-v2.1 scoring). */
+  answerWeight?: number;
+  /** rf-v2.1: 'words' breaks a pattern tie toward the person's words (absent → candidate order). */
+  tieBreak?: 'words' | null;
 }
 
 /** An ActivationPattern's display fields as stored (confidence is added by the engine). */

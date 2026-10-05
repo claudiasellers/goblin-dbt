@@ -4,6 +4,7 @@ import { getActivityDefinition, PATTERN_CONTEXT } from '../../data/guidedActivit
 import { GuidedActivity } from '../activities/GuidedActivity';
 import type { StateResult } from '../../services/neo4j';
 import { CrisisBanner } from '../safety/CrisisBanner';
+import { SafetyLine } from '../safety/SafetyLine';
 import { bailoutSections, resultSections, type ResultSection } from '../../lib/crisisBanner';
 import { recommendationCards } from '../../lib/recommendation';
 import { RecommendationCards } from './RecommendationCards';
@@ -118,6 +119,7 @@ export function LowEnergyStateResult({
     return (
       <div>
         {bailoutSections(safetyFlag).includes('crisis_banner') && <CrisisBanner />}
+        {bailoutSections(safetyFlag).includes('safety_line') && <SafetyLine />}
         <div className="flex flex-col items-center justify-center min-h-[60vh] px-6">
           <p className="text-sm text-[var(--color-text-tertiary)] mb-8">
             That's okay. Let's go smaller.
@@ -164,6 +166,7 @@ export function LowEnergyStateResult({
     <div className="py-4">
       {/* Crisis resources: a banner above the result, never instead of it */}
       {has('crisis_banner') && <CrisisBanner />}
+      {has('safety_line') && <SafetyLine />}
 
       {/* Pattern label — larger, lighter weight, fades in */}
       <div className="text-center mb-6 animate-fade-in">

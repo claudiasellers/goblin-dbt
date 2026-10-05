@@ -64,6 +64,7 @@ export const LOAD_ORDER = [
   'dear-man-content-v2.cypher',            // feeling groups, mirroring, anchor generator
   'dear-man-debrief-content.cypher',
   'discriminating-questions.cypher',
+  'checkin-safety.cypher',                         // Spiral path's optional self-harm question, RAISES_SAFETY, flooding's calm line (needs relationships + discriminating-questions)
   'pattern-co-occurrence.cypher',
   'insight-narratives.cypher',
   'somatic-narratives.cypher',

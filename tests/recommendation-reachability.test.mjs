@@ -184,7 +184,8 @@ test("the check-in asks high-unpleasant discriminating questions too; the DEAR M
   const ci = read("src/pages/CheckIn.tsx");
   assert.match(ci, /if \(asksDiscriminatingQuestions\(inferredQuadrant\)\) \{\s*try \{\s*const questions = await getDiscriminatingQuestions\(inferredQuadrant\);/);
   assert.match(ci, /return quadrant === 'high-unpleasant' \|\| quadrant === 'low-unpleasant';/);
-  assert.deepEqual(graph.questions["high-unpleasant"], ["hu_experience_quality", "hu_body_activation"], "the graph has them");
+  // hu_safety_urge (Oct 2026) follows "I'm spiraling" only: it scores nothing (checkin-safety.cypher).
+  assert.deepEqual(graph.questions["high-unpleasant"], ["hu_experience_quality", "hu_body_activation", "hu_safety_urge"], "the graph has them");
   const dm = read("src/pages/tools/DearMan.tsx");
   const route = dm.slice(dm.indexOf("// ─── DEBRIEF: ROUTE ───"));
   const banner = route.indexOf("{isCrisisFlag(stateResult?.safetyFlag) && <CrisisBanner />}");

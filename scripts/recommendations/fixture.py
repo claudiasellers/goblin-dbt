@@ -18,7 +18,7 @@ OUT = os.path.join(ROOT, 'tests/fixtures/recommendation-graph.json')
 # Statements the interpreter skipped must not touch anything routing reads.
 ROUTING_TOKENS = re.compile(
     r'\[\w*:(ASSOCIATED_WITH|ADDRESSES|REDUCES|TARGETS|EVIDENCE_FOR|CO_OCCURS_WITH|TRIGGERS_SAFETY|HAS_RESPONSE|'
-    r'RECOMMENDED_FOR|SCORES_AS|SIGNALS|CONTRAINDICATED_FOR)\b|\.appToolId\b|\.(side|skillKind|direction|blank)\s*=|'
+    r'RECOMMENDED_FOR|SCORES_AS|SIGNALS|CONTRAINDICATED_FOR|RAISES_SAFETY|TRIGGERS_NEXT)\b|\.appToolId\b|\.(side|skillKind|direction|blank)\s*=|'
     r':(ActivationPattern|SafetyFlag|DiscriminatingQuestion|QuestionResponse|RoutingPolicy)\b')
 TOOL_EDGES = ('ADDRESSES', 'REDUCES', 'TARGETS')
 PATTERN_FIELDS = ('userFacingLabel', 'description', 'evidenceGrade', 'safetyConstraints', 'clinicalNotes')
@@ -68,7 +68,15 @@ def build(g):
     safety = {}
     for r in sorted(g.rels('TRIGGERS_SAFETY', 'ActivationPattern', 'SafetyFlag'), key=lambda r: r.seq):
         f = r.end.props
-        safety.setdefault(pid(r.start), []).append({k: f.get(k) for k in ('id', 'type', 'trigger', 'action')})
+        safety.setdefault(pid(r.start), []).append(dict({k: f.get(k) for k in ('id', 'type', 'trigger', 'action')},
+                                                        withoutSignal=r.props.get('withoutSignal')))
+    # An answer that raises a flag outright (checkin-safety.cypher), in declaration order.
+    raises = {}
+    for r in sorted(g.rels('RAISES_SAFETY', 'QuestionResponse', 'SafetyFlag'), key=lambda r: r.seq):
+        f = r.end.props
+        raises.setdefault(pid(r.start), []).append({k: f.get(k) for k in ('id', 'type', 'trigger', 'action')})
+    next_q = {pid(r.start): pid(r.end) for r in g.rels('TRIGGERS_NEXT', 'QuestionResponse', 'DiscriminatingQuestion')}
+    question_kind = {pid(q): q.props.get('kind') for q in g.find('DiscriminatingQuestion') if q.props.get('kind')}
 
     emotions = {pid(n): {'name': n.props.get('name'), 'quadrant': n.props.get('quadrant')}
                 for n in sorted(g.find('Emotion'), key=pid)}
@@ -90,7 +98,7 @@ def build(g):
     policy = None
     if rp:
         policy = {k: rp.props.get(k) for k in ('version', 'enabled', 'maxCards', 'fallbackConceptId', 'defaultBand',
-                                                'floodedPatterns', 'reviewStatus')}
+                                                'floodedPatterns', 'answerWeight', 'tieBreak', 'reviewStatus')}
 
     return {
         'kind': 'recommendation-graph',
@@ -101,6 +109,9 @@ def build(g):
         'questions': questions,
         'coOccurrence': co,
         'safety': safety,
+        'raisesSafety': raises,
+        'triggersNext': next_q,
+        'questionKinds': question_kind,
         'emotions': emotions,
         'aliases': aliases,
         'signals': signals,

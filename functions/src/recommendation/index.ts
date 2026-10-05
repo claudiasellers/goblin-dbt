@@ -58,6 +58,7 @@ export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
       ruleIds: r?.ruleIds ?? [],
       filtered: r?.filtered ?? [],
       receiveFirst: r?.receiveFirst ?? null,
+      // The type only: banner vs line would say how the person answered the safety question.
       safetyFlag: result.safetyFlag?.type ?? null,
     }));
     return result;
@@ -76,6 +77,8 @@ export const getDiscriminatingQuestions = onCall(
     subtext: string;
     order: number;
     required: boolean;
+    /** 'safety' for the spiral path's self-harm question: sent to getStateAndTools, never saved. */
+    kind?: string;
     responses: Array<{
       id: string;
       label: string;
@@ -83,6 +86,7 @@ export const getDiscriminatingQuestions = onCall(
       order: number;
       isEscapeHatch: boolean;
       triggersNextQuestionId?: string;
+      raisesSafety?: boolean;
     }>;
   }> }> => {
     const { quadrant } = request.data as { quadrant: string };
@@ -97,17 +101,21 @@ export const getDiscriminatingQuestions = onCall(
         MATCH (q:DiscriminatingQuestion)-[hr:HAS_RESPONSE]->(r:QuestionResponse)
         WHERE $quadrant IN q.applicableQuadrants
         OPTIONAL MATCH (r)-[:TRIGGERS_NEXT]->(nextQ:DiscriminatingQuestion)
+        OPTIONAL MATCH (r)-[:RAISES_SAFETY]->(sf:SafetyFlag)
+        WITH q, r, nextQ, count(sf) > 0 AS raisesSafety
         RETURN q.id as questionId,
                q.text as questionText,
                q.subtext as questionSubtext,
                q.order as questionOrder,
                q.required as questionRequired,
+               q.kind as questionKind,
                r.id as responseId,
                r.label as responseLabel,
                r.subtext as responseSubtext,
                r.order as responseOrder,
                r.isEscapeHatch as isEscapeHatch,
-               nextQ.id as triggersNextQuestionId
+               nextQ.id as triggersNextQuestionId,
+               raisesSafety
         ORDER BY q.order, r.order
       `;
 
@@ -120,6 +128,7 @@ export const getDiscriminatingQuestions = onCall(
         subtext: string;
         order: number;
         required: boolean;
+        kind?: string;
         responses: Array<{
           id: string;
           label: string;
@@ -127,6 +136,7 @@ export const getDiscriminatingQuestions = onCall(
           order: number;
           isEscapeHatch: boolean;
           triggersNextQuestionId?: string;
+          raisesSafety?: boolean;
         }>;
       }>();
 
@@ -141,6 +151,7 @@ export const getDiscriminatingQuestions = onCall(
               ? (rec.get('questionOrder') as { toNumber: () => number }).toNumber()
               : Number(rec.get('questionOrder')),
             required: rec.get('questionRequired') as boolean,
+            ...(rec.get('questionKind') ? { kind: rec.get('questionKind') as string } : {}),
             responses: [],
           });
         }
@@ -155,6 +166,7 @@ export const getDiscriminatingQuestions = onCall(
             : Number(rec.get('responseOrder')),
           isEscapeHatch: rec.get('isEscapeHatch') as boolean,
           ...(nextQId ? { triggersNextQuestionId: nextQId } : {}),
+          ...(rec.get('raisesSafety') === true ? { raisesSafety: true } : {}),
         });
       }
 

@@ -14,8 +14,10 @@
  * Interim frontend copy (D-06). The safety batch's `safety.open` wraps this.
  */
 
-// Must work for someone who is flooded but not suicidal: every
-// emotional_flooding result reaches this banner.
+// Since Oct 2026 a flooding result reaches this banner only with a yes (or not sure) to the spiral
+// path's self-harm question; without one it gets the calm SafetyLine. An app or server from before
+// that still shows the banner for every flooding result, so the line must still work for someone who
+// is flooded but not suicidal.
 const CRISIS_BANNER_LINE =
   "When it gets this intense, you don't have to carry it alone. You can talk to someone right now, any time.";
 

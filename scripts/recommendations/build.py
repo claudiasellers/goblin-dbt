@@ -128,7 +128,8 @@ def main():
     A(f"MERGE (rp:RoutingPolicy {{id: \"checkin_result\"}})\n"
       f"SET rp.version = {lit(pol['version'])}, rp.enabled = {lit(pol['enabled'])}, rp.maxCards = {pol['maxCards']},\n"
       f"    rp.fallbackConceptId = {lit(pol['fallbackConceptId'])}, rp.defaultBand = {lit(pol['defaultBand'])},\n"
-      f"    rp.floodedPatterns = {lit(pol['floodedPatterns'])}, rp.reviewStatus = {lit(C.review_status('checkin_result'))};")
+      f"    rp.floodedPatterns = {lit(pol['floodedPatterns'])}, rp.answerWeight = {pol['answerWeight']},\n"
+      f"    rp.tieBreak = {lit(pol['tieBreak'])}, rp.reviewStatus = {lit(C.review_status('checkin_result'))};")
 
     A("\n// --- 4. Pattern × band rows (P = priority 1, swap = 2; gated rows 0 / 1.5) ---")
     concept = {t: v["concept"] for t, v in C.CONCEPT_TAGS.items()}
