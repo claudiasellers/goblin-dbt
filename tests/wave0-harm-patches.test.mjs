@@ -31,54 +31,22 @@ function filesUnder(dir) {
   });
 }
 
-const { coolDownView, coolDownTimerAllowed } = await importTs("src/lib/coolDown.ts");
 const { isCrisisFlag, resultSections, bailoutSections } = await importTs(
   "src/lib/crisisBanner.ts",
 );
 
 // ---------------------------------------------------------------- Cool Down
 
-test("coolDownView gates cold water on the face behind the self-check", () => {
-  assert.equal(coolDownView("cold-water", "unasked"), "check");
-  assert.equal(coolDownView("cold-water", "clear"), "cold");
-  assert.equal(coolDownView("cold-water", "skip"), "exhale");
-  assert.equal(coolDownView("ice-cubes", "unasked"), "technique");
-  assert.equal(coolDownView("ice-cubes", "skip"), "technique");
-  for (const check of ["unasked", "clear", "skip"]) {
-    assert.equal(coolDownView(null, check), "none");
-  }
-});
-
-test("the Cool Down timer can't start from the self-check or with nothing selected", () => {
-  assert.equal(coolDownTimerAllowed("check"), false);
-  assert.equal(coolDownTimerAllowed("none"), false);
-  for (const view of ["cold", "exhale", "technique"]) {
-    assert.equal(coolDownTimerAllowed(view), true);
-  }
-});
-
-test("Cool Down: cold-water copy sits behind the 'cold' view, breath-hold optional, 'not sure' skips", () => {
+// The per-visit self-check (A0-1) was removed with the Circuit Breaker rebuild (PR #46); the
+// stored medical screen (BodySafetyFlags, safety batch) replaces it. What still holds:
+test("Cool Down (Circuit Breaker): cold goes on the face, never wrists or neck; nothing persisted", () => {
   const src = read("src/pages/tools/CoolDown.tsx");
-  assert.match(src, /view === 'cold' \? COLD_WATER_FACE/);
-  assert.match(src, /view === 'exhale' \? \{ id: 'exhale', \.\.\.LONG_EXHALE \}/);
-  // Breath-hold is optional, never prescribed.
-  assert.doesNotMatch(src, /instruction: 'Hold your breath/);
-  assert.match(src, /Hold your breath if that\\'s okay, or breathe out slowly/);
-  // Every self-check item from D-06 / DT PRD §3.5 item 1.
-  for (const item of [
-    /heart medication/,
-    /Fainting/,
-    /Eating disorder or very low weight/,
-    /Pregnant/,
-    /Raynaud/,
-    /Been drinking or using today/,
-  ]) {
-    assert.match(src, item);
-  }
-  assert.match(src, /skip: 'One of these, or not sure'/);
-  assert.match(src, /setColdCheck\('skip'\)/);
-  // Never persisted.
+  assert.match(src, /under your eyes and on your cheekbones/i);
+  assert.doesNotMatch(src, /wrist|neck/i);
   assert.doesNotMatch(src, /localStorage|sessionStorage/);
+  // The dose runs on timestamps, so a locked screen doesn't stretch it.
+  assert.match(src, /Date\.now\(\)/);
+  assert.doesNotMatch(src, /Great job/);
 });
 
 // ------------------------------------------------------------ Crisis banner

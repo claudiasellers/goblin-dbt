@@ -9,19 +9,22 @@ export interface Tool {
   module: ModuleId;
   dbtBasis?: string;
   emoji: string;
+  /** The tool's own screen carries the instructions: the page skips the tagline and "When to use this". */
+  bare?: boolean;
 }
 
 export const tools: Tool[] = [
   // Distress Tolerance
   {
     id: 'cool-down',
-    name: 'Cool Down',
+    name: 'Circuit Breaker',
     tagline: 'Use temperature to calm fast',
     description: 'Cold water or ice can quickly shift your body out of crisis mode by triggering your dive reflex.',
     whenToUse: 'When your body is too loud to think.',
     module: 'distress-tolerance',
     dbtBasis: 'TIP - Temperature',
     emoji: '🧊',
+    bare: true,
   },
   {
     id: 'pause',
@@ -132,6 +135,19 @@ export const intents: Intent[] = [
 
 export function getToolById(id: string): Tool | undefined {
   return tools.find(t => t.id === id);
+}
+
+/**
+ * Address names that differ from the tool id. The id stays the stable key (graph appToolId,
+ * saved sessions, routing); only the address the user sees changes. /tool/<id> redirects here.
+ */
+export const TOOL_URL_SLUGS: Record<string, string> = {
+  'cool-down': 'circuit-breaker',
+};
+
+/** The tool id for an address segment (a slug or the id itself). */
+export function toolIdFromUrl(segment: string): string {
+  return Object.entries(TOOL_URL_SLUGS).find(([, slug]) => slug === segment)?.[0] ?? segment;
 }
 
 export function getToolsByModule(moduleId: string): Tool[] {

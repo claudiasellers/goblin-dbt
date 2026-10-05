@@ -95,13 +95,19 @@ test("close question: the tool's own wording wins; kinds that don't ask get none
 });
 
 test("the five silent tools use the session and render the close on completion", () => {
-  for (const f of ["CoolDown", "FiveSenses", "Pause", "UrgeSurfing"]) {
+  for (const f of ["FiveSenses", "Pause", "UrgeSurfing"]) {
     const src = readFileSync(`src/pages/tools/${f}.tsx`, "utf8");
     assert.match(src, /useToolSession\(\)/, f);
     assert.match(src, /markComplete\(\)/, f);
     assert.match(src, /<SessionClose \/>/, f);
     assert.match(src, /markPracticed\(\)/, f);
   }
+  // Circuit Breaker (cool-down) asks its own check-in and closes the session with the answer.
+  const cb = readFileSync("src/pages/tools/CoolDown.tsx", "utf8");
+  assert.match(cb, /useToolSession\(\)/);
+  assert.match(cb, /markPracticed\(\)/);
+  assert.match(cb, /markComplete\(\)/);
+  assert.match(cb, /session\.close\(\{ status: 'completed', thenVsNow/);
   const ps = readFileSync("src/pages/tools/ProblemSolve.tsx", "utf8");
   assert.match(ps, /useToolSession\(\)/);
   assert.match(ps, /session\.markComplete\(\)/);
