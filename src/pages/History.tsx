@@ -8,6 +8,7 @@ import { HistoryInsights } from '../components/history/HistoryInsights';
 import { Insights } from './Insights';
 import { useBand } from '../hooks/useBand';
 import { historyBandLabel } from '../lib/checkInBand';
+import { HISTORY_LIMIT } from '../lib/reflect';
 
 export function History() {
   const { user } = useAuth();
@@ -29,7 +30,8 @@ export function History() {
 
       try {
         const [checkInResult, dearManResult] = await Promise.allSettled([
-          getCheckInsByUser(user.uid),
+          // The server's ceiling, so "All" means all (it used to stop at the latest 50).
+          getCheckInsByUser(user.uid, HISTORY_LIMIT),
           getDearManSessions(),
         ]);
 
@@ -170,6 +172,11 @@ export function History() {
             <>
               <HistoryInsights checkIns={checkIns} />
               <CheckInFeed checkIns={checkIns} />
+              {checkIns.length >= HISTORY_LIMIT && (
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-3">
+                  Showing your latest {HISTORY_LIMIT} check-ins.
+                </p>
+              )}
             </>
           )}
         </>

@@ -2,7 +2,7 @@ import type { OppositeActionFlow, OppositeActionSession, SavedOppositeActionSess
 import type { InvalidationRecoveryContent, InvalidationRecoveryProgress, InvalidationRecoverySession } from '../data/invalidationRecoveryTypes';
 import { httpsCallable } from 'firebase/functions';
 import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
-import { functions } from './firebase';
+import { auth, functions } from './firebase';
 import type { CollectedWord, FindTheFeelingContent, FindTheFeelingSession } from '../data/findTheFeelingTypes';
 import type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
 
@@ -761,15 +761,20 @@ export interface SomaticCorrelationData {
   narrative: string;
 }
 
-export interface ToolEffectivenessData {
-  tools: Array<{ toolId: string; helpedPct: number; totalUses: number }>;
+/** Mirrors functions/src/insights/types.ts ToolOutcomeSummary (Reflect R1). */
+export interface ToolOutcomeSummary {
+  toolId: string;
+  /** Absent from a server older than Reflect R1. */
+  measure?: 'then_vs_now' | 'urge';
+  direction?: 'down' | 'orient' | null;
+  answered?: number;
+  wentWell?: number;
+  helpedPct: number;
+  totalUses: number;
 }
 
-export interface ContinuityPrompt {
-  toolId: string;
-  toolTimestamp: string;
-  checkInEmotion: string;
-  checkInTimestamp: string;
+export interface ToolEffectivenessData {
+  tools: ToolOutcomeSummary[];
 }
 
 export interface PatternFrequency {
@@ -783,7 +788,8 @@ export interface InsightsPayload {
   growthEvidence: GrowthEvidenceInsight | null;
   somaticCorrelation: SomaticCorrelationData | null;
   toolEffectiveness: ToolEffectivenessData | null;
-  continuityPrompt: ContinuityPrompt | null;
+  /** Retired in Reflect R1 ("did it help?" lives in Today since PR-S5); always null. */
+  continuityPrompt: null;
   patternFrequencies: PatternFrequency[];
   totalCheckIns: number;
 }
@@ -798,14 +804,26 @@ const recordToolOutcomeFn = httpsCallable<
   { success: boolean }
 >(functions, 'recordToolOutcome');
 
+/** How long one Insights answer is reused: long enough for Reflect and its side panel, which ask together; short enough that coming back from a tool reads fresh. */
+export const INSIGHTS_REUSE_MS = 5_000;
+const insightsCache = new Map<string, { at: number; promise: Promise<InsightsPayload> }>();
+
 /**
- * Get all insights data for the Insights page
+ * Insights for Reflect. Calls for the same user and range within INSIGHTS_REUSE_MS share one
+ * request (the page and the side panel used to compute the whole thing twice); a failed request
+ * is forgotten at once. `fresh` skips the reuse.
  */
 export async function getInsightsData(
-  timeRange: '7d' | '30d' | 'all' = '30d'
+  timeRange: '7d' | '30d' | 'all' = '30d',
+  { fresh = false }: { fresh?: boolean } = {},
 ): Promise<InsightsPayload> {
-  const result = await getInsightsDataFn({ timeRange });
-  return result.data;
+  const key = `${auth.currentUser?.uid ?? ''}:${timeRange}`;
+  const hit = insightsCache.get(key);
+  if (!fresh && hit && Date.now() - hit.at < INSIGHTS_REUSE_MS) return hit.promise;
+  const promise = getInsightsDataFn({ timeRange }).then((r) => r.data);
+  insightsCache.set(key, { at: Date.now(), promise });
+  promise.catch(() => { if (insightsCache.get(key)?.promise === promise) insightsCache.delete(key); });
+  return promise;
 }
 
 /**

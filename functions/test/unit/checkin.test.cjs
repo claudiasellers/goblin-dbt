@@ -178,7 +178,7 @@ test('Insights reads emotion families from emotionIds and skips stubs (F12)', as
   const q = f.calls.map((c) => c.query).find((x) => /LOGGED\]->\(c:CheckIn\)/.test(x) && /families/.test(x));
   assert.ok(q, 'families query');
   assert.match(q, /e\.id IN coalesce\(c\.emotionIds, \[\]\)/);
-  assert.match(q, /AND c\.quadrant IS NOT NULL/);
+  assert.match(q, /WHERE c\.quadrant IS NOT NULL/);
   assert.doesNotMatch(q, /Emotion \{id: c\.emotion\}/);
 });
 

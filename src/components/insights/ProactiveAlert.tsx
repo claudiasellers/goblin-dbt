@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { tools as toolsData } from '../../data/tools';
 import type { ProactiveAlert as ProactiveAlertType } from '../../services/neo4j';
+import { fromReflect } from '../../lib/reflect';
 
 interface Props {
   alert: ProactiveAlertType;
@@ -32,6 +33,7 @@ export function ProactiveAlert({ alert, delay = 0 }: Props) {
           {alert.suggestedTool && (
             <Link
               to={`/tool/${alert.suggestedTool}`}
+              state={fromReflect()}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-bg-card)] border border-[var(--color-q-lu-border)] text-sm font-medium text-[var(--color-text-primary)] hover:border-[var(--color-q-lu-border-hover)] transition-colors"
             >
               <span>{tool?.emoji || '🔧'}</span>

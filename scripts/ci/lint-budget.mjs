@@ -6,7 +6,7 @@
  */
 import { execFileSync } from 'node:child_process';
 
-const LINT_ERROR_BUDGET = 5; // PR-C1 removed the 2 unused ensureUserExists params
+const LINT_ERROR_BUDGET = 4; // Reflect R1 removed one in the History charts (PR-C1 removed the 2 unused ensureUserExists params)
 
 let out;
 try {
