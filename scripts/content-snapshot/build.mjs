@@ -21,6 +21,8 @@
  *   find-the-feeling.json  getFindTheFeelingContent, exactly
  *   discriminating-questions.json  getDiscriminatingQuestions per quadrant (the check-in's
  *                          "Continue" waited on it, cold, before the follow-up questions)
+ *   capacity.json          getCapacityContent (band rules, hand-off primitives; loaded with every page)
+ *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
@@ -44,6 +46,8 @@ function constant(file, name) {
 }
 export const BODY_MAP_VERSION = constant('functions/src/bodyMap/index.ts', 'BODY_MAP_VERSION');
 export const FIND_FLOW_VERSION = constant('functions/src/findTheFeeling/index.ts', 'FIND_FLOW_VERSION');
+export const CAPACITY_VERSION = constant('functions/src/capacity/index.ts', 'CAPACITY_VERSION');
+export const SPINE_VERSION = constant('functions/src/spine/registry.ts', 'SPINE_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -222,6 +226,56 @@ export function buildDiscriminatingQuestions(g) {
   return out;
 }
 
+/** `int()` in functions/src/shared/values.ts, as JSON sends it: a number, or null where it gives NaN. */
+const intOrNull = (v) => (typeof v === 'number' ? v : null);
+const parseJson = (s) => JSON.parse(s ?? '{}');
+
+/** getCapacityContent (functions/src/capacity/index.ts), with its version check. */
+export function buildCapacity(g) {
+  const probe = g.nodes('CapacityProbe').find((n) => n.props.id === 'capacity_probe');
+  if (!probe || probe.props.version !== CAPACITY_VERSION) {
+    throw new Error(`Capacity content is ${probe ? probe.props.version : 'missing'}; the app expects ${CAPACITY_VERSION}`);
+  }
+  const primitives = g.nodes('HandoffPrimitive')
+    .sort((a, b) => asc(a.props.rank, b.props.rank))
+    .map(({ props: h }) => ({
+      id: h.id ?? null, component: h.component ?? null, direction: h.direction ?? null, bands: h.bands ?? null,
+      blank: h.blank ?? null, rank: intOrNull(h.rank), conceptId: h.conceptId ?? null, copy: parseJson(h.copyJson),
+    }));
+  const bandRules = g.nodes('BandRule')
+    .sort((a, b) => asc(a.props.skillId, b.props.skillId) || asc(a.props.band, b.props.band))
+    .map(({ props: r }) => {
+      const copy = parseJson(r.copyJson);
+      return { skillId: r.skillId ?? null, band: r.band ?? null, mode: r.mode ?? null, ...(copy.headsUp ? { headsUp: copy.headsUp } : {}) };
+    });
+  return { ...JSON.parse(probe.props.contentJson), version: CAPACITY_VERSION, primitives, bandRules };
+}
+
+/** getSpineContent (functions/src/spine/registry.ts): the close flow and readFollowUpTypes. */
+export function buildSpine(g) {
+  const flow = g.nodes('SessionCloseFlow').find((n) => n.props.id === 'session_close');
+  if (!flow || flow.props.version !== SPINE_VERSION) {
+    throw new Error(`Spine content is ${flow ? flow.props.version : 'missing'}; the app expects ${SPINE_VERSION}`);
+  }
+  const { version: _v, ...closeFlow } = JSON.parse(flow.props.contentJson);
+  const followUpTypes = g.nodes('FollowUpType')
+    .filter((n) => (n.props.reserved ?? false) === false)
+    .sort((a, b) => asc(a.props.id, b.props.id))
+    .map(({ props: t }) => {
+      const content = parseJson(t.contentJson);
+      return {
+        id: t.id, ownerModule: t.ownerModule ?? null, tier: t.hierarchyTier ?? null, resolveMode: t.resolveMode ?? null,
+        deepLinkTemplate: t.deepLinkTemplate ?? null, staleAfterHours: intOrNull(t.staleAfterHours), missedPath: t.missedPath ?? null,
+        notify: { push: t.notifyPush === true, inTab: t.notifyInTab === true, ics: t.notifyIcs === true },
+        enabled: t.enabled === true,
+        ...(content.dir ? { dir: content.dir } : {}),
+        copy: content.copy ?? { title: '' }, choices: content.choices ?? [], window: content.window ?? {},
+        notification: content.notification ?? '',
+      };
+    });
+  return { version: SPINE_VERSION, closeFlow, followUpTypes };
+}
+
 /** All the snapshots from one export (pure apart from reading the version constants). */
 export function buildSnapshots(exp) {
   assertContentOnly(exp);
@@ -231,6 +285,8 @@ export function buildSnapshots(exp) {
     'body-map.json': buildBodyMap(g),
     'find-the-feeling.json': buildFindTheFeeling(g),
     'discriminating-questions.json': buildDiscriminatingQuestions(g),
+    'capacity.json': buildCapacity(g),
+    'spine.json': buildSpine(g),
   };
 }
 

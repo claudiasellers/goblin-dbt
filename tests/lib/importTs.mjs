@@ -31,6 +31,13 @@ function build(file) {
   }).outputText;
   const req = createRequire(file);
   js = js.replace(/(\bfrom\s*|\bimport\s*\(\s*|\bimport\s+)(["'])([^"']+)\2/g, (m, pre, q, spec) => {
+    if (spec.startsWith(".") && spec.endsWith(".json")) {
+      // JSON (src/data/content/*.json): import the file itself, with the attribute Node requires.
+      const url = pathToFileURL(resolve(dirname(file), spec)).href;
+      return pre.startsWith("import") && pre.includes("(")
+        ? `${pre}${q}${url}${q}, { with: { type: "json" } }`
+        : `${pre}${q}${url}${q} with { type: "json" }`;
+    }
     if (spec.startsWith(".")) {
       const dep = build(resolveTs(file, spec));
       return `${pre}${q}${pathToFileURL(dep).href}${q}`;

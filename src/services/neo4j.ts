@@ -264,6 +264,21 @@ const getStateAndToolsFn = httpsCallable<
  * Get the activation pattern and recommended tools based on check-in data
  * This is the main "What's happening right now" query
  */
+const warmStateAndToolsFn = httpsCallable<{ warm: true }, { warm: true }>(functions, 'getStateAndTools');
+let lastWarm = 0;
+
+/**
+ * Wake getStateAndTools (and its Neo4j connection) before the result screen needs it, so the check-in
+ * result doesn't wait on a cold Cloud Function. Signed-in only (the function requires it); at most
+ * once every 2 minutes; never throws (a failed warm-up just means the real call is cold).
+ */
+export function warmCheckInEngine(): void {
+  const now = Date.now();
+  if (now - lastWarm < 120_000) return;
+  lastWarm = now;
+  warmStateAndToolsFn({ warm: true }).catch(() => { lastWarm = 0; });
+}
+
 export async function getStateAndTools(input: {
   quadrant: string;
   emotions?: string[];
