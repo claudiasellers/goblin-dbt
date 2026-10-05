@@ -43,42 +43,39 @@ const pickIds = (sel) => sel.picks.map((p) => p.concept.appToolId);
 
 // ---- Goldens ----
 
-test("#1–3 Anxious → acute_alarm: no band → stirred (inferred): 5-4-3-2-1 + Cool Down; steady: OA + 5-4-3-2-1; flooded: Cool Down + 5-4-3-2-1", async () => {
+test("#1–3 Anxious → On guard (its reviewed pattern): Do the Opposite + 5-4-3-2-1 whatever the band but flooded; flooded: Cool Down + 5-4-3-2-1", async () => {
   const r1 = await run(hu({ emotions: ["Anxious"] }));
-  assert.equal(r1.pattern.id, "acute_alarm");
-  assert.deepEqual([r1.routing.band, r1.routing.bandSource, r1.routing.version], ["stirred", "inferred", "rf-v1"]);
-  assert.deepEqual(ids(r1), ["five-senses", "cool-down"]);
-  assert.deepEqual(ids(await run(hu({ emotions: ["Anxious"], band: "steady", bandSource: "probe" }))), ["opposite-action", "five-senses"]);
+  assert.equal(r1.pattern.id, "chronic_vigilance");
+  assert.deepEqual([r1.routing.band, r1.routing.bandSource, r1.routing.version], ["stirred", "inferred", "rf-v2"]);
+  assert.deepEqual(ids(r1), ["opposite-action", "five-senses"]);
+  assert.equal(r1.tools[0].ruleId, "rf_chronic_vigilance_words_anticipatory_opposite-action");
+  assert.deepEqual(ids(await run(hu({ emotions: ["Anxious"], band: "steady", bandSource: "probe" }))), ["opposite-action", "five-senses"], "no capacity split");
   const r3 = await run(hu({ emotions: ["Anxious"], band: "flooded" }));
   assert.deepEqual(ids(r3), ["cool-down", "five-senses"]);
   assert.equal(r3.routing.bandSource, "probe");
   assert.equal(r3.safetyFlag, undefined);
 });
 
-test("#4 a wound word leads to Recover (E4-6: grid words now move the pattern)", async () => {
-  // Humiliated now scores as hot_shame → social_threat_shame, whose own rows put OA first when steady
-  // and Recover first when stirred (sts has no gate row: Recover is already in its table).
-  const s = await run(hu({ emotions: ["Humiliated"], band: "steady" }));
-  assert.equal(s.pattern.id, "social_threat_shame");
-  assert.deepEqual(ids(s), ["opposite-action", "recovering-from-invalidation"]);
-  assert.deepEqual(ids(await run(hu({ emotions: ["Humiliated"], band: "stirred" }))), ["recovering-from-invalidation", "pause"]);
-  // Where the pattern has no Recover row, the wound gate leads (a word that lands on acute_alarm).
-  const gated = await run(hu({ emotions: ["Humiliated"], band: "steady" }), { ...on, aliases: {} });
-  assert.equal(gated.pattern.id, "acute_alarm");
-  assert.deepEqual(ids(gated), ["recovering-from-invalidation", "opposite-action"]);
-  assert.equal(gated.tools[0].reason, "emotion_gate");
-  assert.equal(gated.tools[0].ruleId, "rf_acute_alarm_addresses_recovering-from-invalidation");
-  // Hurt alone scores rumination first, and the graph's ruminative-collapse co-occurrence makes
-  // freeze primary; freeze has no Recover row, so the wound gate doesn't fire (a D-02 review point).
-  const hurt = await run(lu({ emotions: ["Hurt"], band: "steady" }));
-  assert.equal(hurt.pattern.id, "conservation_freeze");
-  assert.deepEqual(ids(hurt), ["five-senses", "opposite-action"]);
+test("#4 a wound word leads to Recover on every pattern but Flooded (R7 everywhere, Oct 2026 review)", async () => {
+  const h = await run(hu({ emotions: ["Humiliated"] }));
+  assert.equal(h.pattern.id, "social_threat_shame");
+  assert.deepEqual(ids(h), ["recovering-from-invalidation", "cool-down"], "Recover leads; the review's Cool Down follows");
+  assert.equal(h.tools[0].ruleId, "rf_social_threat_shame_addresses_recovering-from-invalidation");
+  for (const pid of PATTERNS.filter((p) => p !== "emotional_flooding")) {
+    const sel = await cell(pid, "stirred", { words: ["hurt"] });
+    assert.equal(pickIds(sel)[0], "recovering-from-invalidation", pid);
+    assert.equal(sel.picks[0].reason, "emotion_gate", pid);
+  }
+  assert.ok(!pickIds(await cell("emotional_flooding", "flooded", { words: ["hurt"] })).includes("recovering-from-invalidation"), "flooded: body first");
+  const hurt = await run(lu({ emotions: ["Hurt"] }));
+  assert.equal(hurt.pattern.id, "rumination_loop", "Hurt is low-energy: On replay, and Recover now reaches it");
+  assert.deepEqual(ids(hurt), ["recovering-from-invalidation", "problem-solve"]);
 });
 
-test("#5 nothing named (somatic skip), steady → OA + Find the feeling", async () => {
+test("#5 nothing named (somatic skip) → Alarm: Cool Down + Find the feeling", async () => {
   const r = await run(hu({ band: "steady" }));
   assert.equal(r.pattern.id, "acute_alarm");
-  assert.deepEqual(ids(r), ["opposite-action", "find-the-feeling"]);
+  assert.deepEqual(ids(r), ["cool-down", "find-the-feeling"]);
 });
 
 test("#6 freeze: 5-4-3-2-1, then OA only 'once you've moved a little'; gentle movement; no flag", async () => {
@@ -93,7 +90,7 @@ test("#6 freeze: 5-4-3-2-1, then OA only 'once you've moved a little'; gentle mo
 
 test("#7 dissociation (any band): 5-4-3-2-1 only, never OA, no flag", async () => {
   for (const band of BANDS) {
-    const r = await run(lu({ emotions: ["Empty"], band, discriminatingAnswers: ans("lu_body_numb") }));
+    const r = await run(lu({ band, discriminatingAnswers: ans("lu_body_numb", "lu_mind_faraway") }));
     assert.equal(r.pattern.id, "dissociation_overmodulation");
     assert.deepEqual(ids(r), ["five-senses"], band);
     assert.equal(r.safetyFlag, undefined);
@@ -101,10 +98,11 @@ test("#7 dissociation (any band): 5-4-3-2-1 only, never OA, no flag", async () =
   }
 });
 
-test("#8 reward_drive_low stirred: OA + 5-4-3-2-1, never Cool Down or Pause", async () => {
-  const r = await run(lu({ emotions: ["Bored"], band: "stirred", discriminatingAnswers: ans("lu_body_flat") }));
+test("#8 Low drive: Do the Opposite ('get active'), never 5-4-3-2-1 for vegetative states, never Cool Down or Pause", async () => {
+  const r = await run(lu({ emotions: ["Bored"], discriminatingAnswers: ans("lu_body_flat") }));
   assert.equal(r.pattern.id, "reward_drive_low");
-  assert.deepEqual(ids(r), ["opposite-action", "five-senses"]);
+  assert.deepEqual(ids(r), ["opposite-action"]);
+  assert.equal(r.guidedActivity.activityId, "micro-win");
 });
 
 test("#9 rumination steady: Problem Solve + 5-4-3-2-1", async () => {
@@ -114,15 +112,16 @@ test("#9 rumination steady: Problem Solve + 5-4-3-2-1", async () => {
   assert.equal(r.guidedActivity.activityId, "attention-shift");
 });
 
-test("#10 social_threat_shame: steady OA + Recover; stirred Recover + Pause", async () => {
-  assert.deepEqual(pickIds(await cell("social_threat_shame", "steady")), ["opposite-action", "recovering-from-invalidation"]);
-  assert.deepEqual(pickIds(await cell("social_threat_shame", "stirred")), ["recovering-from-invalidation", "pause"]);
+test("#10 Social threat: Recover + Do the Opposite (unhiding) in any band but flooded", async () => {
+  assert.deepEqual(pickIds(await cell("social_threat_shame", "steady")), ["recovering-from-invalidation", "opposite-action"]);
+  assert.deepEqual(pickIds(await cell("social_threat_shame", "stirred")), ["recovering-from-invalidation", "opposite-action"]);
 });
 
-test("#11 chronic_vigilance always has a card (was none); Urge Surfing stays off (D-02)", async () => {
-  assert.deepEqual(pickIds(await cell("chronic_vigilance", "steady")), ["five-senses", "problem-solve"]);
-  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred")), ["five-senses"]);
+test("#11 On guard always has a card: 5-4-3-2-1 + Problem Solve; Urge Surfing stays off (D-02)", async () => {
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "steady", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
+  assert.deepEqual(pickIds(await cell("chronic_vigilance", "stirred", { words: ["stressed"] })), ["five-senses", "problem-solve"]);
   assert.deepEqual(pickIds(await cell("chronic_vigilance", "flooded")), ["cool-down", "five-senses"]);
+  assert.ok(!pickIds(await cell("chronic_vigilance", "stirred", { words: ["worried"] })).includes("urge-surfing"));
 });
 
 test("#12 flooding: crisis flag as today, and the cards still come (banner above them, R12)", async () => {
@@ -133,11 +132,11 @@ test("#12 flooding: crisis flag as today, and the cards still come (banner above
   assert.deepEqual(ids(r), ["cool-down", "five-senses"]);
 });
 
-test("#13 co-occurring blank pattern: nothing calming (acute_alarm + dissociation, stirred → 5-4-3-2-1 alone)", async () => {
+test("#13 co-occurring blank pattern: nothing calming and no Do the Opposite (acute_alarm + dissociation, stirred → 5-4-3-2-1 alone)", async () => {
   const sel = await cell("acute_alarm", "stirred", { blank: true, secondary: "dissociation_overmodulation" });
   assert.deepEqual(pickIds(sel), ["five-senses"]);
-  assert.deepEqual(sel.filtered.filter((f) => f.reason !== "emotion_gate").map((f) => [f.toolId, f.reason]), [["cool-down", "direction"]]);
-  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["find-the-feeling", "recovering-from-invalidation"], "gated rows that didn't fire are logged");
+  assert.deepEqual(sel.filtered.filter((f) => f.reason !== "emotion_gate").map((f) => [f.toolId, f.reason]), [["cool-down", "direction"], ["opposite-action", "contraindicated"]]);
+  assert.deepEqual(sel.filtered.filter((f) => f.reason === "emotion_gate").map((f) => f.toolId).sort(), ["find-the-feeling", "five-senses", "opposite-action", "pause", "problem-solve", "recovering-from-invalidation"], "gated rows that didn't fire are logged (word rules too)");
 });
 
 test("#14 FTF flooded + blank → 5-4-3-2-1 only (no Cool Down, D-02)", async () => {
@@ -204,14 +203,14 @@ test("#18 kill switch: policy off (as shipped) or missing → the E4-1 output by
 test("the fallback (5-4-3-2-1) answers when every row is filtered", async () => {
   const g = structuredClone(on);
   g.recommendedFor = g.recommendedFor.filter((r) => r.patternId !== "acute_alarm");
-  const r = await run(hu({ emotions: ["Anxious"], band: "steady" }), g);
+  const r = await run(hu({ emotions: ["Fearful"] }), g);
   assert.deepEqual(ids(r), ["five-senses"]);
   assert.deepEqual([r.tools[0].ruleId, r.tools[0].reason], ["fallback", "fallback"]);
 });
 
 // ---- Invariants over all 27 cells and every gated variant ----
 
-test("invariants: 1–2 cards, ≤1 change skill, distinct kinds, no calming when blank, flooded body/orient only, no OA for dissociation, OA in ≤ 6 of 27 cells, real tools only, no DEAR MAN, requiresPrior never first, deterministic", async () => {
+test("invariants: 1–2 cards, ≤1 change skill, distinct kinds, no calming when blank, flooded body/orient only, no OA for dissociation, real tools only, no DEAR MAN, requiresPrior never first, deterministic", async () => {
   let oaCells = 0;
   const variants = [{ words: [] }, { words: ["humiliated"] }, { words: ["hurt"] }, { words: ["anxious"] }];
   for (const pid of PATTERNS) {
@@ -238,7 +237,10 @@ test("invariants: 1–2 cards, ≤1 change skill, distinct kinds, no calming whe
     }
   }
   assert.equal(PATTERNS.length * BANDS.length, 27);
-  assert.ok(oaCells <= 6, `OA in ${oaCells} of 27 cells`);
+  // Oct 2026 review: the thinking tools are no longer held back by capacity, so Do the Opposite shows in more
+  // cells (pinned, so a change is deliberate): Alarm, Social threat, Shut down (after moving), Low drive and
+  // On guard's anxiety words, each in the two non-flooded bands.
+  assert.equal(oaCells, 10);
 });
 
 test("band: the request's own answer, else inferred (flooded patterns → flooded, else the default)", () => {
@@ -267,15 +269,16 @@ test("request validation: bad band / source / blank / surface / quadrant are err
   });
 });
 
-test("#19 Numb (E4-5, D-14): a low-unpleasant word now; with its body answer → dissociation → 5-4-3-2-1 only", async () => {
+test("#19 Numb (E4-5, D-14; Oct 2026 review): Shut down; with the 'numb or disconnected' answer the graph's freeze + dissociation co-occurrence keeps Shut down first, and nothing that needs engagement shows", async () => {
   const numb = grid.find((g) => g.id === "numb");
   assert.equal(numb.quadrant, "low-unpleasant");
   assert.match(readFileSync("src/data/emotions.ts", "utf8"), /makeEmotion\('numb', 'Numb', 'low-unpleasant', 'angry'/, "family kept");
   assert.match(readFileSync("schema/emotion-wheel-sync.cypher", "utf8"), /\{id: "numb", name: "Numb", quadrant: "low-unpleasant", family: "angry"\}/);
   assert.equal(graph.emotions.numb.quadrant, "low-unpleasant");
   const r = await run(lu({ emotions: ["Numb"], discriminatingAnswers: ans("lu_body_numb") }));
-  assert.equal(r.pattern.id, "dissociation_overmodulation");
-  assert.deepEqual(ids(r), ["five-senses"]);
+  assert.equal(r.pattern.id, "conservation_freeze");
+  assert.equal(r.secondaryPattern.id, "dissociation_overmodulation");
+  assert.deepEqual(ids(r), ["five-senses"], "Do the Opposite is contraindicated with dissociation alongside");
   assert.equal(r.safetyFlag, undefined);
-  assert.equal(r.guidedActivity.activityId, "sensory-anchor");
+  assert.equal(r.guidedActivity.activityId, "gentle-movement");
 });

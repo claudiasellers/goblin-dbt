@@ -77,7 +77,11 @@ try {
   report.aliases = {};
   for (const r of aliasRows) (report.aliases[r.w] ??= []).push(r.a);
   const coOccurs = await q(`MATCH (a:ActivationPattern)-[r:CO_OCCURS_WITH]->(b:ActivationPattern) RETURN a.id AS a, b.id AS b, r.primaryPatternId AS primaryPatternId ORDER BY a, b`);
-  report.gridViaAliases = gridViaAliases(grid, assoc, report.aliases, coOccurs);
+  // Oct 2026 review: each grid word's reviewed pattern (SIGNALS) wins over its aliases.
+  const signalRows = await q(`MATCH (w:Emotion)-[:SIGNALS]->(p:ActivationPattern) RETURN w.id AS w, p.id AS p ORDER BY w, p`);
+  report.signals = {};
+  for (const r of signalRows) (report.signals[r.w] ??= []).push(r.p);
+  report.gridViaAliases = gridViaAliases(grid, assoc, report.aliases, coOccurs, report.signals);
   report.safetyTriggers = await q(`MATCH (p:ActivationPattern)-[:TRIGGERS_SAFETY]->(s:SafetyFlag) RETURN p.id AS pattern, s.type AS type, count(*) AS edges ORDER BY pattern`);
   report.safetyTriggers = report.safetyTriggers.map(r => ({ ...r, edges: toNum(r.edges) }));
   report.discriminatingEvidence = (await q(`MATCH (r:QuestionResponse)-[e:EVIDENCE_FOR]->(p:ActivationPattern) RETURN p.id AS pattern, count(e) AS edges ORDER BY pattern`)).map(r => ({ ...r, edges: toNum(r.edges) }));

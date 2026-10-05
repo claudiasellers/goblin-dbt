@@ -72,6 +72,11 @@ test('M4: only numb moving from high- to low-unpleasant is expected', () => {
   assert.deepEqual(unexpectedRoutingChanges([bigger]), [bigger]);
   const safety = { what: 'safetyTriggers', before: [], after: ['x'] };
   assert.deepEqual(unexpectedRoutingChanges([safety]), [safety]);
+  // The spiraling change: exactly one new acute_alarm evidence edge, nothing else.
+  const spiral = { what: 'discriminatingEvidence', before: [{ pattern: 'acute_alarm', edges: 5 }, { pattern: 'emotional_flooding', edges: 6 }], after: [{ pattern: 'acute_alarm', edges: 6 }, { pattern: 'emotional_flooding', edges: 6 }] };
+  assert.deepEqual(unexpectedRoutingChanges([spiral]), []);
+  const moreEvidence = { ...spiral, after: [{ pattern: 'acute_alarm', edges: 6 }, { pattern: 'emotional_flooding', edges: 7 }] };
+  assert.deepEqual(unexpectedRoutingChanges([moreEvidence]), [moreEvidence]);
 });
 
 test('M1: the positive_state stub is the only extra pattern allowed, and only when asked for', () => {

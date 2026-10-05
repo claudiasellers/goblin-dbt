@@ -486,8 +486,13 @@
  "evidence": [
   {
    "responseId": "hu_body_overwhelmed",
+   "patternId": "acute_alarm",
+   "weight": 0.3
+  },
+  {
+   "responseId": "hu_body_overwhelmed",
    "patternId": "emotional_flooding",
-   "weight": 0.8
+   "weight": 0.3
   },
   {
    "responseId": "hu_body_racing",
@@ -1788,6 +1793,263 @@
    "cold_shame"
   ]
  },
+ "signals": {
+  "abandoned": [
+   "rumination_loop"
+  ],
+  "aggressive": [
+   "reactive_aggression"
+  ],
+  "angry": [
+   "reactive_aggression"
+  ],
+  "annoyed": [
+   "acute_alarm"
+  ],
+  "anxious": [
+   "chronic_vigilance"
+  ],
+  "apathetic": [
+   "reward_drive_low"
+  ],
+  "appalled": [
+   "rumination_loop"
+  ],
+  "ashamed": [
+   "rumination_loop"
+  ],
+  "awful": [
+   "rumination_loop"
+  ],
+  "bad": [
+   "reward_drive_low"
+  ],
+  "betrayed": [
+   "social_threat_shame"
+  ],
+  "bitter": [
+   "reactive_aggression"
+  ],
+  "bored": [
+   "reward_drive_low"
+  ],
+  "busy": [
+   "acute_alarm"
+  ],
+  "critical": [
+   "chronic_vigilance"
+  ],
+  "depressed": [
+   "reward_drive_low"
+  ],
+  "despair": [
+   "conservation_freeze"
+  ],
+  "detestable": [
+   "rumination_loop"
+  ],
+  "disappointed": [
+   "rumination_loop"
+  ],
+  "disapproving": [
+   "rumination_loop"
+  ],
+  "disgusted": [
+   "rumination_loop"
+  ],
+  "dismissive": [
+   "chronic_vigilance"
+  ],
+  "disrespected": [
+   "social_threat_shame"
+  ],
+  "distant": [
+   "acute_alarm"
+  ],
+  "embarrassed": [
+   "rumination_loop"
+  ],
+  "empty": [
+   "conservation_freeze"
+  ],
+  "excluded": [
+   "social_threat_shame"
+  ],
+  "exposed": [
+   "social_threat_shame"
+  ],
+  "fearful": [
+   "acute_alarm"
+  ],
+  "fragile": [
+   "reward_drive_low"
+  ],
+  "frightened": [
+   "acute_alarm"
+  ],
+  "frustrated": [
+   "acute_alarm"
+  ],
+  "furious": [
+   "reactive_aggression"
+  ],
+  "grief": [
+   "conservation_freeze"
+  ],
+  "guilty": [
+   "rumination_loop"
+  ],
+  "helpless": [
+   "chronic_vigilance"
+  ],
+  "hesitant": [
+   "rumination_loop"
+  ],
+  "horrified": [
+   "rumination_loop"
+  ],
+  "hostile": [
+   "reactive_aggression"
+  ],
+  "humiliated": [
+   "social_threat_shame"
+  ],
+  "hurt": [
+   "rumination_loop"
+  ],
+  "inadequate": [
+   "social_threat_shame"
+  ],
+  "indifferent": [
+   "reward_drive_low"
+  ],
+  "indignant": [
+   "reactive_aggression"
+  ],
+  "inferior": [
+   "social_threat_shame"
+  ],
+  "infuriated": [
+   "reactive_aggression"
+  ],
+  "insecure": [
+   "social_threat_shame"
+  ],
+  "insignificant": [
+   "social_threat_shame"
+  ],
+  "isolated": [
+   "reward_drive_low"
+  ],
+  "jealous": [
+   "chronic_vigilance"
+  ],
+  "judgmental": [
+   "rumination_loop"
+  ],
+  "let_down": [
+   "social_threat_shame"
+  ],
+  "lonely": [
+   "reward_drive_low"
+  ],
+  "mad": [
+   "reactive_aggression"
+  ],
+  "nauseated": [
+   "rumination_loop"
+  ],
+  "nervous": [
+   "chronic_vigilance"
+  ],
+  "numb": [
+   "conservation_freeze"
+  ],
+  "out_of_control": [
+   "acute_alarm"
+  ],
+  "overwhelmed": [
+   "acute_alarm"
+  ],
+  "persecuted": [
+   "chronic_vigilance"
+  ],
+  "powerless": [
+   "reward_drive_low"
+  ],
+  "pressured": [
+   "acute_alarm"
+  ],
+  "provoked": [
+   "reactive_aggression"
+  ],
+  "rejected": [
+   "social_threat_shame"
+  ],
+  "remorseful": [
+   "rumination_loop"
+  ],
+  "repelled": [
+   "rumination_loop"
+  ],
+  "resentful": [
+   "reactive_aggression"
+  ],
+  "revolted": [
+   "rumination_loop"
+  ],
+  "ridiculed": [
+   "social_threat_shame"
+  ],
+  "rushed": [
+   "acute_alarm"
+  ],
+  "sad": [
+   "reward_drive_low"
+  ],
+  "scared": [
+   "acute_alarm"
+  ],
+  "skeptical": [
+   "chronic_vigilance"
+  ],
+  "sleepy": [
+   "reward_drive_low"
+  ],
+  "stressed": [
+   "acute_alarm"
+  ],
+  "threatened": [
+   "acute_alarm"
+  ],
+  "tired": [
+   "reward_drive_low"
+  ],
+  "unfocused": [
+   "reward_drive_low"
+  ],
+  "victimized": [
+   "rumination_loop"
+  ],
+  "violated": [
+   "social_threat_shame"
+  ],
+  "vulnerable": [
+   "reward_drive_low"
+  ],
+  "weak": [
+   "social_threat_shame"
+  ],
+  "withdrawn": [
+   "acute_alarm"
+  ],
+  "worried": [
+   "chronic_vigilance"
+  ],
+  "worthless": [
+   "social_threat_shame"
+  ]
+ },
  "recommendedFor": [
   {
    "id": "rf_acute_alarm_addresses_recovering-from-invalidation",
@@ -1802,14 +2064,84 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": "addresses",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7)."
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
+  },
+  {
+   "id": "rf_acute_alarm_backup_five-senses",
+   "conceptId": "se_orienting",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 3.0,
+   "direction": "orient",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Orienting stays available when Cool Down and Do the Opposite are both filtered (alarm with dissociation alongside: blank, and no Do the Opposite)."
+  },
+  {
+   "id": "rf_acute_alarm_default_cool-down",
+   "conceptId": "dbt_tipp",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.0,
+   "direction": "down",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Acute fear needs regulation followed by approach (review, Oct 2026): Cool Down, then Do the Opposite (its fits-the-facts step stands in for Check the Facts)."
+  },
+  {
+   "id": "rf_acute_alarm_default_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 2.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Acute fear needs regulation followed by approach (review, Oct 2026): Cool Down, then Do the Opposite (its fits-the-facts step stands in for Check the Facts)."
   },
   {
    "id": "rf_acute_alarm_flooded_cool-down",
@@ -1823,12 +2155,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
@@ -1844,12 +2177,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
@@ -1866,98 +2200,200 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": "none_named",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Nothing was named (somatic skip): offer to find the word as the swap (R9)."
+   "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_acute_alarm_steady_five-senses",
-   "conceptId": "se_orienting",
+   "id": "rf_acute_alarm_words_annoyed_accepts",
+   "conceptId": "dbt_accepts",
    "patternId": "acute_alarm",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
-   "priority": 2.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Approach vs unjustified fear (check the facts takes the lead when ER-02 ships); orienting to present safety is the non-change swap."
-  },
-  {
-   "id": "rf_acute_alarm_steady_opposite-action",
-   "conceptId": "dbt_opposite_action",
-   "patternId": "acute_alarm",
-   "bands": [
-    "steady"
-   ],
-   "priority": 1.0,
+   "priority": 0.6,
    "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "words",
+   "words": [
+    "annoyed"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
-   "active": true,
-   "version": "rf-v1",
+   "active": false,
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Approach vs unjustified fear (check the facts takes the lead when ER-02 ships); orienting to present safety is the non-change swap."
+   "rationale": "Planned: ACCEPTS as the alternative."
   },
   {
-   "id": "rf_acute_alarm_stirred_cool-down",
-   "conceptId": "dbt_tipp",
+   "id": "rf_acute_alarm_words_annoyed_check-the-facts",
+   "conceptId": "dbt_check_facts",
    "patternId": "acute_alarm",
    "bands": [
+    "steady",
     "stirred"
    ],
-   "priority": 2.0,
-   "direction": "down",
+   "priority": 0.4,
+   "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "words",
+   "words": [
+    "annoyed"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Check the Facts leads for low-grade anger."
+  },
+  {
+   "id": "rf_acute_alarm_words_annoyed_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "annoyed"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Alarm protocol orients to present safety first (pattern-co-occurrence.cypher alarm sequencing); body regulation as the swap."
+   "rationale": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."
   },
   {
-   "id": "rf_acute_alarm_stirred_five-senses",
+   "id": "rf_acute_alarm_words_freeze_five-senses",
    "conceptId": "se_orienting",
    "patternId": "acute_alarm",
    "bands": [
+    "steady",
     "stirred"
    ],
-   "priority": 1.0,
+   "priority": 0.5,
    "direction": "orient",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "words",
+   "words": [
+    "distant",
+    "withdrawn"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Alarm protocol orients to present safety first (pattern-co-occurrence.cypher alarm sequencing); body regulation as the swap."
+   "rationale": "Freeze with high arousal underneath (review, Oct 2026): orient to present safety first, then Cool Down."
+  },
+  {
+   "id": "rf_acute_alarm_words_overwhelm_pause",
+   "conceptId": "dbt_stop",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "down",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "overwhelmed",
+    "out_of_control"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."
+  },
+  {
+   "id": "rf_acute_alarm_words_stress_accepts",
+   "conceptId": "dbt_accepts",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "frustrated",
+    "stressed",
+    "busy",
+    "rushed",
+    "pressured"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: ACCEPTS (distract) leads for strain words once built."
+  },
+  {
+   "id": "rf_acute_alarm_words_stress_problem-solve",
+   "conceptId": "dbt_problem_solving",
+   "patternId": "acute_alarm",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "frustrated",
+    "stressed",
+    "busy",
+    "rushed",
+    "pressured"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."
   },
   {
    "id": "rf_chronic_vigilance_addresses_recovering-from-invalidation",
@@ -1972,14 +2408,61 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": "addresses",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7)."
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
+  },
+  {
+   "id": "rf_chronic_vigilance_default_five-senses",
+   "conceptId": "se_orienting",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.0,
+   "direction": "orient",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."
+  },
+  {
+   "id": "rf_chronic_vigilance_default_problem-solve",
+   "conceptId": "dbt_problem_solving",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 2.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."
   },
   {
    "id": "rf_chronic_vigilance_flooded_cool-down",
@@ -1993,12 +2476,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: DT-01 body first."
   },
@@ -2014,12 +2498,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: DT-01 body first."
   },
@@ -2036,98 +2521,326 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": "none_named",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Nothing was named (somatic skip): offer to find the word as the swap (R9)."
+   "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_chronic_vigilance_steady_five-senses",
-   "conceptId": "se_orienting",
+   "id": "rf_chronic_vigilance_words_anticipatory_check-the-facts",
+   "conceptId": "dbt_check_facts",
    "patternId": "chronic_vigilance",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
-   "priority": 1.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Outward attention (stand-in for MF-01 Listen) and Problem Solve for a solvable worry (cope ahead later; Index §5.2 B)."
-  },
-  {
-   "id": "rf_chronic_vigilance_steady_problem-solve",
-   "conceptId": "dbt_problem_solving",
-   "patternId": "chronic_vigilance",
-   "bands": [
-    "steady"
-   ],
-   "priority": 2.0,
+   "priority": 0.45,
    "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
+   "emotionGate": "words",
+   "words": [
+    "anxious",
+    "nervous"
    ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Outward attention (stand-in for MF-01 Listen) and Problem Solve for a solvable worry (cope ahead later; Index §5.2 B)."
-  },
-  {
-   "id": "rf_chronic_vigilance_stirred_five-senses",
-   "conceptId": "se_orienting",
-   "patternId": "chronic_vigilance",
-   "bands": [
-    "stirred"
-   ],
-   "priority": 1.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Orient, then sit with the checking / reassurance urge (Urge Surfing inactive until DT-05)."
-  },
-  {
-   "id": "rf_chronic_vigilance_stirred_urge-surfing",
-   "conceptId": "urge_surfing",
-   "patternId": "chronic_vigilance",
-   "bands": [
-    "stirred"
-   ],
-   "priority": 2.0,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": false,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Orient, then sit with the checking / reassurance urge (Urge Surfing inactive until DT-05)."
+   "rationale": "Planned: Check the Facts as the alternative."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_anticipatory_cope-ahead",
+   "conceptId": "dbt_cope_ahead",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "anxious",
+    "nervous"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Cope Ahead leads for anticipatory anxiety."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_anticipatory_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "anxious",
+    "nervous"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_helpless_problem-solve",
+   "conceptId": "dbt_problem_solving",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "helpless"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve leads until then."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_helpless_radical-acceptance",
+   "conceptId": "dbt_radical_acceptance",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "helpless"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Radical Acceptance leads for helplessness."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_watchful_wise-mind",
+   "conceptId": "dbt_wise_mind",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "persecuted",
+    "critical",
+    "skeptical",
+    "dismissive",
+    "jealous"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Wise Mind as the alternative for suspicion and judgement."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_worry_check-the-facts",
+   "conceptId": "dbt_check_facts",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "worried",
+    "persecuted",
+    "critical",
+    "skeptical",
+    "dismissive",
+    "jealous"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Check the Facts leads."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_worry_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "worried",
+    "persecuted",
+    "critical",
+    "skeptical",
+    "dismissive",
+    "jealous"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Check the Facts first (planned); Do the Opposite's fits-the-facts step until then."
+  },
+  {
+   "id": "rf_chronic_vigilance_words_worry_urge-surfing",
+   "conceptId": "urge_surfing",
+   "patternId": "chronic_vigilance",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "worried"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Urge Surfing for the checking / reassurance urge, once it's rebuilt (DT-05)."
+  },
+  {
+   "id": "rf_conservation_freeze_addresses_recovering-from-invalidation",
+   "conceptId": "dbt_recovering_from_invalidation",
+   "patternId": "conservation_freeze",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "addresses",
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
+  },
+  {
+   "id": "rf_conservation_freeze_default_five-senses",
+   "conceptId": "se_orienting",
+   "patternId": "conservation_freeze",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.0,
+   "direction": "orient",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Orient; Do the Opposite only once you've moved a little (ER PRD ER-03 item 9). Guided gentle-movement stays the primary CTA."
+  },
+  {
+   "id": "rf_conservation_freeze_default_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "conservation_freeze",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 2.0,
+   "direction": "up",
+   "side": null,
+   "requiresPrior": "up_regulation",
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Orient; Do the Opposite only once you've moved a little (ER PRD ER-03 item 9). Guided gentle-movement stays the primary CTA."
   },
   {
    "id": "rf_conservation_freeze_flooded_five-senses",
@@ -2141,62 +2854,68 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
   },
   {
-   "id": "rf_conservation_freeze_steady_five-senses",
-   "conceptId": "se_orienting",
+   "id": "rf_conservation_freeze_planned_radical-acceptance",
+   "conceptId": "dbt_radical_acceptance",
    "patternId": "conservation_freeze",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
-   "priority": 1.0,
-   "direction": "orient",
+   "priority": 1.5,
+   "direction": "neutral",
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
-   "active": true,
-   "version": "rf-v1",
+   "active": false,
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "No OA without prior activation (ER PRD ER-03 item 9): shown as 'once you've moved a little'. Guided gentle-movement stays the primary CTA."
+   "rationale": "Planned: Radical Acceptance after gentle movement for despair, grief, emptiness and numbness."
   },
   {
-   "id": "rf_conservation_freeze_steady_opposite-action",
-   "conceptId": "dbt_opposite_action",
-   "patternId": "conservation_freeze",
+   "id": "rf_dissociation_overmodulation_addresses_recovering-from-invalidation",
+   "conceptId": "dbt_recovering_from_invalidation",
+   "patternId": "dissociation_overmodulation",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
-   "priority": 2.0,
-   "direction": "up",
+   "priority": 0.0,
+   "direction": "neutral",
    "side": null,
-   "requiresPrior": "up_regulation",
-   "emotionGate": null,
+   "requiresPrior": null,
+   "emotionGate": "addresses",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "No OA without prior activation (ER PRD ER-03 item 9): shown as 'once you've moved a little'. Guided gentle-movement stays the primary CTA."
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
   },
   {
-   "id": "rf_conservation_freeze_stirred_five-senses",
+   "id": "rf_dissociation_overmodulation_default_five-senses",
    "conceptId": "se_orienting",
-   "patternId": "conservation_freeze",
+   "patternId": "dissociation_overmodulation",
    "bands": [
+    "steady",
     "stirred"
    ],
    "priority": 1.0,
@@ -2204,14 +2923,15 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Orient; guided gentle-movement stays the primary CTA."
+   "rationale": "Orient first; no OA, no check the facts, no wave (ER-06 table). 5-4-3-2-1 is eyes-open since A0-1."
   },
   {
    "id": "rf_dissociation_overmodulation_flooded_five-senses",
@@ -2225,78 +2945,15 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Orient first."
-  },
-  {
-   "id": "rf_dissociation_overmodulation_steady_five-senses",
-   "conceptId": "se_orienting",
-   "patternId": "dissociation_overmodulation",
-   "bands": [
-    "steady"
-   ],
-   "priority": 1.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Orient first; no OA, no check the facts, no wave (ER-06 table). 5-4-3-2-1 is eyes-open since A0-1."
-  },
-  {
-   "id": "rf_dissociation_overmodulation_stirred_five-senses",
-   "conceptId": "se_orienting",
-   "patternId": "dissociation_overmodulation",
-   "bands": [
-    "stirred"
-   ],
-   "priority": 1.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Orient first."
-  },
-  {
-   "id": "rf_emotional_flooding_addresses_recovering-from-invalidation",
-   "conceptId": "dbt_recovering_from_invalidation",
-   "patternId": "emotional_flooding",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.0,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "addresses",
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7)."
   },
   {
    "id": "rf_emotional_flooding_flooded_cool-down",
@@ -2310,14 +2967,15 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Flooded: bottom-up only."
+   "rationale": "Flooded: bottom-up only. Crisis banner shows above on check-in."
   },
   {
    "id": "rf_emotional_flooding_flooded_five-senses",
@@ -2331,83 +2989,45 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Flooded: bottom-up only."
+   "rationale": "Flooded: bottom-up only. Crisis banner shows above on check-in."
   },
   {
-   "id": "rf_emotional_flooding_steady_five-senses",
-   "conceptId": "se_orienting",
-   "patternId": "emotional_flooding",
+   "id": "rf_reactive_aggression_addresses_recovering-from-invalidation",
+   "conceptId": "dbt_recovering_from_invalidation",
+   "patternId": "reactive_aggression",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
-   "priority": 1.0,
-   "direction": "orient",
+   "priority": 0.0,
+   "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "addresses",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Body first, no cognitive tools (pattern clinicalNotes). Crisis banner shows above on check-in."
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
   },
   {
-   "id": "rf_emotional_flooding_steady_pause",
-   "conceptId": "dbt_stop",
-   "patternId": "emotional_flooding",
-   "bands": [
-    "steady"
-   ],
-   "priority": 2.0,
-   "direction": "down",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Body first, no cognitive tools (pattern clinicalNotes). Crisis banner shows above on check-in."
-  },
-  {
-   "id": "rf_emotional_flooding_stirred_cool-down",
+   "id": "rf_reactive_aggression_default_cool-down",
    "conceptId": "dbt_tipp",
-   "patternId": "emotional_flooding",
+   "patternId": "reactive_aggression",
    "bands": [
-    "stirred"
-   ],
-   "priority": 1.0,
-   "direction": "down",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Body first; Pause catches the act-now urge."
-  },
-  {
-   "id": "rf_emotional_flooding_stirred_pause",
-   "conceptId": "dbt_stop",
-   "patternId": "emotional_flooding",
-   "bands": [
+    "steady",
     "stirred"
    ],
    "priority": 2.0,
@@ -2415,14 +3035,38 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Body first; Pause catches the act-now urge."
+   "rationale": "Stop before acting (STOP), then bring arousal down (TIPP). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3); intense exercise lowers arousal, it isn't a release."
+  },
+  {
+   "id": "rf_reactive_aggression_default_pause",
+   "conceptId": "dbt_stop",
+   "patternId": "reactive_aggression",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.0,
+   "direction": "down",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Stop before acting (STOP), then bring arousal down (TIPP). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3); intense exercise lowers arousal, it isn't a release."
   },
   {
    "id": "rf_reactive_aggression_flooded_cool-down",
@@ -2436,12 +3080,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
@@ -2457,98 +3102,139 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
   {
-   "id": "rf_reactive_aggression_steady_opposite-action",
-   "conceptId": "dbt_opposite_action",
+   "id": "rf_reactive_aggression_words_grievance_check-the-facts",
+   "conceptId": "dbt_check_facts",
    "patternId": "reactive_aggression",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
-   "priority": 1.0,
+   "priority": 0.4,
    "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
+   "emotionGate": "words",
+   "words": [
+    "bitter",
+    "resentful"
    ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "Authored for when the pattern becomes a candidate (not yet: D-02). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3)."
-  },
-  {
-   "id": "rf_reactive_aggression_steady_urge-surfing",
-   "conceptId": "urge_surfing",
-   "patternId": "reactive_aggression",
-   "bands": [
-    "steady"
-   ],
-   "priority": 2.0,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": false,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Authored for when the pattern becomes a candidate (not yet: D-02). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3)."
+   "rationale": "Planned: Check the Facts leads for resentment."
   },
   {
-   "id": "rf_reactive_aggression_stirred_cool-down",
-   "conceptId": "dbt_tipp",
+   "id": "rf_reactive_aggression_words_grievance_fast",
+   "conceptId": "dbt_fast",
    "patternId": "reactive_aggression",
    "bands": [
+    "steady",
     "stirred"
    ],
-   "priority": 2.0,
-   "direction": "down",
+   "priority": 0.6,
+   "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "words",
+   "words": [
+    "bitter",
+    "resentful"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: FAST as the alternative."
+  },
+  {
+   "id": "rf_reactive_aggression_words_grievance_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "reactive_aggression",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "bitter",
+    "resentful"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Stop before acting; then bring arousal down."
+   "rationale": "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."
   },
   {
-   "id": "rf_reactive_aggression_stirred_pause",
-   "conceptId": "dbt_stop",
-   "patternId": "reactive_aggression",
+   "id": "rf_reward_drive_low_addresses_recovering-from-invalidation",
+   "conceptId": "dbt_recovering_from_invalidation",
+   "patternId": "reward_drive_low",
    "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "addresses",
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
+  },
+  {
+   "id": "rf_reward_drive_low_default_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "reward_drive_low",
+   "bands": [
+    "steady",
     "stirred"
    ],
    "priority": 1.0,
-   "direction": "down",
+   "direction": "neutral",
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Stop before acting; then bring arousal down."
+   "rationale": "Do the Opposite as 'get active' (behavioural activation) until Running low (PLEASE) ships; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."
   },
   {
    "id": "rf_reward_drive_low_flooded_five-senses",
@@ -2562,98 +3248,118 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded + blank: orient only (no Cool Down, D-02)."
   },
   {
-   "id": "rf_reward_drive_low_steady_five-senses",
-   "conceptId": "se_orienting",
+   "id": "rf_reward_drive_low_planned_running-low",
+   "conceptId": "dbt_please",
    "patternId": "reward_drive_low",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
-   "priority": 2.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "OA as 'get active' for sadness / withdrawal (good things L0/L1 replace it when ER-04 ships); never calming."
-  },
-  {
-   "id": "rf_reward_drive_low_steady_opposite-action",
-   "conceptId": "dbt_opposite_action",
-   "patternId": "reward_drive_low",
-   "bands": [
-    "steady"
-   ],
-   "priority": 1.0,
+   "priority": 0.9,
    "direction": "neutral",
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
-   "active": true,
-   "version": "rf-v1",
+   "active": false,
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "OA as 'get active' for sadness / withdrawal (good things L0/L1 replace it when ER-04 ships); never calming."
+   "rationale": "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."
   },
   {
-   "id": "rf_reward_drive_low_stirred_five-senses",
-   "conceptId": "se_orienting",
+   "id": "rf_reward_drive_low_words_connection_give",
+   "conceptId": "dbt_give",
    "patternId": "reward_drive_low",
    "bands": [
+    "steady",
     "stirred"
    ],
-   "priority": 2.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "As steady (D-02 open point: lead with 5-4-3-2-1 instead?)."
-  },
-  {
-   "id": "rf_reward_drive_low_stirred_opposite-action",
-   "conceptId": "dbt_opposite_action",
-   "patternId": "reward_drive_low",
-   "bands": [
-    "stirred"
-   ],
-   "priority": 1.0,
+   "priority": 0.85,
    "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "words",
+   "words": [
+    "lonely",
+    "isolated"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."
+  },
+  {
+   "id": "rf_reward_drive_low_words_fragile_problem-solve",
+   "conceptId": "dbt_problem_solving",
+   "patternId": "reward_drive_low",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "vulnerable",
+    "fragile",
+    "powerless"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "As steady (D-02 open point: lead with 5-4-3-2-1 instead?)."
+   "rationale": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."
+  },
+  {
+   "id": "rf_reward_drive_low_words_fragile_radical-acceptance",
+   "conceptId": "dbt_radical_acceptance",
+   "patternId": "reward_drive_low",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "vulnerable",
+    "fragile",
+    "powerless"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Radical Acceptance leads."
   },
   {
    "id": "rf_rumination_loop_addresses_recovering-from-invalidation",
@@ -2668,14 +3374,61 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": "addresses",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7)."
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
+  },
+  {
+   "id": "rf_rumination_loop_default_five-senses",
+   "conceptId": "se_orienting",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 2.0,
+   "direction": "orient",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."
+  },
+  {
+   "id": "rf_rumination_loop_default_problem-solve",
+   "conceptId": "dbt_problem_solving",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": null,
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."
   },
   {
    "id": "rf_rumination_loop_flooded_cool-down",
@@ -2689,12 +3442,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
@@ -2710,12 +3464,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
@@ -2732,77 +3487,263 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": "none_named",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Nothing was named (somatic skip): offer to find the word as the swap (R9)."
+   "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_rumination_loop_steady_five-senses",
-   "conceptId": "se_orienting",
+   "id": "rf_rumination_loop_words_aversion_accepts",
+   "conceptId": "dbt_accepts",
    "patternId": "rumination_loop",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "disgusted",
+    "disapproving",
+    "disappointed",
+    "awful",
+    "repelled",
+    "judgmental",
+    "appalled",
+    "revolted",
+    "nauseated",
+    "detestable",
+    "horrified",
+    "hesitant"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: ACCEPTS as the alternative."
+  },
+  {
+   "id": "rf_rumination_loop_words_aversion_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "disgusted",
+    "disapproving",
+    "disappointed",
+    "awful",
+    "repelled",
+    "judgmental",
+    "appalled",
+    "revolted",
+    "nauseated",
+    "detestable",
+    "horrified",
+    "hesitant",
+    "guilty",
+    "remorseful"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."
+  },
+  {
+   "id": "rf_rumination_loop_words_guilt_check-the-facts",
+   "conceptId": "dbt_check_facts",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.4,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "guilty",
+    "remorseful",
+    "hesitant"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."
+  },
+  {
+   "id": "rf_rumination_loop_words_low-shame_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "embarrassed",
+    "ashamed"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Do the Opposite (unhiding) as the alternative for shame."
+  },
+  {
+   "id": "rf_rumination_loop_words_low-shame_recovering-from-invalidation",
+   "conceptId": "dbt_recovering_from_invalidation",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "embarrassed",
+    "ashamed",
+    "victimized"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."
+  },
+  {
+   "id": "rf_rumination_loop_words_victimized_fast",
+   "conceptId": "dbt_fast",
+   "patternId": "rumination_loop",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.6,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "victimized"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: FAST (keep self-respect) as the alternative to Recover."
+  },
+  {
+   "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
+   "conceptId": "dbt_recovering_from_invalidation",
+   "patternId": "social_threat_shame",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 0.0,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "addresses",
+   "words": [],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": true,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."
+  },
+  {
+   "id": "rf_social_threat_shame_default_opposite-action",
+   "conceptId": "dbt_opposite_action",
+   "patternId": "social_threat_shame",
+   "bands": [
+    "steady",
+    "stirred"
    ],
    "priority": 2.0,
-   "direction": "orient",
+   "direction": "neutral",
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Problem Solve (its barrier flow is the rumination guard) with an external-attention swap (Index §5.2 C)."
+   "rationale": "Recover (self-validation) first, Do the Opposite (unhiding) as the alternative (review, Oct 2026)."
   },
   {
-   "id": "rf_rumination_loop_steady_problem-solve",
-   "conceptId": "dbt_problem_solving",
-   "patternId": "rumination_loop",
+   "id": "rf_social_threat_shame_default_recovering-from-invalidation",
+   "conceptId": "dbt_recovering_from_invalidation",
+   "patternId": "social_threat_shame",
    "bands": [
-    "steady"
+    "steady",
+    "stirred"
    ],
    "priority": 1.0,
    "direction": "neutral",
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Problem Solve (its barrier flow is the rumination guard) with an external-attention swap (Index §5.2 C)."
-  },
-  {
-   "id": "rf_rumination_loop_stirred_five-senses",
-   "conceptId": "se_orienting",
-   "patternId": "rumination_loop",
-   "bands": [
-    "stirred"
-   ],
-   "priority": 1.0,
-   "direction": "orient",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "External focus (DT-06 later); the guided attention-shift stays the primary CTA."
+   "rationale": "Recover (self-validation) first, Do the Opposite (unhiding) as the alternative (review, Oct 2026)."
   },
   {
    "id": "rf_social_threat_shame_flooded_cool-down",
@@ -2816,12 +3757,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
@@ -2837,12 +3779,13 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": null,
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
    "rationale": "Flooded: bottom-up only."
   },
@@ -2859,103 +3802,133 @@
    "side": null,
    "requiresPrior": null,
    "emotionGate": "none_named",
+   "words": [],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Nothing was named (somatic skip): offer to find the word as the swap (R9)."
+   "rationale": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."
   },
   {
-   "id": "rf_social_threat_shame_steady_opposite-action",
-   "conceptId": "dbt_opposite_action",
+   "id": "rf_social_threat_shame_words_exposed_cool-down",
+   "conceptId": "dbt_tipp",
    "patternId": "social_threat_shame",
    "bands": [
-    "steady"
-   ],
-   "priority": 1.0,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "OA for hide / attack urges; Recover as the validating alternative."
-  },
-  {
-   "id": "rf_social_threat_shame_steady_recovering-from-invalidation",
-   "conceptId": "dbt_recovering_from_invalidation",
-   "patternId": "social_threat_shame",
-   "bands": [
-    "steady"
-   ],
-   "priority": 2.0,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": null,
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": true,
-   "version": "rf-v1",
-   "reviewStatus": "draft",
-   "rationale": "OA for hide / attack urges; Recover as the validating alternative."
-  },
-  {
-   "id": "rf_social_threat_shame_stirred_pause",
-   "conceptId": "dbt_stop",
-   "patternId": "social_threat_shame",
-   "bands": [
+    "steady",
     "stirred"
    ],
-   "priority": 2.0,
+   "priority": 0.5,
    "direction": "down",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "words",
+   "words": [
+    "exposed",
+    "humiliated"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
    "active": true,
-   "version": "rf-v1",
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Recover is body-first then self-validation; Pause catches the send / lash-out urge."
+   "rationale": "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."
   },
   {
-   "id": "rf_social_threat_shame_stirred_recovering-from-invalidation",
-   "conceptId": "dbt_recovering_from_invalidation",
+   "id": "rf_social_threat_shame_words_let-down_give",
+   "conceptId": "dbt_give",
    "patternId": "social_threat_shame",
    "bands": [
+    "steady",
     "stirred"
    ],
-   "priority": 1.0,
+   "priority": 1.5,
    "direction": "neutral",
    "side": null,
    "requiresPrior": null,
-   "emotionGate": null,
+   "emotionGate": "words",
+   "words": [
+    "let_down"
+   ],
    "tier": "quality_of_life",
    "surface": [
     "checkin_result"
    ],
-   "active": true,
-   "version": "rf-v1",
+   "active": false,
+   "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Recover is body-first then self-validation; Pause catches the send / lash-out urge."
+   "rationale": "Planned: GIVE (keep the relationship) as the alternative to Recover."
+  },
+  {
+   "id": "rf_social_threat_shame_words_self-respect_fast",
+   "conceptId": "dbt_fast",
+   "patternId": "social_threat_shame",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "betrayed",
+    "disrespected",
+    "violated"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: FAST (keep self-respect) as the alternative to Recover."
+  },
+  {
+   "id": "rf_social_threat_shame_words_self-worth_check-the-facts",
+   "conceptId": "dbt_check_facts",
+   "patternId": "social_threat_shame",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "insecure",
+    "inadequate",
+    "inferior",
+    "insignificant",
+    "weak",
+    "worthless"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."
   }
  ],
- "contraindicated": [],
+ "contraindicated": [
+  {
+   "conceptId": "dbt_opposite_action",
+   "targetId": "dissociation_overmodulation"
+  }
+ ],
  "routingPolicy": {
-  "version": "rf-v1",
+  "version": "rf-v2",
   "enabled": false,
   "maxCards": 2,
   "fallbackConceptId": "se_orienting",

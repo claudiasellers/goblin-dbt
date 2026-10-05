@@ -21,17 +21,26 @@ export function toNum(v: unknown): number {
  * One row per (pattern, matched word, edge): the pure scorer counts words and picks the bonus.
  * E4-6: a word matches a pattern emotion directly or, when `$useAliases` (RoutingPolicy on), through
  * its SCORES_AS aliases (grid words → pattern vocabulary, scripts/recommendations/vocabulary.py).
+ * Oct 2026 review: when the policy is on and the word has a reviewed pattern
+ * ((:Emotion)-[:SIGNALS]->(:ActivationPattern), vocabulary.py SIGNALS), that pattern is the word's only
+ * match, as a strong edge; aliases and direct edges apply only to words without one.
  * `emotionId` is always the word as sent.
  */
 export const EMOTION_EVIDENCE_QUERY = `
   UNWIND $emotionIds AS sent
-  OPTIONAL MATCH (:Emotion {id: sent})-[:SCORES_AS]->(alias:Emotion)
+  OPTIONAL MATCH (:Emotion {id: sent})-[:SIGNALS]->(sp:ActivationPattern)
   WHERE $useAliases
-  WITH sent, [sent] + collect(DISTINCT alias.id) AS targets
-  MATCH (p:ActivationPattern)-[r:ASSOCIATED_WITH]->(e:Emotion)
-  WHERE p.id IN $candidatePatterns
-    AND e.id IN targets
-  RETURN p.id AS patternId, sent AS emotionId, r.strength AS strength
+  WITH sent, collect(DISTINCT sp.id) AS signalled
+  OPTIONAL MATCH (:Emotion {id: sent})-[:SCORES_AS]->(alias:Emotion)
+  WHERE $useAliases AND size(signalled) = 0
+  WITH sent, signalled, [sent] + collect(DISTINCT alias.id) AS targets
+  OPTIONAL MATCH (p:ActivationPattern)-[r:ASSOCIATED_WITH]->(e:Emotion)
+  WHERE size(signalled) = 0 AND p.id IN $candidatePatterns AND e.id IN targets
+  WITH sent, signalled, collect(CASE WHEN p IS NULL THEN null ELSE {p: p.id, s: r.strength} END) AS viaEmotion
+  UNWIND (CASE WHEN size(signalled) > 0
+            THEN [x IN signalled WHERE x IN $candidatePatterns | {p: x, s: 'strong'}]
+            ELSE viaEmotion END) AS hit
+  RETURN hit.p AS patternId, sent AS emotionId, hit.s AS strength
 `;
 
 export const RESPONSE_EVIDENCE_QUERY = `
@@ -98,7 +107,7 @@ export const ROUTING_SLICE_QUERY = `
   OPTIONAL MATCH (tc)-[:CONTRAINDICATED_FOR]->(mf:MedicalFlag)
   RETURN p.id AS patternId, coalesce(p.blank, false) AS blank, patternEmotions,
          tc { .id, .appToolId, .name, .description, .whenToUse, .dbtBasis, .side, .skillKind, .direction } AS concept,
-         CASE WHEN r IS NULL THEN null ELSE r { .id, .bands, .direction, .side, .requiresPrior, .emotionGate, .active, priority: toFloat(r.priority) } END AS edge,
+         CASE WHEN r IS NULL THEN null ELSE r { .id, .bands, .direction, .side, .requiresPrior, .emotionGate, .words, .active, priority: toFloat(r.priority) } END AS edge,
          addresses, contraPatterns, collect(DISTINCT mf.id) AS contraFlags
 `;
 
@@ -128,7 +137,8 @@ export function toRoutingRow(e: Obj): RoutingRow {
     direction: str(e.direction) as Direction | null,
     side: str(e.side) as Side | null,
     requiresPrior: str(e.requiresPrior),
-    emotionGate: gate === 'addresses' || gate === 'none_named' ? gate : null,
+    emotionGate: gate === 'addresses' || gate === 'none_named' || gate === 'words' ? gate : null,
+    words: strs(e.words),
     active: e.active !== false,
   };
 }

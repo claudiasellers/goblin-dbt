@@ -5,11 +5,17 @@
 #   python3 scripts/recommendations/fixture.py
 #
 # REVIEW (D-02, D-13): every row, tag and the policy are DRAFTS (reviewStatus "draft") for Claudia's
-# clinical sign-off. The table is E4 §2.8 as drafted, with the D-02 defaults:
+# clinical sign-off. rf-v2 is her routing review (Oct 2026, docs/design/checkin-routing-review.md):
+#   - no capacity split: one row set per pattern for every band but flooded (nothing sets "steady"
+#     since the capacity question went), with the thinking tools no longer held back; flooded as approved;
+#   - a hurt word puts Recover first on every pattern but Flooded (R7 everywhere);
+#   - per-word rules (WORD_RULES, gate "words") carry the review's per-word first pick / alternative;
+#   - tools the review named that aren't built yet (PLANNED) are written switched off where they go;
+#   - Ready to fight (reactive_aggression) is a check-in candidate while the policy is on: the anger words;
 #   - flooded + blank → no Cool Down (the engine drops `down` tools for blank states; no row needed);
-#   - reactive_aggression rows are authored but the pattern is not a check-in candidate yet (it waits);
 #   - Pause active (A0-2 fixed its copy); Urge Surfing rows ship active: False until DT-05 rebuilds it;
-#   - DEAR MAN has no rows until IE-01's "is it safe with them?" question ships (safety batch, R9).
+#   - DEAR MAN has no rows until IE-01's "is it safe with them?" question ships (safety batch, R9);
+#   - Do the Opposite is contraindicated for dissociation, primary or alongside (ER-06).
 # D-13: Find the feeling is `acceptance`; Cool Down is `both`.
 #
 # The engine (functions/src/recommendation/select.ts, E4-3) reads these only when
@@ -21,7 +27,9 @@
 #
 # `rationale` strings are clinician-facing (never shown to users).
 
-VERSION = "rf-v1"
+VERSION = "rf-v2"  # rf-v2: Oct 2026 routing review (no capacity bands, word rules, planned tools)
+# Earlier versions whose rows a load removes whole (their ids changed).
+RETIRED_VERSIONS = ["rf-v1"]
 # Sign-off: add a row id (or the policy id "checkin_result") with its review date; that row is then
 # `reviewStatus: "approved"`, everything else stays "draft".
 SIGNED_OFF = {}  # e.g. {"rf_acute_alarm_steady_opposite-action": "2026-10-05"}
@@ -46,6 +54,23 @@ INACTIVE_TOOLS = {"urge-surfing": "DT-05: the 1-10 slider is a rebuild, not a pa
 # Tools that must have no rows at all yet.
 NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the safety batch (R9, D-02)"}
 
+# Planned tools (Oct 2026 review): the routing names them now; each concept is in the graph but has no
+# app module yet, so its rows are written switched off (and the routing slice skips concepts without an
+# appToolId anyway). When a module ships: give the concept its appToolId (app-tool-ids.cypher), drop it
+# from PLANNED and its rows go live where the review put them.
+PLANNED = {
+    "check-the-facts":    {"concept": "dbt_check_facts",        "side": "change",     "skillKind": "change",     "direction": "neutral"},
+    "cope-ahead":         {"concept": "dbt_cope_ahead",         "side": "change",     "skillKind": "change",     "direction": "neutral"},
+    "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
+    "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
+    "radical-acceptance": {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
+    "wise-mind":          {"concept": "dbt_wise_mind",          "side": "both",       "skillKind": "naming",     "direction": "neutral"},
+    "fast":               {"concept": "dbt_fast",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
+    "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
+}
+CONCEPT_TAGS.update(PLANNED)
+INACTIVE_TOOLS.update({t: "not built yet (planned, Oct 2026 review)" for t in PLANNED})
+
 # "Blank" patterns: never calmed (no `down` tool); CORE Arch §5.1 R5, Somatic Gaps §A rule 7.
 BLANK_PATTERNS = {
     "conservation_freeze": True, "dissociation_overmodulation": True, "reward_drive_low": True,
@@ -53,74 +78,168 @@ BLANK_PATTERNS = {
     "rumination_loop": False, "reactive_aggression": False, "grief_yearning": False,
 }
 
-P, S = 1.0, 2.0  # primary, swap (lower first)
+P, S = 1.0, 2.0  # first pick, alternative (lower first)
+WORD_LEAD, WORD_NEXT = 0.5, 0.6  # per-word rules rank above the pattern's own rows
 
 
 def swap(tool, **over):
-    """A swap row with per-use overrides (requiresPrior, direction, side)."""
+    """An alternative with per-use overrides (requiresPrior, direction, side)."""
     return dict(tool=tool, **over)
 
 
-# Pattern × band → (primary, swap or None, rationale). E4 §2.8.
+# Pattern → (first pick, alternative or None, rationale) for "default" (any band but flooded) and
+# "flooded". Oct 2026 review (Claudia): the capacity bands steady / stirred are one row set now (nothing
+# sets "steady" since the capacity question went), with the thinking tools no longer held back; the
+# flooded rows are as approved. Flooded is always "flooded" (RoutingPolicy.floodedPatterns), so it has
+# no default row. Ready to fight is a check-in candidate while the policy is on (the anger words).
 TABLE = {
     "acute_alarm": {
-        "steady":  ("opposite-action", "five-senses", "Approach vs unjustified fear (check the facts takes the lead when ER-02 ships); orienting to present safety is the non-change swap."),
-        "stirred": ("five-senses", "cool-down", "Alarm protocol orients to present safety first (pattern-co-occurrence.cypher alarm sequencing); body regulation as the swap."),
+        "default": ("cool-down", "opposite-action", "Acute fear needs regulation followed by approach (review, Oct 2026): Cool Down, then Do the Opposite (its fits-the-facts step stands in for Check the Facts)."),
+        "backup": ("five-senses", "Orienting stays available when Cool Down and Do the Opposite are both filtered (alarm with dissociation alongside: blank, and no Do the Opposite)."),
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "chronic_vigilance": {
-        "steady":  ("five-senses", "problem-solve", "Outward attention (stand-in for MF-01 Listen) and Problem Solve for a solvable worry (cope ahead later; Index §5.2 B)."),
-        "stirred": ("five-senses", "urge-surfing", "Orient, then sit with the checking / reassurance urge (Urge Surfing inactive until DT-05)."),
+        "default": ("five-senses", "problem-solve", "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."),
         "flooded": ("cool-down", "five-senses", "Flooded: DT-01 body first."),
     },
     "emotional_flooding": {
-        "steady":  ("five-senses", "pause", "Body first, no cognitive tools (pattern clinicalNotes). Crisis banner shows above on check-in."),
-        "stirred": ("cool-down", "pause", "Body first; Pause catches the act-now urge."),
-        "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
+        "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only. Crisis banner shows above on check-in."),
     },
     "social_threat_shame": {
-        "steady":  ("opposite-action", "recovering-from-invalidation", "OA for hide / attack urges; Recover as the validating alternative."),
-        "stirred": ("recovering-from-invalidation", "pause", "Recover is body-first then self-validation; Pause catches the send / lash-out urge."),
+        "default": ("recovering-from-invalidation", "opposite-action", "Recover (self-validation) first, Do the Opposite (unhiding) as the alternative (review, Oct 2026)."),
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "reactive_aggression": {
-        "steady":  ("opposite-action", "urge-surfing", "Authored for when the pattern becomes a candidate (not yet: D-02). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3)."),
-        "stirred": ("pause", "cool-down", "Stop before acting; then bring arousal down."),
+        "default": ("pause", "cool-down", "Stop before acting (STOP), then bring arousal down (TIPP). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3); intense exercise lowers arousal, it isn't a release."),
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "rumination_loop": {
-        "steady":  ("problem-solve", "five-senses", "Problem Solve (its barrier flow is the rumination guard) with an external-attention swap (Index §5.2 C)."),
-        "stirred": ("five-senses", None, "External focus (DT-06 later); the guided attention-shift stays the primary CTA."),
+        "default": ("problem-solve", "five-senses", "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."),
         "flooded": ("cool-down", "five-senses", "Flooded: bottom-up only."),
     },
     "reward_drive_low": {
-        "steady":  ("opposite-action", "five-senses", "OA as 'get active' for sadness / withdrawal (good things L0/L1 replace it when ER-04 ships); never calming."),
-        "stirred": ("opposite-action", "five-senses", "As steady (D-02 open point: lead with 5-4-3-2-1 instead?)."),
+        "default": ("opposite-action", None, "Do the Opposite as 'get active' (behavioural activation) until Running low (PLEASE) ships; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."),
         "flooded": ("five-senses", None, "Flooded + blank: orient only (no Cool Down, D-02)."),
     },
     "conservation_freeze": {
-        "steady":  ("five-senses", swap("opposite-action", requiresPrior="up_regulation", direction="up"),
-                    "No OA without prior activation (ER PRD ER-03 item 9): shown as 'once you've moved a little'. Guided gentle-movement stays the primary CTA."),
-        "stirred": ("five-senses", None, "Orient; guided gentle-movement stays the primary CTA."),
+        "default": ("five-senses", swap("opposite-action", requiresPrior="up_regulation", direction="up"),
+                    "Orient; Do the Opposite only once you've moved a little (ER PRD ER-03 item 9). Guided gentle-movement stays the primary CTA."),
         "flooded": ("five-senses", None, "Flooded + blank: orient only (no Cool Down, D-02)."),
     },
     "dissociation_overmodulation": {
-        "steady":  ("five-senses", None, "Orient first; no OA, no check the facts, no wave (ER-06 table). 5-4-3-2-1 is eyes-open since A0-1."),
-        "stirred": ("five-senses", None, "Orient first."),
+        "default": ("five-senses", None, "Orient first; no OA, no check the facts, no wave (ER-06 table). 5-4-3-2-1 is eyes-open since A0-1."),
         "flooded": ("five-senses", None, "Orient first."),
     },
 }
+DEFAULT_BANDS = ["steady", "stirred"]
+BACKUP = 3.0  # a pattern's backup row, used only when its first pick and alternative are filtered
+
+# CONTRAINDICATED_FOR (the engine's hook: the primary OR the co-occurring pattern): tool → patterns.
+# Do the Opposite never runs while someone is dissociated (ER-06), also when dissociation sits
+# alongside another pattern.
+CONTRAINDICATIONS = {"opposite-action": ["dissociation_overmodulation"]}
 
 # Emotion-gated rows. `addresses`: fires only when one of the user's words is in the concept's
 # ADDRESSES/REDUCES/TARGETS set; `none_named`: only when no emotion was named.
 GATES = [
-    {"tool": "recovering-from-invalidation", "gate": "addresses", "priority": 0.0, "bands": ["steady", "stirred"],
-     "patterns": ["acute_alarm", "chronic_vigilance", "emotional_flooding", "rumination_loop"],
-     "why": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7)."},
-    {"tool": "find-the-feeling", "gate": "none_named", "priority": 1.5, "bands": ["steady", "stirred"],
+    {"tool": "recovering-from-invalidation", "gate": "addresses", "priority": 0.0, "bands": DEFAULT_BANDS,
+     "patterns": ["acute_alarm", "chronic_vigilance", "social_threat_shame", "reactive_aggression", "rumination_loop",
+                  "reward_drive_low", "conservation_freeze", "dissociation_overmodulation"],
+     "why": "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+    {"tool": "find-the-feeling", "gate": "none_named", "priority": 1.5, "bands": DEFAULT_BANDS,
      "patterns": ["acute_alarm", "chronic_vigilance", "social_threat_shame", "rumination_loop"],
-     "why": "Nothing was named (somatic skip): offer to find the word as the swap (R9)."},
+     "why": "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
 ]
+
+DISGUST_WORDS = ["disgusted", "disapproving", "disappointed", "awful", "repelled", "judgmental", "appalled", "revolted",
+                 "nauseated", "detestable", "horrified"]
+STRESS_WORDS = ["frustrated", "stressed", "busy", "rushed", "pressured"]
+WATCHFUL_WORDS = ["persecuted", "critical", "skeptical", "dismissive", "jealous"]
+
+# Per-word rules (Oct 2026 review): when one of the words is picked, this tool ranks above the pattern's
+# own rows. Each row's `why` is the review's reasoning. Planned tools (PLANNED) are written switched off
+# with the priority the review gave them, so they take their place the day the module ships.
+WORD_RULES = [
+    # --- Alarm ---
+    {"key": "overwhelm", "pattern": "acute_alarm", "tool": "pause", "priority": WORD_LEAD, "words": ["overwhelmed", "out_of_control"],
+     "why": "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."},
+    {"key": "stress", "pattern": "acute_alarm", "tool": "problem-solve", "priority": WORD_LEAD, "words": STRESS_WORDS,
+     "why": "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."},
+    {"key": "stress", "pattern": "acute_alarm", "tool": "accepts", "priority": 0.4, "words": STRESS_WORDS,
+     "why": "Planned: ACCEPTS (distract) leads for strain words once built."},
+    {"key": "annoyed", "pattern": "acute_alarm", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["annoyed"],
+     "why": "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
+    {"key": "annoyed", "pattern": "acute_alarm", "tool": "check-the-facts", "priority": 0.4, "words": ["annoyed"],
+     "why": "Planned: Check the Facts leads for low-grade anger."},
+    {"key": "annoyed", "pattern": "acute_alarm", "tool": "accepts", "priority": WORD_NEXT, "words": ["annoyed"],
+     "why": "Planned: ACCEPTS as the alternative."},
+    {"key": "freeze", "pattern": "acute_alarm", "tool": "five-senses", "priority": WORD_LEAD, "words": ["distant", "withdrawn"],
+     "why": "Freeze with high arousal underneath (review, Oct 2026): orient to present safety first, then Cool Down."},
+    # --- On guard ---
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["anxious", "nervous"],
+     "why": "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."},
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "cope-ahead", "priority": 0.4, "words": ["anxious", "nervous"],
+     "why": "Planned: Cope Ahead leads for anticipatory anxiety."},
+    {"key": "anticipatory", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.45, "words": ["anxious", "nervous"],
+     "why": "Planned: Check the Facts as the alternative."},
+    {"key": "worry", "pattern": "chronic_vigilance", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["worried"] + WATCHFUL_WORDS,
+     "why": "Check the Facts first (planned); Do the Opposite's fits-the-facts step until then."},
+    {"key": "worry", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.4, "words": ["worried"] + WATCHFUL_WORDS,
+     "why": "Planned: Check the Facts leads."},
+    {"key": "worry", "pattern": "chronic_vigilance", "tool": "urge-surfing", "priority": WORD_NEXT, "words": ["worried"],
+     "why": "Urge Surfing for the checking / reassurance urge, once it's rebuilt (DT-05)."},
+    {"key": "watchful", "pattern": "chronic_vigilance", "tool": "wise-mind", "priority": WORD_NEXT, "words": WATCHFUL_WORDS,
+     "why": "Planned: Wise Mind as the alternative for suspicion and judgement."},
+    {"key": "helpless", "pattern": "chronic_vigilance", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["helpless"],
+     "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve leads until then."},
+    {"key": "helpless", "pattern": "chronic_vigilance", "tool": "radical-acceptance", "priority": 0.4, "words": ["helpless"],
+     "why": "Planned: Radical Acceptance leads for helplessness."},
+    # --- Social threat ---
+    {"key": "exposed", "pattern": "social_threat_shame", "tool": "cool-down", "priority": WORD_LEAD, "words": ["exposed", "humiliated"],
+     "why": "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."},
+    {"key": "self-worth", "pattern": "social_threat_shame", "tool": "check-the-facts", "priority": 1.5, "words": ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"],
+     "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
+    {"key": "let-down", "pattern": "social_threat_shame", "tool": "give", "priority": 1.5, "words": ["let_down"],
+     "why": "Planned: GIVE (keep the relationship) as the alternative to Recover."},
+    {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected", "violated"],
+     "why": "Planned: FAST (keep self-respect) as the alternative to Recover."},
+    # --- Ready to fight ---
+    {"key": "grievance", "pattern": "reactive_aggression", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["bitter", "resentful"],
+     "why": "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."},
+    {"key": "grievance", "pattern": "reactive_aggression", "tool": "check-the-facts", "priority": 0.4, "words": ["bitter", "resentful"],
+     "why": "Planned: Check the Facts leads for resentment."},
+    {"key": "grievance", "pattern": "reactive_aggression", "tool": "fast", "priority": WORD_NEXT, "words": ["bitter", "resentful"],
+     "why": "Planned: FAST as the alternative."},
+    # --- On replay ---
+    {"key": "aversion", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_LEAD, "words": DISGUST_WORDS + ["hesitant", "guilty", "remorseful"],
+     "why": "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."},
+    {"key": "aversion", "pattern": "rumination_loop", "tool": "accepts", "priority": WORD_NEXT, "words": DISGUST_WORDS + ["hesitant"],
+     "why": "Planned: ACCEPTS as the alternative."},
+    {"key": "guilt", "pattern": "rumination_loop", "tool": "check-the-facts", "priority": 0.4, "words": ["guilty", "remorseful", "hesitant"],
+     "why": "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
+    {"key": "low-shame", "pattern": "rumination_loop", "tool": "recovering-from-invalidation", "priority": WORD_LEAD, "words": ["embarrassed", "ashamed", "victimized"],
+     "why": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
+    {"key": "low-shame", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_NEXT, "words": ["embarrassed", "ashamed"],
+     "why": "Do the Opposite (unhiding) as the alternative for shame."},
+    {"key": "victimized", "pattern": "rumination_loop", "tool": "fast", "priority": WORD_NEXT, "words": ["victimized"],
+     "why": "Planned: FAST (keep self-respect) as the alternative to Recover."},
+    # --- Low drive ---
+    {"key": "fragile", "pattern": "reward_drive_low", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["vulnerable", "fragile", "powerless"],
+     "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},
+    {"key": "fragile", "pattern": "reward_drive_low", "tool": "radical-acceptance", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
+     "why": "Planned: Radical Acceptance leads."},
+    {"key": "connection", "pattern": "reward_drive_low", "tool": "give", "priority": 0.85, "words": ["lonely", "isolated"],
+     "why": "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."},
+]
+
+# Planned pattern-level rows (no word gate): the review's intended first pick for the pattern.
+PLANNED_ROWS = [
+    {"pattern": "reward_drive_low", "tool": "running-low", "priority": 0.9,
+     "why": "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."},
+    {"pattern": "conservation_freeze", "tool": "radical-acceptance", "priority": 1.5,
+     "why": "Planned: Radical Acceptance after gentle movement for despair, grief, emptiness and numbness."},
+]
+
 
 # CORE's routing policy: the kill switch (enabled False → today's legacy ranker), card count,
 # the fallback when every row is filtered, the band assumed when none was given.
@@ -139,29 +258,39 @@ def review_status(id_):
 
 
 def rows():
-    """Every RECOMMENDED_FOR row, in a stable order (pattern, band, priority)."""
+    """Every RECOMMENDED_FOR row, in a stable order (pattern table, gates, word rules, planned)."""
     out = []
+
+    def add(id_, tool, pattern, bands, priority, why, gate=None, words=None, spec=None):
+        spec = spec or {}
+        out.append({
+            "id": id_, "tool": tool, "pattern": pattern, "bands": bands, "priority": priority,
+            "direction": spec.get("direction", CONCEPT_TAGS[tool]["direction"]), "requiresPrior": spec.get("requiresPrior"),
+            "side": spec.get("side"), "emotionGate": gate, "words": words or [], "active": tool not in INACTIVE_TOOLS,
+            "why": why,
+        })
+
     for pattern, cells in TABLE.items():
-        for band in BANDS:
-            primary, second, why = cells[band]
+        if "backup" in cells:
+            tool, why = cells["backup"]
+            add(f"rf_{pattern}_backup_{tool}", tool, pattern, DEFAULT_BANDS, BACKUP, why)
+        for cell, bands in (("default", DEFAULT_BANDS), ("flooded", ["flooded"])):
+            if cell not in cells:
+                continue
+            primary, second, why = cells[cell]
             for slot, spec in (("P", primary), ("S", second)):
                 if spec is None:
                     continue
                 spec = spec if isinstance(spec, dict) else {"tool": spec}
-                tool = spec["tool"]
-                out.append({
-                    "id": f"rf_{pattern}_{band}_{tool}", "tool": tool, "pattern": pattern, "bands": [band],
-                    "priority": P if slot == "P" else S, "direction": spec.get("direction", CONCEPT_TAGS[tool]["direction"]),
-                    "requiresPrior": spec.get("requiresPrior"), "side": spec.get("side"), "emotionGate": None,
-                    "active": tool not in INACTIVE_TOOLS, "why": why,
-                })
+                add(f"rf_{pattern}_{cell}_{spec['tool']}", spec["tool"], pattern, bands, P if slot == "P" else S, why, spec=spec)
     for g in GATES:
         for pattern in g["patterns"]:
-            out.append({
-                "id": f"rf_{pattern}_{g['gate']}_{g['tool']}", "tool": g["tool"], "pattern": pattern, "bands": g["bands"],
-                "priority": g["priority"], "direction": CONCEPT_TAGS[g["tool"]]["direction"], "requiresPrior": None,
-                "side": None, "emotionGate": g["gate"], "active": g["tool"] not in INACTIVE_TOOLS, "why": g["why"],
-            })
+            add(f"rf_{pattern}_{g['gate']}_{g['tool']}", g["tool"], pattern, g["bands"], g["priority"], g["why"], gate=g["gate"])
+    for w in WORD_RULES:
+        add(f"rf_{w['pattern']}_words_{w['key']}_{w['tool']}", w["tool"], w["pattern"], DEFAULT_BANDS, w["priority"], w["why"],
+            gate="words", words=w["words"])
+    for pr in PLANNED_ROWS:
+        add(f"rf_{pr['pattern']}_planned_{pr['tool']}", pr["tool"], pr["pattern"], DEFAULT_BANDS, pr["priority"], pr["why"])
     for r in out:
         r["reviewStatus"] = review_status(r["id"])
     return out

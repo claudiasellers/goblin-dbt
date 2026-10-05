@@ -3,7 +3,8 @@
  * firebase. Order of evaluation (Index §5.1 #8):
  *
  *   rows for the primary pattern whose `bands` include the band (active only)
- *   → emotion gates (`addresses`: a user word is in the concept's set; `none_named`: no words)
+ *   → emotion gates (`addresses`: a user word is in the concept's set; `none_named`: no words;
+ *     `words`: a user word is one the row names, the reviewed per-word rules)
  *   → HARD_FILTERS in order: band (flooded → body / orient only), direction (blank → nothing
  *     `down`), contraindication (hook: CONTRAINDICATED_FOR → primary/secondary pattern or a
  *     medical flag; nothing is authored in Phase A)
@@ -89,6 +90,7 @@ const overlap = (a: readonly string[], b: readonly string[]) => a.filter((x) => 
 function passesGate(row: RoutingRow, concept: RoutingConcept, words: readonly string[]): boolean {
   if (row.emotionGate === 'addresses') return overlap(words, concept.addresses) > 0;
   if (row.emotionGate === 'none_named') return words.length === 0;
+  if (row.emotionGate === 'words') return overlap(words, row.words) > 0;
   return true;
 }
 

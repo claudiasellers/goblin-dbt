@@ -23,9 +23,17 @@ export function fixtureDeps(g = graph, calls = []) {
     async emotionEvidence(candidates, emotionIds, useAliases = true) {
       log("emotionEvidence", candidates, emotionIds, useAliases);
       const rows = [];
+      // A word with a reviewed pattern (SIGNALS) matches only that pattern, as a strong edge.
+      const signalled = new Set();
+      for (const sent of new Set(emotionIds)) {
+        const ps = useAliases ? (g.signals || {})[sent] || [] : [];
+        if (ps.length) signalled.add(sent);
+        for (const pid of ps) if (candidates.includes(pid)) rows.push({ patternId: pid, emotionId: sent, strength: "strong" });
+      }
       for (const pid of candidates) {
         for (const e of g.patterns[pid]?.emotions || []) {
           for (const sent of new Set(emotionIds)) {
+            if (signalled.has(sent)) continue;
             if ((useAliases ? scoringTargets(g, sent) : [sent]).includes(e.id)) rows.push({ patternId: pid, emotionId: sent, strength: e.strength ?? null });
           }
         }
@@ -115,7 +123,7 @@ export function routingConcept(g, conceptId, { withAddresses = true } = {}) {
 function routingRow(r) {
   return {
     id: r.id, bands: [...r.bands], priority: r.priority, direction: r.direction ?? null, side: r.side ?? null,
-    requiresPrior: r.requiresPrior ?? null, emotionGate: r.emotionGate ?? null, active: r.active !== false,
+    requiresPrior: r.requiresPrior ?? null, emotionGate: r.emotionGate ?? null, words: [...(r.words || [])], active: r.active !== false,
   };
 }
 
