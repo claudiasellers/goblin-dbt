@@ -2,8 +2,9 @@
 
 What the check-in result recommends once `RoutingPolicy` is switched on, after Claudia's review of the
 55-row table and the 85 word links (5 Oct 2026). Source: `scripts/recommendations/content.py`
-(rows) and `vocabulary.py` (each word's pattern). Nothing here is live until it's signed off and the
-policy is enabled; switched off, the check-in routes exactly as it does today.
+(rows) and `vocabulary.py` (each word's pattern). **Switched on 5 Oct 2026** (Claudia: "switch it on for
+now we can always come back to it"): every active row and every word's pattern is signed off; the
+planned rows stay drafts until their tool ships. Switched off, the check-in routes as it did before.
 
 ## Decisions
 
@@ -155,7 +156,7 @@ policy is enabled; switched off, the check-in routes exactly as it does today.
 | Empty | Less | Shut down | 5-4-3-2-1, Do the Opposite (once moved) | Do the Opposite |
 | Numb | Less | Shut down | 5-4-3-2-1, Do the Opposite (once moved) | Do the Opposite |
 
-## To go live
+## To go live (done 5 Oct 2026)
 
 1. Sign off: row ids into `content.py` `SIGNED_OFF`, words into `vocabulary.py` `SIGNED_OFF`, and
    `SIGNED_OFF["checkin_result"]` for the policy; set `POLICY["enabled"] = True`; rebuild
@@ -163,3 +164,6 @@ policy is enabled; switched off, the check-in routes exactly as it does today.
 2. `node scripts/load-graph.mjs --only discriminating-questions` and
    `node scripts/load-graph.mjs --only recommended-for --verify`, after the functions deploy that reads
    `SIGNALS` and `words`. Rollback: `enabled` back to False and reload.
+
+To revisit a row later: take its id out of `SIGNED_OFF` and change it (or switch the policy off while
+you do; `build.py` won't build an enabled policy with an active draft), rebuild, reload `recommended-for`.

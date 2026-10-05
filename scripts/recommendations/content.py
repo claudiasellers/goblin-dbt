@@ -32,7 +32,68 @@ VERSION = "rf-v2"  # rf-v2: Oct 2026 routing review (no capacity bands, word rul
 RETIRED_VERSIONS = ["rf-v1"]
 # Sign-off: add a row id (or the policy id "checkin_result") with its review date; that row is then
 # `reviewStatus: "approved"`, everything else stays "draft".
-SIGNED_OFF = {}  # e.g. {"rf_acute_alarm_steady_opposite-action": "2026-10-05"}
+# Claudia, 5 Oct 2026: "switch it on for now we can always come back to it" (after the round-2 sheet,
+# Check-in routing round 2.xlsx). Every ACTIVE row plus the policy; planned (inactive) rows stay drafts
+# until their tool ships and they're reviewed. To revisit a row: take it out of here and either
+# fix it or set POLICY["enabled"] back to False (build.py won't enable with a draft active row).
+SIGNED_OFF = {
+    "checkin_result": "2026-10-05",
+    "rf_acute_alarm_backup_five-senses": "2026-10-05",
+    "rf_acute_alarm_default_cool-down": "2026-10-05",
+    "rf_acute_alarm_default_opposite-action": "2026-10-05",
+    "rf_acute_alarm_flooded_cool-down": "2026-10-05",
+    "rf_acute_alarm_flooded_five-senses": "2026-10-05",
+    "rf_chronic_vigilance_default_five-senses": "2026-10-05",
+    "rf_chronic_vigilance_default_problem-solve": "2026-10-05",
+    "rf_chronic_vigilance_flooded_cool-down": "2026-10-05",
+    "rf_chronic_vigilance_flooded_five-senses": "2026-10-05",
+    "rf_emotional_flooding_flooded_cool-down": "2026-10-05",
+    "rf_emotional_flooding_flooded_five-senses": "2026-10-05",
+    "rf_social_threat_shame_default_recovering-from-invalidation": "2026-10-05",
+    "rf_social_threat_shame_default_opposite-action": "2026-10-05",
+    "rf_social_threat_shame_flooded_cool-down": "2026-10-05",
+    "rf_social_threat_shame_flooded_five-senses": "2026-10-05",
+    "rf_reactive_aggression_default_pause": "2026-10-05",
+    "rf_reactive_aggression_default_cool-down": "2026-10-05",
+    "rf_reactive_aggression_flooded_cool-down": "2026-10-05",
+    "rf_reactive_aggression_flooded_five-senses": "2026-10-05",
+    "rf_rumination_loop_default_problem-solve": "2026-10-05",
+    "rf_rumination_loop_default_five-senses": "2026-10-05",
+    "rf_rumination_loop_flooded_cool-down": "2026-10-05",
+    "rf_rumination_loop_flooded_five-senses": "2026-10-05",
+    "rf_reward_drive_low_default_opposite-action": "2026-10-05",
+    "rf_reward_drive_low_flooded_five-senses": "2026-10-05",
+    "rf_conservation_freeze_default_five-senses": "2026-10-05",
+    "rf_conservation_freeze_default_opposite-action": "2026-10-05",
+    "rf_conservation_freeze_flooded_five-senses": "2026-10-05",
+    "rf_dissociation_overmodulation_default_five-senses": "2026-10-05",
+    "rf_dissociation_overmodulation_flooded_five-senses": "2026-10-05",
+    "rf_acute_alarm_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_chronic_vigilance_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_social_threat_shame_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_reactive_aggression_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_rumination_loop_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_reward_drive_low_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_conservation_freeze_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_dissociation_overmodulation_addresses_recovering-from-invalidation": "2026-10-05",
+    "rf_acute_alarm_none_named_find-the-feeling": "2026-10-05",
+    "rf_chronic_vigilance_none_named_find-the-feeling": "2026-10-05",
+    "rf_social_threat_shame_none_named_find-the-feeling": "2026-10-05",
+    "rf_rumination_loop_none_named_find-the-feeling": "2026-10-05",
+    "rf_acute_alarm_words_overwhelm_pause": "2026-10-05",
+    "rf_acute_alarm_words_stress_problem-solve": "2026-10-05",
+    "rf_acute_alarm_words_annoyed_opposite-action": "2026-10-05",
+    "rf_acute_alarm_words_freeze_five-senses": "2026-10-05",
+    "rf_chronic_vigilance_words_anticipatory_opposite-action": "2026-10-05",
+    "rf_chronic_vigilance_words_worry_opposite-action": "2026-10-05",
+    "rf_chronic_vigilance_words_helpless_problem-solve": "2026-10-05",
+    "rf_social_threat_shame_words_exposed_cool-down": "2026-10-05",
+    "rf_reactive_aggression_words_grievance_opposite-action": "2026-10-05",
+    "rf_rumination_loop_words_aversion_opposite-action": "2026-10-05",
+    "rf_rumination_loop_words_low-shame_recovering-from-invalidation": "2026-10-05",
+    "rf_rumination_loop_words_low-shame_opposite-action": "2026-10-05",
+    "rf_reward_drive_low_words_fragile_problem-solve": "2026-10-05",
+}
 BANDS = ["steady", "stirred", "flooded"]
 
 # WMP-04 v0 side tags, the engine's diversity key (skillKind) and the tool's intrinsic arousal
@@ -245,7 +306,7 @@ PLANNED_ROWS = [
 # the fallback when every row is filtered, the band assumed when none was given.
 POLICY = {
     "version": VERSION,
-    "enabled": False,          # R7: ships dark; flip after D-02 sign-off and A4-3 / A0-1 / A0-2 are live
+    "enabled": True,           # on 5 Oct 2026 (Claudia); False = the legacy ranker, the kill switch
     "maxCards": 2,
     "fallbackConceptId": "se_orienting",
     "defaultBand": "stirred",
