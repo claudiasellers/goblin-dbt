@@ -5,6 +5,19 @@ import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { functions } from './firebase';
 import type { CollectedWord, FindTheFeelingContent, FindTheFeelingSession } from '../data/findTheFeelingTypes';
 import type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
+
+/**
+ * Read-only content shipped with the app (src/data/content/, generated from the graph by
+ * scripts/content-snapshot/build.mjs). Each file is its own chunk, fetched the first time it is
+ * needed and kept for the page's life; a failed fetch can be retried.
+ */
+interface RelatedWordRow { id: string; name: string | null; quadrant: string | null; reason: string }
+function shipped<T>(load: () => Promise<{ default: { content: unknown } }>): () => Promise<T> {
+  let p: Promise<T> | null = null;
+  return () => (p ??= load().then((m) => m.default.content as T).catch((e) => { p = null; throw e; }));
+}
+const relatedWordsFile = shipped<Record<string, RelatedWordRow[]>>(() => import('../data/content/related-words.json'));
+const findTheFeelingFile = shipped<FindTheFeelingContent>(() => import('../data/content/find-the-feeling.json'));
 export type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
 
 // Types (same as before, for consistency across the app)
@@ -249,10 +262,6 @@ const getDiscriminatingQuestionsFn = httpsCallable<
   { questions: DiscriminatingQuestion[] }
 >(functions, 'getDiscriminatingQuestions');
 
-const getRelatedEmotionsFn = httpsCallable<
-  { emotionId: string; quadrant?: string },
-  { relatedEmotions: RelatedEmotion[] }
->(functions, 'getRelatedEmotions');
 
 /**
  * Get the activation pattern and recommended tools based on check-in data
@@ -289,15 +298,21 @@ export async function getDiscriminatingQuestions(
 }
 
 /**
- * Get related emotions based on shared neural substrates
- * Powers the "You might also be feeling..." feature
+ * "Often alongside": the words the graph relates to `emotionId` (RELATED_TO, then shared brain
+ * structures), best first, at most 6, optionally only from one quadrant. Read from the file the app
+ * ships (src/data/content/related-words.json, generated from the graph by
+ * scripts/content-snapshot/build.mjs), so a tap never waits on a Cloud Function. Opposite emotions
+ * are not included: they are the opposite of "alongside".
  */
 export async function getRelatedEmotions(
   emotionId: string,
   quadrant?: string
 ): Promise<RelatedEmotion[]> {
-  const result = await getRelatedEmotionsFn({ emotionId, quadrant });
-  return result.data.relatedEmotions;
+  const rows = (await relatedWordsFile())[emotionId] ?? [];
+  return rows
+    .filter((r) => !quadrant || r.quadrant === quadrant)
+    .slice(0, 6)
+    .map((r) => ({ id: r.id, name: r.name || r.id.replace(/_/g, ' '), reason: r.reason }));
 }
 
 // ============================================
@@ -877,11 +892,9 @@ export async function getInvalidationRecoveryProgress(): Promise<InvalidationRec
 
 // ── Find the feeling (Shape it / Tune it) ──
 
-const getFindTheFeelingContentFn = httpsCallable<void, FindTheFeelingContent>(
-  functions, 'getFindTheFeelingContent', { timeout: CONTENT_TIMEOUT_MS }
-);
+/** Find the feeling's content, from the file the app ships (src/data/content/find-the-feeling.json). */
 export async function getFindTheFeelingContent(): Promise<FindTheFeelingContent> {
-  return (await getFindTheFeelingContentFn()).data;
+  return findTheFeelingFile();
 }
 
 const saveFindTheFeelingSessionFn = httpsCallable<FindTheFeelingSession, { success: boolean }>(
