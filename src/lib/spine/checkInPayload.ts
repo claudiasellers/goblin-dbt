@@ -86,6 +86,25 @@ export function emotionIdsFor(emotions: string[], known: string[] = []): string[
 
 
 /**
+ * Splits the follow-up answers into the safety answer (a `kind: "safety"` question; the last one if
+ * several) and the rest. `raises`: the chosen response raises the crisis banner (`raisesSafety` in the
+ * shipped questions, from RAISES_SAFETY in the graph).
+ */
+export function splitSafetyAnswer(
+  answers: Array<{ questionId: string; responseId: string }>,
+  questions: Array<{ id: string; kind?: string; responses?: Array<{ id: string; raisesSafety?: boolean }> }>,
+): { answer: { questionId: string; responseId: string; raises: boolean } | null; rest: Array<{ questionId: string; responseId: string }> } {
+  const safety = new Map(questions.filter((q) => q.kind === 'safety').map((q) => [q.id, q]));
+  const mine = answers.filter((a) => safety.has(a.questionId));
+  const last = mine[mine.length - 1];
+  const raises = !!last && !!safety.get(last.questionId)?.responses?.find((r) => r.id === last.responseId)?.raisesSafety;
+  return {
+    answer: last ? { questionId: last.questionId, responseId: last.responseId, raises } : null,
+    rest: answers.filter((a) => !safety.has(a.questionId)),
+  };
+}
+
+/**
  * The answers a check-in keeps: every follow-up answer except those to a `kind: "safety"` question
  * (the spiral path's self-harm question, schema/checkin-safety.cypher). Those go to getStateAndTools,
  * which raises the banner, and are never stored; `safetyFlagId` records that the banner showed.

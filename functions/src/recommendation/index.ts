@@ -58,8 +58,8 @@ export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
       ruleIds: r?.ruleIds ?? [],
       filtered: r?.filtered ?? [],
       receiveFirst: r?.receiveFirst ?? null,
+      // The type only: banner vs line would say how the person answered the safety question.
       safetyFlag: result.safetyFlag?.type ?? null,
-      safetyLevel: result.safetyFlag ? (result.safetyFlag.level ?? 'banner') : null,
     }));
     return result;
   },
@@ -86,6 +86,7 @@ export const getDiscriminatingQuestions = onCall(
       order: number;
       isEscapeHatch: boolean;
       triggersNextQuestionId?: string;
+      raisesSafety?: boolean;
     }>;
   }> }> => {
     const { quadrant } = request.data as { quadrant: string };
@@ -100,6 +101,8 @@ export const getDiscriminatingQuestions = onCall(
         MATCH (q:DiscriminatingQuestion)-[hr:HAS_RESPONSE]->(r:QuestionResponse)
         WHERE $quadrant IN q.applicableQuadrants
         OPTIONAL MATCH (r)-[:TRIGGERS_NEXT]->(nextQ:DiscriminatingQuestion)
+        OPTIONAL MATCH (r)-[:RAISES_SAFETY]->(sf:SafetyFlag)
+        WITH q, r, nextQ, count(sf) > 0 AS raisesSafety
         RETURN q.id as questionId,
                q.text as questionText,
                q.subtext as questionSubtext,
@@ -111,7 +114,8 @@ export const getDiscriminatingQuestions = onCall(
                r.subtext as responseSubtext,
                r.order as responseOrder,
                r.isEscapeHatch as isEscapeHatch,
-               nextQ.id as triggersNextQuestionId
+               nextQ.id as triggersNextQuestionId,
+               raisesSafety
         ORDER BY q.order, r.order
       `;
 
@@ -132,6 +136,7 @@ export const getDiscriminatingQuestions = onCall(
           order: number;
           isEscapeHatch: boolean;
           triggersNextQuestionId?: string;
+          raisesSafety?: boolean;
         }>;
       }>();
 
@@ -161,6 +166,7 @@ export const getDiscriminatingQuestions = onCall(
             : Number(rec.get('responseOrder')),
           isEscapeHatch: rec.get('isEscapeHatch') as boolean,
           ...(nextQId ? { triggersNextQuestionId: nextQId } : {}),
+          ...(rec.get('raisesSafety') === true ? { raisesSafety: true } : {}),
         });
       }
 

@@ -202,6 +202,7 @@ export function buildDiscriminatingQuestions(g) {
   for (const r of g.rels('HAS_RESPONSE', 'DiscriminatingQuestion', 'QuestionResponse')) pushTo(responsesOf, r.a, r.b);
   const nextOf = new Map();
   for (const r of g.rels('TRIGGERS_NEXT', 'QuestionResponse', 'DiscriminatingQuestion')) pushTo(nextOf, r.a, r.b);
+  const raises = new Set(g.rels('RAISES_SAFETY', 'QuestionResponse', 'SafetyFlag').map((r) => r.a));
   const questions = g.nodes('DiscriminatingQuestion');
   const quadrants = [...new Set(questions.flatMap((q) => q.props.applicableQuadrants ?? []))].sort();
   const out = {};
@@ -217,7 +218,10 @@ export function buildDiscriminatingQuestions(g) {
         responses: (responsesOf.get(q) ?? [])
           .sort((a, b) => asc(a.props.order, b.props.order))
           .flatMap((r) => {
-            const base = { id: r.props.id, label: r.props.label ?? null, subtext: r.props.subtext ?? null, order: Number(r.props.order), isEscapeHatch: r.props.isEscapeHatch ?? null };
+            const base = {
+              id: r.props.id, label: r.props.label ?? null, subtext: r.props.subtext ?? null, order: Number(r.props.order), isEscapeHatch: r.props.isEscapeHatch ?? null,
+              ...(raises.has(r) ? { raisesSafety: true } : {}),
+            };
             const next = nextOf.get(r) ?? [];
             return next.length ? next.map((n) => ({ ...base, triggersNextQuestionId: n.props.id })) : [base];
           }),

@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-pending-load.json",
-    "exportedAt": "2026-10-05T22:41:27.154Z"
+    "exportedAt": "2026-10-05T22:58:11.743Z"
   },
   "content": {
     "high-unpleasant": [
@@ -99,7 +99,7 @@
       {
         "id": "hu_safety_urge",
         "text": "Are you having any thoughts of hurting yourself or ending your life?",
-        "subtext": "Any answer is okay. It only changes what we show you next.",
+        "subtext": "Any answer is okay. It changes what we show you next.",
         "order": 3,
         "required": false,
         "kind": "safety",
@@ -109,14 +109,16 @@
             "label": "Yes",
             "subtext": "Even a little, or on and off.",
             "order": 1,
-            "isEscapeHatch": false
+            "isEscapeHatch": false,
+            "raisesSafety": true
           },
           {
             "id": "hu_safety_unsure",
             "label": "I'm not sure",
             "subtext": null,
             "order": 2,
-            "isEscapeHatch": true
+            "isEscapeHatch": true,
+            "raisesSafety": true
           },
           {
             "id": "hu_safety_no",

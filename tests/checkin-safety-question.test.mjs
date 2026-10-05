@@ -13,6 +13,7 @@ const safety = await importTs("functions/src/safety/checkinSafetyFlag.ts");
 const banner = await importTs("src/lib/crisisBanner.ts");
 const payload = await importTs("src/lib/spine/checkInPayload.ts");
 const { SAFETY_LINE } = await importTs("src/components/safety/SafetyLine.tsx");
+const checkinValidation = await importTs("functions/src/checkin/validation.ts");
 
 const on = withPolicyOn(graph);
 const run = (input, g = on) => getStateAndToolsHandler(input, fixtureDeps(g));
@@ -90,7 +91,7 @@ test("nothing else changed: no word alone, and no other answer, raises a flag of
 // ── rf-v2.1 tie-break ──
 
 test("rf-v2.1: a tie goes to the person's words; without the policy's tieBreak, candidate order as before", () => {
-  const scores = { acute_alarm: 2.2, chronic_vigilance: 2.2000000000000002 };
+  const scores = { acute_alarm: 0.3, chronic_vigilance: 0.1 + 0.2 };
   const words = { acute_alarm: 0.55, chronic_vigilance: 0.35 };
   assert.equal(scoring.rankPatterns(scores, words).primaryId, "acute_alarm", "within epsilon is a tie; the words favour alarm");
   assert.equal(scoring.rankPatterns({ a: 0.25, b: 0.25 }, { a: 0, b: 0.1 }).primaryId, "b");
@@ -187,4 +188,60 @@ test("the safety answer goes to the engine and is never saved with the check-in"
   const ci = read("src/pages/CheckIn.tsx");
   assert.match(ci, /discriminatingAnswers: savedAnswers\(discriminatingAnswers, discriminatingQuestions\)/, "the saved state strips it");
   assert.match(ci, /discriminatingAnswers: discAnsw\.length > 0 \? discAnsw : undefined/, "the engine still gets every answer");
+});
+
+// ── Independent review fixes (A1–A3, C1, D1, E) ──
+
+test("A1: a yes shows the banner even when the analysis is slow or fails (analyzing / saving / complete)", () => {
+  const ci = read("src/pages/CheckIn.tsx");
+  assert.match(ci, /\{\(step === 'analyzing' \|\| step === 'saving' \|\| step === 'complete'\) && safetyAnswer\.current\?\.raises && <CrisisBanner \/>\}/);
+  const shipped = JSON.parse(read("src/data/content/discriminating-questions.json")).content["high-unpleasant"].find((x) => x.id === "hu_safety_urge");
+  assert.deepEqual(shipped.responses.map((r) => [r.id, r.raisesSafety === true]), [["hu_safety_yes", true], ["hu_safety_unsure", true], ["hu_safety_no", false]],
+    "the app knows which answers raise the banner from the graph (RAISES_SAFETY), not from hard-coded ids");
+});
+
+test("A2: a yes still raises the banner when the words turn pleasant after Back", async () => {
+  const r = await run({ quadrant: "high-pleasant", emotions: ["Calm"], discriminatingAnswers: ans("hu_safety_yes") });
+  assert.equal(r.pattern.id, "positive_state");
+  assert.equal(r.safetyFlag?.type, "crisis");
+  assert.equal(r.safetyFlag?.level, undefined);
+  assert.equal(banner.resultSections({ variant: "standard", safetyFlag: r.safetyFlag, patternId: "positive_state", toolCount: 0 })[0], "crisis_banner");
+  assert.equal((await run({ quadrant: "high-pleasant", emotions: ["Calm"] })).safetyFlag, undefined);
+});
+
+test("A3 / C1: the safety answer is kept apart for the whole check-in: sent every time, never saved", () => {
+  const questions = JSON.parse(read("src/data/content/discriminating-questions.json")).content["high-unpleasant"];
+  const answers = [{ questionId: "hu_experience_quality", responseId: "hu_exp_flooding" }, { questionId: "hu_safety_urge", responseId: "hu_safety_unsure" }];
+  const split = payload.splitSafetyAnswer(answers, questions);
+  assert.deepEqual(split.answer, { questionId: "hu_safety_urge", responseId: "hu_safety_unsure", raises: true });
+  assert.deepEqual(split.rest.map((a) => a.responseId), ["hu_exp_flooding"]);
+  assert.equal(payload.splitSafetyAnswer([{ questionId: "hu_safety_urge", responseId: "hu_safety_no" }], questions).answer.raises, false);
+  const ci = read("src/pages/CheckIn.tsx");
+  assert.match(ci, /const safety = splitSafetyAnswer\(answers, discriminatingQuestions\);\s*if \(safety\.answer\) safetyAnswer\.current = safety\.answer;\s*setDiscriminatingAnswers\(safety\.rest\);/,
+    "only the non-safety answers enter the state that is saved (and that a re-answered quadrant replaces)");
+  assert.match(ci, /\.\.\.\(safetyAnswer\.current \? \[\{ questionId: safetyAnswer\.current\.questionId, responseId: safetyAnswer\.current\.responseId \}\] : \[\]\)/,
+    "every analysis sends it, including after Back and new words");
+  assert.match(ci, /safetyAnswer\.current = null;/, "a new check-in clears it");
+});
+
+test("C1 backstop: saveCheckIn drops a safety answer if one ever arrives; the id list matches the schema", () => {
+  const schemaSafety = Object.entries(rawGraph.questionKinds).filter(([, k]) => k === "safety").map(([id]) => id).sort();
+  assert.deepEqual([...checkinValidation.SAFETY_QUESTION_IDS].sort(), schemaSafety);
+  const v = checkinValidation.validateSaveCheckIn({
+    quadrant: "high-unpleasant", emotion: "Let down",
+    discriminatingAnswers: [{ questionId: "hu_experience_quality", responseId: "hu_exp_flooding" }, { questionId: "hu_safety_urge", responseId: "hu_safety_yes" }],
+  }, new Date());
+  assert.deepEqual(v.discResponseIds, ["hu_exp_flooding"]);
+  assert.deepEqual(v.discQuestionIds, ["hu_experience_quality"]);
+});
+
+test("D1: with the switch off (no tie-break) the sort is exactly the old one, float noise included", () => {
+  const noisy = { a: 0.3, b: 0.1 + 0.2 }; // 0.30000000000000004: a float hair apart
+  assert.equal(scoring.rankPatterns(noisy).primaryId, "b", "no epsilon without tieBreak: the larger float wins, as before");
+  assert.equal(scoring.rankPatterns(noisy, { a: 1, b: 0 }).primaryId, "a", "with tieBreak it's a tie, and the words decide");
+});
+
+test("E: a second tap during the fade is ignored (it could have skipped the safety question)", () => {
+  const src = read("src/components/checkin/DiscriminatingQuestions.tsx");
+  assert.match(src, /if \(transitioning \|\| answers\.some\(\(a\) => a\.questionId === questionId\)\) return;/);
 });

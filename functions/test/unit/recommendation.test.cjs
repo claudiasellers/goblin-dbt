@@ -98,7 +98,7 @@ test('getStateAndTools: the spiral path\'s safety answer (checkin-safety.cypher)
   out = await quiet(() => fns.getStateAndTools.run(ask(['hu_safety_yes'], 'low-unpleasant')));
   assert.equal(out.safetyFlag?.type, 'crisis');
 
-  // The log line says which: ids and enums only, never the answer.
+  // The log line keeps ids and enums only: nothing that tells banner from line (that would be the answer).
   f = fakeDriver(responder({ safety: [{ ...flag, withoutSignal: 'line' }] }));
   setDriver(f.driver);
   const lines = [];
@@ -106,8 +106,25 @@ test('getStateAndTools: the spiral path\'s safety answer (checkin-safety.cypher)
   console.log = (...a) => lines.push(a.join(' '));
   try { await fns.getStateAndTools.run(ask(['hu_safety_no'])); } finally { console.log = orig; }
   const logged = JSON.parse(lines.find((l) => l.startsWith('getStateAndTools')).slice('getStateAndTools '.length));
-  assert.equal(logged.safetyLevel, 'line');
-  assert.ok(!lines.join('').includes('hu_safety'), 'the answer is never logged');
+  assert.equal(logged.safetyFlag, 'crisis');
+  assert.ok(!('safetyLevel' in logged), 'no field that says how the person answered');
+  assert.ok(!lines.join('').includes('hu_safety') && !lines.join('').includes('"line"'), 'the answer is never logged');
+});
+
+test('getStateAndTools: a yes still raises the banner when the words turned pleasant (Back → new words)', async () => {
+  const flag = { id: 'crisis_self_harm', type: 'crisis', trigger: 't', action: 'a' };
+  const f = fakeDriver(responder({ raised: [{ ...flag, withoutSignal: null }] }));
+  setDriver(f.driver);
+  const out = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: {
+    quadrant: 'high-pleasant', emotions: ['Calm'], discriminatingAnswers: [{ questionId: 'hu_safety_urge', responseId: 'hu_safety_yes' }],
+  } }));
+  assert.equal(out.pattern.id, 'positive_state');
+  assert.deepEqual(out.safetyFlag, flag);
+  const g = fakeDriver(responder());
+  setDriver(g.driver);
+  const plain = await quiet(() => fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { quadrant: 'high-pleasant', emotions: ['Calm'] } }));
+  assert.equal(plain.safetyFlag, undefined);
+  assert.equal(g.calls.filter((c) => /SAFETY/.test(c.query)).length, 0, 'a pleasant check-in with no answers still runs no safety query');
 });
 
 test('getStateAndTools { warm: true }: one trivial read, answers { warm: true }, routes and logs nothing; still needs sign-in', async () => {

@@ -117,17 +117,19 @@ export interface RankedPatterns {
 }
 
 /**
- * Highest score first. A tie (within SCORE_EPSILON) goes to whichever the person's words favour, when
- * `tieBreak` is given (rf-v2.1: the RoutingPolicy's tieBreak "words"); otherwise, or when the words
- * tie too, to candidate order (the stable sort), as before.
+ * Highest score first. With `tieBreak` (rf-v2.1: the RoutingPolicy's tieBreak "words"), a tie within
+ * SCORE_EPSILON goes to whichever the person's words favour, then candidate order. Without it, the
+ * pre-rf-v2.1 sort exactly: exact ties keep candidate order (Array.prototype.sort is stable).
  */
 export function rankPatterns(scores: Record<string, number>, tieBreak?: Record<string, number>): RankedPatterns {
-  const sorted = Object.entries(scores).sort(([pa, a], [pb, b]) => {
-    if (Math.abs(b - a) > SCORE_EPSILON) return b - a;
-    if (!tieBreak) return 0;
-    const d = (tieBreak[pb] ?? 0) - (tieBreak[pa] ?? 0);
-    return Math.abs(d) > SCORE_EPSILON ? d : 0;
-  });
+  // Without a tie-break: exactly the pre-rf-v2.1 sort (no epsilon), so the kill switch reproduces it.
+  const sorted = Object.entries(scores).sort(tieBreak
+    ? ([pa, a], [pb, b]) => {
+      if (Math.abs(b - a) > SCORE_EPSILON) return b - a;
+      const d = (tieBreak[pb] ?? 0) - (tieBreak[pa] ?? 0);
+      return Math.abs(d) > SCORE_EPSILON ? d : 0;
+    }
+    : ([, a], [, b]) => b - a);
   return {
     primaryId: sorted[0][0],
     primaryScore: sorted[0][1],

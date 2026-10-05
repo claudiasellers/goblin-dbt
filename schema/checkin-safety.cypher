@@ -14,8 +14,9 @@
 //   3. marks flooding's flag withoutSignal "line": with no yes (No, Skip, or never asked), a calm
 //      line with 988 shows instead of the banner. 988 is on screen either way.
 // The engine reads 2 and 3 in functions/src/safety/checkinSafetyFlag.ts. The answer is sent to
-// getStateAndTools and never saved with the check-in (the app drops kind "safety" answers);
-// CheckIn.safetyFlagId records that the banner showed.
+// getStateAndTools and never saved with the check-in (the app keeps it apart; saveCheckIn drops it
+// as a backstop). CheckIn.safetyFlagId records that the banner showed, as it always has: since only
+// a yes now shows it for flooding, that record implies the answer.
 //
 // Loads after discriminating-questions.cypher (hu_exp_flooding) and relationships.cypher (the flag
 // edge). MERGE-only; uses existing constraints (DiscriminatingQuestion, QuestionResponse, SafetyFlag).
@@ -27,13 +28,13 @@
 MERGE (q:DiscriminatingQuestion {id: "hu_safety_urge"})
 SET q += {
   text: "Are you having any thoughts of hurting yourself or ending your life?",
-  subtext: "Any answer is okay. It only changes what we show you next.",
+  subtext: "Any answer is okay. It changes what we show you next.",
   applicableQuadrants: ["high-unpleasant"],
   order: 3,
   required: false,
   kind: "safety",
   clinicalDimension: "self_harm_or_suicidal_ideation",
-  clinicalRationale: "Checks the intent half of crisis_self_harm's condition (out of control + intent) for someone who has just said they are spiraling. Yes or not sure raises the full crisis banner; no or skip shows a calm line with 988 instead. Optional and skippable; the answer is not stored.",
+  clinicalRationale: "Checks the intent half of crisis_self_harm's condition (out of control + intent) for someone who has just said they are spiraling. Yes or not sure raises the full crisis banner; no or skip shows a calm line with 988 instead. Optional and skippable; the answer itself is not stored (CheckIn.safetyFlagId records that the banner showed, as it always has).",
   keyCitations: ["Dazzi et al. (2014, asking about suicide does not increase suicidal ideation)", "PHQ-9 item 9 (thoughts of being better off dead or of hurting yourself)"]
 };
 

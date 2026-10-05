@@ -10,6 +10,8 @@ import { optionalReading } from '../capacity/reading';
 import type { CapacityReading } from '../capacity/types';
 
 export const CHECKIN_SOURCES = ['grid', 'ftf', 'body', 'dear_man_debrief'] as const;
+/** `kind: "safety"` questions (schema/checkin-safety.cypher): never stored with a check-in (test-pinned to the schema). */
+export const SAFETY_QUESTION_IDS: readonly string[] = ['hu_safety_urge'];
 export type CheckInSource = (typeof CHECKIN_SOURCES)[number];
 export const QUADRANTS = ['high-unpleasant', 'low-unpleasant', 'high-pleasant', 'low-pleasant'] as const;
 /** `safety` is reserved for CORE-01 (safety.open); it is written through the same upsert later. */
@@ -169,7 +171,9 @@ export function validateSaveCheckIn(raw: unknown, now: Date): SaveCheckInInput {
   const disc = Array.isArray(raw.discriminatingAnswers) ? raw.discriminatingAnswers.filter(isObj).slice(0, 10) : [];
   const pairs = disc
     .map((a) => [id(a.questionId, GRAPH_ID), id(a.responseId, GRAPH_ID)] as const)
-    .filter((p): p is readonly [string, string] => Boolean(p[0] && p[1]));
+    .filter((p): p is readonly [string, string] => Boolean(p[0] && p[1]))
+    // Backstop: the app never sends the safety answer to saveCheckIn; if one arrives, it isn't stored.
+    .filter((p) => !SAFETY_QUESTION_IDS.includes(p[0]));
   const confidence = typeof raw.confidence === 'number' && Number.isFinite(raw.confidence) && raw.confidence >= 0 && raw.confidence <= 1
     ? raw.confidence : null;
   return {

@@ -51,6 +51,9 @@ export function DiscriminatingQuestions({
   }, [activeQuestion, onSkip]);
 
   function handleResponseSelect(questionId: string, responseId: string) {
+    // A second tap during the fade would add an answer to the question that's leaving (and could skip
+    // the spiral path's safety question): ignore it.
+    if (transitioning || answers.some((a) => a.questionId === questionId)) return;
     const newAnswers = [...answers, { questionId, responseId }];
     setAnswers(newAnswers);
 

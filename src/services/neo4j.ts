@@ -239,6 +239,8 @@ export interface DiscriminatingResponse {
   order: number;
   isEscapeHatch: boolean;
   triggersNextQuestionId?: string;
+  /** Raises the crisis banner (RAISES_SAFETY): Yes / Not sure to the spiral path's safety question. */
+  raisesSafety?: boolean;
 }
 
 export interface RelatedEmotion {

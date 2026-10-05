@@ -131,7 +131,13 @@ const emptySlice = (id: string): PatternSlice => ({ id, blank: false, emotions: 
 
 export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDeps): Promise<StateResult> {
   if (!input || !input.quadrant) throw new ValidationError('Quadrant is required');
-  if (candidatesFor(input.quadrant).length === 0) return { pattern: POSITIVE_STATE, tools: [] };
+  if (candidatesFor(input.quadrant).length === 0) {
+    // Pleasant: no pattern query. A yes to the safety question still raises the banner (an explicit
+    // signal is never gated): only asked when answers came with the check-in (Back → new words).
+    const responseIds = (input.discriminatingAnswers ?? []).map((a) => a.responseId);
+    const safetyFlag = responseIds.length ? await deps.safetyFlag(POSITIVE_STATE.id, input.quadrant, responseIds) : undefined;
+    return safetyFlag ? { pattern: POSITIVE_STATE, tools: [], safetyFlag } : { pattern: POSITIVE_STATE, tools: [] };
+  }
 
   const { policy, fallback } = await deps.routingPolicy();
   const candidates = candidatesFor(input.quadrant, policy?.enabled === true);
