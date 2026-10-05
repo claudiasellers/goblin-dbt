@@ -50,7 +50,7 @@ test("related words keep RELATED_TO and shared-brain rows, never OPPOSITE_OF", (
 });
 
 test("shipped files carry their source, and related words has no opposites and covers every grid word", () => {
-  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json"]) {
+  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json"]) {
     const f = shipped(name);
     assert.match(f.source.file, /^graph-content-only-.*\.json$/, name);
     assert.ok(!Number.isNaN(Date.parse(f.source.exportedAt)), name);
@@ -87,6 +87,29 @@ test("shipped body map content matches content.py", () => {
     assert.deepEqual(m.wordIds, f.wordIds, m.id);
     assert.deepEqual(m.places, f.places.filter((p) => (p.status ?? "live") === "live").map((p) => strip(p, ["status", "emotionIds"])), m.id);
   }
+});
+
+test("shipped follow-up questions: both unpleasant quadrants, no clinical notes, follow-ups resolve, match the schema", () => {
+  const shippedQs = shipped("discriminating-questions.json").content;
+  const fixture = JSON.parse(readFileSync("tests/fixtures/recommendation-graph.json", "utf8"));
+  // The check-in asks them for both unpleasant quadrants (CheckIn.tsx asksDiscriminatingQuestions).
+  for (const q of ["high-unpleasant", "low-unpleasant"]) assert.ok(shippedQs[q]?.length > 0, q);
+  // Only what getDiscriminatingQuestions returns: never the rationale, citations or signals.
+  const text = JSON.stringify(shippedQs);
+  for (const field of ["clinicalRationale", "keyCitations", "clinicalSignal", "clinicalDimension"]) assert.ok(!text.includes(field), field);
+  for (const [quadrant, qs] of Object.entries(shippedQs)) {
+    const ids = new Set(qs.map((q) => q.id));
+    for (const q of qs) {
+      assert.ok(q.text && q.responses.length > 0, q.id);
+      for (const r of q.responses) if (r.triggersNextQuestionId) assert.ok(ids.has(r.triggersNextQuestionId), `${q.id} → ${r.triggersNextQuestionId}`);
+    }
+    // Drift guard: the same questions, in the same order, as the schema files say.
+    assert.deepEqual(qs.map((q) => q.id), fixture.questions[quadrant] ?? [], quadrant);
+  }
+  // Every answer the engine scores (EVIDENCE_FOR) is one the app can send.
+  const responseIds = new Set(Object.values(shippedQs).flat().flatMap((q) => q.responses.map((r) => r.id)));
+  const scored = [...new Set(fixture.evidence.map((e) => e.responseId))];
+  assert.deepEqual(scored.filter((id) => !responseIds.has(id)), []);
 });
 
 test("load-graph never refreshes the shipped files from a local graph", () => {

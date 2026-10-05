@@ -13,6 +13,7 @@ import {
   setCheckInNextAction,
   getStateAndTools,
   getDiscriminatingQuestions,
+  preloadCheckInContent,
   type StateResult as StateResultType,
   type DiscriminatingQuestion,
 } from '../services/neo4j';
@@ -119,6 +120,12 @@ export function CheckIn() {
   const [knownEmotionIds, setKnownEmotionIds] = useState<string[]>([]);
   /** Find the feeling's pull was `blank` (E4-4): the engine never offers a calming tool then. */
   const ftfBlank = useRef(false);
+  // "Continue" is working: the button shows it, and taps while it works are ignored (a ref, so two
+  // taps in the same frame can't both get through).
+  const continuingRef = useRef(false);
+  const [continuing, setContinuing] = useState(false);
+  // The check-in's files (related words, follow-up questions) start loading as the screen opens.
+  useEffect(() => { preloadCheckInContent(); }, []);
   const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
   /** The render save in flight: resolves true when saved. Next actions chain after it. */
   const savePromise = useRef<Promise<boolean> | null>(null);
@@ -349,6 +356,10 @@ export function CheckIn() {
    * No words ("Continue without a word"): the quadrant and intensity come from the point.
    */
   function handleWordsContinue() {
+    if (continuingRef.current) return;
+    continuingRef.current = true;
+    setContinuing(true);
+    const done = () => { continuingRef.current = false; setContinuing(false); };
     setStartedAt(new Date());
     setSource('grid');
     setKnownEmotionIds([]);
@@ -358,14 +369,14 @@ export function CheckIn() {
     if (all.length === 0) {
       const p = point ?? { x: 0.5, y: 0.5 };
       setCheckInData(prev => ({ ...prev, intensity: { x: p.x, y: p.y } }));
-      void handleEmotionSelect([], quadrantAt(p));
+      void handleEmotionSelect([], quadrantAt(p)).finally(done);
       return;
     }
     const lead = leadSpot(filled, inferQuadrant(all))?.point ?? point ?? { x: 0.5, y: 0.5 };
     setSpots(filled);
     setActive(Math.min(active, filled.length - 1));
     setCheckInData(prev => ({ ...prev, intensity: { x: lead.x, y: lead.y } }));
-    void handleEmotionSelect(all);
+    void handleEmotionSelect(all).finally(done);
   }
 
   /**
@@ -713,6 +724,7 @@ export function CheckIn() {
             onToggleWord={handleToggleWord}
             onSeeMore={() => setStep('word')}
             onContinue={handleWordsContinue}
+            continuing={continuing}
             onAddSpot={handleAddSpot}
             onCancelSpot={handleCancelSpot}
             onHelpNow={handleHelpMeNow}
@@ -728,6 +740,7 @@ export function CheckIn() {
             onToggleWord={handleToggleWord}
             onRemoveWord={handleRemoveWord}
             onContinue={handleWordsContinue}
+            continuing={continuing}
             onMovePoint={() => setStep('emotion')}
             onAddSpot={handleAddSpot}
             onNoneFit={() => { setStartedAt(new Date()); setStep('find'); }}

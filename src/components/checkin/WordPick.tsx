@@ -12,6 +12,8 @@ interface WordPickProps {
   /** Take a word off another spot (removing the spot if it was its last word). */
   onRemoveWord: (spot: number, name: string) => void;
   onContinue: () => void;
+  /** Continue is working: the button says so and can't be tapped again. */
+  continuing?: boolean;
   /** Tap the little square to move the active point. */
   onMovePoint: () => void;
   /** Keep this spot and place another on the square. */
@@ -28,7 +30,7 @@ const PAGE = 8;
  * the graph's related words appear as "+" chips. "More words" pages outward, "Add another spot"
  * goes back to the square for a second or third place, "None of these fit" opens Find the feeling.
  */
-export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue, onMovePoint, onAddSpot, onNoneFit, onHelpNow }: WordPickProps) {
+export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue, continuing = false, onMovePoint, onAddSpot, onNoneFit, onHelpNow }: WordPickProps) {
   const [shown, setShown] = useState(PAGE);
   const spot = spots[active];
   const point = spot.point as SquarePoint;
@@ -141,9 +143,11 @@ export function WordPick({ spots, active, onToggleWord, onRemoveWord, onContinue
         <button
           type="button"
           onClick={onContinue}
-          className="w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer lift-primary"
+          disabled={continuing}
+          aria-busy={continuing}
+          className="w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer disabled:cursor-wait disabled:opacity-80 lift-primary"
         >
-          {everyWord.length > 0 ? `Continue with ${listWords(everyWord)}` : 'Continue without a word'}
+          {continuing ? 'One moment…' : everyWord.length > 0 ? `Continue with ${listWords(everyWord)}` : 'Continue without a word'}
         </button>
       </div>
     </div>

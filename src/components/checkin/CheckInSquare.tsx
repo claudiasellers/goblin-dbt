@@ -22,6 +22,8 @@ interface CheckInSquareProps {
   onSeeMore: () => void;
   /** Done: carry on with every picked word. */
   onContinue: () => void;
+  /** Continue is working: the button says so and can't be tapped again. */
+  continuing?: boolean;
   /** Keep this spot and place another. */
   onAddSpot: () => void;
   /** Leave a spot that was just added (shown from the second spot on). */
@@ -50,6 +52,7 @@ export function CheckInSquare({
   onToggleWord,
   onSeeMore,
   onContinue,
+  continuing = false,
   onAddSpot,
   onCancelSpot,
   onHelpNow,
@@ -162,9 +165,11 @@ export function CheckInSquare({
           <button
             type="button"
             onClick={onContinue}
-            className="w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer lift-primary"
+            disabled={continuing}
+            aria-busy={continuing}
+            className="w-full min-h-[60px] rounded-[18px] text-[17px] font-bold bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-none cursor-pointer disabled:cursor-wait disabled:opacity-80 lift-primary"
           >
-            {`Continue with ${listWords(everyWord)}`}
+            {continuing ? 'One moment…' : `Continue with ${listWords(everyWord)}`}
           </button>
         </div>
       )}

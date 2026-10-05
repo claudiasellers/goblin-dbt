@@ -18,6 +18,7 @@ function shipped<T>(load: () => Promise<{ default: { content: unknown } }>): () 
 }
 const relatedWordsFile = shipped<Record<string, RelatedWordRow[]>>(() => import('../data/content/related-words.json'));
 const findTheFeelingFile = shipped<FindTheFeelingContent>(() => import('../data/content/find-the-feeling.json'));
+const discriminatingQuestionsFile = shipped<Record<string, DiscriminatingQuestion[]>>(() => import('../data/content/discriminating-questions.json'));
 export type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
 
 // Types (same as before, for consistency across the app)
@@ -257,10 +258,6 @@ const getStateAndToolsFn = httpsCallable<
   StateResult
 >(functions, 'getStateAndTools');
 
-const getDiscriminatingQuestionsFn = httpsCallable<
-  { quadrant: string },
-  { questions: DiscriminatingQuestion[] }
->(functions, 'getDiscriminatingQuestions');
 
 
 /**
@@ -287,14 +284,24 @@ export async function getStateAndTools(input: {
 }
 
 /**
- * Get discriminating questions for a quadrant.
- * Used to differentiate between activation patterns within the same quadrant.
+ * The check-in's follow-up questions for a quadrant (to tell activation patterns apart). Read from
+ * the file the app ships (src/data/content/discriminating-questions.json, generated from the graph
+ * by scripts/content-snapshot/build.mjs), so "Continue" never waits on a Cloud Function.
  */
 export async function getDiscriminatingQuestions(
   quadrant: string
 ): Promise<DiscriminatingQuestion[]> {
-  const result = await getDiscriminatingQuestionsFn({ quadrant });
-  return result.data.questions;
+  return (await discriminatingQuestionsFile())[quadrant] ?? [];
+}
+
+/**
+ * Start loading the check-in's files (related words, follow-up questions) when the check-in opens,
+ * so neither the first word tap nor "Continue" waits even for a file. Errors are left to the real
+ * calls, which retry.
+ */
+export function preloadCheckInContent(): void {
+  relatedWordsFile().catch(() => {});
+  discriminatingQuestionsFile().catch(() => {});
 }
 
 /**
