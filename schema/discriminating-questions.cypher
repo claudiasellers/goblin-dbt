@@ -418,8 +418,11 @@ SET r.label = "About what others think of me",
     r.isEscapeHatch = false;
 
 
-// --- Response: Everything hitting at once ---
-// Strong signal for emotional_flooding. The defining feature is
+// --- Response: I'm spiraling and can't stop it (was "Everything hitting at once") ---
+// Oct 2026 (Claudia): spiraling (escalation the person can't stop) is the doorway to Flooded and
+// so to the crisis banner; "everything hitting at once" read as ordinary busyness or overload.
+// Distinct from "A worry that won't turn off" (a loop at the same level → vigilance): spiraling
+// is picking up speed. Strong signal for emotional_flooding. The defining feature is
 // LOSS OF EMOTION SORTING — OFC is offline, so the person cannot
 // differentiate or label what they're feeling. SN is overloaded,
 // producing a "fire alarm for everything" state.
@@ -435,8 +438,8 @@ SET r.label = "About what others think of me",
 // has broken down.
 
 MERGE (r:QuestionResponse {id: "hu_exp_flooding"})
-SET r.label = "Everything hitting at once",
-    r.subtext = "I can't sort it out — too many feelings, can't think straight.",
+SET r.label = "I'm spiraling and can't stop it",
+    r.subtext = "It keeps building and I can't slow it down.",
     r.order = 4,
     r.clinicalSignal = "Salience network overload with OFC offline. Defining feature is loss of emotion differentiation — person cannot label or sort experience. Distinct from alarm (one identifiable emotion) and vigilance (diffuse but manageable). PFC regulatory failure.",
     r.isEscapeHatch = false;
@@ -530,15 +533,17 @@ SET r.label = "Tense everywhere, scanning",
     r.isEscapeHatch = false;
 
 
-// --- Response: Shaking, crying, or overwhelmed ---
-// Strong signal for emotional_flooding. Autonomic overflow
+// --- Response: Shaking or crying, can't stop (was "Shaking, crying, or overwhelmed") ---
+// Oct 2026: a moderate signal for emotional_flooding and acute_alarm alike, so it reaches Flooded
+// (and the crisis banner) together with spiraling, not on its own; "overwhelmed" left the label
+// because one everyday word shouldn't bring up crisis numbers. Autonomic overflow
 // where the body's regulatory capacity has been exceeded.
 // Can manifest as shaking, uncontrollable crying, trembling,
 // or paradoxical freeze (body shutting down from overload,
 // distinct from conservation_freeze PAG-mediated shutdown).
 
 MERGE (r:QuestionResponse {id: "hu_body_overwhelmed"})
-SET r.label = "Shaking, crying, or overwhelmed",
+SET r.label = "Shaking or crying, can't stop",
     r.subtext = "My body is doing things I can't control right now.",
     r.order = 3,
     r.clinicalSignal = "Autonomic overflow — regulatory capacity exceeded. SN hyperreactivity producing motor discharge (shaking, trembling) or parasympathetic rebound (crying). Distinct from alarm (activation with control) and vigilance (activation with containment).",
@@ -937,13 +942,22 @@ SET e.weight = 0.80,
     e.strength = "strong",
     e.rationale = "Sustained muscle tension with scanning behavior. BNST-maintained tonic activation distinct from phasic sympathetic surge. Body is in 'grip' mode — can't release. Attentional deployment to potential threats.";
 
-// "Shaking, crying, or overwhelmed" → emotional_flooding (strong)
+// "Shaking or crying, can't stop" → emotional_flooding (moderate; Oct 2026, was strong 0.80)
 MATCH (r:QuestionResponse {id: "hu_body_overwhelmed"})
 MATCH (p:ActivationPattern {id: "emotional_flooding"})
 MERGE (r)-[e:EVIDENCE_FOR]->(p)
-SET e.weight = 0.80,
-    e.strength = "strong",
+SET e.weight = 0.30,
+    e.strength = "moderate",
     e.rationale = "Autonomic overflow exceeding regulatory capacity. Motor discharge (shaking, trembling) or parasympathetic rebound (crying). Distinct from alarm (activation with control) and vigilance (activation with containment).";
+
+// "Shaking or crying, can't stop" → acute_alarm (moderate; Oct 2026): alone it ties Flooded and the
+// alarm wins on candidate order, so the body answer alone never brings up the crisis banner.
+MATCH (r:QuestionResponse {id: "hu_body_overwhelmed"})
+MATCH (p:ActivationPattern {id: "acute_alarm"})
+MERGE (r)-[e:EVIDENCE_FOR]->(p)
+SET e.weight = 0.30,
+    e.strength = "moderate",
+    e.rationale = "Shaking or crying is also intense alarm activation; it points to flooding only alongside spiraling.";
 
 // "Heat in face/chest, want to hide" → social_threat_shame (strong)
 MATCH (r:QuestionResponse {id: "hu_body_shame"})

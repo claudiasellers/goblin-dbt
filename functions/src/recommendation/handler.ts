@@ -117,10 +117,10 @@ const emptySlice = (id: string): PatternSlice => ({ id, blank: false, emotions: 
 
 export async function getStateAndToolsHandler(input: CheckInInput, deps: StateDeps): Promise<StateResult> {
   if (!input || !input.quadrant) throw new ValidationError('Quadrant is required');
-  const candidates = candidatesFor(input.quadrant);
-  if (candidates.length === 0) return { pattern: POSITIVE_STATE, tools: [] };
+  if (candidatesFor(input.quadrant).length === 0) return { pattern: POSITIVE_STATE, tools: [] };
 
   const { policy, fallback } = await deps.routingPolicy();
+  const candidates = candidatesFor(input.quadrant, policy?.enabled === true);
   const { pattern, secondaryPattern, coOccurrence, emotionIds } = await selectPattern(
     input, candidates, deps, policy?.enabled ? FULL_REACH : NO_REACH,
   );

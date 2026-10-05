@@ -9,6 +9,10 @@
 # the pattern-scoring query counts a word as matching a pattern when the word itself or one of its
 # targets is one of the pattern's emotions (each word still counts once per pattern).
 #
+# Oct 2026: SIGNALS (bottom of this file) gives every unpleasant grid word its reviewed pattern; while the
+# policy is on that replaces the aliases in scoring. The aliases and the notes below stay as the emotion
+# vocabulary for words without one (and for live checks against older loads).
+#
 # REVIEW (D-01, R-19): clinical content, every row a DRAFT (reviewStatus "draft") until Claudia
 # signs it off (add the word to SIGNED_OFF). Mapping rule: each word → the 1–2 closest emotions in
 # PATTERN_VOCABULARY (the only ids that move scoring); a second target only when the word has two
@@ -20,8 +24,9 @@
 #     condition "self-harm urges + out of control", not evaluated until the safety batch) shows 988 on
 #     one anger word. Held, they keep today's result (acute_alarm: the threat system's fight response,
 #     body-first cards) and flooding stays reachable through what the user endorses (the high-unpleasant
-#     answers "Everything hitting at once" / "Shaking, crying, or overwhelmed"). Revisit when
-#     reactive_aggression becomes a candidate or the safety batch evaluates the flag's condition.
+#     answers, since Oct 2026 "I'm spiraling and can't stop it" / "Shaking or crying, can't stop").
+#     Oct 2026: reactive_aggression is a candidate while the policy is on and the anger words signal
+#     it (SIGNALS below), so they're no longer held in scoring; the aliases stay held.
 #     `anger` is also a held target (HELD_TARGETS): annoyed / frustrated → stress (irritability as
 #     strain → chronic_vigilance); bitter / resentful / indignant / betrayed / jealous → rejection and
 #     disrespected → hot_shame (social_threat_shame); violated → fear (acute_alarm).
@@ -154,6 +159,65 @@ VOCABULARY = {
     "empty":         (["emptiness"], "Same state."),
     "numb":          (["numbness"], "Same state."),
 }
+
+
+# --- Reviewed patterns (Oct 2026, Claudia's routing review) ------------------------------------------------
+# Each unpleasant grid word → the one activation pattern it stands for. While RoutingPolicy is on this is
+# the word's ONLY match in pattern scoring (a strong edge, (:Emotion)-[:SIGNALS]->(:ActivationPattern));
+# the aliases above apply only to words without one. Rules: the pattern is on the word's own side of the
+# square (the dot decides which patterns are possible; Ready to fight joins the high side while the
+# policy is on); no word signals Flooded (only the "I'm spiraling and can't stop it" answer gets there,
+# so one everyday word never raises the crisis banner). Where the review put a word across the square,
+# the closest pattern on its own side is used and the tool the review wanted comes from a word rule
+# (content.py WORD_RULES). Drafts until signed off (SIGNED_OFF, by word).
+ALARM, GUARD, SOCIAL, FIGHT = "acute_alarm", "chronic_vigilance", "social_threat_shame", "reactive_aggression"
+REPLAY, LOW, SHUT = "rumination_loop", "reward_drive_low", "conservation_freeze"
+SIDE_PATTERNS = {
+    "high-unpleasant": {ALARM, GUARD, SOCIAL, FIGHT},
+    "low-unpleasant": {REPLAY, LOW, SHUT, "dissociation_overmodulation"},
+}
+
+
+def _words(pattern, words, why):
+    return {w: (pattern, why) for w in words}
+
+
+SIGNALS = {
+    # --- More energy ---
+    **_words(ALARM, ["fearful", "scared", "frightened", "threatened"], "Acute fear: regulation, then approach."),
+    **_words(ALARM, ["overwhelmed", "out_of_control"], "Capacity saturation: a behavioural halt first. Alarm, not Flooded, so one everyday word doesn't raise the crisis banner."),
+    **_words(ALARM, ["frustrated", "stressed", "busy", "rushed", "pressured"], "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."),
+    **_words(ALARM, ["annoyed"], "Low-grade anger read as agitation."),
+    **_words(ALARM, ["distant", "withdrawn"], "Freeze with high arousal underneath: orient, then settle (review, Oct 2026; was Shut down in the sheet, which isn't on this side)."),
+    **_words(GUARD, ["anxious", "nervous"], "Anticipatory anxiety."),
+    **_words(GUARD, ["worried", "persecuted", "critical", "skeptical", "dismissive", "jealous"], "Watching for threat or judging: check the facts."),
+    **_words(GUARD, ["helpless"], "Nothing I do will change it (the sheet's Low drive is on the other side; On guard carries hopelessness here)."),
+    **_words(SOCIAL, ["insecure", "inadequate", "inferior", "insignificant"], "Shame about the self."),
+    **_words(SOCIAL, ["weak", "worthless"], "Cold shame (wheel branch weak → worthless / insignificant), not fatigue."),
+    **_words(SOCIAL, ["rejected", "excluded", "let_down"], "A social wound."),
+    **_words(SOCIAL, ["exposed", "humiliated", "ridiculed"], "Hot shame: being seen, mocked or shamed in front of others."),
+    **_words(SOCIAL, ["betrayed", "disrespected", "violated"], "A broken trust or crossed boundary: protect self-respect."),
+    **_words(FIGHT, ["angry", "mad", "aggressive", "furious", "provoked", "hostile", "infuriated", "indignant"],
+             "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."),
+    **_words(FIGHT, ["bitter", "resentful"], "Settled resentment (the review's On replay / Ready to fight; Ready to fight on this side)."),
+    # --- Less energy ---
+    **_words(LOW, ["tired", "bored", "sleepy", "unfocused", "apathetic", "indifferent"], "Low energy and drive: address the body, get active."),
+    **_words(LOW, ["bad", "sad", "depressed"], "Low mood: behavioural activation."),
+    **_words(LOW, ["lonely", "isolated"], "Cut off from people: reach towards them (the sheet's Social threat is on the other side)."),
+    **_words(LOW, ["vulnerable", "fragile", "powerless"], "Unable to change things: accept, then small steps."),
+    **_words(REPLAY, DISGUST := ["disgusted", "disapproving", "disappointed", "awful", "repelled", "judgmental", "appalled",
+                                 "revolted", "nauseated", "detestable", "horrified"], "Aversion and disappointment that keeps replaying."),
+    **_words(REPLAY, ["hesitant"], "Holding back out of worry (the sheet's Alarm is on the other side)."),
+    **_words(REPLAY, ["guilty", "remorseful"], "Guilt: is it justified, then repair."),
+    **_words(REPLAY, ["embarrassed", "ashamed"], "Low-energy shame that replays."),
+    **_words(REPLAY, ["victimized", "hurt", "abandoned"], "Hurt by someone, replaying it: Recover leads (hurt and abandoned are wound words)."),
+    **_words(SHUT, ["despair", "grief", "empty", "numb"], "Collapse: gentle movement first."),
+}
+
+
+def signals():
+    """[(word, pattern, rationale, reviewStatus)] in a stable order."""
+    return [(w, p, why, review_status(w)) for w, (p, why) in SIGNALS.items()]
 
 
 def review_status(word):

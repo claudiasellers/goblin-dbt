@@ -61,7 +61,7 @@ export interface SaveCheckInInput {
   discQuestionIds: string[];
   discResponseIds: string[];
   recommendedToolIds: string[];
-  routingVersion: string | null;           // E4-4: 'rf-v1' | 'legacy'
+  routingVersion: string | null;           // E4-4: 'rf-v2' (Oct 2026; 'rf-v1' before) | 'legacy'
   routingBand: string | null;              // the engine's band (may be inferred; never stored as band*, R1)
   routingBandSource: string | null;
   secondaryPatternId: string | null;
