@@ -150,7 +150,7 @@ Interactive tool components live in `src/pages/tools/` and are registered in the
 
 ## Data: Emotions
 
-**Every check-in word is a graph node.** `src/data/emotions.ts` places the words on the square; each one is also an `Emotion` node with the same name, quadrant and family in `schema/emotion-wheel-sync.cypher` (`tests/emotion-wheel-sync.test.mjs`). A word the graph doesn't have is a word nothing can be said about (routing aliases, body maps, related words), so a new word goes into both in the same change.
+**Every check-in word is a graph node, and both lists come from one source.** `scripts/emotions/content.py` is the only place to add, move or rename a word: `python3 scripts/emotions/build.py` regenerates the list block in `src/data/emotions.ts` (where each word sits on the square: x, y, quadrant, family, core) and the whole of `schema/emotion-wheel-sync.cypher` (the `Emotion` nodes, family-core `RELATED_TO`, family `OPPOSITE_OF`). Never edit either copy by hand: `tests/emotion-wheel-sync.test.mjs` fails if they're stale, if a square word is missing from the graph, or if the graph has a word that is neither on the square nor in `GRAPH_ONLY` (graph-only words, each with a reason; today: `free`, awaiting a decision). Ids are permanent (check-ins and found words point at them): rename the display name, or move a word to `GRAPH_ONLY`, never delete it. A word the graph doesn't have is a word nothing can be said about (routing aliases, body maps, related words).
 
 Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `irritation` → `anger`) through `(Emotion)-[:HAS_REGULATION_CONTENT]->(EmotionRegulationContent {dbtParent})`. No schema file sets an `Emotion.dbtParent` property, so don't read one (plan F12). The 9 DBT parent emotions are: **fear, anger, disgust, envy, jealousy, love, sadness, shame, guilt**; `shame`, `envy` and `jealousy` aren't `Emotion` nodes in the base schema (`shame` is `hot_shame`/`cold_shame`).
 
@@ -202,6 +202,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `schema/app-tool-ids.cypher` | `TherapyConcept.appToolId`: join key from graph concepts to app tool ids (preferred over `normalizeToolId`) |
 | `dev/find-the-feeling.html` | Dev-only harness for the rooms with fixture content (`tests/fixtures/find-the-feeling-content.json`, regenerate with `scripts/find-the-feeling/fixture.py`); not part of the app build |
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
+| `scripts/emotions/content.py`, `build.py` | The one editable source for the check-in words: generates the list in `src/data/emotions.ts` and `schema/emotion-wheel-sync.cypher` (`--check` for freshness, `--json` for tests) |
 | `src/data/tools.ts` | Tool display metadata (names, emojis, categories) |
 | `src/data/microSteps.ts` | Activation-pattern-keyed micro-interventions |
 | `src/services/neo4j.ts` | Cloud Function call wrappers (related words, Find the feeling content and the follow-up questions read `src/data/content/` instead) |

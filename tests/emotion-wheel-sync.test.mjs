@@ -1,10 +1,12 @@
 // Every check-in word in the app is an Emotion node in the graph, with the same name, quadrant and
 // family. The app's list (src/data/emotions.ts) places the words on the square; the graph is where
 // anything is known about them (routing aliases, body maps, related words), so a word the graph
-// doesn't have is a word nothing can be said about. Add a new word to both in the same change.
+// doesn't have is a word nothing can be said about. Both are generated from one source,
+// scripts/emotions/content.py (python3 scripts/emotions/build.py): edit that, never either copy.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 
 const app = [...readFileSync("src/data/emotions.ts", "utf8")
   .matchAll(/makeEmotion\('([a-z_]+)', '([^']+)', '([a-z-]+)', '([a-z]+)'/g)]
@@ -18,8 +20,27 @@ test("the app's word list was read (guards the regexes)", () => {
   assert.ok(graph.size >= 140, `${graph.size} graph words`);
 });
 
+test("both copies are fresh from scripts/emotions/content.py", (t) => {
+  let out;
+  try { out = execFileSync("python3", ["scripts/emotions/build.py", "--check"], { encoding: "utf8" }); }
+  catch (e) {
+    if (e.code === "ENOENT") { t.skip("python3 unavailable"); return; }
+    assert.fail(`${e.stdout || e.message}`.trim());
+  }
+  assert.match(out, /fresh/);
+});
+
 test("every check-in word in the app is an Emotion node in the graph", () => {
   assert.deepEqual(app.filter((w) => !graph.has(w.id)).map((w) => w.id), []);
+});
+
+test("and the graph has no other words than the square's plus content.py's GRAPH_ONLY", (t) => {
+  let listed;
+  try { listed = JSON.parse(execFileSync("python3", ["scripts/emotions/build.py", "--json"], { encoding: "utf8" })); }
+  catch { t.skip("python3 unavailable"); return; }
+  assert.deepEqual(listed.square, app.map((w) => w.id), "content.py's square is the app's list, in order");
+  const extra = [...graph.keys()].filter((id) => !app.some((w) => w.id === id)).sort();
+  assert.deepEqual(extra, [...listed.graphOnly].sort(), "graph words not on the square must be in GRAPH_ONLY");
 });
 
 test("and the graph agrees with the app on its name, quadrant and family", () => {
