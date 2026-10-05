@@ -31,7 +31,7 @@ test("cards: names, emoji and tagline from tools.ts; unknown ids dropped; ≤ 2;
     card("five-senses", { slot: "swap", side: "acceptance" }), card("pause"),
   ] });
   assert.deepEqual(cards.map((c) => [c.tool.id, c.tool.name, c.slot, c.label, c.ruleId]), [
-    ["cool-down", "Cool Down", "primary", null, "rf_x"],
+    ["cool-down", "Circuit Breaker", "primary", null, "rf_x"],
     ["five-senses", "5-4-3-2-1", "swap", "Or try this", null],
   ]);
   assert.deepEqual(rec.recommendationCards(null), []);
