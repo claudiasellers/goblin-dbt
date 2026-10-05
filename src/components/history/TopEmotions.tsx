@@ -1,4 +1,5 @@
 import type { CheckInRecord } from '../../services/neo4j';
+import { topWords } from '../../lib/reflect';
 
 const quadrantPrefix: Record<string, string> = {
   'high-unpleasant': 'hu',
@@ -14,26 +15,16 @@ interface TopEmotionsProps {
 export function TopEmotions({ checkIns }: TopEmotionsProps) {
   if (checkIns.length === 0) return null;
 
-  // Count emotions and track their quadrant
-  const emotionData: Record<string, { count: number; quadrant: string }> = {};
-  for (const ci of checkIns) {
-    if (!emotionData[ci.emotion]) {
-      emotionData[ci.emotion] = { count: 0, quadrant: ci.quadrant };
-    }
-    emotionData[ci.emotion].count++;
-  }
-
-  const sorted = Object.entries(emotionData)
-    .sort((a, b) => b[1].count - a[1].count)
-    .slice(0, 5);
-
-  const maxCount = sorted[0][1].count;
+  // One bar per word: a check-in with two words counts once for each (emotion is the ", " join).
+  const sorted = topWords(checkIns);
+  if (sorted.length === 0) return null;
+  const maxCount = sorted[0].count;
 
   return (
     <div className="bg-[var(--color-glass-card)] backdrop-blur-md border border-[var(--color-glass-border)] rounded-xl p-4">
       <h3 className="text-sm font-medium text-[var(--color-text-tertiary)] mb-3">Top emotions</h3>
       <div className="space-y-2">
-        {sorted.map(([emotion, { count, quadrant }]) => {
+        {sorted.map(({ word: emotion, count, quadrant }) => {
           const prefix = quadrantPrefix[quadrant] || 'hu';
           const widthPct = (count / maxCount) * 100;
           return (

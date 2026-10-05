@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { tools as toolsData } from '../../data/tools';
 import type { ToolEffectivenessData } from '../../services/neo4j';
+import { fromReflect, outcomeLine } from '../../lib/reflect';
 
 interface Props {
   data: ToolEffectivenessData;
@@ -31,16 +32,14 @@ export function ToolEffectiveness({ data, delay = 0 }: Props) {
             <Link
               key={t.toolId}
               to={`/tool/${t.toolId}`}
+              state={fromReflect()}
               className="flex items-center gap-3 group"
             >
               <span className="text-base flex-shrink-0">{tool?.emoji || '🔧'}</span>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between mb-1">
+                <div className="mb-1">
                   <span className="text-sm font-medium text-[var(--color-text-primary)] group-hover:text-[var(--color-accent)] transition-colors">
                     {tool?.name || t.toolId}
-                  </span>
-                  <span className="text-xs text-[var(--color-text-muted)]">
-                    {t.helpedPct}% helpful
                   </span>
                 </div>
                 <div className="h-1.5 rounded-full bg-[var(--color-bg-elevated)] overflow-hidden">
@@ -49,6 +48,7 @@ export function ToolEffectiveness({ data, delay = 0 }: Props) {
                     style={{ width: `${t.helpedPct}%` }}
                   />
                 </div>
+                <p className="text-xs text-[var(--color-text-tertiary)] mt-1">{outcomeLine(t)}</p>
               </div>
             </Link>
           );

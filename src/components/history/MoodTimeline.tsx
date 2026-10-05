@@ -1,4 +1,5 @@
 import type { CheckInRecord } from '../../services/neo4j';
+import { pleasantness } from '../../lib/reflect';
 
 const quadrantPrefix: Record<string, string> = {
   'high-unpleasant': 'hu',
@@ -7,29 +8,11 @@ const quadrantPrefix: Record<string, string> = {
   'low-pleasant': 'lp',
 };
 
-// Whether a quadrant is on the pleasant side
-const isPleasant: Record<string, boolean> = {
-  'high-pleasant': true,
-  'low-pleasant': true,
-  'high-unpleasant': false,
-  'low-unpleasant': false,
-};
-
 interface MoodTimelineProps {
   checkIns: CheckInRecord[];
 }
 
-/**
- * Derive a –1 to +1 pleasantness score from quadrant + intensity.
- * Pleasant quadrants map intensity.y → 0 to +1
- * Unpleasant quadrants map intensity.y → 0 to –1
- * This gives the y-axis a real bipolar spread.
- */
-function pleasantnessScore(ci: CheckInRecord): number {
-  const mag = ci.intensity.y; // 0–1 magnitude
-  return isPleasant[ci.quadrant] ? mag : -mag;
-}
-
+/** Pleasantness over time: the side from the quadrant, the distance from the square's x (src/lib/reflect.ts). */
 export function MoodTimeline({ checkIns }: MoodTimelineProps) {
   if (checkIns.length === 0) return null;
 
@@ -57,7 +40,7 @@ export function MoodTimeline({ checkIns }: MoodTimelineProps) {
     const tNorm = sorted.length === 1 ? 0.5 : (ci.timestamp.getTime() - minTime) / timeSpan;
     const x = plotLeft + tNorm * plotWidth;
     // pleasantness: +1 = top, -1 = bottom, 0 = center
-    const p = pleasantnessScore(ci);
+    const p = pleasantness(ci);
     const y = plotTop + ((1 - p) / 2) * plotHeight;
     const prefix = quadrantPrefix[ci.quadrant] || 'hu';
     return { x, y, prefix, key: ci.id };

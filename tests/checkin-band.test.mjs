@@ -68,9 +68,13 @@ test("wiring: no probe step in the check-in (removed 30 Sep); band to the engine
   assert.equal((ci.match(/band=\{capacity\?\.value \?\? null\}/g) ?? []).length, 2, "both result screens get the band");
   assert.doesNotMatch(ci, /setCapacity\(null\); void handleEmotionSelect/, "re-picking a word keeps this check-in's answer");
   assert.equal(existsSync("src/components/checkin/IntensityGrid.tsx"), false);
-  const ins = readFileSync("functions/src/insights/index.ts", "utf8");
-  assert.match(ins, /c\.band AS band/);
-  assert.match(ins, /intensityDrop\(olderHalf, newerHalf/);
-  assert.doesNotMatch(ins, /recentAvgIntensity/);
+  // Reflect R1 split the insights callable: the read is in queries.ts, the guarded metrics in compute.ts.
+  assert.match(readFileSync("functions/src/insights/queries.ts", "utf8"), /c\.band AS band/);
+  const ins = readFileSync("functions/src/insights/compute.ts", "utf8");
+  assert.match(ins, /intensityDrop\(older, newer/);
+  assert.match(ins, /intensityTrending\(own\)/);
+  for (const f of ["index.ts", "handler.ts", "compute.ts", "queries.ts"]) {
+    assert.doesNotMatch(readFileSync(`functions/src/insights/${f}`, "utf8"), /recentAvgIntensity/, f);
+  }
   assert.match(readFileSync("src/pages/History.tsx", "utf8"), /historyBandLabel\(checkIn, bandLabels\)/);
 });

@@ -43,10 +43,7 @@ export function Insights() {
 
     setLoading(true);
     getInsightsData(timeRange)
-      .then((result) => {
-        console.log('[Insights] data received:', JSON.stringify(result, null, 2));
-        setData(result);
-      })
+      .then(setData)
       .catch((err) => {
         console.error('[Insights] error fetching data:', err);
       })
