@@ -1,5 +1,5 @@
-import { useParams, Link, useLocation } from 'react-router-dom';
-import { getToolById } from '../data/tools';
+import { useParams, Link, useLocation, Navigate } from 'react-router-dom';
+import { getToolById, toolIdFromUrl, TOOL_URL_SLUGS } from '../data/tools';
 import { ToolSessionProvider } from '../contexts/ToolSessionContext';
 
 // Import tool components
@@ -27,9 +27,16 @@ const toolComponents: Record<string, React.ComponentType> = {
 };
 
 export function ToolPage() {
-  const { toolId } = useParams<{ toolId: string }>();
+  const { toolId: segment } = useParams<{ toolId: string }>();
   const location = useLocation();
+  const toolId = segment ? toolIdFromUrl(segment) : undefined;
   const tool = toolId ? getToolById(toolId) : undefined;
+
+  // Old address (/tool/cool-down): forward to the tool's own name, keeping the query and the
+  // link state (Help me now / check-in / hand-off context for the session).
+  if (segment && TOOL_URL_SLUGS[segment]) {
+    return <Navigate to={{ pathname: `/tool/${TOOL_URL_SLUGS[segment]}`, search: location.search }} state={location.state} replace />;
+  }
 
   if (!tool) {
     return (
@@ -70,20 +77,24 @@ export function ToolPage() {
             {tool.name}
           </h1>
         </div>
-        <p className="text-lg text-[var(--color-text-secondary)]">
-          {tool.tagline}
-        </p>
+        {!tool.bare && (
+          <p className="text-lg text-[var(--color-text-secondary)]">
+            {tool.tagline}
+          </p>
+        )}
       </div>
 
       {/* When to use */}
-      <div className="mb-8 p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
-        <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-1">
-          When to use this
-        </p>
-        <p className="text-[var(--color-text-primary)]">
-          {tool.whenToUse}
-        </p>
-      </div>
+      {!tool.bare && (
+        <div className="mb-8 p-4 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
+          <p className="text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+            When to use this
+          </p>
+          <p className="text-[var(--color-text-primary)]">
+            {tool.whenToUse}
+          </p>
+        </div>
+      )}
 
       {/* Interactive tool component */}
       <div className="mb-8">
