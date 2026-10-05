@@ -14,6 +14,7 @@ import {
   getStateAndTools,
   getDiscriminatingQuestions,
   preloadCheckInContent,
+  warmCheckInEngine,
   type StateResult as StateResultType,
   type DiscriminatingQuestion,
 } from '../services/neo4j';
@@ -126,6 +127,8 @@ export function CheckIn() {
   const [continuing, setContinuing] = useState(false);
   // The check-in's files (related words, follow-up questions) start loading as the screen opens.
   useEffect(() => { preloadCheckInContent(); }, []);
+  // Wake the result's engine while the person is still on the square (signed-in only).
+  useEffect(() => { if (user) warmCheckInEngine(); }, [user]);
   const [embeddedIds, setEmbeddedIds] = useState<string[]>([]);
   /** The render save in flight: resolves true when saved. Next actions chain after it. */
   const savePromise = useRef<Promise<boolean> | null>(null);
@@ -360,6 +363,7 @@ export function CheckIn() {
     continuingRef.current = true;
     setContinuing(true);
     const done = () => { continuingRef.current = false; setContinuing(false); };
+    if (user) warmCheckInEngine(); // again, in case the square sat open long enough for it to sleep
     setStartedAt(new Date());
     setSource('grid');
     setKnownEmotionIds([]);

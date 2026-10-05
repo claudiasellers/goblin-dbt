@@ -69,6 +69,24 @@ test('getStateAndTools: the safety seam queries only for non-low-unpleasant resu
   assert.ok(!g.calls.some((c) => /TRIGGERS_SAFETY/.test(c.query)));
 });
 
+test('getStateAndTools { warm: true }: one trivial read, answers { warm: true }, routes and logs nothing; still needs sign-in', async () => {
+  const f = fakeDriver(responder());
+  setDriver(f.driver);
+  const logged = [];
+  const orig = console.log;
+  console.log = (...a) => logged.push(a);
+  let out;
+  try { out = await fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { warm: true } }); } finally { console.log = orig; }
+  assert.deepEqual(out, { warm: true });
+  assert.deepEqual(f.calls.map((c) => c.query), ['RETURN 1 AS ok']);
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');
+  assert.ok(f.allClosed());
+  assert.ok(!logged.some((a) => a[0] === 'getStateAndTools'), 'no routing log line for a warm-up');
+  await assert.rejects(fns.getStateAndTools.run({ data: { warm: true } }), (e) => e.code === 'unauthenticated');
+  // Only the exact warm request: anything with it still has to be a valid check-in.
+  await assert.rejects(fns.getStateAndTools.run({ auth: { uid: 'u1' }, data: { warm: true, emotions: ['Anxious'] } }), (e) => e.code === 'invalid-argument');
+});
+
 test('getStateAndTools: signed out, missing quadrant or a bad band → rejected before any session; missing pattern → not-found', async () => {
   const f = fakeDriver(responder());
   setDriver(f.driver);

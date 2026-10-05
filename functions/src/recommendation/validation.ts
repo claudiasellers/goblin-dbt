@@ -9,6 +9,14 @@ import { BANDS, QUADRANTS, REQUEST_BAND_SOURCES, SURFACES, type CheckInInput } f
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const unit = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1;
 
+/**
+ * `{ warm: true }` (and nothing else): the check-in sends it when it opens, so this instance and its
+ * Neo4j connection are awake by the time the real request comes. It routes nothing.
+ */
+export function isWarmRequest(raw: unknown): boolean {
+  return isObj(raw) && raw.warm === true && Object.keys(raw).length === 1;
+}
+
 export function parseStateRequest(raw: unknown): CheckInInput {
   if (!isObj(raw) || !raw.quadrant) throw new ValidationError('Quadrant is required');
   if (!(QUADRANTS as readonly unknown[]).includes(raw.quadrant)) throw new ValidationError('Unknown quadrant');

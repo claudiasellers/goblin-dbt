@@ -9,7 +9,7 @@ import { callable } from '../shared/callable';
 import { parseOrInvalid } from '../shared/errors';
 import { getStateAndToolsHandler, PatternNotFoundError } from './handler';
 import { graphDeps } from './queries';
-import { parseStateRequest } from './validation';
+import { isWarmRequest, parseStateRequest } from './validation';
 import type { StateResult } from './types';
 
 // ============================================
@@ -27,9 +27,15 @@ import type { StateResult } from './types';
  * (../safety/checkinSafetyFlag.ts, unchanged). This callable validates, then supplies the query
  * layer (queries.ts) in one read transaction. Signed-in only since E4-3 (plan F9, D-12).
  */
-export const getStateAndTools = callable<unknown, StateResult>(
+export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
   { auth: 'required', label: 'getStateAndTools', errorMessage: 'Failed to analyze emotional state' },
   async ({ data }) => {
+    // Warm-up (isWarmRequest): open the Neo4j connection with a trivial read and answer at once.
+    // No routing, no log line, nothing stored.
+    if (isWarmRequest(data)) {
+      await readTx((tx) => tx.run('RETURN 1 AS ok'));
+      return { warm: true as const };
+    }
     const input = parseOrInvalid(() => parseStateRequest(data), 'Invalid check-in');
     let result: StateResult;
     try {
