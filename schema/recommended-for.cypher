@@ -23,27 +23,27 @@ SET p.blank = row.blank;
 
 // --- 3. Routing policy (kill switch, card count, fallback, default band) ---
 MERGE (rp:RoutingPolicy {id: "checkin_result"})
-SET rp.version = "rf-v2", rp.enabled = false, rp.maxCards = 2,
+SET rp.version = "rf-v2", rp.enabled = true, rp.maxCards = 2,
     rp.fallbackConceptId = "se_orienting", rp.defaultBand = "stirred",
-    rp.floodedPatterns = ["emotional_flooding"], rp.reviewStatus = "draft";
+    rp.floodedPatterns = ["emotional_flooding"], rp.reviewStatus = "approved";
 
 // --- 4. Pattern × band rows (P = priority 1, swap = 2; gated rows 0 / 1.5) ---
 // acute_alarm
 UNWIND [
-  {id: "rf_acute_alarm_backup_five-senses", c: "se_orienting", p: "acute_alarm", bands: ["steady", "stirred"], prio: 3.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Orienting stays available when Cool Down and Do the Opposite are both filtered (alarm with dissociation alongside: blank, and no Do the Opposite)."},
-  {id: "rf_acute_alarm_default_cool-down", c: "dbt_tipp", p: "acute_alarm", bands: ["steady", "stirred"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Acute fear needs regulation followed by approach (review, Oct 2026): Cool Down, then Do the Opposite (its fits-the-facts step stands in for Check the Facts)."},
-  {id: "rf_acute_alarm_default_opposite-action", c: "dbt_opposite_action", p: "acute_alarm", bands: ["steady", "stirred"], prio: 2.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Acute fear needs regulation followed by approach (review, Oct 2026): Cool Down, then Do the Opposite (its fits-the-facts step stands in for Check the Facts)."},
-  {id: "rf_acute_alarm_flooded_cool-down", c: "dbt_tipp", p: "acute_alarm", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_acute_alarm_flooded_five-senses", c: "se_orienting", p: "acute_alarm", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_acute_alarm_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
-  {id: "rf_acute_alarm_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "acute_alarm", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "draft", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
-  {id: "rf_acute_alarm_words_overwhelm_pause", c: "dbt_stop", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "down", req: null, side: null, gate: "words", words: ["overwhelmed", "out_of_control"], active: true, review: "draft", why: "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."},
-  {id: "rf_acute_alarm_words_stress_problem-solve", c: "dbt_problem_solving", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["frustrated", "stressed", "busy", "rushed", "pressured"], active: true, review: "draft", why: "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."},
+  {id: "rf_acute_alarm_backup_five-senses", c: "se_orienting", p: "acute_alarm", bands: ["steady", "stirred"], prio: 3.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Orienting stays available when Cool Down and Do the Opposite are both filtered (alarm with dissociation alongside: blank, and no Do the Opposite)."},
+  {id: "rf_acute_alarm_default_cool-down", c: "dbt_tipp", p: "acute_alarm", bands: ["steady", "stirred"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Acute fear needs regulation followed by approach (review, Oct 2026): Cool Down, then Do the Opposite (its fits-the-facts step stands in for Check the Facts)."},
+  {id: "rf_acute_alarm_default_opposite-action", c: "dbt_opposite_action", p: "acute_alarm", bands: ["steady", "stirred"], prio: 2.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Acute fear needs regulation followed by approach (review, Oct 2026): Cool Down, then Do the Opposite (its fits-the-facts step stands in for Check the Facts)."},
+  {id: "rf_acute_alarm_flooded_cool-down", c: "dbt_tipp", p: "acute_alarm", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_acute_alarm_flooded_five-senses", c: "se_orienting", p: "acute_alarm", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_acute_alarm_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+  {id: "rf_acute_alarm_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "acute_alarm", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "approved", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
+  {id: "rf_acute_alarm_words_overwhelm_pause", c: "dbt_stop", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "down", req: null, side: null, gate: "words", words: ["overwhelmed", "out_of_control"], active: true, review: "approved", why: "Capacity saturation needs a behavioural halt: Pause (STOP), then Cool Down (TIPP). Overwhelmed stays on Alarm, not Flooded: one everyday word doesn't raise the crisis banner."},
+  {id: "rf_acute_alarm_words_stress_problem-solve", c: "dbt_problem_solving", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["frustrated", "stressed", "busy", "rushed", "pressured"], active: true, review: "approved", why: "Bridge high agitation: distraction (ACCEPTS, planned) then Problem Solve; until ACCEPTS ships, Problem Solve leads and Cool Down follows."},
   {id: "rf_acute_alarm_words_stress_accepts", c: "dbt_accepts", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["frustrated", "stressed", "busy", "rushed", "pressured"], active: false, review: "draft", why: "Planned: ACCEPTS (distract) leads for strain words once built."},
-  {id: "rf_acute_alarm_words_annoyed_opposite-action", c: "dbt_opposite_action", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["annoyed"], active: true, review: "draft", why: "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
+  {id: "rf_acute_alarm_words_annoyed_opposite-action", c: "dbt_opposite_action", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["annoyed"], active: true, review: "approved", why: "Check the Facts on low-grade anger (planned); Do the Opposite's fits-the-facts step until then."},
   {id: "rf_acute_alarm_words_annoyed_check-the-facts", c: "dbt_check_facts", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["annoyed"], active: false, review: "draft", why: "Planned: Check the Facts leads for low-grade anger."},
   {id: "rf_acute_alarm_words_annoyed_accepts", c: "dbt_accepts", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["annoyed"], active: false, review: "draft", why: "Planned: ACCEPTS as the alternative."},
-  {id: "rf_acute_alarm_words_freeze_five-senses", c: "se_orienting", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "orient", req: null, side: null, gate: "words", words: ["distant", "withdrawn"], active: true, review: "draft", why: "Freeze with high arousal underneath (review, Oct 2026): orient to present safety first, then Cool Down."}
+  {id: "rf_acute_alarm_words_freeze_five-senses", c: "se_orienting", p: "acute_alarm", bands: ["steady", "stirred"], prio: 0.5, dir: "orient", req: null, side: null, gate: "words", words: ["distant", "withdrawn"], active: true, review: "approved", why: "Freeze with high arousal underneath (review, Oct 2026): orient to present safety first, then Cool Down."}
 ] AS row
 MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})
 MERGE (tc)-[r:RECOMMENDED_FOR {id: row.id}]->(p)
@@ -52,20 +52,20 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // chronic_vigilance
 UNWIND [
-  {id: "rf_chronic_vigilance_default_five-senses", c: "se_orienting", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."},
-  {id: "rf_chronic_vigilance_default_problem-solve", c: "dbt_problem_solving", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 2.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."},
-  {id: "rf_chronic_vigilance_flooded_cool-down", c: "dbt_tipp", p: "chronic_vigilance", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: DT-01 body first."},
-  {id: "rf_chronic_vigilance_flooded_five-senses", c: "se_orienting", p: "chronic_vigilance", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: DT-01 body first."},
-  {id: "rf_chronic_vigilance_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
-  {id: "rf_chronic_vigilance_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "draft", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
-  {id: "rf_chronic_vigilance_words_anticipatory_opposite-action", c: "dbt_opposite_action", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["anxious", "nervous"], active: true, review: "draft", why: "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."},
+  {id: "rf_chronic_vigilance_default_five-senses", c: "se_orienting", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."},
+  {id: "rf_chronic_vigilance_default_problem-solve", c: "dbt_problem_solving", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 2.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Outward attention and Problem Solve for a solvable worry; the anxiety words lead with Do the Opposite (word rules below)."},
+  {id: "rf_chronic_vigilance_flooded_cool-down", c: "dbt_tipp", p: "chronic_vigilance", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: DT-01 body first."},
+  {id: "rf_chronic_vigilance_flooded_five-senses", c: "se_orienting", p: "chronic_vigilance", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: DT-01 body first."},
+  {id: "rf_chronic_vigilance_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+  {id: "rf_chronic_vigilance_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "approved", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
+  {id: "rf_chronic_vigilance_words_anticipatory_opposite-action", c: "dbt_opposite_action", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["anxious", "nervous"], active: true, review: "approved", why: "Anticipatory anxiety needs rehearsal and evaluation: Cope Ahead, then Check the Facts (both planned); Do the Opposite (approach, fits-the-facts step) until then."},
   {id: "rf_chronic_vigilance_words_anticipatory_cope-ahead", c: "dbt_cope_ahead", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["anxious", "nervous"], active: false, review: "draft", why: "Planned: Cope Ahead leads for anticipatory anxiety."},
   {id: "rf_chronic_vigilance_words_anticipatory_check-the-facts", c: "dbt_check_facts", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.45, dir: "neutral", req: null, side: null, gate: "words", words: ["anxious", "nervous"], active: false, review: "draft", why: "Planned: Check the Facts as the alternative."},
-  {id: "rf_chronic_vigilance_words_worry_opposite-action", c: "dbt_opposite_action", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["worried", "persecuted", "critical", "skeptical", "dismissive", "jealous"], active: true, review: "draft", why: "Check the Facts first (planned); Do the Opposite's fits-the-facts step until then."},
+  {id: "rf_chronic_vigilance_words_worry_opposite-action", c: "dbt_opposite_action", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["worried", "persecuted", "critical", "skeptical", "dismissive", "jealous"], active: true, review: "approved", why: "Check the Facts first (planned); Do the Opposite's fits-the-facts step until then."},
   {id: "rf_chronic_vigilance_words_worry_check-the-facts", c: "dbt_check_facts", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["worried", "persecuted", "critical", "skeptical", "dismissive", "jealous"], active: false, review: "draft", why: "Planned: Check the Facts leads."},
   {id: "rf_chronic_vigilance_words_worry_urge-surfing", c: "urge_surfing", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["worried"], active: false, review: "draft", why: "Urge Surfing for the checking / reassurance urge, once it's rebuilt (DT-05)."},
   {id: "rf_chronic_vigilance_words_watchful_wise-mind", c: "dbt_wise_mind", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["persecuted", "critical", "skeptical", "dismissive", "jealous"], active: false, review: "draft", why: "Planned: Wise Mind as the alternative for suspicion and judgement."},
-  {id: "rf_chronic_vigilance_words_helpless_problem-solve", c: "dbt_problem_solving", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["helpless"], active: true, review: "draft", why: "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve leads until then."},
+  {id: "rf_chronic_vigilance_words_helpless_problem-solve", c: "dbt_problem_solving", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["helpless"], active: true, review: "approved", why: "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve leads until then."},
   {id: "rf_chronic_vigilance_words_helpless_radical-acceptance", c: "dbt_radical_acceptance", p: "chronic_vigilance", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["helpless"], active: false, review: "draft", why: "Planned: Radical Acceptance leads for helplessness."}
 ] AS row
 MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})
@@ -75,8 +75,8 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // emotional_flooding
 UNWIND [
-  {id: "rf_emotional_flooding_flooded_cool-down", c: "dbt_tipp", p: "emotional_flooding", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only. Crisis banner shows above on check-in."},
-  {id: "rf_emotional_flooding_flooded_five-senses", c: "se_orienting", p: "emotional_flooding", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only. Crisis banner shows above on check-in."}
+  {id: "rf_emotional_flooding_flooded_cool-down", c: "dbt_tipp", p: "emotional_flooding", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only. Crisis banner shows above on check-in."},
+  {id: "rf_emotional_flooding_flooded_five-senses", c: "se_orienting", p: "emotional_flooding", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only. Crisis banner shows above on check-in."}
 ] AS row
 MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})
 MERGE (tc)-[r:RECOMMENDED_FOR {id: row.id}]->(p)
@@ -85,13 +85,13 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // social_threat_shame
 UNWIND [
-  {id: "rf_social_threat_shame_default_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 1.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Recover (self-validation) first, Do the Opposite (unhiding) as the alternative (review, Oct 2026)."},
-  {id: "rf_social_threat_shame_default_opposite-action", c: "dbt_opposite_action", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 2.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Recover (self-validation) first, Do the Opposite (unhiding) as the alternative (review, Oct 2026)."},
-  {id: "rf_social_threat_shame_flooded_cool-down", c: "dbt_tipp", p: "social_threat_shame", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_social_threat_shame_flooded_five-senses", c: "se_orienting", p: "social_threat_shame", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_social_threat_shame_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
-  {id: "rf_social_threat_shame_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "draft", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
-  {id: "rf_social_threat_shame_words_exposed_cool-down", c: "dbt_tipp", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 0.5, dir: "down", req: null, side: null, gate: "words", words: ["exposed", "humiliated"], active: true, review: "draft", why: "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."},
+  {id: "rf_social_threat_shame_default_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 1.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Recover (self-validation) first, Do the Opposite (unhiding) as the alternative (review, Oct 2026)."},
+  {id: "rf_social_threat_shame_default_opposite-action", c: "dbt_opposite_action", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 2.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Recover (self-validation) first, Do the Opposite (unhiding) as the alternative (review, Oct 2026)."},
+  {id: "rf_social_threat_shame_flooded_cool-down", c: "dbt_tipp", p: "social_threat_shame", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_social_threat_shame_flooded_five-senses", c: "se_orienting", p: "social_threat_shame", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_social_threat_shame_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+  {id: "rf_social_threat_shame_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "approved", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
+  {id: "rf_social_threat_shame_words_exposed_cool-down", c: "dbt_tipp", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 0.5, dir: "down", req: null, side: null, gate: "words", words: ["exposed", "humiliated"], active: true, review: "approved", why: "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."},
   {id: "rf_social_threat_shame_words_self-worth_check-the-facts", c: "dbt_check_facts", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "words", words: ["insecure", "inadequate", "inferior", "insignificant", "weak", "worthless"], active: false, review: "draft", why: "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
   {id: "rf_social_threat_shame_words_let-down_give", c: "dbt_give", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "words", words: ["let_down"], active: false, review: "draft", why: "Planned: GIVE (keep the relationship) as the alternative to Recover."},
   {id: "rf_social_threat_shame_words_self-respect_fast", c: "dbt_fast", p: "social_threat_shame", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "words", words: ["betrayed", "disrespected", "violated"], active: false, review: "draft", why: "Planned: FAST (keep self-respect) as the alternative to Recover."}
@@ -103,12 +103,12 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // reactive_aggression
 UNWIND [
-  {id: "rf_reactive_aggression_default_pause", c: "dbt_stop", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Stop before acting (STOP), then bring arousal down (TIPP). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3); intense exercise lowers arousal, it isn't a release."},
-  {id: "rf_reactive_aggression_default_cool-down", c: "dbt_tipp", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 2.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Stop before acting (STOP), then bring arousal down (TIPP). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3); intense exercise lowers arousal, it isn't a release."},
-  {id: "rf_reactive_aggression_flooded_cool-down", c: "dbt_tipp", p: "reactive_aggression", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_reactive_aggression_flooded_five-senses", c: "se_orienting", p: "reactive_aggression", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_reactive_aggression_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
-  {id: "rf_reactive_aggression_words_grievance_opposite-action", c: "dbt_opposite_action", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["bitter", "resentful"], active: true, review: "draft", why: "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."},
+  {id: "rf_reactive_aggression_default_pause", c: "dbt_stop", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Stop before acting (STOP), then bring arousal down (TIPP). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3); intense exercise lowers arousal, it isn't a release."},
+  {id: "rf_reactive_aggression_default_cool-down", c: "dbt_tipp", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 2.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Stop before acting (STOP), then bring arousal down (TIPP). Arousal-decreasing, never 'burn it off' (Somatic Gaps §F bug 3); intense exercise lowers arousal, it isn't a release."},
+  {id: "rf_reactive_aggression_flooded_cool-down", c: "dbt_tipp", p: "reactive_aggression", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_reactive_aggression_flooded_five-senses", c: "se_orienting", p: "reactive_aggression", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_reactive_aggression_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+  {id: "rf_reactive_aggression_words_grievance_opposite-action", c: "dbt_opposite_action", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["bitter", "resentful"], active: true, review: "approved", why: "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."},
   {id: "rf_reactive_aggression_words_grievance_check-the-facts", c: "dbt_check_facts", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["bitter", "resentful"], active: false, review: "draft", why: "Planned: Check the Facts leads for resentment."},
   {id: "rf_reactive_aggression_words_grievance_fast", c: "dbt_fast", p: "reactive_aggression", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["bitter", "resentful"], active: false, review: "draft", why: "Planned: FAST as the alternative."}
 ] AS row
@@ -119,17 +119,17 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // rumination_loop
 UNWIND [
-  {id: "rf_rumination_loop_default_problem-solve", c: "dbt_problem_solving", p: "rumination_loop", bands: ["steady", "stirred"], prio: 1.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."},
-  {id: "rf_rumination_loop_default_five-senses", c: "se_orienting", p: "rumination_loop", bands: ["steady", "stirred"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."},
-  {id: "rf_rumination_loop_flooded_cool-down", c: "dbt_tipp", p: "rumination_loop", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_rumination_loop_flooded_five-senses", c: "se_orienting", p: "rumination_loop", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded: bottom-up only."},
-  {id: "rf_rumination_loop_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
-  {id: "rf_rumination_loop_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "rumination_loop", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "draft", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
-  {id: "rf_rumination_loop_words_aversion_opposite-action", c: "dbt_opposite_action", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["disgusted", "disapproving", "disappointed", "awful", "repelled", "judgmental", "appalled", "revolted", "nauseated", "detestable", "horrified", "hesitant", "guilty", "remorseful"], active: true, review: "draft", why: "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."},
+  {id: "rf_rumination_loop_default_problem-solve", c: "dbt_problem_solving", p: "rumination_loop", bands: ["steady", "stirred"], prio: 1.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."},
+  {id: "rf_rumination_loop_default_five-senses", c: "se_orienting", p: "rumination_loop", bands: ["steady", "stirred"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Problem Solve (its barrier flow is the rumination guard) with an external-attention alternative (Index §5.2 C)."},
+  {id: "rf_rumination_loop_flooded_cool-down", c: "dbt_tipp", p: "rumination_loop", bands: ["flooded"], prio: 1.0, dir: "down", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_rumination_loop_flooded_five-senses", c: "se_orienting", p: "rumination_loop", bands: ["flooded"], prio: 2.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded: bottom-up only."},
+  {id: "rf_rumination_loop_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+  {id: "rf_rumination_loop_none_named_find-the-feeling", c: "dbt_find_the_feeling", p: "rumination_loop", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: "none_named", words: [], active: true, review: "approved", why: "Nothing was named (somatic skip): offer to find the word as the alternative (R9)."},
+  {id: "rf_rumination_loop_words_aversion_opposite-action", c: "dbt_opposite_action", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["disgusted", "disapproving", "disappointed", "awful", "repelled", "judgmental", "appalled", "revolted", "nauseated", "detestable", "horrified", "hesitant", "guilty", "remorseful"], active: true, review: "approved", why: "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."},
   {id: "rf_rumination_loop_words_aversion_accepts", c: "dbt_accepts", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["disgusted", "disapproving", "disappointed", "awful", "repelled", "judgmental", "appalled", "revolted", "nauseated", "detestable", "horrified", "hesitant"], active: false, review: "draft", why: "Planned: ACCEPTS as the alternative."},
   {id: "rf_rumination_loop_words_guilt_check-the-facts", c: "dbt_check_facts", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["guilty", "remorseful", "hesitant"], active: false, review: "draft", why: "Planned: Check the Facts leads for guilt (is it justified?) and hesitation."},
-  {id: "rf_rumination_loop_words_low-shame_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["embarrassed", "ashamed", "victimized"], active: true, review: "draft", why: "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
-  {id: "rf_rumination_loop_words_low-shame_opposite-action", c: "dbt_opposite_action", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["embarrassed", "ashamed"], active: true, review: "draft", why: "Do the Opposite (unhiding) as the alternative for shame."},
+  {id: "rf_rumination_loop_words_low-shame_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["embarrassed", "ashamed", "victimized"], active: true, review: "approved", why: "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
+  {id: "rf_rumination_loop_words_low-shame_opposite-action", c: "dbt_opposite_action", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["embarrassed", "ashamed"], active: true, review: "approved", why: "Do the Opposite (unhiding) as the alternative for shame."},
   {id: "rf_rumination_loop_words_victimized_fast", c: "dbt_fast", p: "rumination_loop", bands: ["steady", "stirred"], prio: 0.6, dir: "neutral", req: null, side: null, gate: "words", words: ["victimized"], active: false, review: "draft", why: "Planned: FAST (keep self-respect) as the alternative to Recover."}
 ] AS row
 MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})
@@ -139,10 +139,10 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // reward_drive_low
 UNWIND [
-  {id: "rf_reward_drive_low_default_opposite-action", c: "dbt_opposite_action", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 1.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Do the Opposite as 'get active' (behavioural activation) until Running low (PLEASE) ships; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."},
-  {id: "rf_reward_drive_low_flooded_five-senses", c: "se_orienting", p: "reward_drive_low", bands: ["flooded"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded + blank: orient only (no Cool Down, D-02)."},
-  {id: "rf_reward_drive_low_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
-  {id: "rf_reward_drive_low_words_fragile_problem-solve", c: "dbt_problem_solving", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["vulnerable", "fragile", "powerless"], active: true, review: "draft", why: "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},
+  {id: "rf_reward_drive_low_default_opposite-action", c: "dbt_opposite_action", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 1.0, dir: "neutral", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Do the Opposite as 'get active' (behavioural activation) until Running low (PLEASE) ships; never calming, and no 5-4-3-2-1 for vegetative states (review, Oct 2026). The guided Micro win shows above."},
+  {id: "rf_reward_drive_low_flooded_five-senses", c: "se_orienting", p: "reward_drive_low", bands: ["flooded"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded + blank: orient only (no Cool Down, D-02)."},
+  {id: "rf_reward_drive_low_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+  {id: "rf_reward_drive_low_words_fragile_problem-solve", c: "dbt_problem_solving", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 0.5, dir: "neutral", req: null, side: null, gate: "words", words: ["vulnerable", "fragile", "powerless"], active: true, review: "approved", why: "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},
   {id: "rf_reward_drive_low_words_fragile_radical-acceptance", c: "dbt_radical_acceptance", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 0.4, dir: "neutral", req: null, side: null, gate: "words", words: ["vulnerable", "fragile", "powerless"], active: false, review: "draft", why: "Planned: Radical Acceptance leads."},
   {id: "rf_reward_drive_low_words_connection_give", c: "dbt_give", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 0.85, dir: "neutral", req: null, side: null, gate: "words", words: ["lonely", "isolated"], active: false, review: "draft", why: "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."},
   {id: "rf_reward_drive_low_planned_running-low", c: "dbt_please", p: "reward_drive_low", bands: ["steady", "stirred"], prio: 0.9, dir: "neutral", req: null, side: null, gate: null, words: [], active: false, review: "draft", why: "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."}
@@ -154,10 +154,10 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // conservation_freeze
 UNWIND [
-  {id: "rf_conservation_freeze_default_five-senses", c: "se_orienting", p: "conservation_freeze", bands: ["steady", "stirred"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Orient; Do the Opposite only once you've moved a little (ER PRD ER-03 item 9). Guided gentle-movement stays the primary CTA."},
-  {id: "rf_conservation_freeze_default_opposite-action", c: "dbt_opposite_action", p: "conservation_freeze", bands: ["steady", "stirred"], prio: 2.0, dir: "up", req: "up_regulation", side: null, gate: null, words: [], active: true, review: "draft", why: "Orient; Do the Opposite only once you've moved a little (ER PRD ER-03 item 9). Guided gentle-movement stays the primary CTA."},
-  {id: "rf_conservation_freeze_flooded_five-senses", c: "se_orienting", p: "conservation_freeze", bands: ["flooded"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Flooded + blank: orient only (no Cool Down, D-02)."},
-  {id: "rf_conservation_freeze_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "conservation_freeze", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
+  {id: "rf_conservation_freeze_default_five-senses", c: "se_orienting", p: "conservation_freeze", bands: ["steady", "stirred"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Orient; Do the Opposite only once you've moved a little (ER PRD ER-03 item 9). Guided gentle-movement stays the primary CTA."},
+  {id: "rf_conservation_freeze_default_opposite-action", c: "dbt_opposite_action", p: "conservation_freeze", bands: ["steady", "stirred"], prio: 2.0, dir: "up", req: "up_regulation", side: null, gate: null, words: [], active: true, review: "approved", why: "Orient; Do the Opposite only once you've moved a little (ER PRD ER-03 item 9). Guided gentle-movement stays the primary CTA."},
+  {id: "rf_conservation_freeze_flooded_five-senses", c: "se_orienting", p: "conservation_freeze", bands: ["flooded"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Flooded + blank: orient only (no Cool Down, D-02)."},
+  {id: "rf_conservation_freeze_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "conservation_freeze", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."},
   {id: "rf_conservation_freeze_planned_radical-acceptance", c: "dbt_radical_acceptance", p: "conservation_freeze", bands: ["steady", "stirred"], prio: 1.5, dir: "neutral", req: null, side: null, gate: null, words: [], active: false, review: "draft", why: "Planned: Radical Acceptance after gentle movement for despair, grief, emptiness and numbness."}
 ] AS row
 MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})
@@ -167,9 +167,9 @@ SET r.bands = row.bands, r.priority = row.prio, r.direction = row.dir, r.require
     r.active = row.active, r.version = "rf-v2", r.reviewStatus = row.review, r.rationale = row.why;
 // dissociation_overmodulation
 UNWIND [
-  {id: "rf_dissociation_overmodulation_default_five-senses", c: "se_orienting", p: "dissociation_overmodulation", bands: ["steady", "stirred"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Orient first; no OA, no check the facts, no wave (ER-06 table). 5-4-3-2-1 is eyes-open since A0-1."},
-  {id: "rf_dissociation_overmodulation_flooded_five-senses", c: "se_orienting", p: "dissociation_overmodulation", bands: ["flooded"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "draft", why: "Orient first."},
-  {id: "rf_dissociation_overmodulation_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "dissociation_overmodulation", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "draft", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."}
+  {id: "rf_dissociation_overmodulation_default_five-senses", c: "se_orienting", p: "dissociation_overmodulation", bands: ["steady", "stirred"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Orient first; no OA, no check the facts, no wave (ER-06 table). 5-4-3-2-1 is eyes-open since A0-1."},
+  {id: "rf_dissociation_overmodulation_flooded_five-senses", c: "se_orienting", p: "dissociation_overmodulation", bands: ["flooded"], prio: 1.0, dir: "orient", req: null, side: null, gate: null, words: [], active: true, review: "approved", why: "Orient first."},
+  {id: "rf_dissociation_overmodulation_addresses_recovering-from-invalidation", c: "dbt_recovering_from_invalidation", p: "dissociation_overmodulation", bands: ["steady", "stirred"], prio: 0.0, dir: "neutral", req: null, side: null, gate: "addresses", words: [], active: true, review: "approved", why: "A wound word was named (hurt, humiliated, rejected, excluded, abandoned): Recover leads whatever the pattern (CORE routing table R7; everywhere, Oct 2026 review). Not when flooded: body first."}
 ] AS row
 MATCH (tc:TherapyConcept {id: row.c}), (p:ActivationPattern {id: row.p})
 MERGE (tc)-[r:RECOMMENDED_FOR {id: row.id}]->(p)
@@ -194,110 +194,110 @@ DELETE r;
 // --- 6. Grid vocabulary → pattern vocabulary (SCORES_AS aliases, vocab-v1; E4-6) ---
 // Held (no alias yet; vocabulary.py HELD): aggressive, angry, furious, hostile, infuriated, mad, provoked
 UNWIND [
-  {id: "fearful>fear", w: "fearful", e: "fear", review: "draft", why: "Same emotion."},
-  {id: "scared>fear", w: "scared", e: "fear", review: "draft", why: "Same emotion."},
-  {id: "frightened>fear", w: "frightened", e: "fear", review: "draft", why: "Same emotion."},
-  {id: "anxious>anxiety", w: "anxious", e: "anxiety", review: "draft", why: "Same emotion."},
-  {id: "nervous>anxiety", w: "nervous", e: "anxiety", review: "draft", why: "Mild anxiety."},
-  {id: "worried>anxiety", w: "worried", e: "anxiety", review: "draft", why: "Worry is anticipatory anxiety."},
-  {id: "insecure>anxiety", w: "insecure", e: "anxiety", review: "draft", why: "Unsure of footing or worth; the wheel places it under fear."},
-  {id: "overwhelmed>overwhelm", w: "overwhelmed", e: "overwhelm", review: "draft", why: "Same state."},
-  {id: "helpless>hopelessness", w: "helpless", e: "hopelessness", review: "draft", why: "Nothing I do will change it."},
-  {id: "weak>cold_shame", w: "weak", e: "cold_shame", review: "draft", why: "Wheel branch weak → worthless / insignificant: a lowered sense of self."},
-  {id: "worthless>cold_shame", w: "worthless", e: "cold_shame", review: "draft", why: "Worthlessness is the core of cold (collapsed) shame."},
-  {id: "insignificant>cold_shame", w: "insignificant", e: "cold_shame", review: "draft", why: "Feeling small and not counting: cold shame."},
-  {id: "inadequate>cold_shame", w: "inadequate", e: "cold_shame", review: "draft", why: "Not good enough: shame about the self."},
-  {id: "inferior>cold_shame", w: "inferior", e: "cold_shame", review: "draft", why: "Less than others: shame about the self."},
-  {id: "rejected>rejection", w: "rejected", e: "rejection", review: "draft", why: "Same experience."},
-  {id: "excluded>rejection", w: "excluded", e: "rejection", review: "draft", why: "Left out: rejection by a group."},
-  {id: "persecuted>fear", w: "persecuted", e: "fear", review: "draft", why: "Under threat from others."},
-  {id: "exposed>hot_shame", w: "exposed", e: "hot_shame", review: "draft", why: "Being seen when you don't want to be is the core appraisal of shame."},
-  {id: "annoyed>stress", w: "annoyed", e: "stress", review: "draft", why: "Low-grade anger; irritability reads as strain (anger itself is a held target, see HELD_TARGETS)."},
-  {id: "frustrated>stress", w: "frustrated", e: "stress", review: "draft", why: "Blocked-goal anger read as strain (anger itself is a held target)."},
-  {id: "indignant>rejection", w: "indignant", e: "rejection", review: "draft", why: "Anger at being treated unfairly by others: the social wound carries it (anger held)."},
-  {id: "resentful>rejection", w: "resentful", e: "rejection", review: "draft", why: "Lasting anger at having been wronged: the social wound carries it (anger held)."},
-  {id: "bitter>rejection", w: "bitter", e: "rejection", review: "draft", why: "Resentment that has settled: the social wound carries it (anger held)."},
-  {id: "betrayed>rejection", w: "betrayed", e: "rejection", review: "draft", why: "Hurt and anger at a broken trust: the social wound carries it (anger held)."},
-  {id: "jealous>rejection", w: "jealous", e: "rejection", review: "draft", why: "Fear of losing someone to a rival (anger held)."},
-  {id: "let_down>disappointment", w: "let_down", e: "disappointment", review: "draft", why: "Disappointed by someone who mattered."},
-  {id: "let_down>rejection", w: "let_down", e: "rejection", review: "draft", why: "Disappointed by someone who mattered."},
-  {id: "humiliated>hot_shame", w: "humiliated", e: "hot_shame", review: "draft", why: "Shamed in front of others: hot shame."},
-  {id: "ridiculed>hot_shame", w: "ridiculed", e: "hot_shame", review: "draft", why: "Mocked: hot shame."},
-  {id: "disrespected>hot_shame", w: "disrespected", e: "hot_shame", review: "draft", why: "Put down by someone (anger held)."},
-  {id: "threatened>fear", w: "threatened", e: "fear", review: "draft", why: "Sensing danger."},
-  {id: "violated>fear", w: "violated", e: "fear", review: "draft", why: "A boundary crossed: threat (anger held)."},
-  {id: "critical>disgust", w: "critical", e: "disgust", review: "draft", why: "Judging others: the contempt side of disgust."},
-  {id: "skeptical>disgust", w: "skeptical", e: "disgust", review: "draft", why: "Wheel branch critical → skeptical: distrust / contempt."},
-  {id: "dismissive>disgust", w: "dismissive", e: "disgust", review: "draft", why: "Wheel branch critical → dismissive: contempt."},
-  {id: "distant>loneliness", w: "distant", e: "loneliness", review: "draft", why: "Cut off from others; feelings muted."},
-  {id: "distant>numbness", w: "distant", e: "numbness", review: "draft", why: "Cut off from others; feelings muted."},
-  {id: "withdrawn>loneliness", w: "withdrawn", e: "loneliness", review: "draft", why: "Pulling away from others; feelings muted."},
-  {id: "withdrawn>numbness", w: "withdrawn", e: "numbness", review: "draft", why: "Pulling away from others; feelings muted."},
-  {id: "stressed>stress", w: "stressed", e: "stress", review: "draft", why: "Same state."}
+  {id: "fearful>fear", w: "fearful", e: "fear", review: "approved", why: "Same emotion."},
+  {id: "scared>fear", w: "scared", e: "fear", review: "approved", why: "Same emotion."},
+  {id: "frightened>fear", w: "frightened", e: "fear", review: "approved", why: "Same emotion."},
+  {id: "anxious>anxiety", w: "anxious", e: "anxiety", review: "approved", why: "Same emotion."},
+  {id: "nervous>anxiety", w: "nervous", e: "anxiety", review: "approved", why: "Mild anxiety."},
+  {id: "worried>anxiety", w: "worried", e: "anxiety", review: "approved", why: "Worry is anticipatory anxiety."},
+  {id: "insecure>anxiety", w: "insecure", e: "anxiety", review: "approved", why: "Unsure of footing or worth; the wheel places it under fear."},
+  {id: "overwhelmed>overwhelm", w: "overwhelmed", e: "overwhelm", review: "approved", why: "Same state."},
+  {id: "helpless>hopelessness", w: "helpless", e: "hopelessness", review: "approved", why: "Nothing I do will change it."},
+  {id: "weak>cold_shame", w: "weak", e: "cold_shame", review: "approved", why: "Wheel branch weak → worthless / insignificant: a lowered sense of self."},
+  {id: "worthless>cold_shame", w: "worthless", e: "cold_shame", review: "approved", why: "Worthlessness is the core of cold (collapsed) shame."},
+  {id: "insignificant>cold_shame", w: "insignificant", e: "cold_shame", review: "approved", why: "Feeling small and not counting: cold shame."},
+  {id: "inadequate>cold_shame", w: "inadequate", e: "cold_shame", review: "approved", why: "Not good enough: shame about the self."},
+  {id: "inferior>cold_shame", w: "inferior", e: "cold_shame", review: "approved", why: "Less than others: shame about the self."},
+  {id: "rejected>rejection", w: "rejected", e: "rejection", review: "approved", why: "Same experience."},
+  {id: "excluded>rejection", w: "excluded", e: "rejection", review: "approved", why: "Left out: rejection by a group."},
+  {id: "persecuted>fear", w: "persecuted", e: "fear", review: "approved", why: "Under threat from others."},
+  {id: "exposed>hot_shame", w: "exposed", e: "hot_shame", review: "approved", why: "Being seen when you don't want to be is the core appraisal of shame."},
+  {id: "annoyed>stress", w: "annoyed", e: "stress", review: "approved", why: "Low-grade anger; irritability reads as strain (anger itself is a held target, see HELD_TARGETS)."},
+  {id: "frustrated>stress", w: "frustrated", e: "stress", review: "approved", why: "Blocked-goal anger read as strain (anger itself is a held target)."},
+  {id: "indignant>rejection", w: "indignant", e: "rejection", review: "approved", why: "Anger at being treated unfairly by others: the social wound carries it (anger held)."},
+  {id: "resentful>rejection", w: "resentful", e: "rejection", review: "approved", why: "Lasting anger at having been wronged: the social wound carries it (anger held)."},
+  {id: "bitter>rejection", w: "bitter", e: "rejection", review: "approved", why: "Resentment that has settled: the social wound carries it (anger held)."},
+  {id: "betrayed>rejection", w: "betrayed", e: "rejection", review: "approved", why: "Hurt and anger at a broken trust: the social wound carries it (anger held)."},
+  {id: "jealous>rejection", w: "jealous", e: "rejection", review: "approved", why: "Fear of losing someone to a rival (anger held)."},
+  {id: "let_down>disappointment", w: "let_down", e: "disappointment", review: "approved", why: "Disappointed by someone who mattered."},
+  {id: "let_down>rejection", w: "let_down", e: "rejection", review: "approved", why: "Disappointed by someone who mattered."},
+  {id: "humiliated>hot_shame", w: "humiliated", e: "hot_shame", review: "approved", why: "Shamed in front of others: hot shame."},
+  {id: "ridiculed>hot_shame", w: "ridiculed", e: "hot_shame", review: "approved", why: "Mocked: hot shame."},
+  {id: "disrespected>hot_shame", w: "disrespected", e: "hot_shame", review: "approved", why: "Put down by someone (anger held)."},
+  {id: "threatened>fear", w: "threatened", e: "fear", review: "approved", why: "Sensing danger."},
+  {id: "violated>fear", w: "violated", e: "fear", review: "approved", why: "A boundary crossed: threat (anger held)."},
+  {id: "critical>disgust", w: "critical", e: "disgust", review: "approved", why: "Judging others: the contempt side of disgust."},
+  {id: "skeptical>disgust", w: "skeptical", e: "disgust", review: "approved", why: "Wheel branch critical → skeptical: distrust / contempt."},
+  {id: "dismissive>disgust", w: "dismissive", e: "disgust", review: "approved", why: "Wheel branch critical → dismissive: contempt."},
+  {id: "distant>loneliness", w: "distant", e: "loneliness", review: "approved", why: "Cut off from others; feelings muted."},
+  {id: "distant>numbness", w: "distant", e: "numbness", review: "approved", why: "Cut off from others; feelings muted."},
+  {id: "withdrawn>loneliness", w: "withdrawn", e: "loneliness", review: "approved", why: "Pulling away from others; feelings muted."},
+  {id: "withdrawn>numbness", w: "withdrawn", e: "numbness", review: "approved", why: "Pulling away from others; feelings muted."},
+  {id: "stressed>stress", w: "stressed", e: "stress", review: "approved", why: "Same state."}
 ] AS row
 MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
 MERGE (w)-[r:SCORES_AS]->(e)
 SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
 UNWIND [
-  {id: "pressured>stress", w: "pressured", e: "stress", review: "draft", why: "Stress from demands."},
-  {id: "rushed>stress", w: "rushed", e: "stress", review: "draft", why: "Stress from time pressure."},
-  {id: "busy>stress", w: "busy", e: "stress", review: "draft", why: "Load and demand."},
-  {id: "out_of_control>overwhelm", w: "out_of_control", e: "overwhelm", review: "draft", why: "Too much to manage."},
-  {id: "bad>sadness", w: "bad", e: "sadness", review: "draft", why: "Generic low mood; the wheel's centre for this family."},
-  {id: "tired>apathy", w: "tired", e: "apathy", review: "draft", why: "Low energy and drive."},
-  {id: "sleepy>apathy", w: "sleepy", e: "apathy", review: "draft", why: "Low energy and drive."},
-  {id: "unfocused>apathy", w: "unfocused", e: "apathy", review: "draft", why: "Low drive and attention; the nearest low-energy word."},
-  {id: "bored>boredom", w: "bored", e: "boredom", review: "draft", why: "Same state."},
-  {id: "apathetic>apathy", w: "apathetic", e: "apathy", review: "draft", why: "Same state."},
-  {id: "indifferent>apathy", w: "indifferent", e: "apathy", review: "draft", why: "Not caring either way."},
-  {id: "disgusted>disgust", w: "disgusted", e: "disgust", review: "draft", why: "Aversion; at low energy it lands as disappointment."},
-  {id: "disgusted>disappointment", w: "disgusted", e: "disappointment", review: "draft", why: "Aversion; at low energy it lands as disappointment."},
-  {id: "disapproving>disgust", w: "disapproving", e: "disgust", review: "draft", why: "Judging something as wrong, with disappointment."},
-  {id: "disapproving>disappointment", w: "disapproving", e: "disappointment", review: "draft", why: "Judging something as wrong, with disappointment."},
-  {id: "judgmental>disgust", w: "judgmental", e: "disgust", review: "draft", why: "Judging, with disappointment."},
-  {id: "judgmental>disappointment", w: "judgmental", e: "disappointment", review: "draft", why: "Judging, with disappointment."},
-  {id: "disappointed>disappointment", w: "disappointed", e: "disappointment", review: "draft", why: "Same emotion."},
-  {id: "appalled>disgust", w: "appalled", e: "disgust", review: "draft", why: "Moral disgust, with disappointment."},
-  {id: "appalled>disappointment", w: "appalled", e: "disappointment", review: "draft", why: "Moral disgust, with disappointment."},
-  {id: "revolted>disgust", w: "revolted", e: "disgust", review: "draft", why: "Strong aversion, with disappointment."},
-  {id: "revolted>disappointment", w: "revolted", e: "disappointment", review: "draft", why: "Strong aversion, with disappointment."},
-  {id: "repelled>disgust", w: "repelled", e: "disgust", review: "draft", why: "Aversion, with disappointment."},
-  {id: "repelled>disappointment", w: "repelled", e: "disappointment", review: "draft", why: "Aversion, with disappointment."},
-  {id: "awful>sadness", w: "awful", e: "sadness", review: "draft", why: "Feeling awful: low mood with aversion."},
-  {id: "awful>disgust", w: "awful", e: "disgust", review: "draft", why: "Feeling awful: low mood with aversion."},
-  {id: "nauseated>disgust", w: "nauseated", e: "disgust", review: "draft", why: "Bodily disgust; nausea often comes with anxiety."},
-  {id: "nauseated>anxiety", w: "nauseated", e: "anxiety", review: "draft", why: "Bodily disgust; nausea often comes with anxiety."},
-  {id: "detestable>cold_shame", w: "detestable", e: "cold_shame", review: "draft", why: "Feeling detestable is self-disgust: cold shame."},
-  {id: "horrified>fear", w: "horrified", e: "fear", review: "draft", why: "Shocked fear."},
-  {id: "horrified>anxiety", w: "horrified", e: "anxiety", review: "draft", why: "Shocked fear."},
-  {id: "hesitant>anxiety", w: "hesitant", e: "anxiety", review: "draft", why: "Holding back out of worry."},
-  {id: "embarrassed>hot_shame", w: "embarrassed", e: "hot_shame", review: "draft", why: "Mild shame."},
-  {id: "embarrassed>cold_shame", w: "embarrassed", e: "cold_shame", review: "draft", why: "Mild shame."},
-  {id: "sad>sadness", w: "sad", e: "sadness", review: "draft", why: "Same emotion."},
-  {id: "grief>sadness", w: "grief", e: "sadness", review: "draft", why: "Loss-driven sadness (grief_yearning is not a check-in candidate)."},
-  {id: "fragile>sadness", w: "fragile", e: "sadness", review: "draft", why: "Low and easily hurt."},
-  {id: "hurt>sadness", w: "hurt", e: "sadness", review: "draft", why: "Emotional pain, usually from someone."},
-  {id: "hurt>rejection", w: "hurt", e: "rejection", review: "draft", why: "Emotional pain, usually from someone."},
-  {id: "lonely>loneliness", w: "lonely", e: "loneliness", review: "draft", why: "Same emotion."}
+  {id: "pressured>stress", w: "pressured", e: "stress", review: "approved", why: "Stress from demands."},
+  {id: "rushed>stress", w: "rushed", e: "stress", review: "approved", why: "Stress from time pressure."},
+  {id: "busy>stress", w: "busy", e: "stress", review: "approved", why: "Load and demand."},
+  {id: "out_of_control>overwhelm", w: "out_of_control", e: "overwhelm", review: "approved", why: "Too much to manage."},
+  {id: "bad>sadness", w: "bad", e: "sadness", review: "approved", why: "Generic low mood; the wheel's centre for this family."},
+  {id: "tired>apathy", w: "tired", e: "apathy", review: "approved", why: "Low energy and drive."},
+  {id: "sleepy>apathy", w: "sleepy", e: "apathy", review: "approved", why: "Low energy and drive."},
+  {id: "unfocused>apathy", w: "unfocused", e: "apathy", review: "approved", why: "Low drive and attention; the nearest low-energy word."},
+  {id: "bored>boredom", w: "bored", e: "boredom", review: "approved", why: "Same state."},
+  {id: "apathetic>apathy", w: "apathetic", e: "apathy", review: "approved", why: "Same state."},
+  {id: "indifferent>apathy", w: "indifferent", e: "apathy", review: "approved", why: "Not caring either way."},
+  {id: "disgusted>disgust", w: "disgusted", e: "disgust", review: "approved", why: "Aversion; at low energy it lands as disappointment."},
+  {id: "disgusted>disappointment", w: "disgusted", e: "disappointment", review: "approved", why: "Aversion; at low energy it lands as disappointment."},
+  {id: "disapproving>disgust", w: "disapproving", e: "disgust", review: "approved", why: "Judging something as wrong, with disappointment."},
+  {id: "disapproving>disappointment", w: "disapproving", e: "disappointment", review: "approved", why: "Judging something as wrong, with disappointment."},
+  {id: "judgmental>disgust", w: "judgmental", e: "disgust", review: "approved", why: "Judging, with disappointment."},
+  {id: "judgmental>disappointment", w: "judgmental", e: "disappointment", review: "approved", why: "Judging, with disappointment."},
+  {id: "disappointed>disappointment", w: "disappointed", e: "disappointment", review: "approved", why: "Same emotion."},
+  {id: "appalled>disgust", w: "appalled", e: "disgust", review: "approved", why: "Moral disgust, with disappointment."},
+  {id: "appalled>disappointment", w: "appalled", e: "disappointment", review: "approved", why: "Moral disgust, with disappointment."},
+  {id: "revolted>disgust", w: "revolted", e: "disgust", review: "approved", why: "Strong aversion, with disappointment."},
+  {id: "revolted>disappointment", w: "revolted", e: "disappointment", review: "approved", why: "Strong aversion, with disappointment."},
+  {id: "repelled>disgust", w: "repelled", e: "disgust", review: "approved", why: "Aversion, with disappointment."},
+  {id: "repelled>disappointment", w: "repelled", e: "disappointment", review: "approved", why: "Aversion, with disappointment."},
+  {id: "awful>sadness", w: "awful", e: "sadness", review: "approved", why: "Feeling awful: low mood with aversion."},
+  {id: "awful>disgust", w: "awful", e: "disgust", review: "approved", why: "Feeling awful: low mood with aversion."},
+  {id: "nauseated>disgust", w: "nauseated", e: "disgust", review: "approved", why: "Bodily disgust; nausea often comes with anxiety."},
+  {id: "nauseated>anxiety", w: "nauseated", e: "anxiety", review: "approved", why: "Bodily disgust; nausea often comes with anxiety."},
+  {id: "detestable>cold_shame", w: "detestable", e: "cold_shame", review: "approved", why: "Feeling detestable is self-disgust: cold shame."},
+  {id: "horrified>fear", w: "horrified", e: "fear", review: "approved", why: "Shocked fear."},
+  {id: "horrified>anxiety", w: "horrified", e: "anxiety", review: "approved", why: "Shocked fear."},
+  {id: "hesitant>anxiety", w: "hesitant", e: "anxiety", review: "approved", why: "Holding back out of worry."},
+  {id: "embarrassed>hot_shame", w: "embarrassed", e: "hot_shame", review: "approved", why: "Mild shame."},
+  {id: "embarrassed>cold_shame", w: "embarrassed", e: "cold_shame", review: "approved", why: "Mild shame."},
+  {id: "sad>sadness", w: "sad", e: "sadness", review: "approved", why: "Same emotion."},
+  {id: "grief>sadness", w: "grief", e: "sadness", review: "approved", why: "Loss-driven sadness (grief_yearning is not a check-in candidate)."},
+  {id: "fragile>sadness", w: "fragile", e: "sadness", review: "approved", why: "Low and easily hurt."},
+  {id: "hurt>sadness", w: "hurt", e: "sadness", review: "approved", why: "Emotional pain, usually from someone."},
+  {id: "hurt>rejection", w: "hurt", e: "rejection", review: "approved", why: "Emotional pain, usually from someone."},
+  {id: "lonely>loneliness", w: "lonely", e: "loneliness", review: "approved", why: "Same emotion."}
 ] AS row
 MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
 MERGE (w)-[r:SCORES_AS]->(e)
 SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
 UNWIND [
-  {id: "isolated>loneliness", w: "isolated", e: "loneliness", review: "draft", why: "Cut off from others."},
-  {id: "abandoned>loneliness", w: "abandoned", e: "loneliness", review: "draft", why: "Left by someone who mattered."},
-  {id: "abandoned>rejection", w: "abandoned", e: "rejection", review: "draft", why: "Left by someone who mattered."},
-  {id: "vulnerable>anxiety", w: "vulnerable", e: "anxiety", review: "draft", why: "Unprotected; worried about being hurt."},
-  {id: "despair>hopelessness", w: "despair", e: "hopelessness", review: "draft", why: "Same state."},
-  {id: "powerless>hopelessness", w: "powerless", e: "hopelessness", review: "draft", why: "Unable to change anything."},
-  {id: "victimized>hopelessness", w: "victimized", e: "hopelessness", review: "draft", why: "Powerless at others' hands."},
-  {id: "depressed>sadness", w: "depressed", e: "sadness", review: "draft", why: "Low mood with hopelessness."},
-  {id: "depressed>hopelessness", w: "depressed", e: "hopelessness", review: "draft", why: "Low mood with hopelessness."},
-  {id: "guilty>guilt", w: "guilty", e: "guilt", review: "draft", why: "Same emotion."},
-  {id: "remorseful>guilt", w: "remorseful", e: "guilt", review: "draft", why: "Regret for what I did: guilt."},
-  {id: "ashamed>cold_shame", w: "ashamed", e: "cold_shame", review: "draft", why: "Shame about the self (low energy: cold shame)."},
-  {id: "empty>emptiness", w: "empty", e: "emptiness", review: "draft", why: "Same state."},
-  {id: "numb>numbness", w: "numb", e: "numbness", review: "draft", why: "Same state."}
+  {id: "isolated>loneliness", w: "isolated", e: "loneliness", review: "approved", why: "Cut off from others."},
+  {id: "abandoned>loneliness", w: "abandoned", e: "loneliness", review: "approved", why: "Left by someone who mattered."},
+  {id: "abandoned>rejection", w: "abandoned", e: "rejection", review: "approved", why: "Left by someone who mattered."},
+  {id: "vulnerable>anxiety", w: "vulnerable", e: "anxiety", review: "approved", why: "Unprotected; worried about being hurt."},
+  {id: "despair>hopelessness", w: "despair", e: "hopelessness", review: "approved", why: "Same state."},
+  {id: "powerless>hopelessness", w: "powerless", e: "hopelessness", review: "approved", why: "Unable to change anything."},
+  {id: "victimized>hopelessness", w: "victimized", e: "hopelessness", review: "approved", why: "Powerless at others' hands."},
+  {id: "depressed>sadness", w: "depressed", e: "sadness", review: "approved", why: "Low mood with hopelessness."},
+  {id: "depressed>hopelessness", w: "depressed", e: "hopelessness", review: "approved", why: "Low mood with hopelessness."},
+  {id: "guilty>guilt", w: "guilty", e: "guilt", review: "approved", why: "Same emotion."},
+  {id: "remorseful>guilt", w: "remorseful", e: "guilt", review: "approved", why: "Regret for what I did: guilt."},
+  {id: "ashamed>cold_shame", w: "ashamed", e: "cold_shame", review: "approved", why: "Shame about the self (low energy: cold shame)."},
+  {id: "empty>emptiness", w: "empty", e: "emptiness", review: "approved", why: "Same state."},
+  {id: "numb>numbness", w: "numb", e: "numbness", review: "approved", why: "Same state."}
 ] AS row
 MATCH (w:Emotion {id: row.w}), (e:Emotion {id: row.e})
 MERGE (w)-[r:SCORES_AS]->(e)
@@ -309,101 +309,101 @@ DELETE r;
 // --- 7. Reviewed pattern per grid word (SIGNALS, vocab-v1; Oct 2026 review) ---
 // While the policy is on, a word with a reviewed pattern matches only that pattern (a strong edge).
 UNWIND [
-  {id: "fearful>acute_alarm", w: "fearful", p: "acute_alarm", review: "draft", why: "Acute fear: regulation, then approach."},
-  {id: "scared>acute_alarm", w: "scared", p: "acute_alarm", review: "draft", why: "Acute fear: regulation, then approach."},
-  {id: "frightened>acute_alarm", w: "frightened", p: "acute_alarm", review: "draft", why: "Acute fear: regulation, then approach."},
-  {id: "threatened>acute_alarm", w: "threatened", p: "acute_alarm", review: "draft", why: "Acute fear: regulation, then approach."},
-  {id: "overwhelmed>acute_alarm", w: "overwhelmed", p: "acute_alarm", review: "draft", why: "Capacity saturation: a behavioural halt first. Alarm, not Flooded, so one everyday word doesn't raise the crisis banner."},
-  {id: "out_of_control>acute_alarm", w: "out_of_control", p: "acute_alarm", review: "draft", why: "Capacity saturation: a behavioural halt first. Alarm, not Flooded, so one everyday word doesn't raise the crisis banner."},
-  {id: "frustrated>acute_alarm", w: "frustrated", p: "acute_alarm", review: "draft", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
-  {id: "stressed>acute_alarm", w: "stressed", p: "acute_alarm", review: "draft", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
-  {id: "busy>acute_alarm", w: "busy", p: "acute_alarm", review: "draft", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
-  {id: "rushed>acute_alarm", w: "rushed", p: "acute_alarm", review: "draft", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
-  {id: "pressured>acute_alarm", w: "pressured", p: "acute_alarm", review: "draft", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
-  {id: "annoyed>acute_alarm", w: "annoyed", p: "acute_alarm", review: "draft", why: "Low-grade anger read as agitation."},
-  {id: "distant>acute_alarm", w: "distant", p: "acute_alarm", review: "draft", why: "Freeze with high arousal underneath: orient, then settle (review, Oct 2026; was Shut down in the sheet, which isn't on this side)."},
-  {id: "withdrawn>acute_alarm", w: "withdrawn", p: "acute_alarm", review: "draft", why: "Freeze with high arousal underneath: orient, then settle (review, Oct 2026; was Shut down in the sheet, which isn't on this side)."},
-  {id: "anxious>chronic_vigilance", w: "anxious", p: "chronic_vigilance", review: "draft", why: "Anticipatory anxiety."},
-  {id: "nervous>chronic_vigilance", w: "nervous", p: "chronic_vigilance", review: "draft", why: "Anticipatory anxiety."},
-  {id: "worried>chronic_vigilance", w: "worried", p: "chronic_vigilance", review: "draft", why: "Watching for threat or judging: check the facts."},
-  {id: "persecuted>chronic_vigilance", w: "persecuted", p: "chronic_vigilance", review: "draft", why: "Watching for threat or judging: check the facts."},
-  {id: "critical>chronic_vigilance", w: "critical", p: "chronic_vigilance", review: "draft", why: "Watching for threat or judging: check the facts."},
-  {id: "skeptical>chronic_vigilance", w: "skeptical", p: "chronic_vigilance", review: "draft", why: "Watching for threat or judging: check the facts."},
-  {id: "dismissive>chronic_vigilance", w: "dismissive", p: "chronic_vigilance", review: "draft", why: "Watching for threat or judging: check the facts."},
-  {id: "jealous>chronic_vigilance", w: "jealous", p: "chronic_vigilance", review: "draft", why: "Watching for threat or judging: check the facts."},
-  {id: "helpless>chronic_vigilance", w: "helpless", p: "chronic_vigilance", review: "draft", why: "Nothing I do will change it (the sheet's Low drive is on the other side; On guard carries hopelessness here)."},
-  {id: "insecure>social_threat_shame", w: "insecure", p: "social_threat_shame", review: "draft", why: "Shame about the self."},
-  {id: "inadequate>social_threat_shame", w: "inadequate", p: "social_threat_shame", review: "draft", why: "Shame about the self."},
-  {id: "inferior>social_threat_shame", w: "inferior", p: "social_threat_shame", review: "draft", why: "Shame about the self."},
-  {id: "insignificant>social_threat_shame", w: "insignificant", p: "social_threat_shame", review: "draft", why: "Shame about the self."},
-  {id: "weak>social_threat_shame", w: "weak", p: "social_threat_shame", review: "draft", why: "Cold shame (wheel branch weak → worthless / insignificant), not fatigue."},
-  {id: "worthless>social_threat_shame", w: "worthless", p: "social_threat_shame", review: "draft", why: "Cold shame (wheel branch weak → worthless / insignificant), not fatigue."},
-  {id: "rejected>social_threat_shame", w: "rejected", p: "social_threat_shame", review: "draft", why: "A social wound."},
-  {id: "excluded>social_threat_shame", w: "excluded", p: "social_threat_shame", review: "draft", why: "A social wound."},
-  {id: "let_down>social_threat_shame", w: "let_down", p: "social_threat_shame", review: "draft", why: "A social wound."},
-  {id: "exposed>social_threat_shame", w: "exposed", p: "social_threat_shame", review: "draft", why: "Hot shame: being seen, mocked or shamed in front of others."},
-  {id: "humiliated>social_threat_shame", w: "humiliated", p: "social_threat_shame", review: "draft", why: "Hot shame: being seen, mocked or shamed in front of others."},
-  {id: "ridiculed>social_threat_shame", w: "ridiculed", p: "social_threat_shame", review: "draft", why: "Hot shame: being seen, mocked or shamed in front of others."},
-  {id: "betrayed>social_threat_shame", w: "betrayed", p: "social_threat_shame", review: "draft", why: "A broken trust or crossed boundary: protect self-respect."},
-  {id: "disrespected>social_threat_shame", w: "disrespected", p: "social_threat_shame", review: "draft", why: "A broken trust or crossed boundary: protect self-respect."},
-  {id: "violated>social_threat_shame", w: "violated", p: "social_threat_shame", review: "draft", why: "A broken trust or crossed boundary: protect self-respect."},
-  {id: "angry>reactive_aggression", w: "angry", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
-  {id: "mad>reactive_aggression", w: "mad", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."}
+  {id: "fearful>acute_alarm", w: "fearful", p: "acute_alarm", review: "approved", why: "Acute fear: regulation, then approach."},
+  {id: "scared>acute_alarm", w: "scared", p: "acute_alarm", review: "approved", why: "Acute fear: regulation, then approach."},
+  {id: "frightened>acute_alarm", w: "frightened", p: "acute_alarm", review: "approved", why: "Acute fear: regulation, then approach."},
+  {id: "threatened>acute_alarm", w: "threatened", p: "acute_alarm", review: "approved", why: "Acute fear: regulation, then approach."},
+  {id: "overwhelmed>acute_alarm", w: "overwhelmed", p: "acute_alarm", review: "approved", why: "Capacity saturation: a behavioural halt first. Alarm, not Flooded, so one everyday word doesn't raise the crisis banner."},
+  {id: "out_of_control>acute_alarm", w: "out_of_control", p: "acute_alarm", review: "approved", why: "Capacity saturation: a behavioural halt first. Alarm, not Flooded, so one everyday word doesn't raise the crisis banner."},
+  {id: "frustrated>acute_alarm", w: "frustrated", p: "acute_alarm", review: "approved", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
+  {id: "stressed>acute_alarm", w: "stressed", p: "acute_alarm", review: "approved", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
+  {id: "busy>acute_alarm", w: "busy", p: "acute_alarm", review: "approved", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
+  {id: "rushed>acute_alarm", w: "rushed", p: "acute_alarm", review: "approved", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
+  {id: "pressured>acute_alarm", w: "pressured", p: "acute_alarm", review: "approved", why: "High agitation and strain (the review's Alarm / On replay; Alarm on this side)."},
+  {id: "annoyed>acute_alarm", w: "annoyed", p: "acute_alarm", review: "approved", why: "Low-grade anger read as agitation."},
+  {id: "distant>acute_alarm", w: "distant", p: "acute_alarm", review: "approved", why: "Freeze with high arousal underneath: orient, then settle (review, Oct 2026; was Shut down in the sheet, which isn't on this side)."},
+  {id: "withdrawn>acute_alarm", w: "withdrawn", p: "acute_alarm", review: "approved", why: "Freeze with high arousal underneath: orient, then settle (review, Oct 2026; was Shut down in the sheet, which isn't on this side)."},
+  {id: "anxious>chronic_vigilance", w: "anxious", p: "chronic_vigilance", review: "approved", why: "Anticipatory anxiety."},
+  {id: "nervous>chronic_vigilance", w: "nervous", p: "chronic_vigilance", review: "approved", why: "Anticipatory anxiety."},
+  {id: "worried>chronic_vigilance", w: "worried", p: "chronic_vigilance", review: "approved", why: "Watching for threat or judging: check the facts."},
+  {id: "persecuted>chronic_vigilance", w: "persecuted", p: "chronic_vigilance", review: "approved", why: "Watching for threat or judging: check the facts."},
+  {id: "critical>chronic_vigilance", w: "critical", p: "chronic_vigilance", review: "approved", why: "Watching for threat or judging: check the facts."},
+  {id: "skeptical>chronic_vigilance", w: "skeptical", p: "chronic_vigilance", review: "approved", why: "Watching for threat or judging: check the facts."},
+  {id: "dismissive>chronic_vigilance", w: "dismissive", p: "chronic_vigilance", review: "approved", why: "Watching for threat or judging: check the facts."},
+  {id: "jealous>chronic_vigilance", w: "jealous", p: "chronic_vigilance", review: "approved", why: "Watching for threat or judging: check the facts."},
+  {id: "helpless>chronic_vigilance", w: "helpless", p: "chronic_vigilance", review: "approved", why: "Nothing I do will change it (the sheet's Low drive is on the other side; On guard carries hopelessness here)."},
+  {id: "insecure>social_threat_shame", w: "insecure", p: "social_threat_shame", review: "approved", why: "Shame about the self."},
+  {id: "inadequate>social_threat_shame", w: "inadequate", p: "social_threat_shame", review: "approved", why: "Shame about the self."},
+  {id: "inferior>social_threat_shame", w: "inferior", p: "social_threat_shame", review: "approved", why: "Shame about the self."},
+  {id: "insignificant>social_threat_shame", w: "insignificant", p: "social_threat_shame", review: "approved", why: "Shame about the self."},
+  {id: "weak>social_threat_shame", w: "weak", p: "social_threat_shame", review: "approved", why: "Cold shame (wheel branch weak → worthless / insignificant), not fatigue."},
+  {id: "worthless>social_threat_shame", w: "worthless", p: "social_threat_shame", review: "approved", why: "Cold shame (wheel branch weak → worthless / insignificant), not fatigue."},
+  {id: "rejected>social_threat_shame", w: "rejected", p: "social_threat_shame", review: "approved", why: "A social wound."},
+  {id: "excluded>social_threat_shame", w: "excluded", p: "social_threat_shame", review: "approved", why: "A social wound."},
+  {id: "let_down>social_threat_shame", w: "let_down", p: "social_threat_shame", review: "approved", why: "A social wound."},
+  {id: "exposed>social_threat_shame", w: "exposed", p: "social_threat_shame", review: "approved", why: "Hot shame: being seen, mocked or shamed in front of others."},
+  {id: "humiliated>social_threat_shame", w: "humiliated", p: "social_threat_shame", review: "approved", why: "Hot shame: being seen, mocked or shamed in front of others."},
+  {id: "ridiculed>social_threat_shame", w: "ridiculed", p: "social_threat_shame", review: "approved", why: "Hot shame: being seen, mocked or shamed in front of others."},
+  {id: "betrayed>social_threat_shame", w: "betrayed", p: "social_threat_shame", review: "approved", why: "A broken trust or crossed boundary: protect self-respect."},
+  {id: "disrespected>social_threat_shame", w: "disrespected", p: "social_threat_shame", review: "approved", why: "A broken trust or crossed boundary: protect self-respect."},
+  {id: "violated>social_threat_shame", w: "violated", p: "social_threat_shame", review: "approved", why: "A broken trust or crossed boundary: protect self-respect."},
+  {id: "angry>reactive_aggression", w: "angry", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
+  {id: "mad>reactive_aggression", w: "mad", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."}
 ] AS row
 MATCH (w:Emotion {id: row.w}), (p:ActivationPattern {id: row.p})
 MERGE (w)-[r:SIGNALS]->(p)
 SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
 UNWIND [
-  {id: "aggressive>reactive_aggression", w: "aggressive", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
-  {id: "furious>reactive_aggression", w: "furious", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
-  {id: "provoked>reactive_aggression", w: "provoked", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
-  {id: "hostile>reactive_aggression", w: "hostile", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
-  {id: "infuriated>reactive_aggression", w: "infuriated", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
-  {id: "indignant>reactive_aggression", w: "indignant", p: "reactive_aggression", review: "draft", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
-  {id: "bitter>reactive_aggression", w: "bitter", p: "reactive_aggression", review: "draft", why: "Settled resentment (the review's On replay / Ready to fight; Ready to fight on this side)."},
-  {id: "resentful>reactive_aggression", w: "resentful", p: "reactive_aggression", review: "draft", why: "Settled resentment (the review's On replay / Ready to fight; Ready to fight on this side)."},
-  {id: "tired>reward_drive_low", w: "tired", p: "reward_drive_low", review: "draft", why: "Low energy and drive: address the body, get active."},
-  {id: "bored>reward_drive_low", w: "bored", p: "reward_drive_low", review: "draft", why: "Low energy and drive: address the body, get active."},
-  {id: "sleepy>reward_drive_low", w: "sleepy", p: "reward_drive_low", review: "draft", why: "Low energy and drive: address the body, get active."},
-  {id: "unfocused>reward_drive_low", w: "unfocused", p: "reward_drive_low", review: "draft", why: "Low energy and drive: address the body, get active."},
-  {id: "apathetic>reward_drive_low", w: "apathetic", p: "reward_drive_low", review: "draft", why: "Low energy and drive: address the body, get active."},
-  {id: "indifferent>reward_drive_low", w: "indifferent", p: "reward_drive_low", review: "draft", why: "Low energy and drive: address the body, get active."},
-  {id: "bad>reward_drive_low", w: "bad", p: "reward_drive_low", review: "draft", why: "Low mood: behavioural activation."},
-  {id: "sad>reward_drive_low", w: "sad", p: "reward_drive_low", review: "draft", why: "Low mood: behavioural activation."},
-  {id: "depressed>reward_drive_low", w: "depressed", p: "reward_drive_low", review: "draft", why: "Low mood: behavioural activation."},
-  {id: "lonely>reward_drive_low", w: "lonely", p: "reward_drive_low", review: "draft", why: "Cut off from people: reach towards them (the sheet's Social threat is on the other side)."},
-  {id: "isolated>reward_drive_low", w: "isolated", p: "reward_drive_low", review: "draft", why: "Cut off from people: reach towards them (the sheet's Social threat is on the other side)."},
-  {id: "vulnerable>reward_drive_low", w: "vulnerable", p: "reward_drive_low", review: "draft", why: "Unable to change things: accept, then small steps."},
-  {id: "fragile>reward_drive_low", w: "fragile", p: "reward_drive_low", review: "draft", why: "Unable to change things: accept, then small steps."},
-  {id: "powerless>reward_drive_low", w: "powerless", p: "reward_drive_low", review: "draft", why: "Unable to change things: accept, then small steps."},
-  {id: "disgusted>rumination_loop", w: "disgusted", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "disapproving>rumination_loop", w: "disapproving", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "disappointed>rumination_loop", w: "disappointed", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "awful>rumination_loop", w: "awful", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "repelled>rumination_loop", w: "repelled", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "judgmental>rumination_loop", w: "judgmental", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "appalled>rumination_loop", w: "appalled", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "revolted>rumination_loop", w: "revolted", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "nauseated>rumination_loop", w: "nauseated", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "detestable>rumination_loop", w: "detestable", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "horrified>rumination_loop", w: "horrified", p: "rumination_loop", review: "draft", why: "Aversion and disappointment that keeps replaying."},
-  {id: "hesitant>rumination_loop", w: "hesitant", p: "rumination_loop", review: "draft", why: "Holding back out of worry (the sheet's Alarm is on the other side)."},
-  {id: "guilty>rumination_loop", w: "guilty", p: "rumination_loop", review: "draft", why: "Guilt: is it justified, then repair."},
-  {id: "remorseful>rumination_loop", w: "remorseful", p: "rumination_loop", review: "draft", why: "Guilt: is it justified, then repair."},
-  {id: "embarrassed>rumination_loop", w: "embarrassed", p: "rumination_loop", review: "draft", why: "Low-energy shame that replays."},
-  {id: "ashamed>rumination_loop", w: "ashamed", p: "rumination_loop", review: "draft", why: "Low-energy shame that replays."},
-  {id: "victimized>rumination_loop", w: "victimized", p: "rumination_loop", review: "draft", why: "Hurt by someone, replaying it: Recover leads (hurt and abandoned are wound words)."},
-  {id: "hurt>rumination_loop", w: "hurt", p: "rumination_loop", review: "draft", why: "Hurt by someone, replaying it: Recover leads (hurt and abandoned are wound words)."}
+  {id: "aggressive>reactive_aggression", w: "aggressive", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
+  {id: "furious>reactive_aggression", w: "furious", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
+  {id: "provoked>reactive_aggression", w: "provoked", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
+  {id: "hostile>reactive_aggression", w: "hostile", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
+  {id: "infuriated>reactive_aggression", w: "infuriated", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
+  {id: "indignant>reactive_aggression", w: "indignant", p: "reactive_aggression", review: "approved", why: "Anger: halt the action urge, then bring arousal down. Ready to fight has no crisis flag, so these aren't held any more."},
+  {id: "bitter>reactive_aggression", w: "bitter", p: "reactive_aggression", review: "approved", why: "Settled resentment (the review's On replay / Ready to fight; Ready to fight on this side)."},
+  {id: "resentful>reactive_aggression", w: "resentful", p: "reactive_aggression", review: "approved", why: "Settled resentment (the review's On replay / Ready to fight; Ready to fight on this side)."},
+  {id: "tired>reward_drive_low", w: "tired", p: "reward_drive_low", review: "approved", why: "Low energy and drive: address the body, get active."},
+  {id: "bored>reward_drive_low", w: "bored", p: "reward_drive_low", review: "approved", why: "Low energy and drive: address the body, get active."},
+  {id: "sleepy>reward_drive_low", w: "sleepy", p: "reward_drive_low", review: "approved", why: "Low energy and drive: address the body, get active."},
+  {id: "unfocused>reward_drive_low", w: "unfocused", p: "reward_drive_low", review: "approved", why: "Low energy and drive: address the body, get active."},
+  {id: "apathetic>reward_drive_low", w: "apathetic", p: "reward_drive_low", review: "approved", why: "Low energy and drive: address the body, get active."},
+  {id: "indifferent>reward_drive_low", w: "indifferent", p: "reward_drive_low", review: "approved", why: "Low energy and drive: address the body, get active."},
+  {id: "bad>reward_drive_low", w: "bad", p: "reward_drive_low", review: "approved", why: "Low mood: behavioural activation."},
+  {id: "sad>reward_drive_low", w: "sad", p: "reward_drive_low", review: "approved", why: "Low mood: behavioural activation."},
+  {id: "depressed>reward_drive_low", w: "depressed", p: "reward_drive_low", review: "approved", why: "Low mood: behavioural activation."},
+  {id: "lonely>reward_drive_low", w: "lonely", p: "reward_drive_low", review: "approved", why: "Cut off from people: reach towards them (the sheet's Social threat is on the other side)."},
+  {id: "isolated>reward_drive_low", w: "isolated", p: "reward_drive_low", review: "approved", why: "Cut off from people: reach towards them (the sheet's Social threat is on the other side)."},
+  {id: "vulnerable>reward_drive_low", w: "vulnerable", p: "reward_drive_low", review: "approved", why: "Unable to change things: accept, then small steps."},
+  {id: "fragile>reward_drive_low", w: "fragile", p: "reward_drive_low", review: "approved", why: "Unable to change things: accept, then small steps."},
+  {id: "powerless>reward_drive_low", w: "powerless", p: "reward_drive_low", review: "approved", why: "Unable to change things: accept, then small steps."},
+  {id: "disgusted>rumination_loop", w: "disgusted", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "disapproving>rumination_loop", w: "disapproving", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "disappointed>rumination_loop", w: "disappointed", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "awful>rumination_loop", w: "awful", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "repelled>rumination_loop", w: "repelled", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "judgmental>rumination_loop", w: "judgmental", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "appalled>rumination_loop", w: "appalled", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "revolted>rumination_loop", w: "revolted", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "nauseated>rumination_loop", w: "nauseated", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "detestable>rumination_loop", w: "detestable", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "horrified>rumination_loop", w: "horrified", p: "rumination_loop", review: "approved", why: "Aversion and disappointment that keeps replaying."},
+  {id: "hesitant>rumination_loop", w: "hesitant", p: "rumination_loop", review: "approved", why: "Holding back out of worry (the sheet's Alarm is on the other side)."},
+  {id: "guilty>rumination_loop", w: "guilty", p: "rumination_loop", review: "approved", why: "Guilt: is it justified, then repair."},
+  {id: "remorseful>rumination_loop", w: "remorseful", p: "rumination_loop", review: "approved", why: "Guilt: is it justified, then repair."},
+  {id: "embarrassed>rumination_loop", w: "embarrassed", p: "rumination_loop", review: "approved", why: "Low-energy shame that replays."},
+  {id: "ashamed>rumination_loop", w: "ashamed", p: "rumination_loop", review: "approved", why: "Low-energy shame that replays."},
+  {id: "victimized>rumination_loop", w: "victimized", p: "rumination_loop", review: "approved", why: "Hurt by someone, replaying it: Recover leads (hurt and abandoned are wound words)."},
+  {id: "hurt>rumination_loop", w: "hurt", p: "rumination_loop", review: "approved", why: "Hurt by someone, replaying it: Recover leads (hurt and abandoned are wound words)."}
 ] AS row
 MATCH (w:Emotion {id: row.w}), (p:ActivationPattern {id: row.p})
 MERGE (w)-[r:SIGNALS]->(p)
 SET r.id = row.id, r.version = "vocab-v1", r.reviewStatus = row.review, r.rationale = row.why;
 UNWIND [
-  {id: "abandoned>rumination_loop", w: "abandoned", p: "rumination_loop", review: "draft", why: "Hurt by someone, replaying it: Recover leads (hurt and abandoned are wound words)."},
-  {id: "despair>conservation_freeze", w: "despair", p: "conservation_freeze", review: "draft", why: "Collapse: gentle movement first."},
-  {id: "grief>conservation_freeze", w: "grief", p: "conservation_freeze", review: "draft", why: "Collapse: gentle movement first."},
-  {id: "empty>conservation_freeze", w: "empty", p: "conservation_freeze", review: "draft", why: "Collapse: gentle movement first."},
-  {id: "numb>conservation_freeze", w: "numb", p: "conservation_freeze", review: "draft", why: "Collapse: gentle movement first."}
+  {id: "abandoned>rumination_loop", w: "abandoned", p: "rumination_loop", review: "approved", why: "Hurt by someone, replaying it: Recover leads (hurt and abandoned are wound words)."},
+  {id: "despair>conservation_freeze", w: "despair", p: "conservation_freeze", review: "approved", why: "Collapse: gentle movement first."},
+  {id: "grief>conservation_freeze", w: "grief", p: "conservation_freeze", review: "approved", why: "Collapse: gentle movement first."},
+  {id: "empty>conservation_freeze", w: "empty", p: "conservation_freeze", review: "approved", why: "Collapse: gentle movement first."},
+  {id: "numb>conservation_freeze", w: "numb", p: "conservation_freeze", review: "approved", why: "Collapse: gentle movement first."}
 ] AS row
 MATCH (w:Emotion {id: row.w}), (p:ActivationPattern {id: row.p})
 MERGE (w)-[r:SIGNALS]->(p)
