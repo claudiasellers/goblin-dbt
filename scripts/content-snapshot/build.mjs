@@ -19,6 +19,8 @@
  *   body-map.json          getBodyMapContent for every live map (the app picks the maps for its words);
  *                          places computed by the same functions/src/bodyMap/places.ts
  *   find-the-feeling.json  getFindTheFeelingContent, exactly
+ *   discriminating-questions.json  getDiscriminatingQuestions per quadrant (the check-in's
+ *                          "Continue" waited on it, cold, before the follow-up questions)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
@@ -186,7 +188,41 @@ export function buildFindTheFeeling(g) {
   return { version: FIND_FLOW_VERSION, flow, families, urges, floodedBlankRoutes: gates.floodedBlankRoutes };
 }
 
-/** All three snapshots from one export (pure apart from reading the version constants). */
+/**
+ * getDiscriminatingQuestions (functions/src/recommendation/index.ts) for every quadrant that has
+ * questions: the same fields the function returns (never the clinical rationale, citations or
+ * signals on the nodes), questions by `order`, each with its responses by `order`.
+ */
+export function buildDiscriminatingQuestions(g) {
+  const responsesOf = new Map();
+  for (const r of g.rels('HAS_RESPONSE', 'DiscriminatingQuestion', 'QuestionResponse')) pushTo(responsesOf, r.a, r.b);
+  const nextOf = new Map();
+  for (const r of g.rels('TRIGGERS_NEXT', 'QuestionResponse', 'DiscriminatingQuestion')) pushTo(nextOf, r.a, r.b);
+  const questions = g.nodes('DiscriminatingQuestion');
+  const quadrants = [...new Set(questions.flatMap((q) => q.props.applicableQuadrants ?? []))].sort();
+  const out = {};
+  for (const quadrant of quadrants) {
+    out[quadrant] = questions
+      .filter((q) => (q.props.applicableQuadrants ?? []).includes(quadrant))
+      .sort((a, b) => asc(a.props.order, b.props.order))
+      .map((q) => ({
+        id: q.props.id, text: q.props.text ?? null, subtext: q.props.subtext ?? null,
+        order: Number(q.props.order), required: q.props.required ?? null,
+        // One row per (response, next question), as the query's OPTIONAL MATCH returns them.
+        responses: (responsesOf.get(q) ?? [])
+          .sort((a, b) => asc(a.props.order, b.props.order))
+          .flatMap((r) => {
+            const base = { id: r.props.id, label: r.props.label ?? null, subtext: r.props.subtext ?? null, order: Number(r.props.order), isEscapeHatch: r.props.isEscapeHatch ?? null };
+            const next = nextOf.get(r) ?? [];
+            return next.length ? next.map((n) => ({ ...base, triggersNextQuestionId: n.props.id })) : [base];
+          }),
+      }))
+      .filter((q) => q.responses.length > 0);
+  }
+  return out;
+}
+
+/** All the snapshots from one export (pure apart from reading the version constants). */
 export function buildSnapshots(exp) {
   assertContentOnly(exp);
   const g = indexGraph(exp);
@@ -194,6 +230,7 @@ export function buildSnapshots(exp) {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
     'find-the-feeling.json': buildFindTheFeeling(g),
+    'discriminating-questions.json': buildDiscriminatingQuestions(g),
   };
 }
 

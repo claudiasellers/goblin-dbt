@@ -1,0 +1,178 @@
+{
+  "source": {
+    "file": "graph-content-only-2026-10-05.json",
+    "exportedAt": "2026-10-05T04:16:06.437Z"
+  },
+  "content": {
+    "high-unpleasant": [
+      {
+        "id": "hu_experience_quality",
+        "text": "What's happening feels like...",
+        "subtext": "Go with your gut — don't overthink it.",
+        "order": 1,
+        "required": true,
+        "responses": [
+          {
+            "id": "hu_exp_alarm",
+            "label": "My alarm went off",
+            "subtext": "Something triggered it — I feel on edge or afraid.",
+            "order": 1,
+            "isEscapeHatch": false,
+            "triggersNextQuestionId": "hu_body_activation"
+          },
+          {
+            "id": "hu_exp_vigilance",
+            "label": "A worry that won't turn off",
+            "subtext": "Always running in the background — I can't relax.",
+            "order": 2,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_exp_social",
+            "label": "About what others think of me",
+            "subtext": "Judgment, rejection, or being seen in a way I can't handle.",
+            "order": 3,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_exp_flooding",
+            "label": "Everything hitting at once",
+            "subtext": "I can't sort it out — too many feelings, can't think straight.",
+            "order": 4,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_exp_unsure",
+            "label": "I don't know what triggered it",
+            "subtext": "Something's wrong but I can't name what started it.",
+            "order": 5,
+            "isEscapeHatch": true,
+            "triggersNextQuestionId": "hu_body_activation"
+          }
+        ]
+      },
+      {
+        "id": "hu_body_activation",
+        "text": "In my body right now...",
+        "subtext": "What do you notice most?",
+        "order": 2,
+        "required": false,
+        "responses": [
+          {
+            "id": "hu_body_racing",
+            "label": "Heart racing, on alert",
+            "subtext": "Wired up — shallow breathing, can't sit still.",
+            "order": 1,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_body_tense",
+            "label": "Tense everywhere, scanning",
+            "subtext": "Tight muscles, on guard — my body won't let go.",
+            "order": 2,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_body_overwhelmed",
+            "label": "Shaking, crying, or overwhelmed",
+            "subtext": "My body is doing things I can't control right now.",
+            "order": 3,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_body_shame",
+            "label": "Heat in face or chest, want to hide",
+            "subtext": "Flushing, shrinking — I want to disappear.",
+            "order": 4,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "hu_body_unclear",
+            "label": "I can't tell — it's all too much",
+            "subtext": "Everything's activated and I can't sort it out.",
+            "order": 5,
+            "isEscapeHatch": true
+          }
+        ]
+      }
+    ],
+    "low-unpleasant": [
+      {
+        "id": "lu_mind_quality",
+        "text": "Right now, my mind feels...",
+        "subtext": "There's no wrong answer — just pick what's closest.",
+        "order": 1,
+        "required": true,
+        "responses": [
+          {
+            "id": "lu_mind_looping",
+            "label": "Stuck on replay",
+            "subtext": "Same thoughts circling — I can't stop going over things.",
+            "order": 1,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "lu_mind_blank",
+            "label": "Quiet or blank",
+            "subtext": "Not much going on up there — just... empty.",
+            "order": 2,
+            "isEscapeHatch": false,
+            "triggersNextQuestionId": "lu_body_quality"
+          },
+          {
+            "id": "lu_mind_faraway",
+            "label": "Far away or unreal",
+            "subtext": "Like I'm behind glass, or watching from the outside.",
+            "order": 3,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "lu_mind_unsure",
+            "label": "I'm not sure",
+            "subtext": "I can't really tell what my mind is doing right now.",
+            "order": 4,
+            "isEscapeHatch": true,
+            "triggersNextQuestionId": "lu_body_quality"
+          }
+        ]
+      },
+      {
+        "id": "lu_body_quality",
+        "text": "My body feels...",
+        "subtext": "Focus on the physical sensation, not the emotion.",
+        "order": 2,
+        "required": false,
+        "responses": [
+          {
+            "id": "lu_body_heavy",
+            "label": "Heavy or stuck",
+            "subtext": "Like there's a weight on me — I can't make myself move.",
+            "order": 1,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "lu_body_flat",
+            "label": "Flat — nothing sounds good",
+            "subtext": "I could move, but nothing pulls me to. What's the point.",
+            "order": 2,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "lu_body_numb",
+            "label": "Numb or disconnected",
+            "subtext": "Like my body isn't quite mine — or I can't feel it well.",
+            "order": 3,
+            "isEscapeHatch": false
+          },
+          {
+            "id": "lu_body_unclear",
+            "label": "I can't really tell",
+            "subtext": "I'm not sure what my body feels like right now.",
+            "order": 4,
+            "isEscapeHatch": true
+          }
+        ]
+      }
+    ]
+  }
+}

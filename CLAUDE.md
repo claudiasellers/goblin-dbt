@@ -29,7 +29,7 @@ Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `cap
 | `account/` | `ensureUserExists`, `getUserProfile`, `updateUserProfile`, `deleteUserData` (+ Auth user with `deleteAuth`), `exportUserData`; triggers `onUserCreated` / `onUserDeleted` (`account/triggers.ts`) (settings-style profile; `profile/` is reserved for the three-layer "Me") |
 | `toolUsage/` | `trackToolUsage`, `recordToolOutcome` |
 | `insights/` | `getInsightsData` |
-| `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` (still deployed; the app reads `src/data/content/related-words.json` instead) |
+| `recommendation/` | `getStateAndTools`, `getDiscriminatingQuestions`, `getRelatedEmotions` (both still deployed; the app reads `src/data/content/discriminating-questions.json` and `related-words.json` instead) |
 | `oppositeAction/` | `getOppositeActionContent`, `saveOppositeActionSession`, `getOppositeActionSessions`, `getOppositeActionSession`, `getOppositeActionFollowUps` |
 | `dearMan/` | `getDearManContent`, `saveDearManSession`, `getDearManDebriefContent`, `getDearManReflection`, `getDearManSessions` |
 | `problemSolve/` | `getProblemSolveContent` |
@@ -108,12 +108,12 @@ This includes:
 
 ### Generated content files (`src/data/content/`): graph content the app ships
 
-Read-only content that is the same for everyone can ship with the app as a file **generated from the graph**, so the screen never waits on a Cloud Function (a cold one took 2.8 s for "Often alongside"). Today: related words, body map (content + body-first suggestions), Find the feeling content. The graph stays the source; the files are derived copies, never edited by hand.
+Read-only content that is the same for everyone can ship with the app as a file **generated from the graph**, so the screen never waits on a Cloud Function (a cold one took 2.8 s for "Often alongside"). Today: related words, body map (content + body-first suggestions), Find the feeling content, the check-in's follow-up (discriminating) questions. The graph stays the source; the files are derived copies, never edited by hand.
 
 - `scripts/content-snapshot/build.mjs` turns a `graph-export.mjs --content-only` export into the files, mirroring the Cypher of the function each replaces. It refuses any other export: a single `User` / `UserData` / `LogRecord` / `ProfileItem` / `System` node stops it (the files are public once deployed).
 - `scripts/load-graph.mjs` refreshes them after every successful load against Aura (`scripts/content-snapshot/refresh.mjs`: export, then build); never from a local graph, and not with `--dry-run` / `--no-content-refresh`. By hand: `npm run content:refresh`. Commit `src/data/content/` with the content change.
-- The app reads them in `src/services/neo4j.ts` (`getRelatedEmotions`, `getFindTheFeelingContent`) and `src/services/bodyMap.ts`, each file its own lazily loaded chunk. Body-first scoring is the functions' own `scoreBodyMaps` (imported, not copied).
-- `tests/content-snapshot.test.mjs` pins the guard, that related words never include `OPPOSITE_OF` rows, and that the shipped body map / Find the feeling content equals the `content.py` fixtures (a failure there: content.py changed without a graph load).
+- The app reads them in `src/services/neo4j.ts` (`getRelatedEmotions`, `getFindTheFeelingContent`, `getDiscriminatingQuestions`) and `src/services/bodyMap.ts`, each file its own lazily loaded chunk; the check-in preloads related words and the follow-up questions when it opens (`preloadCheckInContent`). Body-first scoring is the functions' own `scoreBodyMaps` (imported, not copied).
+- `tests/content-snapshot.test.mjs` pins the guard, that related words never include `OPPOSITE_OF` rows, that the follow-up questions carry no clinical notes (rationale, citations, signals) and cover every answer the engine scores, and that the shipped body map / Find the feeling / question ids equal the schema fixtures (a failure there: content changed without a graph load).
 - Not for: user data, anything per person, the recommendation engine and crisis flag (one versioned decision on the server, with a live kill switch), or anything that must change without a hosting deploy.
 
 ---
@@ -204,7 +204,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 | `prototypes/goblin-lab/` | Reference prototypes for Stage it / Shape it / Tune it. Not part of the app build; hard-codes content production must read from the graph |
 | `src/data/tools.ts` | Tool display metadata (names, emojis, categories) |
 | `src/data/microSteps.ts` | Activation-pattern-keyed micro-interventions |
-| `src/services/neo4j.ts` | Cloud Function call wrappers (related words and Find the feeling content read `src/data/content/` instead) |
+| `src/services/neo4j.ts` | Cloud Function call wrappers (related words, Find the feeling content and the follow-up questions read `src/data/content/` instead) |
 | `scripts/content-snapshot/`, `src/data/content/` | Generated content files the app ships (see Generated content files): `build.mjs`, `refresh.mjs` (run by `load-graph.mjs`), `npm run content:refresh` |
 | `src/services/firebase.ts` | Firebase init, auth functions |
 | `src/contexts/AuthContext.tsx` | Firebase auth state provider |
