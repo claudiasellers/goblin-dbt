@@ -12,8 +12,8 @@ const MAX_NOTIFY_DELAY_MS = 24 * 3_600_000;
 const NOTIFICATION_TITLE = 'Quick check-in';
 
 /**
- * Today stack state (PR-S5), mounted once in DashboardLayout so the check-in screen and the desktop
- * side panel read the same items. Fetches per signed-in user, again on focus (5-min throttle) and
+ * Today stack state (PR-S5), mounted once in DashboardLayout so the desktop side panel and the
+ * header's Today button (below lg) read the same items. Fetches per signed-in user, again on focus (5-min throttle) and
  * after refresh(). Schedules one content-free in-tab reminder for `nextInTab`, only when permission
  * is already granted (never prompts; push is PR-S8). OA plans keep their own reminder.
  */
@@ -29,6 +29,8 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<{ uid: string; res: GetTodayResponse } | null>(null);
   const [dropped, setDropped] = useState<Set<string>>(new Set());
   const [reloadKey, setReloadKey] = useState(0);
+  const [hidden, setHidden] = useState(false);
+  const [oaHidden, setOaHidden] = useState<ReadonlySet<string>>(new Set());
   const lastFetch = useRef(0);
 
   useEffect(() => {
@@ -37,12 +39,14 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     lastFetch.current = Date.now();
     getToday(bandValue)
       .then((res) => { if (live) { setData({ uid, res }); setDropped(new Set()); } })
-      .catch(() => { if (live) setData({ uid, res: { items: [], more: [], holding: false, nextInTab: null } }); });
+      // A failed fetch (offline) keeps the items already shown; only a first fetch falls back to empty.
+      .catch(() => { if (live) setData((prev) => (prev && prev.uid === uid ? prev : { uid, res: { items: [], more: [], holding: false, nextInTab: null } })); });
     return () => { live = false; };
   }, [uid, reloadKey, bandValue]);
 
   const refresh = useCallback(() => setReloadKey((k) => k + 1), []);
   const drop = useCallback((id: string) => setDropped((prev) => new Set(prev).add(id)), []);
+  const hideOa = useCallback((ids: string[]) => setOaHidden((prev) => new Set([...prev, ...ids])), []);
 
   useEffect(() => {
     if (!uid) return;
@@ -85,7 +89,11 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     ready: !!current,
     refresh,
     drop,
-  }), [current, dropped, refresh, drop]);
+    hidden,
+    setHidden,
+    oaHidden,
+    hideOa,
+  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa]);
 
   return <TodayContext.Provider value={value}>{children}</TodayContext.Provider>;
 }

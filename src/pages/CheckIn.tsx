@@ -21,7 +21,7 @@ import {
 import { getEmotionById, getEmotionByName } from '../data/emotions';
 import { allWords, emptySpot, leadSpot, quadrantAt, squareColor, type SquarePoint, type Spot } from '../lib/feelingSquare';
 import { FindTheFeeling, type FindTheFeelingResult } from './tools/FindTheFeeling';
-import { TodayStack } from '../components/today/TodayStack';
+import { useHideToday } from '../hooks/useToday';
 import { HelpNowInterim } from '../components/checkin/HelpNowInterim';
 import { newId } from '../lib/spine/ids';
 import {
@@ -96,6 +96,10 @@ export function CheckIn() {
   // Where Help now goes back to (the square or the words).
   const [helpReturn, setHelpReturn] = useState<'emotion' | 'word'>('emotion');
   const point = spots[active]?.point ?? null;
+  // Today (follow-ups, "did it help?", OA plans) lives in the side panel / the header's Today button,
+  // not above the square. Here it shows only on the untouched square: from the first touch on (and in
+  // Help me now) it hides, so it is never beside a check-in, a result or the crisis banner (D-09).
+  useHideToday(!(step === 'emotion' && active === 0 && !point));
   const [saveError, setSaveError] = useState<string | null>(null);
   const [stateResult, setStateResult] = useState<StateResultType | null>(null);
   const [analyzeError, setAnalyzeError] = useState<string | null>(null);
@@ -672,10 +676,6 @@ export function CheckIn() {
         className={`feeling-tint${tintOn ? ' is-on' : ''}`}
         style={tintPoint ? ({ ['--tint' as string]: squareColor(tintPoint) }) : undefined}
       />
-
-      {/* Today (PR-S5): follow-ups, "did it help?", OA plans. Only before a new check-in starts,
-          so never beside a result or the crisis banner. */}
-      {step === 'emotion' && active === 0 && <TodayStack />}
 
       {/* Progress indicator - subtle, shows optionality */}
       {showProgress && (

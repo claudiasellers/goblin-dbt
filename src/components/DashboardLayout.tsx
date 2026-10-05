@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { OppositeActionFollowUpProvider } from '../contexts/OppositeActionFollowUpContext';
 import { TodayProvider } from '../contexts/TodayContext';
+import { TodayButton } from './today/TodayButton';
 
 /**
  * App shell: sidebar + header + scrolling main column.
@@ -44,6 +45,10 @@ export function DashboardLayout() {
           Bottom padding: mobile clears the tab bar + home indicator; md+ still clears the home indicator,
           because a landscape iPhone (844–932px) is md-wide with a nonzero bottom inset when installed. */}
       <div className={`flex-1 min-w-0 flex flex-col h-screen ${CONTENT_OFFSET_CLASS} pb-[calc(4rem_+_env(safe-area-inset-bottom))] md:pb-[env(safe-area-inset-bottom)] overflow-hidden`}>
+        {/* Today (PR-S5): one fetch shared by the header's Today button (below lg) and the side panel (lg+).
+            App-level Opposite Action follow-ups: one fetch + in-tab reminder for every page. */}
+        <TodayProvider>
+        <OppositeActionFollowUpProvider>
         {/* pt: the top safe-area inset (0 in a browser tab; the status bar / notch when installed) */}
         <header className="flex-shrink-0 z-30 bg-[var(--color-glass-panel)] backdrop-blur-xl border-b border-[var(--color-glass-border)] pt-[env(safe-area-inset-top)]">
           <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 flex items-center justify-between gap-4">
@@ -67,6 +72,7 @@ export function DashboardLayout() {
               </div>
             )}
             <div className="flex items-center gap-3">
+              {user && !focusedLayout && <TodayButton />}
               {!user && (
                 <Link
                   to="/login"
@@ -80,24 +86,19 @@ export function DashboardLayout() {
         </header>
 
         <main className="flex-1 min-h-0 overflow-y-auto">
-          {/* Today (PR-S5): one fetch shared by the check-in screen's stack and the desktop panel */}
-          <TodayProvider>
           <div className="max-w-7xl w-full mx-auto px-4 md:px-6 py-6 flex gap-6">
             <div className="flex-1 min-w-0">
-              {/* App-level Opposite Action follow-ups: one fetch + in-tab reminder for every page */}
-              <OppositeActionFollowUpProvider>
-                <Outlet />
-              </OppositeActionFollowUpProvider>
+              <Outlet />
             </div>
             {showSidePanel && (
-              <aside className="hidden lg:block w-[280px] flex-shrink-0" aria-label="Recent patterns">
-                <div className="sticky top-0">
+              <aside className="hidden lg:block w-[280px] flex-shrink-0" aria-label="Today and recent patterns">
+                {/* Scrolls on its own when Today's cards make it taller than the window (sticky would clip it). */}
+                <div className="sticky top-0 max-h-[calc(100dvh-11rem)] overflow-y-auto overscroll-contain -mx-1 px-1 pb-2">
                   <InsightsSidePanel />
                 </div>
               </aside>
             )}
           </div>
-          </TodayProvider>
         </main>
 
         {!isExercise && (
@@ -112,6 +113,8 @@ export function DashboardLayout() {
             </div>
           </footer>
         )}
+        </OppositeActionFollowUpProvider>
+        </TodayProvider>
       </div>
     </div>
   );

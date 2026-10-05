@@ -7,6 +7,8 @@ interface Props {
   pending: PendingFollowUp[];
   /** Flow copy from the graph (flow.copy); null falls back to neutral chrome. */
   copy: Record<string, string> | null;
+  /** "Hide for now": the owner (Today) hides these plans, so its count and every stack agree. */
+  onDismiss: () => void;
 }
 
 const FALLBACK_HEADLINE = 'You planned a step earlier.';
@@ -49,11 +51,10 @@ function DismissButton({ onClick }: { onClick: () => void }) {
  * Home-screen card for Opposite Action plans made for later.
  * Works with notifications off: the next time the app opens, the plan is here.
  */
-export function OppositeActionFollowUpCard({ pending, copy }: Props) {
-  const [dismissed, setDismissed] = useState(false);
+export function OppositeActionFollowUpCard({ pending, copy, onDismiss }: Props) {
   const [expanded, setExpanded] = useState(false);
 
-  if (dismissed || pending.length === 0) return null;
+  if (pending.length === 0) return null;
 
   const [top, ...rest] = pending;
   const { session, state } = top;
@@ -95,7 +96,7 @@ export function OppositeActionFollowUpCard({ pending, copy }: Props) {
     return (
       <section
         aria-label="Planned step"
-        className="mb-6 px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
+        className="px-4 py-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -107,7 +108,7 @@ export function OppositeActionFollowUpCard({ pending, copy }: Props) {
               <p className="text-sm text-[var(--color-text-primary)] mt-1">{session.action}</p>
             )}
           </div>
-          <DismissButton onClick={() => setDismissed(true)} />
+          <DismissButton onClick={onDismiss} />
         </div>
         <Link
           to={followUpPath(session.id)}
@@ -123,11 +124,11 @@ export function OppositeActionFollowUpCard({ pending, copy }: Props) {
   return (
     <section
       aria-label="Check in on a planned step"
-      className="mb-6 p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
+      className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)]"
     >
       <div className="flex items-start justify-between gap-3">
         <p className="font-medium text-[var(--color-text-primary)]">{headline}</p>
-        <DismissButton onClick={() => setDismissed(true)} />
+        <DismissButton onClick={onDismiss} />
       </div>
       {session.action && (
         <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{session.action}</p>

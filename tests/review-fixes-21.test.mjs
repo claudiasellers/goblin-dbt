@@ -29,8 +29,11 @@ test("'come back later' chips schedule once per tap, and the outcome card stays 
   const h = readFileSync("src/components/capacity/BreakdownHandoff.tsx", "utf8");
   assert.match(h, /disabled=\{scheduling\}[\s\S]*if \(scheduling\) return;[\s\S]*setScheduling\(true\);/);
   assert.match(h, /\.catch\(\(\) => \{ setScheduling\(false\);/);
-  const c = readFileSync("src/components/insights/ContinuityCard.tsx", "utf8");
-  assert.match(c, /catch \{\s*setState\('asking'\);[^\n]*\n\s*return;\s*\}\s*setState\('done'\);/);
+  // The outcome card is TodayCard now (ContinuityCard is gone, Oct 2026). Only a saved answer removes
+  // it: a failed write keeps it answerable (Codex, #45), and a failed refetch never empties Today.
+  const c = readFileSync("src/components/today/TodayCard.tsx", "utf8");
+  assert.match(c, /try \{\s*await fn\(\);\s*\} catch \{\s*setBusy\(false\);\s*setFailed\(true\);\s*return;\s*\}\s*onDone\(item\.id\);/);
+  assert.match(readFileSync("src/contexts/TodayContext.tsx", "utf8"), /\.catch\(\(\) => \{ if \(live\) setData\(\(prev\) => \(prev && prev\.uid === uid \? prev :/);
 });
 
 test("DEAR MAN pass-through keeps a flooded hand-off from Recover and the resume note", () => {
