@@ -9,7 +9,7 @@ import { fillToolName, LATER_HOURS, outcomeAnswer } from '../../lib/spine/todayC
  * One Today card (PR-S5): a follow-up resolved in place (inline types), a deep link (resume), or the
  * "did it help?" for a tool session closed without an answer. One tap; nothing is a number.
  */
-export function TodayCard({ item, onDone }: { item: TodayItem; onDone: (id: string) => void }) {
+export function TodayCard({ item, onDone, compact = false }: { item: TodayItem; onDone: (id: string) => void; compact?: boolean }) {
   const [busy, setBusy] = useState(false);
   const toolName = item.source?.toolId ? getToolById(item.source.toolId)?.name : null;
   const title = fillToolName(item.copy.title, toolName);
@@ -40,7 +40,7 @@ export function TodayCard({ item, onDone }: { item: TodayItem; onDone: (id: stri
 
   return (
     <section aria-label={title} className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)]">
-      <p className="font-medium text-[var(--color-text-primary)]">{title}</p>
+      <p className={`font-medium text-[var(--color-text-primary)]${compact ? ' text-sm' : ''}`}>{title}</p>
       {body && <p className="mt-1 text-sm text-[var(--color-text-secondary)]">{body}</p>}
       {item.resolveMode === 'deeplink' && item.deepLink ? (
         <Link
@@ -57,7 +57,7 @@ export function TodayCard({ item, onDone }: { item: TodayItem; onDone: (id: stri
               type="button"
               disabled={busy}
               onClick={() => (c.snoozeHours ? void run(() => resolveFollowUp(item.id, c.id)) : choose(c.id))}
-              className="min-h-11 px-3 py-2 rounded-lg border border-[var(--color-border)] text-sm text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-primary)] disabled:opacity-50 transition-colors"
+              className={`min-h-11 ${compact ? 'px-2 py-1.5 text-xs leading-snug' : 'px-3 py-2 text-sm'} rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-primary)] disabled:opacity-50 transition-colors`}
             >
               {c.label}
             </button>

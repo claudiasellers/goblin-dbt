@@ -3,15 +3,11 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { getInsightsData } from '../../services/neo4j';
 import type { PatternFrequency } from '../../services/neo4j';
-import { useToday, useToolOutcomeItem } from '../../hooks/useToday';
-import { ContinuityCard } from './ContinuityCard';
+import { TodayPanel } from '../today/TodayPanel';
 import { RecentPatterns } from './RecentPatterns';
 
 export function InsightsSidePanel() {
   const { user } = useAuth();
-  // "Did it help?" comes from Today (PR-S5): the same item and callable as the phone's stack.
-  const outcomeItem = useToolOutcomeItem();
-  const today = useToday();
   const [patternFrequencies, setPatternFrequencies] = useState<PatternFrequency[]>([]);
   const [totalCheckIns, setTotalCheckIns] = useState(0);
 
@@ -27,7 +23,9 @@ export function InsightsSidePanel() {
 
   return (
     <div className="space-y-4">
-      {outcomeItem && <ContinuityCard key={outcomeItem.id} item={outcomeItem} onAnswered={() => { window.setTimeout(today.refresh, 1500); }} />}
+      {/* Today (follow-ups, "did it help?", OA plans, pattern offers): moved here off the check-in
+          screen, and it replaces the old ContinuityCard, which showed the same "did it help?" twice. */}
+      <TodayPanel />
       <RecentPatterns patterns={patternFrequencies} totalCheckIns={totalCheckIns} />
       <Link
         to="/"

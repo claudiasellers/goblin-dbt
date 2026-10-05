@@ -83,13 +83,25 @@ test("Today card: a tool_outcome choice is a then-vs-now or an urge answer; {too
   assert.equal(card.fillToolName("{toolName}, earlier", "Cool Down"), "Cool Down, earlier");
 });
 
-test("the stack renders on the check-in screen before a check-in starts; the desktop card reads the same item", () => {
+test("Today lives off the check-in screen: side panel (lg+) and the header's Today button, hidden mid check-in", () => {
   const checkIn = readFileSync("src/pages/CheckIn.tsx", "utf8");
-  // Hidden while a second or third spot is placed on the feeling square (the check-in has started).
-  assert.match(checkIn, /\{step === 'emotion' && active === 0 && <TodayStack \/>\}/);
-  assert.match(readFileSync("src/components/DashboardLayout.tsx", "utf8"), /<TodayProvider>/);
-  const cc = readFileSync("src/components/insights/ContinuityCard.tsx", "utf8");
-  assert.match(cc, /answerToolOutcome\(sessionId/);
-  assert.doesNotMatch(cc, /recordToolOutcome/, "F6: never 'the latest unrated' again");
+  // Not above the square any more (it pushed the square down, Oct 2026).
+  assert.doesNotMatch(checkIn, /<TodayStack/);
+  // Hidden from the first touch on, so never beside a check-in, a result or the crisis banner (D-09).
+  assert.match(checkIn, /useHideToday\(!\(step === 'emotion' && active === 0 && !point\)\);/);
+  const layout = readFileSync("src/components/DashboardLayout.tsx", "utf8");
+  assert.match(layout, /<TodayProvider>/);
+  // One provider pair around the header and the main column, so the header button and the panel share it.
+  assert.ok(layout.indexOf("<TodayProvider>") < layout.indexOf("<header"), "TodayProvider wraps the header");
+  assert.ok(layout.indexOf("<OppositeActionFollowUpProvider>") < layout.indexOf("<header"), "OA provider wraps the header");
+  assert.match(layout, /\{user && !focusedLayout && <TodayButton \/>\}/);
+  assert.match(readFileSync("src/components/insights/InsightsSidePanel.tsx", "utf8"), /<TodayPanel \/>/);
+  for (const f of ["src/components/today/TodayPanel.tsx", "src/components/today/TodayButton.tsx"]) {
+    assert.match(readFileSync(f, "utf8"), /today\.hidden/, `${f} respects useHideToday`);
+  }
+  // "Did it help?" is answered for exactly the session it shows (F6), through the one card.
+  const tc = readFileSync("src/components/today/TodayCard.tsx", "utf8");
+  assert.match(tc, /answerToolOutcome\(item\.source!\.toolSessionId!, answer\)/);
+  assert.doesNotMatch(tc, /recordToolOutcome/, "F6: never 'the latest unrated' again");
   assert.match(readFileSync("src/pages/tools/ProblemSolve.tsx", "utf8"), /<SessionClose planType="ps_step" \/>/);
 });

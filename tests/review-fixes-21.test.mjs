@@ -29,8 +29,12 @@ test("'come back later' chips schedule once per tap, and the outcome card stays 
   const h = readFileSync("src/components/capacity/BreakdownHandoff.tsx", "utf8");
   assert.match(h, /disabled=\{scheduling\}[\s\S]*if \(scheduling\) return;[\s\S]*setScheduling\(true\);/);
   assert.match(h, /\.catch\(\(\) => \{ setScheduling\(false\);/);
-  const c = readFileSync("src/components/insights/ContinuityCard.tsx", "utf8");
-  assert.match(c, /catch \{\s*setState\('asking'\);[^\n]*\n\s*return;\s*\}\s*setState\('done'\);/);
+  // The outcome card is TodayCard now (ContinuityCard is gone, Oct 2026): a failed save drops it
+  // locally, and the immediate refetch brings it back unanswered.
+  const c = readFileSync("src/components/today/TodayCard.tsx", "utf8");
+  assert.match(c, /try \{ await fn\(\); \} catch \{[^}]*\}\s*onDone\(item\.id\);/);
+  assert.match(readFileSync("src/components/today/TodayStack.tsx", "utf8"), /const done = \(id: string\) => \{ today\.drop\(id\); today\.refresh\(\); \};/);
+  assert.match(readFileSync("src/contexts/TodayContext.tsx", "utf8"), /setData\(\{ uid, res \}\); setDropped\(new Set\(\)\);/);
 });
 
 test("DEAR MAN pass-through keeps a flooded hand-off from Recover and the resume note", () => {
