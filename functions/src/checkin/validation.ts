@@ -39,6 +39,8 @@ export interface SensationInput {
   sensationIds: string[];
   /** Body map step 3: how strong, 0–1, from the optional strength bar; null when it wasn't used. */
   strength: number | null;
+  /** Body map step 4: the user kept a typical place from the body mirror (only `true` counts). */
+  fromMirror: boolean;
 }
 
 const SIDES = ['both', 'left', 'right'] as const;
@@ -149,6 +151,7 @@ function sensation(raw: unknown): SensationInput | null {
       : [],
     strength: typeof raw.strength === 'number' && Number.isFinite(raw.strength) && raw.strength >= 0 && raw.strength <= 1
       ? Math.round(raw.strength * 1000) / 1000 : null,
+    fromMirror: raw.fromMirror === true,
   };
 }
 

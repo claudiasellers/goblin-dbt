@@ -53,6 +53,8 @@ export interface BodySensationRecord {
   sensationIds?: string[];
   /** How strong, 0–1, from the body step's optional strength bar; null / absent when not used. */
   strength?: number | null;
+  /** The place came from the body mirror (a typical place the user tapped to keep). */
+  fromMirror?: boolean;
 }
 
 /** Bounded timeout for content loads so a stalled request becomes a recoverable error. */

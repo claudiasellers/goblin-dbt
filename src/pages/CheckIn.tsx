@@ -772,6 +772,7 @@ export function CheckIn() {
             onSkip={handleSkipBody}
             onComplete={handleBodyComplete}
             isSomaticEntry={entryPoint === 'somatic'}
+            emotionIds={entryPoint === 'somatic' ? [] : emotionIdsFor(checkInData.emotions, knownEmotionIds)}
           />
         )}
 

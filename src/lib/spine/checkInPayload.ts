@@ -23,7 +23,7 @@ export interface SaveCheckInRequest {
   intensity: { x: number; y: number };
   bodySensations: Array<{
     x: number; y: number; region: string; side?: 'both' | 'left' | 'right'; intensity: { x: number; y: number };
-    tags: string[]; sensationIds?: string[]; strength?: number | null;
+    tags: string[]; sensationIds?: string[]; strength?: number | null; fromMirror?: boolean;
   }>;
   note: string;
   timestamp: string;
