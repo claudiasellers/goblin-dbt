@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useReducedMotion } from 'motion/react';
 import { useToolSession } from '../../hooks/useToolSession';
 import type { ThenVsNow } from '../../data/capacityTypes';
@@ -98,8 +98,40 @@ function useCues() {
   };
 }
 
+/**
+ * Keep the screen on while the timer runs. A locked phone pauses the page, so the end chime
+ * and buzz would only fire once it wakes, and the user is holding ice until they hear it
+ * (iOS auto-lock can be 30 s, shorter than lead-in + dose). Re-acquired if the page comes
+ * back into view mid-run (the browser drops the lock when it's hidden). Unsupported: no-op.
+ */
+function useKeepAwake(active: boolean) {
+  useEffect(() => {
+    if (!active || !('wakeLock' in navigator)) return;
+    let lock: WakeLockSentinel | null = null;
+    let cancelled = false;
+    const acquire = async () => {
+      if (document.visibilityState !== 'visible' || (lock && !lock.released)) return;
+      try {
+        const next = await navigator.wakeLock.request('screen');
+        if (cancelled) void next.release().catch(() => {});
+        else lock = next;
+      } catch { /* denied (battery saver, not visible): the dose still runs on timestamps */ }
+    };
+    void acquire();
+    const onVisible = () => { void acquire(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', onVisible);
+      void lock?.release().catch(() => {});
+    };
+  }, [active]);
+}
+
 export function CoolDown() {
   const session = useToolSession();
+  const location = useLocation();
+  const navigate = useNavigate();
   const reduce = useReducedMotion();
   const cues = useCues();
 
@@ -117,8 +149,10 @@ export function CoolDown() {
 
   const go = (s: Step) => { stepRef.current = s; setStep(s); };
 
-  // One clock for the lead-in and the dose. Timestamp-based, so a locked screen or a
-  // throttled background tab doesn't stretch the 30 seconds.
+  useKeepAwake(step === 'lead' || step === 'running');
+
+  // One clock for the lead-in and the dose. Timestamp-based, so a throttled background tab
+  // doesn't stretch the count; the end cue itself needs the page awake (useKeepAwake).
   useEffect(() => {
     if (step !== 'lead' && step !== 'running') return;
     const id = window.setInterval(() => {
@@ -182,9 +216,11 @@ export function CoolDown() {
       if (!closed.current) { closed.current = true; void session.close({ status: 'completed', thenVsNow: c.thenVsNow }); }
       return;
     }
-    // Still loud / about the same: arm another round, keep the answer showing.
-    progress.current = 0;
-    go('ready');
+    // Still loud / about the same: save this round's answer now (a session left open would close
+    // with no outcome, and Reflect / pattern offers skip those), then start the next round as a
+    // fresh session. Same address and link state; a new location key remounts ToolSessionProvider.
+    if (!closed.current) { closed.current = true; void session.close({ status: 'completed', thenVsNow: c.thenVsNow }); }
+    navigate({ pathname: location.pathname, search: location.search }, { replace: true, state: location.state });
   };
 
   const on = step === 'lead' || step === 'running' || step === 'done';
