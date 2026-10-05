@@ -1,6 +1,6 @@
 # Body map: plan
 
-Status: **steps 1–3 built; content rebuilt on `FELT_AS` (body-map-v2)** (content and function; heat figure, both sides, graph words, body-first suggestions; the one-screen body step: drag, optional strength bar, words in one row). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to AA
+Status: **steps 1–5 built; content rebuilt on `FELT_AS` (body-map-v2)** (content and function; heat figure, both sides, graph words, body-first suggestions; the one-screen body step: drag, optional strength bar, words in one row; the body mirror with one tab per feeling and Together). Nothing is served until the content is signed off. Oct 2026. Design source: the "Goblin UI directions" canvas, rows T to AA
 (sensation pad W, body mirror X, heat figure Y, several feelings Z, one screen with a strength bar AA). Product record: Product
 Changelog, "Body step redesign: the sensation pad".
 
@@ -214,8 +214,32 @@ step reads it.
      routes on. A Together tab stripes the places two maps share.
    - Marks stay put across tabs and never take a tab's colour. Z4's summary is the marks row.
 
-Not built (yet): a `dev/body-map.html` harness like `dev/find-the-feeling.html`. Locally the step
-can be seen with the content stubbed from the fixture.
+`dev/body-map.html` is the step on its own with the shipped content and no Firebase
+(`?words=anxious,excited&palette=dusk&theme=dark`; build with `dev/vite.harness.config.ts`).
+
+### Steps 4–5 as built (Oct 2026)
+
+- `src/lib/bodyMirror.ts` (pure): `mirrorTabs` turns the check-in's maps (already in check-in order,
+  `getBodyMapContent(emotionIds)`) into at most three tabs, each in its first word's square quarter
+  colour, with its typical places: the strongest sensation per place, at most five (`ghostsFor`).
+  `sharedPlaces` is the Together tab. `prefillFrom` is what a tapped place fills in.
+- `components/checkin/body/BodyMirror.tsx`: `MirrorTabs` above the body (only with two or more maps;
+  Together only when two maps share a place) and `MirrorPanel` under it: one line, "Sound familiar?
+  Tap any that fit" chips (dashed until yours), "+ Add all of these", DEAR MAN's disclaimer, a close.
+- `HeatFigure` draws `ghosts`: hatched, dashed, on top of the glows; two colours stripe a shared
+  place. Places you've marked aren't drawn (solid wins); the whole body stays a chip (its shape would
+  hatch over everything).
+- Tapping a ghost on the figure or its chip opens the place card pre-filled: its word picked, both
+  sides, the bar at the map's weight when the bar is on. "Filled in from how *anxious* often feels.
+  Change anything that isn't true for you." The button reads "Keep this place". Kept places save
+  `fromMirror: true` (validation accepts only `true`; older records read back `false`).
+- The one line under the body is app copy built from the graph's map label and the user's words ("*Anxious*
+  and *overwhelmed* are in the same family (fear and worry), so they often show up in the same
+  places."), not new graph copy. A per-map `description` in `content.py` can replace it later,
+  signed off like the rest.
+- Not built from the canvas: the small place labels around the figure in Y2/Z1 (the chips carry
+  the words), and Y1's "It's all over" / "Nothing I notice" (Whole body is in More places; Skip stays).
+- The body-first path ("Start with my body") has no words, so no mirror.
 
 ### Step 2 as built
 

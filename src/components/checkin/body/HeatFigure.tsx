@@ -13,6 +13,14 @@ export interface FigureMark {
   strength?: number | null;
 }
 
+/** A typical place from the body mirror: hatched and dashed, never a mark. Two colours stripe it
+ *  (a place two feelings share, the Together tab). */
+export interface FigureGhost {
+  region: RegionId;
+  /** CSS colours: one per map that draws this place. */
+  colours: string[];
+}
+
 /** What is under the finger during a drag (null when off the body). */
 export interface FigureHover {
   region: RegionId | null;
@@ -20,6 +28,8 @@ export interface FigureHover {
 
 interface HeatFigureProps {
   marks: FigureMark[];
+  /** The body mirror's typical places (step 4), drawn over the glows; omit for none. */
+  ghosts?: FigureGhost[];
   /** The place being edited (aria-pressed on its button; nothing is drawn round it). */
   selected?: RegionId | null;
   /** Choosing a place: lifting a finger (or the mouse) on it, or Enter / Space on a focused place.
@@ -31,6 +41,10 @@ interface HeatFigureProps {
   fingerColour?: string;
   className?: string;
 }
+
+/** A ghost's line colour: the square colour pulled a little toward the text colour, so pale (pastel,
+ *  light-room) quarters still read as lines on the figure. */
+const ink = (c: string) => `color-mix(in oklab, ${c} 72%, var(--color-text-primary))`;
 
 /** Places behind the front view (and the whole body) glow fainter so front marks stay readable. */
 const FAINT = new Set<RegionId>(['body', 'upper_back', 'lower_back', 'neck']);
@@ -44,13 +58,14 @@ function Shape({ s, ...rest }: { s: HitShape } & React.SVGProps<SVGElement>) {
 
 /**
  * The heat figure (canvas row Y): a soft silhouette; each mark glows inside it, clipped to the body,
- * in its words' square colour and as big and bright as its strength. Facing you: the person's left is on the figure's right.
+ * in its words' square colour and as big and bright as its strength. The body mirror's typical places
+ * (`ghosts`) sit on top, hatched and dashed, so they never read as yours. Facing you: the person's left is on the figure's right.
  *
  * Drag (step 3): press anywhere on the figure and move; a glow follows the finger, the place under
  * it is reported through `onHover` (the step names it above the figure), and lifting chooses it (a plain tap still works).
  * Lifting off the body chooses nothing. Keyboard: each place is a button (Enter / Space).
  */
-export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColour, className = '' }: HeatFigureProps) {
+export function HeatFigure({ marks, ghosts = [], selected = null, onPick, onHover, fingerColour, className = '' }: HeatFigureProps) {
   const uid = useId().replace(/:/g, '');
   const clip = `fig-${uid}`;
   const blur = `blur-${uid}`;
@@ -149,6 +164,14 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
         <filter id={blur} x="-100%" y="-100%" width="300%" height="300%">
           <feGaussianBlur stdDeviation="9" />
         </filter>
+        {ghosts.map((g, i) => (
+          <pattern key={`p-${g.region}`} id={`${uid}-h${i}`} width={g.colours.length > 1 ? 8 : 6} height={g.colours.length > 1 ? 8 : 6}
+            patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            {g.colours.length > 1
+              ? g.colours.slice(0, 2).map((c, k) => <rect key={k} x={k * 4} width={4} height={8} style={{ fill: ink(c) }} opacity={0.55} />)
+              : <line x1={0} y1={0} x2={0} y2={6} style={{ stroke: ink(g.colours[0]) }} strokeWidth={1.6} opacity={0.8} />}
+          </pattern>
+        ))}
       </defs>
       <g className="heat-figure__body">{silhouette}</g>
       <g clipPath={`url(#${clip})`}>
@@ -166,6 +189,12 @@ export function HeatFigure({ marks, selected = null, onPick, onHover, fingerColo
               style={{ fill: fingerColour }} opacity={finger.region ? 0.95 : 0.5} />
           )}
         </g>
+        {ghosts.flatMap((g, i) => glowFor(g.region).map((e, k) => (
+          <ellipse key={`ghost-${g.region}-${k}`} className="heat-figure__ghost" cx={e.cx} cy={e.cy}
+            rx={Math.max(9, e.rx * 0.8)} ry={Math.max(9, e.ry * 0.8)} fill={`url(#${uid}-h${i})`}
+            style={{ stroke: g.colours.length > 1 ? 'var(--color-text-primary)' : ink(g.colours[0]) }}
+            strokeWidth={1.2} strokeDasharray="3 3" opacity={FAINT.has(g.region) ? 0.5 : 0.9} />
+        )))}
       </g>
       {interactive && REGION_IDS.flatMap((id) => REGIONS[id].hits.map((s, i) => (
         <Shape key={`${id}-${i}`} s={s}
