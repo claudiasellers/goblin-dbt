@@ -1,6 +1,8 @@
 # Parts
 
 Status: proposal, 6 Oct 2026. Not agreed, not built. Nothing here is signed off.
+Dev harness: `npm run dev`, then `http://localhost:5173/dev/parts.html` (Meet a part, the den, the part
+card, a trail offer; draft copy in `dev/parts-fixture.ts`; `?view=`, `?move=`, `?palette=`).
 Umbrella: [alexithymia-first-interaction.md](alexithymia-first-interaction.md). Its *angry part* section is
 the one IFS decision already agreed, and this proposal grows out of it.
 Related: [recover-from-invalidation.md](recover-from-invalidation.md) (v2 *Stage it*), [den-rooms.md](den-rooms.md),
