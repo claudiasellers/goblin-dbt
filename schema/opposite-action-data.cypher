@@ -127,113 +127,113 @@ SET c.fitsFactsGuidance = "If the love is for someone available, mutual, and hea
 MATCH (c:EmotionRegulationContent {dbtParent: 'fear'})
 WITH c
 UNWIND [
-  {id: "fear-avoid", label: "Avoid it entirely", small: "Stay in the room 2 more minutes", medium: "Approach the thing for 10 minutes, then reassess", bigger: "Do the thing you've been avoiding, start to finish"},
-  {id: "fear-escape", label: "Run away or escape", small: "Plant your feet and take 3 slow breaths", medium: "Stay until the fear drops one notch", bigger: "Stay until the fear passes on its own"},
-  {id: "fear-cancel", label: "Cancel plans", small: "Don't cancel yet — wait 30 minutes and decide then", medium: "Go but give yourself permission to leave early", bigger: "Go and stay the whole time"},
-  {id: "fear-freeze", label: "Freeze and do nothing", small: "Move one part of your body — stand up, stretch", medium: "Take one small action related to what you're avoiding", bigger: "Start the task fully, even imperfectly"}
+  {id: "fear-avoid", label: "Avoid it entirely", small: "Stay in the room 2 more minutes", medium: "Approach the thing for 10 minutes, then reassess", bigger: "Do the thing you've been avoiding, start to finish", order: 1},
+  {id: "fear-escape", label: "Run away or escape", small: "Plant your feet and take 3 slow breaths", medium: "Stay until the fear drops one notch", bigger: "Stay until the fear passes on its own", order: 2},
+  {id: "fear-cancel", label: "Cancel plans", small: "Don't cancel yet — wait 30 minutes and decide then", medium: "Go but give yourself permission to leave early", bigger: "Go and stay the whole time", order: 3},
+  {id: "fear-freeze", label: "Freeze and do nothing", small: "Move one part of your body — stand up, stretch", medium: "Take one small action related to what you're avoiding", bigger: "Start the task fully, even imperfectly", order: 4}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- ANGER urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'anger'})
 WITH c
 UNWIND [
-  {id: "anger-lash", label: "Lash out or say something cutting", small: "Pause and count to 10 before responding", medium: "Write down what you want to say, then set it aside for an hour", bigger: "Say something kind to the person instead"},
-  {id: "anger-stonewall", label: "Shut someone out", small: "Don't block or unfriend — just pause", medium: "Send a brief, neutral message acknowledging them", bigger: "Have an honest, gentle conversation about what happened"},
-  {id: "anger-destroy", label: "Break or throw something", small: "Squeeze ice in your hands for 30 seconds", medium: "Do 30 jumping jacks or a brisk walk around the block", bigger: "Channel the energy into cleaning, building, or creating something"},
-  {id: "anger-criticize", label: "Criticize or blame someone", small: "Pause and name one thing they might be going through", medium: "Ask a genuine question about their perspective", bigger: "Offer an honest compliment or acknowledgment"}
+  {id: "anger-lash", label: "Lash out or say something cutting", small: "Pause and count to 10 before responding", medium: "Write down what you want to say, then set it aside for an hour", bigger: "Say something kind to the person instead", order: 1},
+  {id: "anger-stonewall", label: "Shut someone out", small: "Don't block or unfriend — just pause", medium: "Send a brief, neutral message acknowledging them", bigger: "Have an honest, gentle conversation about what happened", order: 2},
+  {id: "anger-destroy", label: "Break or throw something", small: "Squeeze ice in your hands for 30 seconds", medium: "Do 30 jumping jacks or a brisk walk around the block", bigger: "Channel the energy into cleaning, building, or creating something", order: 3},
+  {id: "anger-criticize", label: "Criticize or blame someone", small: "Pause and name one thing they might be going through", medium: "Ask a genuine question about their perspective", bigger: "Offer an honest compliment or acknowledgment", order: 4}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- SADNESS urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'sadness'})
 WITH c
 UNWIND [
-  {id: "sad-bed", label: "Stay in bed and do nothing", small: "Sit up and open the blinds", medium: "Take a shower and get dressed", bigger: "Go for a 10-minute walk outside"},
-  {id: "sad-isolate", label: "Cancel plans and isolate", small: "Text one person back", medium: "Keep one plan today", bigger: "Call someone and talk for 5 minutes"},
-  {id: "sad-give-up", label: "Give up on something that matters", small: "Do the tiniest next step — open the file, write one sentence", medium: "Work on it for 10 minutes, then stop if you need to", bigger: "Complete one meaningful piece of it"},
-  {id: "sad-scroll", label: "Scroll mindlessly or zone out", small: "Put the phone in another room for 15 minutes", medium: "Do one small task you've been putting off", bigger: "Spend 30 minutes doing something that requires your full attention"}
+  {id: "sad-bed", label: "Stay in bed and do nothing", small: "Sit up and open the blinds", medium: "Take a shower and get dressed", bigger: "Go for a 10-minute walk outside", order: 1},
+  {id: "sad-isolate", label: "Cancel plans and isolate", small: "Text one person back", medium: "Keep one plan today", bigger: "Call someone and talk for 5 minutes", order: 2},
+  {id: "sad-give-up", label: "Give up on something that matters", small: "Do the tiniest next step — open the file, write one sentence", medium: "Work on it for 10 minutes, then stop if you need to", bigger: "Complete one meaningful piece of it", order: 3},
+  {id: "sad-scroll", label: "Scroll mindlessly or zone out", small: "Put the phone in another room for 15 minutes", medium: "Do one small task you've been putting off", bigger: "Spend 30 minutes doing something that requires your full attention", order: 4}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- DISGUST urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'disgust'})
 WITH c
 UNWIND [
-  {id: "disgust-push", label: "Push this person or thing away", small: "Stay present for 2 more minutes", medium: "Find one small thing to appreciate about the situation", bigger: "Engage fully without the disgust filter"},
-  {id: "disgust-leave", label: "Leave the situation", small: "Stay, but shift your attention to something neutral", medium: "Stay and participate, even minimally", bigger: "Stay and engage as if the disgust isn't there"},
-  {id: "disgust-judge", label: "Judge or condemn", small: "Notice the judgment and label it as a judgment, not a fact", medium: "Consider one reason this makes sense from their perspective", bigger: "Actively practice empathy — imagine their full experience"}
+  {id: "disgust-push", label: "Push this person or thing away", small: "Stay present for 2 more minutes", medium: "Find one small thing to appreciate about the situation", bigger: "Engage fully without the disgust filter", order: 1},
+  {id: "disgust-leave", label: "Leave the situation", small: "Stay, but shift your attention to something neutral", medium: "Stay and participate, even minimally", bigger: "Stay and engage as if the disgust isn't there", order: 2},
+  {id: "disgust-judge", label: "Judge or condemn", small: "Notice the judgment and label it as a judgment, not a fact", medium: "Consider one reason this makes sense from their perspective", bigger: "Actively practice empathy — imagine their full experience", order: 3}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- SHAME urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'shame'})
 WITH c
 UNWIND [
-  {id: "shame-hide", label: "Hide or disappear", small: "Stay where you are instead of leaving", medium: "Make eye contact with one person", bigger: "Stand tall, shoulders back, and take up space"},
-  {id: "shame-secret", label: "Keep it secret", small: "Write it down, even just for yourself", medium: "Tell one trusted person a small piece of it", bigger: "Share openly with someone you trust, looking them in the eye"},
-  {id: "shame-shrink", label: "Make yourself small", small: "Uncross your arms and take up your normal space", medium: "Speak at your normal volume — don't mumble or trail off", bigger: "Share your opinion or ask for what you need out loud"},
-  {id: "shame-avoid-people", label: "Avoid people who might notice", small: "Don't cancel your next social plan", medium: "Go where people are, even briefly", bigger: "Initiate contact with someone — text, call, or show up"}
+  {id: "shame-hide", label: "Hide or disappear", small: "Stay where you are instead of leaving", medium: "Make eye contact with one person", bigger: "Stand tall, shoulders back, and take up space", order: 1},
+  {id: "shame-secret", label: "Keep it secret", small: "Write it down, even just for yourself", medium: "Tell one trusted person a small piece of it", bigger: "Share openly with someone you trust, looking them in the eye", order: 2},
+  {id: "shame-shrink", label: "Make yourself small", small: "Uncross your arms and take up your normal space", medium: "Speak at your normal volume — don't mumble or trail off", bigger: "Share your opinion or ask for what you need out loud", order: 3},
+  {id: "shame-avoid-people", label: "Avoid people who might notice", small: "Don't cancel your next social plan", medium: "Go where people are, even briefly", bigger: "Initiate contact with someone — text, call, or show up", order: 4}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- GUILT urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'guilt'})
 WITH c
 UNWIND [
-  {id: "guilt-apologize", label: "Apologize again (or excessively)", small: "Notice the urge to apologize and don't act on it", medium: "If you've already apologized once, let that be enough", bigger: "Act freely, without hedging or seeking reassurance"},
-  {id: "guilt-punish", label: "Punish yourself", small: "Notice the self-punishment urge and name it out loud", medium: "Do something neutral — a walk, a glass of water", bigger: "Do something kind for yourself — the direct opposite of punishment"},
-  {id: "guilt-avoid", label: "Avoid the person you think you wronged", small: "Don't change your route or routine to avoid them", medium: "Make brief, normal contact — a wave, a hello", bigger: "Engage with them normally, without excessive guilt or apology"}
+  {id: "guilt-apologize", label: "Apologize again (or excessively)", small: "Notice the urge to apologize and don't act on it", medium: "If you've already apologized once, let that be enough", bigger: "Act freely, without hedging or seeking reassurance", order: 1},
+  {id: "guilt-punish", label: "Punish yourself", small: "Notice the self-punishment urge and name it out loud", medium: "Do something neutral — a walk, a glass of water", bigger: "Do something kind for yourself — the direct opposite of punishment", order: 2},
+  {id: "guilt-avoid", label: "Avoid the person you think you wronged", small: "Don't change your route or routine to avoid them", medium: "Make brief, normal contact — a wave, a hello", bigger: "Engage with them normally, without excessive guilt or apology", order: 3}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- JEALOUSY urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'jealousy'})
 WITH c
 UNWIND [
-  {id: "jealousy-check", label: "Check their phone, social media, or whereabouts", small: "Put your phone down for 10 minutes", medium: "Delete the checking app from your home screen for today", bigger: "Go a full day without checking"},
-  {id: "jealousy-interrogate", label: "Interrogate or ask repeatedly", small: "Ask once, then accept the answer", medium: "Notice the urge to ask again and do something else instead", bigger: "Say 'have fun' and genuinely mean it"},
-  {id: "jealousy-cling", label: "Cling or demand more attention", small: "Give them 30 minutes of uninterrupted space", medium: "Make plans with someone else", bigger: "Encourage them to spend time with others and enjoy yourself meanwhile"}
+  {id: "jealousy-check", label: "Check their phone, social media, or whereabouts", small: "Put your phone down for 10 minutes", medium: "Delete the checking app from your home screen for today", bigger: "Go a full day without checking", order: 1},
+  {id: "jealousy-interrogate", label: "Interrogate or ask repeatedly", small: "Ask once, then accept the answer", medium: "Notice the urge to ask again and do something else instead", bigger: "Say 'have fun' and genuinely mean it", order: 2},
+  {id: "jealousy-cling", label: "Cling or demand more attention", small: "Give them 30 minutes of uninterrupted space", medium: "Make plans with someone else", bigger: "Encourage them to spend time with others and enjoy yourself meanwhile", order: 3}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- ENVY urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'envy'})
 WITH c
 UNWIND [
-  {id: "envy-tear-down", label: "Tear them down (in your head or out loud)", small: "Catch the thought and label it as envy, not truth", medium: "Say one genuinely kind thing about them", bigger: "Celebrate their success as if it were your own"},
-  {id: "envy-compare", label: "Compare and despair", small: "Notice the comparison and redirect your attention", medium: "List 3 things you have that you're genuinely grateful for", bigger: "Use the envy as information — what does it tell you about what YOU want? Take one step toward that"},
-  {id: "envy-give-up", label: "Give up on your own goals", small: "Name one small thing you've accomplished recently", medium: "Take one tiny step toward something you want", bigger: "Make a plan for getting what envy is pointing you toward"}
+  {id: "envy-tear-down", label: "Tear them down (in your head or out loud)", small: "Catch the thought and label it as envy, not truth", medium: "Say one genuinely kind thing about them", bigger: "Celebrate their success as if it were your own", order: 1},
+  {id: "envy-compare", label: "Compare and despair", small: "Notice the comparison and redirect your attention", medium: "List 3 things you have that you're genuinely grateful for", bigger: "Use the envy as information — what does it tell you about what YOU want? Take one step toward that", order: 2},
+  {id: "envy-give-up", label: "Give up on your own goals", small: "Name one small thing you've accomplished recently", medium: "Take one tiny step toward something you want", bigger: "Make a plan for getting what envy is pointing you toward", order: 3}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 // --- LOVE urges ---
 MATCH (c:EmotionRegulationContent {dbtParent: 'love'})
 WITH c
 UNWIND [
-  {id: "love-reach-out", label: "Text, call, or reach out to them", small: "Write the message but don't send it — wait 1 hour", medium: "Put your phone in another room for an hour", bigger: "Delete the draft, close the app, do something that demands your full attention"},
-  {id: "love-stalk", label: "Check their social media", small: "Notice the urge and set a 10-minute timer before deciding", medium: "Mute or unfollow them", bigger: "Block or remove them from your feed entirely"},
-  {id: "love-proximity", label: "Go places they might be", small: "Choose a different route or venue today", medium: "Make plans that have nothing to do with them", bigger: "Fill the time you'd spend thinking about them with something that builds your life"},
-  {id: "love-idealize", label: "Idealize them and ignore red flags", small: "Write down one realistic negative", medium: "Write the full honest picture — good and bad", bigger: "Talk to a friend about the reality, not the fantasy"}
+  {id: "love-reach-out", label: "Text, call, or reach out to them", small: "Write the message but don't send it — wait 1 hour", medium: "Put your phone in another room for an hour", bigger: "Delete the draft, close the app, do something that demands your full attention", order: 1},
+  {id: "love-stalk", label: "Check their social media", small: "Notice the urge and set a 10-minute timer before deciding", medium: "Mute or unfollow them", bigger: "Block or remove them from your feed entirely", order: 2},
+  {id: "love-proximity", label: "Go places they might be", small: "Choose a different route or venue today", medium: "Make plans that have nothing to do with them", bigger: "Fill the time you'd spend thinking about them with something that builds your life", order: 3},
+  {id: "love-idealize", label: "Idealize them and ignore red flags", small: "Write down one realistic negative", medium: "Write the full honest picture — good and bad", bigger: "Talk to a friend about the reality, not the fantasy", order: 4}
 ] AS urge
 MERGE (u:ActionUrge {id: urge.id})
-SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger
+SET u.label = urge.label, u.small = urge.small, u.medium = urge.medium, u.bigger = urge.bigger, u.order = urge.order
 MERGE (c)-[:HAS_ACTION_URGE]->(u);
 
 

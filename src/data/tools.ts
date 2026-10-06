@@ -66,6 +66,8 @@ export const tools: Tool[] = [
     module: 'emotion-regulation',
     dbtBasis: 'Opposite Action',
     emoji: '🔄',
+    // The doors ask their own question first; the tagline and "When to use" box pushed them off a phone's first screen.
+    bare: true,
   },
   {
     id: 'find-the-feeling',

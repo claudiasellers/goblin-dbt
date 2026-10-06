@@ -7,6 +7,7 @@
  *
  *   node scripts/content-snapshot/build.mjs                       # newest backups/graph-content-only-*.json
  *   node scripts/content-snapshot/build.mjs --from <export.json>
+ *   node scripts/content-snapshot/build.mjs --from <export.json> --only opposite-action-picker.json
  *
  * Input: a `node scripts/graph-export.mjs --content-only` export. Anything else is refused: the
  * files ship in the app bundle, where anyone can read them, so a single user-data node stops the
@@ -23,6 +24,8 @@
  *                          "Continue" waited on it, cold, before the follow-up questions)
  *   capacity.json          getCapacityContent (band rules, hand-off primitives; loaded with every page)
  *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
+ *   opposite-action-picker.json  getOppositeActionContent's word → DBT parent rows and each parent's
+ *                          label, acknowledgment and urges, for every word (Do the Opposite's doors)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
@@ -276,18 +279,60 @@ export function buildSpine(g) {
   return { version: SPINE_VERSION, closeFlow, followUpTypes };
 }
 
-/** All the snapshots from one export (pure apart from reading the version constants). */
-export function buildSnapshots(exp) {
+/**
+ * The Opposite Action picker: which DBT parent each word works on, and each parent's label,
+ * acknowledgment and urges (labels only, by `order`). The same rows getOppositeActionContent
+ * (functions/src/oppositeAction/index.ts) reads, for every word at once, so the doors, the
+ * "start with the urge" list and the square can be drawn before any call. The guided steps
+ * (fits-the-facts, opposite steps, body cues) still come from the function.
+ */
+export function buildOppositeActionPicker(g) {
+  const parentOf = new Map();
+  for (const r of g.rels('HAS_REGULATION_CONTENT', 'Emotion', 'EmotionRegulationContent')) parentOf.set(r.a, r.b);
+  const urgesOf = new Map();
+  for (const r of g.rels('HAS_ACTION_URGE', 'EmotionRegulationContent', 'ActionUrge')) pushTo(urgesOf, r.a, r.b);
+
+  const words = {};
+  const wordsOf = new Map();
+  for (const e of g.nodes('Emotion').sort((a, b) => asc(a.props.id, b.props.id))) {
+    const c = parentOf.get(e);
+    if (e.props.oppositeActionApplicable === undefined && !c) continue;
+    const applicable = e.props.oppositeActionApplicable === true;
+    words[e.props.id] = { applicable, parent: c?.props.dbtParent ?? null, alternativeSkill: e.props.oaAlternativeSkill ?? null };
+    if (applicable && c) pushTo(wordsOf, c, e.props.id);
+  }
+  const parents = g.nodes('EmotionRegulationContent')
+    .sort((a, b) => asc(a.props.dbtParent, b.props.dbtParent))
+    .map((c) => ({
+      id: c.props.dbtParent,
+      label: c.props.label ?? c.props.dbtParent,
+      acknowledgment: c.props.acknowledgment ?? '',
+      urges: (urgesOf.get(c) ?? [])
+        .sort((a, b) => asc(a.props.order, b.props.order) || asc(a.props.id, b.props.id))
+        .map((u) => ({ id: u.props.id, label: u.props.label })),
+      wordIds: wordsOf.get(c) ?? [],
+    }));
+  if (!parents.some((p) => p.wordIds.length && p.urges.length)) throw new Error('Opposite Action picker content is empty');
+  return { parents, words };
+}
+
+/** Every snapshot by file name, each built from the indexed graph. */
+const BUILDERS = {
+  'related-words.json': buildRelatedWords,
+  'body-map.json': buildBodyMap,
+  'find-the-feeling.json': buildFindTheFeeling,
+  'discriminating-questions.json': buildDiscriminatingQuestions,
+  'capacity.json': buildCapacity,
+  'spine.json': buildSpine,
+  'opposite-action-picker.json': buildOppositeActionPicker,
+};
+
+/** All the snapshots from one export (pure apart from reading the version constants); `only` limits it to some files. */
+export function buildSnapshots(exp, only = Object.keys(BUILDERS)) {
   assertContentOnly(exp);
   const g = indexGraph(exp);
-  return {
-    'related-words.json': buildRelatedWords(g),
-    'body-map.json': buildBodyMap(g),
-    'find-the-feeling.json': buildFindTheFeeling(g),
-    'discriminating-questions.json': buildDiscriminatingQuestions(g),
-    'capacity.json': buildCapacity(g),
-    'spine.json': buildSpine(g),
-  };
+  for (const name of only) if (!BUILDERS[name]) throw new Error(`Unknown snapshot ${name}`);
+  return Object.fromEntries(only.map((name) => [name, BUILDERS[name](g)]));
 }
 
 /** The newest content-only export in backups/. */
@@ -303,10 +348,11 @@ export function newestExport(dir = BACKUPS_DIR) {
 function main() {
   const args = process.argv.slice(2);
   const from = args.includes('--from') ? resolve(args[args.indexOf('--from') + 1]) : newestExport();
+  const only = args.includes('--only') ? args[args.indexOf('--only') + 1].split(',') : undefined;
   const exp = JSON.parse(readFileSync(from, 'utf8'));
   let snapshots;
   try {
-    snapshots = buildSnapshots(exp);
+    snapshots = buildSnapshots(exp, only);
   } catch (e) {
     console.error(`✗ ${e.message}\n  Nothing written.`);
     process.exit(2);
