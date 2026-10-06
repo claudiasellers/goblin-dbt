@@ -3,6 +3,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { assertContentOnly, buildRelatedWords, buildSnapshots, USER_LABELS } from "../scripts/content-snapshot/build.mjs";
 import { isLocalUri } from "../scripts/load-graph.mjs";
 
@@ -126,6 +127,52 @@ test("shipped spine content: the close flow, and every non-reserved follow-up ty
   const defined = [...new Set(types.filter(([, , r]) => r === "false").map(([, id]) => id))].sort();
   assert.deepEqual(spine.followUpTypes.map((t) => t.id), defined);
   for (const t of spine.followUpTypes) assert.equal(typeof t.enabled, "boolean", t.id);
+});
+
+test("Opposite Action picker: words → DBT parent, urges by order, parents without words keep no words", () => {
+  const nodes = [
+    node("ashamed", ["Emotion"], { oppositeActionApplicable: true }),
+    node("worthless", ["Emotion"], { oppositeActionApplicable: true }),
+    node("numb", ["Emotion"], { oppositeActionApplicable: false, oaAlternativeSkill: "body-scan" }),
+    node("calm", ["Emotion"]),
+    node("c-shame", ["EmotionRegulationContent"], { id: undefined, dbtParent: "shame", label: "Shame", acknowledgment: "Shame says hide." }),
+    node("c-envy", ["EmotionRegulationContent"], { id: undefined, dbtParent: "envy", label: "Envy" }),
+    node("shame-secret", ["ActionUrge"], { label: "Keep it secret", order: 2 }),
+    node("shame-hide", ["ActionUrge"], { label: "Hide or disappear", order: 1 }),
+    node("envy-compare", ["ActionUrge"], { label: "Compare and despair", order: 1 }),
+  ];
+  const relationships = [
+    rel("HAS_REGULATION_CONTENT", "ashamed", "c-shame"),
+    rel("HAS_REGULATION_CONTENT", "worthless", "c-shame"),
+    rel("HAS_ACTION_URGE", "c-shame", "shame-secret"),
+    rel("HAS_ACTION_URGE", "c-shame", "shame-hide"),
+    rel("HAS_ACTION_URGE", "c-envy", "envy-compare"),
+  ];
+  const { parents, words } = buildSnapshots({ scope: "content-only", nodes, relationships }, ["opposite-action-picker.json"])["opposite-action-picker.json"];
+  assert.deepEqual(parents.map((p) => p.id), ["envy", "shame"]);
+  const shame = parents.find((p) => p.id === "shame");
+  assert.deepEqual(shame.urges.map((u) => u.id), ["shame-hide", "shame-secret"], "urges in graph order");
+  assert.deepEqual(shame.wordIds, ["ashamed", "worthless"]);
+  assert.equal(shame.acknowledgment, "Shame says hide.");
+  assert.deepEqual(parents.find((p) => p.id === "envy").wordIds, []);
+  assert.deepEqual(words.numb, { applicable: false, parent: null, alternativeSkill: "body-scan" });
+  assert.equal(words.calm, undefined, "a word the graph says nothing about for Opposite Action is left out");
+});
+
+// Drift guard: the shipped picker file against the schema files, replayed (schema_export.py).
+test("shipped Opposite Action picker content matches the schema", (t) => {
+  let replay;
+  try {
+    replay = JSON.parse(execFileSync("python3", ["scripts/content-snapshot/schema_export.py"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }));
+  } catch {
+    t.skip("python3 unavailable");
+    return;
+  }
+  const built = buildSnapshots(replay, ["opposite-action-picker.json"])["opposite-action-picker.json"];
+  assert.deepEqual(shipped("opposite-action-picker.json").content, built);
+  // Every grid word is classified, so the picker can say where any word the check-in hands it goes.
+  const grid = [...readFileSync("src/data/emotions.ts", "utf8").matchAll(/makeEmotion\('([a-z_]+)'/g)].map((m) => m[1]);
+  assert.deepEqual(grid.filter((id) => !built.words[id]), [], "grid words with no Opposite Action row");
 });
 
 test("load-graph never refreshes the shipped files from a local graph", () => {
