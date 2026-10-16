@@ -25,7 +25,7 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     RETURN o {.id, .kind, .area, .status, .source, .text, .emotionIds, .situationId, .moment, .uses,
               lastUsedAt: toString(o.lastUsedAt), confirmedAt: toString(o.confirmedAt), revisitAt: toString(o.revisitAt)} AS o`,
   savedLines: `MATCH (:User {id: $uid})-[k:SAVED_LINE]->(l:ValidationLine)
-    RETURN l.id AS lineId, toString(k.confirmedAt) AS confirmedAt ORDER BY k.lastAt DESC LIMIT 50`,
+    RETURN l.id AS lineId, l.text AS text, toString(k.confirmedAt) AS confirmedAt ORDER BY k.lastAt DESC LIMIT 50`,
   // Parts off (absent = off) returns no rows at all; set-aside parts are never read by a tool.
   // Nulls sort first under DESC in Cypher, hence the IS NULL keys: never-visited parts go last.
   parts: `MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
@@ -42,6 +42,15 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     ORDER BY p.lastVisitedAt IS NULL, p.lastVisitedAt DESC, p.confirmedAt IS NULL, p.confirmedAt DESC, p.id LIMIT 50
     RETURN p {.id, .ageId, .voiceIds, .ownVoice, .jobIds, .ownJob, .fearIds, .ownFear, .preferredRoleIds,
               .anchorLineId, .places, .shapeSig} AS p, hurtIds`,
+  // The anchor's text: own words first, else the line it points at, read only through the caller's
+  // own edges (an active OwnLine, a ValidationLine they still keep). No text → no entry.
+  partAnchors: `MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
+    MATCH (u)-[:HAS_PART]->(p:Part) WHERE p.status IN ['active', 'resting']
+    OPTIONAL MATCH (u)-[:HAS_OWN_LINE]->(o:OwnLine {status: 'active'}) WHERE o.id = p.anchorLineId
+    OPTIONAL MATCH (u)-[:SAVED_LINE]->(l:ValidationLine) WHERE l.id = p.anchorLineId
+    WITH p, coalesce(p.anchorOwn, head(collect(o.text)), head(collect(l.text))) AS text
+    ORDER BY p.lastVisitedAt IS NULL, p.lastVisitedAt DESC, p.confirmedAt IS NULL, p.confirmedAt DESC, p.id LIMIT 50
+    RETURN p.id AS partId, text`,
 };
 
 /** A list property or collected ids: absent → [], nulls dropped, sorted when `sorted`. */
@@ -50,6 +59,8 @@ function strings(v: unknown, sorted = false): string[] {
   return sorted ? [...new Set(out)].sort() : out;
 }
 const strOrNull = (v: unknown): string | null => (typeof v === 'string' ? v : null);
+/** A stored `shapeSig` (five numbers) or null. */
+const sig = (v: unknown): number[] | null => (Array.isArray(v) ? v.map((x) => (typeof x === 'number' ? x : int(x))) : null);
 
 type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: number) => Promise<ProfileSlices[K]>;
 
@@ -97,7 +108,9 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
   },
   savedLines: async (tx, uid) => {
     const r = await tx.run(SLICE_QUERIES.savedLines!, { uid });
-    return r.records.map((rec) => ({ lineId: String(rec.get('lineId')), confirmedAt: (rec.get('confirmedAt') as string | null) ?? null }));
+    return r.records.map((rec) => ({
+      lineId: String(rec.get('lineId')), text: String(rec.get('text') ?? ''), confirmedAt: (rec.get('confirmedAt') as string | null) ?? null,
+    }));
   },
   parts: async (tx, uid, now) => {
     const r = await tx.run(SLICE_QUERIES.parts!, { uid });
@@ -107,7 +120,7 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       return {
         id: String(p.id), name: strOrNull(p.name), status: meta.status === 'resting' ? 'resting' as const : 'active' as const,
         tender: p.tender === true, moveIds: strings(rec.get('moveIds'), true), firstPlace: strOrNull(p.firstPlace),
-        shapeSig: Array.isArray(p.shapeSig) ? p.shapeSig.map((x) => (typeof x === 'number' ? x : int(x))) : null, meta,
+        shapeSig: sig(p.shapeSig), meta,
       };
     });
   },
@@ -122,10 +135,19 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
         fearIds: strings(p.fearIds), ownFear: strOrNull(p.ownFear),
         preferredRoleIds: strings(p.preferredRoleIds), anchorLineId: strOrNull(p.anchorLineId),
         places: strings(p.places),
-        shapeSig: Array.isArray(p.shapeSig) ? p.shapeSig.map((x) => (typeof x === 'number' ? x : int(x))) : null,
+        shapeSig: sig(p.shapeSig),
         hurtIds: strings(rec.get('hurtIds'), true),
       };
     });
+  },
+  partAnchors: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.partAnchors!, { uid });
+    const out: Record<string, string> = {};
+    for (const rec of r.records) {
+      const text = rec.get('text');
+      if (typeof text === 'string' && text.trim()) out[String(rec.get('partId'))] = text;
+    }
+    return out;
   },
 };
 

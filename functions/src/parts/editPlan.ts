@@ -6,7 +6,7 @@
 import { GRAPH_ID, ValidationError, obj, oneOf, uuid } from '../shared/validate';
 import { NON_ANSWER } from './keepPlan';
 import {
-  ACTIVE_REVISIT_ANSWERS, JOB_HISTORY_MAX, RATHER_IDS_MAX, RESTING_REVISIT_ANSWERS,
+  ACTIVE_REVISIT_ANSWERS, ANCHOR_MAX_CHARS, JOB_HISTORY_MAX, RATHER_IDS_MAX, RESTING_REVISIT_ANSWERS,
   type PartJobHistoryEntry, type PartRevisitAnswer,
 } from './keepTypes';
 
@@ -20,6 +20,8 @@ export interface PartRef { partId: string }
 export interface RenameInput extends PartRef { name: string | null }
 export interface RestInput extends PartRef { resting: boolean }
 export interface RevisitInput extends PartRef { id: string; answer: PartRevisitAnswer; ratherIds: string[] }
+/** Exactly one of the two is set. */
+export interface AnchorInput extends PartRef { lineId: string | null; own: string | null }
 
 export function validatePartRef(raw: unknown): PartRef {
   const o = obj(raw);
@@ -53,6 +55,23 @@ export function validateRevisit(raw: unknown): RevisitInput {
   if (answer === 'new' && (ratherIds.length < 1 || ratherIds.length > RATHER_IDS_MAX)) fail(`ratherIds: 1 to ${RATHER_IDS_MAX} with "new"`);
   if (answer !== 'new' && ratherIds.length > 0) fail('ratherIds: only with "new"');
   return { id: uuid(o.id), partId: uuid(o.partId), answer, ratherIds };
+}
+
+/** `{ partId, lineId }` or `{ partId, own }`: exactly one. Own words are trimmed, 1–90 characters, never linted. */
+export function validateAnchor(raw: unknown): AnchorInput {
+  const o = obj(raw);
+  only(o, ['partId', 'lineId', 'own']);
+  const hasLine = o.lineId !== undefined && o.lineId !== null;
+  const hasOwn = o.own !== undefined && o.own !== null;
+  if (hasLine === hasOwn) fail('expected exactly one of lineId or own');
+  const lineId = hasLine ? (typeof o.lineId === 'string' && GRAPH_ID.test(o.lineId) ? o.lineId : fail('lineId: expected an id')) : null;
+  let own: string | null = null;
+  if (hasOwn) {
+    if (typeof o.own !== 'string') fail('own: expected text');
+    own = (o.own as string).trim();
+    if (!own || own.length > ANCHOR_MAX_CHARS) fail(`own: 1 to ${ANCHOR_MAX_CHARS} characters`);
+  }
+  return { partId: uuid(o.partId), lineId, own };
 }
 
 export type PartStatus = 'active' | 'resting' | 'set_aside';
