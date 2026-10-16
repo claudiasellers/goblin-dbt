@@ -776,7 +776,7 @@
    "flow": "oa",
    "step": "goal",
    "order": 0,
-   "copy": "Part of you wants to {pull}, and it's trying to help.",
+   "copy": "A part of you {move}, and it's trying to help.",
    "reviewStatus": "draft"
   },
   "oa_goal_you": {

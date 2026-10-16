@@ -1,5 +1,5 @@
 // Do the Opposite's goal line (docs/design/parts.md, the Do the Opposite row): parts on, on the check's
-// effectiveness card, "Part of you wants to {pull}, and it's trying to help." / "You want to {goal}."
+// effectiveness card, "A part of you {move}, and it's trying to help." / "You want to {goal}."
 // (src/lib/oaGoalLine.ts, src/hooks/useOaGoalLine.ts, src/pages/tools/OppositeAction.tsx).
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -20,14 +20,14 @@ const flow = JSON.parse(JSON.parse(read("schema/opposite-action-flow.cypher").ma
 const goals = flow.choices.goal;
 const IDS = [lib.OA_GOAL_PART, lib.OA_GOAL_YOU];
 
-test("copy: two drafts in flow oa, step goal; {pull} and {goal}, no {hurt}", () => {
+test("copy: two drafts in flow oa, step goal; {move} and {goal}, no {hurt}", () => {
   assert.deepEqual(lib.OA_GOAL_LINE_REQUIRED, { prompts: IDS, options: [] });
   const rows = IDS.map((id) => fixture.prompts[id]);
   assert.deepEqual(rows.map((p) => [p.flow, p.step, p.copy]), [
-    ["oa", "goal", "Part of you wants to {pull}, and it's trying to help."],
+    ["oa", "goal", "A part of you {move}, and it's trying to help."],
     ["oa", "goal", "You want to {goal}."],
   ]);
-  for (const p of rows) assert.doesNotMatch(p.copy, /\{hurt\}/);
+  for (const p of rows) assert.doesNotMatch(p.copy, /\{hurt\}|\{pull\}/);
   assert.equal(fixture.options.oa?.goal, undefined, "no options: nothing to tap");
 });
 
@@ -48,13 +48,24 @@ test("the five goals, each read after \"You want to\"", () => {
 test("the gate: an offerable, non-safety-line move from a listed urge, a goal, both lines shipped", () => {
   const goal = goals[0].label;
   assert.deepEqual(lib.oaGoalLine(ALL, { urgeId: "anger-lash", goalLabel: goal }),
-    ["Part of you wants to hit back, and it's trying to help.", "You want to stay connected."]);
-  assert.deepEqual(lib.oaGoalLine(ALL, { urgeId: "shame-hide", goalLabel: goal })[0], "Part of you wants to hide, and it's trying to help.");
+    ["A part of you wants to hit back, and it's trying to help.", "You want to stay connected."]);
+  // The move's unblend phrase, the unblend line's own (so "it" never lacks a referent).
+  const first = (urgeId) => lib.oaGoalLine(ALL, { urgeId, goalLabel: goal })[0];
+  assert.equal(first("shame-hide"), "A part of you wants to hide, and it's trying to help.");
+  assert.equal(first("jealousy-check"), "A part of you wants to chase this down, and it's trying to help.");
+  assert.equal(first("guilt-apologize"), "A part of you wants to keep the peace, and it's trying to help.");
+  assert.equal(first("shame-shrink"), "A part of you wants you to take up less room, and it's trying to help.");
+  assert.equal(first("fear-avoid"), "A part of you wants to put this off, and it's trying to help.");
+  const keepWatch = { ...ALL, expresses: { ...ALL.expresses, ActionUrge: { ...ALL.expresses.ActionUrge, "fear-scan": "keep_watch" } } };
+  assert.equal(lib.oaGoalLine(keepWatch, { urgeId: "fear-scan", goalLabel: goal })[0], "A part of you is keeping watch, and it's trying to help.");
+  // A move with no unblendPhrase: nothing.
+  const noPhrase = { ...ALL, moves: ALL.moves.map((m) => (m.id === "hit_back" ? { ...m, unblendPhrase: "" } : m)) };
+  assert.equal(lib.oaGoalLine(noPhrase, { urgeId: "anger-lash", goalLabel: goal }), null);
   // My urge is different, nothing picked, an id with no edge.
   for (const urgeId of ["custom", "", null, "nope", "__proto__"]) assert.equal(lib.oaGoalLine(ALL, { urgeId, goalLabel: goal }), null, `urge ${urgeId}`);
   // Non-offerable moves (go_blank, zone_out never ship).
   for (const urgeId of ["fear-freeze", "sad-scroll", "sad-bed"]) assert.equal(lib.oaGoalLine(ALL, { urgeId, goalLabel: goal }), null, urgeId);
-  // The safety-line move: never "Part of you wants to turn on yourself, and it's trying to help."
+  // The safety-line move: never "A part of you is turning on you, and it's trying to help."
   const safety = ALL.moves.filter((m) => m.safetyLine).map((m) => m.id);
   assert.deepEqual(safety, ["turn_on_myself"]);
   for (const urgeId of ["guilt-punish", "envy-compare"]) assert.equal(lib.oaGoalLine(ALL, { urgeId, goalLabel: goal }), null, urgeId);
@@ -73,7 +84,7 @@ test("the gate: an offerable, non-safety-line move from a listed urge, a goal, b
 
 test("every filled line fits the prompt's 90 characters", () => {
   for (const m of ALL.moves.filter((x) => !x.safetyLine)) {
-    assert.ok(ALL.prompts.oa_goal_part.copy.replace("{pull}", m.trailPhrase).length <= 90, m.id);
+    assert.ok(ALL.prompts.oa_goal_part.copy.replace("{move}", m.unblendPhrase).length <= 90, m.id);
   }
   for (const g of goals) assert.ok(ALL.prompts.oa_goal_you.copy.replace("{goal}", lib.goalPhrase(g.label)).length <= 90, g.id);
 });
@@ -99,9 +110,9 @@ test("host: the effectiveness card's before slot, two body lines, OA's own goal 
   // No hard-coded copy: the lines and the goal labels are content.
   for (const f of ["src/pages/tools/OppositeAction.tsx", "src/lib/oaGoalLine.ts", "src/hooks/useOaGoalLine.ts"]) {
     const code = read(f).replace(/^\s*(\/\/|\*|\/\*\*).*$/gm, "");
-    for (const s of ["Part of you", "trying to help", "You want to"]) assert.ok(!code.includes(s), `${f}: ${s}`);
+    for (const s of ["A part of you", "trying to help", "You want to"]) assert.ok(!code.includes(s), `${f}: ${s}`);
     for (const g of goals) assert.ok(!code.includes(g.label) && !code.includes(lib.goalPhrase(g.label)), `${f}: ${g.label}`);
-    for (const m of ALL.moves) assert.ok(!code.includes(`"${m.trailPhrase}"`) && !code.includes(`'${m.trailPhrase}'`), `${f}: ${m.trailPhrase}`);
+    for (const m of ALL.moves) assert.ok(!code.includes(m.unblendPhrase), `${f}: ${m.unblendPhrase}`);
   }
   assert.doesNotMatch(read("scripts/parts/content.py"), /Stay connected|Protect a boundary|Make progress on something|Repair harm|Act with self-respect/, "goal labels stay OA's");
 });
