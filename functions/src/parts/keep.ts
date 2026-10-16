@@ -8,6 +8,7 @@
  * keepPart (9b's yes) builds the part from the stored PartSession, never from client fields. The
  * part-card writers below (rename, rest, set aside, restore, tender, the 30-day still-true) change
  * a kept part on the person's own tap; each bumps `u.profileVersion` and returns `{ version }`.
+ * The check-back's Louder pauses a part (PAUSE_PART_QUERY, last).
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -354,4 +355,24 @@ export function partEditDeps(tx: ManagedTransaction, uid: string): PartEditDeps 
       return r ? toNumber(r.get('version')) ?? 0 : null;
     },
   };
+}
+
+// ---- The check-back's Louder (parts/checkback.ts runs it in the same transaction as the answer) ----
+
+/** PartsPolicy.louderPauseHours when the policy is missing. */
+export const DEFAULT_LOUDER_PAUSE_HOURS = 72;
+
+/**
+ * "Louder" after a meeting: no more of that part for PartsPolicy.louderPauseHours. Only the pause:
+ * nothing else on the part changes, and it doesn't touch the profile version (no slice reads it).
+ */
+export const PAUSE_PART_QUERY = `
+  MATCH (u:User {id: $uid})-[:HAS_PART]->(p:Part {key: $partKey})
+  WHERE coalesce(u.partsEnabled, false)
+  SET p.pausedUntil = datetime() + duration({hours: $hours}), p.updatedAt = datetime()
+  RETURN p.id AS id
+`;
+
+export async function pausePart(tx: ManagedTransaction, uid: string, partId: string, hours: number): Promise<boolean> {
+  return (await tx.run(PAUSE_PART_QUERY, { uid, partKey: userKey(uid, partId), hours })).records.length > 0;
 }

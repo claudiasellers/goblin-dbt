@@ -99,6 +99,8 @@ export const resolveFollowUp = callable<unknown, ResolveFollowUpResponse>(
       if (!rec) throw new HttpsError('not-found', 'Follow-up not found');
       if (rec.get('open') !== true) return { next: null, status: rec.get('status') as string };
       if (rec.get('type') === 'oa_plan') throw new HttpsError('failed-precondition', 'Resolved in Opposite Action');
+      // Its answer can pause the part (a Part write): answered only by parts' answerPartCheckback.
+      if (rec.get('type') === 'part_checkback') throw new HttpsError('failed-precondition', 'Answered in parts');
       const content = JSON.parse((rec.get('content') as string | null) ?? '{}') as {
         dir?: string; choices?: Array<{ id: string; status?: string; snoozeHours?: number; thenVsNow?: string }>;
       };

@@ -35,7 +35,7 @@ export interface PartsPrompt {
 /** What picking an option does (scripts/parts/content.py, `branch`). */
 export type PartsBranch =
   | 'continue' | 'tender_offer' | 'tender_path' | 'grounding' | 'unblend' | 'conservative' | 'danger'
-  | 'body_first' | 'candidate' | 'end' | 'keep' | 'own_words' | 'meet' | 'split' | 'new';
+  | 'body_first' | 'candidate' | 'end' | 'keep' | 'own_words' | 'meet' | 'split' | 'new' | 'aftercare' | 'checkback';
 
 /** A chip the person taps (or, `kind: 'voice'`, what a part says). */
 export interface PartsOption {
@@ -78,4 +78,9 @@ export interface PartsContent {
   hurts: PartsHurt[];
   /** Recover's "what happened" (InvalidationEvent id) → the hurts it can touch, in order (approved CAN_TOUCH). */
   canTouch: Record<string, string[]>;
+  /**
+   * PartsPolicy's two numbers a screen needs, only once the policy is signed off. Absent: the client's
+   * pinned defaults (the server's), src/lib/meetAPartSave.ts.
+   */
+  limits?: { nameMaxChars: number; maxNonSelfAnswers: number };
 }

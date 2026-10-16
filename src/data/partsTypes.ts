@@ -13,12 +13,19 @@ export type PartsEntryOpen = 'p2' | 'far_away' | 'clear';
 /** Why, as ids, for logging and tests; never shown. */
 export type PartsEntryReason = 'checkin_flooding' | 'checkin_crisis' | 'recover_loud' | 'dissociation_history';
 
-export type PartsEntry =
+export type PartsEntry = (
   /** The P2 body hand-off first (Keep going anyway stays), with the crisis banner alongside when `crisis`. */
   | { open: 'p2'; band: 'flooded'; crisis: boolean; reasons: PartsEntryReason[] }
   /** The far-away heads-up, then the choice. */
   | { open: 'far_away'; reasons: PartsEntryReason[] }
-  | { open: 'clear'; reasons: PartsEntryReason[] };
+  | { open: 'clear'; reasons: PartsEntryReason[] }
+) & {
+  /**
+   * Present (true) only when the caller made PartsPolicy.tooManyPartsCount parts or more within
+   * tooManyPartsDays: Meet a part says "You don't need to get to know everyone at once." once. Never blocks.
+   */
+  tooMany?: true;
+};
 
 // --- Meet a part's session: mirror of functions/src/parts/sessionTypes.ts (tests/parts-entry.test.mjs) ---
 /** Where the visit came from (parts.md "Entries"). */
@@ -151,6 +158,33 @@ export interface AnswerPartRevisitRequest {
 /** A job the part did before it took up a new one (`Part.jobHistoryJson`, newest last, at most 10). */
 export interface PartJobHistoryEntry { jobIds: string[]; ownJob: string | null; until: string }
 export const JOB_HISTORY_MAX = 10;
+
+// --- The next-day check-back: mirror of functions/src/parts/checkbackTypes.ts (tests/parts-entry.test.mjs) ---
+
+/** The FollowUpType id (scripts/practice-spine/content.py). */
+export const PART_CHECKBACK_TYPE = 'part_checkback';
+
+/** On the close's yes ("Check back with it tomorrow?"), for the part this visit kept. */
+export interface SchedulePartCheckbackRequest {
+  /** A client UUID for the follow-up. */
+  id: string;
+  /** The Meet a part visit (its PartSession) that kept the part. */
+  sessionId: string;
+  /** Tomorrow at 10:00 local (the type's window), computed on the device. */
+  dueAt: string;
+}
+/** The open check-back's id: this one, or the one already open for that part (at most one). */
+export interface SchedulePartCheckbackResponse { id: string | null }
+
+/** "How's {name} today?": Settled · Same · Louder · Skip. */
+export type PartCheckbackAnswer = 'settled' | 'same' | 'louder' | 'skip';
+export const PART_CHECKBACK_ANSWERS: readonly PartCheckbackAnswer[] = ['settled', 'same', 'louder', 'skip'];
+export interface AnswerPartCheckbackRequest { id: string; answer: PartCheckbackAnswer }
+/** `aftercare`: Louder was saved, so the card shows aftercare_louder (the part is paused). */
+export interface AnswerPartCheckbackResponse { status: string; aftercare: boolean }
+
+/** What a check-back card carries about its part (name and tenderness from the profile slice). */
+export interface TodayPartRef { id: string; name: string | null; tender: boolean }
 
 // --- The angry-part card (src/lib/angryPart.ts, src/components/parts/AngryPartCard.tsx) ---
 

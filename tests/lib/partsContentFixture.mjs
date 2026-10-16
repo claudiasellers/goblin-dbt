@@ -33,5 +33,7 @@ export function partsFromFixture(fixture, approve = null) {
       .filter(([id, t]) => ok({ id, ...t }))
       .map(([id, t]) => [id, t.hurts.filter((h) => hurtIds.has(h))])
       .filter(([, hs]) => hs.length)),
+    // PartsPolicy's two client numbers, once the policy is signed off.
+    limits: ok(fixture.policy) ? { nameMaxChars: fixture.policy.nameMaxChars, maxNonSelfAnswers: fixture.policy.maxNonSelfAnswers } : null,
   });
 }

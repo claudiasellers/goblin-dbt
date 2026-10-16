@@ -170,6 +170,23 @@ FOLLOW_UP_TYPES = [
         "choices": [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}],
         "notification": "Something you set aside is ready when you are.",
     },
+    {
+        # Parts (docs/design/parts.md, Meet a part step 10): the next-day check-back on the close's yes,
+        # scheduled by parts' schedulePartCheckback and answered by answerPartCheckback (Louder pauses the
+        # part). Its Today card comes from parts (parts on, the name from the profile slice) and shows the
+        # parts copy (checkback_* in scripts/parts/content.py) only once signed off; the copy and choices
+        # here are the same drafts, kept so the row has the registry's shape. No reminders of any kind.
+        "id": "part_checkback", "ownerModule": "mf", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "at_local", "days": 1, "time": "10:00"},
+        "staleAfterHours": 36, "missedPath": "none", "notify": {"push": False, "inTab": False, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How's {name} today?"},
+        "choices": [{"id": "settled", "label": "Settled", "status": "done"},
+                    {"id": "same", "label": "Same", "status": "done"},
+                    {"id": "louder", "label": "Louder", "status": "done"},
+                    {"id": "skip", "label": "Skip", "status": "dismissed"}],
+        "notification": "",
+    },
 ]
 
 # Reserved rows: authored now so the ids exist, enabled false until their owners ship.
