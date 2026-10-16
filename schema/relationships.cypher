@@ -776,13 +776,16 @@ MATCH (m:TherapyModality {id: "cpt"}), (c:ClinicalConstruct {id: "ptsd"})
 MERGE (m)-[:TREATS]->(c);
 
 MATCH (m:TherapyModality {id: "ifs"}), (c:ClinicalConstruct {id: "cptsd"})
-MERGE (m)-[:TREATS]->(c);
+MERGE (m)-[r:TREATS]->(c)
+SET r += {evidenceGrade: "Preliminary", evidenceNote: "Small pilot studies only (Hodgdon et al. 2021 PTSD pilot; PARTS online group RCT 2026)."};
 
 MATCH (m:TherapyModality {id: "ifs"}), (c:ClinicalConstruct {id: "dissociation"})
-MERGE (m)-[:TREATS]->(c);
+MERGE (m)-[r:TREATS]->(c)
+SET r += {evidenceGrade: "Preliminary", evidenceNote: "Clinical writing (Twombly; Anderson), no controlled trials; dissociation trainers advise care with parts work."};
 
 MATCH (m:TherapyModality {id: "ifs"}), (c:ClinicalConstruct {id: "bpd"})
-MERGE (m)-[:TREATS]->(c);
+MERGE (m)-[r:TREATS]->(c)
+SET r += {evidenceGrade: "Preliminary", evidenceNote: "No IFS studies in BPD (Francis, Fino & Heym 2026 systematic review). Kept only so the edge is graded, not claimed."};
 
 MATCH (m:TherapyModality {id: "se"}), (c:ClinicalConstruct {id: "ptsd"})
 MERGE (m)-[:TREATS]->(c);
@@ -988,18 +991,19 @@ MERGE (c)-[:INVOLVES]->(b);
 // CROSS-MODALITY BRIDGES
 // ============================================================
 
-// Self/Observer parallels
+// Self/Observer parallels. Parallels, not equivalents: Wise Mind and self-as-context are reached by
+// practice; IFS posits Self as innate (docs/design/parts.md, Fix while here).
 MATCH (a:TherapyConcept {id: "ifs_self"}), (b:TherapyConcept {id: "dbt_wise_mind"})
 MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
-SET r += {type: "functional_equivalent"};
+SET r += {type: "functional_parallel"};
 
 MATCH (a:TherapyConcept {id: "ifs_self"}), (b:TherapyConcept {id: "pv_ventral_vagal"})
 MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
-SET r += {type: "functional_equivalent"};
+SET r += {type: "functional_parallel"};
 
 MATCH (a:TherapyConcept {id: "act_self_context"}), (b:TherapyConcept {id: "ifs_self"})
 MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
-SET r += {type: "functional_equivalent"};
+SET r += {type: "functional_parallel"};
 
 MATCH (a:TherapyConcept {id: "act_self_context"}), (b:TherapyConcept {id: "dbt_wise_mind"})
 MERGE (a)-[r:CONCEPTUALLY_RELATED_TO]->(b)
