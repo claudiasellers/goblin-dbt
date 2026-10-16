@@ -129,18 +129,21 @@ export interface AngryCardResult {
   exitStep: AngryStep;
 }
 
-/** A ProtectedHurt as the content serves it. */
-export interface PartsHurt {
-  id: string; label: string; hurtPhrase: string; feltPhrase: string; matters: string; namedAs: string[]; order: number;
+/**
+ * A ProtectedHurt as the card reads it (the fixture's and parts.json's `hurts`; PartsHurt in
+ * partsContentTypes.ts fits). A hurt without its label, matters or feltPhrase is never offered.
+ */
+export interface AngryContentHurt {
+  id: string; label: string; feltPhrase: string; matters?: string; order: number;
   /** OFTEN_GUARDS: the moves that may guard it, with the hurt's rank in each move's chip order. */
   guardedBy: { moveId: string; rank: number }[];
 }
 
-/** The slice of the parts content the angry card is built from. */
+/** The slice of the parts content the angry card is built from (the fixture's shape; the harness reads it). */
 export interface AngryCardContent {
   prompts: Record<string, { flow: string; step: string; copy: string }>;
   options: Record<string, Record<string, { id: string; label: string }[]>>;
-  hurts: PartsHurt[];
+  hurts: AngryContentHurt[];
   /** CAN_TOUCH: Recover's "what happened" (its state id, an InvalidationEvent) → hurt ids, in order. */
   canTouch: Record<string, string[]>;
 }

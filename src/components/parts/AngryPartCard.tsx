@@ -25,6 +25,9 @@ interface AngryPartCardProps {
   tooMuch?: ReactNode;
   /** Each screen as it opens, so a host can resume or log where the person left (TooMuchLink's resume). */
   onStep?(step: AngryStep): void;
+  /** "Not now": a quiet link on the first screen, only when the host passes both (the label is its copy). */
+  onSkip?(): void;
+  skipLabel?: string;
 }
 
 /**
@@ -34,7 +37,7 @@ interface AngryPartCardProps {
  * only: no fetching, no saving; the host gets an AngryCardResult. Nothing locks: Back on screens 2–4,
  * a way past the hold after the first try, and the host's too-much link everywhere.
  */
-export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onStep }: AngryPartCardProps) {
+export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onStep, onSkip, skipLabel }: AngryPartCardProps) {
   const [step, setStep] = useState<AngryStep>('unblend');
   const [hurtId, setHurtId] = useState<string | null>(null);
   const [held, setHeld] = useState(false);
@@ -76,6 +79,9 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
           <Title className={STAMP_LINE}>{c.unblend}</Title>
           <p className="text-[var(--color-text-secondary)]">{c.unblendSub}</p>
           <button type="button" className={primaryButton} onClick={() => setStep('protects')}>{c.next}</button>
+          {onSkip && skipLabel && (
+            <div className="text-center"><button type="button" className={linkButton} onClick={onSkip}>{skipLabel}</button></div>
+          )}
         </section>
       )}
 
