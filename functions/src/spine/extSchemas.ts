@@ -44,6 +44,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     oaEffect: { t: 'id' },                                                         // its effectiveness choice
     oaRoute: { t: 'id' },                                                          // opposite | problem | clarify | support
     unblendShown: { t: 'bool' },                                                   // parts on: the unblend line showed after FTF's pull / OA's urge
+    goalLineShown: { t: 'bool' },                                                  // parts on: Do the Opposite's goal line showed on the effectiveness card
     handoffs: {                                                                    // P2 breakdown hand-off (A4-2)
       t: 'objs', max: 4,
       of: {

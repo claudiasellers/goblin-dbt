@@ -7,7 +7,7 @@
  * `unblendPhrase`, and `expresses` (approved EXPRESSES edges to moves that ship, so a shutdown pick,
  * go_blank / zone_out, never has a line). Hosts decide when (parts on, never while P2 is open).
  */
-import type { PartsContent } from '../data/partsContentTypes';
+import type { PartsContent, PartsMove } from '../data/partsContentTypes';
 import { promptCopy, surfaceReady, type SurfaceIds } from './partsContent';
 
 export const UNBLEND_PROMPT = 'unblend_line';
@@ -29,19 +29,29 @@ export type UnblendSource = keyof typeof UNBLEND_SOURCES;
 export const recoverPullOption = (pull: string): string => `recover_${pull}`;
 
 /**
- * The filled line, or null: no edge for the pick, no phrase, or the line not shipped. Several picks give
- * a line only when every one of them has an edge and all share one move (then it is that move's line);
- * otherwise null, never a guess between moves.
+ * The move the host's pick(s) express, or null: an approved EXPRESSES edge to a move that ships (so an
+ * offerable one: shutdown moves never ship). Several picks give a move only when every one has an edge and
+ * all share it, never a guess between moves. Also read by Do the Opposite's goal line (src/lib/oaGoalLine.ts).
  */
-export function unblendLine(content: PartsContent | null, source: UnblendSource, ids: string | readonly string[] | null): string | null {
-  if (!content || ids === null || !surfaceReady(content, UNBLEND_REQUIRED)) return null;
+export function expressedMove(content: PartsContent | null, source: UnblendSource, ids: string | readonly string[] | null): PartsMove | null {
+  if (!content || ids === null) return null;
   const picks = typeof ids === 'string' ? [ids] : [...ids];
   if (picks.length === 0) return null;
   const table = content.expresses?.[UNBLEND_SOURCES[source]] ?? {};
   const moves = new Set(picks.map((id) => (Object.hasOwn(table, id) ? table[id] : null)));
   if (moves.size !== 1 || moves.has(null)) return null;
   const [moveId] = moves;
-  const phrase = content.moves.find((m) => m.id === moveId)?.unblendPhrase;
+  return content.moves.find((m) => m.id === moveId) ?? null;
+}
+
+/**
+ * The filled line, or null: no edge for the pick, no phrase, or the line not shipped. Several picks give
+ * a line only when every one of them has an edge and all share one move (then it is that move's line);
+ * otherwise null, never a guess between moves.
+ */
+export function unblendLine(content: PartsContent | null, source: UnblendSource, ids: string | readonly string[] | null): string | null {
+  if (!content || !surfaceReady(content, UNBLEND_REQUIRED)) return null;
+  const phrase = expressedMove(content, source, ids)?.unblendPhrase;
   const copy = promptCopy(content, UNBLEND_PROMPT);
   if (!phrase || !copy || !copy.includes('{move}')) return null;
   return copy.replace('{move}', phrase);
