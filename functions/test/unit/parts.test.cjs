@@ -198,14 +198,14 @@ const { PARTS_LABELS, PARTS_FOLLOW_UP_TYPES } = require('../../lib/parts/delete'
 const { USER_DATA } = require('../../lib/userdata/layers');
 
 test('PARTS_LABELS: every registered parts label, nothing else (later phases join by registering)', () => {
-  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartRevisit', 'PartSession']);
+  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartRevisit', 'PartSession', 'PartTag']);
   const partsLike = Object.keys(USER_DATA).filter((l) => /^(Part|Den|Trail)/.test(l));
   assert.deepEqual([...PARTS_LABELS].sort(), partsLike.sort(), 'a registered parts label deleteMyParts would miss');
   for (const l of ['ToolSession', 'CheckIn', 'FollowUp', 'SkillPractice', 'ProfileFact', 'OwnLine']) assert.ok(!PARTS_LABELS.includes(l), l);
 });
 
 test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one write, counts only; parts off too', async () => {
-  const counts = { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4 };
+  const counts = { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5 };
   const f = fakeDriver((q) => {
     const label = /MATCH \(n:(\w+) \{ownerId: \$uid\}\)/.exec(q)?.[1];
     if (label) return [{ n: counts[label] }];
@@ -214,7 +214,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
   });
   setDriver(f.driver);
   const out = await fns.deleteMyParts.run({ auth: auth('u7'), data: {} });
-  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, FollowUp: 1 } });
+  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, FollowUp: 1 } });
   assert.equal(f.sessions.length, 1, 'one transaction');
   assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
   for (const c of f.calls) {
@@ -223,7 +223,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
     assert.doesNotMatch(c.query, /ToolSession|CheckIn|SkillPractice|PatternOffer/, 'never touches other records');
   }
   const deletes = f.calls.filter((c) => /DETACH DELETE/.test(c.query));
-  assert.equal(deletes.length, 5);
+  assert.equal(deletes.length, 6);
   const fu = f.calls.find((c) => /FollowUp/.test(c.query));
   assert.match(fu.query, /WHERE f\.type IN \$types AND f\.status = 'scheduled'/, 'open parts follow-ups only');
   assert.deepEqual(fu.params.types, PARTS_FOLLOW_UP_TYPES);
@@ -233,7 +233,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
   // Nothing kept: nothing deleted, no profile version bump.
   const g = fakeDriver((q) => (/RETURN size/.test(q) ? [{ n: 0 }] : []));
   setDriver(g.driver);
-  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, PartRevisit: 0, FollowUp: 0 });
+  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, PartRevisit: 0, PartTag: 0, FollowUp: 0 });
   assert.ok(!g.calls.some((c) => /profileVersion/.test(c.query)));
 });
 
@@ -654,6 +654,141 @@ test('queuePartCandidate over the fake driver: one write, MERGE on key (idempote
   assert.match(C.CANDIDATE_QUERY, /MERGE \(c:PartCandidate \{key: \$key\}\)\s+ON CREATE SET c:UserData:LogRecord/);
   assert.match(C.CANDIDATE_QUERY, /c\.status = 'open'/);
   assert.match(C.CANDIDATE_QUERY, /MERGE \(x\)-\[:QUEUED\]->\(c\)/);
+});
+
+// ------------------------------------------------------------------ queuePartCandidate from a tool session
+
+const TSID = '7d2c9a0e-1b2c-4d5e-8f90-123456789abc';
+
+test('validateCandidate: toolSessionId is a uuid, only present when given', () => {
+  assert.deepEqual(C.validateCandidate({ id: CID, origin: 'new_one', moveIds: [], toolSessionId: TSID }),
+    { id: CID, origin: 'new_one', moveIds: [], sessionId: null, toolSessionId: TSID });
+  assert.ok(!('toolSessionId' in C.validateCandidate({ id: CID, origin: 'new_one', moveIds: [] })));
+  bad(() => C.validateCandidate({ id: CID, origin: 'new_one', moveIds: [], toolSessionId: 'x' }));
+});
+
+test('candidateMoves: client ids first, then the session\'s sorted, each once, at most 4', () => {
+  assert.deepEqual(C.candidateMoves([], ['hide', 'chase']), ['chase', 'hide']);
+  assert.deepEqual(C.candidateMoves(['hide'], ['hide', 'chase']), ['hide', 'chase']);
+  assert.deepEqual(C.candidateMoves(['a', 'b'], ['e', 'd', 'c']), ['a', 'b', 'c', 'd']);
+});
+
+test('queuePartCandidate with toolSessionId: the caller\'s own closed session; moves derived through EXPRESSES', async () => {
+  const fake = (st) => {
+    const log = [];
+    return { log, deps: { state: async () => st, write: async (c) => { log.push(c); } } };
+  };
+  const input = (extra = {}) => C.validateCandidate({ id: CID, origin: 'new_one', moveIds: [], toolSessionId: TSID, ...extra });
+  const base = { partsOn: true, sessionFound: false, knownMoves: 0 };
+  const off = fake({ ...base, partsOn: false, toolSessionFound: true, toolSessionStatus: 'completed', derivedMoves: ['hide'] });
+  await assert.rejects(C.queuePartCandidateHandler(input(), off.deps), code('failed-precondition'));
+  const other = fake({ ...base, toolSessionFound: false, derivedMoves: [] });
+  await assert.rejects(C.queuePartCandidateHandler(input(), other.deps), code('not-found'), 'someone else\'s session is not found');
+  const open = fake({ ...base, toolSessionFound: true, toolSessionStatus: 'open', derivedMoves: ['hide'] });
+  await assert.rejects(C.queuePartCandidateHandler(input(), open.deps), code('failed-precondition'));
+  assert.equal(other.log.length + open.log.length + off.log.length, 0);
+  const ok = fake({ ...base, knownMoves: 1, toolSessionFound: true, toolSessionStatus: 'completed', derivedMoves: ['keep_watch', 'hide', 'chase', 'hit_back'] });
+  await C.queuePartCandidateHandler(input({ moveIds: ['hide'] }), ok.deps);
+  assert.deepEqual(ok.log[0].moveIds, ['hide', 'chase', 'hit_back', 'keep_watch'], 'union, capped at 4');
+});
+
+test('queuePartCandidate over the fake driver: one state read derives the moves; FROM_SESSION out of the candidate', async () => {
+  const f = fakeDriver((q) => {
+    if (q === C.CANDIDATE_STATE_QUERY) return [{ partsOn: true, sessionFound: false, knownMoves: 0, toolSessionFound: true, toolSessionStatus: 'completed', derivedMoves: ['hide'] }];
+    if (q === C.CANDIDATE_QUERY) return [{ id: CID }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  await fns.queuePartCandidate.run({ auth: auth('real-user'), data: { id: CID, origin: 'new_one', moveIds: [], toolSessionId: TSID } });
+  const reads = f.calls.filter((c) => c.query === C.CANDIDATE_STATE_QUERY);
+  assert.equal(reads.length, 1);
+  assert.equal(reads[0].params.toolSessionKey, `real-user:${TSID}`);
+  const write = f.calls.find((c) => c.query === C.CANDIDATE_QUERY);
+  assert.deepEqual(write.params.moveIds, ['hide']);
+  assert.match(C.CANDIDATE_STATE_QUERY, /x\.reviewStatus = 'approved'/, 'approved EXPRESSES edges only');
+  assert.match(C.CANDIDATE_STATE_QUERY, /\(u\)-\[:HAS_TOOL_SESSION\]->\(ts:ToolSession \{key: \$toolSessionKey\}\)/, 'the caller\'s own');
+  assert.match(C.CANDIDATE_QUERY, /MERGE \(c\)-\[:FROM_SESSION\]->\(x\)/);
+  assert.doesNotMatch(C.CANDIDATE_QUERY, /MERGE \(\w*\)-\[:\w+\]->\(c\)[\s\S]*FROM_SESSION[\s\S]*SET ts|SET ts\./, 'the ToolSession is never written');
+});
+
+// ------------------------------------------------------------------ tagPart
+
+const T = require('../../lib/parts/tag');
+const TAG = '8e2c9a0e-1b2c-4d5e-8f90-123456789abc';
+const TAG2 = '9f2c9a0e-1b2c-4d5e-8f90-123456789abc';
+
+test('validateTag: three uuids, nothing else', () => {
+  assert.deepEqual(T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID }), { id: TAG, partId: PID, toolSessionId: TSID });
+  bad(() => T.validateTag({ id: TAG, partId: PID }));
+  bad(() => T.validateTag({ id: TAG, partId: 'hide', toolSessionId: TSID }));
+  bad(() => T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, thenVsNow: 'better' }));
+});
+
+test('tagPart: refusals before any write; one tag per session', async () => {
+  const good = { partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', toolId: 'five-senses', existingId: null };
+  const fake = (st, wrote = true) => {
+    const log = [];
+    return { log, deps: { state: async () => ({ ...good, ...st }), write: async (t) => { log.push(t); return wrote; } } };
+  };
+  const req = T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID });
+  const refused = [
+    [{ partsOn: false }, 'failed-precondition'],
+    [{ partStatus: null }, 'not-found'],              // not the caller's part
+    [{ partStatus: 'set_aside' }, 'not-found'],
+    [{ sessionFound: false }, 'not-found'],           // not the caller's session
+    [{ sessionStatus: 'open' }, 'failed-precondition'],
+    [{ thenVsNow: 'same' }, 'failed-precondition'],
+    [{ thenVsNow: 'worse' }, 'failed-precondition'],
+    [{ thenVsNow: null }, 'failed-precondition'],     // Help now, a micro-step, an urge close: no then-vs-now
+    [{ toolId: 'meet-a-part', thenVsNow: 'much_better' }, 'failed-precondition'],
+  ];
+  for (const [st, c] of refused) {
+    const f = fake(st);
+    await assert.rejects(T.tagPartHandler(req, f.deps), code(c), JSON.stringify(st));
+    assert.equal(f.log.length, 0, JSON.stringify(st));
+  }
+  for (const thenVsNow of ['better', 'much_better']) {
+    const f = fake({ thenVsNow, partStatus: 'resting' });
+    assert.deepEqual(await T.tagPartHandler(req, f.deps), { id: TAG, created: true });
+    assert.equal(f.log.length, 1);
+  }
+  // Already tagged (any id, any part): the first tag, nothing written.
+  const again = fake({ existingId: TAG });
+  assert.deepEqual(await T.tagPartHandler(T.validateTag({ id: TAG2, partId: NEW_PART, toolSessionId: TSID }), again.deps), { id: TAG, created: false });
+  assert.equal(again.log.length, 0);
+  // The guarded write stopped (state changed under it): refused.
+  await assert.rejects(T.tagPartHandler(req, fake({}, false).deps), code('failed-precondition'));
+});
+
+test('tagPart over the fake driver: log layer, incoming edges only on the ToolSession, a lost race returns the first tag', async () => {
+  assert.match(T.TAG_QUERY, /MERGE \(t:PartTag \{key: \$key\}\)\s+ON CREATE SET t:UserData:LogRecord/);
+  assert.match(T.TAG_QUERY, /t\.source = 'close', t\.taggedKey = \$sessionKey/);
+  for (const e of ['MERGE \\(u\\)-\\[:HAS_PART_TAG\\]->\\(t\\)', 'MERGE \\(t\\)-\\[:TAGS\\]->\\(ts\\)', 'MERGE \\(t\\)-\\[:OF_PART\\]->\\(pt\\)']) {
+    assert.match(T.TAG_QUERY, new RegExp(e));
+  }
+  assert.doesNotMatch(T.TAG_QUERY, /\(ts\)-\[[^\]]*\]->|SET ts\b|SET pt\b|ts\.\w+ =|pt\.\w+ =/, 'nothing out of or onto the ToolSession or the Part');
+  assert.match(T.TAG_QUERY, /ts\.status <> 'open' AND ts\.thenVsNow IN \$closes AND NOT ts\.toolId IN \$never/);
+  assert.match(T.TAG_QUERY, /pt\.status IN \['active', 'resting'\]/);
+  assert.match(T.TAG_QUERY, /coalesce\(u\.partsEnabled, false\)/);
+
+  let reads = 0;
+  const f = fakeDriver((q) => {
+    if (q === T.TAG_STATE_QUERY) {
+      reads += 1;
+      return [{ partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', toolId: 'five-senses', existingId: reads > 1 ? TAG : null }];
+    }
+    if (q === T.TAG_QUERY) {
+      const e = new Error('Node(1) already exists with label `PartTag` and property `taggedKey` = ...');
+      e.code = 'Neo.ClientError.Schema.ConstraintValidationFailed';
+      throw e;
+    }
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  assert.deepEqual(await fns.tagPart.run({ auth: auth('real-user'), data: { id: TAG2, partId: PID, toolSessionId: TSID } }), { id: TAG, created: false });
+  const st = f.calls.find((c) => c.query === T.TAG_STATE_QUERY);
+  assert.deepEqual([st.params.uid, st.params.partKey, st.params.sessionKey], ['real-user', `real-user:${PID}`, `real-user:${TSID}`]);
+  await assert.rejects(fns.tagPart.run({ auth: auth(), data: { id: TAG, partId: PID } }), code('invalid-argument'));
 });
 
 // ---- The part card writers (keep.ts): rename, rest, set aside, restore, tender, still-true ----

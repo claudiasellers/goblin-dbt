@@ -385,6 +385,20 @@
    "copy": "Want to come back to it later?",
    "reviewStatus": "draft"
   },
+  "part_unnamed_place": {
+   "flow": "common",
+   "step": "name",
+   "order": 0,
+   "copy": "The one in your {place}",
+   "reviewStatus": "draft"
+  },
+  "part_unnamed": {
+   "flow": "common",
+   "step": "name",
+   "order": 1,
+   "copy": "One you haven't named",
+   "reviewStatus": "draft"
+  },
   "unblend_line": {
    "flow": "unblend",
    "step": "line",
@@ -2991,7 +3005,7 @@
     },
     {
      "id": "tag_later_no",
-     "label": "No",
+     "label": "No thanks",
      "kind": "chip",
      "flag": null,
      "selfLike": null,

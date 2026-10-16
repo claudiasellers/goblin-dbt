@@ -6,6 +6,11 @@ import { dueAtFor } from '../../lib/spine/windows';
 import { newId } from '../../lib/spine/ids';
 import type { ThenVsNow } from '../../data/capacityTypes';
 import type { ActedOnUrge, CloseKind } from '../../data/spineTypes';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { getPartsContent } from '../../services/partsContent';
+import type { PartsContent } from '../../data/partsContentTypes';
+import { isTagRowTool, tagRowGate, TAG_CLOSES } from '../../lib/partTag';
+import { PartTagRow } from './PartTagRow';
 
 /**
  * The one-tap "did it help?" at the end of a tool (PR-S3). Graph copy (SessionCloseFlow), one tap,
@@ -26,6 +31,19 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
   const asksPlan = closeKind === 'plan' && !!planType;
   const [content, setContent] = useState<SpineContent | null>(null);
   const [done, setDone] = useState<'answered' | 'skipped' | null>(null);
+  // "Was this a part you know?" (PartTagRow): after a better close is saved, parts on, on a tool that
+  // can show it. The parts content is read only once that close is saved.
+  const partsOn = useUserProfile().profile.partsEnabled;
+  const [closeAnswer, setCloseAnswer] = useState<ThenVsNow | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [parts, setParts] = useState<PartsContent | null>(null);
+  const wantsRow = partsOn && saved && isTagRowTool(session.toolId) && !!closeAnswer && TAG_CLOSES.includes(closeAnswer);
+  useEffect(() => {
+    if (!wantsRow || parts) return;
+    let live = true;
+    getPartsContent().then((p) => { if (live) setParts(p); }).catch(() => { /* no row */ });
+    return () => { live = false; };
+  }, [wantsRow, parts]);
 
   useEffect(() => {
     if (!asksAtClose(closeKind) && !asksPlan) return;
@@ -41,9 +59,15 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
   if (!q) return null;
 
   if (done) {
-    return done === 'answered'
-      ? <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
-      : null;
+    if (done !== 'answered') return null;
+    const toolId = session.toolId;
+    const row = isTagRowTool(toolId) && tagRowGate({ partsOn, toolId, thenVsNow: closeAnswer, saved, content: parts });
+    return (
+      <>
+        <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
+        {row && parts && isTagRowTool(toolId) && <PartTagRow toolId={toolId} toolSessionId={session.id} content={parts} />}
+      </>
+    );
   }
 
   const answer = (choiceId: string) => {
@@ -55,10 +79,12 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
       input = { status: 'completed', actedOnUrge: choiceId as ActedOnUrge };
     } else {
       input = { status: 'completed', thenVsNow: choiceId as ThenVsNow };
+      setCloseAnswer(choiceId as ThenVsNow);
     }
     if (detail) input = { ...input, detail };
     setDone('answered');
-    void session.close(input);
+    // The tag row waits for the server to have the close (tagPart refuses an open session).
+    session.close(input).then((r) => { if (r) setSaved(true); }, () => { /* the close is optional */ });
     onAnswered?.(input);
   };
   const skip = () => {
