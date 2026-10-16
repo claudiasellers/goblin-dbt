@@ -18,6 +18,7 @@ const AUTHED = [
   'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
   'getPartsEntry', // reads the caller's own check-ins and Recover sessions
+  'deleteMyParts', // deletes the caller's own parts records
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',

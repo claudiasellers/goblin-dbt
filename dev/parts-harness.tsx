@@ -21,7 +21,7 @@ import '../src/index.css';
 import fixture from '../tests/fixtures/capacity-content.json';
 import partsFixture from '../tests/fixtures/parts-content.json';
 import spineFile from '../src/data/content/spine.json';
-import type { CapacityContent, HandoffResult } from '../src/data/capacityTypes';
+import type { CapacityContent } from '../src/data/capacityTypes';
 import { BandProvider } from '../src/contexts/BandContext';
 import { TooMuchLink } from '../src/components/capacity/TooMuchLink';
 import { BreakdownHandoff } from '../src/components/capacity/BreakdownHandoff';
@@ -29,7 +29,8 @@ import { CrisisBanner } from '../src/components/safety/CrisisBanner';
 import { HeatFigure, type FigureMark } from '../src/components/checkin/body/HeatFigure';
 import { REGIONS, type RegionId } from '../src/data/bodyFigure';
 import { SvgBlob } from '../src/components/tools/findTheFeeling/shape/SvgBlob';
-import { DIMS, fromVec, variant, type Feel } from '../src/components/tools/findTheFeeling/shape/feel';
+import { fromVec, toVec, variant, type Feel } from '../src/components/tools/findTheFeeling/shape/feel';
+import { initialMeet, meetNext, whatToSave, MEET_TRACK, type MeetContext, type MeetEvent, type MeetState } from '../src/lib/meetAPart';
 import { AngryPartCard } from '../src/components/parts/AngryPartCard';
 import { angryCopyFrom, orderHurts } from '../src/lib/angryPart';
 import type { AngryCardContent, AngryStep } from '../src/data/partsTypes';
@@ -130,265 +131,197 @@ function OwnWords({ onDone }: { onDone: (text: string) => void }) {
 
 /* ───────── Meet a part ───────── */
 
-type Step = 'blend' | 'blendBody' | 'find' | 'where' | 'shape' | 'age' | 'young' | 'voice' | 'feel' | 'unblend' | 'unblendEnd' | 'nothing' | 'job' | 'likes'
-  | 'guards' | 'fear' | 'stop' | 'update' | 'canNow' | 'thank' | 'rather' | 'name' | 'keep' | 'tender' | 'close' | 'done';
-const TRACK: Partial<Record<Step, number>> = { find: 1, where: 2, shape: 3, age: 3, young: 3, voice: 3, feel: 4, unblend: 4, job: 5, likes: 5, guards: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, rather: 8, name: 9, keep: 9, tender: 8, close: 10 };
+// The rules are the app's own (src/lib/meetAPart.ts); this view only draws the screens and reports events.
 const ORIENTING = SPINE.kinds.orienting;
 /**
  * The blending check needs something for "it" to point at: it comes right after Find, or first when the
  * flow starts from a named trailhead (?move=…, which already answers Find). ?blend=0 skips it.
  */
-const BLEND = q.get('blend') !== '0';
-const NAMED_TRAILHEAD = !!MOVES[q.get('move') ?? ''];
-const AFTER_FIND: Step = BLEND ? 'blend' : 'where';
-const FIRST: Step = NAMED_TRAILHEAD ? AFTER_FIND : 'find';
-/** The blend check's answer, by option id. It is a log field only: never a band, never carried, never routed on. */
-const BLEND_ANSWER: Record<string, 'notice' | 'running' | 'not_sure'> = { blend_notice: 'notice', blend_running: 'running', blend_not_sure: 'not_sure' };
-
-interface Session {
-  move: MoveId; place: RegionId | null; shape: Feel; ageId?: string; voiceId?: string; ownVoice?: string;
-  feelTowardIds: string[]; steppedBack: number; jobId?: string; ownJob?: string; likesId?: string; guardsId?: string;
-  fearId?: string; ownFear?: string; updateId?: string; canNowId?: string; ratherId?: string; name?: string;
-  tender: boolean; danger: boolean; stopReason: 'tender' | 'own_words' | 'worried_part' | 'nothing' | null; kept: boolean | null; closeId?: string;
-  blendCheck?: 'notice' | 'running' | 'not_sure'; handoffs: HandoffResult[]; exitStep?: Step;
-}
+const MEET_CTX: MeetContext = {
+  safetyLineMoves: PC.moves.filter((m) => m.safetyLine).map((m) => m.id),
+  maxNonSelfAnswers: PC.policy.maxNonSelfAnswers,
+  namedEntry: !!MOVES[q.get('move') ?? ''],
+  blendCheck: q.get('blend') !== '0',
+};
 
 function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unknown) => void }) {
-  const fresh = (): Session => ({ move: initialMove, place: null, shape: fromVec([0, 0, 0, 0, 0]), feelTowardIds: [], steppedBack: 0, tender: false, danger: false, stopReason: null, kept: null, handoffs: [] });
-  const [step, setStep] = useState<Step>(FIRST);
-  const [round, setRound] = useState(0);
+  const fresh = () => initialMeet(MEET_CTX, { move: initialMove, trailheadKind: 'move' });
+  const [st, setSt] = useState<MeetState>(fresh);
   const [ownFor, setOwnFor] = useState<null | 'voice' | 'job' | 'fear'>(null);
-  /** "Picking up where we were.", on the step P2 resumed to, until the person moves on. */
-  const [resumeNote, setResumeNote] = useState(false);
-  /** P2 ended on "come back later" (a follow-up was scheduled): the run ends after its own message, with no close question. */
-  const [later, setLater] = useState(false);
-  const [s, setS] = useState<Session>(fresh);
-  const set = (p: Partial<Session>) => setS((x) => ({ ...x, ...p }));
+  /** The place being chosen on the figure, until Continue reports it. */
+  const [placeDraft, setPlaceDraft] = useState<RegionId | null>(null);
+  const { step, session: s } = st;
   const move = MOVES[s.move];
-  const safety = !!move.safetyLine || s.danger;
-  const go = (st: Step) => { setOwnFor(null); setResumeNote(false); setStep(st); };
-  const restart = () => { setStep(FIRST); setRound(0); setS(fresh()); setLater(false); setResumeNote(false); };
-  const addHandoff = (r: HandoffResult) => setS((x) => ({ ...x, handoffs: [...x.handoffs, r] }));
+  const shape = fromVec(s.shape);
+  const send = (e: MeetEvent) => { setOwnFor(null); setSt((x) => meetNext(x, e, MEET_CTX)); };
+  const option = (o: Option) => send({ type: 'option', option: o });
+  const restart = () => { setSt(fresh()); setPlaceDraft(null); setOwnFor(null); };
 
   useEffect(() => {
+    if (st.aside) onLog({ handoff: st.aside === 'grounding' ? '5-4-3-2-1' : 'body primitive (P2)' });
+  }, [st.aside]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
     if (step !== 'done') return;
-    const guards = s.guardsId && PC.hurts.some((h) => h.id === s.guardsId) ? [s.guardsId] : [];
-    const log = {
-      PartSession: {
-        layer: 'log', trailheadKind: 'move', moveId: s.move, place: s.place, shape: [s.shape.sharp, s.shape.heat, s.shape.weight, s.shape.buzz, s.shape.clench].map((n) => +n.toFixed(2)),
-        ageId: s.ageId, voiceId: s.voiceId, ownVoice: s.ownVoice, feelTowardIds: s.feelTowardIds, steppedBack: s.steppedBack,
-        jobId: s.jobId, ownJob: s.ownJob, likesId: s.likesId, guardsId: s.guardsId, fearId: s.fearId, ownFear: s.ownFear, stopReason: s.stopReason,
-        exitStep: s.exitStep,
-        // The blending check and the P2 run it opened: log only, never a band and never a profile write.
-        blendCheck: s.blendCheck, handoffs: s.handoffs.length ? s.handoffs : undefined,
-      },
+    const save = whatToSave(st);
+    onLog({
+      PartSession: { layer: 'log', ...save.partSession },
       // After P2's "come back later" the session still closes, but nobody was asked: no thenVsNow at all.
-      ToolSession: { layer: 'log', toolId: 'meet-a-part', closeKind: 'orienting', thenVsNow: s.exitStep === 'blend' ? undefined : s.closeId ?? null },
-      keepPart: s.kept ? {
-        layer: 'profile (on yes only)', name: s.name ?? null, tender: s.tender, places: s.place ? [s.place] : [], jobIds: s.jobId ? [s.jobId] : [],
-        fearIds: s.fearId ? [s.fearId] : [], preferredRoleIds: s.ratherId ? [s.ratherId] : [], USES: [s.move], GUARDS: guards,
-      } : null,
-      followUp: s.kept ? { type: 'part_checkback', due: 'tomorrow' } : null,
-    };
-    onLog(log);
+      ToolSession: { layer: 'log', ...save.toolSession },
+      keepPart: save.keep && { layer: 'profile (on yes only)', ...save.keep },
+      followUp: save.followUp,
+      PartCandidate: save.candidate && { layer: 'log, on yes', ...save.candidate },
+    });
   }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /** What picking an option does, from its `branch` in the content; `next` is the step's ordinary next. */
-  const follow = (o: Option, next: Step) => {
-    switch (o.branch) {
-      case 'tender_offer': return go('young');
-      case 'tender_path': set({ tender: true }); return go('tender');
-      case 'unblend': {
-        const n = s.steppedBack + 1;
-        set({ steppedBack: n });
-        return go(n >= PC.policy.maxNonSelfAnswers ? 'unblendEnd' : 'unblend');
-      }
-      case 'grounding':
-        if (step === 'feel') { set({ stopReason: 'nothing' }); return go('nothing'); }
-        onLog({ handoff: '5-4-3-2-1' });
-        return go(next);
-      case 'body_first': onLog({ handoff: 'body primitive (P2)' }); return go(next);
-      case 'conservative': set({ stopReason: 'tender' }); return go('stop');
-      case 'danger': set({ danger: true }); return go('thank');
-      case 'candidate': onLog({ PartCandidate: { layer: 'log, on yes', origin: 'worried_part' } }); return go('close');
-      case 'end': return go('close');
-      case 'keep': set({ kept: true }); return go('close');
-      default: return go(next);
-    }
-  };
-  const afterFeel = (o: Option) => {
-    set({ feelTowardIds: [...s.feelTowardIds, o.id] });
-    follow(o, 'job');
-  };
-  const afterFear = (o: Option | null, own?: string) => {
-    // Own words at the fear step are never read: always the conservative branch.
-    if (own !== undefined) { set({ ownFear: own, stopReason: 'own_words' }); return go('stop'); }
-    if (!o) return;
-    set({ fearId: o.id });
-    follow(o, safety ? 'thank' : 'update');
-  };
-  /** The options at a step as chips; `field` records the pick, `next` is where `continue` goes. */
-  const pick = (flow: string, st: string, next: Step, field?: keyof Session) => (
-    <Chips options={opts(flow, st, s.move)} onPick={(o) => { if (field) set({ [field]: o.id } as Partial<Session>); follow(o, next); }} />
-  );
+  /** The options at a step as chips, each reported as picked. */
+  const pick = (flow: string, sub: string) => <Chips options={opts(flow, sub, s.move)} onPick={option} />;
 
   const body = (): ReactNode => {
     if (ownFor) {
       return (<>
         <p className="text-lg font-medium">{P(ownFor === 'voice' ? 'meet_voice' : ownFor === 'job' ? 'meet_job' : 'meet_fear')}</p>
-        <OwnWords onDone={(t) => {
-          // On a safety-line move, own words at voice or job take the danger branch.
-          if (ownFor === 'voice') { set({ ownVoice: t, danger: s.danger || move.safetyLine }); go('feel'); }
-          else if (ownFor === 'job') { set({ ownJob: t, danger: s.danger || move.safetyLine }); go('likes'); }
-          else afterFear(null, t);
-        }} />
+        <OwnWords onDone={(t) => send({ type: 'ownWords', text: t })} />
       </>);
     }
     switch (step) {
       case 'blend': return (<>
         <p className="text-lg font-medium">{P('gate_blend_check')}</p>
-        {/* "Not sure" is a complete answer: it goes on like "I can notice it". Only body_first changes the way. */}
-        <Chips options={opts('gate', 'blend', s.move)} onPick={(o) => {
-          set({ blendCheck: BLEND_ANSWER[o.id] });
-          go(o.branch === 'body_first' ? 'blendBody' : 'where');
-        }} />
+        {pick('gate', 'blend')}
         <p className="text-xs text-[var(--color-text-tertiary)]">Harness note: asked once "it" is named, never on the check-in; ?blend=0 skips it.</p>
       </>);
       // "It's running things": the real P2 hand-off, card first, in the page (no band is recorded, so stirred).
-      // Resume or keep going lands on Where, never on the blend check again.
       case 'blendBody': return (<>
-        <BreakdownHandoff host="meet-a-part" band="stirred" blank={false}
+        <BreakdownHandoff host="meet-a-part" band={st.p2?.band ?? 'stirred'} blank={false}
           resume={{ hostSessionId: '00000000-0000-4000-8000-0000000000aa', stepId: 'where', draft: {} }}
           onScheduleLater={async (chip) => { onLog({ FollowUp: { layer: 'log', type: 'resume_skill', window: chip } }); return 'fu-demo'; }}
-          onResume={(r) => { addHandoff(r); go('where'); if (!r.overridden) setResumeNote(true); }}
-          onLater={(r) => { addHandoff(r); set({ exitStep: 'blend' }); setLater(true); }} />
-        {/* Come back later ends the run without the orienting close (decided 16 Oct): P2 just asked its own
-            reread, and a second question while leaving reads as being quizzed. The follow-up stands. */}
-        {later && <Primary onClick={() => go('done')}>Continue</Primary>}
+          onResume={(r) => send({ type: 'p2', outcome: r.overridden ? 'override' : 'resume', result: r })}
+          onLater={(r) => send({ type: 'p2', outcome: 'later', result: r })} />
+        {st.later && <Primary onClick={() => send({ type: 'continue' })}>Continue</Primary>}
       </>);
       case 'find': return (<>
         <p className="text-lg font-medium">{P('meet_find')}</p>
         <div className="flex flex-wrap gap-2.5">
-          <Chip label={`The pull to ${move.label.toLowerCase()}`} on onClick={() => go(AFTER_FIND)} />
-          {PARTS.filter((p) => !p.tender).slice(0, 2).map((p) => <Chip key={p.id} label={p.name} onClick={() => { set({ move: p.move }); go(AFTER_FIND); }} />)}
-          {opts('meet', 'find').map((o) => <Chip key={o.id} label={o.label} onClick={() => onLog({ find: o.id })} />)}
+          <Chip label={`The pull to ${move.label.toLowerCase()}`} on onClick={() => send({ type: 'find' })} />
+          {PARTS.filter((p) => !p.tender).slice(0, 2).map((p) => <Chip key={p.id} label={p.name} onClick={() => send({ type: 'find', move: p.move })} />)}
+          {opts('meet', 'find').map((o) => <Chip key={o.id} label={o.label} onClick={() => { onLog({ find: o.id }); option(o); }} />)}
         </div>
         <p className="text-sm text-[var(--color-text-tertiary)]">Or start from another move:</p>
         <div className="flex flex-wrap gap-2">
-          {MOVE_IDS.filter((m) => m !== s.move).map((m) => <Chip key={m} label={MOVES[m].label} onClick={() => { set({ move: m }); }} />)}
+          {MOVE_IDS.filter((m) => m !== s.move).map((m) => <Chip key={m} label={MOVES[m].label} onClick={() => send({ type: 'setMove', move: m })} />)}
         </div>
       </>);
       case 'where': {
-        const marks: FigureMark[] = s.place ? [{ region: s.place, side: 'both', colour: 'var(--color-quadrant-low-unpleasant)', strength: 0.6 }] : [];
+        const marks: FigureMark[] = placeDraft ? [{ region: placeDraft, side: 'both', colour: 'var(--color-quadrant-low-unpleasant)', strength: 0.6 }] : [];
         return (<>
-          {resumeNote && <p className="text-sm text-[var(--color-text-secondary)]">{capacity.handoff.resumeLine}</p>}
+          {st.resumeNote && <p className="text-sm text-[var(--color-text-secondary)]">{capacity.handoff.resumeLine}</p>}
           <p className="text-lg font-medium">{P('meet_where')}</p>
-          <div className="mx-auto w-44"><HeatFigure marks={marks} selected={s.place} onPick={(r) => set({ place: r })} /></div>
-          <p className="text-sm text-[var(--color-text-secondary)] min-h-5">{s.place ? `My ${REGIONS[s.place].label.toLowerCase()}` : 'Touch and drag to a place, then lift.'}</p>
-          <Primary disabled={!s.place} onClick={() => go('shape')}>Continue</Primary>
-          {opts('meet', 'where').map((o) => <TextBtn key={o.id} onClick={() => { set({ place: null }); follow(o, 'shape'); }}>{o.label}</TextBtn>)}
+          <div className="mx-auto w-44"><HeatFigure marks={marks} selected={placeDraft} onPick={setPlaceDraft} /></div>
+          <p className="text-sm text-[var(--color-text-secondary)] min-h-5">{placeDraft ? `My ${REGIONS[placeDraft].label.toLowerCase()}` : 'Touch and drag to a place, then lift.'}</p>
+          <Primary disabled={!placeDraft} onClick={() => send({ type: 'place', place: placeDraft })}>Continue</Primary>
+          {opts('meet', 'where').map((o) => <TextBtn key={o.id} onClick={() => { setPlaceDraft(null); option(o); }}>{o.label}</TextBtn>)}
         </>);
       }
       case 'shape': {
-        const a = variant(s.shape, round, 1), b = variant(s.shape, round, -1);
-        const next = (f: Feel) => { set({ shape: f }); if (round + 1 >= DIMS.length) go('age'); else setRound(round + 1); };
+        const a = variant(shape, st.round, 1), b = variant(shape, st.round, -1);
+        const next = (f: Feel) => send({ type: 'shape', shape: toVec(f) });
         return (<>
           <p className="text-lg font-medium">{P('meet_shape')}</p>
-          <p className="text-sm text-[var(--color-text-tertiary)]">{['I', 'II', 'III', 'IV', 'V'][round]} of V</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">{['I', 'II', 'III', 'IV', 'V'][st.round]} of V</p>
           <div className="grid grid-cols-2 gap-3">
-            {[[a, SHAPE_PAIRS[round][0]], [b, SHAPE_PAIRS[round][1]]].map(([f, label]) => (
+            {[[a, SHAPE_PAIRS[st.round][0]], [b, SHAPE_PAIRS[st.round][1]]].map(([f, label]) => (
               <button key={label as string} type="button" onClick={() => next(f as Feel)}
                 className="lift-secondary rounded-2xl border border-[var(--color-border)] bg-[var(--color-bg-card)] p-3 grid place-items-center gap-1">
                 <Blob feel={f as Feel} size={110} /><span className="text-sm font-medium">{label as string}</span>
               </button>
             ))}
           </div>
-          {opts('meet', 'shape').map((o) => <TextBtn key={o.id} onClick={() => next(s.shape)}>{o.label}</TextBtn>)}
+          {opts('meet', 'shape').map((o) => <TextBtn key={o.id} onClick={() => option(o)}>{o.label}</TextBtn>)}
         </>);
       }
       case 'age': return (<>
-        <div className="flex justify-center"><Blob feel={s.shape} size={120} /></div>
+        <div className="flex justify-center"><Blob feel={shape} size={120} /></div>
         <p className="text-lg font-medium">{P('meet_age')}</p>
-        {pick('meet', 'age', 'voice', 'ageId')}
+        {pick('meet', 'age')}
       </>);
       case 'young': return (<>
         <p className="font-serif text-2xl leading-snug">{P('meet_age_young')}</p>
-        {pick('meet', 'age_young', 'voice')}
+        {pick('meet', 'age_young')}
       </>);
       case 'voice': return (<>
         <p className="text-lg font-medium">{P('meet_voice')}</p>
-        <Chips options={opts('meet', 'voice', s.move)} onPick={(o) => { set({ voiceId: o.id }); follow(o, 'feel'); }} own={() => setOwnFor('voice')} />
+        <Chips options={opts('meet', 'voice', s.move)} onPick={option} own={() => setOwnFor('voice')} />
       </>);
       case 'feel': {
         const feel = opts('meet', 'feel');
         return (<>
-          <div className="flex justify-center"><Blob feel={s.shape} size={100} /></div>
+          <div className="flex justify-center"><Blob feel={shape} size={100} /></div>
           <p className="text-lg font-medium">{P('meet_feel')}</p>
-          <Chips options={feel.filter((o) => o.selfLike === true)} onPick={afterFeel} />
-          <Chips options={feel.filter((o) => o.selfLike === false)} onPick={afterFeel} />
-          <Chips options={feel.filter((o) => o.selfLike == null)} onPick={afterFeel} />
+          <Chips options={feel.filter((o) => o.selfLike === true)} onPick={option} />
+          <Chips options={feel.filter((o) => o.selfLike === false)} onPick={option} />
+          <Chips options={feel.filter((o) => o.selfLike == null)} onPick={option} />
         </>);
       }
       case 'unblend': return (<>
         <p className="font-serif text-2xl leading-snug">{P('meet_unblend')}</p>
-        {pick('meet', 'unblend', 'feel')}
+        {pick('meet', 'unblend')}
       </>);
       case 'unblendEnd': return (<>
         <p className="font-serif text-2xl leading-snug">{P('meet_unblend_end')}</p>
         <p className="text-base">{P('meet_unblend_later')}</p>
-        <Chips options={opts('meet', 'unblend_later')} onPick={(o) => { set({ stopReason: 'worried_part' }); follow(o, 'close'); }} />
+        {pick('meet', 'unblend_later')}
       </>);
       case 'nothing': return (<>
         <p className="font-serif text-2xl leading-snug">{P('meet_nothing')}</p>
-        {pick('meet', 'nothing', 'thank')}
+        {pick('meet', 'nothing')}
       </>);
       case 'job': return (<>
         <p className="text-lg font-medium">{P('meet_job')}</p>
-        <Chips options={opts('meet', 'job', s.move)} onPick={(o) => { set({ jobId: o.id }); follow(o, 'likes'); }} own={() => setOwnFor('job')} />
+        <Chips options={opts('meet', 'job', s.move)} onPick={option} own={() => setOwnFor('job')} />
       </>);
       case 'likes': return (<>
         <p className="text-lg font-medium">{P('meet_likes')}</p>
-        {pick('meet', 'likes', 'guards', 'likesId')}
+        {pick('meet', 'likes')}
       </>);
       case 'guards': return (<>
         <p className="text-lg font-medium">{P('meet_guards')}</p>
-        <Chips options={[...guardsFor(s.move), ...opts('meet', 'guards')]} onPick={(o) => { set({ guardsId: o.id }); go('fear'); }} />
+        <Chips options={[...guardsFor(s.move), ...opts('meet', 'guards')]}
+          onPick={(o) => ('branch' in o ? option(o) : send({ type: 'hurt', hurtId: o.id }))} />
       </>);
       case 'fear': return (<>
         <p className="text-lg font-medium">{P('meet_fear')}</p>
-        <Chips options={opts('meet', 'fear', s.move)} onPick={(o) => afterFear(o)} own={() => setOwnFor('fear')} />
+        <Chips options={opts('meet', 'fear', s.move)} onPick={option} own={() => setOwnFor('fear')} />
         <p className="text-xs text-[var(--color-text-tertiary)]">Harness note: some chips are flagged tender or danger; own words always take the careful branch.</p>
       </>);
       case 'stop': return (<>
         <p className="font-serif text-3xl leading-tight">{P('meet_stop_title')}</p>
         <p className="font-serif text-xl text-[var(--color-text-secondary)]">{P('meet_stop_body')}</p>
         <p className="text-sm text-[var(--color-text-secondary)]">{P('meet_stop_therapist')}</p>
-        {pick('meet', 'stop', 'thank')}
+        {pick('meet', 'stop')}
       </>);
       case 'update': return (<>
         <p className="text-lg font-medium">{P('meet_update')}</p>
-        <Chips options={opts('meet', 'update')} onPick={(o) => { set({ updateId: o.id }); follow(o, o.id === 'update_no' ? 'canNow' : 'thank'); }} />
+        {pick('meet', 'update')}
       </>);
       case 'canNow': return (<>
         <p className="text-lg font-medium">{P('meet_update_show')}</p>
-        {pick('meet', 'update_show', 'thank', 'canNowId')}
+        {pick('meet', 'update_show')}
       </>);
-      case 'thank': return <Thank feel={s.shape} label={P('meet_thank')} onDone={() => go(s.stopReason || safety ? 'name' : 'rather')} />;
-      case 'tender': return <Thank feel={fromVec([-0.8, 0.1, -0.4, -0.8, -0.2])} wrapped label={P('meet_tender')} sub={P('meet_tender_sub')} onDone={() => go('name')} />;
+      case 'thank': return <Thank feel={shape} label={P('meet_thank')} onDone={() => send({ type: 'hold' })} />;
+      case 'tender': return <Thank feel={fromVec([-0.8, 0.1, -0.4, -0.8, -0.2])} wrapped label={P('meet_tender')} sub={P('meet_tender_sub')} onDone={() => send({ type: 'hold' })} />;
       case 'rather': return (<>
         <p className="text-lg font-medium">{P('meet_rather')}</p>
-        {pick('meet', 'rather', 'name', 'ratherId')}
+        {pick('meet', 'rather')}
       </>);
-      case 'name': return <NameStep suggestion={s.tender ? 'the little one' : move.nameHint} onDone={(n) => { set({ name: n }); go('keep'); }} />;
+      case 'name': return <NameStep suggestion={s.tender ? 'the little one' : move.nameHint} onDone={(n) => send({ type: 'name', name: n || null })} />;
       case 'keep': return (<>
-        <div className="flex items-center gap-4"><Blob feel={s.shape} size={72} /><p className="font-serif text-2xl">{s.name || 'This part'}</p></div>
+        <div className="flex items-center gap-4"><Blob feel={shape} size={72} /><p className="font-serif text-2xl">{s.name || 'This part'}</p></div>
         <p className="text-lg font-medium">{P('meet_keep')}</p>
-        {pick('meet', 'keep', 'close')}
+        {pick('meet', 'keep')}
       </>);
       case 'close': return (<>
         <p className="text-lg font-medium">{ORIENTING.question}</p>
-        <div className="grid gap-2">{ORIENTING.choices.map((o) => <button key={o.id} type="button" onClick={() => { set({ closeId: o.id }); go('done'); }} className="lift-secondary min-h-12 rounded-xl border border-[var(--color-border)] text-left px-4">{o.label}</button>)}</div>
-        <TextBtn onClick={() => go('done')}>{SPINE.skip}</TextBtn>
+        <div className="grid gap-2">{ORIENTING.choices.map((o) => <button key={o.id} type="button" onClick={() => send({ type: 'close', choiceId: o.id })} className="lift-secondary min-h-12 rounded-xl border border-[var(--color-border)] text-left px-4">{o.label}</button>)}</div>
+        <TextBtn onClick={() => send({ type: 'close', choiceId: null })}>{SPINE.skip}</TextBtn>
       </>);
       case 'done': return (<>
         <p className="font-serif text-2xl">{SPINE.saved}</p>
@@ -398,11 +331,12 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
     }
   };
 
+  const track = MEET_TRACK[step];
   return (
     <div className="space-y-5">
-      {!['done', 'blend', 'blendBody'].includes(step) && <Track at={TRACK[step] ?? 1} total={10} />}
+      {track !== undefined && <Track at={track} total={10} />}
       {/* Crisis resources alongside, never instead: the app's own banner (the crisis seam's copy). */}
-      {safety && !['find', 'done'].includes(step) && <CrisisBanner />}
+      {st.crisis && !['find', 'done'].includes(step) && <CrisisBanner />}
       <div className="space-y-4">{body()}</div>
       {/* Every screen but P2 itself (no hand-off inside the hand-off). */}
       {!['done', 'blendBody'].includes(step) && (

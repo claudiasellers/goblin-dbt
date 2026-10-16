@@ -3,10 +3,10 @@
  * History is a stack of {step, data} snapshots: Back restores the data too, so
  * re-ratings, skills and unlock targets never leak from an abandoned branch.
  */
-import type { ExitId, Gate, Pull, InvalidationEvent, Zone } from '../data/invalidationRecoveryTypes';
+import type { ExitId, Gate, Pull, InvalidationEvent, RecoveryGates, Zone } from '../data/invalidationRecoveryTypes';
 
 export type Step =
-  | 'what' | 'loud' | 'stop' | 'cold' | 'breathe' | 'orient' | 'rerate' | 'secure'
+  | 'what' | 'loud' | 'stop' | 'cold' | 'breathe' | 'orient' | 'rerate' | 'angry' | 'secure'
   | 'label' | 'validate' | 'compassion' | 'need' | 'certainty' | 'them'
   | 'route' | 'unlock' | 'exit' | 'close' | 'follow';
 
@@ -35,7 +35,7 @@ export const EMPTY_FLOW: FlowData = {
 
 export const PHASES: { key: string; steps: Step[] }[] = [
   { key: 'settle', steps: ['what', 'loud', 'stop', 'cold', 'breathe', 'orient', 'rerate'] },
-  { key: 'name', steps: ['label'] },
+  { key: 'name', steps: ['angry', 'label'] },
   { key: 'validate', steps: ['secure', 'validate', 'compassion'] },
   { key: 'need', steps: ['need', 'certainty', 'them'] },
   { key: 'move', steps: ['route', 'unlock', 'exit'] },
@@ -46,20 +46,37 @@ export const phaseIndex = (s: Step) => PHASES.findIndex(p => p.steps.includes(s)
 const isAttachment = (st: Pick<InvalidationEvent, 'protocol' | 'secondaryProtocol'>) =>
   st.protocol === 'attachment_alarm' || st.secondaryProtocol === 'attachment_alarm';
 
-/** The step after `from`, given the data already collected. */
-export function nextStep(from: Step, d: FlowData, st: Pick<InvalidationEvent, 'protocol' | 'secondaryProtocol'>): Step {
+/**
+ * Whether the angry-part card is offered next (src/components/parts/AngryPartCard.tsx): the pull is
+ * fight back, the latest reading is under the downshift line (never while flooded: after the body
+ * steps only if the re-rating came under it), its copy is complete for the person's wording (`ready`),
+ * and it hasn't been offered in this visit (`offered`; going Back into it is a different thing).
+ */
+export function offerAngryCard(d: Pick<FlowData, 'pull' | 'now'>, g: Pick<RecoveryGates, 'downshiftAt'>, ready: boolean, offered: boolean): boolean {
+  return d.pull === 'fight' && d.now !== null && d.now < g.downshiftAt && ready && !offered;
+}
+
+/**
+ * The step after `from`, given the data already collected. `angry`: offerAngryCard's answer, so the
+ * card sits between settling and naming; leaving it goes on exactly as settling would have.
+ */
+export function nextStep(from: Step, d: FlowData, st: Pick<InvalidationEvent, 'protocol' | 'secondaryProtocol'>, angry = false): Step {
   switch (from) {
     case 'what': return 'loud';
     case 'loud':
       if (d.gate === 'downshift' || d.gate === 'downshift-cold') return 'stop';
       if (d.gate === 'orient') return 'orient';
+      if (angry) return 'angry';
       return isAttachment(st) ? 'secure' : 'label';
     case 'stop': return d.gate === 'downshift-cold' ? 'cold' : 'breathe';
     case 'cold': return 'breathe';
     case 'breathe': case 'orient': case 'unlock': return 'rerate';
     case 'rerate':
       if (d.rerateTo === 'route') return 'route';
+      if (angry) return 'angry';
       return isAttachment(st) && !d.skills.includes('secure') ? 'secure' : 'label';
+    // From loud the skills are still empty, so this is loud's own rule there too.
+    case 'angry': return isAttachment(st) && !d.skills.includes('secure') ? 'secure' : 'label';
     case 'secure': return 'label';
     case 'label': return 'validate';
     case 'validate': return st.protocol === 'diminished_self' ? 'compassion' : 'need';

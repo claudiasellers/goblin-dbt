@@ -101,6 +101,22 @@ test("ext er: Do the Opposite keeps the check's result as ids (parts data fix 3)
   assert.throws(() => ext.validateExt({ er: { oaSafety: "safe" } }), /not registered/);
 });
 
+test("ext wmp: the angry-part card in Recover keeps the hurt, the hold and where it ended, as ids", () => {
+  const wmp = { angryHurtId: "brushed_off", angryVoteHeld: true, angryExit: "speak" };
+  assert.deepEqual(JSON.parse(ext.validateExt({ wmp })).wmp, wmp);
+  // Not sure: no hurt id at all; Not now: skipped, nothing held.
+  assert.deepEqual(JSON.parse(ext.validateExt({ wmp: { angryHurtId: undefined, angryVoteHeld: false, angryExit: "skipped" } })).wmp,
+    { angryVoteHeld: false, angryExit: "skipped" });
+  for (const key of ["angryHurtId", "angryExit"]) {
+    assert.throws(() => ext.validateExt({ wmp: { [key]: "I felt brushed off" } }), /expected an id/, `${key}: no free text`);
+    assert.throws(() => ext.validateExt({ wmp: { [key]: "a".repeat(65) } }), /expected an id/, `${key}: ≤ 64 chars`);
+    assert.throws(() => ext.validateExt({ wmp: { [key]: 1 } }), /expected an id/, `${key}: no numbers`);
+  }
+  assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: "yes" } }), /expected a boolean/);
+  assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: 1 } }), /expected a boolean/);
+  assert.throws(() => ext.validateExt({ wmp: { angrySpeakLine: "I felt brushed off." } }), /not registered/);
+});
+
 test("close: emotion ids picked in the tool are ids only, at most 20; none given is []", () => {
   assert.deepEqual(v.validateClose({ id: ID, status: "completed", emotionIds: ["hurt", "anxious", "hurt"] }, now).emotionIds, ["hurt", "anxious"]);
   assert.deepEqual(v.validateClose({ id: ID, status: "completed" }, now).emotionIds, []);

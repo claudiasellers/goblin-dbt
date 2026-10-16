@@ -659,6 +659,48 @@
    "order": 5,
    "copy": "Not affiliated with or endorsed by the IFS Institute.",
    "reviewStatus": "draft"
+  },
+  "settings_delete": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 6,
+   "copy": "Delete your parts",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_confirm": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 7,
+   "copy": "This deletes the parts you've kept and what you've said about them. It can't be undone.",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_yes": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 8,
+   "copy": "Delete them",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_no": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 9,
+   "copy": "Keep them",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_done": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 10,
+   "copy": "Deleted.",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_failed": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 11,
+   "copy": "Couldn't delete them. Try again.",
+   "reviewStatus": "draft"
   }
  },
  "options": {

@@ -18,6 +18,8 @@ import { validateKeep } from './keepPlan';
 import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
 import type { KeepPartResponse, QueuePartCandidateResponse } from './keepTypes';
 
+export { deleteMyParts } from './delete';
+
 /** What a parts flow opens on: P2 first, the far-away heads-up, or clear. Never a lock. */
 export const getPartsEntry = callable<unknown, PartsEntry>(
   { auth: 'required', label: 'getPartsEntry' },
