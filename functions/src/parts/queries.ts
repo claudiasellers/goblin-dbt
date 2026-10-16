@@ -6,6 +6,7 @@
 import neo4j from 'neo4j-driver';
 import { readTx } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
+import { userKey } from '../userdata/ownership';
 import type { PartsEntryDeps } from './handler';
 
 /**
@@ -54,6 +55,17 @@ export const PARTS_MADE_QUERY = `
   RETURN count(p) AS n
 `;
 
+/**
+ * Whether one of the caller's own parts is paused now (pausedUntil, set when the next-day check-back
+ * said Louder, still ahead). Parts on only; an unknown or someone else's id matches nothing: false.
+ */
+export const PART_PAUSED_QUERY = `
+  MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
+  MATCH (u)-[:HAS_PART]->(p:Part {key: $partKey})
+  WHERE p.ownerId = $uid
+  RETURN coalesce(p.pausedUntil > datetime(), false) AS paused
+`;
+
 /** Recover's `gates.downshiftAt` from its flow JSON, or null. */
 export function recoverDownshiftAt(contentJson: unknown): number | null {
   if (typeof contentJson !== 'string') return null;
@@ -100,6 +112,10 @@ export function graphDeps(uid: string): PartsEntryDeps {
     async partsMade(days) {
       const r = (await read(PARTS_MADE_QUERY, { uid, days: num(days) }))[0];
       return toNumber(r?.get('n')) ?? 0;
+    },
+    async partPaused(partId) {
+      const r = (await read(PART_PAUSED_QUERY, { uid, partKey: userKey(uid, partId) }))[0];
+      return r?.get('paused') === true;
     },
   };
 }

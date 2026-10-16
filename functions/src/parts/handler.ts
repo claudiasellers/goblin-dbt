@@ -15,15 +15,27 @@ export interface PartsEntryDeps {
   dissociation(days: number): Promise<number>;
   /** Parts the caller made in the last `days` (0 while parts are off). */
   partsMade(days: number): Promise<number>;
+  /** Whether the caller's own part `partId` is paused now (false for an unknown or someone else's id). */
+  partPaused(partId: string): Promise<boolean>;
 }
 
-export async function getPartsEntryHandler(deps: PartsEntryDeps): Promise<PartsEntry> {
+/** What the caller may send: nothing, or one of their own part ids (a visit to a kept part). */
+export interface PartsEntryInput {
+  partId: string | null;
+}
+
+export async function getPartsEntryHandler(deps: PartsEntryDeps, input: PartsEntryInput = { partId: null }): Promise<PartsEntry> {
   const policy = resolveEntryPolicy(await deps.policy());
-  const [recent, dissociationCount, made] = await Promise.all([
+  const [recent, dissociationCount, made, paused] = await Promise.all([
     deps.recent(policy.floodGateHours, policy.recoverDownshiftAt),
     deps.dissociation(policy.dissociationDays),
     deps.partsMade(policy.tooManyPartsDays),
+    input.partId ? deps.partPaused(input.partId) : Promise.resolve(false),
   ]);
-  const gate = entryGate({ ...recent, dissociationCount }, policy);
-  return made >= policy.tooManyPartsCount ? { ...gate, tooMany: true } : gate;
+  const gate: PartsEntry = entryGate({ ...recent, dissociationCount }, policy);
+  return {
+    ...gate,
+    ...(made >= policy.tooManyPartsCount ? { tooMany: true as const } : {}),
+    ...(paused ? { paused: true as const } : {}),
+  };
 }

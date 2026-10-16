@@ -11,7 +11,7 @@ import { initialMeet, meetNext, MEET_TRACK, SHAPE_ROUNDS, type MeetContext, type
 import {
   HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_OWN_WORDS_MAX, meetLimits, STEP_PART,
   candidateRequest, entryLaterPatch, entryPlan, guardsFor, keepRequest, meetContext, optionsFor, parseMeetEntry,
-  startRequest, startingMove, toPatch, showTooMany, doneTarget, TOO_MANY_PROMPT, type EntryPlan, type MeetEntry, type ShapeRoundLabels,
+  startRequest, startingMove, toPatch, showTooMany, doneTarget, TOO_MANY_PROMPT, isPaused, meetReady, PAUSED_PROMPT, type EntryPlan, type MeetEntry, type ShapeRoundLabels,
 } from '../../lib/meetAPartSave';
 import { vecToSig } from '../../lib/partFigure';
 import { promptCopy, stepOptions } from '../../lib/partsContent';
@@ -50,9 +50,9 @@ export function MeetAPart() {
     let live = true;
     loadMeetAPartContent().then((c) => { if (live) { if (c) setContent(c); else setFailed(true); } }).catch(() => { if (live) setFailed(true); });
     // A failed gate call is "clear": nothing ever locks.
-    getPartsEntry().then((g) => { if (live) setGate(g); }).catch(() => { if (live) setGate(null); });
+    getPartsEntry(entry.partId).then((g) => { if (live) setGate(g); }).catch(() => { if (live) setGate(null); });
     return () => { live = false; };
-  }, []);
+  }, [entry.partId]);
 
   if (failed) return null;
   if (!content || gate === undefined || profile.status === 'loading') {
@@ -62,15 +62,18 @@ export function MeetAPart() {
       </div>
     );
   }
+  const paused = isPaused(gate, entry);
+  // A paused visit needs its line: without it the visit isn't shown, like any other missing copy.
+  if (paused && !meetReady(content.parts, content.rounds, { paused })) return null;
   const known = profile.slices?.parts ?? [];
-  return <MeetVisit entry={entry} plan={entryPlan(gate)} tooMany={showTooMany(gate, entry)} parts={content.parts} rounds={content.rounds} known={known} />;
+  return <MeetVisit entry={entry} plan={entryPlan(gate)} tooMany={showTooMany(gate, entry)} paused={paused} parts={content.parts} rounds={content.rounds} known={known} />;
 }
 
 type PickedChip = { id: string; branch: string; flag?: string | null };
 type KnownPart = { id: string; name: string | null; tender: boolean; moveIds: string[] };
 
-function MeetVisit({ entry, plan, tooMany, parts, rounds, known }: {
-  entry: MeetEntry; plan: EntryPlan; tooMany: boolean; parts: PartsContent; rounds: ShapeRoundLabels; known: readonly KnownPart[];
+function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
+  entry: MeetEntry; plan: EntryPlan; tooMany: boolean; paused: boolean; parts: PartsContent; rounds: ShapeRoundLabels; known: readonly KnownPart[];
 }) {
   const toolSession = useToolSession();
   const band = useBand();
@@ -369,6 +372,7 @@ function MeetVisit({ entry, plan, tooMany, parts, rounds, known }: {
           {Array.from({ length: 10 }).map((_, i) => <span key={i} className={`h-1 flex-1 rounded ${i < track ? 'bg-[var(--color-text-secondary)]' : 'bg-[var(--color-border)]'}`} />)}
         </div>
       )}
+      {paused && firstScreen && <p role="status" className={secondaryText}>{P(PAUSED_PROMPT)}</p>}
       {tooMany && firstScreen && promptCopy(parts, TOO_MANY_PROMPT) && <p role="status" className={secondaryText}>{P(TOO_MANY_PROMPT)}</p>}
       <div key={step === 'done' || step === 'close' ? 'close' : `${step}:${own}`} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
       {!p2Open && step !== 'done' && tooMuch}

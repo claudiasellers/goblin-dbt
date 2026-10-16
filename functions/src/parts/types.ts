@@ -21,4 +21,9 @@ export type PartsEntry = (
    * tooManyPartsDays: Meet a part says "You don't need to get to know everyone at once." once. Never blocks.
    */
   tooMany?: true;
+  /**
+   * Present (true) only when the request named one of the caller's own parts and its pausedUntil (set
+   * when the next-day check-back said Louder) is still ahead: Meet a part goes gently. Never blocks.
+   */
+  paused?: true;
 };

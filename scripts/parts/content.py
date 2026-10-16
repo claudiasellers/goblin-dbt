@@ -351,6 +351,9 @@ UNDERNEATH_HELD = {
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
+    # A visit to a kept part that is paused (its next-day check-back said Louder): one line on the first
+    # real screen. Nothing locks; the close doesn't offer the check-back for that visit.
+    ("paused_heads_up", "meet", "entry", "Things got louder after last time. Going gently is fine, or come back another day."),
     ("meet_find", "meet", "find", "What's showing up?"),
     ("meet_where", "meet", "where", "Where do you notice it?"),
     ("meet_shape", "meet", "shape", "Which is closer to it?"),
