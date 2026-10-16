@@ -32,6 +32,7 @@ test("copy pins: flow dearman, step cope, every row a draft (nothing ships today
     cope_anchor_noname: "If that part shows up:",
     cope_set_anchor: "What would help if {name} shows up?",
     cope_set_anchor_noname: "What would help if that part shows up?",
+    cope_save_failed: "Couldn't save that. Try again.",
   };
   for (const [id, copy] of Object.entries(prompts)) {
     const p = fixture.prompts[id];
@@ -116,6 +117,10 @@ test("kept lines to anchor with: own and kept witness lines, newest first, at mo
   // Save goes to the one writer with exactly one of the two.
   assert.match(step, /setPartAnchor\(line \? \{ partId: part\.id, lineId: line\.lineId \} : \{ partId: part\.id, own: text \}\)/);
   assert.match(tsx, /profileCache\.bump\(version\);/);
+  // A failed save: the form stays as it was, and the line shows under Save.
+  assert.match(step, /\} catch \{\n[^\n]*\n\s*setFailed\(true\);/);
+  assert.ok(step.indexOf("c.cope_save.label") < step.indexOf("promptCopy(content, 'cope_save_failed')"), "under Save");
+  assert.doesNotMatch(step.slice(step.indexOf("} catch {"), step.indexOf("} finally {")), /clearForm/, "nothing cleared on failure");
 });
 
 test("the anchor is carried to the Summary, under the script, quietly", () => {
