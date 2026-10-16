@@ -136,6 +136,9 @@ export default function TuneRoom(room: RoomProps) {
               </button>
             )}
           </div>
+          {slots.unblend && (
+            <p role="status" data-testid="unblend-line" className="px-5 pb-1 text-sm" style={{ color: 'var(--t-ink-2)' }}>{slots.unblend}</p>
+          )}
           <AnimatePresence mode="wait" initial={false}>
             <m.div key={step === 'regulate' ? `regulate-${state.regulation}` : step} {...fade}
               className="flex-1 min-h-0 flex flex-col overflow-y-auto overscroll-contain">

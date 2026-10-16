@@ -79,6 +79,11 @@ export interface PartsContent {
   /** Recover's "what happened" (InvalidationEvent id) → the hurts it can touch, in order (approved CAN_TOUCH). */
   canTouch: Record<string, string[]>;
   /**
+   * Source label (ActionUrge, FeelingUrge, PullOption, …) → module id → the move it expresses: approved
+   * EXPRESSES edges whose move ships (so never go_blank / zone_out). Feeds the in-the-moment unblend line.
+   */
+  expresses: Record<string, Record<string, string>>;
+  /**
    * PartsPolicy's two numbers a screen needs, only once the policy is signed off. Absent: the client's
    * pinned defaults (the server's), src/lib/meetAPartSave.ts.
    */

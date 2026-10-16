@@ -13,6 +13,7 @@ import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { Orient } from '../../components/tools/regulation/body';
 import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 import { useToolSession } from '../../hooks/useToolSession';
+import { useUnblendLine } from '../../hooks/useUnblendLine';
 import { recordToolSession } from '../../services/spine';
 import { thenVsNowFromFtf } from '../../lib/band';
 import { useBand } from '../../hooks/useBand';
@@ -144,8 +145,14 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
       saved={closeSaved} onGone={() => setTagGone(true)} />
   );
 
+  // Parts on: "A part of you … right now." on the step right after the pull (parts.md, in the moment).
+  // The tool only: inside the check-in nothing parts-related shows.
+  const afterPull = entry === 'tool' && state.step !== 'pull' && history.stack[history.stack.length - 2]?.step === 'pull';
+  const unblend = useUnblendLine('ftf', state.pull, afterPull);
+
   const o = c.orient;
   const slots: RoomProps['slots'] = {
+    unblend,
     back: history.stack.length > 1 && !finished
       ? <button type="button" className={linkButton} onClick={() => dispatch({ t: 'back' })}>{c.nav.back}</button>
       : null,

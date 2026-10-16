@@ -28,6 +28,8 @@ import type { DearManHandoff } from '../../data/dearManHandoff';
 import { withBand } from '../../lib/dearManSafety';
 import { FollowUps, RepsRing, SkillCard, UrgeWave } from '../../components/tools/invalidationRecovery/closeout';
 import { useToolSession } from '../../hooks/useToolSession';
+import { useUnblendLine } from '../../hooks/useUnblendLine';
+import { recoverPullOption } from '../../lib/unblendLine';
 import { getSpineContent, type SpineContent } from '../../services/spine';
 import { recoverSchedule } from '../../lib/spine/wrap';
 import { AngryPartCard } from '../../components/parts/AngryPartCard';
@@ -128,6 +130,12 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     dispatch({ type: 'go', step: nextStep(step, merged, st, offer), patch });
   }, [d, step, states, parts, partsOn, g, angry]);
   const withSkills = (...ids: string[]): Partial<FlowData> => ({ skills: [...d.skills, ...ids] });
+  /**
+   * Whether the angry-part card is (or may still be) offered in this visit for the fight pull: already
+   * offered, or offerAngryCard with any reading under the line (one may come after settling). Then the
+   * card does the unblending and the pull gets no unblend line.
+   */
+  const cardThisVisit = angry !== null || offerAngryCard({ pull: 'fight', now: 0 }, g, Boolean(parts && angryReady(parts, partsOn)), false);
 
   /** The card on the visit's ToolSession (log layer, ids only). Each write is the whole triple. */
   const recordAngry = (r: { angryExit: AngryStep | 'skipped'; angryHurtId?: string | null; angryVoteHeld?: boolean }) => {
@@ -204,7 +212,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
           )}
 
           {step === 'loud' && state && (
-            <LoudStep c={c} pulls={flow.pulls} initial={pre}
+            <LoudStep c={c} pulls={flow.pulls} initial={pre} unblendOk={parts !== null} cardThisVisit={cardThisVisit}
               onDone={(intensity, p, urge) => {
                 const gate = gateFor(intensity, p, state, g);
                 advance({ intensity, pull: p, urge, now: intensity, gate, mids: [], skills: [] });
@@ -360,14 +368,19 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Copy = Record<string, any>;
 
-function LoudStep({ c, pulls, initial, onDone }: {
+function LoudStep({ c, pulls, initial, unblendOk, cardThisVisit, onDone }: {
   c: Copy; pulls: InvalidationRecoveryContent['flow']['pulls']; initial: FlowData | null;
+  /** Parts content has loaded, so `cardThisVisit` is settled. */
+  unblendOk: boolean;
+  cardThisVisit: boolean;
   onDone: (intensity: number, pull: FlowData['pull'] & string, urge: number) => void;
 }) {
   const [intensity, setIntensity] = useState<number | null>(initial?.intensity ?? null);
   const [pull, setPull] = useState<FlowData['pull']>(initial?.pull ?? null);
   const [urge, setUrge] = useState<number | null>(initial?.urge ?? null);
   const p = pulls.find(x => x.id === pull);
+  // Parts on: "A part of you … right now." after the pull, unless the angry card will do the unblending.
+  const unblend = useUnblendLine('recover', pull ? recoverPullOption(pull) : null, unblendOk && !(pull === 'fight' && cardThisVisit));
   return (
     <>
       <StepTitle title={c.loud.title} sub={c.loud.sub} />
@@ -378,6 +391,7 @@ function LoudStep({ c, pulls, initial, onDone }: {
           {pulls.map(x => <Choice key={x.id} selected={pull === x.id} sub={x.sub} onClick={() => setPull(x.id)}>{x.label}</Choice>)}
         </div>
       </fieldset>
+      {unblend && <p role="status" className={secondaryText}>{unblend}</p>}
       {p && <UrgeScale label={fill(c.loud.urgeLabel, { pull: p.urgeLabel })} value={urge} onChange={setUrge} />}
       <button type="button" className={primaryButton} disabled={intensity === null || !pull || urge === null}
         onClick={() => onDone(intensity!, pull!, urge!)}>{c.common.continue}</button>

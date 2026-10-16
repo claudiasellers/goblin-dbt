@@ -204,6 +204,7 @@ function Room({ content, state, dispatch, name, collection, reducedMotion: reduc
       <div className="sr-fill sr-none sr-z6" style={{ opacity: 0.06, mixBlendMode: 'multiply', backgroundImage: GRAIN }} />
 
       {slots.back && step !== 'handoff' && <div className="sr-back" data-testid="back-slot">{slots.back}</div>}
+      {slots.unblend && <p className="sr-small sr-unblend" role="status" data-testid="unblend-line">{slots.unblend}</p>}
 
       <AnimatePresence>
         {step === 'intro' && (

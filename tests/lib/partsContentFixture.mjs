@@ -33,6 +33,12 @@ export function partsFromFixture(fixture, approve = null) {
       .filter(([id, t]) => ok({ id, ...t }))
       .map(([id, t]) => [id, t.hurts.filter((h) => hurtIds.has(h))])
       .filter(([, hs]) => hs.length)),
+    // EXPRESSES is reviewed by its source id: it ships when approved and its move ships (offerable moves only).
+    expresses: Object.fromEntries(Object.entries(fixture.expresses)
+      .map(([label, table]) => [label, Object.fromEntries(Object.entries(table)
+        .filter(([id, e]) => ok({ id, ...e }) && moveIds.has(e.moveId))
+        .map(([id, e]) => [id, e.moveId]))])
+      .filter(([, t]) => Object.keys(t).length)),
     // PartsPolicy's two client numbers, once the policy is signed off.
     limits: ok(fixture.policy) ? { nameMaxChars: fixture.policy.nameMaxChars, maxNonSelfAnswers: fixture.policy.maxNonSelfAnswers } : null,
   });
