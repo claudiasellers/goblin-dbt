@@ -385,6 +385,204 @@
    "copy": "A part of you {move} right now.",
    "reviewStatus": "draft"
   },
+  "angry_unblend": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 0,
+   "copy": "A part of you is furious right now.",
+   "reviewStatus": "draft"
+  },
+  "angry_unblend_plain": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 1,
+   "copy": "The anger is loud right now, and you're here too.",
+   "reviewStatus": "draft"
+  },
+  "angry_unblend_sub": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 2,
+   "copy": "Let it stand a little apart from you for a moment.",
+   "reviewStatus": "draft"
+  },
+  "angry_unblend_sub_plain": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 3,
+   "copy": "Let it stand a little apart from you for a moment.",
+   "reviewStatus": "draft"
+  },
+  "angry_protects": {
+   "flow": "angry",
+   "step": "protects",
+   "order": 4,
+   "copy": "It's trying to protect something. What?",
+   "reviewStatus": "draft"
+  },
+  "angry_protects_plain": {
+   "flow": "angry",
+   "step": "protects",
+   "order": 5,
+   "copy": "Anger usually protects something. What is it protecting?",
+   "reviewStatus": "draft"
+  },
+  "angry_vote": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 6,
+   "copy": "{name}, it's angry because {matters} matters to you.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 7,
+   "copy": "{name}, you're angry because {matters} matters.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_noname": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 8,
+   "copy": "This part is angry because {matters} matters to you.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_noname_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 9,
+   "copy": "You're angry because {matters} matters to you.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_unsure": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 10,
+   "copy": "{name}, this part is angry because something here matters to you.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_unsure_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 11,
+   "copy": "{name}, you're angry because something here matters to you.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_unsure_noname": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 12,
+   "copy": "This part is angry because something here matters to you.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_unsure_noname_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 13,
+   "copy": "You're angry because something here matters to you.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_2": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 14,
+   "copy": "You don't have to let it drive, and you don't have to leave it behind.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_2_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 15,
+   "copy": "You don't have to let it drive, or pretend it isn't there.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_3": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 16,
+   "copy": "{name} can handle what comes next.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_3_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 17,
+   "copy": "{name} can handle what comes next.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_3_noname": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 18,
+   "copy": "You can handle what comes next.",
+   "reviewStatus": "draft"
+  },
+  "angry_vote_3_noname_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 19,
+   "copy": "You can handle what comes next.",
+   "reviewStatus": "draft"
+  },
+  "angry_hold": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 20,
+   "copy": "Hold while you read it",
+   "reviewStatus": "draft"
+  },
+  "angry_hold_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 21,
+   "copy": "Hold while you read it",
+   "reviewStatus": "draft"
+  },
+  "angry_speak": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 22,
+   "copy": "If you say something, speak for it, not from it:",
+   "reviewStatus": "draft"
+  },
+  "angry_speak_plain": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 23,
+   "copy": "If you say something, say what's under the anger:",
+   "reviewStatus": "draft"
+  },
+  "angry_speak_unsure": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 24,
+   "copy": "If you say something, say what you felt, not what it wants to say.",
+   "reviewStatus": "draft"
+  },
+  "angry_speak_unsure_plain": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 25,
+   "copy": "If you say something, say what you felt, not what the anger wants to say.",
+   "reviewStatus": "draft"
+  },
+  "angry_speak_line": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 26,
+   "copy": "I felt {felt}.",
+   "copyKind": "first_person",
+   "reviewStatus": "draft"
+  },
+  "angry_speak_line_plain": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 27,
+   "copy": "I felt {felt}.",
+   "copyKind": "first_person",
+   "reviewStatus": "draft"
+  },
   "aftercare_louder": {
    "flow": "aftercare",
    "step": "louder",
@@ -2646,6 +2844,50 @@
     }
    ]
   },
+  "angry": {
+   "unblend": [
+    {
+     "id": "angry_next",
+     "label": "Okay",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "protects": [
+    {
+     "id": "angry_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "speak": [
+    {
+     "id": "angry_done",
+     "label": "Done",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
   "aftercare": {
    "louder": [
     {
@@ -2785,6 +3027,7 @@
    "label": "being brushed off",
    "hurtPhrase": "being brushed off",
    "feltPhrase": "brushed off",
+   "matters": "being taken seriously",
    "namedAs": [
     "disrespected",
     "hurt"
@@ -2811,6 +3054,7 @@
    "label": "being made small",
    "hurtPhrase": "being made small",
    "feltPhrase": "made small",
+   "matters": "being treated as an equal",
    "namedAs": [
     "inferior",
     "inadequate"
@@ -2845,6 +3089,7 @@
    "label": "being left out",
    "hurtPhrase": "being left out",
    "feltPhrase": "left out",
+   "matters": "belonging",
    "namedAs": [
     "excluded",
     "rejected"
@@ -2875,6 +3120,7 @@
    "label": "not mattering",
    "hurtPhrase": "not mattering",
    "feltPhrase": "like I didn't matter",
+   "matters": "mattering to people",
    "namedAs": [
     "insignificant"
    ],
@@ -2900,6 +3146,7 @@
    "label": "being laughed at",
    "hurtPhrase": "being laughed at",
    "feltPhrase": "laughed at",
+   "matters": "being respected",
    "namedAs": [
     "humiliated",
     "ridiculed"
@@ -2934,6 +3181,7 @@
    "label": "being alone in this",
    "hurtPhrase": "being alone in this",
    "feltPhrase": "alone in this",
+   "matters": "having someone with you",
    "namedAs": [
     "lonely",
     "isolated"
@@ -2956,6 +3204,28 @@
    "reviewStatus": "draft"
   }
  ],
+ "canTouch": {
+  "brushed": [
+   "brushed_off"
+  ],
+  "unheard": [
+   "brushed_off"
+  ],
+  "mocked": [
+   "laughed_at"
+  ],
+  "small": [
+   "made_small"
+  ],
+  "ignored": [
+   "left_out",
+   "not_mattering"
+  ],
+  "leaving": [
+   "left_out",
+   "alone_in_this"
+  ]
+ },
  "pairs": [
   {
    "id": "chase_hide",

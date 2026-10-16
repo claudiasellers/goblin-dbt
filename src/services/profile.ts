@@ -3,8 +3,10 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
 import type { ClientProfileConsumer, GetProfileContextResponse, PatternOfferAnswer, ProfileAreaId, ProfileItemMeta, QuietHours } from '../data/profileTypes';
 
+/** getMe's item labels (functions/src/profile/me.ts). `Part` arrives only while parts are on. */
+export type MeItemLabel = 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
 export interface MeItem {
-  label: 'ProfileFact' | 'MyPattern' | 'OwnLine';
+  label: MeItemLabel;
   meta: ProfileItemMeta;
   title: string;
   summary: string;
@@ -25,7 +27,7 @@ export interface GetMeResponse {
   };
   offers: Array<{ id: string; statement: string; offerCopy: string; toolId: string | null; evidenceCount: number }>;
 }
-export interface ProfileItemRef { id: string; label: 'ProfileFact' | 'MyPattern' | 'OwnLine' }
+export interface ProfileItemRef { id: string; label: MeItemLabel }
 
 const ctxFn = httpsCallable<{ toolId: ClientProfileConsumer }, GetProfileContextResponse>(functions, 'getProfileContext');
 const meFn = httpsCallable<void, GetMeResponse>(functions, 'getMe');

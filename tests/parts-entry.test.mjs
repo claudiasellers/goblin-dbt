@@ -4,6 +4,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { importTs } from "./lib/importTs.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 
@@ -28,8 +29,13 @@ test("parts callables: exported by name, pinned, in the auth matrix as signed-in
   }
 });
 
-test("partsEnabled is a setting (off by default), never profile-layer data", () => {
+test("partsEnabled is a setting (off by default), never profile-layer data", async () => {
   assert.match(read("src/services/neo4j.ts"), /partsEnabled: false,/);
   assert.match(read("functions/src/account/index.ts"), /partsEnabled: false,/);
-  assert.doesNotMatch(read("functions/src/profile/types.ts"), /partsEnabled/);
+  // Never a profile slice or a profile field (comments may name the setting).
+  const profileTypes = await importTs("functions/src/profile/types.ts");
+  assert.ok(!profileTypes.SLICE_IDS.includes("partsEnabled"), "partsEnabled is a profile slice");
+  for (const f of ["functions/src/profile/types.ts", "src/data/profileTypes.ts"]) {
+    assert.doesNotMatch(read(f), /\bpartsEnabled\s*\??\s*:/, `${f}: partsEnabled is a profile field`);
+  }
 });

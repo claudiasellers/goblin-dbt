@@ -35,6 +35,13 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours"]);
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
+  // Parts (Phase 2): the slices exist; no tool reads them before it renders them. 'meet-a-part'
+  // declares ['name', 'parts', 'partDetail'] when the tool exists (a consumer must be an app tool).
+  assert.deepEqual(types.SLICE_IDS.slice(-2), ["parts", "partDetail"]);
+  for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
+    assert.ok(!needs.includes("parts") && !needs.includes("partDetail"), `${consumer} reads parts before Phase 2`);
+  }
+  assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);
 });
 
@@ -45,6 +52,78 @@ test("lint: slice resolvers never read a log record", () => {
     for (const l of logLabels) assert.doesNotMatch(q, new RegExp(`:${l}\\b`), `${slice} reads ${l}`);
   }
   assert.ok(Object.keys(slices.SLICE_QUERIES).length >= 3);
+});
+
+test("parts slices: gated on partsEnabled, HAS_PART only, active / resting only, ≤ 50, no log", () => {
+  for (const id of ["parts", "partDetail"]) {
+    const q = slices.SLICE_QUERIES[id];
+    assert.ok(q, id);
+    assert.match(q, /^MATCH \(u:User \{id: \$uid\}\) WHERE coalesce\(u\.partsEnabled, false\)\s+MATCH \(u\)-\[:HAS_PART\]->\(p:Part\) WHERE p\.status IN \['active', 'resting'\]/, id);
+    assert.doesNotMatch(q, /set_aside/, id);
+    assert.match(q, /LIMIT 50/, id);
+    assert.match(q, /ORDER BY p\.lastVisitedAt IS NULL, p\.lastVisitedAt DESC, p\.confirmedAt IS NULL, p\.confirmedAt DESC/, id);
+    assert.doesNotMatch(q, /:LogRecord\b|:PartSession\b|:PartTag\b|:PartCandidate\b|:TrailOffer\b/, `${id} reads the log`);
+  }
+  assert.match(slices.SLICE_QUERIES.parts, /OPTIONAL MATCH \(p\)-\[:USES\]->\(m:ProtectiveMove\)/);
+  assert.match(slices.SLICE_QUERIES.partDetail, /OPTIONAL MATCH \(p\)-\[:GUARDS\]->\(h:ProtectedHurt\)/);
+  // The light slice never carries what partDetail holds (jobs, fears, own words).
+  assert.doesNotMatch(slices.SLICE_QUERIES.parts, /jobIds|fearIds|ownJob|ownFear|ownVoice/);
+});
+
+/** A read transaction that answers each query from `rows(query)`; records which queries ran. */
+const fakeTx = (rows) => {
+  const ran = [];
+  return {
+    ran,
+    run: async (q) => {
+      ran.push(q);
+      return { records: (rows(q) ?? []).map((r) => ({ get: (k) => r[k] })) };
+    },
+  };
+};
+
+test("parts resolvers: absent arrays are [], absent strings null, ids sorted, resting kept as resting", async (t) => {
+  const now = Date.parse("2026-10-01T12:00:00Z");
+  const tx = fakeTx((q) => {
+    if (/USES/.test(q)) return [
+      { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true,
+             confirmedAt: "2026-08-01T00:00:00Z", revisitAt: "2026-08-31T00:00:00Z" }, moveIds: ["withdraw", "appease", "withdraw"] },
+      { p: { id: "p2", kind: "part", area: "my_parts", status: "active", source: "made", revisitAt: null }, moveIds: [] },
+    ];
+    if (/GUARDS/.test(q)) return [
+      { p: { id: "p1", ageId: "age_teen", voiceIds: ["v_quiet"], ownVoice: "soft", jobIds: ["j_hide"], ownJob: "keep me safe",
+             fearIds: ["f_too_much"], ownFear: null, preferredRoleIds: ["r_tell_me"], anchorLineId: "l1", places: ["chest"], shapeSig: [0.2, 0.4, 0.6, 0.8, 1] },
+        hurtIds: ["rejected", "alone"] },
+      { p: { id: "p2" }, hurtIds: [] },
+    ];
+    return [];
+  });
+  // No consumer declares both yet (meet-a-part lands with its tool): declare one for this test only.
+  types.PROFILE_NEEDS.__parts_test = ["parts", "partDetail"];
+  const read = (t) => slices.readProfileSlices(t, "u1", "__parts_test", now);
+  t.after(() => { delete types.PROFILE_NEEDS.__parts_test; });
+  const out = await read(tx);
+  assert.deepEqual(out.parts.map(({ meta: m, ...rest }) => [rest, m.status, m.area, m.prompt]), [
+    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"] }, "resting", "my_parts", "ask"],
+    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [] }, "active", "my_parts", "none"],
+  ]);
+  assert.deepEqual(out.partDetail, [
+    { id: "p1", ageId: "age_teen", voiceIds: ["v_quiet"], ownVoice: "soft", jobIds: ["j_hide"], ownJob: "keep me safe", fearIds: ["f_too_much"],
+      ownFear: null, preferredRoleIds: ["r_tell_me"], anchorLineId: "l1", places: ["chest"], shapeSig: [0.2, 0.4, 0.6, 0.8, 1], hurtIds: ["alone", "rejected"] },
+    { id: "p2", ageId: null, voiceIds: [], ownVoice: null, jobIds: [], ownJob: null, fearIds: [], ownFear: null, preferredRoleIds: [],
+      anchorLineId: null, places: [], shapeSig: null, hurtIds: [] },
+  ]);
+  // Parts off: the gated queries return no rows, so the slices are empty.
+  const off = await read(fakeTx(() => []));
+  assert.deepEqual(off, { parts: [], partDetail: [] });
+});
+
+test("status: resting is live (still checked back with), set aside is not", () => {
+  const now = Date.parse("2026-10-01T12:00:00Z");
+  assert.equal(meta.profileItemPrompt("2026-09-30T00:00:00Z", "resting", now), "ask");
+  const m = meta.metaFrom({ id: "p1", kind: "part", area: "my_parts", status: "resting", revisitAt: "2026-12-30T00:00:00Z" }, now);
+  assert.deepEqual([m.status, m.prompt], ["resting", "quiet"]);
+  assert.equal(meta.metaFrom({ id: "x", status: "weird" }, now).status, "active", "unknown still reads as active");
 });
 
 test("still-true meta: ask past revisitAt, quiet when fresh, none without a policy or when set aside", () => {
@@ -93,15 +172,17 @@ test("rule 4: only answerPatternOffer creates a MyPattern; scheduled code never 
   for (const f of files.filter((x) => x.includes("/spine/"))) assert.doesNotMatch(readFileSync(f, "utf8"), /from '\.\.\/profile\//, `${f} imports the profile layer`);
 });
 
-test("content: fresh, 7 areas, kinds the code uses, rule what_helps_better off (D-10, R3)", (t) => {
+test("content: fresh, 8 areas, kinds the code uses, rule what_helps_better off (D-10, R3)", (t) => {
   const cypher = readFileSync("schema/profile-layer.cypher", "utf8");
   try { assert.equal(execFileSync("python3", ["scripts/profile-layer/build.py"], { encoding: "utf8" }).trim(), cypher.trim()); }
   catch (e) { if (e.code === "ENOENT") t.diagnostic("python3 unavailable"); else throw e; }
   const st = splitStatements(cypher);
-  assert.equal(st.filter((s) => s.startsWith("MERGE (a:ProfileArea")).length, 7);
-  for (const k of ["quiet_hours", "what_helps", "own_line"]) assert.ok(st.some((s) => s.startsWith(`MERGE (k:ProfileKind {id: "${k}"})`)), k);
+  assert.equal(st.filter((s) => s.startsWith("MERGE (a:ProfileArea")).length, 8);
+  for (const k of ["quiet_hours", "what_helps", "own_line", "part"]) assert.ok(st.some((s) => s.startsWith(`MERGE (k:ProfileKind {id: "${k}"})`)), k);
   assert.match(cypher, /MERGE \(k:ProfileKind \{id: "quiet_hours"\}\)\nSET k\.area = "my_body", k\.label = "Quiet hours", k\.revisitAfterDays = 180/);
   assert.match(cypher, /MERGE \(k:ProfileKind \{id: "what_helps"\}\)\nSET k\.area = "my_patterns", k\.label = "What helps", k\.revisitAfterDays = 60/);
+  assert.match(cypher, /MERGE \(a:ProfileArea \{id: "my_parts"\}\)\nSET a\.label = "Parts of me", [^\n]*a\.order = 6,/);
+  assert.match(cypher, /MERGE \(k:ProfileKind \{id: "part"\}\)\nSET k\.area = "my_parts", k\.label = "A part", k\.revisitAfterDays = 30, k\.stillTrueCopy = "Is \{name\} still doing the same job\?"/);
   assert.match(cypher, /MERGE \(p:PatternRule \{id: "what_helps_better"\}\)[\s\S]*p\.enabled = false/);
   const i = LOAD_ORDER.indexOf("profile-layer.cypher");
   assert.ok(i > LOAD_ORDER.indexOf("practice-spine.cypher") && i < LOAD_ORDER.indexOf("capacity.cypher"), "R14 order");

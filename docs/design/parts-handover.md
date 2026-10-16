@@ -5,9 +5,13 @@ asked, what direction was given, how the work was done, everything that was prod
 and what to do next. Read this first, then `parts.md`.
 
 **16 Oct update.** Phase 0 is built on PR #49 (branch `claude/project-thread-2wmq14`): the vocabulary and
-all parts copy as draft graph content, the parts voice lint, and data fixes 1, 2 and 5. The harness now
-reads `tests/fixtures/parts-content.json` (`dev/parts-fixture.ts` became `dev/parts-example.ts`). Where
-this doc and `parts.md` differ, `parts.md` is current.
+all parts copy as draft graph content, the parts voice lint, and all six data fixes. The harness now
+reads `tests/fixtures/parts-content.json` (`dev/parts-fixture.ts` became `dev/parts-example.ts`). Claudia
+decided the flood signal (the **blending check**, built as content and in the harness) and approved data
+fixes 3 and 4. Phase 1's angry-part card and Phase 2's groundwork (data layers, the `partsEnabled`
+switch, the `getPartsEntry` entry gate, profile slices, the generated `parts.json`) are being built
+behind the switch, with nothing visible until copy is signed off. Where this doc and `parts.md` differ,
+`parts.md` is current. Section 7 has the current state.
 
 ---
 
@@ -251,31 +255,30 @@ Firmness: 1, 2, 5, 8 are hard lines; 3, 4, 6, 9 firm positions; 7 holds until th
 
 ---
 
-## 7. State of play and next steps
+## 7. State of play and next steps (16 Oct)
 
-**Done**: spec, harness, research saved, review folded in, all pushed to `docs/parts-design`.
-**Not done**: no PR; nothing signed off; nothing in the graph; Obsidian changelog entry not pasted
-(vault unreachable from sessions; text is at the bottom of `parts.md`).
+**How the work runs.** Four lane worktrees and a build lane (described in the PR #49 thread): each
+change is built in a lane, queued, merged in batches onto `claude/project-thread-2wmq14` by a build
+runner that runs the whole suite on the batch, and pushed only when green. A fresh session doesn't
+inherit that setup; it's a way of working, not something in the repo.
 
-Suggested order:
+**Built on PR #49 (all drafts, nothing visible):** Phase 0 (vocabulary, copy, lint, six data fixes);
+the blending check as content (`gate_blend_check`, `gate_blend_check_pulls`) and in the harness with
+the real P2 hand-off.
 
-1. **Claudia reads `parts.md` and plays the harness.** Decide the eight open questions at the end of
-   the spec, above all **the flood signal** (blocker) and **opt-in default**.
-2. **Fold §6 above into `parts.md`** as a "Why never" section (the DBT-staging argument for rule 1 isn't
-   in the spec yet and is the strongest case).
-3. **Open the PR** for `docs/parts-design` (docs + dev harness only; Deploy section: nothing to run).
-   Link: https://github.com/claudiasellers/goblin-dbt/pull/new/docs/parts-design
-4. **Paste the changelog entry** into Obsidian (`Goblin DBT/Product Changelog.md`), status `planned`.
-5. **Phase 0** (no UI): the six data fixes; `scripts/parts/content.py` + `build.py` producing
-   `schema/parts.cypher` (`ProtectiveMove`, `EXPRESSES`, `PullOption`, `ProtectedHurt`, prompts/options,
-   `PolarityPair`, `TrailRule`, `PartsPolicy`); `parts_prompt` / `parts_chip` lint scopes and the slot
-   additions in `voice-lint.mjs`; the two graph fixes (IFS `TREATS` evidence grade; retype
-   `functional_equivalent` → `parallel`). Move the harness fixture to a generated
-   `tests/fixtures/parts-content.json` like the others.
-6. **Clinical reviewer** (DBT + IFS + dissociation) before any copy goes in `SIGNED_OFF`; trademark
-   counsel on naming; co-design sessions with plural/dissociative users before Phase 2 ships.
-7. Then Phase 1 (the agreed angry-part card) and Phase 2 (Meet a part + Parts of me), each gated on
-   the previous phase's harm signals.
+**In progress:** the angry-part card as a host-less component with both wordings (parts on / plain);
+Phase 2 groundwork: `Part` / `PartSession` / `PartCandidate` layers, the `partsEnabled` setting,
+`getPartsEntry`, the `parts` / `partDetail` profile slices, `my_parts` area and `part` kind, and the
+generated `src/data/content/parts.json` (signed-off rows only, so empty today).
+
+**Waiting on Claudia:** where the angry-part card lives (recommended: Recover's *Fight back*), whether
+parts is opt-in by default, who sees the angry-part card, tender parts. Then sign-off of copy
+(`SIGNED_OFF` in `scripts/parts/content.py`) with a clinical reviewer (DBT + IFS + dissociation);
+trademark counsel on naming; co-design sessions with plural / dissociative users before Phase 2 ships.
+
+**Next:** the angry card's host; Meet a part (`startPartSession` / `savePartSession`, `keepPart`, the
+screens, the tender path, `part_checkback`); Parts of me in Me; Delete my parts. Each phase is gated on
+the previous phase's harm signals.
 
 ---
 
@@ -284,9 +287,9 @@ Suggested order:
 Paste this to pick up where this left off:
 
 > Read `docs/design/parts-handover.md`, then `docs/design/parts.md`, in the `claudiasellers/goblin-dbt`
-> repo on branch `docs/parts-design`. The research briefs are in `docs/design/parts-research/`. The dev
-> harness is `dev/parts.html` (`npm run dev` → `/dev/parts.html`). Nothing is signed off; the blocker is
-> that no flood signal exists since the capacity probe came out. Work on the branch, never main; push
-> after every commit (the stop hook requires it). Follow CLAUDE.md's data-layer rules and voice
+> repo on branch `claude/project-thread-2wmq14` (PR #49). The research briefs are in
+> `docs/design/parts-research/`. The dev harness is `dev/parts.html` (`npm run dev` → `/dev/parts.html`).
+> Nothing is signed off; the flood signal is decided (the blending check, `parts.md`). Work on the
+> branch, never main; push after every commit (the stop hook requires it). Follow CLAUDE.md's data-layer rules and voice
 > contract; verify every repo fact you cite with grep; lint any new copy against
 > `scripts/witness/voice-rules.json`. Then: [what you want next].

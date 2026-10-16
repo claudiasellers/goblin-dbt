@@ -186,7 +186,7 @@ export function lintFlowDocOrder(files = FLOW_DOC_FILES) {
  */
 export const PARTS_SLOT_WIDTH = {
   name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32,
-  context: 24, anchor: 40, month: 9, want: 20, N: 2,
+  context: 24, anchor: 40, month: 9, want: 20, N: 2, matters: 28, felt: 24,
 };
 
 /** Row kind → lint scope, length limit and the slots it may carry. */
@@ -195,6 +195,8 @@ export const PARTS_KINDS = {
   chip: { scope: 'parts_chip', maxChars: 60, slots: [] },
   voice: { scope: 'parts_voice', maxChars: 40, slots: [] },
   keepsake: { scope: 'parts_chip', maxChars: 90, slots: ['A', 'B', 'want'] },
+  // The person's own sentence (the angry card's "I felt {felt}."): its "I" is theirs, so chip rules.
+  first_person: { scope: 'parts_chip', maxChars: 90, slots: ['felt'] },
 };
 
 /** Every slot at its width; an unknown slot keeps its literal text (it is a parts_slots finding anyway). */

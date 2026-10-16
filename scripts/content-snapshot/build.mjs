@@ -23,6 +23,9 @@
  *                          "Continue" waited on it, cold, before the follow-up questions)
  *   capacity.json          getCapacityContent (band rules, hand-off primitives; loaded with every page)
  *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
+ *   parts.json             parts copy (schema/parts.cypher), signed-off rows only: no Cloud Function
+ *                          serves it; the shape is tests/fixtures/parts-content.json's moves / prompts /
+ *                          options / hurts
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
@@ -61,7 +64,7 @@ export function assertContentOnly(exp) {
   if (dangling.length) throw new Error(`Export has ${dangling.length} relationship(s) to nodes it doesn't contain`);
 }
 
-function indexGraph(exp) {
+export function indexGraph(exp) {
   const byEl = new Map(exp.nodes.map((n) => [n.elementId, n]));
   const has = (n, label) => n.labels.includes(label);
   return {
@@ -276,6 +279,95 @@ export function buildSpine(g) {
   return { version: SPINE_VERSION, closeFlow, followUpTypes };
 }
 
+/** Bookkeeping on every parts node: never shipped (everything in parts.json is approved by construction). */
+const PARTS_BOOKKEEPING = ['id', 'reviewStatus', 'version', 'pending'];
+/** Node properties the shipped shape leaves out, as the parts fixture does (scripts/parts/fixture.py). */
+const PARTS_OMIT = {
+  ProtectiveMove: ['offerable'], // only offerable moves ship
+  PartPrompt: ['copyKind'], // keepsake lines are Two pulls' own key, not shipped
+  PartOption: ['flow', 'step'], // they are the option's place in `options[flow][step]`
+  ProtectedHurt: [],
+};
+/** Signed off and not waiting on a decision. Edges are reviewed by their source id, so the same test holds for them. */
+const signedOff = (props) => props.reviewStatus === 'approved' && props.pending == null;
+/** A node's content properties, whatever they are, so a field added in content.py ships without a code change. */
+const partsProps = (n, label) => Object.fromEntries(Object.entries(n.props)
+  .filter(([k]) => !PARTS_BOOKKEEPING.includes(k) && !PARTS_OMIT[label].includes(k)));
+const byOrder = (a, b) => asc(a.order, b.order) || asc(a.id, b.id);
+
+/**
+ * The parts content's canonical order, shared by buildParts and the fixture projection the drift test
+ * compares it with: rows by `order`, prompts by flow then `order`, flows and steps by name, and the edge
+ * lists without an order of their own (namedAs, guardedBy, sameAs) by id. An option's `moves` keep the
+ * order they were given (OFFERED_FOR's `order`).
+ */
+export function sortParts(c) {
+  const sortObj = (o, f) => Object.fromEntries(Object.keys(o).sort().map((k) => [k, f(o[k])]));
+  return {
+    version: c.version,
+    moves: [...c.moves].sort(byOrder),
+    prompts: Object.fromEntries(Object.entries(c.prompts)
+      .sort(([ia, a], [ib, b]) => asc(a.flow, b.flow) || asc(a.order, b.order) || asc(ia, ib))),
+    options: sortObj(c.options, (steps) => sortObj(steps, (list) => [...list].sort(byOrder)
+      .map((o) => ({ ...o, sameAs: [...o.sameAs].sort((x, y) => asc(x.label, y.label) || asc(x.id, y.id)) })))),
+    hurts: [...c.hurts].sort(byOrder).map((h) => ({
+      ...h,
+      namedAs: [...h.namedAs].sort(asc),
+      guardedBy: [...h.guardedBy].sort((x, y) => asc(x.moveId, y.moveId) || asc(x.rank, y.rank)),
+    })),
+  };
+}
+
+/**
+ * Parts copy (schema/parts.cypher, from scripts/parts/content.py), signed-off rows only: a parts screen
+ * renders only once its copy is signed off, so today this is nearly empty. Only what a screen shows:
+ * trail rules, contexts and the policy (inference rules and safety numbers) stay on the server, and Two
+ * pulls' pairs and keepsake wait for their phase. An approved option ships even when its prompt (or a
+ * move it is offered for) isn't approved yet; the client checks a flow is complete (flowReady).
+ * No parts content at all (parts.cypher not loaded yet) is an empty file, not an error.
+ */
+export function buildParts(g) {
+  const rows = (label) => g.nodes(label).filter((n) => signedOff(n.props));
+  const edges = (type, from, to) => g.rels(type, from, to).filter((r) => signedOff(r.props) && signedOff(r.a.props));
+  const moveNodes = rows('ProtectiveMove').filter((n) => n.props.offerable === true);
+  const promptNodes = rows('PartPrompt').filter((n) => n.props.copyKind !== 'keepsake');
+  const optionNodes = rows('PartOption');
+  const hurtNodes = rows('ProtectedHurt');
+
+  const versions = [...new Set([...moveNodes, ...promptNodes, ...optionNodes, ...hurtNodes].map((n) => n.props.version))];
+  if (versions.length > 1) throw new Error(`Parts content mixes versions ${versions.join(', ')}; load schema/parts.cypher again`);
+  // With nothing signed off, the version every parts node carries reaches the file through the policy node.
+  const version = versions[0] ?? g.nodes('PartsPolicy').find((n) => n.props.id === 'parts')?.props.version ?? null;
+
+  const offered = edges('OFFERED_FOR', 'PartOption', 'ProtectiveMove');
+  const same = edges('SAME_AS', 'PartOption');
+  const named = edges('NAMED_AS', 'ProtectedHurt', 'Emotion');
+  const guards = edges('OFTEN_GUARDS', 'ProtectiveMove', 'ProtectedHurt');
+
+  const options = {};
+  for (const o of optionNodes) {
+    const { flow, step } = o.props;
+    ((options[flow] ??= {})[step] ??= []).push({
+      id: o.props.id, ...partsProps(o, 'PartOption'),
+      // Neo4j drops a null property; the shape keeps these two as null (scripts/parts/fixture.py).
+      flag: o.props.flag ?? null, selfLike: o.props.selfLike ?? null,
+      moves: offered.filter((r) => r.a === o).sort((x, y) => asc(x.props.order, y.props.order) || asc(x.b.props.id, y.b.props.id)).map((r) => r.b.props.id),
+      sameAs: same.filter((r) => r.a === o).map((r) => ({ label: [...r.b.labels].sort()[0], id: r.b.props.id })),
+    });
+  }
+  return sortParts({
+    version,
+    moves: moveNodes.map((m) => ({ id: m.props.id, ...partsProps(m, 'ProtectiveMove') })),
+    prompts: Object.fromEntries(promptNodes.map((p) => [p.props.id, partsProps(p, 'PartPrompt')])),
+    options,
+    hurts: hurtNodes.map((h) => ({
+      id: h.props.id, ...partsProps(h, 'ProtectedHurt'),
+      namedAs: named.filter((r) => r.a === h).map((r) => r.b.props.id),
+      guardedBy: guards.filter((r) => r.b === h).map((r) => ({ moveId: r.a.props.id, rank: r.props.rank })),
+    })),
+  });
+}
+
 /** All the snapshots from one export (pure apart from reading the version constants). */
 export function buildSnapshots(exp) {
   assertContentOnly(exp);
@@ -287,6 +379,7 @@ export function buildSnapshots(exp) {
     'discriminating-questions.json': buildDiscriminatingQuestions(g),
     'capacity.json': buildCapacity(g),
     'spine.json': buildSpine(g),
+    'parts.json': buildParts(g),
   };
 }
 
