@@ -764,6 +764,97 @@
    "order": 7,
    "copy": "Resting",
    "reviewStatus": "draft"
+  },
+  "card_rename": {
+   "flow": "me",
+   "step": "card",
+   "order": 8,
+   "copy": "Rename",
+   "reviewStatus": "draft"
+  },
+  "card_rest": {
+   "flow": "me",
+   "step": "card",
+   "order": 9,
+   "copy": "Rest it",
+   "reviewStatus": "draft"
+  },
+  "card_back": {
+   "flow": "me",
+   "step": "card",
+   "order": 10,
+   "copy": "It's back",
+   "reviewStatus": "draft"
+  },
+  "card_set_aside": {
+   "flow": "me",
+   "step": "card",
+   "order": 11,
+   "copy": "Set aside",
+   "reviewStatus": "draft"
+  },
+  "card_restore": {
+   "flow": "me",
+   "step": "card",
+   "order": 12,
+   "copy": "Bring it back",
+   "reviewStatus": "draft"
+  },
+  "card_tender": {
+   "flow": "me",
+   "step": "card",
+   "order": 13,
+   "copy": "It feels young or hurt",
+   "reviewStatus": "draft"
+  },
+  "card_rename_save": {
+   "flow": "me",
+   "step": "card",
+   "order": 14,
+   "copy": "Save",
+   "reviewStatus": "draft"
+  },
+  "card_cancel": {
+   "flow": "me",
+   "step": "card",
+   "order": 15,
+   "copy": "Cancel",
+   "reviewStatus": "draft"
+  },
+  "revisit_title": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 16,
+   "copy": "Is {name} still doing the same job?",
+   "reviewStatus": "draft"
+  },
+  "revisit_title_noname": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 17,
+   "copy": "Is this part still doing the same job?",
+   "reviewStatus": "draft"
+  },
+  "revisit_resting": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 18,
+   "copy": "{name} has been resting. Still quiet?",
+   "reviewStatus": "draft"
+  },
+  "revisit_resting_noname": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 19,
+   "copy": "This part has been resting. Still quiet?",
+   "reviewStatus": "draft"
+  },
+  "revisit_new_title": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 20,
+   "copy": "What does it do now?",
+   "reviewStatus": "draft"
   }
  },
  "options": {
@@ -3155,6 +3246,82 @@
      "selfLike": null,
      "branch": "continue",
      "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "me": {
+   "revisit": [
+    {
+     "id": "revisit_same",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "revisit_less",
+     "label": "Less than before",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "revisit_new",
+     "label": "It's doing something new",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "revisit_resting_opt",
+     "label": "It's resting",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "revisit_still_quiet",
+     "label": "Still quiet",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "revisit_back",
+     "label": "It's back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

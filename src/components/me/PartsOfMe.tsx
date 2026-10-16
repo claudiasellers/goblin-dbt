@@ -1,24 +1,40 @@
-import type { ReactNode } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { PartsContent } from '../../data/partsContentTypes';
+import { RATHER_IDS_MAX, type PartRevisitAnswer, type PartWriteResponse } from '../../data/partsTypes';
 import type { MeItem } from '../../services/profile';
-import { meetAPartLink, partCardRows, sortPartItems, type PartsOfMePromptId } from '../../lib/partsOfMe';
+import { answerPartRevisit, renamePart, restorePart, restPart, setAsidePart, setPartTender } from '../../services/parts';
+import {
+  PART_NAME_MAX, meetAPartLink, partActions, partAsksBack, partCardRows, partRevisitCopy, renameCall, restoreCall,
+  revisitCall, revisitChoices, revisitQuestion, revisitRatherOptions, sortPartItems, toggleRather,
+  type PartRevisitCopy, type PartWriteCall, type PartsOfMePromptId,
+} from '../../lib/partsOfMe';
+import { newId } from '../../lib/spine/ids';
 import { PartFigure } from '../parts/PartFigure';
 
+type Copy = Record<PartsOfMePromptId, string>;
+/** Sends one part write and refreshes Me from getMe (MeSection's `after`); rejects when the write fails. */
+export type PartWrite = (p: Promise<PartWriteResponse>) => Promise<void>;
+
 /**
- * Me → Parts of me (docs/design/parts.md, "The part card"): read-only cards for the parts a person
- * has kept, no stats yet. Rendered by MeSection only with parts on and all its copy signed off.
- * Nothing here writes a part; set-aside parts use Me's own set-aside row (`renderSetAside`).
+ * Me → Parts of me (docs/design/parts.md, "The part card"): the parts a person has kept, no stats
+ * yet. Rendered by MeSection only with parts on and all its copy signed off. Each card has one row of
+ * quiet actions (lane 2's part writers) and, past its revisit date, the 30-day check-back above them
+ * (only once that copy is signed off too). Set-aside parts sit below as rows with "Bring it back".
+ *
+ * Writes are not optimistic, as elsewhere in Me: the card is disabled while saving, Me reloads after,
+ * and a failed write leaves things as they were with no message (StillTrue's rule).
  */
-export function PartsOfMe({ items, content, copy, renderSetAside }: {
+export function PartsOfMe({ items, content, copy, onWrite }: {
   items: MeItem[];
   content: PartsContent;
-  copy: Record<PartsOfMePromptId, string>;
-  renderSetAside: (item: MeItem) => ReactNode;
+  copy: Copy;
+  onWrite: PartWrite;
 }) {
   const parts = sortPartItems(items.filter((i) => i.part));
   const live = parts.filter((i) => i.meta.status !== 'set_aside');
   const setAside = parts.filter((i) => i.meta.status === 'set_aside');
+  const revisit = partRevisitCopy(content);
   const getToKnow = meetAPartLink();
 
   return (
@@ -29,18 +45,68 @@ export function PartsOfMe({ items, content, copy, renderSetAside }: {
       </Link>
       {live.length > 0 && (
         <ul className="space-y-3">
-          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} />)}
+          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} onWrite={onWrite} />)}
         </ul>
       )}
-      {setAside.length > 0 && <ul>{setAside.map(renderSetAside)}</ul>}
+      {setAside.length > 0 && (
+        <ul>{setAside.map((i) => <SetAsideRow key={i.meta.id} item={i} copy={copy} onWrite={onWrite} />)}</ul>
+      )}
     </div>
   );
 }
 
-function PartCard({ item, content, copy }: { item: MeItem; content: PartsContent; copy: Record<PartsOfMePromptId, string> }) {
+/** The writer a call names (lane 2's, src/services/parts.ts). */
+function send(c: PartWriteCall): Promise<PartWriteResponse> {
+  switch (c.fn) {
+    case 'renamePart': return renamePart(c.req);
+    case 'restPart': return restPart(c.req);
+    case 'setAsidePart': return setAsidePart(c.req);
+    case 'restorePart': return restorePart(c.req);
+    case 'setPartTender': return setPartTender(c.req);
+    case 'answerPartRevisit': return answerPartRevisit(c.req);
+  }
+}
+
+/** One write at a time per card: disabled while it runs, unchanged if it fails. */
+function useWrite(onWrite: PartWrite) {
+  const [busy, setBusy] = useState(false);
+  const run = async (c: PartWriteCall, done?: () => void) => {
+    if (busy) return;
+    setBusy(true);
+    try { await onWrite(send(c)); done?.(); } catch { /* unchanged; Me reloads on the next visit */ } finally { setBusy(false); }
+  };
+  return { busy, run };
+}
+
+const link = 'inline-flex items-center min-h-11 text-sm underline underline-offset-2 disabled:opacity-50';
+const quiet = `${link} text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]`;
+const plain = `${link} text-[var(--color-text-secondary)]`;
+const chip = 'min-h-11 px-3 rounded-lg border text-sm text-left disabled:opacity-50';
+const choice = `${chip} border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]`;
+const chosen = `${chip} border-[var(--color-border-accent)] text-[var(--color-text-primary)]`;
+const box = 'mt-2 p-3 rounded-lg bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)]';
+
+function PartCard({ item, content, copy, revisit, onWrite }: {
+  item: MeItem; content: PartsContent; copy: Copy; revisit: PartRevisitCopy | null; onWrite: PartWrite;
+}) {
   const part = item.part!;
+  const partId = item.meta.id;
+  const resting = item.meta.status === 'resting';
   const rows = partCardRows(part, content);
-  const visit = meetAPartLink(item.meta.id);
+  const visit = meetAPartLink(partId);
+  const { busy, run } = useWrite(onWrite);
+  const [renaming, setRenaming] = useState(false);
+  const [draft, setDraft] = useState('');
+  const [answered, setAnswered] = useState(false);
+
+  const saveName = (e: FormEvent) => {
+    e.preventDefault();
+    run(renameCall(partId, draft), () => setRenaming(false));
+  };
+  const answer = (a: PartRevisitAnswer, ratherIds?: string[]) => {
+    const c = revisitCall(newId(), partId, a, ratherIds);
+    if (c) run(c, () => setAnswered(true));
+  };
   const row = (label: string, value: ReactNode) => (
     <div className="flex flex-wrap gap-x-2">
       <dt className="text-[var(--color-text-tertiary)]">{label}</dt>
@@ -54,17 +120,30 @@ function PartCard({ item, content, copy }: { item: MeItem; content: PartsContent
           <PartFigure shapeSig={part.shapeSig} size={64} />
         </div>
         <div className="min-w-0 flex-1">
-          <div className="flex flex-wrap items-baseline gap-x-2">
-            {/* The person's own name for it, in the serif; unnamed, the kind's label ("A part"). */}
-            <h4 className={part.name
-              ? 'font-serif text-xl leading-tight text-[var(--color-text-primary)] break-words'
-              : 'text-sm font-medium text-[var(--color-text-primary)]'}>
-              {part.name ?? item.title}
-            </h4>
-            {item.meta.status === 'resting' && (
-              <span className="text-xs text-[var(--color-text-tertiary)]">{copy.card_resting}</span>
-            )}
-          </div>
+          {renaming ? (
+            // The person's words, in the serif, never linted; an empty save clears the name.
+            <form onSubmit={saveName}>
+              <input type="text" value={draft} maxLength={PART_NAME_MAX} autoFocus disabled={busy}
+                aria-label={copy.card_rename}
+                onChange={(e) => setDraft(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Escape') setRenaming(false); }}
+                className="w-full min-h-11 px-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] font-serif text-xl text-[var(--color-text-primary)]" />
+              <div className="flex flex-wrap gap-x-4">
+                <button type="submit" disabled={busy} className={plain}>{copy.card_rename_save}</button>
+                <button type="button" disabled={busy} onClick={() => setRenaming(false)} className={quiet}>{copy.card_cancel}</button>
+              </div>
+            </form>
+          ) : (
+            <div className="flex flex-wrap items-baseline gap-x-2">
+              {/* The person's own name for it, in the serif; unnamed, the kind's label ("A part"). */}
+              <h4 className={part.name
+                ? 'font-serif text-xl leading-tight text-[var(--color-text-primary)] break-words'
+                : 'text-sm font-medium text-[var(--color-text-primary)]'}>
+                {part.name ?? item.title}
+              </h4>
+              {resting && <span className="text-xs text-[var(--color-text-tertiary)]">{copy.card_resting}</span>}
+            </div>
+          )}
           <dl className="mt-1 space-y-0.5 text-sm">
             {rows.where.length > 0 && row(copy.card_where, rows.where.join(', '))}
             {rows.job && ('own' in rows.job
@@ -75,10 +154,95 @@ function PartCard({ item, content, copy }: { item: MeItem; content: PartsContent
           </dl>
         </div>
       </div>
-      <Link to={visit.pathname} state={visit.state}
-        className="mt-2 inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
-        {copy.card_visit}
-      </Link>
+      {revisit && partAsksBack(item) && !answered && (
+        <CheckBack item={item} content={content} copy={copy} revisit={revisit} busy={busy} answer={answer} />
+      )}
+      <div className="mt-2 flex flex-wrap items-center gap-x-4">
+        <Link to={visit.pathname} state={visit.state} className={plain}>{copy.card_visit}</Link>
+        {partActions(item, copy).filter((a) => !(renaming && a.id === 'rename')).map((a) => (
+          <button key={a.id} type="button" disabled={busy} className={quiet}
+            onClick={() => { if (a.call) run(a.call); else { setDraft(part.name ?? ''); setRenaming(true); } }}>
+            {a.label}
+          </button>
+        ))}
+      </div>
+    </li>
+  );
+}
+
+/**
+ * The 30-day check-back, in Me's still-true style. Active: four answers; "It's doing something new"
+ * opens the would-rather chips (1 to 3) and a Save. Resting: Still quiet / It's back. Folds away after.
+ */
+function CheckBack({ item, content, copy, revisit, busy, answer }: {
+  item: MeItem; content: PartsContent; copy: Copy; revisit: PartRevisitCopy; busy: boolean;
+  answer: (answer: PartRevisitAnswer, ratherIds?: string[]) => void;
+}) {
+  const part = item.part!;
+  const resting = item.meta.status === 'resting';
+  const [picking, setPicking] = useState(false);
+  const [picked, setPicked] = useState<string[]>([]);
+
+  if (picking) {
+    return (
+      <div className={box}>
+        <p className="text-sm text-[var(--color-text-primary)] mb-2">{revisit.prompts.revisit_new_title}</p>
+        <div className="flex flex-wrap gap-2">
+          {revisitRatherOptions(content, part).map((o) => {
+            const on = picked.includes(o.id);
+            return (
+              <button key={o.id} type="button" aria-pressed={on} disabled={busy || (!on && picked.length >= RATHER_IDS_MAX)}
+                onClick={() => setPicked((p) => toggleRather(p, o.id))} className={on ? chosen : choice}>
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-x-4">
+          <button type="button" disabled={busy || picked.length === 0} onClick={() => answer('new', picked)} className={plain}>
+            {copy.card_rename_save}
+          </button>
+          <button type="button" disabled={busy} onClick={() => { setPicking(false); setPicked([]); }} className={quiet}>
+            {copy.card_cancel}
+          </button>
+        </div>
+      </div>
+    );
+  }
+  return (
+    <div className={box}>
+      <p className="text-sm text-[var(--color-text-primary)] mb-2 break-words">{revisitQuestion(revisit, part, resting)}</p>
+      <div className="flex flex-wrap gap-2">
+        {revisitChoices(revisit, content, part, resting).map((c) => (
+          <button key={c.id} type="button" disabled={busy} className={choice}
+            onClick={() => (c.answer === 'new' ? setPicking(true) : answer(c.answer))}>
+            {c.label}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** A set-aside part, in Me's set-aside style, with "Bring it back" (restorePart). */
+function SetAsideRow({ item, copy, onWrite }: { item: MeItem; copy: Copy; onWrite: PartWrite }) {
+  const { busy, run } = useWrite(onWrite);
+  return (
+    <li className="py-3 border-t border-[var(--color-border-subtle)] first:border-t-0">
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className={item.part?.name
+            ? 'font-serif text-base text-[var(--color-text-primary)] break-words'
+            : 'text-sm font-medium text-[var(--color-text-primary)]'}>
+            {item.part?.name ?? item.title}
+          </p>
+          <p className="text-xs text-[var(--color-text-tertiary)]">{copy.card_set_aside}</p>
+        </div>
+        <button type="button" disabled={busy} onClick={() => run(restoreCall(item.meta.id))}
+          className={`shrink-0 ${plain}`}>
+          {copy.card_restore}
+        </button>
+      </div>
     </li>
   );
 }

@@ -470,6 +470,21 @@ PROMPTS = [
     ("card_rather", "me", "card", "Would rather"),
     ("card_visit", "me", "card", "Spend time with it"),
     ("card_resting", "me", "card", "Resting"),
+    # The card's actions (lane 2's part writers); "It feels young or hurt" only on a part not marked tender
+    ("card_rename", "me", "card", "Rename"),
+    ("card_rest", "me", "card", "Rest it"),
+    ("card_back", "me", "card", "It's back"),
+    ("card_set_aside", "me", "card", "Set aside"),
+    ("card_restore", "me", "card", "Bring it back"),
+    ("card_tender", "me", "card", "It feels young or hurt"),
+    ("card_rename_save", "me", "card", "Save"),
+    ("card_cancel", "me", "card", "Cancel"),
+    # The 30-day check-back on the card (parts.md "Still true? = checking back with protectors")
+    ("revisit_title", "me", "revisit", "Is {name} still doing the same job?"),
+    ("revisit_title_noname", "me", "revisit", "Is this part still doing the same job?"),
+    ("revisit_resting", "me", "revisit", "{name} has been resting. Still quiet?"),
+    ("revisit_resting_noname", "me", "revisit", "This part has been resting. Still quiet?"),
+    ("revisit_new_title", "me", "revisit", "What does it do now?"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry
@@ -699,6 +714,14 @@ OPTIONS = [
     opt("blend_pulls_notice", "gate", "blend_pulls", "I can notice them"),
     opt("blend_pulls_running", "gate", "blend_pulls", "One of them is running things", branch="body_first"),
     opt("blend_pulls_not_sure", "gate", "blend_pulls", "Not sure"),
+
+    # --- Me: the 30-day check-back on a part's card (answers map to answerPartRevisit) ---
+    opt("revisit_same", "me", "revisit", "Yes"),
+    opt("revisit_less", "me", "revisit", "Less than before"),
+    opt("revisit_new", "me", "revisit", "It's doing something new"),
+    opt("revisit_resting_opt", "me", "revisit", "It's resting"),
+    opt("revisit_still_quiet", "me", "revisit", "Still quiet"),
+    opt("revisit_back", "me", "revisit", "It's back"),
 ]
 
 # Prompt and option ids waiting on a decision, not on review: build.py marks them pending. Empty since
