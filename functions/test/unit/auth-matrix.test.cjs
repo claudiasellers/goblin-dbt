@@ -18,6 +18,7 @@ const AUTHED = [
   'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
   'getPartsEntry', // reads the caller's own check-ins and Recover sessions
+  'startPartSession', 'savePartSession',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in
