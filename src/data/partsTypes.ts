@@ -97,6 +97,61 @@ export interface SavePartSessionRequest {
 
 export interface PartSessionResponse { id: string; status: 'open' | 'saved' }
 
+// --- Keeping a part and queueing a candidate: mirror of functions/src/parts/keepTypes.ts (tests/parts-entry.test.mjs) ---
+
+/** 9b's yes. Only ids and the name: the part itself is built from the stored session. */
+export interface KeepPartRequest {
+  sessionId: string;
+  /** A new client UUID for a new part; the visited part's id on a revisit. */
+  partId: string;
+  /** Up to PartsPolicy.nameMaxChars (40); null or absent is "Not yet" (a revisit keeps the old name). */
+  name?: string | null;
+}
+export interface KeepPartResponse { partId: string; created: boolean }
+
+/** Where a candidate came from. */
+export type CandidateOrigin = 'new_one' | 'worried_part' | 'split' | 'ps_ambivalence' | 'angry_card';
+export const CANDIDATE_ORIGINS: readonly CandidateOrigin[] = ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card'];
+
+/** Written only on a yes. */
+export interface QueuePartCandidateRequest {
+  id: string;
+  origin: CandidateOrigin;
+  /** ProtectiveMove ids (at most 4), every one of which must exist. */
+  moveIds: string[];
+  /** The Meet a part visit it came from, when there is one. */
+  sessionId?: string;
+}
+export interface QueuePartCandidateResponse { id: string }
+
+/** Every change to a kept part answers with the new profile version (the client cache key). */
+export interface PartWriteResponse { version: number }
+
+/** Rename: up to PartsPolicy.nameMaxChars (40), trimmed; '' or null is "Not yet". Never linted. */
+export interface RenamePartRequest { partId: string; name: string | null }
+/** true: active → resting; false: resting → active. A set-aside part is restored, not woken. */
+export interface RestPartRequest { partId: string; resting: boolean }
+/** Set aside, restore, mark tender. */
+export interface PartRefRequest { partId: string }
+
+/** The 30-day still-true for a part: an active part's answers, then a resting part's. */
+export type PartRevisitAnswer = 'same' | 'less' | 'new' | 'resting' | 'still_quiet' | 'back';
+export const ACTIVE_REVISIT_ANSWERS: readonly PartRevisitAnswer[] = ['same', 'less', 'new', 'resting'];
+export const RESTING_REVISIT_ANSWERS: readonly PartRevisitAnswer[] = ['still_quiet', 'back'];
+/** `new` takes 1 to 3 of the meet flow's `rather` option ids (the part's new job). */
+export const RATHER_IDS_MAX = 3;
+export interface AnswerPartRevisitRequest {
+  /** A client UUID: the logged answer's id, so a repeat call applies nothing twice. */
+  id: string;
+  partId: string;
+  answer: PartRevisitAnswer;
+  ratherIds?: string[];
+}
+
+/** A job the part did before it took up a new one (`Part.jobHistoryJson`, newest last, at most 10). */
+export interface PartJobHistoryEntry { jobIds: string[]; ownJob: string | null; until: string }
+export const JOB_HISTORY_MAX = 10;
+
 // --- The angry-part card (src/lib/angryPart.ts, src/components/parts/AngryPartCard.tsx) ---
 
 /** The angry card's lines. Each exists twice in the content: `id` (parts on) and `id_plain` (parts off). */
@@ -108,12 +163,29 @@ export const ANGRY_LINES = [
 ] as const;
 export type AngryLineId = (typeof ANGRY_LINES)[number];
 
-/** The angry card's options (one wording: none of them names a part). */
+/** The angry card's options shared by both wordings (none of them names a part). */
 export const ANGRY_OPTIONS = ['angry_next', 'angry_not_sure', 'angry_done'] as const;
 export type AngryOptionId = (typeof ANGRY_OPTIONS)[number];
 
-/** Every prompt (both wordings) and option of the angry flow, by id, as plain strings. */
-export type AngryCardCopy = Record<AngryLineId | `${AngryLineId}_plain` | AngryOptionId, string>;
+/**
+ * The card's own way past on its first screen, one per wording (the card is offered, never imposed;
+ * its host shows it as the skip link). Both read "Not now" today; each wording is reviewed on its own.
+ */
+export const ANGRY_NOT_NOW = 'angry_not_now';
+export type AngryNotNowId = typeof ANGRY_NOT_NOW | `${typeof ANGRY_NOT_NOW}_plain`;
+
+/**
+ * The card's last screen, parts on only (no `_plain` twin): `angry_later` (an option, "Spend a minute
+ * with it later?") is the yes that queues a PartCandidate (origin angry_card); `angry_later_done` (a
+ * prompt) replaces it once queued. Never opens a flow.
+ */
+export const ANGRY_LATER = 'angry_later';
+export const ANGRY_LATER_DONE = 'angry_later_done';
+/** The later line as the card shows it, when it may. */
+export interface AngryLaterCopy { ask: string; done: string }
+
+/** Every prompt and option of the angry flow (both wordings), by id, as plain strings. */
+export type AngryCardCopy = Record<AngryLineId | `${AngryLineId}_plain` | AngryOptionId | AngryNotNowId, string>;
 
 export type AngryStep = 'unblend' | 'protects' | 'vote' | 'speak';
 
@@ -144,6 +216,4 @@ export interface AngryCardContent {
   prompts: Record<string, { flow: string; step: string; copy: string }>;
   options: Record<string, Record<string, { id: string; label: string }[]>>;
   hurts: AngryContentHurt[];
-  /** CAN_TOUCH: Recover's "what happened" (its state id, an InvalidationEvent) → hurt ids, in order. */
-  canTouch: Record<string, string[]>;
 }

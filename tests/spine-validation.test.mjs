@@ -21,7 +21,7 @@ test("every interactive tool declares its close; client and server registries ag
   const page = readFileSync("src/pages/ToolPage.tsx", "utf8");
   const block = page.slice(page.indexOf("const toolComponents"), page.indexOf("};", page.indexOf("const toolComponents")));
   const components = [...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]);
-  assert.equal(components.length, 9);
+  assert.equal(components.length, 10);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);
@@ -115,6 +115,9 @@ test("ext wmp: the angry-part card in Recover keeps the hurt, the hold and where
   assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: "yes" } }), /expected a boolean/);
   assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: 1 } }), /expected a boolean/);
   assert.throws(() => ext.validateExt({ wmp: { angrySpeakLine: "I felt brushed off." } }), /not registered/);
+  // "Spend a minute with it later?" taken (parts on): a bool, never the candidate's id or text.
+  assert.deepEqual(JSON.parse(ext.validateExt({ wmp: { angryLater: true } })).wmp, { angryLater: true });
+  assert.throws(() => ext.validateExt({ wmp: { angryLater: "yes" } }), /expected a boolean/);
 });
 
 test("close: emotion ids picked in the tool are ids only, at most 20; none given is []", () => {

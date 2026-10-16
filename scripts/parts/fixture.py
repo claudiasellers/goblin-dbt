@@ -56,8 +56,8 @@ payload = {
     "options": options,
     "hurts": hurts,
     # Recover's "what happened" (InvalidationEvent id) → the hurts it can touch, in order: pre-orders the
-    # angry card's chips when Recover hands over (src/lib/angryPart.ts orderHurts).
-    "canTouch": CAN_TOUCH,
+    # angry card's chips in Recover (src/lib/angryPart.ts orderHurts). Reviewed by the event id, like the edge.
+    "canTouch": {ev: dict(hurts=hurts, **status(ev)) for ev, hurts in CAN_TOUCH.items()},
     "pairs": pairs,
     "keepsake": [dict(id=kid, copy=copy, **status(kid)) for kid, copy in KEEPSAKE],
     "trailRules": [dict(r, **status(r["id"])) for r in TRAIL_RULES],

@@ -12,6 +12,7 @@ export function partsFromFixture(fixture, approve = null) {
   const ok = approve ? (row) => approve(row.id) : signedOff;
   const moves = fixture.moves.filter(ok);
   const moveIds = new Set(moves.map((m) => m.id));
+  const hurtIds = new Set(fixture.hurts.filter(ok).map((h) => h.id));
   const options = {};
   for (const [flow, steps] of Object.entries(fixture.options)) {
     for (const [step, list] of Object.entries(steps)) {
@@ -27,5 +28,10 @@ export function partsFromFixture(fixture, approve = null) {
     options,
     // OFTEN_GUARDS is reviewed by its move: a hurt ships with the guarding moves that are signed off.
     hurts: fixture.hurts.filter(ok).map((h) => ({ ...strip(h), guardedBy: h.guardedBy.filter((x) => moveIds.has(x.moveId)) })),
+    // CAN_TOUCH is reviewed by its event (Recover's content): it ships when approved, with the hurts that ship.
+    canTouch: Object.fromEntries(Object.entries(fixture.canTouch)
+      .filter(([id, t]) => ok({ id, ...t }))
+      .map(([id, t]) => [id, t.hurts.filter((h) => hurtIds.has(h))])
+      .filter(([, hs]) => hs.length)),
   });
 }

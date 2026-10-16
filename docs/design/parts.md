@@ -113,6 +113,34 @@ flooded line.
 
 ---
 
+## The angry-part card as built (16 Oct, behind sign-off)
+
+- **Component** `src/components/parts/AngryPartCard.tsx` (logic `src/lib/angryPart.ts`), host-agnostic:
+  unblend (the light, and a small figure set apart) → what it protects (the six hurts, ordered by the
+  host's Recover event through `CAN_TOUCH`, then `hit_back`'s `OFTEN_GUARDS`) → the vote of confidence,
+  held for 4 s (the light reaches the figure as the hold completes; letting go early shows *Next*,
+  never a penalty) → "speak for it, not from it" with the person's sentence in the serif
+  ("I felt brushed off."). Back on screens 2–4, the host's *too much* on every screen.
+- **Two wordings.** Every line has a `_plain` twin with no parts language ("The anger is loud right
+  now, and you're here too."), so the card reaches people who haven't turned parts on. A build check
+  and a test keep the word "part" out of every plain line. The vote line reads "{name}, it's angry
+  because {matters} matters to you." (plain: "{name}, you're angry because {matters} matters.");
+  `ProtectedHurt.matters` fills `{matters}`. "I felt {felt}." is lint kind `first_person` (chip rules,
+  90 characters, only `{felt}`), since the prompt scope's "no I" rule would reject it.
+- **Host (recommended placement, Claudia's card still open): Recover's *Fight back*.** A step `angry`
+  in the Name phase, before *What hit hardest?*: offered only when the pull is `fight`, the latest
+  reading is under `downshiftAt` (after the body steps, only if the re-rating came under the line), the
+  copy in the person's wording is in `parts.json`, and it hasn't been offered in this visit. *Not now*
+  (`angry_not_now`) skips it. Recorded on the visit as `ext.wmp.angryHurtId` / `angryVoteHeld` /
+  `angryExit`; nothing goes to the profile. Going on to *Ask them* carries the hurt into DEAR MAN as the
+  first, unselected "I felt" chip: the felt phrase, capitalised like the other chips ("Brushed off"),
+  the same for parts on and off, and saved as the hurt id (not mapped to DEAR MAN's own feeling chips,
+  which would turn "brushed off" back into "Hurt, Disrespected").
+- The "Spend a minute with it later?" line (a `PartCandidate`) shows only with parts on: it names a
+  part, and nothing parts-related is written for someone who hasn't turned parts on.
+
+---
+
 ## Where I'd change the brief
 
 **"Discover parts through patterns."** I'd discover *trails* and let people claim parts.
@@ -152,7 +180,7 @@ The app already has a parts substrate. It just doesn't use the word.
 | DEAR MAN barriers: "I don't feel like I have the right to ask", "I feel guilty asking". Debrief: `ThoughtPattern`, `MomentResponse`, `Underneath` | Managers speaking; protector behaviour under pressure; the tender thing underneath. |
 | Problem Solve `cant-ambivalent` "Part of me doesn't actually want this to change"; ambivalence "What does staying the same protect you from?" | A protector's-fear question, almost word for word. **None of it is saved today.** |
 | Witness: "Giving in made sense in that moment. Part of you was keeping things safe." (`tp_gave_in`); level 3 UNDERNEATH guesses | Protective-function language, already in the house voice (drafts). |
-| The angry part (agreed, not built): Unblend → What it protects → Vote of confidence → Speak for it, not from it | The first parts flow, and the template for the rest. |
+| The angry part (agreed; built 16 Oct behind sign-off, see *The angry-part card as built*): Unblend → What it protects → Vote of confidence → Speak for it, not from it | The first parts flow, and the template for the rest. |
 | Stage (v2 Recover, not built): figures; "Step back from it" lifts the camera | Externalised figures, plus visual self-distancing (the meta-position). |
 | Shape it: 5 forced choices → a sculpted object; Tune it: a sound | A way to *flesh out* a part without words or scales. |
 | Body map: 15 places, sensation words, strength | *Where do you notice it?* (the second F). |
@@ -442,7 +470,8 @@ A new tool, `meet-a-part`, in module `mf` ("Notice it", which has no tool yet). 
 from the house's own mechanics: one decision per screen, chips first, "add your own" as the escape
 hatch, no free text required, no scale anywhere.
 
-**Entries.** All require parts on, except the angry-part card's own link:
+**Entries.** All require parts on. (The angry-part card itself reaches people with parts off, in its
+plain wording; its "later" line below is shown only with parts on.)
 
 - an offer's *Yes*;
 - Me → Parts of me → "Get to know a part";
@@ -498,7 +527,7 @@ hatch, no free text required, no scale anywhere.
     *pauses* on a non-Self answer.
 - **Nothing at 4.** That can be numbing, not a part. The flow does not call it one. It says *"Sometimes
   there's nothing there yet. That's fine."*, offers 5-4-3-2-1 or a body primitive, then Thank it and
-  close.
+  close. There is no Name or Keep: nothing was found, so nothing is kept.
 - **The conservative branch at 6** covers a `tender` fear ("I'd feel the old hurt", "Something would come
   up I can't handle") **or anything in the person's own words**:
 
@@ -511,12 +540,15 @@ hatch, no free text required, no scale anywhere.
 
   - It skips 7 and 8b.
   - It records `stopReason: 'tender'` (or `own_words`).
+  - Name and Keep are still offered: the person found the guard, and keeping it (marked `tender`) is how
+    they come back to it gently.
   - Nothing offers to go further, now or later.
   - Own words are never parsed. Unread text is treated as the riskier case, not the safer one.
 - **`danger` fear, or a move with `safetyLine`.** This covers fears such as "it would hurt me" or "I'd do
   something I can't take back", and own words at 3c or 5 on a `safetyLine` move.
   - Crisis resources render alongside, through the check-in's seam.
-  - The flow goes straight to Thank it and close.
+  - The flow goes straight to Thank it and close, **without Name or Keep**: a moment that showed danger
+    adds no commitment and no profile write. The person can meet it again on a calmer day.
   - These parts never get 7 or 8b on their own.
 - **The tender path** (marked tender, or "little" accepted at 3b). One screen replaces 3c–8b:
 
@@ -544,6 +576,18 @@ hatch, no free text required, no scale anywhere.
 - **Profile writes happen only at 9b**, through `keepPart`, the sole writer of `Part`. They cover the
   figure, places, jobs, fears, preferred roles and name. The person's own-words job and fear are copied
   into the Part only there, on that yes.
+  - **Built from the stored session, never from the client** (`keepPart({ sessionId, partId, name? })`):
+    accepted while the session is open, or saved within 12 h (a slow network or a closed tab, nothing
+    longer). Non-answer chips (*Not sure*, *Nothing*, *Can't tell*, *Not yet*, *In my words*) are never
+    stored as ids on a Part. `feelTowardIds`, `blendCheck` and `handoffs` are never copied.
+  - `tender` is set when the tender path ran, *little* was accepted, or the visit stopped on `tender` or
+    `own_words`. `source` is `candidate`, `offer` or `made`.
+  - **A visit to a part already kept** updates it on the yes: ids and places are unioned (a visit never
+    removes anything), own words and the shape replace the old ones only when this visit gave new ones,
+    the name stays unless a new one is given, and **a newer age answer replaces the old one** (a part's
+    felt age can change as it learns it's not then any more; a non-answer keeps the old one). `tender` is
+    never cleared by a visit.
+  - `ACCEPTED_FROM` a `TrailOffer` waits for that label (Phase 4); a candidate's is written now.
 
 ---
 
@@ -594,7 +638,8 @@ aggregates (`FOUND_WORD`, offers). Stats come from there, never from a profile s
 
 The profile's revisit mechanic becomes the IFS check-back.
 
-- Kind `part`, revisited after 30 days.
+- Kind `part`, revisited after 30 days. A resting part keeps its check-back (resting is live; the
+  check-back is how it wakes or stays quiet), with its own copy: *"{name} has been resting. Still quiet?"*
 - The prompt: *"Is {name} still doing the same job?"*
 - The answers:
   - **Yes**
@@ -608,7 +653,8 @@ The profile's revisit mechanic becomes the IFS check-back.
 
 ### Deleting
 
-**Delete my parts** (Privacy & Data) removes, in one confirmed step:
+**Delete your parts** (Privacy & Data; the app says "your", per the voice contract) removes, in one
+confirmed step (`deleteMyParts`, which works with parts off):
 
 - the `Part`, `PartLink`, `DenSnapshot`, `PartCandidate` and `PartTag` records;
 - any `TrailOffer` that points at them;
@@ -617,7 +663,7 @@ The profile's revisit mechanic becomes the IFS check-back.
 It **asks separately** about kept *Two pulls* lines in My words that contain part names: "Also remove 2
 kept lines that name your parts?"
 
-`PartSession` own-words are log records and follow retention. Delete my parts removes them too.
+`PartSession` own-words are log records and follow retention. Delete your parts removes them too.
 
 ---
 
@@ -734,7 +780,7 @@ which is agreed and which the person chooses.
 | **Reification, self-diagnosis** | Trails, not parts. No roles, no archetypes, no part numbers. Three or more parts made in 7 days → one line: *"You don't need to get to know everyone at once."* |
 | **Accountability** | "A part of you wanted to ___, and you ___". The `no_part_blame` lint |
 | **Rumination** | One offer a week, no streaks, reflection pulled by the person. Nothing on check-in results |
-| **Privacy** | No part names or moves in notifications. Delete my parts is separate from deleting the account |
+| **Privacy** | No part names or moves in notifications. Delete your parts is separate from deleting the account |
 | **AI** | None in v1. If an LLM ever joins, it reflects only. It never speaks as a part or as the person's Self (Barr: a "complementary cognitive artifact") |
 
 ---
@@ -760,6 +806,7 @@ which is agreed and which the person chooses.
   | chip (what the person taps) | `parts_chip` | 60 | none | every validation rule except `voice_distance` |
   | voice (what a part says) | `parts_voice` | 40 | none | safety only: cheer, emoji, role labels, part blame, ideation echo |
   | keepsake | `parts_chip` | 90 | `{A}` `{B}` `{want}` | as chip |
+  | first_person (the person's own sentence, "I felt {felt}.") | `parts_chip` | 90 | `{felt}` | as chip |
 
   A part's voice is deliberately unsoftened ("Just agree", "You always do this"), so the softening rules
   don't apply to it; the safety rules do.
@@ -871,7 +918,13 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
   - `answerPartCandidate`
   - `updatePartLayout`, `restPart`, `setPartTender`, `linkParts`
   - `deleteMyParts`
-  - Content ships as a generated `src/data/content/parts.json`, like the other content files.
+  - Content ships as a generated `src/data/content/parts.json`, like the other content files, holding
+    **approved rows only** (moves, prompts, options, hurts, `canTouch`; never trail rules, contexts or
+    the policy). Screens read it through `getPartsContent()` and render only when `flowReady` finds every
+    line they need, so nothing parts-related appears until its copy is signed off. An approved option
+    may name a move that isn't signed off yet; completeness is `flowReady`'s job.
+  - `meet-a-part` is in `NOT_WHAT_HELPS` (`spine/tools.ts`): its orienting answer is stored but never
+    counted as "it helped" (what-helps rules, Insights, Today's outcome card, `ToolUsage.outcome`).
 - **Trail evaluation.** It joins the Today prepare step as a second rule family. `readRules` filters by
   kind, and the family imports nothing from `profile/items.ts`.
 

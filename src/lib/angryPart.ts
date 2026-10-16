@@ -4,7 +4,8 @@
  * order the hurts are offered in. All copy comes from the parts content (scripts/parts/content.py).
  */
 import {
-  ANGRY_LINES, ANGRY_OPTIONS, type AngryCardContent, type AngryCardCopy, type AngryContentHurt, type AngryHurt, type AngryLineId,
+  ANGRY_LATER, ANGRY_LATER_DONE, ANGRY_LINES, ANGRY_NOT_NOW, ANGRY_OPTIONS, type AngryCardContent, type AngryCardCopy,
+  type AngryContentHurt, type AngryHurt, type AngryLaterCopy, type AngryLineId, type AngryNotNowId,
 } from '../data/partsTypes';
 import type { PartsContent } from '../data/partsContentTypes';
 import { fill } from './invalidationRecovery';
@@ -16,16 +17,34 @@ export const ANGRY_MOVE = 'hit_back';
 /** The prompt ids the card shows for one wording: each line's own id with parts on, its `_plain` twin off. */
 export const angryPromptIds = (partsOn: boolean): string[] => ANGRY_LINES.map((l) => (partsOn ? l : `${l}_plain`));
 
+/** The card's own "Not now" for one wording. */
+export const angryNotNowId = (partsOn: boolean): AngryNotNowId => (partsOn ? ANGRY_NOT_NOW : `${ANGRY_NOT_NOW}_plain`);
+
+/** The option ids the card shows for one wording: the shared ones and that wording's "Not now". */
+export const angryOptionIds = (partsOn: boolean): string[] => [...ANGRY_OPTIONS, angryNotNowId(partsOn)];
+
 /** A hurt the card can offer: its chip, its vote of confidence and its sentence all have words. */
 const complete = (h: AngryContentHurt) => Boolean(h.label?.trim() && h.matters?.trim() && h.feltPhrase?.trim());
 
 /**
  * Whether the card can show for this wording from the shipped (signed-off only) parts content: every
- * prompt of the person's wording and every option (flowReady), and at least one hurt, each complete.
- * The other wording isn't needed. Nothing renders half a card.
+ * prompt and option of the person's wording, its own "Not now" included (flowReady), and at least one
+ * hurt, each complete. The other wording isn't needed. Nothing renders half a card, and the card never
+ * shows without its own way past.
  */
 export function angryReady(content: PartsContent, partsOn: boolean): boolean {
-  return flowReady(content, angryPromptIds(partsOn), ANGRY_OPTIONS) && content.hurts.length > 0 && content.hurts.every(complete);
+  return flowReady(content, angryPromptIds(partsOn), angryOptionIds(partsOn)) && content.hurts.length > 0 && content.hurts.every(complete);
+}
+
+/**
+ * "Spend a minute with it later?" on the last screen: parts on only, and only when both its lines ship
+ * (the ask and what replaces it). Null otherwise, and the screen is as it was.
+ */
+export function angryLaterCopy(content: PartsContent, partsOn: boolean): AngryLaterCopy | null {
+  if (!partsOn || !flowReady(content, [ANGRY_LATER_DONE], [ANGRY_LATER])) return null;
+  const ask = Object.values(content.options.angry ?? {}).flat().find((o) => o.id === ANGRY_LATER)?.label?.trim();
+  const done = content.prompts[ANGRY_LATER_DONE]?.copy?.trim();
+  return ask && done ? { ask, done } : null;
 }
 
 /**
@@ -46,6 +65,12 @@ export function angryCopyFrom(content: Pick<AngryCardContent, 'prompts' | 'optio
     const label = options.find((o) => o.id === id)?.label;
     if (!label) throw new Error(`parts content: no option ${id}`);
     out[id] = label;
+  }
+  for (const on of [true, false]) {
+    const id = angryNotNowId(on);
+    const label = options.find((o) => o.id === id)?.label;
+    if (!label && (partsOn === undefined || partsOn === on)) throw new Error(`parts content: no option ${id}`);
+    out[id] = label ?? '';
   }
   return out as AngryCardCopy;
 }
@@ -82,6 +107,8 @@ export interface ResolvedAngryCopy {
   next: string;
   notSure: string;
   done: string;
+  /** The card's own way past, in this wording (the host's skip link on the first screen). */
+  notNow: string;
 }
 
 /**
@@ -109,5 +136,6 @@ export function resolveAngryCopy(copy: AngryCardCopy, { partsOn, name, hurt }: {
     next: copy.angry_next,
     notSure: copy.angry_not_sure,
     done: copy.angry_done,
+    notNow: copy[angryNotNowId(partsOn)],
   };
 }

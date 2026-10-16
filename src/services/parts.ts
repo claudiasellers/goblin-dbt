@@ -1,7 +1,11 @@
 /** Parts callables (docs/design/parts.md). Only ever called with parts on (`partsEnabled`). */
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
-import type { PartSessionResponse, PartsEntry, SavePartSessionRequest, StartPartSessionRequest } from '../data/partsTypes';
+import type {
+  AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
+  PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
+  SavePartSessionRequest, StartPartSessionRequest,
+} from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<Record<string, never>, PartsEntry>(functions, 'getPartsEntry');
 
@@ -41,4 +45,61 @@ export async function startPartSession(req: StartPartSessionRequest): Promise<Pa
  */
 export async function savePartSession(req: SavePartSessionRequest): Promise<PartSessionResponse> {
   return (await savePartSessionFn(req)).data;
+}
+
+const keepPartFn = httpsCallable<KeepPartRequest, KeepPartResponse>(functions, 'keepPart');
+const queuePartCandidateFn = httpsCallable<QueuePartCandidateRequest, QueuePartCandidateResponse>(functions, 'queuePartCandidate');
+
+/**
+ * 9b's yes ("Keep it, so you can come back to it?"). The server builds the part from this visit's
+ * saved session: send only the ids and the name. Safe to repeat.
+ */
+export async function keepPart(req: KeepPartRequest): Promise<KeepPartResponse> {
+  return (await keepPartFn(req)).data;
+}
+
+/** Only on a yes ("another time", "spend a minute with it later?"). Safe to repeat with the same id. */
+export async function queuePartCandidate(req: QueuePartCandidateRequest): Promise<QueuePartCandidateResponse> {
+  return (await queuePartCandidateFn(req)).data;
+}
+
+// ---- The part card (Me). Each answers with the new profile version (the profile cache key). ----
+
+const renamePartFn = httpsCallable<RenamePartRequest, PartWriteResponse>(functions, 'renamePart');
+const restPartFn = httpsCallable<RestPartRequest, PartWriteResponse>(functions, 'restPart');
+const setAsidePartFn = httpsCallable<PartRefRequest, PartWriteResponse>(functions, 'setAsidePart');
+const restorePartFn = httpsCallable<PartRefRequest, PartWriteResponse>(functions, 'restorePart');
+const setPartTenderFn = httpsCallable<PartRefRequest, PartWriteResponse>(functions, 'setPartTender');
+const answerPartRevisitFn = httpsCallable<AnswerPartRevisitRequest, PartWriteResponse>(functions, 'answerPartRevisit');
+
+/** A new name, or null / '' for "Not yet". What the person typed is kept as typed (trimmed). */
+export async function renamePart(req: RenamePartRequest): Promise<PartWriteResponse> {
+  return (await renamePartFn(req)).data;
+}
+
+/** `resting: true` rests an active part; `false` wakes a resting one. A set-aside part is restored instead. */
+export async function restPart(req: RestPartRequest): Promise<PartWriteResponse> {
+  return (await restPartFn(req)).data;
+}
+
+/** "Not any more": kept and restorable. */
+export async function setAsidePart(req: PartRefRequest): Promise<PartWriteResponse> {
+  return (await setAsidePartFn(req)).data;
+}
+
+export async function restorePart(req: PartRefRequest): Promise<PartWriteResponse> {
+  return (await restorePartFn(req)).data;
+}
+
+/** Gentler from now on. There is no unmark yet. */
+export async function setPartTender(req: PartRefRequest): Promise<PartWriteResponse> {
+  return (await setPartTenderFn(req)).data;
+}
+
+/**
+ * The 30-day "Is {name} still doing the same job?". `id` is a new client UUID per answer (a repeat
+ * with the same id changes nothing); `ratherIds` (1 to 3) only with `new`.
+ */
+export async function answerPartRevisit(req: AnswerPartRevisitRequest): Promise<PartWriteResponse> {
+  return (await answerPartRevisitFn(req)).data;
 }

@@ -17,7 +17,7 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
 from content import (VERSION, SIGNED_OFF, review_status, MOVES, PULL_OPTIONS, EXPRESSES, HELD,  # noqa: E402
                      AT_PLACE, AT_PLACE_HELD, HURTS, OFTEN_GUARDS, CAN_TOUCH, CAN_TOUCH_HELD, ANSWERS, ANSWERS_HELD,
-                     UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, PROMPT_KINDS, OPTIONS, OFFERABLE, SAFETY_LINE, PENDING,
+                     UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, PROMPT_KINDS, PARTS_ON_ONLY, OPTIONS, OFFERABLE, SAFETY_LINE, PENDING,
                      PAIRS, KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY)
 
 MOVE_IDS = [m["id"] for m in MOVES]
@@ -159,7 +159,7 @@ def check():
     prompt_ids = {p[0] for p in PROMPTS}
     for flow in TWO_WORDINGS:
         ids = {p[0] for p in PROMPTS if p[1] == flow}
-        for pid in ids:
+        for pid in ids - PARTS_ON_ONLY:
             twin = pid[:-len("_plain")] if pid.endswith("_plain") else pid + "_plain"
             assert twin in ids, f"{pid}: flow {flow} has two wordings per line, {twin} is missing"
     for pid, flow, step, copy in PROMPTS:
@@ -167,6 +167,8 @@ def check():
             assert not re.search(r"\bparts?\b", copy, re.I), f"{pid}: the parts-off wording never says part: {copy!r}"
     for h in HURTS:
         assert h.get("matters") and h["matters"].strip(), f"{h['id']}: matters (the angry card's vote of confidence)"
+    assert PARTS_ON_ONLY <= prompt_ids and not any(p.endswith("_plain") for p in PARTS_ON_ONLY), f"PARTS_ON_ONLY: {PARTS_ON_ONLY}"
+    assert not any(p + "_plain" in prompt_ids for p in PARTS_ON_ONLY), "a parts-on-only line has no plain twin"
     assert set(PROMPT_KINDS) <= prompt_ids, f"PROMPT_KINDS ids that aren't prompts: {set(PROMPT_KINDS) - prompt_ids}"
     assert set(PROMPT_KINDS.values()) <= set(PROMPT_COPY_KINDS), f"PROMPT_KINDS: {set(PROMPT_KINDS.values())}"
 
@@ -330,8 +332,8 @@ def main():
     A("// Recover's \"what happened\"")
     A("MATCH (:InvalidationEvent)-[r:CAN_TOUCH]->(:ProtectedHurt) DELETE r;")
     for ev, hurts in CAN_TOUCH.items():
-        for h in hurts:
-            edge("InvalidationEvent", ev, "CAN_TOUCH", "ProtectedHurt", h, edge_meta(ev))
+        for i, h in enumerate(hurts):
+            edge("InvalidationEvent", ev, "CAN_TOUCH", "ProtectedHurt", h, edge_meta(ev, order=i))
     A("// Recover's \"Under this, I needed…\"")
     A("MATCH (:UnmetNeed)-[r:ANSWERS]->(:ProtectedHurt) DELETE r;")
     for need, hurts in ANSWERS.items():

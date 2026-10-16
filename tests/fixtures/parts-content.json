@@ -583,6 +583,13 @@
    "copyKind": "first_person",
    "reviewStatus": "draft"
   },
+  "angry_later_done": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 28,
+   "copy": "It's there when you want it.",
+   "reviewStatus": "draft"
+  },
   "aftercare_louder": {
    "flow": "aftercare",
    "step": "louder",
@@ -2955,6 +2962,30 @@
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
+    },
+    {
+     "id": "angry_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "angry_not_now_plain",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
     }
    ],
    "protects": [
@@ -2980,6 +3011,18 @@
      "selfLike": null,
      "branch": "end",
      "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "angry_later",
+     "label": "Spend a minute with it later?",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 1,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3303,26 +3346,44 @@
   }
  ],
  "canTouch": {
-  "brushed": [
-   "brushed_off"
-  ],
-  "unheard": [
-   "brushed_off"
-  ],
-  "mocked": [
-   "laughed_at"
-  ],
-  "small": [
-   "made_small"
-  ],
-  "ignored": [
-   "left_out",
-   "not_mattering"
-  ],
-  "leaving": [
-   "left_out",
-   "alone_in_this"
-  ]
+  "brushed": {
+   "hurts": [
+    "brushed_off"
+   ],
+   "reviewStatus": "draft"
+  },
+  "unheard": {
+   "hurts": [
+    "brushed_off"
+   ],
+   "reviewStatus": "draft"
+  },
+  "mocked": {
+   "hurts": [
+    "laughed_at"
+   ],
+   "reviewStatus": "draft"
+  },
+  "small": {
+   "hurts": [
+    "made_small"
+   ],
+   "reviewStatus": "draft"
+  },
+  "ignored": {
+   "hurts": [
+    "left_out",
+    "not_mattering"
+   ],
+   "reviewStatus": "draft"
+  },
+  "leaving": {
+   "hurts": [
+    "left_out",
+    "alone_in_this"
+   ],
+   "reviewStatus": "draft"
+  }
  },
  "pairs": [
   {

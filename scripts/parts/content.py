@@ -431,6 +431,8 @@ PROMPTS = [
     ("angry_speak_unsure_plain", "angry", "speak", "If you say something, say what you felt, not what the anger wants to say."),
     ("angry_speak_line", "angry", "speak", "I felt {felt}."),
     ("angry_speak_line_plain", "angry", "speak", "I felt {felt}."),
+    # Parts on only (PARTS_ON_ONLY): after "Spend a minute with it later?" (the option angry_later) queued it
+    ("angry_later_done", "angry", "speak", "It's there when you want it."),
     # Aftercare
     ("aftercare_louder", "aftercare", "louder", "Things can get louder after time with a part."),
     ("aftercare_too_many", "aftercare", "too_many", "You don't need to get to know everyone at once."),
@@ -469,6 +471,10 @@ PROMPTS = [
     ("card_visit", "me", "card", "Spend time with it"),
     ("card_resting", "me", "card", "Resting"),
 ]
+
+# Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry
+# card's "later" line queues a part to meet: there is nothing to offer with parts off).
+PARTS_ON_ONLY = {"angry_later_done"}
 
 # Prompts in the person's own voice: the sentence they might say, so its "I" is theirs. Linted as
 # `first_person` (chip rules, no voice_distance) instead of `prompt`; every other prompt is a prompt.
@@ -669,8 +675,13 @@ OPTIONS = [
 
     # --- The angry-part card (the hurt chips at protects are the ProtectedHurt labels, not options) ---
     opt("angry_next", "angry", "unblend", "Okay"),
+    # The card is offered, never imposed: its own way past, in both wordings (the host shows it on screen 1)
+    opt("angry_not_now", "angry", "unblend", "Not now", branch="end"),
+    opt("angry_not_now_plain", "angry", "unblend", "Not now", branch="end"),
     opt("angry_not_sure", "angry", "protects", "Not sure"),
     opt("angry_done", "angry", "speak", "Done", branch="end"),
+    # Parts on only: tapping it is the yes, and queues a PartCandidate (origin angry_card); never opens a flow
+    opt("angry_later", "angry", "speak", "Spend a minute with it later?", branch="candidate"),
 
     # --- Aftercare ---
     opt("louder_body", "aftercare", "louder", "Something for my body", branch="body_first"),

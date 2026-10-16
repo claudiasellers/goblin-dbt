@@ -56,6 +56,7 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   // ---- log (parts, docs/design/parts.md: Data model → User data) ----
   PartSession: { layer: 'log', rel: 'HAS_PART_SESSION', exportAs: 'partSessions' }, // Meet a part; finalise-once
   PartCandidate: { layer: 'log', rel: 'HAS_PART_CANDIDATE', exportAs: 'partCandidates' }, // written only on a yes
+  PartRevisit: { layer: 'log', rel: 'HAS_PART_REVISIT', exportAs: 'partRevisits' }, // a part's 30-day still-true answer; create only
   // ---- profile ----
   ProfileFact: { layer: 'profile', rel: 'HAS_PROFILE_FACT', exportAs: 'profileFacts' },
   MyPattern: { layer: 'profile', rel: 'HAS_PATTERN', exportAs: 'myPatterns' },

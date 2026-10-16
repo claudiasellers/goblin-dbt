@@ -112,6 +112,12 @@ test("the handoff guard accepts the documented shape only (band optional)", () =
   assert.equal(isDearManHandoff({ ...handoff, source: "elsewhere" }), false);
   assert.equal(isDearManHandoff({ ...handoff, waitMinutes: "20" }), false);
   assert.equal(isDearManHandoff(null), false);
+  // The angry card's hurt: optional, and a graph id when present (never free text).
+  assert.equal(isDearManHandoff({ ...handoff, hurtId: "brushed_off" }), true);
+  assert.equal(isDearManHandoff({ ...handoff, hurtId: undefined }), true);
+  for (const bad of [null, "", "Brushed off", "brushed off", "x".repeat(65), 3, ["brushed_off"]]) {
+    assert.equal(isDearManHandoff({ ...handoff, hurtId: bad }), false, JSON.stringify(bad));
+  }
 });
 
 test("safety cypher is idempotent: MERGE only, no bare CREATE", () => {

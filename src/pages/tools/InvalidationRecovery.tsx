@@ -32,17 +32,14 @@ import { getSpineContent, type SpineContent } from '../../services/spine';
 import { recoverSchedule } from '../../lib/spine/wrap';
 import { AngryPartCard } from '../../components/parts/AngryPartCard';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
-import { angryCopyFrom, angryReady, orderHurts } from '../../lib/angryPart';
+import { ANGRY_MOVE, angryCopyFrom, angryLaterCopy, angryNotNowId, angryReady, orderHurts } from '../../lib/angryPart';
+import { queuePartCandidate } from '../../services/parts';
+import { newId } from '../../lib/spine/ids';
 import { handoffExt } from '../../lib/bandStore';
 import { getPartsContent } from '../../services/partsContent';
 import type { PartsContent } from '../../data/partsContentTypes';
-import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryStep } from '../../data/partsTypes';
+import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryLaterCopy, AngryStep } from '../../data/partsTypes';
 import type { HandoffResult } from '../../data/capacityTypes';
-
-/** parts.json doesn't ship CAN_TOUCH yet, so Recover's event can't pre-order the hurts: hit back's order. */
-const NO_CAN_TOUCH: Record<string, string[]> = {};
-/** Approved parts "Not now" labels, in the order to prefer; else Recover's own skip copy. */
-const PARTS_NOT_NOW = ['offer_not_now', 'keep_not_now', 'louder_not_now', 'pulls_not_now'];
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: InvalidationRecoveryContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
@@ -110,8 +107,10 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     return () => { live = false; };
   }, []);
   /** Set once, when the card is offered: its wording and hurts stay as they were, Back into it included. */
-  const [angry, setAngry] = useState<{ copy: AngryCardCopy; partsOn: boolean; hurts: AngryHurt[] } | null>(null);
+  const [angry, setAngry] = useState<{ copy: AngryCardCopy; partsOn: boolean; hurts: AngryHurt[]; later: AngryLaterCopy | null } | null>(null);
   const [angryStep, setAngryStep] = useState<AngryStep>('unblend');
+  /** The hurt the card ended on, for DEAR MAN's first "I felt" chip; null after Not sure or Not now. */
+  const [angryHurtId, setAngryHurtId] = useState<string | null>(null);
 
   /** Advance from the current step, merging what it collected. */
   const advance = useCallback((patch: Partial<FlowData> = {}) => {
@@ -120,7 +119,12 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     if (!st) return;
     const ready = Boolean(parts && angryReady(parts, partsOn));
     const offer = offerAngryCard(merged, g, ready, angry !== null);
-    if (offer && parts) setAngry({ copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, NO_CAN_TOUCH, merged.stateId) });
+    if (offer && parts) {
+      setAngry({
+        copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, parts.canTouch, merged.stateId),
+        later: angryLaterCopy(parts, partsOn),
+      });
+    }
     dispatch({ type: 'go', step: nextStep(step, merged, st, offer), patch });
   }, [d, step, states, parts, partsOn, g, angry]);
   const withSkills = (...ids: string[]): Partial<FlowData> => ({ skills: [...d.skills, ...ids] });
@@ -129,14 +133,22 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
   const recordAngry = (r: { angryExit: AngryStep | 'skipped'; angryHurtId?: string | null; angryVoteHeld?: boolean }) => {
     toolSession.setExt({ wmp: { angryHurtId: r.angryHurtId ?? undefined, angryVoteHeld: r.angryVoteHeld, angryExit: r.angryExit } });
   };
+  /**
+   * "Spend a minute with it later?" (parts on): the tap is the yes. One candidate id per visit, so a
+   * retry after a failed call is the same record. The fight pull's move (EXPRESSES recover_fight).
+   */
+  const laterId = useRef<string | null>(null);
+  const queueLater = async () => {
+    laterId.current ??= newId();
+    await queuePartCandidate({ id: laterId.current, origin: 'angry_card', moveIds: [ANGRY_MOVE] });
+    toolSession.setExt({ wmp: { angryLater: true } });
+  };
   /** "Too much" inside the card: P2 as an overlay, recorded the way DEAR MAN records it. */
   const handoffs = useRef<HandoffResult[]>([]);
   const recordHandoff = (r: HandoffResult) => {
     handoffs.current = [...handoffs.current, r];
     toolSession.setExt({ er: { handoffs: handoffExt(handoffs.current) } });
   };
-  const notNow = PARTS_NOT_NOW.map(id => Object.values(parts?.options ?? {}).flatMap(st => Object.values(st).flat()).find(o => o.id === id)?.label)
-    .find(Boolean) ?? c.orient.skip;
 
   // Progress (skill uses, reps) for signed-in users; the flow works without it.
   const [progress, setProgress] = useState<InvalidationRecoveryProgress | null>(null);
@@ -246,11 +258,13 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
             <AngryPartCard copy={angry.copy} hurts={angry.hurts} partsOn={angry.partsOn} name={firstName}
               // Until it ends, where the person is: leaving mid-card (Back, or the page) still says where.
               onStep={s => { setAngryStep(s); recordAngry({ angryExit: s }); }}
-              onSkip={() => { recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={notNow}
+              onSkip={() => { setAngryHurtId(null); recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={angry.copy[angryNotNowId(angry.partsOn)]}
               onDone={(r: AngryCardResult) => {
+                setAngryHurtId(r.hurtId);
                 recordAngry({ angryExit: r.exitStep, angryHurtId: r.hurtId, angryVoteHeld: r.voteHeld });
                 advance();
               }}
+              later={angry.later} onLater={queueLater}
               tooMuch={<TooMuchLink host="recovering-from-invalidation" onResult={recordHandoff} />} />
           )}
 
@@ -324,10 +338,18 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               contentVersion={content.version} signedIn={Boolean(user)} showFollow={step === 'follow'}
               finishLabel={handoff ? c.ask.finish : c.follow.finish}
               onNext={() => dispatch({ type: 'go', step: 'follow' })}
-              onFinished={endIntensity => (handoff
-                // Hand over the close rating: DEAR MAN re-gates if it went back up.
-                ? navigate('/tool/dear-man', { state: { dearManHandoff: withBand({ ...handoff, intensity: endIntensity ?? handoff.intensity }, g) } })
-                : dispatch({ type: 'reset' }))} />
+              onFinished={endIntensity => {
+                if (handoff) {
+                  // Hand over the close rating (DEAR MAN re-gates if it went back up) and the card's hurt.
+                  navigate('/tool/dear-man', { state: { dearManHandoff: withBand({
+                    ...handoff, intensity: endIntensity ?? handoff.intensity, ...(angryHurtId ? { hurtId: angryHurtId } : {}),
+                  }, g) } });
+                  return;
+                }
+                // A new round starts without the last one's hurt (the card itself is offered once a visit).
+                setAngryHurtId(null);
+                dispatch({ type: 'reset' });
+              }} />
           )}
         </m.section>
       </AnimatePresence>

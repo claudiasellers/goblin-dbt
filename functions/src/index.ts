@@ -28,5 +28,6 @@ export {
   getProfileContext, getMe, upsertProfileFact, confirmProfileItem, setAsideProfileItem, restoreProfileItem,
   answerPatternOffer,
 } from './profile';
-export { getPartsEntry, startPartSession, savePartSession } from './parts';
+export { getPartsEntry, startPartSession, savePartSession, keepPart, queuePartCandidate } from './parts';
 export { deleteMyParts } from './parts';
+export { renamePart, restPart, setAsidePart, restorePart, setPartTender, answerPartRevisit } from './parts';

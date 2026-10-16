@@ -174,14 +174,14 @@ const { PARTS_LABELS, PARTS_FOLLOW_UP_TYPES } = require('../../lib/parts/delete'
 const { USER_DATA } = require('../../lib/userdata/layers');
 
 test('PARTS_LABELS: every registered parts label, nothing else (later phases join by registering)', () => {
-  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartSession']);
+  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartRevisit', 'PartSession']);
   const partsLike = Object.keys(USER_DATA).filter((l) => /^(Part|Den|Trail)/.test(l));
   assert.deepEqual([...PARTS_LABELS].sort(), partsLike.sort(), 'a registered parts label deleteMyParts would miss');
   for (const l of ['ToolSession', 'CheckIn', 'FollowUp', 'SkillPractice', 'ProfileFact', 'OwnLine']) assert.ok(!PARTS_LABELS.includes(l), l);
 });
 
 test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one write, counts only; parts off too', async () => {
-  const counts = { Part: 2, PartSession: 3, PartCandidate: 0 };
+  const counts = { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4 };
   const f = fakeDriver((q) => {
     const label = /MATCH \(n:(\w+) \{ownerId: \$uid\}\)/.exec(q)?.[1];
     if (label) return [{ n: counts[label] }];
@@ -190,7 +190,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
   });
   setDriver(f.driver);
   const out = await fns.deleteMyParts.run({ auth: auth('u7'), data: {} });
-  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, FollowUp: 1 } });
+  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, FollowUp: 1 } });
   assert.equal(f.sessions.length, 1, 'one transaction');
   assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
   for (const c of f.calls) {
@@ -199,7 +199,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
     assert.doesNotMatch(c.query, /ToolSession|CheckIn|SkillPractice|PatternOffer/, 'never touches other records');
   }
   const deletes = f.calls.filter((c) => /DETACH DELETE/.test(c.query));
-  assert.equal(deletes.length, 4);
+  assert.equal(deletes.length, 5);
   const fu = f.calls.find((c) => /FollowUp/.test(c.query));
   assert.match(fu.query, /WHERE f\.type IN \$types AND f\.status = 'scheduled'/, 'open parts follow-ups only');
   assert.deepEqual(fu.params.types, PARTS_FOLLOW_UP_TYPES);
@@ -209,7 +209,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
   // Nothing kept: nothing deleted, no profile version bump.
   const g = fakeDriver((q) => (/RETURN size/.test(q) ? [{ n: 0 }] : []));
   setDriver(g.driver);
-  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, FollowUp: 0 });
+  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, PartRevisit: 0, FollowUp: 0 });
   assert.ok(!g.calls.some((c) => /profileVersion/.test(c.query)));
 });
 
@@ -409,4 +409,418 @@ test('startPartSession / savePartSession reject bad input as invalid-argument, n
   assert.equal(f.calls.length, 0, 'start validates before any query');
   await assert.rejects(fns.savePartSession.run({ auth: auth(), data: { id: SID, patch: { secret: 'x' } } }), code('invalid-argument'));
   assert.ok(f.calls.every((c) => c.query === Q.POLICY_QUERY));
+});
+
+// ------------------------------------------------------------------ keepPart and queuePartCandidate
+
+const plan = require('../../lib/parts/keepPlan');
+const K = require('../../lib/parts/keep');
+const C = require('../../lib/parts/candidate');
+
+const NEW_PART = '6c2c9a0e-1b2c-4d5e-8f90-123456789abc';
+const stored = (o = {}) => ({
+  trailheadKind: 'me', candidateId: null, partId: null, moveIds: ['hide'], keepable: true,
+  stepIdsJson: JSON.stringify({
+    find: ['pull_hide'], age: ['age_teen'], voice: ['hide_voice_see', 'own_words'], job: ['hide_job_out_of_sight'],
+    guards: ['left_out', 'guards_not_sure'], fear: ['hide_fear_too_much'], would_rather: ['rather_not_sure'],
+    feel_toward: ['feel_curious'],
+  }),
+  stopReason: 'done', bodyPlaces: ['chest'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5], soundSig: null,
+  ownVoice: 'get out first', ownJob: null, ownFear: null, ...o,
+});
+
+test('validateKeep: only the session id, the part id and the name; any part field is refused', () => {
+  assert.deepEqual(plan.validateKeep({ sessionId: SID, partId: NEW_PART, name: 'the one who hides' }),
+    { sessionId: SID, partId: NEW_PART, name: 'the one who hides' });
+  for (const extra of [{ tender: false }, { jobIds: ['x'] }, { feelTowardIds: ['feel_curious'] }, { ownJob: 'x' }, { status: 'active' }]) {
+    bad(() => plan.validateKeep({ sessionId: SID, partId: NEW_PART, ...extra }));
+  }
+  bad(() => plan.validateKeep({ sessionId: SID, partId: 'part-1' }));
+  bad(() => plan.validateKeep({ sessionId: SID, partId: NEW_PART, name: 7 }));
+});
+
+test('keptName: trimmed, ≤ the policy max, empty is "Not yet", never interpreted', () => {
+  assert.equal(plan.keptName('  the one who hides ', 40), 'the one who hides');
+  assert.equal(plan.keptName('', 40), null);
+  assert.equal(plan.keptName(null, 40), null);
+  assert.equal(plan.keptName(undefined, 40), undefined);
+  assert.equal(plan.keptName('x'.repeat(40), 40).length, 40);
+  bad(() => plan.keptName('x'.repeat(41), 40));
+});
+
+test('partFromSession: built from the stored session; non-answers dropped; never an ask-fresh field', () => {
+  const p = plan.partFromSession(stored());
+  assert.deepEqual(p, {
+    tender: false, places: ['chest'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5], soundSig: null, ageId: 'age_teen',
+    voiceIds: ['hide_voice_see'], jobIds: ['hide_job_out_of_sight'], fearIds: ['hide_fear_too_much'], preferredRoleIds: [],
+    ownVoice: 'get out first', ownJob: null, ownFear: null, guardIds: ['left_out'],
+  });
+  for (const k of ['feelTowardIds', 'blendCheck', 'handoffs', 'handoffsJson', 'band']) assert.ok(!(k in p), k);
+  assert.equal(plan.partFromSession(stored({ stepIdsJson: JSON.stringify({ age: ['age_cant_tell'] }) })).ageId, null);
+  assert.equal(plan.partFromSession(stored({ stepIdsJson: '{not json' })).jobIds.length, 0);
+});
+
+test('tender: the tender path, little + keep it gentle, or a tender / own-words stop', () => {
+  const t = (steps, stopReason = 'done') => plan.isTender({ stepIdsJson: JSON.stringify(steps), stopReason });
+  assert.equal(t({ tender: ['tender_hold'] }), true);
+  assert.equal(t({ age: ['age_little', 'young_gentle'] }), true);
+  assert.equal(t({ age: ['age_little', 'young_go_on'] }), false, 'little, but they chose to go on');
+  assert.equal(t({}, 'tender'), true);
+  assert.equal(t({}, 'own_words'), true, 'unread text is the riskier case');
+  assert.equal(t({ age: ['age_now'] }, 'danger'), false);
+});
+
+test('partSource: candidate, offer or made', () => {
+  assert.equal(plan.partSource({ trailheadKind: 'candidate', candidateId: null }), 'candidate');
+  assert.equal(plan.partSource({ trailheadKind: 'me', candidateId: CID }), 'candidate');
+  assert.equal(plan.partSource({ trailheadKind: 'offer', candidateId: null }), 'offer');
+  for (const k of ['me', 'settings', 'angry_card', 'problem_solve']) assert.equal(plan.partSource({ trailheadKind: k, candidateId: null }), 'made');
+});
+
+test('mergeRevisit: unions ids, replaces own words only where given, never removes or un-tenders', () => {
+  const existing = {
+    tender: true, places: ['chest'], shapeSig: [0, 0, 0, 0, 0], ageId: 'age_teen', voiceIds: ['a'], jobIds: ['j1'],
+    fearIds: ['f1'], preferredRoleIds: ['r1'], ownVoice: 'old voice', ownJob: 'old job', ownFear: null,
+  };
+  const visit = { ...plan.partFromSession(stored({ stopReason: 'done', ownVoice: null, ownJob: 'new job', bodyPlaces: ['throat', 'chest'] })) };
+  delete visit.guardIds;
+  const m = plan.mergeRevisit(existing, visit);
+  assert.equal(m.tender, true);
+  assert.deepEqual(m.places, ['chest', 'throat']);
+  assert.deepEqual(m.voiceIds, ['a', 'hide_voice_see']);
+  assert.deepEqual(m.jobIds, ['j1', 'hide_job_out_of_sight']);
+  assert.deepEqual(m.preferredRoleIds, ['r1']);
+  assert.equal(m.ageId, 'age_teen');
+  assert.equal(plan.mergeRevisit({ ...existing, ageId: 'age_now' }, visit).ageId, 'age_teen', 'a newer real age answer replaces the stored one');
+  assert.equal(plan.mergeRevisit({ ...existing, ageId: 'age_now' }, { ...visit, ageId: null }).ageId, 'age_now', 'a non-answer keeps it');
+  const cantTell = { ...plan.partFromSession(stored({ stepIdsJson: JSON.stringify({ age: ['age_cant_tell'] }) })) };
+  assert.equal(cantTell.ageId, null);
+  assert.equal(plan.mergeRevisit({ ...existing, ageId: 'age_now' }, cantTell).ageId, 'age_now', "can't tell keeps the stored age");
+  assert.equal(plan.mergeRevisit({ ...existing, tender: true }, { ...visit, tender: false }).tender, true);
+  assert.deepEqual([m.ownVoice, m.ownJob, m.ownFear], ['old voice', 'new job', null]);
+  assert.deepEqual(m.shapeSig, [0.1, 0.2, 0.3, 0.4, 0.5], 'the new figure replaces the old');
+  for (const k of Object.keys(existing)) if (Array.isArray(existing[k])) for (const x of existing[k]) assert.ok(m[k].includes(x) || k === 'shapeSig', `${k} lost ${x}`);
+});
+
+function fakeKeep({ partsOn = true, session = stored(), part = null, linkedPartId = null, writeOk = true } = {}) {
+  const log = [];
+  const deps = {
+    state: async (input) => { log.push(['state', input]); return { partsOn, session, part, linkedPartId, nameMax: 40, revisitDays: 30 }; },
+    create: async (w) => { log.push(['create', w]); return writeOk; },
+    revisit: async (w) => { log.push(['revisit', w]); return writeOk; },
+  };
+  return { deps, log };
+}
+const keepIn = (o = {}) => plan.validateKeep({ sessionId: SID, partId: NEW_PART, ...o });
+
+test('keepPart: a new part from the session, its moves, guards and source; own words copied only here', async () => {
+  const f = fakeKeep({ session: stored({ candidateId: CID, trailheadKind: 'candidate', ownFear: 'that I would be too much' }) });
+  assert.deepEqual(await K.keepPartHandler(keepIn({ name: ' the one who hides ' }), f.deps), { partId: NEW_PART, created: true });
+  const [, w] = f.log.find(([k]) => k === 'create');
+  assert.equal(w.name, 'the one who hides');
+  assert.equal(w.source, 'candidate');
+  assert.equal(w.candidateId, CID);
+  assert.deepEqual(w.moveIds, ['hide']);
+  assert.deepEqual(w.guardIds, ['left_out']);
+  assert.equal(w.fields.ownFear, 'that I would be too much');
+  assert.ok(!('feelTowardIds' in w.fields) && !('blendCheck' in w.fields) && !('handoffs' in w.fields));
+  assert.ok(!('guardIds' in w.fields), 'guards are edges, not fields');
+});
+
+test('keepPart: parts off, someone else\'s session, a closed visit, an id taken by another part', async () => {
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ partsOn: false }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ session: null }).deps), code('not-found'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ session: stored({ keepable: false }) }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ part: { tender: false } }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ linkedPartId: PID }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn({ name: 'x'.repeat(41) }), fakeKeep().deps), (e) => e.name === 'ValidationError');
+  for (const f of [fakeKeep({ partsOn: false }), fakeKeep({ session: null })]) {
+    await K.keepPartHandler(keepIn(), f.deps).catch(() => {});
+    assert.ok(!f.log.some(([k]) => k !== 'state'), 'no write');
+  }
+});
+
+test('keepPart: a revisit updates that part only (merged, never fewer), and a repeat keep is a revisit', async () => {
+  const existing = { tender: true, places: ['jaw'], voiceIds: ['a'], jobIds: [], fearIds: [], preferredRoleIds: [], ownVoice: 'old', ageId: 'age_now' };
+  const f = fakeKeep({ session: stored({ partId: PID }), part: existing });
+  assert.deepEqual(await K.keepPartHandler(keepIn({ partId: PID }), f.deps), { partId: PID, created: false });
+  const [, w] = f.log.find(([k]) => k === 'revisit');
+  assert.deepEqual(w.fields.places, ['jaw', 'chest']);
+  assert.equal(w.fields.tender, true);
+  assert.equal(w.fields.ownVoice, 'get out first');
+  assert.equal(w.fields.ageId, 'age_teen', 'the newer age answer replaces age_now');
+  assert.equal(w.name, null, 'no new name: the old one stays');
+  await assert.rejects(K.keepPartHandler(keepIn({ partId: NEW_PART }), fakeKeep({ session: stored({ partId: PID }), part: existing }).deps),
+    code('invalid-argument'));
+  await assert.rejects(K.keepPartHandler(keepIn({ partId: PID }), fakeKeep({ session: stored({ partId: PID }), part: null }).deps), code('not-found'));
+  // After the first keep the session carries the new part's id: the same call again lands as a revisit.
+  const again = fakeKeep({ session: stored({ partId: NEW_PART }), part: { places: ['chest'] }, linkedPartId: NEW_PART });
+  assert.deepEqual(await K.keepPartHandler(keepIn(), again.deps), { partId: NEW_PART, created: false });
+  assert.ok(!again.log.some(([k]) => k === 'create'));
+});
+
+test('keepPart over the fake driver: caller-scoped keys, guarded writes, profile labels and edges', async () => {
+  const f = fakeDriver((q, p) => {
+    if (q === K.KEEP_STATE_QUERY) {
+      return [{ partsOn: true, session: { ...stored(), keepable: true }, part: null, linkedPartId: null, nameMaxChars: 40, revisitAfterDays: 30 }];
+    }
+    if (q === K.KEEP_NEW_QUERY) return [{ id: p.partId }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  const out = await fns.keepPart.run({ auth: auth('real-user'), data: { sessionId: SID, partId: NEW_PART, name: 'the one who hides' } });
+  assert.deepEqual(out, { partId: NEW_PART, created: true });
+  const w = f.calls.find((c) => c.query === K.KEEP_NEW_QUERY);
+  assert.deepEqual([w.params.uid, w.params.sessionKey, w.params.partKey], ['real-user', `real-user:${SID}`, `real-user:${NEW_PART}`]);
+  assert.equal(w.params.revisitDays, 30);
+  assert.match(K.KEEP_NEW_QUERY, /WHERE coalesce\(u\.partsEnabled, false\) AND \(ps\.status = 'open' OR \(ps\.status = 'saved'/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(u\)-\[:HAS_PART\]->\(p\)/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(ps\)-\[:OF_PART\]->\(p\)/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(p\)-\[r:USES\]->\(x\) ON CREATE SET r\.confirmedAt = datetime\(\), r\.source = \$source/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(p\)-\[r:GUARDS\]->\(x\)/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(p\)-\[r:ACCEPTED_FROM\]->\(x\)[\s\S]*x\.status = CASE WHEN x\.status = 'open' THEN 'accepted'/);
+  for (const k of ['feelTowardIds', 'blendCheck', 'handoffs']) assert.doesNotMatch(K.KEEP_NEW_QUERY + K.KEEP_REVISIT_QUERY, new RegExp(k));
+  await assert.rejects(fns.keepPart.run({ auth: auth(), data: { sessionId: SID, partId: NEW_PART, tender: false } }), code('invalid-argument'));
+});
+
+test('validateCandidate: origin set, move ids, uuids, nothing else', () => {
+  assert.deepEqual(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }),
+    { id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID });
+  for (const o of ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card']) C.validateCandidate({ id: CID, origin: o, moveIds: [] });
+  bad(() => C.validateCandidate({ id: CID, origin: 'checkin', moveIds: [] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['Hide!'] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['a', 'b', 'c', 'd', 'e'] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['hide', 'hide'] }));
+  bad(() => C.validateCandidate({ id: 'x', origin: 'split', moveIds: [] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: [], note: 'free text' }));
+});
+
+test('queuePartCandidate: parts off refused for every origin; moves must exist; the session must be the caller\'s', async () => {
+  const fake = (st) => {
+    const log = [];
+    return { log, deps: { state: async () => st, write: async (c) => { log.push(c); } } };
+  };
+  for (const origin of ['new_one', 'angry_card', 'ps_ambivalence']) {
+    const f = fake({ partsOn: false, sessionFound: false, knownMoves: 0 });
+    await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin, moveIds: [] }), f.deps), code('failed-precondition'));
+    assert.equal(f.log.length, 0);
+  }
+  const unknown = fake({ partsOn: true, sessionFound: true, knownMoves: 1 });
+  await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'split', moveIds: ['hide', 'made_up'] }), unknown.deps), code('invalid-argument'));
+  const noSession = fake({ partsOn: true, sessionFound: false, knownMoves: 1 });
+  await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }), noSession.deps), code('not-found'));
+  const ok = fake({ partsOn: true, sessionFound: true, knownMoves: 1 });
+  assert.deepEqual(await C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }), ok.deps), { id: CID });
+  assert.equal(ok.log.length, 1);
+});
+
+test('queuePartCandidate over the fake driver: one write, MERGE on key (idempotent), log layer, QUEUED from the session', async () => {
+  const f = fakeDriver((q) => {
+    if (q === C.CANDIDATE_STATE_QUERY) return [{ partsOn: true, sessionFound: true, knownMoves: 1 }];
+    if (q === C.CANDIDATE_QUERY) return [{ id: CID }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  for (let i = 0; i < 2; i++) {
+    assert.deepEqual(await fns.queuePartCandidate.run({ auth: auth('real-user'), data: { id: CID, origin: 'angry_card', moveIds: ['hit_back'], sessionId: SID } }), { id: CID });
+  }
+  const writes = f.calls.filter((c) => c.query === C.CANDIDATE_QUERY);
+  assert.equal(writes.length, 2);
+  assert.deepEqual([writes[0].params.key, writes[0].params.sessionKey], [`real-user:${CID}`, `real-user:${SID}`]);
+  assert.match(C.CANDIDATE_QUERY, /MERGE \(c:PartCandidate \{key: \$key\}\)\s+ON CREATE SET c:UserData:LogRecord/);
+  assert.match(C.CANDIDATE_QUERY, /c\.status = 'open'/);
+  assert.match(C.CANDIDATE_QUERY, /MERGE \(x\)-\[:QUEUED\]->\(c\)/);
+});
+
+// ---- The part card writers (keep.ts): rename, rest, set aside, restore, tender, still-true ----
+
+const E = require('../../lib/parts/editPlan');
+const RID = '7d2c9a0e-1b2c-4d5e-8f90-123456789abc';
+
+function fakeEdit({ partsOn = true, part = { status: 'active', tender: false, name: 'the hider' }, revisitLogged = false,
+  knownRather = null, version = 7, writeVersion = 8, nameMax = 40, revisitDays = 30 } = {}) {
+  const log = [];
+  const deps = {
+    state: async (q) => {
+      log.push(['state', q]);
+      return { partsOn, version, part, revisitLogged, knownRather: knownRather ?? (q.ratherIds ?? []).length, nameMax, revisitDays };
+    },
+    write: async (query, params) => { log.push(['write', query, params]); return writeVersion; },
+  };
+  return { deps, log, writes: () => log.filter(([k]) => k === 'write') };
+}
+
+const WRITERS = [
+  ['rename', (d) => K.renamePartHandler({ partId: PID, name: 'new' }, d)],
+  ['rest', (d) => K.restPartHandler({ partId: PID, resting: true }, d)],
+  ['setAside', (d) => K.setAsidePartHandler({ partId: PID }, d)],
+  ['restore', (d) => K.restorePartHandler({ partId: PID }, d)],
+  ['tender', (d) => K.setPartTenderHandler({ partId: PID }, d)],
+  ['revisit', (d) => K.answerPartRevisitHandler({ id: RID, partId: PID, answer: 'same', ratherIds: [] }, d)],
+];
+
+test('part writers: parts off is failed-precondition and another person\'s (or no) part is not-found, before any write', async () => {
+  for (const [name, run] of WRITERS) {
+    const off = fakeEdit({ partsOn: false });
+    await assert.rejects(run(off.deps), code('failed-precondition'), name);
+    const none = fakeEdit({ part: null });
+    await assert.rejects(run(none.deps), code('not-found'), name);
+    assert.equal(off.writes().length + none.writes().length, 0, name);
+  }
+});
+
+test('part writers: a write its guard stopped (the part changed under it) is failed-precondition', async () => {
+  const f = fakeEdit({ writeVersion: null });
+  await assert.rejects(K.setAsidePartHandler({ partId: PID }, f.deps), code('failed-precondition'));
+});
+
+test('renamePart: keptName rules (trim, ≤ policy max, empty is "Not yet"); the same name is a no-op', async () => {
+  const f = fakeEdit();
+  assert.deepEqual(await K.renamePartHandler(E.validateRename({ partId: PID, name: '  the watcher ' }), f.deps), { version: 8 });
+  assert.equal(f.writes()[0][1], K.RENAME_PART_QUERY);
+  assert.equal(f.writes()[0][2].name, 'the watcher');
+  const empty = fakeEdit();
+  await K.renamePartHandler(E.validateRename({ partId: PID, name: '' }), empty.deps);
+  assert.equal(empty.writes()[0][2].name, null);
+  const same = fakeEdit();
+  assert.deepEqual(await K.renamePartHandler({ partId: PID, name: 'the hider' }, same.deps), { version: 7 });
+  assert.equal(same.writes().length, 0);
+  await assert.rejects(K.renamePartHandler({ partId: PID, name: 'x'.repeat(13) }, fakeEdit({ nameMax: 12 }).deps), (e) => e.name === 'ValidationError');
+  assert.throws(() => E.validateRename({ partId: PID }), /name/);
+  assert.throws(() => E.validateRename({ partId: PID, name: 'a', tender: true }), /tender/);
+});
+
+test('restPart: active ⇄ resting; repeats are no-ops; a set-aside part is refused; revisitAt untouched', async () => {
+  const f = fakeEdit();
+  await K.restPartHandler({ partId: PID, resting: true }, f.deps);
+  assert.deepEqual([f.writes()[0][1], f.writes()[0][2].from, f.writes()[0][2].to], [K.REST_PART_QUERY, 'active', 'resting']);
+  const wake = fakeEdit({ part: { status: 'resting' } });
+  await K.restPartHandler({ partId: PID, resting: false }, wake.deps);
+  assert.deepEqual([wake.writes()[0][2].from, wake.writes()[0][2].to], ['resting', 'active']);
+  for (const [status, resting] of [['resting', true], ['active', false]]) {
+    const again = fakeEdit({ part: { status } });
+    assert.deepEqual(await K.restPartHandler({ partId: PID, resting }, again.deps), { version: 7 });
+    assert.equal(again.writes().length, 0);
+  }
+  for (const resting of [true, false]) {
+    await assert.rejects(K.restPartHandler({ partId: PID, resting }, fakeEdit({ part: { status: 'set_aside' } }).deps), code('failed-precondition'));
+  }
+  assert.match(K.REST_PART_QUERY, /WHERE coalesce\(u\.partsEnabled, false\) AND p\.status = \$from/);
+  assert.doesNotMatch(K.REST_PART_QUERY, /revisitAt/);
+  assert.throws(() => E.validateRest({ partId: PID, resting: 'yes' }), /resting/);
+});
+
+test('setAsidePart / restorePart: like the profile items (status, lastReviewedAt; restore confirms and re-dates)', async () => {
+  const f = fakeEdit({ part: { status: 'resting' } });
+  await K.setAsidePartHandler({ partId: PID }, f.deps);
+  assert.equal(f.writes()[0][1], K.SET_ASIDE_PART_QUERY);
+  assert.match(K.SET_ASIDE_PART_QUERY, /SET p\.status = 'set_aside', p\.lastReviewedAt = datetime\(\)/);
+  assert.doesNotMatch(K.SET_ASIDE_PART_QUERY, /DELETE|REMOVE/, 'every field and edge stays');
+  const again = fakeEdit({ part: { status: 'set_aside' } });
+  assert.deepEqual(await K.setAsidePartHandler({ partId: PID }, again.deps), { version: 7 });
+  assert.equal(again.writes().length, 0);
+
+  const r = fakeEdit({ part: { status: 'set_aside' }, revisitDays: 45 });
+  await K.restorePartHandler({ partId: PID }, r.deps);
+  assert.deepEqual([r.writes()[0][1], r.writes()[0][2].revisitDays], [K.RESTORE_PART_QUERY, 45]);
+  assert.match(K.RESTORE_PART_QUERY, /p\.status = 'active', p\.confirmedAt = datetime\(\), p\.lastReviewedAt = datetime\(\), p\.revisitAt = datetime\(\) \+ duration\(\{days: \$revisitDays\}\)/);
+  for (const status of ['active', 'resting']) {
+    const no = fakeEdit({ part: { status } });
+    assert.deepEqual(await K.restorePartHandler({ partId: PID }, no.deps), { version: 7 });
+    assert.equal(no.writes().length, 0, `restore leaves a ${status} part as it is`);
+  }
+});
+
+test('setPartTender: true only, idempotent; no query ever sets it false', async () => {
+  const f = fakeEdit();
+  await K.setPartTenderHandler({ partId: PID }, f.deps);
+  assert.equal(f.writes()[0][1], K.SET_PART_TENDER_QUERY);
+  const again = fakeEdit({ part: { status: 'active', tender: true } });
+  assert.deepEqual(await K.setPartTenderHandler({ partId: PID }, again.deps), { version: 7 });
+  assert.equal(again.writes().length, 0);
+  const src = require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../src/parts/keep.ts'), 'utf8');
+  assert.doesNotMatch(src, /tender = false/);
+  assert.throws(() => E.validatePartRef({ partId: PID, tender: false }), /tender/);
+});
+
+test('validateRevisit: the answer set; ratherIds 1–3 only with new, no non-answers or duplicates', () => {
+  assert.deepEqual(E.validateRevisit({ id: RID, partId: PID, answer: 'same' }), { id: RID, partId: PID, answer: 'same', ratherIds: [] });
+  assert.deepEqual(E.validateRevisit({ id: RID, partId: PID, answer: 'new', ratherIds: ['hide_rather_break'] }).ratherIds, ['hide_rather_break']);
+  for (const bad of [
+    { answer: 'maybe' }, { answer: 'new' }, { answer: 'new', ratherIds: [] }, { answer: 'new', ratherIds: ['a', 'b', 'c', 'd'] },
+    { answer: 'new', ratherIds: ['rather_not_sure'] }, { answer: 'new', ratherIds: ['own_words'] }, { answer: 'new', ratherIds: ['a', 'a'] },
+    { answer: 'same', ratherIds: ['a'] }, { answer: 'same', note: 'x' },
+  ]) assert.throws(() => E.validateRevisit({ id: RID, partId: PID, ...bad }), JSON.stringify(bad));
+});
+
+test('answerPartRevisit: each answer for an active part, then for a resting part; wrong-status answers refused', async () => {
+  const cases = [
+    ['active', 'same', 'active'], ['active', 'less', 'active'], ['active', 'resting', 'resting'],
+    ['resting', 'still_quiet', 'resting'], ['resting', 'back', 'active'],
+  ];
+  for (const [from, answer, to] of cases) {
+    const f = fakeEdit({ part: { status: from }, revisitDays: 30 });
+    assert.deepEqual(await K.answerPartRevisitHandler({ id: RID, partId: PID, answer, ratherIds: [] }, f.deps), { version: 8 });
+    const [, q, p] = f.writes()[0];
+    assert.equal(q, K.ANSWER_PART_REVISIT_QUERY);
+    assert.deepEqual([p.from, p.to, p.answer, p.revisitDays, p.jobFields], [from, to, answer, 30, {}], answer);
+  }
+  for (const [status, answer] of [['active', 'still_quiet'], ['active', 'back'], ['resting', 'same'], ['resting', 'less'],
+    ['resting', 'resting'], ['set_aside', 'same'], ['set_aside', 'back']]) {
+    const f = fakeEdit({ part: { status } });
+    await assert.rejects(K.answerPartRevisitHandler({ id: RID, partId: PID, answer, ratherIds: [] }, f.deps), code('failed-precondition'), `${status}/${answer}`);
+    assert.equal(f.writes().length, 0);
+  }
+  const q = K.ANSWER_PART_REVISIT_QUERY;
+  assert.match(q, /p\.confirmedAt = datetime\(\), p\.lastReviewedAt = datetime\(\),\s+p\.reviewCount = coalesce\(p\.reviewCount, 0\) \+ 1, p\.revisitAt = datetime\(\) \+ duration\(\{days: \$revisitDays\}\)/);
+  assert.match(q, /WHERE coalesce\(u\.partsEnabled, false\) AND p\.status = \$from/);
+});
+
+test('answerPartRevisit new: the old job to the history (newest 10), rather ids become the job and leave preferredRoleIds', async () => {
+  const old = Array.from({ length: 10 }, (_, i) => ({ jobIds: [`j${i}`], ownJob: null, until: '2026-01-01' }));
+  const part = { status: 'active', jobIds: ['hide_job_out_of_sight'], ownJob: 'keeps me out of sight', jobHistoryJson: JSON.stringify(old),
+    preferredRoleIds: ['hide_rather_break', 'hide_rather_need_someone'] };
+  const f = fakeEdit({ part });
+  await K.answerPartRevisitHandler({ id: RID, partId: PID, answer: 'new', ratherIds: ['hide_rather_break'] }, f.deps, '2026-10-16');
+  const jf = f.writes()[0][2].jobFields;
+  assert.deepEqual(jf.jobIds, ['hide_rather_break']);
+  assert.equal(jf.ownJob, null);
+  assert.deepEqual(jf.preferredRoleIds, ['hide_rather_need_someone']);
+  const h = JSON.parse(jf.jobHistoryJson);
+  assert.equal(h.length, 10, 'capped at the newest 10');
+  assert.deepEqual(h.at(-1), { jobIds: ['hide_job_out_of_sight'], ownJob: 'keeps me out of sight', until: '2026-10-16' });
+  assert.equal(h[0].jobIds[0], 'j1', 'the oldest dropped');
+  assert.deepEqual(f.log[0][1].ratherIds, ['hide_rather_break'], 'the rather ids are checked in the state read');
+
+  const unknown = fakeEdit({ part, knownRather: 0 });
+  await assert.rejects(K.answerPartRevisitHandler({ id: RID, partId: PID, answer: 'new', ratherIds: ['made_up'] }, unknown.deps), code('invalid-argument'));
+  assert.equal(unknown.writes().length, 0);
+  assert.deepEqual(JSON.parse(E.newJob({ jobIds: [], ownJob: null }, ['a'], '2026-10-16').jobHistoryJson), [], 'an empty job is not recorded');
+  assert.match(K.PART_STATE_QUERY, /OPTIONAL MATCH \(o:PartOption \{flow: 'meet', step: 'rather'\}\) WHERE o\.id IN \$ratherIds/);
+});
+
+test('answerPartRevisit: logged once per id; a repeat applies nothing twice', async () => {
+  const f = fakeEdit({ revisitLogged: true, part: { status: 'resting' } });
+  assert.deepEqual(await K.answerPartRevisitHandler({ id: RID, partId: PID, answer: 'resting', ratherIds: [] }, f.deps), { version: 7 });
+  assert.equal(f.writes().length, 0);
+  const q = K.ANSWER_PART_REVISIT_QUERY;
+  assert.match(q, /AND NOT EXISTS \{ MATCH \(:PartRevisit \{key: \$revisitKey\}\) \}\s+MERGE \(r:PartRevisit \{key: \$revisitKey\}\)\s+ON CREATE SET r:UserData:LogRecord/);
+  assert.match(q, /MERGE \(u\)-\[:HAS_PART_REVISIT\]->\(r\)\s+MERGE \(r\)-\[:OF_PART\]->\(p\)/);
+});
+
+test('part writers over the fake driver: caller-scoped keys, signed in, profile version returned', async () => {
+  const f = fakeDriver((q, p) => {
+    if (q === K.PART_STATE_QUERY) return [{ partsOn: true, version: 3, part: { status: 'active' }, revisitLogged: false, nameMaxChars: 40, revisitAfterDays: 30, knownRather: p.ratherIds.length }];
+    if (q === K.ANSWER_PART_REVISIT_QUERY) return [{ version: 4 }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  const out = await fns.answerPartRevisit.run({ auth: auth('real-user'), data: { id: RID, partId: PID, answer: 'less' } });
+  assert.deepEqual(out, { version: 4 });
+  const w = f.calls.find((c) => c.query === K.ANSWER_PART_REVISIT_QUERY);
+  assert.deepEqual([w.params.uid, w.params.partKey, w.params.revisitKey, w.params.id], ['real-user', `real-user:${PID}`, `real-user:${RID}`, RID]);
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
+  for (const name of ['renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit']) {
+    await assert.rejects(fns[name].run({ auth: auth(), data: { partId: 'not-a-uuid' } }), code('invalid-argument'), name);
+  }
 });

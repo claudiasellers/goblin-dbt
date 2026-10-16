@@ -54,6 +54,11 @@ test("parts (docs/design/parts.md): PartSession and PartCandidate are log, Part 
   assert.deepEqual(USER_DATA.PartSession, { layer: "log", rel: "HAS_PART_SESSION", exportAs: "partSessions" });
   assert.deepEqual(USER_DATA.PartCandidate, { layer: "log", rel: "HAS_PART_CANDIDATE", exportAs: "partCandidates" });
   assert.deepEqual(USER_DATA.Part, { layer: "profile", rel: "HAS_PART", exportAs: "parts" });
+  assert.deepEqual(USER_DATA.PartRevisit, { layer: "log", rel: "HAS_PART_REVISIT", exportAs: "partRevisits" });
+  assert.equal(exportKeyFor(["PartRevisit", "UserData", "LogRecord"]), "partRevisits");
+  assert.match(readFileSync("schema/constraints.cypher", "utf8"),
+    /^CREATE CONSTRAINT part_revisit_key IF NOT EXISTS FOR \(n:PartRevisit\) REQUIRE n\.key IS UNIQUE;$/m);
+  assert.match(readFileSync("functions/src/parts/delete.ts", "utf8"), /PARTS_DESIGN_LABELS = \[[^\]]*'PartRevisit'/, "deleteMyParts covers PartRevisit");
   assert.equal(exportKeyFor(["PartSession", "UserData", "LogRecord"]), "partSessions");
   assert.equal(exportKeyFor(["PartCandidate", "UserData", "LogRecord"]), "partCandidates");
   assert.equal(exportKeyFor(["Part", "UserData", "ProfileItem"]), "parts");
@@ -130,6 +135,11 @@ test("finalise-once: ToolSession, FollowUp, PatternOffer, ToolUsage, SkillPracti
   assert.equal(writable("SkillPractice", "any", {}, now), false);
   assert.equal(writable("PartSession", "save", { status: "open" }, now), true);
   for (const s of ["saved", "completed", "stopped", "exited_early"]) assert.equal(writable("PartSession", "save", { status: s }, now), false);
+  assert.equal(writable("PartSession", "keep", { status: "open" }, now), true, "keep from an open session");
+  assert.equal(writable("PartSession", "keep", { status: "saved", savedAt: iso(-11) }, now), true, "keep within 12 h of the save");
+  assert.equal(writable("PartSession", "keep", { status: "saved", savedAt: iso(-13) }, now), false);
+  assert.equal(writable("PartCandidate", "accept", { status: "open" }, now), true);
+  for (const s of ["accepted", "declined"]) assert.equal(writable("PartCandidate", "accept", { status: s }, now), false);
   assert.equal(writable("ToolSession", "showLine", { status: "open", startedAt: iso(-30) }, now), true, "a beat inside an open session");
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-11) }, now), true);
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-13) }, now), false);
@@ -149,6 +159,8 @@ test("the Cypher guards encode the same rules", () => {
   assert.equal(GUARDS.PatternOffer.answer("o"), "o.status = 'offered'");
   assert.equal(GUARDS.ToolUsage.outcome("tu"), "tu.outcome IS NULL");
   assert.equal(GUARDS.PartSession.save("ps"), "ps.status = 'open'");
+  assert.equal(GUARDS.PartSession.keep("ps"), "(ps.status = 'open' OR (ps.status = 'saved' AND ps.savedAt > datetime() - duration({hours: 12})))");
+  assert.equal(GUARDS.PartCandidate.accept("c"), "c.status = 'open'");
 });
 
 // Writers that update an existing log record must use the guard (grows with each PR).
@@ -163,6 +175,8 @@ const GUARDED_WRITERS = [
   ["functions/src/witness/index.ts", "GUARDS.CheckIn.upsert"],
   ["functions/src/witness/index.ts", "GUARDS.ToolSession.showLine"],
   ["functions/src/parts/sessionQueries.ts", "GUARDS.PartSession.save"],
+  ["functions/src/parts/keep.ts", "GUARDS.PartSession.keep"],
+  ["functions/src/parts/keep.ts", "GUARDS.PartCandidate.accept"],
 ];
 test("writers that update log records use the lifecycle guards", () => {
   for (const [file, guard] of GUARDED_WRITERS) assert.ok(readFileSync(file, "utf8").includes(guard), `${file} lacks ${guard}`);
