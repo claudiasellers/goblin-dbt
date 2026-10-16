@@ -65,3 +65,10 @@ export interface AnswerPartRevisitRequest {
 /** A job the part did before it took up a new one (`Part.jobHistoryJson`, newest last, at most 10). */
 export interface PartJobHistoryEntry { jobIds: string[]; ownJob: string | null; until: string }
 export const JOB_HISTORY_MAX = 10;
+
+/**
+ * DEAR MAN's cope ahead: the part's anchor, exactly one of a kept line (an OwnLine of theirs or a
+ * ValidationLine they kept) or their own words (trimmed, 1 to 90 characters, never linted).
+ */
+export interface SetPartAnchorRequest { partId: string; lineId?: string; own?: string }
+export const ANCHOR_MAX_CHARS = 90;

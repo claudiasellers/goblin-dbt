@@ -92,11 +92,12 @@ test("hosts: every tool whose close asks then-vs-now, minus Meet a part, each de
       assert.ok(hosts.includes(id) || NEVER_HOSTS.includes(id), `${id} records then-vs-now but shows no tag row`);
     }
   }
-  // Meet a part reads `parts` for its own screens and Today for the check-back card's name; every
-  // other reader is a host, and every host reads it.
+  // Meet a part reads `parts` for its own screens, Today for the check-back card's name and DEAR MAN
+  // for its cope ahead ("Who might show up in this conversation?"); every other reader is a host, and
+  // every host reads it.
   const withParts = Object.entries(profileTypes.PROFILE_NEEDS)
-    .filter(([c, n]) => !["meet-a-part", "today"].includes(c) && n.includes("parts")).map(([c]) => c);
-  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part and Today, nothing else");
+    .filter(([c, n]) => !["meet-a-part", "today", "dear-man"].includes(c) && n.includes("parts")).map(([c]) => c);
+  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part, Today and DEAR MAN, nothing else");
 });
 
 test("each host mounts PartTagSlot under its saved close; the slot is the only gate", () => {

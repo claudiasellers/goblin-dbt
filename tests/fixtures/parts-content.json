@@ -709,6 +709,41 @@
    "copy": "Check back with it tomorrow?",
    "reviewStatus": "draft"
   },
+  "cope_title": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 0,
+   "copy": "Who might show up in this conversation?",
+   "reviewStatus": "draft"
+  },
+  "cope_anchor": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 1,
+   "copy": "If {name} shows up:",
+   "reviewStatus": "draft"
+  },
+  "cope_anchor_noname": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 2,
+   "copy": "If that part shows up:",
+   "reviewStatus": "draft"
+  },
+  "cope_set_anchor": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 3,
+   "copy": "What would help if {name} shows up?",
+   "reviewStatus": "draft"
+  },
+  "cope_set_anchor_noname": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 4,
+   "copy": "What would help if that part shows up?",
+   "reviewStatus": "draft"
+  },
   "gate_far_away": {
    "flow": "gate",
    "step": "dissociation",
@@ -3412,6 +3447,70 @@
      "selfLike": null,
      "branch": "end",
      "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "dearman": {
+   "cope": [
+    {
+     "id": "cope_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "cope_skip",
+     "label": "Skip",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "cope_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "cope_change",
+     "label": "Change it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "cope_save",
+     "label": "Save",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

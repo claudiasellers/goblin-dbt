@@ -39,13 +39,17 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   // Parts: the slices exist; no tool reads them before it renders them. Meet a part reads them (it
   // renders them); Phase 3's tag row is the first render on other tools' closes: exactly the tools that
   // can show it read `parts`, and none of them partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
-  assert.deepEqual(types.SLICE_IDS.slice(-2), ["parts", "partDetail"]);
+  assert.deepEqual(types.SLICE_IDS.slice(-3), ["parts", "partDetail", "partAnchors"]);
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
+  // DEAR MAN's cope ahead (Phase 3) shows parts, their anchors and the kept lines to pick one from;
+  // never partDetail (fears and jobs it never shows).
+  assert.deepEqual(types.PROFILE_NEEDS["dear-man"], ["parts", "ownLines", "savedLines", "partAnchors"]);
   // `today` renders parts too (the check-back card's name, part-checkback); partDetail stays Meet a part's.
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer === "meet-a-part") continue;
+    if (consumer !== "dear-man") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
-    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "find-the-feeling"].includes(consumer), `${consumer} reads parts but is neither Today nor a tag-row host`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "find-the-feeling", "dear-man"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host nor DEAR MAN's cope ahead`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);
@@ -61,7 +65,7 @@ test("lint: slice resolvers never read a log record", () => {
 });
 
 test("parts slices: gated on partsEnabled, HAS_PART only, active / resting only, ≤ 50, no log", () => {
-  for (const id of ["parts", "partDetail"]) {
+  for (const id of ["parts", "partDetail", "partAnchors"]) {
     const q = slices.SLICE_QUERIES[id];
     assert.ok(q, id);
     assert.match(q, /^MATCH \(u:User \{id: \$uid\}\) WHERE coalesce\(u\.partsEnabled, false\)\s+MATCH \(u\)-\[:HAS_PART\]->\(p:Part\) WHERE p\.status IN \['active', 'resting'\]/, id);
@@ -74,6 +78,12 @@ test("parts slices: gated on partsEnabled, HAS_PART only, active / resting only,
   assert.match(slices.SLICE_QUERIES.partDetail, /OPTIONAL MATCH \(p\)-\[:GUARDS\]->\(h:ProtectedHurt\)/);
   // The light slice never carries what partDetail holds (jobs, fears, own words).
   assert.doesNotMatch(slices.SLICE_QUERIES.parts, /jobIds|fearIds|ownJob|ownFear|ownVoice/);
+  // Anchors: own words first, else the kept line, read only through the caller's own edges; nothing else.
+  const anchors = slices.SLICE_QUERIES.partAnchors;
+  assert.match(anchors, /OPTIONAL MATCH \(u\)-\[:HAS_OWN_LINE\]->\(o:OwnLine \{status: 'active'\}\) WHERE o\.id = p\.anchorLineId/);
+  assert.match(anchors, /OPTIONAL MATCH \(u\)-\[:SAVED_LINE\]->\(l:ValidationLine\) WHERE l\.id = p\.anchorLineId/);
+  assert.match(anchors, /coalesce\(p\.anchorOwn, head\(collect\(o\.text\)\), head\(collect\(l\.text\)\)\) AS text/);
+  assert.doesNotMatch(anchors, /jobIds|fearIds|ownJob|ownFear|ownVoice|GUARDS/);
 });
 
 /** A read transaction that answers each query from `rows(query)`; records which queries ran. */
@@ -120,6 +130,21 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   // Parts off: the gated queries return no rows, so the slices are empty.
   const { name: _off, ...off } = await read(fakeTx(() => []));
   assert.deepEqual(off, { parts: [], partDetail: [] });
+});
+
+test("partAnchors: own words or the kept line's text, by part id; parts off or no text → nothing; dear-man only", async () => {
+  const tx = fakeTx((q) => (/anchorLineId/.test(q) && /AS text/.test(q) ? [
+    { partId: "p1", text: "I can take a breath before I answer" },
+    { partId: "p2", text: "You're allowed to be scared." },
+    { partId: "p3", text: null },
+    { partId: "p4", text: "   " },
+  ] : []));
+  const out = await slices.readProfileSlices(tx, "u1", "dear-man");
+  assert.deepEqual(Object.keys(out), ["parts", "ownLines", "savedLines", "partAnchors"]);
+  assert.deepEqual(out.partAnchors, { p1: "I can take a breath before I answer", p2: "You're allowed to be scared." });
+  assert.ok(!tx.ran.some((q) => /GUARDS/.test(q)), "dear-man never reads partDetail");
+  const off = await slices.readProfileSlices(fakeTx(() => []), "u1", "dear-man");
+  assert.deepEqual([off.parts, off.partAnchors], [[], {}]);
 });
 
 test("status: resting is live (still checked back with), set aside is not", () => {
