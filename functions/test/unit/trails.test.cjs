@@ -407,6 +407,12 @@ test('query: reads only listed properties, and none is an own-words property', (
   const dj = [...T.TRAIL_RECORDS_QUERY.matchAll(/(.{0,40})\b\w+\.dataJson/g)].map((m) => m[1]);
   assert.ok(dj.length > 0 && dj.every((pre) => /d:FindTheFeelingSession AND $/.test(pre)), 'dataJson only under d:FindTheFeelingSession');
   for (const p of ['note', 'describeCustom', 'anchorPhrase', 'ownVoice', 'text', 'name']) assert.ok(T.OWN_WORDS_PROPERTIES.includes(p), p);
+  // Every own-words field the parts records hold, found the way the harm report's test finds them.
+  const src = (f) => fs.readFileSync(path.resolve(__dirname, '../../src/parts', f), 'utf8');
+  const own = new Set([...src('sessionTypes.ts').matchAll(/\b(own[A-Z]\w*)\??:/g), ...src('keep.ts').matchAll(/\bp\.(own[A-Z]\w*)\b/g)].map((m) => m[1]));
+  assert.ok(own.has('ownVoice') && own.has('ownUpdate'));
+  for (const p of own) assert.ok(T.OWN_WORDS_PROPERTIES.includes(p), `${p} is in OWN_WORDS_PROPERTIES`);
+  for (const p of [...own, ...T.OWN_WORDS_PROPERTIES]) assert.doesNotMatch(T.TRAIL_RECORDS_QUERY, new RegExp(`\\.${p}\\b`), `.${p}`);
 });
 
 test('no direct Part read anywhere in trails/: claimed parts come through the profile slice', () => {
