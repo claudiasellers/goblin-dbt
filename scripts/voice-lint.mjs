@@ -185,7 +185,7 @@ export function lintFlowDocOrder(files = FLOW_DOC_FILES) {
  * witness lint's 8, because a part's name or a pull is what the person typed or picked.
  */
 export const PARTS_SLOT_WIDTH = {
-  name: 24, A: 24, B: 24, move: 32, pull: 16, pull2: 16, hurt: 28, goal: 32,
+  name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32,
   context: 24, anchor: 40, month: 9, want: 24, N: 2,
 };
 
