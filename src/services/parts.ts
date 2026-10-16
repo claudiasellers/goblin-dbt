@@ -5,6 +5,7 @@ import type {
   AnswerPartCheckbackRequest, AnswerPartCheckbackResponse, AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
   SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, StartPartSessionRequest,
+  TagPartRequest, TagPartResponse,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
@@ -121,4 +122,14 @@ export async function schedulePartCheckback(req: SchedulePartCheckbackRequest): 
 /** The Today card's answer. `aftercare` (Louder): show aftercare_louder with the body tools. */
 export async function answerPartCheckback(req: AnswerPartCheckbackRequest): Promise<AnswerPartCheckbackResponse> {
   return (await answerPartCheckbackFn(req)).data;
+}
+
+const tagPartFn = httpsCallable<TagPartRequest, TagPartResponse>(functions, 'tagPart');
+
+/**
+ * "Was this a part you know?": one tag per closed ToolSession (better or much better). A second call
+ * for the same session returns the first tag. Fire and forget from the row: it never blocks leaving.
+ */
+export async function tagPart(req: TagPartRequest): Promise<TagPartResponse> {
+  return (await tagPartFn(req)).data;
 }
