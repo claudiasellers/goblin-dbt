@@ -611,6 +611,27 @@
    "copy": "You don't need to get to know everyone at once.",
    "reviewStatus": "draft"
   },
+  "checkback_title": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 0,
+   "copy": "How's {name} today?",
+   "reviewStatus": "draft"
+  },
+  "checkback_title_noname": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 1,
+   "copy": "How's the part you met yesterday?",
+   "reviewStatus": "draft"
+  },
+  "close_checkback": {
+   "flow": "meet",
+   "step": "close",
+   "order": 29,
+   "copy": "Check back with it tomorrow?",
+   "reviewStatus": "draft"
+  },
   "gate_far_away": {
    "flow": "gate",
    "step": "dissociation",
@@ -2536,6 +2557,32 @@
      ],
      "reviewStatus": "draft"
     }
+   ],
+   "close": [
+    {
+     "id": "close_checkback_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "checkback",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "close_checkback_no",
+     "label": "No thanks",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
    ]
   },
   "pulls": {
@@ -3058,6 +3105,58 @@
      "selfLike": null,
      "branch": "end",
      "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "checkback": {
+   "checkback": [
+    {
+     "id": "checkback_settled",
+     "label": "Settled",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "checkback_same",
+     "label": "Same",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "checkback_louder",
+     "label": "Louder",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "aftercare",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "checkback_skip",
+     "label": "Skip",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 3,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

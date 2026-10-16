@@ -159,6 +159,33 @@ export interface AnswerPartRevisitRequest {
 export interface PartJobHistoryEntry { jobIds: string[]; ownJob: string | null; until: string }
 export const JOB_HISTORY_MAX = 10;
 
+// --- The next-day check-back: mirror of functions/src/parts/checkbackTypes.ts (tests/parts-entry.test.mjs) ---
+
+/** The FollowUpType id (scripts/practice-spine/content.py). */
+export const PART_CHECKBACK_TYPE = 'part_checkback';
+
+/** On the close's yes ("Check back with it tomorrow?"), for the part this visit kept. */
+export interface SchedulePartCheckbackRequest {
+  /** A client UUID for the follow-up. */
+  id: string;
+  /** The Meet a part visit (its PartSession) that kept the part. */
+  sessionId: string;
+  /** Tomorrow at 10:00 local (the type's window), computed on the device. */
+  dueAt: string;
+}
+/** The open check-back's id: this one, or the one already open for that part (at most one). */
+export interface SchedulePartCheckbackResponse { id: string | null }
+
+/** "How's {name} today?": Settled · Same · Louder · Skip. */
+export type PartCheckbackAnswer = 'settled' | 'same' | 'louder' | 'skip';
+export const PART_CHECKBACK_ANSWERS: readonly PartCheckbackAnswer[] = ['settled', 'same', 'louder', 'skip'];
+export interface AnswerPartCheckbackRequest { id: string; answer: PartCheckbackAnswer }
+/** `aftercare`: Louder was saved, so the card shows aftercare_louder (the part is paused). */
+export interface AnswerPartCheckbackResponse { status: string; aftercare: boolean }
+
+/** What a check-back card carries about its part (name and tenderness from the profile slice). */
+export interface TodayPartRef { id: string; name: string | null; tender: boolean }
+
 // --- The angry-part card (src/lib/angryPart.ts, src/components/parts/AngryPartCard.tsx) ---
 
 /** The angry card's lines. Each exists twice in the content: `id` (parts on) and `id_plain` (parts off). */

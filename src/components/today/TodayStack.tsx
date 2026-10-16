@@ -4,6 +4,8 @@ import { useOppositeActionFollowUpsContext } from '../../hooks/useOppositeAction
 import { OppositeActionFollowUpCard } from '../tools/oppositeAction/OppositeActionFollowUpCard';
 import { TodayCard } from './TodayCard';
 import { PatternOfferCard } from '../me/PatternOfferCard';
+import { PartCheckbackCard } from '../parts/PartCheckbackCard';
+import { PART_CHECKBACK_TYPE } from '../../lib/partCheckback';
 import type { TodayItem } from '../../services/spine';
 
 /** The number of cards shown before "N more". */
@@ -34,6 +36,8 @@ export function TodayStack({ renderItem, compact = false, className = '' }: {
   const draw = (item: TodayItem) => {
     const custom = renderItem?.(item, done);
     if (custom !== undefined && custom !== null) return <div key={item.id}>{custom}</div>;
+    // Parts check-backs: TodayProvider keeps them only while the card can show (parts on, copy signed off).
+    if (item.type === PART_CHECKBACK_TYPE) return <PartCheckbackCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
     if (item.kind === 'follow_up' || item.kind === 'tool_outcome') return <TodayCard key={item.id} item={item} onDone={done} compact={compact} />;
     if (item.kind === 'pattern_offer') {
       return (
