@@ -129,6 +129,16 @@ test("BreakdownHandoff opens on the card with Start and Keep going anyway; skipp
   assert.match(prim, /data-testid="keep-going"/, "never a lock: the way out is there before the breath starts");
 });
 
+test("BreakdownHandoff startLater opens on its last two choices (Meet a part after a P2 on entry): no card, no new primitive", () => {
+  const later = wrap(h(BreakdownHandoff, { host: "meet-a-part", band: "flooded", startLater: true, onResume: () => {} }));
+  assert.match(later, /data-testid="handoff-later"/);
+  assert.match(later, /data-testid="keep-going"/, "never a lock");
+  assert.doesNotMatch(later, /data-testid="handoff-card"|data-testid="primitive-/);
+  const chips = wrap(h(BreakdownHandoff, { host: "meet-a-part", band: "flooded", startLater: true, onResume: () => {},
+    resume: { hostSessionId: U1, stepId: "blend", draft: {} }, onScheduleLater: async () => null }));
+  for (const o of fixture.handoff.later.options) assert.ok(chips.includes(o.label), `come back later: ${o.id}`);
+});
+
 test("closing the too-much overlay is not leaving: P2 doesn't write the draft to the device", () => {
   const link = readFileSync("src/components/capacity/TooMuchLink.tsx", "utf8");
   assert.match(link, /dismissedRef=\{dismissed\}/);

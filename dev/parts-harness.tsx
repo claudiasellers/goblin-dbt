@@ -1,7 +1,7 @@
 /**
  * Dev-only harness for the parts proposal (docs/design/parts.md): Meet a part, the den, the part card,
  * a trail offer and the angry-part card (the app's own AngryPartCard, not mounted in the app yet), in the
- * app's own rooms, chips, Shape object (SvgBlob), heat figure and P2 overlay.
+ * app's own rooms, chips, PartFigure, LightHold, heat figure and P2 overlay.
  * Every move, prompt and option comes from tests/fixtures/parts-content.json (generated from
  * scripts/parts/content.py by scripts/parts/fixture.py; drafts, not signed off); the invented person is
  * dev/parts-example.ts; the close is the spine's own copy. No Firebase, no graph. Not part of the app build.
@@ -28,7 +28,9 @@ import { BreakdownHandoff } from '../src/components/capacity/BreakdownHandoff';
 import { CrisisBanner } from '../src/components/safety/CrisisBanner';
 import { HeatFigure, type FigureMark } from '../src/components/checkin/body/HeatFigure';
 import { REGIONS, type RegionId } from '../src/data/bodyFigure';
-import { SvgBlob } from '../src/components/tools/findTheFeeling/shape/SvgBlob';
+import { PartFigure } from '../src/components/parts/PartFigure';
+import { LightHold } from '../src/components/parts/LightHold';
+import { vecToSig } from '../src/lib/partFigure';
 import { fromVec, toVec, variant, type Feel } from '../src/components/tools/findTheFeeling/shape/feel';
 import { initialMeet, meetNext, whatToSave, MEET_TRACK, type MeetContext, type MeetEvent, type MeetState } from '../src/lib/meetAPart';
 import { AngryPartCard } from '../src/components/parts/AngryPartCard';
@@ -113,10 +115,9 @@ function Track({ at, total }: { at: number; total: number }) {
     </div>
   );
 }
+/** The app's own PartFigure (Shape it's -1..1 vector as the stored 0–1 signature). */
 function Blob({ feel, size = 120, className = '' }: { feel: Feel; size?: number; className?: string }) {
-  const ref = useRef(feel);
-  ref.current = feel;
-  return <div style={{ width: size, height: size }} className={className}><SvgBlob feel={() => ref.current} reduce={reduce} className="block w-full h-full overflow-visible" /></div>;
+  return <PartFigure shapeSig={vecToSig(toVec(feel))} size={size} className={className} />;
 }
 function OwnWords({ onDone }: { onDone: (text: string) => void }) {
   const [t, setT] = useState('');
@@ -306,8 +307,12 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
         <p className="text-lg font-medium">{P('meet_update_show')}</p>
         {pick('meet', 'update_show')}
       </>);
-      case 'thank': return <Thank feel={shape} label={P('meet_thank')} onDone={() => send({ type: 'hold' })} />;
-      case 'tender': return <Thank feel={fromVec([-0.8, 0.1, -0.4, -0.8, -0.2])} wrapped label={P('meet_tender')} sub={P('meet_tender_sub')} onDone={() => send({ type: 'hold' })} />;
+      // The app's own hold (LightHold, shared with the angry card).
+      case 'thank': return <LightHold title={<p className="text-lg font-medium">{P('meet_thank')}</p>} holdLabel={P('meet_thank_hold')}
+        doneLabel={P('meet_thank_done')} nextLabel="Next" figure={<Blob feel={shape} size={80} />} onDone={() => send({ type: 'hold' })} />;
+      case 'tender': return <LightHold title={<p className="font-serif text-3xl leading-tight">{P('meet_tender')}</p>}
+        sub={<p className="font-serif text-xl text-[var(--color-text-secondary)]">{P('meet_tender_sub')}</p>}
+        holdLabel={P('meet_thank_hold')} nextLabel="Next" onDone={() => send({ type: 'hold' })} />;
       case 'rather': return (<>
         <p className="text-lg font-medium">{P('meet_rather')}</p>
         {pick('meet', 'rather')}
@@ -356,52 +361,6 @@ function NameStep({ suggestion, onDone }: { suggestion: string; onDone: (n: stri
     <div className="flex flex-wrap gap-2.5"><Chip label={suggestion} onClick={() => setN(suggestion)} /></div>
     <Primary disabled={!n.trim()} onClick={() => onDone(n.trim())}>Continue</Primary>
     {opts('meet', 'name').map((o) => <TextBtn key={o.id} onClick={() => onDone('')}>{o.label}</TextBtn>)}
-  </>);
-}
-
-/** The flow's one earned moment: hold, and the lamp's light reaches the figure. */
-function Thank({ feel, label, sub, wrapped, onDone }: { feel: Feel; label: string; sub?: string; wrapped?: boolean; onDone: () => void }) {
-  const [p, setP] = useState(0);
-  const [lit, setLit] = useState(false);
-  const raf = useRef(0);
-  const start = useRef(0);
-  const HOLD = reduce ? 1 : 1400;
-  const down = () => {
-    if (lit) return;
-    start.current = performance.now();
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start.current) / HOLD);
-      setP(t);
-      if (t < 1) raf.current = requestAnimationFrame(tick); else setLit(true);
-    };
-    raf.current = requestAnimationFrame(tick);
-  };
-  const up = () => { if (!lit) { cancelAnimationFrame(raf.current); setP(0); } };
-  useEffect(() => () => cancelAnimationFrame(raf.current), []);
-  return (<>
-    <p className={sub ? 'font-serif text-3xl leading-tight' : 'text-lg font-medium'}>{label}</p>
-    {sub && <p className="font-serif text-xl text-[var(--color-text-secondary)]">{sub}</p>}
-    <div className="relative h-56 rounded-3xl overflow-hidden bg-[var(--color-bg-secondary)]" aria-hidden="true">
-      <div className="absolute rounded-full" style={{
-        left: '22%', top: '50%', width: lit ? 520 : 160, height: lit ? 520 : 160, transform: 'translate(-50%,-50%)',
-        background: 'radial-gradient(circle, color-mix(in srgb, var(--color-accent) 55%, transparent), transparent 68%)',
-        transition: reduce ? 'none' : 'width 1.2s cubic-bezier(.2,.7,.2,1), height 1.2s cubic-bezier(.2,.7,.2,1)',
-      }} />
-      <div className="absolute" style={{ left: '72%', top: '50%', transform: 'translate(-50%,-50%)', opacity: lit ? 1 : 0.4, transition: reduce ? 'none' : 'opacity 1.2s' }}>
-        {wrapped
-          ? <div className="w-20 h-20 rounded-t-full rounded-b-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]" />
-          : <Blob feel={feel} size={96} />}
-      </div>
-    </div>
-    {lit
-      ? <Primary onClick={onDone}>Continue</Primary>
-      : <button type="button" onPointerDown={down} onPointerUp={up} onPointerLeave={up} onPointerCancel={up}
-          onKeyDown={(e) => { if ((e.key === ' ' || e.key === 'Enter') && !e.repeat) { e.preventDefault(); down(); } }}
-          onKeyUp={(e) => { if (e.key === ' ' || e.key === 'Enter') up(); }}
-          className="lift-primary relative w-full min-h-12 rounded-2xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-semibold overflow-hidden select-none touch-none">
-          <span className="absolute inset-0 bg-white/30 origin-left" style={{ transform: `scaleX(${p})` }} />
-          <span className="relative">{P('meet_thank_hold')}</span>
-        </button>}
   </>);
 }
 
