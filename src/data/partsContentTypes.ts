@@ -76,4 +76,6 @@ export interface PartsContent {
   /** flow → step → options, in order. */
   options: Record<string, Record<string, PartsOption[]>>;
   hurts: PartsHurt[];
+  /** Recover's "what happened" (InvalidationEvent id) → the hurts it can touch, in order (approved CAN_TOUCH). */
+  canTouch: Record<string, string[]>;
 }

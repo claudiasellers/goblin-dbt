@@ -228,12 +228,26 @@ test("the angry-part card: every line in both wordings, the plain one never says
   // The person's sentence is theirs: linted without voice_distance, with only {felt}.
   for (const id of ["angry_speak_line", "angry_speak_line_plain"]) assert.equal(fixture.prompts[id].copyKind, "first_person", id);
   assert.deepEqual(Object.values(fixture.options.angry).flat().map((o) => [o.id, o.label]),
-    [["angry_next", "Okay"], ["angry_not_sure", "Not sure"], ["angry_done", "Done"]]);
+    [["angry_next", "Okay"], ["angry_not_now", "Not now"], ["angry_not_now_plain", "Not now"], ["angry_not_sure", "Not sure"], ["angry_done", "Done"]]);
+  // The card's own way past, one per wording, on its first screen, and it ends the card.
+  for (const id of ["angry_not_now", "angry_not_now_plain"]) {
+    const o = Object.values(fixture.options.angry).flat().find((x) => x.id === id);
+    assert.equal(fixture.options.angry.unblend.includes(o), true, id);
+    assert.equal(o.branch, "end", id);
+  }
   assert.equal(fixture.hurts.length, 6);
   for (const h of fixture.hurts) assert.ok(h.matters?.trim(), `${h.id}: matters fills the vote of confidence`);
   // Recover's events pre-order the chips; every one points at real hurts.
   const hurtIds = new Set(fixture.hurts.map((h) => h.id));
-  for (const [ev, hs] of Object.entries(fixture.canTouch)) for (const h of hs) assert.ok(hurtIds.has(h), `${ev} → ${h}`);
+  for (const [ev, t] of Object.entries(fixture.canTouch)) {
+    assert.ok(t.hurts.length > 0 && ["draft", "approved"].includes(t.reviewStatus), ev);
+    for (const h of t.hurts) assert.ok(hurtIds.has(h), `${ev} → ${h}`);
+  }
+  // The edges carry their order, so the shipped file (parts.json canTouch) keeps it.
+  for (const [ev, t] of Object.entries(fixture.canTouch)) {
+    t.hurts.forEach((h, i) => assert.ok(
+      stmts.some((x) => x.includes(`{id: "${ev}"}`) && x.includes(`{id: "${h}"}`) && x.includes("CAN_TOUCH") && x.includes(`order: ${i}`)), `${ev} → ${h} order ${i}`));
+  }
 });
 
 test("safety pins", (t) => {

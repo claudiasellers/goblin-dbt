@@ -8,6 +8,7 @@
     "moves": [],
     "prompts": {},
     "options": {},
-    "hurts": []
+    "hurts": [],
+    "canTouch": {}
   }
 }

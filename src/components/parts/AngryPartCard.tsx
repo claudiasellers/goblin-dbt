@@ -25,7 +25,10 @@ interface AngryPartCardProps {
   tooMuch?: ReactNode;
   /** Each screen as it opens, so a host can resume or log where the person left (TooMuchLink's resume). */
   onStep?(step: AngryStep): void;
-  /** "Not now": a quiet link on the first screen, only when the host passes both (the label is its copy). */
+  /**
+   * "Not now": a quiet link on the first screen, only when the host passes both. The label is the card's
+   * own option in the person's wording (`copy[angryNotNowId(partsOn)]`), never a host's skip copy.
+   */
   onSkip?(): void;
   skipLabel?: string;
 }

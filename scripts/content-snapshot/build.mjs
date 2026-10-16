@@ -25,7 +25,7 @@
  *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
  *   parts.json             parts copy (schema/parts.cypher), signed-off rows only: no Cloud Function
  *                          serves it; the shape is tests/fixtures/parts-content.json's moves / prompts /
- *                          options / hurts
+ *                          options / hurts, plus canTouch (Recover event → hurt ids, approved edges)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
@@ -315,6 +315,8 @@ export function sortParts(c) {
       namedAs: [...h.namedAs].sort(asc),
       guardedBy: [...h.guardedBy].sort((x, y) => asc(x.moveId, y.moveId) || asc(x.rank, y.rank)),
     })),
+    // Events by id; each list keeps the order it was given (CAN_TOUCH's `order`).
+    canTouch: sortObj(c.canTouch, (list) => [...list]),
   };
 }
 
@@ -343,6 +345,15 @@ export function buildParts(g) {
   const same = edges('SAME_AS', 'PartOption');
   const named = edges('NAMED_AS', 'ProtectedHurt', 'Emotion');
   const guards = edges('OFTEN_GUARDS', 'ProtectiveMove', 'ProtectedHurt');
+  // Recover's "what happened" → the hurts it can touch (the angry card's chip order in Recover). The
+  // event is Recover's content, not parts': an edge ships when it is approved and its hurt ships.
+  const hurtIds = new Set(hurtNodes.map((h) => h.props.id));
+  const canTouch = {};
+  for (const r of g.rels('CAN_TOUCH', 'InvalidationEvent', 'ProtectedHurt')
+    .filter((x) => signedOff(x.props) && hurtIds.has(x.b.props.id))
+    .sort((x, y) => asc(x.props.order, y.props.order) || asc(x.b.props.id, y.b.props.id))) {
+    (canTouch[r.a.props.id] ??= []).push(r.b.props.id);
+  }
 
   const options = {};
   for (const o of optionNodes) {
@@ -365,6 +376,7 @@ export function buildParts(g) {
       namedAs: named.filter((r) => r.a === h).map((r) => r.b.props.id),
       guardedBy: guards.filter((r) => r.b === h).map((r) => ({ moveId: r.a.props.id, rank: r.props.rank })),
     })),
+    canTouch,
   });
 }
 

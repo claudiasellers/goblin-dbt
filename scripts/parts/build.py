@@ -330,8 +330,8 @@ def main():
     A("// Recover's \"what happened\"")
     A("MATCH (:InvalidationEvent)-[r:CAN_TOUCH]->(:ProtectedHurt) DELETE r;")
     for ev, hurts in CAN_TOUCH.items():
-        for h in hurts:
-            edge("InvalidationEvent", ev, "CAN_TOUCH", "ProtectedHurt", h, edge_meta(ev))
+        for i, h in enumerate(hurts):
+            edge("InvalidationEvent", ev, "CAN_TOUCH", "ProtectedHurt", h, edge_meta(ev, order=i))
     A("// Recover's \"Under this, I needed…\"")
     A("MATCH (:UnmetNeed)-[r:ANSWERS]->(:ProtectedHurt) DELETE r;")
     for need, hurts in ANSWERS.items():

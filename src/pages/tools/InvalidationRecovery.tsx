@@ -32,17 +32,12 @@ import { getSpineContent, type SpineContent } from '../../services/spine';
 import { recoverSchedule } from '../../lib/spine/wrap';
 import { AngryPartCard } from '../../components/parts/AngryPartCard';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
-import { angryCopyFrom, angryReady, orderHurts } from '../../lib/angryPart';
+import { angryCopyFrom, angryNotNowId, angryReady, orderHurts } from '../../lib/angryPart';
 import { handoffExt } from '../../lib/bandStore';
 import { getPartsContent } from '../../services/partsContent';
 import type { PartsContent } from '../../data/partsContentTypes';
 import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryStep } from '../../data/partsTypes';
 import type { HandoffResult } from '../../data/capacityTypes';
-
-/** parts.json doesn't ship CAN_TOUCH yet, so Recover's event can't pre-order the hurts: hit back's order. */
-const NO_CAN_TOUCH: Record<string, string[]> = {};
-/** Approved parts "Not now" labels, in the order to prefer; else Recover's own skip copy. */
-const PARTS_NOT_NOW = ['offer_not_now', 'keep_not_now', 'louder_not_now', 'pulls_not_now'];
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: InvalidationRecoveryContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
@@ -120,7 +115,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     if (!st) return;
     const ready = Boolean(parts && angryReady(parts, partsOn));
     const offer = offerAngryCard(merged, g, ready, angry !== null);
-    if (offer && parts) setAngry({ copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, NO_CAN_TOUCH, merged.stateId) });
+    if (offer && parts) setAngry({ copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, parts.canTouch, merged.stateId) });
     dispatch({ type: 'go', step: nextStep(step, merged, st, offer), patch });
   }, [d, step, states, parts, partsOn, g, angry]);
   const withSkills = (...ids: string[]): Partial<FlowData> => ({ skills: [...d.skills, ...ids] });
@@ -135,8 +130,6 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     handoffs.current = [...handoffs.current, r];
     toolSession.setExt({ er: { handoffs: handoffExt(handoffs.current) } });
   };
-  const notNow = PARTS_NOT_NOW.map(id => Object.values(parts?.options ?? {}).flatMap(st => Object.values(st).flat()).find(o => o.id === id)?.label)
-    .find(Boolean) ?? c.orient.skip;
 
   // Progress (skill uses, reps) for signed-in users; the flow works without it.
   const [progress, setProgress] = useState<InvalidationRecoveryProgress | null>(null);
@@ -246,7 +239,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
             <AngryPartCard copy={angry.copy} hurts={angry.hurts} partsOn={angry.partsOn} name={firstName}
               // Until it ends, where the person is: leaving mid-card (Back, or the page) still says where.
               onStep={s => { setAngryStep(s); recordAngry({ angryExit: s }); }}
-              onSkip={() => { recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={notNow}
+              onSkip={() => { recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={angry.copy[angryNotNowId(angry.partsOn)]}
               onDone={(r: AngryCardResult) => {
                 recordAngry({ angryExit: r.exitStep, angryHurtId: r.hurtId, angryVoteHeld: r.voteHeld });
                 advance();
