@@ -20,9 +20,13 @@ export const WHEN_OPTIONS: Record<PartWhen, string> = {
 /** Everything Reflect's parts section says: its title, the stats lines, the unnamed parts' names. */
 export const REFLECT_PROMPTS = ['reflect_title', ...STATS_PROMPTS, ...UNNAMED_PROMPTS] as const;
 
-/** Reflect shows its parts section only when every line of it ships. */
+/** The stats lines' own gate (common/stats and the when options): Me's part card and Reflect share it. */
+export const statsReady = (content: PartsContent): boolean =>
+  flowReady(content, STATS_PROMPTS, Object.values(WHEN_OPTIONS));
+
+/** Reflect shows its parts section only when every line of it ships: the stats lines plus its own. */
 export const reflectPartsReady = (content: PartsContent): boolean =>
-  flowReady(content, REFLECT_PROMPTS, Object.values(WHEN_OPTIONS));
+  statsReady(content) && flowReady(content, REFLECT_PROMPTS);
 
 export interface PartStatLines {
   /** "Mostly evenings". */

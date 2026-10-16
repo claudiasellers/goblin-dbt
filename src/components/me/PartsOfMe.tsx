@@ -11,18 +11,22 @@ import {
 } from '../../lib/partsOfMe';
 import { newId } from '../../lib/spine/ids';
 import { PartFigure } from '../parts/PartFigure';
+import { getToolById } from '../../data/tools';
+import { monthName, partStatLines, statsReady, type PartStatLines } from '../../lib/partStats';
 
 type Copy = Record<PartsOfMePromptId, string>;
 /** Sends one part write and refreshes Me from getMe (MeSection's `after`); rejects when the write fails. */
 export type PartWrite = (p: Promise<PartWriteResponse>) => Promise<void>;
 
 /**
- * Me → Parts of me (docs/design/parts.md, "The part card"): the parts a person has kept, no stats
- * yet. Rendered by MeSection only with parts on and all its copy signed off. Each card has one row of
- * quiet actions (lane 2's part writers) and, past its revisit date, the 30-day check-back above them
- * (only once that copy is signed off too). Set-aside parts sit below as rows with "Bring it back",
- * then "To come back to": the open candidates (at most 3, its own copy gate), each with Get to know it
- * (Meet a part, candidate trailhead) and Not any more.
+ * Me → Parts of me (docs/design/parts.md, "The part card"): the parts a person has kept, each with
+ * its readout once computed and signed off (when it shows up, what's helped it settle, how they've felt
+ * toward it; Reflect's lines and gate, src/lib/partStats.ts). Rendered by MeSection only with parts on
+ * and all its copy signed off. Each card has one row of quiet actions (lane 2's part writers) and,
+ * past its revisit date, the 30-day check-back above them (only once that copy is signed off too).
+ * Set-aside parts sit below as rows with "Bring it back", then "To come back to": the open candidates
+ * (at most 3, its own copy gate), each with Get to know it (Meet a part, candidate trailhead) and Not
+ * any more.
  *
  * Writes are not optimistic, as elsewhere in Me: the card is disabled while saving, Me reloads after,
  * and a failed write leaves things as they were with no message (StillTrue's rule).
@@ -41,6 +45,7 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
   const setAside = parts.filter((i) => i.meta.status === 'set_aside');
   const revisit = partRevisitCopy(content);
   const candidateCopy = partCandidateCopy(content);
+  const showStats = statsReady(content);
   const getToKnow = meetAPartLink();
 
   return (
@@ -51,7 +56,7 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
       </Link>
       {live.length > 0 && (
         <ul className="space-y-3">
-          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} onWrite={onWrite} />)}
+          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} showStats={showStats} onWrite={onWrite} />)}
         </ul>
       )}
       {setAside.length > 0 && (
@@ -122,6 +127,9 @@ function useWrite(onWrite: PartWrite) {
   return { busy, run };
 }
 
+/** Tool names from src/data/tools.ts; the month in the locale's words. */
+const statDeps = { toolName: (id: string) => getToolById(id)?.name ?? null, monthName: (m: string) => monthName(m) };
+
 const link = 'inline-flex items-center min-h-11 text-sm underline underline-offset-2 disabled:opacity-50';
 const quiet = `${link} text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]`;
 const plain = `${link} text-[var(--color-text-secondary)]`;
@@ -130,13 +138,15 @@ const choice = `${chip} border-[var(--color-border)] text-[var(--color-text-seco
 const chosen = `${chip} border-[var(--color-border-accent)] text-[var(--color-text-primary)]`;
 const box = 'mt-2 p-3 rounded-lg bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)]';
 
-function PartCard({ item, content, copy, revisit, onWrite }: {
-  item: MeItem; content: PartsContent; copy: Copy; revisit: PartRevisitCopy | null; onWrite: PartWrite;
+function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
+  item: MeItem; content: PartsContent; copy: Copy; revisit: PartRevisitCopy | null; showStats: boolean; onWrite: PartWrite;
 }) {
   const part = item.part!;
   const partId = item.meta.id;
   const resting = item.meta.status === 'resting';
   const rows = partCardRows(part, content);
+  // The readout (tender parts too: it's about the relationship), only when computed and its copy ships.
+  const stats: PartStatLines | null = showStats && part.stats ? partStatLines(part.stats, content, statDeps) : null;
   const visit = meetAPartLink(partId);
   const { busy, run } = useWrite(onWrite);
   const [renaming, setRenaming] = useState(false);
@@ -188,6 +198,7 @@ function PartCard({ item, content, copy, revisit, onWrite }: {
               {resting && <span className="text-xs text-[var(--color-text-tertiary)]">{copy.card_resting}</span>}
             </div>
           )}
+          {stats?.when && <p className="text-sm text-[var(--color-text-tertiary)]">{stats.when}</p>}
           <dl className="mt-1 space-y-0.5 text-sm">
             {rows.where.length > 0 && row(copy.card_where, rows.where.join(', '))}
             {rows.job && ('own' in rows.job
@@ -195,6 +206,10 @@ function PartCard({ item, content, copy, revisit, onWrite }: {
               : row(copy.card_job, rows.job.labels.join(', ')))}
             {rows.fears.length > 0 && row(copy.card_fear, rows.fears.join(', '))}
             {rows.rather.length > 0 && row(copy.card_rather, rows.rather.join(', '))}
+            {stats?.helped && row(stats.helped.title, (
+              <ul>{stats.helped.lines.map((l) => <li key={l}>{l}</li>)}</ul>
+            ))}
+            {stats?.felt && row(stats.felt.title, stats.felt.line)}
           </dl>
         </div>
       </div>

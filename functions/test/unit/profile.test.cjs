@@ -133,7 +133,7 @@ test('getMe: parts appear in my_parts only when parts are on; resting is not set
     p: { id, kind: 'part', area: 'my_parts', status, source: 'made', name: `part ${id}`, revisitAt: '2020-01-01T00:00:00Z', ...extra } });
   const run = async (partsOn) => {
     const f = fakeDriver((q) => {
-      if (/AS partsOn/.test(q)) return [{ partsOn }];
+      if (/AS partsOn/.test(q)) return [{ partsOn, timeZone: null }]; // getMe's and the stats' user read
       if (/MATCH \(a:ProfileArea\)/.test(q)) return [
         { id: 'my_patterns', label: 'My patterns', blurb: 'b', kinds: [] },
         { id: 'my_parts', label: 'Parts of me', blurb: 'b', kinds: [{ id: 'part', label: 'A part' }] },
@@ -199,7 +199,7 @@ test('getMe: a Part item carries its card (no own-words fear ever, no fears on a
     p: { id, kind: 'part', area: 'my_parts', status: 'active', source: 'made', revisitAt: null, ...extra } });
   const run = async (partsOn) => {
     const f = fakeDriver((q) => {
-      if (/AS partsOn/.test(q)) return [{ partsOn }];
+      if (/AS partsOn/.test(q)) return [{ partsOn, timeZone: null }]; // getMe's and the stats' user read
       if (/MATCH \(a:ProfileArea\)/.test(q)) return [{ id: 'my_parts', label: 'Parts of me', blurb: 'b', kinds: [] }];
       if (/HAS_PROFILE_FACT\|HAS_PATTERN/.test(q)) return [
         row('p1', { name: 'the one who hides', tender: false, places: ['chest', 'throat'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5],
@@ -234,7 +234,7 @@ test('getMe: open part candidates (newest first, at most 3) only with parts on',
   const cand = (id, createdAt, status = 'open', moveIds = ['hide']) => ({ id, origin: 'new_one', moveIds, createdAt, status });
   const run = async (partsOn) => {
     const f = fakeDriver((q) => {
-      if (/AS partsOn/.test(q)) return [{ partsOn }];
+      if (/AS partsOn/.test(q)) return [{ partsOn, timeZone: null }]; // getMe's and the stats' user read
       if (/HAS_PART_CANDIDATE/.test(q)) return [
         cand('c1', '2026-10-01T00:00:00Z'), cand('c2', '2026-10-05T00:00:00Z'), cand('c3', '2026-10-03T00:00:00Z', 'dismissed'),
         cand('c4', '2026-10-04T00:00:00Z', 'accepted'), cand('c5', '2026-10-02T00:00:00Z', 'open', null), cand('c6', '2026-09-01T00:00:00Z'),
@@ -258,4 +258,44 @@ test('getMe: open part candidates (newest first, at most 3) only with parts on',
   const off = await run(false);
   assert.deepEqual(off.me.partCandidates, []);
   assert.ok(!off.f.calls.some((c) => /HAS_PART_CANDIDATE/.test(c.query)), 'parts off: not even read');
+});
+
+test('getMe: active and resting parts carry the stats readout, passed through untouched; set aside and parts off get none', async () => {
+  const { statsByPart } = require('../../lib/parts/stats');
+  const part = (id, status) => ({ label: 'Part', title: 'A part', stillTrue: '', setAside: '', statement: null, moveIds: [],
+    p: { id, kind: 'part', area: 'my_parts', status, source: 'made', revisitAt: null } });
+  const at = (h) => `2026-10-0${h}T19:00:00Z`;
+  const tags = [1, 2, 3, 4].map((d) => ({ partId: 'p1', toolId: d < 4 ? 'pause' : 'cool-down', at: at(d) }))
+    .concat([1, 2].map((d) => ({ partId: 'p2', toolId: 'pause', at: at(d) })))         // below the threshold
+    .concat([1, 2, 3].map((d) => ({ partId: 'p3', toolId: 'pause', at: at(d) })));    // set aside: never counted
+  const run = async (partsOn) => {
+    const f = fakeDriver((q) => {
+      if (/AS partsOn/.test(q)) return [{ partsOn, timeZone: 'UTC' }];
+      if (/MATCH \(a:ProfileArea\)/.test(q)) return [{ id: 'my_parts', label: 'Parts of me', blurb: 'b', kinds: [] }];
+      if (/HAS_PROFILE_FACT\|HAS_PATTERN/.test(q)) return [part('p1', 'active'), part('p2', 'resting'), part('p3', 'set_aside')];
+      if (/RETURN pt\.id AS id, pt\.name AS name/.test(q)) return [
+        { id: 'p1', name: null, status: 'active', firstPlace: null, shapeSig: null },
+        { id: 'p2', name: null, status: 'resting', firstPlace: null, shapeSig: null },
+      ];
+      if (/HAS_PART_TAG/.test(q)) return tags;
+      if (/HAS_PART_SESSION/.test(q)) return [];
+      return [];
+    });
+    setDriver(f.driver);
+    return { me: await fns.getMe.run({ auth: auth(), data: {} }), f };
+  };
+  const { me, f } = await run(true);
+  const items = me.areas.find((a) => a.id === 'my_parts').items;
+  const byId = Object.fromEntries(items.map((i) => [i.meta.id, i.part.stats]));
+  const expected = statsByPart({ partsOn: true, timeZone: 'UTC', parts: [{ id: 'p1', status: 'active' }, { id: 'p2', status: 'resting' }], tags, sessions: [] });
+  assert.deepEqual(byId.p1, expected.get('p1'), "lane 4's compute, untouched");
+  assert.deepEqual(byId.p1.helped, [{ toolId: 'pause', n: 3 }, { toolId: 'cool-down', n: 1 }]);
+  assert.equal(byId.p1.when, 'evenings');
+  assert.deepEqual(byId.p2, { helped: null, felt: null, when: null }, 'below every threshold: all null, as computed');
+  assert.equal(byId.p3, undefined, 'set aside: none');
+  assert.equal(f.calls.filter((c) => /HAS_PART_TAG/.test(c.query)).length, 1, 'one read for all parts');
+  assert.equal(f.sessions.length, 1, 'inside getMe\'s one read transaction');
+  const off = await run(false);
+  assert.ok(!off.f.calls.some((c) => /HAS_PART_TAG|HAS_PART_SESSION/.test(c.query)), 'parts off: not read');
+  assert.ok(!off.me.areas.some((a) => a.items.some((i) => i.part)), 'parts off: no parts, no stats');
 });
