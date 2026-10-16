@@ -53,10 +53,14 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   SkillPractice: { layer: 'log', rel: 'HAS_SKILL_PRACTICE', exportAs: 'skillPractice' },
   FollowUp: { layer: 'log', rel: 'HAS_FOLLOW_UP', exportAs: 'followUps' },
   PatternOffer: { layer: 'log', rel: 'HAS_PATTERN_OFFER', exportAs: 'patternOffers' },
+  // ---- log (parts, docs/design/parts.md: Data model → User data) ----
+  PartSession: { layer: 'log', rel: 'HAS_PART_SESSION', exportAs: 'partSessions' }, // Meet a part; finalise-once
+  PartCandidate: { layer: 'log', rel: 'HAS_PART_CANDIDATE', exportAs: 'partCandidates' }, // written only on a yes
   // ---- profile ----
   ProfileFact: { layer: 'profile', rel: 'HAS_PROFILE_FACT', exportAs: 'profileFacts' },
   MyPattern: { layer: 'profile', rel: 'HAS_PATTERN', exportAs: 'myPatterns' },
   OwnLine: { layer: 'profile', rel: 'HAS_OWN_LINE', exportAs: 'ownLines' }, // A5-2 (R16): say it my way
+  Part: { layer: 'profile', rel: 'HAS_PART', exportAs: 'parts' }, // keepPart is its only writer (9b's yes)
   // ---- system ----
   PushToken: { layer: 'system', rel: 'HAS_PUSH_TOKEN' },
 };
@@ -79,6 +83,9 @@ export const LOG_AGGREGATE_EDGES: readonly string[] = ['FOUND_WORD'];
 export const ASK_FRESH_FIELDS = [
   'band', 'bandAtStart', 'bandAtEnd', 'thenVsNow', 'thenVsNowDir', 'actedOnUrge',
   'urgeIds', 'fitsFacts', 'wiseMindAnswer', 'readiness', 'eventIds',
+  // Parts (Meet a part): how the person feels toward a part, and the blending check. Both change
+  // within minutes and are never pre-filled or carried to another flow.
+  'feelTowardIds', 'blendCheck',
 ] as const;
 
 /** True when `field` is ask-fresh (exact name, or a `band…` / `bandAtStart…` / `bandAtEnd…` variant). */
