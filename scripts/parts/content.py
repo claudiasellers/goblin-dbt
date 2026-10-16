@@ -660,6 +660,9 @@ OPTIONS = [
 
     # --- The angry-part card (the hurt chips at protects are the ProtectedHurt labels, not options) ---
     opt("angry_next", "angry", "unblend", "Okay"),
+    # The card is offered, never imposed: its own way past, in both wordings (the host shows it on screen 1)
+    opt("angry_not_now", "angry", "unblend", "Not now", branch="end"),
+    opt("angry_not_now_plain", "angry", "unblend", "Not now", branch="end"),
     opt("angry_not_sure", "angry", "protects", "Not sure"),
     opt("angry_done", "angry", "speak", "Done", branch="end"),
 

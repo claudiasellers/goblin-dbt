@@ -133,7 +133,7 @@ test("shipped parts content is content.py's signed-off rows, and nothing a scree
   const parts = shipped("parts.json").content;
   assert.deepEqual(parts, partsFromFixture(JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"))));
   // Trail rules, contexts and the policy stay on the server; pairs and keepsake wait for Two pulls.
-  assert.deepEqual(Object.keys(parts).sort(), ["hurts", "moves", "options", "prompts", "version"]);
+  assert.deepEqual(Object.keys(parts).sort(), ["canTouch", "hurts", "moves", "options", "prompts", "version"]);
   assert.doesNotMatch(JSON.stringify(parts), /"(reviewStatus|pending)"/);
   // Every node parts.cypher writes as a draft (content.py's SIGNED_OFF doesn't list it), by label.
   const drafts = [...readFileSync("schema/parts.cypher", "utf8").matchAll(/^MERGE \(\w:(\w+) \{id: "([^"]+)"\}\)\nSET [^\n]*reviewStatus: "draft"/gm)];
@@ -146,6 +146,7 @@ test("shipped parts content is content.py's signed-off rows, and nothing a scree
     ...parts.moves.map((m) => m.id), ...Object.keys(parts.prompts),
     ...Object.values(parts.options).flatMap((steps) => Object.values(steps).flat().map((o) => o.id)),
     ...parts.hurts.flatMap((h) => [h.id, ...h.guardedBy.map((g) => g.moveId)]),
+    ...Object.values(parts.canTouch).flat(),
   ];
   assert.deepEqual(shippedIds.filter((id) => draft.has(id)), [], "draft parts content in the app bundle");
 });
@@ -166,7 +167,10 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
     node("voice_c", ["PartOption"], { ...draft, flow: "meet", step: "voice", order: 2, label: "C", kind: "chip", branch: "continue" }),
     node("brushed_off", ["ProtectedHurt"], { ...ok, label: "being brushed off", order: 0, matters: "being taken seriously" }),
     node("left_out", ["ProtectedHurt"], { ...draft, label: "being left out", order: 1 }),
+    node("made_small", ["ProtectedHurt"], { ...ok, label: "being made small", order: 2, matters: "being treated as an equal" }),
     node("hurt", ["Emotion"]), node("disrespected", ["Emotion"]),
+    // Recover's events carry no review of their own: CAN_TOUCH is reviewed on the edge.
+    node("dismissed", ["InvalidationEvent"]), node("ignored", ["InvalidationEvent"]), node("mocked", ["InvalidationEvent"]),
     node("tp_agree", ["ThoughtPattern"]),
     node("parts", ["PartsPolicy"], { ...draft, offersEnabled: false, floodGateHours: 2 }),
   ];
@@ -179,6 +183,13 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
     rel("NAMED_AS", "brushed_off", "disrespected", { reviewStatus: "approved" }),
     rel("OFTEN_GUARDS", "hide", "brushed_off", { reviewStatus: "approved", rank: 1 }),
     rel("OFTEN_GUARDS", "chase", "brushed_off", { reviewStatus: "draft", rank: 0 }),
+    // In the edge's order, not the hurts'; a draft hurt or a draft edge drops out; an event left with none is absent.
+    rel("CAN_TOUCH", "dismissed", "made_small", { reviewStatus: "approved", order: 0 }),
+    rel("CAN_TOUCH", "dismissed", "left_out", { reviewStatus: "approved", order: 1 }),
+    rel("CAN_TOUCH", "dismissed", "brushed_off", { reviewStatus: "approved", order: 2 }),
+    rel("CAN_TOUCH", "ignored", "brushed_off", { reviewStatus: "draft", order: 0 }),
+    rel("CAN_TOUCH", "mocked", "brushed_off", { reviewStatus: "approved", pending: "a decision", order: 0 }),
+    rel("CAN_TOUCH", "mocked", "left_out", { reviewStatus: "approved", order: 1 }),
   ];
   const exp = { scope: "content-only", nodes, relationships };
   assertContentOnly(exp);
@@ -197,11 +208,12 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
     hurts: [{
       id: "brushed_off", label: "being brushed off", order: 0, matters: "being taken seriously",
       namedAs: ["disrespected", "hurt"], guardedBy: [{ moveId: "hide", rank: 1 }],
-    }],
+    }, { id: "made_small", label: "being made small", order: 2, matters: "being treated as an equal", namedAs: [], guardedBy: [] }],
+    canTouch: { dismissed: ["made_small", "brushed_off"] },
   });
   // Nothing signed off: an empty file carrying the version every parts node has (the policy's), or none at all.
   const none = { scope: "content-only", nodes: nodes.map((n) => (n.labels.includes("PartsPolicy") ? n : { ...n, props: { ...n.props, reviewStatus: "draft" } })), relationships: [] };
-  assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [] });
+  assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [], canTouch: {} });
   assert.equal(buildParts(indexGraph({ scope: "content-only", nodes: [], relationships: [] })).version, null);
   const mixed = { ...exp, nodes: nodes.map((n) => (n.props.id === "voice_b" ? { ...n, props: { ...n.props, version: "parts-v2" } } : n)) };
   assert.throws(() => buildParts(indexGraph(mixed)), /mixes versions/);

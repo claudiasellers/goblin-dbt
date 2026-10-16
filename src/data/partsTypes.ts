@@ -134,12 +134,19 @@ export const ANGRY_LINES = [
 ] as const;
 export type AngryLineId = (typeof ANGRY_LINES)[number];
 
-/** The angry card's options (one wording: none of them names a part). */
+/** The angry card's options shared by both wordings (none of them names a part). */
 export const ANGRY_OPTIONS = ['angry_next', 'angry_not_sure', 'angry_done'] as const;
 export type AngryOptionId = (typeof ANGRY_OPTIONS)[number];
 
-/** Every prompt (both wordings) and option of the angry flow, by id, as plain strings. */
-export type AngryCardCopy = Record<AngryLineId | `${AngryLineId}_plain` | AngryOptionId, string>;
+/**
+ * The card's own way past on its first screen, one per wording (the card is offered, never imposed;
+ * its host shows it as the skip link). Both read "Not now" today; each wording is reviewed on its own.
+ */
+export const ANGRY_NOT_NOW = 'angry_not_now';
+export type AngryNotNowId = typeof ANGRY_NOT_NOW | `${typeof ANGRY_NOT_NOW}_plain`;
+
+/** Every prompt and option of the angry flow (both wordings), by id, as plain strings. */
+export type AngryCardCopy = Record<AngryLineId | `${AngryLineId}_plain` | AngryOptionId | AngryNotNowId, string>;
 
 export type AngryStep = 'unblend' | 'protects' | 'vote' | 'speak';
 
@@ -170,6 +177,4 @@ export interface AngryCardContent {
   prompts: Record<string, { flow: string; step: string; copy: string }>;
   options: Record<string, Record<string, { id: string; label: string }[]>>;
   hurts: AngryContentHurt[];
-  /** CAN_TOUCH: Recover's "what happened" (its state id, an InvalidationEvent) → hurt ids, in order. */
-  canTouch: Record<string, string[]>;
 }

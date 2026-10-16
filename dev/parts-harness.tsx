@@ -32,7 +32,7 @@ import { SvgBlob } from '../src/components/tools/findTheFeeling/shape/SvgBlob';
 import { fromVec, toVec, variant, type Feel } from '../src/components/tools/findTheFeeling/shape/feel';
 import { initialMeet, meetNext, whatToSave, MEET_TRACK, type MeetContext, type MeetEvent, type MeetState } from '../src/lib/meetAPart';
 import { AngryPartCard } from '../src/components/parts/AngryPartCard';
-import { angryCopyFrom, orderHurts } from '../src/lib/angryPart';
+import { angryCopyFrom, angryNotNowId, orderHurts } from '../src/lib/angryPart';
 import type { AngryCardContent, AngryStep } from '../src/data/partsTypes';
 import { OFFER, PARTS, SNAPSHOTS, type ExamplePart, type MoveId, type Quadrant } from './parts-example';
 
@@ -550,13 +550,17 @@ function Offer({ onLog }: { onLog: (x: unknown) => void }) {
 /* ───────── The angry-part card ───────── */
 
 const ANGRY_CONTENT = partsFixture as unknown as AngryCardContent;
+// The fixture's CAN_TOUCH carries its review; the harness shows drafts, so only the hurt lists are read.
+const CAN_TOUCH: Record<string, string[]> = Object.fromEntries(
+  Object.entries((partsFixture as unknown as { canTouch: Record<string, { hurts: string[] }> }).canTouch).map(([ev, t]) => [ev, t.hurts]),
+);
 
 function AngryCardView({ onLog }: { onLog: (x: unknown) => void }) {
   const partsOn = q.get('parts') !== '0';
   const name = q.get('name')?.trim() || null;
   const state = q.get('state');
   const copy = useMemo(() => angryCopyFrom(ANGRY_CONTENT), []);
-  const hurts = useMemo(() => orderHurts(ANGRY_CONTENT.hurts, ANGRY_CONTENT.canTouch, state), [state]);
+  const hurts = useMemo(() => orderHurts(ANGRY_CONTENT.hurts, CAN_TOUCH, state), [state]);
   const [run, setRun] = useState(0);
   const [done, setDone] = useState(false);
   const step = useRef<AngryStep>('unblend');
@@ -573,6 +577,8 @@ function AngryCardView({ onLog }: { onLog: (x: unknown) => void }) {
       </>) : (
         <AngryPartCard key={run} copy={copy} hurts={hurts} partsOn={partsOn} name={name}
           onStep={(st) => { step.current = st; }}
+          onSkip={() => { onLog({ AngryCardResult: { layer: 'log', hurtId: null, voteHeld: false, exitStep: 'unblend', skipped: true } }); setDone(true); }}
+          skipLabel={copy[angryNotNowId(partsOn)]}
           onDone={(r) => { onLog({ AngryCardResult: { layer: 'log', ...r } }); setDone(true); }}
           tooMuch={<TooMuchLink host="angry-part" blank={false} onResult={(r) => onLog({ tooMuch: r })}
             resume={() => ({ hostSessionId: '00000000-0000-4000-8000-0000000000ab', stepId: step.current, draft: {} })} />} />
