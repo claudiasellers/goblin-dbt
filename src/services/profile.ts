@@ -15,6 +15,21 @@ export interface MeItem {
   stillTrueCopy: string;
   setAsideCopy: string;
   toolId?: string | null;
+  /** Part items only (functions/src/profile/me.ts `MePart`): what the Parts of me card shows. */
+  part?: MePart;
+}
+/** Never the own-words fear, and no fears on a tender part (the server leaves them out). */
+export interface MePart {
+  name: string | null;
+  tender: boolean;
+  places: string[];
+  shapeSig: number[] | null;
+  jobIds: string[];
+  ownJob: string | null;
+  fearIds: string[];
+  preferredRoleIds: string[];
+  moveIds: string[];
+  lastVisitedAt: string | null;
 }
 export interface GetMeResponse {
   version: number;
