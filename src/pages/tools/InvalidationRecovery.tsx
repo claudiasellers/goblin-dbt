@@ -107,6 +107,8 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
   /** Set once, when the card is offered: its wording and hurts stay as they were, Back into it included. */
   const [angry, setAngry] = useState<{ copy: AngryCardCopy; partsOn: boolean; hurts: AngryHurt[] } | null>(null);
   const [angryStep, setAngryStep] = useState<AngryStep>('unblend');
+  /** The hurt the card ended on, for DEAR MAN's first "I felt" chip; null after Not sure or Not now. */
+  const [angryHurtId, setAngryHurtId] = useState<string | null>(null);
 
   /** Advance from the current step, merging what it collected. */
   const advance = useCallback((patch: Partial<FlowData> = {}) => {
@@ -239,8 +241,9 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
             <AngryPartCard copy={angry.copy} hurts={angry.hurts} partsOn={angry.partsOn} name={firstName}
               // Until it ends, where the person is: leaving mid-card (Back, or the page) still says where.
               onStep={s => { setAngryStep(s); recordAngry({ angryExit: s }); }}
-              onSkip={() => { recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={angry.copy[angryNotNowId(angry.partsOn)]}
+              onSkip={() => { setAngryHurtId(null); recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={angry.copy[angryNotNowId(angry.partsOn)]}
               onDone={(r: AngryCardResult) => {
+                setAngryHurtId(r.hurtId);
                 recordAngry({ angryExit: r.exitStep, angryHurtId: r.hurtId, angryVoteHeld: r.voteHeld });
                 advance();
               }}
@@ -317,10 +320,18 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               contentVersion={content.version} signedIn={Boolean(user)} showFollow={step === 'follow'}
               finishLabel={handoff ? c.ask.finish : c.follow.finish}
               onNext={() => dispatch({ type: 'go', step: 'follow' })}
-              onFinished={endIntensity => (handoff
-                // Hand over the close rating: DEAR MAN re-gates if it went back up.
-                ? navigate('/tool/dear-man', { state: { dearManHandoff: withBand({ ...handoff, intensity: endIntensity ?? handoff.intensity }, g) } })
-                : dispatch({ type: 'reset' }))} />
+              onFinished={endIntensity => {
+                if (handoff) {
+                  // Hand over the close rating (DEAR MAN re-gates if it went back up) and the card's hurt.
+                  navigate('/tool/dear-man', { state: { dearManHandoff: withBand({
+                    ...handoff, intensity: endIntensity ?? handoff.intensity, ...(angryHurtId ? { hurtId: angryHurtId } : {}),
+                  }, g) } });
+                  return;
+                }
+                // A new round starts without the last one's hurt (the card itself is offered once a visit).
+                setAngryHurtId(null);
+                dispatch({ type: 'reset' });
+              }} />
           )}
         </m.section>
       </AnimatePresence>
