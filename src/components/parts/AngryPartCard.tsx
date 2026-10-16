@@ -1,6 +1,6 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { useReducedMotion } from 'motion/react';
-import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryStep } from '../../data/partsTypes';
+import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryLaterCopy, AngryStep } from '../../data/partsTypes';
 import { resolveAngryCopy } from '../../lib/angryPart';
 import { Pill } from '../tools/invalidationRecovery/shared';
 import { linkButton, primaryButton } from '../tools/oppositeAction/styles';
@@ -31,6 +31,13 @@ interface AngryPartCardProps {
    */
   onSkip?(): void;
   skipLabel?: string;
+  /**
+   * Parts on only (angryLaterCopy): "Spend a minute with it later?" under Done on the last screen.
+   * Tapping it is the yes: `onLater` queues the candidate; once it resolves the line becomes `done`. A
+   * rejected call leaves the button (try again or go on); Done is never blocked.
+   */
+  later?: AngryLaterCopy | null;
+  onLater?(): Promise<void>;
 }
 
 /**
@@ -40,12 +47,18 @@ interface AngryPartCardProps {
  * only: no fetching, no saving; the host gets an AngryCardResult. Nothing locks: Back on screens 2–4,
  * a way past the hold after the first try, and the host's too-much link everywhere.
  */
-export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onStep, onSkip, skipLabel }: AngryPartCardProps) {
+export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onStep, onSkip, skipLabel, later, onLater }: AngryPartCardProps) {
   const [step, setStep] = useState<AngryStep>('unblend');
   const [hurtId, setHurtId] = useState<string | null>(null);
   const [held, setHeld] = useState(false);
   const [tried, setTried] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [laterState, setLaterState] = useState<'ask' | 'sending' | 'done'>('ask');
+  const askLater = () => {
+    if (!onLater || laterState !== 'ask') return;
+    setLaterState('sending');
+    onLater().then(() => setLaterState('done'), () => setLaterState('ask'));
+  };
   // When the hold completes its button goes away: keyboard focus moves to what replaces it.
   const justHeld = useRef(false);
   const nextRef = useRef<HTMLButtonElement>(null);
@@ -122,6 +135,13 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
           {c.speakLine && <p className="font-serif text-2xl leading-snug text-[var(--color-text-primary)]">{c.speakLine}</p>}
           <button type="button" className={primaryButton}
             onClick={() => onDone({ hurtId, voteHeld: held, exitStep: 'speak' })}>{c.done}</button>
+          {partsOn && later && onLater && (
+            <div className="text-center" aria-live="polite">
+              {laterState === 'done'
+                ? <p className="text-sm text-[var(--color-text-secondary)]">{later.done}</p>
+                : <button type="button" className={linkButton} disabled={laterState === 'sending'} onClick={askLater}>{later.ask}</button>}
+            </div>
+          )}
         </section>
       )}
 

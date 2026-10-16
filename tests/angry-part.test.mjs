@@ -197,3 +197,34 @@ test("Recover hands the card its own Not now and the shipped canTouch", () => {
   assert.match(src, /orderHurts\(parts\.hurts, parts\.canTouch, merged\.stateId\)/);
   assert.doesNotMatch(src, /_not_now'|NO_CAN_TOUCH/, "no fallback to other flows' Not now, no empty CAN_TOUCH");
 });
+
+// ---- "Spend a minute with it later?" (parts on only) ----
+const { angryLaterCopy, ANGRY_MOVE } = await importTs("src/lib/angryPart.ts");
+
+test("later: parts on and both lines shipped, else absent; the plain wording never shows it", () => {
+  const on = new Set([...angryPromptIds(true), ...angryOptionIds(true)]);
+  const both = shippedWith(new Set([...on, "angry_later", "angry_later_done"]));
+  assert.deepEqual(angryLaterCopy(both, true), { ask: "Spend a minute with it later?", done: "It's there when you want it." });
+  assert.equal(angryLaterCopy(both, false), null, "parts off: no later line, whatever ships");
+  assert.equal(angryLaterCopy(shippedWith(new Set([...on, "angry_later"])), true), null, "its done line missing");
+  assert.equal(angryLaterCopy(shippedWith(new Set([...on, "angry_later_done"])), true), null, "its ask missing");
+  assert.equal(angryLaterCopy(shippedWith(on), true), null);
+  // The card is ready without it: the later line is extra, never a reason to hide the card.
+  assert.equal(angryReady(shippedWith(on), true), true);
+});
+
+test("later: the yes queues a candidate for the fight pull's move, records angryLater, and never blocks Done", () => {
+  // Recover's fight pull expresses hit back (content.py EXPRESSES PullOption).
+  assert.match(readFileSync("scripts/parts/content.py", "utf8"), new RegExp(`"recover_fight":\\s+\\("${ANGRY_MOVE}",`));
+  const recover = readFileSync("src/pages/tools/InvalidationRecovery.tsx", "utf8");
+  assert.match(recover, /queuePartCandidate\(\{ id: laterId\.current, origin: 'angry_card', moveIds: \[ANGRY_MOVE\] \}\)/);
+  assert.match(recover, /laterId\.current \?\?= newId\(\);/, "one id per visit: a retry is the same record");
+  assert.match(recover, /await queuePartCandidate[^\n]*\n\s*toolSession\.setExt\(\{ wmp: \{ angryLater: true \} \}\);/, "recorded only once queued");
+  assert.match(recover, /later: angryLaterCopy\(parts, partsOn\)/);
+  const card = readFileSync("src/components/parts/AngryPartCard.tsx", "utf8");
+  assert.match(card, /\{partsOn && later && onLater && \(/);
+  assert.match(card, /onLater\(\)\.then\(\(\) => setLaterState\('done'\), \(\) => setLaterState\('ask'\)\)/, "a failed call leaves the button");
+  // Done comes first and is never disabled by the later line.
+  const speak = card.slice(card.indexOf("{step === 'speak' && ("));
+  assert.ok(speak.indexOf("{c.done}") < speak.indexOf("later.ask"));
+});

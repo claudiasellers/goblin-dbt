@@ -115,6 +115,9 @@ test("ext wmp: the angry-part card in Recover keeps the hurt, the hold and where
   assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: "yes" } }), /expected a boolean/);
   assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: 1 } }), /expected a boolean/);
   assert.throws(() => ext.validateExt({ wmp: { angrySpeakLine: "I felt brushed off." } }), /not registered/);
+  // "Spend a minute with it later?" taken (parts on): a bool, never the candidate's id or text.
+  assert.deepEqual(JSON.parse(ext.validateExt({ wmp: { angryLater: true } })).wmp, { angryLater: true });
+  assert.throws(() => ext.validateExt({ wmp: { angryLater: "yes" } }), /expected a boolean/);
 });
 
 test("close: emotion ids picked in the tool are ids only, at most 20; none given is []", () => {
