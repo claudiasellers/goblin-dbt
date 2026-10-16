@@ -66,6 +66,8 @@ export const GUARDS = {
   PartCandidate: {
     /** keepPart accepts a candidate once; any other status is final. */
     accept: (v: string) => `${v}.status = 'open'`,
+    /** answerPartCandidate's "Not any more" (Me): only while open; a dismissed one stays dismissed. */
+    dismiss: (v: string) => `${v}.status = 'open'`,
   },
 } as const;
 

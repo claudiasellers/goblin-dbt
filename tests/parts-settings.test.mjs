@@ -44,3 +44,18 @@ test("Privacy & Data: a real switch bound to partsEnabled, delete wired to delet
   const text = [...c.matchAll(/>\s*([^<>{}]*[A-Za-z][^<>{}]*?)\s*<\//g)].map((m) => m[1]);
   assert.deepEqual(text, [], `hard-coded copy: ${text.join(" | ")}`);
 });
+
+test("right after turning parts on: one Get to know a part link, gated by Meet a part, this visit only", async () => {
+  const c = read("src/components/parts/PartsSettings.tsx");
+  // Set only by this switch's success, and cleared on any toggle; state, so a later visit starts without it.
+  assert.match(c, /const \[justOn, setJustOn\] = useState\(false\);/);
+  assert.match(c, /setJustOn\(false\);\s*onToggle\(on\)\.then\(\(\) => setJustOn\(on\)\)/);
+  assert.doesNotMatch(c, /localStorage|sessionStorage/, "never remembered across visits");
+  assert.match(c, /\{justOn && enabled && getToKnow && <GetToKnowLink label=\{getToKnow\} \/>\}/);
+  assert.match(c, /const meet = useToolGate\('meet-a-part'\);\s*if \(meet !== 'open'\) return null;/, "Meet a part's own gate, reused");
+  assert.match(c, /promptCopy\(c, 'me_get_to_know'\)/, "the line is the signed-off me_get_to_know");
+  const { settingsMeetLink } = await importTs("src/lib/partsOfMe.ts");
+  const { parseMeetEntry } = await importTs("src/lib/meetAPartSave.ts");
+  assert.deepEqual(settingsMeetLink(), { pathname: "/tool/meet-a-part", state: { parts: { trailheadKind: "settings" } } });
+  assert.equal(parseMeetEntry(settingsMeetLink().state).trailheadKind, "settings");
+});

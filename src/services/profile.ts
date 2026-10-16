@@ -41,6 +41,15 @@ export interface GetMeResponse {
     savedLines: Array<{ lineId: string; text: string }>;
   };
   offers: Array<{ id: string; statement: string; offerCopy: string; toolId: string | null; evidenceCount: number }>;
+  /** Open PartCandidates, newest first, at most 3; empty with parts off. Absent from an older server. */
+  partCandidates?: MePartCandidate[];
+}
+/** A part the person said they'd come back to (functions/src/profile/me.ts `MePartCandidate`). */
+export interface MePartCandidate {
+  id: string;
+  origin: string;
+  moveIds: string[];
+  createdAt: string | null;
 }
 export interface ProfileItemRef { id: string; label: MeItemLabel }
 

@@ -1,13 +1,20 @@
 import { useEffect, useId, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getPartsContent } from '../../services/partsContent';
 import { deleteMyParts } from '../../services/parts';
 import { partsSettingsCopy, type PartsSettingsPromptId } from '../../lib/partsSettings';
+import { promptCopy } from '../../lib/partsContent';
+import { settingsMeetLink } from '../../lib/partsOfMe';
+import { useToolGate } from '../../hooks/useToolGate';
 
 /**
  * Parts in Privacy & Data (docs/design/parts.md, "The switch", "Deleting"). Opt-in, off by default;
  * turning it off hides everything and deletes nothing, so "Delete your parts" is its own confirmed
  * action, there whether parts are on or off. Renders nothing until all its copy is signed off (and
  * nothing while it loads), so the section never jumps for anyone else.
+ *
+ * Right after turning parts on here (that switch's success, this visit only), one "Get to know a part"
+ * link sits under the switch, once Meet a part may open (useToolGate) and the line is signed off.
  */
 export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggle: (on: boolean) => Promise<void> }) {
   const [copy, setCopy] = useState<Record<PartsSettingsPromptId, string> | null>(null);
@@ -15,16 +22,28 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
   const [deleting, setDeleting] = useState(false);
   const [done, setDone] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [getToKnow, setGetToKnow] = useState<string | null>(null);
+  const [justOn, setJustOn] = useState(false);
   const labelId = useId();
   const blurbId = useId();
 
   useEffect(() => {
     let live = true;
-    getPartsContent().then((c) => { if (live) setCopy(partsSettingsCopy(c)); }).catch(() => { /* stays hidden */ });
+    getPartsContent().then((c) => {
+      if (!live) return;
+      setCopy(partsSettingsCopy(c));
+      setGetToKnow(c ? promptCopy(c, 'me_get_to_know') : null);
+    }).catch(() => { /* stays hidden */ });
     return () => { live = false; };
   }, []);
 
   if (!copy) return null;
+
+  function toggle() {
+    const on = !enabled;
+    setJustOn(false);
+    onToggle(on).then(() => setJustOn(on)).catch(() => { /* the context keeps the stored value */ });
+  }
 
   async function handleDelete() {
     setDeleting(true);
@@ -53,7 +72,7 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
           aria-checked={enabled}
           aria-labelledby={labelId}
           aria-describedby={blurbId}
-          onClick={() => { onToggle(!enabled).catch(() => { /* the context keeps the stored value */ }); }}
+          onClick={toggle}
           className={`relative w-10 h-5.5 rounded-full transition-colors flex-shrink-0 ${
             enabled ? 'bg-[var(--color-accent-fill)]' : 'bg-[var(--color-border-accent)]'
           }`}
@@ -65,6 +84,7 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
           />
         </button>
       </div>
+      {justOn && enabled && getToKnow && <GetToKnowLink label={getToKnow} />}
       <p className="text-xs text-[var(--color-text-secondary)]">{copy.settings_dissociation}</p>
       <p className="text-xs text-[var(--color-text-secondary)]">{copy.settings_off}</p>
 
@@ -108,5 +128,18 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
         <p className="text-xs text-[var(--color-text-tertiary)]">{copy.settings_about_2}</p>
       </div>
     </div>
+  );
+}
+
+/** Mounted only right after turning parts on, so Meet a part's gate loads only then. */
+function GetToKnowLink({ label }: { label: string }) {
+  const meet = useToolGate('meet-a-part');
+  if (meet !== 'open') return null;
+  const link = settingsMeetLink();
+  return (
+    <Link to={link.pathname} state={link.state}
+      className="inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
+      {label}
+    </Link>
   );
 }

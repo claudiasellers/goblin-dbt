@@ -7,11 +7,11 @@
  * own-words fear is never shown at all (getMe doesn't send it). Option ids that aren't signed off, and place ids the figure doesn't know, are left out.
  */
 import { REGIONS, isRegionId } from '../data/bodyFigure';
-import type { PartsContent, PartsOption } from '../data/partsContentTypes';
+import type { PartsContent, PartsMove, PartsOption } from '../data/partsContentTypes';
 import {
-  RATHER_IDS_MAX, type AnswerPartRevisitRequest, type PartRefRequest, type PartRevisitAnswer, type RenamePartRequest, type RestPartRequest,
+  RATHER_IDS_MAX, type AnswerPartCandidateRequest, type AnswerPartRevisitRequest, type PartRefRequest, type PartRevisitAnswer, type RenamePartRequest, type RestPartRequest,
 } from '../data/partsTypes';
-import type { MeItem, MePart } from '../services/profile';
+import type { MeItem, MePart, MePartCandidate } from '../services/profile';
 import { MEET_NAME_MAX } from './meetAPartSave';
 import { flowReady, stepOptions } from './partsContent';
 
@@ -67,12 +67,56 @@ export function sortPartItems(items: readonly MeItem[]): MeItem[] {
 
 export interface MeetAPartLink {
   pathname: '/tool/meet-a-part';
-  state: { parts: { trailheadKind: 'me'; partId?: string } };
+  state: { parts: { trailheadKind: 'me' | 'candidate' | 'settings'; partId?: string; candidateId?: string; moveId?: string } };
 }
 
 /** "Get to know a part" (no partId) or "Spend time with it" (this part). */
 export function meetAPartLink(partId?: string): MeetAPartLink {
   return { pathname: '/tool/meet-a-part', state: { parts: { trailheadKind: 'me', ...(partId ? { partId } : {}) } } };
+}
+
+/** Settings' one-time "Get to know a part", right after turning parts on. */
+export function settingsMeetLink(): MeetAPartLink {
+  return { pathname: '/tool/meet-a-part', state: { parts: { trailheadKind: 'settings' } } };
+}
+
+// ---- To come back to (open PartCandidates, after the cards) ----
+
+export const PART_CANDIDATE_PROMPTS = [
+  'candidate_title', 'candidate_line', 'candidate_line_plain', 'candidate_go', 'candidate_dismiss',
+] as const;
+export type PartCandidatePromptId = (typeof PART_CANDIDATE_PROMPTS)[number];
+
+/** The list's copy, or null while any of it is missing (the list then isn't shown). */
+export function partCandidateCopy(content: PartsContent | null): Record<PartCandidatePromptId, string> | null {
+  if (!content || !flowReady(content, PART_CANDIDATE_PROMPTS)) return null;
+  return Object.fromEntries(PART_CANDIDATE_PROMPTS.map((id) => [id, content.prompts[id].copy])) as Record<PartCandidatePromptId, string>;
+}
+
+/** The candidate's move as the app can name it: the first of its moves that ships with a phrase, else none. */
+export function candidateMove(content: PartsContent, c: MePartCandidate): PartsMove | null {
+  for (const id of c.moveIds) {
+    const m = content.moves.find((x) => x.id === id);
+    if (m?.unblendPhrase) return m;
+  }
+  return null;
+}
+
+/** "The one that wants to hide", or "One you wanted to come back to" with no nameable move. */
+export function candidateLine(copy: Record<PartCandidatePromptId, string>, content: PartsContent, c: MePartCandidate): string {
+  const m = candidateMove(content, c);
+  return m ? copy.candidate_line.split('{move}').join(m.unblendPhrase) : copy.candidate_line_plain;
+}
+
+/** "Get to know it": Meet a part on the candidate trailhead, opening on the move the line names. */
+export function candidateMeetLink(content: PartsContent, c: MePartCandidate): MeetAPartLink {
+  const m = candidateMove(content, c);
+  return { pathname: '/tool/meet-a-part', state: { parts: { trailheadKind: 'candidate', candidateId: c.id, ...(m ? { moveId: m.id } : {}) } } };
+}
+
+/** "Not any more". */
+export function dismissCandidateRequest(candidateId: string): AnswerPartCandidateRequest {
+  return { candidateId, answer: 'dismiss' };
 }
 
 /** One call to lane 2's part writers (src/services/parts.ts), by name, with its request. */

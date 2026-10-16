@@ -6,6 +6,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
+import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 
 const lib = await importTs("src/lib/partsOfMe.ts");
 const edit = await importTs("functions/src/parts/editPlan.ts");
@@ -19,8 +20,9 @@ const part = (o = {}) => ({ name: null, tender: false, places: [], shapeSig: nul
 const item = (id, o = {}, meta = {}) => ({ label: "Part", title: "A part", summary: "", editor: null, stillTrueCopy: "", setAsideCopy: "",
   meta: { id, kind: "part", area: "my_parts", status: "active", source: "made", confirmedAt: null, revisitAt: null, prompt: "none", ...meta }, part: part(o) });
 
-// The check-back (step revisit) has its own gate; every other me-flow prompt is the area's.
-const OWN_GATE = new Set(["revisit"]);
+// The check-back (step revisit) and the candidate list (step candidate) have their own gates; every
+// other me-flow prompt is the area's.
+const OWN_GATE = new Set(["revisit", "candidate"]);
 
 test("the area's copy: every me / card prompt, all or nothing", () => {
   const inFlow = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "me" && !OWN_GATE.has(p.step)).map(([id]) => id);
@@ -42,7 +44,7 @@ test("Me's gate: parts off or copy missing → exactly as before", () => {
   assert.match(me, /const partsOn = profile\.partsEnabled === true;/);
   assert.match(me, /if \(!partsOn\) return;/, "the content isn't even fetched with parts off");
   assert.match(me, /i\.label !== 'Part'/, "a part never lands in the generic still-true list");
-  assert.match(me, /<PartsOfMe items=\{a\.items\} content=\{partsContent\} copy=\{partsCopy\} onWrite=\{partWrite\} \/>/,
+  assert.match(me, /<PartsOfMe items=\{a\.items\} [^>]*copy=\{partsCopy\}\s+onWrite=\{partWrite\} /,
     "set-aside parts: the area's own rows (restorePart), not the generic restoreProfileItem row");
   assert.match(me, /const partWrite = \(p: Promise<\{ version: number \}>\) => after\(p\.then\(\(r\) => r\.version\)\);/,
     "a part write refreshes Me the way every other Me write does");
@@ -106,8 +108,8 @@ test("the cards: headed list items, the figure, no hard-coded copy (unnamed fall
 const ID = "3f2c9a0e-1b2c-4d5e-8f90-123456789abc";
 const RID = "5a2c9a0e-1b2c-4d5e-8f90-123456789abc";
 const copy = Object.fromEntries(lib.PARTS_OF_ME_PROMPTS.map((id) => [id, fixture.prompts[id].copy]));
-const ALL = { ...shipped, prompts: Object.fromEntries(Object.entries(fixture.prompts).map(([id, p]) => [id, { flow: p.flow, step: p.step, order: p.order, copy: p.copy }])),
-  options: fixture.options };
+// Everything approved: the shipped file's shape, built from the fixture (as Meet a part's tests do).
+const ALL = partsFromFixture(fixture, () => true);
 const shape = (a) => ({ id: a.id, label: a.label, fn: a.call?.fn ?? null, req: a.call?.req ?? null });
 
 test("the row: Rename, Rest it, Set aside, It feels young or hurt, with lane 2's payloads", () => {
@@ -245,4 +247,57 @@ test("It's doing something new: the would-rather chips, non-answers out, the par
   assert.match(c, /c\.answer === 'new' \? setPicking\(true\) : answer\(c\.answer\)/);
   assert.match(c, /disabled=\{busy \|\| \(!on && picked\.length >= RATHER_IDS_MAX\)\}/);
   assert.match(c, /disabled=\{busy \|\| picked\.length === 0\}/);
+});
+
+// ---- To come back to (open PartCandidates) ----
+
+const CID = "6b2c9a0e-1b2c-4d5e-8f90-123456789abc";
+const cand = (o = {}) => ({ id: CID, origin: "new_one", moveIds: ["hide"], createdAt: "2026-10-01T00:00:00Z", ...o });
+
+test("the list's copy: its own drafts and gate; the move's phrase fills the line", () => {
+  const inStep = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "me" && p.step === "candidate").map(([id]) => id);
+  assert.deepEqual([...lib.PART_CANDIDATE_PROMPTS].sort(), inStep.sort());
+  for (const id of lib.PART_CANDIDATE_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "draft", id);
+  assert.equal(lib.partCandidateCopy(shipped), null, "nothing signed off: no list");
+  assert.equal(lib.partCandidateCopy(null), null);
+  for (const id of lib.PART_CANDIDATE_PROMPTS) {
+    const without = { ...ALL, prompts: { ...ALL.prompts } };
+    delete without.prompts[id];
+    assert.equal(lib.partCandidateCopy(without), null, `without ${id}`);
+  }
+  const c = lib.partCandidateCopy(ALL);
+  const hide = ALL.moves.find((m) => m.id === "hide");
+  assert.equal(lib.candidateLine(c, ALL, cand()), `The one that ${hide.unblendPhrase}`);
+  assert.equal(lib.candidateLine(c, ALL, cand({ moveIds: [] })), "One you wanted to come back to");
+  assert.equal(lib.candidateLine(c, ALL, cand({ moveIds: ["not_shipped"] })), "One you wanted to come back to", "the move doesn't ship");
+  assert.equal(lib.candidateLine(c, ALL, cand({ moveIds: ["not_shipped", "hide"] })), `The one that ${hide.unblendPhrase}`, "the first that ships");
+  assert.equal(lib.candidateLine(c, { ...ALL, moves: [] }, cand()), "One you wanted to come back to");
+});
+
+test("Get to know it: Meet a part on the candidate trailhead, with the move the line names", async () => {
+  const { parseMeetEntry } = await importTs("src/lib/meetAPartSave.ts");
+  const link = lib.candidateMeetLink(ALL, cand());
+  assert.deepEqual(link, { pathname: "/tool/meet-a-part", state: { parts: { trailheadKind: "candidate", candidateId: CID, moveId: "hide" } } });
+  assert.deepEqual(parseMeetEntry(link.state), { trailheadKind: "candidate", partId: null, candidateId: CID, moveId: "hide" });
+  const plain = lib.candidateMeetLink(ALL, cand({ moveIds: [] }));
+  assert.deepEqual(plain.state, { parts: { trailheadKind: "candidate", candidateId: CID } });
+  assert.deepEqual(parseMeetEntry(plain.state), { trailheadKind: "candidate", partId: null, candidateId: CID, moveId: null });
+  assert.deepEqual(lib.dismissCandidateRequest(CID), { candidateId: CID, answer: "dismiss" });
+  const { validateCandidateAnswer } = await importTs("functions/src/parts/candidateAnswer.ts");
+  assert.deepEqual(validateCandidateAnswer(lib.dismissCandidateRequest(CID)), { candidateId: CID, answer: "dismiss" });
+});
+
+test("the rows: after the cards, only with the list's copy, a neutral figure, Not any more via answerPartCandidate", () => {
+  const c = read("src/components/me/PartsOfMe.tsx");
+  assert.match(c, /const candidateCopy = partCandidateCopy\(content\);/);
+  assert.match(c, /\{candidateCopy && candidates\.length > 0 && \(/);
+  assert.ok(c.indexOf("<SetAsideRow") < c.indexOf("<CandidateRow"), "after the cards and set-aside rows");
+  assert.match(c, /<PartFigure shapeSig=\{null\} size=\{40\} \/>/);
+  assert.match(c, /candidateMeetLink\(content, candidate\)/);
+  assert.match(c, /await onDismiss\(candidate\.id\)/);
+  const me = read("src/components/me/MeSection.tsx");
+  assert.match(me, /candidates=\{me\.partCandidates \?\? \[\]\}/);
+  assert.match(me, /await answerPartCandidate\(dismissCandidateRequest\(id\)\);\s*setReload\(\(r\) => r \+ 1\);/);
+  // The area itself is unchanged: still only with parts on and its copy signed off (no parts → the link plus candidates).
+  assert.match(me, /\{a\.id === 'my_parts' && partsCopy && partsContent && \(/);
 });

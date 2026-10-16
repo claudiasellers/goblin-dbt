@@ -904,6 +904,41 @@
    "order": 20,
    "copy": "What does it do now?",
    "reviewStatus": "draft"
+  },
+  "candidate_title": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 21,
+   "copy": "To come back to",
+   "reviewStatus": "draft"
+  },
+  "candidate_line": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 22,
+   "copy": "The one that {move}",
+   "reviewStatus": "draft"
+  },
+  "candidate_line_plain": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 23,
+   "copy": "One you wanted to come back to",
+   "reviewStatus": "draft"
+  },
+  "candidate_go": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 24,
+   "copy": "Get to know it",
+   "reviewStatus": "draft"
+  },
+  "candidate_dismiss": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 25,
+   "copy": "Not any more",
+   "reviewStatus": "draft"
   }
  },
  "options": {

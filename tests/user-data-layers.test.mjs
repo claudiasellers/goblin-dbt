@@ -140,6 +140,8 @@ test("finalise-once: ToolSession, FollowUp, PatternOffer, ToolUsage, SkillPracti
   assert.equal(writable("PartSession", "keep", { status: "saved", savedAt: iso(-13) }, now), false);
   assert.equal(writable("PartCandidate", "accept", { status: "open" }, now), true);
   for (const s of ["accepted", "declined"]) assert.equal(writable("PartCandidate", "accept", { status: s }, now), false);
+  assert.equal(writable("PartCandidate", "dismiss", { status: "open" }, now), true);
+  for (const s of ["accepted", "dismissed"]) assert.equal(writable("PartCandidate", "dismiss", { status: s }, now), false);
   assert.equal(writable("ToolSession", "showLine", { status: "open", startedAt: iso(-30) }, now), true, "a beat inside an open session");
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-11) }, now), true);
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-13) }, now), false);
@@ -161,6 +163,7 @@ test("the Cypher guards encode the same rules", () => {
   assert.equal(GUARDS.PartSession.save("ps"), "ps.status = 'open'");
   assert.equal(GUARDS.PartSession.keep("ps"), "(ps.status = 'open' OR (ps.status = 'saved' AND ps.savedAt > datetime() - duration({hours: 12})))");
   assert.equal(GUARDS.PartCandidate.accept("c"), "c.status = 'open'");
+  assert.equal(GUARDS.PartCandidate.dismiss("c"), "c.status = 'open'");
 });
 
 // Writers that update an existing log record must use the guard (grows with each PR).
@@ -177,6 +180,7 @@ const GUARDED_WRITERS = [
   ["functions/src/parts/sessionQueries.ts", "GUARDS.PartSession.save"],
   ["functions/src/parts/keep.ts", "GUARDS.PartSession.keep"],
   ["functions/src/parts/keep.ts", "GUARDS.PartCandidate.accept"],
+  ["functions/src/parts/candidateAnswer.ts", "GUARDS.PartCandidate.dismiss"],
 ];
 test("writers that update log records use the lifecycle guards", () => {
   for (const [file, guard] of GUARDED_WRITERS) assert.ok(readFileSync(file, "utf8").includes(guard), `${file} lacks ${guard}`);

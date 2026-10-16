@@ -2,12 +2,12 @@ import { useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { RATHER_IDS_MAX, type PartRevisitAnswer, type PartWriteResponse } from '../../data/partsTypes';
-import type { MeItem } from '../../services/profile';
+import type { MeItem, MePartCandidate } from '../../services/profile';
 import { answerPartRevisit, renamePart, restorePart, restPart, setAsidePart, setPartTender } from '../../services/parts';
 import {
-  PART_NAME_MAX, meetAPartLink, partActions, partAsksBack, partCardRows, partRevisitCopy, renameCall, restoreCall,
+  PART_NAME_MAX, candidateLine, candidateMeetLink, meetAPartLink, partCandidateCopy, partActions, partAsksBack, partCardRows, partRevisitCopy, renameCall, restoreCall,
   revisitCall, revisitChoices, revisitQuestion, revisitRatherOptions, sortPartItems, toggleRather,
-  type PartRevisitCopy, type PartWriteCall, type PartsOfMePromptId,
+  type PartCandidatePromptId, type PartRevisitCopy, type PartWriteCall, type PartsOfMePromptId,
 } from '../../lib/partsOfMe';
 import { newId } from '../../lib/spine/ids';
 import { PartFigure } from '../parts/PartFigure';
@@ -20,21 +20,27 @@ export type PartWrite = (p: Promise<PartWriteResponse>) => Promise<void>;
  * Me → Parts of me (docs/design/parts.md, "The part card"): the parts a person has kept, no stats
  * yet. Rendered by MeSection only with parts on and all its copy signed off. Each card has one row of
  * quiet actions (lane 2's part writers) and, past its revisit date, the 30-day check-back above them
- * (only once that copy is signed off too). Set-aside parts sit below as rows with "Bring it back".
+ * (only once that copy is signed off too). Set-aside parts sit below as rows with "Bring it back",
+ * then "To come back to": the open candidates (at most 3, its own copy gate), each with Get to know it
+ * (Meet a part, candidate trailhead) and Not any more.
  *
  * Writes are not optimistic, as elsewhere in Me: the card is disabled while saving, Me reloads after,
  * and a failed write leaves things as they were with no message (StillTrue's rule).
  */
-export function PartsOfMe({ items, content, copy, onWrite }: {
+export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss }: {
   items: MeItem[];
+  candidates: MePartCandidate[];
   content: PartsContent;
   copy: Copy;
   onWrite: PartWrite;
+  /** "Not any more" on a candidate, then Me reloads; rejects when the write fails. */
+  onDismiss: (candidateId: string) => Promise<void>;
 }) {
   const parts = sortPartItems(items.filter((i) => i.part));
   const live = parts.filter((i) => i.meta.status !== 'set_aside');
   const setAside = parts.filter((i) => i.meta.status === 'set_aside');
   const revisit = partRevisitCopy(content);
+  const candidateCopy = partCandidateCopy(content);
   const getToKnow = meetAPartLink();
 
   return (
@@ -51,7 +57,45 @@ export function PartsOfMe({ items, content, copy, onWrite }: {
       {setAside.length > 0 && (
         <ul>{setAside.map((i) => <SetAsideRow key={i.meta.id} item={i} copy={copy} onWrite={onWrite} />)}</ul>
       )}
+      {candidateCopy && candidates.length > 0 && (
+        <div>
+          <h4 className="text-xs text-[var(--color-text-tertiary)]">{candidateCopy.candidate_title}</h4>
+          <ul>
+            {candidates.map((c) => (
+              <CandidateRow key={c.id} candidate={c} content={content} copy={candidateCopy} onDismiss={onDismiss} />
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
+  );
+}
+
+/** A part to come back to: a neutral figure, the line, Get to know it, Not any more. */
+function CandidateRow({ candidate, content, copy, onDismiss }: {
+  candidate: MePartCandidate; content: PartsContent; copy: Record<PartCandidatePromptId, string>;
+  onDismiss: (candidateId: string) => Promise<void>;
+}) {
+  const [busy, setBusy] = useState(false);
+  const go = candidateMeetLink(content, candidate);
+  const dismiss = async () => {
+    if (busy) return;
+    setBusy(true);
+    try { await onDismiss(candidate.id); } catch { /* unchanged; Me reloads on the next visit */ } finally { setBusy(false); }
+  };
+  return (
+    <li className="py-2 border-t border-[var(--color-border-subtle)] first:border-t-0">
+      <div className="flex items-center gap-3">
+        <div className="shrink-0">
+          <PartFigure shapeSig={null} size={40} />
+        </div>
+        <p className="min-w-0 flex-1 text-sm text-[var(--color-text-primary)]">{candidateLine(copy, content, candidate)}</p>
+      </div>
+      <div className="flex flex-wrap items-center gap-x-4 pl-[52px]">
+        <Link to={go.pathname} state={go.state} className={plain}>{copy.candidate_go}</Link>
+        <button type="button" disabled={busy} onClick={dismiss} className={quiet}>{copy.candidate_dismiss}</button>
+      </div>
+    </li>
   );
 }
 
