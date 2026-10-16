@@ -431,7 +431,7 @@
    "flow": "angry",
    "step": "vote",
    "order": 6,
-   "copy": "{name}, this part is angry because {matters} matters.",
+   "copy": "{name}, it's angry because {matters} matters to you.",
    "reviewStatus": "draft"
   },
   "angry_vote_plain": {

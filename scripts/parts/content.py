@@ -400,15 +400,16 @@ PROMPTS = [
     # out of the flooded band. Every line has two wordings: X with parts on, X_plain with parts off (plain
     # distanced self-talk, never the word "part": build check). _noname when there is no first name;
     # _unsure after "Not sure" at protects. {matters} and {felt} come from the hurt picked (HURTS).
-    # angry_vote(_plain) end "… {matters} matters." (the agreed copy's "matters to you" is 97 / 91
-    # characters with {name} and {matters} at their widths; the voice lint's limit is 90).
+    # The named vote lines fit the voice lint's 90 characters at slot widths (the agreed "{name}, this part
+    # is angry because {matters} matters to you." is 97): parts on says "it" (the part from screens 1-2)
+    # and keeps "to you", the point of a vote of confidence; plain drops "to you" ("you're" carries it).
     ("angry_unblend", "angry", "unblend", "A part of you is furious right now."),
     ("angry_unblend_plain", "angry", "unblend", "The anger is loud right now, and you're here too."),
     ("angry_unblend_sub", "angry", "unblend", "Let it stand a little apart from you for a moment."),
     ("angry_unblend_sub_plain", "angry", "unblend", "Let it stand a little apart from you for a moment."),
     ("angry_protects", "angry", "protects", "It's trying to protect something. What?"),
     ("angry_protects_plain", "angry", "protects", "Anger usually protects something. What is it protecting?"),
-    ("angry_vote", "angry", "vote", "{name}, this part is angry because {matters} matters."),
+    ("angry_vote", "angry", "vote", "{name}, it's angry because {matters} matters to you."),
     ("angry_vote_plain", "angry", "vote", "{name}, you're angry because {matters} matters."),
     ("angry_vote_noname", "angry", "vote", "This part is angry because {matters} matters to you."),
     ("angry_vote_noname_plain", "angry", "vote", "You're angry because {matters} matters to you."),

@@ -32,7 +32,7 @@ test("parts on, with a name and a hurt: distanced self-talk in the person's name
   assert.equal(r.unblend, "A part of you is furious right now.");
   assert.equal(r.protects, "It's trying to protect something. What?");
   assert.deepEqual(r.vote, [
-    "Sam, this part is angry because being taken seriously matters.",
+    "Sam, it's angry because being taken seriously matters to you.",
     "You don't have to let it drive, and you don't have to leave it behind.",
     "Sam can handle what comes next.",
   ]);
