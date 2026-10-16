@@ -7,15 +7,16 @@ import type {
   SavePartSessionRequest, StartPartSessionRequest,
 } from '../data/partsTypes';
 
-const getPartsEntryFn = httpsCallable<Record<string, never>, PartsEntry>(functions, 'getPartsEntry');
+const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
 
 /**
  * What a parts flow opens on, from the caller's own recent records: the P2 hand-off first
  * (`band: 'flooded'`, crisis banner alongside when `crisis`), the far-away heads-up, or clear.
  * Never a lock: every outcome lets the person continue. `reasons` are for logging, never shown.
+ * `partId` (a visit to one of the person's own parts) adds `paused` when that part is paused.
  */
-export async function getPartsEntry(): Promise<PartsEntry> {
-  return (await getPartsEntryFn({})).data;
+export async function getPartsEntry(partId?: string | null): Promise<PartsEntry> {
+  return (await getPartsEntryFn(partId ? { partId } : {})).data;
 }
 
 const deleteMyPartsFn = httpsCallable<Record<string, never>, { deleted: Record<string, number> }>(functions, 'deleteMyParts');

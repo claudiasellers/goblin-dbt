@@ -91,206 +91,213 @@
   }
  ],
  "prompts": {
+  "paused_heads_up": {
+   "flow": "meet",
+   "step": "entry",
+   "order": 0,
+   "copy": "Things got louder after last time. Going gently is fine, or come back another day.",
+   "reviewStatus": "draft"
+  },
   "meet_find": {
    "flow": "meet",
    "step": "find",
-   "order": 0,
+   "order": 1,
    "copy": "What's showing up?",
    "reviewStatus": "draft"
   },
   "meet_where": {
    "flow": "meet",
    "step": "where",
-   "order": 1,
+   "order": 2,
    "copy": "Where do you notice it?",
    "reviewStatus": "draft"
   },
   "meet_shape": {
    "flow": "meet",
    "step": "shape",
-   "order": 2,
+   "order": 3,
    "copy": "Which is closer to it?",
    "reviewStatus": "draft"
   },
   "meet_age": {
    "flow": "meet",
    "step": "age",
-   "order": 3,
+   "order": 4,
    "copy": "How old does it seem?",
    "reviewStatus": "draft"
   },
   "meet_age_young": {
    "flow": "meet",
    "step": "age_young",
-   "order": 4,
+   "order": 5,
    "copy": "It sounds young. Want to keep it gentle?",
    "reviewStatus": "draft"
   },
   "meet_voice": {
    "flow": "meet",
    "step": "voice",
-   "order": 5,
+   "order": 6,
    "copy": "Does it say anything?",
    "reviewStatus": "draft"
   },
   "meet_feel": {
    "flow": "meet",
    "step": "feel",
-   "order": 6,
+   "order": 7,
    "copy": "How do you feel toward it right now?",
    "reviewStatus": "draft"
   },
   "meet_unblend": {
    "flow": "meet",
    "step": "unblend",
-   "order": 7,
+   "order": 8,
    "copy": "That reaction might be another part. Can it give you some room, for now?",
    "reviewStatus": "draft"
   },
   "meet_unblend_end": {
    "flow": "meet",
    "step": "unblend_end",
-   "order": 8,
+   "order": 9,
    "copy": "That's enough for today. The part that's worried about it counts too.",
    "reviewStatus": "draft"
   },
   "meet_unblend_later": {
    "flow": "meet",
    "step": "unblend_later",
-   "order": 9,
+   "order": 10,
    "copy": "Want to get to know that one another time?",
    "reviewStatus": "draft"
   },
   "meet_nothing": {
    "flow": "meet",
    "step": "nothing",
-   "order": 10,
+   "order": 11,
    "copy": "Sometimes there's nothing there yet. That's fine.",
    "reviewStatus": "draft"
   },
   "meet_job": {
    "flow": "meet",
    "step": "job",
-   "order": 11,
+   "order": 12,
    "copy": "What's it trying to do for you?",
    "reviewStatus": "draft"
   },
   "meet_likes": {
    "flow": "meet",
    "step": "likes",
-   "order": 12,
+   "order": 13,
    "copy": "Does it like this job?",
    "reviewStatus": "draft"
   },
   "meet_guards": {
    "flow": "meet",
    "step": "guards",
-   "order": 13,
+   "order": 14,
    "copy": "What do you think it's protecting?",
    "reviewStatus": "draft"
   },
   "meet_fear": {
    "flow": "meet",
    "step": "fear",
-   "order": 14,
+   "order": 15,
    "copy": "What's it afraid would happen if it stopped?",
    "reviewStatus": "draft"
   },
   "meet_stop_title": {
    "flow": "meet",
    "step": "stop",
-   "order": 15,
+   "order": 16,
    "copy": "It's guarding something tender.",
    "reviewStatus": "draft"
   },
   "meet_stop_body": {
    "flow": "meet",
    "step": "stop",
-   "order": 16,
+   "order": 17,
    "copy": "We'll leave that be. You found the guard, and that counts.",
    "reviewStatus": "draft"
   },
   "meet_stop_therapist": {
    "flow": "meet",
    "step": "stop",
-   "order": 17,
+   "order": 18,
    "copy": "If you see a therapist, this is a good thing to bring.",
    "reviewStatus": "draft"
   },
   "meet_update": {
    "flow": "meet",
    "step": "update",
-   "order": 18,
+   "order": 19,
    "copy": "Does it know how old you are now?",
    "reviewStatus": "draft"
   },
   "meet_update_show": {
    "flow": "meet",
    "step": "update_show",
-   "order": 19,
+   "order": 20,
    "copy": "Show it something you can do now.",
    "reviewStatus": "draft"
   },
   "meet_thank": {
    "flow": "meet",
    "step": "thank",
-   "order": 20,
+   "order": 21,
    "copy": "Thank it for trying to protect you.",
    "reviewStatus": "draft"
   },
   "meet_thank_hold": {
    "flow": "meet",
    "step": "thank",
-   "order": 21,
+   "order": 22,
    "copy": "Press and hold",
    "reviewStatus": "draft"
   },
   "meet_thank_done": {
    "flow": "meet",
    "step": "thank",
-   "order": 22,
+   "order": 23,
    "copy": "Thanked",
    "reviewStatus": "draft"
   },
   "meet_rather": {
    "flow": "meet",
    "step": "rather",
-   "order": 23,
+   "order": 24,
    "copy": "If it didn't have to do this, what would it rather do?",
    "reviewStatus": "draft"
   },
   "meet_name": {
    "flow": "meet",
    "step": "name",
-   "order": 24,
+   "order": 25,
    "copy": "Want to give it a name?",
    "reviewStatus": "draft"
   },
   "meet_keep": {
    "flow": "meet",
    "step": "keep",
-   "order": 25,
+   "order": 26,
    "copy": "Keep it, so you can come back to it?",
    "reviewStatus": "draft"
   },
   "meet_tender": {
    "flow": "meet",
    "step": "tender",
-   "order": 26,
+   "order": 27,
    "copy": "Can you let it know you're here?",
    "reviewStatus": "draft"
   },
   "meet_tender_sub": {
    "flow": "meet",
    "step": "tender",
-   "order": 27,
+   "order": 28,
    "copy": "You don't need to do anything else.",
    "reviewStatus": "draft"
   },
   "meet_done": {
    "flow": "meet",
    "step": "close",
-   "order": 28,
+   "order": 29,
    "copy": "You can come back to this any time.",
    "reviewStatus": "draft"
   },

@@ -10,7 +10,7 @@ import { getPartsEntryHandler } from './handler';
 import { graphDeps } from './queries';
 import type { PartsEntry } from './types';
 import { savePartSessionHandler, startPartSessionHandler } from './sessions';
-import { validateStartPartSession } from './validation';
+import { readPartsEntryInput, validateStartPartSession } from './validation';
 import { sessionDeps } from './sessionQueries';
 import type { PartSessionResponse } from './sessionTypes';
 import {
@@ -24,10 +24,10 @@ import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } 
 
 export { deleteMyParts } from './delete';
 
-/** What a parts flow opens on: P2 first, the far-away heads-up, or clear. Never a lock. */
+/** What a parts flow opens on: P2 first, the far-away heads-up, or clear (plus tooMany / paused). Never a lock. */
 export const getPartsEntry = callable<unknown, PartsEntry>(
   { auth: 'required', label: 'getPartsEntry' },
-  async ({ uid }) => getPartsEntryHandler(graphDeps(uid as string)),
+  async ({ uid, data }) => getPartsEntryHandler(graphDeps(uid as string), readPartsEntryInput(data)),
 );
 
 /** Open Meet a part's record for this visit (idempotent while open). Parts must be on. */
