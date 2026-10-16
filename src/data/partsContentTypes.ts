@@ -59,6 +59,8 @@ export interface PartsHurt {
   label: string;
   hurtPhrase: string;
   feltPhrase: string;
+  /** What the anger says matters (the angry card's vote of confidence, fills {matters}). */
+  matters: string;
   order: number;
   /** Check-in words that name it. */
   namedAs: string[];
