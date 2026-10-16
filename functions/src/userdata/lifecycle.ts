@@ -54,8 +54,18 @@ export const GUARDS = {
     outcome: (v: string) => `${v}.outcome IS NULL`,
   },
   PartSession: {
-    /** savePartSession (a later task): only while open; finished and stopped sessions are frozen. */
+    /** savePartSession: only while open; a saved session is frozen. */
     save: (v: string) => `${v}.status = 'open'`,
+    /**
+     * keepPart (9b's yes) links the session to its part: while open, or within 12 h of the save, so a
+     * slow keep after the close still lands (the same episode a closed ToolSession's answer gets).
+     */
+    keep: (v: string) =>
+      `(${v}.status = 'open' OR (${v}.status = 'saved' AND ${v}.savedAt > datetime() - duration({hours: ${TOOL_SESSION_ANSWER_HOURS}})))`,
+  },
+  PartCandidate: {
+    /** keepPart accepts a candidate once; any other status is final. */
+    accept: (v: string) => `${v}.status = 'open'`,
   },
 } as const;
 
@@ -69,7 +79,7 @@ const ms = (v: unknown): number | null => {
 
 /** The TypeScript mirror of GUARDS (for tests and for callers that already hold the record). */
 export function writable(
-  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession',
+  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PartCandidate',
   op: string,
   p: Props,
   now: number = Date.now(),
@@ -98,7 +108,13 @@ export function writable(
     case 'FollowUp': return p.status === 'scheduled';
     case 'PatternOffer': return p.status === 'offered';
     case 'ToolUsage': return p.outcome == null;
-    case 'PartSession': return p.status === 'open';
+    case 'PartSession': {
+      if (p.status === 'open') return true;
+      if (op !== 'keep' || p.status !== 'saved') return false;
+      const saved = ms(p.savedAt);
+      return saved !== null && saved > now - TOOL_SESSION_ANSWER_HOURS * HOUR;
+    }
+    case 'PartCandidate': return p.status === 'open';
     case 'SkillPractice': return false; // terminal at creation
     default: return false;
   }
