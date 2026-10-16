@@ -97,6 +97,8 @@ test("parts_voice: unsoftened protector voices pass, the safety rules still fail
 
 test("parts_chip has no voice_distance; parts_prompt does", () => {
   assert.deepEqual(part("I can say no", "chip"), []);
+  assert.deepEqual(part("I felt brushed off.", "first_person"), [], "the person's own sentence: its I is theirs");
+  assert.ok(partRules("I felt {felt}.", "prompt").includes("voice_distance"));
   assert.ok(partRules("I can say no", "prompt").includes("voice_distance"));
   assert.deepEqual(part("How do you feel toward it right now?", "prompt"), []);
 });
@@ -121,6 +123,7 @@ test("parts_max_length per kind at the boundary", () => {
   assert.equal(PARTS_KINDS.chip.maxChars, 60);
   assert.equal(PARTS_KINDS.voice.maxChars, 40);
   assert.equal(PARTS_KINDS.keepsake.maxChars, 90);
+  assert.equal(PARTS_KINDS.first_person.maxChars, 90);
 });
 
 test("parts_max_length counts each slot at its width", () => {
@@ -136,10 +139,15 @@ test("parts_max_length counts each slot at its width", () => {
   assert.ok(partRules(`${a(90 - 24 - 24 + 1)}{A}{B}`, "keepsake").includes("parts_max_length"));
   // curly quotes are normalised before counting (one character each either way)
   assert.ok(!partRules(`I’d ${a(60 - 4)}`, "chip").includes("parts_max_length"));
-  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 40, month: 9, want: 20, N: 2 });
+  // the angry card's vote of confidence and its "I felt …" line
+  assert.ok(!partRules(`${a(90 - 24 - 28)}{name}{matters}`, "prompt").includes("parts_max_length"));
+  assert.ok(partRules(`${a(90 - 24 - 28 + 1)}{name}{matters}`, "prompt").includes("parts_max_length"));
+  assert.ok(!partRules(`${a(90 - 24)}{felt}`, "first_person").includes("parts_max_length"));
+  assert.ok(partRules(`${a(90 - 24 + 1)}{felt}`, "first_person").includes("parts_max_length"));
+  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 40, month: 9, want: 20, N: 2, matters: 28, felt: 24 });
 });
 
-test("parts_slots: only parts slots, only in prompts (all) and keepsakes ({A} {B} {want})", () => {
+test("parts_slots: only parts slots, only in prompts (all), keepsakes ({A} {B} {want}) and first-person lines ({felt})", () => {
   for (const s of Object.keys(PARTS_SLOT_WIDTH)) assert.ok(!partRules(`About {${s}}`, "prompt").includes("parts_slots"), s);
   assert.ok(partRules("About {thing}", "prompt").includes("parts_slots"), "unknown slot");
   assert.ok(partRules("About {word}", "prompt").includes("parts_slots"), "a witness slot is not a parts slot");
@@ -149,6 +157,9 @@ test("parts_slots: only parts slots, only in prompts (all) and keepsakes ({A} {B
   assert.ok(!partRules("Both want {want}", "keepsake").includes("parts_slots"));
   assert.ok(partRules("{name} wants you safe", "keepsake").includes("parts_slots"));
   assert.equal(part("{name} and {thing}", "keepsake").find((f) => f.rule === "parts_slots").match, "{name} {thing}");
+  assert.deepEqual(part("I felt {felt}.", "first_person"), []);
+  assert.ok(partRules("{name} felt {felt}.", "first_person").includes("parts_slots"));
+  assert.ok(partRules("Both want {want}", "first_person").includes("parts_slots"));
 });
 
 test("an unknown kind is an error, never a silent skip", () => {

@@ -8,8 +8,8 @@ for review and trail counting, not for a client.
 import json, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
-from content import (VERSION, review_status, MOVES, HURTS, OFTEN_GUARDS, PROMPTS, OPTIONS, PAIRS, KEEPSAKE,  # noqa: E402
-                     TRAIL_RULES, CONTEXTS, POLICY, PENDING)
+from content import (VERSION, review_status, MOVES, HURTS, OFTEN_GUARDS, CAN_TOUCH, PROMPTS, PROMPT_KINDS, OPTIONS,  # noqa: E402
+                     PAIRS, KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY, PENDING)
 from build import all_options  # noqa: E402  (importing build runs its checks: no fixture from content that fails the build)
 root = os.path.dirname(os.path.dirname(here))
 
@@ -27,7 +27,8 @@ moves = [dict({k: m[k] for k in ("id", "label", "unblendPhrase", "trailPhrase", 
 
 prompts, at = {}, {}
 for pid, flow, step, copy in PROMPTS:
-    prompts[pid] = dict(flow=flow, step=step, order=at.get(flow, 0), copy=copy, **status(pid))
+    prompts[pid] = dict(flow=flow, step=step, order=at.get(flow, 0), copy=copy,
+                        **({"copyKind": PROMPT_KINDS[pid]} if pid in PROMPT_KINDS else {}), **status(pid))
     at[flow] = at.get(flow, 0) + 1
 
 # flow → step → options in order; `moves: []` means offered for any move.
@@ -38,7 +39,7 @@ for o in all_options():
                      order=len(step), moves=list(o["moves"] or []),
                      sameAs=[{"label": label, "id": target} for label, target in o["sameAs"]], **status(o["id"])))
 
-hurts = [dict({k: h[k] for k in ("id", "label", "hurtPhrase", "feltPhrase", "namedAs")}, order=i,
+hurts = [dict({k: h[k] for k in ("id", "label", "hurtPhrase", "feltPhrase", "matters", "namedAs")}, order=i,
               guardedBy=[{"moveId": m, "rank": hs.index(h["id"])} for m, hs in OFTEN_GUARDS.items() if h["id"] in hs],
               **status(h["id"]))
          for i, h in enumerate(HURTS)]
@@ -54,6 +55,9 @@ payload = {
     "prompts": prompts,
     "options": options,
     "hurts": hurts,
+    # Recover's "what happened" (InvalidationEvent id) → the hurts it can touch, in order: pre-orders the
+    # angry card's chips when Recover hands over (src/lib/angryPart.ts orderHurts).
+    "canTouch": CAN_TOUCH,
     "pairs": pairs,
     "keepsake": [dict(id=kid, copy=copy, **status(kid)) for kid, copy in KEEPSAKE],
     "trailRules": [dict(r, **status(r["id"])) for r in TRAIL_RULES],

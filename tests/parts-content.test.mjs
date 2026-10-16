@@ -178,7 +178,7 @@ test("voice contract: every parts copy row passes the lint, the loader's gate co
   assert.equal(have.size, rows.length, "one row per (id, field)");
   const visible = [
     ["ProtectiveMove", ["label", "unblendPhrase", "trailPhrase", "nameHint"]],
-    ["ProtectedHurt", ["label", "hurtPhrase", "feltPhrase"]],
+    ["ProtectedHurt", ["label", "hurtPhrase", "feltPhrase", "matters"]],
     ["PartPrompt", ["copy"]], ["PartOption", ["label"]], ["TrailRule", ["statementTemplate"]], ["TrailContext", ["phrase"]],
   ];
   let n = 0;
@@ -196,7 +196,7 @@ test("voice contract: every parts copy row passes the lint, the loader's gate co
   assert.equal(n, rows.length, "no row without a node behind it");
   const kinds = Object.fromEntries(rows.map((r) => [`${r.id}|${r.field}`, r.kind]));
   for (const o of nodes("PartOption")) assert.equal(kinds[`${o.id}|label`], o.kind, o.id);
-  for (const p of nodes("PartPrompt")) assert.equal(kinds[`${p.id}|copy`], p.copyKind === "keepsake" ? "keepsake" : "prompt", p.id);
+  for (const p of nodes("PartPrompt")) assert.equal(kinds[`${p.id}|copy`], p.copyKind ?? "prompt", p.id);
 });
 
 test("fragment widths fit the slots they fill (PARTS_SLOT_WIDTH)", () => {
@@ -206,9 +206,34 @@ test("fragment widths fit the slots they fill (PARTS_SLOT_WIDTH)", () => {
     fits(m.trailPhrase, "pull", `${m.id} trailPhrase`);
     fits(m.nameHint, "name", `${m.id} nameHint`);
   }
-  for (const h of fixture.hurts) fits(h.hurtPhrase, "hurt", `${h.id} hurtPhrase`);
+  for (const h of fixture.hurts) {
+    fits(h.hurtPhrase, "hurt", `${h.id} hurtPhrase`);
+    fits(h.matters, "matters", `${h.id} matters`);
+    fits(h.feltPhrase, "felt", `${h.id} feltPhrase`);
+  }
   for (const p of fixture.pairs) for (const w of p.bothWant) fits(w.label, "want", `${p.id} bothWant ${w.id}`);
   for (const c of fixture.contexts) fits(c.phrase, "context", `${c.id} phrase`);
+});
+
+test("the angry-part card: every line in both wordings, the plain one never says part, a matters per hurt", () => {
+  const angry = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "angry").map(([id]) => id);
+  const base = angry.filter((id) => !id.endsWith("_plain"));
+  assert.deepEqual(base, ["angry_unblend", "angry_unblend_sub", "angry_protects", "angry_vote", "angry_vote_noname",
+    "angry_vote_unsure", "angry_vote_unsure_noname", "angry_vote_2", "angry_vote_3", "angry_vote_3_noname", "angry_hold",
+    "angry_speak", "angry_speak_unsure", "angry_speak_line"]);
+  assert.deepEqual(angry.sort(), [...base, ...base.map((id) => `${id}_plain`)].sort(), "every X has an X_plain, and nothing else");
+  for (const id of angry.filter((x) => x.endsWith("_plain"))) {
+    assert.doesNotMatch(fixture.prompts[id].copy, /\bparts?\b/i, `${id}: parts off means no parts words`);
+  }
+  // The person's sentence is theirs: linted without voice_distance, with only {felt}.
+  for (const id of ["angry_speak_line", "angry_speak_line_plain"]) assert.equal(fixture.prompts[id].copyKind, "first_person", id);
+  assert.deepEqual(Object.values(fixture.options.angry).flat().map((o) => [o.id, o.label]),
+    [["angry_next", "Okay"], ["angry_not_sure", "Not sure"], ["angry_done", "Done"]]);
+  assert.equal(fixture.hurts.length, 6);
+  for (const h of fixture.hurts) assert.ok(h.matters?.trim(), `${h.id}: matters fills the vote of confidence`);
+  // Recover's events pre-order the chips; every one points at real hurts.
+  const hurtIds = new Set(fixture.hurts.map((h) => h.id));
+  for (const [ev, hs] of Object.entries(fixture.canTouch)) for (const h of hs) assert.ok(hurtIds.has(h), `${ev} → ${h}`);
 });
 
 test("safety pins", (t) => {
