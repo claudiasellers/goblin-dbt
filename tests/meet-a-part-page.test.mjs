@@ -305,6 +305,42 @@ test("a paused part (its check-back said Louder): one gentle line on the first r
   assert.match(page, /getPartsEntry\(entry\.partId\)/, "the gate is asked about this visit's part");
   assert.match(page, /if \(paused && !meetReady\(content\.parts, content\.rounds, \{ paused \}\)\) return null;/);
   assert.match(page, /\{paused && firstScreen && <p role="status" className=\{secondaryText\}>\{P\(PAUSED_PROMPT\)\}<\/p>\}/);
-  assert.doesNotMatch(page, /checkback/i, "the close offers no check-back question (none is built here yet)");
+  assert.match(page, /offerCheckback\(st, \{[^}]*paused \}\)/, "the close offers no check-back question for a paused part");
   assert.match(read("src/services/parts.ts"), /getPartsEntryFn\(partId \? \{ partId \} : \{\}\)/);
+});
+
+test("the check-back question at the close: kept or revisited, opened, shipped, type on; never after later, danger or a paused part", () => {
+  const spine = JSON.parse(read("src/data/content/spine.json")).content;
+  const type = spine.followUpTypes.find((t) => t.id === S.CHECKBACK_TYPE);
+  assert.ok(type, "lane 2's follow-up type ships");
+  const done = (session = {}, extra = {}) => ({ step: "done", later: false, session: { kept: true, partId: null, danger: false, ...session }, ...extra });
+  const o = { content: ALL, type: { ...type, enabled: true }, opened: true, paused: false };
+  assert.equal(S.offerCheckback(done(), o), true, "kept this visit");
+  assert.equal(S.offerCheckback(done({ kept: null, partId: PID }), o), true, "a visit to a part already kept");
+  assert.equal(S.offerCheckback(done({ kept: false }), o), false, "nothing to check back with");
+  assert.equal(S.offerCheckback(done({}, { step: "close" }), o), false, "only after the orienting close");
+  assert.equal(S.offerCheckback(done({}, { later: true }), o), false, "not after P2's later");
+  assert.equal(S.offerCheckback(done({ danger: true }), o), false, "not after a danger ending");
+  assert.equal(S.offerCheckback(done(), { ...o, paused: true }), false, "never for a paused part");
+  assert.equal(S.offerCheckback(done(), { ...o, opened: false }), false, "no record on the server");
+  assert.equal(S.offerCheckback(done(), { ...o, type: { ...type, enabled: false } }), false, "type off");
+  assert.equal(S.offerCheckback(done(), { ...o, type: null }), false);
+  assert.equal(S.offerCheckback(done(), { ...o, content: SHIPPED }), false, "copy not signed off (today)");
+  assert.equal(S.offerCheckback(done(), { ...o, content: partsFromFixture(fixture, (x) => x !== S.CHECKBACK_NO) }), false);
+  assert.deepEqual([fixture.prompts[S.CHECKBACK_PROMPT].copy, ...fixture.options.meet.close.map((x) => x.id)],
+    ["Check back with it tomorrow?", S.CHECKBACK_YES, S.CHECKBACK_NO]);
+
+  // Yes: due in the type's window (tomorrow 10:00 local).
+  const now = new Date(2026, 9, 16, 21, 0, 0);
+  const req = S.checkbackRequest(type, SID, PID, now);
+  const due = new Date(req.dueAt);
+  assert.deepEqual([due.getDate(), due.getHours(), due.getMinutes()], [17, 10, 0]);
+  assert.deepEqual(Object.keys(req).sort(), ["dueAt", "id", "sessionId"]);
+  assert.equal(S.checkbackRequest({ ...type, window: {} }, SID, PID, now), null);
+
+  const page = read("src/pages/tools/MeetAPart.tsx");
+  assert.match(page, /const askCheckback = offerCheckback\(st, \{ content: parts, type: checkType, opened, paused \}\);/);
+  assert.match(page, /id === CHECKBACK_YES \? checkbackRequest\(checkType, newId\(\), psId, new Date\(\)\) : null;/, "only the yes schedules");
+  assert.match(page, /if \(req\) enqueue\(async \(\) => \{ if \(await started\.current\) await schedulePartCheckback\(req\); \}\);/, "after the visit's saves and keep");
+  assert.match(page, /\{\(askCheckback \|\| checkback\) && \(<>\s*<Prompt>\{P\(CHECKBACK_PROMPT\)\}<\/Prompt>/);
 });
