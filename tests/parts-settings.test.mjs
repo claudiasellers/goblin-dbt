@@ -37,6 +37,8 @@ test("Privacy & Data: a real switch bound to partsEnabled, delete wired to delet
   assert.match(c, /aria-checked=\{enabled\}/);
   assert.match(c, /aria-describedby=\{blurbId\}/);
   assert.match(c, /await deleteMyParts\(\)/);
+  assert.match(c, /setFailed\(true\); \/\/ the confirm stays open/);
+  assert.match(c, /\{failed && <p role="status"[^>]*>\{copy\.settings_delete_failed\}<\/p>\}/);
   assert.match(c, /if \(!copy\) return null;/);
   // No visible string of its own: every line is a signed-off prompt.
   const text = [...c.matchAll(/>\s*([^<>{}]*[A-Za-z][^<>{}]*?)\s*<\//g)].map((m) => m[1]);

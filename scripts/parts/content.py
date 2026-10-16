@@ -458,6 +458,7 @@ PROMPTS = [
     ("settings_delete_yes", "settings", "delete", "Delete them"),
     ("settings_delete_no", "settings", "delete", "Keep them"),
     ("settings_delete_done", "settings", "delete", "Deleted."),
+    ("settings_delete_failed", "settings", "delete", "Couldn't delete them. Try again."),
 ]
 
 # Prompts in the person's own voice: the sentence they might say, so its "I" is theirs. Linted as
