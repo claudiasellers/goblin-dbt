@@ -8,7 +8,7 @@
 import type { PartsContent } from '../data/partsContentTypes';
 import type { PartStats, PartWhen } from '../data/partsTypes';
 import { fill } from './invalidationRecovery';
-import { flowReady } from './partsContent';
+import { surfaceReady, type SurfaceIds } from './partsContent';
 import { UNNAMED_PROMPTS } from './partTag';
 
 export const STATS_PROMPTS = [
@@ -20,13 +20,17 @@ export const WHEN_OPTIONS: Record<PartWhen, string> = {
 /** Everything Reflect's parts section says: its title, the stats lines, the unnamed parts' names. */
 export const REFLECT_PROMPTS = ['reflect_title', ...STATS_PROMPTS, ...UNNAMED_PROMPTS] as const;
 
-/** The stats lines' own gate (common/stats and the when options): Me's part card and Reflect share it. */
-export const statsReady = (content: PartsContent): boolean =>
-  flowReady(content, STATS_PROMPTS, Object.values(WHEN_OPTIONS));
+/** The stats lines (common/stats and the when options): what Me's part card requires. */
+export const STATS_REQUIRED: SurfaceIds = { prompts: STATS_PROMPTS, options: Object.values(WHEN_OPTIONS) };
+/** Reflect's parts section: the stats lines plus its title and the unnamed parts' names. */
+export const REFLECT_REQUIRED: SurfaceIds = { prompts: REFLECT_PROMPTS, options: STATS_REQUIRED.options };
 
-/** Reflect shows its parts section only when every line of it ships: the stats lines plus its own. */
+/** The stats lines' own gate: Me's part card uses it, and Reflect's builds on it. */
+export const statsReady = (content: PartsContent): boolean => surfaceReady(content, STATS_REQUIRED);
+
+/** Reflect shows its parts section only when every line of it ships. */
 export const reflectPartsReady = (content: PartsContent): boolean =>
-  statsReady(content) && flowReady(content, REFLECT_PROMPTS);
+  statsReady(content) && surfaceReady(content, REFLECT_REQUIRED);
 
 export interface PartStatLines {
   /** "Mostly evenings". */

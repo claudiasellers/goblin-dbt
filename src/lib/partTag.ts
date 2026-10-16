@@ -8,12 +8,15 @@ import type { ProfileSlices } from '../data/profileTypes';
 import type { ThenVsNow } from '../data/capacityTypes';
 import { REGIONS, type RegionId } from '../data/bodyFigure';
 import { fill } from './invalidationRecovery';
-import { flowReady } from './partsContent';
+import { surfaceReady, type SurfaceIds } from './partsContent';
 
 export const TAG_PROMPTS = ['tag_question', 'tag_new_later'] as const;
 export const TAG_OPTIONS = ['tag_new_one', 'tag_skip', 'tag_later_yes', 'tag_later_no'] as const;
 /** A kept part with no name (flow `common`, step `name`): for every surface that lists parts. */
 export const UNNAMED_PROMPTS = ['part_unnamed_place', 'part_unnamed'] as const;
+
+/** What the row's gate requires: its own lines and the unnamed parts' names (scripts/parts/review.mjs reads it). */
+export const TAG_ROW_REQUIRED: SurfaceIds = { prompts: [...TAG_PROMPTS, ...UNNAMED_PROMPTS], options: TAG_OPTIONS };
 
 /**
  * The tools whose close can show the row: every close that asks then-vs-now (src/lib/spine/close.ts
@@ -41,7 +44,7 @@ export function tagRowGate(g: {
   partsOn: boolean; toolId: string; thenVsNow: ThenVsNow | null | undefined; saved: boolean; content: PartsContent | null;
 }): boolean {
   return g.partsOn && g.saved && isTagRowTool(g.toolId) && !!g.thenVsNow && TAG_CLOSES.includes(g.thenVsNow)
-    && !!g.content && flowReady(g.content, [...TAG_PROMPTS, ...UNNAMED_PROMPTS], [...TAG_OPTIONS]);
+    && !!g.content && surfaceReady(g.content, TAG_ROW_REQUIRED);
 }
 
 export interface TagRowCopy { question: string; newOne: string; skip: string; later: string; yes: string; no: string }
