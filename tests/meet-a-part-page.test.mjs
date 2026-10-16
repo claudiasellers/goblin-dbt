@@ -92,7 +92,7 @@ test("entry: P2 first (flooded, orienting when dissociation is in the history, c
   assert.match(page, /startLater=\{st\.p2\?\.start === 'later'\}/, "the lib's start reaches BreakdownHandoff");
   assert.match(page, /\{entryCrisis && <CrisisBanner \/>\}\s*<BreakdownHandoff host=\{HOST\} band="flooded"/);
   assert.match(page, /S?P\(HEADS_UP_PROMPT\)/);
-  assert.match(page, /getPartsEntry\(\)\.then\(\(g\) => \{ if \(live\) setGate\(g\); \}\)\.catch\(\(\) => \{ if \(live\) setGate\(null\); \}\)/);
+  assert.match(page, /getPartsEntry\(entry\.partId\)\.then\(\(g\) => \{ if \(live\) setGate\(g\); \}\)\.catch\(\(\) => \{ if \(live\) setGate\(null\); \}\)/);
 });
 
 test("entry: router state, the first screen, and the starting move", () => {
@@ -279,4 +279,32 @@ test("too many parts lately: one line on the first real screen of a new part's v
   const page = read("src/pages/tools/MeetAPart.tsx");
   assert.match(page, /\{tooMany && firstScreen && promptCopy\(parts, TOO_MANY_PROMPT\) && <p role="status"/);
   assert.match(page, /setFirstScreen\(false\); setSt\(/, "gone after the first answer");
+});
+
+test("a paused part (its check-back said Louder): one gentle line on the first real screen, required only when paused; never a lock", () => {
+  const clear = { open: "clear", reasons: [] };
+  const kept = S.parseMeetEntry({ parts: { partId: PID } });
+  assert.equal(S.isPaused({ ...clear, paused: true }, kept), true);
+  assert.equal(S.isPaused(clear, kept), false);
+  assert.equal(S.isPaused(null, kept), false, "a failed gate call");
+  assert.equal(S.isPaused({ ...clear, paused: true }, S.parseMeetEntry({})), false, "only for the part this visit opens on");
+  assert.deepEqual(S.entryPlan({ ...clear, paused: true }), { open: "flow" }, "it never changes what opens");
+  assert.deepEqual(S.entryPlan({ open: "p2", band: "flooded", crisis: false, reasons: ["checkin_flooding"], paused: true }),
+    { open: "p2", band: "flooded", blank: false, crisis: false }, "P2 still comes first");
+
+  const p = fixture.prompts[S.PAUSED_PROMPT];
+  assert.deepEqual([p.flow, p.step, p.copy], ["meet", "entry", "Things got louder after last time. Going gently is fine, or come back another day."]);
+  assert.ok(!S.meetPromptIds().includes(S.PAUSED_PROMPT));
+  assert.ok(S.meetPromptIds({ paused: true }).includes(S.PAUSED_PROMPT));
+  const noLine = partsFromFixture(fixture, (x) => x !== S.PAUSED_PROMPT);
+  assert.equal(S.meetReady(noLine, ROUNDS), true, "an ordinary visit doesn't need it");
+  assert.equal(S.meetReady(noLine, ROUNDS, { paused: true }), false, "a paused visit does");
+  assert.equal(S.meetReady(ALL, ROUNDS, { paused: true }), true);
+
+  const page = read("src/pages/tools/MeetAPart.tsx");
+  assert.match(page, /getPartsEntry\(entry\.partId\)/, "the gate is asked about this visit's part");
+  assert.match(page, /if \(paused && !meetReady\(content\.parts, content\.rounds, \{ paused \}\)\) return null;/);
+  assert.match(page, /\{paused && firstScreen && <p role="status" className=\{secondaryText\}>\{P\(PAUSED_PROMPT\)\}<\/p>\}/);
+  assert.doesNotMatch(page, /checkback/i, "the close offers no check-back question (none is built here yet)");
+  assert.match(read("src/services/parts.ts"), /getPartsEntryFn\(partId \? \{ partId \} : \{\}\)/);
 });

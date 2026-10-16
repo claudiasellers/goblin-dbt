@@ -45,8 +45,12 @@ export const MEET_REQUIRED_OPTIONS: readonly string[] = [
   HEADS_UP_LOOK, HEADS_UP_GO_ON,
 ];
 
-/** Every prompt the visit can show, the heads-up included. */
-export const meetPromptIds = (): string[] => [HEADS_UP_PROMPT, ...Object.values(MEET_PROMPTS).flat()];
+/** The paused part's line (a kept part whose next-day check-back said Louder): shown only when paused. */
+export const PAUSED_PROMPT = 'paused_heads_up';
+
+/** Every prompt the visit can show, the heads-up included; the paused line only for a paused visit. */
+export const meetPromptIds = (opts: { paused?: boolean } = {}): string[] =>
+  [HEADS_UP_PROMPT, ...(opts.paused ? [PAUSED_PROMPT] : []), ...Object.values(MEET_PROMPTS).flat()];
 
 /** Shape it's forced choices take their two words a round from Find the feeling's signed-off copy. */
 export type ShapeRoundLabels = readonly (readonly [string, string])[];
@@ -60,8 +64,8 @@ export function shapeRoundsReady(rounds: unknown): rounds is ShapeRoundLabels {
  * True only when the whole visit can be shown: every prompt, every option step with at least one
  * option, the ids read directly, at least one move, a "Keep it" yes, and Shape it's words.
  */
-export function meetReady(content: PartsContent, rounds: unknown): boolean {
-  if (!flowReady(content, meetPromptIds(), MEET_REQUIRED_OPTIONS)) return false;
+export function meetReady(content: PartsContent, rounds: unknown, opts: { paused?: boolean } = {}): boolean {
+  if (!flowReady(content, meetPromptIds(opts), MEET_REQUIRED_OPTIONS)) return false;
   if (content.moves.length === 0 || !shapeRoundsReady(rounds)) return false;
   const steps = [...Object.values(MEET_OPTION_STEP), ['gate', 'dissociation'] as const];
   if (!steps.every((st) => st && stepOptions(content, st[0], st[1]).length > 0)) return false;
@@ -256,6 +260,14 @@ export const TOO_MANY_PROMPT = 'aftercare_too_many';
  */
 export function showTooMany(gate: PartsEntry | null, entry: MeetEntry): boolean {
   return gate?.tooMany === true && !entry.partId;
+}
+
+/**
+ * A visit to a paused part (getPartsEntry's `paused`, only ever for the part this visit opens on):
+ * the paused line on the first real screen, and no check-back question at the close. Never a lock.
+ */
+export function isPaused(gate: PartsEntry | null, entry: MeetEntry): boolean {
+  return gate?.paused === true && entry.partId !== null;
 }
 
 /** Where the last screen's Done goes: back to Me when the visit came from there, else home. */
