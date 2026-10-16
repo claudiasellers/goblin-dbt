@@ -34,7 +34,8 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     WITH p, collect(m.id) AS moveIds
     ORDER BY p.lastVisitedAt IS NULL, p.lastVisitedAt DESC, p.confirmedAt IS NULL, p.confirmedAt DESC, p.id LIMIT 50
     RETURN p {.id, .kind, .area, .status, .source, .name, .tender, .shapeSig, firstPlace: head(coalesce(p.places, [])),
-              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p, moveIds`,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt),
+              lastVisitedAt: toString(p.lastVisitedAt), pausedUntil: toString(p.pausedUntil)} AS p, moveIds`,
   partDetail: `MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
     MATCH (u)-[:HAS_PART]->(p:Part) WHERE p.status IN ['active', 'resting']
     OPTIONAL MATCH (p)-[:GUARDS]->(h:ProtectedHurt)
@@ -120,7 +121,7 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       return {
         id: String(p.id), name: strOrNull(p.name), status: meta.status === 'resting' ? 'resting' as const : 'active' as const,
         tender: p.tender === true, moveIds: strings(rec.get('moveIds'), true), firstPlace: strOrNull(p.firstPlace),
-        shapeSig: sig(p.shapeSig), meta,
+        shapeSig: sig(p.shapeSig), lastVisitedAt: strOrNull(p.lastVisitedAt), pausedUntil: strOrNull(p.pausedUntil), meta,
       };
     });
   },
