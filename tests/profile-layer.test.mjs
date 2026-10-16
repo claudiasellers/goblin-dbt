@@ -127,3 +127,10 @@ test("pattern offers (pure): 3 of the last 4 better within 30 days; cooldown; de
   assert.equal(offers.evaluateRule(good, rule, [offer({ toolId: "pause", offeredAt: ago(2) })], NOW), null, "one new offer a week app-wide");
   assert.ok(offers.evaluateRule(good, rule, [offer({ toolId: "pause", offeredAt: ago(8) })], NOW), "another tool after a week");
 });
+
+test("pattern offers (pure): Meet a part's \"more here\" is never what_helps evidence", () => {
+  const meet = [ses("a", 1, "much_better", "meet-a-part"), ses("b", 2, "better", "meet-a-part"), ses("c", 3, "better", "meet-a-part")];
+  assert.equal(offers.evaluateRule(meet, rule, [], NOW), null);
+  const mixed = [...meet, ses("d", 1, "better"), ses("e", 2, "better")];
+  assert.equal(offers.evaluateRule(mixed, rule, [], NOW), null, "its closes don't count toward another tool either");
+});

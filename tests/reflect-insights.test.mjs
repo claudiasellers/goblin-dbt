@@ -105,6 +105,15 @@ test("outcomeRows: better counts as went well, urge tools on their own question,
   for (const id of spine.RESERVED_TOOL_IDS) assert.equal(c.isAppTool(id), false, id);
 });
 
+test("outcomeRows: Meet a part's orienting close is never counted as went well (or at all)", () => {
+  const rows = c.outcomeRows([
+    session({ id: "1", toolId: "meet-a-part", d: 2, closeKind: "orienting", tvn: "much_better" }),
+    session({ id: "2", toolId: "five-senses", d: 1, closeKind: "orienting", tvn: "better" }),
+  ], []);
+  assert.deepEqual(rows.map((o) => o.toolId), ["five-senses"]);
+  assert.equal(c.toolEffectiveness(c.outcomeRows([session({ id: "1", toolId: "meet-a-part", d: 1, closeKind: "orienting", tvn: "better" })], [])), null);
+});
+
 test("toolEffectiveness: best share first, then most answered; direction from the latest spine close; at most 4", () => {
   const rows = c.outcomeRows([
     session({ id: "1", toolId: "cool-down", d: 5, closeKind: "regulation_down", tvn: "better" }),

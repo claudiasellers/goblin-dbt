@@ -22,11 +22,20 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'opposite-action': { module: 'er', closeKind: 'none' },
   'dear-man': { module: 'ie', closeKind: 'none' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
+  // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
+  'meet-a-part': { module: 'mf', closeKind: 'orienting' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },
 };
+
+/**
+ * Tools whose close is never evidence that something helped: no what_helps pattern offer, no
+ * "went well" in Insights, no "did it help?" card in Today, no compat ToolUsage outcome. "More here"
+ * after meeting a part is not the same claim as "it calmed me" (docs/design/parts.md).
+ */
+export const NOT_WHAT_HELPS: readonly string[] = ['meet-a-part'];
 
 /** Where the reserved ids may be opened from. */
 export const RESERVED_ENTRIES: Record<string, readonly ToolEntry[]> = {
