@@ -107,6 +107,41 @@ test('getMe: areas with items (set-aside kept), found words read-only, stale cou
   assert.deepEqual([me.version, me.name.firstName], [2, 'C']);
 });
 
+test('getMe: parts appear in my_parts only when parts are on; resting is not set aside', async () => {
+  const part = (id, status, extra = {}) => ({ label: 'Part', title: 'A part', stillTrue: 'Is {name} still doing the same job?', setAside: 'Set aside.', statement: null,
+    p: { id, kind: 'part', area: 'my_parts', status, source: 'made', name: `part ${id}`, revisitAt: '2020-01-01T00:00:00Z', ...extra } });
+  const run = async (partsOn) => {
+    const f = fakeDriver((q) => {
+      if (/AS partsOn/.test(q)) return [{ partsOn }];
+      if (/MATCH \(a:ProfileArea\)/.test(q)) return [
+        { id: 'my_patterns', label: 'My patterns', blurb: 'b', kinds: [] },
+        { id: 'my_parts', label: 'Parts of me', blurb: 'b', kinds: [{ id: 'part', label: 'A part' }] },
+      ];
+      // The fake ignores the query's own gate, so the server's second check is what's tested here.
+      if (/HAS_PROFILE_FACT\|HAS_PATTERN/.test(q)) return [part('p1', 'active'), part('p2', 'resting'), part('p3', 'set_aside')];
+      return [];
+    });
+    setDriver(f.driver);
+    return { me: await fns.getMe.run({ auth: auth(), data: {} }), f };
+  };
+  const off = await run(false);
+  assert.deepEqual(off.me.areas.map((a) => a.id), ['my_patterns'], 'no my_parts area');
+  assert.ok(!off.me.areas.some((a) => a.items.some((i) => i.label === 'Part')), 'no part items');
+  assert.equal(off.me.staleCount, 0, 'hidden parts are not counted as stale');
+  const items = off.f.calls.find((c) => /HAS_PART\]/.test(c.query));
+  assert.match(items.query, /WHERE type\(r\) <> 'HAS_PART' OR coalesce\(u\.partsEnabled, false\)/, 'gated in the query too');
+
+  const on = await run(true);
+  const area = on.me.areas.find((a) => a.id === 'my_parts');
+  assert.deepEqual(area.items.map((i) => [i.label, i.meta.id, i.meta.status, i.meta.prompt, i.summary]), [
+    ['Part', 'p1', 'active', 'ask', 'part p1'],
+    ['Part', 'p2', 'resting', 'ask', 'part p2'],
+    ['Part', 'p3', 'set_aside', 'none', 'part p3'],
+  ]);
+  assert.equal(area.items[0].meta.area, 'my_parts');
+  assert.equal(on.me.staleCount, 2);
+});
+
 test('getUserProfile (settings) strips internal, profile-layer and retired goal fields', async () => {
   setDriver(fakeDriver((q) => (/RETURN u \{\.\*\} AS user/.test(q)
     ? [{ user: { id: 'u1', theme: 'dark', profileVersion: 4, patternsEvaluatedAt: 'x', dailyCheckInGoal: 2, focusCategories: ['dt'], timeZone: 'Europe/London' } }] : [])).driver);
