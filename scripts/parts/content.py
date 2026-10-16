@@ -479,6 +479,8 @@ PROMPTS = [
     ("cope_anchor_noname", "dearman", "cope", "If that part shows up:"),
     ("cope_set_anchor", "dearman", "cope", "What would help if {name} shows up?"),
     ("cope_set_anchor_noname", "dearman", "cope", "What would help if that part shows up?"),
+    # Under Save when setPartAnchor fails; the form stays as it was (Claudia, 16 Oct).
+    ("cope_save_failed", "dearman", "cope", "Couldn't save that. Try again."),
     # DEAR MAN's debrief, after "Underneath that": who showed up. _named when prep's cope ahead chose a part
     # that is still kept and has a name (Yes / A bit / No, and the tag row's Skip); otherwise the general
     # form with the tag row's chips (tag_new_one, tag_skip, tag_new_later, tag_later_yes / _no, reused).

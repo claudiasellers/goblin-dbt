@@ -13,7 +13,7 @@ import {
 } from '../data/partsTypes';
 import type { MeItem, MePart, MePartCandidate } from '../services/profile';
 import { MEET_NAME_MAX } from './meetAPartSave';
-import { flowReady, stepOptions } from './partsContent';
+import { stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 
 /** Every line the area uses. It renders only when all are signed off. */
 export const PARTS_OF_ME_PROMPTS = [
@@ -22,10 +22,12 @@ export const PARTS_OF_ME_PROMPTS = [
   'card_rename', 'card_rest', 'card_back', 'card_set_aside', 'card_restore', 'card_tender', 'card_rename_save', 'card_cancel',
 ] as const;
 export type PartsOfMePromptId = (typeof PARTS_OF_ME_PROMPTS)[number];
+/** What the area's gate requires (scripts/parts/review.mjs reads it). */
+export const PARTS_OF_ME_REQUIRED: SurfaceIds = { prompts: PARTS_OF_ME_PROMPTS, options: [] };
 
 /** The area's copy by id, or null while any of it is missing (Me then renders as before). */
 export function partsOfMeCopy(content: PartsContent | null): Record<PartsOfMePromptId, string> | null {
-  if (!content || !flowReady(content, PARTS_OF_ME_PROMPTS)) return null;
+  if (!content || !surfaceReady(content, PARTS_OF_ME_REQUIRED)) return null;
   return Object.fromEntries(PARTS_OF_ME_PROMPTS.map((id) => [id, content.prompts[id].copy])) as Record<PartsOfMePromptId, string>;
 }
 
@@ -86,10 +88,12 @@ export const PART_CANDIDATE_PROMPTS = [
   'candidate_title', 'candidate_line', 'candidate_line_plain', 'candidate_go', 'candidate_dismiss',
 ] as const;
 export type PartCandidatePromptId = (typeof PART_CANDIDATE_PROMPTS)[number];
+/** What the list's gate requires. */
+export const PART_CANDIDATE_REQUIRED: SurfaceIds = { prompts: PART_CANDIDATE_PROMPTS, options: [] };
 
 /** The list's copy, or null while any of it is missing (the list then isn't shown). */
 export function partCandidateCopy(content: PartsContent | null): Record<PartCandidatePromptId, string> | null {
-  if (!content || !flowReady(content, PART_CANDIDATE_PROMPTS)) return null;
+  if (!content || !surfaceReady(content, PART_CANDIDATE_REQUIRED)) return null;
   return Object.fromEntries(PART_CANDIDATE_PROMPTS.map((id) => [id, content.prompts[id].copy])) as Record<PartCandidatePromptId, string>;
 }
 
@@ -179,6 +183,8 @@ export const PART_REVISIT_ANSWERS = {
   resting: [['revisit_still_quiet', 'still_quiet'], ['revisit_back', 'back']],
 } as const satisfies Record<'active' | 'resting', readonly (readonly [string, PartRevisitAnswer])[]>;
 export const PART_REVISIT_OPTIONS: readonly string[] = [...PART_REVISIT_ANSWERS.active, ...PART_REVISIT_ANSWERS.resting].map(([id]) => id);
+/** What the check-back's gate requires. */
+export const PART_REVISIT_REQUIRED: SurfaceIds = { prompts: PART_REVISIT_PROMPTS, options: PART_REVISIT_OPTIONS };
 
 export interface PartRevisitChoice { id: string; answer: PartRevisitAnswer; label: string }
 export interface PartRevisitCopy {
@@ -189,7 +195,7 @@ export interface PartRevisitCopy {
 
 /** The check-back's copy, or null while any of it is missing (the card then asks nothing yet). */
 export function partRevisitCopy(content: PartsContent | null): PartRevisitCopy | null {
-  if (!content || !flowReady(content, PART_REVISIT_PROMPTS, PART_REVISIT_OPTIONS)) return null;
+  if (!content || !surfaceReady(content, PART_REVISIT_REQUIRED)) return null;
   const label = new Map(stepOptions(content, 'me', 'revisit').map((o) => [o.id, o.label]));
   const choices = (rows: readonly (readonly [string, PartRevisitAnswer])[]) =>
     rows.map(([id, answer]) => ({ id, answer, label: label.get(id)! }));

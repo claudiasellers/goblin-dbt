@@ -751,17 +751,24 @@
    "copy": "What would help if that part shows up?",
    "reviewStatus": "draft"
   },
+  "cope_save_failed": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 5,
+   "copy": "Couldn't save that. Try again.",
+   "reviewStatus": "draft"
+  },
   "debrief_who": {
    "flow": "dearman",
    "step": "debrief",
-   "order": 5,
+   "order": 6,
    "copy": "Was one of your parts there?",
    "reviewStatus": "draft"
   },
   "debrief_who_named": {
    "flow": "dearman",
    "step": "debrief",
-   "order": 6,
+   "order": 7,
    "copy": "Did {name} show up?",
    "reviewStatus": "draft"
   },

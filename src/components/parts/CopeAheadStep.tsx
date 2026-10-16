@@ -19,7 +19,7 @@ const chipOn = 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] bord
  * would help if {name} shows up?", their kept lines (at most four, newest first) and In my words, then
  * Save (setPartAnchor). Not sure / Skip go on and write nothing. Every word is signed-off parts content
  * or the person's own; the host renders this only when `showCopeAhead` says so. A failed save keeps the
- * form, answerable (as the check-back card does).
+ * form as it was and says so under Save (cope_save_failed).
  */
 export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, onAnchor, onGoOn }: {
   content: PartsContent;
@@ -41,6 +41,8 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   const [ownOpen, setOwnOpen] = useState(false);
   const [ownText, setOwnText] = useState('');
   const [saving, setSaving] = useState(false);
+  /** The last save failed: cope_save_failed under Save until the next try. */
+  const [failed, setFailed] = useState(false);
 
   const title = promptCopy(content, 'cope_title') ?? '';
   const c = copeChips(content);
@@ -49,7 +51,7 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   const own = ownAnchor(ownText);
   const canSave = !saving && (lineId !== null || (ownOpen && own !== null));
 
-  const clearForm = () => { setEditing(false); setLineId(null); setOwnOpen(false); setOwnText(''); };
+  const clearForm = () => { setEditing(false); setLineId(null); setOwnOpen(false); setOwnText(''); setFailed(false); };
   const pick = (id: string) => { clearForm(); onPick(id); };
   const goOn = () => { clearForm(); onPick(null); onGoOn(); };
 
@@ -59,12 +61,14 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
     const text = line ? line.text : own;
     if (!text) return;
     setSaving(true);
+    setFailed(false);
     try {
       const res = await setPartAnchor(line ? { partId: part.id, lineId: line.lineId } : { partId: part.id, own: text });
       onAnchor(part.id, text, res.version);
       clearForm();
     } catch {
-      // Not saved: the form stays, answerable.
+      // Not saved: the form stays as it was, answerable, with the line under Save.
+      setFailed(true);
     } finally {
       setSaving(false);
     }
@@ -139,6 +143,11 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
               className="w-full min-h-11 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary disabled:opacity-50">
               {c.cope_save.label}
             </button>
+          )}
+          {failed && (
+            <p role="alert" data-testid="cope-save-failed" className="text-sm text-[var(--color-text-secondary)]">
+              {promptCopy(content, 'cope_save_failed')}
+            </p>
           )}
         </div>
       )}

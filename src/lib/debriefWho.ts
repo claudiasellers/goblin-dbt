@@ -10,7 +10,7 @@
 import type { PartsContent } from '../data/partsContentTypes';
 import type { ProfileSlices } from '../data/profileTypes';
 import type { TagPartRequest, TagStrength } from '../data/partsTypes';
-import { flowReady } from './partsContent';
+import { surfaceReady, type SurfaceIds } from './partsContent';
 import { TAG_OPTIONS, TAG_PROMPTS, UNNAMED_PROMPTS } from './partTag';
 
 export const DEBRIEF_PROMPTS = ['debrief_who', 'debrief_who_named'] as const;
@@ -19,8 +19,13 @@ export type WhoShowedUp = 'yes' | 'a_bit' | 'no';
 const ANSWER: Record<(typeof DEBRIEF_OPTIONS)[number], WhoShowedUp> = { debrief_yes: 'yes', debrief_a_bit: 'a_bit', debrief_no: 'no' };
 
 /** Both forms' lines: the screen's own, and the tag row's (reused, not duplicated) with the unnamed names. */
+export const DEBRIEF_WHO_REQUIRED: SurfaceIds = {
+  prompts: [...DEBRIEF_PROMPTS, ...TAG_PROMPTS, ...UNNAMED_PROMPTS],
+  options: [...DEBRIEF_OPTIONS, ...TAG_OPTIONS],
+};
+
 export function debriefWhoReady(content: PartsContent | null): boolean {
-  return !!content && flowReady(content, [...DEBRIEF_PROMPTS, ...TAG_PROMPTS, ...UNNAMED_PROMPTS], [...DEBRIEF_OPTIONS, ...TAG_OPTIONS]);
+  return !!content && surfaceReady(content, DEBRIEF_WHO_REQUIRED);
 }
 
 /** Parts on, at least one kept part (the slice holds active and resting only), and the copy shipped. */

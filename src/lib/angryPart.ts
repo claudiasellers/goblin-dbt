@@ -9,7 +9,7 @@ import {
 } from '../data/partsTypes';
 import type { PartsContent } from '../data/partsContentTypes';
 import { fill } from './invalidationRecovery';
-import { flowReady } from './partsContent';
+import { surfaceReady, type SurfaceIds } from './partsContent';
 
 /** The card is for the fire back urge: its move's OFTEN_GUARDS order is the chips' default order. */
 export const ANGRY_MOVE = 'hit_back';
@@ -23,6 +23,12 @@ export const angryNotNowId = (partsOn: boolean): AngryNotNowId => (partsOn ? ANG
 /** The option ids the card shows for one wording: the shared ones and that wording's "Not now". */
 export const angryOptionIds = (partsOn: boolean): string[] => [...ANGRY_OPTIONS, angryNotNowId(partsOn)];
 
+/** What the card's gate requires for one wording (scripts/parts/review.mjs reads both). */
+export const angryRequired = (partsOn: boolean): SurfaceIds => ({ prompts: angryPromptIds(partsOn), options: angryOptionIds(partsOn) });
+
+/** "Spend a minute with it later?" (parts on only): the ask and what replaces it. */
+export const ANGRY_LATER_REQUIRED: SurfaceIds = { prompts: [ANGRY_LATER_DONE], options: [ANGRY_LATER] };
+
 /** A hurt the card can offer: its chip, its vote of confidence and its sentence all have words. */
 const complete = (h: AngryContentHurt) => Boolean(h.label?.trim() && h.matters?.trim() && h.feltPhrase?.trim());
 
@@ -33,7 +39,7 @@ const complete = (h: AngryContentHurt) => Boolean(h.label?.trim() && h.matters?.
  * shows without its own way past.
  */
 export function angryReady(content: PartsContent, partsOn: boolean): boolean {
-  return flowReady(content, angryPromptIds(partsOn), angryOptionIds(partsOn)) && content.hurts.length > 0 && content.hurts.every(complete);
+  return surfaceReady(content, angryRequired(partsOn)) && content.hurts.length > 0 && content.hurts.every(complete);
 }
 
 /**
@@ -41,7 +47,7 @@ export function angryReady(content: PartsContent, partsOn: boolean): boolean {
  * (the ask and what replaces it). Null otherwise, and the screen is as it was.
  */
 export function angryLaterCopy(content: PartsContent, partsOn: boolean): AngryLaterCopy | null {
-  if (!partsOn || !flowReady(content, [ANGRY_LATER_DONE], [ANGRY_LATER])) return null;
+  if (!partsOn || !surfaceReady(content, ANGRY_LATER_REQUIRED)) return null;
   const ask = Object.values(content.options.angry ?? {}).flat().find((o) => o.id === ANGRY_LATER)?.label?.trim();
   const done = content.prompts[ANGRY_LATER_DONE]?.copy?.trim();
   return ask && done ? { ask, done } : null;

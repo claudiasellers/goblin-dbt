@@ -2,8 +2,8 @@ import { useEffect, useId, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPartsContent } from '../../services/partsContent';
 import { deleteMyParts } from '../../services/parts';
-import { partsSettingsCopy, type PartsSettingsPromptId } from '../../lib/partsSettings';
-import { promptCopy } from '../../lib/partsContent';
+import { SETTINGS_LINK_REQUIRED, partsSettingsCopy, type PartsSettingsPromptId } from '../../lib/partsSettings';
+import { surfaceReady } from '../../lib/partsContent';
 import { settingsMeetLink } from '../../lib/partsOfMe';
 import { useToolGate } from '../../hooks/useToolGate';
 
@@ -32,7 +32,7 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
     getPartsContent().then((c) => {
       if (!live) return;
       setCopy(partsSettingsCopy(c));
-      setGetToKnow(c ? promptCopy(c, 'me_get_to_know') : null);
+      setGetToKnow(c && surfaceReady(c, SETTINGS_LINK_REQUIRED) ? c.prompts[SETTINGS_LINK_REQUIRED.prompts[0]].copy : null);
     }).catch(() => { /* stays hidden */ });
     return () => { live = false; };
   }, []);
