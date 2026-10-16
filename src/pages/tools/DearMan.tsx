@@ -23,6 +23,8 @@ import type { CapacityReading, HandoffResult } from '../../data/capacityTypes';
 import { useBand } from '../../hooks/useBand';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
+import { DebriefWho } from '../../components/parts/DebriefWho';
+import { debriefWhoReady, showDebriefWho } from '../../lib/debriefWho';
 import { handoffExt, makeReading } from '../../lib/bandStore';
 import { dropResumeToken, peekResumeToken } from '../../lib/resumeToken';
 import { scheduleResumeLater } from '../../services/capacity';
@@ -58,6 +60,7 @@ type Phase =
   | 'debrief-body'
   | 'debrief-thought'
   | 'debrief-underneath'
+  | 'debrief-parts'
   | 'debrief-reflection'
   | 'debrief-cope-select'
   | 'debrief-rehearsal'
@@ -351,6 +354,14 @@ export function DearMan() {
     ? { lead: anchorLead(copeCopy, copePart.name), anchor: copeAnchorMap[copePart.id] }
     : null;
 
+  // Debrief, after "Underneath that": who showed up? (src/lib/debriefWho.ts). Its own step: parts on, a
+  // kept part, the copy shipped; P2 ('handoff') is another step and the too-much overlay is never on the
+  // debrief, so neither can be open over it. Named when this visit's prep chose a part (copeAheadPartId).
+  const whoShown = showDebriefWho({ partsOn, partCount: copeSlices?.parts.length ?? 0, ready: debriefWhoReady(copeCopy) });
+  useEffect(() => {
+    if (phase === 'debrief-parts' && !whoShown && !copePending) setPhase('debrief-reflection');
+  }, [phase, whoShown, copePending]);
+
   // ── Pre-fill feelings from check-in emotions ──
   useEffect(() => {
     if (content && checkinEmotions?.length) {
@@ -452,7 +463,8 @@ export function DearMan() {
       case 'debrief-body': setPhase('debrief-response'); break;
       case 'debrief-thought': setPhase('debrief-body'); break;
       case 'debrief-underneath': setPhase('debrief-thought'); break;
-      case 'debrief-reflection': setPhase('debrief-underneath'); break;
+      case 'debrief-parts': setPhase('debrief-underneath'); break;
+      case 'debrief-reflection': setPhase(whoShown ? 'debrief-parts' : 'debrief-underneath'); break;
       case 'debrief-cope-select': setPhase('debrief-reflection'); break;
       case 'debrief-rehearsal': setPhase('debrief-cope-select'); break;
       case 'debrief-moment-plan': setPhase('debrief-rehearsal'); break;
@@ -2097,11 +2109,23 @@ export function DearMan() {
             })}
           </div>
           {underneathIds.length > 0 && (
-            <button onClick={() => setPhase('debrief-reflection')}
+            <button onClick={() => setPhase(whoShown || copePending ? 'debrief-parts' : 'debrief-reflection')}
               className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
               Continue
             </button>
           )}
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: WHO SHOWED UP (parts on) ───
+    if (phase === 'debrief-parts') {
+      if (!whoShown || !copeCopy || !copeSlices) return null;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <DebriefWho content={copeCopy} parts={copeSlices.parts} copeAheadPartId={copeAheadPartId} toolSessionId={session.id}
+            onAnswer={(a) => session.setExt({ er: { whoShowedUp: a } })} onDone={() => setPhase('debrief-reflection')} />
         </div>
       );
     }

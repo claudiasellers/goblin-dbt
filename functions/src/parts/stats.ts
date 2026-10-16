@@ -30,7 +30,7 @@ export interface StatsPartRow {
   firstPlace: string | null;
   shapeSig: number[] | null;
 }
-/** One PartTag: the tagged ToolSession's tool and when the tag was made. */
+/** One close PartTag (statsQueries.ts reads no other source): the tagged ToolSession's tool and when the tag was made. */
 export interface StatsTagRow { partId: string; toolId: string; at: string }
 /**
  * One Meet a part visit of the part with a feel-toward answer: only its FIRST answer (how they arrived,

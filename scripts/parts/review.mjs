@@ -58,7 +58,9 @@ export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } 
 export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
+export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
+export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -131,13 +133,21 @@ export function surfaces(g) {
     },
     {
       id: 'dearman', title: 'DEAR MAN',
-      where: 'DEAR MAN prep, with parts on and a kept part: "Who might show up in this conversation?", then that part\'s anchor before the script.',
-      groups: [{ label: null, ids: g.COPE_REQUIRED }],
+      where: 'DEAR MAN prep, with parts on and a kept part: "Who might show up in this conversation?", then that part\'s anchor before the script; and in the debrief, who showed up.',
+      groups: [
+        { label: null, ids: g.COPE_REQUIRED },
+        { label: 'The debrief, after "Underneath that": "Did {name} show up?" when prep chose that part, else "Was one of your parts there?" with the tag row\'s chips', ids: g.DEBRIEF_WHO_REQUIRED },
+      ],
     },
     {
       id: 'ps', title: 'Problem Solve',
       where: 'In Problem Solve, with parts on, after the "Part of me doesn\'t actually want this to change" barrier and its answer: one quiet line offering to come back to that part another time (a yes queues it in Me\'s "To come back to"). It never opens a parts flow mid-tool.',
       groups: [{ label: null, ids: g.PS_LATER_REQUIRED }],
+    },
+    {
+      id: 'oa', title: 'Do the Opposite',
+      where: 'In Do the Opposite, with parts on, on the check\'s "will it help you move toward your goal" card, above the question: two quiet lines setting the pull beside the goal the person picked, when the picked urge EXPRESSES an offerable move that isn\'t a safety-line move (never for "My urge is different", never while P2 is open). {move} is the move\'s `unblendPhrase` (the unblend line\'s); {goal} is Do the Opposite\'s own goal label with its first letter lower-cased ("You want to stay connected."). It also needs the move and the urge\'s EXPRESSES edge signed off (see The vocabulary).',
+      groups: [{ label: null, ids: g.OA_GOAL_LINE_REQUIRED }],
     },
   ];
 }
@@ -155,6 +165,8 @@ export const POLICY_NOTES = {
   tooManyPartsCount: 'This many parts made (with the next number) shows "You don\'t need to get to know everyone at once."',
   tooManyPartsDays: '… within this many days.',
   nameMaxChars: 'The longest name a person can give a part.',
+  harmWindowDays: 'The harm signals (functions/src/parts/harm.ts, scripts/parts/report.cypher) look back this many days.',
+  tenderRepeatCount: 'This many tender / own-words stops, or not-Self endings, in that window is a harm signal (pauses offers, goes to review).',
 };
 
 const esc = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');

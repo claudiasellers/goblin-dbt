@@ -1,27 +1,31 @@
 /**
- * tagPart (docs/design/parts.md, "Was this a part you know?"): the person's own recognition, after a
- * better close: then-vs-now better or much better, or an urge close answered Held off (Pause, Urge
- * Surfing: holding off is their better close). Writes one `:PartTag:UserData:LogRecord` (source 'close') with
- * `(:User)-[:HAS_PART_TAG]->`, `(:PartTag)-[:TAGS]->(:ToolSession)` and `(:PartTag)-[:OF_PART]->(:Part)`.
- * Edges run out of the new tag only: the ToolSession is finalised and the Part is profile data, so
- * neither is written (keepPart stays the only Part writer).
+ * tagPart (docs/design/parts.md, "Was this a part you know?"): the person's own recognition of a part in
+ * a ToolSession. Writes one `:PartTag:UserData:LogRecord` with `(:User)-[:HAS_PART_TAG]->`,
+ * `(:PartTag)-[:TAGS]->(:ToolSession)` and `(:PartTag)-[:OF_PART]->(:Part)`. Edges run out of the new tag
+ * only: the ToolSession may be finalised and the Part is profile data, so neither is written (keepPart
+ * stays the only Part writer). Two sources:
  *
- * The server enforces what the row's gate does: parts on; the part the caller's and active or resting;
- * the ToolSession the caller's, closed, with then-vs-now better or much better or actedOnUrge 'no',
- * and not Meet a part. Partly, went ahead, still deciding, same and worse are all refused.
+ * - `close` (the default; the tag row after a better close): the ToolSession the caller's, closed, with
+ *   then-vs-now better or much better or actedOnUrge 'no' (Pause, Urge Surfing: holding off is their
+ *   better close), and not Meet a part. Partly, went ahead, still deciding, same and worse are refused.
+ * - `debrief` (DEAR MAN's debrief, "Did {name} show up?" / "Was one of your parts there?"): the
+ *   ToolSession the caller's and DEAR MAN's, open or closed, with `strength` 'yes' or 'a_bit'. It says
+ *   the part was there, not that a tool helped it settle, so the stats' *helped* never counts it.
  *
- * One tag per ToolSession: the state read returns the session's existing tag, and a call for a
- * session already tagged (any id, any part) returns that first tag and writes nothing. Two calls
- * racing past that read are stopped by the `part_tag_tagged_key` uniqueness constraint on
- * `PartTag.taggedKey` (the tagged record's key): the loser's transaction fails, and the callable reads
- * again and returns the winner's tag.
+ * Both: parts on; the part the caller's and active or resting.
+ *
+ * One tag per ToolSession per source: the state read returns the session's existing tag of that source,
+ * and a repeat (any id, any part) returns it and writes nothing. Two calls racing past that read are
+ * stopped by the `part_tag_tagged_key` uniqueness constraint on `PartTag.taggedKey`: the session's key for
+ * a close tag (as before), `<session key>:debrief` for a debrief tag, so one of each can coexist. The
+ * loser's transaction fails, and the callable reads again and returns the winner's tag.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
 import { ValidationError, obj, uuid } from '../shared/validate';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import { partsOff } from './keep';
-import type { TagPartRequest, TagPartResponse } from './tagTypes';
+import { TAG_SOURCES, TAG_STRENGTHS, type TagPartRequest, type TagPartResponse, type TagSource, type TagStrength } from './tagTypes';
 
 /** Then-vs-now answers that count as "it helped" (the what_helps line). */
 export const TAG_CLOSES = ['better', 'much_better'] as const;
@@ -29,18 +33,31 @@ export const TAG_CLOSES = ['better', 'much_better'] as const;
 export const TAG_URGE_CLOSES = ['no'] as const;
 /** Tools whose close never shows the row (Meet a part is the part itself). */
 export const TAG_NEVER_TOOLS = ['meet-a-part'] as const;
+/** The tools a debrief tag may name: DEAR MAN's debrief only. */
+export const TAG_DEBRIEF_TOOLS = ['dear-man'] as const;
 
-export function validateTag(raw: unknown): TagPartRequest {
+/** The constraint's key: a close tag keeps the session's key (as before); other sources add theirs. */
+export const taggedKeyOf = (sessionKey: string, source: TagSource): string => (source === 'close' ? sessionKey : `${sessionKey}:${source}`);
+
+export function validateTag(raw: unknown): TagPartRequest & { source: TagSource } {
   const o = obj(raw);
-  for (const k of Object.keys(o)) if (!['id', 'partId', 'toolSessionId'].includes(k)) throw new ValidationError(`${k}: not accepted`);
-  return { id: uuid(o.id), partId: uuid(o.partId), toolSessionId: uuid(o.toolSessionId) };
+  for (const k of Object.keys(o)) if (!['id', 'partId', 'toolSessionId', 'source', 'strength'].includes(k)) throw new ValidationError(`${k}: not accepted`);
+  const source = o.source === undefined ? 'close' : o.source;
+  if (!(TAG_SOURCES as readonly unknown[]).includes(source)) throw new ValidationError('source: close or debrief');
+  const base = { id: uuid(o.id), partId: uuid(o.partId), toolSessionId: uuid(o.toolSessionId) };
+  if (source === 'close') {
+    if (o.strength !== undefined) throw new ValidationError('strength: debrief tags only');
+    return { ...base, source: 'close' };
+  }
+  if (!(TAG_STRENGTHS as readonly unknown[]).includes(o.strength)) throw new ValidationError('strength: yes or a_bit');
+  return { ...base, source: source as TagSource, strength: o.strength as TagStrength };
 }
 
 export const TAG_STATE_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
   OPTIONAL MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey})
   OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
-  OPTIONAL MATCH (u)-[:HAS_PART_TAG]->(prev:PartTag)-[:TAGS]->(ts)
+  OPTIONAL MATCH (u)-[:HAS_PART_TAG]->(prev:PartTag {taggedKey: $taggedKey})-[:TAGS]->(ts)
   WITH u, pt, ts, prev ORDER BY prev.createdAt
   RETURN coalesce(u.partsEnabled, false) AS partsOn, pt.status AS partStatus,
          ts IS NOT NULL AS sessionFound, ts.status AS sessionStatus, ts.thenVsNow AS thenVsNow,
@@ -48,17 +65,19 @@ export const TAG_STATE_QUERY = `
          collect(prev.id)[0] AS existingId
 `;
 
-/** MERGE on key; the ToolSession and the Part are only matched, never set. */
+/** MERGE on key; the ToolSession and the Part are only matched, never set. Each source's own guard. */
 export const TAG_QUERY = `
   ${MERGE_USER}
   WITH u
   MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
-  WHERE coalesce(u.partsEnabled, false) AND ts.status <> 'open'
-    AND (ts.thenVsNow IN $closes OR ts.actedOnUrge IN $urgeCloses) AND NOT ts.toolId IN $never
+  WHERE coalesce(u.partsEnabled, false) AND (
+    ($source = 'close' AND ts.status <> 'open'
+      AND (ts.thenVsNow IN $closes OR ts.actedOnUrge IN $urgeCloses) AND NOT ts.toolId IN $never)
+    OR ($source = 'debrief' AND ts.toolId IN $debriefTools))
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey}) WHERE pt.status IN ['active', 'resting']
   MERGE (t:PartTag {key: $key})
   ON CREATE SET t:UserData:LogRecord, t.id = $id, t.ownerId = $uid, t.createdAt = datetime(), t.schemaVersion = 1,
-    t.at = datetime(), t.source = 'close', t.taggedKey = $sessionKey
+    t.at = datetime(), t.source = $source, t.taggedKey = $taggedKey, t.strength = $strength
   MERGE (u)-[:HAS_PART_TAG]->(t)
   MERGE (t)-[:TAGS]->(ts)
   MERGE (t)-[:OF_PART]->(pt)
@@ -77,32 +96,43 @@ export interface TagState {
   existingId: string | null;
 }
 
+type TagInput = TagPartRequest & { source: TagSource };
+
 export interface TagDeps {
-  state(t: TagPartRequest): Promise<TagState>;
+  state(t: TagInput): Promise<TagState>;
   /** The guarded write; false when the guard stopped it. */
-  write(t: TagPartRequest): Promise<boolean>;
+  write(t: TagInput): Promise<boolean>;
 }
 
-export async function tagPartHandler(t: TagPartRequest, deps: TagDeps): Promise<TagPartResponse> {
+export async function tagPartHandler(t: TagInput, deps: TagDeps): Promise<TagPartResponse> {
   const st = await deps.state(t);
   if (!st.partsOn) throw partsOff();
   if (!st.sessionFound) throw new HttpsError('not-found', 'Session not found');
   if (st.existingId) return { id: st.existingId, created: false };
-  if (st.sessionStatus === 'open') throw new HttpsError('failed-precondition', 'That session is still open');
-  const better = (TAG_CLOSES as readonly (string | null)[]).includes(st.thenVsNow)
-    || (TAG_URGE_CLOSES as readonly (string | null)[]).includes(st.actedOnUrge);
-  if (!better) throw new HttpsError('failed-precondition', 'Only after a better close');
-  if ((TAG_NEVER_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
+  if (t.source === 'debrief') {
+    // DEAR MAN's debrief: its own session, open or closed; no close answer asked.
+    if (!(TAG_DEBRIEF_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
+  } else {
+    if (st.sessionStatus === 'open') throw new HttpsError('failed-precondition', 'That session is still open');
+    const better = (TAG_CLOSES as readonly (string | null)[]).includes(st.thenVsNow)
+      || (TAG_URGE_CLOSES as readonly (string | null)[]).includes(st.actedOnUrge);
+    if (!better) throw new HttpsError('failed-precondition', 'Only after a better close');
+    if ((TAG_NEVER_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
+  }
   if (st.partStatus !== 'active' && st.partStatus !== 'resting') throw new HttpsError('not-found', 'Part not found');
   if (!(await deps.write(t))) throw new HttpsError('failed-precondition', 'Could not tag that');
   return { id: t.id, created: true };
 }
 
 export function tagDeps(tx: ManagedTransaction, uid: string, email: string | null): TagDeps {
-  const params = (t: TagPartRequest) => ({
-    uid, email, id: t.id, key: userKey(uid, t.id), partKey: userKey(uid, t.partId), sessionKey: userKey(uid, t.toolSessionId),
-    closes: [...TAG_CLOSES], urgeCloses: [...TAG_URGE_CLOSES], never: [...TAG_NEVER_TOOLS],
-  });
+  const params = (t: TagInput) => {
+    const sessionKey = userKey(uid, t.toolSessionId);
+    return {
+      uid, email, id: t.id, key: userKey(uid, t.id), partKey: userKey(uid, t.partId), sessionKey,
+      source: t.source, taggedKey: taggedKeyOf(sessionKey, t.source), strength: t.strength ?? null,
+      closes: [...TAG_CLOSES], urgeCloses: [...TAG_URGE_CLOSES], never: [...TAG_NEVER_TOOLS], debriefTools: [...TAG_DEBRIEF_TOOLS],
+    };
+  };
   const s = (v: unknown) => (typeof v === 'string' ? v : null);
   return {
     async state(t) {

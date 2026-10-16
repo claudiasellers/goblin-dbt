@@ -481,6 +481,19 @@ PROMPTS = [
     ("cope_set_anchor_noname", "dearman", "cope", "What would help if that part shows up?"),
     # Under Save when setPartAnchor fails; the form stays as it was (Claudia, 16 Oct).
     ("cope_save_failed", "dearman", "cope", "Couldn't save that. Try again."),
+    # DEAR MAN's debrief, after "Underneath that": who showed up. _named when prep's cope ahead chose a part
+    # that is still kept and has a name (Yes / A bit / No, and the tag row's Skip); otherwise the general
+    # form with the tag row's chips (tag_new_one, tag_skip, tag_new_later, tag_later_yes / _no, reused).
+    ("debrief_who", "dearman", "debrief", "Was one of your parts there?"),
+    ("debrief_who_named", "dearman", "debrief", "Did {name} show up?"),
+    # Do the Opposite's goal line (parts.md, the Do the Opposite row): on the check's effectiveness card,
+    # above its question, parts on only, when the picked urge EXPRESSES an offerable move that is not a
+    # safety-line move and a goal was picked. {move} is the move's unblendPhrase (the unblend line's, so the
+    # pull reads the same and "it" never lacks a referent); {goal} is OA's own goal
+    # label, first letter lower-cased (OA's content, never copied here). No {hurt}: nothing in the visit
+    # says what this part fears, so the line gives positive intent instead of a guess.
+    ("oa_goal_part", "oa", "goal", "A part of you {move}, and it's trying to help."),
+    ("oa_goal_you", "oa", "goal", "You want to {goal}."),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
     # The blending check (Claudia, 16 Oct: the flood signal at a parts flow's entry). It asks how close
@@ -774,6 +787,10 @@ OPTIONS = [
     opt("cope_own", "dearman", "cope", "In my words", branch="own_words"),
     opt("cope_change", "dearman", "cope", "Change it"),
     opt("cope_save", "dearman", "cope", "Save"),
+    # "Did {name} show up?": Yes and A bit write a debrief PartTag (strength), No writes nothing
+    opt("debrief_yes", "dearman", "debrief", "Yes"),
+    opt("debrief_a_bit", "dearman", "debrief", "A bit"),
+    opt("debrief_no", "dearman", "debrief", "No", branch="end"),
 
     # --- Gates ---
     opt("far_away_look", "gate", "dissociation", "Look around the room first", branch="grounding"),
@@ -890,5 +907,7 @@ POLICY = dict(
     maxNonSelfAnswers=2,        # a second non-Self-like answer at feel-toward ends the session kindly
     tooManyPartsCount=3,        # this many parts made …
     tooManyPartsDays=7,         # … in this many days: one line, "You don't need to get to know everyone at once."
+    harmWindowDays=28,          # the harm signals (functions/src/parts/harm.ts, scripts/parts/report.cypher) look back this far
+    tenderRepeatCount=2,        # this many tender / own-words stops (or not-Self endings) in the window is a harm signal
     nameMaxChars=40,
 )

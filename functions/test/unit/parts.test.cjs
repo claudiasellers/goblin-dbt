@@ -743,8 +743,14 @@ const T = require('../../lib/parts/tag');
 const TAG = '8e2c9a0e-1b2c-4d5e-8f90-123456789abc';
 const TAG2 = '9f2c9a0e-1b2c-4d5e-8f90-123456789abc';
 
-test('validateTag: three uuids, nothing else', () => {
-  assert.deepEqual(T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID }), { id: TAG, partId: PID, toolSessionId: TSID });
+test('validateTag: three uuids, a source (close by default), strength for a debrief only', () => {
+  assert.deepEqual(T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID }), { id: TAG, partId: PID, toolSessionId: TSID, source: 'close' });
+  assert.deepEqual(T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'debrief', strength: 'a_bit' }),
+    { id: TAG, partId: PID, toolSessionId: TSID, source: 'debrief', strength: 'a_bit' });
+  bad(() => T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'debrief' }));           // no strength
+  bad(() => T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'debrief', strength: 'no' })); // No writes nothing
+  bad(() => T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, strength: 'yes' }));             // a close tag has none
+  bad(() => T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'checkin' }));
   bad(() => T.validateTag({ id: TAG, partId: PID }));
   bad(() => T.validateTag({ id: TAG, partId: 'hide', toolSessionId: TSID }));
   bad(() => T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, thenVsNow: 'better' }));
@@ -789,14 +795,62 @@ test('tagPart: refusals before any write; one tag per session', async () => {
   await assert.rejects(T.tagPartHandler(req, fake({}, false).deps), code('failed-precondition'));
 });
 
+test('tagPart debrief: DEAR MAN only, open or closed, no close answer; one per session per source; strength stored', async () => {
+  const good = { partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'open', thenVsNow: null, actedOnUrge: null, toolId: 'dear-man', existingId: null };
+  const fake = (st, wrote = true) => {
+    const log = [];
+    return { log, deps: { state: async (t) => { log.push(['state', t]); return { ...good, ...st }; }, write: async (t) => { log.push(['write', t]); return wrote; } } };
+  };
+  const req = T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'debrief', strength: 'yes' });
+  for (const st of [{}, { sessionStatus: 'completed' }, { sessionStatus: 'exited_early', thenVsNow: 'worse' }]) {
+    const f = fake(st);
+    assert.deepEqual(await T.tagPartHandler(req, f.deps), { id: TAG, created: true }, JSON.stringify(st));
+    assert.equal(f.log.filter(([k]) => k === 'write').length, 1);
+  }
+  for (const [st, c] of [
+    [{ toolId: 'five-senses' }, 'failed-precondition'],
+    [{ toolId: 'meet-a-part' }, 'failed-precondition'],
+    [{ partsOn: false }, 'failed-precondition'],
+    [{ sessionFound: false }, 'not-found'],
+    [{ partStatus: 'set_aside' }, 'not-found'],
+  ]) {
+    const f = fake(st);
+    await assert.rejects(T.tagPartHandler(req, f.deps), code(c), JSON.stringify(st));
+    assert.equal(f.log.filter(([k]) => k === 'write').length, 0);
+  }
+  // Already a debrief tag on this session: the first one, nothing written.
+  const again = fake({ existingId: TAG2 });
+  assert.deepEqual(await T.tagPartHandler(req, again.deps), { id: TAG2, created: false });
+  assert.equal(again.log.filter(([k]) => k === 'write').length, 0);
+  // The write's parameters: the debrief's own taggedKey (a close tag on the same session can coexist), strength.
+  let params = null;
+  const f = fakeDriver((q, p) => {
+    if (q === T.TAG_STATE_QUERY) return [{ ...good, existingId: null }];
+    if (q === T.TAG_QUERY) { params = p; return [{ id: TAG }]; }
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  assert.deepEqual(await fns.tagPart.run({ auth: auth('real-user'), data: { id: TAG, partId: PID, toolSessionId: TSID, source: 'debrief', strength: 'a_bit' } }),
+    { id: TAG, created: true });
+  assert.deepEqual([params.source, params.taggedKey, params.strength, params.debriefTools], ['debrief', `real-user:${TSID}:debrief`, 'a_bit', ['dear-man']]);
+  const st = f.calls.find((c) => c.query === T.TAG_STATE_QUERY);
+  assert.equal(st.params.taggedKey, `real-user:${TSID}:debrief`, 'the existing-tag read is per source');
+});
+
 test('tagPart over the fake driver: log layer, incoming edges only on the ToolSession, a lost race returns the first tag', async () => {
   assert.match(T.TAG_QUERY, /MERGE \(t:PartTag \{key: \$key\}\)\s+ON CREATE SET t:UserData:LogRecord/);
-  assert.match(T.TAG_QUERY, /t\.source = 'close', t\.taggedKey = \$sessionKey/);
+  assert.match(T.TAG_QUERY, /t\.source = \$source, t\.taggedKey = \$taggedKey, t\.strength = \$strength/);
+  // a close tag keeps the session's key (existing tags and the constraint unchanged); a debrief tag adds its source
+  assert.equal(T.taggedKeyOf('u:s', 'close'), 'u:s');
+  assert.equal(T.taggedKeyOf('u:s', 'debrief'), 'u:s:debrief');
+  assert.match(T.TAG_STATE_QUERY, /\(prev:PartTag \{taggedKey: \$taggedKey\}\)-\[:TAGS\]->\(ts\)/, 'the existing tag of this source only');
   for (const e of ['MERGE \\(u\\)-\\[:HAS_PART_TAG\\]->\\(t\\)', 'MERGE \\(t\\)-\\[:TAGS\\]->\\(ts\\)', 'MERGE \\(t\\)-\\[:OF_PART\\]->\\(pt\\)']) {
     assert.match(T.TAG_QUERY, new RegExp(e));
   }
   assert.doesNotMatch(T.TAG_QUERY, /\(ts\)-\[[^\]]*\]->|SET ts\b|SET pt\b|ts\.\w+ =|pt\.\w+ =/, 'nothing out of or onto the ToolSession or the Part');
-  assert.match(T.TAG_QUERY, /ts\.status <> 'open'\s+AND \(ts\.thenVsNow IN \$closes OR ts\.actedOnUrge IN \$urgeCloses\) AND NOT ts\.toolId IN \$never/);
+  assert.match(T.TAG_QUERY, /\$source = 'close' AND ts\.status <> 'open'\s+AND \(ts\.thenVsNow IN \$closes OR ts\.actedOnUrge IN \$urgeCloses\) AND NOT ts\.toolId IN \$never/);
+  assert.match(T.TAG_QUERY, /OR \(\$source = 'debrief' AND ts\.toolId IN \$debriefTools\)/);
+  assert.deepEqual([...T.TAG_DEBRIEF_TOOLS], ['dear-man']);
   assert.deepEqual([[...T.TAG_CLOSES], [...T.TAG_URGE_CLOSES]], [['better', 'much_better'], ['no']]);
   assert.match(T.TAG_QUERY, /pt\.status IN \['active', 'resting'\]/);
   assert.match(T.TAG_QUERY, /coalesce\(u\.partsEnabled, false\)/);
@@ -819,6 +873,7 @@ test('tagPart over the fake driver: log layer, incoming edges only on the ToolSe
   const st = f.calls.find((c) => c.query === T.TAG_STATE_QUERY);
   assert.deepEqual([st.params.uid, st.params.partKey, st.params.sessionKey], ['real-user', `real-user:${PID}`, `real-user:${TSID}`]);
   assert.deepEqual(st.params.urgeCloses, ['no']);
+  assert.deepEqual([st.params.source, st.params.taggedKey, st.params.strength], ['close', `real-user:${TSID}`, null]);
   await assert.rejects(fns.tagPart.run({ auth: auth(), data: { id: TAG, partId: PID } }), code('invalid-argument'));
 });
 

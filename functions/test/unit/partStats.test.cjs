@@ -120,6 +120,8 @@ test('reads: through the caller\'s own User and edges, active or resting parts, 
     assert.doesNotMatch(q, /\b(MERGE|CREATE|SET|DELETE)\b/, 'read-only');
   }
   assert.match(STATS_TAGS_QUERY, /\(u\)-\[:HAS_PART\]->\(pt\)/);
+  // helped (and when) count close tags only: a DEAR MAN debrief tag says the part was there, not that a tool helped
+  assert.match(STATS_TAGS_QUERY, /AND coalesce\(t\.source, 'close'\) = 'close'/);
   assert.match(STATS_TAGS_QUERY, /\(t\)-\[:TAGS\]->\(ts:ToolSession\)<-\[:HAS_TOOL_SESSION\]-\(u\)/, "the tagged session is the caller's");
   assert.match(STATS_SESSIONS_QUERY, /\(u\)-\[:HAS_PART\]->\(pt\)/);
   assert.match(STATS_SESSIONS_QUERY, /ps\.feelTowardIds\[0\] AS firstFeel/, 'the first answer only');
@@ -233,4 +235,26 @@ test('getInsightsData: a failed parts read logs and returns parts null; the rest
   assert.equal(out.totalCheckIns, 1, 'the rest is there');
   assert.ok(logged.some((a) => a[0] === 'getInsightsData parts failed'));
   assert.ok(f.allClosed());
+});
+
+test('helped ignores debrief tags: the tags read filters them out before the compute', async () => {
+  // A responder that applies the query's own source filter to mixed rows, as the graph would.
+  const all = [
+    { partId: 'p1', toolId: 'dear-man', at: at(18), source: 'debrief' },
+    { partId: 'p1', toolId: 'dear-man', at: at(19), source: 'debrief' },
+    { partId: 'p1', toolId: 'dear-man', at: at(20), source: 'debrief' },
+    { partId: 'p1', toolId: 'pause', at: at(9), source: 'close' },
+  ];
+  const tx = fakeTx((q) => {
+    if (/AS timeZone/.test(q)) return [{ partsOn: true, timeZone: null }];
+    if (/pt\.shapeSig AS shapeSig/.test(q)) return [{ id: 'p1', name: 'The guard', status: 'active', firstPlace: null, shapeSig: null }];
+    if (/HAS_PART_TAG/.test(q)) {
+      const closeOnly = /coalesce\(t\.source, 'close'\) = 'close'/.test(q);
+      return all.filter((r) => !closeOnly || r.source === 'close').map(({ source: _s, ...r }) => r);
+    }
+    return [];
+  }).tx;
+  const rows = await readStatsRows(tx, 'u1');
+  assert.deepEqual(rows.tags.map((t) => t.toolId), ['pause']);
+  assert.deepEqual(partsReflect(rows), [], 'one close tag: below every threshold, no block');
 });
