@@ -187,16 +187,24 @@ function CheckbackHost({ named }: { named: boolean }) {
   return <PartCheckbackCard item={checkbackItem(named)} content={content} onDone={() => setGone(true)} />;
 }
 
-function TagHost({ urge }: { urge: boolean }) {
+type TagHostKind = 'five' | 'pause' | 'ftf';
+const TAG_HOSTS: Record<TagHostKind, { toolId: 'five-senses' | 'pause' | 'find-the-feeling'; note: string }> = {
+  five: { toolId: 'five-senses', note: 'Five senses, after a better answer' },
+  pause: { toolId: 'pause', note: 'Pause, after Held off' },
+  ftf: { toolId: 'find-the-feeling', note: 'Find the feeling, after a better answer, in a visit that made a shape' },
+};
+
+function TagHost({ host }: { host: TagHostKind }) {
   const content = useParts();
   const [saved, setSaved] = useState('');
   useEffect(() => { getSpineContent().then((c) => setSaved(c.closeFlow.saved)).catch(() => {}); }, []);
   if (!content) return null;
+  const h = TAG_HOSTS[host];
   return (
     <div className="space-y-2">
-      <p className={mockNote}>{urge ? 'Pause, after Held off' : 'Five senses, after a better answer'} (mock host close)</p>
+      <p className={mockNote}>{h.note} (mock host close)</p>
       <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{saved}</p>
-      <PartTagRow toolId={urge ? 'pause' : 'five-senses'} toolSessionId="00000000-0000-4000-8000-000000000501" content={content} />
+      <PartTagRow toolId={h.toolId} toolSessionId="00000000-0000-4000-8000-000000000501" content={content} offerShape={host === 'ftf'} />
     </div>
   );
 }
@@ -243,6 +251,9 @@ function CopeHost() {
     </section>
   );
 }
+
+/** The unnamed part's chip (dev/review/data.ts: first felt in the stomach), as the tag row labels it. */
+const UNNAMED_CHIP = 'The one in your stomach';
 
 /** The kept line the cope-ahead failure branch picks (dev/review/data.ts savedLines). */
 const KEPT_LINE = 'It makes sense this got to you.';
@@ -409,13 +420,16 @@ export const SURFACES: Surface[] = [
   },
   {
     id: 'tag', pack: 'tag', title: 'Tag row: “Was this a part you know?”',
-    who: 'Parts on: under the saved close of Cool Down, Five senses or Find the feeling after a better answer, or Pause and Urge Surfing after Held off.',
+    who: 'Parts on: under the saved close of Cool Down, Five senses or Find the feeling after a better answer, or Pause and Urge Surfing after Held off. In Find the feeling, when the visit made a shape, a part chip first asks to give that part the shape.',
     branches: [
       { id: 'row', label: 'After a better answer' },
       { id: 'urge', label: 'After Held off (Pause, Urge Surfing)' },
       { id: 'new', label: 'A new one → later?', steps: [{ opt: 'tag_new_one' }] },
+      { id: 'shape', label: 'Find the feeling: “Use this shape for {name}?”', steps: [{ tap: PARTS[0].name }] },
+      { id: 'shape_unnamed', label: 'Find the feeling: an unnamed part', steps: [{ tap: UNNAMED_CHIP }] },
+      { id: 'shape_done', label: 'Find the feeling: Yes → Done. (folds after a moment)', steps: [{ tap: PARTS[0].name }, { opt: 'tag_shape_yes' }] },
     ],
-    render: ({ branch }) => <TagHost urge={branch === 'urge'} />,
+    render: ({ branch }) => <TagHost host={branch.startsWith('shape') ? 'ftf' : branch === 'urge' ? 'pause' : 'five'} />,
   },
   {
     id: 'me', pack: 'me', title: 'Parts of me (Me)',
@@ -481,6 +495,5 @@ export const SURFACES: Surface[] = [
 
 /** Not built on the tip, so not here (the report lists them). */
 export const SKIPPED = [
-  '“Use this shape for {name}?” (Find the feeling): not on the tip yet (lane 4, ftf-shape-for-part).',
   'The trail offer card and its evidence step: not on the tip yet (lane 2, trail-offers).',
 ];
