@@ -8,9 +8,11 @@
  * go_blank / zone_out, never has a line). Hosts decide when (parts on, never while P2 is open).
  */
 import type { PartsContent } from '../data/partsContentTypes';
-import { promptCopy } from './partsContent';
+import { promptCopy, surfaceReady, type SurfaceIds } from './partsContent';
 
 export const UNBLEND_PROMPT = 'unblend_line';
+/** What the line requires of the copy (the move's phrase and the EXPRESSES edge come from the vocabulary). */
+export const UNBLEND_REQUIRED: SurfaceIds = { prompts: [UNBLEND_PROMPT], options: [] };
 
 /** Each host's picks, by the label their ids live on in `expresses` (scripts/parts/content.py EXPRESSES). */
 export const UNBLEND_SOURCES = {
@@ -32,7 +34,7 @@ export const recoverPullOption = (pull: string): string => `recover_${pull}`;
  * otherwise null, never a guess between moves.
  */
 export function unblendLine(content: PartsContent | null, source: UnblendSource, ids: string | readonly string[] | null): string | null {
-  if (!content || ids === null) return null;
+  if (!content || ids === null || !surfaceReady(content, UNBLEND_REQUIRED)) return null;
   const picks = typeof ids === 'string' ? [ids] : [...ids];
   if (picks.length === 0) return null;
   const table = content.expresses?.[UNBLEND_SOURCES[source]] ?? {};

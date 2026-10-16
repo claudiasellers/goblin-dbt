@@ -16,6 +16,16 @@ export function stepOptions(content: PartsContent, flow: string, step: string): 
   return [...(content.options[flow]?.[step] ?? [])].sort((a, b) => a.order - b.order || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 }
 
+/**
+ * The ids one surface's gate requires: every surface exports its own (e.g. `MEET_REQUIRED`, `angryRequired`)
+ * and its gate checks exactly that with `surfaceReady`, so scripts/parts/review.mjs (the sign-off pack)
+ * lists what the code needs and can't drift from it.
+ */
+export interface SurfaceIds { prompts: readonly string[]; options: readonly string[] }
+
+/** A surface's gate: every id it requires is in the shipped content. */
+export const surfaceReady = (content: PartsContent, ids: SurfaceIds): boolean => flowReady(content, ids.prompts, ids.options);
+
 /** True only when every listed prompt and option is in the content. */
 export function flowReady(content: PartsContent, promptIds: readonly string[], optionIds: readonly string[] = []): boolean {
   if (!promptIds.every((id) => content.prompts[id] !== undefined)) return false;

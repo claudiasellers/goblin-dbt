@@ -307,15 +307,16 @@ test("the rows: after the cards, only with the list's copy, a neutral figure, No
 test("the readout: Reflect's own gate helper, shared, not a second one", async () => {
   const S = await importTs("src/lib/partStats.ts");
   const src = read("src/lib/partStats.ts");
-  assert.match(src, /export const statsReady = \(content: PartsContent\): boolean =>\s*flowReady\(content, STATS_PROMPTS, Object\.values\(WHEN_OPTIONS\)\);/);
-  assert.match(src, /statsReady\(content\) && flowReady\(content, REFLECT_PROMPTS\)/, "Reflect builds on it");
+  assert.match(src, /export const STATS_REQUIRED: SurfaceIds = \{ prompts: STATS_PROMPTS, options: Object\.values\(WHEN_OPTIONS\) \};/);
+  assert.match(src, /export const statsReady = \(content: PartsContent\): boolean => surfaceReady\(content, STATS_REQUIRED\);/);
+  assert.match(src, /statsReady\(content\) && surfaceReady\(content, REFLECT_REQUIRED\)/, "Reflect builds on it");
   assert.equal(S.statsReady(shipped), false, "nothing signed off: no readout");
   assert.equal(S.statsReady(ALL), true);
   const noWhen = partsFromFixture(fixture, (id) => id !== "when_nights");
   assert.equal(S.statsReady(noWhen), false, "a missing when option hides it all");
   const c = read("src/components/me/PartsOfMe.tsx");
   assert.match(c, /const showStats = statsReady\(content\);/);
-  assert.doesNotMatch(c, /flowReady\(/, "no gate of its own");
+  assert.doesNotMatch(c, /flowReady\(|surfaceReady\(/, "no gate of its own");
 });
 
 test("the card's readout: Mostly {when} under the name, then what's helped and how you've felt, tender parts too", async () => {
