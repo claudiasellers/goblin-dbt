@@ -108,7 +108,7 @@ test('getMe: areas with items (set-aside kept), found words read-only, stale cou
 });
 
 test('getMe: parts appear in my_parts only when parts are on; resting is not set aside', async () => {
-  const part = (id, status, extra = {}) => ({ label: 'Part', title: 'A part', stillTrue: 'Is {name} still doing the same job?', setAside: 'Set aside.', statement: null,
+  const part = (id, status, extra = {}) => ({ label: 'Part', title: 'A part', stillTrue: 'Is {name} still doing the same job?', setAside: 'Set aside.', statement: null, moveIds: [],
     p: { id, kind: 'part', area: 'my_parts', status, source: 'made', name: `part ${id}`, revisitAt: '2020-01-01T00:00:00Z', ...extra } });
   const run = async (partsOn) => {
     const f = fakeDriver((q) => {
@@ -171,4 +171,40 @@ test('updateUserProfile ignores the retired goal fields', async () => {
   setDriver(f.driver);
   await fns.updateUserProfile.run({ auth: auth(), data: { dailyCheckInGoal: 3, focusCategories: ['dt'] } });
   assert.equal(f.calls.length, 0, 'nothing whitelisted, nothing written');
+});
+
+test('getMe: a Part item carries its card (no own-words fear ever, no fears on a tender part), still only with parts on', async () => {
+  const row = (id, extra) => ({ label: 'Part', title: 'A part', stillTrue: '', setAside: '', statement: null, moveIds: ['withdraw', 'appease', 'withdraw'],
+    p: { id, kind: 'part', area: 'my_parts', status: 'active', source: 'made', revisitAt: null, ...extra } });
+  const run = async (partsOn) => {
+    const f = fakeDriver((q) => {
+      if (/AS partsOn/.test(q)) return [{ partsOn }];
+      if (/MATCH \(a:ProfileArea\)/.test(q)) return [{ id: 'my_parts', label: 'Parts of me', blurb: 'b', kinds: [] }];
+      if (/HAS_PROFILE_FACT\|HAS_PATTERN/.test(q)) return [
+        row('p1', { name: 'the one who hides', tender: false, places: ['chest', 'throat'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5],
+          jobIds: ['hide_job_out_of_sight'], ownJob: 'keep me safe', fearIds: ['fear_too_much'], ownFear: 'that I would vanish',
+          preferredRoleIds: ['rather_tell_me'], lastVisitedAt: '2026-10-10T00:00:00Z' }),
+        row('p2', { tender: true, fearIds: ['fear_too_much'], ownFear: 'x' }),
+      ];
+      return [];
+    });
+    setDriver(f.driver);
+    return { me: await fns.getMe.run({ auth: auth(), data: {} }), f };
+  };
+  const { me, f } = await run(true);
+  const items = me.areas.find((a) => a.id === 'my_parts').items;
+  assert.deepEqual(items[0].part, {
+    name: 'the one who hides', tender: false, places: ['chest', 'throat'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5],
+    jobIds: ['hide_job_out_of_sight'], ownJob: 'keep me safe', fearIds: ['fear_too_much'], preferredRoleIds: ['rather_tell_me'],
+    moveIds: ['appease', 'withdraw'], lastVisitedAt: '2026-10-10T00:00:00Z',
+  });
+  assert.deepEqual(items[1].part, {
+    name: null, tender: true, places: [], shapeSig: null, jobIds: [], ownJob: null, fearIds: [], preferredRoleIds: [], moveIds: ['appease', 'withdraw'], lastVisitedAt: null,
+  }, 'tender: no fears; absent fields are [] / null');
+  assert.ok(!JSON.stringify(me).includes('vanish'), 'the own-words fear never leaves the server');
+  const q = f.calls.find((c) => /HAS_PART\]/.test(c.query)).query;
+  assert.doesNotMatch(q, /ownFear/);
+  assert.match(q, /\[\(p\)-\[:USES\]->\(mv:ProtectiveMove\) \| mv\.id\]/);
+  const off = await run(false);
+  assert.ok(!off.me.areas.some((a) => a.items.some((i) => i.part)), 'parts off: no cards');
 });

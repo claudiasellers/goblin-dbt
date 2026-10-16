@@ -715,6 +715,62 @@
    "order": 11,
    "copy": "Couldn't delete them. Try again.",
    "reviewStatus": "draft"
+  },
+  "me_get_to_know": {
+   "flow": "me",
+   "step": "card",
+   "order": 0,
+   "copy": "Get to know a part",
+   "reviewStatus": "draft"
+  },
+  "card_where": {
+   "flow": "me",
+   "step": "card",
+   "order": 1,
+   "copy": "Where",
+   "reviewStatus": "draft"
+  },
+  "card_job": {
+   "flow": "me",
+   "step": "card",
+   "order": 2,
+   "copy": "Its job",
+   "reviewStatus": "draft"
+  },
+  "card_job_own": {
+   "flow": "me",
+   "step": "card",
+   "order": 3,
+   "copy": "Its job, in your words",
+   "reviewStatus": "draft"
+  },
+  "card_fear": {
+   "flow": "me",
+   "step": "card",
+   "order": 4,
+   "copy": "Afraid that",
+   "reviewStatus": "draft"
+  },
+  "card_rather": {
+   "flow": "me",
+   "step": "card",
+   "order": 5,
+   "copy": "Would rather",
+   "reviewStatus": "draft"
+  },
+  "card_visit": {
+   "flow": "me",
+   "step": "card",
+   "order": 6,
+   "copy": "Spend time with it",
+   "reviewStatus": "draft"
+  },
+  "card_resting": {
+   "flow": "me",
+   "step": "card",
+   "order": 7,
+   "copy": "Resting",
+   "reviewStatus": "draft"
   }
  },
  "options": {
