@@ -136,7 +136,7 @@ test("parts_max_length counts each slot at its width", () => {
   assert.ok(partRules(`${a(90 - 24 - 24 + 1)}{A}{B}`, "keepsake").includes("parts_max_length"));
   // curly quotes are normalised before counting (one character each either way)
   assert.ok(!partRules(`I’d ${a(60 - 4)}`, "chip").includes("parts_max_length"));
-  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 40, month: 9, want: 24, N: 2 });
+  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 40, month: 9, want: 20, N: 2 });
 });
 
 test("parts_slots: only parts slots, only in prompts (all) and keepsakes ({A} {B} {want})", () => {
