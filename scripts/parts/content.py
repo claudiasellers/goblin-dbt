@@ -347,7 +347,7 @@ UNDERNEATH_HELD = {
 # Prompts: (id, flow, step, copy). Order within a flow is list order.
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
 # close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
-# next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me)
+# next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me), ps (Problem Solve's ambivalence line), common (shared), reflect
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -457,6 +457,10 @@ PROMPTS = [
     ("angry_speak_line_plain", "angry", "speak", "I felt {felt}."),
     # Parts on only (PARTS_ON_ONLY): after "Spend a minute with it later?" (the option angry_later) queued it
     ("angry_later_done", "angry", "speak", "It's in Me when you want it."),
+    # Problem Solve's "the part that doesn't want change" (parts.md "Meet a part → Entries"): after the
+    # cant-ambivalent barrier's answer, parts on only, the quiet line ps_later (an option: tapping it is the
+    # yes) queues a PartCandidate for put_it_off; this line replaces it. Never opens a parts flow mid-tool.
+    ("ps_later_done", "ps", "ambivalence", "It's in Me when you want it."),
     # Aftercare
     ("aftercare_louder", "aftercare", "louder", "Things can get louder after time with a part."),
     ("aftercare_too_many", "aftercare", "too_many", "You don't need to get to know everyone at once."),
@@ -732,6 +736,8 @@ OPTIONS = [
     opt("tag_skip", "tag", "tag", "Skip", branch="end"),
     opt("tag_later_yes", "tag", "new", "Yes", branch="candidate"),
     opt("tag_later_no", "tag", "new", "No thanks", branch="end"),
+    # Problem Solve's ambivalence screen (cant-ambivalent only, parts on): the one quiet text button
+    opt("ps_later", "ps", "ambivalence", "Want to get to know that part another time?", branch="candidate"),
     # {when} in stats_when: the band most tags fall in, in the person's time zone (05-12, 12-17, 17-22, 22-05)
     opt("when_mornings", "common", "stats", "mornings"),
     opt("when_afternoons", "common", "stats", "afternoons"),

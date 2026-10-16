@@ -5,6 +5,13 @@ import { EmotionPicker } from '../../components/tools/EmotionPicker';
 import { getToolById } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
 import { SessionClose } from '../../components/spine/SessionClose';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { getPartsContent } from '../../services/partsContent';
+import { queuePartCandidate } from '../../services/parts';
+import type { PartsContent } from '../../data/partsContentTypes';
+import { newId } from '../../lib/spine/ids';
+import { PS_AMBIVALENCE_BARRIER, psLaterCandidate, psLaterCopy } from '../../lib/psAmbivalence';
+import { PartLaterLine } from '../../components/parts/PartLaterLine';
 import {
   getProblemSolveContent,
   type ProblemSolveContent,
@@ -109,6 +116,25 @@ export function ProblemSolve() {
     if (confidenceLevel && CONFIDENCE_LEVELS.includes(confidenceLevel)) er.confidence = confidenceLevel;
     if (Object.keys(er).length) session.setExt({ er });
   }, [selectedProblemTypes, selectedDirection, chosenSize, selectedBarrier, selectedSubResponse, selectedAmbivalence, confidenceLevel, session]);
+  // Parts on, after the cant-ambivalent barrier only: "Want to get to know that part another time?" on
+  // the ambivalence answer's screen (src/lib/psAmbivalence.ts). The parts copy is read only then; the yes
+  // queues a candidate and is recorded once queued.
+  const partsOn = useUserProfile().profile.partsEnabled;
+  const [parts, setParts] = useState<PartsContent | null>(null);
+  const wantsPsLater = partsOn && selectedSubResponse?.id === PS_AMBIVALENCE_BARRIER;
+  useEffect(() => {
+    if (!wantsPsLater || parts) return;
+    let live = true;
+    getPartsContent().then((p) => { if (live) setParts(p); }).catch(() => { /* no line */ });
+    return () => { live = false; };
+  }, [wantsPsLater, parts]);
+  const psLater = psLaterCopy(parts, partsOn, selectedSubResponse?.id);
+  const psLaterId = useRef<string | null>(null);
+  const queuePsLater = async () => {
+    psLaterId.current ??= newId();
+    await queuePartCandidate(psLaterCandidate(psLaterId.current));
+    session.setExt({ er: { psLater: true } });
+  };
   // The emotions picked here are the session's when it opened without any (a hand-off's are kept).
   useEffect(() => { session.setEmotionIds(selectedEmotionIds); }, [selectedEmotionIds, session]);
 
@@ -783,6 +809,8 @@ export function ProblemSolve() {
           >
             Let's keep going
           </button>
+
+          {psLater && <PartLaterLine ask={psLater.ask} done={psLater.done} onLater={queuePsLater} />}
         </div>
       );
     }

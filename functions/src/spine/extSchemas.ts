@@ -38,6 +38,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     barrierTypeId: { t: 'id' },                                                    // what got in the way (MI)
     barrierSubId: { t: 'id' },
     ambivalenceId: { t: 'id' },
+    psLater: { t: 'bool' },                                                        // parts on: "Want to get to know that part another time?" queued a PartCandidate
     confidence: { t: 'id' },                                                       // high | medium | low | none (checked by the client)
     oaFacts: { t: 'id' },                                                          // Do the Opposite: the check's facts choice
     oaEffect: { t: 'id' },                                                         // its effectiveness choice
