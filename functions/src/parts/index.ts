@@ -23,6 +23,11 @@ import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './c
 import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
 import { isTaggedTwice, tagDeps, tagPartHandler, validateTag } from './tag';
 import type { TagPartResponse } from './tagTypes';
+import {
+  answerCheckbackDeps, answerPartCheckbackHandler, scheduleCheckbackDeps, schedulePartCheckbackHandler,
+  validateAnswerCheckback, validateScheduleCheckback,
+} from './checkback';
+import type { AnswerPartCheckbackResponse, SchedulePartCheckbackResponse } from './checkbackTypes';
 
 export { deleteMyParts } from './delete';
 
@@ -136,5 +141,25 @@ export const answerPartRevisit = callable<unknown, PartWriteResponse>(
   async ({ uid, data }) => {
     const input = parseOrInvalid(() => validateRevisit(data), 'Invalid request');
     return writeTx((tx) => answerPartRevisitHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+// ---- The next-day check-back (its Today card registers itself in ./checkback) ----
+
+/** On the close's yes: check back with the kept part tomorrow. At most one open per part. */
+export const schedulePartCheckback = callable<unknown, SchedulePartCheckbackResponse>(
+  { auth: 'required', label: 'schedulePartCheckback', errorMessage: 'Could not schedule that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateScheduleCheckback(data, new Date()), 'Invalid request');
+    return writeTx((tx) => schedulePartCheckbackHandler(input, scheduleCheckbackDeps(tx, uid as string)));
+  },
+);
+
+/** "How's {name} today?": one write; Louder also pauses the part. */
+export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse>(
+  { auth: 'required', label: 'answerPartCheckback', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateAnswerCheckback(data), 'Invalid request');
+    return writeTx((tx) => answerPartCheckbackHandler(input, answerCheckbackDeps(tx, uid as string)));
   },
 );

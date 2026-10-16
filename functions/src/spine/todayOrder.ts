@@ -32,6 +32,8 @@ export interface TodayItem {
   /** May contain {toolName}; the client fills it from src/data/tools.ts. */
   copy: { title: string; body?: string };
   source?: { toolId?: string; toolSessionId?: string; detailId?: string };
+  /** A parts check-back's part (parts on only): its name and tenderness from the profile slice. */
+  part?: { id: string; name: string | null; tender: boolean };
 }
 
 export const TODAY_VISIBLE = 3;

@@ -88,7 +88,7 @@ export const PROFILE_NEEDS = {
   'opposite-action': [],                      // later 'values', 'patterns'
   'cool-down': [],                            // DT-01: 'bodyFlags'
   'checkin': ['patterns'],                    // the router's tie-break (E4)
-  'today': ['quietHours'],
+  'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)
   'witness': ['name', 'ownLines', 'savedLines'],
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
   // "Was this a part you know?" after a better close (PartTagRow in SessionClose): every tool whose

@@ -22,10 +22,17 @@ import { vecToSig } from './partFigure';
 
 /** Own words (voice, job, fear): the server's OWN_WORDS_MAX. */
 export const MEET_OWN_WORDS_MAX = 200;
-/** PartsPolicy.nameMaxChars (the policy stays on the server; the server's DEFAULT_NAME_MAX). */
+/** PartsPolicy.nameMaxChars until the policy ships its `limits` (the server's DEFAULT_NAME_MAX). */
 export const MEET_NAME_MAX = 40;
-/** PartsPolicy.maxNonSelfAnswers (the server's DEFAULT_MAX_NON_SELF; the policy isn't shipped). */
+/** PartsPolicy.maxNonSelfAnswers until the policy ships its `limits` (the server's DEFAULT_MAX_NON_SELF). */
 export const MEET_MAX_NON_SELF = 2;
+
+/** The shipped limits when the policy is signed off, else the pinned defaults. */
+export function meetLimits(content: Pick<PartsContent, 'limits'>): { nameMaxChars: number; maxNonSelfAnswers: number } {
+  const l = content.limits;
+  const n = (v: unknown, d: number) => (typeof v === 'number' && Number.isInteger(v) && v > 0 ? v : d);
+  return { nameMaxChars: n(l?.nameMaxChars, MEET_NAME_MAX), maxNonSelfAnswers: n(l?.maxNonSelfAnswers, MEET_MAX_NON_SELF) };
+}
 
 /** The far-away heads-up (parts.md "The entry gate"): its prompt and its two choices. */
 export const HEADS_UP_PROMPT = 'gate_far_away';
@@ -107,7 +114,7 @@ export function entryPlan(entry: PartsEntry | null): EntryPlan {
 export function meetContext(content: PartsContent, plan: EntryPlan, namedEntry: boolean): MeetContext {
   return {
     safetyLineMoves: content.moves.filter((m) => m.safetyLine).map((m) => m.id),
-    maxNonSelfAnswers: MEET_MAX_NON_SELF,
+    maxNonSelfAnswers: meetLimits(content).maxNonSelfAnswers,
     namedEntry,
     blendCheck: true,
     ...(plan.open === 'p2' ? { p2OnEntry: true, p2Band: 'flooded' as const } : {}),
@@ -238,4 +245,20 @@ export function guardsFor(content: PartsContent, move: string) {
   return content.hurts
     .flatMap((h) => h.guardedBy.filter((g) => g.moveId === move).map((g) => ({ h, rank: g.rank })))
     .sort((a, b) => a.rank - b.rank).map(({ h }) => h);
+}
+
+/** "You don't need to get to know everyone at once.": the prompt, shown when it ships. */
+export const TOO_MANY_PROMPT = 'aftercare_too_many';
+
+/**
+ * The too-many line (parts.md, Safety): once, on the first real screen, when the gate says the person
+ * made several parts lately and this visit isn't to a part they already keep. It never blocks.
+ */
+export function showTooMany(gate: PartsEntry | null, entry: MeetEntry): boolean {
+  return gate?.tooMany === true && !entry.partId;
+}
+
+/** Where the last screen's Done goes: back to Me when the visit came from there, else home. */
+export function doneTarget(entry: MeetEntry): string {
+  return entry.trailheadKind === 'me' || entry.trailheadKind === 'settings' ? '/profile' : '/';
 }

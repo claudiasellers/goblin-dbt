@@ -215,6 +215,13 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
   const none = { scope: "content-only", nodes: nodes.map((n) => (n.labels.includes("PartsPolicy") ? n : { ...n, props: { ...n.props, reviewStatus: "draft" } })), relationships: [] };
   assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [], canTouch: {} });
   assert.equal(buildParts(indexGraph({ scope: "content-only", nodes: [], relationships: [] })).version, null);
+  // The policy's two client numbers ship once it is signed off; nothing else of it ever does.
+  const signedPolicy = { ...exp, nodes: nodes.map((n) => (n.labels.includes("PartsPolicy")
+    ? { ...n, props: { ...n.props, ...ok, nameMaxChars: 40, maxNonSelfAnswers: 2, tooManyPartsCount: 3 } } : n)) };
+  const withLimits = buildParts(indexGraph(signedPolicy));
+  assert.deepEqual(withLimits.limits, { nameMaxChars: 40, maxNonSelfAnswers: 2 });
+  assert.doesNotMatch(JSON.stringify(withLimits), /offersEnabled|floodGateHours|tooManyPartsCount/);
+  assert.ok(!("limits" in buildParts(indexGraph(exp))), "a draft policy: no limits key");
   const mixed = { ...exp, nodes: nodes.map((n) => (n.props.id === "voice_b" ? { ...n, props: { ...n.props, version: "parts-v2" } } : n)) };
   assert.throws(() => buildParts(indexGraph(mixed)), /mixes versions/);
 });

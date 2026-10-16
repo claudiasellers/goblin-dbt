@@ -77,10 +77,11 @@ test("hosts: exactly the tools whose SessionClose asks then-vs-now, each declari
     })
     .map(([id]) => id);
   assert.deepEqual([...lib.TAG_ROW_TOOLS], hosts);
-  // Meet a part reads `parts` for its own screens (never a host: a part can't be tagged in its own session).
+  // Meet a part reads `parts` for its own screens (never a host: a part can't be tagged in its own
+  // session) and Today for the check-back card's name; every other reader is a host.
   const withParts = Object.entries(profileTypes.PROFILE_NEEDS)
-    .filter(([c, n]) => c !== "meet-a-part" && n.includes("parts")).map(([c]) => c);
-  assert.deepEqual(withParts, hosts, "PROFILE_NEEDS parts: the hosts and Meet a part, nothing else");
+    .filter(([c, n]) => !["meet-a-part", "today"].includes(c) && n.includes("parts")).map(([c]) => c);
+  assert.deepEqual(withParts, hosts, "PROFILE_NEEDS parts: the hosts, Meet a part and Today, nothing else");
 });
 
 test("the row: no hard-coded words, after the close is saved, fire-and-forget writes", () => {

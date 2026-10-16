@@ -32,8 +32,11 @@ interface CloseFlowContent {
  */
 export type TodaySource = (tx: ManagedTransaction, uid: string, now: Date) => Promise<TodayItem[]>;
 const extraSources: TodaySource[] = [];
-export function registerTodaySource(s: TodaySource): void {
+/** Follow-up types a registered source draws itself (the generic follow-up read leaves them out). */
+const ownedTypes = new Set<string>();
+export function registerTodaySource(s: TodaySource, ownsFollowUpTypes: readonly string[] = []): void {
   if (!extraSources.includes(s)) extraSources.push(s);
+  for (const t of ownsFollowUpTypes) ownedTypes.add(t);
 }
 
 /**
@@ -49,7 +52,7 @@ export function registerTodayPrepare(p: TodayPrepare): void {
 async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<string, FollowUpTypeContent>, now: Date) {
   const res = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {status: 'scheduled'})
-     MATCH (t:FollowUpType {id: f.type}) WHERE t.enabled = true
+     MATCH (t:FollowUpType {id: f.type}) WHERE t.enabled = true AND NOT t.id IN $owned
      WITH f, t
      WHERE (f.snoozedUntil IS NULL OR f.snoozedUntil <= datetime())
        AND f.dueAt <= datetime() + duration({hours: 24})
@@ -58,7 +61,7 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
      RETURN f.id AS id, f.type AS type, toString(f.dueAt) AS dueAt, f.sourceToolId AS sourceToolId,
             f.sourceSessionId AS sourceSessionId, coalesce(f.notifyInTab, false) AS notifyInTab, d.id AS detailId
      ORDER BY f.dueAt LIMIT 25`,
-    { uid },
+    { uid, owned: [...ownedTypes] },
   );
   const items: TodayItem[] = [];
   let next: GetTodayResponse['nextInTab'] = null;

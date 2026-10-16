@@ -79,7 +79,7 @@ test('getToday: derived states, one tool_outcome from the close question, OA rem
     if (/MATCH \(t:FollowUpType\) WHERE/.test(q)) return [TYPE('recover_next_day'), TYPE('recover_log'), TYPE('tool_outcome', { hierarchyTier: 'skills' }),
       TYPE('oa_plan', { resolveMode: 'deeplink', deepLinkTemplate: '/tool/opposite-action?followUp={detailId}' })];
     if (/SessionCloseFlow/.test(q)) return [{ content: JSON.stringify({ kinds: { regulation_down: { question: 'Compared…', choices: [{ id: 'better', label: 'Quieter' }] } }, byTool: {} }) }];
-    if (/HAS_FOLLOW_UP/.test(q)) return [
+    if (/HAS_FOLLOW_UP/.test(q) && !/part_checkback/.test(q)) return [
       { id: 'a', type: 'recover_next_day', dueAt: inH(-1), sourceToolId: null, sourceSessionId: null, notifyInTab: true, detailId: null },
       { id: 'b', type: 'oa_plan', dueAt: inH(-50), sourceToolId: 'opposite-action', sourceSessionId: null, notifyInTab: true, detailId: 'oa1' },
       { id: 'c', type: 'recover_log', dueAt: inH(1), sourceToolId: null, sourceSessionId: null, notifyInTab: true, detailId: null },

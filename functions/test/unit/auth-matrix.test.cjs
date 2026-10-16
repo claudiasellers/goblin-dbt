@@ -22,6 +22,7 @@ const AUTHED = [
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
   'tagPart',
+  'schedulePartCheckback', 'answerPartCheckback',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in

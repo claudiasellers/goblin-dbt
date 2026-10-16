@@ -32,7 +32,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS["opposite-action"], []);
   assert.deepEqual(types.PROFILE_NEEDS["cool-down"], []);
   assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns"], "R20: consumer is `checkin`");
-  assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours"]);
+  assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
@@ -41,10 +41,11 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   // can show it read `parts`, and none of them partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
   assert.deepEqual(types.SLICE_IDS.slice(-2), ["parts", "partDetail"]);
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
+  // `today` renders parts too (the check-back card's name, part-checkback); partDetail stays Meet a part's.
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer === "meet-a-part") continue;
-    assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail`);
-    if (needs.includes("parts")) assert.ok(["five-senses"].includes(consumer), `${consumer} reads parts but shows no tag row`);
+    assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
+    if (needs.includes("parts")) assert.ok(["today", "five-senses"].includes(consumer), `${consumer} reads parts but is neither Today nor a tag-row host`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);
