@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 
-const { hurtFeelingChip, feelingLabel, feelingEmotionWords } = await importTs("src/lib/dearManHurt.ts");
+const { hurtFeelingChip, feelingLabel, feelingEmotionWords, hurtLabel, chipCase } = await importTs("src/lib/dearManHurt.ts");
 const { dearManDraftOf, isDearManDraft } = await importTs("src/lib/dearManResume.ts");
 const { getPartsContent } = await importTs("src/services/partsContent.ts");
 const fixture = JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"));
@@ -19,8 +19,10 @@ const shippedWith = (ids) => partsFromFixture(fixture, (id) => ids.includes(id))
 
 test("the chip: the hurt's felt phrase alone, only for a hurt the shipped content has", async () => {
   const hurts = shippedWith(["brushed_off", "not_mattering"]).hurts;
-  assert.deepEqual(hurtFeelingChip("brushed_off", hurts), { id: "brushed_off", label: "brushed off", emotionIds: ["disrespected", "hurt"] });
-  assert.equal(hurtFeelingChip("not_mattering", hurts).label, "like I didn't matter");
+  // Displayed like the other chips: first letter capitalised, the rest as written; saved as the id.
+  assert.deepEqual(hurtFeelingChip("brushed_off", hurts), { id: "brushed_off", label: "Brushed off", emotionIds: ["disrespected", "hurt"] });
+  assert.equal(hurtFeelingChip("not_mattering", hurts).label, "Like I didn't matter");
+  assert.equal(chipCase("  alone in this "), "Alone in this");
   // A draft hurt (not in parts.json), an unknown id, no hurt, or no content: no chip.
   assert.equal(hurtFeelingChip("left_out", hurts), null);
   assert.equal(hurtFeelingChip("nope", hurts), null);
@@ -34,7 +36,8 @@ test("the chip: the hurt's felt phrase alone, only for a hurt the shipped conten
   // Nothing parts-worded, parts on or off: every shipped felt phrase is the chip as it stands.
   for (const h of fixture.hurts) {
     const chip = hurtFeelingChip(h.id, fixture.hurts);
-    assert.equal(chip.label, h.feltPhrase.trim());
+    assert.equal(chip.label, chipCase(h.feltPhrase));
+    assert.equal(chip.label.toLowerCase(), h.feltPhrase.trim().toLowerCase());
     assert.doesNotMatch(chip.label, /\bparts?\b/i, h.id);
   }
 });
@@ -49,7 +52,7 @@ test("a resumed draft keeps a saved hurt's chip, so it can be seen and unpicked"
 test("what Express reads back: the chip's words in the summary, its NAMED_AS words for the visit", () => {
   const hurts = shippedWith(["brushed_off"]).hurts;
   const chip = hurtFeelingChip("brushed_off", hurts);
-  assert.deepEqual(["feel_hurt", "brushed_off", "gone"].map((id) => feelingLabel(id, chips, hurts)), ["Hurt", "brushed off", ""]);
+  assert.deepEqual(["feel_hurt", "brushed_off", "gone"].map((id) => feelingLabel(id, chips, hurts)), ["Hurt", "Brushed off", ""]);
   assert.deepEqual(feelingEmotionWords(["feel_hurt", "brushed_off"], chips, chip), ["Hurt", "disrespected", "hurt"]);
   // No hurt in play: exactly the DEAR MAN chips' labels, as before; an id that isn't one is dropped.
   assert.deepEqual(feelingEmotionWords(["feel_hurt", "brushed_off"], chips, null), ["Hurt"]);
@@ -90,4 +93,14 @@ test("Recover hands over the card's hurt only when there is one", () => {
   assert.match(recover, /setAngryHurtId\(r\.hurtId\)/, "Not sure ends with null");
   assert.match(recover, /onSkip=\{\(\) => \{ setAngryHurtId\(null\);/, "Not now hands over none");
   assert.match(recover, /setAngryHurtId\(null\);\s*dispatch\(\{ type: 'reset' \}\)/, "a new round starts without it");
+});
+
+test("History shows a saved hurt as DEAR MAN showed it: the shipped phrase in chip case, else the readable id", () => {
+  const hurts = shippedWith(["not_mattering"]).hurts;
+  assert.equal(hurtLabel("not_mattering", hurts), "Like I didn't matter");
+  assert.equal(hurtLabel("brushed_off", hurts), null, "a hurt that doesn't ship: History humanizes the id");
+  assert.equal(hurtLabel("feel_hurt", hurts), null);
+  const history = readFileSync("src/pages/History.tsx", "utf8");
+  assert.match(history, /session\.feelings\.map\(f => hurtLabel\(f, hurts\) \?\? humanize\(f, feelingLabels\)\)/);
+  assert.match(history, /if \(!anyHurt \|\| hurts\) return;/, "parts content read only when a session holds a hurt id");
 });

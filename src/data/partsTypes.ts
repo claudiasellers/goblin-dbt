@@ -174,6 +174,16 @@ export type AngryOptionId = (typeof ANGRY_OPTIONS)[number];
 export const ANGRY_NOT_NOW = 'angry_not_now';
 export type AngryNotNowId = typeof ANGRY_NOT_NOW | `${typeof ANGRY_NOT_NOW}_plain`;
 
+/**
+ * The card's last screen, parts on only (no `_plain` twin): `angry_later` (an option, "Spend a minute
+ * with it later?") is the yes that queues a PartCandidate (origin angry_card); `angry_later_done` (a
+ * prompt) replaces it once queued. Never opens a flow.
+ */
+export const ANGRY_LATER = 'angry_later';
+export const ANGRY_LATER_DONE = 'angry_later_done';
+/** The later line as the card shows it, when it may. */
+export interface AngryLaterCopy { ask: string; done: string }
+
 /** Every prompt and option of the angry flow (both wordings), by id, as plain strings. */
 export type AngryCardCopy = Record<AngryLineId | `${AngryLineId}_plain` | AngryOptionId | AngryNotNowId, string>;
 

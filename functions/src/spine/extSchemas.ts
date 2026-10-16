@@ -55,6 +55,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     angryHurtId: { t: 'id' },                                                      // the angry-part card in Recover: ProtectedHurt id (absent: Not sure)
     angryVoteHeld: { t: 'bool' },                                                  // its vote of confidence held for the full 4 s
     angryExit: { t: 'id' },                                                        // unblend | protects | vote | speak | skipped (checked by the client)
+    angryLater: { t: 'bool' },                                                     // parts on: "Spend a minute with it later?" queued a PartCandidate
   },
   mf: {},
 };
