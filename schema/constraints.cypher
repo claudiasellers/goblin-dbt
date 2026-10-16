@@ -150,3 +150,14 @@ CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n
 // --- Body map (docs/design/body-map.md, schema/body-map.cypher) ---
 CREATE CONSTRAINT body_map_content_id IF NOT EXISTS FOR (n:BodyMapContent) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT body_map_id IF NOT EXISTS FOR (n:BodyMap) REQUIRE n.id IS UNIQUE;
+
+// --- Parts (docs/design/parts.md, schema/parts.cypher) ---
+CREATE CONSTRAINT protective_move_id IF NOT EXISTS FOR (n:ProtectiveMove) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT pull_option_id IF NOT EXISTS FOR (n:PullOption) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT protected_hurt_id IF NOT EXISTS FOR (n:ProtectedHurt) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT part_prompt_id IF NOT EXISTS FOR (n:PartPrompt) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT part_option_id IF NOT EXISTS FOR (n:PartOption) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT polarity_pair_id IF NOT EXISTS FOR (n:PolarityPair) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT trail_rule_id IF NOT EXISTS FOR (n:TrailRule) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT trail_context_id IF NOT EXISTS FOR (n:TrailContext) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT parts_policy_id IF NOT EXISTS FOR (n:PartsPolicy) REQUIRE n.id IS UNIQUE;
