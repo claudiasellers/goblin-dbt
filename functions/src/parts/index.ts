@@ -20,6 +20,9 @@ import {
 import { validatePartRef, validateRename, validateRest, validateRevisit } from './editPlan';
 import { validateKeep } from './keepPlan';
 import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
+import {
+  answerPartCandidateHandler, candidateAnswerDeps, validateCandidateAnswer, type AnswerPartCandidateResponse,
+} from './candidateAnswer';
 import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
 import {
   answerCheckbackDeps, answerPartCheckbackHandler, scheduleCheckbackDeps, schedulePartCheckbackHandler,
@@ -66,6 +69,15 @@ export const queuePartCandidate = callable<unknown, QueuePartCandidateResponse>(
   async ({ uid, data, request }) => {
     const input = parseOrInvalid(() => validateCandidate(data), 'Invalid request');
     return writeTx((tx) => queuePartCandidateHandler(input, candidateDeps(tx, uid as string, request.auth?.token?.email ?? null)));
+  },
+);
+
+/** Me's "Not any more" on a part waiting to be got to know: open → dismissed, once. */
+export const answerPartCandidate = callable<unknown, AnswerPartCandidateResponse>(
+  { auth: 'required', label: 'answerPartCandidate', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateCandidateAnswer(data), 'Invalid request');
+    return writeTx((tx) => answerPartCandidateHandler(input, candidateAnswerDeps(tx, uid as string, input.candidateId)));
   },
 );
 

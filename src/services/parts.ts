@@ -2,6 +2,7 @@
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
 import type {
+  AnswerPartCandidateRequest, AnswerPartCandidateResponse,
   AnswerPartCheckbackRequest, AnswerPartCheckbackResponse, AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
   SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, StartPartSessionRequest,
@@ -61,6 +62,13 @@ export async function keepPart(req: KeepPartRequest): Promise<KeepPartResponse> 
 /** Only on a yes ("another time", "spend a minute with it later?"). Safe to repeat with the same id. */
 export async function queuePartCandidate(req: QueuePartCandidateRequest): Promise<QueuePartCandidateResponse> {
   return (await queuePartCandidateFn(req)).data;
+}
+
+const answerPartCandidateFn = httpsCallable<AnswerPartCandidateRequest, AnswerPartCandidateResponse>(functions, 'answerPartCandidate');
+
+/** Me's "Not any more" on a part waiting to be got to know. Safe to repeat. */
+export async function answerPartCandidate(req: AnswerPartCandidateRequest): Promise<AnswerPartCandidateResponse> {
+  return (await answerPartCandidateFn(req)).data;
 }
 
 // ---- The part card (Me). Each answers with the new profile version (the profile cache key). ----
