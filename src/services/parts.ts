@@ -4,7 +4,7 @@ import { functions } from './firebase';
 import type {
   AnswerPartCheckbackRequest, AnswerPartCheckbackResponse, AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
-  SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, StartPartSessionRequest,
+  SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, SetPartAnchorRequest, StartPartSessionRequest,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<Record<string, never>, PartsEntry>(functions, 'getPartsEntry');
@@ -120,4 +120,13 @@ export async function schedulePartCheckback(req: SchedulePartCheckbackRequest): 
 /** The Today card's answer. `aftercare` (Louder): show aftercare_louder with the body tools. */
 export async function answerPartCheckback(req: AnswerPartCheckbackRequest): Promise<AnswerPartCheckbackResponse> {
   return (await answerPartCheckbackFn(req)).data;
+}
+
+// ---- DEAR MAN's cope ahead ----
+
+const setPartAnchorFn = httpsCallable<SetPartAnchorRequest, PartWriteResponse>(functions, 'setPartAnchor');
+
+/** The part's anchor: `lineId` (one of their kept lines) or `own` (their words, 1 to 90 characters), exactly one. */
+export async function setPartAnchor(req: SetPartAnchorRequest): Promise<PartWriteResponse> {
+  return (await setPartAnchorFn(req)).data;
 }

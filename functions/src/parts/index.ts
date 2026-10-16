@@ -15,9 +15,9 @@ import { sessionDeps } from './sessionQueries';
 import type { PartSessionResponse } from './sessionTypes';
 import {
   answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, renamePartHandler, restPartHandler,
-  restorePartHandler, setAsidePartHandler, setPartTenderHandler,
+  restorePartHandler, setAsidePartHandler, setPartAnchorHandler, setPartTenderHandler,
 } from './keep';
-import { validatePartRef, validateRename, validateRest, validateRevisit } from './editPlan';
+import { validateAnchor, validatePartRef, validateRename, validateRest, validateRevisit } from './editPlan';
 import { validateKeep } from './keepPlan';
 import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
 import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
@@ -112,6 +112,15 @@ export const setPartTender = callable<unknown, PartWriteResponse>(
   async ({ uid, data }) => {
     const input = parseOrInvalid(() => validatePartRef(data), 'Invalid request');
     return writeTx((tx) => setPartTenderHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** DEAR MAN's cope ahead: the part's anchor, a kept line or their own words. */
+export const setPartAnchor = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setPartAnchor', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateAnchor(data), 'Invalid request');
+    return writeTx((tx) => setPartAnchorHandler(input, partEditDeps(tx, uid as string)));
   },
 );
 

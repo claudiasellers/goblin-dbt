@@ -130,8 +130,8 @@ test("parts_max_length counts each slot at its width", () => {
   const a = (n) => "a".repeat(n);
   assert.ok(!partRules(`${a(90 - 24)}{name}`, "prompt").includes("parts_max_length"));
   assert.ok(partRules(`${a(90 - 24 + 1)}{name}`, "prompt").includes("parts_max_length"));
-  assert.ok(!partRules(`${a(90 - 40)}{anchor}`, "prompt").includes("parts_max_length"));
-  assert.ok(partRules(`${a(90 - 40 + 1)}{anchor}`, "prompt").includes("parts_max_length"));
+  assert.ok(!partRules(`${a(90 - 90)}{anchor}`, "prompt").includes("parts_max_length"));
+  assert.ok(partRules(`${a(90 - 90 + 1)}{anchor}`, "prompt").includes("parts_max_length"));
   // a pull is as wide as the longest real one ("take up less room", 17) plus one
   assert.ok(!partRules(`${a(90 - 18 - 18)}{pull}{pull2}`, "prompt").includes("parts_max_length"));
   assert.ok(partRules(`${a(90 - 18 - 18 + 1)}{pull}{pull2}`, "prompt").includes("parts_max_length"));
@@ -144,7 +144,7 @@ test("parts_max_length counts each slot at its width", () => {
   assert.ok(partRules(`${a(90 - 24 - 28 + 1)}{name}{matters}`, "prompt").includes("parts_max_length"));
   assert.ok(!partRules(`${a(90 - 24)}{felt}`, "first_person").includes("parts_max_length"));
   assert.ok(partRules(`${a(90 - 24 + 1)}{felt}`, "first_person").includes("parts_max_length"));
-  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 40, month: 9, want: 20, N: 2, matters: 28, felt: 24 });
+  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 90, month: 9, want: 20, N: 2, matters: 28, felt: 24 });
 });
 
 test("parts_slots: only parts slots, only in prompts (all), keepsakes ({A} {B} {want}) and first-person lines ({felt})", () => {

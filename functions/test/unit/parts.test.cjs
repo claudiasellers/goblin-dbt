@@ -848,3 +848,86 @@ test('part writers over the fake driver: caller-scoped keys, signed in, profile 
     await assert.rejects(fns[name].run({ auth: auth(), data: { partId: 'not-a-uuid' } }), code('invalid-argument'), name);
   }
 });
+
+// ---- DEAR MAN's cope ahead: the part's anchor (keep.ts, the only Part writer) ----
+
+const OWN_LINE = '1b2c3d4e-5f60-4718-9a0b-c1d2e3f4a5b6';
+
+function fakeAnchor({ lineOwned = true, ...rest } = {}) {
+  const f = fakeEdit(rest);
+  const state = f.deps.state;
+  f.deps.state = async (q) => ({ ...(await state(q)), lineOwned: q.lineId ? lineOwned : false });
+  return f;
+}
+
+test('validateAnchor: exactly one of lineId or own; own trimmed, 1–90 characters, never linted; nothing else', () => {
+  assert.deepEqual(E.validateAnchor({ partId: PID, lineId: 'wit_l1_flat_01' }), { partId: PID, lineId: 'wit_l1_flat_01', own: null });
+  assert.deepEqual(E.validateAnchor({ partId: PID, lineId: OWN_LINE, own: null }), { partId: PID, lineId: OWN_LINE, own: null });
+  assert.deepEqual(E.validateAnchor({ partId: PID, own: "  You just should calm down, it's fine!  " }),
+    { partId: PID, lineId: null, own: "You just should calm down, it's fine!" }, 'own words are never linted');
+  assert.equal(E.validateAnchor({ partId: PID, own: 'x'.repeat(90) }).own.length, 90);
+  for (const bad of [
+    {}, { lineId: 'l1', own: 'both' }, { own: '' }, { own: '   ' }, { own: 'x'.repeat(91) }, { own: 7 },
+    { lineId: 'Not An Id!' }, { lineId: 5 }, { own: 'ok', text: 'x' },
+  ]) assert.throws(() => E.validateAnchor({ partId: PID, ...bad }), (e) => e.name === 'ValidationError', JSON.stringify(bad));
+  assert.throws(() => E.validateAnchor({ partId: 'nope', own: 'ok' }), (e) => e.name === 'ValidationError');
+});
+
+test('setPartAnchor: a kept line sets anchorLineId and clears anchorOwn; own words the reverse; version bumped', async () => {
+  const line = fakeAnchor();
+  assert.deepEqual(await K.setPartAnchorHandler({ partId: PID, lineId: OWN_LINE, own: null }, line.deps), { version: 8 });
+  assert.deepEqual(line.log[0], ['state', { partId: PID, lineId: OWN_LINE }]);
+  assert.deepEqual(line.writes()[0].slice(1), [K.SET_PART_ANCHOR_QUERY, { partId: PID, lineId: OWN_LINE, own: null }]);
+  const own = fakeAnchor({ part: { status: 'resting', anchorLineId: OWN_LINE } });
+  await K.setPartAnchorHandler({ partId: PID, lineId: null, own: 'I can come back to this' }, own.deps);
+  assert.deepEqual(own.log[0], ['state', { partId: PID }], 'own words need no line check');
+  assert.deepEqual(own.writes()[0][2], { partId: PID, lineId: null, own: 'I can come back to this' });
+  assert.match(K.SET_PART_ANCHOR_QUERY, /WHERE coalesce\(u\.partsEnabled, false\) AND p\.status IN \['active', 'resting'\]/);
+  assert.match(K.SET_PART_ANCHOR_QUERY, /SET p\.anchorLineId = \$lineId, p\.anchorOwn = \$own/);
+  assert.match(K.SET_PART_ANCHOR_QUERY, /u\.profileVersion = coalesce\(u\.profileVersion, 0\) \+ 1/);
+});
+
+test('setPartAnchor: the line must be the caller\'s own (OwnLine they have, ValidationLine they kept); idempotent', async () => {
+  const notMine = fakeAnchor({ lineOwned: false });
+  await assert.rejects(K.setPartAnchorHandler({ partId: PID, lineId: 'wit_l1_flat_01', own: null }, notMine.deps), code('not-found'));
+  assert.equal(notMine.writes().length, 0);
+  assert.match(K.PART_STATE_QUERY, /OPTIONAL MATCH \(u\)-\[:HAS_OWN_LINE\]->\(ol:OwnLine \{key: \$lineKey\}\) WHERE ol\.status = 'active'/);
+  assert.match(K.PART_STATE_QUERY, /OPTIONAL MATCH \(u\)-\[:SAVED_LINE\]->\(vl:ValidationLine \{id: \$lineId\}\)/);
+  for (const [part, input] of [
+    [{ status: 'active', anchorLineId: OWN_LINE, anchorOwn: null }, { partId: PID, lineId: OWN_LINE, own: null }],
+    [{ status: 'active', anchorOwn: 'breathe first' }, { partId: PID, lineId: null, own: 'breathe first' }],
+  ]) {
+    const same = fakeAnchor({ part });
+    assert.deepEqual(await K.setPartAnchorHandler(input, same.deps), { version: 7 });
+    assert.equal(same.writes().length, 0);
+  }
+});
+
+test('setPartAnchor: parts off, no part, a set-aside part: refused before any write', async () => {
+  const run = (d) => K.setPartAnchorHandler({ partId: PID, lineId: null, own: 'ok' }, d);
+  const off = fakeAnchor({ partsOn: false });
+  await assert.rejects(run(off.deps), code('failed-precondition'));
+  const none = fakeAnchor({ part: null });
+  await assert.rejects(run(none.deps), code('not-found'));
+  const aside = fakeAnchor({ part: { status: 'set_aside' } });
+  await assert.rejects(run(aside.deps), code('failed-precondition'));
+  assert.equal(off.writes().length + none.writes().length + aside.writes().length, 0);
+});
+
+test('setPartAnchor over the fake driver: caller-scoped part and line keys, signed in, invalid input refused', async () => {
+  const f = fakeDriver((q, p) => {
+    if (q === K.PART_STATE_QUERY) return [{ partsOn: true, version: 3, part: { status: 'active' }, revisitLogged: false, nameMaxChars: 40, revisitAfterDays: 30, knownRather: 0, lineOwned: p.lineKey === `real-user:${OWN_LINE}` }];
+    if (q === K.SET_PART_ANCHOR_QUERY) return [{ version: 4 }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  assert.deepEqual(await fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, lineId: OWN_LINE } }), { version: 4 });
+  const s = f.calls.find((c) => c.query === K.PART_STATE_QUERY);
+  assert.deepEqual([s.params.partKey, s.params.lineId, s.params.lineKey], [`real-user:${PID}`, OWN_LINE, `real-user:${OWN_LINE}`]);
+  const w = f.calls.find((c) => c.query === K.SET_PART_ANCHOR_QUERY);
+  assert.deepEqual([w.params.uid, w.params.partKey, w.params.lineId, w.params.own], ['real-user', `real-user:${PID}`, OWN_LINE, null]);
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
+  await assert.rejects(fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, lineId: OWN_LINE, own: 'both' } }), code('invalid-argument'));
+  await assert.rejects(fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, own: 'x'.repeat(91) } }), code('invalid-argument'));
+  await assert.rejects(fns.setPartAnchor.run({ data: { partId: PID, own: 'ok' } }), code('unauthenticated'));
+});

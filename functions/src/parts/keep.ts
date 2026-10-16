@@ -21,7 +21,7 @@ import {
 } from './keepPlan';
 import type { KeepPartResponse, PartWriteResponse } from './keepTypes';
 import {
-  newJob, revisitTransition, type PartRef, type RenameInput, type RestInput, type RevisitInput,
+  newJob, revisitTransition, type AnchorInput, type PartRef, type RenameInput, type RestInput, type RevisitInput,
 } from './editPlan';
 
 export const partsOff = () => new HttpsError('failed-precondition', 'Parts are off');
@@ -193,11 +193,13 @@ export const PART_STATE_QUERY = `
   OPTIONAL MATCH (pol:PartsPolicy {id: 'parts'})
   OPTIONAL MATCH (k:ProfileKind {id: 'part'})
   OPTIONAL MATCH (o:PartOption {flow: 'meet', step: 'rather'}) WHERE o.id IN $ratherIds
+  OPTIONAL MATCH (u)-[:HAS_OWN_LINE]->(ol:OwnLine {key: $lineKey}) WHERE ol.status = 'active'
+  OPTIONAL MATCH (u)-[:SAVED_LINE]->(vl:ValidationLine {id: $lineId})
   RETURN coalesce(u.partsEnabled, false) AS partsOn, coalesce(u.profileVersion, 0) AS version,
          CASE WHEN p IS NULL THEN null ELSE p {.status, .tender, .name, .jobIds, .ownJob, .jobHistoryJson,
-           .preferredRoleIds} END AS part,
+           .preferredRoleIds, .anchorLineId, .anchorOwn} END AS part,
          r IS NOT NULL AS revisitLogged, pol.nameMaxChars AS nameMaxChars, k.revisitAfterDays AS revisitAfterDays,
-         count(DISTINCT o) AS knownRather
+         count(DISTINCT o) AS knownRather, (ol IS NOT NULL OR vl IS NOT NULL) AS lineOwned
 `;
 
 /** One write to the caller's own part, parts on, under `where`; every writer bumps the profile version. */
@@ -217,6 +219,8 @@ export const SET_ASIDE_PART_QUERY = partWrite("p.status <> 'set_aside'", "p.stat
 export const RESTORE_PART_QUERY = partWrite("p.status = 'set_aside'",
   "p.status = 'active', p.confirmedAt = datetime(), p.lastReviewedAt = datetime(), p.revisitAt = datetime() + duration({days: $revisitDays})");
 export const SET_PART_TENDER_QUERY = partWrite('coalesce(p.tender, false) = false', 'p.tender = true');
+/** DEAR MAN's cope ahead: one anchor, a kept line (by id) or the person's own words, never both. */
+export const SET_PART_ANCHOR_QUERY = partWrite("p.status IN ['active', 'resting']", 'p.anchorLineId = $lineId, p.anchorOwn = $own');
 
 /**
  * The 30-day still-true: logs the answer once (`PartRevisit`, create only: the same id again finds
@@ -245,12 +249,14 @@ export interface PartEditState {
   revisitLogged: boolean;
   /** How many of the asked rather ids are the meet flow's `rather` options. */
   knownRather: number;
+  /** The asked line is the caller's own: an active OwnLine, or a ValidationLine they SAVED_LINE'd. */
+  lineOwned: boolean;
   nameMax: number;
   revisitDays: number;
 }
 
 export interface PartEditDeps {
-  state(q: { partId: string; revisitId?: string; ratherIds?: string[] }): Promise<PartEditState>;
+  state(q: { partId: string; revisitId?: string; ratherIds?: string[]; lineId?: string }): Promise<PartEditState>;
   /** One of the queries above; the new profile version, or null when its guard stopped it. */
   write(query: string, params: Record<string, unknown>): Promise<number | null>;
 }
@@ -311,6 +317,19 @@ export async function setPartTenderHandler(input: PartRef, deps: PartEditDeps): 
   return written(deps, SET_PART_TENDER_QUERY, { partId: input.partId });
 }
 
+/**
+ * DEAR MAN's cope ahead ("If {name} shows up: …"): the part's anchor is one of the caller's kept
+ * lines (`anchorLineId`, clearing `anchorOwn`) or their own words (`anchorOwn`, clearing
+ * `anchorLineId`; never linted). An active or resting part; a set-aside one is restored first.
+ */
+export async function setPartAnchorHandler(input: AnchorInput, deps: PartEditDeps): Promise<PartWriteResponse> {
+  const { st, part, status } = await ownPart(deps, { partId: input.partId, ...(input.lineId ? { lineId: input.lineId } : {}) });
+  if (status === 'set_aside') throw new HttpsError('failed-precondition', 'Set aside: restore it first');
+  if (input.lineId && !st.lineOwned) throw new HttpsError('not-found', 'Line not found');
+  if ((part.anchorLineId ?? null) === input.lineId && (part.anchorOwn ?? null) === input.own) return { version: st.version };
+  return written(deps, SET_PART_ANCHOR_QUERY, { partId: input.partId, lineId: input.lineId, own: input.own });
+}
+
 /** The 30-day still-true for kind `part`, logged once per id as a `PartRevisit`. */
 export async function answerPartRevisitHandler(
   input: RevisitInput, deps: PartEditDeps, today: string = new Date().toISOString().slice(0, 10),
@@ -332,7 +351,7 @@ export function partEditDeps(tx: ManagedTransaction, uid: string): PartEditDeps 
     async state(q) {
       const r = (await tx.run(PART_STATE_QUERY, {
         uid, partKey: userKey(uid, q.partId), revisitKey: q.revisitId ? userKey(uid, q.revisitId) : null,
-        ratherIds: q.ratherIds ?? [],
+        ratherIds: q.ratherIds ?? [], lineId: q.lineId ?? null, lineKey: q.lineId ? userKey(uid, q.lineId) : null,
       })).records[0];
       const max = toNumber(r?.get('nameMaxChars'));
       const days = toNumber(r?.get('revisitAfterDays'));
@@ -342,6 +361,7 @@ export function partEditDeps(tx: ManagedTransaction, uid: string): PartEditDeps 
         part: (r?.get('part') as Record<string, unknown> | null | undefined) ?? null,
         revisitLogged: r?.get('revisitLogged') === true,
         knownRather: toNumber(r?.get('knownRather')) ?? 0,
+        lineOwned: q.lineId ? r?.get('lineOwned') === true : false,
         nameMax: max && max > 0 ? max : DEFAULT_NAME_MAX,
         revisitDays: days && days > 0 ? days : DEFAULT_REVISIT_DAYS,
       };

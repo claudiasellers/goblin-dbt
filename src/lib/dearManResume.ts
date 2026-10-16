@@ -4,8 +4,11 @@
  * never sent to the server.
  */
 
-/** The plan steps "This is too much right now" is offered on (and that a draft can resume to). */
-export const TOO_MUCH_PHASES = ['scene', 'describe', 'express', 'assert', 'reinforce', 'mindful', 'confident', 'negotiate', 'summary'] as const;
+/**
+ * The plan steps "This is too much right now" is offered on (and that a draft can resume to). `cope`
+ * is the parts cope ahead ("Who might show up in this conversation?"), between the scene and the script.
+ */
+export const TOO_MUCH_PHASES = ['scene', 'cope', 'describe', 'express', 'assert', 'reinforce', 'mindful', 'confident', 'negotiate', 'summary'] as const;
 export type DearManPlanPhase = (typeof TOO_MUCH_PHASES)[number];
 
 export interface DearManStep { phase: DearManPlanPhase; sceneStep: number }
@@ -31,6 +34,11 @@ export interface DearManDraft {
   middleGroundCustom: string;
   walkAwayId: string | null;
   walkAwayCustom: string;
+  /**
+   * The part picked at cope ahead: its id only, never its anchor (that is re-read from the profile on
+   * resume, and the screen is skipped if the part or parts are gone). Absent in drafts from before it.
+   */
+  copeAheadPartId?: string | null;
 }
 
 export function dearManStepId(s: DearManStep): string {
@@ -57,7 +65,8 @@ export function isDearManDraft(x: unknown): x is DearManDraft {
     && str(d.barriersCustom) && strOrNull(d.describeId) && str(d.describeCustom) && strs(d.feelings) && str(d.feelingCustom)
     && strs(d.assertIds) && !!d.assertDetails && typeof d.assertDetails === 'object' && str(d.assertCustom)
     && strs(d.reinforceIds) && str(d.reinforceCustom) && str(d.anchorPhrase)
-    && strOrNull(d.middleGroundId) && str(d.middleGroundCustom) && strOrNull(d.walkAwayId) && str(d.walkAwayCustom);
+    && strOrNull(d.middleGroundId) && str(d.middleGroundCustom) && strOrNull(d.walkAwayId) && str(d.walkAwayCustom)
+    && (d.copeAheadPartId === undefined || strOrNull(d.copeAheadPartId));
 }
 
 export function dearManDraftOf(s: Omit<DearManDraft, 'v'>): DearManDraft {

@@ -186,7 +186,7 @@ export function lintFlowDocOrder(files = FLOW_DOC_FILES) {
  */
 export const PARTS_SLOT_WIDTH = {
   name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32,
-  context: 24, anchor: 40, month: 9, want: 20, N: 2, matters: 28, felt: 24,
+  context: 24, anchor: 90, month: 9, want: 20, N: 2, matters: 28, felt: 24,
 };
 
 /** Row kind → lint scope, length limit and the slots it may carry. */

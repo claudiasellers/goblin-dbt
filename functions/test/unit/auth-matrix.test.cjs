@@ -21,7 +21,7 @@ const AUTHED = [
   'deleteMyParts', // deletes the caller's own parts records
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
-  'schedulePartCheckback', 'answerPartCheckback',
+  'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in

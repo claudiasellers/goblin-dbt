@@ -49,6 +49,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
         thenVsNow: { t: 'id' }, resumed: { t: 'bool' }, overridden: { t: 'bool' },
       },
     },
+    copeAheadPartId: { t: 'id' },                                                  // DEAR MAN cope ahead: the part picked (id only, never its anchor)
   },
   ie: {},
   wmp: {

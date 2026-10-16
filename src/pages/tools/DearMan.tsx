@@ -29,13 +29,19 @@ import { scheduleResumeLater } from '../../services/capacity';
 import { dearManDraftOf, dearManStepFromId, dearManStepId, isDearManDraft, TOO_MUCH_PHASES, type DearManDraft, type DearManStep } from '../../lib/dearManResume';
 import { feelingEmotionWords, feelingLabel, hurtFeelingChip } from '../../lib/dearManHurt';
 import { getPartsContent } from '../../services/partsContent';
-import type { PartsHurt } from '../../data/partsContentTypes';
+import type { PartsContent, PartsHurt } from '../../data/partsContentTypes';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { useProfileContext } from '../../hooks/useProfileContext';
+import { profileCache } from '../../lib/profileCache';
+import { anchorLead, copeExt, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
+import { CopeAheadStep } from '../../components/parts/CopeAheadStep';
 
 type Phase =
   | 'entry'
   | 'check'
   | 'handoff'
   | 'scene'
+  | 'cope'
   | 'describe'
   | 'express'
   | 'assert'
@@ -173,6 +179,11 @@ export function DearMan() {
   const [walkAwayCustom, setWalkAwayCustom] = useState('');
   const [showWalkAwayCustom, setShowWalkAwayCustom] = useState(false);
 
+  // ── Cope ahead (parts on): the part picked (its id rides in ext.er and the resume draft, never its
+  // anchor) and anchors saved on this visit (over the profile slice, which is cached) ──
+  const [copeAheadPartId, setCopeAheadPartId] = useState<string | null>(null);
+  const [copeAnchors, setCopeAnchors] = useState<Record<string, string>>({});
+
   // ── Debrief data ──
   const [debriefOverall, setDebriefOverall] = useState<string | null>(null);
 
@@ -236,11 +247,13 @@ export function DearMan() {
     setAnchorPhrase(d.anchorPhrase);
     setMiddleGroundId(d.middleGroundId); setMiddleGroundCustom(d.middleGroundCustom);
     setWalkAwayId(d.walkAwayId); setWalkAwayCustom(d.walkAwayCustom);
+    setCopeAheadPartId(d.copeAheadPartId ?? null);
+    if (d.copeAheadPartId) session.setExt(copeExt(d.copeAheadPartId));
   };
   const draftOf = (): DearManDraft => dearManDraftOf({
     relationshipType, situationType, priorities, barriers, barriersCustom, describeId, describeCustom,
     feelings, feelingCustom, assertIds, assertDetails, assertCustom, reinforceIds, reinforceCustom,
-    anchorPhrase, middleGroundId, middleGroundCustom, walkAwayId, walkAwayCustom,
+    anchorPhrase, middleGroundId, middleGroundCustom, walkAwayId, walkAwayCustom, copeAheadPartId,
   });
 
   // ── Load content from graph (on mount, and on explicit retry) ──
@@ -301,6 +314,42 @@ export function DearMan() {
     return () => { live = false; };
   }, [hurtInPlay, partsHurts]);
   const hurtChip = useMemo(() => hurtFeelingChip(handoff?.hurtId, partsHurts, feelings), [handoff, partsHurts, feelings]);
+
+  // Cope ahead per part ("Who might show up in this conversation?"): read only with parts on. The
+  // profile read is DEAR MAN's declared slices (parts, kept lines, anchors; never partDetail).
+  const partsOn = useUserProfile().profile.partsEnabled;
+  const copeProfile = useProfileContext('dear-man', { enabled: partsOn });
+  /** The shipped parts content for the cope copy: null while loading, false when it couldn't load. */
+  const [copeContent, setCopeContent] = useState<PartsContent | null | false>(null);
+  useEffect(() => {
+    if (!partsOn || copeContent !== null) return;
+    let live = true;
+    getPartsContent().then(p => { if (live) setCopeContent(p); }).catch(() => { if (live) setCopeContent(false); });
+    return () => { live = false; };
+  }, [partsOn, copeContent]);
+  const copeSlices = copeProfile.slices;
+  const copeCopy = copeContent || null;
+  const copeShown = showCopeAhead({
+    partsOn, partCount: copeSlices?.parts.length ?? 0, ready: copeReady(copeCopy),
+    band: bandReading?.value ?? band.current()?.value ?? null,
+  });
+  /** Parts on, but the slices or the copy are still on their way: the cope step waits rather than skip. */
+  const copePending = partsOn && (copeProfile.status === 'loading' || copeContent === null);
+  const copeAnchorMap = useMemo(() => ({ ...(copeSlices?.partAnchors ?? {}), ...copeAnchors }), [copeSlices, copeAnchors]);
+  const copeLines = useMemo(() => keptLines(copeSlices?.ownLines, copeSlices?.savedLines), [copeSlices]);
+  // A resumed draft (or Back) can land on the step after parts went off or the part went: go on.
+  useEffect(() => {
+    if (phase === 'cope' && !copeShown && !copePending) setPhase('describe');
+  }, [phase, copeShown, copePending]);
+  const pickCopePart = (id: string | null) => {
+    setCopeAheadPartId(id);
+    session.setExt(copeExt(id));
+  };
+  /** The anchor carried to the Summary, under the script: the picked part's, when it has one. */
+  const copePart = copeAheadPartId ? copeSlices?.parts.find(p => p.id === copeAheadPartId) ?? null : null;
+  const copeCarry = partsOn && copeCopy && copeReady(copeCopy) && copePart && copeAnchorMap[copePart.id]
+    ? { lead: anchorLead(copeCopy, copePart.name), anchor: copeAnchorMap[copePart.id] }
+    : null;
 
   // ── Pre-fill feelings from check-in emotions ──
   useEffect(() => {
@@ -383,7 +432,11 @@ export function DearMan() {
         if (sceneStep > 0) setSceneStep(sceneStep - 1);
         else setPhase('entry');
         break;
-      case 'describe': setSceneStep(3); setPhase('scene'); break;
+      case 'cope': setSceneStep(3); setPhase('scene'); break;
+      case 'describe':
+        if (copeShown) setPhase('cope');
+        else { setSceneStep(3); setPhase('scene'); }
+        break;
       case 'express': setPhase('describe'); break;
       case 'assert': setPhase('express'); break;
       case 'reinforce': setPhase('assert'); break;
@@ -672,6 +725,7 @@ export function DearMan() {
     setAnchorPhrase(''); setShowAnchorGen(false); setAnchorNeedId(null); setAnchorShowAll(false);
     setMiddleGroundId(null); setMiddleGroundCustom(''); setShowMiddleGroundCustom(false);
     setWalkAwayId(null); setWalkAwayCustom(''); setShowWalkAwayCustom(false);
+    setCopeAheadPartId(null); session.setExt(copeExt(null));
     setDebriefOverall(null);
     setDebriefCurrentFeelings([]); setDebriefRelationshipType(null);
     setTurningPointIds([]); setMomentResponseIds([]);
@@ -885,10 +939,33 @@ export function DearMan() {
                   );
                 })}
               </div>
-              <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
-                Let&apos;s build your script
+              <button onClick={() => setPhase(copeShown ? 'cope' : 'describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
+                {copeShown ? 'Next' : <>Let&apos;s build your script</>}
               </button>
             </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── COPE AHEAD (parts on): who might show up, while the plan is made and before the script ───
+    if (phase === 'cope') {
+      if (!copeShown || !copeCopy || !copeSlices) return null;
+      return (
+        <div className="space-y-6">
+          {noteLine}
+          <BackButton />
+          <CopeAheadStep content={copeCopy} parts={copeParts(copeSlices.parts)} anchors={copeAnchorMap} lines={copeLines}
+            picked={copeAheadPartId} onPick={pickCopePart}
+            onAnchor={(partId, text, version) => {
+              setCopeAnchors(a => ({ ...a, [partId]: text }));
+              profileCache.bump(version);
+            }}
+            onGoOn={() => setPhase('describe')} />
+          {copeAheadPartId && (
+            <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
+              Let&apos;s build your script
+            </button>
           )}
         </div>
       );
@@ -1503,6 +1580,13 @@ export function DearMan() {
               <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">Why It Matters</p>
               {reinforceTexts.map((t, i) => <p key={i} className="text-[var(--color-text-primary)]">{t}</p>)}
             </div>
+
+            {copeCarry && (
+              <div className="mb-6" data-testid="cope-carry">
+                <p className="text-sm text-[var(--color-text-secondary)]">{copeCarry.lead}</p>
+                <p className="font-serif text-[var(--color-text-primary)] break-words">{copeCarry.anchor}</p>
+              </div>
+            )}
 
             <hr className="border-[var(--color-border-subtle)] mb-6" />
 
