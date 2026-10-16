@@ -9,6 +9,9 @@ import { Insights } from './Insights';
 import { useBand } from '../hooks/useBand';
 import { historyBandLabel } from '../lib/checkInBand';
 import { HISTORY_LIMIT } from '../lib/reflect';
+import { hurtLabel } from '../lib/dearManHurt';
+import { getPartsContent } from '../services/partsContent';
+import type { PartsHurt } from '../data/partsContentTypes';
 
 export function History() {
   const { user } = useAuth();
@@ -330,6 +333,16 @@ function humanize(id: string, labelMap?: Record<string, string>): string {
 function DearManFeed({ sessions }: { sessions: DearManSessionRecord[] }) {
   const dateFmt = new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   const timeFmt = new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: '2-digit' });
+  // A hurt named on Recover's angry card is saved as its id beside the feel_* ids: read the shipped
+  // parts content only when one is there, and show its felt phrase as DEAR MAN showed it.
+  const [hurts, setHurts] = useState<PartsHurt[] | null>(null);
+  const anyHurt = sessions.some((s) => s.feelings.some((f) => !f.startsWith('feel_')));
+  useEffect(() => {
+    if (!anyHurt || hurts) return;
+    let live = true;
+    getPartsContent().then((p) => { if (live) setHurts(p.hurts); }).catch(() => { /* the readable id stands */ });
+    return () => { live = false; };
+  }, [anyHurt, hurts]);
 
   return (
     <div className="space-y-3">
@@ -339,6 +352,7 @@ function DearManFeed({ sessions }: { sessions: DearManSessionRecord[] }) {
           session={session}
           dateFmt={dateFmt}
           timeFmt={timeFmt}
+          hurts={hurts}
         />
       ))}
     </div>
@@ -349,10 +363,12 @@ function DearManSessionCard({
   session,
   dateFmt,
   timeFmt,
+  hurts,
 }: {
   session: DearManSessionRecord;
   dateFmt: Intl.DateTimeFormat;
   timeFmt: Intl.DateTimeFormat;
+  hurts: PartsHurt[] | null;
 }) {
   const [expanded, setExpanded] = useState(false);
   const isPrep = session.type === 'prep';
@@ -421,7 +437,7 @@ function DearManSessionCard({
                 />
               )}
               {session.feelings.length > 0 && (
-                <Detail label="Feelings" value={session.feelings.map(f => humanize(f, feelingLabels)).join(', ')} />
+                <Detail label="Feelings" value={session.feelings.map(f => hurtLabel(f, hurts) ?? humanize(f, feelingLabels)).join(', ')} />
               )}
               {session.middleGroundCustom && (
                 <Detail label="Middle ground" value={session.middleGroundCustom} />

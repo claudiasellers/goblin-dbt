@@ -1,6 +1,7 @@
 import { useParams, Link, useLocation, Navigate } from 'react-router-dom';
 import { getToolById, toolIdFromUrl, TOOL_URL_SLUGS } from '../data/tools';
 import { ToolSessionProvider } from '../contexts/ToolSessionContext';
+import { useToolGate } from '../hooks/useToolGate';
 
 // Import tool components
 import { CoolDown } from './tools/CoolDown';
@@ -12,6 +13,7 @@ import { DearMan } from './tools/DearMan';
 import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
+import { MeetAPart } from './tools/MeetAPart';
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -24,6 +26,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'problem-solve': ProblemSolve,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
+  'meet-a-part': MeetAPart,
 };
 
 export function ToolPage() {
@@ -31,6 +34,8 @@ export function ToolPage() {
   const location = useLocation();
   const toolId = segment ? toolIdFromUrl(segment) : undefined;
   const tool = toolId ? getToolById(toolId) : undefined;
+  // Meet a part opens only with parts on and its copy signed off; otherwise it is "not found".
+  const gate = useToolGate(tool?.id);
 
   // Old address (/tool/cool-down): forward to the tool's own name, keeping the query and the
   // link state (Help me now / check-in / hand-off context for the session).
@@ -38,7 +43,15 @@ export function ToolPage() {
     return <Navigate to={{ pathname: `/tool/${TOOL_URL_SLUGS[segment]}`, search: location.search }} state={location.state} replace />;
   }
 
-  if (!tool) {
+  if (tool && gate === 'loading') {
+    return (
+      <div className="py-12 flex justify-center" aria-busy="true">
+        <span className="inline-block w-6 h-6 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full motion-safe:animate-spin" aria-hidden="true" />
+      </div>
+    );
+  }
+
+  if (!tool || gate === 'closed') {
     return (
       <div className="text-center py-12">
         <p className="text-[var(--color-text-secondary)]">

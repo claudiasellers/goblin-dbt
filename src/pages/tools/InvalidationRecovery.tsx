@@ -32,11 +32,13 @@ import { getSpineContent, type SpineContent } from '../../services/spine';
 import { recoverSchedule } from '../../lib/spine/wrap';
 import { AngryPartCard } from '../../components/parts/AngryPartCard';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
-import { angryCopyFrom, angryNotNowId, angryReady, orderHurts } from '../../lib/angryPart';
+import { ANGRY_MOVE, angryCopyFrom, angryLaterCopy, angryNotNowId, angryReady, orderHurts } from '../../lib/angryPart';
+import { queuePartCandidate } from '../../services/parts';
+import { newId } from '../../lib/spine/ids';
 import { handoffExt } from '../../lib/bandStore';
 import { getPartsContent } from '../../services/partsContent';
 import type { PartsContent } from '../../data/partsContentTypes';
-import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryStep } from '../../data/partsTypes';
+import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryLaterCopy, AngryStep } from '../../data/partsTypes';
 import type { HandoffResult } from '../../data/capacityTypes';
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: InvalidationRecoveryContent };
@@ -105,7 +107,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     return () => { live = false; };
   }, []);
   /** Set once, when the card is offered: its wording and hurts stay as they were, Back into it included. */
-  const [angry, setAngry] = useState<{ copy: AngryCardCopy; partsOn: boolean; hurts: AngryHurt[] } | null>(null);
+  const [angry, setAngry] = useState<{ copy: AngryCardCopy; partsOn: boolean; hurts: AngryHurt[]; later: AngryLaterCopy | null } | null>(null);
   const [angryStep, setAngryStep] = useState<AngryStep>('unblend');
   /** The hurt the card ended on, for DEAR MAN's first "I felt" chip; null after Not sure or Not now. */
   const [angryHurtId, setAngryHurtId] = useState<string | null>(null);
@@ -117,7 +119,12 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     if (!st) return;
     const ready = Boolean(parts && angryReady(parts, partsOn));
     const offer = offerAngryCard(merged, g, ready, angry !== null);
-    if (offer && parts) setAngry({ copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, parts.canTouch, merged.stateId) });
+    if (offer && parts) {
+      setAngry({
+        copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, parts.canTouch, merged.stateId),
+        later: angryLaterCopy(parts, partsOn),
+      });
+    }
     dispatch({ type: 'go', step: nextStep(step, merged, st, offer), patch });
   }, [d, step, states, parts, partsOn, g, angry]);
   const withSkills = (...ids: string[]): Partial<FlowData> => ({ skills: [...d.skills, ...ids] });
@@ -125,6 +132,16 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
   /** The card on the visit's ToolSession (log layer, ids only). Each write is the whole triple. */
   const recordAngry = (r: { angryExit: AngryStep | 'skipped'; angryHurtId?: string | null; angryVoteHeld?: boolean }) => {
     toolSession.setExt({ wmp: { angryHurtId: r.angryHurtId ?? undefined, angryVoteHeld: r.angryVoteHeld, angryExit: r.angryExit } });
+  };
+  /**
+   * "Spend a minute with it later?" (parts on): the tap is the yes. One candidate id per visit, so a
+   * retry after a failed call is the same record. The fight pull's move (EXPRESSES recover_fight).
+   */
+  const laterId = useRef<string | null>(null);
+  const queueLater = async () => {
+    laterId.current ??= newId();
+    await queuePartCandidate({ id: laterId.current, origin: 'angry_card', moveIds: [ANGRY_MOVE] });
+    toolSession.setExt({ wmp: { angryLater: true } });
   };
   /** "Too much" inside the card: P2 as an overlay, recorded the way DEAR MAN records it. */
   const handoffs = useRef<HandoffResult[]>([]);
@@ -247,6 +264,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
                 recordAngry({ angryExit: r.exitStep, angryHurtId: r.hurtId, angryVoteHeld: r.voteHeld });
                 advance();
               }}
+              later={angry.later} onLater={queueLater}
               tooMuch={<TooMuchLink host="recovering-from-invalidation" onResult={recordHandoff} />} />
           )}
 

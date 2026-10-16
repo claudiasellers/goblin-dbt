@@ -217,18 +217,28 @@ test("fragment widths fit the slots they fill (PARTS_SLOT_WIDTH)", () => {
 
 test("the angry-part card: every line in both wordings, the plain one never says part, a matters per hurt", () => {
   const angry = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "angry").map(([id]) => id);
-  const base = angry.filter((id) => !id.endsWith("_plain"));
+  // Parts on only, no twin: the later line's "done" (content.py PARTS_ON_ONLY).
+  const onOnly = ["angry_later_done"];
+  const base = angry.filter((id) => !id.endsWith("_plain") && !onOnly.includes(id));
+  assert.deepEqual(angry.filter((id) => onOnly.includes(id)), onOnly);
   assert.deepEqual(base, ["angry_unblend", "angry_unblend_sub", "angry_protects", "angry_vote", "angry_vote_noname",
     "angry_vote_unsure", "angry_vote_unsure_noname", "angry_vote_2", "angry_vote_3", "angry_vote_3_noname", "angry_hold",
     "angry_speak", "angry_speak_unsure", "angry_speak_line"]);
-  assert.deepEqual(angry.sort(), [...base, ...base.map((id) => `${id}_plain`)].sort(), "every X has an X_plain, and nothing else");
+  assert.deepEqual(angry.sort(), [...base, ...base.map((id) => `${id}_plain`), ...onOnly].sort(), "every X has an X_plain, and nothing else");
   for (const id of angry.filter((x) => x.endsWith("_plain"))) {
     assert.doesNotMatch(fixture.prompts[id].copy, /\bparts?\b/i, `${id}: parts off means no parts words`);
   }
   // The person's sentence is theirs: linted without voice_distance, with only {felt}.
   for (const id of ["angry_speak_line", "angry_speak_line_plain"]) assert.equal(fixture.prompts[id].copyKind, "first_person", id);
   assert.deepEqual(Object.values(fixture.options.angry).flat().map((o) => [o.id, o.label]),
-    [["angry_next", "Okay"], ["angry_not_now", "Not now"], ["angry_not_now_plain", "Not now"], ["angry_not_sure", "Not sure"], ["angry_done", "Done"]]);
+    [["angry_next", "Okay"], ["angry_not_now", "Not now"], ["angry_not_now_plain", "Not now"], ["angry_not_sure", "Not sure"],
+      ["angry_done", "Done"], ["angry_later", "Spend a minute with it later?"]]);
+  // "Later" shows with parts on only, so its lines have no plain twin; tapping it queues a candidate.
+  const later = fixture.options.angry.speak.find((o) => o.id === "angry_later");
+  assert.equal(later.branch, "candidate");
+  assert.equal(fixture.prompts.angry_later_done.step, "speak");
+  assert.equal(fixture.prompts.angry_later_done_plain, undefined);
+  assert.equal(Object.values(fixture.options.angry).flat().some((o) => o.id === "angry_later_plain"), false);
   // The card's own way past, one per wording, on its first screen, and it ends the card.
   for (const id of ["angry_not_now", "angry_not_now_plain"]) {
     const o = Object.values(fixture.options.angry).flat().find((x) => x.id === id);

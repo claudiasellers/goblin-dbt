@@ -34,7 +34,7 @@ type Stage =
  * `onSafety` renders the "I'm not safe" link when the safety batch passes `safety.open`.
  */
 export function BreakdownHandoff({
-  host, band: bandValue, blank = false, resume, dismissedRef, startWithPrimitive, onResume, onLater, onScheduleLater, onSafety, safetyLabel,
+  host, band: bandValue, blank = false, resume, dismissedRef, startWithPrimitive, startLater = false, onResume, onLater, onScheduleLater, onSafety, safetyLabel,
 }: {
   host: string;
   band: Band;
@@ -47,6 +47,11 @@ export function BreakdownHandoff({
   dismissedRef?: { current: boolean };
   /** Skip the card (the user asked for this via "too much"). */
   startWithPrimitive?: boolean;
+  /**
+   * Open on the last two choices (come back later, keep going anyway): P2 already ran this visit (Meet a
+   * part after a P2 on entry), so a second "running things" offers no new primitive.
+   */
+  startLater?: boolean;
   onResume: (r: HandoffResult) => void;
   onLater?: (r: HandoffResult) => void;
   /** Schedules the `resume_skill` follow-up; resolves its id, or null. Absent → no "later" chips. */
@@ -59,7 +64,8 @@ export function BreakdownHandoff({
   const content = b.content;
   const plan = useMemo(() => (content ? planHandoff({ band: bandValue, blank }, content.primitives) : []), [content, bandValue, blank]);
 
-  const [stage, setStage] = useState<Stage>(() => (startWithPrimitive ? { k: 'primitive', i: 0, startedAt: Date.now() } : { k: 'card' }));
+  const [stage, setStage] = useState<Stage>(() => (startLater ? { k: 'later', scheduled: false }
+    : startWithPrimitive ? { k: 'primitive', i: 0, startedAt: Date.now() } : { k: 'card' }));
   const [scheduling, setScheduling] = useState(false);
   const runs = useRef<HandoffResult['primitivesRun']>([]);
   const lastReread = useRef<ThenVsNow | null>(null);
