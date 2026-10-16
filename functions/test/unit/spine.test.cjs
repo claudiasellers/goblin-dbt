@@ -149,6 +149,24 @@ test('closeToolSession: emotions picked in the tool are set once, only when the 
   await assert.rejects(fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed', emotionIds: ['I feel awful'] } }), (e) => e.code === 'invalid-argument');
 });
 
+test('closeToolSession: Do the Opposite keeps the urge and the check result as ids, with no rep (parts data fix 3)', async () => {
+  const f = closeDriver({ closeKind: 'none' });
+  setDriver(f.driver);
+  // Route `problem` (the urge fits and would help): left without a plan, so exited early.
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early', exitStep: 'result_problem', urgeIds: ['fear-avoid'],
+    ext: { er: { oaFacts: 'fits', oaEffect: 'helpful', oaRoute: 'problem' } } } });
+  const close = f.calls.find((c) => /SET ts\.status = \$status/.test(c.query));
+  assert.deepEqual(close.params.urgeIds, ['fear-avoid']);
+  assert.deepEqual(JSON.parse(close.params.ext), { er: { oaFacts: 'fits', oaEffect: 'helpful', oaRoute: 'problem' } });
+  assert.ok(!f.calls.some((c) => /MERGE \(sp:SkillPractice/.test(c.query)), 'not a practised rep');
+  // Free text is refused before any query.
+  const g = closeDriver({ closeKind: 'none' });
+  setDriver(g.driver);
+  await assert.rejects(fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early', ext: { er: { oaFacts: 'it fits, mostly' } } } }),
+    (e) => e.code === 'invalid-argument');
+  assert.equal(g.calls.length, 0);
+});
+
 test('startToolSession stores the hand-off emotion ids', async () => {
   const f = fakeDriver((q) => (/RETURN tu\.id AS toolUsageId/.test(q) ? [{ toolUsageId: `${ID}:usage` }] : []));
   setDriver(f.driver);

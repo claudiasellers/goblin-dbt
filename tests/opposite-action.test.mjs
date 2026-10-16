@@ -14,7 +14,7 @@ async function importTs(path) {
     `data:text/javascript;base64,${Buffer.from(source).toString("base64")}`
   );
 }
-const { oppositeActionRoute, reflectionKey } = await importTs(
+const { oppositeActionRoute, oaResultExt, OA_RESULT_CLEARED, reflectionKey } = await importTs(
   "src/lib/oppositeAction.ts",
 );
 const { validateOppositeActionSession } = await importTs(
@@ -47,6 +47,32 @@ test("every graph decision path preserves uncertainty and checks urge effectiven
     oppositeActionRoute(flow, "safe", "missing", "unhelpful"),
     "clarify",
   );
+});
+test("the check's result is recorded as ids whatever the route; support asks no facts (data fix 3)", () => {
+  const ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
+  const keys = new Set(Object.keys(OA_RESULT_CLEARED));
+  for (const facts of flow.choices.facts.map((c) => c.id)) {
+    for (const effectiveness of flow.choices.effectiveness.map((c) => c.id)) {
+      const route = oppositeActionRoute(flow, "safe", facts, effectiveness);
+      const er = oaResultExt("safe", facts, effectiveness, route);
+      assert.deepEqual(er, { oaRoute: route, oaFacts: facts, oaEffect: effectiveness });
+      for (const [k, v] of Object.entries(er)) {
+        assert.ok(keys.has(k), `${k}: a key OA_RESULT_CLEARED clears`);
+        assert.match(v, ID, `${k}: an id`);
+      }
+    }
+  }
+  // The urge fits and would help: a protector doing its job is kept too.
+  assert.deepEqual(oaResultExt("safe", "fits", "helpful", "problem"), { oaRoute: "problem", oaFacts: "fits", oaEffect: "helpful" });
+  for (const safety of ["unsafe", "unsure"]) {
+    const route = oppositeActionRoute(flow, safety, "", "");
+    assert.equal(route, "support");
+    assert.deepEqual(oaResultExt(safety, "", "", route), { oaRoute: "support" });
+    assert.deepEqual(oaResultExt(safety, "fits", "helpful", route), { oaRoute: "support" }, "stale answers are not sent");
+  }
+  // Anything that is not an id never reaches the session.
+  assert.deepEqual(oaResultExt("safe", "it fits, I think", "", "clarify"), { oaRoute: "clarify" });
+  assert.deepEqual(OA_RESULT_CLEARED, { oaFacts: null, oaEffect: null, oaRoute: null });
 });
 test("reflection never treats unsafe practice as success even if intensity falls", () => {
   assert.equal(reflectionKey(8, 2, "unsafe"), "reflectionUnsafe");
