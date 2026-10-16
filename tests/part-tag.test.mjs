@@ -39,9 +39,17 @@ test("gate: each condition off, no row", () => {
   assert.equal(lib.tagRowGate(on), true);
   assert.equal(lib.tagRowGate({ ...on, thenVsNow: "much_better" }), true);
   for (const [k, v] of [["partsOn", false], ["saved", false], ["thenVsNow", "same"], ["thenVsNow", "worse"], ["thenVsNow", null],
-    ["toolId", "meet-a-part"], ["toolId", "help-now"], ["toolId", "micro-step"], ["toolId", "pause"], ["content", null]]) {
+    ["toolId", "meet-a-part"], ["toolId", "help-now"], ["toolId", "micro-step"], ["toolId", "problem-solve"], ["content", null]]) {
     assert.equal(lib.tagRowGate({ ...on, [k]: v }), false, `${k} = ${v}`);
   }
+  // An urge close: Held off only.
+  const urge = { ...on, toolId: "pause", thenVsNow: null, actedOnUrge: "no" };
+  assert.equal(lib.tagRowGate(urge), true);
+  assert.equal(lib.tagRowGate({ ...urge, toolId: "urge-surfing" }), true);
+  for (const a of ["partly", "yes", "not_yet", null, undefined]) assert.equal(lib.tagRowGate({ ...urge, actedOnUrge: a }), false, `actedOnUrge ${a}`);
+  assert.equal(lib.tagRowGate({ ...urge, toolId: "meet-a-part" }), false);
+  assert.equal(lib.tagRowGate({ ...urge, saved: false }), false);
+  assert.deepEqual([...lib.TAG_URGE_CLOSES], ["no"]);
   // One line missing (today nothing is signed off): no row.
   for (const id of TAG_IDS) {
     assert.equal(lib.tagRowGate({ ...on, content: partsFromFixture(fixture, (x) => TAG_IDS.includes(x) && x !== id) }), false, id);
@@ -76,19 +84,21 @@ const pageOf = (id) => {
 /** Tools that may never show the row although their close asks then-vs-now. */
 const NEVER_HOSTS = ["meet-a-part"];
 
-test("hosts: every tool whose close asks then-vs-now, minus Meet a part, each declaring parts", () => {
-  // Derived from the close kinds, so a new tool with a then-vs-now close joins (or fails here).
-  const asks = Object.entries(TOOL_CLOSE_KIND).filter(([, k]) => dirFor(k.closeKind) !== null).map(([id]) => id);
+test("hosts: every tool whose close asks then-vs-now or about the urge, minus Meet a part, each declaring parts", () => {
+  // Derived from the close kinds, so a new tool with a then-vs-now or an urge close joins (or fails here).
+  const asks = Object.entries(TOOL_CLOSE_KIND)
+    .filter(([, k]) => dirFor(k.closeKind) !== null || k.closeKind === "urge").map(([id]) => id);
   const hosts = asks.filter((id) => !NEVER_HOSTS.includes(id));
   assert.deepEqual([...lib.TAG_ROW_TOOLS], hosts);
-  assert.deepEqual(hosts, ["cool-down", "five-senses", "find-the-feeling"], "the survey (Oct 2026)");
+  assert.deepEqual(hosts, ["cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling"], "the survey (Oct 2026)");
   // Every page that closes with a then-vs-now is a host or never one (a tool recording it by hand
   // without a then-vs-now close kind would fail here).
   for (const id of Object.keys(TOOL_CLOSE_KIND)) {
     const page = pageOf(id);
     if (!page) continue;
     const src = read(page);
-    if (/\.close\(\{[^}]*thenVsNow/.test(src) || /<SessionClose\b/.test(src) && dirFor(TOOL_CLOSE_KIND[id].closeKind)) {
+    const kind = TOOL_CLOSE_KIND[id].closeKind;
+    if (/\.close\(\{[^}]*(thenVsNow|actedOnUrge)/.test(src) || /<SessionClose\b/.test(src) && (dirFor(kind) || kind === "urge")) {
       assert.ok(hosts.includes(id) || NEVER_HOSTS.includes(id), `${id} records then-vs-now but shows no tag row`);
     }
   }
@@ -114,9 +124,10 @@ test("each host mounts PartTagSlot under its saved close; the slot is the only g
   }
   const close = read("src/components/spine/SessionClose.tsx");
   assert.match(close, /session\.close\(input\)\.then\(\(r\) => \{ if \(r\) setSaved\(true\); \}/);
-  assert.match(close, /<PartTagSlot toolId=\{session\.toolId\} toolSessionId=\{session\.id\} thenVsNow=\{closeAnswer\} saved=\{saved\} \/>/);
+  assert.match(close, /<PartTagSlot toolId=\{session\.toolId\} toolSessionId=\{session\.id\} thenVsNow=\{closeAnswer\} actedOnUrge=\{closeActed\} saved=\{saved\} \/>/);
+  assert.match(close, /actedOnUrge: choiceId as ActedOnUrge \};\n\s+setCloseActed\(choiceId as ActedOnUrge\);/);
   const slot = read("src/components/spine/PartTagSlot.tsx");
-  assert.match(slot, /if \(!tagRowGate\(\{ partsOn, toolId, thenVsNow, saved, content: parts \}\)\) return null;/);
+  assert.match(slot, /if \(!tagRowGate\(\{ partsOn, toolId, thenVsNow, actedOnUrge, saved, content: parts \}\)\) return null;/);
   assert.match(slot, /if \(!wantsRow \|\| parts\) return;/, "parts content read only for a row that may show");
   // Nothing else mounts the row or decides its gate.
   for (const f of ["src/components/spine/SessionClose.tsx", ...lib.TAG_ROW_TOOLS.map(pageOf)]) {
