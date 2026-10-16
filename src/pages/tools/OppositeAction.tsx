@@ -40,7 +40,10 @@ import type {
 import {
   capacityDefaultSize,
   fill,
+  OA_RESULT_CLEARED,
+  oaResultExt,
   oppositeActionRoute,
+  type OppositeActionRoute,
   urgePhrase,
   urgeReadout,
 } from "../../lib/oppositeAction";
@@ -293,6 +296,8 @@ export function OppositeAction() {
 
   const requestId = useRef(0);
   const saveLock = useRef(false);
+  /** A check result is on this visit's ToolSession (ext.er), so a step back must clear it. */
+  const checkRecorded = useRef(false);
   /** Latest draft id, so a save that resolves late never marks a different session saved. */
   const draftId = useRef(draft.id);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -344,6 +349,33 @@ export function OppositeAction() {
   const go = (next: Stage) => {
     setError("");
     setStage(next);
+  };
+  // Parts data fix 3: the urge and the check's result reach this visit's ToolSession as ids, set
+  // by the tap that makes them, never from a hydrated plan (both are ask-fresh). No markComplete()
+  // on `problem`: a completed visit here logs an opposite-action rep (closeTx writes one per
+  // PracticeSkill.defaultFor), and judging the urge would help is not one. It closes as exited
+  // early, with its step and ext.er.
+  const recordCheck = (
+    safety: string,
+    facts: string,
+    effectiveness: string,
+    route: OppositeActionRoute,
+  ) => {
+    toolSession.setExt({
+      er: { ...OA_RESULT_CLEARED, ...oaResultExt(safety, facts, effectiveness, route) },
+    });
+    toolSession.setStep(`result_${route}`);
+    checkRecorded.current = true;
+  };
+  /**
+   * The result no longer stands (Recheck, Previous, Back, another urge). Only once one was
+   * recorded, so a visit that never reached a result sends no `ext.er` and no step, as before.
+   */
+  const clearCheck = (step: Stage) => {
+    if (!checkRecorded.current) return;
+    checkRecorded.current = false;
+    toolSession.setExt({ er: OA_RESULT_CLEARED });
+    toolSession.setStep(step);
   };
   const resetPlan = () => {
     patch({
@@ -447,6 +479,8 @@ export function OppositeAction() {
         contentVersion: result.flow.version,
         sourceIds: result.flow.sourceIds,
       });
+      toolSession.setUrgeIds([]);
+      clearCheck("urge");
       setCheckStep(0);
       setCustomAction(false);
       setStepOpen(true);
@@ -595,6 +629,8 @@ export function OppositeAction() {
   function startNew() {
     requestId.current += 1;
     setDraft(blank());
+    toolSession.setUrgeIds([]);
+    clearCheck("identify");
     setData(null);
     setIds([]);
     setLoading(false);
@@ -626,11 +662,13 @@ export function OppositeAction() {
       case "check":
         resetPlan();
         resetBody();
+        clearCheck("urge");
         go("urge");
         return;
       case "body":
         resetPlan();
         resetBody();
+        clearCheck("check");
         setCheckStep(CHECK_STEPS.length - 1);
         go("check");
         return;
@@ -783,6 +821,9 @@ export function OppositeAction() {
         effectiveness: "",
       });
       setCheckStep(0);
+      // The pick made here, in this visit. "My urge is different" is free text: no id, never the text.
+      toolSession.setUrgeIds(id === "custom" ? [] : [id]);
+      clearCheck("urge");
     };
     content = (
       <>
@@ -862,9 +903,15 @@ export function OppositeAction() {
     );
   } else if (stage === "check") {
     const previous =
-      checkStep > 0 ? () => setCheckStep((n) => n - 1) : undefined;
+      checkStep > 0
+        ? () => {
+            clearCheck("check");
+            setCheckStep((n) => n - 1);
+          }
+        : undefined;
     const recheck = () => {
       patch({ safety: "", facts: "", effectiveness: "" });
+      clearCheck("check");
       setCheckStep(0);
     };
     const route = oppositeActionRoute(
@@ -902,7 +949,10 @@ export function OppositeAction() {
           onPrevious={previous}
           onSelect={(id) => {
             patch({ safety: id, facts: "", effectiveness: "" });
-            if (id === "safe") setCheckStep(2);
+            if (id === "safe") {
+              clearCheck("check");
+              setCheckStep(2);
+            } else recordCheck(id, "", "", "support");
           }}
           after={
             blocked && (
@@ -987,6 +1037,7 @@ export function OppositeAction() {
           onSelect={(id) => {
             change("effectiveness", id);
             const next = oppositeActionRoute(flow, draft.safety, draft.facts, id);
+            recordCheck(draft.safety, draft.facts, id, next);
             if (next === "opposite") {
               resetBody();
               go("body");
@@ -1025,7 +1076,10 @@ export function OppositeAction() {
           <button
             type="button"
             className={linkButton}
-            onClick={() => setCheckStep(CHECK_STEPS.length - 1)}
+            onClick={() => {
+              clearCheck("check");
+              setCheckStep(CHECK_STEPS.length - 1);
+            }}
           >
             ← Previous
           </button>
