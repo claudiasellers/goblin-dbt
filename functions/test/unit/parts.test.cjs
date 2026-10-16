@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const { loadFunctions, fakeDriver } = require('./fakeDriver.cjs');
 const { entryGate, resolveEntryPolicy, DEFAULT_ENTRY_POLICY } = require('../../lib/parts/gate');
 const { getPartsEntryHandler } = require('../../lib/parts/handler');
-const { POLICY_QUERY, RECENT_QUERY, DISSOCIATION_QUERY, PARTS_MADE_QUERY, PART_PAUSED_QUERY, recoverDownshiftAt } = require('../../lib/parts/queries');
+const { PARTS_ON_QUERY, POLICY_QUERY, RECENT_QUERY, DISSOCIATION_QUERY, PARTS_MADE_QUERY, PART_PAUSED_QUERY, recoverDownshiftAt } = require('../../lib/parts/queries');
 const { readPartsEntryInput } = require('../../lib/parts/validation');
 
 const { fns, setDriver } = loadFunctions();
@@ -74,6 +74,7 @@ test("recoverDownshiftAt reads the flow's gates, or null", () => {
 test('handler: the policy windows reach the queries; a missing policy uses the defaults', async () => {
   const seen = [];
   const deps = (policy, recent = quiet, n = 0, made = 0) => ({
+    partsOn: async () => true,
     policy: async () => policy,
     recent: async (hours, downshiftAt) => { seen.push(['recent', hours, downshiftAt]); return recent; },
     dissociation: async (days) => { seen.push(['dissociation', days]); return n; },
@@ -89,6 +90,7 @@ test('handler: the policy windows reach the queries; a missing policy uses the d
 
 test('handler: tooMany only at PartsPolicy.tooManyPartsCount parts in its window, alongside any outcome, never a lock', async () => {
   const deps = (made, policy = null, recent = quiet) => ({
+    partsOn: async () => true,
     policy: async () => policy, recent: async () => recent, dissociation: async () => 0, partsMade: async () => made,
   });
   assert.deepEqual(await getPartsEntryHandler(deps(2)), { open: 'clear', reasons: [] }, 'under the line: no key at all');
@@ -101,6 +103,7 @@ test('handler: tooMany only at PartsPolicy.tooManyPartsCount parts in its window
 test('handler: paused only when the request names a part and the query says it is paused; never a lock', async () => {
   const asked = [];
   const deps = (paused, recent = quiet) => ({
+    partsOn: async () => true,
     policy: async () => null, recent: async () => recent, dissociation: async () => 0, partsMade: async () => 3,
     partPaused: async (id) => { asked.push(id); return paused; },
   });
@@ -124,8 +127,9 @@ test('readPartsEntryInput: a well-formed partId or nothing; never a refusal (the
 
 // ------------------------------------------------------------------ callable (fake driver)
 
-function partsDriver({ policy = null, recent = null, n = 0, made = 0, paused = null } = {}) {
+function partsDriver({ policy = null, recent = null, n = 0, made = 0, paused = null, partsOn = true } = {}) {
   return fakeDriver((q) => {
+    if (q === PARTS_ON_QUERY) return [{ partsOn }];
     if (q === PART_PAUSED_QUERY) return paused === null ? [] : [{ paused }];
     if (q === PARTS_MADE_QUERY) return [{ n: made }];
     if (q === POLICY_QUERY) return policy ? [policy] : [];
@@ -143,9 +147,9 @@ test("getPartsEntry reads only the caller's own records, in read transactions, w
   setDriver(f.driver);
   const out = await fns.getPartsEntry.run({ auth: auth('real-user'), data: { uid: 'someone-else', userId: 'someone-else' } });
   assert.deepEqual(out, { open: 'far_away', reasons: ['dissociation_history'] });
-  assert.equal(f.calls.length, 4);
+  assert.equal(f.calls.length, 5);
   const user = f.calls.filter((c) => c.query !== POLICY_QUERY);
-  assert.equal(user.length, 3);
+  assert.equal(user.length, 4);
   for (const c of user) {
     assert.equal(c.params.uid, 'real-user');
     assert.ok(!('userId' in c.params));
@@ -187,6 +191,21 @@ test('getPartsEntry: three parts made lately add tooMany, and nothing else', asy
   setDriver(partsDriver({ made: 3 }).driver);
   const out = await fns.getPartsEntry.run({ auth: auth(), data: {} });
   assert.deepEqual(out, { open: 'clear', reasons: [], tooMany: true });
+});
+
+test('getPartsEntry with parts off: clear, and nothing but the setting is read (no check-ins, no Recover, no parts)', async () => {
+  const f = partsDriver({ partsOn: false, recent: { checkinFlooding: true, checkinCrisis: true, recoverLoud: true }, n: 5, made: 9, paused: true });
+  setDriver(f.driver);
+  const out = await fns.getPartsEntry.run({ auth: auth('real-user'), data: { partId: '11111111-2222-4333-8444-555555555555' } });
+  assert.deepEqual(out, { open: 'clear', reasons: [] });
+  assert.deepEqual(f.calls.map((c) => c.query), [PARTS_ON_QUERY]);
+  assert.equal(f.calls[0].params.uid, 'real-user');
+  // The handler alone: no other dep is touched.
+  const touched = [];
+  const spy = (k) => async () => { touched.push(k); throw new Error(`${k} read with parts off`); };
+  assert.deepEqual(await getPartsEntryHandler({ partsOn: async () => false, policy: spy('policy'), recent: spy('recent'),
+    dissociation: spy('dissociation'), partsMade: spy('partsMade'), partPaused: spy('partPaused') }, { partId: 'x' }), { open: 'clear', reasons: [] });
+  assert.deepEqual(touched, []);
 });
 
 // ------------------------------------------------------------------ partsEnabled (a setting)
@@ -666,7 +685,7 @@ test('queuePartCandidate: parts off refused for every origin; moves must exist; 
 
 test('queuePartCandidate over the fake driver: one write, MERGE on key (idempotent), log layer, QUEUED from the session', async () => {
   const f = fakeDriver((q) => {
-    if (q === C.CANDIDATE_STATE_QUERY) return [{ partsOn: true, sessionFound: true, knownMoves: 1 }];
+    if (q === C.CANDIDATE_STATE_QUERY) return [{ partsOn: true, idTaken: false, sessionFound: true, knownMoves: 1 }];
     if (q === C.CANDIDATE_QUERY) return [{ id: CID }];
     return new Error('unexpected');
   });
@@ -720,7 +739,7 @@ test('queuePartCandidate with toolSessionId: the caller\'s own closed session; m
 
 test('queuePartCandidate over the fake driver: one state read derives the moves; FROM_SESSION out of the candidate', async () => {
   const f = fakeDriver((q) => {
-    if (q === C.CANDIDATE_STATE_QUERY) return [{ partsOn: true, sessionFound: false, knownMoves: 0, toolSessionFound: true, toolSessionStatus: 'completed', derivedMoves: ['hide'] }];
+    if (q === C.CANDIDATE_STATE_QUERY) return [{ partsOn: true, idTaken: false, sessionFound: false, knownMoves: 0, toolSessionFound: true, toolSessionStatus: 'completed', derivedMoves: ['hide'] }];
     if (q === C.CANDIDATE_QUERY) return [{ id: CID }];
     return new Error('unexpected');
   });
@@ -825,7 +844,7 @@ test('tagPart debrief: DEAR MAN only, open or closed, no close answer; one per s
   // The write's parameters: the debrief's own taggedKey (a close tag on the same session can coexist), strength.
   let params = null;
   const f = fakeDriver((q, p) => {
-    if (q === T.TAG_STATE_QUERY) return [{ ...good, existingId: null }];
+    if (q === T.TAG_STATE_QUERY) return [{ ...good, existingId: null, idTaken: false }];
     if (q === T.TAG_QUERY) { params = p; return [{ id: TAG }]; }
     return new Error('unexpected');
   });
@@ -859,7 +878,7 @@ test('tagPart over the fake driver: log layer, incoming edges only on the ToolSe
   const f = fakeDriver((q) => {
     if (q === T.TAG_STATE_QUERY) {
       reads += 1;
-      return [{ partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', actedOnUrge: null, toolId: 'five-senses', existingId: reads > 1 ? TAG : null }];
+      return [{ partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', actedOnUrge: null, toolId: 'five-senses', existingId: reads > 1 ? TAG : null, idTaken: false }];
     }
     if (q === T.TAG_QUERY) {
       const e = new Error('Node(1) already exists with label `PartTag` and property `taggedKey` = ...');
@@ -1289,4 +1308,37 @@ test("getPartsEntry with a partId: paused from the caller's own part only, by ke
   setDriver(g.driver);
   assert.deepEqual(await fns.getPartsEntry.run({ auth: auth(), data: { partId: 'nope' } }), { open: 'clear', reasons: [] });
   assert.ok(!g.calls.some((x) => x.query === PART_PAUSED_QUERY), 'a malformed id is never queried');
+});
+
+// ------------------------------------------------------------------ security review: finalised records take incoming edges only
+
+test('tagPart: an id already the caller\'s (reused for another session) writes nothing; the write refuses it too', async () => {
+  const good = { partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', actedOnUrge: null, toolId: 'pause', existingId: null };
+  const log = [];
+  const deps = { state: async () => ({ ...good, idTaken: true }), write: async (t) => { log.push(t); return true; } };
+  assert.deepEqual(await T.tagPartHandler(T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID }), deps), { id: TAG, created: false });
+  assert.equal(log.length, 0, 'no new TAGS / OF_PART edge out of a finalised tag');
+  assert.match(T.TAG_STATE_QUERY, /OPTIONAL MATCH \(same:PartTag \{key: \$key\}\)/);
+  assert.match(T.TAG_STATE_QUERY, /same IS NOT NULL AS idTaken/);
+  assert.match(T.TAG_QUERY, /AND NOT EXISTS \{ MATCH \(:PartTag \{key: \$key\}\) \}/, 'the write itself never reaches an existing tag');
+  // Over the fake driver: the state says taken, and no write is sent.
+  const f = fakeDriver((q) => (q === T.TAG_STATE_QUERY ? [{ ...good, idTaken: true }] : new Error('unexpected')));
+  setDriver(f.driver);
+  assert.deepEqual(await fns.tagPart.run({ auth: auth('real-user'), data: { id: TAG, partId: PID, toolSessionId: TSID } }), { id: TAG, created: false });
+  assert.ok(!f.calls.some((c) => c.query === T.TAG_QUERY));
+});
+
+test('queuePartCandidate: an id already the caller\'s writes nothing; QUEUED only out of a session still taking writes; the tool session is the caller\'s', async () => {
+  const log = [];
+  const deps = { state: async () => ({ partsOn: true, idTaken: true, sessionFound: true, knownMoves: 1 }), write: async (c) => { log.push(c); } };
+  assert.deepEqual(await C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'split', moveIds: ['hide'], sessionId: SID }), deps), { id: CID });
+  assert.equal(log.length, 0, 'no new QUEUED / FROM_SESSION edge onto or out of a finalised candidate');
+  // Parts off still refuses first, taken or not.
+  await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'split', moveIds: [] }),
+    { state: async () => ({ partsOn: false, idTaken: true, sessionFound: false, knownMoves: 0 }), write: async () => {} }), code('failed-precondition'));
+  assert.match(C.CANDIDATE_STATE_QUERY, /OPTIONAL MATCH \(same:PartCandidate \{key: \$key\}\)/);
+  assert.match(C.CANDIDATE_QUERY, /WITH u WHERE NOT EXISTS \{ MATCH \(:PartCandidate \{key: \$key\}\) \}/);
+  assert.match(C.CANDIDATE_QUERY, /\(ps:PartSession \{key: \$sessionKey\}\) WHERE \(ps\.status = 'open' OR \(ps\.status = 'saved' AND ps\.savedAt > datetime\(\) - duration\(\{hours: 12\}\)\)\)/,
+    'GUARDS.PartSession.keep on the QUEUED edge');
+  assert.match(C.CANDIDATE_STATE_QUERY, /OPTIONAL MATCH \(ts\)-\[:DETAIL\]->\(ir:InvalidationRecoverySession\) WHERE ir\.ownerId = \$uid/, 'a DETAIL record read for the moves is the caller\'s own');
 });

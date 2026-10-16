@@ -18,7 +18,9 @@
  * and a repeat (any id, any part) returns it and writes nothing. Two calls racing past that read are
  * stopped by the `part_tag_tagged_key` uniqueness constraint on `PartTag.taggedKey`: the session's key for
  * a close tag (as before), `<session key>:debrief` for a debrief tag, so one of each can coexist. The
- * loser's transaction fails, and the callable reads again and returns the winner's tag.
+ * loser's transaction fails, and the callable reads again and returns the winner's tag. A tag id the
+ * caller already used (for any session) is answered as a repeat and writes nothing: a finalised tag never
+ * takes another outgoing edge.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -57,9 +59,10 @@ export const TAG_STATE_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
   OPTIONAL MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey})
   OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
+  OPTIONAL MATCH (same:PartTag {key: $key})
   OPTIONAL MATCH (u)-[:HAS_PART_TAG]->(prev:PartTag {taggedKey: $taggedKey})-[:TAGS]->(ts)
-  WITH u, pt, ts, prev ORDER BY prev.createdAt
-  RETURN coalesce(u.partsEnabled, false) AS partsOn, pt.status AS partStatus,
+  WITH u, pt, ts, same, prev ORDER BY prev.createdAt
+  RETURN coalesce(u.partsEnabled, false) AS partsOn, pt.status AS partStatus, same IS NOT NULL AS idTaken,
          ts IS NOT NULL AS sessionFound, ts.status AS sessionStatus, ts.thenVsNow AS thenVsNow,
          ts.actedOnUrge AS actedOnUrge, ts.toolId AS toolId,
          collect(prev.id)[0] AS existingId
@@ -70,7 +73,7 @@ export const TAG_QUERY = `
   ${MERGE_USER}
   WITH u
   MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
-  WHERE coalesce(u.partsEnabled, false) AND (
+  WHERE coalesce(u.partsEnabled, false) AND NOT EXISTS { MATCH (:PartTag {key: $key}) } AND (
     ($source = 'close' AND ts.status <> 'open'
       AND (ts.thenVsNow IN $closes OR ts.actedOnUrge IN $urgeCloses) AND NOT ts.toolId IN $never)
     OR ($source = 'debrief' AND ts.toolId IN $debriefTools))
@@ -94,6 +97,8 @@ export interface TagState {
   toolId: string | null;
   /** The session's tag, if it has one already. */
   existingId: string | null;
+  /** A tag with this id is already the caller's (a repeat, or an id reused for another session). */
+  idTaken?: boolean;
 }
 
 type TagInput = TagPartRequest & { source: TagSource };
@@ -109,6 +114,7 @@ export async function tagPartHandler(t: TagInput, deps: TagDeps): Promise<TagPar
   if (!st.partsOn) throw partsOff();
   if (!st.sessionFound) throw new HttpsError('not-found', 'Session not found');
   if (st.existingId) return { id: st.existingId, created: false };
+  if (st.idTaken) return { id: t.id, created: false };
   if (t.source === 'debrief') {
     // DEAR MAN's debrief: its own session, open or closed; no close answer asked.
     if (!(TAG_DEBRIEF_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
@@ -146,6 +152,7 @@ export function tagDeps(tx: ManagedTransaction, uid: string, email: string | nul
         actedOnUrge: s(r?.get('actedOnUrge')),
         toolId: s(r?.get('toolId')),
         existingId: s(r?.get('existingId')),
+        idTaken: r?.get('idTaken') === true,
       };
     },
     async write(t) {
