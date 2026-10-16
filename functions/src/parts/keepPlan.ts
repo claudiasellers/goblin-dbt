@@ -39,6 +39,8 @@ export function keptName(name: string | null | undefined, max: number): string |
 export interface StoredSession {
   trailheadKind: string | null;
   candidateId: string | null;
+  /** The trail offer the visit came from (trailheadKind 'offer'). */
+  offerId?: string | null;
   stepIdsJson: string | null;
   stopReason: string | null;
   bodyPlaces: string[] | null;

@@ -6,6 +6,8 @@ import { TodayCard } from './TodayCard';
 import { PatternOfferCard } from '../me/PatternOfferCard';
 import { PartCheckbackCard } from '../parts/PartCheckbackCard';
 import { PART_CHECKBACK_TYPE } from '../../lib/partCheckback';
+import { TrailOfferCard } from '../parts/TrailOfferCard';
+import { TRAIL_OFFER_KIND } from '../../lib/trailOffer';
 import type { TodayItem } from '../../services/spine';
 
 /** The number of cards shown before "N more". */
@@ -19,7 +21,7 @@ const VISIBLE = 3;
  * (`useHideToday`), so it is never beside a result or the crisis banner. A flooded band collapses
  * it: "Your plans will keep", nothing hidden.
  *
- * Pattern offers (PR-P2) render as PatternOfferCard. `renderItem` lets other modules draw new kinds;
+ * Pattern offers (PR-P2) render as PatternOfferCard, parts trail offers as TrailOfferCard. `renderItem` lets other modules draw new kinds;
  * unknown kinds are skipped. `compact` is the side panel's narrow column.
  */
 export function TodayStack({ renderItem, compact = false, className = '' }: {
@@ -38,6 +40,8 @@ export function TodayStack({ renderItem, compact = false, className = '' }: {
     if (custom !== undefined && custom !== null) return <div key={item.id}>{custom}</div>;
     // Parts check-backs: TodayProvider keeps them only while the card can show (parts on, copy signed off).
     if (item.type === PART_CHECKBACK_TYPE) return <PartCheckbackCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
+    // Trail offers: the server sends at most one, never with a flooded band; TodayProvider keeps it only while the card can show.
+    if (item.kind === TRAIL_OFFER_KIND) return <TrailOfferCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
     if (item.kind === 'follow_up' || item.kind === 'tool_outcome') return <TodayCard key={item.id} item={item} onDone={done} compact={compact} />;
     if (item.kind === 'pattern_offer') {
       return (

@@ -9,6 +9,7 @@ import { inQuietHours } from '../lib/quietHours';
 import { useUserProfile } from './UserProfileContext';
 import { getPartsContent } from '../services/partsContent';
 import { checkbackReady, PART_CHECKBACK_TYPE, withReadyCheckbacks } from '../lib/partCheckback';
+import { TRAIL_OFFER_KIND, trailOfferReady, withReadyTrailOffers } from '../lib/trailOffer';
 import type { PartsContent } from '../data/partsContentTypes';
 
 const FOCUS_REFETCH_MS = 5 * 60_000;
@@ -66,14 +67,18 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   }, [uid, refresh]);
 
   const current = data && data.uid === uid ? data.res : null;
+  // Trail offers (Phase 4) the same way: parts on here too, every word of the card signed off.
   const hasCheckback = !!current && [...current.items, ...current.more].some((i) => i.type === PART_CHECKBACK_TYPE);
+  const hasTrailOffer = !!current && [...current.items, ...current.more].some((i) => i.kind === TRAIL_OFFER_KIND);
+  const needsParts = hasCheckback || hasTrailOffer;
   useEffect(() => {
-    if (!partsOn || !hasCheckback || partsContent) return;
+    if (!partsOn || !needsParts || partsContent) return;
     let live = true;
     getPartsContent().then((c) => { if (live) setPartsContent(c); }).catch(() => { /* no card */ });
     return () => { live = false; };
-  }, [partsOn, hasCheckback, partsContent]);
+  }, [partsOn, needsParts, partsContent]);
   const checkbacksShown = partsOn && checkbackReady(partsContent);
+  const offersShown = partsOn && trailOfferReady(partsContent);
   const next = current?.nextInTab ?? null;
   useEffect(() => {
     if (!next) return;
@@ -99,9 +104,9 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   }, [next, navigate, refresh, quiet]);
 
   const value = useMemo<TodayValue>(() => ({
-    items: withReadyCheckbacks((current?.items ?? []).filter((i) => !dropped.has(i.id)), checkbacksShown),
-    more: withReadyCheckbacks((current?.more ?? []).filter((i) => !dropped.has(i.id)), checkbacksShown),
-    partsContent: checkbacksShown ? partsContent : null,
+    items: withReadyCheckbacks(withReadyTrailOffers((current?.items ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown),
+    more: withReadyCheckbacks(withReadyTrailOffers((current?.more ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown),
+    partsContent: checkbacksShown || offersShown ? partsContent : null,
     holding: current?.holding ?? false,
     ready: !!current,
     refresh,
@@ -110,7 +115,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     setHidden,
     oaHidden,
     hideOa,
-  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa, checkbacksShown, partsContent]);
+  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa, checkbacksShown, offersShown, partsContent]);
 
   return <TodayContext.Provider value={value}>{children}</TodayContext.Provider>;
 }

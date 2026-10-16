@@ -5,6 +5,7 @@
  */
 import { GRAPH_ID, UUID, ValidationError, graphId, obj, oneOf, uuid } from '../shared/validate';
 import { checkExtField } from '../spine/extSchemas';
+import { TRAIL_OFFER_ID } from './offers/blocked';
 import {
   BLEND_CHECKS, PART_STEP_IDS, PART_STOP_REASONS, TRAILHEAD_KINDS,
   type PartExitStep, type PartSessionPatch, type PartStepId, type TrailheadKind,
@@ -49,6 +50,8 @@ export interface StartInput {
   trailheadKind: TrailheadKind;
   partId: string | null;
   candidateId: string | null;
+  /** A trail offer answered Yes (trailheadKind 'offer' only, and required there). */
+  offerId: string | null;
   moveIds: string[];
 }
 
@@ -65,13 +68,19 @@ export function readPartsEntryInput(raw: unknown): { partId: string | null } {
 
 export function validateStartPartSession(raw: unknown): StartInput {
   const o = obj(raw);
-  for (const k of Object.keys(o)) if (!['id', 'trailheadKind', 'partId', 'candidateId', 'moveIds'].includes(k)) fail(`${k}: not accepted`);
+  for (const k of Object.keys(o)) if (!['id', 'trailheadKind', 'partId', 'candidateId', 'offerId', 'moveIds'].includes(k)) fail(`${k}: not accepted`);
   const opt = (v: unknown) => (v === undefined || v === null ? null : uuid(v));
+  const trailheadKind = oneOf(o.trailheadKind, TRAILHEAD_KINDS);
+  // A trail offer's trailhead names its offer, and only that trailhead does.
+  const offerId = o.offerId === undefined || o.offerId === null ? null
+    : typeof o.offerId === 'string' && o.offerId.length <= 400 && TRAIL_OFFER_ID.test(o.offerId) ? o.offerId : fail('offerId: expected an offer id');
+  if ((trailheadKind === 'offer') !== (offerId !== null)) fail('offerId: with the offer trailhead only, and required there');
   return {
     id: uuid(o.id),
-    trailheadKind: oneOf(o.trailheadKind, TRAILHEAD_KINDS),
+    trailheadKind,
     partId: opt(o.partId),
     candidateId: opt(o.candidateId),
+    offerId,
     moveIds: o.moveIds === undefined || o.moveIds === null ? [] : ids(o.moveIds, MAX_MOVES, 'moveIds'),
   };
 }
