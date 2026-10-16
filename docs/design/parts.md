@@ -464,16 +464,22 @@ Was this a part you know?
 
 **As built (16 Oct, behind sign-off).**
 
-- **Hosts:** every tool whose close asks then-vs-now (today Cool Down, 5-4-3-2-1 and Find the feeling),
-  through one component, `PartTagSlot`, which holds the only gate. A test derives the host list from
-  `TOOL_CLOSE_KIND`, so a new tool can't miss it. `meet-a-part` is never a host. Each host declares
+- **Hosts:** every tool whose close asks then-vs-now (Cool Down, 5-4-3-2-1, Find the feeling) and every
+  urge close answered *Held off* (Pause, Urge Surfing: holding off **is** their better close; never
+  *Partly*, *Went ahead* or *Still deciding*), through one component, `PartTagSlot`, which holds the only gate. A test derives the host list from
+  `TOOL_CLOSE_KIND` (both close kinds), so a new tool can't miss it. `meet-a-part` is never a host. Each host declares
   `parts` in `PROFILE_NEEDS`.
 - **Gate:** parts on, the close saved, better or much better, every tag line and both unnamed-part lines
   signed off, and at least one active or resting part. The server (`tagPart`) refuses everything else
   itself: parts off, someone else's or an open session, a same / worse close, a Meet a part session, a
   set-aside part.
-- **One tag per ToolSession**: a read inside the write returns the first tag, and a `taggedKey`
-  uniqueness constraint catches a race. Only `ToolSession` targets so far (no `CheckIn` tags yet).
+- **One tag per ToolSession per source**: a read inside the write returns the first tag, and a
+  `taggedKey` uniqueness constraint catches a race. Only `ToolSession` targets so far (no `CheckIn` tags
+  yet).
+- **Sources**: `tagPart` takes `source`. `close` is everything above. `debrief` is DEAR MAN's *who showed
+  up*: the caller's own `dear-man` ToolSession, open or closed (the tag is the new record, so the edge
+  into the session stays incoming), with `strength` `yes` or `a_bit`, keyed `<session key>:debrief` so a
+  close tag and a debrief tag can sit on one session. Only close tags count toward *helped* and *when*.
 - **Chips:** up to four parts, most recently visited first: a small figure and the name in the serif, or
   for an unnamed part *"The one in your {place}"* / *"One you haven't named"*. Then *A new one*, *Skip*.
   One tap folds the row away with nothing said.
@@ -667,14 +673,23 @@ aggregates (`FOUND_WORD`, offers). Stats come from there, never from a profile s
   tagged close is a better one and a ratio would be dishonest.
 - **As built** (`functions/src/parts/stats.ts`, pure, shared by Reflect and the card; all time, not
   Reflect's range):
-  - *helped*: ≥ 3 tags for the part; tools by count (ties: most recently tagged), at most 3.
+  - *helped*: ≥ 3 **close** tags for the part (a DEAR MAN debrief tag says the part was there, not that
+    a tool helped it settle); tools by count (ties: most recently tagged), at most 3. An urge close
+    answered *Held off* counts like a better close ("Pause helped 3 times").
   - *felt*: each visit counts its **first** feel-toward answer (how the person arrived, which is what
-    changes as the relationship does); ≥ 3 visits in each half; the most common per half (ties: the later
+    changes as the relationship does); a first answer that is a non-answer (*not sure*, *nothing*,
+    *can't tell*: `keepPlan.ts`'s `NON_ANSWER`) doesn't count as a visit, because "Lately: not sure"
+    would read as a verdict when it's the absence of one; ≥ 3 visits in each half; the most common per half (ties: the later
     one); *"In {month}: {then}. Lately: {now}."*, or *"Since {month}: {now}."* when they agree.
-  - *when*: ≥ 3 tags and one of four bands (05–12, 12–17, 17–22, 22–05, in `User.timeZone`) holding more
+  - *when*: ≥ 3 close tags (a debrief tag is dated by the debrief, not the moment) and one of four bands (05–12, 12–17, 17–22, 22–05, in `User.timeZone`) holding more
     than half: *"Mostly evenings"*. The mock's "Shows up when someone pulls away" needs contexts, which
     wait for trails (Phase 4).
   - Below a threshold the line is simply absent. A failed read never takes Reflect down.
+- **The readouts on the card (built)**: *Mostly {when}* sits under the name; *What's helped it settle*
+  and *How you've felt toward it* follow *Would rather*. `getMe` attaches `stats` to active and resting
+  parts (none when set aside or with parts off), in one read for all parts. Each line shows only when it
+  was computed and its copy ships (`statsReady` in `src/lib/partStats.ts`, which Reflect's gate builds
+  on). Tender parts show them too: they're about the relationship, not its fears.
 - **The card as built**: *Spend time with it* · Rename (inline, serif, 40 characters) · Rest it (or
   *It's back* on a resting part) · Set aside (no confirm: it's restorable; set-aside rows get *Bring it
   back*) · *It feels young or hurt* (only on a part that isn't tender; there is no unmark yet). A fear
@@ -806,11 +821,11 @@ which is agreed and which the person chooses.
 |---|---|---|---|
 | **Check-in** | Nothing new. The check-in never asks for an urge, so the app has nothing of the person's own to unblend from. **Keep the per-spot words** (data fix 1): two spots mean two parts present | Tag row after a better close of a tool started from the result | Episodes |
 | **Find the feeling** | After the pull step: "A part of you {unblendPhrase} right now." (built: the tool's Shape and Tune rooms only, never inside the check-in) | Tag row (built) | "Use this shape for {name}?" when they tag a part |
-| **Do the Opposite** | After the urge: the unblend line (built; not for "My urge is different") | On the goal screen, one optional line: *"Part of you wants to {move}. It's worried about {hurt}. You want {goal}."* | Practiced steps per part |
-| **Ask for what you need (DEAR MAN)** | The angry-part card for *fire back* (agreed) | Debrief: "Who showed up?" from `MomentResponse` / `ThoughtPattern` | **Cope ahead per part.** Prep asks "Who might show up in this conversation?" A chosen part brings its `anchorLineId`: *"If {name} shows up: {anchor}."* The person sets the anchor there, from kept lines or their own words. Built: `setPartAnchor` (a kept line, `anchorLineId`, or their words, `anchorOwn`, ≤ 90, never linted), a `partAnchors` slice declared for `dear-man` only, the anchor shown again on the script screen, `copeAheadPartId` in the visit's `ext` |
+| **Do the Opposite** | After the urge: the unblend line (built; not for "My urge is different") | On the check's effectiveness card (built), above *If you follow this urge…*: *"A part of you {unblendPhrase}, and it's trying to help."* / *"You want to {goal}."* ({goal}: the goal choice's own label). No `{hurt}`: nothing in the visit says what this part fears, and a guess would put words in the person's mouth. Never for a safety-line move or *My urge is different*; `ext.er.goalLineShown` | Practiced steps per part |
+| **Ask for what you need (DEAR MAN)** | The angry-part card for *fire back* (agreed) | Debrief (built): its own step after *What was underneath*, before the reflection, so the thought → feeling chain isn't interrupted. *"Did {name} show up?"* (Yes · A bit · No · Skip) when this visit's cope ahead chose a part that's still active or resting; otherwise *"Was one of your parts there?"* with the tag row's chips. Yes / A bit / a chip write a `PartTag {source:'debrief'}`; *No* and *Skip* write nothing; the named form records `ext.er.whoShowedUp`. A debrief started on its own can't reach its prep, so it asks the general form | **Cope ahead per part.** Prep asks "Who might show up in this conversation?" A chosen part brings its `anchorLineId`: *"If {name} shows up: {anchor}."* The person sets the anchor there, from kept lines or their own words. Built: `setPartAnchor` (a kept line, `anchorLineId`, or their words, `anchorOwn`, ≤ 90, never linted), a `partAnchors` slice declared for `dear-man` only, the anchor shown again on the script screen and under *Why It Matters* in the summary, `copeAheadPartId` in the visit's `ext`. The `cope` step sits between *What makes this hard?* and Describe; a flooded hand-over skips it; a failed save says *"Couldn't save that. Try again."* and keeps the form |
 | **Recover** | After the pull: the unblend line (built; not on *fight* while the angry card may still come) | Tag row | Recover's next-day check also asks about a tagged part |
-| **Problem Solve** | — | `cant-ambivalent` queues a candidate (on yes). **Save barrier and ambivalence ids** (data fix 2) | Rule A source for `put_it_off` |
-| **Circuit Breaker, Pause, 5-4-3-2-1, Urge Surfing** | Body first. Nothing added | Tag row only after a better close | "Pause helped 3 times" on the card. Urge Surfing asks *which* urge (data fix 4) |
+| **Problem Solve** | — | `cant-ambivalent` queues a candidate (on yes; built: one quiet text button after the ambivalence answer, *"Want to get to know that part another time?"*, tapping it is the yes, then *"It's in Me when you want it."*; `ext.er.psLater`). **Save barrier and ambivalence ids** (data fix 2) | Rule A source for `put_it_off` |
+| **Circuit Breaker, Pause, 5-4-3-2-1, Urge Surfing** | Body first. Nothing added | Tag row only after a better close, or *Held off* on an urge close (built) | "Pause helped 3 times" on the card. Urge Surfing asks *which* urge (data fix 4) |
 | **Help now, micro-steps** | Nothing | Nothing | Nothing |
 | **Witness** | Unchanged in the moment. **No part names in the moment** | A `part` kind for after and over-weeks moments (check-backs, the card), with a `{name}` slot | — |
 | **Today** | Collapses with flooding signals (as now) | `part_checkback`: "How's {name} today?" Settled · Same · Louder · Skip | One trail offer a week at most; protector check-backs |
@@ -917,7 +932,7 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 | `PartPrompt {id, flow, step, order, copy}`; `PartOption {id, flow, step, order, label, kind, flag, selfLike, branch}`; `(:PartOption)-[:OFFERED_FOR {order}]->(:ProtectiveMove)`; `(:PartOption)-[:SAME_AS]->(:ThoughtPattern \| :AmbivalenceOption)` | Every screen's copy and chips. `branch` says what a pick does. Voice chips reuse DEAR MAN's thought labels word for word, and *put it off*'s fears reuse Problem Solve's ambivalence options, so evidence from those tools can pre-order the chips |
 | `PolarityPair {id, a, b}`; `-[:HAS_SIDE {side}]->(:ProtectiveMove)`; `-[:BOTH_WANT {order}]->` / `-[:WORRY {side, order}]->(:PartOption)` | Two pulls content; offerable moves only (a build check) |
 | `TrailRule {id, shape, minEpisodes, windowDays, …, statementTemplate, enabled}`; `TrailContext {id, key, value, phrase}` | Its own label, off until reviewed; what fills `{context}` |
-| `PartsPolicy {id:'parts', offersEnabled, episodeMergeHours, floodGateHours, crisisPauseHours, dissociationCount, dissociationDays, louderPauseHours, maxNonSelfAnswers, tooManyPartsCount, tooManyPartsDays, nameMaxChars}` | The offers kill switch and every safety number in one tunable place |
+| `PartsPolicy {id:'parts', offersEnabled, episodeMergeHours, floodGateHours, crisisPauseHours, dissociationCount, dissociationDays, louderPauseHours, maxNonSelfAnswers, tooManyPartsCount, tooManyPartsDays, nameMaxChars, harmWindowDays, tenderRepeatCount}` | The offers kill switch and every safety number in one tunable place |
 | `TherapyConcept {id:'parts_meet', appToolId:'meet-a-part'}`, **no `RECOMMENDED_FOR` rows** | Phase 2, with the tool. Gives it a concept without making it routable |
 
 **Fixed while here (16 Oct, `schema/relationships.cypher`):**
@@ -935,7 +950,7 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 | `PartLink` | Profile | `kind: 'two_pulls' \| 'covers_for'`, `aId`, `bId`, `bothWantId?` | Written only on a yes in the den or in Two pulls |
 | `DenSnapshot` | Profile | `takenAt`, `layoutJson` | — |
 | `PartSession` | Log | As in *What's saved* | `ToolSession -DETAIL->` |
-| `PartTag` | Log | `at`, `source` (close / debrief / batch), `taggedKey` (one per tagged record), `-[:TAGS]->(:CheckIn \| :ToolSession)`, `-[:OF_PART]->(:Part)` | An incoming edge only, so finalise-once holds |
+| `PartTag` | Log | `at`, `source` (close / debrief / review: Rule D's "Was this {name}?"), `strength` (debrief: yes / a_bit), `taggedKey` (one per tagged record per source), `-[:TAGS]->(:CheckIn \| :ToolSession)`, `-[:OF_PART]->(:Part)` | An incoming edge only, so finalise-once holds |
 | `PartRevisit` | Log | `partId`, `answer`, `ratherIds`, `-[:OF_PART]->(:Part)` | The 30-day check-back's answer, written once |
 | `PartCandidate` | Log | `origin` (new_one / worried_part / split / ps_ambivalence / angry_card), `moveIds[]`, `createdAt`, `status` (open / accepted / dismissed), `-[:FROM_SESSION]->(:ToolSession)?`; `(:PartSession)-[:QUEUED]->` | Written only on a yes. Read in Me the way `PatternOffer` is |
 | `TrailOffer` | Log | `ruleId`, `moveIds`, `contextKey`, `evidenceKeys`, `status`, `offeredAt`, `cooldownUntil` | `id = ruleId:moves:context`. Shares the weekly budget with `PatternOffer` |
@@ -1048,6 +1063,31 @@ These are **watched, not acted on**: three or more parts in 7 days, and parts de
 are choices, not harms. Global numbers need aggregate telemetry that doesn't exist yet. This proposal
 doesn't add any.
 
+**As built** (16 Oct). The definitions live once, in `functions/src/parts/harm.ts` (pure,
+`harmSignalsFor(rows, now, policy)`), and the review report reads the same numbers from `PartsPolicy`
+(a test pins the two together), so the report and the offer gate can never disagree:
+
+- the window is `harmWindowDays` (28), both ends inclusive;
+- *Louder*: check-backs answered Louder, dated by the answer;
+- *crisis after a meeting*: a Meet a part session followed by a crisis-flagged check-in strictly after
+  it started and within `crisisPauseHours` (48); each session counts once;
+- *tender or own words repeating*: 2 or more of those stops (`tenderRepeatCount`);
+- *not Self repeating*: 2 or more `not_self` endings, counted apart from tender;
+- watched, not harms: sessions where P2 opened, *running things* at the blending check, and 3 or more
+  parts made in 7 days.
+- Not recorded, so not counted: parts deleted (`deleteMyParts` removes the records) and parts turned off
+  (the setting keeps only its current value; the report counts people with parts and the setting off
+  now). No tracking was added for either. The "Not me" rate waits for offers.
+
+`scripts/parts/report.cypher` is read-only, run by hand
+(`node scripts/load-graph.mjs --file scripts/parts/report.cypher --no-content-refresh`, or in Aura
+Workspace; it needs APOC core, which Aura has). Statement 1 is one row per person with any harm signal,
+keyed by the first 12 characters of a sha256 of the account id (never the id, a name, an email or
+anything the person wrote). Statement 2 is aggregates only: parts kept / resting / set aside / tender,
+visits, the feel-toward shift (by each feel option's `selfLike`), unblend lines shown, tags by source,
+check-back answers and the Louder share, still-true answers, candidates, and the watched counts. A test
+fails if it returns a name, own words, an anchor or line text.
+
 One tension with the house rules: the only free validated proxy for how someone relates to their parts,
 the Self-Compassion Scale short form, is a rating scale. If you want an outcome study, run it outside the
 app, with consent. Don't put it in the product.
@@ -1067,6 +1107,31 @@ app, with consent. Don't put it in the product.
 | **6. Wise Mind** | The parts-aware step back | Shares Wise Mind's planned rows |
 
 Each phase is gated on the previous phase's harm signals.
+
+**Where it stands (16 Oct).** Phases 0–3 are built, every line a draft: nothing shows until its copy is
+signed off (*Sign-off*, below). Phase 4's code is being built **switched off** (`TrailRule.enabled` and
+`PartsPolicy.offersEnabled` false), with a read-only dry run so Claudia can see what each rule would find
+on real data and set the counts before anything is offered; switching it on stays gated on Phase 3's
+harm signals. Phase 5 waits on Stage (Recover v2) and on a review of what's built. Not built from the
+module table: Recover's next-day question about a tagged part (it would duplicate the part's own
+check-back) and the witness `part` kind (no moment needs it yet).
+
+## Sign-off
+
+1. Add each id to `SIGNED_OFF` in `scripts/parts/content.py` with its review date.
+2. Rebuild (`python3 scripts/parts/build.py > schema/parts.cypher`, `python3 scripts/parts/fixture.py`),
+   commit, load `--only parts` (which refreshes the app's copy), deploy hosting.
+3. A surface lights up only when every id it needs is signed off and the person has parts on (the angry
+   card's plain wording is the one exception: it reaches people with parts off).
+
+Every surface declares the ids it needs as one exported constant (`*_REQUIRED` / `*Required`), and its
+gate checks that constant through `surfaceReady`, so the review can't drift from the code.
+`node scripts/parts/review.mjs` writes the sign-off pack from the content and those constants: totals,
+then each surface from the most exposed (the unblend line, the angry card) to the least, with every line
+it needs (id, text, plain twin, kind, lint scope, status, the other surfaces that share it), the
+vocabulary the lines lean on (moves, hurts, `EXPRESSES` with its why, `CAN_TOUCH`), the `PartsPolicy`
+numbers, and the lines no surface shows yet. `tests/parts-review.test.mjs` fails if a required id is
+missing from the pack.
 
 ## Never
 
