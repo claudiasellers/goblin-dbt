@@ -18,7 +18,8 @@ export function StillTrue({ meta, question, onYes, onNotAnyMore, onChange }: {
     setBusy(true);
     try { await fn(); } catch { /* unchanged; Me reloads on the next visit */ } finally { setBusy(false); }
   };
-  if (meta.status !== 'active') return null;
+  // Resting (a part gone quiet) is live and still checked back with; set aside never is.
+  if (meta.status === 'set_aside') return null;
   if (meta.prompt === 'ask') {
     return (
       <div className="mt-2 p-3 rounded-lg bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">

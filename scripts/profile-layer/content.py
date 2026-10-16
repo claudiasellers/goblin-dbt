@@ -17,6 +17,7 @@ AREAS = [
     ("my_words", "My words", "Words you've found for your feelings, and lines you've kept."),
     ("my_plans", "My plans", "Plans you've made ahead of time."),
     ("my_patterns", "My patterns", "Things that seem to help you, once you've said yes to them."),
+    ("my_parts", "Parts of me", "The parts of you you've gotten to know. Only the ones you've named."),
     ("my_progress", "My progress", "How your practice is going."),
 ]
 
@@ -28,6 +29,11 @@ KINDS = [
      "Is this still true for you?", "Set aside. It won't shape suggestions any more."),
     ("own_line", "my_words", "Lines in my own words", None,
      "", "Set aside."),
+    # Phase 2 (docs/design/parts.md, "Still true? = checking back with protectors"). {name} is the
+    # person's name for the part; the part check-back flow fills it (Me's generic still-true row
+    # doesn't fill slots today).
+    ("part", "my_parts", "A part", 30,
+     "Is {name} still doing the same job?", "Set aside. You can bring it back any time."),
 ]
 
 # Pattern rules (CORE-owned). Evaluated lazily when Today loads, at most once a day per user.

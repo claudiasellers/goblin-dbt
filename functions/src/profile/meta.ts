@@ -1,11 +1,14 @@
 /**
  * Profile item meta ("still true?") — pure.
  */
-import type { ItemPrompt, ProfileAreaId, ProfileItemMeta } from './types';
+import type { ItemPrompt, ProfileAreaId, ProfileItemMeta, ProfileItemStatus } from './types';
 
-/** ask when past revisitAt; none when the kind has no revisit policy; quiet otherwise (fresh). */
-export function profileItemPrompt(revisitAt: string | null, status: 'active' | 'set_aside', now: number): ItemPrompt {
-  if (status !== 'active' || !revisitAt) return 'none';
+/**
+ * ask when past revisitAt; none when the kind has no revisit policy or the item is set aside; quiet
+ * otherwise (fresh). A resting part is live, so it is still checked back with.
+ */
+export function profileItemPrompt(revisitAt: string | null, status: ProfileItemStatus, now: number): ItemPrompt {
+  if (status === 'set_aside' || !revisitAt) return 'none';
   const t = Date.parse(revisitAt);
   if (Number.isNaN(t)) return 'none';
   return t <= now ? 'ask' : 'quiet';
@@ -13,7 +16,8 @@ export function profileItemPrompt(revisitAt: string | null, status: 'active' | '
 
 /** Build the meta from a node's properties (dates already strings). */
 export function metaFrom(p: Record<string, unknown>, now: number): ProfileItemMeta {
-  const status = p.status === 'set_aside' ? 'set_aside' : 'active';
+  // Anything unknown reads as active, as before; resting is kept (a part gone quiet, not set aside).
+  const status: ProfileItemStatus = p.status === 'set_aside' || p.status === 'resting' ? p.status : 'active';
   const revisitAt = (p.revisitAt as string | null | undefined) ?? null;
   return {
     id: String(p.id),

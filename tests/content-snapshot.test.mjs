@@ -3,8 +3,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { assertContentOnly, buildRelatedWords, buildSnapshots, USER_LABELS } from "../scripts/content-snapshot/build.mjs";
+import { assertContentOnly, buildParts, buildRelatedWords, buildSnapshots, indexGraph, USER_LABELS } from "../scripts/content-snapshot/build.mjs";
 import { isLocalUri } from "../scripts/load-graph.mjs";
+import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 
 const shipped = (name) => JSON.parse(readFileSync(`src/data/content/${name}`, "utf8"));
 const node = (id, labels, props = {}) => ({ elementId: id, labels, props: { id, ...props } });
@@ -50,7 +51,7 @@ test("related words keep RELATED_TO and shared-brain rows, never OPPOSITE_OF", (
 });
 
 test("shipped files carry their source, and related words has no opposites and covers every grid word", () => {
-  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json", "capacity.json", "spine.json"]) {
+  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json", "capacity.json", "spine.json", "parts.json"]) {
     const f = shipped(name);
     assert.match(f.source.file, /^graph-content-only-.*\.json$/, name);
     assert.ok(!Number.isNaN(Date.parse(f.source.exportedAt)), name);
@@ -126,6 +127,84 @@ test("shipped spine content: the close flow, and every non-reserved follow-up ty
   const defined = [...new Set(types.filter(([, , r]) => r === "false").map(([, id]) => id))].sort();
   assert.deepEqual(spine.followUpTypes.map((t) => t.id), defined);
   for (const t of spine.followUpTypes) assert.equal(typeof t.enabled, "boolean", t.id);
+});
+
+test("shipped parts content is content.py's signed-off rows, and nothing a screen doesn't show", () => {
+  const parts = shipped("parts.json").content;
+  assert.deepEqual(parts, partsFromFixture(JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"))));
+  // Trail rules, contexts and the policy stay on the server; pairs and keepsake wait for Two pulls.
+  assert.deepEqual(Object.keys(parts).sort(), ["hurts", "moves", "options", "prompts", "version"]);
+  assert.doesNotMatch(JSON.stringify(parts), /"(reviewStatus|pending)"/);
+  // Every node parts.cypher writes as a draft (content.py's SIGNED_OFF doesn't list it), by label.
+  const drafts = [...readFileSync("schema/parts.cypher", "utf8").matchAll(/^MERGE \(\w:(\w+) \{id: "([^"]+)"\}\)\nSET [^\n]*reviewStatus: "draft"/gm)];
+  assert.ok(drafts.length > 100, `${drafts.length} drafts read from schema/parts.cypher (guards the regex)`);
+  const draft = new Set(drafts.map(([, , id]) => id));
+  // No draft row ships, and no shipped row is guarded by a draft move (OFTEN_GUARDS is reviewed by its move).
+  // An option's `moves` may name a move not yet signed off, as an option may ship before its prompt: the
+  // client's flowReady decides what is complete.
+  const shippedIds = [
+    ...parts.moves.map((m) => m.id), ...Object.keys(parts.prompts),
+    ...Object.values(parts.options).flatMap((steps) => Object.values(steps).flat().map((o) => o.id)),
+    ...parts.hurts.flatMap((h) => [h.id, ...h.guardedBy.map((g) => g.moveId)]),
+  ];
+  assert.deepEqual(shippedIds.filter((id) => draft.has(id)), [], "draft parts content in the app bundle");
+});
+
+test("buildParts: signed-off rows only, any content property carried, edges by their source's review", () => {
+  const ok = { reviewStatus: "approved", version: "parts-v1" };
+  const draft = { reviewStatus: "draft", version: "parts-v1" };
+  const nodes = [
+    node("hide", ["ProtectiveMove"], { ...ok, label: "Hide", offerable: true, safetyLine: false, order: 2, newField: "kept" }),
+    node("chase", ["ProtectiveMove"], { ...draft, label: "Chase", offerable: true, order: 1 }),
+    node("go_blank", ["ProtectiveMove"], { ...ok, label: "Go blank", offerable: false, order: 3 }),
+    node("meet_find", ["PartPrompt"], { ...ok, flow: "meet", step: "find", order: 0, copy: "What's showing up?" }),
+    node("meet_where", ["PartPrompt"], { ...draft, flow: "meet", step: "where", order: 1, copy: "Where?" }),
+    node("gate_wait", ["PartPrompt"], { ...ok, pending: "a decision", flow: "gate", step: "x", order: 0, copy: "Waiting" }),
+    node("keepsake_x", ["PartPrompt"], { ...ok, flow: "pulls", step: "keepsake", order: 6, copy: "{A} and {B}", copyKind: "keepsake" }),
+    node("voice_b", ["PartOption"], { ...ok, flow: "meet", step: "voice", order: 1, label: "B", kind: "voice", branch: "continue" }),
+    node("voice_a", ["PartOption"], { ...ok, flow: "meet", step: "voice", order: 0, label: "A", kind: "chip", flag: "tender", selfLike: false, branch: "conservative" }),
+    node("voice_c", ["PartOption"], { ...draft, flow: "meet", step: "voice", order: 2, label: "C", kind: "chip", branch: "continue" }),
+    node("brushed_off", ["ProtectedHurt"], { ...ok, label: "being brushed off", order: 0, matters: "being taken seriously" }),
+    node("left_out", ["ProtectedHurt"], { ...draft, label: "being left out", order: 1 }),
+    node("hurt", ["Emotion"]), node("disrespected", ["Emotion"]),
+    node("tp_agree", ["ThoughtPattern"]),
+    node("parts", ["PartsPolicy"], { ...draft, offersEnabled: false, floodGateHours: 2 }),
+  ];
+  const relationships = [
+    rel("OFFERED_FOR", "voice_a", "chase", { reviewStatus: "approved", order: 1 }),
+    rel("OFFERED_FOR", "voice_a", "hide", { reviewStatus: "approved", order: 0 }),
+    rel("OFFERED_FOR", "voice_c", "hide", { reviewStatus: "draft", order: 0 }),
+    rel("SAME_AS", "voice_b", "tp_agree", { reviewStatus: "approved" }),
+    rel("NAMED_AS", "brushed_off", "hurt", { reviewStatus: "approved" }),
+    rel("NAMED_AS", "brushed_off", "disrespected", { reviewStatus: "approved" }),
+    rel("OFTEN_GUARDS", "hide", "brushed_off", { reviewStatus: "approved", rank: 1 }),
+    rel("OFTEN_GUARDS", "chase", "brushed_off", { reviewStatus: "draft", rank: 0 }),
+  ];
+  const exp = { scope: "content-only", nodes, relationships };
+  assertContentOnly(exp);
+  assert.deepEqual(buildParts(indexGraph(exp)), {
+    version: "parts-v1",
+    moves: [{ id: "hide", label: "Hide", safetyLine: false, order: 2, newField: "kept" }],
+    prompts: { meet_find: { flow: "meet", step: "find", order: 0, copy: "What's showing up?" } },
+    options: {
+      meet: {
+        voice: [
+          { id: "voice_a", label: "A", kind: "chip", flag: "tender", selfLike: false, branch: "conservative", order: 0, moves: ["hide", "chase"], sameAs: [] },
+          { id: "voice_b", label: "B", kind: "voice", flag: null, selfLike: null, branch: "continue", order: 1, moves: [], sameAs: [{ label: "ThoughtPattern", id: "tp_agree" }] },
+        ],
+      },
+    },
+    hurts: [{
+      id: "brushed_off", label: "being brushed off", order: 0, matters: "being taken seriously",
+      namedAs: ["disrespected", "hurt"], guardedBy: [{ moveId: "hide", rank: 1 }],
+    }],
+  });
+  // Nothing signed off: an empty file carrying the version every parts node has (the policy's), or none at all.
+  const none = { scope: "content-only", nodes: nodes.map((n) => (n.labels.includes("PartsPolicy") ? n : { ...n, props: { ...n.props, reviewStatus: "draft" } })), relationships: [] };
+  assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [] });
+  assert.equal(buildParts(indexGraph({ scope: "content-only", nodes: [], relationships: [] })).version, null);
+  const mixed = { ...exp, nodes: nodes.map((n) => (n.props.id === "voice_b" ? { ...n, props: { ...n.props, version: "parts-v2" } } : n)) };
+  assert.throws(() => buildParts(indexGraph(mixed)), /mixes versions/);
 });
 
 test("load-graph never refreshes the shipped files from a local graph", () => {

@@ -39,7 +39,12 @@ test("Me: Phase A areas; stale items first; set aside is restorable, never a del
   assert.match(me, /A few things to check/);
   assert.match(me, /restoreProfileItem/);
   assert.doesNotMatch(me, /delete/i);
+  // "A few things to check" gathers only from the areas Me renders (a kept part's area isn't one yet).
+  assert.match(me, /const stale = areas\.flatMap\(\(a\) => a\.items\)/);
+  assert.doesNotMatch(me, /me\.areas\.flatMap/);
   const still = read("src/components/me/StillTrue.tsx");
+  assert.match(still, /if \(meta\.status === 'set_aside'\) return null;/, "resting still gets its check-back");
+  assert.match(read("src/services/profile.ts"), /export type MeItemLabel = 'ProfileFact' \| 'MyPattern' \| 'OwnLine' \| 'Part';/);
   for (const label of ["Yes", "Not any more", "Change"]) assert.match(still, new RegExp(`>\\s*${label}\\s*<`));
   assert.match(read("src/components/me/PatternOfferCard.tsx"), /answerPatternOffer\(id, a\)/);
   assert.match(read("src/components/today/TodayStack.tsx"), /item\.kind === 'pattern_offer'/);
