@@ -98,29 +98,6 @@ export function UrgeSurfing() {
           </ul>
         </div>
 
-        {pull && (
-          <div role="group" aria-labelledby="urge-pull-question">
-            <p id="urge-pull-question" className="text-sm text-[var(--color-text-secondary)] mb-2">
-              {pull.question}
-            </p>
-            <div className="grid grid-cols-2 gap-2.5">
-              {pull.choices.map((u) => (
-                <button
-                  key={u.id}
-                  type="button"
-                  className="den-chip flex-col"
-                  style={{ gap: 2, paddingBlock: 8 }}
-                  aria-pressed={pulled === u.id}
-                  onClick={() => pickPull(u.id)}
-                >
-                  <span className="text-[15px] leading-tight">{u.label}</span>
-                  {u.sub && <span className="text-[13px] font-normal leading-snug opacity-80">{u.sub}</span>}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
         <div>
           <label className="block text-sm text-[var(--color-text-secondary)] mb-2">
             How strong is your urge right now? (1-10)
@@ -170,6 +147,30 @@ export function UrgeSurfing() {
             style={{ height: `${intensity * 10}%` }}
           />
         </div>
+
+        {/* Which pull it is: noticed while watching the wave, never asked before Start. */}
+        {pull && (
+          <div role="group" aria-labelledby="urge-pull-question">
+            <p id="urge-pull-question" className="text-sm text-[var(--color-text-secondary)] mb-2 text-center">
+              {pull.question}
+            </p>
+            <div className="grid grid-cols-2 gap-2.5">
+              {pull.choices.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  className="den-chip den-chip--small flex-col"
+                  style={{ gap: 2, paddingBlock: 6 }}
+                  aria-pressed={pulled === u.id}
+                  onClick={() => pickPull(u.id)}
+                >
+                  <span className="text-[14px] leading-tight">{u.label}</span>
+                  {u.sub && <span className="text-[12px] font-normal leading-snug opacity-80">{u.sub}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Intensity slider */}
         <div>
