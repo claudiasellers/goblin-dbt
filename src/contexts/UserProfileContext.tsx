@@ -30,7 +30,8 @@ function browserTimeZone(): string | null {
 function loadCachedProfile(userId: string): UserProfile | null {
   try {
     const raw = localStorage.getItem(`${PROFILE_CACHE_KEY}-${userId}`);
-    return raw ? (JSON.parse(raw) as UserProfile) : null;
+    // Defaults first: a cache written before a setting existed (e.g. partsEnabled) reads as its default.
+    return raw ? { ...DEFAULT_PROFILE, ...(JSON.parse(raw) as Partial<UserProfile>) } : null;
   } catch {
     return null;
   }
@@ -88,7 +89,8 @@ export function UserProfileProvider({ children }: UserProfileProviderProps) {
     setError(null);
 
     try {
-      const fetchedProfile = await getUserProfile();
+      // Defaults first, so a server without a newer setting still yields it (partsEnabled → false).
+      const fetchedProfile: UserProfile = { ...DEFAULT_PROFILE, ...(await getUserProfile()) };
       setProfile(fetchedProfile);
       saveCachedProfile(user.uid, fetchedProfile);
       // Keep User.timeZone in step with this device (follow-up windows, quiet hours).

@@ -75,6 +75,9 @@ const PROFILE_DEFAULTS = {
   dataRetentionDays: null,
   shareAnonymousData: false,
   timeZone: null,
+  // Parts (docs/design/parts.md, "The switch"): off by default. A setting, not profile data:
+  // turning it off hides parts and stops offers, and deletes nothing.
+  partsEnabled: false,
 };
 
 /**
@@ -110,6 +113,7 @@ export const getUserProfile = onCall(
         // Clean up Neo4j integer types
         dataRetentionDays: userNode.dataRetentionDays != null ? toNumber(userNode.dataRetentionDays) : null,
         reminderDays: userNode.reminderDays ?? PROFILE_DEFAULTS.reminderDays,
+        partsEnabled: userNode.partsEnabled === true,
       };
 
       // Remove internal fields. The settings profile is cached in localStorage for the theme paint:
@@ -166,7 +170,7 @@ export const updateUserProfile = onCall(
     const allowedFields = [
       'displayName', 'photoURL', 'theme', 'palette',
       'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
-      'dataRetentionDays', 'shareAnonymousData', 'timeZone',
+      'dataRetentionDays', 'shareAnonymousData', 'timeZone', 'partsEnabled',
     ];
 
     const cleanUpdates: Record<string, unknown> = {};
@@ -180,6 +184,11 @@ export const updateUserProfile = onCall(
     const allowedPalettes = ['velvet', 'dusk', 'tinted', 'pastel', 'pastel-mix', 'daylight'];
     if ('palette' in cleanUpdates && !allowedPalettes.includes(String(cleanUpdates.palette))) {
       throw new HttpsError('invalid-argument', 'Unknown palette');
+    }
+
+    // The parts switch is a real boolean or nothing: a truthy string must never turn parts on.
+    if ('partsEnabled' in cleanUpdates && typeof cleanUpdates.partsEnabled !== 'boolean') {
+      throw new HttpsError('invalid-argument', 'partsEnabled must be true or false');
     }
 
     // IANA time zone (follow-up windows, quiet hours, later push). Unknown zones are dropped.
