@@ -146,6 +146,7 @@ CREATE CONSTRAINT push_token_key IF NOT EXISTS FOR (n:PushToken) REQUIRE n.key I
 CREATE CONSTRAINT part_session_key IF NOT EXISTS FOR (n:PartSession) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_candidate_key IF NOT EXISTS FOR (n:PartCandidate) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_key IF NOT EXISTS FOR (n:Part) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_revisit_key IF NOT EXISTS FOR (n:PartRevisit) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
 CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);

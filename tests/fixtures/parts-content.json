@@ -583,6 +583,13 @@
    "copyKind": "first_person",
    "reviewStatus": "draft"
   },
+  "angry_later_done": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 28,
+   "copy": "It's there when you want it.",
+   "reviewStatus": "draft"
+  },
   "aftercare_louder": {
    "flow": "aftercare",
    "step": "louder",
@@ -2948,6 +2955,18 @@
      "selfLike": null,
      "branch": "end",
      "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "angry_later",
+     "label": "Spend a minute with it later?",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 1,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

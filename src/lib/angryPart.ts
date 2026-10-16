@@ -4,8 +4,8 @@
  * order the hurts are offered in. All copy comes from the parts content (scripts/parts/content.py).
  */
 import {
-  ANGRY_LINES, ANGRY_NOT_NOW, ANGRY_OPTIONS, type AngryCardContent, type AngryCardCopy, type AngryContentHurt,
-  type AngryHurt, type AngryLineId, type AngryNotNowId,
+  ANGRY_LATER, ANGRY_LATER_DONE, ANGRY_LINES, ANGRY_NOT_NOW, ANGRY_OPTIONS, type AngryCardContent, type AngryCardCopy,
+  type AngryContentHurt, type AngryHurt, type AngryLaterCopy, type AngryLineId, type AngryNotNowId,
 } from '../data/partsTypes';
 import type { PartsContent } from '../data/partsContentTypes';
 import { fill } from './invalidationRecovery';
@@ -34,6 +34,17 @@ const complete = (h: AngryContentHurt) => Boolean(h.label?.trim() && h.matters?.
  */
 export function angryReady(content: PartsContent, partsOn: boolean): boolean {
   return flowReady(content, angryPromptIds(partsOn), angryOptionIds(partsOn)) && content.hurts.length > 0 && content.hurts.every(complete);
+}
+
+/**
+ * "Spend a minute with it later?" on the last screen: parts on only, and only when both its lines ship
+ * (the ask and what replaces it). Null otherwise, and the screen is as it was.
+ */
+export function angryLaterCopy(content: PartsContent, partsOn: boolean): AngryLaterCopy | null {
+  if (!partsOn || !flowReady(content, [ANGRY_LATER_DONE], [ANGRY_LATER])) return null;
+  const ask = Object.values(content.options.angry ?? {}).flat().find((o) => o.id === ANGRY_LATER)?.label?.trim();
+  const done = content.prompts[ANGRY_LATER_DONE]?.copy?.trim();
+  return ask && done ? { ask, done } : null;
 }
 
 /**

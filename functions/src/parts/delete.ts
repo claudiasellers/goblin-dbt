@@ -11,8 +11,11 @@ import { int } from '../shared/values';
 import { USER_DATA } from '../userdata/layers';
 import { GUARDS } from '../userdata/lifecycle';
 
-/** Every user-data label parts.md defines (Data model → User data), registered or not yet. */
-const PARTS_DESIGN_LABELS = ['Part', 'PartLink', 'DenSnapshot', 'PartSession', 'PartTag', 'PartCandidate', 'TrailOffer'] as const;
+/**
+ * Every user-data label parts.md defines (Data model → User data), registered or not yet, plus
+ * PartRevisit (a part's logged still-true answers).
+ */
+const PARTS_DESIGN_LABELS = ['Part', 'PartLink', 'DenSnapshot', 'PartSession', 'PartTag', 'PartCandidate', 'TrailOffer', 'PartRevisit'] as const;
 
 /**
  * The parts labels deleteMyParts removes: the design's labels that are registered in layers.ts, so a

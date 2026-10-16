@@ -64,7 +64,7 @@ test("parts slices: gated on partsEnabled, HAS_PART only, active / resting only,
     assert.doesNotMatch(q, /set_aside/, id);
     assert.match(q, /LIMIT 50/, id);
     assert.match(q, /ORDER BY p\.lastVisitedAt IS NULL, p\.lastVisitedAt DESC, p\.confirmedAt IS NULL, p\.confirmedAt DESC/, id);
-    assert.doesNotMatch(q, /:LogRecord\b|:PartSession\b|:PartTag\b|:PartCandidate\b|:TrailOffer\b/, `${id} reads the log`);
+    assert.doesNotMatch(q, /:LogRecord\b|:PartSession\b|:PartTag\b|:PartCandidate\b|:TrailOffer\b|:PartRevisit\b/, `${id} reads the log`);
   }
   assert.match(slices.SLICE_QUERIES.parts, /OPTIONAL MATCH \(p\)-\[:USES\]->\(m:ProtectiveMove\)/);
   assert.match(slices.SLICE_QUERIES.partDetail, /OPTIONAL MATCH \(p\)-\[:GUARDS\]->\(h:ProtectedHurt\)/);

@@ -130,7 +130,9 @@ const union = (a: unknown, b: string[]) => {
 
 /**
  * A revisit's yes on a part already kept: ids unioned in, own words replaced only where this visit
- * gave new ones, a new figure replaces the old, the age and tenderness never go back. Never removes.
+ * gave new ones, a new figure replaces the old. A real age answer replaces the stored one (a part's
+ * felt age can change; the card shows it as it shows up now); a non-answer keeps it. Tenderness never
+ * goes back. Never removes an id.
  */
 export function mergeRevisit(existing: Record<string, unknown>, visit: PartFields): PartFields {
   const str = (v: unknown) => (typeof v === 'string' && v ? v : null);
@@ -140,7 +142,7 @@ export function mergeRevisit(existing: Record<string, unknown>, visit: PartField
     places: union(existing.places, visit.places),
     shapeSig: visit.shapeSig ?? nums(existing.shapeSig),
     soundSig: visit.soundSig ?? nums(existing.soundSig),
-    ageId: str(existing.ageId) ?? visit.ageId,
+    ageId: visit.ageId ?? str(existing.ageId),
     voiceIds: union(existing.voiceIds, visit.voiceIds),
     jobIds: union(existing.jobIds, visit.jobIds),
     fearIds: union(existing.fearIds, visit.fearIds),
