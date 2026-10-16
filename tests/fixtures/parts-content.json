@@ -4542,6 +4542,8 @@
   "maxNonSelfAnswers": 2,
   "tooManyPartsCount": 3,
   "tooManyPartsDays": 7,
+  "harmWindowDays": 28,
+  "tenderRepeatCount": 2,
   "nameMaxChars": 40,
   "reviewStatus": "draft"
  },

@@ -890,5 +890,7 @@ POLICY = dict(
     maxNonSelfAnswers=2,        # a second non-Self-like answer at feel-toward ends the session kindly
     tooManyPartsCount=3,        # this many parts made …
     tooManyPartsDays=7,         # … in this many days: one line, "You don't need to get to know everyone at once."
+    harmWindowDays=28,          # the harm signals (functions/src/parts/harm.ts, scripts/parts/report.cypher) look back this far
+    tenderRepeatCount=2,        # this many tender / own-words stops (or not-Self endings) in the window is a harm signal
     nameMaxChars=40,
 )
