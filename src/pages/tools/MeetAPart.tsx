@@ -9,9 +9,9 @@ import { useProfileContext } from '../../hooks/useProfileContext';
 import { useToolSession } from '../../hooks/useToolSession';
 import { initialMeet, meetNext, MEET_TRACK, SHAPE_ROUNDS, type MeetContext, type MeetEvent, type MeetState } from '../../lib/meetAPart';
 import {
-  HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_NAME_MAX, MEET_OWN_WORDS_MAX, STEP_PART,
+  HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_OWN_WORDS_MAX, meetLimits, STEP_PART,
   candidateRequest, entryLaterPatch, entryPlan, guardsFor, keepRequest, meetContext, optionsFor, parseMeetEntry,
-  startRequest, startingMove, toPatch, type EntryPlan, type MeetEntry, type ShapeRoundLabels,
+  startRequest, startingMove, toPatch, showTooMany, doneTarget, TOO_MANY_PROMPT, type EntryPlan, type MeetEntry, type ShapeRoundLabels,
 } from '../../lib/meetAPartSave';
 import { vecToSig } from '../../lib/partFigure';
 import { promptCopy, stepOptions } from '../../lib/partsContent';
@@ -26,7 +26,7 @@ import { SessionClose } from '../../components/spine/SessionClose';
 import { LightHold } from '../../components/parts/LightHold';
 import { PartFigure } from '../../components/parts/PartFigure';
 import { Chip, Chips, Line, NameScreen, OwnWords, Prompt, ShapeScreen, WhereScreen } from '../../components/parts/meet/MeetScreens';
-import { linkButton } from '../../components/tools/oppositeAction/styles';
+import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 
 const HOST = 'meet-a-part';
 
@@ -63,14 +63,14 @@ export function MeetAPart() {
     );
   }
   const known = profile.slices?.parts ?? [];
-  return <MeetVisit entry={entry} plan={entryPlan(gate)} parts={content.parts} rounds={content.rounds} known={known} />;
+  return <MeetVisit entry={entry} plan={entryPlan(gate)} tooMany={showTooMany(gate, entry)} parts={content.parts} rounds={content.rounds} known={known} />;
 }
 
 type PickedChip = { id: string; branch: string; flag?: string | null };
 type KnownPart = { id: string; name: string | null; tender: boolean; moveIds: string[] };
 
-function MeetVisit({ entry, plan, parts, rounds, known }: {
-  entry: MeetEntry; plan: EntryPlan; parts: PartsContent; rounds: ShapeRoundLabels; known: readonly KnownPart[];
+function MeetVisit({ entry, plan, tooMany, parts, rounds, known }: {
+  entry: MeetEntry; plan: EntryPlan; tooMany: boolean; parts: PartsContent; rounds: ShapeRoundLabels; known: readonly KnownPart[];
 }) {
   const toolSession = useToolSession();
   const band = useBand();
@@ -87,7 +87,9 @@ function MeetVisit({ entry, plan, parts, rounds, known }: {
   const [asideDone, setAsideDone] = useState(false);
   const entryCrisis = plan.open === 'p2' && plan.crisis;
 
-  const send = (e: MeetEvent) => { setOwn(false); setAsideDone(false); setSt((x) => meetNext(x, e, ctx)); };
+  /** The flow's first real screen is still up (the too-many line shows there, once). */
+  const [firstScreen, setFirstScreen] = useState(true);
+  const send = (e: MeetEvent) => { setOwn(false); setAsideDone(false); setFirstScreen(false); setSt((x) => meetNext(x, e, ctx)); };
   const pick = (id: string, list: readonly PickedChip[]) => {
     const o = list.find((x) => x.id === id);
     if (o) send({ type: 'option', option: o });
@@ -181,11 +183,19 @@ function MeetVisit({ entry, plan, parts, rounds, known }: {
       </div>
     );
   }
+  /** The last screen, whichever way the visit ended: the line and the house's Done. */
+  const finale = (
+    <div className="space-y-4 pt-2">
+      <p className="font-serif text-xl text-[var(--color-text-primary)]">{P('meet_done')}</p>
+      <Link to={doneTarget(entry)} className={`${primaryButton} inline-flex items-center justify-center`}>Done</Link>
+    </div>
+  );
   if (phase.k === 'ended') {
     return (
       <div className="space-y-5">
         {entryCrisis && <CrisisBanner />}
         {band.content && <p className="text-[var(--color-text-primary)]">{band.content.handoff.later.scheduled}</p>}
+        {finale}
       </div>
     );
   }
@@ -321,7 +331,7 @@ function MeetVisit({ entry, plan, parts, rounds, known }: {
         break;
       case 'rather': body = (<><Prompt>{P('meet_rather')}</Prompt>{chips('rather')}</>); break;
       case 'name':
-        body = <NameScreen prompt={P('meet_name')} max={MEET_NAME_MAX} quiet={opts('name')}
+        body = <NameScreen prompt={P('meet_name')} max={meetLimits(parts).nameMaxChars} quiet={opts('name')}
           suggestion={visited?.name ?? (s.tender ? null : move?.nameHint ?? null)}
           onName={(name) => send({ type: 'name', name })} onQuiet={(id) => pick(id, opts('name'))} />;
         break;
@@ -338,11 +348,14 @@ function MeetVisit({ entry, plan, parts, rounds, known }: {
       case 'close':
       case 'done':
         // After P2's "come back later" there is no close question: its own line stays.
-        if (st.later) { body = band.content ? <Line>{band.content.handoff.later.scheduled}</Line> : null; break; }
+        if (st.later) { body = (<>{band.content && <Line>{band.content.handoff.later.scheduled}</Line>}{step === 'done' && finale}</>); break; }
         // One instance across both steps, so its "saved" line stays once answered.
-        body = <SessionClose kind="orienting" {...(opened ? { detail: { kind: 'meet_a_part' as const, id: psId } } : {})}
-          onAnswered={(input) => send({ type: 'close', choiceId: input.thenVsNow ?? null })}
-          onSkipped={() => send({ type: 'close', choiceId: null })} />;
+        body = (<>
+          <SessionClose kind="orienting" {...(opened ? { detail: { kind: 'meet_a_part' as const, id: psId } } : {})}
+            onAnswered={(input) => send({ type: 'close', choiceId: input.thenVsNow ?? null })}
+            onSkipped={() => send({ type: 'close', choiceId: null })} />
+          {step === 'done' && finale}
+        </>);
         break;
     }
   }
@@ -356,6 +369,7 @@ function MeetVisit({ entry, plan, parts, rounds, known }: {
           {Array.from({ length: 10 }).map((_, i) => <span key={i} className={`h-1 flex-1 rounded ${i < track ? 'bg-[var(--color-text-secondary)]' : 'bg-[var(--color-border)]'}`} />)}
         </div>
       )}
+      {tooMany && firstScreen && promptCopy(parts, TOO_MANY_PROMPT) && <p role="status" className={secondaryText}>{P(TOO_MANY_PROMPT)}</p>}
       <div key={step === 'done' || step === 'close' ? 'close' : `${step}:${own}`} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
       {!p2Open && step !== 'done' && tooMuch}
     </div>

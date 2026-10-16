@@ -287,6 +287,13 @@
    "copy": "You don't need to do anything else.",
    "reviewStatus": "draft"
   },
+  "meet_done": {
+   "flow": "meet",
+   "step": "close",
+   "order": 28,
+   "copy": "You can come back to this any time.",
+   "reviewStatus": "draft"
+  },
   "pulls_place": {
    "flow": "pulls",
    "step": "place",
@@ -621,7 +628,7 @@
   "close_checkback": {
    "flow": "meet",
    "step": "close",
-   "order": 28,
+   "order": 29,
    "copy": "Check back with it tomorrow?",
    "reviewStatus": "draft"
   },

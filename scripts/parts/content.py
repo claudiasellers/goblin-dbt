@@ -379,6 +379,8 @@ PROMPTS = [
     ("meet_keep", "meet", "keep", "Keep it, so you can come back to it?"),
     ("meet_tender", "meet", "tender", "Can you let it know you're here?"),
     ("meet_tender_sub", "meet", "tender", "You don't need to do anything else."),
+    # The last screen, whether or not the close question was answered
+    ("meet_done", "meet", "close", "You can come back to this any time."),
     # Two pulls (parts.md "Two pulls")
     ("pulls_place", "pulls", "place", "Put your light wherever feels right."),
     ("pulls_feel", "pulls", "feel", "How do you feel toward each of them?"),
