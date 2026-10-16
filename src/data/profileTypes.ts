@@ -62,7 +62,14 @@ export interface ProfileSlices {
    * Kept parts (Phase 2), active and resting only; nothing at all while parts are off
    * (User.partsEnabled). `tender`: every consumer that speaks to a part stays gentle with it.
    */
-  parts: Array<{ id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; moveIds: string[]; meta: ProfileItemMeta }>;
+  parts: Array<{
+    id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; moveIds: string[];
+    /** The part's first body place id (src/data/bodyFigure.ts), for "The one in your {place}" when it has no name. */
+    firstPlace: string | null;
+    /** Shape it's five numbers (PartFigure draws it; null is the plain round figure). */
+    shapeSig: number[] | null;
+    meta: ProfileItemMeta;
+  }>;
   /** The rest of a kept part (Meet a part reads it); `hurtIds` from GUARDS. Own-words fields as written. */
   partDetail: Array<{
     id: string; ageId: string | null; voiceIds: string[]; ownVoice: string | null; jobIds: string[]; ownJob: string | null;
@@ -77,13 +84,16 @@ export interface ProfileSlices {
  */
 export const PROFILE_NEEDS = {
   'recovering-from-invalidation': ['name'],   // later + 'people'
-  'find-the-feeling': ['name'],
+  'find-the-feeling': ['name', 'parts'],     // parts: the tag row on its close
   'opposite-action': [],                      // later 'values', 'patterns'
-  'cool-down': [],                            // DT-01: 'bodyFlags'
+  'cool-down': ['parts'],                     // parts: the tag row on its close; DT-01: 'bodyFlags'
   'checkin': ['patterns'],                    // the router's tie-break (E4)
   'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)
   'witness': ['name', 'ownLines', 'savedLines'],
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
+  // "Was this a part you know?" after a better close (PartTagSlot, in SessionClose or the tool's own
+  // close): every tool whose close asks then-vs-now (src/lib/partTag.ts TAG_ROW_TOOLS) reads `parts`.
+  'five-senses': ['parts'],
   // Other tools declare 'parts' in the phase that renders them, never before.
 } as const satisfies Record<string, readonly SliceId[]>;
 

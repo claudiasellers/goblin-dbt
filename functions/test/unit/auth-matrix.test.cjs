@@ -22,6 +22,7 @@ const AUTHED = [
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
   'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
+  'tagPart',
   'schedulePartCheckback', 'answerPartCheckback',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',

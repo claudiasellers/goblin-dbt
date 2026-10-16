@@ -128,6 +128,11 @@ export interface QueuePartCandidateRequest {
   moveIds: string[];
   /** The Meet a part visit it came from, when there is one. */
   sessionId?: string;
+  /**
+   * The caller's own closed ToolSession it came from ("A new one" on the tag row). The server adds the
+   * moves that session's urge / pull ids express (approved EXPRESSES edges) to `moveIds`, up to 4.
+   */
+  toolSessionId?: string;
 }
 export interface QueuePartCandidateResponse { id: string }
 
@@ -163,6 +168,19 @@ export interface AnswerPartRevisitRequest {
 /** A job the part did before it took up a new one (`Part.jobHistoryJson`, newest last, at most 10). */
 export interface PartJobHistoryEntry { jobIds: string[]; ownJob: string | null; until: string }
 export const JOB_HISTORY_MAX = 10;
+
+// --- "Was this a part you know?": mirror of functions/src/parts/tagTypes.ts (tests/parts-entry.test.mjs) ---
+/** One tap on the tag row after a better or much better close. */
+export interface TagPartRequest {
+  /** A new client UUID for the tag. */
+  id: string;
+  /** The caller's kept part (active or resting). */
+  partId: string;
+  /** The caller's closed ToolSession whose close was better or much better. */
+  toolSessionId: string;
+}
+/** The tag for that session: this one, or the first one if the session was already tagged. */
+export interface TagPartResponse { id: string; created: boolean }
 
 // --- The next-day check-back: mirror of functions/src/parts/checkbackTypes.ts (tests/parts-entry.test.mjs) ---
 

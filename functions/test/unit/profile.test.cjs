@@ -15,8 +15,8 @@ test('getProfileContext returns only the declared slices, with the profile versi
     return [];
   });
   setDriver(f.driver);
-  const out = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'find-the-feeling' } });
-  assert.deepEqual(out, { toolId: 'find-the-feeling', version: 7, slices: { name: { firstName: 'Claudia' } } });
+  const out = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'recovering-from-invalidation' } });
+  assert.deepEqual(out, { toolId: 'recovering-from-invalidation', version: 7, slices: { name: { firstName: 'Claudia' } } });
   assert.ok(!f.calls.some((c) => /ProfileFact|MyPattern/.test(c.query)), 'no undeclared resolver ran');
   assert.equal(f.sessions.length, 1, 'one read transaction');
   assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');

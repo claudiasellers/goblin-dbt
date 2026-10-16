@@ -204,7 +204,7 @@ const { angryLaterCopy, ANGRY_MOVE } = await importTs("src/lib/angryPart.ts");
 test("later: parts on and both lines shipped, else absent; the plain wording never shows it", () => {
   const on = new Set([...angryPromptIds(true), ...angryOptionIds(true)]);
   const both = shippedWith(new Set([...on, "angry_later", "angry_later_done"]));
-  assert.deepEqual(angryLaterCopy(both, true), { ask: "Spend a minute with it later?", done: "It's there when you want it." });
+  assert.deepEqual(angryLaterCopy(both, true), { ask: "Spend a minute with it later?", done: "It's in Me when you want it." });
   assert.equal(angryLaterCopy(both, false), null, "parts off: no later line, whatever ships");
   assert.equal(angryLaterCopy(shippedWith(new Set([...on, "angry_later"])), true), null, "its done line missing");
   assert.equal(angryLaterCopy(shippedWith(new Set([...on, "angry_later_done"])), true), null, "its ask missing");

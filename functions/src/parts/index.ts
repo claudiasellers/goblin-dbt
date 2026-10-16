@@ -24,6 +24,8 @@ import {
   answerPartCandidateHandler, candidateAnswerDeps, validateCandidateAnswer, type AnswerPartCandidateResponse,
 } from './candidateAnswer';
 import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
+import { isTaggedTwice, tagDeps, tagPartHandler, validateTag } from './tag';
+import type { TagPartResponse } from './tagTypes';
 import {
   answerCheckbackDeps, answerPartCheckbackHandler, scheduleCheckbackDeps, schedulePartCheckbackHandler,
   validateAnswerCheckback, validateScheduleCheckback,
@@ -78,6 +80,24 @@ export const answerPartCandidate = callable<unknown, AnswerPartCandidateResponse
   async ({ uid, data }) => {
     const input = parseOrInvalid(() => validateCandidateAnswer(data), 'Invalid request');
     return writeTx((tx) => answerPartCandidateHandler(input, candidateAnswerDeps(tx, uid as string, input.candidateId)));
+  },
+);
+
+/**
+ * "Was this a part you know?": one tag per ToolSession, after a better or much better close. A tag
+ * that lost a race for the same session (the taggedKey constraint) reads again and returns the first.
+ */
+export const tagPart = callable<unknown, TagPartResponse>(
+  { auth: 'required', label: 'tagPart', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateTag(data), 'Invalid request');
+    const run = () => writeTx((tx) => tagPartHandler(input, tagDeps(tx, uid as string, request.auth?.token?.email ?? null)));
+    try {
+      return await run();
+    } catch (e) {
+      if (!isTaggedTwice(e)) throw e;
+      return run();
+    }
   },
 );
 
