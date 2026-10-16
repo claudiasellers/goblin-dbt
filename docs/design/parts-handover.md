@@ -4,6 +4,11 @@ Written 14 Oct 2026 for whoever picks this up next, human or a fresh Claude sess
 asked, what direction was given, how the work was done, everything that was produced, where it lives,
 and what to do next. Read this first, then `parts.md`.
 
+**16 Oct update.** Phase 0 is built on PR #49 (branch `claude/project-thread-2wmq14`): the vocabulary and
+all parts copy as draft graph content, the parts voice lint, and data fixes 1, 2 and 5. The harness now
+reads `tests/fixtures/parts-content.json` (`dev/parts-fixture.ts` became `dev/parts-example.ts`). Where
+this doc and `parts.md` differ, `parts.md` is current.
+
 ---
 
 ## 1. The brief, as given

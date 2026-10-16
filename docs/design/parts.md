@@ -1,8 +1,11 @@
 # Parts
 
-Status: proposal, 6 Oct 2026 (updated 16 Oct). Not agreed, not built. Nothing here is signed off.
+Status: proposal, 6 Oct 2026 (updated 16 Oct). Not agreed. Nothing here is signed off. Phase 0 is built
+(PR #49): the vocabulary and all parts copy as draft graph content (`scripts/parts/content.py` →
+`schema/parts.cypher`), the parts voice lint, and data fixes 1, 2 and 5. Nothing is shown in the app.
 Dev harness: `npm run dev`, then `http://localhost:5173/dev/parts.html` (Meet a part, the den, the part
-card, a trail offer; draft copy in `dev/parts-fixture.ts`; `?view=`, `?move=`, `?palette=`).
+card, a trail offer). Its copy comes from the generated `tests/fixtures/parts-content.json`; the invented
+example person is `dev/parts-example.ts`. `?view=`, `?move=`, `?palette=`, `?blend=1` (the pending blend check).
 Umbrella: [alexithymia-first-interaction.md](alexithymia-first-interaction.md). Its *angry part* section is
 the one IFS decision already agreed, and this proposal grows out of it.
 Related: [recover-from-invalidation.md](recover-from-invalidation.md) (v2 *Stage it*), [den-rooms.md](den-rooms.md),
@@ -207,26 +210,43 @@ here: the part is welcome, and the behaviour is still yours to change.
 ## The vocabulary: protective moves
 
 Discovery needs one vocabulary across modules that ask about urges in their own words. It works like
-`vocabulary.py`'s `SIGNALS` table: a reviewed mapping, drafts until `SIGNED_OFF`.
+`vocabulary.py`'s `SIGNALS` table: a reviewed mapping, drafts until `SIGNED_OFF`. The source is
+`scripts/parts/content.py` (built into `schema/parts.cypher`); the table below is a summary of it.
 
-`(:ProtectiveMove {id, label, unblendPhrase, kind: 'proactive' | 'reactive' | 'either', offerable, safetyLine, reviewStatus})`
+`(:ProtectiveMove {id, label, unblendPhrase, trailPhrase, nameHint, kind: 'proactive' | 'reactive' | 'either', offerable, safetyLine, reviewStatus})`
 
 - `label` is the chip text in the person's register.
-- `unblendPhrase` is the second-person phrase that follows "A part of you…".
-- Every module's existing ids map to a move with `(x)-[:EXPRESSES]->(:ProtectiveMove)`.
+- `unblendPhrase` is the second-person phrase that follows "A part of you…" (the `{move}` slot).
+- `trailPhrase` is the second-person infinitive a trail statement uses ("the pull is to {pull}").
+- `nameHint` is a describing name suggestion ("the one who hides"), never an archetype.
+- Every module's existing ids map to a move with `(x)-[:EXPRESSES]->(:ProtectiveMove)`, **or are held
+  with a reason** (`HELD` in content.py). A test fails when a module gains an id that is neither, so a new
+  urge can't silently stay out of the vocabulary or silently join it.
+- FTF's pulls are already `FeelingUrge` nodes. Only Recover's pulls, which live in its flow JSON, get
+  `PullOption` nodes (`recover_fight`, `recover_chase`, `recover_hide`, `recover_freeze`).
 
 | Move | Label | `unblendPhrase` | Kind | Expressed by (existing ids) |
 |---|---|---|---|---|
-| `hit_back` | Hit back | wants to hit back | reactive | FTF `fight`; Recover `fight`; `anger-lash`, `anger-criticize`, `anger-destroy`, `envy-tear-down`; DEAR MAN `mr_got_loud`, `tp_escalated` |
-| `chase` | Chase it, fix it now | wants to chase this down | reactive | FTF `chase`; Recover `chase`; `jealousy-check`, `jealousy-interrogate`, `jealousy-cling`, `love-stalk` |
-| `hide` | Hide | wants to hide | either | FTF `hide`; Recover `hide`; `shame-hide`, `shame-secret`, `shame-avoid-people`, `sad-isolate`, `fear-cancel`, `fear-escape`, `anger-stonewall`, `disgust-leave`; DEAR MAN `mr_left`, `mr_went_quiet` |
-| `go_blank` | Go blank | (none: never shown) | reactive | FTF `blank`; Recover `freeze`; `fear-freeze`; DEAR MAN `mr_froze`, `tp_no_words`, `bs_numb`; check-in `lu_mind_faraway` |
+| `hit_back` | Hit back | wants to hit back | reactive | FTF `fight`; Recover `fight`; `anger-lash`, `anger-criticize`, `anger-destroy`, `envy-tear-down`, `disgust-judge`; DEAR MAN `mr_got_loud` |
+| `chase` | Chase it, fix it now | wants to chase this down | reactive | FTF `chase`; Recover `chase`; `jealousy-check`, `jealousy-interrogate`, `jealousy-cling`, `love-stalk`, `love-reach-out`, `love-proximity` |
+| `hide` | Hide | wants to hide | either | FTF `hide`; Recover `hide`; `shame-hide`, `shame-secret`, `shame-avoid-people`, `sad-isolate`, `fear-cancel`, `fear-escape`, `anger-stonewall`, `disgust-leave`, `guilt-avoid`; DEAR MAN `mr_left`, `mr_went_quiet`, `mr_changed_subject`; check-in `hu_body_shame` |
+| `go_blank` | Go blank | (none: never shown) | reactive | FTF `blank`; Recover `freeze`; `fear-freeze`; DEAR MAN `mr_froze`, `tp_no_words`, `tp_crying_shutdown`; check-in `lu_mind_faraway`, `lu_mind_blank`, `lu_body_numb` |
 | `zone_out` | Zone out | (none: never shown) | reactive | `sad-scroll`, `sad-bed` |
-| `keep_the_peace` | Keep the peace | wants to keep the peace | proactive | DEAR MAN `tp_gave_in`, `tp_apologized`, `mr_agreed`, `barrier_angry`; `guilt-apologize` |
+| `keep_the_peace` | Keep the peace | wants to keep the peace | proactive | DEAR MAN `tp_gave_in`, `tp_apologized`, `mr_agreed`, `barrier_angry`, `thought_not_worth`; PS `person-scared-reaction`; `guilt-apologize` |
 | `turn_on_myself` | Turn on myself | is turning on you | proactive | DEAR MAN `thought_my_fault`, `thought_too_much`; `guilt-punish`, `envy-compare` |
 | `take_less_room` | Take up less room | wants you to take up less room | proactive | DEAR MAN `barrier_no_right`, `barrier_guilty`, `thought_dont_deserve`; PS `person-no-right-to-speak`; `shame-shrink` |
-| `keep_watch` | Keep watch | is keeping watch | proactive | check-in `hu_exp_vigilance`, `hu_exp_social`; DEAR MAN `thought_wrong`, `thought_will_leave` |
-| `put_it_off` | Put it off | wants to put this off | proactive | `fear-avoid`, `sad-give-up`, `envy-give-up`; PS `cant-keep-putting-off`, `cant-afraid-aftermath`, `cant-ambivalent`; DEAR MAN `thought_not_worth` |
+| `keep_watch` | Keep watch | is keeping watch | proactive | check-in `hu_exp_vigilance`, `hu_exp_social`; DEAR MAN `thought_wrong`, `thought_will_leave`; PS `tried-thinking-constantly` |
+| `put_it_off` | Put it off | wants to put this off | proactive | `fear-avoid`, `sad-give-up`, `envy-give-up`; PS `cant-keep-putting-off`, `cant-afraid-aftermath`, `cant-ambivalent` |
+
+Changes from the first draft of this table, all for review:
+
+- `tp_escalated` ("It escalated quickly") is held: it doesn't say whose move it was.
+- `thought_not_worth` ("This isn't worth the fight") is *keep the peace*, not *put it off*: in DEAR MAN it
+  means dropping the ask to avoid the conflict.
+- `bs_numb` is a body signal, so it gets a place (`AT_PLACE` → `body`), not a move.
+- Held with a reason, among others: `disgust-push` (a boundary as often as a protector), `love-idealize`,
+  `mr_cried` (a feeling arriving), `mr_stayed_course` (the person leading), `hu_exp_flooding` (a flood
+  signal the gates read, never a move), `barrier_emotional` (a fear of flooding).
 
 Notes on the vocabulary:
 
@@ -340,14 +360,14 @@ Mon 27 Sep   DEAR MAN debrief   Partner                  I went quiet
 Fri 1 Oct    Find the feeling   Something with someone   Disappear
 
 Does this feel like a part of you?
-[Yes, a part of me]   [More than one]   [It's just what happens]   [Not me]
+[Yes, a part of me]   [More than one]   [It's how things go]   [Not me]
 ```
 
 | Answer | What happens |
 |---|---|
 | **Yes** | *Meet a part*, with this trail as the trailhead |
 | **More than one** | "Which of these feels like its own thing?" Each kept half becomes a `PartCandidate` (log). On a rule C trail this goes to *Two pulls* |
-| **It's just what happens** | The trail stays a plain pattern in Reflect. It is respected as an answer |
+| **It's how things go** | The trail stays a plain pattern in Reflect. It is respected as an answer |
 | **Not me** | Declined for that rule + moves + context |
 | **Not now** | Cooldown |
 
@@ -409,24 +429,29 @@ hatch, no free text required, no scale anywhere.
   away, stop any time. Coming back into the room comes first."*, plus a 5-4-3-2-1 link, then the
   choice.
 - **`TooMuchLink` on every screen.** It never locks.
+- **Blending check (pending the flood-signal decision).** If Claudia picks it, the first screen asks
+  *"Right now, can you notice it, or is it running things?"* I can notice it · It's running things · Not sure.
+  *Running things* opens on the P2 body hand-off, with *keep going* still there. It asks about distance
+  from the part, not capacity, so it isn't the removed probe. The copy is in the graph as `pending`.
 
 | # | Step | Screen | Copy (draft) | Options |
 |---|---|---|---|---|
 | 1 | Find | What's here | "What's showing up?" | Chips from the trailhead (e.g. "The pull to hide"), parts they know, "Something else" |
 | 2 | Focus | Where | "Where do you notice it?" | The heat figure, one mark. "Nowhere I can find" is a complete answer |
 | 3 | Flesh out | Shape | "Which is closer to it?" | Shape it's five forced choices, no regulate step. The result is the part's figure. Tune it is the alternative |
-| 3b | Flesh out | Age | "How old does it seem?" | school age · teenage · about your age · older · can't tell · **little** → "It sounds young. Want to keep it gentle?" Yes moves to the tender path |
+| 3b | Flesh out | Age | "How old does it seem?" | school age · teenage · about my age · older · can't tell · **little** → "It sounds young. Want to keep it gentle?" Yes moves to the tender path |
 | 3c | Flesh out | Voice | "Does it say anything?" | Chips from the move (`hide`: "Don't let them see", "Get out before they leave", "It's safer alone"), "In my words", "Nothing" |
 | 4 | Feel toward | Gate | "How do you feel toward it right now?" | **Self-like:** curious · steady · warm toward it · open → 5. **Not Self-like:** annoyed · scared of it · want it gone · ashamed of it · tired of it → 4b. **not sure** → 5. **nothing** → grounding (below) |
-| 4b | Unblend | Room | "That reaction is a part too. Can it give you some room, for now?" | It eased off · It's still here · Not sure |
+| 4b | Unblend | Room | "That reaction might be another part. Can it give you some room, for now?" | It eased off · It's still here · Not sure |
 | 5 | Befriend | Job | "What's it trying to do for you?" | Chips from `PartJob` for the move (`hide`: "Keep me out of sight", "Keep me from being pushed out", "Keep me from making it worse"), "In my words" |
 | 5b | Befriend | The job | "Does it like this job?" | It's tired · It's proud of it · Not sure |
+| 5c | Befriend | Guards | "What do you think it's protecting?" | The move's `OFTEN_GUARDS` hurts in rank order (the agreed angry card's six: being brushed off · made small · left out · not mattering · laughed at · alone in this) · Not sure. A category, never a memory: no follow-up question about it. Saved as the part's `GUARDS` on 9b's yes |
 | 6 | Fears | Fear | "What's it afraid would happen if it stopped?" | `PartFear` chips; some flagged `tender` or `danger`. "In my words" always takes the conservative branch |
 | 7 | Update | Now | "Does it know how old you are now?" | Yes · It doesn't seem to · Not sure. If not: "Show it something you can do now." Chips: I can leave a room · I can ask for help · I have people now · I can say no · In my words |
 | 8 | Appreciate | Thanks | "Thank it for trying to protect you." | Press and hold. **The one earned moment:** the lamp's light reaches its figure |
 | 8b | Befriend | Would rather | "If it didn't have to do this, what would it rather do?" | `PreferredRole` chips (`hit_back`: "Tell me when something matters", "Help me stand up for myself, steady and out loud"), "Not sure yet" |
 | 9 | Keep | Name | "Want to give it a name?" | Text, up to 40 characters. Suggestions describe, never archetypes or numbers: "the one who hides". "Not yet" |
-| 9b | Keep | Profile | "Keep it in Parts of me?" | Yes, keep it · Not now. **This is rule 4's yes** |
+| 9b | Keep | Profile | "Keep it, so you can come back to it?" | Yes, keep it · Not now. **This is rule 4's yes** |
 | 10 | Close | Then vs. now | The spine's orienting close: "Further away … More here" | `part_checkback` follow-up tomorrow (on yes) |
 
 ### Branches
@@ -689,41 +714,35 @@ which is agreed and which the person chooses.
     Richard Schwartz. Not affiliated with or endorsed by the IFS Institute."*
   - Get trademark counsel before shipping. This is not legal advice.
 - **Internal vocabulary stays internal.** Manager, firefighter, exile, burden language, Self-energy and
-  trailhead live in code and content only. Add a rule to `voice-rules.json`, using the file's format:
+  trailhead live in code and content only. The voice contract (`scripts/witness/voice-rules.json`,
+  `scripts/voice-lint.mjs`) enforces it, and `load-graph.mjs` refuses to load parts copy that fails it.
+- **Three lint scopes.** Every user-visible string in `schema/parts.cypher` is written to a
+  `// @parts-copy-json` row with its kind:
 
-  ```json
-  {
-    "id": "no_role_labels",
-    "pattern": "\\b(exiles?|firefighters?|unburden\\w*|legacy burdens?|self-energy|trailheads?)\\b",
-    "flags": "i",
-    "severity": { "parts_prompt": "error", "parts_chip": "error", "validation": "error", "user_copy": "warn" },
-    "message": "Parts are known by what they do, in the person's words; the model's role words stay internal."
-  },
-  {
-    "id": "no_role_manager",
-    "pattern": "\\bmanagers?\\b",
-    "flags": "i",
-    "severity": { "parts_prompt": "error", "parts_chip": "error" },
-    "message": "\"Manager\" is a role label in parts copy (and a boss everywhere else)."
-  },
-  {
-    "id": "no_part_blame",
-    "pattern": "\\bpart( of you)? (made|forced) you\\b",
-    "flags": "i",
-    "severity": { "parts_prompt": "error", "parts_chip": "error", "validation": "error" },
-    "message": "A part wanted something; the person acted. Never the part did it."
-  }
-  ```
+  | Kind | Scope | Max | Slots | Rules |
+  |---|---|---|---|---|
+  | prompt (the app's questions) | `parts_prompt` | 90 | all parts slots | every validation rule, `voice_distance` included |
+  | chip (what the person taps) | `parts_chip` | 60 | none | every validation rule except `voice_distance` |
+  | voice (what a part says) | `parts_voice` | 40 | none | safety only: cheer, emoji, role labels, part blame, ideation echo |
+  | keepsake | `parts_chip` | 90 | `{A}` `{B}` `{want}` | as chip |
 
-  Plain "burden" is allowed. DEAR MAN's anchor "Asking isn't a burden. Guessing is." stays, and "I'd be a
-  burden" is a real protector-fear chip.
-- **Two lint scopes.**
-  - `parts_prompt` is the app's questions. It takes every validation rule, `voice_distance` included.
-  - `parts_chip` is the chips the person picks, in their own voice ("I can say no"). It takes everything
-    except `voice_distance`.
-- **Slots.** The structural `slots` rule allows only `{N} {word} {phrase} {need}`. This adds `{name}`,
-  `{move}` (renders `unblendPhrase`), `{hurt}`, `{goal}`, `{context}`, `{A}`, `{B}`, `{anchor}`, each with
-  a fixed 8-character length count.
+  A part's voice is deliberately unsoftened ("Just agree", "You always do this"), so the softening rules
+  don't apply to it; the safety rules do.
+- **Four new rules.**
+  - `no_role_labels`: exile, firefighter, unburden, legacy burden, Self-energy, trailhead. Error in parts
+    scopes and validation, warn in user copy. Plain "burden" stays allowed (DEAR MAN's "Asking isn't a
+    burden. Guessing is." and the fear chip "I'd be a burden").
+  - `no_role_manager`: "manager", in parts scopes only (a boss everywhere else).
+  - `no_part_blame`: "a part (of you) made / forced you". A part wanted something; the person acted.
+  - `no_ideation_echo`: disappear, vanish, die, dead, kill, suicide, "end it all", "not wake up", "better
+    off without me". Error in parts scopes and validation; report-only in user copy, where Recover's and
+    FTF's "disappear" are the person's own words for an urge. This is why hit back's fear chip "I'd
+    disappear" became "I'd stop mattering".
+- **Slots.** Parts slots count at a realistic width, not the witness lint's 8: `{name}` `{A}` `{B}` 24,
+  `{move}` 32, `{pull}` `{pull2}` 18, `{hurt}` 28, `{goal}` 32, `{context}` 24, `{anchor}` 40, `{month}` 9,
+  `{want}` 20, `{N}` 2. The content tests check every fragment (`unblendPhrase`, `trailPhrase`,
+  `nameHint`, …) fits its slot.
+- **No crisis numbers in parts copy.** Crisis resources come from the crisis seam, alongside the flow.
 - **Names belong to the person.** Suggestions describe ("the one who hides"). Never "the Critic", "Inner
   Child", a number or an archetype. People on MyPTSD called numbered parts "dehumanizing".
 - **"Part" itself.** Plural young people found "parts" invalidating for alters (Parry, Eve & Myers 2022).
@@ -737,27 +756,28 @@ These follow the Data layers rules in CLAUDE.md.
 
 ### Graph content: `schema/parts.cypher`, built from `scripts/parts/content.py`
 
+Phase 0 builds this part (drafts, nothing served). Every node and edge carries `reviewStatus`.
+
 | Node / edge | Purpose |
 |---|---|
-| `ProtectiveMove {id, label, unblendPhrase, kind, offerable, safetyLine, reviewStatus}` | The shared vocabulary |
-| `(:ActionUrge \| :MomentResponse \| :ThoughtPattern \| :TurningPoint \| :DearManBarrier \| :BarrierSubResponse \| :QuestionResponse)-[:EXPRESSES]->(:ProtectiveMove)` | Every module's ids, mapped; drafts until `SIGNED_OFF` |
-| `PullOption {id, flow}`: `ftf:fight`, `ftf:chase`, `ftf:hide`, `ftf:blank`, `recover:fight`, `recover:chase`, `recover:hide`, `recover:freeze`; each `-[:EXPRESSES]->` a move | FTF and Recover pulls live in their flow JSON, not as nodes |
-| `(:BodySignal)-[:AT_PLACE]->(:BodyRegion)` | DEAR MAN body signals → the body map's 15 places |
-| `ProtectedHurt {id, label}`; `(:ProtectiveMove)-[:OFTEN_GUARDS]->`; `(:ProtectedHurt)-[:SAME_AS]->(:UnmetNeed \| :InvalidationEvent)` | "What's it protecting?" hypotheses. `SAME_AS` is an addition to the agreed angry-part spec |
-| `PartPrompt {id, step, copy}`; `PartOption {id, step, label, moveIds[], flag: 'tender' \| 'danger' \| null, selfLike: true \| false \| null}` | Every screen's copy and chips |
-| `PolarityPair {id, a, b, bothWant[], worryA[], worryB[]}` | Two pulls content; offerable moves only (a build check) |
-| `TrailRule {id, shape: 'A' \| 'B' \| 'C' \| 'D', minEpisodes, minSpanDays, minTools, contextShare, lift, windowDays, cooldownDays, enabled}` | Its own label, off until reviewed |
-| `PartsPolicy {id:'parts', offersEnabled}` | The offers kill switch |
-| `TherapyConcept {id:'parts_meet', appToolId:'meet-a-part'}`, **no `RECOMMENDED_FOR` rows** | Gives the tool a concept without making it routable |
+| `ProtectiveMove {id, label, unblendPhrase, trailPhrase, nameHint, kind, offerable, safetyLine}` | The shared vocabulary |
+| `(:ActionUrge \| :FeelingUrge \| :PullOption \| :MomentResponse \| :TurningPoint \| :ThoughtPattern \| :DearManBarrier \| :BarrierSubResponse \| :QuestionResponse)-[:EXPRESSES {why}]->(:ProtectiveMove)` | Every module's ids, mapped or held; drafts until `SIGNED_OFF` |
+| `PullOption {id, flow, pullId}`: `recover_fight`, `recover_chase`, `recover_hide`, `recover_freeze` | Recover's pulls live in its flow JSON; FTF's are `FeelingUrge` nodes already |
+| `(:BodySignal)-[:AT_PLACE]->(:BodyRegion)` | DEAR MAN body signals → the body map's 15 places (data fix 6) |
+| `ProtectedHurt {id, label, hurtPhrase, feltPhrase}`; `-[:NAMED_AS]->(:Emotion)`; `(:ProtectiveMove)-[:OFTEN_GUARDS {rank}]->` | The angry card's six hurts, as the agreed spec maps them to Emotion ids; "What's it protecting?" hypotheses |
+| `(:InvalidationEvent)-[:CAN_TOUCH]->`, `(:UnmetNeed)-[:ANSWERS]->`, `(:Underneath)-[:SAME_AS]->(:ProtectedHurt)` | Recover's and DEAR MAN's ids for the same hurts, mapped or held. An addition to the agreed angry-part spec |
+| `PartPrompt {id, flow, step, order, copy}`; `PartOption {id, flow, step, order, label, kind, flag, selfLike, branch}`; `(:PartOption)-[:OFFERED_FOR {order}]->(:ProtectiveMove)`; `(:PartOption)-[:SAME_AS]->(:ThoughtPattern \| :AmbivalenceOption)` | Every screen's copy and chips. `branch` says what a pick does. Voice chips reuse DEAR MAN's thought labels word for word, and *put it off*'s fears reuse Problem Solve's ambivalence options, so evidence from those tools can pre-order the chips |
+| `PolarityPair {id, a, b}`; `-[:HAS_SIDE {side}]->(:ProtectiveMove)`; `-[:BOTH_WANT {order}]->` / `-[:WORRY {side, order}]->(:PartOption)` | Two pulls content; offerable moves only (a build check) |
+| `TrailRule {id, shape, minEpisodes, windowDays, …, statementTemplate, enabled}`; `TrailContext {id, key, value, phrase}` | Its own label, off until reviewed; what fills `{context}` |
+| `PartsPolicy {id:'parts', offersEnabled, episodeMergeHours, floodGateHours, crisisPauseHours, dissociationCount, dissociationDays, louderPauseHours, maxNonSelfAnswers, tooManyPartsCount, tooManyPartsDays, nameMaxChars}` | The offers kill switch and every safety number in one tunable place |
+| `TherapyConcept {id:'parts_meet', appToolId:'meet-a-part'}`, **no `RECOMMENDED_FOR` rows** | Phase 2, with the tool. Gives it a concept without making it routable |
 
-**Fix while here:**
+**Fixed while here (16 Oct, `schema/relationships.cypher`):**
 
-- `(:TherapyModality {id:'ifs'})-[:TREATS]->(:ClinicalConstruct {id:'bpd'})` claims more than the
-  evidence. A 2026 systematic review found no IFS studies in BPD. Drop it, or add
-  `evidenceGrade: 'Preliminary'` to every IFS `TREATS` edge and to the modality.
-- `ifs_self → dbt_wise_mind` and `ifs_self → pv_ventral_vagal` are typed `functional_equivalent`. They are
-  parallels: Wise Mind is reached by practice, while IFS's Self is posited as innate. Retype both to
-  `parallel`.
+- Every IFS `TREATS` edge now carries `evidenceGrade: "Preliminary"` and an `evidenceNote`; the BPD one
+  says no IFS studies exist in BPD (Francis, Fino & Heym 2026).
+- `ifs_self → dbt_wise_mind`, `ifs_self → pv_ventral_vagal` and `act_self_context → ifs_self` are typed
+  `functional_parallel`: Wise Mind is reached by practice, while IFS's Self is posited as innate.
 
 ### User data
 
@@ -813,14 +833,19 @@ These follow the Data layers rules in CLAUDE.md.
 
 ### Data fixes this needs first (no UI)
 
-1. Keep the check-in's per-spot words: `spots: [{wordIds[], x, y}]` on `CheckIn`.
-2. Problem Solve saves `barrierTypeId`, `barrierSubId`, `ambivalenceId` and `confidence` in `ext.er` (ids
-   only).
+1. **Built (16 Oct).** Keep the check-in's per-spot words. A grid check-in with 2 or 3 filled spots
+   sends `spots: [{x, y, emotionIds[]}]`; the server keeps only real Emotion ids and stores
+   `CheckIn.spotsJson` (log layer). Anything invalid drops the field, never the save.
+2. **Built (16 Oct).** Problem Solve saves `barrierTypeId`, `barrierSubId`, `ambivalenceId` and
+   `confidence` in `ext.er` (ids only; the four confidence values are checked by the client).
 3. Do the Opposite saves a minimal record when the urge was judged helpful. That is a protector doing its
-   job well.
-4. Urge Surfing asks which urge (FTF's four pulls as chips), filling `ToolSession.urgeIds`.
-5. Clients send `ToolSession.emotionIds`. It is validated today but always `[]`.
-6. Content: `BodySignal-[:AT_PLACE]->BodyRegion`.
+   job well. **A behaviour change: Claudia's call.**
+4. Urge Surfing asks which urge (FTF's four pulls as chips), filling `ToolSession.urgeIds`. **A new
+   question in a tool: Claudia's call.**
+5. **Built (16 Oct).** Tool sessions carry `emotionIds`: from the hand-off's `checkinEmotions` at start,
+   or set once on close from what the person picked inside the tool (Problem Solve, Do the Opposite,
+   Recover, Find the feeling, DEAR MAN's Express chips). A hand-off's ids are never replaced.
+6. **Built as content (16 Oct).** `BodySignal-[:AT_PLACE]->BodyRegion`, in `schema/parts.cypher`.
 
 ---
 
