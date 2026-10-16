@@ -88,7 +88,13 @@ test("Urge Surfing: the pull is optional, single, ask-fresh and recorded as urge
   assert.match(src, /const reset = \(\) => \{[\s\S]*?setPulled\(null\);\s*session\.setUrgeIds\(\[\]\);/);
   // Not answering is the skip: Start is never gated on the pick.
   assert.doesNotMatch(src, /disabled=/);
-  // On the intro screen, after the how-it-works card and above the strength slider.
-  const intro = src.slice(src.indexOf("How urge surfing works"), src.indexOf("How strong is your urge right now"));
-  assert.match(intro, /pull\.choices\.map/);
+  // On the surfing screen, between the wave and the update slider: never on the intro, so nothing
+  // stands between someone mid-urge and Start.
+  const introAt = src.indexOf("if (phase === 'intro')");
+  const intro = src.slice(introAt, src.indexOf("if (phase === 'surfing')", introAt));
+  assert.match(intro, /Start surfing/);
+  assert.doesNotMatch(intro, /pull\.choices|pull\.question/);
+  const surfing = src.slice(src.indexOf("{/* Wave visualization */}"), src.indexOf("Update: How strong is the urge now?"));
+  assert.match(surfing, /pull\.choices\.map/);
+  assert.equal(src.match(/pull\.choices\.map/g).length, 1);
 });
