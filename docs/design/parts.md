@@ -462,6 +462,25 @@ Was this a part you know?
   existing parts?"). He called it "the kind of question that only a very engaged therapist or close
   friend would be in a position to ask."
 
+**As built (16 Oct, behind sign-off).**
+
+- **Hosts:** every tool whose close asks then-vs-now (today Cool Down, 5-4-3-2-1 and Find the feeling),
+  through one component, `PartTagSlot`, which holds the only gate. A test derives the host list from
+  `TOOL_CLOSE_KIND`, so a new tool can't miss it. `meet-a-part` is never a host. Each host declares
+  `parts` in `PROFILE_NEEDS`.
+- **Gate:** parts on, the close saved, better or much better, every tag line and both unnamed-part lines
+  signed off, and at least one active or resting part. The server (`tagPart`) refuses everything else
+  itself: parts off, someone else's or an open session, a same / worse close, a Meet a part session, a
+  set-aside part.
+- **One tag per ToolSession**: a read inside the write returns the first tag, and a `taggedKey`
+  uniqueness constraint catches a race. Only `ToolSession` targets so far (no `CheckIn` tags yet).
+- **Chips:** up to four parts, most recently visited first: a small figure and the name in the serif, or
+  for an unnamed part *"The one in your {place}"* / *"One you haven't named"*. Then *A new one*, *Skip*.
+  One tap folds the row away with nothing said.
+- **A new one** → *"Want to come back to it later?"* Yes / No thanks. Yes writes a candidate with
+  `toolSessionId`: the server derives its moves from that session's urge / pull ids through approved
+  `EXPRESSES` edges and links `(:PartCandidate)-[:FROM_SESSION]->(:ToolSession)`.
+
 ---
 
 ## Meet a part
@@ -588,6 +607,20 @@ plain wording; its "later" line below is shown only with parts on.)
     felt age can change as it learns it's not then any more; a non-answer keeps the old one). `tender` is
     never cleared by a visit.
   - `ACCEPTED_FROM` a `TrailOffer` waits for that label (Phase 4); a candidate's is written now.
+- **The tool as built** (`src/pages/tools/MeetAPart.tsx`, screens in `src/components/parts/meet/`, the step
+  machine `src/lib/meetAPart.ts`, shared with the review harness): registered with `listed: false`, so it
+  is reached only by link, and the page shows "not found" unless parts are on and its copy ships.
+  - Entry: `p2` opens the body hand-off first (orienting first with dissociation history; the crisis
+    banner alongside when flagged); *later* there saves a final session (`exitStep: 'entry'`,
+    `stopReason: 'later'`) and closes the visit as left early, with no closing question. `far_away` shows
+    the heads-up with the 5-4-3-2-1 link. *You don't need to get to know everyone at once.* shows once when
+    three parts were made in seven days; a paused part gets its own line. After an entry P2, a *running
+    things* answer opens the hand-off at its last two choices (`BreakdownHandoff`'s `startLater`).
+  - The `PartSession` starts once *Find* is answered (or on the first screen when the entry names the
+    part), so a move picked at *Find* is never lost. Leaving mid-visit closes the ToolSession without a
+    `DETAIL` link, like the other wrapped tools.
+  - The last screen says *"You can come back to this any time."* After a keep, the close asks *"Check back
+    with it tomorrow?"* (see *Louder after a meeting*).
 
 ---
 
@@ -612,14 +645,14 @@ aggregates (`FOUND_WORD`, offers). Stats come from there, never from a profile s
 
 ```
 [figure]   the one who hides                     ← serif: the person's name for it
-           Shows up when someone pulls away, mostly evenings
+           Mostly evenings
            Where: chest, throat
            Its job, in your words: keep me from being pushed out
            Afraid that: I'd be too much and they'd leave
            Would rather: let me know when I need someone
 
            What's helped it settle
-           Pause helped 3 of the 4 times            ← shown only with ≥3 tagged closes
+           Pause helped 3 times                     ← shown only with ≥3 tagged closes
 
            How you've felt toward it
            In August: tired of it. Lately: curious.  ← comparison, never a number or chart
@@ -630,7 +663,27 @@ aggregates (`FOUND_WORD`, offers). Stats come from there, never from a profile s
 - **"How you've felt toward it"** is the integration readout. It aggregates the part's `feelTowardIds`
   from `PartSession`s, in the app's then-and-now grammar. It needs at least 3 answers in each half.
 - **"What's helped"** counts tagged closes for this part. Counts are fine; there are no scores and no
-  part numbers.
+  part numbers. It is a count, not "3 of the 4 times": tags are only asked after a better close, so every
+  tagged close is a better one and a ratio would be dishonest.
+- **As built** (`functions/src/parts/stats.ts`, pure, shared by Reflect and the card; all time, not
+  Reflect's range):
+  - *helped*: ≥ 3 tags for the part; tools by count (ties: most recently tagged), at most 3.
+  - *felt*: each visit counts its **first** feel-toward answer (how the person arrived, which is what
+    changes as the relationship does); ≥ 3 visits in each half; the most common per half (ties: the later
+    one); *"In {month}: {then}. Lately: {now}."*, or *"Since {month}: {now}."* when they agree.
+  - *when*: ≥ 3 tags and one of four bands (05–12, 12–17, 17–22, 22–05, in `User.timeZone`) holding more
+    than half: *"Mostly evenings"*. The mock's "Shows up when someone pulls away" needs contexts, which
+    wait for trails (Phase 4).
+  - Below a threshold the line is simply absent. A failed read never takes Reflect down.
+- **The card as built**: *Spend time with it* · Rename (inline, serif, 40 characters) · Rest it (or
+  *It's back* on a resting part) · Set aside (no confirm: it's restorable; set-aside rows get *Bring it
+  back*) · *It feels young or hurt* (only on a part that isn't tender; there is no unmark yet). A fear
+  chip flagged `tender` or `danger` is never shown on any card, a tender part shows no fears at all, and
+  `ownFear` never leaves the server. Unnamed parts are headed "A part".
+- **To come back to**: up to three open candidates after the cards, *"The one that {unblendPhrase}"* (or
+  *"One you wanted to come back to"*), with *Get to know it* (Meet a part from the candidate) and *Not any
+  more* (`answerPartCandidate`, dismissed). Right after turning parts on, Settings shows *Get to know a
+  part* once.
 - **The hue is computed when the card is read** (the home quadrant of the most-tagged words). It is never
   stored on the part.
 
@@ -650,6 +703,13 @@ The profile's revisit mechanic becomes the IFS check-back.
   its job?") after 60 days without a tag.
 - Today reads part names through `readProfileSlices(tx, uid, 'today')` with `parts` declared for `today`.
   `spine/` never imports `profile/`.
+- **As built**: the check-back sits on the card itself, not in Me's generic "A few things to check" (whose
+  row can't fill `{name}`). `answerPartRevisit` takes `same` · `less` · `new` · `resting` (or, for a
+  resting part, `still_quiet` · `back`); every answer confirms the part and sets the next revisit. `new`
+  takes 1–3 would-rather ids: the old job goes into `jobHistoryJson` (newest 10 kept), the chosen ids
+  become its job and leave `preferredRoleIds`, the one place a part's ids are removed, and only because
+  the person said so. Every answer is logged once as a `PartRevisit`, so "less than before" over time can
+  be read later.
 
 ### Deleting
 
@@ -745,12 +805,12 @@ which is agreed and which the person chooses.
 | Module | In the moment | After | Over weeks |
 |---|---|---|---|
 | **Check-in** | Nothing new. The check-in never asks for an urge, so the app has nothing of the person's own to unblend from. **Keep the per-spot words** (data fix 1): two spots mean two parts present | Tag row after a better close of a tool started from the result | Episodes |
-| **Find the feeling** | After the pull step: "A part of you {unblendPhrase} right now." | Tag row | "Use this shape for {name}?" when they tag a part |
-| **Do the Opposite** | After the urge: the unblend line | On the goal screen, one optional line: *"Part of you wants to {move}. It's worried about {hurt}. You want {goal}."* | Practiced steps per part |
-| **Ask for what you need (DEAR MAN)** | The angry-part card for *fire back* (agreed) | Debrief: "Who showed up?" from `MomentResponse` / `ThoughtPattern` | **Cope ahead per part.** Prep asks "Who might show up in this conversation?" A chosen part brings its `anchorLineId`: *"If {name} shows up: {anchor}."* The person sets the anchor there, from kept lines or their own words |
-| **Recover** | After the pull: the unblend line | Tag row | Recover's next-day check also asks about a tagged part |
+| **Find the feeling** | After the pull step: "A part of you {unblendPhrase} right now." (built: the tool's Shape and Tune rooms only, never inside the check-in) | Tag row (built) | "Use this shape for {name}?" when they tag a part |
+| **Do the Opposite** | After the urge: the unblend line (built; not for "My urge is different") | On the goal screen, one optional line: *"Part of you wants to {move}. It's worried about {hurt}. You want {goal}."* | Practiced steps per part |
+| **Ask for what you need (DEAR MAN)** | The angry-part card for *fire back* (agreed) | Debrief: "Who showed up?" from `MomentResponse` / `ThoughtPattern` | **Cope ahead per part.** Prep asks "Who might show up in this conversation?" A chosen part brings its `anchorLineId`: *"If {name} shows up: {anchor}."* The person sets the anchor there, from kept lines or their own words. Built: `setPartAnchor` (a kept line, `anchorLineId`, or their words, `anchorOwn`, ≤ 90, never linted), a `partAnchors` slice declared for `dear-man` only, the anchor shown again on the script screen, `copeAheadPartId` in the visit's `ext` |
+| **Recover** | After the pull: the unblend line (built; not on *fight* while the angry card may still come) | Tag row | Recover's next-day check also asks about a tagged part |
 | **Problem Solve** | — | `cant-ambivalent` queues a candidate (on yes). **Save barrier and ambivalence ids** (data fix 2) | Rule A source for `put_it_off` |
-| **Circuit Breaker, Pause, 5-4-3-2-1, Urge Surfing** | Body first. Nothing added | Tag row only after a better close | "Pause helped 3 of the 4 times" on the card. Urge Surfing asks *which* urge (data fix 4) |
+| **Circuit Breaker, Pause, 5-4-3-2-1, Urge Surfing** | Body first. Nothing added | Tag row only after a better close | "Pause helped 3 times" on the card. Urge Surfing asks *which* urge (data fix 4) |
 | **Help now, micro-steps** | Nothing | Nothing | Nothing |
 | **Witness** | Unchanged in the moment. **No part names in the moment** | A `part` kind for after and over-weeks moments (check-backs, the card), with a `{name}` slot | — |
 | **Today** | Collapses with flooding signals (as now) | `part_checkback`: "How's {name} today?" Settled · Same · Louder · Skip | One trail offer a week at most; protector check-backs |
@@ -763,6 +823,12 @@ which is agreed and which the person chooses.
   after time with a part."* It makes no prediction and no promise.
 - It doesn't offer more of that part for 72 h.
 - This counts as a harm signal (below).
+- **As built**: `answerPartCheckback` resolves the follow-up, marks it `harmSignal` and sets the part's
+  `pausedUntil` in one transaction. A paused part is never refused a visit (nothing locks), but no
+  check-back is scheduled for it, and Meet a part opens with *"Things got louder after last time. Going
+  gently is fine, or come back another day."* The check-back is scheduled only after a keep (or a visit to
+  a kept part), on a yes to *"Check back with it tomorrow?"*, never after P2's *later* or a danger ending;
+  one open check-back per part. It has no push or in-tab reminder (they would bypass the parts-on gate).
 
 ---
 
@@ -865,12 +931,13 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 
 | Label | Layer | Fields / edges | Notes |
 |---|---|---|---|
-| `Part` | Profile | `kind:'part'`, `area:'my_parts'`, `name`, `status` (active / resting / set_aside), `source` (made / offer / candidate), `tender`, `shapeSig[5]`, `soundSig[4]?`, `places[]`, `ageId`, `voiceIds[]`, `ownVoice?`, `jobIds[]`, `ownJob?`, `fearIds[]`, `ownFear?`, `preferredRoleIds[]`, `jobHistoryJson`, `anchorLineId?`, `mapX`, `mapY`, `confirmedAt`, `revisitAt`, `lastVisitedAt`. Profile edges `-[:USES {confirmedAt, source}]->(:ProtectiveMove)`, `-[:GUARDS]->(:ProtectedHurt)`, `-[:ACCEPTED_FROM]->(:TrailOffer \| :PartCandidate)` | **`keepPart` is the only writer.** Add a grep test like the `MyPattern` one |
+| `Part` | Profile | `kind:'part'`, `area:'my_parts'`, `name`, `status` (active / resting / set_aside), `source` (made / offer / candidate), `tender`, `shapeSig[5]`, `soundSig[4]?`, `places[]`, `ageId`, `voiceIds[]`, `ownVoice?`, `jobIds[]`, `ownJob?`, `fearIds[]`, `ownFear?`, `preferredRoleIds[]`, `jobHistoryJson`, `anchorLineId?`, `anchorOwn?`, `pausedUntil?`, `mapX`, `mapY`, `confirmedAt`, `revisitAt`, `lastVisitedAt`. Profile edges `-[:USES {confirmedAt, source}]->(:ProtectiveMove)`, `-[:GUARDS]->(:ProtectedHurt)`, `-[:ACCEPTED_FROM]->(:TrailOffer \| :PartCandidate)` | **`keepPart` is the only writer.** Add a grep test like the `MyPattern` one |
 | `PartLink` | Profile | `kind: 'two_pulls' \| 'covers_for'`, `aId`, `bId`, `bothWantId?` | Written only on a yes in the den or in Two pulls |
 | `DenSnapshot` | Profile | `takenAt`, `layoutJson` | — |
 | `PartSession` | Log | As in *What's saved* | `ToolSession -DETAIL->` |
-| `PartTag` | Log | `at`, `source` (close / debrief / batch), `-[:TAGS]->(:CheckIn \| :ToolSession)`, `-[:OF_PART]->(:Part)` | An incoming edge only, so finalise-once holds |
-| `PartCandidate` | Log | `origin` (new_one / worried_part / split / ps_ambivalence / angry_card), `moveIds[]`, `createdAt`, `status` | Written only on a yes. Read in Me the way `PatternOffer` is |
+| `PartTag` | Log | `at`, `source` (close / debrief / batch), `taggedKey` (one per tagged record), `-[:TAGS]->(:CheckIn \| :ToolSession)`, `-[:OF_PART]->(:Part)` | An incoming edge only, so finalise-once holds |
+| `PartRevisit` | Log | `partId`, `answer`, `ratherIds`, `-[:OF_PART]->(:Part)` | The 30-day check-back's answer, written once |
+| `PartCandidate` | Log | `origin` (new_one / worried_part / split / ps_ambivalence / angry_card), `moveIds[]`, `createdAt`, `status` (open / accepted / dismissed), `-[:FROM_SESSION]->(:ToolSession)?`; `(:PartSession)-[:QUEUED]->` | Written only on a yes. Read in Me the way `PatternOffer` is |
 | `TrailOffer` | Log | `ruleId`, `moveIds`, `contextKey`, `evidenceKeys`, `status`, `offeredAt`, `cooldownUntil` | `id = ruleId:moves:context`. Shares the weekly budget with `PatternOffer` |
 
 **Registration and tests.**
@@ -899,6 +966,9 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
     - Phase 3: `'dear-man': ['parts']`, `'opposite-action': ['parts']`, `'find-the-feeling': ['name','parts']`,
       `'recovering-from-invalidation': ['name','parts']`, `'witness': ['name','ownLines','savedLines','parts']`
   - The tag row reads through its host tool's needs, so there is no `'spine-close'` consumer.
+  - **As built:** `'meet-a-part': ['name','parts','partDetail']`, `'today': [..., 'parts']`, the tag row's
+    hosts `['parts']`, `'dear-man': ['parts','ownLines','savedLines','partAnchors']` (never `partDetail`:
+    DEAR MAN shows no fears). The `parts` slice also carries `firstPlace` and `shapeSig` for the chips.
   - Update the pinned expectations in `tests/profile-layer.test.mjs`.
 - **The area and status types.**
   - Add `my_parts` to `ProfileAreaId`, `PROFILE_AREAS` and the `AREAS` content, and update the "7 areas"
@@ -910,17 +980,18 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
     `src/lib/spine/close.ts`, with close kind `orienting`.
   - Exclude it in `evaluateRule` and in Insights' went-well.
 - **Follow-ups.** New `FollowUpType`s `part_checkback` and `two_pulls_checkback`.
-- **Callables in `functions/src/parts/`:**
-  - `startPartSession` / `savePartSession`
-  - `keepPart`
-  - `tagPart`
-  - `answerTrailOffer`
-  - `answerPartCandidate`
-  - `updatePartLayout`, `restPart`, `setPartTender`, `linkParts`
+- **Callables in `functions/src/parts/`** (built by 16 Oct unless marked):
+  - `getPartsEntry` (also `tooMany`, and `paused` for a given part), `startPartSession` / `savePartSession`
+  - `keepPart` and every other Part writer in `keep.ts`: `renamePart`, `restPart`, `setAsidePart`,
+    `restorePart`, `setPartTender` (true only), `answerPartRevisit`, `setPartAnchor`, the Louder pause
+  - `queuePartCandidate`, `answerPartCandidate`, `tagPart`
+  - `schedulePartCheckback`, `answerPartCheckback` (spine's `resolveFollowUp` refuses this type)
   - `deleteMyParts`
+  - not yet: `answerTrailOffer` (Phase 4), `updatePartLayout`, `linkParts` (Phase 5)
   - Content ships as a generated `src/data/content/parts.json`, like the other content files, holding
-    **approved rows only** (moves, prompts, options, hurts, `canTouch`; never trail rules, contexts or
-    the policy). Screens read it through `getPartsContent()` and render only when `flowReady` finds every
+    **approved rows only** (moves, prompts, options, hurts, `canTouch`, `expresses`; never trail rules or
+    contexts, and of the policy only `limits` (`nameMaxChars`, `maxNonSelfAnswers`) once it is signed
+    off). Screens read it through `getPartsContent()` and render only when `flowReady` finds every
     line they need, so nothing parts-related appears until its copy is signed off. An approved option
     may name a move that isn't signed off yet; completeness is `flowReady`'s job.
   - `meet-a-part` is in `NOT_WHAT_HELPS` (`spine/tools.ts`): its orienting answer is stored but never
