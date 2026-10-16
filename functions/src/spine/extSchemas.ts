@@ -52,6 +52,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
       },
     },
     copeAheadPartId: { t: 'id' },                                                  // DEAR MAN cope ahead: the part picked (id only, never its anchor)
+    whoShowedUp: { t: 'id' },                                                      // DEAR MAN debrief, named form only: yes | a_bit | no (checked by the client; never the name)
   },
   ie: {},
   wmp: {

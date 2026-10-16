@@ -23,10 +23,15 @@ export const STATS_PARTS_QUERY = `
   LIMIT 50
 `;
 
-/** The caller's tags of their own active or resting parts, each with its own tagged ToolSession's tool. */
+/**
+ * The caller's close tags of their own active or resting parts, each with its own tagged ToolSession's
+ * tool. Close tags only: a DEAR MAN debrief tag says the part was there, not that a tool helped it settle
+ * (so never *helped*), and its time is the debrief's, not the moment's (so not *when* either).
+ */
 export const STATS_TAGS_QUERY = `
   MATCH (u:User {id: $uid})-[:HAS_PART_TAG]->(t:PartTag)-[:OF_PART]->(pt:Part)
   WHERE coalesce(u.partsEnabled, false) AND pt.status IN ['active', 'resting'] AND (u)-[:HAS_PART]->(pt)
+    AND coalesce(t.source, 'close') = 'close'
   MATCH (t)-[:TAGS]->(ts:ToolSession)<-[:HAS_TOOL_SESSION]-(u)
   RETURN pt.id AS partId, ts.toolId AS toolId, toString(coalesce(t.at, t.createdAt)) AS at
 `;

@@ -3,6 +3,7 @@ import { useProfileContext } from '../../hooks/useProfileContext';
 import { queuePartCandidate, tagPart } from '../../services/parts';
 import { newId } from '../../lib/spine/ids';
 import { tagChips, tagRowCopy, type TagRowTool } from '../../lib/partTag';
+import { debriefTag } from '../../lib/debriefWho';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { PartFigure } from '../parts/PartFigure';
 
@@ -16,8 +17,13 @@ const quiet = 'min-h-11 px-3 text-sm text-[var(--color-text-tertiary)] hover:tex
  * nothing. One tap and it folds away with nothing more said; every write is fire and forget, so it
  * never blocks or delays leaving the tool. Skip and "No thanks" write nothing.
  */
-export function PartTagRow({ toolId, toolSessionId, content, onGone }: {
-  toolId: TagRowTool; toolSessionId: string; content: PartsContent; onGone?: () => void;
+export function PartTagRow({ toolId, toolSessionId, content, onGone, question, debrief = false }: {
+  /** The host whose profile needs the parts are read under (a tag-row tool, or DEAR MAN's debrief). */
+  toolId: TagRowTool | 'dear-man'; toolSessionId: string; content: PartsContent; onGone?: () => void;
+  /** The row's question, when the host asks its own ("Was one of your parts there?"). */
+  question?: string;
+  /** DEAR MAN's debrief: a picked part is a debrief tag (strength yes), not a close tag. */
+  debrief?: boolean;
 }) {
   const profile = useProfileContext(toolId);
   const [state, setState] = useState<'ask' | 'later' | 'gone'>('ask');
@@ -26,10 +32,12 @@ export function PartTagRow({ toolId, toolSessionId, content, onGone }: {
   const chips = tagChips(profile.slices.parts, content);
   if (chips.length === 0) return null;
   const copy = tagRowCopy(content);
+  const ask = question ?? copy.question;
 
   const tag = (partId: string) => {
     fold();
-    tagPart({ id: newId(), partId, toolSessionId }).catch(() => { /* a missed tag is only a missed signal */ });
+    const req = debrief ? debriefTag(newId(), partId, toolSessionId, 'yes') : { id: newId(), partId, toolSessionId };
+    tagPart(req).catch(() => { /* a missed tag is only a missed signal */ });
   };
   const later = (yes: boolean) => {
     fold();
@@ -49,8 +57,8 @@ export function PartTagRow({ toolId, toolSessionId, content, onGone }: {
   }
 
   return (
-    <section aria-label={copy.question} className="mt-4 space-y-3">
-      <p className="text-sm text-[var(--color-text-secondary)]">{copy.question}</p>
+    <section aria-label={ask} className="mt-4 space-y-3">
+      <p className="text-sm text-[var(--color-text-secondary)]">{ask}</p>
       <div className="flex flex-wrap items-center gap-2">
         {chips.map((c) => (
           <button key={c.id} type="button" className={`${chip} inline-flex items-center gap-2 pl-2`} onClick={() => tag(c.id)}>

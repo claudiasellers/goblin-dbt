@@ -751,6 +751,20 @@
    "copy": "What would help if that part shows up?",
    "reviewStatus": "draft"
   },
+  "debrief_who": {
+   "flow": "dearman",
+   "step": "debrief",
+   "order": 5,
+   "copy": "Was one of your parts there?",
+   "reviewStatus": "draft"
+  },
+  "debrief_who_named": {
+   "flow": "dearman",
+   "step": "debrief",
+   "order": 6,
+   "copy": "Did {name} show up?",
+   "reviewStatus": "draft"
+  },
   "gate_far_away": {
    "flow": "gate",
    "step": "dissociation",
@@ -3534,6 +3548,44 @@
      "selfLike": null,
      "branch": "continue",
      "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "debrief": [
+    {
+     "id": "debrief_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "debrief_a_bit",
+     "label": "A bit",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "debrief_no",
+     "label": "No",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 2,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
