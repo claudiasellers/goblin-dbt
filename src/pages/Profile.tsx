@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { MeSection } from '../components/me/MeSection';
+import { PartsSettings } from '../components/parts/PartsSettings';
 import { palettes, applyRoom, resolvePalette, type PaletteId } from '../data/palettes';
 import { exportUserData, deleteUserData } from '../services/neo4j';
 
@@ -74,6 +75,7 @@ export function Profile() {
       <PrivacySection
         dataRetentionDays={profile.dataRetentionDays}
         shareAnonymousData={profile.shareAnonymousData}
+        partsEnabled={profile.partsEnabled}
         onUpdate={updateProfile}
         onLogOut={logOut}
       />
@@ -407,11 +409,13 @@ function NotificationsSection({
 function PrivacySection({
   dataRetentionDays,
   shareAnonymousData,
+  partsEnabled,
   onUpdate,
   onLogOut,
 }: {
   dataRetentionDays: number | null;
   shareAnonymousData: boolean;
+  partsEnabled: boolean;
   onUpdate: (updates: Record<string, unknown>) => Promise<void>;
   onLogOut: () => Promise<void>;
 }) {
@@ -488,6 +492,8 @@ function PrivacySection({
         checked={shareAnonymousData}
         onChange={(val) => onUpdate({ shareAnonymousData: val })}
       />
+
+      <PartsSettings enabled={partsEnabled} onToggle={(on) => onUpdate({ partsEnabled: on })} />
 
       <div className="pt-2 flex flex-wrap gap-3">
         <button
