@@ -301,3 +301,42 @@ test("the rows: after the cards, only with the list's copy, a neutral figure, No
   // The area itself is unchanged: still only with parts on and its copy signed off (no parts → the link plus candidates).
   assert.match(me, /\{a\.id === 'my_parts' && partsCopy && partsContent && \(/);
 });
+
+// ---- The readout (lane 4's stats, Reflect's lines) ----
+
+test("the readout: Reflect's own gate helper, shared, not a second one", async () => {
+  const S = await importTs("src/lib/partStats.ts");
+  const src = read("src/lib/partStats.ts");
+  assert.match(src, /export const statsReady = \(content: PartsContent\): boolean =>\s*flowReady\(content, STATS_PROMPTS, Object\.values\(WHEN_OPTIONS\)\);/);
+  assert.match(src, /statsReady\(content\) && flowReady\(content, REFLECT_PROMPTS\)/, "Reflect builds on it");
+  assert.equal(S.statsReady(shipped), false, "nothing signed off: no readout");
+  assert.equal(S.statsReady(ALL), true);
+  const noWhen = partsFromFixture(fixture, (id) => id !== "when_nights");
+  assert.equal(S.statsReady(noWhen), false, "a missing when option hides it all");
+  const c = read("src/components/me/PartsOfMe.tsx");
+  assert.match(c, /const showStats = statsReady\(content\);/);
+  assert.doesNotMatch(c, /flowReady\(/, "no gate of its own");
+});
+
+test("the card's readout: Mostly {when} under the name, then what's helped and how you've felt, tender parts too", async () => {
+  const c = read("src/components/me/PartsOfMe.tsx");
+  assert.match(c, /const stats: PartStatLines \| null = showStats && part\.stats \? partStatLines\(part\.stats, content, statDeps\) : null;/,
+    "only when computed and signed off; tender is no exception");
+  const name = c.indexOf("{part.name ?? item.title}");
+  const when = c.indexOf("{stats?.when && ");
+  const rather = c.indexOf("row(copy.card_rather");
+  const helped = c.indexOf("{stats?.helped && row(stats.helped.title");
+  const felt = c.indexOf("{stats?.felt && row(stats.felt.title, stats.felt.line)}");
+  assert.ok(name > 0 && name < when && when < rather && rather < helped && helped < felt, "in that order");
+  assert.match(c, /toolName: \(id: string\) => getToolById\(id\)\?\.name \?\? null, monthName: \(m: string\) => monthName\(m\)/);
+  assert.doesNotMatch(c, /stats\.\w+\.n\b|\.length\}/, "no numbers but the counts the copy carries");
+  // The lines themselves are Reflect's (src/lib/partStats.ts) over the shipped copy.
+  const S = await importTs("src/lib/partStats.ts");
+  const feel = ALL.options.meet.feel;
+  const lines = S.partStatLines({ helped: [{ toolId: "pause", n: 3 }, { toolId: "nope", n: 2 }], felt: { month: "2026-07", then: feel[0].id, now: feel[1].id }, when: "evenings" },
+    ALL, { toolName: (id) => (id === "pause" ? "Pause" : null), monthName: () => "July" });
+  assert.equal(lines.when, "Mostly evenings");
+  assert.deepEqual(lines.helped, { title: "What's helped it settle", lines: ["Pause helped 3 times"] }, "an unknown tool is left out");
+  assert.equal(lines.felt.title, "How you've felt toward it");
+  assert.equal(lines.felt.line, `In July: ${feel[0].label}. Lately: ${feel[1].label}.`);
+});
