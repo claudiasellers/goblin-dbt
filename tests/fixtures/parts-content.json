@@ -772,6 +772,20 @@
    "copy": "Did {name} show up?",
    "reviewStatus": "draft"
   },
+  "oa_goal_part": {
+   "flow": "oa",
+   "step": "goal",
+   "order": 0,
+   "copy": "Part of you wants to {pull}, and it's trying to help.",
+   "reviewStatus": "draft"
+  },
+  "oa_goal_you": {
+   "flow": "oa",
+   "step": "goal",
+   "order": 1,
+   "copy": "You want to {goal}.",
+   "reviewStatus": "draft"
+  },
   "gate_far_away": {
    "flow": "gate",
    "step": "dissociation",

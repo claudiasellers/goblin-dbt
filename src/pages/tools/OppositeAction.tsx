@@ -56,6 +56,7 @@ import {
 } from "../../lib/oppositeActionFollowUp";
 import { useToolSession } from "../../hooks/useToolSession";
 import { useUnblendLine } from "../../hooks/useUnblendLine";
+import { useOaGoalLine } from "../../hooks/useOaGoalLine";
 import { oaSkillIds } from "../../lib/spine/wrap";
 
 const FLOW_VERSION = "oa-guided-v2";
@@ -95,6 +96,7 @@ const TITLES: Record<Stage, string> = {
 
 const CHECK_STEPS = ["goal", "safety", "facts", "effectiveness"] as const;
 const SAFETY_STEP = 1;
+const EFFECTIVENESS_STEP = CHECK_STEPS.indexOf("effectiveness");
 /** Index of the route result card that follows the last question. */
 const CHECK_RESULT = CHECK_STEPS.length;
 
@@ -329,6 +331,15 @@ export function OppositeAction() {
   // Parts on: "A part of you … right now." once an urge is picked, above what comes next (never for
   // "My urge is different": free text has no move).
   const unblend = useUnblendLine("oa", draft.urgeId && draft.urgeId !== "custom" ? draft.urgeId : null, stage === "urge");
+  // Parts on: on the effectiveness card, the pull beside the person's goal (src/lib/oaGoalLine.ts). The
+  // goal's label is OA's own choice; the line never shows for "My urge is different" or a safety-line move.
+  const goalLine = useOaGoalLine(
+    {
+      urgeId: draft.urgeId || null,
+      goalLabel: choices.goal?.find((o) => o.id === draft.goal)?.label ?? null,
+    },
+    stage === "check" && checkStep === EFFECTIVENESS_STEP,
+  );
   const emotion = getEmotionById(draft.emotionId)?.name ?? "";
   const emotionLower = emotion.toLowerCase();
   const examples = urge ?? protocol?.defaultOpposites;
@@ -1029,7 +1040,7 @@ export function OppositeAction() {
           }
         />
       );
-    } else if (checkStep === 3) {
+    } else if (checkStep === EFFECTIVENESS_STEP) {
       card = (
         <TapCard
           key="effectiveness"
@@ -1039,6 +1050,14 @@ export function OppositeAction() {
           options={choices.effectiveness}
           value={draft.effectiveness}
           onPrevious={previous}
+          before={
+            goalLine && (
+              <div className="space-y-1">
+                <p>{goalLine[0]}</p>
+                <p>{goalLine[1]}</p>
+              </div>
+            )
+          }
           onSelect={(id) => {
             change("effectiveness", id);
             const next = oppositeActionRoute(flow, draft.safety, draft.facts, id);
