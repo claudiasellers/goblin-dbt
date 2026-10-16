@@ -1,16 +1,17 @@
 import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react';
-import { useCallback, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEmotionById } from '../../data/emotions';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProfileContext } from '../../hooks/useProfileContext';
+import { useUserProfile } from '../../contexts/UserProfileContext';
 import {
   getInvalidationRecoveryContent, getInvalidationRecoveryProgress, saveInvalidationRecoverySession,
 } from '../../services/neo4j';
 import type { ExitId, InvalidationRecoveryContent, InvalidationRecoveryProgress } from '../../data/invalidationRecoveryTypes';
 import { fill, gateFor, needsOrienting, repsInLastWeek, routeExits, type LockReason } from '../../lib/invalidationRecovery';
 import {
-  PHASES, flowReducer, initialHistory, nextStep, phaseIndex, readingsFor, type FlowData,
+  PHASES, flowReducer, initialHistory, nextStep, offerAngryCard, phaseIndex, readingsFor, type FlowData,
 } from '../../lib/invalidationRecoveryFlow';
 import { ExerciseProgress } from '../../components/tools/ExerciseProgress';
 import { ToolLoading } from '../../components/tools/ToolLoading';
@@ -29,6 +30,19 @@ import { FollowUps, RepsRing, SkillCard, UrgeWave } from '../../components/tools
 import { useToolSession } from '../../hooks/useToolSession';
 import { getSpineContent, type SpineContent } from '../../services/spine';
 import { recoverSchedule } from '../../lib/spine/wrap';
+import { AngryPartCard } from '../../components/parts/AngryPartCard';
+import { TooMuchLink } from '../../components/capacity/TooMuchLink';
+import { angryCopyFrom, angryReady, orderHurts } from '../../lib/angryPart';
+import { handoffExt } from '../../lib/bandStore';
+import { getPartsContent } from '../../services/partsContent';
+import type { PartsContent } from '../../data/partsContentTypes';
+import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryStep } from '../../data/partsTypes';
+import type { HandoffResult } from '../../data/capacityTypes';
+
+/** parts.json doesn't ship CAN_TOUCH yet, so Recover's event can't pre-order the hurts: hit back's order. */
+const NO_CAN_TOUCH: Record<string, string[]> = {};
+/** Approved parts "Not now" labels, in the order to prefer; else Recover's own skip copy. */
+const PARTS_NOT_NOW = ['offer_not_now', 'keep_not_now', 'louder_not_now', 'pulls_not_now'];
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: InvalidationRecoveryContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
@@ -64,6 +78,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
   // The single profile read path (PR-P1): only the slices this tool declared. null while loading,
   // as before (distanced self-talk falls back to "you").
   const firstName = useProfileContext('recovering-from-invalidation').slices?.name.firstName ?? null;
+  const partsOn = useUserProfile().profile.partsEnabled;
 
   const [history, dispatch] = useReducer(flowReducer, undefined, initialHistory);
   const { step, data: d } = history.stack[history.stack.length - 1];
@@ -86,14 +101,42 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
         intensity: now, waitMinutes, oneMessageOnly: pull?.id === 'chase', waitCopy: c.wait }
     : null;
 
+  // The angry-part card (fight back, under the line): its copy is the shipped parts content, signed-off
+  // rows only, so until the angry flow is approved it is never ready and the card never shows.
+  const [parts, setParts] = useState<PartsContent | null>(null);
+  useEffect(() => {
+    let live = true;
+    getPartsContent().then(p => { if (live) setParts(p); }).catch(() => { /* no card, the flow goes on */ });
+    return () => { live = false; };
+  }, []);
+  /** Set once, when the card is offered: its wording and hurts stay as they were, Back into it included. */
+  const [angry, setAngry] = useState<{ copy: AngryCardCopy; partsOn: boolean; hurts: AngryHurt[] } | null>(null);
+  const [angryStep, setAngryStep] = useState<AngryStep>('unblend');
+
   /** Advance from the current step, merging what it collected. */
   const advance = useCallback((patch: Partial<FlowData> = {}) => {
     const merged = { ...d, ...patch };
     const st = states.find(s => s.id === merged.stateId);
     if (!st) return;
-    dispatch({ type: 'go', step: nextStep(step, merged, st), patch });
-  }, [d, step, states]);
+    const ready = Boolean(parts && angryReady(parts, partsOn));
+    const offer = offerAngryCard(merged, g, ready, angry !== null);
+    if (offer && parts) setAngry({ copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, NO_CAN_TOUCH, merged.stateId) });
+    dispatch({ type: 'go', step: nextStep(step, merged, st, offer), patch });
+  }, [d, step, states, parts, partsOn, g, angry]);
   const withSkills = (...ids: string[]): Partial<FlowData> => ({ skills: [...d.skills, ...ids] });
+
+  /** The card on the visit's ToolSession (log layer, ids only). Each write is the whole triple. */
+  const recordAngry = (r: { angryExit: AngryStep | 'skipped'; angryHurtId?: string | null; angryVoteHeld?: boolean }) => {
+    toolSession.setExt({ wmp: { angryHurtId: r.angryHurtId ?? undefined, angryVoteHeld: r.angryVoteHeld, angryExit: r.angryExit } });
+  };
+  /** "Too much" inside the card: P2 as an overlay, recorded the way DEAR MAN records it. */
+  const handoffs = useRef<HandoffResult[]>([]);
+  const recordHandoff = (r: HandoffResult) => {
+    handoffs.current = [...handoffs.current, r];
+    toolSession.setExt({ er: { handoffs: handoffExt(handoffs.current) } });
+  };
+  const notNow = PARTS_NOT_NOW.map(id => Object.values(parts?.options ?? {}).flatMap(st => Object.values(st).flat()).find(o => o.id === id)?.label)
+    .find(Boolean) ?? c.orient.skip;
 
   // Progress (skill uses, reps) for signed-in users; the flow works without it.
   const [progress, setProgress] = useState<InvalidationRecoveryProgress | null>(null);
@@ -119,7 +162,9 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     <div className="space-y-6">
       <div className="space-y-2">
         <ExerciseProgress current={phase + 1} total={PHASES.length} stageName={c.phases[PHASES[phase].key]}
-          onBack={history.stack.length > 1 && step !== 'close' && step !== 'follow' ? () => dispatch({ type: 'back' }) : undefined} />
+          onBack={history.stack.length > 1 && step !== 'close' && step !== 'follow' && !(step === 'angry' && angryStep !== 'unblend')
+            // Past the card's first screen its own Back takes over: one Back on screen at a time.
+            ? () => dispatch({ type: 'back' }) : undefined} />
         {started && step !== 'close' && step !== 'follow' && (
           <div aria-hidden="true" className="h-1 rounded-full bg-[var(--color-border)] overflow-hidden">
             <div className="h-full rounded-full motion-safe:transition-all motion-safe:duration-1000"
@@ -195,6 +240,18 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               <UrgeScale label={c.rerate.prompt} value={pre?.now ?? null} lowLabel={c.loud.low} highLabel={c.loud.high}
                 onChange={v => { if (v !== null) advance({ now: v, mids: [...d.mids, v] }); }} />
             </>
+          )}
+
+          {step === 'angry' && angry && (
+            <AngryPartCard copy={angry.copy} hurts={angry.hurts} partsOn={angry.partsOn} name={firstName}
+              // Until it ends, where the person is: leaving mid-card (Back, or the page) still says where.
+              onStep={s => { setAngryStep(s); recordAngry({ angryExit: s }); }}
+              onSkip={() => { recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={notNow}
+              onDone={(r: AngryCardResult) => {
+                recordAngry({ angryExit: r.exitStep, angryHurtId: r.hurtId, angryVoteHeld: r.voteHeld });
+                advance();
+              }}
+              tooMuch={<TooMuchLink host="recovering-from-invalidation" onResult={recordHandoff} />} />
           )}
 
           {step === 'secure' && (
