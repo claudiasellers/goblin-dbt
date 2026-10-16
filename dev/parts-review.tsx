@@ -1,6 +1,7 @@
 /**
  * The parts review page (dev/parts-review.html): every parts surface, clickable, for the sign-off review.
- * Each surface is the app's real component on tests/fixtures/parts-content.json with every row treated as
+ * The index is the sign-off pack's surface list (scripts/parts/review.mjs), so a surface the pack gains
+ * shows here as missing until the harness has it. Each surface is the app's real component on tests/fixtures/parts-content.json with every row treated as
  * signed off, signed in as an invented person (dev/review/data.ts), in a phone-width frame. No Firebase
  * and no network: firebase/* is stubbed and every callable is answered in the page (dev/review/), with
  * writes listed under the frame, ids only. Not part of the app build.
@@ -22,6 +23,7 @@ import { answers, REVIEW_USER, reviewEvents, type ReviewEvent } from './review/b
 import { slices } from './review/data';
 import { drive, type DriveStep } from './review/driver';
 import { SKIPPED, SURFACES, type Surface } from './review/surfaces';
+import PACK from 'virtual:review-pack';
 
 const q = new URLSearchParams(location.search);
 const ids = q.get('ids') === '1';
@@ -119,23 +121,33 @@ function Events() {
   );
 }
 
+/** The sign-off pack's surfaces in its order, each with the harness screens that show it. */
+const uncovered = PACK.filter((p) => !SURFACES.some((s) => s.pack === p.id));
+const unknown = SURFACES.filter((s) => !PACK.some((p) => p.id === s.pack));
+
 function Index() {
-  const groups = ['In the moment', 'Meet a part', 'Over weeks'] as const;
   return (
     <div className="space-y-6">
-      {groups.map((g) => (
-        <section key={g} className="space-y-2">
-          <h2 className="text-sm font-medium text-[var(--color-text-secondary)]">{g}</h2>
+      {PACK.map((p) => (
+        <section key={p.id} className="space-y-2" data-pack={p.id}>
+          <h2 className="text-sm font-medium text-[var(--color-text-secondary)]">{p.title}</h2>
           <ul className="space-y-1">
-            {SURFACES.filter((s) => s.group === g).map((s) => (
+            {SURFACES.filter((s) => s.pack === p.id).map((s) => (
               <li key={s.id}>
                 <a href={href({ s: s.id, b: null })} data-surface={s.id}
                   className="flex min-h-11 items-center px-3 rounded-lg border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] hover:border-[var(--color-border-accent)]">{s.title}</a>
               </li>
             ))}
           </ul>
+          {!SURFACES.some((s) => s.pack === p.id) && <p className="text-xs text-[var(--color-danger)]">In the sign-off pack but not in this harness yet.</p>}
         </section>
       ))}
+      {unknown.length > 0 && (
+        <section className="space-y-1">
+          <h2 className="text-sm font-medium text-[var(--color-danger)]">Not in the sign-off pack</h2>
+          {unknown.map((s) => <p key={s.id} className={muted}>{s.title}</p>)}
+        </section>
+      )}
       <section className="space-y-1">
         <h2 className="text-sm font-medium text-[var(--color-text-secondary)]">Not here yet</h2>
         {SKIPPED.map((s) => <p key={s} className={muted}>{s}</p>)}
@@ -144,9 +156,15 @@ function Index() {
   );
 }
 
-declare global { interface Window { __reviewMap?: { id: string; branches: string[] }[] } }
-/** For dev/review/check.mjs: every surface and branch, so the check never falls behind the list. */
-window.__reviewMap = SURFACES.map((s) => ({ id: s.id, branches: (s.branches ?? []).map((b) => b.id) }));
+declare global {
+  interface Window { __reviewMap?: { surfaces: { id: string; branches: string[] }[]; uncovered: string[]; unknown: string[] } }
+}
+/** For dev/review/check.mjs: every surface and branch, and any pack surface the harness lacks. */
+window.__reviewMap = {
+  surfaces: SURFACES.map((s) => ({ id: s.id, branches: (s.branches ?? []).map((b) => b.id) })),
+  uncovered: uncovered.map((p) => p.id),
+  unknown: unknown.map((s) => s.id),
+};
 
 let drove = false;
 function SurfaceView({ s }: { s: Surface }) {

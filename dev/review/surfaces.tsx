@@ -36,11 +36,18 @@ import { answer, logEvent } from './backend';
 import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, slices } from './data';
 import type { DriveStep } from './driver';
 import { PARTS } from '../parts-example';
+import hostCopy from 'virtual:review-host-copy';
+import { DebriefWho } from '../../src/components/parts/DebriefWho';
+import { PartLaterLine } from '../../src/components/parts/PartLaterLine';
+import { TapCard } from '../../src/components/tools/oppositeAction/TapCardLoop';
+import { useOaGoalLine } from '../../src/hooks/useOaGoalLine';
+import { PS_AMBIVALENCE_BARRIER, psLaterCandidate, psLaterCopy } from '../../src/lib/psAmbivalence';
 
 export interface Branch { id: string; label: string; steps?: DriveStep[] }
 export interface Surface {
   id: string;
-  group: 'In the moment' | 'Meet a part' | 'Over weeks';
+  /** The sign-off pack surface it shows (scripts/parts/review.mjs `surfaces`, its `id`). */
+  pack: string;
   title: string;
   /** Who sees it and when: one muted sentence (harness chrome). */
   who: string;
@@ -180,16 +187,16 @@ function CheckbackHost({ named }: { named: boolean }) {
   return <PartCheckbackCard item={checkbackItem(named)} content={content} onDone={() => setGone(true)} />;
 }
 
-function TagHost() {
+function TagHost({ urge }: { urge: boolean }) {
   const content = useParts();
   const [saved, setSaved] = useState('');
   useEffect(() => { getSpineContent().then((c) => setSaved(c.closeFlow.saved)).catch(() => {}); }, []);
   if (!content) return null;
   return (
     <div className="space-y-2">
-      <p className={mockNote}>Five senses, after a better answer (mock host close)</p>
+      <p className={mockNote}>{urge ? 'Pause, after Held off' : 'Five senses, after a better answer'} (mock host close)</p>
       <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{saved}</p>
-      <PartTagRow toolId="five-senses" toolSessionId="00000000-0000-4000-8000-000000000501" content={content} />
+      <PartTagRow toolId={urge ? 'pause' : 'five-senses'} toolSessionId="00000000-0000-4000-8000-000000000501" content={content} />
     </div>
   );
 }
@@ -237,6 +244,73 @@ function CopeHost() {
   );
 }
 
+/** The kept line the cope-ahead failure branch picks (dev/review/data.ts savedLines). */
+const KEPT_LINE = 'It makes sense this got to you.';
+
+function DebriefHost({ named }: { named: boolean }) {
+  const content = useParts();
+  const [gone, setGone] = useState(false);
+  if (!content) return null;
+  if (gone) return <p className={mockNote}>DEAR MAN goes on to the reflection.</p>;
+  return (
+    <section className="space-y-2">
+      <p className={mockNote}>DEAR MAN debrief, after “Underneath that”</p>
+      <DebriefWho content={content} parts={slices().parts} copeAheadPartId={named ? PART_IDS.chase : null}
+        toolSessionId="00000000-0000-4000-8000-000000000601"
+        onAnswer={(a) => logEvent('DEAR MAN ext.er', { whoShowedUp: a })} onDone={() => setGone(true)} />
+    </section>
+  );
+}
+
+/** Problem Solve's ambivalence answer screen, its own copy from the schema, with the real line under it. */
+function PsHost() {
+  const content = useParts();
+  const later = psLaterCopy(content, true, PS_AMBIVALENCE_BARRIER);
+  const pick = hostCopy.ambivalence[0];
+  if (!content || !later || !pick) return null;
+  return (
+    <ToolSessionProvider toolId="problem-solve">
+      <div className="space-y-6">
+        <p className={mockNote}>Problem Solve · after “{pick.label}” (mock host screen)</p>
+        <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border)]">
+          <p className="text-[var(--color-text-primary)]">{pick.follow}</p>
+        </div>
+        <button type="button" className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">Let’s keep going</button>
+        <PartLaterLine ask={later.ask} done={later.done} onLater={async () => { await queuePartCandidate(psLaterCandidate('00000000-0000-4000-8000-000000000701')); }} />
+      </div>
+    </ToolSessionProvider>
+  );
+}
+
+/** Urge × goal pairs: lines for a few moves, and two that show nothing. */
+const OA_GOAL_PAIRS: [urge: string, goal: string, note?: string][] = [
+  ['shame-hide', 'connection'], ['anger-lash', 'boundary'], ['jealousy-check', 'connection'], ['fear-avoid', 'progress'],
+  ['guilt-apologize', 'self_respect'], ['guilt-punish', 'repair', 'safety-line move: nothing'], ['custom', 'connection', 'My urge is different: nothing'],
+];
+
+function GoalLine({ urgeId, goalLabel }: { urgeId: string; goalLabel: string | null }) {
+  const lines = useOaGoalLine({ urgeId, goalLabel }, true);
+  const oa = hostCopy.oa;
+  const [value, setValue] = useState('');
+  return (
+    <TapCard index={3} total={4} question={oa.copy.effectiveness} options={oa.choices.effectiveness} value={value}
+      onSelect={(id) => setValue(id)} onPrevious={() => {}}
+      before={lines ? <div className="space-y-1" data-testid="goal-line"><p>{lines[0]}</p><p>{lines[1]}</p></div> : null} />
+  );
+}
+
+function OaGoalHost({ urgeId, goalId }: { urgeId: string; goalId: string }) {
+  const goal = hostCopy.oa.choices.goal.find((g) => g.id === goalId) ?? null;
+  return (
+    <ToolSessionProvider toolId="opposite-action">
+      <div className="space-y-2">
+        <p className={mockNote}>Do the Opposite · urge {urgeId} · goal “{goal?.label ?? goalId}” (the real check card)</p>
+        <GoalLine urgeId={urgeId} goalLabel={goal?.label ?? null} />
+      </div>
+    </ToolSessionProvider>
+  );
+}
+
 /* ───────── Meet a part ───────── */
 
 const clear: PartsEntry = { open: 'clear', reasons: [] };
@@ -276,31 +350,31 @@ const MEET_BRANCHES: MeetBranch[] = [
 
 export const SURFACES: Surface[] = [
   {
-    id: 'unblend_shape', group: 'In the moment', title: 'Unblend line: Find the feeling (Shape it)',
+    id: 'unblend_shape', pack: 'unblend', title: 'Unblend line: Find the feeling (Shape it)',
     who: 'Parts on: in Find the feeling’s Shape it room, right after the person picks what the feeling wants to do (never in the check-in, never while P2 is open).',
     branches: ['fight', 'chase', 'hide', 'blank'].map((id) => ({ id, label: id === 'blank' ? 'blank (no line)' : id })),
     render: ({ branch }) => <FtfHost room="shape" initial={branch} />,
   },
   {
-    id: 'unblend_tune', group: 'In the moment', title: 'Unblend line: Find the feeling (Tune it)',
+    id: 'unblend_tune', pack: 'unblend', title: 'Unblend line: Find the feeling (Tune it)',
     who: 'Parts on: in Find the feeling’s Tune it room, right after the pull is picked.',
     branches: ['fight', 'chase', 'hide', 'blank'].map((id) => ({ id, label: id === 'blank' ? 'blank (no line)' : id })),
     render: ({ branch }) => <FtfHost room="tune" initial={branch} />,
   },
   {
-    id: 'unblend_oa', group: 'In the moment', title: 'Unblend line: Do the Opposite',
+    id: 'unblend_oa', pack: 'unblend', title: 'Unblend line: Do the Opposite',
     who: 'Parts on: in Do the Opposite’s urge step, once an urge with a move is picked (never for In my words).',
     branches: OA_URGES.map((id) => ({ id, label: id })),
     render: ({ branch }) => <ListHost source="oa" toolId="opposite-action" title="Do the Opposite · the urge" picks={OA_URGES} initial={branch} />,
   },
   {
-    id: 'unblend_recover', group: 'In the moment', title: 'Unblend line: Recover',
+    id: 'unblend_recover', pack: 'unblend', title: 'Unblend line: Recover',
     who: 'Parts on: in Recover, right after the pull is picked; the fight pull gets no line whenever the angry card could still come this visit.',
     branches: ['hide', 'chase', 'fight'].map((id) => ({ id, label: id })),
     render: ({ branch }) => <ListHost source="recover" toolId="recovering-from-invalidation" title="Recover · the pull" picks={['fight', 'chase', 'hide']} initial={branch} />,
   },
   {
-    id: 'angry', group: 'In the moment', title: 'The angry-part card',
+    id: 'angry', pack: 'angry', title: 'The angry-part card',
     who: 'In Recover after the fight pull, once the person is out of the flooded band. Parts on: the parts wording and the later line; parts off: the plain twin (use Plain wording).',
     branches: [
       { id: 'first', label: 'First screen, with Not now' },
@@ -313,7 +387,7 @@ export const SURFACES: Surface[] = [
     render: ({ branch, plain }) => <AngryHost plain={plain} branch={branch} />,
   },
   {
-    id: 'meet', group: 'Meet a part', title: 'Meet a part',
+    id: 'meet', pack: 'meet', title: 'Meet a part',
     who: 'Parts on, reached only by a link (Me, Settings, a candidate, an offer). Writes are listed under the frame, ids only.',
     branches: MEET_BRANCHES,
     routeState: (b) => {
@@ -324,7 +398,7 @@ export const SURFACES: Surface[] = [
     render: () => <ToolSessionProvider toolId="meet-a-part"><MeetAPart /></ToolSessionProvider>,
   },
   {
-    id: 'checkback', group: 'Over weeks', title: 'Next-day check-back (Today)',
+    id: 'checkback', pack: 'checkback', title: 'Next-day check-back (Today)',
     who: 'Parts on: on Today the day after a visit, when the person said yes to the check-back question.',
     branches: [
       { id: 'named', label: 'A named part' },
@@ -334,26 +408,27 @@ export const SURFACES: Surface[] = [
     render: ({ branch }) => <CheckbackHost named={branch !== 'unnamed'} />,
   },
   {
-    id: 'tag', group: 'Over weeks', title: 'Tag row: “Was this a part you know?”',
-    who: 'Parts on: under the saved close of Cool Down, Five senses, Pause, Urge Surfing or Find the feeling, after a better answer (or Held off).',
+    id: 'tag', pack: 'tag', title: 'Tag row: “Was this a part you know?”',
+    who: 'Parts on: under the saved close of Cool Down, Five senses or Find the feeling after a better answer, or Pause and Urge Surfing after Held off.',
     branches: [
-      { id: 'row', label: 'Named and unnamed parts' },
+      { id: 'row', label: 'After a better answer' },
+      { id: 'urge', label: 'After Held off (Pause, Urge Surfing)' },
       { id: 'new', label: 'A new one → later?', steps: [{ opt: 'tag_new_one' }] },
     ],
-    render: () => <TagHost />,
+    render: ({ branch }) => <TagHost urge={branch === 'urge'} />,
   },
   {
-    id: 'me', group: 'Over weeks', title: 'Parts of me (Me)',
+    id: 'me', pack: 'me', title: 'Parts of me (Me)',
     who: 'Parts on: Me → Parts of me. A card with its readout, a tender card, a resting card with its 30-day check-back, a set-aside row, then candidates.',
     render: () => <MeHost />,
   },
   {
-    id: 'reflect', group: 'Over weeks', title: 'Reflect: parts',
+    id: 'reflect', pack: 'reflect', title: 'Reflect: parts',
     who: 'Parts on: in Reflect, once a kept part has at least one stat line.',
     render: () => <PartsReflect parts={REFLECT} />,
   },
   {
-    id: 'settings', group: 'Over weeks', title: 'Settings: parts',
+    id: 'settings', pack: 'settings', title: 'Settings: parts',
     who: 'Everyone: Settings → Privacy & data. Off by default; turning it off hides everything and deletes nothing.',
     branches: [
       { id: 'on', label: 'Parts on' },
@@ -366,16 +441,46 @@ export const SURFACES: Surface[] = [
     render: ({ branch }) => <SettingsHost on={branch !== 'off'} />,
   },
   {
-    id: 'cope', group: 'Over weeks', title: 'DEAR MAN: cope ahead',
+    id: 'cope', pack: 'dearman', title: 'DEAR MAN: cope ahead',
     who: 'Parts on, with kept parts: DEAR MAN’s cope-ahead step, before the script.',
     branches: [
       { id: 'pick', label: 'Who might show up?' },
       { id: 'anchor', label: 'A part with an anchor', steps: [{ tap: PARTS[0].name }] },
       { id: 'new', label: 'A part without one: pick a line', steps: [{ tap: PARTS[1].name }] },
+      { id: 'failed', label: 'Save fails: the failure line', steps: [{ tap: PARTS[1].name }, { tap: KEPT_LINE }, { opt: 'cope_save' }] },
     ],
+    setup: (b) => answer('setPartAnchor', () => { if (b === 'failed') throw new Error('review: save fails'); return { version: 2 }; }),
     render: () => <CopeHost />,
+  },
+  {
+    id: 'debrief', pack: 'dearman', title: 'DEAR MAN: who showed up (debrief)',
+    who: 'Parts on, with a kept part: DEAR MAN’s debrief, after “Underneath that”. Named when prep picked a part, else the general form.',
+    branches: [
+      { id: 'named', label: '“Did {name} show up?” (prep picked a part)' },
+      { id: 'general', label: '“Was one of your parts there?”' },
+      { id: 'general_new', label: 'General: A new one → later?', steps: [{ opt: 'tag_new_one' }] },
+    ],
+    render: ({ branch }) => <DebriefHost named={branch === 'named'} />,
+  },
+  {
+    id: 'ps_later', pack: 'ps', title: 'Problem Solve: another time',
+    who: 'Parts on: in Problem Solve, after “Part of me doesn’t actually want this to change” and its answer, under Let’s keep going.',
+    branches: [
+      { id: 'ask', label: 'The line' },
+      { id: 'done', label: 'After the tap', steps: [{ opt: 'ps_later' }] },
+    ],
+    render: () => <PsHost />,
+  },
+  {
+    id: 'oa_goal', pack: 'oa', title: 'Do the Opposite: the goal line',
+    who: 'Parts on: on Do the Opposite’s “will it help you move toward your goal” card, when the urge EXPRESSES a move that isn’t a safety-line move.',
+    branches: OA_GOAL_PAIRS.map(([urge, goal, note]) => ({ id: `${urge}.${goal}`, label: `${urge} × ${goal}${note ? ` (${note})` : ''}` })),
+    render: ({ branch }) => <OaGoalHost urgeId={branch.split('.')[0]} goalId={branch.split('.')[1]} />,
   },
 ];
 
 /** Not built on the tip, so not here (the report lists them). */
-export const SKIPPED = ['Problem Solve’s later line: no parts copy or host for it on the tip yet.'];
+export const SKIPPED = [
+  '“Use this shape for {name}?” (Find the feeling): not on the tip yet (lane 4, ftf-shape-for-part).',
+  'The trail offer card and its evidence step: not on the tip yet (lane 2, trail-offers).',
+];

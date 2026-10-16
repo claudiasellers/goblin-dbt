@@ -50,6 +50,8 @@ const EXPECT = {
   'checkback/louder': 'aftercare_louder', 'tag/row': 'tag_question', 'tag/new': 'tag_new_later', 'me/': 'card_where', 'reflect/': 'reflect_title',
   'settings/on': 'settings_dissociation', 'settings/confirm': 'settings_delete_confirm', 'settings/failed': 'settings_delete_failed',
   'settings/done': 'settings_delete_done', 'cope/pick': 'cope_title', 'cope/anchor': 'cope_change', 'cope/new': 'cope_save',
+  'cope/failed': 'cope_save_failed', 'debrief/named': 'debrief_who_named', 'debrief/general': 'debrief_who',
+  'debrief/general_new': 'tag_new_later', 'ps_later/ask': 'ps_later', 'ps_later/done': 'ps_later_done', 'tag/urge': 'tag_question',
   'angry/first': 'angry_unblend', 'angry/protects': 'angry_protects', 'angry/speak': 'angry_later', 'angry/later': 'angry_later_done',
 };
 const SELECTOR = {
@@ -69,7 +71,7 @@ function plan(map) {
       if (s.id === 'angry') visits.push({ ...v, name: `${v.name}--plain`, query: `${q}&plain=1`, plain: true });
     }
   }
-  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide']]) {
+  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask']]) {
     visits.push({ name: `${surface}${branch ? `--${branch}` : ''}--ids`, query: `?s=${surface}${branch ? `&b=${branch}` : ''}&ids=1`, ids: true, surface, branch });
   }
   return visits;
@@ -101,7 +103,9 @@ try {
   await indexPage.goto(base, { waitUntil: 'load' });
   const map = await indexPage.evaluate(() => window.__reviewMap);
   await indexPage.close();
-  visits = plan(map);
+  if (map.uncovered.length) problems.push(`sign-off pack surfaces with no harness screen: ${map.uncovered.join(', ')}`);
+  if (map.unknown.length) problems.push(`harness screens for no pack surface: ${map.unknown.join(', ')}`);
+  visits = plan(map.surfaces);
   for (const v of visits) {
     const page = await context.newPage();
     const bad = (msg) => problems.push(`${v.name}: ${msg}`);
@@ -131,11 +135,18 @@ try {
         if (v.plain && (v.key === 'angry/speak' || v.key === 'angry/later') && text.includes(copy('angry_later'))) bad('later line shown with plain wording');
         if (SELECTOR[v.key] && !(await page.locator(SELECTOR[v.key]).count())) bad(`missing ${SELECTOR[v.key]}`);
         if (NO_CHECKBACK.has(v.key) && text.includes(copy('close_checkback'))) bad('check-back question after a danger ending');
+        if (v.surface === 'oa_goal') {
+          const shows = (await page.locator('[data-testid="goal-line"]').count()) > 0;
+          const silent = /^(guilt-punish|custom)\./.test(v.branch);
+          if (shows === silent) bad(silent ? 'goal line shown where it must not be' : 'no goal line');
+        }
         if (v.surface?.startsWith('unblend_') && v.branch !== 'blank' && !(await page.locator('[data-testid="unblend-line"]').count())) bad('no unblend line');
       } else if (!text.includes('⟨')) bad('Show ids printed no ids');
     } else {
       await page.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => bad('no index'));
     }
+    // A pointer user's view: a real tap on blank page, so programmatic focus shows no keyboard ring.
+    await page.mouse.click(2, 2);
     await page.screenshot({ path: join(SHOTS, `${v.name}.png`), fullPage: true });
     await page.close();
   }
