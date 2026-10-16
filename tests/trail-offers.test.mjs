@@ -133,10 +133,10 @@ test("Today shows at most one trail offer, drops it with a flooded band, and nev
   const types = read("functions/src/parts/offers/types.ts");
   assert.match(types, /export const TODAY_SHAPES: readonly TrailShape\[\] = \['A', 'B', 'C'\];/);
   const today = read("functions/src/parts/offers/today.ts");
-  assert.match(today, /if \(!TODAY_SHAPES\.includes\(c\.shape\)\) continue;/, "the prepare step skips D");
+  assert.match(today, /if \(!TODAY_SHAPES\.includes\(c\.shape\) \|\| c\.safetyLine\) continue;/, "the prepare step skips D and safety-line moves");
   assert.match(today, /if \(!TODAY_SHAPES\.includes\(offer\.shape\)\) return \[\];/, "the source skips D");
   assert.match(today, /registerTodaySource\(trailOfferItems\)/);
-  assert.match(today, /TODO\(trails-engine\)/);
+  assert.match(today, /from '\.\.\/trails'/, "the evaluator is the trails engine");
   const code = today.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
   assert.doesNotMatch(code, /push|notif|messaging/i, "no push path");
   assert.match(read("functions/src/parts/index.ts"), /from '\.\/offers'/, "registers when the parts module loads");

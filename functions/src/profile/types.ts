@@ -69,6 +69,10 @@ export interface ProfileSlices {
     firstPlace: string | null;
     /** Shape it's five numbers (PartFigure draws it; null is the plain round figure). */
     shapeSig: number[] | null;
+    /** The last Meet a part visit (keepPart sets it); trails' Rule D counts episodes after it. */
+    lastVisitedAt: string | null;
+    /** Set when the next-day check-back said Louder (PartsPolicy.louderPauseHours ahead); trails skip a paused part. */
+    pausedUntil: string | null;
     meta: ProfileItemMeta;
   }>;
   /** The rest of a kept part (Meet a part reads it); `hurtIds` from GUARDS. Own-words fields as written. */

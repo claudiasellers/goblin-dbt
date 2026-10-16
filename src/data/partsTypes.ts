@@ -183,6 +183,12 @@ export const JOB_HISTORY_MAX = 10;
 export interface SetPartAnchorRequest { partId: string; lineId?: string; own?: string }
 export const ANCHOR_MAX_CHARS = 90;
 
+/**
+ * Find the feeling's "Use this shape for {name}?": the part takes the shape of that visit (the caller's own
+ * closed Find the feeling ToolSession). The shape is read from the visit's record, never sent.
+ */
+export interface SetPartShapeRequest { partId: string; toolSessionId: string }
+
 // --- "Was this a part you know?": mirror of functions/src/parts/tagTypes.ts (tests/parts-entry.test.mjs) ---
 /**
  * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's

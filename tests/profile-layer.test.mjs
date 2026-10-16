@@ -105,7 +105,8 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   const tx = fakeTx((q) => {
     if (/USES/.test(q)) return [
       { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true, firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1],
-             confirmedAt: "2026-08-01T00:00:00Z", revisitAt: "2026-08-31T00:00:00Z" }, moveIds: ["withdraw", "appease", "withdraw"] },
+             confirmedAt: "2026-08-01T00:00:00Z", revisitAt: "2026-08-31T00:00:00Z", lastVisitedAt: "2026-09-02T00:00:00Z", pausedUntil: "2026-10-04T00:00:00Z" },
+        moveIds: ["withdraw", "appease", "withdraw"] },
       { p: { id: "p2", kind: "part", area: "my_parts", status: "active", source: "made", revisitAt: null }, moveIds: [] },
     ];
     if (/GUARDS/.test(q)) return [
@@ -120,8 +121,9 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   const read = (t) => slices.readProfileSlices(t, "u1", "meet-a-part", now);
   const { name: _name, ...out } = await read(tx);
   assert.deepEqual(out.parts.map(({ meta: m, ...rest }) => [rest, m.status, m.area, m.prompt]), [
-    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1] }, "resting", "my_parts", "ask"],
-    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null, shapeSig: null }, "active", "my_parts", "none"],
+    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1],
+       lastVisitedAt: "2026-09-02T00:00:00Z", pausedUntil: "2026-10-04T00:00:00Z" }, "resting", "my_parts", "ask"],
+    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null, shapeSig: null, lastVisitedAt: null, pausedUntil: null }, "active", "my_parts", "none"],
   ]);
   assert.deepEqual(out.partDetail, [
     { id: "p1", ageId: "age_teen", voiceIds: ["v_quiet"], ownVoice: "soft", jobIds: ["j_hide"], ownJob: "keep me safe", fearIds: ["f_too_much"],

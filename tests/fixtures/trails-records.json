@@ -1,0 +1,14 @@
+{
+  "timeZone": "Europe/London",
+  "parts": [
+    { "id": "7a1e0c52-3f4b-4d6a-9c1e-2b8f5d7e9a10", "status": "active", "moveIds": ["hide"], "lastVisitedAt": "2026-09-01T09:00:00.000Z", "pausedUntil": null }
+  ],
+  "records": [
+    { "key": "u1:r1", "at": "2026-09-20T18:00:00.000Z", "toolId": "find-the-feeling", "sources": [{ "label": "FeelingUrge", "id": "hide" }], "moveIds": ["hide"], "contexts": { "trigger": "someone" }, "taggedPartIds": [] },
+    { "key": "u1:r2", "at": "2026-09-27T18:00:00.000Z", "toolId": "urge-surfing", "sources": [{ "label": "FeelingUrge", "id": "hide" }], "moveIds": ["hide"], "contexts": {}, "taggedPartIds": [] },
+    { "key": "u1:r2b", "at": "2026-09-27T19:00:00.000Z", "toolId": "recovering-from-invalidation", "sources": [{ "label": "PullOption", "id": "recover_hide" }], "moveIds": ["hide"], "contexts": { "trigger": "someone", "event": "ignored" }, "taggedPartIds": [] },
+    { "key": "u1:r3", "at": "2026-10-04T18:00:00.000Z", "toolId": "find-the-feeling", "sources": [{ "label": "FeelingUrge", "id": "hide" }], "moveIds": ["hide"], "contexts": { "trigger": "someone" }, "taggedPartIds": ["7a1e0c52-3f4b-4d6a-9c1e-2b8f5d7e9a10"] },
+    { "key": "u1:r4", "at": "2026-10-11T08:00:00.000Z", "toolId": "urge-surfing", "sources": [{ "label": "FeelingUrge", "id": "hide" }], "moveIds": ["hide"], "contexts": {}, "taggedPartIds": [] },
+    { "key": "u1:r5", "at": "2026-10-12T08:00:00.000Z", "toolId": "checkin", "sources": [], "moveIds": [], "contexts": {}, "taggedPartIds": [] }
+  ]
+}

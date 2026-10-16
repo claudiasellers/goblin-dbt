@@ -19,7 +19,8 @@ const TAG_IDS = [...lib.TAG_PROMPTS, ...lib.TAG_OPTIONS, ...lib.UNNAMED_PROMPTS]
 const content = partsFromFixture(fixture, (id) => TAG_IDS.includes(id));
 
 test("copy: the row's lines, the later question's options, and the unnamed names (flow common)", () => {
-  const opts = Object.values(fixture.options.tag).flat();
+  // The row's own steps (step `shape` is Find the feeling's "Use this shape for {name}?": tests/part-shape.test.mjs).
+  const opts = [...fixture.options.tag.tag, ...fixture.options.tag.new];
   assert.deepEqual(opts.map((o) => [o.id, o.label]),
     [["tag_new_one", "A new one"], ["tag_skip", "Skip"], ["tag_later_yes", "Yes"], ["tag_later_no", "No thanks"]]);
   assert.equal(fixture.prompts.tag_question.copy, "Was this a part you know?");
@@ -144,7 +145,7 @@ test("the row: no hard-coded words, after the close is saved, fire-and-forget wr
   const jsx = row.slice(row.indexOf("return ("));
   // JSX text: anything between a tag's ">" and the next "<" that isn't an expression.
   assert.deepEqual([...jsx.matchAll(/>([^<>{}()=;]*[A-Za-z][^<>{}()=;]*)</g)].map((m) => m[1].trim()), [], "every word comes from the content");
-  assert.match(row, /const req = debrief \? debriefTag\(newId\(\), partId, toolSessionId, 'yes'\) : \{ id: newId\(\), partId, toolSessionId \};\n\s+tagPart\(req\)\.catch/,
+  assert.match(row, /const req = debrief \? debriefTag\(newId\(\), c\.id, toolSessionId, 'yes'\) : \{ id: newId\(\), partId: c\.id, toolSessionId \};\n\s+tagPart\(req\)\.catch/,
     "a close tag by default; DEAR MAN's debrief tags its own source");
   assert.match(row, /queuePartCandidate\(\{ id: newId\(\), origin: 'new_one', moveIds: \[\], toolSessionId \}\)\.catch/);
   assert.match(row, /if \(yes\) queuePartCandidate/, "only Yes writes");

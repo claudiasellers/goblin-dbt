@@ -9,14 +9,15 @@
  *   and writes the top candidate that is enabled, not blocked, new, and through the same gate.
  * - Shapes A, B and C only (TODAY_SHAPES). Rule D ("Was this {name}?") is never a push: Reflect shows it
  *   and answers it in a batch (a later surface, which can build on writeTrailOffer and offerGate).
+ * - A safety-line move (turn_on_myself, rule A only) is not offered on Today: parts.md wants crisis
+ *   resources alongside any part with that move, and the card has no such seam yet.
  *
- * TODO(trails-engine): the evaluator is not wired yet. Lane 1's `evaluateTrails` and its query
- * (functions/src/parts/trails/) hadn't landed when this shipped, so `TRAIL_EVALUATOR` is null and the
- * prepare step does nothing. Wiring it is one adapter here: read the episodes, call `evaluateTrails` with
- * `ctx.blocked = blocked` (blockedTrails), return its candidates (a `TrailCandidate` is an `OfferableTrail`).
+ * The evaluator is the trails engine (functions/src/parts/trails/): `readTrailState` then
+ * `trailsFromState` with `blocked` (blockedTrails), its candidates in the engine's rank order.
  */
 import type { ManagedTransaction } from 'neo4j-driver';
 import { readTx, writeTx } from '../../shared/neo4j';
+import { readTrailState, trailsFromState } from '../trails';
 import { registerTodayPrepare, registerTodaySource } from '../../spine/today';
 import type { TodayItem } from '../../spine/todayOrder';
 import { blockedTrails, isBlocked, trailOfferId } from './blocked';
@@ -71,8 +72,12 @@ export async function trailOfferItems(tx: ManagedTransaction, uid: string, now: 
  */
 export type TrailEvaluator = (tx: ManagedTransaction, uid: string, blocked: readonly BlockedTrail[], now: Date) => Promise<OfferableTrail[]>;
 
-/** TODO(trails-engine): lane 1's evaluator, once `functions/src/parts/trails/` lands. Null: the prepare step is a no-op. */
-export const TRAIL_EVALUATOR: TrailEvaluator | null = null;
+/** The trails engine over the person's records (enabled rules only; nothing while parts is off). */
+export const TRAIL_EVALUATOR: TrailEvaluator = async (tx, uid, blocked, now) => {
+  const state = await readTrailState(tx, uid, { now: now.getTime() });
+  if (!state.partsOn) return [];
+  return trailsFromState(state, now.getTime(), { blocked: blocked.map((b) => ({ ...b, moveIds: [...b.moveIds] })) }).candidates;
+};
 
 /** When the person's trails were last evaluated (once a day, like what_helps' `patternsEvaluatedAt`). */
 export const EVALUATED_AT_QUERY = `MATCH (u:User {id: $uid}) RETURN toString(u.trailsEvaluatedAt) AS at`;
@@ -97,7 +102,7 @@ export async function prepareTrailOffers(uid: string, now: Date, evaluate: Trail
     const candidates = await evaluate(tx, uid, blocked, now);
     for (const c of candidates) {
       // Rule D is Reflect's, never Today's.
-      if (!TODAY_SHAPES.includes(c.shape)) continue;
+      if (!TODAY_SHAPES.includes(c.shape) || c.safetyLine) continue;
       if (!enabled.has(c.ruleId) || isBlocked(c, blocked, now) || known.has(trailOfferId(c))) continue;
       const gate = await checkOfferGate(tx, uid, state, c.ruleId, now);
       // A closed gate holds every candidate back today (the gate is about the person, not the trail).

@@ -14,10 +14,10 @@ import { readPartsEntryInput, validateStartPartSession } from './validation';
 import { sessionDeps } from './sessionQueries';
 import type { PartSessionResponse } from './sessionTypes';
 import {
-  answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, renamePartHandler, restPartHandler,
-  restorePartHandler, setAsidePartHandler, setPartAnchorHandler, setPartTenderHandler,
+  answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, partShapeDeps, renamePartHandler, restPartHandler,
+  restorePartHandler, setAsidePartHandler, setPartAnchorHandler, setPartShapeHandler, setPartTenderHandler,
 } from './keep';
-import { validateAnchor, validatePartRef, validateRename, validateRest, validateRevisit } from './editPlan';
+import { validateAnchor, validatePartRef, validateRename, validateRest, validateRevisit, validateShape } from './editPlan';
 import { validateKeep } from './keepPlan';
 import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
 import {
@@ -154,6 +154,15 @@ export const setPartAnchor = callable<unknown, PartWriteResponse>(
   async ({ uid, data }) => {
     const input = parseOrInvalid(() => validateAnchor(data), 'Invalid request');
     return writeTx((tx) => setPartAnchorHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** Find the feeling's "Use this shape for {name}?": the visit's own shape, on the person's yes. */
+export const setPartShape = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setPartShape', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateShape(data), 'Invalid request');
+    return writeTx((tx) => setPartShapeHandler(input, partShapeDeps(tx, uid as string)));
   },
 );
 

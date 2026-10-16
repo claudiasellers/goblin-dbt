@@ -8,7 +8,9 @@
  * keepPart (9b's yes) builds the part from the stored PartSession, never from client fields. The
  * part-card writers below (rename, rest, set aside, restore, tender, the 30-day still-true) change
  * a kept part on the person's own tap; each bumps `u.profileVersion` and returns `{ version }`.
- * The check-back's Louder pauses a part (PAUSE_PART_QUERY, last).
+ * Find the feeling's "Use this shape for {name}?" gives a kept part the shape of the visit it was tagged
+ * in (setPartShape, read from that visit's own record). The check-back's Louder pauses a part
+ * (PAUSE_PART_QUERY, last).
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -21,7 +23,8 @@ import {
 } from './keepPlan';
 import type { KeepPartResponse, PartWriteResponse } from './keepTypes';
 import {
-  newJob, revisitTransition, type AnchorInput, type PartRef, type RenameInput, type RestInput, type RevisitInput,
+  newJob, revisitTransition, shapeSigFromFtf, type AnchorInput, type PartRef, type RenameInput, type RestInput,
+  type RevisitInput, type ShapeInput,
 } from './editPlan';
 
 export const partsOff = () => new HttpsError('failed-precondition', 'Parts are off');
@@ -280,7 +283,7 @@ async function ownPart(deps: PartEditDeps, q: Parameters<PartEditDeps['state']>[
   return { st, part: st.part, status: typeof st.part.status === 'string' ? st.part.status : 'active' };
 }
 
-async function written(deps: PartEditDeps, query: string, params: Record<string, unknown>): Promise<PartWriteResponse> {
+async function written(deps: Pick<PartEditDeps, 'write'>, query: string, params: Record<string, unknown>): Promise<PartWriteResponse> {
   const version = await deps.write(query, params);
   if (version === null) throw changed();
   return { version };
@@ -383,6 +386,92 @@ export function partEditDeps(tx: ManagedTransaction, uid: string): PartEditDeps 
       })).records[0];
       return r ? toNumber(r.get('version')) ?? 0 : null;
     },
+  };
+}
+
+// ---- Find the feeling's "Use this shape for {name}?" ----
+
+/** The tools whose visit can give a part its shape: Find the feeling (Shape it) only. */
+export const SHAPE_TOOLS = ['find-the-feeling'] as const;
+
+/**
+ * The part, and the visit's ToolSession with the Find the feeling session it links to (DETAIL), all
+ * the caller's own: the ToolSession by the caller's key, the FTF session by its owner. The shape is read
+ * from that record (`dataJson`), never from the client.
+ */
+export const SHAPE_STATE_QUERY = `
+  OPTIONAL MATCH (u:User {id: $uid})
+  OPTIONAL MATCH (u)-[:HAS_PART]->(p:Part {key: $partKey})
+  OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
+  OPTIONAL MATCH (ts)-[:DETAIL]->(f:FindTheFeelingSession) WHERE f.ownerId = $uid
+  WITH u, p, ts, collect(f.dataJson)[0] AS dataJson
+  RETURN coalesce(u.partsEnabled, false) AS partsOn, coalesce(u.profileVersion, 0) AS version,
+         CASE WHEN p IS NULL THEN null ELSE p {.status, .shapeFrom} END AS part,
+         ts IS NOT NULL AS sessionFound, ts.status AS sessionStatus, ts.toolId AS toolId, dataJson
+`;
+
+/**
+ * The shape and where it came from. Not a visit: `lastVisitedAt` stays. Once per (part, visit): the
+ * guard refuses a repeat, which the handler answers with the current version.
+ */
+export const SET_PART_SHAPE_QUERY = partWrite(
+  "p.status IN ['active', 'resting'] AND coalesce(p.shapeFrom, '') <> $toolSessionId",
+  'p.shapeSig = $shapeSig, p.shapeFrom = $toolSessionId',
+);
+
+export interface PartShapeState {
+  partsOn: boolean;
+  version: number;
+  part: { status: string | null; shapeFrom: string | null } | null;
+  sessionFound: boolean;
+  sessionStatus: string | null;
+  toolId: string | null;
+  /** The linked Find the feeling session's stored record, if there is one. */
+  dataJson: string | null;
+}
+
+export interface PartShapeDeps {
+  state(input: ShapeInput): Promise<PartShapeState>;
+  write: PartEditDeps['write'];
+}
+
+/**
+ * "Use this shape for {name}?", on the person's yes: the caller's own active or resting part (a tender one
+ * too: the figure is how it's drawn) takes the shape of the caller's own closed Find the feeling visit.
+ */
+export async function setPartShapeHandler(input: ShapeInput, deps: PartShapeDeps): Promise<PartWriteResponse> {
+  const st = await deps.state(input);
+  if (!st.partsOn) throw partsOff();
+  if (!st.part) throw notFound();
+  if (st.part.status === 'set_aside') throw new HttpsError('failed-precondition', 'Set aside: restore it first');
+  if (!st.sessionFound) throw new HttpsError('not-found', 'Session not found');
+  if (!(SHAPE_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
+  if (!st.sessionStatus || st.sessionStatus === 'open') throw new HttpsError('failed-precondition', 'That session is still open');
+  if (st.part.shapeFrom === input.toolSessionId) return { version: st.version };
+  const shapeSig = shapeSigFromFtf(st.dataJson);
+  if (!shapeSig) throw new HttpsError('failed-precondition', 'No shape in that visit');
+  return written(deps, SET_PART_SHAPE_QUERY, { partId: input.partId, toolSessionId: input.toolSessionId, shapeSig });
+}
+
+export function partShapeDeps(tx: ManagedTransaction, uid: string): PartShapeDeps {
+  const edit = partEditDeps(tx, uid);
+  return {
+    async state(input) {
+      const r = (await tx.run(SHAPE_STATE_QUERY, {
+        uid, partKey: userKey(uid, input.partId), sessionKey: userKey(uid, input.toolSessionId),
+      })).records[0];
+      const p = r?.get('part') as Record<string, unknown> | null | undefined;
+      return {
+        partsOn: r?.get('partsOn') === true,
+        version: toNumber(r?.get('version')) ?? 0,
+        part: p ? { status: str(p.status), shapeFrom: str(p.shapeFrom) } : null,
+        sessionFound: r?.get('sessionFound') === true,
+        sessionStatus: str(r?.get('sessionStatus')),
+        toolId: str(r?.get('toolId')),
+        dataJson: str(r?.get('dataJson')),
+      };
+    },
+    write: edit.write,
   };
 }
 

@@ -315,7 +315,7 @@ test('getToday with offers off reads nothing past the open-offer query and shows
   assert.equal([...out.items, ...out.more].filter((i) => i.kind === 'trail_offer').length, 0);
   assert.ok(f.calls.some((c) => c.query === Q.OPEN_OFFER_QUERY));
   assert.ok(!f.calls.some((c) => c.query === Q.GATE_CHECKINS_QUERY || c.query === HARM_ROWS_QUERY));
-  assert.ok(!f.calls.some((c) => c.query === R.WRITE_TRAIL_OFFER_QUERY), 'the evaluator is not wired: nothing is written');
+  assert.ok(!f.calls.some((c) => c.query === R.WRITE_TRAIL_OFFER_QUERY), 'offers off: nothing is written');
 });
 
 // ------------------------------------------------------------------ the prepare step
@@ -333,12 +333,28 @@ function prepareFake({ policy = POLICY_ROW(), last = null, states = [], gateChec
   });
 }
 
-test('prepare: a no-op until trails-engine lands (TODO(trails-engine))', async () => {
-  assert.equal(TD.TRAIL_EVALUATOR, null);
-  const f = prepareFake();
+test('prepare: wired to the trails engine (readTrailState, then trailsFromState with the blocked keys)', async () => {
+  const TQ = require('../../lib/parts/trails/queries');
+  assert.equal(typeof TD.TRAIL_EVALUATOR, 'function');
+  const ran = [];
+  const tx = { run: async (q) => { ran.push(q); return { records: q === TQ.TRAIL_USER_QUERY ? [record({ partsOn: false, timeZone: null })] : [] }; } };
+  assert.deepEqual(await TD.TRAIL_EVALUATOR(tx, 'u1', [], NOW), [], 'parts off: no candidates');
+  assert.ok(ran.includes(TQ.TRAIL_USER_QUERY) && ran.includes(TQ.TRAIL_RECORDS_QUERY), 'the engine\'s own read');
+  const src = require('node:fs').readFileSync(require('node:path').resolve(__dirname, '../../src/parts/offers/today.ts'), 'utf8');
+  assert.match(src, /trailsFromState\(state, now\.getTime\(\), \{ blocked: /);
+  assert.doesNotMatch(src, /allEnabled|drafts: true/, 'enabled rules and signed-off content only');
+});
+
+test('prepare: a safety-line rule A candidate is not offered on Today (no crisis seam on the card)', async () => {
+  const policy = POLICY_ROW({ rules: [...POLICY_ROW().rules, { id: 'trail_context', shape: 'A', enabled: true, cooldownDays: 28, statementTemplate: 'When {context}, the pull is to {pull}.', approved: true }] });
+  const safety = trail({ ruleId: 'trail_context', shape: 'A', moveIds: ['turn_on_myself'], pairId: null, safetyLine: true });
+  const f = prepareFake({ policy });
   setDriver(f.driver);
-  assert.equal(await TD.prepareTrailOffers('u1', NOW), null);
-  assert.equal(f.calls.length, 0);
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, async () => [safety, trail()]), 'written');
+  assert.equal(f.calls.find((c) => c.query === R.WRITE_TRAIL_OFFER_QUERY).params.id, OID, 'the safety-line A skipped, the next written');
+  const g = prepareFake({ policy });
+  setDriver(g.driver);
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, async () => [{ ...safety, safetyLine: false }]), 'written', 'the same trail without the flag is offered');
 });
 
 test('prepare: the top enabled A–C candidate that is new and not blocked, through the gate; D never; once a day', async () => {
@@ -414,6 +430,7 @@ test('getTrailOfferEvidence: own offer, marked seen once, rows of dates / tool i
   assert.match(A.EVIDENCE_LABELS_QUERY, /x\.reviewStatus = 'approved'/);
   assert.match(A.EVIDENCE_LABELS_QUERY, /c\.reviewStatus = 'approved'/);
   assert.match(A.EVIDENCE_LABELS_QUERY, /\(o\)-\[:EVIDENCE\]->\(r:LogRecord \{ownerId: \$uid\}\)/);
+  assert.ok(A.EVIDENCE_LABELS_QUERY.includes(require('../../lib/parts/sessionMoves').sessionSourceMatch('src', 'r', 'd')), 'the shared "this session\'s moves" predicate');
   assert.doesNotMatch(A.EVIDENCE_LABELS_QUERY + A.EVIDENCE_STATE_QUERY, /\bown(Voice|Job|Fear|Update|Words)\b|\.text\b|\.note\b/);
 
   const seen = evidenceFake({ offer: { status: 'seen' } });

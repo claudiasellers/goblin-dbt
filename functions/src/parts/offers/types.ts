@@ -5,9 +5,8 @@
  */
 
 /**
- * One trail the evaluator found: the same fields as functions/src/parts/trails/'s `TrailCandidate`
- * (lane 1, `trails-engine`), mirrored structurally so nothing here imports that file before it lands.
- * A `TrailCandidate` is assignable to this (`share` / `lift` are widened to take its `null`).
+ * One trail the evaluator found: the fields of functions/src/parts/trails/'s `TrailCandidate` this module
+ * reads, mirrored structurally (a `TrailCandidate` is assignable to this; `share` / `lift` take its `null`).
  */
 export interface OfferableTrail {
   ruleId: string;
@@ -23,6 +22,8 @@ export interface OfferableTrail {
   /** One row per episode: ids and keys only, never text. */
   evidence: TrailEvidence[];
   strength: { episodes: number; spanDays: number; tools: number; share?: number | null; lift?: number | null };
+  /** A only: the move is a safety-line move (turn_on_myself). Today doesn't offer it (no crisis resources on the card yet). */
+  safetyLine?: boolean;
 }
 
 export type TrailShape = 'A' | 'B' | 'C' | 'D';

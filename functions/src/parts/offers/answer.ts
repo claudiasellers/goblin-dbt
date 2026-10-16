@@ -26,6 +26,7 @@ import { toNumber } from '../../shared/values';
 import { GUARDS } from '../../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../../userdata/ownership';
 import { partsOff } from '../keep';
+import { sessionSourceMatch } from '../sessionMoves';
 import { TRAIL_OFFER_ID } from './blocked';
 import {
   SPLIT_MAX, TRAIL_CANDIDATE_ORIGIN, TRAIL_OFFER_ANSWERS, type AnswerTrailOfferResponse,
@@ -93,11 +94,14 @@ export const MARK_SEEN_QUERY = `
 export const EVIDENCE_LABELS_QUERY = `
   MATCH (:User {id: $uid})-[:HAS_TRAIL_OFFER]->(o:TrailOffer {key: $key})
   OPTIONAL MATCH (o)-[:EVIDENCE]->(r:LogRecord {ownerId: $uid})
-  OPTIONAL MATCH (r)-[:DETAIL]->(ir:InvalidationRecoverySession)
+  OPTIONAL MATCH (r)-[:DETAIL]->(dd) WHERE dd.ownerId = $uid
+  // A detail session without a ToolSession is its own record (as the trails records query reads it).
+  WITH o, r, CASE WHEN r:ToolSession THEN dd ELSE r END AS d
   OPTIONAL MATCH (src)-[x:EXPRESSES]->(m:ProtectiveMove)
-    WHERE r IS NOT NULL AND x.reviewStatus = 'approved' AND m.id IN o.moveIds
-      AND (((src:ActionUrge OR src:FeelingUrge) AND src.id IN coalesce(r.urgeIds, []))
-        OR (src:PullOption AND src.flow = 'recover' AND src.pullId = ir.pull))
+    WHERE r IS NOT NULL AND x.reviewStatus = 'approved' AND m.id IN o.moveIds AND (
+         ${sessionSourceMatch('src', 'r', 'd')}
+      OR (src:QuestionResponse AND r:CheckIn AND src.id IN coalesce(r.discResponseIds, []))
+    )
   WITH r, [l IN collect(DISTINCT src.label) WHERE l IS NOT NULL] AS labels
   WITH collect(CASE WHEN r IS NULL THEN null ELSE {key: r.key, labels: labels} END) AS records
   OPTIONAL MATCH (c:TrailContext)

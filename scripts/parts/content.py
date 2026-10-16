@@ -400,6 +400,13 @@ PROMPTS = [
     # The tag row after a better close
     ("tag_question", "tag", "tag", "Was this a part you know?"),
     ("tag_new_later", "tag", "new", "Want to come back to it later?"),
+    # Find the feeling only (parts.md, its over-weeks column): right after a part chip is tapped, when the
+    # visit made a shape (Shape it), "Use this shape for {name}?"; _noname for an unnamed chip. Yes gives
+    # the part that shape (setPartShape, read from the visit's own record); the done line shows in place
+    # for a moment, then the row folds away. No thanks folds it as now.
+    ("tag_use_shape", "tag", "shape", "Use this shape for {name}?"),
+    ("tag_use_shape_noname", "tag", "shape", "Use this shape for that part?"),
+    ("tag_shape_done", "tag", "shape", "Done."),
     # A kept part with no name, wherever parts are listed (the tag row's chips; the part card may reuse
     # them). {place}: the part's first body place, its label from src/data/bodyFigure.ts in lower case.
     ("part_unnamed_place", "common", "name", "The one in your {place}"),
@@ -486,6 +493,14 @@ PROMPTS = [
     # form with the tag row's chips (tag_new_one, tag_skip, tag_new_later, tag_later_yes / _no, reused).
     ("debrief_who", "dearman", "debrief", "Was one of your parts there?"),
     ("debrief_who_named", "dearman", "debrief", "Did {name} show up?"),
+    # Do the Opposite's goal line (parts.md, the Do the Opposite row): on the check's effectiveness card,
+    # above its question, parts on only, when the picked urge EXPRESSES an offerable move that is not a
+    # safety-line move and a goal was picked. {move} is the move's unblendPhrase (the unblend line's, so the
+    # pull reads the same and "it" never lacks a referent); {goal} is OA's own goal
+    # label, first letter lower-cased (OA's content, never copied here). No {hurt}: nothing in the visit
+    # says what this part fears, so the line gives positive intent instead of a guess.
+    ("oa_goal_part", "oa", "goal", "A part of you {move}, and it's trying to help."),
+    ("oa_goal_you", "oa", "goal", "You want to {goal}."),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
     # The blending check (Claudia, 16 Oct: the flood signal at a parts flow's entry). It asks how close
@@ -745,6 +760,8 @@ OPTIONS = [
     opt("tag_skip", "tag", "tag", "Skip", branch="end"),
     opt("tag_later_yes", "tag", "new", "Yes", branch="candidate"),
     opt("tag_later_no", "tag", "new", "No thanks", branch="end"),
+    opt("tag_shape_yes", "tag", "shape", "Yes", branch="keep"),
+    opt("tag_shape_no", "tag", "shape", "No thanks", branch="end"),
     # Problem Solve's ambivalence screen (cant-ambivalent only, parts on): the one quiet text button
     opt("ps_later", "ps", "ambivalence", "Want to get to know that part another time?", branch="candidate"),
     # {when} in stats_when: the band most tags fall in, in the person's time zone (05-12, 12-17, 17-22, 22-05)

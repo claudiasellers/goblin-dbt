@@ -56,6 +56,7 @@ export { angryRequired, ANGRY_LATER_REQUIRED } from './src/lib/angryPart';
 export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED } from './src/lib/meetAPartSave';
 export { PART_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
+export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
 export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED } from './src/lib/partsSettings';
@@ -63,6 +64,7 @@ export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
 export { TRAIL_OFFER_REQUIRED } from './src/lib/trailOffer';
+export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -108,7 +110,10 @@ export function surfaces(g) {
     {
       id: 'tag', title: 'The tag row',
       where: 'Under a better close, with parts on: better or much better then-vs-now (Cool Down, Five senses, Find the feeling) or Held off (Pause, Urge Surfing). "Was this a part you know?" with the person\'s parts as chips.',
-      groups: [{ label: null, ids: g.TAG_ROW_REQUIRED }],
+      groups: [
+        { label: null, ids: g.TAG_ROW_REQUIRED },
+        { label: 'Find the feeling only, when the visit made a shape: right after a part chip, "Use this shape for {name}?" (Yes gives the part that shape; the row shows without it)', ids: g.TAG_SHAPE_REQUIRED },
+      ],
     },
     {
       id: 'me', title: 'Parts of me',
@@ -150,6 +155,11 @@ export function surfaces(g) {
       id: 'offer', title: 'The trail offer (Today)',
       where: 'Today only, with parts on and offers switched on (PartsPolicy.offersEnabled), at most one a week shared with what_helps, never near flooding, a crisis flag, repeated dissociation or a harm signal: "Something keeps showing up", the rule\'s statement, "Want to take a look?", then the evidence and the four answers. It also needs the rule\'s statement, the moves\' `trailPhrase` and the context\'s phrase signed off (see Trail rules and Trail contexts). Rule D ("Was this {name}?") is never on Today: Reflect asks it in a batch, later.',
       groups: [{ label: null, ids: g.TRAIL_OFFER_REQUIRED }],
+    },
+    {
+      id: 'oa', title: 'Do the Opposite',
+      where: 'In Do the Opposite, with parts on, on the check\'s "will it help you move toward your goal" card, above the question: two quiet lines setting the pull beside the goal the person picked, when the picked urge EXPRESSES an offerable move that isn\'t a safety-line move (never for "My urge is different", never while P2 is open). {move} is the move\'s `unblendPhrase` (the unblend line\'s); {goal} is Do the Opposite\'s own goal label with its first letter lower-cased ("You want to stay connected."). It also needs the move and the urge\'s EXPRESSES edge signed off (see The vocabulary).',
+      groups: [{ label: null, ids: g.OA_GOAL_LINE_REQUIRED }],
     },
   ];
 }

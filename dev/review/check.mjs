@@ -1,0 +1,163 @@
+#!/usr/bin/env node
+/**
+ * The parts review page's check (not part of npm test): serves the built dev-dist/ as plain files, opens
+ * every surface and branch of dev/parts-review.html at 390×844 in Chromium, screenshots each, and fails
+ * on any console error, page error, failed or non-font network request, a branch the driver couldn't
+ * reach, or a screen without the line it is there to show.
+ *   npx vite build --config dev/vite.harness.config.ts
+ *   node dev/review/check.mjs [shots dir]   (default /home/claude/lanes/briefs/review-shots)
+ * Uses the preinstalled Playwright (PLAYWRIGHT_MODULE, else `playwright`, else /opt/node-tools) and its
+ * browsers (PLAYWRIGHT_BROWSERS_PATH, default /opt/pw-browsers). Never installs anything.
+ */
+import { spawn } from 'node:child_process';
+import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { partsFromFixture } from '../../tests/lib/partsContentFixture.mjs';
+
+const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+const DIST = join(ROOT, 'dev-dist');
+const PAGE = 'dev/parts-review.html';
+const SHOTS = resolve(process.argv[2] ?? '/home/claude/lanes/briefs/review-shots');
+process.env.PLAYWRIGHT_BROWSERS_PATH ??= '/opt/pw-browsers';
+
+if (!existsSync(join(DIST, PAGE))) {
+  console.error(`No ${join(DIST, PAGE)}: run npx vite build --config dev/vite.harness.config.ts first.`);
+  process.exit(2);
+}
+
+async function loadPlaywright() {
+  for (const m of [process.env.PLAYWRIGHT_MODULE, 'playwright', '/opt/node-tools/node_modules/playwright/index.mjs'].filter(Boolean)) {
+    try { return await import(m); } catch { /* next */ }
+  }
+  throw new Error('Playwright not found (set PLAYWRIGHT_MODULE)');
+}
+
+/* ── what to check on each screen (the surfaces and branches come from the page itself) ── */
+const content = partsFromFixture(JSON.parse(readFileSync(join(ROOT, 'tests/fixtures/parts-content.json'), 'utf8')), () => true);
+const copy = (id) => {
+  const c = content.prompts[id]?.copy ?? Object.values(content.options).flatMap((s) => Object.values(s).flat()).find((o) => o.id === id)?.label;
+  if (!c) throw new Error(`no copy for ${id}`);
+  return c.split('{')[0].trim();
+};
+
+/** The line each screen is there to show (a prompt or option id), or a selector. */
+const EXPECT = {
+  'meet/walk': 'meet_find', 'meet/far_away': 'gate_far_away', 'meet/tender': 'meet_tender', 'meet/stop_tender': 'meet_stop_title',
+  'meet/stop_own': 'meet_stop_title', 'meet/danger': 'meet_thank', 'meet/nothing': 'meet_nothing', 'meet/worried': 'meet_unblend',
+  'meet/worried_end': 'meet_unblend_end', 'meet/too_many': 'aftercare_too_many', 'meet/paused': 'paused_heads_up', 'meet/keep': 'meet_keep',
+  'meet/close': 'close_checkback', 'meet/danger_close': 'meet_done',
+  'checkback/louder': 'aftercare_louder', 'tag/row': 'tag_question', 'tag/new': 'tag_new_later', 'me/': 'card_where', 'reflect/': 'reflect_title',
+  'settings/on': 'settings_dissociation', 'settings/confirm': 'settings_delete_confirm', 'settings/failed': 'settings_delete_failed',
+  'settings/done': 'settings_delete_done', 'cope/pick': 'cope_title', 'cope/anchor': 'cope_change', 'cope/new': 'cope_save',
+  'cope/failed': 'cope_save_failed', 'debrief/named': 'debrief_who_named', 'debrief/general': 'debrief_who',
+  'debrief/general_new': 'tag_new_later', 'ps_later/ask': 'ps_later', 'ps_later/done': 'ps_later_done', 'tag/urge': 'tag_question',
+  'angry/first': 'angry_unblend', 'angry/protects': 'angry_protects', 'angry/speak': 'angry_later', 'angry/later': 'angry_later_done',
+};
+const SELECTOR = {
+  'meet/danger': 'section[aria-label="Support right now"]', 'meet/danger_close': 'section[aria-label="Support right now"]',
+  'checkback/louder': '[data-testid="part-checkback-aftercare"]',
+};
+const NO_CHECKBACK = new Set(['meet/danger_close']);
+
+/** Every surface and branch, angry's in both wordings, and a few with Show ids. */
+function plan(map) {
+  const visits = [{ name: 'index', query: '' }, { name: 'index--ids', query: '?ids=1' }];
+  for (const s of map) {
+    for (const b of s.branches.length ? s.branches : ['']) {
+      const q = `?s=${s.id}${b ? `&b=${b}` : ''}`;
+      const v = { name: `${s.id}${b ? `--${b}` : ''}`, query: q, key: `${s.id}/${b}`, surface: s.id, branch: b };
+      visits.push(v);
+      if (s.id === 'angry') visits.push({ ...v, name: `${v.name}--plain`, query: `${q}&plain=1`, plain: true });
+    }
+  }
+  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask']]) {
+    visits.push({ name: `${surface}${branch ? `--${branch}` : ''}--ids`, query: `?s=${surface}${branch ? `&b=${branch}` : ''}&ids=1`, ids: true, surface, branch });
+  }
+  return visits;
+}
+
+/* ── serve and visit ── */
+const port = 47000 + Math.floor(Math.random() * 2000);
+const server = spawn('python3', ['-m', 'http.server', String(port), '--bind', '127.0.0.1'], { cwd: DIST, stdio: 'ignore' });
+const base = `http://127.0.0.1:${port}/${PAGE}`;
+const isFont = (url) => /^https:\/\/fonts\.(googleapis|gstatic)\.com\//.test(url);
+const problems = [];
+let visits = [];
+
+try {
+  const { chromium } = await loadPlaywright();
+  for (let i = 0; i < 50; i++) {
+    try { if ((await fetch(base)).ok) break; } catch { /* not up yet */ }
+    await new Promise((r) => setTimeout(r, 100));
+  }
+  mkdirSync(SHOTS, { recursive: true });
+  for (const f of readdirSync(SHOTS)) if (f.endsWith('.png')) rmSync(join(SHOTS, f));
+
+  const browser = await chromium.launch();
+  const context = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, colorScheme: 'dark' });
+  // Fonts are the one call allowed out; they're blocked here so the check needs no network.
+  await context.route(/^https:\/\/fonts\.(googleapis|gstatic)\.com\//, (r) => r.abort());
+  // The page lists its own surfaces and branches, so a new branch is checked without touching this file.
+  const indexPage = await context.newPage();
+  await indexPage.goto(base, { waitUntil: 'load' });
+  const map = await indexPage.evaluate(() => window.__reviewMap);
+  await indexPage.close();
+  if (map.uncovered.length) problems.push(`sign-off pack surfaces with no harness screen: ${map.uncovered.join(', ')}`);
+  if (map.unknown.length) problems.push(`harness screens for no pack surface: ${map.unknown.join(', ')}`);
+  visits = plan(map.surfaces);
+  for (const v of visits) {
+    const page = await context.newPage();
+    const bad = (msg) => problems.push(`${v.name}: ${msg}`);
+    page.on('console', (m) => { if (m.type() === 'error' && !isFont(m.location()?.url ?? '') && !/fonts\.(googleapis|gstatic)/.test(m.text())) bad(`console error: ${m.text()}`); });
+    page.on('pageerror', (e) => bad(`page error: ${e.message}`));
+    page.on('requestfailed', (r) => { if (!isFont(r.url())) bad(`request failed: ${r.url()}`); });
+    page.on('request', (r) => { const u = r.url(); if (!u.startsWith(`http://127.0.0.1:${port}/`) && !isFont(u) && !u.startsWith('data:') && !u.startsWith('blob:')) bad(`call out: ${u}`); });
+    page.on('response', (r) => { if (r.status() >= 400 && !isFont(r.url())) bad(`HTTP ${r.status()}: ${r.url()}`); });
+
+    await page.goto(`${base}${v.query}`, { waitUntil: 'load' });
+    if (v.surface) {
+      await page.waitForFunction(() => {
+        const d = document.querySelector('[data-testid="surface"]')?.getAttribute('data-driven') ?? '';
+        return d === 'done' || d.startsWith('failed');
+      }, null, { timeout: 45000 }).catch(() => bad('timed out waiting for the branch'));
+      const driven = await page.getAttribute('[data-testid="surface"]', 'data-driven').catch(() => null);
+      if (driven !== 'done') bad(`branch not reached: ${driven}`);
+      await page.waitForTimeout(700);
+      const text = await page.locator('[data-testid="surface"]').innerText().catch(() => '');
+      if (!text.trim()) bad('empty surface');
+      if (!v.ids) {
+        const want = EXPECT[v.key];
+        if (want && !(v.plain && v.key === 'angry/speak') && !(v.plain && v.key === 'angry/later')) {
+          const id = v.plain && content.prompts[`${want}_plain`] ? `${want}_plain` : want;
+          if (!text.toLowerCase().includes(copy(id).toLowerCase())) bad(`missing ${id}: "${copy(id)}"`);
+        }
+        if (v.plain && (v.key === 'angry/speak' || v.key === 'angry/later') && text.includes(copy('angry_later'))) bad('later line shown with plain wording');
+        if (SELECTOR[v.key] && !(await page.locator(SELECTOR[v.key]).count())) bad(`missing ${SELECTOR[v.key]}`);
+        if (NO_CHECKBACK.has(v.key) && text.includes(copy('close_checkback'))) bad('check-back question after a danger ending');
+        if (v.surface === 'oa_goal') {
+          const shows = (await page.locator('[data-testid="goal-line"]').count()) > 0;
+          const silent = /^(guilt-punish|custom)\./.test(v.branch);
+          if (shows === silent) bad(silent ? 'goal line shown where it must not be' : 'no goal line');
+        }
+        if (v.surface?.startsWith('unblend_') && v.branch !== 'blank' && !(await page.locator('[data-testid="unblend-line"]').count())) bad('no unblend line');
+      } else if (!text.includes('⟨')) bad('Show ids printed no ids');
+    } else {
+      await page.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => bad('no index'));
+    }
+    // A pointer user's view: a real tap on blank page, so programmatic focus shows no keyboard ring.
+    await page.mouse.click(2, 2);
+    await page.screenshot({ path: join(SHOTS, `${v.name}.png`), fullPage: true });
+    await page.close();
+  }
+  await browser.close();
+} finally {
+  server.kill();
+}
+
+console.log(`${visits.length} screens → ${SHOTS}`);
+if (problems.length) {
+  console.error(problems.join('\n'));
+  process.exit(1);
+}
+console.log('ok: no console errors, no failed or outside requests, every branch reached');

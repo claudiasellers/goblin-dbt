@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useProfileContext } from '../../hooks/useProfileContext';
-import { queuePartCandidate, tagPart } from '../../services/parts';
+import { queuePartCandidate, setPartShape, tagPart } from '../../services/parts';
 import { newId } from '../../lib/spine/ids';
-import { tagChips, tagRowCopy, type TagRowTool } from '../../lib/partTag';
+import { tagChips, tagRowCopy, type TagChip, type TagRowTool } from '../../lib/partTag';
+import { SHAPE_DONE_MS, shapeOfferCopy } from '../../lib/partShape';
+import { markTagRowAnswered, tagRowAnswered } from '../../lib/tagRowOnce';
 import { debriefTag } from '../../lib/debriefWho';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { PartFigure } from '../parts/PartFigure';
@@ -15,30 +17,70 @@ const quiet = 'min-h-11 px-3 text-sm text-[var(--color-text-tertiary)] hover:tex
  * under a better or much better close. PartTagSlot mounts it only once its gate holds (src/lib/partTag.ts
  * tagRowGate), so the person's parts are read (the host tool's `parts` slice) only then. No parts kept:
  * nothing. One tap and it folds away with nothing more said; every write is fire and forget, so it
- * never blocks or delays leaving the tool. Skip and "No thanks" write nothing.
+ * never blocks or delays leaving the tool. Skip and "No thanks" write nothing. With `offerShape` (Find the
+ * feeling, a visit that made a shape: src/lib/partShape.ts) a part chip asks "Use this shape for {name}?"
+ * first; Yes shows "Done." in place for a moment, then the row folds.
  */
-export function PartTagRow({ toolId, toolSessionId, content, onGone, question, debrief = false }: {
+export function PartTagRow({ toolId, toolSessionId, content, onGone, question, debrief = false, offerShape = false }: {
   /** The host whose profile needs the parts are read under (a tag-row tool, or DEAR MAN's debrief). */
   toolId: TagRowTool | 'dear-man'; toolSessionId: string; content: PartsContent; onGone?: () => void;
   /** The row's question, when the host asks its own ("Was one of your parts there?"). */
   question?: string;
   /** DEAR MAN's debrief: a picked part is a debrief tag (strength yes), not a close tag. */
   debrief?: boolean;
+  /** The host's gate held for "Use this shape for {name}?" (PartTagSlot: shapeOfferReady). */
+  offerShape?: boolean;
 }) {
   const profile = useProfileContext(toolId);
-  const [state, setState] = useState<'ask' | 'later' | 'gone'>('ask');
+  const source = debrief ? 'debrief' : 'close';
+  // Answered already on this page (the other place a host draws the row, or a remount): never asked twice.
+  const [state, setState] = useState<'ask' | 'later' | 'shape' | 'done' | 'gone'>(() => (tagRowAnswered(toolSessionId, source) ? 'gone' : 'ask'));
+  const [picked, setPicked] = useState<TagChip | null>(null);
   const fold = () => { setState('gone'); onGone?.(); };
+  // "Done." stays for a moment, then folds; the host's onGone is read when it fires (hosts pass a new one each render).
+  const gone = useRef(onGone);
+  useEffect(() => { gone.current = onGone; }, [onGone]);
+  useEffect(() => {
+    if (state !== 'done') return;
+    const t = setTimeout(() => { setState('gone'); gone.current?.(); }, SHAPE_DONE_MS);
+    return () => clearTimeout(t);
+  }, [state]);
   if (state === 'gone' || !profile.slices) return null;
   const chips = tagChips(profile.slices.parts, content);
   if (chips.length === 0) return null;
   const copy = tagRowCopy(content);
   const ask = question ?? copy.question;
 
-  const tag = (partId: string) => {
-    fold();
-    const req = debrief ? debriefTag(newId(), partId, toolSessionId, 'yes') : { id: newId(), partId, toolSessionId };
+  const answered = () => markTagRowAnswered(toolSessionId, source);
+  const skip = () => { answered(); fold(); };
+  const tag = (c: TagChip) => {
+    answered();
+    if (offerShape && !debrief) {
+      setPicked(c);
+      setState('shape');
+    } else fold();
+    const req = debrief ? debriefTag(newId(), c.id, toolSessionId, 'yes') : { id: newId(), partId: c.id, toolSessionId };
     tagPart(req).catch(() => { /* a missed tag is only a missed signal */ });
   };
+  const answerShape = (yes: boolean) => {
+    if (!yes || !picked) { fold(); return; }
+    setState('done');
+    setPartShape({ partId: picked.id, toolSessionId }).catch(() => { /* the part keeps the shape it had */ });
+  };
+
+  if ((state === 'shape' || state === 'done') && picked) {
+    const shape = shapeOfferCopy(content, picked);
+    if (state === 'done') return <p role="status" className="mt-4 text-sm text-[var(--color-text-secondary)]">{shape.done}</p>;
+    return (
+      <section aria-label={shape.ask} className="mt-4 space-y-3">
+        <p className="text-sm text-[var(--color-text-secondary)]">{shape.ask}</p>
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" className={chip} onClick={() => answerShape(true)}>{shape.yes}</button>
+          <button type="button" className={quiet} onClick={() => answerShape(false)}>{shape.no}</button>
+        </div>
+      </section>
+    );
+  }
   const later = (yes: boolean) => {
     fold();
     if (yes) queuePartCandidate({ id: newId(), origin: 'new_one', moveIds: [], toolSessionId }).catch(() => { /* as above */ });
@@ -61,15 +103,15 @@ export function PartTagRow({ toolId, toolSessionId, content, onGone, question, d
       <p className="text-sm text-[var(--color-text-secondary)]">{ask}</p>
       <div className="flex flex-wrap items-center gap-2">
         {chips.map((c) => (
-          <button key={c.id} type="button" className={`${chip} inline-flex items-center gap-2 pl-2`} onClick={() => tag(c.id)}>
+          <button key={c.id} type="button" className={`${chip} inline-flex items-center gap-2 pl-2`} onClick={() => tag(c)}>
             <PartFigure shapeSig={c.shapeSig} size={28} />
             <span className={c.named ? 'font-serif text-base' : 'text-sm'}>{c.label}</span>
           </button>
         ))}
-        <button type="button" className={chip} onClick={() => setState('later')}>
+        <button type="button" className={chip} onClick={() => { answered(); setState('later'); }}>
           <span className="text-sm">{copy.newOne}</span>
         </button>
-        <button type="button" className={quiet} onClick={fold}>{copy.skip}</button>
+        <button type="button" className={quiet} onClick={skip}>{copy.skip}</button>
       </div>
     </section>
   );

@@ -20,6 +20,7 @@ const GATES = [
   ["src/lib/meetAPartSave.ts", "function offerCheckback", "surfaceReady(o.content, CLOSE_CHECKBACK_REQUIRED)"],
   ["src/lib/partCheckback.ts", "function checkbackReady", "surfaceReady(content, PART_CHECKBACK_REQUIRED)"],
   ["src/lib/partTag.ts", "function tagRowGate", "surfaceReady(g.content, TAG_ROW_REQUIRED)"],
+  ["src/lib/partShape.ts", "function shapeOfferReady", "surfaceReady(g.content, TAG_SHAPE_REQUIRED)"],
   ["src/lib/partsOfMe.ts", "function partsOfMeCopy", "surfaceReady(content, PARTS_OF_ME_REQUIRED)"],
   ["src/lib/partsOfMe.ts", "function partRevisitCopy", "surfaceReady(content, PART_REVISIT_REQUIRED)"],
   ["src/lib/partsOfMe.ts", "function partCandidateCopy", "surfaceReady(content, PART_CANDIDATE_REQUIRED)"],
@@ -30,6 +31,7 @@ const GATES = [
   ["src/lib/copeAhead.ts", "function copeReady", "surfaceReady(content, COPE_REQUIRED)"],
   ["src/lib/debriefWho.ts", "function debriefWhoReady", "surfaceReady(content, DEBRIEF_WHO_REQUIRED)"],
   ["src/lib/psAmbivalence.ts", "function psLaterCopy", "surfaceReady(content, PS_LATER_REQUIRED)"],
+  ["src/lib/oaGoalLine.ts", "function oaGoalLine", "surfaceReady(content, OA_GOAL_LINE_REQUIRED)"],
 ];
 
 /** From the declaration to the next top-level declaration. */
@@ -64,12 +66,13 @@ test("the document: every id a surface requires, with the fixture's text, its st
     ...(await importTs("src/lib/partCheckback.ts")), ...(await importTs("src/lib/partTag.ts")), ...(await importTs("src/lib/partsOfMe.ts")),
     ...(await importTs("src/lib/partStats.ts")), ...(await importTs("src/lib/partsSettings.ts")), ...(await importTs("src/lib/copeAhead.ts")),
     ...(await importTs("src/lib/psAmbivalence.ts")), ...(await importTs("src/lib/debriefWho.ts")),
+    ...(await importTs("src/lib/oaGoalLine.ts")), ...(await importTs("src/lib/partShape.ts")),
   };
   const sets = [
     L.UNBLEND_REQUIRED, L.angryRequired(true), L.angryRequired(false), L.ANGRY_LATER_REQUIRED, L.meetRequired({ paused: true }),
     L.CLOSE_CHECKBACK_REQUIRED, L.PART_CHECKBACK_REQUIRED, L.TAG_ROW_REQUIRED, L.PARTS_OF_ME_REQUIRED, L.PART_REVISIT_REQUIRED,
     L.PART_CANDIDATE_REQUIRED, L.STATS_REQUIRED, L.REFLECT_REQUIRED, L.PARTS_SETTINGS_REQUIRED, L.SETTINGS_LINK_REQUIRED, L.COPE_REQUIRED, L.PS_LATER_REQUIRED,
-    L.DEBRIEF_WHO_REQUIRED,
+    L.DEBRIEF_WHO_REQUIRED, L.OA_GOAL_LINE_REQUIRED, L.TAG_SHAPE_REQUIRED,
   ];
   const options = Object.values(fixture.options).flatMap((steps) => Object.values(steps).flat());
   const textOf = (id) => fixture.prompts[id]?.copy ?? options.find((o) => o.id === id)?.label;
@@ -95,7 +98,7 @@ test("the document: every id a surface requires, with the fixture's text, its st
   for (const ev of Object.keys(fixture.canTouch)) assert.ok(doc.includes(`\`${ev}\``), ev);
   for (const [k, v] of Object.entries(fixture.policy)) if (!["id", "reviewStatus", "version", "pending"].includes(k)) assert.ok(doc.includes(`| \`${k}\` | ${v} |`), k);
   for (const h of ["## How sign-off works", "## Surfaces", "## The vocabulary", "## The numbers (PartsPolicy)"]) assert.ok(doc.includes(h), h);
-  const order = ["The unblend line", "The angry-part card", "Meet a part", "The check-back card", "The tag row", "Parts of me", "Settings", "Reflect", "DEAR MAN", "Problem Solve"]
+  const order = ["The unblend line", "The angry-part card", "Meet a part", "The check-back card", "The tag row", "Parts of me", "Settings", "Reflect", "DEAR MAN", "Problem Solve", "Do the Opposite"]
     .map((t) => doc.search(new RegExp(`^### \\d+\\. ${t}$`, "m")));
   assert.ok(order.every((i, n) => i > 0 && (n === 0 || i > order[n - 1])), "most exposed first");
   assert.match(doc, /\| `part_unnamed` \| One you haven't named \|.*also in .*Reflect/, "shared lines are marked");
