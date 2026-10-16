@@ -7,6 +7,8 @@ import { getPartsEntryHandler } from './handler';
 import { graphDeps } from './queries';
 import type { PartsEntry } from './types';
 
+export { deleteMyParts } from './delete';
+
 /** What a parts flow opens on: P2 first, the far-away heads-up, or clear. Never a lock. */
 export const getPartsEntry = callable<unknown, PartsEntry>(
   { auth: 'required', label: 'getPartsEntry' },

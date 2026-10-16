@@ -29,3 +29,4 @@ export {
   answerPatternOffer,
 } from './profile';
 export { getPartsEntry } from './parts';
+export { deleteMyParts } from './parts';

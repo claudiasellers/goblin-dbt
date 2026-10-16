@@ -13,3 +13,13 @@ const getPartsEntryFn = httpsCallable<Record<string, never>, PartsEntry>(functio
 export async function getPartsEntry(): Promise<PartsEntry> {
   return (await getPartsEntryFn({})).data;
 }
+
+const deleteMyPartsFn = httpsCallable<Record<string, never>, { deleted: Record<string, number> }>(functions, 'deleteMyParts');
+
+/**
+ * Delete my parts (Privacy & Data): every parts record the person has kept or made, in one step
+ * they confirmed. The one call made with parts off too (turning parts off deletes nothing).
+ */
+export async function deleteMyParts(): Promise<{ deleted: Record<string, number> }> {
+  return (await deleteMyPartsFn({})).data;
+}
