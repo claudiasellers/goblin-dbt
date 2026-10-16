@@ -1,6 +1,6 @@
 # Parts
 
-Status: proposal, 6 Oct 2026. Not agreed, not built. Nothing here is signed off.
+Status: proposal, 6 Oct 2026 (updated 16 Oct). Not agreed, not built. Nothing here is signed off.
 Dev harness: `npm run dev`, then `http://localhost:5173/dev/parts.html` (Meet a part, the den, the part
 card, a trail offer; draft copy in `dev/parts-fixture.ts`; `?view=`, `?move=`, `?palette=`).
 Umbrella: [alexithymia-first-interaction.md](alexithymia-first-interaction.md). Its *angry part* section is
@@ -879,6 +879,87 @@ Each phase is gated on the previous phase's harm signals.
 - An AI speaking as a part, or as the person's Self.
 - Collection mechanics, streaks, "parts discovered" counts or shareable cards.
 - Parts language by default.
+
+### Why never
+
+Not every rule is equally firm. Rules 1, 2, 5 and 8 are hard lines. Rules 3, 4, 6 and 9 are firm
+positions that a clinical reviewer could argue with. Rule 7 holds until there is a flood signal. Rule 10
+is a judgment call to test.
+
+1. **Exile witnessing, do-over, retrieval, unburdening.** The strongest case comes from DBT itself.
+   - DBT is staged. Trauma processing waits for Stage 2, after stability criteria are met, and most of
+     this app's users are Stage 1: still working on behavioural control.
+   - The IFS method for exiles needs an observing position held steady, with a therapist who notices
+     blending and steps in. An app can do neither reliably.
+   - Backlash lands on DBT's own targets (self-harm, bingeing, rage, shutdown), often hours later, when
+     nobody is watching. Twombly calls it "extensive" and "dangerous".
+   - There are no data on unaccompanied unburdening.
+   - The cost is real: this is not complete IFS. What survives is the part that is safe alone:
+     unblending, compassion for protectors, polarities softening, updating. Only a clinician-in-the-loop
+     mode could change this rule.
+2. **Questions about the past, or a suggested origin.** Origin questions are the doorway to exiles.
+   - Memory recalled under activation, with a leading question and an inviting frame, is unreliable
+     (imagination inflation). The Castlewood lawsuits are what this looks like at scale.
+   - The IFS Institute itself won't treat recovered memories as fact without corroboration (4 Nov 2025).
+     An app can't corroborate, so it never elicits.
+   - What stays: updating ("Show it something you can do now") looks forward, and the age chip asks for
+     a felt sense ("How old does it seem?"), not a memory.
+3. **Manager, firefighter and exile on screen.** They are interpretations, and DBT's *describe* skill
+   leaves interpretations out.
+   - The same behaviour is a manager one day and a firefighter the next.
+   - The labels carry valence. They turn into identities and rankings ("I'm all firefighters").
+   - "Exile" pulls straight toward rule 1.
+   - This binds the app's copy only. A person may name a part "my firefighter". A glossary in *About
+     this* is fine.
+4. **Archetype names or numbered parts.** Naming is the therapeutic act. It is the affect-labelling
+   thesis the whole app rests on.
+   - Archetypes are Barnum-effect population guesses that pre-load content. "Inner Child" presupposes a
+     wounded exile. "The Critic" sets up an enemy before anyone has befriended it.
+   - Numbers dehumanise (MyPTSD users said so) and echo the labelling of alters in DID.
+   - A tension remains: the descriptive suggestions ("the one who hides") still put words in the mouth.
+     They stay because a blank field is hard for alexithymic users. A stricter version would cut them.
+5. **Creating a part automatically, or inferring a role.**
+   - Behaviour maps to parts many-to-many, and only the felt sense tells them apart.
+   - Within-person variance is 2–4× between-person variance (Fisher, Medaglia & Jeronimus 2018).
+   - 56.5% of students with a diagnosis felt their tracked data said something negative about them
+     (Kelley et al. 2017).
+   - The costs of a wrong guess are lopsided. A missed trail costs nothing; a wrong part costs trust and
+     self-concept. So the system proposes and the person decides (Horvitz 1999; the profile's rule 4).
+   - Roles are worse than parts: a part's intent is only knowable by asking it.
+6. **Naming a specific part in the moment.** This is rule 5 at the worst time: a guess made while the
+   person is blended, with no way to check it, where a wrong guess lands as invalidation.
+   - The generic line ("A part of you wants to hit back right now") gets Kross's self-distancing benefit
+     from the move the person just picked.
+   - Naming a known part in the heat invites judgement toward it, which is blending with a concerned part
+     the app can't catch.
+   - Could relax to a person-initiated "Who's here?" once Phase 3 data shows how tags are used.
+7. **Parts on check-in results or routing cards.**
+   - The result screen has one job, plus the crisis banner.
+   - The routing table is a reviewed clinical decision, made on a band the app no longer has.
+   - On `rumination_loop` it would add inward focus to a loop of inward focus.
+   - Frequency reifies: "meet the part behind this" on every result is *Inside Out*, not therapy.
+   - Revisit for steady, opted-in users once there is a flood signal.
+8. **An AI speaking as a part, or as the person's Self.**
+   - Voicing a part writes the person's inner life for them. Confabulation becomes self-knowledge, and
+     sycophancy plus suggestibility is the recovered-memory risk in new clothes. InnerPond saw persona
+     loops.
+   - Voicing Self replaces the capacity the method exists to build: a competitive cognitive artifact
+     instead of a complementary one (Barr, after Krakauer).
+   - Illinois and Nevada now restrict AI therapy.
+   - Allowed: the app witnessing *to* the person ("Part of you was keeping things safe").
+9. **Collections, streaks, "parts discovered" counts, shareable cards.**
+   - Collections reward inventory: fragmentation by incentive. Words can be collected because
+     granularity is the good; parts can't.
+   - Streaks punish the normal lapse and produce exactly the shame these protectors manage. The goblin-lab
+     spec already bans them.
+   - Shareable cards turn parts into identity content, and parts data is more sensitive than mood data.
+10. **Parts language by default.**
+    - It reaches the people it harms most, and the app can't screen for them (Twombly's clients who
+      didn't come back; Parry, Eve & Myers 2022; reality-testing concerns).
+    - For alexithymic users, parts can replace feeling words instead of building on them.
+    - This is the softest rule: default-off cuts reach. Two things would let it flip: a dissociation
+      screen Claudia is comfortable with (the same kind of clinical decision as the removed probe), and
+      co-design with dissociative and plural users.
 
 ---
 

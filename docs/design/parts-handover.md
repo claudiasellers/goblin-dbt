@@ -192,7 +192,7 @@ For the full thing read `parts.md`. The shape:
 
 ---
 
-## 6. Why the ten "Never" rules (Claudia asked; keep this with the spec)
+## 6. Why the ten "Never" rules (Claudia asked; now also `parts.md` → *Why never*)
 
 Firmness: 1, 2, 5, 8 are hard lines; 3, 4, 6, 9 firm positions; 7 holds until there's a flood signal;
 10 is a judgment call to test.
