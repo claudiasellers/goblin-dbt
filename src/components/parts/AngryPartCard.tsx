@@ -40,16 +40,22 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
   const [held, setHeld] = useState(false);
   const [tried, setTried] = useState(false);
   const [progress, setProgress] = useState(0);
+  // When the hold completes its button goes away: keyboard focus moves to what replaces it.
+  const justHeld = useRef(false);
+  const nextRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => { if (justHeld.current) { justHeld.current = false; nextRef.current?.focus(); } }, [held]);
   const hurt = hurts.find((h) => h.id === hurtId) ?? null;
   const c = useMemo(() => resolveAngryCopy(copy, { partsOn, name, hurt }), [copy, partsOn, name, hurt]);
   useEffect(() => { onStep?.(step); }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /** A new answer at "What it protects" is a new vote, so its hold starts fresh. */
   const pick = (id: string | null) => {
-    setHurtId(id);
-    setHeld(false);
-    setTried(false);
-    setProgress(0);
+    if (id !== hurtId) {
+      setHurtId(id);
+      setHeld(false);
+      setTried(false);
+      setProgress(0);
+    }
     setStep('vote');
   };
   const back = { protects: 'unblend', vote: 'protects', speak: 'vote' } as const;
@@ -92,9 +98,9 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
               : <p key={i} className={STAMP_LINE}>{line}</p>))}
           </div>
           {held
-            ? <button type="button" className={primaryButton} onClick={() => setStep('speak')}>{c.next}</button>
+            ? <button ref={nextRef} type="button" className={primaryButton} onClick={() => setStep('speak')}>{c.next}</button>
             : <HoldButton label={c.hold} ms={HOLD_MS} onProgress={setProgress}
-                onLetGo={() => setTried(true)} onComplete={() => { setHeld(true); buzz(30); }} />}
+                onLetGo={() => setTried(true)} onComplete={() => { justHeld.current = true; setHeld(true); buzz(30); }} />}
           {!held && tried && (
             <button type="button" className={linkButton} onClick={() => setStep('speak')}>Next</button>
           )}
