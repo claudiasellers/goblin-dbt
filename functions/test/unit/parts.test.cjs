@@ -1340,5 +1340,5 @@ test('queuePartCandidate: an id already the caller\'s writes nothing; QUEUED onl
   assert.match(C.CANDIDATE_QUERY, /WITH u WHERE NOT EXISTS \{ MATCH \(:PartCandidate \{key: \$key\}\) \}/);
   assert.match(C.CANDIDATE_QUERY, /\(ps:PartSession \{key: \$sessionKey\}\) WHERE \(ps\.status = 'open' OR \(ps\.status = 'saved' AND ps\.savedAt > datetime\(\) - duration\(\{hours: 12\}\)\)\)/,
     'GUARDS.PartSession.keep on the QUEUED edge');
-  assert.match(C.CANDIDATE_STATE_QUERY, /OPTIONAL MATCH \(ts\)-\[:DETAIL\]->\(ir:InvalidationRecoverySession\) WHERE ir\.ownerId = \$uid/, 'a DETAIL record read for the moves is the caller\'s own');
+  assert.match(C.CANDIDATE_STATE_QUERY, /OPTIONAL MATCH \(ts\)-\[:DETAIL\]->\(d\) WHERE d\.ownerId = \$uid/, 'a DETAIL record read for the moves is the caller\'s own');
 });
