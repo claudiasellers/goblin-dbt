@@ -155,6 +155,8 @@ export const POLICY_NOTES = {
   tooManyPartsCount: 'This many parts made (with the next number) shows "You don\'t need to get to know everyone at once."',
   tooManyPartsDays: '… within this many days.',
   nameMaxChars: 'The longest name a person can give a part.',
+  harmWindowDays: 'The harm signals (functions/src/parts/harm.ts, scripts/parts/report.cypher) look back this many days.',
+  tenderRepeatCount: 'This many tender / own-words stops, or not-Self endings, in that window is a harm signal (pauses offers, goes to review).',
 };
 
 const esc = (s) => String(s ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
