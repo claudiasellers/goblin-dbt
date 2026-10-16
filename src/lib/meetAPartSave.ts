@@ -19,6 +19,7 @@ import { handoffExt } from './bandStore';
 import { flowReady, stepOptions } from './partsContent';
 import { BLEND_ANSWERS, MEET_OPTION_STEP, MEET_PROMPTS, SHAPE_ROUNDS, UPDATE_NOT_YET, whatToSave, type MeetContext, type MeetSession, type MeetState, type MeetStep } from './meetAPart';
 import { vecToSig } from './partFigure';
+import { dueAtFor } from './spine/windows';
 
 /** Own words (voice, job, fear): the server's OWN_WORDS_MAX. */
 export const MEET_OWN_WORDS_MAX = 200;
@@ -273,4 +274,34 @@ export function isPaused(gate: PartsEntry | null, entry: MeetEntry): boolean {
 /** Where the last screen's Done goes: back to Me when the visit came from there, else home. */
 export function doneTarget(entry: MeetEntry): string {
   return entry.trailheadKind === 'me' || entry.trailheadKind === 'settings' ? '/profile' : '/';
+}
+
+/* ───────── the check-back question at the close ───────── */
+
+/** "Check back with it tomorrow?" (lane 2's part_checkback) and its two answers. */
+export const CHECKBACK_PROMPT = 'close_checkback';
+export const CHECKBACK_YES = 'close_checkback_yes';
+export const CHECKBACK_NO = 'close_checkback_no';
+export const CHECKBACK_TYPE = 'part_checkback';
+
+/** The bit of the spine's follow-up type the question needs (src/data/content/spine.json). */
+export interface CheckbackType { id: string; enabled: boolean; window: Record<string, unknown> }
+
+/**
+ * Whether the close asks "Check back with it tomorrow?": after the orienting close, when the visit kept
+ * a part or opened on one it already keeps (the server checks back with the session's part), its record
+ * is on the server, the copy ships and the follow-up type is enabled. Never after P2's "later", a danger
+ * ending, or for a paused part (the server refuses those anyway).
+ */
+export function offerCheckback(state: MeetState, o: { content: PartsContent; type: CheckbackType | null; opened: boolean; paused: boolean }): boolean {
+  if (state.step !== 'done' || state.later || state.session.danger || o.paused || !o.opened) return false;
+  if (state.session.kept !== true && !state.session.partId) return false;
+  if (!o.type || o.type.id !== CHECKBACK_TYPE || !o.type.enabled) return false;
+  return flowReady(o.content, [CHECKBACK_PROMPT], [CHECKBACK_YES, CHECKBACK_NO]);
+}
+
+/** The yes: lane 2's schedulePartCheckback for this visit's session, due in the type's window (tomorrow 10:00 local). */
+export function checkbackRequest(type: CheckbackType, id: string, sessionId: string, now: Date): { id: string; sessionId: string; dueAt: string } | null {
+  const due = dueAtFor(type.window, now);
+  return due ? { id, sessionId, dueAt: due.toISOString() } : null;
 }

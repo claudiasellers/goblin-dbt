@@ -347,7 +347,7 @@ UNDERNEATH_HELD = {
 # Prompts: (id, flow, step, copy). Order within a flow is list order.
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
 # close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
-# next-day check-back card), gate, settings, me (Parts of me)
+# next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me)
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -465,6 +465,16 @@ PROMPTS = [
     ("checkback_title", "checkback", "checkback", "How's {name} today?"),
     ("checkback_title_noname", "checkback", "checkback", "How's the part you met yesterday?"),
     ("close_checkback", "meet", "close", "Check back with it tomorrow?"),
+    # DEAR MAN cope ahead (parts.md, DEAR MAN row and Phase 3): one screen in prep, after "What makes
+    # this hard?" and before the script. A part's anchor is the person's own words or a line they kept.
+    ("cope_title", "dearman", "cope", "Who might show up in this conversation?"),
+    # Brief: "If {name} shows up: {anchor}". With {anchor} at its width (90, the person's own words or a
+    # kept line) that is 128 / 113 characters, over the prompt's 90, so the anchor is not a slot: the
+    # app draws it on its own line under this one, in the serif, never linted.
+    ("cope_anchor", "dearman", "cope", "If {name} shows up:"),
+    ("cope_anchor_noname", "dearman", "cope", "If that part shows up:"),
+    ("cope_set_anchor", "dearman", "cope", "What would help if {name} shows up?"),
+    ("cope_set_anchor_noname", "dearman", "cope", "What would help if that part shows up?"),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
     # The blending check (Claudia, 16 Oct: the flood signal at a parts flow's entry). It asks how close
@@ -749,6 +759,13 @@ OPTIONS = [
     opt("checkback_skip", "checkback", "checkback", "Skip", branch="end"),
     opt("close_checkback_yes", "meet", "close", "Yes", branch="checkback"),
     opt("close_checkback_no", "meet", "close", "No thanks", branch="end"),
+
+    # --- DEAR MAN cope ahead (one pick; Not sure / Skip go on and write nothing) ---
+    opt("cope_not_sure", "dearman", "cope", "Not sure"),
+    opt("cope_skip", "dearman", "cope", "Skip"),
+    opt("cope_own", "dearman", "cope", "In my words", branch="own_words"),
+    opt("cope_change", "dearman", "cope", "Change it"),
+    opt("cope_save", "dearman", "cope", "Save"),
 
     # --- Gates ---
     opt("far_away_look", "gate", "dissociation", "Look around the room first", branch="grounding"),

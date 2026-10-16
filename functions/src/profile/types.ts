@@ -14,7 +14,7 @@ export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'crisisKit', 'safetyPlan', 'country',
-  'parts', 'partDetail',
+  'parts', 'partDetail', 'partAnchors',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
@@ -44,7 +44,8 @@ export interface ProfileSlices {
     id: string; text: string; emotionIds: string[]; situationId: string | null; moment: string | null;
     uses: number; lastUsedAt: string | null; meta: ProfileItemMeta;
   }>;
-  savedLines: Array<{ lineId: string; confirmedAt: string | null }>;
+  /** Witness lines the user kept (SAVED_LINE), newest first; `text` as the corpus has it. */
+  savedLines: Array<{ lineId: string; text: string; confirmedAt: string | null }>;
   people: never[];
   bodyFlags: null;
   values: never[];
@@ -76,6 +77,11 @@ export interface ProfileSlices {
     fearIds: string[]; ownFear: string | null; preferredRoleIds: string[]; anchorLineId: string | null; places: string[];
     shapeSig: number[] | null; hurtIds: string[];
   }>;
+  /**
+   * DEAR MAN's cope ahead: part id → its anchor, the person's own words (`anchorOwn`) or the text of
+   * the kept line it points at (`anchorLineId`). Parts without one, or whose line is no longer kept, are absent.
+   */
+  partAnchors: Record<string, string>;
 }
 
 /**
@@ -91,6 +97,7 @@ export const PROFILE_NEEDS = {
   'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)
   'witness': ['name', 'ownLines', 'savedLines'],
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
+  'dear-man': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // Phase 3 cope ahead (parts slices empty while off); never partDetail
   // "Was this a part you know?" after a better close (PartTagSlot, in SessionClose or the tool's own
   // close): every tool whose close asks then-vs-now (src/lib/partTag.ts TAG_ROW_TOOLS) reads `parts`.
   'five-senses': ['parts'],

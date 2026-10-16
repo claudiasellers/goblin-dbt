@@ -23,7 +23,7 @@ const AUTHED = [
   'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
   'tagPart',
-  'schedulePartCheckback', 'answerPartCheckback',
+  'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in

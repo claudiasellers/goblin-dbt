@@ -31,6 +31,27 @@ test('getProfileContext rejects unknown and server-only consumers', async () => 
   }
 });
 
+test('dear-man reads parts (with shapeSig), kept lines (with text) and partAnchors, never partDetail', async () => {
+  const f = fakeDriver((q) => {
+    if (/profileVersion/.test(q)) return [{ v: 5 }];
+    if (/AS text/.test(q) && /anchorLineId/.test(q)) return [{ partId: 'p1', text: 'breathe first' }, { partId: 'p2', text: null }];
+    if (/\[:USES\]/.test(q)) return [{ p: { id: 'p1', kind: 'part', area: 'my_parts', status: 'active', source: 'made', name: 'the hider', shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5] }, moveIds: [] }];
+    if (/SAVED_LINE/.test(q)) return [{ lineId: 'wit_l1', text: 'That sounds hard.', confirmedAt: '2026-10-01T00:00:00Z' }];
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'dear-man' } });
+  assert.deepEqual(Object.keys(out.slices), ['parts', 'ownLines', 'savedLines', 'partAnchors']);
+  assert.deepEqual(out.slices.partAnchors, { p1: 'breathe first' });
+  assert.deepEqual(out.slices.parts[0].shapeSig, [0.1, 0.2, 0.3, 0.4, 0.5]);
+  assert.deepEqual(out.slices.savedLines, [{ lineId: 'wit_l1', text: 'That sounds hard.', confirmedAt: '2026-10-01T00:00:00Z' }]);
+  assert.ok(!f.calls.some((c) => /GUARDS|fearIds/.test(c.query)), 'no partDetail');
+  // Parts off: the gated queries return nothing.
+  setDriver(fakeDriver((q) => (/profileVersion/.test(q) ? [{ v: 5 }] : [])).driver);
+  const off = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'dear-man' } });
+  assert.deepEqual([off.slices.parts, off.slices.partAnchors], [[], {}]);
+});
+
 test('quiet hours slice (today) parses the fact and computes still-true', async () => {
   setDriver(fakeDriver((q) => (/ProfileFact \{kind: 'quiet_hours'/.test(q)
     ? [{ p: { id: 'quiet_hours', kind: 'quiet_hours', area: 'my_body', status: 'active', source: 'user', valueJson: '{"start":"22:00","end":"07:00"}', confirmedAt: '2026-01-01T00:00:00Z', revisitAt: '2026-02-01T00:00:00Z' } }]
