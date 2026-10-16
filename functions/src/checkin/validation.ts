@@ -73,7 +73,16 @@ export interface SaveCheckInInput {
   resultShown: boolean;
   nextAction: CheckInNextAction | null;
   embeddedToolSessionIds: string[];
+  /** 2–3 places on the feeling square with the words picked at each (null: one place, or not the grid). */
+  spots: SpotInput[] | null;
 }
+
+/** One place on the feeling square (0–1 each way) and the emotion ids of the words picked there. */
+export interface SpotInput { x: number; y: number; emotionIds: string[] }
+
+export const MIN_SPOTS = 2;
+export const MAX_SPOTS = 3;
+export const MAX_SPOT_EMOTIONS = 8;
 
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === 'object' && !Array.isArray(v);
 const num01 = (v: unknown, dflt: number): number => (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1 ? v : dflt);
@@ -132,6 +141,35 @@ export const LEGACY_REGIONS: Record<string, [string, 'left' | 'right' | null]> =
   'Left Calf': ['legs', 'left'], 'Right Calf': ['legs', 'right'],
   'Left Foot': ['feet', 'left'], 'Right Foot': ['feet', 'right'],
 };
+
+/**
+ * The square's spots, only when there are 2–3 of them. All or nothing: any bad spot (a coordinate
+ * outside 0–1, no words, more than 8, a malformed id) drops the whole field, never the save.
+ */
+export function parseSpots(raw: unknown): SpotInput[] | null {
+  if (!Array.isArray(raw) || raw.length < MIN_SPOTS || raw.length > MAX_SPOTS) return null;
+  const out: SpotInput[] = [];
+  for (const s of raw) {
+    if (!isObj(s)) return null;
+    const { x, y, emotionIds } = s;
+    if (typeof x !== 'number' || !Number.isFinite(x) || x < 0 || x > 1) return null;
+    if (typeof y !== 'number' || !Number.isFinite(y) || y < 0 || y > 1) return null;
+    if (!Array.isArray(emotionIds) || emotionIds.length < 1 || emotionIds.length > MAX_SPOT_EMOTIONS) return null;
+    if (!emotionIds.every((e) => typeof e === 'string' && GRAPH_ID.test(e))) return null;
+    out.push({ x, y, emotionIds: [...new Set(emotionIds as string[])] });
+  }
+  return out;
+}
+
+/**
+ * The stored `CheckIn.spotsJson`: each spot keeps only ids that exist as Emotion nodes. A spot left
+ * with none drops the whole field (a spot without its words says nothing about two feelings at once).
+ */
+export function spotsJson(spots: SpotInput[] | null, known: ReadonlySet<string>): string | null {
+  if (!spots) return null;
+  const kept = spots.map((s) => ({ ...s, emotionIds: s.emotionIds.filter((e) => known.has(e)) }));
+  return kept.every((s) => s.emotionIds.length > 0) ? JSON.stringify(kept) : null;
+}
 
 function sensation(raw: unknown): SensationInput | null {
   if (!isObj(raw)) return null;
@@ -200,6 +238,7 @@ export function validateSaveCheckIn(raw: unknown, now: Date): SaveCheckInInput {
     resultShown: raw.resultShown === true,
     nextAction: parseNextAction(raw.nextAction),
     embeddedToolSessionIds: ids(raw.embeddedToolSessionIds, UUID, 3),
+    spots: parseSpots(raw.spots),
   };
 }
 

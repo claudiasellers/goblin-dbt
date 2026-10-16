@@ -45,6 +45,8 @@ export interface SaveCheckInRequest {
   resultShown?: boolean;
   nextAction?: CheckInNextAction;
   embeddedToolSessionIds?: string[];
+  /** Two or three places on the feeling square at once, each with its own words (grid only). */
+  spots?: Array<{ x: number; y: number; emotionIds: string[] }>;
 }
 
 /** The parts of a StateResult the payload reads (structural, so tests can pass plain objects). */
@@ -71,6 +73,8 @@ export interface CheckInState {
   capacity?: CapacityReading | null;
   discriminatingAnswers?: Array<{ questionId: string; responseId: string }>;
   embeddedToolSessionIds?: string[];
+  /** The square's spots (grid check-ins): sent only when two or more hold words. */
+  spots?: Array<{ point: { x: number; y: number } | null; words: string[] }>;
 }
 
 /** Display names and suggestion ids → graph emotion ids (unknown names dropped; the server re-checks). */
@@ -84,6 +88,23 @@ export function emotionIdsFor(emotions: string[], known: string[] = []): string[
   return [...out];
 }
 
+/** The server keeps 2–3 spots of 1–8 ids each, and drops the whole field otherwise. */
+const MAX_SPOTS = 3;
+const MAX_SPOT_IDS = 8;
+
+/**
+ * Which words sat in which spot, when the square held two or more feelings at once. Spots with no
+ * point or no known word don't count; one spot sends nothing (its words are the check-in's).
+ */
+export function spotsFor(spots: CheckInState['spots']): SaveCheckInRequest['spots'] {
+  const filled = (spots ?? [])
+    .flatMap(({ point, words }) => {
+      const emotionIds = emotionIdsFor(words).slice(0, MAX_SPOT_IDS);
+      return point && emotionIds.length > 0 ? [{ x: point.x, y: point.y, emotionIds }] : [];
+    })
+    .slice(0, MAX_SPOTS);
+  return filled.length >= 2 ? filled : undefined;
+}
 
 /**
  * The save for a check-in whose result rendered (`result` set) or whose analysis failed (null).
@@ -104,6 +125,8 @@ export function buildCheckInPayload(s: CheckInState, result: ResultLike | null, 
   if (s.capacity) req.capacity = s.capacity;
   if (s.discriminatingAnswers?.length) req.discriminatingAnswers = s.discriminatingAnswers;
   if (s.embeddedToolSessionIds?.length) req.embeddedToolSessionIds = s.embeddedToolSessionIds;
+  const spots = s.source === 'grid' ? spotsFor(s.spots) : undefined;
+  if (spots) req.spots = spots;
   if (result) {
     req.resultShown = true;
     req.activationPatternId = result.pattern.id;
