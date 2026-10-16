@@ -132,7 +132,10 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
          ts.thenVsNowDir = CASE WHEN ts.answeredAt IS NULL THEN $thenVsNowDir ELSE ts.thenVsNowDir END,
          ts.actedOnUrge = CASE WHEN ts.answeredAt IS NULL THEN $actedOnUrge ELSE ts.actedOnUrge END,
          ts.answeredAt = CASE WHEN ts.answeredAt IS NULL AND $answered THEN datetime() ELSE ts.answeredAt END,
-         ts.urgeIds = $urgeIds, ts.durationSec = $durationSec, ts.ext = $ext, ts.updatedAt = datetime()
+         ts.urgeIds = $urgeIds, ts.durationSec = $durationSec, ts.ext = $ext, ts.updatedAt = datetime(),
+         // Emotions picked inside the tool: set once, never over a hand-off's ids from the start.
+         ts.emotionIds = CASE WHEN size(coalesce(ts.emotionIds, [])) = 0 AND size($emotionIds) > 0
+                              THEN $emotionIds ELSE ts.emotionIds END
      FOREACH (_ IN CASE WHEN $bandAtEnd IS NULL THEN [] ELSE [1] END |
        SET ts.bandAtEnd = $bandAtEnd, ts.bandAtEndSource = $bandAtEndSource, ts.bandAtEndViaCantTell = $bandAtEndViaCantTell,
            ts.bandAtEndAt = datetime($bandAtEndAt), ts.bandAtEndJson = $bandAtEndJson)
@@ -150,7 +153,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
     {
       uid, key, status: c.status, exitStep: c.exitStep, practiced: c.practiced,
       thenVsNow, thenVsNowDir: thenVsNow ? dir : null, actedOnUrge, answered,
-      urgeIds: c.urgeIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
+      urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
       ...readingProps('bandAtStart', c.bandAtStart),
       detailKey: c.detail ? userKey(uid, c.detail.id) : null, detailLabel,
       legacyOutcome: legacyOutcome(thenVsNow),

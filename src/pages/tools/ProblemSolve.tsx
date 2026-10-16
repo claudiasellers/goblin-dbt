@@ -109,6 +109,8 @@ export function ProblemSolve() {
     if (confidenceLevel && CONFIDENCE_LEVELS.includes(confidenceLevel)) er.confidence = confidenceLevel;
     if (Object.keys(er).length) session.setExt({ er });
   }, [selectedProblemTypes, selectedDirection, chosenSize, selectedBarrier, selectedSubResponse, selectedAmbivalence, confidenceLevel, session]);
+  // The emotions picked here are the session's when it opened without any (a hand-off's are kept).
+  useEffect(() => { session.setEmotionIds(selectedEmotionIds); }, [selectedEmotionIds, session]);
 
   // ── Load content ──
 

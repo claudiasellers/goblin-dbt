@@ -49,6 +49,11 @@ export interface ToolSessionApi {
   setBandAtStart(r: CapacityReading): void;
   /** The skills this visit practised, when not the tool's PracticeSkill.defaultFor (e.g. Cool Down's exhale). */
   setSkillIds(ids: string[]): void;
+  /**
+   * Emotions the person picked inside the tool (ids or display names). Sent at close; the server
+   * keeps them only when the session started without any (a hand-off's are never replaced).
+   */
+  setEmotionIds(ids: string[]): void;
   /** Close once (later calls resolve null). Resolves null when nothing was written. */
   close(input?: ToolSessionCloseInput): Promise<CloseToolSessionResponse | null>;
   /** Route + state for handing off to another tool from inside this one. */
@@ -67,6 +72,7 @@ export const NO_SESSION: ToolSessionApi = {
   setExt: () => {},
   setBandAtStart: () => {},
   setSkillIds: () => {},
+  setEmotionIds: () => {},
   close: async () => null,
   linkTo: (toolId, state) => ({ pathname: `/tool/${toolId}`, state: { ...state, spine: { entry: 'handoff' } } }),
 };

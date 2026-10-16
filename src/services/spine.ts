@@ -31,6 +31,8 @@ export interface CloseToolSessionRequest {
   bandAtStart?: CapacityReading;
   bandAtEnd?: CapacityReading;
   urgeIds?: string[];
+  /** Emotions picked inside the tool (set once, only if the start had none). */
+  emotionIds?: string[];
   durationSec?: number;
   detail?: { kind: DetailKind; id: string };
   skillIds?: string[];

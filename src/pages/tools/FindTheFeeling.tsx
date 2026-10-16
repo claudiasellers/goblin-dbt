@@ -17,6 +17,7 @@ import { recordToolSession } from '../../services/spine';
 import { thenVsNowFromFtf } from '../../lib/band';
 import { useBand } from '../../hooks/useBand';
 import { newId } from '../../lib/spine/ids';
+import { sessionEmotionIds } from '../../lib/spine/toolLink';
 import type { RoomProps } from '../../components/tools/findTheFeeling/roomTypes';
 
 // Rooms carry three.js / Web Audio: loaded only when the tool opens, one room at a time.
@@ -93,13 +94,17 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   if (!sessionId.current) sessionId.current = newId();
   const savedFor = useRef<string | null>(null);
   const toolSession = useToolSession();
+  // The word found here is the session's emotion when it opened without any (a hand-off's are kept).
+  useEffect(() => { toolSession.setEmotionIds(state.word ? [state.word] : []); }, [state.word, toolSession]);
   /** PR-S4: link the run to its spine session once the FTF session is saved (DETAIL needs it). */
   const wrap = (embedId: string | null) => {
     const detail = { kind: 'find_the_feeling' as const, id: sessionId.current };
     const skills = state.word ? {} : { skillIds: [] as string[] }; // a rep of `label` only when a word was accepted
     if (embedId) {
       // Inside the check-in there is no tool page: a one-shot embedded session the check-in links to.
-      void recordToolSession({ id: embedId, toolId: 'find-the-feeling', entry: 'embedded', status: 'completed', detail, ...skills })
+      const emotionIds = state.word ? sessionEmotionIds([state.word]) : [];
+      void recordToolSession({ id: embedId, toolId: 'find-the-feeling', entry: 'embedded', status: 'completed', detail, ...skills,
+        ...(emotionIds.length ? { emotionIds } : {}) })
         .catch(() => { /* best effort */ });
       return;
     }

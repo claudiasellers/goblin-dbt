@@ -67,6 +67,9 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
 
   const [history, dispatch] = useReducer(flowReducer, undefined, initialHistory);
   const { step, data: d } = history.stack[history.stack.length - 1];
+  // The word picked for the feeling is the session's emotion when it opened without any.
+  const toolSession = useToolSession();
+  useEffect(() => { toolSession.setEmotionIds(d.emotionId ? [d.emotionId] : []); }, [d.emotionId, toolSession]);
   /** Answers from the screen the user just went Back from: prefill only, never committed data. */
   const pre = history.prefill;
   const state = states.find(s => s.id === d.stateId) ?? null;

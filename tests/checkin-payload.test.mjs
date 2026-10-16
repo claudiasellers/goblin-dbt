@@ -107,6 +107,17 @@ test("server validator: spots are 2–3, coordinates in 0–1, 1–8 ids each; a
   assert.equal(v.spotsJson(null, new Set(["anxious"])), null);
 });
 
+test("tool sessions carry emotion ids from the link: display names and ids both read, capped at 20 (parts data fix 5)", () => {
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: ["Anxious", "Overwhelmed"] }), ["anxious", "overwhelmed"]);
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: ["hurt", "let_down"] }), ["hurt", "let_down"], "a tool's hand-off sends ids");
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: ["Not A Feeling", 7, "", null, "Hurt"] }), ["hurt"]);
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: "Anxious" }), []);
+  assert.deepEqual(link.emotionIdsFromLink(null), []);
+  assert.deepEqual(link.emotionIdsFromLink({}), []);
+  assert.equal(link.sessionEmotionIds(Array.from({ length: 30 }, (_, i) => `e${i}`)).length, 20);
+  assert.deepEqual(link.sessionEmotionIds(["a".repeat(101), "hurt"]), ["hurt"], "never an id the server refuses");
+});
+
 test("tool links keep the legacy state and add spine.checkInId", () => {
   assert.deepEqual(link.fromCheckIn(ID, ["Anxious"], "acute_alarm"),
     { checkinEmotions: ["Anxious"], activationPatternId: "acute_alarm", spine: { entry: "checkin_result", checkInId: ID } });

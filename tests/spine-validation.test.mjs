@@ -86,6 +86,15 @@ test("ext er: Problem Solve keeps what got in the way as ids (parts data fix 2)"
   assert.throws(() => ext.validateExt({ er: { barrierText: "x" } }), /not registered/);
 });
 
+test("close: emotion ids picked in the tool are ids only, at most 20; none given is []", () => {
+  assert.deepEqual(v.validateClose({ id: ID, status: "completed", emotionIds: ["hurt", "anxious", "hurt"] }, now).emotionIds, ["hurt", "anxious"]);
+  assert.deepEqual(v.validateClose({ id: ID, status: "completed" }, now).emotionIds, []);
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", emotionIds: ["I feel awful"] }, now));
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", emotionIds: Array.from({ length: 21 }, (_, i) => `e${i}`) }, now));
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", emotionIds: "hurt" }, now));
+  assert.deepEqual(v.validateStart({ id: ID, toolId: "problem-solve", emotionIds: ["hurt"] }, now).emotionIds, ["hurt"]);
+});
+
 test("record = start + close with the registry's close kind", () => {
   const { start, close: c } = v.validateRecord({ id: ID, toolId: "guided-activity", entry: "checkin_result", status: "exited_early", ext: { core: { activityId: "shake-out" } } }, now);
   assert.equal(start.toolId, "guided-activity");
