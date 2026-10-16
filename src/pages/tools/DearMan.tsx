@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
 import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
@@ -27,6 +27,9 @@ import { handoffExt, makeReading } from '../../lib/bandStore';
 import { dropResumeToken, peekResumeToken } from '../../lib/resumeToken';
 import { scheduleResumeLater } from '../../services/capacity';
 import { dearManDraftOf, dearManStepFromId, dearManStepId, isDearManDraft, TOO_MUCH_PHASES, type DearManDraft, type DearManStep } from '../../lib/dearManResume';
+import { feelingEmotionWords, feelingLabel, hurtFeelingChip } from '../../lib/dearManHurt';
+import { getPartsContent } from '../../services/partsContent';
+import type { PartsHurt } from '../../data/partsContentTypes';
 
 type Phase =
   | 'entry'
@@ -285,6 +288,20 @@ export function DearMan() {
   useEffect(() => { loadContent(); }, [loadContent]);
   useEffect(() => { band.load(); }, [band]);
 
+  // Recover's angry-part card: the hurt picked there is the first "I felt" chip, not selected. The
+  // shipped parts content is read only when a hurt is in play (a hand-off's, or one a resumed draft
+  // saved); otherwise Express is exactly as it was.
+  const [partsHurts, setPartsHurts] = useState<PartsHurt[] | null>(null);
+  const hurtInPlay = Boolean(handoff?.hurtId)
+    || Boolean(content && feelings.some(id => !content.feelingChips.some(f => f.id === id)));
+  useEffect(() => {
+    if (!hurtInPlay || partsHurts) return;
+    let live = true;
+    getPartsContent().then(p => { if (live) setPartsHurts(p.hurts); }).catch(() => { /* no chip */ });
+    return () => { live = false; };
+  }, [hurtInPlay, partsHurts]);
+  const hurtChip = useMemo(() => hurtFeelingChip(handoff?.hurtId, partsHurts, feelings), [handoff, partsHurts, feelings]);
+
   // ── Pre-fill feelings from check-in emotions ──
   useEffect(() => {
     if (content && checkinEmotions?.length) {
@@ -300,10 +317,11 @@ export function DearMan() {
   // The session's emotions when it opened without any: Recover's word (its hand-over carries no
   // checkinEmotions) and the Express feelings, matched to graph words by label (chips that aren't
   // a graph word, e.g. "Small", are dropped).
+  // The hurt chip counts as its NAMED_AS Emotion ids.
   useEffect(() => {
-    const labels = content ? feelings.map(id => content.feelingChips.find(f => f.id === id)?.label ?? '') : [];
+    const labels = content ? feelingEmotionWords(feelings, content.feelingChips, hurtChip) : [];
     session.setEmotionIds([...(handoff?.emotionId ? [handoff.emotionId] : []), ...labels]);
-  }, [content, feelings, handoff, session]);
+  }, [content, feelings, handoff, session, hurtChip]);
 
   // ── Resolve quadrant from debrief feelings and trigger analysis ──
   useEffect(() => {
@@ -539,7 +557,7 @@ export function DearMan() {
 
   // Resolve selected feelings for summary
   const resolveFeelings = () => {
-    const labels = feelings.map(id => resolveLabel(id, content.feelingChips)).filter(Boolean);
+    const labels = feelings.map(id => feelingLabel(id, content.feelingChips, partsHurts)).filter(Boolean);
     if (feelingCustom.trim()) labels.push(feelingCustom.trim());
     return labels;
   };
@@ -965,6 +983,13 @@ export function DearMan() {
           <BackButton />
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How does this make you feel?</h3>
           <p className="text-[var(--color-text-secondary)]">Tap all that apply.</p>
+
+          {/* The hurt named in Recover, first and not selected: its words alone */}
+          {hurtChip && (
+            <div className="flex flex-wrap gap-2">
+              {renderFeelingChip({ id: hurtChip.id, label: hurtChip.label }, feelingGroupColors.neutral)}
+            </div>
+          )}
 
           {/* Mirroring — an example of what this situation typically brings up */}
           {mirror && (

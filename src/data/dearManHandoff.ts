@@ -24,7 +24,15 @@ export interface DearManHandoff {
   oneMessageOnly: boolean;
   /** Legacy: wait-lock copy from the recovery flow. Unused by DEAR MAN since the plan lock was removed. */
   waitCopy?: WaitLockCopy;
+  /**
+   * The ProtectedHurt id picked on Recover's angry-part card. Absent after "Not sure" or "Not now", or
+   * when no card showed. DEAR MAN offers its felt phrase as the first "I felt" chip (src/lib/dearManHurt.ts).
+   */
+  hurtId?: string;
 }
+
+/** A graph id (ProtectedHurt ids are snake_case). */
+const GRAPH_ID = /^[a-z][a-z0-9_]{0,63}$/;
 
 export function isDearManHandoff(v: unknown): v is DearManHandoff {
   if (!v || typeof v !== 'object') return false;
@@ -34,5 +42,6 @@ export function isDearManHandoff(v: unknown): v is DearManHandoff {
     && typeof h.needLabel === 'string' && typeof h.intensity === 'number'
     && typeof h.waitMinutes === 'number' && typeof h.oneMessageOnly === 'boolean'
     && (h.band === undefined || h.band === 'steady' || h.band === 'stirred' || h.band === 'flooded')
-    && (h.bandAt === undefined || (typeof h.bandAt === 'string' && !Number.isNaN(Date.parse(h.bandAt))));
+    && (h.bandAt === undefined || (typeof h.bandAt === 'string' && !Number.isNaN(Date.parse(h.bandAt))))
+    && (h.hurtId === undefined || (typeof h.hurtId === 'string' && GRAPH_ID.test(h.hurtId)));
 }
