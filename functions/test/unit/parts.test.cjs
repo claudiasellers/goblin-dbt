@@ -168,6 +168,58 @@ test('partsEnabled: updateUserProfile writes a boolean and rejects anything else
   }
 });
 
+// ------------------------------------------------------------------ deleteMyParts
+
+const { PARTS_LABELS, PARTS_FOLLOW_UP_TYPES } = require('../../lib/parts/delete');
+const { USER_DATA } = require('../../lib/userdata/layers');
+
+test('PARTS_LABELS: every registered parts label, nothing else (later phases join by registering)', () => {
+  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartSession']);
+  const partsLike = Object.keys(USER_DATA).filter((l) => /^(Part|Den|Trail)/.test(l));
+  assert.deepEqual([...PARTS_LABELS].sort(), partsLike.sort(), 'a registered parts label deleteMyParts would miss');
+  for (const l of ['ToolSession', 'CheckIn', 'FollowUp', 'SkillPractice', 'ProfileFact', 'OwnLine']) assert.ok(!PARTS_LABELS.includes(l), l);
+});
+
+test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one write, counts only; parts off too', async () => {
+  const counts = { Part: 2, PartSession: 3, PartCandidate: 0 };
+  const f = fakeDriver((q) => {
+    const label = /MATCH \(n:(\w+) \{ownerId: \$uid\}\)/.exec(q)?.[1];
+    if (label) return [{ n: counts[label] }];
+    if (/MATCH \(f:FollowUp \{ownerId: \$uid\}\)/.test(q)) return [{ n: 1 }];
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.deleteMyParts.run({ auth: auth('u7'), data: {} });
+  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, FollowUp: 1 } });
+  assert.equal(f.sessions.length, 1, 'one transaction');
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
+  for (const c of f.calls) {
+    assert.equal(c.params.uid, 'u7');
+    assert.doesNotMatch(c.query, /partsEnabled/, 'works with parts off');
+    assert.doesNotMatch(c.query, /ToolSession|CheckIn|SkillPractice|PatternOffer/, 'never touches other records');
+  }
+  const deletes = f.calls.filter((c) => /DETACH DELETE/.test(c.query));
+  assert.equal(deletes.length, 4);
+  const fu = f.calls.find((c) => /FollowUp/.test(c.query));
+  assert.match(fu.query, /WHERE f\.type IN \$types AND f\.status = 'scheduled'/, 'open parts follow-ups only');
+  assert.deepEqual(fu.params.types, PARTS_FOLLOW_UP_TYPES);
+  assert.ok(f.calls.some((c) => /u\.profileVersion = coalesce\(u\.profileVersion, 0\) \+ 1/.test(c.query)), 'cached slices drop the deleted parts');
+  assert.ok(f.allClosed());
+
+  // Nothing kept: nothing deleted, no profile version bump.
+  const g = fakeDriver((q) => (/RETURN size/.test(q) ? [{ n: 0 }] : []));
+  setDriver(g.driver);
+  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, FollowUp: 0 });
+  assert.ok(!g.calls.some((c) => /profileVersion/.test(c.query)));
+});
+
+test('deleteMyParts needs sign-in (before any query)', async () => {
+  const f = fakeDriver();
+  setDriver(f.driver);
+  await assert.rejects(fns.deleteMyParts.run({ data: {} }), (e) => e.code === 'unauthenticated');
+  assert.equal(f.calls.length, 0);
+});
+
 // ------------------------------------------------------------------ Meet a part's session record
 
 const { validateStartPartSession, validateSavePartSession, mergeStepIds, OWN_WORDS_MAX } = require('../../lib/parts/validation');

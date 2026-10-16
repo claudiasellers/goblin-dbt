@@ -452,6 +452,12 @@ PROMPTS = [
     ("settings_off", "settings", "switch", "It stays off unless you turn it on, and you can turn it off any time."),
     ("settings_about_1", "settings", "about", "Draws on ideas from Internal Family Systems, developed by Richard Schwartz."),
     ("settings_about_2", "settings", "about", "Not affiliated with or endorsed by the IFS Institute."),
+    # Delete my parts (parts.md "Deleting"): its own confirmed step; turning parts off deletes nothing
+    ("settings_delete", "settings", "delete", "Delete your parts"),
+    ("settings_delete_confirm", "settings", "delete", "This deletes the parts you've kept and what you've said about them. It can't be undone."),
+    ("settings_delete_yes", "settings", "delete", "Delete them"),
+    ("settings_delete_no", "settings", "delete", "Keep them"),
+    ("settings_delete_done", "settings", "delete", "Deleted."),
 ]
 
 # Prompts in the person's own voice: the sentence they might say, so its "I" is theirs. Linted as

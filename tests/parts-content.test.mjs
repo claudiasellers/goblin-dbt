@@ -332,3 +332,20 @@ test("stale edges: each parts edge type is cleared, scoped to both ends, before 
   // Every DELETE names its target label, so it can only touch the edges this file writes.
   for (const s of stmts.filter((x) => /\bDELETE\b/.test(x))) assert.match(s, /^MATCH \((:\w+)?\)-\[r:[A-Z_|]+\]->\(:\w+\) DELETE r$/, s);
 });
+
+test("settings: the switch, about and Delete your parts prompts exist as drafts in the settings flow", () => {
+  const want = {
+    switch: ["settings_label", "settings_blurb", "settings_dissociation", "settings_off"],
+    about: ["settings_about_1", "settings_about_2"],
+    delete: ["settings_delete", "settings_delete_confirm", "settings_delete_yes", "settings_delete_no", "settings_delete_done"],
+  };
+  for (const [step, ids] of Object.entries(want)) {
+    for (const id of ids) {
+      const p = fixture.prompts[id];
+      assert.ok(p, `${id} missing`);
+      assert.deepEqual([p.flow, p.step], ["settings", step], id);
+      assert.ok(p.copy.trim(), `${id}: no copy`);
+      assert.equal(p.reviewStatus, "draft", `${id}: signed off? Then update this pin with the sign-off`);
+    }
+  }
+});

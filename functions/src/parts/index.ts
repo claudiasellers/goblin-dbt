@@ -14,6 +14,8 @@ import { validateStartPartSession } from './validation';
 import { sessionDeps } from './sessionQueries';
 import type { PartSessionResponse } from './sessionTypes';
 
+export { deleteMyParts } from './delete';
+
 /** What a parts flow opens on: P2 first, the far-away heads-up, or clear. Never a lock. */
 export const getPartsEntry = callable<unknown, PartsEntry>(
   { auth: 'required', label: 'getPartsEntry' },

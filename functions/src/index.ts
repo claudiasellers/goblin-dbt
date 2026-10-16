@@ -29,3 +29,4 @@ export {
   answerPatternOffer,
 } from './profile';
 export { getPartsEntry, startPartSession, savePartSession } from './parts';
+export { deleteMyParts } from './parts';
