@@ -1,27 +1,62 @@
 /**
  * Dev-only harness for the parts proposal (docs/design/parts.md): Meet a part, the den, the part card
  * and a trail offer, in the app's own rooms, chips, Shape object (SvgBlob), heat figure and P2 overlay.
- * Fixture content only (dev/parts-fixture.ts, draft copy); no Firebase, no graph. Not part of the app build.
+ * Every move, prompt and option comes from tests/fixtures/parts-content.json (generated from
+ * scripts/parts/content.py by scripts/parts/fixture.py; drafts, not signed off); the invented person is
+ * dev/parts-example.ts; the close is the spine's own copy. No Firebase, no graph. Not part of the app build.
  *   npm run dev, then open http://localhost:5173/dev/parts.html
  *   or: npx vite build --config dev/vite.harness.config.ts && (cd dev-dist && python3 -m http.server 4321)
- * URL params: ?view=meet|den|card|offer &move=hide|chase|hit_back|keep_the_peace|turn_on_myself
+ * URL params: ?view=meet|den|card|offer &move=hide|chase|hit_back|keep_the_peace|turn_on_myself|…
  *   &palette=velvet|dusk|tinted|pastel|pastel-mix|daylight &theme=dark|light
+ *   &blend=1 shows the blend check before Meet a part (pending the flood-signal decision)
  */
 import { StrictMode, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../src/index.css';
 import fixture from '../tests/fixtures/capacity-content.json';
+import partsFixture from '../tests/fixtures/parts-content.json';
+import spineFile from '../src/data/content/spine.json';
 import type { CapacityContent } from '../src/data/capacityTypes';
 import { BandProvider } from '../src/contexts/BandContext';
 import { TooMuchLink } from '../src/components/capacity/TooMuchLink';
+import { CrisisBanner } from '../src/components/safety/CrisisBanner';
 import { HeatFigure, type FigureMark } from '../src/components/checkin/body/HeatFigure';
 import { REGIONS, type RegionId } from '../src/data/bodyFigure';
 import { SvgBlob } from '../src/components/tools/findTheFeeling/shape/SvgBlob';
 import { DIMS, fromVec, variant, type Feel } from '../src/components/tools/findTheFeeling/shape/feel';
-import {
-  AGES, BY_MOVE, CAN_NOW, CLOSE, FEEL_TOWARD, LIKES, MOVES, OFFER, PARTS, PROMPTS, SNAPSHOTS, UNBLEND, UPDATE,
-  type ExamplePart, type MoveId, type Option, type Quadrant,
-} from './parts-fixture';
+import { OFFER, PARTS, SNAPSHOTS, type ExamplePart, type MoveId, type Quadrant } from './parts-example';
+
+/* ───────── parts content (the generated fixture: what a future getPartsContent would return) ───────── */
+
+interface Move { id: MoveId; label: string; unblendPhrase: string; trailPhrase: string; nameHint: string; kind: string; safetyLine: boolean; order: number }
+interface Option {
+  id: string; label: string; kind: 'chip' | 'voice'; flag: 'tender' | 'danger' | null; selfLike: boolean | null;
+  branch: string; order: number; moves: MoveId[]; pending?: string;
+}
+interface Hurt { id: string; label: string; hurtPhrase: string; feltPhrase: string; order: number; guardedBy: { moveId: MoveId; rank: number }[] }
+interface PartsContent {
+  version: string; moves: Move[]; prompts: Record<string, { flow: string; step: string; copy: string; pending?: string }>;
+  options: Record<string, Record<string, Option[]>>; hurts: Hurt[];
+  trailRules: { id: string; statementTemplate: string }[]; contexts: { id: string; phrase: string }[];
+  policy: { maxNonSelfAnswers: number; nameMaxChars: number };
+}
+interface CloseKind { question: string; choices: { id: string; label: string }[] }
+const PC = partsFixture as unknown as PartsContent;
+const SPINE = (spineFile as unknown as { content: { closeFlow: { kinds: Record<string, CloseKind>; saved: string; skip: string } } }).content.closeFlow;
+const MOVES: Record<MoveId, Move> = Object.fromEntries(PC.moves.map((m) => [m.id, m]));
+const MOVE_IDS = PC.moves.map((m) => m.id);
+/** A prompt's copy by id. */
+const P = (id: string) => PC.prompts[id].copy;
+/** Options at a flow's step, for a move (an option with no moves is offered for any move, and comes last). */
+const opts = (flow: string, step: string, move?: MoveId) => (PC.options[flow]?.[step] ?? [])
+  .filter((o) => !move || o.moves.length === 0 || o.moves.includes(move))
+  .sort((a, b) => Number(a.moves.length === 0) - Number(b.moves.length === 0) || a.order - b.order);
+const OWN_WORDS = PC.options.meet.any.find((o) => o.id === 'own_words')!;
+/** What a move may be guarding, in its OFTEN_GUARDS rank order. */
+const guardsFor = (move: MoveId) => PC.hurts
+  .flatMap((h) => h.guardedBy.filter((g) => g.moveId === move).map((g) => ({ h, rank: g.rank })))
+  .sort((a, b) => a.rank - b.rank).map(({ h }) => h);
+const fill = (template: string, slots: Record<string, string>) => template.replace(/\{(\w+)\}/g, (m, k: string) => slots[k] ?? m);
 
 const q = new URLSearchParams(location.search);
 const ROOMS: [string, 'dark' | 'light'][] = [['velvet', 'dark'], ['dusk', 'dark'], ['tinted', 'light'], ['pastel', 'light'], ['pastel-mix', 'light'], ['daylight', 'light']];
@@ -44,11 +79,11 @@ function Chip({ label, on, onClick, own }: { label: string; on?: boolean; onClic
       className={`den-chip den-chip--small ${own ? 'opacity-80 italic' : ''}`}>{label}</button>
   );
 }
-function Chips({ options, onPick, own, picked }: { options: Option[]; onPick: (o: Option) => void; own?: () => void; picked?: string | null }) {
+function Chips<T extends { id: string; label: string }>({ options, onPick, own, picked }: { options: T[]; onPick: (o: T) => void; own?: () => void; picked?: string | null }) {
   return (
     <div className="flex flex-wrap gap-2.5">
       {options.map((o) => <Chip key={o.id} label={o.label} on={picked === o.id} onClick={() => onPick(o)} />)}
-      {own && <Chip label={PROMPTS.ownWords} own onClick={own} />}
+      {own && <Chip label={OWN_WORDS.label} own onClick={own} />}
     </div>
   );
 }
@@ -86,105 +121,134 @@ function OwnWords({ onDone }: { onDone: (text: string) => void }) {
 
 /* ───────── Meet a part ───────── */
 
-type Step = 'find' | 'where' | 'shape' | 'age' | 'young' | 'voice' | 'feel' | 'unblend' | 'unblendEnd' | 'nothing' | 'job' | 'likes'
-  | 'fear' | 'stop' | 'update' | 'canNow' | 'thank' | 'rather' | 'name' | 'keep' | 'tender' | 'close' | 'done';
-const TRACK: Partial<Record<Step, number>> = { find: 1, where: 2, shape: 3, age: 3, young: 3, voice: 3, feel: 4, unblend: 4, job: 5, likes: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, rather: 8, name: 9, keep: 9, tender: 8, close: 10 };
+type Step = 'blend' | 'find' | 'where' | 'shape' | 'age' | 'young' | 'voice' | 'feel' | 'unblend' | 'unblendEnd' | 'nothing' | 'job' | 'likes'
+  | 'guards' | 'fear' | 'stop' | 'update' | 'canNow' | 'thank' | 'rather' | 'name' | 'keep' | 'tender' | 'close' | 'done';
+const TRACK: Partial<Record<Step, number>> = { find: 1, where: 2, shape: 3, age: 3, young: 3, voice: 3, feel: 4, unblend: 4, job: 5, likes: 5, guards: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, rather: 8, name: 9, keep: 9, tender: 8, close: 10 };
+const ORIENTING = SPINE.kinds.orienting;
+const FIRST: Step = q.get('blend') === '1' ? 'blend' : 'find';
 
 interface Session {
   move: MoveId; place: RegionId | null; shape: Feel; ageId?: string; voiceId?: string; ownVoice?: string;
-  feelTowardIds: string[]; steppedBack: number; jobId?: string; ownJob?: string; likesId?: string;
+  feelTowardIds: string[]; steppedBack: number; jobId?: string; ownJob?: string; likesId?: string; guardsId?: string;
   fearId?: string; ownFear?: string; updateId?: string; canNowId?: string; ratherId?: string; name?: string;
   tender: boolean; danger: boolean; stopReason: 'tender' | 'own_words' | 'worried_part' | 'nothing' | null; kept: boolean | null; closeId?: string;
 }
 
 function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unknown) => void }) {
-  const [step, setStep] = useState<Step>('find');
+  const fresh = (): Session => ({ move: initialMove, place: null, shape: fromVec([0, 0, 0, 0, 0]), feelTowardIds: [], steppedBack: 0, tender: false, danger: false, stopReason: null, kept: null });
+  const [step, setStep] = useState<Step>(FIRST);
   const [round, setRound] = useState(0);
   const [ownFor, setOwnFor] = useState<null | 'voice' | 'job' | 'fear'>(null);
-  const [s, setS] = useState<Session>({
-    move: initialMove, place: null, shape: fromVec([0, 0, 0, 0, 0]), feelTowardIds: [], steppedBack: 0,
-    tender: false, danger: false, stopReason: null, kept: null,
-  });
+  const [s, setS] = useState<Session>(fresh);
   const set = (p: Partial<Session>) => setS((x) => ({ ...x, ...p }));
   const move = MOVES[s.move];
-  const chips = BY_MOVE[s.move];
   const safety = !!move.safetyLine || s.danger;
   const go = (st: Step) => { setOwnFor(null); setStep(st); };
-  const restart = () => { setStep('find'); setRound(0); setS({ move: initialMove, place: null, shape: fromVec([0, 0, 0, 0, 0]), feelTowardIds: [], steppedBack: 0, tender: false, danger: false, stopReason: null, kept: null }); };
+  const restart = () => { setStep(FIRST); setRound(0); setS(fresh()); };
 
   useEffect(() => {
     if (step !== 'done') return;
+    const guards = s.guardsId && PC.hurts.some((h) => h.id === s.guardsId) ? [s.guardsId] : [];
     const log = {
       PartSession: {
         layer: 'log', trailheadKind: 'move', moveId: s.move, place: s.place, shape: [s.shape.sharp, s.shape.heat, s.shape.weight, s.shape.buzz, s.shape.clench].map((n) => +n.toFixed(2)),
         ageId: s.ageId, voiceId: s.voiceId, ownVoice: s.ownVoice, feelTowardIds: s.feelTowardIds, steppedBack: s.steppedBack,
-        jobId: s.jobId, ownJob: s.ownJob, fearId: s.fearId, ownFear: s.ownFear, stopReason: s.stopReason,
+        jobId: s.jobId, ownJob: s.ownJob, likesId: s.likesId, guardsId: s.guardsId, fearId: s.fearId, ownFear: s.ownFear, stopReason: s.stopReason,
       },
       ToolSession: { layer: 'log', toolId: 'meet-a-part', closeKind: 'orienting', thenVsNow: s.closeId ?? null },
-      keepPart: s.kept ? { layer: 'profile (on yes only)', name: s.name ?? null, tender: s.tender, moves: [s.move], places: s.place ? [s.place] : [], jobIds: s.jobId ? [s.jobId] : [], fearIds: s.fearId ? [s.fearId] : [], preferredRoleIds: s.ratherId ? [s.ratherId] : [] } : null,
+      keepPart: s.kept ? {
+        layer: 'profile (on yes only)', name: s.name ?? null, tender: s.tender, places: s.place ? [s.place] : [], jobIds: s.jobId ? [s.jobId] : [],
+        fearIds: s.fearId ? [s.fearId] : [], preferredRoleIds: s.ratherId ? [s.ratherId] : [], USES: [s.move], GUARDS: guards,
+      } : null,
       followUp: s.kept ? { type: 'part_checkback', due: 'tomorrow' } : null,
     };
     onLog(log);
   }, [step]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const afterFeel = (o: Option) => {
-    const ids = [...s.feelTowardIds, o.id];
-    if (o.id === 'nothing') { set({ feelTowardIds: ids, stopReason: 'nothing' }); return go('nothing'); }
-    if (o.selfLike === false) {
-      const n = s.steppedBack + 1;
-      set({ feelTowardIds: ids, steppedBack: n });
-      return go(n >= 2 ? 'unblendEnd' : 'unblend');
+  /** What picking an option does, from its `branch` in the content; `next` is the step's ordinary next. */
+  const follow = (o: Option, next: Step) => {
+    switch (o.branch) {
+      case 'tender_offer': return go('young');
+      case 'tender_path': set({ tender: true }); return go('tender');
+      case 'unblend': {
+        const n = s.steppedBack + 1;
+        set({ steppedBack: n });
+        return go(n >= PC.policy.maxNonSelfAnswers ? 'unblendEnd' : 'unblend');
+      }
+      case 'grounding':
+        if (step === 'feel') { set({ stopReason: 'nothing' }); return go('nothing'); }
+        onLog({ handoff: '5-4-3-2-1' });
+        return go(next);
+      case 'body_first': onLog({ handoff: 'body primitive (P2)' }); return go(next);
+      case 'conservative': set({ stopReason: 'tender' }); return go('stop');
+      case 'danger': set({ danger: true }); return go('thank');
+      case 'candidate': onLog({ PartCandidate: { layer: 'log, on yes', origin: 'worried_part' } }); return go('close');
+      case 'end': return go('close');
+      case 'keep': set({ kept: true }); return go('close');
+      default: return go(next);
     }
-    set({ feelTowardIds: ids });
-    go('job');
+  };
+  const afterFeel = (o: Option) => {
+    set({ feelTowardIds: [...s.feelTowardIds, o.id] });
+    follow(o, 'job');
   };
   const afterFear = (o: Option | null, own?: string) => {
+    // Own words at the fear step are never read: always the conservative branch.
     if (own !== undefined) { set({ ownFear: own, stopReason: 'own_words' }); return go('stop'); }
     if (!o) return;
-    if (o.flag === 'tender') { set({ fearId: o.id, stopReason: 'tender' }); return go('stop'); }
-    if (o.flag === 'danger') { set({ fearId: o.id, danger: true }); return go('thank'); }
     set({ fearId: o.id });
-    go(safety ? 'thank' : 'update');
+    follow(o, safety ? 'thank' : 'update');
   };
+  /** The options at a step as chips; `field` records the pick, `next` is where `continue` goes. */
+  const pick = (flow: string, st: string, next: Step, field?: keyof Session) => (
+    <Chips options={opts(flow, st, s.move)} onPick={(o) => { if (field) set({ [field]: o.id } as Partial<Session>); follow(o, next); }} />
+  );
 
   const body = (): ReactNode => {
     if (ownFor) {
       return (<>
-        <p className="text-lg font-medium">{ownFor === 'voice' ? PROMPTS.voice : ownFor === 'job' ? PROMPTS.job : PROMPTS.fear}</p>
+        <p className="text-lg font-medium">{P(ownFor === 'voice' ? 'meet_voice' : ownFor === 'job' ? 'meet_job' : 'meet_fear')}</p>
         <OwnWords onDone={(t) => {
-          if (ownFor === 'voice') { set({ ownVoice: t }); go('feel'); }
-          else if (ownFor === 'job') { set({ ownJob: t }); go('likes'); }
+          // On a safety-line move, own words at voice or job take the danger branch.
+          if (ownFor === 'voice') { set({ ownVoice: t, danger: s.danger || move.safetyLine }); go('feel'); }
+          else if (ownFor === 'job') { set({ ownJob: t, danger: s.danger || move.safetyLine }); go('likes'); }
           else afterFear(null, t);
         }} />
       </>);
     }
     switch (step) {
+      case 'blend': return (<>
+        <p className="text-lg font-medium">{P('gate_blend_check')}</p>
+        {pick('gate', 'blend', 'find')}
+        <p className="text-xs text-[var(--color-text-tertiary)]">Harness note: shown only with ?blend=1; pending the {PC.prompts.gate_blend_check.pending}.</p>
+      </>);
       case 'find': return (<>
-        <p className="text-lg font-medium">{PROMPTS.find}</p>
+        <p className="text-lg font-medium">{P('meet_find')}</p>
         <div className="flex flex-wrap gap-2.5">
           <Chip label={`The pull to ${move.label.toLowerCase()}`} on onClick={() => go('where')} />
           {PARTS.filter((p) => !p.tender).slice(0, 2).map((p) => <Chip key={p.id} label={p.name} onClick={() => { set({ move: p.move }); go('where'); }} />)}
+          {opts('meet', 'find').map((o) => <Chip key={o.id} label={o.label} onClick={() => onLog({ find: o.id })} />)}
         </div>
         <p className="text-sm text-[var(--color-text-tertiary)]">Or start from another move:</p>
         <div className="flex flex-wrap gap-2">
-          {(Object.keys(MOVES) as MoveId[]).filter((m) => m !== s.move).map((m) => <Chip key={m} label={MOVES[m].label} onClick={() => { set({ move: m }); }} />)}
+          {MOVE_IDS.filter((m) => m !== s.move).map((m) => <Chip key={m} label={MOVES[m].label} onClick={() => { set({ move: m }); }} />)}
         </div>
       </>);
       case 'where': {
         const marks: FigureMark[] = s.place ? [{ region: s.place, side: 'both', colour: 'var(--color-quadrant-low-unpleasant)', strength: 0.6 }] : [];
         return (<>
-          <p className="text-lg font-medium">{PROMPTS.where}</p>
+          <p className="text-lg font-medium">{P('meet_where')}</p>
           <div className="mx-auto w-44"><HeatFigure marks={marks} selected={s.place} onPick={(r) => set({ place: r })} /></div>
           <p className="text-sm text-[var(--color-text-secondary)] min-h-5">{s.place ? `My ${REGIONS[s.place].label.toLowerCase()}` : 'Touch and drag to a place, then lift.'}</p>
           <Primary disabled={!s.place} onClick={() => go('shape')}>Continue</Primary>
-          <TextBtn onClick={() => { set({ place: null }); go('shape'); }}>{PROMPTS.whereNone}</TextBtn>
+          {opts('meet', 'where').map((o) => <TextBtn key={o.id} onClick={() => { set({ place: null }); follow(o, 'shape'); }}>{o.label}</TextBtn>)}
         </>);
       }
       case 'shape': {
         const a = variant(s.shape, round, 1), b = variant(s.shape, round, -1);
         const next = (f: Feel) => { set({ shape: f }); if (round + 1 >= DIMS.length) go('age'); else setRound(round + 1); };
         return (<>
-          <p className="text-lg font-medium">{PROMPTS.shape}</p>
+          <p className="text-lg font-medium">{P('meet_shape')}</p>
           <p className="text-sm text-[var(--color-text-tertiary)]">{['I', 'II', 'III', 'IV', 'V'][round]} of V</p>
           <div className="grid grid-cols-2 gap-3">
             {[[a, SHAPE_PAIRS[round][0]], [b, SHAPE_PAIRS[round][1]]].map(([f, label]) => (
@@ -194,93 +258,95 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
               </button>
             ))}
           </div>
-          <TextBtn onClick={() => next(s.shape)}>{PROMPTS.shapeCantTell}</TextBtn>
+          {opts('meet', 'shape').map((o) => <TextBtn key={o.id} onClick={() => next(s.shape)}>{o.label}</TextBtn>)}
         </>);
       }
       case 'age': return (<>
         <div className="flex justify-center"><Blob feel={s.shape} size={120} /></div>
-        <p className="text-lg font-medium">{PROMPTS.age}</p>
-        <Chips options={AGES} onPick={(o) => { set({ ageId: o.id }); go(o.id === 'little' ? 'young' : 'voice'); }} />
+        <p className="text-lg font-medium">{P('meet_age')}</p>
+        {pick('meet', 'age', 'voice', 'ageId')}
       </>);
       case 'young': return (<>
-        <p className="font-serif text-2xl leading-snug">{PROMPTS.youngOffer}</p>
-        <Primary onClick={() => { set({ tender: true }); go('tender'); }}>Yes, keep it gentle</Primary>
-        <TextBtn onClick={() => go('voice')}>No, carry on</TextBtn>
+        <p className="font-serif text-2xl leading-snug">{P('meet_age_young')}</p>
+        {pick('meet', 'age_young', 'voice')}
       </>);
       case 'voice': return (<>
-        <p className="text-lg font-medium">{PROMPTS.voice}</p>
-        <Chips options={[...chips.voice, { id: 'none', label: 'Nothing' }]} onPick={(o) => { set({ voiceId: o.id }); go('feel'); }} own={() => setOwnFor('voice')} />
+        <p className="text-lg font-medium">{P('meet_voice')}</p>
+        <Chips options={opts('meet', 'voice', s.move)} onPick={(o) => { set({ voiceId: o.id }); follow(o, 'feel'); }} own={() => setOwnFor('voice')} />
       </>);
-      case 'feel': return (<>
-        <div className="flex justify-center"><Blob feel={s.shape} size={100} /></div>
-        <p className="text-lg font-medium">{PROMPTS.feel}</p>
-        <Chips options={FEEL_TOWARD.filter((o) => o.selfLike === true)} onPick={afterFeel} />
-        <Chips options={FEEL_TOWARD.filter((o) => o.selfLike === false)} onPick={afterFeel} />
-        <Chips options={FEEL_TOWARD.filter((o) => o.selfLike == null)} onPick={afterFeel} />
-      </>);
+      case 'feel': {
+        const feel = opts('meet', 'feel');
+        return (<>
+          <div className="flex justify-center"><Blob feel={s.shape} size={100} /></div>
+          <p className="text-lg font-medium">{P('meet_feel')}</p>
+          <Chips options={feel.filter((o) => o.selfLike === true)} onPick={afterFeel} />
+          <Chips options={feel.filter((o) => o.selfLike === false)} onPick={afterFeel} />
+          <Chips options={feel.filter((o) => o.selfLike == null)} onPick={afterFeel} />
+        </>);
+      }
       case 'unblend': return (<>
-        <p className="font-serif text-2xl leading-snug">{PROMPTS.unblend}</p>
-        <Chips options={UNBLEND} onPick={() => go('feel')} />
+        <p className="font-serif text-2xl leading-snug">{P('meet_unblend')}</p>
+        {pick('meet', 'unblend', 'feel')}
       </>);
       case 'unblendEnd': return (<>
-        <p className="font-serif text-2xl leading-snug">{PROMPTS.unblendEnd}</p>
-        <p className="text-base">{PROMPTS.unblendLater}</p>
-        <Primary onClick={() => { set({ stopReason: 'worried_part' }); onLog({ PartCandidate: { layer: 'log, on yes', origin: 'worried_part' } }); go('close'); }}>Yes, another time</Primary>
-        <TextBtn onClick={() => { set({ stopReason: 'worried_part' }); go('close'); }}>No</TextBtn>
+        <p className="font-serif text-2xl leading-snug">{P('meet_unblend_end')}</p>
+        <p className="text-base">{P('meet_unblend_later')}</p>
+        <Chips options={opts('meet', 'unblend_later')} onPick={(o) => { set({ stopReason: 'worried_part' }); follow(o, 'close'); }} />
       </>);
       case 'nothing': return (<>
-        <p className="font-serif text-2xl leading-snug">{PROMPTS.nothing}</p>
-        <div className="flex flex-wrap gap-2.5"><button type="button" className="den-chip den-chip--small den-chip--dt" onClick={() => onLog({ handoff: '5-4-3-2-1' })}>5-4-3-2-1</button></div>
-        <Primary onClick={() => go('thank')}>Continue</Primary>
+        <p className="font-serif text-2xl leading-snug">{P('meet_nothing')}</p>
+        {pick('meet', 'nothing', 'thank')}
       </>);
       case 'job': return (<>
-        <p className="text-lg font-medium">{PROMPTS.job}</p>
-        <Chips options={chips.job} onPick={(o) => { set({ jobId: o.id }); go('likes'); }} own={() => setOwnFor('job')} />
+        <p className="text-lg font-medium">{P('meet_job')}</p>
+        <Chips options={opts('meet', 'job', s.move)} onPick={(o) => { set({ jobId: o.id }); follow(o, 'likes'); }} own={() => setOwnFor('job')} />
       </>);
       case 'likes': return (<>
-        <p className="text-lg font-medium">{PROMPTS.likes}</p>
-        <Chips options={LIKES} onPick={(o) => { set({ likesId: o.id }); go('fear'); }} />
+        <p className="text-lg font-medium">{P('meet_likes')}</p>
+        {pick('meet', 'likes', 'guards', 'likesId')}
+      </>);
+      case 'guards': return (<>
+        <p className="text-lg font-medium">{P('meet_guards')}</p>
+        <Chips options={[...guardsFor(s.move), ...opts('meet', 'guards')]} onPick={(o) => { set({ guardsId: o.id }); go('fear'); }} />
       </>);
       case 'fear': return (<>
-        <p className="text-lg font-medium">{PROMPTS.fear}</p>
-        <Chips options={chips.fear} onPick={(o) => afterFear(o)} own={() => setOwnFor('fear')} />
+        <p className="text-lg font-medium">{P('meet_fear')}</p>
+        <Chips options={opts('meet', 'fear', s.move)} onPick={(o) => afterFear(o)} own={() => setOwnFor('fear')} />
         <p className="text-xs text-[var(--color-text-tertiary)]">Harness note: some chips are flagged tender or danger; own words always take the careful branch.</p>
       </>);
       case 'stop': return (<>
-        <p className="font-serif text-3xl leading-tight">{PROMPTS.stopTitle}</p>
-        <p className="font-serif text-xl text-[var(--color-text-secondary)]">{PROMPTS.stopBody}</p>
-        <p className="text-sm text-[var(--color-text-secondary)]">{PROMPTS.stopTherapist}</p>
-        <Primary onClick={() => go('thank')}>Thank it</Primary>
-        <TextBtn onClick={() => onLog({ handoff: 'body primitive (P2)' })}>Something for my body first</TextBtn>
+        <p className="font-serif text-3xl leading-tight">{P('meet_stop_title')}</p>
+        <p className="font-serif text-xl text-[var(--color-text-secondary)]">{P('meet_stop_body')}</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">{P('meet_stop_therapist')}</p>
+        {pick('meet', 'stop', 'thank')}
       </>);
       case 'update': return (<>
-        <p className="text-lg font-medium">{PROMPTS.update}</p>
-        <Chips options={UPDATE} onPick={(o) => { set({ updateId: o.id }); go(o.id === 'no' ? 'canNow' : 'thank'); }} />
+        <p className="text-lg font-medium">{P('meet_update')}</p>
+        <Chips options={opts('meet', 'update')} onPick={(o) => { set({ updateId: o.id }); follow(o, o.id === 'update_no' ? 'canNow' : 'thank'); }} />
       </>);
       case 'canNow': return (<>
-        <p className="text-lg font-medium">{PROMPTS.updateShow}</p>
-        <Chips options={CAN_NOW} onPick={(o) => { set({ canNowId: o.id }); go('thank'); }} />
+        <p className="text-lg font-medium">{P('meet_update_show')}</p>
+        {pick('meet', 'update_show', 'thank', 'canNowId')}
       </>);
-      case 'thank': return <Thank feel={s.shape} label={PROMPTS.thank} onDone={() => go(s.stopReason || safety ? 'name' : 'rather')} />;
-      case 'tender': return <Thank feel={fromVec([-0.8, 0.1, -0.4, -0.8, -0.2])} wrapped label={PROMPTS.tender} sub={PROMPTS.tenderSub} onDone={() => go('name')} />;
+      case 'thank': return <Thank feel={s.shape} label={P('meet_thank')} onDone={() => go(s.stopReason || safety ? 'name' : 'rather')} />;
+      case 'tender': return <Thank feel={fromVec([-0.8, 0.1, -0.4, -0.8, -0.2])} wrapped label={P('meet_tender')} sub={P('meet_tender_sub')} onDone={() => go('name')} />;
       case 'rather': return (<>
-        <p className="text-lg font-medium">{PROMPTS.rather}</p>
-        <Chips options={[...chips.rather, { id: 'unsure', label: 'Not sure yet' }]} onPick={(o) => { set({ ratherId: o.id }); go('name'); }} />
+        <p className="text-lg font-medium">{P('meet_rather')}</p>
+        {pick('meet', 'rather', 'name', 'ratherId')}
       </>);
       case 'name': return <NameStep suggestion={s.tender ? 'the little one' : move.nameHint} onDone={(n) => { set({ name: n }); go('keep'); }} />;
       case 'keep': return (<>
         <div className="flex items-center gap-4"><Blob feel={s.shape} size={72} /><p className="font-serif text-2xl">{s.name || 'This part'}</p></div>
-        <p className="text-lg font-medium">{PROMPTS.keep}</p>
-        <Primary onClick={() => { set({ kept: true }); go('close'); }}>Yes, keep it</Primary>
-        <TextBtn onClick={() => { set({ kept: false }); go('close'); }}>Not now</TextBtn>
+        <p className="text-lg font-medium">{P('meet_keep')}</p>
+        {pick('meet', 'keep', 'close')}
       </>);
       case 'close': return (<>
-        <p className="text-lg font-medium">{PROMPTS.close}</p>
-        <div className="grid gap-2">{CLOSE.map((o) => <button key={o.id} type="button" onClick={() => { set({ closeId: o.id }); go('done'); }} className="lift-secondary min-h-12 rounded-xl border border-[var(--color-border)] text-left px-4">{o.label}</button>)}</div>
-        <TextBtn onClick={() => go('done')}>Skip</TextBtn>
+        <p className="text-lg font-medium">{ORIENTING.question}</p>
+        <div className="grid gap-2">{ORIENTING.choices.map((o) => <button key={o.id} type="button" onClick={() => { set({ closeId: o.id }); go('done'); }} className="lift-secondary min-h-12 rounded-xl border border-[var(--color-border)] text-left px-4">{o.label}</button>)}</div>
+        <TextBtn onClick={() => go('done')}>{SPINE.skip}</TextBtn>
       </>);
       case 'done': return (<>
-        <p className="font-serif text-2xl">Noted.</p>
+        <p className="font-serif text-2xl">{SPINE.saved}</p>
         <p className="text-sm text-[var(--color-text-secondary)]">What would be saved is in the log below. Profile writes happen only when the person chose to keep the part.</p>
         <TextBtn onClick={restart}>Start again</TextBtn>
       </>);
@@ -289,10 +355,9 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
 
   return (
     <div className="space-y-5">
-      {step !== 'done' && <Track at={TRACK[step] ?? 1} total={10} />}
-      {safety && !['find', 'done'].includes(step) && (
-        <p role="note" className="text-sm rounded-xl border border-[var(--color-danger)] px-3 py-2 text-[var(--color-text-secondary)]">{PROMPTS.dangerNote}</p>
-      )}
+      {step !== 'done' && step !== 'blend' && <Track at={TRACK[step] ?? 1} total={10} />}
+      {/* Crisis resources alongside, never instead: the app's own banner (the crisis seam's copy). */}
+      {safety && !['blend', 'find', 'done'].includes(step) && <CrisisBanner />}
       <div className="space-y-4">{body()}</div>
       {!['done'].includes(step) && (
         <TooMuchLink host="meet-a-part" blank={false} onResult={(r) => onLog({ tooMuch: r })}
@@ -305,12 +370,12 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
 function NameStep({ suggestion, onDone }: { suggestion: string; onDone: (n: string) => void }) {
   const [n, setN] = useState('');
   return (<>
-    <p className="text-lg font-medium">{PROMPTS.name}</p>
-    <input value={n} onChange={(e) => setN(e.target.value.slice(0, 40))} placeholder={suggestion}
+    <p className="text-lg font-medium">{P('meet_name')}</p>
+    <input value={n} onChange={(e) => setN(e.target.value.slice(0, PC.policy.nameMaxChars))} placeholder={suggestion}
       className="w-full min-h-12 px-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] font-serif text-xl" />
     <div className="flex flex-wrap gap-2.5"><Chip label={suggestion} onClick={() => setN(suggestion)} /></div>
     <Primary disabled={!n.trim()} onClick={() => onDone(n.trim())}>Continue</Primary>
-    <TextBtn onClick={() => onDone('')}>Not yet</TextBtn>
+    {opts('meet', 'name').map((o) => <TextBtn key={o.id} onClick={() => onDone('')}>{o.label}</TextBtn>)}
   </>);
 }
 
@@ -355,7 +420,7 @@ function Thank({ feel, label, sub, wrapped, onDone }: { feel: Feel; label: strin
           onKeyUp={(e) => { if (e.key === ' ' || e.key === 'Enter') up(); }}
           className="lift-primary relative w-full min-h-12 rounded-2xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-semibold overflow-hidden select-none touch-none">
           <span className="absolute inset-0 bg-white/30 origin-left" style={{ transform: `scaleX(${p})` }} />
-          <span className="relative">{PROMPTS.hold}</span>
+          <span className="relative">{P('meet_thank_hold')}</span>
         </button>}
   </>);
 }
@@ -372,7 +437,7 @@ function PartCard({ part }: { part: ExamplePart }) {
           <div><p className="font-serif text-2xl leading-tight">{part.name}</p><p className="text-sm text-[var(--color-text-secondary)]">A tender part</p></div>
         </div>
         <p className="text-sm text-[var(--color-text-secondary)]">Here you only keep it company. The app asks it nothing.</p>
-        <p className="font-serif text-lg">{PROMPTS.tender} {PROMPTS.tenderSub}</p>
+        <p className="font-serif text-lg">{P('meet_tender')} {P('meet_tender_sub')}</p>
       </article>
     );
   }
@@ -391,7 +456,7 @@ function PartCard({ part }: { part: ExamplePart }) {
       <Row k="Would rather" v={part.rather} serif />
       <Row k="What's helped it settle" v={part.helped} />
       <Row k="How you've felt toward it" v={part.feel} />
-      {MOVES[part.move].safetyLine && <p className="text-sm text-[var(--color-danger)] border-t border-[var(--color-border-subtle)] pt-2.5">{PROMPTS.dangerNote}</p>}
+      {MOVES[part.move]?.safetyLine && <div className="border-t border-[var(--color-border-subtle)] pt-2.5"><CrisisBanner /></div>}
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-[var(--color-border-subtle)] pt-3">
         <button type="button" className="lift-primary min-h-11 px-4 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-semibold">Spend time with it</button>
         <TextBtn onClick={() => {}}>Rename</TextBtn>
@@ -456,23 +521,33 @@ function Den() {
 
 /* ───────── Trail offer ───────── */
 
+/** What the answer to the offer's question leads to, by the option's branch. */
+const OFFER_NEXT: Record<string, string> = { meet: 'Meet a part, with this trail as the trailhead', split: 'split, or Two pulls', end: 'recorded' };
+
 function Offer({ onLog }: { onLog: (x: unknown) => void }) {
   const [open, setOpen] = useState(false);
+  const rule = PC.trailRules.find((r) => r.id === OFFER.ruleId)!;
+  const statement = fill(rule.statementTemplate, {
+    context: PC.contexts.find((c) => c.id === OFFER.contextId)!.phrase, pull: MOVES[OFFER.pull].trailPhrase, pull2: MOVES[OFFER.pull2].trailPhrase,
+  });
   return (
     <div className="space-y-4">
       <section className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-elevated)] space-y-3">
-        <p className="text-sm text-[var(--color-text-tertiary)]">{OFFER.eyebrow}</p>
-        <p className="font-serif text-2xl leading-snug">{OFFER.statement}</p>
-        <p className="text-sm text-[var(--color-text-secondary)]">{OFFER.ask}</p>
+        <p className="text-sm text-[var(--color-text-tertiary)]">{P('offer_eyebrow')}</p>
+        <p className="font-serif text-2xl leading-snug">{statement}</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">{P('offer_ask')}</p>
         <div className="flex flex-wrap gap-2">
-          <button type="button" onClick={() => setOpen(true)} className="lift-primary min-h-11 px-4 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-semibold">Show me</button>
-          <button type="button" onClick={() => onLog({ TrailOffer: 'not_now' })} className="lift-secondary min-h-11 px-4 rounded-xl border border-[var(--color-border)]">Not now</button>
-          <button type="button" onClick={() => onLog({ TrailOffer: 'no' })} className="lift-secondary min-h-11 px-4 rounded-xl border border-[var(--color-border)]">No</button>
+          {opts('offer', 'card').map((o) => (
+            <button key={o.id} type="button" onClick={() => (o.branch === 'continue' ? setOpen(true) : onLog({ TrailOffer: o.id }))}
+              className={o.branch === 'continue'
+                ? 'lift-primary min-h-11 px-4 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-semibold'
+                : 'lift-secondary min-h-11 px-4 rounded-xl border border-[var(--color-border)]'}>{o.label}</button>
+          ))}
         </div>
       </section>
       {open && (
         <section className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)] space-y-3">
-          <p className="text-sm text-[var(--color-text-tertiary)]">{OFFER.evidenceTitle}</p>
+          <p className="text-sm text-[var(--color-text-tertiary)]">{P('offer_evidence')}</p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm min-w-[440px]"><tbody>
               {OFFER.evidence.map((r) => (
@@ -484,8 +559,8 @@ function Offer({ onLog }: { onLog: (x: unknown) => void }) {
                 </tr>))}
             </tbody></table>
           </div>
-          <p className="font-medium">{OFFER.question}</p>
-          <div className="flex flex-wrap gap-2.5">{OFFER.answers.map((a) => <Chip key={a} label={a} onClick={() => onLog({ answerTrailOffer: a, next: a.startsWith('Yes') ? 'Meet a part, with this trail as the trailhead' : a === 'More than one' ? 'split, or Two pulls' : 'recorded' })} />)}</div>
+          <p className="font-medium">{P('offer_question')}</p>
+          <div className="flex flex-wrap gap-2.5">{opts('offer', 'evidence').map((o) => <Chip key={o.id} label={o.label} onClick={() => onLog({ answerTrailOffer: o.id, next: OFFER_NEXT[o.branch] ?? o.branch })} />)}</div>
         </section>
       )}
     </div>
@@ -501,7 +576,8 @@ function Harness() {
   const [log, setLog] = useState<unknown[]>([]);
   const [room, setRoom] = useState(startRoom);
   const push = (x: unknown) => setLog((l) => [x, ...l].slice(0, 12));
-  const move = (q.get('move') as MoveId) || 'hide';
+  // Only offerable moves are in the content's `moves`: go_blank / zone_out never start Meet a part.
+  const move: MoveId = MOVES[q.get('move') ?? ''] ? q.get('move')! : 'hide';
   const pickRoom = (r: string) => {
     setRoom(r);
     document.documentElement.dataset.palette = r;
