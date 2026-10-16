@@ -400,6 +400,13 @@ PROMPTS = [
     # The tag row after a better close
     ("tag_question", "tag", "tag", "Was this a part you know?"),
     ("tag_new_later", "tag", "new", "Want to come back to it later?"),
+    # Find the feeling only (parts.md, its over-weeks column): right after a part chip is tapped, when the
+    # visit made a shape (Shape it), "Use this shape for {name}?"; _noname for an unnamed chip. Yes gives
+    # the part that shape (setPartShape, read from the visit's own record); the done line shows in place
+    # for a moment, then the row folds away. No thanks folds it as now.
+    ("tag_use_shape", "tag", "shape", "Use this shape for {name}?"),
+    ("tag_use_shape_noname", "tag", "shape", "Use this shape for that part?"),
+    ("tag_shape_done", "tag", "shape", "Done."),
     # A kept part with no name, wherever parts are listed (the tag row's chips; the part card may reuse
     # them). {place}: the part's first body place, its label from src/data/bodyFigure.ts in lower case.
     ("part_unnamed_place", "common", "name", "The one in your {place}"),
@@ -751,6 +758,8 @@ OPTIONS = [
     opt("tag_skip", "tag", "tag", "Skip", branch="end"),
     opt("tag_later_yes", "tag", "new", "Yes", branch="candidate"),
     opt("tag_later_no", "tag", "new", "No thanks", branch="end"),
+    opt("tag_shape_yes", "tag", "shape", "Yes", branch="keep"),
+    opt("tag_shape_no", "tag", "shape", "No thanks", branch="end"),
     # Problem Solve's ambivalence screen (cant-ambivalent only, parts on): the one quiet text button
     opt("ps_later", "ps", "ambivalence", "Want to get to know that part another time?", branch="candidate"),
     # {when} in stats_when: the band most tags fall in, in the person's time zone (05-12, 12-17, 17-22, 22-05)

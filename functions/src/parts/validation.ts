@@ -29,7 +29,8 @@ function ids(v: unknown, max: number, what: string): string[] {
   return out;
 }
 
-function unit(v: unknown, n: number, what: string): number[] {
+/** n numbers, each 0 to 1 (a stored signature); exported for setPartShape (editPlan.ts). */
+export function unit(v: unknown, n: number, what: string): number[] {
   if (!Array.isArray(v) || v.length !== n) return fail(`${what}: expected ${n} numbers`);
   return v.map((x) => (typeof x === 'number' && Number.isFinite(x) && x >= 0 && x <= 1 ? x : fail(`${what}: expected 0 to 1`)));
 }

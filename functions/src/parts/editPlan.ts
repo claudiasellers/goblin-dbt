@@ -5,6 +5,7 @@
  */
 import { GRAPH_ID, ValidationError, obj, oneOf, uuid } from '../shared/validate';
 import { NON_ANSWER } from './keepPlan';
+import { unit } from './validation';
 import {
   ACTIVE_REVISIT_ANSWERS, ANCHOR_MAX_CHARS, JOB_HISTORY_MAX, RATHER_IDS_MAX, RESTING_REVISIT_ANSWERS,
   type PartJobHistoryEntry, type PartRevisitAnswer,
@@ -20,6 +21,8 @@ export interface PartRef { partId: string }
 export interface RenameInput extends PartRef { name: string | null }
 export interface RestInput extends PartRef { resting: boolean }
 export interface RevisitInput extends PartRef { id: string; answer: PartRevisitAnswer; ratherIds: string[] }
+/** Find the feeling's "Use this shape for {name}?": the part, and the visit whose shape it takes. */
+export interface ShapeInput extends PartRef { toolSessionId: string }
 /** Exactly one of the two is set. */
 export interface AnchorInput extends PartRef { lineId: string | null; own: string | null }
 
@@ -72,6 +75,38 @@ export function validateAnchor(raw: unknown): AnchorInput {
     if (!own || own.length > ANCHOR_MAX_CHARS) fail(`own: 1 to ${ANCHOR_MAX_CHARS} characters`);
   }
   return { partId: uuid(o.partId), lineId, own };
+}
+
+/** `{ partId, toolSessionId }` only: the shape itself is never taken from the client. */
+export function validateShape(raw: unknown): ShapeInput {
+  const o = obj(raw);
+  only(o, ['partId', 'toolSessionId']);
+  return { partId: uuid(o.partId), toolSessionId: uuid(o.toolSessionId) };
+}
+
+/**
+ * The part's `shapeSig` from a stored Find the feeling session (its `dataJson`, as saveFindTheFeelingSession
+ * wrote it), or null when it carries no shape: a Tune it visit, an unreadable record, a vector that isn't
+ * five numbers from -1 to 1, or one never moved from neutral (all zero: Meet a part keeps no shape then
+ * either). Shape it's -1..1 vector becomes the stored 0–1 signature, two decimals (the client's
+ * src/lib/partFigure.ts `vecToSig`), checked as Meet a part's keep checks a `shapeSig`.
+ */
+export function shapeSigFromFtf(dataJson: unknown): number[] | null {
+  if (typeof dataJson !== 'string' || !dataJson) return null;
+  let vec: unknown;
+  try {
+    vec = (JSON.parse(dataJson) as { shape?: unknown } | null)?.shape;
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(vec) || vec.length !== 5) return null;
+  if (!vec.every((x) => typeof x === 'number' && Number.isFinite(x) && x >= -1 && x <= 1)) return null;
+  if ((vec as number[]).every((x) => x === 0)) return null;
+  try {
+    return unit((vec as number[]).map((x) => +((x + 1) / 2).toFixed(2)), 5, 'shapeSig');
+  } catch {
+    return null;
+  }
 }
 
 export type PartStatus = 'active' | 'resting' | 'set_aside';
