@@ -29,6 +29,7 @@
  */
 import type { ManagedTransaction } from 'neo4j-driver';
 import { readProfileSlices } from '../../profile/slices';
+import { sessionSourceMatch } from '../sessionMoves';
 import { int, toNumber } from '../../shared/values';
 import type { ClaimedPart, TrailContextKey, TrailContextRow, TrailMove, TrailPair, TrailPolicy, TrailRecord, TrailRule, TrailShape } from './types';
 
@@ -87,15 +88,7 @@ WITH u, r, d, toolId, at,
      CASE WHEN d:InvalidationRecoverySession THEN d.stateId END AS event
 OPTIONAL MATCH (src)-[x:EXPRESSES]->(m:ProtectiveMove)
   WHERE (x.reviewStatus = 'approved' OR $drafts = true) AND (
-       ((src:ActionUrge OR src:FeelingUrge) AND r:ToolSession AND src.id IN coalesce(r.urgeIds, []))
-    OR (src:BarrierSubResponse AND r:ToolSession AND r.ext CONTAINS ('"barrierSubId":"' + src.id + '"'))
-    OR (src:ActionUrge AND d:OppositeActionSession AND src.id = d.urgeId)
-    OR (src:FeelingUrge AND d:FindTheFeelingSession AND src.id = d.pull)
-    OR (src:PullOption AND d:InvalidationRecoverySession AND src.flow = 'recover' AND src.pullId = d.pull)
-    OR (src:MomentResponse AND d:DearManSession AND src.id IN coalesce(d.momentResponseIds, []))
-    OR (src:TurningPoint AND d:DearManSession AND src.id IN coalesce(d.turningPointIds, []))
-    OR (src:ThoughtPattern AND d:DearManSession AND src.id IN coalesce(d.thoughtPatternIds, []))
-    OR (src:DearManBarrier AND d:DearManSession AND src.id IN coalesce(d.barriers, []))
+       ${sessionSourceMatch('src', 'r', 'd')}
     OR (src:QuestionResponse AND r:CheckIn AND src.id IN coalesce(r.discResponseIds, []))
   )
 WITH u, r, toolId, at, trigger, event,

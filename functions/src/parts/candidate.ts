@@ -5,9 +5,10 @@
  * record, idempotent per id. Nothing is written while parts are off, whatever the origin.
  *
  * With `toolSessionId` (the tag row's "A new one", on its later question's yes): the caller's own,
- * closed ToolSession. Its stored urge ids (ActionUrge / FeelingUrge) and, through its DETAIL, Recover's
- * pull (PullOption) give the moves through approved EXPRESSES edges, read in the same state query; the
- * union with the client's ids is capped at 4. The candidate links to it with FROM_SESSION, an edge out
+ * closed ToolSession. The ids it and its DETAIL session recorded (sessionMoves.ts: urge ids, Find the
+ * feeling's and Recover's pull, DEAR MAN's debrief and barrier ids, Problem Solve's barrier) give the
+ * moves through approved EXPRESSES edges, read in the same state query; the union with the client's
+ * ids is capped at 4. The candidate links to it with FROM_SESSION, an edge out
  * of the new record (incoming to the finalised ToolSession, never out of it).
  */
 import { HttpsError } from 'firebase-functions/v2/https';
@@ -16,6 +17,7 @@ import { GRAPH_ID, ValidationError, obj, oneOf, uuid } from '../shared/validate'
 import { toNumber } from '../shared/values';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import { partsOff } from './keep';
+import { sessionSourceMatch } from './sessionMoves';
 import { CANDIDATE_ORIGINS, type CandidateOrigin, type QueuePartCandidateResponse } from './keepTypes';
 
 const MAX_MOVES = 4;
@@ -46,11 +48,10 @@ export const CANDIDATE_STATE_QUERY = `
   OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $toolSessionKey})
   OPTIONAL MATCH (m:ProtectiveMove) WHERE m.id IN $moveIds
   WITH u, ps, ts, count(DISTINCT m) AS knownMoves
-  OPTIONAL MATCH (ts)-[:DETAIL]->(ir:InvalidationRecoverySession)
+  OPTIONAL MATCH (ts)-[:DETAIL]->(d) WHERE d.ownerId = $uid
   OPTIONAL MATCH (src)-[x:EXPRESSES]->(dm:ProtectiveMove)
     WHERE ts IS NOT NULL AND x.reviewStatus = 'approved'
-      AND (((src:ActionUrge OR src:FeelingUrge) AND src.id IN coalesce(ts.urgeIds, []))
-        OR (src:PullOption AND src.flow = 'recover' AND src.pullId = ir.pull))
+      AND (${sessionSourceMatch('src', 'ts', 'd')})
   RETURN coalesce(u.partsEnabled, false) AS partsOn, ps IS NOT NULL AS sessionFound, knownMoves,
          ts IS NOT NULL AS toolSessionFound, ts.status AS toolSessionStatus, collect(DISTINCT dm.id) AS derivedMoves
 `;
