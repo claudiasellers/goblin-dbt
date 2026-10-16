@@ -10,6 +10,7 @@ import { flowReady } from './partsContent';
 export const PARTS_SETTINGS_PROMPTS = [
   'settings_label', 'settings_blurb', 'settings_dissociation', 'settings_off', 'settings_about_1', 'settings_about_2',
   'settings_delete', 'settings_delete_confirm', 'settings_delete_yes', 'settings_delete_no', 'settings_delete_done',
+  'settings_delete_failed',
 ] as const;
 
 export type PartsSettingsPromptId = (typeof PARTS_SETTINGS_PROMPTS)[number];

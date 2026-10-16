@@ -337,7 +337,7 @@ test("settings: the switch, about and Delete your parts prompts exist as drafts 
   const want = {
     switch: ["settings_label", "settings_blurb", "settings_dissociation", "settings_off"],
     about: ["settings_about_1", "settings_about_2"],
-    delete: ["settings_delete", "settings_delete_confirm", "settings_delete_yes", "settings_delete_no", "settings_delete_done"],
+    delete: ["settings_delete", "settings_delete_confirm", "settings_delete_yes", "settings_delete_no", "settings_delete_done", "settings_delete_failed"],
   };
   for (const [step, ids] of Object.entries(want)) {
     for (const id of ids) {

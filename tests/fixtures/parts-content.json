@@ -694,6 +694,13 @@
    "order": 10,
    "copy": "Deleted.",
    "reviewStatus": "draft"
+  },
+  "settings_delete_failed": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 11,
+   "copy": "Couldn't delete them. Try again.",
+   "reviewStatus": "draft"
   }
  },
  "options": {

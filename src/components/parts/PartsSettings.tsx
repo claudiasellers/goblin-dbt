@@ -14,6 +14,7 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [done, setDone] = useState(false);
+  const [failed, setFailed] = useState(false);
   const labelId = useId();
   const blurbId = useId();
 
@@ -27,12 +28,13 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
 
   async function handleDelete() {
     setDeleting(true);
+    setFailed(false);
     try {
       await deleteMyParts();
       setDone(true);
       setConfirming(false);
     } catch {
-      // The confirm stays open to try again; there is no signed-off failure line to show yet.
+      setFailed(true); // the confirm stays open to try again
     } finally {
       setDeleting(false);
     }
@@ -90,13 +92,14 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
             </button>
             <button
               type="button"
-              onClick={() => setConfirming(false)}
+              onClick={() => { setConfirming(false); setFailed(false); }}
               disabled={deleting}
               className="px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-xs font-medium text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
             >
               {copy.settings_delete_no}
             </button>
           </div>
+          {failed && <p role="status" className="text-xs text-[var(--color-danger)]">{copy.settings_delete_failed}</p>}
         </div>
       )}
 
