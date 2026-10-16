@@ -751,6 +751,13 @@
    "copy": "What would help if that part shows up?",
    "reviewStatus": "draft"
   },
+  "cope_save_failed": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 5,
+   "copy": "Couldn't save that. Try again.",
+   "reviewStatus": "draft"
+  },
   "gate_far_away": {
    "flow": "gate",
    "step": "dissociation",

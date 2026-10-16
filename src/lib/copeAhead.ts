@@ -13,7 +13,8 @@ import { partChipLabel as unnamedOrName, UNNAMED_PROMPTS } from './partTag';
 
 /** The screen's own prompts, then the shared unnamed-part chips ("The one in your {place}", "One you haven't named"). */
 export const COPE_PROMPTS = [
-  'cope_title', 'cope_anchor', 'cope_anchor_noname', 'cope_set_anchor', 'cope_set_anchor_noname', ...UNNAMED_PROMPTS,
+  'cope_title', 'cope_anchor', 'cope_anchor_noname', 'cope_set_anchor', 'cope_set_anchor_noname', 'cope_save_failed',
+  ...UNNAMED_PROMPTS,
 ] as const;
 export const COPE_OPTIONS = ['cope_not_sure', 'cope_skip', 'cope_own', 'cope_change', 'cope_save'] as const;
 

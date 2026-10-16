@@ -479,6 +479,8 @@ PROMPTS = [
     ("cope_anchor_noname", "dearman", "cope", "If that part shows up:"),
     ("cope_set_anchor", "dearman", "cope", "What would help if {name} shows up?"),
     ("cope_set_anchor_noname", "dearman", "cope", "What would help if that part shows up?"),
+    # Under Save when setPartAnchor fails; the form stays as it was (Claudia, 16 Oct).
+    ("cope_save_failed", "dearman", "cope", "Couldn't save that. Try again."),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
     # The blending check (Claudia, 16 Oct: the flood signal at a parts flow's entry). It asks how close
