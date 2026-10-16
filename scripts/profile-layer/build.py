@@ -12,7 +12,7 @@ def q(s): return json.dumps(s, ensure_ascii=False)
 
 def check():
     area_ids = [a[0] for a in AREAS]
-    assert len(area_ids) == 7 and len(set(area_ids)) == 7
+    assert len(area_ids) == 8 and len(set(area_ids)) == 8
     for k in KINDS:
         assert k[1] in area_ids, k[0]
     for r in RULES:

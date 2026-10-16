@@ -19,8 +19,10 @@ MERGE (a:ProfileArea {id: "my_plans"})
 SET a.label = "My plans", a.blurb = "Plans you've made ahead of time.", a.order = 4, a.reviewStatus = "draft";
 MERGE (a:ProfileArea {id: "my_patterns"})
 SET a.label = "My patterns", a.blurb = "Things that seem to help you, once you've said yes to them.", a.order = 5, a.reviewStatus = "draft";
+MERGE (a:ProfileArea {id: "my_parts"})
+SET a.label = "Parts of me", a.blurb = "The parts of you you've gotten to know. Only the ones you've named.", a.order = 6, a.reviewStatus = "draft";
 MERGE (a:ProfileArea {id: "my_progress"})
-SET a.label = "My progress", a.blurb = "How your practice is going.", a.order = 6, a.reviewStatus = "draft";
+SET a.label = "My progress", a.blurb = "How your practice is going.", a.order = 7, a.reviewStatus = "draft";
 
 // --- Kinds ---
 MATCH (:ProfileKind)-[r:IN_AREA]->() DELETE r;
@@ -35,6 +37,10 @@ MERGE (k)-[:IN_AREA]->(a);
 MERGE (k:ProfileKind {id: "own_line"})
 SET k.area = "my_words", k.label = "Lines in my own words", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "own_line"}), (a:ProfileArea {id: "my_words"})
+MERGE (k)-[:IN_AREA]->(a);
+MERGE (k:ProfileKind {id: "part"})
+SET k.area = "my_parts", k.label = "A part", k.revisitAfterDays = 30, k.stillTrueCopy = "Is {name} still doing the same job?", k.setAsideCopy = "Set aside. You can bring it back any time.", k.reviewStatus = "draft";
+MATCH (k:ProfileKind {id: "part"}), (a:ProfileArea {id: "my_parts"})
 MERGE (k)-[:IN_AREA]->(a);
 
 // --- Pattern rules (enabled false until reviewed on real data, D-10) ---
