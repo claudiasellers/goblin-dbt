@@ -60,6 +60,7 @@ answers({
   setPartTender: () => ({ version: 2 }),
   answerPartRevisit: () => ({ version: 2 }),
   setPartAnchor: () => ({ version: 2 }),
+  setPartShape: () => ({ version: 2 }),
   schedulePartCheckback: (d) => ({ id: ok(d).id }),
   answerPartCheckback: (d) => ({ status: 'done', aftercare: ok(d).answer === 'louder' }),
   tagPart: (d) => ({ id: ok(d).id, created: true }),
