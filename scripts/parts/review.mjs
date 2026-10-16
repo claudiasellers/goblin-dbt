@@ -146,7 +146,7 @@ export function surfaces(g) {
     },
     {
       id: 'oa', title: 'Do the Opposite',
-      where: 'In Do the Opposite, with parts on, on the check\'s "will it help you move toward your goal" card, above the question: two quiet lines setting the pull beside the goal the person picked, when the picked urge EXPRESSES an offerable move that isn\'t a safety-line move (never for "My urge is different", never while P2 is open). {pull} is the move\'s `trailPhrase`; {goal} is Do the Opposite\'s own goal label with its first letter lower-cased ("You want to stay connected."). It also needs the move and the urge\'s EXPRESSES edge signed off (see The vocabulary).',
+      where: 'In Do the Opposite, with parts on, on the check\'s "will it help you move toward your goal" card, above the question: two quiet lines setting the pull beside the goal the person picked, when the picked urge EXPRESSES an offerable move that isn\'t a safety-line move (never for "My urge is different", never while P2 is open). {move} is the move\'s `unblendPhrase` (the unblend line\'s); {goal} is Do the Opposite\'s own goal label with its first letter lower-cased ("You want to stay connected."). It also needs the move and the urge\'s EXPRESSES edge signed off (see The vocabulary).',
       groups: [{ label: null, ids: g.OA_GOAL_LINE_REQUIRED }],
     },
   ];

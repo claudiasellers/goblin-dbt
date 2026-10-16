@@ -488,10 +488,11 @@ PROMPTS = [
     ("debrief_who_named", "dearman", "debrief", "Did {name} show up?"),
     # Do the Opposite's goal line (parts.md, the Do the Opposite row): on the check's effectiveness card,
     # above its question, parts on only, when the picked urge EXPRESSES an offerable move that is not a
-    # safety-line move and a goal was picked. {pull} is the move's trailPhrase; {goal} is OA's own goal
+    # safety-line move and a goal was picked. {move} is the move's unblendPhrase (the unblend line's, so the
+    # pull reads the same and "it" never lacks a referent); {goal} is OA's own goal
     # label, first letter lower-cased (OA's content, never copied here). No {hurt}: nothing in the visit
     # says what this part fears, so the line gives positive intent instead of a guess.
-    ("oa_goal_part", "oa", "goal", "Part of you wants to {pull}, and it's trying to help."),
+    ("oa_goal_part", "oa", "goal", "A part of you {move}, and it's trying to help."),
     ("oa_goal_you", "oa", "goal", "You want to {goal}."),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
