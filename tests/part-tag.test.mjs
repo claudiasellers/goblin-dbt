@@ -144,7 +144,8 @@ test("the row: no hard-coded words, after the close is saved, fire-and-forget wr
   const jsx = row.slice(row.indexOf("return ("));
   // JSX text: anything between a tag's ">" and the next "<" that isn't an expression.
   assert.deepEqual([...jsx.matchAll(/>([^<>{}()=;]*[A-Za-z][^<>{}()=;]*)</g)].map((m) => m[1].trim()), [], "every word comes from the content");
-  assert.match(row, /tagPart\(\{ id: newId\(\), partId, toolSessionId \}\)\.catch/);
+  assert.match(row, /const req = debrief \? debriefTag\(newId\(\), partId, toolSessionId, 'yes'\) : \{ id: newId\(\), partId, toolSessionId \};\n\s+tagPart\(req\)\.catch/,
+    "a close tag by default; DEAR MAN's debrief tags its own source");
   assert.match(row, /queuePartCandidate\(\{ id: newId\(\), origin: 'new_one', moveIds: \[\], toolSessionId \}\)\.catch/);
   assert.match(row, /if \(yes\) queuePartCandidate/, "only Yes writes");
   assert.match(row, /useProfileContext\(toolId\)/, "the host tool's own needs");

@@ -58,6 +58,7 @@ export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } 
 export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
+export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
 `;
   const out = await build({
@@ -131,8 +132,11 @@ export function surfaces(g) {
     },
     {
       id: 'dearman', title: 'DEAR MAN',
-      where: 'DEAR MAN prep, with parts on and a kept part: "Who might show up in this conversation?", then that part\'s anchor before the script.',
-      groups: [{ label: null, ids: g.COPE_REQUIRED }],
+      where: 'DEAR MAN prep, with parts on and a kept part: "Who might show up in this conversation?", then that part\'s anchor before the script; and in the debrief, who showed up.',
+      groups: [
+        { label: null, ids: g.COPE_REQUIRED },
+        { label: 'The debrief, after "Underneath that": "Did {name} show up?" when prep chose that part, else "Was one of your parts there?" with the tag row\'s chips', ids: g.DEBRIEF_WHO_REQUIRED },
+      ],
     },
     {
       id: 'ps', title: 'Problem Solve',

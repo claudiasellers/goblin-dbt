@@ -84,8 +84,9 @@ export const answerPartCandidate = callable<unknown, AnswerPartCandidateResponse
 );
 
 /**
- * "Was this a part you know?": one tag per ToolSession, after a better or much better close. A tag
- * that lost a race for the same session (the taggedKey constraint) reads again and returns the first.
+ * "Was this a part you know?" (after a better close) and DEAR MAN's debrief "who showed up?": one tag per
+ * ToolSession per source (tag.ts). A tag that lost a race for the same session and source (the taggedKey
+ * constraint) reads again and returns the first.
  */
 export const tagPart = callable<unknown, TagPartResponse>(
   { auth: 'required', label: 'tagPart', errorMessage: 'Could not save that' },

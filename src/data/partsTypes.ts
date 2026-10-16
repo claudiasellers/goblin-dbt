@@ -182,16 +182,30 @@ export interface SetPartAnchorRequest { partId: string; lineId?: string; own?: s
 export const ANCHOR_MAX_CHARS = 90;
 
 // --- "Was this a part you know?": mirror of functions/src/parts/tagTypes.ts (tests/parts-entry.test.mjs) ---
-/** One tap on the tag row after a better or much better close. */
+/**
+ * Where a tag comes from: `close` (the tag row after a better close; the default) or `debrief` (DEAR MAN's
+ * debrief, "who showed up?").
+ */
+export type TagSource = 'close' | 'debrief';
+export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief'];
+/** A debrief tag's answer: Yes or A bit (No and Skip write nothing). */
+export type TagStrength = 'yes' | 'a_bit';
+export const TAG_STRENGTHS: readonly TagStrength[] = ['yes', 'a_bit'];
+
+/** One tap on the tag row after a better close, or a Yes / A bit in DEAR MAN's debrief. */
 export interface TagPartRequest {
   /** A new client UUID for the tag. */
   id: string;
   /** The caller's kept part (active or resting). */
   partId: string;
-  /** The caller's closed ToolSession whose close was better or much better. */
+  /** close: the caller's closed ToolSession with a better close. debrief: the caller's DEAR MAN ToolSession, open or closed. */
   toolSessionId: string;
+  /** Absent is `close`. */
+  source?: TagSource;
+  /** debrief only (required there). */
+  strength?: TagStrength;
 }
-/** The tag for that session: this one, or the first one if the session was already tagged. */
+/** The tag for that session and source: this one, or the first one if it was already tagged. */
 export interface TagPartResponse { id: string; created: boolean }
 
 // --- The next-day check-back: mirror of functions/src/parts/checkbackTypes.ts (tests/parts-entry.test.mjs) ---
