@@ -4,11 +4,12 @@
  */
 
 /**
- * Where a tag comes from: `close` (the tag row after a better close; the default) or `debrief` (DEAR MAN's
- * debrief, "who showed up?").
+ * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's
+ * debrief, "who showed up?") or `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
+ * its first writer, still to come).
  */
-export type TagSource = 'close' | 'debrief';
-export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief'];
+export type TagSource = 'close' | 'debrief' | 'review';
+export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review'];
 /** A debrief tag's answer: Yes or A bit (No and Skip write nothing). */
 export type TagStrength = 'yes' | 'a_bit';
 export const TAG_STRENGTHS: readonly TagStrength[] = ['yes', 'a_bit'];

@@ -36,7 +36,7 @@ export const KEEP_STATE_QUERY = `
   OPTIONAL MATCH (pol:PartsPolicy {id: 'parts'})
   OPTIONAL MATCH (k:ProfileKind {id: 'part'})
   RETURN coalesce(u.partsEnabled, false) AS partsOn,
-         CASE WHEN ps IS NULL THEN null ELSE ps {.trailheadKind, .partId, .candidateId, .moveIds, .stepIdsJson,
+         CASE WHEN ps IS NULL THEN null ELSE ps {.trailheadKind, .partId, .candidateId, .offerId, .moveIds, .stepIdsJson,
            .stopReason, .bodyPlaces, .shapeSig, .soundSig, .ownVoice, .ownJob, .ownFear,
            keepable: ${GUARDS.PartSession.keep('ps')}} END AS session,
          CASE WHEN p IS NULL THEN null ELSE p {.tender, .places, .shapeSig, .soundSig, .ageId, .voiceIds, .jobIds,
@@ -44,7 +44,10 @@ export const KEEP_STATE_QUERY = `
          linked.id AS linkedPartId, pol.nameMaxChars AS nameMaxChars, k.revisitAfterDays AS revisitAfterDays
 `;
 
-/** The profile edges a keep adds (never removes): moves, guarded hurts, the candidate it answers. */
+/**
+ * The profile edges a keep adds (never removes): moves, guarded hurts, the candidate or trail offer it
+ * answers (`ACCEPTED_FROM`, an edge into the finalised log record, never out of it).
+ */
 const KEEP_EDGES = `
   WITH u, p
   OPTIONAL MATCH (m:ProtectiveMove) WHERE m.id IN $moveIds
@@ -52,6 +55,9 @@ const KEEP_EDGES = `
   OPTIONAL MATCH (h:ProtectedHurt) WHERE h.id IN $guardIds
   WITH u, p, moves, collect(h) AS hurts
   OPTIONAL MATCH (u)-[:HAS_PART_CANDIDATE]->(c:PartCandidate {key: $candidateKey})
+  OPTIONAL MATCH (u)-[:HAS_TRAIL_OFFER]->(tof:TrailOffer {key: $offerKey})
+  FOREACH (x IN CASE WHEN tof IS NULL THEN [] ELSE [tof] END |
+    MERGE (p)-[r:ACCEPTED_FROM]->(x) ON CREATE SET r.confirmedAt = datetime(), r.source = $source)
   FOREACH (x IN moves | MERGE (p)-[r:USES]->(x) ON CREATE SET r.confirmedAt = datetime(), r.source = $source)
   FOREACH (x IN hurts | MERGE (p)-[r:GUARDS]->(x) ON CREATE SET r.confirmedAt = datetime(), r.source = $source)
   FOREACH (x IN CASE WHEN c IS NULL THEN [] ELSE [c] END |
@@ -100,6 +106,8 @@ export interface KeepWrite {
   sessionId: string;
   partId: string;
   candidateId: string | null;
+  /** The trail offer this visit answers (trailheadKind 'offer'). */
+  offerId?: string | null;
   fields: PartFields;
   moveIds: string[];
   guardIds: string[];
@@ -123,7 +131,7 @@ export async function keepPartHandler(input: KeepInput, deps: KeepDeps): Promise
   const name = keptName(input.name, st.nameMax);
   const { guardIds, ...visit } = partFromSession(st.session);
   const base = {
-    sessionId: input.sessionId, partId: input.partId, candidateId: st.session.candidateId,
+    sessionId: input.sessionId, partId: input.partId, candidateId: st.session.candidateId, offerId: st.session.offerId ?? null,
     moveIds: st.session.moveIds, guardIds, source: partSource(st.session), revisitDays: st.revisitDays,
   };
   if (st.session.partId) {
@@ -150,6 +158,7 @@ export function keepDeps(tx: ManagedTransaction, uid: string): KeepDeps {
   const params = (w: KeepWrite) => ({
     uid, sessionKey: userKey(uid, w.sessionId), partKey: userKey(uid, w.partId), partId: w.partId,
     candidateKey: w.candidateId ? userKey(uid, w.candidateId) : null,
+    offerKey: w.offerId ? userKey(uid, w.offerId) : null,
     fields: w.fields, moveIds: w.moveIds, guardIds: w.guardIds, source: w.source, name: w.name,
     revisitDays: w.revisitDays,
   });
@@ -164,7 +173,7 @@ export function keepDeps(tx: ManagedTransaction, uid: string): KeepDeps {
       return {
         partsOn: r?.get('partsOn') === true,
         session: s ? {
-          trailheadKind: str(s.trailheadKind), partId: str(s.partId), candidateId: str(s.candidateId),
+          trailheadKind: str(s.trailheadKind), partId: str(s.partId), candidateId: str(s.candidateId), offerId: str(s.offerId),
           moveIds: strs(s.moveIds), stepIdsJson: str(s.stepIdsJson), stopReason: str(s.stopReason),
           bodyPlaces: strs(s.bodyPlaces), shapeSig: nums(s.shapeSig), soundSig: nums(s.soundSig),
           ownVoice: str(s.ownVoice), ownJob: str(s.ownJob), ownFear: str(s.ownFear), keepable: s.keepable === true,

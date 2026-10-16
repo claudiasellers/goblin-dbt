@@ -3213,6 +3213,20 @@
      "sameAs": [],
      "reviewStatus": "draft"
     }
+   ],
+   "split": [
+    {
+     "id": "offer_split_keep",
+     "label": "Keep these",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
    ]
   },
   "tag": {

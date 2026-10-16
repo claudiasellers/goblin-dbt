@@ -185,3 +185,7 @@ export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse
     return writeTx((tx) => answerPartCheckbackHandler(input, answerCheckbackDeps(tx, uid as string)));
   },
 );
+
+// ---- Trail offers (Phase 4; Today's card and the daily evaluation register themselves in ./offers) ----
+
+export { getTrailOfferEvidence, answerTrailOffer } from './offers';

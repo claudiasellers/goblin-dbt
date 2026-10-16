@@ -71,6 +71,8 @@ export interface StartPartSessionRequest {
   trailheadKind: TrailheadKind;
   partId?: string;
   candidateId?: string;
+  /** trailheadKind 'offer' only (and required there): the trail offer answered "Yes, a part of me". */
+  offerId?: string;
   moveIds?: string[];
 }
 
@@ -183,11 +185,12 @@ export const ANCHOR_MAX_CHARS = 90;
 
 // --- "Was this a part you know?": mirror of functions/src/parts/tagTypes.ts (tests/parts-entry.test.mjs) ---
 /**
- * Where a tag comes from: `close` (the tag row after a better close; the default) or `debrief` (DEAR MAN's
- * debrief, "who showed up?").
+ * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's
+ * debrief, "who showed up?") or `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
+ * its first writer, still to come).
  */
-export type TagSource = 'close' | 'debrief';
-export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief'];
+export type TagSource = 'close' | 'debrief' | 'review';
+export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review'];
 /** A debrief tag's answer: Yes or A bit (No and Skip write nothing). */
 export type TagStrength = 'yes' | 'a_bit';
 export const TAG_STRENGTHS: readonly TagStrength[] = ['yes', 'a_bit'];
@@ -333,4 +336,58 @@ export interface PartReflect {
   /** Shape it's five numbers (PartFigure); null is the plain round figure. */
   shapeSig: number[] | null;
   stats: PartStats;
+}
+
+// ---- Trail offers (Phase 4, functions/src/parts/offers/types.ts; built off) ----
+
+/**
+ * The five answers. The card's *No* is `not_me`; *Not now* (card or evidence step) cools the offer down
+ * and leaves it open, as `answerPatternOffer`'s does; the rest are final.
+ */
+export type TrailOfferAnswer = 'not_now' | 'not_me' | 'yes' | 'more_than_one' | 'how_it_goes';
+export const TRAIL_OFFER_ANSWERS: readonly TrailOfferAnswer[] = ['not_now', 'not_me', 'yes', 'more_than_one', 'how_it_goes'];
+
+/** "Show me": the evidence, and the offer marked seen. */
+export interface GetTrailOfferEvidenceRequest { offerId: string }
+export interface TrailOfferEvidenceRow {
+  /** The episode's first record (ISO); the client shows the date in the locale. */
+  at: string;
+  /** App tool ids (src/data/tools.ts names them; unknown ids are dropped). */
+  toolIds: string[];
+  /** The episode's context, as its signed-off TrailContext phrase; null when none ships. */
+  context: string | null;
+  /** The graph labels of the picks behind it (an ActionUrge's or FeelingUrge's label); never the person's words. */
+  sources: string[];
+}
+export interface GetTrailOfferEvidenceResponse {
+  offerId: string;
+  shape: TrailShape;
+  /** The offer's moves in the statement's order (the split's chips). */
+  moveIds: string[];
+  rows: TrailOfferEvidenceRow[];
+}
+
+export type TrailShape = 'A' | 'B' | 'C' | 'D';
+
+export interface AnswerTrailOfferRequest {
+  offerId: string;
+  answer: TrailOfferAnswer;
+  /** more_than_one only: the moves that feel like their own thing (each one of the offer's). */
+  split?: string[];
+  /** more_than_one only: a new client UUID per kept move, in `split`'s order (the candidates' ids). */
+  candidateIds?: string[];
+}
+export interface AnswerTrailOfferResponse {
+  offerId: string;
+  status: 'offered' | 'seen' | 'answered';
+  answer: TrailOfferAnswer;
+  /**
+   * What the client does next: `meet` opens Meet a part on this offer (`trailheadKind: 'offer'`);
+   * `candidates` wrote the split's PartCandidates; `none` otherwise.
+   */
+  next: 'meet' | 'candidates' | 'none';
+  /** The moves Meet a part opens on (yes). */
+  moveIds?: string[];
+  /** more_than_one: the candidates' ids. */
+  candidateIds?: string[];
 }
