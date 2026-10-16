@@ -86,6 +86,21 @@ test("ext er: Problem Solve keeps what got in the way as ids (parts data fix 2)"
   assert.throws(() => ext.validateExt({ er: { barrierText: "x" } }), /not registered/);
 });
 
+test("ext er: Do the Opposite keeps the check's result as ids (parts data fix 3)", () => {
+  const er = { oaFacts: "fits", oaEffect: "helpful", oaRoute: "problem" };
+  assert.deepEqual(JSON.parse(ext.validateExt({ er })).er, er);
+  assert.deepEqual(JSON.parse(ext.validateExt({ er: { oaRoute: "support" } })).er, { oaRoute: "support" });
+  // Recheck / Previous send nulls: dropped, and nothing left is no ext at all.
+  assert.equal(ext.validateExt({ er: { oaFacts: null, oaEffect: null, oaRoute: null } }), null);
+  for (const key of Object.keys(er)) {
+    assert.throws(() => ext.validateExt({ er: { [key]: "it fits the facts, mostly" } }), /expected an id/, `${key}: no free text`);
+    assert.throws(() => ext.validateExt({ er: { [key]: "a".repeat(65) } }), /expected an id/, `${key}: ≤ 64 chars`);
+    assert.throws(() => ext.validateExt({ er: { [key]: 2 } }), /expected an id/, `${key}: no numbers`);
+  }
+  assert.throws(() => ext.validateExt({ er: { oaUrgeText: "x" } }), /not registered/);
+  assert.throws(() => ext.validateExt({ er: { oaSafety: "safe" } }), /not registered/);
+});
+
 test("close: emotion ids picked in the tool are ids only, at most 20; none given is []", () => {
   assert.deepEqual(v.validateClose({ id: ID, status: "completed", emotionIds: ["hurt", "anxious", "hurt"] }, now).emotionIds, ["hurt", "anxious"]);
   assert.deepEqual(v.validateClose({ id: ID, status: "completed" }, now).emotionIds, []);
