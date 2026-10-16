@@ -33,6 +33,11 @@ export interface QueuePartCandidateRequest {
 }
 export interface QueuePartCandidateResponse { id: string }
 
+/** Me's "Not any more" on a candidate (functions/src/parts/candidateAnswer.ts). */
+export interface AnswerPartCandidateRequest { candidateId: string; answer: 'dismiss' }
+/** `dismissed`, or `accepted` when keepPart got there first (nothing written). */
+export interface AnswerPartCandidateResponse { id: string; status: string }
+
 /** Every change to a kept part answers with the new profile version (the client cache key). */
 export interface PartWriteResponse { version: number }
 

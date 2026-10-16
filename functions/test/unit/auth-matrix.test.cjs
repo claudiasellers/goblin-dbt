@@ -20,6 +20,7 @@ const AUTHED = [
   'getPartsEntry', // reads the caller's own check-ins and Recover sessions
   'deleteMyParts', // deletes the caller's own parts records
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
+  'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
   'tagPart',
   'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor',

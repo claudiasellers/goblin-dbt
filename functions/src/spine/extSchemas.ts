@@ -42,6 +42,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     oaFacts: { t: 'id' },                                                          // Do the Opposite: the check's facts choice
     oaEffect: { t: 'id' },                                                         // its effectiveness choice
     oaRoute: { t: 'id' },                                                          // opposite | problem | clarify | support
+    unblendShown: { t: 'bool' },                                                   // parts on: the unblend line showed after FTF's pull / OA's urge
     handoffs: {                                                                    // P2 breakdown hand-off (A4-2)
       t: 'objs', max: 4,
       of: {
@@ -57,6 +58,7 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     angryVoteHeld: { t: 'bool' },                                                  // its vote of confidence held for the full 4 s
     angryExit: { t: 'id' },                                                        // unblend | protects | vote | speak | skipped (checked by the client)
     angryLater: { t: 'bool' },                                                     // parts on: "Spend a minute with it later?" queued a PartCandidate
+    unblendShown: { t: 'bool' },                                                   // parts on: the unblend line showed after Recover's pull
   },
   mf: {},
 };

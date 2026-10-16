@@ -510,6 +510,12 @@ PROMPTS = [
     ("revisit_resting", "me", "revisit", "{name} has been resting. Still quiet?"),
     ("revisit_resting_noname", "me", "revisit", "This part has been resting. Still quiet?"),
     ("revisit_new_title", "me", "revisit", "What does it do now?"),
+    # Parts to come back to (open PartCandidates, after the cards). {move} = the move's unblendPhrase
+    ("candidate_title", "me", "candidate", "To come back to"),
+    ("candidate_line", "me", "candidate", "The one that {move}"),
+    ("candidate_line_plain", "me", "candidate", "One you wanted to come back to"),
+    ("candidate_go", "me", "candidate", "Get to know it"),
+    ("candidate_dismiss", "me", "candidate", "Not any more"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry

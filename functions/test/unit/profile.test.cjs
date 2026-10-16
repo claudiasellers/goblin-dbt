@@ -229,3 +229,33 @@ test('getMe: a Part item carries its card (no own-words fear ever, no fears on a
   const off = await run(false);
   assert.ok(!off.me.areas.some((a) => a.items.some((i) => i.part)), 'parts off: no cards');
 });
+
+test('getMe: open part candidates (newest first, at most 3) only with parts on', async () => {
+  const cand = (id, createdAt, status = 'open', moveIds = ['hide']) => ({ id, origin: 'new_one', moveIds, createdAt, status });
+  const run = async (partsOn) => {
+    const f = fakeDriver((q) => {
+      if (/AS partsOn/.test(q)) return [{ partsOn }];
+      if (/HAS_PART_CANDIDATE/.test(q)) return [
+        cand('c1', '2026-10-01T00:00:00Z'), cand('c2', '2026-10-05T00:00:00Z'), cand('c3', '2026-10-03T00:00:00Z', 'dismissed'),
+        cand('c4', '2026-10-04T00:00:00Z', 'accepted'), cand('c5', '2026-10-02T00:00:00Z', 'open', null), cand('c6', '2026-09-01T00:00:00Z'),
+      ];
+      return [];
+    });
+    setDriver(f.driver);
+    return { me: await fns.getMe.run({ auth: auth(), data: {} }), f };
+  };
+  const on = await run(true);
+  // The fake ignores the query's own filter and limit, so the server's second check is what's tested.
+  assert.deepEqual(on.me.partCandidates, [
+    { id: 'c2', origin: 'new_one', moveIds: ['hide'], createdAt: '2026-10-05T00:00:00Z' },
+    { id: 'c5', origin: 'new_one', moveIds: [], createdAt: '2026-10-02T00:00:00Z' },
+    { id: 'c1', origin: 'new_one', moveIds: ['hide'], createdAt: '2026-10-01T00:00:00Z' },
+  ]);
+  const q = on.f.calls.find((c) => /HAS_PART_CANDIDATE/.test(c.query)).query;
+  assert.match(q, /WHERE c\.status = 'open' AND coalesce\(u\.partsEnabled, false\)/);
+  assert.match(q, /ORDER BY c\.createdAt DESC, c\.id LIMIT 3/);
+  assert.doesNotMatch(q, /sessionId|PartSession/, 'only what the row shows');
+  const off = await run(false);
+  assert.deepEqual(off.me.partCandidates, []);
+  assert.ok(!off.f.calls.some((c) => /HAS_PART_CANDIDATE/.test(c.query)), 'parts off: not even read');
+});

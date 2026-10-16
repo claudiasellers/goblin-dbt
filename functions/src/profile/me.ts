@@ -43,6 +43,16 @@ export interface MePart {
   moveIds: string[];
   lastVisitedAt: string | null;
 }
+/** A part the person said they'd come back to (an open PartCandidate, a log record read for display). */
+export interface MePartCandidate {
+  id: string;
+  origin: string;
+  moveIds: string[];
+  createdAt: string | null;
+}
+/** How many open candidates Me shows. */
+export const ME_CANDIDATES_MAX = 3;
+
 export interface GetMeResponse {
   version: number;
   staleCount: number;
@@ -54,6 +64,8 @@ export interface GetMeResponse {
     savedLines: Array<{ lineId: string; text: string }>;
   };
   offers: Array<{ id: string; statement: string; offerCopy: string; toolId: string | null; evidenceCount: number }>;
+  /** Open PartCandidates, newest first, at most 3; always empty with parts off. */
+  partCandidates: MePartCandidate[];
 }
 
 const ids = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
@@ -74,6 +86,16 @@ export function mePart(p: Record<string, unknown>, moveIds: unknown): MePart {
     moveIds: [...new Set(ids(moveIds))].sort(),
     lastVisitedAt: strOrNull(p.lastVisitedAt),
   };
+}
+
+/** Open ones only, newest first (then id), at most ME_CANDIDATES_MAX. The query does the same; this is the second check. */
+export function mePartCandidates(rows: Array<Record<string, unknown>>): MePartCandidate[] {
+  const t = (v: string | null) => (v ? Date.parse(v) : Number.NaN);
+  return rows
+    .filter((r) => r.status === 'open' && typeof r.id === 'string')
+    .map((r) => ({ id: r.id as string, origin: String(r.origin ?? ''), moveIds: ids(r.moveIds), createdAt: strOrNull(r.createdAt) }))
+    .sort((a, b) => (t(b.createdAt) || -Infinity) - (t(a.createdAt) || -Infinity) || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    .slice(0, ME_CANDIDATES_MAX);
 }
 
 async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise<GetMeResponse> {
@@ -114,6 +136,13 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
      RETURN o.id AS id, rule.statementTemplate AS statement, rule.offerCopy AS offerCopy, o.toolId AS toolId,
             size(coalesce(o.evidenceIds, [])) AS evidenceCount`,
     { uid });
+  // Parts to come back to: read only with parts on (and gated in the query too).
+  const candidates = partsOn ? await tx.run(
+    `MATCH (u:User {id: $uid})-[:HAS_PART_CANDIDATE]->(c:PartCandidate)
+     WHERE c.status = 'open' AND coalesce(u.partsEnabled, false)
+     RETURN c.id AS id, c.origin AS origin, c.moveIds AS moveIds, toString(c.createdAt) AS createdAt, c.status AS status
+     ORDER BY c.createdAt DESC, c.id LIMIT ${ME_CANDIDATES_MAX}`,
+    { uid }) : null;
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
   for (const r of itemsRes.records) {
@@ -159,6 +188,11 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
       id: r.get('id'), statement: r.get('statement') ?? '', offerCopy: r.get('offerCopy') ?? '',
       toolId: r.get('toolId') ?? null, evidenceCount: int(r.get('evidenceCount')),
     })),
+    partCandidates: candidates
+      ? mePartCandidates(candidates.records.map((r) => ({
+        id: r.get('id'), origin: r.get('origin'), moveIds: r.get('moveIds'), createdAt: r.get('createdAt'), status: r.get('status'),
+      })))
+      : [],
   };
 }
 

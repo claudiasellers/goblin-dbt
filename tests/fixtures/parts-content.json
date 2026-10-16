@@ -939,6 +939,41 @@
    "order": 20,
    "copy": "What does it do now?",
    "reviewStatus": "draft"
+  },
+  "candidate_title": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 21,
+   "copy": "To come back to",
+   "reviewStatus": "draft"
+  },
+  "candidate_line": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 22,
+   "copy": "The one that {move}",
+   "reviewStatus": "draft"
+  },
+  "candidate_line_plain": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 23,
+   "copy": "One you wanted to come back to",
+   "reviewStatus": "draft"
+  },
+  "candidate_go": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 24,
+   "copy": "Get to know it",
+   "reviewStatus": "draft"
+  },
+  "candidate_dismiss": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 25,
+   "copy": "Not any more",
+   "reviewStatus": "draft"
   }
  },
  "options": {
@@ -3776,6 +3811,302 @@
     "alone_in_this"
    ],
    "reviewStatus": "draft"
+  }
+ },
+ "expresses": {
+  "ActionUrge": {
+   "anger-lash": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "anger-criticize": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "anger-destroy": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "envy-tear-down": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "disgust-judge": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "jealousy-check": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "jealousy-interrogate": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "jealousy-cling": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "love-stalk": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "love-reach-out": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "love-proximity": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "shame-hide": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "shame-secret": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "shame-avoid-people": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "sad-isolate": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "fear-cancel": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "fear-escape": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "anger-stonewall": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "disgust-leave": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "guilt-avoid": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "fear-freeze": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   },
+   "sad-scroll": {
+    "moveId": "zone_out",
+    "reviewStatus": "draft"
+   },
+   "sad-bed": {
+    "moveId": "zone_out",
+    "reviewStatus": "draft"
+   },
+   "guilt-apologize": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "draft"
+   },
+   "guilt-punish": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "draft"
+   },
+   "envy-compare": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "draft"
+   },
+   "shame-shrink": {
+    "moveId": "take_less_room",
+    "reviewStatus": "draft"
+   },
+   "fear-avoid": {
+    "moveId": "put_it_off",
+    "reviewStatus": "draft"
+   },
+   "sad-give-up": {
+    "moveId": "put_it_off",
+    "reviewStatus": "draft"
+   },
+   "envy-give-up": {
+    "moveId": "put_it_off",
+    "reviewStatus": "draft"
+   }
+  },
+  "FeelingUrge": {
+   "fight": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "chase": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "hide": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "blank": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   }
+  },
+  "PullOption": {
+   "recover_fight": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "recover_chase": {
+    "moveId": "chase",
+    "reviewStatus": "draft"
+   },
+   "recover_hide": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "recover_freeze": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   }
+  },
+  "MomentResponse": {
+   "mr_got_loud": {
+    "moveId": "hit_back",
+    "reviewStatus": "draft"
+   },
+   "mr_left": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "mr_went_quiet": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "mr_changed_subject": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "mr_froze": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   },
+   "mr_agreed": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "draft"
+   }
+  },
+  "TurningPoint": {
+   "tp_no_words": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   },
+   "tp_crying_shutdown": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   },
+   "tp_gave_in": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "draft"
+   },
+   "tp_apologized": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "draft"
+   }
+  },
+  "ThoughtPattern": {
+   "thought_my_fault": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "draft"
+   },
+   "thought_too_much": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "draft"
+   },
+   "thought_dont_deserve": {
+    "moveId": "take_less_room",
+    "reviewStatus": "draft"
+   },
+   "thought_wrong": {
+    "moveId": "keep_watch",
+    "reviewStatus": "draft"
+   },
+   "thought_will_leave": {
+    "moveId": "keep_watch",
+    "reviewStatus": "draft"
+   },
+   "thought_not_worth": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "draft"
+   }
+  },
+  "DearManBarrier": {
+   "barrier_no_right": {
+    "moveId": "take_less_room",
+    "reviewStatus": "draft"
+   },
+   "barrier_guilty": {
+    "moveId": "take_less_room",
+    "reviewStatus": "draft"
+   },
+   "barrier_angry": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "draft"
+   }
+  },
+  "BarrierSubResponse": {
+   "person-no-right-to-speak": {
+    "moveId": "take_less_room",
+    "reviewStatus": "draft"
+   },
+   "person-scared-reaction": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "draft"
+   },
+   "cant-keep-putting-off": {
+    "moveId": "put_it_off",
+    "reviewStatus": "draft"
+   },
+   "cant-afraid-aftermath": {
+    "moveId": "put_it_off",
+    "reviewStatus": "draft"
+   },
+   "cant-ambivalent": {
+    "moveId": "put_it_off",
+    "reviewStatus": "draft"
+   },
+   "tried-thinking-constantly": {
+    "moveId": "keep_watch",
+    "reviewStatus": "draft"
+   }
+  },
+  "QuestionResponse": {
+   "hu_exp_vigilance": {
+    "moveId": "keep_watch",
+    "reviewStatus": "draft"
+   },
+   "hu_exp_social": {
+    "moveId": "keep_watch",
+    "reviewStatus": "draft"
+   },
+   "hu_body_shame": {
+    "moveId": "hide",
+    "reviewStatus": "draft"
+   },
+   "lu_mind_faraway": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   },
+   "lu_mind_blank": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   },
+   "lu_body_numb": {
+    "moveId": "go_blank",
+    "reviewStatus": "draft"
+   }
   }
  },
  "pairs": [

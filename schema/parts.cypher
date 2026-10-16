@@ -717,9 +717,19 @@ MERGE (p:PartPrompt {id: "revisit_resting"})
 SET p += {flow: "me", step: "revisit", order: 18, copy: "{name} has been resting. Still quiet?", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "revisit_resting_noname"})
 SET p += {flow: "me", step: "revisit", order: 19, copy: "This part has been resting. Still quiet?", reviewStatus: "draft", version: "parts-v1", pending: null};
-// @parts-copy-json [{"id": "revisit_new_title", "field": "copy", "kind": "prompt", "text": "What does it do now?"}, {"id": "keepsake_both_want", "field": "copy", "kind": "keepsake", "text": "{A} and {B} both want me {want}."}, {"id": "keepsake_choose", "field": "copy", "kind": "keepsake", "text": "I can hear both of them, and choose what I do next."}]
+// @parts-copy-json [{"id": "revisit_new_title", "field": "copy", "kind": "prompt", "text": "What does it do now?"}, {"id": "candidate_title", "field": "copy", "kind": "prompt", "text": "To come back to"}, {"id": "candidate_line", "field": "copy", "kind": "prompt", "text": "The one that {move}"}, {"id": "candidate_line_plain", "field": "copy", "kind": "prompt", "text": "One you wanted to come back to"}, {"id": "candidate_go", "field": "copy", "kind": "prompt", "text": "Get to know it"}, {"id": "candidate_dismiss", "field": "copy", "kind": "prompt", "text": "Not any more"}, {"id": "keepsake_both_want", "field": "copy", "kind": "keepsake", "text": "{A} and {B} both want me {want}."}, {"id": "keepsake_choose", "field": "copy", "kind": "keepsake", "text": "I can hear both of them, and choose what I do next."}]
 MERGE (p:PartPrompt {id: "revisit_new_title"})
 SET p += {flow: "me", step: "revisit", order: 20, copy: "What does it do now?", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "candidate_title"})
+SET p += {flow: "me", step: "candidate", order: 21, copy: "To come back to", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "candidate_line"})
+SET p += {flow: "me", step: "candidate", order: 22, copy: "The one that {move}", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "candidate_line_plain"})
+SET p += {flow: "me", step: "candidate", order: 23, copy: "One you wanted to come back to", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "candidate_go"})
+SET p += {flow: "me", step: "candidate", order: 24, copy: "Get to know it", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "candidate_dismiss"})
+SET p += {flow: "me", step: "candidate", order: 25, copy: "Not any more", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "keepsake_both_want"})
 SET p += {flow: "pulls", step: "keepsake", order: 6, copy: "{A} and {B} both want me {want}.", copyKind: "keepsake", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "keepsake_choose"})
