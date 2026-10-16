@@ -32,16 +32,18 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS["opposite-action"], []);
   assert.deepEqual(types.PROFILE_NEEDS["cool-down"], []);
   assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns"], "R20: consumer is `checkin`");
-  assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours"]);
+  assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
   // Parts (Phase 2): the slices exist; only Meet a part reads them (it renders them). Other tools
   // declare 'parts' in the phase that renders them, never before.
   assert.deepEqual(types.SLICE_IDS.slice(-2), ["parts", "partDetail"]);
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
+  // `today` renders parts too (the check-back card's name, part-checkback); partDetail stays Meet a part's.
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer === "meet-a-part") continue;
-    assert.ok(!needs.includes("parts") && !needs.includes("partDetail"), `${consumer} reads parts before its phase`);
+    if (consumer !== "today") assert.ok(!needs.includes("parts"), `${consumer} reads parts before its phase`);
+    assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);

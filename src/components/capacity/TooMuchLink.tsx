@@ -7,7 +7,7 @@ import { BreakdownHandoff, type HandoffResumeDraft, type LaterChip } from './Bre
  * A quiet "This is too much right now" (ER-01). Opens P2 at any band as an overlay, so the host's
  * state stays mounted underneath and the user comes back to the same step.
  */
-export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, className }: {
+export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, className, label: ownLabel, onClose }: {
   host: string;
   blank?: boolean;
   /** The host's step + draft at the moment the link is tapped (for "come back to this later"). */
@@ -15,6 +15,10 @@ export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, cl
   onResult?: (r: HandoffResult) => void;
   onScheduleLater?: (chip: LaterChip) => Promise<string | null>;
   className?: string;
+  /** The button's own words (a host's signed-off copy, e.g. parts' "Something for my body"); the same P2 opens. */
+  label?: string;
+  /** Called when the overlay closes (✕, Escape or resume). */
+  onClose?: () => void;
 }) {
   const band = useBand();
   const [open, setOpen] = useState<{ draft?: HandoffResumeDraft } | null>(null);
@@ -23,15 +27,16 @@ export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, cl
   const dismissed = useRef(false);
   const openP2 = () => { dismissed.current = false; setOpen({ draft: resume?.() }); };
   const close = () => { dismissed.current = true; setOpen(null); };
+  const closeAndTell = () => { close(); onClose?.(); };
   useEffect(() => { if (open) band.load(); }, [open, band]);
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeAndTell(); };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [open]);
 
-  const label = band.content?.handoff.tooMuchLink ?? 'This is too much right now';
+  const label = ownLabel ?? band.content?.handoff.tooMuchLink ?? 'This is too much right now';
   return (
     <>
       <button type="button" data-testid="too-much-link" onClick={openP2}
@@ -42,14 +47,14 @@ export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, cl
         <div className="fixed inset-0 z-50 overflow-y-auto bg-[var(--color-bg-primary)]" role="dialog" aria-modal="true" aria-label={label}>
           <div className="max-w-md mx-auto px-4 py-6 space-y-4">
             <div className="flex justify-end">
-              <button type="button" onClick={close} aria-label="Close"
+              <button type="button" onClick={closeAndTell} aria-label="Close"
                 className="min-h-11 min-w-11 rounded-full text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]">
                 <span aria-hidden="true">✕</span>
               </button>
             </div>
             <BreakdownHandoff host={host} band={band.current()?.value ?? 'stirred'} blank={blank} resume={open.draft} dismissedRef={dismissed}
               onScheduleLater={onScheduleLater}
-              onResume={(r) => { close(); onResult?.(r); }}
+              onResume={(r) => { closeAndTell(); onResult?.(r); }}
               onLater={(r) => { onResult?.(r); }} />
           </div>
         </div>

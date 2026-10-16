@@ -346,7 +346,8 @@ UNDERNEATH_HELD = {
 # Copy: PartPrompt (the app's questions and statements) and PartOption (chips the person taps).
 # Prompts: (id, flow, step, copy). Order within a flow is list order.
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
-# close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, gate, settings, me (Parts of me)
+# close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
+# next-day check-back card), gate, settings, me (Parts of me)
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -441,6 +442,11 @@ PROMPTS = [
     # Aftercare
     ("aftercare_louder", "aftercare", "louder", "Things can get louder after time with a part."),
     ("aftercare_too_many", "aftercare", "too_many", "You don't need to get to know everyone at once."),
+    # Check back (parts.md Meet a part step 10, "Over weeks"): on the close's yes, a part_checkback
+    # follow-up the next day. _noname for a part kept without a name. "Louder" shows aftercare_louder.
+    ("checkback_title", "checkback", "checkback", "How's {name} today?"),
+    ("checkback_title_noname", "checkback", "checkback", "How's the part you met yesterday?"),
+    ("close_checkback", "meet", "close", "Check back with it tomorrow?"),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
     # The blending check (Claudia, 16 Oct: the flood signal at a parts flow's entry). It asks how close
@@ -691,6 +697,14 @@ OPTIONS = [
     # --- Aftercare ---
     opt("louder_body", "aftercare", "louder", "Something for my body", branch="body_first"),
     opt("louder_not_now", "aftercare", "louder", "Not now", branch="end"),
+
+    # --- Check back (the next-day card; Louder → aftercare_louder) and the close question that schedules it ---
+    opt("checkback_settled", "checkback", "checkback", "Settled", branch="end"),
+    opt("checkback_same", "checkback", "checkback", "Same", branch="end"),
+    opt("checkback_louder", "checkback", "checkback", "Louder", branch="aftercare"),
+    opt("checkback_skip", "checkback", "checkback", "Skip", branch="end"),
+    opt("close_checkback_yes", "meet", "close", "Yes", branch="checkback"),
+    opt("close_checkback_no", "meet", "close", "No thanks", branch="end"),
 
     # --- Gates ---
     opt("far_away_look", "gate", "dissociation", "Look around the room first", branch="grounding"),

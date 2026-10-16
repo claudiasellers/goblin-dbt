@@ -2,9 +2,9 @@
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
 import type {
-  AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
+  AnswerPartCheckbackRequest, AnswerPartCheckbackResponse, AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
-  SavePartSessionRequest, StartPartSessionRequest,
+  SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, StartPartSessionRequest,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
@@ -103,4 +103,22 @@ export async function setPartTender(req: PartRefRequest): Promise<PartWriteRespo
  */
 export async function answerPartRevisit(req: AnswerPartRevisitRequest): Promise<PartWriteResponse> {
   return (await answerPartRevisitFn(req)).data;
+}
+
+// ---- The next-day check-back ----
+
+const schedulePartCheckbackFn = httpsCallable<SchedulePartCheckbackRequest, SchedulePartCheckbackResponse>(functions, 'schedulePartCheckback');
+const answerPartCheckbackFn = httpsCallable<AnswerPartCheckbackRequest, AnswerPartCheckbackResponse>(functions, 'answerPartCheckback');
+
+/**
+ * The close's yes ("Check back with it tomorrow?"), for the part this visit kept. `dueAt` is the
+ * type's window (tomorrow 10:00 local). Safe to repeat: one open check-back per part.
+ */
+export async function schedulePartCheckback(req: SchedulePartCheckbackRequest): Promise<SchedulePartCheckbackResponse> {
+  return (await schedulePartCheckbackFn(req)).data;
+}
+
+/** The Today card's answer. `aftercare` (Louder): show aftercare_louder with the body tools. */
+export async function answerPartCheckback(req: AnswerPartCheckbackRequest): Promise<AnswerPartCheckbackResponse> {
+  return (await answerPartCheckbackFn(req)).data;
 }

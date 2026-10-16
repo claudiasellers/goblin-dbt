@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect } from 'react';
 import type { TodayItem } from '../services/spine';
 import type { PendingFollowUp } from './useOppositeActionFollowUps';
+import type { PartsContent } from '../data/partsContentTypes';
 
 export interface TodayValue {
   items: TodayItem[];
@@ -19,9 +20,11 @@ export interface TodayValue {
   /** OA plan ids hidden with the OA card's "Hide for now" (this visit only; a new plan shows again). */
   oaHidden: ReadonlySet<string>;
   hideOa: (ids: string[]) => void;
+  /** The parts copy, only while check-back cards can show (parts on, every word signed off). */
+  partsContent: PartsContent | null;
 }
 
-const EMPTY: TodayValue = { items: [], more: [], holding: false, ready: false, refresh: () => {}, drop: () => {}, hidden: false, setHidden: () => {}, oaHidden: new Set(), hideOa: () => {} };
+const EMPTY: TodayValue = { items: [], more: [], holding: false, ready: false, refresh: () => {}, drop: () => {}, hidden: false, setHidden: () => {}, oaHidden: new Set(), hideOa: () => {}, partsContent: null };
 
 export const TodayContext = createContext<TodayValue | null>(null);
 
