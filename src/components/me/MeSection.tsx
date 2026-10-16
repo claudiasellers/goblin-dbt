@@ -106,14 +106,8 @@ export function MeSection() {
     );
   };
 
-  // A set-aside part in Me's set-aside style, read-only for now: restoring a part is restorePart (the
-  // part writers), not restoreProfileItem, and lands with the card's other actions.
-  const setAsidePart = (i: MeItem) => (
-    <li key={`${i.label}:${i.meta.id}`} className="py-3 border-t border-[var(--color-border-subtle)] first:border-t-0">
-      <p className="text-sm font-medium text-[var(--color-text-primary)]">{i.part?.name ?? i.title}</p>
-      <p className="text-xs text-[var(--color-text-tertiary)]">Set aside</p>
-    </li>
-  );
+  // A part write (the card's actions, Bring it back, the check-back): Me's usual refresh after.
+  const partWrite = (p: Promise<{ version: number }>) => after(p.then((r) => r.version));
 
   return (
     <div className="space-y-4">
@@ -166,7 +160,7 @@ export function MeSection() {
             </div>
           ))}
           {a.id === 'my_parts' && partsCopy && partsContent && (
-            <PartsOfMe items={a.items} content={partsContent} copy={partsCopy} renderSetAside={setAsidePart} />
+            <PartsOfMe items={a.items} content={partsContent} copy={partsCopy} onWrite={partWrite} />
           )}
           {a.id !== 'my_parts' && a.items.filter((i) => i.meta.prompt !== 'ask').length > 0 && <ul className="mt-1">{a.items.filter((i) => i.meta.prompt !== 'ask').map(row)}</ul>}
         </section>

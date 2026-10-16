@@ -3,7 +3,7 @@
  * length-checked and nothing else: the witness own-line rule (never linted, parsed or logged).
  * Messages name the rule, never the value.
  */
-import { GRAPH_ID, ValidationError, graphId, obj, oneOf, uuid } from '../shared/validate';
+import { GRAPH_ID, UUID, ValidationError, graphId, obj, oneOf, uuid } from '../shared/validate';
 import { checkExtField } from '../spine/extSchemas';
 import {
   BLEND_CHECKS, PART_STEP_IDS, PART_STOP_REASONS, TRAILHEAD_KINDS,
@@ -49,6 +49,17 @@ export interface StartInput {
   partId: string | null;
   candidateId: string | null;
   moveIds: string[];
+}
+
+/**
+ * getPartsEntry's input: nothing (older clients send `{}`), or `partId`, the part this visit opens on.
+ * Lenient on purpose: the gate carries the flood signal, so a bad request must never cost it. Anything
+ * but a well-formed id is ignored (no `paused`), other keys too (the uid is never read from data);
+ * whether the id is the caller's own part is the query's job.
+ */
+export function readPartsEntryInput(raw: unknown): { partId: string | null } {
+  const v = raw && typeof raw === 'object' ? (raw as Record<string, unknown>).partId : undefined;
+  return { partId: typeof v === 'string' && v.length === 36 && UUID.test(v) ? v : null };
 }
 
 export function validateStartPartSession(raw: unknown): StartInput {

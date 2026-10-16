@@ -9,7 +9,8 @@ const assert = require('node:assert/strict');
 const { loadFunctions, fakeDriver } = require('./fakeDriver.cjs');
 const { entryGate, resolveEntryPolicy, DEFAULT_ENTRY_POLICY } = require('../../lib/parts/gate');
 const { getPartsEntryHandler } = require('../../lib/parts/handler');
-const { POLICY_QUERY, RECENT_QUERY, DISSOCIATION_QUERY, PARTS_MADE_QUERY, recoverDownshiftAt } = require('../../lib/parts/queries');
+const { POLICY_QUERY, RECENT_QUERY, DISSOCIATION_QUERY, PARTS_MADE_QUERY, PART_PAUSED_QUERY, recoverDownshiftAt } = require('../../lib/parts/queries');
+const { readPartsEntryInput } = require('../../lib/parts/validation');
 
 const { fns, setDriver } = loadFunctions();
 test.after(() => setDriver(null));
@@ -97,10 +98,35 @@ test('handler: tooMany only at PartsPolicy.tooManyPartsCount parts in its window
     { open: 'p2', band: 'flooded', crisis: false, reasons: ['checkin_flooding'], tooMany: true });
 });
 
+test('handler: paused only when the request names a part and the query says it is paused; never a lock', async () => {
+  const asked = [];
+  const deps = (paused, recent = quiet) => ({
+    policy: async () => null, recent: async () => recent, dissociation: async () => 0, partsMade: async () => 3,
+    partPaused: async (id) => { asked.push(id); return paused; },
+  });
+  const id = '11111111-2222-4333-8444-555555555555';
+  assert.deepEqual(await getPartsEntryHandler(deps(true)), { open: 'clear', reasons: [], tooMany: true }, 'no partId: not asked');
+  assert.deepEqual(asked.splice(0), []);
+  assert.deepEqual(await getPartsEntryHandler(deps(false), { partId: id }), { open: 'clear', reasons: [], tooMany: true });
+  assert.deepEqual(await getPartsEntryHandler(deps(true), { partId: id }), { open: 'clear', reasons: [], tooMany: true, paused: true });
+  assert.deepEqual(await getPartsEntryHandler(deps(true, { ...quiet, checkinFlooding: true }), { partId: id }),
+    { open: 'p2', band: 'flooded', crisis: false, reasons: ['checkin_flooding'], tooMany: true, paused: true });
+  assert.deepEqual(asked, [id, id, id]);
+});
+
+test('readPartsEntryInput: a well-formed partId or nothing; never a refusal (the flood signal must not be lost)', () => {
+  const id = '11111111-2222-4333-8444-555555555555';
+  assert.deepEqual(readPartsEntryInput({ partId: id }), { partId: id });
+  for (const raw of [undefined, null, {}, 'x', { partId: null }, { partId: 'not-an-id' }, { partId: 7 }, { partId: `${id}x` }, { uid: 'someone-else' }]) {
+    assert.deepEqual(readPartsEntryInput(raw), { partId: null }, JSON.stringify(raw));
+  }
+});
+
 // ------------------------------------------------------------------ callable (fake driver)
 
-function partsDriver({ policy = null, recent = null, n = 0, made = 0 } = {}) {
+function partsDriver({ policy = null, recent = null, n = 0, made = 0, paused = null } = {}) {
   return fakeDriver((q) => {
+    if (q === PART_PAUSED_QUERY) return paused === null ? [] : [{ paused }];
     if (q === PARTS_MADE_QUERY) return [{ n: made }];
     if (q === POLICY_QUERY) return policy ? [policy] : [];
     if (q === RECENT_QUERY) return [recent ?? { checkinFlooding: false, checkinCrisis: false, recoverLoud: false }];
@@ -1065,4 +1091,30 @@ test('setPartAnchor over the fake driver: caller-scoped part and line keys, sign
   await assert.rejects(fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, lineId: OWN_LINE, own: 'both' } }), code('invalid-argument'));
   await assert.rejects(fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, own: 'x'.repeat(91) } }), code('invalid-argument'));
   await assert.rejects(fns.setPartAnchor.run({ data: { partId: PID, own: 'ok' } }), code('unauthenticated'));
+});
+
+test("getPartsEntry with a partId: paused from the caller's own part only, by key; unknown ids give no paused", async () => {
+  const id = '11111111-2222-4333-8444-555555555555';
+  const f = partsDriver({ paused: true });
+  setDriver(f.driver);
+  assert.deepEqual(await fns.getPartsEntry.run({ auth: auth('real-user'), data: { partId: id, uid: 'someone-else' } }),
+    { open: 'clear', reasons: [], paused: true });
+  const c = f.calls.find((x) => x.query === PART_PAUSED_QUERY);
+  assert.equal(c.params.uid, 'real-user');
+  assert.equal(c.params.partKey, `real-user:${id}`);
+  assert.match(PART_PAUSED_QUERY, /coalesce\(u\.partsEnabled, false\)/);
+  assert.match(PART_PAUSED_QUERY, /\(u\)-\[:HAS_PART\]->\(p:Part \{key: \$partKey\}\)/);
+  assert.match(PART_PAUSED_QUERY, /p\.ownerId = \$uid/);
+  assert.match(PART_PAUSED_QUERY, /coalesce\(p\.pausedUntil > datetime\(\), false\) AS paused/);
+  assert.ok(f.sessions.every((s) => s.config.defaultAccessMode === 'READ'));
+  assert.ok(f.allClosed());
+
+  for (const paused of [null, false]) {
+    setDriver(partsDriver({ paused }).driver);
+    assert.deepEqual(await fns.getPartsEntry.run({ auth: auth(), data: { partId: id } }), { open: 'clear', reasons: [] });
+  }
+  const g = partsDriver({ paused: true });
+  setDriver(g.driver);
+  assert.deepEqual(await fns.getPartsEntry.run({ auth: auth(), data: { partId: 'nope' } }), { open: 'clear', reasons: [] });
+  assert.ok(!g.calls.some((x) => x.query === PART_PAUSED_QUERY), 'a malformed id is never queried');
 });
