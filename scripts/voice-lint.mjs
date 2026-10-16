@@ -201,6 +201,14 @@ export const PARTS_KINDS = {
   first_person: { scope: 'parts_chip', maxChars: 90, slots: ['felt'] },
 };
 
+/**
+ * "Me" is the app's screen name (the profile surface), not the app speaking in first person: in parts
+ * copy a capitalised "Me" inside a sentence passes voice_distance ("It's in Me when you want it.").
+ * Lower-case "me", and "Me" opening a sentence, still fail. Lint only: lengths count the real text.
+ */
+export const PARTS_SCREEN_NAME = /(?<=[^.!?]\s)Me\b/g;
+const screenNamed = (t) => norm(t).replace(PARTS_SCREEN_NAME, 'Xx');
+
 /** Every slot at its width; an unknown slot keeps its literal text (it is a parts_slots finding anyway). */
 const partsFilled = (t) => norm(t).replace(/\{(\w+)\}/g, (s, name) => (name in PARTS_SLOT_WIDTH ? 'x'.repeat(PARTS_SLOT_WIDTH[name]) : s));
 
@@ -227,7 +235,7 @@ export function lintPartsCopy(rows) {
     }
     const push = (f) => { if (f.severity === 'error' || f.severity === 'warn') out.push({ id, field, kind, ...f }); };
     const structural = (rule, match) => push({ rule, severity: STRUCT[rule].severity[k.scope], message: STRUCT[rule].message, match });
-    for (const f of lintText(row.text, { scope: k.scope })) push(f);
+    for (const f of lintText(screenNamed(row.text), { scope: k.scope })) push(f);
     const len = partsFilled(row.text).length;
     if (len > k.maxChars) structural('parts_max_length', `${len} chars, ${kind} max ${k.maxChars}`);
     const bad = [...norm(row.text).matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((s) => !k.slots.includes(s));
