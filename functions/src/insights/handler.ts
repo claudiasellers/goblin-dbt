@@ -11,6 +11,7 @@ import type {
   CheckInRow, EscalationContent, FormulationContent, FormulationInsight, InsightsPayload, LegacyUsageRow, ProactiveAlert,
   SessionRow, SomaticCorrelationData, TimeRange,
 } from './types';
+import type { PartReflect } from '../parts/statsTypes';
 
 export interface InsightsDeps {
   /** The user's check-ins in the range, newest first, quadrant set. */
@@ -24,11 +25,15 @@ export interface InsightsDeps {
   escalation(patternId: string): Promise<EscalationContent | null>;
   /** ActivationPattern.somatic_narrative, else SomaticQuadrantNarrative.narrative, else ''. */
   somaticNarrative(id: string): Promise<string>;
+  /** The parts section (functions/src/parts/stats.ts partsReflect), all time: null with parts off. */
+  parts(): Promise<PartReflect[] | null>;
 }
 
 export async function getInsightsHandler(range: TimeRange, deps: InsightsDeps): Promise<InsightsPayload> {
-  // The three reads are independent; the query layer gives each its own transaction.
-  const [checkIns, sessions, legacy] = await Promise.all([deps.checkIns(range), deps.sessions(range), deps.legacyUsages(range)]);
+  // The reads are independent; the query layer gives each its own transaction.
+  const [checkIns, sessions, legacy, parts] = await Promise.all([
+    deps.checkIns(range), deps.sessions(range), deps.legacyUsages(range), deps.parts(),
+  ]);
   const th = thresholdsFor(range);
   const tally = tallyPatterns(checkIns);
   const outcomes = outcomeRows(sessions, legacy);
@@ -79,5 +84,6 @@ export async function getInsightsHandler(range: TimeRange, deps: InsightsDeps): 
     continuityPrompt: null,
     patternFrequencies: tally.frequencies,
     totalCheckIns: checkIns.length,
+    parts,
   };
 }

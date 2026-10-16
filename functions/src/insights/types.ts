@@ -1,7 +1,8 @@
 /**
- * Insights (Reflect) types. Pure, no imports. The payload half is mirrored by hand in
+ * Insights (Reflect) types. Pure, type imports only. The payload half is mirrored by hand in
  * src/services/neo4j.ts (the client's InsightsPayload); add fields there in the same change.
  */
+import type { PartReflect } from '../parts/statsTypes';
 
 export type TimeRange = '7d' | '30d' | 'all';
 export const TIME_RANGES: readonly TimeRange[] = ['7d', '30d', 'all'];
@@ -130,4 +131,9 @@ export interface InsightsPayload {
   continuityPrompt: null;
   patternFrequencies: PatternFrequency[];
   totalCheckIns: number;
+  /**
+   * The parts the person knows, each with its lines past their thresholds (functions/src/parts/stats.ts),
+   * all time (not the range: they read across weeks). null with parts off; [] when no part has a line.
+   */
+  parts: PartReflect[] | null;
 }

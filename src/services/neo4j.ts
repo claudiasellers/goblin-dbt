@@ -5,6 +5,7 @@ import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { auth, functions } from './firebase';
 import type { CollectedWord, FindTheFeelingContent, FindTheFeelingSession } from '../data/findTheFeelingTypes';
 import type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
+import type { PartReflect } from '../data/partsTypes';
 
 /**
  * Read-only content shipped with the app (src/data/content/, generated from the graph by
@@ -812,6 +813,11 @@ export interface InsightsPayload {
   continuityPrompt: null;
   patternFrequencies: PatternFrequency[];
   totalCheckIns: number;
+  /**
+   * Mirrors functions/src/insights/types.ts: the parts the person knows, each with its lines past their
+   * thresholds (all time). null with parts off; absent from a server older than part-stats-reflect.
+   */
+  parts?: PartReflect[] | null;
 }
 
 const getInsightsDataFn = httpsCallable<
