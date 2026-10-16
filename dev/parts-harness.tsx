@@ -6,9 +6,11 @@
  * dev/parts-example.ts; the close is the spine's own copy. No Firebase, no graph. Not part of the app build.
  *   npm run dev, then open http://localhost:5173/dev/parts.html
  *   or: npx vite build --config dev/vite.harness.config.ts && (cd dev-dist && python3 -m http.server 4321)
- * URL params: ?view=meet|den|card|offer &move=hide|chase|hit_back|keep_the_peace|turn_on_myself|…
+ * URL params: ?view=meet|den|card|offer
+ *   &move=hide|chase|hit_back|keep_the_peace|turn_on_myself|… starts Meet a part from that named trailhead
+ *     (Find is already answered, so the blend check is the first screen); without it, Find comes first
  *   &palette=velvet|dusk|tinted|pastel|pastel-mix|daylight &theme=dark|light
- *   &blend=1 shows the blend check before Meet a part (pending the flood-signal decision)
+ *   &blend=0 skips the blending check (decided 16 Oct; asked once "it" is named), to walk the rest of the flow
  */
 import { StrictMode, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -16,9 +18,10 @@ import '../src/index.css';
 import fixture from '../tests/fixtures/capacity-content.json';
 import partsFixture from '../tests/fixtures/parts-content.json';
 import spineFile from '../src/data/content/spine.json';
-import type { CapacityContent } from '../src/data/capacityTypes';
+import type { CapacityContent, HandoffResult } from '../src/data/capacityTypes';
 import { BandProvider } from '../src/contexts/BandContext';
 import { TooMuchLink } from '../src/components/capacity/TooMuchLink';
+import { BreakdownHandoff } from '../src/components/capacity/BreakdownHandoff';
 import { CrisisBanner } from '../src/components/safety/CrisisBanner';
 import { HeatFigure, type FigureMark } from '../src/components/checkin/body/HeatFigure';
 import { REGIONS, type RegionId } from '../src/data/bodyFigure';
@@ -121,30 +124,45 @@ function OwnWords({ onDone }: { onDone: (text: string) => void }) {
 
 /* ───────── Meet a part ───────── */
 
-type Step = 'blend' | 'find' | 'where' | 'shape' | 'age' | 'young' | 'voice' | 'feel' | 'unblend' | 'unblendEnd' | 'nothing' | 'job' | 'likes'
+type Step = 'blend' | 'blendBody' | 'find' | 'where' | 'shape' | 'age' | 'young' | 'voice' | 'feel' | 'unblend' | 'unblendEnd' | 'nothing' | 'job' | 'likes'
   | 'guards' | 'fear' | 'stop' | 'update' | 'canNow' | 'thank' | 'rather' | 'name' | 'keep' | 'tender' | 'close' | 'done';
 const TRACK: Partial<Record<Step, number>> = { find: 1, where: 2, shape: 3, age: 3, young: 3, voice: 3, feel: 4, unblend: 4, job: 5, likes: 5, guards: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, rather: 8, name: 9, keep: 9, tender: 8, close: 10 };
 const ORIENTING = SPINE.kinds.orienting;
-const FIRST: Step = q.get('blend') === '1' ? 'blend' : 'find';
+/**
+ * The blending check needs something for "it" to point at: it comes right after Find, or first when the
+ * flow starts from a named trailhead (?move=…, which already answers Find). ?blend=0 skips it.
+ */
+const BLEND = q.get('blend') !== '0';
+const NAMED_TRAILHEAD = !!MOVES[q.get('move') ?? ''];
+const AFTER_FIND: Step = BLEND ? 'blend' : 'where';
+const FIRST: Step = NAMED_TRAILHEAD ? AFTER_FIND : 'find';
+/** The blend check's answer, by option id. It is a log field only: never a band, never carried, never routed on. */
+const BLEND_ANSWER: Record<string, 'notice' | 'running' | 'not_sure'> = { blend_notice: 'notice', blend_running: 'running', blend_not_sure: 'not_sure' };
 
 interface Session {
   move: MoveId; place: RegionId | null; shape: Feel; ageId?: string; voiceId?: string; ownVoice?: string;
   feelTowardIds: string[]; steppedBack: number; jobId?: string; ownJob?: string; likesId?: string; guardsId?: string;
   fearId?: string; ownFear?: string; updateId?: string; canNowId?: string; ratherId?: string; name?: string;
   tender: boolean; danger: boolean; stopReason: 'tender' | 'own_words' | 'worried_part' | 'nothing' | null; kept: boolean | null; closeId?: string;
+  blendCheck?: 'notice' | 'running' | 'not_sure'; handoffs: HandoffResult[]; exitStep?: Step;
 }
 
 function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unknown) => void }) {
-  const fresh = (): Session => ({ move: initialMove, place: null, shape: fromVec([0, 0, 0, 0, 0]), feelTowardIds: [], steppedBack: 0, tender: false, danger: false, stopReason: null, kept: null });
+  const fresh = (): Session => ({ move: initialMove, place: null, shape: fromVec([0, 0, 0, 0, 0]), feelTowardIds: [], steppedBack: 0, tender: false, danger: false, stopReason: null, kept: null, handoffs: [] });
   const [step, setStep] = useState<Step>(FIRST);
   const [round, setRound] = useState(0);
   const [ownFor, setOwnFor] = useState<null | 'voice' | 'job' | 'fear'>(null);
+  /** "Picking up where we were.", on the step P2 resumed to, until the person moves on. */
+  const [resumeNote, setResumeNote] = useState(false);
+  /** P2 ended on "come back later" (a follow-up was scheduled): the run ends after its own message. */
+  const [later, setLater] = useState(false);
   const [s, setS] = useState<Session>(fresh);
   const set = (p: Partial<Session>) => setS((x) => ({ ...x, ...p }));
   const move = MOVES[s.move];
   const safety = !!move.safetyLine || s.danger;
-  const go = (st: Step) => { setOwnFor(null); setStep(st); };
-  const restart = () => { setStep(FIRST); setRound(0); setS(fresh()); };
+  const go = (st: Step) => { setOwnFor(null); setResumeNote(false); setStep(st); };
+  const restart = () => { setStep(FIRST); setRound(0); setS(fresh()); setLater(false); setResumeNote(false); };
+  const addHandoff = (r: HandoffResult) => setS((x) => ({ ...x, handoffs: [...x.handoffs, r] }));
 
   useEffect(() => {
     if (step !== 'done') return;
@@ -154,6 +172,9 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
         layer: 'log', trailheadKind: 'move', moveId: s.move, place: s.place, shape: [s.shape.sharp, s.shape.heat, s.shape.weight, s.shape.buzz, s.shape.clench].map((n) => +n.toFixed(2)),
         ageId: s.ageId, voiceId: s.voiceId, ownVoice: s.ownVoice, feelTowardIds: s.feelTowardIds, steppedBack: s.steppedBack,
         jobId: s.jobId, ownJob: s.ownJob, likesId: s.likesId, guardsId: s.guardsId, fearId: s.fearId, ownFear: s.ownFear, stopReason: s.stopReason,
+        exitStep: s.exitStep,
+        // The blending check and the P2 run it opened: log only, never a band and never a profile write.
+        blendCheck: s.blendCheck, handoffs: s.handoffs.length ? s.handoffs : undefined,
       },
       ToolSession: { layer: 'log', toolId: 'meet-a-part', closeKind: 'orienting', thenVsNow: s.closeId ?? null },
       keepPart: s.kept ? {
@@ -219,14 +240,29 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
     switch (step) {
       case 'blend': return (<>
         <p className="text-lg font-medium">{P('gate_blend_check')}</p>
-        {pick('gate', 'blend', 'find')}
-        <p className="text-xs text-[var(--color-text-tertiary)]">Harness note: shown only with ?blend=1; pending the {PC.prompts.gate_blend_check.pending}.</p>
+        {/* "Not sure" is a complete answer: it goes on like "I can notice it". Only body_first changes the way. */}
+        <Chips options={opts('gate', 'blend', s.move)} onPick={(o) => {
+          set({ blendCheck: BLEND_ANSWER[o.id] });
+          go(o.branch === 'body_first' ? 'blendBody' : 'where');
+        }} />
+        <p className="text-xs text-[var(--color-text-tertiary)]">Harness note: asked once "it" is named, never on the check-in; ?blend=0 skips it.</p>
+      </>);
+      // "It's running things": the real P2 hand-off, card first, in the page (no band is recorded, so stirred).
+      // Resume or keep going lands on Where, never on the blend check again.
+      case 'blendBody': return (<>
+        <BreakdownHandoff host="meet-a-part" band="stirred" blank={false}
+          resume={{ hostSessionId: '00000000-0000-4000-8000-0000000000aa', stepId: 'where', draft: {} }}
+          onScheduleLater={async (chip) => { onLog({ FollowUp: { layer: 'log', type: 'resume_skill', window: chip } }); return 'fu-demo'; }}
+          onResume={(r) => { addHandoff(r); go('where'); if (!r.overridden) setResumeNote(true); }}
+          onLater={(r) => { addHandoff(r); set({ exitStep: 'blend' }); setLater(true); }} />
+        {/* Come back later ends the run the way a stopped session does: the spine's close, then done. */}
+        {later && <Primary onClick={() => go('close')}>Continue</Primary>}
       </>);
       case 'find': return (<>
         <p className="text-lg font-medium">{P('meet_find')}</p>
         <div className="flex flex-wrap gap-2.5">
-          <Chip label={`The pull to ${move.label.toLowerCase()}`} on onClick={() => go('where')} />
-          {PARTS.filter((p) => !p.tender).slice(0, 2).map((p) => <Chip key={p.id} label={p.name} onClick={() => { set({ move: p.move }); go('where'); }} />)}
+          <Chip label={`The pull to ${move.label.toLowerCase()}`} on onClick={() => go(AFTER_FIND)} />
+          {PARTS.filter((p) => !p.tender).slice(0, 2).map((p) => <Chip key={p.id} label={p.name} onClick={() => { set({ move: p.move }); go(AFTER_FIND); }} />)}
           {opts('meet', 'find').map((o) => <Chip key={o.id} label={o.label} onClick={() => onLog({ find: o.id })} />)}
         </div>
         <p className="text-sm text-[var(--color-text-tertiary)]">Or start from another move:</p>
@@ -237,6 +273,7 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
       case 'where': {
         const marks: FigureMark[] = s.place ? [{ region: s.place, side: 'both', colour: 'var(--color-quadrant-low-unpleasant)', strength: 0.6 }] : [];
         return (<>
+          {resumeNote && <p className="text-sm text-[var(--color-text-secondary)]">{capacity.handoff.resumeLine}</p>}
           <p className="text-lg font-medium">{P('meet_where')}</p>
           <div className="mx-auto w-44"><HeatFigure marks={marks} selected={s.place} onPick={(r) => set({ place: r })} /></div>
           <p className="text-sm text-[var(--color-text-secondary)] min-h-5">{s.place ? `My ${REGIONS[s.place].label.toLowerCase()}` : 'Touch and drag to a place, then lift.'}</p>
@@ -355,11 +392,12 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
 
   return (
     <div className="space-y-5">
-      {step !== 'done' && step !== 'blend' && <Track at={TRACK[step] ?? 1} total={10} />}
+      {!['done', 'blend', 'blendBody'].includes(step) && <Track at={TRACK[step] ?? 1} total={10} />}
       {/* Crisis resources alongside, never instead: the app's own banner (the crisis seam's copy). */}
-      {safety && !['blend', 'find', 'done'].includes(step) && <CrisisBanner />}
+      {safety && !['find', 'done'].includes(step) && <CrisisBanner />}
       <div className="space-y-4">{body()}</div>
-      {!['done'].includes(step) && (
+      {/* Every screen but P2 itself (no hand-off inside the hand-off). */}
+      {!['done', 'blendBody'].includes(step) && (
         <TooMuchLink host="meet-a-part" blank={false} onResult={(r) => onLog({ tooMuch: r })}
           resume={() => ({ hostSessionId: '00000000-0000-4000-8000-0000000000aa', stepId: step, draft: {} })} />
       )}
