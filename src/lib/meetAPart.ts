@@ -34,6 +34,7 @@ export const MEET_PROMPTS: Partial<Record<MeetStep, readonly string[]>> = {
   guards: ['meet_guards'], fear: ['meet_fear'], stop: ['meet_stop_title', 'meet_stop_body', 'meet_stop_therapist'],
   update: ['meet_update'], canNow: ['meet_update_show'], thank: ['meet_thank', 'meet_thank_hold', 'meet_thank_done'],
   tender: ['meet_tender', 'meet_tender_sub'], rather: ['meet_rather'], name: ['meet_name'], keep: ['meet_keep'],
+  done: ['meet_done'],
 };
 
 /** The steps that take "In my words". */

@@ -78,4 +78,9 @@ export interface PartsContent {
   hurts: PartsHurt[];
   /** Recover's "what happened" (InvalidationEvent id) → the hurts it can touch, in order (approved CAN_TOUCH). */
   canTouch: Record<string, string[]>;
+  /**
+   * PartsPolicy's two numbers a screen needs, only once the policy is signed off. Absent: the client's
+   * pinned defaults (the server's), src/lib/meetAPartSave.ts.
+   */
+  limits?: { nameMaxChars: number; maxNonSelfAnswers: number };
 }

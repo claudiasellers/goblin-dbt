@@ -15,6 +15,10 @@ export interface PartsEntryPolicy {
   dissociationDays: number;
   /** Recover's own flooded line (its flow's `gates.downshiftAt`). */
   recoverDownshiftAt: number;
+  /** This many parts made … */
+  tooManyPartsCount: number;
+  /** … in this many days: one aftercare line in Meet a part. */
+  tooManyPartsDays: number;
 }
 
 /**
@@ -26,6 +30,8 @@ export const DEFAULT_ENTRY_POLICY: PartsEntryPolicy = {
   dissociationCount: 2,
   dissociationDays: 14,
   recoverDownshiftAt: 7,
+  tooManyPartsCount: 3,
+  tooManyPartsDays: 7,
 };
 
 /** Patterns that count as dissociation history (the low-unpleasant shutdown pair). */
@@ -44,6 +50,8 @@ export function resolveEntryPolicy(raw: Partial<Record<keyof PartsEntryPolicy, u
     dissociationCount: positive(r.dissociationCount) ?? DEFAULT_ENTRY_POLICY.dissociationCount,
     dissociationDays: positive(r.dissociationDays) ?? DEFAULT_ENTRY_POLICY.dissociationDays,
     recoverDownshiftAt: positive(r.recoverDownshiftAt) ?? DEFAULT_ENTRY_POLICY.recoverDownshiftAt,
+    tooManyPartsCount: positive(r.tooManyPartsCount) ?? DEFAULT_ENTRY_POLICY.tooManyPartsCount,
+    tooManyPartsDays: positive(r.tooManyPartsDays) ?? DEFAULT_ENTRY_POLICY.tooManyPartsDays,
   };
 }
 
