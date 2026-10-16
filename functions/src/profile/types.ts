@@ -6,23 +6,26 @@
  * PROFILE_NEEDS is code, reviewed per PR: a content load can never widen what a tool reads.
  * Copy and revisit policy live in the graph (ProfileKind).
  */
-export type ProfileAreaId = 'about_me' | 'my_people' | 'my_body' | 'my_words' | 'my_plans' | 'my_patterns' | 'my_progress';
-export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people', 'my_body', 'my_words', 'my_plans', 'my_patterns', 'my_progress'];
+export type ProfileAreaId = 'about_me' | 'my_people' | 'my_body' | 'my_words' | 'my_plans' | 'my_patterns' | 'my_parts' | 'my_progress';
+export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people', 'my_body', 'my_words', 'my_plans', 'my_patterns', 'my_parts', 'my_progress'];
 
 /** Phase A slices, then reserved ones (their resolvers return empty until the owner ships). */
 export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'crisisKit', 'safetyPlan', 'country',
+  'parts', 'partDetail',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
 export type ItemPrompt = 'none' | 'quiet' | 'ask';
+export type ProfileItemStatus = 'active' | 'resting' | 'set_aside';
 export interface ProfileItemMeta {
   id: string;
   kind: string;
   area: ProfileAreaId;
-  status: 'active' | 'set_aside';
+  /** resting: a part gone quiet (still live, not set aside: "parts go quiet, not gone"). */
+  status: ProfileItemStatus;
   source: string;
   confirmedAt: string | null;
   revisitAt: string | null;
@@ -55,6 +58,17 @@ export interface ProfileSlices {
   crisisKit: null;
   safetyPlan: null;
   country: null;
+  /**
+   * Kept parts (Phase 2), active and resting only; nothing at all while parts are off
+   * (User.partsEnabled). `tender`: every consumer that speaks to a part stays gentle with it.
+   */
+  parts: Array<{ id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; moveIds: string[]; meta: ProfileItemMeta }>;
+  /** The rest of a kept part (Meet a part reads it); `hurtIds` from GUARDS. Own-words fields as written. */
+  partDetail: Array<{
+    id: string; ageId: string | null; voiceIds: string[]; ownVoice: string | null; jobIds: string[]; ownJob: string | null;
+    fearIds: string[]; ownFear: string | null; preferredRoleIds: string[]; anchorLineId: string | null; places: string[];
+    shapeSig: number[] | null; hurtIds: string[];
+  }>;
 }
 
 /**
@@ -69,6 +83,8 @@ export const PROFILE_NEEDS = {
   'checkin': ['patterns'],                    // the router's tie-break (E4)
   'today': ['quietHours'],
   'witness': ['name', 'ownLines', 'savedLines'],
+  // Phase 2: 'meet-a-part': ['name', 'parts', 'partDetail'] lands with the tool (a consumer must be
+  // an app tool). Other tools declare 'parts' in the phase that renders them, never before.
 } as const satisfies Record<string, readonly SliceId[]>;
 
 export type ProfileConsumer = keyof typeof PROFILE_NEEDS;

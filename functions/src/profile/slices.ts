@@ -26,7 +26,30 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
               lastUsedAt: toString(o.lastUsedAt), confirmedAt: toString(o.confirmedAt), revisitAt: toString(o.revisitAt)} AS o`,
   savedLines: `MATCH (:User {id: $uid})-[k:SAVED_LINE]->(l:ValidationLine)
     RETURN l.id AS lineId, toString(k.confirmedAt) AS confirmedAt ORDER BY k.lastAt DESC LIMIT 50`,
+  // Parts off (absent = off) returns no rows at all; set-aside parts are never read by a tool.
+  // Nulls sort first under DESC in Cypher, hence the IS NULL keys: never-visited parts go last.
+  parts: `MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
+    MATCH (u)-[:HAS_PART]->(p:Part) WHERE p.status IN ['active', 'resting']
+    OPTIONAL MATCH (p)-[:USES]->(m:ProtectiveMove)
+    WITH p, collect(m.id) AS moveIds
+    ORDER BY p.lastVisitedAt IS NULL, p.lastVisitedAt DESC, p.confirmedAt IS NULL, p.confirmedAt DESC, p.id LIMIT 50
+    RETURN p {.id, .kind, .area, .status, .source, .name, .tender,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p, moveIds`,
+  partDetail: `MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
+    MATCH (u)-[:HAS_PART]->(p:Part) WHERE p.status IN ['active', 'resting']
+    OPTIONAL MATCH (p)-[:GUARDS]->(h:ProtectedHurt)
+    WITH p, collect(h.id) AS hurtIds
+    ORDER BY p.lastVisitedAt IS NULL, p.lastVisitedAt DESC, p.confirmedAt IS NULL, p.confirmedAt DESC, p.id LIMIT 50
+    RETURN p {.id, .ageId, .voiceIds, .ownVoice, .jobIds, .ownJob, .fearIds, .ownFear, .preferredRoleIds,
+              .anchorLineId, .places, .shapeSig} AS p, hurtIds`,
 };
+
+/** A list property or collected ids: absent → [], nulls dropped, sorted when `sorted`. */
+function strings(v: unknown, sorted = false): string[] {
+  const out = Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
+  return sorted ? [...new Set(out)].sort() : out;
+}
+const strOrNull = (v: unknown): string | null => (typeof v === 'string' ? v : null);
 
 type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: number) => Promise<ProfileSlices[K]>;
 
@@ -75,6 +98,33 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
   savedLines: async (tx, uid) => {
     const r = await tx.run(SLICE_QUERIES.savedLines!, { uid });
     return r.records.map((rec) => ({ lineId: String(rec.get('lineId')), confirmedAt: (rec.get('confirmedAt') as string | null) ?? null }));
+  },
+  parts: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.parts!, { uid });
+    return r.records.map((rec) => {
+      const p = rec.get('p') as Record<string, unknown>;
+      const meta = metaFrom(p, now);
+      return {
+        id: String(p.id), name: strOrNull(p.name), status: meta.status === 'resting' ? 'resting' as const : 'active' as const,
+        tender: p.tender === true, moveIds: strings(rec.get('moveIds'), true), meta,
+      };
+    });
+  },
+  partDetail: async (tx, uid) => {
+    const r = await tx.run(SLICE_QUERIES.partDetail!, { uid });
+    return r.records.map((rec) => {
+      const p = rec.get('p') as Record<string, unknown>;
+      return {
+        id: String(p.id), ageId: strOrNull(p.ageId),
+        voiceIds: strings(p.voiceIds), ownVoice: strOrNull(p.ownVoice),
+        jobIds: strings(p.jobIds), ownJob: strOrNull(p.ownJob),
+        fearIds: strings(p.fearIds), ownFear: strOrNull(p.ownFear),
+        preferredRoleIds: strings(p.preferredRoleIds), anchorLineId: strOrNull(p.anchorLineId),
+        places: strings(p.places),
+        shapeSig: Array.isArray(p.shapeSig) ? p.shapeSig.map((x) => (typeof x === 'number' ? x : int(x))) : null,
+        hurtIds: strings(rec.get('hurtIds'), true),
+      };
+    });
   },
 };
 
