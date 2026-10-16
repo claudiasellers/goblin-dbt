@@ -2,10 +2,13 @@
 
 Status: proposal, 6 Oct 2026 (updated 16 Oct). Not agreed. Nothing here is signed off. Phase 0 is built
 (PR #49): the vocabulary and all parts copy as draft graph content (`scripts/parts/content.py` →
-`schema/parts.cypher`), the parts voice lint, and data fixes 1, 2 and 5. Nothing is shown in the app.
+`schema/parts.cypher`), the parts voice lint, and all six data fixes. Claudia decided three things on
+16 Oct: the flood signal is the **blending check** (below; built as content and in the harness), and
+data fixes 3 and 4 go ahead (built). The angry-part card is being built as a component with no host
+yet; where it lives is her open call. Phase 2's server and profile groundwork (no UI) is in progress.
 Dev harness: `npm run dev`, then `http://localhost:5173/dev/parts.html` (Meet a part, the den, the part
 card, a trail offer). Its copy comes from the generated `tests/fixtures/parts-content.json`; the invented
-example person is `dev/parts-example.ts`. `?view=`, `?move=`, `?palette=`, `?blend=1` (the pending blend check).
+example person is `dev/parts-example.ts`. `?view=`, `?move=`, `?palette=`, `?blend=0` (skip the blending check).
 Umbrella: [alexithymia-first-interaction.md](alexithymia-first-interaction.md). Its *angry part* section is
 the one IFS decision already agreed, and this proposal grows out of it.
 Related: [recover-from-invalidation.md](recover-from-invalidation.md) (v2 *Stage it*), [den-rooms.md](den-rooms.md),
@@ -59,23 +62,54 @@ second therapy beside the first.
 7. **Parts are opt-in.** One switch in Settings, off by default. The only parts language anyone sees
    before turning it on is the angry-part card, and only when they choose it.
 
-## Blocker before Phase 2: there is no flood signal
+## The flood signal: the blending check (decided 16 Oct)
 
 Since the capacity probe came out (30 Sep), nothing records a band:
 
 - `band.record` is called only from Find the feeling (`FindTheFeeling.tsx:78`), and FTF now saves
   `band: null`.
-- So `BandGate` carries nothing.
-- Every "not when flooded" rule in this doc therefore needs another source:
-  - **Server-side gates** read what *is* stored on recent check-ins: `activationPatternId`
-    (`emotional_flooding`, `dissociation_overmodulation`, `conservation_freeze`), `routingBand`,
-    `safetyFlagId`, and the spiraling answer `hu_exp_flooding`.
-  - **On entry to a parts flow, if a check-in in the last 2 h matched flooding or carried a crisis
-    flag**, the flow opens on the P2 hand-off (sigh or orient, then reread). *Keep going anyway* stays
-    available. That is the house's heads-up-plus-choice; the crisis banner sits alongside.
-  - **The client entry gate is Claudia's decision, and it is open.** It must not be the removed probe or
-    a reworded version of it (CLAUDE.md). Until it's decided, parts flows can only start from calm
-    surfaces: Me, Today, Settings. They never start from a check-in result or the inside of a tool.
+- So `BandGate` carries nothing, and every "not when flooded" rule here needed another source.
+
+Two signals now cover it, in this order:
+
+1. **Stored signals (server-side, on entry).** If a check-in in the last 2 h matched flooding
+   (`activationPatternId` `emotional_flooding`, or the spiraling answer `hu_exp_flooding`) or carried a
+   crisis flag (`safetyFlagId`), the flow opens on the P2 hand-off (sigh or orient, then reread), with
+   *Keep going anyway* always there and the crisis banner alongside. Dissociation history (2 or more
+   `dissociation_overmodulation` / `conservation_freeze` matches in 14 days) adds the far-away
+   heads-up instead. These need a read the profile path can't do (`slices.ts` never reads a
+   `:LogRecord`), so they come from a small parts entry callable, `getPartsEntry`. A Recover session
+   in the window that read at or over its own flooded line (`downshiftAt`, 7) at start or end counts
+   as flooding too. When dissociation history fired alongside a P2 outcome, P2 leads with orienting,
+   not the sigh: slowing the breath can deepen shutdown for someone who goes far away.
+2. **The blending check (client, every time).** *"Right now, can you notice it, or is it running
+   things?"* · I can notice it · It's running things · Not sure.
+   - **Where.** Right after the person says what's there (Meet a part step 1), because "it" needs
+     something to point at; first, when the entry already names it (an offer, a candidate, a known
+     part). Two pulls asks *"Right now, can you notice them both, or is one of them running things?"*
+     on its first screen.
+   - **Running things** opens the P2 body hand-off, card first (band `stirred`; `flooded` when a stored
+     signal said so). Quieter → *"Picking up where we were."* and on to the next step, without asking
+     again. *Keep going anyway* is always there. Not quieter after two primitives → *come back later*
+     or *you can stop here*. If P2 already ran on entry (signal 1), *running things* goes straight to
+     those last two choices rather than a second full hand-off. *Come back later* ends the session
+     **without** the orienting close: P2 has just asked its own "compared to a minute ago", and a
+     second question on the way out reads as a quiz (decided 16 Oct). The spine still closes, with no
+     then-vs-now and `exitStep: 'blend'`.
+   - **I can notice it / Not sure** go on. "Not sure" is a complete answer; it never slows the flow.
+   - **Saved** as `blendCheck` (`notice` | `running` | `not_sure`) on the session record, plus the P2
+     result in the existing `handoffs` shape. Ask-fresh: never pre-filled, never carried to another
+     flow, never a profile write.
+
+**Why it isn't the removed probe.** The probe asked about social capacity in general ("If someone asked
+you for a favour right now…") and Claudia took it out because it measured social style more than state.
+The blending check asks how close the person is to a part they've just named, which is IFS's own
+blended / unblended distinction. It is shown only inside parts flows, only with parts on, is never stored
+as a band, never carried, and never read by check-in routing.
+
+The angry-part card doesn't use it: wherever it's hosted, the host already has a loudness signal
+(Recover's reading, or the band DEAR MAN is handed), and the card comes only once that is under the
+flooded line.
 
 ---
 
@@ -429,10 +463,9 @@ hatch, no free text required, no scale anywhere.
   away, stop any time. Coming back into the room comes first."*, plus a 5-4-3-2-1 link, then the
   choice.
 - **`TooMuchLink` on every screen.** It never locks.
-- **Blending check (pending the flood-signal decision).** If Claudia picks it, the first screen asks
-  *"Right now, can you notice it, or is it running things?"* I can notice it · It's running things · Not sure.
-  *Running things* opens on the P2 body hand-off, with *keep going* still there. It asks about distance
-  from the part, not capacity, so it isn't the removed probe. The copy is in the graph as `pending`.
+- **The blending check** (decided 16 Oct; see *The flood signal*). Asked right after step 1, or first
+  when the entry names the part. *Running things* opens the P2 body hand-off, with *keep going* still
+  there.
 
 | # | Step | Screen | Copy (draft) | Options |
 |---|---|---|---|---|
@@ -502,6 +535,7 @@ hatch, no free text required, no scale anywhere.
   - `partId?`, `candidateId?`, `trailheadKind`
   - `stepIds{}`: the ids chosen at each step
   - `feelTowardIds[]`, in the order asked (ask-fresh: in `ASK_FRESH_FIELDS`, never pre-filled)
+  - `blendCheck` (`notice` | `running` | `not_sure`) and, when P2 ran, `handoffs` (ask-fresh, log only)
   - `steppedBack`, `stopReason`, `exitStep`
   - own-words text, as written and never linted or interpreted
 - **The close lives on the ToolSession, not duplicated.** The close kind is `orienting`, and
@@ -628,7 +662,8 @@ The map, at Me → Parts of me → *See them together*.
 
 The dialectics flow, built on Stage. It starts from a rule C trail, from "More than one", or from the
 den. **It has the same gates as Meet a part:** parts on, the flooding / crisis and dissociation checks,
-`TooMuchLink` on every screen, and the tender and danger branches for any chip or own words.
+the blending check (its own wording, about both figures) on the first screen, `TooMuchLink` on every
+screen, and the tender and danger branches for any chip or own words.
 
 1. **Set them out.** Two figures face each other. The person places *themselves*, a soft light, wherever
    feels right.
@@ -689,7 +724,7 @@ which is agreed and which the person chooses.
 
 | Risk | What the design does |
 |---|---|
-| **No band** | Server-side gates on stored flooding / crisis / dissociation signals. Calm-surface entries only until the client gate is decided (the blocker above) |
+| **No band** | Stored flooding / crisis / dissociation signals on entry, then the blending check every time (*The flood signal*) |
 | **Flooding** | P2 first after flooding signals; `TooMuchLink` everywhere; the tender stop; a second non-Self answer ends the session |
 | **Backlash** | Next-day `part_checkback`. *Louder* → body tools, a 72 h pause on that part, and a review signal |
 | **Exile contact and memories** | Protector level only. No question about the past. The tender path is presence only. Own words take the conservative branch |
@@ -793,20 +828,29 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 
 **Registration and tests.**
 
-- Register every label in `userdata/layers.ts` with its `exportAs`. Add the `<label>_key` constraints.
-  Add `feelTowardIds` to `ASK_FRESH_FIELDS`.
+- Register every label in `userdata/layers.ts` with its `exportAs` and ownership rel (`Part` →
+  `HAS_PART`, `PartSession` → `HAS_PART_SESSION`, `PartCandidate` → `HAS_PART_CANDIDATE`; the others
+  when their phase lands). Add the `<label>_key` constraints. Add `feelTowardIds` and `blendCheck` to
+  `ASK_FRESH_FIELDS`.
+- **The switch** is a setting, `partsEnabled` on the user's settings profile (`account/`
+  get/updateUserProfile, `UserProfileContext`), default false. Profile-layer data never goes there;
+  only the switch does.
+- **The entry gate** is `getPartsEntry` in `functions/src/parts/` (signal 1 of *The flood signal*):
+  it reads the caller's own check-ins (flooding or a crisis flag in `floodGateHours`, dissociation
+  matches in `dissociationDays`) and returns only `{ open: 'p2' | 'far_away' | 'clear', band?, crisis? }`.
+  Every outcome lets the person continue.
 - `PROFILE_NEEDS` and the tests that pin it (`tests/profile-layer.test.mjs`):
   - Add slice `parts` to `SLICE_IDS`. It returns active and resting parts' id, name and moves only.
   - Add slice `partDetail` (jobs, fears, voice, preferred roles, anchor), declared only for `meet-a-part`
     and Me.
-  - Declare:
-    - `'meet-a-part': ['name','parts','partDetail']`
-    - `'today': ['quietHours','parts']`
-    - `'dear-man': ['parts']`
-    - `'opposite-action': ['parts']`
-    - `'find-the-feeling': ['name','parts']`
-    - `'recovering-from-invalidation': ['name','parts']`
-    - `'witness': ['name','ownLines','savedLines','parts']`
+  - Both slices return nothing unless the person has parts on (`User.partsEnabled`). `parts` also
+    carries `tender`, so any consumer that speaks to a part knows to stay gentle with it.
+  - Declare each consumer in the phase that first renders parts, never before (a tool must not read
+    parts it doesn't show):
+    - Phase 2: `'meet-a-part': ['name','parts','partDetail']`; `'today': ['quietHours','parts']` with
+      `part_checkback`
+    - Phase 3: `'dear-man': ['parts']`, `'opposite-action': ['parts']`, `'find-the-feeling': ['name','parts']`,
+      `'recovering-from-invalidation': ['name','parts']`, `'witness': ['name','ownLines','savedLines','parts']`
   - The tag row reads through its host tool's needs, so there is no `'spine-close'` consumer.
   - Update the pinned expectations in `tests/profile-layer.test.mjs`.
 - **The area and status types.**
@@ -838,10 +882,17 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
    `CheckIn.spotsJson` (log layer). Anything invalid drops the field, never the save.
 2. **Built (16 Oct).** Problem Solve saves `barrierTypeId`, `barrierSubId`, `ambivalenceId` and
    `confidence` in `ext.er` (ids only; the four confidence values are checked by the client).
-3. Do the Opposite saves a minimal record when the urge was judged helpful. That is a protector doing its
-   job well. **A behaviour change: Claudia's call.**
-4. Urge Surfing asks which urge (FTF's four pulls as chips), filling `ToolSession.urgeIds`. **A new
-   question in a tool: Claudia's call.**
+3. **Built (16 Oct, approved by Claudia).** Do the Opposite records the urge picked in this visit on the
+   visit's `ToolSession` (`urgeIds`, through `setUrgeIds`; the custom urge sends none, and a follow-up
+   visit that reloads a saved plan sends none) and the check's result as ids in `ext.er`: `oaFacts`,
+   `oaEffect`, `oaRoute` (`support` records the route alone). Recheck or going back clears them. This
+   keeps the case where the urge fits the facts and would help (route `problem`): a protector doing its
+   job well. That visit still closes as `exited_early`: closing it `completed` would write an Opposite
+   action rep (`PracticeSkill.defaultFor`), which it isn't.
+4. **Built (16 Oct, approved by Claudia).** Urge Surfing asks "What does it want to do?" with FTF's
+   four pulls (label and sub, from the generated `find-the-feeling.json`), one optional tap, filling
+   `ToolSession.urgeIds`. It sits on the surfing screen, between the wave and the update slider, not
+   before Start: on the first screen it pushed Start below the fold for someone mid-urge.
 5. **Built (16 Oct).** Tool sessions carry `emotionIds`: from the hand-off's `checkinEmotions` at start,
    or set once on close from what the person picked inside the tool (Problem Solve, Do the Opposite,
    Recover, Find the feeling, DEAR MAN's Express chips). A hand-off's ids are never replaced.
@@ -990,8 +1041,7 @@ is a judgment call to test.
 
 ## Open questions
 
-1. **The flood signal.** What replaces the band at the entry to parts flows, given that the probe and its
-   rewordings are out?
+1. ~~**The flood signal.**~~ Decided 16 Oct: the blending check, on top of stored signals.
 2. **The clinical reviewer.** Someone trained in both DBT and IFS, with dissociation experience, should
    review before any copy is signed off. The angry-part spec cites an "Interpersonal-Wound PRD" that isn't
    in the repo. Where is it?
@@ -1068,7 +1118,9 @@ the skills and the ownership.
 Thinking / rejected: Auto-naming parts and roles (reification, dissociation risk, within-person variance);
 exile and memory work (flooding, backlash, recovered-memory risk); Self as a node; goblins as parts; AI
 voicing parts; parts on check-in results; any rating scale, including the SCS-SF in-app.
-Blocker: no flood signal since the capacity probe came out; parts flows need a decided entry gate.
+Decided 16 Oct: the flood signal is the blending check ("can you notice it, or is it running
+things?"), asked inside parts flows only, plus stored check-in signals on entry; Do the Opposite keeps
+the urge when it fits the facts; Urge Surfing asks which pull it is.
 Open: clinical reviewer (DBT + IFS + dissociation), angry card before opt-in, tender parts, My people
 timing, trail thresholds, trademark counsel, plural co-design.
 ```
