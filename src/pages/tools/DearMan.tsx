@@ -297,6 +297,14 @@ export function DearMan() {
     }
   }, [content, checkinEmotions]);
 
+  // The session's emotions when it opened without any: Recover's word (its hand-over carries no
+  // checkinEmotions) and the Express feelings, matched to graph words by label (chips that aren't
+  // a graph word, e.g. "Small", are dropped).
+  useEffect(() => {
+    const labels = content ? feelings.map(id => content.feelingChips.find(f => f.id === id)?.label ?? '') : [];
+    session.setEmotionIds([...(handoff?.emotionId ? [handoff.emotionId] : []), ...labels]);
+  }, [content, feelings, handoff, session]);
+
   // ── Resolve quadrant from debrief feelings and trigger analysis ──
   useEffect(() => {
     if (phase !== 'debrief-route' || stateResult || !debriefCurrentFeelings.length || !content) return;

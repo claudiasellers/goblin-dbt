@@ -127,6 +127,36 @@ test('closeToolSession: a band asked after the open is set once, only when the s
   assert.equal(g.calls.find((c) => /SET ts\.status = \$status/.test(c.query)).params.bandAtStart, null);
 });
 
+test('closeToolSession: emotions picked in the tool are set once, only when the start had none (parts data fix 5)', async () => {
+  const f = closeDriver();
+  setDriver(f.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed', emotionIds: ['hurt', 'anxious'] } });
+  const close = f.calls.find((c) => /SET ts\.status = \$status/.test(c.query));
+  assert.match(close.query, /WHERE ts\.status = 'open'/, 'inside the close guard (finalise-once)');
+  assert.match(close.query, /ts\.emotionIds = CASE WHEN size\(coalesce\(ts\.emotionIds, \[\]\)\) = 0 AND size\(\$emotionIds\) > 0\s+THEN \$emotionIds ELSE ts\.emotionIds END/);
+  assert.deepEqual(close.params.emotionIds, ['hurt', 'anxious']);
+  // None given: [] (the CASE keeps what the start stored).
+  const g = closeDriver();
+  setDriver(g.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed' } });
+  assert.deepEqual(g.calls.find((c) => /SET ts\.status = \$status/.test(c.query)).params.emotionIds, []);
+  // An already-closed session is a no-op: nothing is set.
+  const h = closeDriver({ open: false });
+  setDriver(h.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed', emotionIds: ['hurt'] } });
+  assert.ok(!h.calls.some((c) => /SET ts\.status = \$status/.test(c.query)));
+  // Junk ids are refused.
+  await assert.rejects(fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed', emotionIds: ['I feel awful'] } }), (e) => e.code === 'invalid-argument');
+});
+
+test('startToolSession stores the hand-off emotion ids', async () => {
+  const f = fakeDriver((q) => (/RETURN tu\.id AS toolUsageId/.test(q) ? [{ toolUsageId: `${ID}:usage` }] : []));
+  setDriver(f.driver);
+  await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'problem-solve', entry: 'checkin_result', emotionIds: ['anxious', 'hurt'] } });
+  assert.match(f.calls[0].query, /ts\.emotionIds = \$emotionIds/);
+  assert.deepEqual(f.calls[0].params.emotionIds, ['anxious', 'hurt']);
+});
+
 test('closeToolSession on an unknown session is not-found', async () => {
   setDriver(fakeDriver(() => []).driver);
   await assert.rejects(fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed' } }), (e) => e.code === 'not-found');

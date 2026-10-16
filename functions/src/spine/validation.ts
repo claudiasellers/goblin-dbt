@@ -73,6 +73,8 @@ export interface CloseInput {
   bandAtStart: CapacityReading | null;
   bandAtEnd: CapacityReading | null;
   urgeIds: string[];
+  /** Emotions picked inside the tool: set once, only if the start (a hand-off) had none. */
+  emotionIds: string[];
   durationSec: number | null;
   detail: { kind: DetailKind; id: string } | null;
   /** null → the tool's PracticeSkill.defaultFor; [] → no rep (e.g. FTF without a word). */
@@ -105,6 +107,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
     bandAtStart: reading(d.bandAtStart, now),
     bandAtEnd: reading(d.bandAtEnd, now),
     urgeIds: ids(d.urgeIds, 10),
+    emotionIds: ids(d.emotionIds, 20),
     durationSec: opt(d.durationSec, (x) => intIn(x, { min: 0, max: 86_400 })),
     detail,
     skillIds: d.skillIds === undefined || d.skillIds === null ? null : ids(d.skillIds, 20),

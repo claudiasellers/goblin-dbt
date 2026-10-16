@@ -267,6 +267,10 @@ export function OppositeAction() {
   );
   const [data, setData] = useState<OppositeActionContent | null>(null);
   const [draft, setDraft] = useState<Draft>(blank);
+  // The one emotion worked with is the session's when it opened without any (a hand-off's are kept).
+  useEffect(() => {
+    toolSession.setEmotionIds(draft.emotionId ? [draft.emotionId] : []);
+  }, [draft.emotionId, toolSession]);
   const [error, setError] = useState("");
   const [saveState, setSaveState] = useState<
     "idle" | "saving" | "saved" | "error"

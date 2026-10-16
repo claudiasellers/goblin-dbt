@@ -4,7 +4,7 @@ import { useAuth } from './AuthContext';
 import { ToolSessionContext, type ToolSessionApi, type ToolSessionCloseInput } from '../hooks/useToolSession';
 import { closeToolSession, getSpineContent, startToolSession, type SessionExt } from '../services/spine';
 import { newId } from '../lib/spine/ids';
-import { spineFrom } from '../lib/spine/toolLink';
+import { emotionIdsFromLink, sessionEmotionIds, spineFrom } from '../lib/spine/toolLink';
 import { closeKindFor, durationSec } from '../lib/spine/close';
 import { useToday } from '../hooks/useToday';
 import type { CapacityReading } from '../data/capacityTypes';
@@ -30,6 +30,8 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
       hostSessionId: spine?.hostSessionId,
       followUpId: spine?.followUpId ?? (followUp && /^[0-9a-f-]{36}$/i.test(followUp) ? followUp : undefined),
       patternId: typeof patternId === 'string' ? patternId : undefined,
+      // The feelings the link carries (a check-in result's words, or another tool's picks).
+      emotionIds: emotionIdsFromLink(location.state),
     } as const;
   });
   const uid = user?.uid ?? null;
@@ -46,6 +48,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
   const complete = useRef(false);
   const ext = useRef<SessionExt>({});
   const skills = useRef<string[]>([]);
+  const emotionIds = useRef<string[]>([]);
   const bandAtStart = useRef<CapacityReading | null>(null);
   const closed = useRef(false);
   const mounted = useRef(false);
@@ -59,6 +62,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
       ...(link.hostSessionId ? { hostSessionId: link.hostSessionId } : {}),
       ...(link.followUpId ? { followUpId: link.followUpId } : {}),
       ...(link.patternId ? { patternId: link.patternId } : {}),
+      ...(link.emotionIds.length ? { emotionIds: link.emotionIds } : {}),
     }).then(() => true).catch(() => false);
   }, [uid, id, toolId, link]);
 
@@ -83,6 +87,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
           ...((input.bandAtStart ?? bandAtStart.current) ? { bandAtStart: input.bandAtStart ?? bandAtStart.current ?? undefined } : {}),
           ...(input.bandAtEnd ? { bandAtEnd: input.bandAtEnd } : {}),
           ...(input.urgeIds?.length ? { urgeIds: input.urgeIds } : {}),
+          ...(emotionIds.current.length ? { emotionIds: emotionIds.current } : {}),
           ...(input.detail ? { detail: input.detail } : {}),
           ...((input.skillIds ?? skills.current).length ? { skillIds: input.skillIds ?? skills.current } : {}),
           ...(input.repSource ? { repSource: input.repSource } : {}),
@@ -110,6 +115,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
         for (const [ns, v] of Object.entries(e)) ext.current[ns] = { ...ext.current[ns], ...v };
       },
       setSkillIds: (ids) => { skills.current = ids; },
+      setEmotionIds: (ids) => { emotionIds.current = sessionEmotionIds(ids); },
       setBandAtStart: (r) => { bandAtStart.current = r; },
       close,
       linkTo: (target, state) => ({

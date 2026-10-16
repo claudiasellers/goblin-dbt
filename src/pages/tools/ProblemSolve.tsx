@@ -33,6 +33,9 @@ type Phase =
   | 'commit'
   | 'complete';
 
+/** The confidence ruler's answers; `ext.er.confidence` takes only these. */
+const CONFIDENCE_LEVELS: readonly string[] = ['high', 'medium', 'low', 'none'];
+
 export function ProblemSolve() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -93,13 +96,21 @@ export function ProblemSolve() {
     if (phase === 'define-problem') session.markPracticed();
     if (phase === 'complete') session.markComplete();
   }, [phase, session]);
+  // What got in the way (barrier, its follow-up, the ambivalence answer, confidence) is kept too, as
+  // ids, so a pattern across tools can be seen later.
   useEffect(() => {
     const er: Record<string, string> = {};
     if (selectedProblemTypes[0]?.id) er.problemTypeId = selectedProblemTypes[0].id;
     if (selectedDirection?.id) er.directionId = selectedDirection.id;
     if (chosenSize) er.size = chosenSize;
+    if (selectedBarrier?.id) er.barrierTypeId = selectedBarrier.id;
+    if (selectedSubResponse?.id) er.barrierSubId = selectedSubResponse.id;
+    if (selectedAmbivalence?.id) er.ambivalenceId = selectedAmbivalence.id;
+    if (confidenceLevel && CONFIDENCE_LEVELS.includes(confidenceLevel)) er.confidence = confidenceLevel;
     if (Object.keys(er).length) session.setExt({ er });
-  }, [selectedProblemTypes, selectedDirection, chosenSize, session]);
+  }, [selectedProblemTypes, selectedDirection, chosenSize, selectedBarrier, selectedSubResponse, selectedAmbivalence, confidenceLevel, session]);
+  // The emotions picked here are the session's when it opened without any (a hand-off's are kept).
+  useEffect(() => { session.setEmotionIds(selectedEmotionIds); }, [selectedEmotionIds, session]);
 
   // ── Load content ──
 
