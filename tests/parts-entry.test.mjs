@@ -25,7 +25,9 @@ test("parts callables: exported by name, pinned, in the auth matrix as signed-in
   const matrix = read("functions/test/unit/auth-matrix.test.cjs");
   const authed = matrix.slice(matrix.indexOf("const AUTHED"), matrix.indexOf("const PUBLIC"));
   const service = read("src/services/parts.ts");
-  for (const name of ["getPartsEntry", "startPartSession", "savePartSession", "keepPart", "queuePartCandidate"]) {
+  assert.match(read("functions/src/index.ts"), /^export \{ renamePart, restPart, setAsidePart, restorePart, setPartTender, answerPartRevisit \} from '\.\/parts';$/m);
+  for (const name of ["getPartsEntry", "startPartSession", "savePartSession", "keepPart", "queuePartCandidate",
+    "renamePart", "restPart", "setAsidePart", "restorePart", "setPartTender", "answerPartRevisit"]) {
     assert.ok(name in endpoints, name);
     assert.ok(authed.includes(`'${name}'`), name);
     assert.match(service, new RegExp(`httpsCallable<.*>\\(functions, '${name}'\\)`), name);
@@ -65,4 +67,8 @@ test("single writer: only functions/src/parts/keep.ts MERGEs, CREATEs or SETs a 
   assert.deepEqual(writers, ["functions/src/parts/keep.ts"]);
   const keep = read("functions/src/parts/keep.ts");
   assert.match(keep, /MERGE \(p:Part \{key: \$partKey\}\)\s+ON CREATE SET p:UserData:ProfileItem/);
+  for (const q of ["KEEP_NEW_QUERY", "KEEP_REVISIT_QUERY", "RENAME_PART_QUERY", "REST_PART_QUERY", "SET_ASIDE_PART_QUERY",
+    "RESTORE_PART_QUERY", "SET_PART_TENDER_QUERY", "ANSWER_PART_REVISIT_QUERY"]) {
+    assert.match(keep, new RegExp(`export const ${q} = `), `${q} lives in keep.ts`);
+  }
 });
