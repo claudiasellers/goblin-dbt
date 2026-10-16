@@ -399,6 +399,62 @@
    "copy": "One you haven't named",
    "reviewStatus": "draft"
   },
+  "stats_helped": {
+   "flow": "common",
+   "step": "stats",
+   "order": 2,
+   "copy": "What's helped it settle",
+   "reviewStatus": "draft"
+  },
+  "stats_helped_line": {
+   "flow": "common",
+   "step": "stats",
+   "order": 3,
+   "copy": "{tool} helped {n} times",
+   "reviewStatus": "draft"
+  },
+  "stats_helped_once": {
+   "flow": "common",
+   "step": "stats",
+   "order": 4,
+   "copy": "{tool} helped once",
+   "reviewStatus": "draft"
+  },
+  "stats_felt": {
+   "flow": "common",
+   "step": "stats",
+   "order": 5,
+   "copy": "How you've felt toward it",
+   "reviewStatus": "draft"
+  },
+  "stats_felt_then_now": {
+   "flow": "common",
+   "step": "stats",
+   "order": 6,
+   "copy": "In {month}: {then}. Lately: {now}.",
+   "reviewStatus": "draft"
+  },
+  "stats_felt_since": {
+   "flow": "common",
+   "step": "stats",
+   "order": 7,
+   "copy": "Since {month}: {now}.",
+   "reviewStatus": "draft"
+  },
+  "stats_when": {
+   "flow": "common",
+   "step": "stats",
+   "order": 8,
+   "copy": "Mostly {when}",
+   "reviewStatus": "draft"
+  },
+  "reflect_title": {
+   "flow": "reflect",
+   "step": "parts",
+   "order": 0,
+   "copy": "The parts you know",
+   "reviewStatus": "draft"
+  },
   "unblend_line": {
    "flow": "unblend",
    "step": "line",
@@ -3011,6 +3067,58 @@
      "selfLike": null,
      "branch": "end",
      "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "common": {
+   "stats": [
+    {
+     "id": "when_mornings",
+     "label": "mornings",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "when_afternoons",
+     "label": "afternoons",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "when_evenings",
+     "label": "evenings",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "when_nights",
+     "label": "at night",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

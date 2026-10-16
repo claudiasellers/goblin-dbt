@@ -8,6 +8,7 @@ import { ProactiveAlert } from '../components/insights/ProactiveAlert';
 import { GrowthEvidence } from '../components/insights/GrowthEvidence';
 import { SomaticCorrelation } from '../components/insights/SomaticCorrelation';
 import { ToolEffectiveness } from '../components/insights/ToolEffectiveness';
+import { PartsReflect } from '../components/insights/PartsReflect';
 import { TimeFilter } from '../components/history/TimeFilter';
 import type { TimeRange } from '../components/history/useFilteredCheckIns';
 
@@ -134,6 +135,9 @@ export function Insights() {
           />
         )}
       </div>
+
+      {/* Parts on only, after Reflect's own sections; renders nothing unless a part has a line and the copy ships. */}
+      {data.parts && data.parts.length > 0 && <PartsReflect parts={data.parts} delay={nextDelay()} />}
     </div>
   );
 }
