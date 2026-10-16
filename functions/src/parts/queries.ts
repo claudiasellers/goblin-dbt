@@ -17,7 +17,8 @@ export const POLICY_QUERY = `
   OPTIONAL MATCH (p:PartsPolicy {id: 'parts'})
   OPTIONAL MATCH (f:InvalidationRecoveryFlow {id: 'invalidation_recovery_flow'})
   RETURN p.floodGateHours AS floodGateHours, p.dissociationCount AS dissociationCount,
-         p.dissociationDays AS dissociationDays, f.contentJson AS recoverFlow
+         p.dissociationDays AS dissociationDays, p.tooManyPartsCount AS tooManyPartsCount,
+         p.tooManyPartsDays AS tooManyPartsDays, f.contentJson AS recoverFlow
 `;
 
 /**
@@ -43,6 +44,14 @@ export const DISSOCIATION_QUERY = `
   WHERE c.timestamp >= datetime() - duration({days: $days})
     AND c.activationPatternId IN ['dissociation_overmodulation', 'conservation_freeze']
   RETURN count(c) AS n
+`;
+
+/** Parts made lately (a count only), parts on only: with parts off nothing parts-related is read. */
+export const PARTS_MADE_QUERY = `
+  MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
+  MATCH (u)-[:HAS_PART]->(p:Part {ownerId: $uid})
+  WHERE p.createdAt >= datetime() - duration({days: $days})
+  RETURN count(p) AS n
 `;
 
 /** Recover's `gates.downshiftAt` from its flow JSON, or null. */
@@ -71,6 +80,8 @@ export function graphDeps(uid: string): PartsEntryDeps {
         floodGateHours: toNumber(r.get('floodGateHours')),
         dissociationCount: toNumber(r.get('dissociationCount')),
         dissociationDays: toNumber(r.get('dissociationDays')),
+        tooManyPartsCount: toNumber(r.get('tooManyPartsCount')),
+        tooManyPartsDays: toNumber(r.get('tooManyPartsDays')),
         recoverDownshiftAt: recoverDownshiftAt(r.get('recoverFlow')),
       };
     },
@@ -84,6 +95,10 @@ export function graphDeps(uid: string): PartsEntryDeps {
     },
     async dissociation(days) {
       const r = (await read(DISSOCIATION_QUERY, { uid, days: num(days) }))[0];
+      return toNumber(r?.get('n')) ?? 0;
+    },
+    async partsMade(days) {
+      const r = (await read(PARTS_MADE_QUERY, { uid, days: num(days) }))[0];
       return toNumber(r?.get('n')) ?? 0;
     },
   };

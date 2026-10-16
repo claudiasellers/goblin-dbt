@@ -223,7 +223,7 @@ test("LightHold: the angry card and Meet a part share one hold", () => {
 
 test("no hard-coded copy: Meet a part's screens and page show only content, the person's words, and Back / Next", () => {
   const files = ["src/pages/tools/MeetAPart.tsx", ...readdirSync("src/components/parts/meet").map((f) => `src/components/parts/meet/${f}`)];
-  const CHROME = new Set(["Back", "Next"]);
+  const CHROME = new Set(["Back", "Next", "Done"]);
   const READ_ATTRS = new Set(["aria-label", "placeholder", "title", "alt", "label", "nextLabel", "holdLabel", "doneLabel", "sub"]);
   for (const f of files) {
     const sf = ts.createSourceFile(f, read(f), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
@@ -242,6 +242,41 @@ test("no hard-coded copy: Meet a part's screens and page show only content, the 
   }
   assert.match(read("src/components/parts/meet/MeetScreens.tsx"), /maxLength=\{max\}[\s\S]*font-serif/, "own words: a plain field, in the serif");
   assert.equal(S.MEET_OWN_WORDS_MAX, V.OWN_WORDS_MAX);
+});
+
+test("limits: the shipped policy's two numbers when signed off, else the pinned defaults (the policy rows' own)", () => {
   assert.equal(S.MEET_NAME_MAX, K.DEFAULT_NAME_MAX);
   assert.equal(S.MEET_MAX_NON_SELF, V.DEFAULT_MAX_NON_SELF);
+  assert.deepEqual([S.MEET_NAME_MAX, S.MEET_MAX_NON_SELF], [fixture.policy.nameMaxChars, fixture.policy.maxNonSelfAnswers], "pinned to PartsPolicy");
+  assert.deepEqual(S.meetLimits(SHIPPED), { nameMaxChars: 40, maxNonSelfAnswers: 2 }, "the policy is a draft today: no limits key");
+  assert.ok(!("limits" in SHIPPED));
+  assert.deepEqual(ALL.limits, { nameMaxChars: 40, maxNonSelfAnswers: 2 }, "approved: shipped");
+  assert.deepEqual(S.meetLimits({ limits: { nameMaxChars: 30, maxNonSelfAnswers: 1 } }), { nameMaxChars: 30, maxNonSelfAnswers: 1 });
+  assert.deepEqual(S.meetLimits({ limits: { nameMaxChars: 0, maxNonSelfAnswers: "x" } }), { nameMaxChars: 40, maxNonSelfAnswers: 2 });
+  assert.equal(S.meetContext({ ...ALL, limits: { nameMaxChars: 40, maxNonSelfAnswers: 1 } }, { open: "flow" }, false).maxNonSelfAnswers, 1);
+  assert.match(read("src/pages/tools/MeetAPart.tsx"), /max=\{meetLimits\(parts\)\.nameMaxChars\}/);
+});
+
+test("the last screen: meet_done and Done, whichever way the visit ended; required by the ready check", () => {
+  assert.equal(fixture.prompts.meet_done.copy, "You can come back to this any time.");
+  assert.deepEqual([fixture.prompts.meet_done.flow, fixture.prompts.meet_done.step], ["meet", "close"]);
+  assert.ok(S.meetPromptIds().includes("meet_done"));
+  const page = read("src/pages/tools/MeetAPart.tsx");
+  assert.match(page, /\{P\('meet_done'\)\}[\s\S]*<Link to=\{doneTarget\(entry\)\}[^>]*>Done<\/Link>/);
+  assert.equal(page.match(/\{finale\}|step === 'done' && finale/g)?.length, 3, "after the close, after P2's later, and after P2 on entry");
+  assert.equal(S.doneTarget(S.parseMeetEntry({})), "/profile");
+  assert.equal(S.doneTarget(S.parseMeetEntry({ parts: { trailheadKind: "angry_card" } })), "/");
+});
+
+test("too many parts lately: one line on the first real screen of a new part's visit, never a block", () => {
+  const clear = { open: "clear", reasons: [] };
+  assert.equal(S.showTooMany({ ...clear, tooMany: true }, S.parseMeetEntry({})), true);
+  assert.equal(S.showTooMany(clear, S.parseMeetEntry({})), false);
+  assert.equal(S.showTooMany(null, S.parseMeetEntry({})), false, "a failed gate call");
+  assert.equal(S.showTooMany({ ...clear, tooMany: true }, S.parseMeetEntry({ parts: { partId: PID } })), false, "a visit to a kept part");
+  assert.deepEqual(S.entryPlan({ ...clear, tooMany: true }), { open: "flow" }, "it never changes what opens");
+  assert.equal(fixture.prompts[S.TOO_MANY_PROMPT].copy, "You don't need to get to know everyone at once.");
+  const page = read("src/pages/tools/MeetAPart.tsx");
+  assert.match(page, /\{tooMany && firstScreen && promptCopy\(parts, TOO_MANY_PROMPT\) && <p role="status"/);
+  assert.match(page, /setFirstScreen\(false\); setSt\(/, "gone after the first answer");
 });

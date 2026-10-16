@@ -317,13 +317,16 @@ export function sortParts(c) {
     })),
     // Events by id; each list keeps the order it was given (CAN_TOUCH's `order`).
     canTouch: sortObj(c.canTouch, (list) => [...list]),
+    // The two numbers a screen needs, only once the policy is signed off (absent: the client's pinned defaults).
+    ...(c.limits ? { limits: { nameMaxChars: c.limits.nameMaxChars, maxNonSelfAnswers: c.limits.maxNonSelfAnswers } } : {}),
   };
 }
 
 /**
  * Parts copy (schema/parts.cypher, from scripts/parts/content.py), signed-off rows only: a parts screen
  * renders only once its copy is signed off, so today this is nearly empty. Only what a screen shows:
- * trail rules, contexts and the policy (inference rules and safety numbers) stay on the server, and Two
+ * trail rules, contexts and the rest of the policy (inference rules and safety numbers) stay on the server
+ * (only `limits`, its name length and non-Self answer count, ships once the policy is signed off), and Two
  * pulls' pairs and keepsake wait for their phase. An approved option ships even when its prompt (or a
  * move it is offered for) isn't approved yet; the client checks a flow is complete (flowReady).
  * No parts content at all (parts.cypher not loaded yet) is an empty file, not an error.
@@ -339,7 +342,10 @@ export function buildParts(g) {
   const versions = [...new Set([...moveNodes, ...promptNodes, ...optionNodes, ...hurtNodes].map((n) => n.props.version))];
   if (versions.length > 1) throw new Error(`Parts content mixes versions ${versions.join(', ')}; load schema/parts.cypher again`);
   // With nothing signed off, the version every parts node carries reaches the file through the policy node.
-  const version = versions[0] ?? g.nodes('PartsPolicy').find((n) => n.props.id === 'parts')?.props.version ?? null;
+  const policy = g.nodes('PartsPolicy').find((n) => n.props.id === 'parts');
+  const version = versions[0] ?? policy?.props.version ?? null;
+  const limits = policy && signedOff(policy.props)
+    ? { nameMaxChars: policy.props.nameMaxChars, maxNonSelfAnswers: policy.props.maxNonSelfAnswers } : null;
 
   const offered = edges('OFFERED_FOR', 'PartOption', 'ProtectiveMove');
   const same = edges('SAME_AS', 'PartOption');
@@ -377,6 +383,7 @@ export function buildParts(g) {
       guardedBy: guards.filter((r) => r.b === h).map((r) => ({ moveId: r.a.props.id, rank: r.props.rank })),
     })),
     canTouch,
+    limits,
   });
 }
 

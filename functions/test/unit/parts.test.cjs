@@ -9,7 +9,7 @@ const assert = require('node:assert/strict');
 const { loadFunctions, fakeDriver } = require('./fakeDriver.cjs');
 const { entryGate, resolveEntryPolicy, DEFAULT_ENTRY_POLICY } = require('../../lib/parts/gate');
 const { getPartsEntryHandler } = require('../../lib/parts/handler');
-const { POLICY_QUERY, RECENT_QUERY, DISSOCIATION_QUERY, recoverDownshiftAt } = require('../../lib/parts/queries');
+const { POLICY_QUERY, RECENT_QUERY, DISSOCIATION_QUERY, PARTS_MADE_QUERY, recoverDownshiftAt } = require('../../lib/parts/queries');
 
 const { fns, setDriver } = loadFunctions();
 test.after(() => setDriver(null));
@@ -54,13 +54,13 @@ test('entryGate: nothing recent is clear, and no outcome is a lock', () => {
   }
 });
 
-test('resolveEntryPolicy: a missing policy or bad values take the defaults (2 h, 2 in 14 days, Recover 7)', () => {
-  assert.deepEqual(DEFAULT_ENTRY_POLICY, { floodGateHours: 2, dissociationCount: 2, dissociationDays: 14, recoverDownshiftAt: 7 });
+test('resolveEntryPolicy: a missing policy or bad values take the defaults (2 h, 2 in 14 days, Recover 7, 3 parts in 7 days)', () => {
+  assert.deepEqual(DEFAULT_ENTRY_POLICY, { floodGateHours: 2, dissociationCount: 2, dissociationDays: 14, recoverDownshiftAt: 7, tooManyPartsCount: 3, tooManyPartsDays: 7 });
   assert.deepEqual(resolveEntryPolicy(null), DEFAULT_ENTRY_POLICY);
   assert.deepEqual(resolveEntryPolicy({ floodGateHours: 0, dissociationCount: 'x', dissociationDays: -1, recoverDownshiftAt: null }),
     DEFAULT_ENTRY_POLICY);
-  assert.deepEqual(resolveEntryPolicy({ floodGateHours: 3, dissociationCount: 4, dissociationDays: 21, recoverDownshiftAt: 8 }),
-    { floodGateHours: 3, dissociationCount: 4, dissociationDays: 21, recoverDownshiftAt: 8 });
+  assert.deepEqual(resolveEntryPolicy({ floodGateHours: 3, dissociationCount: 4, dissociationDays: 21, recoverDownshiftAt: 8, tooManyPartsCount: 5, tooManyPartsDays: 10 }),
+    { floodGateHours: 3, dissociationCount: 4, dissociationDays: 21, recoverDownshiftAt: 8, tooManyPartsCount: 5, tooManyPartsDays: 10 });
 });
 
 test("recoverDownshiftAt reads the flow's gates, or null", () => {
@@ -72,23 +72,36 @@ test("recoverDownshiftAt reads the flow's gates, or null", () => {
 
 test('handler: the policy windows reach the queries; a missing policy uses the defaults', async () => {
   const seen = [];
-  const deps = (policy, recent = quiet, n = 0) => ({
+  const deps = (policy, recent = quiet, n = 0, made = 0) => ({
     policy: async () => policy,
     recent: async (hours, downshiftAt) => { seen.push(['recent', hours, downshiftAt]); return recent; },
     dissociation: async (days) => { seen.push(['dissociation', days]); return n; },
+    partsMade: async (days) => { seen.push(['partsMade', days]); return made; },
   });
   assert.deepEqual(await getPartsEntryHandler(deps({ floodGateHours: 3, dissociationCount: 2, dissociationDays: 21, recoverDownshiftAt: 8 })),
     { open: 'clear', reasons: [] });
-  assert.deepEqual(seen.splice(0), [['recent', 3, 8], ['dissociation', 21]]);
+  assert.deepEqual(seen.splice(0), [['recent', 3, 8], ['dissociation', 21], ['partsMade', 7]]);
   const out = await getPartsEntryHandler(deps(null, { ...quiet, checkinCrisis: true }, 5));
-  assert.deepEqual(seen.splice(0), [['recent', 2, 7], ['dissociation', 14]]);
+  assert.deepEqual(seen.splice(0), [['recent', 2, 7], ['dissociation', 14], ['partsMade', 7]]);
   assert.deepEqual(out, { open: 'p2', band: 'flooded', crisis: true, reasons: ['checkin_crisis', 'dissociation_history'] });
+});
+
+test('handler: tooMany only at PartsPolicy.tooManyPartsCount parts in its window, alongside any outcome, never a lock', async () => {
+  const deps = (made, policy = null, recent = quiet) => ({
+    policy: async () => policy, recent: async () => recent, dissociation: async () => 0, partsMade: async () => made,
+  });
+  assert.deepEqual(await getPartsEntryHandler(deps(2)), { open: 'clear', reasons: [] }, 'under the line: no key at all');
+  assert.deepEqual(await getPartsEntryHandler(deps(3)), { open: 'clear', reasons: [], tooMany: true });
+  assert.deepEqual(await getPartsEntryHandler(deps(3, { tooManyPartsCount: 4 })), { open: 'clear', reasons: [] });
+  assert.deepEqual(await getPartsEntryHandler(deps(5, null, { ...quiet, checkinFlooding: true })),
+    { open: 'p2', band: 'flooded', crisis: false, reasons: ['checkin_flooding'], tooMany: true });
 });
 
 // ------------------------------------------------------------------ callable (fake driver)
 
-function partsDriver({ policy = null, recent = null, n = 0 } = {}) {
+function partsDriver({ policy = null, recent = null, n = 0, made = 0 } = {}) {
   return fakeDriver((q) => {
+    if (q === PARTS_MADE_QUERY) return [{ n: made }];
     if (q === POLICY_QUERY) return policy ? [policy] : [];
     if (q === RECENT_QUERY) return [recent ?? { checkinFlooding: false, checkinCrisis: false, recoverLoud: false }];
     if (q === DISSOCIATION_QUERY) return [{ n }];
@@ -98,25 +111,26 @@ function partsDriver({ policy = null, recent = null, n = 0 } = {}) {
 
 test("getPartsEntry reads only the caller's own records, in read transactions, with windows as parameters", async () => {
   const f = partsDriver({
-    policy: { floodGateHours: 2, dissociationCount: 2, dissociationDays: 14, recoverFlow: JSON.stringify({ gates: { downshiftAt: 7 } }) },
+    policy: { floodGateHours: 2, dissociationCount: 2, dissociationDays: 14, tooManyPartsCount: 3, tooManyPartsDays: 7, recoverFlow: JSON.stringify({ gates: { downshiftAt: 7 } }) },
     n: 2,
   });
   setDriver(f.driver);
   const out = await fns.getPartsEntry.run({ auth: auth('real-user'), data: { uid: 'someone-else', userId: 'someone-else' } });
   assert.deepEqual(out, { open: 'far_away', reasons: ['dissociation_history'] });
-  assert.equal(f.calls.length, 3);
+  assert.equal(f.calls.length, 4);
   const user = f.calls.filter((c) => c.query !== POLICY_QUERY);
-  assert.equal(user.length, 2);
+  assert.equal(user.length, 3);
   for (const c of user) {
     assert.equal(c.params.uid, 'real-user');
     assert.ok(!('userId' in c.params));
-    for (const m of c.query.matchAll(/\((\w+):(CheckIn|InvalidationRecoverySession)\b([^)]*)\)/g)) {
+    for (const m of c.query.matchAll(/\((\w+):(CheckIn|InvalidationRecoverySession|Part)\b([^)]*)\)/g)) {
       assert.match(m[3], /\{ownerId: \$uid\}/, `${m[2]} is read by owner`);
     }
   }
   const recent = f.calls.find((c) => c.query === RECENT_QUERY);
   assert.deepEqual([Number(recent.params.hours), Number(recent.params.downshiftAt)], [2, 7]);
   assert.equal(Number(f.calls.find((c) => c.query === DISSOCIATION_QUERY).params.days), 14);
+  assert.equal(Number(f.calls.find((c) => c.query === PARTS_MADE_QUERY).params.days), 7);
   assert.ok(f.sessions.every((s) => s.config.defaultAccessMode === 'READ'));
   assert.ok(f.allClosed());
 });
@@ -137,6 +151,16 @@ test('the reads match what the spec counts (flooding, the spiraling answer, cris
   assert.match(DISSOCIATION_QUERY, /duration\(\{days: \$days\}\)/);
   assert.match(DISSOCIATION_QUERY, /IN \['dissociation_overmodulation', 'conservation_freeze'\]/);
   assert.match(POLICY_QUERY, /PartsPolicy \{id: 'parts'\}/);
+  // Parts made: a count of the caller's own Part rows in the window, and only with parts on.
+  assert.match(PARTS_MADE_QUERY, /MATCH \(u:User \{id: \$uid\}\) WHERE coalesce\(u\.partsEnabled, false\)/);
+  assert.match(PARTS_MADE_QUERY, /p\.createdAt >= datetime\(\) - duration\(\{days: \$days\}\)/);
+  assert.match(PARTS_MADE_QUERY, /RETURN count\(p\) AS n\s*$/);
+});
+
+test('getPartsEntry: three parts made lately add tooMany, and nothing else', async () => {
+  setDriver(partsDriver({ made: 3 }).driver);
+  const out = await fns.getPartsEntry.run({ auth: auth(), data: {} });
+  assert.deepEqual(out, { open: 'clear', reasons: [], tooMany: true });
 });
 
 // ------------------------------------------------------------------ partsEnabled (a setting)

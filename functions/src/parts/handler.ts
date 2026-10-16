@@ -13,13 +13,17 @@ export interface PartsEntryDeps {
   recent(hours: number, recoverDownshiftAt: number): Promise<{ checkinFlooding: boolean; checkinCrisis: boolean; recoverLoud: boolean }>;
   /** The caller's dissociation / freeze check-ins in the last `days`. */
   dissociation(days: number): Promise<number>;
+  /** Parts the caller made in the last `days` (0 while parts are off). */
+  partsMade(days: number): Promise<number>;
 }
 
 export async function getPartsEntryHandler(deps: PartsEntryDeps): Promise<PartsEntry> {
   const policy = resolveEntryPolicy(await deps.policy());
-  const [recent, dissociationCount] = await Promise.all([
+  const [recent, dissociationCount, made] = await Promise.all([
     deps.recent(policy.floodGateHours, policy.recoverDownshiftAt),
     deps.dissociation(policy.dissociationDays),
+    deps.partsMade(policy.tooManyPartsDays),
   ]);
-  return entryGate({ ...recent, dissociationCount }, policy);
+  const gate = entryGate({ ...recent, dissociationCount }, policy);
+  return made >= policy.tooManyPartsCount ? { ...gate, tooMany: true } : gate;
 }
