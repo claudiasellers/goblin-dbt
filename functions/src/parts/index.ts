@@ -13,6 +13,10 @@ import { savePartSessionHandler, startPartSessionHandler } from './sessions';
 import { validateStartPartSession } from './validation';
 import { sessionDeps } from './sessionQueries';
 import type { PartSessionResponse } from './sessionTypes';
+import { keepDeps, keepPartHandler } from './keep';
+import { validateKeep } from './keepPlan';
+import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
+import type { KeepPartResponse, QueuePartCandidateResponse } from './keepTypes';
 
 /** What a parts flow opens on: P2 first, the far-away heads-up, or clear. Never a lock. */
 export const getPartsEntry = callable<unknown, PartsEntry>(
@@ -34,4 +38,22 @@ export const savePartSession = callable<unknown, PartSessionResponse>(
   { auth: 'required', label: 'savePartSession', errorMessage: 'Could not save' },
   async ({ uid, data, request }) =>
     writeTx((tx) => savePartSessionHandler(data, sessionDeps(tx, uid as string, request.auth?.token?.email ?? null))),
+);
+
+/** 9b's yes: the part, built from the stored session. The only way a Part is made. */
+export const keepPart = callable<unknown, KeepPartResponse>(
+  { auth: 'required', label: 'keepPart', errorMessage: 'Could not keep it' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateKeep(data), 'Invalid request');
+    return writeTx((tx) => keepPartHandler(input, keepDeps(tx, uid as string)));
+  },
+);
+
+/** A part to get to know another time, on a yes. Idempotent per id. */
+export const queuePartCandidate = callable<unknown, QueuePartCandidateResponse>(
+  { auth: 'required', label: 'queuePartCandidate', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateCandidate(data), 'Invalid request');
+    return writeTx((tx) => queuePartCandidateHandler(input, candidateDeps(tx, uid as string, request.auth?.token?.email ?? null)));
+  },
 );

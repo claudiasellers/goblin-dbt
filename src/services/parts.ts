@@ -1,7 +1,10 @@
 /** Parts callables (docs/design/parts.md). Only ever called with parts on (`partsEnabled`). */
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
-import type { PartSessionResponse, PartsEntry, SavePartSessionRequest, StartPartSessionRequest } from '../data/partsTypes';
+import type {
+  KeepPartRequest, KeepPartResponse, PartSessionResponse, PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse,
+  SavePartSessionRequest, StartPartSessionRequest,
+} from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<Record<string, never>, PartsEntry>(functions, 'getPartsEntry');
 
@@ -31,4 +34,20 @@ export async function startPartSession(req: StartPartSessionRequest): Promise<Pa
  */
 export async function savePartSession(req: SavePartSessionRequest): Promise<PartSessionResponse> {
   return (await savePartSessionFn(req)).data;
+}
+
+const keepPartFn = httpsCallable<KeepPartRequest, KeepPartResponse>(functions, 'keepPart');
+const queuePartCandidateFn = httpsCallable<QueuePartCandidateRequest, QueuePartCandidateResponse>(functions, 'queuePartCandidate');
+
+/**
+ * 9b's yes ("Keep it, so you can come back to it?"). The server builds the part from this visit's
+ * saved session: send only the ids and the name. Safe to repeat.
+ */
+export async function keepPart(req: KeepPartRequest): Promise<KeepPartResponse> {
+  return (await keepPartFn(req)).data;
+}
+
+/** Only on a yes ("another time", "spend a minute with it later?"). Safe to repeat with the same id. */
+export async function queuePartCandidate(req: QueuePartCandidateRequest): Promise<QueuePartCandidateResponse> {
+  return (await queuePartCandidateFn(req)).data;
 }

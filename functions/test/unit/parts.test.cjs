@@ -358,3 +358,218 @@ test('startPartSession / savePartSession reject bad input as invalid-argument, n
   await assert.rejects(fns.savePartSession.run({ auth: auth(), data: { id: SID, patch: { secret: 'x' } } }), code('invalid-argument'));
   assert.ok(f.calls.every((c) => c.query === Q.POLICY_QUERY));
 });
+
+// ------------------------------------------------------------------ keepPart and queuePartCandidate
+
+const plan = require('../../lib/parts/keepPlan');
+const K = require('../../lib/parts/keep');
+const C = require('../../lib/parts/candidate');
+
+const NEW_PART = '6c2c9a0e-1b2c-4d5e-8f90-123456789abc';
+const stored = (o = {}) => ({
+  trailheadKind: 'me', candidateId: null, partId: null, moveIds: ['hide'], keepable: true,
+  stepIdsJson: JSON.stringify({
+    find: ['pull_hide'], age: ['age_teen'], voice: ['hide_voice_see', 'own_words'], job: ['hide_job_out_of_sight'],
+    guards: ['left_out', 'guards_not_sure'], fear: ['hide_fear_too_much'], would_rather: ['rather_not_sure'],
+    feel_toward: ['feel_curious'],
+  }),
+  stopReason: 'done', bodyPlaces: ['chest'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5], soundSig: null,
+  ownVoice: 'get out first', ownJob: null, ownFear: null, ...o,
+});
+
+test('validateKeep: only the session id, the part id and the name; any part field is refused', () => {
+  assert.deepEqual(plan.validateKeep({ sessionId: SID, partId: NEW_PART, name: 'the one who hides' }),
+    { sessionId: SID, partId: NEW_PART, name: 'the one who hides' });
+  for (const extra of [{ tender: false }, { jobIds: ['x'] }, { feelTowardIds: ['feel_curious'] }, { ownJob: 'x' }, { status: 'active' }]) {
+    bad(() => plan.validateKeep({ sessionId: SID, partId: NEW_PART, ...extra }));
+  }
+  bad(() => plan.validateKeep({ sessionId: SID, partId: 'part-1' }));
+  bad(() => plan.validateKeep({ sessionId: SID, partId: NEW_PART, name: 7 }));
+});
+
+test('keptName: trimmed, ≤ the policy max, empty is "Not yet", never interpreted', () => {
+  assert.equal(plan.keptName('  the one who hides ', 40), 'the one who hides');
+  assert.equal(plan.keptName('', 40), null);
+  assert.equal(plan.keptName(null, 40), null);
+  assert.equal(plan.keptName(undefined, 40), undefined);
+  assert.equal(plan.keptName('x'.repeat(40), 40).length, 40);
+  bad(() => plan.keptName('x'.repeat(41), 40));
+});
+
+test('partFromSession: built from the stored session; non-answers dropped; never an ask-fresh field', () => {
+  const p = plan.partFromSession(stored());
+  assert.deepEqual(p, {
+    tender: false, places: ['chest'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5], soundSig: null, ageId: 'age_teen',
+    voiceIds: ['hide_voice_see'], jobIds: ['hide_job_out_of_sight'], fearIds: ['hide_fear_too_much'], preferredRoleIds: [],
+    ownVoice: 'get out first', ownJob: null, ownFear: null, guardIds: ['left_out'],
+  });
+  for (const k of ['feelTowardIds', 'blendCheck', 'handoffs', 'handoffsJson', 'band']) assert.ok(!(k in p), k);
+  assert.equal(plan.partFromSession(stored({ stepIdsJson: JSON.stringify({ age: ['age_cant_tell'] }) })).ageId, null);
+  assert.equal(plan.partFromSession(stored({ stepIdsJson: '{not json' })).jobIds.length, 0);
+});
+
+test('tender: the tender path, little + keep it gentle, or a tender / own-words stop', () => {
+  const t = (steps, stopReason = 'done') => plan.isTender({ stepIdsJson: JSON.stringify(steps), stopReason });
+  assert.equal(t({ tender: ['tender_hold'] }), true);
+  assert.equal(t({ age: ['age_little', 'young_gentle'] }), true);
+  assert.equal(t({ age: ['age_little', 'young_go_on'] }), false, 'little, but they chose to go on');
+  assert.equal(t({}, 'tender'), true);
+  assert.equal(t({}, 'own_words'), true, 'unread text is the riskier case');
+  assert.equal(t({ age: ['age_now'] }, 'danger'), false);
+});
+
+test('partSource: candidate, offer or made', () => {
+  assert.equal(plan.partSource({ trailheadKind: 'candidate', candidateId: null }), 'candidate');
+  assert.equal(plan.partSource({ trailheadKind: 'me', candidateId: CID }), 'candidate');
+  assert.equal(plan.partSource({ trailheadKind: 'offer', candidateId: null }), 'offer');
+  for (const k of ['me', 'settings', 'angry_card', 'problem_solve']) assert.equal(plan.partSource({ trailheadKind: k, candidateId: null }), 'made');
+});
+
+test('mergeRevisit: unions ids, replaces own words only where given, never removes or un-tenders', () => {
+  const existing = {
+    tender: true, places: ['chest'], shapeSig: [0, 0, 0, 0, 0], ageId: 'age_teen', voiceIds: ['a'], jobIds: ['j1'],
+    fearIds: ['f1'], preferredRoleIds: ['r1'], ownVoice: 'old voice', ownJob: 'old job', ownFear: null,
+  };
+  const visit = { ...plan.partFromSession(stored({ stopReason: 'done', ownVoice: null, ownJob: 'new job', bodyPlaces: ['throat', 'chest'] })) };
+  delete visit.guardIds;
+  const m = plan.mergeRevisit(existing, visit);
+  assert.equal(m.tender, true);
+  assert.deepEqual(m.places, ['chest', 'throat']);
+  assert.deepEqual(m.voiceIds, ['a', 'hide_voice_see']);
+  assert.deepEqual(m.jobIds, ['j1', 'hide_job_out_of_sight']);
+  assert.deepEqual(m.preferredRoleIds, ['r1']);
+  assert.equal(m.ageId, 'age_teen');
+  assert.deepEqual([m.ownVoice, m.ownJob, m.ownFear], ['old voice', 'new job', null]);
+  assert.deepEqual(m.shapeSig, [0.1, 0.2, 0.3, 0.4, 0.5], 'the new figure replaces the old');
+  for (const k of Object.keys(existing)) if (Array.isArray(existing[k])) for (const x of existing[k]) assert.ok(m[k].includes(x) || k === 'shapeSig', `${k} lost ${x}`);
+});
+
+function fakeKeep({ partsOn = true, session = stored(), part = null, linkedPartId = null, writeOk = true } = {}) {
+  const log = [];
+  const deps = {
+    state: async (input) => { log.push(['state', input]); return { partsOn, session, part, linkedPartId, nameMax: 40, revisitDays: 30 }; },
+    create: async (w) => { log.push(['create', w]); return writeOk; },
+    revisit: async (w) => { log.push(['revisit', w]); return writeOk; },
+  };
+  return { deps, log };
+}
+const keepIn = (o = {}) => plan.validateKeep({ sessionId: SID, partId: NEW_PART, ...o });
+
+test('keepPart: a new part from the session, its moves, guards and source; own words copied only here', async () => {
+  const f = fakeKeep({ session: stored({ candidateId: CID, trailheadKind: 'candidate', ownFear: 'that I would be too much' }) });
+  assert.deepEqual(await K.keepPartHandler(keepIn({ name: ' the one who hides ' }), f.deps), { partId: NEW_PART, created: true });
+  const [, w] = f.log.find(([k]) => k === 'create');
+  assert.equal(w.name, 'the one who hides');
+  assert.equal(w.source, 'candidate');
+  assert.equal(w.candidateId, CID);
+  assert.deepEqual(w.moveIds, ['hide']);
+  assert.deepEqual(w.guardIds, ['left_out']);
+  assert.equal(w.fields.ownFear, 'that I would be too much');
+  assert.ok(!('feelTowardIds' in w.fields) && !('blendCheck' in w.fields) && !('handoffs' in w.fields));
+  assert.ok(!('guardIds' in w.fields), 'guards are edges, not fields');
+});
+
+test('keepPart: parts off, someone else\'s session, a closed visit, an id taken by another part', async () => {
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ partsOn: false }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ session: null }).deps), code('not-found'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ session: stored({ keepable: false }) }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ part: { tender: false } }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn(), fakeKeep({ linkedPartId: PID }).deps), code('failed-precondition'));
+  await assert.rejects(K.keepPartHandler(keepIn({ name: 'x'.repeat(41) }), fakeKeep().deps), (e) => e.name === 'ValidationError');
+  for (const f of [fakeKeep({ partsOn: false }), fakeKeep({ session: null })]) {
+    await K.keepPartHandler(keepIn(), f.deps).catch(() => {});
+    assert.ok(!f.log.some(([k]) => k !== 'state'), 'no write');
+  }
+});
+
+test('keepPart: a revisit updates that part only (merged, never fewer), and a repeat keep is a revisit', async () => {
+  const existing = { tender: true, places: ['jaw'], voiceIds: ['a'], jobIds: [], fearIds: [], preferredRoleIds: [], ownVoice: 'old', ageId: 'age_now' };
+  const f = fakeKeep({ session: stored({ partId: PID }), part: existing });
+  assert.deepEqual(await K.keepPartHandler(keepIn({ partId: PID }), f.deps), { partId: PID, created: false });
+  const [, w] = f.log.find(([k]) => k === 'revisit');
+  assert.deepEqual(w.fields.places, ['jaw', 'chest']);
+  assert.equal(w.fields.tender, true);
+  assert.equal(w.fields.ownVoice, 'get out first');
+  assert.equal(w.fields.ageId, 'age_now');
+  assert.equal(w.name, null, 'no new name: the old one stays');
+  await assert.rejects(K.keepPartHandler(keepIn({ partId: NEW_PART }), fakeKeep({ session: stored({ partId: PID }), part: existing }).deps),
+    code('invalid-argument'));
+  await assert.rejects(K.keepPartHandler(keepIn({ partId: PID }), fakeKeep({ session: stored({ partId: PID }), part: null }).deps), code('not-found'));
+  // After the first keep the session carries the new part's id: the same call again lands as a revisit.
+  const again = fakeKeep({ session: stored({ partId: NEW_PART }), part: { places: ['chest'] }, linkedPartId: NEW_PART });
+  assert.deepEqual(await K.keepPartHandler(keepIn(), again.deps), { partId: NEW_PART, created: false });
+  assert.ok(!again.log.some(([k]) => k === 'create'));
+});
+
+test('keepPart over the fake driver: caller-scoped keys, guarded writes, profile labels and edges', async () => {
+  const f = fakeDriver((q, p) => {
+    if (q === K.KEEP_STATE_QUERY) {
+      return [{ partsOn: true, session: { ...stored(), keepable: true }, part: null, linkedPartId: null, nameMaxChars: 40, revisitAfterDays: 30 }];
+    }
+    if (q === K.KEEP_NEW_QUERY) return [{ id: p.partId }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  const out = await fns.keepPart.run({ auth: auth('real-user'), data: { sessionId: SID, partId: NEW_PART, name: 'the one who hides' } });
+  assert.deepEqual(out, { partId: NEW_PART, created: true });
+  const w = f.calls.find((c) => c.query === K.KEEP_NEW_QUERY);
+  assert.deepEqual([w.params.uid, w.params.sessionKey, w.params.partKey], ['real-user', `real-user:${SID}`, `real-user:${NEW_PART}`]);
+  assert.equal(w.params.revisitDays, 30);
+  assert.match(K.KEEP_NEW_QUERY, /WHERE coalesce\(u\.partsEnabled, false\) AND \(ps\.status = 'open' OR \(ps\.status = 'saved'/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(u\)-\[:HAS_PART\]->\(p\)/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(ps\)-\[:OF_PART\]->\(p\)/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(p\)-\[r:USES\]->\(x\) ON CREATE SET r\.confirmedAt = datetime\(\), r\.source = \$source/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(p\)-\[r:GUARDS\]->\(x\)/);
+  assert.match(K.KEEP_NEW_QUERY, /MERGE \(p\)-\[r:ACCEPTED_FROM\]->\(x\)[\s\S]*x\.status = CASE WHEN x\.status = 'open' THEN 'accepted'/);
+  for (const k of ['feelTowardIds', 'blendCheck', 'handoffs']) assert.doesNotMatch(K.KEEP_NEW_QUERY + K.KEEP_REVISIT_QUERY, new RegExp(k));
+  await assert.rejects(fns.keepPart.run({ auth: auth(), data: { sessionId: SID, partId: NEW_PART, tender: false } }), code('invalid-argument'));
+});
+
+test('validateCandidate: origin set, move ids, uuids, nothing else', () => {
+  assert.deepEqual(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }),
+    { id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID });
+  for (const o of ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card']) C.validateCandidate({ id: CID, origin: o, moveIds: [] });
+  bad(() => C.validateCandidate({ id: CID, origin: 'checkin', moveIds: [] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['Hide!'] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['a', 'b', 'c', 'd', 'e'] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['hide', 'hide'] }));
+  bad(() => C.validateCandidate({ id: 'x', origin: 'split', moveIds: [] }));
+  bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: [], note: 'free text' }));
+});
+
+test('queuePartCandidate: parts off refused for every origin; moves must exist; the session must be the caller\'s', async () => {
+  const fake = (st) => {
+    const log = [];
+    return { log, deps: { state: async () => st, write: async (c) => { log.push(c); } } };
+  };
+  for (const origin of ['new_one', 'angry_card', 'ps_ambivalence']) {
+    const f = fake({ partsOn: false, sessionFound: false, knownMoves: 0 });
+    await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin, moveIds: [] }), f.deps), code('failed-precondition'));
+    assert.equal(f.log.length, 0);
+  }
+  const unknown = fake({ partsOn: true, sessionFound: true, knownMoves: 1 });
+  await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'split', moveIds: ['hide', 'made_up'] }), unknown.deps), code('invalid-argument'));
+  const noSession = fake({ partsOn: true, sessionFound: false, knownMoves: 1 });
+  await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }), noSession.deps), code('not-found'));
+  const ok = fake({ partsOn: true, sessionFound: true, knownMoves: 1 });
+  assert.deepEqual(await C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }), ok.deps), { id: CID });
+  assert.equal(ok.log.length, 1);
+});
+
+test('queuePartCandidate over the fake driver: one write, MERGE on key (idempotent), log layer, QUEUED from the session', async () => {
+  const f = fakeDriver((q) => {
+    if (q === C.CANDIDATE_STATE_QUERY) return [{ partsOn: true, sessionFound: true, knownMoves: 1 }];
+    if (q === C.CANDIDATE_QUERY) return [{ id: CID }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  for (let i = 0; i < 2; i++) {
+    assert.deepEqual(await fns.queuePartCandidate.run({ auth: auth('real-user'), data: { id: CID, origin: 'angry_card', moveIds: ['hit_back'], sessionId: SID } }), { id: CID });
+  }
+  const writes = f.calls.filter((c) => c.query === C.CANDIDATE_QUERY);
+  assert.equal(writes.length, 2);
+  assert.deepEqual([writes[0].params.key, writes[0].params.sessionKey], [`real-user:${CID}`, `real-user:${SID}`]);
+  assert.match(C.CANDIDATE_QUERY, /MERGE \(c:PartCandidate \{key: \$key\}\)\s+ON CREATE SET c:UserData:LogRecord/);
+  assert.match(C.CANDIDATE_QUERY, /c\.status = 'open'/);
+  assert.match(C.CANDIDATE_QUERY, /MERGE \(x\)-\[:QUEUED\]->\(c\)/);
+});
