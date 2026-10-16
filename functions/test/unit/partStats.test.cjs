@@ -193,3 +193,44 @@ test('getInsightsData: `parts` null with parts off; with parts on, the parts tha
   assert.equal(new Set(reads.map((c) => c.session)).size, 1, 'one read transaction');
   assert.ok(f.allClosed());
 });
+
+test('felt: a visit whose first answer is a non-answer (keepPlan NON_ANSWER) is not a visit', () => {
+  const six = ['feel_tired', 'feel_tired', 'feel_annoyed', 'feel_curious', 'feel_curious', 'feel_steady'].map((f, i) => visit(f, i + 1));
+  assert.ok(feltFor(six, null));
+  // one non-answer in place of a real one: 5 visits count, not enough
+  for (const non of ['feel_not_sure', 'feel_nothing', 'feel_cant_tell', 'own_words']) {
+    const withNon = [...six.slice(0, 5), visit(non, 6)];
+    assert.equal(feltFor(withNon, null), null, non);
+  }
+  // non-answers never become then or now, and don't shift the halves
+  const padded = [visit('feel_not_sure', 1), ...six.map((s, i) => ({ ...s, at: at(10, 0, i + 2) })), visit('feel_nothing', 9)];
+  assert.deepEqual(feltFor(padded, null), { month: '2026-07', then: 'feel_tired', now: 'feel_curious' });
+  const { NON_ANSWER } = require('../../lib/parts/keepPlan');
+  assert.ok(NON_ANSWER.test('feel_not_sure') && NON_ANSWER.test('feel_nothing') && !NON_ANSWER.test('feel_tired'), 'the shared rule');
+});
+
+test('getInsightsData: a failed parts read logs and returns parts null; the rest of Reflect renders', async () => {
+  const f = fakeDriver((q) => {
+    if (/AS timeZone/.test(q)) return [{ partsOn: true, timeZone: null }];
+    if (/pt\.shapeSig AS shapeSig/.test(q)) return new Error('boom');
+    if (/\[:LOGGED\]->\(c:CheckIn\)/.test(q)) return [{
+      id: 'c1', timestamp: new Date().toISOString(), emotion: 'anxious', emotionIds: ['anxious'], quadrant: 'high-unpleasant',
+      intensityX: 0.2, intensityY: 0.8, band: null, activationPatternId: 'acute_alarm', bodyRegions: [], tagArrays: [], families: ['fear'],
+    }];
+    return [];
+  });
+  setDriver(f.driver);
+  const logged = [];
+  const orig = console.error;
+  console.error = (...a) => logged.push(a);
+  let out;
+  try {
+    out = await fns.getInsightsData.run({ auth: auth(), data: {} });
+  } finally {
+    console.error = orig;
+  }
+  assert.equal(out.parts, null);
+  assert.equal(out.totalCheckIns, 1, 'the rest is there');
+  assert.ok(logged.some((a) => a[0] === 'getInsightsData parts failed'));
+  assert.ok(f.allClosed());
+});

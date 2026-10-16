@@ -29,6 +29,7 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
   const [done, setDone] = useState<'answered' | 'skipped' | null>(null);
   // "Was this a part you know?" (PartTagSlot): its gate needs the answer and the saved close.
   const [closeAnswer, setCloseAnswer] = useState<ThenVsNow | null>(null);
+  const [closeActed, setCloseActed] = useState<ActedOnUrge | null>(null);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
     return (
       <>
         <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
-        <PartTagSlot toolId={session.toolId} toolSessionId={session.id} thenVsNow={closeAnswer} saved={saved} />
+        <PartTagSlot toolId={session.toolId} toolSessionId={session.id} thenVsNow={closeAnswer} actedOnUrge={closeActed} saved={saved} />
       </>
     );
   }
@@ -61,6 +62,7 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
       input = { status: 'completed', ...(dueAt ? { schedule: [{ id: newId(), type: planType!, dueAt: dueAt.toISOString(), window: choiceId }] } : {}) };
     } else if (closeKind === 'urge') {
       input = { status: 'completed', actedOnUrge: choiceId as ActedOnUrge };
+      setCloseActed(choiceId as ActedOnUrge);
     } else {
       input = { status: 'completed', thenVsNow: choiceId as ThenVsNow };
       setCloseAnswer(choiceId as ThenVsNow);

@@ -8,6 +8,7 @@
  * The thresholds are what stops the app from over-reading a few data points: below one, that line is
  * null, and a part below all of them gets no block at all.
  */
+import { NON_ANSWER } from './keepPlan';
 import { PART_WHENS, type PartReflect, type PartStats, type PartWhen } from './statsTypes';
 
 export const STATS_THRESHOLDS = {
@@ -15,7 +16,7 @@ export const STATS_THRESHOLDS = {
   helpedMinTags: 3,
   /** helped: tools shown at most. */
   helpedMaxTools: 3,
-  /** felt: visits with a feel-toward answer in each half (so at least twice this in all). */
+  /** felt: visits whose first feel-toward answer says something, in each half (so at least twice this in all). */
   feltMinPerHalf: 3,
   /** when: the part's tags in all; one band must also hold more than half of them. */
   whenMinTags: 3,
@@ -97,10 +98,12 @@ function mostCommon(rows: readonly StatsSessionRow[]): string {
 
 /**
  * Visits oldest first, split in two (the earlier half is the smaller one when the count is odd); each
- * half needs ≥ 3. Then vs now when the halves' most common first answers differ, else "since".
+ * half needs ≥ 3. Then vs now when the halves' most common first answers differ, else "since". A visit
+ * whose first answer is a non-answer ("not sure", "nothing": keepPlan's NON_ANSWER) isn't counted:
+ * "Lately: not sure" would read as a verdict when it's the absence of one.
  */
 export function feltFor(sessions: readonly StatsSessionRow[], timeZone: string | null): PartStats['felt'] {
-  const rows = [...sessions].sort(byTime);
+  const rows = sessions.filter((s) => !NON_ANSWER.test(s.firstFeel)).sort(byTime);
   const half = Math.floor(rows.length / 2);
   const earlier = rows.slice(0, half);
   const later = rows.slice(half);

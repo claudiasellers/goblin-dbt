@@ -169,7 +169,15 @@ export function graphDeps(userId: string): InsightsDeps {
       };
     },
     // Parts (all time, parts on only): the stats module's reads in one transaction, then its compute.
-    parts: async () => partsReflect(await readTx((tx) => readStatsRows(tx, userId))),
+    // Optional and new: a failed read logs and leaves the section out, never the rest of Reflect.
+    async parts() {
+      try {
+        return partsReflect(await readTx((tx) => readStatsRows(tx, userId)));
+      } catch (e) {
+        console.error('getInsightsData parts failed', (e as { code?: string } | null)?.code ?? 'unknown');
+        return null;
+      }
+    },
     async somaticNarrative(pid) {
       const r = (await read(SOMATIC_NARRATIVE_QUERY, { pid }))[0];
       return (r?.get('patternNarrative') as string | null) || (r?.get('quadrantNarrative') as string | null) || '';
