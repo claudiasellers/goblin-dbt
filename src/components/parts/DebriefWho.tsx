@@ -4,6 +4,7 @@ import type { PartsContent } from '../../data/partsContentTypes';
 import type { ProfileSlices } from '../../data/profileTypes';
 import { debriefForm, debriefTag, generalQuestion, namedCopy, type WhoShowedUp } from '../../lib/debriefWho';
 import { PartTagRow } from '../spine/PartTagRow';
+import { markTagRowAnswered } from '../../lib/tagRowOnce';
 
 const chip = 'min-h-11 px-4 py-2 rounded-full border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-[var(--color-border-accent)] transition-colors';
 const quiet = 'min-h-11 px-3 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]';
@@ -27,7 +28,10 @@ export function DebriefWho({ content, parts, copeAheadPartId, toolSessionId, onA
     return <PartTagRow toolId="dear-man" toolSessionId={toolSessionId} content={content} question={generalQuestion(content)} debrief onGone={onDone} />;
   }
   const copy = namedCopy(content, form.name);
+  // Answered (Skip too) once per session on this page: DEAR MAN doesn't ask again on Back.
+  const skip = () => { markTagRowAnswered(toolSessionId, 'debrief'); onDone(); };
   const answer = (a: WhoShowedUp) => {
+    markTagRowAnswered(toolSessionId, 'debrief');
     if (a !== 'no') tagPart(debriefTag(newId(), form.partId, toolSessionId, a)).catch(() => { /* a missed tag is only a missed signal */ });
     onAnswer(a);
     onDone();
@@ -39,7 +43,7 @@ export function DebriefWho({ content, parts, copeAheadPartId, toolSessionId, onA
         {copy.answers.map((a) => (
           <button key={a.id} type="button" className={chip} onClick={() => answer(a.id)}>{a.label}</button>
         ))}
-        <button type="button" className={quiet} onClick={onDone}>{copy.skip}</button>
+        <button type="button" className={quiet} onClick={skip}>{copy.skip}</button>
       </div>
     </section>
   );

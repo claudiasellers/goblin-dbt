@@ -24,6 +24,7 @@ import { useBand } from '../../hooks/useBand';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
 import { DebriefWho } from '../../components/parts/DebriefWho';
+import { tagRowAnswered } from '../../lib/tagRowOnce';
 import { debriefWhoReady, showDebriefWho } from '../../lib/debriefWho';
 import { handoffExt, makeReading } from '../../lib/bandStore';
 import { dropResumeToken, peekResumeToken } from '../../lib/resumeToken';
@@ -357,7 +358,9 @@ export function DearMan() {
   // Debrief, after "Underneath that": who showed up? (src/lib/debriefWho.ts). Its own step: parts on, a
   // kept part, the copy shipped; P2 ('handoff') is another step and the too-much overlay is never on the
   // debrief, so neither can be open over it. Named when this visit's prep chose a part (copeAheadPartId).
-  const whoShown = showDebriefWho({ partsOn, partCount: copeSlices?.parts.length ?? 0, ready: debriefWhoReady(copeCopy) });
+  // Answered once this page (src/lib/tagRowOnce.ts): Back from the reflection never asks again.
+  const whoShown = showDebriefWho({ partsOn, partCount: copeSlices?.parts.length ?? 0, ready: debriefWhoReady(copeCopy),
+    answered: tagRowAnswered(session.id, 'debrief') });
   useEffect(() => {
     if (phase === 'debrief-parts' && !whoShown && !copePending) setPhase('debrief-reflection');
   }, [phase, whoShown, copePending]);

@@ -4,6 +4,7 @@ import { queuePartCandidate, setPartShape, tagPart } from '../../services/parts'
 import { newId } from '../../lib/spine/ids';
 import { tagChips, tagRowCopy, type TagChip, type TagRowTool } from '../../lib/partTag';
 import { SHAPE_DONE_MS, shapeOfferCopy } from '../../lib/partShape';
+import { markTagRowAnswered, tagRowAnswered } from '../../lib/tagRowOnce';
 import { debriefTag } from '../../lib/debriefWho';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { PartFigure } from '../parts/PartFigure';
@@ -31,7 +32,9 @@ export function PartTagRow({ toolId, toolSessionId, content, onGone, question, d
   offerShape?: boolean;
 }) {
   const profile = useProfileContext(toolId);
-  const [state, setState] = useState<'ask' | 'later' | 'shape' | 'done' | 'gone'>('ask');
+  const source = debrief ? 'debrief' : 'close';
+  // Answered already on this page (the other place a host draws the row, or a remount): never asked twice.
+  const [state, setState] = useState<'ask' | 'later' | 'shape' | 'done' | 'gone'>(() => (tagRowAnswered(toolSessionId, source) ? 'gone' : 'ask'));
   const [picked, setPicked] = useState<TagChip | null>(null);
   const fold = () => { setState('gone'); onGone?.(); };
   // "Done." stays for a moment, then folds; the host's onGone is read when it fires (hosts pass a new one each render).
@@ -48,7 +51,10 @@ export function PartTagRow({ toolId, toolSessionId, content, onGone, question, d
   const copy = tagRowCopy(content);
   const ask = question ?? copy.question;
 
+  const answered = () => markTagRowAnswered(toolSessionId, source);
+  const skip = () => { answered(); fold(); };
   const tag = (c: TagChip) => {
+    answered();
     if (offerShape && !debrief) {
       setPicked(c);
       setState('shape');
@@ -102,10 +108,10 @@ export function PartTagRow({ toolId, toolSessionId, content, onGone, question, d
             <span className={c.named ? 'font-serif text-base' : 'text-sm'}>{c.label}</span>
           </button>
         ))}
-        <button type="button" className={chip} onClick={() => setState('later')}>
+        <button type="button" className={chip} onClick={() => { answered(); setState('later'); }}>
           <span className="text-sm">{copy.newOne}</span>
         </button>
-        <button type="button" className={quiet} onClick={fold}>{copy.skip}</button>
+        <button type="button" className={quiet} onClick={skip}>{copy.skip}</button>
       </div>
     </section>
   );
