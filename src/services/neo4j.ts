@@ -579,6 +579,8 @@ export interface UserProfile {
   shareAnonymousData: boolean;
   /** IANA zone, synced from the browser (follow-up windows, quiet hours). */
   timeZone: string | null;
+  /** Parts on (Settings → Privacy & Data). Off by default; turning it off deletes nothing. */
+  partsEnabled: boolean;
 }
 
 export const DEFAULT_PROFILE: UserProfile = {
@@ -594,6 +596,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   dataRetentionDays: null,
   shareAnonymousData: false,
   timeZone: null,
+  partsEnabled: false,
 };
 
 const getUserProfileFn = httpsCallable<void, { profile: UserProfile }>(

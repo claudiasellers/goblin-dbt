@@ -28,7 +28,7 @@ test("every registered label has a layer; every non-system label an exportAs, un
   assert.equal(new Set(keys).size, keys.length);
   assert.equal(exportKeyFor(["CheckIn", "UserData", "LogRecord"]), "checkIns");
   assert.equal(exportKeyFor(["PushToken", "UserData", "System"]), null);
-  assert.deepEqual(labelsOf("profile").sort(), ["MyPattern", "OwnLine", "ProfileFact"]);
+  assert.deepEqual(labelsOf("profile").sort(), ["MyPattern", "OwnLine", "Part", "ProfileFact"]);
   assert.deepEqual(LAYER_LABEL, { log: "LogRecord", profile: "ProfileItem", system: "System" });
 });
 
@@ -42,11 +42,32 @@ test("every registered label has a unique constraint on key in constraints.cyphe
 
 test("ask-fresh fields: the plan's list, prefixed band families, never bandIntensity", () => {
   for (const f of ["band", "bandSource", "bandAt", "bandJson", "bandAtStart", "bandAtStartSource", "bandAtEnd",
-    "thenVsNow", "thenVsNowDir", "actedOnUrge", "urgeIds", "fitsFacts", "wiseMindAnswer", "readiness", "eventIds"]) {
+    "thenVsNow", "thenVsNowDir", "actedOnUrge", "urgeIds", "fitsFacts", "wiseMindAnswer", "readiness", "eventIds",
+    "feelTowardIds", "blendCheck"]) {
     assert.ok(isAskFreshField(f), f);
   }
   for (const f of ["bandIntensity", "quietHours", "name", "status", "emotionIds"]) assert.ok(!isAskFreshField(f), f);
   assert.ok(ASK_FRESH_FIELDS.includes("thenVsNowDir"));
+});
+
+test("parts (docs/design/parts.md): PartSession and PartCandidate are log, Part is profile; exported, deleted, retained by layer", () => {
+  assert.deepEqual(USER_DATA.PartSession, { layer: "log", rel: "HAS_PART_SESSION", exportAs: "partSessions" });
+  assert.deepEqual(USER_DATA.PartCandidate, { layer: "log", rel: "HAS_PART_CANDIDATE", exportAs: "partCandidates" });
+  assert.deepEqual(USER_DATA.Part, { layer: "profile", rel: "HAS_PART", exportAs: "parts" });
+  assert.equal(exportKeyFor(["PartSession", "UserData", "LogRecord"]), "partSessions");
+  assert.equal(exportKeyFor(["PartCandidate", "UserData", "LogRecord"]), "partCandidates");
+  assert.equal(exportKeyFor(["Part", "UserData", "ProfileItem"]), "parts");
+  assert.ok(labelsOf("log").includes("PartSession") && labelsOf("log").includes("PartCandidate"));
+  assert.ok(!labelsOf("log").includes("Part"));
+  // Export and delete find every :UserData node by ownerId, whatever its label; retention deletes
+  // :LogRecord only, so PartSession / PartCandidate expire and a kept Part never does.
+  const ed = readFileSync("functions/src/userdata/exportDelete.ts", "utf8");
+  assert.match(ed, /MATCH \(n:UserData \{ownerId: \$uid\}\) WHERE NOT n:System\s+RETURN labels\(n\)/, "export is by ownerId");
+  assert.match(ed, /MATCH \(n:UserData \{ownerId: \$uid\}\)\s+CALL \{ WITH n DETACH DELETE n \}/, "delete is by ownerId");
+  const retention = ed.slice(ed.indexOf("export async function applyRetention"));
+  assert.match(retention, /MATCH \(n:LogRecord \{ownerId: \$uid\}\)/);
+  assert.doesNotMatch(retention, /ProfileItem|:Part\b/);
+  assert.ok(!isAskFreshField("partId") && !isAskFreshField("stopReason"));
 });
 
 test("lint: every :UserData write in functions/src carries its layer label", () => {
@@ -107,6 +128,8 @@ test("finalise-once: ToolSession, FollowUp, PatternOffer, ToolUsage, SkillPracti
   assert.equal(writable("ToolUsage", "outcome", { outcome: null }, now), true);
   assert.equal(writable("ToolUsage", "outcome", { outcome: "helped" }, now), false);
   assert.equal(writable("SkillPractice", "any", {}, now), false);
+  assert.equal(writable("PartSession", "save", { status: "open" }, now), true);
+  for (const s of ["completed", "stopped", "exited_early"]) assert.equal(writable("PartSession", "save", { status: s }, now), false);
   assert.equal(writable("ToolSession", "showLine", { status: "open", startedAt: iso(-30) }, now), true, "a beat inside an open session");
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-11) }, now), true);
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-13) }, now), false);
@@ -125,6 +148,7 @@ test("the Cypher guards encode the same rules", () => {
   assert.equal(GUARDS.FollowUp.update("f"), "f.status = 'scheduled'");
   assert.equal(GUARDS.PatternOffer.answer("o"), "o.status = 'offered'");
   assert.equal(GUARDS.ToolUsage.outcome("tu"), "tu.outcome IS NULL");
+  assert.equal(GUARDS.PartSession.save("ps"), "ps.status = 'open'");
 });
 
 // Writers that update an existing log record must use the guard (grows with each PR).

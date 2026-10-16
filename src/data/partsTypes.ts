@@ -1,8 +1,26 @@
 /**
- * Parts content types (docs/design/parts.md). Pure. The shape a future getPartsContent returns, as far
- * as the app reads it today: the angry-part card. tests/fixtures/parts-content.json (scripts/parts/fixture.py)
- * has this shape; the copy itself lives in the graph (scripts/parts/content.py), never here.
+ * Parts types (docs/design/parts.md). Pure, no imports.
+ * The entry gate mirrors functions/src/parts/; each mirrored block's server text appears here unchanged
+ * (the tests assert it). The angry-part card's types are the client's own: the shape of the parts content
+ * it reads (tests/fixtures/parts-content.json, scripts/parts/fixture.py); its copy lives in the graph
+ * (scripts/parts/content.py), never here.
  */
+
+// --- Entry gate: mirror of functions/src/parts/types.ts (tests/parts-entry.test.mjs) ---
+/** What the client opens first. Every outcome lets the person continue: none of them locks. */
+export type PartsEntryOpen = 'p2' | 'far_away' | 'clear';
+
+/** Why, as ids, for logging and tests; never shown. */
+export type PartsEntryReason = 'checkin_flooding' | 'checkin_crisis' | 'recover_loud' | 'dissociation_history';
+
+export type PartsEntry =
+  /** The P2 body hand-off first (Keep going anyway stays), with the crisis banner alongside when `crisis`. */
+  | { open: 'p2'; band: 'flooded'; crisis: boolean; reasons: PartsEntryReason[] }
+  /** The far-away heads-up, then the choice. */
+  | { open: 'far_away'; reasons: PartsEntryReason[] }
+  | { open: 'clear'; reasons: PartsEntryReason[] };
+
+// --- The angry-part card (src/lib/angryPart.ts, src/components/parts/AngryPartCard.tsx) ---
 
 /** The angry card's lines. Each exists twice in the content: `id` (parts on) and `id_plain` (parts off). */
 export const ANGRY_LINES = [
