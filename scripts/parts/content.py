@@ -347,7 +347,7 @@ UNDERNEATH_HELD = {
 # Prompts: (id, flow, step, copy). Order within a flow is list order.
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
 # close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
-# next-day check-back card), gate, settings
+# next-day check-back card), gate, settings, me (Parts of me)
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -467,6 +467,15 @@ PROMPTS = [
     ("settings_delete_no", "settings", "delete", "Keep them"),
     ("settings_delete_done", "settings", "delete", "Deleted."),
     ("settings_delete_failed", "settings", "delete", "Couldn't delete them. Try again."),
+    # Me → Parts of me (parts.md "The part card"): the entry line and the card's labels. No stats yet.
+    ("me_get_to_know", "me", "card", "Get to know a part"),
+    ("card_where", "me", "card", "Where"),
+    ("card_job", "me", "card", "Its job"),
+    ("card_job_own", "me", "card", "Its job, in your words"),
+    ("card_fear", "me", "card", "Afraid that"),
+    ("card_rather", "me", "card", "Would rather"),
+    ("card_visit", "me", "card", "Spend time with it"),
+    ("card_resting", "me", "card", "Resting"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry

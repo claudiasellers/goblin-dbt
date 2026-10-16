@@ -23,6 +23,25 @@ export interface MeItem {
   stillTrueCopy: string;
   setAsideCopy: string;
   toolId?: string | null;
+  /** Part items only: what the Parts of me card shows (no stats yet). */
+  part?: MePart;
+}
+
+/**
+ * A kept part as its Me card shows it. Never the person's own-words fear (the card never shows it),
+ * and no fears at all on a tender part: the conservative branch told them "we'll leave that be".
+ */
+export interface MePart {
+  name: string | null;
+  tender: boolean;
+  places: string[];
+  shapeSig: number[] | null;
+  jobIds: string[];
+  ownJob: string | null;
+  fearIds: string[];
+  preferredRoleIds: string[];
+  moveIds: string[];
+  lastVisitedAt: string | null;
 }
 export interface GetMeResponse {
   version: number;
@@ -35,6 +54,26 @@ export interface GetMeResponse {
     savedLines: Array<{ lineId: string; text: string }>;
   };
   offers: Array<{ id: string; statement: string; offerCopy: string; toolId: string | null; evidenceCount: number }>;
+}
+
+const ids = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : []);
+const strOrNull = (v: unknown): string | null => (typeof v === 'string' ? v : null);
+
+/** The card's fields from a Part's properties; arrays absent → [], strings absent → null. */
+export function mePart(p: Record<string, unknown>, moveIds: unknown): MePart {
+  const tender = p.tender === true;
+  return {
+    name: strOrNull(p.name),
+    tender,
+    places: ids(p.places),
+    shapeSig: Array.isArray(p.shapeSig) ? p.shapeSig.map((x) => (typeof x === 'number' ? x : int(x))) : null,
+    jobIds: ids(p.jobIds),
+    ownJob: strOrNull(p.ownJob),
+    fearIds: tender ? [] : ids(p.fearIds),
+    preferredRoleIds: ids(p.preferredRoleIds),
+    moveIds: [...new Set(ids(moveIds))].sort(),
+    lastVisitedAt: strOrNull(p.lastVisitedAt),
+  };
 }
 
 async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise<GetMeResponse> {
@@ -55,7 +94,10 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
      RETURN CASE type(r) WHEN 'HAS_PROFILE_FACT' THEN 'ProfileFact' WHEN 'HAS_OWN_LINE' THEN 'OwnLine'
                          WHEN 'HAS_PART' THEN 'Part' ELSE 'MyPattern' END AS label,
             p {.id, .kind, .area, .status, .source, .valueJson, .toolId, .text, .name,
-               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p,
+               .tender, .places, .shapeSig, .jobIds, .ownJob, .fearIds, .preferredRoleIds,
+               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt),
+               lastVisitedAt: toString(p.lastVisitedAt)} AS p,
+            CASE type(r) WHEN 'HAS_PART' THEN [(p)-[:USES]->(mv:ProtectiveMove) | mv.id] ELSE [] END AS moveIds,
             k.label AS title, k.stillTrueCopy AS stillTrue, k.setAsideCopy AS setAside, rule.statementTemplate AS statement`,
     { uid });
   const words = await tx.run(
@@ -88,12 +130,14 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (r.get('label') === 'MyPattern') summary = (r.get('statement') as string | null) ?? '';
     if (r.get('label') === 'OwnLine') summary = String(p.text ?? '');
     if (r.get('label') === 'Part') summary = String(p.name ?? '');
+    const part = r.get('label') === 'Part' ? mePart(p, r.get('moveIds')) : undefined;
     const item: MeItem = {
       label: r.get('label'), meta, title: (r.get('title') as string | null) ?? meta.kind, summary,
       editor: meta.kind === 'quiet_hours' ? 'quiet_hours' : null,
       ...(value ? { value } : {}),
       stillTrueCopy: (r.get('stillTrue') as string | null) ?? '', setAsideCopy: (r.get('setAside') as string | null) ?? '',
       ...(p.toolId !== undefined ? { toolId: (p.toolId as string | null) ?? null } : {}),
+      ...(part ? { part } : {}),
     };
     (byArea.get(meta.area) ?? byArea.set(meta.area, []).get(meta.area)!).push(item);
   }

@@ -10,6 +10,11 @@ import { fillToolName } from '../../lib/spine/todayCard';
 import { StillTrue } from './StillTrue';
 import { QuietHoursEditor } from './QuietHoursEditor';
 import { PatternOfferCard } from './PatternOfferCard';
+import { PartsOfMe } from './PartsOfMe';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { getPartsContent } from '../../services/partsContent';
+import { partsOfMeCopy } from '../../lib/partsOfMe';
+import type { PartsContent } from '../../data/partsContentTypes';
 
 /** Areas shown in Phase A (plan §5.4). My people / My plans / My progress appear when their owners register kinds. */
 const PHASE_A_AREAS: ProfileAreaId[] = ['about_me', 'my_body', 'my_words', 'my_patterns'];
@@ -25,12 +30,23 @@ export function MeSection() {
   const [error, setError] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
+  const { profile } = useUserProfile();
+  const partsOn = profile.partsEnabled === true;
+  const [partsContent, setPartsContent] = useState<PartsContent | null>(null);
 
   useEffect(() => {
     let live = true;
     getMe().then((m) => { if (live) { setMe(m); setError(false); } }).catch(() => { if (live) setError(true); });
     return () => { live = false; };
   }, [reload]);
+
+  // Parts of me's copy, only once parts are on (the switch, Privacy & Data).
+  useEffect(() => {
+    if (!partsOn) return;
+    let live = true;
+    getPartsContent().then((c) => { if (live) setPartsContent(c); }).catch(() => { /* the area stays hidden */ });
+    return () => { live = false; };
+  }, [partsOn]);
 
   const after = useCallback(async (p: Promise<number>) => {
     profileCache.bump(await p);
@@ -42,12 +58,16 @@ export function MeSection() {
   if (!me) return <div className="h-24 animate-pulse rounded-xl bg-[var(--color-bg-card)]" />;
 
   const ref = (i: MeItem) => ({ id: i.meta.id, label: i.label });
-  const areas = me.areas.filter((a) => PHASE_A_AREAS.includes(a.id)).filter((a) => {
+  // Parts of me joins (after My patterns, getMe's order) only with parts on and its copy signed off.
+  const partsCopy = partsOn ? partsOfMeCopy(partsContent) : null;
+  const shown: ProfileAreaId[] = partsCopy ? [...PHASE_A_AREAS, 'my_parts'] : PHASE_A_AREAS;
+  const areas = me.areas.filter((a) => shown.includes(a.id)).filter((a) => {
     if (a.id === 'my_patterns') return a.items.length > 0 || me.offers.length > 0;
     return true;
   });
-  // Only from the areas shown: an item of an area not rendered yet (a kept part) never surfaces here.
-  const stale = areas.flatMap((a) => a.items).filter((i) => i.meta.prompt === 'ask');
+  // Only from the areas shown: an item of an area not rendered yet never surfaces here. Parts are left
+  // out too: checking back with a part is its own flow (with {name} filled), not this generic row.
+  const stale = areas.flatMap((a) => a.items).filter((i) => i.meta.prompt === 'ask' && i.label !== 'Part');
 
   const row = (i: MeItem) => {
     const toolName = i.toolId ? getToolById(i.toolId)?.name : null;
@@ -85,6 +105,15 @@ export function MeSection() {
       </li>
     );
   };
+
+  // A set-aside part in Me's set-aside style, read-only for now: restoring a part is restorePart (the
+  // part writers), not restoreProfileItem, and lands with the card's other actions.
+  const setAsidePart = (i: MeItem) => (
+    <li key={`${i.label}:${i.meta.id}`} className="py-3 border-t border-[var(--color-border-subtle)] first:border-t-0">
+      <p className="text-sm font-medium text-[var(--color-text-primary)]">{i.part?.name ?? i.title}</p>
+      <p className="text-xs text-[var(--color-text-tertiary)]">Set aside</p>
+    </li>
+  );
 
   return (
     <div className="space-y-4">
@@ -136,7 +165,10 @@ export function MeSection() {
                 onDone={() => setReload((r) => r + 1)} />
             </div>
           ))}
-          {a.items.filter((i) => i.meta.prompt !== 'ask').length > 0 && <ul className="mt-1">{a.items.filter((i) => i.meta.prompt !== 'ask').map(row)}</ul>}
+          {a.id === 'my_parts' && partsCopy && partsContent && (
+            <PartsOfMe items={a.items} content={partsContent} copy={partsCopy} renderSetAside={setAsidePart} />
+          )}
+          {a.id !== 'my_parts' && a.items.filter((i) => i.meta.prompt !== 'ask').length > 0 && <ul className="mt-1">{a.items.filter((i) => i.meta.prompt !== 'ask').map(row)}</ul>}
         </section>
       ))}
     </div>
