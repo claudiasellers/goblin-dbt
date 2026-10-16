@@ -76,6 +76,7 @@ export const LOAD_ORDER = [
   'capacity.cypher',                               // Capacity probe, hand-off primitives, band rules (needs Recover's cyclic_sighing)
   'witness.cypher',                                // Witness corpus: ValidationLine, ToolMoment, VoiceRule (needs Recover, OA, DEAR MAN debrief, regulation content)
   'body-map.cypher',                               // Body map: BodyRegion, sensation words on SensationType, ALL FELT_AS, BodyMap groupings; needs Emotion (incl. emotion-wheel-sync) + SensationType
+  'parts.cypher',                                  // Parts (content only, all drafts): ProtectiveMove, prompts / options, pairs, trail rules; MATCHes ActionUrge (OA data), FeelingUrge (FTF), DEAR MAN debrief + barrier labels, Problem Solve barriers, QuestionResponse, Recover's InvalidationEvent / UnmetNeed, BodyRegion (body-map), Emotion
   'recommended-for.cypher',                        // Check-in routing: RECOMMENDED_FOR pattern × band, concept tags, RoutingPolicy (needs urge_surfing, dbt_find_the_feeling)
 ];
 
