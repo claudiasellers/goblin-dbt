@@ -11,6 +11,11 @@ export interface Tool {
   emoji: string;
   /** The tool's own screen carries the instructions: the page skips the tagline and "When to use this". */
   bare?: boolean;
+  /**
+   * `false`: reached only by a link (e.g. Meet a part, from Me or an offer, with parts on). Never in the
+   * Tools page, a picker, search or the intents.
+   */
+  listed?: false;
 }
 
 export const tools: Tool[] = [
@@ -108,6 +113,18 @@ export const tools: Tool[] = [
     dbtBasis: 'Walking the Middle Path: recovering from invalidation (with STOP, TIPP, Opposite Action and DEAR MAN)',
     emoji: '💬',
   },
+  // Mindfulness (unlisted: parts, docs/design/parts.md; behind the parts switch and signed-off copy)
+  {
+    id: 'meet-a-part',
+    name: 'Meet a part',
+    tagline: 'Get to know a part of you that steps in',
+    description: 'Notice a part of you, where it sits and what it does for you, and thank it. You can keep it, so you can come back to it.',
+    whenToUse: 'When a part of you keeps stepping in and you want to know it better.',
+    module: 'mindfulness',
+    emoji: '🕯️',
+    bare: true,
+    listed: false,
+  },
 ];
 
 /**
@@ -150,6 +167,12 @@ export function toolIdFromUrl(segment: string): string {
   return Object.entries(TOOL_URL_SLUGS).find(([, slug]) => slug === segment)?.[0] ?? segment;
 }
 
+/** The tools a module lists (unlisted tools are reached only by link). */
 export function getToolsByModule(moduleId: string): Tool[] {
-  return tools.filter(t => t.module === moduleId);
+  return listedTools().filter(t => t.module === moduleId);
+}
+
+/** Every tool a list, picker or search may show. */
+export function listedTools(): Tool[] {
+  return tools.filter(t => t.listed !== false);
 }
