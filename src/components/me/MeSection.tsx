@@ -42,11 +42,12 @@ export function MeSection() {
   if (!me) return <div className="h-24 animate-pulse rounded-xl bg-[var(--color-bg-card)]" />;
 
   const ref = (i: MeItem) => ({ id: i.meta.id, label: i.label });
-  const stale = me.areas.flatMap((a) => a.items).filter((i) => i.meta.prompt === 'ask');
   const areas = me.areas.filter((a) => PHASE_A_AREAS.includes(a.id)).filter((a) => {
     if (a.id === 'my_patterns') return a.items.length > 0 || me.offers.length > 0;
     return true;
   });
+  // Only from the areas shown: an item of an area not rendered yet (a kept part) never surfaces here.
+  const stale = areas.flatMap((a) => a.items).filter((i) => i.meta.prompt === 'ask');
 
   const row = (i: MeItem) => {
     const toolName = i.toolId ? getToolById(i.toolId)?.name : null;
