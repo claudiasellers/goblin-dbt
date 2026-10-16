@@ -30,3 +30,4 @@ export {
 } from './profile';
 export { getPartsEntry, startPartSession, savePartSession, keepPart, queuePartCandidate } from './parts';
 export { deleteMyParts } from './parts';
+export { tagPart } from './parts';

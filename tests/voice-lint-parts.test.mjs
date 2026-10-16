@@ -144,7 +144,7 @@ test("parts_max_length counts each slot at its width", () => {
   assert.ok(partRules(`${a(90 - 24 - 28 + 1)}{name}{matters}`, "prompt").includes("parts_max_length"));
   assert.ok(!partRules(`${a(90 - 24)}{felt}`, "first_person").includes("parts_max_length"));
   assert.ok(partRules(`${a(90 - 24 + 1)}{felt}`, "first_person").includes("parts_max_length"));
-  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 40, month: 9, want: 20, N: 2, matters: 28, felt: 24 });
+  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 40, month: 9, want: 20, N: 2, matters: 28, felt: 24, place: 10 });
 });
 
 test("parts_slots: only parts slots, only in prompts (all), keepsakes ({A} {B} {want}) and first-person lines ({felt})", () => {

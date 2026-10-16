@@ -25,5 +25,10 @@ export interface QueuePartCandidateRequest {
   moveIds: string[];
   /** The Meet a part visit it came from, when there is one. */
   sessionId?: string;
+  /**
+   * The caller's own closed ToolSession it came from ("A new one" on the tag row). The server adds the
+   * moves that session's urge / pull ids express (approved EXPRESSES edges) to `moveIds`, up to 4.
+   */
+  toolSessionId?: string;
 }
 export interface QueuePartCandidateResponse { id: string }

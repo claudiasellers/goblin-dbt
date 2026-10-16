@@ -62,7 +62,12 @@ export interface ProfileSlices {
    * Kept parts (Phase 2), active and resting only; nothing at all while parts are off
    * (User.partsEnabled). `tender`: every consumer that speaks to a part stays gentle with it.
    */
-  parts: Array<{ id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; moveIds: string[]; meta: ProfileItemMeta }>;
+  parts: Array<{
+    id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; moveIds: string[];
+    /** The part's first body place id (src/data/bodyFigure.ts), for "The one in your {place}" when it has no name. */
+    firstPlace: string | null;
+    meta: ProfileItemMeta;
+  }>;
   /** The rest of a kept part (Meet a part reads it); `hurtIds` from GUARDS. Own-words fields as written. */
   partDetail: Array<{
     id: string; ageId: string | null; voiceIds: string[]; ownVoice: string | null; jobIds: string[]; ownJob: string | null;
@@ -83,6 +88,9 @@ export const PROFILE_NEEDS = {
   'checkin': ['patterns'],                    // the router's tie-break (E4)
   'today': ['quietHours'],
   'witness': ['name', 'ownLines', 'savedLines'],
+  // "Was this a part you know?" after a better close (PartTagRow in SessionClose): every tool whose
+  // SessionClose asks then-vs-now (src/lib/partTag.ts TAG_ROW_TOOLS).
+  'five-senses': ['parts'],
   // Phase 2: 'meet-a-part': ['name', 'parts', 'partDetail'] lands with the tool (a consumer must be
   // an app tool). Other tools declare 'parts' in the phase that renders them, never before.
 } as const satisfies Record<string, readonly SliceId[]>;

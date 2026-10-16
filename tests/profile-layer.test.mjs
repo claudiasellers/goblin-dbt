@@ -34,12 +34,16 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns"], "R20: consumer is `checkin`");
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours"]);
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
+  assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
-  // Parts (Phase 2): the slices exist; no tool reads them before it renders them. 'meet-a-part'
-  // declares ['name', 'parts', 'partDetail'] when the tool exists (a consumer must be an app tool).
+  // Parts: the slices exist; no tool reads them before it renders them. 'meet-a-part' declares
+  // ['name', 'parts', 'partDetail'] when the tool exists (a consumer must be an app tool). Phase 3's
+  // tag row is the first render on other tools' closes: exactly the tools that can show it read
+  // `parts`, and none reads partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
   assert.deepEqual(types.SLICE_IDS.slice(-2), ["parts", "partDetail"]);
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
-    assert.ok(!needs.includes("parts") && !needs.includes("partDetail"), `${consumer} reads parts before Phase 2`);
+    assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail`);
+    if (needs.includes("parts")) assert.ok(["five-senses"].includes(consumer), `${consumer} reads parts but shows no tag row`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);
@@ -86,7 +90,7 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   const now = Date.parse("2026-10-01T12:00:00Z");
   const tx = fakeTx((q) => {
     if (/USES/.test(q)) return [
-      { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true,
+      { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true, firstPlace: "chest",
              confirmedAt: "2026-08-01T00:00:00Z", revisitAt: "2026-08-31T00:00:00Z" }, moveIds: ["withdraw", "appease", "withdraw"] },
       { p: { id: "p2", kind: "part", area: "my_parts", status: "active", source: "made", revisitAt: null }, moveIds: [] },
     ];
@@ -104,8 +108,8 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   t.after(() => { delete types.PROFILE_NEEDS.__parts_test; });
   const out = await read(tx);
   assert.deepEqual(out.parts.map(({ meta: m, ...rest }) => [rest, m.status, m.area, m.prompt]), [
-    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"] }, "resting", "my_parts", "ask"],
-    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [] }, "active", "my_parts", "none"],
+    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], firstPlace: "chest" }, "resting", "my_parts", "ask"],
+    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null }, "active", "my_parts", "none"],
   ]);
   assert.deepEqual(out.partDetail, [
     { id: "p1", ageId: "age_teen", voiceIds: ["v_quiet"], ownVoice: "soft", jobIds: ["j_hide"], ownJob: "keep me safe", fearIds: ["f_too_much"],

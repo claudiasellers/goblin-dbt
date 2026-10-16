@@ -11,6 +11,7 @@ const read = (f) => readFileSync(f, "utf8");
 
 for (const [file, marker] of [
   ["types.ts", "export type PartsEntry ="], ["sessionTypes.ts", "export interface PartSessionPatch"], ["keepTypes.ts", "export interface KeepPartRequest"],
+  ["tagTypes.ts", "export interface TagPartRequest"],
 ]) {
   test(`types mirror: src/data/partsTypes.ts carries functions/src/parts/${file} unchanged (after the header)`, () => {
     const body = read(`functions/src/parts/${file}`).split("\n").slice(4).join("\n").trim();
