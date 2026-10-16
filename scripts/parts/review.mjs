@@ -54,6 +54,7 @@ export { angryRequired, ANGRY_LATER_REQUIRED } from './src/lib/angryPart';
 export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED } from './src/lib/meetAPartSave';
 export { PART_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
+export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
 export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED } from './src/lib/partsSettings';
@@ -106,7 +107,10 @@ export function surfaces(g) {
     {
       id: 'tag', title: 'The tag row',
       where: 'Under a better close, with parts on: better or much better then-vs-now (Cool Down, Five senses, Find the feeling) or Held off (Pause, Urge Surfing). "Was this a part you know?" with the person\'s parts as chips.',
-      groups: [{ label: null, ids: g.TAG_ROW_REQUIRED }],
+      groups: [
+        { label: null, ids: g.TAG_ROW_REQUIRED },
+        { label: 'Find the feeling only, when the visit made a shape: right after a part chip, "Use this shape for {name}?" (Yes gives the part that shape; the row shows without it)', ids: g.TAG_SHAPE_REQUIRED },
+      ],
     },
     {
       id: 'me', title: 'Parts of me',

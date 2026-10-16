@@ -21,6 +21,7 @@ import { newId } from '../../lib/spine/ids';
 import { sessionEmotionIds } from '../../lib/spine/toolLink';
 import type { RoomProps } from '../../components/tools/findTheFeeling/roomTypes';
 import { PartTagSlot } from '../../components/spine/PartTagSlot';
+import { visitHasShape } from '../../lib/partShape';
 
 // Rooms carry three.js / Web Audio: loaded only when the tool opens, one room at a time.
 const rooms: Record<Way, React.LazyExoticComponent<ComponentType<RoomProps>>> = {
@@ -142,7 +143,7 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   const restart = () => { sessionId.current = newId(); setSave('idle'); setCloseSaved(false); setTagGone(false); dispatch({ t: 'restart' }); };
   const tagRow = !tagGone && (
     <PartTagSlot toolId="find-the-feeling" toolSessionId={toolSession.id} thenVsNow={thenVsNowFromFtf(state.close)?.thenVsNow}
-      saved={closeSaved} onGone={() => setTagGone(true)} />
+      saved={closeSaved} onGone={() => setTagGone(true)} shape={visitHasShape(state.found)} />
   );
 
   // Parts on: "A part of you … right now." on the step right after the pull (parts.md, in the moment).

@@ -1153,6 +1153,118 @@ test('setPartAnchor over the fake driver: caller-scoped part and line keys, sign
   await assert.rejects(fns.setPartAnchor.run({ data: { partId: PID, own: 'ok' } }), code('unauthenticated'));
 });
 
+// ------------------------------------------------------------------ setPartShape (Find the feeling's "Use this shape for {name}?")
+
+const FTF_TSID = '9e8d7c6b-5a49-4382-9716-0f1e2d3c4b5a';
+const ftfJson = (shape, extra = {}) => JSON.stringify({ schemaVersion: 1, way: shape ? 'shape' : 'tune', shape, sound: shape ? null : [0.5, 0.5, 0.5, 0.5], ...extra });
+
+function fakeShape({ partsOn = true, part = { status: 'active', shapeFrom: null }, sessionFound = true, sessionStatus = 'completed',
+  toolId = 'find-the-feeling', dataJson = ftfJson([1, -1, 0, 0.5, -0.25]), version = 7, writeVersion = 8 } = {}) {
+  const log = [];
+  const deps = {
+    state: async (q) => { log.push(['state', q]); return { partsOn, version, part, sessionFound, sessionStatus, toolId, dataJson }; },
+    write: async (query, params) => { log.push(['write', query, params]); return writeVersion; },
+  };
+  return { deps, log, writes: () => log.filter(([k]) => k === 'write') };
+}
+const shapeRun = (f, input = { partId: PID, toolSessionId: FTF_TSID }) => K.setPartShapeHandler(input, f.deps);
+
+test('validateShape: partId and toolSessionId only; the shape is never accepted from the client', () => {
+  assert.deepEqual(E.validateShape({ partId: PID, toolSessionId: FTF_TSID }), { partId: PID, toolSessionId: FTF_TSID });
+  for (const bad of [{}, { partId: PID }, { toolSessionId: FTF_TSID }, { partId: PID, toolSessionId: 'nope' },
+    { partId: PID, toolSessionId: FTF_TSID, shapeSig: [0.5, 0.5, 0.5, 0.5, 0.5] }, { partId: PID, toolSessionId: FTF_TSID, shape: [0, 0, 0, 0, 1] }]) {
+    assert.throws(() => E.validateShape(bad), (e) => e.name === 'ValidationError', JSON.stringify(bad));
+  }
+});
+
+test('shapeSigFromFtf: Shape it\'s -1..1 vector as the stored 0-1 signature; anything else is no shape', () => {
+  assert.deepEqual(E.shapeSigFromFtf(ftfJson([1, -1, 0, 0.5, -0.25])), [1, 0, 0.5, 0.75, 0.38]);
+  assert.deepEqual(E.shapeSigFromFtf(ftfJson([0.333, 0, 0, 0, 0])), [0.67, 0.5, 0.5, 0.5, 0.5]);
+  for (const bad of [null, undefined, '', 'not json', '{}', 'null', ftfJson(null), ftfJson([0, 0, 0, 0, 0]), ftfJson([0.1, 0, 0, 0]),
+    ftfJson([2, 0, 0, 0, 0]), ftfJson([0.1, 0, 0, 0, '0']), JSON.stringify({ shape: [0.1, 0, 0, 0, null] }), 7]) {
+    assert.equal(E.shapeSigFromFtf(bad), null, String(bad));
+  }
+});
+
+test('setPartShape: the stored visit\'s shape, from that record; shapeFrom recorded; never a visit; version bumped', async () => {
+  const f = fakeShape();
+  assert.deepEqual(await shapeRun(f), { version: 8 });
+  assert.deepEqual(f.log[0], ['state', { partId: PID, toolSessionId: FTF_TSID }]);
+  assert.deepEqual(f.writes()[0].slice(1), [K.SET_PART_SHAPE_QUERY, { partId: PID, toolSessionId: FTF_TSID, shapeSig: [1, 0, 0.5, 0.75, 0.38] }]);
+  assert.match(K.SET_PART_SHAPE_QUERY, /WHERE coalesce\(u\.partsEnabled, false\) AND p\.status IN \['active', 'resting'\] AND coalesce\(p\.shapeFrom, ''\) <> \$toolSessionId/);
+  assert.match(K.SET_PART_SHAPE_QUERY, /SET p\.shapeSig = \$shapeSig, p\.shapeFrom = \$toolSessionId, p\.updatedAt = datetime\(\), u\.profileVersion = coalesce\(u\.profileVersion, 0\) \+ 1/);
+  assert.doesNotMatch(K.SET_PART_SHAPE_QUERY, /lastVisitedAt/, 'not a visit');
+  // A resting part, and a tender one: allowed.
+  for (const part of [{ status: 'resting', shapeFrom: null }, { status: 'active', shapeFrom: null, tender: true }]) {
+    const g = fakeShape({ part });
+    assert.deepEqual(await shapeRun(g), { version: 8 });
+    assert.equal(g.writes().length, 1);
+  }
+  // Another visit's shape replaces the earlier one.
+  const again = fakeShape({ part: { status: 'active', shapeFrom: '11111111-2222-4333-8444-555555555555' } });
+  assert.deepEqual(await shapeRun(again), { version: 8 });
+});
+
+test('setPartShape: idempotent per (part, visit): a repeat writes nothing and returns the version', async () => {
+  const f = fakeShape({ part: { status: 'active', shapeFrom: FTF_TSID } });
+  assert.deepEqual(await shapeRun(f), { version: 7 });
+  assert.equal(f.writes().length, 0);
+  // The guarded write refused (raced): the usual "changed" answer.
+  const raced = fakeShape({ writeVersion: null });
+  await assert.rejects(shapeRun(raced), code('failed-precondition'));
+});
+
+test('setPartShape: refused before any write: parts off, no part, set aside, no session, another tool, open, no shape', async () => {
+  for (const [opts, c] of [
+    [{ partsOn: false }, 'failed-precondition'],
+    [{ part: null }, 'not-found'],
+    [{ part: { status: 'set_aside', shapeFrom: null } }, 'failed-precondition'],
+    [{ sessionFound: false, sessionStatus: null, toolId: null, dataJson: null }, 'not-found'],
+    [{ toolId: 'cool-down' }, 'failed-precondition'],
+    [{ toolId: 'meet-a-part' }, 'failed-precondition'],
+    [{ sessionStatus: 'open' }, 'failed-precondition'],
+    [{ sessionStatus: null }, 'failed-precondition'],
+    [{ dataJson: null }, 'failed-precondition'],
+    [{ dataJson: ftfJson(null) }, 'failed-precondition'],
+    [{ dataJson: ftfJson([0, 0, 0, 0, 0]) }, 'failed-precondition'],
+  ]) {
+    const f = fakeShape(opts);
+    await assert.rejects(shapeRun(f), code(c), JSON.stringify(opts));
+    assert.equal(f.writes().length, 0, JSON.stringify(opts));
+  }
+});
+
+test('setPartShape: the state read scopes the ToolSession and the Find the feeling session to the caller', () => {
+  assert.match(K.SHAPE_STATE_QUERY, /OPTIONAL MATCH \(u\)-\[:HAS_PART\]->\(p:Part \{key: \$partKey\}\)/);
+  assert.match(K.SHAPE_STATE_QUERY, /OPTIONAL MATCH \(u\)-\[:HAS_TOOL_SESSION\]->\(ts:ToolSession \{key: \$sessionKey\}\)/);
+  assert.match(K.SHAPE_STATE_QUERY, /OPTIONAL MATCH \(ts\)-\[:DETAIL\]->\(f:FindTheFeelingSession\) WHERE f\.ownerId = \$uid/);
+  assert.doesNotMatch(K.SHAPE_STATE_QUERY, /\b(SET|MERGE|CREATE)\b/);
+  assert.deepEqual([...K.SHAPE_TOOLS], ['find-the-feeling']);
+});
+
+test('setPartShape over the fake driver: caller-scoped keys, the stored sig (not the client\'s), signed in, invalid input refused', async () => {
+  const f = fakeDriver((q, p) => {
+    if (q === K.SHAPE_STATE_QUERY) {
+      const mine = p.sessionKey === `real-user:${FTF_TSID}`;
+      return [{ partsOn: true, version: 3, part: { status: 'active', shapeFrom: null }, sessionFound: mine,
+        sessionStatus: mine ? 'completed' : null, toolId: mine ? 'find-the-feeling' : null, dataJson: mine ? ftfJson([-1, 1, 0, 0, 0.5]) : null }];
+    }
+    if (q === K.SET_PART_SHAPE_QUERY) return [{ version: 4 }];
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  assert.deepEqual(await fns.setPartShape.run({ auth: auth('real-user'), data: { partId: PID, toolSessionId: FTF_TSID } }), { version: 4 });
+  const s = f.calls.find((c) => c.query === K.SHAPE_STATE_QUERY);
+  assert.deepEqual([s.params.uid, s.params.partKey, s.params.sessionKey], ['real-user', `real-user:${PID}`, `real-user:${FTF_TSID}`]);
+  const w = f.calls.find((c) => c.query === K.SET_PART_SHAPE_QUERY);
+  assert.deepEqual([w.params.uid, w.params.partKey, w.params.toolSessionId, w.params.shapeSig], ['real-user', `real-user:${PID}`, FTF_TSID, [0, 1, 0.5, 0.5, 0.75]]);
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
+  // Someone else's visit: found under their key only, so not found here.
+  await assert.rejects(fns.setPartShape.run({ auth: auth('other-user'), data: { partId: PID, toolSessionId: FTF_TSID } }), code('not-found'));
+  await assert.rejects(fns.setPartShape.run({ auth: auth('real-user'), data: { partId: PID, toolSessionId: FTF_TSID, shapeSig: [1, 1, 1, 1, 1] } }), code('invalid-argument'));
+  await assert.rejects(fns.setPartShape.run({ data: { partId: PID, toolSessionId: FTF_TSID } }), code('unauthenticated'));
+});
+
 test("getPartsEntry with a partId: paused from the caller's own part only, by key; unknown ids give no paused", async () => {
   const id = '11111111-2222-4333-8444-555555555555';
   const f = partsDriver({ paused: true });

@@ -5,7 +5,7 @@ import type {
   AnswerPartCandidateRequest, AnswerPartCandidateResponse,
   AnswerPartCheckbackRequest, AnswerPartCheckbackResponse, AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
-  SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, SetPartAnchorRequest, StartPartSessionRequest,
+  SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, SetPartAnchorRequest, SetPartShapeRequest, StartPartSessionRequest,
   TagPartRequest, TagPartResponse,
 } from '../data/partsTypes';
 
@@ -149,4 +149,11 @@ const setPartAnchorFn = httpsCallable<SetPartAnchorRequest, PartWriteResponse>(f
 /** The part's anchor: `lineId` (one of their kept lines) or `own` (their words, 1 to 90 characters), exactly one. */
 export async function setPartAnchor(req: SetPartAnchorRequest): Promise<PartWriteResponse> {
   return (await setPartAnchorFn(req)).data;
+}
+
+const setPartShapeFn = httpsCallable<SetPartShapeRequest, PartWriteResponse>(functions, 'setPartShape');
+
+/** Find the feeling's "Use this shape for {name}?": the server reads the shape from that visit; none is sent. */
+export async function setPartShape(req: SetPartShapeRequest): Promise<PartWriteResponse> {
+  return (await setPartShapeFn(req)).data;
 }
