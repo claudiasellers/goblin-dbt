@@ -81,7 +81,7 @@ export const PROFILE_NEEDS = {
   'opposite-action': [],                      // later 'values', 'patterns'
   'cool-down': [],                            // DT-01: 'bodyFlags'
   'checkin': ['patterns'],                    // the router's tie-break (E4)
-  'today': ['quietHours'],
+  'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)
   'witness': ['name', 'ownLines', 'savedLines'],
   // Phase 2: 'meet-a-part': ['name', 'parts', 'partDetail'] lands with the tool (a consumer must be
   // an app tool). Other tools declare 'parts' in the phase that renders them, never before.

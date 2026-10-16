@@ -35,7 +35,7 @@ export interface PartsPrompt {
 /** What picking an option does (scripts/parts/content.py, `branch`). */
 export type PartsBranch =
   | 'continue' | 'tender_offer' | 'tender_path' | 'grounding' | 'unblend' | 'conservative' | 'danger'
-  | 'body_first' | 'candidate' | 'end' | 'keep' | 'own_words' | 'meet' | 'split' | 'new';
+  | 'body_first' | 'candidate' | 'end' | 'keep' | 'own_words' | 'meet' | 'split' | 'new' | 'aftercare' | 'checkback';
 
 /** A chip the person taps (or, `kind: 'voice'`, what a part says). */
 export interface PartsOption {

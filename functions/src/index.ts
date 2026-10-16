@@ -31,3 +31,4 @@ export {
 export { getPartsEntry, startPartSession, savePartSession, keepPart, queuePartCandidate } from './parts';
 export { deleteMyParts } from './parts';
 export { renamePart, restPart, setAsidePart, restorePart, setPartTender, answerPartRevisit } from './parts';
+export { schedulePartCheckback, answerPartCheckback } from './parts';

@@ -136,6 +136,52 @@
         "notification": "A plan you made is ready."
       },
       {
+        "id": "part_checkback",
+        "ownerModule": "mf",
+        "tier": "quality",
+        "resolveMode": "inline",
+        "deepLinkTemplate": null,
+        "staleAfterHours": 36,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": false,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "title": "How's {name} today?"
+        },
+        "choices": [
+          {
+            "id": "settled",
+            "label": "Settled",
+            "status": "done"
+          },
+          {
+            "id": "same",
+            "label": "Same",
+            "status": "done"
+          },
+          {
+            "id": "louder",
+            "label": "Louder",
+            "status": "done"
+          },
+          {
+            "id": "skip",
+            "label": "Skip",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "days": 1,
+          "kind": "at_local",
+          "time": "10:00"
+        },
+        "notification": ""
+      },
+      {
         "id": "pattern_offer",
         "ownerModule": "core",
         "tier": "skills",
