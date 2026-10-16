@@ -35,6 +35,10 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     problemTypeId: { t: 'id' },                                                    // problem-solve
     directionId: { t: 'id' },
     size: { t: 'id' },
+    barrierTypeId: { t: 'id' },                                                    // what got in the way (MI)
+    barrierSubId: { t: 'id' },
+    ambivalenceId: { t: 'id' },
+    confidence: { t: 'id' },                                                       // high | medium | low | none (checked by the client)
     handoffs: {                                                                    // P2 breakdown hand-off (A4-2)
       t: 'objs', max: 4,
       of: {

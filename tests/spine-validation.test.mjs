@@ -75,6 +75,17 @@ test("ext (R18): namespaced, ids/enums only, integers only on *Sec / *Count, ≤
   try { assert.throws(() => ext.validateExt({ mf: { intensity: 7 } }), /Sec \/ \*Count/); } finally { delete ext.EXT_SCHEMAS.mf.intensity; }
 });
 
+test("ext er: Problem Solve keeps what got in the way as ids (parts data fix 2)", () => {
+  const er = { barrierTypeId: "know-but-cant", barrierSubId: "cant-ambivalent", ambivalenceId: "ambiv-change-might-not-help", confidence: "low" };
+  assert.deepEqual(JSON.parse(ext.validateExt({ er })).er, er);
+  for (const key of Object.keys(er)) {
+    assert.throws(() => ext.validateExt({ er: { [key]: "part of me doesn't want this to change" } }), /expected an id/, `${key}: no free text`);
+    assert.throws(() => ext.validateExt({ er: { [key]: "a".repeat(65) } }), /expected an id/, `${key}: ≤ 64 chars`);
+    assert.throws(() => ext.validateExt({ er: { [key]: 3 } }), /expected an id/, `${key}: no numbers`);
+  }
+  assert.throws(() => ext.validateExt({ er: { barrierText: "x" } }), /not registered/);
+});
+
 test("record = start + close with the registry's close kind", () => {
   const { start, close: c } = v.validateRecord({ id: ID, toolId: "guided-activity", entry: "checkin_result", status: "exited_early", ext: { core: { activityId: "shake-out" } } }, now);
   assert.equal(start.toolId, "guided-activity");
