@@ -53,6 +53,10 @@ export const GUARDS = {
     /** outcome is set once. */
     outcome: (v: string) => `${v}.outcome IS NULL`,
   },
+  PartSession: {
+    /** savePartSession (a later task): only while open; finished and stopped sessions are frozen. */
+    save: (v: string) => `${v}.status = 'open'`,
+  },
 } as const;
 
 type Props = Record<string, unknown>;
@@ -65,7 +69,7 @@ const ms = (v: unknown): number | null => {
 
 /** The TypeScript mirror of GUARDS (for tests and for callers that already hold the record). */
 export function writable(
-  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice',
+  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession',
   op: string,
   p: Props,
   now: number = Date.now(),
@@ -94,6 +98,7 @@ export function writable(
     case 'FollowUp': return p.status === 'scheduled';
     case 'PatternOffer': return p.status === 'offered';
     case 'ToolUsage': return p.outcome == null;
+    case 'PartSession': return p.status === 'open';
     case 'SkillPractice': return false; // terminal at creation
     default: return false;
   }
