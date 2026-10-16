@@ -1583,4 +1583,4 @@ SET c += {key: "timeBand", value: "night", phrase: "it's late at night", reviewS
 
 // --- The kill switch and the safety numbers (offersEnabled turns off offers only, never anyone's parts) ---
 MERGE (p:PartsPolicy {id: "parts"})
-SET p += {offersEnabled: false, episodeMergeHours: 2, floodGateHours: 2, crisisPauseHours: 48, dissociationCount: 2, dissociationDays: 14, louderPauseHours: 72, maxNonSelfAnswers: 2, tooManyPartsCount: 3, tooManyPartsDays: 7, nameMaxChars: 40, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {offersEnabled: false, episodeMergeHours: 2, floodGateHours: 2, crisisPauseHours: 48, dissociationCount: 2, dissociationDays: 14, louderPauseHours: 72, maxNonSelfAnswers: 2, tooManyPartsCount: 3, tooManyPartsDays: 7, harmWindowDays: 28, tenderRepeatCount: 2, nameMaxChars: 40, reviewStatus: "draft", version: "parts-v1", pending: null};
