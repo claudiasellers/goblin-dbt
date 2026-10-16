@@ -154,7 +154,7 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
   const [ownFor, setOwnFor] = useState<null | 'voice' | 'job' | 'fear'>(null);
   /** "Picking up where we were.", on the step P2 resumed to, until the person moves on. */
   const [resumeNote, setResumeNote] = useState(false);
-  /** P2 ended on "come back later" (a follow-up was scheduled): the run ends after its own message. */
+  /** P2 ended on "come back later" (a follow-up was scheduled): the run ends after its own message, with no close question. */
   const [later, setLater] = useState(false);
   const [s, setS] = useState<Session>(fresh);
   const set = (p: Partial<Session>) => setS((x) => ({ ...x, ...p }));
@@ -176,7 +176,8 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
         // The blending check and the P2 run it opened: log only, never a band and never a profile write.
         blendCheck: s.blendCheck, handoffs: s.handoffs.length ? s.handoffs : undefined,
       },
-      ToolSession: { layer: 'log', toolId: 'meet-a-part', closeKind: 'orienting', thenVsNow: s.closeId ?? null },
+      // After P2's "come back later" the session still closes, but nobody was asked: no thenVsNow at all.
+      ToolSession: { layer: 'log', toolId: 'meet-a-part', closeKind: 'orienting', thenVsNow: s.exitStep === 'blend' ? undefined : s.closeId ?? null },
       keepPart: s.kept ? {
         layer: 'profile (on yes only)', name: s.name ?? null, tender: s.tender, places: s.place ? [s.place] : [], jobIds: s.jobId ? [s.jobId] : [],
         fearIds: s.fearId ? [s.fearId] : [], preferredRoleIds: s.ratherId ? [s.ratherId] : [], USES: [s.move], GUARDS: guards,
@@ -255,8 +256,9 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
           onScheduleLater={async (chip) => { onLog({ FollowUp: { layer: 'log', type: 'resume_skill', window: chip } }); return 'fu-demo'; }}
           onResume={(r) => { addHandoff(r); go('where'); if (!r.overridden) setResumeNote(true); }}
           onLater={(r) => { addHandoff(r); set({ exitStep: 'blend' }); setLater(true); }} />
-        {/* Come back later ends the run the way a stopped session does: the spine's close, then done. */}
-        {later && <Primary onClick={() => go('close')}>Continue</Primary>}
+        {/* Come back later ends the run without the orienting close (decided 16 Oct): P2 just asked its own
+            reread, and a second question while leaving reads as being quizzed. The follow-up stands. */}
+        {later && <Primary onClick={() => go('done')}>Continue</Primary>}
       </>);
       case 'find': return (<>
         <p className="text-lg font-medium">{P('meet_find')}</p>
