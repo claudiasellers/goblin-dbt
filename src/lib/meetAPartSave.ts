@@ -16,7 +16,7 @@ import {
   type QueuePartCandidateRequest, type StartPartSessionRequest, type TrailheadKind,
 } from '../data/partsTypes';
 import { handoffExt } from './bandStore';
-import { flowReady, stepOptions } from './partsContent';
+import { stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { BLEND_ANSWERS, MEET_OPTION_STEP, MEET_PROMPTS, SHAPE_ROUNDS, UPDATE_NOT_YET, whatToSave, type MeetContext, type MeetSession, type MeetState, type MeetStep } from './meetAPart';
 import { vecToSig } from './partFigure';
 import { dueAtFor } from './spine/windows';
@@ -53,6 +53,14 @@ export const PAUSED_PROMPT = 'paused_heads_up';
 export const meetPromptIds = (opts: { paused?: boolean } = {}): string[] =>
   [HEADS_UP_PROMPT, ...(opts.paused ? [PAUSED_PROMPT] : []), ...Object.values(MEET_PROMPTS).flat()];
 
+/** What a visit's gate requires by id (the paused line only for a paused visit; scripts/parts/review.mjs reads it). */
+export const meetRequired = (opts: { paused?: boolean } = {}): SurfaceIds => ({ prompts: meetPromptIds(opts), options: MEET_REQUIRED_OPTIONS });
+
+/** The option steps a visit needs at least one signed-off option in (flow, step). */
+export const MEET_OPTION_STEPS: readonly (readonly [string, string])[] = [
+  ...Object.values(MEET_OPTION_STEP).filter((st): st is readonly [string, string] => !!st), ['gate', 'dissociation'],
+];
+
 /** Shape it's forced choices take their two words a round from Find the feeling's signed-off copy. */
 export type ShapeRoundLabels = readonly (readonly [string, string])[];
 
@@ -66,10 +74,9 @@ export function shapeRoundsReady(rounds: unknown): rounds is ShapeRoundLabels {
  * option, the ids read directly, at least one move, a "Keep it" yes, and Shape it's words.
  */
 export function meetReady(content: PartsContent, rounds: unknown, opts: { paused?: boolean } = {}): boolean {
-  if (!flowReady(content, meetPromptIds(opts), MEET_REQUIRED_OPTIONS)) return false;
+  if (!surfaceReady(content, meetRequired(opts))) return false;
   if (content.moves.length === 0 || !shapeRoundsReady(rounds)) return false;
-  const steps = [...Object.values(MEET_OPTION_STEP), ['gate', 'dissociation'] as const];
-  if (!steps.every((st) => st && stepOptions(content, st[0], st[1]).length > 0)) return false;
+  if (!MEET_OPTION_STEPS.every(([flow, step]) => stepOptions(content, flow, step).length > 0)) return false;
   return stepOptions(content, 'meet', 'keep').some((o) => o.branch === 'keep');
 }
 
@@ -283,6 +290,8 @@ export const CHECKBACK_PROMPT = 'close_checkback';
 export const CHECKBACK_YES = 'close_checkback_yes';
 export const CHECKBACK_NO = 'close_checkback_no';
 export const CHECKBACK_TYPE = 'part_checkback';
+/** What the close's "Check back with it tomorrow?" requires. */
+export const CLOSE_CHECKBACK_REQUIRED: SurfaceIds = { prompts: [CHECKBACK_PROMPT], options: [CHECKBACK_YES, CHECKBACK_NO] };
 
 /** The bit of the spine's follow-up type the question needs (src/data/content/spine.json). */
 export interface CheckbackType { id: string; enabled: boolean; window: Record<string, unknown> }
@@ -297,7 +306,7 @@ export function offerCheckback(state: MeetState, o: { content: PartsContent; typ
   if (state.step !== 'done' || state.later || state.session.danger || o.paused || !o.opened) return false;
   if (state.session.kept !== true && !state.session.partId) return false;
   if (!o.type || o.type.id !== CHECKBACK_TYPE || !o.type.enabled) return false;
-  return flowReady(o.content, [CHECKBACK_PROMPT], [CHECKBACK_YES, CHECKBACK_NO]);
+  return surfaceReady(o.content, CLOSE_CHECKBACK_REQUIRED);
 }
 
 /** The yes: lane 2's schedulePartCheckback for this visit's session, due in the type's window (tomorrow 10:00 local). */

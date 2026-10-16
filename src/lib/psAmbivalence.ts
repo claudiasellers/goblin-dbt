@@ -8,7 +8,7 @@
  */
 import type { PartsContent } from '../data/partsContentTypes';
 import type { QueuePartCandidateRequest } from '../data/partsTypes';
-import { flowReady } from './partsContent';
+import { surfaceReady, type SurfaceIds } from './partsContent';
 
 /** The one barrier sub-response this line follows. */
 export const PS_AMBIVALENCE_BARRIER = 'cant-ambivalent';
@@ -17,12 +17,15 @@ export const PS_AMBIVALENCE_MOVE = 'put_it_off';
 export const PS_LATER = 'ps_later';
 export const PS_LATER_DONE = 'ps_later_done';
 
+/** What the line's gate requires (scripts/parts/review.mjs reads it). */
+export const PS_LATER_REQUIRED: SurfaceIds = { prompts: [PS_LATER_DONE], options: [PS_LATER] };
+
 export interface PsLaterCopy { ask: string; done: string }
 
 /** The line, or null: parts on, the cant-ambivalent barrier, and both lines shipped. */
 export function psLaterCopy(content: PartsContent | null, partsOn: boolean, barrierSubId: string | null | undefined): PsLaterCopy | null {
   if (!partsOn || barrierSubId !== PS_AMBIVALENCE_BARRIER || !content) return null;
-  if (!flowReady(content, [PS_LATER_DONE], [PS_LATER])) return null;
+  if (!surfaceReady(content, PS_LATER_REQUIRED)) return null;
   const ask = Object.values(content.options.ps ?? {}).flat().find((o) => o.id === PS_LATER)?.label?.trim();
   const done = content.prompts[PS_LATER_DONE]?.copy?.trim();
   return ask && done ? { ask, done } : null;

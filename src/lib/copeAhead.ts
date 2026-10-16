@@ -8,7 +8,7 @@
 import type { Band } from '../data/capacityTypes';
 import type { PartsContent, PartsOption } from '../data/partsContentTypes';
 import type { ProfileSlices } from '../data/profileTypes';
-import { flowReady, promptCopy, stepOptions } from './partsContent';
+import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { partChipLabel as unnamedOrName, UNNAMED_PROMPTS } from './partTag';
 
 /** The screen's own prompts, then the shared unnamed-part chips ("The one in your {place}", "One you haven't named"). */
@@ -18,6 +18,9 @@ export const COPE_PROMPTS = [
 ] as const;
 export const COPE_OPTIONS = ['cope_not_sure', 'cope_skip', 'cope_own', 'cope_change', 'cope_save'] as const;
 
+/** What the screen's gate requires (scripts/parts/review.mjs reads it). */
+export const COPE_REQUIRED: SurfaceIds = { prompts: COPE_PROMPTS, options: COPE_OPTIONS };
+
 /** At most this many parts as chips, and this many kept lines to pick an anchor from. */
 export const COPE_PART_CAP = 4;
 export const COPE_LINE_CAP = 4;
@@ -25,7 +28,7 @@ export const COPE_LINE_CAP = 4;
 export const COPE_OWN_MAX = 90;
 
 export function copeReady(content: PartsContent | null): boolean {
-  return !!content && flowReady(content, COPE_PROMPTS, COPE_OPTIONS);
+  return !!content && surfaceReady(content, COPE_REQUIRED);
 }
 
 export interface CopeGate {

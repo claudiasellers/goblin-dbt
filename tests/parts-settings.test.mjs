@@ -53,7 +53,9 @@ test("right after turning parts on: one Get to know a part link, gated by Meet a
   assert.doesNotMatch(c, /localStorage|sessionStorage/, "never remembered across visits");
   assert.match(c, /\{justOn && enabled && getToKnow && <GetToKnowLink label=\{getToKnow\} \/>\}/);
   assert.match(c, /const meet = useToolGate\('meet-a-part'\);\s*if \(meet !== 'open'\) return null;/, "Meet a part's own gate, reused");
-  assert.match(c, /promptCopy\(c, 'me_get_to_know'\)/, "the line is the signed-off me_get_to_know");
+  assert.match(c, /surfaceReady\(c, SETTINGS_LINK_REQUIRED\)/, "the line is the signed-off me_get_to_know");
+  const { SETTINGS_LINK_REQUIRED } = await importTs("src/lib/partsSettings.ts");
+  assert.deepEqual(SETTINGS_LINK_REQUIRED, { prompts: ["me_get_to_know"], options: [] });
   const { settingsMeetLink } = await importTs("src/lib/partsOfMe.ts");
   const { parseMeetEntry } = await importTs("src/lib/meetAPartSave.ts");
   assert.deepEqual(settingsMeetLink(), { pathname: "/tool/meet-a-part", state: { parts: { trailheadKind: "settings" } } });

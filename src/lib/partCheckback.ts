@@ -6,7 +6,7 @@
 import type { PartsContent, PartsOption } from '../data/partsContentTypes';
 import type { PartCheckbackAnswer } from '../data/partsTypes';
 import type { TodayItem } from '../services/spine';
-import { flowReady, promptCopy, stepOptions } from './partsContent';
+import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 
 export const PART_CHECKBACK_TYPE = 'part_checkback';
 
@@ -17,13 +17,16 @@ export const CHECKBACK_OPTIONS = [
   'checkback_settled', 'checkback_same', 'checkback_louder', 'checkback_skip', 'louder_body', 'louder_not_now',
 ] as const;
 
+/** What the card's gate requires (scripts/parts/review.mjs reads it). */
+export const PART_CHECKBACK_REQUIRED: SurfaceIds = { prompts: CHECKBACK_PROMPTS, options: CHECKBACK_OPTIONS };
+
 /** Option id → the answer answerPartCheckback takes. */
 export const CHECKBACK_ANSWER_OF: Readonly<Record<string, PartCheckbackAnswer>> = {
   checkback_settled: 'settled', checkback_same: 'same', checkback_louder: 'louder', checkback_skip: 'skip',
 };
 
 export function checkbackReady(content: PartsContent | null): boolean {
-  return !!content && flowReady(content, CHECKBACK_PROMPTS, CHECKBACK_OPTIONS);
+  return !!content && surfaceReady(content, PART_CHECKBACK_REQUIRED);
 }
 
 /** Today without check-backs the card can't show (content not signed off, or parts off on this device). */
