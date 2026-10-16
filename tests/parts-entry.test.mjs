@@ -8,18 +8,25 @@ import { importTs } from "./lib/importTs.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 
-test("types mirror: src/data/partsTypes.ts carries functions/src/parts/types.ts unchanged (after the header)", () => {
-  const body = read("functions/src/parts/types.ts").split("\n").slice(4).join("\n").trim();
-  assert.ok(body.includes("export type PartsEntry ="), "server types moved; update the slice");
-  assert.ok(read("src/data/partsTypes.ts").includes(body), "src/data/partsTypes.ts no longer mirrors the server's entry types");
-});
+for (const [file, marker] of [["types.ts", "export type PartsEntry ="], ["sessionTypes.ts", "export interface PartSessionPatch"]]) {
+  test(`types mirror: src/data/partsTypes.ts carries functions/src/parts/${file} unchanged (after the header)`, () => {
+    const body = read(`functions/src/parts/${file}`).split("\n").slice(4).join("\n").trim();
+    assert.ok(body.includes(marker), "server types moved; update the slice");
+    assert.ok(read("src/data/partsTypes.ts").includes(body), `src/data/partsTypes.ts no longer mirrors ${file}`);
+  });
+}
 
-test("getPartsEntry: exported by name, pinned, in the auth matrix as signed-in, wrapped for the app", () => {
-  assert.match(read("functions/src/index.ts"), /^export \{ getPartsEntry \} from '\.\/parts';$/m);
-  assert.ok("getPartsEntry" in JSON.parse(read("functions/test/fixtures/endpoints.json")));
+test("parts callables: exported by name, pinned, in the auth matrix as signed-in, wrapped for the app", () => {
+  assert.match(read("functions/src/index.ts"), /^export \{ getPartsEntry, startPartSession, savePartSession \} from '\.\/parts';$/m);
+  const endpoints = JSON.parse(read("functions/test/fixtures/endpoints.json"));
   const matrix = read("functions/test/unit/auth-matrix.test.cjs");
-  assert.match(matrix.slice(matrix.indexOf("const AUTHED"), matrix.indexOf("const PUBLIC")), /'getPartsEntry'/);
-  assert.match(read("src/services/parts.ts"), /httpsCallable<.*PartsEntry>\(functions, 'getPartsEntry'\)/);
+  const authed = matrix.slice(matrix.indexOf("const AUTHED"), matrix.indexOf("const PUBLIC"));
+  const service = read("src/services/parts.ts");
+  for (const name of ["getPartsEntry", "startPartSession", "savePartSession"]) {
+    assert.ok(name in endpoints, name);
+    assert.ok(authed.includes(`'${name}'`), name);
+    assert.match(service, new RegExp(`httpsCallable<.*>\\(functions, '${name}'\\)`), name);
+  }
 });
 
 test("partsEnabled is a setting (off by default), never profile-layer data", async () => {

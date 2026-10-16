@@ -19,6 +19,7 @@ const AUTHED = [
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
   'getPartsEntry', // reads the caller's own check-ins and Recover sessions
   'deleteMyParts', // deletes the caller's own parts records
+  'startPartSession', 'savePartSession',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in

@@ -93,6 +93,16 @@ function checkObject(schema: Record<string, Field>, v: unknown, path: string): R
 }
 
 /**
+ * One registered field on its own, by the same rules (Meet a part stores P2's `handoffs` on its
+ * PartSession in exactly DEAR MAN's `ext.er.handoffs` shape, so the two can't drift).
+ */
+export function checkExtField(ns: string, key: string, v: unknown): unknown {
+  const f = EXT_SCHEMAS[ns]?.[key];
+  if (!f) throw new ValidationError(`ext ${ns}.${key}: not registered`);
+  return checkField(key, f, v, `${ns}.${key}`);
+}
+
+/**
  * Validate `ext` ({namespace: {...}}). Returns the JSON string stored on the session, or null when
  * empty. Throws ValidationError for an unknown namespace or key, a number outside *Sec/*Count, free
  * text, or more than 4 KB.

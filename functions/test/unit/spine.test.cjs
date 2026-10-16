@@ -34,9 +34,9 @@ test('startToolSession rejects an unknown tool before any query', async () => {
   assert.equal(f.calls.length, 0);
 });
 
-function closeDriver({ open = true, closeKind = 'regulation_down', practiced = false, reps = [] } = {}) {
+function closeDriver({ open = true, closeKind = 'regulation_down', practiced = false, reps = [], toolId = 'cool-down' } = {}) {
   return fakeDriver((q) => {
-    if (/AS open/.test(q)) return [{ open, closeKind, practiced, reps, toolId: 'cool-down', followUps: [] }];
+    if (/AS open/.test(q)) return [{ open, closeKind, practiced, reps, toolId, followUps: [] }];
     if (/RETURN collect\(sp\.id\) AS ids/.test(q)) return [{ ids: [`${ID}:cold`] }];
     return [];
   });
@@ -104,7 +104,17 @@ test('closeToolSession: detail labels come from a whitelist, matched by the call
   setDriver(f.driver);
   await fns.closeToolSession.run({ auth: auth('u9'), data: { id: ID, status: 'completed', detail: { kind: 'opposite_action', id: CI } } });
   assert.deepEqual([f.calls[1].params.detailLabel, f.calls[1].params.detailKey], ['OppositeActionSession', `u9:${CI}`]);
-  assert.match(f.calls[1].query, /\(u\)-\[:COMPLETED_SESSION\]->\(d \{key: \$detailKey\}\)/);
+  // The wrapped tools' sessions hang off COMPLETED_SESSION, Meet a part's off HAS_PART_SESSION.
+  assert.match(f.calls[1].query, /\(u\)-\[:COMPLETED_SESSION\|HAS_PART_SESSION\]->\(d \{key: \$detailKey\}\)/);
+});
+
+test("closeToolSession: Meet a part links its PartSession; its \"more here\" is kept but never a compat outcome", async () => {
+  const f = closeDriver({ closeKind: 'orienting', toolId: 'meet-a-part' });
+  setDriver(f.driver);
+  await fns.closeToolSession.run({ auth: auth('u9'), data: { id: ID, status: 'completed', thenVsNow: 'better', detail: { kind: 'meet_a_part', id: CI } } });
+  const set = f.calls[1];
+  assert.deepEqual([set.params.detailLabel, set.params.detailKey], ['PartSession', `u9:${CI}`]);
+  assert.deepEqual([set.params.thenVsNow, set.params.thenVsNowDir, set.params.legacyOutcome], ['better', 'orient', null]);
 });
 
 test('closeToolSession: a band asked after the open is set once, only when the start had none (A4-4)', async () => {
