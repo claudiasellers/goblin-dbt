@@ -11,14 +11,16 @@ import { initialMeet, meetNext, MEET_TRACK, SHAPE_ROUNDS, type MeetContext, type
 import {
   HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_OWN_WORDS_MAX, meetLimits, STEP_PART,
   candidateRequest, entryLaterPatch, entryPlan, guardsFor, keepRequest, meetContext, optionsFor, parseMeetEntry,
-  startRequest, startingMove, toPatch, showTooMany, doneTarget, TOO_MANY_PROMPT, isPaused, meetReady, PAUSED_PROMPT, type EntryPlan, type MeetEntry, type ShapeRoundLabels,
+  startRequest, startingMove, toPatch, showTooMany, doneTarget, TOO_MANY_PROMPT, isPaused, meetReady, PAUSED_PROMPT,
+  CHECKBACK_NO, CHECKBACK_PROMPT, CHECKBACK_TYPE, CHECKBACK_YES, checkbackRequest, offerCheckback, type CheckbackType, type EntryPlan, type MeetEntry, type ShapeRoundLabels,
 } from '../../lib/meetAPartSave';
 import { vecToSig } from '../../lib/partFigure';
 import { promptCopy, stepOptions } from '../../lib/partsContent';
 import { newId } from '../../lib/spine/ids';
 import { scheduleResumeLater } from '../../services/capacity';
 import { loadMeetAPartContent } from '../../services/meetAPart';
-import { getPartsEntry, keepPart, queuePartCandidate, savePartSession, startPartSession } from '../../services/parts';
+import { getPartsEntry, keepPart, queuePartCandidate, savePartSession, schedulePartCheckback, startPartSession } from '../../services/parts';
+import { getSpineContent } from '../../services/spine';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
 import { CrisisBanner } from '../../components/safety/CrisisBanner';
@@ -149,6 +151,22 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
     // P2's "come back later" ends the visit without the orienting close.
     if (st.step === 'done' && st.later) void toolSession.close({ status: 'exited_early', ...detail() });
   }, [st.step]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* ── the check-back question after the close (lane 2's part_checkback) ── */
+  const [checkType, setCheckType] = useState<CheckbackType | null>(null);
+  useEffect(() => {
+    let live = true;
+    getSpineContent().then((c) => { if (live) setCheckType(c.followUpTypes.find((t) => t.id === CHECKBACK_TYPE) ?? null); }).catch(() => { /* no question */ });
+    return () => { live = false; };
+  }, []);
+  const [checkback, setCheckback] = useState<string | null>(null);
+  const askCheckback = offerCheckback(st, { content: parts, type: checkType, opened, paused });
+  const answerCheckback = (id: string) => {
+    if (checkback || !checkType) return;
+    setCheckback(id);
+    const req = id === CHECKBACK_YES ? checkbackRequest(checkType, newId(), psId, new Date()) : null;
+    if (req) enqueue(async () => { if (await started.current) await schedulePartCheckback(req); });
+  };
 
   const resumeDraft = () => (toolSession.persisted && toolSession.id ? { hostSessionId: toolSession.id, stepId: STEP_PART[st.step] ?? st.step, draft: {} } : undefined);
   const scheduleLater = toolSession.persisted && toolSession.id
@@ -357,6 +375,11 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
           <SessionClose kind="orienting" {...(opened ? { detail: { kind: 'meet_a_part' as const, id: psId } } : {})}
             onAnswered={(input) => send({ type: 'close', choiceId: input.thenVsNow ?? null })}
             onSkipped={() => send({ type: 'close', choiceId: null })} />
+          {(askCheckback || checkback) && (<>
+            <Prompt>{P(CHECKBACK_PROMPT)}</Prompt>
+            <Chips options={stepOptions(parts, 'meet', 'close').filter((o) => o.id === CHECKBACK_YES || o.id === CHECKBACK_NO)}
+              picked={checkback} onPick={answerCheckback} />
+          </>)}
           {step === 'done' && finale}
         </>);
         break;

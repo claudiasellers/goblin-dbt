@@ -133,7 +133,7 @@ test("shipped parts content is content.py's signed-off rows, and nothing a scree
   const parts = shipped("parts.json").content;
   assert.deepEqual(parts, partsFromFixture(JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"))));
   // Trail rules, contexts and the policy stay on the server; pairs and keepsake wait for Two pulls.
-  assert.deepEqual(Object.keys(parts).sort(), ["canTouch", "hurts", "moves", "options", "prompts", "version"]);
+  assert.deepEqual(Object.keys(parts).sort(), ["canTouch", "expresses", "hurts", "moves", "options", "prompts", "version"]);
   assert.doesNotMatch(JSON.stringify(parts), /"(reviewStatus|pending)"/);
   // Every node parts.cypher writes as a draft (content.py's SIGNED_OFF doesn't list it), by label.
   const drafts = [...readFileSync("schema/parts.cypher", "utf8").matchAll(/^MERGE \(\w:(\w+) \{id: "([^"]+)"\}\)\nSET [^\n]*reviewStatus: "draft"/gm)];
@@ -147,6 +147,7 @@ test("shipped parts content is content.py's signed-off rows, and nothing a scree
     ...Object.values(parts.options).flatMap((steps) => Object.values(steps).flat().map((o) => o.id)),
     ...parts.hurts.flatMap((h) => [h.id, ...h.guardedBy.map((g) => g.moveId)]),
     ...Object.values(parts.canTouch).flat(),
+    ...Object.values(parts.expresses).flatMap((t) => Object.entries(t).flat()),
   ];
   assert.deepEqual(shippedIds.filter((id) => draft.has(id)), [], "draft parts content in the app bundle");
 });
@@ -172,6 +173,9 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
     // Recover's events carry no review of their own: CAN_TOUCH is reviewed on the edge.
     node("dismissed", ["InvalidationEvent"]), node("ignored", ["InvalidationEvent"]), node("mocked", ["InvalidationEvent"]),
     node("tp_agree", ["ThoughtPattern"]),
+    // Other modules' ids carry no review of their own: EXPRESSES is reviewed on the edge (by its source id).
+    node("shame-hide", ["ActionUrge"]), node("anger-lash", ["ActionUrge"]), node("fear-freeze", ["ActionUrge"]),
+    node("sad-scroll", ["ActionUrge"]), node("recover_hide", ["PullOption"], { ...ok, flow: "invalidation_recovery" }),
     node("parts", ["PartsPolicy"], { ...draft, offersEnabled: false, floodGateHours: 2 }),
   ];
   const relationships = [
@@ -190,6 +194,12 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
     rel("CAN_TOUCH", "ignored", "brushed_off", { reviewStatus: "draft", order: 0 }),
     rel("CAN_TOUCH", "mocked", "brushed_off", { reviewStatus: "approved", pending: "a decision", order: 0 }),
     rel("CAN_TOUCH", "mocked", "left_out", { reviewStatus: "approved", order: 1 }),
+    // Approved edge to a shipped move only: a draft move (chase), a move never offered (go_blank) or a draft edge drop out.
+    rel("EXPRESSES", "shame-hide", "hide", { reviewStatus: "approved", why: "x" }),
+    rel("EXPRESSES", "anger-lash", "chase", { reviewStatus: "approved" }),
+    rel("EXPRESSES", "fear-freeze", "go_blank", { reviewStatus: "approved" }),
+    rel("EXPRESSES", "sad-scroll", "hide", { reviewStatus: "draft" }),
+    rel("EXPRESSES", "recover_hide", "hide", { reviewStatus: "approved" }),
   ];
   const exp = { scope: "content-only", nodes, relationships };
   assertContentOnly(exp);
@@ -210,10 +220,11 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
       namedAs: ["disrespected", "hurt"], guardedBy: [{ moveId: "hide", rank: 1 }],
     }, { id: "made_small", label: "being made small", order: 2, matters: "being treated as an equal", namedAs: [], guardedBy: [] }],
     canTouch: { dismissed: ["made_small", "brushed_off"] },
+    expresses: { ActionUrge: { "shame-hide": "hide" }, PullOption: { recover_hide: "hide" } },
   });
   // Nothing signed off: an empty file carrying the version every parts node has (the policy's), or none at all.
   const none = { scope: "content-only", nodes: nodes.map((n) => (n.labels.includes("PartsPolicy") ? n : { ...n, props: { ...n.props, reviewStatus: "draft" } })), relationships: [] };
-  assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [], canTouch: {} });
+  assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [], canTouch: {}, expresses: {} });
   assert.equal(buildParts(indexGraph({ scope: "content-only", nodes: [], relationships: [] })).version, null);
   // The policy's two client numbers ship once it is signed off; nothing else of it ever does.
   const signedPolicy = { ...exp, nodes: nodes.map((n) => (n.labels.includes("PartsPolicy")

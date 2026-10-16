@@ -13,7 +13,8 @@ import { PatternOfferCard } from './PatternOfferCard';
 import { PartsOfMe } from './PartsOfMe';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
-import { partsOfMeCopy } from '../../lib/partsOfMe';
+import { answerPartCandidate } from '../../services/parts';
+import { dismissCandidateRequest, partsOfMeCopy } from '../../lib/partsOfMe';
 import type { PartsContent } from '../../data/partsContentTypes';
 
 /** Areas shown in Phase A (plan §5.4). My people / My plans / My progress appear when their owners register kinds. */
@@ -108,6 +109,11 @@ export function MeSection() {
 
   // A part write (the card's actions, Bring it back, the check-back): Me's usual refresh after.
   const partWrite = (p: Promise<{ version: number }>) => after(p.then((r) => r.version));
+  // "Not any more" on a candidate: a log write (no profile version), so just reload.
+  const dismissCandidate = async (id: string) => {
+    await answerPartCandidate(dismissCandidateRequest(id));
+    setReload((r) => r + 1);
+  };
 
   return (
     <div className="space-y-4">
@@ -160,7 +166,8 @@ export function MeSection() {
             </div>
           ))}
           {a.id === 'my_parts' && partsCopy && partsContent && (
-            <PartsOfMe items={a.items} content={partsContent} copy={partsCopy} onWrite={partWrite} />
+            <PartsOfMe items={a.items} candidates={me.partCandidates ?? []} content={partsContent} copy={partsCopy}
+              onWrite={partWrite} onDismiss={dismissCandidate} />
           )}
           {a.id !== 'my_parts' && a.items.filter((i) => i.meta.prompt !== 'ask').length > 0 && <ul className="mt-1">{a.items.filter((i) => i.meta.prompt !== 'ask').map(row)}</ul>}
         </section>
