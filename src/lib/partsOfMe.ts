@@ -2,7 +2,7 @@
  * Parts of me in Me (docs/design/parts.md, "Parts of me (Me)", "The part card"): which signed-off
  * prompts the area needs, what each card shows, the order, and the links into Meet a part. Pure.
  *
- * Card rules: no stats yet. A fear is never shown on a tender part (the conservative branch told the
+ * Card rules: the stats readout is lane 4's (src/lib/partStats.ts). A fear is never shown on a tender part (the conservative branch told the
  * person "we'll leave that be"), nor a fear chip flagged tender or danger on any part, and the person's
  * own-words fear is never shown at all (getMe doesn't send it). Option ids that aren't signed off, and place ids the figure doesn't know, are left out.
  */

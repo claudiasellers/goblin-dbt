@@ -9,6 +9,9 @@ import { int } from '../shared/values';
 import { metaFrom } from './meta';
 import { readProfileSlices, readProfileVersion } from './slices';
 import type { ProfileAreaId, ProfileItemMeta } from './types';
+import { statsByPart } from '../parts/stats';
+import { readStatsRows } from '../parts/statsQueries';
+import type { PartStats } from '../parts/statsTypes';
 
 export interface MeItem {
   label: 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
@@ -23,7 +26,7 @@ export interface MeItem {
   stillTrueCopy: string;
   setAsideCopy: string;
   toolId?: string | null;
-  /** Part items only: what the Parts of me card shows (no stats yet). */
+  /** Part items only: what the Parts of me card shows. */
   part?: MePart;
 }
 
@@ -42,6 +45,11 @@ export interface MePart {
   preferredRoleIds: string[];
   moveIds: string[];
   lastVisitedAt: string | null;
+  /**
+   * Active and resting parts only: lane 4's readout (functions/src/parts/stats.ts), passed through
+   * untouched (each line null below its threshold). Absent on a set-aside part.
+   */
+  stats?: PartStats;
 }
 /** A part the person said they'd come back to (an open PartCandidate, a log record read for display). */
 export interface MePartCandidate {
@@ -143,6 +151,8 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
      RETURN c.id AS id, c.origin AS origin, c.moveIds AS moveIds, toString(c.createdAt) AS createdAt, c.status AS status
      ORDER BY c.createdAt DESC, c.id LIMIT ${ME_CANDIDATES_MAX}`,
     { uid }) : null;
+  // The parts' readout (what's helped, how they've felt toward it, when): one read for all parts.
+  const stats = partsOn ? statsByPart(await readStatsRows(tx, uid)) : new Map<string, PartStats>();
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
   for (const r of itemsRes.records) {
@@ -160,6 +170,8 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (r.get('label') === 'OwnLine') summary = String(p.text ?? '');
     if (r.get('label') === 'Part') summary = String(p.name ?? '');
     const part = r.get('label') === 'Part' ? mePart(p, r.get('moveIds')) : undefined;
+    const partStats = part && (meta.status === 'active' || meta.status === 'resting') ? stats.get(meta.id) : undefined;
+    if (part && partStats) part.stats = partStats;
     const item: MeItem = {
       label: r.get('label'), meta, title: (r.get('title') as string | null) ?? meta.kind, summary,
       editor: meta.kind === 'quiet_hours' ? 'quiet_hours' : null,
