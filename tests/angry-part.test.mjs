@@ -114,3 +114,47 @@ test("hurt order with a Recover state: what it can touch first, in CAN_TOUCH ord
   // A CAN_TOUCH id the content doesn't have is dropped, never shown as an empty chip.
   assert.deepEqual(ids(orderHurts(fixture.hurts, { x: ["gone", "made_small"] }, "x")).slice(0, 2), ["made_small", "brushed_off"]);
 });
+
+// ---- Recover's host: is the card ready, from the shipped (signed-off only) parts content ----
+const { angryReady, angryPromptIds } = await importTs("src/lib/angryPart.ts");
+const { getPartsContent } = await importTs("src/services/partsContent.ts");
+const { partsFromFixture } = await import("./lib/partsContentFixture.mjs");
+const ANGRY_OPTION_IDS = ["angry_next", "angry_not_sure", "angry_done"];
+/** parts.json as it would be with these ids signed off (and everything else as the fixture has it). */
+const shippedWith = (ids) => partsFromFixture(fixture, (id) => ids.has(id) || ["hit_back", ...fixture.hurts.map((h) => h.id)].includes(id));
+
+test("ready: today nothing is signed off, so the shipped file never shows the card", async () => {
+  const shipped = await getPartsContent();
+  const signed = (id) => fixture.prompts[id]?.reviewStatus === "approved";
+  assert.equal(angryReady(shipped, true), angryPromptIds(true).every(signed));
+  assert.equal(angryReady(shipped, false), angryPromptIds(false).every(signed));
+});
+
+test("ready: only the person's wording is needed, every option, and complete hurts", () => {
+  const on = new Set([...angryPromptIds(true), ...ANGRY_OPTION_IDS]);
+  const off = new Set([...angryPromptIds(false), ...ANGRY_OPTION_IDS]);
+  assert.equal(angryReady(shippedWith(on), true), true);
+  assert.equal(angryReady(shippedWith(on), false), false, "parts off needs its own _plain lines");
+  assert.equal(angryReady(shippedWith(off), false), true);
+  assert.equal(angryReady(shippedWith(off), true), false);
+  // One line or one option missing: no card at all, never half of one.
+  const lessLine = new Set(on); lessLine.delete("angry_vote_unsure");
+  assert.equal(angryReady(shippedWith(lessLine), true), false);
+  const lessOption = new Set(on); lessOption.delete("angry_not_sure");
+  assert.equal(angryReady(shippedWith(lessOption), true), false);
+  // Hurts: none signed off, or one without its matters, is not ready.
+  const content = shippedWith(on);
+  assert.equal(angryReady({ ...content, hurts: [] }, true), false);
+  assert.equal(angryReady({ ...content, hurts: content.hurts.map((h, i) => (i ? h : { ...h, matters: undefined })) }, true), false);
+  // The copy for one wording builds from that wording alone; the resolver never reads the other.
+  const copyOff = angryCopyFrom(shippedWith(off), false);
+  assert.equal(copyOff.angry_unblend, "", "the parts wording isn't shipped and isn't needed");
+  const r = resolveAngryCopy(copyOff, { partsOn: false, name: "Sam", hurt: brushed });
+  for (const s of strings(r)) assert.ok(s.length > 0 && !/\bparts?\b/i.test(s), `parts off: "${s}"`);
+  assert.throws(() => angryCopyFrom(shippedWith(off), true), /no prompt angry_unblend/);
+});
+
+test("orderHurts offers only complete hurts", () => {
+  const partial = fixture.hurts.map((h) => (h.id === "made_small" ? { ...h, matters: "" } : h));
+  assert.deepEqual(ids(orderHurts(partial, {})), ["brushed_off", "laughed_at", "not_mattering", "left_out", "alone_in_this"]);
+});
