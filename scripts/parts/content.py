@@ -271,22 +271,24 @@ AT_PLACE_HELD = {"bs_none": "No signal, no place."}
 # "What's it protecting?" chips, never a reading of the person.
 # label       chip ("being brushed off")
 # hurtPhrase  fills {hurt} ("being brushed off"; ≤ 28)
-# feltPhrase  completes "I felt …" when the angry card speaks for the hurt ("brushed off")
+# feltPhrase  completes "I felt …" when the angry card speaks for the hurt ("brushed off"; fills {felt}; ≤ 24)
+# matters     what the anger says matters, for the angry card's vote of confidence ("… because {matters}
+#             matters to you"; fills {matters}; ≤ 28)
 # namedAs     existing Emotion ids (the agreed spec's mapping: ProtectedHurt → Emotion)
 # --------------------------------------------------------------------------------------------------
 HURTS = [
     dict(id="brushed_off", label="being brushed off", hurtPhrase="being brushed off", feltPhrase="brushed off",
-         namedAs=["disrespected", "hurt"]),
+         matters="being taken seriously", namedAs=["disrespected", "hurt"]),
     dict(id="made_small", label="being made small", hurtPhrase="being made small", feltPhrase="made small",
-         namedAs=["inferior", "inadequate"]),
+         matters="being treated as an equal", namedAs=["inferior", "inadequate"]),
     dict(id="left_out", label="being left out", hurtPhrase="being left out", feltPhrase="left out",
-         namedAs=["excluded", "rejected"]),
+         matters="belonging", namedAs=["excluded", "rejected"]),
     dict(id="not_mattering", label="not mattering", hurtPhrase="not mattering", feltPhrase="like I didn't matter",
-         namedAs=["insignificant"]),
+         matters="mattering to people", namedAs=["insignificant"]),
     dict(id="laughed_at", label="being laughed at", hurtPhrase="being laughed at", feltPhrase="laughed at",
-         namedAs=["humiliated", "ridiculed"]),
+         matters="being respected", namedAs=["humiliated", "ridiculed"]),
     dict(id="alone_in_this", label="being alone in this", hurtPhrase="being alone in this", feltPhrase="alone in this",
-         namedAs=["lonely", "isolated"]),
+         matters="having someone with you", namedAs=["lonely", "isolated"]),
 ]
 
 # (:ProtectiveMove)-[:OFTEN_GUARDS {rank}]->(:ProtectedHurt): the order the chips are offered in.
@@ -344,7 +346,7 @@ UNDERNEATH_HELD = {
 # Copy: PartPrompt (the app's questions and statements) and PartOption (chips the person taps).
 # Prompts: (id, flow, step, copy). Order within a flow is list order.
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
-# close), unblend (the in-the-moment line), aftercare, gate, settings
+# close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, gate, settings
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -394,6 +396,41 @@ PROMPTS = [
     ("tag_new_later", "tag", "new", "Want to come back to it later?"),
     # In the moment: only after a move the person picked themselves, parts on, never named
     ("unblend_line", "unblend", "line", "A part of you {move} right now."),
+    # The angry-part card (alexithymia-first-interaction.md, "Anger: the angry part"): the fire back urge,
+    # out of the flooded band. Every line has two wordings: X with parts on, X_plain with parts off (plain
+    # distanced self-talk, never the word "part": build check). _noname when there is no first name;
+    # _unsure after "Not sure" at protects. {matters} and {felt} come from the hurt picked (HURTS).
+    # The named vote lines fit the voice lint's 90 characters at slot widths (the agreed "{name}, this part
+    # is angry because {matters} matters to you." is 97): parts on says "it" (the part from screens 1-2)
+    # and keeps "to you", the point of a vote of confidence; plain drops "to you" ("you're" carries it).
+    ("angry_unblend", "angry", "unblend", "A part of you is furious right now."),
+    ("angry_unblend_plain", "angry", "unblend", "The anger is loud right now, and you're here too."),
+    ("angry_unblend_sub", "angry", "unblend", "Let it stand a little apart from you for a moment."),
+    ("angry_unblend_sub_plain", "angry", "unblend", "Let it stand a little apart from you for a moment."),
+    ("angry_protects", "angry", "protects", "It's trying to protect something. What?"),
+    ("angry_protects_plain", "angry", "protects", "Anger usually protects something. What is it protecting?"),
+    ("angry_vote", "angry", "vote", "{name}, it's angry because {matters} matters to you."),
+    ("angry_vote_plain", "angry", "vote", "{name}, you're angry because {matters} matters."),
+    ("angry_vote_noname", "angry", "vote", "This part is angry because {matters} matters to you."),
+    ("angry_vote_noname_plain", "angry", "vote", "You're angry because {matters} matters to you."),
+    ("angry_vote_unsure", "angry", "vote", "{name}, this part is angry because something here matters to you."),
+    ("angry_vote_unsure_plain", "angry", "vote", "{name}, you're angry because something here matters to you."),
+    ("angry_vote_unsure_noname", "angry", "vote", "This part is angry because something here matters to you."),
+    ("angry_vote_unsure_noname_plain", "angry", "vote", "You're angry because something here matters to you."),
+    ("angry_vote_2", "angry", "vote", "You don't have to let it drive, and you don't have to leave it behind."),
+    ("angry_vote_2_plain", "angry", "vote", "You don't have to let it drive, or pretend it isn't there."),
+    ("angry_vote_3", "angry", "vote", "{name} can handle what comes next."),
+    ("angry_vote_3_plain", "angry", "vote", "{name} can handle what comes next."),
+    ("angry_vote_3_noname", "angry", "vote", "You can handle what comes next."),
+    ("angry_vote_3_noname_plain", "angry", "vote", "You can handle what comes next."),
+    ("angry_hold", "angry", "vote", "Hold while you read it"),
+    ("angry_hold_plain", "angry", "vote", "Hold while you read it"),
+    ("angry_speak", "angry", "speak", "If you say something, speak for it, not from it:"),
+    ("angry_speak_plain", "angry", "speak", "If you say something, say what's under the anger:"),
+    ("angry_speak_unsure", "angry", "speak", "If you say something, say what you felt, not what it wants to say."),
+    ("angry_speak_unsure_plain", "angry", "speak", "If you say something, say what you felt, not what the anger wants to say."),
+    ("angry_speak_line", "angry", "speak", "I felt {felt}."),
+    ("angry_speak_line_plain", "angry", "speak", "I felt {felt}."),
     # Aftercare
     ("aftercare_louder", "aftercare", "louder", "Things can get louder after time with a part."),
     ("aftercare_too_many", "aftercare", "too_many", "You don't need to get to know everyone at once."),
@@ -422,6 +459,13 @@ PROMPTS = [
     ("settings_delete_no", "settings", "delete", "Keep them"),
     ("settings_delete_done", "settings", "delete", "Deleted."),
 ]
+
+# Prompts in the person's own voice: the sentence they might say, so its "I" is theirs. Linted as
+# `first_person` (chip rules, no voice_distance) instead of `prompt`; every other prompt is a prompt.
+PROMPT_KINDS = {
+    "angry_speak_line": "first_person",
+    "angry_speak_line_plain": "first_person",
+}
 
 # Options. Each: id, flow, step, label, and optionally
 #   kind     'chip' (default) or 'voice' (what a part says; looser lint, ≤ 40)
@@ -612,6 +656,11 @@ OPTIONS = [
     opt("tag_skip", "tag", "tag", "Skip", branch="end"),
     opt("tag_later_yes", "tag", "new", "Yes", branch="candidate"),
     opt("tag_later_no", "tag", "new", "No", branch="end"),
+
+    # --- The angry-part card (the hurt chips at protects are the ProtectedHurt labels, not options) ---
+    opt("angry_next", "angry", "unblend", "Okay"),
+    opt("angry_not_sure", "angry", "protects", "Not sure"),
+    opt("angry_done", "angry", "speak", "Done", branch="end"),
 
     # --- Aftercare ---
     opt("louder_body", "aftercare", "louder", "Something for my body", branch="body_first"),

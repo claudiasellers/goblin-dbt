@@ -17,8 +17,8 @@ here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
 from content import (VERSION, SIGNED_OFF, review_status, MOVES, PULL_OPTIONS, EXPRESSES, HELD,  # noqa: E402
                      AT_PLACE, AT_PLACE_HELD, HURTS, OFTEN_GUARDS, CAN_TOUCH, CAN_TOUCH_HELD, ANSWERS, ANSWERS_HELD,
-                     UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, OPTIONS, OFFERABLE, SAFETY_LINE, PENDING, PAIRS,
-                     KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY)
+                     UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, PROMPT_KINDS, OPTIONS, OFFERABLE, SAFETY_LINE, PENDING,
+                     PAIRS, KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY)
 
 MOVE_IDS = [m["id"] for m in MOVES]
 HURT_IDS = [h["id"] for h in HURTS]
@@ -27,6 +27,10 @@ FLAGS = (None, "tender", "danger")
 FLAG_BRANCH = {"tender": "conservative", "danger": "danger"}
 # The two Settings lines that credit the source; nowhere else may name it (parts.md "Language").
 ABOUT_IDS = ("settings_about_1", "settings_about_2")
+# Prompt kinds other than "prompt" a PROMPTS line may take (PROMPT_KINDS); the keepsake is its own list.
+PROMPT_COPY_KINDS = ("first_person",)
+# Flows whose every prompt has two wordings: X (parts on) and X_plain (parts off).
+TWO_WORDINGS = ("angry",)
 
 
 def pair_chips():
@@ -151,10 +155,25 @@ def check():
     for m in SAFETY_LINE:
         assert any(o["flag"] == "danger" and o["moves"] and m in o["moves"] for o in OPTIONS), f"{m}: safetyLine needs a danger fear"
 
+    # the angry card: two wordings per line, the plain one never says "part"; each hurt says what matters
+    prompt_ids = {p[0] for p in PROMPTS}
+    for flow in TWO_WORDINGS:
+        ids = {p[0] for p in PROMPTS if p[1] == flow}
+        for pid in ids:
+            twin = pid[:-len("_plain")] if pid.endswith("_plain") else pid + "_plain"
+            assert twin in ids, f"{pid}: flow {flow} has two wordings per line, {twin} is missing"
+    for pid, flow, step, copy in PROMPTS:
+        if flow in TWO_WORDINGS and pid.endswith("_plain"):
+            assert not re.search(r"\bparts?\b", copy, re.I), f"{pid}: the parts-off wording never says part: {copy!r}"
+    for h in HURTS:
+        assert h.get("matters") and h["matters"].strip(), f"{h['id']}: matters (the angry card's vote of confidence)"
+    assert set(PROMPT_KINDS) <= prompt_ids, f"PROMPT_KINDS ids that aren't prompts: {set(PROMPT_KINDS) - prompt_ids}"
+    assert set(PROMPT_KINDS.values()) <= set(PROMPT_COPY_KINDS), f"PROMPT_KINDS: {set(PROMPT_KINDS.values())}"
+
     # copy rules over everything in the source
     about = {p[3] for p in PROMPTS if p[0] in ABOUT_IDS}
     content = [MOVES, PULL_OPTIONS, EXPRESSES, HELD, AT_PLACE, AT_PLACE_HELD, HURTS, OFTEN_GUARDS, CAN_TOUCH,
-               CAN_TOUCH_HELD, ANSWERS, ANSWERS_HELD, UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, OPTIONS, PENDING,
+               CAN_TOUCH_HELD, ANSWERS, ANSWERS_HELD, UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, PROMPT_KINDS, OPTIONS, PENDING,
                PAIRS, KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY]
     for s in strings(content):
         assert "!" not in s, f"no '!' in parts content: {s!r}"
@@ -297,8 +316,8 @@ def main():
     with_copy(
         [dict(h, order=i) for i, h in enumerate(HURTS)],
         lambda h: [row(h["id"], "label", "chip", h["label"]), row(h["id"], "hurtPhrase", "prompt", h["hurtPhrase"]),
-                   row(h["id"], "feltPhrase", "chip", h["feltPhrase"])],
-        lambda h: node("ProtectedHurt", h["id"], {k: h[k] for k in ("label", "hurtPhrase", "feltPhrase", "order")}, "h"))
+                   row(h["id"], "feltPhrase", "chip", h["feltPhrase"]), row(h["id"], "matters", "prompt", h["matters"])],
+        lambda h: node("ProtectedHurt", h["id"], {k: h[k] for k in ("label", "hurtPhrase", "feltPhrase", "matters", "order")}, "h"))
     A("MATCH (:ProtectedHurt)-[r:NAMED_AS]->(:Emotion) DELETE r;")
     for h in HURTS:
         for e in h["namedAs"]:
@@ -327,7 +346,8 @@ def main():
     A("\n// --- Prompts (order: position within the flow; the keepsake follows Two pulls' prompts) ---")
     prompts, at = [], {}
     for pid, flow, step, copy in PROMPTS:
-        prompts.append(dict(id=pid, flow=flow, step=step, order=at.setdefault(flow, [0])[0], copy=copy, kind="prompt"))
+        prompts.append(dict(id=pid, flow=flow, step=step, order=at.setdefault(flow, [0])[0], copy=copy,
+                            kind=PROMPT_KINDS.get(pid, "prompt")))
         at[flow][0] += 1
     for pid, copy in KEEPSAKE:
         prompts.append(dict(id=pid, flow="pulls", step="keepsake", order=at.setdefault("pulls", [0])[0], copy=copy,
@@ -337,7 +357,7 @@ def main():
         prompts,
         lambda p: [row(p["id"], "copy", p["kind"], p["copy"])],
         lambda p: node("PartPrompt", p["id"], dict({k: p[k] for k in ("flow", "step", "order", "copy")},
-                                                   **({"copyKind": "keepsake"} if p["kind"] == "keepsake" else {})), "p"))
+                                                   **({"copyKind": p["kind"]} if p["kind"] != "prompt" else {})), "p"))
 
     A("\n// --- Options: chips the person taps (order: position within flow and step; Two pulls' chips last) ---")
     options, at = [], {}

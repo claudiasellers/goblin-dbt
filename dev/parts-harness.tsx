@@ -1,16 +1,19 @@
 /**
- * Dev-only harness for the parts proposal (docs/design/parts.md): Meet a part, the den, the part card
- * and a trail offer, in the app's own rooms, chips, Shape object (SvgBlob), heat figure and P2 overlay.
+ * Dev-only harness for the parts proposal (docs/design/parts.md): Meet a part, the den, the part card,
+ * a trail offer and the angry-part card (the app's own AngryPartCard, not mounted in the app yet), in the
+ * app's own rooms, chips, Shape object (SvgBlob), heat figure and P2 overlay.
  * Every move, prompt and option comes from tests/fixtures/parts-content.json (generated from
  * scripts/parts/content.py by scripts/parts/fixture.py; drafts, not signed off); the invented person is
  * dev/parts-example.ts; the close is the spine's own copy. No Firebase, no graph. Not part of the app build.
  *   npm run dev, then open http://localhost:5173/dev/parts.html
  *   or: npx vite build --config dev/vite.harness.config.ts && (cd dev-dist && python3 -m http.server 4321)
- * URL params: ?view=meet|den|card|offer
+ * URL params: ?view=meet|den|card|offer|angry
  *   &move=hide|chase|hit_back|keep_the_peace|turn_on_myself|… starts Meet a part from that named trailhead
  *     (Find is already answered, so the blend check is the first screen); without it, Find comes first
  *   &palette=velvet|dusk|tinted|pastel|pastel-mix|daylight &theme=dark|light
  *   &blend=0 skips the blending check (decided 16 Oct; asked once "it" is named), to walk the rest of the flow
+ *   angry: &parts=0|1 (default 1: parts wording; 0: plain distanced self-talk) &name=Sam (default none:
+ *   the no-name lines) &state=<Recover state id> (brushed, mocked, ignored, …: pre-orders the hurts via CAN_TOUCH)
  */
 import { StrictMode, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -27,6 +30,9 @@ import { HeatFigure, type FigureMark } from '../src/components/checkin/body/Heat
 import { REGIONS, type RegionId } from '../src/data/bodyFigure';
 import { SvgBlob } from '../src/components/tools/findTheFeeling/shape/SvgBlob';
 import { DIMS, fromVec, variant, type Feel } from '../src/components/tools/findTheFeeling/shape/feel';
+import { AngryPartCard } from '../src/components/parts/AngryPartCard';
+import { angryCopyFrom, orderHurts } from '../src/lib/angryPart';
+import type { AngryCardContent, AngryStep } from '../src/data/partsTypes';
 import { OFFER, PARTS, SNAPSHOTS, type ExamplePart, type MoveId, type Quadrant } from './parts-example';
 
 /* ───────── parts content (the generated fixture: what a future getPartsContent would return) ───────── */
@@ -607,9 +613,43 @@ function Offer({ onLog }: { onLog: (x: unknown) => void }) {
   );
 }
 
+/* ───────── The angry-part card ───────── */
+
+const ANGRY_CONTENT = partsFixture as unknown as AngryCardContent;
+
+function AngryCardView({ onLog }: { onLog: (x: unknown) => void }) {
+  const partsOn = q.get('parts') !== '0';
+  const name = q.get('name')?.trim() || null;
+  const state = q.get('state');
+  const copy = useMemo(() => angryCopyFrom(ANGRY_CONTENT), []);
+  const hurts = useMemo(() => orderHurts(ANGRY_CONTENT.hurts, ANGRY_CONTENT.canTouch, state), [state]);
+  const [run, setRun] = useState(0);
+  const [done, setDone] = useState(false);
+  const step = useRef<AngryStep>('unblend');
+  return (
+    <div className="space-y-4">
+      <p className="text-xs text-[var(--color-text-tertiary)]">
+        Harness note: parts {partsOn ? 'on' : 'off'} · {name ? `name ${name}` : 'no name'} · {state ? `Recover state ${state}` : 'no Recover state'}.
+        Change with &amp;parts=0|1 &amp;name= &amp;state=.
+      </p>
+      {done ? (<>
+        <p className="font-serif text-2xl">{SPINE.saved}</p>
+        <p className="text-sm text-[var(--color-text-secondary)]">What the card hands its host is in the log below. The card saves nothing itself.</p>
+        <TextBtn onClick={() => { setDone(false); setRun((n) => n + 1); }}>Start again</TextBtn>
+      </>) : (
+        <AngryPartCard key={run} copy={copy} hurts={hurts} partsOn={partsOn} name={name}
+          onStep={(st) => { step.current = st; }}
+          onDone={(r) => { onLog({ AngryCardResult: { layer: 'log', ...r } }); setDone(true); }}
+          tooMuch={<TooMuchLink host="angry-part" blank={false} onResult={(r) => onLog({ tooMuch: r })}
+            resume={() => ({ hostSessionId: '00000000-0000-4000-8000-0000000000ab', stepId: step.current, draft: {} })} />} />
+      )}
+    </div>
+  );
+}
+
 /* ───────── shell ───────── */
 
-const VIEWS = [['meet', 'Meet a part'], ['den', 'The den'], ['card', 'Part card'], ['offer', 'Trail offer']] as const;
+const VIEWS = [['meet', 'Meet a part'], ['den', 'The den'], ['card', 'Part card'], ['offer', 'Trail offer'], ['angry', 'Angry part']] as const;
 
 function Harness() {
   const [view, setView] = useState(q.get('view') || 'meet');
@@ -644,6 +684,7 @@ function Harness() {
         {view === 'den' && <Den />}
         {view === 'card' && <div className="space-y-4">{PARTS.map((p) => <PartCard key={p.id} part={p} />)}</div>}
         {view === 'offer' && <Offer onLog={push} />}
+        {view === 'angry' && <AngryCardView onLog={push} />}
         {log.length > 0 && (
           <section aria-label="What would be saved" className="space-y-2">
             <p className="text-xs text-[var(--color-text-tertiary)]">What would be saved (newest first)</p>
