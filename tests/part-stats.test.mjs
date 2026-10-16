@@ -104,9 +104,9 @@ test("Reflect: after its own sections, parts on, copy shipped; no hard-coded wor
 test("for Me later: the compute is exported, the handler stays pure", () => {
   const stats = read("functions/src/parts/stats.ts");
   for (const name of ["partStats", "statsByPart", "partsReflect", "STATS_THRESHOLDS"]) assert.match(stats, new RegExp(`export (function|const) ${name}\\b`));
-  assert.doesNotMatch(stats, /^import (?!type|\{ PART_WHENS)/m, "pure: its own types only");
+  assert.doesNotMatch(stats, /^import (?!type|\{ PART_WHENS|\{ NON_ANSWER \} from '\.\/keepPlan')/m, "pure: its types and keepPlan's NON_ANSWER only");
   const handler = read("functions/src/insights/handler.ts");
   assert.doesNotMatch(handler, /neo4j|readTx|statsQueries/, "the reads stay in the query layer");
   assert.match(handler, /deps\.parts\(\)/);
-  assert.match(read("functions/src/insights/queries.ts"), /parts: async \(\) => partsReflect\(await readTx\(\(tx\) => readStatsRows\(tx, userId\)\)\)/);
+  assert.match(read("functions/src/insights/queries.ts"), /return partsReflect\(await readTx\(\(tx\) => readStatsRows\(tx, userId\)\)\);/);
 });

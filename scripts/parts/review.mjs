@@ -58,6 +58,7 @@ export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } 
 export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
+export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -102,7 +103,7 @@ export function surfaces(g) {
     },
     {
       id: 'tag', title: 'The tag row',
-      where: 'Under a better or much better then-vs-now close (Cool Down, Five senses, Find the feeling), with parts on: "Was this a part you know?" with the person\'s parts as chips.',
+      where: 'Under a better close, with parts on: better or much better then-vs-now (Cool Down, Five senses, Find the feeling) or Held off (Pause, Urge Surfing). "Was this a part you know?" with the person\'s parts as chips.',
       groups: [{ label: null, ids: g.TAG_ROW_REQUIRED }],
     },
     {
@@ -135,8 +136,8 @@ export function surfaces(g) {
     },
     {
       id: 'ps', title: 'Problem Solve',
-      where: 'Not built yet: Problem Solve\'s "another time" line for the ambivalence exit has no screen, so there is nothing here to sign.',
-      groups: [],
+      where: 'In Problem Solve, with parts on, after the "Part of me doesn\'t actually want this to change" barrier and its answer: one quiet line offering to come back to that part another time (a yes queues it in Me\'s "To come back to"). It never opens a parts flow mid-tool.',
+      groups: [{ label: null, ids: g.PS_LATER_REQUIRED }],
     },
   ];
 }

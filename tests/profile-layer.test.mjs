@@ -35,6 +35,8 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
+  assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts"], "the tag row on its urge close");
+  assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts"], "the tag row on its urge close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
   // Parts: the slices exist; no tool reads them before it renders them. Meet a part reads them (it
   // renders them); Phase 3's tag row is the first render on other tools' closes: exactly the tools that
@@ -49,7 +51,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
     if (consumer === "meet-a-part") continue;
     if (consumer !== "dear-man") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
-    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "find-the-feeling", "dear-man"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host nor DEAR MAN's cope ahead`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "dear-man"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host nor DEAR MAN's cope ahead`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);

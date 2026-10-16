@@ -751,7 +751,7 @@ test('validateTag: three uuids, nothing else', () => {
 });
 
 test('tagPart: refusals before any write; one tag per session', async () => {
-  const good = { partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', toolId: 'five-senses', existingId: null };
+  const good = { partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', actedOnUrge: null, toolId: 'five-senses', existingId: null };
   const fake = (st, wrote = true) => {
     const log = [];
     return { log, deps: { state: async () => ({ ...good, ...st }), write: async (t) => { log.push(t); return wrote; } } };
@@ -765,7 +765,10 @@ test('tagPart: refusals before any write; one tag per session', async () => {
     [{ sessionStatus: 'open' }, 'failed-precondition'],
     [{ thenVsNow: 'same' }, 'failed-precondition'],
     [{ thenVsNow: 'worse' }, 'failed-precondition'],
-    [{ thenVsNow: null }, 'failed-precondition'],     // Help now, a micro-step, an urge close: no then-vs-now
+    [{ thenVsNow: null }, 'failed-precondition'],     // Help now, a micro-step: no answer at all
+    // An urge close (Pause, Urge Surfing): only Held off counts
+    ...['partly', 'yes', 'not_yet', null].map((actedOnUrge) => [{ toolId: 'pause', thenVsNow: null, actedOnUrge }, 'failed-precondition']),
+    [{ toolId: 'meet-a-part', thenVsNow: null, actedOnUrge: 'no' }, 'failed-precondition'],
     [{ toolId: 'meet-a-part', thenVsNow: 'much_better' }, 'failed-precondition'],
   ];
   for (const [st, c] of refused) {
@@ -773,9 +776,9 @@ test('tagPart: refusals before any write; one tag per session', async () => {
     await assert.rejects(T.tagPartHandler(req, f.deps), code(c), JSON.stringify(st));
     assert.equal(f.log.length, 0, JSON.stringify(st));
   }
-  for (const thenVsNow of ['better', 'much_better']) {
-    const f = fake({ thenVsNow, partStatus: 'resting' });
-    assert.deepEqual(await T.tagPartHandler(req, f.deps), { id: TAG, created: true });
+  for (const st of [{ thenVsNow: 'better' }, { thenVsNow: 'much_better' }, { toolId: 'urge-surfing', thenVsNow: null, actedOnUrge: 'no' }]) {
+    const f = fake({ ...st, partStatus: 'resting' });
+    assert.deepEqual(await T.tagPartHandler(req, f.deps), { id: TAG, created: true }, JSON.stringify(st));
     assert.equal(f.log.length, 1);
   }
   // Already tagged (any id, any part): the first tag, nothing written.
@@ -793,7 +796,8 @@ test('tagPart over the fake driver: log layer, incoming edges only on the ToolSe
     assert.match(T.TAG_QUERY, new RegExp(e));
   }
   assert.doesNotMatch(T.TAG_QUERY, /\(ts\)-\[[^\]]*\]->|SET ts\b|SET pt\b|ts\.\w+ =|pt\.\w+ =/, 'nothing out of or onto the ToolSession or the Part');
-  assert.match(T.TAG_QUERY, /ts\.status <> 'open' AND ts\.thenVsNow IN \$closes AND NOT ts\.toolId IN \$never/);
+  assert.match(T.TAG_QUERY, /ts\.status <> 'open'\s+AND \(ts\.thenVsNow IN \$closes OR ts\.actedOnUrge IN \$urgeCloses\) AND NOT ts\.toolId IN \$never/);
+  assert.deepEqual([[...T.TAG_CLOSES], [...T.TAG_URGE_CLOSES]], [['better', 'much_better'], ['no']]);
   assert.match(T.TAG_QUERY, /pt\.status IN \['active', 'resting'\]/);
   assert.match(T.TAG_QUERY, /coalesce\(u\.partsEnabled, false\)/);
 
@@ -801,7 +805,7 @@ test('tagPart over the fake driver: log layer, incoming edges only on the ToolSe
   const f = fakeDriver((q) => {
     if (q === T.TAG_STATE_QUERY) {
       reads += 1;
-      return [{ partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', toolId: 'five-senses', existingId: reads > 1 ? TAG : null }];
+      return [{ partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'completed', thenVsNow: 'better', actedOnUrge: null, toolId: 'five-senses', existingId: reads > 1 ? TAG : null }];
     }
     if (q === T.TAG_QUERY) {
       const e = new Error('Node(1) already exists with label `PartTag` and property `taggedKey` = ...');
@@ -814,6 +818,7 @@ test('tagPart over the fake driver: log layer, incoming edges only on the ToolSe
   assert.deepEqual(await fns.tagPart.run({ auth: auth('real-user'), data: { id: TAG2, partId: PID, toolSessionId: TSID } }), { id: TAG, created: false });
   const st = f.calls.find((c) => c.query === T.TAG_STATE_QUERY);
   assert.deepEqual([st.params.uid, st.params.partKey, st.params.sessionKey], ['real-user', `real-user:${PID}`, `real-user:${TSID}`]);
+  assert.deepEqual(st.params.urgeCloses, ['no']);
   await assert.rejects(fns.tagPart.run({ auth: auth(), data: { id: TAG, partId: PID } }), code('invalid-argument'));
 });
 

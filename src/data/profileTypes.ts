@@ -99,8 +99,11 @@ export const PROFILE_NEEDS = {
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
   'dear-man': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // Phase 3 cope ahead (parts slices empty while off); never partDetail
   // "Was this a part you know?" after a better close (PartTagSlot, in SessionClose or the tool's own
-  // close): every tool whose close asks then-vs-now (src/lib/partTag.ts TAG_ROW_TOOLS) reads `parts`.
+  // close): every tool whose close asks then-vs-now or about the urge (src/lib/partTag.ts TAG_ROW_TOOLS)
+  // reads `parts`.
   'five-senses': ['parts'],
+  'pause': ['parts'],
+  'urge-surfing': ['parts'],
   // Other tools declare 'parts' in the phase that renders them, never before.
 } as const satisfies Record<string, readonly SliceId[]>;
 

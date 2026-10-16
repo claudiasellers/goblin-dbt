@@ -1,12 +1,14 @@
 /**
  * tagPart (docs/design/parts.md, "Was this a part you know?"): the person's own recognition, after a
- * better or much better close. Writes one `:PartTag:UserData:LogRecord` (source 'close') with
+ * better close: then-vs-now better or much better, or an urge close answered Held off (Pause, Urge
+ * Surfing: holding off is their better close). Writes one `:PartTag:UserData:LogRecord` (source 'close') with
  * `(:User)-[:HAS_PART_TAG]->`, `(:PartTag)-[:TAGS]->(:ToolSession)` and `(:PartTag)-[:OF_PART]->(:Part)`.
  * Edges run out of the new tag only: the ToolSession is finalised and the Part is profile data, so
  * neither is written (keepPart stays the only Part writer).
  *
  * The server enforces what the row's gate does: parts on; the part the caller's and active or resting;
- * the ToolSession the caller's, closed, with then-vs-now better or much better, and not Meet a part.
+ * the ToolSession the caller's, closed, with then-vs-now better or much better or actedOnUrge 'no',
+ * and not Meet a part. Partly, went ahead, still deciding, same and worse are all refused.
  *
  * One tag per ToolSession: the state read returns the session's existing tag, and a call for a
  * session already tagged (any id, any part) returns that first tag and writes nothing. Two calls
@@ -23,6 +25,8 @@ import type { TagPartRequest, TagPartResponse } from './tagTypes';
 
 /** Then-vs-now answers that count as "it helped" (the what_helps line). */
 export const TAG_CLOSES = ['better', 'much_better'] as const;
+/** Urge-close answers that count as "it helped": Held off (the urge close's better answer). */
+export const TAG_URGE_CLOSES = ['no'] as const;
 /** Tools whose close never shows the row (Meet a part is the part itself). */
 export const TAG_NEVER_TOOLS = ['meet-a-part'] as const;
 
@@ -39,7 +43,8 @@ export const TAG_STATE_QUERY = `
   OPTIONAL MATCH (u)-[:HAS_PART_TAG]->(prev:PartTag)-[:TAGS]->(ts)
   WITH u, pt, ts, prev ORDER BY prev.createdAt
   RETURN coalesce(u.partsEnabled, false) AS partsOn, pt.status AS partStatus,
-         ts IS NOT NULL AS sessionFound, ts.status AS sessionStatus, ts.thenVsNow AS thenVsNow, ts.toolId AS toolId,
+         ts IS NOT NULL AS sessionFound, ts.status AS sessionStatus, ts.thenVsNow AS thenVsNow,
+         ts.actedOnUrge AS actedOnUrge, ts.toolId AS toolId,
          collect(prev.id)[0] AS existingId
 `;
 
@@ -48,7 +53,8 @@ export const TAG_QUERY = `
   ${MERGE_USER}
   WITH u
   MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
-  WHERE coalesce(u.partsEnabled, false) AND ts.status <> 'open' AND ts.thenVsNow IN $closes AND NOT ts.toolId IN $never
+  WHERE coalesce(u.partsEnabled, false) AND ts.status <> 'open'
+    AND (ts.thenVsNow IN $closes OR ts.actedOnUrge IN $urgeCloses) AND NOT ts.toolId IN $never
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey}) WHERE pt.status IN ['active', 'resting']
   MERGE (t:PartTag {key: $key})
   ON CREATE SET t:UserData:LogRecord, t.id = $id, t.ownerId = $uid, t.createdAt = datetime(), t.schemaVersion = 1,
@@ -65,6 +71,7 @@ export interface TagState {
   sessionFound: boolean;
   sessionStatus: string | null;
   thenVsNow: string | null;
+  actedOnUrge: string | null;
   toolId: string | null;
   /** The session's tag, if it has one already. */
   existingId: string | null;
@@ -82,7 +89,9 @@ export async function tagPartHandler(t: TagPartRequest, deps: TagDeps): Promise<
   if (!st.sessionFound) throw new HttpsError('not-found', 'Session not found');
   if (st.existingId) return { id: st.existingId, created: false };
   if (st.sessionStatus === 'open') throw new HttpsError('failed-precondition', 'That session is still open');
-  if (!(TAG_CLOSES as readonly (string | null)[]).includes(st.thenVsNow)) throw new HttpsError('failed-precondition', 'Only after a better close');
+  const better = (TAG_CLOSES as readonly (string | null)[]).includes(st.thenVsNow)
+    || (TAG_URGE_CLOSES as readonly (string | null)[]).includes(st.actedOnUrge);
+  if (!better) throw new HttpsError('failed-precondition', 'Only after a better close');
   if ((TAG_NEVER_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
   if (st.partStatus !== 'active' && st.partStatus !== 'resting') throw new HttpsError('not-found', 'Part not found');
   if (!(await deps.write(t))) throw new HttpsError('failed-precondition', 'Could not tag that');
@@ -92,7 +101,7 @@ export async function tagPartHandler(t: TagPartRequest, deps: TagDeps): Promise<
 export function tagDeps(tx: ManagedTransaction, uid: string, email: string | null): TagDeps {
   const params = (t: TagPartRequest) => ({
     uid, email, id: t.id, key: userKey(uid, t.id), partKey: userKey(uid, t.partId), sessionKey: userKey(uid, t.toolSessionId),
-    closes: [...TAG_CLOSES], never: [...TAG_NEVER_TOOLS],
+    closes: [...TAG_CLOSES], urgeCloses: [...TAG_URGE_CLOSES], never: [...TAG_NEVER_TOOLS],
   });
   const s = (v: unknown) => (typeof v === 'string' ? v : null);
   return {
@@ -104,6 +113,7 @@ export function tagDeps(tx: ManagedTransaction, uid: string, email: string | nul
         sessionFound: r?.get('sessionFound') === true,
         sessionStatus: s(r?.get('sessionStatus')),
         thenVsNow: s(r?.get('thenVsNow')),
+        actedOnUrge: s(r?.get('actedOnUrge')),
         toolId: s(r?.get('toolId')),
         existingId: s(r?.get('existingId')),
       };

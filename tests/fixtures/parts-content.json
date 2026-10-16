@@ -674,6 +674,13 @@
    "copy": "It's in Me when you want it.",
    "reviewStatus": "draft"
   },
+  "ps_later_done": {
+   "flow": "ps",
+   "step": "ambivalence",
+   "order": 0,
+   "copy": "It's in Me when you want it.",
+   "reviewStatus": "draft"
+  },
   "aftercare_louder": {
    "flow": "aftercare",
    "step": "louder",
@@ -3235,6 +3242,22 @@
      "selfLike": null,
      "branch": "end",
      "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "ps": {
+   "ambivalence": [
+    {
+     "id": "ps_later",
+     "label": "Want to get to know that part another time?",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 0,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
