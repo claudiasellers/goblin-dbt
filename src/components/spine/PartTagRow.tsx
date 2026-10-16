@@ -4,6 +4,7 @@ import { queuePartCandidate, tagPart } from '../../services/parts';
 import { newId } from '../../lib/spine/ids';
 import { tagChips, tagRowCopy, type TagRowTool } from '../../lib/partTag';
 import type { PartsContent } from '../../data/partsContentTypes';
+import { PartFigure } from '../parts/PartFigure';
 
 const chip = 'min-h-11 px-4 py-2 rounded-full border border-[var(--color-border)] text-[var(--color-text-primary)] hover:border-[var(--color-border-accent)] transition-colors';
 const quiet = 'min-h-11 px-3 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]';
@@ -49,7 +50,8 @@ export function PartTagRow({ toolId, toolSessionId, content }: { toolId: TagRowT
       <p className="text-sm text-[var(--color-text-secondary)]">{copy.question}</p>
       <div className="flex flex-wrap items-center gap-2">
         {chips.map((c) => (
-          <button key={c.id} type="button" className={chip} onClick={() => tag(c.id)}>
+          <button key={c.id} type="button" className={`${chip} inline-flex items-center gap-2 pl-2`} onClick={() => tag(c.id)}>
+            <PartFigure shapeSig={c.shapeSig} size={28} />
             <span className={c.named ? 'font-serif text-base' : 'text-sm'}>{c.label}</span>
           </button>
         ))}

@@ -70,7 +70,10 @@ export interface MeetSession {
   place: string | null;
   /** Shape it's five dimensions, -1..1. */
   shape: number[];
-  ageId?: string; voiceId?: string; ownVoice?: string;
+  ageId?: string;
+  /** The answer to "It sounds young. Want to keep it gentle?" (the tender path, or going on). */
+  youngId?: string;
+  voiceId?: string; ownVoice?: string;
   /** Ask-fresh: in the order asked, never pre-filled, never on the part. */
   feelTowardIds: string[];
   /** Non-Self-like answers at 4 / 4b so far. */
@@ -252,6 +255,7 @@ export function meetNext(state: MeetState, event: MeetEvent, ctx: MeetContext): 
       break;
     case 'young':
       if (!o) break;
+      set({ youngId: o.id });
       // The tender path replaces 3c–8b with the presence hold.
       if (o.branch === 'tender_path') { set({ tender: true }); next = 'tender'; } else next = 'voice';
       break;

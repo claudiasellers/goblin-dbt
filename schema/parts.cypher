@@ -656,7 +656,23 @@ MERGE (p:PartPrompt {id: "settings_delete_done"})
 SET p += {flow: "settings", step: "delete", order: 10, copy: "Deleted.", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_failed"})
 SET p += {flow: "settings", step: "delete", order: 11, copy: "Couldn't delete them. Try again.", reviewStatus: "draft", version: "parts-v1", pending: null};
-// @parts-copy-json [{"id": "keepsake_both_want", "field": "copy", "kind": "keepsake", "text": "{A} and {B} both want me {want}."}, {"id": "keepsake_choose", "field": "copy", "kind": "keepsake", "text": "I can hear both of them, and choose what I do next."}]
+// @parts-copy-json [{"id": "me_get_to_know", "field": "copy", "kind": "prompt", "text": "Get to know a part"}, {"id": "card_where", "field": "copy", "kind": "prompt", "text": "Where"}, {"id": "card_job", "field": "copy", "kind": "prompt", "text": "Its job"}, {"id": "card_job_own", "field": "copy", "kind": "prompt", "text": "Its job, in your words"}, {"id": "card_fear", "field": "copy", "kind": "prompt", "text": "Afraid that"}, {"id": "card_rather", "field": "copy", "kind": "prompt", "text": "Would rather"}, {"id": "card_visit", "field": "copy", "kind": "prompt", "text": "Spend time with it"}, {"id": "card_resting", "field": "copy", "kind": "prompt", "text": "Resting"}, {"id": "keepsake_both_want", "field": "copy", "kind": "keepsake", "text": "{A} and {B} both want me {want}."}, {"id": "keepsake_choose", "field": "copy", "kind": "keepsake", "text": "I can hear both of them, and choose what I do next."}]
+MERGE (p:PartPrompt {id: "me_get_to_know"})
+SET p += {flow: "me", step: "card", order: 0, copy: "Get to know a part", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "card_where"})
+SET p += {flow: "me", step: "card", order: 1, copy: "Where", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "card_job"})
+SET p += {flow: "me", step: "card", order: 2, copy: "Its job", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "card_job_own"})
+SET p += {flow: "me", step: "card", order: 3, copy: "Its job, in your words", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "card_fear"})
+SET p += {flow: "me", step: "card", order: 4, copy: "Afraid that", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "card_rather"})
+SET p += {flow: "me", step: "card", order: 5, copy: "Would rather", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "card_visit"})
+SET p += {flow: "me", step: "card", order: 6, copy: "Spend time with it", reviewStatus: "draft", version: "parts-v1", pending: null};
+MERGE (p:PartPrompt {id: "card_resting"})
+SET p += {flow: "me", step: "card", order: 7, copy: "Resting", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "keepsake_both_want"})
 SET p += {flow: "pulls", step: "keepsake", order: 6, copy: "{A} and {B} both want me {want}.", copyKind: "keepsake", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "keepsake_choose"})

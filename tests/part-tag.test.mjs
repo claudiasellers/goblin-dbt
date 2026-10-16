@@ -52,13 +52,13 @@ test("gate: each condition off, no row", () => {
 test("chips: up to four, in the slice's order (most recently visited first); names, else the unnamed lines", () => {
   const part = (id, name = null, firstPlace = null, status = "active") => ({ id, name, firstPlace, status });
   const chips = lib.tagChips([
-    part("a", "the one who chases"), part("b", null, "upper_back"), part("c", null, null, "resting"), part("d", "  "), part("e", "fifth"),
+    { ...part("a", "the one who chases"), shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5] }, part("b", null, "upper_back"), part("c", null, null, "resting"), part("d", "  "), part("e", "fifth"),
   ], content);
   assert.deepEqual(chips, [
-    { id: "a", label: "the one who chases", named: true },
-    { id: "b", label: "The one in your upper back", named: false },
-    { id: "c", label: "One you haven't named", named: false },
-    { id: "d", label: "One you haven't named", named: false },
+    { id: "a", label: "the one who chases", named: true, shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5] },
+    { id: "b", label: "The one in your upper back", named: false, shapeSig: null },
+    { id: "c", label: "One you haven't named", named: false, shapeSig: null },
+    { id: "d", label: "One you haven't named", named: false, shapeSig: null },
   ]);
   assert.equal(lib.partChipLabel(part("x", null, "nowhere"), content), "One you haven't named", "an unknown place");
   assert.equal(lib.partChipLabel(part("x", null, "body"), content), "The one in your whole body");
@@ -90,6 +90,7 @@ test("the row: no hard-coded words, after the close is saved, fire-and-forget wr
   assert.match(row, /queuePartCandidate\(\{ id: newId\(\), origin: 'new_one', moveIds: \[\], toolSessionId \}\)\.catch/);
   assert.match(row, /if \(yes\) queuePartCandidate/, "only Yes writes");
   assert.match(row, /useProfileContext\(toolId\)/, "the host tool's own needs");
+  assert.match(row, /<PartFigure shapeSig=\{c\.shapeSig\} size=\{28\} \/>/, "each part's own figure beside its name");
   assert.doesNotMatch(row, /await /, "never blocks leaving");
   const close = read("src/components/spine/SessionClose.tsx");
   assert.match(close, /session\.close\(input\)\.then\(\(r\) => \{ if \(r\) setSaved\(true\); \}/);

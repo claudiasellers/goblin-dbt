@@ -695,6 +695,150 @@
     "labels": {},
     "callableTrigger": {}
   },
+  "renamePart": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "restPart": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "setAsidePart": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "restorePart": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "setPartTender": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
+  "answerPartRevisit": {
+    "availableMemoryMb": null,
+    "timeoutSeconds": null,
+    "minInstances": null,
+    "maxInstances": null,
+    "ingressSettings": null,
+    "concurrency": null,
+    "serviceAccountEmail": null,
+    "vpc": null,
+    "platform": "gcfv2",
+    "secretEnvironmentVariables": [
+      {
+        "key": "NEO4J_URI"
+      },
+      {
+        "key": "NEO4J_USER"
+      },
+      {
+        "key": "NEO4J_PASSWORD"
+      }
+    ],
+    "labels": {},
+    "callableTrigger": {}
+  },
   "getOppositeActionContent": {
     "availableMemoryMb": null,
     "timeoutSeconds": null,

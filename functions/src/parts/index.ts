@@ -13,10 +13,14 @@ import { savePartSessionHandler, startPartSessionHandler } from './sessions';
 import { validateStartPartSession } from './validation';
 import { sessionDeps } from './sessionQueries';
 import type { PartSessionResponse } from './sessionTypes';
-import { keepDeps, keepPartHandler } from './keep';
+import {
+  answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, renamePartHandler, restPartHandler,
+  restorePartHandler, setAsidePartHandler, setPartTenderHandler,
+} from './keep';
+import { validatePartRef, validateRename, validateRest, validateRevisit } from './editPlan';
 import { validateKeep } from './keepPlan';
 import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
-import type { KeepPartResponse, QueuePartCandidateResponse } from './keepTypes';
+import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
 import { isTaggedTwice, tagDeps, tagPartHandler, validateTag } from './tag';
 import type { TagPartResponse } from './tagTypes';
 
@@ -77,5 +81,60 @@ export const tagPart = callable<unknown, TagPartResponse>(
       if (!isTaggedTwice(e)) throw e;
       return run();
     }
+  },
+);
+
+// ---- The part card (Me): each the caller's own part, parts on, one guarded write ----
+
+/** Rename a kept part ('' or null is "Not yet"). */
+export const renamePart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'renamePart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateRename(data), 'Invalid request');
+    return writeTx((tx) => renamePartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** Rest a part, or wake a resting one. */
+export const restPart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'restPart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateRest(data), 'Invalid request');
+    return writeTx((tx) => restPartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** "Not any more": set aside, kept and restorable. */
+export const setAsidePart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setAsidePart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validatePartRef(data), 'Invalid request');
+    return writeTx((tx) => setAsidePartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+export const restorePart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'restorePart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validatePartRef(data), 'Invalid request');
+    return writeTx((tx) => restorePartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** Mark a part tender (no unmark yet). */
+export const setPartTender = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setPartTender', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validatePartRef(data), 'Invalid request');
+    return writeTx((tx) => setPartTenderHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** The 30-day still-true for a part, logged once per id. */
+export const answerPartRevisit = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'answerPartRevisit', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateRevisit(data), 'Invalid request');
+    return writeTx((tx) => answerPartRevisitHandler(input, partEditDeps(tx, uid as string)));
   },
 );

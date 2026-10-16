@@ -66,6 +66,8 @@ export interface ProfileSlices {
     id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; moveIds: string[];
     /** The part's first body place id (src/data/bodyFigure.ts), for "The one in your {place}" when it has no name. */
     firstPlace: string | null;
+    /** Shape it's five numbers (PartFigure draws it; null is the plain round figure). */
+    shapeSig: number[] | null;
     meta: ProfileItemMeta;
   }>;
   /** The rest of a kept part (Meet a part reads it); `hurtIds` from GUARDS. Own-words fields as written. */
@@ -88,11 +90,11 @@ export const PROFILE_NEEDS = {
   'checkin': ['patterns'],                    // the router's tie-break (E4)
   'today': ['quietHours'],
   'witness': ['name', 'ownLines', 'savedLines'],
+  'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
   // "Was this a part you know?" after a better close (PartTagRow in SessionClose): every tool whose
   // SessionClose asks then-vs-now (src/lib/partTag.ts TAG_ROW_TOOLS).
   'five-senses': ['parts'],
-  // Phase 2: 'meet-a-part': ['name', 'parts', 'partDetail'] lands with the tool (a consumer must be
-  // an app tool). Other tools declare 'parts' in the phase that renders them, never before.
+  // Other tools declare 'parts' in the phase that renders them, never before.
 } as const satisfies Record<string, readonly SliceId[]>;
 
 export type ProfileConsumer = keyof typeof PROFILE_NEEDS;

@@ -36,12 +36,13 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
-  // Parts: the slices exist; no tool reads them before it renders them. 'meet-a-part' declares
-  // ['name', 'parts', 'partDetail'] when the tool exists (a consumer must be an app tool). Phase 3's
-  // tag row is the first render on other tools' closes: exactly the tools that can show it read
-  // `parts`, and none reads partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
+  // Parts: the slices exist; no tool reads them before it renders them. Meet a part reads them (it
+  // renders them); Phase 3's tag row is the first render on other tools' closes: exactly the tools that
+  // can show it read `parts`, and none of them partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
   assert.deepEqual(types.SLICE_IDS.slice(-2), ["parts", "partDetail"]);
+  assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
+    if (consumer === "meet-a-part") continue;
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail`);
     if (needs.includes("parts")) assert.ok(["five-senses"].includes(consumer), `${consumer} reads parts but shows no tag row`);
   }
@@ -66,7 +67,7 @@ test("parts slices: gated on partsEnabled, HAS_PART only, active / resting only,
     assert.doesNotMatch(q, /set_aside/, id);
     assert.match(q, /LIMIT 50/, id);
     assert.match(q, /ORDER BY p\.lastVisitedAt IS NULL, p\.lastVisitedAt DESC, p\.confirmedAt IS NULL, p\.confirmedAt DESC/, id);
-    assert.doesNotMatch(q, /:LogRecord\b|:PartSession\b|:PartTag\b|:PartCandidate\b|:TrailOffer\b/, `${id} reads the log`);
+    assert.doesNotMatch(q, /:LogRecord\b|:PartSession\b|:PartTag\b|:PartCandidate\b|:TrailOffer\b|:PartRevisit\b/, `${id} reads the log`);
   }
   assert.match(slices.SLICE_QUERIES.parts, /OPTIONAL MATCH \(p\)-\[:USES\]->\(m:ProtectiveMove\)/);
   assert.match(slices.SLICE_QUERIES.partDetail, /OPTIONAL MATCH \(p\)-\[:GUARDS\]->\(h:ProtectedHurt\)/);
@@ -90,7 +91,7 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   const now = Date.parse("2026-10-01T12:00:00Z");
   const tx = fakeTx((q) => {
     if (/USES/.test(q)) return [
-      { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true, firstPlace: "chest",
+      { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true, firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1],
              confirmedAt: "2026-08-01T00:00:00Z", revisitAt: "2026-08-31T00:00:00Z" }, moveIds: ["withdraw", "appease", "withdraw"] },
       { p: { id: "p2", kind: "part", area: "my_parts", status: "active", source: "made", revisitAt: null }, moveIds: [] },
     ];
@@ -102,14 +103,12 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
     ];
     return [];
   });
-  // No consumer declares both yet (meet-a-part lands with its tool): declare one for this test only.
-  types.PROFILE_NEEDS.__parts_test = ["parts", "partDetail"];
-  const read = (t) => slices.readProfileSlices(t, "u1", "__parts_test", now);
-  t.after(() => { delete types.PROFILE_NEEDS.__parts_test; });
-  const out = await read(tx);
+  // Meet a part's own read (its name slice answers from the fake's empty rows).
+  const read = (t) => slices.readProfileSlices(t, "u1", "meet-a-part", now);
+  const { name: _name, ...out } = await read(tx);
   assert.deepEqual(out.parts.map(({ meta: m, ...rest }) => [rest, m.status, m.area, m.prompt]), [
-    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], firstPlace: "chest" }, "resting", "my_parts", "ask"],
-    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null }, "active", "my_parts", "none"],
+    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1] }, "resting", "my_parts", "ask"],
+    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null, shapeSig: null }, "active", "my_parts", "none"],
   ]);
   assert.deepEqual(out.partDetail, [
     { id: "p1", ageId: "age_teen", voiceIds: ["v_quiet"], ownVoice: "soft", jobIds: ["j_hide"], ownJob: "keep me safe", fearIds: ["f_too_much"],
@@ -118,7 +117,7 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
       anchorLineId: null, places: [], shapeSig: null, hurtIds: [] },
   ]);
   // Parts off: the gated queries return no rows, so the slices are empty.
-  const off = await read(fakeTx(() => []));
+  const { name: _off, ...off } = await read(fakeTx(() => []));
   assert.deepEqual(off, { parts: [], partDetail: [] });
 });
 

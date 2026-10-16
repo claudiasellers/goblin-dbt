@@ -17,11 +17,14 @@ import { PartTagRow } from './PartTagRow';
  * skip always there, no numbers. Answering or skipping closes the session as completed; a skipped
  * question comes back once in Today (PR-S5). Renders nothing for tools that ask their own questions.
  */
-export function SessionClose({ kind, planType, onAnswered }: {
+export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: {
   kind?: CloseKind;
   /** For `plan` tools: the FollowUpType the answer schedules (its window turns the chip into a time). */
   planType?: string;
+  /** The tool's own session record, linked with DETAIL on whichever close happens (answer or skip). */
+  detail?: ToolSessionCloseInput['detail'];
   onAnswered?: (input: ToolSessionCloseInput) => void;
+  onSkipped?: () => void;
 }) {
   const session = useToolSession();
   const closeKind = kind ?? session.closeKind;
@@ -78,6 +81,7 @@ export function SessionClose({ kind, planType, onAnswered }: {
       input = { status: 'completed', thenVsNow: choiceId as ThenVsNow };
       setCloseAnswer(choiceId as ThenVsNow);
     }
+    if (detail) input = { ...input, detail };
     setDone('answered');
     // The tag row waits for the server to have the close (tagPart refuses an open session).
     session.close(input).then((r) => { if (r) setSaved(true); }, () => { /* the close is optional */ });
@@ -85,7 +89,8 @@ export function SessionClose({ kind, planType, onAnswered }: {
   };
   const skip = () => {
     setDone('skipped');
-    void session.close({ status: 'completed' });
+    void session.close({ status: 'completed', ...(detail ? { detail } : {}) });
+    onSkipped?.();
   };
 
   return (

@@ -58,7 +58,7 @@ export function tagRowCopy(content: PartsContent): TagRowCopy {
   };
 }
 
-type SlicePart = Pick<ProfileSlices['parts'][number], 'id' | 'name' | 'status' | 'firstPlace'>;
+type SlicePart = Pick<ProfileSlices['parts'][number], 'id' | 'name' | 'status' | 'firstPlace'> & { shapeSig?: number[] | null };
 
 /** A part's chip: its own name, else "The one in your {place}" (first place), else "One you haven't named". */
 export function partChipLabel(part: SlicePart, content: Pick<PartsContent, 'prompts'>): string {
@@ -70,13 +70,13 @@ export function partChipLabel(part: SlicePart, content: Pick<PartsContent, 'prom
   return content.prompts.part_unnamed?.copy ?? '';
 }
 
-export interface TagChip { id: string; label: string; named: boolean }
+export interface TagChip { id: string; label: string; named: boolean; shapeSig: number[] | null }
 
 /** Up to four active or resting parts, in the slice's order (most recently visited first). */
 export function tagChips(parts: readonly SlicePart[], content: Pick<PartsContent, 'prompts'>): TagChip[] {
   return parts
     .filter((p) => p.status === 'active' || p.status === 'resting')
     .slice(0, MAX_TAG_CHIPS)
-    .map((p) => ({ id: p.id, label: partChipLabel(p, content), named: Boolean(p.name?.trim()) }))
+    .map((p) => ({ id: p.id, label: partChipLabel(p, content), named: Boolean(p.name?.trim()), shapeSig: p.shapeSig ?? null }))
     .filter((c) => c.label.length > 0);
 }

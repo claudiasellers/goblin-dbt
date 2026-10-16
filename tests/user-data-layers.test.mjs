@@ -54,6 +54,11 @@ test("parts (docs/design/parts.md): PartSession and PartCandidate are log, Part 
   assert.deepEqual(USER_DATA.PartSession, { layer: "log", rel: "HAS_PART_SESSION", exportAs: "partSessions" });
   assert.deepEqual(USER_DATA.PartCandidate, { layer: "log", rel: "HAS_PART_CANDIDATE", exportAs: "partCandidates" });
   assert.deepEqual(USER_DATA.Part, { layer: "profile", rel: "HAS_PART", exportAs: "parts" });
+  assert.deepEqual(USER_DATA.PartRevisit, { layer: "log", rel: "HAS_PART_REVISIT", exportAs: "partRevisits" });
+  assert.equal(exportKeyFor(["PartRevisit", "UserData", "LogRecord"]), "partRevisits");
+  assert.match(readFileSync("schema/constraints.cypher", "utf8"),
+    /^CREATE CONSTRAINT part_revisit_key IF NOT EXISTS FOR \(n:PartRevisit\) REQUIRE n\.key IS UNIQUE;$/m);
+  assert.match(readFileSync("functions/src/parts/delete.ts", "utf8"), /PARTS_DESIGN_LABELS = \[[^\]]*'PartRevisit'/, "deleteMyParts covers PartRevisit");
   assert.equal(exportKeyFor(["PartSession", "UserData", "LogRecord"]), "partSessions");
   assert.equal(exportKeyFor(["PartCandidate", "UserData", "LogRecord"]), "partCandidates");
   assert.equal(exportKeyFor(["Part", "UserData", "ProfileItem"]), "parts");

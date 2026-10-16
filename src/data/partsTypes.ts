@@ -98,6 +98,7 @@ export interface SavePartSessionRequest {
 export interface PartSessionResponse { id: string; status: 'open' | 'saved' }
 
 // --- Keeping a part and queueing a candidate: mirror of functions/src/parts/keepTypes.ts (tests/parts-entry.test.mjs) ---
+
 /** 9b's yes. Only ids and the name: the part itself is built from the stored session. */
 export interface KeepPartRequest {
   sessionId: string;
@@ -127,6 +128,34 @@ export interface QueuePartCandidateRequest {
   toolSessionId?: string;
 }
 export interface QueuePartCandidateResponse { id: string }
+
+/** Every change to a kept part answers with the new profile version (the client cache key). */
+export interface PartWriteResponse { version: number }
+
+/** Rename: up to PartsPolicy.nameMaxChars (40), trimmed; '' or null is "Not yet". Never linted. */
+export interface RenamePartRequest { partId: string; name: string | null }
+/** true: active → resting; false: resting → active. A set-aside part is restored, not woken. */
+export interface RestPartRequest { partId: string; resting: boolean }
+/** Set aside, restore, mark tender. */
+export interface PartRefRequest { partId: string }
+
+/** The 30-day still-true for a part: an active part's answers, then a resting part's. */
+export type PartRevisitAnswer = 'same' | 'less' | 'new' | 'resting' | 'still_quiet' | 'back';
+export const ACTIVE_REVISIT_ANSWERS: readonly PartRevisitAnswer[] = ['same', 'less', 'new', 'resting'];
+export const RESTING_REVISIT_ANSWERS: readonly PartRevisitAnswer[] = ['still_quiet', 'back'];
+/** `new` takes 1 to 3 of the meet flow's `rather` option ids (the part's new job). */
+export const RATHER_IDS_MAX = 3;
+export interface AnswerPartRevisitRequest {
+  /** A client UUID: the logged answer's id, so a repeat call applies nothing twice. */
+  id: string;
+  partId: string;
+  answer: PartRevisitAnswer;
+  ratherIds?: string[];
+}
+
+/** A job the part did before it took up a new one (`Part.jobHistoryJson`, newest last, at most 10). */
+export interface PartJobHistoryEntry { jobIds: string[]; ownJob: string | null; until: string }
+export const JOB_HISTORY_MAX = 10;
 
 // --- "Was this a part you know?": mirror of functions/src/parts/tagTypes.ts (tests/parts-entry.test.mjs) ---
 /** One tap on the tag row after a better or much better close. */
