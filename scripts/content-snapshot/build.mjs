@@ -317,6 +317,8 @@ export function sortParts(c) {
     })),
     // Events by id; each list keeps the order it was given (CAN_TOUCH's `order`).
     canTouch: sortObj(c.canTouch, (list) => [...list]),
+    // Source label → source id → move id, both by key.
+    expresses: sortObj(c.expresses, (table) => sortObj(table, (moveId) => moveId)),
     // The two numbers a screen needs, only once the policy is signed off (absent: the client's pinned defaults).
     ...(c.limits ? { limits: { nameMaxChars: c.limits.nameMaxChars, maxNonSelfAnswers: c.limits.maxNonSelfAnswers } } : {}),
   };
@@ -327,7 +329,8 @@ export function sortParts(c) {
  * renders only once its copy is signed off, so today this is nearly empty. Only what a screen shows:
  * trail rules, contexts and the rest of the policy (inference rules and safety numbers) stay on the server
  * (only `limits`, its name length and non-Self answer count, ships once the policy is signed off), and Two
- * pulls' pairs and keepsake wait for their phase. An approved option ships even when its prompt (or a
+ * pulls' pairs and keepsake wait for their phase. `expresses` (module id → move, approved edges to shipped
+ * moves) feeds the in-the-moment unblend line. An approved option ships even when its prompt (or a
  * move it is offered for) isn't approved yet; the client checks a flow is complete (flowReady).
  * No parts content at all (parts.cypher not loaded yet) is an empty file, not an error.
  */
@@ -361,6 +364,15 @@ export function buildParts(g) {
     (canTouch[r.a.props.id] ??= []).push(r.b.props.id);
   }
 
+  // The unblend line (A part of you {move} right now.): each module id → the move it expresses, grouped by
+  // its label (ActionUrge, FeelingUrge, PullOption, …). Reviewed by the source id (the edge's status; the
+  // source is another module's content); ships only when the move ships, so go_blank / zone_out never do.
+  const moveIds = new Set(moveNodes.map((m) => m.props.id));
+  const expresses = {};
+  for (const r of g.rels('EXPRESSES', null, 'ProtectiveMove').filter((x) => signedOff(x.props) && moveIds.has(x.b.props.id))) {
+    (expresses[[...r.a.labels].sort()[0]] ??= {})[r.a.props.id] = r.b.props.id;
+  }
+
   const options = {};
   for (const o of optionNodes) {
     const { flow, step } = o.props;
@@ -383,6 +395,7 @@ export function buildParts(g) {
       guardedBy: guards.filter((r) => r.b === h).map((r) => ({ moveId: r.a.props.id, rank: r.props.rank })),
     })),
     canTouch,
+    expresses,
     limits,
   });
 }

@@ -55,6 +55,7 @@ import {
   type DueWindow,
 } from "../../lib/oppositeActionFollowUp";
 import { useToolSession } from "../../hooks/useToolSession";
+import { useUnblendLine } from "../../hooks/useUnblendLine";
 import { oaSkillIds } from "../../lib/spine/wrap";
 
 const FLOW_VERSION = "oa-guided-v2";
@@ -325,6 +326,9 @@ export function OppositeAction() {
       ? draft.customUrge
       : (urge?.label ?? draft.urgeLabel);
   const urgeText = urgePhrase(urgeLabel);
+  // Parts on: "A part of you … right now." once an urge is picked, above what comes next (never for
+  // "My urge is different": free text has no move).
+  const unblend = useUnblendLine("oa", draft.urgeId && draft.urgeId !== "custom" ? draft.urgeId : null, stage === "urge");
   const emotion = getEmotionById(draft.emotionId)?.name ?? "";
   const emotionLower = emotion.toLowerCase();
   const examples = urge ?? protocol?.defaultOpposites;
@@ -865,6 +869,7 @@ export function OppositeAction() {
         )}
         {chosen && (
           <div className={`space-y-4 ${enterAnimation}`}>
+            {unblend && <p role="status" className={secondaryText}>{unblend}</p>}
             <UrgeScale
               label={fill(c.urgeStrength, { urge: urgeText })}
               hint={c.urgeStrengthHint}

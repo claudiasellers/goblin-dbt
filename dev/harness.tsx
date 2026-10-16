@@ -39,6 +39,8 @@ function Harness() {
             orient: <button className={btn} data-testid="orient-done" onClick={() => dispatch({ t: 'oriented' })}>[orient slot] done</button>,
             next: <div data-testid="next-slot">[next slot] {state.routedTo.join(', ') || 'none'} <button className={btn} onClick={() => dispatch({ t: 'nextDone' })}>Finish</button></div>,
             saveStatus: <p data-testid="save-slot">[save slot]</p>,
+            // ?unblend=<text>: preview the parts unblend line's place in a room
+            unblend: q.get('unblend'),
           }} />
       </Suspense>
       <pre data-testid="state" style={{ position: 'fixed', bottom: 0, left: 0, fontSize: 9, opacity: 0.5, pointerEvents: 'none', maxWidth: '100vw', whiteSpace: 'pre-wrap' }}>

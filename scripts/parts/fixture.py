@@ -1,14 +1,15 @@
 """Write tests/fixtures/parts-content.json: what a future getPartsContent would return, built from
 content.py without a database, drafts included (each item carries its `reviewStatus`). Used by the tests
-and the dev harness (dev/parts.html). The review tables (EXPRESSES / HELD and friends) stay out: they are
-for review and trail counting, not for a client.
+and the dev harness (dev/parts.html). The review tables (HELD and friends) stay out: they are for review
+and trail counting, not for a client. EXPRESSES is in (source id → move, reviewed by the source id): the
+in-the-moment unblend line reads it once an edge is signed off and its move ships.
 
   python3 scripts/parts/fixture.py
 """
 import json, os, sys
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
-from content import (VERSION, review_status, MOVES, HURTS, OFTEN_GUARDS, CAN_TOUCH, PROMPTS, PROMPT_KINDS, OPTIONS,  # noqa: E402
+from content import (VERSION, review_status, MOVES, EXPRESSES, HURTS, OFTEN_GUARDS, CAN_TOUCH, PROMPTS, PROMPT_KINDS, OPTIONS,  # noqa: E402
                      PAIRS, KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY, PENDING)
 from build import all_options  # noqa: E402  (importing build runs its checks: no fixture from content that fails the build)
 root = os.path.dirname(os.path.dirname(here))
@@ -58,6 +59,10 @@ payload = {
     # Recover's "what happened" (InvalidationEvent id) → the hurts it can touch, in order: pre-orders the
     # angry card's chips in Recover (src/lib/angryPart.ts orderHurts). Reviewed by the event id, like the edge.
     "canTouch": {ev: dict(hurts=hurts, **status(ev)) for ev, hurts in CAN_TOUCH.items()},
+    # The module ids each move is expressed by, per source label, every edge (moves never offered too:
+    # the projection drops an edge whose move doesn't ship). Reviewed by the source id, like the edge.
+    "expresses": {label: {src: dict(moveId=move, **status(src)) for src, (move, _why) in table.items()}
+                  for label, table in EXPRESSES.items()},
     "pairs": pairs,
     "keepsake": [dict(id=kid, copy=copy, **status(kid)) for kid, copy in KEEPSAKE],
     "trailRules": [dict(r, **status(r["id"])) for r in TRAIL_RULES],
