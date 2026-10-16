@@ -42,7 +42,9 @@
 #   - hit_back's fear "I'd disappear" is now "I'd stop mattering" (no_ideation_echo).
 #   - Danger chips: hit_back "I'd do something I can't take back", turn_on_myself "I'd end up hurting
 #     myself". Picking one shows crisis resources alongside and goes straight to Thank it.
-#   - The blend check (flow "gate") waits on the flood-signal decision; it is content only.
+#   - The blend check (flow "gate", decided 16 Oct): one question as a parts flow opens; "running
+#     things" goes body first. It asks how close the person is to a part, never capacity, so it is
+#     not the removed probe and never a band.
 #   - "That reaction might be another part" (was "That reaction is a part too"): tentative, never a
 #     claim about what's inside someone.
 
@@ -433,9 +435,15 @@ PROMPTS = [
     ("aftercare_too_many", "aftercare", "too_many", "You don't need to get to know everyone at once."),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
-    # PENDING the flood-signal decision (parts.md "Blocker"): shown at the start of Meet a part and
-    # Two pulls only if Claudia picks the blending check.
+    # The blending check (Claudia, 16 Oct: the flood signal at a parts flow's entry). It asks how close
+    # the person is to a part they have already named (blended or not), so it comes once "it" points at
+    # something: right after Find in Meet a part (first, when the flow starts from a named trailhead),
+    # and as Two pulls opens, about both. Shown inside parts flows only, never on the check-in. Not the
+    # removed probe: it asks about distance from a part, not capacity, and is never stored as a band,
+    # carried between flows or read by routing. "Running things" opens the P2 body hand-off, with keep
+    # going still there; stored check-in signals still apply on top (server work, later).
     ("gate_blend_check", "gate", "blend", "Right now, can you notice it, or is it running things?"),
+    ("gate_blend_check_pulls", "gate", "blend_pulls", "Right now, can you notice them both, or is one of them running things?"),
     # Settings: the opt-in switch (off by default) with the dissociation lines, and the About line
     ("settings_label", "settings", "switch", "Parts"),
     ("settings_blurb", "settings", "switch", "Ways to get to know the parts of you that try to protect you."),
@@ -654,19 +662,20 @@ OPTIONS = [
     # --- Gates ---
     opt("far_away_look", "gate", "dissociation", "Look around the room first", branch="grounding"),
     opt("far_away_go_on", "gate", "dissociation", "Go on"),
-    # PENDING the flood-signal decision (see PROMPTS gate_blend_check)
+    # The blending check (decided 16 Oct; see PROMPTS gate_blend_check). Only "running things" changes
+    # the flow (body first); "Not sure" is a complete answer and goes on like "I can notice it".
     opt("blend_notice", "gate", "blend", "I can notice it"),
     opt("blend_running", "gate", "blend", "It's running things", branch="body_first"),
     opt("blend_not_sure", "gate", "blend", "Not sure"),
+    # Two pulls asks it about both parts at once (one question, not one per side).
+    opt("blend_pulls_notice", "gate", "blend_pulls", "I can notice them"),
+    opt("blend_pulls_running", "gate", "blend_pulls", "One of them is running things", branch="body_first"),
+    opt("blend_pulls_not_sure", "gate", "blend_pulls", "Not sure"),
 ]
 
-# Prompt and option ids waiting on a decision, not on review: build.py marks them pending.
-PENDING = {
-    "gate_blend_check": "flood-signal decision",
-    "blend_notice": "flood-signal decision",
-    "blend_running": "flood-signal decision",
-    "blend_not_sure": "flood-signal decision",
-}
+# Prompt and option ids waiting on a decision, not on review: build.py marks them pending. Empty since
+# the blending check was decided (16 Oct); id → what it waits on.
+PENDING = {}
 
 # --------------------------------------------------------------------------------------------------
 # Two pulls: PolarityPair. Offerable moves only (build check). Equal size, equal time: each side's

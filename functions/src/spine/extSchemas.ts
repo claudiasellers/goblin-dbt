@@ -39,6 +39,9 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     barrierSubId: { t: 'id' },
     ambivalenceId: { t: 'id' },
     confidence: { t: 'id' },                                                       // high | medium | low | none (checked by the client)
+    oaFacts: { t: 'id' },                                                          // Do the Opposite: the check's facts choice
+    oaEffect: { t: 'id' },                                                         // its effectiveness choice
+    oaRoute: { t: 'id' },                                                          // opposite | problem | clarify | support
     handoffs: {                                                                    // P2 breakdown hand-off (A4-2)
       t: 'objs', max: 4,
       of: {

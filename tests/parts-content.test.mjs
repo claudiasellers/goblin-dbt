@@ -278,7 +278,44 @@ test("drafts until signed off: every node and edge carries reviewStatus, pending
     }
   }
   for (const r of replay.rels) assert.equal(r.props.reviewStatus, want(r.fromId), `${r.type} from ${r.fromId}: reviewed by its source id`);
-  assert.ok(Object.keys(fixture.pending).length > 0);
+  // Every pending id is a real node and carries its reason (holds for an empty map too).
+  const byId = Object.assign({}, ...Object.values(replay.nodes));
+  for (const [id, why] of Object.entries(fixture.pending)) {
+    assert.ok(byId[id], `pending ${id}: no such node`);
+    assert.ok(why, `pending ${id}: say what it waits on`);
+    assert.equal(byId[id].pending, why, `pending ${id}: marked on the node`);
+  }
+});
+
+test("the blending check is decided (Claudia, 16 Oct): drafts, not pending, in flow gate; Two pulls asks it about both", (t) => {
+  const BLEND = {
+    gate_blend_check: ["blend", null], blend_notice: ["blend", "continue"], blend_running: ["blend", "body_first"],
+    blend_not_sure: ["blend", "continue"],
+    gate_blend_check_pulls: ["blend_pulls", null], blend_pulls_notice: ["blend_pulls", "continue"],
+    blend_pulls_running: ["blend_pulls", "body_first"], blend_pulls_not_sure: ["blend_pulls", "continue"],
+  };
+  for (const id of Object.keys(BLEND)) assert.ok(!(id in fixture.pending), `${id} is decided, not pending`);
+  assert.equal(fixture.prompts.gate_blend_check_pulls.copy, "Right now, can you notice them both, or is one of them running things?");
+  assert.deepEqual(Object.fromEntries((fixture.options.gate.blend_pulls ?? []).map((o) => [o.id, o.label])), {
+    blend_pulls_notice: "I can notice them", blend_pulls_running: "One of them is running things", blend_pulls_not_sure: "Not sure",
+  });
+  for (const [id, [step, branch]] of Object.entries(BLEND)) {
+    if (branch === null) {
+      const p = fixture.prompts[id];
+      assert.ok(p, id);
+      assert.deepEqual([p.flow, p.step, p.reviewStatus, p.pending], ["gate", step, "draft", undefined], id);
+    } else {
+      const o = (fixture.options.gate[step] ?? []).find((x) => x.id === id);
+      assert.ok(o, `${id}: an option at gate/${step}`);
+      assert.deepEqual([o.kind, o.branch, o.reviewStatus, o.pending, o.moves], ["chip", branch, "draft", undefined, []], id);
+    }
+  }
+  if (!needReplay(t)) return;
+  for (const id of Object.keys(BLEND)) {
+    const n = replay.nodes.PartPrompt[id] ?? replay.nodes.PartOption[id];
+    assert.equal(n.pending, undefined, `${id}: the load clears pending (null) on the node`);
+    assert.equal(n.reviewStatus, "draft", id);
+  }
 });
 
 test("stale edges: each parts edge type is cleared, scoped to both ends, before it is merged again", () => {

@@ -11,6 +11,40 @@ export function oppositeActionRoute(
   return flow.routes[`${facts}:${effectiveness}`] ?? "clarify";
 }
 
+export type OppositeActionRoute = ReturnType<typeof oppositeActionRoute>;
+
+/** The check's result as the session's `ext.er` keys (parts data fix 3). */
+export interface OaResultExt {
+  oaRoute: OppositeActionRoute;
+  oaFacts?: string;
+  oaEffect?: string;
+}
+
+/** Sent when the result no longer stands (Recheck, Previous): `setExt` merges per key, the server drops nulls. */
+export const OA_RESULT_CLEARED = { oaFacts: null, oaEffect: null, oaRoute: null } as const;
+
+/** The server's ext id shape (functions/src/spine/extSchemas.ts): anything else is never sent. */
+const EXT_ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
+
+/**
+ * What a reached check result records on the visit's ToolSession: the facts and effectiveness
+ * choice ids and the route, never text. Kept whatever the route, so a protector doing its job
+ * (`problem`: the urge fits and would help) is on the record too, not only urges worked against.
+ * `support` is decided by the safety answer alone: facts and effect were not asked, so stay unset.
+ */
+export function oaResultExt(
+  safety: string,
+  facts: string,
+  effectiveness: string,
+  route: OppositeActionRoute,
+): OaResultExt {
+  const out: OaResultExt = { oaRoute: route };
+  if (safety !== "safe" || route === "support") return out;
+  if (EXT_ID.test(facts)) out.oaFacts = facts;
+  if (EXT_ID.test(effectiveness)) out.oaEffect = effectiveness;
+  return out;
+}
+
 /** v1 emotion-intensity reflection (kept for old saved sessions). */
 export function reflectionKey(
   before: number,

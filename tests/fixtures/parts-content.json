@@ -609,8 +609,14 @@
    "step": "blend",
    "order": 1,
    "copy": "Right now, can you notice it, or is it running things?",
-   "reviewStatus": "draft",
-   "pending": "flood-signal decision"
+   "reviewStatus": "draft"
+  },
+  "gate_blend_check_pulls": {
+   "flow": "gate",
+   "step": "blend_pulls",
+   "order": 2,
+   "copy": "Right now, can you notice them both, or is one of them running things?",
+   "reviewStatus": "draft"
   },
   "settings_label": {
    "flow": "settings",
@@ -2948,8 +2954,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft",
-     "pending": "flood-signal decision"
+     "reviewStatus": "draft"
     },
     {
      "id": "blend_running",
@@ -2961,8 +2966,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft",
-     "pending": "flood-signal decision"
+     "reviewStatus": "draft"
     },
     {
      "id": "blend_not_sure",
@@ -2974,8 +2978,45 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft",
-     "pending": "flood-signal decision"
+     "reviewStatus": "draft"
+    }
+   ],
+   "blend_pulls": [
+    {
+     "id": "blend_pulls_notice",
+     "label": "I can notice them",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "blend_pulls_running",
+     "label": "One of them is running things",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "body_first",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "blend_pulls_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
     }
    ]
   }
@@ -3483,10 +3524,5 @@
   "nameMaxChars": 40,
   "reviewStatus": "draft"
  },
- "pending": {
-  "gate_blend_check": "flood-signal decision",
-  "blend_notice": "flood-signal decision",
-  "blend_running": "flood-signal decision",
-  "blend_not_sure": "flood-signal decision"
- }
+ "pending": {}
 }
