@@ -21,6 +21,7 @@ const AUTHED = [
   'deleteMyParts', // deletes the caller's own parts records
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
+  'tagPart',
   'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor',
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',

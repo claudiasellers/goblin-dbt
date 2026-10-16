@@ -397,6 +397,10 @@ PROMPTS = [
     # The tag row after a better close
     ("tag_question", "tag", "tag", "Was this a part you know?"),
     ("tag_new_later", "tag", "new", "Want to come back to it later?"),
+    # A kept part with no name, wherever parts are listed (the tag row's chips; the part card may reuse
+    # them). {place}: the part's first body place, its label from src/data/bodyFigure.ts in lower case.
+    ("part_unnamed_place", "common", "name", "The one in your {place}"),
+    ("part_unnamed", "common", "name", "One you haven't named"),
     # In the moment: only after a move the person picked themselves, parts on, never named
     ("unblend_line", "unblend", "line", "A part of you {move} right now."),
     # The angry-part card (alexithymia-first-interaction.md, "Anger: the angry part"): the fire back urge,
@@ -435,7 +439,7 @@ PROMPTS = [
     ("angry_speak_line", "angry", "speak", "I felt {felt}."),
     ("angry_speak_line_plain", "angry", "speak", "I felt {felt}."),
     # Parts on only (PARTS_ON_ONLY): after "Spend a minute with it later?" (the option angry_later) queued it
-    ("angry_later_done", "angry", "speak", "It's there when you want it."),
+    ("angry_later_done", "angry", "speak", "It's in Me when you want it."),
     # Aftercare
     ("aftercare_louder", "aftercare", "louder", "Things can get louder after time with a part."),
     ("aftercare_too_many", "aftercare", "too_many", "You don't need to get to know everyone at once."),
@@ -454,8 +458,6 @@ PROMPTS = [
     ("cope_anchor_noname", "dearman", "cope", "If that part shows up:"),
     ("cope_set_anchor", "dearman", "cope", "What would help if {name} shows up?"),
     ("cope_set_anchor_noname", "dearman", "cope", "What would help if that part shows up?"),
-    # The chip for a part kept without a name (the ProfileKind label, which parts content doesn't carry).
-    ("cope_unnamed", "dearman", "cope", "A part"),
     # Entry gates. The P2 hand-off copy is capacity content; these are parts' own.
     ("gate_far_away", "gate", "dissociation", "If you start to feel far away, stop any time. Coming back into the room comes first."),
     # The blending check (Claudia, 16 Oct: the flood signal at a parts flow's entry). It asks how close
@@ -691,7 +693,7 @@ OPTIONS = [
     opt("tag_new_one", "tag", "tag", "A new one", branch="new"),
     opt("tag_skip", "tag", "tag", "Skip", branch="end"),
     opt("tag_later_yes", "tag", "new", "Yes", branch="candidate"),
-    opt("tag_later_no", "tag", "new", "No", branch="end"),
+    opt("tag_later_no", "tag", "new", "No thanks", branch="end"),
 
     # --- The angry-part card (the hurt chips at protects are the ProtectedHurt labels, not options) ---
     opt("angry_next", "angry", "unblend", "Okay"),

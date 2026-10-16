@@ -11,6 +11,7 @@ const read = (f) => readFileSync(f, "utf8");
 
 for (const [file, marker] of [
   ["types.ts", "export type PartsEntry ="], ["sessionTypes.ts", "export interface PartSessionPatch"], ["keepTypes.ts", "export interface KeepPartRequest"],
+  ["tagTypes.ts", "export interface TagPartRequest"],
   ["checkbackTypes.ts", "export interface SchedulePartCheckbackRequest"],
 ]) {
   test(`types mirror: src/data/partsTypes.ts carries functions/src/parts/${file} unchanged (after the header)`, () => {

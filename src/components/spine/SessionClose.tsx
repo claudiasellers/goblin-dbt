@@ -6,6 +6,7 @@ import { dueAtFor } from '../../lib/spine/windows';
 import { newId } from '../../lib/spine/ids';
 import type { ThenVsNow } from '../../data/capacityTypes';
 import type { ActedOnUrge, CloseKind } from '../../data/spineTypes';
+import { PartTagSlot } from './PartTagSlot';
 
 /**
  * The one-tap "did it help?" at the end of a tool (PR-S3). Graph copy (SessionCloseFlow), one tap,
@@ -26,6 +27,9 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
   const asksPlan = closeKind === 'plan' && !!planType;
   const [content, setContent] = useState<SpineContent | null>(null);
   const [done, setDone] = useState<'answered' | 'skipped' | null>(null);
+  // "Was this a part you know?" (PartTagSlot): its gate needs the answer and the saved close.
+  const [closeAnswer, setCloseAnswer] = useState<ThenVsNow | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (!asksAtClose(closeKind) && !asksPlan) return;
@@ -41,9 +45,13 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
   if (!q) return null;
 
   if (done) {
-    return done === 'answered'
-      ? <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
-      : null;
+    if (done !== 'answered') return null;
+    return (
+      <>
+        <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
+        <PartTagSlot toolId={session.toolId} toolSessionId={session.id} thenVsNow={closeAnswer} saved={saved} />
+      </>
+    );
   }
 
   const answer = (choiceId: string) => {
@@ -55,10 +63,12 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
       input = { status: 'completed', actedOnUrge: choiceId as ActedOnUrge };
     } else {
       input = { status: 'completed', thenVsNow: choiceId as ThenVsNow };
+      setCloseAnswer(choiceId as ThenVsNow);
     }
     if (detail) input = { ...input, detail };
     setDone('answered');
-    void session.close(input);
+    // The tag row waits for the server to have the close (tagPart refuses an open session).
+    session.close(input).then((r) => { if (r) setSaved(true); }, () => { /* the close is optional */ });
     onAnswered?.(input);
   };
   const skip = () => {

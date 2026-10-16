@@ -9,9 +9,11 @@ import type { Band } from '../data/capacityTypes';
 import type { PartsContent, PartsOption } from '../data/partsContentTypes';
 import type { ProfileSlices } from '../data/profileTypes';
 import { flowReady, promptCopy, stepOptions } from './partsContent';
+import { partChipLabel as unnamedOrName, UNNAMED_PROMPTS } from './partTag';
 
+/** The screen's own prompts, then the shared unnamed-part chips ("The one in your {place}", "One you haven't named"). */
 export const COPE_PROMPTS = [
-  'cope_title', 'cope_anchor', 'cope_anchor_noname', 'cope_set_anchor', 'cope_set_anchor_noname', 'cope_unnamed',
+  'cope_title', 'cope_anchor', 'cope_anchor_noname', 'cope_set_anchor', 'cope_set_anchor_noname', ...UNNAMED_PROMPTS,
 ] as const;
 export const COPE_OPTIONS = ['cope_not_sure', 'cope_skip', 'cope_own', 'cope_change', 'cope_save'] as const;
 
@@ -56,10 +58,12 @@ export function copeParts(parts: readonly SlicePart[] | null | undefined): Slice
 const withName = (copy: string, name: string) => copy.replace('{name}', () => name);
 const nameOf = (name: string | null | undefined) => name?.trim() || null;
 
-/** The chip's words: the name as they gave it, or the kind label ("A part") for an unnamed part. */
-export function partChipLabel(content: PartsContent, part: Pick<SlicePart, 'name'>): { text: string; named: boolean } {
-  const n = nameOf(part.name);
-  return n ? { text: n, named: true } : { text: promptCopy(content, 'cope_unnamed') ?? '', named: false };
+/**
+ * The chip's words: the name as they gave it (drawn in the serif), or the shared unnamed lines the tag
+ * row uses ("The one in your {place}", else "One you haven't named").
+ */
+export function partChipLabel(content: PartsContent, part: SlicePart): { text: string; named: boolean } {
+  return { text: unnamedOrName(part, content), named: nameOf(part.name) !== null };
 }
 
 /** "If {name} shows up:" (or the unnamed wording); the anchor goes on its own line under it. */

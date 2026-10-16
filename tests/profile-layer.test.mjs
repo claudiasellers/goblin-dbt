@@ -28,15 +28,17 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
     for (const s of needs) assert.ok(types.SLICE_IDS.includes(s), `${consumer}: ${s}`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["recovering-from-invalidation"], ["name"]);
-  assert.deepEqual(types.PROFILE_NEEDS["find-the-feeling"], ["name"]);
+  assert.deepEqual(types.PROFILE_NEEDS["find-the-feeling"], ["name", "parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS["opposite-action"], []);
-  assert.deepEqual(types.PROFILE_NEEDS["cool-down"], []);
+  assert.deepEqual(types.PROFILE_NEEDS["cool-down"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns"], "R20: consumer is `checkin`");
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
+  assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
-  // Parts (Phase 2): the slices exist; only Meet a part reads them (it renders them). Other tools
-  // declare 'parts' in the phase that renders them, never before.
+  // Parts: the slices exist; no tool reads them before it renders them. Meet a part reads them (it
+  // renders them); Phase 3's tag row is the first render on other tools' closes: exactly the tools that
+  // can show it read `parts`, and none of them partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
   assert.deepEqual(types.SLICE_IDS.slice(-3), ["parts", "partDetail", "partAnchors"]);
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
   // DEAR MAN's cope ahead (Phase 3) shows parts, their anchors and the kept lines to pick one from;
@@ -45,9 +47,9 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   // `today` renders parts too (the check-back card's name, part-checkback); partDetail stays Meet a part's.
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer === "meet-a-part") continue;
-    if (consumer !== "today" && consumer !== "dear-man") assert.ok(!needs.includes("parts"), `${consumer} reads parts before its phase`);
     if (consumer !== "dear-man") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "find-the-feeling", "dear-man"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host nor DEAR MAN's cope ahead`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);
@@ -100,8 +102,8 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   const now = Date.parse("2026-10-01T12:00:00Z");
   const tx = fakeTx((q) => {
     if (/USES/.test(q)) return [
-      { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true,
-             shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5], confirmedAt: "2026-08-01T00:00:00Z", revisitAt: "2026-08-31T00:00:00Z" }, moveIds: ["withdraw", "appease", "withdraw"] },
+      { p: { id: "p1", kind: "part", area: "my_parts", status: "resting", source: "made", name: "the one who hides", tender: true, firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1],
+             confirmedAt: "2026-08-01T00:00:00Z", revisitAt: "2026-08-31T00:00:00Z" }, moveIds: ["withdraw", "appease", "withdraw"] },
       { p: { id: "p2", kind: "part", area: "my_parts", status: "active", source: "made", revisitAt: null }, moveIds: [] },
     ];
     if (/GUARDS/.test(q)) return [
@@ -116,8 +118,8 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   const read = (t) => slices.readProfileSlices(t, "u1", "meet-a-part", now);
   const { name: _name, ...out } = await read(tx);
   assert.deepEqual(out.parts.map(({ meta: m, ...rest }) => [rest, m.status, m.area, m.prompt]), [
-    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5] }, "resting", "my_parts", "ask"],
-    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], shapeSig: null }, "active", "my_parts", "none"],
+    [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1] }, "resting", "my_parts", "ask"],
+    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null, shapeSig: null }, "active", "my_parts", "none"],
   ]);
   assert.deepEqual(out.partDetail, [
     { id: "p1", ageId: "age_teen", voiceIds: ["v_quiet"], ownVoice: "soft", jobIds: ["j_hide"], ownJob: "keep me safe", fearIds: ["f_too_much"],

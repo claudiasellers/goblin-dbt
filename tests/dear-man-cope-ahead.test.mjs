@@ -20,8 +20,8 @@ const tsx = read("src/pages/tools/DearMan.tsx");
 const step = read("src/components/parts/CopeAheadStep.tsx");
 const PID = "0f3c2b1a-9d8e-4c7b-a6f5-e4d3c2b1a098";
 
-const part = (id, name = null, shapeSig = null) => ({
-  id, name, status: "active", tender: false, moveIds: [], shapeSig,
+const part = (id, name = null, shapeSig = null, firstPlace = null) => ({
+  id, name, status: "active", tender: false, moveIds: [], firstPlace, shapeSig,
   meta: { id, kind: "part", area: "my_parts", status: "active", source: "made", confirmedAt: null, revisitAt: null, prompt: "none" },
 });
 
@@ -32,7 +32,6 @@ test("copy pins: flow dearman, step cope, every row a draft (nothing ships today
     cope_anchor_noname: "If that part shows up:",
     cope_set_anchor: "What would help if {name} shows up?",
     cope_set_anchor_noname: "What would help if that part shows up?",
-    cope_unnamed: "A part",
   };
   for (const [id, copy] of Object.entries(prompts)) {
     const p = fixture.prompts[id];
@@ -43,7 +42,8 @@ test("copy pins: flow dearman, step cope, every row a draft (nothing ships today
     ["cope_not_sure", "Not sure", "chip", "draft"], ["cope_skip", "Skip", "chip", "draft"], ["cope_own", "In my words", "chip", "draft"],
     ["cope_change", "Change it", "chip", "draft"], ["cope_save", "Save", "chip", "draft"],
   ]);
-  assert.deepEqual([...lib.COPE_PROMPTS].sort(), Object.keys(prompts).sort());
+  // An unnamed part's chip uses the shared lines the tag row uses (lane 4's part_unnamed_*).
+  assert.deepEqual([...lib.COPE_PROMPTS].sort(), [...Object.keys(prompts), "part_unnamed_place", "part_unnamed"].sort());
   assert.equal(lib.copeReady(shipped), false, "no visible change today");
   assert.equal(lib.copeReady(all), true, "with the copy signed off, the screen can show");
   assert.equal(lib.copeReady(null), false);
@@ -83,12 +83,13 @@ test("placement: after What makes this hard?, before the script; back and resume
   assert.deepEqual(resume.TOO_MUCH_PHASES.slice(0, 3), ["scene", "cope", "describe"]);
 });
 
-test("part chips: slice order (most recently visited first), at most four; names as given, unnamed → the kind label", () => {
+test("part chips: slice order (most recently visited first), at most four; names as given, unnamed → the shared unnamed lines", () => {
   const parts = ["a", "b", "c", "d", "e"].map((id) => part(id, id === "b" ? null : `the ${id}`));
   assert.deepEqual(lib.copeParts(parts).map((p) => p.id), ["a", "b", "c", "d"]);
   assert.deepEqual(lib.copeParts(null), []);
-  assert.deepEqual(lib.partChipLabel(all, { name: " the watcher " }), { text: "the watcher", named: true });
-  assert.deepEqual(lib.partChipLabel(all, { name: null }), { text: "A part", named: false });
+  assert.deepEqual(lib.partChipLabel(all, part("x", " the watcher ")), { text: "the watcher", named: true });
+  assert.deepEqual(lib.partChipLabel(all, part("x", null, null, "chest")), { text: "The one in your chest", named: false });
+  assert.deepEqual(lib.partChipLabel(all, part("x")), { text: "One you haven't named", named: false });
   assert.equal(lib.anchorLead(all, "the $& one"), "If the $& one shows up:", "a name is filled as typed");
   assert.equal(lib.anchorLead(all, ""), "If that part shows up:");
   assert.equal(lib.setAnchorLine(all, "Sam's critic"), "What would help if Sam's critic shows up?");

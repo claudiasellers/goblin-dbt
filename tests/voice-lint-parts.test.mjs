@@ -103,6 +103,17 @@ test("parts_chip has no voice_distance; parts_prompt does", () => {
   assert.deepEqual(part("How do you feel toward it right now?", "prompt"), []);
 });
 
+test("\"Me\" the screen passes voice_distance in parts copy; \"me\" and an opening \"Me\" still fail", () => {
+  assert.deepEqual(part("It's in Me when you want it.", "prompt"), []);
+  assert.deepEqual(part("You'll find it in Me.", "prompt"), []);
+  assert.ok(partRules("It's in me when you want it.", "prompt").includes("voice_distance"));
+  assert.ok(partRules("Tell me more.", "prompt").includes("voice_distance"));
+  assert.ok(partRules("Me too.", "prompt").includes("voice_distance"), "a sentence's first word is the pronoun");
+  assert.ok(partRules("Done. Me again.", "prompt").includes("voice_distance"));
+  // Only parts copy: the witness corpus and other scopes are unchanged.
+  assert.ok(lintText("It's in Me when you want it.", { scope: "validation" }).some((f) => f.rule === "voice_distance"));
+});
+
 test("findings carry the row's id, field and kind; report-only findings are dropped", () => {
   const [f] = lintPartsCopy([{ id: "meet_feel", field: "label", kind: "prompt", text: "Meet your exile" }]);
   assert.deepEqual(Object.keys(f).sort(), ["field", "id", "kind", "match", "message", "rule", "severity"]);
@@ -144,7 +155,7 @@ test("parts_max_length counts each slot at its width", () => {
   assert.ok(partRules(`${a(90 - 24 - 28 + 1)}{name}{matters}`, "prompt").includes("parts_max_length"));
   assert.ok(!partRules(`${a(90 - 24)}{felt}`, "first_person").includes("parts_max_length"));
   assert.ok(partRules(`${a(90 - 24 + 1)}{felt}`, "first_person").includes("parts_max_length"));
-  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 90, month: 9, want: 20, N: 2, matters: 28, felt: 24 });
+  assert.deepEqual(PARTS_SLOT_WIDTH, { name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32, context: 24, anchor: 90, month: 9, want: 20, N: 2, matters: 28, felt: 24, place: 10 });
 });
 
 test("parts_slots: only parts slots, only in prompts (all), keepsakes ({A} {B} {want}) and first-person lines ({felt})", () => {
