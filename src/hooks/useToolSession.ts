@@ -54,6 +54,12 @@ export interface ToolSessionApi {
    * keeps them only when the session started without any (a hand-off's are never replaced).
    */
   setEmotionIds(ids: string[]): void;
+  /**
+   * The urge the person picked in this visit (the tool's own graph ids). Sent with whichever close
+   * happens, unless the close passes its own `urgeIds`. Ask-fresh: only a pick made in this visit,
+   * never one hydrated from a saved session.
+   */
+  setUrgeIds(ids: string[]): void;
   /** Close once (later calls resolve null). Resolves null when nothing was written. */
   close(input?: ToolSessionCloseInput): Promise<CloseToolSessionResponse | null>;
   /** Route + state for handing off to another tool from inside this one. */
@@ -73,6 +79,7 @@ export const NO_SESSION: ToolSessionApi = {
   setBandAtStart: () => {},
   setSkillIds: () => {},
   setEmotionIds: () => {},
+  setUrgeIds: () => {},
   close: async () => null,
   linkTo: (toolId, state) => ({ pathname: `/tool/${toolId}`, state: { ...state, spine: { entry: 'handoff' } } }),
 };

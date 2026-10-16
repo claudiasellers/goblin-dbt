@@ -66,6 +66,18 @@ export function sessionEmotionIds(emotions: readonly unknown[]): string[] {
   return emotionIdsFor(words).filter((id) => SESSION_EMOTION_ID.test(id)).slice(0, MAX_SESSION_EMOTIONS);
 }
 
+const MAX_SESSION_URGES = 10;
+
+/**
+ * The urge ids a tool picked in this visit (`setUrgeIds`): the tool's own graph ids (ActionUrge in
+ * Do the Opposite, FeelingUrge in Urge Surfing), deduped, capped as the server caps them, and
+ * anything it would refuse dropped, so a bad id never fails the close.
+ */
+export function sessionUrgeIds(urges: readonly unknown[]): string[] {
+  const ok = urges.filter((u): u is string => typeof u === 'string' && SESSION_EMOTION_ID.test(u));
+  return [...new Set(ok)].slice(0, MAX_SESSION_URGES);
+}
+
 /** The emotion ids a link into a tool carries (`checkinEmotions`), tolerating anything. */
 export function emotionIdsFromLink(state: unknown): string[] {
   if (!state || typeof state !== 'object') return [];

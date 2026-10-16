@@ -116,6 +116,10 @@ test("tool sessions carry emotion ids from the link: display names and ids both 
   assert.deepEqual(link.emotionIdsFromLink({}), []);
   assert.equal(link.sessionEmotionIds(Array.from({ length: 30 }, (_, i) => `e${i}`)).length, 20);
   assert.deepEqual(link.sessionEmotionIds(["a".repeat(101), "hurt"]), ["hurt"], "never an id the server refuses");
+  // An urge pick: the tool's own ids, deduped, at most the server's 10, never one it refuses.
+  assert.deepEqual(link.sessionUrgeIds(["hide", "hide", "fear-avoid"]), ["hide", "fear-avoid"]);
+  assert.equal(link.sessionUrgeIds(Array.from({ length: 30 }, (_, i) => `u${i}`)).length, 10);
+  assert.deepEqual(link.sessionUrgeIds(["My urge is different", "", null, "Hide", "anger-attack"]), ["anger-attack"]);
 });
 
 test("tool links keep the legacy state and add spine.checkInId", () => {
