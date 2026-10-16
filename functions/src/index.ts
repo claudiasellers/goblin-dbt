@@ -28,4 +28,4 @@ export {
   getProfileContext, getMe, upsertProfileFact, confirmProfileItem, setAsideProfileItem, restoreProfileItem,
   answerPatternOffer,
 } from './profile';
-export { getPartsEntry } from './parts';
+export { getPartsEntry, startPartSession, savePartSession } from './parts';

@@ -17,6 +17,7 @@ import { GUARDS } from '../userdata/lifecycle';
 import { userKey } from '../userdata/ownership';
 import { registerTodayPrepare, registerTodaySource } from '../spine/today';
 import type { TodayItem } from '../spine/todayOrder';
+import { NOT_WHAT_HELPS } from '../spine/tools';
 import type { PatternOfferAnswer } from './types';
 
 export interface PatternRule {
@@ -53,6 +54,7 @@ export function evaluateRule(sessions: SessionEvidence[], rule: PatternRule, off
   const groups = new Map<string, SessionEvidence[]>();
   for (const s of sessions) {
     if (!s.patternId || !s.thenVsNow || Date.parse(s.at) < now - rule.windowDays * DAY) continue;
+    if (NOT_WHAT_HELPS.includes(s.toolId)) continue; // a "more here" close is no what_helps evidence
     const k = `${s.toolId}|${s.patternId}`;
     (groups.get(k) ?? groups.set(k, []).get(k)!).push(s);
   }

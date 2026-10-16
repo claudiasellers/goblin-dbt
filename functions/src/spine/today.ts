@@ -10,6 +10,7 @@ import { readTx } from '../shared/neo4j';
 import { BANDS, type Band } from '../capacity/types';
 import { readFollowUpTypes, type FollowUpTypeContent } from './registry';
 import { fillDeepLink, followUpState, orderToday, type TodayItem } from './todayOrder';
+import { NOT_WHAT_HELPS } from './tools';
 
 export interface GetTodayResponse {
   items: TodayItem[];
@@ -97,7 +98,7 @@ async function toolOutcomeItem(
   if (!t?.enabled || !flow) return [];
   const res = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession)
-     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge']
+     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge'] AND NOT ts.toolId IN $notWhatHelps
        AND ts.answeredAt IS NULL AND coalesce(ts.outcomeAskDismissed, false) = false
        AND coalesce(ts.endedAt, ts.startedAt) > datetime() - duration({hours: 12})
        AND (ts.status = 'completed' OR coalesce(ts.practiced, false))
@@ -105,7 +106,7 @@ async function toolOutcomeItem(
      RETURN ts.id AS id, ts.toolId AS toolId, ts.closeKind AS closeKind,
             toString(coalesce(ts.endedAt, ts.startedAt)) AS at
      ORDER BY coalesce(ts.endedAt, ts.startedAt) DESC LIMIT 1`,
-    { uid },
+    { uid, notWhatHelps: NOT_WHAT_HELPS },
   );
   const r = res.records[0];
   if (!r) return [];

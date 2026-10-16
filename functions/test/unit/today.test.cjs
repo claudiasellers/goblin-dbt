@@ -100,6 +100,10 @@ test('getToday: derived states, one tool_outcome from the close question, OA rem
   const flooded = await fns.getToday.run({ auth: auth(), data: { band: 'flooded' } });
   assert.deepEqual([flooded.items.length, flooded.more.length, flooded.holding], [0, 4, true]);
   assert.match(f.calls.find((c) => /HAS_TOOL_SESSION/.test(c.query)).query, /ts\.answeredAt IS NULL AND coalesce\(ts\.outcomeAskDismissed, false\) = false/);
+  // Meet a part never gets a "did it help?" card (docs/design/parts.md).
+  const outcomeRead = f.calls.find((c) => /HAS_TOOL_SESSION/.test(c.query));
+  assert.match(outcomeRead.query, /AND NOT ts\.toolId IN \$notWhatHelps/);
+  assert.deepEqual(outcomeRead.params.notWhatHelps, ['meet-a-part']);
 });
 
 test('answerToolOutcome: by tool session id, guarded, compat outcome; dismissal remembered', async () => {
@@ -110,6 +114,8 @@ test('answerToolOutcome: by tool session id, guarded, compat outcome; dismissal 
   assert.equal(q.params.key, `u1:${TS}`);
   assert.match(q.query, /ts\.answeredAt IS NULL AND coalesce\(ts\.outcomeAskDismissed, false\) = false/);
   assert.match(q.query, /WHEN 'much_better' THEN 'helped'/);
+  assert.match(q.query, /legacy IS NULL OR ts\.toolId IN \$notWhatHelps THEN \[\]/, 'no compat outcome for meet-a-part');
+  assert.deepEqual(q.params.notWhatHelps, ['meet-a-part']);
   await fns.answerToolOutcome.run({ auth: auth(), data: { toolSessionId: TS, dismissed: true } });
   assert.equal(f.calls[1].params.dismissed, true);
   await assert.rejects(fns.answerToolOutcome.run({ auth: auth(), data: { toolSessionId: TS } }), (e) => e.code === 'invalid-argument');

@@ -129,7 +129,7 @@ test("finalise-once: ToolSession, FollowUp, PatternOffer, ToolUsage, SkillPracti
   assert.equal(writable("ToolUsage", "outcome", { outcome: "helped" }, now), false);
   assert.equal(writable("SkillPractice", "any", {}, now), false);
   assert.equal(writable("PartSession", "save", { status: "open" }, now), true);
-  for (const s of ["completed", "stopped", "exited_early"]) assert.equal(writable("PartSession", "save", { status: s }, now), false);
+  for (const s of ["saved", "completed", "stopped", "exited_early"]) assert.equal(writable("PartSession", "save", { status: s }, now), false);
   assert.equal(writable("ToolSession", "showLine", { status: "open", startedAt: iso(-30) }, now), true, "a beat inside an open session");
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-11) }, now), true);
   assert.equal(writable("ToolSession", "showLine", { status: "completed", endedAt: iso(-13) }, now), false);
@@ -162,6 +162,7 @@ const GUARDED_WRITERS = [
   ["functions/src/profile/patternOffers.ts", "GUARDS.PatternOffer.answer"],
   ["functions/src/witness/index.ts", "GUARDS.CheckIn.upsert"],
   ["functions/src/witness/index.ts", "GUARDS.ToolSession.showLine"],
+  ["functions/src/parts/sessionQueries.ts", "GUARDS.PartSession.save"],
 ];
 test("writers that update log records use the lifecycle guards", () => {
   for (const [file, guard] of GUARDED_WRITERS) assert.ok(readFileSync(file, "utf8").includes(guard), `${file} lacks ${guard}`);

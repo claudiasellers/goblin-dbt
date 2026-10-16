@@ -17,6 +17,7 @@
  * Everything else (thresholds, formulation choice, alert, somatic grouping) is unchanged.
  */
 import { RESERVED_TOOL_IDS } from '../spine/types';
+import { NOT_WHAT_HELPS } from '../spine/tools';
 import type {
   CheckInRow, GrowthEvidenceInsight, GrowthInsight, LegacyUsageRow, OutcomeDirection, OutcomeMeasure, PatternFrequency, SessionRow,
   SomaticCorrelationData, TimeRange, ToolEffectivenessData, ToolOutcomeSummary,
@@ -138,7 +139,8 @@ const DIRECTION: Record<string, OutcomeDirection> = { regulation_down: 'down', o
 export function outcomeRows(sessions: SessionRow[], legacy: LegacyUsageRow[]): OutcomeRow[] {
   const rows: OutcomeRow[] = [];
   for (const s of sessions) {
-    if (!isAppTool(s.toolId)) continue;
+    // Meet a part's "more here" is not "it went well" (docs/design/parts.md): never counted.
+    if (!isAppTool(s.toolId) || NOT_WHAT_HELPS.includes(s.toolId)) continue;
     if (s.thenVsNow) {
       rows.push({
         toolId: s.toolId, patternId: s.patternId, at: s.at, measure: 'then_vs_now', direction: DIRECTION[s.closeKind ?? ''] ?? null,
