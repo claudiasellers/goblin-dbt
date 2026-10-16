@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { startWave, updateWave } from '../../lib/urgeSurfing';
+import { startWave, updateWave, pullChoices, pullQuestion, type PullChoice } from '../../lib/urgeSurfing';
 import { useToolSession } from '../../hooks/useToolSession';
+import { getFindTheFeelingContent } from '../../services/neo4j';
 import { SessionClose } from '../../components/spine/SessionClose';
 
 export function UrgeSurfing() {
@@ -10,6 +11,30 @@ export function UrgeSurfing() {
   const [peakIntensity, setPeakIntensity] = useState(intensity);
   // Practice spine (PR-S3). The slider's numbers are never stored (plan: no scale values on sessions).
   const session = useToolSession();
+  // Which pull this is (parts data fix 4): Find the feeling's own question and chips, optional and
+  // ask-fresh. The tool renders at once; the question appears when the shipped content resolves and
+  // is simply absent if it doesn't.
+  const [pull, setPull] = useState<{ question: string; choices: PullChoice[] } | null>(null);
+  const [pulled, setPulled] = useState<string | null>(null);
+
+  useEffect(() => {
+    let live = true;
+    getFindTheFeelingContent()
+      .then((content) => {
+        const question = pullQuestion(content);
+        const choices = pullChoices(content);
+        if (live && question && choices.length) setPull({ question, choices });
+      })
+      .catch(() => {});
+    return () => { live = false; };
+  }, []);
+
+  // Single select; tapping the picked chip again clears it. Not answering is the skip.
+  const pickPull = (id: string) => {
+    const next = pulled === id ? null : id;
+    setPulled(next);
+    session.setUrgeIds(next ? [next] : []);
+  };
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -55,6 +80,8 @@ export function UrgeSurfing() {
     setIntensity(wave.current);
     setElapsed(0);
     setPeakIntensity(wave.peak);
+    setPulled(null);
+    session.setUrgeIds([]);
   };
 
   if (phase === 'intro') {
@@ -70,6 +97,29 @@ export function UrgeSurfing() {
             <li>• You're just riding the wave until it passes</li>
           </ul>
         </div>
+
+        {pull && (
+          <div role="group" aria-labelledby="urge-pull-question">
+            <p id="urge-pull-question" className="text-sm text-[var(--color-text-secondary)] mb-2">
+              {pull.question}
+            </p>
+            <div className="grid grid-cols-2 gap-2.5">
+              {pull.choices.map((u) => (
+                <button
+                  key={u.id}
+                  type="button"
+                  className="den-chip flex-col"
+                  style={{ gap: 2, paddingBlock: 8 }}
+                  aria-pressed={pulled === u.id}
+                  onClick={() => pickPull(u.id)}
+                >
+                  <span className="text-[15px] leading-tight">{u.label}</span>
+                  {u.sub && <span className="text-[13px] font-normal leading-snug opacity-80">{u.sub}</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div>
           <label className="block text-sm text-[var(--color-text-secondary)] mb-2">
