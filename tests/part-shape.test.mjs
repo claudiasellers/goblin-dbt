@@ -63,12 +63,12 @@ test("the copy: the chip's own name, else that part", () => {
 
 test("the row: only after a part chip, never A new one / Skip / the debrief; Yes writes setPartShape, No thanks folds", () => {
   const row = read("src/components/spine/PartTagRow.tsx");
-  assert.match(row, /const tag = \(c: TagChip\) => \{\s*if \(offerShape && !debrief\) \{\s*setPicked\(c\);\s*setState\('shape'\);\s*\} else fold\(\);/);
+  assert.match(row, /const tag = \(c: TagChip\) => \{\s*answered\(\);\s*if \(offerShape && !debrief\) \{\s*setPicked\(c\);\s*setState\('shape'\);\s*\} else fold\(\);/);
   assert.match(row, /const answerShape = \(yes: boolean\) => \{\s*if \(!yes \|\| !picked\) \{ fold\(\); return; \}\s*setState\('done'\);\s*setPartShape\(\{ partId: picked\.id, toolSessionId \}\)\.catch/,
     "the payload: the part and the visit, never a shape");
   assert.match(row, /setTimeout\(\(\) => \{ setState\('gone'\); gone\.current\?\.\(\); \}, SHAPE_DONE_MS\)/, "Done., then the row folds");
-  assert.match(row, /<button type="button" className=\{chip\} onClick=\{\(\) => setState\('later'\)\}>/, "A new one: as before");
-  assert.match(row, /<button type="button" className=\{quiet\} onClick=\{fold\}>\{copy\.skip\}<\/button>/, "Skip: as before");
+  assert.match(row, /<button type="button" className=\{chip\} onClick=\{\(\) => \{ answered\(\); setState\('later'\); \}\}>/, "A new one: as before");
+  assert.match(row, /<button type="button" className=\{quiet\} onClick=\{skip\}>\{copy\.skip\}<\/button>/, "Skip: as before");
   assert.equal((row.match(/setPartShape\(/g) ?? []).length, 1);
   assert.doesNotMatch(row, /await /, "never blocks leaving");
 

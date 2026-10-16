@@ -28,9 +28,9 @@ export function debriefWhoReady(content: PartsContent | null): boolean {
   return !!content && surfaceReady(content, DEBRIEF_WHO_REQUIRED);
 }
 
-/** Parts on, at least one kept part (the slice holds active and resting only), and the copy shipped. */
-export function showDebriefWho(g: { partsOn: boolean; partCount: number; ready: boolean }): boolean {
-  return g.partsOn && g.partCount > 0 && g.ready;
+/** Parts on, at least one kept part (the slice holds active and resting only), the copy shipped, and not answered on this page (src/lib/tagRowOnce.ts). */
+export function showDebriefWho(g: { partsOn: boolean; partCount: number; ready: boolean; answered?: boolean }): boolean {
+  return g.partsOn && g.partCount > 0 && g.ready && !g.answered;
 }
 
 type SlicePart = Pick<ProfileSlices['parts'][number], 'id' | 'name' | 'status'>;

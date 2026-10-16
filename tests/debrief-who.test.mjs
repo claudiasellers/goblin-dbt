@@ -34,7 +34,7 @@ test("gate: parts on, a kept part, every line shipped (its own and the tag row's
   assert.equal(lib.debriefWhoReady(partsFromFixture(fixture)), false, "drafts today: no screen");
   const on = { partsOn: true, partCount: 1, ready: true };
   assert.equal(lib.showDebriefWho(on), true);
-  for (const [k, v] of [["partsOn", false], ["partCount", 0], ["ready", false]]) assert.equal(lib.showDebriefWho({ ...on, [k]: v }), false, k);
+  for (const [k, v] of [["partsOn", false], ["partCount", 0], ["ready", false], ["answered", true]]) assert.equal(lib.showDebriefWho({ ...on, [k]: v }), false, k);
 });
 
 test("form: named when this visit's prep chose a kept, named part; general otherwise", () => {
@@ -57,7 +57,9 @@ test("payloads: Yes / A bit a debrief tag with its strength; ext.er.whoShowedUp 
   assert.throws(() => ext.validateExt({ er: { whoShowedUp: "The guard showed up" } }), /expected an id/, "never the name");
   const card = read("src/components/parts/DebriefWho.tsx");
   assert.match(card, /if \(a !== 'no'\) tagPart\(debriefTag\(newId\(\), form\.partId, toolSessionId, a\)\)\.catch/, "No writes nothing");
-  assert.match(card, /<button type="button" className=\{quiet\} onClick=\{onDone\}>\{copy\.skip\}<\/button>/, "Skip writes nothing");
+  assert.match(card, /<button type="button" className=\{quiet\} onClick=\{skip\}>\{copy\.skip\}<\/button>/, "Skip writes nothing");
+  assert.match(card, /const skip = \(\) => \{ markTagRowAnswered\(toolSessionId, 'debrief'\); onDone\(\); \};/, "but counts as answered");
+  assert.match(card, /const answer = \(a: WhoShowedUp\) => \{\s*markTagRowAnswered\(toolSessionId, 'debrief'\);/);
   assert.match(card, /<PartTagRow toolId="dear-man" toolSessionId=\{toolSessionId\} content=\{content\} question=\{generalQuestion\(content\)\} debrief onGone=\{onDone\} \/>/,
     "the general form is the tag row's own chips");
   const jsx = card.slice(card.indexOf("return (\n    <section"));
@@ -71,7 +73,7 @@ test("DEAR MAN: its own step after Underneath, before the reflection; never unde
   assert.match(dm, /case 'debrief-parts': setPhase\('debrief-underneath'\); break;/);
   assert.match(dm, /case 'debrief-reflection': setPhase\(whoShown \? 'debrief-parts' : 'debrief-underneath'\); break;/);
   assert.match(dm, /if \(phase === 'debrief-parts' && !whoShown && !copePending\) setPhase\('debrief-reflection'\);/, "gate fails: straight on");
-  assert.match(dm, /const whoShown = showDebriefWho\(\{ partsOn, partCount: copeSlices\?\.parts\.length \?\? 0, ready: debriefWhoReady\(copeCopy\) \}\);/);
+  assert.match(dm, /const whoShown = showDebriefWho\(\{ partsOn, partCount: copeSlices\?\.parts\.length \?\? 0, ready: debriefWhoReady\(copeCopy\),\s*answered: tagRowAnswered\(session\.id, 'debrief'\) \}\);/);
   assert.match(dm, /if \(!whoShown \|\| !copeCopy \|\| !copeSlices\) return null;/);
   assert.match(dm, /onAnswer=\{\(a\) => session\.setExt\(\{ er: \{ whoShowedUp: a \} \}\)\}/, "the named form's answer only");
   assert.match(dm, /copeAheadPartId=\{copeAheadPartId\} toolSessionId=\{session\.id\}/, "prep's pick from this visit");
