@@ -189,6 +189,9 @@ export const PARTS_SLOT_WIDTH = {
   context: 24, anchor: 90, month: 9, want: 20, N: 2, matters: 28, felt: 24,
   // A body place label in lower case (src/data/bodyFigure.ts): the longest is "whole body" / "upper back".
   place: 10,
+  // The parts stats lines (common/stats): the longest tool name in src/data/tools.ts ("Recover from a
+  // hurtful moment"), a count, the longest meet/feel label ("warm toward it"), the longest when_* label.
+  tool: 29, n: 3, then: 14, now: 14, when: 10,
 };
 
 /** Row kind → lint scope, length limit and the slots it may carry. */

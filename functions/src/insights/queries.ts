@@ -7,6 +7,8 @@ import neo4j, { type Record as Neo4jRecord } from 'neo4j-driver';
 import { readTx } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
 import { normalizeToolId } from '../shared/toolIds';
+import { partsReflect } from '../parts/stats';
+import { readStatsRows } from '../parts/statsQueries';
 import type { InsightsDeps } from './handler';
 import type { ActedOnUrge, CheckInRow, LegacyUsageRow, SessionRow, ThenVsNow, TimeRange } from './types';
 
@@ -166,6 +168,8 @@ export function graphDeps(userId: string): InsightsDeps {
         targetPatternId: r.get('targetPatternId'),
       };
     },
+    // Parts (all time, parts on only): the stats module's reads in one transaction, then its compute.
+    parts: async () => partsReflect(await readTx((tx) => readStatsRows(tx, userId))),
     async somaticNarrative(pid) {
       const r = (await read(SOMATIC_NARRATIVE_QUERY, { pid }))[0];
       return (r?.get('patternNarrative') as string | null) || (r?.get('quadrantNarrative') as string | null) || '';

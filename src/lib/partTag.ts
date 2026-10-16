@@ -62,8 +62,8 @@ export function tagRowCopy(content: PartsContent): TagRowCopy {
 
 type SlicePart = Pick<ProfileSlices['parts'][number], 'id' | 'name' | 'status' | 'firstPlace'> & { shapeSig?: number[] | null };
 
-/** A part's chip: its own name, else "The one in your {place}" (first place), else "One you haven't named". */
-export function partChipLabel(part: SlicePart, content: Pick<PartsContent, 'prompts'>): string {
+/** A part's name wherever parts are listed (the tag row's chips, Reflect): its own name, else "The one in your {place}" (first place), else "One you haven't named". */
+export function partChipLabel(part: Pick<SlicePart, 'name' | 'firstPlace'>, content: Pick<PartsContent, 'prompts'>): string {
   const name = part.name?.trim();
   if (name) return name;
   const region = part.firstPlace ? REGIONS[part.firstPlace as RegionId] : undefined;

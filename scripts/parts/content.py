@@ -404,6 +404,20 @@ PROMPTS = [
     # them). {place}: the part's first body place, its label from src/data/bodyFigure.ts in lower case.
     ("part_unnamed_place", "common", "name", "The one in your {place}"),
     ("part_unnamed", "common", "name", "One you haven't named"),
+    # The integration readout (parts.md "The part card", Reflect): one set of lines for Me's card and
+    # Reflect, computed in functions/src/parts/stats.ts, each shown only past its threshold. {tool}: the
+    # app's tool name (src/data/tools.ts); {n}: a count of tags (only better closes are tagged, so a
+    # count, never "3 of 4"); {then} / {now}: meet/feel option labels; {month}: a locale month name;
+    # {when}: a when_* option label.
+    ("stats_helped", "common", "stats", "What's helped it settle"),
+    ("stats_helped_line", "common", "stats", "{tool} helped {n} times"),
+    ("stats_helped_once", "common", "stats", "{tool} helped once"),
+    ("stats_felt", "common", "stats", "How you've felt toward it"),
+    ("stats_felt_then_now", "common", "stats", "In {month}: {then}. Lately: {now}."),
+    ("stats_felt_since", "common", "stats", "Since {month}: {now}."),
+    ("stats_when", "common", "stats", "Mostly {when}"),
+    # Reflect: the parts section's title (after Reflect's own sections; parts on only)
+    ("reflect_title", "reflect", "parts", "The parts you know"),
     # In the moment: only after a move the person picked themselves, parts on, never named
     ("unblend_line", "unblend", "line", "A part of you {move} right now."),
     # The angry-part card (alexithymia-first-interaction.md, "Anger: the angry part"): the fire back urge,
@@ -718,6 +732,11 @@ OPTIONS = [
     opt("tag_skip", "tag", "tag", "Skip", branch="end"),
     opt("tag_later_yes", "tag", "new", "Yes", branch="candidate"),
     opt("tag_later_no", "tag", "new", "No thanks", branch="end"),
+    # {when} in stats_when: the band most tags fall in, in the person's time zone (05-12, 12-17, 17-22, 22-05)
+    opt("when_mornings", "common", "stats", "mornings"),
+    opt("when_afternoons", "common", "stats", "afternoons"),
+    opt("when_evenings", "common", "stats", "evenings"),
+    opt("when_nights", "common", "stats", "at night"),
 
     # --- The angry-part card (the hurt chips at protects are the ProtectedHurt labels, not options) ---
     opt("angry_next", "angry", "unblend", "Okay"),
