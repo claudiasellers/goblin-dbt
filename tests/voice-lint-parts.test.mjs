@@ -103,6 +103,17 @@ test("parts_chip has no voice_distance; parts_prompt does", () => {
   assert.deepEqual(part("How do you feel toward it right now?", "prompt"), []);
 });
 
+test("\"Me\" the screen passes voice_distance in parts copy; \"me\" and an opening \"Me\" still fail", () => {
+  assert.deepEqual(part("It's in Me when you want it.", "prompt"), []);
+  assert.deepEqual(part("You'll find it in Me.", "prompt"), []);
+  assert.ok(partRules("It's in me when you want it.", "prompt").includes("voice_distance"));
+  assert.ok(partRules("Tell me more.", "prompt").includes("voice_distance"));
+  assert.ok(partRules("Me too.", "prompt").includes("voice_distance"), "a sentence's first word is the pronoun");
+  assert.ok(partRules("Done. Me again.", "prompt").includes("voice_distance"));
+  // Only parts copy: the witness corpus and other scopes are unchanged.
+  assert.ok(lintText("It's in Me when you want it.", { scope: "validation" }).some((f) => f.rule === "voice_distance"));
+});
+
 test("findings carry the row's id, field and kind; report-only findings are dropped", () => {
   const [f] = lintPartsCopy([{ id: "meet_feel", field: "label", kind: "prompt", text: "Meet your exile" }]);
   assert.deepEqual(Object.keys(f).sort(), ["field", "id", "kind", "match", "message", "rule", "severity"]);

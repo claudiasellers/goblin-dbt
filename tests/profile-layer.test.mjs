@@ -28,9 +28,9 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
     for (const s of needs) assert.ok(types.SLICE_IDS.includes(s), `${consumer}: ${s}`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["recovering-from-invalidation"], ["name"]);
-  assert.deepEqual(types.PROFILE_NEEDS["find-the-feeling"], ["name"]);
+  assert.deepEqual(types.PROFILE_NEEDS["find-the-feeling"], ["name", "parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS["opposite-action"], []);
-  assert.deepEqual(types.PROFILE_NEEDS["cool-down"], []);
+  assert.deepEqual(types.PROFILE_NEEDS["cool-down"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS.checkin, ["patterns"], "R20: consumer is `checkin`");
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
@@ -45,7 +45,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer === "meet-a-part") continue;
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
-    if (needs.includes("parts")) assert.ok(["today", "five-senses"].includes(consumer), `${consumer} reads parts but is neither Today nor a tag-row host`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "find-the-feeling"].includes(consumer), `${consumer} reads parts but is neither Today nor a tag-row host`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);

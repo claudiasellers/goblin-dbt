@@ -439,7 +439,7 @@ PROMPTS = [
     ("angry_speak_line", "angry", "speak", "I felt {felt}."),
     ("angry_speak_line_plain", "angry", "speak", "I felt {felt}."),
     # Parts on only (PARTS_ON_ONLY): after "Spend a minute with it later?" (the option angry_later) queued it
-    ("angry_later_done", "angry", "speak", "It's there when you want it."),
+    ("angry_later_done", "angry", "speak", "It's in Me when you want it."),
     # Aftercare
     ("aftercare_louder", "aftercare", "louder", "Things can get louder after time with a part."),
     ("aftercare_too_many", "aftercare", "too_many", "You don't need to get to know everyone at once."),

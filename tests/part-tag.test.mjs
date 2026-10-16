@@ -11,7 +11,7 @@ import { PARTS_SLOT_WIDTH } from "../scripts/voice-lint.mjs";
 const read = (f) => readFileSync(f, "utf8");
 const lib = await importTs("src/lib/partTag.ts");
 const { REGIONS, REGION_IDS } = await importTs("src/data/bodyFigure.ts");
-const { TOOL_CLOSE_KIND } = await importTs("src/lib/spine/close.ts");
+const { TOOL_CLOSE_KIND, dirFor } = await importTs("src/lib/spine/close.ts");
 const profileTypes = await importTs("src/data/profileTypes.ts");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
 const TAG_IDS = [...lib.TAG_PROMPTS, ...lib.TAG_OPTIONS, ...lib.UNNAMED_PROMPTS];
@@ -66,22 +66,65 @@ test("chips: up to four, in the slice's order (most recently visited first); nam
   assert.deepEqual(lib.tagChips([], content), [], "no parts kept: the row renders nothing");
 });
 
-test("hosts: exactly the tools whose SessionClose asks then-vs-now, each declaring parts", () => {
-  const toolPage = read("src/pages/ToolPage.tsx");
-  const hosts = Object.entries(TOOL_CLOSE_KIND)
-    .filter(([id, k]) => id !== "meet-a-part" && (k.closeKind === "orienting" || k.closeKind === "regulation_down"))
-    .filter(([id]) => {
-      const comp = toolPage.match(new RegExp(`'${id}': (\\w+),`))?.[1];
-      const file = comp && toolPage.match(new RegExp(`import \\{ ${comp} \\} from '\\./tools/(\\w+)'`))?.[1];
-      return file && /<SessionClose\b/.test(read(`src/pages/tools/${file}.tsx`));
-    })
-    .map(([id]) => id);
+/** A tool's page file, from src/pages/ToolPage.tsx's toolComponents map. */
+const toolPage = read("src/pages/ToolPage.tsx");
+const pageOf = (id) => {
+  const comp = toolPage.match(new RegExp(`'${id}': (\\w+),`))?.[1];
+  const file = comp && toolPage.match(new RegExp(`import \\{ ${comp} \\} from '\\./tools/(\\w+)'`))?.[1];
+  return file ? `src/pages/tools/${file}.tsx` : null;
+};
+/** Tools that may never show the row although their close asks then-vs-now. */
+const NEVER_HOSTS = ["meet-a-part"];
+
+test("hosts: every tool whose close asks then-vs-now, minus Meet a part, each declaring parts", () => {
+  // Derived from the close kinds, so a new tool with a then-vs-now close joins (or fails here).
+  const asks = Object.entries(TOOL_CLOSE_KIND).filter(([, k]) => dirFor(k.closeKind) !== null).map(([id]) => id);
+  const hosts = asks.filter((id) => !NEVER_HOSTS.includes(id));
   assert.deepEqual([...lib.TAG_ROW_TOOLS], hosts);
-  // Meet a part reads `parts` for its own screens (never a host: a part can't be tagged in its own
-  // session) and Today for the check-back card's name; every other reader is a host.
+  assert.deepEqual(hosts, ["cool-down", "five-senses", "find-the-feeling"], "the survey (Oct 2026)");
+  // Every page that closes with a then-vs-now is a host or never one (a tool recording it by hand
+  // without a then-vs-now close kind would fail here).
+  for (const id of Object.keys(TOOL_CLOSE_KIND)) {
+    const page = pageOf(id);
+    if (!page) continue;
+    const src = read(page);
+    if (/\.close\(\{[^}]*thenVsNow/.test(src) || /<SessionClose\b/.test(src) && dirFor(TOOL_CLOSE_KIND[id].closeKind)) {
+      assert.ok(hosts.includes(id) || NEVER_HOSTS.includes(id), `${id} records then-vs-now but shows no tag row`);
+    }
+  }
+  // Meet a part reads `parts` for its own screens and Today for the check-back card's name; every
+  // other reader is a host, and every host reads it.
   const withParts = Object.entries(profileTypes.PROFILE_NEEDS)
     .filter(([c, n]) => !["meet-a-part", "today"].includes(c) && n.includes("parts")).map(([c]) => c);
-  assert.deepEqual(withParts, hosts, "PROFILE_NEEDS parts: the hosts, Meet a part and Today, nothing else");
+  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part and Today, nothing else");
+});
+
+test("each host mounts PartTagSlot under its saved close; the slot is the only gate", () => {
+  for (const id of lib.TAG_ROW_TOOLS) {
+    const src = read(pageOf(id));
+    const viaClose = /<SessionClose\b/.test(src) && !/<SessionClose kind=/.test(src);
+    const own = src.includes(`<PartTagSlot toolId="${id}" toolSessionId={`);
+    assert.ok(viaClose !== own, `${id}: the row through SessionClose or its own close, exactly one`);
+    if (own) {
+      // Saved only when the close call resolves with a session (tagPart refuses an open one).
+      assert.match(src, /\.then\(\(r\) => \{ if \(r\) setCloseSaved\(true\); \}/, id);
+      assert.match(src, /saved=\{closeSaved\}/, id);
+    }
+  }
+  const close = read("src/components/spine/SessionClose.tsx");
+  assert.match(close, /session\.close\(input\)\.then\(\(r\) => \{ if \(r\) setSaved\(true\); \}/);
+  assert.match(close, /<PartTagSlot toolId=\{session\.toolId\} toolSessionId=\{session\.id\} thenVsNow=\{closeAnswer\} saved=\{saved\} \/>/);
+  const slot = read("src/components/spine/PartTagSlot.tsx");
+  assert.match(slot, /if \(!tagRowGate\(\{ partsOn, toolId, thenVsNow, saved, content: parts \}\)\) return null;/);
+  assert.match(slot, /if \(!wantsRow \|\| parts\) return;/, "parts content read only for a row that may show");
+  // Nothing else mounts the row or decides its gate.
+  for (const f of ["src/components/spine/SessionClose.tsx", ...lib.TAG_ROW_TOOLS.map(pageOf)]) {
+    const src = read(f);
+    assert.doesNotMatch(src, /<PartTagRow\b/, f);
+    assert.doesNotMatch(src, /tagRowGate\(/, f);
+  }
+  // Cool Down's Quieter is its one better answer; FTF's quieter / much map to better / much_better.
+  assert.match(read(pageOf("cool-down")), /\{ id: 'quieter', label: 'Quieter', thenVsNow: 'better' \}/);
 });
 
 test("the row: no hard-coded words, after the close is saved, fire-and-forget writes", () => {
@@ -95,10 +138,6 @@ test("the row: no hard-coded words, after the close is saved, fire-and-forget wr
   assert.match(row, /useProfileContext\(toolId\)/, "the host tool's own needs");
   assert.match(row, /<PartFigure shapeSig=\{c\.shapeSig\} size=\{28\} \/>/, "each part's own figure beside its name");
   assert.doesNotMatch(row, /await /, "never blocks leaving");
-  const close = read("src/components/spine/SessionClose.tsx");
-  assert.match(close, /session\.close\(input\)\.then\(\(r\) => \{ if \(r\) setSaved\(true\); \}/);
-  assert.match(close, /<PartTagRow toolId=\{toolId\} toolSessionId=\{session\.id\} content=\{parts\} \/>/);
-  assert.match(close, /if \(!wantsRow \|\| parts\) return;/, "parts content read only for a row that may show");
 });
 
 test("tagPart: registered, signed in, wrapped; PartTag a log label with its constraints, exported and deleted", async () => {

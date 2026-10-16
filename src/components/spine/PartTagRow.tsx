@@ -11,25 +11,28 @@ const quiet = 'min-h-11 px-3 text-sm text-[var(--color-text-tertiary)] hover:tex
 
 /**
  * "Was this a part you know?" (docs/design/parts.md, "the stronger signal"): one quiet, skippable row
- * under a better or much better close. SessionClose mounts it only once its gate holds (src/lib/partTag.ts
+ * under a better or much better close. PartTagSlot mounts it only once its gate holds (src/lib/partTag.ts
  * tagRowGate), so the person's parts are read (the host tool's `parts` slice) only then. No parts kept:
  * nothing. One tap and it folds away with nothing more said; every write is fire and forget, so it
  * never blocks or delays leaving the tool. Skip and "No thanks" write nothing.
  */
-export function PartTagRow({ toolId, toolSessionId, content }: { toolId: TagRowTool; toolSessionId: string; content: PartsContent }) {
+export function PartTagRow({ toolId, toolSessionId, content, onGone }: {
+  toolId: TagRowTool; toolSessionId: string; content: PartsContent; onGone?: () => void;
+}) {
   const profile = useProfileContext(toolId);
   const [state, setState] = useState<'ask' | 'later' | 'gone'>('ask');
+  const fold = () => { setState('gone'); onGone?.(); };
   if (state === 'gone' || !profile.slices) return null;
   const chips = tagChips(profile.slices.parts, content);
   if (chips.length === 0) return null;
   const copy = tagRowCopy(content);
 
   const tag = (partId: string) => {
-    setState('gone');
+    fold();
     tagPart({ id: newId(), partId, toolSessionId }).catch(() => { /* a missed tag is only a missed signal */ });
   };
   const later = (yes: boolean) => {
-    setState('gone');
+    fold();
     if (yes) queuePartCandidate({ id: newId(), origin: 'new_one', moveIds: [], toolSessionId }).catch(() => { /* as above */ });
   };
 
@@ -58,7 +61,7 @@ export function PartTagRow({ toolId, toolSessionId, content }: { toolId: TagRowT
         <button type="button" className={chip} onClick={() => setState('later')}>
           <span className="text-sm">{copy.newOne}</span>
         </button>
-        <button type="button" className={quiet} onClick={() => setState('gone')}>{copy.skip}</button>
+        <button type="button" className={quiet} onClick={fold}>{copy.skip}</button>
       </div>
     </section>
   );

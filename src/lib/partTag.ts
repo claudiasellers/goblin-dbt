@@ -16,11 +16,13 @@ export const TAG_OPTIONS = ['tag_new_one', 'tag_skip', 'tag_later_yes', 'tag_lat
 export const UNNAMED_PROMPTS = ['part_unnamed_place', 'part_unnamed'] as const;
 
 /**
- * The tools whose close can show the row: SessionClose asks then-vs-now there (orienting or
- * regulation down), and the tool isn't Meet a part. Help now, micro-steps and guided activities close
- * with no question. Each declares `parts` in PROFILE_NEEDS (tests/part-tag.test.mjs keeps them equal).
+ * The tools whose close can show the row: every close that asks then-vs-now (src/lib/spine/close.ts
+ * `dirFor` of its close kind), through SessionClose (Five senses) or the tool's own close screen (Cool
+ * Down, Find the feeling), all mounting PartTagSlot. Not Meet a part (a part isn't tagged in its own
+ * visit). Help now, micro-steps, guided activities and the urge / plan / no-question closes record no
+ * then-vs-now. Each declares `parts` in PROFILE_NEEDS (tests/part-tag.test.mjs derives the list).
  */
-export const TAG_ROW_TOOLS = ['five-senses'] as const;
+export const TAG_ROW_TOOLS = ['cool-down', 'five-senses', 'find-the-feeling'] as const;
 export type TagRowTool = (typeof TAG_ROW_TOOLS)[number];
 
 /** The closes that count as "it helped" (the server refuses any other: functions/src/parts/tag.ts). */

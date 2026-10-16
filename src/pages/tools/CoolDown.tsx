@@ -5,6 +5,7 @@ import { useToolSession } from '../../hooks/useToolSession';
 import type { ThenVsNow } from '../../data/capacityTypes';
 import { primaryButton } from '../../components/tools/oppositeAction/styles';
 import { buzz } from '../../components/tools/regulation/hooks';
+import { PartTagSlot } from '../../components/spine/PartTagSlot';
 
 // Circuit Breaker (tool id stays `cool-down`): TIPP temperature, cold on the face.
 // Interim frontend copy (D-06): moves to graph content with DT-01.
@@ -137,6 +138,8 @@ export function CoolDown() {
 
   const [step, setStep] = useState<Step>('ready');
   const [pick, setPick] = useState<ChoiceId | null>(null);
+  // "Was this a part you know?" waits for the server to have the Quieter close (tagPart refuses an open one).
+  const [closeSaved, setCloseSaved] = useState(false);
   const [, setNow] = useState(() => Date.now());
   const stepRef = useRef<Step>('ready');
   const leadEnds = useRef(0);
@@ -213,7 +216,10 @@ export function CoolDown() {
   const choose = (c: (typeof CHOICES)[number]) => {
     setPick(c.id);
     if (c.id === 'quieter') {
-      if (!closed.current) { closed.current = true; void session.close({ status: 'completed', thenVsNow: c.thenVsNow }); }
+      if (!closed.current) {
+        closed.current = true;
+        session.close({ status: 'completed', thenVsNow: c.thenVsNow }).then((r) => { if (r) setCloseSaved(true); }, () => { /* the close is optional */ });
+      }
       return;
     }
     // Still loud / about the same: save this round's answer now (a session left open would close
@@ -347,6 +353,9 @@ export function CoolDown() {
                 {COPY.doneLink}
               </Link>
             </div>
+          )}
+          {pick === 'quieter' && (
+            <PartTagSlot toolId="cool-down" toolSessionId={session.id} thenVsNow={CHOICES.find((x) => x.id === 'quieter')?.thenVsNow} saved={closeSaved} />
           )}
         </section>
       )}
