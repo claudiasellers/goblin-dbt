@@ -7,8 +7,9 @@
  * person's yes, once per line id; the line carries `partIds` (two kept parts) so Delete your parts can
  * ask about it separately, and the visit links to it (KEPT_LINE, under GUARDS.PullsSession.keep).
  *
- * With two kept parts this is also where `PartLink {kind: 'two_pulls', bothWantId}` is written, through
- * lane 2's links.ts (writePartLink), once that lands.
+ * With two kept parts the same yes links them in the den: `PartLink {kind: 'two_pulls', bothWantId}`,
+ * through links.ts' writePartLink in this transaction (the only PartLink writer; one link per pair and
+ * kind, a repeat keeps the latest both-want). A pair-only visit has no parts to link.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -16,6 +17,7 @@ import { int } from '../../shared/values';
 import { GUARDS } from '../../userdata/lifecycle';
 import { userKey } from '../../userdata/ownership';
 import { partsOff } from '../keep';
+import { writePartLink } from '../links';
 import type { KeepPullsKeepsakeResponse } from './types';
 
 /** The keepsake's prompts and the pair-only name (scripts/parts/content.py). */
@@ -39,6 +41,8 @@ export interface KeepsakeState {
   b: KeepsakeSide;
   /** The picked bothWant chip's label, only when it is one of the visit's pair's and signed off. */
   want: string | null;
+  /** Its id (the PartLink's bothWantId). */
+  bothWantId: string | null;
   /** Signed-off copy by id (the keepsake lines, the pair-only name). */
   copy: Record<string, string>;
   /** This line id is already the caller's OwnLine: a repeat. */
@@ -50,6 +54,8 @@ export interface KeepsakeDeps {
   /** The OwnLine, the visit's KEPT_LINE, the profile version bump. Returns the new version. */
   write(input: { sessionId: string; lineId: string; text: string; partIds: string[] }): Promise<number>;
   version(): Promise<number>;
+  /** Two kept parts: the den's `two_pulls` link (writePartLink). Its id and the profile version after it. */
+  link(input: { aId: string; bId: string; bothWantId: string | null }): Promise<{ id: string; version: number }>;
 }
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -105,7 +111,11 @@ export async function keepPullsKeepsakeHandler(
   const text = a && b ? keepsakeText(st.copy, a, b, st.want) : null;
   if (!text) throw new HttpsError('failed-precondition', 'The keepsake is not ready');
   const partIds = st.entry === 'parts' && st.aId && st.bId ? [st.aId, st.bId] : [];
-  const version = await deps.write({ sessionId: input.sessionId, lineId: input.lineId, text, partIds });
+  let version = await deps.write({ sessionId: input.sessionId, lineId: input.lineId, text, partIds });
+  if (partIds.length === 2) {
+    const link = await deps.link({ aId: partIds[0], bId: partIds[1], bothWantId: st.bothWantId });
+    return { lineId: input.lineId, text, version: link.version, linkId: link.id };
+  }
   return { lineId: input.lineId, text, version };
 }
 
@@ -127,7 +137,7 @@ export const KEEPSAKE_STATE_QUERY = `
          ps.aId AS aId, ps.bId AS bId,
          pa IS NOT NULL AS aFound, pa.name AS aName, ma.unblendPhrase AS aPhrase,
          pb IS NOT NULL AS bFound, pb.name AS bName, mb.unblendPhrase AS bPhrase,
-         w.label AS want, same.text AS existingText, collect(c {.id, .copy}) AS copy
+         w.label AS want, w.id AS bothWantId, same.text AS existingText, collect(c {.id, .copy}) AS copy
 `;
 
 /** The line (create once), the visit's link to it, and a new profile version (a kept line is profile). */
@@ -172,6 +182,7 @@ export function keepsakeDeps(tx: ManagedTransaction, uid: string): KeepsakeDeps 
         a: { found: r?.get('aFound') === true, name: str(r?.get('aName')), unblendPhrase: str(r?.get('aPhrase')) },
         b: { found: r?.get('bFound') === true, name: str(r?.get('bName')), unblendPhrase: str(r?.get('bPhrase')) },
         want: str(r?.get('want')),
+        bothWantId: str(r?.get('bothWantId')),
         copy,
         existing: existing !== null ? { text: existing } : null,
       };
@@ -186,6 +197,10 @@ export function keepsakeDeps(tx: ManagedTransaction, uid: string): KeepsakeDeps 
     async version() {
       const r = (await tx.run(VERSION_QUERY, { uid })).records[0];
       return int(r?.get('version') ?? 0);
+    },
+    async link({ aId, bId, bothWantId }) {
+      const out = await writePartLink(tx, uid, { kind: 'two_pulls', aId, bId, ...(bothWantId ? { bothWantId } : {}) });
+      return { id: out.id, version: out.version };
     },
   };
 }

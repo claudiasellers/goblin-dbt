@@ -14,6 +14,7 @@ for (const [file, marker] of [
   ["tagTypes.ts", "export interface TagPartRequest"],
   ["checkbackTypes.ts", "export interface SchedulePartCheckbackRequest"],
   ["statsTypes.ts", "export interface PartStats"],
+  ["denTypes.ts", "export type PartLinkKind"],
 ]) {
   test(`types mirror: src/data/partsTypes.ts carries functions/src/parts/${file} unchanged (after the header)`, () => {
     const body = read(`functions/src/parts/${file}`).split("\n").slice(4).join("\n").trim();

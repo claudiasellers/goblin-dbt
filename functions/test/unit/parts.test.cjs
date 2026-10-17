@@ -241,16 +241,17 @@ test('partsEnabled: updateUserProfile writes a boolean and rejects anything else
 
 const { PARTS_LABELS, PARTS_FOLLOW_UP_TYPES } = require('../../lib/parts/delete');
 const { USER_DATA } = require('../../lib/userdata/layers');
+const { DEN_LAYOUT_QUERY } = require('../../lib/parts/denSnapshot');
 
 test('PARTS_LABELS: every registered parts label, nothing else (later phases join by registering)', () => {
-  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartRevisit', 'PartSession', 'PartTag', 'PullsSession', 'TrailOffer']);
+  assert.deepEqual([...PARTS_LABELS].sort(), ['DenSnapshot', 'Part', 'PartCandidate', 'PartLink', 'PartRevisit', 'PartSession', 'PartTag', 'PullsSession', 'TrailOffer']);
   const partsLike = Object.keys(USER_DATA).filter((l) => /^(Part|Den|Trail|Pulls)/.test(l));
   assert.deepEqual([...PARTS_LABELS].sort(), partsLike.sort(), 'a registered parts label deleteMyParts would miss');
   for (const l of ['ToolSession', 'CheckIn', 'FollowUp', 'SkillPractice', 'ProfileFact', 'OwnLine']) assert.ok(!PARTS_LABELS.includes(l), l);
 });
 
 test('deleteMyParts: the caller\'s parts records and parts follow-ups, one write, counts only; parts off too', async () => {
-  const counts = { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, TrailOffer: 6, PullsSession: 0 };
+  const counts = { Part: 2, PartLink: 1, DenSnapshot: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, TrailOffer: 6, PullsSession: 0 };
   const f = fakeDriver((q) => {
     const label = /MATCH \(n:(\w+) \{ownerId: \$uid\}\)/.exec(q)?.[1];
     if (label) return [{ n: counts[label] }];
@@ -259,7 +260,7 @@ test('deleteMyParts: the caller\'s parts records and parts follow-ups, one write
   });
   setDriver(f.driver);
   const out = await fns.deleteMyParts.run({ auth: auth('u7'), data: {} });
-  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, TrailOffer: 6, PullsSession: 0, FollowUp: 1 } });
+  assert.deepEqual(out, { deleted: { Part: 2, PartLink: 1, DenSnapshot: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, TrailOffer: 6, PullsSession: 0, FollowUp: 1 } });
   assert.equal(f.sessions.length, 1, 'one transaction');
   assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
   for (const c of f.calls) {
@@ -268,7 +269,7 @@ test('deleteMyParts: the caller\'s parts records and parts follow-ups, one write
     assert.doesNotMatch(c.query, /ToolSession|CheckIn|SkillPractice|PatternOffer/, 'never touches other records');
   }
   const deletes = f.calls.filter((c) => /DETACH DELETE/.test(c.query));
-  assert.equal(deletes.length, 8);
+  assert.equal(deletes.length, 10);
   const fu = f.calls.find((c) => /FollowUp/.test(c.query));
   assert.match(fu.query, /WHERE f\.type IN \$types\s+WITH collect/, 'every parts follow-up, open or answered');
   assert.deepEqual(fu.params.types, PARTS_FOLLOW_UP_TYPES);
@@ -278,7 +279,7 @@ test('deleteMyParts: the caller\'s parts records and parts follow-ups, one write
   // Nothing kept: nothing deleted, no profile version bump.
   const g = fakeDriver((q) => (/RETURN size/.test(q) ? [{ n: 0 }] : []));
   setDriver(g.driver);
-  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, PartRevisit: 0, PartTag: 0, TrailOffer: 0, PullsSession: 0, FollowUp: 0 });
+  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartLink: 0, DenSnapshot: 0, PartSession: 0, PartCandidate: 0, PartRevisit: 0, PartTag: 0, TrailOffer: 0, PullsSession: 0, FollowUp: 0 });
   assert.ok(!g.calls.some((c) => /profileVersion/.test(c.query)));
 });
 
@@ -640,11 +641,13 @@ test('keepPart over the fake driver: caller-scoped keys, guarded writes, profile
       return [{ partsOn: true, session: { ...stored(), keepable: true }, part: null, linkedPartId: null, nameMaxChars: 40, revisitAfterDays: 30 }];
     }
     if (q === K.KEEP_NEW_QUERY) return [{ id: p.partId }];
+    if (q === DEN_LAYOUT_QUERY) return []; // the day's den snapshot reads the room after the keep
     return new Error('unexpected');
   });
   setDriver(f.driver);
   const out = await fns.keepPart.run({ auth: auth('real-user'), data: { sessionId: SID, partId: NEW_PART, name: 'the one who hides' } });
   assert.deepEqual(out, { partId: NEW_PART, created: true });
+  assert.equal(f.calls.at(-1).query, DEN_LAYOUT_QUERY, 'the snapshot comes after the write, in the same transaction');
   const w = f.calls.find((c) => c.query === K.KEEP_NEW_QUERY);
   assert.deepEqual([w.params.uid, w.params.sessionKey, w.params.partKey], ['real-user', `real-user:${SID}`, `real-user:${NEW_PART}`]);
   assert.equal(w.params.revisitDays, 30);

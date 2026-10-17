@@ -10,6 +10,7 @@ import {
   ACTIVE_REVISIT_ANSWERS, ANCHOR_MAX_CHARS, JOB_HISTORY_MAX, RATHER_IDS_MAX, RESTING_REVISIT_ANSWERS,
   type PartJobHistoryEntry, type PartRevisitAnswer,
 } from './keepTypes';
+import { PART_LAYOUT_MAX, type PartLayoutPosition } from './denTypes';
 
 const fail = (m: string): never => { throw new ValidationError(m); };
 
@@ -25,6 +26,26 @@ export interface RevisitInput extends PartRef { id: string; answer: PartRevisitA
 export interface ShapeInput extends PartRef { toolSessionId: string }
 /** Exactly one of the two is set. */
 export interface AnchorInput extends PartRef { lineId: string | null; own: string | null }
+
+/** The den's drop: where the person put each part (0..1 across and down). */
+export interface LayoutInput { positions: PartLayoutPosition[] }
+
+/** 1 to PART_LAYOUT_MAX positions, one per part, each 0..1. Nothing else on a part is accepted. */
+export function validateLayout(raw: unknown): LayoutInput {
+  const o = obj(raw);
+  only(o, ['positions']);
+  if (!Array.isArray(o.positions) || o.positions.length < 1 || o.positions.length > PART_LAYOUT_MAX) {
+    fail(`positions: 1 to ${PART_LAYOUT_MAX}`);
+  }
+  const positions = (o.positions as unknown[]).map((x) => {
+    const q = obj(x);
+    only(q, ['partId', 'mapX', 'mapY']);
+    const [mapX, mapY] = unit([q.mapX, q.mapY], 2, 'mapX, mapY');
+    return { partId: uuid(q.partId), mapX, mapY };
+  });
+  if (new Set(positions.map((x) => x.partId.toLowerCase())).size !== positions.length) fail('positions: one per part');
+  return { positions };
+}
 
 export function validatePartRef(raw: unknown): PartRef {
   const o = obj(raw);

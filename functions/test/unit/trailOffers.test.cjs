@@ -567,6 +567,7 @@ test('keepPart from an offer: source offer, ACCEPTED_FROM the offer (an edge int
   const f = fakeDriver((q, p) => {
     if (q === K.KEEP_STATE_QUERY) return [{ partsOn: true, session: stored, part: null, linkedPartId: null, nameMaxChars: 40, revisitAfterDays: 30 }];
     if (q === K.KEEP_NEW_QUERY) return [{ id: p.partId }];
+    if (q === require('../../lib/parts/denSnapshot').DEN_LAYOUT_QUERY) return []; // the day's den snapshot
     return new Error('unexpected');
   });
   setDriver(f.driver);

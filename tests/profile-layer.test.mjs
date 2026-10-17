@@ -25,7 +25,7 @@ test("types mirror: src/data/profileTypes.ts equals functions/src/profile/types.
 
 test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 Phase A needs", () => {
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
-    assert.ok(toolIds.has(consumer) || ["checkin", "today", "witness"].includes(consumer), consumer);
+    assert.ok(toolIds.has(consumer) || ["checkin", "today", "witness", "me"].includes(consumer), consumer);
     for (const s of needs) assert.ok(types.SLICE_IDS.includes(s), `${consumer}: ${s}`);
   }
   assert.deepEqual(types.PROFILE_NEEDS["recovering-from-invalidation"], ["name"]);
@@ -38,11 +38,16 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts"], "the tag row on its urge close");
   assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts"], "the tag row on its urge close");
-  assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness"]);
+  assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness", "me"]);
+  // The den (Me only, server-side: getDen adds the recency bucket from the log); no other consumer reads it.
+  assert.deepEqual(types.PROFILE_NEEDS.me, ["den"]);
+  for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
+    if (consumer !== "me") assert.ok(!needs.includes("den"), `${consumer} reads den`);
+  }
   // Parts: the slices exist; no tool reads them before it renders them. Meet a part reads them (it
   // renders them); Phase 3's tag row is the first render on other tools' closes: exactly the tools that
   // can show it read `parts`, and none of them partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
-  assert.deepEqual(types.SLICE_IDS.slice(-3), ["parts", "partDetail", "partAnchors"]);
+  assert.deepEqual(types.SLICE_IDS.slice(-4), ["parts", "partDetail", "partAnchors", "den"]);
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
   // DEAR MAN's cope ahead (Phase 3) shows parts, their anchors and the kept lines to pick one from;
   // never partDetail (fears and jobs it never shows).
@@ -89,6 +94,34 @@ test("parts slices: gated on partsEnabled, HAS_PART only, active / resting only,
   assert.match(anchors, /OPTIONAL MATCH \(u\)-\[:SAVED_LINE\]->\(l:ValidationLine\) WHERE l\.id = p\.anchorLineId/);
   assert.match(anchors, /coalesce\(p\.anchorOwn, head\(collect\(o\.text\)\), head\(collect\(l\.text\)\)\) AS text/);
   assert.doesNotMatch(anchors, /jobIds|fearIds|ownJob|ownFear|ownVoice|GUARDS/);
+});
+
+test("den slice: gated on partsEnabled, active / resting parts, links between two parts in the room, no log, no fears or own words", () => {
+  const q = slices.SLICE_QUERIES.den;
+  assert.match(q, /^MATCH \(u:User \{id: \$uid\}\) WHERE coalesce\(u\.partsEnabled, false\)\s+OPTIONAL MATCH \(u\)-\[:HAS_PART\]->\(p:Part\) WHERE p\.status IN \['active', 'resting'\]/);
+  assert.doesNotMatch(q, /set_aside/);
+  assert.doesNotMatch(q, /:LogRecord\b|:PartSession\b|:PartTag\b|:PartCandidate\b|:TrailOffer\b|:PartRevisit\b|:FollowUp\b/);
+  assert.ok(q.includes(partSafety.partSafetyCypher("p")), "the safety seam");
+  assert.doesNotMatch(q.replace(partSafety.partSafetyCypher("p"), ""), /jobIds|fearIds|ownJob|ownFear|ownVoice|places/);
+  assert.match(q, /la\.id = l\.aId AND la\.status IN \['active', 'resting'\]/);
+  assert.match(q, /lb\.id = l\.bId AND lb\.status IN \['active', 'resting'\]/);
+  assert.match(q, /\[\.\.50\] AS parts/);
+});
+
+test("den resolver: coordinates outside 0..1 are null, unknown link kinds dropped, nothing without a row", async () => {
+  const run = async (row) => {
+    const tx = { run: async () => ({ records: row ? [{ get: (k) => row[k], has: (k) => k in row }] : [] }) };
+    return (await slices.readProfileSlices(tx, "u1", "me")).den;
+  };
+  assert.deepEqual(await run(null), { parts: [], links: [], snapshots: [] });
+  const den = await run({
+    parts: [{ id: "p1", name: "the one who hides", status: "resting", tender: null, shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5], mapX: 1.2, mapY: 0.5, lastVisitedAt: "2026-10-01T10:00:00Z", safety: true }],
+    links: [{ id: "l1", kind: "covers_for", aId: "p1", bId: "p2", bothWantId: null }, { id: "l2", kind: "other", aId: "p1", bId: "p2" }],
+    snapshots: [{ id: "den_2026-10-01", takenAt: "2026-10-01T10:00:00Z" }],
+  });
+  assert.deepEqual(den.parts, [{ id: "p1", name: "the one who hides", status: "resting", tender: false, shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5], mapX: null, mapY: 0.5, lastVisitedAt: "2026-10-01T10:00:00Z", safety: true }]);
+  assert.deepEqual(den.links.map((l) => l.id), ["l1"]);
+  assert.deepEqual(den.snapshots, [{ id: "den_2026-10-01", takenAt: "2026-10-01T10:00:00Z" }]);
 });
 
 /** A read transaction that answers each query from `rows(query)`; records which queries ran. */

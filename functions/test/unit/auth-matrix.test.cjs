@@ -27,6 +27,7 @@ const AUTHED = [
   'startPullsSession', 'savePullsSession', 'keepPullsKeepsake', 'schedulePullsCheckback', // Two pulls: the caller's own visit
   'getTrailOfferEvidence', 'answerTrailOffer', // the caller's own trail offer (Phase 4, built off)
   'getReflectTrails', 'answerKnownPartReview', 'removeTrailPattern', // Reflect: the caller's own rule D batch and plain patterns
+  'getDen', 'getDenSnapshot', 'updatePartLayout', 'linkParts', 'unlinkParts', // the den: the caller's own parts and links
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in

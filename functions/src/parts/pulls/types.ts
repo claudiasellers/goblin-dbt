@@ -85,11 +85,11 @@ export interface PullsSessionResponse { id: string; status: 'open' | 'saved' }
 /**
  * "Keep this": the keepsake, built on the server from the stored visit (the two names, what they both
  * want, the signed-off keepsake lines), saved to My words as an OwnLine (`source: 'two_pulls'`).
- * `lineId` is a client UUID for the line. With two kept parts it also links them (PartLink
- * `kind: 'two_pulls'`, lane 2's writePartLink) once that ships.
+ * `lineId` is a client UUID for the line. With two kept parts it also links them in the den
+ * (PartLink `kind: 'two_pulls'`, `linkId`).
  */
 export interface KeepPullsKeepsakeRequest { sessionId: string; lineId: string }
-export interface KeepPullsKeepsakeResponse { lineId: string; text: string; version: number }
+export interface KeepPullsKeepsakeResponse { lineId: string; text: string; version: number; linkId?: string }
 
 /** On the close's yes: check back with both kept parts in a week (the type's window, computed on the device). */
 export interface SchedulePullsCheckbackRequest { id: string; sessionId: string; dueAt: string }

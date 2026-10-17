@@ -65,6 +65,10 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   MyPattern: { layer: 'profile', rel: 'HAS_PATTERN', exportAs: 'myPatterns' },
   OwnLine: { layer: 'profile', rel: 'HAS_OWN_LINE', exportAs: 'ownLines' }, // A5-2 (R16): say it my way
   Part: { layer: 'profile', rel: 'HAS_PART', exportAs: 'parts' }, // keepPart is its only writer (9b's yes)
+  // The den: parts/links.ts is PartLink's only writer (on a yes; id derived from kind + pair, one per pair
+  // and kind), parts/denSnapshot.ts DenSnapshot's (the server's, `den_<UTC day>`, one per day).
+  PartLink: { layer: 'profile', rel: 'HAS_PART_LINK', exportAs: 'partLinks' },
+  DenSnapshot: { layer: 'profile', rel: 'HAS_DEN_SNAPSHOT', exportAs: 'denSnapshots' },
   // ---- system ----
   PushToken: { layer: 'system', rel: 'HAS_PUSH_TOKEN' },
 };

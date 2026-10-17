@@ -16,6 +16,7 @@ const CB = require('../../lib/parts/pulls/checkback');
 const PCB = require('../../lib/parts/checkback');
 const TY = require('../../lib/parts/pulls/types');
 const A = require('../../lib/parts/offers/answer');
+const L = require('../../lib/parts/links');
 const { writable: guardAllows } = require('../../lib/userdata/lifecycle');
 const { USER_DATA } = require('../../lib/userdata/layers');
 
@@ -156,28 +157,33 @@ const COPY = {
 const ksState = (o = {}) => ({
   partsOn: true, sessionFound: true, keepable: true, entry: 'parts', stopReason: 'done', aId: PA, bId: PB,
   a: { found: true, name: 'the watcher', unblendPhrase: 'keeps watch' }, b: { found: true, name: 'Rocket', unblendPhrase: 'pushes on' },
-  want: 'to keep you safe', copy: COPY, existing: null, ...o,
+  want: 'to keep you safe', bothWantId: 'want_safe', copy: COPY, existing: null, ...o,
 });
 const ksDeps = (o = {}) => {
   const writes = [];
-  return { writes, deps: { state: async () => ksState(o), write: async (w) => { writes.push(w); return 9; }, version: async () => 8 } };
+  const links = [];
+  return { writes, links, deps: { state: async () => ksState(o), write: async (w) => { writes.push(w); return 9; }, version: async () => 8,
+    link: async (l) => { links.push(l); return { id: 'link1', version: 10 }; } } };
 };
 const KEEP = { sessionId: SID, lineId: LID };
 
 test('keepsake: built on the server from the stored visit, both names and what they both want, kept once', async () => {
   const k = ksDeps();
   assert.deepEqual(await KS.keepPullsKeepsakeHandler(KEEP, k.deps),
-    { lineId: LID, text: 'the watcher and Rocket both want to keep you safe. I get to choose what happens next.', version: 9 });
+    { lineId: LID, text: 'the watcher and Rocket both want to keep you safe. I get to choose what happens next.', version: 10, linkId: 'link1' });
   assert.deepEqual(k.writes[0].partIds, [PA, PB], 'two kept parts');
+  assert.deepEqual(k.links, [{ aId: PA, bId: PB, bothWantId: 'want_safe' }], 'the same yes links them in the den');
   // Pair only: the generated names, the lead capitalised; no part ids.
   const p = ksDeps({ entry: 'pair', aId: null, bId: null, a: { found: false, name: null, unblendPhrase: 'keeps watch' }, b: { found: false, name: null, unblendPhrase: 'pushes on' } });
   const out = await KS.keepPullsKeepsakeHandler(KEEP, p.deps);
   assert.equal(out.text, 'The part that keeps watch and the part that pushes on both want to keep you safe. I get to choose what happens next.');
   assert.deepEqual(p.writes[0].partIds, []);
+  assert.equal(p.links.length, 0, 'pair only: no parts to link');
+  assert.equal(out.linkId, undefined);
   // A repeat returns the line, writes nothing.
   const r = ksDeps({ existing: { text: 'kept before' } });
   assert.deepEqual(await KS.keepPullsKeepsakeHandler(KEEP, r.deps), { lineId: LID, text: 'kept before', version: 8 });
-  assert.equal(r.writes.length, 0);
+  assert.equal(r.writes.length + r.links.length, 0);
 });
 
 test('keepsake refusals: parts off, not found, past keeping, a conservative stop, no want, a part gone, copy not signed off', async () => {
@@ -204,16 +210,22 @@ test('keepsake write: an OwnLine in My words (profile), the visit\'s KEPT_LINE u
     if (q === KS.KEEPSAKE_STATE_QUERY) {
       return [{ partsOn: true, sessionFound: true, keepable: true, entry: 'parts', stopReason: 'done', aId: PA, bId: PB,
         aFound: true, aName: 'Watcher', aPhrase: 'keeps watch', bFound: true, bName: 'Rocket', bPhrase: 'pushes on',
-        want: 'rest', existingText: null, copy: Object.entries(COPY).map(([id, copy]) => ({ id, copy })) }];
+        want: 'rest', bothWantId: 'want_rest', existingText: null, copy: Object.entries(COPY).map(([id, copy]) => ({ id, copy })) }];
     }
     if (q === KS.KEEPSAKE_WRITE_QUERY) return [{ version: 3 }];
+    if (q === L.LINK_STATE_QUERY) return [{ partsOn: true, version: 3, aFound: true, bFound: true, linked: false, bothWantKnown: true }];
+    if (q === L.WRITE_PART_LINK_QUERY) return [{ version: 4 }];
     return [];
   });
   setDriver(f.driver);
   const out = await fns.keepPullsKeepsake.run({ auth: auth('u5'), data: KEEP });
-  assert.deepEqual(out, { lineId: LID, text: 'Watcher and Rocket both want rest. I get to choose what happens next.', version: 3 });
+  const linkId = L.partLinkId('two_pulls', PA, PB);
+  assert.deepEqual(out, { lineId: LID, text: 'Watcher and Rocket both want rest. I get to choose what happens next.', version: 4, linkId });
   const w = f.calls.find((c) => c.query === KS.KEEPSAKE_WRITE_QUERY);
   assert.deepEqual([w.params.lineKey, w.params.sessionKey], [`u5:${LID}`, `u5:${SID}`]);
+  const lw = f.calls.find((c) => c.query === L.WRITE_PART_LINK_QUERY);
+  assert.deepEqual([lw.params.kind, lw.params.aId, lw.params.bId, lw.params.bothWantId, lw.params.source], ['two_pulls', PA, PB, 'want_rest', 'two_pulls']);
+  assert.equal(f.sessions.length, 1, 'the line and the link in one write transaction');
   await assert.rejects(fns.keepPullsKeepsake.run({ auth: auth('u5'), data: { ...KEEP, text: 'mine' } }), code('invalid-argument'), 'never client text');
 });
 

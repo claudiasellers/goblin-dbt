@@ -10,7 +10,10 @@
  * a kept part on the person's own tap; each bumps `u.profileVersion` and returns `{ version }`.
  * Find the feeling's "Use this shape for {name}?" gives a kept part the shape of the visit it was tagged
  * in (setPartShape, read from that visit's own record). The check-back's Louder pauses a part
- * (PAUSE_PART_QUERY, last).
+ * (PAUSE_PART_QUERY, last). The den's drop moves parts (updatePartLayout: `mapX` / `mapY` only).
+ *
+ * Keeping a new part, resting or waking one, and a still-true answer that rests, wakes or re-jobs one also
+ * take the day's den snapshot (denSnapshot.ts) in the same transaction, after the write (`deps.snapshot`).
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -23,9 +26,11 @@ import {
 } from './keepPlan';
 import type { KeepPartResponse, PartWriteResponse } from './keepTypes';
 import {
-  newJob, revisitTransition, shapeSigFromFtf, type AnchorInput, type PartRef, type RenameInput, type RestInput,
+  newJob, revisitTransition, shapeSigFromFtf, type AnchorInput, type LayoutInput, type PartRef, type RenameInput, type RestInput,
   type RevisitInput, type ShapeInput,
 } from './editPlan';
+import type { UpdatePartLayoutResponse } from './denTypes';
+import { snapshotDen } from './denSnapshot';
 
 export const partsOff = () => new HttpsError('failed-precondition', 'Parts are off');
 
@@ -124,6 +129,8 @@ export interface KeepDeps {
   /** The guarded writes; false when the guard (or parts off) stopped them. */
   create(w: KeepWrite): Promise<boolean>;
   revisit(w: KeepWrite): Promise<boolean>;
+  /** The day's den snapshot, after a new part is kept. */
+  snapshot?(): Promise<unknown>;
 }
 
 export async function keepPartHandler(input: KeepInput, deps: KeepDeps): Promise<KeepPartResponse> {
@@ -150,6 +157,7 @@ export async function keepPartHandler(input: KeepInput, deps: KeepDeps): Promise
   }
   const ok = await deps.create({ ...base, fields: visit, name: name ?? null });
   if (!ok) throw new HttpsError('failed-precondition', 'This visit is closed');
+  await deps.snapshot?.();
   return { partId: input.partId, created: true };
 }
 
@@ -193,6 +201,7 @@ export function keepDeps(tx: ManagedTransaction, uid: string): KeepDeps {
     async revisit(w) {
       return (await tx.run(KEEP_REVISIT_QUERY, params(w))).records.length > 0;
     },
+    snapshot: () => snapshotDen(tx, uid),
   };
 }
 
@@ -271,6 +280,8 @@ export interface PartEditDeps {
   state(q: { partId: string; revisitId?: string; ratherIds?: string[]; lineId?: string }): Promise<PartEditState>;
   /** One of the queries above; the new profile version, or null when its guard stopped it. */
   write(query: string, params: Record<string, unknown>): Promise<number | null>;
+  /** The day's den snapshot, after a write that changes who is in the room or how (rest, wake, a new job). */
+  snapshot?(): Promise<unknown>;
 }
 
 const notFound = () => new HttpsError('not-found', 'Part not found');
@@ -303,7 +314,9 @@ export async function restPartHandler(input: RestInput, deps: PartEditDeps): Pro
   if (status === 'set_aside') throw new HttpsError('failed-precondition', 'Set aside: restore it first');
   const to = input.resting ? 'resting' : 'active';
   if (status === to) return { version: st.version };
-  return written(deps, REST_PART_QUERY, { partId: input.partId, from: status, to });
+  const out = await written(deps, REST_PART_QUERY, { partId: input.partId, from: status, to });
+  await deps.snapshot?.();
+  return out;
 }
 
 export async function setAsidePartHandler(input: PartRef, deps: PartEditDeps): Promise<PartWriteResponse> {
@@ -352,10 +365,12 @@ export async function answerPartRevisitHandler(
   if (!to) throw new HttpsError('failed-precondition', `"${input.answer}" doesn't fit a ${status} part`);
   if (st.knownRather !== input.ratherIds.length) throw new HttpsError('invalid-argument', 'ratherIds: unknown option');
   const jobFields = input.answer === 'new' ? newJob(part, input.ratherIds, today) : {};
-  return written(deps, ANSWER_PART_REVISIT_QUERY, {
+  const out = await written(deps, ANSWER_PART_REVISIT_QUERY, {
     id: input.id, partId: input.partId, answer: input.answer, ratherIds: input.ratherIds,
     from: status, to, jobFields, revisitDays: st.revisitDays,
   });
+  if (to !== status || input.answer === 'new') await deps.snapshot?.();
+  return out;
 }
 
 export function partEditDeps(tx: ManagedTransaction, uid: string): PartEditDeps {
@@ -383,6 +398,65 @@ export function partEditDeps(tx: ManagedTransaction, uid: string): PartEditDeps 
         uid, partKey: userKey(uid, params.partId as string),
         ...(typeof params.id === 'string' ? { revisitKey: userKey(uid, params.id) } : {}),
         ...params,
+      })).records[0];
+      return r ? toNumber(r.get('version')) ?? 0 : null;
+    },
+    snapshot: () => snapshotDen(tx, uid),
+  };
+}
+
+// ---- The den's drop: where the person put each part ----
+
+/** Parts on, and how many of the asked parts are the caller's and in the room (active or resting). */
+export const LAYOUT_STATE_QUERY = `
+  OPTIONAL MATCH (u:User {id: $uid})
+  OPTIONAL MATCH (u)-[:HAS_PART]->(p:Part) WHERE p.key IN $partKeys AND p.status IN ['active', 'resting']
+  RETURN coalesce(u.partsEnabled, false) AS partsOn, coalesce(u.profileVersion, 0) AS version, count(p) AS found
+`;
+
+/**
+ * Positions only: not a visit (`lastVisitedAt` stays) and not a confirmation (`confirmedAt`, `revisitAt`
+ * stay). The profile version moves, so a cached read of the room drops.
+ */
+export const UPDATE_PART_LAYOUT_QUERY = `
+  MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
+  UNWIND $positions AS pos
+  MATCH (u)-[:HAS_PART]->(p:Part {key: pos.partKey}) WHERE p.status IN ['active', 'resting']
+  SET p.mapX = pos.mapX, p.mapY = pos.mapY
+  WITH u, count(p) AS moved
+  SET u.profileVersion = coalesce(u.profileVersion, 0) + 1
+  RETURN u.profileVersion AS version, moved
+`;
+
+export interface PartLayoutDeps {
+  state(partIds: string[]): Promise<{ partsOn: boolean; version: number; found: number }>;
+  /** The new profile version, or null when nothing was moved. */
+  write(positions: LayoutInput['positions']): Promise<number | null>;
+}
+
+/** The den's drop: any number of the caller's active or resting parts, all or none. Idempotent. */
+export async function updatePartLayoutHandler(input: LayoutInput, deps: PartLayoutDeps): Promise<UpdatePartLayoutResponse> {
+  const st = await deps.state(input.positions.map((x) => x.partId));
+  if (!st.partsOn) throw partsOff();
+  if (st.found !== input.positions.length) throw notFound();
+  const version = await deps.write(input.positions);
+  if (version === null) throw changed();
+  return { version };
+}
+
+export function partLayoutDeps(tx: ManagedTransaction, uid: string): PartLayoutDeps {
+  return {
+    async state(partIds) {
+      const r = (await tx.run(LAYOUT_STATE_QUERY, { uid, partKeys: partIds.map((id) => userKey(uid, id)) })).records[0];
+      return {
+        partsOn: r?.get('partsOn') === true,
+        version: toNumber(r?.get('version')) ?? 0,
+        found: toNumber(r?.get('found')) ?? 0,
+      };
+    },
+    async write(positions) {
+      const r = (await tx.run(UPDATE_PART_LAYOUT_QUERY, {
+        uid, positions: positions.map((x) => ({ partKey: userKey(uid, x.partId), mapX: x.mapX, mapY: x.mapY })),
       })).records[0];
       return r ? toNumber(r.get('version')) ?? 0 : null;
     },

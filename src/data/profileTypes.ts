@@ -14,7 +14,7 @@ export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'crisisKit', 'safetyPlan', 'country',
-  'parts', 'partDetail', 'partAnchors',
+  'parts', 'partDetail', 'partAnchors', 'den',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
@@ -91,6 +91,19 @@ export interface ProfileSlices {
    * the kept line it points at (`anchorLineId`). Parts without one, or whose line is no longer kept, are absent.
    */
   partAnchors: Record<string, string>;
+  /**
+   * The den (Me only, read through getDen): every active and resting part as the room draws it, the
+   * person's confirmed links between two parts in the room, and the snapshot list (newest first).
+   * `lastVisitedAt` stays on the server: getDen turns it, with the log's touches, into a recency bucket.
+   */
+  den: {
+    parts: Array<{
+      id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; shapeSig: number[] | null;
+      mapX: number | null; mapY: number | null; lastVisitedAt: string | null; safety: boolean;
+    }>;
+    links: Array<{ id: string; kind: 'covers_for' | 'two_pulls'; aId: string; bId: string; bothWantId: string | null }>;
+    snapshots: Array<{ id: string; takenAt: string }>;
+  };
 }
 
 /**
@@ -114,13 +127,15 @@ export const PROFILE_NEEDS = {
   'five-senses': ['parts'],
   'pause': ['parts'],
   'urge-surfing': ['parts'],
+  // Me → Parts of me → See them together (the den). Server-side only: getDen reads it and adds recency.
+  'me': ['den'],
   // Other tools declare 'parts' in the phase that renders them, never before.
 } as const satisfies Record<string, readonly SliceId[]>;
 
 export type ProfileConsumer = keyof typeof PROFILE_NEEDS;
-/** Consumers the client may ask for (witness is server-side only). */
-export type ClientProfileConsumer = Exclude<ProfileConsumer, 'witness'>;
-export const SERVER_ONLY_CONSUMERS: readonly ProfileConsumer[] = ['witness'];
+/** Consumers the client may ask for (witness and the den's `me` are server-side only). */
+export type ClientProfileConsumer = Exclude<ProfileConsumer, 'witness' | 'me'>;
+export const SERVER_ONLY_CONSUMERS: readonly ProfileConsumer[] = ['witness', 'me'];
 export type NeedsOf<T extends ProfileConsumer> = (typeof PROFILE_NEEDS)[T][number];
 
 export interface GetProfileContextResponse<T extends ProfileConsumer = ProfileConsumer> {
