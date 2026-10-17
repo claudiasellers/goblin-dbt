@@ -5,10 +5,13 @@ import { RATHER_IDS_MAX, type PartRevisitAnswer, type PartWriteResponse } from '
 import type { MeItem, MePartCandidate } from '../../services/profile';
 import { answerPartRevisit, renamePart, restorePart, restPart, setAsidePart, setPartTender } from '../../services/parts';
 import {
-  PART_NAME_MAX, candidateLine, candidateMeetLink, meetAPartLink, partCandidateCopy, partActions, partAsksBack, partCardRows, partRevisitCopy, renameCall, restoreCall,
-  revisitCall, revisitChoices, revisitQuestion, revisitRatherOptions, sortPartItems, toggleRather,
-  type PartCandidatePromptId, type PartRevisitCopy, type PartWriteCall, type PartsOfMePromptId,
+  PART_NAME_MAX, meetAPartLink, partCandidateCopy, partRevisitCopy,
+  type PartCandidatePromptId, type PartRevisitCopy, type PartsOfMePromptId,
 } from '../../lib/partsOfMe';
+import {
+  candidateLine, candidateMeetLink, partActions, partAsksBack, partCardRows, renameCall, restoreCall,
+  revisitCall, revisitChoices, revisitQuestion, revisitRatherOptions, sortPartItems, toggleRather, type PartWriteCall,
+} from '../../lib/partCard';
 import { newId } from '../../lib/spine/ids';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { PartFigure } from '../parts/PartFigure';
