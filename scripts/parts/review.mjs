@@ -68,6 +68,7 @@ export { KNOWN_PART_REVIEW_REQUIRED, PLAIN_PATTERNS_REQUIRED } from './src/lib/k
 export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 export { DEN_REQUIRED } from './src/lib/den';
 export { WISE_MIND_PARTS_REQUIRED } from './src/lib/wiseMindParts';
+export { PART_STORY_REQUIRED } from './src/lib/partStory';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -144,6 +145,11 @@ export function surfaces(g) {
       id: 'wise_mind', title: 'Wise mind\'s step back',
       where: 'Wise mind (Tools, Mindfulness), with parts on and at least one active or resting part: its second screen becomes the step back, with "Use the two minds instead" to switch. The den\'s room, small, the light in the middle (the person, never labelled). "Who\'s here about this?": the person\'s parts on a shelf (tender ones covered), "A part I haven\'t met" and "No one in particular"; a tap places a figure near the light. One hold asks everyone to take a step back and the figures move to the edge. After it, a tap on a figure: "It won\'t step back", "That\'s fine. It might need its own time." and "Meet it another time" (a kept part: Meet a part for it; the unmet one: queued in Me\'s "To come back to"). A placed part with a safety-line move or a danger fear shows the crisis resources under the room. On "Is this wise mind?", "Pushed, urgent" says "A part might still be close." Placing a part tags it to the visit.',
       groups: [{ label: null, ids: g.WISE_MIND_PARTS_REQUIRED }],
+    },
+    {
+      id: 'story', title: 'A part\'s story',
+      where: 'Me → Parts of me: "Its story" on each active or resting part\'s card opens it in place; in the den, tap one figure for "Its story" and "Spend time with it" (Meet a part for that part). Oldest first, each line only when there is something to say: "Met in {month}", "Rested in {month}" / "Back in {month}", "Its job then: …" / "Its job now: …" (never on a tender part), the card\'s readout (how they\'ve felt toward it, what\'s helped it settle), and "Where it stands": its confirmed threads in words, and an earlier month\'s room beside today\'s when there is one. Months only; no score, no percentage, never a fear.',
+      groups: [{ label: null, ids: g.PART_STORY_REQUIRED }],
     },
     {
       id: 'settings', title: 'Settings',

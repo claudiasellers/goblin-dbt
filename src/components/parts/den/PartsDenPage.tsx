@@ -7,6 +7,7 @@ import { getPartsContent } from '../../../services/partsContent';
 import { getDen } from '../../../services/parts';
 import { getToolById } from '../../../data/tools';
 import { denCopy } from '../../../lib/den';
+import { partStoryCopy } from '../../../lib/partStory';
 import { Den } from './Den';
 
 /**
@@ -33,5 +34,5 @@ export function PartsDenPage() {
   if (!content || !den) return null;
   const copy = denCopy(content);
   if (!copy) return <Navigate to="/profile" replace />;
-  return <Den copy={copy} initial={den} twoPullsAvailable={!!getToolById('two-pulls')} />;
+  return <Den copy={copy} initial={den} twoPullsAvailable={!!getToolById('two-pulls')} content={content} storyCopy={partStoryCopy(content)} />;
 }

@@ -52,6 +52,11 @@ import { denCopy } from '../../src/lib/den';
 import type { GetDenResponse } from '../../src/data/partsTypes';
 import { vecToSig } from '../../src/lib/partFigure';
 // ---- end the den ----
+// ---- A part's story (lane 2) ----
+import { PartStory } from '../../src/components/parts/story/PartStory';
+import { partStoryCopy } from '../../src/lib/partStory';
+import type { GetPartStoryResponse } from '../../src/data/partsTypes';
+// ---- end a part's story ----
 
 export interface Branch { id: string; label: string; steps?: DriveStep[] }
 export interface Surface {
@@ -410,7 +415,7 @@ function DenHost({ one }: { one: boolean }) {
   return (
     <section className="space-y-2">
       <p className={mockNote}>Me → Parts of me → See them together</p>
-      <Den copy={copy} initial={denData(one)} twoPullsAvailable now={DEN_NOW} />
+      <Den copy={copy} initial={denData(one)} twoPullsAvailable now={DEN_NOW} content={content} storyCopy={partStoryCopy(content)} />
     </section>
   );
 }
@@ -441,6 +446,97 @@ const DEN_SURFACE: Surface = {
   render: ({ branch }) => <DenHost one={branch === 'one'} />,
 };
 // ---- end the den ----
+
+// ---- A part's story (lane 2): on its card in Parts of me, and from one figure in the den ----
+
+const LONG_OWN_JOB = 'make sure nobody I love can quietly drift away without me noticing first, so I keep checking, asking, reading every message twice, and I never get caught off guard by a goodbye I could see coming soon';
+/** The longest story: every line, a long own-words job, three helped lines, both feel-toward lines, three threads, then and now rooms. */
+function storyRich(): GetPartStoryResponse {
+  return {
+    moments: [
+      { kind: 'met', month: '2026-04' },
+      { kind: 'rested', month: '2026-06' },
+      { kind: 'back', month: '2026-07' },
+      { kind: 'job', month: '2026-08', then: { jobIds: [], ownJob: LONG_OWN_JOB }, now: { jobIds: ['chase_rather_ask', 'hide_rather_need_someone'], ownJob: null } },
+      { kind: 'rested', month: '2026-09' },
+      { kind: 'back', month: '2026-10' },
+    ],
+    helped: [{ toolId: 'pause', n: 4 }, { toolId: 'recovering-from-invalidation', n: 3 }, { toolId: 'cool-down', n: 1 }],
+    // Steps that helped at their longest: three steps, a long graph label among them.
+    steps: [
+      { stepId: 'oa_step_1', label: 'Let your shoulders drop and slow your breathing for a minute', n: 3 },
+      { stepId: 'oa_step_2', label: 'Say one true thing out loud', n: 2 },
+      { stepId: 'rx_exit_1', label: 'Step away and come back later', n: 1 },
+    ],
+    felt: { month: '2026-05', then: 'feel_annoyed', now: 'feel_warm' },
+    links: [
+      { role: 'behind', otherId: PART_IDS.hide, otherName: PARTS[1].name },
+      { role: 'pulls', otherId: PART_IDS.critic, otherName: PARTS[2].name },
+      { role: 'front', otherId: PART_IDS.unnamed, otherName: null },
+    ],
+    rooms: {
+      thenMonth: '2026-06',
+      then: [
+        { id: PART_IDS.chase, mapX: 0.5, mapY: 0.24, status: 'resting', tender: false },
+        { id: PART_IDS.peace, mapX: 0.3, mapY: 0.72, status: 'active', tender: false },
+      ],
+      now: [
+        { id: PART_IDS.chase, name: PARTS[0].name, status: 'active', tender: false, shapeSig: denSig(0), mapX: 0.3, mapY: 0.32 },
+        { id: PART_IDS.hide, name: PARTS[1].name, status: 'active', tender: false, shapeSig: denSig(1), mapX: 0.72, mapY: 0.36 },
+        { id: PART_IDS.peace, name: PARTS[3].name, status: 'resting', tender: false, shapeSig: denSig(3), mapX: 0.22, mapY: 0.78 },
+        { id: PART_IDS.little, name: PARTS[4].name, status: 'active', tender: true, shapeSig: null, mapX: 0.7, mapY: 0.74 },
+      ],
+      links: [{ id: `covers_for_${PART_IDS.chase}_${PART_IDS.hide}`, kind: 'covers_for', aId: PART_IDS.hide, bId: PART_IDS.chase, bothWantId: null }],
+    },
+  };
+}
+/** A tender part: the server never sends its job; here one is sent anyway, and the screen must not show it. */
+function storyTender(): GetPartStoryResponse {
+  return {
+    moments: [
+      { kind: 'met', month: '2026-08' },
+      { kind: 'job', month: '2026-09', then: { jobIds: ['hide_job_out_of_sight'], ownJob: null }, now: { jobIds: ['hide_rather_need_someone'], ownJob: null } },
+    ],
+    helped: [{ toolId: 'cool-down', n: 3 }],
+    steps: [],
+    felt: { month: '2026-08', then: null, now: 'feel_curious' },
+    links: [{ role: 'behind', otherId: PART_IDS.chase, otherName: PARTS[0].name }],
+  };
+}
+
+function StoryHost({ tender }: { tender: boolean }) {
+  const content = useParts();
+  const copy = partStoryCopy(content);
+  if (!content || !copy) return null;
+  const name = tender ? PARTS[4].name : PARTS[0].name;
+  return (
+    <section className="space-y-2">
+      <p className={mockNote}>Me → Parts of me → {name} → {copy.story_open}{tender ? ' (a tender part)' : ''}</p>
+      <PartStory partId={tender ? PART_IDS.little : PART_IDS.chase} tender={tender} content={content} copy={copy}
+        initial={tender ? storyTender() : storyRich()} />
+    </section>
+  );
+}
+
+const STORY_SURFACE: Surface = {
+  id: 'story', pack: 'story', title: 'A part\'s story',
+  who: 'Parts on: "Its story" on a part\'s card in Parts of me, or one figure tapped in the den. Months only; a tender part has no job line.',
+  branches: [
+    { id: 'rich', label: 'The longest story: every line, then and now rooms' },
+    { id: 'tender', label: 'A tender part: the relationship lines only' },
+    { id: 'card', label: 'From the card: Its story opens in place', steps: [{ prompt: 'story_open' }] },
+    { id: 'den', label: 'From the den: one figure tapped, then Its story', steps: [{ tap: PARTS[0].name }, { prompt: 'story_open' }] },
+  ],
+  setup: (b) => {
+    answer('getPartStory', () => storyRich());
+    if (b === 'den') {
+      answer('getDen', () => denData(false));
+      answer('updatePartLayout', () => ({ version: 2 }));
+    }
+  },
+  render: ({ branch }) => (branch === 'card' ? <MeHost /> : branch === 'den' ? <DenHost one={false} /> : <StoryHost tender={branch === 'tender'} />),
+};
+// ---- end a part's story ----
 
 export const SURFACES: Surface[] = [
   {
@@ -630,6 +726,7 @@ export const SURFACES: Surface[] = [
   },
   DEN_SURFACE, // lane 2: the den
   WISE_MIND_SURFACE, // lane 4: Wise mind's step back
+  STORY_SURFACE, // lane 2: a part's story
 ];
 
 /** Not built on the tip, so not here (the report lists them). */

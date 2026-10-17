@@ -36,6 +36,8 @@ import {
 import type { AnswerPartCheckbackResponse, SchedulePartCheckbackResponse } from './checkbackTypes';
 import { linkPartsHandler, partLinkDeps, unlinkPartsHandler, validateLink, validateUnlink } from './links';
 import { denDeps, getDenHandler, getDenSnapshotHandler, validateSnapshotRef } from './den';
+import { getPartStoryHandler, storyDeps, validateStoryRef } from './story';
+import type { GetPartStoryResponse } from './storyTypes';
 import type {
   GetDenResponse, GetDenSnapshotResponse, LinkPartsResponse, UnlinkPartsResponse, UpdatePartLayoutResponse,
 } from './denTypes';
@@ -217,6 +219,15 @@ export const getDenSnapshot = callable<unknown, GetDenSnapshotResponse>(
   async ({ uid, data }) => {
     const input = parseOrInvalid(() => validateSnapshotRef(data), 'Invalid request');
     return readTx((tx) => getDenSnapshotHandler(input, denDeps(tx, uid as string)));
+  },
+);
+
+/** A part's story: how it has changed, by month. Nothing with parts off; someone else's or a set-aside part: not found. */
+export const getPartStory = callable<unknown, GetPartStoryResponse>(
+  { auth: 'required', label: 'getPartStory', errorMessage: 'Could not load that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateStoryRef(data), 'Invalid request');
+    return readTx((tx) => getPartStoryHandler(input, storyDeps(tx, uid as string)));
   },
 );
 
