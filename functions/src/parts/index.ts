@@ -4,7 +4,7 @@
  * only with parts on, and the writers refuse otherwise.
  */
 import { callable } from '../shared/callable';
-import { writeTx } from '../shared/neo4j';
+import { readTx, writeTx } from '../shared/neo4j';
 import { parseOrInvalid } from '../shared/errors';
 import { getPartsEntryHandler } from './handler';
 import { graphDeps } from './queries';
@@ -14,10 +14,13 @@ import { readPartsEntryInput, validateStartPartSession } from './validation';
 import { sessionDeps } from './sessionQueries';
 import type { PartSessionResponse } from './sessionTypes';
 import {
-  answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, partShapeDeps, renamePartHandler, restPartHandler,
-  restorePartHandler, setAsidePartHandler, setPartAnchorHandler, setPartShapeHandler, setPartTenderHandler,
+  answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, partLayoutDeps, partShapeDeps, renamePartHandler,
+  restPartHandler, restorePartHandler, setAsidePartHandler, setPartAnchorHandler, setPartShapeHandler, setPartTenderHandler,
+  updatePartLayoutHandler,
 } from './keep';
-import { validateAnchor, validatePartRef, validateRename, validateRest, validateRevisit, validateShape } from './editPlan';
+import {
+  validateAnchor, validateLayout, validatePartRef, validateRename, validateRest, validateRevisit, validateShape,
+} from './editPlan';
 import { validateKeep } from './keepPlan';
 import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
 import {
@@ -31,6 +34,11 @@ import {
   validateAnswerCheckback, validateScheduleCheckback,
 } from './checkback';
 import type { AnswerPartCheckbackResponse, SchedulePartCheckbackResponse } from './checkbackTypes';
+import { linkPartsHandler, partLinkDeps, unlinkPartsHandler, validateLink, validateUnlink } from './links';
+import { denDeps, getDenHandler, getDenSnapshotHandler, validateSnapshotRef } from './den';
+import type {
+  GetDenResponse, GetDenSnapshotResponse, LinkPartsResponse, UnlinkPartsResponse, UpdatePartLayoutResponse,
+} from './denTypes';
 
 export { deleteMyParts } from './delete';
 
@@ -192,6 +200,50 @@ export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse
   async ({ uid, data }) => {
     const input = parseOrInvalid(() => validateAnswerCheckback(data), 'Invalid request');
     return writeTx((tx) => answerPartCheckbackHandler(input, answerCheckbackDeps(tx, uid as string)));
+  },
+);
+
+// ---- The den (Me → Parts of me → See them together) ----
+
+/** The room: parts with a recency bucket, confirmed links, the snapshot list. Nothing with parts off. */
+export const getDen = callable<unknown, GetDenResponse>(
+  { auth: 'required', label: 'getDen', errorMessage: 'Could not load that' },
+  async ({ uid }) => readTx((tx) => getDenHandler(denDeps(tx, uid as string))),
+);
+
+/** One saved layout ("How it looked in {month}"). Nothing with parts off or when it isn't the caller's. */
+export const getDenSnapshot = callable<unknown, GetDenSnapshotResponse>(
+  { auth: 'required', label: 'getDenSnapshot', errorMessage: 'Could not load that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateSnapshotRef(data), 'Invalid request');
+    return readTx((tx) => getDenSnapshotHandler(input, denDeps(tx, uid as string)));
+  },
+);
+
+/** The den's drop: where the person put their parts. Positions only. */
+export const updatePartLayout = callable<unknown, UpdatePartLayoutResponse>(
+  { auth: 'required', label: 'updatePartLayout', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateLayout(data), 'Invalid request');
+    return writeTx((tx) => updatePartLayoutHandler(input, partLayoutDeps(tx, uid as string)));
+  },
+);
+
+/** On the person's yes: a link between two of their parts (one per pair and kind; a repeat keeps the latest answer). */
+export const linkParts = callable<unknown, LinkPartsResponse>(
+  { auth: 'required', label: 'linkParts', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateLink(data), 'Invalid request');
+    return writeTx((tx) => linkPartsHandler(input, partLinkDeps(tx, uid as string)));
+  },
+);
+
+/** The den's ×: the link goes. */
+export const unlinkParts = callable<unknown, UnlinkPartsResponse>(
+  { auth: 'required', label: 'unlinkParts', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateUnlink(data), 'Invalid request');
+    return writeTx((tx) => unlinkPartsHandler(input, partLinkDeps(tx, uid as string)));
   },
 );
 
