@@ -24,6 +24,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },
+  // Two pulls (docs/design/parts.md): the same orienting close, never what-helps evidence.
+  'two-pulls': { module: 'mf', closeKind: 'orienting' },
   // Wise mind (docs/design/wise-mind.md): "Further away … More here", unless it handed off. A skill:
   // a "More here" after it counts toward what helps (not in NOT_WHAT_HELPS).
   'wise-mind': { module: 'mf', closeKind: 'orienting' },
@@ -36,9 +38,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
 /**
  * Tools whose close is never evidence that something helped: no what_helps pattern offer, no
  * "went well" in Insights, no "did it help?" card in Today, no compat ToolUsage outcome. "More here"
- * after meeting a part is not the same claim as "it calmed me" (docs/design/parts.md).
+ * after meeting a part (or sitting with two pulls) is not the same claim as "it calmed me" (docs/design/parts.md).
  */
-export const NOT_WHAT_HELPS: readonly string[] = ['meet-a-part'];
+export const NOT_WHAT_HELPS: readonly string[] = ['meet-a-part', 'two-pulls'];
 
 /** Where the reserved ids may be opened from. */
 export const RESERVED_ENTRIES: Record<string, readonly ToolEntry[]> = {

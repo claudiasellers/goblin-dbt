@@ -5,7 +5,7 @@
  * sets what the stubbed server answers (Meet a part's entry gate, a failing delete) or is reached by
  * tapping through the real component (./driver.ts).
  */
-import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import '../../src/components/tools/findTheFeeling/shape/shape.css';
 import '../../src/components/tools/findTheFeeling/tune/tune.css';
 import type { PartsContent } from '../../src/data/partsContentTypes';
@@ -22,6 +22,7 @@ import { angryCopyFrom, angryLaterCopy, angryNotNowId, orderHurts } from '../../
 import { dismissCandidateRequest, partsOfMeCopy } from '../../src/lib/partsOfMe';
 import { copeParts, keptLines } from '../../src/lib/copeAhead';
 import { MeetAPart } from '../../src/pages/tools/MeetAPart';
+import { TwoPulls } from '../../src/pages/tools/TwoPulls';
 import { AngryPartCard } from '../../src/components/parts/AngryPartCard';
 import { PartCheckbackCard } from '../../src/components/parts/PartCheckbackCard';
 import { PartsSettings } from '../../src/components/parts/PartsSettings';
@@ -34,7 +35,7 @@ import { TooMuchLink } from '../../src/components/capacity/TooMuchLink';
 import { DARK } from '../../src/components/tools/findTheFeeling/shape/palette';
 import { linkButton, secondaryText } from '../../src/components/tools/oppositeAction/styles';
 import { answer, logEvent } from './backend';
-import { CANDIDATES, checkbackItem, ME_ITEMS, ME_LONG, PART_IDS, REFLECT, reflectTrails, slices, trailEvidence, trailItem, type TrailKind } from './data';
+import { CANDIDATES, checkbackItem, checkbackItemTwo, ME_ITEMS, ME_LONG, PART_IDS, REFLECT, reflectTrails, slices, trailEvidence, trailItem, type TrailKind } from './data';
 import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
 import { ME_OFF_SURFACE } from './meOff';
@@ -69,6 +70,8 @@ export interface Surface {
   branches?: Branch[];
   /** Router state for the page (Meet a part's entry). */
   routeState?: (branch: string) => unknown;
+  /** The address's query for the page (Two pulls' entry: `?a=&b=` or `?pair=`). */
+  routeSearch?: (branch: string) => string;
   /** What the stubbed server answers for this surface, set before anything mounts. */
   setup?: (branch: string) => void;
   render: (o: { branch: string; plain: boolean }) => ReactNode;
@@ -82,6 +85,16 @@ function useParts(): PartsContent | null {
 }
 
 const mockNote = 'text-[11px] uppercase tracking-wide text-[var(--color-text-tertiary)]';
+
+/**
+ * What the host shows once a card or step hands back (Today drops the card, DEAR MAN goes on): the host's
+ * next thing takes focus, as TodayStack and DearMan.tsx move it, so focus never falls to the page.
+ */
+function HostNext({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLParagraphElement>(null);
+  useEffect(() => { ref.current?.focus({ preventScroll: true }); }, []);
+  return <p ref={ref} tabIndex={-1} className={`${mockNote} focus:outline-none`}>{children}</p>;
+}
 const chipBase = 'min-h-11 px-3 py-2 rounded-full border text-sm transition-colors';
 function MockChip({ on, onClick, children, style }: { on: boolean; onClick: () => void; children: ReactNode; style?: CSSProperties }) {
   return (
@@ -194,12 +207,12 @@ function AngryHost({ plain, branch }: { plain: boolean; branch: string }) {
 
 /* ───────── over weeks ───────── */
 
-function CheckbackHost({ named }: { named: boolean }) {
+function CheckbackHost({ named, two = false }: { named: boolean; two?: boolean }) {
   const content = useParts();
   const [gone, setGone] = useState(false);
   if (!content) return null;
-  if (gone) return <p className={mockNote}>The card leaves Today.</p>;
-  return <PartCheckbackCard item={checkbackItem(named)} content={content} onDone={() => setGone(true)} />;
+  if (gone) return <HostNext>The card leaves Today.</HostNext>;
+  return <PartCheckbackCard item={two ? checkbackItemTwo() : checkbackItem(named)} content={content} onDone={() => setGone(true)} />;
 }
 
 type TagHostKind = 'five' | 'pause' | 'ftf';
@@ -255,7 +268,7 @@ function CopeHost() {
   const [anchors, setAnchors] = useState<Record<string, string>>(s.partAnchors);
   const [gone, setGone] = useState(false);
   if (!content) return null;
-  if (gone) return <p className={mockNote}>DEAR MAN goes on to Describe.</p>;
+  if (gone) return <HostNext>DEAR MAN goes on to Describe.</HostNext>;
   return (
     <section className="space-y-2">
       <p className={mockNote}>DEAR MAN, before the script</p>
@@ -271,7 +284,7 @@ function OfferHost({ kind }: { kind: TrailKind }) {
   const content = useParts();
   const [gone, setGone] = useState(false);
   if (!content) return null;
-  if (gone) return <p className={mockNote}>The card leaves Today.</p>;
+  if (gone) return <HostNext>The card leaves Today.</HostNext>;
   return (
     <section className="space-y-2">
       <p className={mockNote}>Today</p>
@@ -290,7 +303,7 @@ function DebriefHost({ named }: { named: boolean }) {
   const content = useParts();
   const [gone, setGone] = useState(false);
   if (!content) return null;
-  if (gone) return <p className={mockNote}>DEAR MAN goes on to the reflection.</p>;
+  if (gone) return <HostNext>DEAR MAN goes on to the reflection.</HostNext>;
   return (
     <section className="space-y-2">
       <p className={mockNote}>DEAR MAN debrief, after “Underneath that”</p>
@@ -393,6 +406,39 @@ const MEET_BRANCHES: MeetBranch[] = [
   ] },
   // ---- end 5d ----
 ];
+
+/* ───────── Two pulls (lane 3's block) ───────── */
+
+const pullsSetOut: DriveStep[] = [{ opt: 'blend_pulls_notice' }];
+const pullsFeel: DriveStep[] = [...pullsSetOut, { tap: 'Next' }];
+const pullsStepBack: DriveStep[] = [...pullsFeel, { opt: 'feel_curious' }, { opt: 'feel_steady' }];
+const pullsWorries: DriveStep[] = [...pullsStepBack, { press: 'meet_thank_hold' }, { tap: 'Next' }];
+const pullsBothWant: DriveStep[] = [...pullsWorries, { opt: 'chase_worry_drift' }, { opt: 'hide_worry_too_much' }];
+const pullsKeepsake: DriveStep[] = [...pullsBothWant, { opt: 'want_not_left' }];
+const PULLS_BRANCHES: Branch[] = [
+  { id: 'set_out', label: 'Set them out (two kept parts, from the den)', steps: pullsSetOut },
+  { id: 'running', label: 'One of them is running things → P2', steps: [{ opt: 'blend_pulls_running' }] },
+  { id: 'feel_both', label: 'Feel toward, both: the second side', steps: [...pullsFeel, { opt: 'feel_curious' }] },
+  { id: 'unblend', label: 'A non-Self answer → one unblend', steps: [...pullsFeel, { opt: 'feel_annoyed' }] },
+  { id: 'needs_time', label: 'Still there → one of them needs its own time', steps: [...pullsFeel, { opt: 'feel_annoyed' }, { opt: 'unblend_still' }] },
+  { id: 'step_back', label: 'Step back', steps: pullsStepBack },
+  { id: 'worries', label: 'Each side\'s worry (the first)', steps: pullsWorries },
+  { id: 'worry_own', label: 'Own words at a worry → the conservative stop', steps: [...pullsWorries, { opt: 'own_words' }, { type: 'they would go' }, { tap: 'Next' }] },
+  { id: 'both_want', label: 'What they both want', steps: pullsBothWant },
+  { id: 'keepsake', label: 'The keepsake', steps: pullsKeepsake },
+  { id: 'kept', label: 'Keepsake kept: the close and the check-back question', steps: [...pullsKeepsake, { opt: 'pulls_keep' }, { close: 'better' }] },
+  { id: 'pair_only', label: 'Pair only (from a rule C trail): neutral figures named by their moves', steps: pullsSetOut },
+  { id: 'pair_needs_time', label: 'Pair only: needs its own time → Meet it another time queues it', steps: [...pullsFeel, { opt: 'feel_annoyed' }, { opt: 'unblend_still' }, { opt: 'pulls_another_time' }] },
+  { id: 'general', label: 'Two parts with no pair of their own: the general chips, and still a keepsake',
+    steps: [...pullsWorries, { opt: 'pulls_worry_hurt' }, { opt: 'pulls_worry_fall_apart' }, { opt: 'pulls_want_safe' }] },
+  { id: 'not_found', label: 'An address it can\'t resolve (a part no longer kept): "Tool not found."' },
+];
+const PULLS_PAIR = new Set(['pair_only', 'pair_needs_time']);
+/** The general branch: the chase part and the unnamed one (keep_watch), which no pair joins. */
+const pullsSearch = (b: string) => (PULLS_PAIR.has(b) ? `?pair=chase_hide&offer=${encodeURIComponent('trail_two_pulls:chase+hide:ctx_event_ignored')}`
+  : b === 'general' ? `?a=${PART_IDS.chase}&b=${PART_IDS.unnamed}`
+  : b === 'not_found' ? `?a=${PART_IDS.chase}&b=00000000-0000-4000-8000-000000000999`
+  : `?a=${PART_IDS.chase}&b=${PART_IDS.hide}`);
 
 /* ───────── the list ───────── */
 
@@ -596,6 +642,23 @@ export const SURFACES: Surface[] = [
     setup: (b) => { const g = MEET_BRANCHES.find((x) => x.id === b)?.gate ?? clear; answer('getPartsEntry', () => g); },
     render: () => <ToolSessionProvider toolId="meet-a-part"><MeetAPart /></ToolSessionProvider>,
   },
+  // Two pulls (lane 3's block).
+  {
+    id: 'pulls', pack: 'pulls', title: 'Two pulls',
+    who: 'Parts on, reached only by a link: the den with two kept parts, or a rule C trail offer’s More than one with its pair. Writes are listed under the frame, ids only.',
+    branches: PULLS_BRANCHES,
+    routeSearch: pullsSearch,
+    render: () => <ToolSessionProvider toolId="two-pulls"><TwoPulls /></ToolSessionProvider>,
+  },
+  {
+    id: 'checkback_two', pack: 'checkback', title: 'Week check-back after Two pulls (Today)',
+    who: 'Parts on: on Today a week after Two pulls with two kept parts, when the person said yes to checking back with both.',
+    branches: [
+      { id: 'named', label: 'Both named' },
+      { id: 'louder', label: 'Louder → aftercare (no pause)', steps: [{ opt: 'checkback_louder' }] },
+    ],
+    render: () => <CheckbackHost named two />,
+  },
   {
     id: 'checkback', pack: 'checkback', title: 'Next-day check-back (Today)',
     who: 'Parts on: on Today the day after a visit, when the person said yes to the check-back question.',
@@ -644,6 +707,7 @@ export const SURFACES: Surface[] = [
       { id: 'confirm', label: 'Delete: the confirm', steps: [{ prompt: 'settings_delete' }] },
       { id: 'failed', label: 'Delete: the failure line', steps: [{ prompt: 'settings_delete' }, { prompt: 'settings_delete_yes' }] },
       { id: 'done', label: 'Delete: done', steps: [{ prompt: 'settings_delete' }, { prompt: 'settings_delete_yes' }] },
+      { id: 'lines', label: 'Delete: also the 2 kept Two pulls lines that name a part (ticked)', steps: [{ prompt: 'settings_delete' }, { tick: 'Also remove 2 kept lines that name your parts?' }] },
     ],
     setup: (b) => answer('deleteMyParts', () => { if (b === 'failed') throw new Error('review: delete fails'); return { deleted: { Part: 5 } }; }),
     render: ({ branch }) => <SettingsHost on={branch !== 'off'} />,
@@ -679,13 +743,14 @@ export const SURFACES: Surface[] = [
       { id: 'c', label: 'Two pulls in a context (rule C)' },
       { id: 'evidence', label: 'Show me: the evidence (A)', steps: [{ opt: 'offer_show' }] },
       { id: 'evidence_c', label: 'Show me: the evidence, two pulls (C)', steps: [{ opt: 'offer_show' }] },
-      { id: 'split', label: 'More than one: which feels like its own thing?', steps: [{ opt: 'offer_show' }, { opt: 'offer_more_than_one' }] },
+      // Rule C's More than one opens Two pulls (its own surface below); the split is asked on the other shapes.
+      { id: 'split', label: 'More than one (rule B): which feels like its own thing?', steps: [{ opt: 'offer_show' }, { opt: 'offer_more_than_one' }] },
     ],
     setup: (b) => {
-      const kind: TrailKind = b === 'b' ? 'B' : b === 'c' || b === 'evidence_c' || b === 'split' ? 'C' : 'A';
+      const kind: TrailKind = b === 'b' || b === 'split' ? 'B' : b === 'c' || b === 'evidence_c' ? 'C' : 'A';
       answer('getTrailOfferEvidence', () => trailEvidence(kind));
     },
-    render: ({ branch }) => <OfferHost kind={branch === 'b' ? 'B' : branch === 'c' || branch === 'evidence_c' || branch === 'split' ? 'C' : 'A'} />,
+    render: ({ branch }) => <OfferHost kind={branch === 'b' || branch === 'split' ? 'B' : branch === 'c' || branch === 'evidence_c' ? 'C' : 'A'} />,
   },
   {
     id: 'review', pack: 'review', title: 'Reflect: “Was this {name}?” (rule D)',

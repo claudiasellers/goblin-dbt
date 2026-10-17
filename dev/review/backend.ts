@@ -33,7 +33,7 @@ function push(e: Omit<ReviewEvent, 'n'>) {
 /** Ids, enums, numbers, dates and booleans as they are; anything else a person wrote is never shown. */
 const ID_LIKE = /^[A-Za-z0-9_.:+-]{1,64}$/;
 /** Fields that are always the person's own words (a one-word name included), whatever they look like. */
-const OWN_WORDS_KEYS = new Set(['name', 'own', 'ownVoice', 'ownJob', 'ownFear', 'text', 'displayName']);
+const OWN_WORDS_KEYS = new Set(['name', 'own', 'ownVoice', 'ownJob', 'ownFear', 'ownWorryA', 'ownWorryB', 'text', 'displayName']);
 export function redact(v: unknown, key = ''): unknown {
   if (typeof v === 'string') return ID_LIKE.test(v) && !OWN_WORDS_KEYS.has(key) ? v : '‹own words›';
   if (Array.isArray(v)) return v.map((x) => redact(x, key));

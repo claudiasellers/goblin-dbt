@@ -313,6 +313,9 @@ export function sortParts(c) {
     canTouch: sortObj(c.canTouch, (list) => [...list]),
     // Source label → source id → move id, both by key.
     expresses: sortObj(c.expresses, (table) => sortObj(table, (moveId) => moveId)),
+    // Two pulls' pairs by id; each chip list keeps its edges' order.
+    pairs: [...(c.pairs ?? [])].sort((x, y) => asc(x.id, y.id))
+      .map((p) => ({ ...p, bothWant: [...p.bothWant], worryA: [...p.worryA], worryB: [...p.worryB] })),
     // The two numbers a screen needs, only once the policy is signed off (absent: the client's pinned defaults).
     ...(c.limits ? { limits: { nameMaxChars: c.limits.nameMaxChars, maxNonSelfAnswers: c.limits.maxNonSelfAnswers } } : {}),
   };
@@ -329,8 +332,9 @@ export const shipParts = (c) => projectParts(sortParts(c));
  * renders only once its copy is signed off, so today this is nearly empty. Only what a screen reads
  * (PARTS_FIELDS, partsAllowlist.mjs: every row is cut to it):
  * trail rules, contexts and the rest of the policy (inference rules and safety numbers) stay on the server
- * (only `limits`, its name length and non-Self answer count, ships once the policy is signed off), and Two
- * pulls' pairs and keepsake wait for their phase. `expresses` (module id → move, approved edges to shipped
+ * (only `limits`, its name length and non-Self answer count, ships once the policy is signed off). Two
+ * pulls' pairs ship as ids (a signed-off pair whose two moves ship, with the signed-off chips its edges
+ * point at, in their order; the chips' labels are in `options.pulls`), and the keepsake lines as prompts. `expresses` (module id → move, approved edges to shipped
  * moves) feeds the in-the-moment unblend line. An approved option ships even when its prompt (or a
  * move it is offered for) isn't approved yet; the client checks a flow is complete (flowReady).
  * No parts content at all (parts.cypher not loaded yet) is an empty file, not an error.
@@ -339,7 +343,7 @@ export function buildParts(g) {
   const rows = (label) => g.nodes(label).filter((n) => signedOff(n.props));
   const edges = (type, from, to) => g.rels(type, from, to).filter((r) => signedOff(r.props) && signedOff(r.a.props));
   const moveNodes = rows('ProtectiveMove').filter((n) => n.props.offerable === true);
-  const promptNodes = rows('PartPrompt').filter((n) => n.props.copyKind !== 'keepsake');
+  const promptNodes = rows('PartPrompt');
   const optionNodes = rows('PartOption');
   const hurtNodes = rows('ProtectedHurt');
 
@@ -374,6 +378,16 @@ export function buildParts(g) {
     (expresses[[...r.a.labels].sort()[0]] ??= {})[r.a.props.id] = r.b.props.id;
   }
 
+  // Two pulls: a signed-off pair whose two moves ship; each list the signed-off chips its edges point at.
+  const optionIds = new Set(optionNodes.map((o) => o.props.id));
+  const pairEdges = (type, pair, side) => g.rels(type, 'PolarityPair', 'PartOption')
+    .filter((r) => r.a === pair && signedOff(r.props) && optionIds.has(r.b.props.id) && (side === undefined || r.props.side === side))
+    .sort((x, y) => asc(x.props.order, y.props.order) || asc(x.b.props.id, y.b.props.id)).map((r) => r.b.props.id);
+  const pairs = rows('PolarityPair').filter((p) => moveIds.has(p.props.a) && moveIds.has(p.props.b)).map((p) => ({
+    id: p.props.id, a: p.props.a, b: p.props.b,
+    bothWant: pairEdges('BOTH_WANT', p), worryA: pairEdges('WORRY', p, 'a'), worryB: pairEdges('WORRY', p, 'b'),
+  }));
+
   const options = {};
   for (const o of optionNodes) {
     const { flow, step } = o.props;
@@ -397,6 +411,7 @@ export function buildParts(g) {
     })),
     canTouch,
     expresses,
+    pairs,
     limits,
   });
 }

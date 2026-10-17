@@ -28,7 +28,9 @@ export type DriveStep =
   /** Press and let go of the hold button at once (the quiet "Next" then goes past it). */
   | { press: string }
   /** Type into the one text field on screen. */
-  | { type: string };
+  | { type: string }
+  /** Tick the checkbox whose label starts with this text. */
+  | { tick: string };
 
 const norm = (s: string | null | undefined) => (s ?? '').replace(/\s+/g, ' ').trim();
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -73,6 +75,7 @@ export async function drive(root: HTMLElement, steps: readonly DriveStep[]): Pro
       else if ('hurt' in s) (await find(root, label(`hurt:${s.hurt}`))).click();
       else if ('prompt' in s) (await find(root, label(`prompt:${s.prompt}`))).click();
       else if ('tap' in s) (await find(root, s.tap)).click();
+      else if ('tick' in s) (await find(root, s.tick, 'label')).click();
       else if ('close' in s) {
         const choice = spine.closeFlow.kinds.orienting?.choices.find((c) => c.id === s.close);
         if (!choice) throw new Error(`no close choice ${s.close}`);

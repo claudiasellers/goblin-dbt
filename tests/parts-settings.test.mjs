@@ -5,7 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 
-const { PARTS_SETTINGS_PROMPTS, partsSettingsCopy } = await importTs("src/lib/partsSettings.ts");
+const { PARTS_SETTINGS_PROMPTS, SETTINGS_LINES_REQUIRED, partsSettingsCopy, keptLinesQuestion } = await importTs("src/lib/partsSettings.ts");
 const read = (f) => readFileSync(f, "utf8");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
 const shipped = JSON.parse(read("src/data/content/parts.json")).content;
@@ -13,7 +13,7 @@ const shipped = JSON.parse(read("src/data/content/parts.json")).content;
 test("the block needs every settings prompt, each one in the settings flow", () => {
   assert.equal(new Set(PARTS_SETTINGS_PROMPTS).size, PARTS_SETTINGS_PROMPTS.length);
   const inFlow = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "settings").map(([id]) => id);
-  assert.deepEqual([...PARTS_SETTINGS_PROMPTS].sort(), inFlow.sort(), "every settings prompt is used, and only those");
+  assert.deepEqual([...PARTS_SETTINGS_PROMPTS, ...SETTINGS_LINES_REQUIRED.prompts].sort(), inFlow.sort(), "every settings prompt is used, and only those");
 });
 
 test("nothing renders until all of it is signed off; then each id maps to its copy", () => {
@@ -38,7 +38,7 @@ test("Privacy & Data: a real switch bound to partsEnabled, delete wired to delet
   assert.match(sw, /aria-checked=\{enabled\}/);
   assert.match(sw, /aria-labelledby=\{labelledBy\}\s+aria-describedby=\{describedBy\}/);
   assert.match(c, /<PartsSwitch enabled=\{enabled\} onClick=\{toggle\} labelledBy=\{labelId\} describedBy=\{blurbId\} \/>/);
-  assert.match(c, /await deleteMyParts\(\)/);
+  assert.match(c, /await deleteMyParts\(\{ keptLines: removeLines && linesQuestion !== null \}\);/, "kept lines only on their own yes");
   assert.match(c, /setFailed\(true\); \/\/ the confirm stays open/);
   assert.match(c, /\{failed && <p role="status"[^>]*>\{copy\.settings_delete_failed\}<\/p>\}/);
   assert.match(c, /if \(!copy\) return null;/);
@@ -62,4 +62,24 @@ test("right after turning parts on: one Get to know a part link, gated by Meet a
   const { parseMeetEntry } = await importTs("src/lib/meetAPartSave.ts");
   assert.deepEqual(settingsMeetLink(), { pathname: "/tool/meet-a-part", state: { parts: { trailheadKind: "settings" } } });
   assert.equal(parseMeetEntry(settingsMeetLink().state).trailheadKind, "settings");
+});
+
+test("kept Two pulls lines: asked separately, only when there are some and the line ships; unticked; flag on the call", () => {
+  assert.deepEqual([...SETTINGS_LINES_REQUIRED.prompts], ["settings_delete_lines_one", "settings_delete_lines"]);
+  const ready = { ...shipped, prompts: { ...shipped.prompts, ...Object.fromEntries(SETTINGS_LINES_REQUIRED.prompts.map((id) => [id, fixture.prompts[id]])) } };
+  assert.equal(keptLinesQuestion(ready, 2), "Also remove 2 kept lines that name your parts?", "parts.md's own wording");
+  assert.equal(keptLinesQuestion(ready, 1), "Also remove 1 kept line that names your parts?");
+  for (const n of [0, -1, 1.5, Number.NaN]) assert.equal(keptLinesQuestion(ready, n), null, String(n));
+  assert.equal(keptLinesQuestion(null, 2), null);
+  const noLine = { ...ready, prompts: { ...ready.prompts } };
+  delete noLine.prompts.settings_delete_lines;
+  assert.equal(keptLinesQuestion(noLine, 2), null, "not signed off: nothing asked, nothing extra deleted");
+  const c = read("src/components/parts/PartsSettings.tsx");
+  assert.match(c, /const \[removeLines, setRemoveLines\] = useState\(false\);/, "unticked by default");
+  assert.match(c, /if \(!confirming \|\| !content \|\| !surfaceReady\(content, SETTINGS_LINES_REQUIRED\)\) return;/, "counted only for the confirm, and only if it can be asked");
+  assert.match(c, /<input type="checkbox" checked=\{removeLines\}/);
+  assert.match(c, /setConfirming\(false\); setFailed\(false\); setRemoveLines\(false\);/, "Keep them clears it");
+  const svc = read("src/services/parts.ts");
+  assert.match(svc, /deleteMyPartsFn\(opts\.keptLines \? \{ keptLines: true \} : \{\}\)/);
+  assert.match(svc, /httpsCallable<Record<string, never>, \{ keptLines: number \}>\(functions, 'countMyPartsLines'\)/);
 });

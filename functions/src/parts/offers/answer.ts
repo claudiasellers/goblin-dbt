@@ -13,7 +13,8 @@
  * - yes: recorded; the client opens Meet a part on the offer (`trailheadKind: 'offer'`), and keepPart
  *   writes `source: 'offer'` with `ACCEPTED_FROM` the offer;
  * - more_than_one: each kept move becomes a `PartCandidate` (`origin: 'trail'`, `FROM_OFFER` the offer).
- *   Rule C's split will open Two pulls in Phase 5; until then it makes candidates like the others.
+ *   On a rule C trail (two pulls) it writes no candidates: the client opens Two pulls on the offer's pair
+ *   (`next: 'two_pulls'`, `pairId`), and the split is not asked.
  *
  * Rule D ("Was this {name}?") is never a Today offer: it is shown in Reflect and answered in a batch
  * (parts.md's rules table: review.ts's answerKnownPartReview, which writes `PartTag`s, `source: 'review'`).
@@ -58,6 +59,9 @@ export function validateAnswer(raw: unknown): AnswerInput {
     if (o.split !== undefined || o.candidateIds !== undefined) fail('split: More than one only');
     return input;
   }
+  // A rule C trail opens Two pulls instead of asking the split: no split at all is accepted (the handler
+  // checks the shape), and then no candidate ids either.
+  if (o.split === undefined && o.candidateIds === undefined) return input;
   const split = o.split;
   if (!Array.isArray(split) || split.length < 1 || split.length > SPLIT_MAX) fail(`split: 1 to ${SPLIT_MAX} move ids`);
   input.split = (split as unknown[]).map((x) => (typeof x === 'string' && GRAPH_ID.test(x) ? x : fail('split: expected move ids')));
@@ -208,7 +212,7 @@ export const ANSWER_STATE_QUERY = `
   OPTIONAL MATCH (u)-[:HAS_TRAIL_OFFER]->(o:TrailOffer {key: $key})
   OPTIONAL MATCH (r:TrailRule {id: o.ruleId})
   RETURN coalesce(u.partsEnabled, false) AS partsOn,
-         CASE WHEN o IS NULL THEN null ELSE o {.shape, .moveIds, .pullIds, .status, .answer,
+         CASE WHEN o IS NULL THEN null ELSE o {.shape, .moveIds, .pullIds, .status, .answer, .pairId,
            open: ${GUARDS.TrailOffer.answer('o')}} END AS offer,
          r.cooldownDays AS cooldownDays
 `;
@@ -248,7 +252,7 @@ export const SPLIT_CANDIDATES_QUERY = `
 
 export interface AnswerState {
   partsOn: boolean;
-  offer: { shape: TrailShape; moveIds: string[]; pullIds: string[]; status: string; answer: string | null; open: boolean } | null;
+  offer: { shape: TrailShape; moveIds: string[]; pullIds: string[]; status: string; answer: string | null; open: boolean; pairId?: string | null } | null;
   cooldownDays: number | null;
 }
 
@@ -276,18 +280,21 @@ export async function answerTrailOfferHandler(input: AnswerInput, deps: AnswerDe
     return { ...base, status: st.offer.status === 'seen' ? 'seen' : 'offered', next: 'none' };
   }
 
-  if (input.answer === 'more_than_one') {
+  // Rule C (two pulls): More than one opens Two pulls on the offer's pair; nothing to split.
+  const twoPulls = input.answer === 'more_than_one' && st.offer.shape === 'C' && !!st.offer.pairId;
+  if (input.answer === 'more_than_one' && !twoPulls) {
+    if (input.split.length === 0) throw new HttpsError('invalid-argument', 'Which moves feel like their own thing');
     const known = new Set(st.offer.moveIds);
     if (!input.split.every((m) => known.has(m))) throw new HttpsError('invalid-argument', 'Not one of this offer\'s moves');
   }
-  if (!(await deps.final(input.answer, input.answer === 'more_than_one' ? input.split : null))) throw answered();
+  if (!(await deps.final(input.answer, input.answer === 'more_than_one' && !twoPulls ? input.split : null))) throw answered();
   const done = { ...base, status: 'answered' as const };
 
   if (input.answer === 'yes') {
     return { ...done, next: 'meet', moveIds: st.offer.pullIds.length ? st.offer.pullIds : st.offer.moveIds };
   }
+  if (twoPulls) return { ...done, next: 'two_pulls', pairId: st.offer.pairId as string };
   if (input.answer === 'more_than_one') {
-    // Rule C (two pulls) will open Two pulls here in Phase 5; until then its split makes candidates too.
     const ids = await deps.candidates(input.split.map((moveId, i) => ({ id: input.candidateIds[i], moveId })));
     return { ...done, next: 'candidates', candidateIds: ids };
   }
@@ -304,7 +311,7 @@ export function answerDeps(tx: ManagedTransaction, uid: string, email: string | 
         partsOn: r?.get('partsOn') === true,
         offer: o ? {
           shape: o.shape as TrailShape, moveIds: strs(o.moveIds), pullIds: strs(o.pullIds),
-          status: String(o.status ?? ''), answer: s(o.answer), open: o.open === true,
+          status: String(o.status ?? ''), answer: s(o.answer), open: o.open === true, pairId: s(o.pairId),
         } : null,
         cooldownDays: toNumber(r?.get('cooldownDays')),
       };

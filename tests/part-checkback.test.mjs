@@ -83,14 +83,15 @@ test("the card: no hard-coded user-facing strings; Louder's body tools are the t
   const jsx = card.slice(card.indexOf("return ("));
   assert.doesNotMatch(jsx.replace(/\{[^{}]*\}/g, ""), />\s*[A-Za-z][^<]*</, "text between tags comes from content");
   assert.doesNotMatch(card, /(aria-label|label)="[A-Z]/, "no literal labels");
-  assert.match(card, /if \(!content \|\| !checkbackReady\(content\)\) return null;/);
+  assert.match(card, /if \(!content \|\| !\(two \? twoCheckbackReady\(content\) : checkbackReady\(content\)\)\) return null;/);
   assert.match(card, /<TooMuchLink host="meet-a-part" label=\{after\.body\.label\}/);
   assert.match(card, /answerPartCheckback\(\{ id: item\.id, answer: a \}\)/);
   const provider = read("src/contexts/TodayContext.tsx");
   assert.match(provider, /const partsOn = useUserProfile\(\)\.profile\.partsEnabled === true;/);
   assert.match(provider, /const checkbacksShown = partsOn && checkbackReady\(partsContent\);/);
   assert.match(provider, /items: withReadyCheckbacks\(/);
-  assert.match(read("src/components/today/TodayStack.tsx"), /item\.type === PART_CHECKBACK_TYPE\) return <PartCheckbackCard/);
+  assert.match(read("src/components/today/TodayStack.tsx"), /item\.type === PART_CHECKBACK_TYPE \|\| item\.type === TWO_PULLS_CHECKBACK_TYPE\) return <PartCheckbackCard/);
+  assert.match(provider, /const twoCheckbacksShown = partsOn && twoCheckbackReady\(partsContent\);/, "Two pulls' card: its two-names question ships too");
 });
 
 test("server: spine leaves the type to parts; the name comes through the 'today' slice; spine never imports profile/", () => {
