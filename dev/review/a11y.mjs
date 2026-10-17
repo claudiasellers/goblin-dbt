@@ -64,10 +64,7 @@ const LIVE_SELECTORS = ['[data-testid="unblend-line"]', '[data-testid="goal-line
  * Problems in markup a parts component doesn't own (the host's), matched on the whole report line
  * (`visit: check: text`), with why. Reported every run as `host`; never a failure here.
  */
-const OUTSIDE_PARTS = [
-  { match: /^oa_goal--[\w.-]+: live: not announced: div "[^"]*" in goal-line$/,
-    why: 'OppositeAction.tsx renders the goal line (TapCard `before`), above the heading TapCard focuses' },
-];
+const OUTSIDE_PARTS = [];
 
 /** Each surface and branch once (angry also in its plain wording); no Show ids twins. */
 function plan(map) {
