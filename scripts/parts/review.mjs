@@ -59,7 +59,7 @@ export { TAG_ROW_REQUIRED } from './src/lib/partTag';
 export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
 export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
-export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED } from './src/lib/partsSettings';
+export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
@@ -96,7 +96,7 @@ export function surfaces(g) {
     },
     {
       id: 'meet', title: 'Meet a part',
-      where: 'The parts tool, by link only (Me, Settings, a candidate, the angry card), with parts on: the whole visit from the entry gate to the close. It also needs at least one move, Shape it\'s words (Find the feeling) and a "Keep it" yes.',
+      where: 'The parts tool, with parts on: in the Tools list (Mindfulness) once this is signed off, and by its links (Me, Settings, a candidate, the angry card, an offer): the whole visit from the entry gate to the close. It also needs at least one move, Shape it\'s words (Find the feeling) and a "Keep it" yes.',
       groups: [
         { label: 'The visit (the paused line shows only for a paused part)', ids: g.meetRequired({ paused: true }) },
         { label: 'The close\'s "Check back with it tomorrow?" (the visit shows without it)', ids: g.CLOSE_CHECKBACK_REQUIRED },
@@ -118,12 +118,13 @@ export function surfaces(g) {
     },
     {
       id: 'me', title: 'Parts of me',
-      where: 'Me, with parts on: the person\'s kept parts as cards (their actions, the 30-day check-back, the readout), set-aside parts, and the parts they said they\'d come back to. Each group below lights up on its own once the area does.',
+      where: 'Me, with parts on (with parts off, the switch card in the last group): the person\'s kept parts as cards (their actions, the 30-day check-back, the readout), set-aside parts, and the parts they said they\'d come back to. Each group below lights up on its own once the area does.',
       groups: [
         { label: 'The area, the cards and their actions', ids: g.PARTS_OF_ME_REQUIRED },
         { label: 'The 30-day check-back', ids: g.PART_REVISIT_REQUIRED },
         { label: 'To come back to', ids: g.PART_CANDIDATE_REQUIRED },
         { label: 'The card\'s readout', ids: g.STATS_REQUIRED },
+        { label: 'With parts off: a quiet card in its place with the parts switch (Settings\' label, blurb and small print). It also needs the area\'s lines, so turning parts on there shows Parts of me', ids: g.PARTS_ME_OFF_REQUIRED },
       ],
     },
     {

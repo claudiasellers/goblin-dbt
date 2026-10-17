@@ -46,15 +46,23 @@ const FULL = ["find_something_else", { type: "find" }, "blend_running", { type: 
   "feel_curious", "hide_job_out_of_sight", "likes_tired", { type: "hurt", hurtId: "left_out" }, "hide_fear_regret", "update_no", "now_ask",
   hold, "hide_rather_need_someone", { type: "name", name: "Ash" }];
 
-test("hidden: registered and reachable by link only, never in a list", () => {
+test("listed only with parts on and its copy shipped (the gate ToolPage opens it with); never in the intents", () => {
   const tool = T.getToolById("meet-a-part");
-  assert.deepEqual([tool.name, tool.module, tool.listed, tool.bare], ["Meet a part", "mindfulness", false, true]);
-  assert.ok(!T.getToolsByModule("mindfulness").some((t) => t.id === "meet-a-part"));
+  assert.deepEqual([tool.name, tool.module, tool.listed, tool.bare], ["Meet a part", "mindfulness", "parts", true]);
+  assert.ok(!T.getToolsByModule("mindfulness").some((t) => t.id === "meet-a-part"), "parts off: not listed");
+  assert.ok(!T.getToolsByModule("mindfulness", { parts: false }).some((t) => t.id === "meet-a-part"));
   assert.ok(!T.listedTools().some((t) => t.id === "meet-a-part"));
+  assert.ok(T.getToolsByModule("mindfulness", { parts: true }).some((t) => t.id === "meet-a-part"), "parts on and ready: listed");
+  assert.deepEqual(T.listedTools({ parts: true }).map((t) => t.id), T.tools.map((t) => t.id), "nothing else is held back");
+  assert.deepEqual(T.listedTools().map((t) => t.id), T.tools.filter((t) => t.id !== "meet-a-part").map((t) => t.id));
   assert.ok(!T.intents.some((i) => i.toolId === "meet-a-part"));
-  assert.equal(T.tools.filter((t) => t.listed === false).length, 1);
-  // Lists read only listed tools: Tools.tsx through getToolsByModule; nothing else iterates `tools` to show them.
-  assert.match(read("src/pages/Tools.tsx"), /import \{ getToolsByModule, intents \} from '\.\.\/data\/tools'/);
+  assert.deepEqual(T.tools.filter((t) => t.listed !== undefined).map((t) => t.id), ["meet-a-part"]);
+  // Lists read only listed tools: Tools.tsx through getToolsByModule, with `parts` from Meet a part's own gate.
+  const tools = read("src/pages/Tools.tsx");
+  assert.match(tools, /import \{ getToolsByModule, intents \} from '\.\.\/data\/tools'/);
+  assert.match(tools, /const parts = useToolGate\('meet-a-part'\) === 'open';/, "false while the gate loads: no flicker");
+  assert.match(tools, /getToolsByModule\(mod\.id, \{ parts \}\)/);
+  assert.match(tools, /\{intents\.map\(/, "the intents are the fixed list");
   const page = read("src/pages/ToolPage.tsx");
   assert.match(page, /'meet-a-part': MeetAPart,/);
   assert.match(page, /if \(!tool \|\| gate === 'closed'\) \{/, "parts off or copy missing: the existing not-found state");

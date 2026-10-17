@@ -33,9 +33,11 @@ test("Privacy & Data: a real switch bound to partsEnabled, delete wired to delet
   const privacy = page.slice(page.indexOf("function PrivacySection"), page.indexOf("function ToggleRow"));
   assert.match(privacy, /<PartsSettings enabled=\{partsEnabled\} onToggle=\{\(on\) => onUpdate\(\{ partsEnabled: on \}\)\} \/>/);
   const c = read("src/components/parts/PartsSettings.tsx");
-  assert.match(c, /role="switch"/);
-  assert.match(c, /aria-checked=\{enabled\}/);
-  assert.match(c, /aria-describedby=\{blurbId\}/);
+  const sw = read("src/components/parts/PartsSwitch.tsx");
+  assert.match(sw, /role="switch"/);
+  assert.match(sw, /aria-checked=\{enabled\}/);
+  assert.match(sw, /aria-labelledby=\{labelledBy\}\s+aria-describedby=\{describedBy\}/);
+  assert.match(c, /<PartsSwitch enabled=\{enabled\} onClick=\{toggle\} labelledBy=\{labelId\} describedBy=\{blurbId\} \/>/);
   assert.match(c, /await deleteMyParts\(\)/);
   assert.match(c, /setFailed\(true\); \/\/ the confirm stays open/);
   assert.match(c, /\{failed && <p role="status"[^>]*>\{copy\.settings_delete_failed\}<\/p>\}/);
