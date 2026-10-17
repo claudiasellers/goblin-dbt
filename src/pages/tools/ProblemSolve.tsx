@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, Suspense, lazy, type ComponentProps } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getEmotionById, getEmotionByName } from '../../data/emotions';
 import { EmotionPicker } from '../../components/tools/EmotionPicker';
@@ -10,7 +10,6 @@ import { getPartsContent } from '../../services/partsContent';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { newId } from '../../lib/spine/ids';
 import { PS_AMBIVALENCE_BARRIER, psLaterCandidate, psLaterCopy } from '../../lib/psAmbivalence';
-import { PartLaterLine } from '../../components/parts/PartLaterLine';
 import {
   getProblemSolveContent,
   type ProblemSolveContent,
@@ -44,6 +43,10 @@ const CONFIDENCE_LEVELS: readonly string[] = ['high', 'medium', 'low', 'none'];
 
 // Parts' callables load on demand, at the one moment this page calls one (a yes to "another time").
 const queuePartCandidate: typeof import('../../services/parts').queuePartCandidate = (req) => import('../../services/parts').then((m) => m.queuePartCandidate(req));
+// "Another time" is fetched with the parts copy it needs, so the line never waits on its own chunk.
+const loadLater = () => import('../../components/parts/PartLaterLine');
+const LazyPartLaterLine = lazy(() => loadLater().then((m) => ({ default: m.PartLaterLine })));
+function PartLaterLine(p: ComponentProps<typeof LazyPartLaterLine>) { return <Suspense fallback={null}><LazyPartLaterLine {...p} /></Suspense>; }
 
 export function ProblemSolve() {
   const location = useLocation();
@@ -127,7 +130,7 @@ export function ProblemSolve() {
   useEffect(() => {
     if (!wantsPsLater || parts) return;
     let live = true;
-    getPartsContent().then((p) => { if (live) setParts(p); }).catch(() => { /* no line */ });
+    Promise.all([getPartsContent(), loadLater()]).then(([p]) => { if (live) setParts(p); }).catch(() => { /* no line */ });
     return () => { live = false; };
   }, [wantsPsLater, parts]);
   const psLater = psLaterCopy(parts, partsOn, selectedSubResponse?.id);

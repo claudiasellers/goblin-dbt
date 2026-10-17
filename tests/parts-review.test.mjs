@@ -32,6 +32,8 @@ const GATES = [
   ["src/lib/debriefWho.ts", "function debriefWhoReady", "surfaceReady(content, DEBRIEF_WHO_REQUIRED)"],
   ["src/lib/psAmbivalence.ts", "function psLaterCopy", "surfaceReady(content, PS_LATER_REQUIRED)"],
   ["src/lib/oaGoalLine.ts", "function oaGoalLine", "surfaceReady(content, OA_GOAL_LINE_REQUIRED)"],
+  ["src/lib/knownPartReview.ts", "function knownPartReviewReady", "surfaceReady(content, KNOWN_PART_REVIEW_REQUIRED)"],
+  ["src/lib/knownPartReview.ts", "function plainPatternsReady", "surfaceReady(content, PLAIN_PATTERNS_REQUIRED)"],
 ];
 
 /** From the declaration to the next top-level declaration. */
@@ -67,12 +69,13 @@ test("the document: every id a surface requires, with the fixture's text, its st
     ...(await importTs("src/lib/partStats.ts")), ...(await importTs("src/lib/partsSettings.ts")), ...(await importTs("src/lib/copeAhead.ts")),
     ...(await importTs("src/lib/psAmbivalence.ts")), ...(await importTs("src/lib/debriefWho.ts")),
     ...(await importTs("src/lib/oaGoalLine.ts")), ...(await importTs("src/lib/partShape.ts")),
+    ...(await importTs("src/lib/knownPartReview.ts")),
   };
   const sets = [
     L.UNBLEND_REQUIRED, L.angryRequired(true), L.angryRequired(false), L.ANGRY_LATER_REQUIRED, L.meetRequired({ paused: true }),
     L.CLOSE_CHECKBACK_REQUIRED, L.PART_CHECKBACK_REQUIRED, L.TAG_ROW_REQUIRED, L.PARTS_OF_ME_REQUIRED, L.PART_REVISIT_REQUIRED,
     L.PART_CANDIDATE_REQUIRED, L.STATS_REQUIRED, L.REFLECT_REQUIRED, L.PARTS_SETTINGS_REQUIRED, L.SETTINGS_LINK_REQUIRED, L.COPE_REQUIRED, L.PS_LATER_REQUIRED,
-    L.DEBRIEF_WHO_REQUIRED, L.OA_GOAL_LINE_REQUIRED, L.TAG_SHAPE_REQUIRED,
+    L.DEBRIEF_WHO_REQUIRED, L.OA_GOAL_LINE_REQUIRED, L.TAG_SHAPE_REQUIRED, L.KNOWN_PART_REVIEW_REQUIRED, L.PLAIN_PATTERNS_REQUIRED,
   ];
   const options = Object.values(fixture.options).flatMap((steps) => Object.values(steps).flat());
   const textOf = (id) => fixture.prompts[id]?.copy ?? options.find((o) => o.id === id)?.label;

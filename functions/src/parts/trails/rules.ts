@@ -18,7 +18,9 @@
  *                             episodes with a and c ≥ minEpisodes and episodes with b and c ≥ minEpisodes.
  *                             One candidate per pair: the context with the most episodes, ties as A.
  *  D  a part you know         each claimed part (active or resting, not paused): episodes after its last
- *                             visit with any of its moves (offerable or not) and no PartTag ≥ minEpisodes.
+ *                             visit with any of its moves (offerable or not), no PartTag, and no record the
+ *                             person said No to for that part in Reflect's review (a blocked key's
+ *                             `recordKeys`, for good) ≥ minEpisodes.
  *
  * Blocked keys (rule + sorted moves + context; for D, rule + part, since its matching moves shift) with
  * `until` null or ahead are skipped before a rule picks its best context, so a blocked context doesn't
@@ -186,13 +188,29 @@ export function partIsLive(p: ClaimedPart, now: number): boolean {
   return !(p.pausedUntil && t(p.pausedUntil) > now);
 }
 
+/** The records the person said No to for this part under this rule (Reflect's review), for good. */
+export function refusedRecordKeys(blocked: readonly BlockedKey[], ruleId: string, partId: string): Set<string> {
+  return new Set(blocked.filter((b) => b.ruleId === ruleId && b.partId === partId).flatMap((b) => b.recordKeys ?? []));
+}
+
+/**
+ * Rule D's episodes for one part, before the threshold: after its last visit (or its confirmation), with
+ * any of its moves, untagged, and holding no record the person said No to for it. Reflect's answer
+ * (answerKnownPartReview) checks the answered episodes against this same list.
+ */
+export function knownPartEpisodes(ruleId: string, eps: readonly Episode[], p: ClaimedPart, blocked: readonly BlockedKey[]): Episode[] {
+  const sinceIso = p.lastVisitedAt ?? p.confirmedAt ?? null;
+  const since = sinceIso ? t(sinceIso) : -Infinity;
+  const refused = refusedRecordKeys(blocked, ruleId, p.id);
+  return eps.filter((e) => t(e.at) > since && !e.taggedPartIds.length && e.moveIds.some((m) => p.moveIds.includes(m))
+    && !e.recordKeys.some((k) => refused.has(k)));
+}
+
 function ruleD(rule: TrailRule, eps: Episode[], ctx: TrailCtx, now: number): TrailCandidate[] {
   const out: TrailCandidate[] = [];
   for (const p of ctx.parts) {
     if (!partIsLive(p, now) || !p.moveIds.length) continue;
-    const sinceIso = p.lastVisitedAt ?? p.confirmedAt ?? null;
-    const since = sinceIso ? t(sinceIso) : -Infinity;
-    const hit = eps.filter((e) => t(e.at) > since && !e.taggedPartIds.length && e.moveIds.some((m) => p.moveIds.includes(m)));
+    const hit = knownPartEpisodes(rule.id, eps, p, ctx.blocked);
     if (hit.length < rule.minEpisodes) continue;
     const moveIds = uniq(hit.flatMap((e) => e.moveIds.filter((m) => p.moveIds.includes(m)))).sort();
     if (isBlocked(ctx.blocked, { ruleId: rule.id, moveIds, contextId: null, partId: p.id }, now)) continue;

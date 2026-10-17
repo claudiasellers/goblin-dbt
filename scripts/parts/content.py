@@ -364,7 +364,8 @@ UNDERNEATH_HELD = {
 # Prompts: (id, flow, step, copy). Order within a flow is list order.
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
 # close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
-# next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me), ps (Problem Solve's ambivalence line), common (shared), reflect
+# next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me), ps (Problem Solve's ambivalence line), common (shared), reflect,
+# review (rule D's batch in Reflect)
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -442,6 +443,13 @@ PROMPTS = [
     ("stats_when", "common", "stats", "Mostly {when}"),
     # Reflect: the parts section's title (after Reflect's own sections; parts on only)
     ("reflect_title", "reflect", "parts", "The parts you know"),
+    # Reflect: trails answered "It's how things go", kept as plain statements (no parts language) under
+    # this heading until the person removes one (patterns_remove, the ×'s label).
+    ("patterns_title", "reflect", "patterns", "How things tend to go"),
+    # Reflect: rule D's batch ("Was this {name}?", TrailRule trail_known_part's statementTemplate), one
+    # block per part with a row per moment. The part with no name: its chip label heads the block
+    # (part_unnamed_place / part_unnamed), and this is the question.
+    ("review_noname", "review", "question", "Was this that part?"),
     # In the moment: only after a move the person picked themselves, parts on, never named
     ("unblend_line", "unblend", "line", "A part of you {move} right now."),
     # The angry-part card (alexithymia-first-interaction.md, "Anger: the angry part"): the fire back urge,
@@ -771,6 +779,17 @@ OPTIONS = [
     opt("offer_not_me", "offer", "evidence", "Not me", branch="end"),
     # The split ("Which of these feels like its own thing?"): the offer's moves as chips, then this to keep them.
     opt("offer_split_keep", "offer", "split", "Keep these", branch="candidate"),
+
+    # --- Reflect: rule D's batch. Per row (a moment): Yes tags it to the part, No never asks it again for
+    # that part, Not sure does nothing. Per block: Done / Not now, either way the part rests for the rule's
+    # cooldownDays before it's asked about again. ---
+    opt("review_yes", "review", "row", "Yes"),
+    opt("review_no", "review", "row", "No"),
+    opt("review_not_sure", "review", "row", "Not sure"),
+    opt("review_done", "review", "block", "Done", branch="end"),
+    opt("review_not_now", "review", "block", "Not now", branch="end"),
+    # --- Reflect: a plain pattern's × (its accessible label) ---
+    opt("patterns_remove", "reflect", "patterns", "Remove", branch="end"),
 
     # --- The tag row ---
     opt("tag_new_one", "tag", "tag", "A new one", branch="new"),

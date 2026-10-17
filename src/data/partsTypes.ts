@@ -193,7 +193,7 @@ export interface SetPartShapeRequest { partId: string; toolSessionId: string }
 /**
  * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's
  * debrief, "who showed up?") or `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
- * its first writer, still to come).
+ * functions/src/parts/offers/review.ts).
  */
 export type TagSource = 'close' | 'debrief' | 'review';
 export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review'];
@@ -305,7 +305,7 @@ export interface AngryContentHurt {
 
 /** The slice of the parts content the angry card is built from (the fixture's shape; the harness reads it). */
 export interface AngryCardContent {
-  prompts: Record<string, { flow: string; step: string; copy: string }>;
+  prompts: Record<string, { copy: string }>;
   options: Record<string, Record<string, { id: string; label: string }[]>>;
   hurts: AngryContentHurt[];
 }
@@ -397,3 +397,76 @@ export interface AnswerTrailOfferResponse {
   /** more_than_one: the candidates' ids. */
   candidateIds?: string[];
 }
+
+// ---- Reflect: rule D's review and the plain patterns (functions/src/parts/offers/types.ts; built off) ----
+
+/** One row of a rule D block: one episode, its moment as labels only (never anything the person wrote). */
+export interface KnownPartReviewRow {
+  /** The id of one of the episode's records: what the row's answer names. */
+  episodeId: string;
+  /** The episode's first record (ISO); the client shows the date in the locale. */
+  at: string;
+  /** App tool ids (src/data/tools.ts names them; unknown ids are dropped). */
+  toolIds: string[];
+  /** The episode's context, as its signed-off TrailContext phrase; null when none ships. */
+  context: string | null;
+  /** The graph labels of the picks behind it (an ActionUrge's or FeelingUrge's label). */
+  sources: string[];
+}
+
+/** One part's block: "Was this {name}?" (the rule's statementTemplate), then a row per episode. */
+export interface KnownPartReviewBlock {
+  partId: string;
+  /** The rule's signed-off template ("Was this {name}?"). */
+  template: string;
+  /** The part as the profile slice gives it: its name as kept, its first place, its shape, its safety flag. */
+  name: string | null;
+  firstPlace: string | null;
+  shapeSig: number[] | null;
+  /** The part safety flag (functions/src/safety/partSafetyFlag.ts): CrisisBanner alongside the block. */
+  safety: boolean;
+  rows: KnownPartReviewRow[];
+}
+
+/** A trail answered *It's how things go*: the statement's parts, as Today's card gets them. No parts language. */
+export interface PlainTrailPattern {
+  offerId: string;
+  shape: 'A' | 'B' | 'C';
+  template: string;
+  pulls: string[];
+  context: string | null;
+}
+
+export interface GetReflectTrailsResponse {
+  /** At most two parts at once (REVIEW_MAX_PARTS); empty unless parts, offers and rule D are on and the gate is open. */
+  reviews: KnownPartReviewBlock[];
+  /** Newest answer first; parts on only. */
+  patterns: PlainTrailPattern[];
+}
+
+/** A row's answer: Yes tags the episode's records (`source: 'review'`), No keeps it out for good, Not sure does nothing. */
+export type KnownPartRowAnswer = 'yes' | 'no' | 'not_sure';
+export const KNOWN_PART_ROW_ANSWERS: readonly KnownPartRowAnswer[] = ['yes', 'no', 'not_sure'];
+/** The block's close: either way the part rests for the rule's cooldownDays (14) before rule D asks again. */
+export type KnownPartReviewClose = 'done' | 'not_now';
+export const KNOWN_PART_REVIEW_CLOSES: readonly KnownPartReviewClose[] = ['done', 'not_now'];
+
+export interface AnswerKnownPartReviewRequest {
+  /** A new client UUID for the batch (the TrailOffer's id); a repeat writes nothing. */
+  id: string;
+  partId: string;
+  close: KnownPartReviewClose;
+  /** The rows answered (a row left alone is Not sure). */
+  rows: Array<{ episodeId: string; answer: KnownPartRowAnswer }>;
+}
+export interface AnswerKnownPartReviewResponse {
+  id: string;
+  /** False: this batch was already saved (a repeat). */
+  created: boolean;
+  /** Records tagged by the Yes rows. */
+  tagged: number;
+}
+
+/** The plain pattern's ×: it leaves Reflect for good. */
+export interface RemoveTrailPatternRequest { offerId: string }
+export interface RemoveTrailPatternResponse { offerId: string; removed: boolean }

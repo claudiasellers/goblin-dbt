@@ -33,8 +33,10 @@ export interface OfferState {
   partId: string | null;
   status: TrailOfferStatus | string;
   answer: TrailOfferAnswer | string | null;
-  /** ISO, Not now's. */
+  /** ISO, Not now's (and a rule D review's, Done or Not now). */
   cooldownUntil: string | null;
+  /** A rule D review's No rows: the records said not to be that part. */
+  noKeys?: readonly string[];
 }
 
 /**
@@ -42,13 +44,22 @@ export interface OfferState {
  * - an answered offer (Not me; Yes, More than one, It's how things go as an offer): for good;
  * - Not now: until `cooldownUntil` (TrailRule.cooldownDays after the answer); past it, nothing;
  * - an offer still open (offered or seen, no answer yet): while it is open, i.e. `until: null`. It is
- *   already on Today; a second copy of it would be the same id anyway.
+ *   already on Today; a second copy of it would be the same id anyway;
+ * - a rule D review (Reflect's batch, the only TrailOffer with a part): the part until its `cooldownUntil`
+ *   (Done or Not now), and its No rows' records for good (`recordKeys`, kept after the cooldown ends).
  */
 export function blockedTrails(offers: readonly OfferState[], now: Date | number): BlockedTrail[] {
   const t = typeof now === 'number' ? now : now.getTime();
   const out: BlockedTrail[] = [];
   for (const o of offers) {
     const key = { ruleId: o.ruleId, moveIds: sortedMoves(o.moveIds), contextId: o.contextId ?? null, partId: o.partId ?? null };
+    if (o.partId) {
+      const until = o.cooldownUntil ? Date.parse(o.cooldownUntil) : Number.NaN;
+      // Kept past its cooldown (an `until` behind now blocks nothing) so the No rows still hold.
+      const end = Number.isFinite(until) ? until : t + 24 * HOUR;
+      out.push({ ...key, until: new Date(end).toISOString(), recordKeys: [...(o.noKeys ?? [])].sort() });
+      continue;
+    }
     if (o.status === 'answered') { out.push({ ...key, until: null }); continue; }
     if (o.answer === 'not_now') {
       const until = o.cooldownUntil ? Date.parse(o.cooldownUntil) : Number.NaN;

@@ -8,6 +8,7 @@ import type {
   SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, SetPartAnchorRequest, SetPartShapeRequest, StartPartSessionRequest,
   TagPartRequest, TagPartResponse,
   AnswerTrailOfferRequest, AnswerTrailOfferResponse, GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse,
+  AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse, GetReflectTrailsResponse, RemoveTrailPatternRequest, RemoveTrailPatternResponse,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
@@ -172,4 +173,25 @@ export async function getTrailOfferEvidence(req: GetTrailOfferEvidenceRequest): 
 /** One of the five answers; `next` says what the card does after it. */
 export async function answerTrailOffer(req: AnswerTrailOfferRequest): Promise<AnswerTrailOfferResponse> {
   return (await answerTrailOfferFn(req)).data;
+}
+
+// ---- Reflect: rule D's batch and the plain patterns (Phase 4) ----
+
+const getReflectTrailsFn = httpsCallable<Record<string, never>, GetReflectTrailsResponse>(functions, 'getReflectTrails');
+const answerKnownPartReviewFn = httpsCallable<AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse>(functions, 'answerKnownPartReview');
+const removeTrailPatternFn = httpsCallable<RemoveTrailPatternRequest, RemoveTrailPatternResponse>(functions, 'removeTrailPattern');
+
+/** Reflect's trails: rule D's blocks (gated on the server) and the trails kept as plain patterns. */
+export async function getReflectTrails(): Promise<GetReflectTrailsResponse> {
+  return (await getReflectTrailsFn({})).data;
+}
+
+/** Rule D's batch for one part: each answered row, then Done or Not now. */
+export async function answerKnownPartReview(req: AnswerKnownPartReviewRequest): Promise<AnswerKnownPartReviewResponse> {
+  return (await answerKnownPartReviewFn(req)).data;
+}
+
+/** A plain pattern's ×. */
+export async function removeTrailPattern(req: RemoveTrailPatternRequest): Promise<RemoveTrailPatternResponse> {
+  return (await removeTrailPatternFn(req)).data;
 }

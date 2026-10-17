@@ -197,4 +197,4 @@ export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse
 
 // ---- Trail offers (Phase 4; Today's card and the daily evaluation register themselves in ./offers) ----
 
-export { getTrailOfferEvidence, answerTrailOffer } from './offers';
+export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './offers';

@@ -27,6 +27,7 @@ import { CrisisBanner } from '../../components/safety/CrisisBanner';
 import { SessionClose } from '../../components/spine/SessionClose';
 import { LightHold } from '../../components/parts/LightHold';
 import { PartFigure } from '../../components/parts/PartFigure';
+import { useStepFocus } from '../../components/parts/stepFocus';
 import { Chip, Chips, Line, NameScreen, OwnWords, Prompt, ShapeScreen, WhereScreen } from '../../components/parts/meet/MeetScreens';
 import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 
@@ -163,6 +164,10 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
     return () => { live = false; };
   }, []);
   const [checkback, setCheckback] = useState<string | null>(null);
+  // Most screens' Prompt takes focus as it opens; a screen without one (the close, the ending, P2) gets
+  // its first heading or line, so a chip that moved the step on never drops focus to the page.
+  const stepRoot = useRef<HTMLDivElement>(null);
+  useStepFocus(stepRoot, `${phase.k}:${st.step}:${own}`);
   const askCheckback = offerCheckback(st, { content: parts, type: checkType, opened, paused });
   const answerCheckback = (id: string) => {
     if (checkback || !checkType) return;
@@ -189,7 +194,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
   /* ── the entry gate ── */
   if (phase.k === 'p2') {
     return (
-      <div className="space-y-5">
+      <div ref={stepRoot} className="space-y-5">
         {entryCrisis && <CrisisBanner />}
         <BreakdownHandoff host={HOST} band="flooded" blank={plan.open === 'p2' && plan.blank}
           resume={resumeDraft()} onScheduleLater={scheduleLater}
@@ -216,7 +221,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
   );
   if (phase.k === 'ended') {
     return (
-      <div className="space-y-5">
+      <div ref={stepRoot} className="space-y-5">
         {entryCrisis && <CrisisBanner />}
         {band.content && <p className="text-[var(--color-text-primary)]">{band.content.handoff.later.scheduled}</p>}
         {finale}
@@ -233,7 +238,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
     const look = opts.find((o) => o.id === HEADS_UP_LOOK);
     const goOn = opts.find((o) => o.id === HEADS_UP_GO_ON);
     return (
-      <div className="space-y-5">
+      <div ref={stepRoot} className="space-y-5">
         {entryCrisis && <CrisisBanner />}
         <Prompt serif>{P(HEADS_UP_PROMPT)}</Prompt>
         <div className="flex flex-wrap gap-2.5">
@@ -401,7 +406,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
       )}
       {paused && firstScreen && <p role="status" className={secondaryText}>{P(PAUSED_PROMPT)}</p>}
       {tooMany && firstScreen && promptCopy(parts, TOO_MANY_PROMPT) && <p role="status" className={secondaryText}>{P(TOO_MANY_PROMPT)}</p>}
-      <div key={step === 'done' || step === 'close' ? 'close' : `${step}:${own}`} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
+      <div ref={stepRoot} key={step === 'done' || step === 'close' ? 'close' : `${step}:${own}`} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
       {!p2Open && step !== 'done' && tooMuch}
     </div>
   );

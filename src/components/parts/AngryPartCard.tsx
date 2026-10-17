@@ -5,6 +5,7 @@ import { Pill } from '../tools/invalidationRecovery/shared';
 import { linkButton, primaryButton } from '../tools/oppositeAction/styles';
 import { buzz } from '../tools/regulation/hooks';
 import { HoldButton, PartScene } from './LightHold';
+import { useStepFocus } from './stepFocus';
 
 /** The vote of confidence is held for 4 s: long enough to read it, short enough to stay one move. */
 const HOLD_MS = 4000;
@@ -54,6 +55,8 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
   const [tried, setTried] = useState(false);
   const [progress, setProgress] = useState(0);
   const [laterState, setLaterState] = useState<'ask' | 'sending' | 'done'>('ask');
+  const laterRoot = useRef<HTMLDivElement>(null);
+  useStepFocus(laterRoot, laterState === 'done');
   const askLater = () => {
     if (!onLater || laterState !== 'ask') return;
     setLaterState('sending');
@@ -136,10 +139,10 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
           <button type="button" className={primaryButton}
             onClick={() => onDone({ hurtId, voteHeld: held, exitStep: 'speak' })}>{c.done}</button>
           {partsOn && later && onLater && (
-            <div className="text-center" aria-live="polite">
+            <div ref={laterRoot} className="text-center" aria-live="polite">
               {laterState === 'done'
-                ? <p className="text-sm text-[var(--color-text-secondary)]">{later.done}</p>
-                : <button type="button" className={linkButton} disabled={laterState === 'sending'} onClick={askLater}>{later.ask}</button>}
+                ? <p className="text-sm text-[var(--color-text-secondary)] focus:outline-none">{later.done}</p>
+                : <button type="button" className={linkButton} aria-disabled={laterState === 'sending' || undefined} onClick={askLater}>{later.ask}</button>}
             </div>
           )}
         </section>

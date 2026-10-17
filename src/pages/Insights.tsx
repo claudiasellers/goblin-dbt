@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useState, type ComponentProps } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useUserProfile } from '../contexts/UserProfileContext';
 import { getInsightsData, type InsightsPayload } from '../services/neo4j';
 import { InsightSkeleton } from '../components/insights/InsightSkeleton';
 import { FormulationCard } from '../components/insights/FormulationCard';
@@ -14,6 +15,12 @@ import type { TimeRange } from '../components/history/useFilteredCheckIns';
 // Reflect's parts section loads only when the server sent parts (parts on): nobody else downloads it.
 const LazyPartsReflect = lazy(() => import('../components/insights/PartsReflect').then((m) => ({ default: m.PartsReflect })));
 function PartsReflect(p: ComponentProps<typeof LazyPartsReflect>) { return <Suspense fallback={null}><LazyPartsReflect {...p} /></Suspense>; }
+// Rule D's block renders nothing with parts off (TrailsReflect's own first check), so it is fetched only with parts on.
+const LazyTrailsReflect = lazy(() => import('../components/insights/TrailsReflect').then((m) => ({ default: m.TrailsReflect })));
+function TrailsReflect(p: ComponentProps<typeof LazyTrailsReflect>) {
+  const partsOn = useUserProfile().profile.partsEnabled;
+  return partsOn ? <Suspense fallback={null}><LazyTrailsReflect {...p} /></Suspense> : null;
+}
 
 function InsightPlaceholder({ icon, title, description, delay = 0 }: {
   icon: string;
@@ -141,6 +148,8 @@ export function Insights() {
 
       {/* Parts on only, after Reflect's own sections; renders nothing unless a part has a line and the copy ships. */}
       {data.parts && data.parts.length > 0 && <PartsReflect parts={data.parts} delay={nextDelay()} />}
+      {/* Parts on only: rule D's "Was this {name}?" batch and the trails kept as plain patterns; nothing unless the server and the copy allow. */}
+      <TrailsReflect delay={nextDelay()} />
     </div>
   );
 }

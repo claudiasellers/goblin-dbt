@@ -77,6 +77,8 @@ export const GUARDS = {
      * cooldown; every other answer is final (`answered`).
      */
     answer: (v: string) => `(${v}.status IN ['offered', 'seen'] AND (${v}.cooldownUntil IS NULL OR ${v}.cooldownUntil <= datetime()))`,
+    /** removeTrailPattern (Reflect's ×): a trail answered *It's how things go*, once; forward only. */
+    removePattern: (v: string) => `(${v}.status = 'answered' AND ${v}.answer = 'how_it_goes' AND ${v}.patternRemovedAt IS NULL)`,
   },
 } as const;
 
@@ -128,6 +130,7 @@ export function writable(
     case 'PartCandidate': return p.status === 'open';
     case 'TrailOffer': {
       if (op === 'see') return p.status === 'offered';
+      if (op === 'removePattern') return p.status === 'answered' && p.answer === 'how_it_goes' && p.patternRemovedAt == null;
       if (op !== 'answer' || (p.status !== 'offered' && p.status !== 'seen')) return false;
       const until = ms(p.cooldownUntil);
       return until === null || until <= now;

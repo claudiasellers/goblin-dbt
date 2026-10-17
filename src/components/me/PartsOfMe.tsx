@@ -68,7 +68,7 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
       )}
       {candidateCopy && candidates.length > 0 && (
         <div>
-          <h4 className="text-xs text-[var(--color-text-tertiary)]">{candidateCopy.candidate_title}</h4>
+          <h4 className="text-xs text-[var(--color-text-secondary)]">{candidateCopy.candidate_title}</h4>
           <ul>
             {candidates.map((c) => (
               <CandidateRow key={c.id} candidate={c} content={content} copy={candidateCopy} onDismiss={onDismiss} />
@@ -134,8 +134,8 @@ function useWrite(onWrite: PartWrite) {
 /** Tool names from src/data/tools.ts; the month in the locale's words. */
 const statDeps = { toolName: (id: string) => getToolById(id)?.name ?? null, monthName: (m: string) => monthName(m) };
 
-const link = 'inline-flex items-center min-h-11 text-sm underline underline-offset-2 disabled:opacity-50';
-const quiet = `${link} text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]`;
+const link = 'inline-flex items-center justify-center min-h-11 min-w-11 text-sm underline underline-offset-2 disabled:opacity-50';
+const quiet = `${link} text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]`;
 const plain = `${link} text-[var(--color-text-secondary)]`;
 const chip = 'min-h-11 px-3 rounded-lg border text-sm text-left disabled:opacity-50';
 const choice = `${chip} border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]`;
@@ -165,10 +165,11 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
     const c = revisitCall(newId(), partId, a, ratherIds);
     if (c) run(c, () => setAnswered(true));
   };
-  // Every row stacked: the label a small muted line, the value under it in the body style.
+  // Every row stacked: the label a small quiet line (secondary: tertiary on the card is under 4.5:1 in
+  // dusk), the value under it in the body style.
   const row = (label: string, value: ReactNode) => (
     <div>
-      <dt className="text-xs text-[var(--color-text-tertiary)]">{label}</dt>
+      <dt className="text-xs text-[var(--color-text-secondary)]">{label}</dt>
       <dd className="text-sm text-[var(--color-text-primary)] break-words">{value}</dd>
     </div>
   );
@@ -200,10 +201,10 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
                 : 'text-sm font-medium text-[var(--color-text-primary)]'}>
                 {part.name ?? item.title}
               </h4>
-              {resting && <span className="text-xs text-[var(--color-text-tertiary)]">{copy.card_resting}</span>}
+              {resting && <span className="text-xs text-[var(--color-text-secondary)]">{copy.card_resting}</span>}
             </div>
           )}
-          {stats?.when && <p className="text-sm text-[var(--color-text-tertiary)]">{stats.when}</p>}
+          {stats?.when && <p className="text-sm text-[var(--color-text-secondary)]">{stats.when}</p>}
           <dl className="mt-2 space-y-2">
             {rows.where.length > 0 && row(copy.card_where, rows.where.join(', '))}
             {rows.job && ('own' in rows.job
@@ -304,7 +305,7 @@ function SetAsideRow({ item, copy, onWrite }: { item: MeItem; copy: Copy; onWrit
             : 'text-sm font-medium text-[var(--color-text-primary)]'}>
             {item.part?.name ?? item.title}
           </p>
-          <p className="text-xs text-[var(--color-text-tertiary)]">{copy.card_set_aside}</p>
+          <p className="text-xs text-[var(--color-text-secondary)]">{copy.card_set_aside}</p>
         </div>
         <button type="button" disabled={busy} onClick={() => run(restoreCall(item.meta.id))}
           className={`shrink-0 ${plain}`}>
