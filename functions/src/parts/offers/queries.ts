@@ -12,6 +12,14 @@ import { readHarmRows } from '../harmRows';
 import type { OfferState } from './blocked';
 import { offerGate, resolveOfferPolicy, type GateCheckIn, type OfferGate, type OfferPolicy } from './gate';
 import type { TrailShape } from './types';
+import { ruleLive } from '../trails/rules';
+
+/**
+ * A rule is live only switched on and signed off (`enabled && approved`): the prepare step, Today, Reflect
+ * and the gate all ask this, so a rule switched on while still a draft writes nothing, spends no budget
+ * and is never marked offered. Whether offers are on at all is PartsPolicy.offersEnabled, unchanged here.
+ */
+export { ruleLive };
 
 export interface TrailRuleRow {
   id: string;
@@ -134,7 +142,7 @@ export async function checkOfferGate(
   const harm = await readHarmRows(tx, uid, p.harm);
   const rule = state.rules.find((x) => x.id === ruleId);
   return offerGate({
-    partsOn: state.partsOn, offersEnabled: state.offersEnabled, ruleEnabled: rule?.enabled === true,
+    partsOn: state.partsOn, offersEnabled: state.offersEnabled, ruleEnabled: ruleLive(rule),
     checkIns, harm, offers, offerId,
   }, p, now);
 }

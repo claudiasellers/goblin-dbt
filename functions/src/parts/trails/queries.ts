@@ -118,7 +118,7 @@ export const TRAIL_USER_QUERY = `
 export const TRAIL_RULES_QUERY = `
   MATCH (t:TrailRule)
   RETURN t {.id, .shape, .minEpisodes, .windowDays, .minSpanDays, .minTools, .contextShare, .withinHours, .lift,
-            .cooldownDays, .enabled, .statementTemplate} AS t
+            .cooldownDays, .enabled, .statementTemplate, approved: t.reviewStatus = 'approved' AND t.pending IS NULL} AS t
   ORDER BY t.id
 `;
 export const TRAIL_CONTEXTS_QUERY = `MATCH (c:TrailContext) RETURN c.id AS id, c.key AS key, c.value AS value, c.phrase AS phrase ORDER BY c.id`;
@@ -145,7 +145,8 @@ export function ruleFrom(t: Record<string, unknown>): TrailRule | null {
   return {
     id: t.id, shape, minEpisodes: int(t.minEpisodes), windowDays: num(t.windowDays), minSpanDays: num(t.minSpanDays),
     minTools: num(t.minTools), contextShare: num(t.contextShare), withinHours: num(t.withinHours), lift: num(t.lift),
-    cooldownDays: int(t.cooldownDays), enabled: t.enabled === true, statementTemplate: String(t.statementTemplate ?? ''),
+    cooldownDays: int(t.cooldownDays), enabled: t.enabled === true, approved: t.approved === true,
+    statementTemplate: String(t.statementTemplate ?? ''),
   };
 }
 

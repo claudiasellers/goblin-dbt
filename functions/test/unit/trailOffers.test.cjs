@@ -220,7 +220,7 @@ test('evaluatePatternOffers reads the trail offers\' times into the shared budge
 });
 
 test('the gate reads the caller\'s own check-ins, both offer kinds and the harm rows; no own words', async () => {
-  const state = { partsOn: true, offersEnabled: true, policy: G.DEFAULT_OFFER_POLICY, rules: [{ id: 'trail_two_pulls', enabled: true }] };
+  const state = { partsOn: true, offersEnabled: true, policy: G.DEFAULT_OFFER_POLICY, rules: [{ id: 'trail_two_pulls', enabled: true, approved: true }] };
   const f = fakeDriver((q) => {
     if (q === Q.GATE_CHECKINS_QUERY) return [{ at: ago(1), flooding: true, crisis: false, dissociation: false }];
     if (q === Q.OFFER_TIMES_QUERY) return [];
@@ -320,9 +320,11 @@ test('getToday with offers off reads nothing past the open-offer query and shows
 
 // ------------------------------------------------------------------ the prepare step
 
-function prepareFake({ policy = POLICY_ROW(), last = null, states = [], gateCheckIns = [] } = {}) {
-  return fakeDriver((q) => {
+const SIGNED_PHRASES = { moves: [{ id: 'hide', trailPhrase: 'hide' }, { id: 'chase', trailPhrase: 'chase it' }, { id: 'turn_on_myself', trailPhrase: 'turn on yourself' }], context: 'someone pulls away' };
+function prepareFake({ policy = POLICY_ROW(), last = null, states = [], gateCheckIns = [], phrases = SIGNED_PHRASES } = {}) {
+  return fakeDriver((q, p) => {
     if (q === Q.OFFER_POLICY_QUERY) return [policy];
+    if (q === Q.PHRASES_QUERY) return [{ moves: phrases.moves.filter((m) => p.moveIds.includes(m.id)), context: p.contextId ? phrases.context : null }];
     if (q === TD.EVALUATED_AT_QUERY) return [{ at: last }];
     if (q === Q.OFFER_STATES_QUERY) return states;
     if (q === Q.GATE_CHECKINS_QUERY) return gateCheckIns;
@@ -390,6 +392,101 @@ test('prepare: the top enabled A–C candidate that is new and not blocked, thro
     assert.equal(await TD.prepareTrailOffers('u1', NOW, evaluate), null);
     assert.ok(!fake.calls.some((c) => c.query === R.WRITE_TRAIL_OFFER_QUERY || c.query === TD.STAMP_EVALUATED_QUERY));
   }
+});
+
+// ------------------------------------------------------------------ live = switched on and signed off
+
+test('ruleLive: enabled and approved, nothing else; the engine, the gate, prepare, Today and Reflect all ask it', () => {
+  const TR = require('../../lib/parts/trails/rules');
+  assert.equal(Q.ruleLive, TR.ruleLive, 'one helper (offers/queries re-exports the engine\'s)');
+  assert.equal(Q.ruleLive({ enabled: true, approved: true }), true);
+  for (const r of [{ enabled: true, approved: false }, { enabled: false, approved: true }, null, undefined]) assert.equal(Q.ruleLive(r), false);
+  const src = (f) => require('node:fs').readFileSync(require('node:path').resolve(__dirname, `../../src/parts/${f}`), 'utf8');
+  assert.match(src('offers/queries.ts'), /ruleEnabled: ruleLive\(rule\)/, 'the gate');
+  assert.match(src('offers/today.ts'), /if \(!ruleLive\(rule\) \|\| !rule\.statementTemplate\) return \[\];/, 'Today');
+  assert.match(src('offers/today.ts'), /state\.rules\.filter\(\(r\) => ruleLive\(r\) && r\.statementTemplate\)/, 'prepare');
+  assert.match(src('offers/review.ts'), /!ruleLive\(rule\) \|\| !rule\.statementTemplate/, 'Reflect');
+  assert.match(src('trails/rules.ts'), /if \(!ruleLive\(rule\)\) continue;/, 'the engine');
+  assert.match(require('../../lib/parts/trails/queries').TRAIL_RULES_QUERY, /approved: t\.reviewStatus = 'approved' AND t\.pending IS NULL/);
+});
+
+test('a rule switched on while still a draft: the engine finds nothing, the gate stays shut', () => {
+  const TT = require('../../lib/parts/trails');
+  const r = TT.ruleFrom({ id: 'trail_two_pulls', shape: 'C', minEpisodes: 3, cooldownDays: 28, enabled: true, statementTemplate: 'x', approved: false });
+  assert.deepEqual([r.enabled, r.approved], [true, false]);
+  const state = { records: [], policy: { episodeMergeHours: 2, louderPauseHours: 72 }, timeZone: null, rules: [r], moves: [], pairs: [], contexts: [], parts: [] };
+  assert.deepEqual(TT.trailsFromState(state, NOW.getTime()).candidates, []);
+  const gateIn = { partsOn: true, offersEnabled: true, checkIns: [], harm: { checkbacks: [], sessions: [], crisisCheckIns: [], partsMade: [] }, offers: [], offerId: null };
+  assert.deepEqual(G.offerGate({ ...gateIn, ruleEnabled: Q.ruleLive(r) }, G.DEFAULT_OFFER_POLICY, NOW).reasons, ['rule_off']);
+  assert.equal(G.offerGate({ ...gateIn, ruleEnabled: Q.ruleLive({ ...r, approved: true }) }, G.DEFAULT_OFFER_POLICY, NOW).open, true);
+});
+
+test('prepare / Today / Reflect: a rule forced on but a draft writes and shows nothing; approved, it does; a draft phrase writes nothing; offers off, nothing', async () => {
+  const V = require('../../lib/parts/offers/review');
+  const draft = POLICY_ROW({ rules: [{ ...POLICY_ROW().rules[0], approved: false }] });
+  const evaluate = async () => [trail()];
+  const wrote = (f) => f.calls.filter((c) => c.query === R.WRITE_TRAIL_OFFER_QUERY);
+
+  // Forced enabled, approved false: nothing written, nothing stamped, so the weekly budget isn't spent and
+  // the trail isn't marked offered (it can still be offered once signed off).
+  const a = prepareFake({ policy: draft });
+  setDriver(a.driver);
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, evaluate), null);
+  assert.equal(wrote(a).length, 0);
+  assert.ok(!a.calls.some((c) => c.query === TD.STAMP_EVALUATED_QUERY), 'no live rule: not even evaluated');
+  assert.deepEqual(await items(todayFake({ policy: draft })), [], 'Today: nothing');
+  // Another rule live, this one a draft: its candidate is skipped, never written.
+  const mixed = POLICY_ROW({ rules: [{ ...POLICY_ROW().rules[0], approved: false }, { id: 'trail_context', shape: 'A', enabled: true, cooldownDays: 28, statementTemplate: 'When {context}, the pull is to {pull}.', approved: true }] });
+  const m = prepareFake({ policy: mixed });
+  setDriver(m.driver);
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, evaluate), null);
+  assert.equal(wrote(m).length, 0, 'the draft rule\'s candidate is never written');
+
+  // The same rule approved: written, and Today shows it.
+  const b = prepareFake();
+  setDriver(b.driver);
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, evaluate), 'written');
+  assert.equal(wrote(b)[0].params.id, OID);
+  assert.equal((await items(todayFake())).length, 1);
+
+  // Approved, but a move or the context phrase is a draft: nothing is written (and the next candidate gets its turn).
+  for (const phrases of [
+    { moves: [{ id: 'hide', trailPhrase: 'hide' }], context: 'someone pulls away' },
+    { moves: [{ id: 'hide', trailPhrase: 'hide' }, { id: 'chase', trailPhrase: 'chase it' }], context: null },
+  ]) {
+    const c = prepareFake({ phrases });
+    setDriver(c.driver);
+    assert.equal(await TD.prepareTrailOffers('u1', NOW, evaluate), null);
+    assert.equal(wrote(c).length, 0);
+    const n = c.calls.find((x) => x.query === Q.PHRASES_QUERY);
+    assert.deepEqual([n.params.moveIds, n.params.contextId], [['hide', 'chase'], 'ctx_event_leaving'], 'the statement\'s pulls, in its order');
+  }
+  const next = prepareFake({ phrases: { moves: [{ id: 'hide', trailPhrase: 'hide' }], context: null } });
+  setDriver(next.driver);
+  const B2 = trail({ ruleId: 'trail_two_pulls', moveIds: ['hide'], contextId: null, pairId: null });
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, async () => [trail(), B2]), 'written', 'a candidate that can render after one that can\'t');
+  assert.equal(wrote(next)[0].params.contextId, null);
+
+  // Offers off: nothing anywhere.
+  const off = prepareFake({ policy: POLICY_ROW({ offersEnabled: false }) });
+  setDriver(off.driver);
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, evaluate), null);
+  assert.equal(wrote(off).length, 0);
+  assert.deepEqual(await items(todayFake({ policy: POLICY_ROW({ offersEnabled: false }) })), []);
+
+  // Reflect's rule D: forced on but a draft shows no block; approved, it does; offers off, none.
+  const D = { id: 'trail_known_part', shape: 'D', enabled: true, cooldownDays: 14, statementTemplate: 'Was this {name}?', approved: false };
+  const dCand = { ...trail({ ruleId: 'trail_known_part', shape: 'D', contextId: null, partId: PID, moveIds: ['hide'], pairId: null }) };
+  const reflect = (rule, offersEnabled = true) => V.getReflectTrailsHandler({
+    policy: async () => ({ partsOn: true, offersEnabled, policy: {}, rules: [rule] }),
+    gate: async () => ({ open: true, reasons: [] }), offers: async () => [], candidates: async () => [dCand],
+    parts: async () => [{ id: PID, name: 'Wren', firstPlace: null, shapeSig: null, safety: false, moveIds: ['hide'] }],
+    labels: async (keys) => ({ records: new Map(keys.map((k) => [k, ['Hide away']])), contexts: new Map() }),
+    patterns: async () => [], phrases: async () => ({ moves: new Map(), context: null }),
+  }, NOW);
+  assert.equal((await reflect(D)).reviews.length, 0, 'a draft rule D: no block');
+  assert.equal((await reflect({ ...D, approved: true })).reviews.length, 1, 'signed off: the block');
+  assert.equal((await reflect({ ...D, approved: true }, false)).reviews.length, 0, 'offers off');
 });
 
 // ------------------------------------------------------------------ getTrailOfferEvidence

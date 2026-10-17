@@ -21,7 +21,7 @@ const day = (n, hour = 18) => Date.parse('2026-10-16T00:00:00.000Z') - n * D + h
 
 // ---- content, as the graph has it (the fixture is generated from the same content.py) ----
 const RULES = FIXTURE.trailRules.map((r) => T.ruleFrom(r));
-const rule = (shape, over = {}) => ({ ...RULES.find((r) => r.shape === shape), enabled: true, ...over });
+const rule = (shape, over = {}) => ({ ...RULES.find((r) => r.shape === shape), enabled: true, approved: true, ...over });
 const CONTEXTS = FIXTURE.contexts.map((c) => ({ id: c.id, key: c.key, value: c.value, phrase: c.phrase }));
 const MOVES = [
   ...FIXTURE.moves.map((m) => ({ id: m.id, offerable: true, safetyLine: m.safetyLine === true, trailPhrase: m.trailPhrase })),
