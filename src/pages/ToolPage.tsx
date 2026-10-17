@@ -17,11 +17,15 @@ import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
 
-// Meet a part, the one tool loaded on demand: its gate below (parts on, copy signed off) stays eager, so
+// Meet a part, loaded on demand: its gate below (parts on, copy signed off) stays eager, so
 // a parts-off person never fetches it. With parts on, the fetch starts with the gate's own.
 const loadMeetAPart = () => import('./tools/MeetAPart');
 const LazyMeetAPart = lazy(() => loadMeetAPart().then((m) => ({ default: m.MeetAPart })));
 function MeetAPart() { return <Suspense fallback={<ToolLoading />}><LazyMeetAPart /></Suspense>; }
+// Wise mind (docs/design/wise-mind.md), its own chunk too: two SVG scenes and three practices nobody else needs.
+const loadWiseMind = () => import('./tools/WiseMind');
+const LazyWiseMind = lazy(() => loadWiseMind().then((m) => ({ default: m.WiseMind })));
+function WiseMind() { return <Suspense fallback={<ToolLoading />}><LazyWiseMind /></Suspense>; }
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -35,6 +39,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,
+  'wise-mind': WiseMind,
 };
 
 export function ToolPage() {

@@ -8,10 +8,10 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { loadFunctions, fakeDriver } = require('./fakeDriver.cjs');
 const {
-  STATS_THRESHOLDS, helpedFor, feltFor, whenFor, whenBand, localTime, partStats, statsByPart, partsReflect, hasLine,
+  STATS_THRESHOLDS, helpedFor, feltFor, whenFor, whenBand, localTime, partStats, statsByPart, partsReflect, hasLine, stepsFor,
 } = require('../../lib/parts/stats');
 const {
-  STATS_USER_QUERY, STATS_PARTS_QUERY, STATS_TAGS_QUERY, STATS_SESSIONS_QUERY, readStatsRows,
+  STATS_USER_QUERY, STATS_PARTS_QUERY, STATS_TAGS_QUERY, STATS_SESSIONS_QUERY, STATS_STEPS_QUERY, readStatsRows,
 } = require('../../lib/parts/statsQueries');
 
 const { fns, setDriver } = loadFunctions();
@@ -24,7 +24,9 @@ const tag = (toolId, a, partId = 'p1') => ({ partId, toolId, at: a });
 const visit = (firstFeel, day, month = 7, partId = 'p1') => ({ partId, at: at(10, 0, day, month), firstFeel });
 
 test('the thresholds are the agreed numbers', () => {
-  assert.deepEqual({ ...STATS_THRESHOLDS }, { helpedMinTags: 3, helpedMaxTools: 3, feltMinPerHalf: 3, whenMinTags: 3 });
+  assert.deepEqual({ ...STATS_THRESHOLDS }, {
+    helpedMinTags: 3, helpedMaxTools: 3, feltMinPerHalf: 3, whenMinTags: 3, stepsMinSessions: 2, stepsMaxSteps: 3,
+  });
 });
 
 test('helped: 2 tags say nothing, 3 do; a count per tool, most first, ties to the most recent, at most 3', () => {
@@ -88,13 +90,14 @@ const rows = (o = {}) => ({
   ],
   tags: [tag('pause', at(18)), tag('pause', at(19)), tag('cool-down', at(20)), tag('pause', at(9), 'p2')],
   sessions: [],
+  steps: [],
   ...o,
 });
 
 test('per part: only its own rows; parts off nothing; set-aside and unknown parts left out; no line, no block', () => {
   const s = statsByPart(rows());
-  assert.deepEqual(s.get('p1'), { helped: [{ toolId: 'pause', n: 2 }, { toolId: 'cool-down', n: 1 }], felt: null, when: 'evenings' });
-  assert.deepEqual(s.get('p2'), { helped: null, felt: null, when: null }, "p2's one tag isn't p1's");
+  assert.deepEqual(s.get('p1'), { helped: [{ toolId: 'pause', n: 2 }, { toolId: 'cool-down', n: 1 }], felt: null, when: 'evenings', steps: null });
+  assert.deepEqual(s.get('p2'), { helped: null, felt: null, when: null, steps: null }, "p2's one tag isn't p1's");
   assert.equal(hasLine(s.get('p2')), false);
   assert.deepEqual(partsReflect(rows()).map((p) => p.id), ['p1'], 'only parts with a line');
   assert.deepEqual(partsReflect(rows())[0], {
@@ -109,11 +112,11 @@ test('per part: only its own rows; parts off nothing; set-aside and unknown part
   const stranger = rows({ tags: [tag('pause', at(18), 'someone-elses'), tag('pause', at(19), 'someone-elses'), tag('pause', at(20), 'someone-elses')] });
   assert.deepEqual(partsReflect(stranger), []);
   // the result never carries the raw feel answers
-  assert.deepEqual(Object.keys(partStats([], [], null)).sort(), ['felt', 'helped', 'when']);
+  assert.deepEqual(Object.keys(partStats([], [], null)).sort(), ['felt', 'helped', 'steps', 'when']);
 });
 
 test('reads: through the caller\'s own User and edges, active or resting parts, parts on, first answer only', () => {
-  for (const q of [STATS_PARTS_QUERY, STATS_TAGS_QUERY, STATS_SESSIONS_QUERY]) {
+  for (const q of [STATS_PARTS_QUERY, STATS_TAGS_QUERY, STATS_SESSIONS_QUERY, STATS_STEPS_QUERY]) {
     assert.match(q, /^\s*MATCH \(u:User \{id: \$uid\}\)-\[:HAS_PART(_TAG|_SESSION)?\]->/);
     assert.match(q, /coalesce\(u\.partsEnabled, false\)/);
     assert.match(q, /pt\.status IN \['active', 'resting'\]/);
@@ -138,11 +141,15 @@ function fakeTx(responder) {
 
 test('readStatsRows: parts off stops after the user read; on, it maps every row', async () => {
   const off = fakeTx((q) => (/AS timeZone/.test(q) ? [{ partsOn: false, timeZone: 'Europe/London' }] : []));
-  assert.deepEqual(await readStatsRows(off.tx, 'u1'), { partsOn: false, timeZone: null, parts: [], tags: [], sessions: [] });
+  assert.deepEqual(await readStatsRows(off.tx, 'u1'), { partsOn: false, timeZone: null, parts: [], tags: [], sessions: [], steps: [] });
   assert.equal(off.f.calls.length, 1);
   const on = fakeTx((q) => {
     if (/AS timeZone/.test(q)) return [{ partsOn: true, timeZone: 'Europe/London' }];
     if (/pt\.shapeSig AS shapeSig/.test(q)) return [{ id: 'p1', name: 'The guard', status: 'active', firstPlace: 'chest', shapeSig: [0.5, 0.5, 0.5, 0.5, 0.5] }];
+    if (/AS stepId/.test(q)) return [
+      { partId: 'p1', stepId: 'recover:park', label: 'Park the replay', at: at(9) },
+      { partId: 'p1', stepId: null, label: 'x', at: at(9) }, { partId: 'p1', stepId: 'recover:land', label: '', at: at(9) },
+    ];
     if (/HAS_PART_TAG/.test(q)) return [{ partId: 'p1', toolId: 'pause', at: at(9) }, { partId: 'p1', toolId: null, at: at(10) }];
     if (/HAS_PART_SESSION/.test(q)) return [{ partId: 'p1', at: at(9), firstFeel: 'feel_tired' }, { partId: 'p1', at: at(9), firstFeel: null }];
     return [];
@@ -153,6 +160,7 @@ test('readStatsRows: parts off stops after the user read; on, it maps every row'
     parts: [{ id: 'p1', name: 'The guard', status: 'active', firstPlace: 'chest', shapeSig: [0.5, 0.5, 0.5, 0.5, 0.5] }],
     tags: [{ partId: 'p1', toolId: 'pause', at: at(9) }],
     sessions: [{ partId: 'p1', at: at(9), firstFeel: 'feel_tired' }],
+    steps: [{ partId: 'p1', stepId: 'recover:park', label: 'Park the replay', at: at(9) }],
   });
   assert.ok(on.f.calls.every((c) => c.params.uid === 'u1'));
 });
@@ -162,6 +170,7 @@ function reflectDriver(parts) {
   return fakeDriver((q) => {
     if (/AS timeZone/.test(q)) return [{ partsOn: parts.on, timeZone: null }];
     if (/pt\.shapeSig AS shapeSig/.test(q)) return parts.parts ?? [];
+    if (/AS stepId/.test(q)) return parts.steps ?? [];
     if (/HAS_PART_TAG/.test(q)) return parts.tags ?? [];
     if (/HAS_PART_SESSION/.test(q)) return parts.sessions ?? [];
     return [];
@@ -187,10 +196,10 @@ test('getInsightsData: `parts` null with parts off; with parts on, the parts tha
   out = await fns.getInsightsData.run({ auth: auth(), data: { timeRange: '7d' } });
   assert.deepEqual(out.parts, [{
     id: 'p1', name: 'The guard', firstPlace: 'chest', shapeSig: null,
-    stats: { helped: [{ toolId: 'pause', n: 2 }, { toolId: 'cool-down', n: 1 }], felt: null, when: 'evenings' },
+    stats: { helped: [{ toolId: 'pause', n: 2 }, { toolId: 'cool-down', n: 1 }], felt: null, when: 'evenings', steps: null },
   }]);
   const reads = f.calls.filter((c) => /HAS_PART|AS timeZone/.test(c.query));
-  assert.equal(reads.length, 4);
+  assert.equal(reads.length, 5);
   assert.ok(reads.every((c) => !('days' in c.params) && c.params.uid === 'u1'), 'not the range: all time, the caller');
   assert.equal(new Set(reads.map((c) => c.session)).size, 1, 'one read transaction');
   assert.ok(f.allClosed());
@@ -248,6 +257,7 @@ test('helped ignores debrief tags: the tags read filters them out before the com
   const tx = fakeTx((q) => {
     if (/AS timeZone/.test(q)) return [{ partsOn: true, timeZone: null }];
     if (/pt\.shapeSig AS shapeSig/.test(q)) return [{ id: 'p1', name: 'The guard', status: 'active', firstPlace: null, shapeSig: null }];
+    if (/AS stepId/.test(q)) return [];
     if (/HAS_PART_TAG/.test(q)) {
       const closeOnly = /coalesce\(t\.source, 'close'\) = 'close'/.test(q);
       return all.filter((r) => !closeOnly || r.source === 'close').map(({ source: _s, ...r }) => r);
@@ -257,4 +267,95 @@ test('helped ignores debrief tags: the tags read filters them out before the com
   const rows = await readStatsRows(tx, 'u1');
   assert.deepEqual(rows.tags.map((t) => t.toolId), ['pause']);
   assert.deepEqual(partsReflect(rows), [], 'one close tag: below every threshold, no block');
+});
+
+const step = (stepId, a, label = stepId, partId = 'p1') => ({ partId, stepId, label, at: a });
+
+test('steps: 1 tagged session says nothing, 2 do; most used first, ties to the most recent, at most 3', () => {
+  assert.equal(stepsFor([]), null);
+  assert.equal(stepsFor([step('recover:park', at(9))]), null, '1 session');
+  assert.deepEqual(stepsFor([step('recover:park', at(9)), step('oa:fear_avoid:small', at(10))]),
+    [{ stepId: 'oa:fear_avoid:small', label: 'oa:fear_avoid:small', n: 1 }, { stepId: 'recover:park', label: 'recover:park', n: 1 }],
+    '2 sessions, one each: the more recent first');
+  const rows = [
+    step('recover:park', at(9)), step('oa:fear_avoid:small', at(8)), step('oa:fear_avoid:small', at(7)),
+    step('recover:land', at(12)), step('recover:land', at(6)), step('oa:sad_withdraw:medium', at(13)),
+  ];
+  assert.deepEqual(stepsFor(rows).map((s) => [s.stepId, s.n]),
+    [['recover:land', 2], ['oa:fear_avoid:small', 2], ['oa:sad_withdraw:medium', 1]], 'twice before once; a tie to the latest; ≤ 3');
+  // the label is the latest row's (the graph's wording can change between sessions)
+  assert.equal(stepsFor([step('recover:park', at(9), 'Park it'), step('recover:park', at(10), 'Park the replay')])[0].label, 'Park the replay');
+  // a row with no id, no label or no time never counts toward the threshold
+  assert.equal(stepsFor([step('recover:park', at(9)), step('', at(10)), step('recover:land', at(11), '')]), null);
+  assert.equal(stepsFor([step('recover:park', at(9)), step('recover:land', 'not a time')]), null);
+});
+
+test('steps: per part, a line of its own (a part with only steps has a Reflect block)', () => {
+  const r = rows({ tags: [], steps: [step('recover:park', at(9), 'Park the replay', 'p3'), step('recover:park', at(10), 'Park the replay', 'p3'), step('recover:land', at(9), 'x', 'p2')] });
+  const s = statsByPart(r);
+  assert.deepEqual(s.get('p3'), { helped: null, felt: null, when: null, steps: [{ stepId: 'recover:park', label: 'Park the replay', n: 2 }] });
+  assert.equal(s.get('p2').steps, null, "p3's steps aren't p2's");
+  assert.equal(hasLine(s.get('p3')), true);
+  assert.deepEqual(partsReflect(r).map((p) => p.id), ['p3']);
+  assert.equal(partsReflect(rows({ partsOn: false, steps: r.steps })), null, 'parts off: nothing');
+});
+
+/**
+ * The graph as the steps query sees it, for a fake driver: every session the caller tagged, with the
+ * snapshot OA stores. The responder applies the query's own filters (the tools it names, the sizes it
+ * tests with CONTAINS), so a change to the query that lets own words or another tool through fails here.
+ */
+function stepsGraph(q) {
+  const tools = [...q.matchAll(/ToolSession \{toolId: '([\w-]+)'\}/g)].map((m) => m[1]);
+  const sizes = [...q.matchAll(/CONTAINS '"actionSize":"(\w+)"'/g)].map((m) => m[1]);
+  const tagged = [
+    { toolId: 'opposite-action', at: at(9), urge: { id: 'fear_avoid', small: 'Stay in the room for five minutes' },
+      dataJson: JSON.stringify({ urgeId: 'fear_avoid', parentId: 'fear', actionSize: 'small', action: 'Stay in the room for five minutes' }) },
+    { toolId: 'opposite-action', at: at(10), urge: { id: 'fear_avoid', small: 'Stay in the room for five minutes' },
+      dataJson: JSON.stringify({ urgeId: 'fear_avoid', parentId: 'fear', actionSize: 'custom', action: 'call my sister Jo' }) },
+    { toolId: 'opposite-action', at: at(11), urge: null, erc: { dbtParent: 'sadness', defaultOppositeMedium: 'Reach out to one person' },
+      dataJson: JSON.stringify({ urgeId: 'custom', customUrge: 'hide under "actionSize":"small"', parentId: 'sadness', actionSize: 'medium', action: 'Reach out to one person' }) },
+    { toolId: 'recovering-from-invalidation', at: at(12), exit: { id: 'park', title: 'Park the replay' } },
+    { toolId: 'pause', at: at(13) },
+    { toolId: 'dear-man', at: at(14), exit: { id: 'ask', title: 'Ask them to hear you' } },
+  ];
+  return tagged.filter((t) => tools.includes(t.toolId)).flatMap((t) => {
+    if (t.toolId === 'recovering-from-invalidation') return [{ partId: 'p1', stepId: `recover:${t.exit.id}`, label: t.exit.title, at: t.at }];
+    if (t.toolId !== 'opposite-action') return [];
+    const size = sizes.find((z) => t.dataJson.includes(`"actionSize":"${z}"`));
+    if (!size) return [];
+    if (t.urge) return [{ partId: 'p1', stepId: `oa:${t.urge.id}:${size}`, label: t.urge[size], at: t.at }];
+    const key = `defaultOpposite${size[0].toUpperCase()}${size.slice(1)}`;
+    return [{ partId: 'p1', stepId: `oa:default_${t.erc.dbtParent}:${size}`, label: t.erc[key], at: t.at }];
+  });
+}
+
+test('steps query: Do the Opposite and Recover only, the step picked by id, own words never counted or returned', async () => {
+  const tx = fakeTx((q) => {
+    if (/AS timeZone/.test(q)) return [{ partsOn: true, timeZone: null }];
+    if (/pt\.shapeSig AS shapeSig/.test(q)) return [{ id: 'p1', name: null, status: 'active', firstPlace: null, shapeSig: null }];
+    if (/AS stepId/.test(q)) return stepsGraph(q);
+    return [];
+  });
+  const r = await readStatsRows(tx.tx, 'u1');
+  assert.deepEqual(r.steps.map((s) => s.stepId), ['oa:fear_avoid:small', 'oa:default_sadness:medium', 'recover:park'],
+    "own words (actionSize custom) drop out; Pause and DEAR MAN aren't read; a custom urge's text can't fake a size");
+  assert.deepEqual(statsByPart(r).get('p1').steps.map((s) => s.label),
+    ['Park the replay', 'Reach out to one person', 'Stay in the room for five minutes']);
+  assert.ok(!JSON.stringify(r).includes('call my sister'), 'the person\'s own words never leave the read');
+  const call = tx.f.calls.find((c) => /AS stepId/.test(c.query));
+  assert.deepEqual(call.params, { uid: 'u1' });
+  // the query itself: ids and graph labels out, never the snapshot or the person's text
+  const q = STATS_STEPS_QUERY;
+  assert.match(q, /AND coalesce\(t\.source, 'close'\) = 'close'/, 'close tags only');
+  assert.match(q, /\(ts\)-\[:DETAIL\]->\(d:OppositeActionSession\)<-\[:COMPLETED_SESSION\]-\(u\)/, "the caller's own OA record");
+  assert.match(q, /\(ts\)-\[:DETAIL\]->\(d:InvalidationRecoverySession\)<-\[:COMPLETED_SESSION\]-\(u\)/, "the caller's own Recover record");
+  assert.doesNotMatch(q, /"actionSize":"custom"/, 'own words are never a step');
+  const returns = [...q.matchAll(/RETURN ([^\n]+)/g)].map((m) => m[1]);
+  assert.equal(returns.length, 2);
+  for (const ret of returns) {
+    assert.doesNotMatch(ret, /dataJson|\.action\b|customUrge/, 'no snapshot text returned');
+    assert.match(ret, /AS partId, .*stepId, .*label, .*AS at$/);
+  }
+  assert.deepEqual([...q.matchAll(/toolId: '([\w-]+)'/g)].map((m) => m[1]), ['opposite-action', 'recovering-from-invalidation']);
 });

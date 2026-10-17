@@ -136,3 +136,11 @@ test("the room: saves on drop, unlinks by id, the light is not a control, tender
   // Set-aside parts never reach the room: the server sends active and resting only.
   assert.doesNotMatch(room + view, /set_aside/);
 });
+
+test("keyboard order follows the room: figures and thread removes in measured reading order, focus kept across a reorder", () => {
+  const room = read("src/components/parts/den/DenRoom.tsx");
+  assert.match(room, /\{inReadingOrder\(\[/);
+  assert.match(room, /if \(held \|\| drag\) return;/, "never reordered while a figure is held or dragged");
+  assert.match(room, /if \(active && root\.contains\(active\)\) refocus\.current = active\.dataset\.denFocus \?\? null;/);
+  assert.match(room, /if \(row && b\.r\.top - row\[0\]\.r\.top <= ROW_PX\) row\.push\(b\); else rows\.push\(\[b\]\);/);
+});

@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
+import { useId, useLayoutEffect, useRef, useState, type KeyboardEvent, type PointerEvent, type ReactElement } from 'react';
 import type { DenLink, DenRecency } from '../../../data/partsTypes';
 import { PartFigure } from '../PartFigure';
 import { FIGURE_BOX } from '../../../lib/partFigure';
@@ -56,6 +56,25 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
   const [held, setHeld] = useState<Held | null>(null);
   const [drag, setDrag] = useState<{ id: string; x0: number; y0: number; at: Spot | null } | null>(null);
   const interactive = !!onMove && !small;
+  /** The controls' keys in reading order, measured after layout (null until then: the source order). */
+  const [order, setOrder] = useState<string[] | null>(null);
+  /** A control that had focus when the order changed: moving a node in the DOM drops its focus, so it is given back. */
+  const refocus = useRef<string | null>(null);
+  useLayoutEffect(() => {
+    const root = roomRef.current;
+    if (!root || !interactive) return;
+    if (refocus.current) {
+      root.querySelector<HTMLElement>(`:scope > [data-den-focus="${refocus.current}"]`)?.focus({ preventScroll: true });
+      refocus.current = null;
+    }
+    // Never while a figure is held or dragged: it stays where it is in the order until it is put down.
+    if (held || drag) return;
+    const next = readingOrder([...root.querySelectorAll<HTMLElement>(':scope > [data-den-focus]')]);
+    if (order && order.join('|') === next.join('|')) return;
+    const active = document.activeElement as HTMLElement | null;
+    if (active && root.contains(active)) refocus.current = active.dataset.denFocus ?? null;
+    setOrder(next);
+  }, [interactive, held, drag, order, spots, parts, links]);
   const fig = small ? FIGURE_SMALL : FIGURE;
   const named = new Map(parts.map((p) => [p.id, p.name]));
 
@@ -128,7 +147,10 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
           })}
         </svg>
 
-        {parts.map((p) => {
+        {/* Figures and thread removes in reading order (top to bottom, left to right, as measured), so Tab
+            follows the room; the DOM order never changes where anything is drawn. */}
+        {inReadingOrder([
+          ...(parts.map((p) => {
           const s = spotOf(p.id);
           if (!s) return null;
           const light = p.recency ? figureLight(p.recency, p.resting) : { glow: 0, opacity: p.resting ? 0.8 : 1 };
@@ -158,7 +180,7 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
             );
           }
           return (
-            <button key={p.id} type="button" aria-label={p.name} aria-pressed={held?.id === p.id}
+            <button key={p.id} data-den-focus={p.id} type="button" aria-label={p.name} aria-pressed={held?.id === p.id}
               data-den-figure={p.id} data-selected={chosen ? '' : undefined}
               className={`absolute -translate-x-1/2 -translate-y-1/2 text-center min-w-11 min-h-11 p-1 rounded-xl touch-none select-none cursor-grab
                 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-border-accent)]
@@ -193,17 +215,17 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
               {body}
             </button>
           );
-        })}
-
-        {interactive && onUnlink && lines.map(({ l, a, b }) => (
-          <button key={`x-${l.id}`} type="button"
+        })).flatMap((n) => (n ? [n] : [])),
+          ...((interactive && onUnlink && lines.map(({ l, a, b }) => (
+          <button key={`x-${l.id}`} data-den-focus={`x-${l.id}`} type="button"
             aria-label={`${copy?.den_remove ?? ''}: ${named.get(l.aId) ?? ''}, ${named.get(l.bId) ?? ''}`}
             className="absolute -translate-x-1/2 -translate-y-1/2 min-w-11 min-h-11 flex items-center justify-center rounded-full text-base text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             style={{ left: `${((a.x + b.x) / 2) * 100}%`, top: `${((a.y + b.y) / 2) * 100}%` }}
             onClick={() => onUnlink(l)} data-den-unlink={l.id}>
             <span aria-hidden="true">×</span>
           </button>
-        ))}
+        ))) || []),
+        ], order)}
       </div>
       {interactive && copy && (
         <p id={help} className="mt-2 text-xs text-center text-[var(--color-text-secondary)]">
@@ -212,6 +234,26 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
       )}
     </div>
   );
+}
+
+/** Rows of controls whose tops sit within ROW_PX of the row's first, top to bottom; left to right in a row. */
+const ROW_PX = 8;
+function readingOrder(els: readonly HTMLElement[]): string[] {
+  const boxes = els.map((e) => ({ key: e.dataset.denFocus ?? '', r: e.getBoundingClientRect() })).sort((a, b) => a.r.top - b.r.top);
+  const rows: Array<typeof boxes> = [];
+  for (const b of boxes) {
+    const row = rows[rows.length - 1];
+    if (row && b.r.top - row[0].r.top <= ROW_PX) row.push(b); else rows.push([b]);
+  }
+  return rows.flatMap((row) => row.sort((a, b) => a.r.left - b.r.left).map((b) => b.key));
+}
+
+/** The elements in the measured order (any not measured yet keep their place at the end). */
+function inReadingOrder(nodes: ReactElement[], order: readonly string[] | null): ReactElement[] {
+  if (!order) return nodes;
+  const at = new Map(order.map((k, i) => [k, i]));
+  const rank = (n: ReactElement) => at.get(String(n.key)) ?? order.length;
+  return [...nodes].sort((a, b) => rank(a) - rank(b));
 }
 
 /** A soft wedge from `a` (wide) to `b` (narrow), in the room's 0..100 box. */

@@ -72,6 +72,8 @@ const SELECTOR = {
   'review/failed': '[data-testid="known-part-review"] button[aria-pressed="true"]',
 };
 const NO_CHECKBACK = new Set(['meet/danger_close']);
+// lane 4 (parts-steps-tried): screens that must also show "Steps that helped" (fresh loads, without ids).
+const ALSO_EXPECT = { 'me/cards': ['stats_steps'], 'me/long': ['stats_steps'], 'reflect/': ['stats_steps'] };
 
 /** Every surface and branch, angry's in both wordings, and a few with Show ids. */
 function plan(map) {
@@ -147,6 +149,7 @@ try {
         }
         if (v.plain && (v.key === 'angry/speak' || v.key === 'angry/later') && text.includes(copy('angry_later'))) bad('later line shown with plain wording');
         if (SELECTOR[v.key] && !(await page.locator(SELECTOR[v.key]).count())) bad(`missing ${SELECTOR[v.key]}`);
+        for (const id of ALSO_EXPECT[v.key] ?? []) if (!text.toLowerCase().includes(copy(id).toLowerCase())) bad(`missing ${id}: "${copy(id)}"`); // lane 4
         if (NO_CHECKBACK.has(v.key) && text.includes(copy('close_checkback'))) bad('check-back question after a danger ending');
         if (v.surface === 'oa_goal') {
           const shows = (await page.locator('[data-testid="goal-line"]').count()) > 0;

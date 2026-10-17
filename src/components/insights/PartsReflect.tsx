@@ -60,6 +60,7 @@ export function PartsReflect({ parts, delay = 0 }: { parts: PartReflect[]; delay
                   </ul>
                 </div>
               )}
+              {lines.steps && <p className="text-sm text-[var(--color-text-secondary)] break-words">{lines.steps}</p>}
               {lines.felt && (
                 <div>
                   <p className="text-xs text-[var(--color-text-tertiary)]">{lines.felt.title}</p>

@@ -1,7 +1,7 @@
 /**
  * The integration readout per part (docs/design/parts.md, "The part card", and Reflect): what has helped
- * it settle (the person's own tags), how they've felt toward it over their visits, and when it tends to
- * show up. Pure: rows in (statsQueries.ts reads them), counts and ids out; the app words them from the
+ * it settle (the person's own tags), how they've felt toward it over their visits, when it tends to
+ * show up, and which steps they chose in the tagged Do the Opposite and Recover sessions. Pure: rows in (statsQueries.ts reads them), counts and ids out; the app words them from the
  * shipped copy (common/stats). Reflect reads it through insights/queries.ts; Me's card can attach the
  * same `partStats` to each part (getMe, later).
  *
@@ -20,6 +20,10 @@ export const STATS_THRESHOLDS = {
   feltMinPerHalf: 3,
   /** when: the part's tags in all; one band must also hold more than half of them. */
   whenMinTags: 3,
+  /** steps: tagged sessions that have a step, in all. */
+  stepsMinSessions: 2,
+  /** steps: steps shown at most. */
+  stepsMaxSteps: 3,
 } as const;
 
 /** A kept part as the stats query returns it (the caller's own, through their User). */
@@ -38,6 +42,11 @@ export interface StatsTagRow { partId: string; toolId: string; at: string }
  * head alone and nothing here returns it raw, only the most common per half.
  */
 export interface StatsSessionRow { partId: string; at: string; firstFeel: string }
+/**
+ * One close-tagged Do the Opposite or Recover session of the part that has a step: the step's id and
+ * graph label (statsQueries.ts STATS_STEPS_QUERY reads ids, never the person's text) and the tag's time.
+ */
+export interface StatsStepRow { partId: string; stepId: string; label: string; at: string }
 
 export interface StatsRows {
   partsOn: boolean;
@@ -46,6 +55,7 @@ export interface StatsRows {
   parts: StatsPartRow[];
   tags: StatsTagRow[];
   sessions: StatsSessionRow[];
+  steps: StatsStepRow[];
 }
 
 const byTime = (a: { at: string }, b: { at: string }) => Date.parse(a.at) - Date.parse(b.at);
@@ -88,6 +98,25 @@ export function helpedFor(tags: readonly StatsTagRow[]): PartStats['helped'] {
     .map(([toolId, { n }]) => ({ toolId, n }));
 }
 
+/**
+ * Steps by how many tagged sessions chose them, most first, ties by the most recent; only with ≥ 2 such
+ * sessions in all; ≤ 3 steps. The label is the latest row's (graph copy can be reworded).
+ */
+export function stepsFor(rows: readonly StatsStepRow[]): PartStats['steps'] {
+  const valid = rows.filter((r) => r.stepId && r.label && Number.isFinite(Date.parse(r.at)));
+  if (valid.length < STATS_THRESHOLDS.stepsMinSessions) return null;
+  const by = new Map<string, { n: number; last: number; label: string }>();
+  for (const r of valid) {
+    const at = Date.parse(r.at);
+    const e = by.get(r.stepId) ?? { n: 0, last: -Infinity, label: r.label };
+    by.set(r.stepId, { n: e.n + 1, last: Math.max(e.last, at), label: at >= e.last ? r.label : e.label });
+  }
+  return [...by.entries()]
+    .sort(([a, x], [b, y]) => y.n - x.n || y.last - x.last || a.localeCompare(b))
+    .slice(0, STATS_THRESHOLDS.stepsMaxSteps)
+    .map(([stepId, { n, label }]) => ({ stepId, label, n }));
+}
+
 /** The most common answer; a tie goes to the one given most recently (rows oldest first). */
 function mostCommon(rows: readonly StatsSessionRow[]): string {
   const n = new Map<string, number>();
@@ -124,12 +153,14 @@ export function whenFor(tags: readonly StatsTagRow[], timeZone: string | null): 
   return PART_WHENS.find((b) => (n.get(b) ?? 0) * 2 > tags.length) ?? null;
 }
 
-/** One part's lines from its own tags and visits. */
-export function partStats(tags: readonly StatsTagRow[], sessions: readonly StatsSessionRow[], timeZone: string | null): PartStats {
-  return { helped: helpedFor(tags), felt: feltFor(sessions, timeZone), when: whenFor(tags, timeZone) };
+/** One part's lines from its own tags, visits and tagged steps. */
+export function partStats(
+  tags: readonly StatsTagRow[], sessions: readonly StatsSessionRow[], timeZone: string | null, steps: readonly StatsStepRow[] = [],
+): PartStats {
+  return { helped: helpedFor(tags), felt: feltFor(sessions, timeZone), when: whenFor(tags, timeZone), steps: stepsFor(steps) };
 }
 
-export const hasLine = (s: PartStats): boolean => s.helped !== null || s.felt !== null || s.when !== null;
+export const hasLine = (s: PartStats): boolean => s.helped !== null || s.felt !== null || s.when !== null || s.steps !== null;
 
 /**
  * Every active or resting part's stats, keyed by part id (parts below every threshold included, with
@@ -140,7 +171,10 @@ export function statsByPart(rows: StatsRows): Map<string, PartStats> {
   if (!rows.partsOn) return out;
   const kept = rows.parts.filter((p) => p.status === 'active' || p.status === 'resting');
   for (const p of kept) {
-    out.set(p.id, partStats(rows.tags.filter((t) => t.partId === p.id), rows.sessions.filter((s) => s.partId === p.id), rows.timeZone));
+    out.set(p.id, partStats(
+      rows.tags.filter((t) => t.partId === p.id), rows.sessions.filter((s) => s.partId === p.id), rows.timeZone,
+      rows.steps.filter((s) => s.partId === p.id),
+    ));
   }
   return out;
 }

@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-10-17-schema-replay.json",
-    "exportedAt": "2026-10-17T02:21:22.691Z"
+    "exportedAt": "2026-10-17T02:44:39.268Z"
   },
   "content": {
     "version": "wise-mind-v1",
@@ -9,7 +9,8 @@
     "copy": {
       "chrome": {
         "back": "Back",
-        "next": "Next"
+        "next": "Next",
+        "skip": "Skip"
       },
       "question": {
         "prompt": "What would you like wise mind's help with?",
@@ -33,6 +34,7 @@
         "here": "I'm here",
         "hold": "Hold as you breathe in",
         "letGo": "Let go as you breathe out",
+        "holdHint": "Hold to fill it, or press once and wait.",
         "listen": "Listen."
       },
       "comes": {

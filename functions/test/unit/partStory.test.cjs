@@ -62,7 +62,7 @@ test('getPartStory over the fake driver: the caller\'s own part by key, set-asid
   const on = fakeDriver((q) => {
     if (q === SQ.STATS_USER_QUERY) return [{ partsOn: true, timeZone: 'America/Los_Angeles' }];
     if (q === SQ.STATS_PARTS_QUERY) return [{ id: A, name: 'Guard', status: 'active', firstPlace: null, shapeSig: null }];
-    if (q === SQ.STATS_TAGS_QUERY || q === SQ.STATS_SESSIONS_QUERY) return [];
+    if (q === SQ.STATS_TAGS_QUERY || q === SQ.STATS_SESSIONS_QUERY || q === SQ.STATS_STEPS_QUERY) return [];
     if (q === ST.STORY_PART_QUERY) {
       return [{ id: A, createdAt: '2026-08-01T03:00:00Z', tender: false, status: 'resting', jobIds: ['job_b'], ownJob: null,
         jobHistoryJson: JSON.stringify([{ jobIds: ['job_a'], ownJob: null, until: '2026-09-10T10:00:00Z' }]) }];

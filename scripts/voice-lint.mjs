@@ -195,6 +195,9 @@ export const PARTS_SLOT_WIDTH = {
   // A part's story (story_job_then / story_job_now): a job as the card shows it, at its longest chip
   // label (meet/job and meet/rather); the person's own words can be longer and wrap.
   old: 48, new: 48,
+  // Steps that helped: one step's graph label (ActionUrge steps run long and wrap; the lint counts a
+  // realistic one), and the joined list as the line holds it.
+  step: 60, steps: 60,
 };
 
 /** Row kind → lint scope, length limit and the slots it may carry. */

@@ -83,7 +83,7 @@ export function storyView(story: GetPartStoryResponse, content: PartsContent, co
     lines.push({ kind: 'text', key: `${m.kind}-${i}`, text: fill(template, { month }) });
   });
 
-  const stat = partStatLines({ helped: story.helped.length ? story.helped : null, felt: story.felt ?? null, when: null }, content, deps);
+  const stat = partStatLines({ helped: story.helped.length ? story.helped : null, felt: story.felt ?? null, when: null, steps: null }, content, deps);
   const sections: StorySection[] = [];
   if (stat.felt) sections.push({ key: 'felt', title: stat.felt.title, lines: [stat.felt.line] });
   if (stat.helped) sections.push({ key: 'helped', title: stat.helped.title, lines: stat.helped.lines });

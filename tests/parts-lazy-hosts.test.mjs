@@ -61,11 +61,16 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part is the only lazy tool; its gate stays eager and fetches the content on demand", () => {
+test("Meet a part and Wise mind are the lazy tools; Meet a part's gate stays eager and fetches the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 1, "one lazy tool");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 2, "two lazy tools");
+  // Wise mind (not a parts surface): its own chunk, for everyone.
+  assert.match(page, /const loadWiseMind = \(\) => import\('\.\/tools\/WiseMind'\);/);
+  assert.match(page, /const LazyWiseMind = lazy\(\(\) => loadWiseMind\(\)\.then\(\(m\) => \(\{ default: m\.WiseMind \}\)\)\);/);
+  assert.match(page, /<Suspense fallback=\{<ToolLoading \/>\}><LazyWiseMind \/><\/Suspense>/);
+  assert.match(page, /'wise-mind': WiseMind,/);
   assert.match(page, /'meet-a-part': MeetAPart,/);
   assert.match(page, /if \(tool\?\.id === 'meet-a-part' && partsOn\) void loadMeetAPart\(\)/, "prefetched only with parts on");
   const gate = read("src/hooks/useToolGate.ts");
