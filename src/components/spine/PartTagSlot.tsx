@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState, type ComponentProps } from 'react';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
 import type { PartsContent } from '../../data/partsContentTypes';
@@ -6,7 +6,10 @@ import type { ThenVsNow } from '../../data/capacityTypes';
 import type { ActedOnUrge } from '../../data/spineTypes';
 import { isBetterClose, isTagRowTool, tagRowGate } from '../../lib/partTag';
 import { shapeOfferReady } from '../../lib/partShape';
-import { PartTagRow } from './PartTagRow';
+
+// The row is fetched only once its gate below holds (parts on, a better close, every line shipped).
+const LazyRow = lazy(() => import('./PartTagRow').then((m) => ({ default: m.PartTagRow })));
+function PartTagRow(p: ComponentProps<typeof LazyRow>) { return <Suspense fallback={null}><LazyRow {...p} /></Suspense>; }
 
 /**
  * Where a host's close puts "Was this a part you know?" (PartTagRow): under the saved answer, never in

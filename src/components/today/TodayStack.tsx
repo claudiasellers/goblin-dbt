@@ -1,14 +1,19 @@
-import { useState, type ReactNode } from 'react';
+import { Suspense, lazy, useState, type ComponentProps, type ReactNode } from 'react';
 import { todayCards, useToday, visibleOaPending } from '../../hooks/useToday';
 import { useOppositeActionFollowUpsContext } from '../../hooks/useOppositeActionFollowUps';
 import { OppositeActionFollowUpCard } from '../tools/oppositeAction/OppositeActionFollowUpCard';
 import { TodayCard } from './TodayCard';
 import { PatternOfferCard } from '../me/PatternOfferCard';
-import { PartCheckbackCard } from '../parts/PartCheckbackCard';
 import { PART_CHECKBACK_TYPE } from '../../lib/partCheckback';
-import { TrailOfferCard } from '../parts/TrailOfferCard';
 import { TRAIL_OFFER_KIND } from '../../lib/trailOffer';
 import type { TodayItem } from '../../services/spine';
+
+// Parts cards are fetched only when TodayProvider keeps one (parts on, copy signed off), so nobody else
+// downloads them. Each waits in its own Suspense with nothing in its place: no card shows half-drawn.
+const LazyCheckback = lazy(() => import('../parts/PartCheckbackCard').then((m) => ({ default: m.PartCheckbackCard })));
+const LazyTrailOffer = lazy(() => import('../parts/TrailOfferCard').then((m) => ({ default: m.TrailOfferCard })));
+function PartCheckbackCard(p: ComponentProps<typeof LazyCheckback>) { return <Suspense fallback={null}><LazyCheckback {...p} /></Suspense>; }
+function TrailOfferCard(p: ComponentProps<typeof LazyTrailOffer>) { return <Suspense fallback={null}><LazyTrailOffer {...p} /></Suspense>; }
 
 /** The number of cards shown before "N more". */
 const VISIBLE = 3;
