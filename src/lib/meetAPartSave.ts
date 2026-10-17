@@ -298,8 +298,9 @@ export function isPaused(gate: PartsEntry | null, entry: MeetEntry): boolean {
   return gate?.paused === true && entry.partId !== null;
 }
 
-/** Where the last screen's Done goes: back to Me when the visit came from there, else home. */
+/** Where the last screen's Done goes: back to Me (or the Tools list) when the visit came from there, else home. */
 export function doneTarget(entry: MeetEntry): string {
+  if (entry.trailheadKind === 'tools') return '/tools';
   return entry.trailheadKind === 'me' || entry.trailheadKind === 'settings' ? '/profile' : '/';
 }
 

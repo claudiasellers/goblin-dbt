@@ -27,12 +27,17 @@ export function partsOfMeCopy(content: PartsContent | null): Record<PartsOfMePro
 
 export interface MeetAPartLink {
   pathname: '/tool/meet-a-part';
-  state: { parts: { trailheadKind: 'me' | 'candidate' | 'settings'; partId?: string; candidateId?: string; moveId?: string } };
+  state: { parts: { trailheadKind: 'me' | 'candidate' | 'settings' | 'tools'; partId?: string; candidateId?: string; moveId?: string } };
 }
 
 /** "Get to know a part" (no partId) or "Spend time with it" (this part). */
 export function meetAPartLink(partId?: string): MeetAPartLink {
   return { pathname: '/tool/meet-a-part', state: { parts: { trailheadKind: 'me', ...(partId ? { partId } : {}) } } };
+}
+
+/** Meet a part's card in the Tools list (listed with parts on): a visit that starts there. */
+export function toolsMeetLink(): MeetAPartLink {
+  return { pathname: '/tool/meet-a-part', state: { parts: { trailheadKind: 'tools' } } };
 }
 
 /** Settings' one-time "Get to know a part", right after turning parts on. */

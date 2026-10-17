@@ -3,6 +3,7 @@ import { modules } from '../data/modules';
 import { getToolsByModule, intents } from '../data/tools';
 import { ToolCard } from '../components/ToolCard';
 import { useToolGate } from '../hooks/useToolGate';
+import { toolsMeetLink } from '../lib/partsOfMe';
 
 export function Tools() {
   // Parts tools join the list only when Meet a part may open (parts on, its copy shipped): the gate
@@ -58,7 +59,7 @@ export function Tools() {
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {tools.map(tool => (
-                  <ToolCard key={tool.id} tool={tool} />
+                  <ToolCard key={tool.id} tool={tool} state={tool.id === 'meet-a-part' ? toolsMeetLink().state : undefined} />
                 ))}
               </div>
             </div>
