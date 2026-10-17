@@ -15,6 +15,7 @@ import { userKey } from '../userdata/ownership';
 import { partStats } from './stats';
 import { readStatsRows } from './statsQueries';
 import { buildPartStory, type StoryRows } from './storyBuild';
+import { PART_MESSAGES_QUERY } from './say';
 import type { GetPartStoryRequest, GetPartStoryResponse } from './storyTypes';
 
 export const STORY_PART_QUERY = `
@@ -76,6 +77,10 @@ export function storyDeps(tx: ManagedTransaction, uid: string): StoryDeps {
       const snapshots = (await tx.run(STORY_SNAPSHOTS_QUERY, { uid })).records
         .map((r) => ({ takenAt: str(r.get('takenAt')) ?? '', layoutJson: str(r.get('layoutJson')) }))
         .filter((s) => s.takenAt);
+      // What they said to it (sayToPart): read here, in the callable, like the revisits.
+      const messages = (await tx.run(PART_MESSAGES_QUERY, { uid, partKey })).records
+        .map((r) => ({ at: str(r.get('at')) ?? '', chipId: str(r.get('chipId')), own: str(r.get('own')) }))
+        .filter((m) => m.at && (m.chipId || m.own));
       const { den } = await readProfileSlices(tx, uid, 'me');
       const id = String(p.get('id'));
       return {
@@ -89,6 +94,7 @@ export function storyDeps(tx: ManagedTransaction, uid: string): StoryDeps {
           },
           revisits,
           snapshots,
+          messages,
           room: {
             parts: den.parts.map((x) => ({
               id: x.id, name: x.name, status: x.status, tender: x.tender, shapeSig: x.shapeSig, mapX: x.mapX, mapY: x.mapY, safety: x.safety,

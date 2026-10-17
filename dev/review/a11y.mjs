@@ -65,12 +65,6 @@ const LIVE_SELECTORS = ['[data-testid="unblend-line"]', '[data-testid="goal-line
  * (`visit: check: text`), with why. Reported every run as `host`; never a failure here.
  */
 const OUTSIDE_PARTS = [
-  { match: /: contrast: [\w-]+: [\d.]+:1 < 4\.5 on button "[^"]*" in too-much-link /,
-    why: 'TooMuchLink (src/components/capacity/) is the host\'s; its muted text is under 4.5:1 in the light rooms' },
-  { match: /: focus: after Enter on button "[^"]*" in handoff-card focus went to body$/,
-    why: 'BreakdownHandoff (src/components/capacity/): P2\'s own step change' },
-  { match: /^pulls--\w+: contrast: [\w-]+: [\d.]+:1 < 4\.5 on button "Skip" \(/,
-    why: 'SessionClose (src/components/spine/) is the spine\'s close: its Skip is muted text' },
   { match: /^oa_goal--[\w.-]+: live: not announced: div "[^"]*" in goal-line$/,
     why: 'OppositeAction.tsx renders the goal line (TapCard `before`), above the heading TapCard focuses' },
 ];

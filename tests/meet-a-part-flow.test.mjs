@@ -35,6 +35,7 @@ const TO_FEEL = ["find_something_else", { type: "find" }, "blend_notice", { type
 const TO_FEAR = [...TO_FEEL, "feel_curious", "hide_job_out_of_sight", "likes_tired", { type: "hurt", hurtId: "left_out" }];
 const hold = { type: "hold" };
 const FRONT_A = "5a2c9a0e-1b2c-4d5e-8f90-123456789abc";
+const SAY_PART = "6b3d0a1f-2c3d-4e5f-9a01-23456789abcd";
 const FRONT_B = "5b2c9a0e-1b2c-4d5e-8f90-123456789abc";
 
 test("the content: every step's prompts and options exist, and own words are offered where the machine takes them", () => {
@@ -260,6 +261,7 @@ function eventsAt(state) {
     where: [{ type: "place", place: "chest" }], shape: [{ type: "shape", shape: [0, 0, 0, 0, 0] }], guards: [{ type: "hurt", hurtId: "left_out" }],
     thank: [{ type: "hold" }], tender: [{ type: "hold" }], name: [{ type: "name", name: "n" }], close: [{ type: "close", choiceId: null }],
     front: [{ type: "front", partId: FRONT_A }, ev("front_none"), ev("front_not_sure")],
+    say: [{ type: "said" }],
   };
   return [...out, ...(special[step] ?? [])];
 }
@@ -279,11 +281,13 @@ function reachable(start, ctx) {
 }
 
 test("no dead ends: from every reachable screen some event leaves it, and done is always reachable", () => {
-  const ctxs = [CTX, ctxOf({ namedEntry: true }), ctxOf({ blendCheck: false }), ctxOf({ namedEntry: true, p2OnEntry: true, p2Band: "flooded" }), ctxOf({ frontParts: [FRONT_A] })];
+  const ctxs = [CTX, ctxOf({ namedEntry: true }), ctxOf({ blendCheck: false }), ctxOf({ namedEntry: true, p2OnEntry: true, p2Band: "flooded" }), ctxOf({ frontParts: [FRONT_A] }),
+    ctxOf({ sayReady: true })];
   const steps = new Set();
   for (const ctx of ctxs) {
     for (const move of fixture.moves.map((m) => m.id)) {
-      const start = initialMeet(ctx, { move });
+      // "Say something to it" is a kept part's visit: the say context visits one.
+      const start = initialMeet(ctx, { move, ...(ctx.sayReady ? { partId: SAY_PART } : {}) });
       const states = new Map([[keyOf(start), start]]);
       const edges = new Map();
       const queue = [start];
@@ -371,4 +375,43 @@ test("5d: not on the tender path, and not after a danger answer", () => {
   const danger = run(["find_something_else", { type: "find" }, "blend_notice", { type: "place", place: "chest" }, ...SHAPE, "age_now", { type: "ownWords", text: "x" }], { ctx, move: safetyMove });
   assert.equal(danger.session.danger, true);
   assert.ok(!walk(danger).has("front"), "a danger ending never reaches 5d");
+});
+
+test("say something to it: after Thanks on a kept part's visit with its copy shipped; skipped otherwise", () => {
+  const SAY = ctxOf({ sayReady: true });
+  const kept = (ctx, rest) => run(["find_something_else", { type: "find", partId: SAY_PART }, ...TO_FEEL.slice(2), "feel_curious", "hide_job_out_of_sight",
+    "likes_tired", { type: "hurt", hurtId: "left_out" }, ...rest], { ctx });
+  // A kept part, copy shipped: Thanks → say → on as before (Would rather).
+  const thanked = kept(SAY, ["hide_fear_too_much", "update_yes", hold]);
+  assert.equal(thanked.step, "say");
+  assert.equal(run([{ type: "said" }], { state: thanked, ctx: SAY }).step, "rather");
+  assert.equal(meetNext(thanked, { type: "hold" }, SAY), thanked, "only said (or Not now) leaves it");
+  // Skip rules: copy not shipped, or a new part (no partId): straight on, as before.
+  assert.equal(kept(CTX, ["hide_fear_too_much", "update_yes", hold]).step, "rather", "copy not signed off");
+  assert.equal(run([...TO_FEAR, "hide_fear_too_much", "update_yes", hold], { ctx: SAY }).step, "rather", "a new part: nothing to say it to yet");
+  // A conservative stop still gets it, then Name (no 8b).
+  const stopped = kept(SAY, ["fear_old_hurt", "stop_thank", hold]);
+  assert.equal(stopped.step, "say");
+  assert.equal(run([{ type: "said" }], { state: stopped, ctx: SAY }).step, "name");
+  // Never on the straight-to-close ways: "nothing there", and the danger branch.
+  const nothing = run(["find_something_else", { type: "find", partId: SAY_PART }, ...TO_FEEL.slice(2), "feel_nothing", "nothing_look", hold], { ctx: SAY });
+  assert.equal(nothing.step, "close");
+  const s0 = initialMeet(SAY, { move: "turn_on_myself", partId: SAY_PART });
+  const danger = run([{ type: "find" }, "blend_notice", { type: "place", place: "head" }, ...SHAPE, "age_older", "turn_voice_my_fault", "feel_steady",
+    "turn_job_get_there_first", "likes_proud", { type: "hurt", hurtId: "not_mattering" }, "turn_fear_hurt_myself", hold], { ctx: SAY, state: s0 });
+  assert.deepEqual([danger.step, danger.session.danger], ["close", true]);
+  assert.equal(M.offersSay(danger.session, SAY), false);
+});
+
+test("say something to it on the tender path: after the presence hold (the host shows the gentle set), then Name", () => {
+  const SAY = ctxOf({ sayReady: true });
+  const young = run(["find_something_else", { type: "find", partId: SAY_PART }, "blend_notice", { type: "place", place: "chest" }, ...SHAPE, "age_little"], { ctx: SAY });
+  const tender = run(["young_gentle"], { state: young, ctx: SAY });
+  assert.equal(tender.step, "tender", "the presence hold itself is never replaced");
+  const held = run([hold], { state: tender, ctx: SAY });
+  assert.deepEqual([held.step, held.session.tender], ["say", true]);
+  assert.equal(run([{ type: "said" }], { state: held, ctx: SAY }).step, "name");
+  assert.equal(run([hold], { state: tender }).step, "name", "copy not shipped: the hold goes straight to Name");
+  // Nothing about it reaches the PartSession (its own log record is sayToPart's).
+  assert.deepEqual(whatToSave(run([{ type: "said" }], { state: held, ctx: SAY })).partSession, whatToSave(run([hold], { state: tender })).partSession);
 });
