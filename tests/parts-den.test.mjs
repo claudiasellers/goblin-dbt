@@ -128,7 +128,7 @@ test("the room: saves on drop, unlinks by id, the light is not a control, tender
   assert.match(room, /<circle cx="50" cy="50" r="30" fill=\{`url\(#\$\{uid\}-lamp\)`\} data-den-light="" \/>/);
   assert.equal((room.match(/data-den-light/g) ?? []).length, 1);
   assert.doesNotMatch(room.slice(room.indexOf("data-den-light") - 120, room.indexOf("data-den-light")), /onClick|button/);
-  assert.match(room, /\{p\.tender \? <TenderCover size=\{FIGURE\} \/> : <PartFigure shapeSig=\{p\.shapeSig\} size=\{FIGURE\} still \/>\}/);
+  assert.match(room, /\{p\.tender \? <TenderCover size=\{fig\} \/> : <PartFigure shapeSig=\{p\.shapeSig\} size=\{fig\} still \/>\}/);
   assert.doesNotMatch(room + view, /\btransition|\banimate[=-]|motion\/react/, "no motion on entry, no transitions");
   assert.match(room, /if \(r\.kind === 'drop'\) onMove\?\.\(id, r\.at\);/);
   assert.match(room, /if \(at\) \{ dragged\.current = true; onMove\?\.\(p\.id, at\); \}/, "a drop saves");

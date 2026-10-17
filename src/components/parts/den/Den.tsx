@@ -8,6 +8,10 @@ import {
 } from '../../../lib/den';
 import { monthName } from '../../../lib/partStats';
 import { CrisisBanner } from '../../safety/CrisisBanner';
+import type { PartsContent } from '../../../data/partsContentTypes';
+import { meetAPartLink } from '../../../lib/partsOfMe';
+import type { PartStoryCopy } from '../../../lib/partStory';
+import { PartStory } from '../story/PartStory';
 import { DenRoom, type RoomPart } from './DenRoom';
 
 const link = 'inline-flex items-center min-h-11 text-sm underline underline-offset-2 disabled:opacity-50';
@@ -19,9 +23,12 @@ const chip = 'min-h-11 px-3 rounded-lg border border-[var(--color-border)] text-
  * own arrangement saved on each drop, threads only on a yes, then and now, and the plain list one tap away.
  * Writes are quiet: a failed one leaves the room as it was, with no message (Me's rule).
  */
-export function Den({ copy, initial, twoPullsAvailable, now = new Date() }: {
+export function Den({ copy, initial, twoPullsAvailable, content, storyCopy, now = new Date() }: {
   copy: DenCopy;
   initial: GetDenResponse;
+  /** A part's story (one figure tapped: *Its story*, *Spend time with it*), once its copy ships. */
+  content: PartsContent;
+  storyCopy: PartStoryCopy | null;
   /** Two pulls is built (src/data/tools.ts): only then is "These two pull against each other" offered. */
   twoPullsAvailable: boolean;
   now?: Date;
@@ -33,6 +40,7 @@ export function Den({ copy, initial, twoPullsAvailable, now = new Date() }: {
   const [busy, setBusy] = useState(false);
   const [then, setThen] = useState<{ id: string; month: string; parts: DenSnapshotPart[] } | null>(null);
   const [view, setView] = useState<'now' | 'then'>('now');
+  const [storyOf, setStoryOf] = useState<string | null>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
 
   // A part that joined since the room was laid out arrives at the edge of the light; nobody else moves.
@@ -66,8 +74,8 @@ export function Den({ copy, initial, twoPullsAvailable, now = new Date() }: {
     }
   };
 
-  const closeSheet = () => { setSel(NO_SELECTION); setAsking('choose'); };
-  const tap = (id: string) => { setAsking('choose'); setSel((s) => tapFigure(s, id)); };
+  const closeSheet = () => { setSel(NO_SELECTION); setAsking('choose'); setStoryOf(null); };
+  const tap = (id: string) => { setAsking('choose'); setStoryOf(null); setSel((s) => tapFigure(s, id)); };
 
   const standsInFront = async (frontId: string) => {
     if (!sel.pair || busy) return;
@@ -149,6 +157,27 @@ export function Den({ copy, initial, twoPullsAvailable, now = new Date() }: {
 
       <p className="text-center font-serif text-base text-[var(--color-text-primary)]">{copy.den_room}</p>
       {den.parts.length < 2 && <p className="text-center text-sm text-[var(--color-text-secondary)]">{copy.den_one_part}</p>}
+
+      {/* One figure tapped: its story, or time with it (tap another for how the two go together). */}
+      {!pair && sel.first && storyCopy && names.has(sel.first) && (() => {
+        const id = sel.first;
+        const spend = meetAPartLink(id);
+        const p = den.parts.find((x) => x.id === id)!;
+        return (
+          <div role="group" aria-label={names.get(id)} data-den-one=""
+            className="max-w-md mx-auto p-3 rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]">
+            <p className={p.name ? 'font-serif text-base text-[var(--color-text-primary)] break-words' : 'text-sm text-[var(--color-text-primary)]'}>{names.get(id)}</p>
+            <div className="flex flex-wrap items-center gap-x-4">
+              <button type="button" aria-expanded={storyOf === id} className={quiet} onClick={() => setStoryOf((s) => (s === id ? null : id))}>
+                {storyCopy.story_open}
+              </button>
+              <Link to={spend.pathname} state={spend.state} className={quiet}>{storyCopy.story_spend_time}</Link>
+              <button type="button" className={quiet} onClick={closeSheet}>{copy.den_thread_cancel}</button>
+            </div>
+            {storyOf === id && <PartStory partId={id} tender={p.tender} content={content} copy={storyCopy} />}
+          </div>
+        );
+      })()}
 
       {pair && (
         <div ref={sheetRef} tabIndex={-1} role="group" aria-label={`${names.get(pair[0])}, ${names.get(pair[1])}`}

@@ -18,6 +18,8 @@ import { PartFigure } from '../parts/PartFigure';
 import { getToolById } from '../../data/tools';
 import { monthName, partStatLines, statsReady, type PartStatLines } from '../../lib/partStats';
 import { DEN_PATH, denCopy, showDenLink } from '../../lib/den';
+import { partStoryCopy, type PartStoryCopy } from '../../lib/partStory';
+import { PartStory } from '../parts/story/PartStory';
 
 type Copy = Record<PartsOfMePromptId, string>;
 /** Sends one part write and refreshes Me from getMe (MeSection's `after`); rejects when the write fails. */
@@ -53,6 +55,7 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
   const showStats = statsReady(content);
   const getToKnow = meetAPartLink();
   const den = denCopy(content);
+  const story = partStoryCopy(content);
 
   return (
     <div className="mt-1 space-y-3">
@@ -70,7 +73,7 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
       </div>
       {live.length > 0 && (
         <ul className="space-y-3">
-          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} showStats={showStats} onWrite={onWrite} />)}
+          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} showStats={showStats} story={story} onWrite={onWrite} />)}
         </ul>
       )}
       {setAside.length > 0 && (
@@ -152,9 +155,13 @@ const choice = `${chip} border-[var(--color-border)] text-[var(--color-text-seco
 const chosen = `${chip} border-[var(--color-border-accent)] text-[var(--color-text-primary)]`;
 const box = 'mt-2 p-3 rounded-lg bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)]';
 
-function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
-  item: MeItem; content: PartsContent; copy: Copy; revisit: PartRevisitCopy | null; showStats: boolean; onWrite: PartWrite;
+function PartCard({ item, content, copy, revisit, showStats, story, onWrite }: {
+  item: MeItem; content: PartsContent; copy: Copy; revisit: PartRevisitCopy | null; showStats: boolean;
+  /** A part's story: *Its story* opens it in place, once its copy ships. */
+  story: PartStoryCopy | null;
+  onWrite: PartWrite;
 }) {
+  const [storyOpen, setStoryOpen] = useState(false);
   const part = item.part!;
   const partId = item.meta.id;
   const resting = item.meta.status === 'resting';
@@ -235,6 +242,11 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
       )}
       <div className="mt-2 flex flex-wrap items-center gap-x-4">
         <Link to={visit.pathname} state={visit.state} className={plain}>{copy.card_visit}</Link>
+        {story && (
+          <button type="button" aria-expanded={storyOpen} onClick={() => setStoryOpen((o) => !o)} className={quiet}>
+            {story.story_open}
+          </button>
+        )}
         {partActions(item, copy).filter((a) => !(renaming && a.id === 'rename')).map((a) => (
           <button key={a.id} type="button" disabled={busy} className={quiet}
             onClick={() => { if (a.call) run(a.call); else { setDraft(part.name ?? ''); setRenaming(true); } }}>
@@ -242,6 +254,7 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
           </button>
         ))}
       </div>
+      {story && storyOpen && <PartStory partId={partId} tender={part.tender} content={content} copy={story} />}
       {/* A safety-line or danger part (functions/src/safety/partSafetyFlag.ts): crisis resources under the
           actions, quiet, alongside the card and its 30-day check-back above, never instead. */}
       {part.safety === true && <div className="mt-3"><CrisisBanner compact /></div>}
