@@ -82,6 +82,8 @@ export interface CloseInput {
   repSource: RepSource;
   ext: string | null;
   schedule: ScheduleInput[];
+  /** Wise mind's answer (a WiseMindAnswer id, or `own`): ask-fresh, on this session only; kept for wise-mind only. */
+  wiseMindAnswer: string | null;
 }
 
 /** `closeKind` is the tool's (from SPINE_TOOLS): an answer the kind doesn't ask is rejected. */
@@ -114,6 +116,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
     repSource: oneOf(d.repSource ?? 'standalone', REP_SOURCES),
     ext: validateExt(d.ext),
     schedule: validateSchedule(d.schedule, now),
+    wiseMindAnswer: opt(d.wiseMindAnswer, (x) => str(x, { max: 64, pattern: GRAPH_ID })),
   };
 }
 

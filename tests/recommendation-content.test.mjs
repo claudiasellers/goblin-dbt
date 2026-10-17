@@ -76,8 +76,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 10 app-tool concepts; D
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
     "wise-mind": ["both", "naming", "neutral"],
   });
-  // wise-mind: its content ships first (wise-mind-content); the tool itself with the next change.
-  for (const id of Object.keys(tags).filter((x) => x !== "wise-mind")) assert.ok(toolIds.includes(id), id);
+  for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });
 
 test("blank patterns are never calmed and flooded rows are body / orient only (defence in depth over the engine)", () => {

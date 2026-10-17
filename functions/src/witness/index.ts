@@ -162,7 +162,7 @@ export const recordWitnessBeat = callable<unknown, RecordWitnessBeatResponse>(
            SET r.landed = coalesce(r.landed, s.landed),
                r.skipped = coalesce(r.skipped, false) OR $skipped,
                r.noneFit = coalesce(r.noneFit, false) OR $noneFit`,
-          { uid, hostKey, shown: req.shown, moment: req.moment, band: req.band, skipped: req.skipped, noneFit: req.noneFit },
+          { uid, hostKey, shown: req.shown, moment: req.moment, band: req.band ?? null, skipped: req.skipped, noneFit: req.noneFit },
         );
       }
 

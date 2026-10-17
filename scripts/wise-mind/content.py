@@ -92,7 +92,7 @@ FLOW = {
     "ownMax": OWN_MAX,
     "sourceIds": ["linehan_skills_2015"],
     "copy": {
-        "chrome": {"back": "Back", "next": "Next"},
+        "chrome": {"back": "Back", "next": "Next", "skip": "Skip"},
         "question": {
             "prompt": "What would you like wise mind's help with?",
             "own": "Something else",
@@ -115,6 +115,7 @@ FLOW = {
             "here": "I'm here",
             "hold": "Hold as you breathe in",
             "letGo": "Let go as you breathe out",
+            "holdHint": "Hold to fill it, or press once and wait.",
             "listen": "Listen.",
         },
         "comes": {
