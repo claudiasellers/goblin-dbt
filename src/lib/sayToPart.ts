@@ -25,8 +25,12 @@ export const SAY_OPTIONS = [
 ] as const;
 /** What the card's button and Meet a part's step need (scripts/parts/review.mjs reads it). */
 export const SAY_TO_PART_REQUIRED: SurfaceIds = { prompts: SAY_PROMPTS, options: SAY_OPTIONS };
-/** The part story's line: shown only when it ships too (the story itself never waits on it). */
-export const SAY_STORY_PROMPT = 'say_story';
+/** The part story's "In {month} you told it: …": shown only when it ships too (the story itself never waits on it). */
+export const SAY_STORY_REQUIRED: SurfaceIds = { prompts: ['say_story'], options: SAY_OPTIONS };
+
+/** The story line's template, or null while it (or the chips it names) isn't shipped. */
+export const sayStoryLine = (content: PartsContent): string | null =>
+  surfaceReady(content, SAY_STORY_REQUIRED) ? content.prompts.say_story.copy : null;
 
 export type SayCopy = Record<SayPromptId, string>;
 
