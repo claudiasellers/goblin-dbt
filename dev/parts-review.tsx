@@ -30,9 +30,10 @@ import { drive, type DriveStep } from './review/driver';
 import { SKIPPED, SURFACES, type Surface } from './review/surfaces';
 import PARTS_PACK from 'virtual:review-pack';
 import { WISE_MIND_ABSENT, WISE_MIND_EXPECT, WISE_MIND_PACK } from './review/wiseMind'; // lane 1: Wise mind, not parts
+import { COPE_AHEAD_ABSENT, COPE_AHEAD_EXPECT, COPE_AHEAD_PACK } from './review/copeAhead'; // lane 1: Cope Ahead, not parts
 
 /** The sign-off pack's surfaces, then the non-parts tools shown here for review (Wise mind). */
-const PACK = [...PARTS_PACK, WISE_MIND_PACK];
+const PACK = [...PARTS_PACK, WISE_MIND_PACK, COPE_AHEAD_PACK];
 
 interface Nav { surface: Surface | null; branch: NonNullable<Surface['branches']>[number] | null; ids: boolean; plain: boolean }
 function readNav(): Nav {
@@ -209,8 +210,8 @@ window.__reviewMap = {
   surfaces: SURFACES.map((s) => ({ id: s.id, branches: (s.branches ?? []).map((b) => b.id) })),
   uncovered: uncovered.map((p) => p.id),
   unknown: unknown.map((s) => s.id),
-  expect: WISE_MIND_EXPECT,
-  absent: WISE_MIND_ABSENT,
+  expect: { ...WISE_MIND_EXPECT, ...COPE_AHEAD_EXPECT },
+  absent: { ...WISE_MIND_ABSENT, ...COPE_AHEAD_ABSENT },
 };
 
 /** One screen; remounted (by its key) for every hash change, so its branch is driven once per visit. */

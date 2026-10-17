@@ -8,6 +8,7 @@ import { useProfileContext } from '../../hooks/useProfileContext';
 import { useToolSession } from '../../hooks/useToolSession';
 import { handoffExt } from '../../lib/bandStore';
 import { anchorLead, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
+import { afterScheduleItem, COPE_AHEAD_AFTER_TYPE } from '../../lib/copeAheadAfter';
 import { planLine } from '../../lib/copeAheadPlan';
 import {
   COPE_EXIT_STEP, copeExt, copeNext, initialCope, isDanger, momentText, parseCopeEntry, planCa,
@@ -15,7 +16,6 @@ import {
 } from '../../lib/copeAheadTool';
 import { profileCache } from '../../lib/profileCache';
 import { newId } from '../../lib/spine/ids';
-import { dueAtFor } from '../../lib/spine/windows';
 import { pullChoices, type PullChoice } from '../../lib/urgeSurfing';
 import { partChipLabel as unnamedOrName } from '../../lib/partTag';
 import { getCopeAheadContent } from '../../services/copeAhead';
@@ -31,8 +31,6 @@ import { Settle } from '../../components/tools/copeAhead/Settle';
 import { KeepCard } from '../../components/tools/copeAhead/KeepCard';
 
 const HOST = 'cope-ahead';
-/** The follow-up the after card answers (scripts/practice-spine/content.py). */
-const AFTER_TYPE = 'cope_ahead_after';
 
 // DEAR MAN's cope ahead step, reused as is (parts on): fetched once its gate holds.
 const loadCope = () => import('../../components/parts/CopeAheadStep');
@@ -145,7 +143,7 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
   };
 
   const keepIt = async () => {
-    if (!plan?.text || keep === 'saving' || keep === 'kept' || !toolSession.persisted) return;
+    if (!plan.text || keep === 'saving' || keep === 'kept' || !toolSession.persisted) return;
     setKeep('saving');
     try {
       await recordWitnessBeat({
@@ -164,12 +162,11 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
     if (!yes || !toolSession.persisted) return;
     try {
       const spine = await getSpineContent();
-      const type = spine.followUpTypes.find((t) => t.id === AFTER_TYPE && t.enabled);
-      const chip = s.when ?? 'later';
-      const due = type ? dueAtFor(type.window, new Date(), chip) : null;
-      if (!due) return;
-      await scheduleFollowUps([{ id: newId(), type: AFTER_TYPE, dueAt: due.toISOString(), window: chip }],
-        { sourceSessionId: toolSession.id, sourceToolId: HOST });
+      const type = spine.followUpTypes.find((t) => t.id === COPE_AHEAD_AFTER_TYPE && t.enabled);
+      // Screen 1's when is the window chip (Later, or not sure when it wasn't answered).
+      const item = type ? afterScheduleItem(type, s.when ?? 'later', newId(), new Date()) : null;
+      if (!item) return;
+      await scheduleFollowUps([item], { sourceSessionId: toolSession.id, sourceToolId: HOST });
     } catch { /* the after card is a nice-to-have: nothing to undo */ }
   };
 
@@ -198,16 +195,16 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
       body = <MomentScreen content={content} s={s} send={send} danger={danger} />;
       break;
     case 'plan':
-      body = <PlanScreen content={content} s={s} send={send} plan={plan?.text ?? null} anchor={anchorBlock} danger={danger} />;
+      body = <PlanScreen content={content} s={s} send={send} plan={plan} anchor={anchorBlock} danger={danger} />;
       break;
     case 'rehearse': {
       const p = s.pass === 2
         ? { id: s.newMomentId, own: s.newMomentOwn }
         : { id: s.hardMomentId, own: s.hardMomentOwn };
-      body = passPlan ? (
+      body = (
         <Rehearse key={s.pass} content={content} moment={momentText(content, p.id, p.own)} plan={passPlan} pass={s.pass}
           onDone={() => send({ type: 'rehearsed' })} />
-      ) : null;
+      );
       break;
     }
     case 'again':
@@ -220,12 +217,12 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
       body = <Settle content={content} onChoose={(c) => { void settle(c); }} />;
       break;
     case 'keep':
-      body = plan ? (
-        <KeepCard content={content} plan={plan} anchor={cardAnchor ? { name: cardAnchor.name, line: cardAnchor.line } : null}
+      body = (
+        <KeepCard content={content} plan={plan} anchor={cardAnchor}
           keep={keep} onKeep={() => { void keepIt(); }} onNotNow={() => send({ type: 'kept', kept: false })}
           askAfter={s.followUp} onAskAfter={(yes: boolean) => { void askAfter(yes); }}
           onDone={() => navigate('/tools')} />
-      ) : null;
+      );
       break;
   }
 

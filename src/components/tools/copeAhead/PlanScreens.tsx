@@ -9,6 +9,7 @@ import type { PullChoice } from '../../../lib/urgeSurfing';
 import { EmotionPicker } from '../EmotionPicker';
 import { Chip, ChipRow, Line, Prompt } from '../wiseMind/bits';
 import { primaryButton } from '../oppositeAction/styles';
+import { PlanSentence, type PlanParts } from './PlanSentence';
 
 /**
  * Cope Ahead's screens 1-4 and the *once more* screens (docs/design/cope-ahead.md, "The flow").
@@ -152,11 +153,15 @@ function MoveChips({ content, s, send, momentId }: ScreenProps & { momentId: str
  * Screen 4: "If it happens, I'll…". The line reads back in the serif as it is built (`plan`, from
  * copeAheadPlan's planLine); the part's anchor sits under it (`anchor`); `danger`: CrisisBanner compact.
  */
-export function PlanScreen({ content, s, send, plan, anchor, danger }: ScreenProps & { plan: string | null; anchor: ReactNode; danger: ReactNode }) {
+export function PlanScreen({ content, s, send, plan, anchor, danger }: ScreenProps & { plan: PlanParts; anchor: ReactNode; danger: ReactNode }) {
   const c = content.copy;
   return (<>
     <Prompt>{c.plan_title}</Prompt>
-    {plan && <p className="font-serif text-xl leading-snug text-[var(--color-text-primary)] break-words" data-testid="ca-plan-line" aria-live="polite">{plan}</p>}
+    {plan.text && (
+      <p className="font-serif text-xl leading-snug text-[var(--color-text-primary)] break-words" data-testid="ca-plan-line" aria-live="polite">
+        <PlanSentence content={content} plan={plan} />.
+      </p>
+    )}
     {canPlanForPull(s) && (
       <div className="flex flex-wrap gap-2.5">
         {s.ifFrom === 'moment'
