@@ -10,7 +10,7 @@
  * (spine never imports profile/). A set-aside or deleted part has no card.
  *
  * The answer resolves the follow-up under GUARDS.FollowUp.update and, on Louder, pauses the part
- * (keep.ts's PAUSE_PART_QUERY) in the same transaction. deleteMyParts removes open check-backs by type.
+ * (keep.ts's PAUSE_PART_QUERY) in the same transaction. deleteMyParts removes every check-back by type, open or answered.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -66,14 +66,18 @@ export const SCHEDULE_STATE_QUERY = `
          pt.status AS partStatus, coalesce(pt.pausedUntil > datetime(), false) AS paused, head(collect(open.id)) AS openId
 `;
 
-/** After scheduleTx wrote the follow-up: which part it checks back with, and the visit it came from. */
+/**
+ * After scheduleTx wrote the follow-up: which part it checks back with, and the visit it came from.
+ * `SCHEDULED` comes out of the Meet a part session, so only while it takes writes (GUARDS.PartSession.keep).
+ */
 export const LINK_CHECKBACK_QUERY = `
   MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $followUpKey})
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey})
-  MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $sessionKey})
   SET f.partId = $partId, f.partSessionId = $sessionId
   MERGE (f)-[:CHECKS_BACK]->(pt)
-  MERGE (ps)-[:SCHEDULED]->(f)
+  WITH u, f
+  OPTIONAL MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $sessionKey}) WHERE ${GUARDS.PartSession.keep('ps')}
+  FOREACH (x IN CASE WHEN ps IS NULL THEN [] ELSE [ps] END | MERGE (x)-[:SCHEDULED]->(f))
   RETURN f.id AS id
 `;
 
@@ -233,7 +237,7 @@ export async function partCheckbackItems(tx: ManagedTransaction, uid: string, no
       resolveMode: 'inline', deepLink: null,
       choices: t.choices.map(({ id, label, status }) => ({ id, label, ...(status ? { status: status as 'done' } : {}) })),
       copy: t.copy, source: { toolId: 'meet-a-part' },
-      part: { id: part.id, name: part.name, tender: part.tender },
+      part: { id: part.id, name: part.name, tender: part.tender, safety: part.safety },
     });
   }
   return items;

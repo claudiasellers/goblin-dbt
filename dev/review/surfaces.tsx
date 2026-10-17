@@ -33,7 +33,8 @@ import { TooMuchLink } from '../../src/components/capacity/TooMuchLink';
 import { DARK } from '../../src/components/tools/findTheFeeling/shape/palette';
 import { linkButton, secondaryText } from '../../src/components/tools/oppositeAction/styles';
 import { answer, logEvent } from './backend';
-import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, slices } from './data';
+import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, slices, trailEvidence, trailItem, type TrailKind } from './data';
+import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
 import { PARTS } from '../parts-example';
 import hostCopy from 'virtual:review-host-copy';
@@ -187,16 +188,24 @@ function CheckbackHost({ named }: { named: boolean }) {
   return <PartCheckbackCard item={checkbackItem(named)} content={content} onDone={() => setGone(true)} />;
 }
 
-function TagHost({ urge }: { urge: boolean }) {
+type TagHostKind = 'five' | 'pause' | 'ftf';
+const TAG_HOSTS: Record<TagHostKind, { toolId: 'five-senses' | 'pause' | 'find-the-feeling'; note: string }> = {
+  five: { toolId: 'five-senses', note: 'Five senses, after a better answer' },
+  pause: { toolId: 'pause', note: 'Pause, after Held off' },
+  ftf: { toolId: 'find-the-feeling', note: 'Find the feeling, after a better answer, in a visit that made a shape' },
+};
+
+function TagHost({ host }: { host: TagHostKind }) {
   const content = useParts();
   const [saved, setSaved] = useState('');
   useEffect(() => { getSpineContent().then((c) => setSaved(c.closeFlow.saved)).catch(() => {}); }, []);
   if (!content) return null;
+  const h = TAG_HOSTS[host];
   return (
     <div className="space-y-2">
-      <p className={mockNote}>{urge ? 'Pause, after Held off' : 'Five senses, after a better answer'} (mock host close)</p>
+      <p className={mockNote}>{h.note} (mock host close)</p>
       <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{saved}</p>
-      <PartTagRow toolId={urge ? 'pause' : 'five-senses'} toolSessionId="00000000-0000-4000-8000-000000000501" content={content} />
+      <PartTagRow toolId={h.toolId} toolSessionId="00000000-0000-4000-8000-000000000501" content={content} offerShape={host === 'ftf'} />
     </div>
   );
 }
@@ -243,6 +252,22 @@ function CopeHost() {
     </section>
   );
 }
+
+function OfferHost({ kind }: { kind: TrailKind }) {
+  const content = useParts();
+  const [gone, setGone] = useState(false);
+  if (!content) return null;
+  if (gone) return <p className={mockNote}>The card leaves Today.</p>;
+  return (
+    <section className="space-y-2">
+      <p className={mockNote}>Today</p>
+      <TrailOfferCard item={trailItem(kind)} content={content} onDone={() => setGone(true)} />
+    </section>
+  );
+}
+
+/** The unnamed part's chip (dev/review/data.ts: first felt in the stomach), as the tag row labels it. */
+const UNNAMED_CHIP = 'The one in your stomach';
 
 /** The kept line the cope-ahead failure branch picks (dev/review/data.ts savedLines). */
 const KEPT_LINE = 'It makes sense this got to you.';
@@ -409,13 +434,16 @@ export const SURFACES: Surface[] = [
   },
   {
     id: 'tag', pack: 'tag', title: 'Tag row: “Was this a part you know?”',
-    who: 'Parts on: under the saved close of Cool Down, Five senses or Find the feeling after a better answer, or Pause and Urge Surfing after Held off.',
+    who: 'Parts on: under the saved close of Cool Down, Five senses or Find the feeling after a better answer, or Pause and Urge Surfing after Held off. In Find the feeling, when the visit made a shape, a part chip first asks to give that part the shape.',
     branches: [
       { id: 'row', label: 'After a better answer' },
       { id: 'urge', label: 'After Held off (Pause, Urge Surfing)' },
       { id: 'new', label: 'A new one → later?', steps: [{ opt: 'tag_new_one' }] },
+      { id: 'shape', label: 'Find the feeling: “Use this shape for {name}?”', steps: [{ tap: PARTS[0].name }] },
+      { id: 'shape_unnamed', label: 'Find the feeling: an unnamed part', steps: [{ tap: UNNAMED_CHIP }] },
+      { id: 'shape_done', label: 'Find the feeling: Yes → Done. (folds after a moment)', steps: [{ tap: PARTS[0].name }, { opt: 'tag_shape_yes' }] },
     ],
-    render: ({ branch }) => <TagHost urge={branch === 'urge'} />,
+    render: ({ branch }) => <TagHost host={branch.startsWith('shape') ? 'ftf' : branch === 'urge' ? 'pause' : 'five'} />,
   },
   {
     id: 'me', pack: 'me', title: 'Parts of me (Me)',
@@ -463,6 +491,23 @@ export const SURFACES: Surface[] = [
     render: ({ branch }) => <DebriefHost named={branch === 'named'} />,
   },
   {
+    id: 'offer', pack: 'offer', title: 'The trail offer (Today)',
+    who: 'Parts on, offers on: on Today, at most one at a time, when a pattern across tools passes its rule and the gates (no flooding, crisis or dissociation signal).',
+    branches: [
+      { id: 'a', label: 'A pull in a context (rule A)' },
+      { id: 'b', label: 'One pull after another (rule B)' },
+      { id: 'c', label: 'Two pulls in a context (rule C)' },
+      { id: 'evidence', label: 'Show me: the evidence (A)', steps: [{ opt: 'offer_show' }] },
+      { id: 'evidence_c', label: 'Show me: the evidence, two pulls (C)', steps: [{ opt: 'offer_show' }] },
+      { id: 'split', label: 'More than one: which feels like its own thing?', steps: [{ opt: 'offer_show' }, { opt: 'offer_more_than_one' }] },
+    ],
+    setup: (b) => {
+      const kind: TrailKind = b === 'b' ? 'B' : b === 'c' || b === 'evidence_c' || b === 'split' ? 'C' : 'A';
+      answer('getTrailOfferEvidence', () => trailEvidence(kind));
+    },
+    render: ({ branch }) => <OfferHost kind={branch === 'b' ? 'B' : branch === 'c' || branch === 'evidence_c' || branch === 'split' ? 'C' : 'A'} />,
+  },
+  {
     id: 'ps_later', pack: 'ps', title: 'Problem Solve: another time',
     who: 'Parts on: in Problem Solve, after “Part of me doesn’t actually want this to change” and its answer, under Let’s keep going.',
     branches: [
@@ -481,6 +526,5 @@ export const SURFACES: Surface[] = [
 
 /** Not built on the tip, so not here (the report lists them). */
 export const SKIPPED = [
-  '“Use this shape for {name}?” (Find the feeling): not on the tip yet (lane 4, ftf-shape-for-part).',
-  'The trail offer card and its evidence step: not on the tip yet (lane 2, trail-offers).',
+  '“Was this {name}?” in Reflect (rule D): not built yet (lane 3, rule-d-review).',
 ];

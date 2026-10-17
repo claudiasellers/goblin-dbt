@@ -3,13 +3,18 @@
  * record the caller owns. Works with parts off: turning parts off deletes nothing, so this is how
  * someone leaves for good. Never touches ToolSessions (a visit happened; its DETAIL edge goes with
  * the deleted PartSession), check-ins, or any other record.
+ *
+ * Follow-ups: every follow-up of a parts type goes, open or answered (an answered check-back carries
+ * `partId`). Left alone on purpose: `ToolSession.ext.er.copeAheadPartId` / `whoShowedUp`. They are an
+ * opaque id and an enum on finalised log records, carry no name or own words, and point at nothing
+ * once the part is gone; rewriting a finalised record is not ours to do outside retention.
  */
 import type { ManagedTransaction } from 'neo4j-driver';
 import { callable } from '../shared/callable';
 import { writeTx } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { USER_DATA } from '../userdata/layers';
-import { GUARDS } from '../userdata/lifecycle';
+import { PARTS_FOLLOW_UP_TYPES } from './followUpTypes';
 
 /**
  * Every user-data label parts.md defines (Data model → User data), registered or not yet, plus
@@ -23,11 +28,10 @@ const PARTS_DESIGN_LABELS = ['Part', 'PartLink', 'DenSnapshot', 'PartSession', '
  */
 export const PARTS_LABELS: readonly string[] = PARTS_DESIGN_LABELS.filter((l) => l in USER_DATA);
 
-/** Follow-up types that only exist for parts (they arrive with the check-back flows). */
-export const PARTS_FOLLOW_UP_TYPES: readonly string[] = ['part_checkback', 'two_pulls_checkback'];
+export { PARTS_FOLLOW_UP_TYPES } from './followUpTypes';
 
 export interface DeleteMyPartsResponse {
-  /** Nodes deleted per label (`FollowUp`: open parts follow-ups only). */
+  /** Nodes deleted per label (`FollowUp`: the parts follow-up types, open or answered). */
   deleted: Record<string, number>;
 }
 
@@ -37,9 +41,10 @@ const deleteLabel = (label: string) => `
   FOREACH (x IN ns | DETACH DELETE x)
   RETURN size(ns) AS n`;
 
+/** Every parts follow-up, open or answered: an answered check-back still carries `partId`. */
 export const DELETE_FOLLOW_UPS = `
   MATCH (f:FollowUp {ownerId: $uid})
-  WHERE f.type IN $types AND ${GUARDS.FollowUp.update('f')}
+  WHERE f.type IN $types
   WITH collect(f) AS fs
   FOREACH (x IN fs | DETACH DELETE x)
   RETURN size(fs) AS n`;

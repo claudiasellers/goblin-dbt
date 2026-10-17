@@ -10,6 +10,11 @@ import type { PartReflect } from '../../src/data/partsTypes';
 import type { TodayItem } from '../../src/services/spine';
 import { vecToSig } from '../../src/lib/partFigure';
 import { PARTS } from '../parts-example';
+import fixture from '../../tests/fixtures/parts-content.json';
+import ftf from '../../src/data/content/find-the-feeling.json';
+import hostCopy from 'virtual:review-host-copy';
+import type { GetTrailOfferEvidenceResponse } from '../../src/data/partsTypes';
+import { showIds } from './ids';
 
 const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const byId = Object.fromEntries(PARTS.map((p) => [p.id, p]));
@@ -27,7 +32,7 @@ const slicePart = (key: keyof typeof PART_IDS, name: string | null, o: Partial<S
   const ex = byId[key === 'unnamed' ? 'hide' : key];
   return {
     id: PART_IDS[key], name, status: 'active', tender: !!ex.tender, moveIds: [ex.move], firstPlace: ex.places[0] ?? 'chest',
-    shapeSig: ex.tender ? null : sig(ex.id), meta: meta(PART_IDS[key], 'active'), ...o,
+    shapeSig: ex.tender ? null : sig(ex.id), lastVisitedAt: '2026-10-14T19:00:00.000Z', pausedUntil: null, meta: meta(PART_IDS[key], 'active'), ...o,
   };
 };
 
@@ -112,3 +117,46 @@ export function checkbackItem(named: boolean): TodayItem {
 }
 
 export const ids = { uuid };
+
+/* ── trail offers: the statement the server would build (rule template, context phrase, moves' trailPhrases) ── */
+
+type Raw = { trailRules: { id: string; shape: string; statementTemplate: string }[]; contexts: { id: string; phrase: string }[]; moves: { id: string; trailPhrase: string }[] };
+const raw = fixture as unknown as Raw;
+const tagged = (text: string, id: string) => (showIds() ? `${text} ⟨${id}⟩` : text);
+const rule = (id: string) => raw.trailRules.find((r) => r.id === id)!;
+const ctx = (id: string) => tagged(raw.contexts.find((c) => c.id === id)!.phrase, id);
+const pull = (id: string) => tagged(raw.moves.find((m) => m.id === id)!.trailPhrase, id);
+const ftfUrge = (id: string) => ((ftf as unknown as { content: { urges: { id: string; label: string }[] } }).content.urges.find((u) => u.id === id)?.label ?? id);
+
+export type TrailKind = 'A' | 'B' | 'C';
+const TRAILS: Record<TrailKind, { rule: string; moves: string[]; context: string | null }> = {
+  A: { rule: 'trail_move_in_context', moves: ['hide'], context: 'ctx_event_brushed' },
+  B: { rule: 'trail_sequence', moves: ['chase', 'hide'], context: null },
+  C: { rule: 'trail_two_pulls', moves: ['chase', 'hide'], context: 'ctx_event_ignored' },
+};
+
+/** A trail offer on Today, as getToday would send it. */
+export function trailItem(kind: TrailKind): TodayItem {
+  const t = TRAILS[kind];
+  const r = rule(t.rule);
+  return {
+    id: uuid(800 + kind.charCodeAt(0)), kind: 'trail_offer', type: 'trail_offer', tier: 'quality', state: 'due', dueAt: null,
+    resolveMode: 'inline', deepLink: null, choices: [], copy: { title: '' },
+    trail: { ruleId: t.rule, shape: kind, template: tagged(r.statementTemplate, r.id), pulls: t.moves.map(pull), context: t.context ? ctx(t.context) : null },
+  };
+}
+
+/** Its evidence: three moments, each with tool ids, the context phrase and the picks' graph labels. */
+export function trailEvidence(kind: TrailKind): GetTrailOfferEvidenceResponse {
+  const t = TRAILS[kind];
+  const c = t.context ? ctx(t.context) : null;
+  const urge = (id: string) => hostCopy.actionUrges[id] ?? id;
+  return {
+    offerId: uuid(800 + kind.charCodeAt(0)), shape: kind, moveIds: t.moves,
+    rows: [
+      { at: '2026-10-02T19:10:00.000Z', toolIds: ['find-the-feeling'], context: c, sources: t.moves.map(ftfUrge) },
+      { at: '2026-10-07T21:30:00.000Z', toolIds: ['opposite-action'], context: c, sources: t.moves.includes('chase') ? [urge('jealousy-check'), urge('shame-hide')] : [urge('shame-hide')] },
+      { at: '2026-10-12T18:05:00.000Z', toolIds: ['recovering-from-invalidation'], context: c, sources: [] },
+    ],
+  };
+}

@@ -70,6 +70,7 @@ test("every parts surface that replaces a pressed control moves focus to what re
   const uses = {
     "src/components/spine/PartTagRow.tsx": /useStepFocus\(root, state\)/,
     "src/components/parts/PartCheckbackCard.tsx": /useStepFocus\(root, aftercare\)/,
+    "src/components/parts/TrailOfferCard.tsx": /useStepFocus\(root, splitting \? 'split' : evidence \? 'evidence' : 'offer'\)/,
     "src/components/parts/CopeAheadStep.tsx": /useStepFocus\(panel, view\)/,
     "src/components/parts/PartsSettings.tsx": /useStepFocus\(deleteArea, done \? 'done' : confirming \? 'confirm' : 'ask'\)/,
     "src/components/parts/PartLaterLine.tsx": /useStepFocus\(root, state === 'done'\)/,
@@ -89,6 +90,9 @@ test("a control that stays while it saves is aria-disabled, never disabled (disa
   const card = read("src/components/parts/PartCheckbackCard.tsx");
   assert.match(card, /aria-disabled=\{busy \|\| undefined\}/);
   assert.match(card, /if \(busy\) return;/);
+  const offer = read("src/components/parts/TrailOfferCard.tsx");
+  assert.doesNotMatch(offer, /[^-]disabled=\{busy/);
+  assert.match(offer, /const run = async \(fn: \(\) => Promise<void>\) => \{\s*if \(busy\) return;/);
   const cope = read("src/components/parts/CopeAheadStep.tsx");
   assert.match(cope, /disabled=\{!ready\} aria-disabled=\{saving \|\| undefined\}/);
   const settings = read("src/components/parts/PartsSettings.tsx");

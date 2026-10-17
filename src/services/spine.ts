@@ -112,7 +112,7 @@ export function getSpineContent(): Promise<SpineContent> {
 export type TodayState = 'due' | 'stale' | 'upcoming';
 export interface TodayItem {
   id: string;
-  kind: 'follow_up' | 'tool_outcome' | 'pattern_offer' | 'profile_revisit';
+  kind: 'follow_up' | 'tool_outcome' | 'pattern_offer' | 'profile_revisit' | 'trail_offer';
   type: string;
   tier: 'safety' | 'practice' | 'quality' | 'skills';
   state: TodayState;
@@ -124,7 +124,13 @@ export interface TodayItem {
   copy: { title: string; body?: string };
   source?: { toolId?: string; toolSessionId?: string; detailId?: string };
   /** A parts check-back's part (parts on only): its name and tenderness from the profile slice. */
-  part?: { id: string; name: string | null; tender: boolean };
+  /** `safety`: the part safety flag (functions/src/safety/partSafetyFlag.ts): CrisisBanner alongside the card. */
+  part?: { id: string; name: string | null; tender: boolean; safety?: boolean };
+  /**
+   * A parts trail offer (kind `trail_offer`, shapes A–C): the rule's signed-off statement and what fills
+   * it, every phrase signed-off graph content. The card fills the template (src/lib/trailOffer.ts).
+   */
+  trail?: { ruleId: string; shape: 'A' | 'B' | 'C'; template: string; pulls: string[]; context: string | null };
 }
 export interface GetTodayResponse {
   items: TodayItem[];

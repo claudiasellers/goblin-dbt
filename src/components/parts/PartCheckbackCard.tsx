@@ -4,6 +4,7 @@ import type { TodayItem } from '../../services/spine';
 import { answerPartCheckback } from '../../services/parts';
 import { checkbackChoices, checkbackReady, checkbackTitle, louderAftercare } from '../../lib/partCheckback';
 import { TooMuchLink } from '../capacity/TooMuchLink';
+import { CrisisBanner } from '../safety/CrisisBanner';
 import { useStepFocus } from './stepFocus';
 
 const chip = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-primary)] aria-disabled:opacity-50 transition-colors';
@@ -13,7 +14,9 @@ const chip = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-b
  * Settled · Same · Louder · Skip, one tap, one write. Louder (the part is now paused) stays on the card
  * with the aftercare line, "Something for my body" (the same P2 body tools as the too-much link) and
  * "Not now". Every word is signed-off parts content; without all of it the card is nothing. A tender
- * part gets the same card. A failed save keeps the card, answerable.
+ * part gets the same card. A failed save keeps the card, answerable. A safety-line or danger part
+ * (`item.part.safety`, functions/src/safety/partSafetyFlag.ts) gets CrisisBanner under the answers,
+ * alongside them, never instead, and through the aftercare too.
  */
 export function PartCheckbackCard({ item, content, onDone }: {
   item: TodayItem;
@@ -28,6 +31,7 @@ export function PartCheckbackCard({ item, content, onDone }: {
   if (!content || !checkbackReady(content)) return null;
 
   const title = checkbackTitle(content, item.part?.name);
+  const crisis = item.part?.safety === true ? <div className="mt-3"><CrisisBanner compact /></div> : null;
   const answer = async (a: 'settled' | 'same' | 'louder' | 'skip') => {
     // aria-disabled while it saves, not disabled: a disabled button would drop keyboard focus.
     if (busy) return;
@@ -57,6 +61,7 @@ export function PartCheckbackCard({ item, content, onDone }: {
             <button type="button" className={chip} onClick={() => onDone(item.id)}>{after.notNow.label}</button>
           )}
         </div>
+        {crisis}
       </section>
     );
   }
@@ -72,6 +77,7 @@ export function PartCheckbackCard({ item, content, onDone }: {
           </button>
         ))}
       </div>
+      {crisis}
     </section>
   );
 }

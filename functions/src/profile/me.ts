@@ -12,6 +12,7 @@ import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
 import type { PartStats } from '../parts/statsTypes';
+import { partSafetyCypher } from '../safety/partSafetyFlag';
 
 export interface MeItem {
   label: 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
@@ -45,6 +46,11 @@ export interface MePart {
   preferredRoleIds: string[];
   moveIds: string[];
   lastVisitedAt: string | null;
+  /**
+   * The part safety flag (functions/src/safety/partSafetyFlag.ts), computed here from all of its fears,
+   * a tender part's too: the card shows CrisisBanner alongside, never instead.
+   */
+  safety: boolean;
   /**
    * Active and resting parts only: lane 4's readout (functions/src/parts/stats.ts), passed through
    * untouched (each line null below its threshold). Absent on a set-aside part.
@@ -80,7 +86,7 @@ const ids = (v: unknown): string[] => (Array.isArray(v) ? v.filter((x): x is str
 const strOrNull = (v: unknown): string | null => (typeof v === 'string' ? v : null);
 
 /** The card's fields from a Part's properties; arrays absent → [], strings absent → null. */
-export function mePart(p: Record<string, unknown>, moveIds: unknown): MePart {
+export function mePart(p: Record<string, unknown>, moveIds: unknown, safety: unknown = false): MePart {
   const tender = p.tender === true;
   return {
     name: strOrNull(p.name),
@@ -93,6 +99,7 @@ export function mePart(p: Record<string, unknown>, moveIds: unknown): MePart {
     preferredRoleIds: ids(p.preferredRoleIds),
     moveIds: [...new Set(ids(moveIds))].sort(),
     lastVisitedAt: strOrNull(p.lastVisitedAt),
+    safety: safety === true,
   };
 }
 
@@ -128,6 +135,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
                confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt),
                lastVisitedAt: toString(p.lastVisitedAt)} AS p,
             CASE type(r) WHEN 'HAS_PART' THEN [(p)-[:USES]->(mv:ProtectiveMove) | mv.id] ELSE [] END AS moveIds,
+            CASE type(r) WHEN 'HAS_PART' THEN ${partSafetyCypher('p')} ELSE false END AS safety,
             k.label AS title, k.stillTrueCopy AS stillTrue, k.setAsideCopy AS setAside, rule.statementTemplate AS statement`,
     { uid });
   const words = await tx.run(
@@ -169,7 +177,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (r.get('label') === 'MyPattern') summary = (r.get('statement') as string | null) ?? '';
     if (r.get('label') === 'OwnLine') summary = String(p.text ?? '');
     if (r.get('label') === 'Part') summary = String(p.name ?? '');
-    const part = r.get('label') === 'Part' ? mePart(p, r.get('moveIds')) : undefined;
+    const part = r.get('label') === 'Part' ? mePart(p, r.get('moveIds'), r.has('safety') ? r.get('safety') : false) : undefined;
     const partStats = part && (meta.status === 'active' || meta.status === 'resting') ? stats.get(meta.id) : undefined;
     if (part && partStats) part.stats = partStats;
     const item: MeItem = {

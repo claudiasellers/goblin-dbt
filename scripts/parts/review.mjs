@@ -40,6 +40,8 @@ print(json.dumps({
   "held": [dict(label=l, source=s, why=r) for l, rows in c.HELD.items() for s, r in rows.items()],
   "canTouch": [dict(event=e, hurts=h, **st(e)) for e, h in c.CAN_TOUCH.items()],
   "canTouchHeld": [dict(event=e, why=r) for e, r in c.CAN_TOUCH_HELD.items()],
+  "trailRules": [dict(id=r["id"], shape=r["shape"], statement=r["statementTemplate"], enabled=r["enabled"], **st(r["id"])) for r in c.TRAIL_RULES],
+  "contexts": [dict(id=x[0], key=x[1], value=x[2], phrase=x[3], **st(x[0])) for x in c.CONTEXTS],
   "policy": dict(c.POLICY, **st(c.POLICY["id"])),
 }, ensure_ascii=False))
 `;
@@ -61,6 +63,7 @@ export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED } from './src/lib/parts
 export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
+export { TRAIL_OFFER_REQUIRED } from './src/lib/trailOffer';
 export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 `;
   const out = await build({
@@ -147,6 +150,11 @@ export function surfaces(g) {
       id: 'ps', title: 'Problem Solve',
       where: 'In Problem Solve, with parts on, after the "Part of me doesn\'t actually want this to change" barrier and its answer: one quiet line offering to come back to that part another time (a yes queues it in Me\'s "To come back to"). It never opens a parts flow mid-tool.',
       groups: [{ label: null, ids: g.PS_LATER_REQUIRED }],
+    },
+    {
+      id: 'offer', title: 'The trail offer (Today)',
+      where: 'Today only, with parts on and offers switched on (PartsPolicy.offersEnabled), at most one a week shared with what_helps, never near flooding, a crisis flag, repeated dissociation or a harm signal: "Something keeps showing up", the rule\'s statement, "Want to take a look?", then the evidence and the four answers. It also needs the rule\'s statement, the moves\' `trailPhrase` and the context\'s phrase signed off (see Trail rules and Trail contexts). Rule D ("Was this {name}?") is never on Today: Reflect asks it in a batch, later.',
+      groups: [{ label: null, ids: g.TRAIL_OFFER_REQUIRED }],
     },
     {
       id: 'oa', title: 'Do the Opposite',
@@ -263,7 +271,12 @@ export function render(content, gates, kinds = lintKinds()) {
     table(['Source', 'id', 'Why'], content.held.map((h) => [h.label, code(h.source), h.why])), '',
     '### CAN_TOUCH (Recover\'s "what happened" → the hurts it can touch)', '',
     table(['Event', 'Hurts', 'Status'], content.canTouch.map((c) => [code(c.event), c.hurts.join(', '), statusOf(c)])), '',
-    'Held:', '', table(['Event', 'Why'], content.canTouchHeld.map((c) => [code(c.event), c.why])), '');
+    'Held:', '', table(['Event', 'Why'], content.canTouchHeld.map((c) => [code(c.event), c.why])), '',
+    '### Trail rules (the statement a trail offer shows)', '',
+    '`{context}` is a trail context\'s phrase, `{pull}` / `{pull2}` a move\'s `trailPhrase`, `{name}` the part\'s name. Every rule ships switched off.', '',
+    table(['id', 'Shape', 'Statement', 'Enabled', 'Status'], (content.trailRules ?? []).map((r) => [code(r.id), r.shape, r.statement, r.enabled ? 'yes' : 'no', statusOf(r)])), '',
+    '### Trail contexts (what fills {context})', '',
+    table(['id', 'Kind', 'Phrase', 'Status'], (content.contexts ?? []).map((c) => [code(c.id), `${c.key} = ${c.value}`, c.phrase, statusOf(c)])), '');
 
   A('## The numbers (PartsPolicy)', '', `Status: ${statusOf(content.policy)}.`, '',
     table(['Field', 'Value', 'What it guards'], Object.keys(POLICY_NOTES).filter((k) => k in content.policy).map((k) => [code(k), String(content.policy[k]), POLICY_NOTES[k]])), '');

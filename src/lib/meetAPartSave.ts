@@ -87,9 +87,13 @@ export interface MeetEntry {
   trailheadKind: TrailheadKind;
   partId: string | null;
   candidateId: string | null;
+  /** A trail offer answered "Yes, a part of me" (trailheadKind 'offer' only; src/lib/trailOffer.ts). */
+  offerId?: string;
   moveId: string | null;
 }
 
+/** A trail offer id (functions/src/parts/offers/blocked.ts TRAIL_OFFER_ID). */
+const OFFER_ID = /^[a-z0-9_]{1,60}:[a-z0-9_]{1,60}(\+[a-z0-9_]{1,60}){0,7}:[a-z0-9_]{1,60}(:[0-9a-f-]{36})?$/;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const GRAPH_ID = /^[a-z0-9][a-z0-9_-]{0,99}$/;
 
@@ -98,10 +102,14 @@ export function parseMeetEntry(state: unknown): MeetEntry {
   const p = (state && typeof state === 'object' ? (state as { parts?: unknown }).parts : null) as Record<string, unknown> | null;
   const o = p && typeof p === 'object' ? p : {};
   const str = (v: unknown, re: RegExp) => (typeof v === 'string' && re.test(v) ? v : null);
+  const kind = TRAILHEAD_KINDS.includes(o.trailheadKind as TrailheadKind) ? o.trailheadKind as TrailheadKind : 'me';
+  const offerId = kind === 'offer' ? str(o.offerId, OFFER_ID) : null;
   return {
-    trailheadKind: TRAILHEAD_KINDS.includes(o.trailheadKind as TrailheadKind) ? o.trailheadKind as TrailheadKind : 'me',
+    // The offer trailhead needs its offer (the server refuses one without it): without, it's from Me.
+    trailheadKind: kind === 'offer' && !offerId ? 'me' : kind,
     partId: str(o.partId, UUID),
     candidateId: str(o.candidateId, UUID),
+    ...(offerId ? { offerId } : {}),
     moveId: str(o.moveId, GRAPH_ID),
   };
 }
@@ -173,6 +181,7 @@ export function startRequest(id: string, session: Pick<MeetSession, 'move' | 'pa
     id, trailheadKind: entry.trailheadKind,
     ...(session.partId ? { partId: session.partId } : {}),
     ...(entry.candidateId ? { candidateId: entry.candidateId } : {}),
+    ...(entry.offerId ? { offerId: entry.offerId } : {}),
     moveIds: session.move ? [session.move] : [],
   };
 }

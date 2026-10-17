@@ -6,11 +6,12 @@
  * - Order: tier safety > practice > quality > skills; within a tier due > stale > upcoming; due and
  *   upcoming soonest first, stale newest first (the order OA's card already uses).
  * - The first 3 are `items`, the rest `more`. `flooded` (a fresh band, A4) collapses the stack:
- *   nothing is hidden, one tap expands it ("Your plans will keep").
+ *   nothing is hidden, one tap expands it ("Your plans will keep"). A parts trail offer is the one
+ *   exception: it isn't something the person owes, so a flooded band drops it altogether.
  */
 export type Tier = 'safety' | 'practice' | 'quality' | 'skills';
 export type TodayState = 'due' | 'stale' | 'upcoming';
-export type TodayKind = 'follow_up' | 'tool_outcome' | 'pattern_offer' | 'profile_revisit';
+export type TodayKind = 'follow_up' | 'tool_outcome' | 'pattern_offer' | 'profile_revisit' | 'trail_offer';
 
 export interface TodayChoice {
   id: string;
@@ -33,7 +34,14 @@ export interface TodayItem {
   copy: { title: string; body?: string };
   source?: { toolId?: string; toolSessionId?: string; detailId?: string };
   /** A parts check-back's part (parts on only): its name and tenderness from the profile slice. */
-  part?: { id: string; name: string | null; tender: boolean };
+  /** `safety`: the part safety flag (functions/src/safety/partSafetyFlag.ts): CrisisBanner alongside the card. */
+  part?: { id: string; name: string | null; tender: boolean; safety?: boolean };
+  /**
+   * A parts trail offer (kind `trail_offer`, shapes A–C): the rule's signed-off statement and what fills
+   * it, every phrase signed-off graph content (the moves' `trailPhrase`, the context's `phrase`). The card
+   * fills the template.
+   */
+  trail?: { ruleId: string; shape: 'A' | 'B' | 'C'; template: string; pulls: string[]; context: string | null };
 }
 
 export const TODAY_VISIBLE = 3;
@@ -69,14 +77,16 @@ export function compareToday(a: TodayItem, b: TodayItem): number {
 }
 
 /**
- * Order the stack. At most one derived `tool_outcome` and one `pattern_offer` are kept (the newest).
- * A flooded band empties `items` and sets `holding`: everything stays one tap away in `more`.
+ * Order the stack. At most one derived `tool_outcome`, one `pattern_offer` and one `trail_offer` are
+ * kept (the newest). A flooded band empties `items` and sets `holding`: everything stays one tap away in
+ * `more`, except a trail offer, which a flooded band drops.
  */
 export function orderToday(all: TodayItem[], band?: 'steady' | 'stirred' | 'flooded' | null): { items: TodayItem[]; more: TodayItem[]; holding: boolean } {
   const onceKinds = new Set<TodayKind>();
   const kept: TodayItem[] = [];
   for (const it of [...all].sort((a, b) => (b.dueAt ? Date.parse(b.dueAt) : 0) - (a.dueAt ? Date.parse(a.dueAt) : 0))) {
-    if (it.kind === 'tool_outcome' || it.kind === 'pattern_offer') {
+    if (band === 'flooded' && it.kind === 'trail_offer') continue;
+    if (it.kind === 'tool_outcome' || it.kind === 'pattern_offer' || it.kind === 'trail_offer') {
       if (onceKinds.has(it.kind)) continue;
       onceKinds.add(it.kind);
     }

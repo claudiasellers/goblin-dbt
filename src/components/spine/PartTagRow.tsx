@@ -21,6 +21,10 @@ const quiet = 'min-h-11 px-3 text-sm text-[var(--color-text-tertiary)] hover:tex
  * never blocks or delays leaving the tool. Skip and "No thanks" write nothing. With `offerShape` (Find the
  * feeling, a visit that made a shape: src/lib/partShape.ts) a part chip asks "Use this shape for {name}?"
  * first; Yes shows "Done." in place for a moment, then the row folds.
+ *
+ * No crisis banner here, even for a part whose `safety` flag is set (functions/src/safety/partSafetyFlag.ts):
+ * a chip row after a better close isn't the moment. The part's own card, its check-backs and a visit to
+ * it carry the banner instead.
  */
 export function PartTagRow({ toolId, toolSessionId, content, onGone, question, debrief = false, offerShape = false }: {
   /** The host whose profile needs the parts are read under (a tag-row tool, or DEAR MAN's debrief). */

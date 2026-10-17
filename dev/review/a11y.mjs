@@ -71,6 +71,8 @@ const OUTSIDE_PARTS = [
     why: 'BreakdownHandoff (src/components/capacity/): P2\'s own step change' },
   { match: /^checkback--\w+: focus: after Enter on button "[^"]*" in part-checkback(-aftercare)? focus went to body$/,
     why: 'the answered card leaves Today: where focus goes next is TodayStack\'s (here the harness note)' },
+  { match: /^offer--\w+: focus: after Enter on button "(?!Show me")[^"]*" in trail-offer(-evidence)? focus went to body$/,
+    why: 'an answered offer leaves Today (Yes also opens Meet a part): where focus goes next is TodayStack\'s (here the harness note)' },
   { match: /^debrief--\w+: focus: after Enter on button "[^"]*" focus went to body$/,
     why: 'every debrief tap moves DEAR MAN on (onDone): its next step is DearMan.tsx\'s (here the harness note)' },
   { match: /^cope--pick: focus: after Enter on button "[^"]*" in cope-ahead focus went to body$/,

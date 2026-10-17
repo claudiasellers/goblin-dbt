@@ -180,6 +180,7 @@ test("voice contract: every parts copy row passes the lint, the loader's gate co
     ["ProtectiveMove", ["label", "unblendPhrase", "trailPhrase", "nameHint"]],
     ["ProtectedHurt", ["label", "hurtPhrase", "feltPhrase", "matters"]],
     ["PartPrompt", ["copy"]], ["PartOption", ["label"]], ["TrailRule", ["statementTemplate"]], ["TrailContext", ["phrase"]],
+    ["PullOption", ["label"]], // Recover's own pull labels (imported), shown on the trail offer's evidence rows
   ];
   let n = 0;
   for (const [label, fields] of visible) {

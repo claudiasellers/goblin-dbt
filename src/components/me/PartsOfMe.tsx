@@ -10,6 +10,7 @@ import {
   type PartCandidatePromptId, type PartRevisitCopy, type PartWriteCall, type PartsOfMePromptId,
 } from '../../lib/partsOfMe';
 import { newId } from '../../lib/spine/ids';
+import { CrisisBanner } from '../safety/CrisisBanner';
 import { PartFigure } from '../parts/PartFigure';
 import { getToolById } from '../../data/tools';
 import { monthName, partStatLines, statsReady, type PartStatLines } from '../../lib/partStats';
@@ -161,10 +162,12 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
     const c = revisitCall(newId(), partId, a, ratherIds);
     if (c) run(c, () => setAnswered(true));
   };
+  // Every row stacked: the label a small quiet line (secondary: tertiary on the card is under 4.5:1 in
+  // dusk), the value under it in the body style.
   const row = (label: string, value: ReactNode) => (
-    <div className="flex flex-wrap gap-x-2">
-      <dt className="text-[var(--color-text-secondary)]">{label}</dt>
-      <dd className="text-[var(--color-text-secondary)]">{value}</dd>
+    <div>
+      <dt className="text-xs text-[var(--color-text-secondary)]">{label}</dt>
+      <dd className="text-sm text-[var(--color-text-primary)] break-words">{value}</dd>
     </div>
   );
   return (
@@ -199,10 +202,11 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
             </div>
           )}
           {stats?.when && <p className="text-sm text-[var(--color-text-secondary)]">{stats.when}</p>}
-          <dl className="mt-1 space-y-0.5 text-sm">
+          <dl className="mt-2 space-y-2">
             {rows.where.length > 0 && row(copy.card_where, rows.where.join(', '))}
             {rows.job && ('own' in rows.job
-              ? row(copy.card_job_own, <span className="font-serif">{rows.job.own}</span>)
+              // The person's own words: the serif, at body size (text-base sets it level with the sans).
+              ? row(copy.card_job_own, <span className="font-serif text-base leading-snug">{rows.job.own}</span>)
               : row(copy.card_job, rows.job.labels.join(', ')))}
             {rows.fears.length > 0 && row(copy.card_fear, rows.fears.join(', '))}
             {rows.rather.length > 0 && row(copy.card_rather, rows.rather.join(', '))}
@@ -225,6 +229,9 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
           </button>
         ))}
       </div>
+      {/* A safety-line or danger part (functions/src/safety/partSafetyFlag.ts): crisis resources under the
+          actions, quiet, alongside the card and its 30-day check-back above, never instead. */}
+      {part.safety === true && <div className="mt-3"><CrisisBanner compact /></div>}
     </li>
   );
 }

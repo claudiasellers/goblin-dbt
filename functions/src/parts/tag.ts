@@ -3,7 +3,7 @@
  * a ToolSession. Writes one `:PartTag:UserData:LogRecord` with `(:User)-[:HAS_PART_TAG]->`,
  * `(:PartTag)-[:TAGS]->(:ToolSession)` and `(:PartTag)-[:OF_PART]->(:Part)`. Edges run out of the new tag
  * only: the ToolSession may be finalised and the Part is profile data, so neither is written (keepPart
- * stays the only Part writer). Two sources:
+ * stays the only Part writer). Three sources:
  *
  * - `close` (the default; the tag row after a better close): the ToolSession the caller's, closed, with
  *   then-vs-now better or much better or actedOnUrge 'no' (Pause, Urge Surfing: holding off is their
@@ -12,13 +12,19 @@
  *   ToolSession the caller's and DEAR MAN's, open or closed, with `strength` 'yes' or 'a_bit'. It says
  *   the part was there, not that a tool helped it settle, so the stats' *helped* never counts it.
  *
- * Both: parts on; the part the caller's and active or resting.
+ * - `review` (rule D's "Was this {name}?", answered weeks later in a batch in Reflect, the source's first
+ *   writer, still to come): the caller's own closed ToolSession, not Meet a part. The person recognising
+ *   the part is the evidence, so no close answer is asked; like a debrief tag, the stats never count it.
+ *
+ * All: parts on; the part the caller's and active or resting.
  *
  * One tag per ToolSession per source: the state read returns the session's existing tag of that source,
  * and a repeat (any id, any part) returns it and writes nothing. Two calls racing past that read are
  * stopped by the `part_tag_tagged_key` uniqueness constraint on `PartTag.taggedKey`: the session's key for
  * a close tag (as before), `<session key>:debrief` for a debrief tag, so one of each can coexist. The
- * loser's transaction fails, and the callable reads again and returns the winner's tag.
+ * loser's transaction fails, and the callable reads again and returns the winner's tag. A tag id the
+ * caller already used (for any session) is answered as a repeat and writes nothing: a finalised tag never
+ * takes another outgoing edge.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -43,11 +49,11 @@ export function validateTag(raw: unknown): TagPartRequest & { source: TagSource 
   const o = obj(raw);
   for (const k of Object.keys(o)) if (!['id', 'partId', 'toolSessionId', 'source', 'strength'].includes(k)) throw new ValidationError(`${k}: not accepted`);
   const source = o.source === undefined ? 'close' : o.source;
-  if (!(TAG_SOURCES as readonly unknown[]).includes(source)) throw new ValidationError('source: close or debrief');
+  if (!(TAG_SOURCES as readonly unknown[]).includes(source)) throw new ValidationError('source: close, debrief or review');
   const base = { id: uuid(o.id), partId: uuid(o.partId), toolSessionId: uuid(o.toolSessionId) };
-  if (source === 'close') {
+  if (source === 'close' || source === 'review') {
     if (o.strength !== undefined) throw new ValidationError('strength: debrief tags only');
-    return { ...base, source: 'close' };
+    return { ...base, source };
   }
   if (!(TAG_STRENGTHS as readonly unknown[]).includes(o.strength)) throw new ValidationError('strength: yes or a_bit');
   return { ...base, source: source as TagSource, strength: o.strength as TagStrength };
@@ -57,9 +63,10 @@ export const TAG_STATE_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
   OPTIONAL MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey})
   OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
+  OPTIONAL MATCH (same:PartTag {key: $key})
   OPTIONAL MATCH (u)-[:HAS_PART_TAG]->(prev:PartTag {taggedKey: $taggedKey})-[:TAGS]->(ts)
-  WITH u, pt, ts, prev ORDER BY prev.createdAt
-  RETURN coalesce(u.partsEnabled, false) AS partsOn, pt.status AS partStatus,
+  WITH u, pt, ts, same, prev ORDER BY prev.createdAt
+  RETURN coalesce(u.partsEnabled, false) AS partsOn, pt.status AS partStatus, same IS NOT NULL AS idTaken,
          ts IS NOT NULL AS sessionFound, ts.status AS sessionStatus, ts.thenVsNow AS thenVsNow,
          ts.actedOnUrge AS actedOnUrge, ts.toolId AS toolId,
          collect(prev.id)[0] AS existingId
@@ -70,10 +77,11 @@ export const TAG_QUERY = `
   ${MERGE_USER}
   WITH u
   MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $sessionKey})
-  WHERE coalesce(u.partsEnabled, false) AND (
+  WHERE coalesce(u.partsEnabled, false) AND NOT EXISTS { MATCH (:PartTag {key: $key}) } AND (
     ($source = 'close' AND ts.status <> 'open'
       AND (ts.thenVsNow IN $closes OR ts.actedOnUrge IN $urgeCloses) AND NOT ts.toolId IN $never)
-    OR ($source = 'debrief' AND ts.toolId IN $debriefTools))
+    OR ($source = 'debrief' AND ts.toolId IN $debriefTools)
+    OR ($source = 'review' AND ts.status <> 'open' AND NOT ts.toolId IN $never))
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey}) WHERE pt.status IN ['active', 'resting']
   MERGE (t:PartTag {key: $key})
   ON CREATE SET t:UserData:LogRecord, t.id = $id, t.ownerId = $uid, t.createdAt = datetime(), t.schemaVersion = 1,
@@ -94,6 +102,8 @@ export interface TagState {
   toolId: string | null;
   /** The session's tag, if it has one already. */
   existingId: string | null;
+  /** A tag with this id is already the caller's (a repeat, or an id reused for another session). */
+  idTaken?: boolean;
 }
 
 type TagInput = TagPartRequest & { source: TagSource };
@@ -109,7 +119,12 @@ export async function tagPartHandler(t: TagInput, deps: TagDeps): Promise<TagPar
   if (!st.partsOn) throw partsOff();
   if (!st.sessionFound) throw new HttpsError('not-found', 'Session not found');
   if (st.existingId) return { id: st.existingId, created: false };
-  if (t.source === 'debrief') {
+  if (st.idTaken) return { id: t.id, created: false };
+  if (t.source === 'review') {
+    // Rule D's batch review: a closed session of the caller's, any close answer.
+    if (st.sessionStatus === 'open') throw new HttpsError('failed-precondition', 'That session is still open');
+    if ((TAG_NEVER_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
+  } else if (t.source === 'debrief') {
     // DEAR MAN's debrief: its own session, open or closed; no close answer asked.
     if (!(TAG_DEBRIEF_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
   } else {
@@ -146,6 +161,7 @@ export function tagDeps(tx: ManagedTransaction, uid: string, email: string | nul
         actedOnUrge: s(r?.get('actedOnUrge')),
         toolId: s(r?.get('toolId')),
         existingId: s(r?.get('existingId')),
+        idTaken: r?.get('idTaken') === true,
       };
     },
     async write(t) {

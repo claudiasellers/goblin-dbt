@@ -341,3 +341,19 @@ test("the card's readout: Mostly {when} under the name, then what's helped and h
   assert.equal(lines.felt.title, "How you've felt toward it");
   assert.equal(lines.felt.line, `In July: ${feel[0].label}. Lately: ${feel[1].label}.`);
 });
+
+test("the card's layout: every row stacked (small muted label over a body-style value), own words in the serif at body size, one rhythm", () => {
+  const c = read("src/components/me/PartsOfMe.tsx");
+  const card = c.slice(c.indexOf("function PartCard("), c.indexOf("function CheckBack("));
+  assert.match(card, /const row = \(label: string, value: ReactNode\) => \(\s*<div>\s*<dt className="text-xs text-\[var\(--color-text-secondary\)\]">\{label\}<\/dt>\s*<dd className="text-sm text-\[var\(--color-text-primary\)\] break-words">\{value\}<\/dd>\s*<\/div>/,
+    "label above, value below; no inline label/value rows (secondary: tertiary on the card is under 4.5:1 in dusk)");
+  assert.doesNotMatch(card, /flex flex-wrap gap-x-2">\s*<dt/, "no inline row left");
+  assert.match(card, /<dl className="mt-2 space-y-2">/, "one spacing token between rows");
+  assert.match(card, /row\(copy\.card_job_own, <span className="font-serif text-base leading-snug">\{rows\.job\.own\}<\/span>\)/, "the person's words: serif, body size");
+  assert.match(card, /row\(copy\.card_job, rows\.job\.labels\.join\(', '\)\)/, "chip-picked values stay in the sans");
+  for (const r of ["copy.card_where", "copy.card_fear", "copy.card_rather", "stats.helped.title", "stats.felt.title"]) assert.ok(card.includes(`row(${r}`), r);
+  const name = card.indexOf("{part.name ?? item.title}");
+  const when = card.indexOf("{stats?.when && <p className=\"text-sm text-[var(--color-text-secondary)]\">{stats.when}</p>}");
+  const dl = card.indexOf("<dl ");
+  assert.ok(name > 0 && name < when && when < dl, "Mostly {when}: a quiet line directly under the name");
+});
