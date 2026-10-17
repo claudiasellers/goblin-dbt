@@ -111,9 +111,14 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
         <div className="space-y-2">
           <p className="text-xs text-[var(--color-danger)] focus:outline-none">{copy.settings_delete_confirm}</p>
           {linesQuestion && (
-            <label className="flex items-start gap-2 min-h-11 py-1 text-xs text-[var(--color-text-secondary)] cursor-pointer">
+            // The whole line is the target (≥ 44 px): the real checkbox covers it, the box beside the words is drawn.
+            <label className="relative flex items-center gap-2 min-h-11 py-1 text-xs text-[var(--color-text-secondary)] cursor-pointer">
               <input type="checkbox" checked={removeLines} onChange={(e) => setRemoveLines(e.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--color-danger)]" />
+                className="peer absolute inset-0 h-full w-full opacity-0 cursor-pointer" />
+              <span aria-hidden="true"
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-[var(--color-danger)] text-[var(--color-on-danger)] peer-checked:bg-[var(--color-danger)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--color-accent)]">
+                {removeLines && <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2.5 6.5l2.5 2.5 4.5-5" /></svg>}
+              </span>
               <span>{linesQuestion}</span>
             </label>
           )}

@@ -13,7 +13,7 @@ export function ToolNotFound() {
       </p>
       <Link
         to="/tools"
-        className="mt-4 inline-block text-[var(--color-text-secondary)] underline hover:no-underline"
+        className="mt-4 inline-flex items-center min-h-11 px-2 text-[var(--color-text-secondary)] underline hover:no-underline"
       >
         ← Tools
       </Link>
