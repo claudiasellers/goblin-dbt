@@ -138,6 +138,9 @@ test("session: every field whatToSave keeps maps to a field lane 2's validators 
     chipVoice.concat({ type: "ownWords", text: "keeps me safe" }),
     chipVoice.concat("hide_job_out_of_sight", "likes_tired", "guards_not_sure", { type: "ownWords", text: "it all comes back" }),
   ].map((events) => S.toPatch(run(events)));
+  // 5d, with another part kept: the pick is stored by id.
+  const FRONT_CTX = S.meetContext(ALL, { open: "flow" }, false, [{ id: PID, name: "Ash" }]);
+  others.push(S.toPatch(run([...FULL.slice(0, 18), { type: "front", partId: PID }], { ctx: FRONT_CTX })));
   for (const p of others) V.validateSavePartSession({ id: SID, patch: p });
   for (const target of new Set(Object.values(S.SESSION_FIELD))) {
     if (target.startsWith("start:")) continue;
@@ -361,4 +364,31 @@ test("the check-back question at the close: kept or revisited, opened, shipped, 
   assert.match(page, /id === CHECKBACK_YES \? checkbackRequest\(checkType, newId\(\), psId, new Date\(\)\) : null;/, "only the yes schedules");
   assert.match(page, /if \(req\) enqueue\(async \(\) => \{ if \(await started\.current\) await schedulePartCheckback\(req\); \}\);/, "after the visit's saves and keep");
   assert.match(page, /\{\(askCheckback \|\| checkback\) && \(<>\s*<Prompt>\{P\(CHECKBACK_PROMPT\)\}<\/Prompt>/);
+});
+
+test("5d: optional copy (skipped, never the visit), named parts only, the pick saved by id and checked by lane 2's validator", () => {
+  const known = [{ id: PID, name: "Ash" }, { id: SID, name: null }, { id: "5c2c9a0e-1b2c-4d5e-8f90-123456789abc", name: "  " }];
+  assert.deepEqual(S.frontParts(known), [PID], "only parts with a name, in the slice's order");
+  assert.deepEqual(S.meetContext(ALL, { open: "flow" }, false, known).frontParts, [PID]);
+  assert.equal(S.meetContext(ALL, { open: "flow" }, false, []).frontParts, undefined, "no other part: no 5d");
+  for (const id of [...S.MEET_FRONT_REQUIRED.prompts, ...S.MEET_FRONT_REQUIRED.options]) {
+    const missing = partsFromFixture(fixture, (x) => x !== id);
+    assert.equal(S.frontReady(missing), false, `without ${id}`);
+    assert.equal(S.meetContext(missing, { open: "flow" }, false, known).frontParts, undefined, `without ${id}: 5d is skipped`);
+    assert.equal(S.meetReady(missing, ROUNDS), true, `without ${id}: the visit still opens`);
+  }
+  assert.ok(!S.meetPromptIds().includes(S.FRONT_PROMPT) && !S.MEET_REQUIRED_OPTIONS.some((o) => o.startsWith("front_")), "never in the visit's own gate");
+  const ctx = S.meetContext(ALL, { open: "flow" }, false, known);
+  const at = run(FULL.slice(0, 18), { ctx });
+  assert.equal(at.step, "front");
+  assert.equal(S.STEP_PART.front, "guards");
+  const patch = S.toPatch(run([{ type: "front", partId: PID }], { ctx, state: at }));
+  assert.equal(patch.frontOfPartId, PID);
+  assert.equal(V.validateSavePartSession({ id: SID, patch }).props.frontOfPartId, PID);
+  for (const id of [S.FRONT_NONE, S.FRONT_NOT_SURE]) assert.ok(!("frontOfPartId" in S.toPatch(run([id], { ctx, state: at }))), `${id}: nothing saved`);
+  // The page: the names as chips, then the two options; TooMuchLink as on every screen.
+  const page = read("src/pages/tools/MeetAPart.tsx");
+  assert.match(page, /meetContext\(parts, plan, start\.named, known\)/);
+  assert.match(page, /case 'front': \{[\s\S]*?frontChoices\(s, ctx\)\.map\(\(id\) => <Chip key=\{id\} own label=\{byId\.get\(id\)\?\.name \?\? ''\} onClick=\{\(\) => send\(\{ type: 'front', partId: id \}\)\} \/>\)/);
+  assert.match(page, /\{!p2Open && step !== 'done' && tooMuch\}/);
 });

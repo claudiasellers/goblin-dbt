@@ -48,6 +48,7 @@ const EXPECT = {
   'meet/stop_own': 'meet_stop_title', 'meet/danger': 'meet_thank', 'meet/nothing': 'meet_nothing', 'meet/worried': 'meet_unblend',
   'meet/worried_end': 'meet_unblend_end', 'meet/too_many': 'aftercare_too_many', 'meet/paused': 'paused_heads_up', 'meet/keep': 'meet_keep',
   'meet/close': 'close_checkback', 'meet/danger_close': 'meet_done',
+  'meet/front': 'meet_front', 'meet/front_keep': 'meet_keep', // 5d (lane 2)
   'checkback/louder': 'aftercare_louder', 'tag/row': 'tag_question', 'tag/new': 'tag_new_later', 'me/cards': 'card_where', 'me/long': 'card_where', 'reflect/': 'reflect_title',
   'settings/on': 'settings_dissociation', 'settings/confirm': 'settings_delete_confirm', 'settings/failed': 'settings_delete_failed',
   'settings/done': 'settings_delete_done', 'cope/pick': 'cope_title', 'cope/anchor': 'cope_change', 'cope/new': 'cope_save',

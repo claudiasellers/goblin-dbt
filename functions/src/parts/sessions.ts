@@ -13,9 +13,18 @@ export interface PartSessionDeps {
   maxNonSelfAnswers(): Promise<unknown>;
   startState(s: StartInput): Promise<StartState>;
   create(s: StartInput): Promise<void>;
-  saveState(id: string): Promise<{ partsOn: boolean; status: string | null; stepIdsJson: string | null }>;
+  /**
+   * `frontOfPartId`: the 5d pick asked about; `frontFound` is true only when it is the caller's own
+   * active or resting part. `partId` and `storedFrontOfPartId` are the session's own.
+   */
+  saveState(id: string, frontOfPartId?: string | null): Promise<{
+    partsOn: boolean; status: string | null; stepIdsJson: string | null;
+    partId?: string | null; storedFrontOfPartId?: string | null; frontFound?: boolean;
+  }>;
   /** The guarded write; the session's status after it, or null when the guard refused. */
   save(id: string, props: PatchProps, stepIdsJson: string | null, final: boolean): Promise<string | null>;
+  /** 5d's thread (frontLink.ts): this visit's part in front of the one picked. */
+  link?(frontId: string, behindId: string): Promise<boolean>;
 }
 
 export interface StartState {
@@ -52,11 +61,19 @@ export async function savePartSessionHandler(raw: unknown, deps: PartSessionDeps
   const policy = await deps.maxNonSelfAnswers();
   const max = typeof policy === 'number' && Number.isInteger(policy) && policy >= 0 ? policy : DEFAULT_MAX_NON_SELF;
   const input = validateSavePartSession(raw, max);
-  const state = await deps.saveState(input.id);
+  const asked = typeof input.props.frontOfPartId === 'string' ? input.props.frontOfPartId : null;
+  const state = await deps.saveState(input.id, asked);
   if (!state.partsOn) throw partsOff();
   if (!state.status) throw new HttpsError('not-found', 'Session not found');
   if (state.status !== 'open') throw frozen();
-  const status = await deps.save(input.id, input.props, mergeStepIds(state.stepIdsJson, input.stepIds), input.final);
+  // 5d: only the caller's own active or resting part, never this visit's own. Anything else is dropped,
+  // not refused: the rest of the visit is still saved.
+  const props = { ...input.props };
+  if (asked && (!state.frontFound || asked === state.partId)) delete props.frontOfPartId;
+  const status = await deps.save(input.id, props, mergeStepIds(state.stepIdsJson, input.stepIds), input.final);
   if (status === null) throw frozen(); // saved in between: the guard held
+  // A visit to a part already kept: its last save draws 5d's thread, from what is stored now.
+  const front = 'frontOfPartId' in props ? (props.frontOfPartId as string | null) : state.storedFrontOfPartId ?? null;
+  if (status === 'saved' && state.partId && front && front !== state.partId) await deps.link?.(state.partId, front);
   return { id: input.id, status: status === 'saved' ? 'saved' : 'open' };
 }

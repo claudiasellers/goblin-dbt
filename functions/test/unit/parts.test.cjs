@@ -1352,3 +1352,123 @@ test('queuePartCandidate: an id already the caller\'s writes nothing; QUEUED onl
     'GUARDS.PartSession.keep on the QUEUED edge');
   assert.match(C.CANDIDATE_STATE_QUERY, /OPTIONAL MATCH \(ts\)-\[:DETAIL\]->\(d\) WHERE d\.ownerId = \$uid/, 'a DETAIL record read for the moves is the caller\'s own');
 });
+
+// ------------------------------------------------------------------ 5d: "Does it stand in front of another part you know?"
+
+const L = require('../../lib/parts/links');
+const BEHIND = '7d2c9a0e-1b2c-4d5e-8f90-123456789abc';
+
+test('validateSavePartSession: frontOfPartId is a uuid or null; anything else is refused', () => {
+  assert.deepEqual(validateSavePartSession({ id: SID, patch: { frontOfPartId: BEHIND } }).props, { frontOfPartId: BEHIND });
+  assert.deepEqual(validateSavePartSession({ id: SID, patch: { frontOfPartId: null } }).props, { frontOfPartId: null });
+  for (const v of ['front_none', 'not-a-uuid', 3, ['x']]) bad(() => validateSavePartSession({ id: SID, patch: { frontOfPartId: v } }));
+});
+
+/** fakeSessions plus 5d: which parts are the caller's own active or resting ones, the session's part, and the link log. */
+function fakeFront({ own = [BEHIND], partId = null, storedFront = null } = {}) {
+  const f = fakeSessions({ sessions: { [SID]: { status: 'open', stepIdsJson: null } } });
+  f.deps.saveState = async (id, front) => {
+    f.log.push(['saveState', id, front]);
+    const s = f.sessions[id];
+    return { partsOn: true, status: s?.status ?? null, stepIdsJson: null, partId, storedFrontOfPartId: s?.frontOfPartId ?? storedFront, frontFound: own.includes(front) };
+  };
+  f.deps.link = async (a, b) => { f.log.push(['link', a, b]); return true; };
+  return f;
+}
+const links = (log) => log.filter(([k]) => k === 'link').map(([, a, b]) => [a, b]);
+
+test("save 5d: the caller's own part is stored; not theirs, or this visit's own part, is dropped and the rest still saved", async () => {
+  const f = fakeFront();
+  await savePartSessionHandler({ id: SID, patch: { frontOfPartId: BEHIND } }, f.deps);
+  assert.equal(f.sessions[SID].frontOfPartId, BEHIND);
+  assert.deepEqual(f.log.find(([k]) => k === 'saveState'), ['saveState', SID, BEHIND], 'the pick is checked in the state read');
+
+  const g = fakeFront({ own: [] });
+  await savePartSessionHandler({ id: SID, patch: { frontOfPartId: BEHIND, blendCheck: 'notice' } }, g.deps);
+  const [, , props] = g.log.find(([k]) => k === 'save');
+  assert.deepEqual(props, { blendCheck: 'notice' });
+
+  const h = fakeFront({ own: [PID], partId: PID });
+  await savePartSessionHandler({ id: SID, patch: { frontOfPartId: PID } }, h.deps);
+  assert.ok(!('frontOfPartId' in h.sessions[SID]), 'never in front of itself');
+});
+
+test('save 5d: a new part draws nothing on save (the keep does); a kept part draws its thread on the last save only', async () => {
+  const fresh = fakeFront();
+  await savePartSessionHandler({ id: SID, patch: { frontOfPartId: BEHIND }, final: true }, fresh.deps);
+  assert.deepEqual(links(fresh.log), [], 'no part yet: keepPart writes it on the yes');
+
+  const kept = fakeFront({ partId: PID });
+  await savePartSessionHandler({ id: SID, patch: { frontOfPartId: BEHIND } }, kept.deps);
+  assert.deepEqual(links(kept.log), [], 'not while the visit is open');
+  await savePartSessionHandler({ id: SID, patch: { stopReason: 'done' }, final: true }, kept.deps);
+  assert.deepEqual(links(kept.log), [[PID, BEHIND]], 'from the stored pick, the kept part in front');
+});
+
+test('save 5d: No one I know, Not sure or no answer write nothing', async () => {
+  const none = fakeFront({ partId: PID });
+  await savePartSessionHandler({ id: SID, patch: { stopReason: 'done' }, final: true }, none.deps);
+  assert.deepEqual(links(none.log), []);
+  const cleared = fakeFront({ partId: PID, storedFront: BEHIND });
+  await savePartSessionHandler({ id: SID, patch: { frontOfPartId: null }, final: true }, cleared.deps);
+  assert.deepEqual(links(cleared.log), [], 'a cleared pick draws nothing');
+});
+
+test('keepPart 5d: the new part stands in front of the stored pick, before the snapshot; a revisit draws it too; non-answers nothing', async () => {
+  const withLink = (f) => { f.deps.link = async (a, b) => { f.log.push(['link', a, b]); return true; }; f.deps.snapshot = async () => { f.log.push(['snapshot']); }; return f; };
+  const f = withLink(fakeKeep({ session: stored({ frontOfPartId: BEHIND }) }));
+  await K.keepPartHandler(keepIn(), f.deps);
+  assert.deepEqual(f.log.map(([k]) => k), ['state', 'create', 'link', 'snapshot']);
+  assert.deepEqual(links(f.log), [[NEW_PART, BEHIND]]);
+
+  const r = withLink(fakeKeep({ session: stored({ partId: PID, frontOfPartId: BEHIND }), part: { places: [] } }));
+  await K.keepPartHandler(keepIn({ partId: PID }), r.deps);
+  assert.deepEqual(links(r.log), [[PID, BEHIND]]);
+
+  const self = withLink(fakeKeep({ session: stored({ partId: PID, frontOfPartId: PID }), part: { places: [] } }));
+  await K.keepPartHandler(keepIn({ partId: PID }), self.deps);
+  assert.deepEqual(links(self.log), []);
+
+  const none = withLink(fakeKeep({ session: stored() }));
+  await K.keepPartHandler(keepIn(), none.deps);
+  assert.deepEqual(links(none.log), [], 'No one I know / Not sure store nothing, so nothing is drawn');
+});
+
+test('keepPart over the fake driver: 5d writes covers_for through writePartLink in the same transaction; a refused link keeps the part', async () => {
+  for (const linkOk of [true, false]) {
+    const f = fakeDriver((q, p) => {
+      if (q === K.KEEP_STATE_QUERY) {
+        return [{ partsOn: true, session: { ...stored({ frontOfPartId: BEHIND }), keepable: true }, part: null, linkedPartId: null, nameMaxChars: 40, revisitAfterDays: 30 }];
+      }
+      if (q === K.KEEP_NEW_QUERY) return [{ id: p.partId }];
+      if (q === L.LINK_STATE_QUERY) return [{ partsOn: true, version: 3, aFound: true, bFound: linkOk, linked: false, bothWantKnown: false }];
+      if (q === L.WRITE_PART_LINK_QUERY) return [{ version: 4 }];
+      if (q === DEN_LAYOUT_QUERY) return [];
+      return new Error(`unexpected: ${q.slice(0, 60)}`);
+    });
+    setDriver(f.driver);
+    const out = await fns.keepPart.run({ auth: auth('real-user'), data: { sessionId: SID, partId: NEW_PART } });
+    assert.deepEqual(out, { partId: NEW_PART, created: true });
+    const st = f.calls.find((c) => c.query === L.LINK_STATE_QUERY);
+    assert.deepEqual([st.params.aKey, st.params.bKey], [`real-user:${NEW_PART}`, `real-user:${BEHIND}`]);
+    const w = f.calls.find((c) => c.query === L.WRITE_PART_LINK_QUERY);
+    if (linkOk) assert.deepEqual([w.params.kind, w.params.aId, w.params.bId, w.params.source], ['covers_for', NEW_PART, BEHIND, 'den']);
+    else assert.equal(w, undefined, 'that part was set aside since: no thread, the keep stands');
+    assert.equal(f.calls.at(-1).query, DEN_LAYOUT_QUERY);
+  }
+});
+
+test('savePartSession over the fake driver: the pick is checked as the caller\'s own active or resting part', async () => {
+  assert.match(Q.SAVE_STATE_QUERY, /\(u\)-\[:HAS_PART\]->\(fp:Part \{key: \$frontKey\}\) WHERE fp\.status IN \['active', 'resting'\]/);
+  const g = fakeDriver((q) => {
+    if (q === Q.POLICY_QUERY) return [{ maxNonSelfAnswers: 2 }];
+    if (q === Q.SAVE_STATE_QUERY) return [{ partsOn: true, status: 'open', stepIdsJson: null, partId: null, storedFrontOfPartId: null, frontFound: true }];
+    if (q === Q.SAVE_QUERY) return [{ status: 'open' }];
+    return new Error('unexpected');
+  });
+  setDriver(g.driver);
+  await fns.savePartSession.run({ auth: auth('real-user'), data: { id: SID, patch: { frontOfPartId: BEHIND } } });
+  const s = g.calls.find((c) => c.query === Q.SAVE_STATE_QUERY);
+  assert.equal(s.params.frontKey, `real-user:${BEHIND}`);
+  assert.deepEqual(g.calls.find((c) => c.query === Q.SAVE_QUERY).params.props, { frontOfPartId: BEHIND });
+});
