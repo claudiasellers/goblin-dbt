@@ -155,13 +155,18 @@ COPY = {
     "settle_breath": "Three long breaths out",
     "settle_five": "5-4-3-2-1",
     "settle_ok": "I'm OK",
+    "settle_hold": "Hold while you breathe out, slowly.",
+    "settle_hold_hint": "Three times. Let go between them.",
     "keep_title": "Here's your plan.",
     "keep_yes": "Keep this",
     "keep_no": "Not now",
+    "keep_failed": "Couldn't save that. Try again.",
     "ask_after_q": "Want me to ask how it went?",
     "ask_after_yes": "Yes",
     "ask_after_no": "No thanks",
     "done": "Done",
+    "entry_dear_man": "Rehearse it",
+    "entry_recover": "Walk through it with Cope Ahead",
 }
 
 # The after card (cope_ahead_after), keyed as the doc's table. The Today card reads the plan from the

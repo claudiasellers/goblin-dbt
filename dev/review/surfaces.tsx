@@ -64,6 +64,7 @@ import { WISE_MIND_SURFACE } from './wiseMind'; // lane 1: Wise mind
 import { SAY_SURFACE } from './sayToPart'; // lane 1: say something to it
 import { COPE_CLOSING_SURFACE } from './copeAheadClosing'; // lane 3: Cope Ahead's screens 5–7
 import { COPE_AHEAD_SURFACE } from './copeAhead'; // lane 1: Cope Ahead
+import { COPE_ENTRIES_SURFACE } from './copeAheadEntries'; // lane 2: the ways into Cope Ahead
 
 export interface Branch { id: string; label: string; steps?: DriveStep[] }
 export interface Surface {
@@ -812,6 +813,7 @@ export const SURFACES: Surface[] = [
   SAY_SURFACE, // lane 1: say something to it (dev/review/sayToPart.tsx)
   COPE_CLOSING_SURFACE, // lane 3: Cope Ahead's screens 5–7 (not a parts surface: dev/review/copeAheadClosing.tsx)
   COPE_AHEAD_SURFACE, // lane 1: Cope Ahead (not a parts surface: dev/review/copeAhead.tsx)
+  COPE_ENTRIES_SURFACE, // lane 2: the ways into Cope Ahead, DEAR MAN and Today (dev/review/copeAheadEntries.tsx)
   COPE_AHEAD_AFTER_SURFACE, // lane 4: Cope Ahead's after card on Today (not a parts surface: dev/review/copeAheadAfter.tsx)
 ];
 

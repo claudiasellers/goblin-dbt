@@ -146,9 +146,6 @@ test("feelings: up to two, the situation's four first, a grid word from the list
 });
 
 test("a link may put a situation first, never pre-selected", () => {
-  const entry = ca.parseCopeEntry("?first=conversation", content);
-  assert.equal(entry.firstSituationId, "conversation");
-  assert.equal(ca.parseCopeEntry("?first=nope", content).firstSituationId, null);
   assert.equal(ca.orderedSituations(content, "alone")[0].id, "alone");
   assert.equal(ca.initialCope().situationId, null);
 });

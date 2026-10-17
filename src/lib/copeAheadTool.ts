@@ -11,6 +11,7 @@
  * carried, length-capped, and saved.
  */
 import type { CopeAheadContent, CopeMoveItem, CopePull, CopeWhen, HardMomentItem } from '../data/copeAheadTypes';
+import { situationsWithFirst } from './copeAheadEntry';
 
 export const COPE_STEPS = ['what', 'feel', 'moment', 'plan', 'rehearse', 'again', 'newMoment', 'settle', 'keep'] as const;
 export type CopeStep = (typeof COPE_STEPS)[number];
@@ -396,15 +397,7 @@ export const COPE_TRACK: Record<CopeStep, number> = {
   what: 1, feel: 2, moment: 3, plan: 4, rehearse: 5, again: 5, newMoment: 5, settle: 6, keep: 7,
 };
 
-/** `?first=<situation id>`: the situation a link puts first (DEAR MAN's *Rehearse it*), never pre-selected. */
-export function parseCopeEntry(search: string, c: Pick<CopeContext, 'situations'>): { firstSituationId: string | null } {
-  const id = new URLSearchParams(search).get('first');
-  return { firstSituationId: id && c.situations.some((x) => x.id === id) ? id : null };
-}
-
-/** Screen 1's chips: the content's order, with a linked situation first. */
+/** Screen 1's chips: the content's order, with a linked situation first (copeAheadEntry's `first`, never pressed). */
 export function orderedSituations(c: Pick<CopeContext, 'situations'>, first: string | null) {
-  const all = [...c.situations].sort((a, b) => a.order - b.order);
-  const lead = all.filter((x) => x.id === first);
-  return [...lead, ...all.filter((x) => x.id !== first)];
+  return situationsWithFirst([...c.situations].sort((a, b) => a.order - b.order), first);
 }

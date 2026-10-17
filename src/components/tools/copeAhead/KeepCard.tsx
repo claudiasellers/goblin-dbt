@@ -32,9 +32,6 @@ export interface KeepCardProps {
   onDone: () => void;
 }
 
-/** The failed save's line, until cope-ahead.json ships its own (`keep_failed`). */
-const FAILED = "Couldn't save that. Try again.";
-
 function anchorText(anchor: NonNullable<KeepCardProps['anchor']>): string {
   const lead = anchor.lead?.trim() || `${capFirst(anchor.name.trim())}:`;
   return `${lead} ${anchor.line.trim()}`;
@@ -78,7 +75,7 @@ export function KeepCard({ content, plan, anchor, keep, onKeep, onNotNow, askAft
             </div>
           )
       )}
-      {keep === 'failed' && <p role="status" className="text-sm text-center text-[var(--color-text-secondary)]">{copy('keep_failed') || FAILED}</p>}
+      {keep === 'failed' && <p role="status" className="text-sm text-center text-[var(--color-text-secondary)]">{copy('keep_failed')}</p>}
 
       {answered && (
         <div className="space-y-3">

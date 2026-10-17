@@ -84,6 +84,9 @@ const SELECTOR = {
 };
 const NO_CHECKBACK = new Set(['meet/danger_close']);
 // lane 4 (parts-steps-tried): screens that must also show "Steps that helped" (fresh loads, without ids).
+/** A link into Cope Ahead (src/lib/copeAheadEntry.ts): the path, then first (a situation id) and part (an id), each optional. */
+const COPE_HREF = /^#?\/tool\/cope-ahead(\?(first=[a-z][a-z0-9_]*(&part=[a-f0-9-]{36})?|part=[a-f0-9-]{36}))?$/i;
+
 const ALSO_EXPECT = {
   'me/cards': ['stats_steps'], 'me/long': ['stats_steps'], 'reflect/': ['stats_steps'],
   // lane 4 (wise-mind-parts): Wise mind's step back
@@ -181,6 +184,10 @@ try {
         // Non-parts screens (lane 1: Wise mind) bring their own lines, read from the page's map.
         if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) bad(`missing "${map.expect[v.key]}"`);
         if (map.absent?.[v.key] && text.includes(map.absent[v.key])) bad(`shows "${map.absent[v.key]}"`);
+        // lane 2 (cope-ahead-entries): every link into Cope Ahead is well-formed, and is the one the branch expects.
+        const copeHrefs = await page.locator('a[href*="/tool/cope-ahead"]').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''));
+        for (const h of copeHrefs) if (!COPE_HREF.test(h)) bad(`malformed Cope Ahead link: ${h}`);
+        if (map.copeHref?.[v.key] && !copeHrefs.includes(map.copeHref[v.key])) bad(`no link to ${map.copeHref[v.key]} (found ${copeHrefs.join(', ') || 'none'})`);
       } else if (!text.includes('⟨')) bad('Show ids printed no ids');
     } else {
       await page.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => bad('no index'));

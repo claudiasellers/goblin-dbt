@@ -9,9 +9,10 @@ import { useToolSession } from '../../hooks/useToolSession';
 import { handoffExt } from '../../lib/bandStore';
 import { anchorLead, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
 import { afterScheduleItem, COPE_AHEAD_AFTER_TYPE } from '../../lib/copeAheadAfter';
+import { parseCopeAheadEntry } from '../../lib/copeAheadEntry';
 import { planLine } from '../../lib/copeAheadPlan';
 import {
-  COPE_EXIT_STEP, copeNext, copeSessionExt, initialCope, isDanger, momentText, parseCopeEntry, planCa,
+  COPE_EXIT_STEP, copeNext, copeSessionExt, initialCope, isDanger, momentText, planCa,
   type CopeEvent, type CopeSettle, type CopeState,
 } from '../../lib/copeAheadTool';
 import { profileCache } from '../../lib/profileCache';
@@ -72,7 +73,7 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
   const toolSession = useToolSession();
   const navigate = useNavigate();
   const location = useLocation();
-  const [entry] = useState(() => parseCopeEntry(location.search, content));
+  const [entry] = useState(() => parseCopeAheadEntry(location.search, content));
   const [st, setSt] = useState<CopeState>(initialCope);
   const [keep, setKeep] = useState<'idle' | 'saving' | 'kept' | 'failed'>('idle');
   const handoffs = useRef<HandoffResult[]>([]);
@@ -107,6 +108,15 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
   const anchors = useMemo(() => ({ ...(slices?.partAnchors ?? {}), ...savedAnchors }), [slices, savedAnchors]);
   const lines = useMemo(() => keptLines(slices?.ownLines, slices?.savedLines), [slices]);
   const part = partsShown && st.partId ? slices?.parts.find((p) => p.id === st.partId) ?? null : null;
+  // A link's part (DEAR MAN's summary): preset once in the parts step, only if it is one of their kept parts
+  // (the chips copeParts shows). They can change it; Not sure / Skip clear it.
+  const preset = useRef(entry.presetPartId);
+  useEffect(() => {
+    const id = preset.current;
+    if (!id || st.step !== 'feel' || !partsShown || !slices) return;
+    preset.current = null;
+    if (copeParts(slices.parts).some((p) => p.id === id)) setSt((x) => (x.partId ? x : copeNext(x, { type: 'part', partId: id }, content)));
+  }, [st.step, partsShown, slices, content]);
   const onAnchor = (partId: string, text: string, version: number) => {
     setSavedAnchors((a) => ({ ...a, [partId]: text }));
     profileCache.bump(version);

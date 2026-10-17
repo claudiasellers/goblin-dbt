@@ -19,7 +19,7 @@ import { CopeAhead } from '../../src/pages/tools/CopeAhead';
 import { PARTS } from '../parts-example';
 import { answers } from './backend';
 import { COPE_AHEAD_PACK } from './copeAheadClosing'; // lane 3's pack: one Cope Ahead entry in the sign-off list
-import { slices } from './data';
+import { PART_IDS, slices } from './data';
 import type { DriveStep } from './driver';
 import type { Branch, Surface } from './surfaces';
 
@@ -68,8 +68,9 @@ const kept: DriveStep[] = [...toKeep, tap(t('keep_yes'))];
 const partsToPlan = (part: string): DriveStep[] => [...toFeel('conversation'), tap(partName(part)), next, tap(M('go_blank')), next, tap(MV('feet'))];
 const clause = (s: string) => s.replace(/[\s.,]+$/u, '');
 
-const BRANCHES: (Branch & { reduce?: boolean; noParts?: boolean; keepFails?: boolean })[] = [
+const BRANCHES: (Branch & { reduce?: boolean; noParts?: boolean; keepFails?: boolean; search?: string })[] = [
   { id: 'what', label: '1. What\'s coming up? and When' },
+  { id: 'first_linked', label: '1. From a link (?first=alone): that chip first, not pressed', search: '?first=alone' },
   { id: 'what_own', label: '1. Something else: own words (140)', steps: [tap(S('other')), { type: LONG_SITUATION }] },
   { id: 'feel', label: '2. What might you feel / want to do (A conversation I\'m dreading)', steps: toFeel('conversation') },
   { id: 'feel_more', label: '2. Something else: the full word list', steps: [...toFeel('hard_day'), tap(t('feel_more'))] },
@@ -107,6 +108,7 @@ const BRANCHES: (Branch & { reduce?: boolean; noParts?: boolean; keepFails?: boo
   { id: 'parts_anchor', label: 'Parts on: a part with an anchor, under the plan', steps: partsToPlan('chase') },
   { id: 'parts_set', label: 'Parts on: a part with no anchor: set one under the plan', steps: partsToPlan('hide') },
   { id: 'parts_set_saved', label: 'Parts on: a kept line saved as its anchor', steps: [...partsToPlan('hide'), tap(KEPT_LINE), { opt: 'cope_save' }] },
+  { id: 'parts_preset', label: 'Parts on: from DEAR MAN\'s link (?part=): the part preset, changeable', steps: toFeel('conversation'), search: `?first=conversation&part=${PART_IDS.chase}` },
   { id: 'parts_keep', label: 'Parts on: the plan card with the part\'s anchor', steps: [...partsToPlan('chase'), next, ...nexts(6), tap(t('rehearse_again_no')), tap(t('settle_ok'))] },
 ].map((b) => ({ ...b, noParts: !b.id.startsWith('parts_') }));
 
@@ -128,6 +130,7 @@ export const COPE_AHEAD_SURFACE: Surface = {
   id: 'cope-ahead', pack: COPE_AHEAD_PACK.id, title: 'Cope Ahead: plan for something hard, then rehearse it',
   who: 'Everyone: Tools → Emotion regulation. Copy from src/data/content/cope-ahead.json (what ships). The parts_* branches run as a person with kept parts (parts copy from the fixture); every other branch as a person with none.',
   branches: BRANCHES.map(({ id, label, steps }) => ({ id, label, ...(steps ? { steps } : {}) })),
+  routeSearch: (branch) => byId(branch)?.search ?? '',
   setup: (branch) => {
     const b = byId(branch);
     // In-page navigation keeps the app's profile cache: a branch with no kept parts must not hand its empty
@@ -181,13 +184,14 @@ export const COPE_AHEAD_EXPECT: Record<string, string> = Object.fromEntries(([
   ['keep_not_now', t('ask_after_q')], ['ask_yes', t('done')], ['ask_no', t('done')], ['done', 'Opened /tools'],
   ['own_max_keep', plan({ hardMomentOwn: LONG_MOMENT, moveOwn: LONG_MOVE })],
   ['parts_step', copeTitle], ['parts_anchor', CHASE_ANCHOR], ['parts_set', KEPT_LINE], ['parts_set_saved', KEPT_LINE],
-  ['parts_keep', CHASE_ANCHOR],
+  ['parts_preset', CHASE_ANCHOR], ['parts_keep', CHASE_ANCHOR], ['first_linked', S('alone')],
 ] as [string, string][]).map(([b, line]) => [`cope-ahead/${b}`, line]));
 
 /** Lines a branch must not show: once more is offered once; no parts step without kept parts. */
 export const COPE_AHEAD_ABSENT: Record<string, string> = {
   'cope-ahead/once_more_end': t('rehearse_again_q'),
   'cope-ahead/feel': copeTitle,
+  'cope-ahead/parts_step': CHASE_ANCHOR,
   'cope-ahead/plan_two': t('plan_add'),
   'cope-ahead/keep_kept': t('keep_no'),
   'cope-ahead/keep_failed': t('ask_after_q'),
