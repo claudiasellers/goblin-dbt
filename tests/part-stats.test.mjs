@@ -30,6 +30,9 @@ test("copy: common/stats shared by Me and Reflect, the when options, Reflect's t
     stats_felt_then_now: "In {month}: {then}. Lately: {now}.",
     stats_felt_since: "Since {month}: {now}.",
     stats_when: "Mostly {when}",
+    stats_steps: "Steps that helped: {steps}",
+    stats_step_twice: "{step} (twice)",
+    stats_step_times: "{step} ({n} times)",
   });
   for (const id of lib.STATS_PROMPTS) assert.deepEqual([fixture.prompts[id].flow, fixture.prompts[id].step], ["common", "stats"], id);
   assert.deepEqual([fixture.prompts.reflect_title.flow, fixture.prompts.reflect_title.copy], ["reflect", "The parts you know"]);
@@ -46,6 +49,10 @@ test("slot widths: the longest real value of each", () => {
   assert.equal(PARTS_SLOT_WIDTH.when, Math.max(...fixture.options.common.stats.map((o) => o.label.length)));
   const months = Array.from({ length: 12 }, (_, i) => lib.monthName(`2026-${String(i + 1).padStart(2, "0")}`, "en-GB").length);
   assert.equal(PARTS_SLOT_WIDTH.month, Math.max(...months), "September");
+  // a step's label is graph content (ActionUrge steps run to ~100 characters and wrap): the lint counts a
+  // realistic one, and the joined list at the same width
+  assert.equal(PARTS_SLOT_WIDTH.step, 60);
+  assert.equal(PARTS_SLOT_WIDTH.steps, PARTS_SLOT_WIDTH.step);
 });
 
 test("lines: labels resolved by id; once and n times; then vs now and since; when", () => {
@@ -57,11 +64,30 @@ test("lines: labels resolved by id; once and n times; then vs now and since; whe
   assert.deepEqual(lib.partStatLines(stats, content, deps), {
     when: "Mostly evenings",
     helped: { title: "What's helped it settle", lines: ["Pause helped 3 times", "Circuit Breaker helped once"] },
+    steps: null,
     felt: { title: "How you've felt toward it", line: "In July: tired of it. Lately: curious." },
   });
   const since = lib.partStatLines({ helped: null, felt: { month: "2026-06", then: null, now: "feel_warm" }, when: "nights" }, content, deps);
-  assert.deepEqual(since, { when: "Mostly at night", helped: null, felt: { title: "How you've felt toward it", line: "Since June: warm toward it." } });
+  assert.deepEqual(since, { when: "Mostly at night", helped: null, steps: null, felt: { title: "How you've felt toward it", line: "Since June: warm toward it." } });
   assert.equal(lib.hasStatLine(lib.partStatLines({ helped: null, felt: null, when: null }, content, deps)), false);
+});
+
+test("lines: steps that helped, one line; a count only past once; the graph's labels as they come", () => {
+  const steps = [
+    { stepId: "oa:fear-avoid:small", label: "Stay in the room", n: 2 },
+    { stepId: "recover:park", label: "Park the replay", n: 4 },
+    { stepId: "oa:default_sadness:small", label: "Reach out to one person", n: 1 },
+  ];
+  const out = lib.partStatLines({ helped: null, felt: null, when: null, steps }, content, deps);
+  assert.equal(out.steps, "Steps that helped: Stay in the room (twice) · Park the replay (4 times) · Reach out to one person");
+  assert.equal(lib.hasStatLine(out), true, "a part with only steps has a line");
+  // a label that brings a slot of its own is printed as it is, never filled
+  assert.equal(lib.partStatLines({ helped: null, felt: null, when: null, steps: [{ stepId: "x", label: "{n} {steps}", n: 1 }] }, content, deps).steps,
+    "Steps that helped: {n} {steps}");
+  // nothing to say: null, never "Steps that helped: "
+  for (const none of [null, undefined, [], [{ stepId: "x", label: "", n: 2 }], [{ stepId: "x", label: "Park", n: 0 }]]) {
+    assert.equal(lib.partStatLines({ helped: null, felt: null, when: null, steps: none }, content, deps).steps, null, JSON.stringify(none));
+  }
 });
 
 test("lines: a line whose words don't ship is left out, never half-filled", () => {
@@ -96,6 +122,9 @@ test("Reflect: after its own sections, parts on, copy shipped; no hard-coded wor
   assert.doesNotMatch(c, /from '[^']*chart|<svg/i, "no chart (PartFigure draws the part)");
   assert.match(c, /<PartFigure shapeSig=\{p\.shapeSig\}/);
   assert.match(c, /partChipLabel\(p, content\)/, "the name, or the unnamed lines");
+  // steps that helped: one line between what's helped and how you've felt, only when worded (and ready, above)
+  const [helped, steps, felt] = ["{lines.helped && (", "{lines.steps && <p ", "{lines.felt && ("].map((x) => jsx.indexOf(x));
+  assert.ok(helped > 0 && helped < steps && steps < felt, "helped, steps, felt");
   // the client mirrors the payload field
   assert.match(read("src/services/neo4j.ts"), /parts\?: PartReflect\[\] \| null;/);
   assert.match(read("functions/src/insights/types.ts"), /parts: PartReflect\[\] \| null;/);

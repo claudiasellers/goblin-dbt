@@ -216,8 +216,10 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
             {stats?.helped && row(stats.helped.title, (
               <ul>{stats.helped.lines.map((l) => <li key={l}>{l}</li>)}</ul>
             ))}
-            {stats?.felt && row(stats.felt.title, stats.felt.line)}
           </dl>
+          {/* One line, its own label inside the copy ("Steps that helped: …"), so outside the dl's rows. */}
+          {stats?.steps && <p className="mt-2 text-sm text-[var(--color-text-primary)] break-words">{stats.steps}</p>}
+          {stats?.felt && <dl className="mt-2">{row(stats.felt.title, stats.felt.line)}</dl>}
         </div>
       </div>
       {revisit && partAsksBack(item) && !answered && (

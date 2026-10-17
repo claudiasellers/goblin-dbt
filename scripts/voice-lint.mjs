@@ -192,6 +192,9 @@ export const PARTS_SLOT_WIDTH = {
   // The parts stats lines (common/stats): the longest tool name in src/data/tools.ts ("Recover from a
   // hurtful moment"), a count, the longest meet/feel label ("warm toward it"), the longest when_* label.
   tool: 29, n: 3, then: 14, now: 14, when: 10,
+  // Steps that helped: one step's graph label (ActionUrge steps run long and wrap; the lint counts a
+  // realistic one), and the joined list as the line holds it.
+  step: 60, steps: 60,
 };
 
 /** Row kind → lint scope, length limit and the slots it may carry. */

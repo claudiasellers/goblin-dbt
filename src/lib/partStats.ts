@@ -1,8 +1,9 @@
 /**
  * The parts stats in words (docs/design/parts.md, "The part card" and Reflect): what has helped a part
- * settle, how the person has felt toward it, and when it tends to show up. Pure: the numbers come from
- * the server (functions/src/parts/stats.ts, PartStats); every word from the shipped parts copy
- * (common/stats, meet/feel), the tool names from src/data/tools.ts. Reflect renders it now; Me's part
+ * settle, the steps that helped, how the person has felt toward it, and when it tends to show up. Pure:
+ * the numbers come from the server (functions/src/parts/stats.ts, PartStats); every word from the
+ * shipped parts copy (common/stats, meet/feel), the tool names from src/data/tools.ts, the steps' labels
+ * from the graph in the same response. Reflect renders it now; Me's part
  * card can render the same lines later.
  */
 import type { PartsContent } from '../data/partsContentTypes';
@@ -13,6 +14,7 @@ import { UNNAMED_PROMPTS } from './partTag';
 
 export const STATS_PROMPTS = [
   'stats_helped', 'stats_helped_line', 'stats_helped_once', 'stats_felt', 'stats_felt_then_now', 'stats_felt_since', 'stats_when',
+  'stats_steps', 'stats_step_twice', 'stats_step_times',
 ] as const;
 export const WHEN_OPTIONS: Record<PartWhen, string> = {
   mornings: 'when_mornings', afternoons: 'when_afternoons', evenings: 'when_evenings', nights: 'when_nights',
@@ -37,6 +39,8 @@ export interface PartStatLines {
   when: string | null;
   /** "What's helped it settle", then "Pause helped 3 times" / "Cool Down helped once". */
   helped: { title: string; lines: string[] } | null;
+  /** "Steps that helped: Stay in the room (twice) · Reach out to one person". */
+  steps: string | null;
   /** "How you've felt toward it", then "In July: tired of it. Lately: curious." / "Since July: curious." */
   felt: { title: string; line: string } | null;
 }
@@ -70,6 +74,14 @@ export function partStatLines(stats: PartStats, content: PartsContent, deps: {
   });
   const helped = lines.length ? { title: copy('stats_helped'), lines } : null;
 
+  // `?? []`: a readout from a server before the steps shipped has no field.
+  const items = (stats.steps ?? []).flatMap(({ label, n }) => {
+    if (!label || n < 1) return [];
+    if (n === 1) return [label];
+    return [n === 2 ? fill(copy('stats_step_twice'), { step: label }) : fill(copy('stats_step_times'), { step: label, n })];
+  });
+  const steps = items.length ? fill(copy('stats_steps'), { steps: items.join(' · ') }) : null;
+
   let felt: PartStatLines['felt'] = null;
   if (stats.felt) {
     const now = optionLabel(content, 'meet', 'feel', stats.felt.now);
@@ -82,7 +94,7 @@ export function partStatLines(stats: PartStats, content: PartsContent, deps: {
       felt = { title: copy('stats_felt'), line };
     }
   }
-  return { when, helped, felt };
+  return { when, helped, steps, felt };
 }
 
-export const hasStatLine = (l: PartStatLines): boolean => l.when !== null || l.helped !== null || l.felt !== null;
+export const hasStatLine = (l: PartStatLines): boolean => l.when !== null || l.helped !== null || l.steps !== null || l.felt !== null;

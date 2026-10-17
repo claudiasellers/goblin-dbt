@@ -325,7 +325,8 @@ export const PART_WHENS: readonly PartWhen[] = ['mornings', 'afternoons', 'eveni
 
 /**
  * A part's lines, each null below its threshold (functions/src/parts/stats.ts STATS_THRESHOLDS).
- * Counts and ids only: the app words them from the shipped parts copy (common/stats).
+ * Counts and ids: the app words them from the shipped parts copy (common/stats). The one exception is
+ * `steps`, whose labels are graph content read in the same response (never the person's own words).
  */
 export interface PartStats {
   /** Tools whose better closes the person tagged with this part, most first (ties: most recent), ≤ 3. */
@@ -338,6 +339,13 @@ export interface PartStats {
   felt: { month: string; then: string | null; now: string } | null;
   /** The band more than half of the tags fall in. */
   when: PartWhen | null;
+  /**
+   * The steps chosen in the tool sessions the person tagged with this part (a better close): Do the
+   * Opposite's opposite step, Recover's path. Most used first (ties: most recent), ≤ 3, each with its
+   * graph label (ActionUrge / EmotionRegulationContent step, RecoveryExit title). Own-words steps are
+   * never counted. Null below 2 tagged sessions that have a step.
+   */
+  steps: { stepId: string; label: string; n: number }[] | null;
 }
 
 /** One part's block in Reflect: who it is (as the person kept it) and its lines (at least one is set). */
