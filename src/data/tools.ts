@@ -94,6 +94,18 @@ export const tools: Tool[] = [
     dbtBasis: 'Problem Solving',
     emoji: '🛠️',
   },
+  {
+    id: 'cope-ahead',
+    name: 'Cope Ahead',
+    tagline: 'Plan for something hard that\'s coming',
+    description: 'Name what\'s coming and what might show up, pick what you\'ll do at the hardest moment, and rehearse it once in your mind.',
+    whenToUse: 'When something hard is coming and you want to be ready for it.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 19',
+    emoji: '🧭',
+    bare: true,
+    listed: false,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',

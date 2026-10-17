@@ -361,6 +361,17 @@
     "irritation"
    ]
   },
+  "dbt_cope_ahead": {
+   "appToolId": "cope-ahead",
+   "name": "Cope Ahead",
+   "description": "Planning and rehearsing for difficult situations before they occur",
+   "whenToUse": "When something hard is coming and you want to be ready for it",
+   "dbtBasis": "DBT Emotion Regulation Handout 19: cope ahead",
+   "side": "change",
+   "skillKind": "change",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_dear_man": {
    "appToolId": "dear-man",
    "name": "DEAR MAN",

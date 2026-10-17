@@ -13,6 +13,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'pause': { module: 'dt', closeKind: 'urge' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
+  'cope-ahead': { module: 'er', closeKind: 'none' },
   'find-the-feeling': { module: 'er', closeKind: 'regulation_down' },
   'opposite-action': { module: 'er', closeKind: 'none' },
   'dear-man': { module: 'ie', closeKind: 'none' },

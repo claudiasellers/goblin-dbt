@@ -24,6 +24,7 @@
  *   capacity.json          getCapacityContent (band rules, hand-off primitives; loaded with every page)
  *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
  *   wise-mind.json         getWiseMindContent (Wise mind's questions, what each mind says, practices, answers, copy)
+ *   cope-ahead.json        getCopeAheadContent (Cope Ahead's situations, hardest moments, moves, rehearsal beats, copy)
  *   parts.json             parts copy (schema/parts.cypher), signed-off rows only: no Cloud Function
  *                          serves it; the shape is tests/fixtures/parts-content.json's moves / prompts /
  *                          options / hurts, plus canTouch (Recover event → hurt ids, approved edges),
@@ -55,6 +56,7 @@ export const FIND_FLOW_VERSION = constant('functions/src/findTheFeeling/index.ts
 export const CAPACITY_VERSION = constant('functions/src/capacity/index.ts', 'CAPACITY_VERSION');
 export const SPINE_VERSION = constant('functions/src/spine/registry.ts', 'SPINE_VERSION');
 export const WISE_MIND_VERSION = constant('functions/src/wiseMind/index.ts', 'WISE_MIND_VERSION');
+export const COPE_AHEAD_VERSION = constant('functions/src/copeAhead/index.ts', 'COPE_AHEAD_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -450,8 +452,36 @@ export function buildWiseMind(g) {
   return { version: WISE_MIND_VERSION, ownMax: doc.ownMax, copy: doc.copy, questions, practices, answers };
 }
 
+/**
+ * getCopeAheadContent (functions/src/copeAhead/index.ts), with its version check. null when the graph has
+ * no Cope Ahead content at all (a load before schema/cope-ahead.cypher's first load): the committed
+ * cope-ahead.json is kept. A wrong version throws.
+ */
+export function buildCopeAhead(g) {
+  const flow = g.nodes('CopeAheadFlow').find((n) => n.props.id === 'cope_ahead_flow');
+  if (!flow) return null;
+  if (flow.props.version !== COPE_AHEAD_VERSION) {
+    throw new Error(`Cope Ahead content is ${flow.props.version}; the app expects ${COPE_AHEAD_VERSION}`);
+  }
+  const doc = JSON.parse(flow.props.contentJson);
+  const off = (type, label) => g.rels(type, 'TherapyConcept', label)
+    .filter((r) => r.a.props.id === 'dbt_cope_ahead')
+    .map((r) => r.b.props)
+    .sort((a, b) => asc(a.order, b.order));
+  const situations = off('HAS_SITUATION', 'CopeSituation').map((s) => ({
+    id: s.id, label: s.label, afterName: s.afterName, likelyFeelings: s.likelyFeelings ?? [], hardMoments: s.hardMoments ?? [],
+    dangerMomentIds: s.dangerMomentIds ?? [], order: intOrNull(s.order) }));
+  const hardMoments = off('HAS_HARD_MOMENT', 'HardMoment').map((m) => ({ id: m.id, label: m.label, ifText: m.ifText, order: intOrNull(m.order) }));
+  const moves = off('HAS_MOVE', 'CopeMove').map((m) => ({
+    id: m.id, kind: m.kind, label: m.label, line: m.line, forPulls: m.forPulls ?? [], general: m.general === true,
+    appToolId: m.appToolId ?? null, forMoments: m.forMoments ?? [], order: intOrNull(m.order) }));
+  const beats = off('HAS_BEAT', 'RehearsalBeat').map((b) => ({ id: b.id, text: b.text, order: intOrNull(b.order) }));
+  return { version: COPE_AHEAD_VERSION, ownMax: doc.ownMax, moveOwnMax: doc.moveOwnMax, when: doc.when, copy: doc.copy,
+    pullIf: doc.pullIf, after: doc.after, situations, hardMoments, moves, beats };
+}
+
 /** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
-export const KEPT_WHEN_MISSING = ['wise-mind.json'];
+export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json'];
 
 /**
  * All the snapshots from one export (pure apart from reading the version constants). A file in
@@ -461,6 +491,7 @@ export function buildSnapshots(exp) {
   assertContentOnly(exp);
   const g = indexGraph(exp);
   const wiseMind = buildWiseMind(g);
+  const copeAhead = buildCopeAhead(g);
   return {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
@@ -470,6 +501,7 @@ export function buildSnapshots(exp) {
     'spine.json': buildSpine(g),
     'parts.json': buildParts(g),
     ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
+    ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
   };
 }
 
