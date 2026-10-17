@@ -7,6 +7,7 @@ import { surfaceReady } from '../../lib/partsContent';
 import { settingsMeetLink } from '../../lib/partsOfMe';
 import { useToolGate } from '../../hooks/useToolGate';
 import { useStepFocus } from './stepFocus';
+import { PartsSwitch } from './PartsSwitch';
 
 /**
  * Parts in Privacy & Data (docs/design/parts.md, "The switch", "Deleting"). Opt-in, off by default;
@@ -72,26 +73,7 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
           <p id={labelId} className="text-sm font-medium text-[var(--color-text-primary)]">{copy.settings_label}</p>
           <p id={blurbId} className="text-xs text-[var(--color-text-tertiary)] mt-0.5">{copy.settings_blurb}</p>
         </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={enabled}
-          aria-labelledby={labelId}
-          aria-describedby={blurbId}
-          onClick={toggle}
-          className="-my-[11px] -mr-0.5 min-w-11 min-h-11 inline-flex items-center justify-center rounded-full flex-shrink-0"
-        >
-          {/* The track as before (40×22), inside a 44×44 target. */}
-          <span aria-hidden="true" className={`relative block w-10 h-5.5 rounded-full transition-colors ${
-            enabled ? 'bg-[var(--color-accent-fill)]' : 'bg-[var(--color-border-accent)]'
-          }`}>
-            <span
-              className={`absolute top-0.5 w-4.5 h-4.5 rounded-full bg-white transition-transform shadow-sm ${
-                enabled ? 'translate-x-5' : 'translate-x-0.5'
-              }`}
-            />
-          </span>
-        </button>
+        <PartsSwitch enabled={enabled} onClick={toggle} labelledBy={labelId} describedBy={blurbId} />
       </div>
       {justOn && enabled && getToKnow && <GetToKnowLink label={getToKnow} />}
       <p className="text-xs text-[var(--color-text-secondary)]">{copy.settings_dissociation}</p>

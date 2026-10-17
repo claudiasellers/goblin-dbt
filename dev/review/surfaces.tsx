@@ -37,6 +37,7 @@ import { answer, logEvent } from './backend';
 import { CANDIDATES, checkbackItem, ME_ITEMS, ME_LONG, PART_IDS, REFLECT, reflectTrails, slices, trailEvidence, trailItem, type TrailKind } from './data';
 import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
+import { ME_OFF_SURFACE } from './meOff';
 import { PARTS } from '../parts-example';
 import hostCopy from 'virtual:review-host-copy';
 import { DebriefWho } from '../../src/components/parts/DebriefWho';
@@ -455,6 +456,7 @@ export const SURFACES: Surface[] = [
     ],
     render: ({ branch }) => <MeHost long={branch === 'long'} />,
   },
+  ME_OFF_SURFACE,
   {
     id: 'reflect', pack: 'reflect', title: 'Reflect: parts',
     who: 'Parts on: in Reflect, once a kept part has at least one stat line.',

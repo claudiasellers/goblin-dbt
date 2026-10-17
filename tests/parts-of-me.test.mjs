@@ -37,12 +37,13 @@ test("the area's copy: every me / card prompt, all or nothing", () => {
   assert.equal(lib.partsOfMeCopy(shipped) === null, !lib.PARTS_OF_ME_PROMPTS.every((id) => shipped.prompts[id]), "the shipped file decides");
 });
 
-test("Me's gate: parts off or copy missing → exactly as before", () => {
+test("Me's gate: parts off or copy missing → no Parts of me (with parts off, only the switch card, tests/parts-reachable.test.mjs)", () => {
   const me = read("src/components/me/MeSection.tsx");
   assert.match(me, /const partsCopy = partsOn \? partsOfMeCopy\(partsContent\) : null;/);
   assert.match(me, /const shown: ProfileAreaId\[\] = partsCopy \? \[\.\.\.PHASE_A_AREAS, 'my_parts'\] : PHASE_A_AREAS;/);
   assert.match(me, /const partsOn = profile\.partsEnabled === true;/);
-  assert.match(me, /if \(!partsOn\) return;/, "the content isn't even fetched with parts off");
+  // Read on every visit: Parts of me's copy with parts on, the switch card's with parts off (Profile reads the same file).
+  assert.match(me, /getPartsContent\(\)\.then\(\(c\) => \{ if \(live\) setPartsContent\(c\); \}\)[\s\S]{0,120}\}, \[\]\);/);
   assert.match(me, /i\.label !== 'Part'/, "a part never lands in the generic still-true list");
   assert.match(me, /<PartsOfMe items=\{a\.items\} [^>]*copy=\{partsCopy\}\s+onWrite=\{partWrite\} /,
     "set-aside parts: the area's own rows (restorePart), not the generic restoreProfileItem row");
