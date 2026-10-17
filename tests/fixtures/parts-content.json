@@ -10,7 +10,7 @@
    "kind": "reactive",
    "safetyLine": false,
    "order": 0,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "chase",
@@ -21,7 +21,7 @@
    "kind": "reactive",
    "safetyLine": false,
    "order": 1,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "hide",
@@ -32,7 +32,7 @@
    "kind": "either",
    "safetyLine": false,
    "order": 2,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "keep_the_peace",
@@ -43,7 +43,7 @@
    "kind": "proactive",
    "safetyLine": false,
    "order": 5,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "turn_on_myself",
@@ -54,7 +54,7 @@
    "kind": "proactive",
    "safetyLine": true,
    "order": 6,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "take_less_room",
@@ -65,7 +65,7 @@
    "kind": "proactive",
    "safetyLine": false,
    "order": 7,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "keep_watch",
@@ -76,7 +76,7 @@
    "kind": "proactive",
    "safetyLine": false,
    "order": 8,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "put_it_off",
@@ -87,7 +87,7 @@
    "kind": "proactive",
    "safetyLine": false,
    "order": 9,
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  ],
  "prompts": {
@@ -96,665 +96,665 @@
    "step": "entry",
    "order": 0,
    "copy": "Things got louder after last time. Going gently is fine, or come back another day.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_find": {
    "flow": "meet",
    "step": "find",
    "order": 1,
    "copy": "What's showing up?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_where": {
    "flow": "meet",
    "step": "where",
    "order": 2,
    "copy": "Where do you notice it?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_shape": {
    "flow": "meet",
    "step": "shape",
    "order": 3,
    "copy": "Which is closer to it?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_age": {
    "flow": "meet",
    "step": "age",
    "order": 4,
    "copy": "How old does it seem?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_age_young": {
    "flow": "meet",
    "step": "age_young",
    "order": 5,
    "copy": "It sounds young. Want to keep it gentle?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_voice": {
    "flow": "meet",
    "step": "voice",
    "order": 6,
    "copy": "Does it say anything?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_feel": {
    "flow": "meet",
    "step": "feel",
    "order": 7,
    "copy": "How do you feel toward it right now?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_unblend": {
    "flow": "meet",
    "step": "unblend",
    "order": 8,
    "copy": "That reaction might be another part. Can it give you some room, for now?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_unblend_end": {
    "flow": "meet",
    "step": "unblend_end",
    "order": 9,
    "copy": "That's enough for today. The part that's worried about it counts too.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_unblend_later": {
    "flow": "meet",
    "step": "unblend_later",
    "order": 10,
    "copy": "Want to get to know that one another time?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_nothing": {
    "flow": "meet",
    "step": "nothing",
    "order": 11,
    "copy": "Sometimes there's nothing there yet. That's fine.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_job": {
    "flow": "meet",
    "step": "job",
    "order": 12,
    "copy": "What's it trying to do for you?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_likes": {
    "flow": "meet",
    "step": "likes",
    "order": 13,
    "copy": "Does it like this job?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_guards": {
    "flow": "meet",
    "step": "guards",
    "order": 14,
    "copy": "What do you think it's protecting?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_front": {
    "flow": "meet",
    "step": "front",
    "order": 15,
    "copy": "Does it stand in front of another part you know?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_fear": {
    "flow": "meet",
    "step": "fear",
    "order": 16,
    "copy": "What's it afraid would happen if it stopped?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_stop_title": {
    "flow": "meet",
    "step": "stop",
    "order": 17,
    "copy": "It's guarding something tender.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_stop_body": {
    "flow": "meet",
    "step": "stop",
    "order": 18,
    "copy": "We'll leave that be. You found the guard, and that counts.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_stop_therapist": {
    "flow": "meet",
    "step": "stop",
    "order": 19,
    "copy": "If you see a therapist, this is a good thing to bring.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_update": {
    "flow": "meet",
    "step": "update",
    "order": 20,
    "copy": "Does it know how old you are now?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_update_show": {
    "flow": "meet",
    "step": "update_show",
    "order": 21,
    "copy": "Show it something you can do now.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_thank": {
    "flow": "meet",
    "step": "thank",
    "order": 22,
    "copy": "Thank it for trying to protect you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_thank_hold": {
    "flow": "meet",
    "step": "thank",
    "order": 23,
    "copy": "Press and hold",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_thank_done": {
    "flow": "meet",
    "step": "thank",
    "order": 24,
    "copy": "Thanked",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_rather": {
    "flow": "meet",
    "step": "rather",
    "order": 25,
    "copy": "If it didn't have to do this, what would it rather do?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_name": {
    "flow": "meet",
    "step": "name",
    "order": 26,
    "copy": "Want to give it a name?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_keep": {
    "flow": "meet",
    "step": "keep",
    "order": 27,
    "copy": "Keep it, so you can come back to it?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_tender": {
    "flow": "meet",
    "step": "tender",
    "order": 28,
    "copy": "Can you let it know you're here?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_tender_sub": {
    "flow": "meet",
    "step": "tender",
    "order": 29,
    "copy": "You don't need to do anything else.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "meet_done": {
    "flow": "meet",
    "step": "close",
    "order": 30,
    "copy": "You can come back to this any time.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_place": {
    "flow": "pulls",
    "step": "place",
    "order": 0,
    "copy": "Put your light wherever feels right.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_feel": {
    "flow": "pulls",
    "step": "feel",
    "order": 1,
    "copy": "How do you feel toward each of them?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_needs_time": {
    "flow": "pulls",
    "step": "needs_time",
    "order": 2,
    "copy": "One of them needs its own time first.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_step_back": {
    "flow": "pulls",
    "step": "step_back",
    "order": 3,
    "copy": "Hold a breath, and step back from both of them.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_worry": {
    "flow": "pulls",
    "step": "worry",
    "order": 4,
    "copy": "If {B} gets its way, what's {A} afraid of?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_both_want": {
    "flow": "pulls",
    "step": "both_want",
    "order": 5,
    "copy": "What do they both want for you?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_pair_name": {
    "flow": "pulls",
    "step": "name",
    "order": 6,
    "copy": "the part that {move}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_close_checkback": {
    "flow": "pulls",
    "step": "close",
    "order": 7,
    "copy": "Check back with both of them in a week?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "pulls_wise_mind": {
    "flow": "pulls",
    "step": "keepsake",
    "order": 8,
    "copy": "Ask wise mind what's next",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "offer_eyebrow": {
    "flow": "offer",
    "step": "card",
    "order": 0,
    "copy": "Something keeps showing up",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "offer_ask": {
    "flow": "offer",
    "step": "card",
    "order": 1,
    "copy": "Want to take a look?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "offer_evidence": {
    "flow": "offer",
    "step": "evidence",
    "order": 2,
    "copy": "What the app saw",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "offer_question": {
    "flow": "offer",
    "step": "evidence",
    "order": 3,
    "copy": "Does this feel like a part of you?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "offer_split": {
    "flow": "offer",
    "step": "split",
    "order": 4,
    "copy": "Which of these feels like its own thing?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "tag_question": {
    "flow": "tag",
    "step": "tag",
    "order": 0,
    "copy": "Was this a part you know?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "tag_new_later": {
    "flow": "tag",
    "step": "new",
    "order": 1,
    "copy": "Want to come back to it later?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "tag_use_shape": {
    "flow": "tag",
    "step": "shape",
    "order": 2,
    "copy": "Use this shape for {name}?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "tag_use_shape_noname": {
    "flow": "tag",
    "step": "shape",
    "order": 3,
    "copy": "Use this shape for that part?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "tag_shape_done": {
    "flow": "tag",
    "step": "shape",
    "order": 4,
    "copy": "Done.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "part_unnamed_place": {
    "flow": "common",
    "step": "name",
    "order": 0,
    "copy": "The one in your {place}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "part_unnamed": {
    "flow": "common",
    "step": "name",
    "order": 1,
    "copy": "One you haven't named",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_helped": {
    "flow": "common",
    "step": "stats",
    "order": 2,
    "copy": "What's helped it settle",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_helped_line": {
    "flow": "common",
    "step": "stats",
    "order": 3,
    "copy": "{tool} helped {n} times",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_helped_once": {
    "flow": "common",
    "step": "stats",
    "order": 4,
    "copy": "{tool} helped once",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_felt": {
    "flow": "common",
    "step": "stats",
    "order": 5,
    "copy": "How you've felt toward it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_felt_then_now": {
    "flow": "common",
    "step": "stats",
    "order": 6,
    "copy": "In {month}: {then}. Lately: {now}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_felt_since": {
    "flow": "common",
    "step": "stats",
    "order": 7,
    "copy": "Since {month}: {now}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_when": {
    "flow": "common",
    "step": "stats",
    "order": 8,
    "copy": "Mostly {when}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_steps": {
    "flow": "common",
    "step": "stats",
    "order": 9,
    "copy": "Steps that helped: {steps}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_step_twice": {
    "flow": "common",
    "step": "stats",
    "order": 10,
    "copy": "{step} (twice)",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_step_times": {
    "flow": "common",
    "step": "stats",
    "order": 11,
    "copy": "{step} ({n} times)",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_feel_lately": {
    "flow": "common",
    "step": "stats",
    "order": 12,
    "copy": "Lately, meeting your parts, you've mostly been {feel}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "stats_feel_earlier": {
    "flow": "common",
    "step": "stats",
    "order": 13,
    "copy": "Earlier, more often {feel}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "hold_hint": {
    "flow": "common",
    "step": "hold",
    "order": 14,
    "copy": "Hold to fill it, or press once and wait.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "reflect_title": {
    "flow": "reflect",
    "step": "parts",
    "order": 0,
    "copy": "The parts you know",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "patterns_title": {
    "flow": "reflect",
    "step": "patterns",
    "order": 1,
    "copy": "How things tend to go",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "review_noname": {
    "flow": "review",
    "step": "question",
    "order": 0,
    "copy": "Was this that part?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "unblend_line": {
    "flow": "unblend",
    "step": "line",
    "order": 0,
    "copy": "A part of you {move} right now.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_unblend": {
    "flow": "angry",
    "step": "unblend",
    "order": 0,
    "copy": "A part of you is furious right now.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_unblend_plain": {
    "flow": "angry",
    "step": "unblend",
    "order": 1,
    "copy": "The anger is loud right now, and you're here too.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_unblend_sub": {
    "flow": "angry",
    "step": "unblend",
    "order": 2,
    "copy": "Let it stand a little apart from you for a moment.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_unblend_sub_plain": {
    "flow": "angry",
    "step": "unblend",
    "order": 3,
    "copy": "Let it stand a little apart from you for a moment.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_protects": {
    "flow": "angry",
    "step": "protects",
    "order": 4,
    "copy": "It's trying to protect something. What?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_protects_plain": {
    "flow": "angry",
    "step": "protects",
    "order": 5,
    "copy": "Anger usually protects something. What is it protecting?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote": {
    "flow": "angry",
    "step": "vote",
    "order": 6,
    "copy": "{name}, it's angry because {matters} matters to you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 7,
    "copy": "{name}, you're angry because {matters} matters.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_noname": {
    "flow": "angry",
    "step": "vote",
    "order": 8,
    "copy": "This part is angry because {matters} matters to you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_noname_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 9,
    "copy": "You're angry because {matters} matters to you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_unsure": {
    "flow": "angry",
    "step": "vote",
    "order": 10,
    "copy": "{name}, this part is angry because something here matters to you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_unsure_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 11,
    "copy": "{name}, you're angry because something here matters to you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_unsure_noname": {
    "flow": "angry",
    "step": "vote",
    "order": 12,
    "copy": "This part is angry because something here matters to you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_unsure_noname_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 13,
    "copy": "You're angry because something here matters to you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_2": {
    "flow": "angry",
    "step": "vote",
    "order": 14,
    "copy": "You don't have to let it drive, and you don't have to leave it behind.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_2_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 15,
    "copy": "You don't have to let it drive, or pretend it isn't there.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_3": {
    "flow": "angry",
    "step": "vote",
    "order": 16,
    "copy": "{name} can handle what comes next.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_3_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 17,
    "copy": "{name} can handle what comes next.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_3_noname": {
    "flow": "angry",
    "step": "vote",
    "order": 18,
    "copy": "You can handle what comes next.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_vote_3_noname_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 19,
    "copy": "You can handle what comes next.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_hold": {
    "flow": "angry",
    "step": "vote",
    "order": 20,
    "copy": "Hold while you read it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_hold_plain": {
    "flow": "angry",
    "step": "vote",
    "order": 21,
    "copy": "Hold while you read it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_speak": {
    "flow": "angry",
    "step": "speak",
    "order": 22,
    "copy": "If you say something, speak for it, not from it:",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_speak_plain": {
    "flow": "angry",
    "step": "speak",
    "order": 23,
    "copy": "If you say something, say what's under the anger:",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_speak_unsure": {
    "flow": "angry",
    "step": "speak",
    "order": 24,
    "copy": "If you say something, say what you felt, not what it wants to say.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_speak_unsure_plain": {
    "flow": "angry",
    "step": "speak",
    "order": 25,
    "copy": "If you say something, say what you felt, not what the anger wants to say.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_speak_line": {
    "flow": "angry",
@@ -762,7 +762,7 @@
    "order": 26,
    "copy": "I felt {felt}.",
    "copyKind": "first_person",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_speak_line_plain": {
    "flow": "angry",
@@ -770,784 +770,784 @@
    "order": 27,
    "copy": "I felt {felt}.",
    "copyKind": "first_person",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "angry_later_done": {
    "flow": "angry",
    "step": "speak",
    "order": 28,
    "copy": "It's in Me when you want it.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "ps_later_done": {
    "flow": "ps",
    "step": "ambivalence",
    "order": 0,
    "copy": "It's in Me when you want it.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "aftercare_louder": {
    "flow": "aftercare",
    "step": "louder",
    "order": 0,
    "copy": "Things can get louder after time with a part.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "aftercare_too_many": {
    "flow": "aftercare",
    "step": "too_many",
    "order": 1,
    "copy": "You don't need to get to know everyone at once.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "checkback_title": {
    "flow": "checkback",
    "step": "checkback",
    "order": 0,
    "copy": "How's {name} today?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "checkback_title_noname": {
    "flow": "checkback",
    "step": "checkback",
    "order": 1,
    "copy": "How's the part you met yesterday?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "checkback_title_two": {
    "flow": "checkback",
    "step": "checkback",
    "order": 2,
    "copy": "How are {A} and {B} today?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "checkback_title_two_noname": {
    "flow": "checkback",
    "step": "checkback",
    "order": 3,
    "copy": "How are the two parts from last week?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "close_checkback": {
    "flow": "meet",
    "step": "close",
    "order": 31,
    "copy": "Check back with it tomorrow?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "cope_title": {
    "flow": "dearman",
    "step": "cope",
    "order": 0,
    "copy": "Who might show up in this conversation?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "cope_title_any": {
    "flow": "dearman",
    "step": "cope",
    "order": 1,
    "copy": "Who might show up there?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "cope_anchor": {
    "flow": "dearman",
    "step": "cope",
    "order": 2,
    "copy": "If {name} shows up:",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "cope_anchor_noname": {
    "flow": "dearman",
    "step": "cope",
    "order": 3,
    "copy": "If that part shows up:",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "cope_set_anchor": {
    "flow": "dearman",
    "step": "cope",
    "order": 4,
    "copy": "What would help if {name} shows up?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "cope_set_anchor_noname": {
    "flow": "dearman",
    "step": "cope",
    "order": 5,
    "copy": "What would help if that part shows up?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "cope_save_failed": {
    "flow": "dearman",
    "step": "cope",
    "order": 6,
    "copy": "Couldn't save that. Try again.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "debrief_who": {
    "flow": "dearman",
    "step": "debrief",
    "order": 7,
    "copy": "Was one of your parts there?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "debrief_who_named": {
    "flow": "dearman",
    "step": "debrief",
    "order": 8,
    "copy": "Did {name} show up?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "oa_goal_part": {
    "flow": "oa",
    "step": "goal",
    "order": 0,
    "copy": "A part of you {move}, and it's trying to help.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "oa_goal_you": {
    "flow": "oa",
    "step": "goal",
    "order": 1,
    "copy": "You want to {goal}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "gate_far_away": {
    "flow": "gate",
    "step": "dissociation",
    "order": 0,
    "copy": "If you start to feel far away, stop any time. Coming back into the room comes first.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "gate_blend_check": {
    "flow": "gate",
    "step": "blend",
    "order": 1,
    "copy": "Right now, can you notice it, or is it running things?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "gate_blend_check_pulls": {
    "flow": "gate",
    "step": "blend_pulls",
    "order": 2,
    "copy": "Right now, can you notice them both, or is one of them running things?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_label": {
    "flow": "settings",
    "step": "switch",
    "order": 0,
    "copy": "Parts",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_blurb": {
    "flow": "settings",
    "step": "switch",
    "order": 1,
    "copy": "Ways to get to know the parts of you that try to protect you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_dissociation": {
    "flow": "settings",
    "step": "switch",
    "order": 2,
    "copy": "If you live with alters or a lot of dissociation, this way of talking may not fit you.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_off": {
    "flow": "settings",
    "step": "switch",
    "order": 3,
    "copy": "It stays off unless you turn it on, and you can turn it off any time.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_about_1": {
    "flow": "settings",
    "step": "about",
    "order": 4,
    "copy": "Draws on ideas from Internal Family Systems, developed by Richard Schwartz.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_about_2": {
    "flow": "settings",
    "step": "about",
    "order": 5,
    "copy": "Not affiliated with or endorsed by the IFS Institute.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete": {
    "flow": "settings",
    "step": "delete",
    "order": 6,
    "copy": "Delete your parts",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete_confirm": {
    "flow": "settings",
    "step": "delete",
    "order": 7,
    "copy": "This deletes the parts you've kept and what you've said about them. It can't be undone.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete_yes": {
    "flow": "settings",
    "step": "delete",
    "order": 8,
    "copy": "Delete them",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete_no": {
    "flow": "settings",
    "step": "delete",
    "order": 9,
    "copy": "Keep them",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete_done": {
    "flow": "settings",
    "step": "delete",
    "order": 10,
    "copy": "Deleted.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete_failed": {
    "flow": "settings",
    "step": "delete",
    "order": 11,
    "copy": "Couldn't delete them. Try again.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete_lines_one": {
    "flow": "settings",
    "step": "delete",
    "order": 12,
    "copy": "Also remove 1 kept line that names your parts?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "settings_delete_lines": {
    "flow": "settings",
    "step": "delete",
    "order": 13,
    "copy": "Also remove {n} kept lines that name your parts?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "me_get_to_know": {
    "flow": "me",
    "step": "card",
    "order": 0,
    "copy": "Get to know a part",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_where": {
    "flow": "me",
    "step": "card",
    "order": 1,
    "copy": "Where",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_job": {
    "flow": "me",
    "step": "card",
    "order": 2,
    "copy": "Its job",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_job_own": {
    "flow": "me",
    "step": "card",
    "order": 3,
    "copy": "Its job, in your words",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_fear": {
    "flow": "me",
    "step": "card",
    "order": 4,
    "copy": "Afraid that",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_rather": {
    "flow": "me",
    "step": "card",
    "order": 5,
    "copy": "Would rather",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_visit": {
    "flow": "me",
    "step": "card",
    "order": 6,
    "copy": "Spend time with it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_resting": {
    "flow": "me",
    "step": "card",
    "order": 7,
    "copy": "Resting",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_rename": {
    "flow": "me",
    "step": "card",
    "order": 8,
    "copy": "Rename",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_rest": {
    "flow": "me",
    "step": "card",
    "order": 9,
    "copy": "Rest it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_back": {
    "flow": "me",
    "step": "card",
    "order": 10,
    "copy": "It's back",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_set_aside": {
    "flow": "me",
    "step": "card",
    "order": 11,
    "copy": "Set aside",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_restore": {
    "flow": "me",
    "step": "card",
    "order": 12,
    "copy": "Bring it back",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_tender": {
    "flow": "me",
    "step": "card",
    "order": 13,
    "copy": "It feels young or hurt",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_rename_save": {
    "flow": "me",
    "step": "card",
    "order": 14,
    "copy": "Save",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "card_cancel": {
    "flow": "me",
    "step": "card",
    "order": 15,
    "copy": "Cancel",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "revisit_title": {
    "flow": "me",
    "step": "revisit",
    "order": 16,
    "copy": "Is {name} still doing the same job?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "revisit_title_noname": {
    "flow": "me",
    "step": "revisit",
    "order": 17,
    "copy": "Is this part still doing the same job?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "revisit_resting": {
    "flow": "me",
    "step": "revisit",
    "order": 18,
    "copy": "{name} has been resting. Still quiet?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "revisit_resting_noname": {
    "flow": "me",
    "step": "revisit",
    "order": 19,
    "copy": "This part has been resting. Still quiet?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "revisit_new_title": {
    "flow": "me",
    "step": "revisit",
    "order": 20,
    "copy": "What does it do now?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "candidate_title": {
    "flow": "me",
    "step": "candidate",
    "order": 21,
    "copy": "To come back to",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "candidate_line": {
    "flow": "me",
    "step": "candidate",
    "order": 22,
    "copy": "The one that {move}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "candidate_line_plain": {
    "flow": "me",
    "step": "candidate",
    "order": 23,
    "copy": "One you wanted to come back to",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "candidate_go": {
    "flow": "me",
    "step": "candidate",
    "order": 24,
    "copy": "Get to know it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "candidate_dismiss": {
    "flow": "me",
    "step": "candidate",
    "order": 25,
    "copy": "Not any more",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_link": {
    "flow": "den",
    "step": "room",
    "order": 0,
    "copy": "See them together",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_room": {
    "flow": "den",
    "step": "room",
    "order": 1,
    "copy": "Everyone here is in your house.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_unnamed": {
    "flow": "den",
    "step": "room",
    "order": 2,
    "copy": "A part",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_move_help": {
    "flow": "den",
    "step": "room",
    "order": 3,
    "copy": "Tap one, then another, to say how they go together. Drag to move them.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_move_keys": {
    "flow": "den",
    "step": "room",
    "order": 4,
    "copy": "Enter picks one up, the arrow keys move it, Enter puts it down.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_one_part": {
    "flow": "den",
    "step": "room",
    "order": 5,
    "copy": "When you get to know another part, it will be here too.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_list": {
    "flow": "den",
    "step": "room",
    "order": 6,
    "copy": "See them as a list",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_pull_against": {
    "flow": "den",
    "step": "thread",
    "order": 7,
    "copy": "These two pull against each other",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_stands_front": {
    "flow": "den",
    "step": "thread",
    "order": 8,
    "copy": "This one stands in front of that one",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_which_front": {
    "flow": "den",
    "step": "thread",
    "order": 9,
    "copy": "Which one stands in front?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_thread_cancel": {
    "flow": "den",
    "step": "thread",
    "order": 10,
    "copy": "Not now",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_remove": {
    "flow": "den",
    "step": "thread",
    "order": 11,
    "copy": "Remove this thread",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_then": {
    "flow": "den",
    "step": "then",
    "order": 12,
    "copy": "How it looked in {month}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_now": {
    "flow": "den",
    "step": "then",
    "order": 13,
    "copy": "Now",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "den_back_now": {
    "flow": "den",
    "step": "then",
    "order": 14,
    "copy": "Back to now",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_who": {
    "flow": "wise_mind",
    "step": "who",
    "order": 0,
    "copy": "Who's here about this?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_who_help": {
    "flow": "wise_mind",
    "step": "who",
    "order": 1,
    "copy": "Tap a part to bring it near the light.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_room": {
    "flow": "wise_mind",
    "step": "who",
    "order": 2,
    "copy": "The room, with the light in the middle",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_step_back": {
    "flow": "wise_mind",
    "step": "step_back",
    "order": 3,
    "copy": "Ask everyone to take one step back.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_hold": {
    "flow": "wise_mind",
    "step": "step_back",
    "order": 4,
    "copy": "Hold to ask",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_held": {
    "flow": "wise_mind",
    "step": "step_back",
    "order": 5,
    "copy": "From here, what's the wise next step?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_tap_one": {
    "flow": "wise_mind",
    "step": "step_back",
    "order": 6,
    "copy": "Tap a part if it won't step back.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_wont_line": {
    "flow": "wise_mind",
    "step": "wont",
    "order": 7,
    "copy": "That's fine. It might need its own time.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_later_done": {
    "flow": "wise_mind",
    "step": "wont",
    "order": 8,
    "copy": "It's in Me for another time.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_use_minds": {
    "flow": "wise_mind",
    "step": "chrome",
    "order": 9,
    "copy": "Use the two minds instead",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "wm_pushed": {
    "flow": "wise_mind",
    "step": "feel",
    "order": 10,
    "copy": "A part might still be close.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_open": {
    "flow": "story",
    "step": "card",
    "order": 0,
    "copy": "Its story",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_spend_time": {
    "flow": "story",
    "step": "card",
    "order": 1,
    "copy": "Spend time with it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_met": {
    "flow": "story",
    "step": "line",
    "order": 2,
    "copy": "Met in {month}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_job_then": {
    "flow": "story",
    "step": "line",
    "order": 3,
    "copy": "Its job then: {old}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_job_now": {
    "flow": "story",
    "step": "line",
    "order": 4,
    "copy": "Its job now: {new}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_rested": {
    "flow": "story",
    "step": "line",
    "order": 5,
    "copy": "Rested in {month}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_back": {
    "flow": "story",
    "step": "line",
    "order": 6,
    "copy": "Back in {month}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_where": {
    "flow": "story",
    "step": "where",
    "order": 7,
    "copy": "Where it stands",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_front": {
    "flow": "story",
    "step": "where",
    "order": 8,
    "copy": "Stands in front of {name}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_behind": {
    "flow": "story",
    "step": "where",
    "order": 9,
    "copy": "Stands behind {name}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_pulls": {
    "flow": "story",
    "step": "where",
    "order": 10,
    "copy": "Pulls against {name}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_other": {
    "flow": "story",
    "step": "where",
    "order": 11,
    "copy": "another part",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_room_then": {
    "flow": "story",
    "step": "where",
    "order": 12,
    "copy": "In {month}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "story_room_now": {
    "flow": "story",
    "step": "where",
    "order": 13,
    "copy": "Now",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_open": {
    "flow": "say",
    "step": "card",
    "order": 0,
    "copy": "Say something to it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_prompt": {
    "flow": "say",
    "step": "ask",
    "order": 1,
    "copy": "What would you like to say to {name}?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_prompt_noname": {
    "flow": "say",
    "step": "ask",
    "order": 2,
    "copy": "What would you like to say to this part?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_own_label": {
    "flow": "say",
    "step": "ask",
    "order": 3,
    "copy": "Your words",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_send": {
    "flow": "say",
    "step": "ask",
    "order": 4,
    "copy": "Say it",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_cancel": {
    "flow": "say",
    "step": "ask",
    "order": 5,
    "copy": "Not now",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_told": {
    "flow": "say",
    "step": "card",
    "order": 6,
    "copy": "You told it: {said}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "say_story": {
    "flow": "say",
    "step": "story",
    "order": 7,
    "copy": "In {month} you told it: {said}",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  },
  "options": {
@@ -1563,7 +1563,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "chrome": [
@@ -1577,7 +1577,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "meet_next",
@@ -1589,7 +1589,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "meet_finish",
@@ -1601,7 +1601,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "find": [
@@ -1615,7 +1615,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "where": [
@@ -1629,7 +1629,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "shape": [
@@ -1643,7 +1643,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "age": [
@@ -1657,7 +1657,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "age_teen",
@@ -1669,7 +1669,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "age_now",
@@ -1681,7 +1681,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "age_older",
@@ -1693,7 +1693,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "age_cant_tell",
@@ -1705,7 +1705,7 @@
      "order": 4,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "age_little",
@@ -1717,7 +1717,7 @@
      "order": 5,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "age_young": [
@@ -1731,7 +1731,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "young_go_on",
@@ -1743,7 +1743,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "voice": [
@@ -1757,7 +1757,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_voice_see",
@@ -1771,7 +1771,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_voice_leave_first",
@@ -1785,7 +1785,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_voice_safer_alone",
@@ -1799,7 +1799,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_voice_fix_now",
@@ -1813,7 +1813,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_voice_not_angry",
@@ -1827,7 +1827,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_voice_dont_let_go",
@@ -1841,7 +1841,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_voice_cant_talk",
@@ -1855,7 +1855,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_voice_slide",
@@ -1869,7 +1869,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_voice_agree",
@@ -1883,7 +1883,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_voice_not_a_thing",
@@ -1897,7 +1897,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_voice_not_worth",
@@ -1916,7 +1916,7 @@
        "id": "thought_not_worth"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_voice_always",
@@ -1930,7 +1930,7 @@
       "turn_on_myself"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_voice_my_fault",
@@ -1949,7 +1949,7 @@
        "id": "thought_my_fault"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_voice_too_much",
@@ -1968,7 +1968,7 @@
        "id": "thought_too_much"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_voice_dont_ask",
@@ -1982,7 +1982,7 @@
       "take_less_room"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_voice_dont_deserve",
@@ -2001,7 +2001,7 @@
        "id": "thought_dont_deserve"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_voice_wrong",
@@ -2020,7 +2020,7 @@
        "id": "thought_wrong"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_voice_leave",
@@ -2039,7 +2039,7 @@
        "id": "thought_will_leave"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_voice_off",
@@ -2053,7 +2053,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_voice_later",
@@ -2067,7 +2067,7 @@
       "put_it_off"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_voice_not_today",
@@ -2081,7 +2081,7 @@
       "put_it_off"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "feel": [
@@ -2095,7 +2095,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_steady",
@@ -2107,7 +2107,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_warm",
@@ -2119,7 +2119,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_open",
@@ -2131,7 +2131,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_annoyed",
@@ -2143,7 +2143,7 @@
      "order": 4,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_scared",
@@ -2155,7 +2155,7 @@
      "order": 5,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_gone",
@@ -2167,7 +2167,7 @@
      "order": 6,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_ashamed",
@@ -2179,7 +2179,7 @@
      "order": 7,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_tired",
@@ -2191,7 +2191,7 @@
      "order": 8,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_not_sure",
@@ -2203,7 +2203,7 @@
      "order": 9,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "feel_nothing",
@@ -2215,7 +2215,7 @@
      "order": 10,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "unblend": [
@@ -2229,7 +2229,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "unblend_still",
@@ -2241,7 +2241,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "unblend_not_sure",
@@ -2253,7 +2253,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "unblend_later": [
@@ -2267,7 +2267,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "later_no",
@@ -2279,7 +2279,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "nothing": [
@@ -2293,7 +2293,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "nothing_body",
@@ -2305,7 +2305,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "nothing_finish",
@@ -2317,7 +2317,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "likes": [
@@ -2331,7 +2331,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "likes_proud",
@@ -2343,7 +2343,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "likes_not_sure",
@@ -2355,7 +2355,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "guards": [
@@ -2369,7 +2369,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "front": [
@@ -2383,7 +2383,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "front_not_sure",
@@ -2395,7 +2395,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "stop": [
@@ -2409,7 +2409,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "stop_body",
@@ -2421,7 +2421,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "update": [
@@ -2435,7 +2435,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "update_no",
@@ -2447,7 +2447,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "update_not_sure",
@@ -2459,7 +2459,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "update_show": [
@@ -2473,7 +2473,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "now_ask",
@@ -2485,7 +2485,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "now_people",
@@ -2497,7 +2497,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "now_no",
@@ -2509,7 +2509,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "rather": [
@@ -2523,7 +2523,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_rather_need_someone",
@@ -2537,7 +2537,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_rather_break",
@@ -2551,7 +2551,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_rather_ask",
@@ -2565,7 +2565,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_rather_wait",
@@ -2579,7 +2579,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_rather_matters",
@@ -2593,7 +2593,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_rather_stand_up",
@@ -2607,7 +2607,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_rather_notice",
@@ -2621,7 +2621,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_rather_say_no",
@@ -2635,7 +2635,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_rather_kindly",
@@ -2649,7 +2649,7 @@
       "turn_on_myself"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_rather_small_things",
@@ -2663,7 +2663,7 @@
       "take_less_room"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_rather_allowed",
@@ -2677,7 +2677,7 @@
       "take_less_room"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_rather_rest",
@@ -2691,7 +2691,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_rather_safe",
@@ -2705,7 +2705,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_rather_start_small",
@@ -2719,7 +2719,7 @@
       "put_it_off"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_rather_ready",
@@ -2733,7 +2733,7 @@
       "put_it_off"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "name": [
@@ -2747,7 +2747,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "keep": [
@@ -2761,7 +2761,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "keep_not_now",
@@ -2773,7 +2773,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "job": [
@@ -2789,7 +2789,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_job_pushed_out",
@@ -2803,7 +2803,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_job_worse",
@@ -2817,7 +2817,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_job_dont_leave",
@@ -2831,7 +2831,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_job_answer",
@@ -2845,7 +2845,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_job_seriously",
@@ -2859,7 +2859,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_job_stop_them",
@@ -2873,7 +2873,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_job_calm",
@@ -2887,7 +2887,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_job_nobody_angry",
@@ -2901,7 +2901,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_job_not_again",
@@ -2915,7 +2915,7 @@
       "turn_on_myself"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_job_get_there_first",
@@ -2929,7 +2929,7 @@
       "turn_on_myself"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_job_too_much",
@@ -2943,7 +2943,7 @@
       "take_less_room"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_job_bother",
@@ -2957,7 +2957,7 @@
       "take_less_room"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_job_trouble",
@@ -2971,7 +2971,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_job_surprise",
@@ -2985,7 +2985,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_job_failing",
@@ -2999,7 +2999,7 @@
       "put_it_off"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_job_hard_talk",
@@ -3013,7 +3013,7 @@
       "put_it_off"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "fear": [
@@ -3033,7 +3033,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "fear_cant_handle",
@@ -3047,7 +3047,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_fear_too_much",
@@ -3061,7 +3061,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_fear_regret",
@@ -3075,7 +3075,7 @@
       "hide"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_fear_not_know",
@@ -3089,7 +3089,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_fear_waiting",
@@ -3103,7 +3103,7 @@
       "chase"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_fear_walk_over",
@@ -3117,7 +3117,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_fear_stop_mattering",
@@ -3131,7 +3131,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_fear_take_back",
@@ -3145,7 +3145,7 @@
       "hit_back"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_fear_angry",
@@ -3159,7 +3159,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_fear_lose_them",
@@ -3173,7 +3173,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_fear_fight",
@@ -3187,7 +3187,7 @@
       "keep_the_peace"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_fear_hurt_people",
@@ -3201,7 +3201,7 @@
       "turn_on_myself"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_fear_careless",
@@ -3215,7 +3215,7 @@
       "turn_on_myself"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "turn_fear_hurt_myself",
@@ -3229,7 +3229,7 @@
       "turn_on_myself"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_fear_burden",
@@ -3243,7 +3243,7 @@
       "take_less_room"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_fear_annoyed",
@@ -3257,7 +3257,7 @@
       "take_less_room"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_fear_off_guard",
@@ -3271,7 +3271,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "watch_fear_miss_it",
@@ -3285,7 +3285,7 @@
       "keep_watch"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_fear_cant_do_it",
@@ -3299,7 +3299,7 @@
       "put_it_off"
      ],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_fear_hard_talk",
@@ -3318,7 +3318,7 @@
        "id": "ambiv-hard-conversation"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_fear_might_not_help",
@@ -3337,7 +3337,7 @@
        "id": "ambiv-change-might-not-help"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_fear_lose_something",
@@ -3356,7 +3356,7 @@
        "id": "ambiv-losing-something"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "off_fear_need_help",
@@ -3375,7 +3375,7 @@
        "id": "ambiv-admitting-need-help"
       }
      ],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "close": [
@@ -3389,7 +3389,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "close_checkback_no",
@@ -3401,7 +3401,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -3417,7 +3417,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_not_now",
@@ -3429,7 +3429,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "needs_time": [
@@ -3443,7 +3443,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_needs_time_not_now",
@@ -3455,7 +3455,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "worry": [
@@ -3469,7 +3469,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_worry_drift",
@@ -3481,7 +3481,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "chase_worry_nobody_knows",
@@ -3493,7 +3493,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_worry_too_much",
@@ -3505,7 +3505,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hide_worry_hurt_worse",
@@ -3517,7 +3517,7 @@
      "order": 4,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_worry_walked_over",
@@ -3529,7 +3529,7 @@
      "order": 5,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_worry_never_change",
@@ -3541,7 +3541,7 @@
      "order": 6,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_worry_blow_up",
@@ -3553,7 +3553,7 @@
      "order": 7,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "peace_worry_lose_them",
@@ -3565,7 +3565,7 @@
      "order": 8,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_worry_too_much",
@@ -3577,7 +3577,7 @@
      "order": 9,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "small_worry_turn_on_me",
@@ -3589,7 +3589,7 @@
      "order": 10,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_worry_stop_mattering",
@@ -3601,7 +3601,7 @@
      "order": 11,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "hit_back_worry_keep_doing_it",
@@ -3613,7 +3613,7 @@
      "order": 12,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "both_want": [
@@ -3627,7 +3627,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "want_not_left",
@@ -3639,7 +3639,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "want_safe_in_it",
@@ -3651,7 +3651,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "want_matter_someone",
@@ -3663,7 +3663,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "want_safe",
@@ -3675,7 +3675,7 @@
      "order": 4,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "want_treated_well",
@@ -3687,7 +3687,7 @@
      "order": 5,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "want_keep_what_matters",
@@ -3699,7 +3699,7 @@
      "order": 6,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "want_matter",
@@ -3711,7 +3711,7 @@
      "order": 7,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "close": [
@@ -3725,7 +3725,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_close_checkback_no",
@@ -3737,7 +3737,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "worry_general": [
@@ -3751,7 +3751,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_worry_nothing",
@@ -3763,7 +3763,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_worry_fall_apart",
@@ -3775,7 +3775,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_worry_on_my_own",
@@ -3787,7 +3787,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "both_want_general": [
@@ -3801,7 +3801,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_want_matter",
@@ -3813,7 +3813,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_want_not_hurt",
@@ -3825,7 +3825,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "pulls_want_okay",
@@ -3837,7 +3837,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -3853,7 +3853,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "wm_no_one",
@@ -3865,7 +3865,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "wont": [
@@ -3879,7 +3879,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "wm_meet_later",
@@ -3891,7 +3891,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "chrome": [
@@ -3905,7 +3905,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -3921,7 +3921,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "offer_not_now",
@@ -3933,7 +3933,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "offer_no",
@@ -3945,7 +3945,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "evidence": [
@@ -3959,7 +3959,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "offer_more_than_one",
@@ -3971,7 +3971,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "offer_how_it_goes",
@@ -3983,7 +3983,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "offer_not_me",
@@ -3995,7 +3995,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "split": [
@@ -4009,7 +4009,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4025,7 +4025,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "review_no",
@@ -4037,7 +4037,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "review_not_sure",
@@ -4049,7 +4049,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "block": [
@@ -4063,7 +4063,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "review_not_now",
@@ -4075,7 +4075,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4091,7 +4091,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4107,7 +4107,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "tag_skip",
@@ -4119,7 +4119,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "new": [
@@ -4133,7 +4133,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "tag_later_no",
@@ -4145,7 +4145,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "shape": [
@@ -4159,7 +4159,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "tag_shape_no",
@@ -4171,7 +4171,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4187,7 +4187,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4203,7 +4203,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "when_afternoons",
@@ -4215,7 +4215,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "when_evenings",
@@ -4227,7 +4227,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "when_nights",
@@ -4239,7 +4239,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4255,7 +4255,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "angry_not_now",
@@ -4267,7 +4267,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "angry_not_now_plain",
@@ -4279,7 +4279,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "protects": [
@@ -4293,7 +4293,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "speak": [
@@ -4307,7 +4307,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "angry_later",
@@ -4319,7 +4319,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "chrome": [
@@ -4333,7 +4333,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "vote": [
@@ -4347,7 +4347,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4363,7 +4363,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "louder_not_now",
@@ -4375,7 +4375,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4391,7 +4391,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "checkback_same",
@@ -4403,7 +4403,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "checkback_louder",
@@ -4415,7 +4415,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "checkback_skip",
@@ -4427,7 +4427,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4443,7 +4443,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "cope_skip",
@@ -4455,7 +4455,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "cope_own",
@@ -4467,7 +4467,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "cope_change",
@@ -4479,7 +4479,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "cope_save",
@@ -4491,7 +4491,7 @@
      "order": 4,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "debrief": [
@@ -4505,7 +4505,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "debrief_a_bit",
@@ -4517,7 +4517,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "debrief_no",
@@ -4529,7 +4529,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4545,7 +4545,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "far_away_go_on",
@@ -4557,7 +4557,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "blend": [
@@ -4571,7 +4571,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "blend_running",
@@ -4583,7 +4583,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "blend_not_sure",
@@ -4595,7 +4595,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "blend_pulls": [
@@ -4609,7 +4609,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "blend_pulls_running",
@@ -4621,7 +4621,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "blend_pulls_not_sure",
@@ -4633,7 +4633,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4649,7 +4649,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_got_this",
@@ -4661,7 +4661,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_rest",
@@ -4673,7 +4673,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_listening",
@@ -4685,7 +4685,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_see",
@@ -4697,7 +4697,7 @@
      "order": 4,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_own",
@@ -4709,7 +4709,7 @@
      "order": 5,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ],
    "say_tender": [
@@ -4723,7 +4723,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_safe",
@@ -4735,7 +4735,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_tender_listening",
@@ -4747,7 +4747,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "say_tender_own",
@@ -4759,7 +4759,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   },
@@ -4775,7 +4775,7 @@
      "order": 0,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "revisit_less",
@@ -4787,7 +4787,7 @@
      "order": 1,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "revisit_new",
@@ -4799,7 +4799,7 @@
      "order": 2,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "revisit_resting_opt",
@@ -4811,7 +4811,7 @@
      "order": 3,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "revisit_still_quiet",
@@ -4823,7 +4823,7 @@
      "order": 4,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     },
     {
      "id": "revisit_back",
@@ -4835,7 +4835,7 @@
      "order": 5,
      "moves": [],
      "sameAs": [],
-     "reviewStatus": "draft"
+     "reviewStatus": "approved"
     }
    ]
   }
@@ -4866,7 +4866,7 @@
      "rank": 0
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "made_small",
@@ -4901,7 +4901,7 @@
      "rank": 0
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "left_out",
@@ -4932,7 +4932,7 @@
      "rank": 0
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "not_mattering",
@@ -4958,7 +4958,7 @@
      "rank": 2
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "laughed_at",
@@ -4993,7 +4993,7 @@
      "rank": 1
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "alone_in_this",
@@ -5020,7 +5020,7 @@
      "rank": 2
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  ],
  "canTouch": {
@@ -5028,334 +5028,334 @@
    "hurts": [
     "brushed_off"
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "unheard": {
    "hurts": [
     "brushed_off"
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "mocked": {
    "hurts": [
     "laughed_at"
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "small": {
    "hurts": [
     "made_small"
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "ignored": {
    "hurts": [
     "left_out",
     "not_mattering"
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   "leaving": {
    "hurts": [
     "left_out",
     "alone_in_this"
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  },
  "expresses": {
   "ActionUrge": {
    "anger-lash": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "anger-criticize": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "anger-destroy": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "envy-tear-down": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "disgust-judge": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "jealousy-check": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "jealousy-interrogate": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "jealousy-cling": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "love-stalk": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "love-reach-out": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "love-proximity": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "shame-hide": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "shame-secret": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "shame-avoid-people": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "sad-isolate": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "fear-cancel": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "fear-escape": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "anger-stonewall": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "disgust-leave": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "guilt-avoid": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "fear-freeze": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "sad-scroll": {
     "moveId": "zone_out",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "sad-bed": {
     "moveId": "zone_out",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "guilt-apologize": {
     "moveId": "keep_the_peace",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "guilt-punish": {
     "moveId": "turn_on_myself",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "envy-compare": {
     "moveId": "turn_on_myself",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "shame-shrink": {
     "moveId": "take_less_room",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "fear-avoid": {
     "moveId": "put_it_off",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "sad-give-up": {
     "moveId": "put_it_off",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "envy-give-up": {
     "moveId": "put_it_off",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "FeelingUrge": {
    "fight": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "chase": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "hide": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "blank": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "PullOption": {
    "recover_fight": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "recover_chase": {
     "moveId": "chase",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "recover_hide": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "recover_freeze": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "MomentResponse": {
    "mr_got_loud": {
     "moveId": "hit_back",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "mr_left": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "mr_went_quiet": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "mr_changed_subject": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "mr_froze": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "mr_agreed": {
     "moveId": "keep_the_peace",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "TurningPoint": {
    "tp_no_words": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "tp_crying_shutdown": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "tp_gave_in": {
     "moveId": "keep_the_peace",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "tp_apologized": {
     "moveId": "keep_the_peace",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "ThoughtPattern": {
    "thought_my_fault": {
     "moveId": "turn_on_myself",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "thought_too_much": {
     "moveId": "turn_on_myself",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "thought_dont_deserve": {
     "moveId": "take_less_room",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "thought_wrong": {
     "moveId": "keep_watch",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "thought_will_leave": {
     "moveId": "keep_watch",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "thought_not_worth": {
     "moveId": "keep_the_peace",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "DearManBarrier": {
    "barrier_no_right": {
     "moveId": "take_less_room",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "barrier_guilty": {
     "moveId": "take_less_room",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "barrier_angry": {
     "moveId": "keep_the_peace",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "BarrierSubResponse": {
    "person-no-right-to-speak": {
     "moveId": "take_less_room",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "person-scared-reaction": {
     "moveId": "keep_the_peace",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "cant-keep-putting-off": {
     "moveId": "put_it_off",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "cant-afraid-aftermath": {
     "moveId": "put_it_off",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "cant-ambivalent": {
     "moveId": "put_it_off",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "tried-thinking-constantly": {
     "moveId": "keep_watch",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   },
   "QuestionResponse": {
    "hu_exp_vigilance": {
     "moveId": "keep_watch",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "hu_exp_social": {
     "moveId": "keep_watch",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "hu_body_shame": {
     "moveId": "hide",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "lu_mind_faraway": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "lu_mind_blank": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    },
    "lu_body_numb": {
     "moveId": "go_blank",
-    "reviewStatus": "draft"
+    "reviewStatus": "approved"
    }
   }
  },
@@ -5398,7 +5398,7 @@
      "label": "I'd get hurt worse"
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "hit_back_keep_the_peace",
@@ -5438,7 +5438,7 @@
      "label": "I'd lose them"
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "take_less_room_hit_back",
@@ -5474,19 +5474,19 @@
      "label": "They'd keep doing it"
     }
    ],
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  ],
  "keepsake": [
   {
    "id": "keepsake_both_want",
    "copy": "{A} and {B} both want me {want}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "keepsake_choose",
    "copy": "I can hear both of them, and choose what I do next.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  ],
  "trailRules": [
@@ -5501,7 +5501,7 @@
    "cooldownDays": 28,
    "enabled": false,
    "statementTemplate": "When {context}, the pull is to {pull}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "trail_sequence",
@@ -5513,7 +5513,7 @@
    "cooldownDays": 28,
    "enabled": false,
    "statementTemplate": "After the pull to {pull}, the pull to {pull2} often comes next.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "trail_two_pulls",
@@ -5523,7 +5523,7 @@
    "cooldownDays": 28,
    "enabled": false,
    "statementTemplate": "When {context}, two pulls: to {pull} and to {pull2}.",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "trail_known_part",
@@ -5532,7 +5532,7 @@
    "cooldownDays": 14,
    "enabled": false,
    "statementTemplate": "Was this {name}?",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  ],
  "contexts": [
@@ -5541,105 +5541,105 @@
    "key": "trigger",
    "value": "someone",
    "phrase": "it's about someone",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_trigger_situation",
    "key": "trigger",
    "value": "situation",
    "phrase": "it's about a situation",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_trigger_body",
    "key": "trigger",
    "value": "body",
    "phrase": "it starts in your body",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_brushed",
    "key": "event",
    "value": "brushed",
    "phrase": "someone brushes you off",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_unheard",
    "key": "event",
    "value": "unheard",
    "phrase": "you're not heard",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_mocked",
    "key": "event",
    "value": "mocked",
    "phrase": "someone mocks you",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_small",
    "key": "event",
    "value": "small",
    "phrase": "you're made small",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_ignored",
    "key": "event",
    "value": "ignored",
    "phrase": "you're left out",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_leaving",
    "key": "event",
    "value": "leaving",
    "phrase": "someone pulls away",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_blocked",
    "key": "event",
    "value": "blocked",
    "phrase": "you keep getting blocked",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_event_stewing",
    "key": "event",
    "value": "stewing",
    "phrase": "it keeps happening",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_time_morning",
    "key": "timeBand",
    "value": "morning",
    "phrase": "it's morning",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_time_afternoon",
    "key": "timeBand",
    "value": "afternoon",
    "phrase": "it's afternoon",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_time_evening",
    "key": "timeBand",
    "value": "evening",
    "phrase": "it's evening",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   },
   {
    "id": "ctx_time_night",
    "key": "timeBand",
    "value": "night",
    "phrase": "it's late at night",
-   "reviewStatus": "draft"
+   "reviewStatus": "approved"
   }
  ],
  "policy": {
@@ -5657,7 +5657,7 @@
   "harmWindowDays": 28,
   "tenderRepeatCount": 2,
   "nameMaxChars": 40,
-  "reviewStatus": "draft"
+  "reviewStatus": "approved"
  },
  "pending": {}
 }

@@ -18,1798 +18,1798 @@
 // --- Protective moves ---
 // @parts-copy-json [{"id": "hit_back", "field": "label", "kind": "chip", "text": "Hit back"}, {"id": "hit_back", "field": "unblendPhrase", "kind": "prompt", "text": "wants to hit back"}, {"id": "hit_back", "field": "trailPhrase", "kind": "prompt", "text": "hit back"}, {"id": "hit_back", "field": "nameHint", "kind": "chip", "text": "the one who hits back"}, {"id": "chase", "field": "label", "kind": "chip", "text": "Chase it, fix it now"}, {"id": "chase", "field": "unblendPhrase", "kind": "prompt", "text": "wants to chase this down"}, {"id": "chase", "field": "trailPhrase", "kind": "prompt", "text": "chase it"}, {"id": "chase", "field": "nameHint", "kind": "chip", "text": "the one who chases"}, {"id": "hide", "field": "label", "kind": "chip", "text": "Hide"}, {"id": "hide", "field": "unblendPhrase", "kind": "prompt", "text": "wants to hide"}, {"id": "hide", "field": "trailPhrase", "kind": "prompt", "text": "hide"}, {"id": "hide", "field": "nameHint", "kind": "chip", "text": "the one who hides"}, {"id": "go_blank", "field": "label", "kind": "chip", "text": "Go blank"}, {"id": "zone_out", "field": "label", "kind": "chip", "text": "Zone out"}, {"id": "keep_the_peace", "field": "label", "kind": "chip", "text": "Keep the peace"}, {"id": "keep_the_peace", "field": "unblendPhrase", "kind": "prompt", "text": "wants to keep the peace"}, {"id": "keep_the_peace", "field": "trailPhrase", "kind": "prompt", "text": "keep the peace"}, {"id": "keep_the_peace", "field": "nameHint", "kind": "chip", "text": "the one who keeps peace"}, {"id": "turn_on_myself", "field": "label", "kind": "chip", "text": "Turn on myself"}, {"id": "turn_on_myself", "field": "unblendPhrase", "kind": "prompt", "text": "is turning on you"}, {"id": "turn_on_myself", "field": "trailPhrase", "kind": "prompt", "text": "turn on yourself"}, {"id": "turn_on_myself", "field": "nameHint", "kind": "chip", "text": "the one who turns on me"}, {"id": "take_less_room", "field": "label", "kind": "chip", "text": "Take up less room"}, {"id": "take_less_room", "field": "unblendPhrase", "kind": "prompt", "text": "wants you to take up less room"}, {"id": "take_less_room", "field": "trailPhrase", "kind": "prompt", "text": "take up less room"}, {"id": "take_less_room", "field": "nameHint", "kind": "chip", "text": "the one who stays small"}, {"id": "keep_watch", "field": "label", "kind": "chip", "text": "Keep watch"}, {"id": "keep_watch", "field": "unblendPhrase", "kind": "prompt", "text": "is keeping watch"}, {"id": "keep_watch", "field": "trailPhrase", "kind": "prompt", "text": "keep watch"}, {"id": "keep_watch", "field": "nameHint", "kind": "chip", "text": "the one who keeps watch"}]
 MERGE (m:ProtectiveMove {id: "hit_back"})
-SET m += {label: "Hit back", unblendPhrase: "wants to hit back", trailPhrase: "hit back", nameHint: "the one who hits back", kind: "reactive", offerable: true, safetyLine: false, order: 0, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Hit back", unblendPhrase: "wants to hit back", trailPhrase: "hit back", nameHint: "the one who hits back", kind: "reactive", offerable: true, safetyLine: false, order: 0, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "chase"})
-SET m += {label: "Chase it, fix it now", unblendPhrase: "wants to chase this down", trailPhrase: "chase it", nameHint: "the one who chases", kind: "reactive", offerable: true, safetyLine: false, order: 1, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Chase it, fix it now", unblendPhrase: "wants to chase this down", trailPhrase: "chase it", nameHint: "the one who chases", kind: "reactive", offerable: true, safetyLine: false, order: 1, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "hide"})
-SET m += {label: "Hide", unblendPhrase: "wants to hide", trailPhrase: "hide", nameHint: "the one who hides", kind: "either", offerable: true, safetyLine: false, order: 2, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Hide", unblendPhrase: "wants to hide", trailPhrase: "hide", nameHint: "the one who hides", kind: "either", offerable: true, safetyLine: false, order: 2, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "go_blank"})
-SET m += {label: "Go blank", unblendPhrase: null, trailPhrase: null, nameHint: null, kind: "reactive", offerable: false, safetyLine: false, order: 3, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Go blank", unblendPhrase: null, trailPhrase: null, nameHint: null, kind: "reactive", offerable: false, safetyLine: false, order: 3, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "zone_out"})
-SET m += {label: "Zone out", unblendPhrase: null, trailPhrase: null, nameHint: null, kind: "reactive", offerable: false, safetyLine: false, order: 4, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Zone out", unblendPhrase: null, trailPhrase: null, nameHint: null, kind: "reactive", offerable: false, safetyLine: false, order: 4, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "keep_the_peace"})
-SET m += {label: "Keep the peace", unblendPhrase: "wants to keep the peace", trailPhrase: "keep the peace", nameHint: "the one who keeps peace", kind: "proactive", offerable: true, safetyLine: false, order: 5, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Keep the peace", unblendPhrase: "wants to keep the peace", trailPhrase: "keep the peace", nameHint: "the one who keeps peace", kind: "proactive", offerable: true, safetyLine: false, order: 5, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "turn_on_myself"})
-SET m += {label: "Turn on myself", unblendPhrase: "is turning on you", trailPhrase: "turn on yourself", nameHint: "the one who turns on me", kind: "proactive", offerable: true, safetyLine: true, order: 6, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Turn on myself", unblendPhrase: "is turning on you", trailPhrase: "turn on yourself", nameHint: "the one who turns on me", kind: "proactive", offerable: true, safetyLine: true, order: 6, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "take_less_room"})
-SET m += {label: "Take up less room", unblendPhrase: "wants you to take up less room", trailPhrase: "take up less room", nameHint: "the one who stays small", kind: "proactive", offerable: true, safetyLine: false, order: 7, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Take up less room", unblendPhrase: "wants you to take up less room", trailPhrase: "take up less room", nameHint: "the one who stays small", kind: "proactive", offerable: true, safetyLine: false, order: 7, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (m:ProtectiveMove {id: "keep_watch"})
-SET m += {label: "Keep watch", unblendPhrase: "is keeping watch", trailPhrase: "keep watch", nameHint: "the one who keeps watch", kind: "proactive", offerable: true, safetyLine: false, order: 8, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Keep watch", unblendPhrase: "is keeping watch", trailPhrase: "keep watch", nameHint: "the one who keeps watch", kind: "proactive", offerable: true, safetyLine: false, order: 8, reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "put_it_off", "field": "label", "kind": "chip", "text": "Put it off"}, {"id": "put_it_off", "field": "unblendPhrase", "kind": "prompt", "text": "wants to put this off"}, {"id": "put_it_off", "field": "trailPhrase", "kind": "prompt", "text": "put it off"}, {"id": "put_it_off", "field": "nameHint", "kind": "chip", "text": "the one who puts it off"}]
 MERGE (m:ProtectiveMove {id: "put_it_off"})
-SET m += {label: "Put it off", unblendPhrase: "wants to put this off", trailPhrase: "put it off", nameHint: "the one who puts it off", kind: "proactive", offerable: true, safetyLine: false, order: 9, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET m += {label: "Put it off", unblendPhrase: "wants to put this off", trailPhrase: "put it off", nameHint: "the one who puts it off", kind: "proactive", offerable: true, safetyLine: false, order: 9, reviewStatus: "approved", version: "parts-v1", pending: null};
 
 // --- Recover's pulls (its flow JSON has no nodes; FTF's are FeelingUrge); labels are Recover's own ---
 // @parts-copy-json [{"id": "recover_fight", "field": "label", "kind": "chip", "text": "Fight back"}, {"id": "recover_chase", "field": "label", "kind": "chip", "text": "Chase them"}, {"id": "recover_hide", "field": "label", "kind": "chip", "text": "Hide"}, {"id": "recover_freeze", "field": "label", "kind": "chip", "text": "Shut down"}]
 MERGE (p:PullOption {id: "recover_fight"})
-SET p += {flow: "recover", pullId: "fight", label: "Fight back", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "fight", label: "Fight back", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PullOption {id: "recover_chase"})
-SET p += {flow: "recover", pullId: "chase", label: "Chase them", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "chase", label: "Chase them", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PullOption {id: "recover_hide"})
-SET p += {flow: "recover", pullId: "hide", label: "Hide", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "hide", label: "Hide", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PullOption {id: "recover_freeze"})
-SET p += {flow: "recover", pullId: "freeze", label: "Shut down", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "freeze", label: "Shut down", reviewStatus: "approved", version: "parts-v1", pending: null};
 
 // --- EXPRESSES: every module's ids on the vocabulary (HELD ids get no edge) ---
 MATCH ()-[r:EXPRESSES]->(:ProtectiveMove) DELETE r;
 // ActionUrge
 MATCH (a:ActionUrge {id: "anger-lash"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Lash out or say something cutting.", reviewStatus: "draft"};
+SET r += {why: "Lash out or say something cutting.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "anger-criticize"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Criticize or blame someone: hitting back with words.", reviewStatus: "draft"};
+SET r += {why: "Criticize or blame someone: hitting back with words.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "anger-destroy"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Break or throw something: the fight move turned on things.", reviewStatus: "draft"};
+SET r += {why: "Break or throw something: the fight move turned on things.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "envy-tear-down"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Tear them down, in your head or out loud.", reviewStatus: "draft"};
+SET r += {why: "Tear them down, in your head or out loud.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "disgust-judge"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Judge or condemn: contempt is an attack from a distance.", reviewStatus: "draft"};
+SET r += {why: "Judge or condemn: contempt is an attack from a distance.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "jealousy-check"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Check their phone or whereabouts: chasing certainty.", reviewStatus: "draft"};
+SET r += {why: "Check their phone or whereabouts: chasing certainty.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "jealousy-interrogate"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Ask repeatedly: chasing an answer so it can settle.", reviewStatus: "draft"};
+SET r += {why: "Ask repeatedly: chasing an answer so it can settle.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "jealousy-cling"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Cling or demand attention: chasing closeness.", reviewStatus: "draft"};
+SET r += {why: "Cling or demand attention: chasing closeness.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "love-stalk"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Check their social media.", reviewStatus: "draft"};
+SET r += {why: "Check their social media.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "love-reach-out"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Reach out when love doesn't fit the facts: chasing contact.", reviewStatus: "draft"};
+SET r += {why: "Reach out when love doesn't fit the facts: chasing contact.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "love-proximity"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Go places they might be: chasing proximity.", reviewStatus: "draft"};
+SET r += {why: "Go places they might be: chasing proximity.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "shame-hide"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Hide or disappear (OA's own label; the move is hide).", reviewStatus: "draft"};
+SET r += {why: "Hide or disappear (OA's own label; the move is hide).", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "shame-secret"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Keep it secret: hiding what happened.", reviewStatus: "draft"};
+SET r += {why: "Keep it secret: hiding what happened.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "shame-avoid-people"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Avoid people who might notice.", reviewStatus: "draft"};
+SET r += {why: "Avoid people who might notice.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "sad-isolate"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Cancel plans and isolate.", reviewStatus: "draft"};
+SET r += {why: "Cancel plans and isolate.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "fear-cancel"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Cancel plans: getting out of the way of it.", reviewStatus: "draft"};
+SET r += {why: "Cancel plans: getting out of the way of it.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "fear-escape"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Run away or escape.", reviewStatus: "draft"};
+SET r += {why: "Run away or escape.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "anger-stonewall"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Shut someone out: hiding behind a wall, not attacking.", reviewStatus: "draft"};
+SET r += {why: "Shut someone out: hiding behind a wall, not attacking.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "disgust-leave"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Leave the situation.", reviewStatus: "draft"};
+SET r += {why: "Leave the situation.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "guilt-avoid"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Avoid the person you think you wronged.", reviewStatus: "draft"};
+SET r += {why: "Avoid the person you think you wronged.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "fear-freeze"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Freeze and do nothing: shutdown, never offered.", reviewStatus: "draft"};
+SET r += {why: "Freeze and do nothing: shutdown, never offered.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "sad-scroll"}), (b:ProtectiveMove {id: "zone_out"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Scroll mindlessly or zone out.", reviewStatus: "draft"};
+SET r += {why: "Scroll mindlessly or zone out.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "sad-bed"}), (b:ProtectiveMove {id: "zone_out"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Stay in bed and do nothing.", reviewStatus: "draft"};
+SET r += {why: "Stay in bed and do nothing.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "guilt-apologize"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Apologize again or excessively: smoothing it over.", reviewStatus: "draft"};
+SET r += {why: "Apologize again or excessively: smoothing it over.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "guilt-punish"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Punish yourself (safety line).", reviewStatus: "draft"};
+SET r += {why: "Punish yourself (safety line).", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "envy-compare"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Compare and despair: the comparison is turned on yourself.", reviewStatus: "draft"};
+SET r += {why: "Compare and despair: the comparison is turned on yourself.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "shame-shrink"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Make yourself small.", reviewStatus: "draft"};
+SET r += {why: "Make yourself small.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "fear-avoid"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Avoid it entirely.", reviewStatus: "draft"};
+SET r += {why: "Avoid it entirely.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "sad-give-up"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Give up on something that matters.", reviewStatus: "draft"};
+SET r += {why: "Give up on something that matters.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "envy-give-up"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Give up on your own goals.", reviewStatus: "draft"};
+SET r += {why: "Give up on your own goals.", reviewStatus: "approved"};
 // FeelingUrge
 MATCH (a:FeelingUrge {id: "fight"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "FTF's fight pull.", reviewStatus: "draft"};
+SET r += {why: "FTF's fight pull.", reviewStatus: "approved"};
 MATCH (a:FeelingUrge {id: "chase"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "FTF's chase pull.", reviewStatus: "draft"};
+SET r += {why: "FTF's chase pull.", reviewStatus: "approved"};
 MATCH (a:FeelingUrge {id: "hide"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "FTF's hide pull (its chip says \"Disappear\"; the app answers with hide).", reviewStatus: "draft"};
+SET r += {why: "FTF's hide pull (its chip says \"Disappear\"; the app answers with hide).", reviewStatus: "approved"};
 MATCH (a:FeelingUrge {id: "blank"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "FTF's blank pull: shutdown, never offered.", reviewStatus: "draft"};
+SET r += {why: "FTF's blank pull: shutdown, never offered.", reviewStatus: "approved"};
 // PullOption
 MATCH (a:PullOption {id: "recover_fight"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Recover's \"Fight back\".", reviewStatus: "draft"};
+SET r += {why: "Recover's \"Fight back\".", reviewStatus: "approved"};
 MATCH (a:PullOption {id: "recover_chase"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Recover's \"Chase them\".", reviewStatus: "draft"};
+SET r += {why: "Recover's \"Chase them\".", reviewStatus: "approved"};
 MATCH (a:PullOption {id: "recover_hide"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Recover's \"Hide\".", reviewStatus: "draft"};
+SET r += {why: "Recover's \"Hide\".", reviewStatus: "approved"};
 MATCH (a:PullOption {id: "recover_freeze"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Recover's \"Shut down\": never offered.", reviewStatus: "draft"};
+SET r += {why: "Recover's \"Shut down\": never offered.", reviewStatus: "approved"};
 // MomentResponse
 MATCH (a:MomentResponse {id: "mr_got_loud"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I got loud or intense.", reviewStatus: "draft"};
+SET r += {why: "I got loud or intense.", reviewStatus: "approved"};
 MATCH (a:MomentResponse {id: "mr_left"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I left / ended it.", reviewStatus: "draft"};
+SET r += {why: "I left / ended it.", reviewStatus: "approved"};
 MATCH (a:MomentResponse {id: "mr_went_quiet"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I went quiet.", reviewStatus: "draft"};
+SET r += {why: "I went quiet.", reviewStatus: "approved"};
 MATCH (a:MomentResponse {id: "mr_changed_subject"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I changed the subject: stepping out of sight of it.", reviewStatus: "draft"};
+SET r += {why: "I changed the subject: stepping out of sight of it.", reviewStatus: "approved"};
 MATCH (a:MomentResponse {id: "mr_froze"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I froze up.", reviewStatus: "draft"};
+SET r += {why: "I froze up.", reviewStatus: "approved"};
 MATCH (a:MomentResponse {id: "mr_agreed"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I agreed with them.", reviewStatus: "draft"};
+SET r += {why: "I agreed with them.", reviewStatus: "approved"};
 // TurningPoint
 MATCH (a:TurningPoint {id: "tp_no_words"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I couldn't find the words.", reviewStatus: "draft"};
+SET r += {why: "I couldn't find the words.", reviewStatus: "approved"};
 MATCH (a:TurningPoint {id: "tp_crying_shutdown"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I started crying or shutting down.", reviewStatus: "draft"};
+SET r += {why: "I started crying or shutting down.", reviewStatus: "approved"};
 MATCH (a:TurningPoint {id: "tp_gave_in"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I gave in to keep the peace.", reviewStatus: "draft"};
+SET r += {why: "I gave in to keep the peace.", reviewStatus: "approved"};
 MATCH (a:TurningPoint {id: "tp_apologized"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I apologized when I didn't need to.", reviewStatus: "draft"};
+SET r += {why: "I apologized when I didn't need to.", reviewStatus: "approved"};
 // ThoughtPattern
 MATCH (a:ThoughtPattern {id: "thought_my_fault"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "This is probably my fault.", reviewStatus: "draft"};
+SET r += {why: "This is probably my fault.", reviewStatus: "approved"};
 MATCH (a:ThoughtPattern {id: "thought_too_much"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I'm being too much.", reviewStatus: "draft"};
+SET r += {why: "I'm being too much.", reviewStatus: "approved"};
 MATCH (a:ThoughtPattern {id: "thought_dont_deserve"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I don't deserve to ask.", reviewStatus: "draft"};
+SET r += {why: "I don't deserve to ask.", reviewStatus: "approved"};
 MATCH (a:ThoughtPattern {id: "thought_wrong"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "What if I'm wrong?", reviewStatus: "draft"};
+SET r += {why: "What if I'm wrong?", reviewStatus: "approved"};
 MATCH (a:ThoughtPattern {id: "thought_will_leave"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "They're going to leave: scanning for the loss.", reviewStatus: "draft"};
+SET r += {why: "They're going to leave: scanning for the loss.", reviewStatus: "approved"};
 MATCH (a:ThoughtPattern {id: "thought_not_worth"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "This isn't worth the fight: dropping the ask to avoid the conflict.", reviewStatus: "draft"};
+SET r += {why: "This isn't worth the fight: dropping the ask to avoid the conflict.", reviewStatus: "approved"};
 // DearManBarrier
 MATCH (a:DearManBarrier {id: "barrier_no_right"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I don't feel like I have the right to ask.", reviewStatus: "draft"};
+SET r += {why: "I don't feel like I have the right to ask.", reviewStatus: "approved"};
 MATCH (a:DearManBarrier {id: "barrier_guilty"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I feel guilty asking.", reviewStatus: "draft"};
+SET r += {why: "I feel guilty asking.", reviewStatus: "approved"};
 MATCH (a:DearManBarrier {id: "barrier_angry"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I'm afraid they'll get angry.", reviewStatus: "draft"};
+SET r += {why: "I'm afraid they'll get angry.", reviewStatus: "approved"};
 // BarrierSubResponse
 MATCH (a:BarrierSubResponse {id: "person-no-right-to-speak"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I don't feel like I have the right to say something.", reviewStatus: "draft"};
+SET r += {why: "I don't feel like I have the right to say something.", reviewStatus: "approved"};
 MATCH (a:BarrierSubResponse {id: "person-scared-reaction"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I'm scared of their reaction.", reviewStatus: "draft"};
+SET r += {why: "I'm scared of their reaction.", reviewStatus: "approved"};
 MATCH (a:BarrierSubResponse {id: "cant-keep-putting-off"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I keep putting it off and I don't know why.", reviewStatus: "draft"};
+SET r += {why: "I keep putting it off and I don't know why.", reviewStatus: "approved"};
 MATCH (a:BarrierSubResponse {id: "cant-afraid-aftermath"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I'm afraid of what happens after.", reviewStatus: "draft"};
+SET r += {why: "I'm afraid of what happens after.", reviewStatus: "approved"};
 MATCH (a:BarrierSubResponse {id: "cant-ambivalent"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Part of me doesn't actually want this to change.", reviewStatus: "draft"};
+SET r += {why: "Part of me doesn't actually want this to change.", reviewStatus: "approved"};
 MATCH (a:BarrierSubResponse {id: "tried-thinking-constantly"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "I've been thinking about it constantly.", reviewStatus: "draft"};
+SET r += {why: "I've been thinking about it constantly.", reviewStatus: "approved"};
 // QuestionResponse
 MATCH (a:QuestionResponse {id: "hu_exp_vigilance"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "A worry that won't switch off.", reviewStatus: "draft"};
+SET r += {why: "A worry that won't switch off.", reviewStatus: "approved"};
 MATCH (a:QuestionResponse {id: "hu_exp_social"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "About what others think of me: watching for judgement.", reviewStatus: "draft"};
+SET r += {why: "About what others think of me: watching for judgement.", reviewStatus: "approved"};
 MATCH (a:QuestionResponse {id: "hu_body_shame"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Heat in face or chest, want to hide.", reviewStatus: "draft"};
+SET r += {why: "Heat in face or chest, want to hide.", reviewStatus: "approved"};
 MATCH (a:QuestionResponse {id: "lu_mind_faraway"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Far away or unreal: never offered.", reviewStatus: "draft"};
+SET r += {why: "Far away or unreal: never offered.", reviewStatus: "approved"};
 MATCH (a:QuestionResponse {id: "lu_mind_blank"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Quiet or blank: never offered.", reviewStatus: "draft"};
+SET r += {why: "Quiet or blank: never offered.", reviewStatus: "approved"};
 MATCH (a:QuestionResponse {id: "lu_body_numb"}), (b:ProtectiveMove {id: "go_blank"})
 MERGE (a)-[r:EXPRESSES]->(b)
-SET r += {why: "Numb or disconnected: never offered.", reviewStatus: "draft"};
+SET r += {why: "Numb or disconnected: never offered.", reviewStatus: "approved"};
 
 // --- DEAR MAN's body signals on the body map's places ---
 MATCH (:BodySignal)-[r:AT_PLACE]->(:BodyRegion) DELETE r;
 MATCH (a:BodySignal {id: "bs_chest_tight"}), (b:BodyRegion {id: "chest"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_stomach_drop"}), (b:BodyRegion {id: "stomach"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_face_hot"}), (b:BodyRegion {id: "face"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_hands_shaking"}), (b:BodyRegion {id: "hands"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_throat_closed"}), (b:BodyRegion {id: "throat"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_numb"}), (b:BodyRegion {id: "body"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_heart_racing"}), (b:BodyRegion {id: "chest"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_jaw_clenched"}), (b:BodyRegion {id: "jaw"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:BodySignal {id: "bs_shoulders_up"}), (b:BodyRegion {id: "shoulders"})
 MERGE (a)-[r:AT_PLACE]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 
 // --- Protected hurts: offering hypotheses for "What do you think it's protecting?", never a reading ---
 // @parts-copy-json [{"id": "brushed_off", "field": "label", "kind": "chip", "text": "being brushed off"}, {"id": "brushed_off", "field": "hurtPhrase", "kind": "prompt", "text": "being brushed off"}, {"id": "brushed_off", "field": "feltPhrase", "kind": "chip", "text": "brushed off"}, {"id": "brushed_off", "field": "matters", "kind": "prompt", "text": "being taken seriously"}, {"id": "made_small", "field": "label", "kind": "chip", "text": "being made small"}, {"id": "made_small", "field": "hurtPhrase", "kind": "prompt", "text": "being made small"}, {"id": "made_small", "field": "feltPhrase", "kind": "chip", "text": "made small"}, {"id": "made_small", "field": "matters", "kind": "prompt", "text": "being treated as an equal"}, {"id": "left_out", "field": "label", "kind": "chip", "text": "being left out"}, {"id": "left_out", "field": "hurtPhrase", "kind": "prompt", "text": "being left out"}, {"id": "left_out", "field": "feltPhrase", "kind": "chip", "text": "left out"}, {"id": "left_out", "field": "matters", "kind": "prompt", "text": "belonging"}, {"id": "not_mattering", "field": "label", "kind": "chip", "text": "not mattering"}, {"id": "not_mattering", "field": "hurtPhrase", "kind": "prompt", "text": "not mattering"}, {"id": "not_mattering", "field": "feltPhrase", "kind": "chip", "text": "like I didn't matter"}, {"id": "not_mattering", "field": "matters", "kind": "prompt", "text": "mattering to people"}, {"id": "laughed_at", "field": "label", "kind": "chip", "text": "being laughed at"}, {"id": "laughed_at", "field": "hurtPhrase", "kind": "prompt", "text": "being laughed at"}, {"id": "laughed_at", "field": "feltPhrase", "kind": "chip", "text": "laughed at"}, {"id": "laughed_at", "field": "matters", "kind": "prompt", "text": "being respected"}, {"id": "alone_in_this", "field": "label", "kind": "chip", "text": "being alone in this"}, {"id": "alone_in_this", "field": "hurtPhrase", "kind": "prompt", "text": "being alone in this"}, {"id": "alone_in_this", "field": "feltPhrase", "kind": "chip", "text": "alone in this"}, {"id": "alone_in_this", "field": "matters", "kind": "prompt", "text": "having someone with you"}]
 MERGE (h:ProtectedHurt {id: "brushed_off"})
-SET h += {label: "being brushed off", hurtPhrase: "being brushed off", feltPhrase: "brushed off", matters: "being taken seriously", order: 0, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET h += {label: "being brushed off", hurtPhrase: "being brushed off", feltPhrase: "brushed off", matters: "being taken seriously", order: 0, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (h:ProtectedHurt {id: "made_small"})
-SET h += {label: "being made small", hurtPhrase: "being made small", feltPhrase: "made small", matters: "being treated as an equal", order: 1, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET h += {label: "being made small", hurtPhrase: "being made small", feltPhrase: "made small", matters: "being treated as an equal", order: 1, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (h:ProtectedHurt {id: "left_out"})
-SET h += {label: "being left out", hurtPhrase: "being left out", feltPhrase: "left out", matters: "belonging", order: 2, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET h += {label: "being left out", hurtPhrase: "being left out", feltPhrase: "left out", matters: "belonging", order: 2, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (h:ProtectedHurt {id: "not_mattering"})
-SET h += {label: "not mattering", hurtPhrase: "not mattering", feltPhrase: "like I didn't matter", matters: "mattering to people", order: 3, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET h += {label: "not mattering", hurtPhrase: "not mattering", feltPhrase: "like I didn't matter", matters: "mattering to people", order: 3, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (h:ProtectedHurt {id: "laughed_at"})
-SET h += {label: "being laughed at", hurtPhrase: "being laughed at", feltPhrase: "laughed at", matters: "being respected", order: 4, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET h += {label: "being laughed at", hurtPhrase: "being laughed at", feltPhrase: "laughed at", matters: "being respected", order: 4, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (h:ProtectedHurt {id: "alone_in_this"})
-SET h += {label: "being alone in this", hurtPhrase: "being alone in this", feltPhrase: "alone in this", matters: "having someone with you", order: 5, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET h += {label: "being alone in this", hurtPhrase: "being alone in this", feltPhrase: "alone in this", matters: "having someone with you", order: 5, reviewStatus: "approved", version: "parts-v1", pending: null};
 MATCH (:ProtectedHurt)-[r:NAMED_AS]->(:Emotion) DELETE r;
 MATCH (a:ProtectedHurt {id: "brushed_off"}), (b:Emotion {id: "disrespected"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "brushed_off"}), (b:Emotion {id: "hurt"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "made_small"}), (b:Emotion {id: "inferior"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "made_small"}), (b:Emotion {id: "inadequate"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "left_out"}), (b:Emotion {id: "excluded"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "left_out"}), (b:Emotion {id: "rejected"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "not_mattering"}), (b:Emotion {id: "insignificant"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "laughed_at"}), (b:Emotion {id: "humiliated"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "laughed_at"}), (b:Emotion {id: "ridiculed"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "alone_in_this"}), (b:Emotion {id: "lonely"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:ProtectedHurt {id: "alone_in_this"}), (b:Emotion {id: "isolated"})
 MERGE (a)-[r:NAMED_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 // the order the chips are offered in
 MATCH (:ProtectiveMove)-[r:OFTEN_GUARDS]->(:ProtectedHurt) DELETE r;
 MATCH (a:ProtectiveMove {id: "hit_back"}), (b:ProtectedHurt {id: "brushed_off"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "hit_back"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "hit_back"}), (b:ProtectedHurt {id: "laughed_at"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 2, reviewStatus: "draft"};
+SET r += {rank: 2, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "hit_back"}), (b:ProtectedHurt {id: "not_mattering"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 3, reviewStatus: "draft"};
+SET r += {rank: 3, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "chase"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "chase"}), (b:ProtectedHurt {id: "alone_in_this"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "chase"}), (b:ProtectedHurt {id: "not_mattering"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 2, reviewStatus: "draft"};
+SET r += {rank: 2, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "hide"}), (b:ProtectedHurt {id: "laughed_at"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "hide"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "hide"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 2, reviewStatus: "draft"};
+SET r += {rank: 2, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "keep_the_peace"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "keep_the_peace"}), (b:ProtectedHurt {id: "alone_in_this"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "keep_the_peace"}), (b:ProtectedHurt {id: "brushed_off"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 2, reviewStatus: "draft"};
+SET r += {rank: 2, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "turn_on_myself"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "turn_on_myself"}), (b:ProtectedHurt {id: "laughed_at"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "take_less_room"}), (b:ProtectedHurt {id: "brushed_off"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "take_less_room"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "take_less_room"}), (b:ProtectedHurt {id: "not_mattering"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 2, reviewStatus: "draft"};
+SET r += {rank: 2, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "keep_watch"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "keep_watch"}), (b:ProtectedHurt {id: "laughed_at"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "keep_watch"}), (b:ProtectedHurt {id: "alone_in_this"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 2, reviewStatus: "draft"};
+SET r += {rank: 2, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "put_it_off"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 0, reviewStatus: "draft"};
+SET r += {rank: 0, reviewStatus: "approved"};
 MATCH (a:ProtectiveMove {id: "put_it_off"}), (b:ProtectedHurt {id: "laughed_at"})
 MERGE (a)-[r:OFTEN_GUARDS]->(b)
-SET r += {rank: 1, reviewStatus: "draft"};
+SET r += {rank: 1, reviewStatus: "approved"};
 // Recover's "what happened"
 MATCH (:InvalidationEvent)-[r:CAN_TOUCH]->(:ProtectedHurt) DELETE r;
 MATCH (a:InvalidationEvent {id: "brushed"}), (b:ProtectedHurt {id: "brushed_off"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:InvalidationEvent {id: "unheard"}), (b:ProtectedHurt {id: "brushed_off"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:InvalidationEvent {id: "mocked"}), (b:ProtectedHurt {id: "laughed_at"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:InvalidationEvent {id: "small"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:InvalidationEvent {id: "ignored"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:InvalidationEvent {id: "ignored"}), (b:ProtectedHurt {id: "not_mattering"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 1, reviewStatus: "draft"};
+SET r += {order: 1, reviewStatus: "approved"};
 MATCH (a:InvalidationEvent {id: "leaving"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:InvalidationEvent {id: "leaving"}), (b:ProtectedHurt {id: "alone_in_this"})
 MERGE (a)-[r:CAN_TOUCH]->(b)
-SET r += {order: 1, reviewStatus: "draft"};
+SET r += {order: 1, reviewStatus: "approved"};
 // Recover's "Under this, I needed…"
 MATCH (:UnmetNeed)-[r:ANSWERS]->(:ProtectedHurt) DELETE r;
 MATCH (a:UnmetNeed {id: "heard"}), (b:ProtectedHurt {id: "brushed_off"})
 MERGE (a)-[r:ANSWERS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:UnmetNeed {id: "respected"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:ANSWERS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:UnmetNeed {id: "respected"}), (b:ProtectedHurt {id: "laughed_at"})
 MERGE (a)-[r:ANSWERS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:UnmetNeed {id: "included"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:ANSWERS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:UnmetNeed {id: "matter"}), (b:ProtectedHurt {id: "not_mattering"})
 MERGE (a)-[r:ANSWERS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 // DEAR MAN debrief's "What was underneath" (SAME_AS is also PartOption's: scoped by both ends)
 MATCH (:Underneath)-[r:SAME_AS]->(:ProtectedHurt) DELETE r;
 MATCH (a:Underneath {id: "under_fear_rejection"}), (b:ProtectedHurt {id: "left_out"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:Underneath {id: "under_loneliness"}), (b:ProtectedHurt {id: "alone_in_this"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:Underneath {id: "under_powerlessness"}), (b:ProtectedHurt {id: "made_small"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 
 // --- Prompts (order: position within the flow; the keepsake follows Two pulls' prompts) ---
 // @parts-copy-json [{"id": "paused_heads_up", "field": "copy", "kind": "prompt", "text": "Things got louder after last time. Going gently is fine, or come back another day."}, {"id": "meet_find", "field": "copy", "kind": "prompt", "text": "What's showing up?"}, {"id": "meet_where", "field": "copy", "kind": "prompt", "text": "Where do you notice it?"}, {"id": "meet_shape", "field": "copy", "kind": "prompt", "text": "Which is closer to it?"}, {"id": "meet_age", "field": "copy", "kind": "prompt", "text": "How old does it seem?"}, {"id": "meet_age_young", "field": "copy", "kind": "prompt", "text": "It sounds young. Want to keep it gentle?"}, {"id": "meet_voice", "field": "copy", "kind": "prompt", "text": "Does it say anything?"}, {"id": "meet_feel", "field": "copy", "kind": "prompt", "text": "How do you feel toward it right now?"}, {"id": "meet_unblend", "field": "copy", "kind": "prompt", "text": "That reaction might be another part. Can it give you some room, for now?"}, {"id": "meet_unblend_end", "field": "copy", "kind": "prompt", "text": "That's enough for today. The part that's worried about it counts too."}, {"id": "meet_unblend_later", "field": "copy", "kind": "prompt", "text": "Want to get to know that one another time?"}, {"id": "meet_nothing", "field": "copy", "kind": "prompt", "text": "Sometimes there's nothing there yet. That's fine."}, {"id": "meet_job", "field": "copy", "kind": "prompt", "text": "What's it trying to do for you?"}, {"id": "meet_likes", "field": "copy", "kind": "prompt", "text": "Does it like this job?"}, {"id": "meet_guards", "field": "copy", "kind": "prompt", "text": "What do you think it's protecting?"}, {"id": "meet_front", "field": "copy", "kind": "prompt", "text": "Does it stand in front of another part you know?"}, {"id": "meet_fear", "field": "copy", "kind": "prompt", "text": "What's it afraid would happen if it stopped?"}, {"id": "meet_stop_title", "field": "copy", "kind": "prompt", "text": "It's guarding something tender."}, {"id": "meet_stop_body", "field": "copy", "kind": "prompt", "text": "We'll leave that be. You found the guard, and that counts."}, {"id": "meet_stop_therapist", "field": "copy", "kind": "prompt", "text": "If you see a therapist, this is a good thing to bring."}, {"id": "meet_update", "field": "copy", "kind": "prompt", "text": "Does it know how old you are now?"}, {"id": "meet_update_show", "field": "copy", "kind": "prompt", "text": "Show it something you can do now."}, {"id": "meet_thank", "field": "copy", "kind": "prompt", "text": "Thank it for trying to protect you."}, {"id": "meet_thank_hold", "field": "copy", "kind": "prompt", "text": "Press and hold"}, {"id": "meet_thank_done", "field": "copy", "kind": "prompt", "text": "Thanked"}, {"id": "meet_rather", "field": "copy", "kind": "prompt", "text": "If it didn't have to do this, what would it rather do?"}, {"id": "meet_name", "field": "copy", "kind": "prompt", "text": "Want to give it a name?"}, {"id": "meet_keep", "field": "copy", "kind": "prompt", "text": "Keep it, so you can come back to it?"}, {"id": "meet_tender", "field": "copy", "kind": "prompt", "text": "Can you let it know you're here?"}, {"id": "meet_tender_sub", "field": "copy", "kind": "prompt", "text": "You don't need to do anything else."}]
 MERGE (p:PartPrompt {id: "paused_heads_up"})
-SET p += {flow: "meet", step: "entry", order: 0, copy: "Things got louder after last time. Going gently is fine, or come back another day.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "entry", order: 0, copy: "Things got louder after last time. Going gently is fine, or come back another day.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_find"})
-SET p += {flow: "meet", step: "find", order: 1, copy: "What's showing up?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "find", order: 1, copy: "What's showing up?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_where"})
-SET p += {flow: "meet", step: "where", order: 2, copy: "Where do you notice it?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "where", order: 2, copy: "Where do you notice it?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_shape"})
-SET p += {flow: "meet", step: "shape", order: 3, copy: "Which is closer to it?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "shape", order: 3, copy: "Which is closer to it?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_age"})
-SET p += {flow: "meet", step: "age", order: 4, copy: "How old does it seem?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "age", order: 4, copy: "How old does it seem?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_age_young"})
-SET p += {flow: "meet", step: "age_young", order: 5, copy: "It sounds young. Want to keep it gentle?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "age_young", order: 5, copy: "It sounds young. Want to keep it gentle?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_voice"})
-SET p += {flow: "meet", step: "voice", order: 6, copy: "Does it say anything?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "voice", order: 6, copy: "Does it say anything?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_feel"})
-SET p += {flow: "meet", step: "feel", order: 7, copy: "How do you feel toward it right now?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "feel", order: 7, copy: "How do you feel toward it right now?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_unblend"})
-SET p += {flow: "meet", step: "unblend", order: 8, copy: "That reaction might be another part. Can it give you some room, for now?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "unblend", order: 8, copy: "That reaction might be another part. Can it give you some room, for now?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_unblend_end"})
-SET p += {flow: "meet", step: "unblend_end", order: 9, copy: "That's enough for today. The part that's worried about it counts too.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "unblend_end", order: 9, copy: "That's enough for today. The part that's worried about it counts too.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_unblend_later"})
-SET p += {flow: "meet", step: "unblend_later", order: 10, copy: "Want to get to know that one another time?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "unblend_later", order: 10, copy: "Want to get to know that one another time?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_nothing"})
-SET p += {flow: "meet", step: "nothing", order: 11, copy: "Sometimes there's nothing there yet. That's fine.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "nothing", order: 11, copy: "Sometimes there's nothing there yet. That's fine.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_job"})
-SET p += {flow: "meet", step: "job", order: 12, copy: "What's it trying to do for you?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "job", order: 12, copy: "What's it trying to do for you?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_likes"})
-SET p += {flow: "meet", step: "likes", order: 13, copy: "Does it like this job?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "likes", order: 13, copy: "Does it like this job?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_guards"})
-SET p += {flow: "meet", step: "guards", order: 14, copy: "What do you think it's protecting?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "guards", order: 14, copy: "What do you think it's protecting?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_front"})
-SET p += {flow: "meet", step: "front", order: 15, copy: "Does it stand in front of another part you know?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "front", order: 15, copy: "Does it stand in front of another part you know?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_fear"})
-SET p += {flow: "meet", step: "fear", order: 16, copy: "What's it afraid would happen if it stopped?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "fear", order: 16, copy: "What's it afraid would happen if it stopped?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_stop_title"})
-SET p += {flow: "meet", step: "stop", order: 17, copy: "It's guarding something tender.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "stop", order: 17, copy: "It's guarding something tender.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_stop_body"})
-SET p += {flow: "meet", step: "stop", order: 18, copy: "We'll leave that be. You found the guard, and that counts.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "stop", order: 18, copy: "We'll leave that be. You found the guard, and that counts.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_stop_therapist"})
-SET p += {flow: "meet", step: "stop", order: 19, copy: "If you see a therapist, this is a good thing to bring.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "stop", order: 19, copy: "If you see a therapist, this is a good thing to bring.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_update"})
-SET p += {flow: "meet", step: "update", order: 20, copy: "Does it know how old you are now?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "update", order: 20, copy: "Does it know how old you are now?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_update_show"})
-SET p += {flow: "meet", step: "update_show", order: 21, copy: "Show it something you can do now.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "update_show", order: 21, copy: "Show it something you can do now.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_thank"})
-SET p += {flow: "meet", step: "thank", order: 22, copy: "Thank it for trying to protect you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "thank", order: 22, copy: "Thank it for trying to protect you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_thank_hold"})
-SET p += {flow: "meet", step: "thank", order: 23, copy: "Press and hold", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "thank", order: 23, copy: "Press and hold", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_thank_done"})
-SET p += {flow: "meet", step: "thank", order: 24, copy: "Thanked", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "thank", order: 24, copy: "Thanked", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_rather"})
-SET p += {flow: "meet", step: "rather", order: 25, copy: "If it didn't have to do this, what would it rather do?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "rather", order: 25, copy: "If it didn't have to do this, what would it rather do?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_name"})
-SET p += {flow: "meet", step: "name", order: 26, copy: "Want to give it a name?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "name", order: 26, copy: "Want to give it a name?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_keep"})
-SET p += {flow: "meet", step: "keep", order: 27, copy: "Keep it, so you can come back to it?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "keep", order: 27, copy: "Keep it, so you can come back to it?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_tender"})
-SET p += {flow: "meet", step: "tender", order: 28, copy: "Can you let it know you're here?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "tender", order: 28, copy: "Can you let it know you're here?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "meet_tender_sub"})
-SET p += {flow: "meet", step: "tender", order: 29, copy: "You don't need to do anything else.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "tender", order: 29, copy: "You don't need to do anything else.", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "meet_done", "field": "copy", "kind": "prompt", "text": "You can come back to this any time."}, {"id": "pulls_place", "field": "copy", "kind": "prompt", "text": "Put your light wherever feels right."}, {"id": "pulls_feel", "field": "copy", "kind": "prompt", "text": "How do you feel toward each of them?"}, {"id": "pulls_needs_time", "field": "copy", "kind": "prompt", "text": "One of them needs its own time first."}, {"id": "pulls_step_back", "field": "copy", "kind": "prompt", "text": "Hold a breath, and step back from both of them."}, {"id": "pulls_worry", "field": "copy", "kind": "prompt", "text": "If {B} gets its way, what's {A} afraid of?"}, {"id": "pulls_both_want", "field": "copy", "kind": "prompt", "text": "What do they both want for you?"}, {"id": "pulls_pair_name", "field": "copy", "kind": "prompt", "text": "the part that {move}"}, {"id": "pulls_close_checkback", "field": "copy", "kind": "prompt", "text": "Check back with both of them in a week?"}, {"id": "pulls_wise_mind", "field": "copy", "kind": "prompt", "text": "Ask wise mind what's next"}, {"id": "offer_eyebrow", "field": "copy", "kind": "prompt", "text": "Something keeps showing up"}, {"id": "offer_ask", "field": "copy", "kind": "prompt", "text": "Want to take a look?"}, {"id": "offer_evidence", "field": "copy", "kind": "prompt", "text": "What the app saw"}, {"id": "offer_question", "field": "copy", "kind": "prompt", "text": "Does this feel like a part of you?"}, {"id": "offer_split", "field": "copy", "kind": "prompt", "text": "Which of these feels like its own thing?"}, {"id": "tag_question", "field": "copy", "kind": "prompt", "text": "Was this a part you know?"}, {"id": "tag_new_later", "field": "copy", "kind": "prompt", "text": "Want to come back to it later?"}, {"id": "tag_use_shape", "field": "copy", "kind": "prompt", "text": "Use this shape for {name}?"}, {"id": "tag_use_shape_noname", "field": "copy", "kind": "prompt", "text": "Use this shape for that part?"}, {"id": "tag_shape_done", "field": "copy", "kind": "prompt", "text": "Done."}, {"id": "part_unnamed_place", "field": "copy", "kind": "prompt", "text": "The one in your {place}"}, {"id": "part_unnamed", "field": "copy", "kind": "prompt", "text": "One you haven't named"}, {"id": "stats_helped", "field": "copy", "kind": "prompt", "text": "What's helped it settle"}, {"id": "stats_helped_line", "field": "copy", "kind": "prompt", "text": "{tool} helped {n} times"}, {"id": "stats_helped_once", "field": "copy", "kind": "prompt", "text": "{tool} helped once"}, {"id": "stats_felt", "field": "copy", "kind": "prompt", "text": "How you've felt toward it"}, {"id": "stats_felt_then_now", "field": "copy", "kind": "prompt", "text": "In {month}: {then}. Lately: {now}."}, {"id": "stats_felt_since", "field": "copy", "kind": "prompt", "text": "Since {month}: {now}."}, {"id": "stats_when", "field": "copy", "kind": "prompt", "text": "Mostly {when}"}, {"id": "stats_steps", "field": "copy", "kind": "prompt", "text": "Steps that helped: {steps}"}]
 MERGE (p:PartPrompt {id: "meet_done"})
-SET p += {flow: "meet", step: "close", order: 30, copy: "You can come back to this any time.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "close", order: 30, copy: "You can come back to this any time.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_place"})
-SET p += {flow: "pulls", step: "place", order: 0, copy: "Put your light wherever feels right.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "place", order: 0, copy: "Put your light wherever feels right.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_feel"})
-SET p += {flow: "pulls", step: "feel", order: 1, copy: "How do you feel toward each of them?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "feel", order: 1, copy: "How do you feel toward each of them?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_needs_time"})
-SET p += {flow: "pulls", step: "needs_time", order: 2, copy: "One of them needs its own time first.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "needs_time", order: 2, copy: "One of them needs its own time first.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_step_back"})
-SET p += {flow: "pulls", step: "step_back", order: 3, copy: "Hold a breath, and step back from both of them.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "step_back", order: 3, copy: "Hold a breath, and step back from both of them.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_worry"})
-SET p += {flow: "pulls", step: "worry", order: 4, copy: "If {B} gets its way, what's {A} afraid of?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "worry", order: 4, copy: "If {B} gets its way, what's {A} afraid of?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_both_want"})
-SET p += {flow: "pulls", step: "both_want", order: 5, copy: "What do they both want for you?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "both_want", order: 5, copy: "What do they both want for you?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_pair_name"})
-SET p += {flow: "pulls", step: "name", order: 6, copy: "the part that {move}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "name", order: 6, copy: "the part that {move}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_close_checkback"})
-SET p += {flow: "pulls", step: "close", order: 7, copy: "Check back with both of them in a week?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "close", order: 7, copy: "Check back with both of them in a week?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "pulls_wise_mind"})
-SET p += {flow: "pulls", step: "keepsake", order: 8, copy: "Ask wise mind what's next", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "keepsake", order: 8, copy: "Ask wise mind what's next", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "offer_eyebrow"})
-SET p += {flow: "offer", step: "card", order: 0, copy: "Something keeps showing up", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "offer", step: "card", order: 0, copy: "Something keeps showing up", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "offer_ask"})
-SET p += {flow: "offer", step: "card", order: 1, copy: "Want to take a look?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "offer", step: "card", order: 1, copy: "Want to take a look?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "offer_evidence"})
-SET p += {flow: "offer", step: "evidence", order: 2, copy: "What the app saw", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "offer", step: "evidence", order: 2, copy: "What the app saw", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "offer_question"})
-SET p += {flow: "offer", step: "evidence", order: 3, copy: "Does this feel like a part of you?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "offer", step: "evidence", order: 3, copy: "Does this feel like a part of you?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "offer_split"})
-SET p += {flow: "offer", step: "split", order: 4, copy: "Which of these feels like its own thing?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "offer", step: "split", order: 4, copy: "Which of these feels like its own thing?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "tag_question"})
-SET p += {flow: "tag", step: "tag", order: 0, copy: "Was this a part you know?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "tag", step: "tag", order: 0, copy: "Was this a part you know?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "tag_new_later"})
-SET p += {flow: "tag", step: "new", order: 1, copy: "Want to come back to it later?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "tag", step: "new", order: 1, copy: "Want to come back to it later?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "tag_use_shape"})
-SET p += {flow: "tag", step: "shape", order: 2, copy: "Use this shape for {name}?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "tag", step: "shape", order: 2, copy: "Use this shape for {name}?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "tag_use_shape_noname"})
-SET p += {flow: "tag", step: "shape", order: 3, copy: "Use this shape for that part?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "tag", step: "shape", order: 3, copy: "Use this shape for that part?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "tag_shape_done"})
-SET p += {flow: "tag", step: "shape", order: 4, copy: "Done.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "tag", step: "shape", order: 4, copy: "Done.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "part_unnamed_place"})
-SET p += {flow: "common", step: "name", order: 0, copy: "The one in your {place}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "name", order: 0, copy: "The one in your {place}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "part_unnamed"})
-SET p += {flow: "common", step: "name", order: 1, copy: "One you haven't named", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "name", order: 1, copy: "One you haven't named", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_helped"})
-SET p += {flow: "common", step: "stats", order: 2, copy: "What's helped it settle", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 2, copy: "What's helped it settle", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_helped_line"})
-SET p += {flow: "common", step: "stats", order: 3, copy: "{tool} helped {n} times", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 3, copy: "{tool} helped {n} times", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_helped_once"})
-SET p += {flow: "common", step: "stats", order: 4, copy: "{tool} helped once", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 4, copy: "{tool} helped once", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_felt"})
-SET p += {flow: "common", step: "stats", order: 5, copy: "How you've felt toward it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 5, copy: "How you've felt toward it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_felt_then_now"})
-SET p += {flow: "common", step: "stats", order: 6, copy: "In {month}: {then}. Lately: {now}.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 6, copy: "In {month}: {then}. Lately: {now}.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_felt_since"})
-SET p += {flow: "common", step: "stats", order: 7, copy: "Since {month}: {now}.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 7, copy: "Since {month}: {now}.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_when"})
-SET p += {flow: "common", step: "stats", order: 8, copy: "Mostly {when}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 8, copy: "Mostly {when}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_steps"})
-SET p += {flow: "common", step: "stats", order: 9, copy: "Steps that helped: {steps}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 9, copy: "Steps that helped: {steps}", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "stats_step_twice", "field": "copy", "kind": "prompt", "text": "{step} (twice)"}, {"id": "stats_step_times", "field": "copy", "kind": "prompt", "text": "{step} ({n} times)"}, {"id": "stats_feel_lately", "field": "copy", "kind": "prompt", "text": "Lately, meeting your parts, you've mostly been {feel}."}, {"id": "stats_feel_earlier", "field": "copy", "kind": "prompt", "text": "Earlier, more often {feel}."}, {"id": "hold_hint", "field": "copy", "kind": "prompt", "text": "Hold to fill it, or press once and wait."}, {"id": "reflect_title", "field": "copy", "kind": "prompt", "text": "The parts you know"}, {"id": "patterns_title", "field": "copy", "kind": "prompt", "text": "How things tend to go"}, {"id": "review_noname", "field": "copy", "kind": "prompt", "text": "Was this that part?"}, {"id": "unblend_line", "field": "copy", "kind": "prompt", "text": "A part of you {move} right now."}, {"id": "angry_unblend", "field": "copy", "kind": "prompt", "text": "A part of you is furious right now."}, {"id": "angry_unblend_plain", "field": "copy", "kind": "prompt", "text": "The anger is loud right now, and you're here too."}, {"id": "angry_unblend_sub", "field": "copy", "kind": "prompt", "text": "Let it stand a little apart from you for a moment."}, {"id": "angry_unblend_sub_plain", "field": "copy", "kind": "prompt", "text": "Let it stand a little apart from you for a moment."}, {"id": "angry_protects", "field": "copy", "kind": "prompt", "text": "It's trying to protect something. What?"}, {"id": "angry_protects_plain", "field": "copy", "kind": "prompt", "text": "Anger usually protects something. What is it protecting?"}, {"id": "angry_vote", "field": "copy", "kind": "prompt", "text": "{name}, it's angry because {matters} matters to you."}, {"id": "angry_vote_plain", "field": "copy", "kind": "prompt", "text": "{name}, you're angry because {matters} matters."}, {"id": "angry_vote_noname", "field": "copy", "kind": "prompt", "text": "This part is angry because {matters} matters to you."}, {"id": "angry_vote_noname_plain", "field": "copy", "kind": "prompt", "text": "You're angry because {matters} matters to you."}, {"id": "angry_vote_unsure", "field": "copy", "kind": "prompt", "text": "{name}, this part is angry because something here matters to you."}, {"id": "angry_vote_unsure_plain", "field": "copy", "kind": "prompt", "text": "{name}, you're angry because something here matters to you."}, {"id": "angry_vote_unsure_noname", "field": "copy", "kind": "prompt", "text": "This part is angry because something here matters to you."}, {"id": "angry_vote_unsure_noname_plain", "field": "copy", "kind": "prompt", "text": "You're angry because something here matters to you."}, {"id": "angry_vote_2", "field": "copy", "kind": "prompt", "text": "You don't have to let it drive, and you don't have to leave it behind."}, {"id": "angry_vote_2_plain", "field": "copy", "kind": "prompt", "text": "You don't have to let it drive, or pretend it isn't there."}, {"id": "angry_vote_3", "field": "copy", "kind": "prompt", "text": "{name} can handle what comes next."}, {"id": "angry_vote_3_plain", "field": "copy", "kind": "prompt", "text": "{name} can handle what comes next."}, {"id": "angry_vote_3_noname", "field": "copy", "kind": "prompt", "text": "You can handle what comes next."}, {"id": "angry_vote_3_noname_plain", "field": "copy", "kind": "prompt", "text": "You can handle what comes next."}, {"id": "angry_hold", "field": "copy", "kind": "prompt", "text": "Hold while you read it"}]
 MERGE (p:PartPrompt {id: "stats_step_twice"})
-SET p += {flow: "common", step: "stats", order: 10, copy: "{step} (twice)", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 10, copy: "{step} (twice)", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_step_times"})
-SET p += {flow: "common", step: "stats", order: 11, copy: "{step} ({n} times)", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 11, copy: "{step} ({n} times)", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_feel_lately"})
-SET p += {flow: "common", step: "stats", order: 12, copy: "Lately, meeting your parts, you've mostly been {feel}.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 12, copy: "Lately, meeting your parts, you've mostly been {feel}.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "stats_feel_earlier"})
-SET p += {flow: "common", step: "stats", order: 13, copy: "Earlier, more often {feel}.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "stats", order: 13, copy: "Earlier, more often {feel}.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "hold_hint"})
-SET p += {flow: "common", step: "hold", order: 14, copy: "Hold to fill it, or press once and wait.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "common", step: "hold", order: 14, copy: "Hold to fill it, or press once and wait.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "reflect_title"})
-SET p += {flow: "reflect", step: "parts", order: 0, copy: "The parts you know", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "reflect", step: "parts", order: 0, copy: "The parts you know", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "patterns_title"})
-SET p += {flow: "reflect", step: "patterns", order: 1, copy: "How things tend to go", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "reflect", step: "patterns", order: 1, copy: "How things tend to go", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "review_noname"})
-SET p += {flow: "review", step: "question", order: 0, copy: "Was this that part?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "review", step: "question", order: 0, copy: "Was this that part?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "unblend_line"})
-SET p += {flow: "unblend", step: "line", order: 0, copy: "A part of you {move} right now.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "unblend", step: "line", order: 0, copy: "A part of you {move} right now.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_unblend"})
-SET p += {flow: "angry", step: "unblend", order: 0, copy: "A part of you is furious right now.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "unblend", order: 0, copy: "A part of you is furious right now.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_unblend_plain"})
-SET p += {flow: "angry", step: "unblend", order: 1, copy: "The anger is loud right now, and you're here too.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "unblend", order: 1, copy: "The anger is loud right now, and you're here too.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_unblend_sub"})
-SET p += {flow: "angry", step: "unblend", order: 2, copy: "Let it stand a little apart from you for a moment.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "unblend", order: 2, copy: "Let it stand a little apart from you for a moment.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_unblend_sub_plain"})
-SET p += {flow: "angry", step: "unblend", order: 3, copy: "Let it stand a little apart from you for a moment.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "unblend", order: 3, copy: "Let it stand a little apart from you for a moment.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_protects"})
-SET p += {flow: "angry", step: "protects", order: 4, copy: "It's trying to protect something. What?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "protects", order: 4, copy: "It's trying to protect something. What?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_protects_plain"})
-SET p += {flow: "angry", step: "protects", order: 5, copy: "Anger usually protects something. What is it protecting?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "protects", order: 5, copy: "Anger usually protects something. What is it protecting?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote"})
-SET p += {flow: "angry", step: "vote", order: 6, copy: "{name}, it's angry because {matters} matters to you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 6, copy: "{name}, it's angry because {matters} matters to you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_plain"})
-SET p += {flow: "angry", step: "vote", order: 7, copy: "{name}, you're angry because {matters} matters.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 7, copy: "{name}, you're angry because {matters} matters.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_noname"})
-SET p += {flow: "angry", step: "vote", order: 8, copy: "This part is angry because {matters} matters to you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 8, copy: "This part is angry because {matters} matters to you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_noname_plain"})
-SET p += {flow: "angry", step: "vote", order: 9, copy: "You're angry because {matters} matters to you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 9, copy: "You're angry because {matters} matters to you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_unsure"})
-SET p += {flow: "angry", step: "vote", order: 10, copy: "{name}, this part is angry because something here matters to you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 10, copy: "{name}, this part is angry because something here matters to you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_unsure_plain"})
-SET p += {flow: "angry", step: "vote", order: 11, copy: "{name}, you're angry because something here matters to you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 11, copy: "{name}, you're angry because something here matters to you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_unsure_noname"})
-SET p += {flow: "angry", step: "vote", order: 12, copy: "This part is angry because something here matters to you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 12, copy: "This part is angry because something here matters to you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_unsure_noname_plain"})
-SET p += {flow: "angry", step: "vote", order: 13, copy: "You're angry because something here matters to you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 13, copy: "You're angry because something here matters to you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_2"})
-SET p += {flow: "angry", step: "vote", order: 14, copy: "You don't have to let it drive, and you don't have to leave it behind.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 14, copy: "You don't have to let it drive, and you don't have to leave it behind.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_2_plain"})
-SET p += {flow: "angry", step: "vote", order: 15, copy: "You don't have to let it drive, or pretend it isn't there.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 15, copy: "You don't have to let it drive, or pretend it isn't there.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_3"})
-SET p += {flow: "angry", step: "vote", order: 16, copy: "{name} can handle what comes next.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 16, copy: "{name} can handle what comes next.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_3_plain"})
-SET p += {flow: "angry", step: "vote", order: 17, copy: "{name} can handle what comes next.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 17, copy: "{name} can handle what comes next.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_3_noname"})
-SET p += {flow: "angry", step: "vote", order: 18, copy: "You can handle what comes next.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 18, copy: "You can handle what comes next.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_vote_3_noname_plain"})
-SET p += {flow: "angry", step: "vote", order: 19, copy: "You can handle what comes next.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 19, copy: "You can handle what comes next.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_hold"})
-SET p += {flow: "angry", step: "vote", order: 20, copy: "Hold while you read it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 20, copy: "Hold while you read it", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "angry_hold_plain", "field": "copy", "kind": "prompt", "text": "Hold while you read it"}, {"id": "angry_speak", "field": "copy", "kind": "prompt", "text": "If you say something, speak for it, not from it:"}, {"id": "angry_speak_plain", "field": "copy", "kind": "prompt", "text": "If you say something, say what's under the anger:"}, {"id": "angry_speak_unsure", "field": "copy", "kind": "prompt", "text": "If you say something, say what you felt, not what it wants to say."}, {"id": "angry_speak_unsure_plain", "field": "copy", "kind": "prompt", "text": "If you say something, say what you felt, not what the anger wants to say."}, {"id": "angry_speak_line", "field": "copy", "kind": "first_person", "text": "I felt {felt}."}, {"id": "angry_speak_line_plain", "field": "copy", "kind": "first_person", "text": "I felt {felt}."}, {"id": "angry_later_done", "field": "copy", "kind": "prompt", "text": "It's in Me when you want it."}, {"id": "ps_later_done", "field": "copy", "kind": "prompt", "text": "It's in Me when you want it."}, {"id": "aftercare_louder", "field": "copy", "kind": "prompt", "text": "Things can get louder after time with a part."}, {"id": "aftercare_too_many", "field": "copy", "kind": "prompt", "text": "You don't need to get to know everyone at once."}, {"id": "checkback_title", "field": "copy", "kind": "prompt", "text": "How's {name} today?"}, {"id": "checkback_title_noname", "field": "copy", "kind": "prompt", "text": "How's the part you met yesterday?"}, {"id": "checkback_title_two", "field": "copy", "kind": "prompt", "text": "How are {A} and {B} today?"}, {"id": "checkback_title_two_noname", "field": "copy", "kind": "prompt", "text": "How are the two parts from last week?"}, {"id": "close_checkback", "field": "copy", "kind": "prompt", "text": "Check back with it tomorrow?"}, {"id": "cope_title", "field": "copy", "kind": "prompt", "text": "Who might show up in this conversation?"}, {"id": "cope_title_any", "field": "copy", "kind": "prompt", "text": "Who might show up there?"}, {"id": "cope_anchor", "field": "copy", "kind": "prompt", "text": "If {name} shows up:"}, {"id": "cope_anchor_noname", "field": "copy", "kind": "prompt", "text": "If that part shows up:"}, {"id": "cope_set_anchor", "field": "copy", "kind": "prompt", "text": "What would help if {name} shows up?"}, {"id": "cope_set_anchor_noname", "field": "copy", "kind": "prompt", "text": "What would help if that part shows up?"}, {"id": "cope_save_failed", "field": "copy", "kind": "prompt", "text": "Couldn't save that. Try again."}, {"id": "debrief_who", "field": "copy", "kind": "prompt", "text": "Was one of your parts there?"}, {"id": "debrief_who_named", "field": "copy", "kind": "prompt", "text": "Did {name} show up?"}, {"id": "oa_goal_part", "field": "copy", "kind": "prompt", "text": "A part of you {move}, and it's trying to help."}, {"id": "oa_goal_you", "field": "copy", "kind": "prompt", "text": "You want to {goal}."}, {"id": "gate_far_away", "field": "copy", "kind": "prompt", "text": "If you start to feel far away, stop any time. Coming back into the room comes first."}, {"id": "gate_blend_check", "field": "copy", "kind": "prompt", "text": "Right now, can you notice it, or is it running things?"}, {"id": "gate_blend_check_pulls", "field": "copy", "kind": "prompt", "text": "Right now, can you notice them both, or is one of them running things?"}]
 MERGE (p:PartPrompt {id: "angry_hold_plain"})
-SET p += {flow: "angry", step: "vote", order: 21, copy: "Hold while you read it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "vote", order: 21, copy: "Hold while you read it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_speak"})
-SET p += {flow: "angry", step: "speak", order: 22, copy: "If you say something, speak for it, not from it:", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "speak", order: 22, copy: "If you say something, speak for it, not from it:", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_speak_plain"})
-SET p += {flow: "angry", step: "speak", order: 23, copy: "If you say something, say what's under the anger:", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "speak", order: 23, copy: "If you say something, say what's under the anger:", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_speak_unsure"})
-SET p += {flow: "angry", step: "speak", order: 24, copy: "If you say something, say what you felt, not what it wants to say.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "speak", order: 24, copy: "If you say something, say what you felt, not what it wants to say.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_speak_unsure_plain"})
-SET p += {flow: "angry", step: "speak", order: 25, copy: "If you say something, say what you felt, not what the anger wants to say.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "speak", order: 25, copy: "If you say something, say what you felt, not what the anger wants to say.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_speak_line"})
-SET p += {flow: "angry", step: "speak", order: 26, copy: "I felt {felt}.", copyKind: "first_person", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "speak", order: 26, copy: "I felt {felt}.", copyKind: "first_person", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_speak_line_plain"})
-SET p += {flow: "angry", step: "speak", order: 27, copy: "I felt {felt}.", copyKind: "first_person", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "speak", order: 27, copy: "I felt {felt}.", copyKind: "first_person", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "angry_later_done"})
-SET p += {flow: "angry", step: "speak", order: 28, copy: "It's in Me when you want it.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "angry", step: "speak", order: 28, copy: "It's in Me when you want it.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "ps_later_done"})
-SET p += {flow: "ps", step: "ambivalence", order: 0, copy: "It's in Me when you want it.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "ps", step: "ambivalence", order: 0, copy: "It's in Me when you want it.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "aftercare_louder"})
-SET p += {flow: "aftercare", step: "louder", order: 0, copy: "Things can get louder after time with a part.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "aftercare", step: "louder", order: 0, copy: "Things can get louder after time with a part.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "aftercare_too_many"})
-SET p += {flow: "aftercare", step: "too_many", order: 1, copy: "You don't need to get to know everyone at once.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "aftercare", step: "too_many", order: 1, copy: "You don't need to get to know everyone at once.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "checkback_title"})
-SET p += {flow: "checkback", step: "checkback", order: 0, copy: "How's {name} today?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "checkback", step: "checkback", order: 0, copy: "How's {name} today?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "checkback_title_noname"})
-SET p += {flow: "checkback", step: "checkback", order: 1, copy: "How's the part you met yesterday?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "checkback", step: "checkback", order: 1, copy: "How's the part you met yesterday?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "checkback_title_two"})
-SET p += {flow: "checkback", step: "checkback", order: 2, copy: "How are {A} and {B} today?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "checkback", step: "checkback", order: 2, copy: "How are {A} and {B} today?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "checkback_title_two_noname"})
-SET p += {flow: "checkback", step: "checkback", order: 3, copy: "How are the two parts from last week?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "checkback", step: "checkback", order: 3, copy: "How are the two parts from last week?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "close_checkback"})
-SET p += {flow: "meet", step: "close", order: 31, copy: "Check back with it tomorrow?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "meet", step: "close", order: 31, copy: "Check back with it tomorrow?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "cope_title"})
-SET p += {flow: "dearman", step: "cope", order: 0, copy: "Who might show up in this conversation?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "cope", order: 0, copy: "Who might show up in this conversation?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "cope_title_any"})
-SET p += {flow: "dearman", step: "cope", order: 1, copy: "Who might show up there?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "cope", order: 1, copy: "Who might show up there?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "cope_anchor"})
-SET p += {flow: "dearman", step: "cope", order: 2, copy: "If {name} shows up:", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "cope", order: 2, copy: "If {name} shows up:", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "cope_anchor_noname"})
-SET p += {flow: "dearman", step: "cope", order: 3, copy: "If that part shows up:", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "cope", order: 3, copy: "If that part shows up:", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "cope_set_anchor"})
-SET p += {flow: "dearman", step: "cope", order: 4, copy: "What would help if {name} shows up?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "cope", order: 4, copy: "What would help if {name} shows up?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "cope_set_anchor_noname"})
-SET p += {flow: "dearman", step: "cope", order: 5, copy: "What would help if that part shows up?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "cope", order: 5, copy: "What would help if that part shows up?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "cope_save_failed"})
-SET p += {flow: "dearman", step: "cope", order: 6, copy: "Couldn't save that. Try again.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "cope", order: 6, copy: "Couldn't save that. Try again.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "debrief_who"})
-SET p += {flow: "dearman", step: "debrief", order: 7, copy: "Was one of your parts there?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "debrief", order: 7, copy: "Was one of your parts there?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "debrief_who_named"})
-SET p += {flow: "dearman", step: "debrief", order: 8, copy: "Did {name} show up?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "dearman", step: "debrief", order: 8, copy: "Did {name} show up?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "oa_goal_part"})
-SET p += {flow: "oa", step: "goal", order: 0, copy: "A part of you {move}, and it's trying to help.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "oa", step: "goal", order: 0, copy: "A part of you {move}, and it's trying to help.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "oa_goal_you"})
-SET p += {flow: "oa", step: "goal", order: 1, copy: "You want to {goal}.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "oa", step: "goal", order: 1, copy: "You want to {goal}.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "gate_far_away"})
-SET p += {flow: "gate", step: "dissociation", order: 0, copy: "If you start to feel far away, stop any time. Coming back into the room comes first.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "gate", step: "dissociation", order: 0, copy: "If you start to feel far away, stop any time. Coming back into the room comes first.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "gate_blend_check"})
-SET p += {flow: "gate", step: "blend", order: 1, copy: "Right now, can you notice it, or is it running things?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "gate", step: "blend", order: 1, copy: "Right now, can you notice it, or is it running things?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "gate_blend_check_pulls"})
-SET p += {flow: "gate", step: "blend_pulls", order: 2, copy: "Right now, can you notice them both, or is one of them running things?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "gate", step: "blend_pulls", order: 2, copy: "Right now, can you notice them both, or is one of them running things?", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "settings_label", "field": "copy", "kind": "prompt", "text": "Parts"}, {"id": "settings_blurb", "field": "copy", "kind": "prompt", "text": "Ways to get to know the parts of you that try to protect you."}, {"id": "settings_dissociation", "field": "copy", "kind": "prompt", "text": "If you live with alters or a lot of dissociation, this way of talking may not fit you."}, {"id": "settings_off", "field": "copy", "kind": "prompt", "text": "It stays off unless you turn it on, and you can turn it off any time."}, {"id": "settings_about_1", "field": "copy", "kind": "prompt", "text": "Draws on ideas from Internal Family Systems, developed by Richard Schwartz."}, {"id": "settings_about_2", "field": "copy", "kind": "prompt", "text": "Not affiliated with or endorsed by the IFS Institute."}, {"id": "settings_delete", "field": "copy", "kind": "prompt", "text": "Delete your parts"}, {"id": "settings_delete_confirm", "field": "copy", "kind": "prompt", "text": "This deletes the parts you've kept and what you've said about them. It can't be undone."}, {"id": "settings_delete_yes", "field": "copy", "kind": "prompt", "text": "Delete them"}, {"id": "settings_delete_no", "field": "copy", "kind": "prompt", "text": "Keep them"}, {"id": "settings_delete_done", "field": "copy", "kind": "prompt", "text": "Deleted."}, {"id": "settings_delete_failed", "field": "copy", "kind": "prompt", "text": "Couldn't delete them. Try again."}, {"id": "settings_delete_lines_one", "field": "copy", "kind": "prompt", "text": "Also remove 1 kept line that names your parts?"}, {"id": "settings_delete_lines", "field": "copy", "kind": "prompt", "text": "Also remove {n} kept lines that name your parts?"}, {"id": "me_get_to_know", "field": "copy", "kind": "prompt", "text": "Get to know a part"}, {"id": "card_where", "field": "copy", "kind": "prompt", "text": "Where"}, {"id": "card_job", "field": "copy", "kind": "prompt", "text": "Its job"}, {"id": "card_job_own", "field": "copy", "kind": "prompt", "text": "Its job, in your words"}, {"id": "card_fear", "field": "copy", "kind": "prompt", "text": "Afraid that"}, {"id": "card_rather", "field": "copy", "kind": "prompt", "text": "Would rather"}, {"id": "card_visit", "field": "copy", "kind": "prompt", "text": "Spend time with it"}, {"id": "card_resting", "field": "copy", "kind": "prompt", "text": "Resting"}, {"id": "card_rename", "field": "copy", "kind": "prompt", "text": "Rename"}, {"id": "card_rest", "field": "copy", "kind": "prompt", "text": "Rest it"}, {"id": "card_back", "field": "copy", "kind": "prompt", "text": "It's back"}, {"id": "card_set_aside", "field": "copy", "kind": "prompt", "text": "Set aside"}, {"id": "card_restore", "field": "copy", "kind": "prompt", "text": "Bring it back"}, {"id": "card_tender", "field": "copy", "kind": "prompt", "text": "It feels young or hurt"}, {"id": "card_rename_save", "field": "copy", "kind": "prompt", "text": "Save"}, {"id": "card_cancel", "field": "copy", "kind": "prompt", "text": "Cancel"}]
 MERGE (p:PartPrompt {id: "settings_label"})
-SET p += {flow: "settings", step: "switch", order: 0, copy: "Parts", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "switch", order: 0, copy: "Parts", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_blurb"})
-SET p += {flow: "settings", step: "switch", order: 1, copy: "Ways to get to know the parts of you that try to protect you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "switch", order: 1, copy: "Ways to get to know the parts of you that try to protect you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_dissociation"})
-SET p += {flow: "settings", step: "switch", order: 2, copy: "If you live with alters or a lot of dissociation, this way of talking may not fit you.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "switch", order: 2, copy: "If you live with alters or a lot of dissociation, this way of talking may not fit you.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_off"})
-SET p += {flow: "settings", step: "switch", order: 3, copy: "It stays off unless you turn it on, and you can turn it off any time.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "switch", order: 3, copy: "It stays off unless you turn it on, and you can turn it off any time.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_about_1"})
-SET p += {flow: "settings", step: "about", order: 4, copy: "Draws on ideas from Internal Family Systems, developed by Richard Schwartz.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "about", order: 4, copy: "Draws on ideas from Internal Family Systems, developed by Richard Schwartz.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_about_2"})
-SET p += {flow: "settings", step: "about", order: 5, copy: "Not affiliated with or endorsed by the IFS Institute.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "about", order: 5, copy: "Not affiliated with or endorsed by the IFS Institute.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete"})
-SET p += {flow: "settings", step: "delete", order: 6, copy: "Delete your parts", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 6, copy: "Delete your parts", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_confirm"})
-SET p += {flow: "settings", step: "delete", order: 7, copy: "This deletes the parts you've kept and what you've said about them. It can't be undone.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 7, copy: "This deletes the parts you've kept and what you've said about them. It can't be undone.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_yes"})
-SET p += {flow: "settings", step: "delete", order: 8, copy: "Delete them", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 8, copy: "Delete them", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_no"})
-SET p += {flow: "settings", step: "delete", order: 9, copy: "Keep them", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 9, copy: "Keep them", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_done"})
-SET p += {flow: "settings", step: "delete", order: 10, copy: "Deleted.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 10, copy: "Deleted.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_failed"})
-SET p += {flow: "settings", step: "delete", order: 11, copy: "Couldn't delete them. Try again.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 11, copy: "Couldn't delete them. Try again.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_lines_one"})
-SET p += {flow: "settings", step: "delete", order: 12, copy: "Also remove 1 kept line that names your parts?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 12, copy: "Also remove 1 kept line that names your parts?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "settings_delete_lines"})
-SET p += {flow: "settings", step: "delete", order: 13, copy: "Also remove {n} kept lines that name your parts?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "settings", step: "delete", order: 13, copy: "Also remove {n} kept lines that name your parts?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "me_get_to_know"})
-SET p += {flow: "me", step: "card", order: 0, copy: "Get to know a part", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 0, copy: "Get to know a part", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_where"})
-SET p += {flow: "me", step: "card", order: 1, copy: "Where", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 1, copy: "Where", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_job"})
-SET p += {flow: "me", step: "card", order: 2, copy: "Its job", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 2, copy: "Its job", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_job_own"})
-SET p += {flow: "me", step: "card", order: 3, copy: "Its job, in your words", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 3, copy: "Its job, in your words", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_fear"})
-SET p += {flow: "me", step: "card", order: 4, copy: "Afraid that", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 4, copy: "Afraid that", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_rather"})
-SET p += {flow: "me", step: "card", order: 5, copy: "Would rather", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 5, copy: "Would rather", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_visit"})
-SET p += {flow: "me", step: "card", order: 6, copy: "Spend time with it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 6, copy: "Spend time with it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_resting"})
-SET p += {flow: "me", step: "card", order: 7, copy: "Resting", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 7, copy: "Resting", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_rename"})
-SET p += {flow: "me", step: "card", order: 8, copy: "Rename", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 8, copy: "Rename", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_rest"})
-SET p += {flow: "me", step: "card", order: 9, copy: "Rest it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 9, copy: "Rest it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_back"})
-SET p += {flow: "me", step: "card", order: 10, copy: "It's back", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 10, copy: "It's back", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_set_aside"})
-SET p += {flow: "me", step: "card", order: 11, copy: "Set aside", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 11, copy: "Set aside", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_restore"})
-SET p += {flow: "me", step: "card", order: 12, copy: "Bring it back", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 12, copy: "Bring it back", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_tender"})
-SET p += {flow: "me", step: "card", order: 13, copy: "It feels young or hurt", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 13, copy: "It feels young or hurt", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_rename_save"})
-SET p += {flow: "me", step: "card", order: 14, copy: "Save", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 14, copy: "Save", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "card_cancel"})
-SET p += {flow: "me", step: "card", order: 15, copy: "Cancel", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "card", order: 15, copy: "Cancel", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "revisit_title", "field": "copy", "kind": "prompt", "text": "Is {name} still doing the same job?"}, {"id": "revisit_title_noname", "field": "copy", "kind": "prompt", "text": "Is this part still doing the same job?"}, {"id": "revisit_resting", "field": "copy", "kind": "prompt", "text": "{name} has been resting. Still quiet?"}, {"id": "revisit_resting_noname", "field": "copy", "kind": "prompt", "text": "This part has been resting. Still quiet?"}, {"id": "revisit_new_title", "field": "copy", "kind": "prompt", "text": "What does it do now?"}, {"id": "candidate_title", "field": "copy", "kind": "prompt", "text": "To come back to"}, {"id": "candidate_line", "field": "copy", "kind": "prompt", "text": "The one that {move}"}, {"id": "candidate_line_plain", "field": "copy", "kind": "prompt", "text": "One you wanted to come back to"}, {"id": "candidate_go", "field": "copy", "kind": "prompt", "text": "Get to know it"}, {"id": "candidate_dismiss", "field": "copy", "kind": "prompt", "text": "Not any more"}, {"id": "den_link", "field": "copy", "kind": "prompt", "text": "See them together"}, {"id": "den_room", "field": "copy", "kind": "prompt", "text": "Everyone here is in your house."}, {"id": "den_unnamed", "field": "copy", "kind": "prompt", "text": "A part"}, {"id": "den_move_help", "field": "copy", "kind": "prompt", "text": "Tap one, then another, to say how they go together. Drag to move them."}, {"id": "den_move_keys", "field": "copy", "kind": "prompt", "text": "Enter picks one up, the arrow keys move it, Enter puts it down."}, {"id": "den_one_part", "field": "copy", "kind": "prompt", "text": "When you get to know another part, it will be here too."}, {"id": "den_list", "field": "copy", "kind": "prompt", "text": "See them as a list"}, {"id": "den_pull_against", "field": "copy", "kind": "prompt", "text": "These two pull against each other"}, {"id": "den_stands_front", "field": "copy", "kind": "prompt", "text": "This one stands in front of that one"}, {"id": "den_which_front", "field": "copy", "kind": "prompt", "text": "Which one stands in front?"}, {"id": "den_thread_cancel", "field": "copy", "kind": "prompt", "text": "Not now"}, {"id": "den_remove", "field": "copy", "kind": "prompt", "text": "Remove this thread"}, {"id": "den_then", "field": "copy", "kind": "prompt", "text": "How it looked in {month}"}, {"id": "den_now", "field": "copy", "kind": "prompt", "text": "Now"}, {"id": "den_back_now", "field": "copy", "kind": "prompt", "text": "Back to now"}, {"id": "wm_who", "field": "copy", "kind": "prompt", "text": "Who's here about this?"}, {"id": "wm_who_help", "field": "copy", "kind": "prompt", "text": "Tap a part to bring it near the light."}, {"id": "wm_room", "field": "copy", "kind": "prompt", "text": "The room, with the light in the middle"}, {"id": "wm_step_back", "field": "copy", "kind": "prompt", "text": "Ask everyone to take one step back."}, {"id": "wm_hold", "field": "copy", "kind": "prompt", "text": "Hold to ask"}]
 MERGE (p:PartPrompt {id: "revisit_title"})
-SET p += {flow: "me", step: "revisit", order: 16, copy: "Is {name} still doing the same job?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "revisit", order: 16, copy: "Is {name} still doing the same job?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "revisit_title_noname"})
-SET p += {flow: "me", step: "revisit", order: 17, copy: "Is this part still doing the same job?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "revisit", order: 17, copy: "Is this part still doing the same job?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "revisit_resting"})
-SET p += {flow: "me", step: "revisit", order: 18, copy: "{name} has been resting. Still quiet?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "revisit", order: 18, copy: "{name} has been resting. Still quiet?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "revisit_resting_noname"})
-SET p += {flow: "me", step: "revisit", order: 19, copy: "This part has been resting. Still quiet?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "revisit", order: 19, copy: "This part has been resting. Still quiet?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "revisit_new_title"})
-SET p += {flow: "me", step: "revisit", order: 20, copy: "What does it do now?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "revisit", order: 20, copy: "What does it do now?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "candidate_title"})
-SET p += {flow: "me", step: "candidate", order: 21, copy: "To come back to", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "candidate", order: 21, copy: "To come back to", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "candidate_line"})
-SET p += {flow: "me", step: "candidate", order: 22, copy: "The one that {move}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "candidate", order: 22, copy: "The one that {move}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "candidate_line_plain"})
-SET p += {flow: "me", step: "candidate", order: 23, copy: "One you wanted to come back to", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "candidate", order: 23, copy: "One you wanted to come back to", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "candidate_go"})
-SET p += {flow: "me", step: "candidate", order: 24, copy: "Get to know it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "candidate", order: 24, copy: "Get to know it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "candidate_dismiss"})
-SET p += {flow: "me", step: "candidate", order: 25, copy: "Not any more", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "me", step: "candidate", order: 25, copy: "Not any more", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_link"})
-SET p += {flow: "den", step: "room", order: 0, copy: "See them together", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "room", order: 0, copy: "See them together", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_room"})
-SET p += {flow: "den", step: "room", order: 1, copy: "Everyone here is in your house.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "room", order: 1, copy: "Everyone here is in your house.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_unnamed"})
-SET p += {flow: "den", step: "room", order: 2, copy: "A part", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "room", order: 2, copy: "A part", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_move_help"})
-SET p += {flow: "den", step: "room", order: 3, copy: "Tap one, then another, to say how they go together. Drag to move them.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "room", order: 3, copy: "Tap one, then another, to say how they go together. Drag to move them.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_move_keys"})
-SET p += {flow: "den", step: "room", order: 4, copy: "Enter picks one up, the arrow keys move it, Enter puts it down.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "room", order: 4, copy: "Enter picks one up, the arrow keys move it, Enter puts it down.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_one_part"})
-SET p += {flow: "den", step: "room", order: 5, copy: "When you get to know another part, it will be here too.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "room", order: 5, copy: "When you get to know another part, it will be here too.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_list"})
-SET p += {flow: "den", step: "room", order: 6, copy: "See them as a list", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "room", order: 6, copy: "See them as a list", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_pull_against"})
-SET p += {flow: "den", step: "thread", order: 7, copy: "These two pull against each other", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "thread", order: 7, copy: "These two pull against each other", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_stands_front"})
-SET p += {flow: "den", step: "thread", order: 8, copy: "This one stands in front of that one", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "thread", order: 8, copy: "This one stands in front of that one", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_which_front"})
-SET p += {flow: "den", step: "thread", order: 9, copy: "Which one stands in front?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "thread", order: 9, copy: "Which one stands in front?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_thread_cancel"})
-SET p += {flow: "den", step: "thread", order: 10, copy: "Not now", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "thread", order: 10, copy: "Not now", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_remove"})
-SET p += {flow: "den", step: "thread", order: 11, copy: "Remove this thread", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "thread", order: 11, copy: "Remove this thread", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_then"})
-SET p += {flow: "den", step: "then", order: 12, copy: "How it looked in {month}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "then", order: 12, copy: "How it looked in {month}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_now"})
-SET p += {flow: "den", step: "then", order: 13, copy: "Now", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "then", order: 13, copy: "Now", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "den_back_now"})
-SET p += {flow: "den", step: "then", order: 14, copy: "Back to now", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "den", step: "then", order: 14, copy: "Back to now", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_who"})
-SET p += {flow: "wise_mind", step: "who", order: 0, copy: "Who's here about this?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "who", order: 0, copy: "Who's here about this?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_who_help"})
-SET p += {flow: "wise_mind", step: "who", order: 1, copy: "Tap a part to bring it near the light.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "who", order: 1, copy: "Tap a part to bring it near the light.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_room"})
-SET p += {flow: "wise_mind", step: "who", order: 2, copy: "The room, with the light in the middle", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "who", order: 2, copy: "The room, with the light in the middle", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_step_back"})
-SET p += {flow: "wise_mind", step: "step_back", order: 3, copy: "Ask everyone to take one step back.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "step_back", order: 3, copy: "Ask everyone to take one step back.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_hold"})
-SET p += {flow: "wise_mind", step: "step_back", order: 4, copy: "Hold to ask", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "step_back", order: 4, copy: "Hold to ask", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "wm_held", "field": "copy", "kind": "prompt", "text": "From here, what's the wise next step?"}, {"id": "wm_tap_one", "field": "copy", "kind": "prompt", "text": "Tap a part if it won't step back."}, {"id": "wm_wont_line", "field": "copy", "kind": "prompt", "text": "That's fine. It might need its own time."}, {"id": "wm_later_done", "field": "copy", "kind": "prompt", "text": "It's in Me for another time."}, {"id": "wm_use_minds", "field": "copy", "kind": "prompt", "text": "Use the two minds instead"}, {"id": "wm_pushed", "field": "copy", "kind": "prompt", "text": "A part might still be close."}, {"id": "story_open", "field": "copy", "kind": "prompt", "text": "Its story"}, {"id": "story_spend_time", "field": "copy", "kind": "prompt", "text": "Spend time with it"}, {"id": "story_met", "field": "copy", "kind": "prompt", "text": "Met in {month}"}, {"id": "story_job_then", "field": "copy", "kind": "prompt", "text": "Its job then: {old}"}, {"id": "story_job_now", "field": "copy", "kind": "prompt", "text": "Its job now: {new}"}, {"id": "story_rested", "field": "copy", "kind": "prompt", "text": "Rested in {month}"}, {"id": "story_back", "field": "copy", "kind": "prompt", "text": "Back in {month}"}, {"id": "story_where", "field": "copy", "kind": "prompt", "text": "Where it stands"}, {"id": "story_front", "field": "copy", "kind": "prompt", "text": "Stands in front of {name}"}, {"id": "story_behind", "field": "copy", "kind": "prompt", "text": "Stands behind {name}"}, {"id": "story_pulls", "field": "copy", "kind": "prompt", "text": "Pulls against {name}"}, {"id": "story_other", "field": "copy", "kind": "prompt", "text": "another part"}, {"id": "story_room_then", "field": "copy", "kind": "prompt", "text": "In {month}"}, {"id": "story_room_now", "field": "copy", "kind": "prompt", "text": "Now"}, {"id": "say_open", "field": "copy", "kind": "prompt", "text": "Say something to it"}, {"id": "say_prompt", "field": "copy", "kind": "prompt", "text": "What would you like to say to {name}?"}, {"id": "say_prompt_noname", "field": "copy", "kind": "prompt", "text": "What would you like to say to this part?"}, {"id": "say_own_label", "field": "copy", "kind": "prompt", "text": "Your words"}, {"id": "say_send", "field": "copy", "kind": "prompt", "text": "Say it"}, {"id": "say_cancel", "field": "copy", "kind": "prompt", "text": "Not now"}, {"id": "say_told", "field": "copy", "kind": "prompt", "text": "You told it: {said}"}, {"id": "say_story", "field": "copy", "kind": "prompt", "text": "In {month} you told it: {said}"}, {"id": "keepsake_both_want", "field": "copy", "kind": "keepsake", "text": "{A} and {B} both want me {want}."}, {"id": "keepsake_choose", "field": "copy", "kind": "keepsake", "text": "I can hear both of them, and choose what I do next."}]
 MERGE (p:PartPrompt {id: "wm_held"})
-SET p += {flow: "wise_mind", step: "step_back", order: 5, copy: "From here, what's the wise next step?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "step_back", order: 5, copy: "From here, what's the wise next step?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_tap_one"})
-SET p += {flow: "wise_mind", step: "step_back", order: 6, copy: "Tap a part if it won't step back.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "step_back", order: 6, copy: "Tap a part if it won't step back.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_wont_line"})
-SET p += {flow: "wise_mind", step: "wont", order: 7, copy: "That's fine. It might need its own time.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "wont", order: 7, copy: "That's fine. It might need its own time.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_later_done"})
-SET p += {flow: "wise_mind", step: "wont", order: 8, copy: "It's in Me for another time.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "wont", order: 8, copy: "It's in Me for another time.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_use_minds"})
-SET p += {flow: "wise_mind", step: "chrome", order: 9, copy: "Use the two minds instead", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "chrome", order: 9, copy: "Use the two minds instead", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "wm_pushed"})
-SET p += {flow: "wise_mind", step: "feel", order: 10, copy: "A part might still be close.", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "wise_mind", step: "feel", order: 10, copy: "A part might still be close.", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_open"})
-SET p += {flow: "story", step: "card", order: 0, copy: "Its story", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "card", order: 0, copy: "Its story", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_spend_time"})
-SET p += {flow: "story", step: "card", order: 1, copy: "Spend time with it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "card", order: 1, copy: "Spend time with it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_met"})
-SET p += {flow: "story", step: "line", order: 2, copy: "Met in {month}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "line", order: 2, copy: "Met in {month}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_job_then"})
-SET p += {flow: "story", step: "line", order: 3, copy: "Its job then: {old}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "line", order: 3, copy: "Its job then: {old}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_job_now"})
-SET p += {flow: "story", step: "line", order: 4, copy: "Its job now: {new}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "line", order: 4, copy: "Its job now: {new}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_rested"})
-SET p += {flow: "story", step: "line", order: 5, copy: "Rested in {month}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "line", order: 5, copy: "Rested in {month}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_back"})
-SET p += {flow: "story", step: "line", order: 6, copy: "Back in {month}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "line", order: 6, copy: "Back in {month}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_where"})
-SET p += {flow: "story", step: "where", order: 7, copy: "Where it stands", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "where", order: 7, copy: "Where it stands", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_front"})
-SET p += {flow: "story", step: "where", order: 8, copy: "Stands in front of {name}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "where", order: 8, copy: "Stands in front of {name}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_behind"})
-SET p += {flow: "story", step: "where", order: 9, copy: "Stands behind {name}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "where", order: 9, copy: "Stands behind {name}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_pulls"})
-SET p += {flow: "story", step: "where", order: 10, copy: "Pulls against {name}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "where", order: 10, copy: "Pulls against {name}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_other"})
-SET p += {flow: "story", step: "where", order: 11, copy: "another part", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "where", order: 11, copy: "another part", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_room_then"})
-SET p += {flow: "story", step: "where", order: 12, copy: "In {month}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "where", order: 12, copy: "In {month}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "story_room_now"})
-SET p += {flow: "story", step: "where", order: 13, copy: "Now", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "story", step: "where", order: 13, copy: "Now", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_open"})
-SET p += {flow: "say", step: "card", order: 0, copy: "Say something to it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "card", order: 0, copy: "Say something to it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_prompt"})
-SET p += {flow: "say", step: "ask", order: 1, copy: "What would you like to say to {name}?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "ask", order: 1, copy: "What would you like to say to {name}?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_prompt_noname"})
-SET p += {flow: "say", step: "ask", order: 2, copy: "What would you like to say to this part?", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "ask", order: 2, copy: "What would you like to say to this part?", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_own_label"})
-SET p += {flow: "say", step: "ask", order: 3, copy: "Your words", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "ask", order: 3, copy: "Your words", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_send"})
-SET p += {flow: "say", step: "ask", order: 4, copy: "Say it", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "ask", order: 4, copy: "Say it", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_cancel"})
-SET p += {flow: "say", step: "ask", order: 5, copy: "Not now", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "ask", order: 5, copy: "Not now", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_told"})
-SET p += {flow: "say", step: "card", order: 6, copy: "You told it: {said}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "card", order: 6, copy: "You told it: {said}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "say_story"})
-SET p += {flow: "say", step: "story", order: 7, copy: "In {month} you told it: {said}", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "say", step: "story", order: 7, copy: "In {month} you told it: {said}", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "keepsake_both_want"})
-SET p += {flow: "pulls", step: "keepsake", order: 9, copy: "{A} and {B} both want me {want}.", copyKind: "keepsake", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "keepsake", order: 9, copy: "{A} and {B} both want me {want}.", copyKind: "keepsake", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PartPrompt {id: "keepsake_choose"})
-SET p += {flow: "pulls", step: "keepsake", order: 10, copy: "I can hear both of them, and choose what I do next.", copyKind: "keepsake", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "pulls", step: "keepsake", order: 10, copy: "I can hear both of them, and choose what I do next.", copyKind: "keepsake", reviewStatus: "approved", version: "parts-v1", pending: null};
 
 // --- Options: chips the person taps (order: position within flow and step; Two pulls' chips last) ---
 // @parts-copy-json [{"id": "own_words", "field": "label", "kind": "chip", "text": "In my words"}, {"id": "meet_back", "field": "label", "kind": "chip", "text": "Back"}, {"id": "meet_next", "field": "label", "kind": "chip", "text": "Next"}, {"id": "meet_finish", "field": "label", "kind": "chip", "text": "Done"}, {"id": "find_something_else", "field": "label", "kind": "chip", "text": "Something else"}, {"id": "where_nowhere", "field": "label", "kind": "chip", "text": "Nowhere I can find"}, {"id": "shape_cant_tell", "field": "label", "kind": "chip", "text": "Can't tell"}, {"id": "age_school", "field": "label", "kind": "chip", "text": "school age"}, {"id": "age_teen", "field": "label", "kind": "chip", "text": "teenage"}, {"id": "age_now", "field": "label", "kind": "chip", "text": "about my age"}, {"id": "age_older", "field": "label", "kind": "chip", "text": "older"}, {"id": "age_cant_tell", "field": "label", "kind": "chip", "text": "can't tell"}, {"id": "age_little", "field": "label", "kind": "chip", "text": "little"}, {"id": "young_gentle", "field": "label", "kind": "chip", "text": "Yes, keep it gentle"}, {"id": "young_go_on", "field": "label", "kind": "chip", "text": "Keep going as we were"}, {"id": "voice_nothing", "field": "label", "kind": "chip", "text": "Nothing"}, {"id": "feel_curious", "field": "label", "kind": "chip", "text": "curious"}, {"id": "feel_steady", "field": "label", "kind": "chip", "text": "steady"}, {"id": "feel_warm", "field": "label", "kind": "chip", "text": "warm toward it"}, {"id": "feel_open", "field": "label", "kind": "chip", "text": "open"}, {"id": "feel_annoyed", "field": "label", "kind": "chip", "text": "annoyed"}, {"id": "feel_scared", "field": "label", "kind": "chip", "text": "scared of it"}, {"id": "feel_gone", "field": "label", "kind": "chip", "text": "want it gone"}, {"id": "feel_ashamed", "field": "label", "kind": "chip", "text": "ashamed of it"}, {"id": "feel_tired", "field": "label", "kind": "chip", "text": "tired of it"}, {"id": "feel_not_sure", "field": "label", "kind": "chip", "text": "not sure"}, {"id": "feel_nothing", "field": "label", "kind": "chip", "text": "nothing"}, {"id": "unblend_eased", "field": "label", "kind": "chip", "text": "It eased off"}, {"id": "unblend_still", "field": "label", "kind": "chip", "text": "It's still here"}, {"id": "unblend_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}]
 MERGE (o:PartOption {id: "own_words"})
-SET o += {flow: "meet", step: "any", order: 0, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "any", order: 0, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "meet_back"})
-SET o += {flow: "meet", step: "chrome", order: 0, label: "Back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "chrome", order: 0, label: "Back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "meet_next"})
-SET o += {flow: "meet", step: "chrome", order: 1, label: "Next", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "chrome", order: 1, label: "Next", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "meet_finish"})
-SET o += {flow: "meet", step: "chrome", order: 2, label: "Done", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "chrome", order: 2, label: "Done", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "find_something_else"})
-SET o += {flow: "meet", step: "find", order: 0, label: "Something else", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "find", order: 0, label: "Something else", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "where_nowhere"})
-SET o += {flow: "meet", step: "where", order: 0, label: "Nowhere I can find", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "where", order: 0, label: "Nowhere I can find", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "shape_cant_tell"})
-SET o += {flow: "meet", step: "shape", order: 0, label: "Can't tell", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "shape", order: 0, label: "Can't tell", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "age_school"})
-SET o += {flow: "meet", step: "age", order: 0, label: "school age", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age", order: 0, label: "school age", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "age_teen"})
-SET o += {flow: "meet", step: "age", order: 1, label: "teenage", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age", order: 1, label: "teenage", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "age_now"})
-SET o += {flow: "meet", step: "age", order: 2, label: "about my age", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age", order: 2, label: "about my age", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "age_older"})
-SET o += {flow: "meet", step: "age", order: 3, label: "older", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age", order: 3, label: "older", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "age_cant_tell"})
-SET o += {flow: "meet", step: "age", order: 4, label: "can't tell", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age", order: 4, label: "can't tell", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "age_little"})
-SET o += {flow: "meet", step: "age", order: 5, label: "little", kind: "chip", flag: null, selfLike: null, branch: "tender_offer", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age", order: 5, label: "little", kind: "chip", flag: null, selfLike: null, branch: "tender_offer", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "young_gentle"})
-SET o += {flow: "meet", step: "age_young", order: 0, label: "Yes, keep it gentle", kind: "chip", flag: null, selfLike: null, branch: "tender_path", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age_young", order: 0, label: "Yes, keep it gentle", kind: "chip", flag: null, selfLike: null, branch: "tender_path", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "young_go_on"})
-SET o += {flow: "meet", step: "age_young", order: 1, label: "Keep going as we were", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "age_young", order: 1, label: "Keep going as we were", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "voice_nothing"})
-SET o += {flow: "meet", step: "voice", order: 0, label: "Nothing", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 0, label: "Nothing", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_curious"})
-SET o += {flow: "meet", step: "feel", order: 0, label: "curious", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 0, label: "curious", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_steady"})
-SET o += {flow: "meet", step: "feel", order: 1, label: "steady", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 1, label: "steady", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_warm"})
-SET o += {flow: "meet", step: "feel", order: 2, label: "warm toward it", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 2, label: "warm toward it", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_open"})
-SET o += {flow: "meet", step: "feel", order: 3, label: "open", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 3, label: "open", kind: "chip", flag: null, selfLike: true, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_annoyed"})
-SET o += {flow: "meet", step: "feel", order: 4, label: "annoyed", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 4, label: "annoyed", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_scared"})
-SET o += {flow: "meet", step: "feel", order: 5, label: "scared of it", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 5, label: "scared of it", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_gone"})
-SET o += {flow: "meet", step: "feel", order: 6, label: "want it gone", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 6, label: "want it gone", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_ashamed"})
-SET o += {flow: "meet", step: "feel", order: 7, label: "ashamed of it", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 7, label: "ashamed of it", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_tired"})
-SET o += {flow: "meet", step: "feel", order: 8, label: "tired of it", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 8, label: "tired of it", kind: "chip", flag: null, selfLike: false, branch: "unblend", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_not_sure"})
-SET o += {flow: "meet", step: "feel", order: 9, label: "not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 9, label: "not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "feel_nothing"})
-SET o += {flow: "meet", step: "feel", order: 10, label: "nothing", kind: "chip", flag: null, selfLike: null, branch: "grounding", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "feel", order: 10, label: "nothing", kind: "chip", flag: null, selfLike: null, branch: "grounding", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "unblend_eased"})
-SET o += {flow: "meet", step: "unblend", order: 0, label: "It eased off", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "unblend", order: 0, label: "It eased off", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "unblend_still"})
-SET o += {flow: "meet", step: "unblend", order: 1, label: "It's still here", kind: "chip", flag: null, selfLike: null, branch: "unblend", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "unblend", order: 1, label: "It's still here", kind: "chip", flag: null, selfLike: null, branch: "unblend", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "unblend_not_sure"})
-SET o += {flow: "meet", step: "unblend", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "unblend", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "later_yes", "field": "label", "kind": "chip", "text": "Yes, another time"}, {"id": "later_no", "field": "label", "kind": "chip", "text": "No"}, {"id": "nothing_look", "field": "label", "kind": "chip", "text": "Look around the room"}, {"id": "nothing_body", "field": "label", "kind": "chip", "text": "Something for my body"}, {"id": "nothing_finish", "field": "label", "kind": "chip", "text": "Finish here"}, {"id": "likes_tired", "field": "label", "kind": "chip", "text": "It's tired"}, {"id": "likes_proud", "field": "label", "kind": "chip", "text": "It's proud of it"}, {"id": "likes_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "guards_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "front_none", "field": "label", "kind": "chip", "text": "No one I know"}, {"id": "front_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "stop_thank", "field": "label", "kind": "chip", "text": "Thank it"}, {"id": "stop_body", "field": "label", "kind": "chip", "text": "Something for my body first"}, {"id": "update_yes", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "update_no", "field": "label", "kind": "chip", "text": "It doesn't seem to"}, {"id": "update_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "now_leave", "field": "label", "kind": "chip", "text": "I can leave a room"}, {"id": "now_ask", "field": "label", "kind": "chip", "text": "I can ask for help"}, {"id": "now_people", "field": "label", "kind": "chip", "text": "I have people now"}, {"id": "now_no", "field": "label", "kind": "chip", "text": "I can say no"}, {"id": "rather_not_sure", "field": "label", "kind": "chip", "text": "Not sure yet"}, {"id": "name_not_yet", "field": "label", "kind": "chip", "text": "Not yet"}, {"id": "keep_yes", "field": "label", "kind": "chip", "text": "Yes, keep it"}, {"id": "keep_not_now", "field": "label", "kind": "chip", "text": "Not now"}, {"id": "hide_voice_see", "field": "label", "kind": "voice", "text": "Don't let them see"}, {"id": "hide_voice_leave_first", "field": "label", "kind": "voice", "text": "Get out before they leave"}, {"id": "hide_voice_safer_alone", "field": "label", "kind": "voice", "text": "It's safer alone"}, {"id": "chase_voice_fix_now", "field": "label", "kind": "voice", "text": "Fix it now"}, {"id": "chase_voice_not_angry", "field": "label", "kind": "voice", "text": "Make sure they're not angry"}, {"id": "chase_voice_dont_let_go", "field": "label", "kind": "voice", "text": "Don't let them go"}]
 MERGE (o:PartOption {id: "later_yes"})
-SET o += {flow: "meet", step: "unblend_later", order: 0, label: "Yes, another time", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "unblend_later", order: 0, label: "Yes, another time", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "later_no"})
-SET o += {flow: "meet", step: "unblend_later", order: 1, label: "No", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "unblend_later", order: 1, label: "No", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "nothing_look"})
-SET o += {flow: "meet", step: "nothing", order: 0, label: "Look around the room", kind: "chip", flag: null, selfLike: null, branch: "grounding", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "nothing", order: 0, label: "Look around the room", kind: "chip", flag: null, selfLike: null, branch: "grounding", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "nothing_body"})
-SET o += {flow: "meet", step: "nothing", order: 1, label: "Something for my body", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "nothing", order: 1, label: "Something for my body", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "nothing_finish"})
-SET o += {flow: "meet", step: "nothing", order: 2, label: "Finish here", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "nothing", order: 2, label: "Finish here", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "likes_tired"})
-SET o += {flow: "meet", step: "likes", order: 0, label: "It's tired", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "likes", order: 0, label: "It's tired", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "likes_proud"})
-SET o += {flow: "meet", step: "likes", order: 1, label: "It's proud of it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "likes", order: 1, label: "It's proud of it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "likes_not_sure"})
-SET o += {flow: "meet", step: "likes", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "likes", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "guards_not_sure"})
-SET o += {flow: "meet", step: "guards", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "guards", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "front_none"})
-SET o += {flow: "meet", step: "front", order: 0, label: "No one I know", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "front", order: 0, label: "No one I know", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "front_not_sure"})
-SET o += {flow: "meet", step: "front", order: 1, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "front", order: 1, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "stop_thank"})
-SET o += {flow: "meet", step: "stop", order: 0, label: "Thank it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "stop", order: 0, label: "Thank it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "stop_body"})
-SET o += {flow: "meet", step: "stop", order: 1, label: "Something for my body first", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "stop", order: 1, label: "Something for my body first", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "update_yes"})
-SET o += {flow: "meet", step: "update", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "update", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "update_no"})
-SET o += {flow: "meet", step: "update", order: 1, label: "It doesn't seem to", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "update", order: 1, label: "It doesn't seem to", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "update_not_sure"})
-SET o += {flow: "meet", step: "update", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "update", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "now_leave"})
-SET o += {flow: "meet", step: "update_show", order: 0, label: "I can leave a room", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "update_show", order: 0, label: "I can leave a room", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "now_ask"})
-SET o += {flow: "meet", step: "update_show", order: 1, label: "I can ask for help", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "update_show", order: 1, label: "I can ask for help", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "now_people"})
-SET o += {flow: "meet", step: "update_show", order: 2, label: "I have people now", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "update_show", order: 2, label: "I have people now", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "now_no"})
-SET o += {flow: "meet", step: "update_show", order: 3, label: "I can say no", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "update_show", order: 3, label: "I can say no", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "rather_not_sure"})
-SET o += {flow: "meet", step: "rather", order: 0, label: "Not sure yet", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 0, label: "Not sure yet", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "name_not_yet"})
-SET o += {flow: "meet", step: "name", order: 0, label: "Not yet", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "name", order: 0, label: "Not yet", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "keep_yes"})
-SET o += {flow: "meet", step: "keep", order: 0, label: "Yes, keep it", kind: "chip", flag: null, selfLike: null, branch: "keep", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "keep", order: 0, label: "Yes, keep it", kind: "chip", flag: null, selfLike: null, branch: "keep", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "keep_not_now"})
-SET o += {flow: "meet", step: "keep", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "keep", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_voice_see"})
-SET o += {flow: "meet", step: "voice", order: 1, label: "Don't let them see", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 1, label: "Don't let them see", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_voice_leave_first"})
-SET o += {flow: "meet", step: "voice", order: 2, label: "Get out before they leave", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 2, label: "Get out before they leave", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_voice_safer_alone"})
-SET o += {flow: "meet", step: "voice", order: 3, label: "It's safer alone", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 3, label: "It's safer alone", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_voice_fix_now"})
-SET o += {flow: "meet", step: "voice", order: 4, label: "Fix it now", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 4, label: "Fix it now", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_voice_not_angry"})
-SET o += {flow: "meet", step: "voice", order: 5, label: "Make sure they're not angry", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 5, label: "Make sure they're not angry", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_voice_dont_let_go"})
-SET o += {flow: "meet", step: "voice", order: 6, label: "Don't let them go", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 6, label: "Don't let them go", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "hit_back_voice_cant_talk", "field": "label", "kind": "voice", "text": "They can't talk to you like that"}, {"id": "hit_back_voice_slide", "field": "label", "kind": "voice", "text": "Don't let it slide"}, {"id": "peace_voice_agree", "field": "label", "kind": "voice", "text": "Just agree"}, {"id": "peace_voice_not_a_thing", "field": "label", "kind": "voice", "text": "Don't make it a thing"}, {"id": "peace_voice_not_worth", "field": "label", "kind": "voice", "text": "This isn't worth the fight"}, {"id": "turn_voice_always", "field": "label", "kind": "voice", "text": "You always do this"}, {"id": "turn_voice_my_fault", "field": "label", "kind": "voice", "text": "This is probably my fault"}, {"id": "turn_voice_too_much", "field": "label", "kind": "voice", "text": "I'm being too much"}, {"id": "small_voice_dont_ask", "field": "label", "kind": "voice", "text": "Don't ask"}, {"id": "small_voice_dont_deserve", "field": "label", "kind": "voice", "text": "I don't deserve to ask"}, {"id": "watch_voice_wrong", "field": "label", "kind": "voice", "text": "What if I'm wrong?"}, {"id": "watch_voice_leave", "field": "label", "kind": "voice", "text": "They're going to leave"}, {"id": "watch_voice_off", "field": "label", "kind": "voice", "text": "Something's off"}, {"id": "off_voice_later", "field": "label", "kind": "voice", "text": "Later"}, {"id": "off_voice_not_today", "field": "label", "kind": "voice", "text": "Not today"}, {"id": "hide_job_out_of_sight", "field": "label", "kind": "chip", "text": "Keep me out of sight"}, {"id": "hide_job_pushed_out", "field": "label", "kind": "chip", "text": "Keep me from being pushed out"}, {"id": "hide_job_worse", "field": "label", "kind": "chip", "text": "Keep me from making it worse"}, {"id": "chase_job_dont_leave", "field": "label", "kind": "chip", "text": "Make sure they don't leave"}, {"id": "chase_job_answer", "field": "label", "kind": "chip", "text": "Get an answer so I can breathe"}, {"id": "hit_back_job_seriously", "field": "label", "kind": "chip", "text": "Make sure I'm taken seriously"}, {"id": "hit_back_job_stop_them", "field": "label", "kind": "chip", "text": "Stop them before it gets worse"}, {"id": "peace_job_calm", "field": "label", "kind": "chip", "text": "Keep everyone calm"}, {"id": "peace_job_nobody_angry", "field": "label", "kind": "chip", "text": "Make sure nobody gets angry"}, {"id": "turn_job_not_again", "field": "label", "kind": "chip", "text": "Stop me from doing that again"}, {"id": "turn_job_get_there_first", "field": "label", "kind": "chip", "text": "Get there before anyone else does"}, {"id": "small_job_too_much", "field": "label", "kind": "chip", "text": "Keep me from being too much"}, {"id": "small_job_bother", "field": "label", "kind": "chip", "text": "Keep me from being a bother"}, {"id": "watch_job_trouble", "field": "label", "kind": "chip", "text": "See trouble coming"}, {"id": "watch_job_surprise", "field": "label", "kind": "chip", "text": "Make sure nothing surprises me"}]
 MERGE (o:PartOption {id: "hit_back_voice_cant_talk"})
-SET o += {flow: "meet", step: "voice", order: 7, label: "They can't talk to you like that", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 7, label: "They can't talk to you like that", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_voice_slide"})
-SET o += {flow: "meet", step: "voice", order: 8, label: "Don't let it slide", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 8, label: "Don't let it slide", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_voice_agree"})
-SET o += {flow: "meet", step: "voice", order: 9, label: "Just agree", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 9, label: "Just agree", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_voice_not_a_thing"})
-SET o += {flow: "meet", step: "voice", order: 10, label: "Don't make it a thing", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 10, label: "Don't make it a thing", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_voice_not_worth"})
-SET o += {flow: "meet", step: "voice", order: 11, label: "This isn't worth the fight", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 11, label: "This isn't worth the fight", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_voice_always"})
-SET o += {flow: "meet", step: "voice", order: 12, label: "You always do this", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 12, label: "You always do this", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_voice_my_fault"})
-SET o += {flow: "meet", step: "voice", order: 13, label: "This is probably my fault", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 13, label: "This is probably my fault", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_voice_too_much"})
-SET o += {flow: "meet", step: "voice", order: 14, label: "I'm being too much", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 14, label: "I'm being too much", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_voice_dont_ask"})
-SET o += {flow: "meet", step: "voice", order: 15, label: "Don't ask", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 15, label: "Don't ask", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_voice_dont_deserve"})
-SET o += {flow: "meet", step: "voice", order: 16, label: "I don't deserve to ask", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 16, label: "I don't deserve to ask", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_voice_wrong"})
-SET o += {flow: "meet", step: "voice", order: 17, label: "What if I'm wrong?", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 17, label: "What if I'm wrong?", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_voice_leave"})
-SET o += {flow: "meet", step: "voice", order: 18, label: "They're going to leave", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 18, label: "They're going to leave", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_voice_off"})
-SET o += {flow: "meet", step: "voice", order: 19, label: "Something's off", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 19, label: "Something's off", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_voice_later"})
-SET o += {flow: "meet", step: "voice", order: 20, label: "Later", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 20, label: "Later", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_voice_not_today"})
-SET o += {flow: "meet", step: "voice", order: 21, label: "Not today", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "voice", order: 21, label: "Not today", kind: "voice", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_job_out_of_sight"})
-SET o += {flow: "meet", step: "job", order: 0, label: "Keep me out of sight", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 0, label: "Keep me out of sight", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_job_pushed_out"})
-SET o += {flow: "meet", step: "job", order: 1, label: "Keep me from being pushed out", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 1, label: "Keep me from being pushed out", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_job_worse"})
-SET o += {flow: "meet", step: "job", order: 2, label: "Keep me from making it worse", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 2, label: "Keep me from making it worse", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_job_dont_leave"})
-SET o += {flow: "meet", step: "job", order: 3, label: "Make sure they don't leave", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 3, label: "Make sure they don't leave", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_job_answer"})
-SET o += {flow: "meet", step: "job", order: 4, label: "Get an answer so I can breathe", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 4, label: "Get an answer so I can breathe", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_job_seriously"})
-SET o += {flow: "meet", step: "job", order: 5, label: "Make sure I'm taken seriously", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 5, label: "Make sure I'm taken seriously", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_job_stop_them"})
-SET o += {flow: "meet", step: "job", order: 6, label: "Stop them before it gets worse", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 6, label: "Stop them before it gets worse", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_job_calm"})
-SET o += {flow: "meet", step: "job", order: 7, label: "Keep everyone calm", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 7, label: "Keep everyone calm", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_job_nobody_angry"})
-SET o += {flow: "meet", step: "job", order: 8, label: "Make sure nobody gets angry", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 8, label: "Make sure nobody gets angry", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_job_not_again"})
-SET o += {flow: "meet", step: "job", order: 9, label: "Stop me from doing that again", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 9, label: "Stop me from doing that again", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_job_get_there_first"})
-SET o += {flow: "meet", step: "job", order: 10, label: "Get there before anyone else does", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 10, label: "Get there before anyone else does", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_job_too_much"})
-SET o += {flow: "meet", step: "job", order: 11, label: "Keep me from being too much", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 11, label: "Keep me from being too much", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_job_bother"})
-SET o += {flow: "meet", step: "job", order: 12, label: "Keep me from being a bother", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 12, label: "Keep me from being a bother", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_job_trouble"})
-SET o += {flow: "meet", step: "job", order: 13, label: "See trouble coming", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 13, label: "See trouble coming", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_job_surprise"})
-SET o += {flow: "meet", step: "job", order: 14, label: "Make sure nothing surprises me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 14, label: "Make sure nothing surprises me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "off_job_failing", "field": "label", "kind": "chip", "text": "Keep me from failing at it"}, {"id": "off_job_hard_talk", "field": "label", "kind": "chip", "text": "Keep me from a hard conversation"}, {"id": "fear_old_hurt", "field": "label", "kind": "chip", "text": "I'd feel the old hurt"}, {"id": "fear_cant_handle", "field": "label", "kind": "chip", "text": "Something would come up I can't handle"}, {"id": "hide_fear_too_much", "field": "label", "kind": "chip", "text": "I'd be too much and they'd leave"}, {"id": "hide_fear_regret", "field": "label", "kind": "chip", "text": "I'd say something I regret"}, {"id": "chase_fear_not_know", "field": "label", "kind": "chip", "text": "I'd be left and not know why"}, {"id": "chase_fear_waiting", "field": "label", "kind": "chip", "text": "The waiting would be unbearable"}, {"id": "hit_back_fear_walk_over", "field": "label", "kind": "chip", "text": "They'd walk all over me"}, {"id": "hit_back_fear_stop_mattering", "field": "label", "kind": "chip", "text": "I'd stop mattering"}, {"id": "hit_back_fear_take_back", "field": "label", "kind": "chip", "text": "I'd do something I can't take back"}, {"id": "peace_fear_angry", "field": "label", "kind": "chip", "text": "They'd get angry and I couldn't handle it"}, {"id": "peace_fear_lose_them", "field": "label", "kind": "chip", "text": "I'd lose them"}, {"id": "peace_fear_fight", "field": "label", "kind": "chip", "text": "It would turn into a fight"}, {"id": "turn_fear_hurt_people", "field": "label", "kind": "chip", "text": "I'd turn into someone who hurts people"}, {"id": "turn_fear_careless", "field": "label", "kind": "chip", "text": "I'd get careless and lose everyone"}, {"id": "turn_fear_hurt_myself", "field": "label", "kind": "chip", "text": "I'd end up hurting myself"}, {"id": "small_fear_burden", "field": "label", "kind": "chip", "text": "I'd be a burden"}, {"id": "small_fear_annoyed", "field": "label", "kind": "chip", "text": "They'd be annoyed with me"}, {"id": "watch_fear_off_guard", "field": "label", "kind": "chip", "text": "I'd be caught off guard"}, {"id": "watch_fear_miss_it", "field": "label", "kind": "chip", "text": "Something bad would happen and I'd miss it"}, {"id": "off_fear_cant_do_it", "field": "label", "kind": "chip", "text": "I'd find out I can't do it"}, {"id": "off_fear_hard_talk", "field": "label", "kind": "chip", "text": "I'd have to have a hard conversation"}, {"id": "off_fear_might_not_help", "field": "label", "kind": "chip", "text": "It might not help after all"}, {"id": "off_fear_lose_something", "field": "label", "kind": "chip", "text": "I'd lose something I still value"}, {"id": "off_fear_need_help", "field": "label", "kind": "chip", "text": "I'd have to admit I need help"}, {"id": "hide_rather_need_someone", "field": "label", "kind": "chip", "text": "Let me know when I need someone"}, {"id": "hide_rather_break", "field": "label", "kind": "chip", "text": "Help me take a break, then come back"}, {"id": "chase_rather_ask", "field": "label", "kind": "chip", "text": "Tell me when I need reassurance, so I can ask"}, {"id": "chase_rather_wait", "field": "label", "kind": "chip", "text": "Help me wait a little"}]
 MERGE (o:PartOption {id: "off_job_failing"})
-SET o += {flow: "meet", step: "job", order: 15, label: "Keep me from failing at it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 15, label: "Keep me from failing at it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_job_hard_talk"})
-SET o += {flow: "meet", step: "job", order: 16, label: "Keep me from a hard conversation", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "job", order: 16, label: "Keep me from a hard conversation", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "fear_old_hurt"})
-SET o += {flow: "meet", step: "fear", order: 0, label: "I'd feel the old hurt", kind: "chip", flag: "tender", selfLike: null, branch: "conservative", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 0, label: "I'd feel the old hurt", kind: "chip", flag: "tender", selfLike: null, branch: "conservative", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "fear_cant_handle"})
-SET o += {flow: "meet", step: "fear", order: 1, label: "Something would come up I can't handle", kind: "chip", flag: "tender", selfLike: null, branch: "conservative", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 1, label: "Something would come up I can't handle", kind: "chip", flag: "tender", selfLike: null, branch: "conservative", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_fear_too_much"})
-SET o += {flow: "meet", step: "fear", order: 2, label: "I'd be too much and they'd leave", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 2, label: "I'd be too much and they'd leave", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_fear_regret"})
-SET o += {flow: "meet", step: "fear", order: 3, label: "I'd say something I regret", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 3, label: "I'd say something I regret", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_fear_not_know"})
-SET o += {flow: "meet", step: "fear", order: 4, label: "I'd be left and not know why", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 4, label: "I'd be left and not know why", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_fear_waiting"})
-SET o += {flow: "meet", step: "fear", order: 5, label: "The waiting would be unbearable", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 5, label: "The waiting would be unbearable", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_fear_walk_over"})
-SET o += {flow: "meet", step: "fear", order: 6, label: "They'd walk all over me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 6, label: "They'd walk all over me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_fear_stop_mattering"})
-SET o += {flow: "meet", step: "fear", order: 7, label: "I'd stop mattering", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 7, label: "I'd stop mattering", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_fear_take_back"})
-SET o += {flow: "meet", step: "fear", order: 8, label: "I'd do something I can't take back", kind: "chip", flag: "danger", selfLike: null, branch: "danger", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 8, label: "I'd do something I can't take back", kind: "chip", flag: "danger", selfLike: null, branch: "danger", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_fear_angry"})
-SET o += {flow: "meet", step: "fear", order: 9, label: "They'd get angry and I couldn't handle it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 9, label: "They'd get angry and I couldn't handle it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_fear_lose_them"})
-SET o += {flow: "meet", step: "fear", order: 10, label: "I'd lose them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 10, label: "I'd lose them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_fear_fight"})
-SET o += {flow: "meet", step: "fear", order: 11, label: "It would turn into a fight", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 11, label: "It would turn into a fight", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_fear_hurt_people"})
-SET o += {flow: "meet", step: "fear", order: 12, label: "I'd turn into someone who hurts people", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 12, label: "I'd turn into someone who hurts people", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_fear_careless"})
-SET o += {flow: "meet", step: "fear", order: 13, label: "I'd get careless and lose everyone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 13, label: "I'd get careless and lose everyone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_fear_hurt_myself"})
-SET o += {flow: "meet", step: "fear", order: 14, label: "I'd end up hurting myself", kind: "chip", flag: "danger", selfLike: null, branch: "danger", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 14, label: "I'd end up hurting myself", kind: "chip", flag: "danger", selfLike: null, branch: "danger", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_fear_burden"})
-SET o += {flow: "meet", step: "fear", order: 15, label: "I'd be a burden", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 15, label: "I'd be a burden", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_fear_annoyed"})
-SET o += {flow: "meet", step: "fear", order: 16, label: "They'd be annoyed with me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 16, label: "They'd be annoyed with me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_fear_off_guard"})
-SET o += {flow: "meet", step: "fear", order: 17, label: "I'd be caught off guard", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 17, label: "I'd be caught off guard", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_fear_miss_it"})
-SET o += {flow: "meet", step: "fear", order: 18, label: "Something bad would happen and I'd miss it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 18, label: "Something bad would happen and I'd miss it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_fear_cant_do_it"})
-SET o += {flow: "meet", step: "fear", order: 19, label: "I'd find out I can't do it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 19, label: "I'd find out I can't do it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_fear_hard_talk"})
-SET o += {flow: "meet", step: "fear", order: 20, label: "I'd have to have a hard conversation", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 20, label: "I'd have to have a hard conversation", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_fear_might_not_help"})
-SET o += {flow: "meet", step: "fear", order: 21, label: "It might not help after all", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 21, label: "It might not help after all", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_fear_lose_something"})
-SET o += {flow: "meet", step: "fear", order: 22, label: "I'd lose something I still value", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 22, label: "I'd lose something I still value", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_fear_need_help"})
-SET o += {flow: "meet", step: "fear", order: 23, label: "I'd have to admit I need help", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "fear", order: 23, label: "I'd have to admit I need help", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_rather_need_someone"})
-SET o += {flow: "meet", step: "rather", order: 1, label: "Let me know when I need someone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 1, label: "Let me know when I need someone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_rather_break"})
-SET o += {flow: "meet", step: "rather", order: 2, label: "Help me take a break, then come back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 2, label: "Help me take a break, then come back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_rather_ask"})
-SET o += {flow: "meet", step: "rather", order: 3, label: "Tell me when I need reassurance, so I can ask", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 3, label: "Tell me when I need reassurance, so I can ask", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_rather_wait"})
-SET o += {flow: "meet", step: "rather", order: 4, label: "Help me wait a little", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 4, label: "Help me wait a little", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "hit_back_rather_matters", "field": "label", "kind": "chip", "text": "Tell me when something matters"}, {"id": "hit_back_rather_stand_up", "field": "label", "kind": "chip", "text": "Help me stand up for myself, steady and out loud"}, {"id": "peace_rather_notice", "field": "label", "kind": "chip", "text": "Help me notice when I'm agreeing too fast"}, {"id": "peace_rather_say_no", "field": "label", "kind": "chip", "text": "Help me say no kindly"}, {"id": "turn_rather_kindly", "field": "label", "kind": "chip", "text": "Point out what I want to do differently, kindly"}, {"id": "small_rather_small_things", "field": "label", "kind": "chip", "text": "Help me ask for small things first"}, {"id": "small_rather_allowed", "field": "label", "kind": "chip", "text": "Remind me I'm allowed to want things"}, {"id": "watch_rather_rest", "field": "label", "kind": "chip", "text": "Keep watch, then let me rest"}, {"id": "watch_rather_safe", "field": "label", "kind": "chip", "text": "Tell me when it's safe to stop"}, {"id": "off_rather_start_small", "field": "label", "kind": "chip", "text": "Help me start small"}, {"id": "off_rather_ready", "field": "label", "kind": "chip", "text": "Tell me when I'm ready"}, {"id": "pulls_keep", "field": "label", "kind": "chip", "text": "Keep this"}, {"id": "pulls_not_now", "field": "label", "kind": "chip", "text": "Not now"}, {"id": "pulls_another_time", "field": "label", "kind": "chip", "text": "Meet it another time"}, {"id": "pulls_needs_time_not_now", "field": "label", "kind": "chip", "text": "Not now"}, {"id": "pulls_worry_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "pulls_both_want_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "pulls_close_checkback_yes", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "pulls_close_checkback_no", "field": "label", "kind": "chip", "text": "No thanks"}, {"id": "pulls_worry_hurt", "field": "label", "kind": "chip", "text": "I'd get hurt"}, {"id": "pulls_worry_nothing", "field": "label", "kind": "chip", "text": "I'd be left with nothing"}, {"id": "pulls_worry_fall_apart", "field": "label", "kind": "chip", "text": "It would all fall apart"}, {"id": "pulls_worry_on_my_own", "field": "label", "kind": "chip", "text": "I'd end up on my own"}, {"id": "pulls_want_safe", "field": "label", "kind": "chip", "text": "to be safe"}, {"id": "pulls_want_matter", "field": "label", "kind": "chip", "text": "to matter to someone"}, {"id": "pulls_want_not_hurt", "field": "label", "kind": "chip", "text": "not to be hurt again"}, {"id": "pulls_want_okay", "field": "label", "kind": "chip", "text": "to be okay"}, {"id": "wm_unmet", "field": "label", "kind": "chip", "text": "A part I haven't met"}, {"id": "wm_no_one", "field": "label", "kind": "chip", "text": "No one in particular"}, {"id": "wm_wont", "field": "label", "kind": "chip", "text": "It won't step back"}]
 MERGE (o:PartOption {id: "hit_back_rather_matters"})
-SET o += {flow: "meet", step: "rather", order: 5, label: "Tell me when something matters", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 5, label: "Tell me when something matters", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_rather_stand_up"})
-SET o += {flow: "meet", step: "rather", order: 6, label: "Help me stand up for myself, steady and out loud", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 6, label: "Help me stand up for myself, steady and out loud", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_rather_notice"})
-SET o += {flow: "meet", step: "rather", order: 7, label: "Help me notice when I'm agreeing too fast", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 7, label: "Help me notice when I'm agreeing too fast", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_rather_say_no"})
-SET o += {flow: "meet", step: "rather", order: 8, label: "Help me say no kindly", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 8, label: "Help me say no kindly", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "turn_rather_kindly"})
-SET o += {flow: "meet", step: "rather", order: 9, label: "Point out what I want to do differently, kindly", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 9, label: "Point out what I want to do differently, kindly", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_rather_small_things"})
-SET o += {flow: "meet", step: "rather", order: 10, label: "Help me ask for small things first", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 10, label: "Help me ask for small things first", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_rather_allowed"})
-SET o += {flow: "meet", step: "rather", order: 11, label: "Remind me I'm allowed to want things", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 11, label: "Remind me I'm allowed to want things", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_rather_rest"})
-SET o += {flow: "meet", step: "rather", order: 12, label: "Keep watch, then let me rest", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 12, label: "Keep watch, then let me rest", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "watch_rather_safe"})
-SET o += {flow: "meet", step: "rather", order: 13, label: "Tell me when it's safe to stop", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 13, label: "Tell me when it's safe to stop", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_rather_start_small"})
-SET o += {flow: "meet", step: "rather", order: 14, label: "Help me start small", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 14, label: "Help me start small", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "off_rather_ready"})
-SET o += {flow: "meet", step: "rather", order: 15, label: "Tell me when I'm ready", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "rather", order: 15, label: "Tell me when I'm ready", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_keep"})
-SET o += {flow: "pulls", step: "keepsake", order: 0, label: "Keep this", kind: "chip", flag: null, selfLike: null, branch: "keep", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "keepsake", order: 0, label: "Keep this", kind: "chip", flag: null, selfLike: null, branch: "keep", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_not_now"})
-SET o += {flow: "pulls", step: "keepsake", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "keepsake", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_another_time"})
-SET o += {flow: "pulls", step: "needs_time", order: 0, label: "Meet it another time", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "needs_time", order: 0, label: "Meet it another time", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_needs_time_not_now"})
-SET o += {flow: "pulls", step: "needs_time", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "needs_time", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_worry_not_sure"})
-SET o += {flow: "pulls", step: "worry", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_both_want_not_sure"})
-SET o += {flow: "pulls", step: "both_want", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_close_checkback_yes"})
-SET o += {flow: "pulls", step: "close", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "checkback", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "close", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "checkback", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_close_checkback_no"})
-SET o += {flow: "pulls", step: "close", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "close", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_worry_hurt"})
-SET o += {flow: "pulls", step: "worry_general", order: 0, label: "I'd get hurt", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry_general", order: 0, label: "I'd get hurt", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_worry_nothing"})
-SET o += {flow: "pulls", step: "worry_general", order: 1, label: "I'd be left with nothing", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry_general", order: 1, label: "I'd be left with nothing", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_worry_fall_apart"})
-SET o += {flow: "pulls", step: "worry_general", order: 2, label: "It would all fall apart", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry_general", order: 2, label: "It would all fall apart", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_worry_on_my_own"})
-SET o += {flow: "pulls", step: "worry_general", order: 3, label: "I'd end up on my own", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry_general", order: 3, label: "I'd end up on my own", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_want_safe"})
-SET o += {flow: "pulls", step: "both_want_general", order: 0, label: "to be safe", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want_general", order: 0, label: "to be safe", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_want_matter"})
-SET o += {flow: "pulls", step: "both_want_general", order: 1, label: "to matter to someone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want_general", order: 1, label: "to matter to someone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_want_not_hurt"})
-SET o += {flow: "pulls", step: "both_want_general", order: 2, label: "not to be hurt again", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want_general", order: 2, label: "not to be hurt again", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "pulls_want_okay"})
-SET o += {flow: "pulls", step: "both_want_general", order: 3, label: "to be okay", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want_general", order: 3, label: "to be okay", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "wm_unmet"})
-SET o += {flow: "wise_mind", step: "who", order: 0, label: "A part I haven't met", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "wise_mind", step: "who", order: 0, label: "A part I haven't met", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "wm_no_one"})
-SET o += {flow: "wise_mind", step: "who", order: 1, label: "No one in particular", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "wise_mind", step: "who", order: 1, label: "No one in particular", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "wm_wont"})
-SET o += {flow: "wise_mind", step: "wont", order: 0, label: "It won't step back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "wise_mind", step: "wont", order: 0, label: "It won't step back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "wm_meet_later", "field": "label", "kind": "chip", "text": "Meet it another time"}, {"id": "wm_next", "field": "label", "kind": "chip", "text": "Next"}, {"id": "offer_show", "field": "label", "kind": "chip", "text": "Show me"}, {"id": "offer_not_now", "field": "label", "kind": "chip", "text": "Not now"}, {"id": "offer_no", "field": "label", "kind": "chip", "text": "No"}, {"id": "offer_yes_part", "field": "label", "kind": "chip", "text": "Yes, a part of me"}, {"id": "offer_more_than_one", "field": "label", "kind": "chip", "text": "More than one"}, {"id": "offer_how_it_goes", "field": "label", "kind": "chip", "text": "It's how things go"}, {"id": "offer_not_me", "field": "label", "kind": "chip", "text": "Not me"}, {"id": "offer_split_keep", "field": "label", "kind": "chip", "text": "Keep these"}, {"id": "review_yes", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "review_no", "field": "label", "kind": "chip", "text": "No"}, {"id": "review_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "review_done", "field": "label", "kind": "chip", "text": "Done"}, {"id": "review_not_now", "field": "label", "kind": "chip", "text": "Not now"}, {"id": "patterns_remove", "field": "label", "kind": "chip", "text": "Remove"}, {"id": "tag_new_one", "field": "label", "kind": "chip", "text": "A new one"}, {"id": "tag_skip", "field": "label", "kind": "chip", "text": "Skip"}, {"id": "tag_later_yes", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "tag_later_no", "field": "label", "kind": "chip", "text": "No thanks"}, {"id": "tag_shape_yes", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "tag_shape_no", "field": "label", "kind": "chip", "text": "No thanks"}, {"id": "ps_later", "field": "label", "kind": "chip", "text": "Want to get to know that part another time?"}, {"id": "when_mornings", "field": "label", "kind": "chip", "text": "mornings"}, {"id": "when_afternoons", "field": "label", "kind": "chip", "text": "afternoons"}, {"id": "when_evenings", "field": "label", "kind": "chip", "text": "evenings"}, {"id": "when_nights", "field": "label", "kind": "chip", "text": "at night"}, {"id": "angry_next", "field": "label", "kind": "chip", "text": "Okay"}, {"id": "angry_not_now", "field": "label", "kind": "chip", "text": "Not now"}, {"id": "angry_not_now_plain", "field": "label", "kind": "chip", "text": "Not now"}]
 MERGE (o:PartOption {id: "wm_meet_later"})
-SET o += {flow: "wise_mind", step: "wont", order: 1, label: "Meet it another time", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "wise_mind", step: "wont", order: 1, label: "Meet it another time", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "wm_next"})
-SET o += {flow: "wise_mind", step: "chrome", order: 0, label: "Next", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "wise_mind", step: "chrome", order: 0, label: "Next", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_show"})
-SET o += {flow: "offer", step: "card", order: 0, label: "Show me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "card", order: 0, label: "Show me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_not_now"})
-SET o += {flow: "offer", step: "card", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "card", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_no"})
-SET o += {flow: "offer", step: "card", order: 2, label: "No", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "card", order: 2, label: "No", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_yes_part"})
-SET o += {flow: "offer", step: "evidence", order: 0, label: "Yes, a part of me", kind: "chip", flag: null, selfLike: null, branch: "meet", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "evidence", order: 0, label: "Yes, a part of me", kind: "chip", flag: null, selfLike: null, branch: "meet", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_more_than_one"})
-SET o += {flow: "offer", step: "evidence", order: 1, label: "More than one", kind: "chip", flag: null, selfLike: null, branch: "split", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "evidence", order: 1, label: "More than one", kind: "chip", flag: null, selfLike: null, branch: "split", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_how_it_goes"})
-SET o += {flow: "offer", step: "evidence", order: 2, label: "It's how things go", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "evidence", order: 2, label: "It's how things go", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_not_me"})
-SET o += {flow: "offer", step: "evidence", order: 3, label: "Not me", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "evidence", order: 3, label: "Not me", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "offer_split_keep"})
-SET o += {flow: "offer", step: "split", order: 0, label: "Keep these", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "offer", step: "split", order: 0, label: "Keep these", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "review_yes"})
-SET o += {flow: "review", step: "row", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "review", step: "row", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "review_no"})
-SET o += {flow: "review", step: "row", order: 1, label: "No", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "review", step: "row", order: 1, label: "No", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "review_not_sure"})
-SET o += {flow: "review", step: "row", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "review", step: "row", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "review_done"})
-SET o += {flow: "review", step: "block", order: 0, label: "Done", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "review", step: "block", order: 0, label: "Done", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "review_not_now"})
-SET o += {flow: "review", step: "block", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "review", step: "block", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "patterns_remove"})
-SET o += {flow: "reflect", step: "patterns", order: 0, label: "Remove", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "reflect", step: "patterns", order: 0, label: "Remove", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "tag_new_one"})
-SET o += {flow: "tag", step: "tag", order: 0, label: "A new one", kind: "chip", flag: null, selfLike: null, branch: "new", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "tag", step: "tag", order: 0, label: "A new one", kind: "chip", flag: null, selfLike: null, branch: "new", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "tag_skip"})
-SET o += {flow: "tag", step: "tag", order: 1, label: "Skip", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "tag", step: "tag", order: 1, label: "Skip", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "tag_later_yes"})
-SET o += {flow: "tag", step: "new", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "tag", step: "new", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "tag_later_no"})
-SET o += {flow: "tag", step: "new", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "tag", step: "new", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "tag_shape_yes"})
-SET o += {flow: "tag", step: "shape", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "keep", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "tag", step: "shape", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "keep", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "tag_shape_no"})
-SET o += {flow: "tag", step: "shape", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "tag", step: "shape", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "ps_later"})
-SET o += {flow: "ps", step: "ambivalence", order: 0, label: "Want to get to know that part another time?", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "ps", step: "ambivalence", order: 0, label: "Want to get to know that part another time?", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "when_mornings"})
-SET o += {flow: "common", step: "stats", order: 0, label: "mornings", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "common", step: "stats", order: 0, label: "mornings", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "when_afternoons"})
-SET o += {flow: "common", step: "stats", order: 1, label: "afternoons", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "common", step: "stats", order: 1, label: "afternoons", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "when_evenings"})
-SET o += {flow: "common", step: "stats", order: 2, label: "evenings", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "common", step: "stats", order: 2, label: "evenings", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "when_nights"})
-SET o += {flow: "common", step: "stats", order: 3, label: "at night", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "common", step: "stats", order: 3, label: "at night", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "angry_next"})
-SET o += {flow: "angry", step: "unblend", order: 0, label: "Okay", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "unblend", order: 0, label: "Okay", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "angry_not_now"})
-SET o += {flow: "angry", step: "unblend", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "unblend", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "angry_not_now_plain"})
-SET o += {flow: "angry", step: "unblend", order: 2, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "unblend", order: 2, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "angry_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "angry_done", "field": "label", "kind": "chip", "text": "Done"}, {"id": "angry_back", "field": "label", "kind": "chip", "text": "Back"}, {"id": "angry_vote_next", "field": "label", "kind": "chip", "text": "Next"}, {"id": "angry_later", "field": "label", "kind": "chip", "text": "Spend a minute with it later?"}, {"id": "louder_body", "field": "label", "kind": "chip", "text": "Something for my body"}, {"id": "louder_not_now", "field": "label", "kind": "chip", "text": "Not now"}, {"id": "checkback_settled", "field": "label", "kind": "chip", "text": "Settled"}, {"id": "checkback_same", "field": "label", "kind": "chip", "text": "Same"}, {"id": "checkback_louder", "field": "label", "kind": "chip", "text": "Louder"}, {"id": "checkback_skip", "field": "label", "kind": "chip", "text": "Skip"}, {"id": "close_checkback_yes", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "close_checkback_no", "field": "label", "kind": "chip", "text": "No thanks"}, {"id": "cope_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "cope_skip", "field": "label", "kind": "chip", "text": "Skip"}, {"id": "cope_own", "field": "label", "kind": "chip", "text": "In my words"}, {"id": "cope_change", "field": "label", "kind": "chip", "text": "Change it"}, {"id": "cope_save", "field": "label", "kind": "chip", "text": "Save"}, {"id": "debrief_yes", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "debrief_a_bit", "field": "label", "kind": "chip", "text": "A bit"}, {"id": "debrief_no", "field": "label", "kind": "chip", "text": "No"}, {"id": "far_away_look", "field": "label", "kind": "chip", "text": "Look around the room first"}, {"id": "far_away_go_on", "field": "label", "kind": "chip", "text": "Go on"}, {"id": "blend_notice", "field": "label", "kind": "chip", "text": "I can notice it"}, {"id": "blend_running", "field": "label", "kind": "chip", "text": "It's running things"}, {"id": "blend_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "blend_pulls_notice", "field": "label", "kind": "chip", "text": "I can notice them"}, {"id": "blend_pulls_running", "field": "label", "kind": "chip", "text": "One of them is running things"}, {"id": "blend_pulls_not_sure", "field": "label", "kind": "chip", "text": "Not sure"}, {"id": "say_thanks", "field": "label", "kind": "chip", "text": "Thank you for trying"}]
 MERGE (o:PartOption {id: "angry_not_sure"})
-SET o += {flow: "angry", step: "protects", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "protects", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "angry_done"})
-SET o += {flow: "angry", step: "speak", order: 0, label: "Done", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "speak", order: 0, label: "Done", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "angry_back"})
-SET o += {flow: "angry", step: "chrome", order: 0, label: "Back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "chrome", order: 0, label: "Back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "angry_vote_next"})
-SET o += {flow: "angry", step: "vote", order: 0, label: "Next", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "vote", order: 0, label: "Next", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "angry_later"})
-SET o += {flow: "angry", step: "speak", order: 1, label: "Spend a minute with it later?", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "angry", step: "speak", order: 1, label: "Spend a minute with it later?", kind: "chip", flag: null, selfLike: null, branch: "candidate", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "louder_body"})
-SET o += {flow: "aftercare", step: "louder", order: 0, label: "Something for my body", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "aftercare", step: "louder", order: 0, label: "Something for my body", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "louder_not_now"})
-SET o += {flow: "aftercare", step: "louder", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "aftercare", step: "louder", order: 1, label: "Not now", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "checkback_settled"})
-SET o += {flow: "checkback", step: "checkback", order: 0, label: "Settled", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "checkback", step: "checkback", order: 0, label: "Settled", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "checkback_same"})
-SET o += {flow: "checkback", step: "checkback", order: 1, label: "Same", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "checkback", step: "checkback", order: 1, label: "Same", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "checkback_louder"})
-SET o += {flow: "checkback", step: "checkback", order: 2, label: "Louder", kind: "chip", flag: null, selfLike: null, branch: "aftercare", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "checkback", step: "checkback", order: 2, label: "Louder", kind: "chip", flag: null, selfLike: null, branch: "aftercare", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "checkback_skip"})
-SET o += {flow: "checkback", step: "checkback", order: 3, label: "Skip", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "checkback", step: "checkback", order: 3, label: "Skip", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "close_checkback_yes"})
-SET o += {flow: "meet", step: "close", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "checkback", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "close", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "checkback", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "close_checkback_no"})
-SET o += {flow: "meet", step: "close", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "meet", step: "close", order: 1, label: "No thanks", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "cope_not_sure"})
-SET o += {flow: "dearman", step: "cope", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "cope", order: 0, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "cope_skip"})
-SET o += {flow: "dearman", step: "cope", order: 1, label: "Skip", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "cope", order: 1, label: "Skip", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "cope_own"})
-SET o += {flow: "dearman", step: "cope", order: 2, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "cope", order: 2, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "cope_change"})
-SET o += {flow: "dearman", step: "cope", order: 3, label: "Change it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "cope", order: 3, label: "Change it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "cope_save"})
-SET o += {flow: "dearman", step: "cope", order: 4, label: "Save", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "cope", order: 4, label: "Save", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "debrief_yes"})
-SET o += {flow: "dearman", step: "debrief", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "debrief", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "debrief_a_bit"})
-SET o += {flow: "dearman", step: "debrief", order: 1, label: "A bit", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "debrief", order: 1, label: "A bit", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "debrief_no"})
-SET o += {flow: "dearman", step: "debrief", order: 2, label: "No", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "dearman", step: "debrief", order: 2, label: "No", kind: "chip", flag: null, selfLike: null, branch: "end", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "far_away_look"})
-SET o += {flow: "gate", step: "dissociation", order: 0, label: "Look around the room first", kind: "chip", flag: null, selfLike: null, branch: "grounding", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "dissociation", order: 0, label: "Look around the room first", kind: "chip", flag: null, selfLike: null, branch: "grounding", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "far_away_go_on"})
-SET o += {flow: "gate", step: "dissociation", order: 1, label: "Go on", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "dissociation", order: 1, label: "Go on", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "blend_notice"})
-SET o += {flow: "gate", step: "blend", order: 0, label: "I can notice it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "blend", order: 0, label: "I can notice it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "blend_running"})
-SET o += {flow: "gate", step: "blend", order: 1, label: "It's running things", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "blend", order: 1, label: "It's running things", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "blend_not_sure"})
-SET o += {flow: "gate", step: "blend", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "blend", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "blend_pulls_notice"})
-SET o += {flow: "gate", step: "blend_pulls", order: 0, label: "I can notice them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "blend_pulls", order: 0, label: "I can notice them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "blend_pulls_running"})
-SET o += {flow: "gate", step: "blend_pulls", order: 1, label: "One of them is running things", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "blend_pulls", order: 1, label: "One of them is running things", kind: "chip", flag: null, selfLike: null, branch: "body_first", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "blend_pulls_not_sure"})
-SET o += {flow: "gate", step: "blend_pulls", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "gate", step: "blend_pulls", order: 2, label: "Not sure", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_thanks"})
-SET o += {flow: "say", step: "say", order: 0, label: "Thank you for trying", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say", order: 0, label: "Thank you for trying", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "say_got_this", "field": "label", "kind": "chip", "text": "I've got this one"}, {"id": "say_rest", "field": "label", "kind": "chip", "text": "You can rest now"}, {"id": "say_listening", "field": "label", "kind": "chip", "text": "I'm listening"}, {"id": "say_see", "field": "label", "kind": "chip", "text": "I see how hard you work"}, {"id": "say_own", "field": "label", "kind": "chip", "text": "In my words"}, {"id": "say_here", "field": "label", "kind": "chip", "text": "I'm here"}, {"id": "say_safe", "field": "label", "kind": "chip", "text": "You're safe with me now"}, {"id": "say_tender_listening", "field": "label", "kind": "chip", "text": "I'm listening"}, {"id": "say_tender_own", "field": "label", "kind": "chip", "text": "In my words"}, {"id": "revisit_same", "field": "label", "kind": "chip", "text": "Yes"}, {"id": "revisit_less", "field": "label", "kind": "chip", "text": "Less than before"}, {"id": "revisit_new", "field": "label", "kind": "chip", "text": "It's doing something new"}, {"id": "revisit_resting_opt", "field": "label", "kind": "chip", "text": "It's resting"}, {"id": "revisit_still_quiet", "field": "label", "kind": "chip", "text": "Still quiet"}, {"id": "revisit_back", "field": "label", "kind": "chip", "text": "It's back"}, {"id": "want_not_left", "field": "label", "kind": "chip", "text": "not to be left"}, {"id": "want_safe_in_it", "field": "label", "kind": "chip", "text": "to stay safe in it"}, {"id": "want_matter_someone", "field": "label", "kind": "chip", "text": "to matter to someone"}, {"id": "chase_worry_drift", "field": "label", "kind": "chip", "text": "They'd drift away and I'd lose them"}, {"id": "chase_worry_nobody_knows", "field": "label", "kind": "chip", "text": "Nobody would know I need them"}, {"id": "hide_worry_too_much", "field": "label", "kind": "chip", "text": "I'd be too much and they'd leave"}, {"id": "hide_worry_hurt_worse", "field": "label", "kind": "chip", "text": "I'd get hurt worse"}, {"id": "want_safe", "field": "label", "kind": "chip", "text": "to be safe"}, {"id": "want_treated_well", "field": "label", "kind": "chip", "text": "to be treated well"}, {"id": "want_keep_what_matters", "field": "label", "kind": "chip", "text": "to keep what matters"}, {"id": "hit_back_worry_walked_over", "field": "label", "kind": "chip", "text": "I'd get walked over"}, {"id": "hit_back_worry_never_change", "field": "label", "kind": "chip", "text": "Nothing would ever change"}, {"id": "peace_worry_blow_up", "field": "label", "kind": "chip", "text": "It would blow up"}, {"id": "peace_worry_lose_them", "field": "label", "kind": "chip", "text": "I'd lose them"}, {"id": "want_matter", "field": "label", "kind": "chip", "text": "to matter"}]
 MERGE (o:PartOption {id: "say_got_this"})
-SET o += {flow: "say", step: "say", order: 1, label: "I've got this one", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say", order: 1, label: "I've got this one", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_rest"})
-SET o += {flow: "say", step: "say", order: 2, label: "You can rest now", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say", order: 2, label: "You can rest now", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_listening"})
-SET o += {flow: "say", step: "say", order: 3, label: "I'm listening", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say", order: 3, label: "I'm listening", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_see"})
-SET o += {flow: "say", step: "say", order: 4, label: "I see how hard you work", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say", order: 4, label: "I see how hard you work", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_own"})
-SET o += {flow: "say", step: "say", order: 5, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say", order: 5, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_here"})
-SET o += {flow: "say", step: "say_tender", order: 0, label: "I'm here", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say_tender", order: 0, label: "I'm here", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_safe"})
-SET o += {flow: "say", step: "say_tender", order: 1, label: "You're safe with me now", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say_tender", order: 1, label: "You're safe with me now", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_tender_listening"})
-SET o += {flow: "say", step: "say_tender", order: 2, label: "I'm listening", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say_tender", order: 2, label: "I'm listening", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "say_tender_own"})
-SET o += {flow: "say", step: "say_tender", order: 3, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "say", step: "say_tender", order: 3, label: "In my words", kind: "chip", flag: null, selfLike: null, branch: "own_words", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "revisit_same"})
-SET o += {flow: "me", step: "revisit", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "me", step: "revisit", order: 0, label: "Yes", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "revisit_less"})
-SET o += {flow: "me", step: "revisit", order: 1, label: "Less than before", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "me", step: "revisit", order: 1, label: "Less than before", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "revisit_new"})
-SET o += {flow: "me", step: "revisit", order: 2, label: "It's doing something new", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "me", step: "revisit", order: 2, label: "It's doing something new", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "revisit_resting_opt"})
-SET o += {flow: "me", step: "revisit", order: 3, label: "It's resting", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "me", step: "revisit", order: 3, label: "It's resting", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "revisit_still_quiet"})
-SET o += {flow: "me", step: "revisit", order: 4, label: "Still quiet", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "me", step: "revisit", order: 4, label: "Still quiet", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "revisit_back"})
-SET o += {flow: "me", step: "revisit", order: 5, label: "It's back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "me", step: "revisit", order: 5, label: "It's back", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "want_not_left"})
-SET o += {flow: "pulls", step: "both_want", order: 1, label: "not to be left", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 1, label: "not to be left", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "want_safe_in_it"})
-SET o += {flow: "pulls", step: "both_want", order: 2, label: "to stay safe in it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 2, label: "to stay safe in it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "want_matter_someone"})
-SET o += {flow: "pulls", step: "both_want", order: 3, label: "to matter to someone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 3, label: "to matter to someone", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_worry_drift"})
-SET o += {flow: "pulls", step: "worry", order: 1, label: "They'd drift away and I'd lose them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 1, label: "They'd drift away and I'd lose them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "chase_worry_nobody_knows"})
-SET o += {flow: "pulls", step: "worry", order: 2, label: "Nobody would know I need them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 2, label: "Nobody would know I need them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_worry_too_much"})
-SET o += {flow: "pulls", step: "worry", order: 3, label: "I'd be too much and they'd leave", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 3, label: "I'd be too much and they'd leave", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hide_worry_hurt_worse"})
-SET o += {flow: "pulls", step: "worry", order: 4, label: "I'd get hurt worse", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 4, label: "I'd get hurt worse", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "want_safe"})
-SET o += {flow: "pulls", step: "both_want", order: 4, label: "to be safe", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 4, label: "to be safe", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "want_treated_well"})
-SET o += {flow: "pulls", step: "both_want", order: 5, label: "to be treated well", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 5, label: "to be treated well", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "want_keep_what_matters"})
-SET o += {flow: "pulls", step: "both_want", order: 6, label: "to keep what matters", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 6, label: "to keep what matters", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_worry_walked_over"})
-SET o += {flow: "pulls", step: "worry", order: 5, label: "I'd get walked over", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 5, label: "I'd get walked over", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_worry_never_change"})
-SET o += {flow: "pulls", step: "worry", order: 6, label: "Nothing would ever change", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 6, label: "Nothing would ever change", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_worry_blow_up"})
-SET o += {flow: "pulls", step: "worry", order: 7, label: "It would blow up", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 7, label: "It would blow up", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "peace_worry_lose_them"})
-SET o += {flow: "pulls", step: "worry", order: 8, label: "I'd lose them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 8, label: "I'd lose them", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "want_matter"})
-SET o += {flow: "pulls", step: "both_want", order: 7, label: "to matter", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "both_want", order: 7, label: "to matter", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // @parts-copy-json [{"id": "small_worry_too_much", "field": "label", "kind": "chip", "text": "I'd be too much"}, {"id": "small_worry_turn_on_me", "field": "label", "kind": "chip", "text": "They'd turn on me"}, {"id": "hit_back_worry_stop_mattering", "field": "label", "kind": "chip", "text": "I'd stop mattering"}, {"id": "hit_back_worry_keep_doing_it", "field": "label", "kind": "chip", "text": "They'd keep doing it"}]
 MERGE (o:PartOption {id: "small_worry_too_much"})
-SET o += {flow: "pulls", step: "worry", order: 9, label: "I'd be too much", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 9, label: "I'd be too much", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "small_worry_turn_on_me"})
-SET o += {flow: "pulls", step: "worry", order: 10, label: "They'd turn on me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 10, label: "They'd turn on me", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_worry_stop_mattering"})
-SET o += {flow: "pulls", step: "worry", order: 11, label: "I'd stop mattering", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 11, label: "I'd stop mattering", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (o:PartOption {id: "hit_back_worry_keep_doing_it"})
-SET o += {flow: "pulls", step: "worry", order: 12, label: "They'd keep doing it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET o += {flow: "pulls", step: "worry", order: 12, label: "They'd keep doing it", kind: "chip", flag: null, selfLike: null, branch: "continue", reviewStatus: "approved", version: "parts-v1", pending: null};
 // offered only for these moves (no edge: offered for any move)
 MATCH (:PartOption)-[r:OFFERED_FOR]->(:ProtectiveMove) DELETE r;
 MATCH (a:PartOption {id: "hide_voice_see"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_voice_leave_first"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_voice_safer_alone"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_voice_fix_now"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_voice_not_angry"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_voice_dont_let_go"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_voice_cant_talk"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_voice_slide"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_voice_agree"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_voice_not_a_thing"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_voice_not_worth"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_voice_always"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_voice_my_fault"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_voice_too_much"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_voice_dont_ask"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_voice_dont_deserve"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_voice_wrong"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_voice_leave"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_voice_off"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_voice_later"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_voice_not_today"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_job_out_of_sight"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_job_pushed_out"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_job_worse"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_job_dont_leave"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_job_answer"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_job_seriously"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_job_stop_them"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_job_calm"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_job_nobody_angry"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_job_not_again"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_job_get_there_first"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_job_too_much"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_job_bother"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_job_trouble"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_job_surprise"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_job_failing"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_job_hard_talk"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "fear_old_hurt"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "fear_old_hurt"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 1, reviewStatus: "draft"};
+SET r += {order: 1, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "fear_old_hurt"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 2, reviewStatus: "draft"};
+SET r += {order: 2, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "fear_old_hurt"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 3, reviewStatus: "draft"};
+SET r += {order: 3, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "fear_old_hurt"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 4, reviewStatus: "draft"};
+SET r += {order: 4, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "fear_cant_handle"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_fear_too_much"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_fear_regret"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_fear_not_know"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_fear_waiting"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_fear_walk_over"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_fear_stop_mattering"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_fear_take_back"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_fear_angry"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_fear_lose_them"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_fear_fight"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_fear_hurt_people"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_fear_careless"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_fear_hurt_myself"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_fear_burden"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_fear_annoyed"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_fear_off_guard"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_fear_miss_it"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_cant_do_it"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_hard_talk"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_might_not_help"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_lose_something"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_need_help"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_rather_need_someone"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hide_rather_break"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_rather_ask"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "chase_rather_wait"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_rather_matters"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "hit_back_rather_stand_up"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_rather_notice"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "peace_rather_say_no"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_rather_kindly"}), (b:ProtectiveMove {id: "turn_on_myself"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_rather_small_things"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_rather_allowed"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_rather_rest"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_rather_safe"}), (b:ProtectiveMove {id: "keep_watch"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_rather_start_small"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_rather_ready"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:OFFERED_FOR]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 // the same answer in another module
 MATCH (:PartOption)-[r:SAME_AS]->(:ThoughtPattern) DELETE r;
 MATCH (:PartOption)-[r:SAME_AS]->(:AmbivalenceOption) DELETE r;
 MATCH (a:PartOption {id: "peace_voice_not_worth"}), (b:ThoughtPattern {id: "thought_not_worth"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_voice_my_fault"}), (b:ThoughtPattern {id: "thought_my_fault"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "turn_voice_too_much"}), (b:ThoughtPattern {id: "thought_too_much"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "small_voice_dont_deserve"}), (b:ThoughtPattern {id: "thought_dont_deserve"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_voice_wrong"}), (b:ThoughtPattern {id: "thought_wrong"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "watch_voice_leave"}), (b:ThoughtPattern {id: "thought_will_leave"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_hard_talk"}), (b:AmbivalenceOption {id: "ambiv-hard-conversation"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_might_not_help"}), (b:AmbivalenceOption {id: "ambiv-change-might-not-help"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_lose_something"}), (b:AmbivalenceOption {id: "ambiv-losing-something"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 MATCH (a:PartOption {id: "off_fear_need_help"}), (b:AmbivalenceOption {id: "ambiv-admitting-need-help"})
 MERGE (a)-[r:SAME_AS]->(b)
-SET r += {reviewStatus: "draft"};
+SET r += {reviewStatus: "approved"};
 
 // --- Two pulls: offerable moves only; each side's worries are what it fears if the other wins ---
 MERGE (p:PolarityPair {id: "chase_hide"})
-SET p += {a: "chase", b: "hide", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {a: "chase", b: "hide", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PolarityPair {id: "hit_back_keep_the_peace"})
-SET p += {a: "hit_back", b: "keep_the_peace", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {a: "hit_back", b: "keep_the_peace", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (p:PolarityPair {id: "take_less_room_hit_back"})
-SET p += {a: "take_less_room", b: "hit_back", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {a: "take_less_room", b: "hit_back", reviewStatus: "approved", version: "parts-v1", pending: null};
 MATCH (:PolarityPair)-[r:HAS_SIDE]->(:ProtectiveMove) DELETE r;
 MATCH (:PolarityPair)-[r:BOTH_WANT|WORRY]->(:PartOption) DELETE r;
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:ProtectiveMove {id: "chase"})
 MERGE (a)-[r:HAS_SIDE]->(b)
-SET r += {side: "a", reviewStatus: "draft"};
+SET r += {side: "a", reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:ProtectiveMove {id: "hide"})
 MERGE (a)-[r:HAS_SIDE]->(b)
-SET r += {side: "b", reviewStatus: "draft"};
+SET r += {side: "b", reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:PartOption {id: "want_not_left"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:PartOption {id: "want_safe_in_it"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 1, reviewStatus: "draft"};
+SET r += {order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:PartOption {id: "want_matter_someone"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 2, reviewStatus: "draft"};
+SET r += {order: 2, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:PartOption {id: "chase_worry_drift"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "a", order: 0, reviewStatus: "draft"};
+SET r += {side: "a", order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:PartOption {id: "chase_worry_nobody_knows"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "a", order: 1, reviewStatus: "draft"};
+SET r += {side: "a", order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:PartOption {id: "hide_worry_too_much"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "b", order: 0, reviewStatus: "draft"};
+SET r += {side: "b", order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "chase_hide"}), (b:PartOption {id: "hide_worry_hurt_worse"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "b", order: 1, reviewStatus: "draft"};
+SET r += {side: "b", order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:HAS_SIDE]->(b)
-SET r += {side: "a", reviewStatus: "draft"};
+SET r += {side: "a", reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:ProtectiveMove {id: "keep_the_peace"})
 MERGE (a)-[r:HAS_SIDE]->(b)
-SET r += {side: "b", reviewStatus: "draft"};
+SET r += {side: "b", reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:PartOption {id: "want_safe"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:PartOption {id: "want_treated_well"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 1, reviewStatus: "draft"};
+SET r += {order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:PartOption {id: "want_keep_what_matters"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 2, reviewStatus: "draft"};
+SET r += {order: 2, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:PartOption {id: "hit_back_worry_walked_over"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "a", order: 0, reviewStatus: "draft"};
+SET r += {side: "a", order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:PartOption {id: "hit_back_worry_never_change"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "a", order: 1, reviewStatus: "draft"};
+SET r += {side: "a", order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:PartOption {id: "peace_worry_blow_up"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "b", order: 0, reviewStatus: "draft"};
+SET r += {side: "b", order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "hit_back_keep_the_peace"}), (b:PartOption {id: "peace_worry_lose_them"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "b", order: 1, reviewStatus: "draft"};
+SET r += {side: "b", order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:ProtectiveMove {id: "take_less_room"})
 MERGE (a)-[r:HAS_SIDE]->(b)
-SET r += {side: "a", reviewStatus: "draft"};
+SET r += {side: "a", reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:HAS_SIDE]->(b)
-SET r += {side: "b", reviewStatus: "draft"};
+SET r += {side: "b", reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:PartOption {id: "want_matter"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 0, reviewStatus: "draft"};
+SET r += {order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:PartOption {id: "want_safe"})
 MERGE (a)-[r:BOTH_WANT]->(b)
-SET r += {order: 1, reviewStatus: "draft"};
+SET r += {order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:PartOption {id: "small_worry_too_much"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "a", order: 0, reviewStatus: "draft"};
+SET r += {side: "a", order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:PartOption {id: "small_worry_turn_on_me"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "a", order: 1, reviewStatus: "draft"};
+SET r += {side: "a", order: 1, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:PartOption {id: "hit_back_worry_stop_mattering"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "b", order: 0, reviewStatus: "draft"};
+SET r += {side: "b", order: 0, reviewStatus: "approved"};
 MATCH (a:PolarityPair {id: "take_less_room_hit_back"}), (b:PartOption {id: "hit_back_worry_keep_doing_it"})
 MERGE (a)-[r:WORRY]->(b)
-SET r += {side: "b", order: 1, reviewStatus: "draft"};
+SET r += {side: "b", order: 1, reviewStatus: "approved"};
 
 // --- Trails (enabled false until Claudia reviews the rules on real data) ---
 // @parts-copy-json [{"id": "trail_move_in_context", "field": "statementTemplate", "kind": "prompt", "text": "When {context}, the pull is to {pull}."}, {"id": "trail_sequence", "field": "statementTemplate", "kind": "prompt", "text": "After the pull to {pull}, the pull to {pull2} often comes next."}, {"id": "trail_two_pulls", "field": "statementTemplate", "kind": "prompt", "text": "When {context}, two pulls: to {pull} and to {pull2}."}, {"id": "trail_known_part", "field": "statementTemplate", "kind": "prompt", "text": "Was this {name}?"}]
 MERGE (t:TrailRule {id: "trail_move_in_context"})
-SET t += {shape: "A", minEpisodes: 4, windowDays: 42, minSpanDays: 14, minTools: 2, contextShare: 0.6, cooldownDays: 28, enabled: false, statementTemplate: "When {context}, the pull is to {pull}.", withinHours: null, lift: null, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET t += {shape: "A", minEpisodes: 4, windowDays: 42, minSpanDays: 14, minTools: 2, contextShare: 0.6, cooldownDays: 28, enabled: false, statementTemplate: "When {context}, the pull is to {pull}.", withinHours: null, lift: null, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (t:TrailRule {id: "trail_sequence"})
-SET t += {shape: "B", minEpisodes: 3, windowDays: 42, minSpanDays: null, minTools: null, contextShare: null, cooldownDays: 28, enabled: false, statementTemplate: "After the pull to {pull}, the pull to {pull2} often comes next.", withinHours: 24, lift: 2.0, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET t += {shape: "B", minEpisodes: 3, windowDays: 42, minSpanDays: null, minTools: null, contextShare: null, cooldownDays: 28, enabled: false, statementTemplate: "After the pull to {pull}, the pull to {pull2} often comes next.", withinHours: 24, lift: 2.0, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (t:TrailRule {id: "trail_two_pulls"})
-SET t += {shape: "C", minEpisodes: 3, windowDays: 42, minSpanDays: null, minTools: null, contextShare: null, cooldownDays: 28, enabled: false, statementTemplate: "When {context}, two pulls: to {pull} and to {pull2}.", withinHours: null, lift: null, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET t += {shape: "C", minEpisodes: 3, windowDays: 42, minSpanDays: null, minTools: null, contextShare: null, cooldownDays: 28, enabled: false, statementTemplate: "When {context}, two pulls: to {pull} and to {pull2}.", withinHours: null, lift: null, reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (t:TrailRule {id: "trail_known_part"})
-SET t += {shape: "D", minEpisodes: 3, windowDays: null, minSpanDays: null, minTools: null, contextShare: null, cooldownDays: 14, enabled: false, statementTemplate: "Was this {name}?", withinHours: null, lift: null, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET t += {shape: "D", minEpisodes: 3, windowDays: null, minSpanDays: null, minTools: null, contextShare: null, cooldownDays: 14, enabled: false, statementTemplate: "Was this {name}?", withinHours: null, lift: null, reviewStatus: "approved", version: "parts-v1", pending: null};
 // what fills {context}: only contexts the app already stores
 // @parts-copy-json [{"id": "ctx_trigger_someone", "field": "phrase", "kind": "prompt", "text": "it's about someone"}, {"id": "ctx_trigger_situation", "field": "phrase", "kind": "prompt", "text": "it's about a situation"}, {"id": "ctx_trigger_body", "field": "phrase", "kind": "prompt", "text": "it starts in your body"}, {"id": "ctx_event_brushed", "field": "phrase", "kind": "prompt", "text": "someone brushes you off"}, {"id": "ctx_event_unheard", "field": "phrase", "kind": "prompt", "text": "you're not heard"}, {"id": "ctx_event_mocked", "field": "phrase", "kind": "prompt", "text": "someone mocks you"}, {"id": "ctx_event_small", "field": "phrase", "kind": "prompt", "text": "you're made small"}, {"id": "ctx_event_ignored", "field": "phrase", "kind": "prompt", "text": "you're left out"}, {"id": "ctx_event_leaving", "field": "phrase", "kind": "prompt", "text": "someone pulls away"}, {"id": "ctx_event_blocked", "field": "phrase", "kind": "prompt", "text": "you keep getting blocked"}, {"id": "ctx_event_stewing", "field": "phrase", "kind": "prompt", "text": "it keeps happening"}, {"id": "ctx_time_morning", "field": "phrase", "kind": "prompt", "text": "it's morning"}, {"id": "ctx_time_afternoon", "field": "phrase", "kind": "prompt", "text": "it's afternoon"}, {"id": "ctx_time_evening", "field": "phrase", "kind": "prompt", "text": "it's evening"}, {"id": "ctx_time_night", "field": "phrase", "kind": "prompt", "text": "it's late at night"}]
 MERGE (c:TrailContext {id: "ctx_trigger_someone"})
-SET c += {key: "trigger", value: "someone", phrase: "it's about someone", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "trigger", value: "someone", phrase: "it's about someone", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_trigger_situation"})
-SET c += {key: "trigger", value: "situation", phrase: "it's about a situation", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "trigger", value: "situation", phrase: "it's about a situation", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_trigger_body"})
-SET c += {key: "trigger", value: "body", phrase: "it starts in your body", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "trigger", value: "body", phrase: "it starts in your body", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_brushed"})
-SET c += {key: "event", value: "brushed", phrase: "someone brushes you off", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "brushed", phrase: "someone brushes you off", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_unheard"})
-SET c += {key: "event", value: "unheard", phrase: "you're not heard", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "unheard", phrase: "you're not heard", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_mocked"})
-SET c += {key: "event", value: "mocked", phrase: "someone mocks you", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "mocked", phrase: "someone mocks you", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_small"})
-SET c += {key: "event", value: "small", phrase: "you're made small", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "small", phrase: "you're made small", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_ignored"})
-SET c += {key: "event", value: "ignored", phrase: "you're left out", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "ignored", phrase: "you're left out", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_leaving"})
-SET c += {key: "event", value: "leaving", phrase: "someone pulls away", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "leaving", phrase: "someone pulls away", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_blocked"})
-SET c += {key: "event", value: "blocked", phrase: "you keep getting blocked", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "blocked", phrase: "you keep getting blocked", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_event_stewing"})
-SET c += {key: "event", value: "stewing", phrase: "it keeps happening", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "event", value: "stewing", phrase: "it keeps happening", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_time_morning"})
-SET c += {key: "timeBand", value: "morning", phrase: "it's morning", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "timeBand", value: "morning", phrase: "it's morning", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_time_afternoon"})
-SET c += {key: "timeBand", value: "afternoon", phrase: "it's afternoon", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "timeBand", value: "afternoon", phrase: "it's afternoon", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_time_evening"})
-SET c += {key: "timeBand", value: "evening", phrase: "it's evening", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "timeBand", value: "evening", phrase: "it's evening", reviewStatus: "approved", version: "parts-v1", pending: null};
 MERGE (c:TrailContext {id: "ctx_time_night"})
-SET c += {key: "timeBand", value: "night", phrase: "it's late at night", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET c += {key: "timeBand", value: "night", phrase: "it's late at night", reviewStatus: "approved", version: "parts-v1", pending: null};
 
 // --- The kill switch and the safety numbers (offersEnabled turns off offers only, never anyone's parts) ---
 MERGE (p:PartsPolicy {id: "parts"})
-SET p += {offersEnabled: false, episodeMergeHours: 2, floodGateHours: 2, crisisPauseHours: 48, dissociationCount: 2, dissociationDays: 14, louderPauseHours: 72, maxNonSelfAnswers: 2, tooManyPartsCount: 3, tooManyPartsDays: 7, harmWindowDays: 28, tenderRepeatCount: 2, nameMaxChars: 40, reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {offersEnabled: false, episodeMergeHours: 2, floodGateHours: 2, crisisPauseHours: 48, dissociationCount: 2, dissociationDays: 14, louderPauseHours: 72, maxNonSelfAnswers: 2, tooManyPartsCount: 3, tooManyPartsDays: 7, harmWindowDays: 28, tenderRepeatCount: 2, nameMaxChars: 40, reviewStatus: "approved", version: "parts-v1", pending: null};
