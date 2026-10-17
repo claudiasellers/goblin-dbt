@@ -57,3 +57,20 @@ export function partsFromFixture(fixture, approve = null) {
     limits: ok(fixture.policy) ? { nameMaxChars: fixture.policy.nameMaxChars, maxNonSelfAnswers: fixture.policy.maxNonSelfAnswers } : null,
   });
 }
+
+/**
+ * Shipped parts content with some lines taken out (prompts, options, moves or hurts, by id): every line is
+ * signed off since 17 Oct (Claudia: ship it all), so a gate's "anything missing, nothing" path is tested
+ * on the real content minus one line rather than on today's file.
+ */
+export function withoutIds(content, ...ids) {
+  const drop = new Set(ids);
+  const c = structuredClone(content);
+  for (const id of drop) delete c.prompts[id];
+  for (const steps of Object.values(c.options)) {
+    for (const [step, list] of Object.entries(steps)) steps[step] = list.filter((o) => !drop.has(o.id));
+  }
+  c.moves = c.moves.filter((m) => !drop.has(m.id));
+  c.hurts = c.hurts.filter((h) => !drop.has(h.id));
+  return c;
+}

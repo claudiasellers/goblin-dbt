@@ -141,13 +141,18 @@ test("shipped spine content: the close flow, and every non-reserved follow-up ty
 test("shipped parts content is content.py's signed-off rows, and nothing a screen doesn't show", () => {
   const parts = shipped("parts.json").content;
   assert.deepEqual(parts, partsFromFixture(JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"))));
-  // Trail rules, contexts and the policy stay on the server; Two pulls' pairs ship as ids.
-  assert.deepEqual(Object.keys(parts).sort(), ["canTouch", "expresses", "hurts", "moves", "options", "pairs", "prompts", "version"]);
-  assert.doesNotMatch(JSON.stringify(parts), /"(reviewStatus|pending)"/);
-  // Every node parts.cypher writes as a draft (content.py's SIGNED_OFF doesn't list it), by label.
-  const drafts = [...readFileSync("schema/parts.cypher", "utf8").matchAll(/^MERGE \(\w:(\w+) \{id: "([^"]+)"\}\)\nSET [^\n]*reviewStatus: "draft"/gm)];
-  assert.ok(drafts.length > 100, `${drafts.length} drafts read from schema/parts.cypher (guards the regex)`);
-  const draft = new Set(drafts.map(([, , id]) => id));
+  // Trail rules and contexts stay on the server; Two pulls' pairs ship as ids. Of the policy, only `limits`
+  // (its two numbers) ships, and only once the policy is signed off (every line signed off 17 Oct, Claudia:
+  // ship it all).
+  assert.deepEqual(Object.keys(parts).sort(), ["canTouch", "expresses", "hurts", "limits", "moves", "options", "pairs", "prompts", "version"]);
+  assert.deepEqual(Object.keys(parts.limits).sort(), ["maxNonSelfAnswers", "nameMaxChars"]);
+  assert.doesNotMatch(JSON.stringify(parts), /"(reviewStatus|pending|offersEnabled|enabled|floodGateHours)"/);
+  // Moves never offered (go_blank, zone_out) never ship, signed off or not.
+  for (const id of ["go_blank", "zone_out"]) assert.ok(!parts.moves.some((m) => m.id === id), id);
+  // Every node parts.cypher writes, by its review (content.py's SIGNED_OFF): the drafts never ship.
+  const reviewed = [...readFileSync("schema/parts.cypher", "utf8").matchAll(/^MERGE \(\w:(\w+) \{id: "([^"]+)"\}\)\nSET [^\n]*reviewStatus: "(draft|approved)"/gm)];
+  assert.ok(reviewed.length > 100, `${reviewed.length} reviewed nodes read from schema/parts.cypher (guards the regex)`);
+  const draft = new Set(reviewed.filter(([, , , st]) => st === "draft").map(([, , id]) => id));
   // No draft row ships, and no shipped row is guarded by a draft move (OFTEN_GUARDS is reviewed by its move).
   // An option's `moves` may name a move not yet signed off, as an option may ship before its prompt: the
   // client's flowReady decides what is complete.

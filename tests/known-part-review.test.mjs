@@ -7,7 +7,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
@@ -18,16 +18,20 @@ const reviewIds = [...lib.KNOWN_PART_REVIEW_REQUIRED.prompts, ...lib.KNOWN_PART_
 const patternIds = [...lib.PLAIN_PATTERNS_REQUIRED.prompts, ...lib.PLAIN_PATTERNS_REQUIRED.options];
 const only = (ids) => partsFromFixture(fixture, (id) => ids.includes(id));
 
-test("copy pins: the row answers, Done / Not now, the unnamed question, the heading and the ×, all drafts", () => {
+test("copy pins: the row answers, Done / Not now, the unnamed question, the heading and the ×, signed off 17 Oct (Claudia: ship it all)", () => {
   assert.deepEqual(fixture.options.review.row.map((o) => [o.id, o.label]), [["review_yes", "Yes"], ["review_no", "No"], ["review_not_sure", "Not sure"]]);
   assert.deepEqual(fixture.options.review.block.map((o) => [o.id, o.label, o.branch]), [["review_done", "Done", "end"], ["review_not_now", "Not now", "end"]]);
   assert.deepEqual([fixture.prompts.review_noname.flow, fixture.prompts.review_noname.copy], ["review", "Was this that part?"]);
   assert.deepEqual([fixture.prompts.patterns_title.flow, fixture.prompts.patterns_title.step, fixture.prompts.patterns_title.copy], ["reflect", "patterns", "How things tend to go"]);
   assert.deepEqual(fixture.options.reflect.patterns.map((o) => [o.id, o.label]), [["patterns_remove", "Remove"]]);
-  for (const id of ["review_noname", "patterns_title"]) assert.equal(fixture.prompts[id].reviewStatus, "draft", id);
-  for (const o of [...fixture.options.review.row, ...fixture.options.review.block, ...fixture.options.reflect.patterns]) assert.equal(o.reviewStatus, "draft", o.id);
-  assert.equal(lib.knownPartReviewReady(shipped), false, "nothing shows today");
-  assert.equal(lib.plainPatternsReady(shipped), false);
+  for (const id of ["review_noname", "patterns_title"]) assert.equal(fixture.prompts[id].reviewStatus, "approved", id);
+  for (const o of [...fixture.options.review.row, ...fixture.options.review.block, ...fixture.options.reflect.patterns]) assert.equal(o.reviewStatus, "approved", o.id);
+  assert.equal(shipped.prompts.review_noname.copy, "Was this that part?");
+  assert.equal(shipped.prompts.patterns_title.copy, "How things tend to go");
+  assert.equal(lib.knownPartReviewReady(shipped), true, "the shipped file has every line");
+  assert.equal(lib.plainPatternsReady(shipped), true);
+  for (const id of reviewIds) assert.equal(lib.knownPartReviewReady(withoutIds(shipped, id)), false, `shipped file without ${id}`);
+  for (const id of patternIds) assert.equal(lib.plainPatternsReady(withoutIds(shipped, id)), false, `shipped file without ${id}`);
   // No parts language in the plain heading.
   assert.doesNotMatch(fixture.prompts.patterns_title.copy, /\bparts?\b/i);
 });

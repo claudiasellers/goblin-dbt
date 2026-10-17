@@ -30,9 +30,18 @@ test("the chip: the hurt's felt phrase alone, only for a hurt the shipped conten
   assert.equal(hurtFeelingChip("brushed_off", null), null);
   // A hurt without its felt phrase isn't offered.
   assert.equal(hurtFeelingChip("brushed_off", hurts.map((h) => ({ ...h, feltPhrase: " " }))), null);
-  // Today nothing is signed off: the shipped file never offers one.
-  assert.equal(hurtFeelingChip("brushed_off", (await getPartsContent()).hurts),
-    fixture.hurts.find((h) => h.id === "brushed_off").reviewStatus === "approved" ? hurtFeelingChip("brushed_off", fixture.hurts) : null);
+  // Every hurt signed off 17 Oct (Claudia: ship it all): the shipped file offers each one's chip, the
+  // same chip the fixture's row makes, and a hurt it lacks still gets none.
+  const shippedHurts = (await getPartsContent()).hurts;
+  assert.deepEqual(shippedHurts.map((h) => h.id).sort(), fixture.hurts.filter((h) => h.reviewStatus === "approved").map((h) => h.id).sort());
+  for (const h of fixture.hurts) {
+    assert.equal(h.reviewStatus, "approved", h.id);
+    assert.notEqual(hurtFeelingChip(h.id, shippedHurts), null, h.id);
+    // The same chip: id, label and NAMED_AS words (the snapshot and the fixture order those words differently).
+    const norm = (c) => ({ ...c, emotionIds: [...c.emotionIds].sort() });
+    assert.deepEqual(norm(hurtFeelingChip(h.id, shippedHurts)), norm(hurtFeelingChip(h.id, fixture.hurts)), h.id);
+  }
+  assert.equal(hurtFeelingChip("brushed_off", shippedHurts.filter((h) => h.id !== "brushed_off")), null);
   // Nothing parts-worded, parts on or off: every shipped felt phrase is the chip as it stands.
   for (const h of fixture.hurts) {
     const chip = hurtFeelingChip(h.id, fixture.hurts);

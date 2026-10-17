@@ -52,7 +52,7 @@ test("thresholds: the report's defaults, harm.ts's defaults and PartsPolicy's nu
     assert.equal(fixture.policy[prop], def[key], `PartsPolicy.${prop} (scripts/parts/content.py)`);
   }
   assert.deepEqual(Object.keys(inReport).sort(), Object.values(props).sort(), "the report reads exactly harm.ts's policy numbers");
-  assert.equal(fixture.policy.reviewStatus, "draft", "PartsPolicy stays a draft until signed off");
+  assert.equal(fixture.policy.reviewStatus, "approved", "PartsPolicy signed off 17 Oct (Claudia: ship it all)");
 });
 
 test("definitions: the report applies harm.ts's rules", () => {

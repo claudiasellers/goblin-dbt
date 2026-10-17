@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const lib = await importTs("src/lib/psAmbivalence.ts");
@@ -30,8 +30,11 @@ test("gate: parts on, the cant-ambivalent barrier, both lines shipped; anything 
   for (const b of ["cant-overwhelmed", "dont-know-how", null, undefined]) assert.equal(lib.psLaterCopy(both, true, b), null, `barrier ${b}`);
   for (const id of IDS) assert.equal(lib.psLaterCopy(shipped(IDS.filter((x) => x !== id)), true, "cant-ambivalent"), null, `${id} missing`);
   assert.equal(lib.psLaterCopy(null, true, "cant-ambivalent"), null, "content not loaded");
-  assert.equal(lib.psLaterCopy(partsFromFixture(fixture), true, "cant-ambivalent"),
-    fixture.prompts.ps_later_done.reviewStatus === "approved" ? lib.psLaterCopy(both, true, "cant-ambivalent") : null, "drafts today: no line");
+  // Signed off 17 Oct (Claudia: ship it all): the shipped file says the line; either line out of it, nothing.
+  const real = JSON.parse(read("src/data/content/parts.json")).content;
+  assert.deepEqual(lib.psLaterCopy(real, true, "cant-ambivalent"),
+    { ask: "Want to get to know that part another time?", done: "It's in Me when you want it." }, "the shipped file");
+  for (const id of IDS) assert.equal(lib.psLaterCopy(withoutIds(real, id), true, "cant-ambivalent"), null, `shipped file without ${id}`);
 });
 
 test("payload: origin ps_ambivalence, the move cant-ambivalent expresses, no tool session (still open)", () => {

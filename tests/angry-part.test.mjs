@@ -125,16 +125,18 @@ test("hurt order with a Recover state: what it can touch first, in CAN_TOUCH ord
 // ---- Recover's host: is the card ready, from the shipped (signed-off only) parts content ----
 const { angryReady, angryPromptIds, angryOptionIds } = await importTs("src/lib/angryPart.ts");
 const { getPartsContent } = await importTs("src/services/partsContent.ts");
-const { partsFromFixture } = await import("./lib/partsContentFixture.mjs");
+const { partsFromFixture, withoutIds } = await import("./lib/partsContentFixture.mjs");
 const ANGRY_OPTION_IDS = ["angry_next", "angry_not_sure", "angry_done", "angry_back", "angry_vote_next"];
 /** parts.json as it would be with these ids signed off (and everything else as the fixture has it). */
 const shippedWith = (ids) => partsFromFixture(fixture, (id) => ids.has(id) || ["hit_back", ...fixture.hurts.map((h) => h.id)].includes(id));
 
-test("ready: today nothing is signed off, so the shipped file never shows the card", async () => {
+test("ready: every line signed off 17 Oct (Claudia: ship it all), so the shipped file shows the card, both wordings", async () => {
   const shipped = await getPartsContent();
-  const signed = (id) => fixture.prompts[id]?.reviewStatus === "approved";
-  assert.equal(angryReady(shipped, true), angryPromptIds(true).every(signed));
-  assert.equal(angryReady(shipped, false), angryPromptIds(false).every(signed));
+  assert.equal(angryReady(shipped, true), true);
+  assert.equal(angryReady(shipped, false), true);
+  for (const on of [true, false]) {
+    for (const id of [...angryPromptIds(on), ...angryOptionIds(on)]) assert.equal(angryReady(withoutIds(shipped, id), on), false, `shipped file without ${id} (parts ${on ? "on" : "off"})`);
+  }
 });
 
 test("ready: only the person's wording is needed, every option, and complete hurts", () => {

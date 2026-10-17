@@ -312,7 +312,7 @@ test("drafts until signed off: every node and edge carries reviewStatus, pending
   }
 });
 
-test("the blending check is decided (Claudia, 16 Oct): drafts, not pending, in flow gate; Two pulls asks it about both", (t) => {
+test("the blending check is decided (Claudia, 16 Oct), signed off 17 Oct (Claudia: ship it all): not pending, in flow gate; Two pulls asks it about both", (t) => {
   const BLEND = {
     gate_blend_check: ["blend", null], blend_notice: ["blend", "continue"], blend_running: ["blend", "body_first"],
     blend_not_sure: ["blend", "continue"],
@@ -328,18 +328,18 @@ test("the blending check is decided (Claudia, 16 Oct): drafts, not pending, in f
     if (branch === null) {
       const p = fixture.prompts[id];
       assert.ok(p, id);
-      assert.deepEqual([p.flow, p.step, p.reviewStatus, p.pending], ["gate", step, "draft", undefined], id);
+      assert.deepEqual([p.flow, p.step, p.reviewStatus, p.pending], ["gate", step, "approved", undefined], id);
     } else {
       const o = (fixture.options.gate[step] ?? []).find((x) => x.id === id);
       assert.ok(o, `${id}: an option at gate/${step}`);
-      assert.deepEqual([o.kind, o.branch, o.reviewStatus, o.pending, o.moves], ["chip", branch, "draft", undefined, []], id);
+      assert.deepEqual([o.kind, o.branch, o.reviewStatus, o.pending, o.moves], ["chip", branch, "approved", undefined, []], id);
     }
   }
   if (!needReplay(t)) return;
   for (const id of Object.keys(BLEND)) {
     const n = replay.nodes.PartPrompt[id] ?? replay.nodes.PartOption[id];
     assert.equal(n.pending, undefined, `${id}: the load clears pending (null) on the node`);
-    assert.equal(n.reviewStatus, "draft", id);
+    assert.equal(n.reviewStatus, "approved", id);
   }
 });
 
@@ -358,7 +358,7 @@ test("stale edges: each parts edge type is cleared, scoped to both ends, before 
   for (const s of stmts.filter((x) => /\bDELETE\b/.test(x))) assert.match(s, /^MATCH \((:\w+)?\)-\[r:[A-Z_|]+\]->\(:\w+\) DELETE r$/, s);
 });
 
-test("settings: the switch, about and Delete your parts prompts exist as drafts in the settings flow", () => {
+test("settings: the switch, about and Delete your parts prompts exist in the settings flow, signed off 17 Oct (Claudia: ship it all)", () => {
   const want = {
     switch: ["settings_label", "settings_blurb", "settings_dissociation", "settings_off"],
     about: ["settings_about_1", "settings_about_2"],
@@ -370,7 +370,7 @@ test("settings: the switch, about and Delete your parts prompts exist as drafts 
       assert.ok(p, `${id} missing`);
       assert.deepEqual([p.flow, p.step], ["settings", step], id);
       assert.ok(p.copy.trim(), `${id}: no copy`);
-      assert.equal(p.reviewStatus, "draft", `${id}: signed off? Then update this pin with the sign-off`);
+      assert.equal(p.reviewStatus, "approved", `${id}: signed off 17 Oct (Claudia: ship it all)`);
     }
   }
 });

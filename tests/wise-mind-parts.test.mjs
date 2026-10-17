@@ -9,7 +9,7 @@ import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { MemoryRouter } from "react-router-dom";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const W = await importTs("src/lib/wiseMindParts.ts");
@@ -24,7 +24,7 @@ const C = "00000000-0000-4000-8000-000000000103";
 const part = (id, o = {}) => ({ id, name: `Part ${id.slice(-3)}`, status: "active", tender: false, moveIds: [], firstPlace: null, shapeSig: null,
   lastVisitedAt: null, pausedUntil: null, safety: false, meta: {}, ...o });
 
-test("copy: every 2p line and screen 5's parts line, drafts in flow wise_mind, in the review pack", () => {
+test("copy: every 2p line and screen 5's parts line, in flow wise_mind (signed off 17 Oct), in the review pack", () => {
   for (const id of W.WISE_MIND_PARTS_PROMPTS) assert.equal(fixture.prompts[id]?.flow, "wise_mind", id);
   const options = Object.values(fixture.options.wise_mind ?? {}).flat().map((o) => o.id);
   for (const id of W.WISE_MIND_PARTS_OPTIONS) assert.ok(options.includes(id), id);
@@ -43,11 +43,15 @@ test("the gate: parts on, an active or resting part, and the copy shipped; anyth
   assert.equal(W.partsFormOn({ partsOn: true, parts: [], content: ALL }), false, "no parts");
   assert.equal(W.partsFormOn({ partsOn: true, parts: null, content: ALL }), false, "the slice didn't load");
   assert.equal(W.partsFormOn({ partsOn: true, parts, content: null }), false, "no copy");
-  assert.equal(W.partsFormOn({ partsOn: true, parts, content: shipped }), false, "drafts today: the two minds");
+  // Signed off 17 Oct (Claudia: ship it all): the shipped file opens the parts form; any one line out, the two minds.
+  assert.equal(W.partsFormOn({ partsOn: true, parts, content: shipped }), true, "the shipped file");
+  for (const id of [...W.WISE_MIND_PARTS_REQUIRED.prompts, ...W.WISE_MIND_PARTS_REQUIRED.options]) {
+    assert.equal(W.partsFormOn({ partsOn: true, parts, content: withoutIds(shipped, id) }), false, `shipped file without ${id}`);
+  }
   for (const id of ["wm_who", "wm_unmet", "hold_hint"]) {
     assert.equal(W.partsFormOn({ partsOn: true, parts, content: partsFromFixture(fixture, (x) => x !== id) }), false, id);
   }
-  assert.equal(W.wiseMindPartsCopy(shipped), null);
+  assert.equal(W.wiseMindPartsCopy(shipped).wm_unmet, "A part I haven't met");
   assert.equal(W.wiseMindPartsCopy(ALL).wm_unmet, "A part I haven't met");
 });
 

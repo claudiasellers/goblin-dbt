@@ -13,12 +13,13 @@ const fixture = JSON.parse(readFileSync("tests/fixtures/parts-content.json", "ut
 const everything = partsFromFixture(fixture, () => true);
 const MEET_PROMPTS = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "meet").map(([id]) => id);
 
-test("the service reads the shipped file; Meet a part is ready only once all its prompts are signed off", async () => {
+test("the service reads the shipped file; every Meet a part prompt signed off 17 Oct (Claudia: ship it all), so it is ready", async () => {
   const content = await getPartsContent();
   assert.deepEqual(content, JSON.parse(readFileSync("src/data/content/parts.json", "utf8")).content);
   assert.equal(await getPartsContent(), content, "one load per page");
-  // Today nothing is signed off (content.py SIGNED_OFF is empty), so this is false.
-  assert.equal(flowReady(content, MEET_PROMPTS), MEET_PROMPTS.every((id) => fixture.prompts[id].reviewStatus === "approved"));
+  for (const id of MEET_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "approved", id);
+  assert.equal(flowReady(content, MEET_PROMPTS), true);
+  assert.equal(flowReady(content, [...MEET_PROMPTS, "no_such_prompt"]), false);
 });
 
 test("promptCopy: the copy when signed off, null when not", () => {
