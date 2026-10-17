@@ -56,7 +56,7 @@ export const OFFER_TIMES_QUERY = `
 export const OFFER_STATES_QUERY = `
   MATCH (:User {id: $uid})-[:HAS_TRAIL_OFFER]->(o:TrailOffer)
   RETURN o.id AS id, o.ruleId AS ruleId, o.moveIds AS moveIds, o.contextId AS contextId, o.partId AS partId,
-         o.status AS status, o.answer AS answer, toString(o.cooldownUntil) AS cooldownUntil
+         o.status AS status, o.answer AS answer, toString(o.cooldownUntil) AS cooldownUntil, o.noKeys AS noKeys
 `;
 
 /**
@@ -111,7 +111,7 @@ export async function readOfferStates(tx: ManagedTransaction, uid: string): Prom
   return res.records.map((r) => ({
     id: String(r.get('id')), ruleId: String(r.get('ruleId')), moveIds: strs(r.get('moveIds')),
     contextId: s(r.get('contextId')), partId: s(r.get('partId')), status: String(r.get('status') ?? ''),
-    answer: s(r.get('answer')), cooldownUntil: s(r.get('cooldownUntil')),
+    answer: s(r.get('answer')), cooldownUntil: s(r.get('cooldownUntil')), noKeys: strs(r.get('noKeys')),
   }));
 }
 

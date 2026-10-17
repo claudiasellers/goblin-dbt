@@ -143,7 +143,7 @@ test("Today shows at most one trail offer, drops it with a flooded band, and nev
   assert.match(read("functions/src/parts/offers/index.ts"), /import '\.\/today';/);
 });
 
-test("writeTrailOffer is the one writer of :TrailOffer; the gate is exported for a Reflect surface", () => {
+test("record.ts is the one writer of :TrailOffer (writeTrailOffer; Reflect's writeKnownPartReview); the gate is exported for a Reflect surface", () => {
   const writers = walk("functions/src").filter((f) => f.endsWith(".ts"))
     .filter((f) => /(MERGE|CREATE)\s*\(\w*:TrailOffer\b/.test(read(f)));
   assert.deepEqual(writers, ["functions/src/parts/offers/record.ts"]);
@@ -153,7 +153,7 @@ test("writeTrailOffer is the one writer of :TrailOffer; the gate is exported for
   for (const f of walk("functions/src").filter((x) => x.endsWith(".ts") && x !== "functions/src/parts/offers/record.ts")) {
     const src = read(f);
     for (const m of src.matchAll(/:TrailOffer \{key: \$key\}\)[\s\S]{0,40}?\n\s*WHERE ([^\n]*)\n\s*SET o\./g)) {
-      assert.match(m[1], /\$\{GUARDS\.TrailOffer\.(see|answer)\('o'\)\}/, `${f}: an offer write without its guard`);
+      assert.match(m[1], /\$\{GUARDS\.TrailOffer\.(see|answer|removePattern)\('o'\)\}/, `${f}: an offer write without its guard`);
     }
   }
   assert.match(read("functions/src/parts/offers/gate.ts"), /export function offerGate\(/);

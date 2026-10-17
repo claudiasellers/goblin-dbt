@@ -302,7 +302,11 @@ describe("9. Parts language by default.", () => {
   // "the gate", tests/unblend-lines.test.mjs "the hook", tests/meet-a-part-page.test.mjs "hidden";
   // the angry card's plain wording: tests/angry-part.test.mjs "parts off never says part" and
   // tests/parts-content.test.mjs "the angry-part card ... the plain one never says part".
-  test("every parts callable refuses with parts off (deleteMyParts excepted; the entry gate answers clear)", () => {
+  // The rule: every writer refuses with parts off (failed-precondition); a reader in READERS_EMPTY returns
+  // nothing instead (its every array empty), so a screen simply has no parts section. The list is named
+  // here, so a writer can't slip through by returning: every other callable must throw.
+  const READERS_EMPTY = ["getReflectTrails"];
+  test("every parts writer refuses with parts off; every reader returns nothing (deleteMyParts excepted; the entry gate answers clear)", () => {
     const index = read("functions/src/parts/index.ts") + read("functions/src/parts/offers/index.ts");
     const callables = [...index.matchAll(/export const (\w+) = callable<[\s\S]*?\n\);/g)].map((m) => [m[1], m[0]]);
     const deployed = [...read("functions/src/index.ts").matchAll(/export \{([^}]*)\} from '\.\/parts';/g)]
@@ -317,9 +321,16 @@ describe("9. Parts language by default.", () => {
       const def = sources.match(new RegExp(`export async function ${handler}\\([\\s\\S]*?\\n\\}`))?.[0];
       assert.ok(def, `${name}: ${handler} found`);
       if (name === "getPartsEntry") assert.match(def, /if \(!\(await deps\.partsOn\(\)\)\) return \{ \.\.\.PARTS_OFF_ENTRY/, name);
-      else if (/await ownPart\(/.test(def)) assert.ok(OWN_PART_REFUSES, `${name}: ownPart refuses with parts off`);
+      else if (READERS_EMPTY.includes(name)) {
+        const ret = def.match(/if \(!\w+\.partsOn\) return \{([^}]*)\};/)?.[1];
+        assert.ok(ret !== undefined, `${name}: returns nothing with parts off`);
+        const fields = ret.split(",").map((x) => x.trim()).filter(Boolean);
+        assert.ok(fields.length > 0 && fields.every((f) => /^\w+: \[\]$/.test(f)), `${name}: every array empty with parts off (${ret})`);
+        assert.doesNotMatch(def, /\bwrite|MERGE|SET /, `${name}: a reader writes nothing`);
+      } else if (/await ownPart\(/.test(def)) assert.ok(OWN_PART_REFUSES, `${name}: ownPart refuses with parts off`);
       else assert.match(def, /if \(!\w+\.partsOn\) throw partsOff\(\);/, `${name}: refuses with parts off`);
     }
+    for (const name of READERS_EMPTY) assert.ok(callables.some(([n]) => n === name), `${name} is a parts callable`);
     assert.doesNotMatch(index, /export const deleteMyParts/, "deleteMyParts (works with parts off) lives in delete.ts");
   });
 
