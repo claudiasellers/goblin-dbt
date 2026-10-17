@@ -504,10 +504,24 @@
    "copy": "{step} ({n} times)",
    "reviewStatus": "draft"
   },
+  "stats_feel_lately": {
+   "flow": "common",
+   "step": "stats",
+   "order": 12,
+   "copy": "Lately, meeting your parts, you've mostly been {feel}.",
+   "reviewStatus": "draft"
+  },
+  "stats_feel_earlier": {
+   "flow": "common",
+   "step": "stats",
+   "order": 13,
+   "copy": "Earlier, more often {feel}.",
+   "reviewStatus": "draft"
+  },
   "hold_hint": {
    "flow": "common",
    "step": "hold",
-   "order": 12,
+   "order": 14,
    "copy": "Hold to fill it, or press once and wait.",
    "reviewStatus": "draft"
   },
