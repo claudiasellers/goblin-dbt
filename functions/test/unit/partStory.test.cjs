@@ -9,6 +9,7 @@ const { loadFunctions, fakeDriver } = require('./fakeDriver.cjs');
 
 const { fns, setDriver } = loadFunctions();
 const ST = require('../../lib/parts/story');
+const SAY = require('../../lib/parts/say');
 const SQ = require('../../lib/parts/statsQueries');
 
 test.after(() => setDriver(null));
@@ -69,6 +70,8 @@ test('getPartStory over the fake driver: the caller\'s own part by key, set-asid
     }
     if (q === ST.STORY_REVISITS_QUERY) return [{ at: '2026-09-10T10:00:00Z', answer: 'new' }, { at: '2026-10-02T10:00:00Z', answer: 'resting' }];
     if (q === ST.STORY_SNAPSHOTS_QUERY) return [];
+    // What they told it (sayToPart): the month's latest becomes one line.
+    if (q === SAY.PART_MESSAGES_QUERY) return [{ at: '2026-10-05T10:00:00Z', chipId: 'say_thanks', own: null }, { at: '2026-10-06T10:00:00Z', chipId: null, own: 'I see you' }];
     if (/HAS_DEN_SNAPSHOT/.test(q) && /AS snapshots/.test(q)) {
       return [{ parts: [{ id: A, name: 'Guard', status: 'resting', tender: false, shapeSig: null, mapX: 0.5, mapY: 0.5, lastVisitedAt: null, safety: false }], links: [], snapshots: [] }];
     }
@@ -77,7 +80,9 @@ test('getPartStory over the fake driver: the caller\'s own part by key, set-asid
   setDriver(on.driver);
   const out = await fns.getPartStory.run({ auth: auth('u4'), data: { partId: A } });
   // Kept 1 Aug 03:00 UTC is still 31 July in Los Angeles: months in the person's own time zone.
-  assert.deepEqual(out.moments.map((m) => [m.kind, m.month]), [['met', '2026-07'], ['job', '2026-09'], ['rested', '2026-10']]);
+  assert.deepEqual(out.moments.map((m) => [m.kind, m.month]), [['met', '2026-07'], ['job', '2026-09'], ['rested', '2026-10'], ['told', '2026-10']]);
+  assert.deepEqual(out.moments[3], { kind: 'told', month: '2026-10', chipId: null, own: 'I see you' }, 'the month\'s latest');
+  assert.equal(on.calls.find((c) => c.query === SAY.PART_MESSAGES_QUERY).params.partKey, `u4:${A}`);
   assert.ok(on.calls.every((c) => c.params.uid === 'u4'));
   assert.doesNotMatch(JSON.stringify(out), /\d{4}-\d{2}-\d{2}/, 'no date reaches the client');
   await assert.rejects(fns.getPartStory.run({ auth: auth(), data: { partId: 'x' } }), code('invalid-argument'));

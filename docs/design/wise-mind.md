@@ -5,7 +5,9 @@ for a few breaths, and listen for the quieter answer underneath. With parts on, 
 parts-aware step back from `parts.md` (*Skills are how you look after a part*, phase 6): *"Ask everyone
 to take one step back. From here, what's the wise next step?"*
 
-Status: **designed 17 Oct 2026, not built.** Claudia's steer the same night: features first, no new gates.
+Status: **built 17 Oct 2026** (the minds form; listed for everyone). The parts-aware step back (2p) is
+being built into the seam the minds form left. Claudia's steer the same night: features first, no new
+gates.
 
 ---
 
@@ -158,3 +160,51 @@ now."* (chip) or their own words. Same store My words already reads for kept lin
 - Never names it Self, never draws the person as a figure, never speaks as them.
 - No scale, score, streak or "how wise" rating.
 - Never asks a part to leave or stop: *a step back*, so you can listen.
+
+---
+
+## As built (17 Oct)
+
+- **Where:**
+  - `src/pages/tools/WiseMind.tsx` (lazy), `src/components/tools/wiseMind/` (`TwoMinds`, `Practices`,
+    `bits`), the pure flow in `src/lib/wiseMind.ts`.
+  - Listed under Mindfulness for everyone, and the intent *"I'm torn about what to do"*.
+  - Spine: `wise-mind` is `{ module: 'mf', closeKind: 'orienting' }`. Wise mind is in the tag row's
+    `NEVER_HOSTS`, so a parts tag row never follows it.
+- **Content:**
+  - `scripts/wise-mind/content.py` → `schema/wise-mind.cypher` (`LOAD_ORDER` after `parts`, before
+    `recommended-for`; five constraints).
+  - 6 questions, each with a default practice. 36 `MindVoice`s (3 per mind per question). 3 practices
+    (*Stone on the lake*, *Wise in, mind out*, *Ask and listen*) hung off `dbt_wise_mind`. 7 answers
+    with real `nextToolIds` (*Nothing yet* is the quiet kind). `WiseMindFlow` for the screen copy.
+  - Voice-linted (flow-doc files).
+  - The public `getWiseMindContent` serves it, and `src/data/content/wise-mind.json` ships it. A
+    refresh that finds no Wise mind content keeps the committed file and warns (`KEPT_WHEN_MISSING`);
+    a wrong version throws.
+  - `dbt_wise_mind.appToolId = 'wise-mind'`. The concept stays in `PLANNED`, and the watchful row
+    stays off and a draft (test-pinned). `PracticeSkill wise_mind` (Preliminary) is in practice-spine.
+- **Both minds:**
+  - Once heard, a circle shows what it said under its name: the chip label, or the person's own words
+    clamped to two lines. *Nothing comes* shows as "…".
+  - Tapping a heard circle reopens its chips with the pick marked.
+  - When both have been heard, the overlap brightens one static step.
+- **Practices:**
+  - *Wise in, mind out* uses the shared `HoldButton`: a hold per in-breath, plus a hands-free tap
+    mode.
+  - Reduced motion shows the stone as still frames.
+  - Focus stays in the screen, never dropping to the page, after the hold, the close, a hand-off and
+    *This is enough for now*.
+- **The visit:**
+  - `ext.wm` is registered in `extSchemas.ts`, with a `text` type on the `*Own` keys (1–140,
+    length-checked only).
+  - `wiseMindAnswer` is set through `setWiseMindAnswer`, kept only for `wise-mind`.
+  - *Keep what wise mind said* goes through `recordWitnessBeat` with moment `wise_mind` (no band needed
+    when no witness line was shown), into My words.
+- **The seam for 2p:**
+  - `form: 'minds' | 'parts'`.
+  - Step `stepBack` renders `StepBackSlot.Room`.
+  - The pushed line has a parts form.
+  - `?a=&b=` presets the parts (from Two pulls' *Ask wise mind what's next*).
+- **Review:** `dev/review/wiseMind.tsx` is the review page's Wise mind surface (pack `wise_mind`,
+  every screen and branch). It reads `wise-mind.json` directly, and `check.mjs` checks each branch's
+  expected and absent lines.

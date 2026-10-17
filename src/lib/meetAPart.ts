@@ -13,7 +13,7 @@ import type { HandoffResult } from '../data/capacityTypes';
 /** Every screen of the flow, in the harness's names. */
 export const MEET_STEPS = [
   'find', 'blend', 'blendBody', 'where', 'shape', 'age', 'young', 'voice', 'feel', 'unblend', 'unblendEnd', 'nothing',
-  'job', 'likes', 'guards', 'front', 'fear', 'stop', 'update', 'canNow', 'thank', 'tender', 'rather', 'name', 'keep', 'close', 'done',
+  'job', 'likes', 'guards', 'front', 'fear', 'stop', 'update', 'canNow', 'thank', 'tender', 'say', 'rather', 'name', 'keep', 'close', 'done',
 ] as const;
 export type MeetStep = (typeof MEET_STEPS)[number];
 
@@ -43,7 +43,7 @@ export const OWN_WORDS_STEPS: readonly MeetStep[] = ['voice', 'job', 'fear'];
 /** The 1–10 of the steps table, for the progress track; the gate's screens and done have none. */
 export const MEET_TRACK: Partial<Record<MeetStep, number>> = {
   find: 1, where: 2, shape: 3, age: 3, young: 3, voice: 3, feel: 4, unblend: 4, unblendEnd: 4, nothing: 4, job: 5, likes: 5,
-  guards: 5, front: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, tender: 8, rather: 8, name: 9, keep: 9, close: 10,
+  guards: 5, front: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, tender: 8, say: 8, rather: 8, name: 9, keep: 9, close: 10,
 };
 
 /** Shape it's forced choices: five rounds, one per dimension. */
@@ -123,6 +123,12 @@ export interface MeetContext {
    * or absent (5d's copy not signed off, no other part) skips 5d; the flow goes on to Fear.
    */
   frontParts?: readonly string[];
+  /**
+   * "Say something to it" after Thanks (src/lib/sayToPart.ts): its copy ships. Offered only on a visit to
+   * a kept part (`session.partId`), never after "nothing there" or the danger branch (straight to close).
+   * The tender path gets it after its hold, with the gentle set (the host picks the chips).
+   */
+  sayReady?: boolean;
 }
 
 /** What the host renders P2 with, while the step is blendBody. */
@@ -168,6 +174,8 @@ export type MeetEvent =
   | { type: 'p2'; outcome: 'resume' | 'override' | 'later'; result?: HandoffResult }
   /** Thanks or the tender path's hold completed. */
   | { type: 'hold' }
+  /** "Say something to it": said (the host wrote it) or Not now; both go on. */
+  | { type: 'said' }
   /** Name: entered, or null for "Not yet". */
   | { type: 'name'; name: string | null }
   /** The orienting close: a choice, or null for skip. */
@@ -181,6 +189,17 @@ export const FRONT_MAX = 4;
 /** 5d's part chips for this visit: never the part being visited, at most FRONT_MAX. */
 export function frontChoices(session: Pick<MeetSession, 'partId'>, ctx: MeetContext): string[] {
   return (ctx.frontParts ?? []).filter((id) => id !== session.partId).slice(0, FRONT_MAX);
+}
+
+/** After Thanks: danger and "nothing there" go straight to close; any other stop or a safety-line part skips 8b. */
+function afterThank(s: MeetSession, ctx: MeetContext): MeetStep {
+  if (s.danger || s.stopReason === 'nothing') return 'close';
+  return s.stopReason || isSafety(s, ctx) ? 'name' : 'rather';
+}
+
+/** "Say something to it" after Thanks (or the tender hold): a kept part's visit, its copy shipped, not on the way straight to close. */
+export function offersSay(s: MeetSession, ctx: MeetContext): boolean {
+  return ctx.sayReady === true && !!s.partId && (s.tender || afterThank(s, ctx) !== 'close');
 }
 
 export function firstStep(ctx: MeetContext): MeetStep {
@@ -360,12 +379,14 @@ export function meetNext(state: MeetState, event: MeetEvent, ctx: MeetContext): 
       break;
     case 'thank':
       if (event.type !== 'hold') break;
-      // Danger and "nothing there" go straight to close; any other stop or a safety-line part skips 8b.
-      if (session.danger || session.stopReason === 'nothing') next = 'close';
-      else next = session.stopReason || safety() ? 'name' : 'rather';
+      // A kept part's visit: "Say something to it" first, then on as below (never on the straight-to-close ways).
+      next = offersSay(session, ctx) ? 'say' : afterThank(session, ctx);
       break;
     case 'tender':
-      if (event.type === 'hold') next = 'name';
+      if (event.type === 'hold') next = offersSay(session, ctx) ? 'say' : 'name';
+      break;
+    case 'say':
+      if (event.type === 'said') next = session.tender ? 'name' : afterThank(session, ctx);
       break;
     case 'rather':
       if (o) { set({ ratherId: o.id }); next = 'name'; }

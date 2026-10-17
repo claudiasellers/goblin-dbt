@@ -63,6 +63,16 @@ export const GUARDS = {
     keep: (v: string) =>
       `(${v}.status = 'open' OR (${v}.status = 'saved' AND ${v}.savedAt > datetime() - duration({hours: ${TOOL_SESSION_ANSWER_HOURS}})))`,
   },
+  PullsSession: {
+    /** savePullsSession: only while open; a saved session is frozen. */
+    save: (v: string) => `${v}.status = 'open'`,
+    /**
+     * keepPullsKeepsake and schedulePullsCheckback link out of the visit (KEPT_LINE, SCHEDULED): while
+     * open, or within 12 h of the save, as PartSession.keep (the record's own properties never change).
+     */
+    keep: (v: string) =>
+      `(${v}.status = 'open' OR (${v}.status = 'saved' AND ${v}.savedAt > datetime() - duration({hours: ${TOOL_SESSION_ANSWER_HOURS}})))`,
+  },
   PartCandidate: {
     /** keepPart accepts a candidate once; any other status is final. */
     accept: (v: string) => `${v}.status = 'open'`,
@@ -92,7 +102,7 @@ const ms = (v: unknown): number | null => {
 
 /** The TypeScript mirror of GUARDS (for tests and for callers that already hold the record). */
 export function writable(
-  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PartCandidate' | 'TrailOffer',
+  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PullsSession' | 'PartCandidate' | 'TrailOffer',
   op: string,
   p: Props,
   now: number = Date.now(),
@@ -121,7 +131,8 @@ export function writable(
     case 'FollowUp': return p.status === 'scheduled';
     case 'PatternOffer': return p.status === 'offered';
     case 'ToolUsage': return p.outcome == null;
-    case 'PartSession': {
+    case 'PartSession':
+    case 'PullsSession': {
       if (p.status === 'open') return true;
       if (op !== 'keep' || p.status !== 'saved') return false;
       const saved = ms(p.savedAt);

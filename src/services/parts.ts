@@ -6,11 +6,13 @@ import type {
   AnswerPartCheckbackRequest, AnswerPartCheckbackResponse, AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
   SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, SetPartAnchorRequest, SetPartShapeRequest, StartPartSessionRequest,
-  TagPartRequest, TagPartResponse,
+  TagPartRequest, TagPartResponse, SayToPartRequest, SayToPartResponse,
   AnswerTrailOfferRequest, AnswerTrailOfferResponse, GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse,
   AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse, GetReflectTrailsResponse, RemoveTrailPatternRequest, RemoveTrailPatternResponse,
   GetDenResponse, GetPartStoryRequest, GetPartStoryResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
   UnlinkPartsResponse, UpdatePartLayoutRequest, UpdatePartLayoutResponse,
+  KeepPullsKeepsakeRequest, KeepPullsKeepsakeResponse, PullsSessionResponse, SavePullsSessionRequest,
+  SchedulePullsCheckbackRequest, SchedulePullsCheckbackResponse, StartPullsSessionRequest,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
@@ -25,14 +27,21 @@ export async function getPartsEntry(partId?: string | null): Promise<PartsEntry>
   return (await getPartsEntryFn(partId ? { partId } : {})).data;
 }
 
-const deleteMyPartsFn = httpsCallable<Record<string, never>, { deleted: Record<string, number> }>(functions, 'deleteMyParts');
+const deleteMyPartsFn = httpsCallable<{ keptLines?: boolean }, { deleted: Record<string, number> }>(functions, 'deleteMyParts');
+const countMyPartsLinesFn = httpsCallable<Record<string, never>, { keptLines: number }>(functions, 'countMyPartsLines');
 
 /**
  * Delete my parts (Privacy & Data): every parts record the person has kept or made, in one step
- * they confirmed. The one call made with parts off too (turning parts off deletes nothing).
+ * they confirmed. The one call made with parts off too (turning parts off deletes nothing). Kept Two
+ * pulls lines that name their parts go too only on their separate yes (`keptLines`).
  */
-export async function deleteMyParts(): Promise<{ deleted: Record<string, number> }> {
-  return (await deleteMyPartsFn({})).data;
+export async function deleteMyParts(opts: { keptLines?: boolean } = {}): Promise<{ deleted: Record<string, number> }> {
+  return (await deleteMyPartsFn(opts.keptLines ? { keptLines: true } : {})).data;
+}
+
+/** For Delete your parts' confirm: how many kept Two pulls lines name the person's parts. */
+export async function countMyPartsLines(): Promise<number> {
+  return (await countMyPartsLinesFn({})).data.keptLines;
 }
 
 const startPartSessionFn = httpsCallable<StartPartSessionRequest, PartSessionResponse>(functions, 'startPartSession');
@@ -146,6 +155,13 @@ export async function tagPart(req: TagPartRequest): Promise<TagPartResponse> {
   return (await tagPartFn(req)).data;
 }
 
+const sayToPartFn = httpsCallable<SayToPartRequest, SayToPartResponse>(functions, 'sayToPart');
+
+/** "Say something to it": a chip or their own words, to one of their kept parts. A repeat id writes nothing. */
+export async function sayToPart(req: SayToPartRequest): Promise<SayToPartResponse> {
+  return (await sayToPartFn(req)).data;
+}
+
 // ---- DEAR MAN's cope ahead ----
 
 const setPartAnchorFn = httpsCallable<SetPartAnchorRequest, PartWriteResponse>(functions, 'setPartAnchor');
@@ -229,6 +245,33 @@ export async function linkParts(req: LinkPartsRequest): Promise<LinkPartsRespons
 /** A thread's ×. */
 export async function unlinkParts(req: UnlinkPartsRequest): Promise<UnlinkPartsResponse> {
   return (await unlinkPartsFn(req)).data;
+}
+
+// ---- Two pulls (a hidden tool: from the den, or a rule C trail's More than one) ----
+
+const startPullsSessionFn = httpsCallable<StartPullsSessionRequest, PullsSessionResponse>(functions, 'startPullsSession');
+const savePullsSessionFn = httpsCallable<SavePullsSessionRequest, PullsSessionResponse>(functions, 'savePullsSession');
+const keepPullsKeepsakeFn = httpsCallable<KeepPullsKeepsakeRequest, KeepPullsKeepsakeResponse>(functions, 'keepPullsKeepsake');
+const schedulePullsCheckbackFn = httpsCallable<SchedulePullsCheckbackRequest, SchedulePullsCheckbackResponse>(functions, 'schedulePullsCheckback');
+
+/** Open this visit's record (idempotent while open). */
+export async function startPullsSession(req: StartPullsSessionRequest): Promise<PullsSessionResponse> {
+  return (await startPullsSessionFn(req)).data;
+}
+
+/** Merge what the visit has so far; `final` freezes it. */
+export async function savePullsSession(req: SavePullsSessionRequest): Promise<PullsSessionResponse> {
+  return (await savePullsSessionFn(req)).data;
+}
+
+/** "Keep this": the server builds the keepsake from the stored visit and keeps it in My words. */
+export async function keepPullsKeepsake(req: KeepPullsKeepsakeRequest): Promise<KeepPullsKeepsakeResponse> {
+  return (await keepPullsKeepsakeFn(req)).data;
+}
+
+/** On the close's yes: check back with both kept parts in a week. */
+export async function schedulePullsCheckback(req: SchedulePullsCheckbackRequest): Promise<SchedulePullsCheckbackResponse> {
+  return (await schedulePullsCheckbackFn(req)).data;
 }
 
 // ---- A part's story ----

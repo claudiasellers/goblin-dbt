@@ -137,8 +137,8 @@ test("shipped spine content: the close flow, and every non-reserved follow-up ty
 test("shipped parts content is content.py's signed-off rows, and nothing a screen doesn't show", () => {
   const parts = shipped("parts.json").content;
   assert.deepEqual(parts, partsFromFixture(JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"))));
-  // Trail rules, contexts and the policy stay on the server; pairs and keepsake wait for Two pulls.
-  assert.deepEqual(Object.keys(parts).sort(), ["canTouch", "expresses", "hurts", "moves", "options", "prompts", "version"]);
+  // Trail rules, contexts and the policy stay on the server; Two pulls' pairs ship as ids.
+  assert.deepEqual(Object.keys(parts).sort(), ["canTouch", "expresses", "hurts", "moves", "options", "pairs", "prompts", "version"]);
   assert.doesNotMatch(JSON.stringify(parts), /"(reviewStatus|pending)"/);
   // Every node parts.cypher writes as a draft (content.py's SIGNED_OFF doesn't list it), by label.
   const drafts = [...readFileSync("schema/parts.cypher", "utf8").matchAll(/^MERGE \(\w:(\w+) \{id: "([^"]+)"\}\)\nSET [^\n]*reviewStatus: "draft"/gm)];
@@ -153,6 +153,7 @@ test("shipped parts content is content.py's signed-off rows, and nothing a scree
     ...parts.hurts.flatMap((h) => [h.id, ...h.guardedBy.map((g) => g.moveId)]),
     ...Object.values(parts.canTouch).flat(),
     ...Object.values(parts.expresses).flatMap((t) => Object.entries(t).flat()),
+    ...(parts.pairs ?? []).flatMap((p) => [p.id, ...p.bothWant, ...p.worryA, ...p.worryB]),
   ];
   assert.deepEqual(shippedIds.filter((id) => draft.has(id)), [], "draft parts content in the app bundle");
 });
@@ -211,7 +212,8 @@ test("buildParts: signed-off rows only, only the allowlisted fields, edges by th
   assert.deepEqual(buildParts(indexGraph(exp)), {
     version: "parts-v1",
     moves: [{ id: "hide", label: "Hide", safetyLine: false }],
-    prompts: { meet_find: { copy: "What's showing up?" } },
+    // The keepsake lines ship as prompts (Two pulls' last screen).
+    prompts: { meet_find: { copy: "What's showing up?" }, keepsake_x: { copy: "{A} and {B}" } },
     options: {
       meet: {
         voice: [
@@ -226,10 +228,11 @@ test("buildParts: signed-off rows only, only the allowlisted fields, edges by th
     }, { id: "made_small", label: "being made small", order: 2, matters: "being treated as an equal", namedAs: [], guardedBy: [] }],
     canTouch: { dismissed: ["made_small", "brushed_off"] },
     expresses: { ActionUrge: { "shame-hide": "hide" }, PullOption: { recover_hide: "hide" } },
+    pairs: [],
   });
   // Nothing signed off: an empty file carrying the version every parts node has (the policy's), or none at all.
   const none = { scope: "content-only", nodes: nodes.map((n) => (n.labels.includes("PartsPolicy") ? n : { ...n, props: { ...n.props, reviewStatus: "draft" } })), relationships: [] };
-  assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [], canTouch: {}, expresses: {} });
+  assert.deepEqual(buildParts(indexGraph(none)), { version: "parts-v1", moves: [], prompts: {}, options: {}, hurts: [], canTouch: {}, expresses: {}, pairs: [] });
   assert.equal(buildParts(indexGraph({ scope: "content-only", nodes: [], relationships: [] })).version, null);
   // The policy's two client numbers ship once it is signed off; nothing else of it ever does.
   const signedPolicy = { ...exp, nodes: nodes.map((n) => (n.labels.includes("PartsPolicy")
@@ -251,6 +254,7 @@ const partsRowKeys = (c) => ({
   options: Object.values(c.options).flatMap((steps) => Object.values(steps).flat()).flatMap(Object.keys),
   hurts: c.hurts.flatMap(Object.keys),
   guardedBy: c.hurts.flatMap((h) => h.guardedBy).flatMap(Object.keys),
+  pairs: (c.pairs ?? []).flatMap(Object.keys),
   limits: Object.keys(c.limits ?? {}),
 });
 const within = (keys, allowed, what) => assert.deepEqual([...new Set(keys)].filter((k) => !allowed.includes(k)), [], `${what}: fields off the allowlist`);
@@ -283,7 +287,7 @@ test("parts.json: a property not on the allowlist never ships, whatever node or 
   assert.doesNotMatch(JSON.stringify(c), /never|"(kind|why|reason|leak|trailPhrase|hurtPhrase|sameAs|copyKind|offerable|flow|step|reviewStatus|pending)"|minEpisodes|windowDays|statementTemplate|offersEnabled|floodGateHours|tooManyPartsCount|harmWindowDays|it's late/);
   const keys = partsRowKeys(c);
   within(keys.top, PARTS_KEYS, "top level");
-  for (const t of ["moves", "prompts", "options", "hurts", "guardedBy", "limits"]) within(keys[t], PARTS_FIELDS[t], t);
+  for (const t of ["moves", "prompts", "options", "hurts", "guardedBy", "pairs", "limits"]) within(keys[t], PARTS_FIELDS[t], t);
   // Every allowlisted field does arrive when the graph has it (the list is not just a filter that drops all).
   assert.deepEqual(Object.keys(c.moves[0]).sort(), [...PARTS_FIELDS.moves].sort());
   assert.deepEqual(Object.keys(c.prompts.meet_find), [...PARTS_FIELDS.prompts]);
@@ -294,18 +298,46 @@ test("parts.json: a property not on the allowlist never ships, whatever node or 
   assert.deepEqual(c.expresses, { ActionUrge: { "shame-hide": "hide" } });
 });
 
+test("buildParts: Two pulls' pairs ship as ids, signed off with both moves shipped, chips in edge order", () => {
+  const ok = { reviewStatus: "approved", version: "parts-v1" };
+  const draft = { reviewStatus: "draft", version: "parts-v1" };
+  const move = (id, r = ok) => node(id, ["ProtectiveMove"], { ...r, label: id, offerable: true, order: 0 });
+  const chip = (id, step, r = ok) => node(id, ["PartOption"], { ...r, flow: "pulls", step, order: 0, label: id, branch: "continue" });
+  const exp = {
+    scope: "content-only",
+    nodes: [
+      move("chase"), move("hide"), move("hit_back"), move("keep_the_peace", draft),
+      node("chase_hide", ["PolarityPair"], { ...ok, a: "chase", b: "hide", leak: "never" }),
+      node("hit_back_keep_the_peace", ["PolarityPair"], { ...ok, a: "hit_back", b: "keep_the_peace" }),
+      node("chase_hit_back", ["PolarityPair"], { ...draft, a: "chase", b: "hit_back" }),
+      chip("want_two", "both_want"), chip("want_one", "both_want"), chip("want_draft", "both_want", draft),
+      chip("worry_a", "worry"), chip("worry_b", "worry"),
+    ],
+    relationships: [
+      rel("BOTH_WANT", "chase_hide", "want_two", { reviewStatus: "approved", order: 1 }),
+      rel("BOTH_WANT", "chase_hide", "want_one", { reviewStatus: "approved", order: 0 }),
+      rel("BOTH_WANT", "chase_hide", "want_draft", { reviewStatus: "approved", order: 2 }),
+      rel("WORRY", "chase_hide", "worry_a", { reviewStatus: "approved", side: "a", order: 0 }),
+      rel("WORRY", "chase_hide", "worry_b", { reviewStatus: "approved", side: "b", order: 0 }),
+    ],
+  };
+  const c = buildParts(indexGraph(exp));
+  assert.deepEqual(c.pairs, [{ id: "chase_hide", a: "chase", b: "hide", bothWant: ["want_one", "want_two"], worryA: ["worry_a"], worryB: ["worry_b"] }]);
+  assert.doesNotMatch(JSON.stringify(c.pairs), /never|leak|reviewStatus/);
+});
+
 test("parts.json: with every row signed off, only allowlisted fields ship (kind, why, HELD, review and policy numbers never)", () => {
   const fixture = JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"));
   const all = partsFromFixture(fixture, () => true);
   assert.ok(all.moves.length >= 8 && Object.keys(all.prompts).length > 100 && all.hurts.length >= 6, "the whole fixture went through");
   const keys = partsRowKeys(all);
   within(keys.top, PARTS_KEYS, "top level");
-  for (const t of ["moves", "prompts", "options", "hurts", "guardedBy", "limits"]) within(keys[t], PARTS_FIELDS[t], t);
+  for (const t of ["moves", "prompts", "options", "hurts", "guardedBy", "pairs", "limits"]) within(keys[t], PARTS_FIELDS[t], t);
   // What the fixture has and the file never carries: the move's role-like kind, EXPRESSES' why, HELD
   // reasons, review metadata, trail rules and contexts, and the policy's inference and safety numbers.
   // Checked on the field names (map keys are ids: "shape" and "keepsake" are also step ids).
   const fieldNames = new Set(Object.values(keys).flat());
-  const never = ["kind", "why", "reason", "held", "reviewStatus", "pending", "trailRules", "contexts", "pairs", "keepsake", "policy",
+  const never = ["kind", "why", "reason", "held", "reviewStatus", "pending", "trailRules", "contexts", "keepsake", "policy",
     "trailPhrase", "hurtPhrase", "sameAs", "copyKind", "offerable", "flow", "step",
     ...Object.keys(fixture.policy).filter((x) => !PARTS_FIELDS.limits.includes(x) && x !== "id"),
     ...Object.keys(fixture.trailRules[0]).filter((x) => x !== "id")];
@@ -331,6 +363,7 @@ test("parts.json's allowlist is exactly the fields the client types declare", ()
   assert.deepEqual(fields(body("PartsHurt")), sorted(PARTS_FIELDS.hurts));
   assert.deepEqual(inline(body("PartsHurt"), "guardedBy"), sorted(PARTS_FIELDS.guardedBy));
   assert.deepEqual(fields(body("PartsContent")), sorted(PARTS_KEYS));
+  assert.deepEqual(fields(body("PartsPair")), sorted(PARTS_FIELDS.pairs));
   assert.deepEqual(inline(body("PartsContent"), "limits"), sorted(PARTS_FIELDS.limits));
 });
 

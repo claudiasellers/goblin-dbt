@@ -91,7 +91,10 @@ export interface GetTrailOfferEvidenceResponse {
 export interface AnswerTrailOfferRequest {
   offerId: string;
   answer: TrailOfferAnswer;
-  /** more_than_one only: the moves that feel like their own thing (each one of the offer's). */
+  /**
+   * more_than_one only: the moves that feel like their own thing (each one of the offer's). Left out on a
+   * rule C trail, which opens Two pulls instead.
+   */
   split?: string[];
   /** more_than_one only: a new client UUID per kept move, in `split`'s order (the candidates' ids). */
   candidateIds?: string[];
@@ -102,9 +105,12 @@ export interface AnswerTrailOfferResponse {
   answer: TrailOfferAnswer;
   /**
    * What the client does next: `meet` opens Meet a part on this offer (`trailheadKind: 'offer'`);
-   * `candidates` wrote the split's PartCandidates; `none` otherwise.
+   * `candidates` wrote the split's PartCandidates; `two_pulls` opens Two pulls on `pairId` (a rule C
+   * trail's More than one); `none` otherwise.
    */
-  next: 'meet' | 'candidates' | 'none';
+  next: 'meet' | 'candidates' | 'two_pulls' | 'none';
+  /** two_pulls: the offer's PolarityPair. */
+  pairId?: string;
   /** The moves Meet a part opens on (yes). */
   moveIds?: string[];
   /** more_than_one: the candidates' ids. */

@@ -187,6 +187,22 @@ FOLLOW_UP_TYPES = [
                     {"id": "skip", "label": "Skip", "status": "dismissed"}],
         "notification": "",
     },
+    {
+        # Parts (docs/design/parts.md, Two pulls step 7): a week after Two pulls, for both kept parts, on
+        # the close's yes; scheduled by schedulePullsCheckback, answered by answerPartCheckback (the same
+        # card and answers; Louder shows the aftercare). Its Today card comes from parts (parts on, both
+        # names from the profile slice) and shows checkback_title_two only once signed off.
+        "id": "two_pulls_checkback", "ownerModule": "mf", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "at_local", "days": 7, "time": "10:00"},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": False, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How are {A} and {B} today?"},
+        "choices": [{"id": "settled", "label": "Settled", "status": "done"},
+                    {"id": "same", "label": "Same", "status": "done"},
+                    {"id": "louder", "label": "Louder", "status": "done"},
+                    {"id": "skip", "label": "Skip", "status": "dismissed"}],
+        "notification": "",
+    },
 ]
 
 # Reserved rows: authored now so the ids exist, enabled false until their owners ship.
@@ -228,6 +244,11 @@ NEW_SKILLS = [
     ("problem_solve", "Solve the problem", "Moderate", "mind", "dbt_problem_solving",
      "When the facts are the problem, a small concrete step changes the situation that keeps the feeling going.",
      ["linehan_skills_2015"], ["problem-solve"]),
+    # Wise mind (docs/design/wise-mind.md): a practice started (Stone on the lake, Wise in mind out, Ask
+    # and listen) is the rep, through the tool's markPracticed.
+    ("wise_mind", "Wise mind", "Preliminary", "mind", "dbt_wise_mind",
+     "Hearing what feeling and thinking each say, then pausing to listen, leaves room for a choice that fits both.",
+     ["linehan_skills_2015"], ["wise-mind"]),
 ]
 
 SOURCES = [

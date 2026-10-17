@@ -18,12 +18,14 @@ const AUTHED = [
   'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
   'getPartsEntry', // reads the caller's own check-ins and Recover sessions
-  'deleteMyParts', // deletes the caller's own parts records
+  'deleteMyParts', 'countMyPartsLines', // deletes (counts) the caller's own parts records
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
   'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
   'tagPart',
+  'sayToPart', // a message to the caller's own part
   'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor', 'setPartShape',
+  'startPullsSession', 'savePullsSession', 'keepPullsKeepsake', 'schedulePullsCheckback', // Two pulls: the caller's own visit
   'getTrailOfferEvidence', 'answerTrailOffer', // the caller's own trail offer (Phase 4, built off)
   'getReflectTrails', 'answerKnownPartReview', 'removeTrailPattern', // Reflect: the caller's own rule D batch and plain patterns
   'getDen', 'getDenSnapshot', 'updatePartLayout', 'linkParts', 'unlinkParts', // the den: the caller's own parts and links

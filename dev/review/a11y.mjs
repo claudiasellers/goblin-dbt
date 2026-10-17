@@ -65,18 +65,6 @@ const LIVE_SELECTORS = ['[data-testid="unblend-line"]', '[data-testid="goal-line
  * (`visit: check: text`), with why. Reported every run as `host`; never a failure here.
  */
 const OUTSIDE_PARTS = [
-  { match: /: contrast: [\w-]+: [\d.]+:1 < 4\.5 on button "[^"]*" in too-much-link /,
-    why: 'TooMuchLink (src/components/capacity/) is the host\'s; its muted text is under 4.5:1 in the light rooms' },
-  { match: /: focus: after Enter on button "[^"]*" in handoff-card focus went to body$/,
-    why: 'BreakdownHandoff (src/components/capacity/): P2\'s own step change' },
-  { match: /^checkback--\w+: focus: after Enter on button "[^"]*" in part-checkback(-aftercare)? focus went to body$/,
-    why: 'the answered card leaves Today: where focus goes next is TodayStack\'s (here the harness note)' },
-  { match: /^offer--\w+: focus: after Enter on button "(?!Show me")[^"]*" in trail-offer(-evidence)? focus went to body$/,
-    why: 'an answered offer leaves Today (Yes also opens Meet a part): where focus goes next is TodayStack\'s (here the harness note)' },
-  { match: /^debrief--\w+: focus: after Enter on button "[^"]*" focus went to body$/,
-    why: 'every debrief tap moves DEAR MAN on (onDone): its next step is DearMan.tsx\'s (here the harness note)' },
-  { match: /^cope--pick: focus: after Enter on button "[^"]*" in cope-ahead focus went to body$/,
-    why: 'Not sure / Skip move DEAR MAN on (onGoOn): its next step is DearMan.tsx\'s (here the harness note)' },
   { match: /^oa_goal--[\w.-]+: live: not announced: div "[^"]*" in goal-line$/,
     why: 'OppositeAction.tsx renders the goal line (TapCard `before`), above the heading TapCard focuses' },
 ];
@@ -224,6 +212,8 @@ window.__a11y = (() => {
     },
     probeGone() { return !S().querySelector('[data-a11y-probe]'); },
     holds() { return Array.from(S().querySelectorAll('[data-hold]')).filter(visible).length; },
+    /** A repeating hold (Two pulls' Step back) stays on screen: it says how many times it was held. */
+    breaths() { return Array.from(S().querySelectorAll('[data-breaths]')).reduce((n, el) => n + Number(el.getAttribute('data-breaths') || 0), 0); },
     focusHold() { const el = S().querySelector('[data-hold]'); if (el) el.focus(); return !!el; },
     dialogs() { return Array.from(document.querySelectorAll('[role=dialog], [aria-modal="true"]')).filter(visible).length; },
   };
@@ -366,12 +356,14 @@ async function motionAndHold(context, v) {
     if (!(await page.evaluate(() => window.__a11y.holds()))) return;
     // Space held for longer than any hold (the angry card's vote is 4 s).
     await page.keyboard.press('Shift');
+    const before = await page.evaluate(() => window.__a11y.breaths());
+    const held = async (p) => !(await p.evaluate(() => window.__a11y.holds())) || (await p.evaluate(() => window.__a11y.breaths())) > before;
     await page.evaluate(() => window.__a11y.focusHold());
     await page.keyboard.down('Space');
     await page.waitForTimeout(4400);
     await page.keyboard.up('Space');
     await page.waitForTimeout(300);
-    if (await page.evaluate(() => window.__a11y.holds())) report(v.name, 'hold', 'Space held did not complete the hold (reduced motion)');
+    if (!(await held(page))) report(v.name, 'hold', 'Space held did not complete the hold (reduced motion)');
     const a = await page.evaluate(() => window.__a11y.active());
     if (a.where !== 'surface') report(v.name, 'focus', `after the hold completed focus went to ${a.where}`);
   } finally {
@@ -383,11 +375,13 @@ async function motionAndHold(context, v) {
     const p2 = await open(context, v);
     try {
       await p2.keyboard.press('Shift');
+      const before = await p2.evaluate(() => window.__a11y.breaths());
       await p2.evaluate(() => window.__a11y.focusHold());
       if (how === 'click') await p2.evaluate(() => document.activeElement.click());
       else await p2.keyboard.press(how);
       await p2.waitForTimeout(4600);
-      if (await p2.evaluate(() => window.__a11y.holds())) report(v.name, 'hold', `a quick ${how} did not complete the hold hands-free (reduced motion)`);
+      const done = !(await p2.evaluate(() => window.__a11y.holds())) || (await p2.evaluate(() => window.__a11y.breaths())) > before;
+      if (!done) report(v.name, 'hold', `a quick ${how} did not complete the hold hands-free (reduced motion)`);
     } finally {
       await p2.close();
     }

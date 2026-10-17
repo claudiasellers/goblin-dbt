@@ -12,6 +12,7 @@ const read = (f) => readFileSync(f, "utf8");
 for (const [file, marker] of [
   ["types.ts", "export type PartsEntry ="], ["sessionTypes.ts", "export interface PartSessionPatch"], ["keepTypes.ts", "export interface KeepPartRequest"],
   ["tagTypes.ts", "export interface TagPartRequest"],
+  ["sayTypes.ts", "export interface SayToPartRequest"],
   ["checkbackTypes.ts", "export interface SchedulePartCheckbackRequest"],
   ["statsTypes.ts", "export interface PartStats"],
   ["denTypes.ts", "export type PartLinkKind"],

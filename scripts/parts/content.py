@@ -413,6 +413,14 @@ PROMPTS = [
     ("pulls_step_back", "pulls", "step_back", "Hold a breath, and step back from both of them."),
     ("pulls_worry", "pulls", "worry", "If {B} gets its way, what's {A} afraid of?"),
     ("pulls_both_want", "pulls", "both_want", "What do they both want for you?"),
+    # A side with no kept part (the tool opened on a pair, from a rule C trail): named by its move.
+    # {move} is the move's unblendPhrase ("wants to hide").
+    ("pulls_pair_name", "pulls", "name", "the part that {move}"),
+    # After the orienting close, with two kept parts: a two_pulls_checkback in a week, on the yes.
+    ("pulls_close_checkback", "pulls", "close", "Check back with both of them in a week?"),
+    # After the keepsake (kept, or Not now): a quiet link to Wise mind (lane 1's tool; shown only once it
+    # exists). Optional: the flow doesn't wait for it.
+    ("pulls_wise_mind", "pulls", "keepsake", "Ask wise mind what's next"),
     # The trail offer (parts.md "The offer card")
     ("offer_eyebrow", "offer", "card", "Something keeps showing up"),
     ("offer_ask", "offer", "card", "Want to take a look?"),
@@ -520,6 +528,9 @@ PROMPTS = [
     # follow-up the next day. _noname for a part kept without a name. "Louder" shows aftercare_louder.
     ("checkback_title", "checkback", "checkback", "How's {name} today?"),
     ("checkback_title_noname", "checkback", "checkback", "How's the part you met yesterday?"),
+    # Two pulls' check-back (two_pulls_checkback, a week after): the same card and answers, two names.
+    ("checkback_title_two", "checkback", "checkback", "How are {A} and {B} today?"),
+    ("checkback_title_two_noname", "checkback", "checkback", "How are the two parts from last week?"),
     ("close_checkback", "meet", "close", "Check back with it tomorrow?"),
     # DEAR MAN cope ahead (parts.md, DEAR MAN row and Phase 3): one screen in prep, after "What makes
     # this hard?" and before the script. A part's anchor is the person's own words or a line they kept.
@@ -571,6 +582,10 @@ PROMPTS = [
     ("settings_delete_no", "settings", "delete", "Keep them"),
     ("settings_delete_done", "settings", "delete", "Deleted."),
     ("settings_delete_failed", "settings", "delete", "Couldn't delete them. Try again."),
+    # Asked separately (parts.md "Deleting"), only when there are some: kept Two pulls lines in My words
+    # that name a kept part. Unticked by default; {n} is the count (2 or more; one has its own line).
+    ("settings_delete_lines_one", "settings", "delete", "Also remove 1 kept line that names your parts?"),
+    ("settings_delete_lines", "settings", "delete", "Also remove {n} kept lines that name your parts?"),
     # Me → Parts of me (parts.md "The part card"): the entry line and the card's labels. No stats yet.
     ("me_get_to_know", "me", "card", "Get to know a part"),
     ("card_where", "me", "card", "Where"),
@@ -637,6 +652,18 @@ PROMPTS = [
     ("story_other", "story", "where", "another part"),
     ("story_room_then", "story", "where", "In {month}"),
     ("story_room_now", "story", "where", "Now"),
+    # Say something to it (17 Oct): on each active or resting part's card in Parts of me, and after Thanks
+    # in Meet a part when the visit is to a kept part. The prompt is the app's voice; the chips (OPTIONS,
+    # flow say) are the person's, said to the part. A tender part gets the gentle set (step say_tender).
+    # Own words (≤ 140) are never linted. {said} = a chip's label or their own words; {month} as above.
+    ("say_open", "say", "card", "Say something to it"),
+    ("say_prompt", "say", "ask", "What would you like to say to {name}?"),
+    ("say_prompt_noname", "say", "ask", "What would you like to say to this part?"),
+    ("say_own_label", "say", "ask", "Your words"),
+    ("say_send", "say", "ask", "Say it"),
+    ("say_cancel", "say", "ask", "Not now"),
+    ("say_told", "say", "card", "You told it: {said}"),
+    ("say_story", "say", "story", "In {month} you told it: {said}"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry
@@ -831,6 +858,23 @@ OPTIONS = [
     opt("pulls_keep", "pulls", "keepsake", "Keep this", branch="keep"),
     opt("pulls_not_now", "pulls", "keepsake", "Not now", branch="end"),
     opt("pulls_another_time", "pulls", "needs_time", "Meet it another time", branch="candidate"),
+    opt("pulls_needs_time_not_now", "pulls", "needs_time", "Not now", branch="end"),
+    # "Not sure" is a complete answer at both steps: a worry left open, or no keepsake.
+    opt("pulls_worry_not_sure", "pulls", "worry", "Not sure"),
+    opt("pulls_both_want_not_sure", "pulls", "both_want", "Not sure", branch="end"),
+    opt("pulls_close_checkback_yes", "pulls", "close", "Yes", branch="checkback"),
+    opt("pulls_close_checkback_no", "pulls", "close", "No thanks", branch="end"),
+    # The general chips, for two parts with no shipped PolarityPair (or a pair whose own chips don't
+    # ship): the same worries offered to each side, and what both want ({want} in the keepsake: it reads
+    # "both want me {want}", ≤ 20). Own words stay at each worry. Every visit can end with a keepsake.
+    opt("pulls_worry_hurt", "pulls", "worry_general", "I'd get hurt"),
+    opt("pulls_worry_nothing", "pulls", "worry_general", "I'd be left with nothing"),
+    opt("pulls_worry_fall_apart", "pulls", "worry_general", "It would all fall apart"),
+    opt("pulls_worry_on_my_own", "pulls", "worry_general", "I'd end up on my own"),
+    opt("pulls_want_safe", "pulls", "both_want_general", "to be safe"),
+    opt("pulls_want_matter", "pulls", "both_want_general", "to matter to someone"),
+    opt("pulls_want_not_hurt", "pulls", "both_want_general", "not to be hurt again"),
+    opt("pulls_want_okay", "pulls", "both_want_general", "to be okay"),
 
     # --- The trail offer ---
     opt("offer_show", "offer", "card", "Show me"),
@@ -918,6 +962,19 @@ OPTIONS = [
     opt("blend_pulls_notice", "gate", "blend_pulls", "I can notice them"),
     opt("blend_pulls_running", "gate", "blend_pulls", "One of them is running things", branch="body_first"),
     opt("blend_pulls_not_sure", "gate", "blend_pulls", "Not sure"),
+
+    # --- Say something to it: the person's words to the part (sayToPart stores the id) ---
+    opt("say_thanks", "say", "say", "Thank you for trying"),
+    opt("say_got_this", "say", "say", "I've got this one"),
+    opt("say_rest", "say", "say", "You can rest now"),
+    opt("say_listening", "say", "say", "I'm listening"),
+    opt("say_see", "say", "say", "I see how hard you work"),
+    opt("say_own", "say", "say", "In my words", branch="own_words"),
+    # A tender part: the gentle set, nothing that asks it to change or step back.
+    opt("say_here", "say", "say_tender", "I'm here"),
+    opt("say_safe", "say", "say_tender", "You're safe with me now"),
+    opt("say_tender_listening", "say", "say_tender", "I'm listening"),
+    opt("say_tender_own", "say", "say_tender", "In my words", branch="own_words"),
 
     # --- Me: the 30-day check-back on a part's card (answers map to answerPartRevisit) ---
     opt("revisit_same", "me", "revisit", "Yes"),

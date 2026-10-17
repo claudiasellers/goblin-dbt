@@ -10,7 +10,8 @@
  * (spine never imports profile/). A set-aside or deleted part has no card.
  *
  * The answer resolves the follow-up under GUARDS.FollowUp.update and, on Louder, pauses the part
- * (keep.ts's PAUSE_PART_QUERY) in the same transaction. deleteMyParts removes every check-back by type, open or answered.
+ * (keep.ts's PAUSE_PART_QUERY) in the same transaction. It also answers Two pulls' week check-back
+ * (pulls/checkback.ts): the same card, Louder recorded as the harm signal without a pause. deleteMyParts removes every check-back by type, open or answered.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -25,6 +26,7 @@ import { registerTodaySource } from '../spine/today';
 import { followUpState, type TodayItem } from '../spine/todayOrder';
 import { validateScheduleItem, type ScheduleInput } from '../spine/validation';
 import { DEFAULT_LOUDER_PAUSE_HOURS, partsOff, pausePart } from './keep';
+import { TWO_PULLS_CHECKBACK_TYPE } from './pulls/types';
 import {
   PART_CHECKBACK_ANSWERS, PART_CHECKBACK_TYPE, type AnswerPartCheckbackResponse, type PartCheckbackAnswer,
   type SchedulePartCheckbackResponse,
@@ -138,14 +140,18 @@ export const ANSWER_STATE_QUERY = `
   OPTIONAL MATCH (u)-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key})
   OPTIONAL MATCH (f)-[:CHECKS_BACK]->(pt:Part)
   OPTIONAL MATCH (pol:PartsPolicy {id: 'parts'})
+  WITH u, f, pol, collect(pt.id) AS partIds
   RETURN coalesce(u.partsEnabled, false) AS partsOn, f.type AS type, f.status AS status,
-         coalesce(${GUARDS.FollowUp.update('f')}, false) AS open, pt.id AS partId, pol.louderPauseHours AS louderPauseHours
+         coalesce(${GUARDS.FollowUp.update('f')}, false) AS open, head(partIds) AS partId, pol.louderPauseHours AS louderPauseHours
 `;
+
+/** The check-backs this answer takes: Meet a part's next-day one, and Two pulls' week one (two parts). */
+export const CHECKBACK_TYPES: readonly string[] = [PART_CHECKBACK_TYPE, TWO_PULLS_CHECKBACK_TYPE];
 
 /** Resolves the check-back the way resolveFollowUp does (same guard, same outcome shape). */
 export const RESOLVE_CHECKBACK_QUERY = `
   MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key})
-  WHERE f.type = '${PART_CHECKBACK_TYPE}' AND ${GUARDS.FollowUp.update('f')}
+  WHERE f.type IN ['${PART_CHECKBACK_TYPE}', '${TWO_PULLS_CHECKBACK_TYPE}'] AND ${GUARDS.FollowUp.update('f')}
   SET f.status = $status, f.outcome = $outcome, f.harmSignal = $harmSignal, f.resolvedAt = datetime(), f.updatedAt = datetime()
   RETURN f.id AS id
 `;
@@ -176,12 +182,13 @@ export async function answerPartCheckbackHandler(
   const st = await deps.state(input.id);
   if (!st.partsOn) throw partsOff();
   if (!st.type) throw new HttpsError('not-found', 'Follow-up not found');
-  if (st.type !== PART_CHECKBACK_TYPE) throw new HttpsError('invalid-argument', 'Not a check-back');
+  if (!CHECKBACK_TYPES.includes(st.type)) throw new HttpsError('invalid-argument', 'Not a check-back');
   if (!st.open) return { status: st.status ?? 'done', aftercare: false };
   const status = CHECKBACK_STATUS[input.answer];
   if (!(await deps.resolve(input.id, status, input.answer))) return { status: st.status ?? 'done', aftercare: false };
   const louder = input.answer === 'louder';
-  if (louder && st.partId) await deps.pause(st.partId, st.pauseHours);
+  // Meet a part's Louder pauses its part; Two pulls' records the signal and shows the same aftercare.
+  if (louder && st.partId && st.type === PART_CHECKBACK_TYPE) await deps.pause(st.partId, st.pauseHours);
   return { status, aftercare: louder };
 }
 

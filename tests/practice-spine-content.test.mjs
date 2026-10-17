@@ -64,6 +64,9 @@ test("PracticeSkill defaultFor names real app tools; new skills link to existing
   for (const id of defaults) assert.ok(toolIds.has(id), id);
   assert.match(cypher, /PracticeSkill \{id: "urge_surf"\}\), \(c:TherapyConcept \{id: "urge_surfing"\}\)/);
   assert.match(cypher, /PracticeSkill \{id: "problem_solve"\}\), \(c:TherapyConcept \{id: "dbt_problem_solving"\}\)/);
+  // Wise mind: finishing a practice (markPracticed) logs a rep.
+  assert.match(cypher, /PracticeSkill \{id: "wise_mind"\}\)\nSET k\.name = "Wise mind",[\s\S]*?k\.defaultFor = \["wise-mind"\]/);
+  assert.match(cypher, /PracticeSkill \{id: "wise_mind"\}\), \(c:TherapyConcept \{id: "dbt_wise_mind"\}\)/);
 });
 
 test("no PracticeSkill DELETE is unscoped (Recover's reload used to strip every module's links)", () => {

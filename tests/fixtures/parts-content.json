@@ -350,6 +350,27 @@
    "copy": "What do they both want for you?",
    "reviewStatus": "draft"
   },
+  "pulls_pair_name": {
+   "flow": "pulls",
+   "step": "name",
+   "order": 6,
+   "copy": "the part that {move}",
+   "reviewStatus": "draft"
+  },
+  "pulls_close_checkback": {
+   "flow": "pulls",
+   "step": "close",
+   "order": 7,
+   "copy": "Check back with both of them in a week?",
+   "reviewStatus": "draft"
+  },
+  "pulls_wise_mind": {
+   "flow": "pulls",
+   "step": "keepsake",
+   "order": 8,
+   "copy": "Ask wise mind what's next",
+   "reviewStatus": "draft"
+  },
   "offer_eyebrow": {
    "flow": "offer",
    "step": "card",
@@ -793,6 +814,20 @@
    "copy": "How's the part you met yesterday?",
    "reviewStatus": "draft"
   },
+  "checkback_title_two": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 2,
+   "copy": "How are {A} and {B} today?",
+   "reviewStatus": "draft"
+  },
+  "checkback_title_two_noname": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 3,
+   "copy": "How are the two parts from last week?",
+   "reviewStatus": "draft"
+  },
   "close_checkback": {
    "flow": "meet",
    "step": "close",
@@ -973,6 +1008,20 @@
    "step": "delete",
    "order": 11,
    "copy": "Couldn't delete them. Try again.",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_lines_one": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 12,
+   "copy": "Also remove 1 kept line that names your parts?",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_lines": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 13,
+   "copy": "Also remove {n} kept lines that name your parts?",
    "reviewStatus": "draft"
   },
   "me_get_to_know": {
@@ -1358,6 +1407,62 @@
    "step": "where",
    "order": 13,
    "copy": "Now",
+   "reviewStatus": "draft"
+  },
+  "say_open": {
+   "flow": "say",
+   "step": "card",
+   "order": 0,
+   "copy": "Say something to it",
+   "reviewStatus": "draft"
+  },
+  "say_prompt": {
+   "flow": "say",
+   "step": "ask",
+   "order": 1,
+   "copy": "What would you like to say to {name}?",
+   "reviewStatus": "draft"
+  },
+  "say_prompt_noname": {
+   "flow": "say",
+   "step": "ask",
+   "order": 2,
+   "copy": "What would you like to say to this part?",
+   "reviewStatus": "draft"
+  },
+  "say_own_label": {
+   "flow": "say",
+   "step": "ask",
+   "order": 3,
+   "copy": "Your words",
+   "reviewStatus": "draft"
+  },
+  "say_send": {
+   "flow": "say",
+   "step": "ask",
+   "order": 4,
+   "copy": "Say it",
+   "reviewStatus": "draft"
+  },
+  "say_cancel": {
+   "flow": "say",
+   "step": "ask",
+   "order": 5,
+   "copy": "Not now",
+   "reviewStatus": "draft"
+  },
+  "say_told": {
+   "flow": "say",
+   "step": "card",
+   "order": 6,
+   "copy": "You told it: {said}",
+   "reviewStatus": "draft"
+  },
+  "say_story": {
+   "flow": "say",
+   "step": "story",
+   "order": 7,
+   "copy": "In {month} you told it: {said}",
    "reviewStatus": "draft"
   }
  },
@@ -3255,89 +3360,15 @@
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
-    }
-   ],
-   "both_want": [
-    {
-     "id": "want_not_left",
-     "label": "not to be left",
-     "kind": "chip",
-     "flag": null,
-     "selfLike": null,
-     "branch": "continue",
-     "order": 0,
-     "moves": [],
-     "sameAs": [],
-     "reviewStatus": "draft"
     },
     {
-     "id": "want_safe_in_it",
-     "label": "to stay safe in it",
+     "id": "pulls_needs_time_not_now",
+     "label": "Not now",
      "kind": "chip",
      "flag": null,
      "selfLike": null,
-     "branch": "continue",
+     "branch": "end",
      "order": 1,
-     "moves": [],
-     "sameAs": [],
-     "reviewStatus": "draft"
-    },
-    {
-     "id": "want_matter_someone",
-     "label": "to matter to someone",
-     "kind": "chip",
-     "flag": null,
-     "selfLike": null,
-     "branch": "continue",
-     "order": 2,
-     "moves": [],
-     "sameAs": [],
-     "reviewStatus": "draft"
-    },
-    {
-     "id": "want_safe",
-     "label": "to be safe",
-     "kind": "chip",
-     "flag": null,
-     "selfLike": null,
-     "branch": "continue",
-     "order": 3,
-     "moves": [],
-     "sameAs": [],
-     "reviewStatus": "draft"
-    },
-    {
-     "id": "want_treated_well",
-     "label": "to be treated well",
-     "kind": "chip",
-     "flag": null,
-     "selfLike": null,
-     "branch": "continue",
-     "order": 4,
-     "moves": [],
-     "sameAs": [],
-     "reviewStatus": "draft"
-    },
-    {
-     "id": "want_keep_what_matters",
-     "label": "to keep what matters",
-     "kind": "chip",
-     "flag": null,
-     "selfLike": null,
-     "branch": "continue",
-     "order": 5,
-     "moves": [],
-     "sameAs": [],
-     "reviewStatus": "draft"
-    },
-    {
-     "id": "want_matter",
-     "label": "to matter",
-     "kind": "chip",
-     "flag": null,
-     "selfLike": null,
-     "branch": "continue",
-     "order": 6,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3345,13 +3376,25 @@
    ],
    "worry": [
     {
+     "id": "pulls_worry_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
      "id": "chase_worry_drift",
      "label": "They'd drift away and I'd lose them",
      "kind": "chip",
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 0,
+     "order": 1,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3363,7 +3406,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 1,
+     "order": 2,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3375,7 +3418,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 2,
+     "order": 3,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3387,7 +3430,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 3,
+     "order": 4,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3399,7 +3442,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 4,
+     "order": 5,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3411,7 +3454,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 5,
+     "order": 6,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3423,7 +3466,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 6,
+     "order": 7,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3435,7 +3478,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 7,
+     "order": 8,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3447,7 +3490,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 8,
+     "order": 9,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3459,7 +3502,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 9,
+     "order": 10,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3471,7 +3514,7 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 10,
+     "order": 11,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3483,7 +3526,231 @@
      "flag": null,
      "selfLike": null,
      "branch": "continue",
-     "order": 11,
+     "order": 12,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "both_want": [
+    {
+     "id": "pulls_both_want_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "want_not_left",
+     "label": "not to be left",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "want_safe_in_it",
+     "label": "to stay safe in it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "want_matter_someone",
+     "label": "to matter to someone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "want_safe",
+     "label": "to be safe",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "want_treated_well",
+     "label": "to be treated well",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "want_keep_what_matters",
+     "label": "to keep what matters",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 6,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "want_matter",
+     "label": "to matter",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 7,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "close": [
+    {
+     "id": "pulls_close_checkback_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "checkback",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_close_checkback_no",
+     "label": "No thanks",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "worry_general": [
+    {
+     "id": "pulls_worry_hurt",
+     "label": "I'd get hurt",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_worry_nothing",
+     "label": "I'd be left with nothing",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_worry_fall_apart",
+     "label": "It would all fall apart",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_worry_on_my_own",
+     "label": "I'd end up on my own",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "both_want_general": [
+    {
+     "id": "pulls_want_safe",
+     "label": "to be safe",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_want_matter",
+     "label": "to matter to someone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_want_not_hurt",
+     "label": "not to be hurt again",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_want_okay",
+     "label": "to be okay",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -4212,6 +4479,132 @@
      "selfLike": null,
      "branch": "continue",
      "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "say": {
+   "say": [
+    {
+     "id": "say_thanks",
+     "label": "Thank you for trying",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_got_this",
+     "label": "I've got this one",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_rest",
+     "label": "You can rest now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_listening",
+     "label": "I'm listening",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_see",
+     "label": "I see how hard you work",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "say_tender": [
+    {
+     "id": "say_here",
+     "label": "I'm here",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_safe",
+     "label": "You're safe with me now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_tender_listening",
+     "label": "I'm listening",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_tender_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 3,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

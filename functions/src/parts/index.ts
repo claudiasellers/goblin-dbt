@@ -30,6 +30,8 @@ import {
 import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
 import { isTaggedTwice, tagDeps, tagPartHandler, validateTag } from './tag';
 import type { TagPartResponse } from './tagTypes';
+import { sayDeps, sayToPartHandler, validateSay } from './say';
+import type { SayToPartResponse } from './sayTypes';
 import {
   answerCheckbackDeps, answerPartCheckbackHandler, scheduleCheckbackDeps, schedulePartCheckbackHandler,
   validateAnswerCheckback, validateScheduleCheckback,
@@ -43,7 +45,7 @@ import type {
   GetDenResponse, GetDenSnapshotResponse, LinkPartsResponse, UnlinkPartsResponse, UpdatePartLayoutResponse,
 } from './denTypes';
 
-export { deleteMyParts } from './delete';
+export { deleteMyParts, countMyPartsLines } from './delete';
 
 /** What a parts flow opens on: P2 first, the far-away heads-up, or clear (plus tooMany / paused). Never a lock. */
 export const getPartsEntry = callable<unknown, PartsEntry>(
@@ -110,6 +112,15 @@ export const tagPart = callable<unknown, TagPartResponse>(
       if (!isTaggedTwice(e)) throw e;
       return run();
     }
+  },
+);
+
+/** "Say something to it": one message to the caller's own active or resting part (say.ts). A repeat id writes nothing. */
+export const sayToPart = callable<unknown, SayToPartResponse>(
+  { auth: 'required', label: 'sayToPart', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateSay(data), 'Invalid request');
+    return writeTx((tx) => sayToPartHandler(input, sayDeps(tx, uid as string, request.auth?.token?.email ?? null)));
   },
 );
 
@@ -197,7 +208,7 @@ export const schedulePartCheckback = callable<unknown, SchedulePartCheckbackResp
   },
 );
 
-/** "How's {name} today?": one write; Louder also pauses the part. */
+/** "How's {name} today?" (and Two pulls' "How are {A} and {B} today?"): one write; Louder also pauses Meet a part's part. */
 export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse>(
   { auth: 'required', label: 'answerPartCheckback', errorMessage: 'Could not save that' },
   async ({ uid, data }) => {
@@ -262,3 +273,7 @@ export const unlinkParts = callable<unknown, UnlinkPartsResponse>(
 // ---- Trail offers (Phase 4; Today's card and the daily evaluation register themselves in ./offers) ----
 
 export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './offers';
+
+// ---- Two pulls (its week check-back's Today card registers itself in ./pulls/checkback) ----
+
+export { startPullsSession, savePullsSession, keepPullsKeepsake, schedulePullsCheckback } from './pulls';

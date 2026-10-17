@@ -83,7 +83,7 @@ test("CrisisBanner is the one crisis seam: the numbers live only there; compact 
 test("the check-back card: the banner under the answers, alongside them, only for a flagged part (and its aftercare)", () => {
   // (Rendering the card pulls in firebase; the card is checked from its source, CrisisBanner by rendering above.)
   const card = read("src/components/parts/PartCheckbackCard.tsx");
-  assert.match(card, /const crisis = item\.part\?\.safety === true \? <div className="mt-3"><CrisisBanner compact \/><\/div> : null;/);
+  assert.match(card, /const crisis = item\.part\?\.safety === true \|\| item\.parts\?\.some\(\(p\) => p\.safety === true\) \? <div className="mt-3"><CrisisBanner compact \/><\/div> : null;/, "either of Two pulls' parts too");
   assert.equal((card.match(/\{crisis\}/g) ?? []).length, 2, "the card and its aftercare");
   const main = card.slice(card.indexOf('data-testid="part-checkback"'));
   assert.ok(main.indexOf("checkbackChoices(content).map") < main.indexOf("{crisis}"), "after the answers, which all stay");

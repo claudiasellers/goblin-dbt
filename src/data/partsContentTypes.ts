@@ -59,6 +59,20 @@ export interface PartsHurt {
   guardedBy: { moveId: string; rank: number }[];
 }
 
+/**
+ * Two pulls' pair (two offerable moves that pull against each other): ids only. Each chip list names
+ * options in `options.pulls` (both_want, worry): what both want for the person, and each side's worry
+ * about the other getting its way (worryA is A's), in order.
+ */
+export interface PartsPair {
+  id: string;
+  a: string;
+  b: string;
+  bothWant: string[];
+  worryA: string[];
+  worryB: string[];
+}
+
 export interface PartsContent {
   /** content.py's VERSION; null only when the graph has no parts content at all. */
   version: string | null;
@@ -74,6 +88,8 @@ export interface PartsContent {
    * EXPRESSES edges whose move ships (so never go_blank / zone_out). Feeds the in-the-moment unblend line.
    */
   expresses: Record<string, Record<string, string>>;
+  /** Two pulls' signed-off pairs whose two moves ship (absent in an older file: none). */
+  pairs?: PartsPair[];
   /**
    * PartsPolicy's two numbers a screen needs, only once the policy is signed off. Absent: the client's
    * pinned defaults (the server's), src/lib/meetAPartSave.ts.

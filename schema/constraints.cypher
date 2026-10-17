@@ -145,11 +145,13 @@ CREATE CONSTRAINT own_line_key IF NOT EXISTS FOR (n:OwnLine) REQUIRE n.key IS UN
 CREATE CONSTRAINT push_token_key IF NOT EXISTS FOR (n:PushToken) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_session_key IF NOT EXISTS FOR (n:PartSession) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_candidate_key IF NOT EXISTS FOR (n:PartCandidate) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT pulls_session_key IF NOT EXISTS FOR (n:PullsSession) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_tag_key IF NOT EXISTS FOR (n:PartTag) REQUIRE n.key IS UNIQUE;
 // One tag per tagged record (tagPart): the tagged ToolSession's key, unique across tags.
 CREATE CONSTRAINT part_tag_tagged_key IF NOT EXISTS FOR (n:PartTag) REQUIRE n.taggedKey IS UNIQUE;
 CREATE CONSTRAINT part_key IF NOT EXISTS FOR (n:Part) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_revisit_key IF NOT EXISTS FOR (n:PartRevisit) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_message_key IF NOT EXISTS FOR (n:PartMessage) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT trail_offer_key IF NOT EXISTS FOR (n:TrailOffer) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_link_key IF NOT EXISTS FOR (n:PartLink) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT den_snapshot_key IF NOT EXISTS FOR (n:DenSnapshot) REQUIRE n.key IS UNIQUE;

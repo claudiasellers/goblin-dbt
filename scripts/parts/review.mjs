@@ -54,12 +54,13 @@ export async function loadGates() {
 export { UNBLEND_REQUIRED } from './src/lib/unblendLine';
 export { angryRequired, ANGRY_LATER_REQUIRED } from './src/lib/angryPart';
 export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED, MEET_FRONT_REQUIRED } from './src/lib/meetAPartSave';
-export { PART_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
+export { PART_CHECKBACK_REQUIRED, TWO_PULLS_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
+export { TWO_PULLS_REQUIRED, PULLS_OPTION_STEPS, PULLS_CHECKBACK_REQUIRED, PULLS_WISE_MIND_REQUIRED, PULLS_GENERAL_REQUIRED } from './src/lib/twoPullsSave';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
 export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
 export { STATS_REQUIRED, REFLECT_REQUIRED, REFLECT_FEEL_REQUIRED } from './src/lib/partStats';
-export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
+export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, SETTINGS_LINES_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
@@ -68,6 +69,7 @@ export { KNOWN_PART_REVIEW_REQUIRED, PLAIN_PATTERNS_REQUIRED } from './src/lib/k
 export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 export { DEN_REQUIRED } from './src/lib/den';
 export { PART_STORY_REQUIRED } from './src/lib/partStory';
+export { SAY_TO_PART_REQUIRED, SAY_STORY_REQUIRED } from './src/lib/sayToPart';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -112,9 +114,23 @@ export function surfaces(g) {
       choices: g.MEET_OPTION_STEPS,
     },
     {
+      id: 'pulls', title: 'Two pulls',
+      where: 'The parts tool for two parts pulling different ways, by link only (the den with two kept parts, or a rule C trail offer\'s "More than one" with its pair), with parts on: the entry gate, the blending check about both, setting them out, how they feel toward each (Meet a part\'s feel-toward and unblend chips), step back, each side\'s worry, what they both want, the keepsake and the close. A pair-only visit names each side "the part that {move}" from the move\'s `unblendPhrase`. The worries and what both want also need the pair and its chips signed off (Two pulls pairs); without a pair, two parts get "Not sure" and their own words only, and no keepsake.',
+      groups: [
+        { label: 'The visit', ids: g.TWO_PULLS_REQUIRED },
+        { label: 'The general chips: worries and what both want for two parts with no pair of their own (each visit then ends with a keepsake; the visit shows without them)', ids: g.PULLS_GENERAL_REQUIRED },
+        { label: 'The close\'s "Check back with both of them in a week?" (two kept parts; the visit shows without it)', ids: g.PULLS_CHECKBACK_REQUIRED },
+        { label: 'After the keepsake: "Ask wise mind what\'s next" (only once Wise mind is a tool; the visit shows without it)', ids: g.PULLS_WISE_MIND_REQUIRED },
+      ],
+      choices: g.PULLS_OPTION_STEPS,
+    },
+    {
       id: 'checkback', title: 'The check-back card',
       where: 'On Today, the day after a visit whose close said yes to checking back: "How\'s {name} today?" and, on Louder, the aftercare line. Parts on only.',
-      groups: [{ label: null, ids: g.PART_CHECKBACK_REQUIRED }],
+      groups: [
+        { label: null, ids: g.PART_CHECKBACK_REQUIRED },
+        { label: 'Two pulls\' week check-back: the same card with both names ("How are {A} and {B} today?")', ids: g.TWO_PULLS_CHECKBACK_REQUIRED },
+      ],
     },
     {
       id: 'tag', title: 'The tag row',
@@ -147,11 +163,20 @@ export function surfaces(g) {
       groups: [{ label: null, ids: g.PART_STORY_REQUIRED }],
     },
     {
+      id: 'say', title: 'Say something to it',
+      where: 'Me → Parts of me: "Say something to it" on each active or resting part\'s card opens "What would you like to say to {name}?" in place, with chips in the person\'s voice (a tender part gets the gentle set) and "In my words" (up to 140 characters, never linted); Not now closes it. The latest one shows quietly on the card as "You told it: …". Also in Meet a part, after Thanks (or the tender path\'s hold, with the gentle set) on a visit to a kept part. Saved as a PartMessage; nothing else reads it.',
+      groups: [
+        { label: null, ids: g.SAY_TO_PART_REQUIRED },
+        { label: 'In the part\'s story: "In {month} you told it: …" (the story shows without it)', ids: g.SAY_STORY_REQUIRED },
+      ],
+    },
+    {
       id: 'settings', title: 'Settings',
       where: 'Privacy & Data, for everyone signed in: the parts switch (off by default), what it does, and Delete your parts (there whether parts are on or off).',
       groups: [
         { label: null, ids: g.PARTS_SETTINGS_REQUIRED },
         { label: 'The one-time link right after turning parts on (also needs Meet a part)', ids: g.SETTINGS_LINK_REQUIRED },
+        { label: 'Under the delete confirm, only when kept Two pulls lines name a part (optional)', ids: g.SETTINGS_LINES_REQUIRED },
       ],
     },
     {
