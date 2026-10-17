@@ -78,18 +78,12 @@ export function roomParts(parts: readonly SlicePart[], content: PartsContent, co
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /**
- * `?a=<id>&b=<id>` (Two pulls' keepsake: both figures already in the room): the ids that are the
- * person's active or resting parts, each once, in that order. Anything else is dropped.
+ * The parts a link put in the room (`?a=<id>&b=<id>`, Two pulls' keepsake; Wise mind's parseWiseEntry
+ * reads them, unchecked): only ids that are the person's active or resting parts, each once, in order.
  */
-export function presetPartIds(search: string, parts: readonly Pick<SlicePart, 'id' | 'status'>[]): string[] {
-  const q = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+export function presetPartIds(ids: readonly string[], parts: readonly Pick<SlicePart, 'id' | 'status'>[]): string[] {
   const kept = new Set(parts.filter((p) => p.status === 'active' || p.status === 'resting').map((p) => p.id));
-  const out: string[] = [];
-  for (const k of ['a', 'b']) {
-    const v = q.get(k);
-    if (v && UUID.test(v) && kept.has(v) && !out.includes(v)) out.push(v);
-  }
-  return out;
+  return [...new Set(ids.filter((v) => UUID.test(v) && kept.has(v)))];
 }
 
 export interface StepBackState {

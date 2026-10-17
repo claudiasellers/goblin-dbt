@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from 'react';
+import { useId, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useReducedMotion } from 'motion/react';
 import { CrisisBanner } from '../../../safety/CrisisBanner';
@@ -49,7 +49,6 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
   const uid = `wm${useId().replace(/[^A-Za-z0-9_-]/g, '')}`;
   const [progress, setProgress] = useState(0);
   const [tried, setTried] = useState(false);
-  useEffect(() => { if (state.held) setProgress(1); }, [state.held]);
 
   const t = state.held ? 1 : reduce ? 0 : progress;
   const spots = placedSpots(state, t);
