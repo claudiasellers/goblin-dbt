@@ -40,6 +40,8 @@ export interface CloseToolSessionRequest {
   ext?: SessionExt;
   /** Follow-ups this close schedules (≤5; e.g. Problem Solve's ps_step, Recover's three). */
   schedule?: ScheduleFollowUpInput[];
+  /** Wise mind's answer (a WiseMindAnswer id, or `own`): ask-fresh, on this session only; the server drops it for other tools. */
+  wiseMindAnswer?: string;
 }
 
 export interface CloseToolSessionResponse { id: string; skillPracticeIds: string[]; followUpIds: string[] }
