@@ -354,6 +354,26 @@ The evaluator turns log records into **episodes**: `{at, moveIds[], context, sou
 | `timeBand` | morning / afternoon / evening / night, from `timestamp` and `User.timeZone` |
 | `guards` | Recover `needId`, DEAR MAN `underneathIds` → `ProtectedHurt` |
 
+**As built (17 Oct, `functions/src/parts/trails/`, switched off).** `episodes.ts` is pure. Records within
+`episodeMergeHours` of an episode's **first** record merge, so a busy day can't chain into one episode.
+Each context takes the first non-null value in time order; a later record that disagrees is counted as a
+conflict, never guessed. `timeBand` comes from the first record in `User.timeZone`. Only closed sessions
+count, and an episode's time is its first ToolSession's start. Where moves come from (one predicate,
+`parts/sessionMoves.ts`, shared with `queuePartCandidate`; approved `EXPRESSES` edges only):
+
+| Tool | Moves | Context |
+|---|---|---|
+| Do the Opposite | `ToolSession.urgeIds`, the plan's `urgeId` | — |
+| Urge Surfing | `urgeIds` → `FeelingUrge` | — |
+| Find the feeling | `DETAIL` session's `pull` → `FeelingUrge` | `setOff` → trigger (an exact `dataJson` match, test-pinned) |
+| Recover | `DETAIL` session's `pull` → `PullOption` | `stateId` → event; trigger someone |
+| DEAR MAN | moment response, turning point, thought pattern and barrier ids | trigger someone |
+| Problem Solve | `ext.er.barrierSubId` (its ambivalence id has no `EXPRESSES`) | — |
+| Check-in | follow-up answer ids (`discResponseIds`) | — |
+
+A detail session with no ToolSession counts as its own record. Meet a part is never read. No free text is
+ever read (`trails/ownWords.ts` lists the own-words properties the query must not return, test-enforced).
+
 ### Rules
 
 `TrailRule` is graph content with its **own label**. The existing evaluator hardcodes `PatternRule` and
@@ -382,6 +402,23 @@ Why the rules look like this:
 - **Rule D reads claimed parts' moves.** That is a profile read, so it goes through
   `readProfileSlices(tx, uid, 'today')` with `parts` declared for `today`. It never touches the Part node
   directly.
+
+**As built (17 Oct, every rule `enabled: false`).** `rules.ts` evaluates the four shapes; `evaluate.ts`
+removes blocked trails before it picks each trail's best context. The choices:
+
+- **A** counts only records that express the move, for its episodes and for its tools. It may name
+  `turn_on_myself` and carries `safetyLine` when it does; Today never offers those (below).
+- **B** windows run start to start, and its two moves are sorted for the offer id and the block, so
+  both orders are one trail.
+- **C** gives one candidate per polarity pair.
+- **D** is blocked by rule and part; "since it was last visited" falls back to when the part was kept.
+  The `parts` slice carries `lastVisitedAt` and `pausedUntil` for it. D goes to Reflect only, never to
+  Today.
+- **The dry run** (`scripts/parts/trails-dry-run.mjs`, read-only, after `npm --prefix functions run
+  build`) treats every rule as on and prints what each would find: `--uid <uid>` for one person
+  (episodes, candidates, statements, evidence), `--all` for aggregates with no uid, `--drafts` to count
+  draft `EXPRESSES` edges too, `--set <rule>.<field>=<n>` to try a threshold, and `--records <file>`
+  offline. Sources print as graph labels and a part as ‹part id›; nothing the person wrote.
 
 ### When an offer may appear
 
@@ -438,6 +475,29 @@ Does this feel like a part of you?
 - Rows are ids rendered as labels. No free text appears on an offer.
 - **Its own callable.** `answerTrailOffer` takes the five answers and the evidence step.
   `answerPatternOffer` and `patternOfferItems` stay as they are.
+
+**As built (17 Oct, switched off; `functions/src/parts/offers/`, `TrailOfferCard`).**
+
+- **The prepare step** runs once a day (`User.trailsEvaluatedAt`): `readTrailState`, then the engine
+  with the person's blocked trails. It offers shapes **A to C only**: D is filtered out before the top
+  candidate is picked. Safety-line A trails are skipped too: whether they are ever offered, with the
+  crisis banner alongside, is a question for the clinical review.
+- **`writeTrailOffer`** (`offers/record.ts`) is the one writer of a `TrailOffer`, test-enforced.
+- **`offerGate`** (`offers/gate.ts`, pure, exported so Reflect can share it) checks parts on, offers on
+  and the rule on; flooding or a crisis flag within `floodGateHours`; a crisis within
+  `crisisPauseHours`; repeated dissociation; any harm signal (`parts/harmRows.ts`, shared with
+  `harm.ts`); and one weekly budget shared with `what_helps` (`profile/offerBudget.ts`). The windows
+  include both ends.
+- **Today** shows at most one offer, the newest open one, only when every phrase its statement needs is
+  signed off, and drops it on a flooded band.
+- **The callables.** `getTrailOfferEvidence` marks the offer seen and returns rows of date, tool,
+  context phrase and graph labels. `answerTrailOffer`: *Yes* opens Meet a part on the `offer` trailhead,
+  and `keepPart` records `ACCEPTED_FROM` (the offer's moves join the session's); *More than one* writes
+  `PartCandidate`s (origin `trail`) after "Which of these feels like its own thing?" and *Keep these*
+  (`offer_split_keep`); *It's how things go* and *Not me* close it; *Not now* keeps it open and cools it
+  down. It refuses a D offer, and accepts answers with offers off, so an open card can still be closed.
+- **Blocking** (`offers/blocked.ts`): *Not me*, every other final answer and an offer still open block
+  that trail for good; *Not now* blocks until `cooldownUntil` (the rule's `cooldownDays`, else 28).
 
 ### "Was this a part you know?" — the stronger signal
 
@@ -732,8 +792,12 @@ The profile's revisit mechanic becomes the IFS check-back.
 confirmed step (`deleteMyParts`, which works with parts off):
 
 - the `Part`, `PartLink`, `DenSnapshot`, `PartCandidate` and `PartTag` records;
-- any `TrailOffer` that points at them;
-- any open `part_checkback` follow-up.
+- every `TrailOffer`;
+- every `part_checkback` follow-up, open or answered (both carry `partId`).
+
+It leaves `ToolSession.ext.er.copeAheadPartId` and `whoShowedUp` alone: they are opaque ids and enums on
+finalised log records, pointing at nothing once the part is gone, and rewriting a finalised record is
+retention's job, not this one's.
 
 It **asks separately** about kept *Two pulls* lines in My words that contain part names: "Also remove 2
 kept lines that name your parts?"
@@ -856,7 +920,7 @@ which is agreed and which the person chooses.
 | **Backlash** | Next-day `part_checkback`. *Louder* → body tools, a 72 h pause on that part, and a review signal |
 | **Exile contact and memories** | Protector level only. No question about the past. The tender path is presence only. Own words take the conservative branch |
 | **Dissociation and plural experience** | Off by default, switched on in Settings with the dissociation lines. Shutdown moves are never offered or paired. Dissociation history blocks offers and adds a heads-up on entry. No "everyone has parts" script |
-| **Self-harm** | `safetyLine` moves, `danger` fears and own words on those moves show crisis resources alongside, through one seam. No update or would-rather steps alone |
+| **Self-harm** | `safetyLine` moves, `danger` fears and own words on those moves show crisis resources alongside, through one seam. No update or would-rather steps alone. **As built:** `partSafetyFlag` (`functions/src/safety/partSafetyFlag.ts`, mirrored in `src/lib/partSafetyFlag.ts`, agreement test-pinned) reads `ProtectiveMove.safetyLine` and the `danger` fear flag from content. The `parts` / `partDetail` slices and getMe carry one boolean, `safety`, computed server-side, so a tender part's hidden fears still flag it. The app's `CrisisBanner` (its `compact` form on cards) shows under the part's card actions in Me (beside its 30-day check-back, which sits in the card), under the Today check-back's answers and its Louder aftercare, and on every screen of a visit to that part in Meet a part, never instead of them. The tag row is the one place it doesn't (a chip row after a better close isn't the moment), and a set-aside row offers only "Bring it back". The seam ignores review status: content can only add a banner, never take one away |
 | **Suicidal-ideation echo** | No "disappear" from the app's side; `unblendPhrase` is reviewed per move |
 | **Reification, self-diagnosis** | Trails, not parts. No roles, no archetypes, no part numbers. Three or more parts made in 7 days → one line: *"You don't need to get to know everyone at once."* |
 | **Accountability** | "A part of you wanted to ___, and you ___". The `no_part_blame` lint |
@@ -946,14 +1010,14 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 
 | Label | Layer | Fields / edges | Notes |
 |---|---|---|---|
-| `Part` | Profile | `kind:'part'`, `area:'my_parts'`, `name`, `status` (active / resting / set_aside), `source` (made / offer / candidate), `tender`, `shapeSig[5]`, `soundSig[4]?`, `places[]`, `ageId`, `voiceIds[]`, `ownVoice?`, `jobIds[]`, `ownJob?`, `fearIds[]`, `ownFear?`, `preferredRoleIds[]`, `jobHistoryJson`, `anchorLineId?`, `anchorOwn?`, `pausedUntil?`, `mapX`, `mapY`, `confirmedAt`, `revisitAt`, `lastVisitedAt`. Profile edges `-[:USES {confirmedAt, source}]->(:ProtectiveMove)`, `-[:GUARDS]->(:ProtectedHurt)`, `-[:ACCEPTED_FROM]->(:TrailOffer \| :PartCandidate)` | **`keepPart` is the only writer.** Add a grep test like the `MyPattern` one |
+| `Part` | Profile | `kind:'part'`, `area:'my_parts'`, `name`, `status` (active / resting / set_aside), `source` (made / offer / candidate), `tender`, `shapeSig[5]`, `soundSig[4]?`, `places[]`, `ageId`, `voiceIds[]`, `ownVoice?`, `jobIds[]`, `ownJob?`, `fearIds[]`, `ownFear?`, `preferredRoleIds[]`, `jobHistoryJson`, `anchorLineId?`, `anchorOwn?`, `pausedUntil?`, `shapeFrom?` (the visit whose Find the feeling shape it carries), `mapX`, `mapY`, `confirmedAt`, `revisitAt`, `lastVisitedAt`. Profile edges `-[:USES {confirmedAt, source}]->(:ProtectiveMove)`, `-[:GUARDS]->(:ProtectedHurt)`, `-[:ACCEPTED_FROM]->(:TrailOffer \| :PartCandidate)` | **`keepPart` is the only writer.** Add a grep test like the `MyPattern` one |
 | `PartLink` | Profile | `kind: 'two_pulls' \| 'covers_for'`, `aId`, `bId`, `bothWantId?` | Written only on a yes in the den or in Two pulls |
 | `DenSnapshot` | Profile | `takenAt`, `layoutJson` | — |
 | `PartSession` | Log | As in *What's saved* | `ToolSession -DETAIL->` |
 | `PartTag` | Log | `at`, `source` (close / debrief / review: Rule D's "Was this {name}?"), `strength` (debrief: yes / a_bit), `taggedKey` (one per tagged record per source), `-[:TAGS]->(:CheckIn \| :ToolSession)`, `-[:OF_PART]->(:Part)` | An incoming edge only, so finalise-once holds |
 | `PartRevisit` | Log | `partId`, `answer`, `ratherIds`, `-[:OF_PART]->(:Part)` | The 30-day check-back's answer, written once |
 | `PartCandidate` | Log | `origin` (new_one / worried_part / split / ps_ambivalence / angry_card), `moveIds[]`, `createdAt`, `status` (open / accepted / dismissed), `-[:FROM_SESSION]->(:ToolSession)?`; `(:PartSession)-[:QUEUED]->` | Written only on a yes. Read in Me the way `PatternOffer` is |
-| `TrailOffer` | Log | `ruleId`, `moveIds`, `contextKey`, `evidenceKeys`, `status`, `offeredAt`, `cooldownUntil` | `id = ruleId:moves:context`. Shares the weekly budget with `PatternOffer` |
+| `TrailOffer` | Log | `ruleId`, `shape`, `moveIds` (sorted), `pullIds` (statement order), `contextId`, `pairId`, `partId`, `evidenceKeys`, `evidenceJson` (dates, tool ids, record keys, move and context ids; never text), `status` (offered → seen → answered), `answer`, `offeredAt`, `seenAt`, `answeredAt`, `cooldownUntil`; `-[:EVIDENCE]->(record)`, `-[:ABOUT_PART]->(:Part)` (rule D) | `HAS_TRAIL_OFFER`. `writeTrailOffer` is the one writer; edges run out of it only. Shares the weekly budget with `PatternOffer` |
 
 **Registration and tests.**
 
@@ -998,11 +1062,15 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 - **Callables in `functions/src/parts/`** (built by 16 Oct unless marked):
   - `getPartsEntry` (also `tooMany`, and `paused` for a given part), `startPartSession` / `savePartSession`
   - `keepPart` and every other Part writer in `keep.ts`: `renamePart`, `restPart`, `setAsidePart`,
-    `restorePart`, `setPartTender` (true only), `answerPartRevisit`, `setPartAnchor`, the Louder pause
+    `restorePart`, `setPartTender` (true only), `answerPartRevisit`, `setPartAnchor`, the Louder pause,
+    `setPartShape` (Find the feeling's "Use this shape for {name}?": writes `shapeSig` and `shapeFrom`,
+    once per part per visit, active or resting parts only)
   - `queuePartCandidate`, `answerPartCandidate`, `tagPart`
-  - `schedulePartCheckback`, `answerPartCheckback` (spine's `resolveFollowUp` refuses this type)
+  - `schedulePartCheckback`, `answerPartCheckback` (spine's `resolveFollowUp` refuses this type; spine's
+    `scheduleFollowUp` and `snoozeFollowUp` refuse any parts follow-up while parts are off, as not found)
   - `deleteMyParts`
-  - not yet: `answerTrailOffer` (Phase 4), `updatePartLayout`, `linkParts` (Phase 5)
+  - Phase 4, switched off: `getTrailOfferEvidence`, `answerTrailOffer`
+  - not yet: `updatePartLayout`, `linkParts` (Phase 5)
   - Content ships as a generated `src/data/content/parts.json`, like the other content files, holding
     **approved rows only** (moves, prompts, options, hurts, `canTouch`, `expresses`; never trail rules or
     contexts, and of the policy only `limits` (`nameMaxChars`, `maxNonSelfAnswers`) once it is signed
@@ -1012,7 +1080,7 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
   - `meet-a-part` is in `NOT_WHAT_HELPS` (`spine/tools.ts`): its orienting answer is stored but never
     counted as "it helped" (what-helps rules, Insights, Today's outcome card, `ToolUsage.outcome`).
 - **Trail evaluation.** It joins the Today prepare step as a second rule family. `readRules` filters by
-  kind, and the family imports nothing from `profile/items.ts`.
+  kind, and the family imports nothing from `profile/items.ts`. **As built:** see *Discovery: trails*.
 
 ### Data fixes this needs first (no UI)
 
@@ -1108,11 +1176,14 @@ app, with consent. Don't put it in the product.
 
 Each phase is gated on the previous phase's harm signals.
 
-**Where it stands (16 Oct).** Phases 0–3 are built, every line a draft: nothing shows until its copy is
-signed off (*Sign-off*, below). Phase 4's code is being built **switched off** (`TrailRule.enabled` and
-`PartsPolicy.offersEnabled` false), with a read-only dry run so Claudia can see what each rule would find
-on real data and set the counts before anything is offered; switching it on stays gated on Phase 3's
-harm signals. Phase 5 waits on Stage (Recover v2) and on a review of what's built. Not built from the
+**Where it stands (17 Oct).** Phases 0–3 are built, every line a draft: nothing shows until its copy is
+signed off (*Sign-off*, below). Phase 4's engine and Today's offer card are built **switched off**
+(`TrailRule.enabled` and `PartsPolicy.offersEnabled` false), with a read-only dry run so Claudia can see
+what each rule would find on real data and set the counts before anything is offered; switching it on
+stays gated on Phase 3's harm signals. Every parts callable has had a security review (ownership by key,
+the same not-found for someone else's record, parts-off refusals, limits, logs, lifecycle guards, export
+and delete; `functions/test/unit/partsDataCoverage.test.cjs` builds the parts labels from `layers.ts`
+and checks both paths cover each). Phase 5 waits on Stage (Recover v2) and on a review of what's built. Not built from the
 module table: Recover's next-day question about a tagged part (it would duplicate the part's own
 check-back) and the witness `part` kind (no moment needs it yet).
 
@@ -1132,6 +1203,13 @@ it needs (id, text, plain twin, kind, lint scope, status, the other surfaces tha
 vocabulary the lines lean on (moves, hurts, `EXPRESSES` with its why, `CAN_TOUCH`), the `PartsPolicy`
 numbers, and the lines no surface shows yet. `tests/parts-review.test.mjs` fails if a required id is
 missing from the pack.
+
+**The review page** (`dev/parts-review.html`) renders every surface and branch with the real components,
+the fixture copy treated as signed off, an invented person and nothing saved. Its index is driven by the
+pack's surface list, so it can't miss a surface. Build it with `npx vite build --config
+dev/vite.harness.config.ts`; `node dev/review/check.mjs [shots dir]` opens every branch at 390×844 and
+fails on a console or page error, a failed request, a branch it couldn't reach, or a screen without its
+line. A static build is published as a private artifact for the reviewer.
 
 ## Never
 
