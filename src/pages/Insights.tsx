@@ -147,7 +147,7 @@ export function Insights() {
       </div>
 
       {/* Parts on only, after Reflect's own sections; renders nothing unless a part has a line and the copy ships. */}
-      {data.parts && data.parts.length > 0 && <PartsReflect parts={data.parts} delay={nextDelay()} />}
+      {((data.parts && data.parts.length > 0) || data.partsFeel) && <PartsReflect parts={data.parts ?? []} feel={data.partsFeel ?? null} delay={nextDelay()} />}
       {/* Parts on only: rule D's "Was this {name}?" batch and the trails kept as plain patterns; nothing unless the server and the copy allow. */}
       <TrailsReflect delay={nextDelay()} />
     </div>

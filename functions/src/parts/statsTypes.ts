@@ -42,3 +42,10 @@ export interface PartReflect {
   shapeSig: number[] | null;
   stats: PartStats;
 }
+
+/**
+ * Reflect's line across all the person's parts: the most common FIRST feel-toward answer (a meet/feel
+ * option id) of their Meet a part visits in the last 30 days (`now`) and in the 30 days before (`then`,
+ * null unless it differs and is past its own threshold). Ids only; null below the threshold.
+ */
+export interface PartsFeel { now: string; then: string | null }

@@ -6,7 +6,7 @@
  * from the graph in the same response. Me's part card and Reflect render the same lines.
  */
 import type { PartsContent } from '../data/partsContentTypes';
-import type { PartStats, PartWhen } from '../data/partsTypes';
+import type { PartStats, PartWhen, PartsFeel } from '../data/partsTypes';
 import { fill } from './invalidationRecovery';
 import { surfaceReady, type SurfaceIds } from './partsContent';
 import { UNNAMED_PROMPTS } from './partTag';
@@ -94,6 +94,27 @@ export function partStatLines(stats: PartStats, content: PartsContent, deps: {
     }
   }
   return { when, helped, steps, felt };
+}
+
+/* ───────── Reflect: how you've met your parts lately, across all of them ───────── */
+
+/** The two lines (common/stats). Optional: Reflect's parts section shows without them. */
+export const REFLECT_FEEL_REQUIRED: SurfaceIds = { prompts: ['stats_feel_lately', 'stats_feel_earlier'], options: [] };
+export const reflectFeelReady = (content: PartsContent): boolean => surfaceReady(content, REFLECT_FEEL_REQUIRED);
+
+/**
+ * "Lately …: mostly {feel}." and, when it has changed, "Earlier: more often {feel}." `{feel}` is the
+ * meet/feel chip label, lower-case. Null when not ready or the lately label no longer ships; the earlier
+ * line is left out alone when its label doesn't. Nothing else: no count of parts, score or direction.
+ */
+export function partsFeelLines(feel: PartsFeel | null | undefined, content: PartsContent): string[] | null {
+  if (!feel || !reflectFeelReady(content)) return null;
+  const label = (id: string) => optionLabel(content, 'meet', 'feel', id)?.toLowerCase() ?? null;
+  const now = label(feel.now);
+  if (!now) return null;
+  const then = feel.then ? label(feel.then) : null;
+  const copy = (id: string) => content.prompts[id]?.copy ?? '';
+  return [fill(copy('stats_feel_lately'), { feel: now }), ...(then ? [fill(copy('stats_feel_earlier'), { feel: then })] : [])];
 }
 
 export const hasStatLine = (l: PartStatLines): boolean => l.when !== null || l.helped !== null || l.steps !== null || l.felt !== null;
