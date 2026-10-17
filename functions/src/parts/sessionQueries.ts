@@ -7,6 +7,7 @@ import type { ManagedTransaction } from 'neo4j-driver';
 import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import type { PartSessionDeps } from './sessions';
+import { frontLinkWriter } from './frontLink';
 
 export const POLICY_QUERY = `
   OPTIONAL MATCH (p:PartsPolicy {id: 'parts'})
@@ -43,10 +44,13 @@ export const CREATE_QUERY = `
   FOREACH (x IN CASE WHEN o IS NULL THEN [] ELSE [o] END | MERGE (ps)-[:FROM_OFFER]->(x))
 `;
 
+/** The session's state, and whether 5d's pick (`$frontKey`) is the caller's own active or resting part. */
 export const SAVE_STATE_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
   OPTIONAL MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $key})
-  RETURN coalesce(u.partsEnabled, false) AS partsOn, ps.status AS status, ps.stepIdsJson AS stepIdsJson
+  OPTIONAL MATCH (u)-[:HAS_PART]->(fp:Part {key: $frontKey}) WHERE fp.status IN ['active', 'resting']
+  RETURN coalesce(u.partsEnabled, false) AS partsOn, ps.status AS status, ps.stepIdsJson AS stepIdsJson,
+         ps.partId AS partId, ps.frontOfPartId AS storedFrontOfPartId, fp IS NOT NULL AS frontFound
 `;
 
 /** The guarded merge: only while open; `final` freezes it. A `null` in $props removes that property. */
@@ -90,17 +94,22 @@ export function sessionDeps(tx: ManagedTransaction, uid: string, email: string |
         partId: s.partId, candidateId: s.candidateId, offerId: s.offerId, moveIds: s.moveIds,
       });
     },
-    async saveState(id) {
-      const r = (await tx.run(SAVE_STATE_QUERY, keys(id))).records[0];
+    async saveState(id, frontOfPartId = null) {
+      const r = (await tx.run(SAVE_STATE_QUERY, { ...keys(id), frontKey: frontOfPartId ? userKey(uid, frontOfPartId) : null })).records[0];
+      const has = (k: string) => (r && typeof r.has === 'function' ? r.has(k) : false);
+      const s = (k: string) => (has(k) && typeof r?.get(k) === 'string' ? (r?.get(k) as string) : null);
       return {
         partsOn: r?.get('partsOn') === true,
         status: (r?.get('status') as string | null | undefined) ?? null,
         stepIdsJson: (r?.get('stepIdsJson') as string | null | undefined) ?? null,
+        partId: s('partId'), storedFrontOfPartId: s('storedFrontOfPartId'),
+        frontFound: has('frontFound') && r?.get('frontFound') === true,
       };
     },
     async save(id, props, stepIdsJson, final) {
       const r = (await tx.run(SAVE_QUERY, { ...keys(id), props, stepIdsJson, final })).records[0];
       return r ? ((r.get('status') as string | null) ?? null) : null;
     },
+    link: frontLinkWriter(tx, uid),
   };
 }

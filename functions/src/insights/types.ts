@@ -2,7 +2,7 @@
  * Insights (Reflect) types. Pure, type imports only. The payload half is mirrored by hand in
  * src/services/neo4j.ts (the client's InsightsPayload); add fields there in the same change.
  */
-import type { PartReflect } from '../parts/statsTypes';
+import type { PartReflect, PartsFeel } from '../parts/statsTypes';
 
 export type TimeRange = '7d' | '30d' | 'all';
 export const TIME_RANGES: readonly TimeRange[] = ['7d', '30d', 'all'];
@@ -136,4 +136,10 @@ export interface InsightsPayload {
    * all time (not the range: they read across weeks). null with parts off; [] when no part has a line.
    */
   parts: PartReflect[] | null;
+  /**
+   * How the person has met their parts lately, across all of them (functions/src/parts/stats.ts
+   * partsFeel): the most common first feel-toward id, last 30 days and the 30 before. null below its
+   * threshold or with parts off.
+   */
+  partsFeel: PartsFeel | null;
 }

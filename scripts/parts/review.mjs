@@ -53,13 +53,13 @@ export async function loadGates() {
   const contents = `
 export { UNBLEND_REQUIRED } from './src/lib/unblendLine';
 export { angryRequired, ANGRY_LATER_REQUIRED } from './src/lib/angryPart';
-export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED } from './src/lib/meetAPartSave';
+export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED, MEET_FRONT_REQUIRED } from './src/lib/meetAPartSave';
 export { PART_CHECKBACK_REQUIRED, TWO_PULLS_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
 export { TWO_PULLS_REQUIRED, PULLS_OPTION_STEPS, PULLS_CHECKBACK_REQUIRED, PULLS_WISE_MIND_REQUIRED, PULLS_GENERAL_REQUIRED } from './src/lib/twoPullsSave';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
 export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
-export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
+export { STATS_REQUIRED, REFLECT_REQUIRED, REFLECT_FEEL_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, SETTINGS_LINES_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
@@ -68,6 +68,7 @@ export { TRAIL_OFFER_REQUIRED } from './src/lib/trailOffer';
 export { KNOWN_PART_REVIEW_REQUIRED, PLAIN_PATTERNS_REQUIRED } from './src/lib/knownPartReview';
 export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 export { DEN_REQUIRED } from './src/lib/den';
+export { PART_STORY_REQUIRED } from './src/lib/partStory';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -107,6 +108,7 @@ export function surfaces(g) {
       groups: [
         { label: 'The visit (the paused line shows only for a paused part)', ids: g.meetRequired({ paused: true }) },
         { label: 'The close\'s "Check back with it tomorrow?" (the visit shows without it)', ids: g.CLOSE_CHECKBACK_REQUIRED },
+        { label: 'After "What do you think it\'s protecting?", when the person keeps another part: "Does it stand in front of another part you know?" with their parts by name, then these two (a part picked draws the den\'s thread when the part is kept; the visit shows without it, skipping the step)', ids: g.MEET_FRONT_REQUIRED },
       ],
       choices: g.MEET_OPTION_STEPS,
     },
@@ -155,6 +157,11 @@ export function surfaces(g) {
       groups: [{ label: null, ids: g.DEN_REQUIRED }],
     },
     {
+      id: 'story', title: 'A part\'s story',
+      where: 'Me → Parts of me: "Its story" on each active or resting part\'s card opens it in place; in the den, tap one figure for "Its story" and "Spend time with it" (Meet a part for that part). Oldest first, each line only when there is something to say: "Met in {month}", "Rested in {month}" / "Back in {month}", "Its job then: …" / "Its job now: …" (never on a tender part), the card\'s readout (how they\'ve felt toward it, what\'s helped it settle), and "Where it stands": its confirmed threads in words, and an earlier month\'s room beside today\'s when there is one. Months only; no score, no percentage, never a fear.',
+      groups: [{ label: null, ids: g.PART_STORY_REQUIRED }],
+    },
+    {
       id: 'settings', title: 'Settings',
       where: 'Privacy & Data, for everyone signed in: the parts switch (off by default), what it does, and Delete your parts (there whether parts are on or off).',
       groups: [
@@ -166,7 +173,10 @@ export function surfaces(g) {
     {
       id: 'reflect', title: 'Reflect',
       where: 'Reflect, with parts on: a quiet block per part with a line past its threshold (what\'s helped it settle, how they\'ve felt toward it, when it shows up).',
-      groups: [{ label: null, ids: g.REFLECT_REQUIRED }],
+      groups: [
+        { label: null, ids: g.REFLECT_REQUIRED },
+        { label: 'Above the blocks, across all their parts: how they\'ve met them lately (each visit\'s first feel-toward answer, the last 30 days; at least 4, the most common at least 40%), and the earlier 30 days\' when it has changed (the section shows without these)', ids: g.REFLECT_FEEL_REQUIRED },
+      ],
     },
     {
       id: 'dearman', title: 'DEAR MAN',

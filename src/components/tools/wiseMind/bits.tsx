@@ -42,20 +42,21 @@ function useFocusOnMount<T extends HTMLElement>(on: boolean) {
 export function Chip({ label, pressed, onClick, own = false }: { label: ReactNode; pressed?: boolean; onClick: () => void; own?: boolean }) {
   return (
     <button type="button" aria-pressed={pressed ? 'true' : 'false'} onClick={onClick}
-      className={`den-chip den-chip--small ${own ? 'font-serif' : ''}`}>{label}</button>
+      className={`den-chip den-chip--small ${own ? 'font-serif' : ''} ${pressed ? '!text-[var(--color-on-accent)]' : ''}`}>{label}</button>
   );
 }
 
 /** One decision: chips, then "Something else" when the screen takes own words. */
-export function ChipRow({ options, picked, onPick, ownLabel, onOwn, children }: {
+export function ChipRow({ options, picked, onPick, ownLabel, onOwn, ownPressed = false, children }: {
   options: readonly { id: string; label: string }[]; picked?: string | null; onPick: (id: string) => void;
-  ownLabel?: string; onOwn?: () => void; children?: ReactNode;
+  /** `ownPressed`: the current pick is their own words (a heard circle reopened). */
+  ownLabel?: string; onOwn?: () => void; ownPressed?: boolean; children?: ReactNode;
 }) {
   return (
     <div className="flex flex-wrap gap-2.5">
       {options.map((o) => <Chip key={o.id} label={o.label} pressed={picked === o.id} onClick={() => onPick(o.id)} />)}
       {children}
-      {ownLabel && onOwn && <Chip label={ownLabel} onClick={onOwn} />}
+      {ownLabel && onOwn && <Chip label={ownLabel} pressed={ownPressed} onClick={onOwn} />}
     </div>
   );
 }
@@ -73,10 +74,12 @@ export function QuietLink({ label, onClick }: { label: string; onClick: () => vo
  * The person's own words: a plain field, ≤ `max` characters, kept as written (never linted, parsed or
  * shown back outside this visit and My words).
  */
-export function OwnWords({ label, fieldLabel, backLabel, nextLabel, max, onDone, onBack }: {
+export function OwnWords({ label, fieldLabel, backLabel, nextLabel, max, onDone, onBack, initial = '' }: {
   label: string; fieldLabel: string; backLabel: string; nextLabel: string; max: number; onDone: (text: string) => void; onBack: () => void;
+  /** What they wrote before, when they come back to change it. */
+  initial?: string;
 }) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(initial.slice(0, max));
   return (
     <div className="space-y-4">
       <button type="button" onClick={onBack}

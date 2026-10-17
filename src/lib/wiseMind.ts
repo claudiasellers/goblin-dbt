@@ -104,6 +104,17 @@ export function defaultPracticeId(st: WiseState, ctx: WiseContext): string | nul
 /** Both circles answered (a chip, own words or *Nothing comes*): the witness line shows. */
 export const mindsHeard = (st: WiseState): boolean => st.emotion !== null && st.reason !== null;
 
+/** What a heard circle shows under its name: the chip's label, their own words, or *Nothing comes*; null while unheard. */
+export type MindWords = { kind: 'words'; text: string; own: boolean } | { kind: 'nothing' };
+export function mindWords(st: WiseState, ctx: WiseContext, side: MindSide): MindWords | null {
+  const v = st[side];
+  if (!v) return null;
+  if (v.nothing) return { kind: 'nothing' };
+  if (v.own) return { kind: 'words', text: v.own, own: true };
+  const label = voicesFor(st, ctx, side).find((x) => x.id === v.id)?.label;
+  return label ? { kind: 'words', text: label, own: false } : { kind: 'nothing' };
+}
+
 /** The question chips in order, with the entry's chip first (not pressed: the page never pre-selects). */
 export function orderedQuestions(ctx: WiseContext, entry: WiseEntry) {
   const qs = [...ctx.questions].sort((a, b) => a.order - b.order);

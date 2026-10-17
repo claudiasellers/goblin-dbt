@@ -48,6 +48,7 @@ const EXPECT = {
   'meet/stop_own': 'meet_stop_title', 'meet/danger': 'meet_thank', 'meet/nothing': 'meet_nothing', 'meet/worried': 'meet_unblend',
   'meet/worried_end': 'meet_unblend_end', 'meet/too_many': 'aftercare_too_many', 'meet/paused': 'paused_heads_up', 'meet/keep': 'meet_keep',
   'meet/close': 'close_checkback', 'meet/danger_close': 'meet_done',
+  'meet/front': 'meet_front', 'meet/front_keep': 'meet_keep', // 5d (lane 2)
   'checkback/louder': 'aftercare_louder', 'tag/row': 'tag_question', 'tag/new': 'tag_new_later', 'me/cards': 'card_where', 'me/long': 'card_where', 'reflect/': 'reflect_title',
   'settings/on': 'settings_dissociation', 'settings/confirm': 'settings_delete_confirm', 'settings/failed': 'settings_delete_failed',
   'settings/done': 'settings_delete_done', 'cope/pick': 'cope_title', 'cope/anchor': 'cope_change', 'cope/new': 'cope_save',
@@ -67,6 +68,8 @@ const EXPECT = {
   'checkback_two/named': 'checkback_title_two', 'checkback_two/louder': 'aftercare_louder',
   // The den (lane 2)
   'den/room': 'den_room', 'den/one': 'den_one_part', 'den/sheet': 'den_stands_front', 'den/front': 'den_which_front', 'den/then': 'den_now',
+  // A part's story (lane 2)
+  'story/rich': 'story_met', 'story/tender': 'story_met', 'story/card': 'story_met', 'story/den': 'story_spend_time',
 };
 const SELECTOR = {
   'meet/danger': 'section[aria-label="Support right now"]', 'meet/danger_close': 'section[aria-label="Support right now"]',
@@ -158,6 +161,8 @@ try {
         if (v.plain && (v.key === 'angry/speak' || v.key === 'angry/later') && text.includes(copy('angry_later'))) bad('later line shown with plain wording');
         if (SELECTOR[v.key] && !(await page.locator(SELECTOR[v.key]).count())) bad(`missing ${SELECTOR[v.key]}`);
         for (const id of ALSO_EXPECT[v.key] ?? []) if (!text.toLowerCase().includes(copy(id).toLowerCase())) bad(`missing ${id}: "${copy(id)}"`); // lane 4
+        // lane 2 (parts-reflect-feel): Reflect's line across parts, and its earlier line, above the blocks.
+        if (v.key === 'reflect/' && (await page.locator('[data-testid="parts-feel"] p').count()) !== 2) bad('no "how you\'ve met your parts" lines');
         if (NO_CHECKBACK.has(v.key) && text.includes(copy('close_checkback'))) bad('check-back question after a danger ending');
         if (v.surface === 'oa_goal') {
           const shows = (await page.locator('[data-testid="goal-line"]').count()) > 0;
@@ -165,6 +170,9 @@ try {
           if (shows === silent) bad(silent ? 'goal line shown where it must not be' : 'no goal line');
         }
         if (v.surface?.startsWith('unblend_') && v.branch !== 'blank' && !(await page.locator('[data-testid="unblend-line"]').count())) bad('no unblend line');
+        // Non-parts screens (lane 1: Wise mind) bring their own lines, read from the page's map.
+        if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) bad(`missing "${map.expect[v.key]}"`);
+        if (map.absent?.[v.key] && text.includes(map.absent[v.key])) bad(`shows "${map.absent[v.key]}"`);
       } else if (!text.includes('⟨')) bad('Show ids printed no ids');
     } else {
       await page.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => bad('no index'));
@@ -214,6 +222,7 @@ try {
     const want = EXPECT[v.key];
     if (want && !v.plain && !text.toLowerCase().includes(copy(want).toLowerCase())) tbad(`${v.name}: missing ${want}`);
     if (SELECTOR[v.key] && !v.plain && !(await tour.locator(SELECTOR[v.key]).count())) tbad(`${v.name}: missing ${SELECTOR[v.key]}`);
+    if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) tbad(`${v.name}: missing "${map.expect[v.key]}"`); // lane 1
   }
   await tour.close();
   await browser.close();

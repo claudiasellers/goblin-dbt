@@ -28,7 +28,11 @@ import { resetTagRowAnswers } from '../src/lib/tagRowOnce';
 import { slices } from './review/data';
 import { drive, type DriveStep } from './review/driver';
 import { SKIPPED, SURFACES, type Surface } from './review/surfaces';
-import PACK from 'virtual:review-pack';
+import PARTS_PACK from 'virtual:review-pack';
+import { WISE_MIND_ABSENT, WISE_MIND_EXPECT, WISE_MIND_PACK } from './review/wiseMind'; // lane 1: Wise mind, not parts
+
+/** The sign-off pack's surfaces, then the non-parts tools shown here for review (Wise mind). */
+const PACK = [...PARTS_PACK, WISE_MIND_PACK];
 
 interface Nav { surface: Surface | null; branch: NonNullable<Surface['branches']>[number] | null; ids: boolean; plain: boolean }
 function readNav(): Nav {
@@ -192,13 +196,21 @@ function Index({ nav }: { nav: Nav }) {
 }
 
 declare global {
-  interface Window { __reviewMap?: { surfaces: { id: string; branches: string[] }[]; uncovered: string[]; unknown: string[] } }
+  interface Window {
+    __reviewMap?: {
+      surfaces: { id: string; branches: string[] }[]; uncovered: string[]; unknown: string[];
+      /** Non-parts screens' lines to show / not show, by `surface/branch` (Wise mind's copy isn't the parts fixture). */
+      expect: Record<string, string>; absent: Record<string, string>;
+    };
+  }
 }
 /** For dev/review/check.mjs: every surface and branch, and any pack surface the harness lacks. */
 window.__reviewMap = {
   surfaces: SURFACES.map((s) => ({ id: s.id, branches: (s.branches ?? []).map((b) => b.id) })),
   uncovered: uncovered.map((p) => p.id),
   unknown: unknown.map((s) => s.id),
+  expect: WISE_MIND_EXPECT,
+  absent: WISE_MIND_ABSENT,
 };
 
 /** One screen; remounted (by its key) for every hash change, so its branch is driven once per visit. */

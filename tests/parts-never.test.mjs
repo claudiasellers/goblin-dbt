@@ -305,7 +305,7 @@ describe("9. Parts language by default.", () => {
   // The rule: every writer refuses with parts off (failed-precondition); a reader in READERS_EMPTY returns
   // nothing instead (its every array empty), so a screen simply has no parts section. The list is named
   // here, so a writer can't slip through by returning: every other callable must throw.
-  const READERS_EMPTY = ["getReflectTrails", "getDen", "getDenSnapshot"];
+  const READERS_EMPTY = ["getReflectTrails", "getDen", "getDenSnapshot", "getPartStory"];
   test("every parts writer refuses with parts off; every reader returns nothing (deleteMyParts excepted; the entry gate answers clear)", () => {
     const index = read("functions/src/parts/index.ts") + read("functions/src/parts/offers/index.ts") + read("functions/src/parts/pulls/index.ts");
     const callables = [...index.matchAll(/export const (\w+) = callable<[\s\S]*?\n\);/g)].map((m) => [m[1], m[0]]);

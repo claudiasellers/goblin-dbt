@@ -9,7 +9,7 @@ import type {
   TagPartRequest, TagPartResponse,
   AnswerTrailOfferRequest, AnswerTrailOfferResponse, GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse,
   AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse, GetReflectTrailsResponse, RemoveTrailPatternRequest, RemoveTrailPatternResponse,
-  GetDenResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
+  GetDenResponse, GetPartStoryRequest, GetPartStoryResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
   UnlinkPartsResponse, UpdatePartLayoutRequest, UpdatePartLayoutResponse,
   KeepPullsKeepsakeRequest, KeepPullsKeepsakeResponse, PullsSessionResponse, SavePullsSessionRequest,
   SchedulePullsCheckbackRequest, SchedulePullsCheckbackResponse, StartPullsSessionRequest,
@@ -265,4 +265,13 @@ export async function keepPullsKeepsake(req: KeepPullsKeepsakeRequest): Promise<
 /** On the close's yes: check back with both kept parts in a week. */
 export async function schedulePullsCheckback(req: SchedulePullsCheckbackRequest): Promise<SchedulePullsCheckbackResponse> {
   return (await schedulePullsCheckbackFn(req)).data;
+}
+
+// ---- A part's story ----
+
+const getPartStoryFn = httpsCallable<GetPartStoryRequest, GetPartStoryResponse>(functions, 'getPartStory');
+
+/** One of the caller's own parts, how it has changed: months, ids and the readout's counts, never a date. */
+export async function getPartStory(req: GetPartStoryRequest): Promise<GetPartStoryResponse> {
+  return (await getPartStoryFn(req)).data;
 }

@@ -8,7 +8,7 @@ import { handoffExt } from '../../lib/bandStore';
 import { newId } from '../../lib/spine/ids';
 import {
   WISE_EXIT_STEP, WISE_FEELS, canKeep, defaultPracticeId, feelLine, initialWise, keptLine, mindsHeard, nextToolIdsFor, offersOnceMore,
-  orderedQuestions, parseWiseEntry, voicesFor, wiseCopy, wiseCopyReady, wiseExt, wiseMindAnswerOf, wiseNext,
+  mindWords, orderedQuestions, parseWiseEntry, voicesFor, wiseCopy, wiseCopyReady, wiseExt, wiseMindAnswerOf, wiseNext,
   type MindSide, type StepBackSlot, type WiseCopy, type WiseEvent, type WiseState,
 } from '../../lib/wiseMind';
 import { getWiseMindContent } from '../../services/wiseMind';
@@ -21,6 +21,13 @@ import { AskListen, PracticePicker, StoneLake, WiseBreath } from '../../componen
 import { primaryButton } from '../../components/tools/oppositeAction/styles';
 
 const HOST = 'wise-mind';
+
+/** A screen with no question of its own (the close): its first content takes focus as it opens. */
+function FocusHere({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.focus({ preventScroll: true }); }, []);
+  return <div ref={ref} tabIndex={-1} className="focus:outline-none">{children}</div>;
+}
 
 /**
  * Wise mind (docs/design/wise-mind.md): the question, both minds, drop in, what comes, is this wise mind,
@@ -64,6 +71,8 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
   const [keep, setKeep] = useState<'idle' | 'saving' | 'failed'>('idle');
   const handoffs = useRef<HandoffResult[]>([]);
   const hereRef = useRef<HTMLButtonElement>(null);
+  const doneRef = useRef<HTMLAnchorElement>(null);
+  const focusDone = () => { setTimeout(() => doneRef.current?.focus({ preventScroll: true }), 0); };
 
   /** The session always carries what the visit has said so far, so whichever close happens sends it. */
   const sync = useCallback((s: WiseState) => {
@@ -84,9 +93,9 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
   const question = content.questions.find((q) => q.id === s.questionId);
   const questionText = question?.label ?? s.questionOwn;
   const max = content.ownMax;
-  const ownWords = (label: string, fieldLabel: string, done: (text: string) => void) => (
+  const ownWords = (label: string, fieldLabel: string, done: (text: string) => void, initial?: string) => (
     <OwnWords label={label} fieldLabel={fieldLabel} backLabel={copy.chrome.back} nextLabel={copy.chrome.next} max={max}
-      onDone={done} onBack={() => setOwn(null)} />
+      onDone={done} onBack={() => setOwn(null)} initial={initial} />
   );
 
   const handOff = (toolId: string) => {
@@ -130,7 +139,8 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
     case 'minds': {
       const side = s.side;
       if (side && own === side) {
-        body = ownWords(side === 'emotion' ? copy.minds.emotionSays : copy.minds.reasonSays, copy.minds.ownLabel, (text) => send({ type: 'saysOwn', side, text }));
+        body = ownWords(side === 'emotion' ? copy.minds.emotionSays : copy.minds.reasonSays, copy.minds.ownLabel,
+          (text) => send({ type: 'saysOwn', side, text }), s[side]?.own ?? undefined);
         break;
       }
       const heard = mindsHeard(s);
@@ -138,12 +148,12 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
         <Prompt>{questionText ?? copy.minds.prompt}</Prompt>
         {questionText && <Line>{copy.minds.prompt}</Line>}
         <TwoMinds labels={{ emotion: copy.minds.emotion, reason: copy.minds.reason }} open={side}
-          heard={{ emotion: s.emotion !== null, reason: s.reason !== null }} onSide={(x) => send({ type: 'side', side: x })} />
+          said={{ emotion: mindWords(s, content, 'emotion'), reason: mindWords(s, content, 'reason') }} onSide={(x) => send({ type: 'side', side: x })} />
         {side && (
           <section key={side} aria-labelledby={`wm-says-${side}`} className="space-y-3">
             <SubPrompt id={`wm-says-${side}`}>{side === 'emotion' ? copy.minds.emotionSays : copy.minds.reasonSays}</SubPrompt>
             <ChipRow options={voicesFor(s, content, side)} picked={s[side]?.id ?? null} onPick={(id) => send({ type: 'says', side, id })}
-              ownLabel={copy.minds.own} onOwn={() => setOwn(side)}>
+              ownLabel={copy.minds.own} onOwn={() => setOwn(side)} ownPressed={!!s[side]?.own}>
               <Chip label={copy.minds.nothingComes} pressed={s[side]?.nothing} onClick={() => send({ type: 'nothing', side })} />
             </ChipRow>
           </section>
@@ -245,9 +255,11 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
     }
     case 'close':
     case 'handoff':
+      // The close takes focus as it opens (the control that led here has gone); once answered or
+      // skipped, Done does.
       body = (<>
-        {s.step === 'close' && <SessionClose kind="orienting" />}
-        <Link to="/tools" className={`${primaryButton} inline-flex items-center justify-center`}>{copy.next.done}</Link>
+        <FocusHere>{s.step === 'close' && <SessionClose kind="orienting" onAnswered={focusDone} onSkipped={focusDone} />}</FocusHere>
+        <Link ref={doneRef} to="/tools" className={`${primaryButton} inline-flex items-center justify-center`}>{copy.next.done}</Link>
       </>);
       break;
   }
