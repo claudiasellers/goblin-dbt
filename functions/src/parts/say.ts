@@ -36,6 +36,7 @@ export function validateSay(raw: unknown): SayInput {
   } else {
     if (typeof o.own !== 'string') throw new ValidationError('own: expected text');
     // Kept as written: line breaks fold to a space and control characters go, nothing else is touched.
+    // eslint-disable-next-line no-control-regex
     own = o.own.replace(/[\r\n\t]+/g, ' ').replace(/[\u0000-\u001f\u007f-\u009f]/g, '').trim();
     if (!own || own.length > SAY_OWN_MAX) throw new ValidationError(`own: 1 to ${SAY_OWN_MAX} characters`);
   }
