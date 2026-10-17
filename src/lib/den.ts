@@ -11,6 +11,7 @@ import { surfaceReady, type SurfaceIds } from './partsContent';
 export const DEN_PROMPTS = [
   'den_link', 'den_room', 'den_unnamed', 'den_move_help', 'den_move_keys', 'den_one_part', 'den_list',
   'den_pull_against', 'den_stands_front', 'den_which_front', 'den_thread_cancel', 'den_remove', 'den_then', 'den_now',
+  'den_back_now',
 ] as const;
 export type DenPromptId = (typeof DEN_PROMPTS)[number];
 /** What the den's gate requires (scripts/parts/review.mjs reads it). */
@@ -42,12 +43,49 @@ export const MIN_GAP = 0.26;
 export const EDGE = 0.06;
 
 export const clamp = (v: number): number => Math.min(1 - EDGE, Math.max(EDGE, v));
-const dist = (a: Spot, b: Spot) => Math.hypot(a.x - b.x, a.y - b.y);
+
+/**
+ * A figure and its name as boxes, in shares of the room at its narrowest (a 390 px phone: about 320 px
+ * square), round its spot (as DenRoom draws it): the figure above, up to two lines of name (6.5rem wide)
+ * below. Two parts are clear when no box of one comes within MARGIN of a box of the other.
+ */
+const FIG_HALF = 0.085;
+const FIG_TOP = 0.145;
+const FIG_BOTTOM = 0.02;
+const NAME_HALF = 0.17;
+const NAME_BOTTOM = 0.125;
+const MARGIN = 0.02;
+/** Two names keep further apart (about 13 px), and a name over a name counts most when a room is full. */
+const NAME_MARGIN = 0.04;
+const NAME_WEIGHT = 10;
+type Box = readonly [left: number, right: number, top: number, bottom: number];
+const boxes = (s: Spot): Box[] => [
+  [s.x - FIG_HALF, s.x + FIG_HALF, s.y - FIG_TOP, s.y + FIG_BOTTOM],
+  [s.x - NAME_HALF, s.x + NAME_HALF, s.y + FIG_BOTTOM, s.y + NAME_BOTTOM],
+];
+const overlap = (a: Box, b: Box, m: number): number =>
+  Math.max(0, Math.min(a[1], b[1]) + m - Math.max(a[0], b[0])) * Math.max(0, Math.min(a[3], b[3]) + m - Math.max(a[2], b[2]));
+/** How much two parts' figures and names would cover each other (0: clear); a name over a name weighs most. */
+export const crowding = (a: Spot, b: Spot): number => {
+  const [fa, na] = boxes(a);
+  const [fb, nb] = boxes(b);
+  return NAME_WEIGHT * overlap(na, nb, NAME_MARGIN) + overlap(fa, fb, MARGIN) + overlap(fa, nb, MARGIN) + overlap(na, fb, MARGIN);
+};
+/** Two names never touch: the first thing a full room keeps. */
+export const namesClear = (a: Spot, b: Spot): boolean => overlap(boxes(a)[1], boxes(b)[1], NAME_MARGIN) === 0;
+/** No figure or name of one comes near a figure or name of the other. */
+export const clearOf = (a: Spot, b: Spot): boolean => crowding(a, b) === 0;
+
+/** Where an arriving part tries, in order: the edge of the light, then a ring further out, then nearer. */
+const ARRIVE_RINGS = [ARRIVE_RADIUS, 0.42, 0.24];
+/** An arriving part stands this far in, so its figure and its name are whole inside the room. */
+const ARRIVE_IN = { left: 0.18, right: 0.82, top: 0.16, bottom: 0.86 };
 
 /**
  * Every part's spot: its own place when the person put it somewhere; otherwise round the edge of the
- * light, spread evenly from the top, each nudged round until it overlaps nobody (or a full turn is used).
- * No auto-layout of placed parts, ever.
+ * light, spread evenly from the top, each nudged round until it is clear of everyone (`clearOf`); when
+ * the edge of the light is full, a ring further out, then one nearer. A room too full for any clear spot
+ * gets the one that crowds the others least. No auto-layout of placed parts, ever.
  */
 export function placeParts(parts: ReadonlyArray<{ id: string; mapX: number | null; mapY: number | null }>): Map<string, Spot> {
   const out = new Map<string, Spot>();
@@ -62,15 +100,24 @@ export function placeParts(parts: ReadonlyArray<{ id: string; mapX: number | nul
   const free = parts.filter((p) => !out.has(p.id));
   const step = (2 * Math.PI) / Math.max(free.length, 6);
   free.forEach((p, i) => {
-    let best: Spot | null = null;
-    for (let k = 0; k < 24; k++) {
-      const a = -Math.PI / 2 + i * step + (k * Math.PI) / 12;
-      const s = { x: clamp(LIGHT.x + ARRIVE_RADIUS * Math.cos(a)), y: clamp(LIGHT.y + ARRIVE_RADIUS * Math.sin(a)) };
-      best ??= s;
-      if (taken.every((t) => dist(t, s) >= MIN_GAP)) { best = s; break; }
+    let found: Spot | null = null;
+    let least: { s: Spot; n: number } | null = null;
+    for (const r of ARRIVE_RINGS) {
+      for (let k = 0; k < 24 && !found; k++) {
+        const a = -Math.PI / 2 + i * step + (k * Math.PI) / 12;
+        const s = {
+          x: Math.min(ARRIVE_IN.right, Math.max(ARRIVE_IN.left, LIGHT.x + r * Math.cos(a))),
+          y: Math.min(ARRIVE_IN.bottom, Math.max(ARRIVE_IN.top, LIGHT.y + r * Math.sin(a))),
+        };
+        const n = taken.reduce((sum, t) => sum + crowding(t, s), 0);
+        if (n === 0) found = s;
+        else if (!least || n < least.n) least = { s, n };
+      }
+      if (found) break;
     }
-    out.set(p.id, best!);
-    taken.push(best!);
+    const s = found ?? least!.s;
+    out.set(p.id, s);
+    taken.push(s);
   });
   return out;
 }

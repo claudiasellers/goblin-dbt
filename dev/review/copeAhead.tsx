@@ -17,6 +17,7 @@ import { planLine, type PlanCa } from '../../src/lib/copeAheadPlan';
 import { CopeAhead } from '../../src/pages/tools/CopeAhead';
 import { PARTS } from '../parts-example';
 import { answers } from './backend';
+import { COPE_AHEAD_PACK } from './copeAheadClosing'; // lane 3's pack: one Cope Ahead entry in the sign-off list
 import { slices } from './data';
 import type { DriveStep } from './driver';
 import type { Branch, Surface } from './surfaces';
@@ -119,8 +120,6 @@ function Went() {
 function Host({ reduce, children }: { reduce: boolean; children: ReactNode }) {
   return <MotionConfig reducedMotion={reduce ? 'always' : 'user'}>{children}</MotionConfig>;
 }
-
-export const COPE_AHEAD_PACK = { id: 'cope_ahead', title: 'Cope Ahead (not parts: ships with its own content; the parts step waits for the parts sign-off)', where: 'Tools → Emotion regulation, or "Something\'s coming up that I\'m dreading"' };
 
 const byId = (id: string) => BRANCHES.find((b) => b.id === id);
 
