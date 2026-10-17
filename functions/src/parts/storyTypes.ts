@@ -14,7 +14,9 @@ export type PartStoryMoment =
   | { kind: 'rested'; month: string }
   | { kind: 'back'; month: string }
   /** It took up a new job: the first job it had, and the one it has now. Never on a tender part. */
-  | { kind: 'job'; month: string; then: PartStoryJob; now: PartStoryJob };
+  | { kind: 'job'; month: string; then: PartStoryJob; now: PartStoryJob }
+  /** Something the person said to it (sayToPart): the month's latest, a chip id or their own words. */
+  | { kind: 'told'; month: string; chipId: string | null; own: string | null };
 
 /** A confirmed den link, from this part's side: it stands in front of, or behind, the other; or they pull against each other. */
 export interface PartStoryLink { role: 'front' | 'behind' | 'pulls'; otherId: string; otherName: string | null }
