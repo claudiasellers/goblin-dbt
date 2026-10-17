@@ -11,11 +11,22 @@ import type { PartSessionResponse } from './sessionTypes';
 export interface PartSessionDeps {
   /** PartsPolicy.maxNonSelfAnswers (null when the policy is missing). */
   maxNonSelfAnswers(): Promise<unknown>;
-  startState(s: StartInput): Promise<{ partsOn: boolean; partFound: boolean; candidateFound: boolean; status: string | null }>;
+  startState(s: StartInput): Promise<StartState>;
   create(s: StartInput): Promise<void>;
   saveState(id: string): Promise<{ partsOn: boolean; status: string | null; stepIdsJson: string | null }>;
   /** The guarded write; the session's status after it, or null when the guard refused. */
   save(id: string, props: PatchProps, stepIdsJson: string | null, final: boolean): Promise<string | null>;
+}
+
+export interface StartState {
+  partsOn: boolean;
+  partFound: boolean;
+  candidateFound: boolean;
+  /** The caller's own trail offer, answered Yes, of shape A–C (rule D's yes tags instead). */
+  offerFound?: boolean;
+  /** That offer's moves (sorted). */
+  offerMoves?: string[];
+  status: string | null;
 }
 
 const partsOff = () => new HttpsError('failed-precondition', 'Parts are off');
@@ -26,12 +37,14 @@ export async function startPartSessionHandler(s: StartInput, deps: PartSessionDe
   const state = await deps.startState(s);
   if (!state.partsOn) throw partsOff();
   // Another person's part or candidate has a different key: it simply isn't found.
-  if ((s.partId && !state.partFound) || (s.candidateId && !state.candidateFound)) {
+  if ((s.partId && !state.partFound) || (s.candidateId && !state.candidateFound) || (s.offerId && !state.offerFound)) {
     throw new HttpsError('not-found', 'Not found');
   }
   if (state.status === 'open') return { id: s.id, status: 'open' }; // a repeat start: nothing to write
   if (state.status) throw frozen();
-  await deps.create(s);
+  // A trail offer's moves are the visit's from the start (pre-selected at Find, as a candidate's move is),
+  // after the client's own, so keepPart's USES edges carry the whole trail.
+  await deps.create(s.offerId ? { ...s, moveIds: [...new Set([...s.moveIds, ...(state.offerMoves ?? [])])] } : s);
   return { id: s.id, status: 'open' };
 }
 

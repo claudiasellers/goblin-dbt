@@ -752,6 +752,8 @@ OPTIONS = [
     opt("offer_more_than_one", "offer", "evidence", "More than one", branch="split"),
     opt("offer_how_it_goes", "offer", "evidence", "It's how things go", branch="end"),
     opt("offer_not_me", "offer", "evidence", "Not me", branch="end"),
+    # The split ("Which of these feels like its own thing?"): the offer's moves as chips, then this to keep them.
+    opt("offer_split_keep", "offer", "split", "Keep these", branch="candidate"),
 
     # --- The tag row ---
     opt("tag_new_one", "tag", "tag", "A new one", branch="new"),

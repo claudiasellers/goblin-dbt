@@ -27,7 +27,7 @@ const slicePart = (key: keyof typeof PART_IDS, name: string | null, o: Partial<S
   const ex = byId[key === 'unnamed' ? 'hide' : key];
   return {
     id: PART_IDS[key], name, status: 'active', tender: !!ex.tender, moveIds: [ex.move], firstPlace: ex.places[0] ?? 'chest',
-    shapeSig: ex.tender ? null : sig(ex.id), meta: meta(PART_IDS[key], 'active'), ...o,
+    shapeSig: ex.tender ? null : sig(ex.id), lastVisitedAt: '2026-10-14T19:00:00.000Z', pausedUntil: null, meta: meta(PART_IDS[key], 'active'), ...o,
   };
 };
 

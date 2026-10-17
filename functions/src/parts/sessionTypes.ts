@@ -41,6 +41,8 @@ export interface StartPartSessionRequest {
   trailheadKind: TrailheadKind;
   partId?: string;
   candidateId?: string;
+  /** trailheadKind 'offer' only (and required there): the trail offer answered "Yes, a part of me". */
+  offerId?: string;
   moveIds?: string[];
 }
 

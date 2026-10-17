@@ -7,6 +7,7 @@ import type {
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
   SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, SetPartAnchorRequest, SetPartShapeRequest, StartPartSessionRequest,
   TagPartRequest, TagPartResponse,
+  AnswerTrailOfferRequest, AnswerTrailOfferResponse, GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
@@ -156,4 +157,19 @@ const setPartShapeFn = httpsCallable<SetPartShapeRequest, PartWriteResponse>(fun
 /** Find the feeling's "Use this shape for {name}?": the server reads the shape from that visit; none is sent. */
 export async function setPartShape(req: SetPartShapeRequest): Promise<PartWriteResponse> {
   return (await setPartShapeFn(req)).data;
+}
+
+// ---- Trail offers (Phase 4; the card on Today) ----
+
+const getTrailOfferEvidenceFn = httpsCallable<GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse>(functions, 'getTrailOfferEvidence');
+const answerTrailOfferFn = httpsCallable<AnswerTrailOfferRequest, AnswerTrailOfferResponse>(functions, 'answerTrailOffer');
+
+/** "Show me": the offer's evidence as labels (marks it seen). */
+export async function getTrailOfferEvidence(req: GetTrailOfferEvidenceRequest): Promise<GetTrailOfferEvidenceResponse> {
+  return (await getTrailOfferEvidenceFn(req)).data;
+}
+
+/** One of the five answers; `next` says what the card does after it. */
+export async function answerTrailOffer(req: AnswerTrailOfferRequest): Promise<AnswerTrailOfferResponse> {
+  return (await answerTrailOfferFn(req)).data;
 }

@@ -69,6 +69,15 @@ export const GUARDS = {
     /** answerPartCandidate's "Not any more" (Me): only while open; a dismissed one stays dismissed. */
     dismiss: (v: string) => `${v}.status = 'open'`,
   },
+  TrailOffer: {
+    /** getTrailOfferEvidence ("Show me"): offered → seen, once. */
+    see: (v: string) => `${v}.status = 'offered'`,
+    /**
+     * answerTrailOffer: while open (offered or seen) and not cooling down. Not now leaves it open with a
+     * cooldown; every other answer is final (`answered`).
+     */
+    answer: (v: string) => `(${v}.status IN ['offered', 'seen'] AND (${v}.cooldownUntil IS NULL OR ${v}.cooldownUntil <= datetime()))`,
+  },
 } as const;
 
 type Props = Record<string, unknown>;
@@ -81,7 +90,7 @@ const ms = (v: unknown): number | null => {
 
 /** The TypeScript mirror of GUARDS (for tests and for callers that already hold the record). */
 export function writable(
-  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PartCandidate',
+  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PartCandidate' | 'TrailOffer',
   op: string,
   p: Props,
   now: number = Date.now(),
@@ -117,6 +126,12 @@ export function writable(
       return saved !== null && saved > now - TOOL_SESSION_ANSWER_HOURS * HOUR;
     }
     case 'PartCandidate': return p.status === 'open';
+    case 'TrailOffer': {
+      if (op === 'see') return p.status === 'offered';
+      if (op !== 'answer' || (p.status !== 'offered' && p.status !== 'seen')) return false;
+      const until = ms(p.cooldownUntil);
+      return until === null || until <= now;
+    }
     case 'SkillPractice': return false; // terminal at creation
     default: return false;
   }

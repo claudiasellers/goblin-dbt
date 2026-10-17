@@ -243,14 +243,14 @@ const { PARTS_LABELS, PARTS_FOLLOW_UP_TYPES } = require('../../lib/parts/delete'
 const { USER_DATA } = require('../../lib/userdata/layers');
 
 test('PARTS_LABELS: every registered parts label, nothing else (later phases join by registering)', () => {
-  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartRevisit', 'PartSession', 'PartTag']);
+  assert.deepEqual([...PARTS_LABELS].sort(), ['Part', 'PartCandidate', 'PartRevisit', 'PartSession', 'PartTag', 'TrailOffer']);
   const partsLike = Object.keys(USER_DATA).filter((l) => /^(Part|Den|Trail)/.test(l));
   assert.deepEqual([...PARTS_LABELS].sort(), partsLike.sort(), 'a registered parts label deleteMyParts would miss');
   for (const l of ['ToolSession', 'CheckIn', 'FollowUp', 'SkillPractice', 'ProfileFact', 'OwnLine']) assert.ok(!PARTS_LABELS.includes(l), l);
 });
 
 test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one write, counts only; parts off too', async () => {
-  const counts = { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5 };
+  const counts = { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, TrailOffer: 6 };
   const f = fakeDriver((q) => {
     const label = /MATCH \(n:(\w+) \{ownerId: \$uid\}\)/.exec(q)?.[1];
     if (label) return [{ n: counts[label] }];
@@ -259,7 +259,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
   });
   setDriver(f.driver);
   const out = await fns.deleteMyParts.run({ auth: auth('u7'), data: {} });
-  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, FollowUp: 1 } });
+  assert.deepEqual(out, { deleted: { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, TrailOffer: 6, FollowUp: 1 } });
   assert.equal(f.sessions.length, 1, 'one transaction');
   assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
   for (const c of f.calls) {
@@ -268,7 +268,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
     assert.doesNotMatch(c.query, /ToolSession|CheckIn|SkillPractice|PatternOffer/, 'never touches other records');
   }
   const deletes = f.calls.filter((c) => /DETACH DELETE/.test(c.query));
-  assert.equal(deletes.length, 6);
+  assert.equal(deletes.length, 7);
   const fu = f.calls.find((c) => /FollowUp/.test(c.query));
   assert.match(fu.query, /WHERE f\.type IN \$types AND f\.status = 'scheduled'/, 'open parts follow-ups only');
   assert.deepEqual(fu.params.types, PARTS_FOLLOW_UP_TYPES);
@@ -278,7 +278,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
   // Nothing kept: nothing deleted, no profile version bump.
   const g = fakeDriver((q) => (/RETURN size/.test(q) ? [{ n: 0 }] : []));
   setDriver(g.driver);
-  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, PartRevisit: 0, PartTag: 0, FollowUp: 0 });
+  assert.deepEqual((await fns.deleteMyParts.run({ auth: auth(), data: {} })).deleted, { Part: 0, PartSession: 0, PartCandidate: 0, PartRevisit: 0, PartTag: 0, TrailOffer: 0, FollowUp: 0 });
   assert.ok(!g.calls.some((c) => /profileVersion/.test(c.query)));
 });
 
@@ -302,9 +302,15 @@ const bad = (fn) => assert.throws(fn, (e) => e.name === 'ValidationError');
 
 test('validateStartPartSession: closed trailhead set, uuids, move ids, nothing else', () => {
   assert.deepEqual(validateStartPartSession({ id: SID, trailheadKind: 'me' }),
-    { id: SID, trailheadKind: 'me', partId: null, candidateId: null, moveIds: [] });
+    { id: SID, trailheadKind: 'me', partId: null, candidateId: null, offerId: null, moveIds: [] });
   assert.deepEqual(validateStartPartSession({ id: SID, trailheadKind: 'candidate', candidateId: CID, moveIds: ['hide'] }).moveIds, ['hide']);
-  for (const k of ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve']) validateStartPartSession({ id: SID, trailheadKind: k });
+  for (const k of ['me', 'candidate', 'settings', 'angry_card', 'problem_solve']) validateStartPartSession({ id: SID, trailheadKind: k });
+  // The offer trailhead names its trail offer (and only it does).
+  const OID = 'trail_two_pulls:chase+hide:ctx_event_leaving';
+  assert.equal(validateStartPartSession({ id: SID, trailheadKind: 'offer', offerId: OID }).offerId, OID);
+  bad(() => validateStartPartSession({ id: SID, trailheadKind: 'offer' }));
+  bad(() => validateStartPartSession({ id: SID, trailheadKind: 'me', offerId: OID }));
+  bad(() => validateStartPartSession({ id: SID, trailheadKind: 'offer', offerId: 'DROP TABLE' }));
   bad(() => validateStartPartSession({ id: SID, trailheadKind: 'checkin' }));
   bad(() => validateStartPartSession({ id: 'nope', trailheadKind: 'me' }));
   bad(() => validateStartPartSession({ id: SID, trailheadKind: 'me', partId: 'not-a-uuid' }));
