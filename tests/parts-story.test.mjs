@@ -44,6 +44,7 @@ test("builder: met, its job then and now, rested and back, oldest first; months 
   assert.doesNotMatch(JSON.stringify(story), /\d{4}-\d{2}-\d{2}/, "no date");
   assert.deepEqual(story.helped, []);
   assert.equal(story.felt, undefined);
+  assert.deepEqual(story.steps, []);
 });
 
 test("builder: each line only when its data exists; a still-true answer that keeps it active isn't a moment", () => {
@@ -58,11 +59,13 @@ test("builder: each line only when its data exists; a still-true answer that kee
 });
 
 test("builder: a tender part's story has no job, and keeps the relationship lines", () => {
-  const stats = { helped: [{ toolId: "cool-down", n: 3 }], felt: { month: "2026-07", then: "feel_steady", now: "feel_curious" }, when: "evenings" };
+  const stats = { helped: [{ toolId: "cool-down", n: 3 }], felt: { month: "2026-07", then: "feel_steady", now: "feel_curious" }, when: "evenings",
+    steps: [{ stepId: "s1", label: "Step outside for a minute", n: 2 }] };
   const story = B.buildPartStory(rows({ part: { tender: true }, stats, room: { parts: [roomPart(A, "Guard", { tender: true }), roomPart(C, "Critic")], links: [{ id: "l1", kind: "covers_for", aId: C, bId: A, bothWantId: null }] } }), NOW);
   assert.ok(!story.moments.some((m) => m.kind === "job"));
   assert.deepEqual(story.helped, stats.helped);
   assert.deepEqual(story.felt, stats.felt);
+  assert.deepEqual(story.steps, stats.steps, "steps that helped, as the card has them");
   assert.deepEqual(story.links, [{ role: "behind", otherId: C, otherName: "Critic" }]);
   assert.equal("when" in story, false, "the story carries no when");
 });
@@ -180,4 +183,23 @@ test("the job slots are linted at the longest job chip label (own words wrap)", 
   const labels = [...fixture.options.meet.job, ...fixture.options.meet.rather].map((o) => o.label.length);
   assert.equal(PARTS_SLOT_WIDTH.old, Math.max(...labels));
   assert.equal(PARTS_SLOT_WIDTH.new, Math.max(...labels));
+});
+
+test("words: steps that helped sit after what's helped it settle, worded as on the card, under the same gate", () => {
+  const copy = S.partStoryCopy(content);
+  const story = {
+    moments: [], links: [], helped: [{ toolId: "cool-down", n: 3 }],
+    steps: [{ stepId: "s1", label: "Step outside", n: 1 }, { stepId: "s2", label: "Say it slowly", n: 2 }, { stepId: "s3", label: "Text a friend", n: 4 }],
+  };
+  const v = S.storyView(story, content, copy, deps, false);
+  assert.deepEqual(v.sections.map((s) => s.key), ["helped", "steps"]);
+  assert.deepEqual(v.sections[1], { key: "steps", title: null, lines: ["Steps that helped: Step outside · Say it slowly (twice) · Text a friend (4 times)"] });
+  // The card reads the same readout through the same function.
+  const P = read("src/lib/partStory.ts");
+  assert.match(P, /steps: story\.steps\?\.length \? story\.steps : null,/);
+  // A story from a server before the steps shipped: no line, nothing breaks.
+  assert.deepEqual(S.storyView({ moments: [], links: [], helped: [] }, content, copy, deps, false).sections, []);
+  // Its words are part of the story's gate (the readout's own STATS_REQUIRED).
+  for (const id of ["stats_steps", "stats_step_twice", "stats_step_times"]) assert.ok(S.PART_STORY_REQUIRED.prompts.includes(id), id);
+  assert.match(read("src/components/parts/story/PartStory.tsx"), /\{s\.title && <h5/);
 });

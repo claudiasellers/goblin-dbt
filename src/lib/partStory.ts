@@ -4,6 +4,7 @@
  * counts (functions/src/parts/storyBuild.ts); every word comes from the shipped parts copy (flow `story`,
  * and the readout's own lines, common/stats), tool names from src/data/tools.ts.
  *
+ * The readout's lines (felt, helped, steps) come from the same fields and words as the card's.
  * Rules: oldest first; a line only when its data and its words exist (never half-filled); no number but
  * the readout's own counts; never a fear; a tender part's story has no job (and no job chip flagged
  * tender or danger is ever named, on any part).
@@ -37,7 +38,8 @@ export type StoryLine =
   | { kind: 'text'; key: string; text: string }
   | { kind: 'job'; key: string; before: string; words: string; after: string; own: boolean };
 
-export interface StorySection { key: 'felt' | 'helped' | 'where'; title: string; lines: string[] }
+/** `title` null: a line that names itself (Steps that helped: …). */
+export interface StorySection { key: 'felt' | 'helped' | 'steps' | 'where'; title: string | null; lines: string[] }
 
 export interface StoryView {
   /** Met, rested, back, its job then and now: oldest first. */
@@ -83,10 +85,16 @@ export function storyView(story: GetPartStoryResponse, content: PartsContent, co
     lines.push({ kind: 'text', key: `${m.kind}-${i}`, text: fill(template, { month }) });
   });
 
-  const stat = partStatLines({ helped: story.helped.length ? story.helped : null, felt: story.felt ?? null, when: null, steps: null }, content, deps);
+  const stat = partStatLines({
+    helped: story.helped.length ? story.helped : null, felt: story.felt ?? null, when: null,
+    // `?? []`: a story from a server before the steps shipped has no field.
+    steps: story.steps?.length ? story.steps : null,
+  }, content, deps);
   const sections: StorySection[] = [];
   if (stat.felt) sections.push({ key: 'felt', title: stat.felt.title, lines: [stat.felt.line] });
   if (stat.helped) sections.push({ key: 'helped', title: stat.helped.title, lines: stat.helped.lines });
+  // Steps that helped, after what's helped it settle, as the card has it.
+  if (stat.steps) sections.push({ key: 'steps', title: null, lines: [stat.steps] });
   const where = story.links.map((l) => {
     const name = l.otherName ?? copy.story_other;
     return fill(l.role === 'front' ? copy.story_front : l.role === 'behind' ? copy.story_behind : copy.story_pulls, { name });

@@ -58,7 +58,7 @@ function StoryBody({ partId, view, whereTitle }: { partId: string; view: StoryVi
       )}
       {others.map((s) => (
         <div key={s.key}>
-          <h5 className="text-xs text-[var(--color-text-secondary)]">{s.title}</h5>
+          {s.title && <h5 className="text-xs text-[var(--color-text-secondary)]">{s.title}</h5>}
           <ul>{s.lines.map((l) => <li key={l} className="text-sm text-[var(--color-text-primary)] break-words">{l}</li>)}</ul>
         </div>
       ))}
