@@ -27,7 +27,7 @@ const ROWS = {
 };
 
 test('getPartStory handler: parts off is nothing; not the caller\'s active or resting part is not found', async () => {
-  assert.deepEqual(await ST.getPartStoryHandler({ partId: A }, { story: async () => ({ partsOn: false }) }, NOW), { moments: [], helped: [], links: [] });
+  assert.deepEqual(await ST.getPartStoryHandler({ partId: A }, { story: async () => ({ partsOn: false }) }, NOW), { moments: [], helped: [], steps: [], links: [] });
   await assert.rejects(ST.getPartStoryHandler({ partId: A }, { story: async () => ({ partsOn: true, rows: null }) }, NOW), code('not-found'));
   const out = await ST.getPartStoryHandler({ partId: A }, { story: async () => ({ partsOn: true, rows: ROWS }) }, NOW);
   assert.deepEqual(out.moments, [{ kind: 'met', month: '2026-07' }]);
@@ -42,7 +42,7 @@ test('validateStoryRef: a part id only', () => {
 test('getPartStory over the fake driver: the caller\'s own part by key, set-aside not found, parts off reads nothing else', async () => {
   const off = fakeDriver((q) => (q === SQ.STATS_USER_QUERY ? [{ partsOn: false, timeZone: null }] : new Error(`unexpected ${q}`)));
   setDriver(off.driver);
-  assert.deepEqual(await fns.getPartStory.run({ auth: auth('u2'), data: { partId: A } }), { moments: [], helped: [], links: [] });
+  assert.deepEqual(await fns.getPartStory.run({ auth: auth('u2'), data: { partId: A } }), { moments: [], helped: [], steps: [], links: [] });
   assert.equal(off.calls.length, 1);
   assert.equal(off.sessions[0].config.defaultAccessMode, 'READ');
 

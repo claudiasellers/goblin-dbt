@@ -461,6 +461,12 @@ function storyRich(): GetPartStoryResponse {
       { kind: 'back', month: '2026-10' },
     ],
     helped: [{ toolId: 'pause', n: 4 }, { toolId: 'recovering-from-invalidation', n: 3 }, { toolId: 'cool-down', n: 1 }],
+    // Steps that helped at their longest: three steps, a long graph label among them.
+    steps: [
+      { stepId: 'oa_step_1', label: 'Let your shoulders drop and slow your breathing for a minute', n: 3 },
+      { stepId: 'oa_step_2', label: 'Say one true thing out loud', n: 2 },
+      { stepId: 'rx_exit_1', label: 'Step away and come back later', n: 1 },
+    ],
     felt: { month: '2026-05', then: 'feel_annoyed', now: 'feel_warm' },
     links: [
       { role: 'behind', otherId: PART_IDS.hide, otherName: PARTS[1].name },
@@ -491,6 +497,7 @@ function storyTender(): GetPartStoryResponse {
       { kind: 'job', month: '2026-09', then: { jobIds: ['hide_job_out_of_sight'], ownJob: null }, now: { jobIds: ['hide_rather_need_someone'], ownJob: null } },
     ],
     helped: [{ toolId: 'cool-down', n: 3 }],
+    steps: [],
     felt: { month: '2026-08', then: null, now: 'feel_curious' },
     links: [{ role: 'behind', otherId: PART_IDS.chase, otherName: PARTS[0].name }],
   };

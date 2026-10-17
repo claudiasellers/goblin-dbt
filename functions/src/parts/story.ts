@@ -54,7 +54,7 @@ export function validateStoryRef(raw: unknown): GetPartStoryRequest {
 /** One part's story. Parts off: nothing. Not the caller's active or resting part: not found. */
 export async function getPartStoryHandler(input: GetPartStoryRequest, deps: StoryDeps, now: Date = new Date()): Promise<GetPartStoryResponse> {
   const st = await deps.story(input.partId);
-  if (!st.partsOn) return { moments: [], helped: [], links: [] };
+  if (!st.partsOn) return { moments: [], helped: [], steps: [], links: [] };
   if (!st.rows) throw new HttpsError('not-found', 'Part not found');
   return buildPartStory(st.rows, now);
 }
@@ -95,7 +95,8 @@ export function storyDeps(tx: ManagedTransaction, uid: string): StoryDeps {
             })),
             links: den.links,
           },
-          stats: partStats(stats.tags.filter((t) => t.partId === id), stats.sessions.filter((s) => s.partId === id), stats.timeZone),
+          stats: partStats(stats.tags.filter((t) => t.partId === id), stats.sessions.filter((s) => s.partId === id), stats.timeZone,
+            stats.steps.filter((s) => s.partId === id)),
         },
       };
     },

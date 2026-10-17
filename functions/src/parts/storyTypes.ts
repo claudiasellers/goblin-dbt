@@ -47,6 +47,8 @@ export interface GetPartStoryResponse {
   moments: PartStoryMoment[];
   /** What's helped it settle: the card's readout (≥ 3 close tags), else empty. */
   helped: Array<{ toolId: string; n: number }>;
+  /** Steps that helped: the card's readout (graph labels, never own words), else empty. */
+  steps: Array<{ stepId: string; label: string; n: number }>;
   links: PartStoryLink[];
   /** How they've felt toward it: the card's readout, when it says something. */
   felt?: { month: string; then: string | null; now: string };

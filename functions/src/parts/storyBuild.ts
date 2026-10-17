@@ -150,6 +150,7 @@ export function buildPartStory(rows: StoryRows, now: Date): GetPartStoryResponse
   const out: GetPartStoryResponse = {
     moments: timed.map((t) => t.m),
     helped: rows.stats?.helped ?? [],
+    steps: rows.stats?.steps ?? [],
     links: storyLinks(rows.part.id, rows.room),
   };
   if (rows.stats?.felt) out.felt = rows.stats.felt;
