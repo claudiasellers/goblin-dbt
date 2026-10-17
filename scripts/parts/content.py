@@ -608,6 +608,23 @@ PROMPTS = [
     ("den_remove", "den", "thread", "Remove this thread"),
     ("den_then", "den", "then", "How it looked in {month}"),
     ("den_now", "den", "then", "Now"),
+    # Wise mind's step back (docs/design/wise-mind.md, 2p; parts on, at least one kept part): the room
+    # from the den, small, the light in the middle. The light is the person and is never labelled, never
+    # called Self. Parts are asked to take a step back so the person can listen, never to leave or stop.
+    ("wm_who", "wise_mind", "who", "Who's here about this?"),
+    ("wm_who_help", "wise_mind", "who", "Tap a part to bring it near the light."),
+    ("wm_room", "wise_mind", "who", "The room, with the light in the middle"),
+    ("wm_step_back", "wise_mind", "step_back", "Ask everyone to take one step back."),
+    ("wm_hold", "wise_mind", "step_back", "Hold to ask"),
+    ("wm_held", "wise_mind", "step_back", "From here, what's the wise next step?"),
+    ("wm_tap_one", "wise_mind", "step_back", "Tap a part if it won't step back."),
+    ("wm_wont_line", "wise_mind", "wont", "That's fine. It might need its own time."),
+    ("wm_later_done", "wise_mind", "wont", "It's in Me for another time."),
+    # The quiet way back to the default form, on every step-back screen
+    ("wm_use_minds", "wise_mind", "chrome", "Use the two minds instead"),
+    # Screen 5 (Is this wise mind?), the parts form's line for *Pushed, urgent* (the default form's
+    # "That might be emotion mind talking." is Wise mind's own content)
+    ("wm_pushed", "wise_mind", "feel", "A part might still be close."),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry
@@ -800,6 +817,13 @@ OPTIONS = [
     opt("pulls_keep", "pulls", "keepsake", "Keep this", branch="keep"),
     opt("pulls_not_now", "pulls", "keepsake", "Not now", branch="end"),
     opt("pulls_another_time", "pulls", "needs_time", "Meet it another time", branch="candidate"),
+    # Wise mind's step back. wm_unmet is a figure of its own in the room (its later tap queues a
+    # PartCandidate, origin wise_mind); wm_no_one goes on with nobody placed and no step back.
+    opt("wm_unmet", "wise_mind", "who", "A part I haven't met"),
+    opt("wm_no_one", "wise_mind", "who", "No one in particular", branch="end"),
+    opt("wm_wont", "wise_mind", "wont", "It won't step back"),
+    opt("wm_meet_later", "wise_mind", "wont", "Meet it another time", branch="candidate"),
+    opt("wm_next", "wise_mind", "chrome", "Next"),
 
     # --- The trail offer ---
     opt("offer_show", "offer", "card", "Show me"),

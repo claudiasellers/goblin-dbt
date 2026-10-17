@@ -67,6 +67,7 @@ export { TRAIL_OFFER_REQUIRED } from './src/lib/trailOffer';
 export { KNOWN_PART_REVIEW_REQUIRED, PLAIN_PATTERNS_REQUIRED } from './src/lib/knownPartReview';
 export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 export { DEN_REQUIRED } from './src/lib/den';
+export { WISE_MIND_PARTS_REQUIRED } from './src/lib/wiseMindParts';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -138,6 +139,11 @@ export function surfaces(g) {
       id: 'den', title: 'The den',
       where: 'Me → Parts of me → "See them together" (the link shows once the person has two active or resting parts), with parts on: the room seen from above with the person as the light (never labelled), each part where they put it (drag, or the keyboard), "Everyone here is in your house." under it. Tap one figure, then another: "These two pull against each other" (opens Two pulls, once it is built) or "This one stands in front of that one", then "Which one stands in front?" with both names; a confirmed thread has a remove. "How it looked in {month}" shows a past layout beside today. A part with a safety-line move or a danger fear shows the crisis resources under the room.',
       groups: [{ label: null, ids: g.DEN_REQUIRED }],
+    },
+    {
+      id: 'wise_mind', title: 'Wise mind\'s step back',
+      where: 'Wise mind (Tools, Mindfulness), with parts on and at least one active or resting part: its second screen becomes the step back, with "Use the two minds instead" to switch. The den\'s room, small, the light in the middle (the person, never labelled). "Who\'s here about this?": the person\'s parts on a shelf (tender ones covered), "A part I haven\'t met" and "No one in particular"; a tap places a figure near the light. One hold asks everyone to take a step back and the figures move to the edge. After it, a tap on a figure: "It won\'t step back", "That\'s fine. It might need its own time." and "Meet it another time" (a kept part: Meet a part for it; the unmet one: queued in Me\'s "To come back to"). A placed part with a safety-line move or a danger fear shows the crisis resources under the room. On "Is this wise mind?", "Pushed, urgent" says "A part might still be close." Placing a part tags it to the visit.',
+      groups: [{ label: null, ids: g.WISE_MIND_PARTS_REQUIRED }],
     },
     {
       id: 'settings', title: 'Settings',

@@ -33,6 +33,17 @@ export const statsReady = (content: PartsContent): boolean => surfaceReady(conte
 export const reflectPartsReady = (content: PartsContent): boolean =>
   statsReady(content) && surfaceReady(content, REFLECT_REQUIRED);
 
+/** A step label longer than this (graph steps run to ~100 characters) caps the line at STEPS_CAP_LONG. */
+export const STEPS_LONG_LABEL = 60;
+export const STEPS_CAP_LONG = 2;
+export const STEPS_CAP = 3;
+
+/** The steps the line names: three, or two when any of those three has a long label. */
+export function shownSteps<T extends { label: string }>(steps: readonly T[]): T[] {
+  const top = steps.slice(0, STEPS_CAP);
+  return top.some((s) => s.label.length > STEPS_LONG_LABEL) ? top.slice(0, STEPS_CAP_LONG) : top;
+}
+
 export interface PartStatLines {
   /** "Mostly evenings". */
   when: string | null;
@@ -74,7 +85,7 @@ export function partStatLines(stats: PartStats, content: PartsContent, deps: {
   const helped = lines.length ? { title: copy('stats_helped'), lines } : null;
 
   // `?? []`: a readout from a server before the steps shipped has no field.
-  const items = (stats.steps ?? []).flatMap(({ label, n }) => {
+  const items = shownSteps(stats.steps ?? []).flatMap(({ label, n }) => {
     if (!label || n < 1) return [];
     if (n === 1) return [label];
     return [n === 2 ? fill(copy('stats_step_twice'), { step: label }) : fill(copy('stats_step_times'), { step: label, n })];

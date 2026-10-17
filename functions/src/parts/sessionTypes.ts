@@ -4,9 +4,12 @@
  */
 
 /** Where the visit came from (parts.md "Entries"). */
-/** Where a Meet a part visit started; `tools`: the Tools list (Mindfulness), with parts on. */
-export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve' | 'tools';
-export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools'];
+/**
+ * Where a Meet a part visit started; `tools`: the Tools list (Mindfulness), with parts on; `wise_mind`:
+ * Wise mind's step back, *Meet it another time* on a kept part that wouldn't step back.
+ */
+export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve' | 'tools' | 'wise_mind';
+export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools', 'wise_mind'];
 
 /** The steps table's ids, plus the tender path's one screen and the "nothing there" branch. */
 export type PartStepId =

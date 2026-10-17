@@ -5,11 +5,12 @@
 
 /**
  * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's
- * debrief, "who showed up?") or `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
- * functions/src/parts/offers/review.ts).
+ * debrief, "who showed up?"), `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
+ * functions/src/parts/offers/review.ts) or `wise_mind` (the parts the person placed in Wise mind's step
+ * back, on that visit's own ToolSession, open or closed; one per session and part).
  */
-export type TagSource = 'close' | 'debrief' | 'review';
-export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review'];
+export type TagSource = 'close' | 'debrief' | 'review' | 'wise_mind';
+export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review', 'wise_mind'];
 /** A debrief tag's answer: Yes or A bit (No and Skip write nothing). */
 export type TagStrength = 'yes' | 'a_bit';
 export const TAG_STRENGTHS: readonly TagStrength[] = ['yes', 'a_bit'];
@@ -20,7 +21,10 @@ export interface TagPartRequest {
   id: string;
   /** The caller's kept part (active or resting). */
   partId: string;
-  /** close: the caller's closed ToolSession with a better close. debrief: the caller's DEAR MAN ToolSession, open or closed. */
+  /**
+   * close: the caller's closed ToolSession with a better close. debrief: the caller's DEAR MAN ToolSession,
+   * open or closed. wise_mind: the caller's Wise mind ToolSession, open or closed.
+   */
   toolSessionId: string;
   /** Absent is `close`. */
   source?: TagSource;

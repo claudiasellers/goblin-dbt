@@ -305,7 +305,7 @@ test('validateStartPartSession: closed trailhead set, uuids, move ids, nothing e
   assert.deepEqual(validateStartPartSession({ id: SID, trailheadKind: 'me' }),
     { id: SID, trailheadKind: 'me', partId: null, candidateId: null, offerId: null, moveIds: [] });
   assert.deepEqual(validateStartPartSession({ id: SID, trailheadKind: 'candidate', candidateId: CID, moveIds: ['hide'] }).moveIds, ['hide']);
-  for (const k of ['me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools']) validateStartPartSession({ id: SID, trailheadKind: k });
+  for (const k of ['me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools', 'wise_mind']) validateStartPartSession({ id: SID, trailheadKind: k });
   assert.equal(validateStartPartSession({ id: SID, trailheadKind: 'tools' }).trailheadKind, 'tools', 'the Tools list');
   // The offer trailhead names its trail offer (and only it does).
   const OID = 'trail_two_pulls:chase+hide:ctx_event_leaving';
@@ -551,7 +551,7 @@ test('partSource: candidate, offer or made', () => {
   assert.equal(plan.partSource({ trailheadKind: 'candidate', candidateId: null }), 'candidate');
   assert.equal(plan.partSource({ trailheadKind: 'me', candidateId: CID }), 'candidate');
   assert.equal(plan.partSource({ trailheadKind: 'offer', candidateId: null }), 'offer');
-  for (const k of ['me', 'settings', 'angry_card', 'problem_solve', 'tools']) assert.equal(plan.partSource({ trailheadKind: k, candidateId: null }), 'made');
+  for (const k of ['me', 'settings', 'angry_card', 'problem_solve', 'tools', 'wise_mind']) assert.equal(plan.partSource({ trailheadKind: k, candidateId: null }), 'made');
 });
 
 test('mergeRevisit: unions ids, replaces own words only where given, never removes or un-tenders', () => {
@@ -665,7 +665,7 @@ test('keepPart over the fake driver: caller-scoped keys, guarded writes, profile
 test('validateCandidate: origin set, move ids, uuids, nothing else', () => {
   assert.deepEqual(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }),
     { id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID });
-  for (const o of ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card']) C.validateCandidate({ id: CID, origin: o, moveIds: [] });
+  for (const o of ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card', 'wise_mind']) C.validateCandidate({ id: CID, origin: o, moveIds: [] });
   bad(() => C.validateCandidate({ id: CID, origin: 'checkin', moveIds: [] }));
   bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['Hide!'] }));
   bad(() => C.validateCandidate({ id: CID, origin: 'split', moveIds: ['a', 'b', 'c', 'd', 'e'] }));
@@ -679,7 +679,7 @@ test('queuePartCandidate: parts off refused for every origin; moves must exist; 
     const log = [];
     return { log, deps: { state: async () => st, write: async (c) => { log.push(c); } } };
   };
-  for (const origin of ['new_one', 'angry_card', 'ps_ambivalence']) {
+  for (const origin of ['new_one', 'angry_card', 'ps_ambivalence', 'wise_mind']) {
     const f = fake({ partsOn: false, sessionFound: false, knownMoves: 0 });
     await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin, moveIds: [] }), f.deps), code('failed-precondition'));
     assert.equal(f.log.length, 0);
@@ -690,7 +690,10 @@ test('queuePartCandidate: parts off refused for every origin; moves must exist; 
   await assert.rejects(C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }), noSession.deps), code('not-found'));
   const ok = fake({ partsOn: true, sessionFound: true, knownMoves: 1 });
   assert.deepEqual(await C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'worried_part', moveIds: ['hide'], sessionId: SID }), ok.deps), { id: CID });
-  assert.equal(ok.log.length, 1);
+  assert.equal(ok.log.length, 1);  // Wise mind's *A part I haven't met* → *Meet it another time*: no moves, no session, on that tap
+  const wm = fake({ partsOn: true, sessionFound: false, knownMoves: 0 });
+  assert.deepEqual(await C.queuePartCandidateHandler(C.validateCandidate({ id: CID, origin: 'wise_mind', moveIds: [] }), wm.deps), { id: CID });
+  assert.deepEqual(wm.log, [{ id: CID, origin: 'wise_mind', moveIds: [], sessionId: null }]);
 });
 
 test('queuePartCandidate over the fake driver: one write, MERGE on key (idempotent), log layer, QUEUED from the session', async () => {
@@ -864,6 +867,57 @@ test('tagPart debrief: DEAR MAN only, open or closed, no close answer; one per s
   assert.deepEqual([params.source, params.taggedKey, params.strength, params.debriefTools], ['debrief', `real-user:${TSID}:debrief`, 'a_bit', ['dear-man']]);
   const st = f.calls.find((c) => c.query === T.TAG_STATE_QUERY);
   assert.equal(st.params.taggedKey, `real-user:${TSID}:debrief`, 'the existing-tag read is per source');
+});
+
+test('tagPart wise_mind: Wise mind only, open or closed, no close answer; one per session and part; no strength', async () => {
+  assert.deepEqual(T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'wise_mind' }),
+    { id: TAG, partId: PID, toolSessionId: TSID, source: 'wise_mind' });
+  bad(() => T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'wise_mind', strength: 'yes' }));
+  const good = { partsOn: true, partStatus: 'active', sessionFound: true, sessionStatus: 'open', thenVsNow: null, actedOnUrge: null, toolId: 'wise-mind', existingId: null };
+  const fake = (st, wrote = true) => {
+    const log = [];
+    return { log, deps: { state: async () => ({ ...good, ...st }), write: async (t) => { log.push(t); return wrote; } } };
+  };
+  const req = T.validateTag({ id: TAG, partId: PID, toolSessionId: TSID, source: 'wise_mind' });
+  // the visit is still open when the person places the parts; a closed one (any close answer) takes it too
+  for (const st of [{}, { partStatus: 'resting' }, { sessionStatus: 'completed', thenVsNow: 'worse' }]) {
+    const f = fake(st);
+    assert.deepEqual(await T.tagPartHandler(req, f.deps), { id: TAG, created: true }, JSON.stringify(st));
+    assert.equal(f.log.length, 1);
+  }
+  for (const [st, c] of [
+    [{ toolId: 'dear-man' }, 'failed-precondition'],
+    [{ toolId: 'five-senses', sessionStatus: 'completed', thenVsNow: 'better' }, 'failed-precondition'],
+    [{ partsOn: false }, 'failed-precondition'],
+    [{ sessionFound: false }, 'not-found'],
+    [{ partStatus: 'set_aside' }, 'not-found'],
+    [{ partStatus: null }, 'not-found'],
+  ]) {
+    const f = fake(st);
+    await assert.rejects(T.tagPartHandler(req, f.deps), code(c), JSON.stringify(st));
+    assert.equal(f.log.length, 0, JSON.stringify(st));
+  }
+  // this part already placed on this visit: its tag, nothing written
+  const again = fake({ existingId: TAG2 });
+  assert.deepEqual(await T.tagPartHandler(req, again.deps), { id: TAG2, created: false });
+  assert.equal(again.log.length, 0);
+  // the key carries the part: two parts placed on one visit both get theirs
+  assert.equal(T.taggedKeyOf('u:s', 'wise_mind', 'u:p1'), 'u:s:wise_mind:u:p1');
+  assert.notEqual(T.taggedKeyOf('u:s', 'wise_mind', 'u:p1'), T.taggedKeyOf('u:s', 'wise_mind', 'u:p2'));
+  assert.match(T.TAG_QUERY, /OR \(\$source = 'wise_mind' AND ts\.toolId IN \$wiseMindTools\)/);
+  assert.deepEqual([...T.TAG_WISE_MIND_TOOLS], ['wise-mind']);
+  let params = null;
+  const f = fakeDriver((q, p) => {
+    if (q === T.TAG_STATE_QUERY) return [{ ...good, existingId: null, idTaken: false }];
+    if (q === T.TAG_QUERY) { params = p; return [{ id: TAG }]; }
+    return new Error('unexpected');
+  });
+  setDriver(f.driver);
+  assert.deepEqual(await fns.tagPart.run({ auth: auth('real-user'), data: { id: TAG, partId: PID, toolSessionId: TSID, source: 'wise_mind' } }),
+    { id: TAG, created: true });
+  assert.deepEqual([params.source, params.taggedKey, params.strength, params.wiseMindTools],
+    ['wise_mind', `real-user:${TSID}:wise_mind:real-user:${PID}`, null, ['wise-mind']]);
+  assert.equal(f.calls.find((c) => c.query === T.TAG_STATE_QUERY).params.taggedKey, params.taggedKey, 'the existing-tag read is per part');
 });
 
 test('tagPart over the fake driver: log layer, incoming edges only on the ToolSession, a lost race returns the first tag', async () => {

@@ -17,9 +17,14 @@
  *   REVIEW_TAGS_QUERY: any of the trail's evidence records, the same `taggedKey`). The person recognising
  *   the part is the evidence, so no close answer is asked; like a debrief tag, the stats never count it.
  *
+ * - `wise_mind` (Wise mind's step back, the parts-aware form): the ToolSession the caller's and Wise
+ *   mind's, open or closed. Placing a part in the room is the person's yes; no close answer is asked. It
+ *   says the part was there, so, like a debrief tag, the stats never count it. One per session and part
+ *   (the person may place several), so its `taggedKey` carries the part.
+ *
  * All: parts on; the part the caller's and active or resting.
  *
- * One tag per ToolSession per source: the state read returns the session's existing tag of that source,
+ * One tag per ToolSession per source (per part for `wise_mind`): the state read returns the session's existing tag of that source,
  * and a repeat (any id, any part) returns it and writes nothing. Two calls racing past that read are
  * stopped by the `part_tag_tagged_key` uniqueness constraint on `PartTag.taggedKey`: the session's key for
  * a close tag (as before), `<session key>:debrief` for a debrief tag, so one of each can coexist. The
@@ -42,17 +47,26 @@ export const TAG_URGE_CLOSES = ['no'] as const;
 export const TAG_NEVER_TOOLS = ['meet-a-part'] as const;
 /** The tools a debrief tag may name: DEAR MAN's debrief only. */
 export const TAG_DEBRIEF_TOOLS = ['dear-man'] as const;
+/** The tools a wise_mind tag may name: Wise mind's step back only. */
+export const TAG_WISE_MIND_TOOLS = ['wise-mind'] as const;
 
-/** The constraint's key: a close tag keeps the session's key (as before); other sources add theirs. */
-export const taggedKeyOf = (sessionKey: string, source: TagSource): string => (source === 'close' ? sessionKey : `${sessionKey}:${source}`);
+/**
+ * The constraint's key: a close tag keeps the session's key (as before); other sources add theirs, and a
+ * wise_mind tag its part too (one per session and part).
+ */
+export const taggedKeyOf = (sessionKey: string, source: TagSource, partKey?: string): string => {
+  if (source === 'close') return sessionKey;
+  if (source === 'wise_mind') return `${sessionKey}:wise_mind:${partKey ?? ''}`;
+  return `${sessionKey}:${source}`;
+};
 
 export function validateTag(raw: unknown): TagPartRequest & { source: TagSource } {
   const o = obj(raw);
   for (const k of Object.keys(o)) if (!['id', 'partId', 'toolSessionId', 'source', 'strength'].includes(k)) throw new ValidationError(`${k}: not accepted`);
   const source = o.source === undefined ? 'close' : o.source;
-  if (!(TAG_SOURCES as readonly unknown[]).includes(source)) throw new ValidationError('source: close, debrief or review');
+  if (!(TAG_SOURCES as readonly unknown[]).includes(source)) throw new ValidationError('source: close, debrief, review or wise_mind');
   const base = { id: uuid(o.id), partId: uuid(o.partId), toolSessionId: uuid(o.toolSessionId) };
-  if (source === 'close' || source === 'review') {
+  if (source === 'close' || source === 'review' || source === 'wise_mind') {
     if (o.strength !== undefined) throw new ValidationError('strength: debrief tags only');
     return { ...base, source };
   }
@@ -82,6 +96,7 @@ export const TAG_QUERY = `
     ($source = 'close' AND ts.status <> 'open'
       AND (ts.thenVsNow IN $closes OR ts.actedOnUrge IN $urgeCloses) AND NOT ts.toolId IN $never)
     OR ($source = 'debrief' AND ts.toolId IN $debriefTools)
+    OR ($source = 'wise_mind' AND ts.toolId IN $wiseMindTools)
     OR ($source = 'review' AND ts.status <> 'open' AND NOT ts.toolId IN $never))
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey}) WHERE pt.status IN ['active', 'resting']
   MERGE (t:PartTag {key: $key})
@@ -125,6 +140,9 @@ export async function tagPartHandler(t: TagInput, deps: TagDeps): Promise<TagPar
     // Rule D's batch review: a closed session of the caller's, any close answer.
     if (st.sessionStatus === 'open') throw new HttpsError('failed-precondition', 'That session is still open');
     if ((TAG_NEVER_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
+  } else if (t.source === 'wise_mind') {
+    // Wise mind's step back: its own session, open or closed; placing the part was the yes.
+    if (!(TAG_WISE_MIND_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
   } else if (t.source === 'debrief') {
     // DEAR MAN's debrief: its own session, open or closed; no close answer asked.
     if (!(TAG_DEBRIEF_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
@@ -143,10 +161,12 @@ export async function tagPartHandler(t: TagInput, deps: TagDeps): Promise<TagPar
 export function tagDeps(tx: ManagedTransaction, uid: string, email: string | null): TagDeps {
   const params = (t: TagInput) => {
     const sessionKey = userKey(uid, t.toolSessionId);
+    const partKey = userKey(uid, t.partId);
     return {
-      uid, email, id: t.id, key: userKey(uid, t.id), partKey: userKey(uid, t.partId), sessionKey,
-      source: t.source, taggedKey: taggedKeyOf(sessionKey, t.source), strength: t.strength ?? null,
+      uid, email, id: t.id, key: userKey(uid, t.id), partKey, sessionKey,
+      source: t.source, taggedKey: taggedKeyOf(sessionKey, t.source, partKey), strength: t.strength ?? null,
       closes: [...TAG_CLOSES], urgeCloses: [...TAG_URGE_CLOSES], never: [...TAG_NEVER_TOOLS], debriefTools: [...TAG_DEBRIEF_TOOLS],
+      wiseMindTools: [...TAG_WISE_MIND_TOOLS],
     };
   };
   const s = (v: unknown) => (typeof v === 'string' ? v : null);

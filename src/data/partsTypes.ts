@@ -34,9 +34,12 @@ export type PartsEntry = (
 
 // --- Meet a part's session: mirror of functions/src/parts/sessionTypes.ts (tests/parts-entry.test.mjs) ---
 /** Where the visit came from (parts.md "Entries"). */
-/** Where a Meet a part visit started; `tools`: the Tools list (Mindfulness), with parts on. */
-export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve' | 'tools';
-export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools'];
+/**
+ * Where a Meet a part visit started; `tools`: the Tools list (Mindfulness), with parts on; `wise_mind`:
+ * Wise mind's step back, *Meet it another time* on a kept part that wouldn't step back.
+ */
+export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve' | 'tools' | 'wise_mind';
+export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools', 'wise_mind'];
 
 /** The steps table's ids, plus the tender path's one screen and the "nothing there" branch. */
 export type PartStepId =
@@ -125,8 +128,8 @@ export interface KeepPartRequest {
 export interface KeepPartResponse { partId: string; created: boolean }
 
 /** Where a candidate came from. */
-export type CandidateOrigin = 'new_one' | 'worried_part' | 'split' | 'ps_ambivalence' | 'angry_card';
-export const CANDIDATE_ORIGINS: readonly CandidateOrigin[] = ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card'];
+export type CandidateOrigin = 'new_one' | 'worried_part' | 'split' | 'ps_ambivalence' | 'angry_card' | 'wise_mind';
+export const CANDIDATE_ORIGINS: readonly CandidateOrigin[] = ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card', 'wise_mind'];
 
 /** Written only on a yes. */
 export interface QueuePartCandidateRequest {
@@ -193,11 +196,12 @@ export interface SetPartShapeRequest { partId: string; toolSessionId: string }
 // --- "Was this a part you know?": mirror of functions/src/parts/tagTypes.ts (tests/parts-entry.test.mjs) ---
 /**
  * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's
- * debrief, "who showed up?") or `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
- * functions/src/parts/offers/review.ts).
+ * debrief, "who showed up?"), `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
+ * functions/src/parts/offers/review.ts) or `wise_mind` (the parts the person placed in Wise mind's step
+ * back, on that visit's own ToolSession, open or closed; one per session and part).
  */
-export type TagSource = 'close' | 'debrief' | 'review';
-export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review'];
+export type TagSource = 'close' | 'debrief' | 'review' | 'wise_mind';
+export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review', 'wise_mind'];
 /** A debrief tag's answer: Yes or A bit (No and Skip write nothing). */
 export type TagStrength = 'yes' | 'a_bit';
 export const TAG_STRENGTHS: readonly TagStrength[] = ['yes', 'a_bit'];
@@ -208,7 +212,10 @@ export interface TagPartRequest {
   id: string;
   /** The caller's kept part (active or resting). */
   partId: string;
-  /** close: the caller's closed ToolSession with a better close. debrief: the caller's DEAR MAN ToolSession, open or closed. */
+  /**
+   * close: the caller's closed ToolSession with a better close. debrief: the caller's DEAR MAN ToolSession,
+   * open or closed. wise_mind: the caller's Wise mind ToolSession, open or closed.
+   */
   toolSessionId: string;
   /** Absent is `close`. */
   source?: TagSource;
