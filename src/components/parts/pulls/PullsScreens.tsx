@@ -17,9 +17,9 @@ import { PullsStage, type StageSide } from './PullsStage';
  * out a step (`holds`, at most `max`); after one, Next goes on. After a first try a quiet Next goes past
  * it too: nothing locks.
  */
-export function StepBack({ title, a, b, light, holds, max, holdLabel, nextLabel, onBreath, onNext }: {
+export function StepBack({ title, a, b, light, holds, max, holdLabel, holdHint, nextLabel, onBreath, onNext }: {
   title: ReactNode; a: StageSide; b: StageSide; light: readonly [number, number]; holds: number; max: number;
-  holdLabel: string; nextLabel: string; onBreath: () => void; onNext: () => void;
+  holdLabel: string; holdHint: string; nextLabel: string; onBreath: () => void; onNext: () => void;
 }) {
   const [tried, setTried] = useState(false);
   /** Remounts the hold after each breath, so the next one starts empty. */
@@ -37,7 +37,7 @@ export function StepBack({ title, a, b, light, holds, max, holdLabel, nextLabel,
       <PullsStage a={a} b={b} light={light} zoom={holds} />
       {title}
       {holds < max && (
-        <HoldButton key={round} label={holdLabel} ms={LIGHT_HOLD_MS} onProgress={() => {}} onLetGo={() => setTried(true)}
+        <HoldButton key={round} label={holdLabel} hint={holdHint} ms={LIGHT_HOLD_MS} onProgress={() => {}} onLetGo={() => setTried(true)}
           onComplete={() => { buzz(30); onBreath(); setRound((r) => r + 1); }} />
       )}
       {holds > 0

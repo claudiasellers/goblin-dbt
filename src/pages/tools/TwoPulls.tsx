@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import type { HandoffResult } from '../../data/capacityTypes';
 import type { PartsContent } from '../../data/partsContentTypes';
-import type { PartsEntry, PullsSessionPatch } from '../../data/partsTypes';
+import { HOLD_HINT, type PartsEntry, type PullsSessionPatch } from '../../data/partsTypes';
 import { getToolById } from '../../data/tools';
 import { useBand } from '../../hooks/useBand';
 import { useProfileContext } from '../../hooks/useProfileContext';
@@ -18,7 +18,7 @@ import {
   keepsakeLines, meetLinkFor, meetOptions, offerCheckback, parsePullsEntry, pullsContext, resolveVisit, startRequest, toPatch,
   wiseMindLink, worryOptions, worryPrompt, type PullsCheckbackType, type PullsVisit,
 } from '../../lib/twoPullsSave';
-import { MEET_OWN_WORDS_MAX } from '../../lib/meetAPartSave';
+import { MEET_OWN_WORDS_MAX, meetChrome } from '../../lib/meetAPartSave';
 import { scheduleResumeLater } from '../../services/capacity';
 import { getPartsEntry, keepPullsKeepsake, queuePartCandidate, savePullsSession, schedulePullsCheckback, startPullsSession } from '../../services/parts';
 import { getSpineContent } from '../../services/spine';
@@ -181,6 +181,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
     { name: visit.b.name, shapeSig: visit.b.part?.shapeSig ?? null },
   ];
   const stageLight: [number, number] = s.lightAt ?? light;
+  const chrome = meetChrome(parts);
   const ownLabel = stepOptions(parts, 'meet', 'any').find((o) => o.id === PULLS_OPTIONS.ownWords)?.label ?? '';
   const tooMuch = (
     <div className="flex justify-center">
@@ -190,7 +191,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
   const finale = (
     <div className="space-y-4 pt-2">
       <p className="font-serif text-xl text-[var(--color-text-primary)]">{P(PULLS_PROMPTS.done)}</p>
-      <Link to="/profile" className={`${primaryButton} inline-flex items-center justify-center`}>Done</Link>
+      <Link to="/profile" className={`${primaryButton} inline-flex items-center justify-center`}>{chrome.finish}</Link>
     </div>
   );
 
@@ -262,7 +263,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
   let body: ReactNode = null;
   if (own && (step === 'worryA' || step === 'worryB')) {
     const side = step === 'worryA' ? 'a' : 'b';
-    body = <OwnWords label={worryPrompt(parts, visit, side) ?? ''} fieldLabel={ownLabel} max={MEET_OWN_WORDS_MAX}
+    body = <OwnWords label={worryPrompt(parts, visit, side) ?? ''} fieldLabel={ownLabel} backLabel={chrome.back} nextLabel={chrome.next} max={MEET_OWN_WORDS_MAX}
       onDone={(text) => send({ type: 'ownWords', text })} onBack={() => setOwn(false)} />;
   } else {
     switch (step) {
@@ -277,7 +278,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
             startLater={st.p2?.start === 'later'} resume={resumeDraft()} onScheduleLater={scheduleLater}
             onResume={(r) => send({ type: 'p2', outcome: r.overridden ? 'override' : 'resume', result: r })}
             onLater={(r) => send({ type: 'p2', outcome: 'later', result: r })} />
-          {st.later && <button type="button" className={linkButton} onClick={() => send({ type: 'continue' })}>Next</button>}
+          {st.later && <button type="button" className={linkButton} onClick={() => send({ type: 'continue' })}>{chrome.next}</button>}
         </>);
         break;
       case 'place':
@@ -285,7 +286,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
           {st.resumeNote && band.content?.handoff.resumeLine && <Line>{band.content.handoff.resumeLine}</Line>}
           <Prompt>{P(PULLS_PROMPTS.place)}</Prompt>
           <PullsStage a={sides[0]} b={sides[1]} light={light} onMove={setLight} label={P(PULLS_PROMPTS.place)} />
-          <button type="button" className={primaryButton} onClick={() => send({ type: 'place', at: light })}>Next</button>
+          <button type="button" className={primaryButton} onClick={() => send({ type: 'place', at: light })}>{chrome.next}</button>
         </>);
         break;
       case 'feel': {
@@ -326,7 +327,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
       }
       case 'stepBack':
         body = <StepBack title={<Prompt>{P(PULLS_PROMPTS.stepBack)}</Prompt>} a={sides[0]} b={sides[1]} light={stageLight}
-          holds={s.stepBackHolds} max={STEP_BACK_MAX} holdLabel={P(PULLS_PROMPTS.hold)} nextLabel="Next"
+          holds={s.stepBackHolds} max={STEP_BACK_MAX} holdLabel={P(PULLS_PROMPTS.hold)} holdHint={P(HOLD_HINT)} nextLabel={chrome.next}
           onBreath={() => send({ type: 'breath' })} onNext={() => send({ type: 'next' })} />;
         break;
       case 'worryA':
@@ -365,7 +366,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
               else setKeptChoice(id);
               pick(id, opts);
             }} />
-          : notNow && <button type="button" className={primaryButton} onClick={() => pick(notNow.id, opts)}>Next</button>;
+          : notNow && <button type="button" className={primaryButton} onClick={() => pick(notNow.id, opts)}>{chrome.next}</button>;
         break;
       }
       case 'close':

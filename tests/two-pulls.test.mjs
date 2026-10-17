@@ -223,6 +223,13 @@ test("hidden tool behind the gate: registered, never listed, lazy, gated like Me
   assert.match(page, /const loadTwoPulls = \(\) => import\('\.\/tools\/TwoPulls'\);/);
   const gate = read("src/hooks/useToolGate.ts");
   assert.match(gate, /'two-pulls': \(\) => import\('\.\.\/services\/twoPulls'\)\.then\(\(m\) => m\.loadTwoPullsContent\(\)\)\.then\(\(c\) => c !== null\)/);
+  // House controls and the hold's hint come from the content, as in Meet a part.
+  for (const id of ["meet_back", "meet_next", "meet_finish"]) assert.ok(S.TWO_PULLS_REQUIRED.options.includes(id), id);
+  assert.ok(S.TWO_PULLS_REQUIRED.prompts.includes("hold_hint"));
+  for (const f of ["src/pages/tools/TwoPulls.tsx", "src/components/parts/pulls/PullsScreens.tsx"]) {
+    assert.doesNotMatch(read(f), />(Next|Back|Done)</, f);
+    assert.doesNotMatch(read(f), /Label="[A-Z]/, f);
+  }
   const svc = read("src/services/twoPulls.ts");
   assert.match(svc, /twoPullsReady\(parts\) \? parts : null/);
 });

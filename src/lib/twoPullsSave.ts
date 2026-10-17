@@ -14,7 +14,8 @@ import type {
   PullsExitStep, PullsSessionPatch, PullsSide, QueuePartCandidateRequest, StartPullsSessionRequest,
 } from '../data/partsTypes';
 import { handoffExt } from './bandStore';
-import { HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, optionsFor } from './meetAPartSave';
+import { HOLD_HINT } from '../data/partsTypes';
+import { HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_CHROME, optionsFor } from './meetAPartSave';
 import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { dueAtFor } from './spine/windows';
 import type { PullsEntry } from './twoPullsLink';
@@ -49,10 +50,13 @@ export const PULLS_OPTIONS = {
   worryNotSure: 'pulls_worry_not_sure', bothWantNotSure: 'pulls_both_want_not_sure', ownWords: 'own_words',
 } as const;
 
-/** Everything a visit needs by id (the entry gate's far-away heads-up included, as in Meet a part). */
+/**
+ * Everything a visit needs by id: the entry gate's far-away heads-up, the hold's hint and Meet a part's
+ * house controls (Back, Next, Done) included, as in Meet a part.
+ */
 export const TWO_PULLS_REQUIRED: SurfaceIds = {
-  prompts: [HEADS_UP_PROMPT, ...Object.values(PULLS_PROMPTS)],
-  options: [HEADS_UP_LOOK, HEADS_UP_GO_ON, ...Object.values(PULLS_OPTIONS)],
+  prompts: [HEADS_UP_PROMPT, ...Object.values(PULLS_PROMPTS), HOLD_HINT],
+  options: [HEADS_UP_LOOK, HEADS_UP_GO_ON, ...Object.values(PULLS_OPTIONS), ...Object.values(MEET_CHROME)],
 };
 
 /** The steps it borrows from Meet a part need at least one signed-off chip each (feel: both kinds). */
