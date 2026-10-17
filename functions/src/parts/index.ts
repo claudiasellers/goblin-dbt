@@ -12,6 +12,7 @@ import type { PartsEntry } from './types';
 import { savePartSessionHandler, startPartSessionHandler } from './sessions';
 import { readPartsEntryInput, validateStartPartSession } from './validation';
 import { sessionDeps } from './sessionQueries';
+import { frontLinkWriter } from './frontLink';
 import type { PartSessionResponse } from './sessionTypes';
 import {
   answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, partLayoutDeps, partShapeDeps, renamePartHandler,
@@ -71,7 +72,7 @@ export const keepPart = callable<unknown, KeepPartResponse>(
   { auth: 'required', label: 'keepPart', errorMessage: 'Could not keep it' },
   async ({ uid, data }) => {
     const input = parseOrInvalid(() => validateKeep(data), 'Invalid request');
-    return writeTx((tx) => keepPartHandler(input, keepDeps(tx, uid as string)));
+    return writeTx((tx) => keepPartHandler(input, { ...keepDeps(tx, uid as string), link: frontLinkWriter(tx, uid as string) }));
   },
 );
 

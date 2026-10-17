@@ -387,6 +387,9 @@ PROMPTS = [
     ("meet_job", "meet", "job", "What's it trying to do for you?"),
     ("meet_likes", "meet", "likes", "Does it like this job?"),
     ("meet_guards", "meet", "guards", "What do you think it's protecting?"),
+    # 5d, optional (skipped, not the flow, until signed off): asked only when the person keeps another
+    # active or resting part; its chips are their parts by name, then the two below.
+    ("meet_front", "meet", "front", "Does it stand in front of another part you know?"),
     ("meet_fear", "meet", "fear", "What's it afraid would happen if it stopped?"),
     ("meet_stop_title", "meet", "stop", "It's guarding something tender."),
     ("meet_stop_body", "meet", "stop", "We'll leave that be. You found the guard, and that counts."),
@@ -702,6 +705,8 @@ OPTIONS = [
     opt("likes_proud", "meet", "likes", "It's proud of it"),
     opt("likes_not_sure", "meet", "likes", "Not sure"),
     opt("guards_not_sure", "meet", "guards", "Not sure"),
+    opt("front_none", "meet", "front", "No one I know"),
+    opt("front_not_sure", "meet", "front", "Not sure"),
     opt("stop_thank", "meet", "stop", "Thank it"),
     opt("stop_body", "meet", "stop", "Something for my body first", branch="body_first"),
     opt("update_yes", "meet", "update", "Yes"),

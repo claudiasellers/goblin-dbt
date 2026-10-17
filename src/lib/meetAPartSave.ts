@@ -141,16 +141,38 @@ export function entryPlan(entry: PartsEntry | null): EntryPlan {
   return { open: 'flow' };
 }
 
-/** The machine's context for this visit. A P2 on entry makes "running things" offer only P2's last two choices. */
-export function meetContext(content: PartsContent, plan: EntryPlan, namedEntry: boolean): MeetContext {
+/**
+ * The machine's context for this visit. A P2 on entry makes "running things" offer only P2's last two
+ * choices. `known`: the person's parts (the profile's parts slice, most recently visited first); 5d offers
+ * the named ones, only when its copy is signed off.
+ */
+export function meetContext(content: PartsContent, plan: EntryPlan, namedEntry: boolean, known: readonly FrontPart[] = []): MeetContext {
+  const front = frontReady(content) ? frontParts(known) : [];
   return {
     safetyLineMoves: content.moves.filter((m) => m.safetyLine).map((m) => m.id),
     maxNonSelfAnswers: meetLimits(content).maxNonSelfAnswers,
     namedEntry,
     blendCheck: true,
+    ...(front.length ? { frontParts: front } : {}),
     ...(plan.open === 'p2' ? { p2OnEntry: true, p2Band: 'flooded' as const } : {}),
   };
 }
+
+/* ───────── 5d: "Does it stand in front of another part you know?" ───────── */
+
+/** 5d's prompt and its two answers that aren't a part. Optional: unsigned, the step is skipped, not the visit. */
+export const FRONT_PROMPT = 'meet_front';
+export const FRONT_NONE = 'front_none';
+export const FRONT_NOT_SURE = 'front_not_sure';
+export const MEET_FRONT_REQUIRED: SurfaceIds = { prompts: [FRONT_PROMPT], options: [FRONT_NONE, FRONT_NOT_SURE] };
+export const frontReady = (content: PartsContent): boolean => surfaceReady(content, MEET_FRONT_REQUIRED);
+
+/** A known part as 5d needs it: its id and name (tender parts are offered by name too, nothing else). */
+export type FrontPart = { id: string; name: string | null };
+
+/** 5d's part chips, in the slice's order (most recently visited first): only parts with a name. */
+export const frontParts = (known: readonly FrontPart[]): string[] =>
+  known.filter((p) => typeof p.name === 'string' && p.name.trim() !== '').map((p) => p.id);
 
 /**
  * The move the visit starts from: the entry's, else the visited part's first, else the first signed-off
@@ -168,7 +190,7 @@ export function startingMove(content: PartsContent, entry: MeetEntry, partMoveId
 export const STEP_PART: Record<MeetStep, PartExitStep | null> = {
   find: 'find', blend: 'blend', blendBody: 'blend', where: 'where', shape: 'shape', age: 'age', young: 'age', voice: 'voice',
   feel: 'feel_toward', unblend: 'unblend', unblendEnd: 'unblend', nothing: 'nothing', job: 'job', likes: 'job_like',
-  guards: 'guards', fear: 'fear', stop: 'fear', update: 'update', canNow: 'update', thank: 'thanks', tender: 'tender',
+  guards: 'guards', front: 'guards', fear: 'fear', stop: 'fear', update: 'update', canNow: 'update', thank: 'thanks', tender: 'tender',
   rather: 'would_rather', name: 'name', keep: 'keep', close: null, done: null,
 };
 
@@ -181,7 +203,7 @@ export const SESSION_FIELD: Record<keyof ReturnType<typeof whatToSave>['partSess
   findId: 'stepIds.find', place: 'bodyPlaces', shape: 'shapeSig', ageId: 'stepIds.age', youngId: 'stepIds.age',
   voiceId: 'stepIds.voice', ownVoice: 'ownVoice', feelTowardIds: 'feelTowardIds', steppedBack: 'steppedBack',
   jobId: 'stepIds.job', ownJob: 'ownJob', likesId: 'stepIds.job_like', guardsId: 'stepIds.guards', hurtId: 'stepIds.guards',
-  fearId: 'stepIds.fear', ownFear: 'ownFear', updateId: 'stepIds.update', canNowId: 'stepIds.update',
+  frontOfPartId: 'frontOfPartId', fearId: 'stepIds.fear', ownFear: 'ownFear', updateId: 'stepIds.update', canNowId: 'stepIds.update',
   ratherId: 'stepIds.would_rather', tender: 'stopReason', danger: 'stopReason', stopReason: 'stopReason',
   blendCheck: 'blendCheck', handoffs: 'handoffs', exitStep: 'exitStep',
 };
@@ -236,6 +258,7 @@ export function toPatch(state: MeetState, extraHandoffs: readonly HandoffResult[
   if (s.ownVoice) patch.ownVoice = s.ownVoice;
   if (s.ownJob) patch.ownJob = s.ownJob;
   if (s.ownFear) patch.ownFear = s.ownFear;
+  if (s.frontOfPartId) patch.frontOfPartId = s.frontOfPartId;
   if (s.place) patch.bodyPlaces = [s.place];
   // All zeros is "Can't tell" every round: nothing is said about the shape.
   if (s.shape.some((n) => n !== 0)) patch.shapeSig = vecToSig(s.shape);

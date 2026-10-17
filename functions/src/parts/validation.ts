@@ -145,6 +145,7 @@ export function validateSavePartSession(raw: unknown, maxNonSelfAnswers: number 
       case 'bodyPlaces': props.bodyPlaces = ids(v, MAX_PLACES, 'bodyPlaces'); break;
       case 'shapeSig': props.shapeSig = unit(v, 5, 'shapeSig'); break;
       case 'soundSig': props.soundSig = v === null ? null : unit(v, 4, 'soundSig'); break;
+      case 'frontOfPartId': props.frontOfPartId = v === null ? null : uuid(v); break;
       default: fail(`patch.${k}: not accepted`);
     }
   }

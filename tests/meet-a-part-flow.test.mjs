@@ -34,6 +34,8 @@ const SHAPE = Array.from({ length: 5 }, () => ({ type: "shape", shape: [0.1, 0.2
 const TO_FEEL = ["find_something_else", { type: "find" }, "blend_notice", { type: "place", place: "chest" }, ...SHAPE, "age_now", "hide_voice_see"];
 const TO_FEAR = [...TO_FEEL, "feel_curious", "hide_job_out_of_sight", "likes_tired", { type: "hurt", hurtId: "left_out" }];
 const hold = { type: "hold" };
+const FRONT_A = "5a2c9a0e-1b2c-4d5e-8f90-123456789abc";
+const FRONT_B = "5b2c9a0e-1b2c-4d5e-8f90-123456789abc";
 
 test("the content: every step's prompts and options exist, and own words are offered where the machine takes them", () => {
   for (const [step, ids] of Object.entries(MEET_PROMPTS)) for (const id of ids) assert.ok(fixture.prompts[id], `${step}: prompt ${id}`);
@@ -257,6 +259,7 @@ function eventsAt(state) {
     find: [{ type: "find" }], blendBody: [{ type: "p2", outcome: "resume" }, { type: "p2", outcome: "override" }, { type: "p2", outcome: "later" }, { type: "continue" }],
     where: [{ type: "place", place: "chest" }], shape: [{ type: "shape", shape: [0, 0, 0, 0, 0] }], guards: [{ type: "hurt", hurtId: "left_out" }],
     thank: [{ type: "hold" }], tender: [{ type: "hold" }], name: [{ type: "name", name: "n" }], close: [{ type: "close", choiceId: null }],
+    front: [{ type: "front", partId: FRONT_A }, ev("front_none"), ev("front_not_sure")],
   };
   return [...out, ...(special[step] ?? [])];
 }
@@ -276,7 +279,7 @@ function reachable(start, ctx) {
 }
 
 test("no dead ends: from every reachable screen some event leaves it, and done is always reachable", () => {
-  const ctxs = [CTX, ctxOf({ namedEntry: true }), ctxOf({ blendCheck: false }), ctxOf({ namedEntry: true, p2OnEntry: true, p2Band: "flooded" })];
+  const ctxs = [CTX, ctxOf({ namedEntry: true }), ctxOf({ blendCheck: false }), ctxOf({ namedEntry: true, p2OnEntry: true, p2Band: "flooded" }), ctxOf({ frontParts: [FRONT_A] })];
   const steps = new Set();
   for (const ctx of ctxs) {
     for (const move of fixture.moves.map((m) => m.id)) {
@@ -309,4 +312,63 @@ test("no dead ends: from every reachable screen some event leaves it, and done i
     }
   }
   assert.deepEqual([...steps].sort(), [...MEET_STEPS].sort(), "the walk reaches every screen");
+});
+
+test("5d: after Guards, only when the person keeps another part; one pick, then Fear; non-answers store nothing", () => {
+  assert.equal(run(TO_FEAR).step, "fear", "no other part: straight on to Fear");
+  const ctx = ctxOf({ frontParts: [FRONT_A, FRONT_B] });
+  const at = run(TO_FEAR, { ctx });
+  assert.equal(at.step, "front");
+  assert.equal(M.MEET_TRACK.front, 5);
+  assert.deepEqual(M.frontChoices(at.session, ctx), [FRONT_A, FRONT_B]);
+  const picked = run([{ type: "front", partId: FRONT_B }], { ctx, state: at });
+  assert.deepEqual([picked.step, picked.session.frontOfPartId], ["fear", FRONT_B]);
+  assert.equal(whatToSave(picked).partSession.frontOfPartId, FRONT_B, "stored on the session (not ask-fresh)");
+  assert.ok(!("frontOfPartId" in (whatToSave(run(["hide_fear_too_much", "update_yes", hold, "hide_rather_break", { type: "name", name: null }, "keep_yes"], { ctx, state: picked })).keep)),
+    "never a client field of the keep: the server reads the stored session");
+  for (const id of ["front_none", "front_not_sure"]) {
+    const s = run([id], { ctx, state: at });
+    assert.deepEqual([s.step, s.session.frontOfPartId], ["fear", undefined], id);
+  }
+  // A guards chip ("Not sure") goes there too.
+  assert.equal(run([...TO_FEAR.slice(0, -1), "guards_not_sure"], { ctx }).step, "front");
+});
+
+test("5d: never the part being visited, at most four, never a part that wasn't offered", () => {
+  const five = ["a", "b", "c", "d", "e"].map((x) => `${x.repeat(8)}-1b2c-4d5e-8f90-123456789abc`);
+  const ctx = ctxOf({ frontParts: [FRONT_A, ...five] });
+  assert.deepEqual(M.frontChoices({ partId: FRONT_A }, ctx), five.slice(0, 4), "the visited part is skipped, then four");
+  const visiting = initialMeet(ctx, { move: "hide", partId: FRONT_A });
+  const at = run(TO_FEAR, { ctx, state: visiting });
+  assert.equal(at.step, "front");
+  for (const partId of [FRONT_A, five[4], "nope"]) assert.equal(meetNext(at, { type: "front", partId }, ctx), at, partId);
+  // Only the visited part to offer: 5d is skipped.
+  const alone = ctxOf({ frontParts: [FRONT_A] });
+  assert.equal(run(TO_FEAR, { ctx: alone, state: initialMeet(alone, { move: "hide", partId: FRONT_A }) }).step, "fear");
+});
+
+test("5d: not on the tender path, and not after a danger answer", () => {
+  const ctx = ctxOf({ frontParts: [FRONT_A] });
+  const tender = run(["find_something_else", { type: "find" }, "blend_notice", { type: "place", place: "chest" }, ...SHAPE, "age_little", "young_gentle", hold], { ctx });
+  assert.equal(tender.step, "name");
+  const walk = (start) => {
+    const seen = new Set();
+    const queue = [start];
+    const steps = new Set();
+    while (queue.length) {
+      const s = queue.shift();
+      steps.add(s.step);
+      for (const e of eventsAt(s)) {
+        const n = meetNext(s, e, ctx);
+        const k = keyOf(n);
+        if (n !== s && !seen.has(k)) { seen.add(k); queue.push(n); }
+      }
+    }
+    return steps;
+  };
+  assert.ok(!walk(run(["find_something_else", { type: "find" }, "blend_notice", { type: "place", place: "chest" }, ...SHAPE, "age_little", "young_gentle"], { ctx })).has("front"));
+  const safetyMove = SAFETY[0];
+  const danger = run(["find_something_else", { type: "find" }, "blend_notice", { type: "place", place: "chest" }, ...SHAPE, "age_now", { type: "ownWords", text: "x" }], { ctx, move: safetyMove });
+  assert.equal(danger.session.danger, true);
+  assert.ok(!walk(danger).has("front"), "a danger ending never reaches 5d");
 });

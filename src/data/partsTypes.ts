@@ -101,6 +101,11 @@ export interface PartSessionPatch {
   shapeSig?: number[];
   /** Tune it's four values, each 0–1. */
   soundSig?: number[];
+  /**
+   * 5d: the caller's own active or resting part this one stands in front of (not ask-fresh); `null`
+   * clears it. The thread is written from the stored session, on the keep or a kept part's last save.
+   */
+  frontOfPartId?: string | null;
 }
 
 export interface SavePartSessionRequest {

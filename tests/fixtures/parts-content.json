@@ -196,108 +196,115 @@
    "copy": "What do you think it's protecting?",
    "reviewStatus": "draft"
   },
+  "meet_front": {
+   "flow": "meet",
+   "step": "front",
+   "order": 15,
+   "copy": "Does it stand in front of another part you know?",
+   "reviewStatus": "draft"
+  },
   "meet_fear": {
    "flow": "meet",
    "step": "fear",
-   "order": 15,
+   "order": 16,
    "copy": "What's it afraid would happen if it stopped?",
    "reviewStatus": "draft"
   },
   "meet_stop_title": {
    "flow": "meet",
    "step": "stop",
-   "order": 16,
+   "order": 17,
    "copy": "It's guarding something tender.",
    "reviewStatus": "draft"
   },
   "meet_stop_body": {
    "flow": "meet",
    "step": "stop",
-   "order": 17,
+   "order": 18,
    "copy": "We'll leave that be. You found the guard, and that counts.",
    "reviewStatus": "draft"
   },
   "meet_stop_therapist": {
    "flow": "meet",
    "step": "stop",
-   "order": 18,
+   "order": 19,
    "copy": "If you see a therapist, this is a good thing to bring.",
    "reviewStatus": "draft"
   },
   "meet_update": {
    "flow": "meet",
    "step": "update",
-   "order": 19,
+   "order": 20,
    "copy": "Does it know how old you are now?",
    "reviewStatus": "draft"
   },
   "meet_update_show": {
    "flow": "meet",
    "step": "update_show",
-   "order": 20,
+   "order": 21,
    "copy": "Show it something you can do now.",
    "reviewStatus": "draft"
   },
   "meet_thank": {
    "flow": "meet",
    "step": "thank",
-   "order": 21,
+   "order": 22,
    "copy": "Thank it for trying to protect you.",
    "reviewStatus": "draft"
   },
   "meet_thank_hold": {
    "flow": "meet",
    "step": "thank",
-   "order": 22,
+   "order": 23,
    "copy": "Press and hold",
    "reviewStatus": "draft"
   },
   "meet_thank_done": {
    "flow": "meet",
    "step": "thank",
-   "order": 23,
+   "order": 24,
    "copy": "Thanked",
    "reviewStatus": "draft"
   },
   "meet_rather": {
    "flow": "meet",
    "step": "rather",
-   "order": 24,
+   "order": 25,
    "copy": "If it didn't have to do this, what would it rather do?",
    "reviewStatus": "draft"
   },
   "meet_name": {
    "flow": "meet",
    "step": "name",
-   "order": 25,
+   "order": 26,
    "copy": "Want to give it a name?",
    "reviewStatus": "draft"
   },
   "meet_keep": {
    "flow": "meet",
    "step": "keep",
-   "order": 26,
+   "order": 27,
    "copy": "Keep it, so you can come back to it?",
    "reviewStatus": "draft"
   },
   "meet_tender": {
    "flow": "meet",
    "step": "tender",
-   "order": 27,
+   "order": 28,
    "copy": "Can you let it know you're here?",
    "reviewStatus": "draft"
   },
   "meet_tender_sub": {
    "flow": "meet",
    "step": "tender",
-   "order": 28,
+   "order": 29,
    "copy": "You don't need to do anything else.",
    "reviewStatus": "draft"
   },
   "meet_done": {
    "flow": "meet",
    "step": "close",
-   "order": 29,
+   "order": 30,
    "copy": "You can come back to this any time.",
    "reviewStatus": "draft"
   },
@@ -775,7 +782,7 @@
   "close_checkback": {
    "flow": "meet",
    "step": "close",
-   "order": 30,
+   "order": 31,
    "copy": "Check back with it tomorrow?",
    "reviewStatus": "draft"
   },
@@ -2150,6 +2157,32 @@
      "selfLike": null,
      "branch": "continue",
      "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "front": [
+    {
+     "id": "front_none",
+     "label": "No one I know",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "front_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
