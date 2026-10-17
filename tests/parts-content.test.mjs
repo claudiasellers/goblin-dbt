@@ -233,7 +233,7 @@ test("the angry-part card: every line in both wordings, the plain one never says
   for (const id of ["angry_speak_line", "angry_speak_line_plain"]) assert.equal(fixture.prompts[id].copyKind, "first_person", id);
   assert.deepEqual(Object.values(fixture.options.angry).flat().map((o) => [o.id, o.label]),
     [["angry_next", "Okay"], ["angry_not_now", "Not now"], ["angry_not_now_plain", "Not now"], ["angry_not_sure", "Not sure"],
-      ["angry_done", "Done"], ["angry_later", "Spend a minute with it later?"]]);
+      ["angry_done", "Done"], ["angry_later", "Spend a minute with it later?"], ["angry_back", "Back"], ["angry_vote_next", "Next"]]);
   // "Later" shows with parts on only, so its lines have no plain twin; tapping it queues a candidate.
   const later = fixture.options.angry.speak.find((o) => o.id === "angry_later");
   assert.equal(later.branch, "candidate");

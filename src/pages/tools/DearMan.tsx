@@ -38,6 +38,7 @@ import { useProfileContext } from '../../hooks/useProfileContext';
 import { profileCache } from '../../lib/profileCache';
 import { anchorLead, copeExt, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
 import { CopeAheadStep } from '../../components/parts/CopeAheadStep';
+import { focusLost, focusStepStart } from '../../lib/focusStart';
 
 type Phase =
   | 'entry'
@@ -425,6 +426,18 @@ export function DearMan() {
       })
       .catch(() => {});
   }, [phase]);
+
+  // Where a parts step hands back (cope ahead's go-on, the debrief's who showed up), focus lands on DEAR
+  // MAN's next step (its heading or first line) instead of the page: the parts control that had it is
+  // gone. Held while that step is up, so a step that first shows a loading line (the reflection) gets
+  // its own start once it arrives. DEAR MAN's other step changes are unchanged.
+  const viewRoot = useRef<HTMLDivElement>(null);
+  const handedBackTo = useRef<Phase | null>(null);
+  const handBack = (next: Phase) => { handedBackTo.current = next; setPhase(next); };
+  useEffect(() => {
+    if (handedBackTo.current !== phase) { handedBackTo.current = null; return; }
+    if (focusLost()) focusStepStart(viewRoot.current);
+  });
 
   // ── Loading / Error states ──
   if (loading && !content) {
@@ -976,9 +989,9 @@ export function DearMan() {
               setCopeAnchors(a => ({ ...a, [partId]: text }));
               profileCache.bump(version);
             }}
-            onGoOn={() => setPhase('describe')} />
+            onGoOn={() => handBack('describe')} />
           {copeAheadPartId && (
-            <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
+            <button onClick={() => handBack('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
               Let&apos;s build your script
             </button>
           )}
@@ -2128,7 +2141,7 @@ export function DearMan() {
         <div className="space-y-6">
           <BackButton />
           <DebriefWho content={copeCopy} parts={copeSlices.parts} copeAheadPartId={copeAheadPartId} toolSessionId={session.id}
-            onAnswer={(a) => session.setExt({ er: { whoShowedUp: a } })} onDone={() => setPhase('debrief-reflection')} />
+            onAnswer={(a) => session.setExt({ er: { whoShowedUp: a } })} onDone={() => handBack('debrief-reflection')} />
         </div>
       );
     }
@@ -2324,7 +2337,7 @@ export function DearMan() {
   const planStep = (TOO_MUCH_PHASES as readonly string[]).includes(phase);
   return (
     <>
-      {view}
+      <div ref={viewRoot}>{view}</div>
       {planStep && (
         <div className="mt-8 text-center">
           <TooMuchLink host="dear-man" onScheduleLater={scheduleLater} onResult={recordHandoff}

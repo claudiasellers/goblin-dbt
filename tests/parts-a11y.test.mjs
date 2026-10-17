@@ -6,10 +6,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
+import { createElement as h } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 import { importTs } from "./lib/importTs.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const { focusLost, focusLine, focusStepStart } = await importTs("src/components/parts/stepFocus.ts");
+const { afterRemoval } = await importTs("src/lib/focusStart.ts");
 
 /** A minimal element: tag, focusability, children found by querySelector in document order. */
 function el(tag, { focusable = false, kids = [] } = {}) {
@@ -133,4 +136,86 @@ test("the checker exists, is dev-only and names its check command", () => {
   assert.match(checker, /npx vite build --config dev\/vite\.harness\.config\.ts/);
   assert.match(checker, /node dev\/review\/a11y\.mjs/);
   assert.doesNotMatch(read("package.json"), /a11y\.mjs/, "not in npm test: it needs the harness build and a browser");
+});
+
+// parts-a11y-followups
+
+test("the hold hint: one draft line, the description of every press-and-hold, never part of its name", async () => {
+  const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
+  const { HOLD_HINT } = await importTs("src/data/partsTypes.ts");
+  assert.equal(HOLD_HINT, "hold_hint");
+  assert.deepEqual([fixture.prompts.hold_hint.flow, fixture.prompts.hold_hint.step], ["common", "hold"]);
+  assert.match(fixture.prompts.hold_hint.copy, /^Hold to fill it, or press once and wait\.$/);
+  // Required by both surfaces that show a hold, in both of the angry card's wordings.
+  const { angryPromptIds } = await importTs("src/lib/angryPart.ts");
+  const { meetPromptIds } = await importTs("src/lib/meetAPartSave.ts");
+  for (const ids of [angryPromptIds(true), angryPromptIds(false), meetPromptIds(), meetPromptIds({ paused: true })]) assert.ok(ids.includes(HOLD_HINT));
+  const { HoldButton } = await importTs("src/components/parts/LightHold.tsx");
+  const html = renderToStaticMarkup(h(HoldButton, { label: "Hold", hint: "Hold to fill it.", ms: 10, onProgress() {}, onLetGo() {}, onComplete() {} }));
+  const id = html.match(/<span id="([^"]+)" hidden="">Hold to fill it\.<\/span><button[^>]*aria-describedby="([^"]+)"/);
+  assert.ok(id, html);
+  assert.equal(id[1], id[2], "the button is described by the hint");
+  assert.doesNotMatch(html.slice(html.indexOf("<button")), /Hold to fill it/, "outside the button: not in its name");
+  assert.match(read("src/components/parts/AngryPartCard.tsx"), /<HoldButton label=\{c\.hold\} hint=\{c\.holdHint\}/);
+  assert.equal((read("src/pages/tools/MeetAPart.tsx").match(/holdHint=\{P\(HOLD_HINT\)\}/g) ?? []).length, 2, "both of Meet a part's holds");
+});
+
+test("no hard-coded controls: the angry card's Back and Next and Meet a part's Back / Next / Done come from content", async () => {
+  const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
+  const label = (flow, id) => Object.values(fixture.options[flow]).flat().find((o) => o.id === id)?.label;
+  assert.deepEqual(["angry_back", "angry_vote_next"].map((id) => label("angry", id)), ["Back", "Next"]);
+  assert.deepEqual(["meet_back", "meet_next", "meet_finish"].map((id) => label("meet", id)), ["Back", "Next", "Done"]);
+  const { meetChrome, MEET_REQUIRED_OPTIONS } = await importTs("src/lib/meetAPartSave.ts");
+  assert.deepEqual(meetChrome({ options: fixture.options }), { back: "Back", next: "Next", finish: "Done" });
+  assert.deepEqual(meetChrome({ options: {} }), { back: "", next: "", finish: "" }, "not shipped: the gate keeps the visit dark");
+  for (const id of ["meet_back", "meet_next", "meet_finish"]) assert.ok(MEET_REQUIRED_OPTIONS.includes(id), id);
+  const card = read("src/components/parts/AngryPartCard.tsx");
+  assert.match(card, /\{c\.back\}/);
+  assert.match(card, /\{c\.voteNext\}/);
+  assert.doesNotMatch(card, />\s*(Back|Next)\s*</);
+});
+
+test("Today: after a card goes, the card that took its place, else the new last one, else Today's heading", () => {
+  assert.equal(afterRemoval(0, 2), 0, "the next card slid into its place");
+  assert.equal(afterRemoval(1, 2), 1);
+  assert.equal(afterRemoval(2, 2), 1, "it was the last: the new last one");
+  assert.equal(afterRemoval(-1, 3), 0, "unknown: the first");
+  assert.equal(afterRemoval(0, 0), null, "none left: Today's heading");
+  const stack = read("src/components/today/TodayStack.tsx");
+  assert.match(stack, /<div ref=\{root\} onFocus=\{onFocus\} /, "the stack knows which card had focus");
+  assert.match(stack, /const done = \(id: string\) => \{ setLeaving\(\{ id, at: focusedAt \}\); today\.drop\(id\); today\.refresh\(\); \};/);
+  assert.match(stack, /if \(!gone \|\| !leaving \|\| !focusLost\(\)\) return;/, "only once it's gone, and only when focus went with it");
+  assert.match(stack, /focusStepStart\(i === null \? todayHeading\(\) : left\[i\]\);/);
+  assert.match(stack, /document\.getElementById\('today-panel-heading'\), document\.getElementById\('today-sheet-heading'\)/);
+  assert.match(read("src/components/today/TodayPanel.tsx"), /<h2 id="today-panel-heading"/);
+  assert.match(read("src/components/today/TodayButton.tsx"), /<h2 id="today-sheet-heading"/);
+  // The last card gone closes the panel or the sheet with the stack (same commit): the page's own start.
+  assert.match(stack, /const fallback = useFocusFallback\(todayHeading\);/);
+  assert.match(stack, /onFocus=\{onFocus\} onBlur=\{fallback\.onBlur\}/);
+  assert.match(stack, /const onFocus = \(e: FocusEvent<HTMLDivElement>\) => \{ fallback\.onFocus\(\);/);
+  const hook = read("src/hooks/useFocusFallback.ts");
+  assert.match(hook, /if \(held\.current\) requestAnimationFrame\(\(\) => \{ if \(focusLost\(\)\) focusStepStart\(to\.current\(\)\); \}\);/, "only on unmount, only while it held focus");
+  assert.match(hook, /if \(to && !e\.currentTarget\.contains\(to\)\) inside\.current = false;/, "a removed control's blur (nowhere to go) isn't leaving");
+});
+
+test("Reflect's trails: a closed block or a removed line hands focus on; saving is aria-disabled, never disabled", () => {
+  const c = read("src/components/insights/TrailsReflect.tsx");
+  assert.doesNotMatch(c, /\sdisabled=\{/, "disabled under a focused control drops it");
+  assert.equal((c.match(/aria-disabled=\{busy/g) ?? []).length, 4, "the answer chips, Done, Not now and the ×");
+  assert.match(c, /onDone=\{\(id\) => \{ setMoved\(\{ kind: 'review', at, before: before\(reviewDomId\(id\)\) \}\);/);
+  assert.match(c, /setMoved\(\{ kind: 'pattern', at: shownPatterns\.findIndex\(\(x\) => x\.p\.offerId === id\), before: before\(PATTERNS_DOM_ID\) \}\);/);
+  assert.match(c, /if \(!moved \|\| !focusLost\(\)\) return;/);
+  assert.match(c, /const instead = moved\.kind === 'review' \? document\.getElementById\(PATTERNS_DOM_ID\) : blocks\[blocks\.length - 1\];/);
+  assert.match(c, /focusStepStart\(\(i === null \? instead \?\? prior : list\[i\]\) \?\? document\.querySelector<HTMLElement>\('main'\)\);/);
+  for (const id of ["id={reviewDomId(block.partId)}", "id={PATTERNS_DOM_ID}", "id={patternDomId(p.offerId)}"]) assert.ok(c.includes(id), id);
+});
+
+test("DEAR MAN: only a parts step handing back moves focus to its next step's start", () => {
+  const dm = read("src/pages/tools/DearMan.tsx");
+  assert.deepEqual(dm.match(/handBack\('[a-z-]+'\)/g), ["handBack('describe')", "handBack('describe')", "handBack('debrief-reflection')"],
+    "cope ahead's go-on (and its build-the-script button), the debrief's who showed up; nothing else");
+  assert.match(dm, /onGoOn=\{\(\) => handBack\('describe'\)\}/);
+  assert.match(dm, /<DebriefWho [\s\S]*?onDone=\{\(\) => handBack\('debrief-reflection'\)\}/);
+  assert.match(dm, /if \(handedBackTo\.current !== phase\) \{ handedBackTo\.current = null; return; \}\s*if \(focusLost\(\)\) focusStepStart\(viewRoot\.current\);/);
+  assert.match(dm, /<div ref=\{viewRoot\}>\{view\}<\/div>/);
 });

@@ -55,11 +55,12 @@ type HoldMode = 'idle' | 'press' | 'auto';
  * sends (no pointer, no key: `detail` 0) fills it hands-free over the same `ms`, so they can complete it
  * too. A pointer's quick tap stays a try: the hold is the gesture there. Letting go early, or a second
  * key or activation while it fills, stops it and reports a try (the host then offers a way past;
- * nothing punishes).
+ * nothing punishes). `hint` (the signed-off hold_hint) is what a screen reader says with the label.
  */
-export function HoldButton({ label, ms, onProgress, onLetGo, onComplete }: {
-  label: string; ms: number; onProgress: (p: number) => void; onLetGo: () => void; onComplete: () => void;
+export function HoldButton({ label, hint, ms, onProgress, onLetGo, onComplete }: {
+  label: string; hint: string; ms: number; onProgress: (p: number) => void; onLetGo: () => void; onComplete: () => void;
 }) {
+  const hintId = useId();
   const [p, setP] = useState(0);
   const frame = useRef<number | null>(null);
   const start = useRef(0);
@@ -115,13 +116,17 @@ export function HoldButton({ label, ms, onProgress, onLetGo, onComplete }: {
   };
 
   return (
-    <button type="button" data-hold="" onPointerDown={(e) => { if (e.pointerType !== 'mouse' || e.button === 0) down(false); }}
+    <>
+    {/* Before the button and outside it: not part of its name, and never a last child that takes spacing. */}
+    <span id={hintId} hidden>{hint}</span>
+    <button type="button" data-hold="" aria-describedby={hintId} onPointerDown={(e) => { if (e.pointerType !== 'mouse' || e.button === 0) down(false); }}
       onPointerUp={up} onPointerLeave={cancelPress} onPointerCancel={cancelPress} onBlur={cancelPress} onKeyDown={onKeyDown} onKeyUp={onKeyUp}
       onClick={onClick} onContextMenu={(e) => e.preventDefault()}
       className="lift-primary relative w-full min-h-12 p-3 rounded-xl bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium overflow-hidden select-none touch-none [-webkit-touch-callout:none]">
       <span aria-hidden="true" className="absolute inset-y-0 left-0 bg-[var(--color-on-accent)] opacity-25 pointer-events-none" style={{ width: `${p * 100}%` }} />
       <span className="relative">{label}</span>
     </button>
+    </>
   );
 }
 
@@ -129,8 +134,8 @@ export function HoldButton({ label, ms, onProgress, onLetGo, onComplete }: {
  * One screen of hold: the scene, the host's lines, the hold, and once it is held its done line and
  * `next`. After a first try a quiet `next` link goes past it: nothing locks.
  */
-export function LightHold({ title, sub, holdLabel, doneLabel, nextLabel, figure, ms = LIGHT_HOLD_MS, onDone }: {
-  title: ReactNode; sub?: ReactNode; holdLabel: string; doneLabel?: string; nextLabel: string;
+export function LightHold({ title, sub, holdLabel, holdHint, doneLabel, nextLabel, figure, ms = LIGHT_HOLD_MS, onDone }: {
+  title: ReactNode; sub?: ReactNode; holdLabel: string; holdHint: string; doneLabel?: string; nextLabel: string;
   figure?: ReactNode; ms?: number; onDone: (held: boolean) => void;
 }) {
   const [progress, setProgress] = useState(0);
@@ -147,7 +152,7 @@ export function LightHold({ title, sub, holdLabel, doneLabel, nextLabel, figure,
       {held && doneLabel && <p role="status" className="text-sm text-[var(--color-text-secondary)]">{doneLabel}</p>}
       {held
         ? <button ref={nextRef} type="button" className={primaryButton} onClick={() => onDone(true)}>{nextLabel}</button>
-        : <HoldButton label={holdLabel} ms={ms} onProgress={setProgress}
+        : <HoldButton label={holdLabel} hint={holdHint} ms={ms} onProgress={setProgress}
             onLetGo={() => setTried(true)} onComplete={() => { justHeld.current = true; setHeld(true); buzz(30); }} />}
       {!held && tried && <button type="button" className={linkButton} onClick={() => onDone(false)}>{nextLabel}</button>}
     </section>

@@ -100,6 +100,9 @@ const EFFECTIVENESS_STEP = CHECK_STEPS.indexOf("effectiveness");
 /** Index of the route result card that follows the last question. */
 const CHECK_RESULT = CHECK_STEPS.length;
 
+/** Parts on: the goal line above the effectiveness question, which the focused question is read with. */
+const OA_GOAL_LINE_ID = "oa-goal-line";
+
 const MISSED_COPY: Record<string, string> = {
   too_strong: "missedTooStrong",
   no_moment: "missedNoMoment",
@@ -1050,9 +1053,10 @@ export function OppositeAction() {
           options={choices.effectiveness}
           value={draft.effectiveness}
           onPrevious={previous}
+          describedBy={goalLine ? OA_GOAL_LINE_ID : undefined}
           before={
             goalLine && (
-              <div className="space-y-1">
+              <div id={OA_GOAL_LINE_ID} className="space-y-1">
                 <p>{goalLine[0]}</p>
                 <p>{goalLine[1]}</p>
               </div>

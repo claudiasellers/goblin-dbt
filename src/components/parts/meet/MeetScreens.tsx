@@ -10,7 +10,7 @@ import { PartFigure } from '../PartFigure';
 /**
  * Meet a part's screens (docs/design/parts.md). Presentation only: every string arrives from the page
  * (parts.json through promptCopy / stepOptions, or the person's own words); the page reports events to
- * the step machine. House chrome only: Back and Next.
+ * the step machine. Back and Next are parts content too (meetChrome: meet_back / meet_next).
  */
 
 /** A step's question. Takes focus when its screen opens, so keyboard and screen-reader users land on it. */
@@ -57,12 +57,12 @@ export function QuietOptions({ options, onPick }: { options: readonly Pick<Parts
   );
 }
 
-export function BackButton({ onClick }: { onClick: () => void }) {
+export function BackButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick}
       className="inline-flex items-center gap-1 min-h-11 px-2 -ml-2 rounded-lg text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
       <span aria-hidden="true">←</span>
-      <span>Back</span>
+      <span>{label}</span>
     </button>
   );
 }
@@ -71,24 +71,24 @@ export function BackButton({ onClick }: { onClick: () => void }) {
  * The person's own words: a plain field, kept as written (never linted, parsed or read back to them
  * except as their own words, in the serif). `label` is the step's own question.
  */
-export function OwnWords({ label, fieldLabel, max, onDone, onBack }: {
-  label: string; fieldLabel: string; max: number; onDone: (text: string) => void; onBack: () => void;
+export function OwnWords({ label, fieldLabel, backLabel, nextLabel, max, onDone, onBack }: {
+  label: string; fieldLabel: string; backLabel: string; nextLabel: string; max: number; onDone: (text: string) => void; onBack: () => void;
 }) {
   const [text, setText] = useState('');
   return (
     <div className="space-y-4">
-      <BackButton onClick={onBack} />
+      <BackButton label={backLabel} onClick={onBack} />
       <Prompt>{label}</Prompt>
       <textarea value={text} onChange={(e) => setText(e.target.value.slice(0, max))} maxLength={max} rows={3} aria-label={fieldLabel}
         className="w-full p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] font-serif text-lg focus:ring-2 focus:ring-[var(--color-accent)]" />
-      <button type="button" className={primaryButton} disabled={!text.trim()} onClick={() => onDone(text.trim())}>Next</button>
+      <button type="button" className={primaryButton} disabled={!text.trim()} onClick={() => onDone(text.trim())}>{nextLabel}</button>
     </div>
   );
 }
 
 /** Where: one place on the heat figure; "Nowhere I can find" is a complete answer. */
-export function WhereScreen({ prompt, resumeLine, quiet, onPlace, onQuiet }: {
-  prompt: string; resumeLine: string | null; quiet: readonly Pick<PartsOption, 'id' | 'label'>[];
+export function WhereScreen({ prompt, resumeLine, nextLabel, quiet, onPlace, onQuiet }: {
+  prompt: string; resumeLine: string | null; nextLabel: string; quiet: readonly Pick<PartsOption, 'id' | 'label'>[];
   onPlace: (place: RegionId) => void; onQuiet: (id: string) => void;
 }) {
   const [place, setPlace] = useState<RegionId | null>(null);
@@ -99,7 +99,7 @@ export function WhereScreen({ prompt, resumeLine, quiet, onPlace, onQuiet }: {
       <Prompt>{prompt}</Prompt>
       <div className="mx-auto w-44"><HeatFigure marks={marks} selected={place} onPick={setPlace} /></div>
       <p className={`${secondaryText} min-h-5 text-center`} aria-live="polite">{place ? REGIONS[place].label : ''}</p>
-      <button type="button" className={primaryButton} disabled={!place} onClick={() => { if (place) onPlace(place); }}>Next</button>
+      <button type="button" className={primaryButton} disabled={!place} onClick={() => { if (place) onPlace(place); }}>{nextLabel}</button>
       <QuietOptions options={quiet} onPick={onQuiet} />
     </div>
   );
@@ -136,8 +136,8 @@ export function ShapeScreen({ prompt, round, rounds, shape, labels, quiet, onSha
 }
 
 /** Name: the person's own name for it, or a describing suggestion, or "Not yet". */
-export function NameScreen({ prompt, suggestion, max, quiet, onName, onQuiet }: {
-  prompt: string; suggestion: string | null; max: number; quiet: readonly Pick<PartsOption, 'id' | 'label'>[];
+export function NameScreen({ prompt, suggestion, nextLabel, max, quiet, onName, onQuiet }: {
+  prompt: string; suggestion: string | null; nextLabel: string; max: number; quiet: readonly Pick<PartsOption, 'id' | 'label'>[];
   onName: (name: string) => void; onQuiet: (id: string) => void;
 }) {
   const [name, setName] = useState('');
@@ -147,7 +147,7 @@ export function NameScreen({ prompt, suggestion, max, quiet, onName, onQuiet }: 
       <input value={name} onChange={(e) => setName(e.target.value.slice(0, max))} maxLength={max} aria-label={prompt}
         className="w-full min-h-12 px-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] font-serif text-xl focus:ring-2 focus:ring-[var(--color-accent)]" />
       {suggestion && <div className="flex flex-wrap gap-2.5"><Chip own label={suggestion} onClick={() => setName(suggestion.slice(0, max))} /></div>}
-      <button type="button" className={primaryButton} disabled={!name.trim()} onClick={() => onName(name.trim())}>Next</button>
+      <button type="button" className={primaryButton} disabled={!name.trim()} onClick={() => onName(name.trim())}>{nextLabel}</button>
       <QuietOptions options={quiet} onPick={onQuiet} />
     </div>
   );

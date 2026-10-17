@@ -11,7 +11,7 @@
 import type { HandoffResult } from '../data/capacityTypes';
 import type { PartsContent } from '../data/partsContentTypes';
 import {
-  TRAILHEAD_KINDS,
+  HOLD_HINT, TRAILHEAD_KINDS,
   type KeepPartRequest, type PartExitStep, type PartSessionPatch, type PartStepId, type PartStopReason, type PartsEntry,
   type QueuePartCandidateRequest, type StartPartSessionRequest, type TrailheadKind,
 } from '../data/partsTypes';
@@ -40,10 +40,21 @@ export const HEADS_UP_PROMPT = 'gate_far_away';
 export const HEADS_UP_LOOK = 'far_away_look';
 export const HEADS_UP_GO_ON = 'far_away_go_on';
 
+/** The visit's house controls (options in meet / chrome): Back, Next and the last screen's Done. */
+export const MEET_CHROME = { back: 'meet_back', next: 'meet_next', finish: 'meet_finish' } as const;
+export type MeetChrome = Record<keyof typeof MEET_CHROME, string>;
+
+/** The house controls' labels from the content ('' for one not shipped: the gate requires all three). */
+export function meetChrome(content: PartsContent): MeetChrome {
+  const chrome = stepOptions(content, 'meet', 'chrome');
+  const label = (id: string) => chrome.find((o) => o.id === id)?.label ?? '';
+  return { back: label(MEET_CHROME.back), next: label(MEET_CHROME.next), finish: label(MEET_CHROME.finish) };
+}
+
 /** Option ids the screens or the machine read by id, not only by branch. */
 export const MEET_REQUIRED_OPTIONS: readonly string[] = [
   'own_words', ...Object.keys(BLEND_ANSWERS).filter((id) => !id.startsWith('blend_pulls')), UPDATE_NOT_YET,
-  HEADS_UP_LOOK, HEADS_UP_GO_ON,
+  HEADS_UP_LOOK, HEADS_UP_GO_ON, ...Object.values(MEET_CHROME),
 ];
 
 /** The paused part's line (a kept part whose next-day check-back said Louder): shown only when paused. */
@@ -51,7 +62,7 @@ export const PAUSED_PROMPT = 'paused_heads_up';
 
 /** Every prompt the visit can show, the heads-up included; the paused line only for a paused visit. */
 export const meetPromptIds = (opts: { paused?: boolean } = {}): string[] =>
-  [HEADS_UP_PROMPT, ...(opts.paused ? [PAUSED_PROMPT] : []), ...Object.values(MEET_PROMPTS).flat()];
+  [HEADS_UP_PROMPT, ...(opts.paused ? [PAUSED_PROMPT] : []), ...Object.values(MEET_PROMPTS).flat(), HOLD_HINT];
 
 /** What a visit's gate requires by id (the paused line only for a paused visit; scripts/parts/review.mjs reads it). */
 export const meetRequired = (opts: { paused?: boolean } = {}): SurfaceIds => ({ prompts: meetPromptIds(opts), options: MEET_REQUIRED_OPTIONS });

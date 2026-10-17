@@ -10,10 +10,16 @@ import {
 } from '../../lib/knownPartReview';
 import { PartFigure } from '../parts/PartFigure';
 import { CrisisBanner } from '../safety/CrisisBanner';
+import { afterRemoval, focusLost, focusStepStart } from '../../lib/focusStart';
 
-const chip = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-primary)] disabled:opacity-50 transition-colors';
-const chipOn = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-accent)] text-[var(--color-text-primary)] bg-[var(--color-bg-subtle)] disabled:opacity-50 transition-colors';
+const chip = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-primary)] disabled:opacity-50 aria-disabled:opacity-50 transition-colors';
+const chipOn = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-accent)] text-[var(--color-text-primary)] bg-[var(--color-bg-subtle)] disabled:opacity-50 aria-disabled:opacity-50 transition-colors';
 const card = 'rounded-xl bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)] p-6';
+
+/** Where focus can go after a block or a line leaves: each review block, the patterns card, each ×. */
+const reviewDomId = (partId: string) => `trails-review-${partId}`;
+const PATTERNS_DOM_ID = 'trails-patterns';
+const patternDomId = (offerId: string) => `trails-pattern-${offerId}`;
 
 /**
  * Reflect's trails (docs/design/parts.md, Rules → rule D; The offer card): with parts on, after the parts
@@ -30,6 +36,26 @@ export function TrailsReflect({ delay = 0 }: { delay?: number }) {
   const [reviews, setReviews] = useState<KnownPartReviewBlock[]>([]);
   const [patterns, setPatterns] = useState<PlainTrailPattern[]>([]);
   const ready = !!content && (knownPartReviewReady(content) || plainPatternsReady(content));
+  // A closed block or a removed line takes focus with it: focus goes to the next block (its first line)
+  // or the next line's ×, else the patterns card's heading or the last block, else what came before
+  // the trails (the last one gone takes the whole section with it), else the page's start.
+  const [moved, setMoved] = useState<{ kind: 'review' | 'pattern'; at: number; before: Element | null } | null>(null);
+  /** Read as the person answers, while it is still on screen: what sits before that card. */
+  const before = (domId: string) => {
+    const el = document.getElementById(domId);
+    return el?.previousElementSibling ?? el?.parentElement ?? null;
+  };
+  useEffect(() => {
+    if (!moved || !focusLost()) return;
+    const els = (ids: string[]) => ids.map((id) => document.getElementById(id)).filter((e): e is HTMLElement => !!e);
+    const blocks = els(reviews.map((b) => reviewDomId(b.partId)));
+    const lines = els(patterns.map((x) => patternDomId(x.offerId)));
+    const list = moved.kind === 'review' ? blocks : lines;
+    const i = afterRemoval(moved.at, list.length);
+    const instead = moved.kind === 'review' ? document.getElementById(PATTERNS_DOM_ID) : blocks[blocks.length - 1];
+    const prior = moved.before instanceof HTMLElement && moved.before.isConnected ? moved.before : null;
+    focusStepStart((i === null ? instead ?? prior : list[i]) ?? document.querySelector<HTMLElement>('main'));
+  }, [moved, reviews, patterns]);
 
   useEffect(() => {
     if (!partsOn || content) return;
@@ -59,13 +85,16 @@ export function TrailsReflect({ delay = 0 }: { delay?: number }) {
 
   return (
     <>
-      {shownReviews.map((b) => (
+      {shownReviews.map((b, at) => (
         <KnownPartReview key={b.partId} block={b} content={content} style={style}
-          onDone={(id) => setReviews((rs) => rs.filter((x) => x.partId !== id))} />
+          onDone={(id) => { setMoved({ kind: 'review', at, before: before(reviewDomId(id)) }); setReviews((rs) => rs.filter((x) => x.partId !== id)); }} />
       ))}
       {shownPatterns.length > 0 && (
         <PlainPatterns items={shownPatterns} content={content} style={style}
-          onRemoved={(id) => setPatterns((ps) => ps.filter((x) => x.offerId !== id))} />
+          onRemoved={(id) => {
+            setMoved({ kind: 'pattern', at: shownPatterns.findIndex((x) => x.p.offerId === id), before: before(PATTERNS_DOM_ID) });
+            setPatterns((ps) => ps.filter((x) => x.offerId !== id));
+          }} />
       )}
     </>
   );
@@ -86,7 +115,9 @@ function KnownPartReview({ block, content, style, onDone }: {
   const copy = knownPartReviewCopy(content);
   const rows = reviewRows(block);
 
+  // aria-disabled while it saves, not disabled: a disabled button would drop keyboard focus.
   const close = async (c: KnownPartReviewClose) => {
+    if (busy) return;
     setBusy(true);
     try {
       await answerKnownPartReview(reviewRequest(batchId.current, block, answers, c));
@@ -95,7 +126,7 @@ function KnownPartReview({ block, content, style, onDone }: {
   };
 
   return (
-    <section aria-label={statement.question} data-testid="known-part-review" className={card} style={style}>
+    <section id={reviewDomId(block.partId)} aria-label={statement.question} data-testid="known-part-review" className={card} style={style}>
       <div className="flex items-start gap-3">
         <PartFigure shapeSig={block.shapeSig} size={44} className="flex-shrink-0" />
         <div className="min-w-0 flex-1">
@@ -117,8 +148,8 @@ function KnownPartReview({ block, content, style, onDone }: {
               {copy.answers.map((a) => {
                 const on = answers[r.episodeId] === a.answer;
                 return (
-                  <button key={a.id} type="button" aria-pressed={on} disabled={busy} className={on ? chipOn : chip}
-                    onClick={() => setAnswers((x) => ({ ...x, [r.episodeId]: a.answer }))}>
+                  <button key={a.id} type="button" aria-pressed={on} aria-disabled={busy || undefined} className={on ? chipOn : chip}
+                    onClick={() => { if (!busy) setAnswers((x) => ({ ...x, [r.episodeId]: a.answer })); }}>
                     {a.label}
                   </button>
                 );
@@ -128,8 +159,8 @@ function KnownPartReview({ block, content, style, onDone }: {
         ))}
       </ul>
       <div className="mt-4 grid grid-cols-2 gap-2">
-        <button type="button" disabled={busy} className={chip} onClick={() => void close('done')}>{copy.done}</button>
-        <button type="button" disabled={busy} className={chip} onClick={() => void close('not_now')}>{copy.notNow}</button>
+        <button type="button" aria-disabled={busy || undefined} className={chip} onClick={() => void close('done')}>{copy.done}</button>
+        <button type="button" aria-disabled={busy || undefined} className={chip} onClick={() => void close('not_now')}>{copy.notNow}</button>
       </div>
       {block.safety && <div className="mt-3"><CrisisBanner compact /></div>}
     </section>
@@ -145,6 +176,7 @@ function PlainPatterns({ items, content, style, onRemoved }: {
   const [busy, setBusy] = useState<string | null>(null);
   const copy = plainPatternsCopy(content);
   const remove = async (offerId: string) => {
+    if (busy) return;
     setBusy(offerId);
     try {
       await removeTrailPattern({ offerId });
@@ -152,14 +184,14 @@ function PlainPatterns({ items, content, style, onRemoved }: {
     } catch { /* the line stays */ } finally { setBusy(null); }
   };
   return (
-    <section aria-label={copy.title} data-testid="plain-patterns" className={card} style={style}>
+    <section id={PATTERNS_DOM_ID} aria-label={copy.title} data-testid="plain-patterns" className={card} style={style}>
       <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-4">{copy.title}</h3>
       <ul className="divide-y divide-[var(--color-border-subtle)]">
         {items.map(({ p, line }) => (
           <li key={p.offerId} className="flex items-start gap-3 py-3 first:pt-0 last:pb-0">
             <p className="min-w-0 flex-1 text-sm text-[var(--color-text-primary)]">{line}</p>
-            <button type="button" aria-label={`${copy.remove}: ${line}`} disabled={busy === p.offerId}
-              className="-my-2 -mr-2 min-h-11 min-w-11 rounded-lg text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] disabled:opacity-50"
+            <button type="button" id={patternDomId(p.offerId)} aria-label={`${copy.remove}: ${line}`} aria-disabled={busy === p.offerId || undefined}
+              className="-my-2 -mr-2 min-h-11 min-w-11 rounded-lg text-[var(--color-text-tertiary)] hover:text-[var(--color-text-primary)] aria-disabled:opacity-50"
               onClick={() => void remove(p.offerId)}>
               <span aria-hidden="true">×</span>
             </button>
