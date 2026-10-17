@@ -981,6 +981,36 @@ The flow never asks either part to stop and never names a winner. This is DBT's 
 
 ---
 
+## Say something to it (built 17 Oct, behind sign-off)
+
+IFS heals through the relationship between the person and each part, not through insight about it. Most
+of the app's parts surfaces *observe* a part. This is the smallest way to *speak* to one, between visits.
+
+- **Where.**
+  - **Parts of me:** each active or resting card has a *Say something to it* text button. Under the
+    readouts, *"You told it: …"* shows the latest message.
+  - **Meet a part:** on a visit to a kept part, the same step comes after Thanks, or after the tender
+    path's hold. It is skipped after *nothing there* and the danger branch, which go straight to close,
+    and while the copy isn't signed off.
+- **What.**
+  - Five chips (flow `say`).
+  - A tender part gets the gentle set instead (step `say_tender`: *I'm here*, *You're safe with me now*,
+    *I'm listening*).
+  - Or own words, ≤ 140, kept as written and never linted.
+- **A part's story** adds one line a month, *"In {month} you told it: …"*. It waits for its own line's
+  sign-off; the rest of the story doesn't wait on it.
+- **Data.** `sayToPart` (`parts/say.ts`) writes a `PartMessage`:
+  - log, `HAS_PART_MESSAGE`, `part_message_key`;
+  - `(:PartMessage)-[:TO_PART]->(:Part)`, with the edge running out of the new message only. The Part
+    is never written, so `keep.ts` stays the only Part writer.
+  - Created once; the same id again writes nothing.
+  - Parts on only, to the caller's active or resting part.
+  - Covered by `deleteMyParts` and export.
+- **Never.** No reply from the part, no suggested wording beyond the chips, no count of how often, no
+  reminder to say something.
+
+---
+
 ## In every module
 
 All of the parts behaviour below requires parts to be on. The one exception is the angry-part card,
@@ -1304,7 +1334,8 @@ and checks both paths cover each). **Phase 5 is built in 2D, without Stage** (Cl
 features first): the den, a part's story, Meet a part 5d and Two pulls, as SVG rooms with
 `PartFigure`s; Stage can replace the renderer later. Trail offers stay off until Claudia has looked at
 the dry run (her choice, 17 Oct). **Phase 6:** Wise mind is built and listed for everyone
-(`docs/design/wise-mind.md`); its parts-aware step back is being built into the seam it left. Not built
+(`docs/design/wise-mind.md`); its parts-aware step back is being built into the seam it left.
+*Say something to it* is built (above). Not built
 from the module table: Recover's next-day question about a tagged part (it would duplicate the part's own
 check-back) and the witness `part` kind (no moment needs it yet).
 
