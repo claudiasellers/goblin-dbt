@@ -365,7 +365,8 @@ UNDERNEATH_HELD = {
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
 # close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
 # next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me), ps (Problem Solve's ambivalence line), common (shared), reflect,
-# review (rule D's batch in Reflect), den (the den: Me → Parts of me → See them together)
+# review (rule D's batch in Reflect), den (the den: Me → Parts of me → See them together), story (a part's
+# story: on its card in Parts of me, and from a figure in the den)
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -608,6 +609,24 @@ PROMPTS = [
     ("den_remove", "den", "thread", "Remove this thread"),
     ("den_then", "den", "then", "How it looked in {month}"),
     ("den_now", "den", "then", "Now"),
+    # A part's story (on its card, and from one figure in the den): how it has changed, oldest first, by
+    # month. {month} = a month in the locale's words; {old} / {new} = a job as the card shows it (its chip
+    # labels, or the person's own words); {name} = another part's name. How they've felt toward it and
+    # what's helped reuse the readout's lines (common/stats). Never a fear; a tender part's story has no job.
+    ("story_open", "story", "card", "Its story"),
+    ("story_spend_time", "story", "card", "Spend time with it"),
+    ("story_met", "story", "line", "Met in {month}"),
+    ("story_job_then", "story", "line", "Its job then: {old}"),
+    ("story_job_now", "story", "line", "Its job now: {new}"),
+    ("story_rested", "story", "line", "Rested in {month}"),
+    ("story_back", "story", "line", "Back in {month}"),
+    ("story_where", "story", "where", "Where it stands"),
+    ("story_front", "story", "where", "Stands in front of {name}"),
+    ("story_behind", "story", "where", "Stands behind {name}"),
+    ("story_pulls", "story", "where", "Pulls against {name}"),
+    ("story_other", "story", "where", "another part"),
+    ("story_room_then", "story", "where", "In {month}"),
+    ("story_room_now", "story", "where", "Now"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry

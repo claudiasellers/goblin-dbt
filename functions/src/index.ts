@@ -39,3 +39,4 @@ export { setPartAnchor } from './parts';
 export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './parts';
 export { setPartShape } from './parts';
 export { getDen, getDenSnapshot, updatePartLayout, linkParts, unlinkParts } from './parts';
+export { getPartStory } from './parts';

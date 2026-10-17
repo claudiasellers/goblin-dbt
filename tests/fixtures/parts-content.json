@@ -1233,6 +1233,104 @@
    "order": 13,
    "copy": "Now",
    "reviewStatus": "draft"
+  },
+  "story_open": {
+   "flow": "story",
+   "step": "card",
+   "order": 0,
+   "copy": "Its story",
+   "reviewStatus": "draft"
+  },
+  "story_spend_time": {
+   "flow": "story",
+   "step": "card",
+   "order": 1,
+   "copy": "Spend time with it",
+   "reviewStatus": "draft"
+  },
+  "story_met": {
+   "flow": "story",
+   "step": "line",
+   "order": 2,
+   "copy": "Met in {month}",
+   "reviewStatus": "draft"
+  },
+  "story_job_then": {
+   "flow": "story",
+   "step": "line",
+   "order": 3,
+   "copy": "Its job then: {old}",
+   "reviewStatus": "draft"
+  },
+  "story_job_now": {
+   "flow": "story",
+   "step": "line",
+   "order": 4,
+   "copy": "Its job now: {new}",
+   "reviewStatus": "draft"
+  },
+  "story_rested": {
+   "flow": "story",
+   "step": "line",
+   "order": 5,
+   "copy": "Rested in {month}",
+   "reviewStatus": "draft"
+  },
+  "story_back": {
+   "flow": "story",
+   "step": "line",
+   "order": 6,
+   "copy": "Back in {month}",
+   "reviewStatus": "draft"
+  },
+  "story_where": {
+   "flow": "story",
+   "step": "where",
+   "order": 7,
+   "copy": "Where it stands",
+   "reviewStatus": "draft"
+  },
+  "story_front": {
+   "flow": "story",
+   "step": "where",
+   "order": 8,
+   "copy": "Stands in front of {name}",
+   "reviewStatus": "draft"
+  },
+  "story_behind": {
+   "flow": "story",
+   "step": "where",
+   "order": 9,
+   "copy": "Stands behind {name}",
+   "reviewStatus": "draft"
+  },
+  "story_pulls": {
+   "flow": "story",
+   "step": "where",
+   "order": 10,
+   "copy": "Pulls against {name}",
+   "reviewStatus": "draft"
+  },
+  "story_other": {
+   "flow": "story",
+   "step": "where",
+   "order": 11,
+   "copy": "another part",
+   "reviewStatus": "draft"
+  },
+  "story_room_then": {
+   "flow": "story",
+   "step": "where",
+   "order": 12,
+   "copy": "In {month}",
+   "reviewStatus": "draft"
+  },
+  "story_room_now": {
+   "flow": "story",
+   "step": "where",
+   "order": 13,
+   "copy": "Now",
+   "reviewStatus": "draft"
   }
  },
  "options": {

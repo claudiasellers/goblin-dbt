@@ -9,7 +9,7 @@ import type {
   TagPartRequest, TagPartResponse,
   AnswerTrailOfferRequest, AnswerTrailOfferResponse, GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse,
   AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse, GetReflectTrailsResponse, RemoveTrailPatternRequest, RemoveTrailPatternResponse,
-  GetDenResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
+  GetDenResponse, GetPartStoryRequest, GetPartStoryResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
   UnlinkPartsResponse, UpdatePartLayoutRequest, UpdatePartLayoutResponse,
 } from '../data/partsTypes';
 
@@ -229,4 +229,13 @@ export async function linkParts(req: LinkPartsRequest): Promise<LinkPartsRespons
 /** A thread's ×. */
 export async function unlinkParts(req: UnlinkPartsRequest): Promise<UnlinkPartsResponse> {
   return (await unlinkPartsFn(req)).data;
+}
+
+// ---- A part's story ----
+
+const getPartStoryFn = httpsCallable<GetPartStoryRequest, GetPartStoryResponse>(functions, 'getPartStory');
+
+/** One of the caller's own parts, how it has changed: months, ids and the readout's counts, never a date. */
+export async function getPartStory(req: GetPartStoryRequest): Promise<GetPartStoryResponse> {
+  return (await getPartStoryFn(req)).data;
 }
