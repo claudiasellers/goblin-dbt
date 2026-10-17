@@ -90,6 +90,19 @@ test("lines: steps that helped, one line; a count only past once; the graph's la
   }
 });
 
+test("lines: three steps, or two when any of them has a label over 60 characters", () => {
+  const short = (id, n = 1) => ({ stepId: id, label: `Step ${id}`, n });
+  const long = { stepId: "oa:love-proximity:bigger", label: "Fill the time you'd spend thinking about them with something that builds your life", n: 1 };
+  assert.equal(lib.STEPS_LONG_LABEL, 60);
+  const line = (steps) => lib.partStatLines({ helped: null, felt: null, when: null, steps }, content, deps).steps;
+  assert.equal(line([short("a"), short("b"), short("c")]), "Steps that helped: Step a · Step b · Step c");
+  assert.equal(line([short("a"), short("b"), long]), "Steps that helped: Step a · Step b", "a long third: two");
+  assert.equal(line([long, short("b"), short("c")]), `Steps that helped: ${long.label} · Step b`, "a long first: two");
+  const sixty = { stepId: "x", label: "x".repeat(60), n: 1 };
+  assert.deepEqual(lib.shownSteps([short("a"), short("b"), sixty]).length, 3, "60 is not over");
+  assert.deepEqual(lib.shownSteps([short("a"), short("b"), short("c"), long]).length, 3, "a fourth never counts (the server sends three)");
+});
+
 test("lines: a line whose words don't ship is left out, never half-filled", () => {
   const unknownTool = lib.partStatLines({ helped: [{ toolId: "gone-tool", n: 4 }], felt: null, when: null }, content, deps);
   assert.equal(unknownTool.helped, null);

@@ -4,7 +4,8 @@
  * the host stands in for MeSection's state (the setting, the card's "turned on here", getMe bringing the
  * area a moment later). Kept in its own file so other lanes' blocks in ./surfaces.tsx don't collide.
  */
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { focusStepStart } from '../../src/lib/focusStart';
 import type { PartsContent } from '../../src/data/partsContentTypes';
 import { getPartsContent } from '../../src/services/partsContent';
 import { dismissCandidateRequest, partsOfMeCopy } from '../../src/lib/partsOfMe';
@@ -29,6 +30,8 @@ function MeOffHost({ on }: { on: boolean }) {
     const t = setTimeout(() => setAreaShown(partsOn), 300);
     return () => clearTimeout(t);
   }, [partsOn]);
+  // As MeSection: the card gives way to Parts of me, and focus goes to the area's start.
+  const partsArrived = useCallback((el: HTMLElement | null) => { if (el) focusStepStart(el); }, []);
   const offCopy = partsMeOffCopy(content);
   const partsCopy = partsOn ? partsOfMeCopy(content) : null;
   const area = areaShown && partsOn && partsCopy !== null;
@@ -37,7 +40,7 @@ function MeOffHost({ on }: { on: boolean }) {
     <section className="space-y-2">
       <p className={mockNote}>Me (parts {partsOn ? 'on' : 'off'}), after My patterns</p>
       {area && partsCopy && (
-        <section aria-label="Parts of me" className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)]">
+        <section aria-label="Parts of me" ref={turnedOnHere ? partsArrived : undefined} className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)]">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">Parts of me</h3>
           <p className="text-xs text-[var(--color-text-tertiary)] mb-2">The area's name and blurb come from getMe (profile-layer content).</p>
           <PartsOfMe items={ME_ITEMS} candidates={CANDIDATES} content={content} copy={partsCopy}

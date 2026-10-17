@@ -203,3 +203,31 @@ test("words: steps that helped sit after what's helped it settle, worded as on t
   for (const id of ["stats_steps", "stats_step_twice", "stats_step_times"]) assert.ok(S.PART_STORY_REQUIRED.prompts.includes(id), id);
   assert.match(read("src/components/parts/story/PartStory.tsx"), /\{s\.title && <h5/);
 });
+
+test("what they told it (say something to it): the month's latest, a chip or their own words, tender parts too; only once its line ships", () => {
+  const story = B.buildPartStory({
+    ...rows({ part: { tender: true } }),
+    messages: [
+      { at: "2026-08-03T10:00:00Z", chipId: "say_thanks", own: null },
+      { at: "2026-08-20T10:00:00Z", chipId: "say_listening", own: null },
+      { at: "2026-09-02T10:00:00Z", chipId: null, own: "I see you" },
+      { at: "2026-09-04T10:00:00Z", chipId: null, own: "   " },
+      { at: "not a date", chipId: "say_rest", own: null },
+    ],
+  }, NOW);
+  assert.deepEqual(story.moments.filter((m) => m.kind === "told"), [
+    { kind: "told", month: "2026-08", chipId: "say_listening", own: null },
+    { kind: "told", month: "2026-09", chipId: null, own: "I see you" },
+  ]);
+  const copy = S.partStoryCopy(content);
+  const v = S.storyView(story, content, copy, deps, true);
+  const told = v.lines.filter((l) => l.key.startsWith("told-"));
+  assert.deepEqual(told.map((l) => [l.before, l.words, l.after, l.own]), [
+    ["In August you told it: ", "I'm listening", "", false],
+    ["In September you told it: ", "I see you", "", true],
+  ]);
+  const noLine = { ...content, prompts: { ...content.prompts } };
+  delete noLine.prompts.say_story;
+  assert.ok(S.partStoryCopy(noLine), "the story never waits on it");
+  assert.deepEqual(S.storyView(story, noLine, copy, deps, true).lines.filter((l) => l.key.startsWith("told-")), []);
+});

@@ -14,6 +14,7 @@ import type { GetPartStoryResponse, PartStoryJob, PartStoryRooms } from '../data
 import { fill } from './invalidationRecovery';
 import { capFirst, fillParts, opensSentence, surfaceReady, type SurfaceIds } from './partsContent';
 import { STATS_REQUIRED, partStatLines } from './partStats';
+import { saidWords, sayStoryLine } from './sayToPart';
 
 export const PART_STORY_PROMPTS = [
   'story_open', 'story_spend_time', 'story_met', 'story_job_then', 'story_job_now', 'story_rested', 'story_back',
@@ -78,6 +79,15 @@ export function storyView(story: GetPartStoryResponse, content: PartsContent, co
       const now = jobWords(content, m.now);
       if (!then || !now || then.words === now.words) return;
       lines.push(jobLine(`job-then-${i}`, copy.story_job_then, 'old', then), jobLine(`job-now-${i}`, copy.story_job_now, 'new', now));
+      return;
+    }
+    if (m.kind === 'told') {
+      // "In {month} you told it: …": only once its own line ships (the story never waits on it).
+      const template = sayStoryLine(content);
+      const w = saidWords(content, m);
+      const month = deps.monthName(m.month);
+      if (!template || !w || !month) return;
+      lines.push(jobLine(`told-${i}`, fill(template, { month }), 'said', w));
       return;
     }
     const month = deps.monthName(m.month);

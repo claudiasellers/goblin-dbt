@@ -84,7 +84,14 @@ const SELECTOR = {
 };
 const NO_CHECKBACK = new Set(['meet/danger_close']);
 // lane 4 (parts-steps-tried): screens that must also show "Steps that helped" (fresh loads, without ids).
-const ALSO_EXPECT = { 'me/cards': ['stats_steps'], 'me/long': ['stats_steps'], 'reflect/': ['stats_steps'] };
+const ALSO_EXPECT = {
+  'me/cards': ['stats_steps'], 'me/long': ['stats_steps'], 'reflect/': ['stats_steps'],
+  // lane 4 (wise-mind-parts): Wise mind's step back
+  'wise_mind_parts/who': ['wm_who', 'wm_unmet', 'wm_no_one'], 'wise_mind_parts/placed': ['wm_step_back'], 'wise_mind_parts/stepped': ['wm_held'],
+  'wise_mind_parts/wont': ['wm_wont_line', 'wm_meet_later'], 'wise_mind_parts/wont_unmet': ['wm_later_done'], 'wise_mind_parts/tender': ['wm_held'],
+  'wise_mind_parts/safety': ['wm_step_back'],
+};
+const ALSO_SELECTOR = { 'wise_mind_parts/safety': '[data-testid="crisis-banner-compact"]', 'wise_mind_parts/tender': '[data-den-tender]' }; // lane 4
 
 /** Every surface and branch, angry's in both wordings, and a few with Show ids. */
 function plan(map) {
@@ -161,6 +168,7 @@ try {
         if (v.plain && (v.key === 'angry/speak' || v.key === 'angry/later') && text.includes(copy('angry_later'))) bad('later line shown with plain wording');
         if (SELECTOR[v.key] && !(await page.locator(SELECTOR[v.key]).count())) bad(`missing ${SELECTOR[v.key]}`);
         for (const id of ALSO_EXPECT[v.key] ?? []) if (!text.toLowerCase().includes(copy(id).toLowerCase())) bad(`missing ${id}: "${copy(id)}"`); // lane 4
+        if (ALSO_SELECTOR[v.key] && !(await page.locator(ALSO_SELECTOR[v.key]).count())) bad(`missing ${ALSO_SELECTOR[v.key]}`); // lane 4
         // lane 2 (parts-reflect-feel): Reflect's line across parts, and its earlier line, above the blocks.
         if (v.key === 'reflect/' && (await page.locator('[data-testid="parts-feel"] p').count()) !== 2) bad('no "how you\'ve met your parts" lines');
         if (NO_CHECKBACK.has(v.key) && text.includes(copy('close_checkback'))) bad('check-back question after a danger ending');

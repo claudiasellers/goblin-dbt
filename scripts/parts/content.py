@@ -632,6 +632,23 @@ PROMPTS = [
     ("den_remove", "den", "thread", "Remove this thread"),
     ("den_then", "den", "then", "How it looked in {month}"),
     ("den_now", "den", "then", "Now"),
+    # Wise mind's step back (docs/design/wise-mind.md, 2p; parts on, at least one kept part): the room
+    # from the den, small, the light in the middle. The light is the person and is never labelled, never
+    # called Self. Parts are asked to take a step back so the person can listen, never to leave or stop.
+    ("wm_who", "wise_mind", "who", "Who's here about this?"),
+    ("wm_who_help", "wise_mind", "who", "Tap a part to bring it near the light."),
+    ("wm_room", "wise_mind", "who", "The room, with the light in the middle"),
+    ("wm_step_back", "wise_mind", "step_back", "Ask everyone to take one step back."),
+    ("wm_hold", "wise_mind", "step_back", "Hold to ask"),
+    ("wm_held", "wise_mind", "step_back", "From here, what's the wise next step?"),
+    ("wm_tap_one", "wise_mind", "step_back", "Tap a part if it won't step back."),
+    ("wm_wont_line", "wise_mind", "wont", "That's fine. It might need its own time."),
+    ("wm_later_done", "wise_mind", "wont", "It's in Me for another time."),
+    # The quiet way back to the default form, on every step-back screen
+    ("wm_use_minds", "wise_mind", "chrome", "Use the two minds instead"),
+    # Screen 5 (Is this wise mind?), the parts form's line for *Pushed, urgent* (the default form's
+    # "That might be emotion mind talking." is Wise mind's own content)
+    ("wm_pushed", "wise_mind", "feel", "A part might still be close."),
     # A part's story (on its card, and from one figure in the den): how it has changed, oldest first, by
     # month. {month} = a month in the locale's words; {old} / {new} = a job as the card shows it (its chip
     # labels, or the person's own words); {name} = another part's name. How they've felt toward it and
@@ -650,6 +667,18 @@ PROMPTS = [
     ("story_other", "story", "where", "another part"),
     ("story_room_then", "story", "where", "In {month}"),
     ("story_room_now", "story", "where", "Now"),
+    # Say something to it (17 Oct): on each active or resting part's card in Parts of me, and after Thanks
+    # in Meet a part when the visit is to a kept part. The prompt is the app's voice; the chips (OPTIONS,
+    # flow say) are the person's, said to the part. A tender part gets the gentle set (step say_tender).
+    # Own words (≤ 140) are never linted. {said} = a chip's label or their own words; {month} as above.
+    ("say_open", "say", "card", "Say something to it"),
+    ("say_prompt", "say", "ask", "What would you like to say to {name}?"),
+    ("say_prompt_noname", "say", "ask", "What would you like to say to this part?"),
+    ("say_own_label", "say", "ask", "Your words"),
+    ("say_send", "say", "ask", "Say it"),
+    ("say_cancel", "say", "ask", "Not now"),
+    ("say_told", "say", "card", "You told it: {said}"),
+    ("say_story", "say", "story", "In {month} you told it: {said}"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry
@@ -861,6 +890,13 @@ OPTIONS = [
     opt("pulls_want_matter", "pulls", "both_want_general", "to matter to someone"),
     opt("pulls_want_not_hurt", "pulls", "both_want_general", "not to be hurt again"),
     opt("pulls_want_okay", "pulls", "both_want_general", "to be okay"),
+    # Wise mind's step back. wm_unmet is a figure of its own in the room (its later tap queues a
+    # PartCandidate, origin wise_mind); wm_no_one goes on with nobody placed and no step back.
+    opt("wm_unmet", "wise_mind", "who", "A part I haven't met"),
+    opt("wm_no_one", "wise_mind", "who", "No one in particular", branch="end"),
+    opt("wm_wont", "wise_mind", "wont", "It won't step back"),
+    opt("wm_meet_later", "wise_mind", "wont", "Meet it another time", branch="candidate"),
+    opt("wm_next", "wise_mind", "chrome", "Next"),
 
     # --- The trail offer ---
     opt("offer_show", "offer", "card", "Show me"),
@@ -948,6 +984,19 @@ OPTIONS = [
     opt("blend_pulls_notice", "gate", "blend_pulls", "I can notice them"),
     opt("blend_pulls_running", "gate", "blend_pulls", "One of them is running things", branch="body_first"),
     opt("blend_pulls_not_sure", "gate", "blend_pulls", "Not sure"),
+
+    # --- Say something to it: the person's words to the part (sayToPart stores the id) ---
+    opt("say_thanks", "say", "say", "Thank you for trying"),
+    opt("say_got_this", "say", "say", "I've got this one"),
+    opt("say_rest", "say", "say", "You can rest now"),
+    opt("say_listening", "say", "say", "I'm listening"),
+    opt("say_see", "say", "say", "I see how hard you work"),
+    opt("say_own", "say", "say", "In my words", branch="own_words"),
+    # A tender part: the gentle set, nothing that asks it to change or step back.
+    opt("say_here", "say", "say_tender", "I'm here"),
+    opt("say_safe", "say", "say_tender", "You're safe with me now"),
+    opt("say_tender_listening", "say", "say_tender", "I'm listening"),
+    opt("say_tender_own", "say", "say_tender", "In my words", branch="own_words"),
 
     # --- Me: the 30-day check-back on a part's card (answers map to answerPartRevisit) ---
     opt("revisit_same", "me", "revisit", "Yes"),

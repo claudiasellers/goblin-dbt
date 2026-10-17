@@ -445,7 +445,10 @@ An offer is an intervention, so it waits for an opening:
   - not within 48 h of a crisis flag;
   - not after **2 or more** `dissociation_overmodulation` / `conservation_freeze` results in the last
     14 days (history, not just the latest check-in).
-- **At most one offer a week, shared with `what_helps`** (the existing `OFFER_EVERY_DAYS` budget).
+- **At most one offer a week, shared with `what_helps`** (the existing `OFFER_EVERY_DAYS` budget). The
+  week runs from the later of an offer's `offeredAt` and `answeredAt` (`offerBudgetAt`, in both
+  readers), and no new offer is made while one is still on Today, including a *Not now* back from its
+  cooldown (`showableOffer`).
 - Quiet hours are respected. **No part name or move ever appears in a push notification.** Pushes say only
   "Something on Today".
 - `PartsPolicy {offersEnabled}` is the kill switch. It turns off **offers only**, never anyone's parts.
@@ -606,6 +609,7 @@ plain wording; its "later" line below is shown only with parts on.)
 | 5 | Befriend | Job | "What's it trying to do for you?" | Chips from `PartJob` for the move (`hide`: "Keep me out of sight", "Keep me from being pushed out", "Keep me from making it worse"), "In my words" |
 | 5b | Befriend | The job | "Does it like this job?" | It's tired · It's proud of it · Not sure |
 | 5c | Befriend | Guards | "What do you think it's protecting?" | The move's `OFTEN_GUARDS` hurts in rank order (the agreed angry card's six: being brushed off · made small · left out · not mattering · laughed at · alone in this) · Not sure. A category, never a memory: no follow-up question about it. Saved as the part's `GUARDS` on 9b's yes |
+| 5d | Befriend | In front | "Does it stand in front of another part you know?" | Their other active or resting parts by name, then *No one I know* · *Not sure*. A part picked writes `PartLink {kind:'covers_for'}` (this part in front) on keep, server-side through `links.ts` (`frontLink.ts`). Asked only when they keep another part; skipped until its copy is signed off |
 | 6 | Fears | Fear | "What's it afraid would happen if it stopped?" | `PartFear` chips; some flagged `tender` or `danger`. "In my words" always takes the conservative branch |
 | 7 | Update | Now | "Does it know how old you are now?" | Yes · It doesn't seem to · Not sure. If not: "Show it something you can do now." Chips: I can leave a room · I can ask for help · I have people now · I can say no · In my words |
 | 8 | Appreciate | Thanks | "Thank it for trying to protect you." | Press and hold. **The one earned moment:** the lamp's light reaches its figure |
@@ -778,6 +782,22 @@ aggregates (`FOUND_WORD`, offers). Stats come from there, never from a profile s
   *Its job*, *Afraid that*, *Would rather*, the readouts), one spacing step between rows. The person's own
   words keep the serif at body size; chip-picked values stay in the sans; *Mostly {when}* is a quiet line
   under the name.
+- **Steps that helped (built):** under *What's helped it settle*: *"Steps that helped: {step} (3 times)
+  · {step} (twice) · {step}"*. These are up to 3 step ids from the part's tagged sessions, most used
+  then most recent: Do the Opposite's step size, Recover's path. The line needs at least 2 tagged
+  sessions with a step, and it caps at 2 steps when a label runs past 60 characters (`stats.steps`).
+- **Its story (built):** *Its story* on the card opens in place, and one figure tapped in the den opens
+  it too (`getPartStory`, `src/lib/partStory.ts`). Oldest first, in months only (`User.timeZone`):
+  - met, rested and back;
+  - its job then and now (from `jobHistoryJson`; never for a tender part, and a job chip flagged tender
+    or danger is never named);
+  - the card's readouts;
+  - where it stands with the parts it's linked to (*Stands behind…*, *Pulls against…*);
+  - a small room from the earliest earlier month beside now.
+
+  A line shows only when its data and its words exist. There is never a fear, and no number but the
+  readout's own counts.
+- *See them together* sits above the cards with 2 or more active or resting parts, and opens the den.
 
 ### Still true? = checking back with protectors
 
@@ -852,6 +872,39 @@ The map, at Me → Parts of me → *See them together*.
 - **Fallbacks.** A plain list one tap away. (The 2D SVG room is the first build; it stays the fallback
   for reduced motion or failed WebGL once Stage renders it.)
 
+**As built (17 Oct, 2D).**
+- **Route and gate.** `#/me/parts/den` (`src/components/parts/den/`, a lazy chunk), reached from *See them
+  together* above the cards in Parts of me when the person has 2 or more active or resting parts. Its
+  gate is parts on plus `DEN_REQUIRED` through `surfaceReady`.
+- **The room.**
+  - The read is `getDen`, the `den` slice, declared for `'me'` only. It returns every active and resting
+    part's id, name, `shapeSig`, tender, status, `mapX` / `mapY`, safety flag and a **recency bucket**
+    (`near` / `a_while` / `not_lately`, from the latest of a visit, a tag and a check-back answer). No
+    dates or counts reach the client.
+  - The person's links, and the snapshot list, come with it.
+- **Placing.**
+  - Drag, or use the keyboard: focus a figure, Enter or Space picks it up, the arrows move it, Enter
+    drops it, Escape cancels.
+  - A drop saves through `updatePartLayout`, which lives in `keep.ts` and doesn't touch `lastVisitedAt`
+    or the still-true dates.
+  - A part with no position arrives at the edge of the light, spread out.
+- **Threads.**
+  - Tapping one figure, then another, opens the sheet:
+    - *These two pull against each other* goes to Two pulls (`?a=&b=`);
+    - *This one stands in front of that one* asks "Which one stands in front?" and writes the
+      `covers_for` link on that tap (`linkParts`).
+  - Each confirmed line has a remove (`unlinkParts`).
+  - Tapping one figure alone offers *Its story* and *Spend time with it* (Meet a part for that part).
+- **Links and snapshots.**
+  - `functions/src/parts/links.ts` is `PartLink`'s only writer. The id is derived from kind + pair, so
+    there is one link per pair and kind. Two pulls' keepsake writes through it too.
+  - `denSnapshot.ts` is `DenSnapshot`'s only writer. The server takes one when a part is kept, rested,
+    woken or given a new job: `den_<UTC day>`, the day's latest wins, holding ids, positions, status and
+    tender, never names.
+  - *How it looked in {month}* sets the earliest earlier month beside today: side by side on wide
+    screens, a toggle on a phone (`getDenSnapshot`).
+- `CrisisBanner` sits compact under the room when any placed part carries the safety flag.
+
 **Rejected:**
 
 - A radial map with Self at the hub: it makes Self one more part.
@@ -894,6 +947,68 @@ screen, and the tender and danger branches for any chip or own words.
 The flow never asks either part to stop and never names a winner. This is DBT's synthesis and IFS's
 "neither protector has to win" in one move.
 
+**As built (17 Oct, 2D).**
+- **Route and gate.** A hidden tool, `two-pulls` (`listed: false`, lazy). It opens at
+  `#/tool/two-pulls?a=<partId>&b=<partId>` from the den, or `?pair=<polarityPairId>&offer=<id>` from a
+  rule C trail's *More than one*. That answer now opens Two pulls on the pair instead of asking which
+  one feels like its own thing. Other shapes are unchanged.
+  - With a pair only, the figures are neutral and named by their moves' `unblendPhrase`.
+  - An address it can't use shows ToolPage's "Tool not found." (`ToolNotFound`).
+  - Its gate is parts on and `TWO_PULLS_REQUIRED`.
+- **The flow** is the pure step machine `src/lib/twoPulls.ts`, with `src/pages/tools/TwoPulls.tsx` and
+  `src/components/parts/pulls/`. It opens with the entry gate and the blending check about both
+  (*running things* → P2 with resume).
+  - **Set out:** the person's light is dragged, or moved with the arrows; its position is a log field.
+  - **Feel toward, both:** there is no *nothing* chip. A non-Self answer gets one unblend; if it's still
+    there, *"One of them needs its own time first"* with *Meet it another time*: Meet a part for a kept
+    part, or a `PartCandidate` (origin `two_pulls`) on the tap for a pair.
+  - **Step back:** a `LightHold` that zooms the stage out a step per breath.
+  - **Worries, in turn:** own words take the conservative stop.
+  - **Both want, then the keepsake.**
+- **Any two parts.** Two kept parts with no `PolarityPair` of their own get the general chips: four
+  worries offered to each side and four both-wants (`PULLS_GENERAL_REQUIRED`, optional, drafts). So
+  every visit reaches a keepsake.
+- **The keepsake.** *Keep this* saves the two lines to My words. With two kept parts, it also writes
+  `PartLink {kind:'two_pulls', bothWantId}` through `links.ts`, in the same transaction
+  (`keepPullsKeepsake`).
+- **The close** is orienting. On its yes, `two_pulls_checkback` is scheduled for both in a week
+  (`schedulePullsCheckback`), and Today's check-back card handles both types. *Louder* on it is a harm
+  signal and pauses neither part.
+- **The session** is `PullsSession` (log, `HAS_PULLS_SESSION`, finalise-once, `pulls_session_key`;
+  `startPullsSession` / `savePullsSession`), with the ask-fresh fields as in Meet a part.
+- **Deleting your parts** leaves the keepsake lines in My words, unless the person ticks *Also remove
+  {n} kept lines* (`deleteMyParts({ keptLines: true })`, counted by `countMyPartsLines`).
+
+---
+
+## Say something to it (built 17 Oct, behind sign-off)
+
+IFS heals through the relationship between the person and each part, not through insight about it. Most
+of the app's parts surfaces *observe* a part. This is the smallest way to *speak* to one, between visits.
+
+- **Where.**
+  - **Parts of me:** each active or resting card has a *Say something to it* text button. Under the
+    readouts, *"You told it: …"* shows the latest message.
+  - **Meet a part:** on a visit to a kept part, the same step comes after Thanks, or after the tender
+    path's hold. It is skipped after *nothing there* and the danger branch, which go straight to close,
+    and while the copy isn't signed off.
+- **What.**
+  - Five chips (flow `say`).
+  - A tender part gets the gentle set instead (step `say_tender`: *I'm here*, *You're safe with me now*,
+    *I'm listening*).
+  - Or own words, ≤ 140, kept as written and never linted.
+- **A part's story** adds one line a month, *"In {month} you told it: …"*. It waits for its own line's
+  sign-off; the rest of the story doesn't wait on it.
+- **Data.** `sayToPart` (`parts/say.ts`) writes a `PartMessage`:
+  - log, `HAS_PART_MESSAGE`, `part_message_key`;
+  - `(:PartMessage)-[:TO_PART]->(:Part)`, with the edge running out of the new message only. The Part
+    is never written, so `keep.ts` stays the only Part writer.
+  - Created once; the same id again writes nothing.
+  - Parts on only, to the caller's active or resting part.
+  - Covered by `deleteMyParts` and export.
+- **Never.** No reply from the part, no suggested wording beyond the chips, no count of how often, no
+  reminder to say something.
+
 ---
 
 ## In every module
@@ -913,7 +1028,7 @@ which is agreed and which the person chooses.
 | **Help now, micro-steps** | Nothing | Nothing | Nothing |
 | **Witness** | Unchanged in the moment. **No part names in the moment** | A `part` kind for after and over-weeks moments (check-backs, the card), with a `{name}` slot | — |
 | **Today** | Collapses with flooding signals (as now) | `part_checkback`: "How's {name} today?" Settled · Same · Louder · Skip | One trail offer a week at most; protector check-backs |
-| **Reflect** | — | — | Per-part view: where, when, what helped. Rule B sequences as plain patterns. Rule D batch "Was this {name}?" |
+| **Reflect** | — | — | Per-part view: where, when, what helped. Rule B sequences as plain patterns. Rule D batch "Was this {name}?". Built: one line above the per-part blocks, how the person has met their parts lately: the most common first feel-toward answer across every active or resting part's Meet a part visits in the last 30 days, and the 30 days before when it differs (≥ 4 answers in a half, the most common holding 40%, non-answers not counted; `feelAcross` in `parts/stats.ts`). No count of parts, score or direction |
 | **Wise Mind** (planned) | — | — | The parts-aware step back. `wiseMindAnswer` stays ask-fresh |
 
 **Louder after a meeting.**
@@ -1031,8 +1146,9 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 | Label | Layer | Fields / edges | Notes |
 |---|---|---|---|
 | `Part` | Profile | `kind:'part'`, `area:'my_parts'`, `name`, `status` (active / resting / set_aside), `source` (made / offer / candidate), `tender`, `shapeSig[5]`, `soundSig[4]?`, `places[]`, `ageId`, `voiceIds[]`, `ownVoice?`, `jobIds[]`, `ownJob?`, `fearIds[]`, `ownFear?`, `preferredRoleIds[]`, `jobHistoryJson`, `anchorLineId?`, `anchorOwn?`, `pausedUntil?`, `shapeFrom?` (the visit whose Find the feeling shape it carries), `mapX`, `mapY`, `confirmedAt`, `revisitAt`, `lastVisitedAt`. Profile edges `-[:USES {confirmedAt, source}]->(:ProtectiveMove)`, `-[:GUARDS]->(:ProtectedHurt)`, `-[:ACCEPTED_FROM]->(:TrailOffer \| :PartCandidate)` | **`keepPart` is the only writer.** Add a grep test like the `MyPattern` one |
-| `PartLink` | Profile | `kind: 'two_pulls' \| 'covers_for'`, `aId`, `bId`, `bothWantId?` | Written only on a yes in the den or in Two pulls |
-| `DenSnapshot` | Profile | `takenAt`, `layoutJson` | — |
+| `PartLink` | Profile | `kind: 'two_pulls' \| 'covers_for'`, `aId`, `bId` (for `covers_for`, `aId` stands in front), `bothWantId?`, `confirmedAt`, `source`; `-[:LINKS]->(:Part)` ×2 | Written only on a yes in the den, Meet a part 5d or Two pulls' keepsake. **`links.ts` is the only writer** (test-enforced); one per pair and kind |
+| `DenSnapshot` | Profile | `takenAt`, `layoutJson` (ids, positions, status, tender; no names or own words) | Written by the server (`denSnapshot.ts`) on a keep, rest, wake or new job; `den_<UTC day>`, one per day |
+| `PullsSession` | Log | Two pulls' visit: the parts or pair, the light's position, feel-toward per side, worries, both-want, keepsake kept | `HAS_PULLS_SESSION`, finalise-once |
 | `PartSession` | Log | As in *What's saved* | `ToolSession -DETAIL->` |
 | `PartTag` | Log | `at`, `source` (close / debrief / review: Rule D's "Was this {name}?"), `strength` (debrief: yes / a_bit), `taggedKey` (one per tagged record per source), `-[:TAGS]->(:CheckIn \| :ToolSession)`, `-[:OF_PART]->(:Part)` | An incoming edge only, so finalise-once holds |
 | `PartRevisit` | Log | `partId`, `answer`, `ratherIds`, `-[:OF_PART]->(:Part)` | The 30-day check-back's answer, written once |
@@ -1067,7 +1183,8 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
   - The tag row reads through its host tool's needs, so there is no `'spine-close'` consumer.
   - **As built:** `'meet-a-part': ['name','parts','partDetail']`, `'today': [..., 'parts']`, the tag row's
     hosts `['parts']`, `'dear-man': ['parts','ownLines','savedLines','partAnchors']` (never `partDetail`:
-    DEAR MAN shows no fears). The `parts` slice also carries `firstPlace` and `shapeSig` for the chips.
+    DEAR MAN shows no fears), and `'me': ['den']`. The `parts` slice also carries `firstPlace` and
+    `shapeSig` for the chips.
   - Update the pinned expectations in `tests/profile-layer.test.mjs`.
 - **The area and status types.**
   - Add `my_parts` to `ProfileAreaId`, `PROFILE_AREAS` and the `AREAS` content, and update the "7 areas"
@@ -1091,7 +1208,10 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
   - `deleteMyParts`
   - Phase 4, switched off: `getTrailOfferEvidence`, `answerTrailOffer`; Reflect's `getReflectTrails`,
     `answerKnownPartReview`, `removeTrailPattern`
-  - not yet: `updatePartLayout`, `linkParts` (Phase 5)
+  - Phase 5: the den's `getDen`, `getDenSnapshot`, `updatePartLayout` (in `keep.ts`), `linkParts`,
+    `unlinkParts`; `getPartStory` (`story.ts`, `storyBuild.ts` pure); Two pulls' `startPullsSession`,
+    `savePullsSession`, `keepPullsKeepsake`, `schedulePullsCheckback`; `countMyPartsLines`. Every reader
+    returns empty with parts off (`READERS_EMPTY`), and every writer throws `partsOff()`.
   - Content ships as a generated `src/data/content/parts.json`, like the other content files, holding
     **approved rows only** (moves, prompts, options, hurts, `canTouch`, `expresses`; never trail rules or
     contexts, and of the policy only `limits` (`nameMaxChars`, `maxNonSelfAnswers`) once it is signed
@@ -1210,11 +1330,13 @@ what each rule would find on real data and set the counts before anything is off
 stays gated on Phase 3's harm signals. Every parts callable has had a security review (ownership by key,
 the same not-found for someone else's record, parts-off refusals, limits, logs, lifecycle guards, export
 and delete; `functions/test/unit/partsDataCoverage.test.cjs` builds the parts labels from `layers.ts`
-and checks both paths cover each). **Phase 5 is being built now in 2D, without Stage** (Claudia, 17
-Oct: features first): the den and Two pulls as SVG rooms with `PartFigure`s; Stage can replace the
-renderer later. Trail offers stay off until Claudia has looked at the dry run (her choice, 17 Oct).
-Phase 6 is designed in `docs/design/wise-mind.md`. Not built from the
-module table: Recover's next-day question about a tagged part (it would duplicate the part's own
+and checks both paths cover each). **Phase 5 is built in 2D, without Stage** (Claudia, 17 Oct:
+features first): the den, a part's story, Meet a part 5d and Two pulls, as SVG rooms with
+`PartFigure`s; Stage can replace the renderer later. Trail offers stay off until Claudia has looked at
+the dry run (her choice, 17 Oct). **Phase 6:** Wise mind is built and listed for everyone
+(`docs/design/wise-mind.md`); its parts-aware step back is being built into the seam it left.
+*Say something to it* is built (above). Not built
+from the module table: Recover's next-day question about a tagged part (it would duplicate the part's own
 check-back) and the witness `part` kind (no moment needs it yet).
 
 ## Sign-off

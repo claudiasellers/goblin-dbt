@@ -20,7 +20,8 @@ import { promptCopy, stepOptions } from '../../lib/partsContent';
 import { newId } from '../../lib/spine/ids';
 import { scheduleResumeLater } from '../../services/capacity';
 import { loadMeetAPartContent } from '../../services/meetAPart';
-import { getPartsEntry, keepPart, queuePartCandidate, savePartSession, schedulePartCheckback, startPartSession } from '../../services/parts';
+import { getPartsEntry, keepPart, queuePartCandidate, savePartSession, sayToPart, schedulePartCheckback, startPartSession } from '../../services/parts';
+import { SAY_OWN_MAX, sayChoices, sayCopy, sayQuestion, sayRequest } from '../../lib/sayToPart';
 import { getSpineContent } from '../../services/spine';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
@@ -85,7 +86,10 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
 
   const visited = known.find((p) => p.id === entry.partId) ?? null;
   const start = useMemo(() => startingMove(parts, entry, visited?.moveIds), [parts, entry, visited]);
-  const ctx: MeetContext = useMemo(() => meetContext(parts, plan, start.named, known), [parts, plan, start.named, known]);
+  // "Say something to it" after Thanks: a kept part's visit, once its copy ships (src/lib/sayToPart.ts).
+  const say = useMemo(() => sayCopy(parts), [parts]);
+  const ctx: MeetContext = useMemo(() => ({ ...meetContext(parts, plan, start.named, known), ...(say ? { sayReady: true } : {}) }),
+    [parts, plan, start.named, known, say]);
   const [phase, setPhase] = useState<Phase>(() => ({ k: plan.open === 'p2' ? 'p2' : plan.open === 'heads_up' ? 'heads_up' : 'flow' }));
   const [st, setSt] = useState<MeetState>(() => initialMeet(ctx, { move: start.move, partId: visited?.id ?? null, trailheadKind: entry.trailheadKind }));
   const [own, setOwn] = useState(false);
@@ -374,6 +378,29 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
         body = <LightHold title={<Prompt serif size="large">{P('meet_tender')}</Prompt>} sub={<Line serif>{P('meet_tender_sub')}</Line>}
           holdLabel={P('meet_thank_hold')} holdHint={P(HOLD_HINT)} nextLabel={chrome.next} onDone={() => send({ type: 'hold' })} />;
         break;
+      case 'say': {
+        // The kept part this visit is to; the gentle set on the tender path or for a part kept as tender.
+        const to = known.find((p) => p.id === s.partId) ?? null;
+        const choices = sayChoices(parts, s.tender || to?.tender === true);
+        const question = say ? sayQuestion(say, to?.name) : '';
+        const said = (what: { chipId: string } | { own: string }) => {
+          const req = s.partId ? sayRequest(newId(), s.partId, what) : null;
+          // Fire and forget: the visit never waits on it, and a failed write leaves nothing behind.
+          if (req && toolSession.persisted) void sayToPart(req).catch(() => { /* nothing saved; the visit goes on */ });
+          send({ type: 'said' });
+        };
+        body = say && own
+          ? <OwnWords label={question} fieldLabel={say.say_own_label} backLabel={chrome.back} nextLabel={say.say_send} max={SAY_OWN_MAX}
+              onDone={(text) => said({ own: text })} onBack={() => setOwn(false)} />
+          : (<>
+            {figure(80)}
+            <Prompt serif>{question}</Prompt>
+            <Chips options={choices.chips} onPick={(id) => said({ chipId: id })}
+              {...(choices.own ? { ownLabel: choices.own.label, onOwn: () => setOwn(true) } : {})} />
+            {say && <div className="flex justify-center"><button type="button" className={linkButton} onClick={() => send({ type: 'said' })}>{say.say_cancel}</button></div>}
+          </>);
+        break;
+      }
       case 'rather': body = (<><Prompt>{P('meet_rather')}</Prompt>{chips('rather')}</>); break;
       case 'name':
         body = <NameScreen prompt={P('meet_name')} nextLabel={chrome.next} max={meetLimits(parts).nameMaxChars} quiet={opts('name')}

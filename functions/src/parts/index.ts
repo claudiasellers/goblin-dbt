@@ -30,6 +30,8 @@ import {
 import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
 import { isTaggedTwice, tagDeps, tagPartHandler, validateTag } from './tag';
 import type { TagPartResponse } from './tagTypes';
+import { sayDeps, sayToPartHandler, validateSay } from './say';
+import type { SayToPartResponse } from './sayTypes';
 import {
   answerCheckbackDeps, answerPartCheckbackHandler, scheduleCheckbackDeps, schedulePartCheckbackHandler,
   validateAnswerCheckback, validateScheduleCheckback,
@@ -110,6 +112,15 @@ export const tagPart = callable<unknown, TagPartResponse>(
       if (!isTaggedTwice(e)) throw e;
       return run();
     }
+  },
+);
+
+/** "Say something to it": one message to the caller's own active or resting part (say.ts). A repeat id writes nothing. */
+export const sayToPart = callable<unknown, SayToPartResponse>(
+  { auth: 'required', label: 'sayToPart', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateSay(data), 'Invalid request');
+    return writeTx((tx) => sayToPartHandler(input, sayDeps(tx, uid as string, request.auth?.token?.email ?? null)));
   },
 );
 
