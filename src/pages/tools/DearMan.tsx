@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { Suspense, lazy, useState, useEffect, useCallback, useMemo, useRef, type ComponentProps } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
 import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
@@ -23,7 +23,6 @@ import type { CapacityReading, HandoffResult } from '../../data/capacityTypes';
 import { useBand } from '../../hooks/useBand';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
-import { DebriefWho } from '../../components/parts/DebriefWho';
 import { tagRowAnswered } from '../../lib/tagRowOnce';
 import { debriefWhoReady, showDebriefWho } from '../../lib/debriefWho';
 import { handoffExt, makeReading } from '../../lib/bandStore';
@@ -37,7 +36,6 @@ import { useUserProfile } from '../../contexts/UserProfileContext';
 import { useProfileContext } from '../../hooks/useProfileContext';
 import { profileCache } from '../../lib/profileCache';
 import { anchorLead, copeExt, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
-import { CopeAheadStep } from '../../components/parts/CopeAheadStep';
 
 type Phase =
   | 'entry'
@@ -105,6 +103,15 @@ const debriefOverallOptions = [
   { id: 'not_well', label: "It didn't go well" },
   { id: 'didnt_have', label: "Didn't have it yet" },
 ];
+
+// Parts steps load on demand: fetched once their gate holds (copeShown / whoShown, prefetched below
+// before their phase), each in its own Suspense with nothing in its place.
+const loadCope = () => import('../../components/parts/CopeAheadStep');
+const loadWho = () => import('../../components/parts/DebriefWho');
+const LazyCopeAheadStep = lazy(() => loadCope().then((m) => ({ default: m.CopeAheadStep })));
+const LazyDebriefWho = lazy(() => loadWho().then((m) => ({ default: m.DebriefWho })));
+function CopeAheadStep(p: ComponentProps<typeof LazyCopeAheadStep>) { return <Suspense fallback={null}><LazyCopeAheadStep {...p} /></Suspense>; }
+function DebriefWho(p: ComponentProps<typeof LazyDebriefWho>) { return <Suspense fallback={null}><LazyDebriefWho {...p} /></Suspense>; }
 
 export function DearMan() {
   const session = useToolSession();
@@ -364,6 +371,9 @@ export function DearMan() {
   useEffect(() => {
     if (phase === 'debrief-parts' && !whoShown && !copePending) setPhase('debrief-reflection');
   }, [phase, whoShown, copePending]);
+  // Fetch each parts step as soon as its gate holds, so it is there when its phase comes.
+  useEffect(() => { if (copeShown) void loadCope().catch(() => { /* the step's render retries */ }); }, [copeShown]);
+  useEffect(() => { if (whoShown) void loadWho().catch(() => { /* the step's render retries */ }); }, [whoShown]);
 
   // ── Pre-fill feelings from check-in emotions ──
   useEffect(() => {

@@ -8,7 +8,7 @@ import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 
-const lib = await importTs("src/lib/partsOfMe.ts");
+const lib = { ...(await importTs("src/lib/partsOfMe.ts")), ...(await importTs("src/lib/partCard.ts")) };
 const edit = await importTs("functions/src/parts/editPlan.ts");
 const read = (f) => readFileSync(f, "utf8");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
@@ -63,7 +63,7 @@ test("card rows: labels by id, own-words job wins, no fear on a tender part or f
 });
 
 test("the own-words fear never reaches the app, the card, or getMe's projection", () => {
-  for (const f of ["src/components/me/PartsOfMe.tsx", "src/lib/partsOfMe.ts"]) assert.doesNotMatch(read(f), /ownFear/, f);
+  for (const f of ["src/components/me/PartsOfMe.tsx", "src/lib/partsOfMe.ts", "src/lib/partCard.ts"]) assert.doesNotMatch(read(f), /ownFear/, f);
   const svc = read("src/services/profile.ts");
   assert.doesNotMatch(svc.slice(svc.indexOf("export interface MePart"), svc.indexOf("}", svc.indexOf("export interface MePart"))), /ownFear/);
   assert.doesNotMatch(read("functions/src/profile/me.ts"), /\.ownFear\b|ownFear:/);

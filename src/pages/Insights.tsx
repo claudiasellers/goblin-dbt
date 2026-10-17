@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState, type ComponentProps } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getInsightsData, type InsightsPayload } from '../services/neo4j';
@@ -8,9 +8,12 @@ import { ProactiveAlert } from '../components/insights/ProactiveAlert';
 import { GrowthEvidence } from '../components/insights/GrowthEvidence';
 import { SomaticCorrelation } from '../components/insights/SomaticCorrelation';
 import { ToolEffectiveness } from '../components/insights/ToolEffectiveness';
-import { PartsReflect } from '../components/insights/PartsReflect';
 import { TimeFilter } from '../components/history/TimeFilter';
 import type { TimeRange } from '../components/history/useFilteredCheckIns';
+
+// Reflect's parts section loads only when the server sent parts (parts on): nobody else downloads it.
+const LazyPartsReflect = lazy(() => import('../components/insights/PartsReflect').then((m) => ({ default: m.PartsReflect })));
+function PartsReflect(p: ComponentProps<typeof LazyPartsReflect>) { return <Suspense fallback={null}><LazyPartsReflect {...p} /></Suspense>; }
 
 function InsightPlaceholder({ icon, title, description, delay = 0 }: {
   icon: string;

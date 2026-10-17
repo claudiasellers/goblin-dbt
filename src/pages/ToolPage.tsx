@@ -1,7 +1,10 @@
+import { Suspense, lazy, useEffect } from 'react';
 import { useParams, Link, useLocation, Navigate } from 'react-router-dom';
 import { getToolById, toolIdFromUrl, TOOL_URL_SLUGS } from '../data/tools';
 import { ToolSessionProvider } from '../contexts/ToolSessionContext';
 import { useToolGate } from '../hooks/useToolGate';
+import { useUserProfile } from '../contexts/UserProfileContext';
+import { ToolLoading } from '../components/tools/ToolLoading';
 
 // Import tool components
 import { CoolDown } from './tools/CoolDown';
@@ -13,7 +16,12 @@ import { DearMan } from './tools/DearMan';
 import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
-import { MeetAPart } from './tools/MeetAPart';
+
+// Meet a part, the one tool loaded on demand: its gate below (parts on, copy signed off) stays eager, so
+// a parts-off person never fetches it. With parts on, the fetch starts with the gate's own.
+const loadMeetAPart = () => import('./tools/MeetAPart');
+const LazyMeetAPart = lazy(() => loadMeetAPart().then((m) => ({ default: m.MeetAPart })));
+function MeetAPart() { return <Suspense fallback={<ToolLoading />}><LazyMeetAPart /></Suspense>; }
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -36,6 +44,8 @@ export function ToolPage() {
   const tool = toolId ? getToolById(toolId) : undefined;
   // Meet a part opens only with parts on and its copy signed off; otherwise it is "not found".
   const gate = useToolGate(tool?.id);
+  const partsOn = useUserProfile().profile.partsEnabled;
+  useEffect(() => { if (tool?.id === 'meet-a-part' && partsOn) void loadMeetAPart().catch(() => { /* the render retries */ }); }, [tool?.id, partsOn]);
 
   // Old address (/tool/cool-down): forward to the tool's own name, keeping the query and the
   // link state (Help me now / check-in / hand-off context for the session).

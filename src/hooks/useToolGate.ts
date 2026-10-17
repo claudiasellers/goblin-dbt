@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useUserProfile } from '../contexts/UserProfileContext';
-import { loadMeetAPartContent } from '../services/meetAPart';
 
 export type ToolGate = 'open' | 'loading' | 'closed';
 
@@ -16,7 +15,9 @@ export function useToolGate(toolId: string | undefined): ToolGate {
   useEffect(() => {
     if (!gated || !on) return;
     let live = true;
-    loadMeetAPartContent().then((c) => { if (live) setReady(c !== null); }).catch(() => { if (live) setReady(false); });
+    // Fetched only here, with parts on: Meet a part's content check (and its step machine) stays out of the entry.
+    import('../services/meetAPart').then((m) => m.loadMeetAPartContent())
+      .then((c) => { if (live) setReady(c !== null); }).catch(() => { if (live) setReady(false); });
     return () => { live = false; };
   }, [gated, on]);
   if (!gated) return 'open';

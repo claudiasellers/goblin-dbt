@@ -7,7 +7,6 @@ import { useToolSession } from '../../hooks/useToolSession';
 import { SessionClose } from '../../components/spine/SessionClose';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
-import { queuePartCandidate } from '../../services/parts';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { newId } from '../../lib/spine/ids';
 import { PS_AMBIVALENCE_BARRIER, psLaterCandidate, psLaterCopy } from '../../lib/psAmbivalence';
@@ -42,6 +41,9 @@ type Phase =
 
 /** The confidence ruler's answers; `ext.er.confidence` takes only these. */
 const CONFIDENCE_LEVELS: readonly string[] = ['high', 'medium', 'low', 'none'];
+
+// Parts' callables load on demand, at the one moment this page calls one (a yes to "another time").
+const queuePartCandidate: typeof import('../../services/parts').queuePartCandidate = (req) => import('../../services/parts').then((m) => m.queuePartCandidate(req));
 
 export function ProblemSolve() {
   const location = useLocation();

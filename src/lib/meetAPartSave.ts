@@ -20,11 +20,11 @@ import { stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { BLEND_ANSWERS, MEET_OPTION_STEP, MEET_PROMPTS, SHAPE_ROUNDS, UPDATE_NOT_YET, whatToSave, type MeetContext, type MeetSession, type MeetState, type MeetStep } from './meetAPart';
 import { vecToSig } from './partFigure';
 import { dueAtFor } from './spine/windows';
+import { MEET_NAME_MAX } from './partNameMax';
 
 /** Own words (voice, job, fear): the server's OWN_WORDS_MAX. */
 export const MEET_OWN_WORDS_MAX = 200;
-/** PartsPolicy.nameMaxChars until the policy ships its `limits` (the server's DEFAULT_NAME_MAX). */
-export const MEET_NAME_MAX = 40;
+export { MEET_NAME_MAX };
 /** PartsPolicy.maxNonSelfAnswers until the policy ships its `limits` (the server's DEFAULT_MAX_NON_SELF). */
 export const MEET_MAX_NON_SELF = 2;
 

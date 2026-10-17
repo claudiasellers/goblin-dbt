@@ -4,9 +4,10 @@ import type { PartsContent } from '../../data/partsContentTypes';
 import type { GetTrailOfferEvidenceResponse, TrailOfferAnswer } from '../../data/partsTypes';
 import type { TodayItem } from '../../services/spine';
 import { answerTrailOffer, getTrailOfferEvidence } from '../../services/parts';
+import { trailOfferReady } from '../../lib/trailOffer';
 import {
-  evidenceAnswers, evidenceRows, offerMeetLink, splitChips, splitCopy, trailCardCopy, trailOfferReady, trailStatement,
-} from '../../lib/trailOffer';
+  evidenceAnswers, evidenceRows, offerMeetLink, splitChips, splitCopy, trailCardCopy, trailStatement,
+} from '../../lib/trailOfferCard';
 
 const chip = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-primary)] disabled:opacity-50 transition-colors';
 const chipOn = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color-border-accent)] text-[var(--color-text-primary)] bg-[var(--color-bg-subtle)] disabled:opacity-50 transition-colors';

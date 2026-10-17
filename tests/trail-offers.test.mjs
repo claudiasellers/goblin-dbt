@@ -12,7 +12,7 @@ import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 const read = (f) => readFileSync(f, "utf8");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
 const shipped = JSON.parse(read("src/data/content/parts.json")).content;
-const lib = await importTs("src/lib/trailOffer.ts");
+const lib = { ...(await importTs("src/lib/trailOffer.ts")), ...(await importTs("src/lib/trailOfferCard.ts")) };
 const meet = await importTs("src/lib/meetAPartSave.ts");
 const order = await importTs("functions/src/spine/todayOrder.ts");
 const option = (flow, step, id) => fixture.options[flow]?.[step]?.find((o) => o.id === id);

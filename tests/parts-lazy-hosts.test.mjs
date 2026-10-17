@@ -1,51 +1,119 @@
-// People with parts off don't download parts UI from the screens everyone opens (parts-bundle-cost): Today,
-// the session close and Me import parts components only through lazy(), each behind its own Suspense
-// with nothing in its place, and fetch them only once their eager gate holds. Pure gate helpers
-// (src/lib/*, partsEnabled, surfaceReady) stay eager. Tool pages are not split (ToolPage doesn't
-// lazy-load tools), so their parts imports are left as they are.
+// People with parts off don't download parts UI. parts-bundle-cost: Today, the session close, Me,
+// Settings and Reflect import parts components only through lazy(), each behind its own Suspense with
+// nothing in its place, and fetch them only once their eager gate holds. parts-bundle-cost-2: Meet a
+// part is the one lazy tool (its gate in useToolGate stays eager, so a parts-off person never fetches
+// the chunk), and the parts steps inside Recover and DEAR MAN are lazy, prefetched once their own gate
+// holds. Pure gate helpers (src/lib/*, partsEnabled, surfaceReady, *Copy) stay eager; the parts
+// callables are imported on demand. Left eager on purpose: Problem Solve's PartLaterLine (~0.3 KB gzip).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 
 const read = (f) => readFileSync(f, "utf8");
-const HOSTS = {
-  "src/components/today/TodayStack.tsx": ["PartCheckbackCard", "TrailOfferCard"],
-  "src/components/spine/SessionClose.tsx": [],
-  "src/components/spine/PartTagSlot.tsx": ["PartTagRow"],
-  "src/components/me/MeSection.tsx": ["PartsOfMe"],
-  "src/pages/Profile.tsx": ["PartsSettings"],
-};
-/** A parts UI component: anything under components/parts/, Parts of me, the tag row. */
-const PARTS_UI = /['"][./]*(?:components\/)?(?:parts\/[A-Za-z/]+|(?:me\/|\.\/)PartsOfMe|(?:spine\/|\.\/)PartTagRow)['"]/;
+const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-test("always-mounted hosts: no static import of a parts component", () => {
-  for (const f of Object.keys(HOSTS)) {
-    for (const line of read(f).split("\n").filter((l) => /^\s*import\b/.test(l) && !/^\s*import type\b/.test(l))) {
-      assert.doesNotMatch(line, PARTS_UI, `${f}: ${line}`);
+/** host → [component, its lazy const, the named loader it shares with a prefetch (if any)] */
+const HOSTS = {
+  "src/components/today/TodayStack.tsx": [["PartCheckbackCard", "LazyCheckback"], ["TrailOfferCard", "LazyTrailOffer"]],
+  "src/components/spine/SessionClose.tsx": [],
+  "src/components/spine/PartTagSlot.tsx": [["PartTagRow", "LazyRow"]],
+  "src/components/me/MeSection.tsx": [["PartsOfMe", "LazyPartsOfMe"]],
+  "src/pages/Profile.tsx": [["PartsSettings", "LazyPartsSettings"]],
+  "src/pages/Insights.tsx": [["PartsReflect", "LazyPartsReflect"]],
+  "src/pages/ToolPage.tsx": [["MeetAPart", "LazyMeetAPart", "loadMeetAPart"]],
+  "src/pages/tools/InvalidationRecovery.tsx": [["AngryPartCard", "LazyAngryPartCard", "loadAngryCard"]],
+  "src/pages/tools/DearMan.tsx": [["CopeAheadStep", "LazyCopeAheadStep", "loadCope"], ["DebriefWho", "LazyDebriefWho", "loadWho"]],
+};
+const ALSO_NO_STATIC = ["src/hooks/useToolGate.ts", "src/pages/tools/ProblemSolve.tsx", "src/contexts/TodayContext.tsx"];
+/** Static parts imports a host keeps on purpose (too small to be worth a chunk). */
+const KEPT = { "src/pages/tools/ProblemSolve.tsx": ["../../components/parts/PartLaterLine"] };
+
+/** Every non-type import specifier in a file (multi-line imports included). */
+const importsOf = (src) => [...src.matchAll(/^import (?!type\b)[\s\S]*?from '([^']+)';/gm)].map((m) => m[1]);
+/** Parts UI, the card-only helpers split out of the gate libs, and the parts callables. */
+const PARTS_UI = /(?:^|\/)(?:components\/parts\/|parts\/[A-Z]|PartsOfMe$|PartTagRow$|PartsReflect$|MeetAPart$|partCard$|trailOfferCard$|angryPartCopy$|services\/parts$|services\/meetAPart$)/;
+
+test("hosts: no static import of a parts component, card helper or parts callable", () => {
+  for (const f of [...Object.keys(HOSTS), ...ALSO_NO_STATIC]) {
+    const kept = KEPT[f] ?? [];
+    for (const spec of importsOf(read(f))) {
+      if (kept.includes(spec)) continue;
+      assert.doesNotMatch(spec, PARTS_UI, `${f}: ${spec}`);
     }
   }
+  // The pattern sees what it should.
+  for (const s of ["../parts/PartCheckbackCard", "./PartTagRow", "./tools/MeetAPart", "../../lib/partCard", "../../services/parts", "../services/meetAPart"]) assert.match(s, PARTS_UI, s);
+  for (const s of ["../../services/partsContent", "../../lib/angryPart", "../lib/trailOffer", "../../lib/partsOfMe"]) assert.doesNotMatch(s, PARTS_UI, s);
 });
 
-test("each one comes through lazy(), in its own Suspense with no fallback", () => {
-  for (const [f, names] of Object.entries(HOSTS)) {
+test("each one comes through lazy(), in its own Suspense", () => {
+  for (const [f, rows] of Object.entries(HOSTS)) {
     const src = read(f);
-    for (const n of names) {
-      const lazyName = `Lazy${n === "PartCheckbackCard" ? "Checkback" : n === "TrailOfferCard" ? "TrailOffer" : n === "PartTagRow" ? "Row" : n}`;
-      assert.match(src, new RegExp(`const ${lazyName} = lazy\\(\\(\\) => import\\('[^']*\\/${n}'\\)\\.then\\(\\(m\\) => \\(\\{ default: m\\.${n} \\}\\)\\)\\);`), `${f}: ${n} is lazy`);
-      assert.match(src, new RegExp(`<Suspense fallback=\\{null\\}><${lazyName} [^>]*/></Suspense>`), `${f}: ${n} waits with nothing in its place`);
+    for (const [name, lazyName, loader] of rows) {
+      const source = loader ? `${loader}\\(\\)` : `import\\('[^']*\\/${name}'\\)`;
+      assert.match(src, new RegExp(`const ${lazyName} = lazy\\(\\(\\) => ${source}\\.then\\(\\(m\\) => \\(\\{ default: m\\.${name} \\}\\)\\)\\);`), `${f}: ${name} is lazy`);
+      if (loader) assert.match(src, new RegExp(`const ${loader} = \\(\\) => import\\('[^']*\\/${name}'\\);`), `${f}: ${loader} loads ${name}`);
+      // Meet a part is a whole page: it waits on the page's own loading state, as the gate does.
+      const fallback = name === "MeetAPart" ? "<ToolLoading />" : "null";
+      assert.match(src, new RegExp(`<Suspense fallback=\\{${esc(fallback)}\\}><${lazyName}[ />]`), `${f}: ${name} waits with ${fallback}`);
     }
   }
   // SessionClose reaches the row only through the slot, whose gate is eager.
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("the gates stay eager: Settings checks its copy before fetching the block; Me and Today keep their gates", () => {
+test("Meet a part is the only lazy tool; its gate stays eager and fetches the content on demand", () => {
+  const page = read("src/pages/ToolPage.tsx");
+  const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
+  assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 1, "one lazy tool");
+  assert.match(page, /'meet-a-part': MeetAPart,/);
+  assert.match(page, /if \(tool\?\.id === 'meet-a-part' && partsOn\) void loadMeetAPart\(\)/, "prefetched only with parts on");
+  const gate = read("src/hooks/useToolGate.ts");
+  assert.match(gate, /if \(!gated \|\| !on\) return;[\s\S]*?import\('\.\.\/services\/meetAPart'\)\.then\(\(m\) => m\.loadMeetAPartContent\(\)\)/, "content only with parts on");
+  assert.match(gate, /if \(!on\) return loading \? 'loading' : 'closed';/);
+});
+
+test("prefetch: each tool step is fetched once its gate holds, before it renders", () => {
+  const ir = read("src/pages/tools/InvalidationRecovery.tsx");
+  const loud = ir.slice(ir.indexOf("function LoudStep("), ir.indexOf("function LabelStep("));
+  assert.match(loud, /useEffect\(\(\) => \{ if \(cardThisVisit\) void loadAngryCard\(\)\.catch\(/, "with the pull options");
+  const dm = read("src/pages/tools/DearMan.tsx");
+  assert.match(dm, /useEffect\(\(\) => \{ if \(copeShown\) void loadCope\(\)\.catch\(/);
+  assert.match(dm, /useEffect\(\(\) => \{ if \(whoShown\) void loadWho\(\)\.catch\(/);
+});
+
+test("parts callables load on demand, with the same signature", () => {
+  const cases = [
+    ["src/pages/tools/InvalidationRecovery.tsx", "queuePartCandidate"],
+    ["src/pages/tools/ProblemSolve.tsx", "queuePartCandidate"],
+    ["src/components/me/MeSection.tsx", "answerPartCandidate"],
+  ];
+  for (const [f, fn] of cases) {
+    assert.match(read(f), new RegExp(`const ${fn}: typeof import\\('\\.\\./\\.\\./services/parts'\\)\\.${fn} = \\(req\\) => import\\('\\.\\./\\.\\./services/parts'\\)\\.then\\(\\(m\\) => m\\.${fn}\\(req\\)\\);`), `${f}: ${fn}`);
+  }
+});
+
+test("the gates stay eager; card-only helpers are imported only by their card", () => {
   const profile = read("src/pages/Profile.tsx");
   assert.match(profile, /import \{ partsSettingsCopy \} from '\.\.\/lib\/partsSettings';/);
   assert.match(profile, /setReady\(partsSettingsCopy\(c\) !== null\)/);
   assert.match(profile, /if \(!ready\) return null;\s*return <Suspense fallback=\{null\}><LazyPartsSettings /);
   const me = read("src/components/me/MeSection.tsx");
+  assert.match(me, /import \{ dismissCandidateRequest, partsOfMeCopy \} from '\.\.\/\.\.\/lib\/partsOfMe';/);
   assert.match(me, /\{a\.id === 'my_parts' && partsCopy && partsContent && \(/, "only with parts on and its copy signed off");
   assert.match(read("src/contexts/TodayContext.tsx"), /from '\.\.\/lib\/trailOffer'/, "Today's gate helpers stay eager");
   assert.match(read("src/components/spine/PartTagSlot.tsx"), /if \(!tagRowGate\(\{ partsOn, toolId, thenVsNow, actedOnUrge, saved, content: parts \}\)\) return null;/);
+  assert.match(read("src/pages/Insights.tsx"), /\{data\.parts && data\.parts\.length > 0 && <PartsReflect /);
+  // Rollup keeps a module whole: a gate module that imported these would pull them back into the entry.
+  const only = { partCard: "src/components/me/PartsOfMe.tsx", trailOfferCard: "src/components/parts/TrailOfferCard.tsx", angryPartCopy: "src/components/parts/AngryPartCard.tsx" };
+  const srcFiles = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap((d) => d.isDirectory() ? srcFiles(`${dir}/${d.name}`) : /\.tsx?$/.test(d.name) ? [`${dir}/${d.name}`] : []);
+  for (const f of srcFiles("src")) {
+    for (const spec of importsOf(read(f))) {
+      for (const [mod, owner] of Object.entries(only)) {
+        if (spec.endsWith(`/${mod}`)) assert.equal(f, owner, `${f} imports ${mod}`);
+      }
+    }
+  }
+  for (const [mod, owner] of Object.entries(only)) assert.ok(importsOf(read(owner)).includes(`../../lib/${mod}`), `${owner} imports ${mod}`);
 });

@@ -202,7 +202,7 @@ describe("5. Naming a specific part in the moment.", () => {
     for (const host of ["recovering-from-invalidation", "opposite-action"]) {
       assert.ok(!PROFILE_NEEDS[host].some((s) => /^part/.test(s)), `${host} reads ${PROFILE_NEEDS[host]}`);
     }
-    for (const f of ["src/lib/unblendLine.ts", "src/hooks/useUnblendLine.ts", "src/lib/oaGoalLine.ts", "src/lib/angryPart.ts"]) {
+    for (const f of ["src/lib/unblendLine.ts", "src/hooks/useUnblendLine.ts", "src/lib/oaGoalLine.ts", "src/lib/angryPart.ts", "src/lib/angryPartCopy.ts"]) {
       assert.doesNotMatch(code(f), /useProfileContext|slices\??\.parts|partDetail|\.part\.name|partName/, f);
     }
   });
