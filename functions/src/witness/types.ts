@@ -16,6 +16,8 @@ export const WITNESS_MOMENTS = [
   'debrief_turning_point', 'missed_followup', 'urge_louder', 'crisis',
   // Wise mind's "Keep what wise mind said" (an own line only: no ToolMoment, no line is ever served for it).
   'wise_mind',
+  // Cope Ahead's "Keep this": the plan line, an own line only, like Wise mind's.
+  'cope_ahead',
 ] as const;
 export type WitnessMoment = (typeof WITNESS_MOMENTS)[number];
 
@@ -34,6 +36,11 @@ export const LEVELS_BY_BAND: Record<Band, readonly WitnessLevel[]> = {
 
 /** Own lines ("say it my way"): at most 140 characters, stored as written, never linted or interpreted. */
 export const OWN_LINE_MAX = 140;
+/**
+ * Moments whose own line is longer: Cope Ahead's kept plan ("If {moment}, I'll {move} and {move}.") can carry
+ * the person's own words in three slots (140 + 90 + 90). Still stored as written, never linted.
+ */
+export const OWN_LINE_MAX_BY_MOMENT: Partial<Record<(typeof WITNESS_MOMENTS)[number], number>> = { cope_ahead: 360 };
 /** A flooded beat is one line merged into the header: at most 8 words. */
 export const FLOODED_MAX_WORDS = 8;
 

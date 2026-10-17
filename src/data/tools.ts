@@ -104,7 +104,6 @@ export const tools: Tool[] = [
     dbtBasis: 'DBT ER Handout 19',
     emoji: '🧭',
     bare: true,
-    listed: false,
   },
   // Interpersonal Effectiveness
   {
@@ -184,6 +183,7 @@ export const intents: Intent[] = [
   { id: 'urge', label: 'Ride out an urge', toolId: 'urge-surfing', emoji: '🌊' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
+  { id: 'coming-up', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
 ];
