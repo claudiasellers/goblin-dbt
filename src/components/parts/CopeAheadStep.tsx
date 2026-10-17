@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { PartsContent } from '../../data/partsContentTypes';
 import type { ProfileSlices } from '../../data/profileTypes';
 import { setPartAnchor } from '../../services/parts';
@@ -7,6 +7,7 @@ import {
 } from '../../lib/copeAhead';
 import { promptCopy } from '../../lib/partsContent';
 import { PartFigure } from './PartFigure';
+import { useStepFocus } from './stepFocus';
 
 const chip = 'min-h-11 px-3 py-2 rounded-full border transition-colors disabled:opacity-50';
 const chipOff = 'border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)] hover:text-[var(--color-text-primary)]';
@@ -43,13 +44,19 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   const [saving, setSaving] = useState(false);
   /** The last save failed: cope_save_failed under Save until the next try. */
   const [failed, setFailed] = useState(false);
+  const panel = useRef<HTMLDivElement>(null);
 
   const title = promptCopy(content, 'cope_title') ?? '';
   const c = copeChips(content);
   const part = parts.find((p) => p.id === picked) ?? null;
   const anchor = part ? anchors[part.id] ?? null : null;
   const own = ownAnchor(ownText);
-  const canSave = !saving && (lineId !== null || (ownOpen && own !== null));
+  const ready = lineId !== null || (ownOpen && own !== null);
+  const canSave = !saving && ready;
+  // Change it and a saved anchor each replace the control that had focus: focus moves to the panel now
+  // shown (the anchor, or the form's question).
+  const view = !part ? 'none' : anchor && !editing ? 'anchor' : 'set';
+  useStepFocus(panel, view);
 
   const clearForm = () => { setEditing(false); setLineId(null); setOwnOpen(false); setOwnText(''); setFailed(false); };
   const pick = (id: string) => { clearForm(); onPick(id); };
@@ -98,8 +105,8 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
       </div>
 
       {part && anchor && !editing && (
-        <div className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]" data-testid="cope-anchor">
-          <p className="text-sm text-[var(--color-text-secondary)]">{anchorLead(content, part.name)}</p>
+        <div ref={panel} className="p-4 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-elevated)]" data-testid="cope-anchor">
+          <p className="text-sm text-[var(--color-text-secondary)] focus:outline-none">{anchorLead(content, part.name)}</p>
           <p className="mt-1 font-serif text-lg text-[var(--color-text-primary)] break-words">{anchor}</p>
           {c.cope_change && (
             <button type="button" onClick={() => setEditing(true)}
@@ -111,8 +118,8 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
       )}
 
       {part && (!anchor || editing) && (
-        <div className="space-y-3" data-testid="cope-set-anchor">
-          <p className="font-medium text-[var(--color-text-primary)]">{setAnchorLine(content, part.name)}</p>
+        <div ref={panel} className="space-y-3" data-testid="cope-set-anchor">
+          <p className="font-medium text-[var(--color-text-primary)] focus:outline-none">{setAnchorLine(content, part.name)}</p>
           {lines.length > 0 && (
             <div className="flex flex-col gap-2">
               {lines.map((l) => {
@@ -139,16 +146,20 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
             )
           )}
           {c.cope_save && (
-            <button type="button" disabled={!canSave} onClick={() => void save()}
-              className="w-full min-h-11 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary disabled:opacity-50">
+            // aria-disabled while it saves (not disabled), so keyboard focus stays on Save through a failure.
+            <button type="button" disabled={!ready} aria-disabled={saving || undefined} onClick={() => void save()}
+              className="w-full min-h-11 py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary disabled:opacity-50 aria-disabled:opacity-50">
               {c.cope_save.label}
             </button>
           )}
-          {failed && (
-            <p role="alert" data-testid="cope-save-failed" className="text-sm text-[var(--color-text-secondary)]">
-              {promptCopy(content, 'cope_save_failed')}
-            </p>
-          )}
+          {/* Polite, and there before the line is, so it is announced when it appears. */}
+          <div role="status">
+            {failed && (
+              <p data-testid="cope-save-failed" className="text-sm text-[var(--color-text-secondary)]">
+                {promptCopy(content, 'cope_save_failed')}
+              </p>
+            )}
+          </div>
         </div>
       )}
     </div>
