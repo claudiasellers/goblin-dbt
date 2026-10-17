@@ -34,8 +34,9 @@ export type PartsEntry = (
 
 // --- Meet a part's session: mirror of functions/src/parts/sessionTypes.ts (tests/parts-entry.test.mjs) ---
 /** Where the visit came from (parts.md "Entries"). */
-export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve';
-export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve'];
+/** Where a Meet a part visit started; `tools`: the Tools list (Mindfulness), with parts on. */
+export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve' | 'tools';
+export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools'];
 
 /** The steps table's ids, plus the tender path's one screen and the "nothing there" branch. */
 export type PartStepId =

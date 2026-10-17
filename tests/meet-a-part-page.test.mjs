@@ -13,6 +13,7 @@ import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 
 const M = await importTs("src/lib/meetAPart.ts");
 const S = await importTs("src/lib/meetAPartSave.ts");
+const PM = await importTs("src/lib/partsOfMe.ts");
 const F = await importTs("src/lib/partFigure.ts");
 const T = await importTs("src/data/tools.ts");
 const V = await importTs("functions/src/parts/validation.ts");
@@ -62,6 +63,12 @@ test("listed only with parts on and its copy shipped (the gate ToolPage opens it
   assert.match(tools, /import \{ getToolsByModule, intents \} from '\.\.\/data\/tools'/);
   assert.match(tools, /const parts = useToolGate\('meet-a-part'\) === 'open';/, "false while the gate loads: no flicker");
   assert.match(tools, /getToolsByModule\(mod\.id, \{ parts \}\)/);
+  // A visit that starts from the list says so ('tools'); every other card carries no state.
+  assert.match(tools, /<ToolCard key=\{tool\.id\} tool=\{tool\} state=\{tool\.id === 'meet-a-part' \? toolsMeetLink\(\)\.state : undefined\} \/>/);
+  assert.deepEqual(S.parseMeetEntry(PM.toolsMeetLink().state), { trailheadKind: "tools", partId: null, candidateId: null, moveId: null });
+  assert.equal(PM.toolsMeetLink().pathname, "/tool/meet-a-part");
+  assert.equal(V.validateStartPartSession(S.startRequest(SID, { move: "hide", partId: null }, S.parseMeetEntry(PM.toolsMeetLink().state))).trailheadKind, "tools", "the server takes it");
+  assert.match(read("src/components/ToolCard.tsx"), /to=\{`\/tool\/\$\{tool\.id\}`\}\s+state=\{state\}/);
   assert.match(tools, /\{intents\.map\(/, "the intents are the fixed list");
   const page = read("src/pages/ToolPage.tsx");
   assert.match(page, /'meet-a-part': MeetAPart,/);
@@ -276,6 +283,7 @@ test("the last screen: meet_done and Done, whichever way the visit ended; requir
   assert.equal(page.match(/\{finale\}|step === 'done' && finale/g)?.length, 3, "after the close, after P2's later, and after P2 on entry");
   assert.equal(S.doneTarget(S.parseMeetEntry({})), "/profile");
   assert.equal(S.doneTarget(S.parseMeetEntry({ parts: { trailheadKind: "angry_card" } })), "/");
+  assert.equal(S.doneTarget(S.parseMeetEntry({ parts: { trailheadKind: "tools" } })), "/tools", "back to the Tools list");
 });
 
 test("too many parts lately: one line on the first real screen of a new part's visit, never a block", () => {

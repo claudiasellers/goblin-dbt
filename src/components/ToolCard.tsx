@@ -3,12 +3,15 @@ import type { Tool } from '../data/tools';
 
 interface ToolCardProps {
   tool: Tool;
+  /** Router state the tool reads on entry (Meet a part: where the visit started). */
+  state?: unknown;
 }
 
-export function ToolCard({ tool }: ToolCardProps) {
+export function ToolCard({ tool, state }: ToolCardProps) {
   return (
     <Link
       to={`/tool/${tool.id}`}
+      state={state}
       className="
         block p-4 rounded-xl border border-[var(--color-border-subtle)]
         bg-[var(--color-bg-card)]
