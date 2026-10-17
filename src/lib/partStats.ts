@@ -3,8 +3,7 @@
  * settle, the steps that helped, how the person has felt toward it, and when it tends to show up. Pure:
  * the numbers come from the server (functions/src/parts/stats.ts, PartStats); every word from the
  * shipped parts copy (common/stats, meet/feel), the tool names from src/data/tools.ts, the steps' labels
- * from the graph in the same response. Reflect renders it now; Me's part
- * card can render the same lines later.
+ * from the graph in the same response. Me's part card and Reflect render the same lines.
  */
 import type { PartsContent } from '../data/partsContentTypes';
 import type { PartStats, PartWhen } from '../data/partsTypes';
