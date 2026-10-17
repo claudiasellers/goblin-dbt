@@ -14,6 +14,7 @@ import PARTS_FIXTURE from '../../tests/fixtures/parts-content.json';
 import type { CopeAheadContent } from '../../src/data/copeAheadTypes';
 import { ToolSessionProvider } from '../../src/contexts/ToolSessionContext';
 import { planLine, type PlanCa } from '../../src/lib/copeAheadPlan';
+import { profileCache } from '../../src/lib/profileCache';
 import { CopeAhead } from '../../src/pages/tools/CopeAhead';
 import { PARTS } from '../parts-example';
 import { answers } from './backend';
@@ -129,6 +130,9 @@ export const COPE_AHEAD_SURFACE: Surface = {
   branches: BRANCHES.map(({ id, label, steps }) => ({ id, label, ...(steps ? { steps } : {}) })),
   setup: (branch) => {
     const b = byId(branch);
+    // In-page navigation keeps the app's profile cache: a branch with no kept parts must not hand its empty
+    // slices to the next branch (or the reverse).
+    profileCache.clear();
     answers({
       recordWitnessBeat: (d) => {
         if (b?.keepFails) throw new Error('unavailable');
