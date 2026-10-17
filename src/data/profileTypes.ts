@@ -121,6 +121,7 @@ export const PROFILE_NEEDS = {
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
   'two-pulls': ['parts'], // Phase 5: the two parts' names, figures, tenderness (parts on only)
   'dear-man': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // Phase 3 cope ahead (parts slices empty while off); never partDetail
+  'cope-ahead': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // DEAR MAN's cope ahead step on screen 2, the anchor under the plan (parts on only); never partDetail
   // "Was this a part you know?" after a better close (PartTagSlot, in SessionClose or the tool's own
   // close): every tool whose close asks then-vs-now or about the urge (src/lib/partTag.ts TAG_ROW_TOOLS)
   // reads `parts`.

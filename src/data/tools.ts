@@ -104,7 +104,6 @@ export const tools: Tool[] = [
     dbtBasis: 'DBT ER Handout 19',
     emoji: '🧭',
     bare: true,
-    listed: false,
   },
   // Interpersonal Effectiveness
   {
