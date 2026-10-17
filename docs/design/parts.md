@@ -1,7 +1,9 @@
 # Parts
 
-Status: proposal, 6 Oct 2026 (updated 16 Oct). Not agreed. Nothing here is signed off. Phase 0 is built
-(PR #49): the vocabulary and all parts copy as draft graph content (`scripts/parts/content.py` →
+Status: proposal, 6 Oct 2026 (updated 17 Oct). **Every line of parts copy is signed off** (17 Oct, Claudia:
+"ship it all"; see *Sign-off*), so each surface shows once the parts load and hosting deploy are done and
+the person has parts on. Trail offers stay off until Claudia has seen the dry run. Phase 0 is built
+(PR #49): the vocabulary and all parts copy as graph content (`scripts/parts/content.py` →
 `schema/parts.cypher`), the parts voice lint, and all six data fixes. Claudia decided three things on
 16 Oct: the flood signal is the **blending check** (below; built as content and in the harness), and
 data fixes 3 and 4 go ahead (built). The angry-part card is being built as a component with no host
@@ -1323,8 +1325,8 @@ app, with consent. Don't put it in the product.
 
 Each phase is gated on the previous phase's harm signals.
 
-**Where it stands (17 Oct).** Phases 0–3 are built, every line a draft: nothing shows until its copy is
-signed off (*Sign-off*, below). Phase 4's engine and Today's offer card are built **switched off**
+**Where it stands (17 Oct).** Phases 0–3 are built, and every line is signed off (17 Oct, *Sign-off*,
+below): each surface shows with parts on once the parts load and hosting deploy are done. Phase 4's engine and Today's offer card are built **switched off**
 (`TrailRule.enabled` and `PartsPolicy.offersEnabled` false), with a read-only dry run so Claudia can see
 what each rule would find on real data and set the counts before anything is offered; switching it on
 stays gated on Phase 3's harm signals. Every parts callable has had a security review (ownership by key,
@@ -1334,12 +1336,18 @@ and checks both paths cover each). **Phase 5 is built in 2D, without Stage** (Cl
 features first): the den, a part's story, Meet a part 5d and Two pulls, as SVG rooms with
 `PartFigure`s; Stage can replace the renderer later. Trail offers stay off until Claudia has looked at
 the dry run (her choice, 17 Oct). **Phase 6:** Wise mind is built and listed for everyone
-(`docs/design/wise-mind.md`), and so is its parts-aware step back (2p, behind sign-off).
+(`docs/design/wise-mind.md`), and so is its parts-aware step back (2p, parts on).
 *Say something to it* is built (above). Not built
 from the module table: Recover's next-day question about a tagged part (it would duplicate the part's own
 check-back) and the witness `part` kind (no moment needs it yet).
 
 ## Sign-off
+
+**Done for every line on 17 Oct.** Claudia: "And yes, ship it all. We literally don't have any users so
+it doesn't matter." `node scripts/parts/sign-off.mjs --all --date 2026-10-17` put all 582 ids (prompts,
+options, moves, hurts, edges, pairs, trail rules, contexts, the policy) in `SIGNED_OFF`. It switched
+nothing on: `TrailRule.enabled` and `PartsPolicy.offersEnabled` are still false. A line added from now on
+is a draft until it goes through the steps below.
 
 1. Add each id to `SIGNED_OFF` in `scripts/parts/content.py` with its review date.
 2. Rebuild (`python3 scripts/parts/build.py > schema/parts.cypher`, `python3 scripts/parts/fixture.py`),

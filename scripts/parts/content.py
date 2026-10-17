@@ -50,7 +50,8 @@
 
 VERSION = "parts-v1"
 
-# id → review date. Nothing is signed off yet.
+# id → review date. Every id was signed off on 2026-10-17 (Claudia: "ship it all"); a new id is a draft
+# until it is added here (node scripts/parts/sign-off.mjs).
 SIGNED_OFF = {
     "aftercare_louder": "2026-10-17",
     "aftercare_too_many": "2026-10-17",
