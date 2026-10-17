@@ -356,8 +356,10 @@ const clear: PartsEntry = { open: 'clear', reasons: [] };
 const prefix = (move: string): DriveStep[] => [{ move }, { opt: 'blend_notice' }];
 const toAge = (move: string): DriveStep[] => [...prefix(move), { opt: 'where_nowhere' }, { shape: true }];
 const toFeel = (move: string, voice: string): DriveStep[] => [...toAge(move), { opt: 'age_now' }, { opt: voice }];
-const toFear = (move: string, voice: string, job: string): DriveStep[] =>
+const toGuards = (move: string, voice: string, job: string): DriveStep[] =>
   [...toFeel(move, voice), { opt: 'feel_curious' }, { opt: job }, { opt: 'likes_tired' }, { opt: 'guards_not_sure' }];
+// The harness person keeps other parts, so 5d comes after Guards (lane 2): "Not sure" goes on to Fear.
+const toFear = (move: string, voice: string, job: string): DriveStep[] => [...toGuards(move, voice, job), { opt: 'front_not_sure' }];
 const hideFear = toFear('hide', 'hide_voice_see', 'hide_job_pushed_out');
 const toKeep: DriveStep[] = [
   ...hideFear, { opt: 'hide_fear_too_much' }, { opt: 'update_yes' }, { press: 'meet_thank_hold' }, { tap: 'Next' },
@@ -383,6 +385,13 @@ const MEET_BRANCHES: MeetBranch[] = [
   { id: 'paused', label: 'A paused part: the heads-up', gate: { ...clear, paused: true }, partId: PART_IDS.chase },
   { id: 'keep', label: 'Name it and keep it', steps: toKeep },
   { id: 'close', label: 'The orienting close and the check-back question', steps: [...toKeep, { opt: 'keep_yes' }, { close: 'better' }] },
+  // ---- 5d (lane 2): "Does it stand in front of another part you know?" ----
+  { id: 'front', label: '5d: does it stand in front of another part you know? (their parts by name)', steps: toGuards('hide', 'hide_voice_see', 'hide_job_pushed_out') },
+  { id: 'front_keep', label: '5d: one of their parts picked, then kept (the den draws the thread)', steps: [
+    ...toGuards('hide', 'hide_voice_see', 'hide_job_pushed_out'), { tap: 'the one who chases' }, { opt: 'hide_fear_too_much' }, { opt: 'update_yes' },
+    { press: 'meet_thank_hold' }, { tap: 'Next' }, { opt: 'hide_rather_break' }, { type: 'the hider' }, { tap: 'Next' },
+  ] },
+  // ---- end 5d ----
 ];
 
 /* ───────── the list ───────── */

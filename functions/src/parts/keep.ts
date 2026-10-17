@@ -44,7 +44,7 @@ export const KEEP_STATE_QUERY = `
   OPTIONAL MATCH (pol:PartsPolicy {id: 'parts'})
   OPTIONAL MATCH (k:ProfileKind {id: 'part'})
   RETURN coalesce(u.partsEnabled, false) AS partsOn,
-         CASE WHEN ps IS NULL THEN null ELSE ps {.trailheadKind, .partId, .candidateId, .offerId, .moveIds, .stepIdsJson,
+         CASE WHEN ps IS NULL THEN null ELSE ps {.trailheadKind, .partId, .candidateId, .offerId, .moveIds, .stepIdsJson, .frontOfPartId,
            .stopReason, .bodyPlaces, .shapeSig, .soundSig, .ownVoice, .ownJob, .ownFear,
            keepable: ${GUARDS.PartSession.keep('ps')}} END AS session,
          CASE WHEN p IS NULL THEN null ELSE p {.tender, .places, .shapeSig, .soundSig, .ageId, .voiceIds, .jobIds,
@@ -101,7 +101,7 @@ ${KEEP_EDGES}`;
 
 export interface KeepState {
   partsOn: boolean;
-  session: (StoredSession & { partId: string | null; moveIds: string[]; keepable: boolean }) | null;
+  session: (StoredSession & { partId: string | null; moveIds: string[]; keepable: boolean; frontOfPartId?: string | null }) | null;
   /** The part keyed by the requested part id, if the caller has one. */
   part: Record<string, unknown> | null;
   /** The part this session already kept, if any. */
@@ -131,6 +131,8 @@ export interface KeepDeps {
   revisit(w: KeepWrite): Promise<boolean>;
   /** The day's den snapshot, after a new part is kept. */
   snapshot?(): Promise<unknown>;
+  /** Meet a part's 5d thread (frontLink.ts, given by the callable): the kept part in front of the one picked. */
+  link?(frontId: string, behindId: string): Promise<boolean>;
 }
 
 export async function keepPartHandler(input: KeepInput, deps: KeepDeps): Promise<KeepPartResponse> {
@@ -139,6 +141,7 @@ export async function keepPartHandler(input: KeepInput, deps: KeepDeps): Promise
   if (!st.session) throw new HttpsError('not-found', 'Session not found');
   if (!st.session.keepable) throw new HttpsError('failed-precondition', 'This visit is closed');
   const name = keptName(input.name, st.nameMax);
+  const front = st.session.frontOfPartId ?? null;
   const { guardIds, ...visit } = partFromSession(st.session);
   const base = {
     sessionId: input.sessionId, partId: input.partId, candidateId: st.session.candidateId, offerId: st.session.offerId ?? null,
@@ -150,6 +153,7 @@ export async function keepPartHandler(input: KeepInput, deps: KeepDeps): Promise
     if (!st.part) throw new HttpsError('not-found', 'Part not found');
     const ok = await deps.revisit({ ...base, fields: mergeRevisit(st.part, visit), name: name ?? null });
     if (!ok) throw new HttpsError('failed-precondition', 'This visit is closed');
+    if (front && front !== input.partId) await deps.link?.(input.partId, front);
     return { partId: input.partId, created: false };
   }
   if (st.part || (st.linkedPartId && st.linkedPartId !== input.partId)) {
@@ -157,6 +161,8 @@ export async function keepPartHandler(input: KeepInput, deps: KeepDeps): Promise
   }
   const ok = await deps.create({ ...base, fields: visit, name: name ?? null });
   if (!ok) throw new HttpsError('failed-precondition', 'This visit is closed');
+  // 5d, from the stored session: the new part stands in front of the one picked (No one I know / Not sure: nothing).
+  if (front) await deps.link?.(input.partId, front);
   await deps.snapshot?.();
   return { partId: input.partId, created: true };
 }
@@ -188,6 +194,7 @@ export function keepDeps(tx: ManagedTransaction, uid: string): KeepDeps {
           moveIds: strs(s.moveIds), stepIdsJson: str(s.stepIdsJson), stopReason: str(s.stopReason),
           bodyPlaces: strs(s.bodyPlaces), shapeSig: nums(s.shapeSig), soundSig: nums(s.soundSig),
           ownVoice: str(s.ownVoice), ownJob: str(s.ownJob), ownFear: str(s.ownFear), keepable: s.keepable === true,
+          frontOfPartId: str(s.frontOfPartId),
         } : null,
         part: (r?.get('part') as Record<string, unknown> | null | undefined) ?? null,
         linkedPartId: str(r?.get('linkedPartId')),

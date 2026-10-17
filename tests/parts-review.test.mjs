@@ -18,6 +18,7 @@ const GATES = [
   ["src/lib/meetAPartSave.ts", "function meetReady", "surfaceReady(content, meetRequired(opts))"],
   ["src/lib/meetAPartSave.ts", "function meetReady", "MEET_OPTION_STEPS.every("],
   ["src/lib/meetAPartSave.ts", "function offerCheckback", "surfaceReady(o.content, CLOSE_CHECKBACK_REQUIRED)"],
+  ["src/lib/meetAPartSave.ts", "const frontReady", "surfaceReady(content, MEET_FRONT_REQUIRED)"],
   ["src/lib/partCheckback.ts", "function checkbackReady", "surfaceReady(content, PART_CHECKBACK_REQUIRED)"],
   ["src/lib/partTag.ts", "function tagRowGate", "surfaceReady(g.content, TAG_ROW_REQUIRED)"],
   ["src/lib/partShape.ts", "function shapeOfferReady", "surfaceReady(g.content, TAG_SHAPE_REQUIRED)"],
@@ -77,7 +78,7 @@ test("the document: every id a surface requires, with the fixture's text, its st
   };
   const sets = [
     L.UNBLEND_REQUIRED, L.angryRequired(true), L.angryRequired(false), L.ANGRY_LATER_REQUIRED, L.meetRequired({ paused: true }),
-    L.CLOSE_CHECKBACK_REQUIRED, L.PART_CHECKBACK_REQUIRED, L.TAG_ROW_REQUIRED, L.PARTS_OF_ME_REQUIRED, L.PART_REVISIT_REQUIRED,
+    L.CLOSE_CHECKBACK_REQUIRED, L.MEET_FRONT_REQUIRED, L.PART_CHECKBACK_REQUIRED, L.TAG_ROW_REQUIRED, L.PARTS_OF_ME_REQUIRED, L.PART_REVISIT_REQUIRED,
     L.PART_CANDIDATE_REQUIRED, L.STATS_REQUIRED, L.REFLECT_REQUIRED, L.PARTS_SETTINGS_REQUIRED, L.SETTINGS_LINK_REQUIRED, L.COPE_REQUIRED, L.PS_LATER_REQUIRED,
     L.DEBRIEF_WHO_REQUIRED, L.OA_GOAL_LINE_REQUIRED, L.TAG_SHAPE_REQUIRED, L.KNOWN_PART_REVIEW_REQUIRED, L.PLAIN_PATTERNS_REQUIRED, L.DEN_REQUIRED, L.PART_STORY_REQUIRED,
     L.WISE_MIND_PARTS_REQUIRED,
