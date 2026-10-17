@@ -37,7 +37,7 @@ const nexts = (n: number): DriveStep[] => Array.from({ length: n }, () => next);
 const partName = (id: string) => PARTS.find((p) => p.id === id)!.name;
 const CHASE_ANCHOR = slices().partAnchors[Object.keys(slices().partAnchors)[0]];
 const KEPT_LINE = slices().savedLines[0].text;
-const copeTitle = (PARTS_FIXTURE.prompts as Record<string, { copy: string }>).cope_title.copy;
+const copeTitle = (PARTS_FIXTURE.prompts as Record<string, { copy: string }>).cope_title_any.copy;
 
 /** Own words at each slot's full length: the situation and the moment (140), a move (90). */
 const LONG_SITUATION = 'My sister is coming to stay for the whole weekend and we have not really talked properly since the funeral in the spring, not once, honestly';

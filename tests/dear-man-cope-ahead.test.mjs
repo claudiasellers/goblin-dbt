@@ -123,6 +123,47 @@ test("kept lines to anchor with: own and kept witness lines, newest first, at mo
   assert.doesNotMatch(step.slice(step.indexOf("} catch {"), step.indexOf("} finally {")), /clearForm/, "nothing cleared on failure");
 });
 
+test("anchor choices: never a Cope Ahead plan kept in My words, never a line over 90; the server's rule is the same", async () => {
+  const own = (id, text, moment, at) => ({ id, text, emotionIds: [], situationId: null, moment, uses: 0, lastUsedAt: null, meta: { confirmedAt: at } });
+  const plan = "If they raise their voice, I'll breathe out longer than in and say \"Give me a minute\".";
+  const lines = lib.keptLines(
+    [own("o1", plan, "cope_ahead", "2026-10-09T00:00:00Z"), own("o2", "x".repeat(91), null, "2026-10-08T00:00:00Z"),
+      own("o3", "x".repeat(90), "wise_mind", "2026-10-07T00:00:00Z"), own("o4", "Short and mine", null, "2026-10-06T00:00:00Z")],
+    [{ lineId: "w1", text: "y".repeat(91), confirmedAt: "2026-10-05T00:00:00Z" }, { lineId: "w2", text: "Of course that hurt.", confirmedAt: "2026-10-04T00:00:00Z" }],
+  );
+  assert.deepEqual(lines.map((l) => l.lineId), ["o3", "o4", "w2"], "the plan, and both long lines, left out");
+  // A short Cope Ahead plan is still a plan: the moment is what leaves it out.
+  assert.deepEqual(lib.keptLines([own("o5", "If I go blank, I'll pause.", "cope_ahead", null)], []), []);
+  const server = await importTs("functions/src/parts/keepTypes.ts");
+  const client = await importTs("src/data/partsTypes.ts");
+  for (const t of [server, client]) {
+    assert.equal(t.ANCHOR_MAX_CHARS, 90);
+    assert.deepEqual([...t.ANCHOR_EXCLUDED_MOMENTS], ["cope_ahead"]);
+    assert.equal(t.anchorableLine({ text: "x".repeat(90), moment: null }), true);
+    assert.equal(t.anchorableLine({ text: "x".repeat(91) }), false);
+    assert.equal(t.anchorableLine({ text: "short", moment: "cope_ahead" }), false);
+    assert.equal(t.anchorableLine({ text: "   " }), false);
+  }
+});
+
+test("Cope Ahead reuses the step with its own question; DEAR MAN's gate and title are unchanged", () => {
+  assert.equal(fixture.prompts.cope_title_any.copy, "Who might show up there?");
+  assert.deepEqual([fixture.prompts.cope_title_any.flow, fixture.prompts.cope_title_any.step, fixture.prompts.cope_title_any.reviewStatus], ["dearman", "cope", "draft"]);
+  assert.ok(!lib.COPE_PROMPTS.includes("cope_title_any"), "not in DEAR MAN's gate");
+  assert.deepEqual([...lib.COPE_AHEAD_PARTS_REQUIRED.prompts], [...lib.COPE_PROMPTS, "cope_title_any"]);
+  assert.deepEqual([...lib.COPE_AHEAD_PARTS_REQUIRED.options], [...lib.COPE_OPTIONS]);
+  assert.equal(lib.copeAheadPartsReady(shipped), false);
+  assert.equal(lib.copeAheadPartsReady(all), true);
+  assert.equal(lib.copeAheadPartsReady(null), false);
+  assert.match(step, /titleId = 'cope_title'/, "DEAR MAN's default");
+  assert.match(step, /promptCopy\(content, titleId\)/);
+  assert.doesNotMatch(tsx, /titleId=/, "DEAR MAN passes none");
+  const page = read("src/pages/tools/CopeAhead.tsx");
+  assert.match(page, /titleId=\{COPE_AHEAD_TITLE\}/);
+  assert.match(page, /ready: copeAheadPartsReady\(partsCopy\)/);
+  assert.match(read("scripts/parts/review.mjs"), /ids: g\.COPE_AHEAD_PARTS_REQUIRED/);
+});
+
 test("the anchor is carried to the Summary, under the script, quietly", () => {
   const summary = tsx.slice(tsx.indexOf("if (phase === 'summary')"), tsx.indexOf("// ─── DEBRIEF") > 0 ? tsx.indexOf("// ─── DEBRIEF") : undefined);
   const at = (s) => { const i = summary.indexOf(s); assert.ok(i > 0, s); return i; };

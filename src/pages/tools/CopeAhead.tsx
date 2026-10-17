@@ -7,7 +7,7 @@ import { useUserProfile } from '../../contexts/UserProfileContext';
 import { useProfileContext } from '../../hooks/useProfileContext';
 import { useToolSession } from '../../hooks/useToolSession';
 import { handoffExt } from '../../lib/bandStore';
-import { anchorLead, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
+import { anchorLead, COPE_AHEAD_TITLE, copeAheadPartsReady, copeParts, keptLines, showCopeAhead } from '../../lib/copeAhead';
 import { afterScheduleItem, COPE_AHEAD_AFTER_TYPE } from '../../lib/copeAheadAfter';
 import { parseCopeAheadEntry } from '../../lib/copeAheadEntry';
 import { planLine } from '../../lib/copeAheadPlan';
@@ -99,7 +99,7 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
   const [savedAnchors, setSavedAnchors] = useState<Record<string, string>>({});
   const slices = profile.slices;
   const partsCopy = partsContent || null;
-  const partsShown = showCopeAhead({ partsOn, partCount: slices?.parts.length ?? 0, ready: copeReady(partsCopy), band: null });
+  const partsShown = showCopeAhead({ partsOn, partCount: slices?.parts.length ?? 0, ready: copeAheadPartsReady(partsCopy), band: null });
   useEffect(() => {
     if (!partsShown) return;
     void loadCope().catch(() => { /* the step's render retries */ });
@@ -197,7 +197,8 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
         <FeelScreen content={content} s={s} send={send} pulls={pulls}
           partsStep={partsShown && partsCopy && slices ? (
             <CopeAheadStep content={partsCopy} parts={copeParts(slices.parts)} anchors={anchors} lines={lines}
-              picked={s.partId} onPick={(id) => send({ type: 'part', partId: id })} onAnchor={onAnchor} onGoOn={() => {}} />
+              picked={s.partId} onPick={(id) => send({ type: 'part', partId: id })} onAnchor={onAnchor} onGoOn={() => {}}
+              titleId={COPE_AHEAD_TITLE} />
           ) : null} />
       );
       break;

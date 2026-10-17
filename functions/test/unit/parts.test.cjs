@@ -1205,11 +1205,12 @@ test('part writers over the fake driver: caller-scoped keys, signed in, profile 
 // ---- DEAR MAN's cope ahead: the part's anchor (keep.ts, the only Part writer) ----
 
 const OWN_LINE = '1b2c3d4e-5f60-4718-9a0b-c1d2e3f4a5b6';
+const PLAN_LINE = '2c3d4e5f-6071-4829-8a1b-d2e3f4a5b6c7';
 
-function fakeAnchor({ lineOwned = true, ...rest } = {}) {
+function fakeAnchor({ lineOwned = true, line = { text: 'I can take a breath first', moment: null }, ...rest } = {}) {
   const f = fakeEdit(rest);
   const state = f.deps.state;
-  f.deps.state = async (q) => ({ ...(await state(q)), lineOwned: q.lineId ? lineOwned : false });
+  f.deps.state = async (q) => ({ ...(await state(q)), lineOwned: q.lineId ? lineOwned : false, line: q.lineId && lineOwned ? line : null });
   return f;
 }
 
@@ -1256,6 +1257,26 @@ test('setPartAnchor: the line must be the caller\'s own (OwnLine they have, Vali
   }
 });
 
+test('setPartAnchor: a kept line that is a Cope Ahead plan, or over 90 characters, is refused (the picker\'s rule, for a stale client)', async () => {
+  for (const line of [
+    { text: "If I go blank, I'll feel my feet on the floor.", moment: 'cope_ahead' },
+    { text: 'x'.repeat(91), moment: null },
+    { text: 'y'.repeat(91), moment: 'wise_mind' },
+  ]) {
+    const f = fakeAnchor({ line });
+    await assert.rejects(K.setPartAnchorHandler({ partId: PID, lineId: OWN_LINE, own: null }, f.deps), code('invalid-argument'), JSON.stringify(line));
+    assert.equal(f.writes().length, 0);
+  }
+  const ok = fakeAnchor({ line: { text: 'x'.repeat(90), moment: 'wise_mind' } });
+  assert.deepEqual(await K.setPartAnchorHandler({ partId: PID, lineId: OWN_LINE, own: null }, ok.deps), { version: 8 });
+  // Own words are checked by validateAnchor (90), never by the moment rule.
+  const own = fakeAnchor();
+  await K.setPartAnchorHandler({ partId: PID, lineId: null, own: 'x'.repeat(90) }, own.deps);
+  assert.equal(own.writes().length, 1);
+  // The state query reads the line's words and its moment (own lines only; a kept witness line has none).
+  assert.match(K.PART_STATE_QUERY, /coalesce\(ol\.text, vl\.text\) AS lineText, ol\.moment AS lineMoment/);
+});
+
 test('setPartAnchor: parts off, no part, a set-aside part: refused before any write', async () => {
   const run = (d) => K.setPartAnchorHandler({ partId: PID, lineId: null, own: 'ok' }, d);
   const off = fakeAnchor({ partsOn: false });
@@ -1269,7 +1290,7 @@ test('setPartAnchor: parts off, no part, a set-aside part: refused before any wr
 
 test('setPartAnchor over the fake driver: caller-scoped part and line keys, signed in, invalid input refused', async () => {
   const f = fakeDriver((q, p) => {
-    if (q === K.PART_STATE_QUERY) return [{ partsOn: true, version: 3, part: { status: 'active' }, revisitLogged: false, nameMaxChars: 40, revisitAfterDays: 30, knownRather: 0, lineOwned: p.lineKey === `real-user:${OWN_LINE}` }];
+    if (q === K.PART_STATE_QUERY) return [{ partsOn: true, version: 3, part: { status: 'active' }, revisitLogged: false, nameMaxChars: 40, revisitAfterDays: 30, knownRather: 0, lineOwned: [`real-user:${OWN_LINE}`, `real-user:${PLAN_LINE}`].includes(p.lineKey), lineText: p.lineId === PLAN_LINE ? "If I go blank, I'll pause." : 'Breathe first', lineMoment: p.lineId === PLAN_LINE ? 'cope_ahead' : null }];
     if (q === K.SET_PART_ANCHOR_QUERY) return [{ version: 4 }];
     return new Error('unexpected');
   });
@@ -1281,6 +1302,9 @@ test('setPartAnchor over the fake driver: caller-scoped part and line keys, sign
   assert.deepEqual([w.params.uid, w.params.partKey, w.params.lineId, w.params.own], ['real-user', `real-user:${PID}`, OWN_LINE, null]);
   assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
   await assert.rejects(fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, lineId: OWN_LINE, own: 'both' } }), code('invalid-argument'));
+  f.calls.length = 0;
+  await assert.rejects(fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, lineId: PLAN_LINE } }), code('invalid-argument'), 'a kept Cope Ahead plan');
+  assert.ok(!f.calls.some((c) => c.query === K.SET_PART_ANCHOR_QUERY));
   await assert.rejects(fns.setPartAnchor.run({ auth: auth('real-user'), data: { partId: PID, own: 'x'.repeat(91) } }), code('invalid-argument'));
   await assert.rejects(fns.setPartAnchor.run({ data: { partId: PID, own: 'ok' } }), code('unauthenticated'));
 });

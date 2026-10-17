@@ -24,7 +24,7 @@ import {
   DEFAULT_NAME_MAX, DEFAULT_REVISIT_DAYS, keptName, mergeRevisit, partFromSession, partSource,
   type KeepInput, type PartFields, type StoredSession,
 } from './keepPlan';
-import type { KeepPartResponse, PartWriteResponse } from './keepTypes';
+import { anchorableLine, type KeepPartResponse, type PartWriteResponse } from './keepTypes';
 import {
   newJob, revisitTransition, shapeSigFromFtf, type AnchorInput, type LayoutInput, type PartRef, type RenameInput, type RestInput,
   type RevisitInput, type ShapeInput,
@@ -227,7 +227,8 @@ export const PART_STATE_QUERY = `
          CASE WHEN p IS NULL THEN null ELSE p {.status, .tender, .name, .jobIds, .ownJob, .jobHistoryJson,
            .preferredRoleIds, .anchorLineId, .anchorOwn} END AS part,
          r IS NOT NULL AS revisitLogged, pol.nameMaxChars AS nameMaxChars, k.revisitAfterDays AS revisitAfterDays,
-         count(DISTINCT o) AS knownRather, (ol IS NOT NULL OR vl IS NOT NULL) AS lineOwned
+         count(DISTINCT o) AS knownRather, (ol IS NOT NULL OR vl IS NOT NULL) AS lineOwned,
+         coalesce(ol.text, vl.text) AS lineText, ol.moment AS lineMoment
 `;
 
 /** One write to the caller's own part, parts on, under `where`; every writer bumps the profile version. */
@@ -279,6 +280,8 @@ export interface PartEditState {
   knownRather: number;
   /** The asked line is the caller's own: an active OwnLine, or a ValidationLine they SAVED_LINE'd. */
   lineOwned: boolean;
+  /** That line's words and, for an own line, the moment it was kept from (null when not owned). */
+  line: { text: string; moment: string | null } | null;
   nameMax: number;
   revisitDays: number;
 }
@@ -358,6 +361,8 @@ export async function setPartAnchorHandler(input: AnchorInput, deps: PartEditDep
   const { st, part, status } = await ownPart(deps, { partId: input.partId, ...(input.lineId ? { lineId: input.lineId } : {}) });
   if (status === 'set_aside') throw new HttpsError('failed-precondition', 'Set aside: restore it first');
   if (input.lineId && !st.lineOwned) throw new HttpsError('not-found', 'Line not found');
+  // The picker's rule, for a stale client too: no Cope Ahead plan and nothing over 90 characters.
+  if (input.lineId && !(st.line && anchorableLine(st.line))) throw new HttpsError('invalid-argument', 'That line can\'t be an anchor');
   if ((part.anchorLineId ?? null) === input.lineId && (part.anchorOwn ?? null) === input.own) return { version: st.version };
   return written(deps, SET_PART_ANCHOR_QUERY, { partId: input.partId, lineId: input.lineId, own: input.own });
 }
@@ -396,6 +401,8 @@ export function partEditDeps(tx: ManagedTransaction, uid: string): PartEditDeps 
         revisitLogged: r?.get('revisitLogged') === true,
         knownRather: toNumber(r?.get('knownRather')) ?? 0,
         lineOwned: q.lineId ? r?.get('lineOwned') === true : false,
+        line: q.lineId && r?.get('lineOwned') === true
+          ? { text: String(r.get('lineText') ?? ''), moment: (r.get('lineMoment') as string | null) ?? null } : null,
         nameMax: max && max > 0 ? max : DEFAULT_NAME_MAX,
         revisitDays: days && days > 0 ? days : DEFAULT_REVISIT_DAYS,
       };
