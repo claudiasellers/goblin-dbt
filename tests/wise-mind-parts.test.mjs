@@ -32,7 +32,7 @@ test("copy: every 2p line and screen 5's parts line, drafts in flow wise_mind, i
   assert.equal(fixture.prompts.wm_step_back.copy, "Ask everyone to take one step back.");
   assert.equal(fixture.prompts.wm_wont_line.copy, "That's fine. It might need its own time.");
   assert.ok(W.WISE_MIND_PARTS_REQUIRED.prompts.includes("hold_hint") && W.WISE_MIND_PARTS_REQUIRED.prompts.includes("part_unnamed"));
-  assert.match(read("scripts/parts/review.mjs"), /id: 'wise_mind', title: 'Wise mind\\'s step back'/);
+  assert.match(read("scripts/parts/review.mjs"), /id: 'wise_mind_parts', title: 'Wise mind\\'s step back'/);
 });
 
 test("the gate: parts on, an active or resting part, and the copy shipped; anything else is the two minds", () => {

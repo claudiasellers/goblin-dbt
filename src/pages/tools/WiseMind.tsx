@@ -22,6 +22,13 @@ import { primaryButton } from '../../components/tools/oppositeAction/styles';
 
 const HOST = 'wise-mind';
 
+/** A screen with no question of its own (the close): its first content takes focus as it opens. */
+function FocusHere({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { ref.current?.focus({ preventScroll: true }); }, []);
+  return <div ref={ref} tabIndex={-1} className="focus:outline-none">{children}</div>;
+}
+
 /**
  * Wise mind (docs/design/wise-mind.md): the question, both minds, drop in, what comes, is this wise mind,
  * one next step. The step machine (src/lib/wiseMind.ts) decides; this page renders, keeps the visit's
@@ -64,6 +71,8 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
   const [keep, setKeep] = useState<'idle' | 'saving' | 'failed'>('idle');
   const handoffs = useRef<HandoffResult[]>([]);
   const hereRef = useRef<HTMLButtonElement>(null);
+  const doneRef = useRef<HTMLAnchorElement>(null);
+  const focusDone = () => { setTimeout(() => doneRef.current?.focus({ preventScroll: true }), 0); };
 
   /** The session always carries what the visit has said so far, so whichever close happens sends it. */
   const sync = useCallback((s: WiseState) => {
@@ -245,9 +254,11 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
     }
     case 'close':
     case 'handoff':
+      // The close takes focus as it opens (the control that led here has gone); once answered or
+      // skipped, Done does.
       body = (<>
-        {s.step === 'close' && <SessionClose kind="orienting" />}
-        <Link to="/tools" className={`${primaryButton} inline-flex items-center justify-center`}>{copy.next.done}</Link>
+        <FocusHere>{s.step === 'close' && <SessionClose kind="orienting" onAnswered={focusDone} onSkipped={focusDone} />}</FocusHere>
+        <Link ref={doneRef} to="/tools" className={`${primaryButton} inline-flex items-center justify-center`}>{copy.next.done}</Link>
       </>);
       break;
   }

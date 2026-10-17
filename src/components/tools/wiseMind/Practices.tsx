@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { useReducedMotion } from 'motion/react';
+import { useReducedMotionConfig } from 'motion/react';
 import type { WiseMindPracticeItem } from '../../../data/wiseMindTypes';
 import { HoldButton } from '../../parts/LightHold';
 import { choiceButton, choiceSelected } from '../oppositeAction/styles';
@@ -8,7 +8,8 @@ import { choiceButton, choiceSelected } from '../oppositeAction/styles';
  * Wise mind's three ways in (docs/design/wise-mind.md, screen 3; DBT Mindfulness Handout 3a). 2D, in the
  * room's colours. No countdown numbers and no progress score: the page's *I'm here* is always on screen
  * to move on early, and each practice calls `onEnd` when it has run its course (the page then moves
- * focus to *I'm here*; it never moves on by itself). Reduced motion: still frames, no transitions.
+ * focus to *I'm here*; it never moves on by itself). Reduced motion (the device's, or a MotionConfig's):
+ * still frames, no transitions.
  */
 
 /** Breath timings (ms): an unhurried in-breath, a longer out-breath. Never shown. */
@@ -24,7 +25,7 @@ export function PracticePicker({ practices, picked, onPick }: {
         <button key={p.id} type="button" aria-pressed={picked === p.id ? 'true' : 'false'} onClick={() => onPick(p.id)}
           className={`${choiceButton} ${picked === p.id ? choiceSelected : ''}`}>
           <span className="block font-medium">{p.name}</span>
-          <span className="block text-sm opacity-80">{p.sub}</span>
+          <span className="block text-sm">{p.sub}</span>
         </button>
       ))}
     </div>
@@ -56,7 +57,7 @@ function useTimeline(steps: number[], onDone: () => void) {
  * practice's `seconds`, one line per third. Reduced motion: three still frames, one per line.
  */
 export function StoneLake({ practice, onEnd }: { practice: WiseMindPracticeItem; onEnd: () => void }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionConfig() === true;
   const id = useId().replace(/[^\w-]/g, '');
   const lines = practice.lines;
   const per = Math.round(((practice.seconds ?? 40) * 1000) / Math.max(1, lines.length));
@@ -98,35 +99,45 @@ export function StoneLake({ practice, onEnd }: { practice: WiseMindPracticeItem;
 export function WiseBreath({ practice, holdLabel, holdHint, letGo, onEnd }: {
   practice: WiseMindPracticeItem; holdLabel: string; holdHint: string; letGo: string; onEnd: () => void;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionConfig() === true;
   const total = practice.breaths ?? 5;
   const [breath, setBreath] = useState(0);
   const [phase, setPhase] = useState<'in' | 'out' | 'end'>('in');
   const [fill, setFill] = useState(0);
   const ended = useRef(onEnd);
   useEffect(() => { ended.current = onEnd; }, [onEnd]);
+  // Keyboard and switch users keep their place: focus stays with the breath (the hold, then the
+  // out-breath line, then the next hold), never dropped to the page when the control changes.
+  const box = useRef<HTMLDivElement>(null);
+  const keep = useRef(false);
+  const hadFocus = () => !!box.current && box.current.contains(document.activeElement);
+  useEffect(() => {
+    if (!keep.current) return;
+    keep.current = false;
+    box.current?.querySelector<HTMLElement>('[data-hold], [data-breath-out]')?.focus({ preventScroll: true });
+  }, [phase, breath]);
   useEffect(() => {
     if (phase !== 'out') return;
     const t = setTimeout(() => {
       if (breath + 1 >= total) { setPhase('end'); ended.current(); }
-      else { setBreath((b) => b + 1); setFill(0); setPhase('in'); }
+      else { keep.current = hadFocus(); setBreath((b) => b + 1); setFill(0); setPhase('in'); }
     }, OUT_MS);
     return () => clearTimeout(t);
   }, [phase, breath, total]);
-  const out = () => { if (phase === 'in') setPhase('out'); };
+  const out = () => { if (phase === 'in') { keep.current = hadFocus(); setPhase('out'); } };
   const [inLine, outLine] = [practice.lines[0] ?? '', practice.lines[1] ?? ''];
   const r = phase === 'in' ? 34 + fill * 40 : phase === 'out' ? 34 : 50;
   return (
-    <div className="space-y-4" data-testid="practice-breath">
+    <div ref={box} className="space-y-4" data-testid="practice-breath">
       <svg viewBox="0 0 320 170" className="block w-full h-auto rounded-3xl bg-[var(--color-bg-secondary)]" aria-hidden="true">
         <circle cx="160" cy="85" r="74" style={{ fill: 'var(--color-accent)', ...grow(reduce ? (phase === 'in' && fill > 0 ? 1 : 0.6) : r / 74) }} opacity="0.3"
-          className={phase === 'out' ? 'motion-safe:transition-transform motion-safe:duration-[5000ms] motion-safe:ease-out' : ''} />
+          className={phase === 'out' && !reduce ? 'motion-safe:transition-transform motion-safe:duration-[5000ms] motion-safe:ease-out' : ''} />
         <circle cx="160" cy="85" r="6" style={{ fill: 'var(--color-accent)' }} opacity="0.85" />
       </svg>
       <Said>{phase === 'in' ? inLine : outLine}</Said>
       {phase === 'in'
         ? <HoldButton key={breath} label={holdLabel} hint={holdHint} ms={IN_MS} onProgress={setFill} onLetGo={out} onComplete={out} />
-        : phase === 'out' && <p className="min-h-12 grid place-items-center text-sm text-[var(--color-text-secondary)]">{letGo}</p>}
+        : phase === 'out' && <p data-breath-out="" tabIndex={-1} className="min-h-12 grid place-items-center text-sm text-[var(--color-text-secondary)] focus:outline-none">{letGo}</p>}
     </div>
   );
 }
@@ -136,7 +147,7 @@ export function WiseBreath({ practice, holdLabel, holdHint, letGo, onEnd }: {
  * *Listen.* and nothing else.
  */
 export function AskListen({ practice, question, onEnd }: { practice: WiseMindPracticeItem; question: string | null; onEnd: () => void }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionConfig() === true;
   const total = practice.breaths ?? 3;
   const [steps] = useState(() => Array.from({ length: total * 2 }, (_, i) => (i % 2 === 0 ? IN_MS : OUT_MS)));
   const at = useTimeline(steps, onEnd);
@@ -146,7 +157,7 @@ export function AskListen({ practice, question, onEnd }: { practice: WiseMindPra
     <div className="space-y-4" data-testid="practice-ask">
       <svg viewBox="0 0 320 170" className="block w-full h-auto rounded-3xl bg-[var(--color-bg-secondary)]" aria-hidden="true">
         <circle cx="160" cy="85" r="74" style={{ fill: 'var(--color-accent)', ...grow(reduce ? 0.68 : breathingIn ? 1 : 0.5) }} opacity="0.28"
-          className="motion-safe:transition-transform motion-safe:duration-[4000ms] motion-safe:ease-in-out" />
+          className={reduce ? '' : 'motion-safe:transition-transform motion-safe:duration-[4000ms] motion-safe:ease-in-out'} />
         <circle cx="160" cy="85" r="6" style={{ fill: 'var(--color-accent)' }} opacity="0.85" />
       </svg>
       {breathingIn

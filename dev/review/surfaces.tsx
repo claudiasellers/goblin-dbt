@@ -38,7 +38,7 @@ import { CANDIDATES, checkbackItem, ME_ITEMS, ME_LONG, PART_IDS, REFLECT, reflec
 import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
 import { ME_OFF_SURFACE } from './meOff';
-import { WISE_MIND_SURFACE } from './wiseMind'; // lane 4: Wise mind's step back
+import { WISE_MIND_PARTS_SURFACE } from './wiseMindParts'; // lane 4: Wise mind's step back
 import { PARTS } from '../parts-example';
 import hostCopy from 'virtual:review-host-copy';
 import { DebriefWho } from '../../src/components/parts/DebriefWho';
@@ -57,6 +57,7 @@ import { PartStory } from '../../src/components/parts/story/PartStory';
 import { partStoryCopy } from '../../src/lib/partStory';
 import type { GetPartStoryResponse } from '../../src/data/partsTypes';
 // ---- end a part's story ----
+import { WISE_MIND_SURFACE } from './wiseMind'; // lane 1: Wise mind
 
 export interface Branch { id: string; label: string; steps?: DriveStep[] }
 export interface Surface {
@@ -632,7 +633,8 @@ export const SURFACES: Surface[] = [
   {
     id: 'reflect', pack: 'reflect', title: 'Reflect: parts',
     who: 'Parts on: in Reflect, once a kept part has at least one stat line.',
-    render: () => <PartsReflect parts={REFLECT} />,
+    // lane 2 (parts-reflect-feel): the line across all their parts above the blocks, changed since the 30 days before.
+    render: () => <PartsReflect parts={REFLECT} feel={{ now: 'feel_curious', then: 'feel_scared' }} />,
   },
   {
     id: 'settings', pack: 'settings', title: 'Settings: parts',
@@ -734,8 +736,9 @@ export const SURFACES: Surface[] = [
     render: ({ branch }) => <OaGoalHost urgeId={branch.split('.')[0]} goalId={branch.split('.')[1]} />,
   },
   DEN_SURFACE, // lane 2: the den
-  WISE_MIND_SURFACE, // lane 4: Wise mind's step back
+  WISE_MIND_PARTS_SURFACE, // lane 4: Wise mind's step back
   STORY_SURFACE, // lane 2: a part's story
+  WISE_MIND_SURFACE, // lane 1: Wise mind (not a parts surface: dev/review/wiseMind.tsx)
 ];
 
 /** Not built on the tip, so not here (the report lists them). */

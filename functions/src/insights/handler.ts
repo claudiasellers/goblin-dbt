@@ -11,7 +11,7 @@ import type {
   CheckInRow, EscalationContent, FormulationContent, FormulationInsight, InsightsPayload, LegacyUsageRow, ProactiveAlert,
   SessionRow, SomaticCorrelationData, TimeRange,
 } from './types';
-import type { PartReflect } from '../parts/statsTypes';
+import type { PartReflect, PartsFeel } from '../parts/statsTypes';
 
 export interface InsightsDeps {
   /** The user's check-ins in the range, newest first, quadrant set. */
@@ -25,8 +25,11 @@ export interface InsightsDeps {
   escalation(patternId: string): Promise<EscalationContent | null>;
   /** ActivationPattern.somatic_narrative, else SomaticQuadrantNarrative.narrative, else ''. */
   somaticNarrative(id: string): Promise<string>;
-  /** The parts section (functions/src/parts/stats.ts partsReflect), all time: null with parts off. */
-  parts(): Promise<PartReflect[] | null>;
+  /**
+   * The parts section (functions/src/parts/stats.ts): `parts` (partsReflect, all time) and `feel`
+   * (partsFeel, the last 60 days), from one read; null with parts off or when the read failed.
+   */
+  parts(): Promise<{ parts: PartReflect[] | null; feel: PartsFeel | null } | null>;
 }
 
 export async function getInsightsHandler(range: TimeRange, deps: InsightsDeps): Promise<InsightsPayload> {
@@ -84,6 +87,7 @@ export async function getInsightsHandler(range: TimeRange, deps: InsightsDeps): 
     continuityPrompt: null,
     patternFrequencies: tally.frequencies,
     totalCheckIns: checkIns.length,
-    parts,
+    parts: parts?.parts ?? null,
+    partsFeel: parts?.feel ?? null,
   };
 }

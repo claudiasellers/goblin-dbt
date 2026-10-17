@@ -97,7 +97,7 @@ export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: 
       <button
         type="button"
         onClick={skip}
-        className="mt-2 min-h-11 w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]"
+        className="mt-2 min-h-11 w-full text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
       >
         {content.closeFlow.skip}
       </button>

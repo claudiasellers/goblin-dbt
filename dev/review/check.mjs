@@ -77,11 +77,11 @@ const NO_CHECKBACK = new Set(['meet/danger_close']);
 const ALSO_EXPECT = {
   'me/cards': ['stats_steps'], 'me/long': ['stats_steps'], 'reflect/': ['stats_steps'],
   // lane 4 (wise-mind-parts): Wise mind's step back
-  'wise_mind/who': ['wm_who', 'wm_unmet', 'wm_no_one'], 'wise_mind/placed': ['wm_step_back'], 'wise_mind/stepped': ['wm_held'],
-  'wise_mind/wont': ['wm_wont_line', 'wm_meet_later'], 'wise_mind/wont_unmet': ['wm_later_done'], 'wise_mind/tender': ['wm_held'],
-  'wise_mind/safety': ['wm_step_back'],
+  'wise_mind_parts/who': ['wm_who', 'wm_unmet', 'wm_no_one'], 'wise_mind_parts/placed': ['wm_step_back'], 'wise_mind_parts/stepped': ['wm_held'],
+  'wise_mind_parts/wont': ['wm_wont_line', 'wm_meet_later'], 'wise_mind_parts/wont_unmet': ['wm_later_done'], 'wise_mind_parts/tender': ['wm_held'],
+  'wise_mind_parts/safety': ['wm_step_back'],
 };
-const ALSO_SELECTOR = { 'wise_mind/safety': '[data-testid="crisis-banner-compact"]', 'wise_mind/tender': '[data-den-tender]' }; // lane 4
+const ALSO_SELECTOR = { 'wise_mind_parts/safety': '[data-testid="crisis-banner-compact"]', 'wise_mind_parts/tender': '[data-den-tender]' }; // lane 4
 
 /** Every surface and branch, angry's in both wordings, and a few with Show ids. */
 function plan(map) {
@@ -159,6 +159,8 @@ try {
         if (SELECTOR[v.key] && !(await page.locator(SELECTOR[v.key]).count())) bad(`missing ${SELECTOR[v.key]}`);
         for (const id of ALSO_EXPECT[v.key] ?? []) if (!text.toLowerCase().includes(copy(id).toLowerCase())) bad(`missing ${id}: "${copy(id)}"`); // lane 4
         if (ALSO_SELECTOR[v.key] && !(await page.locator(ALSO_SELECTOR[v.key]).count())) bad(`missing ${ALSO_SELECTOR[v.key]}`); // lane 4
+        // lane 2 (parts-reflect-feel): Reflect's line across parts, and its earlier line, above the blocks.
+        if (v.key === 'reflect/' && (await page.locator('[data-testid="parts-feel"] p').count()) !== 2) bad('no "how you\'ve met your parts" lines');
         if (NO_CHECKBACK.has(v.key) && text.includes(copy('close_checkback'))) bad('check-back question after a danger ending');
         if (v.surface === 'oa_goal') {
           const shows = (await page.locator('[data-testid="goal-line"]').count()) > 0;
@@ -166,6 +168,9 @@ try {
           if (shows === silent) bad(silent ? 'goal line shown where it must not be' : 'no goal line');
         }
         if (v.surface?.startsWith('unblend_') && v.branch !== 'blank' && !(await page.locator('[data-testid="unblend-line"]').count())) bad('no unblend line');
+        // Non-parts screens (lane 1: Wise mind) bring their own lines, read from the page's map.
+        if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) bad(`missing "${map.expect[v.key]}"`);
+        if (map.absent?.[v.key] && text.includes(map.absent[v.key])) bad(`shows "${map.absent[v.key]}"`);
       } else if (!text.includes('⟨')) bad('Show ids printed no ids');
     } else {
       await page.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => bad('no index'));
@@ -213,6 +218,7 @@ try {
     const want = EXPECT[v.key];
     if (want && !v.plain && !text.toLowerCase().includes(copy(want).toLowerCase())) tbad(`${v.name}: missing ${want}`);
     if (SELECTOR[v.key] && !v.plain && !(await tour.locator(SELECTOR[v.key]).count())) tbad(`${v.name}: missing ${SELECTOR[v.key]}`);
+    if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) tbad(`${v.name}: missing "${map.expect[v.key]}"`); // lane 1
   }
   await tour.close();
   await browser.close();

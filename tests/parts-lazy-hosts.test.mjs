@@ -115,7 +115,8 @@ test("the gates stay eager; card-only helpers are imported only by their card", 
   assert.match(read("src/contexts/TodayContext.tsx"), /from '\.\.\/lib\/trailOffer'/, "Today's gate helpers stay eager");
   assert.match(read("src/components/spine/PartTagSlot.tsx"), /if \(!tagRowGate\(\{ partsOn, toolId, thenVsNow, actedOnUrge, saved, content: parts \}\)\) return null;/);
   const insights = read("src/pages/Insights.tsx");
-  assert.match(insights, /\{data\.parts && data\.parts\.length > 0 && <PartsReflect /);
+  // partsFeel is null with parts off, like parts: the section's chunk still loads only with parts on.
+  assert.match(insights, /\{\(\(data\.parts && data\.parts\.length > 0\) \|\| data\.partsFeel\) && <PartsReflect /);
   assert.match(insights, /return partsOn \? <Suspense fallback=\{null\}><LazyTrailsReflect \{\.\.\.p\} \/><\/Suspense> : null;/, "rule D's block: fetched only with parts on");
   // Rollup keeps a module whole: a gate module that imported these would pull them back into the entry.
   const only = {

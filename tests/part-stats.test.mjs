@@ -124,10 +124,10 @@ test("ready: the section needs every line (title, stats, unnamed names, when opt
 test("Reflect: after its own sections, parts on, copy shipped; no hard-coded words, no other numbers", () => {
   const page = read("src/pages/Insights.tsx");
   assert.ok(page.indexOf("<PartsReflect") > page.indexOf("<ToolEffectiveness"), "after the existing sections");
-  assert.match(page, /\{data\.parts && data\.parts\.length > 0 && <PartsReflect parts=\{data\.parts\} delay=\{nextDelay\(\)\} \/>\}/);
+  assert.match(page, /\{\(\(data\.parts && data\.parts\.length > 0\) \|\| data\.partsFeel\) && <PartsReflect parts=\{data\.parts \?\? \[\]\} feel=\{data\.partsFeel \?\? null\} delay=\{nextDelay\(\)\} \/>\}/);
   const c = read("src/components/insights/PartsReflect.tsx");
   assert.match(c, /if \(!wanted \|\| !content \|\| !reflectPartsReady\(content\)\) return null;/);
-  assert.match(c, /const wanted = partsOn && parts\.length > 0;/);
+  assert.match(c, /const wanted = partsOn && \(parts\.length > 0 \|\| !!feel\);/);
   assert.match(c, /if \(!wanted \|\| content\) return;/, "the parts copy is fetched only for a section that may show");
   const jsx = c.slice(c.indexOf("return (\n    <section"));
   assert.deepEqual([...jsx.matchAll(/>([^<>{}()=;]*[A-Za-z0-9][^<>{}()=;]*)</g)].map((m) => m[1].trim()), [], "every word from the content");
@@ -145,10 +145,41 @@ test("Reflect: after its own sections, parts on, copy shipped; no hard-coded wor
 
 test("for Me later: the compute is exported, the handler stays pure", () => {
   const stats = read("functions/src/parts/stats.ts");
-  for (const name of ["partStats", "statsByPart", "partsReflect", "STATS_THRESHOLDS"]) assert.match(stats, new RegExp(`export (function|const) ${name}\\b`));
+  for (const name of ["partStats", "statsByPart", "partsReflect", "partsFeel", "feelAcross", "STATS_THRESHOLDS"]) assert.match(stats, new RegExp(`export (function|const) ${name}\\b`));
   assert.doesNotMatch(stats, /^import (?!type|\{ PART_WHENS|\{ NON_ANSWER \} from '\.\/keepPlan')/m, "pure: its types and keepPlan's NON_ANSWER only");
   const handler = read("functions/src/insights/handler.ts");
   assert.doesNotMatch(handler, /neo4j|readTx|statsQueries/, "the reads stay in the query layer");
   assert.match(handler, /deps\.parts\(\)/);
-  assert.match(read("functions/src/insights/queries.ts"), /return partsReflect\(await readTx\(\(tx\) => readStatsRows\(tx, userId\)\)\);/);
+  assert.match(read("functions/src/insights/queries.ts"), /const rows = await readTx\(\(tx\) => readStatsRows\(tx, userId\)\);\s+return \{ parts: partsReflect\(rows\), feel: partsFeel\(rows, new Date\(\)\) \};/);
+});
+
+test("Reflect across parts: two optional lines, lower-case feel labels, the earlier one only when it changed", () => {
+  const FEEL = [...lib.REFLECT_FEEL_REQUIRED.prompts];
+  assert.deepEqual(FEEL, ["stats_feel_lately", "stats_feel_earlier"]);
+  for (const id of FEEL) assert.deepEqual([fixture.prompts[id].flow, fixture.prompts[id].step], ["common", "stats"], id);
+  assert.equal(PARTS_SLOT_WIDTH.feel, Math.max(...fixture.options.meet.feel.map((o) => o.label.length)));
+  const ready = partsFromFixture(fixture, (id) => IDS.includes(id) || FEEL.includes(id) || id.startsWith("feel_"));
+  const fill = (id, feel) => fixture.prompts[id].copy.replace("{feel}", feel);
+  assert.deepEqual(lib.partsFeelLines({ now: "feel_curious", then: "feel_scared" }, ready),
+    [fill("stats_feel_lately", "curious"), fill("stats_feel_earlier", "scared of it")]);
+  assert.deepEqual(lib.partsFeelLines({ now: "feel_warm", then: null }, ready), [fill("stats_feel_lately", "warm toward it")]);
+  for (const none of [null, undefined]) assert.equal(lib.partsFeelLines(none, ready), null);
+  // optional: unsigned, no lines; and the section's own gate doesn't need them
+  for (const id of FEEL) assert.equal(lib.partsFeelLines({ now: "feel_curious", then: null }, partsFromFixture(fixture, (x) => x !== id && (IDS.includes(x) || FEEL.includes(x) || x.startsWith("feel_")))), null, id);
+  assert.equal(lib.reflectPartsReady(content), true, "the section shows without them");
+  assert.ok(!lib.REFLECT_REQUIRED.prompts.some((p) => FEEL.includes(p)));
+  // a label that no longer ships: no line (now), or just the lately line (then)
+  const noScared = partsFromFixture(fixture, (id) => IDS.includes(id) || FEEL.includes(id) || (id.startsWith("feel_") && id !== "feel_scared"));
+  assert.equal(lib.partsFeelLines({ now: "feel_scared", then: null }, noScared), null);
+  assert.deepEqual(lib.partsFeelLines({ now: "feel_curious", then: "feel_scared" }, noScared), [fill("stats_feel_lately", "curious")]);
+  // never a count, a score or a direction
+  for (const l of lib.partsFeelLines({ now: "feel_curious", then: "feel_scared" }, ready)) assert.doesNotMatch(l, /\d|better|worse|more curious|↑|↓/);
+});
+
+test("Reflect across parts: rendered above the blocks, only when worded; the section shows for it alone", async () => {
+  const c = read("src/components/insights/PartsReflect.tsx");
+  assert.match(c, /const across = partsFeelLines\(feel, content\);\s+const hasBlocks = blocks\.length > 0;\s+if \(!hasBlocks && !across\) return null;/);
+  assert.ok(c.indexOf("{across && (") > 0 && c.indexOf("{across && (") < c.indexOf("{hasBlocks && <ul"), "above the per-part blocks");
+  assert.match(read("src/services/neo4j.ts"), /partsFeel\?: PartsFeel \| null;/);
+  assert.match(read("functions/src/insights/types.ts"), /partsFeel: PartsFeel \| null;/);
 });

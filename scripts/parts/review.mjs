@@ -58,7 +58,7 @@ export { PART_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
 export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
-export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
+export { STATS_REQUIRED, REFLECT_REQUIRED, REFLECT_FEEL_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
@@ -143,7 +143,7 @@ export function surfaces(g) {
       groups: [{ label: null, ids: g.DEN_REQUIRED }],
     },
     {
-      id: 'wise_mind', title: 'Wise mind\'s step back',
+      id: 'wise_mind_parts', title: 'Wise mind\'s step back',
       where: 'Wise mind (Tools, Mindfulness), with parts on and at least one active or resting part: its second screen becomes the step back, with "Use the two minds instead" to switch. The den\'s room, small, the light in the middle (the person, never labelled). "Who\'s here about this?": the person\'s parts on a shelf (tender ones covered), "A part I haven\'t met" and "No one in particular"; a tap places a figure near the light. One hold asks everyone to take a step back and the figures move to the edge. After it, a tap on a figure: "It won\'t step back", "That\'s fine. It might need its own time." and "Meet it another time" (a kept part: Meet a part for it; the unmet one: queued in Me\'s "To come back to"). A placed part with a safety-line move or a danger fear shows the crisis resources under the room. On "Is this wise mind?", "Pushed, urgent" says "A part might still be close." Placing a part tags it to the visit.',
       groups: [{ label: null, ids: g.WISE_MIND_PARTS_REQUIRED }],
     },
@@ -163,7 +163,10 @@ export function surfaces(g) {
     {
       id: 'reflect', title: 'Reflect',
       where: 'Reflect, with parts on: a quiet block per part with a line past its threshold (what\'s helped it settle, how they\'ve felt toward it, when it shows up).',
-      groups: [{ label: null, ids: g.REFLECT_REQUIRED }],
+      groups: [
+        { label: null, ids: g.REFLECT_REQUIRED },
+        { label: 'Above the blocks, across all their parts: how they\'ve met them lately (each visit\'s first feel-toward answer, the last 30 days; at least 4, the most common at least 40%), and the earlier 30 days\' when it has changed (the section shows without these)', ids: g.REFLECT_FEEL_REQUIRED },
+      ],
     },
     {
       id: 'dearman', title: 'DEAR MAN',

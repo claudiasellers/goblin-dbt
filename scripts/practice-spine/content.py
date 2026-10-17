@@ -228,6 +228,11 @@ NEW_SKILLS = [
     ("problem_solve", "Solve the problem", "Moderate", "mind", "dbt_problem_solving",
      "When the facts are the problem, a small concrete step changes the situation that keeps the feeling going.",
      ["linehan_skills_2015"], ["problem-solve"]),
+    # Wise mind (docs/design/wise-mind.md): a practice started (Stone on the lake, Wise in mind out, Ask
+    # and listen) is the rep, through the tool's markPracticed.
+    ("wise_mind", "Wise mind", "Preliminary", "mind", "dbt_wise_mind",
+     "Hearing what feeling and thinking each say, then pausing to listen, leaves room for a choice that fits both.",
+     ["linehan_skills_2015"], ["wise-mind"]),
 ]
 
 SOURCES = [
