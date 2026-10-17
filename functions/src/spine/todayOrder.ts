@@ -34,7 +34,8 @@ export interface TodayItem {
   copy: { title: string; body?: string };
   source?: { toolId?: string; toolSessionId?: string; detailId?: string };
   /** A parts check-back's part (parts on only): its name and tenderness from the profile slice. */
-  part?: { id: string; name: string | null; tender: boolean };
+  /** `safety`: the part safety flag (functions/src/safety/partSafetyFlag.ts): CrisisBanner alongside the card. */
+  part?: { id: string; name: string | null; tender: boolean; safety?: boolean };
   /**
    * A parts trail offer (kind `trail_offer`, shapes A–C): the rule's signed-off statement and what fills
    * it, every phrase signed-off graph content (the moves' `trailPhrase`, the context's `phrase`). The card

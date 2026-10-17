@@ -45,7 +45,9 @@ test('dear-man reads parts (with shapeSig), kept lines (with text) and partAncho
   assert.deepEqual(out.slices.partAnchors, { p1: 'breathe first' });
   assert.deepEqual(out.slices.parts[0].shapeSig, [0.1, 0.2, 0.3, 0.4, 0.5]);
   assert.deepEqual(out.slices.savedLines, [{ lineId: 'wit_l1', text: 'That sounds hard.', confirmedAt: '2026-10-01T00:00:00Z' }]);
-  assert.ok(!f.calls.some((c) => /GUARDS|fearIds/.test(c.query)), 'no partDetail');
+  // The part safety seam reads fears inside its own boolean predicate; nothing else in the light slice does.
+  const seam = require('../../lib/safety/partSafetyFlag').partSafetyCypher('p');
+  assert.ok(!f.calls.some((c) => /GUARDS|fearIds/.test(c.query.replace(seam, ''))), 'no partDetail');
   // Parts off: the gated queries return nothing.
   setDriver(fakeDriver((q) => (/profileVersion/.test(q) ? [{ v: 5 }] : [])).driver);
   const off = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'dear-man' } });
@@ -217,10 +219,10 @@ test('getMe: a Part item carries its card (no own-words fear ever, no fears on a
   assert.deepEqual(items[0].part, {
     name: 'the one who hides', tender: false, places: ['chest', 'throat'], shapeSig: [0.1, 0.2, 0.3, 0.4, 0.5],
     jobIds: ['hide_job_out_of_sight'], ownJob: 'keep me safe', fearIds: ['fear_too_much'], preferredRoleIds: ['rather_tell_me'],
-    moveIds: ['appease', 'withdraw'], lastVisitedAt: '2026-10-10T00:00:00Z',
+    moveIds: ['appease', 'withdraw'], lastVisitedAt: '2026-10-10T00:00:00Z', safety: false,
   });
   assert.deepEqual(items[1].part, {
-    name: null, tender: true, places: [], shapeSig: null, jobIds: [], ownJob: null, fearIds: [], preferredRoleIds: [], moveIds: ['appease', 'withdraw'], lastVisitedAt: null,
+    name: null, tender: true, places: [], shapeSig: null, jobIds: [], ownJob: null, fearIds: [], preferredRoleIds: [], moveIds: ['appease', 'withdraw'], lastVisitedAt: null, safety: false,
   }, 'tender: no fears; absent fields are [] / null');
   assert.ok(!JSON.stringify(me).includes('vanish'), 'the own-words fear never leaves the server');
   const q = f.calls.find((c) => /HAS_PART\]/.test(c.query)).query;

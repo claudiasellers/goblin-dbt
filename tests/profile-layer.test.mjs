@@ -14,6 +14,7 @@ const meta = await importTs("functions/src/profile/meta.ts");
 const offers = await importTs("functions/src/profile/patternOffers.ts");
 const cache = await importTs("src/lib/profileCache.ts");
 const layers = await importTs("functions/src/userdata/layers.ts");
+const partSafety = await importTs("functions/src/safety/partSafetyFlag.ts");
 const toolIds = new Set([...readFileSync("src/data/tools.ts", "utf8").matchAll(/^\s{4}id: '([a-z-]+)',$/gm)].map((m) => m[1]));
 const walk = (d) => readdirSync(d).flatMap((f) => (statSync(join(d, f)).isDirectory() ? walk(join(d, f)) : [join(d, f)]));
 
@@ -78,8 +79,10 @@ test("parts slices: gated on partsEnabled, HAS_PART only, active / resting only,
   }
   assert.match(slices.SLICE_QUERIES.parts, /OPTIONAL MATCH \(p\)-\[:USES\]->\(m:ProtectiveMove\)/);
   assert.match(slices.SLICE_QUERIES.partDetail, /OPTIONAL MATCH \(p\)-\[:GUARDS\]->\(h:ProtectedHurt\)/);
-  // The light slice never carries what partDetail holds (jobs, fears, own words).
-  assert.doesNotMatch(slices.SLICE_QUERIES.parts, /jobIds|fearIds|ownJob|ownFear|ownVoice/);
+  // The light slice never carries what partDetail holds (jobs, fears, own words). The one read of fears is
+  // the part safety seam's own predicate, which returns a boolean (functions/src/safety/partSafetyFlag.ts).
+  assert.ok(slices.SLICE_QUERIES.parts.includes(`${partSafety.partSafetyCypher("p")} AS safety`), "the safety seam");
+  assert.doesNotMatch(slices.SLICE_QUERIES.parts.replace(partSafety.partSafetyCypher("p"), ""), /jobIds|fearIds|ownJob|ownFear|ownVoice/);
   // Anchors: own words first, else the kept line, read only through the caller's own edges; nothing else.
   const anchors = slices.SLICE_QUERIES.partAnchors;
   assert.match(anchors, /OPTIONAL MATCH \(u\)-\[:HAS_OWN_LINE\]->\(o:OwnLine \{status: 'active'\}\) WHERE o\.id = p\.anchorLineId/);
@@ -95,7 +98,7 @@ const fakeTx = (rows) => {
     ran,
     run: async (q) => {
       ran.push(q);
-      return { records: (rows(q) ?? []).map((r) => ({ get: (k) => r[k] })) };
+      return { records: (rows(q) ?? []).map((r) => ({ get: (k) => r[k], has: (k) => k in r })) };
     },
   };
 };
@@ -122,8 +125,8 @@ test("parts resolvers: absent arrays are [], absent strings null, ids sorted, re
   const { name: _name, ...out } = await read(tx);
   assert.deepEqual(out.parts.map(({ meta: m, ...rest }) => [rest, m.status, m.area, m.prompt]), [
     [{ id: "p1", name: "the one who hides", status: "resting", tender: true, moveIds: ["appease", "withdraw"], firstPlace: "chest", shapeSig: [0.2, 0.4, 0.6, 0.8, 1],
-       lastVisitedAt: "2026-09-02T00:00:00Z", pausedUntil: "2026-10-04T00:00:00Z" }, "resting", "my_parts", "ask"],
-    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null, shapeSig: null, lastVisitedAt: null, pausedUntil: null }, "active", "my_parts", "none"],
+       lastVisitedAt: "2026-09-02T00:00:00Z", pausedUntil: "2026-10-04T00:00:00Z", safety: false }, "resting", "my_parts", "ask"],
+    [{ id: "p2", name: null, status: "active", tender: false, moveIds: [], firstPlace: null, shapeSig: null, lastVisitedAt: null, pausedUntil: null, safety: false }, "active", "my_parts", "none"],
   ]);
   assert.deepEqual(out.partDetail, [
     { id: "p1", ageId: "age_teen", voiceIds: ["v_quiet"], ownVoice: "soft", jobIds: ["j_hide"], ownJob: "keep me safe", fearIds: ["f_too_much"],

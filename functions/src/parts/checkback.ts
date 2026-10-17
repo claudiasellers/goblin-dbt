@@ -237,7 +237,7 @@ export async function partCheckbackItems(tx: ManagedTransaction, uid: string, no
       resolveMode: 'inline', deepLink: null,
       choices: t.choices.map(({ id, label, status }) => ({ id, label, ...(status ? { status: status as 'done' } : {}) })),
       copy: t.copy, source: { toolId: 'meet-a-part' },
-      part: { id: part.id, name: part.name, tender: part.tender },
+      part: { id: part.id, name: part.name, tender: part.tender, safety: part.safety },
     });
   }
   return items;

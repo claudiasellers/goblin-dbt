@@ -173,7 +173,7 @@ test("getToday: the check-back card with the part's name from the 'today' slice;
   const out = await fns.getToday.run({ auth: auth(), data: {} });
   const all = [...out.items, ...out.more];
   assert.deepEqual(all.map((i) => [i.id, i.type, i.kind, i.state]), [[FID, 'part_checkback', 'follow_up', 'due']]);
-  assert.deepEqual(all[0].part, { id: PID, name: 'the watcher', tender: true });
+  assert.deepEqual(all[0].part, { id: PID, name: 'the watcher', tender: true, safety: false });
   assert.equal(out.nextInTab, null, 'no reminder of any kind');
   assert.match(f.calls.find((c) => /HAS_FOLLOW_UP\]->\(f:FollowUp \{status: 'scheduled'\}\)/.test(c.query)).query, /AND NOT t\.id IN \$owned/);
   assert.match(CB.CHECKBACK_ITEMS_QUERY, /WHERE coalesce\(u\.partsEnabled, false\)/);
@@ -184,7 +184,7 @@ test("getToday: the check-back card with the part's name from the 'today' slice;
 
   setDriver(todayDriver({ parts: [{ id: PID, name: null, tender: false }] }).driver);
   const unnamed = await fns.getToday.run({ auth: auth(), data: {} });
-  assert.deepEqual([...unnamed.items, ...unnamed.more][0].part, { id: PID, name: null, tender: false });
+  assert.deepEqual([...unnamed.items, ...unnamed.more][0].part, { id: PID, name: null, tender: false, safety: false });
 });
 
 test('deleteMyParts removes check-backs, open or answered (an answered one carries partId): the type the scheduler writes', () => {

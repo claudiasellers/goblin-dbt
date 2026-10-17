@@ -12,6 +12,10 @@
  * Visual changes (emoji, palette, SMS pre-fill) wait for the safety batch.
  *
  * Interim frontend copy (D-06). The safety batch's `safety.open` wraps this.
+ *
+ * `compact`: the same resources, quieter, for inside a card (a safety-line or danger part's card,
+ * check-back; functions/src/safety/partSafetyFlag.ts): no emoji or heading, the line and the two links.
+ * Still alongside the card's own content, never instead of it.
  */
 
 // Must work for someone who is flooded but not suicidal: every
@@ -19,7 +23,28 @@
 const CRISIS_BANNER_LINE =
   "When it gets this intense, you don't have to carry it alone. You can talk to someone right now, any time.";
 
-export function CrisisBanner() {
+export function CrisisBanner({ compact = false }: { compact?: boolean } = {}) {
+  if (compact) {
+    return (
+      <section
+        aria-label="Support right now"
+        data-testid="crisis-banner-compact"
+        className="p-3 rounded-xl bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]"
+      >
+        <p className="text-sm text-[var(--color-q-hu-text)] mb-2">{CRISIS_BANNER_LINE}</p>
+        <div className="flex flex-wrap gap-2">
+          <a href="tel:988"
+            className="inline-flex items-center min-h-11 py-2 px-3 rounded-lg bg-[var(--color-danger)] hover:opacity-90 text-[var(--color-on-danger)] text-sm font-medium transition-colors">
+            Call 988 (Suicide & Crisis Lifeline)
+          </a>
+          <a href="sms:741741?body=HELLO"
+            className="inline-flex items-center min-h-11 py-2 px-3 rounded-lg border border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)] text-sm font-medium transition-colors">
+            Text HOME to 741741
+          </a>
+        </div>
+      </section>
+    );
+  }
   return (
     <section
       aria-label="Support right now"

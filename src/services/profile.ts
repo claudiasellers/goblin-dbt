@@ -31,6 +31,8 @@ export interface MePart {
   preferredRoleIds: string[];
   moveIds: string[];
   lastVisitedAt: string | null;
+  /** The part safety flag (functions/src/safety/partSafetyFlag.ts): CrisisBanner alongside the card, never instead. */
+  safety?: boolean;
   /** Active and resting parts: the readout's counts and ids (functions/src/parts/stats.ts), each line null below its threshold. */
   stats?: PartStats;
 }
