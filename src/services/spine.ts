@@ -135,6 +135,21 @@ export interface TodayItem {
    * it, every phrase signed-off graph content. The card fills the template (src/lib/trailOffer.ts).
    */
   trail?: { ruleId: string; shape: 'A' | 'B' | 'C'; template: string; pulls: string[]; context: string | null };
+  /**
+   * Cope Ahead's after card (`cope_ahead_after`): the plan's ids from the visit's ext.ca (null when it
+   * stored none). The card composes the words with planLine (src/lib/copeAheadPlan.ts); never a stored string.
+   */
+  plan?: CopeAheadPlanIds | null;
+}
+/** functions/src/spine/copeAheadAfter.ts CopeAheadPlanIds. */
+export interface CopeAheadPlanIds {
+  situationId: string | null;
+  hardMomentId: string | null;
+  hardMomentOwn: string | null;
+  ifFrom: 'moment' | 'pull' | null;
+  pullIds: string[];
+  moveIds: string[];
+  moveOwn: string | null;
 }
 export interface GetTodayResponse {
   items: TodayItem[];
@@ -152,7 +167,7 @@ export interface ScheduleFollowUpInput {
 }
 
 const getTodayFn = httpsCallable<{ band?: string }, GetTodayResponse>(functions, 'getToday');
-const resolveFn = httpsCallable<{ id: string; choiceId?: string; status?: string }, { next: null | 'missing_links'; status: string | null }>(functions, 'resolveFollowUp');
+const resolveFn = httpsCallable<{ id: string; choiceId?: string; status?: string; planHelped?: PlanHelped }, { next: null | 'missing_links'; status: string | null }>(functions, 'resolveFollowUp');
 const snoozeFn = httpsCallable<{ id: string; until: string }, { ok: true }>(functions, 'snoozeFollowUp');
 const answerFn = httpsCallable<{ toolSessionId: string; thenVsNow?: ThenVsNow; actedOnUrge?: ActedOnUrge; dismissed?: boolean }, { ok: true; recorded: boolean }>(functions, 'answerToolOutcome');
 const scheduleFn = httpsCallable<{ items: ScheduleFollowUpInput[]; sourceSessionId?: string; sourceToolId?: string }, { ids: string[] }>(functions, 'scheduleFollowUp');
@@ -162,6 +177,15 @@ export async function getToday(band?: string): Promise<GetTodayResponse> {
 }
 export async function resolveFollowUp(id: string, choiceId: string): Promise<void> {
   await resolveFn({ id, choiceId });
+}
+/** Cope Ahead's after card, "Did your plan help?" (functions/src/spine/validation.ts PLAN_HELPED). */
+export type PlanHelped = 'helped' | 'unsure' | 'unused';
+/**
+ * Cope Ahead's after card: both answers in one resolve. `choiceId` is "How did it go?" (better /
+ * as_expected / harder); `planHelped` is null for Skip, or when the person left after the first question.
+ */
+export async function resolveCopeAheadAfter(id: string, choiceId: string, planHelped: PlanHelped | null): Promise<void> {
+  await resolveFn({ id, choiceId, ...(planHelped ? { planHelped } : {}) });
 }
 export async function dismissFollowUp(id: string): Promise<void> {
   await resolveFn({ id, status: 'dismissed' });

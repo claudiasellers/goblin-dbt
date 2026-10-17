@@ -125,8 +125,9 @@ test('reads: through the caller\'s own User and edges, active or resting parts, 
     assert.doesNotMatch(q, /\b(MERGE|CREATE|SET|DELETE)\b/, 'read-only');
   }
   assert.match(STATS_TAGS_QUERY, /\(u\)-\[:HAS_PART\]->\(pt\)/);
-  // helped (and when) count close tags only: a DEAR MAN debrief tag says the part was there, not that a tool helped
-  assert.match(STATS_TAGS_QUERY, /AND coalesce\(t\.source, 'close'\) = 'close'/);
+  // helped counts close and cope_ahead tags (when: close only, stats.ts): a DEAR MAN debrief tag says the part was there, not that a tool helped
+  assert.match(STATS_TAGS_QUERY, /AND coalesce\(t\.source, 'close'\) IN \['close', 'cope_ahead'\]/);
+  assert.match(STATS_TAGS_QUERY, /coalesce\(t\.source, 'close'\) AS source/);
   assert.match(STATS_TAGS_QUERY, /\(t\)-\[:TAGS\]->\(ts:ToolSession\)<-\[:HAS_TOOL_SESSION\]-\(u\)/, "the tagged session is the caller's");
   assert.match(STATS_SESSIONS_QUERY, /\(u\)-\[:HAS_PART\]->\(pt\)/);
   assert.match(STATS_SESSIONS_QUERY, /ps\.feelTowardIds\[0\] AS firstFeel/, 'the first answer only');
@@ -261,8 +262,8 @@ test('helped ignores debrief tags: the tags read filters them out before the com
     if (/pt\.shapeSig AS shapeSig/.test(q)) return [{ id: 'p1', name: 'The guard', status: 'active', firstPlace: null, shapeSig: null }];
     if (/AS stepId/.test(q)) return [];
     if (/HAS_PART_TAG/.test(q)) {
-      const closeOnly = /coalesce\(t\.source, 'close'\) = 'close'/.test(q);
-      return all.filter((r) => !closeOnly || r.source === 'close').map(({ source: _s, ...r }) => r);
+      const counted = /coalesce\(t\.source, 'close'\) IN \['close', 'cope_ahead'\]/.test(q);
+      return all.filter((r) => !counted || r.source === 'close' || r.source === 'cope_ahead');
     }
     return [];
   }).tx;
@@ -429,4 +430,23 @@ test('getInsightsData: partsFeel from the same read; null with parts off', async
   assert.deepEqual(out.partsFeel, { now: 'feel_curious', then: null });
   assert.equal(f.calls.filter((c) => /HAS_PART_SESSION/.test(c.query)).length, 1, 'one read for both');
   assert.ok(!JSON.stringify(out.partsFeel).includes('feel_open'), 'only the most common id leaves the server');
+});
+
+test('cope_ahead tags (Cope Ahead\'s "Used it, it helped") count with the close tags for helped, never for when', async () => {
+  const tags = [
+    { partId: 'p1', toolId: 'cope-ahead', at: at(21), source: 'cope_ahead' },
+    { partId: 'p1', toolId: 'cope-ahead', at: at(21, 30), source: 'cope_ahead' },
+    { partId: 'p1', toolId: 'pause', at: at(9), source: 'close' },
+  ];
+  const s = partStats(tags, [], null);
+  assert.deepEqual(s.helped, [{ toolId: 'cope-ahead', n: 2 }, { toolId: 'pause', n: 1 }]);
+  assert.equal(s.when, null, 'one close tag: when says nothing (the after card\'s time is not the moment)');
+  // The read keeps the source: a row without one is a close tag (older rows, the fake driver's).
+  const rec = (r) => ({ has: (k) => k in r, get: (k) => r[k] });
+  const part = { id: 'p1', name: null, status: 'active', firstPlace: null, shapeSig: null };
+  const tx = { run: async (q) => ({ records: /AS timeZone/.test(q) ? [rec({ partsOn: true, timeZone: null })]
+    : /pt\.shapeSig AS shapeSig/.test(q) ? [rec(part)]
+    : /HAS_PART_TAG/.test(q) && !/AS stepId/.test(q) ? tags.map((r) => rec(r.source === 'close' ? { partId: r.partId, toolId: r.toolId, at: r.at } : r)) : [] }) };
+  const rows = await readStatsRows(tx, 'u1');
+  assert.deepEqual(rows.tags.map((t) => t.source ?? 'close'), ['cope_ahead', 'cope_ahead', 'close']);
 });

@@ -3,6 +3,8 @@ import { todayCards, useToday, visibleOaPending } from '../../hooks/useToday';
 import { useOppositeActionFollowUpsContext } from '../../hooks/useOppositeActionFollowUps';
 import { OppositeActionFollowUpCard } from '../tools/oppositeAction/OppositeActionFollowUpCard';
 import { TodayCard } from './TodayCard';
+import { CopeAheadAfterCard } from './CopeAheadAfterCard';
+import { COPE_AHEAD_AFTER_TYPE } from '../../lib/copeAheadAfter';
 import { PatternOfferCard } from '../me/PatternOfferCard';
 import { PART_CHECKBACK_TYPE, TWO_PULLS_CHECKBACK_TYPE } from '../../lib/partCheckback';
 import { TRAIL_OFFER_KIND } from '../../lib/trailOffer';
@@ -37,7 +39,8 @@ const todayHeading = (): HTMLElement | null =>
  * (`useHideToday`), so it is never beside a result or the crisis banner. A flooded band collapses
  * it: "Your plans will keep", nothing hidden.
  *
- * Pattern offers (PR-P2) render as PatternOfferCard, parts trail offers as TrailOfferCard. `renderItem` lets other modules draw new kinds;
+ * Pattern offers (PR-P2) render as PatternOfferCard, parts trail offers as TrailOfferCard, Cope Ahead's
+ * after card as CopeAheadAfterCard. `renderItem` lets other modules draw new kinds;
  * unknown kinds are skipped. `compact` is the side panel's narrow column.
  */
 export function TodayStack({ renderItem, compact = false, className = '' }: {
@@ -76,6 +79,8 @@ export function TodayStack({ renderItem, compact = false, className = '' }: {
     if (item.type === PART_CHECKBACK_TYPE || item.type === TWO_PULLS_CHECKBACK_TYPE) return <PartCheckbackCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
     // Trail offers: the server sends at most one, never with a flooded band; TodayProvider keeps it only while the card can show.
     if (item.kind === TRAIL_OFFER_KIND) return <TrailOfferCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
+    // Cope Ahead's after card: two questions, one resolve (its words from cope-ahead.json, the plan from the visit's ids).
+    if (item.type === COPE_AHEAD_AFTER_TYPE) return <CopeAheadAfterCard key={item.id} item={item} onDone={done} compact={compact} />;
     if (item.kind === 'follow_up' || item.kind === 'tool_outcome') return <TodayCard key={item.id} item={item} onDone={done} compact={compact} />;
     if (item.kind === 'pattern_offer') {
       return (
