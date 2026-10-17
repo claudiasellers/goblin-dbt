@@ -58,6 +58,7 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   PartCandidate: { layer: 'log', rel: 'HAS_PART_CANDIDATE', exportAs: 'partCandidates' }, // written only on a yes
   PartTag: { layer: 'log', rel: 'HAS_PART_TAG', exportAs: 'partTags' }, // "Was this a part you know?": edges out of it only
   PartRevisit: { layer: 'log', rel: 'HAS_PART_REVISIT', exportAs: 'partRevisits' }, // a part's 30-day still-true answer; create only
+  PartMessage: { layer: 'log', rel: 'HAS_PART_MESSAGE', exportAs: 'partMessages' }, // "Say something to it": sayToPart, create only; edges out of it only
   TrailOffer: { layer: 'log', rel: 'HAS_TRAIL_OFFER', exportAs: 'trailOffers' }, // Phase 4: writeTrailOffer is its one writer; edges out of it only
   // ---- profile ----
   ProfileFact: { layer: 'profile', rel: 'HAS_PROFILE_FACT', exportAs: 'profileFacts' },

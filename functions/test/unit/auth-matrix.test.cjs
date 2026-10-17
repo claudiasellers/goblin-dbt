@@ -23,6 +23,7 @@ const AUTHED = [
   'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
   'tagPart',
+  'sayToPart', // a message to the caller's own part
   'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor', 'setPartShape',
   'getTrailOfferEvidence', 'answerTrailOffer', // the caller's own trail offer (Phase 4, built off)
   'getReflectTrails', 'answerKnownPartReview', 'removeTrailPattern', // Reflect: the caller's own rule D batch and plain patterns

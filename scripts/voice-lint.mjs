@@ -198,6 +198,9 @@ export const PARTS_SLOT_WIDTH = {
   // Steps that helped: one step's graph label (ActionUrge steps run long and wrap; the lint counts a
   // realistic one), and the joined list as the line holds it.
   step: 60, steps: 60,
+  // Say something to it (say_told / say_story): a chip's label at its longest ("You're safe with me now");
+  // the person's own words (≤ 140) can be longer and wrap.
+  said: 24,
 };
 
 /** Row kind → lint scope, length limit and the slots it may carry. */

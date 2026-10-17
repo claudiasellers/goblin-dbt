@@ -59,6 +59,12 @@ test("parts (docs/design/parts.md): PartSession and PartCandidate are log, Part 
   assert.match(readFileSync("schema/constraints.cypher", "utf8"),
     /^CREATE CONSTRAINT part_revisit_key IF NOT EXISTS FOR \(n:PartRevisit\) REQUIRE n\.key IS UNIQUE;$/m);
   assert.match(readFileSync("functions/src/parts/delete.ts", "utf8"), /PARTS_DESIGN_LABELS = \[[^\]]*'PartRevisit'/, "deleteMyParts covers PartRevisit");
+  // Say something to it: a log record, created once, deleted with the parts.
+  assert.deepEqual(USER_DATA.PartMessage, { layer: "log", rel: "HAS_PART_MESSAGE", exportAs: "partMessages" });
+  assert.equal(exportKeyFor(["PartMessage", "UserData", "LogRecord"]), "partMessages");
+  assert.match(readFileSync("schema/constraints.cypher", "utf8"),
+    /^CREATE CONSTRAINT part_message_key IF NOT EXISTS FOR \(n:PartMessage\) REQUIRE n\.key IS UNIQUE;$/m);
+  assert.match(readFileSync("functions/src/parts/delete.ts", "utf8"), /PARTS_DESIGN_LABELS = \[[^\]]*'PartMessage'/, "deleteMyParts covers PartMessage");
   assert.equal(exportKeyFor(["PartSession", "UserData", "LogRecord"]), "partSessions");
   assert.equal(exportKeyFor(["PartCandidate", "UserData", "LogRecord"]), "partCandidates");
   assert.equal(exportKeyFor(["Part", "UserData", "ProfileItem"]), "parts");

@@ -630,6 +630,18 @@ PROMPTS = [
     ("story_other", "story", "where", "another part"),
     ("story_room_then", "story", "where", "In {month}"),
     ("story_room_now", "story", "where", "Now"),
+    # Say something to it (17 Oct): on each active or resting part's card in Parts of me, and after Thanks
+    # in Meet a part when the visit is to a kept part. The prompt is the app's voice; the chips (OPTIONS,
+    # flow say) are the person's, said to the part. A tender part gets the gentle set (step say_tender).
+    # Own words (≤ 140) are never linted. {said} = a chip's label or their own words; {month} as above.
+    ("say_open", "say", "card", "Say something to it"),
+    ("say_prompt", "say", "ask", "What would you like to say to {name}?"),
+    ("say_prompt_noname", "say", "ask", "What would you like to say to this part?"),
+    ("say_own_label", "say", "ask", "Your words"),
+    ("say_send", "say", "ask", "Say it"),
+    ("say_cancel", "say", "ask", "Not now"),
+    ("say_told", "say", "card", "You told it: {said}"),
+    ("say_story", "say", "story", "In {month} you told it: {said}"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry
@@ -911,6 +923,19 @@ OPTIONS = [
     opt("blend_pulls_notice", "gate", "blend_pulls", "I can notice them"),
     opt("blend_pulls_running", "gate", "blend_pulls", "One of them is running things", branch="body_first"),
     opt("blend_pulls_not_sure", "gate", "blend_pulls", "Not sure"),
+
+    # --- Say something to it: the person's words to the part (sayToPart stores the id) ---
+    opt("say_thanks", "say", "say", "Thank you for trying"),
+    opt("say_got_this", "say", "say", "I've got this one"),
+    opt("say_rest", "say", "say", "You can rest now"),
+    opt("say_listening", "say", "say", "I'm listening"),
+    opt("say_see", "say", "say", "I see how hard you work"),
+    opt("say_own", "say", "say", "In my words", branch="own_words"),
+    # A tender part: the gentle set, nothing that asks it to change or step back.
+    opt("say_here", "say", "say_tender", "I'm here"),
+    opt("say_safe", "say", "say_tender", "You're safe with me now"),
+    opt("say_tender_listening", "say", "say_tender", "I'm listening"),
+    opt("say_tender_own", "say", "say_tender", "In my words", branch="own_words"),
 
     # --- Me: the 30-day check-back on a part's card (answers map to answerPartRevisit) ---
     opt("revisit_same", "me", "revisit", "Yes"),

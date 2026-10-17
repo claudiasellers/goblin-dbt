@@ -12,6 +12,8 @@ import type { ProfileAreaId, ProfileItemMeta } from './types';
 import { statsByPart } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
 import type { PartStats } from '../parts/statsTypes';
+import { LATEST_MESSAGES_QUERY } from '../parts/say';
+import type { PartMessageLine } from '../parts/sayTypes';
 import { partSafetyCypher } from '../safety/partSafetyFlag';
 
 export interface MeItem {
@@ -56,6 +58,8 @@ export interface MePart {
    * untouched (each line null below its threshold). Absent on a set-aside part.
    */
   stats?: PartStats;
+  /** Active and resting parts only: the latest thing the person said to it (sayToPart), for "You told it: …". */
+  told?: PartMessageLine;
 }
 /** A part the person said they'd come back to (an open PartCandidate, a log record read for display). */
 export interface MePartCandidate {
@@ -161,6 +165,16 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     { uid }) : null;
   // The parts' readout (what's helped, how they've felt toward it, when): one read for all parts.
   const stats = partsOn ? statsByPart(await readStatsRows(tx, uid)) : new Map<string, PartStats>();
+  // The latest message to each part (log records, read here for display, never by a slice resolver).
+  const told = new Map<string, PartMessageLine>();
+  if (partsOn) {
+    for (const r of (await tx.run(LATEST_MESSAGES_QUERY, { uid })).records) {
+      const chipId = strOrNull(r.get('chipId'));
+      const own = strOrNull(r.get('own'));
+      const at = strOrNull(r.get('at'));
+      if (at && (chipId || own)) told.set(String(r.get('partId')), { chipId, own, at });
+    }
+  }
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
   for (const r of itemsRes.records) {
@@ -180,6 +194,8 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     const part = r.get('label') === 'Part' ? mePart(p, r.get('moveIds'), r.has('safety') ? r.get('safety') : false) : undefined;
     const partStats = part && (meta.status === 'active' || meta.status === 'resting') ? stats.get(meta.id) : undefined;
     if (part && partStats) part.stats = partStats;
+    const toldIt = part && (meta.status === 'active' || meta.status === 'resting') ? told.get(meta.id) : undefined;
+    if (part && toldIt) part.told = toldIt;
     const item: MeItem = {
       label: r.get('label'), meta, title: (r.get('title') as string | null) ?? meta.kind, summary,
       editor: meta.kind === 'quiet_hours' ? 'quiet_hours' : null,

@@ -223,6 +223,30 @@ export interface TagPartRequest {
 /** The tag for that session and source: this one, or the first one if it was already tagged. */
 export interface TagPartResponse { id: string; created: boolean }
 
+// --- "Say something to it": mirror of functions/src/parts/sayTypes.ts (tests/parts-entry.test.mjs) ---
+/** Own words: at most this many characters, kept as written (never linted). */
+export const SAY_OWN_MAX = 140;
+
+/** One message: a chip from the parts content (flow `say`), or their own words. Exactly one of the two. */
+export interface SayToPartRequest {
+  /** A new client UUID for the message. */
+  id: string;
+  /** The caller's kept part (active or resting). */
+  partId: string;
+  chipId?: string | null;
+  own?: string | null;
+}
+/** The message: this one, or the same id already said (nothing written again). */
+export interface SayToPartResponse { id: string; created: boolean }
+
+/** The latest thing said to a part, as its card and its story show it. */
+export interface PartMessageLine {
+  chipId: string | null;
+  own: string | null;
+  /** ISO time it was said. */
+  at: string;
+}
+
 // --- The next-day check-back: mirror of functions/src/parts/checkbackTypes.ts (tests/parts-entry.test.mjs) ---
 
 /** The FollowUpType id (scripts/practice-spine/content.py). */

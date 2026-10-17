@@ -1338,6 +1338,62 @@
    "order": 13,
    "copy": "Now",
    "reviewStatus": "draft"
+  },
+  "say_open": {
+   "flow": "say",
+   "step": "card",
+   "order": 0,
+   "copy": "Say something to it",
+   "reviewStatus": "draft"
+  },
+  "say_prompt": {
+   "flow": "say",
+   "step": "ask",
+   "order": 1,
+   "copy": "What would you like to say to {name}?",
+   "reviewStatus": "draft"
+  },
+  "say_prompt_noname": {
+   "flow": "say",
+   "step": "ask",
+   "order": 2,
+   "copy": "What would you like to say to this part?",
+   "reviewStatus": "draft"
+  },
+  "say_own_label": {
+   "flow": "say",
+   "step": "ask",
+   "order": 3,
+   "copy": "Your words",
+   "reviewStatus": "draft"
+  },
+  "say_send": {
+   "flow": "say",
+   "step": "ask",
+   "order": 4,
+   "copy": "Say it",
+   "reviewStatus": "draft"
+  },
+  "say_cancel": {
+   "flow": "say",
+   "step": "ask",
+   "order": 5,
+   "copy": "Not now",
+   "reviewStatus": "draft"
+  },
+  "say_told": {
+   "flow": "say",
+   "step": "card",
+   "order": 6,
+   "copy": "You told it: {said}",
+   "reviewStatus": "draft"
+  },
+  "say_story": {
+   "flow": "say",
+   "step": "story",
+   "order": 7,
+   "copy": "In {month} you told it: {said}",
+   "reviewStatus": "draft"
   }
  },
  "options": {
@@ -4191,6 +4247,132 @@
      "selfLike": null,
      "branch": "continue",
      "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "say": {
+   "say": [
+    {
+     "id": "say_thanks",
+     "label": "Thank you for trying",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_got_this",
+     "label": "I've got this one",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_rest",
+     "label": "You can rest now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_listening",
+     "label": "I'm listening",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_see",
+     "label": "I see how hard you work",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "say_tender": [
+    {
+     "id": "say_here",
+     "label": "I'm here",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_safe",
+     "label": "You're safe with me now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_tender_listening",
+     "label": "I'm listening",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "say_tender_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 3,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
