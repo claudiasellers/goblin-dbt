@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useState, type ComponentProps } from 'react';
 import { getToolById } from '../../data/tools';
 import type { ProfileAreaId } from '../../data/profileTypes';
 import {
@@ -10,12 +10,15 @@ import { fillToolName } from '../../lib/spine/todayCard';
 import { StillTrue } from './StillTrue';
 import { QuietHoursEditor } from './QuietHoursEditor';
 import { PatternOfferCard } from './PatternOfferCard';
-import { PartsOfMe } from './PartsOfMe';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
 import { answerPartCandidate } from '../../services/parts';
 import { dismissCandidateRequest, partsOfMeCopy } from '../../lib/partsOfMe';
 import type { PartsContent } from '../../data/partsContentTypes';
+
+// Parts of me is fetched only with parts on and its copy signed off, so nobody else downloads it.
+const LazyPartsOfMe = lazy(() => import('./PartsOfMe').then((m) => ({ default: m.PartsOfMe })));
+function PartsOfMe(p: ComponentProps<typeof LazyPartsOfMe>) { return <Suspense fallback={null}><LazyPartsOfMe {...p} /></Suspense>; }
 
 /** Areas shown in Phase A (plan §5.4). My people / My plans / My progress appear when their owners register kinds. */
 const PHASE_A_AREAS: ProfileAreaId[] = ['about_me', 'my_body', 'my_words', 'my_patterns'];
