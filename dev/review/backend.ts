@@ -47,6 +47,8 @@ export function logEvent(name: string, data: unknown) { push({ name, data: redac
 /** What a callable answers in this surface (replaces any earlier answer for that name). */
 export function answer(name: string, h: Handler) { handlers.set(name, h); }
 export function answers(map: Record<string, Handler>) { for (const [k, h] of Object.entries(map)) handlers.set(k, h); }
+/** Before another screen (the page swaps screens without reloading): no answer carries over. */
+export function resetAnswers() { handlers.clear(); }
 
 /** The stubbed httpsCallable's body. A handler that throws is a failed call (the component's own error path). */
 export async function callStub(name: string, data: unknown): Promise<unknown> {

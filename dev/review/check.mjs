@@ -3,7 +3,8 @@
  * The parts review page's check (not part of npm test): serves the built dev-dist/ as plain files, opens
  * every surface and branch of dev/parts-review.html at 390×844 in Chromium, screenshots each, and fails
  * on any console error, page error, failed or non-font network request, a branch the driver couldn't
- * reach, or a screen without the line it is there to show.
+ * reach, or a screen without the line it is there to show. Then it walks every screen again in one page by
+ * the hash (#s=…&b=…), as an Artifact frame navigates: never a reload, always back at the top.
  *   npx vite build --config dev/vite.harness.config.ts
  *   node dev/review/check.mjs [shots dir]   (default /home/claude/lanes/briefs/review-shots)
  * Uses the preinstalled Playwright (PLAYWRIGHT_MODULE, else `playwright`, else /opt/node-tools) and its
@@ -47,7 +48,7 @@ const EXPECT = {
   'meet/stop_own': 'meet_stop_title', 'meet/danger': 'meet_thank', 'meet/nothing': 'meet_nothing', 'meet/worried': 'meet_unblend',
   'meet/worried_end': 'meet_unblend_end', 'meet/too_many': 'aftercare_too_many', 'meet/paused': 'paused_heads_up', 'meet/keep': 'meet_keep',
   'meet/close': 'close_checkback', 'meet/danger_close': 'meet_done',
-  'checkback/louder': 'aftercare_louder', 'tag/row': 'tag_question', 'tag/new': 'tag_new_later', 'me/': 'card_where', 'reflect/': 'reflect_title',
+  'checkback/louder': 'aftercare_louder', 'tag/row': 'tag_question', 'tag/new': 'tag_new_later', 'me/cards': 'card_where', 'me/long': 'card_where', 'reflect/': 'reflect_title',
   'settings/on': 'settings_dissociation', 'settings/confirm': 'settings_delete_confirm', 'settings/failed': 'settings_delete_failed',
   'settings/done': 'settings_delete_done', 'cope/pick': 'cope_title', 'cope/anchor': 'cope_change', 'cope/new': 'cope_save',
   'cope/failed': 'cope_save_failed', 'debrief/named': 'debrief_who_named', 'debrief/general': 'debrief_who',
@@ -70,17 +71,17 @@ const NO_CHECKBACK = new Set(['meet/danger_close']);
 
 /** Every surface and branch, angry's in both wordings, and a few with Show ids. */
 function plan(map) {
-  const visits = [{ name: 'index', query: '' }, { name: 'index--ids', query: '?ids=1' }];
+  const visits = [{ name: 'index', query: '' }, { name: 'index--ids', query: '#ids=1' }];
   for (const s of map) {
     for (const b of s.branches.length ? s.branches : ['']) {
-      const q = `?s=${s.id}${b ? `&b=${b}` : ''}`;
+      const q = `#s=${s.id}${b ? `&b=${b}` : ''}`;
       const v = { name: `${s.id}${b ? `--${b}` : ''}`, query: q, key: `${s.id}/${b}`, surface: s.id, branch: b };
       visits.push(v);
       if (s.id === 'angry') visits.push({ ...v, name: `${v.name}--plain`, query: `${q}&plain=1`, plain: true });
     }
   }
-  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask'], ['offer', 'evidence'], ['review', 'blocks'], ['patterns', 'list']]) {
-    visits.push({ name: `${surface}${branch ? `--${branch}` : ''}--ids`, query: `?s=${surface}${branch ? `&b=${branch}` : ''}&ids=1`, ids: true, surface, branch });
+  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', 'cards'], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask'], ['offer', 'evidence'], ['review', 'blocks'], ['patterns', 'list']]) {
+    visits.push({ name: `${surface}${branch ? `--${branch}` : ''}--ids`, query: `#s=${surface}${branch ? `&b=${branch}` : ''}&ids=1`, ids: true, surface, branch });
   }
   return visits;
 }
@@ -158,6 +159,46 @@ try {
     await page.screenshot({ path: join(SHOTS, `${v.name}.png`), fullPage: true });
     await page.close();
   }
+
+  // In-frame navigation, as an Artifact frame does it: one page, never reloaded, every screen reached by
+  // the hash (real link clicks first, then every branch in turn). A screen that leaks state from the one
+  // before (answers, events, the tag row's memory, storage) shows up here and not in the fresh loads above.
+  const tour = await context.newPage();
+  const tbad = (msg) => problems.push(`in-page: ${msg}`);
+  tour.on('pageerror', (e) => tbad(`page error: ${e.message}`));
+  tour.on('console', (m) => { if (m.type() === 'error' && !isFont(m.location()?.url ?? '') && !/fonts\.(googleapis|gstatic)/.test(m.text())) tbad(`console error: ${m.text()} (${m.location()?.url ?? ''})`); });
+  tour.on('requestfailed', (r) => { if (!isFont(r.url())) tbad(`request failed: ${r.url()}`); });
+  await tour.goto(base, { waitUntil: 'load' });
+  await tour.evaluate(() => { window.__noReload = true; });
+  const reached = async (label) => {
+    await tour.waitForFunction(() => {
+      const d = document.querySelector('[data-testid="surface"]')?.getAttribute('data-driven') ?? '';
+      return d === 'done' || d.startsWith('failed');
+    }, null, { timeout: 45000 }).catch(() => tbad(`${label}: timed out`));
+    const driven = await tour.getAttribute('[data-testid="surface"]', 'data-driven').catch(() => null);
+    if (driven !== 'done') tbad(`${label}: branch not reached: ${driven}`);
+    if (!(await tour.evaluate(() => window.__noReload === true))) tbad(`${label}: the page reloaded`);
+  };
+  await tour.click('[data-surface="meet"]');
+  await reached('link to meet');
+  if (!(await tour.evaluate(() => location.hash)).startsWith('#s=meet')) tbad('the surface link is not a hash link');
+  await tour.click('[data-branch="keep"]');
+  await reached('link to meet/keep');
+  await tour.click('text=← All surfaces');
+  await tour.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => tbad('back to the index'));
+  if ((await tour.evaluate(() => location.hash)) !== '') tbad('the index link is not #');
+  for (const v of visits.filter((x) => x.surface && !x.ids)) {
+    await tour.evaluate((h) => { window.scrollTo(0, 400); location.hash = h; }, v.query);
+    await tour.waitForFunction((h) => location.hash === h, v.query);
+    await reached(v.name);
+    await tour.waitForTimeout(500);
+    if ((await tour.evaluate(() => window.scrollY)) !== 0) tbad(`${v.name}: not scrolled to the top`);
+    const text = await tour.locator('[data-testid="surface"]').innerText().catch(() => '');
+    const want = EXPECT[v.key];
+    if (want && !v.plain && !text.toLowerCase().includes(copy(want).toLowerCase())) tbad(`${v.name}: missing ${want}`);
+    if (SELECTOR[v.key] && !v.plain && !(await tour.locator(SELECTOR[v.key]).count())) tbad(`${v.name}: missing ${SELECTOR[v.key]}`);
+  }
+  await tour.close();
   await browser.close();
 } finally {
   server.kill();
