@@ -7,6 +7,8 @@ import { entryGate, resolveEntryPolicy, type PartsEntryPolicy } from './gate';
 import type { PartsEntry } from './types';
 
 export interface PartsEntryDeps {
+  /** The caller's parts setting. Off: the gate reads nothing and answers clear. */
+  partsOn(): Promise<boolean>;
   /** PartsPolicy's numbers and Recover's downshiftAt, raw (null when the nodes are missing). */
   policy(): Promise<Partial<Record<keyof PartsEntryPolicy, unknown>> | null>;
   /** The caller's check-ins and Recover sessions in the last `hours`. */
@@ -24,7 +26,12 @@ export interface PartsEntryInput {
   partId: string | null;
 }
 
+/** What the gate answers with parts off: nothing to say, and nothing read. */
+export const PARTS_OFF_ENTRY: PartsEntry = { open: 'clear', reasons: [] };
+
 export async function getPartsEntryHandler(deps: PartsEntryDeps, input: PartsEntryInput = { partId: null }): Promise<PartsEntry> {
+  // Parts off: no parts flow can open, so none of the caller's records is read (not an error: nothing).
+  if (!(await deps.partsOn())) return { ...PARTS_OFF_ENTRY, reasons: [] };
   const policy = resolveEntryPolicy(await deps.policy());
   const [recent, dissociationCount, made, paused] = await Promise.all([
     deps.recent(policy.floodGateHours, policy.recoverDownshiftAt),

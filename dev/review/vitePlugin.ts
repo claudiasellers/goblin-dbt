@@ -7,7 +7,7 @@
  * - `virtual:review-pack`: the sign-off pack's surface list (scripts/parts/review.mjs, from the gates' own
  *   `*_REQUIRED` constants), so the index lists every surface the pack does and can't miss one;
  * - `virtual:review-host-copy`: the host copy the mocks sit in, read from the schema files that load it
- *   (Do the Opposite's flow JSON, Problem Solve's ambivalence options), never retyped.
+ *   (Do the Opposite's flow JSON and urge labels, Problem Solve's ambivalence options), never retyped.
  * Harness builds only: the app's own vite.config.ts never sees any of this.
  */
 import { readFileSync } from 'node:fs';
@@ -28,6 +28,12 @@ function ambivalenceOptions(): { id: string; label: string; follow: string }[] {
   const re = new RegExp(`MERGE \\(a:AmbivalenceOption \\{id: ${str}\\}\\)\\s*SET a\\.label = ${str},\\s*a\\.therapeuticFollow = ${str}`, 'g');
   const un = (t: string) => t.replace(/\\(.)/g, '$1');
   return [...cy.matchAll(re)].map((m) => ({ id: m[1], label: un(m[2]), follow: un(m[3]) }));
+}
+
+/** Do the Opposite's ActionUrge labels by id (schema/opposite-action-data.cypher), for evidence rows. */
+function actionUrges(): Record<string, string> {
+  const cy = readFileSync(resolve(ROOT, 'schema/opposite-action-data.cypher'), 'utf8');
+  return Object.fromEntries([...cy.matchAll(/\{id: "([a-z-]+)", label: "([^"]+)"/g)].map((m) => [m[1], m[2]]));
 }
 
 /** Do the Opposite's flow content (copy and choices) as schema/opposite-action-flow.cypher loads it. */
@@ -55,7 +61,7 @@ export function reviewPartsContent(): Plugin {
       }
       if (id === HOST) {
         const oa = oaFlow();
-        return `export default ${JSON.stringify({ oa: { copy: { effectiveness: oa.copy.effectiveness }, choices: { goal: oa.choices.goal, effectiveness: oa.choices.effectiveness } }, ambivalence: ambivalenceOptions() })};`;
+        return `export default ${JSON.stringify({ oa: { copy: { effectiveness: oa.copy.effectiveness }, choices: { goal: oa.choices.goal, effectiveness: oa.choices.effectiveness } }, ambivalence: ambivalenceOptions(), actionUrges: actionUrges() })};`;
       }
       if (id !== VIRTUAL) return null;
       const fixture = JSON.parse(readFileSync(resolve(ROOT, 'tests/fixtures/parts-content.json'), 'utf8'));

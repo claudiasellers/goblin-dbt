@@ -33,3 +33,15 @@ export function toHttpsError(error: unknown, o: { message: string; label: string
   console.error(o.label, typeof code === 'string' ? code : 'unknown');
   return new HttpsError('internal', o.message);
 }
+
+/**
+ * What may be logged about a caught error: its code and name, never the error itself (a driver
+ * error's message can quote a parameter value, and so carry something personal).
+ */
+export function errorTag(error: unknown): { code: string; name: string } {
+  const e = (error ?? null) as { code?: unknown; name?: unknown } | null;
+  return {
+    code: typeof e?.code === 'string' || typeof e?.code === 'number' ? String(e.code) : 'unknown',
+    name: typeof e?.name === 'string' ? e.name : 'unknown',
+  };
+}

@@ -8,6 +8,8 @@ declare module 'virtual:review-host-copy' {
   const host: {
     oa: { copy: { effectiveness: string }; choices: { goal: { id: string; label: string }[]; effectiveness: { id: string; label: string }[] } };
     ambivalence: { id: string; label: string; follow: string }[];
+    /** ActionUrge id → label. */
+    actionUrges: Record<string, string>;
   };
   export default host;
 }

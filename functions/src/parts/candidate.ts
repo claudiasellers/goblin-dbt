@@ -9,12 +9,15 @@
  * feeling's and Recover's pull, DEAR MAN's debrief and barrier ids, Problem Solve's barrier) give the
  * moves through approved EXPRESSES edges, read in the same state query; the union with the client's
  * ids is capped at 4. The candidate links to it with FROM_SESSION, an edge out
- * of the new record (incoming to the finalised ToolSession, never out of it).
+ * of the new record (incoming to the finalised ToolSession, never out of it). `QUEUED` comes out of the
+ * Meet a part session, so only while that session takes writes (GUARDS.PartSession.keep). A candidate id
+ * the caller already used is a repeat: it writes nothing (an answered candidate takes no new edge).
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
 import { GRAPH_ID, ValidationError, obj, oneOf, uuid } from '../shared/validate';
 import { toNumber } from '../shared/values';
+import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import { partsOff } from './keep';
 import { sessionSourceMatch } from './sessionMoves';
@@ -46,24 +49,26 @@ export const CANDIDATE_STATE_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
   OPTIONAL MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $sessionKey})
   OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $toolSessionKey})
+  OPTIONAL MATCH (same:PartCandidate {key: $key})
   OPTIONAL MATCH (m:ProtectiveMove) WHERE m.id IN $moveIds
-  WITH u, ps, ts, count(DISTINCT m) AS knownMoves
+  WITH u, ps, ts, same, count(DISTINCT m) AS knownMoves
   OPTIONAL MATCH (ts)-[:DETAIL]->(d) WHERE d.ownerId = $uid
   OPTIONAL MATCH (src)-[x:EXPRESSES]->(dm:ProtectiveMove)
     WHERE ts IS NOT NULL AND x.reviewStatus = 'approved'
       AND (${sessionSourceMatch('src', 'ts', 'd')})
-  RETURN coalesce(u.partsEnabled, false) AS partsOn, ps IS NOT NULL AS sessionFound, knownMoves,
+  RETURN coalesce(u.partsEnabled, false) AS partsOn, same IS NOT NULL AS idTaken, ps IS NOT NULL AS sessionFound, knownMoves,
          ts IS NOT NULL AS toolSessionFound, ts.status AS toolSessionStatus, collect(DISTINCT dm.id) AS derivedMoves
 `;
 
 export const CANDIDATE_QUERY = `
   ${MERGE_USER}
+  WITH u WHERE NOT EXISTS { MATCH (:PartCandidate {key: $key}) }
   MERGE (c:PartCandidate {key: $key})
   ON CREATE SET c:UserData:LogRecord, c.id = $id, c.ownerId = $uid, c.createdAt = datetime(), c.schemaVersion = 1,
     c.origin = $origin, c.moveIds = $moveIds, c.status = 'open'
   MERGE (u)-[:HAS_PART_CANDIDATE]->(c)
   WITH u, c
-  OPTIONAL MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $sessionKey})
+  OPTIONAL MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $sessionKey}) WHERE ${GUARDS.PartSession.keep('ps')}
   FOREACH (x IN CASE WHEN ps IS NULL THEN [] ELSE [ps] END | MERGE (x)-[:QUEUED]->(c))
   WITH u, c
   OPTIONAL MATCH (u)-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $toolSessionKey})
@@ -73,6 +78,8 @@ export const CANDIDATE_QUERY = `
 
 export interface CandidateState {
   partsOn: boolean;
+  /** A candidate with this id is already the caller's: a repeat, answered without a write. */
+  idTaken?: boolean;
   sessionFound: boolean;
   knownMoves: number;
   /** Only read when the input names a toolSessionId (absent in an older fake: not found). */
@@ -95,6 +102,7 @@ export function candidateMoves(client: readonly string[], derived: readonly stri
 export async function queuePartCandidateHandler(c: CandidateInput, deps: CandidateDeps): Promise<QueuePartCandidateResponse> {
   const st = await deps.state(c);
   if (!st.partsOn) throw partsOff();
+  if (st.idTaken) return { id: c.id };
   if (st.knownMoves !== c.moveIds.length) throw new HttpsError('invalid-argument', 'Unknown move');
   if (c.sessionId && !st.sessionFound) throw new HttpsError('not-found', 'Session not found');
   if (c.toolSessionId) {
@@ -118,6 +126,7 @@ export function candidateDeps(tx: ManagedTransaction, uid: string, email: string
       const r = (await tx.run(CANDIDATE_STATE_QUERY, params(c))).records[0];
       return {
         partsOn: r?.get('partsOn') === true,
+        idTaken: r?.get('idTaken') === true,
         sessionFound: r?.get('sessionFound') === true,
         knownMoves: toNumber(r?.get('knownMoves')) ?? 0,
         // Read only when asked about a tool session.

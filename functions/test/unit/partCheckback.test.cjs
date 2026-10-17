@@ -74,7 +74,9 @@ test('schedulePartCheckback over the fake driver: the spine scheduler, then link
   assert.deepEqual([sched.params.items[0].type, sched.params.sourceToolId], ['part_checkback', 'meet-a-part']);
   const link = f.calls.find((c) => c.query === CB.LINK_CHECKBACK_QUERY);
   assert.deepEqual([link.params.followUpKey, link.params.partKey, link.params.sessionKey], [`u9:${FID}`, `u9:${PID}`, `u9:${SID}`]);
-  assert.match(CB.LINK_CHECKBACK_QUERY, /MERGE \(f\)-\[:CHECKS_BACK\]->\(pt\)\s+MERGE \(ps\)-\[:SCHEDULED\]->\(f\)/);
+  assert.match(CB.LINK_CHECKBACK_QUERY, /MERGE \(f\)-\[:CHECKS_BACK\]->\(pt\)/);
+  // SCHEDULED comes out of the visit's PartSession, so only while it takes writes (its keep window).
+  assert.match(CB.LINK_CHECKBACK_QUERY, /OPTIONAL MATCH \(u\)-\[:HAS_PART_SESSION\]->\(ps:PartSession \{key: \$sessionKey\}\) WHERE \(ps\.status = 'open' OR \(ps\.status = 'saved' AND ps\.savedAt > datetime\(\) - duration\(\{hours: 12\}\)\)\)\s+FOREACH \(x IN CASE WHEN ps IS NULL THEN \[\] ELSE \[ps\] END \| MERGE \(x\)-\[:SCHEDULED\]->\(f\)\)/);
   assert.equal(f.sessions.length, 1, 'one transaction');
 });
 
@@ -141,7 +143,7 @@ test('answerPartCheckback over the fake driver: one transaction, the spine guard
 });
 
 test('resolveFollowUp refuses a check-back: its answer can pause a part, so only parts answers it', async () => {
-  setDriver(fakeDriver((q) => (/AS open/.test(q) ? [{ type: 'part_checkback', status: 'scheduled', open: true, content: '{}' }] : [])).driver);
+  setDriver(fakeDriver((q) => (/AS open/.test(q) ? [{ type: 'part_checkback', status: 'scheduled', open: true, content: '{}', partsOn: true }] : [])).driver);
   await assert.rejects(fns.resolveFollowUp.run({ auth: auth(), data: { id: FID, status: 'done' } }), code('failed-precondition'));
 });
 
@@ -185,8 +187,9 @@ test("getToday: the check-back card with the part's name from the 'today' slice;
   assert.deepEqual([...unnamed.items, ...unnamed.more][0].part, { id: PID, name: null, tender: false, safety: false });
 });
 
-test('deleteMyParts removes open check-backs: the type the scheduler writes, only while scheduled', () => {
+test('deleteMyParts removes check-backs, open or answered (an answered one carries partId): the type the scheduler writes', () => {
   assert.ok(PARTS_FOLLOW_UP_TYPES.includes(PART_CHECKBACK_TYPE));
-  assert.match(DELETE_FOLLOW_UPS, /WHERE f\.type IN \$types AND f\.status = 'scheduled'/);
+  assert.match(DELETE_FOLLOW_UPS, /WHERE f\.type IN \$types\s+WITH collect/);
+  assert.doesNotMatch(DELETE_FOLLOW_UPS, /status/);
   assert.equal(CB.validateScheduleCheckback({ id: FID, sessionId: SID, dueAt: inH(20) }, new Date()).item.type, PARTS_FOLLOW_UP_TYPES[0]);
 });
