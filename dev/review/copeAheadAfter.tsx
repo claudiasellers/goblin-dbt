@@ -16,10 +16,12 @@ import spine from '../../src/data/content/spine.json';
 import { answers, logEvent } from './backend';
 import { PART_IDS } from './data';
 import type { Branch, Surface } from './surfaces';
+import { COPE_AHEAD_PACK } from './copeAheadClosing'; // lane 3's Cope Ahead pack entry
 
 const CONTENT = (ca as unknown as { content: CopeAheadContent }).content;
 const TYPE = (spine as unknown as { content: { followUpTypes: Array<{ id: string; choices: TodayItem['choices']; copy: TodayItem['copy'] }> } })
   .content.followUpTypes.find((t) => t.id === 'cope_ahead_after');
+/** Harness chrome. Uppercase by CSS, so check.mjs (innerText) never matches on it: branch lines aren't in it. */
 const mockNote = 'text-[11px] uppercase tracking-wide text-[var(--color-text-tertiary)]';
 const TOOL_SESSION = '00000000-0000-4000-8000-000000000a01';
 /** The invented person's own words for the hard moment (the If's own-words slot). */
@@ -66,16 +68,14 @@ function Host({ branch }: { branch: string }) {
     <section className="space-y-2">
       <p className={mockNote}>Today, after the time the person picked on Cope Ahead’s first screen</p>
       {gone
-        ? <p ref={next} tabIndex={-1} className={`${mockNote} focus:outline-none`}>The card leaves Today.</p>
+        ? <p ref={next} tabIndex={-1} className="text-xs text-[var(--color-text-tertiary)] focus:outline-none">The card leaves Today.</p>
         : <CopeAheadAfterCard item={item} onDone={() => setGone(true)} />}
     </section>
   );
 }
 
-export const COPE_AHEAD_AFTER_PACK = { id: 'cope_ahead_after', title: 'Cope Ahead: how did it go? (not parts: cope-ahead.json, no sign-off gate)', where: 'Today' };
-
 export const COPE_AHEAD_AFTER_SURFACE: Surface = {
-  id: 'cope-ahead-after', pack: COPE_AHEAD_AFTER_PACK.id, title: 'Cope Ahead: the after card (Today)',
+  id: 'cope-ahead-after', pack: COPE_AHEAD_PACK.id, title: 'Cope Ahead: the after card (Today)',
   who: 'Everyone who said yes to “Want me to ask how it went?” on Cope Ahead’s keep screen: on Today from the time they picked. Copy from src/data/content/cope-ahead.json.',
   branches: BRANCHES,
   setup: (branch) => answers({

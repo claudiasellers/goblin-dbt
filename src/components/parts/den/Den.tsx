@@ -207,7 +207,12 @@ export function Den({ copy, initial, twoPullsAvailable, content, storyCopy, now 
         </div>
       )}
 
-      {months.length > 0 && (
+      {/* While a past month is open its own toggle names it: here, just the way back. */}
+      {thenRoom ? (
+        <div className="flex justify-center">
+          <button type="button" className={quiet} onClick={() => { setThen(null); setView('now'); }}>{copy.den_back_now}</button>
+        </div>
+      ) : months.length > 0 && (
         <div className="flex flex-wrap justify-center gap-x-4">
           {months.map((m) => (
             <button key={m.id} type="button" aria-pressed={then?.id === m.id} className={quiet} onClick={() => openThen(m.id, m.month)}>

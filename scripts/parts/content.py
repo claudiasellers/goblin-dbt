@@ -632,6 +632,8 @@ PROMPTS = [
     ("den_remove", "den", "thread", "Remove this thread"),
     ("den_then", "den", "then", "How it looked in {month}"),
     ("den_now", "den", "then", "Now"),
+    # Under the room while the comparison is open, in place of the month links: closes it.
+    ("den_back_now", "den", "then", "Back to now"),
     # Wise mind's step back (docs/design/wise-mind.md, 2p; parts on, at least one kept part): the room
     # from the den, small, the light in the middle. The light is the person and is never labelled, never
     # called Self. Parts are asked to take a step back so the person can listen, never to leave or stop.
