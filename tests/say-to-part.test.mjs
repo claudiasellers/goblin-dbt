@@ -88,7 +88,7 @@ test("Parts of me: a text button on each active or resting card, the panel in pl
   assert.match(card, /className=\{told\.own \? 'font-serif text-base' : ''\}/);
   // The panel: the gentle set for a tender part; a failed write changes nothing; focus back to the button.
   assert.match(card, /<SayPanel partId=\{partId\} name=\{part\.name\} tender=\{part\.tender\}/);
-  assert.match(card, /sayButton\.current\?\.focus\(\)/);
+  assert.match(card, /sayButton\.current\?\.focus\(\{ preventScroll: true \}\)/);
   const panel = src.slice(src.indexOf("function SayPanel"), src.indexOf("function CheckBack"));
   assert.match(panel, /sayChoices\(content, tender\)/);
   assert.match(panel, /maxLength=\{SAY_OWN_MAX\}/);

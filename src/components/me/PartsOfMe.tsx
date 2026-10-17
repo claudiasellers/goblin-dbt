@@ -278,7 +278,7 @@ function PartCard({ item, content, copy, revisit, showStats, story, say, onWrite
       </div>
       {say && saying && (
         <SayPanel partId={partId} name={part.name} tender={part.tender} content={content} copy={say}
-          onDone={(line) => { if (line) setJustTold(line); setSaying(false); sayButton.current?.focus(); }} />
+          onDone={(line) => { if (line) setJustTold(line); setSaying(false); sayButton.current?.focus({ preventScroll: true }); }} />
       )}
       {story && storyOpen && <PartStory partId={partId} tender={part.tender} content={content} copy={story} />}
       {/* A safety-line or danger part (functions/src/safety/partSafetyFlag.ts): crisis resources under the
@@ -302,7 +302,10 @@ function SayPanel({ partId, name, tender, content, copy, onDone }: {
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const title = useRef<HTMLParagraphElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
   useEffect(() => { title.current?.focus({ preventScroll: true }); }, []);
+  // Own words: the field takes focus as it opens (without scrolling the page).
+  useEffect(() => { if (own) field.current?.focus({ preventScroll: true }); }, [own]);
   const { chips, own: ownChip } = sayChoices(content, tender);
   const send = async (what: { chipId: string } | { own: string }) => {
     const req = sayRequest(newId(), partId, what);
@@ -320,7 +323,7 @@ function SayPanel({ partId, name, tender, content, copy, onDone }: {
       </p>
       {own ? (
         <>
-          <textarea value={text} maxLength={SAY_OWN_MAX} rows={3} disabled={busy} aria-label={copy.say_own_label} autoFocus
+          <textarea ref={field} value={text} maxLength={SAY_OWN_MAX} rows={3} disabled={busy} aria-label={copy.say_own_label}
             onChange={(e) => setText(e.target.value.slice(0, SAY_OWN_MAX))}
             className="w-full p-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] font-serif text-base text-[var(--color-text-primary)]" />
           <div className="flex flex-wrap gap-x-4">
