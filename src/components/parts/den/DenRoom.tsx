@@ -158,7 +158,8 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
           const chosen = selected.includes(p.id);
           const body = (
             <>
-              <span className="block mx-auto" style={{ width: fig, height: fig, opacity: light.opacity }}>
+              {/* Picked: a soft ring round the figure only, never a box over the name (it would cover a neighbour's). */}
+              <span className={`block mx-auto rounded-full ${chosen ? 'ring-2 ring-offset-2 ring-offset-transparent ring-[var(--color-border-accent)] shadow-[0_0_10px_2px_var(--color-border-accent)]' : ''}`} style={{ width: fig, height: fig, opacity: light.opacity }}>
                 {p.tender ? <TenderCover size={fig} /> : <PartFigure shapeSig={p.shapeSig} size={fig} still />}
               </span>
               {!small && (
@@ -169,12 +170,13 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
               )}
             </>
           );
-          const place = { left: `${s.x * 100}%`, top: `${s.y * 100}%` };
+          // Higher in the room paints above lower: a name hangs down toward the figures below it, so it is
+          // never under a neighbour's figure or ring. A part being moved is above everything.
+          const place = { left: `${s.x * 100}%`, top: `${s.y * 100}%`, zIndex: lifted ? 20 : 1 + Math.round((1 - s.y) * 10) };
           if (!interactive) {
             return (
               <div key={p.id} style={place} data-den-figure={p.id} data-selected={chosen ? '' : undefined}
-                className={`absolute -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none rounded-lg
-                  ${chosen ? 'outline outline-2 outline-dashed outline-offset-2 outline-[var(--color-border-accent)]' : ''}`}>
+                className="absolute -translate-x-1/2 -translate-y-1/2 text-center pointer-events-none rounded-lg">
                 {body}
               </div>
             );
@@ -184,8 +186,7 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
               data-den-figure={p.id} data-selected={chosen ? '' : undefined}
               className={`absolute -translate-x-1/2 -translate-y-1/2 text-center min-w-11 min-h-11 p-1 rounded-xl touch-none select-none cursor-grab
                 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-border-accent)]
-                ${chosen ? 'outline outline-2 outline-dashed outline-[var(--color-border-accent)]' : ''}
-                ${lifted ? 'scale-105 cursor-grabbing z-10 drop-shadow-lg' : ''}`}
+                ${lifted ? 'scale-105 cursor-grabbing drop-shadow-lg' : ''}`}
               style={place}
               onKeyDown={onKey(p.id)}
               onBlur={() => { if (held?.id === p.id) setHeld(null); }}
@@ -219,7 +220,7 @@ export function DenRoom({ parts, spots, links, copy, selected = [], onMove, onTa
           ...((interactive && onUnlink && lines.map(({ l, a, b }) => (
           <button key={`x-${l.id}`} data-den-focus={`x-${l.id}`} type="button"
             aria-label={`${copy?.den_remove ?? ''}: ${named.get(l.aId) ?? ''}, ${named.get(l.bId) ?? ''}`}
-            className="absolute -translate-x-1/2 -translate-y-1/2 min-w-11 min-h-11 flex items-center justify-center rounded-full text-base text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
+            className="absolute z-[15] -translate-x-1/2 -translate-y-1/2 min-w-11 min-h-11 flex items-center justify-center rounded-full text-base text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]"
             style={{ left: `${((a.x + b.x) / 2) * 100}%`, top: `${((a.y + b.y) / 2) * 100}%` }}
             onClick={() => onUnlink(l)} data-den-unlink={l.id}>
             <span aria-hidden="true">×</span>

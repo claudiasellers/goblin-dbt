@@ -144,3 +144,41 @@ test("keyboard order follows the room: figures and thread removes in measured re
   assert.match(room, /if \(active && root\.contains\(active\)\) refocus\.current = active\.dataset\.denFocus \?\? null;/);
   assert.match(room, /if \(row && b\.r\.top - row\[0\]\.r\.top <= ROW_PX\) row\.push\(b\); else rows\.push\(\[b\]\);/);
 });
+
+test("arrivals: names never touch at 390 px, with the harness den's places (the critic arrives clear)", () => {
+  // dev/review/surfaces.tsx's den: four placed parts, the critic with no place yet (a full room: names first).
+  const fixture = [
+    { id: "chase", mapX: 0.3, mapY: 0.32 }, { id: "hide", mapX: 0.72, mapY: 0.36 }, { id: "critic", mapX: null, mapY: null },
+    { id: "peace", mapX: 0.22, mapY: 0.78 }, { id: "little", mapX: 0.7, mapY: 0.74 },
+  ];
+  const spots = den.placeParts(fixture);
+  const all = [...spots.entries()];
+  for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) {
+    assert.ok(den.namesClear(all[i][1], all[j][1]), `${all[i][0]} and ${all[j][0]}: names clear`);
+  }
+  const critic = spots.get("critic");
+  assert.ok(critic.y >= 0.16 && critic.y <= 0.86 && critic.x >= 0.18 && critic.x <= 0.82, "whole inside the room, name and figure");
+  // Into an empty room, up to six arrive with figures and names all clear of each other.
+  for (let n = 2; n <= 6; n++) {
+    const s = [...den.placeParts(Array.from({ length: n }, (_, i) => ({ id: `p${i}`, mapX: null, mapY: null }))).values()];
+    for (let i = 0; i < s.length; i++) for (let j = i + 1; j < s.length; j++) assert.ok(den.clearOf(s[i], s[j]), `${n} arrivals: ${i}, ${j}`);
+  }
+  // The old arrival spot: the critic's name ran into the one who chases.
+  assert.equal(den.clearOf({ x: 0.3, y: 0.32 }, { x: 0.5, y: 0.18 }), false);
+  assert.equal(den.clearOf({ x: 0.2, y: 0.4 }, { x: 0.65, y: 0.4 }), true, "side by side, a name's width apart");
+  assert.equal(den.clearOf({ x: 0.4, y: 0.2 }, { x: 0.4, y: 0.5 }), true, "one above the other");
+});
+
+test("picked: a ring round the figure only, never a box round figure and name", () => {
+  const room = read("src/components/parts/den/DenRoom.tsx");
+  assert.doesNotMatch(room, /outline-dashed/, "no dashed box");
+  assert.match(room, /<span className=\{`block mx-auto rounded-full \$\{chosen \? 'ring-2 /, "on the figure's own span");
+  // Higher in the room paints above lower, so a name is never under the ring or figure of a part below it.
+  assert.match(room, /zIndex: lifted \? 20 : 1 \+ Math\.round\(\(1 - s\.y\) \* 10\)/);
+});
+
+test("then and now: while a month is open, one way back under the room instead of the month links", () => {
+  const c = read("src/components/parts/den/Den.tsx");
+  assert.match(c, /\{thenRoom \? \(\s+<div className="flex justify-center">\s+<button type="button" className=\{quiet\} onClick=\{\(\) => \{ setThen\(null\); setView\('now'\); \}\}>\{copy\.den_back_now\}<\/button>/);
+  assert.ok(den.DEN_PROMPTS.includes("den_back_now"));
+});

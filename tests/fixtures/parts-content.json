@@ -1255,6 +1255,13 @@
    "copy": "Now",
    "reviewStatus": "draft"
   },
+  "den_back_now": {
+   "flow": "den",
+   "step": "then",
+   "order": 14,
+   "copy": "Back to now",
+   "reviewStatus": "draft"
+  },
   "story_open": {
    "flow": "story",
    "step": "card",

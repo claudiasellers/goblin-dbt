@@ -617,6 +617,8 @@ PROMPTS = [
     ("den_remove", "den", "thread", "Remove this thread"),
     ("den_then", "den", "then", "How it looked in {month}"),
     ("den_now", "den", "then", "Now"),
+    # Under the room while the comparison is open, in place of the month links: closes it.
+    ("den_back_now", "den", "then", "Back to now"),
     # A part's story (on its card, and from one figure in the den): how it has changed, oldest first, by
     # month. {month} = a month in the locale's words; {old} / {new} = a job as the card shows it (its chip
     # labels, or the person's own words); {name} = another part's name. How they've felt toward it and
