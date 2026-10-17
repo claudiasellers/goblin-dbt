@@ -2,11 +2,15 @@ import { Link } from 'react-router-dom';
 import { modules } from '../data/modules';
 import { getToolsByModule, intents } from '../data/tools';
 import { ToolCard } from '../components/ToolCard';
+import { useToolGate } from '../hooks/useToolGate';
 
 export function Tools() {
+  // Parts tools join the list only when Meet a part may open (parts on, its copy shipped): the gate
+  // ToolPage opens it with. Never while that loads, so no card flickers in and out.
+  const parts = useToolGate('meet-a-part') === 'open';
   // Only modules with at least one built tool appear in the actionable directory.
   const populatedModules = modules
-    .map(mod => ({ mod, tools: getToolsByModule(mod.id) }))
+    .map(mod => ({ mod, tools: getToolsByModule(mod.id, { parts }) }))
     .filter(({ tools }) => tools.length > 0);
 
   return (

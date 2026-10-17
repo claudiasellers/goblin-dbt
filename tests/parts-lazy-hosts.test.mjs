@@ -17,7 +17,8 @@ const HOSTS = {
   "src/components/today/TodayStack.tsx": [["PartCheckbackCard", "LazyCheckback"], ["TrailOfferCard", "LazyTrailOffer"]],
   "src/components/spine/SessionClose.tsx": [],
   "src/components/spine/PartTagSlot.tsx": [["PartTagRow", "LazyRow"]],
-  "src/components/me/MeSection.tsx": [["PartsOfMe", "LazyPartsOfMe"]],
+  "src/components/me/MeSection.tsx": [["PartsOfMe", "LazyPartsOfMe"], ["PartsOffCard", "LazyPartsOffCard"]],
+  "src/pages/Tools.tsx": [],
   "src/pages/Profile.tsx": [["PartsSettings", "LazyPartsSettings"]],
   "src/pages/Insights.tsx": [["PartsReflect", "LazyPartsReflect"], ["TrailsReflect", "LazyTrailsReflect"]],
   "src/pages/ToolPage.tsx": [["MeetAPart", "LazyMeetAPart", "loadMeetAPart"]],
@@ -100,6 +101,9 @@ test("the gates stay eager; card-only helpers are imported only by their card", 
   assert.match(profile, /if \(!ready\) return null;\s*return <Suspense fallback=\{null\}><LazyPartsSettings /);
   const me = read("src/components/me/MeSection.tsx");
   assert.match(me, /import \{ dismissCandidateRequest, partsOfMeCopy \} from '\.\.\/\.\.\/lib\/partsOfMe';/);
+  assert.match(me, /import \{ partsMeOffCopy, partsOffCardShown \} from '\.\.\/\.\.\/lib\/partsSettings';/, "the switch card's gate");
+  // The Tools list's parts flag is Meet a part's own gate (eager; its content check is fetched only with parts on).
+  assert.match(read("src/pages/Tools.tsx"), /import \{ useToolGate \} from '\.\.\/hooks\/useToolGate';/);
   assert.match(me, /\{a\.id === 'my_parts' && partsCopy && partsContent && \(/, "only with parts on and its copy signed off");
   assert.match(read("src/contexts/TodayContext.tsx"), /from '\.\.\/lib\/trailOffer'/, "Today's gate helpers stay eager");
   assert.match(read("src/components/spine/PartTagSlot.tsx"), /if \(!tagRowGate\(\{ partsOn, toolId, thenVsNow, actedOnUrge, saved, content: parts \}\)\) return null;/);

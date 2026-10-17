@@ -123,7 +123,9 @@ test("press and hold: Space held, or a quick key / a switch or screen-reader act
 
 test("targets: the parts switch and the delete buttons are 44 px; Me's quiet links are at least 44 wide", () => {
   const settings = read("src/components/parts/PartsSettings.tsx");
-  assert.match(settings, /role="switch"[\s\S]*?className="-my-\[11px\] -mr-0\.5 min-w-11 min-h-11/);
+  // The switch is shared with Me's parts-off card (PartsSwitch).
+  assert.match(read("src/components/parts/PartsSwitch.tsx"), /role="switch"[\s\S]*?className="-my-\[11px\] -mr-0\.5 min-w-11 min-h-11/);
+  for (const f of ["src/components/parts/PartsSettings.tsx", "src/components/parts/PartsOffCard.tsx"]) assert.match(read(f), /<PartsSwitch /, f);
   assert.equal((settings.match(/className="min-h-11 px-/g) ?? []).length, 3, "Delete your parts, Delete them, Keep them");
   assert.match(read("src/components/me/PartsOfMe.tsx"), /const link = 'inline-flex items-center justify-center min-h-11 min-w-11 /);
 });
