@@ -15,6 +15,7 @@ import ftf from '../../src/data/content/find-the-feeling.json';
 import hostCopy from 'virtual:review-host-copy';
 import type { GetReflectTrailsResponse, GetTrailOfferEvidenceResponse } from '../../src/data/partsTypes';
 import { showIds } from './ids';
+import { CHASE_STEPS, LONG_STEPS } from './steps'; // lane 4: steps that helped
 
 const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const byId = Object.fromEntries(PARTS.map((p) => [p.id, p]));
@@ -79,6 +80,7 @@ const mePart = (key: keyof typeof PART_IDS, status: 'active' | 'resting' | 'set_
 /** The chase part's readout: every line (Me's card and Reflect show the same stats). */
 const CHASE_STATS: PartReflect['stats'] = {
   helped: [{ toolId: 'pause', n: 3 }, { toolId: 'recovering-from-invalidation', n: 1 }], felt: { month: '2026-08', then: 'feel_annoyed', now: 'feel_warm' }, when: 'evenings',
+  steps: CHASE_STEPS,
 };
 
 /** Parts of me: a card with its readout, a tender card, a resting card whose 30-day check-back is due, one set aside. */
@@ -101,6 +103,7 @@ export const ME_LONG: MeItem[] = [{
     stats: {
       helped: [{ toolId: 'pause', n: 4 }, { toolId: 'recovering-from-invalidation', n: 3 }, { toolId: 'cool-down', n: 2 }],
       felt: { month: '2026-08', then: 'feel_annoyed', now: 'feel_warm' }, when: 'evenings',
+      steps: LONG_STEPS,
     },
   }),
   title: LONG_NAME,
@@ -120,7 +123,7 @@ export const REFLECT: PartReflect[] = [
   },
   {
     id: PART_IDS.unnamed, name: null, firstPlace: 'stomach', shapeSig: sig('hide'),
-    stats: { helped: [{ toolId: 'cool-down', n: 2 }], felt: { month: '2026-09', then: null, now: 'feel_curious' }, when: null },
+    stats: { helped: [{ toolId: 'cool-down', n: 2 }], felt: { month: '2026-09', then: null, now: 'feel_curious' }, when: null, steps: null },
   },
 ];
 
