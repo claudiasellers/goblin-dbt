@@ -130,6 +130,19 @@ export function isDanger(s: CopeState, c: Pick<CopeContext, 'situations'>): bool
   return !!s.hardMomentId && dangerIds(s, c).includes(s.hardMomentId);
 }
 
+/**
+ * Danger from another person (*They might hurt me*): CrisisBanner's `other_person` resources (emergency
+ * services and a domestic violence line first; CrisisBanner holds the numbers), not the suicide and crisis
+ * lines. *I might hurt myself* keeps the default banner.
+ */
+export const OTHER_PERSON_DANGER: readonly string[] = ['might_hurt'];
+
+/** Which CrisisBanner the plan's danger moment shows alongside, or null when it isn't one. */
+export function dangerBanner(s: CopeState, c: Pick<CopeContext, 'situations'>): 'crisis' | 'other_person' | null {
+  if (!isDanger(s, c)) return null;
+  return OTHER_PERSON_DANGER.includes(s.hardMomentId as string) ? 'other_person' : 'crisis';
+}
+
 /** The danger moment's first move (exactly one per danger moment). */
 export function dangerMove(momentId: string | null, c: Pick<CopeContext, 'moves'>): CopeMoveItem | null {
   return momentId ? c.moves.find((m) => m.forMoments.includes(momentId)) ?? null : null;

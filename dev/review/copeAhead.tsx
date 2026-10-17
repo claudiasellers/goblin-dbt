@@ -75,7 +75,8 @@ const BRANCHES: (Branch & { reduce?: boolean; noParts?: boolean; keepFails?: boo
   { id: 'feel', label: '2. What might you feel / want to do (A conversation I\'m dreading)', steps: toFeel('conversation') },
   { id: 'feel_more', label: '2. Something else: the full word list', steps: [...toFeel('hard_day'), tap(t('feel_more'))] },
   ...C.situations.map((x) => ({ id: `moments_${x.id}`, label: `3. ${x.label}: its moments`, steps: toMoment(x.id) })),
-  { id: 'danger_moment', label: '3. A danger moment (They might hurt me): the crisis line alongside', steps: [...toMoment('someone'), tap(M('might_hurt'))] },
+  { id: 'danger_moment', label: '3. A danger moment (They might hurt me): 911 and the domestic violence line alongside, 988 last', steps: [...toMoment('someone'), tap(M('might_hurt'))] },
+  { id: 'danger_moment_self', label: '3. A danger moment (I might hurt myself): the crisis line alongside', steps: [...toMoment('alone'), tap(M('might_hurt_self'))] },
   { id: 'danger_hurt', label: '4. They might hurt me: the safe move first, the crisis line alongside', steps: toPlan('someone', 'might_hurt') },
   { id: 'danger_self', label: '4. I might hurt myself: the help move first, the crisis line alongside', steps: toPlan('alone', 'might_hurt_self') },
   { id: 'plan', label: '4. The plan, read back as it is built', steps: withMove },
@@ -160,6 +161,8 @@ export const COPE_AHEAD_SURFACE: Surface = {
 const BASE_PLAN = plan(BASE);
 /** CrisisBanner compact's text line (the app's own, alongside a danger moment). */
 const CRISIS = 'Text HOME to 741741';
+/** CrisisBanner's other_person resources (danger from another person: They might hurt me). */
+const OTHER_PERSON = 'Text START to 88788';
 const planBeat = (p: string) => beat(5).replace('{plan}', p.replace(/\.$/, ''));
 const momentBeat = (m: string) => beat(3).replace('{moment}', clause(m));
 const ifText = (id: string) => C.hardMoments.find((x) => x.id === id)!.ifText;
@@ -168,7 +171,7 @@ const ifText = (id: string) => C.hardMoments.find((x) => x.id === id)!.ifText;
 export const COPE_AHEAD_EXPECT: Record<string, string> = Object.fromEntries(([
   ['what', t('when_title')], ['what_own', t('when_title')], ['feel', t('pull_title')], ['feel_more', t('feel_title')],
   ...C.situations.map((x) => [`moments_${x.id}`, M(x.hardMoments[x.hardMoments.length - 1])]),
-  ['danger_moment', CRISIS],
+  ['danger_moment', OTHER_PERSON], ['danger_moment_self', CRISIS],
   ['danger_hurt', plan({ hardMomentId: 'might_hurt', moveIds: ['leave_safe'] })],
   ['danger_self', plan({ hardMomentId: 'might_hurt_self', moveIds: ['reach_help'] })],
   ['plan', BASE_PLAN], ['plan_empty', MV('feet')],
@@ -180,7 +183,7 @@ export const COPE_AHEAD_EXPECT: Record<string, string> = Object.fromEntries(([
   ['once_more_same', planBeat(plan({ hardMomentId: NEW_MOMENT, moveIds: ['feet'] }))],
   ['once_more_changed', momentBeat(ifText(NEW_MOMENT))], ['once_more_end', t('settle_title')],
   ['settle', t('settle_five')], ['settle_breath', t('settle_title')], ['settle_five', 'Opened /tool/five-senses'],
-  ['keep', BASE_PLAN], ['keep_kept', t('ask_after_q')], ['keep_failed', t('keep_yes')],
+  ['keep', BASE_PLAN], ['keep_kept', t('keep_done')], ['keep_failed', t('keep_yes')],
   ['keep_not_now', t('ask_after_q')], ['ask_yes', t('done')], ['ask_no', t('done')], ['done', 'Opened /tools'],
   ['own_max_keep', plan({ hardMomentOwn: LONG_MOMENT, moveOwn: LONG_MOVE })],
   ['parts_step', copeTitle], ['parts_anchor', CHASE_ANCHOR], ['parts_set', KEPT_LINE], ['parts_set_saved', KEPT_LINE],
@@ -197,4 +200,7 @@ export const COPE_AHEAD_ABSENT: Record<string, string> = {
   'cope-ahead/keep_failed': t('ask_after_q'),
   'cope-ahead/moments_someone': CRISIS,
   'cope-ahead/plan': CRISIS,
+  'cope-ahead/danger_moment': CRISIS,
+  'cope-ahead/danger_hurt': CRISIS,
+  'cope-ahead/danger_moment_self': OTHER_PERSON,
 };

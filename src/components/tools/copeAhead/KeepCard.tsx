@@ -11,7 +11,8 @@ import { PlanSentence, type PlanParts } from './PlanSentence';
  * pulls' keepsake uses (src/components/shared/PaperCard.tsx), the part's anchor line under the plan when
  * there is one, *Keep this* / *Not now*, then *Want me to ask how it went?* and *Done*. Presentation only:
  * the page saves (`keep`), schedules the after card and closes the visit; this reports the taps.
- * After *Not now*, *Keep this* stays for a change of mind. A failed save says so and keeps the buttons.
+ * After *Not now*, *Keep this* stays for a change of mind. A failed save says so and keeps the buttons; a
+ * kept one says *Kept in My words.* (`keep_done`) where the buttons were.
  */
 export interface KeepCardProps {
   content: CopeAheadContent;
@@ -59,7 +60,9 @@ export function KeepCard({ content, plan, anchor, keep, onKeep, onNotNow, askAft
         {anchorLine && <p className="font-serif text-lg leading-snug text-[var(--color-text-secondary)] text-balance" data-anchor="">{anchorLine}</p>}
       </PaperCard>
 
-      {keep !== 'kept' && (
+      {keep === 'kept'
+        ? <p role="status" className="text-sm text-center text-[var(--color-text-secondary)]" data-testid="cope-keep-done">{copy('keep_done')}</p>
+        : (
         notNow
           ? (
             <div className="flex justify-center">
@@ -74,7 +77,7 @@ export function KeepCard({ content, plan, anchor, keep, onKeep, onNotNow, askAft
               </div>
             </div>
           )
-      )}
+        )}
       {keep === 'failed' && <p role="status" className="text-sm text-center text-[var(--color-text-secondary)]">{copy('keep_failed')}</p>}
 
       {answered && (

@@ -69,7 +69,7 @@ test("Settle: three holds then breath; 5-4-3-2-1 and I'm OK at once", () => {
 test("KeepCard: the anchor only when set, a failed save keeps the buttons, then ask after and Done", () => {
   const src = read(`${DIR}/KeepCard.tsx`);
   assert.match(src, /\{anchorLine && <p /);
-  assert.match(src, /\{keep !== 'kept' && \(/);
+  assert.match(src, /\{keep === 'kept'\s*\? <p role="status"[^>]*>\{copy\('keep_done'\)\}<\/p>\s*: \(/, "kept: the line in the buttons' place");
   assert.match(src, /\{keep === 'failed' && <p role="status"/);
   assert.match(src, /const answered = keep === 'kept' \|\| notNow;/);
   assert.match(src, /\{askAfter !== null && <button type="button" className=\{primaryButton\} onClick=\{onDone\}>/);

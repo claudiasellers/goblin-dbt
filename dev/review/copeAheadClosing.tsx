@@ -69,7 +69,7 @@ const ROWS: Row[] = [
   { id: 'keep_two_anchor', label: '7. Two moves, with a part’s anchor (parts on)', kind: 'keep', plan: TWO, keep: 'idle', anchor: true, expect: 'shows up:' },
   { id: 'keep_long', label: '7. The 140-character If, two moves and an anchor', kind: 'keep', plan: LONG, keep: 'idle', anchor: true, expect: LONG_IF },
   { id: 'keep_saving', label: '7. Saving', kind: 'keep', plan: ONE, keep: 'saving', expect: copy('keep_yes') },
-  { id: 'keep_kept', label: '7. Kept: then Want me to ask how it went?', kind: 'keep', plan: ONE, keep: 'kept', expect: copy('ask_after_q'), absent: copy('keep_no') },
+  { id: 'keep_kept', label: '7. Kept: Kept in My words., then Want me to ask how it went?', kind: 'keep', plan: ONE, keep: 'kept', expect: copy('keep_done'), absent: copy('keep_no') },
   { id: 'keep_failed', label: '7. The save failed: the line, the buttons stay', kind: 'keep', plan: ONE, keep: 'failed', failNext: true, expect: copy('keep_failed') },
   { id: 'keep_not_now', label: '7. Not now: Keep this stays for a change of mind', kind: 'keep', plan: ONE, keep: 'idle', steps: [{ tap: copy('keep_no') }], expect: copy('ask_after_q') },
   { id: 'keep_ask_yes', label: '7. Ask after: Yes, then Done', kind: 'keep', plan: TWO, keep: 'kept', anchor: true, askAfter: true, expect: copy('done') },

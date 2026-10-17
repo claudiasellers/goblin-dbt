@@ -101,7 +101,8 @@ test("the doc's copy, as written", () => {
   assert.equal(fixture.beats[4].text, "You do your plan: {plan}.");
   assert.deepEqual(fixture.when.map((w) => [w.id, fixture.copy[w.key]]), [["today", "Today"], ["tomorrow", "Tomorrow"], ["this_week", "This week"], ["later", "Later, or not sure"]]);
   const c = fixture.copy;
-  assert.equal(Object.keys(c).length, 46);
+  assert.equal(Object.keys(c).length, 47);
+  assert.equal(c.keep_done, "Kept in My words.");
   assert.equal(c.rehearse_intro, "Picture it as if it's happening now. You're in it, not watching.");
   assert.equal(c.plan_title, "If it happens, I'll…");
   assert.deepEqual([c.settle_breath, c.settle_five, c.settle_ok], ["Three long breaths out", "5-4-3-2-1", "I'm OK"]);

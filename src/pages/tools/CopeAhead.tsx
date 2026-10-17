@@ -12,7 +12,7 @@ import { afterScheduleItem, COPE_AHEAD_AFTER_TYPE } from '../../lib/copeAheadAft
 import { parseCopeAheadEntry } from '../../lib/copeAheadEntry';
 import { planLine } from '../../lib/copeAheadPlan';
 import {
-  COPE_EXIT_STEP, copeNext, copeSessionExt, initialCope, isDanger, momentText, planCa,
+  COPE_EXIT_STEP, copeNext, copeSessionExt, dangerBanner, initialCope, momentText, planCa,
   type CopeEvent, type CopeSettle, type CopeState,
 } from '../../lib/copeAheadTool';
 import { profileCache } from '../../lib/profileCache';
@@ -137,7 +137,8 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
   const s = st;
   const plan = useMemo(() => planLine(content, planCa(s, 1)), [content, s]);
   const passPlan = useMemo(() => planLine(content, planCa(s, s.pass)), [content, s]);
-  const danger = isDanger(s, content) ? <CrisisBanner compact /> : null;
+  const banner = dangerBanner(s, content);
+  const danger = banner ? <CrisisBanner compact variant={banner} /> : null;
 
   const settle = async (choice: CopeSettle) => {
     const next = copeNext(s, { type: 'settle', settle: choice }, content);

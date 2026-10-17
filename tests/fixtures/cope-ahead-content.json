@@ -61,6 +61,7 @@
   "keep_yes": "Keep this",
   "keep_no": "Not now",
   "keep_failed": "Couldn't save that. Try again.",
+  "keep_done": "Kept in My words.",
   "ask_after_q": "Want me to ask how it went?",
   "ask_after_yes": "Yes",
   "ask_after_no": "No thanks",
@@ -437,8 +438,8 @@
   {
    "id": "give_minute",
    "kind": "words",
-   "label": "Say \"Give me a minute\"",
-   "line": "say \"Give me a minute\"",
+   "label": "Say “Give me a minute”",
+   "line": "say “Give me a minute”",
    "forPulls": [
     "fight",
     "blank",
@@ -452,8 +453,8 @@
   {
    "id": "come_back",
    "kind": "words",
-   "label": "Say \"I'll come back to you on that\"",
-   "line": "say \"I'll come back to you on that\"",
+   "label": "Say “I'll come back to you on that”",
+   "line": "say “I'll come back to you on that”",
    "forPulls": [
     "fight",
     "chase"
@@ -466,8 +467,8 @@
   {
    "id": "say_hard",
    "kind": "words",
-   "label": "Say \"This is hard for me\"",
-   "line": "say \"This is hard for me\"",
+   "label": "Say “This is hard for me”",
+   "line": "say “This is hard for me”",
    "forPulls": [
     "hide",
     "blank"

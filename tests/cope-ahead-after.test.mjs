@@ -65,7 +65,7 @@ test("the card's words: cope-ahead.json's after lines, the situation's after nam
   assert.equal(c.question, "How did the conversation go?");
   assert.deepEqual(c.how.map((x) => x.label), ["Better than I feared", "About what I expected", "Harder than I expected", "It hasn't happened yet"]);
   assert.equal(c.planQuestion, "Did your plan help?");
-  assert.equal(c.planLine, "Your plan: If I go blank, I'll breathe out longer than in and say \"Give me a minute\".");
+  assert.equal(c.planLine, "Your plan: If I go blank, I'll breathe out longer than in and say “Give me a minute”.");
   assert.deepEqual(c.plan.map((x) => [x.id, x.label]), [["helped", "Used it, it helped"], ["unsure", "Used it, not sure"], ["unused", "Didn't use it"], [null, "Skip"]]);
   assert.equal(A.afterCardCopy(CA, plan({ situationId: "alone" })).question, "How did being on your own go?");
   assert.equal(A.afterCardCopy(CA, plan({ situationId: "hard_day" })).question, "How did the day go?");
