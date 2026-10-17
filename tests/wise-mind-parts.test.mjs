@@ -166,3 +166,28 @@ test("Me: turning parts on from the card moves focus to Parts of me, not the pag
   assert.match(me, /const partsArrived = useCallback\(\(el: HTMLElement \| null\) => \{ if \(el\) focusStepStart\(el\); \}, \[\]\);/);
   assert.match(me, /ref=\{a\.id === 'my_parts' && turnedOnHere \? partsArrived : undefined\}/);
 });
+
+test("from Two pulls: Ask wise mind what's next lands on the step back with both figures already placed", async () => {
+  const S = await importTs("src/lib/twoPullsSave.ts");
+  const WM = await importTs("src/lib/wiseMind.ts");
+  const wise = JSON.parse(read("src/data/content/wise-mind.json")).content;
+  const link = S.wiseMindLink(ALL, { entry: { kind: "parts", aId: A, bId: B } }, { session: { kept: true } }, true);
+  const url = new URL(link.to, "https://x.invalid");
+  assert.equal(url.pathname, "/tool/wise-mind");
+  const entry = WM.parseWiseEntry(url.search, wise);
+  // Screen 1: What to do next first, never pre-selected; then 2p, not the two minds.
+  assert.equal(WM.orderedQuestions(wise, entry)[0].id, "wm_q_next");
+  const start = WM.initialWise("parts");
+  assert.equal(start.questionId, null);
+  assert.equal(WM.wiseNext(start, { type: "question", id: "wm_q_next" }, wise).step, "stepBack");
+  assert.equal(WM.wiseNext(start, { type: "skip", toStepBack: entry.presetPartIds.length > 0 }, wise).step, "stepBack", "skip still opens the room");
+  assert.equal(WM.wiseNext(start, { type: "skip" }, wise).step, "dropIn", "no parts brought: skip goes to the practice");
+  assert.equal(WM.wiseNext(WM.initialWise("minds"), { type: "skip", toStepBack: true }, wise).step, "dropIn", "the two minds form never opens the room");
+  assert.match(read("src/pages/tools/WiseMind.tsx"), /send\(\{ type: 'skip', toStepBack: entry\.presetPartIds\.length > 0 \}\)/);
+  // The room: both of the person's parts near the light, the hold showing.
+  const state = W.stepBackStart(W.presetPartIds(entry.presetPartIds, [part(A), part(B)]));
+  assert.deepEqual(state.placed, [A, B]);
+  const html = render(state);
+  for (const id of [A, B]) assert.ok(html.includes(`data-step-back-figure="${id}"`), id);
+  assert.ok(html.includes("Hold to ask"));
+});

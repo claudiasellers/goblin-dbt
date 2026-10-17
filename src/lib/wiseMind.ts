@@ -64,7 +64,8 @@ export type WiseEvent =
   | { type: 'keep' }
   | { type: 'handoff'; toolId: string }
   | { type: 'enough' }
-  | { type: 'skip' }
+  /** `toStepBack`: screen 1's skip on a visit that brought parts (Two pulls' `?a=&b=`), in the parts form. */
+  | { type: 'skip'; toStepBack?: boolean }
   | { type: 'continue' }
   /** The step back is done (2p): what was placed, ids only. */
   | { type: 'steppedBack'; partIds: string[]; stillCloseIds: string[] }
@@ -149,8 +150,9 @@ export function wiseNext(st: WiseState, e: WiseEvent, ctx: WiseContext): WiseSta
         const t = own(e.text, ctx.ownMax);
         return t ? { ...st, questionId: null, questionOwn: t, step: second } : st;
       }
-      // No question: nothing for the minds to say about it, so straight to the practice (the stone).
-      if (e.type === 'skip') return { ...st, step: 'dropIn', practiceId: null };
+      // No question: nothing for the minds to say about it, so straight to the practice (the stone). A
+      // visit that brought parts into the room (Two pulls) still opens the room: they are what it's about.
+      if (e.type === 'skip') return e.toStepBack && st.form === 'parts' ? { ...st, step: 'stepBack' } : { ...st, step: 'dropIn', practiceId: null };
       return st;
     case 'minds': {
       if (e.type === 'side') return { ...st, side: e.side };

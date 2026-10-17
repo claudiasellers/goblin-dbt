@@ -133,7 +133,7 @@ function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy
           <Prompt>{copy.question.prompt}</Prompt>
           <ChipRow options={orderedQuestions(content, entry)} onPick={(id) => send({ type: 'question', id })}
             ownLabel={copy.question.own} onOwn={() => setOwn('question')} />
-          <QuietLink label={copy.chrome.skip} onClick={() => send({ type: 'skip' })} />
+          <QuietLink label={copy.chrome.skip} onClick={() => send({ type: 'skip', toStepBack: entry.presetPartIds.length > 0 })} />
         </>);
       break;
     case 'minds': {
