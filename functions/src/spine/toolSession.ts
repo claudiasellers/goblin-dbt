@@ -33,9 +33,10 @@ export const DETAIL_LABELS: Record<DetailKind, string> = {
   dear_man: 'DearManSession',
   find_the_feeling: 'FindTheFeelingSession',
   meet_a_part: 'PartSession',
+  two_pulls: 'PullsSession',
 };
 
-/** The User → detail ownership rels (COMPLETED_SESSION for the four wrapped tools, HAS_PART_SESSION). */
+/** The User → detail ownership rels (COMPLETED_SESSION for the four wrapped tools, HAS_PART_SESSION, HAS_PULLS_SESSION). */
 const DETAIL_RELS = [...new Set(Object.values(DETAIL_LABELS).map((l) => USER_DATA[l].rel))].join('|');
 
 /** Patterns whose reps are flagged blank / dissociated (E2 §A3.2). */

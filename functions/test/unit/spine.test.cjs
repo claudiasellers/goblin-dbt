@@ -105,7 +105,7 @@ test('closeToolSession: detail labels come from a whitelist, matched by the call
   await fns.closeToolSession.run({ auth: auth('u9'), data: { id: ID, status: 'completed', detail: { kind: 'opposite_action', id: CI } } });
   assert.deepEqual([f.calls[1].params.detailLabel, f.calls[1].params.detailKey], ['OppositeActionSession', `u9:${CI}`]);
   // The wrapped tools' sessions hang off COMPLETED_SESSION, Meet a part's off HAS_PART_SESSION.
-  assert.match(f.calls[1].query, /\(u\)-\[:COMPLETED_SESSION\|HAS_PART_SESSION\]->\(d \{key: \$detailKey\}\)/);
+  assert.match(f.calls[1].query, /\(u\)-\[:COMPLETED_SESSION\|HAS_PART_SESSION\|HAS_PULLS_SESSION\]->\(d \{key: \$detailKey\}\)/);
 });
 
 test("closeToolSession: Meet a part links its PartSession; its \"more here\" is kept but never a compat outcome", async () => {

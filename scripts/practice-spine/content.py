@@ -187,6 +187,22 @@ FOLLOW_UP_TYPES = [
                     {"id": "skip", "label": "Skip", "status": "dismissed"}],
         "notification": "",
     },
+    {
+        # Parts (docs/design/parts.md, Two pulls step 7): a week after Two pulls, for both kept parts, on
+        # the close's yes; scheduled by schedulePullsCheckback, answered by answerPartCheckback (the same
+        # card and answers; Louder shows the aftercare). Its Today card comes from parts (parts on, both
+        # names from the profile slice) and shows checkback_title_two only once signed off.
+        "id": "two_pulls_checkback", "ownerModule": "mf", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "at_local", "days": 7, "time": "10:00"},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": False, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How are {A} and {B} today?"},
+        "choices": [{"id": "settled", "label": "Settled", "status": "done"},
+                    {"id": "same", "label": "Same", "status": "done"},
+                    {"id": "louder", "label": "Louder", "status": "done"},
+                    {"id": "skip", "label": "Skip", "status": "dismissed"}],
+        "notification": "",
+    },
 ]
 
 # Reserved rows: authored now so the ids exist, enabled false until their owners ship.

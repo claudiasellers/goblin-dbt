@@ -36,4 +36,5 @@ export { renamePart, restPart, setAsidePart, restorePart, setPartTender, answerP
 export { schedulePartCheckback, answerPartCheckback } from './parts';
 export { setPartAnchor } from './parts';
 export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './parts';
+export { startPullsSession, savePullsSession, keepPullsKeepsake, schedulePullsCheckback } from './parts';
 export { setPartShape } from './parts';

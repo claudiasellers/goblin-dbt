@@ -24,6 +24,7 @@ const AUTHED = [
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
   'tagPart',
   'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor', 'setPartShape',
+  'startPullsSession', 'savePullsSession', 'keepPullsKeepsake', 'schedulePullsCheckback', // Two pulls: the caller's own visit
   'getTrailOfferEvidence', 'answerTrailOffer', // the caller's own trail offer (Phase 4, built off)
   'getReflectTrails', 'answerKnownPartReview', 'removeTrailPattern', // Reflect: the caller's own rule D batch and plain patterns
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',

@@ -124,8 +124,8 @@ export interface KeepPartRequest {
 export interface KeepPartResponse { partId: string; created: boolean }
 
 /** Where a candidate came from. */
-export type CandidateOrigin = 'new_one' | 'worried_part' | 'split' | 'ps_ambivalence' | 'angry_card';
-export const CANDIDATE_ORIGINS: readonly CandidateOrigin[] = ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card'];
+export type CandidateOrigin = 'new_one' | 'worried_part' | 'split' | 'ps_ambivalence' | 'angry_card' | 'two_pulls';
+export const CANDIDATE_ORIGINS: readonly CandidateOrigin[] = ['new_one', 'worried_part', 'split', 'ps_ambivalence', 'angry_card', 'two_pulls'];
 
 /** Written only on a yes. */
 export interface QueuePartCandidateRequest {

@@ -414,6 +414,9 @@ PROMPTS = [
     ("pulls_pair_name", "pulls", "name", "the part that {move}"),
     # After the orienting close, with two kept parts: a two_pulls_checkback in a week, on the yes.
     ("pulls_close_checkback", "pulls", "close", "Check back with both of them in a week?"),
+    # After the keepsake (kept, or Not now): a quiet link to Wise mind (lane 1's tool; shown only once it
+    # exists). Optional: the flow doesn't wait for it.
+    ("pulls_wise_mind", "pulls", "keepsake", "Ask wise mind what's next"),
     # The trail offer (parts.md "The offer card")
     ("offer_eyebrow", "offer", "card", "Something keeps showing up"),
     ("offer_ask", "offer", "card", "Want to take a look?"),

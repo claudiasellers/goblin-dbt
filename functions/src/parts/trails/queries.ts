@@ -42,7 +42,7 @@ export const SOURCE_LABELS = [
 ] as const;
 
 /** Visits that are no pull moment (Meet a part is the part itself). */
-export const SKIP_TOOLS = ['meet-a-part'] as const;
+export const SKIP_TOOLS = ['meet-a-part', 'two-pulls'] as const;
 
 /** FTF `setOff` values that are a trigger context (nothing / not sure are none). */
 export const SET_OFF_TRIGGERS = ['someone', 'situation', 'body'] as const;

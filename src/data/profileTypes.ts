@@ -106,6 +106,7 @@ export const PROFILE_NEEDS = {
   'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)
   'witness': ['name', 'ownLines', 'savedLines'],
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
+  'two-pulls': ['parts'], // Phase 5: the two parts' names, figures, tenderness (parts on only)
   'dear-man': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // Phase 3 cope ahead (parts slices empty while off); never partDetail
   // "Was this a part you know?" after a better close (PartTagSlot, in SessionClose or the tool's own
   // close): every tool whose close asks then-vs-now or about the urge (src/lib/partTag.ts TAG_ROW_TOOLS)

@@ -8,6 +8,7 @@ const { fns, setDriver } = loadFunctions();
 test.after(() => setDriver(null));
 const CB = require('../../lib/parts/checkback');
 const K = require('../../lib/parts/keep');
+const PULLS = require('../../lib/parts/pulls/checkback');
 const { DELETE_FOLLOW_UPS, PARTS_FOLLOW_UP_TYPES } = require('../../lib/parts/delete');
 const { PART_CHECKBACK_TYPE } = require('../../lib/parts/checkbackTypes');
 
@@ -127,7 +128,7 @@ test('answerPartCheckback over the fake driver: one transaction, the spine guard
   assert.equal(f.sessions[0].config.defaultAccessMode, 'WRITE');
   const r = f.calls.find((c) => c.query === CB.RESOLVE_CHECKBACK_QUERY);
   assert.deepEqual([r.params.key, r.params.status, JSON.parse(r.params.outcome), r.params.harmSignal], [`u9:${FID}`, 'done', { choiceId: 'louder' }, true]);
-  assert.match(CB.RESOLVE_CHECKBACK_QUERY, /WHERE f\.type = 'part_checkback' AND f\.status = 'scheduled'/, "spine's GUARDS.FollowUp.update");
+  assert.match(CB.RESOLVE_CHECKBACK_QUERY, /WHERE f\.type IN \['part_checkback', 'two_pulls_checkback'\] AND f\.status = 'scheduled'/, "spine's GUARDS.FollowUp.update");
   const p = f.calls.find((c) => c.query === K.PAUSE_PART_QUERY);
   assert.deepEqual([p.params.partKey, p.params.hours], [`u9:${PID}`, 72]);
   assert.match(K.PAUSE_PART_QUERY, /SET p\.pausedUntil = datetime\(\) \+ duration\(\{hours: \$hours\}\)/);
@@ -158,6 +159,7 @@ function todayDriver({ partsOn = true, parts = [{ id: PID, name: 'the watcher', 
     if (/MATCH \(u\)-\[:HAS_PART\]->\(p:Part\) WHERE p\.status IN \['active', 'resting'\]\s+OPTIONAL MATCH \(p\)-\[:USES\]/.test(q)) {
       return partsOn ? parts.map((p) => ({ p: { ...p, kind: 'part', area: 'my_parts', status: 'active', source: 'made', confirmedAt: null, revisitAt: null }, moveIds: [] })) : [];
     }
+    if (q === PULLS.PULLS_CHECKBACK_ITEMS_QUERY) return [];
     if (/HAS_FOLLOW_UP/.test(q)) {
       // The generic read must leave part_checkback to parts.
       assert.ok(params.owned.includes('part_checkback'));

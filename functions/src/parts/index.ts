@@ -186,7 +186,7 @@ export const schedulePartCheckback = callable<unknown, SchedulePartCheckbackResp
   },
 );
 
-/** "How's {name} today?": one write; Louder also pauses the part. */
+/** "How's {name} today?" (and Two pulls' "How are {A} and {B} today?"): one write; Louder also pauses Meet a part's part. */
 export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse>(
   { auth: 'required', label: 'answerPartCheckback', errorMessage: 'Could not save that' },
   async ({ uid, data }) => {
@@ -198,3 +198,7 @@ export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse
 // ---- Trail offers (Phase 4; Today's card and the daily evaluation register themselves in ./offers) ----
 
 export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './offers';
+
+// ---- Two pulls (its week check-back's Today card registers itself in ./pulls/checkback) ----
+
+export { startPullsSession, savePullsSession, keepPullsKeepsake, schedulePullsCheckback } from './pulls';

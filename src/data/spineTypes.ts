@@ -27,8 +27,8 @@ export type SessionStatus = 'open' | 'completed' | 'exited_early';
 export type CloseStatus = 'completed' | 'exited_early';
 export const CLOSE_STATUSES: readonly CloseStatus[] = ['completed', 'exited_early'];
 
-export type DetailKind = 'opposite_action' | 'invalidation_recovery' | 'dear_man' | 'find_the_feeling' | 'meet_a_part';
-export const DETAIL_KINDS: readonly DetailKind[] = ['opposite_action', 'invalidation_recovery', 'dear_man', 'find_the_feeling', 'meet_a_part'];
+export type DetailKind = 'opposite_action' | 'invalidation_recovery' | 'dear_man' | 'find_the_feeling' | 'meet_a_part' | 'two_pulls';
+export const DETAIL_KINDS: readonly DetailKind[] = ['opposite_action', 'invalidation_recovery', 'dear_man', 'find_the_feeling', 'meet_a_part', 'two_pulls'];
 
 export type RepSource = 'standalone' | 'embedded' | 'help_now' | 'followup_offphone';
 export const REP_SOURCES: readonly RepSource[] = ['standalone', 'embedded', 'help_now', 'followup_offphone'];

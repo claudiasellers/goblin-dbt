@@ -357,6 +357,13 @@
    "copy": "Check back with both of them in a week?",
    "reviewStatus": "draft"
   },
+  "pulls_wise_mind": {
+   "flow": "pulls",
+   "step": "keepsake",
+   "order": 8,
+   "copy": "Ask wise mind what's next",
+   "reviewStatus": "draft"
+  },
   "offer_eyebrow": {
    "flow": "offer",
    "step": "card",
