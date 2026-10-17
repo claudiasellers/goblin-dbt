@@ -5,6 +5,7 @@ import { buzz } from '../../tools/regulation/hooks';
 import { linkButton, primaryButton } from '../../tools/oppositeAction/styles';
 import { HoldButton, LIGHT_HOLD_MS } from '../LightHold';
 import { Chips } from '../meet/MeetScreens';
+import { PaperCard, paperLine } from '../../shared/PaperCard';
 import { PullsStage, type StageSide } from './PullsStage';
 
 /**
@@ -49,7 +50,7 @@ export function StepBack({ title, a, b, light, holds, max, holdLabel, holdHint, 
 }
 
 /**
- * The keepsake: square paper, the only shadow in the app, the two lines as the server will keep them.
+ * The keepsake: the square paper (src/components/shared/PaperCard.tsx), the two lines as the server will keep them.
  * "Keep this" and "Not now" (the page saves on Keep); after either, `after` (the Wise mind link) shows.
  * `first` is the first line as segments: the two names (slots A and B) are set in italics, as parts.md
  * draws it; without it the first line shows plain.
@@ -59,18 +60,14 @@ export function Keepsake({ lines, first, options, picked, status, after, onPick 
   /** A line under the paper once answered (e.g. the save failed: "Couldn't save that. Try again."). */
   status?: ReactNode; after?: ReactNode; onPick: (id: string) => void;
 }) {
-  const paper = useRef<HTMLDivElement>(null);
-  useEffect(() => { paper.current?.focus({ preventScroll: true }); }, []);
   return (
     <section className="space-y-5" data-testid="pulls-keepsake">
-      <div ref={paper} tabIndex={-1} role="group" aria-label={`${lines[0]} ${lines[1]}`} data-keepsake=""
-        className="mx-auto w-full max-w-[20rem] aspect-square rounded-md bg-[var(--color-bg-elevated)] p-7 flex flex-col justify-center gap-4 focus:outline-none"
-        style={{ boxShadow: '0 18px 40px -18px color-mix(in oklab, var(--color-text-primary) 45%, transparent), 0 2px 6px -2px color-mix(in oklab, var(--color-text-primary) 20%, transparent)' }}>
-        <p className="font-serif text-xl leading-snug text-[var(--color-text-primary)] text-balance">
+      <PaperCard label={`${lines[0]} ${lines[1]}`} focusOnMount data={{ 'data-keepsake': '' }}>
+        <p className={paperLine}>
           {first ? first.map((seg, i) => (seg.slot === 'A' || seg.slot === 'B' ? <em key={i}>{seg.text}</em> : seg.text)) : lines[0]}
         </p>
-        <p className="font-serif text-xl leading-snug text-[var(--color-text-primary)] text-balance">{lines[1]}</p>
-      </div>
+        <p className={paperLine}>{lines[1]}</p>
+      </PaperCard>
       <Chips options={options} picked={picked} onPick={onPick} />
       {status}
       {after}
