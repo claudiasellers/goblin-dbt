@@ -52,7 +52,7 @@ test("related words keep RELATED_TO and shared-brain rows, never OPPOSITE_OF", (
 });
 
 test("shipped files carry their source, and related words has no opposites and covers every grid word", () => {
-  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json", "capacity.json", "spine.json", "parts.json", "wise-mind.json"]) {
+  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json", "capacity.json", "spine.json", "parts.json", "wise-mind.json", "cope-ahead.json"]) {
     const f = shipped(name);
     assert.match(f.source.file, /^graph-content-only-.*\.json$/, name);
     assert.ok(!Number.isNaN(Date.parse(f.source.exportedAt)), name);
@@ -116,6 +116,10 @@ test("shipped follow-up questions: both unpleasant quadrants, no clinical notes,
 
 test("shipped Wise mind content matches content.py", () => {
   assert.deepEqual(shipped("wise-mind.json").content, JSON.parse(readFileSync("tests/fixtures/wise-mind-content.json", "utf8")));
+});
+
+test("shipped Cope Ahead content matches content.py", () => {
+  assert.deepEqual(shipped("cope-ahead.json").content, JSON.parse(readFileSync("tests/fixtures/cope-ahead-content.json", "utf8")));
 });
 
 test("shipped capacity content matches content.py", () => {
@@ -377,7 +381,7 @@ test("Wise mind: no content in the graph yet keeps the committed file (warns, wr
   const { mkdtempSync, readdirSync, rmSync } = await import("node:fs");
   const { tmpdir } = await import("node:os");
   const { join } = await import("node:path");
-  assert.deepEqual(KEPT_WHEN_MISSING, ["wise-mind.json"]);
+  assert.deepEqual(KEPT_WHEN_MISSING, ["wise-mind.json", "cope-ahead.json"]);
   const empty = indexGraph({ scope: "content-only", nodes: [], relationships: [] });
   assert.equal(buildWiseMind(empty), null, "missing: nothing to build");
   const wrong = indexGraph({ scope: "content-only", nodes: [node("wise_mind_flow", ["WiseMindFlow"], { version: "wise-mind-v0", contentJson: "{}" })], relationships: [] });
@@ -387,8 +391,16 @@ test("Wise mind: no content in the graph yet keeps the committed file (warns, wr
     const said = { warn: [], log: [] };
     writeSnapshots({ "spine.json": { a: 1 } }, { file: "x.json", exportedAt: "2026-10-17T00:00:00Z" },
       { outDir: dir, log: { warn: (m) => said.warn.push(m), log: (m) => said.log.push(m) } });
-    assert.deepEqual(readdirSync(dir), ["spine.json"], "wise-mind.json not written");
-    assert.equal(said.warn.length, 1);
+    assert.deepEqual(readdirSync(dir), ["spine.json"], "wise-mind.json and cope-ahead.json not written");
+    assert.equal(said.warn.length, 2);
     assert.match(said.warn[0], /wise-mind\.json: no content for it in this graph yet; kept the committed file/);
+    assert.match(said.warn[1], /cope-ahead\.json: no content for it in this graph yet; kept the committed file/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test("Cope Ahead: no content in the graph yet builds nothing; a wrong version throws", async () => {
+  const { buildCopeAhead } = await import("../scripts/content-snapshot/build.mjs");
+  assert.equal(buildCopeAhead(indexGraph({ scope: "content-only", nodes: [], relationships: [] })), null);
+  const wrong = indexGraph({ scope: "content-only", nodes: [node("cope_ahead_flow", ["CopeAheadFlow"], { version: "cope-ahead-v0", contentJson: "{}" })], relationships: [] });
+  assert.throws(() => buildCopeAhead(wrong), /cope-ahead-v0; the app expects cope-ahead-v1/);
 });

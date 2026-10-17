@@ -96,6 +96,31 @@ test("ext wm: Wise mind's ids, and the person's own words on *Own keys only (≤
   try { assert.throws(() => ext.validateExt({ mf: { note: "hi" } }), /\*Own keys/); } finally { delete ext.EXT_SCHEMAS.mf.note; }
 });
 
+test("ext ca: Cope Ahead's ids and closed sets, own words on *Own keys only (situation and moment ≤ 140, move ≤ 90, never linted)", () => {
+  const ca = {
+    situationId: "conversation", when: "this_week", feelIds: ["anxious", "hurt"], pullIds: ["blank"], partId: "p1",
+    hardMomentId: "go_blank", ifFrom: "pull", moveIds: ["long_out", "give_minute"], rehearsed: 2, newMomentId: "not_heard",
+    newMoveIds: ["step_out"], settle: "five_senses", kept: true, followUp: true,
+  };
+  assert.deepEqual(JSON.parse(ext.validateExt({ ca })).ca, ca);
+  const own = JSON.parse(ext.validateExt({ ca: { situationOwn: " My sister's\nwedding ", hardMomentOwn: "x".repeat(140), moveOwn: "y".repeat(90), newMomentOwn: "z", newMoveOwn: "w" } })).ca;
+  assert.equal(own.situationOwn, "My sister's wedding");
+  assert.equal(own.hardMomentOwn.length, 140);
+  assert.throws(() => ext.validateExt({ ca: { situationOwn: "x".repeat(141) } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ ca: { hardMomentOwn: "x".repeat(141) } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ ca: { moveOwn: "x".repeat(91) } }), /1 to 90/);
+  assert.throws(() => ext.validateExt({ ca: { rehearsed: 3 } }), /one of 1, 2/, "rehearsed is 1 or 2");
+  assert.throws(() => ext.validateExt({ ca: { rehearsed: "2" } }), /one of 1, 2/);
+  assert.throws(() => ext.validateExt({ ca: { settle: "nap" } }), /one of breath, five_senses, ok/);
+  assert.throws(() => ext.validateExt({ ca: { ifFrom: "both" } }), /one of moment, pull/);
+  assert.throws(() => ext.validateExt({ ca: { when: "next_year" } }), /one of/);
+  assert.throws(() => ext.validateExt({ ca: { feelIds: ["a", "b", "c"] } }), /up to 2/);
+  assert.throws(() => ext.validateExt({ ca: { moveIds: ["a", "b", "c"] } }), /up to 2/);
+  assert.throws(() => ext.validateExt({ ca: { hardMomentId: "they raise their voice" } }), /expected an id/, "no free text");
+  assert.throws(() => ext.validateExt({ ca: { plan: "If I go blank" } }), /not registered/, "the plan line is never stored, only its parts");
+  assert.deepEqual(tools.SPINE_TOOLS["cope-ahead"], { module: "er", closeKind: "none" });
+});
+
 test("close: wiseMindAnswer is an id (ask-fresh, on the session only)", () => {
   assert.equal(v.validateClose({ id: ID, status: "completed", wiseMindAnswer: "wm_a_wait" }, now, "orienting").wiseMindAnswer, "wm_a_wait");
   assert.equal(v.validateClose({ id: ID, status: "completed" }, now, "orienting").wiseMindAnswer, null);
