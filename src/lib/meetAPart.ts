@@ -13,7 +13,7 @@ import type { HandoffResult } from '../data/capacityTypes';
 /** Every screen of the flow, in the harness's names. */
 export const MEET_STEPS = [
   'find', 'blend', 'blendBody', 'where', 'shape', 'age', 'young', 'voice', 'feel', 'unblend', 'unblendEnd', 'nothing',
-  'job', 'likes', 'guards', 'fear', 'stop', 'update', 'canNow', 'thank', 'tender', 'rather', 'name', 'keep', 'close', 'done',
+  'job', 'likes', 'guards', 'front', 'fear', 'stop', 'update', 'canNow', 'thank', 'tender', 'rather', 'name', 'keep', 'close', 'done',
 ] as const;
 export type MeetStep = (typeof MEET_STEPS)[number];
 
@@ -43,7 +43,7 @@ export const OWN_WORDS_STEPS: readonly MeetStep[] = ['voice', 'job', 'fear'];
 /** The 1–10 of the steps table, for the progress track; the gate's screens and done have none. */
 export const MEET_TRACK: Partial<Record<MeetStep, number>> = {
   find: 1, where: 2, shape: 3, age: 3, young: 3, voice: 3, feel: 4, unblend: 4, unblendEnd: 4, nothing: 4, job: 5, likes: 5,
-  guards: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, tender: 8, rather: 8, name: 9, keep: 9, close: 10,
+  guards: 5, front: 5, fear: 6, stop: 6, update: 7, canNow: 7, thank: 8, tender: 8, rather: 8, name: 9, keep: 9, close: 10,
 };
 
 /** Shape it's forced choices: five rounds, one per dimension. */
@@ -82,6 +82,11 @@ export interface MeetSession {
   jobId?: string; ownJob?: string; likesId?: string;
   /** What was picked at Guards (a hurt id or "Not sure"); `hurtId` only when it was a hurt. */
   guardsId?: string; hurtId?: string;
+  /**
+   * 5d: another part the person keeps that this one stands in front of (a part id, never a non-answer).
+   * Not ask-fresh: the server draws the den's thread from it, on the keep or a kept part's last save.
+   */
+  frontOfPartId?: string;
   fearId?: string; ownFear?: string; updateId?: string; canNowId?: string; ratherId?: string;
   name?: string;
   tender: boolean;
@@ -113,6 +118,11 @@ export interface MeetContext {
   p2OnEntry?: boolean;
   /** The band for the blend check's P2: flooded when a stored signal said so, else stirred. */
   p2Band?: 'stirred' | 'flooded';
+  /**
+   * 5d's chips: the person's other active or resting parts (named), most recently visited first. Empty
+   * or absent (5d's copy not signed off, no other part) skips 5d; the flow goes on to Fear.
+   */
+  frontParts?: readonly string[];
 }
 
 /** What the host renders P2 with, while the step is blendBody. */
@@ -146,6 +156,8 @@ export type MeetEvent =
   | { type: 'option'; option: PickedOption }
   /** A hurt chip at Guards. */
   | { type: 'hurt'; hurtId: string }
+  /** 5d: one of the person's own parts, by id ("No one I know" / "Not sure" are options). */
+  | { type: 'front'; partId: string }
   /** "In my words" at voice, job or fear. The text is stored, never read. */
   | { type: 'ownWords'; text: string }
   /** Where: Continue with a place (null: "Nowhere I can find"). */
@@ -162,6 +174,14 @@ export type MeetEvent =
   | { type: 'close'; choiceId: string | null }
   /** Leave P2's "come back later" message. */
   | { type: 'continue' };
+
+/** 5d offers at most this many of the person's parts. */
+export const FRONT_MAX = 4;
+
+/** 5d's part chips for this visit: never the part being visited, at most FRONT_MAX. */
+export function frontChoices(session: Pick<MeetSession, 'partId'>, ctx: MeetContext): string[] {
+  return (ctx.frontParts ?? []).filter((id) => id !== session.partId).slice(0, FRONT_MAX);
+}
 
 export function firstStep(ctx: MeetContext): MeetStep {
   return ctx.namedEntry ? afterFind(ctx) : 'find';
@@ -301,8 +321,16 @@ export function meetNext(state: MeetState, event: MeetEvent, ctx: MeetContext): 
       break;
     case 'guards':
       // A category, never a memory: no follow-up question about it.
-      if (event.type === 'hurt') { set({ guardsId: event.hurtId, hurtId: event.hurtId }); next = 'fear'; }
-      else if (o) { set({ guardsId: o.id, hurtId: undefined }); next = 'fear'; }
+      if (event.type === 'hurt') set({ guardsId: event.hurtId, hurtId: event.hurtId });
+      else if (o) set({ guardsId: o.id, hurtId: undefined });
+      else break;
+      // 5d only when there is another part to name (never on the tender path, which skips Guards).
+      next = frontChoices(session, ctx).length ? 'front' : 'fear';
+      break;
+    case 'front':
+      // One pick. A part is stored by id; "No one I know" and "Not sure" store nothing.
+      if (event.type === 'front' && frontChoices(session, ctx).includes(event.partId)) { set({ frontOfPartId: event.partId }); next = 'fear'; }
+      else if (o) { set({ frontOfPartId: undefined }); next = 'fear'; }
       break;
     case 'fear':
       if (event.type === 'ownWords') {

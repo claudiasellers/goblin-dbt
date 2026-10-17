@@ -7,12 +7,13 @@ import { getToolById } from '../../data/tools';
 import { useBand } from '../../hooks/useBand';
 import { useProfileContext } from '../../hooks/useProfileContext';
 import { useToolSession } from '../../hooks/useToolSession';
-import { initialMeet, meetNext, MEET_TRACK, SHAPE_ROUNDS, type MeetContext, type MeetEvent, type MeetState } from '../../lib/meetAPart';
+import { frontChoices, initialMeet, meetNext, MEET_TRACK, SHAPE_ROUNDS, type MeetContext, type MeetEvent, type MeetState } from '../../lib/meetAPart';
 import {
   HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_OWN_WORDS_MAX, meetLimits, STEP_PART,
   candidateRequest, entryLaterPatch, entryPlan, guardsFor, keepRequest, meetContext, optionsFor, parseMeetEntry,
   startRequest, startingMove, toPatch, showTooMany, doneTarget, TOO_MANY_PROMPT, isPaused, meetReady, PAUSED_PROMPT,
   CHECKBACK_NO, CHECKBACK_PROMPT, CHECKBACK_TYPE, CHECKBACK_YES, checkbackRequest, offerCheckback, type CheckbackType, type EntryPlan, type MeetEntry, type ShapeRoundLabels, meetChrome,
+  FRONT_NONE, FRONT_NOT_SURE, FRONT_PROMPT,
 } from '../../lib/meetAPartSave';
 import { vecToSig } from '../../lib/partFigure';
 import { promptCopy, stepOptions } from '../../lib/partsContent';
@@ -84,7 +85,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
 
   const visited = known.find((p) => p.id === entry.partId) ?? null;
   const start = useMemo(() => startingMove(parts, entry, visited?.moveIds), [parts, entry, visited]);
-  const ctx: MeetContext = useMemo(() => meetContext(parts, plan, start.named), [parts, plan, start.named]);
+  const ctx: MeetContext = useMemo(() => meetContext(parts, plan, start.named, known), [parts, plan, start.named, known]);
   const [phase, setPhase] = useState<Phase>(() => ({ k: plan.open === 'p2' ? 'p2' : plan.open === 'heads_up' ? 'heads_up' : 'flow' }));
   const [st, setSt] = useState<MeetState>(() => initialMeet(ctx, { move: start.move, partId: visited?.id ?? null, trailheadKind: entry.trailheadKind }));
   const [own, setOwn] = useState(false);
@@ -327,6 +328,19 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
           <Prompt>{P('meet_guards')}</Prompt>
           <div className="flex flex-wrap gap-2.5">
             {hurts.map((h) => <Chip key={h.id} label={h.label} onClick={() => send({ type: 'hurt', hurtId: h.id })} />)}
+            {rest.map((o) => <Chip key={o.id} label={o.label} onClick={() => pick(o.id, rest)} />)}
+          </div>
+        </>);
+        break;
+      }
+      case 'front': {
+        // 5d: their other parts by name (a tender one too, by its name only), then the two that aren't a part.
+        const byId = new Map(known.map((p) => [p.id, p]));
+        const rest = opts('front').filter((o) => o.id === FRONT_NONE || o.id === FRONT_NOT_SURE);
+        body = (<>
+          <Prompt>{P(FRONT_PROMPT)}</Prompt>
+          <div className="flex flex-wrap gap-2.5">
+            {frontChoices(s, ctx).map((id) => <Chip key={id} own label={byId.get(id)?.name ?? ''} onClick={() => send({ type: 'front', partId: id })} />)}
             {rest.map((o) => <Chip key={o.id} label={o.label} onClick={() => pick(o.id, rest)} />)}
           </div>
         </>);

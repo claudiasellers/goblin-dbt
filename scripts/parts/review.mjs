@@ -53,7 +53,7 @@ export async function loadGates() {
   const contents = `
 export { UNBLEND_REQUIRED } from './src/lib/unblendLine';
 export { angryRequired, ANGRY_LATER_REQUIRED } from './src/lib/angryPart';
-export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED } from './src/lib/meetAPartSave';
+export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED, MEET_FRONT_REQUIRED } from './src/lib/meetAPartSave';
 export { PART_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
 export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
@@ -107,6 +107,7 @@ export function surfaces(g) {
       groups: [
         { label: 'The visit (the paused line shows only for a paused part)', ids: g.meetRequired({ paused: true }) },
         { label: 'The close\'s "Check back with it tomorrow?" (the visit shows without it)', ids: g.CLOSE_CHECKBACK_REQUIRED },
+        { label: 'After "What do you think it\'s protecting?", when the person keeps another part: "Does it stand in front of another part you know?" with their parts by name, then these two (a part picked draws the den\'s thread when the part is kept; the visit shows without it, skipping the step)', ids: g.MEET_FRONT_REQUIRED },
       ],
       choices: g.MEET_OPTION_STEPS,
     },
