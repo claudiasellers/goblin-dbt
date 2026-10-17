@@ -249,7 +249,7 @@ test('PARTS_LABELS: every registered parts label, nothing else (later phases joi
   for (const l of ['ToolSession', 'CheckIn', 'FollowUp', 'SkillPractice', 'ProfileFact', 'OwnLine']) assert.ok(!PARTS_LABELS.includes(l), l);
 });
 
-test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one write, counts only; parts off too', async () => {
+test('deleteMyParts: the caller\'s parts records and parts follow-ups, one write, counts only; parts off too', async () => {
   const counts = { Part: 2, PartSession: 3, PartCandidate: 0, PartRevisit: 4, PartTag: 5, TrailOffer: 6 };
   const f = fakeDriver((q) => {
     const label = /MATCH \(n:(\w+) \{ownerId: \$uid\}\)/.exec(q)?.[1];
@@ -270,7 +270,7 @@ test('deleteMyParts: the caller\'s parts records and open parts follow-ups, one 
   const deletes = f.calls.filter((c) => /DETACH DELETE/.test(c.query));
   assert.equal(deletes.length, 7);
   const fu = f.calls.find((c) => /FollowUp/.test(c.query));
-  assert.match(fu.query, /WHERE f\.type IN \$types AND f\.status = 'scheduled'/, 'open parts follow-ups only');
+  assert.match(fu.query, /WHERE f\.type IN \$types\s+WITH collect/, 'every parts follow-up, open or answered');
   assert.deepEqual(fu.params.types, PARTS_FOLLOW_UP_TYPES);
   assert.ok(f.calls.some((c) => /u\.profileVersion = coalesce\(u\.profileVersion, 0\) \+ 1/.test(c.query)), 'cached slices drop the deleted parts');
   assert.ok(f.allClosed());

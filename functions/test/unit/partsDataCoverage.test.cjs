@@ -100,3 +100,20 @@ test('account delete removes every parts node: the :UserData {ownerId} sweep com
   assert.ok(f.calls.every((c) => c.params.uid === 'u-gone'));
   assert.match(f.calls.at(-1).query, /MATCH \(u:User \{id: \$uid\}\) DETACH DELETE u/);
 });
+
+test('deleteMyParts: every parts follow-up goes, open or answered; the only FollowUp that carries a part is a parts type', async () => {
+  const { DELETE_FOLLOW_UPS, PARTS_FOLLOW_UP_TYPES } = require('../../lib/parts/delete');
+  assert.doesNotMatch(DELETE_FOLLOW_UPS, /status|GUARDS/, 'answered check-backs carry partId too');
+  // The one writer that puts a part on a FollowUp is the check-back's link, for its own type.
+  const writers = SOURCES.filter(({ src }) => /\bf\.partId = /.test(src)).map(({ f }) => f);
+  assert.deepEqual(writers, ['parts/checkback.ts']);
+  assert.ok(PARTS_FOLLOW_UP_TYPES.includes(require('../../lib/parts/checkbackTypes').PART_CHECKBACK_TYPE));
+  const f = fakeDriver((q) => (/RETURN size/.test(q) ? [{ n: /FollowUp/.test(q) ? 2 : 0 }] : []));
+  setDriver(f.driver);
+  const out = await fns.deleteMyParts.run({ auth: auth('u-dm'), data: {} });
+  assert.equal(out.deleted.FollowUp, 2);
+  const fu = f.calls.find((c) => c.query === DELETE_FOLLOW_UPS);
+  assert.deepEqual([fu.params.uid, fu.params.types], ['u-dm', [...PARTS_FOLLOW_UP_TYPES]]);
+  // ToolSession ext ids (copeAheadPartId, whoShowedUp) stay: finalised log records, opaque ids only.
+  assert.ok(f.calls.every((c) => !/ToolSession/.test(c.query)));
+});

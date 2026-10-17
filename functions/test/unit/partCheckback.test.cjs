@@ -143,7 +143,7 @@ test('answerPartCheckback over the fake driver: one transaction, the spine guard
 });
 
 test('resolveFollowUp refuses a check-back: its answer can pause a part, so only parts answers it', async () => {
-  setDriver(fakeDriver((q) => (/AS open/.test(q) ? [{ type: 'part_checkback', status: 'scheduled', open: true, content: '{}' }] : [])).driver);
+  setDriver(fakeDriver((q) => (/AS open/.test(q) ? [{ type: 'part_checkback', status: 'scheduled', open: true, content: '{}', partsOn: true }] : [])).driver);
   await assert.rejects(fns.resolveFollowUp.run({ auth: auth(), data: { id: FID, status: 'done' } }), code('failed-precondition'));
 });
 
@@ -187,8 +187,9 @@ test("getToday: the check-back card with the part's name from the 'today' slice;
   assert.deepEqual([...unnamed.items, ...unnamed.more][0].part, { id: PID, name: null, tender: false });
 });
 
-test('deleteMyParts removes open check-backs: the type the scheduler writes, only while scheduled', () => {
+test('deleteMyParts removes check-backs, open or answered (an answered one carries partId): the type the scheduler writes', () => {
   assert.ok(PARTS_FOLLOW_UP_TYPES.includes(PART_CHECKBACK_TYPE));
-  assert.match(DELETE_FOLLOW_UPS, /WHERE f\.type IN \$types AND f\.status = 'scheduled'/);
+  assert.match(DELETE_FOLLOW_UPS, /WHERE f\.type IN \$types\s+WITH collect/);
+  assert.doesNotMatch(DELETE_FOLLOW_UPS, /status/);
   assert.equal(CB.validateScheduleCheckback({ id: FID, sessionId: SID, dueAt: inH(20) }, new Date()).item.type, PARTS_FOLLOW_UP_TYPES[0]);
 });
