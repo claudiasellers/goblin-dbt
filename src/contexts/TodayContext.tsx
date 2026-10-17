@@ -8,7 +8,7 @@ import { useProfileContext } from '../hooks/useProfileContext';
 import { inQuietHours } from '../lib/quietHours';
 import { useUserProfile } from './UserProfileContext';
 import { getPartsContent } from '../services/partsContent';
-import { checkbackReady, PART_CHECKBACK_TYPE, twoCheckbackReady, withReadyCheckbacks } from '../lib/partCheckback';
+import { checkbackReady, PART_CHECKBACK_TYPE, TWO_PULLS_CHECKBACK_TYPE, twoCheckbackReady, withReadyCheckbacks } from '../lib/partCheckback';
 import { TRAIL_OFFER_KIND, trailOfferReady, withReadyTrailOffers } from '../lib/trailOffer';
 import type { PartsContent } from '../data/partsContentTypes';
 
@@ -68,7 +68,8 @@ export function TodayProvider({ children }: { children: ReactNode }) {
 
   const current = data && data.uid === uid ? data.res : null;
   // Trail offers (Phase 4) the same way: parts on here too, every word of the card signed off.
-  const hasCheckback = !!current && [...current.items, ...current.more].some((i) => i.type === PART_CHECKBACK_TYPE);
+  // A part's check-back and Two pulls' both read parts content: either alone loads it.
+  const hasCheckback = !!current && [...current.items, ...current.more].some((i) => i.type === PART_CHECKBACK_TYPE || i.type === TWO_PULLS_CHECKBACK_TYPE);
   const hasTrailOffer = !!current && [...current.items, ...current.more].some((i) => i.kind === TRAIL_OFFER_KIND);
   const needsParts = hasCheckback || hasTrailOffer;
   useEffect(() => {
@@ -107,7 +108,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   const value = useMemo<TodayValue>(() => ({
     items: withReadyCheckbacks(withReadyTrailOffers((current?.items ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown, twoCheckbacksShown),
     more: withReadyCheckbacks(withReadyTrailOffers((current?.more ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown, twoCheckbacksShown),
-    partsContent: checkbacksShown || offersShown ? partsContent : null,
+    partsContent: checkbacksShown || twoCheckbacksShown || offersShown ? partsContent : null,
     holding: current?.holding ?? false,
     ready: !!current,
     refresh,
@@ -116,7 +117,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     setHidden,
     oaHidden,
     hideOa,
-  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa, checkbacksShown, offersShown, partsContent]);
+  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa, checkbacksShown, twoCheckbacksShown, offersShown, partsContent]);
 
   return <TodayContext.Provider value={value}>{children}</TodayContext.Provider>;
 }

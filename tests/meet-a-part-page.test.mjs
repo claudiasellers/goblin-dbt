@@ -206,8 +206,28 @@ test("keep and candidate: ids and the name only; ask-fresh fields never reach ke
   assert.deepEqual(C.validateCandidate(cand), { id: PID, origin: "worried_part", moveIds: ["hide"], sessionId: SID });
   assert.equal(S.candidateRequest(run(["keep_yes"], { state: full }), PID, SID), null);
   const page = read("src/pages/tools/MeetAPart.tsx");
-  assert.match(page, /await keepPart\(keep\)/);
-  assert.match(page, /await queuePartCandidate\(cand\)/);
+  assert.match(page, /once\(kept, \(\) => keepPart\(keep\)\.then\(\(\) => profileCache\.clear\(\)\)\)/, "keep, then the cached slices go");
+  assert.match(page, /once\(queued, \(\) => queuePartCandidate\(cand\)\)/);
+});
+
+test("keep and candidate are written once, and only marked done once they land; a failure retries at the next step", () => {
+  const page = read("src/pages/tools/MeetAPart.tsx");
+  const once = page.slice(page.indexOf("const once = "), page.indexOf("useEffect(", page.indexOf("const once = ")));
+  assert.match(once, /guard\.current = 'pending';/);
+  assert.match(once, /if \(!\(await started\.current\)\) throw new Error/, "no session yet is a failure, not a silent skip");
+  assert.match(once, /await write\(\);\s*guard\.current = 'done';/, "done only after the write");
+  assert.match(once, /catch \(e\) \{\s*guard\.current = 'no';/, "a failure goes back to 'no'");
+  assert.match(page, /if \(kept\.current === 'no'\)/);
+  assert.match(page, /if \(queued\.current === 'no'\)/);
+  // A retry repeats the same ids: keepPart and queuePartCandidate answer a repeat id without a second write.
+  assert.match(page, /const \[newPartId\] = useState\(newId\);/);
+  assert.match(page, /const \[candidateId\] = useState\(newId\);/);
+  assert.match(page, /candidateRequest\(st, candidateId, psId\)/);
+  assert.doesNotMatch(page, /candidateRequest\(st, newId\(\)/, "never a fresh id per render");
+  // A failed start is retried too (a repeat start is a no-op on the server).
+  assert.match(page, /\.catch\(\(\) => \{ if \(started\.current === p\) started\.current = null; return false; \}\)/);
+  const sessions = read("functions/src/parts/sessions.ts");
+  assert.match(sessions, /if \(state\.status === 'open'\) return \{ id: s\.id, status: 'open' \}; \/\/ a repeat start/);
 });
 
 test("PartFigure: the five numbers make the outline; null is a plain figure; room tokens only", () => {

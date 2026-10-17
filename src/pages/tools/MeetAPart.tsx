@@ -18,6 +18,7 @@ import {
 import { vecToSig } from '../../lib/partFigure';
 import { promptCopy, stepOptions } from '../../lib/partsContent';
 import { newId } from '../../lib/spine/ids';
+import { profileCache } from '../../lib/profileCache';
 import { scheduleResumeLater } from '../../services/capacity';
 import { loadMeetAPartContent } from '../../services/meetAPart';
 import { getPartsEntry, keepPart, queuePartCandidate, savePartSession, sayToPart, schedulePartCheckback, startPartSession } from '../../services/parts';
@@ -117,17 +118,38 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
   const queue = useRef<Promise<unknown>>(Promise.resolve());
   const started = useRef<Promise<boolean> | null>(null);
   const lastSaved = useRef('');
-  const kept = useRef(false);
-  const queued = useRef(false);
+  /** Keep it / another time: written once. A failed write goes back to 'no', so the next step retries it
+   *  (both are repeat-safe by id, so a write that landed but answered with an error is not doubled). */
+  const kept = useRef<'no' | 'pending' | 'done'>('no');
+  const queued = useRef<'no' | 'pending' | 'done'>('no');
   const [newPartId] = useState(newId);
+  const [candidateId] = useState(newId);
   /** The ToolSession links to the PartSession (DETAIL) once it was opened. */
   const detail = () => (started.current ? { detail: { kind: 'meet_a_part' as const, id: psId } } : {});
   const enqueue = (f: () => Promise<unknown>) => { queue.current = queue.current.then(f).catch(() => { /* the next save carries everything */ }); };
   const ensureStarted = () => {
     if (!started.current) {
-      started.current = startPartSession(startRequest(psId, st.session, entry)).then(() => { setOpened(true); return true; }).catch(() => false);
-      enqueue(() => started.current!);
+      // A failed start is tried again at the next step (a repeat start is a no-op on the server).
+      const p: Promise<boolean> = startPartSession(startRequest(psId, st.session, entry))
+        .then(() => { setOpened(true); return true; })
+        .catch(() => { if (started.current === p) started.current = null; return false; });
+      started.current = p;
+      enqueue(() => p);
     }
+  };
+  /** One write, marked done only once it landed; a failure (or no session yet) leaves it to retry. */
+  const once = (guard: { current: 'no' | 'pending' | 'done' }, write: () => Promise<unknown>) => {
+    guard.current = 'pending';
+    enqueue(async () => {
+      try {
+        if (!(await started.current)) throw new Error('no session yet');
+        await write();
+        guard.current = 'done';
+      } catch (e) {
+        guard.current = 'no';
+        throw e;
+      }
+    });
   };
   const save = (patch: PartSessionPatch, final: boolean) => {
     const key = JSON.stringify([patch, final]);
@@ -143,13 +165,14 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
     if (st.step === 'find' && !started.current) return;
     ensureStarted();
     save(toPatch(st, extra), st.step === 'done');
-    if (!kept.current) {
+    if (kept.current === 'no') {
       const keep = keepRequest(st, psId, newPartId);
-      if (keep) { kept.current = true; enqueue(async () => { if (await started.current) await keepPart(keep); }); }
+      // The new part is in Me at once: drop the cached slices so a visit opened from there knows it.
+      if (keep) once(kept, () => keepPart(keep).then(() => profileCache.clear()));
     }
-    if (!queued.current) {
-      const cand = candidateRequest(st, newId(), psId);
-      if (cand) { queued.current = true; enqueue(async () => { if (await started.current) await queuePartCandidate(cand); }); }
+    if (queued.current === 'no') {
+      const cand = candidateRequest(st, candidateId, psId);
+      if (cand) once(queued, () => queuePartCandidate(cand));
     }
   }, [st, extra, phase.k]); // eslint-disable-line react-hooks/exhaustive-deps
 
