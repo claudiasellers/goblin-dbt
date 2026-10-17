@@ -51,6 +51,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
   const emotionIds = useRef<string[]>([]);
   const urgeIds = useRef<string[]>([]);
   const bandAtStart = useRef<CapacityReading | null>(null);
+  const wiseMindAnswer = useRef<string | null>(null);
   const closed = useRef(false);
   const mounted = useRef(false);
 
@@ -94,6 +95,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
           ...((input.skillIds ?? skills.current).length ? { skillIds: input.skillIds ?? skills.current } : {}),
           ...(input.repSource ? { repSource: input.repSource } : {}),
           ...(input.schedule?.length ? { schedule: input.schedule } : {}),
+          ...(wiseMindAnswer.current ? { wiseMindAnswer: wiseMindAnswer.current } : {}),
         });
         refreshToday();
         return res;
@@ -120,6 +122,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
       setEmotionIds: (ids) => { emotionIds.current = sessionEmotionIds(ids); },
       setUrgeIds: (ids) => { urgeIds.current = sessionUrgeIds(ids); },
       setBandAtStart: (r) => { bandAtStart.current = r; },
+      setWiseMindAnswer: (a) => { wiseMindAnswer.current = a; },
       close,
       linkTo: (target, state) => ({
         pathname: `/tool/${target}`,

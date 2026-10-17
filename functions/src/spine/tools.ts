@@ -24,6 +24,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },
+  // Wise mind (docs/design/wise-mind.md): "Further away … More here", unless it handed off. A skill:
+  // a "More here" after it counts toward what helps (not in NOT_WHAT_HELPS).
+  'wise-mind': { module: 'mf', closeKind: 'orienting' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },

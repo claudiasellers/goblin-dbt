@@ -338,3 +338,24 @@ test("load-graph never refreshes the shipped files from a local graph", () => {
   for (const u of ["bolt://127.0.0.1:7687", "neo4j://localhost", "neo4j://localhost:7687", "bolt://[::1]:7687"]) assert.ok(isLocalUri(u), u);
   for (const u of ["neo4j+s://abcd.databases.neo4j.io", "neo4j+s://localhost.example.io", "", undefined]) assert.ok(!isLocalUri(u), String(u));
 });
+
+test("Wise mind: no content in the graph yet keeps the committed file (warns, writes nothing); a wrong version throws", async () => {
+  const { writeSnapshots, buildWiseMind, KEPT_WHEN_MISSING } = await import("../scripts/content-snapshot/build.mjs");
+  const { mkdtempSync, readdirSync, rmSync } = await import("node:fs");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  assert.deepEqual(KEPT_WHEN_MISSING, ["wise-mind.json"]);
+  const empty = indexGraph({ scope: "content-only", nodes: [], relationships: [] });
+  assert.equal(buildWiseMind(empty), null, "missing: nothing to build");
+  const wrong = indexGraph({ scope: "content-only", nodes: [node("wise_mind_flow", ["WiseMindFlow"], { version: "wise-mind-v0", contentJson: "{}" })], relationships: [] });
+  assert.throws(() => buildWiseMind(wrong), /wise-mind-v0; the app expects wise-mind-v1/);
+  const dir = mkdtempSync(join(tmpdir(), "snap-"));
+  try {
+    const said = { warn: [], log: [] };
+    writeSnapshots({ "spine.json": { a: 1 } }, { file: "x.json", exportedAt: "2026-10-17T00:00:00Z" },
+      { outDir: dir, log: { warn: (m) => said.warn.push(m), log: (m) => said.log.push(m) } });
+    assert.deepEqual(readdirSync(dir), ["spine.json"], "wise-mind.json not written");
+    assert.equal(said.warn.length, 1);
+    assert.match(said.warn[0], /wise-mind\.json: no content for it in this graph yet; kept the committed file/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
