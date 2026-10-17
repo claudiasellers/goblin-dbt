@@ -52,12 +52,14 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   // DEAR MAN's cope ahead (Phase 3) shows parts, their anchors and the kept lines to pick one from;
   // never partDetail (fears and jobs it never shows).
   assert.deepEqual(types.PROFILE_NEEDS["dear-man"], ["parts", "ownLines", "savedLines", "partAnchors"]);
+  // Cope Ahead reuses that step as is on its screen 2, and sets the anchor under its plan (docs/design/cope-ahead.md).
+  assert.deepEqual(types.PROFILE_NEEDS["cope-ahead"], types.PROFILE_NEEDS["dear-man"]);
   // `today` renders parts too (the check-back card's name, part-checkback); partDetail stays Meet a part's.
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer === "meet-a-part") continue;
-    if (consumer !== "dear-man") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
+    if (consumer !== "dear-man" && consumer !== "cope-ahead") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
-    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "dear-man", "two-pulls", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead, Two pulls nor Wise mind's step back`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "dear-man", "cope-ahead", "two-pulls", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead (or Cope Ahead's), Two pulls nor Wise mind's step back`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);
