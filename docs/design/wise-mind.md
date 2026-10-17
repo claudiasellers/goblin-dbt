@@ -5,9 +5,9 @@ for a few breaths, and listen for the quieter answer underneath. With parts on, 
 parts-aware step back from `parts.md` (*Skills are how you look after a part*, phase 6): *"Ask everyone
 to take one step back. From here, what's the wise next step?"*
 
-Status: **built 17 Oct 2026** (the minds form; listed for everyone). The parts-aware step back (2p) is
-being built into the seam the minds form left. Claudia's steer the same night: features first, no new
-gates.
+Status: **built 17 Oct 2026**. The minds form is listed for everyone; the parts-aware step back (2p) is
+built behind the parts copy sign-off (*As built*, below). Claudia's steer the same night: features
+first, no new gates.
 
 ---
 
@@ -205,6 +205,21 @@ now."* (chip) or their own words. Same store My words already reads for kept lin
   - Step `stepBack` renders `StepBackSlot.Room`.
   - The pushed line has a parts form.
   - `?a=&b=` presets the parts (from Two pulls' *Ask wise mind what's next*).
-- **Review:** `dev/review/wiseMind.tsx` is the review page's Wise mind surface (pack `wise_mind`,
+- **The step back (2p), built:**
+  - `src/lib/wiseMindParts.ts` (pure: the gate, copy, room state, what it writes) and
+    `src/components/tools/wiseMind/parts/` (`StepBackScreen`, `StepBackRoom`), mounted through
+    `useStepBackSlot`, so the minds form never loads parts code.
+  - It shows when parts are on, there's ≥ 1 active or resting part and every `WISE_MIND_PARTS_REQUIRED`
+    line ships. Otherwise the two minds show, as before.
+  - With parts brought in from Two pulls, *Skip* on screen 1 opens the step back rather than the
+    practice.
+  - It writes part ids only: `ext.wm.partIds` and `stillCloseIds`.
+  - One `PartTag {source: 'wise_mind'}` goes on the visit per placed kept part, open or closed.
+  - *A part I haven't met* → *It won't step back* → *Meet it another time* queues a `PartCandidate`
+    with origin `wise_mind`.
+- **Entry links:** `?first=<question id>` puts that question chip first, not pressed: Two pulls sends
+  `wm_q_next`, and DEAR MAN's prep can send *Whether to say something*. `?a=&b=` places the two parts.
+- **Review:** `dev/review/wiseMindParts.tsx` is the step back's own surface and pack, `wise_mind_parts`.
+  `dev/review/wiseMind.tsx` is the review page's Wise mind surface (pack `wise_mind`,
   every screen and branch). It reads `wise-mind.json` directly, and `check.mjs` checks each branch's
   expected and absent lines.
