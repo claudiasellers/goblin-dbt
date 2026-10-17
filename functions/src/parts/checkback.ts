@@ -66,14 +66,18 @@ export const SCHEDULE_STATE_QUERY = `
          pt.status AS partStatus, coalesce(pt.pausedUntil > datetime(), false) AS paused, head(collect(open.id)) AS openId
 `;
 
-/** After scheduleTx wrote the follow-up: which part it checks back with, and the visit it came from. */
+/**
+ * After scheduleTx wrote the follow-up: which part it checks back with, and the visit it came from.
+ * `SCHEDULED` comes out of the Meet a part session, so only while it takes writes (GUARDS.PartSession.keep).
+ */
 export const LINK_CHECKBACK_QUERY = `
   MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $followUpKey})
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey})
-  MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $sessionKey})
   SET f.partId = $partId, f.partSessionId = $sessionId
   MERGE (f)-[:CHECKS_BACK]->(pt)
-  MERGE (ps)-[:SCHEDULED]->(f)
+  WITH u, f
+  OPTIONAL MATCH (u)-[:HAS_PART_SESSION]->(ps:PartSession {key: $sessionKey}) WHERE ${GUARDS.PartSession.keep('ps')}
+  FOREACH (x IN CASE WHEN ps IS NULL THEN [] ELSE [ps] END | MERGE (x)-[:SCHEDULED]->(f))
   RETURN f.id AS id
 `;
 

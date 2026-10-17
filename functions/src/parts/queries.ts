@@ -9,6 +9,12 @@ import { toNumber } from '../shared/values';
 import { userKey } from '../userdata/ownership';
 import type { PartsEntryDeps } from './handler';
 
+/** The caller's parts setting (absent = off). */
+export const PARTS_ON_QUERY = `
+  OPTIONAL MATCH (u:User {id: $uid})
+  RETURN coalesce(u.partsEnabled, false) AS partsOn
+`;
+
 /**
  * PartsPolicy's thresholds and Recover's flooded line, in one read. Either node may be missing
  * (then gate.ts's defaults apply). PartsPolicy is still a draft as content; its numbers are used
@@ -85,6 +91,10 @@ const read = (query: string, params: Record<string, unknown>) => readTx((tx) => 
 /** The production query layer for one user. */
 export function graphDeps(uid: string): PartsEntryDeps {
   return {
+    async partsOn() {
+      const r = (await read(PARTS_ON_QUERY, { uid }))[0];
+      return r?.get('partsOn') === true;
+    },
     async policy() {
       const r = (await read(POLICY_QUERY, {}))[0];
       if (!r) return null;

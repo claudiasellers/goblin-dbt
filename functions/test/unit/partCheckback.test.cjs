@@ -74,7 +74,9 @@ test('schedulePartCheckback over the fake driver: the spine scheduler, then link
   assert.deepEqual([sched.params.items[0].type, sched.params.sourceToolId], ['part_checkback', 'meet-a-part']);
   const link = f.calls.find((c) => c.query === CB.LINK_CHECKBACK_QUERY);
   assert.deepEqual([link.params.followUpKey, link.params.partKey, link.params.sessionKey], [`u9:${FID}`, `u9:${PID}`, `u9:${SID}`]);
-  assert.match(CB.LINK_CHECKBACK_QUERY, /MERGE \(f\)-\[:CHECKS_BACK\]->\(pt\)\s+MERGE \(ps\)-\[:SCHEDULED\]->\(f\)/);
+  assert.match(CB.LINK_CHECKBACK_QUERY, /MERGE \(f\)-\[:CHECKS_BACK\]->\(pt\)/);
+  // SCHEDULED comes out of the visit's PartSession, so only while it takes writes (its keep window).
+  assert.match(CB.LINK_CHECKBACK_QUERY, /OPTIONAL MATCH \(u\)-\[:HAS_PART_SESSION\]->\(ps:PartSession \{key: \$sessionKey\}\) WHERE \(ps\.status = 'open' OR \(ps\.status = 'saved' AND ps\.savedAt > datetime\(\) - duration\(\{hours: 12\}\)\)\)\s+FOREACH \(x IN CASE WHEN ps IS NULL THEN \[\] ELSE \[ps\] END \| MERGE \(x\)-\[:SCHEDULED\]->\(f\)\)/);
   assert.equal(f.sessions.length, 1, 'one transaction');
 });
 
