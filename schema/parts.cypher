@@ -39,15 +39,16 @@ SET m += {label: "Keep watch", unblendPhrase: "is keeping watch", trailPhrase: "
 MERGE (m:ProtectiveMove {id: "put_it_off"})
 SET m += {label: "Put it off", unblendPhrase: "wants to put this off", trailPhrase: "put it off", nameHint: "the one who puts it off", kind: "proactive", offerable: true, safetyLine: false, order: 9, reviewStatus: "draft", version: "parts-v1", pending: null};
 
-// --- Recover's pulls (its flow JSON has no nodes; FTF's are FeelingUrge) ---
+// --- Recover's pulls (its flow JSON has no nodes; FTF's are FeelingUrge); labels are Recover's own ---
+// @parts-copy-json [{"id": "recover_fight", "field": "label", "kind": "chip", "text": "Fight back"}, {"id": "recover_chase", "field": "label", "kind": "chip", "text": "Chase them"}, {"id": "recover_hide", "field": "label", "kind": "chip", "text": "Hide"}, {"id": "recover_freeze", "field": "label", "kind": "chip", "text": "Shut down"}]
 MERGE (p:PullOption {id: "recover_fight"})
-SET p += {flow: "recover", pullId: "fight", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "fight", label: "Fight back", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PullOption {id: "recover_chase"})
-SET p += {flow: "recover", pullId: "chase", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "chase", label: "Chase them", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PullOption {id: "recover_hide"})
-SET p += {flow: "recover", pullId: "hide", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "hide", label: "Hide", reviewStatus: "draft", version: "parts-v1", pending: null};
 MERGE (p:PullOption {id: "recover_freeze"})
-SET p += {flow: "recover", pullId: "freeze", reviewStatus: "draft", version: "parts-v1", pending: null};
+SET p += {flow: "recover", pullId: "freeze", label: "Shut down", reviewStatus: "draft", version: "parts-v1", pending: null};
 
 // --- EXPRESSES: every module's ids on the vocabulary (HELD ids get no edge) ---
 MATCH ()-[r:EXPRESSES]->(:ProtectiveMove) DELETE r;
