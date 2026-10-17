@@ -9,6 +9,8 @@ import type {
   TagPartRequest, TagPartResponse,
   AnswerTrailOfferRequest, AnswerTrailOfferResponse, GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse,
   AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse, GetReflectTrailsResponse, RemoveTrailPatternRequest, RemoveTrailPatternResponse,
+  GetDenResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
+  UnlinkPartsResponse, UpdatePartLayoutRequest, UpdatePartLayoutResponse,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
@@ -194,4 +196,37 @@ export async function answerKnownPartReview(req: AnswerKnownPartReviewRequest): 
 /** A plain pattern's ×. */
 export async function removeTrailPattern(req: RemoveTrailPatternRequest): Promise<RemoveTrailPatternResponse> {
   return (await removeTrailPatternFn(req)).data;
+}
+
+// ---- The den (Me → Parts of me → See them together) ----
+
+const getDenFn = httpsCallable<Record<string, never>, GetDenResponse>(functions, 'getDen');
+const getDenSnapshotFn = httpsCallable<GetDenSnapshotRequest, GetDenSnapshotResponse>(functions, 'getDenSnapshot');
+const updatePartLayoutFn = httpsCallable<UpdatePartLayoutRequest, UpdatePartLayoutResponse>(functions, 'updatePartLayout');
+const linkPartsFn = httpsCallable<LinkPartsRequest, LinkPartsResponse>(functions, 'linkParts');
+const unlinkPartsFn = httpsCallable<UnlinkPartsRequest, UnlinkPartsResponse>(functions, 'unlinkParts');
+
+/** The room: active and resting parts (each with a recency bucket, never a date), confirmed links, snapshots. */
+export async function getDen(): Promise<GetDenResponse> {
+  return (await getDenFn({})).data;
+}
+
+/** One saved layout ("How it looked in {month}"): ids, places, status, tender. */
+export async function getDenSnapshot(req: GetDenSnapshotRequest): Promise<GetDenSnapshotResponse> {
+  return (await getDenSnapshotFn(req)).data;
+}
+
+/** The drop: where the person put each part (0..1). */
+export async function updatePartLayout(req: UpdatePartLayoutRequest): Promise<UpdatePartLayoutResponse> {
+  return (await updatePartLayoutFn(req)).data;
+}
+
+/** On the person's yes: "This one stands in front of that one" (`covers_for`, `aId` in front). */
+export async function linkParts(req: LinkPartsRequest): Promise<LinkPartsResponse> {
+  return (await linkPartsFn(req)).data;
+}
+
+/** A thread's ×. */
+export async function unlinkParts(req: UnlinkPartsRequest): Promise<UnlinkPartsResponse> {
+  return (await unlinkPartsFn(req)).data;
 }
