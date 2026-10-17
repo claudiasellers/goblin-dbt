@@ -12,7 +12,7 @@ import type { PartsContent } from '../data/partsContentTypes';
 import type {
   AnswerKnownPartReviewRequest, KnownPartReviewBlock, KnownPartReviewClose, KnownPartRowAnswer, PlainTrailPattern,
 } from '../data/partsTypes';
-import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
+import { fillPartsLine, promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { partChipLabel } from './partTag';
 import { evidenceRows, trailStatement, type EvidenceRowView } from './trailOfferCard';
 
@@ -64,13 +64,8 @@ export function knownPartStatement(block: Pick<KnownPartReviewBlock, 'template' 
     const q = promptCopy(content, 'review_noname');
     return q ? { heading, question: q } : null;
   }
-  let missing = false;
-  const question = block.template.replace(/\{(\w+)\}/g, (_, k: string) => {
-    if (k === 'name') return name;
-    missing = true;
-    return '';
-  });
-  return missing ? null : { heading, question };
+  const question = fillPartsLine(block.template, { name }, { strict: true });
+  return question === null ? null : { heading, question };
 }
 
 /** One row per moment: the offer's evidence row view (date, tool, context, labels), keyed by its episode. */

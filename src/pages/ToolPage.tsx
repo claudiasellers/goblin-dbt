@@ -3,6 +3,7 @@ import { useParams, Link, useLocation, Navigate } from 'react-router-dom';
 import { getToolById, toolIdFromUrl, TOOL_URL_SLUGS } from '../data/tools';
 import { ToolSessionProvider } from '../contexts/ToolSessionContext';
 import { useToolGate } from '../hooks/useToolGate';
+import { useStepBackSlot } from '../hooks/useStepBackSlot';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { ToolLoading } from '../components/tools/ToolLoading';
 import { ToolNotFound } from '../components/tools/ToolNotFound';
@@ -30,7 +31,15 @@ function TwoPulls() { return <Suspense fallback={<ToolLoading />}><LazyTwoPulls 
 // Wise mind (docs/design/wise-mind.md), its own chunk too: two SVG scenes and three practices nobody else needs.
 const loadWiseMind = () => import('./tools/WiseMind');
 const LazyWiseMind = lazy(() => loadWiseMind().then((m) => ({ default: m.WiseMind })));
-function WiseMind() { return <Suspense fallback={<ToolLoading />}><LazyWiseMind /></Suspense>; }
+/**
+ * With parts on, a kept part and the step back's copy shipped, Wise mind runs its parts form (screen 2p,
+ * src/hooks/useStepBackSlot.tsx); the page decides its form once, so it waits for that gate first.
+ */
+function WiseMind() {
+  const { pending, slot } = useStepBackSlot();
+  if (pending) return <ToolLoading />;
+  return <Suspense fallback={<ToolLoading />}><LazyWiseMind stepBack={slot} /></Suspense>;
+}
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {

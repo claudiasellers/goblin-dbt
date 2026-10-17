@@ -169,8 +169,9 @@ const KEEP = { sessionId: SID, lineId: LID };
 
 test('keepsake: built on the server from the stored visit, both names and what they both want, kept once', async () => {
   const k = ksDeps();
+  // A kept name that opens the line takes a capital in the line only ("the watcher" stays as kept).
   assert.deepEqual(await KS.keepPullsKeepsakeHandler(KEEP, k.deps),
-    { lineId: LID, text: 'the watcher and Rocket both want to keep you safe. I get to choose what happens next.', version: 10, linkId: 'link1' });
+    { lineId: LID, text: 'The watcher and Rocket both want to keep you safe. I get to choose what happens next.', version: 10, linkId: 'link1' });
   assert.deepEqual(k.writes[0].partIds, [PA, PB], 'two kept parts');
   assert.deepEqual(k.links, [{ aId: PA, bId: PB, bothWantId: 'want_safe' }], 'the same yes links them in the den');
   // Pair only: the generated names, the lead capitalised; no part ids.

@@ -10,7 +10,7 @@
 import type { PartsContent } from '../data/partsContentTypes';
 import type { ProfileSlices } from '../data/profileTypes';
 import type { TagPartRequest, TagStrength } from '../data/partsTypes';
-import { surfaceReady, type SurfaceIds } from './partsContent';
+import { fillParts, surfaceReady, type SurfaceIds } from './partsContent';
 import { TAG_OPTIONS, TAG_PROMPTS, UNNAMED_PROMPTS } from './partTag';
 
 export const DEBRIEF_PROMPTS = ['debrief_who', 'debrief_who_named'] as const;
@@ -51,7 +51,7 @@ const optionLabel = (content: PartsContent, flow: string, step: string, id: stri
 /** "Did {name} show up?" (the name filled as typed), Yes / A bit / No, and the tag row's Skip. */
 export function namedCopy(content: PartsContent, name: string): NamedCopy {
   return {
-    question: (content.prompts.debrief_who_named?.copy ?? '').replace('{name}', () => name),
+    question: fillParts(content.prompts.debrief_who_named?.copy ?? '', { name }),
     answers: DEBRIEF_OPTIONS.map((id) => ({ id: ANSWER[id], label: optionLabel(content, 'dearman', 'debrief', id) })),
     skip: optionLabel(content, 'tag', 'tag', 'tag_skip'),
   };

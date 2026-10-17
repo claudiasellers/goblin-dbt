@@ -15,6 +15,7 @@ import { getPartsContent } from '../../services/partsContent';
 import { dismissCandidateRequest, partsOfMeCopy } from '../../lib/partsOfMe';
 import { partsMeOffCopy, partsOffCardShown } from '../../lib/partsSettings';
 import type { PartsContent } from '../../data/partsContentTypes';
+import { focusStepStart } from '../../lib/focusStart';
 
 // Parts' callables load on demand, when a candidate is dismissed.
 const answerPartCandidate: typeof import('../../services/parts').answerPartCandidate = (req) => import('../../services/parts').then((m) => m.answerPartCandidate(req));
@@ -58,6 +59,10 @@ export function MeSection() {
     getPartsContent().then((c) => { if (live) setPartsContent(c); }).catch(() => { /* both stay hidden */ });
     return () => { live = false; };
   }, []);
+
+  // Turned on from the card: the card (with focus on its switch) gives way to Parts of me, so focus goes
+  // to the area's start, never <body> (the parts screens' stepFocus convention; only when focus was lost).
+  const partsArrived = useCallback((el: HTMLElement | null) => { if (el) focusStepStart(el); }, []);
 
   const after = useCallback(async (p: Promise<number>) => {
     profileCache.bump(await p);
@@ -142,7 +147,8 @@ export function MeSection() {
         </section>
       )}
       {areas.map((a) => (
-        <section key={a.id} aria-label={a.label} className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)]">
+        <section key={a.id} aria-label={a.label} ref={a.id === 'my_parts' && turnedOnHere ? partsArrived : undefined}
+          className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)]">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{a.label}</h3>
           <p className="text-xs text-[var(--color-text-tertiary)] mb-2">{a.blurb}</p>
           {a.id === 'about_me' && (

@@ -6,6 +6,7 @@
 import { HOLD_HINT, type AngryCardCopy, type AngryHurt, type AngryLineId } from '../data/partsTypes';
 import { angryNotNowId } from './angryPart';
 import { fill } from './invalidationRecovery';
+import { fillParts } from './partsContent';
 
 /** Every string the card shows, for one person at one moment. */
 export interface ResolvedAngryCopy {
@@ -41,7 +42,8 @@ export function resolveAngryCopy(copy: AngryCardCopy, { partsOn, name, hurt }: {
   const first = name?.trim() || null;
   const line = (id: AngryLineId) => copy[partsOn ? id : `${id}_plain` as const];
   const slots = { name: first ?? '', matters: hurt?.matters ?? '', felt: hurt?.feltPhrase ?? '' };
-  const say = (id: AngryLineId) => fill(line(id), slots);
+  // The name first, through the shared parts filler (a capital where it opens the line), then the rest.
+  const say = (id: AngryLineId) => fill(fillParts(line(id), { name: first }), slots);
   const vote1: AngryLineId = hurt
     ? (first ? 'angry_vote' : 'angry_vote_noname')
     : (first ? 'angry_vote_unsure' : 'angry_vote_unsure_noname');

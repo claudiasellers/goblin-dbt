@@ -16,7 +16,9 @@ import type {
 import { handoffExt } from './bandStore';
 import { HOLD_HINT } from '../data/partsTypes';
 import { HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_CHROME, optionsFor } from './meetAPartSave';
-import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
+import {
+  fillPartsLine, fillPartsSegments, promptCopy, stepOptions, surfaceReady, type SlotSegment, type SurfaceIds,
+} from './partsContent';
 import { dueAtFor } from './spine/windows';
 import type { PullsEntry } from './twoPullsLink';
 import type { PullsContext, PullsState, PullsStep } from './twoPulls';
@@ -233,37 +235,33 @@ export function feelOptions(content: PartsContent): PartsOption[] {
 /** Meet a part's chips at a borrowed step (unblend, stop). */
 export const meetOptions = (content: PartsContent, step: string): PartsOption[] => optionsFor(content, 'meet', step, '');
 
-const fill = (tpl: string, slots: Record<string, string>): string | null => {
-  let missing = false;
-  const out = tpl.replace(/\{(\w+)\}/g, (_, k: string) => {
-    if (k in slots) return slots[k];
-    missing = true;
-    return '';
-  });
-  return missing ? null : out;
-};
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-
 /** "If {B} gets its way, what's {A} afraid of?" for a side: {A} is the side asked about. */
 export function worryPrompt(content: PartsContent, visit: PullsVisit, side: PullsSide): string | null {
   const tpl = promptCopy(content, PULLS_PROMPTS.worry);
   if (!tpl) return null;
   const [me, them] = side === 'a' ? [visit.a, visit.b] : [visit.b, visit.a];
-  const out = fill(tpl, { A: me.name, B: them.name });
-  return out && tpl.startsWith('{') && !(tpl.startsWith('{A}') ? me : them).own ? cap(out) : out;
+  return fillPartsLine(tpl, { A: me.name, B: them.name }, { strict: true });
+}
+
+/**
+ * The keepsake's first line as segments, the two names marked (slot `A` / `B`) so the screen can set them
+ * in italics. A name that opens the sentence takes a capital, at render time only (the stored name is
+ * never changed); the rest of each name as written.
+ */
+export function keepsakeSegments(content: PartsContent, visit: PullsVisit, wantLabel: string): SlotSegment[] | null {
+  const both = promptCopy(content, PULLS_PROMPTS.keepsakeBothWant);
+  return both ? fillPartsSegments(both, { A: visit.a.name, B: visit.b.name, want: wantLabel }, { strict: true }) : null;
 }
 
 /**
  * The keepsake exactly as keepPullsKeepsake builds it (functions/src/parts/pulls/keepsake.ts): the
- * two lines, a generated lead name capitalised, the person's own names as they wrote them.
+ * two lines, a name that opens a sentence capitalised (own or generated), the rest as written.
  */
 export function keepsakeLines(content: PartsContent, visit: PullsVisit, wantLabel: string): [string, string] | null {
-  const both = promptCopy(content, PULLS_PROMPTS.keepsakeBothWant);
+  const segs = keepsakeSegments(content, visit, wantLabel);
   const choose = promptCopy(content, PULLS_PROMPTS.keepsakeChoose);
-  if (!both || !choose) return null;
-  const first = fill(both, { A: visit.a.name, B: visit.b.name, want: wantLabel });
-  if (!first) return null;
-  return [both.startsWith('{A}') && !visit.a.own ? cap(first) : first, choose];
+  if (!segs || !choose) return null;
+  return [segs.map((x) => x.text).join(''), choose];
 }
 export const keepsakeText = (lines: [string, string]): string => `${lines[0]} ${lines[1]}`;
 
@@ -353,6 +351,10 @@ export function checkbackRequest(type: PullsCheckbackType, id: string, sessionId
 }
 
 /**
+/** Wise mind's *What to do next* question (src/data/content/wise-mind.json): the chip it puts first. */
+const WISE_FIRST = 'wm_q_next';
+
+/**
  * The quiet link after the keepsake (kept, or Not now): "Ask wise mind what's next". Only when Wise mind
  * is a tool (`hasWiseMind`: getToolById('wise-mind')) and its line ships. Two kept parts carry their ids.
  */
@@ -361,5 +363,6 @@ export function wiseMindLink(content: PartsContent, visit: PullsVisit, state: Pu
   const label = promptCopy(content, PULLS_WISE_MIND);
   if (!label) return null;
   const e = visit.entry;
-  return { to: e.kind === 'parts' ? `/tool/wise-mind?a=${e.aId}&b=${e.bId}` : '/tool/wise-mind', label };
+  // `first`: Wise mind puts *What to do next* first, never pre-selected (docs/design/wise-mind.md, screen 1).
+  return { to: e.kind === 'parts' ? `/tool/wise-mind?first=${WISE_FIRST}&a=${e.aId}&b=${e.bId}` : `/tool/wise-mind?first=${WISE_FIRST}`, label };
 }
