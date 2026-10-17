@@ -58,7 +58,10 @@ export interface KeepsakeDeps {
   link(input: { aId: string; bId: string; bothWantId: string | null }): Promise<{ id: string; version: number }>;
 }
 
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+/** True when text ending in `before` would start a sentence next (line start, or after `. ` `? ` `! `). */
+const opensSentence = (before: string): boolean => /(^|[.?!]\s+|\n)\s*$/.test(before);
+/** A lowercase first letter capitalised; a capital, digit or emoji left as is (src/lib/partsContent.ts). */
+const capFirst = (s: string): string => s.replace(/^\p{Ll}/u, (c) => c.toLocaleUpperCase());
 
 /**
  * A side's name in the keepsake: the part's own name as they kept it, else the pair-only name with its
@@ -72,8 +75,9 @@ export function sideName(side: KeepsakeSide, pairName: string | null): { name: s
 }
 
 /**
- * The two lines, and-not-but, as one My words line. A generated name that opens the sentence takes a
- * capital; the person's own names are left exactly as they wrote them. Null when a slot can't be filled.
+ * The two lines, and-not-but, as one My words line. A name that opens a sentence takes a capital in the
+ * line (own or generated; the kept name itself is never changed), as the app's fillPartsLine does; the
+ * rest as written. Null when a slot can't be filled.
  */
 export function keepsakeText(
   copy: Record<string, string>, a: { name: string; own: boolean }, b: { name: string; own: boolean }, want: string,
@@ -81,17 +85,18 @@ export function keepsakeText(
   const both = copy.keepsake_both_want;
   const choose = copy.keepsake_choose;
   if (!both || !choose) return null;
-  let missing = false;
-  const first = both.replace(/\{(\w+)\}/g, (_, k: string) => {
-    if (k === 'A') return a.name;
-    if (k === 'B') return b.name;
-    if (k === 'want') return want;
-    missing = true;
-    return '';
-  });
-  if (missing) return null;
-  const lead = both.startsWith('{A}') && !a.own ? cap(first) : first;
-  return `${lead} ${choose}`;
+  const slots: Record<string, string> = { A: a.name, B: b.name, want };
+  let first = '';
+  let at = 0;
+  for (const m of both.matchAll(/\{(\w+)\}/g)) {
+    first += both.slice(at, m.index);
+    at = (m.index ?? 0) + m[0].length;
+    const v = slots[m[1]];
+    if (!v) return null;
+    first += opensSentence(first) ? capFirst(v) : v;
+  }
+  first += both.slice(at);
+  return `${first} ${choose}`;
 }
 
 export async function keepPullsKeepsakeHandler(

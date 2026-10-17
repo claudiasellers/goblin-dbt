@@ -32,3 +32,60 @@ export function flowReady(content: PartsContent, promptIds: readonly string[], o
   const options = new Set(Object.values(content.options).flatMap((steps) => Object.values(steps).flat().map((o) => o.id)));
   return optionIds.every((id) => options.has(id));
 }
+
+/* ───────── filling a line's slots ───────── */
+
+/**
+ * Where a slot opens a sentence: the start of the line, or after ". ", "? " or "! " (a line break too).
+ */
+export const opensSentence = (before: string): boolean => /(^|[.?!]\s+|\n)\s*$/.test(before);
+
+/**
+ * The first letter upper-cased when it is a lower-case letter; an emoji, a digit or a capital is left as
+ * is. Render only: a stored name is never changed.
+ */
+export const capFirst = (s: string): string => s.replace(/^\p{Ll}/u, (c) => c.toLocaleUpperCase());
+
+/** A filled line in pieces: plain text, or a slot's value (`slot` names it, so a screen can set it apart). */
+export interface SlotSegment { text: string; slot?: string }
+
+/**
+ * Every parts line's slots ({name}, {A}, {B}, {move}, …) filled for display, in one place: each value as
+ * written (a function replacement, so `$&` stays literal), except that a value opening a sentence takes a
+ * capital first letter ("the one who chases and …" → "The one who chases and …"). A slot with no value is
+ * left as written, or makes the line null with `strict`.
+ */
+export function fillPartsSegments(template: string, slots: Readonly<Record<string, string | null | undefined>>, o: { strict?: boolean } = {}): SlotSegment[] | null {
+  const out: SlotSegment[] = [];
+  let text = '';
+  let at = 0;
+  for (const m of template.matchAll(/\{(\w+)\}/g)) {
+    const lit = template.slice(at, m.index);
+    if (lit) out.push({ text: lit });
+    text += lit;
+    at = (m.index ?? 0) + m[0].length;
+    const v = slots[m[1]];
+    if (v === undefined || v === null || v === '') {
+      if (o.strict) return null;
+      out.push({ text: m[0] });
+      text += m[0];
+      continue;
+    }
+    const shown = opensSentence(text) ? capFirst(v) : v;
+    out.push({ text: shown, slot: m[1] });
+    text += shown;
+  }
+  const rest = template.slice(at);
+  if (rest) out.push({ text: rest });
+  return out;
+}
+
+/** fillPartsSegments as one string (null only with `strict` and a slot missing). */
+export function fillPartsLine(template: string, slots: Readonly<Record<string, string | null | undefined>>, o: { strict?: boolean } = {}): string | null {
+  const segs = fillPartsSegments(template, slots, o);
+  return segs ? segs.map((s) => s.text).join('') : null;
+}
+
+/** fillPartsLine for a slot set that is always complete (unknown slots stay as written): never null. */
+export const fillParts = (template: string, slots: Readonly<Record<string, string | null | undefined>>): string =>
+  fillPartsLine(template, slots) ?? template;
