@@ -4,8 +4,9 @@ A tool for something hard that's coming: name it, say what might show up, pick w
 hardest moment, rehearse it in your mind as if it's happening, settle, and keep the plan. Afterwards,
 Today asks how it went.
 
-Status: **designed 17 Oct 2026, not built.** It's the recommended answer on Claudia's "what next" card.
-Work starts on it while the card is open, and it stops if she picks another option.
+Status: **built 17 Oct 2026**, listed under Emotion Regulation for everyone. Its content isn't gated on
+sign-off; the parts step waits for the parts copy like every parts surface. It was the recommended
+answer on Claudia's "what next" card and was built while the card was open. *As built* is at the end.
 
 ---
 
@@ -389,3 +390,58 @@ rename fails loudly instead of drifting.
 - No scale, score, streak or "confidence".
 - Never pre-fills a past plan into a new visit. A kept plan is in My words, where the person can find it.
 - Never shows a part's name outside the parts step and the person's own plan card.
+
+---
+
+## As built (17 Oct)
+
+- **Where:**
+  - `src/pages/tools/CopeAhead.tsx` (lazy) and `src/components/tools/copeAhead/`:
+    - `PlanScreens` (screens 1–4 and once more);
+    - `PlanAnchor`;
+    - `Rehearse`, `Settle` and `KeepCard`, which are presentational;
+    - `PlanSentence`;
+    - `CopeAheadEntryLink`.
+  - The pure step machine is `src/lib/copeAheadTool.ts`. It handles the order, the If toggle, moves by
+    pull, the danger move first, two moves at most, own words in every slot, and once more.
+  - Listed under Emotion Regulation, with the intent *"Something's coming up that I'm dreading"*.
+- **One plan sentence.** `planLine(content, ca)` in `src/lib/copeAheadPlan.ts` returns
+  `PlanParts { ifText, moves, text }`. The keep card, the rehearsal's plan beat and the after card all
+  call it.
+- **Content:**
+  - `scripts/cope-ahead/content.py` → `schema/cope-ahead.cypher` (five constraints, loaded after
+    `wise-mind`).
+  - `getCopeAheadContent` serves it, and `src/data/content/cope-ahead.json` ships it.
+  - The Copy section above, as written. The voice lint needed no changes.
+  - `dbt_cope_ahead.appToolId = 'cope-ahead'`, out of `PLANNED`. The anticipatory row stays off and a
+    draft.
+- **The visit:**
+  - `ext.ca` is registered, with a closed-set `one` type for `when`, `ifFrom`, `rehearsed` and `settle`.
+  - The page sends every unset field as null and the server drops them, so a cleared answer doesn't
+    linger after the per-namespace merge.
+  - `PROFILE_NEEDS['cope-ahead']` reads the parts anchors.
+  - *Keep this* saves the plan line to My words through `recordWitnessBeat`, as the `cope_ahead` moment
+    (own-line limit 360).
+- **Safety:** a danger moment shows `CrisisBanner` compact under screens 3 and 4. The flow goes on.
+- **The after card:**
+  - `cope_ahead_after`, with chips `today` / `tomorrow` / `this_week` / `later`.
+  - The card holds the first answer on the device. The second tap sends both in one `resolveFollowUp`
+    (`choiceId` + `planHelped`). Skipping or leaving sends the first alone.
+  - Reflect credits `planHelped: 'helped'` to Cope Ahead only.
+  - With a part, the server writes `PartTag {source: 'cope_ahead'}`, which counts for *helped* and never
+    for *when*.
+  - There's a `PracticeSkill` for Cope Ahead.
+- **Ways in:**
+  - `src/lib/copeAheadEntry.ts` holds `copeAheadLink`, `parseCopeAheadEntry` and `situationsWithFirst`.
+  - DEAR MAN's summary shows *Rehearse it* above *How did it go?*, carrying the part only with parts on.
+  - Recover's `recover_rehearse` card on Today shows *Walk through it with Cope Ahead*.
+- **Review:**
+  - `dev/review/copeAhead.tsx` is the whole flow, with 47 branches.
+  - `cope-ahead-closing` covers the three closing components, `cope-ahead-entries` the links, and
+    `cope-ahead-after` the Today card.
+  - a11y is clean on each.
+- **Being fixed:**
+  - The parts step will ask *"Who might show up there?"* (`cope_title_any`) instead of DEAR MAN's
+    conversation wording.
+  - Kept Cope Ahead plans, and any kept line longer than 90 characters, won't be offered as a DEAR MAN
+    anchor, on the client or on the server.
