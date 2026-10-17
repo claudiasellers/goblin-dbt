@@ -2,9 +2,10 @@
  * `ToolSession.ext`: tool-specific detail, namespaced by module (ruling R18). Pure.
  *
  * Each namespace has a registered schema. Values are ids / enums / booleans; integers are allowed
- * only on keys ending `Sec` or `Count` (durations and counts are not scales); the whole object is
+ * only on keys ending `Sec` or `Count` (durations and counts are not scales), or as one of a closed set
+ * a key registers as `one` (Cope Ahead's `rehearsed`: 1 or 2 passes, never a scale); the whole object is
  * ≤ 4 KB serialised. No numeric scale ever reaches a session record, and no free text except the
- * person's own words on a key a tool registers as `text` (Wise mind's `*Own`, docs/design/wise-mind.md):
+ * person's own words on a key a tool registers as `text` (Wise mind's and Cope Ahead's `*Own`):
  * length-checked only, never linted or interpreted, never shown back outside that visit and My words.
  */
 import { ValidationError } from '../shared/validate';
@@ -15,6 +16,7 @@ type Field =
   | { t: 'bool' }
   | { t: 'int'; max: number }                    // key must end in Sec or Count
   | { t: 'text'; max: number }                   // key must end in Own: the person's own words, length-checked only
+  | { t: 'one'; of: readonly (string | number)[] } // exactly one of a closed set
   | { t: 'obj'; of: Record<string, Field> }
   | { t: 'objs'; max: number; of: Record<string, Field> };
 
@@ -22,6 +24,9 @@ const ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
 export const EXT_MAX_BYTES = 4096;
 /** Wise mind's own words (scripts/wise-mind/content.py OWN_MAX). */
 export const WM_OWN_MAX = 140;
+/** Cope Ahead's own words (scripts/cope-ahead/content.py OWN_MAX, MOVE_OWN_MAX). */
+export const CA_OWN_MAX = 140;
+export const CA_MOVE_OWN_MAX = 90;
 
 /** Registered namespaces. A module adds its keys here in the PR that writes them. */
 export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
@@ -87,6 +92,28 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     nextToolId: { t: 'id' },                                                       // the tool it handed off to
     kept: { t: 'bool' },                                                           // "Keep what wise mind said" wrote an OwnLine
   },
+  // Cope Ahead (docs/design/cope-ahead.md). The cope_ahead_after card reads the plan from here.
+  ca: {
+    situationId: { t: 'id' },                                                      // CopeSituation id
+    situationOwn: { t: 'text', max: CA_OWN_MAX },
+    when: { t: 'one', of: ['today', 'tomorrow', 'this_week', 'later'] },           // also the follow-up's chip
+    feelIds: { t: 'ids', max: 2 },                                                 // grid word ids, up to two
+    pullIds: { t: 'ids', max: 4 },                                                 // Find the feeling's pull ids
+    partId: { t: 'id' },                                                           // parts on: the part picked (id only, never its anchor)
+    hardMomentId: { t: 'id' },                                                     // HardMoment id
+    hardMomentOwn: { t: 'text', max: CA_OWN_MAX },
+    ifFrom: { t: 'one', of: ['moment', 'pull'] },                                  // the plan's "If"
+    moveIds: { t: 'ids', max: 2 },                                                 // CopeMove ids
+    moveOwn: { t: 'text', max: CA_MOVE_OWN_MAX },
+    rehearsed: { t: 'one', of: [1, 2] },                                           // passes, never a scale
+    newMomentId: { t: 'id' },                                                      // once more: the moment you didn't plan for
+    newMomentOwn: { t: 'text', max: CA_OWN_MAX },
+    newMoveIds: { t: 'ids', max: 2 },                                              // once more: Change what I'll do
+    newMoveOwn: { t: 'text', max: CA_MOVE_OWN_MAX },
+    settle: { t: 'one', of: ['breath', 'five_senses', 'ok'] },
+    kept: { t: 'bool' },                                                           // "Keep this" wrote an OwnLine
+    followUp: { t: 'bool' },                                                       // "Want me to ask how it went?" Yes
+  },
 };
 
 function checkField(key: string, f: Field, v: unknown, path: string): unknown {
@@ -113,6 +140,9 @@ function checkField(key: string, f: Field, v: unknown, path: string): unknown {
       if (!t || t.length > f.max) throw new ValidationError(`ext ${path}: expected 1 to ${f.max} characters`);
       return t;
     }
+    case 'one':
+      if (!f.of.includes(v as string | number)) throw new ValidationError(`ext ${path}: expected one of ${f.of.join(', ')}`);
+      return v;
     case 'obj':
       return checkObject(f.of, v, path);
     case 'objs':

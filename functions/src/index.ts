@@ -19,6 +19,7 @@ export { getInvalidationRecoveryContent, saveInvalidationRecoverySession, getInv
 export { getFindTheFeelingContent, saveFindTheFeelingSession, getFeelingCollection } from './findTheFeeling';
 export { getCapacityContent } from './capacity';
 export { getWiseMindContent } from './wiseMind';
+export { getCopeAheadContent } from './copeAhead';
 export { getBodyMapContent, suggestEmotionsFromBody } from './bodyMap';
 export { getWitnessLines, recordWitnessBeat } from './witness';
 export {
