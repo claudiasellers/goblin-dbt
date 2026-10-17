@@ -61,6 +61,7 @@ import type { GetPartStoryResponse } from '../../src/data/partsTypes';
 // ---- end a part's story ----
 import { WISE_MIND_SURFACE } from './wiseMind'; // lane 1: Wise mind
 import { SAY_SURFACE } from './sayToPart'; // lane 1: say something to it
+import { COPE_CLOSING_SURFACE } from './copeAheadClosing'; // lane 3: Cope Ahead's screens 5–7
 
 export interface Branch { id: string; label: string; steps?: DriveStep[] }
 export interface Surface {
@@ -807,6 +808,7 @@ export const SURFACES: Surface[] = [
   STORY_SURFACE, // lane 2: a part's story
   WISE_MIND_SURFACE, // lane 1: Wise mind (not a parts surface: dev/review/wiseMind.tsx)
   SAY_SURFACE, // lane 1: say something to it (dev/review/sayToPart.tsx)
+  COPE_CLOSING_SURFACE, // lane 3: Cope Ahead's screens 5–7 (not a parts surface: dev/review/copeAheadClosing.tsx)
 ];
 
 /** Not built on the tip, so not here (the report lists them). */
