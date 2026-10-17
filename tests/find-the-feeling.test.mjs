@@ -58,7 +58,8 @@ test("appToolId values point at real app tools (except the one this change adds)
   assert.ok(rows.length >= 9);
   for (const [c, t] of rows) {
     assert.ok(conceptIds.has(c), `unknown concept ${c}`);
-    if (t !== "find-the-feeling") assert.match(tools, new RegExp(`id: '${t}'`), t);
+    // wise-mind: the content ships first (wise-mind-content), the tool with the next change (wise-mind).
+    if (t !== "find-the-feeling" && t !== "wise-mind") assert.match(tools, new RegExp(`id: '${t}'`), t);
   }
   // Every urge route target must have an app tool id, or the card would point nowhere.
   const withApp = new Set(rows.map(([c]) => c));

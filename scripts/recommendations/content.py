@@ -118,7 +118,9 @@ NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the 
 # Planned tools (Oct 2026 review): the routing names them now; each concept is in the graph but has no
 # app module yet, so its rows are written switched off (and the routing slice skips concepts without an
 # appToolId anyway). When a module ships: give the concept its appToolId (app-tool-ids.cypher), drop it
-# from PLANNED and its rows go live where the review put them.
+# from PLANNED and its rows go live where the review put them. Wise mind's module has shipped (its
+# concept has appToolId 'wise-mind') but it stays here until Claudia signs off the watchful row: its row
+# is written switched off and stays a draft until then.
 PLANNED = {
     "check-the-facts":    {"concept": "dbt_check_facts",        "side": "change",     "skillKind": "change",     "direction": "neutral"},
     "cope-ahead":         {"concept": "dbt_cope_ahead",         "side": "change",     "skillKind": "change",     "direction": "neutral"},
