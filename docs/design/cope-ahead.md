@@ -449,7 +449,9 @@ rename fails loudly instead of drifting.
   - a11y is clean on each.
 - **The parts step's own question.** Cope Ahead asks *"Who might show up there?"* (`cope_title_any`, a
   parts draft). `CopeAheadStep` takes it as `titleId`, and the step's gate is `COPE_AHEAD_PARTS_REQUIRED`
-  (DEAR MAN's set plus that prompt). DEAR MAN keeps *"Who might show up in this conversation?"*.
+  (DEAR MAN's set plus that prompt). DEAR MAN keeps *"Who might show up in this conversation?"*. With
+  `host: 'cope-ahead'` the step takes the screen's heading style, drops *Skip* (the screen's *Next* moves
+  on) and makes *Not sure* a pressable chip that clears the part; nothing is saved for it.
 - **Anchors stay one line.** `anchorableLine` (`functions/src/parts/keepTypes.ts`, mirrored in
   `src/data/partsTypes.ts`) allows a kept line as an anchor only if it is at most 90 characters and isn't
   an own line kept from the `cope_ahead` moment. DEAR MAN's anchor picker filters by it, and
