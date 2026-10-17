@@ -441,6 +441,13 @@ PROMPTS = [
     ("stats_felt_then_now", "common", "stats", "In {month}: {then}. Lately: {now}."),
     ("stats_felt_since", "common", "stats", "Since {month}: {now}."),
     ("stats_when", "common", "stats", "Mostly {when}"),
+    # Steps that helped (Me's card and Reflect, after "What's helped it settle"): the steps chosen in the
+    # Do the Opposite and Recover sessions tagged with the part, most used first, ≤ 3, joined with " · ".
+    # {steps}: each step's graph label (an ActionUrge or default opposite step, a RecoveryExit title),
+    # alone when chosen once, else in stats_step_twice / stats_step_times; {n}: 3 or more.
+    ("stats_steps", "common", "stats", "Steps that helped: {steps}"),
+    ("stats_step_twice", "common", "stats", "{step} (twice)"),
+    ("stats_step_times", "common", "stats", "{step} ({n} times)"),
     # Every press-and-hold (Meet a part's thank and tender holds, the angry card's vote): what a screen
     # reader says with the hold's own label (aria-describedby). A quick key press, a switch or a screen
     # reader's activation fills it hands-free (LightHold's HoldButton), so "press once" is true for them.

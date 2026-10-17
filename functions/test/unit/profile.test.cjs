@@ -270,6 +270,7 @@ test('getMe: active and resting parts carry the stats readout, passed through un
   const tags = [1, 2, 3, 4].map((d) => ({ partId: 'p1', toolId: d < 4 ? 'pause' : 'cool-down', at: at(d) }))
     .concat([1, 2].map((d) => ({ partId: 'p2', toolId: 'pause', at: at(d) })))         // below the threshold
     .concat([1, 2, 3].map((d) => ({ partId: 'p3', toolId: 'pause', at: at(d) })));    // set aside: never counted
+  const steps = [1, 2].map((d) => ({ partId: 'p1', stepId: 'recover:park', label: 'Park the replay', at: at(d) }));
   const run = async (partsOn) => {
     const f = fakeDriver((q) => {
       if (/AS partsOn/.test(q)) return [{ partsOn, timeZone: 'UTC' }];
@@ -279,6 +280,7 @@ test('getMe: active and resting parts carry the stats readout, passed through un
         { id: 'p1', name: null, status: 'active', firstPlace: null, shapeSig: null },
         { id: 'p2', name: null, status: 'resting', firstPlace: null, shapeSig: null },
       ];
+      if (/AS stepId/.test(q)) return steps;
       if (/HAS_PART_TAG/.test(q)) return tags;
       if (/HAS_PART_SESSION/.test(q)) return [];
       return [];
@@ -289,13 +291,15 @@ test('getMe: active and resting parts carry the stats readout, passed through un
   const { me, f } = await run(true);
   const items = me.areas.find((a) => a.id === 'my_parts').items;
   const byId = Object.fromEntries(items.map((i) => [i.meta.id, i.part.stats]));
-  const expected = statsByPart({ partsOn: true, timeZone: 'UTC', parts: [{ id: 'p1', status: 'active' }, { id: 'p2', status: 'resting' }], tags, sessions: [] });
+  const expected = statsByPart({ partsOn: true, timeZone: 'UTC', parts: [{ id: 'p1', status: 'active' }, { id: 'p2', status: 'resting' }], tags, sessions: [], steps });
   assert.deepEqual(byId.p1, expected.get('p1'), "lane 4's compute, untouched");
   assert.deepEqual(byId.p1.helped, [{ toolId: 'pause', n: 3 }, { toolId: 'cool-down', n: 1 }]);
   assert.equal(byId.p1.when, 'evenings');
-  assert.deepEqual(byId.p2, { helped: null, felt: null, when: null }, 'below every threshold: all null, as computed');
+  assert.deepEqual(byId.p1.steps, [{ stepId: 'recover:park', label: 'Park the replay', n: 2 }], 'its steps, with their labels');
+  assert.deepEqual(byId.p2, { helped: null, felt: null, when: null, steps: null }, 'below every threshold: all null, as computed');
   assert.equal(byId.p3, undefined, 'set aside: none');
-  assert.equal(f.calls.filter((c) => /HAS_PART_TAG/.test(c.query)).length, 1, 'one read for all parts');
+  assert.equal(f.calls.filter((c) => /HAS_PART_TAG/.test(c.query) && !/AS stepId/.test(c.query)).length, 1, 'one read for all parts');
+  assert.equal(f.calls.filter((c) => /AS stepId/.test(c.query)).length, 1, 'and one steps read for all parts');
   assert.equal(f.sessions.length, 1, 'inside getMe\'s one read transaction');
   const off = await run(false);
   assert.ok(!off.f.calls.some((c) => /HAS_PART_TAG|HAS_PART_SESSION/.test(c.query)), 'parts off: not read');

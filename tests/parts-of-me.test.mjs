@@ -315,12 +315,16 @@ test("the readout: Reflect's own gate helper, shared, not a second one", async (
   assert.equal(S.statsReady(ALL), true);
   const noWhen = partsFromFixture(fixture, (id) => id !== "when_nights");
   assert.equal(S.statsReady(noWhen), false, "a missing when option hides it all");
+  for (const id of ["stats_steps", "stats_step_twice", "stats_step_times"]) {
+    assert.equal(S.statsReady(partsFromFixture(fixture, (x) => x !== id)), false, `${id}: steps that helped ships with the readout`);
+    assert.equal(S.reflectPartsReady(partsFromFixture(fixture, (x) => x !== id)), false, `${id}: Reflect too`);
+  }
   const c = read("src/components/me/PartsOfMe.tsx");
   assert.match(c, /const showStats = statsReady\(content\);/);
   assert.doesNotMatch(c, /flowReady\(|surfaceReady\(/, "no gate of its own");
 });
 
-test("the card's readout: Mostly {when} under the name, then what's helped and how you've felt, tender parts too", async () => {
+test("the card's readout: Mostly {when} under the name, then what's helped, the steps and how you've felt, tender parts too", async () => {
   const c = read("src/components/me/PartsOfMe.tsx");
   assert.match(c, /const stats: PartStatLines \| null = showStats && part\.stats \? partStatLines\(part\.stats, content, statDeps\) : null;/,
     "only when computed and signed off; tender is no exception");
@@ -328,8 +332,9 @@ test("the card's readout: Mostly {when} under the name, then what's helped and h
   const when = c.indexOf("{stats?.when && ");
   const rather = c.indexOf("row(copy.card_rather");
   const helped = c.indexOf("{stats?.helped && row(stats.helped.title");
-  const felt = c.indexOf("{stats?.felt && row(stats.felt.title, stats.felt.line)}");
-  assert.ok(name > 0 && name < when && when < rather && rather < helped && helped < felt, "in that order");
+  const steps = c.indexOf("{stats?.steps && <p ");
+  const felt = c.indexOf("{stats?.felt && <dl className=\"mt-2\">{row(stats.felt.title, stats.felt.line)}</dl>}");
+  assert.ok(name > 0 && name < when && when < rather && rather < helped && helped < steps && steps < felt, "in that order");
   assert.match(c, /toolName: \(id: string\) => getToolById\(id\)\?\.name \?\? null, monthName: \(m: string\) => monthName\(m\)/);
   assert.doesNotMatch(c, /stats\.\w+\.n\b|\.length\}/, "no numbers but the counts the copy carries");
   // The lines themselves are Reflect's (src/lib/partStats.ts) over the shipped copy.
