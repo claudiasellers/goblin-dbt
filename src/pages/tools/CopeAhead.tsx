@@ -11,7 +11,7 @@ import { anchorLead, copeParts, copeReady, keptLines, showCopeAhead } from '../.
 import { afterScheduleItem, COPE_AHEAD_AFTER_TYPE } from '../../lib/copeAheadAfter';
 import { planLine } from '../../lib/copeAheadPlan';
 import {
-  COPE_EXIT_STEP, copeExt, copeNext, initialCope, isDanger, momentText, parseCopeEntry, planCa,
+  COPE_EXIT_STEP, copeNext, copeSessionExt, initialCope, isDanger, momentText, parseCopeEntry, planCa,
   type CopeEvent, type CopeSettle, type CopeState,
 } from '../../lib/copeAheadTool';
 import { profileCache } from '../../lib/profileCache';
@@ -115,7 +115,7 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
   /** The session always carries what the visit has said so far, so whichever close happens sends it. */
   const sync = useCallback((s: CopeState) => {
     toolSession.setStep(COPE_EXIT_STEP[s.step]);
-    toolSession.setExt({ ca: copeExt(s) });
+    toolSession.setExt({ ca: copeSessionExt(s) });
     toolSession.setEmotionIds(s.feelIds);
     toolSession.setUrgeIds(s.pull && s.pull !== 'not_sure' ? [s.pull] : []);
     if (s.rehearsed > 0) toolSession.markPracticed();

@@ -152,3 +152,14 @@ test("a link may put a situation first, never pre-selected", () => {
   assert.equal(ca.orderedSituations(content, "alone")[0].id, "alone");
   assert.equal(ca.initialCope().situationId, null);
 });
+
+test("the session's ext.ca: every field the server knows, cleared ones as null (setExt merges), nulls dropped on save", () => {
+  const schemaKeys = Object.keys(ext.EXT_SCHEMAS.ca).sort();
+  assert.deepEqual([...ca.CA_KEYS].sort(), schemaKeys);
+  const picked = run([{ type: "moment", id: "go_blank" }], { ...toPlan(), step: "moment" });
+  const own = run([{ type: "momentOwn", text: "They walk out" }], picked);
+  const sent = ca.copeSessionExt(own);
+  assert.equal(sent.hardMomentId, null, "the earlier pick is cleared, not left behind");
+  assert.equal(sent.hardMomentOwn, "They walk out");
+  assert.deepEqual(JSON.parse(ext.validateExt({ ca: sent })).ca, ca.copeExt(own));
+});

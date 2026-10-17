@@ -370,6 +370,21 @@ export function copeExt(s: CopeState): Record<string, unknown> {
   return out;
 }
 
+/** Every `ext.ca` field (functions/src/spine/extSchemas.ts `ca`; a test pins the two together). */
+export const CA_KEYS = [
+  'situationId', 'situationOwn', 'when', 'feelIds', 'pullIds', 'partId', 'hardMomentId', 'hardMomentOwn', 'ifFrom',
+  'moveIds', 'moveOwn', 'rehearsed', 'newMomentId', 'newMomentOwn', 'newMoveIds', 'newMoveOwn', 'settle', 'kept', 'followUp',
+] as const;
+
+/**
+ * What the page hands `setExt` as `ca`: copeExt with every unset field as null. setExt merges per namespace,
+ * so a field the person cleared (a moment swapped for their own words, a move taken out) would otherwise
+ * stay from an earlier screen; the server drops nulls (validateExt).
+ */
+export function copeSessionExt(s: CopeState): Record<string, unknown> {
+  return { ...Object.fromEntries(CA_KEYS.map((k) => [k, null])), ...copeExt(s) };
+}
+
 /** The step sent as exitStep if the person leaves mid-visit. */
 export const COPE_EXIT_STEP: Record<CopeStep, string> = {
   what: 'what', feel: 'feel', moment: 'moment', plan: 'plan', rehearse: 'rehearse', again: 'rehearse',
