@@ -6,7 +6,7 @@
  */
 import type { ManagedTransaction } from 'neo4j-driver';
 import { toNumber } from '../shared/values';
-import type { StatsPartRow, StatsRows, StatsSessionRow, StatsTagRow } from './stats';
+import type { StatsPartRow, StatsRows, StatsSessionRow, StatsStepRow, StatsTagRow } from './stats';
 
 export const STATS_USER_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
@@ -36,6 +36,50 @@ export const STATS_TAGS_QUERY = `
   RETURN pt.id AS partId, ts.toolId AS toolId, toString(coalesce(t.at, t.createdAt)) AS at
 `;
 
+/** The tagged-session prefix both halves of STATS_STEPS_QUERY share: STATS_TAGS_QUERY's, for one tool. */
+const stepTagged = (toolId: string) => `
+  MATCH (u:User {id: $uid})-[:HAS_PART_TAG]->(t:PartTag)-[:OF_PART]->(pt:Part)
+  WHERE coalesce(u.partsEnabled, false) AND pt.status IN ['active', 'resting'] AND (u)-[:HAS_PART]->(pt)
+    AND coalesce(t.source, 'close') = 'close'
+  MATCH (t)-[:TAGS]->(ts:ToolSession {toolId: '${toolId}'})<-[:HAS_TOOL_SESSION]-(u)`;
+
+/**
+ * The step chosen in each close-tagged Do the Opposite and Recover session (its DETAIL record, the
+ * caller's own through COMPLETED_SESSION). Ids and graph labels only, never the person's text:
+ * - Do the Opposite: the size picked (small / medium / bigger) is tested inside the session snapshot
+ *   with CONTAINS, so only the size leaves the graph ("custom", own words, matches none and drops out);
+ *   the step is the targeted ActionUrge's, or, for "My urge is different", the protocol's default step
+ *   of the session's DBT parent (the emotion's EmotionRegulationContent named in the snapshot).
+ * - Recover: the path chosen (exitId), labelled by its RecoveryExit title.
+ * Step ids are namespaced (`oa:<urge>:<size>`, `oa:default_<parent>:<size>`, `recover:<exit>`).
+ */
+export const STATS_STEPS_QUERY = `${stepTagged('opposite-action')}
+  MATCH (ts)-[:DETAIL]->(d:OppositeActionSession)<-[:COMPLETED_SESSION]-(u)
+  WITH pt, t, d,
+       CASE WHEN d.dataJson CONTAINS '"actionSize":"small"' THEN 'small'
+            WHEN d.dataJson CONTAINS '"actionSize":"medium"' THEN 'medium'
+            WHEN d.dataJson CONTAINS '"actionSize":"bigger"' THEN 'bigger' END AS size
+  WHERE size IS NOT NULL
+  OPTIONAL MATCH (d)-[:TARGETED_URGE]->(au:ActionUrge)
+  OPTIONAL MATCH (d)-[:FOCUSED_ON]->(:Emotion)-[:HAS_REGULATION_CONTENT]->(c:EmotionRegulationContent)
+    WHERE d.urgeId = 'custom' AND d.dataJson CONTAINS ('"parentId":"' + c.dbtParent + '"')
+  WITH pt, t, size, au, head(collect(c)) AS c
+  WITH pt, t,
+       CASE WHEN au IS NOT NULL THEN 'oa:' + au.id + ':' + size
+            WHEN c IS NOT NULL THEN 'oa:default_' + c.dbtParent + ':' + size END AS stepId,
+       CASE WHEN au IS NOT NULL THEN au[size]
+            WHEN c IS NOT NULL THEN CASE size WHEN 'small' THEN c.defaultOppositeSmall
+                                              WHEN 'medium' THEN c.defaultOppositeMedium
+                                              ELSE c.defaultOppositeBigger END END AS label
+  WHERE stepId IS NOT NULL AND label IS NOT NULL AND label <> ''
+  RETURN pt.id AS partId, stepId, label, toString(coalesce(t.at, t.createdAt)) AS at
+  UNION ALL${stepTagged('recovering-from-invalidation')}
+  MATCH (ts)-[:DETAIL]->(d:InvalidationRecoverySession)<-[:COMPLETED_SESSION]-(u)
+  MATCH (x:RecoveryExit {id: d.exitId})
+  WHERE x.title IS NOT NULL AND x.title <> ''
+  RETURN pt.id AS partId, 'recover:' + x.id AS stepId, x.title AS label, toString(coalesce(t.at, t.createdAt)) AS at
+`;
+
 /** The caller's Meet a part visits of those parts with a feel-toward answer: the first answer only. */
 export const STATS_SESSIONS_QUERY = `
   MATCH (u:User {id: $uid})-[:HAS_PART_SESSION]->(ps:PartSession)-[:OF_PART]->(pt:Part)
@@ -55,18 +99,21 @@ const nums = (v: unknown): number[] | null => {
 export async function readStatsRows(tx: Pick<ManagedTransaction, 'run'>, uid: string): Promise<StatsRows> {
   const user = (await tx.run(STATS_USER_QUERY, { uid })).records[0];
   const partsOn = user?.get('partsOn') === true;
-  if (!partsOn) return { partsOn: false, timeZone: null, parts: [], tags: [], sessions: [] };
+  if (!partsOn) return { partsOn: false, timeZone: null, parts: [], tags: [], sessions: [], steps: [] };
   const timeZone = str(user?.get('timeZone'));
   const parts: StatsPartRow[] = (await tx.run(STATS_PARTS_QUERY, { uid })).records.map((r) => ({
     id: r.get('id'), name: str(r.get('name')), status: r.get('status'),
     firstPlace: str(r.get('firstPlace')), shapeSig: nums(r.get('shapeSig')),
   }));
-  if (parts.length === 0) return { partsOn, timeZone, parts, tags: [], sessions: [] };
+  if (parts.length === 0) return { partsOn, timeZone, parts, tags: [], sessions: [], steps: [] };
   const tags: StatsTagRow[] = (await tx.run(STATS_TAGS_QUERY, { uid })).records
     .map((r) => ({ partId: r.get('partId'), toolId: str(r.get('toolId')) ?? '', at: r.get('at') }))
     .filter((t) => t.toolId && typeof t.at === 'string');
   const sessions: StatsSessionRow[] = (await tx.run(STATS_SESSIONS_QUERY, { uid })).records
     .map((r) => ({ partId: r.get('partId'), at: r.get('at'), firstFeel: str(r.get('firstFeel')) ?? '' }))
     .filter((s) => s.firstFeel && typeof s.at === 'string');
-  return { partsOn, timeZone, parts, tags, sessions };
+  const steps: StatsStepRow[] = (await tx.run(STATS_STEPS_QUERY, { uid })).records
+    .map((r) => ({ partId: r.get('partId'), stepId: str(r.get('stepId')) ?? '', label: str(r.get('label')) ?? '', at: r.get('at') }))
+    .filter((s) => s.stepId && s.label && typeof s.at === 'string');
+  return { partsOn, timeZone, parts, tags, sessions, steps };
 }

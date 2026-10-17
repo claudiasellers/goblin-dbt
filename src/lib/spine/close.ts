@@ -19,6 +19,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },
   'two-pulls': { module: 'mf', closeKind: 'orienting' },
+  'wise-mind': { module: 'mf', closeKind: 'orienting' },
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },

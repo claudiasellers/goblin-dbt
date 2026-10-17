@@ -140,6 +140,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
          ts.actedOnUrge = CASE WHEN ts.answeredAt IS NULL THEN $actedOnUrge ELSE ts.actedOnUrge END,
          ts.answeredAt = CASE WHEN ts.answeredAt IS NULL AND $answered THEN datetime() ELSE ts.answeredAt END,
          ts.urgeIds = $urgeIds, ts.durationSec = $durationSec, ts.ext = $ext, ts.updatedAt = datetime(),
+         ts.wiseMindAnswer = $wiseMindAnswer,
          // Emotions picked inside the tool: set once, never over a hand-off's ids from the start.
          ts.emotionIds = CASE WHEN size(coalesce(ts.emotionIds, [])) = 0 AND size($emotionIds) > 0
                               THEN $emotionIds ELSE ts.emotionIds END
@@ -161,6 +162,8 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       uid, key, status: c.status, exitStep: c.exitStep, practiced: c.practiced,
       thenVsNow, thenVsNowDir: thenVsNow ? dir : null, actedOnUrge, answered,
       urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
+      // Ask-fresh, on the log record only (layers.ts ASK_FRESH_FIELDS); another tool's is dropped.
+      wiseMindAnswer: rec.get('toolId') === 'wise-mind' ? c.wiseMindAnswer : null,
       ...readingProps('bandAtStart', c.bandAtStart),
       detailKey: c.detail ? userKey(uid, c.detail.id) : null, detailLabel,
       // A "more here" close is not "it helped": no compat outcome for those tools.

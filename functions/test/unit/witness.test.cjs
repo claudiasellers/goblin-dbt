@@ -125,6 +125,27 @@ test('recordWitnessBeat: own-line use counted once per host; tool-session hosts 
   assert.equal(use.params.ownKey, `u1:${OWN}`);
 });
 
+test('recordWitnessBeat: Wise mind\'s keep writes one OwnLine on its own session, with no band and nothing shown', async () => {
+  const f = fakeDriver((q) => {
+    if (/AS found/.test(q)) return [{ found: true, writable: true }];
+    if (/profileVersion/.test(q)) return [{ version: 3 }];
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.recordWitnessBeat.run({
+    auth: auth(),
+    data: { hostKind: 'tool_session', hostId: HOST, moment: 'wise_mind', shown: [], skipped: false, noneFit: false,
+      ownLine: { id: OWN, text: 'Wise mind said: wait, not now.', emotionIds: [] } },
+  });
+  assert.deepEqual(out, { logged: true, ownLineId: OWN, profileVersion: 3 });
+  assert.match(f.calls[0].query, /-\[:HAS_TOOL_SESSION\]->\(h:ToolSession \{key: \$hostKey\}\)/);
+  assert.ok(!f.calls.some((c) => /SHOWED_LINE/.test(c.query)));
+  const own = f.calls.filter((c) => /MERGE \(o:OwnLine \{key: \$key\}\)/.test(c.query));
+  assert.equal(own.length, 1);
+  assert.equal(own[0].params.moment, 'wise_mind');
+  assert.deepEqual(own[0].params.emotionIds, []);
+});
+
 test('recordWitnessBeat: a line can only be kept if it was shown; own-line text over 140 is rejected', async () => {
   setDriver(fakeDriver(() => [{ found: true, writable: true }]).driver);
   await assert.rejects(fns.recordWitnessBeat.run({ auth: auth(), data: beat({ keepLineId: 'other_line' }) }), (e) => e.code === 'invalid-argument');

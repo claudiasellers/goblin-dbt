@@ -115,6 +115,18 @@ export const tools: Tool[] = [
     dbtBasis: 'Walking the Middle Path: recovering from invalidation (with STOP, TIPP, Opposite Action and DEAR MAN)',
     emoji: '💬',
   },
+  // Mindfulness
+  {
+    id: 'wise-mind',
+    name: 'Wise mind',
+    tagline: 'Find the quieter answer when you\'re torn',
+    description: 'Hear what your feelings say and what your thinking says, drop in for a few breaths, and listen for the quieter answer underneath.',
+    whenToUse: 'When you\'re torn about what to do, or want to settle before you choose.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: wise mind (states of mind; ideas for practising wise mind)',
+    emoji: '🪨',
+    bare: true,
+  },
   // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
   {
     id: 'meet-a-part',
@@ -161,6 +173,7 @@ export const intents: Intent[] = [
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
+  { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
 ];
 
 export function getToolById(id: string): Tool | undefined {

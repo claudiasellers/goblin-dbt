@@ -146,6 +146,20 @@ test("validation: recordWitnessBeat request", () => {
   ]) assert.throws(() => v.parseRecordWitnessBeat(bad), JSON.stringify(bad).slice(0, 80));
 });
 
+test("validation: Wise mind's keep is an own line with no band; a shown line still needs one", () => {
+  const keep = v.parseRecordWitnessBeat({
+    hostKind: "tool_session", hostId: HOST, moment: "wise_mind", shown: [], skipped: false, noneFit: false,
+    ownLine: { id: OWN, text: "Wise mind said: wait, not now.", emotionIds: [] },
+  });
+  assert.equal(keep.band, undefined);
+  assert.equal(keep.moment, "wise_mind");
+  assert.equal(keep.ownLine.text, "Wise mind said: wait, not now.");
+  assert.throws(() => v.parseRecordWitnessBeat({
+    hostKind: "checkin", hostId: HOST, moment: "checkin_result", shown: [{ lineId: "ci_fear_l5_1", landed: null }],
+  }), "a shown line is stored with its band");
+  assert.throws(() => v.parseRecordWitnessBeat({ hostKind: "tool_session", hostId: HOST, moment: "wise_mind", band: "calm", shown: [] }));
+});
+
 test("own lines are never linted or sent anywhere: the witness module doesn't import the voice lint", () => {
   for (const f of ["index.ts", "rank.ts", "validation.ts"]) {
     assert.doesNotMatch(readFileSync(`functions/src/witness/${f}`, "utf8"), /voice-lint|lintText|fetch\(/, f);

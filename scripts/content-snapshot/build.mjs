@@ -416,11 +416,16 @@ export function buildParts(g) {
   });
 }
 
-/** getWiseMindContent (functions/src/wiseMind/index.ts), with its version check. */
+/**
+ * getWiseMindContent (functions/src/wiseMind/index.ts), with its version check. null when the graph has
+ * no Wise mind content at all (a load that runs before schema/wise-mind.cypher's first load): the
+ * committed wise-mind.json is kept, so the load order of a deploy doesn't matter. A wrong version throws.
+ */
 export function buildWiseMind(g) {
   const flow = g.nodes('WiseMindFlow').find((n) => n.props.id === 'wise_mind_flow');
-  if (!flow || flow.props.version !== WISE_MIND_VERSION) {
-    throw new Error(`Wise mind content is ${flow ? flow.props.version : 'missing'}; the app expects ${WISE_MIND_VERSION}`);
+  if (!flow) return null;
+  if (flow.props.version !== WISE_MIND_VERSION) {
+    throw new Error(`Wise mind content is ${flow.props.version}; the app expects ${WISE_MIND_VERSION}`);
   }
   const doc = JSON.parse(flow.props.contentJson);
   const voicesOf = new Map();
@@ -445,10 +450,17 @@ export function buildWiseMind(g) {
   return { version: WISE_MIND_VERSION, ownMax: doc.ownMax, copy: doc.copy, questions, practices, answers };
 }
 
-/** All the snapshots from one export (pure apart from reading the version constants). */
+/** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
+export const KEPT_WHEN_MISSING = ['wise-mind.json'];
+
+/**
+ * All the snapshots from one export (pure apart from reading the version constants). A file in
+ * KEPT_WHEN_MISSING whose content isn't in the graph yet is left out (main keeps the committed one).
+ */
 export function buildSnapshots(exp) {
   assertContentOnly(exp);
   const g = indexGraph(exp);
+  const wiseMind = buildWiseMind(g);
   return {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
@@ -457,7 +469,7 @@ export function buildSnapshots(exp) {
     'capacity.json': buildCapacity(g),
     'spine.json': buildSpine(g),
     'parts.json': buildParts(g),
-    'wise-mind.json': buildWiseMind(g),
+    ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
   };
 }
 
@@ -471,6 +483,23 @@ export function newestExport(dir = BACKUPS_DIR) {
   return files[0];
 }
 
+/**
+ * Write the snapshots to `outDir` (src/data/content/ by default). A KEPT_WHEN_MISSING file the export had
+ * no content for is not touched: a warning says the committed one was kept.
+ */
+export function writeSnapshots(snapshots, source, { outDir = OUT_DIR, log = console } = {}) {
+  mkdirSync(outDir, { recursive: true });
+  for (const name of KEPT_WHEN_MISSING.filter((n) => !(n in snapshots))) {
+    log.warn(`! src/data/content/${name}: no content for it in this graph yet; kept the committed file`);
+  }
+  for (const [name, content] of Object.entries(snapshots)) {
+    const text = `${JSON.stringify({ source, content }, null, 2)}\n`;
+    writeFileSync(join(outDir, name), text);
+    log.log(`✓ src/data/content/${name.padEnd(22)} ${(text.length / 1024).toFixed(1)} KB`);
+  }
+  log.log(`  from ${source.file} (exported ${source.exportedAt})`);
+}
+
 function main() {
   const args = process.argv.slice(2);
   const from = args.includes('--from') ? resolve(args[args.indexOf('--from') + 1]) : newestExport();
@@ -482,14 +511,7 @@ function main() {
     console.error(`✗ ${e.message}\n  Nothing written.`);
     process.exit(2);
   }
-  mkdirSync(OUT_DIR, { recursive: true });
-  const source = { file: basename(from), exportedAt: exp.exportedAt };
-  for (const [name, content] of Object.entries(snapshots)) {
-    const text = `${JSON.stringify({ source, content }, null, 2)}\n`;
-    writeFileSync(join(OUT_DIR, name), text);
-    console.log(`✓ src/data/content/${name.padEnd(22)} ${(text.length / 1024).toFixed(1)} KB`);
-  }
-  console.log(`  from ${source.file} (exported ${source.exportedAt})`);
+  writeSnapshots(snapshots, { file: basename(from), exportedAt: exp.exportedAt });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main();

@@ -497,10 +497,31 @@
    "copy": "Mostly {when}",
    "reviewStatus": "draft"
   },
+  "stats_steps": {
+   "flow": "common",
+   "step": "stats",
+   "order": 9,
+   "copy": "Steps that helped: {steps}",
+   "reviewStatus": "draft"
+  },
+  "stats_step_twice": {
+   "flow": "common",
+   "step": "stats",
+   "order": 10,
+   "copy": "{step} (twice)",
+   "reviewStatus": "draft"
+  },
+  "stats_step_times": {
+   "flow": "common",
+   "step": "stats",
+   "order": 11,
+   "copy": "{step} ({n} times)",
+   "reviewStatus": "draft"
+  },
   "hold_hint": {
    "flow": "common",
    "step": "hold",
-   "order": 9,
+   "order": 12,
    "copy": "Hold to fill it, or press once and wait.",
    "reviewStatus": "draft"
   },

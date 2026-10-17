@@ -26,6 +26,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },
   // Two pulls (docs/design/parts.md): the same orienting close, never what-helps evidence.
   'two-pulls': { module: 'mf', closeKind: 'orienting' },
+  // Wise mind (docs/design/wise-mind.md): "Further away … More here", unless it handed off. A skill:
+  // a "More here" after it counts toward what helps (not in NOT_WHAT_HELPS).
+  'wise-mind': { module: 'mf', closeKind: 'orienting' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
