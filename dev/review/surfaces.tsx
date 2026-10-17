@@ -56,6 +56,7 @@ import { PartStory } from '../../src/components/parts/story/PartStory';
 import { partStoryCopy } from '../../src/lib/partStory';
 import type { GetPartStoryResponse } from '../../src/data/partsTypes';
 // ---- end a part's story ----
+import { WISE_MIND_SURFACE } from './wiseMind'; // lane 1: Wise mind
 
 export interface Branch { id: string; label: string; steps?: DriveStep[] }
 export interface Surface {
@@ -735,6 +736,7 @@ export const SURFACES: Surface[] = [
   },
   DEN_SURFACE, // lane 2: the den
   STORY_SURFACE, // lane 2: a part's story
+  WISE_MIND_SURFACE, // lane 1: Wise mind (not a parts surface: dev/review/wiseMind.tsx)
 ];
 
 /** Not built on the tip, so not here (the report lists them). */
