@@ -38,6 +38,8 @@ const partName = (id: string) => PARTS.find((p) => p.id === id)!.name;
 const CHASE_ANCHOR = slices().partAnchors[Object.keys(slices().partAnchors)[0]];
 const KEPT_LINE = slices().savedLines[0].text;
 const copeTitle = (PARTS_FIXTURE.prompts as Record<string, { copy: string }>).cope_title_any.copy;
+/** DEAR MAN's Skip: never on Cope Ahead's screen (its Next moves on). */
+const COPE_SKIP = (PARTS_FIXTURE.options as unknown as Record<string, Record<string, { id: string; label: string }[]>>).dearman.cope.find((o) => o.id === 'cope_skip')!.label;
 
 /** Own words at each slot's full length: the situation and the moment (140), a move (90). */
 const LONG_SITUATION = 'My sister is coming to stay for the whole weekend and we have not really talked properly since the funeral in the spring, not once, honestly';
@@ -105,7 +107,8 @@ const BRANCHES: (Branch & { reduce?: boolean; noParts?: boolean; keepFails?: boo
   { id: 'ask_no', label: '7. Ask how it went: No thanks', steps: [...kept, tap(t('ask_after_no'))] },
   { id: 'done', label: '7. Done: back to Tools', steps: [...kept, tap(t('ask_after_no')), tap(t('done'))] },
   { id: 'own_max_keep', label: '7. The plan card with own words at full length', steps: [...ownMax, next, ...nexts(6), tap(t('rehearse_again_no')), tap(t('settle_ok'))] },
-  { id: 'parts_step', label: 'Parts on: Who might show up? on screen 2 (DEAR MAN\'s step, as is)', steps: toFeel('conversation') },
+  { id: 'parts_step', label: 'Parts on: Who might show up? on screen 2 (DEAR MAN\'s step in this screen\'s ways: no Skip)', steps: toFeel('conversation') },
+  { id: 'parts_not_sure', label: 'Parts on: Who might show up? Not sure pressed', steps: [...toFeel('conversation'), { opt: 'cope_not_sure', in: '[data-testid="cope-ahead"]' }] },
   { id: 'parts_anchor', label: 'Parts on: a part with an anchor, under the plan', steps: partsToPlan('chase') },
   { id: 'parts_set', label: 'Parts on: a part with no anchor: set one under the plan', steps: partsToPlan('hide') },
   { id: 'parts_set_saved', label: 'Parts on: a kept line saved as its anchor', steps: [...partsToPlan('hide'), tap(KEPT_LINE), { opt: 'cope_save' }] },
@@ -186,7 +189,7 @@ export const COPE_AHEAD_EXPECT: Record<string, string> = Object.fromEntries(([
   ['keep', BASE_PLAN], ['keep_kept', t('keep_done')], ['keep_failed', t('keep_yes')],
   ['keep_not_now', t('ask_after_q')], ['ask_yes', t('done')], ['ask_no', t('done')], ['done', 'Opened /tools'],
   ['own_max_keep', plan({ hardMomentOwn: LONG_MOMENT, moveOwn: LONG_MOVE })],
-  ['parts_step', copeTitle], ['parts_anchor', CHASE_ANCHOR], ['parts_set', KEPT_LINE], ['parts_set_saved', KEPT_LINE],
+  ['parts_step', copeTitle], ['parts_not_sure', copeTitle], ['parts_anchor', CHASE_ANCHOR], ['parts_set', KEPT_LINE], ['parts_set_saved', KEPT_LINE],
   ['parts_preset', CHASE_ANCHOR], ['parts_keep', CHASE_ANCHOR], ['first_linked', S('alone')],
 ] as [string, string][]).map(([b, line]) => [`cope-ahead/${b}`, line]));
 
@@ -195,6 +198,7 @@ export const COPE_AHEAD_ABSENT: Record<string, string> = {
   'cope-ahead/once_more_end': t('rehearse_again_q'),
   'cope-ahead/feel': copeTitle,
   'cope-ahead/parts_step': CHASE_ANCHOR,
+  'cope-ahead/parts_not_sure': COPE_SKIP,
   'cope-ahead/plan_two': t('plan_add'),
   'cope-ahead/keep_kept': t('keep_no'),
   'cope-ahead/keep_failed': t('ask_after_q'),

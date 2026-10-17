@@ -21,8 +21,13 @@ const chipOn = 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] bord
  * Save (setPartAnchor). Not sure / Skip go on and write nothing. Every word is signed-off parts content
  * or the person's own; the host renders this only when `showCopeAhead` says so. A failed save keeps the
  * form as it was and says so under Save (cope_save_failed).
+ *
+ * `host: 'cope-ahead'` (Cope Ahead's screen 2, under its own two questions) takes that screen's ways: the
+ * question in its sub-question style, no Skip (the screen's Next moves on), and Not sure as a pressable
+ * chip like the screen's own Not sure chips (pressing it clears any part, picking a part un-presses it).
+ * That press is UI state only: nothing is saved for it. DEAR MAN (the default) is unchanged.
  */
-export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, onAnchor, onGoOn, titleId = 'cope_title' }: {
+export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, onAnchor, onGoOn, titleId = 'cope_title', host = 'dear-man' }: {
   content: PartsContent;
   /** The part chips (copeParts: slice order, at most four). */
   parts: ProfileSlices['parts'];
@@ -38,6 +43,8 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   onGoOn: () => void;
   /** The question's prompt id: DEAR MAN's `cope_title`, or Cope Ahead's `cope_title_any` (COPE_AHEAD_TITLE). */
   titleId?: 'cope_title' | 'cope_title_any';
+  /** Whose screen it sits on: DEAR MAN's own step (default), or Cope Ahead's screen 2. */
+  host?: 'dear-man' | 'cope-ahead';
 }) {
   const [editing, setEditing] = useState(false);
   const [lineId, setLineId] = useState<string | null>(null);
@@ -47,6 +54,10 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   /** The last save failed: cope_save_failed under Save until the next try. */
   const [failed, setFailed] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
+  const inCope = host === 'cope-ahead';
+  /** Cope Ahead: Not sure pressed (only while no part is picked). */
+  const [unsure, setUnsure] = useState(false);
+  const unsureOn = inCope && unsure && picked === null;
 
   const title = promptCopy(content, titleId) ?? '';
   const c = copeChips(content);
@@ -61,7 +72,11 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   useStepFocus(panel, view);
 
   const clearForm = () => { setEditing(false); setLineId(null); setOwnOpen(false); setOwnText(''); setFailed(false); };
-  const pick = (id: string) => { clearForm(); onPick(id); };
+  const pick = (id: string) => { clearForm(); setUnsure(false); onPick(id); };
+  const toggleUnsure = () => {
+    if (unsureOn) { setUnsure(false); return; }
+    clearForm(); setUnsure(true); onPick(null);
+  };
   const goOn = () => { clearForm(); onPick(null); onGoOn(); };
 
   const save = async () => {
@@ -85,7 +100,7 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
 
   return (
     <div className="space-y-5" data-testid="cope-ahead">
-      <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{title}</h3>
+      <h3 className={inCope ? 'font-medium text-[var(--color-text-primary)]' : 'text-lg font-semibold text-[var(--color-text-primary)]'}>{title}</h3>
       <div className="flex flex-wrap gap-2" role="group" aria-label={title}>
         {parts.map((p) => {
           const label = partChipLabel(content, p);
@@ -98,10 +113,13 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
             </button>
           );
         })}
-        {c.cope_not_sure && (
-          <button type="button" onClick={goOn} className={`${chip} ${chipOff} text-sm`}>{c.cope_not_sure.label}</button>
+        {c.cope_not_sure && (inCope
+          // Cope Ahead's own chip (wiseMind/bits Chip's look), as its Not sure chips above.
+          ? <button type="button" aria-pressed={unsureOn ? 'true' : 'false'} onClick={toggleUnsure}
+              className={`den-chip den-chip--small ${unsureOn ? '!text-[var(--color-on-accent)]' : ''}`}>{c.cope_not_sure.label}</button>
+          : <button type="button" onClick={goOn} className={`${chip} ${chipOff} text-sm`}>{c.cope_not_sure.label}</button>
         )}
-        {c.cope_skip && (
+        {c.cope_skip && !inCope && (
           <button type="button" onClick={goOn} className={`${chip} ${chipOff} text-sm`}>{c.cope_skip.label}</button>
         )}
       </div>

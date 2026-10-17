@@ -211,3 +211,28 @@ test("no hard-coded user-facing strings in the cope screen; DEAR MAN reads only 
   assert.deepEqual(clientTypes.PROFILE_NEEDS["dear-man"], ["parts", "ownLines", "savedLines", "partAnchors"]);
   assert.ok(!clientTypes.PROFILE_NEEDS["dear-man"].includes("partDetail"));
 });
+
+test("hosted in Cope Ahead (host: 'cope-ahead'): the host's sub-question style, no Skip, Not sure a pressable chip; DEAR MAN unchanged", () => {
+  assert.match(step, /host = 'dear-man' \}: \{/, "DEAR MAN is the default");
+  assert.match(step, /host\?: 'dear-man' \| 'cope-ahead';/);
+  // Heading: DEAR MAN's own, or Cope Ahead's Sub style (PlanScreens.tsx).
+  assert.match(step, /<h3 className=\{inCope \? 'font-medium text-\[var\(--color-text-primary\)\]' : 'text-lg font-semibold text-\[var\(--color-text-primary\)\]'\}>\{title\}<\/h3>/);
+  assert.match(read("src/components/tools/copeAhead/PlanScreens.tsx"), /<h3 id=\{id\} className="font-medium text-\[var\(--color-text-primary\)\]">/);
+  // DEAR MAN: Not sure and Skip both go on (and write nothing).
+  assert.match(step, /: <button type="button" onClick=\{goOn\} className=\{`\$\{chip\} \$\{chipOff\} text-sm`\}>\{c\.cope_not_sure\.label\}<\/button>/);
+  assert.match(step, /\{c\.cope_skip && !inCope && \(\s*<button type="button" onClick=\{goOn\}/);
+  // Cope Ahead: Not sure toggles aria-pressed, clears the part; picking a part un-presses it. UI state only.
+  assert.match(step, /\? <button type="button" aria-pressed=\{unsureOn \? 'true' : 'false'\} onClick=\{toggleUnsure\}\s*className=\{`den-chip den-chip--small/);
+  assert.match(step, /const unsureOn = inCope && unsure && picked === null;/);
+  assert.match(step, /const toggleUnsure = \(\) => \{\s*if \(unsureOn\) \{ setUnsure\(false\); return; \}\s*clearForm\(\); setUnsure\(true\); onPick\(null\);\s*\};/);
+  assert.match(step, /const pick = \(id: string\) => \{ clearForm\(\); setUnsure\(false\); onPick\(id\); \};/);
+  const toggle = step.slice(step.indexOf("const toggleUnsure"), step.indexOf("};", step.indexOf("const toggleUnsure")));
+  assert.doesNotMatch(toggle, /onGoOn|goOn\(/, "Not sure in Cope Ahead never goes on");
+  // The hosts: Cope Ahead passes it, DEAR MAN doesn't.
+  assert.match(read("src/pages/tools/CopeAhead.tsx"), /titleId=\{COPE_AHEAD_TITLE\} host="cope-ahead" \/>/);
+  assert.doesNotMatch(tsx, /host="cope-ahead"/);
+  // The review walks it: Not sure pressed, and no Skip on Cope Ahead's screen.
+  const review = read("dev/review/copeAhead.tsx");
+  assert.match(review, /id: 'parts_not_sure'/);
+  assert.match(review, /'cope-ahead\/parts_not_sure': COPE_SKIP,/);
+});

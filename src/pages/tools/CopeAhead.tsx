@@ -199,7 +199,7 @@ function CopeVisit({ content }: { content: CopeAheadContent }) {
           partsStep={partsShown && partsCopy && slices ? (
             <CopeAheadStep content={partsCopy} parts={copeParts(slices.parts)} anchors={anchors} lines={lines}
               picked={s.partId} onPick={(id) => send({ type: 'part', partId: id })} onAnchor={onAnchor} onGoOn={() => {}}
-              titleId={COPE_AHEAD_TITLE} />
+              titleId={COPE_AHEAD_TITLE} host="cope-ahead" />
           ) : null} />
       );
       break;
