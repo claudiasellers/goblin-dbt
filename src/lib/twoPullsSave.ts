@@ -353,6 +353,10 @@ export function checkbackRequest(type: PullsCheckbackType, id: string, sessionId
 }
 
 /**
+/** Wise mind's *What to do next* question (src/data/content/wise-mind.json): the chip it puts first. */
+const WISE_FIRST = 'wm_q_next';
+
+/**
  * The quiet link after the keepsake (kept, or Not now): "Ask wise mind what's next". Only when Wise mind
  * is a tool (`hasWiseMind`: getToolById('wise-mind')) and its line ships. Two kept parts carry their ids.
  */
@@ -361,5 +365,6 @@ export function wiseMindLink(content: PartsContent, visit: PullsVisit, state: Pu
   const label = promptCopy(content, PULLS_WISE_MIND);
   if (!label) return null;
   const e = visit.entry;
-  return { to: e.kind === 'parts' ? `/tool/wise-mind?a=${e.aId}&b=${e.bId}` : '/tool/wise-mind', label };
+  // `first`: Wise mind puts *What to do next* first, never pre-selected (docs/design/wise-mind.md, screen 1).
+  return { to: e.kind === 'parts' ? `/tool/wise-mind?first=${WISE_FIRST}&a=${e.aId}&b=${e.bId}` : `/tool/wise-mind?first=${WISE_FIRST}`, label };
 }
