@@ -7,9 +7,9 @@ import { useToolSession } from '../../hooks/useToolSession';
 import { handoffExt } from '../../lib/bandStore';
 import { newId } from '../../lib/spine/ids';
 import {
-  WISE_EXIT_STEP, WISE_FEELS, canKeep, defaultPracticeId, initialWise, keptLine, mindsHeard, nextToolIdsFor, offersOnceMore,
+  WISE_EXIT_STEP, WISE_FEELS, canKeep, defaultPracticeId, feelLine, initialWise, keptLine, mindsHeard, nextToolIdsFor, offersOnceMore,
   orderedQuestions, parseWiseEntry, voicesFor, wiseCopy, wiseCopyReady, wiseExt, wiseMindAnswerOf, wiseNext,
-  type MindSide, type WiseCopy, type WiseEvent, type WiseState,
+  type MindSide, type StepBackSlot, type WiseCopy, type WiseEvent, type WiseState,
 } from '../../lib/wiseMind';
 import { getWiseMindContent } from '../../services/wiseMind';
 import { recordWitnessBeat } from '../../services/witness';
@@ -28,7 +28,10 @@ const HOST = 'wise-mind';
  * ToolSession up to date (`ext.wm`, the ask-fresh `wiseMindAnswer`), saves *Keep what wise mind said* as
  * an own line on that tap only, and hands off through `linkTo`. TooMuchLink on every screen; no band gate.
  */
-export function WiseMind() {
+export function WiseMind({ stepBack = null }: {
+  /** The parts form (screen 2p) when its gate holds; without it the default form runs. */
+  stepBack?: StepBackSlot | null;
+} = {}) {
   const [content, setContent] = useState<WiseMindContent | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -45,17 +48,17 @@ export function WiseMind() {
       </div>
     );
   }
-  return <WiseVisit content={content} copy={copy} />;
+  return <WiseVisit content={content} copy={copy} stepBack={stepBack} />;
 }
 
 type OwnFor = 'question' | MindSide | 'answer' | null;
 
-function WiseVisit({ content, copy }: { content: WiseMindContent; copy: WiseCopy }) {
+function WiseVisit({ content, copy, stepBack }: { content: WiseMindContent; copy: WiseCopy; stepBack: StepBackSlot | null }) {
   const toolSession = useToolSession();
   const navigate = useNavigate();
   const location = useLocation();
   const [entry] = useState(() => parseWiseEntry(location.search, content));
-  const [st, setSt] = useState<WiseState>(initialWise);
+  const [st, setSt] = useState<WiseState>(() => initialWise(stepBack ? 'parts' : 'minds'));
   const [own, setOwn] = useState<OwnFor>(null);
   const [practiceEnded, setPracticeEnded] = useState(false);
   const [keep, setKeep] = useState<'idle' | 'saving' | 'failed'>('idle');
@@ -153,6 +156,15 @@ function WiseVisit({ content, copy }: { content: WiseMindContent; copy: WiseCopy
       </>);
       break;
     }
+    case 'stepBack': {
+      // Screen 2p: the room comes with the slot (the parts form only starts with one).
+      const Room = stepBack?.Room;
+      body = Room
+        ? <Room question={questionText} presetPartIds={entry.presetPartIds} sessionId={toolSession.persisted ? toolSession.id : ''}
+            onDone={(r) => send({ type: 'steppedBack', ...r })} onUseMinds={() => send({ type: 'useMinds' })} />
+        : <QuietLink label={copy.chrome.next} onClick={() => send({ type: 'continue' })} />;
+      break;
+    }
     case 'dropIn': {
       const picked = s.practiceId ?? defaultPracticeId(s, content);
       body = (<>
@@ -199,7 +211,7 @@ function WiseVisit({ content, copy }: { content: WiseMindContent; copy: WiseCopy
         <Prompt>{copy.feel.prompt}</Prompt>
         <ChipRow options={WISE_FEELS.map((f) => ({ id: f, label: copy.feel.options[f] }))} picked={s.feel}
           onPick={(id) => send({ type: 'feel', feel: id as (typeof WISE_FEELS)[number] })} />
-        {s.feel && <Line serif status>{copy.feel.lines[s.feel]}</Line>}
+        {s.feel && <Line serif status>{feelLine(s, copy, stepBack?.pushedLine ?? null)}</Line>}
         {s.feel === 'pushed' && (
           <div className="flex flex-wrap gap-2.5">
             {offersOnceMore(s) && <Chip label={copy.feel.onceMore} onClick={() => send({ type: 'onceMore' })} />}

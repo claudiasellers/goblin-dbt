@@ -187,3 +187,33 @@ test("wiseMindAnswer rides on whichever close happens, never pre-filled", () => 
   const layers = read("functions/src/userdata/layers.ts");
   assert.match(layers, /'wiseMindAnswer'/, "an ask-fresh field");
 });
+
+test("the parts form's seam (screen 2p, lane 4): the step back after the question, part ids only, back to the two minds", () => {
+  assert.equal(wm.initialWise().form, "minds", "the default form");
+  let s = run([{ type: "question", id: "wm_q_next" }], wm.initialWise("parts"));
+  assert.equal(s.step, "stepBack");
+  assert.equal(run([{ type: "useMinds" }], s).step, "minds");
+  assert.equal(run([{ type: "useMinds" }], s).form, "minds");
+  assert.equal(run([{ type: "skip" }], s).step, "dropIn");
+  s = run([{ type: "steppedBack", partIds: ["p1", "p2", "p1", ""], stillCloseIds: ["p2", "p9"] }], s);
+  assert.deepEqual([s.step, s.partIds, s.stillCloseIds], ["dropIn", ["p1", "p2"], ["p2"]], "deduplicated; still close only among the placed");
+  const out = wm.wiseExt(s);
+  assert.deepEqual([out.form, out.partIds, out.stillCloseIds], ["parts", ["p1", "p2"], ["p2"]]);
+  assert.ok(JSON.parse(ext.validateExt({ wm: out })).wm.partIds);
+  assert.equal(wm.wiseExt(run([{ type: "useMinds" }], run([{ type: "question", id: "wm_q_next" }], wm.initialWise("parts")))).partIds, undefined);
+  assert.equal(wm.WISE_EXIT_STEP.stepBack, "step_back");
+});
+
+test("screen 5's Pushed, urgent line switches on the form; ?a=&b= is passed on as presetPartIds", () => {
+  const c = wm.wiseCopy(content.copy);
+  const pushed = (form) => run([{ type: "skip" }, { type: "start" }, { type: "here" }, { type: "answer", id: "wm_a_say" }, { type: "feel", feel: "pushed" }], wm.initialWise(form));
+  assert.equal(wm.feelLine(pushed("minds"), c, "A part might still be close."), "That might be emotion mind talking.");
+  assert.equal(wm.feelLine(pushed("parts"), c, "A part might still be close."), "A part might still be close.");
+  assert.equal(wm.feelLine(pushed("parts"), c, null), "That might be emotion mind talking.", "until the parts line ships");
+  assert.deepEqual(wm.parseWiseEntry("?a=part_1&b=part_2", content).presetPartIds, ["part_1", "part_2"]);
+  assert.deepEqual(wm.parseWiseEntry("?a=part_1&b=part_1", content).presetPartIds, ["part_1"]);
+  assert.deepEqual(wm.parseWiseEntry("?a=<x>&b=", content).presetPartIds, []);
+  const page = read("src/pages/tools/WiseMind.tsx");
+  assert.match(page, /useState<WiseState>\(\(\) => initialWise\(stepBack \? 'parts' : 'minds'\)\)/);
+  assert.match(page, /<Room question=\{questionText\} presetPartIds=\{entry\.presetPartIds\}/);
+});

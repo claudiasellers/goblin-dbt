@@ -7,12 +7,15 @@
  * ever blocks: *Pushed, urgent* offers *Drop in once more* (once) and *Keep it anyway*, never a stop.
  * The machine never reads what the person wrote: own words are carried, length-capped, and saved.
  */
+import type { ComponentType } from 'react';
 import type { WiseMindContent } from '../data/wiseMindTypes';
 
-export const WISE_STEPS = ['question', 'minds', 'dropIn', 'practice', 'comes', 'quiet', 'feel', 'next', 'close', 'handoff'] as const;
+export const WISE_STEPS = ['question', 'minds', 'stepBack', 'dropIn', 'practice', 'comes', 'quiet', 'feel', 'next', 'close', 'handoff'] as const;
 export type WiseStep = (typeof WISE_STEPS)[number];
 export type MindSide = 'emotion' | 'reason';
 export type WiseFeel = 'calm' | 'pushed' | 'unsure';
+/** `minds`: screen 2, both minds (the default). `parts`: screen 2p, the step back (docs/design/wise-mind.md; parts on). */
+export type WiseForm = 'minds' | 'parts';
 export const WISE_FEELS: readonly WiseFeel[] = ['calm', 'pushed', 'unsure'];
 
 /** What one mind said: a chip, the person's words, or *Nothing comes*. */
@@ -20,8 +23,8 @@ export interface MindSaid { id: string | null; own: string | null; nothing: bool
 
 export interface WiseState {
   step: WiseStep;
-  /** The form this visit runs (piece 3 adds `parts`). */
-  form: 'minds';
+  /** The form this visit runs: screen 2 or 2p after the question (the page decides at the start). */
+  form: WiseForm;
   questionId: string | null;
   questionOwn: string | null;
   /** The circle whose chips are open on screen 2. */
@@ -38,6 +41,9 @@ export interface WiseState {
   onceMore: boolean;
   nextToolId: string | null;
   kept: boolean;
+  /** The step back (2p): the parts the person placed, and those that wouldn't step back. Part ids only. */
+  partIds: string[];
+  stillCloseIds: string[];
 }
 
 export type WiseEvent =
@@ -59,18 +65,26 @@ export type WiseEvent =
   | { type: 'handoff'; toolId: string }
   | { type: 'enough' }
   | { type: 'skip' }
-  | { type: 'continue' };
+  | { type: 'continue' }
+  /** The step back is done (2p): what was placed, ids only. */
+  | { type: 'steppedBack'; partIds: string[]; stillCloseIds: string[] }
+  /** 2p's *Use the two minds instead*. */
+  | { type: 'useMinds' };
 
 /** The parts of the content the machine decides by (ids, kinds, defaults), never the copy. */
 export type WiseContext = Pick<WiseMindContent, 'ownMax' | 'questions' | 'practices' | 'answers'>;
 
-/** The question chip a link may put first (never pre-selected): `?first=<question id>`. */
-export interface WiseEntry { firstQuestionId: string | null }
+/**
+ * What the link carried: the question chip it may put first (never pre-selected), `?first=<question id>`;
+ * and, from Two pulls' keepsake, `?a=<part id>&b=<part id>`: the parts already in the room (2p).
+ */
+export interface WiseEntry { firstQuestionId: string | null; presetPartIds: string[] }
 
-export function initialWise(): WiseState {
+export function initialWise(form: WiseForm = 'minds'): WiseState {
   return {
-    step: 'question', form: 'minds', questionId: null, questionOwn: null, side: null, emotion: null, reason: null,
+    step: 'question', form, questionId: null, questionOwn: null, side: null, emotion: null, reason: null,
     practiceId: null, dropped: false, answerId: null, answerOwn: null, feel: null, onceMore: false, nextToolId: null, kept: false,
+    partIds: [], stillCloseIds: [],
   };
 }
 
@@ -115,12 +129,14 @@ export const canKeep = (st: WiseState, ctx: WiseContext): boolean =>
   !st.kept && (st.answerOwn !== null || (st.answerId !== null && ctx.answers.find((a) => a.id === st.answerId)?.kind !== 'quiet'));
 
 export function wiseNext(st: WiseState, e: WiseEvent, ctx: WiseContext): WiseState {
+  // After the question: screen 2, or the step back (2p) in the parts form.
+  const second: WiseStep = st.form === 'parts' ? 'stepBack' : 'minds';
   switch (st.step) {
     case 'question':
-      if (e.type === 'question' && ctx.questions.some((q) => q.id === e.id)) return { ...st, questionId: e.id, questionOwn: null, step: 'minds' };
+      if (e.type === 'question' && ctx.questions.some((q) => q.id === e.id)) return { ...st, questionId: e.id, questionOwn: null, step: second };
       if (e.type === 'questionOwn') {
         const t = own(e.text, ctx.ownMax);
-        return t ? { ...st, questionId: null, questionOwn: t, step: 'minds' } : st;
+        return t ? { ...st, questionId: null, questionOwn: t, step: second } : st;
       }
       // No question: nothing for the minds to say about it, so straight to the practice (the stone).
       if (e.type === 'skip') return { ...st, step: 'dropIn', practiceId: null };
@@ -140,6 +156,16 @@ export function wiseNext(st: WiseState, e: WiseEvent, ctx: WiseContext): WiseSta
       }
       if (e.type === 'nothing') return said(e.side, { id: null, own: null, nothing: true });
       if (e.type === 'continue' || e.type === 'skip') return { ...st, side: null, step: 'dropIn' };
+      return st;
+    }
+    case 'stepBack': {
+      const ids = (xs: readonly string[]) => [...new Set(xs.filter((x) => typeof x === 'string' && x.length > 0))].slice(0, 12);
+      if (e.type === 'steppedBack') {
+        const partIds = ids(e.partIds);
+        return { ...st, partIds, stillCloseIds: ids(e.stillCloseIds).filter((x) => partIds.includes(x)), step: 'dropIn' };
+      }
+      if (e.type === 'useMinds') return { ...st, form: 'minds', partIds: [], stillCloseIds: [], step: 'minds' };
+      if (e.type === 'skip' || e.type === 'continue') return { ...st, step: 'dropIn' };
       return st;
     }
     case 'dropIn':
@@ -207,12 +233,14 @@ export function wiseExt(st: WiseState): Record<string, unknown> {
   if (st.onceMore) out.onceMore = true;
   if (st.nextToolId) out.nextToolId = st.nextToolId;
   if (st.kept) out.kept = true;
+  if (st.form === 'parts' && st.partIds.length) out.partIds = st.partIds;
+  if (st.form === 'parts' && st.stillCloseIds.length) out.stillCloseIds = st.stillCloseIds;
   return out;
 }
 
 /** The step id sent as `exitStep` if the person leaves here. */
 export const WISE_EXIT_STEP: Record<WiseStep, string> = {
-  question: 'question', minds: 'minds', dropIn: 'drop_in', practice: 'practice', comes: 'comes', quiet: 'comes',
+  question: 'question', minds: 'minds', stepBack: 'step_back', dropIn: 'drop_in', practice: 'practice', comes: 'comes', quiet: 'comes',
   feel: 'feel', next: 'next', close: 'close', handoff: 'next',
 };
 
@@ -231,10 +259,53 @@ export function keptLine(st: WiseState, ctx: WiseContext, frame: string): string
   return line.slice(0, ctx.ownMax);
 }
 
-/** `?first=<question id>` (Two pulls: What to do next; DEAR MAN's prep: Whether to say something). */
+/** What the page hands screen 2p's room (the parts-aware step back). */
+export interface StepBackRoomProps {
+  /** The question in the chip's or the person's words (null: skipped). */
+  question: string | null;
+  /** Parts a link put in the room already (`?a=&b=`), unchecked: the room keeps only the caller's own. */
+  presetPartIds: readonly string[];
+  /** This visit's ToolSession id ('' when it isn't saved): the host for its tags and candidates. */
+  sessionId: string;
+  /** The step back is done: part ids only (the machine caps and de-duplicates them). */
+  onDone: (r: { partIds: string[]; stillCloseIds: string[] }) => void;
+  /** *Use the two minds instead*. */
+  onUseMinds: () => void;
+}
+
+/**
+ * The parts form, when the page is given one (parts on, a part to place, its copy shipped: decided by
+ * whoever passes it): the room for screen 2p, and screen 5's *Pushed, urgent* line in that form.
+ */
+export interface StepBackSlot {
+  Room: ComponentType<StepBackRoomProps>;
+  pushedLine: string | null;
+}
+
+/** Part ids as a link carries them: the same shape the server's ids take; anything else is dropped. */
+const PART_ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
+
+/**
+ * `?first=<question id>` (Two pulls: What to do next; DEAR MAN's prep: Whether to say something), and
+ * `?a=&b=` (Two pulls' keepsake: both figures already in the room). The preset parts are only passed on to
+ * the step back; whether they are the caller's own is the room's to check against the profile slice.
+ */
 export function parseWiseEntry(search: string, ctx: Pick<WiseContext, 'questions'>): WiseEntry {
-  const first = new URLSearchParams(search).get('first');
-  return { firstQuestionId: first && ctx.questions.some((q) => q.id === first) ? first : null };
+  const q = new URLSearchParams(search);
+  const first = q.get('first');
+  const presetPartIds = [...new Set([q.get('a'), q.get('b')].filter((x): x is string => !!x && PART_ID.test(x)))];
+  return { firstQuestionId: first && ctx.questions.some((q2) => q2.id === first) ? first : null, presetPartIds };
+}
+
+/**
+ * Screen 5's line for the answer's feel. *Pushed, urgent* says it in the form's own words: "That might be
+ * emotion mind talking." (minds), or the parts form's line, which is parts copy and comes from the step
+ * back's slot (`partsPushed`; until it ships, the minds line).
+ */
+export function feelLine(st: WiseState, copy: WiseCopy, partsPushed: string | null = null): string | null {
+  if (!st.feel) return null;
+  if (st.feel === 'pushed' && st.form === 'parts' && partsPushed) return partsPushed;
+  return copy.feel.lines[st.feel];
 }
 
 /** The copy screens 1–6 read, typed, with '' for anything missing (the content test pins every key). */
