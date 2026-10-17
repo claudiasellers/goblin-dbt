@@ -38,7 +38,7 @@ ROOMS['velvet'] = dict(
     title='Velvet (default, dark): deep plum walls, warm lamp light, brass action',
     pal=dict(page='#231827', page2='#1B121F', card='#33253A', **{'card-hover': '#3B2B42'}, elevated='#3E2C45', input='#2A1D2F',
              border='#4E3B56', **{'border-subtle': '#3C2C43', 'border-accent': '#62506B'},
-             ink='#F5EBDF', text2='#CDBFB3', text3='#BBAD9F', **{'text-muted': '#978A7E'},
+             ink='#F5EBDF', text2='#CDBFB3', text3='#BBAD9F', **{'text-muted': '#A59A90'},
              accent='#F2C27E', **{'accent-hover': '#F7D39E', 'accent-fill': '#E8B56E', 'accent-fill-hover': '#F2C27E', 'on-accent': '#2A1806',
                                    'accent-glow': '#F2C27E'},
              success='#8ED8B4', warning='#F2C27E', danger='#F59A8A', **{'on-danger': '#2A0E0A'}, info='#A9BDF6',
@@ -57,7 +57,9 @@ ROOMS['dusk'] = dict(
     title='Dusk (dark): cool slate, muted colour, one warm brass light',
     pal=dict(page='#2E3542', page2='#262C37', card='#3A4252', **{'card-hover': '#424B5C'}, elevated='#4A5364', input='#343B49',
              border='#566073', **{'border-subtle': '#454E5E', 'border-accent': '#6A7488'},
-             ink='#EEF2F5', text2='#C8D0DA', text3='#BAC3CE', **{'text-muted': '#949EAB'},
+             # text3 lifted (it was 4.34:1 on elevated) and muted equal to it: on dusk's elevated panel
+             # nothing quieter than text3 reaches 4.5:1.
+             ink='#EEF2F5', text2='#C8D0DA', text3='#C1C9D3', **{'text-muted': '#C1C9D3'},
              accent='#E3C29E', **{'accent-hover': '#EDD1B2', 'accent-fill': '#D8B48C', 'accent-fill-hover': '#E3C29E', 'on-accent': '#2A1A0C',
                                    'accent-glow': '#D8B48C'},
              success='#A5D3BD', warning='#E3C29E', danger='#F2A898', **{'on-danger': '#2A0E0A'}, info='#B5C3E3',
@@ -76,7 +78,7 @@ ROOMS['tinted'] = dict(
     title='Tinted (light): warm plaster, colour washing in from the corners',
     pal=dict(page='#E8DFD1', page2='#E1D7C8', card='#F6F0E7', **{'card-hover': '#FBF7F1'}, elevated='#EFE7DA', input='#FCF9F4',
              border='#D2C5B2', **{'border-subtle': '#E0D6C6', 'border-accent': '#C1B29C'},
-             ink='#2A241D', text2='#554B3F', text3='#5E5346', **{'text-muted': '#7D7163'},
+             ink='#2A241D', text2='#554B3F', text3='#5E5346', **{'text-muted': '#655B50'},
              accent='#6E5128', **{'accent-hover': '#58401E', 'accent-fill': '#7A5B2E', 'accent-fill-hover': '#6E5128', 'on-accent': '#FBF6EC',
                                   'accent-glow': '#8A6734'},
              success='#3E6E4A', warning='#7A5A12', danger='#9A3B2A', **{'on-danger': '#FFFFFF'}, info='#3C5183',
@@ -99,7 +101,7 @@ ROOMS['pastel'] = dict(
     title='Pastel (light): blush into sky, candy corners, coral action',
     pal=dict(page='#F6E6F0', page2='#EFE3F2', card='#FFF7F3', **{'card-hover': '#FFF1EC'}, elevated='#FFEDE4', input='#FFFFFF',
              border='#EAD0D8', **{'border-subtle': '#F2E1E6', 'border-accent': '#DDBEC9'},
-             ink='#2A2742', text2='#555170', text3='#5E5A78', **{'text-muted': '#847F9C'},
+             ink='#2A2742', text2='#555170', text3='#5E5A78', **{'text-muted': '#67637F'},
              accent='#A8423A', **{'accent-hover': '#8F352E', 'accent-fill': '#FFA898', 'accent-fill-hover': '#FF9C8A', 'on-accent': '#3A1820',
                                   'accent-glow': '#FF9C8A'},
              success='#2F7A55', warning='#7A5600', danger='#B0443A', **{'on-danger': '#FFFFFF'}, info='#3D5BAE',
@@ -116,7 +118,7 @@ ROOMS['pastel-mix'] = dict(
     title='Pastel mix (light): warm and cool pastels on every screen, periwinkle action',
     pal=dict(page='#F6EEF0', page2='#EFEAF6', card='#FFFBF9', **{'card-hover': '#FFF6F2'}, elevated='#F7F1F8', input='#FFFFFF',
              border='#E3D8E4', **{'border-subtle': '#EEE7EF', 'border-accent': '#D6C8DA'},
-             ink='#2A2742', text2='#565272', text3='#5E5A79', **{'text-muted': '#86829E'},
+             ink='#2A2742', text2='#565272', text3='#5E5A79', **{'text-muted': '#6A6684'},
              accent='#3F55B8', **{'accent-hover': '#33479C', 'accent-fill': '#B3C1FF', 'accent-fill-hover': '#A3B3FB', 'on-accent': '#1C2350',
                                   'accent-glow': '#9CAEFA'},
              success='#1E6B66', warning='#7A5600', danger='#B0443A', **{'on-danger': '#FFFFFF'}, info='#3F55B8',
@@ -133,7 +135,7 @@ ROOMS['daylight'] = dict(
     title='Daylight (light): bright and clear, full-strength colour, indigo action',
     pal=dict(page='#E6ECFD', page2='#DDE5FA', card='#FFFFFF', **{'card-hover': '#F6F8FF'}, elevated='#EEF2FF', input='#FFFFFF',
              border='#CBD4EE', **{'border-subtle': '#DDE3F5', 'border-accent': '#B7C2E2'},
-             ink='#191C35', text2='#4B5275', text3='#555C80', **{'text-muted': '#7A809F'},
+             ink='#191C35', text2='#4B5275', text3='#555C80', **{'text-muted': '#5E6482'},
              accent='#2F3FA8', **{'accent-hover': '#24338F', 'accent-fill': '#2F3FA8', 'accent-fill-hover': '#24338F', 'on-accent': '#FFFFFF',
                                   'accent-glow': '#5B6BD6'},
              success='#1D6E46', warning='#7A5600', danger='#B01240', **{'on-danger': '#FFFFFF'}, info='#2B4FA3',
@@ -173,6 +175,14 @@ for rid, r in ROOMS.items():
     # Tool cards put the room's ink and secondary text on the family tile too.
     checks += [('%s/%s tile' % (t, f), p[t], e[f]) for f in ('fam-dt', 'fam-er', 'fam-ie') for t in ('ink', 'text2')]
     checks += [('on-quadrant/%s' % q, e['on-quadrant'], p[q]) for q in ('q-hu', 'q-hp', 'q-lu', 'q-lp')]
+    # Tertiary and muted text are real text (hints, sub lines, Skip, the too-much link): AA on every
+    # ground they sit on, the page, the panels and every card / surface token.
+    checks += [('%s/%s' % (t, b), p[t], p[b]) for t in ('text3', 'text-muted')
+               for b in ('page', 'page2', 'card', 'card-hover', 'elevated', 'input', 'sidebar')]
+    # Muted stays the quietest text: never more contrast than text3 on the page (equal is allowed: dusk).
+    if ratio(p['text-muted'], p['page']) > ratio(p['text3'], p['page']) + 1e-9:
+        fail += 1
+        print('%-10s %-18s louder than text3 FAIL' % (rid, 'text-muted order'))
     for name, fg, bg in checks:
         r_ = ratio(fg, bg)
         if r_ < 4.5:

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { primaryButton, linkButton, secondaryText } from '../oppositeAction/styles';
 import { ProgressRing } from './ProgressRing';
 import { buzz, useLatest } from './hooks';
+import { focusLine, focusLost } from '../../../lib/focusStart';
 
 // ── Cyclic sigh pacer ───────────────────────────────────────────────────────
 export interface BreathPhase { key: 'in' | 'sip' | 'out'; label: string; ms: number }
@@ -18,8 +19,11 @@ export function BreathOrb({ phases, cycles, startLabel, skipLabel, doneLabel, on
   const [running, setRunning] = useState(false);
   const [i, setI] = useState(0);
   const total = cycles * phases.length;
+  /** Start (and later Skip) go away when pressed: focus moves to the orb's line, never to the page. */
+  const line = useRef<HTMLParagraphElement>(null);
   const finished = i >= total;
   const phase = phases[i % phases.length];
+  useEffect(() => { if ((running || finished) && focusLost()) focusLine(line.current); }, [running, finished]);
 
   const finish = (completed: boolean) => {
     if (finishedOnce.current) return;
@@ -61,7 +65,7 @@ export function BreathOrb({ phases, cycles, startLabel, skipLabel, doneLabel, on
           transition={{ duration: reduce || !running ? 0.3 : phase.ms / 1000, ease: phase.key === 'out' ? [0.33, 0, 0.2, 1] : [0.4, 0, 0.2, 1] }} />
       </div>
       {/* Label sits below the orb in body text colour: readable at any orb size, in both themes. */}
-      <p className="min-h-7 text-lg font-semibold text-[var(--color-text-primary)]" aria-live="polite">
+      <p ref={line} className="min-h-7 text-lg font-semibold text-[var(--color-text-primary)] focus:outline-none" aria-live="polite">
         <AnimatePresence mode="wait">
           <m.span key={label} className="inline-block" initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.25 }}>
             {label}
@@ -134,6 +138,9 @@ export function Orient({ look, move, moveSeconds, startMoveLabel, skipLabel, see
   const done = useLatest(onDone);
   const [seen, setSeen] = useState<boolean[]>([false, false, false]);
   const [endsAt, setEndsAt] = useState<number | null>(null);
+  /** "Start" goes away when pressed: focus moves to the move's line, never to the page. */
+  const moveLine = useRef<HTMLParagraphElement>(null);
+  useEffect(() => { if (endsAt !== null && focusLost()) focusLine(moveLine.current); }, [endsAt]);
   const [now, setNow] = useState(() => Date.now());
   const count = seen.filter(Boolean).length;
   const left = endsAt === null ? moveSeconds : Math.max(0, Math.ceil((endsAt - now) / 1000));
@@ -174,7 +181,7 @@ export function Orient({ look, move, moveSeconds, startMoveLabel, skipLabel, see
               animate={endsAt !== null && left > 0 && !reduce ? { rotate: [-12, 12, -12] } : { rotate: 0 }}
               transition={{ duration: 0.3, repeat: endsAt !== null && left > 0 && !reduce ? Infinity : 0 }}>✋</m.span>
             <div>
-              <p className="font-semibold">{move}</p>
+              <p ref={moveLine} className="font-semibold focus:outline-none">{move}</p>
               {endsAt !== null && <p className={`${secondaryText} tabular-nums`} aria-live="polite">{left}s</p>}
             </div>
           </div>
