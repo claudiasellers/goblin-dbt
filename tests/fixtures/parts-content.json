@@ -842,52 +842,59 @@
    "copy": "Who might show up in this conversation?",
    "reviewStatus": "draft"
   },
-  "cope_anchor": {
+  "cope_title_any": {
    "flow": "dearman",
    "step": "cope",
    "order": 1,
+   "copy": "Who might show up there?",
+   "reviewStatus": "draft"
+  },
+  "cope_anchor": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 2,
    "copy": "If {name} shows up:",
    "reviewStatus": "draft"
   },
   "cope_anchor_noname": {
    "flow": "dearman",
    "step": "cope",
-   "order": 2,
+   "order": 3,
    "copy": "If that part shows up:",
    "reviewStatus": "draft"
   },
   "cope_set_anchor": {
    "flow": "dearman",
    "step": "cope",
-   "order": 3,
+   "order": 4,
    "copy": "What would help if {name} shows up?",
    "reviewStatus": "draft"
   },
   "cope_set_anchor_noname": {
    "flow": "dearman",
    "step": "cope",
-   "order": 4,
+   "order": 5,
    "copy": "What would help if that part shows up?",
    "reviewStatus": "draft"
   },
   "cope_save_failed": {
    "flow": "dearman",
    "step": "cope",
-   "order": 5,
+   "order": 6,
    "copy": "Couldn't save that. Try again.",
    "reviewStatus": "draft"
   },
   "debrief_who": {
    "flow": "dearman",
    "step": "debrief",
-   "order": 6,
+   "order": 7,
    "copy": "Was one of your parts there?",
    "reviewStatus": "draft"
   },
   "debrief_who_named": {
    "flow": "dearman",
    "step": "debrief",
-   "order": 7,
+   "order": 8,
    "copy": "Did {name} show up?",
    "reviewStatus": "draft"
   },

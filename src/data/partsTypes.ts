@@ -191,6 +191,16 @@ export const JOB_HISTORY_MAX = 10;
  */
 export interface SetPartAnchorRequest { partId: string; lineId?: string; own?: string }
 export const ANCHOR_MAX_CHARS = 90;
+/**
+ * A kept line reads as an anchor only when it is short and is not a Cope Ahead plan: an own line kept from
+ * the `cope_ahead` moment is a whole "If …, I'll …" sentence (kept in My words, never offered as an anchor).
+ * The picker (src/lib/copeAhead.ts keptLines) and setPartAnchor (keep.ts) apply the same rule.
+ */
+export const ANCHOR_EXCLUDED_MOMENTS: readonly string[] = ['cope_ahead'];
+export function anchorableLine(line: { text: string; moment?: string | null }): boolean {
+  const t = typeof line.text === 'string' ? line.text.trim() : '';
+  return t.length > 0 && t.length <= ANCHOR_MAX_CHARS && !ANCHOR_EXCLUDED_MOMENTS.includes(line.moment ?? '');
+}
 
 /**
  * Find the feeling's "Use this shape for {name}?": the part takes the shape of that visit (the caller's own

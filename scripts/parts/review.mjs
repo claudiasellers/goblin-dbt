@@ -61,7 +61,7 @@ export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
 export { STATS_REQUIRED, REFLECT_REQUIRED, REFLECT_FEEL_REQUIRED } from './src/lib/partStats';
 export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, SETTINGS_LINES_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
-export { COPE_REQUIRED } from './src/lib/copeAhead';
+export { COPE_REQUIRED, COPE_AHEAD_PARTS_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
 export { TRAIL_OFFER_REQUIRED } from './src/lib/trailOffer';
@@ -198,6 +198,7 @@ export function surfaces(g) {
       where: 'DEAR MAN prep, with parts on and a kept part: "Who might show up in this conversation?", then that part\'s anchor before the script; and in the debrief, who showed up.',
       groups: [
         { label: null, ids: g.COPE_REQUIRED },
+        { label: 'Cope Ahead, screen 2, with parts on and a kept part: the same step with its own question, "Who might show up there?" (its gate needs all of these)', ids: g.COPE_AHEAD_PARTS_REQUIRED },
         { label: 'The debrief, after "Underneath that": "Did {name} show up?" when prep chose that part, else "Was one of your parts there?" with the tag row\'s chips', ids: g.DEBRIEF_WHO_REQUIRED },
       ],
     },
