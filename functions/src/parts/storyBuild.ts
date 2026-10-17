@@ -35,6 +35,8 @@ export interface StoryRows {
   room: { parts: Array<Omit<DenPart, 'recency'>>; links: DenLink[] };
   /** This part's readout (stats.ts), or null. */
   stats: PartStats | null;
+  /** What the person said to it (PartMessage), any order. Absent: none read. */
+  messages?: Array<{ at: string; chipId: string | null; own: string | null }>;
 }
 
 const ms = (iso: string | null | undefined): number => (iso ? Date.parse(iso) : Number.NaN);
@@ -145,6 +147,16 @@ export function buildPartStory(rows: StoryRows, now: Date): GetPartStoryResponse
     const first = past[0];
     timed.push({ at: changed, order: 2, m: { kind: 'job', month: month(changed), then: { jobIds: first.jobIds, ownJob: first.ownJob }, now: nowJob } });
   }
+  // What they told it: the latest of each month (a chip or their own words), in time order.
+  const told = new Map<string, { at: number; chipId: string | null; own: string | null }>();
+  for (const m of rows.messages ?? []) {
+    const at = ms(m.at);
+    if (!Number.isFinite(at) || (!m.chipId && !m.own?.trim())) continue;
+    const key = month(at);
+    const prev = told.get(key);
+    if (!prev || at > prev.at) told.set(key, { at, chipId: m.chipId, own: m.own?.trim() ? m.own : null });
+  }
+  for (const [mo, t] of told) timed.push({ at: t.at, order: 3, m: { kind: 'told', month: mo, chipId: t.chipId, own: t.own } });
   timed.sort((a, b) => a.at - b.at || a.order - b.order);
 
   const out: GetPartStoryResponse = {

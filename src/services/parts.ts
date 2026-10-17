@@ -6,7 +6,7 @@ import type {
   AnswerPartCheckbackRequest, AnswerPartCheckbackResponse, AnswerPartRevisitRequest, KeepPartRequest, KeepPartResponse, PartRefRequest, PartSessionResponse, PartWriteResponse,
   PartsEntry, QueuePartCandidateRequest, QueuePartCandidateResponse, RenamePartRequest, RestPartRequest,
   SavePartSessionRequest, SchedulePartCheckbackRequest, SchedulePartCheckbackResponse, SetPartAnchorRequest, SetPartShapeRequest, StartPartSessionRequest,
-  TagPartRequest, TagPartResponse,
+  TagPartRequest, TagPartResponse, SayToPartRequest, SayToPartResponse,
   AnswerTrailOfferRequest, AnswerTrailOfferResponse, GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse,
   AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse, GetReflectTrailsResponse, RemoveTrailPatternRequest, RemoveTrailPatternResponse,
   GetDenResponse, GetPartStoryRequest, GetPartStoryResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
@@ -153,6 +153,13 @@ const tagPartFn = httpsCallable<TagPartRequest, TagPartResponse>(functions, 'tag
  */
 export async function tagPart(req: TagPartRequest): Promise<TagPartResponse> {
   return (await tagPartFn(req)).data;
+}
+
+const sayToPartFn = httpsCallable<SayToPartRequest, SayToPartResponse>(functions, 'sayToPart');
+
+/** "Say something to it": a chip or their own words, to one of their kept parts. A repeat id writes nothing. */
+export async function sayToPart(req: SayToPartRequest): Promise<SayToPartResponse> {
+  return (await sayToPartFn(req)).data;
 }
 
 // ---- DEAR MAN's cope ahead ----

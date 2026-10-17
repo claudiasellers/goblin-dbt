@@ -24,9 +24,10 @@ import { PARTS_FOLLOW_UP_TYPES } from './followUpTypes';
 
 /**
  * Every user-data label parts.md defines (Data model → User data), registered or not yet, plus
- * PartRevisit (a part's logged still-true answers) and PullsSession (Two pulls' visits).
+ * PartRevisit (a part's logged still-true answers), PullsSession (Two pulls' visits) and PartMessage (what
+ * the person said to a part).
  */
-const PARTS_DESIGN_LABELS = ['Part', 'PartLink', 'DenSnapshot', 'PartSession', 'PullsSession', 'PartTag', 'PartCandidate', 'TrailOffer', 'PartRevisit'] as const;
+const PARTS_DESIGN_LABELS = ['Part', 'PartLink', 'DenSnapshot', 'PartSession', 'PullsSession', 'PartTag', 'PartCandidate', 'TrailOffer', 'PartRevisit', 'PartMessage'] as const;
 
 /**
  * The parts labels deleteMyParts removes: the design's labels that are registered in layers.ts, so a

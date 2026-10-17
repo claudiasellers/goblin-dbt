@@ -1,9 +1,10 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { PartsContent } from '../../data/partsContentTypes';
-import { RATHER_IDS_MAX, type PartRevisitAnswer, type PartWriteResponse } from '../../data/partsTypes';
+import { RATHER_IDS_MAX, type PartMessageLine, type PartRevisitAnswer, type PartWriteResponse } from '../../data/partsTypes';
 import type { MeItem, MePartCandidate } from '../../services/profile';
-import { answerPartRevisit, renamePart, restorePart, restPart, setAsidePart, setPartTender } from '../../services/parts';
+import { answerPartRevisit, renamePart, restorePart, restPart, sayToPart, setAsidePart, setPartTender } from '../../services/parts';
+import { SAY_OWN_MAX, sayChoices, sayCopy, sayQuestion, sayRequest, toldLine, type SayCopy } from '../../lib/sayToPart';
 import {
   PART_NAME_MAX, meetAPartLink, partCandidateCopy, partRevisitCopy,
   type PartCandidatePromptId, type PartRevisitCopy, type PartsOfMePromptId,
@@ -56,6 +57,7 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
   const getToKnow = meetAPartLink();
   const den = denCopy(content);
   const story = partStoryCopy(content);
+  const say = sayCopy(content);
 
   return (
     <div className="mt-1 space-y-3">
@@ -73,7 +75,7 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
       </div>
       {live.length > 0 && (
         <ul className="space-y-3">
-          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} showStats={showStats} story={story} onWrite={onWrite} />)}
+          {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} showStats={showStats} story={story} say={say} onWrite={onWrite} />)}
         </ul>
       )}
       {setAside.length > 0 && (
@@ -155,17 +157,24 @@ const choice = `${chip} border-[var(--color-border)] text-[var(--color-text-seco
 const chosen = `${chip} border-[var(--color-border-accent)] text-[var(--color-text-primary)]`;
 const box = 'mt-2 p-3 rounded-lg bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)]';
 
-function PartCard({ item, content, copy, revisit, showStats, story, onWrite }: {
+function PartCard({ item, content, copy, revisit, showStats, story, say, onWrite }: {
   item: MeItem; content: PartsContent; copy: Copy; revisit: PartRevisitCopy | null; showStats: boolean;
   /** A part's story: *Its story* opens it in place, once its copy ships. */
   story: PartStoryCopy | null;
+  /** "Say something to it", once its copy ships. */
+  say: SayCopy | null;
   onWrite: PartWrite;
 }) {
   const [storyOpen, setStoryOpen] = useState(false);
+  const [saying, setSaying] = useState(false);
+  /** What they just said here (Me isn't reloaded for a log write): the card's line until the next getMe. */
+  const [justTold, setJustTold] = useState<PartMessageLine | null>(null);
+  const sayButton = useRef<HTMLButtonElement>(null);
   const part = item.part!;
   const partId = item.meta.id;
   const resting = item.meta.status === 'resting';
   const rows = partCardRows(part, content);
+  const told = say ? toldLine(say, content, justTold ?? part.told) : null;
   // The readout (tender parts too: it's about the relationship), only when computed and its copy ships.
   const stats: PartStatLines | null = showStats && part.stats ? partStatLines(part.stats, content, statDeps) : null;
   const visit = meetAPartLink(partId);
@@ -237,6 +246,12 @@ function PartCard({ item, content, copy, revisit, showStats, story, onWrite }: {
           {/* One line, its own label inside the copy ("Steps that helped: …"), so outside the dl's rows. */}
           {stats?.steps && <p className="mt-2 text-sm text-[var(--color-text-primary)] break-words">{stats.steps}</p>}
           {stats?.felt && <dl className="mt-2">{row(stats.felt.title, stats.felt.line)}</dl>}
+          {/* The latest thing they said to it: quiet, under the readouts; their own words in the serif. */}
+          {say && told && (
+            <p data-testid="part-told" className="mt-2 text-sm text-[var(--color-text-secondary)] break-words">
+              {told.before}<span className={told.own ? 'font-serif text-base' : ''}>{told.words}</span>{told.after}
+            </p>
+          )}
         </div>
       </div>
       {revisit && partAsksBack(item) && !answered && (
@@ -249,6 +264,11 @@ function PartCard({ item, content, copy, revisit, showStats, story, onWrite }: {
             {story.story_open}
           </button>
         )}
+        {say && (
+          <button ref={sayButton} type="button" aria-expanded={saying} onClick={() => setSaying((o) => !o)} className={quiet}>
+            {say.say_open}
+          </button>
+        )}
         {partActions(item, copy).filter((a) => !(renaming && a.id === 'rename')).map((a) => (
           <button key={a.id} type="button" disabled={busy} className={quiet}
             onClick={() => { if (a.call) run(a.call); else { setDraft(part.name ?? ''); setRenaming(true); } }}>
@@ -256,11 +276,75 @@ function PartCard({ item, content, copy, revisit, showStats, story, onWrite }: {
           </button>
         ))}
       </div>
+      {say && saying && (
+        <SayPanel partId={partId} name={part.name} tender={part.tender} content={content} copy={say}
+          onDone={(line) => { if (line) setJustTold(line); setSaying(false); sayButton.current?.focus({ preventScroll: true }); }} />
+      )}
       {story && storyOpen && <PartStory partId={partId} tender={part.tender} content={content} copy={story} />}
       {/* A safety-line or danger part (functions/src/safety/partSafetyFlag.ts): crisis resources under the
           actions, quiet, alongside the card and its 30-day check-back above, never instead. */}
       {part.safety === true && <div className="mt-3"><CrisisBanner compact /></div>}
     </li>
+  );
+}
+
+/**
+ * "Say something to it": the chips (the gentle set for a tender part), then their own words (≤ 140, never
+ * linted). One write; on success the card's "You told it" line shows it, on failure nothing changes (Me's
+ * rule) and the chips stay. Not now closes it. Focus goes to the question as it opens.
+ */
+function SayPanel({ partId, name, tender, content, copy, onDone }: {
+  partId: string; name: string | null; tender: boolean; content: PartsContent; copy: SayCopy;
+  /** The line just said, or null for Not now. */
+  onDone: (line: PartMessageLine | null) => void;
+}) {
+  const [own, setOwn] = useState(false);
+  const [text, setText] = useState('');
+  const [busy, setBusy] = useState(false);
+  const title = useRef<HTMLParagraphElement>(null);
+  const field = useRef<HTMLTextAreaElement>(null);
+  useEffect(() => { title.current?.focus({ preventScroll: true }); }, []);
+  // Own words: the field takes focus as it opens (without scrolling the page).
+  useEffect(() => { if (own) field.current?.focus({ preventScroll: true }); }, [own]);
+  const { chips, own: ownChip } = sayChoices(content, tender);
+  const send = async (what: { chipId: string } | { own: string }) => {
+    const req = sayRequest(newId(), partId, what);
+    if (!req || busy) return;
+    setBusy(true);
+    try {
+      await sayToPart(req);
+      onDone({ chipId: req.chipId ?? null, own: req.own ?? null, at: new Date().toISOString() });
+    } catch { /* unchanged: the chips stay */ } finally { setBusy(false); }
+  };
+  return (
+    <div className={box}>
+      <p ref={title} tabIndex={-1} className="font-serif text-base text-[var(--color-text-primary)] mb-2 break-words focus:outline-none">
+        {sayQuestion(copy, name)}
+      </p>
+      {own ? (
+        <>
+          <textarea ref={field} value={text} maxLength={SAY_OWN_MAX} rows={3} disabled={busy} aria-label={copy.say_own_label}
+            onChange={(e) => setText(e.target.value.slice(0, SAY_OWN_MAX))}
+            className="w-full p-2 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-card)] font-serif text-base text-[var(--color-text-primary)]" />
+          <div className="flex flex-wrap gap-x-4">
+            <button type="button" disabled={busy || !text.trim()} onClick={() => send({ own: text })} className={plain}>{copy.say_send}</button>
+            <button type="button" disabled={busy} onClick={() => onDone(null)} className={quiet}>{copy.say_cancel}</button>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className="flex flex-wrap gap-2">
+            {chips.map((o) => (
+              <button key={o.id} type="button" disabled={busy} onClick={() => send({ chipId: o.id })} className={choice}>{o.label}</button>
+            ))}
+            {ownChip && <button type="button" disabled={busy} onClick={() => setOwn(true)} className={choice}>{ownChip.label}</button>}
+          </div>
+          <div className="flex flex-wrap gap-x-4">
+            <button type="button" disabled={busy} onClick={() => onDone(null)} className={quiet}>{copy.say_cancel}</button>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 

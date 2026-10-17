@@ -23,6 +23,7 @@ const AUTHED = [
   'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
   'tagPart',
+  'sayToPart', // a message to the caller's own part
   'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor', 'setPartShape',
   'startPullsSession', 'savePullsSession', 'keepPullsKeepsake', 'schedulePullsCheckback', // Two pulls: the caller's own visit
   'getTrailOfferEvidence', 'answerTrailOffer', // the caller's own trail offer (Phase 4, built off)
