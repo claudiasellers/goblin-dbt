@@ -701,3 +701,43 @@ test('tagPart review over the handler: open sessions and Meet a part refused', a
 });
 
 void record;
+
+test('prepare: nothing new while an offer is on Today, or a Not now is back from its cooldown', async () => {
+  const policy = POLICY_ROW();
+  const base = { id: 'trail_move_in_context:hit_back:ctx_time_evening', ruleId: 'trail_move_in_context', moveIds: ['hit_back'], contextId: 'ctx_time_evening', partId: null, noKeys: null };
+  const open = [
+    { ...base, status: 'offered', answer: null, cooldownUntil: null },
+    { ...base, status: 'seen', answer: null, cooldownUntil: null },
+    { ...base, status: 'seen', answer: 'not_now', cooldownUntil: ago(1) },
+  ];
+  for (const st of open) {
+    assert.equal(B.showableOffer([st], NOW), true, JSON.stringify(st));
+    const f = prepareFake({ policy, states: [st] });
+    setDriver(f.driver);
+    assert.equal(await TD.prepareTrailOffers('u1', NOW, async () => [trail()]), null);
+    assert.ok(!f.calls.some((c) => c.query === R.WRITE_TRAIL_OFFER_QUERY), 'no second offer');
+    assert.ok(f.calls.some((c) => c.query === TD.STAMP_EVALUATED_QUERY), 'evaluated for the day');
+  }
+  // Cooling down, answered, or a rule D batch: the week's offer is free.
+  const free = [
+    { ...base, status: 'seen', answer: 'not_now', cooldownUntil: new Date(NOW.getTime() + DAY).toISOString() },
+    { ...base, status: 'answered', answer: 'not_me', cooldownUntil: null },
+    { ...base, ruleId: 'trail_known_part', partId: PID, status: 'answered', answer: 'done', cooldownUntil: ago(1) },
+  ];
+  for (const st of free) assert.equal(B.showableOffer([st], NOW), false, JSON.stringify(st));
+  const g = prepareFake({ policy, states: free });
+  setDriver(g.driver);
+  assert.equal(await TD.prepareTrailOffers('u1', NOW, async () => [trail()]), 'written');
+});
+
+test('the weekly budget counts each offer from the later of offered and answered, in both readers', () => {
+  const { offerBudgetAt } = require('../../lib/profile/offerBudget');
+  assert.equal(offerBudgetAt('o'), 'CASE WHEN o.answeredAt IS NOT NULL AND o.answeredAt > o.offeredAt THEN o.answeredAt ELSE o.offeredAt END');
+  // The parts gate (both kinds) and what_helps (trail offers) read the same moment; never-offered rows (rule D's batch) don't count.
+  for (const [raw, v] of [[Q.OFFER_TIMES_QUERY, 'o'], [offers.TRAIL_OFFER_TIMES_QUERY, 't']]) {
+    const q = raw.replace(/\s+/g, ' ');
+    assert.ok(q.includes(`${v}.offeredAt IS NOT NULL AND ${offerBudgetAt(v)} > datetime() - duration({days: $days})`), q);
+    assert.ok(q.includes(`toString(${offerBudgetAt(v)}) AS offeredAt`), q);
+    assert.doesNotMatch(q, new RegExp(`\\b${v}\\.offeredAt > datetime`), 'not from offeredAt alone');
+  }
+});

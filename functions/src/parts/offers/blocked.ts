@@ -81,3 +81,14 @@ export function isBlocked(trail: TrailIdentity, blocked: readonly BlockedTrail[]
     && (b.contextId ?? null) === (trail.contextId ?? null) && (b.partId ?? null) === (trail.partId ?? null)
     && (b.until === null || Date.parse(b.until) > t));
 }
+
+/**
+ * An offer still open and not cooling down: on Today now (offered or seen, or a Not now whose cooldown has
+ * ended). While one is, the prepare step writes no other: Today shows one offer, and a Not now that has
+ * cooled down takes the week's place it comes back to, instead of a newer offer hiding it.
+ */
+export function showableOffer(offers: readonly OfferState[], now: Date | number): boolean {
+  const t = typeof now === 'number' ? now : now.getTime();
+  return offers.some((o) => !o.partId && (o.status === 'offered' || o.status === 'seen')
+    && (o.cooldownUntil == null || !(Date.parse(o.cooldownUntil) > t)));
+}
