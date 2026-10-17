@@ -23,6 +23,7 @@
  *                          "Continue" waited on it, cold, before the follow-up questions)
  *   capacity.json          getCapacityContent (band rules, hand-off primitives; loaded with every page)
  *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
+ *   wise-mind.json         getWiseMindContent (Wise mind's questions, what each mind says, practices, answers, copy)
  *   parts.json             parts copy (schema/parts.cypher), signed-off rows only: no Cloud Function
  *                          serves it; the shape is tests/fixtures/parts-content.json's moves / prompts /
  *                          options / hurts, plus canTouch (Recover event → hurt ids, approved edges),
@@ -53,6 +54,7 @@ export const BODY_MAP_VERSION = constant('functions/src/bodyMap/index.ts', 'BODY
 export const FIND_FLOW_VERSION = constant('functions/src/findTheFeeling/index.ts', 'FIND_FLOW_VERSION');
 export const CAPACITY_VERSION = constant('functions/src/capacity/index.ts', 'CAPACITY_VERSION');
 export const SPINE_VERSION = constant('functions/src/spine/registry.ts', 'SPINE_VERSION');
+export const WISE_MIND_VERSION = constant('functions/src/wiseMind/index.ts', 'WISE_MIND_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -399,6 +401,35 @@ export function buildParts(g) {
   });
 }
 
+/** getWiseMindContent (functions/src/wiseMind/index.ts), with its version check. */
+export function buildWiseMind(g) {
+  const flow = g.nodes('WiseMindFlow').find((n) => n.props.id === 'wise_mind_flow');
+  if (!flow || flow.props.version !== WISE_MIND_VERSION) {
+    throw new Error(`Wise mind content is ${flow ? flow.props.version : 'missing'}; the app expects ${WISE_MIND_VERSION}`);
+  }
+  const doc = JSON.parse(flow.props.contentJson);
+  const voicesOf = new Map();
+  for (const r of g.rels('VOICES', 'MindVoice', 'WiseMindQuestion')) pushTo(voicesOf, r.b.props.id, r.a.props);
+  const questions = g.nodes('WiseMindQuestion')
+    .sort((a, b) => asc(a.props.order, b.props.order))
+    .map(({ props: q }) => {
+      const vs = (voicesOf.get(q.id) ?? []).sort((a, b) => asc(a.mind, b.mind) || asc(a.order, b.order));
+      const side = (m) => vs.filter((v) => v.mind === m).map((v) => ({ id: v.id, label: v.label }));
+      return { id: q.id, label: q.label, order: intOrNull(q.order), defaultPracticeId: q.defaultPracticeId,
+        voices: { emotion: side('emotion'), reason: side('reason') } };
+    });
+  const practices = g.rels('HAS_PRACTICE', 'TherapyConcept', 'WiseMindPractice')
+    .filter((r) => r.a.props.id === 'dbt_wise_mind')
+    .map((r) => r.b.props)
+    .sort((a, b) => asc(a.order, b.order))
+    .map((p) => ({ id: p.id, name: p.name, sub: p.sub, kind: p.kind, lines: p.lines ?? [], breaths: intOrNull(p.breaths),
+      seconds: intOrNull(p.seconds), order: intOrNull(p.order) }));
+  const answers = g.nodes('WiseMindAnswer')
+    .sort((a, b) => asc(a.props.order, b.props.order))
+    .map(({ props: a }) => ({ id: a.id, label: a.label, order: intOrNull(a.order), nextToolIds: a.nextToolIds ?? [], kind: a.kind ?? null }));
+  return { version: WISE_MIND_VERSION, ownMax: doc.ownMax, copy: doc.copy, questions, practices, answers };
+}
+
 /** All the snapshots from one export (pure apart from reading the version constants). */
 export function buildSnapshots(exp) {
   assertContentOnly(exp);
@@ -411,6 +442,7 @@ export function buildSnapshots(exp) {
     'capacity.json': buildCapacity(g),
     'spine.json': buildSpine(g),
     'parts.json': buildParts(g),
+    'wise-mind.json': buildWiseMind(g),
   };
 }
 

@@ -460,6 +460,17 @@
     "panic"
    ]
   },
+  "dbt_wise_mind": {
+   "appToolId": "wise-mind",
+   "name": "Wise Mind",
+   "description": "Integration of emotional mind and reasonable mind; intuitive knowing",
+   "whenToUse": "When you're torn about what to do",
+   "dbtBasis": "DBT Mindfulness: wise mind (states of mind; ideas for practising wise mind)",
+   "side": "both",
+   "skillKind": "naming",
+   "direction": "neutral",
+   "addresses": []
+  },
   "se_orienting": {
    "appToolId": "five-senses",
    "name": "Orienting",
