@@ -40,7 +40,7 @@ import type {
   GetDenResponse, GetDenSnapshotResponse, LinkPartsResponse, UnlinkPartsResponse, UpdatePartLayoutResponse,
 } from './denTypes';
 
-export { deleteMyParts } from './delete';
+export { deleteMyParts, countMyPartsLines } from './delete';
 
 /** What a parts flow opens on: P2 first, the far-away heads-up, or clear (plus tooMany / paused). Never a lock. */
 export const getPartsEntry = callable<unknown, PartsEntry>(

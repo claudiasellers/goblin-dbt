@@ -5,6 +5,7 @@ import { ToolSessionProvider } from '../contexts/ToolSessionContext';
 import { useToolGate } from '../hooks/useToolGate';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { ToolLoading } from '../components/tools/ToolLoading';
+import { ToolNotFound } from '../components/tools/ToolNotFound';
 
 // Import tool components
 import { CoolDown } from './tools/CoolDown';
@@ -53,7 +54,7 @@ export function ToolPage() {
   const toolId = segment ? toolIdFromUrl(segment) : undefined;
   const tool = toolId ? getToolById(toolId) : undefined;
   // Meet a part opens only with parts on and its copy signed off; otherwise it is "not found".
-  const gate = useToolGate(tool?.id);
+  const gate = useToolGate(tool?.id, location.search);
   const partsOn = useUserProfile().profile.partsEnabled;
   useEffect(() => {
     if (!partsOn) return;
@@ -76,19 +77,7 @@ export function ToolPage() {
   }
 
   if (!tool || gate === 'closed') {
-    return (
-      <div className="text-center py-12">
-        <p className="text-[var(--color-text-secondary)]">
-          Tool not found.
-        </p>
-        <Link
-          to="/tools"
-          className="mt-4 inline-block text-[var(--color-text-secondary)] underline hover:no-underline"
-        >
-          ← Tools
-        </Link>
-      </div>
-    );
+    return <ToolNotFound />;
   }
 
   const ToolComponent = toolComponents[tool.id];

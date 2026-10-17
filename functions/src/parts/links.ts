@@ -57,13 +57,14 @@ export function validateUnlink(raw: unknown): UnlinkPartsRequest {
   return { linkId: o.linkId as string };
 }
 
-/** Parts on; both parts the caller's and in the room; the link if it exists; the both-want if it is a pair's. */
+/** Parts on; both parts the caller's and in the room; the link if it exists; the both-want if it is a pair's or a general one (Two pulls without a pair). */
 export const LINK_STATE_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
   OPTIONAL MATCH (u)-[:HAS_PART]->(pa:Part {key: $aKey}) WHERE pa.status IN ['active', 'resting']
   OPTIONAL MATCH (u)-[:HAS_PART]->(pb:Part {key: $bKey}) WHERE pb.status IN ['active', 'resting']
   OPTIONAL MATCH (u)-[:HAS_PART_LINK]->(l:PartLink {key: $linkKey})
-  OPTIONAL MATCH (:PolarityPair)-[:BOTH_WANT]->(bw:PartOption {id: $bothWantId})
+  OPTIONAL MATCH (bw:PartOption {id: $bothWantId})
+    WHERE EXISTS { MATCH (:PolarityPair)-[:BOTH_WANT]->(bw) } OR (bw.flow = 'pulls' AND bw.step = 'both_want_general')
   RETURN coalesce(u.partsEnabled, false) AS partsOn, coalesce(u.profileVersion, 0) AS version,
          pa IS NOT NULL AS aFound, pb IS NOT NULL AS bFound, l IS NOT NULL AS linked,
          count(bw) > 0 AS bothWantKnown

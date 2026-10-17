@@ -120,6 +120,11 @@ export async function keepPullsKeepsakeHandler(
 }
 
 const signedOff = (v: string) => `(${v}.reviewStatus = 'approved' AND ${v}.pending IS NULL)`;
+/**
+ * A general both-want chip (content.py, `both_want_general`): what any two parts can both want, so a
+ * visit without a shipped pair (or with a pair whose own chips don't ship) still ends with a keepsake.
+ */
+export const GENERAL_WANT = (v: string) => `(${v}.flow = 'pulls' AND ${v}.step = 'both_want_general')`;
 
 export const KEEPSAKE_STATE_QUERY = `
   OPTIONAL MATCH (u:User {id: $uid})
@@ -128,8 +133,9 @@ export const KEEPSAKE_STATE_QUERY = `
   OPTIONAL MATCH (u)-[:HAS_PART]->(pb:Part) WHERE ps.bId IS NOT NULL AND pb.key = $uid + ':' + ps.bId AND pb.status IN ['active', 'resting']
   OPTIONAL MATCH (ma:ProtectiveMove {id: ps.moveA})
   OPTIONAL MATCH (mb:ProtectiveMove {id: ps.moveB})
-  OPTIONAL MATCH (:PolarityPair {id: ps.pairId})-[bw:BOTH_WANT]->(w:PartOption {id: ps.bothWantId})
-    WHERE ${signedOff('bw')} AND ${signedOff('w')}
+  OPTIONAL MATCH (w:PartOption {id: ps.bothWantId})
+    WHERE ${signedOff('w')} AND (${GENERAL_WANT('w')}
+      OR EXISTS { MATCH (:PolarityPair {id: ps.pairId})-[bw:BOTH_WANT]->(w) WHERE ${signedOff('bw')} })
   OPTIONAL MATCH (u)-[:HAS_OWN_LINE]->(same:OwnLine {key: $lineKey})
   OPTIONAL MATCH (c:PartPrompt) WHERE c.id IN $copyIds AND ${signedOff('c')}
   RETURN coalesce(u.partsEnabled, false) AS partsOn, ps IS NOT NULL AS sessionFound,

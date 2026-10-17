@@ -283,6 +283,55 @@ test('deleteMyParts: the caller\'s parts records and parts follow-ups, one write
   assert.ok(!g.calls.some((c) => /profileVersion/.test(c.query)));
 });
 
+const { DELETE_KEPT_LINES, COUNT_KEPT_LINES, validateDeleteMyParts } = require('../../lib/parts/delete');
+
+test('deleteMyParts: kept Two pulls lines that name a part go only on their own yes (keptLines, default false)', async () => {
+  const run = async (data, lines = 2) => {
+    const f = fakeDriver((q) => {
+      if (q === DELETE_KEPT_LINES) return [{ n: lines }];
+      if (/RETURN size/.test(q)) return [{ n: 0 }];
+      return [];
+    });
+    setDriver(f.driver);
+    return { out: await fns.deleteMyParts.run({ auth: auth('u7'), data }), f };
+  };
+  // Off (missing, {}, false): the lines stay; nothing is even asked of OwnLine.
+  for (const data of [undefined, {}, { keptLines: false }]) {
+    const { out, f } = await run(data);
+    assert.equal(out.deleted.OwnLine, undefined, JSON.stringify(data));
+    assert.ok(!f.calls.some((c) => /OwnLine/.test(c.query)), 'the flag-off path never touches My words');
+    assert.ok(!f.calls.some((c) => /profileVersion/.test(c.query)));
+  }
+  // On: only the marked lines (source two_pulls, with the kept parts' ids), in the same transaction.
+  const { out, f } = await run({ keptLines: true });
+  assert.equal(out.deleted.OwnLine, 2);
+  assert.equal(f.sessions.length, 1);
+  const d = f.calls.find((c) => c.query === DELETE_KEPT_LINES);
+  assert.equal(d.params.uid, 'u7');
+  assert.match(DELETE_KEPT_LINES, /MATCH \(o:OwnLine \{ownerId: \$uid\}\)\s+WHERE o\.source = 'two_pulls' AND size\(coalesce\(o\.partIds, \[\]\)\) > 0/);
+  assert.ok(f.calls.some((c) => /u\.profileVersion = coalesce/.test(c.query)), 'My words is profile: cached slices drop the lines');
+  // None to delete: no version bump.
+  assert.ok(!(await run({ keptLines: true }, 0)).f.calls.some((c) => /profileVersion/.test(c.query)));
+  // Anything else is refused before any query.
+  for (const bad of [{ keptLines: 'yes' }, { other: true }, [1]]) {
+    const g = fakeDriver();
+    setDriver(g.driver);
+    await assert.rejects(fns.deleteMyParts.run({ auth: auth('u7'), data: bad }), (e) => e.code === 'invalid-argument', JSON.stringify(bad));
+    assert.equal(g.calls.length, 0);
+  }
+  assert.deepEqual(validateDeleteMyParts(null), { keptLines: false });
+});
+
+test('countMyPartsLines: the same lines, counted for the confirm (read only, parts off too)', async () => {
+  assert.equal(COUNT_KEPT_LINES.split('RETURN')[0], DELETE_KEPT_LINES.split('WITH')[0], 'the same match as the delete');
+  const f = fakeDriver((q) => (q === COUNT_KEPT_LINES ? [{ n: 3 }] : []));
+  setDriver(f.driver);
+  assert.deepEqual(await fns.countMyPartsLines.run({ auth: auth('u7'), data: {} }), { keptLines: 3 });
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');
+  assert.doesNotMatch(COUNT_KEPT_LINES, /partsEnabled|DELETE|SET /);
+  await assert.rejects(fns.countMyPartsLines.run({ data: {} }), (e) => e.code === 'unauthenticated');
+});
+
 test('deleteMyParts needs sign-in (before any query)', async () => {
   const f = fakeDriver();
   setDriver(f.driver);

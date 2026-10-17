@@ -27,8 +27,8 @@ export const PULLS_TRACK: Partial<Record<PullsStep, number>> = {
 };
 
 export interface PullsContext {
-  /** The worries and what both want have their chips: the visit has a pair (always, opened on a pair). */
-  hasPair: boolean;
+  /** What both want has chips (the pair's, or the general ones): the visit can end with a keepsake. */
+  hasWants: boolean;
   /** Ask the blending check first. Always true in the app; the harness can turn it off. */
   blendCheck: boolean;
   /** A move of either side has a safety line: crisis resources alongside from the start. */
@@ -188,7 +188,7 @@ export function pullsNext(state: PullsState, event: PullsEvent, ctx: PullsContex
       } else if (event.type === 'next') next = 'worryA';
       break;
     case 'worryA': worry('a', 'worryB'); break;
-    case 'worryB': worry('b', ctx.hasPair ? 'bothWant' : 'close'); break;
+    case 'worryB': worry('b', ctx.hasWants ? 'bothWant' : 'close'); break;
     case 'stop':
       // The conservative stop: nothing offers to go further. On to the close.
       if (o || event.type === 'continue') next = 'close';

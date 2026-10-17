@@ -22,6 +22,22 @@ export const SETTINGS_LINK_REQUIRED: SurfaceIds = { prompts: ['me_get_to_know'],
 
 export type PartsSettingsPromptId = (typeof PARTS_SETTINGS_PROMPTS)[number];
 
+/**
+ * Optional, under the confirm (parts.md "Deleting"): "Also remove 2 kept lines that name your parts?",
+ * asked only when there are some and the line ships; without it nothing extra is asked or deleted.
+ */
+export const SETTINGS_LINES_ONE = 'settings_delete_lines_one';
+export const SETTINGS_LINES_MANY = 'settings_delete_lines';
+export const SETTINGS_LINES_REQUIRED: SurfaceIds = { prompts: [SETTINGS_LINES_ONE, SETTINGS_LINES_MANY], options: [] };
+
+/** The question for `n` kept lines, or null (none, or its copy not signed off). */
+export function keptLinesQuestion(content: PartsContent | null, n: number): string | null {
+  if (!content || !Number.isInteger(n) || n < 1) return null;
+  const id = n === 1 ? SETTINGS_LINES_ONE : SETTINGS_LINES_MANY;
+  const copy = content.prompts[id]?.copy;
+  return copy ? copy.replace('{n}', String(n)) : null;
+}
+
 /** The block's copy by id, or null while any of it is missing (render nothing then). */
 export function partsSettingsCopy(content: PartsContent | null): Record<PartsSettingsPromptId, string> | null {
   if (!content || !surfaceReady(content, PARTS_SETTINGS_REQUIRED)) return null;

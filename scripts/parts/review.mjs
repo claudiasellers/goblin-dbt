@@ -55,12 +55,12 @@ export { UNBLEND_REQUIRED } from './src/lib/unblendLine';
 export { angryRequired, ANGRY_LATER_REQUIRED } from './src/lib/angryPart';
 export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED } from './src/lib/meetAPartSave';
 export { PART_CHECKBACK_REQUIRED, TWO_PULLS_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
-export { TWO_PULLS_REQUIRED, PULLS_OPTION_STEPS, PULLS_CHECKBACK_REQUIRED, PULLS_WISE_MIND_REQUIRED } from './src/lib/twoPullsSave';
+export { TWO_PULLS_REQUIRED, PULLS_OPTION_STEPS, PULLS_CHECKBACK_REQUIRED, PULLS_WISE_MIND_REQUIRED, PULLS_GENERAL_REQUIRED } from './src/lib/twoPullsSave';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
 export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
 export { STATS_REQUIRED, REFLECT_REQUIRED } from './src/lib/partStats';
-export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
+export { PARTS_SETTINGS_REQUIRED, SETTINGS_LINK_REQUIRED, SETTINGS_LINES_REQUIRED, PARTS_ME_OFF_REQUIRED } from './src/lib/partsSettings';
 export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
@@ -115,6 +115,7 @@ export function surfaces(g) {
       where: 'The parts tool for two parts pulling different ways, by link only (the den with two kept parts, or a rule C trail offer\'s "More than one" with its pair), with parts on: the entry gate, the blending check about both, setting them out, how they feel toward each (Meet a part\'s feel-toward and unblend chips), step back, each side\'s worry, what they both want, the keepsake and the close. A pair-only visit names each side "the part that {move}" from the move\'s `unblendPhrase`. The worries and what both want also need the pair and its chips signed off (Two pulls pairs); without a pair, two parts get "Not sure" and their own words only, and no keepsake.',
       groups: [
         { label: 'The visit', ids: g.TWO_PULLS_REQUIRED },
+        { label: 'The general chips: worries and what both want for two parts with no pair of their own (each visit then ends with a keepsake; the visit shows without them)', ids: g.PULLS_GENERAL_REQUIRED },
         { label: 'The close\'s "Check back with both of them in a week?" (two kept parts; the visit shows without it)', ids: g.PULLS_CHECKBACK_REQUIRED },
         { label: 'After the keepsake: "Ask wise mind what\'s next" (only once Wise mind is a tool; the visit shows without it)', ids: g.PULLS_WISE_MIND_REQUIRED },
       ],
@@ -159,6 +160,7 @@ export function surfaces(g) {
       groups: [
         { label: null, ids: g.PARTS_SETTINGS_REQUIRED },
         { label: 'The one-time link right after turning parts on (also needs Meet a part)', ids: g.SETTINGS_LINK_REQUIRED },
+        { label: 'Under the delete confirm, only when kept Two pulls lines name a part (optional)', ids: g.SETTINGS_LINES_REQUIRED },
       ],
     },
     {

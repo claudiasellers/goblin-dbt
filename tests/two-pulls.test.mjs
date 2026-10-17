@@ -31,7 +31,7 @@ const CHASE = { id: PA, name: "Runner", tender: false, moveIds: ["chase"], shape
 const HIDE = { id: PB, name: null, tender: false, moveIds: ["hide"], shapeSig: null };
 const PAIR_ENTRY = { kind: "pair", pairId: "chase_hide", offerId: "trail_two_pulls:chase+hide:ctx_event_ignored" };
 
-const CTX = { hasPair: true, blendCheck: true, safetyLine: false };
+const CTX = { hasWants: true, blendCheck: true, safetyLine: false };
 const optionById = (id) => Object.values(ALL.options).flatMap((s) => Object.values(s).flat()).find((o) => o.id === id);
 const ev = (x) => (typeof x === "string" ? { type: "option", option: optionById(x) ?? assert.fail(`no option ${x}`) } : x);
 const run = (events, { ctx = CTX, state } = {}) => events.reduce((s, e) => {
@@ -40,6 +40,8 @@ const run = (events, { ctx = CTX, state } = {}) => events.reduce((s, e) => {
   return next;
 }, state ?? M.initialPulls(ctx));
 const synth = (o) => ({ type: "option", option: { moves: [], ...o } });
+const GENERAL_IDS = new Set([...fixture.options.pulls.worry_general, ...fixture.options.pulls.both_want_general].map((o) => o.id));
+const NO_GENERAL = partsFromFixture(fixture, (x) => !GENERAL_IDS.has(x));
 
 const breath = { type: "breath" };
 const TO_STEP_BACK = ["blend_pulls_notice", { type: "place", at: [0.42, 0.61] }, "feel_curious", "feel_steady"];
@@ -165,7 +167,7 @@ test("worries: own words take the conservative stop; a tender chip stops; a dang
   // "Not sure" goes on.
   assert.equal(run(["pulls_worry_not_sure"], { state: at }).step, "worryB");
   // No pair: worry B goes to the close (no both-want, no keepsake).
-  const ctx = { ...CTX, hasPair: false };
+  const ctx = { ...CTX, hasWants: false };
   assert.equal(run([...TO_WORRY, "pulls_worry_not_sure", "pulls_worry_not_sure"], { ctx }).step, "close");
   for (const s of [own, ownB]) assert.equal(M.keepsakeOpen(s), false);
 });
@@ -222,7 +224,8 @@ test("hidden tool behind the gate: registered, never listed, lazy, gated like Me
   assert.match(page, /'two-pulls': TwoPulls,/);
   assert.match(page, /const loadTwoPulls = \(\) => import\('\.\/tools\/TwoPulls'\);/);
   const gate = read("src/hooks/useToolGate.ts");
-  assert.match(gate, /'two-pulls': \(\) => import\('\.\.\/services\/twoPulls'\)\.then\(\(m\) => m\.loadTwoPullsContent\(\)\)\.then\(\(c\) => c !== null\)/);
+  assert.match(gate, /'two-pulls': \(search\) => import\('\.\.\/services\/twoPulls'\)\.then\(\(m\) => m\.twoPullsOpens\(search\)\)/);
+  assert.match(page, /const gate = useToolGate\(tool\?\.id, location\.search\);/, "the gate sees the address");
   // House controls and the hold's hint come from the content, as in Meet a part.
   for (const id of ["meet_back", "meet_next", "meet_finish"]) assert.ok(S.TWO_PULLS_REQUIRED.options.includes(id), id);
   assert.ok(S.TWO_PULLS_REQUIRED.prompts.includes("hold_hint"));
@@ -232,6 +235,15 @@ test("hidden tool behind the gate: registered, never listed, lazy, gated like Me
   }
   const svc = read("src/services/twoPulls.ts");
   assert.match(svc, /twoPullsReady\(parts\) \? parts : null/);
+  // An address that can't be resolved is ToolPage's "not found", from the gate or the page, never blank.
+  assert.match(svc, /const entry = parsePullsEntry\(search\);\s*if \(!content \|\| !entry\) return false;/);
+  assert.match(svc, /if \(entry\.kind === 'pair'\) return resolveVisit\(content, entry, \[\]\) !== null;/);
+  assert.match(svc, /return resolveVisit\(content, entry, known\) !== null;/);
+  const tp = read("src/pages/tools/TwoPulls.tsx");
+  assert.match(tp, /if \(failed \|\| !entry\) return <ToolNotFound \/>;/);
+  assert.match(tp, /if \(!visit\) return <ToolNotFound \/>;/);
+  assert.doesNotMatch(tp, /return null;/, "never a blank page");
+  assert.match(page, /if \(!tool \|\| gate === 'closed'\) \{\s*return <ToolNotFound \/>;/);
 });
 
 /* ───────── the entry ───────── */
@@ -284,21 +296,35 @@ test("the visit: kept parts follow a shipped pair's order; no pair → each part
   assert.equal(S.resolveVisit(ALL, { kind: "pair", pairId: "nope", offerId: null }, []), null, "unknown pair");
   assert.equal(S.resolveVisit(ALL, { kind: "parts", aId: PA, bId: PB }, [CHASE, { ...HIDE, moveIds: ["chase"] }]), null, "one move for both");
   // Context: a pair; a safety-line move or part puts crisis resources alongside.
-  assert.deepEqual(S.pullsContext(ALL, v, false), { hasPair: true, blendCheck: true, safetyLine: false });
-  assert.equal(S.pullsContext(ALL, np, false).hasPair, false);
+  assert.deepEqual(S.pullsContext(ALL, v, false), { hasWants: true, blendCheck: true, safetyLine: false });
+  assert.equal(S.pullsContext(ALL, np, false).hasWants, true, "no pair: the general chips");
+  assert.equal(S.pullsContext(NO_GENERAL, np, false).hasWants, false, "no pair and no general chips: no keepsake");
   assert.equal(S.pullsContext(ALL, { ...v, a: { ...v.a, part: { ...CHASE, safety: true } } }, false).safetyLine, true);
   const safe = S.resolveVisit(ALL, { kind: "parts", aId: PA, bId: PB }, [CHASE, { ...HIDE, moveIds: ["turn_on_myself"] }]);
   assert.equal(S.pullsContext(ALL, safe, false).safetyLine, true);
-  assert.deepEqual(S.pullsContext(ALL, v, true), { hasPair: true, blendCheck: true, safetyLine: false, p2OnEntry: true, p2Band: "flooded" });
+  assert.deepEqual(S.pullsContext(ALL, v, true), { hasWants: true, blendCheck: true, safetyLine: false, p2OnEntry: true, p2Band: "flooded" });
 });
 
-test("each side's worry chips are its own; what both want is the pair's; no pair → Not sure alone", () => {
+test("each side's worry chips are its own; what both want is the pair's; no pair (or no pair chips) → the general chips", () => {
   const v = S.resolveVisit(ALL, { kind: "parts", aId: PA, bId: PB }, [CHASE, HIDE]);
   assert.deepEqual(S.worryOptions(ALL, v, "a").map((o) => o.id), ["chase_worry_drift", "chase_worry_nobody_knows", "pulls_worry_not_sure"]);
   assert.deepEqual(S.worryOptions(ALL, v, "b").map((o) => o.id), ["hide_worry_too_much", "hide_worry_hurt_worse", "pulls_worry_not_sure"]);
   assert.deepEqual(S.bothWantOptions(ALL, v).map((o) => o.id), ["want_not_left", "want_safe_in_it", "want_matter_someone", "pulls_both_want_not_sure"]);
   const np = { ...v, pair: null };
-  assert.deepEqual(S.worryOptions(ALL, np, "a").map((o) => o.id), ["pulls_worry_not_sure"]);
+  const general = ["pulls_worry_hurt", "pulls_worry_nothing", "pulls_worry_fall_apart", "pulls_worry_on_my_own", "pulls_worry_not_sure"];
+  assert.deepEqual(S.worryOptions(ALL, np, "a").map((o) => o.id), general, "no pair: the general worries, the same for each side");
+  assert.deepEqual(S.worryOptions(ALL, np, "b").map((o) => o.id), general);
+  assert.deepEqual(S.bothWantOptions(ALL, np).map((o) => o.id), ["pulls_want_safe", "pulls_want_matter", "pulls_want_not_hurt", "pulls_want_okay", "pulls_both_want_not_sure"]);
+  assert.deepEqual(S.worryOptions(NO_GENERAL, np, "a").map((o) => o.id), ["pulls_worry_not_sure"], "without them: Not sure (and own words)");
+  // A shipped pair whose own chips don't ship falls back too.
+  const bare = { ...v, pair: { ...v.pair, worryA: [], bothWant: [] } };
+  assert.deepEqual(S.worryOptions(ALL, bare, "a").map((o) => o.id), general);
+  assert.deepEqual(S.worryOptions(ALL, bare, "b").map((o) => o.id)[0], "hide_worry_too_much");
+  assert.equal(S.bothWantOptions(ALL, bare)[0].id, "pulls_want_safe");
+  // Every general chip is in the optional ids, in the content's own step.
+  assert.deepEqual([...S.PULLS_GENERAL_REQUIRED.options].sort(),
+    [...fixture.options.pulls.worry_general, ...fixture.options.pulls.both_want_general].map((o) => o.id).sort());
+  for (const o of fixture.options.pulls.both_want_general) assert.ok(o.label.length <= 20, `${o.id}: fills {want}`);
   assert.equal(S.worryPrompt(ALL, v, "a"), "If the part that wants to hide gets its way, what's Runner afraid of?");
   assert.equal(S.worryPrompt(ALL, v, "b"), "If Runner gets its way, what's the part that wants to hide afraid of?");
 });
@@ -369,7 +395,7 @@ test("Meet it another time: a pair's side queues a candidate (origin two_pulls);
 
 /* ───────── the keepsake ───────── */
 
-test("the keepsake: the client's lines are exactly what keepPullsKeepsake keeps", () => {
+test("the keepsake: the client's lines are exactly what keepPullsKeepsake keeps, for any two parts", () => {
   const copy = Object.fromEntries(fixture.keepsake.map((k) => [k.id, k.copy]));
   const pairName = fixture.prompts.pulls_pair_name.copy;
   const phrase = (m) => fixture.moves.find((x) => x.id === m).unblendPhrase;
@@ -385,6 +411,15 @@ test("the keepsake: the client's lines are exactly what keepPullsKeepsake keeps"
     const side = (s) => K.sideName({ name: s.part?.name ?? null, found: true, unblendPhrase: phrase(s.move) }, pairName);
     assert.equal(S.keepsakeText(lines), K.keepsakeText(copy, side(v.a), side(v.b), want), JSON.stringify(entry));
   }
+  // Two kept parts with no pair: a general want, the same lines the server keeps.
+  const npv = S.resolveVisit(ALL, { kind: "parts", aId: PA, bId: PB }, [CHASE, { ...HIDE, moveIds: ["keep_watch"] }]);
+  const general = fixture.options.pulls.both_want_general[0].label;
+  const sideOf = (s) => K.sideName({ name: s.part?.name ?? null, found: true, unblendPhrase: phrase(s.move) }, pairName);
+  assert.equal(S.keepsakeText(S.keepsakeLines(ALL, npv, general)), K.keepsakeText(copy, sideOf(npv.a), sideOf(npv.b), general));
+  assert.equal(S.keepsakeLines(ALL, npv, general)[0], "Runner and the part that is keeping watch both want me to be safe.");
+  // The server takes a general want with or without a pair, a pair's own only with its pair; the link too.
+  assert.match(K.KEEPSAKE_STATE_QUERY, /OPTIONAL MATCH \(w:PartOption \{id: ps\.bothWantId\}\)\s+WHERE \(w\.reviewStatus = 'approved' AND w\.pending IS NULL\) AND \(\(w\.flow = 'pulls' AND w\.step = 'both_want_general'\)\s+OR EXISTS \{ MATCH \(:PolarityPair \{id: ps\.pairId\}\)-\[bw:BOTH_WANT\]->\(w\) WHERE \(bw\.reviewStatus = 'approved'/);
+  assert.match(read("functions/src/parts/links.ts"), /OPTIONAL MATCH \(bw:PartOption \{id: \$bothWantId\}\)\s+WHERE EXISTS \{ MATCH \(:PolarityPair\)-\[:BOTH_WANT\]->\(bw\) \} OR \(bw\.flow = 'pulls' AND bw\.step = 'both_want_general'\)/);
   const pv = S.resolveVisit(ALL, PAIR_ENTRY, []);
   assert.deepEqual(S.keepsakeLines(ALL, pv, want), [
     "The part that wants to chase this down and the part that wants to hide both want me not to be left.",
@@ -466,4 +501,15 @@ test("mirrors: the server's pulls types are in src/data/partsTypes.ts; the servi
   }
   assert.equal(S.TWO_PULLS_TOOL, "two-pulls");
   assert.equal(S.TWO_PULLS_CHECKBACK_TYPE, "two_pulls_checkback");
+});
+
+test("every visit can end with a keepsake: two kept parts with no pair go worries → general want → keepsake", () => {
+  const np = S.resolveVisit(ALL, { kind: "parts", aId: PA, bId: PB }, [CHASE, { ...HIDE, moveIds: ["keep_watch"] }]);
+  const ctx = S.pullsContext(ALL, np, false);
+  const s = run([...TO_WORRY, "pulls_worry_hurt", "pulls_worry_fall_apart", "pulls_want_not_hurt"], { ctx });
+  assert.deepEqual([s.step, s.session.worryA, s.session.worryB, s.session.bothWantId, M.keepsakeOpen(s)],
+    ["keepsake", "pulls_worry_hurt", "pulls_worry_fall_apart", "pulls_want_not_hurt", true]);
+  assert.doesNotThrow(() => V.validateSavePulls({ id: SID, patch: S.toPatch(s), final: false }));
+  // Own words still take the conservative stop.
+  assert.equal(run([...TO_WORRY, { type: "ownWords", text: "mine" }], { ctx }).step, "stop");
 });

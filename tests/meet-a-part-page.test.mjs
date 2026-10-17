@@ -76,7 +76,7 @@ test("listed only with parts on and its copy shipped (the gate ToolPage opens it
   assert.match(page, /if \(!tool \|\| gate === 'closed'\) \{/, "parts off or copy missing: the existing not-found state");
   const gate = read("src/hooks/useToolGate.ts");
   assert.match(gate, /if \(!on\) return loading \? 'loading' : 'closed';/, "parts off: closed");
-  assert.match(gate, /return ready \? 'open' : 'closed';/);
+  assert.match(gate, /return ready\.ok \? 'open' : 'closed';/);
 });
 
 test("ready only with every prompt and option signed off, and Shape it's words: today's file says no", () => {

@@ -70,6 +70,20 @@ export const PULLS_CHECKBACK_REQUIRED: SurfaceIds = { prompts: [PULLS_CHECKBACK_
 export const PULLS_WISE_MIND = 'pulls_wise_mind';
 export const PULLS_WISE_MIND_REQUIRED: SurfaceIds = { prompts: [PULLS_WISE_MIND], options: [] };
 
+/**
+ * Optional: the general chips (content.py, `worry_general` / `both_want_general`) for two parts with no
+ * shipped pair, or a pair whose own chips don't ship. Each list shows when any of it ships; without
+ * them such a visit still runs (Not sure and own words at the worries), with no keepsake.
+ */
+export const PULLS_GENERAL = { worry: 'worry_general', bothWant: 'both_want_general' } as const;
+export const PULLS_GENERAL_REQUIRED: SurfaceIds = {
+  prompts: [],
+  options: [
+    'pulls_worry_hurt', 'pulls_worry_nothing', 'pulls_worry_fall_apart', 'pulls_worry_on_my_own',
+    'pulls_want_safe', 'pulls_want_matter', 'pulls_want_not_hurt', 'pulls_want_okay',
+  ],
+};
+
 /** True only when the whole visit can be shown. */
 export function twoPullsReady(content: PartsContent): boolean {
   if (!surfaceReady(content, TWO_PULLS_REQUIRED)) return false;
@@ -179,7 +193,7 @@ export function resolveVisit(content: PartsContent, entry: PullsEntry, known: re
 export function pullsContext(content: PartsContent, visit: PullsVisit, p2OnEntry: boolean): PullsContext {
   const safety = new Set(content.moves.filter((m) => m.safetyLine).map((m) => m.id));
   return {
-    hasPair: visit.pair !== null,
+    hasWants: wantChips(content, visit).length > 0,
     blendCheck: true,
     safetyLine: safety.has(visit.a.move) || safety.has(visit.b.move) || visit.a.part?.safety === true || visit.b.part?.safety === true,
     ...(p2OnEntry ? { p2OnEntry: true, p2Band: 'flooded' as const } : {}),
@@ -193,16 +207,22 @@ const byIds = (content: PartsContent, flow: string, step: string, ids: readonly 
   return ids.map((id) => all.find((o) => o.id === id)).filter((o): o is PartsOption => !!o);
 };
 
-/** A side's worry chips (the pair's, that side's), then "Not sure". Without a pair, "Not sure" alone. */
+/** A side's worry chips (the pair's, that side's; else the general ones, the same for both), then "Not sure". */
 export function worryOptions(content: PartsContent, visit: PullsVisit, side: PullsSide): PartsOption[] {
   const own = visit.pair ? byIds(content, 'pulls', 'worry', side === 'a' ? visit.pair.worryA : visit.pair.worryB) : [];
-  return [...own, ...byIds(content, 'pulls', 'worry', [PULLS_OPTIONS.worryNotSure])];
+  const chips = own.length ? own : stepOptions(content, 'pulls', PULLS_GENERAL.worry);
+  return [...chips, ...byIds(content, 'pulls', 'worry', [PULLS_OPTIONS.worryNotSure])];
 }
 
-/** What they both want: the pair's chips, then "Not sure". */
-export function bothWantOptions(content: PartsContent, visit: PullsVisit): PartsOption[] {
+/** What they both want, without "Not sure": the pair's chips, else the general ones. */
+export function wantChips(content: PartsContent, visit: PullsVisit): PartsOption[] {
   const want = visit.pair ? byIds(content, 'pulls', 'both_want', visit.pair.bothWant) : [];
-  return [...want, ...byIds(content, 'pulls', 'both_want', [PULLS_OPTIONS.bothWantNotSure])];
+  return want.length ? want : stepOptions(content, 'pulls', PULLS_GENERAL.bothWant);
+}
+
+/** What they both want: the pair's chips (else the general ones), then "Not sure". */
+export function bothWantOptions(content: PartsContent, visit: PullsVisit): PartsOption[] {
+  return [...wantChips(content, visit), ...byIds(content, 'pulls', 'both_want', [PULLS_OPTIONS.bothWantNotSure])];
 }
 
 /** The step-4 chips, the same for both sides (never "nothing": that's Meet a part's own grounding step). */

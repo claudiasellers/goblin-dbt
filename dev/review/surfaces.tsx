@@ -414,8 +414,16 @@ const PULLS_BRANCHES: Branch[] = [
   { id: 'kept', label: 'Keepsake kept: the close and the check-back question', steps: [...pullsKeepsake, { opt: 'pulls_keep' }, { close: 'better' }] },
   { id: 'pair_only', label: 'Pair only (from a rule C trail): neutral figures named by their moves', steps: pullsSetOut },
   { id: 'pair_needs_time', label: 'Pair only: needs its own time → Meet it another time queues it', steps: [...pullsFeel, { opt: 'feel_annoyed' }, { opt: 'unblend_still' }, { opt: 'pulls_another_time' }] },
+  { id: 'general', label: 'Two parts with no pair of their own: the general chips, and still a keepsake',
+    steps: [...pullsWorries, { opt: 'pulls_worry_hurt' }, { opt: 'pulls_worry_fall_apart' }, { opt: 'pulls_want_safe' }] },
+  { id: 'not_found', label: 'An address it can\'t resolve (a part no longer kept): "Tool not found."' },
 ];
 const PULLS_PAIR = new Set(['pair_only', 'pair_needs_time']);
+/** The general branch: the chase part and the unnamed one (keep_watch), which no pair joins. */
+const pullsSearch = (b: string) => (PULLS_PAIR.has(b) ? `?pair=chase_hide&offer=${encodeURIComponent('trail_two_pulls:chase+hide:ctx_event_ignored')}`
+  : b === 'general' ? `?a=${PART_IDS.chase}&b=${PART_IDS.unnamed}`
+  : b === 'not_found' ? `?a=${PART_IDS.chase}&b=00000000-0000-4000-8000-000000000999`
+  : `?a=${PART_IDS.chase}&b=${PART_IDS.hide}`);
 
 /* ───────── the list ───────── */
 
@@ -533,7 +541,7 @@ export const SURFACES: Surface[] = [
     id: 'pulls', pack: 'pulls', title: 'Two pulls',
     who: 'Parts on, reached only by a link: the den with two kept parts, or a rule C trail offer’s More than one with its pair. Writes are listed under the frame, ids only.',
     branches: PULLS_BRANCHES,
-    routeSearch: (b) => (PULLS_PAIR.has(b) ? `?pair=chase_hide&offer=${encodeURIComponent('trail_two_pulls:chase+hide:ctx_event_ignored')}` : `?a=${PART_IDS.chase}&b=${PART_IDS.hide}`),
+    routeSearch: pullsSearch,
     render: () => <ToolSessionProvider toolId="two-pulls"><TwoPulls /></ToolSessionProvider>,
   },
   {
@@ -592,6 +600,7 @@ export const SURFACES: Surface[] = [
       { id: 'confirm', label: 'Delete: the confirm', steps: [{ prompt: 'settings_delete' }] },
       { id: 'failed', label: 'Delete: the failure line', steps: [{ prompt: 'settings_delete' }, { prompt: 'settings_delete_yes' }] },
       { id: 'done', label: 'Delete: done', steps: [{ prompt: 'settings_delete' }, { prompt: 'settings_delete_yes' }] },
+      { id: 'lines', label: 'Delete: also the 2 kept Two pulls lines that name a part (ticked)', steps: [{ prompt: 'settings_delete' }, { tick: 'Also remove 2 kept lines that name your parts?' }] },
     ],
     setup: (b) => answer('deleteMyParts', () => { if (b === 'failed') throw new Error('review: delete fails'); return { deleted: { Part: 5 } }; }),
     render: ({ branch }) => <SettingsHost on={branch !== 'off'} />,

@@ -82,6 +82,7 @@ const defaults = () => answers({
   answerPartCheckback: (d) => ({ status: 'done', aftercare: ok(d).answer === 'louder' }),
   tagPart: (d) => ({ id: ok(d).id, created: true }),
   deleteMyParts: () => ({ deleted: {} }),
+  countMyPartsLines: () => ({ keptLines: 2 }),
   startPullsSession: (d) => ({ id: ok(d).id, status: 'open' }),
   savePullsSession: (d) => ({ id: ok(d).id, status: ok(d).final ? 'saved' : 'open' }),
   keepPullsKeepsake: (d) => ({ lineId: ok(d).lineId, text: '', version: 2 }),

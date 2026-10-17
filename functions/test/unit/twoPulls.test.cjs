@@ -229,6 +229,31 @@ test('keepsake write: an OwnLine in My words (profile), the visit\'s KEPT_LINE u
   await assert.rejects(fns.keepPullsKeepsake.run({ auth: auth('u5'), data: { ...KEEP, text: 'mine' } }), code('invalid-argument'), 'never client text');
 });
 
+test('keepsake for any two parts: a general want (no pair of their own) is accepted by the keepsake and the link', async () => {
+  // The state query matches a general both-want chip whatever the pair; a pair's own only through its pair.
+  assert.match(KS.KEEPSAKE_STATE_QUERY, /\(w\.flow = 'pulls' AND w\.step = 'both_want_general'\)\s+OR EXISTS \{ MATCH \(:PolarityPair \{id: ps\.pairId\}\)-\[bw:BOTH_WANT\]->\(w\)/);
+  assert.equal(KS.GENERAL_WANT('w'), "(w.flow = 'pulls' AND w.step = 'both_want_general')");
+  assert.match(L.LINK_STATE_QUERY, /OR \(bw\.flow = 'pulls' AND bw\.step = 'both_want_general'\)/);
+  const f = fakeDriver((q) => {
+    if (q === KS.KEEPSAKE_STATE_QUERY) {
+      return [{ partsOn: true, sessionFound: true, keepable: true, entry: 'parts', stopReason: 'done', aId: PA, bId: PB,
+        aFound: true, aName: 'Watcher', aPhrase: 'keeps watch', bFound: true, bName: null, bPhrase: 'pushes on',
+        want: 'to be safe', bothWantId: 'pulls_want_safe', existingText: null, copy: Object.entries(COPY).map(([id, copy]) => ({ id, copy })) }];
+    }
+    if (q === KS.KEEPSAKE_WRITE_QUERY) return [{ version: 3 }];
+    if (q === L.LINK_STATE_QUERY) return [{ partsOn: true, version: 3, aFound: true, bFound: true, linked: false, bothWantKnown: true }];
+    if (q === L.WRITE_PART_LINK_QUERY) return [{ version: 4 }];
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.keepPullsKeepsake.run({ auth: auth('u5'), data: KEEP });
+  assert.equal(out.linkId, L.partLinkId('two_pulls', PA, PB));
+  assert.match(out.text, /^Watcher and .* both want to be safe\./);
+  const lw = f.calls.find((c) => c.query === L.WRITE_PART_LINK_QUERY);
+  assert.equal(lw.params.bothWantId, 'pulls_want_safe');
+  assert.equal(f.calls.find((c) => c.query === L.LINK_STATE_QUERY).params.bothWantId, 'pulls_want_safe');
+});
+
 // ------------------------------------------------------------------ check-back
 
 test('schedulePullsCheckback: two kept parts only, one per visit, parts on', async () => {

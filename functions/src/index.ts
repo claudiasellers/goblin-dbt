@@ -30,7 +30,7 @@ export {
   answerPatternOffer,
 } from './profile';
 export { getPartsEntry, startPartSession, savePartSession, keepPart, queuePartCandidate } from './parts';
-export { deleteMyParts } from './parts';
+export { deleteMyParts, countMyPartsLines } from './parts';
 export { answerPartCandidate } from './parts';
 export { tagPart } from './parts';
 export { renamePart, restPart, setAsidePart, restorePart, setPartTender, answerPartRevisit } from './parts';

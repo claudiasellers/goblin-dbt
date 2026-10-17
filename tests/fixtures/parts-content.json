@@ -989,6 +989,20 @@
    "copy": "Couldn't delete them. Try again.",
    "reviewStatus": "draft"
   },
+  "settings_delete_lines_one": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 12,
+   "copy": "Also remove 1 kept line that names your parts?",
+   "reviewStatus": "draft"
+  },
+  "settings_delete_lines": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 13,
+   "copy": "Also remove {n} kept lines that name your parts?",
+   "reviewStatus": "draft"
+  },
   "me_get_to_know": {
    "flow": "me",
    "step": "card",
@@ -3429,6 +3443,106 @@
      "selfLike": null,
      "branch": "end",
      "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "worry_general": [
+    {
+     "id": "pulls_worry_hurt",
+     "label": "I'd get hurt",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_worry_nothing",
+     "label": "I'd be left with nothing",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_worry_fall_apart",
+     "label": "It would all fall apart",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_worry_on_my_own",
+     "label": "I'd end up on my own",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "both_want_general": [
+    {
+     "id": "pulls_want_safe",
+     "label": "to be safe",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_want_matter",
+     "label": "to matter to someone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_want_not_hurt",
+     "label": "not to be hurt again",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "pulls_want_okay",
+     "label": "to be okay",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

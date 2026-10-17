@@ -27,14 +27,21 @@ export async function getPartsEntry(partId?: string | null): Promise<PartsEntry>
   return (await getPartsEntryFn(partId ? { partId } : {})).data;
 }
 
-const deleteMyPartsFn = httpsCallable<Record<string, never>, { deleted: Record<string, number> }>(functions, 'deleteMyParts');
+const deleteMyPartsFn = httpsCallable<{ keptLines?: boolean }, { deleted: Record<string, number> }>(functions, 'deleteMyParts');
+const countMyPartsLinesFn = httpsCallable<Record<string, never>, { keptLines: number }>(functions, 'countMyPartsLines');
 
 /**
  * Delete my parts (Privacy & Data): every parts record the person has kept or made, in one step
- * they confirmed. The one call made with parts off too (turning parts off deletes nothing).
+ * they confirmed. The one call made with parts off too (turning parts off deletes nothing). Kept Two
+ * pulls lines that name their parts go too only on their separate yes (`keptLines`).
  */
-export async function deleteMyParts(): Promise<{ deleted: Record<string, number> }> {
-  return (await deleteMyPartsFn({})).data;
+export async function deleteMyParts(opts: { keptLines?: boolean } = {}): Promise<{ deleted: Record<string, number> }> {
+  return (await deleteMyPartsFn(opts.keptLines ? { keptLines: true } : {})).data;
+}
+
+/** For Delete your parts' confirm: how many kept Two pulls lines name the person's parts. */
+export async function countMyPartsLines(): Promise<number> {
+  return (await countMyPartsLinesFn({})).data.keptLines;
 }
 
 const startPartSessionFn = httpsCallable<StartPartSessionRequest, PartSessionResponse>(functions, 'startPartSession');

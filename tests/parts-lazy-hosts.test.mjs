@@ -76,8 +76,8 @@ test("Meet a part, Two pulls and Wise mind are the lazy tools; the parts gates s
   assert.match(page, /if \(!partsOn\) return;\s*if \(tool\?\.id === 'meet-a-part'\) void loadMeetAPart\(\)[^\n]*\n\s*if \(tool\?\.id === 'two-pulls'\) void loadTwoPulls\(\)/, "prefetched only with parts on");
   const gate = read("src/hooks/useToolGate.ts");
   assert.match(gate, /'meet-a-part': \(\) => import\('\.\.\/services\/meetAPart'\)\.then\(\(m\) => m\.loadMeetAPartContent\(\)\)/);
-  assert.match(gate, /'two-pulls': \(\) => import\('\.\.\/services\/twoPulls'\)\.then\(\(m\) => m\.loadTwoPullsContent\(\)\)/);
-  assert.match(gate, /if \(!gated \|\| !on\) return;\s*let live = true;\s*check!\(\)/, "content only with parts on");
+  assert.match(gate, /'two-pulls': \(search\) => import\('\.\.\/services\/twoPulls'\)\.then\(\(m\) => m\.twoPullsOpens\(search\)\)/);
+  assert.match(gate, /if \(!gated \|\| !on\) return;\s*let live = true;\s*check!\(search\)/, "content only with parts on");
   assert.match(gate, /if \(!on\) return loading \? 'loading' : 'closed';/);
 });
 

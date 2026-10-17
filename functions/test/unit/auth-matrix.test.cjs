@@ -18,7 +18,7 @@ const AUTHED = [
   'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
   'getPartsEntry', // reads the caller's own check-ins and Recover sessions
-  'deleteMyParts', // deletes the caller's own parts records
+  'deleteMyParts', 'countMyPartsLines', // deletes (counts) the caller's own parts records
   'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
   'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
   'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',

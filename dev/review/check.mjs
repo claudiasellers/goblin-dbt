@@ -63,7 +63,7 @@ const EXPECT = {
   'pulls/set_out': 'pulls_place', 'pulls/feel_both': 'pulls_feel', 'pulls/unblend': 'meet_unblend', 'pulls/needs_time': 'pulls_needs_time',
   'pulls/step_back': 'pulls_step_back', 'pulls/worries': 'chase_worry_drift', 'pulls/worry_own': 'meet_stop_title',
   'pulls/both_want': 'pulls_both_want', 'pulls/keepsake': 'keepsake_choose', 'pulls/kept': 'pulls_close_checkback',
-  'pulls/pair_only': 'pulls_pair_name',
+  'pulls/pair_only': 'pulls_pair_name', 'pulls/general': 'keepsake_choose',
   'checkback_two/named': 'checkback_title_two', 'checkback_two/louder': 'aftercare_louder',
   // The den (lane 2)
   'den/room': 'den_room', 'den/one': 'den_one_part', 'den/sheet': 'den_stands_front', 'den/front': 'den_which_front', 'den/then': 'den_now',
@@ -76,7 +76,8 @@ const SELECTOR = {
   'review/failed': '[data-testid="known-part-review"] button[aria-pressed="true"]',
   // Two pulls (lane 3's block)
   'pulls/set_out': '[role="slider"]', 'pulls/step_back': '[data-testid="pulls-step-back"]', 'pulls/keepsake': '[data-keepsake]',
-  'pulls/kept': '[data-keepsake]', 'checkback_two/louder': '[data-testid="part-checkback-aftercare"]',
+  'pulls/kept': '[data-keepsake]', 'pulls/general': '[data-keepsake]', 'pulls/not_found': 'text=Tool not found.',
+  'settings/confirm': 'input[type="checkbox"]', 'settings/lines': 'input[type="checkbox"]:checked', 'checkback_two/louder': '[data-testid="part-checkback-aftercare"]',
 };
 const NO_CHECKBACK = new Set(['meet/danger_close']);
 // lane 4 (parts-steps-tried): screens that must also show "Steps that helped" (fresh loads, without ids).
@@ -196,6 +197,8 @@ try {
   await tour.click('[data-surface="meet"]');
   await reached('link to meet');
   if (!(await tour.evaluate(() => location.hash)).startsWith('#s=meet')) tbad('the surface link is not a hash link');
+  // The meet surface's own 'done' would satisfy the wait before the branch starts: mark it stale first.
+  await tour.evaluate(() => document.querySelector('[data-testid="surface"]')?.setAttribute('data-driven', 'stale'));
   await tour.click('[data-branch="keep"]');
   await reached('link to meet/keep');
   await tour.click('text=← All surfaces');

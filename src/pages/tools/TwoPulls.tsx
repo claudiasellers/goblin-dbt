@@ -31,6 +31,7 @@ import { useStepFocus } from '../../components/parts/stepFocus';
 import { Chip, Chips, Line, OwnWords, Prompt } from '../../components/parts/meet/MeetScreens';
 import { PullsStage, type StageSide } from '../../components/parts/pulls/PullsStage';
 import { Keepsake, StepBack } from '../../components/parts/pulls/PullsScreens';
+import { ToolNotFound } from '../../components/tools/ToolNotFound';
 import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 
 const HOST = TWO_PULLS_TOOL;
@@ -60,7 +61,7 @@ export function TwoPulls() {
     return () => { live = false; };
   }, []);
 
-  if (failed || !entry) return null;
+  if (failed || !entry) return <ToolNotFound />;
   if (!content || gate === undefined || profile.status === 'loading') {
     return (
       <div className="py-8 flex justify-center" aria-busy="true">
@@ -69,8 +70,9 @@ export function TwoPulls() {
     );
   }
   const visit = resolveVisit(content, entry, profile.slices?.parts ?? []);
-  // Two parts that aren't both kept, or a pair that doesn't ship: nothing to show.
-  if (!visit) return null;
+  // Two parts that aren't both kept, or a pair that doesn't ship: ToolPage's "not found" (its gate
+  // usually says so first; this is the same answer if the parts changed in between).
+  if (!visit) return <ToolNotFound />;
   return <PullsVisitView visit={visit} plan={entryPlan(gate)} parts={content} />;
 }
 
