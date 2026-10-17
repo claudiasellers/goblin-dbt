@@ -235,7 +235,7 @@ test("the angry-part card is offered for fight back under the line, with its cop
   assert.equal(offer({ pull: "fight", now: 10 }), false);
   assert.equal(offer({ pull: "fight", now: null }), false);
   for (const pull of ["chase", "hide", "freeze", null]) assert.equal(offer({ pull, now: 2 }), false, `${pull}`);
-  assert.equal(offer({ pull: "fight", now: 2 }, false), false, "copy not ready (nothing signed off): no card");
+  assert.equal(offer({ pull: "fight", now: 2 }, false), false, "copy not ready: no card");
   assert.equal(offer({ pull: "fight", now: 2 }, true, true), false, "already offered in this visit");
 });
 

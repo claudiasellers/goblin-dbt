@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const lib = await importTs("src/lib/oaGoalLine.ts");
@@ -20,7 +20,7 @@ const flow = JSON.parse(JSON.parse(read("schema/opposite-action-flow.cypher").ma
 const goals = flow.choices.goal;
 const IDS = [lib.OA_GOAL_PART, lib.OA_GOAL_YOU];
 
-test("copy: two drafts in flow oa, step goal; {move} and {goal}, no {hurt}", () => {
+test("copy: two lines in flow oa, step goal (signed off 17 Oct); {move} and {goal}, no {hurt}", () => {
   assert.deepEqual(lib.OA_GOAL_LINE_REQUIRED, { prompts: IDS, options: [] });
   const rows = IDS.map((id) => fixture.prompts[id]);
   assert.deepEqual(rows.map((p) => [p.flow, p.step, p.copy]), [
@@ -78,8 +78,14 @@ test("the gate: an offerable, non-safety-line move from a listed urge, a goal, b
   assert.equal(lib.oaGoalLine(null, { urgeId: "anger-lash", goalLabel: goal }), null);
   const noSlot = { ...ALL, prompts: { ...ALL.prompts, oa_goal_you: { ...ALL.prompts.oa_goal_you, copy: "No slot." } } };
   assert.equal(lib.oaGoalLine(noSlot, { urgeId: "anger-lash", goalLabel: goal }), null);
-  // Today's shipped file: nothing.
-  for (const urgeId of Object.keys(fixture.expresses.ActionUrge)) assert.equal(lib.oaGoalLine(SHIPPED, { urgeId, goalLabel: goal }), null, urgeId);
+  // The shipped file (signed off 17 Oct, Claudia: ship it all): the same line the whole fixture gives, for
+  // every urge; either line taken out of it, nothing.
+  assert.deepEqual(lib.oaGoalLine(SHIPPED, { urgeId: "anger-lash", goalLabel: goal }),
+    ["A part of you wants to hit back, and it's trying to help.", "You want to stay connected."]);
+  for (const urgeId of Object.keys(fixture.expresses.ActionUrge)) {
+    assert.deepEqual(lib.oaGoalLine(SHIPPED, { urgeId, goalLabel: goal }), lib.oaGoalLine(ALL, { urgeId, goalLabel: goal }), urgeId);
+  }
+  for (const id of IDS) assert.equal(lib.oaGoalLine(withoutIds(SHIPPED, id), { urgeId: "anger-lash", goalLabel: goal }), null, `shipped file without ${id}`);
 });
 
 test("every filled line fits the prompt's 90 characters", () => {

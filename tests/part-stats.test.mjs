@@ -6,7 +6,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 import { PARTS_SLOT_WIDTH } from "../scripts/voice-lint.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
@@ -118,7 +118,10 @@ test("ready: the section needs every line (title, stats, unnamed names, when opt
   for (const id of IDS) {
     assert.equal(lib.reflectPartsReady(partsFromFixture(fixture, (x) => x !== id && (IDS.includes(x) || x.startsWith("feel_")))), false, id);
   }
-  assert.equal(lib.reflectPartsReady(partsFromFixture(fixture)), false, "drafts today: Reflect is exactly as before");
+  // Signed off 17 Oct (Claudia: ship it all): the shipped file has the section; any one line out, Reflect as before.
+  const shipped = JSON.parse(read("src/data/content/parts.json")).content;
+  assert.equal(lib.reflectPartsReady(shipped), true, "the shipped file");
+  for (const id of IDS) assert.equal(lib.reflectPartsReady(withoutIds(shipped, id)), false, `shipped file without ${id}`);
 });
 
 test("Reflect: after its own sections, parts on, copy shipped; no hard-coded words, no other numbers", () => {

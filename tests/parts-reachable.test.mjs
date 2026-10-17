@@ -7,7 +7,7 @@ import { readFileSync } from "node:fs";
 import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const S = await importTs("src/lib/partsSettings.ts");
@@ -21,7 +21,10 @@ test("the Me card's copy: Settings' switch lines, and only once Parts of me's li
   assert.deepEqual([...S.PARTS_ME_OFF_PROMPTS], ["settings_label", "settings_blurb", "settings_dissociation", "settings_off"]);
   for (const id of [...S.PARTS_ME_OFF_PROMPTS, ...M.PARTS_OF_ME_REQUIRED.prompts]) assert.ok(S.PARTS_ME_OFF_REQUIRED.prompts.includes(id), id);
   assert.equal(S.partsMeOffCopy(null), null);
-  assert.equal(S.partsMeOffCopy(partsFromFixture(fixture)), null, "nothing signed off today: no card");
+  // Signed off 17 Oct (Claudia: ship it all): the shipped file shows the card; any one line out of it, none.
+  const shipped = JSON.parse(read("src/data/content/parts.json")).content;
+  assert.deepEqual(S.partsMeOffCopy(shipped), Object.fromEntries(S.PARTS_ME_OFF_PROMPTS.map((id) => [id, fixture.prompts[id].copy])), "the shipped file");
+  for (const id of S.PARTS_ME_OFF_REQUIRED.prompts) assert.equal(S.partsMeOffCopy(withoutIds(shipped, id)), null, `shipped file without ${id}`);
   assert.equal(S.partsMeOffCopy(only([...S.PARTS_ME_OFF_PROMPTS])), null, "its own lines alone: turning on would show nothing");
   assert.equal(S.partsMeOffCopy(only([...M.PARTS_OF_ME_REQUIRED.prompts])), null);
   const copy = S.partsMeOffCopy(only([...S.PARTS_ME_OFF_REQUIRED.prompts]));

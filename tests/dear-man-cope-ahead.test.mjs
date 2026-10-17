@@ -6,7 +6,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
@@ -25,7 +25,7 @@ const part = (id, name = null, shapeSig = null, firstPlace = null) => ({
   meta: { id, kind: "part", area: "my_parts", status: "active", source: "made", confirmedAt: null, revisitAt: null, prompt: "none" },
 });
 
-test("copy pins: flow dearman, step cope, every row a draft (nothing ships today)", () => {
+test("copy pins: flow dearman, step cope, every row signed off 17 Oct (Claudia: ship it all) and shipped", () => {
   const prompts = {
     cope_title: "Who might show up in this conversation?",
     cope_anchor: "If {name} shows up:",
@@ -36,17 +36,18 @@ test("copy pins: flow dearman, step cope, every row a draft (nothing ships today
   };
   for (const [id, copy] of Object.entries(prompts)) {
     const p = fixture.prompts[id];
-    assert.deepEqual([p?.flow, p?.step, p?.copy, p?.reviewStatus], ["dearman", "cope", copy, "draft"], id);
-    assert.ok(!shipped.prompts[id], `${id} ships only signed off`);
+    assert.deepEqual([p?.flow, p?.step, p?.copy, p?.reviewStatus], ["dearman", "cope", copy, "approved"], id);
+    assert.equal(shipped.prompts[id]?.copy, copy, `${id} ships, signed off`);
   }
   assert.deepEqual(fixture.options.dearman.cope.map((o) => [o.id, o.label, o.kind, o.reviewStatus]), [
-    ["cope_not_sure", "Not sure", "chip", "draft"], ["cope_skip", "Skip", "chip", "draft"], ["cope_own", "In my words", "chip", "draft"],
-    ["cope_change", "Change it", "chip", "draft"], ["cope_save", "Save", "chip", "draft"],
+    ["cope_not_sure", "Not sure", "chip", "approved"], ["cope_skip", "Skip", "chip", "approved"], ["cope_own", "In my words", "chip", "approved"],
+    ["cope_change", "Change it", "chip", "approved"], ["cope_save", "Save", "chip", "approved"],
   ]);
   // An unnamed part's chip uses the shared lines the tag row uses (lane 4's part_unnamed_*).
   assert.deepEqual([...lib.COPE_PROMPTS].sort(), [...Object.keys(prompts), "part_unnamed_place", "part_unnamed"].sort());
-  assert.equal(lib.copeReady(shipped), false, "no visible change today");
-  assert.equal(lib.copeReady(all), true, "with the copy signed off, the screen can show");
+  assert.equal(lib.copeReady(shipped), true, "the shipped file has every line: the screen can show");
+  assert.equal(lib.copeReady(all), true);
+  for (const id of [...lib.COPE_PROMPTS, ...lib.COPE_OPTIONS]) assert.equal(lib.copeReady(withoutIds(shipped, id)), false, `without ${id}, nothing`);
   assert.equal(lib.copeReady(null), false);
   // {anchor} is the person's own text or a kept line: a 90-wide slot, so it isn't in the prompt (the lint's
   // 90-character prompt limit) and the app draws it on its own line, in the serif.
@@ -148,12 +149,14 @@ test("anchor choices: never a Cope Ahead plan kept in My words, never a line ove
 
 test("Cope Ahead reuses the step with its own question; DEAR MAN's gate and title are unchanged", () => {
   assert.equal(fixture.prompts.cope_title_any.copy, "Who might show up there?");
-  assert.deepEqual([fixture.prompts.cope_title_any.flow, fixture.prompts.cope_title_any.step, fixture.prompts.cope_title_any.reviewStatus], ["dearman", "cope", "draft"]);
+  assert.deepEqual([fixture.prompts.cope_title_any.flow, fixture.prompts.cope_title_any.step, fixture.prompts.cope_title_any.reviewStatus], ["dearman", "cope", "approved"]);
   assert.ok(!lib.COPE_PROMPTS.includes("cope_title_any"), "not in DEAR MAN's gate");
   assert.deepEqual([...lib.COPE_AHEAD_PARTS_REQUIRED.prompts], [...lib.COPE_PROMPTS, "cope_title_any"]);
   assert.deepEqual([...lib.COPE_AHEAD_PARTS_REQUIRED.options], [...lib.COPE_OPTIONS]);
-  assert.equal(lib.copeAheadPartsReady(shipped), false);
+  assert.equal(lib.copeAheadPartsReady(shipped), true);
   assert.equal(lib.copeAheadPartsReady(all), true);
+  assert.equal(lib.copeAheadPartsReady(withoutIds(shipped, "cope_title_any")), false, "its own title missing: nothing");
+  assert.equal(lib.copeReady(withoutIds(shipped, "cope_title_any")), true, "DEAR MAN's gate doesn't need it");
   assert.equal(lib.copeAheadPartsReady(null), false);
   assert.match(step, /titleId = 'cope_title'/, "DEAR MAN's default");
   assert.match(step, /promptCopy\(content, titleId\)/);

@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 import { PARTS_SLOT_WIDTH } from "../scripts/voice-lint.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
@@ -51,11 +51,14 @@ test("gate: each condition off, no row", () => {
   assert.equal(lib.tagRowGate({ ...urge, toolId: "meet-a-part" }), false);
   assert.equal(lib.tagRowGate({ ...urge, saved: false }), false);
   assert.deepEqual([...lib.TAG_URGE_CLOSES], ["no"]);
-  // One line missing (today nothing is signed off): no row.
+  // One line missing: no row.
   for (const id of TAG_IDS) {
     assert.equal(lib.tagRowGate({ ...on, content: partsFromFixture(fixture, (x) => TAG_IDS.includes(x) && x !== id) }), false, id);
   }
-  assert.equal(lib.tagRowGate({ ...on, content: partsFromFixture(fixture) }), fixture.prompts.tag_question.reviewStatus === "approved");
+  // Signed off 17 Oct (Claudia: ship it all): the shipped file shows the row; any one line out of it, none.
+  const shipped = JSON.parse(read("src/data/content/parts.json")).content;
+  assert.equal(lib.tagRowGate({ ...on, content: shipped }), true, "the shipped file");
+  for (const id of TAG_IDS) assert.equal(lib.tagRowGate({ ...on, content: withoutIds(shipped, id) }), false, `shipped file without ${id}`);
 });
 
 test("chips: up to four, in the slice's order (most recently visited first); names, else the unnamed lines", () => {

@@ -6,7 +6,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const lib = { ...(await importTs("src/lib/partsOfMe.ts")), ...(await importTs("src/lib/partCard.ts")) };
 const edit = await importTs("functions/src/parts/editPlan.ts");
@@ -24,17 +24,19 @@ const item = (id, o = {}, meta = {}) => ({ label: "Part", title: "A part", summa
 // other me-flow prompt is the area's.
 const OWN_GATE = new Set(["revisit", "candidate"]);
 
-test("the area's copy: every me / card prompt, all or nothing", () => {
+test("the area's copy: every me / card prompt, all or nothing; signed off 17 Oct (Claudia: ship it all)", () => {
   const inFlow = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "me" && !OWN_GATE.has(p.step)).map(([id]) => id);
   assert.deepEqual([...lib.PARTS_OF_ME_PROMPTS].sort(), inFlow.sort());
-  for (const id of lib.PARTS_OF_ME_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "draft", `${id}: signed off? update this pin`);
+  for (const id of lib.PARTS_OF_ME_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "approved", id);
   const ready = { ...shipped, prompts: Object.fromEntries(lib.PARTS_OF_ME_PROMPTS.map((id) => [id, fixture.prompts[id]])) };
   assert.equal(lib.partsOfMeCopy(ready).card_visit, fixture.prompts.card_visit.copy);
   const missing = { ...ready, prompts: { ...ready.prompts } };
   delete missing.prompts.card_resting;
   assert.equal(lib.partsOfMeCopy(missing), null);
   assert.equal(lib.partsOfMeCopy(null), null);
-  assert.equal(lib.partsOfMeCopy(shipped) === null, !lib.PARTS_OF_ME_PROMPTS.every((id) => shipped.prompts[id]), "the shipped file decides");
+  // The shipped file has the area; any one prompt out of it, no Parts of me.
+  assert.equal(lib.partsOfMeCopy(shipped)?.card_visit, fixture.prompts.card_visit.copy, "the shipped file");
+  for (const id of lib.PARTS_OF_ME_PROMPTS) assert.equal(lib.partsOfMeCopy(withoutIds(shipped, id)), null, `shipped file without ${id}`);
 });
 
 test("Me's gate: parts off or copy missing → no Parts of me (with parts off, only the switch card, tests/parts-reachable.test.mjs)", () => {
@@ -167,13 +169,14 @@ test("the card sends exactly the call it built, one at a time, disabled while sa
 
 // ---- The 30-day check-back ----
 
-test("the check-back's copy: its own drafts, and its own gate", () => {
+test("the check-back's copy: its own lines (signed off 17 Oct), and its own gate", () => {
   const inStep = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "me" && p.step === "revisit").map(([id]) => id);
   assert.deepEqual([...lib.PART_REVISIT_PROMPTS].sort(), inStep.sort());
   assert.deepEqual([...lib.PART_REVISIT_OPTIONS].sort(), fixture.options.me.revisit.map((o) => o.id).sort());
-  for (const id of lib.PART_REVISIT_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "draft", id);
-  for (const o of fixture.options.me.revisit) assert.equal(o.reviewStatus, "draft", o.id);
-  assert.equal(lib.partRevisitCopy(shipped), null, "nothing signed off: no card asks");
+  for (const id of lib.PART_REVISIT_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "approved", id);
+  for (const o of fixture.options.me.revisit) assert.equal(o.reviewStatus, "approved", o.id);
+  assert.deepEqual(lib.partRevisitCopy(shipped), lib.partRevisitCopy(ALL), "the shipped file: the card asks");
+  for (const id of [...lib.PART_REVISIT_PROMPTS, ...lib.PART_REVISIT_OPTIONS]) assert.equal(lib.partRevisitCopy(withoutIds(shipped, id)), null, `shipped file without ${id}`);
   assert.equal(lib.partRevisitCopy(null), null);
   const r = lib.partRevisitCopy(ALL);
   assert.deepEqual(r.active.map((c) => [c.answer, c.label]), [["same", "Yes"], ["less", "Less than before"], ["new", "It's doing something new"], ["resting", "It's resting"]]);
@@ -255,11 +258,13 @@ test("It's doing something new: the would-rather chips, non-answers out, the par
 const CID = "6b2c9a0e-1b2c-4d5e-8f90-123456789abc";
 const cand = (o = {}) => ({ id: CID, origin: "new_one", moveIds: ["hide"], createdAt: "2026-10-01T00:00:00Z", ...o });
 
-test("the list's copy: its own drafts and gate; the move's phrase fills the line", () => {
+test("the list's copy: its own lines (signed off 17 Oct) and gate; the move's phrase fills the line", () => {
   const inStep = Object.entries(fixture.prompts).filter(([, p]) => p.flow === "me" && p.step === "candidate").map(([id]) => id);
   assert.deepEqual([...lib.PART_CANDIDATE_PROMPTS].sort(), inStep.sort());
-  for (const id of lib.PART_CANDIDATE_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "draft", id);
-  assert.equal(lib.partCandidateCopy(shipped), null, "nothing signed off: no list");
+  for (const id of lib.PART_CANDIDATE_PROMPTS) assert.equal(fixture.prompts[id].reviewStatus, "approved", id);
+  assert.deepEqual(lib.partCandidateCopy(shipped), lib.partCandidateCopy(ALL), "the shipped file: the list shows");
+  assert.notEqual(lib.partCandidateCopy(shipped), null);
+  for (const id of lib.PART_CANDIDATE_PROMPTS) assert.equal(lib.partCandidateCopy(withoutIds(shipped, id)), null, `shipped file without ${id}`);
   assert.equal(lib.partCandidateCopy(null), null);
   for (const id of lib.PART_CANDIDATE_PROMPTS) {
     const without = { ...ALL, prompts: { ...ALL.prompts } };
@@ -311,7 +316,8 @@ test("the readout: Reflect's own gate helper, shared, not a second one", async (
   assert.match(src, /export const STATS_REQUIRED: SurfaceIds = \{ prompts: STATS_PROMPTS, options: Object\.values\(WHEN_OPTIONS\) \};/);
   assert.match(src, /export const statsReady = \(content: PartsContent\): boolean => surfaceReady\(content, STATS_REQUIRED\);/);
   assert.match(src, /statsReady\(content\) && surfaceReady\(content, REFLECT_REQUIRED\)/, "Reflect builds on it");
-  assert.equal(S.statsReady(shipped), false, "nothing signed off: no readout");
+  assert.equal(S.statsReady(shipped), true, "the shipped file (signed off 17 Oct): the readout shows");
+  for (const id of ["when_nights", "stats_steps"]) assert.equal(S.statsReady(withoutIds(shipped, id)), false, `shipped file without ${id}`);
   assert.equal(S.statsReady(ALL), true);
   const noWhen = partsFromFixture(fixture, (id) => id !== "when_nights");
   assert.equal(S.statsReady(noWhen), false, "a missing when option hides it all");

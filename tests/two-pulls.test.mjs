@@ -7,7 +7,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const M = await importTs("src/lib/twoPulls.ts");
 const S = await importTs("src/lib/twoPullsSave.ts");
@@ -198,8 +198,11 @@ test("a stale tap changes nothing; crisis resources are alongside from the start
 
 /* ───────── the gate ───────── */
 
-test("gate: ready only with every required line and the borrowed steps; today's file says no", () => {
-  assert.equal(S.twoPullsReady(SHIPPED), false, "nothing signed off yet");
+test("gate: ready only with every required line and the borrowed steps; the shipped file is ready (signed off 17 Oct, Claudia: ship it all)", () => {
+  assert.equal(S.twoPullsReady(SHIPPED), true, "every line signed off: the visit opens");
+  for (const id of [...S.TWO_PULLS_REQUIRED.prompts, ...S.TWO_PULLS_REQUIRED.options]) {
+    assert.equal(S.twoPullsReady(withoutIds(SHIPPED, id)), false, `shipped file without ${id}`);
+  }
   assert.equal(S.twoPullsReady(ALL), true, "the whole fixture approved");
   for (const id of [...S.TWO_PULLS_REQUIRED.prompts, ...S.TWO_PULLS_REQUIRED.options]) {
     assert.equal(S.twoPullsReady(partsFromFixture(fixture, (x) => x !== id)), false, `without ${id}`);

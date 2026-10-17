@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
@@ -24,7 +24,7 @@ const walk = (dir) => readdirSync(dir).flatMap((f) => {
   return statSync(p).isDirectory() ? walk(p) : [p];
 });
 
-test("copy pins: the card, the evidence step and the split, all drafts; nothing ships yet", () => {
+test("copy pins: the card, the evidence step and the split, signed off 17 Oct (Claudia: ship it all) and shipped", () => {
   const prompts = {
     offer_eyebrow: ["card", "Something keeps showing up"], offer_ask: ["card", "Want to take a look?"],
     offer_evidence: ["evidence", "What the app saw"], offer_question: ["evidence", "Does this feel like a part of you?"],
@@ -38,9 +38,11 @@ test("copy pins: the card, the evidence step and the split, all drafts; nothing 
   assert.deepEqual([option("offer", "split", "offer_split_keep")?.label, option("offer", "split", "offer_split_keep")?.branch], ["Keep these", "candidate"]);
   for (const id of ids) {
     const row = fixture.prompts[id] ?? Object.values(fixture.options.offer).flat().find((o) => o.id === id);
-    assert.equal(row?.reviewStatus, "draft", id);
+    assert.equal(row?.reviewStatus, "approved", id);
   }
-  assert.equal(lib.trailOfferReady(shipped), false, "the card can't show today");
+  // The copy ships; whether a card is ever offered is the policy's offersEnabled and the TrailRules (both off).
+  assert.equal(lib.trailOfferReady(shipped), true, "the shipped file has every line");
+  for (const id of ids) assert.equal(lib.trailOfferReady(withoutIds(shipped, id)), false, `shipped file without ${id}`);
 });
 
 test("the gate constant: every id it needs is in the content; any one missing hides the card; the stack drops it", () => {
@@ -197,7 +199,11 @@ test("Recover's evidence rows have a source label: PullOption.label is Recover's
   const content = read("scripts/parts/content.py");
   assert.match(content, /"invalidation-recovery", "content\.py"/, "imported from Recover's content");
   assert.match(content, /PULL_LABELS = \{pid: RECOVER_PULL_LABELS\[pull\] for pid, flow, pull in PULL_OPTIONS/, "derived, no second copy");
-  assert.doesNotMatch(content, /"recover_\w+":\s*"/, "no hand-written PullOption label");
+  // SIGNED_OFF maps each id to its sign-off date ("recover_chase": "2026-10-17"): not a label, so it is left out.
+  const signedOff = content.indexOf("\nSIGNED_OFF = {");
+  assert.ok(signedOff > 0, "content.py has its SIGNED_OFF block");
+  const outside = content.slice(0, signedOff) + content.slice(content.indexOf("\n}\n", signedOff));
+  assert.doesNotMatch(outside, /"recover_\w+":\s*"/, "no hand-written PullOption label");
   // The evidence rows read every source's own `label` (the one shared predicate, PullOption among them).
   const answer = read("functions/src/parts/offers/answer.ts");
   assert.match(answer, /collect\(DISTINCT src\.label\)/);

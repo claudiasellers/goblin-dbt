@@ -9,7 +9,7 @@ import { createElement as h } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import ts from "typescript";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const M = await importTs("src/lib/meetAPart.ts");
 const S = await importTs("src/lib/meetAPartSave.ts");
@@ -79,8 +79,12 @@ test("listed only with parts on and its copy shipped (the gate ToolPage opens it
   assert.match(gate, /return ready\.ok \? 'open' : 'closed';/);
 });
 
-test("ready only with every prompt and option signed off, and Shape it's words: today's file says no", () => {
-  assert.equal(S.meetReady(SHIPPED, ROUNDS), false, "nothing is signed off yet: ToolPage refuses");
+test("ready only with every prompt and option signed off, and Shape it's words: the shipped file is ready (signed off 17 Oct, Claudia: ship it all)", () => {
+  assert.equal(S.meetReady(SHIPPED, ROUNDS), true, "every line signed off: ToolPage opens it");
+  for (const id of [...S.meetPromptIds(), ...S.MEET_REQUIRED_OPTIONS]) {
+    assert.equal(S.meetReady(withoutIds(SHIPPED, id), ROUNDS), false, `shipped file without ${id}`);
+  }
+  assert.equal(S.meetReady(SHIPPED, ROUNDS.slice(0, 4)), false, "the shipped file, a round without words");
   assert.equal(S.meetReady(ALL, ROUNDS), true, "with the whole fixture approved it opens");
   assert.equal(S.meetReady(ALL, ROUNDS.slice(0, 4)), false, "a round without words");
   for (const id of [...S.meetPromptIds(), ...S.MEET_REQUIRED_OPTIONS]) {
@@ -267,8 +271,11 @@ test("limits: the shipped policy's two numbers when signed off, else the pinned 
   assert.equal(S.MEET_NAME_MAX, K.DEFAULT_NAME_MAX);
   assert.equal(S.MEET_MAX_NON_SELF, V.DEFAULT_MAX_NON_SELF);
   assert.deepEqual([S.MEET_NAME_MAX, S.MEET_MAX_NON_SELF], [fixture.policy.nameMaxChars, fixture.policy.maxNonSelfAnswers], "pinned to PartsPolicy");
-  assert.deepEqual(S.meetLimits(SHIPPED), { nameMaxChars: 40, maxNonSelfAnswers: 2 }, "the policy is a draft today: no limits key");
-  assert.ok(!("limits" in SHIPPED));
+  // The policy signed off 17 Oct (Claudia: ship it all): parts.json carries its two numbers, the row's own.
+  assert.equal(fixture.policy.reviewStatus, "approved");
+  assert.deepEqual(SHIPPED.limits, { nameMaxChars: fixture.policy.nameMaxChars, maxNonSelfAnswers: fixture.policy.maxNonSelfAnswers });
+  assert.deepEqual(S.meetLimits(SHIPPED), SHIPPED.limits);
+  assert.deepEqual(S.meetLimits({ ...SHIPPED, limits: null }), { nameMaxChars: 40, maxNonSelfAnswers: 2 }, "no limits key: the pinned defaults");
   assert.deepEqual(ALL.limits, { nameMaxChars: 40, maxNonSelfAnswers: 2 }, "approved: shipped");
   assert.deepEqual(S.meetLimits({ limits: { nameMaxChars: 30, maxNonSelfAnswers: 1 } }), { nameMaxChars: 30, maxNonSelfAnswers: 1 });
   assert.deepEqual(S.meetLimits({ limits: { nameMaxChars: 0, maxNonSelfAnswers: "x" } }), { nameMaxChars: 40, maxNonSelfAnswers: 2 });
@@ -347,7 +354,9 @@ test("the check-back question at the close: kept or revisited, opened, shipped, 
   assert.equal(S.offerCheckback(done(), { ...o, opened: false }), false, "no record on the server");
   assert.equal(S.offerCheckback(done(), { ...o, type: { ...type, enabled: false } }), false, "type off");
   assert.equal(S.offerCheckback(done(), { ...o, type: null }), false);
-  assert.equal(S.offerCheckback(done(), { ...o, content: SHIPPED }), false, "copy not signed off (today)");
+  assert.equal(S.offerCheckback(done(), { ...o, content: SHIPPED }), true, "the shipped file (signed off 17 Oct)");
+  assert.equal(S.offerCheckback(done(), { ...o, content: withoutIds(SHIPPED, S.CHECKBACK_PROMPT) }), false, "copy not shipped");
+  assert.equal(S.offerCheckback(done(), { ...o, content: withoutIds(SHIPPED, S.CHECKBACK_YES) }), false);
   assert.equal(S.offerCheckback(done(), { ...o, content: partsFromFixture(fixture, (x) => x !== S.CHECKBACK_NO) }), false);
   assert.deepEqual([fixture.prompts[S.CHECKBACK_PROMPT].copy, ...fixture.options.meet.close.map((x) => x.id)],
     ["Check back with it tomorrow?", S.CHECKBACK_YES, S.CHECKBACK_NO]);

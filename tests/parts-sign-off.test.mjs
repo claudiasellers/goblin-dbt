@@ -1,4 +1,5 @@
-// scripts/parts/sign-off.mjs, always on a temp copy of the parts sources (never the real content.py):
+// scripts/parts/sign-off.mjs, always on a temp copy of the parts sources (never the real content.py), its
+// SIGNED_OFF emptied so the script has drafts to work on (the real one signs off every line, 17 Oct):
 // --all marks every draft but PENDING, --surface marks what the pack lists for that surface (and its
 // vocabulary), a second run changes nothing, --dry-run writes nothing, the result still builds, and
 // signing off never switches anything on.
@@ -21,6 +22,10 @@ function sandbox({ pending = null } = {}) {
   mkdirSync(join(root, "tests/fixtures"), { recursive: true });
   writeFileSync(join(root, "schema/parts.cypher"), readFileSync("schema/parts.cypher"));
   writeFileSync(join(root, "tests/fixtures/parts-content.json"), readFileSync("tests/fixtures/parts-content.json"));
+  // Start from nothing signed off: every line was signed off 17 Oct, so the copy unsigns them all.
+  const cp = join(root, "scripts/parts/content.py");
+  writeFileSync(cp, withSignedOff(readFileSync(cp, "utf8"), {}));
+  assert.match(readFileSync(cp, "utf8"), /^SIGNED_OFF = \{\}$/m);
   if (pending) {
     const f = join(root, "scripts/parts/content.py");
     const src = readFileSync(f, "utf8");
@@ -41,8 +46,20 @@ const signedOf = (src) => {
 };
 const outsideLiteral = (src) => src.replace(/^SIGNED_OFF = \{[^}]*\}/m, "SIGNED_OFF = <>");
 
-test("the real content.py is untouched and still signs nothing off", () => {
-  assert.match(REAL, /^SIGNED_OFF = \{\}$/m);
+test("the real content.py: every line signed off 17 Oct (Claudia: ship it all), and nothing switched on", async () => {
+  const out = [];
+  assert.equal(await signOff(["--all", "--dry-run"], (x) => out.push(x)), 0);
+  assert.match(out.join("\n"), /^Would sign off 0 ids \(/, "nothing left to sign off");
+  assert.ok(Object.keys(signedOf(REAL)).length > 400);
+  // Signing off switched nothing on: no TrailRule enabled, offers off.
+  const cypher = readFileSync("schema/parts.cypher", "utf8");
+  const rules = [...cypher.matchAll(/MERGE \(t:TrailRule \{id: "(\w+)"\}\)\nSET t \+= \{[^\n]*?enabled: (true|false)/g)];
+  assert.ok(rules.length >= 4, "found the TrailRules");
+  for (const [, id, on] of rules) assert.equal(on, "false", id);
+  assert.match(cypher, /SET p \+= \{offersEnabled: false,/);
+  const fixture = JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"));
+  assert.equal(fixture.policy.offersEnabled, false);
+  assert.ok(fixture.trailRules.every((r) => r.enabled === false), "the fixture's rules too");
 });
 
 test("withSignedOff: the literal only, sorted, one per line; empty stays {}", () => {
