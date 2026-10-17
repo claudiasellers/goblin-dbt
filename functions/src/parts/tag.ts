@@ -110,7 +110,7 @@ export const TAG_QUERY = `
     OR ($source = 'debrief' AND ts.toolId IN $debriefTools)
     OR ($source = 'wise_mind' AND ts.toolId IN $wiseMindTools)
     OR ($source = 'cope_ahead' AND ts.toolId IN $copeAheadTools
-      AND EXISTS { MATCH (ts)-[:SCHEDULED]->(f:FollowUp {type: 'cope_ahead_after'}) WHERE f.planHelped = 'helped' })
+      AND EXISTS { MATCH (f:FollowUp {type: 'cope_ahead_after'})<-[:SCHEDULED]-(ts) WHERE f.planHelped = 'helped' })
     OR ($source = 'review' AND ts.status <> 'open' AND NOT ts.toolId IN $never))
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey}) WHERE pt.status IN ['active', 'resting']
   MERGE (t:PartTag {key: $key})

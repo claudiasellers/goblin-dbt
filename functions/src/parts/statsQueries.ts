@@ -109,7 +109,7 @@ export async function readStatsRows(tx: Pick<ManagedTransaction, 'run'>, uid: st
   }));
   if (parts.length === 0) return { partsOn, timeZone, parts, tags: [], sessions: [], steps: [] };
   const tags: StatsTagRow[] = (await tx.run(STATS_TAGS_QUERY, { uid })).records
-    .map((r) => ({ partId: r.get('partId'), toolId: str(r.get('toolId')) ?? '', at: r.get('at'), source: r.get('source') === 'cope_ahead' ? 'cope_ahead' as const : 'close' as const }))
+    .map((r) => ({ partId: r.get('partId'), toolId: str(r.get('toolId')) ?? '', at: r.get('at'), source: r.has('source') && r.get('source') === 'cope_ahead' ? 'cope_ahead' as const : 'close' as const }))
     .filter((t) => t.toolId && typeof t.at === 'string');
   const sessions: StatsSessionRow[] = (await tx.run(STATS_SESSIONS_QUERY, { uid })).records
     .map((r) => ({ partId: r.get('partId'), at: r.get('at'), firstFeel: str(r.get('firstFeel')) ?? '' }))

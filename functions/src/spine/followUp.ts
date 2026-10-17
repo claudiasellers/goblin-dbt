@@ -157,6 +157,11 @@ export const resolveFollowUp = callable<unknown, ResolveFollowUpResponse>(
       };
       const choice = r.choiceId ? (content.choices ?? []).find((c) => c.id === r.choiceId) : undefined;
       if (r.choiceId && !choice) throw new HttpsError('invalid-argument', 'Unknown choice');
+      // Cope Ahead's after card: how it went is the choice; whether the plan helped rides along with it
+      // (never with It hasn't happened yet, and never on another type).
+      const after = rec.get('type') === COPE_AHEAD_AFTER;
+      const howItWent = after && choice && (HOW_IT_WENT as readonly string[]).includes(choice.id) ? choice.id : null;
+      if (r.planHelped && !howItWent) throw new HttpsError('invalid-argument', 'Invalid follow-up');
       if (choice?.snoozeHours) {
         await tx.run(
           `MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key}) WHERE ${GUARDS.FollowUp.update('f')} AND ${PARTS_ON_FOR('u', 'f')}
@@ -167,11 +172,6 @@ export const resolveFollowUp = callable<unknown, ResolveFollowUpResponse>(
       }
       const status = (choice?.status ?? r.status) as string | undefined;
       if (!status) throw new HttpsError('invalid-argument', 'Invalid follow-up');
-      // Cope Ahead's after card: how it went is the choice; whether the plan helped rides along.
-      const after = rec.get('type') === COPE_AHEAD_AFTER;
-      if (r.planHelped && !after) throw new HttpsError('invalid-argument', 'Invalid follow-up');
-      const howItWent = after && choice && (HOW_IT_WENT as readonly string[]).includes(choice.id) ? choice.id : null;
-      if (r.planHelped && !howItWent) throw new HttpsError('invalid-argument', 'Invalid follow-up');
       const planHelped = howItWent ? r.planHelped : null;
       const outcome = choice
         ? JSON.stringify({ choiceId: choice.id, ...(choice.thenVsNow ? { thenVsNow: choice.thenVsNow, thenVsNowDir: content.dir ?? null } : {}) })

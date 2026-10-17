@@ -128,7 +128,7 @@ export function sessionRow(r: Neo4jRecord): SessionRow {
     closeKind: strOrNull(r.get('closeKind')),
     thenVsNow: THEN_VS_NOW.includes(tvn) ? (tvn as ThenVsNow) : null,
     actedOnUrge: ACTED.includes(acted) ? (acted as ActedOnUrge) : null,
-    planHelped: PLAN_HELPED.includes(r.get('planHelped')) ? (r.get('planHelped') as SessionRow['planHelped']) : null,
+    planHelped: r.has('planHelped') && PLAN_HELPED.includes(r.get('planHelped')) ? (r.get('planHelped') as SessionRow['planHelped']) : null,
   };
 }
 
