@@ -226,7 +226,7 @@ export function copeNext(st: CopeState, e: CopeEvent, c: CopeContext): CopeState
     case 'situationOwn': {
       if (s.step !== 'what') return st;
       const text = cap(e.text, c.ownMax);
-      if (!text) return st;
+      if (!text) return s.situationId === OWN_SITUATION ? { ...s, situationOwn: null } : st;
       if (s.situationId !== OWN_SITUATION) Object.assign(s, { feelIds: [], hardMomentId: null, hardMomentOwn: null, moves: NO_MOVES, adding: false });
       return { ...s, situationId: OWN_SITUATION, situationOwn: text };
     }
@@ -261,7 +261,7 @@ export function copeNext(st: CopeState, e: CopeEvent, c: CopeContext): CopeState
     case 'momentOwn': {
       if (s.step !== 'moment') return st;
       const text = cap(e.text, c.ownMax);
-      if (!text) return st;
+      if (!text) return { ...s, hardMomentOwn: null };
       const wasDanger = dangerMove(s.hardMomentId, c);
       const moves = wasDanger ? { ...s.moves, ids: s.moves.ids.filter((x) => x !== wasDanger.id) } : s.moves;
       return { ...s, hardMomentId: null, hardMomentOwn: text, moves, adding: false };
@@ -278,7 +278,6 @@ export function copeNext(st: CopeState, e: CopeEvent, c: CopeContext): CopeState
       return (s.step === 'plan' || (s.step === 'newMoment' && s.changeMove)) && offersAdd(s) ? { ...s, adding: true } : st;
     case 'moveOwn': {
       const own = e.text === null ? null : cap(e.text, c.moveOwnMax);
-      if (e.text !== null && !own) return st;
       if (s.step === 'plan') return { ...s, moves: setOwnMove(s.moves, own, s.adding), adding: false };
       if (s.step === 'newMoment' && s.changeMove) return { ...s, newMoves: setOwnMove(s.newMoves, own, s.adding), adding: false };
       return st;
@@ -297,7 +296,7 @@ export function copeNext(st: CopeState, e: CopeEvent, c: CopeContext): CopeState
     case 'newMomentOwn': {
       if (s.step !== 'newMoment') return st;
       const text = cap(e.text, c.ownMax);
-      return text ? { ...s, newMomentId: null, newMomentOwn: text } : st;
+      return text ? { ...s, newMomentId: null, newMomentOwn: text } : { ...s, newMomentOwn: null };
     }
     case 'changeMove':
       if (s.step !== 'newMoment') return st;
