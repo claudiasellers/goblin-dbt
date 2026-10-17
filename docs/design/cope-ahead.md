@@ -89,9 +89,11 @@ Today asks afterwards (screen 7).
 - **A danger chip** shows `CrisisBanner` compact under the screen, alongside, never instead, and the
   flow goes on. Two of them:
   - *They might hurt me* (on *A conversation I'm dreading* and *Seeing someone in particular*): the
-    plan's first move becomes *Leave and get somewhere safe*.
+    plan's first move becomes *Leave and get somewhere safe*. The banner is the `other_person` variant,
+    because a crisis line is the wrong first call when the danger is another person: *"If you're in danger
+    now, call 911."*, then the National Domestic Violence Hotline (call or text), with 988 last.
   - *I might hurt myself* (on *A day that's hard every year* and *Being on my own*): the first move
-    becomes *Call or text someone who can help, now*.
+    becomes *Call or text someone who can help, now*. The banner is the default one.
 
   The person can still change the move. Nothing is blocked, and the visit saves as usual.
 
@@ -99,13 +101,13 @@ Today asks afterwards (screen 7).
 
 The plan is one if-then line built from taps:
 
-> **If** *I go blank* **, I'll** *breathe out longer than in* **and** *say "Give me a minute."*
+> **If** *I go blank* **, I'll** *breathe out longer than in* **and** *say “Give me a minute.”*
 
 - **If:** the hardest moment from screen 3, or the pull from screen 2 ("If I start to shut down").
   The person can switch between them.
 - **I'll:** 1–2 moves from `CopeMove`, filtered by the pull and the situation. A move is either:
   - **body** — *Breathe out longer than in*, *Feel my feet on the floor*, *Cold water on my hands*;
-  - **words** — *Say "Give me a minute"*, *Say the one thing I came to say*;
+  - **words** — *Say “Give me a minute”*, *Say the one thing I came to say*;
   - **action** — *Step out for five minutes*, *Text someone I trust*, *Leave and get somewhere safe*;
   - **a tool**, linked by `appToolId` — *Pause*, *5-4-3-2-1*, *Circuit Breaker*, *Urge Surfing*
     (only tools that work in the moment; DEAR MAN is prep, not a move).
@@ -298,9 +300,9 @@ those moments, first.
 | `feet` | body | Feel my feet on the floor | feel my feet on the floor | hide, blank, fight | yes | |
 | `cold_water` | body | Cold water on my hands | put cold water on my hands | fight, chase, blank | | |
 | `hold_something` | body | Hold something in my pocket | hold something in my pocket | blank, hide | | |
-| `give_minute` | words | Say "Give me a minute" | say "Give me a minute" | fight, blank, chase | yes | |
-| `come_back` | words | Say "I'll come back to you on that" | say "I'll come back to you on that" | fight, chase | | |
-| `say_hard` | words | Say "This is hard for me" | say "This is hard for me" | hide, blank | yes | |
+| `give_minute` | words | Say “Give me a minute” | say “Give me a minute” | fight, blank, chase | yes | |
+| `come_back` | words | Say “I'll come back to you on that” | say “I'll come back to you on that” | fight, chase | | |
+| `say_hard` | words | Say “This is hard for me” | say “This is hard for me” | hide, blank | yes | |
 | `one_thing` | words | Say the one thing I came to say | say the one thing I came to say | hide, chase | | |
 | `step_out` | action | Step out for five minutes | step out for five minutes | fight, chase, hide | yes | |
 | `stay_ten` | action | Stay ten more minutes, then decide | stay ten more minutes, then decide | hide | | |
@@ -351,6 +353,7 @@ rename fails loudly instead of drifting.
 | `keep_title` | Here's your plan. |
 | `keep_yes` / `keep_no` | Keep this · Not now |
 | `keep_failed` | Couldn't save that. Try again. |
+| `keep_done` | Kept in My words. |
 | `ask_after_q` | Want me to ask how it went? |
 | `ask_after_yes` / `ask_after_no` | Yes · No thanks |
 | `done` | Done |
@@ -423,6 +426,10 @@ rename fails loudly instead of drifting.
   - *Keep this* saves the plan line to My words through `recordWitnessBeat`, as the `cope_ahead` moment
     (own-line limit 360).
 - **Safety:** a danger moment shows `CrisisBanner` compact under screens 3 and 4. The flow goes on.
+  `dangerBanner` in `copeAheadTool.ts` picks the variant: `other_person` for *They might hurt me*, the
+  default for *I might hurt myself*. A test fails if a new danger moment isn't placed in one of the two.
+- **Keep:** after *Keep this* saves, *"Kept in My words."* (`keep_done`) replaces the two buttons as a
+  polite status line.
 - **The after card:**
   - `cope_ahead_after`, with chips `today` / `tomorrow` / `this_week` / `later`.
   - The card holds the first answer on the device. The second tap sends both in one `resolveFollowUp`
@@ -440,8 +447,11 @@ rename fails loudly instead of drifting.
   - `cope-ahead-closing` covers the three closing components, `cope-ahead-entries` the links, and
     `cope-ahead-after` the Today card.
   - a11y is clean on each.
-- **Being fixed:**
-  - The parts step will ask *"Who might show up there?"* (`cope_title_any`) instead of DEAR MAN's
-    conversation wording.
-  - Kept Cope Ahead plans, and any kept line longer than 90 characters, won't be offered as a DEAR MAN
-    anchor, on the client or on the server.
+- **The parts step's own question.** Cope Ahead asks *"Who might show up there?"* (`cope_title_any`, a
+  parts draft). `CopeAheadStep` takes it as `titleId`, and the step's gate is `COPE_AHEAD_PARTS_REQUIRED`
+  (DEAR MAN's set plus that prompt). DEAR MAN keeps *"Who might show up in this conversation?"*.
+- **Anchors stay one line.** `anchorableLine` (`functions/src/parts/keepTypes.ts`, mirrored in
+  `src/data/partsTypes.ts`) allows a kept line as an anchor only if it is at most 90 characters and isn't
+  an own line kept from the `cope_ahead` moment. DEAR MAN's anchor picker filters by it, and
+  `setPartAnchor` refuses any other line, so a whole plan stays in My words and is never offered as an
+  anchor.
