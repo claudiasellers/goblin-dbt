@@ -63,7 +63,7 @@
   --pal-ink-light: #F5EBDF;  --pal-ink-dark: #F5EBDF;
   --pal-text2-light: #CDBFB3;  --pal-text2-dark: #CDBFB3;
   --pal-text3-light: #BBAD9F;  --pal-text3-dark: #BBAD9F;
-  --pal-text-muted-light: #978A7E;  --pal-text-muted-dark: #978A7E;
+  --pal-text-muted-light: #A59A90;  --pal-text-muted-dark: #A59A90;
   --pal-accent-light: #F2C27E;  --pal-accent-dark: #F2C27E;
   --pal-accent-hover-light: #F7D39E;  --pal-accent-hover-dark: #F7D39E;
   --pal-accent-fill-light: #E8B56E;  --pal-accent-fill-dark: #E8B56E;
@@ -128,8 +128,8 @@
   --pal-border-accent-light: #6A7488;  --pal-border-accent-dark: #6A7488;
   --pal-ink-light: #EEF2F5;  --pal-ink-dark: #EEF2F5;
   --pal-text2-light: #C8D0DA;  --pal-text2-dark: #C8D0DA;
-  --pal-text3-light: #BAC3CE;  --pal-text3-dark: #BAC3CE;
-  --pal-text-muted-light: #949EAB;  --pal-text-muted-dark: #949EAB;
+  --pal-text3-light: #C1C9D3;  --pal-text3-dark: #C1C9D3;
+  --pal-text-muted-light: #C1C9D3;  --pal-text-muted-dark: #C1C9D3;
   --pal-accent-light: #E3C29E;  --pal-accent-dark: #E3C29E;
   --pal-accent-hover-light: #EDD1B2;  --pal-accent-hover-dark: #EDD1B2;
   --pal-accent-fill-light: #D8B48C;  --pal-accent-fill-dark: #D8B48C;
@@ -195,7 +195,7 @@
   --pal-ink-light: #2A241D;  --pal-ink-dark: #2A241D;
   --pal-text2-light: #554B3F;  --pal-text2-dark: #554B3F;
   --pal-text3-light: #5E5346;  --pal-text3-dark: #5E5346;
-  --pal-text-muted-light: #7D7163;  --pal-text-muted-dark: #7D7163;
+  --pal-text-muted-light: #655B50;  --pal-text-muted-dark: #655B50;
   --pal-accent-light: #6E5128;  --pal-accent-dark: #6E5128;
   --pal-accent-hover-light: #58401E;  --pal-accent-hover-dark: #58401E;
   --pal-accent-fill-light: #7A5B2E;  --pal-accent-fill-dark: #7A5B2E;
@@ -261,7 +261,7 @@
   --pal-ink-light: #2A2742;  --pal-ink-dark: #2A2742;
   --pal-text2-light: #555170;  --pal-text2-dark: #555170;
   --pal-text3-light: #5E5A78;  --pal-text3-dark: #5E5A78;
-  --pal-text-muted-light: #847F9C;  --pal-text-muted-dark: #847F9C;
+  --pal-text-muted-light: #67637F;  --pal-text-muted-dark: #67637F;
   --pal-accent-light: #A8423A;  --pal-accent-dark: #A8423A;
   --pal-accent-hover-light: #8F352E;  --pal-accent-hover-dark: #8F352E;
   --pal-accent-fill-light: #FFA898;  --pal-accent-fill-dark: #FFA898;
@@ -327,7 +327,7 @@
   --pal-ink-light: #2A2742;  --pal-ink-dark: #2A2742;
   --pal-text2-light: #565272;  --pal-text2-dark: #565272;
   --pal-text3-light: #5E5A79;  --pal-text3-dark: #5E5A79;
-  --pal-text-muted-light: #86829E;  --pal-text-muted-dark: #86829E;
+  --pal-text-muted-light: #6A6684;  --pal-text-muted-dark: #6A6684;
   --pal-accent-light: #3F55B8;  --pal-accent-dark: #3F55B8;
   --pal-accent-hover-light: #33479C;  --pal-accent-hover-dark: #33479C;
   --pal-accent-fill-light: #B3C1FF;  --pal-accent-fill-dark: #B3C1FF;
@@ -393,7 +393,7 @@
   --pal-ink-light: #191C35;  --pal-ink-dark: #191C35;
   --pal-text2-light: #4B5275;  --pal-text2-dark: #4B5275;
   --pal-text3-light: #555C80;  --pal-text3-dark: #555C80;
-  --pal-text-muted-light: #7A809F;  --pal-text-muted-dark: #7A809F;
+  --pal-text-muted-light: #5E6482;  --pal-text-muted-dark: #5E6482;
   --pal-accent-light: #2F3FA8;  --pal-accent-dark: #2F3FA8;
   --pal-accent-hover-light: #24338F;  --pal-accent-hover-dark: #24338F;
   --pal-accent-fill-light: #2F3FA8;  --pal-accent-fill-dark: #2F3FA8;
