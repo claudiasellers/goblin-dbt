@@ -31,6 +31,10 @@ const toolChip = (id: string) => { const tool = getToolById(id)!; return `${tool
 const toComes: DriveStep[] = [tap(t('chrome', 'skip')), tap(t('dropIn', 'start')), tap(t('dropIn', 'here'))];
 const toFeel = (answerId: string): DriveStep[] => [...toComes, tap(a(answerId))];
 const toNext = (answerId: string): DriveStep[] => [...toFeel(answerId), tap(feel('calm')), tap(t('chrome', 'next'))];
+/** Own words at the full 140 characters (WM_OWN_MAX): the circles clamp them to two lines. */
+const LONG_EMOTION = "I want to say it right now, tonight, before I lose my nerve, because if I wait I'll talk myself out of it and then nothing will change. Ever";
+const LONG_REASON = "Write it down first and read it again tomorrow morning, then decide what actually needs saying and to whom, and what can stay unsaid for now";
+const heardChip = () => q('wm_q_say').voices.reason[1].label;
 const practice = (kind: string): DriveStep[] => [tap(t('chrome', 'skip')), tap(p(kind).name), tap(t('dropIn', 'start'))];
 
 const BRANCHES: (Branch & { reduce?: boolean })[] = [
@@ -38,6 +42,8 @@ const BRANCHES: (Branch & { reduce?: boolean })[] = [
   ...C.questions.map((x) => ({ id: `q_${x.id.replace(/^wm_q_/, '')}`, label: `2. ${x.label}: emotion mind's chips`, steps: [tap(x.label), tap(t('minds', 'emotion'))] })),
   { id: 'reason', label: '2. Reasonable mind opens next', steps: [tap(q('wm_q_say').label), tap(t('minds', 'emotion')), tap(q('wm_q_say').voices.emotion[0].label)] },
   { id: 'heard', label: '2. Both heard (one chip, one Nothing comes): the witness line', steps: [tap(q('wm_q_say').label), tap(t('minds', 'reason')), tap(q('wm_q_say').voices.reason[1].label), tap(t('minds', 'nothingComes'))] },
+  { id: 'heard_own', label: '2. Both heard in own words at full length (clamped to two lines in each circle)', steps: [tap(q('wm_q_say').label), tap(t('minds', 'emotion')), tap(t('minds', 'own')), { type: LONG_EMOTION }, tap(t('chrome', 'next')), tap(t('minds', 'own')), { type: LONG_REASON }, tap(t('chrome', 'next'))] },
+  { id: 'heard_reopen', label: '2. A heard circle tapped again: its chips, the pick marked', steps: [tap(q('wm_q_say').label), tap(t('minds', 'reason')), tap(q('wm_q_say').voices.reason[1].label), tap(t('minds', 'nothingComes')), tap(t('minds', 'reason'))] },
   { id: 'own_question', label: '1. Something else: own words', steps: [tap(t('question', 'own')), { type: 'Whether to move flats this year' }] },
   { id: 'own_mind', label: '2. Something else for a mind', steps: [tap(q('wm_q_next').label), tap(t('minds', 'emotion')), tap(t('minds', 'own')), { type: 'Get out of here today' }] },
   { id: 'drop_in', label: '3. Choose a way in (Ask and listen highlighted)', steps: [tap(q('wm_q_next').label), tap(t('chrome', 'skip'))] },
@@ -101,7 +107,7 @@ export const WISE_MIND_SURFACE: Surface = {
 export const WISE_MIND_EXPECT: Record<string, string> = Object.fromEntries(([
   ['question', t('question', 'prompt')],
   ...C.questions.map((x) => [`q_${x.id.replace(/^wm_q_/, '')}`, t('minds', 'emotionSays')]),
-  ['reason', t('minds', 'reasonSays')], ['heard', t('minds', 'witness')], ['own_question', t('chrome', 'back')],
+  ['reason', t('minds', 'reasonSays')], ['heard', heardChip()], ['heard_own', LONG_EMOTION], ['heard_reopen', t('minds', 'reasonSays')], ['own_question', t('chrome', 'back')],
   ['own_mind', t('minds', 'emotionSays')], ['drop_in', t('dropIn', 'prompt')], ['drop_in_settle', t('dropIn', 'prompt')],
   ['stone', p('drift').lines[0]], ['stone_reduced', p('drift').lines[0]], ['breath', p('hold').lines[0]], ['breath_reduced', p('hold').lines[0]],
   ['ask', p('ask').lines[0]], ['ask_reduced', p('ask').lines[0]], ['comes', t('comes', 'prompt')],

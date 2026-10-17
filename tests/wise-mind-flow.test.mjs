@@ -217,3 +217,30 @@ test("screen 5's Pushed, urgent line switches on the form; ?a=&b= is passed on a
   assert.match(page, /useState<WiseState>\(\(\) => initialWise\(stepBack \? 'parts' : 'minds'\)\)/);
   assert.match(page, /<Room question=\{questionText\} presetPartIds=\{entry\.presetPartIds\}/);
 });
+
+test("a heard circle holds what it said: the chip's label, own words, or Nothing comes; reopening keeps the pick", () => {
+  let s = run([{ type: "question", id: "wm_q_say" }]);
+  assert.equal(wm.mindWords(s, content, "emotion"), null, "unheard: nothing under the name");
+  s = run([{ type: "side", side: "emotion" }, { type: "says", side: "emotion", id: "wm_v_say_emotion_1" }], s);
+  const label = content.questions.find((q) => q.id === "wm_q_say").voices.emotion.find((v) => v.id === "wm_v_say_emotion_1").label;
+  assert.deepEqual(wm.mindWords(s, content, "emotion"), { kind: "words", text: label, own: false });
+  s = run([{ type: "saysOwn", side: "reason", text: "  Wait till Monday  " }], s);
+  assert.deepEqual(wm.mindWords(s, content, "reason"), { kind: "words", text: "Wait till Monday", own: true });
+  // Tapping a heard circle reopens its chips with the pick still there; a new pick replaces it.
+  s = run([{ type: "side", side: "emotion" }], s);
+  assert.equal(s.side, "emotion");
+  assert.equal(s.emotion.id, "wm_v_say_emotion_1");
+  s = run([{ type: "nothing", side: "emotion" }], s);
+  assert.deepEqual(wm.mindWords(s, content, "emotion"), { kind: "nothing" });
+  assert.equal(s.side, null, "both heard again: nothing open");
+});
+
+test("the diagram: words under each name (own words clamped to two lines), a quiet … for Nothing comes, a static overlap step", () => {
+  const src = read("src/components/tools/wiseMind/TwoMinds.tsx");
+  assert.match(src, /font-serif text-sm[^"`]*\$\{w\.own \? 'line-clamp-2' : ''\}/);
+  assert.match(src, /aria-hidden="true" data-testid=\{`said-\$\{side\}`\}[^>]*>…</);
+  assert.match(src, /opacity=\{both \? 0\.2 : 0\.12\} data-both=\{both \? 'true' : 'false'\} \/>/, "the overlap has no transition class");
+  const page = read("src/pages/tools/WiseMind.tsx");
+  assert.match(page, /said=\{\{ emotion: mindWords\(s, content, 'emotion'\), reason: mindWords\(s, content, 'reason'\) \}\}/);
+  assert.match(page, /ownPressed=\{!!s\[side\]\?\.own\}/);
+});
