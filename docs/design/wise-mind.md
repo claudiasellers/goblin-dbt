@@ -217,8 +217,8 @@ now."* (chip) or their own words. Same store My words already reads for kept lin
   - One `PartTag {source: 'wise_mind'}` goes on the visit per placed kept part, open or closed.
   - *A part I haven't met* → *It won't step back* → *Meet it another time* queues a `PartCandidate`
     with origin `wise_mind`.
-- **Entry links:** `?first=<question id>` puts that question chip first, not pressed: Two pulls sends
-  `wm_q_next`, and DEAR MAN's prep can send *Whether to say something*. `?a=&b=` places the two parts.
+- **Entry links:** `?first=<question id>` puts that question chip first, not pressed. Only Two pulls
+  sends one today (`wm_q_next`). `?a=&b=` places the two parts.
 - **Review:** `dev/review/wiseMindParts.tsx` is the step back's own surface and pack, `wise_mind_parts`.
   `dev/review/wiseMind.tsx` is the review page's Wise mind surface (pack `wise_mind`,
   every screen and branch). It reads `wise-mind.json` directly, and `check.mjs` checks each branch's
