@@ -16,8 +16,8 @@
  *   Rule C's split will open Two pulls in Phase 5; until then it makes candidates like the others.
  *
  * Rule D ("Was this {name}?") is never a Today offer: it is shown in Reflect and answered in a batch
- * (parts.md's rules table), which writes `PartTag`s (`source: 'review'`) through tagPart. So this callable
- * refuses a D offer; the record keeps `partId` / `ABOUT_PART` for that batch.
+ * (parts.md's rules table: review.ts's answerKnownPartReview, which writes `PartTag`s, `source: 'review'`).
+ * So this callable refuses a D offer; the batch's record keeps `partId` / `ABOUT_PART`.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';

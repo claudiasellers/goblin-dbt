@@ -9,6 +9,7 @@ import { GrowthEvidence } from '../components/insights/GrowthEvidence';
 import { SomaticCorrelation } from '../components/insights/SomaticCorrelation';
 import { ToolEffectiveness } from '../components/insights/ToolEffectiveness';
 import { PartsReflect } from '../components/insights/PartsReflect';
+import { TrailsReflect } from '../components/insights/TrailsReflect';
 import { TimeFilter } from '../components/history/TimeFilter';
 import type { TimeRange } from '../components/history/useFilteredCheckIns';
 
@@ -138,6 +139,8 @@ export function Insights() {
 
       {/* Parts on only, after Reflect's own sections; renders nothing unless a part has a line and the copy ships. */}
       {data.parts && data.parts.length > 0 && <PartsReflect parts={data.parts} delay={nextDelay()} />}
+      {/* Parts on only: rule D's "Was this {name}?" batch and the trails kept as plain patterns; nothing unless the server and the copy allow. */}
+      <TrailsReflect delay={nextDelay()} />
     </div>
   );
 }

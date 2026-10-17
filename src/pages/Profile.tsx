@@ -1,10 +1,26 @@
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useRef, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { MeSection } from '../components/me/MeSection';
-import { PartsSettings } from '../components/parts/PartsSettings';
+import { getPartsContent } from '../services/partsContent';
+import { partsSettingsCopy } from '../lib/partsSettings';
 import { palettes, applyRoom, resolvePalette, type PaletteId } from '../data/palettes';
 import { exportUserData, deleteUserData } from '../services/neo4j';
+
+// Parts in Privacy & Data is fetched only once its copy is signed off (then it shows with parts off too).
+const LazyPartsSettings = lazy(() => import('../components/parts/PartsSettings').then((m) => ({ default: m.PartsSettings })));
+
+/** The block's own gate, eager and pure (its whole copy shipped); until it holds, nothing loads or shows. */
+function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggle: (on: boolean) => Promise<void> }) {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    let live = true;
+    getPartsContent().then((c) => { if (live) setReady(partsSettingsCopy(c) !== null); }).catch(() => { /* stays hidden */ });
+    return () => { live = false; };
+  }, []);
+  if (!ready) return null;
+  return <Suspense fallback={null}><LazyPartsSettings enabled={enabled} onToggle={onToggle} /></Suspense>;
+}
 
 export function Profile() {
   const { user, logOut } = useAuth();

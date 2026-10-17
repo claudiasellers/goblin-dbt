@@ -8,7 +8,7 @@
  * - The prepare step (`prepareTrailOffers`) runs the evaluator at most once a day (`User.trailsEvaluatedAt`)
  *   and writes the top candidate that is enabled, not blocked, new, and through the same gate.
  * - Shapes A, B and C only (TODAY_SHAPES). Rule D ("Was this {name}?") is never a push: Reflect shows it
- *   and answers it in a batch (a later surface, which can build on writeTrailOffer and offerGate).
+ *   and answers it in a batch (review.ts, on writeKnownPartReview and the same gate).
  * - A safety-line move (turn_on_myself, rule A only) is not offered on Today: parts.md wants crisis
  *   resources alongside any part with that move, and the card has no such seam yet.
  *

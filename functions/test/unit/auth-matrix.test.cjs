@@ -25,6 +25,7 @@ const AUTHED = [
   'tagPart',
   'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor', 'setPartShape',
   'getTrailOfferEvidence', 'answerTrailOffer', // the caller's own trail offer (Phase 4, built off)
+  'getReflectTrails', 'answerKnownPartReview', 'removeTrailPattern', // Reflect: the caller's own rule D batch and plain patterns
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in

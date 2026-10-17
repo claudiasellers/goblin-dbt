@@ -35,5 +35,5 @@ export { tagPart } from './parts';
 export { renamePart, restPart, setAsidePart, restorePart, setPartTender, answerPartRevisit } from './parts';
 export { schedulePartCheckback, answerPartCheckback } from './parts';
 export { setPartAnchor } from './parts';
-export { getTrailOfferEvidence, answerTrailOffer } from './parts';
+export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './parts';
 export { setPartShape } from './parts';

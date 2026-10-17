@@ -11,7 +11,7 @@ const handlers = new Map<string, Handler>();
 /** Reads and app plumbing: answered, never listed (the list is "what would be saved"). */
 const QUIET = new Set([
   'getPartsEntry', 'getProfileContext', 'getMe', 'getUserProfile', 'updateUserProfile', 'ensureUserExists', 'getToday',
-  'getSpineContent', 'getWitnessLines', 'getStateAndTools',
+  'getSpineContent', 'getWitnessLines', 'getStateAndTools', 'getReflectTrails',
 ]);
 
 export interface ReviewEvent { n: number; name: string; data: unknown; failed?: boolean }
