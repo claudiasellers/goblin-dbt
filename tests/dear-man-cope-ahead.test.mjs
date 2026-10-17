@@ -76,7 +76,7 @@ test("placement: after What makes this hard?, before the script; back and resume
   assert.ok(cope.length > 200, "the cope phase sits right before Describe");
   assert.ok(tsx.indexOf("What makes this hard?") < tsx.indexOf("// ─── COPE AHEAD"));
   assert.match(cope, /if \(!copeShown \|\| !copeCopy \|\| !copeSlices\) return null;/);
-  assert.match(cope, /onGoOn=\{\(\) => setPhase\('describe'\)\}/);
+  assert.match(cope, /onGoOn=\{\(\) => handBack\('describe'\)\}/, "a parts step handing back: focus goes to Describe's heading");
   assert.match(tsx, /case 'cope': setSceneStep\(3\); setPhase\('scene'\); break;/);
   assert.match(tsx, /case 'describe':\s*if \(copeShown\) setPhase\('cope'\);\s*else \{ setSceneStep\(3\); setPhase\('scene'\); \}/);
   assert.match(tsx, /if \(phase === 'cope' && !copeShown && !copePending\) setPhase\('describe'\);/, "parts gone on resume: on to the script");

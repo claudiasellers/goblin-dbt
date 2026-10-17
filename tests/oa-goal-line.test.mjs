@@ -104,7 +104,10 @@ test("host: the effectiveness card's before slot, two body lines, OA's own goal 
   const oa = read("src/pages/tools/OppositeAction.tsx");
   assert.match(oa, /const EFFECTIVENESS_STEP = CHECK_STEPS\.indexOf\("effectiveness"\);/);
   assert.match(oa, /useOaGoalLine\(\s*\{\s*urgeId: draft\.urgeId \|\| null,\s*goalLabel: choices\.goal\?\.find\(\(o\) => o\.id === draft\.goal\)\?\.label \?\? null,\s*\},\s*stage === "check" && checkStep === EFFECTIVENESS_STEP,\s*\)/);
-  assert.match(oa, /key="effectiveness"[\s\S]*?before=\{\s*goalLine && \(\s*<div className="space-y-1">\s*<p>\{goalLine\[0\]\}<\/p>\s*<p>\{goalLine\[1\]\}<\/p>\s*<\/div>\s*\)\s*\}/);
+  assert.match(oa, /key="effectiveness"[\s\S]*?before=\{\s*goalLine && \(\s*<div id=\{OA_GOAL_LINE_ID\} className="space-y-1">\s*<p>\{goalLine\[0\]\}<\/p>\s*<p>\{goalLine\[1\]\}<\/p>\s*<\/div>\s*\)\s*\}/);
+  // Above the question, and read with it: the focused question is described by the line, only while it shows.
+  assert.match(oa, /key="effectiveness"[\s\S]*?describedBy=\{goalLine \? OA_GOAL_LINE_ID : undefined\}/);
+  assert.match(read("src/components/tools/oppositeAction/TapCardLoop.tsx"), /<h3 ref=\{heading\} tabIndex=\{-1\} aria-describedby=\{describedBy\}/);
   // Only the effectiveness card has it.
   assert.equal((oa.match(/goalLine\[0\]/g) ?? []).length, 1);
   // No hard-coded copy: the lines and the goal labels are content.

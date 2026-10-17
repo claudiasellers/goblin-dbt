@@ -476,6 +476,13 @@
    "copy": "Mostly {when}",
    "reviewStatus": "draft"
   },
+  "hold_hint": {
+   "flow": "common",
+   "step": "hold",
+   "order": 9,
+   "copy": "Hold to fill it, or press once and wait.",
+   "reviewStatus": "draft"
+  },
   "reflect_title": {
    "flow": "reflect",
    "step": "parts",
@@ -1120,6 +1127,44 @@
      "selfLike": null,
      "branch": "own_words",
      "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "chrome": [
+    {
+     "id": "meet_back",
+     "label": "Back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "meet_next",
+     "label": "Next",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "meet_finish",
+     "label": "Done",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"
@@ -3582,6 +3627,34 @@
      "selfLike": null,
      "branch": "candidate",
      "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "chrome": [
+    {
+     "id": "angry_back",
+     "label": "Back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "vote": [
+    {
+     "id": "angry_vote_next",
+     "label": "Next",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

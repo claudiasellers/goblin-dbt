@@ -222,17 +222,17 @@ test("LightHold: the angry card and Meet a part share one hold", () => {
   const card = read("src/components/parts/AngryPartCard.tsx");
   assert.match(card, /import \{ HoldButton, PartScene \} from '\.\/LightHold';/);
   assert.doesNotMatch(card, /function HoldButton|function PartScene/, "extracted, not copied");
-  assert.match(card, /<HoldButton label=\{c\.hold\} ms=\{HOLD_MS\}/, "its 4 s vote is unchanged");
+  assert.match(card, /<HoldButton label=\{c\.hold\} hint=\{c\.holdHint\} ms=\{HOLD_MS\}/, "its 4 s vote is unchanged; the hold hint describes it");
   const page = read("src/pages/tools/MeetAPart.tsx");
   assert.equal(page.match(/<LightHold /g)?.length, 2, "Thanks and the tender path");
   assert.match(read("dev/parts-harness.tsx"), /import \{ LightHold \} from '\.\.\/src\/components\/parts\/LightHold';/);
   assert.match(read("dev/parts-harness.tsx"), /import \{ PartFigure \} from '\.\.\/src\/components\/parts\/PartFigure';/);
 });
 
-test("no hard-coded copy: Meet a part's screens and page show only content, the person's words, and Back / Next", () => {
+test("no hard-coded copy: Meet a part's screens and page show only content and the person's words (Back / Next / Done are meet_back / meet_next / meet_finish)", () => {
   const files = ["src/pages/tools/MeetAPart.tsx", ...readdirSync("src/components/parts/meet").map((f) => `src/components/parts/meet/${f}`)];
-  const CHROME = new Set(["Back", "Next", "Done"]);
-  const READ_ATTRS = new Set(["aria-label", "placeholder", "title", "alt", "label", "nextLabel", "holdLabel", "doneLabel", "sub"]);
+  const CHROME = new Set();
+  const READ_ATTRS = new Set(["aria-label", "placeholder", "title", "alt", "label", "nextLabel", "backLabel", "fieldLabel", "holdLabel", "holdHint", "doneLabel", "sub"]);
   for (const f of files) {
     const sf = ts.createSourceFile(f, read(f), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
     const walk = (n) => {
@@ -270,7 +270,9 @@ test("the last screen: meet_done and Done, whichever way the visit ended; requir
   assert.deepEqual([fixture.prompts.meet_done.flow, fixture.prompts.meet_done.step], ["meet", "close"]);
   assert.ok(S.meetPromptIds().includes("meet_done"));
   const page = read("src/pages/tools/MeetAPart.tsx");
-  assert.match(page, /\{P\('meet_done'\)\}[\s\S]*<Link to=\{doneTarget\(entry\)\}[^>]*>Done<\/Link>/);
+  assert.match(page, /\{P\('meet_done'\)\}[\s\S]*<Link to=\{doneTarget\(entry\)\}[^>]*>\{chrome\.finish\}<\/Link>/);
+  assert.equal(fixture.options.meet.chrome.find((o) => o.id === 'meet_finish').label, "Done");
+  assert.ok(S.MEET_REQUIRED_OPTIONS.includes('meet_finish'));
   assert.equal(page.match(/\{finale\}|step === 'done' && finale/g)?.length, 3, "after the close, after P2's later, and after P2 on entry");
   assert.equal(S.doneTarget(S.parseMeetEntry({})), "/profile");
   assert.equal(S.doneTarget(S.parseMeetEntry({ parts: { trailheadKind: "angry_card" } })), "/");
