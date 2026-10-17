@@ -8,7 +8,7 @@
 import type { Band } from '../data/capacityTypes';
 import type { PartsContent, PartsOption } from '../data/partsContentTypes';
 import type { ProfileSlices } from '../data/profileTypes';
-import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
+import { fillParts, promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { partChipLabel as unnamedOrName, UNNAMED_PROMPTS } from './partTag';
 
 /** The screen's own prompts, then the shared unnamed-part chips ("The one in your {place}", "One you haven't named"). */
@@ -58,8 +58,8 @@ export function copeParts(parts: readonly SlicePart[] | null | undefined): Slice
   return (parts ?? []).slice(0, COPE_PART_CAP);
 }
 
-/** A slot filled as typed: a function replacement, so `$&` in a name stays literal. */
-const withName = (copy: string, name: string) => copy.replace('{name}', () => name);
+/** A slot filled as typed (`$&` in a name stays literal; a capital only where it opens a sentence). */
+const withName = (copy: string, name: string) => fillParts(copy, { name });
 const nameOf = (name: string | null | undefined) => name?.trim() || null;
 
 /**

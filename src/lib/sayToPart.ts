@@ -9,8 +9,7 @@
  */
 import type { PartsContent, PartsOption } from '../data/partsContentTypes';
 import { SAY_OWN_MAX, type PartMessageLine, type SayToPartRequest } from '../data/partsTypes';
-import { fill } from './invalidationRecovery';
-import { stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
+import { fillParts, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 
 export { SAY_OWN_MAX };
 
@@ -42,7 +41,7 @@ export function sayCopy(content: PartsContent | null): SayCopy | null {
 
 /** The question, with the part's own name when it has one. */
 export const sayQuestion = (copy: SayCopy, name: string | null | undefined): string =>
-  name?.trim() ? fill(copy.say_prompt, { name: name.trim() }) : copy.say_prompt_noname;
+  name?.trim() ? fillParts(copy.say_prompt, { name: name.trim() }) : copy.say_prompt_noname;
 
 /** A part's chips: the gentle set for a tender part. Own words is the chip whose branch is `own_words`. */
 export function sayChoices(content: PartsContent, tender: boolean): { chips: PartsOption[]; own: PartsOption | null } {

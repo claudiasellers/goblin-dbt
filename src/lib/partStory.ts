@@ -12,7 +12,7 @@
 import type { PartsContent } from '../data/partsContentTypes';
 import type { GetPartStoryResponse, PartStoryJob, PartStoryRooms } from '../data/partsTypes';
 import { fill } from './invalidationRecovery';
-import { surfaceReady, type SurfaceIds } from './partsContent';
+import { capFirst, fillParts, opensSentence, surfaceReady, type SurfaceIds } from './partsContent';
 import { STATS_REQUIRED, partStatLines } from './partStats';
 import { saidWords, sayStoryLine } from './sayToPart';
 
@@ -63,7 +63,8 @@ export function jobWords(content: PartsContent, job: PartStoryJob): { words: str
 
 function jobLine(key: string, template: string, slot: string, w: { words: string; own: boolean }): StoryLine {
   const [before, after = ''] = template.split(`{${slot}}`);
-  return { kind: 'job', key, before, words: w.words, after, own: w.own };
+  // Words that open a sentence take a capital at render time (shared rule, partsContent.ts).
+  return { kind: 'job', key, before, words: opensSentence(before) ? capFirst(w.words) : w.words, after, own: w.own };
 }
 
 export function storyView(story: GetPartStoryResponse, content: PartsContent, copy: PartStoryCopy, deps: {
@@ -107,7 +108,7 @@ export function storyView(story: GetPartStoryResponse, content: PartsContent, co
   if (stat.steps) sections.push({ key: 'steps', title: null, lines: [stat.steps] });
   const where = story.links.map((l) => {
     const name = l.otherName ?? copy.story_other;
-    return fill(l.role === 'front' ? copy.story_front : l.role === 'behind' ? copy.story_behind : copy.story_pulls, { name });
+    return fillParts(l.role === 'front' ? copy.story_front : l.role === 'behind' ? copy.story_behind : copy.story_pulls, { name });
   });
   if (where.length) sections.push({ key: 'where', title: copy.story_where, lines: where });
 

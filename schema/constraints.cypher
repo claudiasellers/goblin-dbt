@@ -180,3 +180,10 @@ CREATE CONSTRAINT wise_mind_question_id IF NOT EXISTS FOR (n:WiseMindQuestion) R
 CREATE CONSTRAINT mind_voice_id IF NOT EXISTS FOR (n:MindVoice) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT wise_mind_practice_id IF NOT EXISTS FOR (n:WiseMindPractice) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT wise_mind_answer_id IF NOT EXISTS FOR (n:WiseMindAnswer) REQUIRE n.id IS UNIQUE;
+
+// --- Cope Ahead (docs/design/cope-ahead.md, schema/cope-ahead.cypher) ---
+CREATE CONSTRAINT cope_ahead_flow_id IF NOT EXISTS FOR (n:CopeAheadFlow) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT cope_situation_id IF NOT EXISTS FOR (n:CopeSituation) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT hard_moment_id IF NOT EXISTS FOR (n:HardMoment) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT cope_move_id IF NOT EXISTS FOR (n:CopeMove) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT rehearsal_beat_id IF NOT EXISTS FOR (n:RehearsalBeat) REQUIRE n.id IS UNIQUE;

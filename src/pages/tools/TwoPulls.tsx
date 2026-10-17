@@ -15,7 +15,7 @@ import { initialPulls, pullsNext, keepsakeOpen, PULLS_TRACK, STEP_BACK_MAX, type
 import {
   PULLS_CHECKBACK_NO, PULLS_CHECKBACK_PROMPT, PULLS_CHECKBACK_YES, PULLS_OPTIONS, PULLS_PROMPTS, STEP_EXIT,
   TWO_PULLS_CHECKBACK_TYPE, TWO_PULLS_TOOL, bothWantOptions, candidateRequest, checkbackRequest, entryLaterPatch, feelOptions,
-  keepsakeLines, meetLinkFor, meetOptions, offerCheckback, parsePullsEntry, pullsContext, resolveVisit, startRequest, toPatch,
+  keepsakeLines, keepsakeSegments, meetLinkFor, meetOptions, offerCheckback, parsePullsEntry, pullsContext, resolveVisit, startRequest, toPatch,
   wiseMindLink, worryOptions, worryPrompt, type PullsCheckbackType, type PullsVisit,
 } from '../../lib/twoPullsSave';
 import { MEET_OWN_WORDS_MAX, meetChrome } from '../../lib/meetAPartSave';
@@ -250,6 +250,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
   const stage = <PullsStage a={sides[0]} b={sides[1]} light={stageLight} />;
   const want = bothWantOptions(parts, visit).find((o) => o.id === s.bothWantId) ?? null;
   const lines = want ? keepsakeLines(parts, visit, want.label) : null;
+  const first = want ? keepsakeSegments(parts, visit, want.label) : null;
   const wise = wiseMindLink(parts, visit, st, !!getToolById('wise-mind'));
   const keepsakeAfter = (
     <>
@@ -362,7 +363,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
         const opts = stepOptions(parts, 'pulls', 'keepsake');
         const notNow = opts.find((o) => o.branch === 'end');
         body = lines
-          ? <Keepsake lines={lines} options={opts} picked={null} onPick={(id) => {
+          ? <Keepsake lines={lines} first={first} options={opts} picked={null} onPick={(id) => {
               const o = opts.find((x) => x.id === id);
               if (o?.branch === 'keep' && keepsakeOpen(st)) keepIt();
               else setKeptChoice(id);
@@ -377,7 +378,7 @@ function PullsVisitView({ visit, plan, parts }: { visit: PullsVisit; plan: Entry
         body = (<>
           {lines && s.kept !== null && (
             // Kept: the paper stays, on its own. Not now: "Keep this" is still there, for a change of mind.
-            <Keepsake lines={lines} options={keptChoice === PULLS_OPTIONS.keep && keep !== 'failed' ? []
+            <Keepsake lines={lines} first={first} options={keptChoice === PULLS_OPTIONS.keep && keep !== 'failed' ? []
               : stepOptions(parts, 'pulls', 'keepsake').filter((o) => o.branch === 'keep')}
               picked={null} onPick={(id) => { if (id === PULLS_OPTIONS.keep) keepIt(); }}
               after={keepsakeAfter} />

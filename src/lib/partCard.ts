@@ -14,7 +14,7 @@ import {
   RATHER_IDS_MAX, type AnswerPartRevisitRequest, type PartRefRequest, type PartRevisitAnswer, type RenamePartRequest, type RestPartRequest,
 } from '../data/partsTypes';
 import type { MeItem, MePart, MePartCandidate } from '../services/profile';
-import { stepOptions } from './partsContent';
+import { fillParts, stepOptions } from './partsContent';
 import {
   PART_NAME_MAX, type MeetAPartLink, type PartCandidatePromptId, type PartRevisitChoice, type PartRevisitCopy, type PartsOfMePromptId,
 } from './partsOfMe';
@@ -67,7 +67,7 @@ export function candidateMove(content: PartsContent, c: MePartCandidate): PartsM
 /** "The one that wants to hide", or "One you wanted to come back to" with no nameable move. */
 export function candidateLine(copy: Record<PartCandidatePromptId, string>, content: PartsContent, c: MePartCandidate): string {
   const m = candidateMove(content, c);
-  return m ? copy.candidate_line.split('{move}').join(m.unblendPhrase) : copy.candidate_line_plain;
+  return m ? fillParts(copy.candidate_line, { move: m.unblendPhrase }) : copy.candidate_line_plain;
 }
 
 /** "Get to know it": Meet a part on the candidate trailhead, opening on the move the line names. */
@@ -129,7 +129,7 @@ export function partAsksBack(item: MeItem): boolean {
 export function revisitQuestion(copy: PartRevisitCopy, part: MePart, resting: boolean): string {
   const name = part.name?.trim();
   if (!name) return copy.prompts[resting ? 'revisit_resting_noname' : 'revisit_title_noname'];
-  return copy.prompts[resting ? 'revisit_resting' : 'revisit_title'].split('{name}').join(name);
+  return fillParts(copy.prompts[resting ? 'revisit_resting' : 'revisit_title'], { name });
 }
 
 /** Not a job: mirrors functions/src/parts/keepPlan.ts `NON_ANSWER` (the server refuses these). */

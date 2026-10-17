@@ -1334,7 +1334,7 @@ and checks both paths cover each). **Phase 5 is built in 2D, without Stage** (Cl
 features first): the den, a part's story, Meet a part 5d and Two pulls, as SVG rooms with
 `PartFigure`s; Stage can replace the renderer later. Trail offers stay off until Claudia has looked at
 the dry run (her choice, 17 Oct). **Phase 6:** Wise mind is built and listed for everyone
-(`docs/design/wise-mind.md`); its parts-aware step back is being built into the seam it left.
+(`docs/design/wise-mind.md`), and so is its parts-aware step back (2p, behind sign-off).
 *Say something to it* is built (above). Not built
 from the module table: Recover's next-day question about a tagged part (it would duplicate the part's own
 check-back) and the witness `part` kind (no moment needs it yet).
