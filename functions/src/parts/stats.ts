@@ -9,7 +9,7 @@
  * null, and a part below all of them gets no block at all.
  */
 import { NON_ANSWER } from './keepPlan';
-import { PART_WHENS, type PartReflect, type PartStats, type PartWhen } from './statsTypes';
+import { PART_WHENS, type PartReflect, type PartStats, type PartWhen, type PartsFeel } from './statsTypes';
 
 export const STATS_THRESHOLDS = {
   /** helped: the part's tags in all (parts.md: "after 3+ tags"). */
@@ -24,6 +24,12 @@ export const STATS_THRESHOLDS = {
   stepsMinSessions: 2,
   /** steps: steps shown at most. */
   stepsMaxSteps: 3,
+  /** feel across parts (Reflect): days in each half, the later half ending now. */
+  feelDays: 30,
+  /** feel across parts: answers that say something, in a half, for that half's line. */
+  feelMinPerHalf: 4,
+  /** feel across parts: the most common answer's share of its half, at least. */
+  feelMinShare: 0.4,
 } as const;
 
 /** A kept part as the stats query returns it (the caller's own, through their User). */
@@ -177,6 +183,39 @@ export function statsByPart(rows: StatsRows): Map<string, PartStats> {
     ));
   }
   return out;
+}
+
+const DAY_MS = 86_400_000;
+
+/** A half's most common answer (ties: the most recent), when there are enough and it holds enough of them. */
+function clearMost(rows: readonly StatsSessionRow[]): string | null {
+  if (rows.length < STATS_THRESHOLDS.feelMinPerHalf) return null;
+  const top = mostCommon(rows);
+  return rows.filter((r) => r.firstFeel === top).length >= STATS_THRESHOLDS.feelMinShare * rows.length ? top : null;
+}
+
+/**
+ * How the person has met their parts lately, across all of them: each visit's first feel-toward answer
+ * (non-answers don't count), the last 30 days against the 30 before. Null unless the later half has a
+ * clear most common answer; `then` only when the earlier half has one too and it differs. Ids only: no
+ * count of parts, no score, no direction.
+ */
+export function feelAcross(sessions: readonly StatsSessionRow[], now: Date): PartsFeel | null {
+  const t = now.getTime();
+  const span = STATS_THRESHOLDS.feelDays * DAY_MS;
+  const rows = sessions.filter((s) => !NON_ANSWER.test(s.firstFeel) && Number.isFinite(Date.parse(s.at))).sort(byTime);
+  const within = (from: number, to: number) => rows.filter((s) => { const a = Date.parse(s.at); return a > from && a <= to; });
+  const later = clearMost(within(t - span, t));
+  if (!later) return null;
+  const earlier = clearMost(within(t - 2 * span, t - span));
+  return { now: later, then: earlier && earlier !== later ? earlier : null };
+}
+
+/** Reflect's line across parts: null with parts off; visits of the active or resting parts only. */
+export function partsFeel(rows: StatsRows, now: Date): PartsFeel | null {
+  if (!rows.partsOn) return null;
+  const kept = new Set(rows.parts.filter((p) => p.status === 'active' || p.status === 'resting').map((p) => p.id));
+  return feelAcross(rows.sessions.filter((s) => kept.has(s.partId)), now);
 }
 
 /** Reflect's parts section: null with parts off; else the parts with at least one line, in the rows' order. */

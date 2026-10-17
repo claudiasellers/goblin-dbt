@@ -631,7 +631,8 @@ export const SURFACES: Surface[] = [
   {
     id: 'reflect', pack: 'reflect', title: 'Reflect: parts',
     who: 'Parts on: in Reflect, once a kept part has at least one stat line.',
-    render: () => <PartsReflect parts={REFLECT} />,
+    // lane 2 (parts-reflect-feel): the line across all their parts above the blocks, changed since the 30 days before.
+    render: () => <PartsReflect parts={REFLECT} feel={{ now: 'feel_curious', then: 'feel_scared' }} />,
   },
   {
     id: 'settings', pack: 'settings', title: 'Settings: parts',

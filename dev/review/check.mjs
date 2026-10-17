@@ -151,6 +151,8 @@ try {
         if (v.plain && (v.key === 'angry/speak' || v.key === 'angry/later') && text.includes(copy('angry_later'))) bad('later line shown with plain wording');
         if (SELECTOR[v.key] && !(await page.locator(SELECTOR[v.key]).count())) bad(`missing ${SELECTOR[v.key]}`);
         for (const id of ALSO_EXPECT[v.key] ?? []) if (!text.toLowerCase().includes(copy(id).toLowerCase())) bad(`missing ${id}: "${copy(id)}"`); // lane 4
+        // lane 2 (parts-reflect-feel): Reflect's line across parts, and its earlier line, above the blocks.
+        if (v.key === 'reflect/' && (await page.locator('[data-testid="parts-feel"] p').count()) !== 2) bad('no "how you\'ve met your parts" lines');
         if (NO_CHECKBACK.has(v.key) && text.includes(copy('close_checkback'))) bad('check-back question after a danger ending');
         if (v.surface === 'oa_goal') {
           const shows = (await page.locator('[data-testid="goal-line"]').count()) > 0;

@@ -7,7 +7,7 @@ import neo4j, { type Record as Neo4jRecord } from 'neo4j-driver';
 import { readTx } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
 import { normalizeToolId } from '../shared/toolIds';
-import { partsReflect } from '../parts/stats';
+import { partsFeel, partsReflect } from '../parts/stats';
 import { readStatsRows } from '../parts/statsQueries';
 import type { InsightsDeps } from './handler';
 import type { ActedOnUrge, CheckInRow, LegacyUsageRow, SessionRow, ThenVsNow, TimeRange } from './types';
@@ -172,7 +172,8 @@ export function graphDeps(userId: string): InsightsDeps {
     // Optional and new: a failed read logs and leaves the section out, never the rest of Reflect.
     async parts() {
       try {
-        return partsReflect(await readTx((tx) => readStatsRows(tx, userId)));
+        const rows = await readTx((tx) => readStatsRows(tx, userId));
+        return { parts: partsReflect(rows), feel: partsFeel(rows, new Date()) };
       } catch (e) {
         console.error('getInsightsData parts failed', (e as { code?: string } | null)?.code ?? 'unknown');
         return null;
