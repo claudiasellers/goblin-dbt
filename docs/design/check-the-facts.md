@@ -6,8 +6,9 @@ ways to see it. If there's a threat in it, you check how likely it is and whethe
 it. Then you look at when this feeling fits the facts, and the tool hands you to the skill that fits your
 answer.
 
-Status: **designed 17 Oct 2026, not built.** It's the second option on Claudia's "what next" card. It is
-written ahead so lanes can start the moment it's picked, and it stays unbuilt unless she picks it.
+Status: **being built 17 Oct 2026.** It's the recommended option on Claudia's "what to build after Cope
+Ahead" card, so it's being built while the card is open, as Cope Ahead was. *Decisions for the build* at
+the end override anything above them.
 
 ---
 
@@ -270,3 +271,50 @@ The parts line `cf_unblend` (*This story might come from a part of you that's tr
 - Never treats a feeling that fits as a problem. *Fits* leads to changing the situation, not the feeling.
 - Never pre-fills a past visit's story or answers. Each visit is asked fresh.
 - Never names a part. The unblend line says "a part of you".
+
+---
+
+## Decisions for the build (17 Oct)
+
+These were settled when the build was split across the lanes. Where they differ from the sections above,
+they win.
+
+1. **Screen 1's chips are curated, not the person's most-used words.**
+   - `FOUND_WORD` is a log aggregate. Ordering a live flow by it would cross the data-layer rule
+     ("never used to pre-fill a live flow"), and it has no read path outside Me.
+   - The chips are *anxious*, *worried*, *annoyed*, *angry*, *hurt*, *guilty*, *ashamed* and
+     *embarrassed* (`feelChips`, all grid words).
+   - Emotions carried in by a link or hand-off come first. They aren't pre-selected.
+   - *Something else* opens the grid word list.
+2. **A word's parent** comes from `HAS_REGULATION_CONTENT` for every grid word. That's the mapping Do the
+   Opposite reads, and it ships in the json as `parentOf`.
+   - The story sets are *fear*, *anger*, *sadness*, *shame* (both `hot_shame` and `cold_shame`) and
+     *guilt*.
+   - Every other parent, and a word with no parent, takes *general*.
+3. **Screen 6's title:** *"Here's when feeling {feeling} fits the facts. Does one of these match what
+   happened?"*. The grid words are adjectives, so "when anxious fits" doesn't read.
+   - When the word has no parent with a `fitsTheFactsWhen` list, the screen asks *"Does feeling
+     {feeling} fit what happened?"* (`fits_title_general`), with no list and the same four answers.
+4. **A story in the person's own words** gets three alternatives of its own (`ownStoryAlternatives`):
+   - `own_alt_unknown`: *There's something I don't know yet*;
+   - `own_alt_other_view`: *Someone else might see it differently*;
+   - `own_alt_meaning`: *It might not mean what it feels like it means*.
+5. **Screen 5 shows** for the fear, anger and shame sets, or when any chosen story `predicts`. Otherwise
+   it's skipped.
+   - `predicts` is true for all four fear stories, `anger_always`, `sad_never_better`,
+     `shame_if_they_knew`, `gen_go_wrong` and `gen_against_me`.
+6. **The Cope Ahead link** on screen 5 opens `copeAheadLink({ situationId: 'other' })`. `'other'` is
+   Cope Ahead's *Something else*. Taking it records `handoff: 'cope-ahead'` and leaves through `linkTo`,
+   like every hand-off.
+7. **Screen 7's offers** are named from `src/data/tools.ts`: *Problem Solve*, *Do the Opposite*, *Ask for
+   what you need* and *Wise mind*.
+   - Problem Solve, Do the Opposite and Ask for what you need carry the emotion through `linkTo`.
+   - Wise mind opens with `?first=wm_q_next`.
+   - `ext.cf.handoff` records the choice (`CfHandoff`). The regulation close is asked before the person
+     leaves, as in Find the feeling's hand-offs.
+8. **The entry contract** is `/tool/check-the-facts?feel=<grid id>` (`src/lib/checkFactsEntry.ts`).
+   - An unknown id is dropped.
+   - The word comes first on screen 1 and isn't pre-selected.
+   - Do the Opposite's fits step passes its emotion.
+
+The shared types and every screen's props are in `src/data/checkFactsTypes.ts`.
