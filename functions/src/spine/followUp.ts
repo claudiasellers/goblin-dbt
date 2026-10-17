@@ -3,6 +3,9 @@
  * reserved). Status scheduled → done | partly | didnt | dismissed | cancelled; `due` / `stale` are
  * derived at read (todayOrder.ts). Finalise-once: only a scheduled follow-up can be resolved or
  * snoozed (GUARDS.FollowUp.update).
+ *
+ * Parts follow-ups (parts/followUpTypes.ts) while the caller's parts are off: scheduling, resolving
+ * and snoozing one is refused as not-found, the answer a missing or someone else's follow-up gets.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -12,6 +15,7 @@ import { parseOrInvalid } from '../shared/errors';
 import { obj, str, uuid } from '../shared/validate';
 import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
+import { PARTS_FOLLOW_UP_TYPES, isPartsFollowUpType } from '../parts/followUpTypes';
 import { validateResolve, validateSchedule, validateSnooze, type ScheduleInput } from './validation';
 import { SPINE_TOOLS } from './tools';
 
@@ -55,6 +59,17 @@ export async function scheduleTx(
   return (res.records[0]?.get('ids') as string[] | undefined) ?? [];
 }
 
+/** The caller's parts setting (absent = off). */
+export const FOLLOW_UP_PARTS_ON_QUERY = `
+  OPTIONAL MATCH (u:User {id: $uid})
+  RETURN coalesce(u.partsEnabled, false) AS partsOn
+`;
+
+/** In a write's WHERE (with `u` and `f` bound): a parts follow-up takes no write while parts are off. */
+const PARTS_ON_FOR = (u: string, f: string) => `(NOT ${f}.type IN $partsTypes OR coalesce(${u}.partsEnabled, false))`;
+
+const followUpNotFound = () => new HttpsError('not-found', 'Follow-up not found');
+
 export const scheduleFollowUp = callable<unknown, { ids: string[] }>(
   { auth: 'required', label: 'scheduleFollowUp', errorMessage: 'Could not schedule that' },
   async ({ uid, data, request }) => {
@@ -65,6 +80,10 @@ export const scheduleFollowUp = callable<unknown, { ids: string[] }>(
     const sourceToolId = parseOrInvalid(() => (d.sourceToolId == null ? null : str(d.sourceToolId, { max: 64 })), 'Invalid follow-up');
     if (sourceToolId && !SPINE_TOOLS[sourceToolId]) throw new HttpsError('invalid-argument', 'Invalid follow-up');
     const ids = await writeTx(async (tx) => {
+      if (items.some((i) => isPartsFollowUpType(i.type))) {
+        const on = (await tx.run(FOLLOW_UP_PARTS_ON_QUERY, { uid })).records[0]?.get('partsOn') === true;
+        if (!on) throw followUpNotFound();
+      }
       await tx.run(MERGE_USER, { uid, email: request.auth?.token?.email ?? null });
       return scheduleTx(tx, uid as string, items, { sourceSessionId, sourceToolId });
     });
@@ -90,13 +109,15 @@ export const resolveFollowUp = callable<unknown, ResolveFollowUpResponse>(
     const key = userKey(uid as string, r.id);
     return writeTx(async (tx) => {
       const head = await tx.run(
-        `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key})
+        `MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key})
          OPTIONAL MATCH (t:FollowUpType {id: f.type})
-         RETURN f.type AS type, f.status AS status, ${GUARDS.FollowUp.update('f')} AS open, t.contentJson AS content`,
+         RETURN f.type AS type, f.status AS status, ${GUARDS.FollowUp.update('f')} AS open, t.contentJson AS content,
+                coalesce(u.partsEnabled, false) AS partsOn`,
         { uid, key },
       );
       const rec = head.records[0];
-      if (!rec) throw new HttpsError('not-found', 'Follow-up not found');
+      if (!rec) throw followUpNotFound();
+      if (isPartsFollowUpType(rec.get('type')) && rec.get('partsOn') !== true) throw followUpNotFound();
       if (rec.get('open') !== true) return { next: null, status: rec.get('status') as string };
       if (rec.get('type') === 'oa_plan') throw new HttpsError('failed-precondition', 'Resolved in Opposite Action');
       // Its answer can pause the part (a Part write): answered only by parts' answerPartCheckback.
@@ -108,9 +129,9 @@ export const resolveFollowUp = callable<unknown, ResolveFollowUpResponse>(
       if (r.choiceId && !choice) throw new HttpsError('invalid-argument', 'Unknown choice');
       if (choice?.snoozeHours) {
         await tx.run(
-          `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key}) WHERE ${GUARDS.FollowUp.update('f')}
+          `MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key}) WHERE ${GUARDS.FollowUp.update('f')} AND ${PARTS_ON_FOR('u', 'f')}
            SET f.snoozedUntil = datetime() + duration({hours: $hours}), f.updatedAt = datetime()`,
-          { uid, key, hours: choice.snoozeHours },
+          { uid, key, hours: choice.snoozeHours, partsTypes: PARTS_FOLLOW_UP_TYPES },
         );
         return { next: null, status: 'scheduled' };
       }
@@ -120,25 +141,36 @@ export const resolveFollowUp = callable<unknown, ResolveFollowUpResponse>(
         ? JSON.stringify({ choiceId: choice.id, ...(choice.thenVsNow ? { thenVsNow: choice.thenVsNow, thenVsNowDir: content.dir ?? null } : {}) })
         : null;
       await tx.run(
-        `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key}) WHERE ${GUARDS.FollowUp.update('f')}
+        `MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key}) WHERE ${GUARDS.FollowUp.update('f')} AND ${PARTS_ON_FOR('u', 'f')}
          SET f.status = $status, f.outcome = $outcome, f.missedReason = $missedReason,
              f.resolvedAt = datetime(), f.updatedAt = datetime()`,
-        { uid, key, status, outcome, missedReason: r.missedReason },
+        { uid, key, status, outcome, missedReason: r.missedReason, partsTypes: PARTS_FOLLOW_UP_TYPES },
       );
       return { next: null, status };
     });
   },
 );
 
+export const SNOOZE_HEAD_QUERY = `
+  MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key})
+  RETURN f.type AS type, coalesce(u.partsEnabled, false) AS partsOn
+`;
+
+export const SNOOZE_QUERY = `
+  MATCH (u:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key}) WHERE ${GUARDS.FollowUp.update('f')} AND ${PARTS_ON_FOR('u', 'f')}
+  SET f.snoozedUntil = datetime($until), f.updatedAt = datetime()
+`;
+
 export const snoozeFollowUp = callable<unknown, { ok: true }>(
   { auth: 'required', label: 'snoozeFollowUp', errorMessage: 'Could not save that' },
   async ({ uid, data }) => {
     const s = parseOrInvalid(() => validateSnooze(data, new Date()), 'Invalid follow-up');
-    await writeTx((tx) => tx.run(
-      `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {key: $key}) WHERE ${GUARDS.FollowUp.update('f')}
-       SET f.snoozedUntil = datetime($until), f.updatedAt = datetime()`,
-      { uid, key: userKey(uid as string, s.id), until: s.until },
-    ));
+    const key = userKey(uid as string, s.id);
+    await writeTx(async (tx) => {
+      const head = (await tx.run(SNOOZE_HEAD_QUERY, { uid, key })).records[0];
+      if (head && isPartsFollowUpType(head.get('type')) && head.get('partsOn') !== true) throw followUpNotFound();
+      await tx.run(SNOOZE_QUERY, { uid, key, until: s.until, partsTypes: PARTS_FOLLOW_UP_TYPES });
+    });
     return { ok: true };
   },
 );

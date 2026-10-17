@@ -66,7 +66,7 @@ test('snoozeFollowUp: at most 7 days, only while scheduled', async () => {
   const f = fakeDriver(() => []);
   setDriver(f.driver);
   await fns.snoozeFollowUp.run({ auth: auth(), data: { id: ID, until: inH(3) } });
-  assert.match(f.calls[0].query, /WHERE f\.status = 'scheduled'/);
+  assert.match(f.calls.find((c) => /SET f\.snoozedUntil/.test(c.query)).query, /WHERE f\.status = 'scheduled'/);
   await assert.rejects(fns.snoozeFollowUp.run({ auth: auth(), data: { id: ID, until: inH(24 * 8) } }), (e) => e.code === 'invalid-argument');
 });
 

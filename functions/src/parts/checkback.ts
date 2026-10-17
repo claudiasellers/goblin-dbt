@@ -10,7 +10,7 @@
  * (spine never imports profile/). A set-aside or deleted part has no card.
  *
  * The answer resolves the follow-up under GUARDS.FollowUp.update and, on Louder, pauses the part
- * (keep.ts's PAUSE_PART_QUERY) in the same transaction. deleteMyParts removes open check-backs by type.
+ * (keep.ts's PAUSE_PART_QUERY) in the same transaction. deleteMyParts removes every check-back by type, open or answered.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
