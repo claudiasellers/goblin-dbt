@@ -1,4 +1,5 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
+import { focusLine, focusLost } from '../../../../lib/focusStart';
 import { Link } from 'react-router-dom';
 import { useReducedMotion } from 'motion/react';
 import { CrisisBanner } from '../../../safety/CrisisBanner';
@@ -12,6 +13,7 @@ import {
 } from '../../../../lib/wiseMindParts';
 
 const FIGURE = 44;
+const PANEL = '\u0000panel';
 const SHELF_FIGURE = 36;
 
 /**
@@ -49,9 +51,41 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
   const uid = `wm${useId().replace(/[^A-Za-z0-9_-]/g, '')}`;
   const [progress, setProgress] = useState(0);
   const [tried, setTried] = useState(false);
+  const rootRef = useRef<HTMLElement>(null);
+  const heldRef = useRef<HTMLParagraphElement>(null);
+  /** The figure a tap just moved (shelf ↔ room): its button there takes focus, never <body>. */
+  const moved = useRef<string | null>(null);
+  const wasHeld = useRef(state.held);
+  useEffect(() => {
+    const id = moved.current;
+    const justHeld = state.held && !wasHeld.current;
+    wasHeld.current = state.held;
+    // The panel's swap can come a render later (the candidate is queued first): it waits for it.
+    if (!focusLost()) { if (id !== PANEL) moved.current = null; return; }
+    moved.current = null;
+    if (justHeld) { focusLine(heldRef.current); return; }
+    if (id === PANEL) {
+      // *It won't step back* / *Meet it another time* gave way to their lines: the panel's last line.
+      const lines = rootRef.current?.querySelectorAll<HTMLElement>('[data-testid="wont-step-back"] p');
+      focusLine(lines && lines.length ? lines[lines.length - 1] : null);
+      return;
+    }
+    if (id) {
+      const el = rootRef.current?.querySelector<HTMLElement>(`[data-step-back-figure="${id}"], [data-shelf-figure="${id}"]`);
+      focusLine(el ?? null);
+    }
+  });
+  const toggle = (id: string) => { moved.current = id; onToggle(id); };
+  const inPanel = (f: () => void) => () => { moved.current = PANEL; f(); };
 
   const t = state.held ? 1 : reduce ? 0 : progress;
   const spots = placedSpots(state, t);
+  // Reading order follows where they stand (top to bottom, then left to right), not the order placed.
+  const at = placedSpots(state, 0);
+  const inOrder = [...state.placed].sort((a, b) => {
+    const pa = at.get(a)!, pb = at.get(b)!;
+    return Math.abs(pa.y - pb.y) > 0.02 ? pa.y - pb.y : pa.x - pb.x;
+  });
   const byId = new Map(parts.map((p) => [p.id, p]));
   const shelf = parts.filter((p) => !state.placed.includes(p.id));
   const open = state.open ? byId.get(state.open) ?? null : null;
@@ -64,7 +98,7 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
     : <span style={{ opacity: p.id === UNMET ? 0.6 : p.resting ? 0.8 : 1 }} className="block"><PartFigure shapeSig={p.shapeSig} size={size} still /></span>);
 
   return (
-    <section className="space-y-4" data-testid="step-back">
+    <section ref={rootRef} className="space-y-4" data-testid="step-back">
       <h2 className="text-lg font-medium text-[var(--color-text-primary)]">{copy.wm_who}</h2>
 
       <div role="group" aria-label={copy.wm_room}
@@ -86,7 +120,7 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
           {/* The light is the person: no label, no node, nothing to tap. */}
           <circle cx="50" cy="50" r={light} fill={`url(#${uid}-lamp)`} data-step-back-light={light.toFixed(1)} />
         </svg>
-        {state.placed.map((id) => {
+        {inOrder.map((id) => {
           const p = byId.get(id);
           const s = spots.get(id);
           if (!p || !s) return null;
@@ -97,7 +131,7 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
               className="absolute -translate-x-1/2 -translate-y-1/2 text-center min-w-11 min-h-11 p-1 rounded-xl
                 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--color-border-accent)]"
               style={{ left: `${s.x * 100}%`, top: `${s.y * 100}%` }}
-              onClick={() => (state.held ? onOpen(state.open === id ? null : id) : onToggle(id))}>
+              onClick={() => (state.held ? onOpen(state.open === id ? null : id) : toggle(id))}>
               <span className="block mx-auto" style={{ width: FIGURE, height: FIGURE }}>{figure(p, FIGURE)}</span>
               <span className="block max-w-[5.5rem] mx-auto font-serif text-[12px] leading-tight text-[var(--color-text-primary)] break-words line-clamp-2">{p.name}</span>
             </button>
@@ -113,7 +147,7 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
           <ul className="flex flex-wrap gap-2" aria-label={copy.wm_who}>
             {shelf.map((p) => (
               <li key={p.id}>
-                <button type="button" aria-pressed={false} data-shelf-figure={p.id} onClick={() => onToggle(p.id)}
+                <button type="button" aria-pressed={false} data-shelf-figure={p.id} onClick={() => toggle(p.id)}
                   className="flex items-center gap-2 min-h-11 pl-1 pr-3 rounded-xl border border-[var(--color-border)] text-sm text-left text-[var(--color-text-primary)] hover:border-[var(--color-border-accent)]">
                   <span className="shrink-0" style={{ width: SHELF_FIGURE, height: SHELF_FIGURE }}>{figure(p, SHELF_FIGURE)}</span>
                   <span className={p.id === UNMET ? '' : 'font-serif'}>{p.name}</span>
@@ -136,13 +170,13 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
 
       {state.held && (
         <div className="space-y-3">
-          <p role="status" className="text-base text-[var(--color-text-primary)]">{copy.wm_held}</p>
+          <p ref={heldRef} role="status" className="text-base text-[var(--color-text-primary)]">{copy.wm_held}</p>
           {!open && <p className="text-sm text-[var(--color-text-secondary)]">{copy.wm_tap_one}</p>}
           {open && (
             <div className="p-3 rounded-xl border border-[var(--color-border-subtle)] bg-[var(--color-bg-card)] space-y-2" data-testid="wont-step-back">
               <p className="font-serif text-[var(--color-text-primary)]">{open.name}</p>
               {!openWont
-                ? <button type="button" className={linkButton} onClick={() => onWont(open.id)}>{copy.wm_wont}</button>
+                ? <button type="button" className={linkButton} onClick={inPanel(() => onWont(open.id))}>{copy.wm_wont}</button>
                 : (
                   <>
                     <p className="text-sm text-[var(--color-text-secondary)]">{copy.wm_wont_line}</p>
@@ -150,7 +184,7 @@ export function StepBackRoom({ parts, copy, state, onToggle, onNoOne, onHeld, on
                       ? <Link {...linkTo(open.id)} className={linkButton}>{copy.wm_meet_later}</Link>
                       : state.unmetLater
                         ? <p role="status" className="text-sm text-[var(--color-text-secondary)]">{copy.wm_later_done}</p>
-                        : <button type="button" className={linkButton} onClick={onUnmetLater}>{copy.wm_meet_later}</button>}
+                        : <button type="button" className={linkButton} onClick={inPanel(onUnmetLater)}>{copy.wm_meet_later}</button>}
                   </>
                 )}
             </div>
