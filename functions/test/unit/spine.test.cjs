@@ -34,9 +34,9 @@ test('startToolSession rejects an unknown tool before any query', async () => {
   assert.equal(f.calls.length, 0);
 });
 
-function closeDriver({ open = true, closeKind = 'regulation_down', practiced = false, reps = [] } = {}) {
+function closeDriver({ open = true, closeKind = 'regulation_down', practiced = false, reps = [], toolId = 'cool-down' } = {}) {
   return fakeDriver((q) => {
-    if (/AS open/.test(q)) return [{ open, closeKind, practiced, reps, toolId: 'cool-down', followUps: [] }];
+    if (/AS open/.test(q)) return [{ open, closeKind, practiced, reps, toolId, followUps: [] }];
     if (/RETURN collect\(sp\.id\) AS ids/.test(q)) return [{ ids: [`${ID}:cold`] }];
     return [];
   });
@@ -104,7 +104,17 @@ test('closeToolSession: detail labels come from a whitelist, matched by the call
   setDriver(f.driver);
   await fns.closeToolSession.run({ auth: auth('u9'), data: { id: ID, status: 'completed', detail: { kind: 'opposite_action', id: CI } } });
   assert.deepEqual([f.calls[1].params.detailLabel, f.calls[1].params.detailKey], ['OppositeActionSession', `u9:${CI}`]);
-  assert.match(f.calls[1].query, /\(u\)-\[:COMPLETED_SESSION\]->\(d \{key: \$detailKey\}\)/);
+  // The wrapped tools' sessions hang off COMPLETED_SESSION, Meet a part's off HAS_PART_SESSION.
+  assert.match(f.calls[1].query, /\(u\)-\[:COMPLETED_SESSION\|HAS_PART_SESSION\|HAS_PULLS_SESSION\]->\(d \{key: \$detailKey\}\)/);
+});
+
+test("closeToolSession: Meet a part links its PartSession; its \"more here\" is kept but never a compat outcome", async () => {
+  const f = closeDriver({ closeKind: 'orienting', toolId: 'meet-a-part' });
+  setDriver(f.driver);
+  await fns.closeToolSession.run({ auth: auth('u9'), data: { id: ID, status: 'completed', thenVsNow: 'better', detail: { kind: 'meet_a_part', id: CI } } });
+  const set = f.calls[1];
+  assert.deepEqual([set.params.detailLabel, set.params.detailKey], ['PartSession', `u9:${CI}`]);
+  assert.deepEqual([set.params.thenVsNow, set.params.thenVsNowDir, set.params.legacyOutcome], ['better', 'orient', null]);
 });
 
 test('closeToolSession: a band asked after the open is set once, only when the start had none (A4-4)', async () => {
@@ -125,6 +135,54 @@ test('closeToolSession: a band asked after the open is set once, only when the s
   setDriver(g.driver);
   await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early' } });
   assert.equal(g.calls.find((c) => /SET ts\.status = \$status/.test(c.query)).params.bandAtStart, null);
+});
+
+test('closeToolSession: emotions picked in the tool are set once, only when the start had none (parts data fix 5)', async () => {
+  const f = closeDriver();
+  setDriver(f.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed', emotionIds: ['hurt', 'anxious'] } });
+  const close = f.calls.find((c) => /SET ts\.status = \$status/.test(c.query));
+  assert.match(close.query, /WHERE ts\.status = 'open'/, 'inside the close guard (finalise-once)');
+  assert.match(close.query, /ts\.emotionIds = CASE WHEN size\(coalesce\(ts\.emotionIds, \[\]\)\) = 0 AND size\(\$emotionIds\) > 0\s+THEN \$emotionIds ELSE ts\.emotionIds END/);
+  assert.deepEqual(close.params.emotionIds, ['hurt', 'anxious']);
+  // None given: [] (the CASE keeps what the start stored).
+  const g = closeDriver();
+  setDriver(g.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed' } });
+  assert.deepEqual(g.calls.find((c) => /SET ts\.status = \$status/.test(c.query)).params.emotionIds, []);
+  // An already-closed session is a no-op: nothing is set.
+  const h = closeDriver({ open: false });
+  setDriver(h.driver);
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed', emotionIds: ['hurt'] } });
+  assert.ok(!h.calls.some((c) => /SET ts\.status = \$status/.test(c.query)));
+  // Junk ids are refused.
+  await assert.rejects(fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'completed', emotionIds: ['I feel awful'] } }), (e) => e.code === 'invalid-argument');
+});
+
+test('closeToolSession: Do the Opposite keeps the urge and the check result as ids, with no rep (parts data fix 3)', async () => {
+  const f = closeDriver({ closeKind: 'none' });
+  setDriver(f.driver);
+  // Route `problem` (the urge fits and would help): left without a plan, so exited early.
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early', exitStep: 'result_problem', urgeIds: ['fear-avoid'],
+    ext: { er: { oaFacts: 'fits', oaEffect: 'helpful', oaRoute: 'problem' } } } });
+  const close = f.calls.find((c) => /SET ts\.status = \$status/.test(c.query));
+  assert.deepEqual(close.params.urgeIds, ['fear-avoid']);
+  assert.deepEqual(JSON.parse(close.params.ext), { er: { oaFacts: 'fits', oaEffect: 'helpful', oaRoute: 'problem' } });
+  assert.ok(!f.calls.some((c) => /MERGE \(sp:SkillPractice/.test(c.query)), 'not a practised rep');
+  // Free text is refused before any query.
+  const g = closeDriver({ closeKind: 'none' });
+  setDriver(g.driver);
+  await assert.rejects(fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early', ext: { er: { oaFacts: 'it fits, mostly' } } } }),
+    (e) => e.code === 'invalid-argument');
+  assert.equal(g.calls.length, 0);
+});
+
+test('startToolSession stores the hand-off emotion ids', async () => {
+  const f = fakeDriver((q) => (/RETURN tu\.id AS toolUsageId/.test(q) ? [{ toolUsageId: `${ID}:usage` }] : []));
+  setDriver(f.driver);
+  await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'problem-solve', entry: 'checkin_result', emotionIds: ['anxious', 'hurt'] } });
+  assert.match(f.calls[0].query, /ts\.emotionIds = \$emotionIds/);
+  assert.deepEqual(f.calls[0].params.emotionIds, ['anxious', 'hurt']);
 });
 
 test('closeToolSession on an unknown session is not-found', async () => {

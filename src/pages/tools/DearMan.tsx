@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { Suspense, lazy, useState, useEffect, useCallback, useMemo, useRef, type ComponentProps } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { getDearManContent, saveDearManSession, getDearManDebriefContent, getDearManReflection, saveCheckIn, getStateAndTools } from '../../services/neo4j';
 import { buildCheckInPayload } from '../../lib/spine/checkInPayload';
@@ -19,20 +19,32 @@ import { BreathOrb, type BreathPhase } from '../../components/tools/regulation/b
 import { linkButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 import { fill } from '../../lib/invalidationRecovery';
 import { handoffPrefill, summaryHeadsUpForBand } from '../../lib/dearManSafety';
+import { CopeAheadEntryLink } from '../../components/tools/copeAhead/CopeAheadEntryLink';
 import type { CapacityReading, HandoffResult } from '../../data/capacityTypes';
 import { useBand } from '../../hooks/useBand';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
+import { tagRowAnswered } from '../../lib/tagRowOnce';
+import { debriefWhoReady, showDebriefWho } from '../../lib/debriefWho';
 import { handoffExt, makeReading } from '../../lib/bandStore';
 import { dropResumeToken, peekResumeToken } from '../../lib/resumeToken';
 import { scheduleResumeLater } from '../../services/capacity';
 import { dearManDraftOf, dearManStepFromId, dearManStepId, isDearManDraft, TOO_MUCH_PHASES, type DearManDraft, type DearManStep } from '../../lib/dearManResume';
+import { feelingEmotionWords, feelingLabel, hurtFeelingChip } from '../../lib/dearManHurt';
+import { getPartsContent } from '../../services/partsContent';
+import type { PartsContent, PartsHurt } from '../../data/partsContentTypes';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { useProfileContext } from '../../hooks/useProfileContext';
+import { profileCache } from '../../lib/profileCache';
+import { anchorLead, copeExt, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
+import { focusLost, focusStepStart } from '../../lib/focusStart';
 
 type Phase =
   | 'entry'
   | 'check'
   | 'handoff'
   | 'scene'
+  | 'cope'
   | 'describe'
   | 'express'
   | 'assert'
@@ -49,6 +61,7 @@ type Phase =
   | 'debrief-body'
   | 'debrief-thought'
   | 'debrief-underneath'
+  | 'debrief-parts'
   | 'debrief-reflection'
   | 'debrief-cope-select'
   | 'debrief-rehearsal'
@@ -92,6 +105,15 @@ const debriefOverallOptions = [
   { id: 'not_well', label: "It didn't go well" },
   { id: 'didnt_have', label: "Didn't have it yet" },
 ];
+
+// Parts steps load on demand: fetched once their gate holds (copeShown / whoShown, prefetched below
+// before their phase), each in its own Suspense with nothing in its place.
+const loadCope = () => import('../../components/parts/CopeAheadStep');
+const loadWho = () => import('../../components/parts/DebriefWho');
+const LazyCopeAheadStep = lazy(() => loadCope().then((m) => ({ default: m.CopeAheadStep })));
+const LazyDebriefWho = lazy(() => loadWho().then((m) => ({ default: m.DebriefWho })));
+function CopeAheadStep(p: ComponentProps<typeof LazyCopeAheadStep>) { return <Suspense fallback={null}><LazyCopeAheadStep {...p} /></Suspense>; }
+function DebriefWho(p: ComponentProps<typeof LazyDebriefWho>) { return <Suspense fallback={null}><LazyDebriefWho {...p} /></Suspense>; }
 
 export function DearMan() {
   const session = useToolSession();
@@ -170,6 +192,11 @@ export function DearMan() {
   const [walkAwayCustom, setWalkAwayCustom] = useState('');
   const [showWalkAwayCustom, setShowWalkAwayCustom] = useState(false);
 
+  // ── Cope ahead (parts on): the part picked (its id rides in ext.er and the resume draft, never its
+  // anchor) and anchors saved on this visit (over the profile slice, which is cached) ──
+  const [copeAheadPartId, setCopeAheadPartId] = useState<string | null>(null);
+  const [copeAnchors, setCopeAnchors] = useState<Record<string, string>>({});
+
   // ── Debrief data ──
   const [debriefOverall, setDebriefOverall] = useState<string | null>(null);
 
@@ -233,11 +260,13 @@ export function DearMan() {
     setAnchorPhrase(d.anchorPhrase);
     setMiddleGroundId(d.middleGroundId); setMiddleGroundCustom(d.middleGroundCustom);
     setWalkAwayId(d.walkAwayId); setWalkAwayCustom(d.walkAwayCustom);
+    setCopeAheadPartId(d.copeAheadPartId ?? null);
+    if (d.copeAheadPartId) session.setExt(copeExt(d.copeAheadPartId));
   };
   const draftOf = (): DearManDraft => dearManDraftOf({
     relationshipType, situationType, priorities, barriers, barriersCustom, describeId, describeCustom,
     feelings, feelingCustom, assertIds, assertDetails, assertCustom, reinforceIds, reinforceCustom,
-    anchorPhrase, middleGroundId, middleGroundCustom, walkAwayId, walkAwayCustom,
+    anchorPhrase, middleGroundId, middleGroundCustom, walkAwayId, walkAwayCustom, copeAheadPartId,
   });
 
   // ── Load content from graph (on mount, and on explicit retry) ──
@@ -285,6 +314,69 @@ export function DearMan() {
   useEffect(() => { loadContent(); }, [loadContent]);
   useEffect(() => { band.load(); }, [band]);
 
+  // Recover's angry-part card: the hurt picked there is the first "I felt" chip, not selected. The
+  // shipped parts content is read only when a hurt is in play (a hand-off's, or one a resumed draft
+  // saved); otherwise Express is exactly as it was.
+  const [partsHurts, setPartsHurts] = useState<PartsHurt[] | null>(null);
+  const hurtInPlay = Boolean(handoff?.hurtId)
+    || Boolean(content && feelings.some(id => !content.feelingChips.some(f => f.id === id)));
+  useEffect(() => {
+    if (!hurtInPlay || partsHurts) return;
+    let live = true;
+    getPartsContent().then(p => { if (live) setPartsHurts(p.hurts); }).catch(() => { /* no chip */ });
+    return () => { live = false; };
+  }, [hurtInPlay, partsHurts]);
+  const hurtChip = useMemo(() => hurtFeelingChip(handoff?.hurtId, partsHurts, feelings), [handoff, partsHurts, feelings]);
+
+  // Cope ahead per part ("Who might show up in this conversation?"): read only with parts on. The
+  // profile read is DEAR MAN's declared slices (parts, kept lines, anchors; never partDetail).
+  const partsOn = useUserProfile().profile.partsEnabled;
+  const copeProfile = useProfileContext('dear-man', { enabled: partsOn });
+  /** The shipped parts content for the cope copy: null while loading, false when it couldn't load. */
+  const [copeContent, setCopeContent] = useState<PartsContent | null | false>(null);
+  useEffect(() => {
+    if (!partsOn || copeContent !== null) return;
+    let live = true;
+    getPartsContent().then(p => { if (live) setCopeContent(p); }).catch(() => { if (live) setCopeContent(false); });
+    return () => { live = false; };
+  }, [partsOn, copeContent]);
+  const copeSlices = copeProfile.slices;
+  const copeCopy = copeContent || null;
+  const copeShown = showCopeAhead({
+    partsOn, partCount: copeSlices?.parts.length ?? 0, ready: copeReady(copeCopy),
+    band: bandReading?.value ?? band.current()?.value ?? null,
+  });
+  /** Parts on, but the slices or the copy are still on their way: the cope step waits rather than skip. */
+  const copePending = partsOn && (copeProfile.status === 'loading' || copeContent === null);
+  const copeAnchorMap = useMemo(() => ({ ...(copeSlices?.partAnchors ?? {}), ...copeAnchors }), [copeSlices, copeAnchors]);
+  const copeLines = useMemo(() => keptLines(copeSlices?.ownLines, copeSlices?.savedLines), [copeSlices]);
+  // A resumed draft (or Back) can land on the step after parts went off or the part went: go on.
+  useEffect(() => {
+    if (phase === 'cope' && !copeShown && !copePending) setPhase('describe');
+  }, [phase, copeShown, copePending]);
+  const pickCopePart = (id: string | null) => {
+    setCopeAheadPartId(id);
+    session.setExt(copeExt(id));
+  };
+  /** The anchor carried to the Summary, under the script: the picked part's, when it has one. */
+  const copePart = copeAheadPartId ? copeSlices?.parts.find(p => p.id === copeAheadPartId) ?? null : null;
+  const copeCarry = partsOn && copeCopy && copeReady(copeCopy) && copePart && copeAnchorMap[copePart.id]
+    ? { lead: anchorLead(copeCopy, copePart.name), anchor: copeAnchorMap[copePart.id] }
+    : null;
+
+  // Debrief, after "Underneath that": who showed up? (src/lib/debriefWho.ts). Its own step: parts on, a
+  // kept part, the copy shipped; P2 ('handoff') is another step and the too-much overlay is never on the
+  // debrief, so neither can be open over it. Named when this visit's prep chose a part (copeAheadPartId).
+  // Answered once this page (src/lib/tagRowOnce.ts): Back from the reflection never asks again.
+  const whoShown = showDebriefWho({ partsOn, partCount: copeSlices?.parts.length ?? 0, ready: debriefWhoReady(copeCopy),
+    answered: tagRowAnswered(session.id, 'debrief') });
+  useEffect(() => {
+    if (phase === 'debrief-parts' && !whoShown && !copePending) setPhase('debrief-reflection');
+  }, [phase, whoShown, copePending]);
+  // Fetch each parts step as soon as its gate holds, so it is there when its phase comes.
+  useEffect(() => { if (copeShown) void loadCope().catch(() => { /* the step's render retries */ }); }, [copeShown]);
+  useEffect(() => { if (whoShown) void loadWho().catch(() => { /* the step's render retries */ }); }, [whoShown]);
+
   // ── Pre-fill feelings from check-in emotions ──
   useEffect(() => {
     if (content && checkinEmotions?.length) {
@@ -296,6 +388,15 @@ export function DearMan() {
       if (matchedIds.length) setFeelings(matchedIds);
     }
   }, [content, checkinEmotions]);
+
+  // The session's emotions when it opened without any: Recover's word (its hand-over carries no
+  // checkinEmotions) and the Express feelings, matched to graph words by label (chips that aren't
+  // a graph word, e.g. "Small", are dropped).
+  // The hurt chip counts as its NAMED_AS Emotion ids.
+  useEffect(() => {
+    const labels = content ? feelingEmotionWords(feelings, content.feelingChips, hurtChip) : [];
+    session.setEmotionIds([...(handoff?.emotionId ? [handoff.emotionId] : []), ...labels]);
+  }, [content, feelings, handoff, session, hurtChip]);
 
   // ── Resolve quadrant from debrief feelings and trigger analysis ──
   useEffect(() => {
@@ -337,6 +438,18 @@ export function DearMan() {
       .catch(() => {});
   }, [phase]);
 
+  // Where a parts step hands back (cope ahead's go-on, the debrief's who showed up), focus lands on DEAR
+  // MAN's next step (its heading or first line) instead of the page: the parts control that had it is
+  // gone. Held while that step is up, so a step that first shows a loading line (the reflection) gets
+  // its own start once it arrives. DEAR MAN's other step changes are unchanged.
+  const viewRoot = useRef<HTMLDivElement>(null);
+  const handedBackTo = useRef<Phase | null>(null);
+  const handBack = (next: Phase) => { handedBackTo.current = next; setPhase(next); };
+  useEffect(() => {
+    if (handedBackTo.current !== phase) { handedBackTo.current = null; return; }
+    if (focusLost()) focusStepStart(viewRoot.current);
+  });
+
   // ── Loading / Error states ──
   if (loading && !content) {
     return <ToolLoading label="Loading the conversation builder…" />;
@@ -357,7 +470,11 @@ export function DearMan() {
         if (sceneStep > 0) setSceneStep(sceneStep - 1);
         else setPhase('entry');
         break;
-      case 'describe': setSceneStep(3); setPhase('scene'); break;
+      case 'cope': setSceneStep(3); setPhase('scene'); break;
+      case 'describe':
+        if (copeShown) setPhase('cope');
+        else { setSceneStep(3); setPhase('scene'); }
+        break;
       case 'express': setPhase('describe'); break;
       case 'assert': setPhase('express'); break;
       case 'reinforce': setPhase('assert'); break;
@@ -373,7 +490,8 @@ export function DearMan() {
       case 'debrief-body': setPhase('debrief-response'); break;
       case 'debrief-thought': setPhase('debrief-body'); break;
       case 'debrief-underneath': setPhase('debrief-thought'); break;
-      case 'debrief-reflection': setPhase('debrief-underneath'); break;
+      case 'debrief-parts': setPhase('debrief-underneath'); break;
+      case 'debrief-reflection': setPhase(whoShown ? 'debrief-parts' : 'debrief-underneath'); break;
       case 'debrief-cope-select': setPhase('debrief-reflection'); break;
       case 'debrief-rehearsal': setPhase('debrief-cope-select'); break;
       case 'debrief-moment-plan': setPhase('debrief-rehearsal'); break;
@@ -531,7 +649,7 @@ export function DearMan() {
 
   // Resolve selected feelings for summary
   const resolveFeelings = () => {
-    const labels = feelings.map(id => resolveLabel(id, content.feelingChips)).filter(Boolean);
+    const labels = feelings.map(id => feelingLabel(id, content.feelingChips, partsHurts)).filter(Boolean);
     if (feelingCustom.trim()) labels.push(feelingCustom.trim());
     return labels;
   };
@@ -646,6 +764,7 @@ export function DearMan() {
     setAnchorPhrase(''); setShowAnchorGen(false); setAnchorNeedId(null); setAnchorShowAll(false);
     setMiddleGroundId(null); setMiddleGroundCustom(''); setShowMiddleGroundCustom(false);
     setWalkAwayId(null); setWalkAwayCustom(''); setShowWalkAwayCustom(false);
+    setCopeAheadPartId(null); session.setExt(copeExt(null));
     setDebriefOverall(null);
     setDebriefCurrentFeelings([]); setDebriefRelationshipType(null);
     setTurningPointIds([]); setMomentResponseIds([]);
@@ -859,10 +978,33 @@ export function DearMan() {
                   );
                 })}
               </div>
-              <button onClick={() => setPhase('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
-                Let&apos;s build your script
+              <button onClick={() => setPhase(copeShown ? 'cope' : 'describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
+                {copeShown ? 'Next' : <>Let&apos;s build your script</>}
               </button>
             </div>
+          )}
+        </div>
+      );
+    }
+
+    // ─── COPE AHEAD (parts on): who might show up, while the plan is made and before the script ───
+    if (phase === 'cope') {
+      if (!copeShown || !copeCopy || !copeSlices) return null;
+      return (
+        <div className="space-y-6">
+          {noteLine}
+          <BackButton />
+          <CopeAheadStep content={copeCopy} parts={copeParts(copeSlices.parts)} anchors={copeAnchorMap} lines={copeLines}
+            picked={copeAheadPartId} onPick={pickCopePart}
+            onAnchor={(partId, text, version) => {
+              setCopeAnchors(a => ({ ...a, [partId]: text }));
+              profileCache.bump(version);
+            }}
+            onGoOn={() => handBack('describe')} />
+          {copeAheadPartId && (
+            <button onClick={() => handBack('describe')} className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
+              Let&apos;s build your script
+            </button>
           )}
         </div>
       );
@@ -957,6 +1099,13 @@ export function DearMan() {
           <BackButton />
           <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">How does this make you feel?</h3>
           <p className="text-[var(--color-text-secondary)]">Tap all that apply.</p>
+
+          {/* The hurt named in Recover, first and not selected: its words alone */}
+          {hurtChip && (
+            <div className="flex flex-wrap gap-2">
+              {renderFeelingChip({ id: hurtChip.id, label: hurtChip.label }, feelingGroupColors.neutral)}
+            </div>
+          )}
 
           {/* Mirroring — an example of what this situation typically brings up */}
           {mirror && (
@@ -1471,6 +1620,13 @@ export function DearMan() {
               {reinforceTexts.map((t, i) => <p key={i} className="text-[var(--color-text-primary)]">{t}</p>)}
             </div>
 
+            {copeCarry && (
+              <div className="mb-6" data-testid="cope-carry">
+                <p className="text-sm text-[var(--color-text-secondary)]">{copeCarry.lead}</p>
+                <p className="font-serif text-[var(--color-text-primary)] break-words">{copeCarry.anchor}</p>
+              </div>
+            )}
+
             <hr className="border-[var(--color-border-subtle)] mb-6" />
 
             {anchorPhrase && (
@@ -1533,13 +1689,15 @@ export function DearMan() {
             </details>
           )}
 
+          {/* Cope Ahead: rehearse this conversation, with the part picked in prep carried in (parts on only). */}
+          <CopeAheadEntryLink copyKey="entry_dear_man" situationId="conversation" partId={partsOn ? copeAheadPartId : null} />
           <button onClick={() => {
               if (!debriefContent) {
                 getDearManDebriefContent().then(setDebriefContent).catch(() => {});
               }
               setPhase('debrief-checkin');
             }}
-            className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+            className="w-full min-h-11 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
             After the conversation &rarr; How did it go?
           </button>
         </div>
@@ -1980,11 +2138,23 @@ export function DearMan() {
             })}
           </div>
           {underneathIds.length > 0 && (
-            <button onClick={() => setPhase('debrief-reflection')}
+            <button onClick={() => setPhase(whoShown || copePending ? 'debrief-parts' : 'debrief-reflection')}
               className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
               Continue
             </button>
           )}
+        </div>
+      );
+    }
+
+    // ─── DEBRIEF: WHO SHOWED UP (parts on) ───
+    if (phase === 'debrief-parts') {
+      if (!whoShown || !copeCopy || !copeSlices) return null;
+      return (
+        <div className="space-y-6">
+          <BackButton />
+          <DebriefWho content={copeCopy} parts={copeSlices.parts} copeAheadPartId={copeAheadPartId} toolSessionId={session.id}
+            onAnswer={(a) => session.setExt({ er: { whoShowedUp: a } })} onDone={() => handBack('debrief-reflection')} />
         </div>
       );
     }
@@ -2180,7 +2350,7 @@ export function DearMan() {
   const planStep = (TOO_MUCH_PHASES as readonly string[]).includes(phase);
   return (
     <>
-      {view}
+      <div ref={viewRoot}>{view}</div>
       {planStep && (
         <div className="mt-8 text-center">
           <TooMuchLink host="dear-man" onScheduleLater={scheduleLater} onResult={recordHandoff}

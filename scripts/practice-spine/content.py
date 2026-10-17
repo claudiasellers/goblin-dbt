@@ -125,6 +125,28 @@ FOLLOW_UP_TYPES = [
         "notification": "A step you planned is ready.",
     },
     {
+        # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
+        # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's
+        # own cope-ahead ToolSession. Its Today card is the tool's own (cope-ahead.json's after_* lines, the
+        # plan line composed from the session's ext.ca ids): "How did {afterName} go?", then "Did your plan
+        # help?"; both answers go in one resolve as log fields (howItWent, planHelped). The copy and choices
+        # here are the first question's, in the registry's shape: the server checks the answer against them.
+        # Stale and missed: as recover_log, the closest existing type.
+        "id": "cope_ahead_after", "ownerModule": "er", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"},
+                                             "later": {"kind": "at_local", "days": 7, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How did it go?", "body": "Something you planned for in Cope Ahead."},
+        "choices": [{"id": "better", "label": "Better than I feared", "status": "done"},
+                    {"id": "as_expected", "label": "About what I expected", "status": "done"},
+                    {"id": "harder", "label": "Harder than I expected", "status": "done"},
+                    {"id": "not_yet", "label": "It hasn't happened yet", "snoozeHours": 24}],
+        "notification": "A plan you made is ready.",
+    },
+    {
         # Derived (no FollowUp node): the latest tool session closed without an answer.
         "id": "tool_outcome", "ownerModule": "core", "tier": "skills", "resolveMode": "inline",
         "window": {"kind": "derived"}, "staleAfterHours": 12, "missedPath": "none",
@@ -170,6 +192,39 @@ FOLLOW_UP_TYPES = [
         "choices": [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}],
         "notification": "Something you set aside is ready when you are.",
     },
+    {
+        # Parts (docs/design/parts.md, Meet a part step 10): the next-day check-back on the close's yes,
+        # scheduled by parts' schedulePartCheckback and answered by answerPartCheckback (Louder pauses the
+        # part). Its Today card comes from parts (parts on, the name from the profile slice) and shows the
+        # parts copy (checkback_* in scripts/parts/content.py) only once signed off; the copy and choices
+        # here are the same drafts, kept so the row has the registry's shape. No reminders of any kind.
+        "id": "part_checkback", "ownerModule": "mf", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "at_local", "days": 1, "time": "10:00"},
+        "staleAfterHours": 36, "missedPath": "none", "notify": {"push": False, "inTab": False, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How's {name} today?"},
+        "choices": [{"id": "settled", "label": "Settled", "status": "done"},
+                    {"id": "same", "label": "Same", "status": "done"},
+                    {"id": "louder", "label": "Louder", "status": "done"},
+                    {"id": "skip", "label": "Skip", "status": "dismissed"}],
+        "notification": "",
+    },
+    {
+        # Parts (docs/design/parts.md, Two pulls step 7): a week after Two pulls, for both kept parts, on
+        # the close's yes; scheduled by schedulePullsCheckback, answered by answerPartCheckback (the same
+        # card and answers; Louder shows the aftercare). Its Today card comes from parts (parts on, both
+        # names from the profile slice) and shows checkback_title_two only once signed off.
+        "id": "two_pulls_checkback", "ownerModule": "mf", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "at_local", "days": 7, "time": "10:00"},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": False, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How are {A} and {B} today?"},
+        "choices": [{"id": "settled", "label": "Settled", "status": "done"},
+                    {"id": "same", "label": "Same", "status": "done"},
+                    {"id": "louder", "label": "Louder", "status": "done"},
+                    {"id": "skip", "label": "Skip", "status": "dismissed"}],
+        "notification": "",
+    },
 ]
 
 # Reserved rows: authored now so the ids exist, enabled false until their owners ship.
@@ -211,6 +266,16 @@ NEW_SKILLS = [
     ("problem_solve", "Solve the problem", "Moderate", "mind", "dbt_problem_solving",
      "When the facts are the problem, a small concrete step changes the situation that keeps the feeling going.",
      ["linehan_skills_2015"], ["problem-solve"]),
+    # Wise mind (docs/design/wise-mind.md): a practice started (Stone on the lake, Wise in mind out, Ask
+    # and listen) is the rep, through the tool's markPracticed.
+    ("wise_mind", "Wise mind", "Preliminary", "mind", "dbt_wise_mind",
+     "Hearing what feeling and thinking each say, then pausing to listen, leaves room for a choice that fits both.",
+     ["linehan_skills_2015"], ["wise-mind"]),
+    # Cope Ahead (docs/design/cope-ahead.md): a completed visit (the plan rehearsed and kept, or not) is
+    # the rep. If-then plans: Gollwitzer & Sheeran 2006; DBT Emotion Regulation Handout 19.
+    ("cope_ahead", "Cope Ahead", "Moderate", "mind", "dbt_cope_ahead",
+     "Deciding what you'll do at the hardest moment, and rehearsing it once in your mind, makes the plan easier to reach when it comes.",
+     ["linehan_skills_2015"], ["cope-ahead"]),
 ]
 
 SOURCES = [

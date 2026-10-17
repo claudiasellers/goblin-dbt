@@ -155,6 +155,8 @@ export function CheckIn() {
     capacity,
     discriminatingAnswers,
     embeddedToolSessionIds: embeddedIds,
+    // Which words sat in which spot (sent only for a grid check-in with 2+ filled spots).
+    spots,
   });
 
   // Save on result render, before any tool can open (R4: every downstream write keys on this id).

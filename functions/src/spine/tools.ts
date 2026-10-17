@@ -16,17 +16,34 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'pause': { module: 'dt', closeKind: 'urge' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
+  // Cope Ahead (docs/design/cope-ahead.md): screen 1 already asked when, so no close question; its outcome
+  // is the cope_ahead_after card.
+  'cope-ahead': { module: 'er', closeKind: 'none' },
   // FTF asks its own then-vs-now (stored `close`, mapped at read: R3).
   'find-the-feeling': { module: 'er', closeKind: 'regulation_down' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'none' },
   'dear-man': { module: 'ie', closeKind: 'none' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
+  // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
+  'meet-a-part': { module: 'mf', closeKind: 'orienting' },
+  // Two pulls (docs/design/parts.md): the same orienting close, never what-helps evidence.
+  'two-pulls': { module: 'mf', closeKind: 'orienting' },
+  // Wise mind (docs/design/wise-mind.md): "Further away … More here", unless it handed off. A skill:
+  // a "More here" after it counts toward what helps (not in NOT_WHAT_HELPS).
+  'wise-mind': { module: 'mf', closeKind: 'orienting' },
   // Reserved spine ids (one-shots and embeds).
   'help-now': { module: 'core', closeKind: 'none' },
   'micro-step': { module: 'core', closeKind: 'none' },
   'guided-activity': { module: 'core', closeKind: 'none' },
 };
+
+/**
+ * Tools whose close is never evidence that something helped: no what_helps pattern offer, no
+ * "went well" in Insights, no "did it help?" card in Today, no compat ToolUsage outcome. "More here"
+ * after meeting a part (or sitting with two pulls) is not the same claim as "it calmed me" (docs/design/parts.md).
+ */
+export const NOT_WHAT_HELPS: readonly string[] = ['meet-a-part', 'two-pulls'];
 
 /** Where the reserved ids may be opened from. */
 export const RESERVED_ENTRIES: Record<string, readonly ToolEntry[]> = {

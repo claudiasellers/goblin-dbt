@@ -63,6 +63,65 @@ test("analysis failure saves without a pattern; discriminating answers flatten; 
   assert.deepEqual(partial.nextAction, { kind: "activity_partial", activityId: "shake-out" });
 });
 
+test("two or more spots on the square send which words sat where (parts data fix 1)", () => {
+  const spots = [
+    { point: { x: 0.2, y: 0.9 }, words: ["Anxious", "Overwhelmed"] },
+    { point: { x: 0.85, y: 0.9 }, words: ["Excited"] },
+  ];
+  const r = p.buildCheckInPayload(state({ emotions: ["Anxious", "Overwhelmed", "Excited"], spots }), result());
+  assert.deepEqual(r.spots, [
+    { x: 0.2, y: 0.9, emotionIds: ["anxious", "overwhelmed"] },
+    { x: 0.85, y: 0.9, emotionIds: ["excited"] },
+  ]);
+  assert.deepEqual(r.emotionIds, ["anxious", "overwhelmed", "excited"], "the pooled ids are unchanged");
+  // One spot: its words are the check-in's, nothing more to keep.
+  assert.ok(!("spots" in p.buildCheckInPayload(state({ spots: [spots[0]] }), result())));
+  // A second spot with no point or no known word doesn't count.
+  assert.ok(!("spots" in p.buildCheckInPayload(state({ spots: [spots[0], { point: null, words: ["Excited"] }] }), result())));
+  assert.ok(!("spots" in p.buildCheckInPayload(state({ spots: [spots[0], { point: { x: 0.5, y: 0.5 }, words: ["Not A Feeling"] }] }), result())));
+  // Only the grid has spots: body-first, FTF and the debrief never send them.
+  for (const source of ["body", "ftf", "dear_man_debrief"]) {
+    assert.ok(!("spots" in p.buildCheckInPayload(state({ source, spots }), result())), source);
+  }
+  assert.ok(!("spots" in p.buildCheckInPayload(state(), null, { kind: "done" })), "no spots in state");
+});
+
+test("server validator: spots are 2–3, coordinates in 0–1, 1–8 ids each; anything else drops the field", () => {
+  const now = new Date();
+  const at = (spots) => v.validateSaveCheckIn({ emotion: "x", quadrant: "high-unpleasant", spots }, now).spots;
+  const a = { x: 0.2, y: 0.9, emotionIds: ["anxious"] };
+  const b = { x: 0.85, y: 0.9, emotionIds: ["excited", "excited"] };
+  assert.deepEqual(at([a, b]), [a, { ...b, emotionIds: ["excited"] }]);
+  assert.equal(at([a]), null);
+  assert.equal(at([a, b, a, b]), null);
+  assert.equal(at([a, { ...b, x: 1.2 }]), null);
+  assert.equal(at([a, { ...b, y: Number.NaN }]), null);
+  assert.equal(at([a, { ...b, emotionIds: [] }]), null);
+  assert.equal(at([a, { ...b, emotionIds: ["Not An Id"] }]), null);
+  assert.equal(at([a, { ...b, emotionIds: Array.from({ length: 9 }, (_, i) => `e${i}`) }]), null);
+  assert.equal(at("spots"), null);
+  assert.equal(at(undefined), null);
+  // Stored: only ids that exist; a spot left with none drops the field.
+  assert.equal(v.spotsJson([a, b], new Set(["anxious", "excited"])), JSON.stringify([a, b]));
+  assert.equal(v.spotsJson([a, b], new Set(["anxious"])), null);
+  assert.equal(v.spotsJson(null, new Set(["anxious"])), null);
+});
+
+test("tool sessions carry emotion ids from the link: display names and ids both read, capped at 20 (parts data fix 5)", () => {
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: ["Anxious", "Overwhelmed"] }), ["anxious", "overwhelmed"]);
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: ["hurt", "let_down"] }), ["hurt", "let_down"], "a tool's hand-off sends ids");
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: ["Not A Feeling", 7, "", null, "Hurt"] }), ["hurt"]);
+  assert.deepEqual(link.emotionIdsFromLink({ checkinEmotions: "Anxious" }), []);
+  assert.deepEqual(link.emotionIdsFromLink(null), []);
+  assert.deepEqual(link.emotionIdsFromLink({}), []);
+  assert.equal(link.sessionEmotionIds(Array.from({ length: 30 }, (_, i) => `e${i}`)).length, 20);
+  assert.deepEqual(link.sessionEmotionIds(["a".repeat(101), "hurt"]), ["hurt"], "never an id the server refuses");
+  // An urge pick: the tool's own ids, deduped, at most the server's 10, never one it refuses.
+  assert.deepEqual(link.sessionUrgeIds(["hide", "hide", "fear-avoid"]), ["hide", "fear-avoid"]);
+  assert.equal(link.sessionUrgeIds(Array.from({ length: 30 }, (_, i) => `u${i}`)).length, 10);
+  assert.deepEqual(link.sessionUrgeIds(["My urge is different", "", null, "Hide", "anger-attack"]), ["anger-attack"]);
+});
+
 test("tool links keep the legacy state and add spine.checkInId", () => {
   assert.deepEqual(link.fromCheckIn(ID, ["Anxious"], "acute_alarm"),
     { checkinEmotions: ["Anxious"], activationPatternId: "acute_alarm", spine: { entry: "checkin_result", checkInId: ID } });

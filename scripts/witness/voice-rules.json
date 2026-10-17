@@ -1,69 +1,97 @@
 {
   "version": "voice-v1",
-  "about": "The witness voice contract (WMP-01 A, E3 §A5.2.4). Regex rules live here; structural rules (length, slots, levels, review) are in scripts/voice-lint.mjs. Severity per scope: validation (ValidationLine text), feeling_copy (copy that answers a feeling), user_copy (other app copy). 'report' never fails. Nothing the user writes is ever linted.",
+  "about": "The witness voice contract (WMP-01 A, E3 §A5.2.4). Regex rules live here; structural rules (length, slots, levels, review) are in scripts/voice-lint.mjs. Severity per scope: validation (ValidationLine text), feeling_copy (copy that answers a feeling), user_copy (other app copy). Parts copy (schema/parts.cypher, `// @parts-copy-json` rows): parts_prompt is the app's own questions and statements in parts flows, second person, the strictest scope; parts_chip is an answer the person taps, in their own first-person voice, so everything a prompt gets except voice_distance; parts_voice is what a part says, quoted and deliberately unsoftened, so only the safety rules apply. 'report' never fails. Nothing the user writes is ever linted.",
   "rules": [
     {
       "id": "no_interpretation",
       "pattern": "\\byou're right\\b|\\bthey were wrong\\b|\\bit was (unkind|wrong)\\b|\\bthis was wrong\\b|\\bthey don't care\\b|\\bthey meant\\b",
       "flags": "i",
-      "severity": { "validation": "error" },
+      "severity": { "validation": "error", "parts_prompt": "error", "parts_chip": "error" },
       "message": "Validate the feeling, never an interpretation or another person's intent."
     },
     {
       "id": "no_cheer",
       "pattern": "great job|amazing|proud of you|awesome|well done|!",
       "flags": "i",
-      "severity": { "validation": "error", "feeling_copy": "error", "user_copy": "warn" },
+      "severity": { "validation": "error", "feeling_copy": "error", "user_copy": "warn", "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error" },
       "message": "Flat, warm witness: no cheer on feelings, no exclamation marks."
     },
     {
       "id": "no_emoji",
       "pattern": "[\\u{1F000}-\\u{1FAFF}\\u{2600}-\\u{27BF}\\u{2B50}\\u{2728}]",
       "flags": "u",
-      "severity": { "validation": "error", "feeling_copy": "error" },
+      "severity": { "validation": "error", "feeling_copy": "error", "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error" },
       "message": "No emoji in validation or feeling copy."
     },
     {
       "id": "and_not_but",
       "pattern": "[,.;:] but\\b",
       "flags": "i",
-      "severity": { "validation": "error" },
+      "severity": { "validation": "error", "parts_prompt": "error", "parts_chip": "error" },
       "message": "And, not but: a second clause never takes the first one back."
     },
     {
       "id": "no_minimising",
       "pattern": "\\bat least\\b|\\bdon't worry\\b|\\bjust\\b|\\beverything happens\\b|\\bit'll be fine\\b|\\bcalm down\\b",
       "flags": "i",
-      "severity": { "validation": "error" },
+      "severity": { "validation": "error", "parts_prompt": "error", "parts_chip": "error" },
       "message": "No minimising or reassurance."
     },
     {
       "id": "no_should",
       "pattern": "\\bshould\\b",
       "flags": "i",
-      "severity": { "validation": "error", "feeling_copy": "warn", "user_copy": "warn" },
+      "severity": { "validation": "error", "feeling_copy": "warn", "user_copy": "warn", "parts_prompt": "error", "parts_chip": "error" },
       "message": "No shoulds."
     },
     {
       "id": "no_diagnosis",
       "pattern": "\\boverreact\\w*|\\boversensitiv\\w*",
       "flags": "i",
-      "severity": { "validation": "error" },
+      "severity": { "validation": "error", "parts_prompt": "error", "parts_chip": "error" },
       "message": "No diagnosis words."
     },
     {
       "id": "no_physiology",
       "pattern": "\\bvag(us|al)\\b|\\bventral\\b|\\bdorsal\\b|\\boffline\\b|\\bhijack\\w*|\\bamygdala\\b|\\bcortex\\b|\\bnervous system\\b|\\bneuroscience\\b|\\blanguage cent(er|re)s\\b|\\balarm systems?\\b",
       "flags": "i",
-      "severity": { "validation": "error", "feeling_copy": "report", "user_copy": "report" },
+      "severity": { "validation": "error", "feeling_copy": "report", "user_copy": "report", "parts_prompt": "error", "parts_chip": "error", "parts_voice": "report" },
       "message": "No physiology claims in validation lines (D-04: report-only elsewhere)."
     },
     {
       "id": "voice_distance",
       "pattern": "\\bI\\b|\\b[Mm]y\\b|\\b[Mm]e\\b|\\bI'(m|ve|ll|d)\\b",
       "flags": "",
-      "severity": { "validation": "error" },
+      "severity": { "validation": "error", "parts_prompt": "error" },
       "message": "App lines speak as a witness (you, or the user's name); first person only in lines the user writes."
+    },
+    {
+      "id": "no_role_labels",
+      "pattern": "\\b(exiles?|firefighters?|unburden\\w*|legacy burdens?|self-energy|trailheads?)\\b",
+      "flags": "i",
+      "severity": { "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error", "validation": "error", "user_copy": "warn" },
+      "message": "Parts are known by what they do, in the person's words; the model's role words stay internal."
+    },
+    {
+      "id": "no_role_manager",
+      "pattern": "\\bmanagers?\\b",
+      "flags": "i",
+      "severity": { "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error" },
+      "message": "\"Manager\" is a role label in parts copy (and a boss everywhere else, so only parts scopes)."
+    },
+    {
+      "id": "no_part_blame",
+      "pattern": "\\bparts?( of (you|me))? (made|makes|forced|forces) (you|me)\\b",
+      "flags": "i",
+      "severity": { "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error", "validation": "error" },
+      "message": "A part wanted something; the person acted. Never 'the part made you'."
+    },
+    {
+      "id": "no_ideation_echo",
+      "pattern": "\\b(disappear\\w*|vanish\\w*|die|dies|died|dying|dead|kill\\w*|suicid\\w*|end it all|end (my|your) life|not be here|not (wake|waking) up|better off without me)\\b",
+      "flags": "i",
+      "severity": { "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error", "validation": "error", "user_copy": "report" },
+      "message": "Never put death or disappearing words in the app's mouth or the person's chips. Crisis copy goes through the crisis seam."
     }
   ],
   "structural": [
@@ -74,6 +102,8 @@
     { "id": "level6_capacity", "severity": { "validation": "error" }, "message": "Level 6 is about capacity, never worth or flattery." },
     { "id": "reviewed_live", "severity": { "validation": "error" }, "message": "A live line has been reviewed (reviewStatus reviewed, reviewedAt set)." },
     { "id": "receive_before_change", "severity": { "flow": "error" }, "message": "In a flow that declares step kinds, a receive step precedes any change step." },
-    { "id": "skip_always", "severity": { "component": "error" }, "message": "The receive beat always renders skip, none of these fit and say it my way." }
+    { "id": "skip_always", "severity": { "component": "error" }, "message": "The receive beat always renders skip, none of these fit and say it my way." },
+    { "id": "parts_max_length", "severity": { "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error" }, "message": "Prompts and keepsakes ≤ 90 characters, chips ≤ 60, part voices ≤ 40; slots count at their width." },
+    { "id": "parts_slots", "severity": { "parts_prompt": "error", "parts_chip": "error", "parts_voice": "error" }, "message": "Only the parts slots, only in prompts (all) and keepsakes ({A} {B} {want})." }
   ]
 }

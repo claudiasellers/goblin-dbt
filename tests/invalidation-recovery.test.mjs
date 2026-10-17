@@ -225,6 +225,58 @@ test("Back restores the data snapshot, and double pushes are ignored", () => {
   assert.equal(top.stateId, "brushed");
 });
 
+test("the angry-part card is offered for fight back under the line, with its copy ready, once a visit", () => {
+  const g = flow.gates;
+  const offer = (d, ready = true, offered = false) => flowLib.offerAngryCard(d, g, ready, offered);
+  assert.equal(offer({ pull: "fight", now: g.downshiftAt - 1 }), true);
+  assert.equal(offer({ pull: "fight", now: 0 }), true);
+  // Never while flooded: at or over the line, at the start or after the body steps' re-rating.
+  assert.equal(offer({ pull: "fight", now: g.downshiftAt }), false);
+  assert.equal(offer({ pull: "fight", now: 10 }), false);
+  assert.equal(offer({ pull: "fight", now: null }), false);
+  for (const pull of ["chase", "hide", "freeze", null]) assert.equal(offer({ pull, now: 2 }), false, `${pull}`);
+  assert.equal(offer({ pull: "fight", now: 2 }, false), false, "copy not ready: no card");
+  assert.equal(offer({ pull: "fight", now: 2 }, true, true), false, "already offered in this visit");
+});
+
+test("step machine: the angry card sits between settling and naming, and leaves the way settling would have", () => {
+  const A = { protocol: "not_received", secondaryProtocol: null };
+  const D = { protocol: "not_received", secondaryProtocol: "attachment_alarm" };
+  const d = { ...flowLib.EMPTY_FLOW, pull: "fight", gate: "none", now: 4 };
+  // From loud (gate none) and from rerate (back under the line, rerateTo label).
+  assert.equal(flowLib.nextStep("loud", d, A, true), "angry");
+  assert.equal(flowLib.nextStep("loud", d, A, false), "label");
+  assert.equal(flowLib.nextStep("rerate", d, A, true), "angry");
+  assert.equal(flowLib.nextStep("rerate", d, A, false), "label");
+  // A downshift gate always goes to the body first, and the route's unlock re-rating never detours.
+  assert.equal(flowLib.nextStep("loud", { ...d, gate: "downshift" }, A, true), "stop");
+  assert.equal(flowLib.nextStep("rerate", { ...d, rerateTo: "route" }, A, true), "route");
+  // Out of the card: secure first for attachment states (unless it ran already), else label.
+  assert.equal(flowLib.nextStep("angry", d, A), "label");
+  assert.equal(flowLib.nextStep("angry", d, D), "secure");
+  assert.equal(flowLib.nextStep("angry", { ...d, skills: ["breathe", "secure"] }, D), "label");
+  assert.equal(flowLib.nextStep("loud", d, D, false), flowLib.nextStep("angry", d, D), "the card leaves where loud would have gone");
+  // It's in the Name phase, before label.
+  const name = flowLib.PHASES.find((p) => p.key === "name");
+  assert.deepEqual(name.steps, ["angry", "label"]);
+  assert.equal(flowLib.phaseIndex("angry"), flowLib.phaseIndex("label"));
+});
+
+test("Back out of the angry card restores the data, and Back into it is just the stack", () => {
+  let h = flowLib.initialHistory();
+  h = flowLib.flowReducer(h, { type: "go", step: "loud", patch: { stateId: "brushed" } });
+  h = flowLib.flowReducer(h, { type: "go", step: "angry", patch: { intensity: 4, pull: "fight", urge: 6, now: 4 } });
+  h = flowLib.flowReducer(h, { type: "go", step: "label", patch: {} });
+  h = flowLib.flowReducer(h, { type: "back" });
+  assert.equal(h.stack[h.stack.length - 1].step, "angry");
+  assert.equal(h.stack[h.stack.length - 1].data.pull, "fight");
+  h = flowLib.flowReducer(h, { type: "back" });
+  const top = h.stack[h.stack.length - 1];
+  assert.equal(top.step, "loud");
+  assert.equal(top.data.pull, null);
+  assert.equal(h.prefill.now, 4, "loud's controls prefill from the abandoned entry");
+});
+
 test("validation lines render in distanced or second-person voice", () => {
   const line = "{N}'s hurt makes sense. {N} can know this hurt without needing them to be the villain.";
   assert.equal(lib.renderValidationLine(line, "Sam", "x"), "Sam's hurt makes sense. Sam can know this hurt without needing them to be the villain.");

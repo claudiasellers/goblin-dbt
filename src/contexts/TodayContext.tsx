@@ -6,6 +6,11 @@ import { getToday, type GetTodayResponse } from '../services/spine';
 import { useBand } from '../hooks/useBand';
 import { useProfileContext } from '../hooks/useProfileContext';
 import { inQuietHours } from '../lib/quietHours';
+import { useUserProfile } from './UserProfileContext';
+import { getPartsContent } from '../services/partsContent';
+import { checkbackReady, PART_CHECKBACK_TYPE, TWO_PULLS_CHECKBACK_TYPE, twoCheckbackReady, withReadyCheckbacks } from '../lib/partCheckback';
+import { TRAIL_OFFER_KIND, trailOfferReady, withReadyTrailOffers } from '../lib/trailOffer';
+import type { PartsContent } from '../data/partsContentTypes';
 
 const FOCUS_REFETCH_MS = 5 * 60_000;
 const MAX_NOTIFY_DELAY_MS = 24 * 3_600_000;
@@ -32,6 +37,10 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   const [hidden, setHidden] = useState(false);
   const [oaHidden, setOaHidden] = useState<ReadonlySet<string>>(new Set());
   const lastFetch = useRef(0);
+  // Parts check-backs (part-checkback): shown only with parts on here too, and only once every word
+  // of the card is signed off (flowReady). The parts copy loads only when there is one to show.
+  const partsOn = useUserProfile().profile.partsEnabled === true;
+  const [partsContent, setPartsContent] = useState<PartsContent | null>(null);
 
   useEffect(() => {
     if (!uid) return;
@@ -58,6 +67,20 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   }, [uid, refresh]);
 
   const current = data && data.uid === uid ? data.res : null;
+  // Trail offers (Phase 4) the same way: parts on here too, every word of the card signed off.
+  // A part's check-back and Two pulls' both read parts content: either alone loads it.
+  const hasCheckback = !!current && [...current.items, ...current.more].some((i) => i.type === PART_CHECKBACK_TYPE || i.type === TWO_PULLS_CHECKBACK_TYPE);
+  const hasTrailOffer = !!current && [...current.items, ...current.more].some((i) => i.kind === TRAIL_OFFER_KIND);
+  const needsParts = hasCheckback || hasTrailOffer;
+  useEffect(() => {
+    if (!partsOn || !needsParts || partsContent) return;
+    let live = true;
+    getPartsContent().then((c) => { if (live) setPartsContent(c); }).catch(() => { /* no card */ });
+    return () => { live = false; };
+  }, [partsOn, needsParts, partsContent]);
+  const checkbacksShown = partsOn && checkbackReady(partsContent);
+  const twoCheckbacksShown = partsOn && twoCheckbackReady(partsContent);
+  const offersShown = partsOn && trailOfferReady(partsContent);
   const next = current?.nextInTab ?? null;
   useEffect(() => {
     if (!next) return;
@@ -83,8 +106,9 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   }, [next, navigate, refresh, quiet]);
 
   const value = useMemo<TodayValue>(() => ({
-    items: (current?.items ?? []).filter((i) => !dropped.has(i.id)),
-    more: (current?.more ?? []).filter((i) => !dropped.has(i.id)),
+    items: withReadyCheckbacks(withReadyTrailOffers((current?.items ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown, twoCheckbacksShown),
+    more: withReadyCheckbacks(withReadyTrailOffers((current?.more ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown, twoCheckbacksShown),
+    partsContent: checkbacksShown || twoCheckbacksShown || offersShown ? partsContent : null,
     holding: current?.holding ?? false,
     ready: !!current,
     refresh,
@@ -93,7 +117,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     setHidden,
     oaHidden,
     hideOa,
-  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa]);
+  }), [current, dropped, refresh, drop, hidden, oaHidden, hideOa, checkbacksShown, twoCheckbacksShown, offersShown, partsContent]);
 
   return <TodayContext.Provider value={value}>{children}</TodayContext.Provider>;
 }

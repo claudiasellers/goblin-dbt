@@ -8,6 +8,7 @@ import { getDriver, neo4jUri, neo4jUser, neo4jPassword, withSession } from '../s
 import { admin, authAdmin } from '../shared/admin';
 import { applyRetention, deleteUserGraph, exportUserRecords, plain } from '../userdata/exportDelete';
 import { toNumber } from '../shared/values';
+import { errorTag } from '../shared/errors';
 import { toSavedOppositeActionSession } from '../oppositeAction';
 
 /**
@@ -36,7 +37,7 @@ export const ensureUserExists = onCall(
 
       return { success: true };
     } catch (error) {
-      console.error('Error ensuring user exists:', error);
+      console.error('ensureUserExists failed', errorTag(error));
       throw new HttpsError('internal', 'Failed to create user');
     } finally {
       await session.close();
@@ -75,6 +76,9 @@ const PROFILE_DEFAULTS = {
   dataRetentionDays: null,
   shareAnonymousData: false,
   timeZone: null,
+  // Parts (docs/design/parts.md, "The switch"): off by default. A setting, not profile data:
+  // turning it off hides parts and stops offers, and deletes nothing.
+  partsEnabled: false,
 };
 
 /**
@@ -110,6 +114,7 @@ export const getUserProfile = onCall(
         // Clean up Neo4j integer types
         dataRetentionDays: userNode.dataRetentionDays != null ? toNumber(userNode.dataRetentionDays) : null,
         reminderDays: userNode.reminderDays ?? PROFILE_DEFAULTS.reminderDays,
+        partsEnabled: userNode.partsEnabled === true,
       };
 
       // Remove internal fields. The settings profile is cached in localStorage for the theme paint:
@@ -131,13 +136,13 @@ export const getUserProfile = onCall(
           await applyRetention(session, userId, retentionDays);
         } catch (cleanupErr) {
           // Don't fail the profile load if cleanup fails
-          console.warn('Data retention cleanup failed:', cleanupErr);
+          console.warn('getUserProfile retention failed', errorTag(cleanupErr));
         }
       }
 
       return { profile };
     } catch (error) {
-      console.error('Error getting user profile:', error);
+      console.error('getUserProfile failed', errorTag(error));
       throw new HttpsError('internal', 'Failed to get profile');
     } finally {
       await session.close();
@@ -166,7 +171,7 @@ export const updateUserProfile = onCall(
     const allowedFields = [
       'displayName', 'photoURL', 'theme', 'palette',
       'checkInReminder', 'reminderTime', 'reminderDays', 'weeklyDigest',
-      'dataRetentionDays', 'shareAnonymousData', 'timeZone',
+      'dataRetentionDays', 'shareAnonymousData', 'timeZone', 'partsEnabled',
     ];
 
     const cleanUpdates: Record<string, unknown> = {};
@@ -180,6 +185,11 @@ export const updateUserProfile = onCall(
     const allowedPalettes = ['velvet', 'dusk', 'tinted', 'pastel', 'pastel-mix', 'daylight'];
     if ('palette' in cleanUpdates && !allowedPalettes.includes(String(cleanUpdates.palette))) {
       throw new HttpsError('invalid-argument', 'Unknown palette');
+    }
+
+    // The parts switch is a real boolean or nothing: a truthy string must never turn parts on.
+    if ('partsEnabled' in cleanUpdates && typeof cleanUpdates.partsEnabled !== 'boolean') {
+      throw new HttpsError('invalid-argument', 'partsEnabled must be true or false');
     }
 
     // IANA time zone (follow-up windows, quiet hours, later push). Unknown zones are dropped.
@@ -221,7 +231,7 @@ export const updateUserProfile = onCall(
 
       return { success: true };
     } catch (error) {
-      console.error('Error updating user profile:', error);
+      console.error('updateUserProfile failed', errorTag(error));
       throw new HttpsError('internal', 'Failed to update profile');
     } finally {
       await session.close();
@@ -247,7 +257,7 @@ export const deleteUserData = onCall(
     try {
       await withSession((session) => deleteUserGraph(session, userId));
     } catch (error) {
-      console.error('Error deleting user data:', (error as { code?: string })?.code ?? 'unknown');
+      console.error('deleteUserData failed', errorTag(error));
       throw new HttpsError('internal', 'Failed to delete user data');
     }
     if (deleteAuth) {
@@ -255,7 +265,7 @@ export const deleteUserData = onCall(
         await authAdmin().deleteUser(userId);
       } catch (error) {
         if ((error as { code?: string })?.code !== 'auth/user-not-found') {
-          console.error('Error deleting auth user:', (error as { code?: string })?.code ?? 'unknown');
+          console.error('deleteUserData auth delete failed', errorTag(error));
           throw new HttpsError('internal', 'Your data was deleted, but the sign-in could not be removed. Try again.');
         }
       }
@@ -365,7 +375,7 @@ export const exportUserData = onCall(
         },
       };
     } catch (error) {
-      console.error('Error exporting user data:', error);
+      console.error('exportUserData failed', errorTag(error));
       throw new HttpsError('internal', 'Failed to export data');
     } finally {
       await session.close();

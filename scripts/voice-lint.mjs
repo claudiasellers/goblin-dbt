@@ -3,25 +3,30 @@
  * The witness voice lint (WMP-01 A, E3 §A5.2.4). One implementation, imported by the tests and by
  * scripts/load-graph.mjs; the Python build scripts don't re-implement the rules.
  *
- *   lintText(text, ctx)       regex rules for one string in a scope (validation | feeling_copy | user_copy)
+ *   lintText(text, ctx)       regex rules for one string in a scope (validation | feeling_copy | user_copy |
+ *                             parts_prompt | parts_chip | parts_voice)
  *   lintLine(row)             one ValidationLine: text + textNamed + structural rules
  *   lintCorpus(rows)          every line → findings [{id, field, rule, severity, message}]
  *   corpusFromCypher(src)     the rows build.py writes after each `// @corpus-json ` marker
  *   flowDocStrings(src, file) every string in a generated file's contentJson / copyJson, with a path
  *   lintFlowDocs(files)       those strings as user copy → findings [{file, path, rule, severity}]
  *   lintFlowOrder(steps)      receive_before_change for a flow that declares steps[].kind (none do yet)
+ *   partsCopyFromCypher(src)  the parts copy rows after each `// @parts-copy-json ` marker in schema/parts.cypher
+ *   lintPartsCopy(rows)       each row in its kind's scope (parts_prompt | parts_chip | parts_voice) + length and
+ *                             slot rules → findings [{id, field, kind, rule, severity, message, match}]
  *   gateProblems(fileNames)   what scripts/load-graph.mjs refuses to send
  *
  * CLI:
- *   node scripts/voice-lint.mjs            lint the committed corpus + flow docs; exit 1 on errors or new flow-doc findings
+ *   node scripts/voice-lint.mjs            lint the committed corpus + flow docs, and schema/parts.cypher when it exists;
+ *                                          exit 1 on errors or new flow-doc findings
  *   node scripts/voice-lint.mjs --write-baseline   regenerate scripts/witness/voice-baseline.json from today's flow docs
  *                                          (only ever to shrink it: new findings are fixed in the source, not baselined)
  *   node scripts/voice-lint.mjs --report   also print a table over src/**\/*.tsx JSX text and hand-written schema copy
  *                                          (acknowledgment, psAcknowledgment, validationText, userFacingLabel …); never fails
  *
- * Never linted: anything the user writes (OwnLine text).
+ * Never linted: anything the user writes (OwnLine text, a part's name or words the person types).
  */
-import { readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -29,10 +34,12 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 export const RULES_FILE = join(root, 'scripts/witness/voice-rules.json');
 export const BASELINE_FILE = join(root, 'scripts/witness/voice-baseline.json');
 export const WITNESS_FILE = join(root, 'schema/witness.cypher');
+export const PARTS_FILE = join(root, 'schema/parts.cypher');
 /** Generated flow documents whose user copy is linted against the baseline (E3 §A5.2.4 (c)). */
 export const FLOW_DOC_FILES = [
   'schema/find-the-feeling.cypher', 'schema/invalidation-recovery.cypher', 'schema/capacity.cypher',
-  'schema/opposite-action-flow.cypher', 'schema/practice-spine.cypher',
+  'schema/opposite-action-flow.cypher', 'schema/practice-spine.cypher', 'schema/wise-mind.cypher',
+  'schema/cope-ahead.cypher',
 ];
 
 export const RULESET = JSON.parse(readFileSync(RULES_FILE, 'utf8'));
@@ -172,6 +179,86 @@ export function lintFlowDocOrder(files = FLOW_DOC_FILES) {
   return out;
 }
 
+// ---- parts copy (schema/parts.cypher) ----
+
+/**
+ * Parts slots and the width each counts as when measuring length: a realistic filled value, not the
+ * witness lint's 8, because a part's name or a pull is what the person typed or picked.
+ */
+export const PARTS_SLOT_WIDTH = {
+  name: 24, A: 24, B: 24, move: 32, pull: 18, pull2: 18, hurt: 28, goal: 32,
+  context: 24, anchor: 90, month: 9, want: 20, N: 2, matters: 28, felt: 24,
+  // A body place label in lower case (src/data/bodyFigure.ts): the longest is "whole body" / "upper back".
+  place: 10,
+  // The parts stats lines (common/stats): the longest tool name in src/data/tools.ts ("Recover from a
+  // hurtful moment"), a count, the longest meet/feel label ("warm toward it"), the longest when_* label.
+  tool: 29, n: 3, then: 14, now: 14, when: 10,
+  // Reflect's line across parts (stats_feel_lately / stats_feel_earlier): a meet/feel label, as then / now.
+  feel: 14,
+  // A part's story (story_job_then / story_job_now): a job as the card shows it, at its longest chip
+  // label (meet/job and meet/rather); the person's own words can be longer and wrap.
+  old: 48, new: 48,
+  // Steps that helped: one step's graph label (ActionUrge steps run long and wrap; the lint counts a
+  // realistic one), and the joined list as the line holds it.
+  step: 60, steps: 60,
+  // Say something to it (say_told / say_story): a chip's label at its longest ("You're safe with me now");
+  // the person's own words (≤ 140) can be longer and wrap.
+  said: 24,
+};
+
+/** Row kind → lint scope, length limit and the slots it may carry. */
+export const PARTS_KINDS = {
+  prompt: { scope: 'parts_prompt', maxChars: 90, slots: Object.keys(PARTS_SLOT_WIDTH) },
+  chip: { scope: 'parts_chip', maxChars: 60, slots: [] },
+  voice: { scope: 'parts_voice', maxChars: 40, slots: [] },
+  keepsake: { scope: 'parts_chip', maxChars: 90, slots: ['A', 'B', 'want'] },
+  // The person's own sentence (the angry card's "I felt {felt}."): its "I" is theirs, so chip rules.
+  first_person: { scope: 'parts_chip', maxChars: 90, slots: ['felt'] },
+};
+
+/**
+ * "Me" is the app's screen name (the profile surface), not the app speaking in first person: in parts
+ * copy a capitalised "Me" inside a sentence passes voice_distance ("It's in Me when you want it.").
+ * Lower-case "me", and "Me" opening a sentence, still fail. Lint only: lengths count the real text.
+ */
+export const PARTS_SCREEN_NAME = /(?<=[^.!?]\s)Me\b/g;
+const screenNamed = (t) => norm(t).replace(PARTS_SCREEN_NAME, 'Xx');
+
+/** Every slot at its width; an unknown slot keeps its literal text (it is a parts_slots finding anyway). */
+const partsFilled = (t) => norm(t).replace(/\{(\w+)\}/g, (s, name) => (name in PARTS_SLOT_WIDTH ? 'x'.repeat(PARTS_SLOT_WIDTH[name]) : s));
+
+/** The rows the content build writes as single-line JSON after `// @parts-copy-json ` markers. */
+export function partsCopyFromCypher(src) {
+  const rows = [];
+  for (const m of src.matchAll(/^\/\/ @parts-copy-json (.+)$/gm)) rows.push(...JSON.parse(m[1]));
+  return rows;
+}
+
+/**
+ * Each row {id, field, kind, text} in its kind's scope, plus parts_max_length and parts_slots.
+ * Error and warn only. An unknown kind is itself an error, so a typo can't skip the lint.
+ */
+export function lintPartsCopy(rows) {
+  const out = [];
+  for (const row of rows) {
+    const { id, field, kind } = row;
+    const k = Object.hasOwn(PARTS_KINDS, kind) ? PARTS_KINDS[kind] : null;
+    if (!k) {
+      out.push({ id, field, kind, rule: 'parts_slots', severity: 'error',
+        message: `Unknown parts copy kind; use one of ${Object.keys(PARTS_KINDS).join(', ')}.`, match: `kind ${kind}` });
+      continue;
+    }
+    const push = (f) => { if (f.severity === 'error' || f.severity === 'warn') out.push({ id, field, kind, ...f }); };
+    const structural = (rule, match) => push({ rule, severity: STRUCT[rule].severity[k.scope], message: STRUCT[rule].message, match });
+    for (const f of lintText(screenNamed(row.text), { scope: k.scope })) push(f);
+    const len = partsFilled(row.text).length;
+    if (len > k.maxChars) structural('parts_max_length', `${len} chars, ${kind} max ${k.maxChars}`);
+    const bad = [...norm(row.text).matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((s) => !k.slots.includes(s));
+    if (bad.length) structural('parts_slots', bad.map((s) => `{${s}}`).join(' '));
+  }
+  return out;
+}
+
 export const findingKey = (f) => `${f.file}|${f.path}|${f.rule}`;
 
 /** Flow-doc findings not in the baseline, and baseline entries that no longer fail (both must be empty). */
@@ -185,14 +272,19 @@ export function compareBaseline(findings, baseline = JSON.parse(readFileSync(BAS
 }
 
 /**
- * The loader's gate (scripts/load-graph.mjs): errors in the corpus, or new flow-doc findings, in
- * the files about to load. Returns human-readable problems ([] = go).
+ * The loader's gate (scripts/load-graph.mjs): errors in the corpus or the parts copy, or new
+ * flow-doc findings, in the files about to load. Returns human-readable problems ([] = go).
  */
 export function gateProblems(fileNames) {
   const problems = [];
   if (fileNames.includes('witness.cypher')) {
     for (const f of lintCorpus(corpusFromCypher(readFileSync(WITNESS_FILE, 'utf8')))) {
       if (f.severity === 'error') problems.push(`witness ${f.id} ${f.field}: ${f.rule} (${f.match ?? ''}) ${f.message}`);
+    }
+  }
+  if (fileNames.includes('parts.cypher') && existsSync(PARTS_FILE)) {
+    for (const f of lintPartsCopy(partsCopyFromCypher(readFileSync(PARTS_FILE, 'utf8')))) {
+      if (f.severity === 'error') problems.push(`parts ${f.id} ${f.field}: ${f.rule} (${f.match ?? ''}) ${f.message}`);
     }
   }
   const flow = FLOW_DOC_FILES.filter((f) => fileNames.includes(f.replace(/^schema\//, '')));
@@ -273,9 +365,15 @@ async function main() {
   for (const e of stale) console.error(`! baseline entry no longer fails, remove it: ${findingKey(e)}`);
   const order = lintFlowDocOrder();
   for (const f of order) console.error(`✗ ${f.file}: ${f.rule} (${f.match}) ${f.message}`);
-  console.log(`voice lint: ${rows.length} lines, ${corpus.length} corpus error(s), ${fresh.length} new flow-doc finding(s), ${stale.length} stale baseline entr(ies)`);
+  // Parts copy is written by its own content build; until that lands there is nothing to lint.
+  const partsRows = existsSync(PARTS_FILE) ? partsCopyFromCypher(readFileSync(PARTS_FILE, 'utf8')) : null;
+  const parts = partsRows ? lintPartsCopy(partsRows) : [];
+  for (const f of parts) console.error(`${f.severity === 'error' ? '✗' : '!'} parts ${f.id} ${f.field}: ${f.rule} (${f.match ?? ''}) ${f.message}`);
+  const partsErrors = parts.filter((f) => f.severity === 'error').length;
+  console.log(`voice lint: ${rows.length} lines, ${corpus.length} corpus error(s), ${fresh.length} new flow-doc finding(s), ${stale.length} stale baseline entr(ies)`
+    + (partsRows ? `, ${partsRows.length} parts row(s) with ${partsErrors} error(s)` : ''));
   if (process.argv.includes('--report')) await report();
-  if (corpus.length || fresh.length || stale.length || order.length) process.exitCode = 1;
+  if (corpus.length || fresh.length || stale.length || order.length || partsErrors) process.exitCode = 1;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {

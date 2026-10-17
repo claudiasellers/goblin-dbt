@@ -23,19 +23,33 @@ const REGEX_FIXTURES = [
   ["no_diagnosis", "This is real pain.", "This is real pain, not oversensitivity."],
   ["no_physiology", "Losing connection sets off a real alarm.", "Rejection sets off alarm systems that overlap with pain."],
   ["voice_distance", "Your hurt makes sense.", "My hurt makes sense to me."],
+  ["no_role_labels", "Asking isn't a burden. Guessing is.", "That was your exile talking."],
+  ["no_part_blame", "A part of you wanted to hit back, and you waited.", "A part of you made you say it."],
+  ["no_ideation_echo", "The deadline is close.", "You wanted to disappear."],
+];
+// [rule, scope, passes, fails] for regex rules with no validation scope
+const SCOPED_FIXTURES = [
+  ["no_role_manager", "parts_prompt", "What does it do for you?", "Meet the manager."],
 ];
 
 test("every rule in voice-rules.json has fixtures here", () => {
   const regexIds = RULESET.rules.map((r) => r.id).sort();
-  assert.deepEqual(REGEX_FIXTURES.map(([id]) => id).sort(), regexIds);
+  assert.deepEqual([...REGEX_FIXTURES, ...SCOPED_FIXTURES].map(([id]) => id).sort(), regexIds);
   const structural = RULESET.structural.map((r) => r.id).sort();
-  assert.deepEqual(structural, ["flooded_short", "level3_tentative", "level6_capacity", "max_length", "receive_before_change", "reviewed_live", "skip_always", "slots"]);
+  assert.deepEqual(structural, ["flooded_short", "level3_tentative", "level6_capacity", "max_length", "parts_max_length", "parts_slots", "receive_before_change", "reviewed_live", "skip_always", "slots"]);
 });
 
 for (const [id, ok, bad] of REGEX_FIXTURES) {
   test(`rule ${id}: passes and fails`, () => {
     assert.ok(!rules(ok).includes(id), `${id} should not fire on: ${ok}`);
     assert.ok(rules(bad).includes(id), `${id} should fire on: ${bad}`);
+  });
+}
+
+for (const [id, scope, ok, bad] of SCOPED_FIXTURES) {
+  test(`rule ${id} (${scope}): passes and fails`, () => {
+    assert.ok(!rules(ok, scope).includes(id), `${id} should not fire on: ${ok}`);
+    assert.ok(rules(bad, scope).includes(id), `${id} should fire on: ${bad}`);
   });
 }
 

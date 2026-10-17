@@ -1,0 +1,279 @@
+/**
+ * Parts (docs/design/parts.md). Phase 2's server: the entry gate every parts flow opens with, and
+ * Meet a part's session record. Off by default (the `partsEnabled` setting); the client calls these
+ * only with parts on, and the writers refuse otherwise.
+ */
+import { callable } from '../shared/callable';
+import { readTx, writeTx } from '../shared/neo4j';
+import { parseOrInvalid } from '../shared/errors';
+import { getPartsEntryHandler } from './handler';
+import { graphDeps } from './queries';
+import type { PartsEntry } from './types';
+import { savePartSessionHandler, startPartSessionHandler } from './sessions';
+import { readPartsEntryInput, validateStartPartSession } from './validation';
+import { sessionDeps } from './sessionQueries';
+import { frontLinkWriter } from './frontLink';
+import type { PartSessionResponse } from './sessionTypes';
+import {
+  answerPartRevisitHandler, keepDeps, keepPartHandler, partEditDeps, partLayoutDeps, partShapeDeps, renamePartHandler,
+  restPartHandler, restorePartHandler, setAsidePartHandler, setPartAnchorHandler, setPartShapeHandler, setPartTenderHandler,
+  updatePartLayoutHandler,
+} from './keep';
+import {
+  validateAnchor, validateLayout, validatePartRef, validateRename, validateRest, validateRevisit, validateShape,
+} from './editPlan';
+import { validateKeep } from './keepPlan';
+import { candidateDeps, queuePartCandidateHandler, validateCandidate } from './candidate';
+import {
+  answerPartCandidateHandler, candidateAnswerDeps, validateCandidateAnswer, type AnswerPartCandidateResponse,
+} from './candidateAnswer';
+import type { KeepPartResponse, PartWriteResponse, QueuePartCandidateResponse } from './keepTypes';
+import { isTaggedTwice, tagDeps, tagPartHandler, validateTag } from './tag';
+import type { TagPartResponse } from './tagTypes';
+import { sayDeps, sayToPartHandler, validateSay } from './say';
+import type { SayToPartResponse } from './sayTypes';
+import {
+  answerCheckbackDeps, answerPartCheckbackHandler, scheduleCheckbackDeps, schedulePartCheckbackHandler,
+  validateAnswerCheckback, validateScheduleCheckback,
+} from './checkback';
+import type { AnswerPartCheckbackResponse, SchedulePartCheckbackResponse } from './checkbackTypes';
+import { linkPartsHandler, partLinkDeps, unlinkPartsHandler, validateLink, validateUnlink } from './links';
+import { denDeps, getDenHandler, getDenSnapshotHandler, validateSnapshotRef } from './den';
+import { getPartStoryHandler, storyDeps, validateStoryRef } from './story';
+import type { GetPartStoryResponse } from './storyTypes';
+import type {
+  GetDenResponse, GetDenSnapshotResponse, LinkPartsResponse, UnlinkPartsResponse, UpdatePartLayoutResponse,
+} from './denTypes';
+
+export { deleteMyParts, countMyPartsLines } from './delete';
+
+/** What a parts flow opens on: P2 first, the far-away heads-up, or clear (plus tooMany / paused). Never a lock. */
+export const getPartsEntry = callable<unknown, PartsEntry>(
+  { auth: 'required', label: 'getPartsEntry' },
+  async ({ uid, data }) => getPartsEntryHandler(graphDeps(uid as string), readPartsEntryInput(data)),
+);
+
+/** Open Meet a part's record for this visit (idempotent while open). Parts must be on. */
+export const startPartSession = callable<unknown, PartSessionResponse>(
+  { auth: 'required', label: 'startPartSession', errorMessage: 'Could not start' },
+  async ({ uid, data, request }) => {
+    const s = parseOrInvalid(() => validateStartPartSession(data), 'Invalid session');
+    return writeTx((tx) => startPartSessionHandler(s, sessionDeps(tx, uid as string, request.auth?.token?.email ?? null)));
+  },
+);
+
+/** Merge what the visit has so far; `final` saves it, and nothing changes it after that. */
+export const savePartSession = callable<unknown, PartSessionResponse>(
+  { auth: 'required', label: 'savePartSession', errorMessage: 'Could not save' },
+  async ({ uid, data, request }) =>
+    writeTx((tx) => savePartSessionHandler(data, sessionDeps(tx, uid as string, request.auth?.token?.email ?? null))),
+);
+
+/** 9b's yes: the part, built from the stored session. The only way a Part is made. */
+export const keepPart = callable<unknown, KeepPartResponse>(
+  { auth: 'required', label: 'keepPart', errorMessage: 'Could not keep it' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateKeep(data), 'Invalid request');
+    return writeTx((tx) => keepPartHandler(input, { ...keepDeps(tx, uid as string), link: frontLinkWriter(tx, uid as string) }));
+  },
+);
+
+/** A part to get to know another time, on a yes. Idempotent per id. */
+export const queuePartCandidate = callable<unknown, QueuePartCandidateResponse>(
+  { auth: 'required', label: 'queuePartCandidate', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateCandidate(data), 'Invalid request');
+    return writeTx((tx) => queuePartCandidateHandler(input, candidateDeps(tx, uid as string, request.auth?.token?.email ?? null)));
+  },
+);
+
+/** Me's "Not any more" on a part waiting to be got to know: open → dismissed, once. */
+export const answerPartCandidate = callable<unknown, AnswerPartCandidateResponse>(
+  { auth: 'required', label: 'answerPartCandidate', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateCandidateAnswer(data), 'Invalid request');
+    return writeTx((tx) => answerPartCandidateHandler(input, candidateAnswerDeps(tx, uid as string, input.candidateId)));
+  },
+);
+
+/**
+ * "Was this a part you know?" (after a better close) and DEAR MAN's debrief "who showed up?": one tag per
+ * ToolSession per source (tag.ts). A tag that lost a race for the same session and source (the taggedKey
+ * constraint) reads again and returns the first.
+ */
+export const tagPart = callable<unknown, TagPartResponse>(
+  { auth: 'required', label: 'tagPart', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateTag(data), 'Invalid request');
+    const run = () => writeTx((tx) => tagPartHandler(input, tagDeps(tx, uid as string, request.auth?.token?.email ?? null)));
+    try {
+      return await run();
+    } catch (e) {
+      if (!isTaggedTwice(e)) throw e;
+      return run();
+    }
+  },
+);
+
+/** "Say something to it": one message to the caller's own active or resting part (say.ts). A repeat id writes nothing. */
+export const sayToPart = callable<unknown, SayToPartResponse>(
+  { auth: 'required', label: 'sayToPart', errorMessage: 'Could not save that' },
+  async ({ uid, data, request }) => {
+    const input = parseOrInvalid(() => validateSay(data), 'Invalid request');
+    return writeTx((tx) => sayToPartHandler(input, sayDeps(tx, uid as string, request.auth?.token?.email ?? null)));
+  },
+);
+
+// ---- The part card (Me): each the caller's own part, parts on, one guarded write ----
+
+/** Rename a kept part ('' or null is "Not yet"). */
+export const renamePart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'renamePart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateRename(data), 'Invalid request');
+    return writeTx((tx) => renamePartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** Rest a part, or wake a resting one. */
+export const restPart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'restPart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateRest(data), 'Invalid request');
+    return writeTx((tx) => restPartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** "Not any more": set aside, kept and restorable. */
+export const setAsidePart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setAsidePart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validatePartRef(data), 'Invalid request');
+    return writeTx((tx) => setAsidePartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+export const restorePart = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'restorePart', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validatePartRef(data), 'Invalid request');
+    return writeTx((tx) => restorePartHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** Mark a part tender (no unmark yet). */
+export const setPartTender = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setPartTender', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validatePartRef(data), 'Invalid request');
+    return writeTx((tx) => setPartTenderHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** DEAR MAN's cope ahead: the part's anchor, a kept line or their own words. */
+export const setPartAnchor = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setPartAnchor', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateAnchor(data), 'Invalid request');
+    return writeTx((tx) => setPartAnchorHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+/** Find the feeling's "Use this shape for {name}?": the visit's own shape, on the person's yes. */
+export const setPartShape = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'setPartShape', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateShape(data), 'Invalid request');
+    return writeTx((tx) => setPartShapeHandler(input, partShapeDeps(tx, uid as string)));
+  },
+);
+
+/** The 30-day still-true for a part, logged once per id. */
+export const answerPartRevisit = callable<unknown, PartWriteResponse>(
+  { auth: 'required', label: 'answerPartRevisit', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateRevisit(data), 'Invalid request');
+    return writeTx((tx) => answerPartRevisitHandler(input, partEditDeps(tx, uid as string)));
+  },
+);
+
+// ---- The next-day check-back (its Today card registers itself in ./checkback) ----
+
+/** On the close's yes: check back with the kept part tomorrow. At most one open per part. */
+export const schedulePartCheckback = callable<unknown, SchedulePartCheckbackResponse>(
+  { auth: 'required', label: 'schedulePartCheckback', errorMessage: 'Could not schedule that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateScheduleCheckback(data, new Date()), 'Invalid request');
+    return writeTx((tx) => schedulePartCheckbackHandler(input, scheduleCheckbackDeps(tx, uid as string)));
+  },
+);
+
+/** "How's {name} today?" (and Two pulls' "How are {A} and {B} today?"): one write; Louder also pauses Meet a part's part. */
+export const answerPartCheckback = callable<unknown, AnswerPartCheckbackResponse>(
+  { auth: 'required', label: 'answerPartCheckback', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateAnswerCheckback(data), 'Invalid request');
+    return writeTx((tx) => answerPartCheckbackHandler(input, answerCheckbackDeps(tx, uid as string)));
+  },
+);
+
+// ---- The den (Me → Parts of me → See them together) ----
+
+/** The room: parts with a recency bucket, confirmed links, the snapshot list. Nothing with parts off. */
+export const getDen = callable<unknown, GetDenResponse>(
+  { auth: 'required', label: 'getDen', errorMessage: 'Could not load that' },
+  async ({ uid }) => readTx((tx) => getDenHandler(denDeps(tx, uid as string))),
+);
+
+/** One saved layout ("How it looked in {month}"). Nothing with parts off or when it isn't the caller's. */
+export const getDenSnapshot = callable<unknown, GetDenSnapshotResponse>(
+  { auth: 'required', label: 'getDenSnapshot', errorMessage: 'Could not load that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateSnapshotRef(data), 'Invalid request');
+    return readTx((tx) => getDenSnapshotHandler(input, denDeps(tx, uid as string)));
+  },
+);
+
+/** A part's story: how it has changed, by month. Nothing with parts off; someone else's or a set-aside part: not found. */
+export const getPartStory = callable<unknown, GetPartStoryResponse>(
+  { auth: 'required', label: 'getPartStory', errorMessage: 'Could not load that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateStoryRef(data), 'Invalid request');
+    return readTx((tx) => getPartStoryHandler(input, storyDeps(tx, uid as string)));
+  },
+);
+
+/** The den's drop: where the person put their parts. Positions only. */
+export const updatePartLayout = callable<unknown, UpdatePartLayoutResponse>(
+  { auth: 'required', label: 'updatePartLayout', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateLayout(data), 'Invalid request');
+    return writeTx((tx) => updatePartLayoutHandler(input, partLayoutDeps(tx, uid as string)));
+  },
+);
+
+/** On the person's yes: a link between two of their parts (one per pair and kind; a repeat keeps the latest answer). */
+export const linkParts = callable<unknown, LinkPartsResponse>(
+  { auth: 'required', label: 'linkParts', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateLink(data), 'Invalid request');
+    return writeTx((tx) => linkPartsHandler(input, partLinkDeps(tx, uid as string)));
+  },
+);
+
+/** The den's ×: the link goes. */
+export const unlinkParts = callable<unknown, UnlinkPartsResponse>(
+  { auth: 'required', label: 'unlinkParts', errorMessage: 'Could not save that' },
+  async ({ uid, data }) => {
+    const input = parseOrInvalid(() => validateUnlink(data), 'Invalid request');
+    return writeTx((tx) => unlinkPartsHandler(input, partLinkDeps(tx, uid as string)));
+  },
+);
+
+// ---- Trail offers (Phase 4; Today's card and the daily evaluation register themselves in ./offers) ----
+
+export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './offers';
+
+// ---- Two pulls (its week check-back's Today card registers itself in ./pulls/checkback) ----
+
+export { startPullsSession, savePullsSession, keepPullsKeepsake, schedulePullsCheckback } from './pulls';

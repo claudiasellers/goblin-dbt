@@ -143,6 +143,18 @@ CREATE CONSTRAINT profile_fact_key IF NOT EXISTS FOR (n:ProfileFact) REQUIRE n.k
 CREATE CONSTRAINT my_pattern_key IF NOT EXISTS FOR (n:MyPattern) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT own_line_key IF NOT EXISTS FOR (n:OwnLine) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT push_token_key IF NOT EXISTS FOR (n:PushToken) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_session_key IF NOT EXISTS FOR (n:PartSession) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_candidate_key IF NOT EXISTS FOR (n:PartCandidate) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT pulls_session_key IF NOT EXISTS FOR (n:PullsSession) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_tag_key IF NOT EXISTS FOR (n:PartTag) REQUIRE n.key IS UNIQUE;
+// One tag per tagged record (tagPart): the tagged ToolSession's key, unique across tags.
+CREATE CONSTRAINT part_tag_tagged_key IF NOT EXISTS FOR (n:PartTag) REQUIRE n.taggedKey IS UNIQUE;
+CREATE CONSTRAINT part_key IF NOT EXISTS FOR (n:Part) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_revisit_key IF NOT EXISTS FOR (n:PartRevisit) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_message_key IF NOT EXISTS FOR (n:PartMessage) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT trail_offer_key IF NOT EXISTS FOR (n:TrailOffer) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_link_key IF NOT EXISTS FOR (n:PartLink) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT den_snapshot_key IF NOT EXISTS FOR (n:DenSnapshot) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
 CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);
@@ -150,3 +162,28 @@ CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n
 // --- Body map (docs/design/body-map.md, schema/body-map.cypher) ---
 CREATE CONSTRAINT body_map_content_id IF NOT EXISTS FOR (n:BodyMapContent) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT body_map_id IF NOT EXISTS FOR (n:BodyMap) REQUIRE n.id IS UNIQUE;
+
+// --- Parts (docs/design/parts.md, schema/parts.cypher) ---
+CREATE CONSTRAINT protective_move_id IF NOT EXISTS FOR (n:ProtectiveMove) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT pull_option_id IF NOT EXISTS FOR (n:PullOption) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT protected_hurt_id IF NOT EXISTS FOR (n:ProtectedHurt) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT part_prompt_id IF NOT EXISTS FOR (n:PartPrompt) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT part_option_id IF NOT EXISTS FOR (n:PartOption) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT polarity_pair_id IF NOT EXISTS FOR (n:PolarityPair) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT trail_rule_id IF NOT EXISTS FOR (n:TrailRule) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT trail_context_id IF NOT EXISTS FOR (n:TrailContext) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT parts_policy_id IF NOT EXISTS FOR (n:PartsPolicy) REQUIRE n.id IS UNIQUE;
+
+// --- Wise mind (docs/design/wise-mind.md, schema/wise-mind.cypher) ---
+CREATE CONSTRAINT wise_mind_flow_id IF NOT EXISTS FOR (n:WiseMindFlow) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT wise_mind_question_id IF NOT EXISTS FOR (n:WiseMindQuestion) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT mind_voice_id IF NOT EXISTS FOR (n:MindVoice) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT wise_mind_practice_id IF NOT EXISTS FOR (n:WiseMindPractice) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT wise_mind_answer_id IF NOT EXISTS FOR (n:WiseMindAnswer) REQUIRE n.id IS UNIQUE;
+
+// --- Cope Ahead (docs/design/cope-ahead.md, schema/cope-ahead.cypher) ---
+CREATE CONSTRAINT cope_ahead_flow_id IF NOT EXISTS FOR (n:CopeAheadFlow) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT cope_situation_id IF NOT EXISTS FOR (n:CopeSituation) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT hard_moment_id IF NOT EXISTS FOR (n:HardMoment) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT cope_move_id IF NOT EXISTS FOR (n:CopeMove) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT rehearsal_beat_id IF NOT EXISTS FOR (n:RehearsalBeat) REQUIRE n.id IS UNIQUE;

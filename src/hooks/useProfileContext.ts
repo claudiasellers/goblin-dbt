@@ -13,9 +13,11 @@ export interface ProfileContextState<T extends ClientProfileConsumer> {
 
 /**
  * The profile slices a tool declared (PROFILE_NEEDS), through the single read path. Tools render
- * their fallback while `slices` is null (loading, error or signed out).
+ * their fallback while `slices` is null (loading, error or signed out). `enabled: false` reads
+ * nothing (stays 'loading'): a tool whose only use for the profile is behind a setting (DEAR MAN's
+ * cope ahead, parts on) makes no call while it's off.
  */
-export function useProfileContext<T extends ClientProfileConsumer>(toolId: T): ProfileContextState<T> {
+export function useProfileContext<T extends ClientProfileConsumer>(toolId: T, { enabled = true }: { enabled?: boolean } = {}): ProfileContextState<T> {
   const { user } = useAuth();
   const uid = user?.uid ?? null;
   const [state, setState] = useState<{ key: string; value: ProfileContextState<T> } | null>(null);
@@ -23,7 +25,7 @@ export function useProfileContext<T extends ClientProfileConsumer>(toolId: T): P
 
   useEffect(() => {
     profileCache.setUser(uid);
-    if (!uid) return;
+    if (!uid || !enabled) return;
     const cached = profileCache.get(toolId, Date.now()) as { version: number; slices: unknown } | null;
     let live = true;
     const load = cached ? Promise.resolve(cached) : getProfileContext(toolId).then((r) => {
@@ -34,9 +36,10 @@ export function useProfileContext<T extends ClientProfileConsumer>(toolId: T): P
       .then((r) => { if (live) setState({ key, value: { status: 'ready', slices: r.slices as SlicesOf<T>, version: r.version } }); })
       .catch(() => { if (live) setState({ key, value: { status: 'error', slices: null, version: 0 } }); });
     return () => { live = false; };
-  }, [uid, toolId, key]);
+  }, [uid, toolId, key, enabled]);
 
   if (!uid) return { status: 'signed-out', slices: null, version: 0 };
+  if (!enabled) return { status: 'loading', slices: null, version: 0 };
   if (!state || state.key !== key) return { status: 'loading', slices: null, version: 0 };
   return state.value;
 }

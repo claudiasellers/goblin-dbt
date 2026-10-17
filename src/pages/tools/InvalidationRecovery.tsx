@@ -1,16 +1,17 @@
 import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react';
-import { useCallback, useEffect, useMemo, useReducer, useState, type ReactNode } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useReducer, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEmotionById } from '../../data/emotions';
 import { useAuth } from '../../contexts/AuthContext';
 import { useProfileContext } from '../../hooks/useProfileContext';
+import { useUserProfile } from '../../contexts/UserProfileContext';
 import {
   getInvalidationRecoveryContent, getInvalidationRecoveryProgress, saveInvalidationRecoverySession,
 } from '../../services/neo4j';
 import type { ExitId, InvalidationRecoveryContent, InvalidationRecoveryProgress } from '../../data/invalidationRecoveryTypes';
 import { fill, gateFor, needsOrienting, repsInLastWeek, routeExits, type LockReason } from '../../lib/invalidationRecovery';
 import {
-  PHASES, flowReducer, initialHistory, nextStep, phaseIndex, readingsFor, type FlowData,
+  PHASES, flowReducer, initialHistory, nextStep, offerAngryCard, phaseIndex, readingsFor, type FlowData,
 } from '../../lib/invalidationRecoveryFlow';
 import { ExerciseProgress } from '../../components/tools/ExerciseProgress';
 import { ToolLoading } from '../../components/tools/ToolLoading';
@@ -27,11 +28,31 @@ import type { DearManHandoff } from '../../data/dearManHandoff';
 import { withBand } from '../../lib/dearManSafety';
 import { FollowUps, RepsRing, SkillCard, UrgeWave } from '../../components/tools/invalidationRecovery/closeout';
 import { useToolSession } from '../../hooks/useToolSession';
+import { useUnblendLine } from '../../hooks/useUnblendLine';
+import { recoverPullOption } from '../../lib/unblendLine';
 import { getSpineContent, type SpineContent } from '../../services/spine';
 import { recoverSchedule } from '../../lib/spine/wrap';
+import { TooMuchLink } from '../../components/capacity/TooMuchLink';
+import { ANGRY_MOVE, angryCopyFrom, angryLaterCopy, angryNotNowId, angryReady, orderHurts } from '../../lib/angryPart';
+import { newId } from '../../lib/spine/ids';
+import { handoffExt } from '../../lib/bandStore';
+import { getPartsContent } from '../../services/partsContent';
+import type { PartsContent } from '../../data/partsContentTypes';
+import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryLaterCopy, AngryStep } from '../../data/partsTypes';
+import type { HandoffResult } from '../../data/capacityTypes';
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: InvalidationRecoveryContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
+
+// The angry-part card loads on demand: it is fetched on the fight pull's step once the card may be
+// offered this visit (parts on or off: its plain wording reaches everyone), so it is there before the
+// moment it shows. Its own Suspense, nothing in its place.
+const loadAngryCard = () => import('../../components/parts/AngryPartCard');
+const LazyAngryPartCard = lazy(() => loadAngryCard().then((m) => ({ default: m.AngryPartCard })));
+function AngryPartCard(p: ComponentProps<typeof LazyAngryPartCard>) { return <Suspense fallback={null}><LazyAngryPartCard {...p} /></Suspense>; }
+
+// Parts' callables load on demand, at the one moment this page calls one (a yes to "another time").
+const queuePartCandidate: typeof import('../../services/parts').queuePartCandidate = (req) => import('../../services/parts').then((m) => m.queuePartCandidate(req));
 
 export function InvalidationRecovery() {
   const [load, setLoad] = useState<Load>({ status: 'loading' });
@@ -64,9 +85,13 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
   // The single profile read path (PR-P1): only the slices this tool declared. null while loading,
   // as before (distanced self-talk falls back to "you").
   const firstName = useProfileContext('recovering-from-invalidation').slices?.name.firstName ?? null;
+  const partsOn = useUserProfile().profile.partsEnabled;
 
   const [history, dispatch] = useReducer(flowReducer, undefined, initialHistory);
   const { step, data: d } = history.stack[history.stack.length - 1];
+  // The word picked for the feeling is the session's emotion when it opened without any.
+  const toolSession = useToolSession();
+  useEffect(() => { toolSession.setEmotionIds(d.emotionId ? [d.emotionId] : []); }, [d.emotionId, toolSession]);
   /** Answers from the screen the user just went Back from: prefill only, never committed data. */
   const pre = history.prefill;
   const state = states.find(s => s.id === d.stateId) ?? null;
@@ -83,14 +108,63 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
         intensity: now, waitMinutes, oneMessageOnly: pull?.id === 'chase', waitCopy: c.wait }
     : null;
 
+  // The angry-part card (fight back, under the line): its copy is the shipped parts content, signed-off
+  // rows only, so until the angry flow is approved it is never ready and the card never shows.
+  const [parts, setParts] = useState<PartsContent | null>(null);
+  useEffect(() => {
+    let live = true;
+    getPartsContent().then(p => { if (live) setParts(p); }).catch(() => { /* no card, the flow goes on */ });
+    return () => { live = false; };
+  }, []);
+  /** Set once, when the card is offered: its wording and hurts stay as they were, Back into it included. */
+  const [angry, setAngry] = useState<{ copy: AngryCardCopy; partsOn: boolean; hurts: AngryHurt[]; later: AngryLaterCopy | null } | null>(null);
+  const [angryStep, setAngryStep] = useState<AngryStep>('unblend');
+  /** The hurt the card ended on, for DEAR MAN's first "I felt" chip; null after Not sure or Not now. */
+  const [angryHurtId, setAngryHurtId] = useState<string | null>(null);
+
   /** Advance from the current step, merging what it collected. */
   const advance = useCallback((patch: Partial<FlowData> = {}) => {
     const merged = { ...d, ...patch };
     const st = states.find(s => s.id === merged.stateId);
     if (!st) return;
-    dispatch({ type: 'go', step: nextStep(step, merged, st), patch });
-  }, [d, step, states]);
+    const ready = Boolean(parts && angryReady(parts, partsOn));
+    const offer = offerAngryCard(merged, g, ready, angry !== null);
+    if (offer && parts) {
+      setAngry({
+        copy: angryCopyFrom(parts, partsOn), partsOn, hurts: orderHurts(parts.hurts, parts.canTouch, merged.stateId),
+        later: angryLaterCopy(parts, partsOn),
+      });
+    }
+    dispatch({ type: 'go', step: nextStep(step, merged, st, offer), patch });
+  }, [d, step, states, parts, partsOn, g, angry]);
   const withSkills = (...ids: string[]): Partial<FlowData> => ({ skills: [...d.skills, ...ids] });
+  /**
+   * Whether the angry-part card is (or may still be) offered in this visit for the fight pull: already
+   * offered, or offerAngryCard with any reading under the line (one may come after settling). Then the
+   * card does the unblending and the pull gets no unblend line.
+   */
+  const cardThisVisit = angry !== null || offerAngryCard({ pull: 'fight', now: 0 }, g, Boolean(parts && angryReady(parts, partsOn)), false);
+
+  /** The card on the visit's ToolSession (log layer, ids only). Each write is the whole triple. */
+  const recordAngry = (r: { angryExit: AngryStep | 'skipped'; angryHurtId?: string | null; angryVoteHeld?: boolean }) => {
+    toolSession.setExt({ wmp: { angryHurtId: r.angryHurtId ?? undefined, angryVoteHeld: r.angryVoteHeld, angryExit: r.angryExit } });
+  };
+  /**
+   * "Spend a minute with it later?" (parts on): the tap is the yes. One candidate id per visit, so a
+   * retry after a failed call is the same record. The fight pull's move (EXPRESSES recover_fight).
+   */
+  const laterId = useRef<string | null>(null);
+  const queueLater = async () => {
+    laterId.current ??= newId();
+    await queuePartCandidate({ id: laterId.current, origin: 'angry_card', moveIds: [ANGRY_MOVE] });
+    toolSession.setExt({ wmp: { angryLater: true } });
+  };
+  /** "Too much" inside the card: P2 as an overlay, recorded the way DEAR MAN records it. */
+  const handoffs = useRef<HandoffResult[]>([]);
+  const recordHandoff = (r: HandoffResult) => {
+    handoffs.current = [...handoffs.current, r];
+    toolSession.setExt({ er: { handoffs: handoffExt(handoffs.current) } });
+  };
 
   // Progress (skill uses, reps) for signed-in users; the flow works without it.
   const [progress, setProgress] = useState<InvalidationRecoveryProgress | null>(null);
@@ -116,7 +190,9 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
     <div className="space-y-6">
       <div className="space-y-2">
         <ExerciseProgress current={phase + 1} total={PHASES.length} stageName={c.phases[PHASES[phase].key]}
-          onBack={history.stack.length > 1 && step !== 'close' && step !== 'follow' ? () => dispatch({ type: 'back' }) : undefined} />
+          onBack={history.stack.length > 1 && step !== 'close' && step !== 'follow' && !(step === 'angry' && angryStep !== 'unblend')
+            // Past the card's first screen its own Back takes over: one Back on screen at a time.
+            ? () => dispatch({ type: 'back' }) : undefined} />
         {started && step !== 'close' && step !== 'follow' && (
           <div aria-hidden="true" className="h-1 rounded-full bg-[var(--color-border)] overflow-hidden">
             <div className="h-full rounded-full motion-safe:transition-all motion-safe:duration-1000"
@@ -144,7 +220,7 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
           )}
 
           {step === 'loud' && state && (
-            <LoudStep c={c} pulls={flow.pulls} initial={pre}
+            <LoudStep c={c} pulls={flow.pulls} initial={pre} unblendOk={parts !== null} cardThisVisit={cardThisVisit}
               onDone={(intensity, p, urge) => {
                 const gate = gateFor(intensity, p, state, g);
                 advance({ intensity, pull: p, urge, now: intensity, gate, mids: [], skills: [] });
@@ -192,6 +268,20 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               <UrgeScale label={c.rerate.prompt} value={pre?.now ?? null} lowLabel={c.loud.low} highLabel={c.loud.high}
                 onChange={v => { if (v !== null) advance({ now: v, mids: [...d.mids, v] }); }} />
             </>
+          )}
+
+          {step === 'angry' && angry && (
+            <AngryPartCard copy={angry.copy} hurts={angry.hurts} partsOn={angry.partsOn} name={firstName}
+              // Until it ends, where the person is: leaving mid-card (Back, or the page) still says where.
+              onStep={s => { setAngryStep(s); recordAngry({ angryExit: s }); }}
+              onSkip={() => { setAngryHurtId(null); recordAngry({ angryExit: 'skipped', angryVoteHeld: false }); advance(); }} skipLabel={angry.copy[angryNotNowId(angry.partsOn)]}
+              onDone={(r: AngryCardResult) => {
+                setAngryHurtId(r.hurtId);
+                recordAngry({ angryExit: r.exitStep, angryHurtId: r.hurtId, angryVoteHeld: r.voteHeld });
+                advance();
+              }}
+              later={angry.later} onLater={queueLater}
+              tooMuch={<TooMuchLink host="recovering-from-invalidation" onResult={recordHandoff} />} />
           )}
 
           {step === 'secure' && (
@@ -264,10 +354,18 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
               contentVersion={content.version} signedIn={Boolean(user)} showFollow={step === 'follow'}
               finishLabel={handoff ? c.ask.finish : c.follow.finish}
               onNext={() => dispatch({ type: 'go', step: 'follow' })}
-              onFinished={endIntensity => (handoff
-                // Hand over the close rating: DEAR MAN re-gates if it went back up.
-                ? navigate('/tool/dear-man', { state: { dearManHandoff: withBand({ ...handoff, intensity: endIntensity ?? handoff.intensity }, g) } })
-                : dispatch({ type: 'reset' }))} />
+              onFinished={endIntensity => {
+                if (handoff) {
+                  // Hand over the close rating (DEAR MAN re-gates if it went back up) and the card's hurt.
+                  navigate('/tool/dear-man', { state: { dearManHandoff: withBand({
+                    ...handoff, intensity: endIntensity ?? handoff.intensity, ...(angryHurtId ? { hurtId: angryHurtId } : {}),
+                  }, g) } });
+                  return;
+                }
+                // A new round starts without the last one's hurt (the card itself is offered once a visit).
+                setAngryHurtId(null);
+                dispatch({ type: 'reset' });
+              }} />
           )}
         </m.section>
       </AnimatePresence>
@@ -278,14 +376,21 @@ function Flow({ content }: { content: InvalidationRecoveryContent }) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Copy = Record<string, any>;
 
-function LoudStep({ c, pulls, initial, onDone }: {
+function LoudStep({ c, pulls, initial, unblendOk, cardThisVisit, onDone }: {
   c: Copy; pulls: InvalidationRecoveryContent['flow']['pulls']; initial: FlowData | null;
+  /** Parts content has loaded, so `cardThisVisit` is settled. */
+  unblendOk: boolean;
+  cardThisVisit: boolean;
   onDone: (intensity: number, pull: FlowData['pull'] & string, urge: number) => void;
 }) {
   const [intensity, setIntensity] = useState<number | null>(initial?.intensity ?? null);
   const [pull, setPull] = useState<FlowData['pull']>(initial?.pull ?? null);
   const [urge, setUrge] = useState<number | null>(initial?.urge ?? null);
   const p = pulls.find(x => x.id === pull);
+  // The pull options are on screen: fetch the angry card now if it may be offered, so it never waits.
+  useEffect(() => { if (cardThisVisit) void loadAngryCard().catch(() => { /* the card's render retries */ }); }, [cardThisVisit]);
+  // Parts on: "A part of you … right now." after the pull, unless the angry card will do the unblending.
+  const unblend = useUnblendLine('recover', pull ? recoverPullOption(pull) : null, unblendOk && !(pull === 'fight' && cardThisVisit));
   return (
     <>
       <StepTitle title={c.loud.title} sub={c.loud.sub} />
@@ -296,6 +401,7 @@ function LoudStep({ c, pulls, initial, onDone }: {
           {pulls.map(x => <Choice key={x.id} selected={pull === x.id} sub={x.sub} onClick={() => setPull(x.id)}>{x.label}</Choice>)}
         </div>
       </fieldset>
+      {unblend && <p role="status" className={secondaryText}>{unblend}</p>}
       {p && <UrgeScale label={fill(c.loud.urgeLabel, { pull: p.urgeLabel })} value={urge} onChange={setUrge} />}
       <button type="button" className={primaryButton} disabled={intensity === null || !pull || urge === null}
         onClick={() => onDone(intensity!, pull!, urge!)}>{c.common.continue}</button>

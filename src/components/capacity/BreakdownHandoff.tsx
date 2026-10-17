@@ -7,6 +7,7 @@ import { afterReread, planHandoff } from '../../lib/band';
 import { saveResumeToken, RESUME_TTL_MS } from '../../lib/resumeToken';
 import { fill } from '../../lib/invalidationRecovery';
 import { BreathOrb, Orient, type BreathPhase } from '../tools/regulation/body';
+import { focusStepStart } from '../../lib/focusStart';
 import { choiceButton, linkButton, primaryButton, secondaryText } from '../tools/oppositeAction/styles';
 
 /** What the host hands P2 so it can resume the same step (kept in memory; device-local if saved). */
@@ -34,7 +35,7 @@ type Stage =
  * `onSafety` renders the "I'm not safe" link when the safety batch passes `safety.open`.
  */
 export function BreakdownHandoff({
-  host, band: bandValue, blank = false, resume, dismissedRef, startWithPrimitive, onResume, onLater, onScheduleLater, onSafety, safetyLabel,
+  host, band: bandValue, blank = false, resume, dismissedRef, startWithPrimitive, startLater = false, onResume, onLater, onScheduleLater, onSafety, safetyLabel,
 }: {
   host: string;
   band: Band;
@@ -47,6 +48,11 @@ export function BreakdownHandoff({
   dismissedRef?: { current: boolean };
   /** Skip the card (the user asked for this via "too much"). */
   startWithPrimitive?: boolean;
+  /**
+   * Open on the last two choices (come back later, keep going anyway): P2 already ran this visit (Meet a
+   * part after a P2 on entry), so a second "running things" offers no new primitive.
+   */
+  startLater?: boolean;
   onResume: (r: HandoffResult) => void;
   onLater?: (r: HandoffResult) => void;
   /** Schedules the `resume_skill` follow-up; resolves its id, or null. Absent → no "later" chips. */
@@ -59,12 +65,24 @@ export function BreakdownHandoff({
   const content = b.content;
   const plan = useMemo(() => (content ? planHandoff({ band: bandValue, blank }, content.primitives) : []), [content, bandValue, blank]);
 
-  const [stage, setStage] = useState<Stage>(() => (startWithPrimitive ? { k: 'primitive', i: 0, startedAt: Date.now() } : { k: 'card' }));
+  const [stage, setStage] = useState<Stage>(() => (startLater ? { k: 'later', scheduled: false }
+    : startWithPrimitive ? { k: 'primitive', i: 0, startedAt: Date.now() } : { k: 'card' }));
   const [scheduling, setScheduling] = useState(false);
   const runs = useRef<HandoffResult['primitivesRun']>([]);
   const lastReread = useRef<ThenVsNow | null>(null);
   const resolved = useRef(false);
   const deferredId = useRef<string | undefined>(undefined);
+
+  // Each stage replaces the control that moved it on (Start, a reread answer, a later chip): focus goes to
+  // the new stage's heading or first line, never to the page. Not on the first render.
+  const root = useRef<HTMLElement>(null);
+  const stageKey = stage.k === 'primitive' ? `primitive:${stage.i}` : stage.k === 'later' ? `later:${stage.scheduled}` : stage.k;
+  const lastStage = useRef(stageKey);
+  useEffect(() => {
+    if (lastStage.current === stageKey) return;
+    lastStage.current = stageKey;
+    focusStepStart(root.current);
+  }, [stageKey]);
 
   const result = (resumed: boolean, overridden: boolean): HandoffResult => ({
     resumed, overridden, thenVsNow: lastReread.current, primitivesRun: [...runs.current],
@@ -149,7 +167,7 @@ export function BreakdownHandoff({
   } else if (stage.k === 'reread') {
     body = (
       <div className="space-y-4" data-testid="handoff-reread">
-        <p className="text-lg font-medium text-[var(--color-text-primary)]">{h.reread.prompt}</p>
+        <p className="text-lg font-medium text-[var(--color-text-primary)] focus:outline-none">{h.reread.prompt}</p>
         <div className="space-y-2" role="group" aria-label={h.reread.prompt}>
           {THEN_VS_NOW.map((v) => (
             <button key={v} type="button" className={choiceButton} data-then={v} onClick={() => {
@@ -167,10 +185,10 @@ export function BreakdownHandoff({
     body = (
       <div className="space-y-4" data-testid="handoff-later">
         {stage.scheduled ? (
-          <p className="text-[var(--color-text-primary)]">{h.later.scheduled}</p>
+          <p className="text-[var(--color-text-primary)] focus:outline-none">{h.later.scheduled}</p>
         ) : (
           <>
-            <p className="text-[var(--color-text-primary)]">{h.later.holding}</p>
+            <p className="text-[var(--color-text-primary)] focus:outline-none">{h.later.holding}</p>
             {onScheduleLater && resume && (
               <div className="space-y-2">
                 <p className={secondaryText}>{h.later.offer}</p>
@@ -202,7 +220,7 @@ export function BreakdownHandoff({
 
   return (
     <LazyMotion features={domAnimation}>
-      <section className="space-y-4" aria-label="Body first" data-host={host}>
+      <section ref={root} className="space-y-4" aria-label="Body first" data-host={host}>
         {body}
         {safety}
       </section>
@@ -237,7 +255,7 @@ function Primitive({ p, onDone }: { p: HandoffPrimitive; onDone: (completed: boo
 function Title({ title, sub }: { title: string; sub: string }) {
   return (
     <div>
-      <h2 className="text-xl font-semibold text-[var(--color-text-primary)]">{title}</h2>
+      <h2 className="text-xl font-semibold text-[var(--color-text-primary)] focus:outline-none">{title}</h2>
       {sub && <p className={`${secondaryText} mt-1`}>{sub}</p>}
     </div>
   );

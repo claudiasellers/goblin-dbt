@@ -1,0 +1,671 @@
+{
+ "version": "cope-ahead-v1",
+ "ownMax": 140,
+ "moveOwnMax": 90,
+ "when": [
+  {
+   "id": "today",
+   "key": "when_today"
+  },
+  {
+   "id": "tomorrow",
+   "key": "when_tomorrow"
+  },
+  {
+   "id": "this_week",
+   "key": "when_week"
+  },
+  {
+   "id": "later",
+   "key": "when_later"
+  }
+ ],
+ "copy": {
+  "what_title": "What's coming up?",
+  "what_own_hint": "Say it your way",
+  "when_title": "When is it?",
+  "when_today": "Today",
+  "when_tomorrow": "Tomorrow",
+  "when_week": "This week",
+  "when_later": "Later, or not sure",
+  "feel_title": "What might you feel there?",
+  "feel_hint": "Pick up to two.",
+  "feel_more": "Something else",
+  "pull_title": "What might you want to do?",
+  "not_sure": "Not sure",
+  "moment_title": "What's the moment you're most worried about?",
+  "moment_own_hint": "Say it your way",
+  "plan_title": "If it happens, I'll…",
+  "plan_if": "If",
+  "plan_ill": "I'll",
+  "plan_and": "and",
+  "plan_use_pull": "Plan for the pull instead",
+  "plan_use_moment": "Plan for the moment instead",
+  "plan_add": "Add one more",
+  "plan_own_hint": "Say it your way",
+  "rehearse_intro": "Picture it as if it's happening now. You're in it, not watching.",
+  "rehearse_next": "Next",
+  "rehearse_again_q": "Once more, with something you didn't expect?",
+  "rehearse_again_yes": "Yes",
+  "rehearse_again_no": "That's enough",
+  "rehearse_new_problem": "Something you didn't plan for happens.",
+  "rehearse_keep_move": "Keep the same plan",
+  "rehearse_change_move": "Change what I'll do",
+  "settle_title": "Let your body come back to now.",
+  "settle_breath": "Three long breaths out",
+  "settle_five": "5-4-3-2-1",
+  "settle_ok": "I'm OK",
+  "settle_hold": "Hold while you breathe out, slowly.",
+  "settle_hold_hint": "Three times. Let go between them.",
+  "keep_title": "Here's your plan.",
+  "keep_yes": "Keep this",
+  "keep_no": "Not now",
+  "keep_failed": "Couldn't save that. Try again.",
+  "keep_done": "Kept in My words.",
+  "ask_after_q": "Want me to ask how it went?",
+  "ask_after_yes": "Yes",
+  "ask_after_no": "No thanks",
+  "done": "Done",
+  "entry_dear_man": "Rehearse it",
+  "entry_recover": "Walk through it with Cope Ahead"
+ },
+ "pullIf": {
+  "fight": "I want to say something sharp",
+  "chase": "I want to text them over and over",
+  "hide": "I want to disappear",
+  "blank": "I start to shut down"
+ },
+ "after": {
+  "after_q": "How did {afterName} go?",
+  "after_better": "Better than I feared",
+  "after_expected": "About what I expected",
+  "after_harder": "Harder than I expected",
+  "after_not_yet": "It hasn't happened yet",
+  "after_plan_q": "Did your plan help?",
+  "after_plan_helped": "Used it, it helped",
+  "after_plan_unsure": "Used it, not sure",
+  "after_plan_unused": "Didn't use it",
+  "after_skip": "Skip",
+  "after_plan_line": "Your plan: {plan}"
+ },
+ "situations": [
+  {
+   "id": "conversation",
+   "label": "A conversation I'm dreading",
+   "afterName": "the conversation",
+   "likelyFeelings": [
+    "anxious",
+    "nervous",
+    "angry",
+    "hurt"
+   ],
+   "hardMoments": [
+    "voice_raised",
+    "go_blank",
+    "not_heard",
+    "start_crying",
+    "might_hurt"
+   ],
+   "dangerMomentIds": [
+    "might_hurt"
+   ],
+   "order": 0
+  },
+  {
+   "id": "someone",
+   "label": "Seeing someone in particular",
+   "afterName": "seeing them",
+   "likelyFeelings": [
+    "nervous",
+    "hurt",
+    "angry",
+    "embarrassed"
+   ],
+   "hardMoments": [
+    "bring_up_past",
+    "cold_with_me",
+    "old_role",
+    "go_blank",
+    "might_hurt"
+   ],
+   "dangerMomentIds": [
+    "might_hurt"
+   ],
+   "order": 1
+  },
+  {
+   "id": "work_school",
+   "label": "Something at work or school",
+   "afterName": "it",
+   "likelyFeelings": [
+    "anxious",
+    "pressured",
+    "inadequate",
+    "exposed"
+   ],
+   "hardMoments": [
+    "go_blank",
+    "criticised",
+    "mistake_seen",
+    "cant_answer"
+   ],
+   "dangerMomentIds": [],
+   "order": 2
+  },
+  {
+   "id": "place_event",
+   "label": "A place or an event",
+   "afterName": "it",
+   "likelyFeelings": [
+    "nervous",
+    "excluded",
+    "overwhelmed",
+    "embarrassed"
+   ],
+   "hardMoments": [
+    "nobody_talks",
+    "too_much",
+    "want_leave",
+    "see_someone"
+   ],
+   "dangerMomentIds": [],
+   "order": 3
+  },
+  {
+   "id": "hard_day",
+   "label": "A day that's hard every year",
+   "afterName": "the day",
+   "likelyFeelings": [
+    "sad",
+    "grief",
+    "lonely",
+    "numb"
+   ],
+   "hardMoments": [
+    "wave_hits",
+    "others_normal",
+    "reminder",
+    "start_crying",
+    "might_hurt_self"
+   ],
+   "dangerMomentIds": [
+    "might_hurt_self"
+   ],
+   "order": 4
+  },
+  {
+   "id": "alone",
+   "label": "Being on my own",
+   "afterName": "being on your own",
+   "likelyFeelings": [
+    "lonely",
+    "empty",
+    "anxious",
+    "bored"
+   ],
+   "hardMoments": [
+    "evening_stretches",
+    "cant_stop_checking",
+    "thoughts_loop",
+    "old_habit",
+    "might_hurt_self"
+   ],
+   "dangerMomentIds": [
+    "might_hurt_self"
+   ],
+   "order": 5
+  },
+  {
+   "id": "other",
+   "label": "Something else",
+   "afterName": "it",
+   "likelyFeelings": [
+    "anxious",
+    "nervous",
+    "sad",
+    "angry"
+   ],
+   "hardMoments": [
+    "go_blank",
+    "start_crying",
+    "want_leave",
+    "voice_raised"
+   ],
+   "dangerMomentIds": [],
+   "order": 6
+  }
+ ],
+ "hardMoments": [
+  {
+   "id": "voice_raised",
+   "label": "They raise their voice",
+   "ifText": "they raise their voice",
+   "order": 0
+  },
+  {
+   "id": "go_blank",
+   "label": "I go blank",
+   "ifText": "I go blank",
+   "order": 1
+  },
+  {
+   "id": "not_heard",
+   "label": "They don't listen",
+   "ifText": "they don't listen",
+   "order": 2
+  },
+  {
+   "id": "start_crying",
+   "label": "I start crying",
+   "ifText": "I start crying",
+   "order": 3
+  },
+  {
+   "id": "bring_up_past",
+   "label": "They bring up the past",
+   "ifText": "they bring up the past",
+   "order": 4
+  },
+  {
+   "id": "cold_with_me",
+   "label": "They're cold with me",
+   "ifText": "they're cold with me",
+   "order": 5
+  },
+  {
+   "id": "old_role",
+   "label": "I slip into an old role",
+   "ifText": "I slip into an old role",
+   "order": 6
+  },
+  {
+   "id": "criticised",
+   "label": "Someone criticises me",
+   "ifText": "someone criticises me",
+   "order": 7
+  },
+  {
+   "id": "mistake_seen",
+   "label": "I make a mistake in front of people",
+   "ifText": "I make a mistake in front of people",
+   "order": 8
+  },
+  {
+   "id": "cant_answer",
+   "label": "I'm asked something I can't answer",
+   "ifText": "I'm asked something I can't answer",
+   "order": 9
+  },
+  {
+   "id": "nobody_talks",
+   "label": "Nobody talks to me",
+   "ifText": "nobody talks to me",
+   "order": 10
+  },
+  {
+   "id": "too_much",
+   "label": "It gets too loud or too much",
+   "ifText": "it gets too loud or too much",
+   "order": 11
+  },
+  {
+   "id": "want_leave",
+   "label": "I want to leave straight away",
+   "ifText": "I want to leave straight away",
+   "order": 12
+  },
+  {
+   "id": "see_someone",
+   "label": "I see someone I'd rather not",
+   "ifText": "I see someone I'd rather not",
+   "order": 13
+  },
+  {
+   "id": "wave_hits",
+   "label": "A wave of it hits",
+   "ifText": "a wave of it hits",
+   "order": 14
+  },
+  {
+   "id": "others_normal",
+   "label": "Everyone acts like it's a normal day",
+   "ifText": "everyone acts like it's a normal day",
+   "order": 15
+  },
+  {
+   "id": "reminder",
+   "label": "Something reminds me out of nowhere",
+   "ifText": "something reminds me out of nowhere",
+   "order": 16
+  },
+  {
+   "id": "evening_stretches",
+   "label": "The evening stretches out",
+   "ifText": "the evening stretches out",
+   "order": 17
+  },
+  {
+   "id": "cant_stop_checking",
+   "label": "I can't stop scrolling or checking",
+   "ifText": "I can't stop scrolling or checking",
+   "order": 18
+  },
+  {
+   "id": "thoughts_loop",
+   "label": "The same thoughts go round",
+   "ifText": "the same thoughts go round",
+   "order": 19
+  },
+  {
+   "id": "old_habit",
+   "label": "I want to do the thing I'm trying not to",
+   "ifText": "I want to do the thing I'm trying not to",
+   "order": 20
+  },
+  {
+   "id": "might_hurt",
+   "label": "They might hurt me",
+   "ifText": "they start to frighten me",
+   "order": 21
+  },
+  {
+   "id": "might_hurt_self",
+   "label": "I might hurt myself",
+   "ifText": "I feel like hurting myself",
+   "order": 22
+  }
+ ],
+ "moves": [
+  {
+   "id": "long_out",
+   "kind": "body",
+   "label": "Breathe out longer than in",
+   "line": "breathe out longer than in",
+   "forPulls": [
+    "fight",
+    "chase",
+    "hide"
+   ],
+   "general": true,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 0
+  },
+  {
+   "id": "feet",
+   "kind": "body",
+   "label": "Feel my feet on the floor",
+   "line": "feel my feet on the floor",
+   "forPulls": [
+    "hide",
+    "blank",
+    "fight"
+   ],
+   "general": true,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 1
+  },
+  {
+   "id": "cold_water",
+   "kind": "body",
+   "label": "Cold water on my hands",
+   "line": "put cold water on my hands",
+   "forPulls": [
+    "fight",
+    "chase",
+    "blank"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 2
+  },
+  {
+   "id": "hold_something",
+   "kind": "body",
+   "label": "Hold something in my pocket",
+   "line": "hold something in my pocket",
+   "forPulls": [
+    "blank",
+    "hide"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 3
+  },
+  {
+   "id": "give_minute",
+   "kind": "words",
+   "label": "Say “Give me a minute”",
+   "line": "say “Give me a minute”",
+   "forPulls": [
+    "fight",
+    "blank",
+    "chase"
+   ],
+   "general": true,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 4
+  },
+  {
+   "id": "come_back",
+   "kind": "words",
+   "label": "Say “I'll come back to you on that”",
+   "line": "say “I'll come back to you on that”",
+   "forPulls": [
+    "fight",
+    "chase"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 5
+  },
+  {
+   "id": "say_hard",
+   "kind": "words",
+   "label": "Say “This is hard for me”",
+   "line": "say “This is hard for me”",
+   "forPulls": [
+    "hide",
+    "blank"
+   ],
+   "general": true,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 6
+  },
+  {
+   "id": "one_thing",
+   "kind": "words",
+   "label": "Say the one thing I came to say",
+   "line": "say the one thing I came to say",
+   "forPulls": [
+    "hide",
+    "chase"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 7
+  },
+  {
+   "id": "step_out",
+   "kind": "action",
+   "label": "Step out for five minutes",
+   "line": "step out for five minutes",
+   "forPulls": [
+    "fight",
+    "chase",
+    "hide"
+   ],
+   "general": true,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 8
+  },
+  {
+   "id": "stay_ten",
+   "kind": "action",
+   "label": "Stay ten more minutes, then decide",
+   "line": "stay ten more minutes, then decide",
+   "forPulls": [
+    "hide"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 9
+  },
+  {
+   "id": "text_trust",
+   "kind": "action",
+   "label": "Text someone I trust",
+   "line": "text someone I trust",
+   "forPulls": [
+    "hide",
+    "blank"
+   ],
+   "general": true,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 10
+  },
+  {
+   "id": "phone_away",
+   "kind": "action",
+   "label": "Put my phone in another room",
+   "line": "put my phone in another room",
+   "forPulls": [
+    "chase"
+   ],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [],
+   "order": 11
+  },
+  {
+   "id": "leave_safe",
+   "kind": "action",
+   "label": "Leave and get somewhere safe",
+   "line": "leave and get somewhere safe",
+   "forPulls": [],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [
+    "might_hurt"
+   ],
+   "order": 12
+  },
+  {
+   "id": "reach_help",
+   "kind": "action",
+   "label": "Call or text someone who can help, now",
+   "line": "call or text someone who can help, now",
+   "forPulls": [],
+   "general": false,
+   "appToolId": null,
+   "forMoments": [
+    "might_hurt_self"
+   ],
+   "order": 13
+  },
+  {
+   "id": "pause",
+   "kind": "tool",
+   "label": "Pause",
+   "line": "open Pause",
+   "forPulls": [
+    "fight",
+    "chase"
+   ],
+   "general": false,
+   "appToolId": "pause",
+   "forMoments": [],
+   "order": 14
+  },
+  {
+   "id": "five_senses",
+   "kind": "tool",
+   "label": "5-4-3-2-1",
+   "line": "do 5-4-3-2-1",
+   "forPulls": [
+    "blank",
+    "hide",
+    "fight"
+   ],
+   "general": true,
+   "appToolId": "five-senses",
+   "forMoments": [],
+   "order": 15
+  },
+  {
+   "id": "cool_down",
+   "kind": "tool",
+   "label": "Circuit Breaker",
+   "line": "do Circuit Breaker",
+   "forPulls": [
+    "fight",
+    "chase"
+   ],
+   "general": false,
+   "appToolId": "cool-down",
+   "forMoments": [],
+   "order": 16
+  },
+  {
+   "id": "urge_surfing",
+   "kind": "tool",
+   "label": "Urge Surfing",
+   "line": "use Urge Surfing",
+   "forPulls": [
+    "chase",
+    "fight"
+   ],
+   "general": false,
+   "appToolId": "urge-surfing",
+   "forMoments": [],
+   "order": 17
+  }
+ ],
+ "beats": [
+  {
+   "id": "arrive",
+   "text": "You're arriving. Picture where it happens.",
+   "order": 1
+  },
+  {
+   "id": "around",
+   "text": "Notice what's around you: what you see, what you hear, your feet.",
+   "order": 2
+  },
+  {
+   "id": "moment",
+   "text": "Then it happens: {moment}.",
+   "order": 3
+  },
+  {
+   "id": "notice",
+   "text": "You feel it rise. You know this moment. You planned for it.",
+   "order": 4
+  },
+  {
+   "id": "plan",
+   "text": "You do your plan: {plan}.",
+   "order": 5
+  },
+  {
+   "id": "through",
+   "text": "It's still hard, and you keep going.",
+   "order": 6
+  },
+  {
+   "id": "over",
+   "text": "Then it's over.",
+   "order": 7
+  }
+ ]
+}

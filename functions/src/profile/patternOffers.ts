@@ -5,6 +5,8 @@
  * weeks of ToolSession data, reviewed on real counts).
  *
  * Evaluation is lazy: when Today loads, at most once a day per user (User.patternsEvaluatedAt).
+ * The one-a-week budget is shared with the parts trail offers (offerBudget.ts): a `TrailOffer` made in
+ * the last week holds back a new `PatternOffer`, and the other way round.
  */
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
@@ -17,7 +19,11 @@ import { GUARDS } from '../userdata/lifecycle';
 import { userKey } from '../userdata/ownership';
 import { registerTodayPrepare, registerTodaySource } from '../spine/today';
 import type { TodayItem } from '../spine/todayOrder';
+import { NOT_WHAT_HELPS } from '../spine/tools';
+import { OFFER_EVERY_DAYS, offerBudgetAt, offerBudgetSpent } from './offerBudget';
 import type { PatternOfferAnswer } from './types';
+
+export { OFFER_EVERY_DAYS, offerBudgetSpent } from './offerBudget';
 
 export interface PatternRule {
   id: string;
@@ -36,23 +42,25 @@ export interface ExistingOffer { ruleId: string; toolId: string; patternId: stri
 export interface OfferCandidate { ruleId: string; patternKind: string; toolId: string; patternId: string; evidenceIds: string[] }
 
 const DAY = 86_400_000;
-/** App-wide: at most one new offer a week. */
-export const OFFER_EVERY_DAYS = 7;
 
 /**
  * Pure rule evaluation. For each (tool, pattern) in the window, the last `ofLast` answered closes:
  * `minEvidence` or more better / much better → a candidate. Never re-offer a declined or accepted
  * (tool, pattern) for the rule, never while one is pending or cooling down, and at most one new
- * offer a week app-wide. Returns at most one candidate (the strongest, then the most recent).
+ * offer a week app-wide: `otherOffers` are the offer times of the other kind (the person's
+ * `TrailOffer`s), which share the budget. Returns at most one candidate (the strongest, then the most recent).
  */
-export function evaluateRule(sessions: SessionEvidence[], rule: PatternRule, offers: ExistingOffer[], now: number): OfferCandidate | null {
+export function evaluateRule(
+  sessions: SessionEvidence[], rule: PatternRule, offers: ExistingOffer[], now: number, otherOffers: readonly string[] = [],
+): OfferCandidate | null {
   if (!rule.enabled) return null;
-  if (offers.some((o) => Date.parse(o.offeredAt) > now - OFFER_EVERY_DAYS * DAY)) return null;
+  if (offerBudgetSpent([...offers.map((o) => o.offeredAt), ...otherOffers], now)) return null;
   const blocked = new Set(offers.filter((o) => o.ruleId === rule.id && (o.status !== 'offered' || !o.cooldownUntil || Date.parse(o.cooldownUntil) > now))
     .map((o) => `${o.toolId}|${o.patternId}`));
   const groups = new Map<string, SessionEvidence[]>();
   for (const s of sessions) {
     if (!s.patternId || !s.thenVsNow || Date.parse(s.at) < now - rule.windowDays * DAY) continue;
+    if (NOT_WHAT_HELPS.includes(s.toolId)) continue; // a "more here" close is no what_helps evidence
     const k = `${s.toolId}|${s.patternId}`;
     (groups.get(k) ?? groups.set(k, []).get(k)!).push(s);
   }
@@ -72,6 +80,15 @@ export function evaluateRule(sessions: SessionEvidence[], rule: PatternRule, off
   void _h; void _l;
   return candidate;
 }
+
+/**
+ * The caller's trail offers in the last `$days` (their times only: they count against the weekly budget),
+ * each from the later of when it was offered and answered (`offerBudgetAt`), as the parts gate counts them.
+ */
+export const TRAIL_OFFER_TIMES_QUERY = `
+  MATCH (:User {id: $uid})-[:HAS_TRAIL_OFFER]->(t:TrailOffer)
+  WHERE t.offeredAt IS NOT NULL AND ${offerBudgetAt('t')} > datetime() - duration({days: $days})
+  RETURN toString(${offerBudgetAt('t')}) AS offeredAt`;
 
 async function readRules(tx: ManagedTransaction): Promise<PatternRule[]> {
   const r = await tx.run(`MATCH (p:PatternRule) RETURN p {.*} AS p`);
@@ -107,16 +124,19 @@ export async function evaluatePatternOffers(uid: string, now: Date): Promise<voi
               toString(o.offeredAt) AS offeredAt, toString(o.cooldownUntil) AS cooldownUntil`,
       { uid },
     );
+    // The parts trail offers share the weekly budget (only their times are read).
+    const t = await tx.run(TRAIL_OFFER_TIMES_QUERY, { uid, days: OFFER_EVERY_DAYS });
     return {
       rules,
       sessions: s.records.map((r) => r.toObject() as unknown as SessionEvidence),
       offers: o.records.map((r) => r.toObject() as unknown as ExistingOffer),
+      trailOffers: t.records.map((r) => r.get('offeredAt') as string),
     };
   });
   if (!state) return;
   let candidate: OfferCandidate | null = null;
   for (const rule of state.rules) {
-    candidate = evaluateRule(state.sessions, rule, state.offers, now.getTime());
+    candidate = evaluateRule(state.sessions, rule, state.offers, now.getTime(), state.trailOffers);
     if (candidate) break;
   }
   await writeTx(async (tx) => {

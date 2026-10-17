@@ -19,10 +19,12 @@ import { writeTx } from '../shared/neo4j';
 import { parseOrInvalid } from '../shared/errors';
 import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
+import { USER_DATA } from '../userdata/layers';
 import { legacyOutcome, readingProps } from '../capacity/reading';
 import { validateAnswer, validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
 import type { CloseKind, DetailKind } from './types';
 import { scheduleTx } from './followUp';
+import { NOT_WHAT_HELPS } from './tools';
 
 /** Detail node labels by kind (a whitelist: the label is interpolated into Cypher). */
 export const DETAIL_LABELS: Record<DetailKind, string> = {
@@ -30,7 +32,12 @@ export const DETAIL_LABELS: Record<DetailKind, string> = {
   invalidation_recovery: 'InvalidationRecoverySession',
   dear_man: 'DearManSession',
   find_the_feeling: 'FindTheFeelingSession',
+  meet_a_part: 'PartSession',
+  two_pulls: 'PullsSession',
 };
+
+/** The User → detail ownership rels (COMPLETED_SESSION for the four wrapped tools, HAS_PART_SESSION, HAS_PULLS_SESSION). */
+const DETAIL_RELS = [...new Set(Object.values(DETAIL_LABELS).map((l) => USER_DATA[l].rel))].join('|');
 
 /** Patterns whose reps are flagged blank / dissociated (E2 §A3.2). */
 export const BLANK_PATTERNS = ['conservation_freeze', 'dissociation_overmodulation', 'reward_drive_low'];
@@ -132,7 +139,11 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
          ts.thenVsNowDir = CASE WHEN ts.answeredAt IS NULL THEN $thenVsNowDir ELSE ts.thenVsNowDir END,
          ts.actedOnUrge = CASE WHEN ts.answeredAt IS NULL THEN $actedOnUrge ELSE ts.actedOnUrge END,
          ts.answeredAt = CASE WHEN ts.answeredAt IS NULL AND $answered THEN datetime() ELSE ts.answeredAt END,
-         ts.urgeIds = $urgeIds, ts.durationSec = $durationSec, ts.ext = $ext, ts.updatedAt = datetime()
+         ts.urgeIds = $urgeIds, ts.durationSec = $durationSec, ts.ext = $ext, ts.updatedAt = datetime(),
+         ts.wiseMindAnswer = $wiseMindAnswer,
+         // Emotions picked inside the tool: set once, never over a hand-off's ids from the start.
+         ts.emotionIds = CASE WHEN size(coalesce(ts.emotionIds, [])) = 0 AND size($emotionIds) > 0
+                              THEN $emotionIds ELSE ts.emotionIds END
      FOREACH (_ IN CASE WHEN $bandAtEnd IS NULL THEN [] ELSE [1] END |
        SET ts.bandAtEnd = $bandAtEnd, ts.bandAtEndSource = $bandAtEndSource, ts.bandAtEndViaCantTell = $bandAtEndViaCantTell,
            ts.bandAtEndAt = datetime($bandAtEndAt), ts.bandAtEndJson = $bandAtEndJson)
@@ -140,7 +151,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
        SET ts.bandAtStart = $bandAtStart, ts.bandAtStartSource = $bandAtStartSource, ts.bandAtStartViaCantTell = $bandAtStartViaCantTell,
            ts.bandAtStartAt = datetime($bandAtStartAt), ts.bandAtStartJson = $bandAtStartJson)
      WITH u, ts
-     OPTIONAL MATCH (u)-[:COMPLETED_SESSION]->(d {key: $detailKey})
+     OPTIONAL MATCH (u)-[:${DETAIL_RELS}]->(d {key: $detailKey})
        WHERE $detailLabel IS NOT NULL AND $detailLabel IN labels(d)
      FOREACH (x IN CASE WHEN d IS NULL THEN [] ELSE [d] END | MERGE (ts)-[:DETAIL]->(x))
      WITH DISTINCT ts
@@ -150,10 +161,13 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
     {
       uid, key, status: c.status, exitStep: c.exitStep, practiced: c.practiced,
       thenVsNow, thenVsNowDir: thenVsNow ? dir : null, actedOnUrge, answered,
-      urgeIds: c.urgeIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
+      urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
+      // Ask-fresh, on the log record only (layers.ts ASK_FRESH_FIELDS); another tool's is dropped.
+      wiseMindAnswer: rec.get('toolId') === 'wise-mind' ? c.wiseMindAnswer : null,
       ...readingProps('bandAtStart', c.bandAtStart),
       detailKey: c.detail ? userKey(uid, c.detail.id) : null, detailLabel,
-      legacyOutcome: legacyOutcome(thenVsNow),
+      // A "more here" close is not "it helped": no compat outcome for those tools.
+      legacyOutcome: NOT_WHAT_HELPS.includes(rec.get('toolId') as string) ? null : legacyOutcome(thenVsNow),
     },
   );
   const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
@@ -243,10 +257,13 @@ export const answerToolOutcome = callable<unknown, { ok: true; recorded: boolean
        OPTIONAL MATCH (ts)-[:COMPAT_USAGE]->(tu:ToolUsage) WHERE ${GUARDS.ToolUsage.outcome('tu')}
        WITH ts, tvn, tu, CASE tvn WHEN 'much_better' THEN 'helped' WHEN 'better' THEN 'somewhat'
                               WHEN 'same' THEN 'not_really' WHEN 'worse' THEN 'not_really' ELSE null END AS legacy
-       FOREACH (x IN CASE WHEN tu IS NULL OR legacy IS NULL THEN [] ELSE [tu] END |
+       FOREACH (x IN CASE WHEN tu IS NULL OR legacy IS NULL OR ts.toolId IN $notWhatHelps THEN [] ELSE [tu] END |
          SET x.outcome = legacy, x.outcomeTimestamp = datetime())
        RETURN ts.id AS id`,
-      { uid, key: userKey(uid as string, a.toolSessionId), thenVsNow: a.thenVsNow, actedOnUrge: a.actedOnUrge, dismissed: a.dismissed },
+      {
+        uid, key: userKey(uid as string, a.toolSessionId), thenVsNow: a.thenVsNow, actedOnUrge: a.actedOnUrge, dismissed: a.dismissed,
+        notWhatHelps: NOT_WHAT_HELPS,
+      },
     ));
     return { ok: true, recorded: res.records.length > 0 };
   },

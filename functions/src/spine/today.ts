@@ -10,6 +10,8 @@ import { readTx } from '../shared/neo4j';
 import { BANDS, type Band } from '../capacity/types';
 import { readFollowUpTypes, type FollowUpTypeContent } from './registry';
 import { fillDeepLink, followUpState, orderToday, type TodayItem } from './todayOrder';
+import { NOT_WHAT_HELPS } from './tools';
+import { COPE_AHEAD_AFTER, planIdsFromExt } from './copeAheadAfter';
 
 export interface GetTodayResponse {
   items: TodayItem[];
@@ -31,8 +33,11 @@ interface CloseFlowContent {
  */
 export type TodaySource = (tx: ManagedTransaction, uid: string, now: Date) => Promise<TodayItem[]>;
 const extraSources: TodaySource[] = [];
-export function registerTodaySource(s: TodaySource): void {
+/** Follow-up types a registered source draws itself (the generic follow-up read leaves them out). */
+const ownedTypes = new Set<string>();
+export function registerTodaySource(s: TodaySource, ownsFollowUpTypes: readonly string[] = []): void {
   if (!extraSources.includes(s)) extraSources.push(s);
+  for (const t of ownsFollowUpTypes) ownedTypes.add(t);
 }
 
 /**
@@ -48,16 +53,19 @@ export function registerTodayPrepare(p: TodayPrepare): void {
 async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<string, FollowUpTypeContent>, now: Date) {
   const res = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_FOLLOW_UP]->(f:FollowUp {status: 'scheduled'})
-     MATCH (t:FollowUpType {id: f.type}) WHERE t.enabled = true
+     MATCH (t:FollowUpType {id: f.type}) WHERE t.enabled = true AND NOT t.id IN $owned
      WITH f, t
      WHERE (f.snoozedUntil IS NULL OR f.snoozedUntil <= datetime())
        AND f.dueAt <= datetime() + duration({hours: 24})
        AND f.dueAt > datetime() - duration({hours: coalesce(t.staleAfterHours, 36) + 168})
      OPTIONAL MATCH (f)-[:DETAIL]->(d)
      RETURN f.id AS id, f.type AS type, toString(f.dueAt) AS dueAt, f.sourceToolId AS sourceToolId,
-            f.sourceSessionId AS sourceSessionId, coalesce(f.notifyInTab, false) AS notifyInTab, d.id AS detailId
+            f.sourceSessionId AS sourceSessionId, coalesce(f.notifyInTab, false) AS notifyInTab, d.id AS detailId,
+            // Cope Ahead's after card: the visit's ext, for the plan's ids (copeAheadAfter.ts), nothing else.
+            head([(f)<-[:SCHEDULED]-(ts:ToolSession {toolId: 'cope-ahead'})
+                  WHERE f.type = 'cope_ahead_after' AND ts.ownerId = $uid | ts.ext]) AS planExt
      ORDER BY f.dueAt LIMIT 25`,
-    { uid },
+    { uid, owned: [...ownedTypes] },
   );
   const items: TodayItem[] = [];
   let next: GetTodayResponse['nextInTab'] = null;
@@ -79,6 +87,8 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
         copy: t.copy,
         source: { ...(vars.sourceToolId ? { toolId: vars.sourceToolId } : {}), ...(vars.sourceSessionId ? { toolSessionId: vars.sourceSessionId } : {}),
           ...(vars.detailId ? { detailId: vars.detailId } : {}) },
+        // The plan's ids from the visit (never a stored plan string): the card composes the words.
+        ...(t.id === COPE_AHEAD_AFTER ? { plan: planIdsFromExt(r.get('planExt')) } : {}),
       });
     }
     // OA plans keep their own reminder (useOppositeActionFollowUps); the rest remind from here.
@@ -97,7 +107,7 @@ async function toolOutcomeItem(
   if (!t?.enabled || !flow) return [];
   const res = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession)
-     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge']
+     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge'] AND NOT ts.toolId IN $notWhatHelps
        AND ts.answeredAt IS NULL AND coalesce(ts.outcomeAskDismissed, false) = false
        AND coalesce(ts.endedAt, ts.startedAt) > datetime() - duration({hours: 12})
        AND (ts.status = 'completed' OR coalesce(ts.practiced, false))
@@ -105,7 +115,7 @@ async function toolOutcomeItem(
      RETURN ts.id AS id, ts.toolId AS toolId, ts.closeKind AS closeKind,
             toString(coalesce(ts.endedAt, ts.startedAt)) AS at
      ORDER BY coalesce(ts.endedAt, ts.startedAt) DESC LIMIT 1`,
-    { uid },
+    { uid, notWhatHelps: NOT_WHAT_HELPS },
   );
   const r = res.records[0];
   if (!r) return [];

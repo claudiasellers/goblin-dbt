@@ -1,10 +1,15 @@
-import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef, Suspense, lazy, type ComponentProps } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { getEmotionById, getEmotionByName } from '../../data/emotions';
 import { EmotionPicker } from '../../components/tools/EmotionPicker';
 import { getToolById } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
 import { SessionClose } from '../../components/spine/SessionClose';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { getPartsContent } from '../../services/partsContent';
+import type { PartsContent } from '../../data/partsContentTypes';
+import { newId } from '../../lib/spine/ids';
+import { PS_AMBIVALENCE_BARRIER, psLaterCandidate, psLaterCopy } from '../../lib/psAmbivalence';
 import {
   getProblemSolveContent,
   type ProblemSolveContent,
@@ -32,6 +37,16 @@ type Phase =
   | 'solutions'
   | 'commit'
   | 'complete';
+
+/** The confidence ruler's answers; `ext.er.confidence` takes only these. */
+const CONFIDENCE_LEVELS: readonly string[] = ['high', 'medium', 'low', 'none'];
+
+// Parts' callables load on demand, at the one moment this page calls one (a yes to "another time").
+const queuePartCandidate: typeof import('../../services/parts').queuePartCandidate = (req) => import('../../services/parts').then((m) => m.queuePartCandidate(req));
+// "Another time" is fetched with the parts copy it needs, so the line never waits on its own chunk.
+const loadLater = () => import('../../components/parts/PartLaterLine');
+const LazyPartLaterLine = lazy(() => loadLater().then((m) => ({ default: m.PartLaterLine })));
+function PartLaterLine(p: ComponentProps<typeof LazyPartLaterLine>) { return <Suspense fallback={null}><LazyPartLaterLine {...p} /></Suspense>; }
 
 export function ProblemSolve() {
   const location = useLocation();
@@ -93,13 +108,40 @@ export function ProblemSolve() {
     if (phase === 'define-problem') session.markPracticed();
     if (phase === 'complete') session.markComplete();
   }, [phase, session]);
+  // What got in the way (barrier, its follow-up, the ambivalence answer, confidence) is kept too, as
+  // ids, so a pattern across tools can be seen later.
   useEffect(() => {
     const er: Record<string, string> = {};
     if (selectedProblemTypes[0]?.id) er.problemTypeId = selectedProblemTypes[0].id;
     if (selectedDirection?.id) er.directionId = selectedDirection.id;
     if (chosenSize) er.size = chosenSize;
+    if (selectedBarrier?.id) er.barrierTypeId = selectedBarrier.id;
+    if (selectedSubResponse?.id) er.barrierSubId = selectedSubResponse.id;
+    if (selectedAmbivalence?.id) er.ambivalenceId = selectedAmbivalence.id;
+    if (confidenceLevel && CONFIDENCE_LEVELS.includes(confidenceLevel)) er.confidence = confidenceLevel;
     if (Object.keys(er).length) session.setExt({ er });
-  }, [selectedProblemTypes, selectedDirection, chosenSize, session]);
+  }, [selectedProblemTypes, selectedDirection, chosenSize, selectedBarrier, selectedSubResponse, selectedAmbivalence, confidenceLevel, session]);
+  // Parts on, after the cant-ambivalent barrier only: "Want to get to know that part another time?" on
+  // the ambivalence answer's screen (src/lib/psAmbivalence.ts). The parts copy is read only then; the yes
+  // queues a candidate and is recorded once queued.
+  const partsOn = useUserProfile().profile.partsEnabled;
+  const [parts, setParts] = useState<PartsContent | null>(null);
+  const wantsPsLater = partsOn && selectedSubResponse?.id === PS_AMBIVALENCE_BARRIER;
+  useEffect(() => {
+    if (!wantsPsLater || parts) return;
+    let live = true;
+    Promise.all([getPartsContent(), loadLater()]).then(([p]) => { if (live) setParts(p); }).catch(() => { /* no line */ });
+    return () => { live = false; };
+  }, [wantsPsLater, parts]);
+  const psLater = psLaterCopy(parts, partsOn, selectedSubResponse?.id);
+  const psLaterId = useRef<string | null>(null);
+  const queuePsLater = async () => {
+    psLaterId.current ??= newId();
+    await queuePartCandidate(psLaterCandidate(psLaterId.current));
+    session.setExt({ er: { psLater: true } });
+  };
+  // The emotions picked here are the session's when it opened without any (a hand-off's are kept).
+  useEffect(() => { session.setEmotionIds(selectedEmotionIds); }, [selectedEmotionIds, session]);
 
   // ── Load content ──
 
@@ -772,6 +814,8 @@ export function ProblemSolve() {
           >
             Let's keep going
           </button>
+
+          {psLater && <PartLaterLine ask={psLater.ask} done={psLater.done} onLater={queuePsLater} />}
         </div>
       );
     }

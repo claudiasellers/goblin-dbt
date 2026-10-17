@@ -7,6 +7,8 @@ import neo4j, { type Record as Neo4jRecord } from 'neo4j-driver';
 import { readTx } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
 import { normalizeToolId } from '../shared/toolIds';
+import { partsFeel, partsReflect } from '../parts/stats';
+import { readStatsRows } from '../parts/statsQueries';
 import type { InsightsDeps } from './handler';
 import type { ActedOnUrge, CheckInRow, LegacyUsageRow, SessionRow, ThenVsNow, TimeRange } from './types';
 
@@ -45,7 +47,10 @@ export const SESSIONS_QUERY = `
          coalesce(ts.patternId, c.activationPatternId) AS patternId,
          coalesce(c.id, ts.checkInId) AS checkInId,
          toString(coalesce(ts.endedAt, ts.startedAt)) AS at,
-         ts.closeKind AS closeKind, ts.thenVsNow AS thenVsNow, ts.actedOnUrge AS actedOnUrge
+         ts.closeKind AS closeKind, ts.thenVsNow AS thenVsNow, ts.actedOnUrge AS actedOnUrge,
+         // Cope Ahead: its after card's answer (the follow-up the visit scheduled, resolved).
+         head([(ts)-[:SCHEDULED]->(f:FollowUp {type: 'cope_ahead_after'})
+               WHERE f.status = 'done' AND f.planHelped IS NOT NULL | f.planHelped]) AS planHelped
   ORDER BY at DESC
 `;
 
@@ -92,6 +97,7 @@ const strOrNull = (v: unknown): string | null => (typeof v === 'string' && v.len
 const THEN_VS_NOW: readonly string[] = ['much_better', 'better', 'same', 'worse'];
 const ACTED: readonly string[] = ['no', 'partly', 'yes', 'not_yet'];
 const LEGACY: readonly string[] = ['helped', 'somewhat', 'not_really'];
+const PLAN_HELPED: readonly string[] = ['helped', 'unsure', 'unused'];
 
 export function checkInRow(r: Neo4jRecord): CheckInRow {
   return {
@@ -122,6 +128,7 @@ export function sessionRow(r: Neo4jRecord): SessionRow {
     closeKind: strOrNull(r.get('closeKind')),
     thenVsNow: THEN_VS_NOW.includes(tvn) ? (tvn as ThenVsNow) : null,
     actedOnUrge: ACTED.includes(acted) ? (acted as ActedOnUrge) : null,
+    planHelped: r.has('planHelped') && PLAN_HELPED.includes(r.get('planHelped')) ? (r.get('planHelped') as SessionRow['planHelped']) : null,
   };
 }
 
@@ -165,6 +172,17 @@ export function graphDeps(userId: string): InsightsDeps {
         suggestedTool: (r.get('suggestedAppTool') as string | null) || (raw ? normalizeToolId(raw) : null),
         targetPatternId: r.get('targetPatternId'),
       };
+    },
+    // Parts (all time, parts on only): the stats module's reads in one transaction, then its compute.
+    // Optional and new: a failed read logs and leaves the section out, never the rest of Reflect.
+    async parts() {
+      try {
+        const rows = await readTx((tx) => readStatsRows(tx, userId));
+        return { parts: partsReflect(rows), feel: partsFeel(rows, new Date()) };
+      } catch (e) {
+        console.error('getInsightsData parts failed', (e as { code?: string } | null)?.code ?? 'unknown');
+        return null;
+      }
     },
     async somaticNarrative(pid) {
       const r = (await read(SOMATIC_NARRATIVE_QUERY, { pid }))[0];

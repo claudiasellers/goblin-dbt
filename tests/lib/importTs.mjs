@@ -6,7 +6,7 @@ import { mkdirSync, readFileSync, writeFileSync, existsSync, mkdtempSync } from 
 import { dirname, join, relative, resolve } from "node:path";
 import { tmpdir } from "node:os";
 import { pathToFileURL } from "node:url";
-import { createRequire } from "node:module";
+import { createRequire, isBuiltin } from "node:module";
 import ts from "typescript";
 
 const root = resolve(dirname(new URL(import.meta.url).pathname), "../..");
@@ -42,6 +42,8 @@ function build(file) {
       const dep = build(resolveTs(file, spec));
       return `${pre}${q}${pathToFileURL(dep).href}${q}`;
     }
+    // Node's own modules (node:crypto) stay as they are: req.resolve returns them bare, not as a path.
+    if (isBuiltin(spec)) return m;
     try {
       return `${pre}${q}${pathToFileURL(req.resolve(spec)).href}${q}`;
     } catch {

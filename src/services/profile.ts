@@ -2,9 +2,12 @@
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
 import type { ClientProfileConsumer, GetProfileContextResponse, PatternOfferAnswer, ProfileAreaId, ProfileItemMeta, QuietHours } from '../data/profileTypes';
+import type { PartMessageLine, PartStats } from '../data/partsTypes';
 
+/** getMe's item labels (functions/src/profile/me.ts). `Part` arrives only while parts are on. */
+export type MeItemLabel = 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
 export interface MeItem {
-  label: 'ProfileFact' | 'MyPattern' | 'OwnLine';
+  label: MeItemLabel;
   meta: ProfileItemMeta;
   title: string;
   summary: string;
@@ -13,6 +16,27 @@ export interface MeItem {
   stillTrueCopy: string;
   setAsideCopy: string;
   toolId?: string | null;
+  /** Part items only (functions/src/profile/me.ts `MePart`): what the Parts of me card shows. */
+  part?: MePart;
+}
+/** Never the own-words fear, and no fears on a tender part (the server leaves them out). */
+export interface MePart {
+  name: string | null;
+  tender: boolean;
+  places: string[];
+  shapeSig: number[] | null;
+  jobIds: string[];
+  ownJob: string | null;
+  fearIds: string[];
+  preferredRoleIds: string[];
+  moveIds: string[];
+  lastVisitedAt: string | null;
+  /** The part safety flag (functions/src/safety/partSafetyFlag.ts): CrisisBanner alongside the card, never instead. */
+  safety?: boolean;
+  /** Active and resting parts: the readout's counts and ids (functions/src/parts/stats.ts), each line null below its threshold. */
+  stats?: PartStats;
+  /** Active and resting parts: the latest thing the person said to it (sayToPart). Absent from an older server. */
+  told?: PartMessageLine;
 }
 export interface GetMeResponse {
   version: number;
@@ -24,8 +48,17 @@ export interface GetMeResponse {
     savedLines: Array<{ lineId: string; text: string }>;
   };
   offers: Array<{ id: string; statement: string; offerCopy: string; toolId: string | null; evidenceCount: number }>;
+  /** Open PartCandidates, newest first, at most 3; empty with parts off. Absent from an older server. */
+  partCandidates?: MePartCandidate[];
 }
-export interface ProfileItemRef { id: string; label: 'ProfileFact' | 'MyPattern' | 'OwnLine' }
+/** A part the person said they'd come back to (functions/src/profile/me.ts `MePartCandidate`). */
+export interface MePartCandidate {
+  id: string;
+  origin: string;
+  moveIds: string[];
+  createdAt: string | null;
+}
+export interface ProfileItemRef { id: string; label: MeItemLabel }
 
 const ctxFn = httpsCallable<{ toolId: ClientProfileConsumer }, GetProfileContextResponse>(functions, 'getProfileContext');
 const meFn = httpsCallable<void, GetMeResponse>(functions, 'getMe');

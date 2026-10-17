@@ -15,6 +15,11 @@ interface TapCardProps {
   onPrevious?: () => void;
   /** Extra content above the choices (e.g. a values check). */
   before?: ReactNode;
+  /**
+   * The id of a line in `before` the question should be read with (aria-describedby on the focused
+   * heading): a line above the question that a screen reader landing on it would otherwise skip.
+   */
+  describedBy?: string;
   /** Extra content below the choices (e.g. optional details, support). */
   after?: ReactNode;
 }
@@ -33,6 +38,7 @@ export function TapCard({
   onPrevious,
   before,
   after,
+  describedBy,
 }: TapCardProps) {
   const heading = useRef<HTMLHeadingElement>(null);
   // Tapping a choice unmounts the button that had focus; move focus to the new question.
@@ -57,7 +63,7 @@ export function TapCard({
         </span>
       </div>
       {before}
-      <h3 ref={heading} tabIndex={-1} className="font-semibold text-lg outline-none">
+      <h3 ref={heading} tabIndex={-1} aria-describedby={describedBy} className="font-semibold text-lg outline-none">
         {question}
       </h3>
       <ChoiceList options={options} value={value} onSelect={onSelect} label={question} />

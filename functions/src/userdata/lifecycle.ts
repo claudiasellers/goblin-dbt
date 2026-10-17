@@ -53,6 +53,43 @@ export const GUARDS = {
     /** outcome is set once. */
     outcome: (v: string) => `${v}.outcome IS NULL`,
   },
+  PartSession: {
+    /** savePartSession: only while open; a saved session is frozen. */
+    save: (v: string) => `${v}.status = 'open'`,
+    /**
+     * keepPart (9b's yes) links the session to its part: while open, or within 12 h of the save, so a
+     * slow keep after the close still lands (the same episode a closed ToolSession's answer gets).
+     */
+    keep: (v: string) =>
+      `(${v}.status = 'open' OR (${v}.status = 'saved' AND ${v}.savedAt > datetime() - duration({hours: ${TOOL_SESSION_ANSWER_HOURS}})))`,
+  },
+  PullsSession: {
+    /** savePullsSession: only while open; a saved session is frozen. */
+    save: (v: string) => `${v}.status = 'open'`,
+    /**
+     * keepPullsKeepsake and schedulePullsCheckback link out of the visit (KEPT_LINE, SCHEDULED): while
+     * open, or within 12 h of the save, as PartSession.keep (the record's own properties never change).
+     */
+    keep: (v: string) =>
+      `(${v}.status = 'open' OR (${v}.status = 'saved' AND ${v}.savedAt > datetime() - duration({hours: ${TOOL_SESSION_ANSWER_HOURS}})))`,
+  },
+  PartCandidate: {
+    /** keepPart accepts a candidate once; any other status is final. */
+    accept: (v: string) => `${v}.status = 'open'`,
+    /** answerPartCandidate's "Not any more" (Me): only while open; a dismissed one stays dismissed. */
+    dismiss: (v: string) => `${v}.status = 'open'`,
+  },
+  TrailOffer: {
+    /** getTrailOfferEvidence ("Show me"): offered → seen, once. */
+    see: (v: string) => `${v}.status = 'offered'`,
+    /**
+     * answerTrailOffer: while open (offered or seen) and not cooling down. Not now leaves it open with a
+     * cooldown; every other answer is final (`answered`).
+     */
+    answer: (v: string) => `(${v}.status IN ['offered', 'seen'] AND (${v}.cooldownUntil IS NULL OR ${v}.cooldownUntil <= datetime()))`,
+    /** removeTrailPattern (Reflect's ×): a trail answered *It's how things go*, once; forward only. */
+    removePattern: (v: string) => `(${v}.status = 'answered' AND ${v}.answer = 'how_it_goes' AND ${v}.patternRemovedAt IS NULL)`,
+  },
 } as const;
 
 type Props = Record<string, unknown>;
@@ -65,7 +102,7 @@ const ms = (v: unknown): number | null => {
 
 /** The TypeScript mirror of GUARDS (for tests and for callers that already hold the record). */
 export function writable(
-  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice',
+  label: 'CheckIn' | 'ToolSession' | 'FollowUp' | 'PatternOffer' | 'ToolUsage' | 'SkillPractice' | 'PartSession' | 'PullsSession' | 'PartCandidate' | 'TrailOffer',
   op: string,
   p: Props,
   now: number = Date.now(),
@@ -94,6 +131,21 @@ export function writable(
     case 'FollowUp': return p.status === 'scheduled';
     case 'PatternOffer': return p.status === 'offered';
     case 'ToolUsage': return p.outcome == null;
+    case 'PartSession':
+    case 'PullsSession': {
+      if (p.status === 'open') return true;
+      if (op !== 'keep' || p.status !== 'saved') return false;
+      const saved = ms(p.savedAt);
+      return saved !== null && saved > now - TOOL_SESSION_ANSWER_HOURS * HOUR;
+    }
+    case 'PartCandidate': return p.status === 'open';
+    case 'TrailOffer': {
+      if (op === 'see') return p.status === 'offered';
+      if (op === 'removePattern') return p.status === 'answered' && p.answer === 'how_it_goes' && p.patternRemovedAt == null;
+      if (op !== 'answer' || (p.status !== 'offered' && p.status !== 'seen')) return false;
+      const until = ms(p.cooldownUntil);
+      return until === null || until <= now;
+    }
     case 'SkillPractice': return false; // terminal at creation
     default: return false;
   }

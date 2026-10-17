@@ -15,7 +15,7 @@ import { obj, uuid } from '../shared/validate';
 import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import { readingProps } from '../capacity/reading';
-import { nextActionParams, parseNextAction, validateSaveCheckIn, type CheckInNextAction } from './validation';
+import { nextActionParams, parseNextAction, spotsJson, validateSaveCheckIn, type CheckInNextAction } from './validation';
 
 export interface SaveCheckInResponse { id: string }
 
@@ -51,7 +51,10 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
         { uid, email, key, id, timestamp: input.timestamp },
       );
       if (head.records[0]?.get('open') !== true) return; // finalised: the save is a no-op
-      const emotionIds = await knownEmotionIds(tx, input.emotionIds);
+      // One lookup for the check-in's ids and its spots' (the spots' are normally a subset).
+      const spotIds = (input.spots ?? []).flatMap((s) => s.emotionIds);
+      const known = new Set(await knownEmotionIds(tx, [...new Set([...input.emotionIds, ...spotIds])]));
+      const emotionIds = input.emotionIds.filter((e) => known.has(e));
       const band = readingProps('band', input.capacity);
       const next = nextActionParams(input.nextAction);
       // 2. Every result field (re-analysis overwrites them); a next-action stub keeps its next action.
@@ -60,7 +63,7 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
          WITH c, c.nextActionKind IS NULL AS noNext
          SET c.emotion = $emotion, c.quadrant = $quadrant, c.intensityX = $intensityX, c.intensityY = $intensityY,
              c.note = $note, c.activationPatternId = $activationPatternId, c.confidence = $confidence,
-             c.source = $source, c.emotionIds = $emotionIds,
+             c.source = $source, c.emotionIds = $emotionIds, c.spotsJson = $spotsJson,
              c.discQuestionIds = $discQuestionIds, c.discResponseIds = $discResponseIds,
              c.recommendedToolIds = $recommendedToolIds, c.secondaryPatternId = $secondaryPatternId,
              c.routingVersion = $routingVersion, c.routingBand = $routingBand, c.routingBandSource = $routingBandSource,
@@ -108,7 +111,7 @@ export const saveCheckIn = callable<unknown, SaveCheckInResponse>(
           uid, key,
           emotion: input.emotion, quadrant: input.quadrant, intensityX: input.intensityX, intensityY: input.intensityY,
           note: input.note, activationPatternId: input.activationPatternId, confidence: input.confidence,
-          source: input.source, emotionIds,
+          source: input.source, emotionIds, spotsJson: spotsJson(input.spots, known),
           discQuestionIds: input.discQuestionIds, discResponseIds: input.discResponseIds,
           recommendedToolIds: input.recommendedToolIds, secondaryPatternId: input.secondaryPatternId,
           routingVersion: input.routingVersion, routingBand: input.routingBand, routingBandSource: input.routingBandSource,

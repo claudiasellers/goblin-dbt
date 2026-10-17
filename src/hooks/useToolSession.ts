@@ -49,6 +49,22 @@ export interface ToolSessionApi {
   setBandAtStart(r: CapacityReading): void;
   /** The skills this visit practised, when not the tool's PracticeSkill.defaultFor (e.g. Cool Down's exhale). */
   setSkillIds(ids: string[]): void;
+  /**
+   * Emotions the person picked inside the tool (ids or display names). Sent at close; the server
+   * keeps them only when the session started without any (a hand-off's are never replaced).
+   */
+  setEmotionIds(ids: string[]): void;
+  /**
+   * The urge the person picked in this visit (the tool's own graph ids). Sent with whichever close
+   * happens, unless the close passes its own `urgeIds`. Ask-fresh: only a pick made in this visit,
+   * never one hydrated from a saved session.
+   */
+  setUrgeIds(ids: string[]): void;
+  /**
+   * Wise mind's answer in this visit (a WiseMindAnswer id, or `own`), sent with whichever close happens.
+   * Ask-fresh (layers.ts ASK_FRESH_FIELDS): only what was picked now, never read back or pre-filled.
+   */
+  setWiseMindAnswer(id: string | null): void;
   /** Close once (later calls resolve null). Resolves null when nothing was written. */
   close(input?: ToolSessionCloseInput): Promise<CloseToolSessionResponse | null>;
   /** Route + state for handing off to another tool from inside this one. */
@@ -67,6 +83,9 @@ export const NO_SESSION: ToolSessionApi = {
   setExt: () => {},
   setBandAtStart: () => {},
   setSkillIds: () => {},
+  setEmotionIds: () => {},
+  setUrgeIds: () => {},
+  setWiseMindAnswer: () => {},
   close: async () => null,
   linkTo: (toolId, state) => ({ pathname: `/tool/${toolId}`, state: { ...state, spine: { entry: 'handoff' } } }),
 };

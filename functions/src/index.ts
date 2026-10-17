@@ -18,6 +18,8 @@ export { getProblemSolveContent } from './problemSolve';
 export { getInvalidationRecoveryContent, saveInvalidationRecoverySession, getInvalidationRecoveryProgress } from './invalidationRecovery';
 export { getFindTheFeelingContent, saveFindTheFeelingSession, getFeelingCollection } from './findTheFeeling';
 export { getCapacityContent } from './capacity';
+export { getWiseMindContent } from './wiseMind';
+export { getCopeAheadContent } from './copeAhead';
 export { getBodyMapContent, suggestEmotionsFromBody } from './bodyMap';
 export { getWitnessLines, recordWitnessBeat } from './witness';
 export {
@@ -28,3 +30,16 @@ export {
   getProfileContext, getMe, upsertProfileFact, confirmProfileItem, setAsideProfileItem, restoreProfileItem,
   answerPatternOffer,
 } from './profile';
+export { getPartsEntry, startPartSession, savePartSession, keepPart, queuePartCandidate } from './parts';
+export { deleteMyParts, countMyPartsLines } from './parts';
+export { answerPartCandidate } from './parts';
+export { tagPart } from './parts';
+export { sayToPart } from './parts';
+export { renamePart, restPart, setAsidePart, restorePart, setPartTender, answerPartRevisit } from './parts';
+export { schedulePartCheckback, answerPartCheckback } from './parts';
+export { setPartAnchor } from './parts';
+export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './parts';
+export { startPullsSession, savePullsSession, keepPullsKeepsake, schedulePullsCheckback } from './parts';
+export { setPartShape } from './parts';
+export { getDen, getDenSnapshot, updatePartLayout, linkParts, unlinkParts } from './parts';
+export { getPartStory } from './parts';

@@ -13,11 +13,15 @@ import { ToolLoadError } from '../../components/tools/ToolLoadError';
 import { Orient } from '../../components/tools/regulation/body';
 import { linkButton, primaryButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 import { useToolSession } from '../../hooks/useToolSession';
+import { useUnblendLine } from '../../hooks/useUnblendLine';
 import { recordToolSession } from '../../services/spine';
 import { thenVsNowFromFtf } from '../../lib/band';
 import { useBand } from '../../hooks/useBand';
 import { newId } from '../../lib/spine/ids';
+import { sessionEmotionIds } from '../../lib/spine/toolLink';
 import type { RoomProps } from '../../components/tools/findTheFeeling/roomTypes';
+import { PartTagSlot } from '../../components/spine/PartTagSlot';
+import { visitHasShape } from '../../lib/partShape';
 
 // Rooms carry three.js / Web Audio: loaded only when the tool opens, one room at a time.
 const rooms: Record<Way, React.LazyExoticComponent<ComponentType<RoomProps>>> = {
@@ -93,18 +97,27 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   if (!sessionId.current) sessionId.current = newId();
   const savedFor = useRef<string | null>(null);
   const toolSession = useToolSession();
+  // "Was this a part you know?" (PartTagSlot) under the close, in the next step and then the collection:
+  // it waits for the server to have the close, and folds away in both once tapped.
+  const [closeSaved, setCloseSaved] = useState(false);
+  const [tagGone, setTagGone] = useState(false);
+  // The word found here is the session's emotion when it opened without any (a hand-off's are kept).
+  useEffect(() => { toolSession.setEmotionIds(state.word ? [state.word] : []); }, [state.word, toolSession]);
   /** PR-S4: link the run to its spine session once the FTF session is saved (DETAIL needs it). */
   const wrap = (embedId: string | null) => {
     const detail = { kind: 'find_the_feeling' as const, id: sessionId.current };
     const skills = state.word ? {} : { skillIds: [] as string[] }; // a rep of `label` only when a word was accepted
     if (embedId) {
       // Inside the check-in there is no tool page: a one-shot embedded session the check-in links to.
-      void recordToolSession({ id: embedId, toolId: 'find-the-feeling', entry: 'embedded', status: 'completed', detail, ...skills })
+      const emotionIds = state.word ? sessionEmotionIds([state.word]) : [];
+      void recordToolSession({ id: embedId, toolId: 'find-the-feeling', entry: 'embedded', status: 'completed', detail, ...skills,
+        ...(emotionIds.length ? { emotionIds } : {}) })
         .catch(() => { /* best effort */ });
       return;
     }
     const tvn = thenVsNowFromFtf(state.close);
-    void toolSession.close({ status: 'completed', detail, ...(tvn ? { thenVsNow: tvn.thenVsNow } : {}), ...skills });
+    toolSession.close({ status: 'completed', detail, ...(tvn ? { thenVsNow: tvn.thenVsNow } : {}), ...skills })
+      .then((r) => { if (r) setCloseSaved(true); }, () => { /* best effort */ });
   };
   const doSave = (embedId: string | null = null) => {
     const session = toSession(state, sessionId.current, content.version);
@@ -127,10 +140,20 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finished]);
 
-  const restart = () => { sessionId.current = newId(); setSave('idle'); dispatch({ t: 'restart' }); };
+  const restart = () => { sessionId.current = newId(); setSave('idle'); setCloseSaved(false); setTagGone(false); dispatch({ t: 'restart' }); };
+  const tagRow = !tagGone && (
+    <PartTagSlot toolId="find-the-feeling" toolSessionId={toolSession.id} thenVsNow={thenVsNowFromFtf(state.close)?.thenVsNow}
+      saved={closeSaved} onGone={() => setTagGone(true)} shape={visitHasShape(state.found)} />
+  );
+
+  // Parts on: "A part of you … right now." on the step right after the pull (parts.md, in the moment).
+  // The tool only: inside the check-in nothing parts-related shows.
+  const afterPull = entry === 'tool' && state.step !== 'pull' && history.stack[history.stack.length - 2]?.step === 'pull';
+  const unblend = useUnblendLine('ftf', state.pull, afterPull);
 
   const o = c.orient;
   const slots: RoomProps['slots'] = {
+    unblend,
     back: history.stack.length > 1 && !finished
       ? <button type="button" className={linkButton} onClick={() => dispatch({ t: 'back' })}>{c.nav.back}</button>
       : null,
@@ -156,6 +179,7 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
           );
         })}
         <button type="button" className={primaryButton} onClick={() => dispatch({ t: 'nextDone' })}>{c.next.done}</button>
+        {tagRow}
       </div>
     ),
     saveStatus: (
@@ -170,6 +194,7 @@ function Flow({ content, entry, onHandoff }: { content: FindTheFeelingContent; e
           </div>
         )}
         <button type="button" className={linkButton} onClick={restart}>{c.collection.again}</button>
+        {tagRow}
       </div>
     ),
   };

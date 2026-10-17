@@ -16,7 +16,8 @@ import type { Action, FlowState } from '../../../lib/findTheFeelingFlow';
  * - Ambient descent: rooms read `ambientDescent(...)` from lib/findTheFeeling each render and apply
  *   `driftShape` / `driftSound` to what they display (not to `state.found`).
  * - `slots.orient` is rendered in the orient step; `slots.next` in the next step; `slots.saveStatus`
- *   in the collection step. `slots.back` is a Back control or null.
+ *   in the collection step. `slots.back` is a Back control or null. `slots.unblend` is the parts
+ *   unblend line (text, already resolved) or null: a room shows it as one quiet line near the top.
  * - Everything must work with reduced motion, with a finger and a mouse, and (Tune) with sound off.
  */
 export interface RoomProps {
@@ -27,5 +28,5 @@ export interface RoomProps {
   name: string | null;
   collection: CollectedWord[];
   reducedMotion: boolean;
-  slots: { orient: ReactNode; next: ReactNode; back: ReactNode | null; saveStatus: ReactNode };
+  slots: { orient: ReactNode; next: ReactNode; back: ReactNode | null; saveStatus: ReactNode; unblend: string | null };
 }

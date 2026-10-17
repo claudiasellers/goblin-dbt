@@ -1,6 +1,12 @@
+import { Suspense, lazy, useEffect } from 'react';
 import { useParams, Link, useLocation, Navigate } from 'react-router-dom';
 import { getToolById, toolIdFromUrl, TOOL_URL_SLUGS } from '../data/tools';
 import { ToolSessionProvider } from '../contexts/ToolSessionContext';
+import { useToolGate } from '../hooks/useToolGate';
+import { useStepBackSlot } from '../hooks/useStepBackSlot';
+import { useUserProfile } from '../contexts/UserProfileContext';
+import { ToolLoading } from '../components/tools/ToolLoading';
+import { ToolNotFound } from '../components/tools/ToolNotFound';
 
 // Import tool components
 import { CoolDown } from './tools/CoolDown';
@@ -13,6 +19,33 @@ import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
 
+// Meet a part, loaded on demand: its gate below (parts on, copy signed off) stays eager, so
+// a parts-off person never fetches it. With parts on, the fetch starts with the gate's own.
+const loadMeetAPart = () => import('./tools/MeetAPart');
+const LazyMeetAPart = lazy(() => loadMeetAPart().then((m) => ({ default: m.MeetAPart })));
+function MeetAPart() { return <Suspense fallback={<ToolLoading />}><LazyMeetAPart /></Suspense>; }
+// Two pulls loads the same way, behind the same kind of gate (parts on, its copy signed off).
+const loadTwoPulls = () => import('./tools/TwoPulls');
+const LazyTwoPulls = lazy(() => loadTwoPulls().then((m) => ({ default: m.TwoPulls })));
+function TwoPulls() { return <Suspense fallback={<ToolLoading />}><LazyTwoPulls /></Suspense>; }
+// Wise mind (docs/design/wise-mind.md), its own chunk too: two SVG scenes and three practices nobody else needs.
+const loadWiseMind = () => import('./tools/WiseMind');
+const LazyWiseMind = lazy(() => loadWiseMind().then((m) => ({ default: m.WiseMind })));
+/**
+ * With parts on, a kept part and the step back's copy shipped, Wise mind runs its parts form (screen 2p,
+ * src/hooks/useStepBackSlot.tsx); the page decides its form once, so it waits for that gate first.
+ */
+function WiseMind() {
+  const { pending, slot } = useStepBackSlot();
+  if (pending) return <ToolLoading />;
+  return <Suspense fallback={<ToolLoading />}><LazyWiseMind stepBack={slot} /></Suspense>;
+}
+
+// Cope Ahead (docs/design/cope-ahead.md), its own chunk: seven screens and a rehearsal nobody else needs.
+const loadCopeAhead = () => import('./tools/CopeAhead');
+const LazyCopeAhead = lazy(() => loadCopeAhead().then((m) => ({ default: m.CopeAhead })));
+function CopeAhead() { return <Suspense fallback={<ToolLoading />}><LazyCopeAhead /></Suspense>; }
+
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
   'cool-down': CoolDown,
@@ -22,8 +55,12 @@ const toolComponents: Record<string, React.ComponentType> = {
   'opposite-action': OppositeAction,
   'dear-man': DearMan,
   'problem-solve': ProblemSolve,
+  'cope-ahead': CopeAhead,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
+  'meet-a-part': MeetAPart,
+  'two-pulls': TwoPulls,
+  'wise-mind': WiseMind,
 };
 
 export function ToolPage() {
@@ -31,6 +68,14 @@ export function ToolPage() {
   const location = useLocation();
   const toolId = segment ? toolIdFromUrl(segment) : undefined;
   const tool = toolId ? getToolById(toolId) : undefined;
+  // Meet a part opens only with parts on and its copy signed off; otherwise it is "not found".
+  const gate = useToolGate(tool?.id, location.search);
+  const partsOn = useUserProfile().profile.partsEnabled;
+  useEffect(() => {
+    if (!partsOn) return;
+    if (tool?.id === 'meet-a-part') void loadMeetAPart().catch(() => { /* the render retries */ });
+    if (tool?.id === 'two-pulls') void loadTwoPulls().catch(() => { /* the render retries */ });
+  }, [tool?.id, partsOn]);
 
   // Old address (/tool/cool-down): forward to the tool's own name, keeping the query and the
   // link state (Help me now / check-in / hand-off context for the session).
@@ -38,20 +83,16 @@ export function ToolPage() {
     return <Navigate to={{ pathname: `/tool/${TOOL_URL_SLUGS[segment]}`, search: location.search }} state={location.state} replace />;
   }
 
-  if (!tool) {
+  if (tool && gate === 'loading') {
     return (
-      <div className="text-center py-12">
-        <p className="text-[var(--color-text-secondary)]">
-          Tool not found.
-        </p>
-        <Link
-          to="/tools"
-          className="mt-4 inline-block text-[var(--color-text-secondary)] underline hover:no-underline"
-        >
-          ← Tools
-        </Link>
+      <div className="py-12 flex justify-center" aria-busy="true">
+        <span className="inline-block w-6 h-6 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full motion-safe:animate-spin" aria-hidden="true" />
       </div>
     );
+  }
+
+  if (!tool || gate === 'closed') {
+    return <ToolNotFound />;
   }
 
   const ToolComponent = toolComponents[tool.id];

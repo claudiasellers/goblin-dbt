@@ -5,6 +5,7 @@ import { DEFAULT_PALETTE, type PaletteId } from '../data/palettes';
 import { auth, functions } from './firebase';
 import type { CollectedWord, FindTheFeelingContent, FindTheFeelingSession } from '../data/findTheFeelingTypes';
 import type { CheckInNextAction, SaveCheckInRequest } from '../lib/spine/checkInPayload';
+import type { PartReflect, PartsFeel } from '../data/partsTypes';
 
 /**
  * Read-only content shipped with the app (src/data/content/, generated from the graph by
@@ -579,6 +580,8 @@ export interface UserProfile {
   shareAnonymousData: boolean;
   /** IANA zone, synced from the browser (follow-up windows, quiet hours). */
   timeZone: string | null;
+  /** Parts on (Settings → Privacy & Data). Off by default; turning it off deletes nothing. */
+  partsEnabled: boolean;
 }
 
 export const DEFAULT_PROFILE: UserProfile = {
@@ -594,6 +597,7 @@ export const DEFAULT_PROFILE: UserProfile = {
   dataRetentionDays: null,
   shareAnonymousData: false,
   timeZone: null,
+  partsEnabled: false,
 };
 
 const getUserProfileFn = httpsCallable<void, { profile: UserProfile }>(
@@ -782,7 +786,7 @@ export interface SomaticCorrelationData {
 export interface ToolOutcomeSummary {
   toolId: string;
   /** Absent from a server older than Reflect R1. */
-  measure?: 'then_vs_now' | 'urge';
+  measure?: 'then_vs_now' | 'urge' | 'plan';
   direction?: 'down' | 'orient' | null;
   answered?: number;
   wentWell?: number;
@@ -809,6 +813,16 @@ export interface InsightsPayload {
   continuityPrompt: null;
   patternFrequencies: PatternFrequency[];
   totalCheckIns: number;
+  /**
+   * Mirrors functions/src/insights/types.ts: the parts the person knows, each with its lines past their
+   * thresholds (all time). null with parts off; absent from a server older than part-stats-reflect.
+   */
+  parts?: PartReflect[] | null;
+  /**
+   * Mirrors functions/src/insights/types.ts: how the person has met their parts lately, across all of
+   * them (feel-toward ids). null below its threshold or with parts off; absent from an older server.
+   */
+  partsFeel?: PartsFeel | null;
 }
 
 const getInsightsDataFn = httpsCallable<

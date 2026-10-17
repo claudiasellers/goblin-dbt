@@ -441,15 +441,23 @@ export function EmotionPicker({
         </div>
       )}
       {canVibrate && (
-        <label className="min-h-11 flex items-center gap-3 text-sm text-[var(--color-text-secondary)]">
-          <input
-            type="checkbox"
-            checked={haptics}
-            disabled={loading}
-            onChange={(e) => setHaptics(e.target.checked)}
-          />
+        // A switch the size of its row (a bare checkbox was a 13 px target).
+        <button
+          type="button"
+          role="switch"
+          aria-checked={haptics}
+          disabled={loading}
+          onClick={() => setHaptics((h) => !h)}
+          className="min-h-11 w-full flex items-center gap-3 text-left text-sm text-[var(--color-text-secondary)] disabled:opacity-50"
+        >
+          <span
+            aria-hidden="true"
+            className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border ${haptics ? 'bg-[var(--color-accent-fill)] border-transparent text-[var(--color-on-accent)]' : 'border-[var(--color-border)]'}`}
+          >
+            {haptics ? '✓' : ''}
+          </span>
           Gentle tap feedback (if supported)
-        </label>
+        </button>
       )}
       {error && (
         <p role="alert" className="text-sm text-[var(--color-danger)]">

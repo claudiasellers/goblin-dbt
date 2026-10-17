@@ -17,6 +17,19 @@ const AUTHED = [
   'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday',
   'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
+  'getPartsEntry', // reads the caller's own check-ins and Recover sessions
+  'deleteMyParts', 'countMyPartsLines', // deletes (counts) the caller's own parts records
+  'startPartSession', 'savePartSession', 'keepPart', 'queuePartCandidate',
+  'answerPartCandidate', // the caller's own candidate (Me: "Not any more")
+  'renamePart', 'restPart', 'setAsidePart', 'restorePart', 'setPartTender', 'answerPartRevisit',
+  'tagPart',
+  'sayToPart', // a message to the caller's own part
+  'schedulePartCheckback', 'answerPartCheckback', 'setPartAnchor', 'setPartShape',
+  'startPullsSession', 'savePullsSession', 'keepPullsKeepsake', 'schedulePullsCheckback', // Two pulls: the caller's own visit
+  'getTrailOfferEvidence', 'answerTrailOffer', // the caller's own trail offer (Phase 4, built off)
+  'getReflectTrails', 'answerKnownPartReview', 'removeTrailPattern', // Reflect: the caller's own rule D batch and plain patterns
+  'getDen', 'getDenSnapshot', 'updatePartLayout', 'linkParts', 'unlinkParts', // the den: the caller's own parts and links
+  'getPartStory', // a part's story: the caller's own part
   'saveDearManSession', 'saveFindTheFeelingSession', 'saveInvalidationRecoverySession',
   'saveOppositeActionSession', 'trackToolUsage', 'updateUserProfile',
   'getStateAndTools', // E4-3: requireUid (plan F9, D-12); every caller is signed in
@@ -24,7 +37,7 @@ const AUTHED = [
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getRelatedEmotions', 'getCapacityContent', 'getSpineContent', 'getBodyMapContent', 'suggestEmotionsFromBody',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getCapacityContent', 'getWiseMindContent', 'getCopeAheadContent', 'getSpineContent', 'getBodyMapContent', 'suggestEmotionsFromBody',
   'getWitnessLines', // public content; reads the caller's own lines only when signed in
 ];
 

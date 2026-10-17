@@ -19,7 +19,9 @@ UNWIND [
   {c: "dbt_opposite_action", t: "opposite-action"},
   {c: "dbt_problem_solving", t: "problem-solve"},
   {c: "dbt_dear_man", t: "dear-man"},
-  {c: "dbt_recovering_from_invalidation", t: "recovering-from-invalidation"}
+  {c: "dbt_recovering_from_invalidation", t: "recovering-from-invalidation"},
+  {c: "dbt_wise_mind", t: "wise-mind"},
+  {c: "dbt_cope_ahead", t: "cope-ahead"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})
 SET c.appToolId = row.t;

@@ -6,23 +6,26 @@
  * PROFILE_NEEDS is code, reviewed per PR: a content load can never widen what a tool reads.
  * Copy and revisit policy live in the graph (ProfileKind).
  */
-export type ProfileAreaId = 'about_me' | 'my_people' | 'my_body' | 'my_words' | 'my_plans' | 'my_patterns' | 'my_progress';
-export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people', 'my_body', 'my_words', 'my_plans', 'my_patterns', 'my_progress'];
+export type ProfileAreaId = 'about_me' | 'my_people' | 'my_body' | 'my_words' | 'my_plans' | 'my_patterns' | 'my_parts' | 'my_progress';
+export const PROFILE_AREAS: readonly ProfileAreaId[] = ['about_me', 'my_people', 'my_body', 'my_words', 'my_plans', 'my_patterns', 'my_parts', 'my_progress'];
 
 /** Phase A slices, then reserved ones (their resolvers return empty until the owner ships). */
 export const SLICE_IDS = [
   'name', 'quietHours', 'patterns', 'ownLines', 'savedLines',
   'people', 'bodyFlags', 'values', 'goals', 'copeAheadPlans', 'boundaryLines', 'practicePrefs',
   'fadeLevels', 'ownWords', 'thingsILike', 'crisisKit', 'safetyPlan', 'country',
+  'parts', 'partDetail', 'partAnchors', 'den',
 ] as const;
 export type SliceId = (typeof SLICE_IDS)[number];
 
 export type ItemPrompt = 'none' | 'quiet' | 'ask';
+export type ProfileItemStatus = 'active' | 'resting' | 'set_aside';
 export interface ProfileItemMeta {
   id: string;
   kind: string;
   area: ProfileAreaId;
-  status: 'active' | 'set_aside';
+  /** resting: a part gone quiet (still live, not set aside: "parts go quiet, not gone"). */
+  status: ProfileItemStatus;
   source: string;
   confirmedAt: string | null;
   revisitAt: string | null;
@@ -41,7 +44,8 @@ export interface ProfileSlices {
     id: string; text: string; emotionIds: string[]; situationId: string | null; moment: string | null;
     uses: number; lastUsedAt: string | null; meta: ProfileItemMeta;
   }>;
-  savedLines: Array<{ lineId: string; confirmedAt: string | null }>;
+  /** Witness lines the user kept (SAVED_LINE), newest first; `text` as the corpus has it. */
+  savedLines: Array<{ lineId: string; text: string; confirmedAt: string | null }>;
   people: never[];
   bodyFlags: null;
   values: never[];
@@ -55,6 +59,51 @@ export interface ProfileSlices {
   crisisKit: null;
   safetyPlan: null;
   country: null;
+  /**
+   * Kept parts (Phase 2), active and resting only; nothing at all while parts are off
+   * (User.partsEnabled). `tender`: every consumer that speaks to a part stays gentle with it.
+   */
+  parts: Array<{
+    id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; moveIds: string[];
+    /** The part's first body place id (src/data/bodyFigure.ts), for "The one in your {place}" when it has no name. */
+    firstPlace: string | null;
+    /** Shape it's five numbers (PartFigure draws it; null is the plain round figure). */
+    shapeSig: number[] | null;
+    /** The last Meet a part visit (keepPart sets it); trails' Rule D counts episodes after it. */
+    lastVisitedAt: string | null;
+    /** Set when the next-day check-back said Louder (PartsPolicy.louderPauseHours ahead); trails skip a paused part. */
+    pausedUntil: string | null;
+    /**
+     * The part safety flag (functions/src/safety/partSafetyFlag.ts): a safetyLine move or a danger fear.
+     * Show CrisisBanner alongside, never instead; computed on the server, so no fears are needed here.
+     */
+    safety: boolean;
+    meta: ProfileItemMeta;
+  }>;
+  /** The rest of a kept part (Meet a part reads it); `hurtIds` from GUARDS. Own-words fields as written. */
+  partDetail: Array<{
+    id: string; ageId: string | null; voiceIds: string[]; ownVoice: string | null; jobIds: string[]; ownJob: string | null;
+    fearIds: string[]; ownFear: string | null; preferredRoleIds: string[]; anchorLineId: string | null; places: string[];
+    shapeSig: number[] | null; hurtIds: string[];
+  }>;
+  /**
+   * DEAR MAN's cope ahead: part id → its anchor, the person's own words (`anchorOwn`) or the text of
+   * the kept line it points at (`anchorLineId`). Parts without one, or whose line is no longer kept, are absent.
+   */
+  partAnchors: Record<string, string>;
+  /**
+   * The den (Me only, read through getDen): every active and resting part as the room draws it, the
+   * person's confirmed links between two parts in the room, and the snapshot list (newest first).
+   * `lastVisitedAt` stays on the server: getDen turns it, with the log's touches, into a recency bucket.
+   */
+  den: {
+    parts: Array<{
+      id: string; name: string | null; status: 'active' | 'resting'; tender: boolean; shapeSig: number[] | null;
+      mapX: number | null; mapY: number | null; lastVisitedAt: string | null; safety: boolean;
+    }>;
+    links: Array<{ id: string; kind: 'covers_for' | 'two_pulls'; aId: string; bId: string; bothWantId: string | null }>;
+    snapshots: Array<{ id: string; takenAt: string }>;
+  };
 }
 
 /**
@@ -63,18 +112,34 @@ export interface ProfileSlices {
  */
 export const PROFILE_NEEDS = {
   'recovering-from-invalidation': ['name'],   // later + 'people'
-  'find-the-feeling': ['name'],
+  'find-the-feeling': ['name', 'parts'],     // parts: the tag row on its close
   'opposite-action': [],                      // later 'values', 'patterns'
-  'cool-down': [],                            // DT-01: 'bodyFlags'
+  'cool-down': ['parts'],                     // parts: the tag row on its close; DT-01: 'bodyFlags'
   'checkin': ['patterns'],                    // the router's tie-break (E4)
-  'today': ['quietHours'],
+  'today': ['quietHours', 'parts'],          // parts: the check-back card's name (Phase 2, parts on only)
   'witness': ['name', 'ownLines', 'savedLines'],
+  'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
+  'two-pulls': ['parts'], // Phase 5: the two parts' names, figures, tenderness (parts on only)
+  'dear-man': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // Phase 3 cope ahead (parts slices empty while off); never partDetail
+  'cope-ahead': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // DEAR MAN's cope ahead step on screen 2, the anchor under the plan (parts on only); never partDetail
+  // "Was this a part you know?" after a better close (PartTagSlot, in SessionClose or the tool's own
+  // close): every tool whose close asks then-vs-now or about the urge (src/lib/partTag.ts TAG_ROW_TOOLS)
+  // reads `parts`.
+  'five-senses': ['parts'],
+  'pause': ['parts'],
+  'urge-surfing': ['parts'],
+  // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
+  // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
+  'wise-mind': ['parts'],
+  // Me → Parts of me → See them together (the den). Server-side only: getDen reads it and adds recency.
+  'me': ['den'],
+  // Other tools declare 'parts' in the phase that renders them, never before.
 } as const satisfies Record<string, readonly SliceId[]>;
 
 export type ProfileConsumer = keyof typeof PROFILE_NEEDS;
-/** Consumers the client may ask for (witness is server-side only). */
-export type ClientProfileConsumer = Exclude<ProfileConsumer, 'witness'>;
-export const SERVER_ONLY_CONSUMERS: readonly ProfileConsumer[] = ['witness'];
+/** Consumers the client may ask for (witness and the den's `me` are server-side only). */
+export type ClientProfileConsumer = Exclude<ProfileConsumer, 'witness' | 'me'>;
+export const SERVER_ONLY_CONSUMERS: readonly ProfileConsumer[] = ['witness', 'me'];
 export type NeedsOf<T extends ProfileConsumer> = (typeof PROFILE_NEEDS)[T][number];
 
 export interface GetProfileContextResponse<T extends ProfileConsumer = ProfileConsumer> {

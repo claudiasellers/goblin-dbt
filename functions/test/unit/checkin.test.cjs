@@ -74,6 +74,44 @@ test('saveCheckIn never throws on bad optional fields; only the quadrant is requ
   await assert.rejects(fns.saveCheckIn.run({ auth: auth(), data: { ...base(), quadrant: 'sideways' } }), (e) => e.code === 'invalid-argument');
 });
 
+test('saveCheckIn keeps 2–3 square spots as spotsJson (known ids only); any bad spot drops the field, never the save', async () => {
+  const a = { x: 0.2, y: 0.9, emotionIds: ['anxious'] };
+  const b = { x: 0.85, y: 0.9, emotionIds: ['excited'] };
+  const f = driver({ emotions: ['anxious', 'excited'] });
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...base(), source: 'grid', emotionIds: ['anxious', 'excited'], spots: [a, b] } });
+  const w = f.calls.at(-1);
+  assert.match(w.query, /c\.spotsJson = \$spotsJson/);
+  assert.deepEqual(JSON.parse(w.params.spotsJson), [a, b]);
+  assert.deepEqual(w.params.emotionIds, ['anxious', 'excited']);
+  const lookup = f.calls.find((c) => /MATCH \(e:Emotion\) WHERE e\.id IN \$raw/.test(c.query));
+  assert.deepEqual(lookup.params.raw, ['anxious', 'excited'], "one lookup for the check-in's ids and the spots'");
+
+  const cases = {
+    'one spot': [a],
+    'four spots': [a, b, a, b],
+    'a bad coordinate': [a, { ...b, x: 1.5 }],
+    'an empty emotionIds': [a, { ...b, emotionIds: [] }],
+    'a bad id': [a, { ...b, emotionIds: ['Not An Id!'] }],
+    'an id that is not an Emotion': [a, { ...b, emotionIds: ['not_an_emotion'] }],
+  };
+  for (const [name, spots] of Object.entries(cases)) {
+    const g = driver({ emotions: ['anxious', 'excited'] });
+    setDriver(g.driver);
+    const out = await fns.saveCheckIn.run({ auth: auth(), data: { ...base(), emotionIds: ['anxious'], spots } });
+    assert.equal(out.id, ID, name);
+    assert.equal(g.calls.at(-1).params.spotsJson, null, name);
+    assert.deepEqual(g.calls.at(-1).params.emotionIds, ['anxious'], `${name}: the rest of the save is unchanged`);
+  }
+});
+
+test('saveCheckIn on a finalised check-in never writes spots (finalise-once)', async () => {
+  const f = driver({ open: false });
+  setDriver(f.driver);
+  await fns.saveCheckIn.run({ auth: auth(), data: { ...base(), spots: [{ x: 0.2, y: 0.9, emotionIds: ['anxious'] }, { x: 0.8, y: 0.9, emotionIds: ['anxious'] }] } });
+  assert.ok(!f.calls.some((c) => /spotsJson/.test(c.query)));
+});
+
 test('saveCheckIn on a finalised check-in is a no-op that still returns its id (finalise-once)', async () => {
   const f = driver({ open: false });
   setDriver(f.driver);

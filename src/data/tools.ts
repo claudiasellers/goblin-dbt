@@ -11,6 +11,13 @@ export interface Tool {
   emoji: string;
   /** The tool's own screen carries the instructions: the page skips the tagline and "When to use this". */
   bare?: boolean;
+  /**
+   * Absent: listed for everyone. `'parts'`: listed only for a person with parts on whose copy for the tool
+   * has shipped (Meet a part: Tools.tsx passes `parts` from the same gate ToolPage opens it with,
+   * useToolGate); always reachable by its links (Me, Settings, an offer) under that gate. `false`: reached
+   * only by a link. Neither is ever in the intents or recommended by routing.
+   */
+  listed?: false | 'parts';
 }
 
 export const tools: Tool[] = [
@@ -87,6 +94,17 @@ export const tools: Tool[] = [
     dbtBasis: 'Problem Solving',
     emoji: '🛠️',
   },
+  {
+    id: 'cope-ahead',
+    name: 'Cope Ahead',
+    tagline: 'Plan for something hard that\'s coming',
+    description: 'Name what\'s coming and what might show up, pick what you\'ll do at the hardest moment, and rehearse it once in your mind.',
+    whenToUse: 'When something hard is coming and you want to be ready for it.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 19',
+    emoji: '🧭',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -108,6 +126,41 @@ export const tools: Tool[] = [
     dbtBasis: 'Walking the Middle Path: recovering from invalidation (with STOP, TIPP, Opposite Action and DEAR MAN)',
     emoji: '💬',
   },
+  // Mindfulness
+  {
+    id: 'wise-mind',
+    name: 'Wise mind',
+    tagline: 'Find the quieter answer when you\'re torn',
+    description: 'Hear what your feelings say and what your thinking says, drop in for a few breaths, and listen for the quieter answer underneath.',
+    whenToUse: 'When you\'re torn about what to do, or want to settle before you choose.',
+    module: 'mindfulness',
+    dbtBasis: 'DBT Mindfulness: wise mind (states of mind; ideas for practising wise mind)',
+    emoji: '🪨',
+    bare: true,
+  },
+  // Mindfulness (parts, docs/design/parts.md: listed and opened only with the parts switch on and its copy signed off)
+  {
+    id: 'meet-a-part',
+    name: 'Meet a part',
+    tagline: 'Get to know a part of you that steps in',
+    description: 'Notice a part of you, where it sits and what it does for you, and thank it. You can keep it, so you can come back to it.',
+    whenToUse: 'When a part of you keeps stepping in and you want to know it better.',
+    module: 'mindfulness',
+    emoji: '🕯️',
+    bare: true,
+    listed: 'parts',
+  },
+  {
+    id: 'two-pulls',
+    name: 'Two pulls',
+    tagline: 'Two parts of you pulling different ways',
+    description: 'Set two parts of you out side by side, notice how you feel toward each, hear what each one worries about, and find what they both want for you.',
+    whenToUse: 'When two parts of you want different things and both are trying to help.',
+    module: 'mindfulness',
+    emoji: '🪢',
+    bare: true,
+    listed: false,
+  },
 ];
 
 /**
@@ -121,7 +174,11 @@ export interface Intent {
   emoji: string;
 }
 
-export const intents: Intent[] = [
+/**
+ * Every intent, in the order the Tools page shows them. An intent whose tool is unlisted waits: Cope Ahead's
+ * (*Something's coming up that I'm dreading*) shows once its tool is listed, when its screens ship.
+ */
+export const allIntents: Intent[] = [
   { id: 'cant-tell', label: 'I can\'t tell what I\'m feeling', toolId: 'find-the-feeling', emoji: '🫧' },
   { id: 'hurt', label: 'Recover from a hurtful moment', toolId: 'recovering-from-invalidation', emoji: '💬' },
   { id: 'calm-fast', label: 'Calm down fast', toolId: 'cool-down', emoji: '🧊' },
@@ -131,7 +188,12 @@ export const intents: Intent[] = [
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
+  { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
+  { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
 ];
+
+/** The intents the Tools page lists: those whose tool is listed for everyone. */
+export const intents: Intent[] = allIntents.filter(i => tools.find(t => t.id === i.toolId)?.listed === undefined);
 
 export function getToolById(id: string): Tool | undefined {
   return tools.find(t => t.id === id);
@@ -150,6 +212,15 @@ export function toolIdFromUrl(segment: string): string {
   return Object.entries(TOOL_URL_SLUGS).find(([, slug]) => slug === segment)?.[0] ?? segment;
 }
 
-export function getToolsByModule(moduleId: string): Tool[] {
-  return tools.filter(t => t.module === moduleId);
+/** Who is looking: `parts` is true only with parts on and the parts tools' copy shipped (useToolGate). */
+export interface ListedFor { parts?: boolean }
+
+/** The tools a module lists (unlisted tools are reached only by link; parts tools only with `parts`). */
+export function getToolsByModule(moduleId: string, who: ListedFor = {}): Tool[] {
+  return listedTools(who).filter(t => t.module === moduleId);
+}
+
+/** Every tool a list, picker or search may show. */
+export function listedTools({ parts = false }: ListedFor = {}): Tool[] {
+  return tools.filter(t => t.listed === undefined || (t.listed === 'parts' && parts));
 }

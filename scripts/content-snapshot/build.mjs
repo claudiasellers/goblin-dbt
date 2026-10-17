@@ -23,12 +23,19 @@
  *                          "Continue" waited on it, cold, before the follow-up questions)
  *   capacity.json          getCapacityContent (band rules, hand-off primitives; loaded with every page)
  *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
+ *   wise-mind.json         getWiseMindContent (Wise mind's questions, what each mind says, practices, answers, copy)
+ *   cope-ahead.json        getCopeAheadContent (Cope Ahead's situations, hardest moments, moves, rehearsal beats, copy)
+ *   parts.json             parts copy (schema/parts.cypher), signed-off rows only: no Cloud Function
+ *                          serves it; the shape is tests/fixtures/parts-content.json's moves / prompts /
+ *                          options / hurts, plus canTouch (Recover event → hurt ids, approved edges),
+ *                          cut to the fields screens read (an allowlist, partsAllowlist.mjs)
  * Each builder mirrors the Cypher in the Cloud Function it replaces (named on the function).
  */
 import { readFileSync, writeFileSync, readdirSync, mkdirSync, statSync } from 'node:fs';
 import { resolve, dirname, basename, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { importTs } from '../../tests/lib/importTs.mjs';
+import { projectParts } from './partsAllowlist.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export const OUT_DIR = resolve(root, 'src/data/content');
@@ -48,6 +55,8 @@ export const BODY_MAP_VERSION = constant('functions/src/bodyMap/index.ts', 'BODY
 export const FIND_FLOW_VERSION = constant('functions/src/findTheFeeling/index.ts', 'FIND_FLOW_VERSION');
 export const CAPACITY_VERSION = constant('functions/src/capacity/index.ts', 'CAPACITY_VERSION');
 export const SPINE_VERSION = constant('functions/src/spine/registry.ts', 'SPINE_VERSION');
+export const WISE_MIND_VERSION = constant('functions/src/wiseMind/index.ts', 'WISE_MIND_VERSION');
+export const COPE_AHEAD_VERSION = constant('functions/src/copeAhead/index.ts', 'COPE_AHEAD_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -61,7 +70,7 @@ export function assertContentOnly(exp) {
   if (dangling.length) throw new Error(`Export has ${dangling.length} relationship(s) to nodes it doesn't contain`);
 }
 
-function indexGraph(exp) {
+export function indexGraph(exp) {
   const byEl = new Map(exp.nodes.map((n) => [n.elementId, n]));
   const has = (n, label) => n.labels.includes(label);
   return {
@@ -276,10 +285,213 @@ export function buildSpine(g) {
   return { version: SPINE_VERSION, closeFlow, followUpTypes };
 }
 
-/** All the snapshots from one export (pure apart from reading the version constants). */
+/** Signed off and not waiting on a decision. Edges are reviewed by their source id, so the same test holds for them. */
+const signedOff = (props) => props.reviewStatus === 'approved' && props.pending == null;
+/** A node's properties; shipParts cuts every row to PARTS_FIELDS (partsAllowlist.mjs), so nothing unlisted ships. */
+const partsProps = (n) => ({ ...n.props });
+const byOrder = (a, b) => asc(a.order, b.order) || asc(a.id, b.id);
+
+/**
+ * The parts content's canonical order, shared by buildParts and the fixture projection the drift test
+ * compares it with: rows by `order`, prompts by flow then `order`, flows and steps by name, and the edge
+ * lists without an order of their own (namedAs, guardedBy, sameAs) by id. An option's `moves` keep the
+ * order they were given (OFFERED_FOR's `order`).
+ */
+export function sortParts(c) {
+  const sortObj = (o, f) => Object.fromEntries(Object.keys(o).sort().map((k) => [k, f(o[k])]));
+  return {
+    version: c.version,
+    moves: [...c.moves].sort(byOrder),
+    prompts: Object.fromEntries(Object.entries(c.prompts)
+      .sort(([ia, a], [ib, b]) => asc(a.flow, b.flow) || asc(a.order, b.order) || asc(ia, ib))),
+    options: sortObj(c.options, (steps) => sortObj(steps, (list) => [...list].sort(byOrder)
+      .map((o) => ({ ...o, sameAs: [...o.sameAs].sort((x, y) => asc(x.label, y.label) || asc(x.id, y.id)) })))),
+    hurts: [...c.hurts].sort(byOrder).map((h) => ({
+      ...h,
+      namedAs: [...h.namedAs].sort(asc),
+      guardedBy: [...h.guardedBy].sort((x, y) => asc(x.moveId, y.moveId) || asc(x.rank, y.rank)),
+    })),
+    // Events by id; each list keeps the order it was given (CAN_TOUCH's `order`).
+    canTouch: sortObj(c.canTouch, (list) => [...list]),
+    // Source label → source id → move id, both by key.
+    expresses: sortObj(c.expresses, (table) => sortObj(table, (moveId) => moveId)),
+    // Two pulls' pairs by id; each chip list keeps its edges' order.
+    pairs: [...(c.pairs ?? [])].sort((x, y) => asc(x.id, y.id))
+      .map((p) => ({ ...p, bothWant: [...p.bothWant], worryA: [...p.worryA], worryB: [...p.worryB] })),
+    // The two numbers a screen needs, only once the policy is signed off (absent: the client's pinned defaults).
+    ...(c.limits ? { limits: { nameMaxChars: c.limits.nameMaxChars, maxNonSelfAnswers: c.limits.maxNonSelfAnswers } } : {}),
+  };
+}
+
+/**
+ * What parts.json ships: the content in its canonical order, cut to the allowlist (PARTS_FIELDS in
+ * partsAllowlist.mjs). buildParts and the fixture projection both end here.
+ */
+export const shipParts = (c) => projectParts(sortParts(c));
+
+/**
+ * Parts copy (schema/parts.cypher, from scripts/parts/content.py), signed-off rows only: a parts screen
+ * renders only once its copy is signed off, so today this is nearly empty. Only what a screen reads
+ * (PARTS_FIELDS, partsAllowlist.mjs: every row is cut to it):
+ * trail rules, contexts and the rest of the policy (inference rules and safety numbers) stay on the server
+ * (only `limits`, its name length and non-Self answer count, ships once the policy is signed off). Two
+ * pulls' pairs ship as ids (a signed-off pair whose two moves ship, with the signed-off chips its edges
+ * point at, in their order; the chips' labels are in `options.pulls`), and the keepsake lines as prompts. `expresses` (module id → move, approved edges to shipped
+ * moves) feeds the in-the-moment unblend line. An approved option ships even when its prompt (or a
+ * move it is offered for) isn't approved yet; the client checks a flow is complete (flowReady).
+ * No parts content at all (parts.cypher not loaded yet) is an empty file, not an error.
+ */
+export function buildParts(g) {
+  const rows = (label) => g.nodes(label).filter((n) => signedOff(n.props));
+  const edges = (type, from, to) => g.rels(type, from, to).filter((r) => signedOff(r.props) && signedOff(r.a.props));
+  const moveNodes = rows('ProtectiveMove').filter((n) => n.props.offerable === true);
+  const promptNodes = rows('PartPrompt');
+  const optionNodes = rows('PartOption');
+  const hurtNodes = rows('ProtectedHurt');
+
+  const versions = [...new Set([...moveNodes, ...promptNodes, ...optionNodes, ...hurtNodes].map((n) => n.props.version))];
+  if (versions.length > 1) throw new Error(`Parts content mixes versions ${versions.join(', ')}; load schema/parts.cypher again`);
+  // With nothing signed off, the version every parts node carries reaches the file through the policy node.
+  const policy = g.nodes('PartsPolicy').find((n) => n.props.id === 'parts');
+  const version = versions[0] ?? policy?.props.version ?? null;
+  const limits = policy && signedOff(policy.props)
+    ? { nameMaxChars: policy.props.nameMaxChars, maxNonSelfAnswers: policy.props.maxNonSelfAnswers } : null;
+
+  const offered = edges('OFFERED_FOR', 'PartOption', 'ProtectiveMove');
+  const same = edges('SAME_AS', 'PartOption');
+  const named = edges('NAMED_AS', 'ProtectedHurt', 'Emotion');
+  const guards = edges('OFTEN_GUARDS', 'ProtectiveMove', 'ProtectedHurt');
+  // Recover's "what happened" → the hurts it can touch (the angry card's chip order in Recover). The
+  // event is Recover's content, not parts': an edge ships when it is approved and its hurt ships.
+  const hurtIds = new Set(hurtNodes.map((h) => h.props.id));
+  const canTouch = {};
+  for (const r of g.rels('CAN_TOUCH', 'InvalidationEvent', 'ProtectedHurt')
+    .filter((x) => signedOff(x.props) && hurtIds.has(x.b.props.id))
+    .sort((x, y) => asc(x.props.order, y.props.order) || asc(x.b.props.id, y.b.props.id))) {
+    (canTouch[r.a.props.id] ??= []).push(r.b.props.id);
+  }
+
+  // The unblend line (A part of you {move} right now.): each module id → the move it expresses, grouped by
+  // its label (ActionUrge, FeelingUrge, PullOption, …). Reviewed by the source id (the edge's status; the
+  // source is another module's content); ships only when the move ships, so go_blank / zone_out never do.
+  const moveIds = new Set(moveNodes.map((m) => m.props.id));
+  const expresses = {};
+  for (const r of g.rels('EXPRESSES', null, 'ProtectiveMove').filter((x) => signedOff(x.props) && moveIds.has(x.b.props.id))) {
+    (expresses[[...r.a.labels].sort()[0]] ??= {})[r.a.props.id] = r.b.props.id;
+  }
+
+  // Two pulls: a signed-off pair whose two moves ship; each list the signed-off chips its edges point at.
+  const optionIds = new Set(optionNodes.map((o) => o.props.id));
+  const pairEdges = (type, pair, side) => g.rels(type, 'PolarityPair', 'PartOption')
+    .filter((r) => r.a === pair && signedOff(r.props) && optionIds.has(r.b.props.id) && (side === undefined || r.props.side === side))
+    .sort((x, y) => asc(x.props.order, y.props.order) || asc(x.b.props.id, y.b.props.id)).map((r) => r.b.props.id);
+  const pairs = rows('PolarityPair').filter((p) => moveIds.has(p.props.a) && moveIds.has(p.props.b)).map((p) => ({
+    id: p.props.id, a: p.props.a, b: p.props.b,
+    bothWant: pairEdges('BOTH_WANT', p), worryA: pairEdges('WORRY', p, 'a'), worryB: pairEdges('WORRY', p, 'b'),
+  }));
+
+  const options = {};
+  for (const o of optionNodes) {
+    const { flow, step } = o.props;
+    ((options[flow] ??= {})[step] ??= []).push({
+      id: o.props.id, ...partsProps(o),
+      // Neo4j drops a null property; the shape keeps these two as null (scripts/parts/fixture.py).
+      flag: o.props.flag ?? null, selfLike: o.props.selfLike ?? null,
+      moves: offered.filter((r) => r.a === o).sort((x, y) => asc(x.props.order, y.props.order) || asc(x.b.props.id, y.b.props.id)).map((r) => r.b.props.id),
+      sameAs: same.filter((r) => r.a === o).map((r) => ({ label: [...r.b.labels].sort()[0], id: r.b.props.id })),
+    });
+  }
+  return shipParts({
+    version,
+    moves: moveNodes.map((m) => ({ id: m.props.id, ...partsProps(m) })),
+    prompts: Object.fromEntries(promptNodes.map((p) => [p.props.id, partsProps(p)])),
+    options,
+    hurts: hurtNodes.map((h) => ({
+      id: h.props.id, ...partsProps(h),
+      namedAs: named.filter((r) => r.a === h).map((r) => r.b.props.id),
+      guardedBy: guards.filter((r) => r.b === h).map((r) => ({ moveId: r.a.props.id, rank: r.props.rank })),
+    })),
+    canTouch,
+    expresses,
+    pairs,
+    limits,
+  });
+}
+
+/**
+ * getWiseMindContent (functions/src/wiseMind/index.ts), with its version check. null when the graph has
+ * no Wise mind content at all (a load that runs before schema/wise-mind.cypher's first load): the
+ * committed wise-mind.json is kept, so the load order of a deploy doesn't matter. A wrong version throws.
+ */
+export function buildWiseMind(g) {
+  const flow = g.nodes('WiseMindFlow').find((n) => n.props.id === 'wise_mind_flow');
+  if (!flow) return null;
+  if (flow.props.version !== WISE_MIND_VERSION) {
+    throw new Error(`Wise mind content is ${flow.props.version}; the app expects ${WISE_MIND_VERSION}`);
+  }
+  const doc = JSON.parse(flow.props.contentJson);
+  const voicesOf = new Map();
+  for (const r of g.rels('VOICES', 'MindVoice', 'WiseMindQuestion')) pushTo(voicesOf, r.b.props.id, r.a.props);
+  const questions = g.nodes('WiseMindQuestion')
+    .sort((a, b) => asc(a.props.order, b.props.order))
+    .map(({ props: q }) => {
+      const vs = (voicesOf.get(q.id) ?? []).sort((a, b) => asc(a.mind, b.mind) || asc(a.order, b.order));
+      const side = (m) => vs.filter((v) => v.mind === m).map((v) => ({ id: v.id, label: v.label }));
+      return { id: q.id, label: q.label, order: intOrNull(q.order), defaultPracticeId: q.defaultPracticeId,
+        voices: { emotion: side('emotion'), reason: side('reason') } };
+    });
+  const practices = g.rels('HAS_PRACTICE', 'TherapyConcept', 'WiseMindPractice')
+    .filter((r) => r.a.props.id === 'dbt_wise_mind')
+    .map((r) => r.b.props)
+    .sort((a, b) => asc(a.order, b.order))
+    .map((p) => ({ id: p.id, name: p.name, sub: p.sub, kind: p.kind, lines: p.lines ?? [], breaths: intOrNull(p.breaths),
+      seconds: intOrNull(p.seconds), order: intOrNull(p.order) }));
+  const answers = g.nodes('WiseMindAnswer')
+    .sort((a, b) => asc(a.props.order, b.props.order))
+    .map(({ props: a }) => ({ id: a.id, label: a.label, order: intOrNull(a.order), nextToolIds: a.nextToolIds ?? [], kind: a.kind ?? null }));
+  return { version: WISE_MIND_VERSION, ownMax: doc.ownMax, copy: doc.copy, questions, practices, answers };
+}
+
+/**
+ * getCopeAheadContent (functions/src/copeAhead/index.ts), with its version check. null when the graph has
+ * no Cope Ahead content at all (a load before schema/cope-ahead.cypher's first load): the committed
+ * cope-ahead.json is kept. A wrong version throws.
+ */
+export function buildCopeAhead(g) {
+  const flow = g.nodes('CopeAheadFlow').find((n) => n.props.id === 'cope_ahead_flow');
+  if (!flow) return null;
+  if (flow.props.version !== COPE_AHEAD_VERSION) {
+    throw new Error(`Cope Ahead content is ${flow.props.version}; the app expects ${COPE_AHEAD_VERSION}`);
+  }
+  const doc = JSON.parse(flow.props.contentJson);
+  const off = (type, label) => g.rels(type, 'TherapyConcept', label)
+    .filter((r) => r.a.props.id === 'dbt_cope_ahead')
+    .map((r) => r.b.props)
+    .sort((a, b) => asc(a.order, b.order));
+  const situations = off('HAS_SITUATION', 'CopeSituation').map((s) => ({
+    id: s.id, label: s.label, afterName: s.afterName, likelyFeelings: s.likelyFeelings ?? [], hardMoments: s.hardMoments ?? [],
+    dangerMomentIds: s.dangerMomentIds ?? [], order: intOrNull(s.order) }));
+  const hardMoments = off('HAS_HARD_MOMENT', 'HardMoment').map((m) => ({ id: m.id, label: m.label, ifText: m.ifText, order: intOrNull(m.order) }));
+  const moves = off('HAS_MOVE', 'CopeMove').map((m) => ({
+    id: m.id, kind: m.kind, label: m.label, line: m.line, forPulls: m.forPulls ?? [], general: m.general === true,
+    appToolId: m.appToolId ?? null, forMoments: m.forMoments ?? [], order: intOrNull(m.order) }));
+  const beats = off('HAS_BEAT', 'RehearsalBeat').map((b) => ({ id: b.id, text: b.text, order: intOrNull(b.order) }));
+  return { version: COPE_AHEAD_VERSION, ownMax: doc.ownMax, moveOwnMax: doc.moveOwnMax, when: doc.when, copy: doc.copy,
+    pullIf: doc.pullIf, after: doc.after, situations, hardMoments, moves, beats };
+}
+
+/** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
+export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json'];
+
+/**
+ * All the snapshots from one export (pure apart from reading the version constants). A file in
+ * KEPT_WHEN_MISSING whose content isn't in the graph yet is left out (main keeps the committed one).
+ */
 export function buildSnapshots(exp) {
   assertContentOnly(exp);
   const g = indexGraph(exp);
+  const wiseMind = buildWiseMind(g);
+  const copeAhead = buildCopeAhead(g);
   return {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
@@ -287,6 +499,9 @@ export function buildSnapshots(exp) {
     'discriminating-questions.json': buildDiscriminatingQuestions(g),
     'capacity.json': buildCapacity(g),
     'spine.json': buildSpine(g),
+    'parts.json': buildParts(g),
+    ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
+    ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
   };
 }
 
@@ -300,6 +515,23 @@ export function newestExport(dir = BACKUPS_DIR) {
   return files[0];
 }
 
+/**
+ * Write the snapshots to `outDir` (src/data/content/ by default). A KEPT_WHEN_MISSING file the export had
+ * no content for is not touched: a warning says the committed one was kept.
+ */
+export function writeSnapshots(snapshots, source, { outDir = OUT_DIR, log = console } = {}) {
+  mkdirSync(outDir, { recursive: true });
+  for (const name of KEPT_WHEN_MISSING.filter((n) => !(n in snapshots))) {
+    log.warn(`! src/data/content/${name}: no content for it in this graph yet; kept the committed file`);
+  }
+  for (const [name, content] of Object.entries(snapshots)) {
+    const text = `${JSON.stringify({ source, content }, null, 2)}\n`;
+    writeFileSync(join(outDir, name), text);
+    log.log(`✓ src/data/content/${name.padEnd(22)} ${(text.length / 1024).toFixed(1)} KB`);
+  }
+  log.log(`  from ${source.file} (exported ${source.exportedAt})`);
+}
+
 function main() {
   const args = process.argv.slice(2);
   const from = args.includes('--from') ? resolve(args[args.indexOf('--from') + 1]) : newestExport();
@@ -311,14 +543,7 @@ function main() {
     console.error(`✗ ${e.message}\n  Nothing written.`);
     process.exit(2);
   }
-  mkdirSync(OUT_DIR, { recursive: true });
-  const source = { file: basename(from), exportedAt: exp.exportedAt };
-  for (const [name, content] of Object.entries(snapshots)) {
-    const text = `${JSON.stringify({ source, content }, null, 2)}\n`;
-    writeFileSync(join(OUT_DIR, name), text);
-    console.log(`✓ src/data/content/${name.padEnd(22)} ${(text.length / 1024).toFixed(1)} KB`);
-  }
-  console.log(`  from ${source.file} (exported ${source.exportedAt})`);
+  writeSnapshots(snapshots, { file: basename(from), exportedAt: exp.exportedAt });
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main();

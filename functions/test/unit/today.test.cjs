@@ -66,7 +66,7 @@ test('snoozeFollowUp: at most 7 days, only while scheduled', async () => {
   const f = fakeDriver(() => []);
   setDriver(f.driver);
   await fns.snoozeFollowUp.run({ auth: auth(), data: { id: ID, until: inH(3) } });
-  assert.match(f.calls[0].query, /WHERE f\.status = 'scheduled'/);
+  assert.match(f.calls.find((c) => /SET f\.snoozedUntil/.test(c.query)).query, /WHERE f\.status = 'scheduled'/);
   await assert.rejects(fns.snoozeFollowUp.run({ auth: auth(), data: { id: ID, until: inH(24 * 8) } }), (e) => e.code === 'invalid-argument');
 });
 
@@ -79,7 +79,7 @@ test('getToday: derived states, one tool_outcome from the close question, OA rem
     if (/MATCH \(t:FollowUpType\) WHERE/.test(q)) return [TYPE('recover_next_day'), TYPE('recover_log'), TYPE('tool_outcome', { hierarchyTier: 'skills' }),
       TYPE('oa_plan', { resolveMode: 'deeplink', deepLinkTemplate: '/tool/opposite-action?followUp={detailId}' })];
     if (/SessionCloseFlow/.test(q)) return [{ content: JSON.stringify({ kinds: { regulation_down: { question: 'Compared…', choices: [{ id: 'better', label: 'Quieter' }] } }, byTool: {} }) }];
-    if (/HAS_FOLLOW_UP/.test(q)) return [
+    if (/HAS_FOLLOW_UP/.test(q) && !/part_checkback/.test(q)) return [
       { id: 'a', type: 'recover_next_day', dueAt: inH(-1), sourceToolId: null, sourceSessionId: null, notifyInTab: true, detailId: null },
       { id: 'b', type: 'oa_plan', dueAt: inH(-50), sourceToolId: 'opposite-action', sourceSessionId: null, notifyInTab: true, detailId: 'oa1' },
       { id: 'c', type: 'recover_log', dueAt: inH(1), sourceToolId: null, sourceSessionId: null, notifyInTab: true, detailId: null },
@@ -100,6 +100,10 @@ test('getToday: derived states, one tool_outcome from the close question, OA rem
   const flooded = await fns.getToday.run({ auth: auth(), data: { band: 'flooded' } });
   assert.deepEqual([flooded.items.length, flooded.more.length, flooded.holding], [0, 4, true]);
   assert.match(f.calls.find((c) => /HAS_TOOL_SESSION/.test(c.query)).query, /ts\.answeredAt IS NULL AND coalesce\(ts\.outcomeAskDismissed, false\) = false/);
+  // Meet a part never gets a "did it help?" card (docs/design/parts.md).
+  const outcomeRead = f.calls.find((c) => /HAS_TOOL_SESSION/.test(c.query));
+  assert.match(outcomeRead.query, /AND NOT ts\.toolId IN \$notWhatHelps/);
+  assert.deepEqual(outcomeRead.params.notWhatHelps, ['meet-a-part', 'two-pulls']);
 });
 
 test('answerToolOutcome: by tool session id, guarded, compat outcome; dismissal remembered', async () => {
@@ -110,6 +114,8 @@ test('answerToolOutcome: by tool session id, guarded, compat outcome; dismissal 
   assert.equal(q.params.key, `u1:${TS}`);
   assert.match(q.query, /ts\.answeredAt IS NULL AND coalesce\(ts\.outcomeAskDismissed, false\) = false/);
   assert.match(q.query, /WHEN 'much_better' THEN 'helped'/);
+  assert.match(q.query, /legacy IS NULL OR ts\.toolId IN \$notWhatHelps THEN \[\]/, 'no compat outcome for meet-a-part');
+  assert.deepEqual(q.params.notWhatHelps, ['meet-a-part', 'two-pulls']);
   await fns.answerToolOutcome.run({ auth: auth(), data: { toolSessionId: TS, dismissed: true } });
   assert.equal(f.calls[1].params.dismissed, true);
   await assert.rejects(fns.answerToolOutcome.run({ auth: auth(), data: { toolSessionId: TS } }), (e) => e.code === 'invalid-argument');

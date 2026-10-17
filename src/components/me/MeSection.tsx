@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useState, type ComponentProps } from 'react';
 import { getToolById } from '../../data/tools';
 import type { ProfileAreaId } from '../../data/profileTypes';
 import {
@@ -10,6 +10,21 @@ import { fillToolName } from '../../lib/spine/todayCard';
 import { StillTrue } from './StillTrue';
 import { QuietHoursEditor } from './QuietHoursEditor';
 import { PatternOfferCard } from './PatternOfferCard';
+import { useUserProfile } from '../../contexts/UserProfileContext';
+import { getPartsContent } from '../../services/partsContent';
+import { dismissCandidateRequest, partsOfMeCopy } from '../../lib/partsOfMe';
+import { partsMeOffCopy, partsOffCardShown } from '../../lib/partsSettings';
+import type { PartsContent } from '../../data/partsContentTypes';
+import { focusStepStart } from '../../lib/focusStart';
+
+// Parts' callables load on demand, when a candidate is dismissed.
+const answerPartCandidate: typeof import('../../services/parts').answerPartCandidate = (req) => import('../../services/parts').then((m) => m.answerPartCandidate(req));
+// Parts of me is fetched only with parts on and its copy signed off, so nobody else downloads it.
+const LazyPartsOfMe = lazy(() => import('./PartsOfMe').then((m) => ({ default: m.PartsOfMe })));
+function PartsOfMe(p: ComponentProps<typeof LazyPartsOfMe>) { return <Suspense fallback={null}><LazyPartsOfMe {...p} /></Suspense>; }
+// With parts off, the card that turns them on: fetched only once its copy (and Parts of me's) has shipped.
+const LazyPartsOffCard = lazy(() => import('../parts/PartsOffCard').then((m) => ({ default: m.PartsOffCard })));
+function PartsOffCard(p: ComponentProps<typeof LazyPartsOffCard>) { return <Suspense fallback={null}><LazyPartsOffCard {...p} /></Suspense>; }
 
 /** Areas shown in Phase A (plan §5.4). My people / My plans / My progress appear when their owners register kinds. */
 const PHASE_A_AREAS: ProfileAreaId[] = ['about_me', 'my_body', 'my_words', 'my_patterns'];
@@ -25,12 +40,29 @@ export function MeSection() {
   const [error, setError] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [reload, setReload] = useState(0);
+  const { profile, updateProfile } = useUserProfile();
+  const partsOn = profile.partsEnabled === true;
+  const [partsContent, setPartsContent] = useState<PartsContent | null>(null);
+  // Parts turned on from the card this visit: it stays (switch on) until getMe brings Parts of me.
+  const [turnedOnHere, setTurnedOnHere] = useState(false);
 
   useEffect(() => {
     let live = true;
     getMe().then((m) => { if (live) { setMe(m); setError(false); } }).catch(() => { if (live) setError(true); });
     return () => { live = false; };
-  }, [reload]);
+    // Parts switched (here or in Settings): getMe again, which brings or drops the my_parts area.
+  }, [reload, partsOn]);
+
+  // The parts copy: Parts of me's with parts on, the switch card's with parts off (Settings reads the same file on this page).
+  useEffect(() => {
+    let live = true;
+    getPartsContent().then((c) => { if (live) setPartsContent(c); }).catch(() => { /* both stay hidden */ });
+    return () => { live = false; };
+  }, []);
+
+  // Turned on from the card: the card (with focus on its switch) gives way to Parts of me, so focus goes
+  // to the area's start, never <body> (the parts screens' stepFocus convention; only when focus was lost).
+  const partsArrived = useCallback((el: HTMLElement | null) => { if (el) focusStepStart(el); }, []);
 
   const after = useCallback(async (p: Promise<number>) => {
     profileCache.bump(await p);
@@ -42,11 +74,24 @@ export function MeSection() {
   if (!me) return <div className="h-24 animate-pulse rounded-xl bg-[var(--color-bg-card)]" />;
 
   const ref = (i: MeItem) => ({ id: i.meta.id, label: i.label });
-  const stale = me.areas.flatMap((a) => a.items).filter((i) => i.meta.prompt === 'ask');
-  const areas = me.areas.filter((a) => PHASE_A_AREAS.includes(a.id)).filter((a) => {
+  // Parts of me joins (after My patterns, getMe's order) only with parts on and its copy signed off.
+  const partsCopy = partsOn ? partsOfMeCopy(partsContent) : null;
+  const shown: ProfileAreaId[] = partsCopy ? [...PHASE_A_AREAS, 'my_parts'] : PHASE_A_AREAS;
+  const areas = me.areas.filter((a) => shown.includes(a.id)).filter((a) => {
     if (a.id === 'my_patterns') return a.items.length > 0 || me.offers.length > 0;
     return true;
   });
+  // Only from the areas shown: an item of an area not rendered yet never surfaces here. Parts are left
+  // out too: checking back with a part is its own flow (with {name} filled), not this generic row.
+  const stale = areas.flatMap((a) => a.items).filter((i) => i.meta.prompt === 'ask' && i.label !== 'Part');
+  // Parts off: the switch card, where Parts of me would be (once on, getMe brings the area and it replaces the card).
+  const offCopy = partsMeOffCopy(partsContent);
+  const showOffCard = partsOffCardShown({ copyReady: offCopy !== null, partsOn, turnedOnHere, partsAreaShown: areas.some((a) => a.id === 'my_parts') });
+  const togglePartsHere = (on: boolean) => {
+    // Marked first, so the card never blinks out between the write landing and getMe bringing the area.
+    if (on) setTurnedOnHere(true);
+    updateProfile({ partsEnabled: on }).catch(() => { /* the context keeps the stored value (still off: the card stays) */ });
+  };
 
   const row = (i: MeItem) => {
     const toolName = i.toolId ? getToolById(i.toolId)?.name : null;
@@ -85,6 +130,14 @@ export function MeSection() {
     );
   };
 
+  // A part write (the card's actions, Bring it back, the check-back): Me's usual refresh after.
+  const partWrite = (p: Promise<{ version: number }>) => after(p.then((r) => r.version));
+  // "Not any more" on a candidate: a log write (no profile version), so just reload.
+  const dismissCandidate = async (id: string) => {
+    await answerPartCandidate(dismissCandidateRequest(id));
+    setReload((r) => r + 1);
+  };
+
   return (
     <div className="space-y-4">
       {stale.length > 0 && (
@@ -94,7 +147,8 @@ export function MeSection() {
         </section>
       )}
       {areas.map((a) => (
-        <section key={a.id} aria-label={a.label} className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)]">
+        <section key={a.id} aria-label={a.label} ref={a.id === 'my_parts' && turnedOnHere ? partsArrived : undefined}
+          className="p-4 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-card)]">
           <h3 className="text-sm font-semibold text-[var(--color-text-primary)]">{a.label}</h3>
           <p className="text-xs text-[var(--color-text-tertiary)] mb-2">{a.blurb}</p>
           {a.id === 'about_me' && (
@@ -135,9 +189,14 @@ export function MeSection() {
                 onDone={() => setReload((r) => r + 1)} />
             </div>
           ))}
-          {a.items.filter((i) => i.meta.prompt !== 'ask').length > 0 && <ul className="mt-1">{a.items.filter((i) => i.meta.prompt !== 'ask').map(row)}</ul>}
+          {a.id === 'my_parts' && partsCopy && partsContent && (
+            <PartsOfMe items={a.items} candidates={me.partCandidates ?? []} content={partsContent} copy={partsCopy}
+              onWrite={partWrite} onDismiss={dismissCandidate} />
+          )}
+          {a.id !== 'my_parts' && a.items.filter((i) => i.meta.prompt !== 'ask').length > 0 && <ul className="mt-1">{a.items.filter((i) => i.meta.prompt !== 'ask').map(row)}</ul>}
         </section>
       ))}
+      {showOffCard && offCopy && <PartsOffCard copy={offCopy} enabled={partsOn} onToggle={togglePartsHere} />}
     </div>
   );
 }

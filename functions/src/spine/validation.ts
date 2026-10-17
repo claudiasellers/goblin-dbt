@@ -73,6 +73,8 @@ export interface CloseInput {
   bandAtStart: CapacityReading | null;
   bandAtEnd: CapacityReading | null;
   urgeIds: string[];
+  /** Emotions picked inside the tool: set once, only if the start (a hand-off) had none. */
+  emotionIds: string[];
   durationSec: number | null;
   detail: { kind: DetailKind; id: string } | null;
   /** null → the tool's PracticeSkill.defaultFor; [] → no rep (e.g. FTF without a word). */
@@ -80,6 +82,8 @@ export interface CloseInput {
   repSource: RepSource;
   ext: string | null;
   schedule: ScheduleInput[];
+  /** Wise mind's answer (a WiseMindAnswer id, or `own`): ask-fresh, on this session only; kept for wise-mind only. */
+  wiseMindAnswer: string | null;
 }
 
 /** `closeKind` is the tool's (from SPINE_TOOLS): an answer the kind doesn't ask is rejected. */
@@ -105,12 +109,14 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
     bandAtStart: reading(d.bandAtStart, now),
     bandAtEnd: reading(d.bandAtEnd, now),
     urgeIds: ids(d.urgeIds, 10),
+    emotionIds: ids(d.emotionIds, 20),
     durationSec: opt(d.durationSec, (x) => intIn(x, { min: 0, max: 86_400 })),
     detail,
     skillIds: d.skillIds === undefined || d.skillIds === null ? null : ids(d.skillIds, 20),
     repSource: oneOf(d.repSource ?? 'standalone', REP_SOURCES),
     ext: validateExt(d.ext),
     schedule: validateSchedule(d.schedule, now),
+    wiseMindAnswer: opt(d.wiseMindAnswer, (x) => str(x, { max: 64, pattern: GRAPH_ID })),
   };
 }
 
@@ -124,7 +130,7 @@ export function validateRecord(raw: unknown, now: Date): { start: StartInput; cl
 
 // ---- Follow-ups (PR-S5) ----
 
-export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h'] as const;
+export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later'] as const;
 export type FollowUpWindow = (typeof FOLLOW_UP_WINDOWS)[number];
 const TYPE_ID = /^[a-z][a-z0-9_]{0,63}$/;
 const MINUTE = 60_000;
@@ -166,15 +172,33 @@ export function validateSchedule(raw: unknown, now: Date): ScheduleInput[] {
 export const RESOLVE_STATUSES = ['done', 'partly', 'didnt', 'dismissed'] as const;
 export type ResolveStatus = (typeof RESOLVE_STATUSES)[number];
 
-export function validateResolve(raw: unknown): { id: string; choiceId: string | null; status: ResolveStatus | null; missedReason: string | null } {
+/**
+ * Cope Ahead's after card, its second question ("Did your plan help?"): Used it, it helped · Used it, not
+ * sure · Didn't use it. Skip (or leaving after the first question) is null. A log field on the follow-up.
+ */
+export const PLAN_HELPED = ['helped', 'unsure', 'unused'] as const;
+export type PlanHelped = (typeof PLAN_HELPED)[number];
+
+export interface ResolveInput {
+  id: string;
+  choiceId: string | null;
+  status: ResolveStatus | null;
+  missedReason: string | null;
+  /** cope_ahead_after only (the server refuses it on any other type): null for Skip or not asked. */
+  planHelped: PlanHelped | null;
+}
+
+export function validateResolve(raw: unknown): ResolveInput {
   const d = obj(raw);
   const out = {
     id: uuid(d.id),
     choiceId: opt(d.choiceId, (x) => str(x, { max: 64, pattern: STEP })),
     status: opt(d.status, (x) => oneOf(x, RESOLVE_STATUSES)),
     missedReason: opt(d.missedReason, (x) => str(x, { max: 64, pattern: STEP })),
+    planHelped: opt(d.planHelped, (x) => oneOf(x, PLAN_HELPED)),
   };
   if (!out.choiceId && !out.status) throw new ValidationError('Expected a choice or a status');
+  if (out.planHelped && !out.choiceId) throw new ValidationError('planHelped: with the first answer only');
   return out;
 }
 

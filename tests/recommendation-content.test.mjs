@@ -58,17 +58,27 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
     assert.equal(r.active, !off, r.id);
   }
   assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
-  for (const c of planned) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
+  // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
+  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
+  const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
+  assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
+  // Cope Ahead (docs/design/cope-ahead.md) the same way: built, out of PLANNED, its anticipatory row off and a draft.
+  assert.equal(graph.concepts.dbt_cope_ahead.appToolId, "cope-ahead");
+  const cope = rows.filter((r) => r.conceptId === "dbt_cope_ahead");
+  assert.deepEqual(cope.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_anticipatory_cope-ahead", false, "draft"]]);
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });
 
-test("tags (WMP-04 v0 side, skillKind, direction) on the 9 app-tool concepts; D-13: FTF acceptance, Cool Down both", () => {
+test("tags (WMP-04 v0 side, skillKind, direction) on the 11 app-tool concepts; D-13: FTF acceptance, Cool Down both", () => {
   const tags = Object.fromEntries(Object.values(graph.concepts).filter((c) => c.side).map((c) => [c.appToolId, [c.side, c.skillKind, c.direction]]));
   assert.deepEqual(tags, {
     "cool-down": ["both", "body", "down"], pause: ["both", "hold", "down"], "five-senses": ["acceptance", "orient", "orient"],
     "urge-surfing": ["acceptance", "hold", "neutral"], "opposite-action": ["change", "change", "neutral"],
     "find-the-feeling": ["acceptance", "naming", "neutral"], "problem-solve": ["change", "change", "neutral"],
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
+    "wise-mind": ["both", "naming", "neutral"], "cope-ahead": ["change", "change", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

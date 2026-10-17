@@ -6,23 +6,31 @@ import { dueAtFor } from '../../lib/spine/windows';
 import { newId } from '../../lib/spine/ids';
 import type { ThenVsNow } from '../../data/capacityTypes';
 import type { ActedOnUrge, CloseKind } from '../../data/spineTypes';
+import { PartTagSlot } from './PartTagSlot';
 
 /**
  * The one-tap "did it help?" at the end of a tool (PR-S3). Graph copy (SessionCloseFlow), one tap,
  * skip always there, no numbers. Answering or skipping closes the session as completed; a skipped
  * question comes back once in Today (PR-S5). Renders nothing for tools that ask their own questions.
  */
-export function SessionClose({ kind, planType, onAnswered }: {
+export function SessionClose({ kind, planType, detail, onAnswered, onSkipped }: {
   kind?: CloseKind;
   /** For `plan` tools: the FollowUpType the answer schedules (its window turns the chip into a time). */
   planType?: string;
+  /** The tool's own session record, linked with DETAIL on whichever close happens (answer or skip). */
+  detail?: ToolSessionCloseInput['detail'];
   onAnswered?: (input: ToolSessionCloseInput) => void;
+  onSkipped?: () => void;
 }) {
   const session = useToolSession();
   const closeKind = kind ?? session.closeKind;
   const asksPlan = closeKind === 'plan' && !!planType;
   const [content, setContent] = useState<SpineContent | null>(null);
   const [done, setDone] = useState<'answered' | 'skipped' | null>(null);
+  // "Was this a part you know?" (PartTagSlot): its gate needs the answer and the saved close.
+  const [closeAnswer, setCloseAnswer] = useState<ThenVsNow | null>(null);
+  const [closeActed, setCloseActed] = useState<ActedOnUrge | null>(null);
+  const [saved, setSaved] = useState(false);
 
   useEffect(() => {
     if (!asksAtClose(closeKind) && !asksPlan) return;
@@ -38,9 +46,13 @@ export function SessionClose({ kind, planType, onAnswered }: {
   if (!q) return null;
 
   if (done) {
-    return done === 'answered'
-      ? <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
-      : null;
+    if (done !== 'answered') return null;
+    return (
+      <>
+        <p role="status" className="mt-4 text-sm text-center text-[var(--color-text-tertiary)]">{content.closeFlow.saved}</p>
+        <PartTagSlot toolId={session.toolId} toolSessionId={session.id} thenVsNow={closeAnswer} actedOnUrge={closeActed} saved={saved} />
+      </>
+    );
   }
 
   const answer = (choiceId: string) => {
@@ -50,16 +62,21 @@ export function SessionClose({ kind, planType, onAnswered }: {
       input = { status: 'completed', ...(dueAt ? { schedule: [{ id: newId(), type: planType!, dueAt: dueAt.toISOString(), window: choiceId }] } : {}) };
     } else if (closeKind === 'urge') {
       input = { status: 'completed', actedOnUrge: choiceId as ActedOnUrge };
+      setCloseActed(choiceId as ActedOnUrge);
     } else {
       input = { status: 'completed', thenVsNow: choiceId as ThenVsNow };
+      setCloseAnswer(choiceId as ThenVsNow);
     }
+    if (detail) input = { ...input, detail };
     setDone('answered');
-    void session.close(input);
+    // The tag row waits for the server to have the close (tagPart refuses an open session).
+    session.close(input).then((r) => { if (r) setSaved(true); }, () => { /* the close is optional */ });
     onAnswered?.(input);
   };
   const skip = () => {
     setDone('skipped');
-    void session.close({ status: 'completed' });
+    void session.close({ status: 'completed', ...(detail ? { detail } : {}) });
+    onSkipped?.();
   };
 
   return (

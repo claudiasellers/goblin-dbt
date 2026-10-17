@@ -118,10 +118,16 @@ NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the 
 # Planned tools (Oct 2026 review): the routing names them now; each concept is in the graph but has no
 # app module yet, so its rows are written switched off (and the routing slice skips concepts without an
 # appToolId anyway). When a module ships: give the concept its appToolId (app-tool-ids.cypher), drop it
-# from PLANNED and its rows go live where the review put them.
+# from PLANNED and its rows go live where the review put them. Wise mind's module has shipped (its
+# concept has appToolId 'wise-mind') but it stays here until Claudia signs off the watchful row: its row
+# is written switched off and stays a draft until then.
+# Cope Ahead's module has shipped too (appToolId 'cope-ahead', docs/design/cope-ahead.md): it is out of
+# PLANNED, and its anticipatory row stays switched off (BUILT_NOT_SIGNED_OFF) and a draft until Claudia
+# signs it off.
+CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "skillKind": "change", "direction": "neutral"}
+BUILT_NOT_SIGNED_OFF = {"cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)"}
 PLANNED = {
     "check-the-facts":    {"concept": "dbt_check_facts",        "side": "change",     "skillKind": "change",     "direction": "neutral"},
-    "cope-ahead":         {"concept": "dbt_cope_ahead",         "side": "change",     "skillKind": "change",     "direction": "neutral"},
     "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
     "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "radical-acceptance": {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
@@ -131,6 +137,7 @@ PLANNED = {
 }
 CONCEPT_TAGS.update(PLANNED)
 INACTIVE_TOOLS.update({t: "not built yet (planned, Oct 2026 review)" for t in PLANNED})
+INACTIVE_TOOLS.update(BUILT_NOT_SIGNED_OFF)
 
 # "Blank" patterns: never calmed (no `down` tool); CORE Arch §5.1 R5, Somatic Gaps §A rule 7.
 BLANK_PATTERNS = {

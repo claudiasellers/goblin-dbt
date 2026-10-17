@@ -21,7 +21,7 @@ test("every interactive tool declares its close; client and server registries ag
   const page = readFileSync("src/pages/ToolPage.tsx", "utf8");
   const block = page.slice(page.indexOf("const toolComponents"), page.indexOf("};", page.indexOf("const toolComponents")));
   const components = [...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]);
-  assert.equal(components.length, 9);
+  assert.equal(components.length, 13);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);
@@ -73,6 +73,115 @@ test("ext (R18): namespaced, ids/enums only, integers only on *Sec / *Count, ≤
   // An integer field on a key not ending in Sec/Count is refused even if registered.
   ext.EXT_SCHEMAS.mf.intensity = { t: "int", max: 10 };
   try { assert.throws(() => ext.validateExt({ mf: { intensity: 7 } }), /Sec \/ \*Count/); } finally { delete ext.EXT_SCHEMAS.mf.intensity; }
+});
+
+test("ext wm: Wise mind's ids, and the person's own words on *Own keys only (≤ 140, never linted)", () => {
+  const wm = {
+    questionId: "wm_q_next", form: "minds", emotionSaysIds: ["wm_v_next_emotion_1"], reasonSaysIds: ["wm_v_next_reason_2"],
+    practiceId: "wm_breath", feel: "pushed", onceMore: true, nextToolId: "dear-man", kept: true,
+    partIds: ["p1", "p2"], stillCloseIds: ["p2"],
+  };
+  assert.deepEqual(JSON.parse(ext.validateExt({ wm })).wm, wm);
+  const own = JSON.parse(ext.validateExt({ wm: { questionOwn: " Whether to\nmove out ", answerOwn: "x".repeat(140), emotionSaysOwn: "Run.", reasonSaysOwn: "Stay put." } })).wm;
+  assert.equal(own.questionOwn, "Whether to move out");
+  assert.equal(own.answerOwn.length, 140);
+  assert.throws(() => ext.validateExt({ wm: { answerOwn: "x".repeat(141) } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ wm: { answerOwn: " \n " } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ wm: { answerOwn: 7 } }), /1 to 140/);
+  for (const key of ["questionId", "practiceId", "feel", "nextToolId"]) {
+    assert.throws(() => ext.validateExt({ wm: { [key]: "wait, not now" } }), /expected an id/, `${key}: no free text`);
+  }
+  assert.throws(() => ext.validateExt({ wm: { partNames: ["the critic"] } }), /not registered/, "parts are ids only");
+  ext.EXT_SCHEMAS.mf.note = { t: "text", max: 10 };
+  try { assert.throws(() => ext.validateExt({ mf: { note: "hi" } }), /\*Own keys/); } finally { delete ext.EXT_SCHEMAS.mf.note; }
+});
+
+test("ext ca: Cope Ahead's ids and closed sets, own words on *Own keys only (situation and moment ≤ 140, move ≤ 90, never linted)", () => {
+  const ca = {
+    situationId: "conversation", when: "this_week", feelIds: ["anxious", "hurt"], pullIds: ["blank"], partId: "p1",
+    hardMomentId: "go_blank", ifFrom: "pull", moveIds: ["long_out", "give_minute"], rehearsed: 2, newMomentId: "not_heard",
+    newMoveIds: ["step_out"], settle: "five_senses", kept: true, followUp: true,
+  };
+  assert.deepEqual(JSON.parse(ext.validateExt({ ca })).ca, ca);
+  const own = JSON.parse(ext.validateExt({ ca: { situationOwn: " My sister's\nwedding ", hardMomentOwn: "x".repeat(140), moveOwn: "y".repeat(90), newMomentOwn: "z", newMoveOwn: "w" } })).ca;
+  assert.equal(own.situationOwn, "My sister's wedding");
+  assert.equal(own.hardMomentOwn.length, 140);
+  assert.throws(() => ext.validateExt({ ca: { situationOwn: "x".repeat(141) } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ ca: { hardMomentOwn: "x".repeat(141) } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ ca: { moveOwn: "x".repeat(91) } }), /1 to 90/);
+  assert.throws(() => ext.validateExt({ ca: { rehearsed: 3 } }), /one of 1, 2/, "rehearsed is 1 or 2");
+  assert.throws(() => ext.validateExt({ ca: { rehearsed: "2" } }), /one of 1, 2/);
+  assert.throws(() => ext.validateExt({ ca: { settle: "nap" } }), /one of breath, five_senses, ok/);
+  assert.throws(() => ext.validateExt({ ca: { ifFrom: "both" } }), /one of moment, pull/);
+  assert.throws(() => ext.validateExt({ ca: { when: "next_year" } }), /one of/);
+  assert.throws(() => ext.validateExt({ ca: { feelIds: ["a", "b", "c"] } }), /up to 2/);
+  assert.throws(() => ext.validateExt({ ca: { moveIds: ["a", "b", "c"] } }), /up to 2/);
+  assert.throws(() => ext.validateExt({ ca: { hardMomentId: "they raise their voice" } }), /expected an id/, "no free text");
+  assert.throws(() => ext.validateExt({ ca: { plan: "If I go blank" } }), /not registered/, "the plan line is never stored, only its parts");
+  assert.deepEqual(tools.SPINE_TOOLS["cope-ahead"], { module: "er", closeKind: "none" });
+});
+
+test("close: wiseMindAnswer is an id (ask-fresh, on the session only)", () => {
+  assert.equal(v.validateClose({ id: ID, status: "completed", wiseMindAnswer: "wm_a_wait" }, now, "orienting").wiseMindAnswer, "wm_a_wait");
+  assert.equal(v.validateClose({ id: ID, status: "completed" }, now, "orienting").wiseMindAnswer, null);
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", wiseMindAnswer: "Wait, not now" }, now, "orienting"));
+  const src = readFileSync("functions/src/spine/toolSession.ts", "utf8");
+  assert.match(src, /wiseMindAnswer: rec\.get\('toolId'\) === 'wise-mind' \? c\.wiseMindAnswer : null/, "another tool's answer is dropped");
+  assert.ok(!tools.NOT_WHAT_HELPS.includes("wise-mind"), "a More here after Wise mind counts toward what helps");
+});
+
+test("ext er: Problem Solve keeps what got in the way as ids (parts data fix 2)", () => {
+  const er = { barrierTypeId: "know-but-cant", barrierSubId: "cant-ambivalent", ambivalenceId: "ambiv-change-might-not-help", confidence: "low" };
+  assert.deepEqual(JSON.parse(ext.validateExt({ er })).er, er);
+  for (const key of Object.keys(er)) {
+    assert.throws(() => ext.validateExt({ er: { [key]: "part of me doesn't want this to change" } }), /expected an id/, `${key}: no free text`);
+    assert.throws(() => ext.validateExt({ er: { [key]: "a".repeat(65) } }), /expected an id/, `${key}: ≤ 64 chars`);
+    assert.throws(() => ext.validateExt({ er: { [key]: 3 } }), /expected an id/, `${key}: no numbers`);
+  }
+  assert.throws(() => ext.validateExt({ er: { barrierText: "x" } }), /not registered/);
+});
+
+test("ext er: Do the Opposite keeps the check's result as ids (parts data fix 3)", () => {
+  const er = { oaFacts: "fits", oaEffect: "helpful", oaRoute: "problem" };
+  assert.deepEqual(JSON.parse(ext.validateExt({ er })).er, er);
+  assert.deepEqual(JSON.parse(ext.validateExt({ er: { oaRoute: "support" } })).er, { oaRoute: "support" });
+  // Recheck / Previous send nulls: dropped, and nothing left is no ext at all.
+  assert.equal(ext.validateExt({ er: { oaFacts: null, oaEffect: null, oaRoute: null } }), null);
+  for (const key of Object.keys(er)) {
+    assert.throws(() => ext.validateExt({ er: { [key]: "it fits the facts, mostly" } }), /expected an id/, `${key}: no free text`);
+    assert.throws(() => ext.validateExt({ er: { [key]: "a".repeat(65) } }), /expected an id/, `${key}: ≤ 64 chars`);
+    assert.throws(() => ext.validateExt({ er: { [key]: 2 } }), /expected an id/, `${key}: no numbers`);
+  }
+  assert.throws(() => ext.validateExt({ er: { oaUrgeText: "x" } }), /not registered/);
+  assert.throws(() => ext.validateExt({ er: { oaSafety: "safe" } }), /not registered/);
+});
+
+test("ext wmp: the angry-part card in Recover keeps the hurt, the hold and where it ended, as ids", () => {
+  const wmp = { angryHurtId: "brushed_off", angryVoteHeld: true, angryExit: "speak" };
+  assert.deepEqual(JSON.parse(ext.validateExt({ wmp })).wmp, wmp);
+  // Not sure: no hurt id at all; Not now: skipped, nothing held.
+  assert.deepEqual(JSON.parse(ext.validateExt({ wmp: { angryHurtId: undefined, angryVoteHeld: false, angryExit: "skipped" } })).wmp,
+    { angryVoteHeld: false, angryExit: "skipped" });
+  for (const key of ["angryHurtId", "angryExit"]) {
+    assert.throws(() => ext.validateExt({ wmp: { [key]: "I felt brushed off" } }), /expected an id/, `${key}: no free text`);
+    assert.throws(() => ext.validateExt({ wmp: { [key]: "a".repeat(65) } }), /expected an id/, `${key}: ≤ 64 chars`);
+    assert.throws(() => ext.validateExt({ wmp: { [key]: 1 } }), /expected an id/, `${key}: no numbers`);
+  }
+  assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: "yes" } }), /expected a boolean/);
+  assert.throws(() => ext.validateExt({ wmp: { angryVoteHeld: 1 } }), /expected a boolean/);
+  assert.throws(() => ext.validateExt({ wmp: { angrySpeakLine: "I felt brushed off." } }), /not registered/);
+  // "Spend a minute with it later?" taken (parts on): a bool, never the candidate's id or text.
+  assert.deepEqual(JSON.parse(ext.validateExt({ wmp: { angryLater: true } })).wmp, { angryLater: true });
+  assert.throws(() => ext.validateExt({ wmp: { angryLater: "yes" } }), /expected a boolean/);
+});
+
+test("close: emotion ids picked in the tool are ids only, at most 20; none given is []", () => {
+  assert.deepEqual(v.validateClose({ id: ID, status: "completed", emotionIds: ["hurt", "anxious", "hurt"] }, now).emotionIds, ["hurt", "anxious"]);
+  assert.deepEqual(v.validateClose({ id: ID, status: "completed" }, now).emotionIds, []);
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", emotionIds: ["I feel awful"] }, now));
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", emotionIds: Array.from({ length: 21 }, (_, i) => `e${i}`) }, now));
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", emotionIds: "hurt" }, now));
+  assert.deepEqual(v.validateStart({ id: ID, toolId: "problem-solve", emotionIds: ["hurt"] }, now).emotionIds, ["hurt"]);
 });
 
 test("record = start + close with the registry's close kind", () => {

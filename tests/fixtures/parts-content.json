@@ -1,0 +1,5663 @@
+{
+ "version": "parts-v1",
+ "moves": [
+  {
+   "id": "hit_back",
+   "label": "Hit back",
+   "unblendPhrase": "wants to hit back",
+   "trailPhrase": "hit back",
+   "nameHint": "the one who hits back",
+   "kind": "reactive",
+   "safetyLine": false,
+   "order": 0,
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "chase",
+   "label": "Chase it, fix it now",
+   "unblendPhrase": "wants to chase this down",
+   "trailPhrase": "chase it",
+   "nameHint": "the one who chases",
+   "kind": "reactive",
+   "safetyLine": false,
+   "order": 1,
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "hide",
+   "label": "Hide",
+   "unblendPhrase": "wants to hide",
+   "trailPhrase": "hide",
+   "nameHint": "the one who hides",
+   "kind": "either",
+   "safetyLine": false,
+   "order": 2,
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "keep_the_peace",
+   "label": "Keep the peace",
+   "unblendPhrase": "wants to keep the peace",
+   "trailPhrase": "keep the peace",
+   "nameHint": "the one who keeps peace",
+   "kind": "proactive",
+   "safetyLine": false,
+   "order": 5,
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "turn_on_myself",
+   "label": "Turn on myself",
+   "unblendPhrase": "is turning on you",
+   "trailPhrase": "turn on yourself",
+   "nameHint": "the one who turns on me",
+   "kind": "proactive",
+   "safetyLine": true,
+   "order": 6,
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "take_less_room",
+   "label": "Take up less room",
+   "unblendPhrase": "wants you to take up less room",
+   "trailPhrase": "take up less room",
+   "nameHint": "the one who stays small",
+   "kind": "proactive",
+   "safetyLine": false,
+   "order": 7,
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "keep_watch",
+   "label": "Keep watch",
+   "unblendPhrase": "is keeping watch",
+   "trailPhrase": "keep watch",
+   "nameHint": "the one who keeps watch",
+   "kind": "proactive",
+   "safetyLine": false,
+   "order": 8,
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "put_it_off",
+   "label": "Put it off",
+   "unblendPhrase": "wants to put this off",
+   "trailPhrase": "put it off",
+   "nameHint": "the one who puts it off",
+   "kind": "proactive",
+   "safetyLine": false,
+   "order": 9,
+   "reviewStatus": "approved"
+  }
+ ],
+ "prompts": {
+  "paused_heads_up": {
+   "flow": "meet",
+   "step": "entry",
+   "order": 0,
+   "copy": "Things got louder after last time. Going gently is fine, or come back another day.",
+   "reviewStatus": "approved"
+  },
+  "meet_find": {
+   "flow": "meet",
+   "step": "find",
+   "order": 1,
+   "copy": "What's showing up?",
+   "reviewStatus": "approved"
+  },
+  "meet_where": {
+   "flow": "meet",
+   "step": "where",
+   "order": 2,
+   "copy": "Where do you notice it?",
+   "reviewStatus": "approved"
+  },
+  "meet_shape": {
+   "flow": "meet",
+   "step": "shape",
+   "order": 3,
+   "copy": "Which is closer to it?",
+   "reviewStatus": "approved"
+  },
+  "meet_age": {
+   "flow": "meet",
+   "step": "age",
+   "order": 4,
+   "copy": "How old does it seem?",
+   "reviewStatus": "approved"
+  },
+  "meet_age_young": {
+   "flow": "meet",
+   "step": "age_young",
+   "order": 5,
+   "copy": "It sounds young. Want to keep it gentle?",
+   "reviewStatus": "approved"
+  },
+  "meet_voice": {
+   "flow": "meet",
+   "step": "voice",
+   "order": 6,
+   "copy": "Does it say anything?",
+   "reviewStatus": "approved"
+  },
+  "meet_feel": {
+   "flow": "meet",
+   "step": "feel",
+   "order": 7,
+   "copy": "How do you feel toward it right now?",
+   "reviewStatus": "approved"
+  },
+  "meet_unblend": {
+   "flow": "meet",
+   "step": "unblend",
+   "order": 8,
+   "copy": "That reaction might be another part. Can it give you some room, for now?",
+   "reviewStatus": "approved"
+  },
+  "meet_unblend_end": {
+   "flow": "meet",
+   "step": "unblend_end",
+   "order": 9,
+   "copy": "That's enough for today. The part that's worried about it counts too.",
+   "reviewStatus": "approved"
+  },
+  "meet_unblend_later": {
+   "flow": "meet",
+   "step": "unblend_later",
+   "order": 10,
+   "copy": "Want to get to know that one another time?",
+   "reviewStatus": "approved"
+  },
+  "meet_nothing": {
+   "flow": "meet",
+   "step": "nothing",
+   "order": 11,
+   "copy": "Sometimes there's nothing there yet. That's fine.",
+   "reviewStatus": "approved"
+  },
+  "meet_job": {
+   "flow": "meet",
+   "step": "job",
+   "order": 12,
+   "copy": "What's it trying to do for you?",
+   "reviewStatus": "approved"
+  },
+  "meet_likes": {
+   "flow": "meet",
+   "step": "likes",
+   "order": 13,
+   "copy": "Does it like this job?",
+   "reviewStatus": "approved"
+  },
+  "meet_guards": {
+   "flow": "meet",
+   "step": "guards",
+   "order": 14,
+   "copy": "What do you think it's protecting?",
+   "reviewStatus": "approved"
+  },
+  "meet_front": {
+   "flow": "meet",
+   "step": "front",
+   "order": 15,
+   "copy": "Does it stand in front of another part you know?",
+   "reviewStatus": "approved"
+  },
+  "meet_fear": {
+   "flow": "meet",
+   "step": "fear",
+   "order": 16,
+   "copy": "What's it afraid would happen if it stopped?",
+   "reviewStatus": "approved"
+  },
+  "meet_stop_title": {
+   "flow": "meet",
+   "step": "stop",
+   "order": 17,
+   "copy": "It's guarding something tender.",
+   "reviewStatus": "approved"
+  },
+  "meet_stop_body": {
+   "flow": "meet",
+   "step": "stop",
+   "order": 18,
+   "copy": "We'll leave that be. You found the guard, and that counts.",
+   "reviewStatus": "approved"
+  },
+  "meet_stop_therapist": {
+   "flow": "meet",
+   "step": "stop",
+   "order": 19,
+   "copy": "If you see a therapist, this is a good thing to bring.",
+   "reviewStatus": "approved"
+  },
+  "meet_update": {
+   "flow": "meet",
+   "step": "update",
+   "order": 20,
+   "copy": "Does it know how old you are now?",
+   "reviewStatus": "approved"
+  },
+  "meet_update_show": {
+   "flow": "meet",
+   "step": "update_show",
+   "order": 21,
+   "copy": "Show it something you can do now.",
+   "reviewStatus": "approved"
+  },
+  "meet_thank": {
+   "flow": "meet",
+   "step": "thank",
+   "order": 22,
+   "copy": "Thank it for trying to protect you.",
+   "reviewStatus": "approved"
+  },
+  "meet_thank_hold": {
+   "flow": "meet",
+   "step": "thank",
+   "order": 23,
+   "copy": "Press and hold",
+   "reviewStatus": "approved"
+  },
+  "meet_thank_done": {
+   "flow": "meet",
+   "step": "thank",
+   "order": 24,
+   "copy": "Thanked",
+   "reviewStatus": "approved"
+  },
+  "meet_rather": {
+   "flow": "meet",
+   "step": "rather",
+   "order": 25,
+   "copy": "If it didn't have to do this, what would it rather do?",
+   "reviewStatus": "approved"
+  },
+  "meet_name": {
+   "flow": "meet",
+   "step": "name",
+   "order": 26,
+   "copy": "Want to give it a name?",
+   "reviewStatus": "approved"
+  },
+  "meet_keep": {
+   "flow": "meet",
+   "step": "keep",
+   "order": 27,
+   "copy": "Keep it, so you can come back to it?",
+   "reviewStatus": "approved"
+  },
+  "meet_tender": {
+   "flow": "meet",
+   "step": "tender",
+   "order": 28,
+   "copy": "Can you let it know you're here?",
+   "reviewStatus": "approved"
+  },
+  "meet_tender_sub": {
+   "flow": "meet",
+   "step": "tender",
+   "order": 29,
+   "copy": "You don't need to do anything else.",
+   "reviewStatus": "approved"
+  },
+  "meet_done": {
+   "flow": "meet",
+   "step": "close",
+   "order": 30,
+   "copy": "You can come back to this any time.",
+   "reviewStatus": "approved"
+  },
+  "pulls_place": {
+   "flow": "pulls",
+   "step": "place",
+   "order": 0,
+   "copy": "Put your light wherever feels right.",
+   "reviewStatus": "approved"
+  },
+  "pulls_feel": {
+   "flow": "pulls",
+   "step": "feel",
+   "order": 1,
+   "copy": "How do you feel toward each of them?",
+   "reviewStatus": "approved"
+  },
+  "pulls_needs_time": {
+   "flow": "pulls",
+   "step": "needs_time",
+   "order": 2,
+   "copy": "One of them needs its own time first.",
+   "reviewStatus": "approved"
+  },
+  "pulls_step_back": {
+   "flow": "pulls",
+   "step": "step_back",
+   "order": 3,
+   "copy": "Hold a breath, and step back from both of them.",
+   "reviewStatus": "approved"
+  },
+  "pulls_worry": {
+   "flow": "pulls",
+   "step": "worry",
+   "order": 4,
+   "copy": "If {B} gets its way, what's {A} afraid of?",
+   "reviewStatus": "approved"
+  },
+  "pulls_both_want": {
+   "flow": "pulls",
+   "step": "both_want",
+   "order": 5,
+   "copy": "What do they both want for you?",
+   "reviewStatus": "approved"
+  },
+  "pulls_pair_name": {
+   "flow": "pulls",
+   "step": "name",
+   "order": 6,
+   "copy": "the part that {move}",
+   "reviewStatus": "approved"
+  },
+  "pulls_close_checkback": {
+   "flow": "pulls",
+   "step": "close",
+   "order": 7,
+   "copy": "Check back with both of them in a week?",
+   "reviewStatus": "approved"
+  },
+  "pulls_wise_mind": {
+   "flow": "pulls",
+   "step": "keepsake",
+   "order": 8,
+   "copy": "Ask wise mind what's next",
+   "reviewStatus": "approved"
+  },
+  "offer_eyebrow": {
+   "flow": "offer",
+   "step": "card",
+   "order": 0,
+   "copy": "Something keeps showing up",
+   "reviewStatus": "approved"
+  },
+  "offer_ask": {
+   "flow": "offer",
+   "step": "card",
+   "order": 1,
+   "copy": "Want to take a look?",
+   "reviewStatus": "approved"
+  },
+  "offer_evidence": {
+   "flow": "offer",
+   "step": "evidence",
+   "order": 2,
+   "copy": "What the app saw",
+   "reviewStatus": "approved"
+  },
+  "offer_question": {
+   "flow": "offer",
+   "step": "evidence",
+   "order": 3,
+   "copy": "Does this feel like a part of you?",
+   "reviewStatus": "approved"
+  },
+  "offer_split": {
+   "flow": "offer",
+   "step": "split",
+   "order": 4,
+   "copy": "Which of these feels like its own thing?",
+   "reviewStatus": "approved"
+  },
+  "tag_question": {
+   "flow": "tag",
+   "step": "tag",
+   "order": 0,
+   "copy": "Was this a part you know?",
+   "reviewStatus": "approved"
+  },
+  "tag_new_later": {
+   "flow": "tag",
+   "step": "new",
+   "order": 1,
+   "copy": "Want to come back to it later?",
+   "reviewStatus": "approved"
+  },
+  "tag_use_shape": {
+   "flow": "tag",
+   "step": "shape",
+   "order": 2,
+   "copy": "Use this shape for {name}?",
+   "reviewStatus": "approved"
+  },
+  "tag_use_shape_noname": {
+   "flow": "tag",
+   "step": "shape",
+   "order": 3,
+   "copy": "Use this shape for that part?",
+   "reviewStatus": "approved"
+  },
+  "tag_shape_done": {
+   "flow": "tag",
+   "step": "shape",
+   "order": 4,
+   "copy": "Done.",
+   "reviewStatus": "approved"
+  },
+  "part_unnamed_place": {
+   "flow": "common",
+   "step": "name",
+   "order": 0,
+   "copy": "The one in your {place}",
+   "reviewStatus": "approved"
+  },
+  "part_unnamed": {
+   "flow": "common",
+   "step": "name",
+   "order": 1,
+   "copy": "One you haven't named",
+   "reviewStatus": "approved"
+  },
+  "stats_helped": {
+   "flow": "common",
+   "step": "stats",
+   "order": 2,
+   "copy": "What's helped it settle",
+   "reviewStatus": "approved"
+  },
+  "stats_helped_line": {
+   "flow": "common",
+   "step": "stats",
+   "order": 3,
+   "copy": "{tool} helped {n} times",
+   "reviewStatus": "approved"
+  },
+  "stats_helped_once": {
+   "flow": "common",
+   "step": "stats",
+   "order": 4,
+   "copy": "{tool} helped once",
+   "reviewStatus": "approved"
+  },
+  "stats_felt": {
+   "flow": "common",
+   "step": "stats",
+   "order": 5,
+   "copy": "How you've felt toward it",
+   "reviewStatus": "approved"
+  },
+  "stats_felt_then_now": {
+   "flow": "common",
+   "step": "stats",
+   "order": 6,
+   "copy": "In {month}: {then}. Lately: {now}.",
+   "reviewStatus": "approved"
+  },
+  "stats_felt_since": {
+   "flow": "common",
+   "step": "stats",
+   "order": 7,
+   "copy": "Since {month}: {now}.",
+   "reviewStatus": "approved"
+  },
+  "stats_when": {
+   "flow": "common",
+   "step": "stats",
+   "order": 8,
+   "copy": "Mostly {when}",
+   "reviewStatus": "approved"
+  },
+  "stats_steps": {
+   "flow": "common",
+   "step": "stats",
+   "order": 9,
+   "copy": "Steps that helped: {steps}",
+   "reviewStatus": "approved"
+  },
+  "stats_step_twice": {
+   "flow": "common",
+   "step": "stats",
+   "order": 10,
+   "copy": "{step} (twice)",
+   "reviewStatus": "approved"
+  },
+  "stats_step_times": {
+   "flow": "common",
+   "step": "stats",
+   "order": 11,
+   "copy": "{step} ({n} times)",
+   "reviewStatus": "approved"
+  },
+  "stats_feel_lately": {
+   "flow": "common",
+   "step": "stats",
+   "order": 12,
+   "copy": "Lately, meeting your parts, you've mostly been {feel}.",
+   "reviewStatus": "approved"
+  },
+  "stats_feel_earlier": {
+   "flow": "common",
+   "step": "stats",
+   "order": 13,
+   "copy": "Earlier, more often {feel}.",
+   "reviewStatus": "approved"
+  },
+  "hold_hint": {
+   "flow": "common",
+   "step": "hold",
+   "order": 14,
+   "copy": "Hold to fill it, or press once and wait.",
+   "reviewStatus": "approved"
+  },
+  "reflect_title": {
+   "flow": "reflect",
+   "step": "parts",
+   "order": 0,
+   "copy": "The parts you know",
+   "reviewStatus": "approved"
+  },
+  "patterns_title": {
+   "flow": "reflect",
+   "step": "patterns",
+   "order": 1,
+   "copy": "How things tend to go",
+   "reviewStatus": "approved"
+  },
+  "review_noname": {
+   "flow": "review",
+   "step": "question",
+   "order": 0,
+   "copy": "Was this that part?",
+   "reviewStatus": "approved"
+  },
+  "unblend_line": {
+   "flow": "unblend",
+   "step": "line",
+   "order": 0,
+   "copy": "A part of you {move} right now.",
+   "reviewStatus": "approved"
+  },
+  "angry_unblend": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 0,
+   "copy": "A part of you is furious right now.",
+   "reviewStatus": "approved"
+  },
+  "angry_unblend_plain": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 1,
+   "copy": "The anger is loud right now, and you're here too.",
+   "reviewStatus": "approved"
+  },
+  "angry_unblend_sub": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 2,
+   "copy": "Let it stand a little apart from you for a moment.",
+   "reviewStatus": "approved"
+  },
+  "angry_unblend_sub_plain": {
+   "flow": "angry",
+   "step": "unblend",
+   "order": 3,
+   "copy": "Let it stand a little apart from you for a moment.",
+   "reviewStatus": "approved"
+  },
+  "angry_protects": {
+   "flow": "angry",
+   "step": "protects",
+   "order": 4,
+   "copy": "It's trying to protect something. What?",
+   "reviewStatus": "approved"
+  },
+  "angry_protects_plain": {
+   "flow": "angry",
+   "step": "protects",
+   "order": 5,
+   "copy": "Anger usually protects something. What is it protecting?",
+   "reviewStatus": "approved"
+  },
+  "angry_vote": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 6,
+   "copy": "{name}, it's angry because {matters} matters to you.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 7,
+   "copy": "{name}, you're angry because {matters} matters.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_noname": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 8,
+   "copy": "This part is angry because {matters} matters to you.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_noname_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 9,
+   "copy": "You're angry because {matters} matters to you.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_unsure": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 10,
+   "copy": "{name}, this part is angry because something here matters to you.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_unsure_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 11,
+   "copy": "{name}, you're angry because something here matters to you.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_unsure_noname": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 12,
+   "copy": "This part is angry because something here matters to you.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_unsure_noname_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 13,
+   "copy": "You're angry because something here matters to you.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_2": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 14,
+   "copy": "You don't have to let it drive, and you don't have to leave it behind.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_2_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 15,
+   "copy": "You don't have to let it drive, or pretend it isn't there.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_3": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 16,
+   "copy": "{name} can handle what comes next.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_3_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 17,
+   "copy": "{name} can handle what comes next.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_3_noname": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 18,
+   "copy": "You can handle what comes next.",
+   "reviewStatus": "approved"
+  },
+  "angry_vote_3_noname_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 19,
+   "copy": "You can handle what comes next.",
+   "reviewStatus": "approved"
+  },
+  "angry_hold": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 20,
+   "copy": "Hold while you read it",
+   "reviewStatus": "approved"
+  },
+  "angry_hold_plain": {
+   "flow": "angry",
+   "step": "vote",
+   "order": 21,
+   "copy": "Hold while you read it",
+   "reviewStatus": "approved"
+  },
+  "angry_speak": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 22,
+   "copy": "If you say something, speak for it, not from it:",
+   "reviewStatus": "approved"
+  },
+  "angry_speak_plain": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 23,
+   "copy": "If you say something, say what's under the anger:",
+   "reviewStatus": "approved"
+  },
+  "angry_speak_unsure": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 24,
+   "copy": "If you say something, say what you felt, not what it wants to say.",
+   "reviewStatus": "approved"
+  },
+  "angry_speak_unsure_plain": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 25,
+   "copy": "If you say something, say what you felt, not what the anger wants to say.",
+   "reviewStatus": "approved"
+  },
+  "angry_speak_line": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 26,
+   "copy": "I felt {felt}.",
+   "copyKind": "first_person",
+   "reviewStatus": "approved"
+  },
+  "angry_speak_line_plain": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 27,
+   "copy": "I felt {felt}.",
+   "copyKind": "first_person",
+   "reviewStatus": "approved"
+  },
+  "angry_later_done": {
+   "flow": "angry",
+   "step": "speak",
+   "order": 28,
+   "copy": "It's in Me when you want it.",
+   "reviewStatus": "approved"
+  },
+  "ps_later_done": {
+   "flow": "ps",
+   "step": "ambivalence",
+   "order": 0,
+   "copy": "It's in Me when you want it.",
+   "reviewStatus": "approved"
+  },
+  "aftercare_louder": {
+   "flow": "aftercare",
+   "step": "louder",
+   "order": 0,
+   "copy": "Things can get louder after time with a part.",
+   "reviewStatus": "approved"
+  },
+  "aftercare_too_many": {
+   "flow": "aftercare",
+   "step": "too_many",
+   "order": 1,
+   "copy": "You don't need to get to know everyone at once.",
+   "reviewStatus": "approved"
+  },
+  "checkback_title": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 0,
+   "copy": "How's {name} today?",
+   "reviewStatus": "approved"
+  },
+  "checkback_title_noname": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 1,
+   "copy": "How's the part you met yesterday?",
+   "reviewStatus": "approved"
+  },
+  "checkback_title_two": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 2,
+   "copy": "How are {A} and {B} today?",
+   "reviewStatus": "approved"
+  },
+  "checkback_title_two_noname": {
+   "flow": "checkback",
+   "step": "checkback",
+   "order": 3,
+   "copy": "How are the two parts from last week?",
+   "reviewStatus": "approved"
+  },
+  "close_checkback": {
+   "flow": "meet",
+   "step": "close",
+   "order": 31,
+   "copy": "Check back with it tomorrow?",
+   "reviewStatus": "approved"
+  },
+  "cope_title": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 0,
+   "copy": "Who might show up in this conversation?",
+   "reviewStatus": "approved"
+  },
+  "cope_title_any": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 1,
+   "copy": "Who might show up there?",
+   "reviewStatus": "approved"
+  },
+  "cope_anchor": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 2,
+   "copy": "If {name} shows up:",
+   "reviewStatus": "approved"
+  },
+  "cope_anchor_noname": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 3,
+   "copy": "If that part shows up:",
+   "reviewStatus": "approved"
+  },
+  "cope_set_anchor": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 4,
+   "copy": "What would help if {name} shows up?",
+   "reviewStatus": "approved"
+  },
+  "cope_set_anchor_noname": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 5,
+   "copy": "What would help if that part shows up?",
+   "reviewStatus": "approved"
+  },
+  "cope_save_failed": {
+   "flow": "dearman",
+   "step": "cope",
+   "order": 6,
+   "copy": "Couldn't save that. Try again.",
+   "reviewStatus": "approved"
+  },
+  "debrief_who": {
+   "flow": "dearman",
+   "step": "debrief",
+   "order": 7,
+   "copy": "Was one of your parts there?",
+   "reviewStatus": "approved"
+  },
+  "debrief_who_named": {
+   "flow": "dearman",
+   "step": "debrief",
+   "order": 8,
+   "copy": "Did {name} show up?",
+   "reviewStatus": "approved"
+  },
+  "oa_goal_part": {
+   "flow": "oa",
+   "step": "goal",
+   "order": 0,
+   "copy": "A part of you {move}, and it's trying to help.",
+   "reviewStatus": "approved"
+  },
+  "oa_goal_you": {
+   "flow": "oa",
+   "step": "goal",
+   "order": 1,
+   "copy": "You want to {goal}.",
+   "reviewStatus": "approved"
+  },
+  "gate_far_away": {
+   "flow": "gate",
+   "step": "dissociation",
+   "order": 0,
+   "copy": "If you start to feel far away, stop any time. Coming back into the room comes first.",
+   "reviewStatus": "approved"
+  },
+  "gate_blend_check": {
+   "flow": "gate",
+   "step": "blend",
+   "order": 1,
+   "copy": "Right now, can you notice it, or is it running things?",
+   "reviewStatus": "approved"
+  },
+  "gate_blend_check_pulls": {
+   "flow": "gate",
+   "step": "blend_pulls",
+   "order": 2,
+   "copy": "Right now, can you notice them both, or is one of them running things?",
+   "reviewStatus": "approved"
+  },
+  "settings_label": {
+   "flow": "settings",
+   "step": "switch",
+   "order": 0,
+   "copy": "Parts",
+   "reviewStatus": "approved"
+  },
+  "settings_blurb": {
+   "flow": "settings",
+   "step": "switch",
+   "order": 1,
+   "copy": "Ways to get to know the parts of you that try to protect you.",
+   "reviewStatus": "approved"
+  },
+  "settings_dissociation": {
+   "flow": "settings",
+   "step": "switch",
+   "order": 2,
+   "copy": "If you live with alters or a lot of dissociation, this way of talking may not fit you.",
+   "reviewStatus": "approved"
+  },
+  "settings_off": {
+   "flow": "settings",
+   "step": "switch",
+   "order": 3,
+   "copy": "It stays off unless you turn it on, and you can turn it off any time.",
+   "reviewStatus": "approved"
+  },
+  "settings_about_1": {
+   "flow": "settings",
+   "step": "about",
+   "order": 4,
+   "copy": "Draws on ideas from Internal Family Systems, developed by Richard Schwartz.",
+   "reviewStatus": "approved"
+  },
+  "settings_about_2": {
+   "flow": "settings",
+   "step": "about",
+   "order": 5,
+   "copy": "Not affiliated with or endorsed by the IFS Institute.",
+   "reviewStatus": "approved"
+  },
+  "settings_delete": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 6,
+   "copy": "Delete your parts",
+   "reviewStatus": "approved"
+  },
+  "settings_delete_confirm": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 7,
+   "copy": "This deletes the parts you've kept and what you've said about them. It can't be undone.",
+   "reviewStatus": "approved"
+  },
+  "settings_delete_yes": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 8,
+   "copy": "Delete them",
+   "reviewStatus": "approved"
+  },
+  "settings_delete_no": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 9,
+   "copy": "Keep them",
+   "reviewStatus": "approved"
+  },
+  "settings_delete_done": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 10,
+   "copy": "Deleted.",
+   "reviewStatus": "approved"
+  },
+  "settings_delete_failed": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 11,
+   "copy": "Couldn't delete them. Try again.",
+   "reviewStatus": "approved"
+  },
+  "settings_delete_lines_one": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 12,
+   "copy": "Also remove 1 kept line that names your parts?",
+   "reviewStatus": "approved"
+  },
+  "settings_delete_lines": {
+   "flow": "settings",
+   "step": "delete",
+   "order": 13,
+   "copy": "Also remove {n} kept lines that name your parts?",
+   "reviewStatus": "approved"
+  },
+  "me_get_to_know": {
+   "flow": "me",
+   "step": "card",
+   "order": 0,
+   "copy": "Get to know a part",
+   "reviewStatus": "approved"
+  },
+  "card_where": {
+   "flow": "me",
+   "step": "card",
+   "order": 1,
+   "copy": "Where",
+   "reviewStatus": "approved"
+  },
+  "card_job": {
+   "flow": "me",
+   "step": "card",
+   "order": 2,
+   "copy": "Its job",
+   "reviewStatus": "approved"
+  },
+  "card_job_own": {
+   "flow": "me",
+   "step": "card",
+   "order": 3,
+   "copy": "Its job, in your words",
+   "reviewStatus": "approved"
+  },
+  "card_fear": {
+   "flow": "me",
+   "step": "card",
+   "order": 4,
+   "copy": "Afraid that",
+   "reviewStatus": "approved"
+  },
+  "card_rather": {
+   "flow": "me",
+   "step": "card",
+   "order": 5,
+   "copy": "Would rather",
+   "reviewStatus": "approved"
+  },
+  "card_visit": {
+   "flow": "me",
+   "step": "card",
+   "order": 6,
+   "copy": "Spend time with it",
+   "reviewStatus": "approved"
+  },
+  "card_resting": {
+   "flow": "me",
+   "step": "card",
+   "order": 7,
+   "copy": "Resting",
+   "reviewStatus": "approved"
+  },
+  "card_rename": {
+   "flow": "me",
+   "step": "card",
+   "order": 8,
+   "copy": "Rename",
+   "reviewStatus": "approved"
+  },
+  "card_rest": {
+   "flow": "me",
+   "step": "card",
+   "order": 9,
+   "copy": "Rest it",
+   "reviewStatus": "approved"
+  },
+  "card_back": {
+   "flow": "me",
+   "step": "card",
+   "order": 10,
+   "copy": "It's back",
+   "reviewStatus": "approved"
+  },
+  "card_set_aside": {
+   "flow": "me",
+   "step": "card",
+   "order": 11,
+   "copy": "Set aside",
+   "reviewStatus": "approved"
+  },
+  "card_restore": {
+   "flow": "me",
+   "step": "card",
+   "order": 12,
+   "copy": "Bring it back",
+   "reviewStatus": "approved"
+  },
+  "card_tender": {
+   "flow": "me",
+   "step": "card",
+   "order": 13,
+   "copy": "It feels young or hurt",
+   "reviewStatus": "approved"
+  },
+  "card_rename_save": {
+   "flow": "me",
+   "step": "card",
+   "order": 14,
+   "copy": "Save",
+   "reviewStatus": "approved"
+  },
+  "card_cancel": {
+   "flow": "me",
+   "step": "card",
+   "order": 15,
+   "copy": "Cancel",
+   "reviewStatus": "approved"
+  },
+  "revisit_title": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 16,
+   "copy": "Is {name} still doing the same job?",
+   "reviewStatus": "approved"
+  },
+  "revisit_title_noname": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 17,
+   "copy": "Is this part still doing the same job?",
+   "reviewStatus": "approved"
+  },
+  "revisit_resting": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 18,
+   "copy": "{name} has been resting. Still quiet?",
+   "reviewStatus": "approved"
+  },
+  "revisit_resting_noname": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 19,
+   "copy": "This part has been resting. Still quiet?",
+   "reviewStatus": "approved"
+  },
+  "revisit_new_title": {
+   "flow": "me",
+   "step": "revisit",
+   "order": 20,
+   "copy": "What does it do now?",
+   "reviewStatus": "approved"
+  },
+  "candidate_title": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 21,
+   "copy": "To come back to",
+   "reviewStatus": "approved"
+  },
+  "candidate_line": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 22,
+   "copy": "The one that {move}",
+   "reviewStatus": "approved"
+  },
+  "candidate_line_plain": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 23,
+   "copy": "One you wanted to come back to",
+   "reviewStatus": "approved"
+  },
+  "candidate_go": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 24,
+   "copy": "Get to know it",
+   "reviewStatus": "approved"
+  },
+  "candidate_dismiss": {
+   "flow": "me",
+   "step": "candidate",
+   "order": 25,
+   "copy": "Not any more",
+   "reviewStatus": "approved"
+  },
+  "den_link": {
+   "flow": "den",
+   "step": "room",
+   "order": 0,
+   "copy": "See them together",
+   "reviewStatus": "approved"
+  },
+  "den_room": {
+   "flow": "den",
+   "step": "room",
+   "order": 1,
+   "copy": "Everyone here is in your house.",
+   "reviewStatus": "approved"
+  },
+  "den_unnamed": {
+   "flow": "den",
+   "step": "room",
+   "order": 2,
+   "copy": "A part",
+   "reviewStatus": "approved"
+  },
+  "den_move_help": {
+   "flow": "den",
+   "step": "room",
+   "order": 3,
+   "copy": "Tap one, then another, to say how they go together. Drag to move them.",
+   "reviewStatus": "approved"
+  },
+  "den_move_keys": {
+   "flow": "den",
+   "step": "room",
+   "order": 4,
+   "copy": "Enter picks one up, the arrow keys move it, Enter puts it down.",
+   "reviewStatus": "approved"
+  },
+  "den_one_part": {
+   "flow": "den",
+   "step": "room",
+   "order": 5,
+   "copy": "When you get to know another part, it will be here too.",
+   "reviewStatus": "approved"
+  },
+  "den_list": {
+   "flow": "den",
+   "step": "room",
+   "order": 6,
+   "copy": "See them as a list",
+   "reviewStatus": "approved"
+  },
+  "den_pull_against": {
+   "flow": "den",
+   "step": "thread",
+   "order": 7,
+   "copy": "These two pull against each other",
+   "reviewStatus": "approved"
+  },
+  "den_stands_front": {
+   "flow": "den",
+   "step": "thread",
+   "order": 8,
+   "copy": "This one stands in front of that one",
+   "reviewStatus": "approved"
+  },
+  "den_which_front": {
+   "flow": "den",
+   "step": "thread",
+   "order": 9,
+   "copy": "Which one stands in front?",
+   "reviewStatus": "approved"
+  },
+  "den_thread_cancel": {
+   "flow": "den",
+   "step": "thread",
+   "order": 10,
+   "copy": "Not now",
+   "reviewStatus": "approved"
+  },
+  "den_remove": {
+   "flow": "den",
+   "step": "thread",
+   "order": 11,
+   "copy": "Remove this thread",
+   "reviewStatus": "approved"
+  },
+  "den_then": {
+   "flow": "den",
+   "step": "then",
+   "order": 12,
+   "copy": "How it looked in {month}",
+   "reviewStatus": "approved"
+  },
+  "den_now": {
+   "flow": "den",
+   "step": "then",
+   "order": 13,
+   "copy": "Now",
+   "reviewStatus": "approved"
+  },
+  "den_back_now": {
+   "flow": "den",
+   "step": "then",
+   "order": 14,
+   "copy": "Back to now",
+   "reviewStatus": "approved"
+  },
+  "wm_who": {
+   "flow": "wise_mind",
+   "step": "who",
+   "order": 0,
+   "copy": "Who's here about this?",
+   "reviewStatus": "approved"
+  },
+  "wm_who_help": {
+   "flow": "wise_mind",
+   "step": "who",
+   "order": 1,
+   "copy": "Tap a part to bring it near the light.",
+   "reviewStatus": "approved"
+  },
+  "wm_room": {
+   "flow": "wise_mind",
+   "step": "who",
+   "order": 2,
+   "copy": "The room, with the light in the middle",
+   "reviewStatus": "approved"
+  },
+  "wm_step_back": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 3,
+   "copy": "Ask everyone to take one step back.",
+   "reviewStatus": "approved"
+  },
+  "wm_hold": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 4,
+   "copy": "Hold to ask",
+   "reviewStatus": "approved"
+  },
+  "wm_held": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 5,
+   "copy": "From here, what's the wise next step?",
+   "reviewStatus": "approved"
+  },
+  "wm_tap_one": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 6,
+   "copy": "Tap a part if it won't step back.",
+   "reviewStatus": "approved"
+  },
+  "wm_wont_line": {
+   "flow": "wise_mind",
+   "step": "wont",
+   "order": 7,
+   "copy": "That's fine. It might need its own time.",
+   "reviewStatus": "approved"
+  },
+  "wm_later_done": {
+   "flow": "wise_mind",
+   "step": "wont",
+   "order": 8,
+   "copy": "It's in Me for another time.",
+   "reviewStatus": "approved"
+  },
+  "wm_use_minds": {
+   "flow": "wise_mind",
+   "step": "chrome",
+   "order": 9,
+   "copy": "Use the two minds instead",
+   "reviewStatus": "approved"
+  },
+  "wm_pushed": {
+   "flow": "wise_mind",
+   "step": "feel",
+   "order": 10,
+   "copy": "A part might still be close.",
+   "reviewStatus": "approved"
+  },
+  "story_open": {
+   "flow": "story",
+   "step": "card",
+   "order": 0,
+   "copy": "Its story",
+   "reviewStatus": "approved"
+  },
+  "story_spend_time": {
+   "flow": "story",
+   "step": "card",
+   "order": 1,
+   "copy": "Spend time with it",
+   "reviewStatus": "approved"
+  },
+  "story_met": {
+   "flow": "story",
+   "step": "line",
+   "order": 2,
+   "copy": "Met in {month}",
+   "reviewStatus": "approved"
+  },
+  "story_job_then": {
+   "flow": "story",
+   "step": "line",
+   "order": 3,
+   "copy": "Its job then: {old}",
+   "reviewStatus": "approved"
+  },
+  "story_job_now": {
+   "flow": "story",
+   "step": "line",
+   "order": 4,
+   "copy": "Its job now: {new}",
+   "reviewStatus": "approved"
+  },
+  "story_rested": {
+   "flow": "story",
+   "step": "line",
+   "order": 5,
+   "copy": "Rested in {month}",
+   "reviewStatus": "approved"
+  },
+  "story_back": {
+   "flow": "story",
+   "step": "line",
+   "order": 6,
+   "copy": "Back in {month}",
+   "reviewStatus": "approved"
+  },
+  "story_where": {
+   "flow": "story",
+   "step": "where",
+   "order": 7,
+   "copy": "Where it stands",
+   "reviewStatus": "approved"
+  },
+  "story_front": {
+   "flow": "story",
+   "step": "where",
+   "order": 8,
+   "copy": "Stands in front of {name}",
+   "reviewStatus": "approved"
+  },
+  "story_behind": {
+   "flow": "story",
+   "step": "where",
+   "order": 9,
+   "copy": "Stands behind {name}",
+   "reviewStatus": "approved"
+  },
+  "story_pulls": {
+   "flow": "story",
+   "step": "where",
+   "order": 10,
+   "copy": "Pulls against {name}",
+   "reviewStatus": "approved"
+  },
+  "story_other": {
+   "flow": "story",
+   "step": "where",
+   "order": 11,
+   "copy": "another part",
+   "reviewStatus": "approved"
+  },
+  "story_room_then": {
+   "flow": "story",
+   "step": "where",
+   "order": 12,
+   "copy": "In {month}",
+   "reviewStatus": "approved"
+  },
+  "story_room_now": {
+   "flow": "story",
+   "step": "where",
+   "order": 13,
+   "copy": "Now",
+   "reviewStatus": "approved"
+  },
+  "say_open": {
+   "flow": "say",
+   "step": "card",
+   "order": 0,
+   "copy": "Say something to it",
+   "reviewStatus": "approved"
+  },
+  "say_prompt": {
+   "flow": "say",
+   "step": "ask",
+   "order": 1,
+   "copy": "What would you like to say to {name}?",
+   "reviewStatus": "approved"
+  },
+  "say_prompt_noname": {
+   "flow": "say",
+   "step": "ask",
+   "order": 2,
+   "copy": "What would you like to say to this part?",
+   "reviewStatus": "approved"
+  },
+  "say_own_label": {
+   "flow": "say",
+   "step": "ask",
+   "order": 3,
+   "copy": "Your words",
+   "reviewStatus": "approved"
+  },
+  "say_send": {
+   "flow": "say",
+   "step": "ask",
+   "order": 4,
+   "copy": "Say it",
+   "reviewStatus": "approved"
+  },
+  "say_cancel": {
+   "flow": "say",
+   "step": "ask",
+   "order": 5,
+   "copy": "Not now",
+   "reviewStatus": "approved"
+  },
+  "say_told": {
+   "flow": "say",
+   "step": "card",
+   "order": 6,
+   "copy": "You told it: {said}",
+   "reviewStatus": "approved"
+  },
+  "say_story": {
+   "flow": "say",
+   "step": "story",
+   "order": 7,
+   "copy": "In {month} you told it: {said}",
+   "reviewStatus": "approved"
+  }
+ },
+ "options": {
+  "meet": {
+   "any": [
+    {
+     "id": "own_words",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "chrome": [
+    {
+     "id": "meet_back",
+     "label": "Back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "meet_next",
+     "label": "Next",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "meet_finish",
+     "label": "Done",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "find": [
+    {
+     "id": "find_something_else",
+     "label": "Something else",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "where": [
+    {
+     "id": "where_nowhere",
+     "label": "Nowhere I can find",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "shape": [
+    {
+     "id": "shape_cant_tell",
+     "label": "Can't tell",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "age": [
+    {
+     "id": "age_school",
+     "label": "school age",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "age_teen",
+     "label": "teenage",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "age_now",
+     "label": "about my age",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "age_older",
+     "label": "older",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "age_cant_tell",
+     "label": "can't tell",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "age_little",
+     "label": "little",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "tender_offer",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "age_young": [
+    {
+     "id": "young_gentle",
+     "label": "Yes, keep it gentle",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "tender_path",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "young_go_on",
+     "label": "Keep going as we were",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "voice": [
+    {
+     "id": "voice_nothing",
+     "label": "Nothing",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_voice_see",
+     "label": "Don't let them see",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_voice_leave_first",
+     "label": "Get out before they leave",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_voice_safer_alone",
+     "label": "It's safer alone",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_voice_fix_now",
+     "label": "Fix it now",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_voice_not_angry",
+     "label": "Make sure they're not angry",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_voice_dont_let_go",
+     "label": "Don't let them go",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 6,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_voice_cant_talk",
+     "label": "They can't talk to you like that",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 7,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_voice_slide",
+     "label": "Don't let it slide",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 8,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_voice_agree",
+     "label": "Just agree",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 9,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_voice_not_a_thing",
+     "label": "Don't make it a thing",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 10,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_voice_not_worth",
+     "label": "This isn't worth the fight",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 11,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [
+      {
+       "label": "ThoughtPattern",
+       "id": "thought_not_worth"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_voice_always",
+     "label": "You always do this",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 12,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_voice_my_fault",
+     "label": "This is probably my fault",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 13,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [
+      {
+       "label": "ThoughtPattern",
+       "id": "thought_my_fault"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_voice_too_much",
+     "label": "I'm being too much",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 14,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [
+      {
+       "label": "ThoughtPattern",
+       "id": "thought_too_much"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_voice_dont_ask",
+     "label": "Don't ask",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 15,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_voice_dont_deserve",
+     "label": "I don't deserve to ask",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 16,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [
+      {
+       "label": "ThoughtPattern",
+       "id": "thought_dont_deserve"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_voice_wrong",
+     "label": "What if I'm wrong?",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 17,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [
+      {
+       "label": "ThoughtPattern",
+       "id": "thought_wrong"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_voice_leave",
+     "label": "They're going to leave",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 18,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [
+      {
+       "label": "ThoughtPattern",
+       "id": "thought_will_leave"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_voice_off",
+     "label": "Something's off",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 19,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_voice_later",
+     "label": "Later",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 20,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_voice_not_today",
+     "label": "Not today",
+     "kind": "voice",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 21,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "feel": [
+    {
+     "id": "feel_curious",
+     "label": "curious",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": true,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_steady",
+     "label": "steady",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": true,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_warm",
+     "label": "warm toward it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": true,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_open",
+     "label": "open",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": true,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_annoyed",
+     "label": "annoyed",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": false,
+     "branch": "unblend",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_scared",
+     "label": "scared of it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": false,
+     "branch": "unblend",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_gone",
+     "label": "want it gone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": false,
+     "branch": "unblend",
+     "order": 6,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_ashamed",
+     "label": "ashamed of it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": false,
+     "branch": "unblend",
+     "order": 7,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_tired",
+     "label": "tired of it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": false,
+     "branch": "unblend",
+     "order": 8,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_not_sure",
+     "label": "not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 9,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "feel_nothing",
+     "label": "nothing",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "grounding",
+     "order": 10,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "unblend": [
+    {
+     "id": "unblend_eased",
+     "label": "It eased off",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "unblend_still",
+     "label": "It's still here",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "unblend",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "unblend_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "unblend_later": [
+    {
+     "id": "later_yes",
+     "label": "Yes, another time",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "later_no",
+     "label": "No",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "nothing": [
+    {
+     "id": "nothing_look",
+     "label": "Look around the room",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "grounding",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "nothing_body",
+     "label": "Something for my body",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "body_first",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "nothing_finish",
+     "label": "Finish here",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "likes": [
+    {
+     "id": "likes_tired",
+     "label": "It's tired",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "likes_proud",
+     "label": "It's proud of it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "likes_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "guards": [
+    {
+     "id": "guards_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "front": [
+    {
+     "id": "front_none",
+     "label": "No one I know",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "front_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "stop": [
+    {
+     "id": "stop_thank",
+     "label": "Thank it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "stop_body",
+     "label": "Something for my body first",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "body_first",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "update": [
+    {
+     "id": "update_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "update_no",
+     "label": "It doesn't seem to",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "update_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "update_show": [
+    {
+     "id": "now_leave",
+     "label": "I can leave a room",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "now_ask",
+     "label": "I can ask for help",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "now_people",
+     "label": "I have people now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "now_no",
+     "label": "I can say no",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "rather": [
+    {
+     "id": "rather_not_sure",
+     "label": "Not sure yet",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_rather_need_someone",
+     "label": "Let me know when I need someone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_rather_break",
+     "label": "Help me take a break, then come back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_rather_ask",
+     "label": "Tell me when I need reassurance, so I can ask",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_rather_wait",
+     "label": "Help me wait a little",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_rather_matters",
+     "label": "Tell me when something matters",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_rather_stand_up",
+     "label": "Help me stand up for myself, steady and out loud",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 6,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_rather_notice",
+     "label": "Help me notice when I'm agreeing too fast",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 7,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_rather_say_no",
+     "label": "Help me say no kindly",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 8,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_rather_kindly",
+     "label": "Point out what I want to do differently, kindly",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 9,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_rather_small_things",
+     "label": "Help me ask for small things first",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 10,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_rather_allowed",
+     "label": "Remind me I'm allowed to want things",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 11,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_rather_rest",
+     "label": "Keep watch, then let me rest",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 12,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_rather_safe",
+     "label": "Tell me when it's safe to stop",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 13,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_rather_start_small",
+     "label": "Help me start small",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 14,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_rather_ready",
+     "label": "Tell me when I'm ready",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 15,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "name": [
+    {
+     "id": "name_not_yet",
+     "label": "Not yet",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "keep": [
+    {
+     "id": "keep_yes",
+     "label": "Yes, keep it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "keep",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "keep_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "job": [
+    {
+     "id": "hide_job_out_of_sight",
+     "label": "Keep me out of sight",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_job_pushed_out",
+     "label": "Keep me from being pushed out",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_job_worse",
+     "label": "Keep me from making it worse",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_job_dont_leave",
+     "label": "Make sure they don't leave",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_job_answer",
+     "label": "Get an answer so I can breathe",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_job_seriously",
+     "label": "Make sure I'm taken seriously",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_job_stop_them",
+     "label": "Stop them before it gets worse",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 6,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_job_calm",
+     "label": "Keep everyone calm",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 7,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_job_nobody_angry",
+     "label": "Make sure nobody gets angry",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 8,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_job_not_again",
+     "label": "Stop me from doing that again",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 9,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_job_get_there_first",
+     "label": "Get there before anyone else does",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 10,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_job_too_much",
+     "label": "Keep me from being too much",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 11,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_job_bother",
+     "label": "Keep me from being a bother",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 12,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_job_trouble",
+     "label": "See trouble coming",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 13,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_job_surprise",
+     "label": "Make sure nothing surprises me",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 14,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_job_failing",
+     "label": "Keep me from failing at it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 15,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_job_hard_talk",
+     "label": "Keep me from a hard conversation",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 16,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "fear": [
+    {
+     "id": "fear_old_hurt",
+     "label": "I'd feel the old hurt",
+     "kind": "chip",
+     "flag": "tender",
+     "selfLike": null,
+     "branch": "conservative",
+     "order": 0,
+     "moves": [
+      "hide",
+      "chase",
+      "keep_the_peace",
+      "take_less_room",
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "fear_cant_handle",
+     "label": "Something would come up I can't handle",
+     "kind": "chip",
+     "flag": "tender",
+     "selfLike": null,
+     "branch": "conservative",
+     "order": 1,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_fear_too_much",
+     "label": "I'd be too much and they'd leave",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_fear_regret",
+     "label": "I'd say something I regret",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [
+      "hide"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_fear_not_know",
+     "label": "I'd be left and not know why",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_fear_waiting",
+     "label": "The waiting would be unbearable",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [
+      "chase"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_fear_walk_over",
+     "label": "They'd walk all over me",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 6,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_fear_stop_mattering",
+     "label": "I'd stop mattering",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 7,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_fear_take_back",
+     "label": "I'd do something I can't take back",
+     "kind": "chip",
+     "flag": "danger",
+     "selfLike": null,
+     "branch": "danger",
+     "order": 8,
+     "moves": [
+      "hit_back"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_fear_angry",
+     "label": "They'd get angry and I couldn't handle it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 9,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_fear_lose_them",
+     "label": "I'd lose them",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 10,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_fear_fight",
+     "label": "It would turn into a fight",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 11,
+     "moves": [
+      "keep_the_peace"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_fear_hurt_people",
+     "label": "I'd turn into someone who hurts people",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 12,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_fear_careless",
+     "label": "I'd get careless and lose everyone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 13,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "turn_fear_hurt_myself",
+     "label": "I'd end up hurting myself",
+     "kind": "chip",
+     "flag": "danger",
+     "selfLike": null,
+     "branch": "danger",
+     "order": 14,
+     "moves": [
+      "turn_on_myself"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_fear_burden",
+     "label": "I'd be a burden",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 15,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_fear_annoyed",
+     "label": "They'd be annoyed with me",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 16,
+     "moves": [
+      "take_less_room"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_fear_off_guard",
+     "label": "I'd be caught off guard",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 17,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "watch_fear_miss_it",
+     "label": "Something bad would happen and I'd miss it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 18,
+     "moves": [
+      "keep_watch"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_fear_cant_do_it",
+     "label": "I'd find out I can't do it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 19,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_fear_hard_talk",
+     "label": "I'd have to have a hard conversation",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 20,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [
+      {
+       "label": "AmbivalenceOption",
+       "id": "ambiv-hard-conversation"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_fear_might_not_help",
+     "label": "It might not help after all",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 21,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [
+      {
+       "label": "AmbivalenceOption",
+       "id": "ambiv-change-might-not-help"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_fear_lose_something",
+     "label": "I'd lose something I still value",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 22,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [
+      {
+       "label": "AmbivalenceOption",
+       "id": "ambiv-losing-something"
+      }
+     ],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "off_fear_need_help",
+     "label": "I'd have to admit I need help",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 23,
+     "moves": [
+      "put_it_off"
+     ],
+     "sameAs": [
+      {
+       "label": "AmbivalenceOption",
+       "id": "ambiv-admitting-need-help"
+      }
+     ],
+     "reviewStatus": "approved"
+    }
+   ],
+   "close": [
+    {
+     "id": "close_checkback_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "checkback",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "close_checkback_no",
+     "label": "No thanks",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "pulls": {
+   "keepsake": [
+    {
+     "id": "pulls_keep",
+     "label": "Keep this",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "keep",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "needs_time": [
+    {
+     "id": "pulls_another_time",
+     "label": "Meet it another time",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_needs_time_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "worry": [
+    {
+     "id": "pulls_worry_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_worry_drift",
+     "label": "They'd drift away and I'd lose them",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "chase_worry_nobody_knows",
+     "label": "Nobody would know I need them",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_worry_too_much",
+     "label": "I'd be too much and they'd leave",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hide_worry_hurt_worse",
+     "label": "I'd get hurt worse",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_worry_walked_over",
+     "label": "I'd get walked over",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_worry_never_change",
+     "label": "Nothing would ever change",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 6,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_worry_blow_up",
+     "label": "It would blow up",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 7,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "peace_worry_lose_them",
+     "label": "I'd lose them",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 8,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_worry_too_much",
+     "label": "I'd be too much",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 9,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "small_worry_turn_on_me",
+     "label": "They'd turn on me",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 10,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_worry_stop_mattering",
+     "label": "I'd stop mattering",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 11,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "hit_back_worry_keep_doing_it",
+     "label": "They'd keep doing it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 12,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "both_want": [
+    {
+     "id": "pulls_both_want_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "want_not_left",
+     "label": "not to be left",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "want_safe_in_it",
+     "label": "to stay safe in it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "want_matter_someone",
+     "label": "to matter to someone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "want_safe",
+     "label": "to be safe",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "want_treated_well",
+     "label": "to be treated well",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "want_keep_what_matters",
+     "label": "to keep what matters",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 6,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "want_matter",
+     "label": "to matter",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 7,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "close": [
+    {
+     "id": "pulls_close_checkback_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "checkback",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_close_checkback_no",
+     "label": "No thanks",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "worry_general": [
+    {
+     "id": "pulls_worry_hurt",
+     "label": "I'd get hurt",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_worry_nothing",
+     "label": "I'd be left with nothing",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_worry_fall_apart",
+     "label": "It would all fall apart",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_worry_on_my_own",
+     "label": "I'd end up on my own",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "both_want_general": [
+    {
+     "id": "pulls_want_safe",
+     "label": "to be safe",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_want_matter",
+     "label": "to matter to someone",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_want_not_hurt",
+     "label": "not to be hurt again",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "pulls_want_okay",
+     "label": "to be okay",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "wise_mind": {
+   "who": [
+    {
+     "id": "wm_unmet",
+     "label": "A part I haven't met",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "wm_no_one",
+     "label": "No one in particular",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "wont": [
+    {
+     "id": "wm_wont",
+     "label": "It won't step back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "wm_meet_later",
+     "label": "Meet it another time",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "chrome": [
+    {
+     "id": "wm_next",
+     "label": "Next",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "offer": {
+   "card": [
+    {
+     "id": "offer_show",
+     "label": "Show me",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "offer_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "offer_no",
+     "label": "No",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "evidence": [
+    {
+     "id": "offer_yes_part",
+     "label": "Yes, a part of me",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "meet",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "offer_more_than_one",
+     "label": "More than one",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "split",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "offer_how_it_goes",
+     "label": "It's how things go",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "offer_not_me",
+     "label": "Not me",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "split": [
+    {
+     "id": "offer_split_keep",
+     "label": "Keep these",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "review": {
+   "row": [
+    {
+     "id": "review_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "review_no",
+     "label": "No",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "review_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "block": [
+    {
+     "id": "review_done",
+     "label": "Done",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "review_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "reflect": {
+   "patterns": [
+    {
+     "id": "patterns_remove",
+     "label": "Remove",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "tag": {
+   "tag": [
+    {
+     "id": "tag_new_one",
+     "label": "A new one",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "new",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "tag_skip",
+     "label": "Skip",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "new": [
+    {
+     "id": "tag_later_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "tag_later_no",
+     "label": "No thanks",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "shape": [
+    {
+     "id": "tag_shape_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "keep",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "tag_shape_no",
+     "label": "No thanks",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "ps": {
+   "ambivalence": [
+    {
+     "id": "ps_later",
+     "label": "Want to get to know that part another time?",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "common": {
+   "stats": [
+    {
+     "id": "when_mornings",
+     "label": "mornings",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "when_afternoons",
+     "label": "afternoons",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "when_evenings",
+     "label": "evenings",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "when_nights",
+     "label": "at night",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "angry": {
+   "unblend": [
+    {
+     "id": "angry_next",
+     "label": "Okay",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "angry_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "angry_not_now_plain",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "protects": [
+    {
+     "id": "angry_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "speak": [
+    {
+     "id": "angry_done",
+     "label": "Done",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "angry_later",
+     "label": "Spend a minute with it later?",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "chrome": [
+    {
+     "id": "angry_back",
+     "label": "Back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "vote": [
+    {
+     "id": "angry_vote_next",
+     "label": "Next",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "aftercare": {
+   "louder": [
+    {
+     "id": "louder_body",
+     "label": "Something for my body",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "body_first",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "louder_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "checkback": {
+   "checkback": [
+    {
+     "id": "checkback_settled",
+     "label": "Settled",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "checkback_same",
+     "label": "Same",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "checkback_louder",
+     "label": "Louder",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "aftercare",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "checkback_skip",
+     "label": "Skip",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "dearman": {
+   "cope": [
+    {
+     "id": "cope_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "cope_skip",
+     "label": "Skip",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "cope_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "cope_change",
+     "label": "Change it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "cope_save",
+     "label": "Save",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "debrief": [
+    {
+     "id": "debrief_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "debrief_a_bit",
+     "label": "A bit",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "debrief_no",
+     "label": "No",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "gate": {
+   "dissociation": [
+    {
+     "id": "far_away_look",
+     "label": "Look around the room first",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "grounding",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "far_away_go_on",
+     "label": "Go on",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "blend": [
+    {
+     "id": "blend_notice",
+     "label": "I can notice it",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "blend_running",
+     "label": "It's running things",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "body_first",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "blend_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "blend_pulls": [
+    {
+     "id": "blend_pulls_notice",
+     "label": "I can notice them",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "blend_pulls_running",
+     "label": "One of them is running things",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "body_first",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "blend_pulls_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "say": {
+   "say": [
+    {
+     "id": "say_thanks",
+     "label": "Thank you for trying",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_got_this",
+     "label": "I've got this one",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_rest",
+     "label": "You can rest now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_listening",
+     "label": "I'm listening",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_see",
+     "label": "I see how hard you work",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ],
+   "say_tender": [
+    {
+     "id": "say_here",
+     "label": "I'm here",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_safe",
+     "label": "You're safe with me now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_tender_listening",
+     "label": "I'm listening",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "say_tender_own",
+     "label": "In my words",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "own_words",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  },
+  "me": {
+   "revisit": [
+    {
+     "id": "revisit_same",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "revisit_less",
+     "label": "Less than before",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "revisit_new",
+     "label": "It's doing something new",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "revisit_resting_opt",
+     "label": "It's resting",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "revisit_still_quiet",
+     "label": "Still quiet",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 4,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    },
+    {
+     "id": "revisit_back",
+     "label": "It's back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 5,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "approved"
+    }
+   ]
+  }
+ },
+ "hurts": [
+  {
+   "id": "brushed_off",
+   "label": "being brushed off",
+   "hurtPhrase": "being brushed off",
+   "feltPhrase": "brushed off",
+   "matters": "being taken seriously",
+   "namedAs": [
+    "disrespected",
+    "hurt"
+   ],
+   "order": 0,
+   "guardedBy": [
+    {
+     "moveId": "hit_back",
+     "rank": 0
+    },
+    {
+     "moveId": "keep_the_peace",
+     "rank": 2
+    },
+    {
+     "moveId": "take_less_room",
+     "rank": 0
+    }
+   ],
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "made_small",
+   "label": "being made small",
+   "hurtPhrase": "being made small",
+   "feltPhrase": "made small",
+   "matters": "being treated as an equal",
+   "namedAs": [
+    "inferior",
+    "inadequate"
+   ],
+   "order": 1,
+   "guardedBy": [
+    {
+     "moveId": "hit_back",
+     "rank": 1
+    },
+    {
+     "moveId": "hide",
+     "rank": 1
+    },
+    {
+     "moveId": "turn_on_myself",
+     "rank": 0
+    },
+    {
+     "moveId": "take_less_room",
+     "rank": 1
+    },
+    {
+     "moveId": "put_it_off",
+     "rank": 0
+    }
+   ],
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "left_out",
+   "label": "being left out",
+   "hurtPhrase": "being left out",
+   "feltPhrase": "left out",
+   "matters": "belonging",
+   "namedAs": [
+    "excluded",
+    "rejected"
+   ],
+   "order": 2,
+   "guardedBy": [
+    {
+     "moveId": "chase",
+     "rank": 0
+    },
+    {
+     "moveId": "hide",
+     "rank": 2
+    },
+    {
+     "moveId": "keep_the_peace",
+     "rank": 0
+    },
+    {
+     "moveId": "keep_watch",
+     "rank": 0
+    }
+   ],
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "not_mattering",
+   "label": "not mattering",
+   "hurtPhrase": "not mattering",
+   "feltPhrase": "like I didn't matter",
+   "matters": "mattering to people",
+   "namedAs": [
+    "insignificant"
+   ],
+   "order": 3,
+   "guardedBy": [
+    {
+     "moveId": "hit_back",
+     "rank": 3
+    },
+    {
+     "moveId": "chase",
+     "rank": 2
+    },
+    {
+     "moveId": "take_less_room",
+     "rank": 2
+    }
+   ],
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "laughed_at",
+   "label": "being laughed at",
+   "hurtPhrase": "being laughed at",
+   "feltPhrase": "laughed at",
+   "matters": "being respected",
+   "namedAs": [
+    "humiliated",
+    "ridiculed"
+   ],
+   "order": 4,
+   "guardedBy": [
+    {
+     "moveId": "hit_back",
+     "rank": 2
+    },
+    {
+     "moveId": "hide",
+     "rank": 0
+    },
+    {
+     "moveId": "turn_on_myself",
+     "rank": 1
+    },
+    {
+     "moveId": "keep_watch",
+     "rank": 1
+    },
+    {
+     "moveId": "put_it_off",
+     "rank": 1
+    }
+   ],
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "alone_in_this",
+   "label": "being alone in this",
+   "hurtPhrase": "being alone in this",
+   "feltPhrase": "alone in this",
+   "matters": "having someone with you",
+   "namedAs": [
+    "lonely",
+    "isolated"
+   ],
+   "order": 5,
+   "guardedBy": [
+    {
+     "moveId": "chase",
+     "rank": 1
+    },
+    {
+     "moveId": "keep_the_peace",
+     "rank": 1
+    },
+    {
+     "moveId": "keep_watch",
+     "rank": 2
+    }
+   ],
+   "reviewStatus": "approved"
+  }
+ ],
+ "canTouch": {
+  "brushed": {
+   "hurts": [
+    "brushed_off"
+   ],
+   "reviewStatus": "approved"
+  },
+  "unheard": {
+   "hurts": [
+    "brushed_off"
+   ],
+   "reviewStatus": "approved"
+  },
+  "mocked": {
+   "hurts": [
+    "laughed_at"
+   ],
+   "reviewStatus": "approved"
+  },
+  "small": {
+   "hurts": [
+    "made_small"
+   ],
+   "reviewStatus": "approved"
+  },
+  "ignored": {
+   "hurts": [
+    "left_out",
+    "not_mattering"
+   ],
+   "reviewStatus": "approved"
+  },
+  "leaving": {
+   "hurts": [
+    "left_out",
+    "alone_in_this"
+   ],
+   "reviewStatus": "approved"
+  }
+ },
+ "expresses": {
+  "ActionUrge": {
+   "anger-lash": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "anger-criticize": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "anger-destroy": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "envy-tear-down": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "disgust-judge": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "jealousy-check": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "jealousy-interrogate": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "jealousy-cling": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "love-stalk": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "love-reach-out": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "love-proximity": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "shame-hide": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "shame-secret": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "shame-avoid-people": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "sad-isolate": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "fear-cancel": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "fear-escape": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "anger-stonewall": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "disgust-leave": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "guilt-avoid": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "fear-freeze": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   },
+   "sad-scroll": {
+    "moveId": "zone_out",
+    "reviewStatus": "approved"
+   },
+   "sad-bed": {
+    "moveId": "zone_out",
+    "reviewStatus": "approved"
+   },
+   "guilt-apologize": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "approved"
+   },
+   "guilt-punish": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "approved"
+   },
+   "envy-compare": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "approved"
+   },
+   "shame-shrink": {
+    "moveId": "take_less_room",
+    "reviewStatus": "approved"
+   },
+   "fear-avoid": {
+    "moveId": "put_it_off",
+    "reviewStatus": "approved"
+   },
+   "sad-give-up": {
+    "moveId": "put_it_off",
+    "reviewStatus": "approved"
+   },
+   "envy-give-up": {
+    "moveId": "put_it_off",
+    "reviewStatus": "approved"
+   }
+  },
+  "FeelingUrge": {
+   "fight": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "chase": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "hide": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "blank": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   }
+  },
+  "PullOption": {
+   "recover_fight": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "recover_chase": {
+    "moveId": "chase",
+    "reviewStatus": "approved"
+   },
+   "recover_hide": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "recover_freeze": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   }
+  },
+  "MomentResponse": {
+   "mr_got_loud": {
+    "moveId": "hit_back",
+    "reviewStatus": "approved"
+   },
+   "mr_left": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "mr_went_quiet": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "mr_changed_subject": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "mr_froze": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   },
+   "mr_agreed": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "approved"
+   }
+  },
+  "TurningPoint": {
+   "tp_no_words": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   },
+   "tp_crying_shutdown": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   },
+   "tp_gave_in": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "approved"
+   },
+   "tp_apologized": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "approved"
+   }
+  },
+  "ThoughtPattern": {
+   "thought_my_fault": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "approved"
+   },
+   "thought_too_much": {
+    "moveId": "turn_on_myself",
+    "reviewStatus": "approved"
+   },
+   "thought_dont_deserve": {
+    "moveId": "take_less_room",
+    "reviewStatus": "approved"
+   },
+   "thought_wrong": {
+    "moveId": "keep_watch",
+    "reviewStatus": "approved"
+   },
+   "thought_will_leave": {
+    "moveId": "keep_watch",
+    "reviewStatus": "approved"
+   },
+   "thought_not_worth": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "approved"
+   }
+  },
+  "DearManBarrier": {
+   "barrier_no_right": {
+    "moveId": "take_less_room",
+    "reviewStatus": "approved"
+   },
+   "barrier_guilty": {
+    "moveId": "take_less_room",
+    "reviewStatus": "approved"
+   },
+   "barrier_angry": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "approved"
+   }
+  },
+  "BarrierSubResponse": {
+   "person-no-right-to-speak": {
+    "moveId": "take_less_room",
+    "reviewStatus": "approved"
+   },
+   "person-scared-reaction": {
+    "moveId": "keep_the_peace",
+    "reviewStatus": "approved"
+   },
+   "cant-keep-putting-off": {
+    "moveId": "put_it_off",
+    "reviewStatus": "approved"
+   },
+   "cant-afraid-aftermath": {
+    "moveId": "put_it_off",
+    "reviewStatus": "approved"
+   },
+   "cant-ambivalent": {
+    "moveId": "put_it_off",
+    "reviewStatus": "approved"
+   },
+   "tried-thinking-constantly": {
+    "moveId": "keep_watch",
+    "reviewStatus": "approved"
+   }
+  },
+  "QuestionResponse": {
+   "hu_exp_vigilance": {
+    "moveId": "keep_watch",
+    "reviewStatus": "approved"
+   },
+   "hu_exp_social": {
+    "moveId": "keep_watch",
+    "reviewStatus": "approved"
+   },
+   "hu_body_shame": {
+    "moveId": "hide",
+    "reviewStatus": "approved"
+   },
+   "lu_mind_faraway": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   },
+   "lu_mind_blank": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   },
+   "lu_body_numb": {
+    "moveId": "go_blank",
+    "reviewStatus": "approved"
+   }
+  }
+ },
+ "pairs": [
+  {
+   "id": "chase_hide",
+   "a": "chase",
+   "b": "hide",
+   "bothWant": [
+    {
+     "id": "want_not_left",
+     "label": "not to be left"
+    },
+    {
+     "id": "want_safe_in_it",
+     "label": "to stay safe in it"
+    },
+    {
+     "id": "want_matter_someone",
+     "label": "to matter to someone"
+    }
+   ],
+   "worryA": [
+    {
+     "id": "chase_worry_drift",
+     "label": "They'd drift away and I'd lose them"
+    },
+    {
+     "id": "chase_worry_nobody_knows",
+     "label": "Nobody would know I need them"
+    }
+   ],
+   "worryB": [
+    {
+     "id": "hide_worry_too_much",
+     "label": "I'd be too much and they'd leave"
+    },
+    {
+     "id": "hide_worry_hurt_worse",
+     "label": "I'd get hurt worse"
+    }
+   ],
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "hit_back_keep_the_peace",
+   "a": "hit_back",
+   "b": "keep_the_peace",
+   "bothWant": [
+    {
+     "id": "want_safe",
+     "label": "to be safe"
+    },
+    {
+     "id": "want_treated_well",
+     "label": "to be treated well"
+    },
+    {
+     "id": "want_keep_what_matters",
+     "label": "to keep what matters"
+    }
+   ],
+   "worryA": [
+    {
+     "id": "hit_back_worry_walked_over",
+     "label": "I'd get walked over"
+    },
+    {
+     "id": "hit_back_worry_never_change",
+     "label": "Nothing would ever change"
+    }
+   ],
+   "worryB": [
+    {
+     "id": "peace_worry_blow_up",
+     "label": "It would blow up"
+    },
+    {
+     "id": "peace_worry_lose_them",
+     "label": "I'd lose them"
+    }
+   ],
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "take_less_room_hit_back",
+   "a": "take_less_room",
+   "b": "hit_back",
+   "bothWant": [
+    {
+     "id": "want_matter",
+     "label": "to matter"
+    },
+    {
+     "id": "want_safe",
+     "label": "to be safe"
+    }
+   ],
+   "worryA": [
+    {
+     "id": "small_worry_too_much",
+     "label": "I'd be too much"
+    },
+    {
+     "id": "small_worry_turn_on_me",
+     "label": "They'd turn on me"
+    }
+   ],
+   "worryB": [
+    {
+     "id": "hit_back_worry_stop_mattering",
+     "label": "I'd stop mattering"
+    },
+    {
+     "id": "hit_back_worry_keep_doing_it",
+     "label": "They'd keep doing it"
+    }
+   ],
+   "reviewStatus": "approved"
+  }
+ ],
+ "keepsake": [
+  {
+   "id": "keepsake_both_want",
+   "copy": "{A} and {B} both want me {want}.",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "keepsake_choose",
+   "copy": "I can hear both of them, and choose what I do next.",
+   "reviewStatus": "approved"
+  }
+ ],
+ "trailRules": [
+  {
+   "id": "trail_move_in_context",
+   "shape": "A",
+   "minEpisodes": 4,
+   "windowDays": 42,
+   "minSpanDays": 14,
+   "minTools": 2,
+   "contextShare": 0.6,
+   "cooldownDays": 28,
+   "enabled": false,
+   "statementTemplate": "When {context}, the pull is to {pull}.",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "trail_sequence",
+   "shape": "B",
+   "minEpisodes": 3,
+   "windowDays": 42,
+   "withinHours": 24,
+   "lift": 2.0,
+   "cooldownDays": 28,
+   "enabled": false,
+   "statementTemplate": "After the pull to {pull}, the pull to {pull2} often comes next.",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "trail_two_pulls",
+   "shape": "C",
+   "minEpisodes": 3,
+   "windowDays": 42,
+   "cooldownDays": 28,
+   "enabled": false,
+   "statementTemplate": "When {context}, two pulls: to {pull} and to {pull2}.",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "trail_known_part",
+   "shape": "D",
+   "minEpisodes": 3,
+   "cooldownDays": 14,
+   "enabled": false,
+   "statementTemplate": "Was this {name}?",
+   "reviewStatus": "approved"
+  }
+ ],
+ "contexts": [
+  {
+   "id": "ctx_trigger_someone",
+   "key": "trigger",
+   "value": "someone",
+   "phrase": "it's about someone",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_trigger_situation",
+   "key": "trigger",
+   "value": "situation",
+   "phrase": "it's about a situation",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_trigger_body",
+   "key": "trigger",
+   "value": "body",
+   "phrase": "it starts in your body",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_brushed",
+   "key": "event",
+   "value": "brushed",
+   "phrase": "someone brushes you off",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_unheard",
+   "key": "event",
+   "value": "unheard",
+   "phrase": "you're not heard",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_mocked",
+   "key": "event",
+   "value": "mocked",
+   "phrase": "someone mocks you",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_small",
+   "key": "event",
+   "value": "small",
+   "phrase": "you're made small",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_ignored",
+   "key": "event",
+   "value": "ignored",
+   "phrase": "you're left out",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_leaving",
+   "key": "event",
+   "value": "leaving",
+   "phrase": "someone pulls away",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_blocked",
+   "key": "event",
+   "value": "blocked",
+   "phrase": "you keep getting blocked",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_event_stewing",
+   "key": "event",
+   "value": "stewing",
+   "phrase": "it keeps happening",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_time_morning",
+   "key": "timeBand",
+   "value": "morning",
+   "phrase": "it's morning",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_time_afternoon",
+   "key": "timeBand",
+   "value": "afternoon",
+   "phrase": "it's afternoon",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_time_evening",
+   "key": "timeBand",
+   "value": "evening",
+   "phrase": "it's evening",
+   "reviewStatus": "approved"
+  },
+  {
+   "id": "ctx_time_night",
+   "key": "timeBand",
+   "value": "night",
+   "phrase": "it's late at night",
+   "reviewStatus": "approved"
+  }
+ ],
+ "policy": {
+  "id": "parts",
+  "offersEnabled": false,
+  "episodeMergeHours": 2,
+  "floodGateHours": 2,
+  "crisisPauseHours": 48,
+  "dissociationCount": 2,
+  "dissociationDays": 14,
+  "louderPauseHours": 72,
+  "maxNonSelfAnswers": 2,
+  "tooManyPartsCount": 3,
+  "tooManyPartsDays": 7,
+  "harmWindowDays": 28,
+  "tenderRepeatCount": 2,
+  "nameMaxChars": 40,
+  "reviewStatus": "approved"
+ },
+ "pending": {}
+}

@@ -361,6 +361,17 @@
     "irritation"
    ]
   },
+  "dbt_cope_ahead": {
+   "appToolId": "cope-ahead",
+   "name": "Cope Ahead",
+   "description": "Planning and rehearsing for difficult situations before they occur",
+   "whenToUse": "When something hard is coming and you want to be ready for it",
+   "dbtBasis": "DBT Emotion Regulation Handout 19: cope ahead",
+   "side": "change",
+   "skillKind": "change",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_dear_man": {
    "appToolId": "dear-man",
    "name": "DEAR MAN",
@@ -459,6 +470,17 @@
     "overwhelm",
     "panic"
    ]
+  },
+  "dbt_wise_mind": {
+   "appToolId": "wise-mind",
+   "name": "Wise Mind",
+   "description": "Integration of emotional mind and reasonable mind; intuitive knowing",
+   "whenToUse": "When you're torn about what to do",
+   "dbtBasis": "DBT Mindfulness: wise mind (states of mind; ideas for practising wise mind)",
+   "side": "both",
+   "skillKind": "naming",
+   "direction": "neutral",
+   "addresses": []
   },
   "se_orienting": {
    "appToolId": "five-senses",

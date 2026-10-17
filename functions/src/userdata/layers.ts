@@ -53,10 +53,23 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   SkillPractice: { layer: 'log', rel: 'HAS_SKILL_PRACTICE', exportAs: 'skillPractice' },
   FollowUp: { layer: 'log', rel: 'HAS_FOLLOW_UP', exportAs: 'followUps' },
   PatternOffer: { layer: 'log', rel: 'HAS_PATTERN_OFFER', exportAs: 'patternOffers' },
+  // ---- log (parts, docs/design/parts.md: Data model → User data) ----
+  PartSession: { layer: 'log', rel: 'HAS_PART_SESSION', exportAs: 'partSessions' }, // Meet a part; finalise-once
+  PullsSession: { layer: 'log', rel: 'HAS_PULLS_SESSION', exportAs: 'pullsSessions' }, // Two pulls; finalise-once
+  PartCandidate: { layer: 'log', rel: 'HAS_PART_CANDIDATE', exportAs: 'partCandidates' }, // written only on a yes
+  PartTag: { layer: 'log', rel: 'HAS_PART_TAG', exportAs: 'partTags' }, // "Was this a part you know?": edges out of it only
+  PartRevisit: { layer: 'log', rel: 'HAS_PART_REVISIT', exportAs: 'partRevisits' }, // a part's 30-day still-true answer; create only
+  PartMessage: { layer: 'log', rel: 'HAS_PART_MESSAGE', exportAs: 'partMessages' }, // "Say something to it": sayToPart, create only; edges out of it only
+  TrailOffer: { layer: 'log', rel: 'HAS_TRAIL_OFFER', exportAs: 'trailOffers' }, // Phase 4: writeTrailOffer is its one writer; edges out of it only
   // ---- profile ----
   ProfileFact: { layer: 'profile', rel: 'HAS_PROFILE_FACT', exportAs: 'profileFacts' },
   MyPattern: { layer: 'profile', rel: 'HAS_PATTERN', exportAs: 'myPatterns' },
   OwnLine: { layer: 'profile', rel: 'HAS_OWN_LINE', exportAs: 'ownLines' }, // A5-2 (R16): say it my way
+  Part: { layer: 'profile', rel: 'HAS_PART', exportAs: 'parts' }, // keepPart is its only writer (9b's yes)
+  // The den: parts/links.ts is PartLink's only writer (on a yes; id derived from kind + pair, one per pair
+  // and kind), parts/denSnapshot.ts DenSnapshot's (the server's, `den_<UTC day>`, one per day).
+  PartLink: { layer: 'profile', rel: 'HAS_PART_LINK', exportAs: 'partLinks' },
+  DenSnapshot: { layer: 'profile', rel: 'HAS_DEN_SNAPSHOT', exportAs: 'denSnapshots' },
   // ---- system ----
   PushToken: { layer: 'system', rel: 'HAS_PUSH_TOKEN' },
 };
@@ -79,6 +92,9 @@ export const LOG_AGGREGATE_EDGES: readonly string[] = ['FOUND_WORD'];
 export const ASK_FRESH_FIELDS = [
   'band', 'bandAtStart', 'bandAtEnd', 'thenVsNow', 'thenVsNowDir', 'actedOnUrge',
   'urgeIds', 'fitsFacts', 'wiseMindAnswer', 'readiness', 'eventIds',
+  // Parts (Meet a part): how the person feels toward a part, and the blending check. Both change
+  // within minutes and are never pre-filled or carried to another flow.
+  'feelTowardIds', 'blendCheck',
 ] as const;
 
 /** True when `field` is ask-fresh (exact name, or a `band…` / `bandAtStart…` / `bandAtEnd…` variant). */
