@@ -409,6 +409,11 @@ PROMPTS = [
     ("pulls_step_back", "pulls", "step_back", "Hold a breath, and step back from both of them."),
     ("pulls_worry", "pulls", "worry", "If {B} gets its way, what's {A} afraid of?"),
     ("pulls_both_want", "pulls", "both_want", "What do they both want for you?"),
+    # A side with no kept part (the tool opened on a pair, from a rule C trail): named by its move.
+    # {move} is the move's unblendPhrase ("wants to hide").
+    ("pulls_pair_name", "pulls", "name", "the part that {move}"),
+    # After the orienting close, with two kept parts: a two_pulls_checkback in a week, on the yes.
+    ("pulls_close_checkback", "pulls", "close", "Check back with both of them in a week?"),
     # The trail offer (parts.md "The offer card")
     ("offer_eyebrow", "offer", "card", "Something keeps showing up"),
     ("offer_ask", "offer", "card", "Want to take a look?"),
@@ -500,6 +505,9 @@ PROMPTS = [
     # follow-up the next day. _noname for a part kept without a name. "Louder" shows aftercare_louder.
     ("checkback_title", "checkback", "checkback", "How's {name} today?"),
     ("checkback_title_noname", "checkback", "checkback", "How's the part you met yesterday?"),
+    # Two pulls' check-back (two_pulls_checkback, a week after): the same card and answers, two names.
+    ("checkback_title_two", "checkback", "checkback", "How are {A} and {B} today?"),
+    ("checkback_title_two_noname", "checkback", "checkback", "How are the two parts from last week?"),
     ("close_checkback", "meet", "close", "Check back with it tomorrow?"),
     # DEAR MAN cope ahead (parts.md, DEAR MAN row and Phase 3): one screen in prep, after "What makes
     # this hard?" and before the script. A part's anchor is the person's own words or a line they kept.
@@ -768,6 +776,12 @@ OPTIONS = [
     opt("pulls_keep", "pulls", "keepsake", "Keep this", branch="keep"),
     opt("pulls_not_now", "pulls", "keepsake", "Not now", branch="end"),
     opt("pulls_another_time", "pulls", "needs_time", "Meet it another time", branch="candidate"),
+    opt("pulls_needs_time_not_now", "pulls", "needs_time", "Not now", branch="end"),
+    # "Not sure" is a complete answer at both steps: a worry left open, or no keepsake.
+    opt("pulls_worry_not_sure", "pulls", "worry", "Not sure"),
+    opt("pulls_both_want_not_sure", "pulls", "both_want", "Not sure", branch="end"),
+    opt("pulls_close_checkback_yes", "pulls", "close", "Yes", branch="checkback"),
+    opt("pulls_close_checkback_no", "pulls", "close", "No thanks", branch="end"),
 
     # --- The trail offer ---
     opt("offer_show", "offer", "card", "Show me"),

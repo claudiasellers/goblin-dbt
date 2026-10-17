@@ -22,11 +22,21 @@ export function partsFromFixture(fixture, approve = null) {
       if (kept.length) (options[flow] ??= {})[step] = kept;
     }
   }
+  // The keepsake lines are prompts too (flow pulls, after its other prompts, as build.py orders them).
+  const pullsAt = Object.values(fixture.prompts).filter((p) => p.flow === "pulls").length;
+  const keepsake = (fixture.keepsake ?? []).filter(ok)
+    .map((k, i) => [k.id, { flow: "pulls", step: "keepsake", order: pullsAt + i, copy: k.copy }]);
+  // A pair ships when signed off with both its moves; each list keeps the signed-off chips, in order.
+  const optionIds = new Set(Object.values(options).flatMap((steps) => Object.values(steps).flat().map((o) => o.id)));
+  const chips = (list) => list.map((c) => c.id).filter((id) => optionIds.has(id));
   return shipParts({
     // Every parts node carries content.py's VERSION, the policy node included.
     version: fixture.version,
     moves: moves.map(strip),
-    prompts: Object.fromEntries(Object.entries(fixture.prompts).filter(([id, p]) => ok({ id, ...p })).map(([id, p]) => [id, strip(p)])),
+    prompts: Object.fromEntries([
+      ...Object.entries(fixture.prompts).filter(([id, p]) => ok({ id, ...p })).map(([id, p]) => [id, strip(p)]),
+      ...keepsake,
+    ]),
     options,
     // OFTEN_GUARDS is reviewed by its move: a hurt ships with the guarding moves that are signed off.
     hurts: fixture.hurts.filter(ok).map((h) => ({ ...strip(h), guardedBy: h.guardedBy.filter((x) => moveIds.has(x.moveId)) })),
@@ -41,6 +51,8 @@ export function partsFromFixture(fixture, approve = null) {
         .filter(([id, e]) => ok({ id, ...e }) && moveIds.has(e.moveId))
         .map(([id, e]) => [id, e.moveId]))])
       .filter(([, t]) => Object.keys(t).length)),
+    pairs: (fixture.pairs ?? []).filter((p) => ok(p) && moveIds.has(p.a) && moveIds.has(p.b))
+      .map((p) => ({ id: p.id, a: p.a, b: p.b, bothWant: chips(p.bothWant), worryA: chips(p.worryA), worryB: chips(p.worryB) })),
     // PartsPolicy's two client numbers, once the policy is signed off.
     limits: ok(fixture.policy) ? { nameMaxChars: fixture.policy.nameMaxChars, maxNonSelfAnswers: fixture.policy.maxNonSelfAnswers } : null,
   });
