@@ -126,7 +126,7 @@ test("hurt order with a Recover state: what it can touch first, in CAN_TOUCH ord
 const { angryReady, angryPromptIds, angryOptionIds } = await importTs("src/lib/angryPart.ts");
 const { getPartsContent } = await importTs("src/services/partsContent.ts");
 const { partsFromFixture } = await import("./lib/partsContentFixture.mjs");
-const ANGRY_OPTION_IDS = ["angry_next", "angry_not_sure", "angry_done"];
+const ANGRY_OPTION_IDS = ["angry_next", "angry_not_sure", "angry_done", "angry_back", "angry_vote_next"];
 /** parts.json as it would be with these ids signed off (and everything else as the fixture has it). */
 const shippedWith = (ids) => partsFromFixture(fixture, (id) => ids.has(id) || ["hit_back", ...fixture.hurts.map((h) => h.id)].includes(id));
 

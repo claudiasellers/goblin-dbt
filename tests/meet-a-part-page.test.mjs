@@ -13,6 +13,7 @@ import { partsFromFixture } from "./lib/partsContentFixture.mjs";
 
 const M = await importTs("src/lib/meetAPart.ts");
 const S = await importTs("src/lib/meetAPartSave.ts");
+const PM = await importTs("src/lib/partsOfMe.ts");
 const F = await importTs("src/lib/partFigure.ts");
 const T = await importTs("src/data/tools.ts");
 const V = await importTs("functions/src/parts/validation.ts");
@@ -46,15 +47,30 @@ const FULL = ["find_something_else", { type: "find" }, "blend_running", { type: 
   "feel_curious", "hide_job_out_of_sight", "likes_tired", { type: "hurt", hurtId: "left_out" }, "hide_fear_regret", "update_no", "now_ask",
   hold, "hide_rather_need_someone", { type: "name", name: "Ash" }];
 
-test("hidden: registered and reachable by link only, never in a list", () => {
+test("listed only with parts on and its copy shipped (the gate ToolPage opens it with); never in the intents", () => {
   const tool = T.getToolById("meet-a-part");
-  assert.deepEqual([tool.name, tool.module, tool.listed, tool.bare], ["Meet a part", "mindfulness", false, true]);
-  assert.ok(!T.getToolsByModule("mindfulness").some((t) => t.id === "meet-a-part"));
+  assert.deepEqual([tool.name, tool.module, tool.listed, tool.bare], ["Meet a part", "mindfulness", "parts", true]);
+  assert.ok(!T.getToolsByModule("mindfulness").some((t) => t.id === "meet-a-part"), "parts off: not listed");
+  assert.ok(!T.getToolsByModule("mindfulness", { parts: false }).some((t) => t.id === "meet-a-part"));
   assert.ok(!T.listedTools().some((t) => t.id === "meet-a-part"));
+  assert.ok(T.getToolsByModule("mindfulness", { parts: true }).some((t) => t.id === "meet-a-part"), "parts on and ready: listed");
+  assert.deepEqual(T.listedTools({ parts: true }).map((t) => t.id), T.tools.filter((t) => t.listed !== false).map((t) => t.id), "nothing else is held back (Two pulls is link-only)");
+  assert.deepEqual(T.listedTools().map((t) => t.id), T.tools.filter((t) => t.id !== "meet-a-part" && t.id !== "two-pulls").map((t) => t.id));
   assert.ok(!T.intents.some((i) => i.toolId === "meet-a-part"));
-  assert.deepEqual(T.tools.filter((t) => t.listed === false).map((t) => t.id), ["meet-a-part", "two-pulls"], "Meet a part and Two pulls");
-  // Lists read only listed tools: Tools.tsx through getToolsByModule; nothing else iterates `tools` to show them.
-  assert.match(read("src/pages/Tools.tsx"), /import \{ getToolsByModule, intents \} from '\.\.\/data\/tools'/);
+  assert.deepEqual(T.tools.filter((t) => t.listed !== undefined).map((t) => t.id), ["meet-a-part", "two-pulls"]);
+  assert.equal(T.getToolById("two-pulls").listed, false, "Two pulls: by link only, never listed");
+  // Lists read only listed tools: Tools.tsx through getToolsByModule, with `parts` from Meet a part's own gate.
+  const tools = read("src/pages/Tools.tsx");
+  assert.match(tools, /import \{ getToolsByModule, intents \} from '\.\.\/data\/tools'/);
+  assert.match(tools, /const parts = useToolGate\('meet-a-part'\) === 'open';/, "false while the gate loads: no flicker");
+  assert.match(tools, /getToolsByModule\(mod\.id, \{ parts \}\)/);
+  // A visit that starts from the list says so ('tools'); every other card carries no state.
+  assert.match(tools, /<ToolCard key=\{tool\.id\} tool=\{tool\} state=\{tool\.id === 'meet-a-part' \? toolsMeetLink\(\)\.state : undefined\} \/>/);
+  assert.deepEqual(S.parseMeetEntry(PM.toolsMeetLink().state), { trailheadKind: "tools", partId: null, candidateId: null, moveId: null });
+  assert.equal(PM.toolsMeetLink().pathname, "/tool/meet-a-part");
+  assert.equal(V.validateStartPartSession(S.startRequest(SID, { move: "hide", partId: null }, S.parseMeetEntry(PM.toolsMeetLink().state))).trailheadKind, "tools", "the server takes it");
+  assert.match(read("src/components/ToolCard.tsx"), /to=\{`\/tool\/\$\{tool\.id\}`\}\s+state=\{state\}/);
+  assert.match(tools, /\{intents\.map\(/, "the intents are the fixed list");
   const page = read("src/pages/ToolPage.tsx");
   assert.match(page, /'meet-a-part': MeetAPart,/);
   assert.match(page, /if \(!tool \|\| gate === 'closed'\) \{/, "parts off or copy missing: the existing not-found state");
@@ -214,17 +230,17 @@ test("LightHold: the angry card and Meet a part share one hold", () => {
   const card = read("src/components/parts/AngryPartCard.tsx");
   assert.match(card, /import \{ HoldButton, PartScene \} from '\.\/LightHold';/);
   assert.doesNotMatch(card, /function HoldButton|function PartScene/, "extracted, not copied");
-  assert.match(card, /<HoldButton label=\{c\.hold\} ms=\{HOLD_MS\}/, "its 4 s vote is unchanged");
+  assert.match(card, /<HoldButton label=\{c\.hold\} hint=\{c\.holdHint\} ms=\{HOLD_MS\}/, "its 4 s vote is unchanged; the hold hint describes it");
   const page = read("src/pages/tools/MeetAPart.tsx");
   assert.equal(page.match(/<LightHold /g)?.length, 2, "Thanks and the tender path");
   assert.match(read("dev/parts-harness.tsx"), /import \{ LightHold \} from '\.\.\/src\/components\/parts\/LightHold';/);
   assert.match(read("dev/parts-harness.tsx"), /import \{ PartFigure \} from '\.\.\/src\/components\/parts\/PartFigure';/);
 });
 
-test("no hard-coded copy: Meet a part's screens and page show only content, the person's words, and Back / Next", () => {
+test("no hard-coded copy: Meet a part's screens and page show only content and the person's words (Back / Next / Done are meet_back / meet_next / meet_finish)", () => {
   const files = ["src/pages/tools/MeetAPart.tsx", ...readdirSync("src/components/parts/meet").map((f) => `src/components/parts/meet/${f}`)];
-  const CHROME = new Set(["Back", "Next", "Done"]);
-  const READ_ATTRS = new Set(["aria-label", "placeholder", "title", "alt", "label", "nextLabel", "holdLabel", "doneLabel", "sub"]);
+  const CHROME = new Set();
+  const READ_ATTRS = new Set(["aria-label", "placeholder", "title", "alt", "label", "nextLabel", "backLabel", "fieldLabel", "holdLabel", "holdHint", "doneLabel", "sub"]);
   for (const f of files) {
     const sf = ts.createSourceFile(f, read(f), ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
     const walk = (n) => {
@@ -262,10 +278,13 @@ test("the last screen: meet_done and Done, whichever way the visit ended; requir
   assert.deepEqual([fixture.prompts.meet_done.flow, fixture.prompts.meet_done.step], ["meet", "close"]);
   assert.ok(S.meetPromptIds().includes("meet_done"));
   const page = read("src/pages/tools/MeetAPart.tsx");
-  assert.match(page, /\{P\('meet_done'\)\}[\s\S]*<Link to=\{doneTarget\(entry\)\}[^>]*>Done<\/Link>/);
+  assert.match(page, /\{P\('meet_done'\)\}[\s\S]*<Link to=\{doneTarget\(entry\)\}[^>]*>\{chrome\.finish\}<\/Link>/);
+  assert.equal(fixture.options.meet.chrome.find((o) => o.id === 'meet_finish').label, "Done");
+  assert.ok(S.MEET_REQUIRED_OPTIONS.includes('meet_finish'));
   assert.equal(page.match(/\{finale\}|step === 'done' && finale/g)?.length, 3, "after the close, after P2's later, and after P2 on entry");
   assert.equal(S.doneTarget(S.parseMeetEntry({})), "/profile");
   assert.equal(S.doneTarget(S.parseMeetEntry({ parts: { trailheadKind: "angry_card" } })), "/");
+  assert.equal(S.doneTarget(S.parseMeetEntry({ parts: { trailheadKind: "tools" } })), "/tools", "back to the Tools list");
 });
 
 test("too many parts lately: one line on the first real screen of a new part's visit, never a block", () => {

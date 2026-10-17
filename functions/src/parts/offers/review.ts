@@ -40,7 +40,7 @@ import {
 } from '../trails';
 import { blockedTrails, TRAIL_OFFER_ID, type OfferState } from './blocked';
 import type { OfferGate } from './gate';
-import { checkOfferGate, readOfferPolicy, readOfferStates, readPhrases, type OfferPolicyState } from './queries';
+import { checkOfferGate, readOfferPolicy, readOfferStates, readPhrases, ruleLive, type OfferPolicyState } from './queries';
 import { writeKnownPartReview, type KnownPartReview } from './record';
 import { TRAIL_EVALUATOR } from './today';
 import {
@@ -162,7 +162,7 @@ async function plainPatterns(st: OfferPolicyState, deps: ReflectTrailsDeps): Pro
 
 async function knownPartBlocks(st: OfferPolicyState, deps: ReflectTrailsDeps, now: Date): Promise<KnownPartReviewBlock[]> {
   const rule = st.rules.find((r) => r.shape === 'D');
-  if (!st.offersEnabled || !rule?.enabled || !rule.approved || !rule.statementTemplate) return [];
+  if (!st.offersEnabled || !ruleLive(rule) || !rule.statementTemplate) return [];
   const gate = await deps.gate(rule.id);
   if (gate.reasons.some((r) => !REVIEW_IGNORES.includes(r))) return [];
   const blocked = blockedTrails(await deps.offers(), now);

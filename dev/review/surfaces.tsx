@@ -38,6 +38,7 @@ import { answer, logEvent } from './backend';
 import { CANDIDATES, checkbackItem, checkbackItemTwo, ME_ITEMS, ME_LONG, PART_IDS, REFLECT, reflectTrails, slices, trailEvidence, trailItem, type TrailKind } from './data';
 import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
+import { ME_OFF_SURFACE } from './meOff';
 import { PARTS } from '../parts-example';
 import hostCopy from 'virtual:review-host-copy';
 import { DebriefWho } from '../../src/components/parts/DebriefWho';
@@ -45,6 +46,12 @@ import { PartLaterLine } from '../../src/components/parts/PartLaterLine';
 import { TapCard } from '../../src/components/tools/oppositeAction/TapCardLoop';
 import { useOaGoalLine } from '../../src/hooks/useOaGoalLine';
 import { PS_AMBIVALENCE_BARRIER, psLaterCandidate, psLaterCopy } from '../../src/lib/psAmbivalence';
+// ---- The den (lane 2) ----
+import { Den } from '../../src/components/parts/den/Den';
+import { denCopy } from '../../src/lib/den';
+import type { GetDenResponse } from '../../src/data/partsTypes';
+import { vecToSig } from '../../src/lib/partFigure';
+// ---- end the den ----
 
 export interface Branch { id: string; label: string; steps?: DriveStep[] }
 export interface Surface {
@@ -412,6 +419,66 @@ const PULLS_PAIR = new Set(['pair_only', 'pair_needs_time']);
 
 /* ───────── the list ───────── */
 
+// ---- The den (lane 2): Me → Parts of me → See them together ----
+
+const DEN_NOW = new Date('2026-10-17T12:00:00Z');
+const denSig = (i: number) => vecToSig(PARTS[i].shape);
+/** Five parts: two placed, a thread between them, one arriving at the edge of the light, a resting one, a tender one. */
+function denData(one: boolean): GetDenResponse {
+  const parts: GetDenResponse['parts'] = [
+    { id: PART_IDS.chase, name: PARTS[0].name, status: 'active', tender: false, shapeSig: denSig(0), mapX: 0.3, mapY: 0.32, recency: 'near', safety: false },
+    { id: PART_IDS.hide, name: PARTS[1].name, status: 'active', tender: false, shapeSig: denSig(1), mapX: 0.72, mapY: 0.36, recency: 'a_while', safety: false },
+    { id: PART_IDS.critic, name: PARTS[2].name, status: 'active', tender: false, shapeSig: denSig(2), mapX: null, mapY: null, recency: 'not_lately', safety: true },
+    { id: PART_IDS.peace, name: PARTS[3].name, status: 'resting', tender: false, shapeSig: denSig(3), mapX: 0.22, mapY: 0.78, recency: 'a_while', safety: false },
+    { id: PART_IDS.little, name: PARTS[4].name, status: 'active', tender: true, shapeSig: null, mapX: 0.7, mapY: 0.74, recency: 'near', safety: false },
+  ];
+  if (one) return { parts: parts.slice(0, 1), links: [], snapshots: [] };
+  return {
+    parts,
+    links: [{ id: `covers_for_${PART_IDS.chase}_${PART_IDS.hide}`, kind: 'covers_for', aId: PART_IDS.hide, bId: PART_IDS.chase, bothWantId: null }],
+    snapshots: [{ id: 'den_2026-08-20', takenAt: '2026-08-20T18:00:00.000Z' }, { id: 'den_2026-10-02', takenAt: '2026-10-02T18:00:00.000Z' }],
+  };
+}
+
+function DenHost({ one }: { one: boolean }) {
+  const content = useParts();
+  const copy = denCopy(content);
+  if (!content || !copy) return null;
+  return (
+    <section className="space-y-2">
+      <p className={mockNote}>Me → Parts of me → See them together</p>
+      <Den copy={copy} initial={denData(one)} twoPullsAvailable now={DEN_NOW} />
+    </section>
+  );
+}
+
+const DEN_SURFACE: Surface = {
+  id: 'den', pack: 'den', title: 'The den',
+  who: 'Parts on, two or more parts: Me → Parts of me → See them together. Drag (or Enter, arrows, Enter) to place; tap one figure then another for a thread.',
+  branches: [
+    { id: 'room', label: 'The room: placed, arriving, resting, tender, a thread, the safety flag' },
+    { id: 'one', label: 'One part' },
+    { id: 'sheet', label: 'Tap two: the thread sheet', steps: [{ tap: PARTS[0].name }, { tap: PARTS[2].name }] },
+    { id: 'front', label: 'Which one stands in front?', steps: [{ tap: PARTS[0].name }, { tap: PARTS[2].name }, { prompt: 'den_stands_front' }] },
+    { id: 'then', label: 'How it looked in August, beside now', steps: [{ tap: 'How it looked in August' }] },
+  ],
+  setup: (b) => {
+    answer('getDen', () => denData(b === 'one'));
+    answer('getDenSnapshot', () => ({
+      takenAt: '2026-08-20T18:00:00.000Z',
+      parts: [
+        { id: PART_IDS.chase, mapX: 0.5, mapY: 0.3, status: 'active', tender: false },
+        { id: PART_IDS.peace, mapX: 0.3, mapY: 0.7, status: 'active', tender: false },
+      ],
+    }));
+    answer('updatePartLayout', () => ({ version: 2 }));
+    answer('linkParts', () => ({ id: 'link', created: true, version: 3 }));
+    answer('unlinkParts', () => ({ removed: true, version: 4 }));
+  },
+  render: ({ branch }) => <DenHost one={branch === 'one'} />,
+};
+// ---- end the den ----
+
 export const SURFACES: Surface[] = [
   {
     id: 'unblend_shape', pack: 'unblend', title: 'Unblend line: Find the feeling (Shape it)',
@@ -510,6 +577,7 @@ export const SURFACES: Surface[] = [
     ],
     render: ({ branch }) => <MeHost long={branch === 'long'} />,
   },
+  ME_OFF_SURFACE,
   {
     id: 'reflect', pack: 'reflect', title: 'Reflect: parts',
     who: 'Parts on: in Reflect, once a kept part has at least one stat line.',
@@ -615,6 +683,7 @@ export const SURFACES: Surface[] = [
     branches: OA_GOAL_PAIRS.map(([urge, goal, note]) => ({ id: `${urge}.${goal}`, label: `${urge} × ${goal}${note ? ` (${note})` : ''}` })),
     render: ({ branch }) => <OaGoalHost urgeId={branch.split('.')[0]} goalId={branch.split('.')[1]} />,
   },
+  DEN_SURFACE, // lane 2: the den
 ];
 
 /** Not built on the tip, so not here (the report lists them). */

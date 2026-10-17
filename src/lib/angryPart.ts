@@ -5,7 +5,7 @@
  * wording for one person at one moment is ./angryPartCopy.ts, which loads with the card.
  */
 import {
-  ANGRY_LATER, ANGRY_LATER_DONE, ANGRY_LINES, ANGRY_NOT_NOW, ANGRY_OPTIONS, type AngryCardContent, type AngryCardCopy,
+  ANGRY_LATER, ANGRY_LATER_DONE, ANGRY_LINES, ANGRY_NOT_NOW, ANGRY_OPTIONS, HOLD_HINT, type AngryCardContent, type AngryCardCopy,
   type AngryContentHurt, type AngryHurt, type AngryLaterCopy, type AngryNotNowId,
 } from '../data/partsTypes';
 import type { PartsContent } from '../data/partsContentTypes';
@@ -14,8 +14,11 @@ import { surfaceReady, type SurfaceIds } from './partsContent';
 /** The card is for the fire back urge: its move's OFTEN_GUARDS order is the chips' default order. */
 export const ANGRY_MOVE = 'hit_back';
 
-/** The prompt ids the card shows for one wording: each line's own id with parts on, its `_plain` twin off. */
-export const angryPromptIds = (partsOn: boolean): string[] => ANGRY_LINES.map((l) => (partsOn ? l : `${l}_plain`));
+/**
+ * The prompt ids the card shows for one wording: each line's own id with parts on, its `_plain` twin off,
+ * and the hold hint (one wording).
+ */
+export const angryPromptIds = (partsOn: boolean): string[] => [...ANGRY_LINES.map((l) => (partsOn ? l : `${l}_plain`)), HOLD_HINT];
 
 /** The card's own "Not now" for one wording. */
 export const angryNotNowId = (partsOn: boolean): AngryNotNowId => (partsOn ? ANGRY_NOT_NOW : `${ANGRY_NOT_NOW}_plain`);
@@ -62,7 +65,7 @@ export function angryCopyFrom(content: Pick<AngryCardContent, 'prompts' | 'optio
   const options = Object.values(content.options.angry ?? {}).flat();
   const out: Record<string, string> = {};
   const needed = new Set(partsOn === undefined ? [...angryPromptIds(true), ...angryPromptIds(false)] : angryPromptIds(partsOn));
-  for (const id of ANGRY_LINES.flatMap((l) => [l, `${l}_plain`])) {
+  for (const id of [...ANGRY_LINES.flatMap((l) => [l, `${l}_plain`]), HOLD_HINT]) {
     const copy = content.prompts[id]?.copy;
     if (!copy && needed.has(id)) throw new Error(`parts content: no prompt ${id}`);
     out[id] = copy ?? '';

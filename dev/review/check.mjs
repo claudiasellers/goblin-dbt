@@ -65,6 +65,8 @@ const EXPECT = {
   'pulls/both_want': 'pulls_both_want', 'pulls/keepsake': 'keepsake_choose', 'pulls/kept': 'pulls_close_checkback',
   'pulls/pair_only': 'pulls_pair_name',
   'checkback_two/named': 'checkback_title_two', 'checkback_two/louder': 'aftercare_louder',
+  // The den (lane 2)
+  'den/room': 'den_room', 'den/one': 'den_one_part', 'den/sheet': 'den_stands_front', 'den/front': 'den_which_front', 'den/then': 'den_now',
 };
 const SELECTOR = {
   'meet/danger': 'section[aria-label="Support right now"]', 'meet/danger_close': 'section[aria-label="Support right now"]',

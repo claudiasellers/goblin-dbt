@@ -305,7 +305,8 @@ test('validateStartPartSession: closed trailhead set, uuids, move ids, nothing e
   assert.deepEqual(validateStartPartSession({ id: SID, trailheadKind: 'me' }),
     { id: SID, trailheadKind: 'me', partId: null, candidateId: null, offerId: null, moveIds: [] });
   assert.deepEqual(validateStartPartSession({ id: SID, trailheadKind: 'candidate', candidateId: CID, moveIds: ['hide'] }).moveIds, ['hide']);
-  for (const k of ['me', 'candidate', 'settings', 'angry_card', 'problem_solve']) validateStartPartSession({ id: SID, trailheadKind: k });
+  for (const k of ['me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools']) validateStartPartSession({ id: SID, trailheadKind: k });
+  assert.equal(validateStartPartSession({ id: SID, trailheadKind: 'tools' }).trailheadKind, 'tools', 'the Tools list');
   // The offer trailhead names its trail offer (and only it does).
   const OID = 'trail_two_pulls:chase+hide:ctx_event_leaving';
   assert.equal(validateStartPartSession({ id: SID, trailheadKind: 'offer', offerId: OID }).offerId, OID);
@@ -550,7 +551,7 @@ test('partSource: candidate, offer or made', () => {
   assert.equal(plan.partSource({ trailheadKind: 'candidate', candidateId: null }), 'candidate');
   assert.equal(plan.partSource({ trailheadKind: 'me', candidateId: CID }), 'candidate');
   assert.equal(plan.partSource({ trailheadKind: 'offer', candidateId: null }), 'offer');
-  for (const k of ['me', 'settings', 'angry_card', 'problem_solve']) assert.equal(plan.partSource({ trailheadKind: k, candidateId: null }), 'made');
+  for (const k of ['me', 'settings', 'angry_card', 'problem_solve', 'tools']) assert.equal(plan.partSource({ trailheadKind: k, candidateId: null }), 'made');
 });
 
 test('mergeRevisit: unions ids, replaces own words only where given, never removes or un-tenders', () => {

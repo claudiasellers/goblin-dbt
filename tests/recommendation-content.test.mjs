@@ -58,19 +58,26 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
     assert.equal(r.active, !off, r.id);
   }
   assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
-  for (const c of planned) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
+  // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
+  for (const c of planned.filter((x) => x !== "dbt_wise_mind")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
+  const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
+  assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });
 
-test("tags (WMP-04 v0 side, skillKind, direction) on the 9 app-tool concepts; D-13: FTF acceptance, Cool Down both", () => {
+test("tags (WMP-04 v0 side, skillKind, direction) on the 10 app-tool concepts; D-13: FTF acceptance, Cool Down both", () => {
   const tags = Object.fromEntries(Object.values(graph.concepts).filter((c) => c.side).map((c) => [c.appToolId, [c.side, c.skillKind, c.direction]]));
   assert.deepEqual(tags, {
     "cool-down": ["both", "body", "down"], pause: ["both", "hold", "down"], "five-senses": ["acceptance", "orient", "orient"],
     "urge-surfing": ["acceptance", "hold", "neutral"], "opposite-action": ["change", "change", "neutral"],
     "find-the-feeling": ["acceptance", "naming", "neutral"], "problem-solve": ["change", "change", "neutral"],
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
+    "wise-mind": ["both", "naming", "neutral"],
   });
-  for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
+  // wise-mind: its content ships first (wise-mind-content); the tool itself with the next change.
+  for (const id of Object.keys(tags).filter((x) => x !== "wise-mind")) assert.ok(toolIds.includes(id), id);
 });
 
 test("blank patterns are never calmed and flooded rows are body / orient only (defence in depth over the engine)", () => {

@@ -5,13 +5,21 @@
  * ids, times and statuses; the phrases read signed-off content only).
  */
 import neo4j, { type ManagedTransaction } from 'neo4j-driver';
-import { OFFER_EVERY_DAYS } from '../../profile/offerBudget';
+import { OFFER_EVERY_DAYS, offerBudgetAt } from '../../profile/offerBudget';
 import { toNumber } from '../../shared/values';
 import { DISSOCIATION_PATTERNS } from '../gate';
 import { readHarmRows } from '../harmRows';
 import type { OfferState } from './blocked';
 import { offerGate, resolveOfferPolicy, type GateCheckIn, type OfferGate, type OfferPolicy } from './gate';
 import type { TrailShape } from './types';
+import { ruleLive } from '../trails/rules';
+
+/**
+ * A rule is live only switched on and signed off (`enabled && approved`): the prepare step, Today, Reflect
+ * and the gate all ask this, so a rule switched on while still a draft writes nothing, spends no budget
+ * and is never marked offered. Whether offers are on at all is PartsPolicy.offersEnabled, unchanged here.
+ */
+export { ruleLive };
 
 export interface TrailRuleRow {
   id: string;
@@ -45,11 +53,16 @@ export const GATE_CHECKINS_QUERY = `
          coalesce(c.activationPatternId IN $dissociation, false) AS dissociation
 `;
 
-/** Offers of both kinds made in the budget window (ids and times only): the shared weekly budget. */
+/**
+ * Offers of both kinds in the budget window (ids and times only): the shared weekly budget. Each counts
+ * from the later of when it was offered and answered (offerBudget.ts `offerBudgetAt`), so a Not now that
+ * comes back and is answered is that week's offer.
+ */
 export const OFFER_TIMES_QUERY = `
   MATCH (:User {id: $uid})-[:HAS_PATTERN_OFFER|HAS_TRAIL_OFFER]->(o)
-  WHERE (o:PatternOffer OR o:TrailOffer) AND o.offeredAt > datetime() - duration({days: $days})
-  RETURN o.id AS id, toString(o.offeredAt) AS offeredAt
+  WHERE (o:PatternOffer OR o:TrailOffer) AND o.offeredAt IS NOT NULL
+    AND ${offerBudgetAt('o')} > datetime() - duration({days: $days})
+  RETURN o.id AS id, toString(${offerBudgetAt('o')}) AS offeredAt
 `;
 
 /** Every trail offer the caller has, as much as blocking needs (blocked.ts). */
@@ -134,7 +147,7 @@ export async function checkOfferGate(
   const harm = await readHarmRows(tx, uid, p.harm);
   const rule = state.rules.find((x) => x.id === ruleId);
   return offerGate({
-    partsOn: state.partsOn, offersEnabled: state.offersEnabled, ruleEnabled: rule?.enabled === true,
+    partsOn: state.partsOn, offersEnabled: state.offersEnabled, ruleEnabled: ruleLive(rule),
     checkIns, harm, offers, offerId,
   }, p, now);
 }

@@ -308,11 +308,11 @@ function MeetAPart({ initialMove, onLog }: { initialMove: MoveId; onLog: (x: unk
         {pick('meet', 'update_show')}
       </>);
       // The app's own hold (LightHold, shared with the angry card).
-      case 'thank': return <LightHold title={<p className="text-lg font-medium">{P('meet_thank')}</p>} holdLabel={P('meet_thank_hold')}
+      case 'thank': return <LightHold title={<p className="text-lg font-medium">{P('meet_thank')}</p>} holdLabel={P('meet_thank_hold')} holdHint={P('hold_hint')}
         doneLabel={P('meet_thank_done')} nextLabel="Next" figure={<Blob feel={shape} size={80} />} onDone={() => send({ type: 'hold' })} />;
       case 'tender': return <LightHold title={<p className="font-serif text-3xl leading-tight">{P('meet_tender')}</p>}
         sub={<p className="font-serif text-xl text-[var(--color-text-secondary)]">{P('meet_tender_sub')}</p>}
-        holdLabel={P('meet_thank_hold')} nextLabel="Next" onDone={() => send({ type: 'hold' })} />;
+        holdLabel={P('meet_thank_hold')} holdHint={P('hold_hint')} nextLabel="Next" onDone={() => send({ type: 'hold' })} />;
       case 'rather': return (<>
         <p className="text-lg font-medium">{P('meet_rather')}</p>
         {pick('meet', 'rather')}

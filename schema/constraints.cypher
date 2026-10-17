@@ -172,3 +172,10 @@ CREATE CONSTRAINT polarity_pair_id IF NOT EXISTS FOR (n:PolarityPair) REQUIRE n.
 CREATE CONSTRAINT trail_rule_id IF NOT EXISTS FOR (n:TrailRule) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT trail_context_id IF NOT EXISTS FOR (n:TrailContext) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT parts_policy_id IF NOT EXISTS FOR (n:PartsPolicy) REQUIRE n.id IS UNIQUE;
+
+// --- Wise mind (docs/design/wise-mind.md, schema/wise-mind.cypher) ---
+CREATE CONSTRAINT wise_mind_flow_id IF NOT EXISTS FOR (n:WiseMindFlow) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT wise_mind_question_id IF NOT EXISTS FOR (n:WiseMindQuestion) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT mind_voice_id IF NOT EXISTS FOR (n:MindVoice) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT wise_mind_practice_id IF NOT EXISTS FOR (n:WiseMindPractice) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT wise_mind_answer_id IF NOT EXISTS FOR (n:WiseMindAnswer) REQUIRE n.id IS UNIQUE;

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import type { HandoffResult } from '../../data/capacityTypes';
 import type { PartsContent } from '../../data/partsContentTypes';
-import type { PartsEntry, PartSessionPatch } from '../../data/partsTypes';
+import { HOLD_HINT, type PartsEntry, type PartSessionPatch } from '../../data/partsTypes';
 import { getToolById } from '../../data/tools';
 import { useBand } from '../../hooks/useBand';
 import { useProfileContext } from '../../hooks/useProfileContext';
@@ -12,7 +12,7 @@ import {
   HEADS_UP_GO_ON, HEADS_UP_LOOK, HEADS_UP_PROMPT, MEET_OWN_WORDS_MAX, meetLimits, STEP_PART,
   candidateRequest, entryLaterPatch, entryPlan, guardsFor, keepRequest, meetContext, optionsFor, parseMeetEntry,
   startRequest, startingMove, toPatch, showTooMany, doneTarget, TOO_MANY_PROMPT, isPaused, meetReady, PAUSED_PROMPT,
-  CHECKBACK_NO, CHECKBACK_PROMPT, CHECKBACK_TYPE, CHECKBACK_YES, checkbackRequest, offerCheckback, type CheckbackType, type EntryPlan, type MeetEntry, type ShapeRoundLabels,
+  CHECKBACK_NO, CHECKBACK_PROMPT, CHECKBACK_TYPE, CHECKBACK_YES, checkbackRequest, offerCheckback, type CheckbackType, type EntryPlan, type MeetEntry, type ShapeRoundLabels, meetChrome,
 } from '../../lib/meetAPartSave';
 import { vecToSig } from '../../lib/partFigure';
 import { promptCopy, stepOptions } from '../../lib/partsContent';
@@ -181,6 +181,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
     ? (chip: '1h' | 'evening' | 'tomorrow') => scheduleResumeLater(HOST, toolSession.id, chip) : undefined;
 
   const P = (id: string) => promptCopy(parts, id) ?? '';
+  const chrome = meetChrome(parts);
   const s = st.session;
   const move = parts.moves.find((m) => m.id === s.move) ?? parts.moves[0];
   const sig = s.shape.some((n) => n !== 0) ? vecToSig(s.shape) : null;
@@ -216,7 +217,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
   const finale = (
     <div className="space-y-4 pt-2">
       <p className="font-serif text-xl text-[var(--color-text-primary)]">{P('meet_done')}</p>
-      <Link to={doneTarget(entry)} className={`${primaryButton} inline-flex items-center justify-center`}>Done</Link>
+      <Link to={doneTarget(entry)} className={`${primaryButton} inline-flex items-center justify-center`}>{chrome.finish}</Link>
     </div>
   );
   if (phase.k === 'ended') {
@@ -261,7 +262,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
 
   let body: ReactNode = null;
   if (own && (step === 'voice' || step === 'job' || step === 'fear')) {
-    body = <OwnWords label={P(`meet_${step}`)} fieldLabel={ownLabel} max={MEET_OWN_WORDS_MAX}
+    body = <OwnWords label={P(`meet_${step}`)} fieldLabel={ownLabel} backLabel={chrome.back} nextLabel={chrome.next} max={MEET_OWN_WORDS_MAX}
       onDone={(text) => send({ type: 'ownWords', text })} onBack={() => setOwn(false)} />;
   } else {
     switch (step) {
@@ -288,11 +289,11 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
             startLater={st.p2?.start === 'later'} resume={resumeDraft()} onScheduleLater={scheduleLater}
             onResume={(r) => send({ type: 'p2', outcome: r.overridden ? 'override' : 'resume', result: r })}
             onLater={(r) => send({ type: 'p2', outcome: 'later', result: r })} />
-          {st.later && <button type="button" className={linkButton} onClick={() => send({ type: 'continue' })}>Next</button>}
+          {st.later && <button type="button" className={linkButton} onClick={() => send({ type: 'continue' })}>{chrome.next}</button>}
         </>);
         break;
       case 'where':
-        body = <WhereScreen prompt={P('meet_where')} resumeLine={st.resumeNote ? band.content?.handoff.resumeLine ?? null : null}
+        body = <WhereScreen prompt={P('meet_where')} nextLabel={chrome.next} resumeLine={st.resumeNote ? band.content?.handoff.resumeLine ?? null : null}
           quiet={opts('where')} onPlace={(place) => send({ type: 'place', place })} onQuiet={(id) => pick(id, opts('where'))} />;
         break;
       case 'shape':
@@ -350,18 +351,18 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
         } else {
           body = (<>
             {st.aside === 'grounding' && fiveSenses && <div className="flex">{groundingLink(<><span aria-hidden="true">{fiveSenses.emoji}</span> {fiveSenses.name}</>)}</div>}
-            <LightHold title={<Prompt>{P('meet_thank')}</Prompt>} holdLabel={P('meet_thank_hold')} doneLabel={P('meet_thank_done')} nextLabel="Next"
+            <LightHold title={<Prompt>{P('meet_thank')}</Prompt>} holdLabel={P('meet_thank_hold')} holdHint={P(HOLD_HINT)} doneLabel={P('meet_thank_done')} nextLabel={chrome.next}
               figure={<PartFigure shapeSig={sig} size={80} />} onDone={() => send({ type: 'hold' })} />
           </>);
         }
         break;
       case 'tender':
         body = <LightHold title={<Prompt serif size="large">{P('meet_tender')}</Prompt>} sub={<Line serif>{P('meet_tender_sub')}</Line>}
-          holdLabel={P('meet_thank_hold')} nextLabel="Next" onDone={() => send({ type: 'hold' })} />;
+          holdLabel={P('meet_thank_hold')} holdHint={P(HOLD_HINT)} nextLabel={chrome.next} onDone={() => send({ type: 'hold' })} />;
         break;
       case 'rather': body = (<><Prompt>{P('meet_rather')}</Prompt>{chips('rather')}</>); break;
       case 'name':
-        body = <NameScreen prompt={P('meet_name')} max={meetLimits(parts).nameMaxChars} quiet={opts('name')}
+        body = <NameScreen prompt={P('meet_name')} nextLabel={chrome.next} max={meetLimits(parts).nameMaxChars} quiet={opts('name')}
           suggestion={visited?.name ?? (s.tender ? null : move?.nameHint ?? null)}
           onName={(name) => send({ type: 'name', name })} onQuiet={(id) => pick(id, opts('name'))} />;
         break;

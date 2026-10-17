@@ -52,7 +52,7 @@ test("related words keep RELATED_TO and shared-brain rows, never OPPOSITE_OF", (
 });
 
 test("shipped files carry their source, and related words has no opposites and covers every grid word", () => {
-  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json", "capacity.json", "spine.json", "parts.json"]) {
+  for (const name of ["related-words.json", "body-map.json", "find-the-feeling.json", "discriminating-questions.json", "capacity.json", "spine.json", "parts.json", "wise-mind.json"]) {
     const f = shipped(name);
     assert.match(f.source.file, /^graph-content-only-.*\.json$/, name);
     assert.ok(!Number.isNaN(Date.parse(f.source.exportedAt)), name);
@@ -112,6 +112,10 @@ test("shipped follow-up questions: both unpleasant quadrants, no clinical notes,
   const responseIds = new Set(Object.values(shippedQs).flat().flatMap((q) => q.responses.map((r) => r.id)));
   const scored = [...new Set(fixture.evidence.map((e) => e.responseId))];
   assert.deepEqual(scored.filter((id) => !responseIds.has(id)), []);
+});
+
+test("shipped Wise mind content matches content.py", () => {
+  assert.deepEqual(shipped("wise-mind.json").content, JSON.parse(readFileSync("tests/fixtures/wise-mind-content.json", "utf8")));
 });
 
 test("shipped capacity content matches content.py", () => {

@@ -365,7 +365,7 @@ UNDERNEATH_HELD = {
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
 # close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
 # next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me), ps (Problem Solve's ambivalence line), common (shared), reflect,
-# review (rule D's batch in Reflect)
+# review (rule D's batch in Reflect), den (the den: Me → Parts of me → See them together)
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -449,6 +449,10 @@ PROMPTS = [
     ("stats_felt_then_now", "common", "stats", "In {month}: {then}. Lately: {now}."),
     ("stats_felt_since", "common", "stats", "Since {month}: {now}."),
     ("stats_when", "common", "stats", "Mostly {when}"),
+    # Every press-and-hold (Meet a part's thank and tender holds, the angry card's vote): what a screen
+    # reader says with the hold's own label (aria-describedby). A quick key press, a switch or a screen
+    # reader's activation fills it hands-free (LightHold's HoldButton), so "press once" is true for them.
+    ("hold_hint", "common", "hold", "Hold to fill it, or press once and wait."),
     # Reflect: the parts section's title (after Reflect's own sections; parts on only)
     ("reflect_title", "reflect", "parts", "The parts you know"),
     # Reflect: trails answered "It's how things go", kept as plain statements (no parts language) under
@@ -592,6 +596,22 @@ PROMPTS = [
     ("candidate_line_plain", "me", "candidate", "One you wanted to come back to"),
     ("candidate_go", "me", "candidate", "Get to know it"),
     ("candidate_dismiss", "me", "candidate", "Not any more"),
+    # The den (parts.md "The den"): Me → Parts of me → See them together. The light is the person and is
+    # never labelled; threads appear only on a yes. {month} = the snapshot's month in the locale's words.
+    ("den_link", "den", "room", "See them together"),
+    ("den_room", "den", "room", "Everyone here is in your house."),
+    ("den_unnamed", "den", "room", "A part"),
+    ("den_move_help", "den", "room", "Tap one, then another, to say how they go together. Drag to move them."),
+    ("den_move_keys", "den", "room", "Enter picks one up, the arrow keys move it, Enter puts it down."),
+    ("den_one_part", "den", "room", "When you get to know another part, it will be here too."),
+    ("den_list", "den", "room", "See them as a list"),
+    ("den_pull_against", "den", "thread", "These two pull against each other"),
+    ("den_stands_front", "den", "thread", "This one stands in front of that one"),
+    ("den_which_front", "den", "thread", "Which one stands in front?"),
+    ("den_thread_cancel", "den", "thread", "Not now"),
+    ("den_remove", "den", "thread", "Remove this thread"),
+    ("den_then", "den", "then", "How it looked in {month}"),
+    ("den_now", "den", "then", "Now"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry
@@ -627,6 +647,11 @@ SAFETY_LINE = [m["id"] for m in MOVES if m["safetyLine"]]
 OPTIONS = [
     # --- shared, any move ---
     opt("own_words", "meet", "any", "In my words", branch="own_words"),
+    # Meet a part's house controls: Back (own words), Next (a typed answer, a place, a name, after P2's
+    # come back later, after a hold), and the last screen's Done
+    opt("meet_back", "meet", "chrome", "Back"),
+    opt("meet_next", "meet", "chrome", "Next"),
+    opt("meet_finish", "meet", "chrome", "Done"),
     opt("find_something_else", "meet", "find", "Something else"),
     opt("where_nowhere", "meet", "where", "Nowhere I can find"),
     opt("shape_cant_tell", "meet", "shape", "Can't tell"),
@@ -830,6 +855,10 @@ OPTIONS = [
     opt("angry_not_now_plain", "angry", "unblend", "Not now", branch="end"),
     opt("angry_not_sure", "angry", "protects", "Not sure"),
     opt("angry_done", "angry", "speak", "Done", branch="end"),
+    # Back on screens 2-4, and the quiet way past the hold once it was tried (a different control from
+    # angry_next's "Okay" on screen 1)
+    opt("angry_back", "angry", "chrome", "Back"),
+    opt("angry_vote_next", "angry", "vote", "Next"),
     # Parts on only: tapping it is the yes, and queues a PartCandidate (origin angry_card); never opens a flow
     opt("angry_later", "angry", "speak", "Spend a minute with it later?", branch="candidate"),
 

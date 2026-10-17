@@ -34,8 +34,9 @@ export type PartsEntry = (
 
 // --- Meet a part's session: mirror of functions/src/parts/sessionTypes.ts (tests/parts-entry.test.mjs) ---
 /** Where the visit came from (parts.md "Entries"). */
-export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve';
-export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve'];
+/** Where a Meet a part visit started; `tools`: the Tools list (Mindfulness), with parts on. */
+export type TrailheadKind = 'offer' | 'me' | 'candidate' | 'settings' | 'angry_card' | 'problem_solve' | 'tools';
+export const TRAILHEAD_KINDS: readonly TrailheadKind[] = ['offer', 'me', 'candidate', 'settings', 'angry_card', 'problem_solve', 'tools'];
 
 /** The steps table's ids, plus the tender path's one screen and the "nothing there" branch. */
 export type PartStepId =
@@ -256,7 +257,7 @@ export const ANGRY_LINES = [
 export type AngryLineId = (typeof ANGRY_LINES)[number];
 
 /** The angry card's options shared by both wordings (none of them names a part). */
-export const ANGRY_OPTIONS = ['angry_next', 'angry_not_sure', 'angry_done'] as const;
+export const ANGRY_OPTIONS = ['angry_next', 'angry_not_sure', 'angry_done', 'angry_back', 'angry_vote_next'] as const;
 export type AngryOptionId = (typeof ANGRY_OPTIONS)[number];
 
 /**
@@ -276,8 +277,14 @@ export const ANGRY_LATER_DONE = 'angry_later_done';
 /** The later line as the card shows it, when it may. */
 export interface AngryLaterCopy { ask: string; done: string }
 
-/** Every prompt and option of the angry flow (both wordings), by id, as plain strings. */
-export type AngryCardCopy = Record<AngryLineId | `${AngryLineId}_plain` | AngryOptionId | AngryNotNowId, string>;
+/**
+ * What a screen reader says with every press-and-hold's own label (aria-describedby; a common prompt,
+ * one wording): the angry card's vote and Meet a part's holds.
+ */
+export const HOLD_HINT = 'hold_hint';
+
+/** Every prompt and option of the angry flow (both wordings), and the hold hint, by id, as plain strings. */
+export type AngryCardCopy = Record<AngryLineId | `${AngryLineId}_plain` | AngryOptionId | AngryNotNowId | typeof HOLD_HINT, string>;
 
 export type AngryStep = 'unblend' | 'protects' | 'vote' | 'speak';
 
