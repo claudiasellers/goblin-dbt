@@ -419,6 +419,19 @@ removes blocked trails before it picks each trail's best context. The choices:
   (episodes, candidates, statements, evidence), `--all` for aggregates with no uid, `--drafts` to count
   draft `EXPRESSES` edges too, `--set <rule>.<field>=<n>` to try a threshold, and `--records <file>`
   offline. Sources print as graph labels and a part as ‹part id›; nothing the person wrote.
+- **Rule D in Reflect (built, `offers/review.ts`).** `getReflectTrails` returns at most two D blocks
+  ("Was this {name}?", each with its moments), through `offerGate` without the weekly budget (D is never
+  a push, so a D batch has no `offeredAt`), and the plain patterns: offers answered *It's how things
+  go*, shown with parts on and every phrase signed off. `answerKnownPartReview` takes the batch on the
+  caller's own live part, and only moments that are still its D episodes. *Yes* writes a
+  `PartTag {source: 'review'}` per record (`taggedKey <recordKey>:review`). *No* writes a D `TrailOffer`,
+  answered, with `noKeys` (its id is the client's batch UUID, cooling down for the rule's 14 days), and a
+  moment with a *No* for that part never comes back for it (`knownPartEpisodes`). *Done* and *Not now*
+  save what was answered and cool the part down. `removeTrailPattern` (×) sets `patternRemovedAt`
+  (`GUARDS.TrailOffer.removePattern`). A part with the safety flag gets the compact crisis banner beside
+  its block. Copy: `review_yes` / `review_no` / `review_not_sure` / `review_done` / `review_not_now`,
+  `review_noname` ("Was this that part?"), `patterns_title` ("How things tend to go"), `patterns_remove`;
+  `KNOWN_PART_REVIEW_REQUIRED`, `PLAIN_PATTERNS_REQUIRED`.
 
 ### When an offer may appear
 
@@ -761,6 +774,10 @@ aggregates (`FOUND_WORD`, offers). Stats come from there, never from a profile s
   part* once.
 - **The hue is computed when the card is read** (the home quadrant of the most-tagged words). It is never
   stored on the part.
+- **Layout (built):** every row is stacked, a small muted label over its value in the body style (*Where*,
+  *Its job*, *Afraid that*, *Would rather*, the readouts), one spacing step between rows. The person's own
+  words keep the serif at body size; chip-picked values stay in the sans; *Mostly {when}* is a quiet line
+  under the name.
 
 ### Still true? = checking back with protectors
 
@@ -815,7 +832,8 @@ The map, at Me → Parts of me → *See them together*.
   - One line under the room: *"Everyone here is in your house."*
 - **Parts are small, faceless figures.** The brand rule is no face and no teeth.
   - The figure is the Stage capsule, wearing the part's Shape signature (the same render as the FTF shelf
-    object).
+    object). **Built first in 2D** (17 Oct): the `PartFigure` from its `shapeSig`, the one Me and Meet a
+    part already draw.
   - It is coloured by the part's computed hue, and the name sits below it in the serif.
   - Tender parts sit wrapped, under a soft cover. They are never exposed.
 - **Light on a figure** shows how recently you spent time with it: a meeting, a tag or a check-back.
@@ -831,7 +849,8 @@ The map, at Me → Parts of me → *See them together*.
 - **Then and now.** "How the den looked in July" can sit beside today. Snapshots are saved when a part is
   added, rested or re-jobbed.
 - **Motion.** None on entry. The earned moment belongs to *Meet a part*.
-- **Fallbacks.** A 2D SVG for reduced motion or failed WebGL, and a plain list one tap away.
+- **Fallbacks.** A plain list one tap away. (The 2D SVG room is the first build; it stays the fallback
+  for reduced motion or failed WebGL once Stage renders it.)
 
 **Rejected:**
 
@@ -845,7 +864,7 @@ The map, at Me → Parts of me → *See them together*.
 
 ## Two pulls (polarities)
 
-The dialectics flow, built on Stage. It starts from a rule C trail, from "More than one", or from the
+The dialectics flow, built first in 2D (17 Oct) and on Stage later. It starts from a rule C trail, from "More than one", or from the
 den. **It has the same gates as Meet a part:** parts on, the flooding / crisis and dissociation checks,
 the blending check (its own wording, about both figures) on the first screen, `TooMuchLink` on every
 screen, and the tender and danger branches for any chip or own words.
@@ -856,8 +875,9 @@ screen, and the tender and danger branches for any chip or own words.
    - A non-Self answer to either side gets one 4b.
    - If it is still non-Self, the flow ends: *"One of them needs its own time first."* It then offers to
      meet that part another time.
-3. **Step back.** Each held breath lifts the camera. This is Stage's visual self-distancing (Kross &
-   Ayduk), and the meta-position InnerPond had to build a pond for.
+3. **Step back.** Each held breath lifts the camera (in 2D: the stage zooms out a step; reduced motion:
+   it steps). This is Stage's visual self-distancing (Kross & Ayduk), and the meta-position InnerPond
+   had to build a pond for.
 4. **Each side's worry, in turn.** "What is {A} worried would happen if {B} got its way?" Chips from the
    pair's content, plus own words (own words → the conservative branch). Then the same for B. Equal size,
    equal time, neither one marked as the problem.
@@ -989,7 +1009,7 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
 |---|---|
 | `ProtectiveMove {id, label, unblendPhrase, trailPhrase, nameHint, kind, offerable, safetyLine}` | The shared vocabulary |
 | `(:ActionUrge \| :FeelingUrge \| :PullOption \| :MomentResponse \| :TurningPoint \| :ThoughtPattern \| :DearManBarrier \| :BarrierSubResponse \| :QuestionResponse)-[:EXPRESSES {why}]->(:ProtectiveMove)` | Every module's ids, mapped or held; drafts until `SIGNED_OFF` |
-| `PullOption {id, flow, pullId}`: `recover_fight`, `recover_chase`, `recover_hide`, `recover_freeze` | Recover's pulls live in its flow JSON; FTF's are `FeelingUrge` nodes already |
+| `PullOption {id, flow, pullId, label}`: `recover_fight`, `recover_chase`, `recover_hide`, `recover_freeze` | Recover's pulls live in its flow JSON; FTF's are `FeelingUrge` nodes already. `label` is imported from Recover's own `content.py` (one source; `build.py` asserts every PullOption has one), so evidence rows name the pull |
 | `(:BodySignal)-[:AT_PLACE]->(:BodyRegion)` | DEAR MAN body signals → the body map's 15 places (data fix 6) |
 | `ProtectedHurt {id, label, hurtPhrase, feltPhrase}`; `-[:NAMED_AS]->(:Emotion)`; `(:ProtectiveMove)-[:OFTEN_GUARDS {rank}]->` | The angry card's six hurts, as the agreed spec maps them to Emotion ids; "What's it protecting?" hypotheses |
 | `(:InvalidationEvent)-[:CAN_TOUCH]->`, `(:UnmetNeed)-[:ANSWERS]->`, `(:Underneath)-[:SAME_AS]->(:ProtectedHurt)` | Recover's and DEAR MAN's ids for the same hurts, mapped or held. An addition to the agreed angry-part spec |
@@ -1069,14 +1089,21 @@ Phase 0 builds this part (drafts, nothing served). Every node and edge carries `
   - `schedulePartCheckback`, `answerPartCheckback` (spine's `resolveFollowUp` refuses this type; spine's
     `scheduleFollowUp` and `snoozeFollowUp` refuse any parts follow-up while parts are off, as not found)
   - `deleteMyParts`
-  - Phase 4, switched off: `getTrailOfferEvidence`, `answerTrailOffer`
+  - Phase 4, switched off: `getTrailOfferEvidence`, `answerTrailOffer`; Reflect's `getReflectTrails`,
+    `answerKnownPartReview`, `removeTrailPattern`
   - not yet: `updatePartLayout`, `linkParts` (Phase 5)
   - Content ships as a generated `src/data/content/parts.json`, like the other content files, holding
     **approved rows only** (moves, prompts, options, hurts, `canTouch`, `expresses`; never trail rules or
     contexts, and of the policy only `limits` (`nameMaxChars`, `maxNonSelfAnswers`) once it is signed
     off). Screens read it through `getPartsContent()` and render only when `flowReady` finds every
     line they need, so nothing parts-related appears until its copy is signed off. An approved option
-    may name a move that isn't signed off yet; completeness is `flowReady`'s job.
+    may name a move that isn't signed off yet; completeness is `flowReady`'s job. **Only the fields a
+    screen uses ship**, through one list, `scripts/content-snapshot/partsAllowlist.mjs`, which the
+    snapshot build and the fixture projection both read: moves `id, label, unblendPhrase, nameHint,
+    safetyLine`; prompts `copy`; options `id, label, flag, selfLike, branch, order, moves`; hurts `id,
+    label, feltPhrase, matters, order, namedAs, guardedBy {moveId, rank}`; `canTouch` / `expresses` as
+    ids. Move kinds and trail phrases, prompt flow / step / order, option kind / `sameAs` and the hurt
+    phrase stay in the graph.
   - `meet-a-part` is in `NOT_WHAT_HELPS` (`spine/tools.ts`): its orienting answer is stored but never
     counted as "it helped" (what-helps rules, Insights, Today's outcome card, `ToolUsage.outcome`).
 - **Trail evaluation.** It joins the Today prepare step as a second rule family. `readRules` filters by
@@ -1171,8 +1198,8 @@ app, with consent. Don't put it in the product.
 | **2. Meet a part + Parts of me** | The tool, the Settings switch, the `my_parts` area, the part card (no stats yet), the tender path, `part_checkback`, deletion | Hand-made parts first, to test whether people want this before any inference |
 | **3. Tags and per-part help** | The tag row, card stats, Reflect per-part, DEAR MAN cope-ahead per part, unblend lines in FTF / OA / Recover, the OA goal line | The person's labels before the machine's guesses |
 | **4. Trails** | Rules A and D, then B and C; evidence offers; `PartsPolicy` | Only after 4+ weeks of tagged data to sanity-check thresholds |
-| **5. The den + Two pulls** | The map, snapshots, links, the Stage polarity flow, the keepsake | Needs Stage (Recover v2) built |
-| **6. Wise Mind** | The parts-aware step back | Shares Wise Mind's planned rows |
+| **5. The den + Two pulls** | The map, snapshots, links, the polarity flow, the keepsake | 2D first (17 Oct); Stage (Recover v2) can take over the rendering later |
+| **6. Wise Mind** | The Wise mind tool and its parts-aware step back (`docs/design/wise-mind.md`) | Shares Wise Mind's planned rows |
 
 Each phase is gated on the previous phase's harm signals.
 
@@ -1183,7 +1210,10 @@ what each rule would find on real data and set the counts before anything is off
 stays gated on Phase 3's harm signals. Every parts callable has had a security review (ownership by key,
 the same not-found for someone else's record, parts-off refusals, limits, logs, lifecycle guards, export
 and delete; `functions/test/unit/partsDataCoverage.test.cjs` builds the parts labels from `layers.ts`
-and checks both paths cover each). Phase 5 waits on Stage (Recover v2) and on a review of what's built. Not built from the
+and checks both paths cover each). **Phase 5 is being built now in 2D, without Stage** (Claudia, 17
+Oct: features first): the den and Two pulls as SVG rooms with `PartFigure`s; Stage can replace the
+renderer later. Trail offers stay off until Claudia has looked at the dry run (her choice, 17 Oct).
+Phase 6 is designed in `docs/design/wise-mind.md`. Not built from the
 module table: Recover's next-day question about a tagged part (it would duplicate the part's own
 check-back) and the witness `part` kind (no moment needs it yet).
 
@@ -1209,7 +1239,22 @@ the fixture copy treated as signed off, an invented person and nothing saved. It
 pack's surface list, so it can't miss a surface. Build it with `npx vite build --config
 dev/vite.harness.config.ts`; `node dev/review/check.mjs [shots dir]` opens every branch at 390×844 and
 fails on a console or page error, a failed request, a branch it couldn't reach, or a screen without its
-line. A static build is published as a private artifact for the reviewer.
+line. A static build is published as a private artifact for the reviewer. Surfaces and branches are
+addressed by hash (`#s=<surface>…`, never a query string), so the page works inside the artifact frame.
+
+**Accessibility (checked 17 Oct).** `npx vite build --config dev/vite.harness.config.ts && node
+dev/review/a11y.mjs [--only <surface>] [--jobs <n>]` walks every review screen at 390×844: names,
+a keyboard walk, focus after each step change (`src/components/parts/stepFocus.ts`: the new step's
+heading takes focus, the app's convention), polite live lines, 44 px targets, reduced motion and holds,
+Escape, and contrast in all six rooms (`tests/parts-a11y.test.mjs`). Saving sets `aria-disabled`; a
+failed save is a polite status line. Every hold works by Space or Enter held, or a quick tap or switch
+click that fills hands-free over the same time.
+
+**Loading.** Parts code loads only where it is used: Today's parts cards, Me's Parts of me, the parts
+settings, the tag row, Recover's angry card, DEAR MAN's cope ahead and debrief, Problem Solve's line,
+Reflect's parts sections and the parts callables are each lazy, and Meet a part is the only lazily
+loaded tool (`tests/parts-lazy-hosts.test.mjs`). About 4.6 KB gzip of parts code stays in the entry
+chunk: the gate helpers, the unblend line, the OA goal line and the tag slot.
 
 ## Never
 
@@ -1222,6 +1267,11 @@ line. A static build is published as a private artifact for the reviewer.
 - An AI speaking as a part, or as the person's Self.
 - Collection mechanics, streaks, "parts discovered" counts or shareable cards.
 - Parts language by default.
+
+Each item is a describe block in `tests/parts-never.test.mjs`. Prompts are the app's voice (second
+person, never *I* / *me* / *my*); a part's words exist only as `PartOption` chips the person picks. With
+parts off every parts writer throws `partsOff()` and every reader returns empty and writes nothing
+(`READERS_EMPTY`).
 
 ### Why never
 

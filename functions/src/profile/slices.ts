@@ -54,6 +54,21 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     WITH p, coalesce(p.anchorOwn, head(collect(o.text)), head(collect(l.text))) AS text
     ORDER BY p.lastVisitedAt IS NULL, p.lastVisitedAt DESC, p.confirmedAt IS NULL, p.confirmedAt DESC, p.id LIMIT 50
     RETURN p.id AS partId, text`,
+  // The den (Me only): the room's parts, the links whose two parts are both in it, the snapshot list.
+  // Profile only: how recently each part was spent time with comes from the log in getDen, not here.
+  den: `MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
+    OPTIONAL MATCH (u)-[:HAS_PART]->(p:Part) WHERE p.status IN ['active', 'resting']
+    WITH u, p ORDER BY p.lastVisitedAt IS NULL, p.lastVisitedAt DESC, p.confirmedAt IS NULL, p.confirmedAt DESC, p.id
+    WITH u, collect(p {.id, .name, .status, .tender, .shapeSig, .mapX, .mapY, lastVisitedAt: toString(p.lastVisitedAt),
+      safety: ${partSafetyCypher('p')}})[..50] AS parts
+    OPTIONAL MATCH (u)-[:HAS_PART_LINK]->(l:PartLink)
+    WHERE EXISTS { MATCH (u)-[:HAS_PART]->(la:Part) WHERE la.id = l.aId AND la.status IN ['active', 'resting'] }
+      AND EXISTS { MATCH (u)-[:HAS_PART]->(lb:Part) WHERE lb.id = l.bId AND lb.status IN ['active', 'resting'] }
+    WITH u, parts, l ORDER BY l.id
+    WITH u, parts, collect(l {.id, .kind, .aId, .bId, .bothWantId})[..100] AS links
+    OPTIONAL MATCH (u)-[:HAS_DEN_SNAPSHOT]->(s:DenSnapshot)
+    WITH parts, links, s ORDER BY s.takenAt DESC
+    RETURN parts, links, collect(s {.id, takenAt: toString(s.takenAt)})[..36] AS snapshots`,
 };
 
 /** A list property or collected ids: absent → [], nulls dropped, sorted when `sorted`. */
@@ -64,6 +79,10 @@ function strings(v: unknown, sorted = false): string[] {
 const strOrNull = (v: unknown): string | null => (typeof v === 'string' ? v : null);
 /** A stored `shapeSig` (five numbers) or null. */
 const sig = (v: unknown): number[] | null => (Array.isArray(v) ? v.map((x) => (typeof x === 'number' ? x : int(x))) : null);
+/** A stored map coordinate (0..1) or null. */
+const coord = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= 1 ? v : null);
+const objs = (v: unknown): Record<string, unknown>[] =>
+  (Array.isArray(v) ? v.filter((x): x is Record<string, unknown> => !!x && typeof x === 'object') : []);
 
 type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: number) => Promise<ProfileSlices[K]>;
 
@@ -152,6 +171,27 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       if (typeof text === 'string' && text.trim()) out[String(rec.get('partId'))] = text;
     }
     return out;
+  },
+  den: async (tx, uid) => {
+    const r = (await tx.run(SLICE_QUERIES.den!, { uid })).records[0];
+    if (!r) return { parts: [], links: [], snapshots: [] };
+    return {
+      parts: objs(r.get('parts')).filter((p) => typeof p.id === 'string').map((p) => ({
+        id: p.id as string, name: strOrNull(p.name), status: p.status === 'resting' ? 'resting' as const : 'active' as const,
+        tender: p.tender === true, shapeSig: sig(p.shapeSig), mapX: coord(p.mapX), mapY: coord(p.mapY),
+        lastVisitedAt: strOrNull(p.lastVisitedAt), safety: p.safety === true,
+      })),
+      links: objs(r.get('links'))
+        .filter((l) => typeof l.id === 'string' && typeof l.aId === 'string' && typeof l.bId === 'string'
+          && (l.kind === 'covers_for' || l.kind === 'two_pulls'))
+        .map((l) => ({
+          id: l.id as string, kind: l.kind as 'covers_for' | 'two_pulls', aId: l.aId as string, bId: l.bId as string,
+          bothWantId: strOrNull(l.bothWantId),
+        })),
+      snapshots: objs(r.get('snapshots'))
+        .filter((x) => typeof x.id === 'string' && typeof x.takenAt === 'string')
+        .map((x) => ({ id: x.id as string, takenAt: x.takenAt as string })),
+    };
   },
 };
 

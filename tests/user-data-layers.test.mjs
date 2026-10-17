@@ -28,7 +28,7 @@ test("every registered label has a layer; every non-system label an exportAs, un
   assert.equal(new Set(keys).size, keys.length);
   assert.equal(exportKeyFor(["CheckIn", "UserData", "LogRecord"]), "checkIns");
   assert.equal(exportKeyFor(["PushToken", "UserData", "System"]), null);
-  assert.deepEqual(labelsOf("profile").sort(), ["MyPattern", "OwnLine", "Part", "ProfileFact"]);
+  assert.deepEqual(labelsOf("profile").sort(), ["DenSnapshot", "MyPattern", "OwnLine", "Part", "PartLink", "ProfileFact"]);
   assert.deepEqual(LAYER_LABEL, { log: "LogRecord", profile: "ProfileItem", system: "System" });
 });
 

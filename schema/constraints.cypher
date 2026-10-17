@@ -151,6 +151,8 @@ CREATE CONSTRAINT part_tag_tagged_key IF NOT EXISTS FOR (n:PartTag) REQUIRE n.ta
 CREATE CONSTRAINT part_key IF NOT EXISTS FOR (n:Part) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_revisit_key IF NOT EXISTS FOR (n:PartRevisit) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT trail_offer_key IF NOT EXISTS FOR (n:TrailOffer) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT part_link_key IF NOT EXISTS FOR (n:PartLink) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT den_snapshot_key IF NOT EXISTS FOR (n:DenSnapshot) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
 CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);
