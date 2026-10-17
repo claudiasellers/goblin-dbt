@@ -88,7 +88,7 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
         <button type="button" onClick={() => setStep(back[step])}
           className="inline-flex items-center gap-1 min-h-11 px-2 -ml-2 rounded-lg text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] transition-colors">
           <span aria-hidden="true">←</span>
-          <span>Back</span>
+          <span>{c.back}</span>
         </button>
       )}
 
@@ -124,10 +124,10 @@ export function AngryPartCard({ copy, hurts, partsOn, name, onDone, tooMuch, onS
           </div>
           {held
             ? <button ref={nextRef} type="button" className={primaryButton} onClick={() => setStep('speak')}>{c.next}</button>
-            : <HoldButton label={c.hold} ms={HOLD_MS} onProgress={setProgress}
+            : <HoldButton label={c.hold} hint={c.holdHint} ms={HOLD_MS} onProgress={setProgress}
                 onLetGo={() => setTried(true)} onComplete={() => { justHeld.current = true; setHeld(true); buzz(30); }} />}
           {!held && tried && (
-            <button type="button" className={linkButton} onClick={() => setStep('speak')}>Next</button>
+            <button type="button" className={linkButton} onClick={() => setStep('speak')}>{c.voteNext}</button>
           )}
         </section>
       )}

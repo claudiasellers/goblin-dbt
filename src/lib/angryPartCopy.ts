@@ -3,7 +3,7 @@
  * Pure. Split from ./angryPart.ts (the rules Recover reads eagerly to decide whether to offer the card)
  * so it loads with the card.
  */
-import type { AngryCardCopy, AngryHurt, AngryLineId } from '../data/partsTypes';
+import { HOLD_HINT, type AngryCardCopy, type AngryHurt, type AngryLineId } from '../data/partsTypes';
 import { angryNotNowId } from './angryPart';
 import { fill } from './invalidationRecovery';
 
@@ -15,12 +15,18 @@ export interface ResolvedAngryCopy {
   /** The vote of confidence, in order. */
   vote: [string, string, string];
   hold: string;
+  /** What a screen reader says with the hold (its aria-describedby). */
+  holdHint: string;
   speak: string;
   /** The person's own sentence ("I felt brushed off."); null after "Not sure". */
   speakLine: string | null;
   next: string;
   notSure: string;
   done: string;
+  /** Back on screens 2-4. */
+  back: string;
+  /** The quiet way past the hold once it was tried. */
+  voteNext: string;
   /** The card's own way past, in this wording (the host's skip link on the first screen). */
   notNow: string;
 }
@@ -45,11 +51,14 @@ export function resolveAngryCopy(copy: AngryCardCopy, { partsOn, name, hurt }: {
     protects: say('angry_protects'),
     vote: [say(vote1), say('angry_vote_2'), say(first ? 'angry_vote_3' : 'angry_vote_3_noname')],
     hold: say('angry_hold'),
+    holdHint: copy[HOLD_HINT],
     speak: say(hurt ? 'angry_speak' : 'angry_speak_unsure'),
     speakLine: hurt ? say('angry_speak_line') : null,
     next: copy.angry_next,
     notSure: copy.angry_not_sure,
     done: copy.angry_done,
+    back: copy.angry_back,
+    voteNext: copy.angry_vote_next,
     notNow: copy[angryNotNowId(partsOn)],
   };
 }
