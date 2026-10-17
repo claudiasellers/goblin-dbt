@@ -7,7 +7,8 @@
  *   render, and only when every phrase its statement needs is signed off.
  * - The prepare step (`prepareTrailOffers`) runs the evaluator at most once a day (`User.trailsEvaluatedAt`)
  *   and writes the top candidate whose rule is live (switched on and signed off) and whose statement's
- *   phrases are signed off, not blocked, new, and through the same gate.
+ *   phrases are signed off, not blocked, new, and through the same gate, and nothing while an offer is
+ *   still on Today (so a Not now comes back after its cooldown instead of being hidden by a newer offer).
  * - Shapes A, B and C only (TODAY_SHAPES). Rule D ("Was this {name}?") is never a push: Reflect shows it
  *   and answers it in a batch (review.ts, on writeKnownPartReview and the same gate).
  * - A safety-line move (turn_on_myself, rule A only) is not offered on Today: parts.md wants crisis
@@ -21,7 +22,7 @@ import { readTx, writeTx } from '../../shared/neo4j';
 import { readTrailState, trailsFromState } from '../trails';
 import { registerTodayPrepare, registerTodaySource } from '../../spine/today';
 import type { TodayItem } from '../../spine/todayOrder';
-import { blockedTrails, isBlocked, trailOfferId } from './blocked';
+import { blockedTrails, isBlocked, showableOffer, trailOfferId } from './blocked';
 import { checkOfferGate, OPEN_OFFER_QUERY, readOfferPolicy, readOfferStates, readPhrases, ruleLive } from './queries';
 import { trailOfferParams, writeTrailOffer } from './record';
 import { TODAY_SHAPES, type BlockedTrail, type OfferableTrail, type TrailShape } from './types';
@@ -101,6 +102,8 @@ export const STAMP_EVALUATED_QUERY = `MATCH (u:User {id: $uid}) SET u.trailsEval
  * statement's phrases are all signed off, that isn't blocked or already offered, and that the gate lets
  * through, written by writeTrailOffer. At most one offer per run. A candidate that couldn't render is
  * skipped, never written: it would spend the shared weekly budget and be marked offered for good.
+ * Nothing either while an offer is on Today (showableOffer: offered or seen, or a Not now back from its
+ * cooldown), so a Not now comes back after its cooldown instead of being hidden by a newer offer.
  */
 export async function prepareTrailOffers(uid: string, now: Date, evaluate: TrailEvaluator | null = TRAIL_EVALUATOR): Promise<string | null> {
   if (!evaluate) return null;
@@ -111,6 +114,8 @@ export async function prepareTrailOffers(uid: string, now: Date, evaluate: Trail
     const last = (await tx.run(EVALUATED_AT_QUERY, { uid })).records[0]?.get('at') as string | null | undefined;
     if (last && Date.parse(last) > now.getTime() - DAY) return null;
     const offers = await readOfferStates(tx, uid);
+    // One on Today already (or a Not now back from its cooldown): nothing new while it is.
+    if (showableOffer(offers, now)) return { trail: null };
     const blocked = blockedTrails(offers, now);
     const known = new Set(offers.map((o) => o.id));
     const candidates = await evaluate(tx, uid, blocked, now);

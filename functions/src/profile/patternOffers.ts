@@ -20,7 +20,7 @@ import { userKey } from '../userdata/ownership';
 import { registerTodayPrepare, registerTodaySource } from '../spine/today';
 import type { TodayItem } from '../spine/todayOrder';
 import { NOT_WHAT_HELPS } from '../spine/tools';
-import { OFFER_EVERY_DAYS, offerBudgetSpent } from './offerBudget';
+import { OFFER_EVERY_DAYS, offerBudgetAt, offerBudgetSpent } from './offerBudget';
 import type { PatternOfferAnswer } from './types';
 
 export { OFFER_EVERY_DAYS, offerBudgetSpent } from './offerBudget';
@@ -81,11 +81,14 @@ export function evaluateRule(
   return candidate;
 }
 
-/** The caller's trail offers made in the last `$days` (their times only: they count against the weekly budget). */
+/**
+ * The caller's trail offers in the last `$days` (their times only: they count against the weekly budget),
+ * each from the later of when it was offered and answered (`offerBudgetAt`), as the parts gate counts them.
+ */
 export const TRAIL_OFFER_TIMES_QUERY = `
   MATCH (:User {id: $uid})-[:HAS_TRAIL_OFFER]->(t:TrailOffer)
-  WHERE t.offeredAt > datetime() - duration({days: $days})
-  RETURN toString(t.offeredAt) AS offeredAt`;
+  WHERE t.offeredAt IS NOT NULL AND ${offerBudgetAt('t')} > datetime() - duration({days: $days})
+  RETURN toString(${offerBudgetAt('t')}) AS offeredAt`;
 
 async function readRules(tx: ManagedTransaction): Promise<PatternRule[]> {
   const r = await tx.run(`MATCH (p:PatternRule) RETURN p {.*} AS p`);
