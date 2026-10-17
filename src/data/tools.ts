@@ -175,7 +175,11 @@ export interface Intent {
   emoji: string;
 }
 
-export const intents: Intent[] = [
+/**
+ * Every intent, in the order the Tools page shows them. An intent whose tool is unlisted waits: Cope Ahead's
+ * (*Something's coming up that I'm dreading*) shows once its tool is listed, when its screens ship.
+ */
+export const allIntents: Intent[] = [
   { id: 'cant-tell', label: 'I can\'t tell what I\'m feeling', toolId: 'find-the-feeling', emoji: '🫧' },
   { id: 'hurt', label: 'Recover from a hurtful moment', toolId: 'recovering-from-invalidation', emoji: '💬' },
   { id: 'calm-fast', label: 'Calm down fast', toolId: 'cool-down', emoji: '🧊' },
@@ -185,8 +189,12 @@ export const intents: Intent[] = [
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
+  { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
 ];
+
+/** The intents the Tools page lists: those whose tool is listed for everyone. */
+export const intents: Intent[] = allIntents.filter(i => tools.find(t => t.id === i.toolId)?.listed === undefined);
 
 export function getToolById(id: string): Tool | undefined {
   return tools.find(t => t.id === id);

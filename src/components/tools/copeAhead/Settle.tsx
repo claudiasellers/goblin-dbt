@@ -60,7 +60,7 @@ export function Settle({ content, onChoose }: SettleProps) {
             ))}
           </ol>
           {done < SETTLE_BREATHS && (
-            <HoldButton key={done} label={copy('settle_hold') || copy('settle_breath')} hint={copy('settle_hold_hint')} ms={SETTLE_HOLD_MS}
+            <HoldButton key={done} label={copy('settle_hold')} hint={copy('settle_hold_hint')} ms={SETTLE_HOLD_MS}
               onProgress={(p) => { if (p > 0) progress.current = p; }}
               onLetGo={() => { if (progress.current >= COUNTS_FROM) breathed(); else progress.current = 0; }}
               onComplete={breathed} />
