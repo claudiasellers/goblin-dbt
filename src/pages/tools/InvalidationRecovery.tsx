@@ -1,5 +1,5 @@
 import { AnimatePresence, LazyMotion, domAnimation, m, useReducedMotion } from 'motion/react';
-import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type ReactNode } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useMemo, useReducer, useRef, useState, type ComponentProps, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getEmotionById } from '../../data/emotions';
 import { useAuth } from '../../contexts/AuthContext';
@@ -32,10 +32,8 @@ import { useUnblendLine } from '../../hooks/useUnblendLine';
 import { recoverPullOption } from '../../lib/unblendLine';
 import { getSpineContent, type SpineContent } from '../../services/spine';
 import { recoverSchedule } from '../../lib/spine/wrap';
-import { AngryPartCard } from '../../components/parts/AngryPartCard';
 import { TooMuchLink } from '../../components/capacity/TooMuchLink';
 import { ANGRY_MOVE, angryCopyFrom, angryLaterCopy, angryNotNowId, angryReady, orderHurts } from '../../lib/angryPart';
-import { queuePartCandidate } from '../../services/parts';
 import { newId } from '../../lib/spine/ids';
 import { handoffExt } from '../../lib/bandStore';
 import { getPartsContent } from '../../services/partsContent';
@@ -45,6 +43,16 @@ import type { HandoffResult } from '../../data/capacityTypes';
 
 type Load = { status: 'loading' } | { status: 'error' } | { status: 'ready'; content: InvalidationRecoveryContent };
 type Save = 'idle' | 'saving' | 'saved' | 'error' | 'signed-out';
+
+// The angry-part card loads on demand: it is fetched on the fight pull's step once the card may be
+// offered this visit (parts on or off: its plain wording reaches everyone), so it is there before the
+// moment it shows. Its own Suspense, nothing in its place.
+const loadAngryCard = () => import('../../components/parts/AngryPartCard');
+const LazyAngryPartCard = lazy(() => loadAngryCard().then((m) => ({ default: m.AngryPartCard })));
+function AngryPartCard(p: ComponentProps<typeof LazyAngryPartCard>) { return <Suspense fallback={null}><LazyAngryPartCard {...p} /></Suspense>; }
+
+// Parts' callables load on demand, at the one moment this page calls one (a yes to "another time").
+const queuePartCandidate: typeof import('../../services/parts').queuePartCandidate = (req) => import('../../services/parts').then((m) => m.queuePartCandidate(req));
 
 export function InvalidationRecovery() {
   const [load, setLoad] = useState<Load>({ status: 'loading' });
@@ -379,6 +387,8 @@ function LoudStep({ c, pulls, initial, unblendOk, cardThisVisit, onDone }: {
   const [pull, setPull] = useState<FlowData['pull']>(initial?.pull ?? null);
   const [urge, setUrge] = useState<number | null>(initial?.urge ?? null);
   const p = pulls.find(x => x.id === pull);
+  // The pull options are on screen: fetch the angry card now if it may be offered, so it never waits.
+  useEffect(() => { if (cardThisVisit) void loadAngryCard().catch(() => { /* the card's render retries */ }); }, [cardThisVisit]);
   // Parts on: "A part of you … right now." after the pull, unless the angry card will do the unblending.
   const unblend = useUnblendLine('recover', pull ? recoverPullOption(pull) : null, unblendOk && !(pull === 'fight' && cardThisVisit));
   return (

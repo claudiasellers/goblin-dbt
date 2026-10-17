@@ -198,16 +198,12 @@ test("Today: after a card goes, the card that took its place, else the new last 
   assert.match(hook, /if \(to && !e\.currentTarget\.contains\(to\)\) inside\.current = false;/, "a removed control's blur (nowhere to go) isn't leaving");
 });
 
-test("Reflect's trails: a closed block or a removed line hands focus on; saving is aria-disabled, never disabled", () => {
+test("Reflect's trails: saving is aria-disabled, never disabled (lane 3 hands focus on after Done / Remove)", () => {
   const c = read("src/components/insights/TrailsReflect.tsx");
   assert.doesNotMatch(c, /\sdisabled=\{/, "disabled under a focused control drops it");
   assert.equal((c.match(/aria-disabled=\{busy/g) ?? []).length, 4, "the answer chips, Done, Not now and the ×");
-  assert.match(c, /onDone=\{\(id\) => \{ setMoved\(\{ kind: 'review', at, before: before\(reviewDomId\(id\)\) \}\);/);
-  assert.match(c, /setMoved\(\{ kind: 'pattern', at: shownPatterns\.findIndex\(\(x\) => x\.p\.offerId === id\), before: before\(PATTERNS_DOM_ID\) \}\);/);
-  assert.match(c, /if \(!moved \|\| !focusLost\(\)\) return;/);
-  assert.match(c, /const instead = moved\.kind === 'review' \? document\.getElementById\(PATTERNS_DOM_ID\) : blocks\[blocks\.length - 1\];/);
-  assert.match(c, /focusStepStart\(\(i === null \? instead \?\? prior : list\[i\]\) \?\? document\.querySelector<HTMLElement>\('main'\)\);/);
-  for (const id of ["id={reviewDomId(block.partId)}", "id={PATTERNS_DOM_ID}", "id={patternDomId(p.offerId)}"]) assert.ok(c.includes(id), id);
+  assert.match(c, /const close = async \(c: KnownPartReviewClose\) => \{\s*if \(busy\) return;/);
+  assert.match(c, /const remove = async \(offerId: string\) => \{\s*if \(busy\) return;/);
 });
 
 test("DEAR MAN: only a parts step handing back moves focus to its next step's start", () => {

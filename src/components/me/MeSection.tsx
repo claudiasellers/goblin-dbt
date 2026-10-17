@@ -12,10 +12,11 @@ import { QuietHoursEditor } from './QuietHoursEditor';
 import { PatternOfferCard } from './PatternOfferCard';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
-import { answerPartCandidate } from '../../services/parts';
 import { dismissCandidateRequest, partsOfMeCopy } from '../../lib/partsOfMe';
 import type { PartsContent } from '../../data/partsContentTypes';
 
+// Parts' callables load on demand, when a candidate is dismissed.
+const answerPartCandidate: typeof import('../../services/parts').answerPartCandidate = (req) => import('../../services/parts').then((m) => m.answerPartCandidate(req));
 // Parts of me is fetched only with parts on and its copy signed off, so nobody else downloads it.
 const LazyPartsOfMe = lazy(() => import('./PartsOfMe').then((m) => ({ default: m.PartsOfMe })));
 function PartsOfMe(p: ComponentProps<typeof LazyPartsOfMe>) { return <Suspense fallback={null}><LazyPartsOfMe {...p} /></Suspense>; }

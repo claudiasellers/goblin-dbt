@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { Suspense, lazy, useEffect, useState, type ComponentProps } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useUserProfile } from '../contexts/UserProfileContext';
 import { getInsightsData, type InsightsPayload } from '../services/neo4j';
 import { InsightSkeleton } from '../components/insights/InsightSkeleton';
 import { FormulationCard } from '../components/insights/FormulationCard';
@@ -8,10 +9,18 @@ import { ProactiveAlert } from '../components/insights/ProactiveAlert';
 import { GrowthEvidence } from '../components/insights/GrowthEvidence';
 import { SomaticCorrelation } from '../components/insights/SomaticCorrelation';
 import { ToolEffectiveness } from '../components/insights/ToolEffectiveness';
-import { PartsReflect } from '../components/insights/PartsReflect';
-import { TrailsReflect } from '../components/insights/TrailsReflect';
 import { TimeFilter } from '../components/history/TimeFilter';
 import type { TimeRange } from '../components/history/useFilteredCheckIns';
+
+// Reflect's parts section loads only when the server sent parts (parts on): nobody else downloads it.
+const LazyPartsReflect = lazy(() => import('../components/insights/PartsReflect').then((m) => ({ default: m.PartsReflect })));
+function PartsReflect(p: ComponentProps<typeof LazyPartsReflect>) { return <Suspense fallback={null}><LazyPartsReflect {...p} /></Suspense>; }
+// Rule D's block renders nothing with parts off (TrailsReflect's own first check), so it is fetched only with parts on.
+const LazyTrailsReflect = lazy(() => import('../components/insights/TrailsReflect').then((m) => ({ default: m.TrailsReflect })));
+function TrailsReflect(p: ComponentProps<typeof LazyTrailsReflect>) {
+  const partsOn = useUserProfile().profile.partsEnabled;
+  return partsOn ? <Suspense fallback={null}><LazyTrailsReflect {...p} /></Suspense> : null;
+}
 
 function InsightPlaceholder({ icon, title, description, delay = 0 }: {
   icon: string;

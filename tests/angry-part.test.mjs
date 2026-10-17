@@ -7,7 +7,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
 
-const { angryCopyFrom, orderHurts, resolveAngryCopy } = await importTs("src/lib/angryPart.ts");
+const { angryCopyFrom, orderHurts } = await importTs("src/lib/angryPart.ts");
+const { resolveAngryCopy } = await importTs("src/lib/angryPartCopy.ts");
 const { ANGRY_LINES } = await importTs("src/data/partsTypes.ts");
 const fixture = JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"));
 const copy = angryCopyFrom(fixture);

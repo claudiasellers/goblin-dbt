@@ -34,7 +34,7 @@ import { TooMuchLink } from '../../src/components/capacity/TooMuchLink';
 import { DARK } from '../../src/components/tools/findTheFeeling/shape/palette';
 import { linkButton, secondaryText } from '../../src/components/tools/oppositeAction/styles';
 import { answer, logEvent } from './backend';
-import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, reflectTrails, slices, trailEvidence, trailItem, type TrailKind } from './data';
+import { CANDIDATES, checkbackItem, ME_ITEMS, ME_LONG, PART_IDS, REFLECT, reflectTrails, slices, trailEvidence, trailItem, type TrailKind } from './data';
 import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
 import { PARTS } from '../parts-example';
@@ -211,14 +211,14 @@ function TagHost({ host }: { host: TagHostKind }) {
   );
 }
 
-function MeHost() {
+function MeHost({ long = false }: { long?: boolean }) {
   const content = useParts();
   const copy = partsOfMeCopy(content);
   if (!content || !copy) return null;
   return (
     <section className="space-y-2">
       <p className={mockNote}>Me → Parts of me</p>
-      <PartsOfMe items={ME_ITEMS} candidates={CANDIDATES} content={content} copy={copy}
+      <PartsOfMe items={long ? ME_LONG : ME_ITEMS} candidates={long ? [] : CANDIDATES} content={content} copy={copy}
         onWrite={(p) => p.then(() => undefined)}
         onDismiss={async (id) => { await answerPartCandidate(dismissCandidateRequest(id)); }} />
     </section>
@@ -449,7 +449,11 @@ export const SURFACES: Surface[] = [
   {
     id: 'me', pack: 'me', title: 'Parts of me (Me)',
     who: 'Parts on: Me → Parts of me. A card with its readout, a tender card, a resting card with its 30-day check-back, a set-aside row, then candidates.',
-    render: () => <MeHost />,
+    branches: [
+      { id: 'cards', label: 'The cards' },
+      { id: 'long', label: 'At its longest: a 40-character name, a 200-character job in their words, four places, three helped lines' },
+    ],
+    render: ({ branch }) => <MeHost long={branch === 'long'} />,
   },
   {
     id: 'reflect', pack: 'reflect', title: 'Reflect: parts',

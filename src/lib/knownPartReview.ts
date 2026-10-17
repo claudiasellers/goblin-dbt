@@ -14,7 +14,7 @@ import type {
 } from '../data/partsTypes';
 import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { partChipLabel } from './partTag';
-import { evidenceRows, trailStatement, type EvidenceRowView } from './trailOffer';
+import { evidenceRows, trailStatement, type EvidenceRowView } from './trailOfferCard';
 
 /** Rule D's block: the unnamed part's question, the three row answers, Done and Not now. */
 export const KNOWN_PART_REVIEW_PROMPTS = ['review_noname', 'part_unnamed_place', 'part_unnamed'] as const;

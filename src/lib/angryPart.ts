@@ -1,14 +1,14 @@
 /**
  * Pure rules for the angry-part card (docs/design/alexithymia-first-interaction.md, "Anger: the angry
  * part"; component: src/components/parts/AngryPartCard.tsx). Which wording each line takes, and the
- * order the hurts are offered in. All copy comes from the parts content (scripts/parts/content.py).
+ * order the hurts are offered in. All copy comes from the parts content (scripts/parts/content.py). The
+ * wording for one person at one moment is ./angryPartCopy.ts, which loads with the card.
  */
 import {
   ANGRY_LATER, ANGRY_LATER_DONE, ANGRY_LINES, ANGRY_NOT_NOW, ANGRY_OPTIONS, HOLD_HINT, type AngryCardContent, type AngryCardCopy,
-  type AngryContentHurt, type AngryHurt, type AngryLaterCopy, type AngryLineId, type AngryNotNowId,
+  type AngryContentHurt, type AngryHurt, type AngryLaterCopy, type AngryNotNowId,
 } from '../data/partsTypes';
 import type { PartsContent } from '../data/partsContentTypes';
-import { fill } from './invalidationRecovery';
 import { surfaceReady, type SurfaceIds } from './partsContent';
 
 /** The card is for the fire back urge: its move's OFTEN_GUARDS order is the chips' default order. */
@@ -100,60 +100,4 @@ export function orderHurts(all: AngryContentHurt[], canTouch: Record<string, str
     const h = byId.get(id)!;
     return { id: h.id, label: h.label, matters: h.matters!, feltPhrase: h.feltPhrase };
   });
-}
-
-/** Every string the card shows, for one person at one moment. */
-export interface ResolvedAngryCopy {
-  unblend: string;
-  unblendSub: string;
-  protects: string;
-  /** The vote of confidence, in order. */
-  vote: [string, string, string];
-  hold: string;
-  /** What a screen reader says with the hold (its aria-describedby). */
-  holdHint: string;
-  speak: string;
-  /** The person's own sentence ("I felt brushed off."); null after "Not sure". */
-  speakLine: string | null;
-  next: string;
-  notSure: string;
-  done: string;
-  /** Back on screens 2-4. */
-  back: string;
-  /** The quiet way past the hold once it was tried. */
-  voteNext: string;
-  /** The card's own way past, in this wording (the host's skip link on the first screen). */
-  notNow: string;
-}
-
-/**
- * The wording for (parts on or off, a first name or none, a hurt or "Not sure"). Parts off takes every
- * line's `_plain` twin, which never says "part". No name takes the `_noname` lines (second person).
- */
-export function resolveAngryCopy(copy: AngryCardCopy, { partsOn, name, hurt }: {
-  partsOn: boolean; name: string | null; hurt: Pick<AngryHurt, 'matters' | 'feltPhrase'> | null;
-}): ResolvedAngryCopy {
-  const first = name?.trim() || null;
-  const line = (id: AngryLineId) => copy[partsOn ? id : `${id}_plain` as const];
-  const slots = { name: first ?? '', matters: hurt?.matters ?? '', felt: hurt?.feltPhrase ?? '' };
-  const say = (id: AngryLineId) => fill(line(id), slots);
-  const vote1: AngryLineId = hurt
-    ? (first ? 'angry_vote' : 'angry_vote_noname')
-    : (first ? 'angry_vote_unsure' : 'angry_vote_unsure_noname');
-  return {
-    unblend: say('angry_unblend'),
-    unblendSub: say('angry_unblend_sub'),
-    protects: say('angry_protects'),
-    vote: [say(vote1), say('angry_vote_2'), say(first ? 'angry_vote_3' : 'angry_vote_3_noname')],
-    hold: say('angry_hold'),
-    holdHint: copy[HOLD_HINT],
-    speak: say(hurt ? 'angry_speak' : 'angry_speak_unsure'),
-    speakLine: hurt ? say('angry_speak_line') : null,
-    next: copy.angry_next,
-    notSure: copy.angry_not_sure,
-    done: copy.angry_done,
-    back: copy.angry_back,
-    voteNext: copy.angry_vote_next,
-    notNow: copy[angryNotNowId(partsOn)],
-  };
 }

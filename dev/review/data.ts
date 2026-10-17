@@ -89,6 +89,23 @@ export const ME_ITEMS: MeItem[] = [
   mePart('critic', 'set_aside', 'none', { jobIds: ['turn_job_not_again'], moveIds: ['turn_on_myself'] }),
 ];
 
+/**
+ * Parts of me at its longest, for the 390 px review: a 40-character name (nameMaxChars), a 200-character
+ * job in the person's own words (OWN_WORDS_MAX), four places, three helped lines and both feel-toward lines.
+ */
+export const LONG_NAME = 'the one who keeps checking all the texts';
+export const ME_LONG: MeItem[] = [{
+  ...mePart('chase', 'active', 'quiet', {
+    name: LONG_NAME, places: ['chest', 'throat', 'stomach', 'hands'], lastVisitedAt: '2026-10-14T19:00:00.000Z',
+    ownJob: 'make sure nobody I love can quietly drift away without me noticing first, so I keep checking, asking, reading every message twice, and I never get caught off guard by a goodbye I could see coming soon',
+    stats: {
+      helped: [{ toolId: 'pause', n: 4 }, { toolId: 'recovering-from-invalidation', n: 3 }, { toolId: 'cool-down', n: 2 }],
+      felt: { month: '2026-08', then: 'feel_annoyed', now: 'feel_warm' }, when: 'evenings',
+    },
+  }),
+  title: LONG_NAME,
+}];
+
 export const CANDIDATES: MePartCandidate[] = [
   { id: uuid(201), origin: 'worried_part', moveIds: ['hide'], createdAt: '2026-10-11T20:00:00.000Z' },
   { id: uuid(202), origin: 'angry_card', moveIds: ['hit_back'], createdAt: '2026-10-13T20:00:00.000Z' },

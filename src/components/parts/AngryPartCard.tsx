@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AngryCardCopy, AngryCardResult, AngryHurt, AngryLaterCopy, AngryStep } from '../../data/partsTypes';
-import { resolveAngryCopy } from '../../lib/angryPart';
+import { resolveAngryCopy } from '../../lib/angryPartCopy';
 import { Pill } from '../tools/invalidationRecovery/shared';
 import { linkButton, primaryButton } from '../tools/oppositeAction/styles';
 import { buzz } from '../tools/regulation/hooks';

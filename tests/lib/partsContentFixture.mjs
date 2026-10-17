@@ -1,7 +1,9 @@
 // The parts fixture (tests/fixtures/parts-content.json, every row with its reviewStatus) projected to
-// what src/data/content/parts.json ships: signed-off rows only, in buildParts' shape and order. The drift
+// what src/data/content/parts.json ships: signed-off rows only, in buildParts' shape and order, cut to the
+// same allowlist (shipParts, scripts/content-snapshot/partsAllowlist.mjs). The fixture itself keeps every
+// field (the dev harness and the content tests read it raw). The drift
 // guard compares the shipped file with this, so a content.py change without a graph load fails there.
-import { sortParts } from "../../scripts/content-snapshot/build.mjs";
+import { shipParts } from "../../scripts/content-snapshot/build.mjs";
 
 const signedOff = (row) => row.reviewStatus === "approved" && row.pending == null;
 /** A row without its bookkeeping: everything in parts.json is approved by construction. */
@@ -20,7 +22,7 @@ export function partsFromFixture(fixture, approve = null) {
       if (kept.length) (options[flow] ??= {})[step] = kept;
     }
   }
-  return sortParts({
+  return shipParts({
     // Every parts node carries content.py's VERSION, the policy node included.
     version: fixture.version,
     moves: moves.map(strip),

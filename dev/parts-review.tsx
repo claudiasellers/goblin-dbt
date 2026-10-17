@@ -8,10 +8,14 @@
  *   npx vite build --config dev/vite.harness.config.ts  →  dev-dist/dev/parts-review.html
  *   (cd dev-dist && python3 -m http.server 4321), then open http://localhost:4321/dev/parts-review.html
  *   node dev/review/check.mjs: every surface and branch at 390×844, screenshots, no errors
- * URL params: ?s=<surface>&b=<branch>, &ids=1 (each parts line's content id), &plain=1 (parts-off twins).
+ * Navigation is by the hash, never the query string (an Artifact frame needn't keep a query string across
+ * in-frame navigation): #s=<surface>&b=<branch>, &ids=1 (each parts line's content id), &plain=1 (parts-off
+ * twins); # is the index. A hash change swaps the screen in place, nothing reloads: the callable answers,
+ * the event list, the tag row's once-per-session memory and this origin's storage start fresh, the screen
+ * remounts and the page scrolls to the top. Only Show ids reloads (the copy is tagged when parts.json loads).
  * The old views stay on dev/parts.html (?view=meet|den|card|offer|angry).
  */
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createRoot } from 'react-dom/client';
 import { MemoryRouter } from 'react-router-dom';
 import '../src/index.css';
@@ -19,21 +23,27 @@ import { AuthProvider } from '../src/contexts/AuthContext';
 import { UserProfileProvider } from '../src/contexts/UserProfileContext';
 import { AuthBandProvider } from '../src/contexts/AuthBandProvider';
 import { DEFAULT_PROFILE } from '../src/services/neo4j';
-import { answers, REVIEW_USER, reviewEvents, type ReviewEvent } from './review/backend';
+import { answers, resetAnswers, REVIEW_USER, reviewEvents, type ReviewEvent } from './review/backend';
+import { resetTagRowAnswers } from '../src/lib/tagRowOnce';
 import { slices } from './review/data';
 import { drive, type DriveStep } from './review/driver';
 import { SKIPPED, SURFACES, type Surface } from './review/surfaces';
 import PACK from 'virtual:review-pack';
 
-const q = new URLSearchParams(location.search);
-const ids = q.get('ids') === '1';
-const plain = q.get('plain') === '1';
-const surface: Surface | null = SURFACES.find((s) => s.id === q.get('s')) ?? null;
-const branch = surface?.branches?.find((b) => b.id === q.get('b')) ?? surface?.branches?.[0] ?? null;
+interface Nav { surface: Surface | null; branch: NonNullable<Surface['branches']>[number] | null; ids: boolean; plain: boolean }
+function readNav(): Nav {
+  const q = new URLSearchParams(location.hash.slice(1));
+  const surface = SURFACES.find((s) => s.id === q.get('s')) ?? null;
+  const branch = surface?.branches?.find((b) => b.id === q.get('b')) ?? surface?.branches?.[0] ?? null;
+  return { surface, branch, ids: q.get('ids') === '1', plain: q.get('plain') === '1' };
+}
+/** Show ids is read once: the served parts copy is tagged when it loads (dev/review/ids.ts). */
+const IDS = readNav().ids;
 
 type Req = Record<string, unknown>;
 const ok = (d: unknown) => d as Req;
-answers({
+/** Every callable's default answer; a surface's setup overrides what it needs. */
+const defaults = () => answers({
   ensureUserExists: () => ({ success: true }),
   getUserProfile: () => ({
     profile: {
@@ -71,29 +81,41 @@ answers({
   tagPart: (d) => ({ id: ok(d).id, created: true }),
   deleteMyParts: () => ({ deleted: {} }),
 });
-if (surface && branch) surface.setup?.(branch.id);
-else surface?.setup?.('');
+
+/** A fresh page for one screen, without reloading: answers, events, the tag row's memory, storage. */
+function prepare(nav: Nav) {
+  resetAnswers();
+  defaults();
+  nav.surface?.setup?.(nav.branch?.id ?? '');
+  reviewEvents.clear();
+  resetTagRowAnswers();
+  for (const store of [window.sessionStorage, window.localStorage]) {
+    try { store.clear(); } catch { /* storage blocked: nothing to clear */ }
+  }
+}
 
 /** Plain wording runs the card's `_plain` twins: its hold has its own label, and it has no later line. */
-function stepsFor(steps: readonly DriveStep[]): DriveStep[] {
+function stepsFor(steps: readonly DriveStep[], plain: boolean): DriveStep[] {
   if (!plain) return [...steps];
   return steps.filter((s) => !('opt' in s && s.opt === 'angry_later'))
     .map((s) => ('press' in s && s.press === 'angry_hold' ? { press: 'angry_hold_plain' } : s));
 }
 
-const href = (p: Record<string, string | null>) => {
+/** A link to another screen of this page: the hash only (`#` is the index). */
+const ht = (nav: Nav, p: Record<string, string | null>) => {
   const n = new URLSearchParams();
-  for (const [k, v] of Object.entries({ s: surface?.id ?? null, b: branch?.id ?? null, ids: ids ? '1' : null, plain: plain ? '1' : null, ...p })) if (v) n.set(k, v);
+  const base = { s: nav.surface?.id ?? null, b: nav.branch?.id ?? null, ids: nav.ids ? '1' : null, plain: nav.plain ? '1' : null };
+  for (const [k, v] of Object.entries({ ...base, ...p })) if (v) n.set(k, v);
   const str = n.toString();
-  return str ? `?${str}` : location.pathname;
+  return str ? `#${str}` : '#';
 };
 
 const muted = 'text-xs text-[var(--color-text-tertiary)]';
 const pill = 'inline-flex items-center min-h-9 px-3 rounded-full border text-xs';
 
-function Toggle({ label, on, param, testId }: { label: string; on: boolean; param: string; testId: string }) {
+function Toggle({ nav, label, on, param, testId }: { nav: Nav; label: string; on: boolean; param: string; testId: string }) {
   return (
-    <a href={href({ [param]: on ? null : '1' })} role="switch" aria-checked={on} data-testid={testId}
+    <a href={ht(nav, { [param]: on ? null : '1' })} role="switch" aria-checked={on} data-testid={testId}
       className={`${pill} ${on ? 'border-[var(--color-border-accent)] text-[var(--color-text-primary)]' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'}`}>
       {label}: {on ? 'on' : 'off'}
     </a>
@@ -131,7 +153,7 @@ function Events() {
 const uncovered = PACK.filter((p) => !SURFACES.some((s) => s.pack === p.id));
 const unknown = SURFACES.filter((s) => !PACK.some((p) => p.id === s.pack));
 
-function Index() {
+function Index({ nav }: { nav: Nav }) {
   return (
     <div className="space-y-6">
       {PACK.map((p) => (
@@ -140,7 +162,7 @@ function Index() {
           <ul className="space-y-1">
             {SURFACES.filter((s) => s.pack === p.id).map((s) => (
               <li key={s.id}>
-                <a href={href({ s: s.id, b: null })} data-surface={s.id}
+                <a href={ht(nav, { s: s.id, b: null })} data-surface={s.id}
                   className="flex min-h-11 items-center px-3 rounded-lg border border-[var(--color-border-subtle)] text-[var(--color-text-primary)] hover:border-[var(--color-border-accent)]">{s.title}</a>
               </li>
             ))}
@@ -172,51 +194,78 @@ window.__reviewMap = {
   unknown: unknown.map((s) => s.id),
 };
 
-let drove = false;
-function SurfaceView({ s }: { s: Surface }) {
+/** One screen; remounted (by its key) for every hash change, so its branch is driven once per visit. */
+function SurfaceView({ s, nav }: { s: Surface; nav: Nav }) {
   const frame = useRef<HTMLDivElement>(null);
+  const branch = nav.branch;
   useEffect(() => {
-    if (drove || !frame.current) return;
-    drove = true;
-    void drive(frame.current, stepsFor(branch?.steps ?? []));
-  }, []);
+    if (!frame.current) return;
+    void drive(frame.current, stepsFor(branch?.steps ?? [], nav.plain));
+  }, [branch, nav.plain]);
   return (
     <div className="space-y-4">
       <div className="space-y-1">
-        <a href={href({ s: null, b: null })} className="inline-flex min-h-9 items-center text-sm text-[var(--color-text-secondary)]">← All surfaces</a>
+        <a href={ht(nav, { s: null, b: null })} className="inline-flex min-h-9 items-center text-sm text-[var(--color-text-secondary)]">← All surfaces</a>
         <h1 className="text-lg font-medium text-[var(--color-text-primary)]">{s.title}</h1>
         <p data-testid="who" className={muted}>{s.who}</p>
       </div>
       {s.branches && s.branches.length > 1 && (
         <nav aria-label="Branches" className="flex flex-wrap gap-1.5">
           {s.branches.map((b) => (
-            <a key={b.id} href={href({ b: b.id })} aria-current={b.id === branch?.id ? 'page' : undefined} data-branch={b.id}
+            <a key={b.id} href={ht(nav, { b: b.id })} aria-current={b.id === branch?.id ? 'page' : undefined} data-branch={b.id}
               className={`${pill} ${b.id === branch?.id ? 'border-[var(--color-border-accent)] text-[var(--color-text-primary)] font-medium' : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'}`}>{b.label}</a>
           ))}
         </nav>
       )}
       <div ref={frame} data-testid="surface" data-driven="pending" className="pt-2">
-        {s.render({ branch: branch?.id ?? '', plain })}
+        {s.render({ branch: branch?.id ?? '', plain: nav.plain })}
       </div>
       <Events />
     </div>
   );
 }
 
-function Review() {
+function Review({ nav }: { nav: Nav }) {
+  const key = `${nav.surface?.id ?? ''}/${nav.branch?.id ?? ''}/${nav.plain ? 'plain' : ''}`;
   return (
     <div className="min-h-screen text-[var(--color-text-primary)] px-4 py-5">
       <div className="max-w-[420px] mx-auto space-y-5">
         <header className="space-y-2">
           <p className={muted}>Parts review · fixture copy, every row treated as signed off · invented person · nothing is saved</p>
           <div className="flex flex-wrap gap-1.5">
-            <Toggle label="Show ids" on={ids} param="ids" testId="toggle-ids" />
-            {surface?.id === 'angry' && <Toggle label="Plain wording" on={plain} param="plain" testId="toggle-plain" />}
+            <Toggle nav={nav} label="Show ids" on={nav.ids} param="ids" testId="toggle-ids" />
+            {nav.surface?.id === 'angry' && <Toggle nav={nav} label="Plain wording" on={nav.plain} param="plain" testId="toggle-plain" />}
           </div>
         </header>
-        {surface ? <SurfaceView s={surface} /> : <Index />}
+        {nav.surface ? <SurfaceView key={key} s={nav.surface} nav={nav} /> : <Index nav={nav} />}
       </div>
     </div>
+  );
+}
+
+/** The selection lives in state, driven by `hashchange`: nothing reloads but a Show ids toggle. */
+function App() {
+  const [nav, setNav] = useState<Nav>(() => {
+    const n = readNav();
+    prepare(n);
+    return n;
+  });
+  useEffect(() => {
+    const onHash = () => {
+      const n = readNav();
+      if (n.ids !== IDS) { location.reload(); return; }
+      prepare(n);
+      setNav(n);
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+  const key = `${nav.surface?.id ?? 'review'}/${nav.branch?.id ?? ''}/${nav.plain ? 'plain' : ''}`;
+  return (
+    <MemoryRouter key={key} initialEntries={[{ pathname: `/tool/${nav.surface?.id ?? 'review'}`, state: nav.surface?.routeState?.(nav.branch?.id ?? '') ?? null }]}>
+      <Review nav={nav} />
+    </MemoryRouter>
   );
 }
 
@@ -224,9 +273,7 @@ createRoot(document.getElementById('root')!).render(
   <AuthProvider>
     <UserProfileProvider>
       <AuthBandProvider>
-        <MemoryRouter initialEntries={[{ pathname: `/tool/${surface?.id ?? 'review'}`, state: surface?.routeState?.(branch?.id ?? '') ?? null }]}>
-          <Review />
-        </MemoryRouter>
+        <App />
       </AuthBandProvider>
     </UserProfileProvider>
   </AuthProvider>,
