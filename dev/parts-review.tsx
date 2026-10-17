@@ -61,6 +61,11 @@ answers({
   answerPartRevisit: () => ({ version: 2 }),
   setPartAnchor: () => ({ version: 2 }),
   setPartShape: () => ({ version: 2 }),
+  answerTrailOffer: (d) => {
+    const r = ok(d);
+    const next = r.answer === 'yes' ? 'meet' : r.answer === 'more_than_one' ? 'candidates' : 'none';
+    return { offerId: r.offerId, status: 'answered', answer: r.answer, next, ...(r.answer === 'more_than_one' ? { candidateIds: r.candidateIds } : {}) };
+  },
   schedulePartCheckback: (d) => ({ id: ok(d).id }),
   answerPartCheckback: (d) => ({ status: 'done', aftercare: ok(d).answer === 'louder' }),
   tagPart: (d) => ({ id: ok(d).id, created: true }),
