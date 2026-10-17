@@ -3,8 +3,8 @@ import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
 import { getToolById } from '../../data/tools';
 import type { PartsContent } from '../../data/partsContentTypes';
-import type { PartReflect } from '../../data/partsTypes';
-import { hasStatLine, monthName, partStatLines, reflectPartsReady } from '../../lib/partStats';
+import type { PartReflect, PartsFeel } from '../../data/partsTypes';
+import { hasStatLine, monthName, partStatLines, partsFeelLines, reflectPartsReady } from '../../lib/partStats';
 import { partChipLabel } from '../../lib/partTag';
 import { PartFigure } from '../parts/PartFigure';
 
@@ -18,10 +18,10 @@ const month = (m: string) => monthName(m);
  * as they kept it, tool names from src/data/tools.ts. No numbers but the counts the copy carries, no
  * part count, no chart. Parts off, no part with a line, or any line not shipped: nothing at all.
  */
-export function PartsReflect({ parts, delay = 0 }: { parts: PartReflect[]; delay?: number }) {
+export function PartsReflect({ parts, feel = null, delay = 0 }: { parts: PartReflect[]; feel?: PartsFeel | null; delay?: number }) {
   const partsOn = useUserProfile().profile.partsEnabled;
   const [content, setContent] = useState<PartsContent | null>(null);
-  const wanted = partsOn && parts.length > 0;
+  const wanted = partsOn && (parts.length > 0 || !!feel);
   useEffect(() => {
     if (!wanted || content) return;
     let live = true;
@@ -33,7 +33,10 @@ export function PartsReflect({ parts, delay = 0 }: { parts: PartReflect[]; delay
   const blocks = parts
     .map((p) => ({ p, lines: partStatLines(p.stats, content, { toolName, monthName: month }) }))
     .filter((b) => hasStatLine(b.lines));
-  if (blocks.length === 0) return null;
+  // Above the blocks: how they've met their parts lately, across all of them (optional lines).
+  const across = partsFeelLines(feel, content);
+  const hasBlocks = blocks.length > 0;
+  if (!hasBlocks && !across) return null;
   const title = content.prompts.reflect_title.copy;
 
   return (
@@ -43,7 +46,12 @@ export function PartsReflect({ parts, delay = 0 }: { parts: PartReflect[]; delay
       style={{ animation: `fadeIn 0.5s var(--ease-default) ${delay}s both` }}
     >
       <h3 className="text-xs font-semibold uppercase tracking-wider text-[var(--color-text-tertiary)] mb-4">{title}</h3>
-      <ul className="divide-y divide-[var(--color-border-subtle)]">
+      {across && (
+        <div className={`space-y-0.5 ${hasBlocks ? 'mb-4' : ''}`} data-testid="parts-feel">
+          {across.map((l) => <p key={l} className="text-sm text-[var(--color-text-primary)]">{l}</p>)}
+        </div>
+      )}
+      {hasBlocks && <ul className="divide-y divide-[var(--color-border-subtle)]">
         {blocks.map(({ p, lines }) => (
           <li key={p.id} className="flex items-start gap-3 py-4 first:pt-0 last:pb-0">
             <PartFigure shapeSig={p.shapeSig} size={44} className="flex-shrink-0" />
@@ -70,7 +78,7 @@ export function PartsReflect({ parts, delay = 0 }: { parts: PartReflect[]; delay
             </div>
           </li>
         ))}
-      </ul>
+      </ul>}
     </section>
   );
 }

@@ -9,6 +9,7 @@ const assert = require('node:assert/strict');
 const { loadFunctions, fakeDriver } = require('./fakeDriver.cjs');
 const {
   STATS_THRESHOLDS, helpedFor, feltFor, whenFor, whenBand, localTime, partStats, statsByPart, partsReflect, hasLine, stepsFor,
+  feelAcross, partsFeel,
 } = require('../../lib/parts/stats');
 const {
   STATS_USER_QUERY, STATS_PARTS_QUERY, STATS_TAGS_QUERY, STATS_SESSIONS_QUERY, STATS_STEPS_QUERY, readStatsRows,
@@ -26,6 +27,7 @@ const visit = (firstFeel, day, month = 7, partId = 'p1') => ({ partId, at: at(10
 test('the thresholds are the agreed numbers', () => {
   assert.deepEqual({ ...STATS_THRESHOLDS }, {
     helpedMinTags: 3, helpedMaxTools: 3, feltMinPerHalf: 3, whenMinTags: 3, stepsMinSessions: 2, stepsMaxSteps: 3,
+    feelDays: 30, feelMinPerHalf: 4, feelMinShare: 0.4,
   });
 });
 
@@ -358,4 +360,73 @@ test('steps query: Do the Opposite and Recover only, the step picked by id, own 
     assert.match(ret, /AS partId, .*stepId, .*label, .*AS at$/);
   }
   assert.deepEqual([...q.matchAll(/toolId: '([\w-]+)'/g)].map((m) => m[1]), ['opposite-action', 'recovering-from-invalidation']);
+});
+
+// ------------------------------------------------------------------ Reflect: how they've met their parts lately, across all of them
+
+const NOW = new Date(Date.UTC(2026, 9, 17, 12)); // 17 Oct 2026
+/** A first feel-toward answer `daysAgo` days before NOW, of any part. */
+const ago = (firstFeel, daysAgo, partId = 'p1') => ({ partId, at: new Date(NOW.getTime() - daysAgo * 86_400_000).toISOString(), firstFeel });
+
+test('feelAcross: the last 30 days, at least 4 answers, the most common holding 40%; else nothing', () => {
+  const later = [ago('feel_curious', 1), ago('feel_curious', 3, 'p2'), ago('feel_tired', 5, 'p3'), ago('feel_steady', 8)];
+  assert.deepEqual(feelAcross(later, NOW), { now: 'feel_curious', then: null }, '2 of 4 = 50%, across three parts');
+  assert.equal(feelAcross(later.slice(0, 3), NOW), null, 'three answers: no line');
+  // 2 of 6 = 33% < 40%: no clear answer, no line
+  const spread = [...later, ago('feel_open', 9), ago('feel_warm', 10)];
+  assert.equal(feelAcross(spread, NOW), null);
+  // exactly 40%: 2 of 5
+  assert.deepEqual(feelAcross([...later, ago('feel_open', 9)], NOW), { now: 'feel_curious', then: null });
+  // older than 30 days, or in the future, isn't "lately"
+  assert.equal(feelAcross([ago('feel_curious', 31), ago('feel_curious', 32), ago('feel_curious', 33), ago('feel_curious', 34)], NOW), null);
+  assert.equal(feelAcross([ago('feel_curious', -1), ago('feel_curious', 2), ago('feel_curious', 3), ago('feel_curious', 4)], NOW), null);
+});
+
+test('feelAcross: the earlier line only when the 30 days before have their own clear answer and it differs', () => {
+  const later = [ago('feel_curious', 1), ago('feel_curious', 2), ago('feel_warm', 3), ago('feel_curious', 4)];
+  const earlier = [ago('feel_scared', 31), ago('feel_scared', 40), ago('feel_annoyed', 45), ago('feel_scared', 59)];
+  assert.deepEqual(feelAcross([...earlier, ...later], NOW), { now: 'feel_curious', then: 'feel_scared' });
+  assert.deepEqual(feelAcross([...earlier.map((e) => ({ ...e, firstFeel: 'feel_curious' })), ...later], NOW), { now: 'feel_curious', then: null }, 'the same: no earlier line');
+  assert.deepEqual(feelAcross([...earlier.slice(0, 3), ...later], NOW), { now: 'feel_curious', then: null }, 'three earlier answers: not enough');
+  assert.deepEqual(feelAcross([...earlier, ago('feel_scared', 61), ...later], NOW), { now: 'feel_curious', then: 'feel_scared' }, 'older than 60 days ignored');
+  assert.equal(feelAcross(earlier, NOW), null, 'nothing lately: no line at all, not even the earlier one');
+});
+
+test('feelAcross: non-answers never count; a tie goes to the most recent answer', () => {
+  const later = [ago('feel_curious', 1), ago('feel_curious', 2), ago('feel_warm', 3), ago('feel_curious', 4)];
+  for (const non of ['feel_not_sure', 'feel_nothing']) {
+    assert.equal(feelAcross([ago(non, 1), ago(non, 2), ago(non, 3), ago('feel_curious', 4)], NOW), null, `${non} is not an answer`);
+    assert.deepEqual(feelAcross([...later, ago(non, 0.5), ago(non, 0.6), ago(non, 0.7)], NOW), { now: 'feel_curious', then: null }, `${non} doesn't dilute`);
+  }
+  // 2 and 2: the one given most recently wins, whichever way the rows arrive
+  const tie = [ago('feel_steady', 2), ago('feel_tired', 6), ago('feel_tired', 4), ago('feel_steady', 8)];
+  assert.deepEqual(feelAcross(tie, NOW), { now: 'feel_steady', then: null });
+  assert.deepEqual(feelAcross([...tie].reverse(), NOW), { now: 'feel_steady', then: null });
+});
+
+test('partsFeel: parts off nothing; active and resting parts only; ids only', () => {
+  const sessions = [ago('feel_curious', 1), ago('feel_curious', 2, 'p2'), ago('feel_curious', 3, 'p3'), ago('feel_open', 4, 'p1')];
+  assert.deepEqual(partsFeel(rows({ sessions }), NOW), { now: 'feel_curious', then: null });
+  assert.equal(partsFeel(rows({ sessions, partsOn: false }), NOW), null);
+  const aside = rows({ sessions, parts: rows().parts.map((p) => (p.id === 'p3' ? { ...p, status: 'set_aside' } : p)) });
+  assert.equal(partsFeel(aside, NOW), null, "a set-aside part's visit isn't counted: three answers left");
+  assert.equal(partsFeel(rows({ sessions: sessions.map((s) => ({ ...s, partId: 'stranger' })) }), NOW), null);
+});
+
+test('getInsightsData: partsFeel from the same read; null with parts off', async () => {
+  const day = (d) => new Date(Date.now() - d * 86_400_000).toISOString();
+  let f = reflectDriver({ on: false });
+  setDriver(f.driver);
+  let out = await fns.getInsightsData.run({ auth: auth(), data: {} });
+  assert.equal(out.partsFeel, null);
+  f = reflectDriver({
+    on: true,
+    parts: [{ id: 'p1', name: 'The guard', status: 'active', firstPlace: null, shapeSig: null }],
+    sessions: [1, 2, 3, 4].map((d) => ({ partId: 'p1', at: day(d), firstFeel: d === 4 ? 'feel_open' : 'feel_curious' })),
+  });
+  setDriver(f.driver);
+  out = await fns.getInsightsData.run({ auth: auth(), data: {} });
+  assert.deepEqual(out.partsFeel, { now: 'feel_curious', then: null });
+  assert.equal(f.calls.filter((c) => /HAS_PART_SESSION/.test(c.query)).length, 1, 'one read for both');
+  assert.ok(!JSON.stringify(out.partsFeel).includes('feel_open'), 'only the most common id leaves the server');
 });

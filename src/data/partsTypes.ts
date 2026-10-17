@@ -364,6 +364,13 @@ export interface PartReflect {
   stats: PartStats;
 }
 
+/**
+ * Reflect's line across all the person's parts: the most common FIRST feel-toward answer (a meet/feel
+ * option id) of their Meet a part visits in the last 30 days (`now`) and in the 30 days before (`then`,
+ * null unless it differs and is past its own threshold). Ids only; null below the threshold.
+ */
+export interface PartsFeel { now: string; then: string | null }
+
 // --- The den: mirror of functions/src/parts/denTypes.ts (tests/parts-entry.test.mjs) ---
 
 /** `covers_for`: `aId` stands in front of `bId`. `two_pulls`: the two pull against each other (Two pulls writes it). */

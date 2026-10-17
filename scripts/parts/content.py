@@ -452,6 +452,11 @@ PROMPTS = [
     ("stats_steps", "common", "stats", "Steps that helped: {steps}"),
     ("stats_step_twice", "common", "stats", "{step} (twice)"),
     ("stats_step_times", "common", "stats", "{step} ({n} times)"),
+    # Reflect, above the parts' blocks: how the person has met their parts lately, across all of them
+    # (each visit's first feel-toward answer, the last 30 days against the 30 before). {feel}: a meet/feel
+    # chip label, lower-case. The earlier line only when it has changed. Optional: the section shows without.
+    ("stats_feel_lately", "common", "stats", "Lately, meeting your parts, you've mostly been {feel}."),
+    ("stats_feel_earlier", "common", "stats", "Earlier, more often {feel}."),
     # Every press-and-hold (Meet a part's thank and tender holds, the angry card's vote): what a screen
     # reader says with the hold's own label (aria-describedby). A quick key press, a switch or a screen
     # reader's activation fills it hands-free (LightHold's HoldButton), so "press once" is true for them.
