@@ -4,6 +4,8 @@ import { getToolById } from '../../data/tools';
 import type { TodayItem } from '../../services/spine';
 import { answerToolOutcome, dismissFollowUp, resolveFollowUp, snoozeFollowUp } from '../../services/spine';
 import { fillToolName, LATER_HOURS, outcomeAnswer } from '../../lib/spine/todayCard';
+import { RECOVER_FOLLOW_UP_TYPES } from '../../lib/spine/wrap';
+import { CopeAheadEntryLink } from '../tools/copeAhead/CopeAheadEntryLink';
 
 /**
  * One Today card (PR-S5): a follow-up resolved in place (inline types), a deep link (resume), or the
@@ -74,18 +76,22 @@ export function TodayCard({ item, onDone, compact = false }: { item: TodayItem; 
           ))}
         </div>
       )}
+      {/* Recover's Rehearse the next time: a way to walk it through in Cope Ahead. The follow-up is unchanged. */}
+      {item.type === RECOVER_FOLLOW_UP_TYPES.rehearse && (
+        <CopeAheadEntryLink copyKey="entry_recover" situationId="someone" />
+      )}
       {failed && (
         <p role="status" className="mt-2 text-xs text-[var(--color-text-secondary)]">That didn't save. Try again when you're ready.</p>
       )}
       <div className="mt-1 flex justify-end gap-4">
         {item.kind === 'follow_up' && (
           <button type="button" disabled={busy} onClick={later}
-            className="min-h-11 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
+            className="min-h-11 min-w-11 px-1 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
             Later
           </button>
         )}
         <button type="button" disabled={busy} onClick={notNow}
-          className="min-h-11 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
+          className="min-h-11 min-w-11 px-1 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)]">
           {item.kind === 'tool_outcome' ? 'Skip' : 'Not any more'}
         </button>
       </div>
