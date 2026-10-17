@@ -24,6 +24,7 @@ const HOSTS = {
   "src/pages/ToolPage.tsx": [["MeetAPart", "LazyMeetAPart", "loadMeetAPart"]],
   "src/pages/tools/InvalidationRecovery.tsx": [["AngryPartCard", "LazyAngryPartCard", "loadAngryCard"]],
   "src/pages/tools/DearMan.tsx": [["CopeAheadStep", "LazyCopeAheadStep", "loadCope"], ["DebriefWho", "LazyDebriefWho", "loadWho"]],
+  "src/pages/tools/CopeAhead.tsx": [["CopeAheadStep", "LazyCopeAheadStep", "loadCope"], ["PlanAnchor", "LazyPlanAnchor", "loadAnchor"]],
   "src/pages/tools/ProblemSolve.tsx": [["PartLaterLine", "LazyPartLaterLine", "loadLater"]],
   "src/App.tsx": [["PartsDenPage", "LazyPartsDenPage"]],
   "src/hooks/useStepBackSlot.tsx": [["StepBackScreen", "LazyStepBackScreen", "loadStepBack"]],
@@ -62,11 +63,14 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part, Two pulls and Wise mind are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
+test("Meet a part, Two pulls, Wise mind and Cope Ahead are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 3, "three lazy tools");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 4, "four lazy tools");
+  // Cope Ahead (not a parts surface): its own chunk, for everyone.
+  assert.match(page, /const loadCopeAhead = \(\) => import\('\.\/tools\/CopeAhead'\);/);
+  assert.match(page, /'cope-ahead': CopeAhead,/);
   // Wise mind (not a parts surface): its own chunk, for everyone.
   assert.match(page, /const loadWiseMind = \(\) => import\('\.\/tools\/WiseMind'\);/);
   assert.match(page, /const LazyWiseMind = lazy\(\(\) => loadWiseMind\(\)\.then\(\(m\) => \(\{ default: m\.WiseMind \}\)\)\);/);

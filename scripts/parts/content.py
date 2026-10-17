@@ -535,6 +535,10 @@ PROMPTS = [
     # DEAR MAN cope ahead (parts.md, DEAR MAN row and Phase 3): one screen in prep, after "What makes
     # this hard?" and before the script. A part's anchor is the person's own words or a line they kept.
     ("cope_title", "dearman", "cope", "Who might show up in this conversation?"),
+    # The same step reused in Cope Ahead (docs/design/cope-ahead.md, screen 2), where "there" may not be a
+    # conversation: CopeAheadStep's titleId. Cope Ahead's gate is COPE_AHEAD_PARTS_REQUIRED (COPE_REQUIRED
+    # plus this); DEAR MAN's is unchanged.
+    ("cope_title_any", "dearman", "cope", "Who might show up there?"),
     # Brief: "If {name} shows up: {anchor}". With {anchor} at its width (90, the person's own words or a
     # kept line) that is 128 / 113 characters, over the prompt's 90, so the anchor is not a slot: the
     # app draws it on its own line under this one, in the serif, never linted.
@@ -632,6 +636,8 @@ PROMPTS = [
     ("den_remove", "den", "thread", "Remove this thread"),
     ("den_then", "den", "then", "How it looked in {month}"),
     ("den_now", "den", "then", "Now"),
+    # Under the room while the comparison is open, in place of the month links: closes it.
+    ("den_back_now", "den", "then", "Back to now"),
     # Wise mind's step back (docs/design/wise-mind.md, 2p; parts on, at least one kept part): the room
     # from the den, small, the light in the middle. The light is the person and is never labelled, never
     # called Self. Parts are asked to take a step back so the person can listen, never to leave or stop.

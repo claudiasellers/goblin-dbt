@@ -8,6 +8,7 @@
 import type { Band } from '../data/capacityTypes';
 import type { PartsContent, PartsOption } from '../data/partsContentTypes';
 import type { ProfileSlices } from '../data/profileTypes';
+import { anchorableLine } from '../data/partsTypes';
 import { fillParts, promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 import { partChipLabel as unnamedOrName, UNNAMED_PROMPTS } from './partTag';
 
@@ -29,6 +30,17 @@ export const COPE_OWN_MAX = 90;
 
 export function copeReady(content: PartsContent | null): boolean {
   return !!content && surfaceReady(content, COPE_REQUIRED);
+}
+
+/**
+ * Cope Ahead's screen 2 reuses this step with its own title (`cope_title_any`, "Who might show up there?":
+ * the situation may not be a conversation). Its gate is DEAR MAN's plus that title; DEAR MAN's is unchanged.
+ */
+export const COPE_AHEAD_TITLE = 'cope_title_any';
+export const COPE_AHEAD_PARTS_REQUIRED: SurfaceIds = { prompts: [...COPE_PROMPTS, COPE_AHEAD_TITLE], options: COPE_OPTIONS };
+
+export function copeAheadPartsReady(content: PartsContent | null): boolean {
+  return !!content && surfaceReady(content, COPE_AHEAD_PARTS_REQUIRED);
 }
 
 export interface CopeGate {
@@ -96,16 +108,19 @@ export interface KeptLine { lineId: string; text: string; at: string | null }
 
 /**
  * The lines they've kept, to pick an anchor from: their own ("say it my way") and the witness lines
- * they kept, newest first, at most four, empty text dropped and the same words once.
+ * they kept, newest first, at most four, empty text dropped and the same words once. Only lines that
+ * read as an anchor (anchorableLine, the rule setPartAnchor enforces too): none over 90 characters, and
+ * never a Cope Ahead plan kept in My words.
  */
 export function keptLines(
   ownLines: ProfileSlices['ownLines'] | null | undefined,
   savedLines: ProfileSlices['savedLines'] | null | undefined,
 ): KeptLine[] {
   const all: KeptLine[] = [
-    ...(ownLines ?? []).map((o) => ({ lineId: o.id, text: o.text, at: o.meta?.confirmedAt ?? o.lastUsedAt ?? null })),
-    ...(savedLines ?? []).map((l) => ({ lineId: l.lineId, text: l.text, at: l.confirmedAt })),
-  ].filter((l) => typeof l.text === 'string' && l.text.trim() !== '');
+    ...(ownLines ?? []).filter((o) => anchorableLine(o))
+      .map((o) => ({ lineId: o.id, text: o.text, at: o.meta?.confirmedAt ?? o.lastUsedAt ?? null })),
+    ...(savedLines ?? []).filter((l) => anchorableLine(l)).map((l) => ({ lineId: l.lineId, text: l.text, at: l.confirmedAt })),
+  ];
   const t = (at: string | null) => (at ? Date.parse(at) || 0 : 0);
   const sorted = all.map((l, i) => ({ l, i })).sort((a, b) => t(b.l.at) - t(a.l.at) || a.i - b.i).map((x) => x.l);
   const seen = new Set<string>();

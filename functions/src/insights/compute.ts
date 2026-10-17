@@ -18,6 +18,7 @@
  */
 import { RESERVED_TOOL_IDS } from '../spine/types';
 import { NOT_WHAT_HELPS } from '../spine/tools';
+import { COPE_AHEAD_TOOL } from '../spine/copeAheadAfter';
 import type {
   CheckInRow, GrowthEvidenceInsight, GrowthInsight, LegacyUsageRow, OutcomeDirection, OutcomeMeasure, PatternFrequency, SessionRow,
   SomaticCorrelationData, TimeRange, ToolEffectivenessData, ToolOutcomeSummary,
@@ -135,10 +136,18 @@ const DIRECTION: Record<string, OutcomeDirection> = { regulation_down: 'down', o
  * Answered closes, newest first. Sessions answer then-vs-now or the urge question; a pre-spine
  * rating maps back through D-03 read in reverse (helped ↔ much better, somewhat ↔ better,
  * not really ↔ same or worse), so "somewhat" counts as went well, like "better" does.
+ *
+ * Cope Ahead asks nothing at its close: its outcome is the after card's "Did your plan help?" (Used it,
+ * it helped is a visit that went well; not sure and didn't use it are answered, not well; Skip is no
+ * answer). It credits Cope Ahead only, never the move's tool: the app never saw that tool used.
  */
 export function outcomeRows(sessions: SessionRow[], legacy: LegacyUsageRow[]): OutcomeRow[] {
   const rows: OutcomeRow[] = [];
   for (const s of sessions) {
+    if (s.toolId === COPE_AHEAD_TOOL) {
+      if (s.planHelped) rows.push({ toolId: s.toolId, patternId: s.patternId, at: s.at, measure: 'plan', direction: null, wentWell: s.planHelped === 'helped' });
+      continue;
+    }
     // Meet a part's "more here" is not "it went well" (docs/design/parts.md): never counted.
     if (!isAppTool(s.toolId) || NOT_WHAT_HELPS.includes(s.toolId)) continue;
     if (s.thenVsNow) {

@@ -191,6 +191,16 @@ export const JOB_HISTORY_MAX = 10;
  */
 export interface SetPartAnchorRequest { partId: string; lineId?: string; own?: string }
 export const ANCHOR_MAX_CHARS = 90;
+/**
+ * A kept line reads as an anchor only when it is short and is not a Cope Ahead plan: an own line kept from
+ * the `cope_ahead` moment is a whole "If …, I'll …" sentence (kept in My words, never offered as an anchor).
+ * The picker (src/lib/copeAhead.ts keptLines) and setPartAnchor (keep.ts) apply the same rule.
+ */
+export const ANCHOR_EXCLUDED_MOMENTS: readonly string[] = ['cope_ahead'];
+export function anchorableLine(line: { text: string; moment?: string | null }): boolean {
+  const t = typeof line.text === 'string' ? line.text.trim() : '';
+  return t.length > 0 && t.length <= ANCHOR_MAX_CHARS && !ANCHOR_EXCLUDED_MOMENTS.includes(line.moment ?? '');
+}
 
 /**
  * Find the feeling's "Use this shape for {name}?": the part takes the shape of that visit (the caller's own
@@ -203,10 +213,12 @@ export interface SetPartShapeRequest { partId: string; toolSessionId: string }
  * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's
  * debrief, "who showed up?"), `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
  * functions/src/parts/offers/review.ts) or `wise_mind` (the parts the person placed in Wise mind's step
- * back, on that visit's own ToolSession, open or closed; one per session and part).
+ * back, on that visit's own ToolSession, open or closed; one per session and part) or `cope_ahead`
+ * (Cope Ahead's after card, "Used it, it helped", for the part the visit named: written by the server in
+ * that resolve, never through tagPart; one per session).
  */
-export type TagSource = 'close' | 'debrief' | 'review' | 'wise_mind';
-export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review', 'wise_mind'];
+export type TagSource = 'close' | 'debrief' | 'review' | 'wise_mind' | 'cope_ahead';
+export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review', 'wise_mind', 'cope_ahead'];
 /** A debrief tag's answer: Yes or A bit (No and Skip write nothing). */
 export type TagStrength = 'yes' | 'a_bit';
 export const TAG_STRENGTHS: readonly TagStrength[] = ['yes', 'a_bit'];

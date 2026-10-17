@@ -6,7 +6,7 @@
 import { ValidationError, graphId, obj, oneOf, str, strArray, uuid } from '../shared/validate';
 import { BANDS, type Band } from '../capacity/types';
 import {
-  LANDED, OWN_LINE_MAX, WITNESS_MOMENTS,
+  LANDED, OWN_LINE_MAX, OWN_LINE_MAX_BY_MOMENT, WITNESS_MOMENTS,
   type GetWitnessLinesRequest, type Landed, type RecordWitnessBeatRequest, type WitnessMoment,
 } from './types';
 
@@ -41,12 +41,12 @@ export function parseGetWitnessLines(data: unknown): ParsedGetWitnessLines {
   };
 }
 
-/** Own-line text: control characters stripped (newlines become spaces), trimmed, 1…140 characters. */
-export function cleanOwnLineText(v: unknown): string {
+/** Own-line text: control characters stripped (newlines become spaces), trimmed, 1…140 characters (or the moment's own limit). */
+export function cleanOwnLineText(v: unknown, max: number = OWN_LINE_MAX): string {
   if (typeof v !== 'string') throw new ValidationError('Expected a string');
   // eslint-disable-next-line no-control-regex
   const t = v.replace(/[\r\n\t]+/g, ' ').replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028\u2029\u202a-\u202e\u2066-\u2069]/g, '').replace(/ {2,}/g, ' ').trim();
-  if (!t.length || t.length > OWN_LINE_MAX) throw new ValidationError(`Expected 1 to ${OWN_LINE_MAX} characters`);
+  if (!t.length || t.length > max) throw new ValidationError(`Expected 1 to ${max} characters`);
   return t;
 }
 
@@ -80,7 +80,7 @@ export function parseRecordWitnessBeat(data: unknown): RecordWitnessBeatRequest 
     const situationId = optGraphId(o.situationId);
     out.ownLine = {
       id: uuid(o.id),
-      text: cleanOwnLineText(o.text),
+      text: cleanOwnLineText(o.text, OWN_LINE_MAX_BY_MOMENT[out.moment] ?? OWN_LINE_MAX),
       emotionIds: o.emotionIds === undefined || o.emotionIds === null ? [] : strArray(o.emotionIds, { max: 5, item: graphId }),
       ...(situationId ? { situationId } : {}),
     };

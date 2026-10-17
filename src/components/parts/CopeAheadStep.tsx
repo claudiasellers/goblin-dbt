@@ -22,7 +22,7 @@ const chipOn = 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] bord
  * or the person's own; the host renders this only when `showCopeAhead` says so. A failed save keeps the
  * form as it was and says so under Save (cope_save_failed).
  */
-export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, onAnchor, onGoOn }: {
+export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, onAnchor, onGoOn, titleId = 'cope_title' }: {
   content: PartsContent;
   /** The part chips (copeParts: slice order, at most four). */
   parts: ProfileSlices['parts'];
@@ -36,6 +36,8 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   onAnchor: (partId: string, text: string, version: number) => void;
   /** Not sure / Skip: on to the script. */
   onGoOn: () => void;
+  /** The question's prompt id: DEAR MAN's `cope_title`, or Cope Ahead's `cope_title_any` (COPE_AHEAD_TITLE). */
+  titleId?: 'cope_title' | 'cope_title_any';
 }) {
   const [editing, setEditing] = useState(false);
   const [lineId, setLineId] = useState<string | null>(null);
@@ -46,7 +48,7 @@ export function CopeAheadStep({ content, parts, anchors, lines, picked, onPick, 
   const [failed, setFailed] = useState(false);
   const panel = useRef<HTMLDivElement>(null);
 
-  const title = promptCopy(content, 'cope_title') ?? '';
+  const title = promptCopy(content, titleId) ?? '';
   const c = copeChips(content);
   const part = parts.find((p) => p.id === picked) ?? null;
   const anchor = part ? anchors[part.id] ?? null : null;

@@ -4,8 +4,9 @@ A tool for something hard that's coming: name it, say what might show up, pick w
 hardest moment, rehearse it in your mind as if it's happening, settle, and keep the plan. Afterwards,
 Today asks how it went.
 
-Status: **designed 17 Oct 2026, not built.** It's the recommended answer on Claudia's "what next" card.
-Work starts on it while the card is open, and it stops if she picks another option.
+Status: **built 17 Oct 2026**, listed under Emotion Regulation for everyone. Its content isn't gated on
+sign-off; the parts step waits for the parts copy like every parts surface. It was the recommended
+answer on Claudia's "what next" card and was built while the card was open. *As built* is at the end.
 
 ---
 
@@ -88,9 +89,11 @@ Today asks afterwards (screen 7).
 - **A danger chip** shows `CrisisBanner` compact under the screen, alongside, never instead, and the
   flow goes on. Two of them:
   - *They might hurt me* (on *A conversation I'm dreading* and *Seeing someone in particular*): the
-    plan's first move becomes *Leave and get somewhere safe*.
+    plan's first move becomes *Leave and get somewhere safe*. The banner is the `other_person` variant,
+    because a crisis line is the wrong first call when the danger is another person: *"If you're in danger
+    now, call 911."*, then the National Domestic Violence Hotline (call or text), with 988 last.
   - *I might hurt myself* (on *A day that's hard every year* and *Being on my own*): the first move
-    becomes *Call or text someone who can help, now*.
+    becomes *Call or text someone who can help, now*. The banner is the default one.
 
   The person can still change the move. Nothing is blocked, and the visit saves as usual.
 
@@ -98,13 +101,13 @@ Today asks afterwards (screen 7).
 
 The plan is one if-then line built from taps:
 
-> **If** *I go blank* **, I'll** *breathe out longer than in* **and** *say "Give me a minute."*
+> **If** *I go blank* **, I'll** *breathe out longer than in* **and** *say “Give me a minute.”*
 
 - **If:** the hardest moment from screen 3, or the pull from screen 2 ("If I start to shut down").
   The person can switch between them.
 - **I'll:** 1–2 moves from `CopeMove`, filtered by the pull and the situation. A move is either:
   - **body** — *Breathe out longer than in*, *Feel my feet on the floor*, *Cold water on my hands*;
-  - **words** — *Say "Give me a minute"*, *Say the one thing I came to say*;
+  - **words** — *Say “Give me a minute”*, *Say the one thing I came to say*;
   - **action** — *Step out for five minutes*, *Text someone I trust*, *Leave and get somewhere safe*;
   - **a tool**, linked by `appToolId` — *Pause*, *5-4-3-2-1*, *Circuit Breaker*, *Urge Surfing*
     (only tools that work in the moment; DEAR MAN is prep, not a move).
@@ -173,10 +176,13 @@ makes.
 
 - **Tools:** Emotion Regulation, listed for everyone.
 - **Intents:** *"Something's coming up that I'm dreading"* → Cope Ahead.
+- **The link contract** (`src/lib/copeAheadEntry.ts`): `/tool/cope-ahead?first=<situationId>&part=<partId>`.
+  The situation chip comes first, never pressed. The part is preset in the parts step only if it's one of
+  the person's kept parts, and they can change it.
 - **DEAR MAN:** on the summary, *"Rehearse it"* opens Cope Ahead with *A conversation I'm dreading*
-  first (not pre-selected) and the person's chosen part carried in.
+  first (not pre-selected) and the person's chosen part carried in (parts on only).
 - **Recover:** *Rehearse the next time* (`recover_rehearse` on Today) gains a link, *"Walk through it
-  with Cope Ahead"*. The follow-up itself is unchanged.
+  with Cope Ahead"*, with *Seeing someone in particular* first. The follow-up itself is unchanged.
 - **The check-in result:** the anticipatory row (*anxious*, *nervous* → `cope-ahead`) goes live only
   when Claudia signs off that row, as with Wise mind. The tool lands with the row still switched off.
 
@@ -202,8 +208,8 @@ makes.
   - `feelIds`, `pullIds`, `partId`;
   - `hardMomentId`, `hardMomentOwn`, `ifFrom` (`moment` | `pull`);
   - `moveIds`, `moveOwn`;
-  - `rehearsed` (1 | 2), `newMomentId`, `settle` (`breath` | `five_senses` | `ok`), `kept`,
-    `followUp`.
+  - `rehearsed` (1 | 2), `newMomentId`, `newMomentOwn`, `newMoveIds`, `newMoveOwn` (the once-more
+    pass), `settle` (`breath` | `five_senses` | `ok`), `kept`, `followUp`.
 
   It is registered in `extSchemas.ts`. The `*Own` fields are length-checked only.
 - **The follow-up:** a new `FollowUpType` `cope_ahead_after` in practice-spine content.
@@ -294,9 +300,9 @@ those moments, first.
 | `feet` | body | Feel my feet on the floor | feel my feet on the floor | hide, blank, fight | yes | |
 | `cold_water` | body | Cold water on my hands | put cold water on my hands | fight, chase, blank | | |
 | `hold_something` | body | Hold something in my pocket | hold something in my pocket | blank, hide | | |
-| `give_minute` | words | Say "Give me a minute" | say "Give me a minute" | fight, blank, chase | yes | |
-| `come_back` | words | Say "I'll come back to you on that" | say "I'll come back to you on that" | fight, chase | | |
-| `say_hard` | words | Say "This is hard for me" | say "This is hard for me" | hide, blank | yes | |
+| `give_minute` | words | Say “Give me a minute” | say “Give me a minute” | fight, blank, chase | yes | |
+| `come_back` | words | Say “I'll come back to you on that” | say “I'll come back to you on that” | fight, chase | | |
+| `say_hard` | words | Say “This is hard for me” | say “This is hard for me” | hide, blank | yes | |
 | `one_thing` | words | Say the one thing I came to say | say the one thing I came to say | hide, chase | | |
 | `step_out` | action | Step out for five minutes | step out for five minutes | fight, chase, hide | yes | |
 | `stay_ten` | action | Stay ten more minutes, then decide | stay ten more minutes, then decide | hide | | |
@@ -342,11 +348,17 @@ rename fails loudly instead of drifting.
 | `rehearse_keep_move` / `rehearse_change_move` | Keep the same plan · Change what I'll do |
 | `settle_title` | Let your body come back to now. |
 | `settle_breath` / `settle_five` / `settle_ok` | Three long breaths out · 5-4-3-2-1 · I'm OK |
+| `settle_hold` | Hold while you breathe out, slowly. |
+| `settle_hold_hint` | Three times. Let go between them. |
 | `keep_title` | Here's your plan. |
 | `keep_yes` / `keep_no` | Keep this · Not now |
+| `keep_failed` | Couldn't save that. Try again. |
+| `keep_done` | Kept in My words. |
 | `ask_after_q` | Want me to ask how it went? |
 | `ask_after_yes` / `ask_after_no` | Yes · No thanks |
 | `done` | Done |
+| `entry_dear_man` | Rehearse it |
+| `entry_recover` | Walk through it with Cope Ahead |
 
 ### Rehearsal beats (`RehearsalBeat`, in order)
 
@@ -381,3 +393,65 @@ rename fails loudly instead of drifting.
 - No scale, score, streak or "confidence".
 - Never pre-fills a past plan into a new visit. A kept plan is in My words, where the person can find it.
 - Never shows a part's name outside the parts step and the person's own plan card.
+
+---
+
+## As built (17 Oct)
+
+- **Where:**
+  - `src/pages/tools/CopeAhead.tsx` (lazy) and `src/components/tools/copeAhead/`:
+    - `PlanScreens` (screens 1–4 and once more);
+    - `PlanAnchor`;
+    - `Rehearse`, `Settle` and `KeepCard`, which are presentational;
+    - `PlanSentence`;
+    - `CopeAheadEntryLink`.
+  - The pure step machine is `src/lib/copeAheadTool.ts`. It handles the order, the If toggle, moves by
+    pull, the danger move first, two moves at most, own words in every slot, and once more.
+  - Listed under Emotion Regulation, with the intent *"Something's coming up that I'm dreading"*.
+- **One plan sentence.** `planLine(content, ca)` in `src/lib/copeAheadPlan.ts` returns
+  `PlanParts { ifText, moves, text }`. The keep card, the rehearsal's plan beat and the after card all
+  call it.
+- **Content:**
+  - `scripts/cope-ahead/content.py` → `schema/cope-ahead.cypher` (five constraints, loaded after
+    `wise-mind`).
+  - `getCopeAheadContent` serves it, and `src/data/content/cope-ahead.json` ships it.
+  - The Copy section above, as written. The voice lint needed no changes.
+  - `dbt_cope_ahead.appToolId = 'cope-ahead'`, out of `PLANNED`. The anticipatory row stays off and a
+    draft.
+- **The visit:**
+  - `ext.ca` is registered, with a closed-set `one` type for `when`, `ifFrom`, `rehearsed` and `settle`.
+  - The page sends every unset field as null and the server drops them, so a cleared answer doesn't
+    linger after the per-namespace merge.
+  - `PROFILE_NEEDS['cope-ahead']` reads the parts anchors.
+  - *Keep this* saves the plan line to My words through `recordWitnessBeat`, as the `cope_ahead` moment
+    (own-line limit 360).
+- **Safety:** a danger moment shows `CrisisBanner` compact under screens 3 and 4. The flow goes on.
+  `dangerBanner` in `copeAheadTool.ts` picks the variant: `other_person` for *They might hurt me*, the
+  default for *I might hurt myself*. A test fails if a new danger moment isn't placed in one of the two.
+- **Keep:** after *Keep this* saves, *"Kept in My words."* (`keep_done`) replaces the two buttons as a
+  polite status line.
+- **The after card:**
+  - `cope_ahead_after`, with chips `today` / `tomorrow` / `this_week` / `later`.
+  - The card holds the first answer on the device. The second tap sends both in one `resolveFollowUp`
+    (`choiceId` + `planHelped`). Skipping or leaving sends the first alone.
+  - Reflect credits `planHelped: 'helped'` to Cope Ahead only.
+  - With a part, the server writes `PartTag {source: 'cope_ahead'}`, which counts for *helped* and never
+    for *when*.
+  - There's a `PracticeSkill` for Cope Ahead.
+- **Ways in:**
+  - `src/lib/copeAheadEntry.ts` holds `copeAheadLink`, `parseCopeAheadEntry` and `situationsWithFirst`.
+  - DEAR MAN's summary shows *Rehearse it* above *How did it go?*, carrying the part only with parts on.
+  - Recover's `recover_rehearse` card on Today shows *Walk through it with Cope Ahead*.
+- **Review:**
+  - `dev/review/copeAhead.tsx` is the whole flow, with 47 branches.
+  - `cope-ahead-closing` covers the three closing components, `cope-ahead-entries` the links, and
+    `cope-ahead-after` the Today card.
+  - a11y is clean on each.
+- **The parts step's own question.** Cope Ahead asks *"Who might show up there?"* (`cope_title_any`, a
+  parts draft). `CopeAheadStep` takes it as `titleId`, and the step's gate is `COPE_AHEAD_PARTS_REQUIRED`
+  (DEAR MAN's set plus that prompt). DEAR MAN keeps *"Who might show up in this conversation?"*.
+- **Anchors stay one line.** `anchorableLine` (`functions/src/parts/keepTypes.ts`, mirrored in
+  `src/data/partsTypes.ts`) allows a kept line as an anchor only if it is at most 90 characters and isn't
+  an own line kept from the `cope_ahead` moment. DEAR MAN's anchor picker filters by it, and
+  `setPartAnchor` refuses any other line, so a whole plan stays in My words and is never offered as an
+  anchor.

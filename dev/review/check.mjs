@@ -84,6 +84,9 @@ const SELECTOR = {
 };
 const NO_CHECKBACK = new Set(['meet/danger_close']);
 // lane 4 (parts-steps-tried): screens that must also show "Steps that helped" (fresh loads, without ids).
+/** A link into Cope Ahead (src/lib/copeAheadEntry.ts): the path, then first (a situation id) and part (an id), each optional. */
+const COPE_HREF = /^#?\/tool\/cope-ahead(\?(first=[a-z][a-z0-9_]*(&part=[a-f0-9-]{36})?|part=[a-f0-9-]{36}))?$/i;
+
 const ALSO_EXPECT = {
   'me/cards': ['stats_steps'], 'me/long': ['stats_steps'], 'reflect/': ['stats_steps'],
   // lane 4 (wise-mind-parts): Wise mind's step back
@@ -181,6 +184,10 @@ try {
         // Non-parts screens (lane 1: Wise mind) bring their own lines, read from the page's map.
         if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) bad(`missing "${map.expect[v.key]}"`);
         if (map.absent?.[v.key] && text.includes(map.absent[v.key])) bad(`shows "${map.absent[v.key]}"`);
+        // lane 2 (cope-ahead-entries): every link into Cope Ahead is well-formed, and is the one the branch expects.
+        const copeHrefs = await page.locator('a[href*="/tool/cope-ahead"]').evaluateAll((as) => as.map((a) => a.getAttribute('href') ?? ''));
+        for (const h of copeHrefs) if (!COPE_HREF.test(h)) bad(`malformed Cope Ahead link: ${h}`);
+        if (map.copeHref?.[v.key] && !copeHrefs.includes(map.copeHref[v.key])) bad(`no link to ${map.copeHref[v.key]} (found ${copeHrefs.join(', ') || 'none'})`);
       } else if (!text.includes('⟨')) bad('Show ids printed no ids');
     } else {
       await page.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => bad('no index'));
@@ -201,18 +208,28 @@ try {
   tour.on('requestfailed', (r) => { if (!isFont(r.url())) tbad(`request failed: ${r.url()}`); });
   await tour.goto(base, { waitUntil: 'load' });
   await tour.evaluate(() => { window.__noReload = true; });
+  // Before every navigation the screen on show is marked as left: until React mounts the next one, the
+  // old frame (already "done") is still in the page, and reading it raced the new branch under load
+  // ("branch not reached: running"). `reached` waits for a frame that isn't marked, and has settled.
+  const leave = () => tour.evaluate(() => { const el = document.querySelector('[data-testid="surface"]'); if (el) el.__left = true; });
   const reached = async (label) => {
     await tour.waitForFunction(() => {
-      const d = document.querySelector('[data-testid="surface"]')?.getAttribute('data-driven') ?? '';
+      const el = document.querySelector('[data-testid="surface"]');
+      const d = el && !el.__left ? el.getAttribute('data-driven') ?? '' : '';
       return d === 'done' || d.startsWith('failed');
     }, null, { timeout: 45000 }).catch(() => tbad(`${label}: timed out`));
-    const driven = await tour.getAttribute('[data-testid="surface"]', 'data-driven').catch(() => null);
+    const driven = await tour.evaluate(() => {
+      const el = document.querySelector('[data-testid="surface"]');
+      return el && !el.__left ? el.getAttribute('data-driven') : null;
+    }).catch(() => null);
     if (driven !== 'done') tbad(`${label}: branch not reached: ${driven}`);
     if (!(await tour.evaluate(() => window.__noReload === true))) tbad(`${label}: the page reloaded`);
   };
+  await leave();
   await tour.click('[data-surface="meet"]');
   await reached('link to meet');
   if (!(await tour.evaluate(() => location.hash)).startsWith('#s=meet')) tbad('the surface link is not a hash link');
+  await leave();
   // The meet surface's own 'done' would satisfy the wait before the branch starts: mark it stale first.
   await tour.evaluate(() => document.querySelector('[data-testid="surface"]')?.setAttribute('data-driven', 'stale'));
   await tour.click('[data-branch="keep"]');
@@ -221,6 +238,7 @@ try {
   await tour.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => tbad('back to the index'));
   if ((await tour.evaluate(() => location.hash)) !== '') tbad('the index link is not #');
   for (const v of visits.filter((x) => x.surface && !x.ids)) {
+    await leave();
     await tour.evaluate((h) => { window.scrollTo(0, 400); location.hash = h; }, v.query);
     await tour.waitForFunction((h) => location.hash === h, v.query);
     await reached(v.name);

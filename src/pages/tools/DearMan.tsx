@@ -19,6 +19,7 @@ import { BreathOrb, type BreathPhase } from '../../components/tools/regulation/b
 import { linkButton, secondaryText } from '../../components/tools/oppositeAction/styles';
 import { fill } from '../../lib/invalidationRecovery';
 import { handoffPrefill, summaryHeadsUpForBand } from '../../lib/dearManSafety';
+import { CopeAheadEntryLink } from '../../components/tools/copeAhead/CopeAheadEntryLink';
 import type { CapacityReading, HandoffResult } from '../../data/capacityTypes';
 import { useBand } from '../../hooks/useBand';
 import { BreakdownHandoff } from '../../components/capacity/BreakdownHandoff';
@@ -1688,13 +1689,15 @@ export function DearMan() {
             </details>
           )}
 
+          {/* Cope Ahead: rehearse this conversation, with the part picked in prep carried in (parts on only). */}
+          <CopeAheadEntryLink copyKey="entry_dear_man" situationId="conversation" partId={partsOn ? copeAheadPartId : null} />
           <button onClick={() => {
               if (!debriefContent) {
                 getDearManDebriefContent().then(setDebriefContent).catch(() => {});
               }
               setPhase('debrief-checkin');
             }}
-            className="w-full text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
+            className="w-full min-h-11 text-sm text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors">
             After the conversation &rarr; How did it go?
           </button>
         </div>

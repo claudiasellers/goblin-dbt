@@ -47,7 +47,10 @@ export const SESSIONS_QUERY = `
          coalesce(ts.patternId, c.activationPatternId) AS patternId,
          coalesce(c.id, ts.checkInId) AS checkInId,
          toString(coalesce(ts.endedAt, ts.startedAt)) AS at,
-         ts.closeKind AS closeKind, ts.thenVsNow AS thenVsNow, ts.actedOnUrge AS actedOnUrge
+         ts.closeKind AS closeKind, ts.thenVsNow AS thenVsNow, ts.actedOnUrge AS actedOnUrge,
+         // Cope Ahead: its after card's answer (the follow-up the visit scheduled, resolved).
+         head([(ts)-[:SCHEDULED]->(f:FollowUp {type: 'cope_ahead_after'})
+               WHERE f.status = 'done' AND f.planHelped IS NOT NULL | f.planHelped]) AS planHelped
   ORDER BY at DESC
 `;
 
@@ -94,6 +97,7 @@ const strOrNull = (v: unknown): string | null => (typeof v === 'string' && v.len
 const THEN_VS_NOW: readonly string[] = ['much_better', 'better', 'same', 'worse'];
 const ACTED: readonly string[] = ['no', 'partly', 'yes', 'not_yet'];
 const LEGACY: readonly string[] = ['helped', 'somewhat', 'not_really'];
+const PLAN_HELPED: readonly string[] = ['helped', 'unsure', 'unused'];
 
 export function checkInRow(r: Neo4jRecord): CheckInRow {
   return {
@@ -124,6 +128,7 @@ export function sessionRow(r: Neo4jRecord): SessionRow {
     closeKind: strOrNull(r.get('closeKind')),
     thenVsNow: THEN_VS_NOW.includes(tvn) ? (tvn as ThenVsNow) : null,
     actedOnUrge: ACTED.includes(acted) ? (acted as ActedOnUrge) : null,
+    planHelped: r.has('planHelped') && PLAN_HELPED.includes(r.get('planHelped')) ? (r.get('planHelped') as SessionRow['planHelped']) : null,
   };
 }
 

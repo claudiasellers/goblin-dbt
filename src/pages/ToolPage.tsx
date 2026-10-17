@@ -41,6 +41,11 @@ function WiseMind() {
   return <Suspense fallback={<ToolLoading />}><LazyWiseMind stepBack={slot} /></Suspense>;
 }
 
+// Cope Ahead (docs/design/cope-ahead.md), its own chunk: seven screens and a rehearsal nobody else needs.
+const loadCopeAhead = () => import('./tools/CopeAhead');
+const LazyCopeAhead = lazy(() => loadCopeAhead().then((m) => ({ default: m.CopeAhead })));
+function CopeAhead() { return <Suspense fallback={<ToolLoading />}><LazyCopeAhead /></Suspense>; }
+
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
   'cool-down': CoolDown,
@@ -50,6 +55,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'opposite-action': OppositeAction,
   'dear-man': DearMan,
   'problem-solve': ProblemSolve,
+  'cope-ahead': CopeAhead,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,

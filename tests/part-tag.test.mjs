@@ -108,11 +108,11 @@ test("hosts: every tool whose close asks then-vs-now or about the urge, minus Me
     }
   }
   // Meet a part and Two pulls read `parts` for their own screens, Today for the check-back card's name, DEAR MAN
-  // for its cope ahead ("Who might show up in this conversation?") and Wise mind for its step back's room;
-  // every other reader is a host, and every host reads it.
+  // for its cope ahead ("Who might show up in this conversation?"), Cope Ahead for the same step (reused as
+  // is) and Wise mind for its step back's room; every other reader is a host, and every host reads it.
   const withParts = Object.entries(profileTypes.PROFILE_NEEDS)
-    .filter(([c, n]) => !["meet-a-part", "two-pulls", "today", "dear-man", "wise-mind"].includes(c) && n.includes("parts")).map(([c]) => c);
-  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part, Two pulls, Today, DEAR MAN and Wise mind, nothing else");
+    .filter(([c, n]) => !["meet-a-part", "two-pulls", "today", "dear-man", "cope-ahead", "wise-mind"].includes(c) && n.includes("parts")).map(([c]) => c);
+  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part, Two pulls, Today, DEAR MAN, Cope Ahead and Wise mind, nothing else");
 });
 
 test("each host mounts PartTagSlot under its saved close; the slot is the only gate", () => {
