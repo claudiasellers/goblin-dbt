@@ -35,7 +35,7 @@ const ep = (n, days, moveIds = ['hide'], tags = []) => ({
   moveToolIds: Object.fromEntries(moveIds.map((m) => [m, ['opposite-action']])), recordKeys: [key(n)], taggedPartIds: tags, sources: [],
 });
 const part = { id: PID, status: 'active', moveIds: ['hide'], lastVisitedAt: ago(30), pausedUntil: null };
-const ruleD = { id: 'trail_known_part', shape: 'D', minEpisodes: 3, windowDays: null, minSpanDays: null, minTools: null, contextShare: null, withinHours: null, lift: null, cooldownDays: 14, enabled: true, statementTemplate: 'Was this {name}?' };
+const ruleD = { id: 'trail_known_part', shape: 'D', minEpisodes: 3, windowDays: null, minSpanDays: null, minTools: null, contextShare: null, withinHours: null, lift: null, cooldownDays: 14, enabled: true, approved: true, statementTemplate: 'Was this {name}?' };
 const ctx = (blocked = []) => ({ moves: [{ id: 'hide', offerable: true, safetyLine: false }], pairs: [], contexts: [], parts: [part], blocked });
 
 test('rule D: a No row\'s records never count for that part again, after the cooldown too; the cooldown blocks the part', () => {

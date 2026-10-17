@@ -63,6 +63,8 @@ export interface TrailRule {
   lift: number | null;
   cooldownDays: number;
   enabled: boolean;
+  /** Signed off (reviewStatus approved, nothing pending): with `enabled`, the rule is live (`ruleLive`). */
+  approved: boolean;
   statementTemplate: string;
 }
 

@@ -1,6 +1,7 @@
 /**
- * One person's trails from a read state, pure: episodes, then every enabled rule (or every rule, for
- * the dry run). Writes nothing and offers nothing: the offer task consumes the candidates.
+ * One person's trails from a read state, pure: episodes, then every live rule (switched on and signed off;
+ * or every rule, as if both, for the dry run). Writes nothing and offers nothing: the offer task consumes
+ * the candidates.
  */
 import { buildEpisodes } from './episodes';
 import { evaluateTrails } from './rules';
@@ -14,7 +15,7 @@ export function trailsFromState(
   now: number, opts: { allEnabled?: boolean; blocked?: BlockedKey[] } = {},
 ): TrailRun {
   const { episodes, conflicts } = buildEpisodes(state.records, state.policy, state.timeZone);
-  const rules = opts.allEnabled ? state.rules.map((r) => ({ ...r, enabled: true })) : state.rules;
+  const rules = opts.allEnabled ? state.rules.map((r) => ({ ...r, enabled: true, approved: true })) : state.rules;
   const candidates = evaluateTrails(episodes, rules, {
     moves: state.moves, pairs: state.pairs, contexts: state.contexts, parts: state.parts, blocked: opts.blocked ?? [],
   }, now);

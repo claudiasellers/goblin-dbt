@@ -235,10 +235,19 @@ export function rankTrails(cands: TrailCandidate[]): TrailCandidate[] {
     || (tie(a) < tie(b) ? -1 : tie(a) > tie(b) ? 1 : 0));
 }
 
+/**
+ * A rule is live only when it is switched on (`enabled`) and signed off (`approved`): the one check the
+ * engine, the prepare step, Today and Reflect share (offers/queries.ts re-exports it). A rule switched on
+ * while still a draft finds nothing, writes nothing and spends no budget.
+ */
+export function ruleLive<R extends { enabled: boolean; approved: boolean }>(rule: R | null | undefined): rule is R {
+  return !!rule && rule.enabled === true && rule.approved === true;
+}
+
 export function evaluateTrails(episodes: readonly Episode[], rules: readonly TrailRule[], ctx: TrailCtx, now: number): TrailCandidate[] {
   const out: TrailCandidate[] = [];
   for (const rule of rules) {
-    if (!rule.enabled) continue;
+    if (!ruleLive(rule)) continue;
     const run = RULES[rule.shape];
     if (!run) continue;
     out.push(...run(rule, inWindow(episodes, rule.windowDays, now), ctx, now));

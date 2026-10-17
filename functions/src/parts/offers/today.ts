@@ -6,7 +6,8 @@
  *   cooling down after Not now), only through the offer gate (gate.ts), checked as the card is about to
  *   render, and only when every phrase its statement needs is signed off.
  * - The prepare step (`prepareTrailOffers`) runs the evaluator at most once a day (`User.trailsEvaluatedAt`)
- *   and writes the top candidate that is enabled, not blocked, new, and through the same gate.
+ *   and writes the top candidate whose rule is live (switched on and signed off) and whose statement's
+ *   phrases are signed off, not blocked, new, and through the same gate.
  * - Shapes A, B and C only (TODAY_SHAPES). Rule D ("Was this {name}?") is never a push: Reflect shows it
  *   and answers it in a batch (review.ts, on writeKnownPartReview and the same gate).
  * - A safety-line move (turn_on_myself, rule A only) is not offered on Today: parts.md wants crisis
@@ -21,8 +22,8 @@ import { readTrailState, trailsFromState } from '../trails';
 import { registerTodayPrepare, registerTodaySource } from '../../spine/today';
 import type { TodayItem } from '../../spine/todayOrder';
 import { blockedTrails, isBlocked, trailOfferId } from './blocked';
-import { checkOfferGate, OPEN_OFFER_QUERY, readOfferPolicy, readOfferStates, readPhrases } from './queries';
-import { writeTrailOffer } from './record';
+import { checkOfferGate, OPEN_OFFER_QUERY, readOfferPolicy, readOfferStates, readPhrases, ruleLive } from './queries';
+import { trailOfferParams, writeTrailOffer } from './record';
 import { TODAY_SHAPES, type BlockedTrail, type OfferableTrail, type TrailShape } from './types';
 
 const DAY = 86_400_000;
@@ -43,15 +44,13 @@ export async function trailOfferItems(tx: ManagedTransaction, uid: string, now: 
   if (!TODAY_SHAPES.includes(offer.shape)) return [];
   const state = await readOfferPolicy(tx, uid);
   const rule = state.rules.find((x) => x.id === offer.ruleId);
-  if (!rule?.approved || !rule.statementTemplate) return [];
+  if (!ruleLive(rule) || !rule.statementTemplate) return [];
   const gate = await checkOfferGate(tx, uid, state, offer.ruleId, now, offer.id);
   if (!gate.open) return [];
 
   // Every phrase the statement uses must be signed off; anything missing, no card.
-  const { moves, context } = await readPhrases(tx, offer.pulls, offer.contextId);
-  const pulls = offer.pulls.map((m) => moves.get(m) ?? null);
-  if (pulls.length === 0 || pulls.some((p) => p === null)) return [];
-  if (offer.contextId && !context) return [];
+  const pulls = await signedOffPulls(tx, offer.pulls, offer.contextId);
+  if (!pulls) return [];
   return [{
     id: offer.id, kind: 'trail_offer', type: 'trail_offer', tier: 'skills', state: 'due',
     dueAt: offer.offeredAt, resolveMode: 'inline', deepLink: null, choices: [],
@@ -59,9 +58,22 @@ export async function trailOfferItems(tx: ManagedTransaction, uid: string, now: 
     copy: { title: '' },
     trail: {
       ruleId: offer.ruleId, shape: offer.shape as 'A' | 'B' | 'C', template: rule.statementTemplate,
-      pulls: pulls as string[], context: offer.contextId ? context : null,
+      pulls: pulls.pulls, context: pulls.context,
     },
   }];
+}
+
+/**
+ * The statement's signed-off pieces: each pull's trailPhrase, in order, and the context's phrase (when the
+ * trail has one), or null when any is missing. Today checks it as the card renders; prepare checks it
+ * before writing, so nothing is written that couldn't show.
+ */
+async function signedOffPulls(tx: ManagedTransaction, pullIds: readonly string[], contextId: string | null): Promise<{ pulls: string[]; context: string | null } | null> {
+  const { moves, context } = await readPhrases(tx, pullIds, contextId);
+  const pulls = pullIds.map((m) => moves.get(m) ?? null);
+  if (pulls.length === 0 || pulls.some((p) => p === null)) return null;
+  if (contextId && !context) return null;
+  return { pulls: pulls as string[], context: contextId ? context : null };
 }
 
 // ---- The prepare step ----
@@ -84,16 +96,18 @@ export const EVALUATED_AT_QUERY = `MATCH (u:User {id: $uid}) RETURN toString(u.t
 export const STAMP_EVALUATED_QUERY = `MATCH (u:User {id: $uid}) SET u.trailsEvaluatedAt = datetime()`;
 
 /**
- * At most once a day: nothing while parts or offers are off or no rule is enabled; otherwise the first
- * candidate (the evaluator's order) whose rule is enabled, that isn't blocked or already offered, and that
- * the gate lets through, written by writeTrailOffer. At most one offer per run.
+ * At most once a day: nothing while parts or offers are off or no rule is live (switched on and signed
+ * off, `ruleLive`); otherwise the first candidate (the evaluator's order) whose rule is live, whose
+ * statement's phrases are all signed off, that isn't blocked or already offered, and that the gate lets
+ * through, written by writeTrailOffer. At most one offer per run. A candidate that couldn't render is
+ * skipped, never written: it would spend the shared weekly budget and be marked offered for good.
  */
 export async function prepareTrailOffers(uid: string, now: Date, evaluate: TrailEvaluator | null = TRAIL_EVALUATOR): Promise<string | null> {
   if (!evaluate) return null;
   const pick = await readTx(async (tx) => {
     const state = await readOfferPolicy(tx, uid);
-    const enabled = new Set(state.rules.filter((r) => r.enabled).map((r) => r.id));
-    if (!state.partsOn || !state.offersEnabled || enabled.size === 0) return null;
+    const live = new Set(state.rules.filter((r) => ruleLive(r) && r.statementTemplate).map((r) => r.id));
+    if (!state.partsOn || !state.offersEnabled || live.size === 0) return null;
     const last = (await tx.run(EVALUATED_AT_QUERY, { uid })).records[0]?.get('at') as string | null | undefined;
     if (last && Date.parse(last) > now.getTime() - DAY) return null;
     const offers = await readOfferStates(tx, uid);
@@ -103,7 +117,9 @@ export async function prepareTrailOffers(uid: string, now: Date, evaluate: Trail
     for (const c of candidates) {
       // Rule D is Reflect's, never Today's.
       if (!TODAY_SHAPES.includes(c.shape) || c.safetyLine) continue;
-      if (!enabled.has(c.ruleId) || isBlocked(c, blocked, now) || known.has(trailOfferId(c))) continue;
+      if (!live.has(c.ruleId) || isBlocked(c, blocked, now) || known.has(trailOfferId(c))) continue;
+      // The statement's moves (in its order, as the offer stores them) and context, signed off.
+      if (!(await signedOffPulls(tx, trailOfferParams(uid, c).pullIds, c.contextId))) continue;
       const gate = await checkOfferGate(tx, uid, state, c.ruleId, now);
       // A closed gate holds every candidate back today (the gate is about the person, not the trail).
       return { trail: gate.open ? c : null };
