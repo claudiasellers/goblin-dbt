@@ -160,9 +160,12 @@ makes.
 - *"How did {situation} go?"* — *Better than I feared* · *About what I expected* · *Harder than I
   expected* · *It hasn't happened yet* (snooze 24 h).
 - Then *"Did your plan help?"* — *Used it, it helped* · *Used it, not sure* · *Didn't use it* · *Skip*.
-- *Used it, it helped* counts toward what helps for the move's tool when it has one. With parts on and
-  a chosen part, it also counts toward the part's *what's helped it settle*, through a `PartTag
-  {source: 'cope_ahead'}` written on that answer, because the person named the part.
+- *Used it, it helped* counts toward what helps **for Cope Ahead** in Reflect: a visit whose after card says
+  so is a visit that went well. It doesn't credit the move's tool (*Pause*, *5-4-3-2-1*): the app
+  never saw that tool used, and crediting it would inflate it with uses nobody opened.
+- With parts on and a chosen part, it also counts toward the part's *what's helped it settle*, through a
+  `PartTag {source: 'cope_ahead'}` written on that answer (one per ToolSession, `tag.ts`), because the
+  person named the part. `stats.ts` counts `cope_ahead` tags with the close tags for *helped*.
 
 ---
 
@@ -208,8 +211,15 @@ makes.
     days 18:00, later at +7 days 18:00.
   - It's resolved inline. Both answers are stored on the follow-up as log fields.
   - The plan line it shows comes from the session, never pre-filled into a new visit.
+- **The after answers** are log fields on the follow-up: `howItWent` (`better` | `as_expected` |
+  `harder`; *It hasn't happened yet* snoozes 24 h and stores nothing) and `planHelped` (`helped` |
+  `unsure` | `unused`; *Skip* stores null). Resolved inline, like `ps_step`.
+- **The plan line** is one pure function, `planLine(content, ca)` in `src/lib/copeAheadPlan.ts`. The keep
+  card, the rehearsal's plan beat and the after card all call it, so the wording can't drift between
+  them. The after card composes it from the session's `ext.ca` ids and `cope-ahead.json`, never from a
+  stored string.
 - **Counts toward what helps:** yes, through the after card's *Used it, it helped*, the only outcome
-  this tool records.
+  this tool records (Cope Ahead itself, as above).
 
 ## Copy (the source for `content.py`)
 
