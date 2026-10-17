@@ -52,6 +52,8 @@ const EXPECT = {
   'settings/done': 'settings_delete_done', 'cope/pick': 'cope_title', 'cope/anchor': 'cope_change', 'cope/new': 'cope_save',
   'cope/failed': 'cope_save_failed', 'debrief/named': 'debrief_who_named', 'debrief/general': 'debrief_who',
   'debrief/general_new': 'tag_new_later', 'ps_later/ask': 'ps_later', 'ps_later/done': 'ps_later_done', 'tag/urge': 'tag_question',
+  'offer/a': 'offer_eyebrow', 'offer/b': 'offer_eyebrow', 'offer/c': 'offer_eyebrow', 'offer/evidence': 'offer_question',
+  'offer/evidence_c': 'offer_more_than_one', 'offer/split': 'offer_split',
   'tag/shape': 'tag_use_shape', 'tag/shape_unnamed': 'tag_use_shape_noname', 'tag/shape_done': 'tag_shape_done',
   'angry/first': 'angry_unblend', 'angry/protects': 'angry_protects', 'angry/speak': 'angry_later', 'angry/later': 'angry_later_done',
 };
@@ -72,7 +74,7 @@ function plan(map) {
       if (s.id === 'angry') visits.push({ ...v, name: `${v.name}--plain`, query: `${q}&plain=1`, plain: true });
     }
   }
-  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask']]) {
+  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask'], ['offer', 'evidence']]) {
     visits.push({ name: `${surface}${branch ? `--${branch}` : ''}--ids`, query: `?s=${surface}${branch ? `&b=${branch}` : ''}&ids=1`, ids: true, surface, branch });
   }
   return visits;

@@ -33,7 +33,8 @@ import { TooMuchLink } from '../../src/components/capacity/TooMuchLink';
 import { DARK } from '../../src/components/tools/findTheFeeling/shape/palette';
 import { linkButton, secondaryText } from '../../src/components/tools/oppositeAction/styles';
 import { answer, logEvent } from './backend';
-import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, slices } from './data';
+import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, slices, trailEvidence, trailItem, type TrailKind } from './data';
+import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
 import { PARTS } from '../parts-example';
 import hostCopy from 'virtual:review-host-copy';
@@ -248,6 +249,19 @@ function CopeHost() {
         picked={picked} onPick={(id) => { setPicked(id); logEvent('DEAR MAN ext.er', { copeAheadPartId: id }); }}
         onAnchor={(partId, text) => setAnchors((a) => ({ ...a, [partId]: text }))}
         onGoOn={() => setGone(true)} />
+    </section>
+  );
+}
+
+function OfferHost({ kind }: { kind: TrailKind }) {
+  const content = useParts();
+  const [gone, setGone] = useState(false);
+  if (!content) return null;
+  if (gone) return <p className={mockNote}>The card leaves Today.</p>;
+  return (
+    <section className="space-y-2">
+      <p className={mockNote}>Today</p>
+      <TrailOfferCard item={trailItem(kind)} content={content} onDone={() => setGone(true)} />
     </section>
   );
 }
@@ -477,6 +491,23 @@ export const SURFACES: Surface[] = [
     render: ({ branch }) => <DebriefHost named={branch === 'named'} />,
   },
   {
+    id: 'offer', pack: 'offer', title: 'The trail offer (Today)',
+    who: 'Parts on, offers on: on Today, at most one at a time, when a pattern across tools passes its rule and the gates (no flooding, crisis or dissociation signal).',
+    branches: [
+      { id: 'a', label: 'A pull in a context (rule A)' },
+      { id: 'b', label: 'One pull after another (rule B)' },
+      { id: 'c', label: 'Two pulls in a context (rule C)' },
+      { id: 'evidence', label: 'Show me: the evidence (A)', steps: [{ opt: 'offer_show' }] },
+      { id: 'evidence_c', label: 'Show me: the evidence, two pulls (C)', steps: [{ opt: 'offer_show' }] },
+      { id: 'split', label: 'More than one: which feels like its own thing?', steps: [{ opt: 'offer_show' }, { opt: 'offer_more_than_one' }] },
+    ],
+    setup: (b) => {
+      const kind: TrailKind = b === 'b' ? 'B' : b === 'c' || b === 'evidence_c' || b === 'split' ? 'C' : 'A';
+      answer('getTrailOfferEvidence', () => trailEvidence(kind));
+    },
+    render: ({ branch }) => <OfferHost kind={branch === 'b' ? 'B' : branch === 'c' || branch === 'evidence_c' || branch === 'split' ? 'C' : 'A'} />,
+  },
+  {
     id: 'ps_later', pack: 'ps', title: 'Problem Solve: another time',
     who: 'Parts on: in Problem Solve, after “Part of me doesn’t actually want this to change” and its answer, under Let’s keep going.',
     branches: [
@@ -495,5 +526,5 @@ export const SURFACES: Surface[] = [
 
 /** Not built on the tip, so not here (the report lists them). */
 export const SKIPPED = [
-  'The trail offer card and its evidence step: not on the tip yet (lane 2, trail-offers).',
+  '“Was this {name}?” in Reflect (rule D): not built yet (lane 3, rule-d-review).',
 ];
