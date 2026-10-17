@@ -22,6 +22,12 @@
  *   says the part was there, so, like a debrief tag, the stats never count it. One per session and part
  *   (the person may place several), so its `taggedKey` carries the part.
  *
+ * - `cope_ahead` (Cope Ahead's after card, "Used it, it helped"): written by the server inside that
+ *   resolve (spine/followUp.ts), never through tagPart, for the part the visit named (ext.ca.partId). The
+ *   ToolSession the caller's and Cope Ahead's, with its cope_ahead_after follow-up answered `helped`. The
+ *   person used the plan made for that part and it helped, so the stats count it with the close tags for
+ *   *helped* (not for *when*: its time is the answer's, not the moment's).
+ *
  * All: parts on; the part the caller's and active or resting.
  *
  * One tag per ToolSession per source (per part for `wise_mind`): the state read returns the session's existing tag of that source,
@@ -49,6 +55,10 @@ export const TAG_NEVER_TOOLS = ['meet-a-part', 'two-pulls'] as const;
 export const TAG_DEBRIEF_TOOLS = ['dear-man'] as const;
 /** The tools a wise_mind tag may name: Wise mind's step back only. */
 export const TAG_WISE_MIND_TOOLS = ['wise-mind'] as const;
+/** The tools a cope_ahead tag may name: Cope Ahead only. */
+export const TAG_COPE_AHEAD_TOOLS = ['cope-ahead'] as const;
+/** Sources only the server writes (tagPart refuses them). */
+export const SERVER_TAG_SOURCES: readonly TagSource[] = ['cope_ahead'];
 
 /**
  * The constraint's key: a close tag keeps the session's key (as before); other sources add theirs, and a
@@ -64,7 +74,9 @@ export function validateTag(raw: unknown): TagPartRequest & { source: TagSource 
   const o = obj(raw);
   for (const k of Object.keys(o)) if (!['id', 'partId', 'toolSessionId', 'source', 'strength'].includes(k)) throw new ValidationError(`${k}: not accepted`);
   const source = o.source === undefined ? 'close' : o.source;
-  if (!(TAG_SOURCES as readonly unknown[]).includes(source)) throw new ValidationError('source: close, debrief, review or wise_mind');
+  if (!(TAG_SOURCES as readonly unknown[]).includes(source) || SERVER_TAG_SOURCES.includes(source as TagSource)) {
+    throw new ValidationError('source: close, debrief, review or wise_mind');
+  }
   const base = { id: uuid(o.id), partId: uuid(o.partId), toolSessionId: uuid(o.toolSessionId) };
   if (source === 'close' || source === 'review' || source === 'wise_mind') {
     if (o.strength !== undefined) throw new ValidationError('strength: debrief tags only');
@@ -97,6 +109,8 @@ export const TAG_QUERY = `
       AND (ts.thenVsNow IN $closes OR ts.actedOnUrge IN $urgeCloses) AND NOT ts.toolId IN $never)
     OR ($source = 'debrief' AND ts.toolId IN $debriefTools)
     OR ($source = 'wise_mind' AND ts.toolId IN $wiseMindTools)
+    OR ($source = 'cope_ahead' AND ts.toolId IN $copeAheadTools
+      AND EXISTS { MATCH (ts)-[:SCHEDULED]->(f:FollowUp {type: 'cope_ahead_after'}) WHERE f.planHelped = 'helped' })
     OR ($source = 'review' AND ts.status <> 'open' AND NOT ts.toolId IN $never))
   MATCH (u)-[:HAS_PART]->(pt:Part {key: $partKey}) WHERE pt.status IN ['active', 'resting']
   MERGE (t:PartTag {key: $key})
@@ -140,6 +154,9 @@ export async function tagPartHandler(t: TagInput, deps: TagDeps): Promise<TagPar
     // Rule D's batch review: a closed session of the caller's, any close answer.
     if (st.sessionStatus === 'open') throw new HttpsError('failed-precondition', 'That session is still open');
     if ((TAG_NEVER_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
+  } else if (t.source === 'cope_ahead') {
+    // Never through tagPart (validateTag refuses it): the after card's resolve writes it itself.
+    throw new HttpsError('failed-precondition', 'Not for this tool');
   } else if (t.source === 'wise_mind') {
     // Wise mind's step back: its own session, open or closed; placing the part was the yes.
     if (!(TAG_WISE_MIND_TOOLS as readonly (string | null)[]).includes(st.toolId)) throw new HttpsError('failed-precondition', 'Not for this tool');
@@ -166,7 +183,7 @@ export function tagDeps(tx: ManagedTransaction, uid: string, email: string | nul
       uid, email, id: t.id, key: userKey(uid, t.id), partKey, sessionKey,
       source: t.source, taggedKey: taggedKeyOf(sessionKey, t.source, partKey), strength: t.strength ?? null,
       closes: [...TAG_CLOSES], urgeCloses: [...TAG_URGE_CLOSES], never: [...TAG_NEVER_TOOLS], debriefTools: [...TAG_DEBRIEF_TOOLS],
-      wiseMindTools: [...TAG_WISE_MIND_TOOLS],
+      wiseMindTools: [...TAG_WISE_MIND_TOOLS], copeAheadTools: [...TAG_COPE_AHEAD_TOOLS],
     };
   };
   const s = (v: unknown) => (typeof v === 'string' ? v : null);

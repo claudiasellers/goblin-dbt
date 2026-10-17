@@ -63,7 +63,7 @@ export const fromReflect = (): ToolLinkState => ({ spine: { entry: 'insights' } 
  * for down, "A bit more here" / "More here" for orient), never a percentage.
  */
 export function outcomeLine(t: {
-  measure?: 'then_vs_now' | 'urge'; direction?: 'down' | 'orient' | null; answered?: number; wentWell?: number;
+  measure?: 'then_vs_now' | 'urge' | 'plan'; direction?: 'down' | 'orient' | null; answered?: number; wentWell?: number;
   totalUses: number; helpedPct: number;
 }): string {
   const answered = t.answered ?? t.totalUses;

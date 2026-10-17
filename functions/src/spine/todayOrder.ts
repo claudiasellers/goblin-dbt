@@ -9,6 +9,8 @@
  *   nothing is hidden, one tap expands it ("Your plans will keep"). A parts trail offer is the one
  *   exception: it isn't something the person owes, so a flooded band drops it altogether.
  */
+import type { CopeAheadPlanIds } from './copeAheadAfter';
+
 export type Tier = 'safety' | 'practice' | 'quality' | 'skills';
 export type TodayState = 'due' | 'stale' | 'upcoming';
 export type TodayKind = 'follow_up' | 'tool_outcome' | 'pattern_offer' | 'profile_revisit' | 'trail_offer';
@@ -44,6 +46,11 @@ export interface TodayItem {
    * fills the template.
    */
   trail?: { ruleId: string; shape: 'A' | 'B' | 'C'; template: string; pulls: string[]; context: string | null };
+  /**
+   * Cope Ahead's after card (`cope_ahead_after`): the plan's ids from the visit's ext.ca (null when it
+   * stored none). The card composes the words (planLine over cope-ahead.json); never a stored string.
+   */
+  plan?: CopeAheadPlanIds | null;
 }
 
 export const TODAY_VISIBLE = 3;

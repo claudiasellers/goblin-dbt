@@ -24,16 +24,18 @@ export const STATS_PARTS_QUERY = `
 `;
 
 /**
- * The caller's close tags of their own active or resting parts, each with its own tagged ToolSession's
- * tool. Close tags only: a DEAR MAN debrief tag says the part was there, not that a tool helped it settle
- * (so never *helped*), and its time is the debrief's, not the moment's (so not *when* either).
+ * The caller's close and cope_ahead tags of their own active or resting parts, each with its own tagged
+ * ToolSession's tool and its source. A DEAR MAN debrief tag says the part was there, not that a tool
+ * helped it settle (so never *helped*), and its time is the debrief's, not the moment's (so not *when*
+ * either). A cope_ahead tag (Cope Ahead's after card, "Used it, it helped") counts for *helped* only
+ * (stats.ts): its time is the answer's.
  */
 export const STATS_TAGS_QUERY = `
   MATCH (u:User {id: $uid})-[:HAS_PART_TAG]->(t:PartTag)-[:OF_PART]->(pt:Part)
   WHERE coalesce(u.partsEnabled, false) AND pt.status IN ['active', 'resting'] AND (u)-[:HAS_PART]->(pt)
-    AND coalesce(t.source, 'close') = 'close'
+    AND coalesce(t.source, 'close') IN ['close', 'cope_ahead']
   MATCH (t)-[:TAGS]->(ts:ToolSession)<-[:HAS_TOOL_SESSION]-(u)
-  RETURN pt.id AS partId, ts.toolId AS toolId, toString(coalesce(t.at, t.createdAt)) AS at
+  RETURN pt.id AS partId, ts.toolId AS toolId, toString(coalesce(t.at, t.createdAt)) AS at, coalesce(t.source, 'close') AS source
 `;
 
 /** The tagged-session prefix both halves of STATS_STEPS_QUERY share: STATS_TAGS_QUERY's, for one tool. */
@@ -107,7 +109,7 @@ export async function readStatsRows(tx: Pick<ManagedTransaction, 'run'>, uid: st
   }));
   if (parts.length === 0) return { partsOn, timeZone, parts, tags: [], sessions: [], steps: [] };
   const tags: StatsTagRow[] = (await tx.run(STATS_TAGS_QUERY, { uid })).records
-    .map((r) => ({ partId: r.get('partId'), toolId: str(r.get('toolId')) ?? '', at: r.get('at') }))
+    .map((r) => ({ partId: r.get('partId'), toolId: str(r.get('toolId')) ?? '', at: r.get('at'), source: r.get('source') === 'cope_ahead' ? 'cope_ahead' as const : 'close' as const }))
     .filter((t) => t.toolId && typeof t.at === 'string');
   const sessions: StatsSessionRow[] = (await tx.run(STATS_SESSIONS_QUERY, { uid })).records
     .map((r) => ({ partId: r.get('partId'), at: r.get('at'), firstFeel: str(r.get('firstFeel')) ?? '' }))

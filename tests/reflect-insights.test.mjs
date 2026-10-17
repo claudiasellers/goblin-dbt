@@ -21,6 +21,7 @@ const ci = (o) => ({
 const session = (o) => ({
   id: o.id, toolId: o.toolId, patternId: o.pattern ?? null, checkInId: o.checkInId ?? null, at: at(o.d),
   closeKind: o.closeKind ?? null, thenVsNow: o.tvn ?? null, actedOnUrge: o.acted ?? null,
+  ...(o.plan !== undefined ? { planHelped: o.plan } : {}),
 });
 const newestFirst = (xs) => [...xs].sort((a, b) => Date.parse(b.timestamp ?? b.at) - Date.parse(a.timestamp ?? a.at));
 
@@ -139,6 +140,32 @@ test("effectiveToolsForPattern: only this pattern, only closes that went well", 
     session({ id: "3", toolId: "pause", pattern: "rumination_loop", d: 1, closeKind: "urge", acted: "no" }),
   ], []);
   assert.deepEqual(c.effectiveToolsForPattern(rows, "acute_alarm"), ["cool-down"]);
+});
+
+test("Cope Ahead: its after card's \"Used it, it helped\" is a visit that went well, for Cope Ahead only", () => {
+  const sessions = [
+    session({ id: "a1", toolId: "cope-ahead", d: 1, closeKind: "none", plan: "helped", pattern: "chronic_vigilance" }),
+    session({ id: "a2", toolId: "cope-ahead", d: 2, closeKind: "none", plan: "unsure" }),
+    session({ id: "a3", toolId: "cope-ahead", d: 3, closeKind: "none", plan: "unused" }),
+    session({ id: "a4", toolId: "cope-ahead", d: 4, closeKind: "none", plan: null }),
+    session({ id: "a5", toolId: "cope-ahead", d: 5, closeKind: "none" }),
+    session({ id: "a6", toolId: "cope-ahead", d: 6, closeKind: "none", plan: "helped", pattern: "chronic_vigilance" }),
+    // Its plan's move was a tool (Pause, 5-4-3-2-1): the app never saw it used, so nothing is credited to it.
+  ];
+  const rows = c.outcomeRows(sessions, []);
+  assert.deepEqual(rows.map((o) => [o.toolId, o.measure, o.wentWell]), [
+    ["cope-ahead", "plan", true], ["cope-ahead", "plan", false], ["cope-ahead", "plan", false], ["cope-ahead", "plan", true],
+  ], "Skip and no answer aren't answers");
+  const eff = c.toolEffectiveness(rows).tools;
+  assert.deepEqual(eff.map((t) => t.toolId), ["cope-ahead"], "no move's tool is credited");
+  assert.equal(eff[0].measure, "plan");
+  assert.equal(eff[0].answered, 4);
+  assert.equal(eff[0].wentWell, 2);
+  assert.deepEqual(c.effectiveToolsForPattern(rows, "chronic_vigilance"), ["cope-ahead"]);
+  assert.equal(r.outcomeLine(eff[0]), "Helped 2 of 4 times");
+  // The query: the visit's own cope_ahead_after, resolved; never the move's tool.
+  const q = readFileSync("functions/src/insights/queries.ts", "utf8");
+  assert.match(q, /\(ts\)-\[:SCHEDULED\]->\(f:FollowUp \{type: 'cope_ahead_after'\}\)\s+WHERE f\.status = 'done' AND f\.planHelped IS NOT NULL \| f\.planHelped\]\) AS planHelped/);
 });
 
 test("'what you're doing is working' reads the spine: better now counts (pre-R1 needed much better)", () => {
