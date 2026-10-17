@@ -95,6 +95,9 @@ test("the card: no hard-coded user-facing strings; Louder's body tools are the t
   assert.match(provider, /items: withReadyCheckbacks\(/);
   assert.match(read("src/components/today/TodayStack.tsx"), /item\.type === PART_CHECKBACK_TYPE \|\| item\.type === TWO_PULLS_CHECKBACK_TYPE\) return <PartCheckbackCard/);
   assert.match(provider, /const twoCheckbacksShown = partsOn && twoCheckbackReady\(partsContent\);/, "Two pulls' card: its two-names question ships too");
+  // A Two pulls check-back alone still loads the content, and the card gets it.
+  assert.match(provider, /i\.type === PART_CHECKBACK_TYPE \|\| i\.type === TWO_PULLS_CHECKBACK_TYPE\)/);
+  assert.match(provider, /partsContent: checkbacksShown \|\| twoCheckbacksShown \|\| offersShown \? partsContent : null/);
 });
 
 test("server: spine leaves the type to parts; the name comes through the 'today' slice; spine never imports profile/", () => {
