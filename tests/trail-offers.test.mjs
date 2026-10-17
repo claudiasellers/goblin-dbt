@@ -185,3 +185,21 @@ test("the client mirror: the callables' types appear in src/data/partsTypes.ts; 
   assert.match(svc, /httpsCallable<GetTrailOfferEvidenceRequest, GetTrailOfferEvidenceResponse>\(functions, 'getTrailOfferEvidence'\)/);
   assert.match(svc, /httpsCallable<AnswerTrailOfferRequest, AnswerTrailOfferResponse>\(functions, 'answerTrailOffer'\)/);
 });
+
+test("Recover's evidence rows have a source label: PullOption.label is Recover's own pull label, imported, never copied", () => {
+  const recover = read("schema/invalidation-recovery.cypher");
+  const want = Object.fromEntries([...recover.matchAll(/\{\\"id\\": \\"(\w+)\\", \\"label\\": \\"([^"\\]+)\\", \\"sub\\"/g)].map((m) => [m[1], m[2]]));
+  assert.deepEqual(Object.keys(want).sort(), ["chase", "fight", "freeze", "hide"]);
+  const parts = read("schema/parts.cypher");
+  const got = [...parts.matchAll(/MERGE \(p:PullOption \{id: "(\w+)"\}\)\nSET p \+= \{flow: "recover", pullId: "(\w+)", label: "([^"]+)"/g)];
+  assert.equal(got.length, 4, "every PullOption has a label");
+  for (const [, id, pull, label] of got) assert.equal(label, want[pull], id);
+  const content = read("scripts/parts/content.py");
+  assert.match(content, /"invalidation-recovery", "content\.py"/, "imported from Recover's content");
+  assert.match(content, /PULL_LABELS = \{pid: RECOVER_PULL_LABELS\[pull\] for pid, flow, pull in PULL_OPTIONS/, "derived, no second copy");
+  assert.doesNotMatch(content, /"recover_\w+":\s*"/, "no hand-written PullOption label");
+  // The evidence rows read every source's own `label` (the one shared predicate, PullOption among them).
+  const answer = read("functions/src/parts/offers/answer.ts");
+  assert.match(answer, /collect\(DISTINCT src\.label\)/);
+  assert.match(read("functions/src/parts/sessionMoves.ts"), /\$\{src\}:PullOption AND \$\{d\}:InvalidationRecoverySession/);
+});

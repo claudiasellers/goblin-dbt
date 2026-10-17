@@ -15,7 +15,7 @@ to both ends, so only edges this file owns), so a dropped mapping leaves no stal
 import ast, json, os, re, sys
 here = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, here)
-from content import (VERSION, SIGNED_OFF, review_status, MOVES, PULL_OPTIONS, EXPRESSES, HELD,  # noqa: E402
+from content import (VERSION, SIGNED_OFF, review_status, MOVES, PULL_OPTIONS, PULL_LABELS, EXPRESSES, HELD,  # noqa: E402
                      AT_PLACE, AT_PLACE_HELD, HURTS, OFTEN_GUARDS, CAN_TOUCH, CAN_TOUCH_HELD, ANSWERS, ANSWERS_HELD,
                      UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, PROMPT_KINDS, PARTS_ON_ONLY, OPTIONS, OFFERABLE, SAFETY_LINE, PENDING,
                      PAIRS, KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY)
@@ -118,6 +118,7 @@ def check():
     # PullOption is parts' own label, so its coverage is checked here (the others against the schema, in the test)
     pulls = {p[0] for p in PULL_OPTIONS}
     assert set(EXPRESSES["PullOption"]) | set(HELD["PullOption"]) == pulls, "every PullOption mapped or held"
+    assert set(PULL_LABELS) == pulls and all(PULL_LABELS.values()), "every PullOption has its Recover label"
 
     # offerable moves have every phrase; go_blank / zone_out have none
     for m in MOVES:
@@ -174,7 +175,7 @@ def check():
 
     # copy rules over everything in the source
     about = {p[3] for p in PROMPTS if p[0] in ABOUT_IDS}
-    content = [MOVES, PULL_OPTIONS, EXPRESSES, HELD, AT_PLACE, AT_PLACE_HELD, HURTS, OFTEN_GUARDS, CAN_TOUCH,
+    content = [MOVES, PULL_OPTIONS, PULL_LABELS, EXPRESSES, HELD, AT_PLACE, AT_PLACE_HELD, HURTS, OFTEN_GUARDS, CAN_TOUCH,
                CAN_TOUCH_HELD, ANSWERS, ANSWERS_HELD, UNDERNEATH_SAME_AS, UNDERNEATH_HELD, PROMPTS, PROMPT_KINDS, OPTIONS, PENDING,
                PAIRS, KEEPSAKE, TRAIL_RULES, CONTEXTS, POLICY]
     for s in strings(content):
@@ -298,9 +299,11 @@ def main():
                                                          ("trailPhrase", "prompt"), ("nameHint", "chip")) if m[f] is not None],
         lambda m: node("ProtectiveMove", m["id"], {k: m[k] for k in ("label", *PHRASES, "kind", "offerable", "safetyLine", "order")}, "m"))
 
-    A("\n// --- Recover's pulls (its flow JSON has no nodes; FTF's are FeelingUrge) ---")
-    for pid, flow, pull in PULL_OPTIONS:
-        node("PullOption", pid, {"flow": flow, "pullId": pull}, "p")
+    A("\n// --- Recover's pulls (its flow JSON has no nodes; FTF's are FeelingUrge); labels are Recover's own ---")
+    with_copy(
+        list(PULL_OPTIONS),
+        lambda p: [row(p[0], "label", "chip", PULL_LABELS[p[0]])],
+        lambda p: node("PullOption", p[0], {"flow": p[1], "pullId": p[2], "label": PULL_LABELS[p[0]]}, "p"))
 
     A("\n// --- EXPRESSES: every module's ids on the vocabulary (HELD ids get no edge) ---")
     A("MATCH ()-[r:EXPRESSES]->(:ProtectiveMove) DELETE r;")

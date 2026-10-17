@@ -101,6 +101,23 @@ PULL_OPTIONS = [
     ("recover_freeze", "recover", "freeze"),
 ]
 
+
+def _recover_pull_labels():
+    """Recover's own pull labels (scripts/invalidation-recovery/content.py FLOW["pulls"]): the one source."""
+    import importlib.util
+    import os
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "invalidation-recovery", "content.py")
+    spec = importlib.util.spec_from_file_location("recover_content", path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return {p["id"]: p["label"] for p in mod.FLOW["pulls"]}
+
+
+# Each PullOption's label is the chip the person picked in Recover ("Fight back", "Hide", ...), imported,
+# never a second copy: the trail offer's evidence rows show it. A pull Recover drops fails the build here.
+RECOVER_PULL_LABELS = _recover_pull_labels()
+PULL_LABELS = {pid: RECOVER_PULL_LABELS[pull] for pid, flow, pull in PULL_OPTIONS if flow == "recover"}
+
 # --------------------------------------------------------------------------------------------------
 # (x)-[:EXPRESSES]->(:ProtectiveMove). label → {source id: (move id, why)}
 # A source maps to at most one move. Unsure → HELD, never a guess: a wrong edge inflates a trail.
