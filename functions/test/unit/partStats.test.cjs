@@ -442,9 +442,11 @@ test('cope_ahead tags (Cope Ahead\'s "Used it, it helped") count with the close 
   assert.deepEqual(s.helped, [{ toolId: 'cope-ahead', n: 2 }, { toolId: 'pause', n: 1 }]);
   assert.equal(s.when, null, 'one close tag: when says nothing (the after card\'s time is not the moment)');
   // The read keeps the source: a row without one is a close tag (older rows, the fake driver's).
-  const tx = { run: async (q) => ({ records: /HAS_PART_TAG/.test(q) && !/AS stepId/.test(q)
-    ? tags.map((r) => ({ has: (k) => k in r, get: (k) => r[k] }))
-    : /AS timeZone/.test(q) ? [{ has: () => true, get: (k) => ({ partsOn: true, timeZone: null })[k] }] : [] }) };
+  const rec = (r) => ({ has: (k) => k in r, get: (k) => r[k] });
+  const part = { id: 'p1', name: null, status: 'active', firstPlace: null, shapeSig: null };
+  const tx = { run: async (q) => ({ records: /AS timeZone/.test(q) ? [rec({ partsOn: true, timeZone: null })]
+    : /pt\.shapeSig AS shapeSig/.test(q) ? [rec(part)]
+    : /HAS_PART_TAG/.test(q) && !/AS stepId/.test(q) ? tags.map((r) => rec(r.source === 'close' ? { partId: r.partId, toolId: r.toolId, at: r.at } : r)) : [] }) };
   const rows = await readStatsRows(tx, 'u1');
-  assert.deepEqual(rows.tags.map((t) => t.source), ['cope_ahead', 'cope_ahead', 'close']);
+  assert.deepEqual(rows.tags.map((t) => t.source ?? 'close'), ['cope_ahead', 'cope_ahead', 'close']);
 });

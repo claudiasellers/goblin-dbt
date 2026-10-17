@@ -37,11 +37,11 @@ export const PLAN_CHOICES: ReadonlyArray<{ id: PlanHelped | null; key: string }>
   { id: null, key: 'after_skip' },
 ];
 
-/** Every `after` line the card says. Without all of them the card falls back to Today's plain card. */
-export const AFTER_REQUIRED = ['after_q', 'after_plan_q', 'after_plan_line', ...HOW_CHOICES.map((c) => c.key), ...PLAN_CHOICES.map((c) => c.key)] as const;
+/** Every `after` line the card says (cope-ahead.json, not parts copy: not in the parts pack). Without all of them the card falls back to Today's plain card. */
+export const AFTER_LINES = ['after_q', 'after_plan_q', 'after_plan_line', ...HOW_CHOICES.map((c) => c.key), ...PLAN_CHOICES.map((c) => c.key)] as const;
 
 export const afterReady = (content: Pick<CopeAheadContent, 'after'> | null | undefined): boolean =>
-  !!content && AFTER_REQUIRED.every((k) => typeof content.after?.[k] === 'string' && content.after[k].trim() !== '');
+  !!content && AFTER_LINES.every((k) => typeof content.after?.[k] === 'string' && content.after[k].trim() !== '');
 
 const fill = (s: string, slots: Record<string, string>): string => s.replace(/\{(\w+)\}/g, (m, k: string) => slots[k] ?? m);
 
