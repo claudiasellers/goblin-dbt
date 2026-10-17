@@ -6,9 +6,10 @@ ways to see it. If there's a threat in it, you check how likely it is and whethe
 it. Then you look at when this feeling fits the facts, and the tool hands you to the skill that fits your
 answer.
 
-Status: **being built 17 Oct 2026.** It's the recommended option on Claudia's "what to build after Cope
-Ahead" card, so it's being built while the card is open, as Cope Ahead was. *Decisions for the build* at
-the end override anything above them.
+Status: **designed, not built (17 Oct 2026); handed to a new session.** Claudia picked it as the next tool
+after Cope Ahead, then moved the build to its own session. Start with `check-the-facts-handover.md`, which has the
+build contract (types, helpers, props), the facts checked against the code and the deploy steps.
+*Decisions for the build* at the end override anything above them.
 
 ---
 
@@ -170,7 +171,7 @@ Then the regulation close: *"How strong is it now, compared to when you started?
     - `CheckFactsFlow` (screen copy, the step-7 table).
   - `fitsTheFactsWhen` is read from the existing nodes and never copied.
   - The copy is voice-linted. It isn't gated on sign-off, the same as Wise mind and Cope Ahead. The one
-    parts line (`cf_unblend`) waits for the parts sign-off.
+    parts line (`cf_unblend`) is a draft until it's signed off (every other parts line was, 17 Oct).
 - **The concept:** `dbt_check_facts.appToolId = 'check-the-facts'`, taken out of `PLANNED`. Its routing
   rows stay off and drafts.
 - **The visit:** a `ToolSession` with `ext.cf`:
@@ -317,4 +318,5 @@ they win.
    - The word comes first on screen 1 and isn't pre-selected.
    - Do the Opposite's fits step passes its emotion.
 
-The shared types and every screen's props are in `src/data/checkFactsTypes.ts`.
+The shared types and every screen's props are in `check-the-facts-handover.md` (*Build contract*); the types
+file, `src/data/checkFactsTypes.ts`, is written from it.
