@@ -104,7 +104,9 @@ test("the document: every id a surface requires, with the fixture's text, its st
   assert.ok(keepsake.length > 0);
   for (const id of [...Object.keys(fixture.prompts), ...options.map((o) => o.id), ...keepsake]) assert.ok(doc.includes(`\`${id}\``), `${id}: never shown for review`);
   const total = Object.keys(fixture.prompts).length + options.length + keepsake.length;
-  assert.match(doc, new RegExp(`\\*\\*${total} lines in all: 0 signed off, ${total} drafts`));
+  // Every line signed off 17 Oct (Claudia: ship it all).
+  assert.equal(total, 454);
+  assert.ok(doc.includes("**454 lines in all: 454 signed off, 0 drafts.**"));
   for (const m of fixture.moves) assert.ok(doc.includes(`\`${m.id}\``), m.id);
   for (const h of fixture.hurts) assert.ok(doc.includes(`| \`${h.id}\` | ${h.label} | ${h.feltPhrase} | ${h.matters} |`), h.id);
   for (const ev of Object.keys(fixture.canTouch)) assert.ok(doc.includes(`\`${ev}\``), ev);

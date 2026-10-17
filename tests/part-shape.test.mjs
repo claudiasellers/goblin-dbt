@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const lib = await importTs("src/lib/partShape.ts");
@@ -18,7 +18,7 @@ const SHIPPED = JSON.parse(read("src/data/content/parts.json")).content;
 const without = (drop) => partsFromFixture(fixture, (id) => !drop.includes(id));
 const IDS = [...lib.TAG_SHAPE_REQUIRED.prompts, ...lib.TAG_SHAPE_REQUIRED.options];
 
-test("copy: drafts in flow tag, step shape", () => {
+test("copy: flow tag, step shape, signed off 17 Oct (Claudia: ship it all)", () => {
   assert.deepEqual(lib.TAG_SHAPE_REQUIRED, {
     prompts: ["tag_use_shape", "tag_use_shape_noname", "tag_shape_done"], options: ["tag_shape_yes", "tag_shape_no"],
   });
@@ -28,7 +28,7 @@ test("copy: drafts in flow tag, step shape", () => {
     ["tag_shape_done", "tag", "shape", "Done."],
   ]);
   assert.deepEqual(fixture.options.tag.shape.map((o) => [o.id, o.label, o.branch]), [["tag_shape_yes", "Yes", "keep"], ["tag_shape_no", "No thanks", "end"]]);
-  for (const id of IDS) assert.equal(fixture.prompts[id]?.reviewStatus ?? fixture.options.tag.shape.find((o) => o.id === id).reviewStatus, "draft", id);
+  for (const id of IDS) assert.equal(fixture.prompts[id]?.reviewStatus ?? fixture.options.tag.shape.find((o) => o.id === id).reviewStatus, "approved", id);
 });
 
 test("visitHasShape: a Shape it visit moved from neutral; Tune it, neutral or nothing: none", () => {
@@ -50,7 +50,9 @@ test("the gate: parts on, Find the feeling with a shape, every line shipped; any
   }
   for (const id of IDS) assert.equal(lib.shapeOfferReady({ ...ok, content: without([id]) }), false, `${id} missing`);
   assert.equal(lib.shapeOfferReady({ ...ok, content: null }), false);
-  assert.equal(lib.shapeOfferReady({ ...ok, content: SHIPPED }), false, "today: nothing signed off");
+  assert.equal(lib.shapeOfferReady({ ...ok, content: SHIPPED }), true, "the shipped file (signed off 17 Oct)");
+  for (const id of IDS) assert.equal(lib.shapeOfferReady({ ...ok, content: withoutIds(SHIPPED, id) }), false, `shipped file without ${id}`);
+  assert.equal(lib.shapeOfferCopy(SHIPPED, { label: "The guard", named: true }).ask, "Use this shape for The guard?");
   assert.deepEqual([...lib.SHAPE_HOSTS], [...SHAPE_TOOLS], "the client's hosts are the server's tools");
 });
 

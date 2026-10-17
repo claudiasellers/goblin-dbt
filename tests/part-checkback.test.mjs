@@ -1,11 +1,11 @@
 // The next-day check-back after a meeting (docs/design/parts.md, Meet a part step 10; part-checkback):
-// its copy is drafts in parts content, its follow-up type is a spine row, Today reads the part's name
+// its copy is in parts content (signed off 17 Oct), its follow-up type is a spine row, Today reads the part's name
 // through the 'today' profile slice, and the card renders only when every word of it is signed off.
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 import { followUpTypes } from "./lib/practiceSpine.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
@@ -14,7 +14,7 @@ const shipped = JSON.parse(read("src/data/content/parts.json")).content;
 const lib = await importTs("src/lib/partCheckback.ts");
 const option = (flow, step, id) => fixture.options[flow]?.[step]?.find((o) => o.id === id);
 
-test("copy pins: the check-back, its answers and the close question, all drafts until Claudia signs them off", () => {
+test("copy pins: the check-back, its answers and the close question, signed off 17 Oct (Claudia: ship it all)", () => {
   const prompts = {
     checkback_title: ["checkback", "checkback", "How's {name} today?"],
     checkback_title_noname: ["checkback", "checkback", "How's the part you met yesterday?"],
@@ -34,8 +34,8 @@ test("copy pins: the check-back, its answers and the close question, all drafts 
     assert.deepEqual([option(flow, step, id)?.label, option(flow, step, id)?.branch], [label, branch], id);
   }
   assert.deepEqual(fixture.options.checkback.checkback.map((o) => o.id), ["checkback_settled", "checkback_same", "checkback_louder", "checkback_skip"]);
-  for (const id of ["checkback_title", "checkback_title_noname", "close_checkback"]) assert.equal(fixture.prompts[id].reviewStatus, "draft", id);
-  for (const id of ["checkback_title", "checkback_title_noname", "close_checkback"]) assert.ok(!shipped.prompts[id], `${id} ships only signed off`);
+  for (const id of ["checkback_title", "checkback_title_noname", "close_checkback"]) assert.equal(fixture.prompts[id].reviewStatus, "approved", id);
+  for (const id of ["checkback_title", "checkback_title_noname", "close_checkback"]) assert.equal(shipped.prompts[id]?.copy, fixture.prompts[id].copy, `${id} ships signed off`);
 });
 
 test("the part_checkback follow-up type: mf, quality, inline, tomorrow 10:00, stale after 36 h, no reminders; drafts mirror the parts copy", () => {
@@ -65,7 +65,10 @@ test("Today's card gate: no flowReady, no card (and the stack drops it); every i
     assert.equal(lib.checkbackReady(without), false, `${id} missing hides the card`);
   }
   assert.equal(lib.checkbackReady(null), false);
-  assert.equal(lib.checkbackReady(shipped), ids.every((id) => shipped.prompts[id] || Object.values(shipped.options).some((s) => Object.values(s).flat().some((o) => o.id === id))));
+  // Signed off 17 Oct (Claudia: ship it all): the shipped file shows the card; any one line out hides it.
+  assert.equal(lib.checkbackReady(shipped), true);
+  assert.equal(lib.checkbackTitle(shipped, null), "How's the part you met yesterday?");
+  for (const id of ids) assert.equal(lib.checkbackReady(withoutIds(shipped, id)), false, `shipped file without ${id}`);
   const items = [{ id: "a", type: "part_checkback" }, { id: "b", type: "recover_log" }];
   assert.deepEqual(lib.withReadyCheckbacks(items, false).map((i) => i.id), ["b"]);
   assert.deepEqual(lib.withReadyCheckbacks(items, true).map((i) => i.id), ["a", "b"]);

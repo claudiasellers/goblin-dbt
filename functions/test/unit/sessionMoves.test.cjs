@@ -44,10 +44,12 @@ test('Find the feeling: the DETAIL session\'s pull gives its move, with no urgeI
   const ts = tool({ toolId: 'find-the-feeling' });
   const ftf = { labels: ['FindTheFeelingSession'], pull: 'hide' };
   assert.deepEqual(movesOf(ts, ftf, anyStatus), [FIXTURE.expresses.FeelingUrge.hide.moveId]);
-  assert.deepEqual(movesOf(ts, ftf), [], 'approved edges only: every edge is a draft today');
-  const approvedHide = SOURCES.map((s) => (s.node.labels[0] === 'FeelingUrge' && s.node.id === 'hide' ? { ...s, status: 'approved' } : s));
-  assert.deepEqual(movesOf(ts, ftf, undefined, approvedHide), ['hide'], 'once its edge is approved');
-  assert.deepEqual(movesOf(ts, { ...ftf, pull: 'chase' }, undefined, approvedHide), [], 'another pull\'s draft edge still does not count');
+  // Every edge signed off 17 Oct (Claudia: ship it all): the approved edge counts; a draft one never does.
+  assert.ok(SOURCES.every((s) => s.status === 'approved'), 'every edge approved');
+  assert.deepEqual(movesOf(ts, ftf), ['hide'], 'approved edges count');
+  const draftHide = SOURCES.map((s) => (s.node.labels[0] === 'FeelingUrge' && s.node.id === 'hide' ? { ...s, status: 'draft' } : s));
+  assert.deepEqual(movesOf(ts, ftf, undefined, draftHide), [], 'a draft edge does not count');
+  assert.deepEqual(movesOf(ts, { ...ftf, pull: 'chase' }, undefined, draftHide), [FIXTURE.expresses.FeelingUrge.chase.moveId], 'another pull\'s approved edge still does');
   assert.deepEqual(movesOf(ts, null, anyStatus), [], 'no DETAIL, no urgeIds: nothing');
 });
 

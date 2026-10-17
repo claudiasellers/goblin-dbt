@@ -6,7 +6,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const U = await importTs("src/lib/unblendLine.ts");
 const ext = await importTs("functions/src/spine/extSchemas.ts");
@@ -32,8 +32,9 @@ test("expresses: approved edges to moves that ship, by source label; the fixture
   assert.ok(!("fight" in partsFromFixture(fixture, (id) => id !== "hit_back").expresses.FeelingUrge));
   // An edge is reviewed by its source id.
   assert.ok(!("fight" in partsFromFixture(fixture, (id) => id !== "fight").expresses.FeelingUrge));
-  // Today nothing is signed off: no id has a line yet.
-  assert.deepEqual(SHIPPED.expresses, {});
+  // Signed off 17 Oct (Claudia: ship it all): the shipped file carries every offerable edge, never a shutdown move.
+  assert.deepEqual(SHIPPED.expresses, ALL.expresses);
+  assert.deepEqual(SHIPPED.expresses.FeelingUrge, { chase: "chase", fight: "hit_back", hide: "hide" });
 });
 
 test("unblendLine: the move's phrase in unblend_line, or null", () => {
@@ -60,8 +61,12 @@ test("unblendLine: the move's phrase in unblend_line, or null", () => {
   assert.equal(U.unblendLine(without(["fight"]), "ftf", "fight"), null);
   assert.equal(U.unblendLine(without(["fight"]), "ftf", "hide"), "A part of you wants to hide right now.");
   assert.equal(U.unblendLine({ ...ALL, prompts: { ...ALL.prompts, unblend_line: { ...ALL.prompts.unblend_line, copy: "No slot." } } }, "ftf", "hide"), null);
-  // Today's shipped file: nothing.
-  for (const id of ["fight", "chase", "hide", "blank"]) assert.equal(U.unblendLine(SHIPPED, "ftf", id), null);
+  // The shipped file (signed off 17 Oct): the same lines, blank still none; the line or the move out of it, nothing.
+  for (const id of ["fight", "chase", "hide", "blank"]) assert.equal(U.unblendLine(SHIPPED, "ftf", id), U.unblendLine(ALL, "ftf", id), id);
+  assert.equal(U.unblendLine(SHIPPED, "ftf", "hide"), "A part of you wants to hide right now.");
+  assert.equal(U.unblendLine(SHIPPED, "ftf", "blank"), null);
+  assert.equal(U.unblendLine(withoutIds(SHIPPED, U.UNBLEND_PROMPT), "ftf", "hide"), null, "shipped file without the line");
+  assert.equal(U.unblendLine(withoutIds(SHIPPED, "hide"), "ftf", "hide"), null, "shipped file without the move");
 });
 
 test("unblendLine with several picks: a line only when every pick has an edge and they share one move", () => {

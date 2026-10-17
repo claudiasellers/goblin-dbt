@@ -5,7 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { importTs } from "./lib/importTs.mjs";
-import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { partsFromFixture, withoutIds } from "./lib/partsContentFixture.mjs";
 
 const read = (f) => readFileSync(f, "utf8");
 const lib = await importTs("src/lib/debriefWho.ts");
@@ -16,6 +16,8 @@ const fixture = JSON.parse(read("tests/fixtures/parts-content.json"));
 const IDS = [...lib.DEBRIEF_PROMPTS, ...lib.DEBRIEF_OPTIONS, ...tagLib.TAG_PROMPTS, ...tagLib.TAG_OPTIONS, ...tagLib.UNNAMED_PROMPTS];
 const shipped = (ids) => partsFromFixture(fixture, (id) => ids.includes(id));
 const content = shipped(IDS);
+/** parts.json as the app ships it: every line signed off 17 Oct (Claudia: ship it all). */
+const real = JSON.parse(read("src/data/content/parts.json")).content;
 
 test("copy: dearman/debrief, its own lines only (the tag row's are reused, not copied)", () => {
   assert.deepEqual(lib.DEBRIEF_PROMPTS.map((id) => [id, fixture.prompts[id].flow, fixture.prompts[id].step, fixture.prompts[id].copy]), [
@@ -31,7 +33,8 @@ test("gate: parts on, a kept part, every line shipped (its own and the tag row's
   assert.equal(lib.debriefWhoReady(content), true);
   for (const id of IDS) assert.equal(lib.debriefWhoReady(shipped(IDS.filter((x) => x !== id))), false, `${id} missing`);
   assert.equal(lib.debriefWhoReady(null), false);
-  assert.equal(lib.debriefWhoReady(partsFromFixture(fixture)), false, "drafts today: no screen");
+  assert.equal(lib.debriefWhoReady(real), true, "the shipped file: the screen shows");
+  for (const id of IDS) assert.equal(lib.debriefWhoReady(withoutIds(real, id)), false, `shipped file without ${id}`);
   const on = { partsOn: true, partCount: 1, ready: true };
   assert.equal(lib.showDebriefWho(on), true);
   for (const [k, v] of [["partsOn", false], ["partCount", 0], ["ready", false], ["answered", true]]) assert.equal(lib.showDebriefWho({ ...on, [k]: v }), false, k);
