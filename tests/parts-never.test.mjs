@@ -307,10 +307,10 @@ describe("9. Parts language by default.", () => {
   // here, so a writer can't slip through by returning: every other callable must throw.
   const READERS_EMPTY = ["getReflectTrails", "getDen", "getDenSnapshot", "getPartStory"];
   test("every parts writer refuses with parts off; every reader returns nothing (deleteMyParts excepted; the entry gate answers clear)", () => {
-    const index = read("functions/src/parts/index.ts") + read("functions/src/parts/offers/index.ts");
+    const index = read("functions/src/parts/index.ts") + read("functions/src/parts/offers/index.ts") + read("functions/src/parts/pulls/index.ts");
     const callables = [...index.matchAll(/export const (\w+) = callable<[\s\S]*?\n\);/g)].map((m) => [m[1], m[0]]);
     const deployed = [...read("functions/src/index.ts").matchAll(/export \{([^}]*)\} from '\.\/parts';/g)]
-      .flatMap((m) => m[1].split(",").map((x) => x.trim())).filter((x) => x && x !== "deleteMyParts");
+      .flatMap((m) => m[1].split(",").map((x) => x.trim())).filter((x) => x && x !== "deleteMyParts" && x !== "countMyPartsLines"); // both work with parts off (delete.ts)
     assert.deepEqual(callables.map(([n]) => n).sort(), deployed.sort(), "every deployed parts callable is checked");
     // The part editors (rename, rest, set aside, ...) all open with keep.ts' ownPart, which refuses first.
     const OWN_PART_REFUSES = /async function ownPart\([^)]*\) \{\n\s*const st = await deps\.state\(q\);\n\s*if \(!st\.partsOn\) throw partsOff\(\);/.test(read("functions/src/parts/keep.ts"));

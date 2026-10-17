@@ -30,7 +30,7 @@ export {
   answerPatternOffer,
 } from './profile';
 export { getPartsEntry, startPartSession, savePartSession, keepPart, queuePartCandidate } from './parts';
-export { deleteMyParts } from './parts';
+export { deleteMyParts, countMyPartsLines } from './parts';
 export { answerPartCandidate } from './parts';
 export { tagPart } from './parts';
 export { sayToPart } from './parts';
@@ -38,6 +38,7 @@ export { renamePart, restPart, setAsidePart, restorePart, setPartTender, answerP
 export { schedulePartCheckback, answerPartCheckback } from './parts';
 export { setPartAnchor } from './parts';
 export { getTrailOfferEvidence, answerTrailOffer, getReflectTrails, answerKnownPartReview, removeTrailPattern } from './parts';
+export { startPullsSession, savePullsSession, keepPullsKeepsake, schedulePullsCheckback } from './parts';
 export { setPartShape } from './parts';
 export { getDen, getDenSnapshot, updatePartLayout, linkParts, unlinkParts } from './parts';
 export { getPartStory } from './parts';

@@ -39,7 +39,7 @@ export const TAG_CLOSES = ['better', 'much_better'] as const;
 /** Urge-close answers that count as "it helped": Held off (the urge close's better answer). */
 export const TAG_URGE_CLOSES = ['no'] as const;
 /** Tools whose close never shows the row (Meet a part is the part itself). */
-export const TAG_NEVER_TOOLS = ['meet-a-part'] as const;
+export const TAG_NEVER_TOOLS = ['meet-a-part', 'two-pulls'] as const;
 /** The tools a debrief tag may name: DEAR MAN's debrief only. */
 export const TAG_DEBRIEF_TOOLS = ['dear-man'] as const;
 

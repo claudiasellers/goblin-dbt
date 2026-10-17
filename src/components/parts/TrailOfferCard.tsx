@@ -5,6 +5,7 @@ import type { GetTrailOfferEvidenceResponse, TrailOfferAnswer } from '../../data
 import type { TodayItem } from '../../services/spine';
 import { answerTrailOffer, getTrailOfferEvidence } from '../../services/parts';
 import { trailOfferReady } from '../../lib/trailOffer';
+import { opensTwoPulls, twoPullsPath } from '../../lib/twoPullsLink';
 import {
   evidenceAnswers, evidenceRows, offerMeetLink, splitChips, splitCopy, trailCardCopy, trailStatement,
 } from '../../lib/trailOfferCard';
@@ -19,7 +20,7 @@ const chipOn = 'min-h-11 px-3 py-2 text-sm rounded-lg border border-[var(--color
  * (No is Not me). Show me opens the evidence: one row per moment (date, tool, context, what was picked,
  * all ids rendered as labels), "Does this feel like a part of you?" and the four answers. Yes opens Meet a
  * part on the offer; More than one asks which feels like its own thing, the offer's moves as chips, and
- * keeps each as a part to come back to. Every word is signed-off content; without all of it the card is
+ * keeps each as a part to come back to (on a rule C trail it opens Two pulls on the offer's pair instead). Every word is signed-off content; without all of it the card is
  * nothing. A failed call keeps the card as it was.
  */
 export function TrailOfferCard({ item, content, onDone }: {
@@ -47,8 +48,14 @@ export function TrailOfferCard({ item, content, onDone }: {
   };
   const show = () => run(async () => { setEvidence(await getTrailOfferEvidence({ offerId: item.id })); });
   const answer = (a: TrailOfferAnswer) => run(async () => {
-    if (a === 'more_than_one') { setSplitting(true); return; }
+    // A rule C trail (two pulls) opens Two pulls on its pair; any other shape asks the split.
+    if (a === 'more_than_one' && !opensTwoPulls(item.trail)) { setSplitting(true); return; }
     const res = await answerTrailOffer({ offerId: item.id, answer: a });
+    if (res.next === 'two_pulls' && res.pairId) {
+      onDone(item.id);
+      navigate(twoPullsPath({ kind: 'pair', pairId: res.pairId, offerId: item.id }));
+      return;
+    }
     onDone(item.id);
     if (res.next === 'meet') {
       const link = offerMeetLink(content, item.id, res.moveIds ?? evidence?.moveIds ?? []);
@@ -87,7 +94,7 @@ export function TrailOfferCard({ item, content, onDone }: {
   if (evidence) {
     const rows = evidenceRows(evidence.rows);
     // "More than one" needs every move as a chip.
-    const canSplit = splitChips(content, evidence.moveIds).length > 0;
+    const canSplit = opensTwoPulls(item.trail) || splitChips(content, evidence.moveIds).length > 0;
     const heading = content.prompts.offer_evidence.copy;
     return (
       <section ref={root} aria-label={heading} data-testid="trail-offer-evidence" className={frame}>

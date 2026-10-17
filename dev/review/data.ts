@@ -136,6 +136,15 @@ export function checkbackItem(named: boolean): TodayItem {
   };
 }
 
+/** Two pulls' week check-back (two_pulls_checkback): both kept parts, as getToday sends it. */
+export function checkbackItemTwo(): TodayItem {
+  return {
+    id: uuid(303), kind: 'follow_up', type: 'two_pulls_checkback', tier: 'quality', state: 'due', dueAt: '2026-10-23T10:00:00.000Z',
+    resolveMode: 'inline', deepLink: null, choices: [], copy: { title: '' },
+    parts: [{ id: PART_IDS.chase, name: byId.chase.name, tender: false }, { id: PART_IDS.hide, name: byId.hide.name, tender: false }],
+  };
+}
+
 export const ids = { uuid };
 
 /* ── trail offers: the statement the server would build (rule template, context phrase, moves' trailPhrases) ── */

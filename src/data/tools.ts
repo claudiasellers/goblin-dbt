@@ -139,6 +139,17 @@ export const tools: Tool[] = [
     bare: true,
     listed: 'parts',
   },
+  {
+    id: 'two-pulls',
+    name: 'Two pulls',
+    tagline: 'Two parts of you pulling different ways',
+    description: 'Set two parts of you out side by side, notice how you feel toward each, hear what each one worries about, and find what they both want for you.',
+    whenToUse: 'When two parts of you want different things and both are trying to help.',
+    module: 'mindfulness',
+    emoji: '🪢',
+    bare: true,
+    listed: false,
+  },
 ];
 
 /**
