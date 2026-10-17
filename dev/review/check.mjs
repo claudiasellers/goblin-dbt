@@ -155,6 +155,9 @@ try {
           if (shows === silent) bad(silent ? 'goal line shown where it must not be' : 'no goal line');
         }
         if (v.surface?.startsWith('unblend_') && v.branch !== 'blank' && !(await page.locator('[data-testid="unblend-line"]').count())) bad('no unblend line');
+        // Non-parts screens (lane 1: Wise mind) bring their own lines, read from the page's map.
+        if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) bad(`missing "${map.expect[v.key]}"`);
+        if (map.absent?.[v.key] && text.includes(map.absent[v.key])) bad(`shows "${map.absent[v.key]}"`);
       } else if (!text.includes('⟨')) bad('Show ids printed no ids');
     } else {
       await page.waitForSelector('[data-surface]', { timeout: 15000 }).catch(() => bad('no index'));
@@ -202,6 +205,7 @@ try {
     const want = EXPECT[v.key];
     if (want && !v.plain && !text.toLowerCase().includes(copy(want).toLowerCase())) tbad(`${v.name}: missing ${want}`);
     if (SELECTOR[v.key] && !v.plain && !(await tour.locator(SELECTOR[v.key]).count())) tbad(`${v.name}: missing ${SELECTOR[v.key]}`);
+    if (map.expect?.[v.key] && !text.includes(map.expect[v.key])) tbad(`${v.name}: missing "${map.expect[v.key]}"`); // lane 1
   }
   await tour.close();
   await browser.close();

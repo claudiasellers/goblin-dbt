@@ -69,7 +69,7 @@ MERGE (k:PracticeSkill {id: "label"})
 SET k.defaultFor = ["find-the-feeling"], k.displayLabel = "Name it";
 
 // --- New PracticeSkills (only their own links are refreshed) ---
-MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN ["urge_surf", "problem_solve"] DELETE r;
+MATCH (k:PracticeSkill)-[r:PRACTICES|SUPPORTED_BY]->() WHERE k.id IN ["urge_surf", "problem_solve", "wise_mind"] DELETE r;
 MERGE (k:PracticeSkill {id: "urge_surf"})
 SET k.name = "Ride the urge", k.displayLabel = "Ride the urge", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Watching an urge rise and fall without acting on it teaches that it passes on its own.", k.defaultFor = ["urge-surfing"], k.reviewStatus = "draft";
 MATCH (k:PracticeSkill {id: "urge_surf"}), (c:TherapyConcept {id: "urge_surfing"})
@@ -83,4 +83,11 @@ MATCH (k:PracticeSkill {id: "problem_solve"}), (c:TherapyConcept {id: "dbt_probl
 MERGE (k)-[:PRACTICES]->(c);
 UNWIND ["linehan_skills_2015"] AS srcId
 MATCH (k:PracticeSkill {id: "problem_solve"}), (s:ClinicalSource {id: srcId})
+MERGE (k)-[:SUPPORTED_BY]->(s);
+MERGE (k:PracticeSkill {id: "wise_mind"})
+SET k.name = "Wise mind", k.displayLabel = "Wise mind", k.evidenceGrade = "Preliminary", k.evidenceBasis = "Limited trials", k.family = "mind", k.why = "Hearing what feeling and thinking each say, then pausing to listen, leaves room for a choice that fits both.", k.defaultFor = ["wise-mind"], k.reviewStatus = "draft";
+MATCH (k:PracticeSkill {id: "wise_mind"}), (c:TherapyConcept {id: "dbt_wise_mind"})
+MERGE (k)-[:PRACTICES]->(c);
+UNWIND ["linehan_skills_2015"] AS srcId
+MATCH (k:PracticeSkill {id: "wise_mind"}), (s:ClinicalSource {id: srcId})
 MERGE (k)-[:SUPPORTED_BY]->(s);

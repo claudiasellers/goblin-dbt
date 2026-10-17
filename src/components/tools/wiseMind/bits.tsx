@@ -42,7 +42,7 @@ function useFocusOnMount<T extends HTMLElement>(on: boolean) {
 export function Chip({ label, pressed, onClick, own = false }: { label: ReactNode; pressed?: boolean; onClick: () => void; own?: boolean }) {
   return (
     <button type="button" aria-pressed={pressed ? 'true' : 'false'} onClick={onClick}
-      className={`den-chip den-chip--small ${own ? 'font-serif' : ''}`}>{label}</button>
+      className={`den-chip den-chip--small ${own ? 'font-serif' : ''} ${pressed ? '!text-[var(--color-on-accent)]' : ''}`}>{label}</button>
   );
 }
 

@@ -176,7 +176,7 @@ test("the page: no band gate, TooMuchLink on every screen, the keep through the 
   assert.match(page, /onClick=\{\(\) => \{ void keepIt\(\); \}\}/);
   assert.match(page, /const to = toolSession\.linkTo\(toolId\);\s*navigate\(to\.pathname, \{ state: to\.state \}\);/);
   assert.match(page, /toolSession\.setWiseMindAnswer\(wiseMindAnswerOf\(s\)\)/);
-  assert.match(page, /<SessionClose kind="orienting" \/>/);
+  assert.match(page, /<SessionClose kind="orienting" onAnswered=\{focusDone\} onSkipped=\{focusDone\} \/>/);
   assert.doesNotMatch(page, /localStorage|sessionStorage/, "the answer is never kept on the device to pre-fill");
 });
 
