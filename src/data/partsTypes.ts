@@ -305,7 +305,7 @@ export interface AngryContentHurt {
 
 /** The slice of the parts content the angry card is built from (the fixture's shape; the harness reads it). */
 export interface AngryCardContent {
-  prompts: Record<string, { flow: string; step: string; copy: string }>;
+  prompts: Record<string, { copy: string }>;
   options: Record<string, Record<string, { id: string; label: string }[]>>;
   hurts: AngryContentHurt[];
 }
