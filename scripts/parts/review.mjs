@@ -76,17 +76,21 @@ export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 
 /**
  * The surfaces, most exposed first: where each shows and to whom, and the id sets its gates require.
- * `choices` (Meet a part): option steps that need at least one signed-off option each.
+ * `choices` (Meet a part): option steps that need at least one signed-off option each. `vocab`: the
+ * signed-off vocabulary its lines show through, as its `where` says (moves, hurts, contexts, EXPRESSES
+ * sources, trail rules A–C or D); scripts/parts/sign-off.mjs --surface signs these off with the lines.
  */
 export function surfaces(g) {
   return [
     {
       id: 'unblend', title: 'The unblend line',
+      vocab: ['moves', 'expresses'],
       where: 'With parts on, right after a pull or urge the person picked in Find the feeling, Do the Opposite or Recover: one line, "A part of you {move} right now.", from the move the pick EXPRESSES (never while the P2 hand-off is open). It also needs the move\'s `unblendPhrase` and the pick\'s EXPRESSES edge signed off (see The vocabulary).',
       groups: [{ label: null, ids: g.UNBLEND_REQUIRED }],
     },
     {
       id: 'angry', title: 'The angry-part card',
+      vocab: ['hurts'],
       where: 'In Recover, on the fight pull: a short card in the moment. With parts on it speaks of "a part of you"; with parts off it shows its plain wording (the `_plain` twins), so it reaches people who never turned parts on. It also needs every protected hurt complete (label, `feltPhrase`, `matters`).',
       groups: [
         { label: 'Parts on', ids: g.angryRequired(true) },
@@ -96,6 +100,7 @@ export function surfaces(g) {
     },
     {
       id: 'meet', title: 'Meet a part',
+      vocab: ['moves', 'hurts'],
       where: 'The parts tool, with parts on: in the Tools list (Mindfulness) once this is signed off, and by its links (Me, Settings, a candidate, the angry card, an offer): the whole visit from the entry gate to the close. It also needs at least one move, Shape it\'s words (Find the feeling) and a "Keep it" yes.',
       groups: [
         { label: 'The visit (the paused line shows only for a paused part)', ids: g.meetRequired({ paused: true }) },
@@ -118,6 +123,7 @@ export function surfaces(g) {
     },
     {
       id: 'me', title: 'Parts of me',
+      vocab: ['moves'],
       where: 'Me, with parts on (with parts off, the switch card in the last group): the person\'s kept parts as cards (their actions, the 30-day check-back, the readout), set-aside parts, and the parts they said they\'d come back to. Each group below lights up on its own once the area does.',
       groups: [
         { label: 'The area, the cards and their actions', ids: g.PARTS_OF_ME_REQUIRED },
@@ -155,21 +161,25 @@ export function surfaces(g) {
     },
     {
       id: 'offer', title: 'The trail offer (Today)',
+      vocab: ['trailRules', 'moves', 'contexts'],
       where: 'Today only, with parts on and offers switched on (PartsPolicy.offersEnabled), at most one a week shared with what_helps, never near flooding, a crisis flag, repeated dissociation or a harm signal: "Something keeps showing up", the rule\'s statement, "Want to take a look?", then the evidence and the four answers. It also needs the rule\'s statement, the moves\' `trailPhrase` and the context\'s phrase signed off (see Trail rules and Trail contexts). Rule D ("Was this {name}?") is never on Today: Reflect asks it in a batch (below).',
       groups: [{ label: null, ids: g.TRAIL_OFFER_REQUIRED }],
     },
     {
       id: 'review', title: '"Was this {name}?" (Reflect)',
+      vocab: ['trailRuleD'],
       where: 'Reflect, with parts on and offers switched on, never a push and never near flooding, a crisis flag, repeated dissociation or a harm signal (the trail offer\'s gate, without the weekly budget): one block per part the person knows that rule D found (at most two at once). The part\'s name and figure, then rule D\'s statement ("Was this {name}?"; for a part with no name, its chip label and the line below), a row per moment (date, tool, context, what was picked: labels only, never their words) with Yes / No / Not sure, then Done / Not now. Yes tags that moment to the part; No never asks about it again for that part; Not sure does nothing. Done or Not now: the part rests for the rule\'s cooldown (14 days). A part with a safety-line move or a danger fear shows the crisis resources alongside. It also needs the rule\'s statement signed off (see Trail rules).',
       groups: [{ label: null, ids: g.KNOWN_PART_REVIEW_REQUIRED }],
     },
     {
       id: 'patterns', title: 'Plain patterns (Reflect)',
+      vocab: ['trailRules', 'moves', 'contexts'],
       where: 'Reflect, with parts on: the trails the person answered "It\'s how things go", as the offer\'s own statement with no parts language ("When someone pulls away, the pull is to hide."), under this heading, each with a × to remove it for good. It also needs each statement\'s rule, moves\' `trailPhrase` and context phrase signed off.',
       groups: [{ label: null, ids: g.PLAIN_PATTERNS_REQUIRED }],
     },
     {
       id: 'oa', title: 'Do the Opposite',
+      vocab: ['moves', 'expresses'],
       where: 'In Do the Opposite, with parts on, on the check\'s "will it help you move toward your goal" card, above the question: two quiet lines setting the pull beside the goal the person picked, when the picked urge EXPRESSES an offerable move that isn\'t a safety-line move (never for "My urge is different", never while P2 is open). {move} is the move\'s `unblendPhrase` (the unblend line\'s); {goal} is Do the Opposite\'s own goal label with its first letter lower-cased ("You want to stay connected."). It also needs the move and the urge\'s EXPRESSES edge signed off (see The vocabulary).',
       groups: [{ label: null, ids: g.OA_GOAL_LINE_REQUIRED }],
     },
