@@ -87,7 +87,7 @@ function plan(map) {
   for (const s of map) {
     if (only && s.id !== only) continue;
     for (const b of s.branches.length ? s.branches : ['']) {
-      const q = `?s=${s.id}${b ? `&b=${b}` : ''}`;
+      const q = `#s=${s.id}${b ? `&b=${b}` : ''}`;
       visits.push({ name: `${s.id}${b ? `--${b}` : ''}`, query: q, surface: s.id });
       if (s.id === 'angry') visits.push({ name: `${s.id}--${b}--plain`, query: `${q}&plain=1`, surface: s.id });
     }
