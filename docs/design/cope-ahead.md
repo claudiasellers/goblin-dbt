@@ -173,10 +173,13 @@ makes.
 
 - **Tools:** Emotion Regulation, listed for everyone.
 - **Intents:** *"Something's coming up that I'm dreading"* → Cope Ahead.
+- **The link contract** (`src/lib/copeAheadEntry.ts`): `/tool/cope-ahead?first=<situationId>&part=<partId>`.
+  The situation chip comes first, never pressed. The part is preset in the parts step only if it's one of
+  the person's kept parts, and they can change it.
 - **DEAR MAN:** on the summary, *"Rehearse it"* opens Cope Ahead with *A conversation I'm dreading*
-  first (not pre-selected) and the person's chosen part carried in.
+  first (not pre-selected) and the person's chosen part carried in (parts on only).
 - **Recover:** *Rehearse the next time* (`recover_rehearse` on Today) gains a link, *"Walk through it
-  with Cope Ahead"*. The follow-up itself is unchanged.
+  with Cope Ahead"*, with *Seeing someone in particular* first. The follow-up itself is unchanged.
 - **The check-in result:** the anticipatory row (*anxious*, *nervous* → `cope-ahead`) goes live only
   when Claudia signs off that row, as with Wise mind. The tool lands with the row still switched off.
 
@@ -202,8 +205,8 @@ makes.
   - `feelIds`, `pullIds`, `partId`;
   - `hardMomentId`, `hardMomentOwn`, `ifFrom` (`moment` | `pull`);
   - `moveIds`, `moveOwn`;
-  - `rehearsed` (1 | 2), `newMomentId`, `settle` (`breath` | `five_senses` | `ok`), `kept`,
-    `followUp`.
+  - `rehearsed` (1 | 2), `newMomentId`, `newMomentOwn`, `newMoveIds`, `newMoveOwn` (the once-more
+    pass), `settle` (`breath` | `five_senses` | `ok`), `kept`, `followUp`.
 
   It is registered in `extSchemas.ts`. The `*Own` fields are length-checked only.
 - **The follow-up:** a new `FollowUpType` `cope_ahead_after` in practice-spine content.
@@ -342,11 +345,16 @@ rename fails loudly instead of drifting.
 | `rehearse_keep_move` / `rehearse_change_move` | Keep the same plan · Change what I'll do |
 | `settle_title` | Let your body come back to now. |
 | `settle_breath` / `settle_five` / `settle_ok` | Three long breaths out · 5-4-3-2-1 · I'm OK |
+| `settle_hold` | Hold while you breathe out, slowly. |
+| `settle_hold_hint` | Three times. Let go between them. |
 | `keep_title` | Here's your plan. |
 | `keep_yes` / `keep_no` | Keep this · Not now |
+| `keep_failed` | Couldn't save that. Try again. |
 | `ask_after_q` | Want me to ask how it went? |
 | `ask_after_yes` / `ask_after_no` | Yes · No thanks |
 | `done` | Done |
+| `entry_dear_man` | Rehearse it |
+| `entry_recover` | Walk through it with Cope Ahead |
 
 ### Rehearsal beats (`RehearsalBeat`, in order)
 
