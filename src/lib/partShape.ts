@@ -6,8 +6,7 @@
  * parts content; a part's own name is the person's.
  */
 import type { PartsContent } from '../data/partsContentTypes';
-import { fill } from './invalidationRecovery';
-import { surfaceReady, type SurfaceIds } from './partsContent';
+import { fillParts, surfaceReady, type SurfaceIds } from './partsContent';
 import type { TagChip } from './partTag';
 
 export const SHAPE_PROMPTS = ['tag_use_shape', 'tag_use_shape_noname', 'tag_shape_done'] as const;
@@ -43,7 +42,7 @@ const option = (content: PartsContent, id: string) => (content.options.tag?.shap
 export function shapeOfferCopy(content: PartsContent, chip: Pick<TagChip, 'label' | 'named'>): ShapeOfferCopy {
   const named = chip.named && chip.label.trim().length > 0;
   return {
-    ask: named ? fill(content.prompts.tag_use_shape?.copy ?? '', { name: chip.label.trim() }) : content.prompts.tag_use_shape_noname?.copy ?? '',
+    ask: named ? fillParts(content.prompts.tag_use_shape?.copy ?? '', { name: chip.label.trim() }) : content.prompts.tag_use_shape_noname?.copy ?? '',
     yes: option(content, 'tag_shape_yes'),
     no: option(content, 'tag_shape_no'),
     done: content.prompts.tag_shape_done?.copy ?? '',

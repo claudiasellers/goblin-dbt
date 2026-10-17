@@ -8,7 +8,7 @@
  * go_blank / zone_out, never has a line). Hosts decide when (parts on, never while P2 is open).
  */
 import type { PartsContent, PartsMove } from '../data/partsContentTypes';
-import { promptCopy, surfaceReady, type SurfaceIds } from './partsContent';
+import { fillParts, promptCopy, surfaceReady, type SurfaceIds } from './partsContent';
 
 export const UNBLEND_PROMPT = 'unblend_line';
 /** What the line requires of the copy (the move's phrase and the EXPRESSES edge come from the vocabulary). */
@@ -54,7 +54,7 @@ export function unblendLine(content: PartsContent | null, source: UnblendSource,
   const phrase = expressedMove(content, source, ids)?.unblendPhrase;
   const copy = promptCopy(content, UNBLEND_PROMPT);
   if (!phrase || !copy || !copy.includes('{move}')) return null;
-  return copy.replace('{move}', phrase);
+  return fillParts(copy, { move: phrase });
 }
 
 /** Where each host records that the line showed: its ToolSession's ext namespace (functions/src/spine/tools.ts). */

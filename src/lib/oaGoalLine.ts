@@ -13,7 +13,7 @@
  * effectiveness card, never while P2 or the too-much overlay is open).
  */
 import type { PartsContent } from '../data/partsContentTypes';
-import { promptCopy, surfaceReady, type SurfaceIds } from './partsContent';
+import { fillParts, promptCopy, surfaceReady, type SurfaceIds } from './partsContent';
 import { expressedMove } from './unblendLine';
 
 export const OA_GOAL_PART = 'oa_goal_part';
@@ -44,5 +44,5 @@ export function oaGoalLine(content: PartsContent | null, input: OaGoalLineInput)
   const part = promptCopy(content, OA_GOAL_PART);
   const you = promptCopy(content, OA_GOAL_YOU);
   if (!part?.includes('{move}') || !you?.includes('{goal}')) return null;
-  return [part.replace('{move}', move.unblendPhrase), you.replace('{goal}', goal)];
+  return [fillParts(part, { move: move.unblendPhrase }), fillParts(you, { goal })];
 }
