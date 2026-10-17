@@ -21,7 +21,7 @@ test("every interactive tool declares its close; client and server registries ag
   const page = readFileSync("src/pages/ToolPage.tsx", "utf8");
   const block = page.slice(page.indexOf("const toolComponents"), page.indexOf("};", page.indexOf("const toolComponents")));
   const components = [...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]);
-  assert.equal(components.length, 10);
+  assert.equal(components.length, 11);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);

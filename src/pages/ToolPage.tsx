@@ -22,6 +22,10 @@ import { FindTheFeeling } from './tools/FindTheFeeling';
 const loadMeetAPart = () => import('./tools/MeetAPart');
 const LazyMeetAPart = lazy(() => loadMeetAPart().then((m) => ({ default: m.MeetAPart })));
 function MeetAPart() { return <Suspense fallback={<ToolLoading />}><LazyMeetAPart /></Suspense>; }
+// Two pulls loads the same way, behind the same kind of gate (parts on, its copy signed off).
+const loadTwoPulls = () => import('./tools/TwoPulls');
+const LazyTwoPulls = lazy(() => loadTwoPulls().then((m) => ({ default: m.TwoPulls })));
+function TwoPulls() { return <Suspense fallback={<ToolLoading />}><LazyTwoPulls /></Suspense>; }
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -35,6 +39,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,
+  'two-pulls': TwoPulls,
 };
 
 export function ToolPage() {
@@ -45,7 +50,11 @@ export function ToolPage() {
   // Meet a part opens only with parts on and its copy signed off; otherwise it is "not found".
   const gate = useToolGate(tool?.id);
   const partsOn = useUserProfile().profile.partsEnabled;
-  useEffect(() => { if (tool?.id === 'meet-a-part' && partsOn) void loadMeetAPart().catch(() => { /* the render retries */ }); }, [tool?.id, partsOn]);
+  useEffect(() => {
+    if (!partsOn) return;
+    if (tool?.id === 'meet-a-part') void loadMeetAPart().catch(() => { /* the render retries */ });
+    if (tool?.id === 'two-pulls') void loadTwoPulls().catch(() => { /* the render retries */ });
+  }, [tool?.id, partsOn]);
 
   // Old address (/tool/cool-down): forward to the tool's own name, keeping the query and the
   // link state (Help me now / check-in / hand-off context for the session).

@@ -11,6 +11,8 @@ import type {
   AnswerKnownPartReviewRequest, AnswerKnownPartReviewResponse, GetReflectTrailsResponse, RemoveTrailPatternRequest, RemoveTrailPatternResponse,
   GetDenResponse, GetDenSnapshotRequest, GetDenSnapshotResponse, LinkPartsRequest, LinkPartsResponse, UnlinkPartsRequest,
   UnlinkPartsResponse, UpdatePartLayoutRequest, UpdatePartLayoutResponse,
+  KeepPullsKeepsakeRequest, KeepPullsKeepsakeResponse, PullsSessionResponse, SavePullsSessionRequest,
+  SchedulePullsCheckbackRequest, SchedulePullsCheckbackResponse, StartPullsSessionRequest,
 } from '../data/partsTypes';
 
 const getPartsEntryFn = httpsCallable<{ partId?: string }, PartsEntry>(functions, 'getPartsEntry');
@@ -229,4 +231,31 @@ export async function linkParts(req: LinkPartsRequest): Promise<LinkPartsRespons
 /** A thread's ×. */
 export async function unlinkParts(req: UnlinkPartsRequest): Promise<UnlinkPartsResponse> {
   return (await unlinkPartsFn(req)).data;
+}
+
+// ---- Two pulls (a hidden tool: from the den, or a rule C trail's More than one) ----
+
+const startPullsSessionFn = httpsCallable<StartPullsSessionRequest, PullsSessionResponse>(functions, 'startPullsSession');
+const savePullsSessionFn = httpsCallable<SavePullsSessionRequest, PullsSessionResponse>(functions, 'savePullsSession');
+const keepPullsKeepsakeFn = httpsCallable<KeepPullsKeepsakeRequest, KeepPullsKeepsakeResponse>(functions, 'keepPullsKeepsake');
+const schedulePullsCheckbackFn = httpsCallable<SchedulePullsCheckbackRequest, SchedulePullsCheckbackResponse>(functions, 'schedulePullsCheckback');
+
+/** Open this visit's record (idempotent while open). */
+export async function startPullsSession(req: StartPullsSessionRequest): Promise<PullsSessionResponse> {
+  return (await startPullsSessionFn(req)).data;
+}
+
+/** Merge what the visit has so far; `final` freezes it. */
+export async function savePullsSession(req: SavePullsSessionRequest): Promise<PullsSessionResponse> {
+  return (await savePullsSessionFn(req)).data;
+}
+
+/** "Keep this": the server builds the keepsake from the stored visit and keeps it in My words. */
+export async function keepPullsKeepsake(req: KeepPullsKeepsakeRequest): Promise<KeepPullsKeepsakeResponse> {
+  return (await keepPullsKeepsakeFn(req)).data;
+}
+
+/** On the close's yes: check back with both kept parts in a week. */
+export async function schedulePullsCheckback(req: SchedulePullsCheckbackRequest): Promise<SchedulePullsCheckbackResponse> {
+  return (await schedulePullsCheckbackFn(req)).data;
 }

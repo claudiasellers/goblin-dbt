@@ -126,6 +126,8 @@ export interface TodayItem {
   /** A parts check-back's part (parts on only): its name and tenderness from the profile slice. */
   /** `safety`: the part safety flag (functions/src/safety/partSafetyFlag.ts): CrisisBanner alongside the card. */
   part?: { id: string; name: string | null; tender: boolean; safety?: boolean };
+  /** Two pulls' week check-back (`two_pulls_checkback`): both kept parts, in the visit's order. */
+  parts?: Array<{ id: string; name: string | null; tender: boolean; safety?: boolean }>;
   /**
    * A parts trail offer (kind `trail_offer`, shapes A–C): the rule's signed-off statement and what fills
    * it, every phrase signed-off graph content. The card fills the template (src/lib/trailOffer.ts).

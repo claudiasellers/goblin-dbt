@@ -52,7 +52,7 @@ test("hidden: registered and reachable by link only, never in a list", () => {
   assert.ok(!T.getToolsByModule("mindfulness").some((t) => t.id === "meet-a-part"));
   assert.ok(!T.listedTools().some((t) => t.id === "meet-a-part"));
   assert.ok(!T.intents.some((i) => i.toolId === "meet-a-part"));
-  assert.equal(T.tools.filter((t) => t.listed === false).length, 1);
+  assert.deepEqual(T.tools.filter((t) => t.listed === false).map((t) => t.id), ["meet-a-part", "two-pulls"], "Meet a part and Two pulls");
   // Lists read only listed tools: Tools.tsx through getToolsByModule; nothing else iterates `tools` to show them.
   assert.match(read("src/pages/Tools.tsx"), /import \{ getToolsByModule, intents \} from '\.\.\/data\/tools'/);
   const page = read("src/pages/ToolPage.tsx");

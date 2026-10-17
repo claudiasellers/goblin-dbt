@@ -54,7 +54,8 @@ export async function loadGates() {
 export { UNBLEND_REQUIRED } from './src/lib/unblendLine';
 export { angryRequired, ANGRY_LATER_REQUIRED } from './src/lib/angryPart';
 export { meetRequired, MEET_OPTION_STEPS, CLOSE_CHECKBACK_REQUIRED } from './src/lib/meetAPartSave';
-export { PART_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
+export { PART_CHECKBACK_REQUIRED, TWO_PULLS_CHECKBACK_REQUIRED } from './src/lib/partCheckback';
+export { TWO_PULLS_REQUIRED, PULLS_OPTION_STEPS, PULLS_CHECKBACK_REQUIRED, PULLS_WISE_MIND_REQUIRED } from './src/lib/twoPullsSave';
 export { TAG_ROW_REQUIRED } from './src/lib/partTag';
 export { TAG_SHAPE_REQUIRED } from './src/lib/partShape';
 export { PARTS_OF_ME_REQUIRED, PART_REVISIT_REQUIRED, PART_CANDIDATE_REQUIRED } from './src/lib/partsOfMe';
@@ -104,9 +105,22 @@ export function surfaces(g) {
       choices: g.MEET_OPTION_STEPS,
     },
     {
+      id: 'pulls', title: 'Two pulls',
+      where: 'The parts tool for two parts pulling different ways, by link only (the den with two kept parts, or a rule C trail offer\'s "More than one" with its pair), with parts on: the entry gate, the blending check about both, setting them out, how they feel toward each (Meet a part\'s feel-toward and unblend chips), step back, each side\'s worry, what they both want, the keepsake and the close. A pair-only visit names each side "the part that {move}" from the move\'s `unblendPhrase`. The worries and what both want also need the pair and its chips signed off (Two pulls pairs); without a pair, two parts get "Not sure" and their own words only, and no keepsake.',
+      groups: [
+        { label: 'The visit', ids: g.TWO_PULLS_REQUIRED },
+        { label: 'The close\'s "Check back with both of them in a week?" (two kept parts; the visit shows without it)', ids: g.PULLS_CHECKBACK_REQUIRED },
+        { label: 'After the keepsake: "Ask wise mind what\'s next" (only once Wise mind is a tool; the visit shows without it)', ids: g.PULLS_WISE_MIND_REQUIRED },
+      ],
+      choices: g.PULLS_OPTION_STEPS,
+    },
+    {
       id: 'checkback', title: 'The check-back card',
       where: 'On Today, the day after a visit whose close said yes to checking back: "How\'s {name} today?" and, on Louder, the aftercare line. Parts on only.',
-      groups: [{ label: null, ids: g.PART_CHECKBACK_REQUIRED }],
+      groups: [
+        { label: null, ids: g.PART_CHECKBACK_REQUIRED },
+        { label: 'Two pulls\' week check-back: the same card with both names ("How are {A} and {B} today?")', ids: g.TWO_PULLS_CHECKBACK_REQUIRED },
+      ],
     },
     {
       id: 'tag', title: 'The tag row',

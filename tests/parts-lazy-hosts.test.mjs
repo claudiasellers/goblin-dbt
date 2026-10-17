@@ -59,15 +59,18 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part is the only lazy tool; its gate stays eager and fetches the content on demand", () => {
+test("Meet a part and Two pulls are the lazy tools; their gate stays eager and fetches the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 1, "one lazy tool");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 2, "two lazy tools");
   assert.match(page, /'meet-a-part': MeetAPart,/);
-  assert.match(page, /if \(tool\?\.id === 'meet-a-part' && partsOn\) void loadMeetAPart\(\)/, "prefetched only with parts on");
+  assert.match(page, /'two-pulls': TwoPulls,/);
+  assert.match(page, /if \(!partsOn\) return;\s*if \(tool\?\.id === 'meet-a-part'\) void loadMeetAPart\(\)[^\n]*\n\s*if \(tool\?\.id === 'two-pulls'\) void loadTwoPulls\(\)/, "prefetched only with parts on");
   const gate = read("src/hooks/useToolGate.ts");
-  assert.match(gate, /if \(!gated \|\| !on\) return;[\s\S]*?import\('\.\.\/services\/meetAPart'\)\.then\(\(m\) => m\.loadMeetAPartContent\(\)\)/, "content only with parts on");
+  assert.match(gate, /'meet-a-part': \(\) => import\('\.\.\/services\/meetAPart'\)\.then\(\(m\) => m\.loadMeetAPartContent\(\)\)/);
+  assert.match(gate, /'two-pulls': \(\) => import\('\.\.\/services\/twoPulls'\)\.then\(\(m\) => m\.loadTwoPullsContent\(\)\)/);
+  assert.match(gate, /if \(!gated \|\| !on\) return;\s*let live = true;\s*check!\(\)/, "content only with parts on");
   assert.match(gate, /if \(!on\) return loading \? 'loading' : 'closed';/);
 });
 

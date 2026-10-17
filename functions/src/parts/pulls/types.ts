@@ -37,10 +37,11 @@ export const PULLS_EXIT_STEPS: readonly PullsExitStep[] = [
 
 /**
  * Why a visit stopped: one side needed its own time (`not_self`), own words at a worry (`own_words`,
- * the conservative branch), danger, P2's come back later, or done.
+ * the conservative branch), a tender chip at a worry (`tender`, the same stop), danger, P2's come back
+ * later, or done.
  */
-export type PullsStopReason = 'not_self' | 'own_words' | 'danger' | 'later' | 'done';
-export const PULLS_STOP_REASONS: readonly PullsStopReason[] = ['not_self', 'own_words', 'danger', 'later', 'done'];
+export type PullsStopReason = 'not_self' | 'own_words' | 'tender' | 'danger' | 'later' | 'done';
+export const PULLS_STOP_REASONS: readonly PullsStopReason[] = ['not_self', 'own_words', 'tender', 'danger', 'later', 'done'];
 
 export type PullsSide = 'a' | 'b';
 

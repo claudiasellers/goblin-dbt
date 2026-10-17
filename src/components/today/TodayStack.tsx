@@ -4,7 +4,7 @@ import { useOppositeActionFollowUpsContext } from '../../hooks/useOppositeAction
 import { OppositeActionFollowUpCard } from '../tools/oppositeAction/OppositeActionFollowUpCard';
 import { TodayCard } from './TodayCard';
 import { PatternOfferCard } from '../me/PatternOfferCard';
-import { PART_CHECKBACK_TYPE } from '../../lib/partCheckback';
+import { PART_CHECKBACK_TYPE, TWO_PULLS_CHECKBACK_TYPE } from '../../lib/partCheckback';
 import { TRAIL_OFFER_KIND } from '../../lib/trailOffer';
 import type { TodayItem } from '../../services/spine';
 
@@ -44,7 +44,7 @@ export function TodayStack({ renderItem, compact = false, className = '' }: {
     const custom = renderItem?.(item, done);
     if (custom !== undefined && custom !== null) return <div key={item.id}>{custom}</div>;
     // Parts check-backs: TodayProvider keeps them only while the card can show (parts on, copy signed off).
-    if (item.type === PART_CHECKBACK_TYPE) return <PartCheckbackCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
+    if (item.type === PART_CHECKBACK_TYPE || item.type === TWO_PULLS_CHECKBACK_TYPE) return <PartCheckbackCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
     // Trail offers: the server sends at most one, never with a flooded band; TodayProvider keeps it only while the card can show.
     if (item.kind === TRAIL_OFFER_KIND) return <TrailOfferCard key={item.id} item={item} content={today.partsContent} onDone={done} />;
     if (item.kind === 'follow_up' || item.kind === 'tool_outcome') return <TodayCard key={item.id} item={item} onDone={done} compact={compact} />;

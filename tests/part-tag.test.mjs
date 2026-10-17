@@ -83,9 +83,9 @@ const pageOf = (id) => {
   return file ? `src/pages/tools/${file}.tsx` : null;
 };
 /** Tools that may never show the row although their close asks then-vs-now. */
-const NEVER_HOSTS = ["meet-a-part"];
+const NEVER_HOSTS = ["meet-a-part", "two-pulls"];
 
-test("hosts: every tool whose close asks then-vs-now or about the urge, minus Meet a part, each declaring parts", () => {
+test("hosts: every tool whose close asks then-vs-now or about the urge, minus Meet a part and Two pulls, each declaring parts", () => {
   // Derived from the close kinds, so a new tool with a then-vs-now or an urge close joins (or fails here).
   const asks = Object.entries(TOOL_CLOSE_KIND)
     .filter(([, k]) => dirFor(k.closeKind) !== null || k.closeKind === "urge").map(([id]) => id);
@@ -103,12 +103,12 @@ test("hosts: every tool whose close asks then-vs-now or about the urge, minus Me
       assert.ok(hosts.includes(id) || NEVER_HOSTS.includes(id), `${id} records then-vs-now but shows no tag row`);
     }
   }
-  // Meet a part reads `parts` for its own screens, Today for the check-back card's name and DEAR MAN
+  // Meet a part and Two pulls read `parts` for their own screens, Today for the check-back card's name and DEAR MAN
   // for its cope ahead ("Who might show up in this conversation?"); every other reader is a host, and
   // every host reads it.
   const withParts = Object.entries(profileTypes.PROFILE_NEEDS)
-    .filter(([c, n]) => !["meet-a-part", "today", "dear-man"].includes(c) && n.includes("parts")).map(([c]) => c);
-  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part, Today and DEAR MAN, nothing else");
+    .filter(([c, n]) => !["meet-a-part", "two-pulls", "today", "dear-man"].includes(c) && n.includes("parts")).map(([c]) => c);
+  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part, Two pulls, Today and DEAR MAN, nothing else");
 });
 
 test("each host mounts PartTagSlot under its saved close; the slot is the only gate", () => {

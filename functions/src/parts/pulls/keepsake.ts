@@ -24,7 +24,7 @@ import type { KeepPullsKeepsakeResponse } from './types';
 export const KEEPSAKE_PROMPTS = ['keepsake_both_want', 'keepsake_choose'] as const;
 export const PAIR_NAME_PROMPT = 'pulls_pair_name';
 /** A visit that stopped on one of these has no keepsake (the conservative branch, danger, a side not ready). */
-const NO_KEEPSAKE = ['own_words', 'danger', 'not_self'];
+const NO_KEEPSAKE = ['own_words', 'tender', 'danger', 'not_self'];
 
 export interface KeepsakeSide { name: string | null; found: boolean; unblendPhrase: string | null }
 
@@ -111,7 +111,7 @@ export async function keepPullsKeepsakeHandler(
   const text = a && b ? keepsakeText(st.copy, a, b, st.want) : null;
   if (!text) throw new HttpsError('failed-precondition', 'The keepsake is not ready');
   const partIds = st.entry === 'parts' && st.aId && st.bId ? [st.aId, st.bId] : [];
-  let version = await deps.write({ sessionId: input.sessionId, lineId: input.lineId, text, partIds });
+  const version = await deps.write({ sessionId: input.sessionId, lineId: input.lineId, text, partIds });
   if (partIds.length === 2) {
     const link = await deps.link({ aId: partIds[0], bId: partIds[1], bothWantId: st.bothWantId });
     return { lineId: input.lineId, text, version: link.version, linkId: link.id };
