@@ -32,6 +32,7 @@ import PARTS_PACK from 'virtual:review-pack';
 import { WISE_MIND_ABSENT, WISE_MIND_EXPECT, WISE_MIND_PACK } from './review/wiseMind'; // lane 1: Wise mind, not parts
 import { COPE_AHEAD_PACK, COPE_CLOSING_ABSENT, COPE_CLOSING_EXPECT } from './review/copeAheadClosing'; // lane 3: Cope Ahead, not parts
 import { COPE_ENTRIES_EXPECT, COPE_ENTRY_HREF } from './review/copeAheadEntries'; // lane 2: the ways into Cope Ahead
+import { COPE_AHEAD_AFTER_ABSENT, COPE_AHEAD_AFTER_EXPECT } from './review/copeAheadAfter'; // lane 4: Cope Ahead's after card, not parts
 
 /** The sign-off pack's surfaces, then the non-parts tools shown here for review (Wise mind, Cope Ahead). */
 const PACK = [...PARTS_PACK, WISE_MIND_PACK, COPE_AHEAD_PACK];
@@ -213,8 +214,8 @@ window.__reviewMap = {
   surfaces: SURFACES.map((s) => ({ id: s.id, branches: (s.branches ?? []).map((b) => b.id) })),
   uncovered: uncovered.map((p) => p.id),
   unknown: unknown.map((s) => s.id),
-  expect: { ...WISE_MIND_EXPECT, ...COPE_CLOSING_EXPECT, ...COPE_ENTRIES_EXPECT },
-  absent: { ...WISE_MIND_ABSENT, ...COPE_CLOSING_ABSENT },
+  expect: { ...WISE_MIND_EXPECT, ...COPE_CLOSING_EXPECT, ...COPE_ENTRIES_EXPECT, ...COPE_AHEAD_AFTER_EXPECT },
+  absent: { ...WISE_MIND_ABSENT, ...COPE_CLOSING_ABSENT, ...COPE_AHEAD_AFTER_ABSENT },
   copeHref: COPE_ENTRY_HREF,
 };
 

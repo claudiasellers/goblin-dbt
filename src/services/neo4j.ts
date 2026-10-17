@@ -786,7 +786,7 @@ export interface SomaticCorrelationData {
 export interface ToolOutcomeSummary {
   toolId: string;
   /** Absent from a server older than Reflect R1. */
-  measure?: 'then_vs_now' | 'urge';
+  measure?: 'then_vs_now' | 'urge' | 'plan';
   direction?: 'down' | 'orient' | null;
   answered?: number;
   wentWell?: number;

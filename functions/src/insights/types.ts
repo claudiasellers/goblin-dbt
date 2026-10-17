@@ -48,6 +48,11 @@ export interface SessionRow {
   closeKind: string | null;
   thenVsNow: ThenVsNow | null;
   actedOnUrge: ActedOnUrge | null;
+  /**
+   * Cope Ahead (closeKind none): its after card's "Did your plan help?" (the cope_ahead_after follow-up it
+   * scheduled, answered), the only outcome the tool records. Absent or null for every other session.
+   */
+  planHelped?: 'helped' | 'unsure' | 'unused' | null;
 }
 
 /** A pre-spine ToolUsage (no ToolSession behind it): trackToolUsage + recordToolOutcome era. */
@@ -95,9 +100,10 @@ export interface SomaticCorrelationData {
 
 /**
  * How a tool's close is measured. `then_vs_now`: the regulation / orienting close (R3), and
- * pre-spine ratings mapped back onto it. `urge`: whether the user acted on the urge.
+ * pre-spine ratings mapped back onto it. `urge`: whether the user acted on the urge. `plan`: Cope Ahead's
+ * after card, "Did your plan help?" (Used it, it helped is the visit that went well).
  */
-export type OutcomeMeasure = 'then_vs_now' | 'urge';
+export type OutcomeMeasure = 'then_vs_now' | 'urge' | 'plan';
 
 /** The then-vs-now direction the user answered in (R3): quieter (down) or more here (orient). */
 export type OutcomeDirection = 'down' | 'orient';
@@ -109,7 +115,7 @@ export interface ToolOutcomeSummary {
   direction: OutcomeDirection | null;
   /** Closes with an answer. */
   answered: number;
-  /** then_vs_now: better or much better. urge: didn't act on it. */
+  /** then_vs_now: better or much better. urge: didn't act on it. plan: used it, it helped. */
   wentWell: number;
   /** Kept for clients from before Reflect R1: round(wentWell / answered × 100). */
   helpedPct: number;
