@@ -67,6 +67,7 @@ export { TRAIL_OFFER_REQUIRED } from './src/lib/trailOffer';
 export { KNOWN_PART_REVIEW_REQUIRED, PLAIN_PATTERNS_REQUIRED } from './src/lib/knownPartReview';
 export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 export { DEN_REQUIRED } from './src/lib/den';
+export { PART_STORY_REQUIRED } from './src/lib/partStory';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -138,6 +139,11 @@ export function surfaces(g) {
       id: 'den', title: 'The den',
       where: 'Me → Parts of me → "See them together" (the link shows once the person has two active or resting parts), with parts on: the room seen from above with the person as the light (never labelled), each part where they put it (drag, or the keyboard), "Everyone here is in your house." under it. Tap one figure, then another: "These two pull against each other" (opens Two pulls, once it is built) or "This one stands in front of that one", then "Which one stands in front?" with both names; a confirmed thread has a remove. "How it looked in {month}" shows a past layout beside today. A part with a safety-line move or a danger fear shows the crisis resources under the room.',
       groups: [{ label: null, ids: g.DEN_REQUIRED }],
+    },
+    {
+      id: 'story', title: 'A part\'s story',
+      where: 'Me → Parts of me: "Its story" on each active or resting part\'s card opens it in place; in the den, tap one figure for "Its story" and "Spend time with it" (Meet a part for that part). Oldest first, each line only when there is something to say: "Met in {month}", "Rested in {month}" / "Back in {month}", "Its job then: …" / "Its job now: …" (never on a tender part), the card\'s readout (how they\'ve felt toward it, what\'s helped it settle), and "Where it stands": its confirmed threads in words, and an earlier month\'s room beside today\'s when there is one. Months only; no score, no percentage, never a fear.',
+      groups: [{ label: null, ids: g.PART_STORY_REQUIRED }],
     },
     {
       id: 'settings', title: 'Settings',

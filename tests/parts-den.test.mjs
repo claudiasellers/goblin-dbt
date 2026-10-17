@@ -128,11 +128,19 @@ test("the room: saves on drop, unlinks by id, the light is not a control, tender
   assert.match(room, /<circle cx="50" cy="50" r="30" fill=\{`url\(#\$\{uid\}-lamp\)`\} data-den-light="" \/>/);
   assert.equal((room.match(/data-den-light/g) ?? []).length, 1);
   assert.doesNotMatch(room.slice(room.indexOf("data-den-light") - 120, room.indexOf("data-den-light")), /onClick|button/);
-  assert.match(room, /\{p\.tender \? <TenderCover size=\{FIGURE\} \/> : <PartFigure shapeSig=\{p\.shapeSig\} size=\{FIGURE\} still \/>\}/);
+  assert.match(room, /\{p\.tender \? <TenderCover size=\{fig\} \/> : <PartFigure shapeSig=\{p\.shapeSig\} size=\{fig\} still \/>\}/);
   assert.doesNotMatch(room + view, /\btransition|\banimate[=-]|motion\/react/, "no motion on entry, no transitions");
   assert.match(room, /if \(r\.kind === 'drop'\) onMove\?\.\(id, r\.at\);/);
   assert.match(room, /if \(at\) \{ dragged\.current = true; onMove\?\.\(p\.id, at\); \}/, "a drop saves");
   assert.match(room, /onClick=\{\(\) => \{\s+if \(dragged\.current\) \{ dragged\.current = false; return; \}\s+onTap\?\.\(p\.id\);/, "a press and lift in place (or assistive tech's click) is a tap; a drag is not");
   // Set-aside parts never reach the room: the server sends active and resting only.
   assert.doesNotMatch(room + view, /set_aside/);
+});
+
+test("keyboard order follows the room: figures and thread removes in measured reading order, focus kept across a reorder", () => {
+  const room = read("src/components/parts/den/DenRoom.tsx");
+  assert.match(room, /\{inReadingOrder\(\[/);
+  assert.match(room, /if \(held \|\| drag\) return;/, "never reordered while a figure is held or dragged");
+  assert.match(room, /if \(active && root\.contains\(active\)\) refocus\.current = active\.dataset\.denFocus \?\? null;/);
+  assert.match(room, /if \(row && b\.r\.top - row\[0\]\.r\.top <= ROW_PX\) row\.push\(b\); else rows\.push\(\[b\]\);/);
 });
