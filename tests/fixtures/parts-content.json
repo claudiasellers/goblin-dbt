@@ -483,6 +483,20 @@
    "copy": "The parts you know",
    "reviewStatus": "draft"
   },
+  "patterns_title": {
+   "flow": "reflect",
+   "step": "patterns",
+   "order": 1,
+   "copy": "How things tend to go",
+   "reviewStatus": "draft"
+  },
+  "review_noname": {
+   "flow": "review",
+   "step": "question",
+   "order": 0,
+   "copy": "Was this that part?",
+   "reviewStatus": "draft"
+  },
   "unblend_line": {
    "flow": "unblend",
    "step": "line",
@@ -3257,6 +3271,88 @@
      "flag": null,
      "selfLike": null,
      "branch": "candidate",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "review": {
+   "row": [
+    {
+     "id": "review_yes",
+     "label": "Yes",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "review_no",
+     "label": "No",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "review_not_sure",
+     "label": "Not sure",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 2,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "block": [
+    {
+     "id": "review_done",
+     "label": "Done",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "review_not_now",
+     "label": "Not now",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "reflect": {
+   "patterns": [
+    {
+     "id": "patterns_remove",
+     "label": "Remove",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
      "order": 0,
      "moves": [],
      "sameAs": [],

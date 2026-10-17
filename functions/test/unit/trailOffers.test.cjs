@@ -371,7 +371,7 @@ test('prepare: the top enabled A–C candidate that is new and not blocked, thro
   assert.deepEqual(seen[0], ['u1', []]);
 
   // Blocked or already offered: the next one, or nothing.
-  const states = [{ id: OID, ruleId: 'trail_two_pulls', moveIds: ['chase', 'hide'], contextId: 'ctx_event_leaving', partId: null, status: 'answered', answer: 'not_me', cooldownUntil: null }];
+  const states = [{ id: OID, ruleId: 'trail_two_pulls', moveIds: ['chase', 'hide'], contextId: 'ctx_event_leaving', partId: null, status: 'answered', answer: 'not_me', cooldownUntil: null, noKeys: null }];
   const g = prepareFake({ policy, states });
   setDriver(g.driver);
   assert.equal(await TD.prepareTrailOffers('u1', NOW, evaluate), null);

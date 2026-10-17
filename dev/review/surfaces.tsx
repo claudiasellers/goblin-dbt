@@ -28,12 +28,13 @@ import { PartsSettings } from '../../src/components/parts/PartsSettings';
 import { CopeAheadStep } from '../../src/components/parts/CopeAheadStep';
 import { PartsOfMe } from '../../src/components/me/PartsOfMe';
 import { PartsReflect } from '../../src/components/insights/PartsReflect';
+import { TrailsReflect } from '../../src/components/insights/TrailsReflect';
 import { PartTagRow } from '../../src/components/spine/PartTagRow';
 import { TooMuchLink } from '../../src/components/capacity/TooMuchLink';
 import { DARK } from '../../src/components/tools/findTheFeeling/shape/palette';
 import { linkButton, secondaryText } from '../../src/components/tools/oppositeAction/styles';
 import { answer, logEvent } from './backend';
-import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, slices, trailEvidence, trailItem, type TrailKind } from './data';
+import { CANDIDATES, checkbackItem, ME_ITEMS, PART_IDS, REFLECT, reflectTrails, slices, trailEvidence, trailItem, type TrailKind } from './data';
 import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
 import { PARTS } from '../parts-example';
@@ -508,6 +509,38 @@ export const SURFACES: Surface[] = [
     render: ({ branch }) => <OfferHost kind={branch === 'b' ? 'B' : branch === 'c' || branch === 'evidence_c' || branch === 'split' ? 'C' : 'A'} />,
   },
   {
+    id: 'review', pack: 'review', title: 'Reflect: “Was this {name}?” (rule D)',
+    who: 'Parts on, offers on: in Reflect, after the parts section; never a push, never near flooding, a crisis flag, repeated dissociation or a harm signal. One block per part rule D found (at most two), a row per moment.',
+    branches: [
+      { id: 'blocks', label: 'Two parts: a named one, an unnamed one with the safety flag (crisis resources alongside)' },
+      { id: 'answered', label: 'A row answered Yes', steps: [{ opt: 'review_yes' }] },
+      { id: 'done', label: 'Done: that block goes, the next part stays', steps: [{ opt: 'review_yes' }, { opt: 'review_done' }] },
+      { id: 'failed', label: 'Done fails: the block stays as it was', steps: [{ opt: 'review_no' }, { opt: 'review_done' }] },
+    ],
+    setup: (b) => {
+      answer('getReflectTrails', () => ({ ...reflectTrails(), patterns: [] }));
+      answer('answerKnownPartReview', (d) => {
+        if (b === 'failed') throw new Error('review: save fails');
+        const r = d as { id: string; rows: { answer: string }[] };
+        return { id: r.id, created: true, tagged: r.rows.filter((x) => x.answer === 'yes').length };
+      });
+    },
+    render: () => <TrailsReflect />,
+  },
+  {
+    id: 'patterns', pack: 'patterns', title: 'Reflect: plain patterns',
+    who: 'Parts on: in Reflect, the trails answered “It’s how things go”, as plain statements with no parts language, until the person removes one.',
+    branches: [
+      { id: 'list', label: 'Two patterns (rules A and B)' },
+      { id: 'removed', label: '× removes one', steps: [{ tap: '×' }] },
+    ],
+    setup: () => {
+      answer('getReflectTrails', () => ({ reviews: [], patterns: reflectTrails().patterns }));
+      answer('removeTrailPattern', (d) => ({ offerId: (d as { offerId: string }).offerId, removed: true }));
+    },
+    render: () => <TrailsReflect />,
+  },
+  {
     id: 'ps_later', pack: 'ps', title: 'Problem Solve: another time',
     who: 'Parts on: in Problem Solve, after “Part of me doesn’t actually want this to change” and its answer, under Let’s keep going.',
     branches: [
@@ -525,6 +558,4 @@ export const SURFACES: Surface[] = [
 ];
 
 /** Not built on the tip, so not here (the report lists them). */
-export const SKIPPED = [
-  '“Was this {name}?” in Reflect (rule D): not built yet (lane 3, rule-d-review).',
-];
+export const SKIPPED: string[] = [];

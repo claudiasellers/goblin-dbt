@@ -13,7 +13,7 @@ import { PARTS } from '../parts-example';
 import fixture from '../../tests/fixtures/parts-content.json';
 import ftf from '../../src/data/content/find-the-feeling.json';
 import hostCopy from 'virtual:review-host-copy';
-import type { GetTrailOfferEvidenceResponse } from '../../src/data/partsTypes';
+import type { GetReflectTrailsResponse, GetTrailOfferEvidenceResponse } from '../../src/data/partsTypes';
 import { showIds } from './ids';
 
 const uuid = (n: number) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
@@ -32,7 +32,7 @@ const slicePart = (key: keyof typeof PART_IDS, name: string | null, o: Partial<S
   const ex = byId[key === 'unnamed' ? 'hide' : key];
   return {
     id: PART_IDS[key], name, status: 'active', tender: !!ex.tender, moveIds: [ex.move], firstPlace: ex.places[0] ?? 'chest',
-    shapeSig: ex.tender ? null : sig(ex.id), lastVisitedAt: '2026-10-14T19:00:00.000Z', pausedUntil: null, meta: meta(PART_IDS[key], 'active'), ...o,
+    shapeSig: ex.tender ? null : sig(ex.id), lastVisitedAt: '2026-10-14T19:00:00.000Z', pausedUntil: null, safety: false, meta: meta(PART_IDS[key], 'active'), ...o,
   };
 };
 
@@ -157,6 +157,43 @@ export function trailEvidence(kind: TrailKind): GetTrailOfferEvidenceResponse {
       { at: '2026-10-02T19:10:00.000Z', toolIds: ['find-the-feeling'], context: c, sources: t.moves.map(ftfUrge) },
       { at: '2026-10-07T21:30:00.000Z', toolIds: ['opposite-action'], context: c, sources: t.moves.includes('chase') ? [urge('jealousy-check'), urge('shame-hide')] : [urge('shame-hide')] },
       { at: '2026-10-12T18:05:00.000Z', toolIds: ['recovering-from-invalidation'], context: c, sources: [] },
+    ],
+  };
+}
+
+/* ── Reflect's trails: rule D's batch and the plain patterns, as getReflectTrails would send them ── */
+
+/**
+ * Two parts with a rule D candidate (a named one, and an unnamed one with the safety flag: the crisis
+ * resources alongside), a row per moment as labels; and two trails answered "It's how things go".
+ */
+export function reflectTrails(): GetReflectTrailsResponse {
+  const d = rule('trail_known_part');
+  const urge = (id: string) => hostCopy.actionUrges[id] ?? id;
+  const brushed = ctx('ctx_event_brushed');
+  const leaving = ctx('ctx_event_leaving');
+  return {
+    reviews: [
+      {
+        partId: PART_IDS.chase, template: tagged(d.statementTemplate, d.id), name: byId.chase.name, firstPlace: 'chest', shapeSig: sig('chase'), safety: false,
+        rows: [
+          { episodeId: uuid(901), at: '2026-10-03T19:10:00.000Z', toolIds: ['opposite-action'], context: leaving, sources: [urge('jealousy-check')] },
+          { episodeId: uuid(902), at: '2026-10-08T21:30:00.000Z', toolIds: ['find-the-feeling'], context: null, sources: [ftfUrge('chase')] },
+          { episodeId: uuid(903), at: '2026-10-13T18:05:00.000Z', toolIds: ['checkin'], context: null, sources: [] },
+        ],
+      },
+      {
+        partId: PART_IDS.unnamed, template: tagged(d.statementTemplate, d.id), name: null, firstPlace: 'stomach', shapeSig: sig('hide'), safety: true,
+        rows: [
+          { episodeId: uuid(911), at: '2026-10-04T08:40:00.000Z', toolIds: ['recovering-from-invalidation'], context: brushed, sources: [] },
+          { episodeId: uuid(912), at: '2026-10-09T22:15:00.000Z', toolIds: ['opposite-action'], context: null, sources: [urge('shame-hide')] },
+          { episodeId: uuid(913), at: '2026-10-14T13:00:00.000Z', toolIds: ['dear-man'], context: null, sources: [] },
+        ],
+      },
+    ],
+    patterns: [
+      { offerId: 'trail_move_in_context:hide:ctx_event_leaving', shape: 'A', template: tagged(rule('trail_move_in_context').statementTemplate, 'trail_move_in_context'), pulls: [pull('hide')], context: leaving },
+      { offerId: 'trail_sequence:chase+hide:none', shape: 'B', template: tagged(rule('trail_sequence').statementTemplate, 'trail_sequence'), pulls: [pull('chase'), pull('hide')], context: null },
     ],
   };
 }

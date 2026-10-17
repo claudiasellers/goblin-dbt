@@ -64,6 +64,7 @@ export { COPE_REQUIRED } from './src/lib/copeAhead';
 export { DEBRIEF_WHO_REQUIRED } from './src/lib/debriefWho';
 export { PS_LATER_REQUIRED } from './src/lib/psAmbivalence';
 export { TRAIL_OFFER_REQUIRED } from './src/lib/trailOffer';
+export { KNOWN_PART_REVIEW_REQUIRED, PLAIN_PATTERNS_REQUIRED } from './src/lib/knownPartReview';
 export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 `;
   const out = await build({
@@ -153,8 +154,18 @@ export function surfaces(g) {
     },
     {
       id: 'offer', title: 'The trail offer (Today)',
-      where: 'Today only, with parts on and offers switched on (PartsPolicy.offersEnabled), at most one a week shared with what_helps, never near flooding, a crisis flag, repeated dissociation or a harm signal: "Something keeps showing up", the rule\'s statement, "Want to take a look?", then the evidence and the four answers. It also needs the rule\'s statement, the moves\' `trailPhrase` and the context\'s phrase signed off (see Trail rules and Trail contexts). Rule D ("Was this {name}?") is never on Today: Reflect asks it in a batch, later.',
+      where: 'Today only, with parts on and offers switched on (PartsPolicy.offersEnabled), at most one a week shared with what_helps, never near flooding, a crisis flag, repeated dissociation or a harm signal: "Something keeps showing up", the rule\'s statement, "Want to take a look?", then the evidence and the four answers. It also needs the rule\'s statement, the moves\' `trailPhrase` and the context\'s phrase signed off (see Trail rules and Trail contexts). Rule D ("Was this {name}?") is never on Today: Reflect asks it in a batch (below).',
       groups: [{ label: null, ids: g.TRAIL_OFFER_REQUIRED }],
+    },
+    {
+      id: 'review', title: '"Was this {name}?" (Reflect)',
+      where: 'Reflect, with parts on and offers switched on, never a push and never near flooding, a crisis flag, repeated dissociation or a harm signal (the trail offer\'s gate, without the weekly budget): one block per part the person knows that rule D found (at most two at once). The part\'s name and figure, then rule D\'s statement ("Was this {name}?"; for a part with no name, its chip label and the line below), a row per moment (date, tool, context, what was picked: labels only, never their words) with Yes / No / Not sure, then Done / Not now. Yes tags that moment to the part; No never asks about it again for that part; Not sure does nothing. Done or Not now: the part rests for the rule\'s cooldown (14 days). A part with a safety-line move or a danger fear shows the crisis resources alongside. It also needs the rule\'s statement signed off (see Trail rules).',
+      groups: [{ label: null, ids: g.KNOWN_PART_REVIEW_REQUIRED }],
+    },
+    {
+      id: 'patterns', title: 'Plain patterns (Reflect)',
+      where: 'Reflect, with parts on: the trails the person answered "It\'s how things go", as the offer\'s own statement with no parts language ("When someone pulls away, the pull is to hide."), under this heading, each with a × to remove it for good. It also needs each statement\'s rule, moves\' `trailPhrase` and context phrase signed off.',
+      groups: [{ label: null, ids: g.PLAIN_PATTERNS_REQUIRED }],
     },
     {
       id: 'oa', title: 'Do the Opposite',

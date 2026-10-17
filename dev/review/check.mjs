@@ -54,12 +54,17 @@ const EXPECT = {
   'debrief/general_new': 'tag_new_later', 'ps_later/ask': 'ps_later', 'ps_later/done': 'ps_later_done', 'tag/urge': 'tag_question',
   'offer/a': 'offer_eyebrow', 'offer/b': 'offer_eyebrow', 'offer/c': 'offer_eyebrow', 'offer/evidence': 'offer_question',
   'offer/evidence_c': 'offer_more_than_one', 'offer/split': 'offer_split',
+  'review/blocks': 'review_noname', 'review/answered': 'review_not_sure', 'review/done': 'review_noname', 'review/failed': 'review_done',
+  'patterns/list': 'patterns_title', 'patterns/removed': 'patterns_title',
   'tag/shape': 'tag_use_shape', 'tag/shape_unnamed': 'tag_use_shape_noname', 'tag/shape_done': 'tag_shape_done',
   'angry/first': 'angry_unblend', 'angry/protects': 'angry_protects', 'angry/speak': 'angry_later', 'angry/later': 'angry_later_done',
 };
 const SELECTOR = {
   'meet/danger': 'section[aria-label="Support right now"]', 'meet/danger_close': 'section[aria-label="Support right now"]',
   'checkback/louder': '[data-testid="part-checkback-aftercare"]',
+  'review/blocks': 'section[aria-label="Support right now"]',
+  'review/answered': '[data-testid="known-part-review"] button[aria-pressed="true"]',
+  'review/failed': '[data-testid="known-part-review"] button[aria-pressed="true"]',
 };
 const NO_CHECKBACK = new Set(['meet/danger_close']);
 
@@ -74,7 +79,7 @@ function plan(map) {
       if (s.id === 'angry') visits.push({ ...v, name: `${v.name}--plain`, query: `${q}&plain=1`, plain: true });
     }
   }
-  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask'], ['offer', 'evidence']]) {
+  for (const [surface, branch] of [['meet', 'keep'], ['meet', 'close'], ['angry', 'first'], ['tag', 'row'], ['me', ''], ['unblend_oa', 'shame-hide'], ['oa_goal', 'shame-hide.connection'], ['debrief', 'named'], ['ps_later', 'ask'], ['offer', 'evidence'], ['review', 'blocks'], ['patterns', 'list']]) {
     visits.push({ name: `${surface}${branch ? `--${branch}` : ''}--ids`, query: `?s=${surface}${branch ? `&b=${branch}` : ''}&ids=1`, ids: true, surface, branch });
   }
   return visits;

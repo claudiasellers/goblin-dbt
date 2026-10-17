@@ -12,8 +12,9 @@
  *   ToolSession the caller's and DEAR MAN's, open or closed, with `strength` 'yes' or 'a_bit'. It says
  *   the part was there, not that a tool helped it settle, so the stats' *helped* never counts it.
  *
- * - `review` (rule D's "Was this {name}?", answered weeks later in a batch in Reflect, the source's first
- *   writer, still to come): the caller's own closed ToolSession, not Meet a part. The person recognising
+ * - `review` (rule D's "Was this {name}?", answered weeks later in a batch in Reflect): through tagPart,
+ *   the caller's own closed ToolSession, not Meet a part. Reflect's batch writes its own (offers/review.ts
+ *   REVIEW_TAGS_QUERY: any of the trail's evidence records, the same `taggedKey`). The person recognising
  *   the part is the evidence, so no close answer is asked; like a debrief tag, the stats never count it.
  *
  * All: parts on; the part the caller's and active or resting.

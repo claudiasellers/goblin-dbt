@@ -87,6 +87,11 @@ export interface BlockedKey {
   contextId: string | null;
   partId: string | null;
   until: string | null;
+  /**
+   * Rule D only (Reflect's review batch): the records the person said No to for this part. An episode
+   * holding any of them never counts for the part again, whatever `until` says (until only blocks the part).
+   */
+  recordKeys?: string[];
 }
 
 export interface TrailPolicy { episodeMergeHours: number; louderPauseHours: number }
