@@ -91,8 +91,8 @@ words as the escape hatch: ≤ 140 characters, never linted, never shown back ou
 
 - For each chosen story, 2–3 `Alternative` chips (`ALTERNATIVE_TO`), plus own words.
 - The person picks any that *might* be true. Picking none is fine.
-- The screen never says which one is right. Under the picks: *"You don't have to believe them. Just
-  notice they're possible."*
+- The screen never says which one is right. Under the picks: *"You don't have to believe them.
+  Notice that they're possible."*
 
 ### 5. The threat (fear, anxiety, anger, shame, or any story that predicts something)
 
