@@ -203,3 +203,8 @@ test("Recover's evidence rows have a source label: PullOption.label is Recover's
   assert.match(answer, /collect\(DISTINCT src\.label\)/);
   assert.match(read("functions/src/parts/sessionMoves.ts"), /\$\{src\}:PullOption AND \$\{d\}:InvalidationRecoverySession/);
 });
+
+test("importTs keeps Node's own modules as they are (review.ts imports node:crypto)", async () => {
+  const review = await importTs("functions/src/parts/offers/review.ts");
+  assert.equal(typeof review.REVIEW_EXISTS_QUERY, "string");
+});

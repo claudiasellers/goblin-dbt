@@ -1,0 +1,387 @@
+{
+ "version": "wise-mind-v1",
+ "ownMax": 140,
+ "copy": {
+  "chrome": {
+   "back": "Back",
+   "next": "Next"
+  },
+  "question": {
+   "prompt": "What would you like wise mind's help with?",
+   "own": "Something else",
+   "ownLabel": "What would you like help with?"
+  },
+  "minds": {
+   "prompt": "Tap each side to hear what it says.",
+   "emotion": "Emotion mind",
+   "reason": "Reasonable mind",
+   "emotionSays": "Emotion mind says…",
+   "reasonSays": "Reasonable mind says…",
+   "nothingComes": "Nothing comes",
+   "own": "Something else",
+   "ownLabel": "In your own words",
+   "witness": "Both make sense from where they stand."
+  },
+  "dropIn": {
+   "prompt": "Choose a way in.",
+   "start": "Start",
+   "here": "I'm here",
+   "hold": "Hold as you breathe in",
+   "letGo": "Let go as you breathe out",
+   "listen": "Listen."
+  },
+  "comes": {
+   "prompt": "What does wise mind say?",
+   "own": "Something else",
+   "ownLabel": "What does it say?",
+   "quiet": "Wise mind is often quiet. It can arrive later, on a walk or in the shower."
+  },
+  "feel": {
+   "prompt": "How does it feel?",
+   "options": {
+    "calm": "Calm, settled",
+    "pushed": "Pushed, urgent",
+    "unsure": "Not sure"
+   },
+   "lines": {
+    "calm": "That sounds like wise mind.",
+    "pushed": "That might be emotion mind talking.",
+    "unsure": "Keep it and see how it sits."
+   },
+   "onceMore": "Drop in once more",
+   "keepAnyway": "Keep it anyway"
+  },
+  "next": {
+   "prompt": "What's one thing you'll do with it?",
+   "enough": "This is enough for now",
+   "keep": "Keep what wise mind said",
+   "kept": "Wise mind said: {answer}",
+   "keptDone": "Kept in My words.",
+   "done": "Done"
+  }
+ },
+ "questions": [
+  {
+   "id": "wm_q_next",
+   "label": "What to do next",
+   "order": 0,
+   "defaultPracticeId": "wm_ask",
+   "voices": {
+    "emotion": [
+     {
+      "id": "wm_v_next_emotion_1",
+      "label": "Do something, now"
+     },
+     {
+      "id": "wm_v_next_emotion_2",
+      "label": "Fix it before it gets worse"
+     },
+     {
+      "id": "wm_v_next_emotion_3",
+      "label": "Hide until it passes"
+     }
+    ],
+    "reason": [
+     {
+      "id": "wm_v_next_reason_1",
+      "label": "Make a list first"
+     },
+     {
+      "id": "wm_v_next_reason_2",
+      "label": "Do the sensible thing"
+     },
+     {
+      "id": "wm_v_next_reason_3",
+      "label": "Wait for more information"
+     }
+    ]
+   }
+  },
+  {
+   "id": "wm_q_say",
+   "label": "Whether to say something",
+   "order": 1,
+   "defaultPracticeId": "wm_ask",
+   "voices": {
+    "emotion": [
+     {
+      "id": "wm_v_say_emotion_1",
+      "label": "Say it now"
+     },
+     {
+      "id": "wm_v_say_emotion_2",
+      "label": "Don't, it'll go badly"
+     },
+     {
+      "id": "wm_v_say_emotion_3",
+      "label": "They ought to know by now"
+     }
+    ],
+    "reason": [
+     {
+      "id": "wm_v_say_reason_1",
+      "label": "Wait until you're calm"
+     },
+     {
+      "id": "wm_v_say_reason_2",
+      "label": "It's not worth the fight"
+     },
+     {
+      "id": "wm_v_say_reason_3",
+      "label": "Get the facts first"
+     }
+    ]
+   }
+  },
+  {
+   "id": "wm_q_let_go",
+   "label": "Whether to let it go",
+   "order": 2,
+   "defaultPracticeId": "wm_ask",
+   "voices": {
+    "emotion": [
+     {
+      "id": "wm_v_let_go_emotion_1",
+      "label": "I can't let this go"
+     },
+     {
+      "id": "wm_v_let_go_emotion_2",
+      "label": "Let it go, it's easier"
+     },
+     {
+      "id": "wm_v_let_go_emotion_3",
+      "label": "They need to know it hurt"
+     }
+    ],
+    "reason": [
+     {
+      "id": "wm_v_let_go_reason_1",
+      "label": "It's a small thing"
+     },
+     {
+      "id": "wm_v_let_go_reason_2",
+      "label": "See if it still matters tomorrow"
+     },
+     {
+      "id": "wm_v_let_go_reason_3",
+      "label": "Think about what holding on costs"
+     }
+    ]
+   }
+  },
+  {
+   "id": "wm_q_need",
+   "label": "What I actually need",
+   "order": 3,
+   "defaultPracticeId": "wm_ask",
+   "voices": {
+    "emotion": [
+     {
+      "id": "wm_v_need_emotion_1",
+      "label": "I need someone, right now"
+     },
+     {
+      "id": "wm_v_need_emotion_2",
+      "label": "I need to be left alone"
+     },
+     {
+      "id": "wm_v_need_emotion_3",
+      "label": "I need this to stop"
+     }
+    ],
+    "reason": [
+     {
+      "id": "wm_v_need_reason_1",
+      "label": "Sleep, food, a break"
+     },
+     {
+      "id": "wm_v_need_reason_2",
+      "label": "Get on with what's due"
+     },
+     {
+      "id": "wm_v_need_reason_3",
+      "label": "Needs can wait"
+     }
+    ]
+   }
+  },
+  {
+   "id": "wm_q_trust",
+   "label": "Whether to trust this feeling",
+   "order": 4,
+   "defaultPracticeId": "wm_ask",
+   "voices": {
+    "emotion": [
+     {
+      "id": "wm_v_trust_emotion_1",
+      "label": "This feeling is the truth"
+     },
+     {
+      "id": "wm_v_trust_emotion_2",
+      "label": "Something's wrong, I can tell"
+     },
+     {
+      "id": "wm_v_trust_emotion_3",
+      "label": "Act on it before it's too late"
+     }
+    ],
+    "reason": [
+     {
+      "id": "wm_v_trust_reason_1",
+      "label": "Feelings aren't facts"
+     },
+     {
+      "id": "wm_v_trust_reason_2",
+      "label": "Check what actually happened"
+     },
+     {
+      "id": "wm_v_trust_reason_3",
+      "label": "Ignore it and carry on"
+     }
+    ]
+   }
+  },
+  {
+   "id": "wm_q_settle",
+   "label": "Nothing in particular, I want to settle",
+   "order": 5,
+   "defaultPracticeId": "wm_stone",
+   "voices": {
+    "emotion": [
+     {
+      "id": "wm_v_settle_emotion_1",
+      "label": "Everything's too much"
+     },
+     {
+      "id": "wm_v_settle_emotion_2",
+      "label": "I can't sit still"
+     },
+     {
+      "id": "wm_v_settle_emotion_3",
+      "label": "Something needs doing"
+     }
+    ],
+    "reason": [
+     {
+      "id": "wm_v_settle_reason_1",
+      "label": "There's no reason to feel this"
+     },
+     {
+      "id": "wm_v_settle_reason_2",
+      "label": "Make a plan"
+     },
+     {
+      "id": "wm_v_settle_reason_3",
+      "label": "Keep busy"
+     }
+    ]
+   }
+  }
+ ],
+ "practices": [
+  {
+   "id": "wm_stone",
+   "name": "Stone on the lake",
+   "sub": "A small stone drifts down through clear water and settles.",
+   "kind": "drift",
+   "lines": [
+    "Picture a clear lake, and a small flat stone on the water.",
+    "Let it go. It drifts down slowly through the clear water.",
+    "It settles on the soft sand at the bottom. Rest there with it."
+   ],
+   "breaths": null,
+   "seconds": 40,
+   "order": 0
+  },
+  {
+   "id": "wm_breath",
+   "name": "Wise in, mind out",
+   "sub": "Five breaths. Hold as you breathe in, let go as you breathe out.",
+   "kind": "hold",
+   "lines": [
+    "Breathing in: wise.",
+    "Breathing out: mind."
+   ],
+   "breaths": 5,
+   "seconds": null,
+   "order": 1
+  },
+  {
+   "id": "wm_ask",
+   "name": "Ask and listen",
+   "sub": "Three breaths. Ask on the in-breath, listen on the out-breath.",
+   "kind": "ask",
+   "lines": [
+    "Breathing in, ask.",
+    "Listen."
+   ],
+   "breaths": 3,
+   "seconds": null,
+   "order": 2
+  }
+ ],
+ "answers": [
+  {
+   "id": "wm_a_know",
+   "label": "I already know what to do",
+   "order": 0,
+   "nextToolIds": [
+    "problem-solve"
+   ],
+   "kind": null
+  },
+  {
+   "id": "wm_a_wait",
+   "label": "Wait, not now",
+   "order": 1,
+   "nextToolIds": [
+    "pause"
+   ],
+   "kind": null
+  },
+  {
+   "id": "wm_a_say",
+   "label": "Say it, kindly",
+   "order": 2,
+   "nextToolIds": [
+    "dear-man"
+   ],
+   "kind": null
+  },
+  {
+   "id": "wm_a_let_go",
+   "label": "Let this one go",
+   "order": 3,
+   "nextToolIds": [
+    "pause"
+   ],
+   "kind": null
+  },
+  {
+   "id": "wm_a_help",
+   "label": "Ask someone for help",
+   "order": 4,
+   "nextToolIds": [
+    "dear-man"
+   ],
+   "kind": null
+  },
+  {
+   "id": "wm_a_care",
+   "label": "Look after myself first",
+   "order": 5,
+   "nextToolIds": [
+    "cool-down",
+    "five-senses"
+   ],
+   "kind": null
+  },
+  {
+   "id": "wm_a_nothing",
+   "label": "Nothing yet",
+   "order": 6,
+   "nextToolIds": [],
+   "kind": "quiet"
+  }
+ ]
+}

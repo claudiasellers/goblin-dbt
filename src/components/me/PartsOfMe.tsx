@@ -17,6 +17,7 @@ import { CrisisBanner } from '../safety/CrisisBanner';
 import { PartFigure } from '../parts/PartFigure';
 import { getToolById } from '../../data/tools';
 import { monthName, partStatLines, statsReady, type PartStatLines } from '../../lib/partStats';
+import { DEN_PATH, denCopy, showDenLink } from '../../lib/den';
 
 type Copy = Record<PartsOfMePromptId, string>;
 /** Sends one part write and refreshes Me from getMe (MeSection's `after`); rejects when the write fails. */
@@ -51,13 +52,22 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
   const candidateCopy = partCandidateCopy(content);
   const showStats = statsReady(content);
   const getToKnow = meetAPartLink();
+  const den = denCopy(content);
 
   return (
     <div className="mt-1 space-y-3">
-      <Link to={getToKnow.pathname} state={getToKnow.state}
-        className="inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
-        {copy.me_get_to_know}
-      </Link>
+      <div className="flex flex-wrap gap-x-4">
+        <Link to={getToKnow.pathname} state={getToKnow.state}
+          className="inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
+          {copy.me_get_to_know}
+        </Link>
+        {/* The den, once there are two parts to see together and its copy ships. */}
+        {den && showDenLink(live.length, den) && (
+          <Link to={DEN_PATH} className="inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
+            {den.den_link}
+          </Link>
+        )}
+      </div>
       {live.length > 0 && (
         <ul className="space-y-3">
           {live.map((i) => <PartCard key={i.meta.id} item={i} content={content} copy={copy} revisit={revisit} showStats={showStats} onWrite={onWrite} />)}

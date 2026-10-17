@@ -21,3 +21,13 @@ export function offerBudgetSpent(offeredAt: readonly (string | null | undefined)
     return Number.isFinite(t) && t > now - OFFER_EVERY_DAYS * DAY;
   });
 }
+
+/**
+ * When an offer last spent the budget, as Cypher over the offer variable `v`: the later of when it was
+ * offered and when it was answered. A trail offer answered *Not now* stays open and comes back on Today
+ * after its cooldown without a new `offeredAt`; counting it from its answer keeps that return to the week's
+ * one offer (otherwise a new offer could follow it the next day). Offers never offered (rule D's Reflect
+ * batch) don't count: callers keep `offeredAt IS NOT NULL`.
+ */
+export const offerBudgetAt = (v: string): string =>
+  `CASE WHEN ${v}.answeredAt IS NOT NULL AND ${v}.answeredAt > ${v}.offeredAt THEN ${v}.answeredAt ELSE ${v}.offeredAt END`;

@@ -1135,6 +1135,104 @@
    "order": 25,
    "copy": "Not any more",
    "reviewStatus": "draft"
+  },
+  "den_link": {
+   "flow": "den",
+   "step": "room",
+   "order": 0,
+   "copy": "See them together",
+   "reviewStatus": "draft"
+  },
+  "den_room": {
+   "flow": "den",
+   "step": "room",
+   "order": 1,
+   "copy": "Everyone here is in your house.",
+   "reviewStatus": "draft"
+  },
+  "den_unnamed": {
+   "flow": "den",
+   "step": "room",
+   "order": 2,
+   "copy": "A part",
+   "reviewStatus": "draft"
+  },
+  "den_move_help": {
+   "flow": "den",
+   "step": "room",
+   "order": 3,
+   "copy": "Tap one, then another, to say how they go together. Drag to move them.",
+   "reviewStatus": "draft"
+  },
+  "den_move_keys": {
+   "flow": "den",
+   "step": "room",
+   "order": 4,
+   "copy": "Enter picks one up, the arrow keys move it, Enter puts it down.",
+   "reviewStatus": "draft"
+  },
+  "den_one_part": {
+   "flow": "den",
+   "step": "room",
+   "order": 5,
+   "copy": "When you get to know another part, it will be here too.",
+   "reviewStatus": "draft"
+  },
+  "den_list": {
+   "flow": "den",
+   "step": "room",
+   "order": 6,
+   "copy": "See them as a list",
+   "reviewStatus": "draft"
+  },
+  "den_pull_against": {
+   "flow": "den",
+   "step": "thread",
+   "order": 7,
+   "copy": "These two pull against each other",
+   "reviewStatus": "draft"
+  },
+  "den_stands_front": {
+   "flow": "den",
+   "step": "thread",
+   "order": 8,
+   "copy": "This one stands in front of that one",
+   "reviewStatus": "draft"
+  },
+  "den_which_front": {
+   "flow": "den",
+   "step": "thread",
+   "order": 9,
+   "copy": "Which one stands in front?",
+   "reviewStatus": "draft"
+  },
+  "den_thread_cancel": {
+   "flow": "den",
+   "step": "thread",
+   "order": 10,
+   "copy": "Not now",
+   "reviewStatus": "draft"
+  },
+  "den_remove": {
+   "flow": "den",
+   "step": "thread",
+   "order": 11,
+   "copy": "Remove this thread",
+   "reviewStatus": "draft"
+  },
+  "den_then": {
+   "flow": "den",
+   "step": "then",
+   "order": 12,
+   "copy": "How it looked in {month}",
+   "reviewStatus": "draft"
+  },
+  "den_now": {
+   "flow": "den",
+   "step": "then",
+   "order": 13,
+   "copy": "Now",
+   "reviewStatus": "draft"
   }
  },
  "options": {

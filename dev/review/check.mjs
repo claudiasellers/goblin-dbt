@@ -59,6 +59,8 @@ const EXPECT = {
   'patterns/list': 'patterns_title', 'patterns/removed': 'patterns_title',
   'tag/shape': 'tag_use_shape', 'tag/shape_unnamed': 'tag_use_shape_noname', 'tag/shape_done': 'tag_shape_done',
   'angry/first': 'angry_unblend', 'angry/protects': 'angry_protects', 'angry/speak': 'angry_later', 'angry/later': 'angry_later_done',
+  // The den (lane 2)
+  'den/room': 'den_room', 'den/one': 'den_one_part', 'den/sheet': 'den_stands_front', 'den/front': 'den_which_front', 'den/then': 'den_now',
 };
 const SELECTOR = {
   'meet/danger': 'section[aria-label="Support right now"]', 'meet/danger_close': 'section[aria-label="Support right now"]',
