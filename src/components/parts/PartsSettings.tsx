@@ -1,11 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPartsContent } from '../../services/partsContent';
-import { deleteMyParts } from '../../services/parts';
-import { SETTINGS_LINK_REQUIRED, partsSettingsCopy, type PartsSettingsPromptId } from '../../lib/partsSettings';
+import { countMyPartsLines, deleteMyParts } from '../../services/parts';
+import { SETTINGS_LINES_REQUIRED, SETTINGS_LINK_REQUIRED, keptLinesQuestion, partsSettingsCopy, type PartsSettingsPromptId } from '../../lib/partsSettings';
 import { surfaceReady } from '../../lib/partsContent';
 import { settingsMeetLink } from '../../lib/partsOfMe';
 import { useToolGate } from '../../hooks/useToolGate';
+import type { PartsContent } from '../../data/partsContentTypes';
 import { useStepFocus } from './stepFocus';
 import { PartsSwitch } from './PartsSwitch';
 
@@ -17,6 +18,9 @@ import { PartsSwitch } from './PartsSwitch';
  *
  * Right after turning parts on here (that switch's success, this visit only), one "Get to know a part"
  * link sits under the switch, once Meet a part may open (useToolGate) and the line is signed off.
+ *
+ * The confirm asks separately about kept Two pulls lines in My words that name a part ("Also remove 2
+ * kept lines that name your parts?"), unticked, only when there are some and the line ships.
  */
 export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggle: (on: boolean) => Promise<void> }) {
   const [copy, setCopy] = useState<Record<PartsSettingsPromptId, string> | null>(null);
@@ -26,6 +30,9 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
   const [failed, setFailed] = useState(false);
   const [getToKnow, setGetToKnow] = useState<string | null>(null);
   const [justOn, setJustOn] = useState(false);
+  const [content, setContent] = useState<PartsContent | null>(null);
+  const [keptLines, setKeptLines] = useState(0);
+  const [removeLines, setRemoveLines] = useState(false);
   const labelId = useId();
   const blurbId = useId();
   // Delete → confirm → done (or Keep them → back): each replaces the button that had focus, so focus
@@ -38,12 +45,22 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
     getPartsContent().then((c) => {
       if (!live) return;
       setCopy(partsSettingsCopy(c));
+      setContent(c);
       setGetToKnow(c && surfaceReady(c, SETTINGS_LINK_REQUIRED) ? c.prompts[SETTINGS_LINK_REQUIRED.prompts[0]].copy : null);
     }).catch(() => { /* stays hidden */ });
     return () => { live = false; };
   }, []);
 
+  // The kept lines are counted when the confirm opens, and only if their question can be asked.
+  useEffect(() => {
+    if (!confirming || !content || !surfaceReady(content, SETTINGS_LINES_REQUIRED)) return;
+    let live = true;
+    countMyPartsLines().then((n) => { if (live) setKeptLines(n); }).catch(() => { /* no question: the lines stay */ });
+    return () => { live = false; };
+  }, [confirming, content]);
+
   if (!copy) return null;
+  const linesQuestion = keptLinesQuestion(content, keptLines);
 
   function toggle() {
     const on = !enabled;
@@ -56,7 +73,7 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
     setDeleting(true);
     setFailed(false);
     try {
-      await deleteMyParts();
+      await deleteMyParts({ keptLines: removeLines && linesQuestion !== null });
       setDone(true);
       setConfirming(false);
     } catch {
@@ -93,6 +110,18 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
       ) : (
         <div className="space-y-2">
           <p className="text-xs text-[var(--color-danger)] focus:outline-none">{copy.settings_delete_confirm}</p>
+          {linesQuestion && (
+            // The whole line is the target (≥ 44 px): the real checkbox covers it, the box beside the words is drawn.
+            <label className="relative flex items-center gap-2 min-h-11 py-1 text-xs text-[var(--color-text-secondary)] cursor-pointer">
+              <input type="checkbox" checked={removeLines} onChange={(e) => setRemoveLines(e.target.checked)}
+                className="peer absolute inset-0 h-full w-full opacity-0 cursor-pointer" />
+              <span aria-hidden="true"
+                className="flex h-4 w-4 shrink-0 items-center justify-center rounded border border-[var(--color-danger)] text-[var(--color-on-danger)] peer-checked:bg-[var(--color-danger)] peer-focus-visible:outline peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-[var(--color-accent)]">
+                {removeLines && <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2.5 6.5l2.5 2.5 4.5-5" /></svg>}
+              </span>
+              <span>{linesQuestion}</span>
+            </label>
+          )}
           <div className="flex items-center gap-2">
             <button
               type="button"
@@ -104,7 +133,7 @@ export function PartsSettings({ enabled, onToggle }: { enabled: boolean; onToggl
             </button>
             <button
               type="button"
-              onClick={() => { if (!deleting) { setConfirming(false); setFailed(false); } }}
+              onClick={() => { if (!deleting) { setConfirming(false); setFailed(false); setRemoveLines(false); } }}
               aria-disabled={deleting || undefined}
               className="min-h-11 px-3 py-1.5 rounded-lg border border-[var(--color-border)] text-xs font-medium text-[var(--color-text-tertiary)] hover:text-[var(--color-text-secondary)] transition-colors"
             >

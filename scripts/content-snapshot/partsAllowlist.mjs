@@ -23,19 +23,21 @@ export const PARTS_FIELDS = Object.freeze({
   hurts: Object.freeze(['id', 'label', 'feltPhrase', 'matters', 'order', 'namedAs', 'guardedBy']),
   /** hurts[].guardedBy[]. */
   guardedBy: Object.freeze(['moveId', 'rank']),
+  /** pairs[]: Two pulls' pairs, ids only (the chips' labels are options.pulls'). */
+  pairs: Object.freeze(['id', 'a', 'b', 'bothWant', 'worryA', 'worryB']),
   /** limits: PartsPolicy's two client numbers, once the policy is signed off. */
   limits: Object.freeze(['nameMaxChars', 'maxNonSelfAnswers']),
 });
 
 /** The top-level keys of parts.json (`limits` only once the policy is signed off). */
-export const PARTS_KEYS = Object.freeze(['version', 'moves', 'prompts', 'options', 'hurts', 'canTouch', 'expresses', 'limits']);
+export const PARTS_KEYS = Object.freeze(['version', 'moves', 'prompts', 'options', 'hurts', 'canTouch', 'expresses', 'pairs', 'limits']);
 
 const pick = (row, fields) => Object.fromEntries(fields.filter((k) => k in row).map((k) => [k, row[k]]));
 const ids = (list) => list.filter((x) => typeof x === 'string');
 
 /**
  * Content in buildParts' shape (already in its canonical order) cut to the allowlist. `canTouch` and
- * `expresses` are id maps (event → hurt ids; source label → source id → move id): only ids pass.
+ * `expresses` are id maps (and a pair's chip lists id lists) (event → hurt ids; source label → source id → move id): only ids pass.
  */
 export function projectParts(c) {
   const mapObj = (o, f) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, f(v)]));
@@ -51,6 +53,9 @@ export function projectParts(c) {
     })),
     canTouch: mapObj(c.canTouch, ids),
     expresses: mapObj(c.expresses, (table) => mapObj(table, (moveId) => String(moveId))),
+    pairs: (c.pairs ?? []).map((p) => ({
+      ...pick(p, PARTS_FIELDS.pairs), bothWant: ids(p.bothWant), worryA: ids(p.worryA), worryB: ids(p.worryB),
+    })),
     ...(c.limits ? { limits: pick(c.limits, PARTS_FIELDS.limits) } : {}),
   };
 }

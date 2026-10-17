@@ -57,7 +57,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
     if (consumer === "meet-a-part") continue;
     if (consumer !== "dear-man") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
-    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "dear-man", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead nor Wise mind's step back`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "dear-man", "two-pulls", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead, Two pulls nor Wise mind's step back`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);

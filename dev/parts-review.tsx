@@ -77,6 +77,8 @@ const defaults = () => answers({
   setPartShape: () => ({ version: 2 }),
   answerTrailOffer: (d) => {
     const r = ok(d);
+    // More than one with no split is a rule C trail: it opens Two pulls on the offer's pair.
+    if (r.answer === 'more_than_one' && !r.split) return { offerId: r.offerId, status: 'answered', answer: r.answer, next: 'two_pulls', pairId: 'chase_hide' };
     const next = r.answer === 'yes' ? 'meet' : r.answer === 'more_than_one' ? 'candidates' : 'none';
     return { offerId: r.offerId, status: 'answered', answer: r.answer, next, ...(r.answer === 'more_than_one' ? { candidateIds: r.candidateIds } : {}) };
   },
@@ -84,6 +86,11 @@ const defaults = () => answers({
   answerPartCheckback: (d) => ({ status: 'done', aftercare: ok(d).answer === 'louder' }),
   tagPart: (d) => ({ id: ok(d).id, created: true }),
   deleteMyParts: () => ({ deleted: {} }),
+  countMyPartsLines: () => ({ keptLines: 2 }),
+  startPullsSession: (d) => ({ id: ok(d).id, status: 'open' }),
+  savePullsSession: (d) => ({ id: ok(d).id, status: ok(d).final ? 'saved' : 'open' }),
+  keepPullsKeepsake: (d) => ({ lineId: ok(d).lineId, text: '', version: 2 }),
+  schedulePullsCheckback: (d) => ({ id: ok(d).id }),
 });
 
 /** A fresh page for one screen, without reloading: answers, events, the tag row's memory, storage. */
@@ -275,7 +282,10 @@ function App() {
   }, []);
   const key = `${nav.surface?.id ?? 'review'}/${nav.branch?.id ?? ''}/${nav.plain ? 'plain' : ''}`;
   return (
-    <MemoryRouter key={key} initialEntries={[{ pathname: `/tool/${nav.surface?.id ?? 'review'}`, state: nav.surface?.routeState?.(nav.branch?.id ?? '') ?? null }]}>
+    <MemoryRouter key={key} initialEntries={[{
+      pathname: `/tool/${nav.surface?.id ?? 'review'}`, search: nav.surface?.routeSearch?.(nav.branch?.id ?? '') ?? '',
+      state: nav.surface?.routeState?.(nav.branch?.id ?? '') ?? null,
+    }]}>
       <Review nav={nav} />
     </MemoryRouter>
   );

@@ -8,7 +8,7 @@ import { useProfileContext } from '../hooks/useProfileContext';
 import { inQuietHours } from '../lib/quietHours';
 import { useUserProfile } from './UserProfileContext';
 import { getPartsContent } from '../services/partsContent';
-import { checkbackReady, PART_CHECKBACK_TYPE, withReadyCheckbacks } from '../lib/partCheckback';
+import { checkbackReady, PART_CHECKBACK_TYPE, twoCheckbackReady, withReadyCheckbacks } from '../lib/partCheckback';
 import { TRAIL_OFFER_KIND, trailOfferReady, withReadyTrailOffers } from '../lib/trailOffer';
 import type { PartsContent } from '../data/partsContentTypes';
 
@@ -78,6 +78,7 @@ export function TodayProvider({ children }: { children: ReactNode }) {
     return () => { live = false; };
   }, [partsOn, needsParts, partsContent]);
   const checkbacksShown = partsOn && checkbackReady(partsContent);
+  const twoCheckbacksShown = partsOn && twoCheckbackReady(partsContent);
   const offersShown = partsOn && trailOfferReady(partsContent);
   const next = current?.nextInTab ?? null;
   useEffect(() => {
@@ -104,8 +105,8 @@ export function TodayProvider({ children }: { children: ReactNode }) {
   }, [next, navigate, refresh, quiet]);
 
   const value = useMemo<TodayValue>(() => ({
-    items: withReadyCheckbacks(withReadyTrailOffers((current?.items ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown),
-    more: withReadyCheckbacks(withReadyTrailOffers((current?.more ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown),
+    items: withReadyCheckbacks(withReadyTrailOffers((current?.items ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown, twoCheckbacksShown),
+    more: withReadyCheckbacks(withReadyTrailOffers((current?.more ?? []).filter((i) => !dropped.has(i.id)), offersShown), checkbacksShown, twoCheckbacksShown),
     partsContent: checkbacksShown || offersShown ? partsContent : null,
     holding: current?.holding ?? false,
     ready: !!current,

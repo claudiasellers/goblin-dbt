@@ -6,6 +6,7 @@ import { useToolGate } from '../hooks/useToolGate';
 import { useStepBackSlot } from '../hooks/useStepBackSlot';
 import { useUserProfile } from '../contexts/UserProfileContext';
 import { ToolLoading } from '../components/tools/ToolLoading';
+import { ToolNotFound } from '../components/tools/ToolNotFound';
 
 // Import tool components
 import { CoolDown } from './tools/CoolDown';
@@ -23,6 +24,10 @@ import { FindTheFeeling } from './tools/FindTheFeeling';
 const loadMeetAPart = () => import('./tools/MeetAPart');
 const LazyMeetAPart = lazy(() => loadMeetAPart().then((m) => ({ default: m.MeetAPart })));
 function MeetAPart() { return <Suspense fallback={<ToolLoading />}><LazyMeetAPart /></Suspense>; }
+// Two pulls loads the same way, behind the same kind of gate (parts on, its copy signed off).
+const loadTwoPulls = () => import('./tools/TwoPulls');
+const LazyTwoPulls = lazy(() => loadTwoPulls().then((m) => ({ default: m.TwoPulls })));
+function TwoPulls() { return <Suspense fallback={<ToolLoading />}><LazyTwoPulls /></Suspense>; }
 // Wise mind (docs/design/wise-mind.md), its own chunk too: two SVG scenes and three practices nobody else needs.
 const loadWiseMind = () => import('./tools/WiseMind');
 const LazyWiseMind = lazy(() => loadWiseMind().then((m) => ({ default: m.WiseMind })));
@@ -48,6 +53,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,
+  'two-pulls': TwoPulls,
   'wise-mind': WiseMind,
 };
 
@@ -57,9 +63,13 @@ export function ToolPage() {
   const toolId = segment ? toolIdFromUrl(segment) : undefined;
   const tool = toolId ? getToolById(toolId) : undefined;
   // Meet a part opens only with parts on and its copy signed off; otherwise it is "not found".
-  const gate = useToolGate(tool?.id);
+  const gate = useToolGate(tool?.id, location.search);
   const partsOn = useUserProfile().profile.partsEnabled;
-  useEffect(() => { if (tool?.id === 'meet-a-part' && partsOn) void loadMeetAPart().catch(() => { /* the render retries */ }); }, [tool?.id, partsOn]);
+  useEffect(() => {
+    if (!partsOn) return;
+    if (tool?.id === 'meet-a-part') void loadMeetAPart().catch(() => { /* the render retries */ });
+    if (tool?.id === 'two-pulls') void loadTwoPulls().catch(() => { /* the render retries */ });
+  }, [tool?.id, partsOn]);
 
   // Old address (/tool/cool-down): forward to the tool's own name, keeping the query and the
   // link state (Help me now / check-in / hand-off context for the session).
@@ -76,19 +86,7 @@ export function ToolPage() {
   }
 
   if (!tool || gate === 'closed') {
-    return (
-      <div className="text-center py-12">
-        <p className="text-[var(--color-text-secondary)]">
-          Tool not found.
-        </p>
-        <Link
-          to="/tools"
-          className="mt-4 inline-block text-[var(--color-text-secondary)] underline hover:no-underline"
-        >
-          ← Tools
-        </Link>
-      </div>
-    );
+    return <ToolNotFound />;
   }
 
   const ToolComponent = toolComponents[tool.id];

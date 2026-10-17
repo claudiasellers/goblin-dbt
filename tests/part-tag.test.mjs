@@ -85,11 +85,11 @@ const pageOf = (id) => {
 /**
  * Tools that may never show the row although their close asks then-vs-now. Wise mind: its parts form
  * tags the parts the person placed itself (PartTag source `wise_mind`, docs/design/wise-mind.md), so a
- * close tag after it would ask the same thing twice.
+ * close tag after it would ask the same thing twice. Two pulls: the visit is about two parts already.
  */
-const NEVER_HOSTS = ["meet-a-part", "wise-mind"];
+const NEVER_HOSTS = ["meet-a-part", "two-pulls", "wise-mind"];
 
-test("hosts: every tool whose close asks then-vs-now or about the urge, minus Meet a part and Wise mind, each declaring parts", () => {
+test("hosts: every tool whose close asks then-vs-now or about the urge, minus Meet a part, Two pulls and Wise mind, each declaring parts", () => {
   // Derived from the close kinds, so a new tool with a then-vs-now or an urge close joins (or fails here).
   const asks = Object.entries(TOOL_CLOSE_KIND)
     .filter(([, k]) => dirFor(k.closeKind) !== null || k.closeKind === "urge").map(([id]) => id);
@@ -107,12 +107,12 @@ test("hosts: every tool whose close asks then-vs-now or about the urge, minus Me
       assert.ok(hosts.includes(id) || NEVER_HOSTS.includes(id), `${id} records then-vs-now but shows no tag row`);
     }
   }
-  // Meet a part reads `parts` for its own screens, Today for the check-back card's name, DEAR MAN
+  // Meet a part and Two pulls read `parts` for their own screens, Today for the check-back card's name, DEAR MAN
   // for its cope ahead ("Who might show up in this conversation?") and Wise mind for its step back's room;
   // every other reader is a host, and every host reads it.
   const withParts = Object.entries(profileTypes.PROFILE_NEEDS)
-    .filter(([c, n]) => !["meet-a-part", "today", "dear-man", "wise-mind"].includes(c) && n.includes("parts")).map(([c]) => c);
-  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part, Today, DEAR MAN and Wise mind, nothing else");
+    .filter(([c, n]) => !["meet-a-part", "two-pulls", "today", "dear-man", "wise-mind"].includes(c) && n.includes("parts")).map(([c]) => c);
+  assert.deepEqual(withParts.sort(), [...hosts].sort(), "PROFILE_NEEDS parts: the hosts, Meet a part, Two pulls, Today, DEAR MAN and Wise mind, nothing else");
 });
 
 test("each host mounts PartTagSlot under its saved close; the slot is the only gate", () => {

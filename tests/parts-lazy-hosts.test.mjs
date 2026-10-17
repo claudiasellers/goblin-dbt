@@ -62,20 +62,23 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part and Wise mind are the lazy tools; Meet a part's gate stays eager and fetches the content on demand", () => {
+test("Meet a part, Two pulls and Wise mind are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 2, "two lazy tools");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 3, "three lazy tools");
   // Wise mind (not a parts surface): its own chunk, for everyone.
   assert.match(page, /const loadWiseMind = \(\) => import\('\.\/tools\/WiseMind'\);/);
   assert.match(page, /const LazyWiseMind = lazy\(\(\) => loadWiseMind\(\)\.then\(\(m\) => \(\{ default: m\.WiseMind \}\)\)\);/);
   assert.match(page, /<Suspense fallback=\{<ToolLoading \/>\}><LazyWiseMind stepBack=\{slot\} \/><\/Suspense>/, "with its parts form's slot (or null)");
   assert.match(page, /'wise-mind': WiseMind,/);
   assert.match(page, /'meet-a-part': MeetAPart,/);
-  assert.match(page, /if \(tool\?\.id === 'meet-a-part' && partsOn\) void loadMeetAPart\(\)/, "prefetched only with parts on");
+  assert.match(page, /'two-pulls': TwoPulls,/);
+  assert.match(page, /if \(!partsOn\) return;\s*if \(tool\?\.id === 'meet-a-part'\) void loadMeetAPart\(\)[^\n]*\n\s*if \(tool\?\.id === 'two-pulls'\) void loadTwoPulls\(\)/, "prefetched only with parts on");
   const gate = read("src/hooks/useToolGate.ts");
-  assert.match(gate, /if \(!gated \|\| !on\) return;[\s\S]*?import\('\.\.\/services\/meetAPart'\)\.then\(\(m\) => m\.loadMeetAPartContent\(\)\)/, "content only with parts on");
+  assert.match(gate, /'meet-a-part': \(\) => import\('\.\.\/services\/meetAPart'\)\.then\(\(m\) => m\.loadMeetAPartContent\(\)\)/);
+  assert.match(gate, /'two-pulls': \(search\) => import\('\.\.\/services\/twoPulls'\)\.then\(\(m\) => m\.twoPullsOpens\(search\)\)/);
+  assert.match(gate, /if \(!gated \|\| !on\) return;\s*let live = true;\s*check!\(search\)/, "content only with parts on");
   assert.match(gate, /if \(!on\) return loading \? 'loading' : 'closed';/);
 });
 

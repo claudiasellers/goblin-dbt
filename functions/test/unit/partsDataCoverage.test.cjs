@@ -21,7 +21,7 @@ test.after(() => { setDriver(null); setAuthAdminForTesting(null); });
 const auth = (uid = 'u1') => ({ uid, token: { email: `${uid}@example.test` } });
 
 /** Every registered parts label: the parts design's prefixes (parts.md, Data model → User data). */
-const PARTS_FROM_LAYERS = Object.keys(USER_DATA).filter((l) => /^(Part|Trail|DenSnapshot)/.test(l)).sort();
+const PARTS_FROM_LAYERS = Object.keys(USER_DATA).filter((l) => /^(Part|Trail|DenSnapshot|Pulls)/.test(l)).sort();
 
 const SRC = path.resolve(__dirname, '../../src');
 const tsFiles = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
