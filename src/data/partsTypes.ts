@@ -230,6 +230,30 @@ export interface TagPartRequest {
 /** The tag for that session and source: this one, or the first one if it was already tagged. */
 export interface TagPartResponse { id: string; created: boolean }
 
+// --- "Say something to it": mirror of functions/src/parts/sayTypes.ts (tests/parts-entry.test.mjs) ---
+/** Own words: at most this many characters, kept as written (never linted). */
+export const SAY_OWN_MAX = 140;
+
+/** One message: a chip from the parts content (flow `say`), or their own words. Exactly one of the two. */
+export interface SayToPartRequest {
+  /** A new client UUID for the message. */
+  id: string;
+  /** The caller's kept part (active or resting). */
+  partId: string;
+  chipId?: string | null;
+  own?: string | null;
+}
+/** The message: this one, or the same id already said (nothing written again). */
+export interface SayToPartResponse { id: string; created: boolean }
+
+/** The latest thing said to a part, as its card and its story show it. */
+export interface PartMessageLine {
+  chipId: string | null;
+  own: string | null;
+  /** ISO time it was said. */
+  at: string;
+}
+
 // --- The next-day check-back: mirror of functions/src/parts/checkbackTypes.ts (tests/parts-entry.test.mjs) ---
 
 /** The FollowUpType id (scripts/practice-spine/content.py). */
@@ -680,7 +704,9 @@ export type PartStoryMoment =
   | { kind: 'rested'; month: string }
   | { kind: 'back'; month: string }
   /** It took up a new job: the first job it had, and the one it has now. Never on a tender part. */
-  | { kind: 'job'; month: string; then: PartStoryJob; now: PartStoryJob };
+  | { kind: 'job'; month: string; then: PartStoryJob; now: PartStoryJob }
+  /** Something the person said to it (sayToPart): the month's latest, a chip id or their own words. */
+  | { kind: 'told'; month: string; chipId: string | null; own: string | null };
 
 /** A confirmed den link, from this part's side: it stands in front of, or behind, the other; or they pull against each other. */
 export interface PartStoryLink { role: 'front' | 'behind' | 'pulls'; otherId: string; otherName: string | null }

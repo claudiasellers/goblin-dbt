@@ -190,7 +190,7 @@ export function startingMove(content: PartsContent, entry: MeetEntry, partMoveId
 export const STEP_PART: Record<MeetStep, PartExitStep | null> = {
   find: 'find', blend: 'blend', blendBody: 'blend', where: 'where', shape: 'shape', age: 'age', young: 'age', voice: 'voice',
   feel: 'feel_toward', unblend: 'unblend', unblendEnd: 'unblend', nothing: 'nothing', job: 'job', likes: 'job_like',
-  guards: 'guards', front: 'guards', fear: 'fear', stop: 'fear', update: 'update', canNow: 'update', thank: 'thanks', tender: 'tender',
+  guards: 'guards', front: 'guards', fear: 'fear', stop: 'fear', update: 'update', canNow: 'update', thank: 'thanks', tender: 'tender', say: 'thanks',
   rather: 'would_rather', name: 'name', keep: 'keep', close: null, done: null,
 };
 

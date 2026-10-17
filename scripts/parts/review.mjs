@@ -70,6 +70,7 @@ export { OA_GOAL_LINE_REQUIRED } from './src/lib/oaGoalLine';
 export { DEN_REQUIRED } from './src/lib/den';
 export { WISE_MIND_PARTS_REQUIRED } from './src/lib/wiseMindParts';
 export { PART_STORY_REQUIRED } from './src/lib/partStory';
+export { SAY_TO_PART_REQUIRED, SAY_STORY_REQUIRED } from './src/lib/sayToPart';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -166,6 +167,14 @@ export function surfaces(g) {
       id: 'story', title: 'A part\'s story',
       where: 'Me → Parts of me: "Its story" on each active or resting part\'s card opens it in place; in the den, tap one figure for "Its story" and "Spend time with it" (Meet a part for that part). Oldest first, each line only when there is something to say: "Met in {month}", "Rested in {month}" / "Back in {month}", "Its job then: …" / "Its job now: …" (never on a tender part), the card\'s readout (how they\'ve felt toward it, what\'s helped it settle), and "Where it stands": its confirmed threads in words, and an earlier month\'s room beside today\'s when there is one. Months only; no score, no percentage, never a fear.',
       groups: [{ label: null, ids: g.PART_STORY_REQUIRED }],
+    },
+    {
+      id: 'say', title: 'Say something to it',
+      where: 'Me → Parts of me: "Say something to it" on each active or resting part\'s card opens "What would you like to say to {name}?" in place, with chips in the person\'s voice (a tender part gets the gentle set) and "In my words" (up to 140 characters, never linted); Not now closes it. The latest one shows quietly on the card as "You told it: …". Also in Meet a part, after Thanks (or the tender path\'s hold, with the gentle set) on a visit to a kept part. Saved as a PartMessage; nothing else reads it.',
+      groups: [
+        { label: null, ids: g.SAY_TO_PART_REQUIRED },
+        { label: 'In the part\'s story: "In {month} you told it: …" (the story shows without it)', ids: g.SAY_STORY_REQUIRED },
+      ],
     },
     {
       id: 'settings', title: 'Settings',

@@ -2,7 +2,7 @@
 import { httpsCallable } from 'firebase/functions';
 import { functions } from './firebase';
 import type { ClientProfileConsumer, GetProfileContextResponse, PatternOfferAnswer, ProfileAreaId, ProfileItemMeta, QuietHours } from '../data/profileTypes';
-import type { PartStats } from '../data/partsTypes';
+import type { PartMessageLine, PartStats } from '../data/partsTypes';
 
 /** getMe's item labels (functions/src/profile/me.ts). `Part` arrives only while parts are on. */
 export type MeItemLabel = 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
@@ -35,6 +35,8 @@ export interface MePart {
   safety?: boolean;
   /** Active and resting parts: the readout's counts and ids (functions/src/parts/stats.ts), each line null below its threshold. */
   stats?: PartStats;
+  /** Active and resting parts: the latest thing the person said to it (sayToPart). Absent from an older server. */
+  told?: PartMessageLine;
 }
 export interface GetMeResponse {
   version: number;

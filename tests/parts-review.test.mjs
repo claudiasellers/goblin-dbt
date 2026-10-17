@@ -39,6 +39,8 @@ const GATES = [
   ["src/lib/den.ts", "function denCopy", "surfaceReady(content, DEN_REQUIRED)"],
   ["src/lib/wiseMindParts.ts", "const wiseMindPartsReady", "surfaceReady(content, WISE_MIND_PARTS_REQUIRED)"],
   ["src/lib/partStory.ts", "function partStoryCopy", "surfaceReady(content, PART_STORY_REQUIRED)"],
+  ["src/lib/sayToPart.ts", "function sayCopy", "surfaceReady(content, SAY_TO_PART_REQUIRED)"],
+  ["src/lib/sayToPart.ts", "const sayStoryLine", "surfaceReady(content, SAY_STORY_REQUIRED)"],
 ];
 
 /** From the declaration to the next top-level declaration. */
