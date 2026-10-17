@@ -7,7 +7,7 @@ import type { PartsContent, PartsMove } from '../data/partsContentTypes';
 import type { TrailOfferAnswer, TrailOfferEvidenceRow } from '../data/partsTypes';
 import { getToolById } from '../data/tools';
 import type { TodayItem } from '../services/spine';
-import { promptCopy, stepOptions } from './partsContent';
+import { fillPartsLine, promptCopy, stepOptions } from './partsContent';
 
 /** Option id → the answer answerTrailOffer takes. The card's *No* is *Not me*. */
 export const TRAIL_ANSWER_OF: Readonly<Record<string, TrailOfferAnswer>> = {
@@ -23,13 +23,7 @@ export const TRAIL_ANSWER_OF: Readonly<Record<string, TrailOfferAnswer>> = {
 export function trailStatement(trail: TodayItem['trail'] | null | undefined): string | null {
   if (!trail?.template) return null;
   const vars: Record<string, string | null | undefined> = { context: trail.context, pull: trail.pulls[0], pull2: trail.pulls[1] };
-  let missing = false;
-  const out = trail.template.replace(/\{(\w+)\}/g, (_, k: string) => {
-    const v = vars[k];
-    if (!v) { missing = true; return ''; }
-    return v;
-  });
-  return missing ? null : out;
+  return fillPartsLine(trail.template, vars, { strict: true });
 }
 
 export interface TrailCardCopy { eyebrow: string; ask: string; show: string; notNow: string; no: string }

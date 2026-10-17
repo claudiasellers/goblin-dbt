@@ -1311,6 +1311,83 @@
    "copy": "Back to now",
    "reviewStatus": "draft"
   },
+  "wm_who": {
+   "flow": "wise_mind",
+   "step": "who",
+   "order": 0,
+   "copy": "Who's here about this?",
+   "reviewStatus": "draft"
+  },
+  "wm_who_help": {
+   "flow": "wise_mind",
+   "step": "who",
+   "order": 1,
+   "copy": "Tap a part to bring it near the light.",
+   "reviewStatus": "draft"
+  },
+  "wm_room": {
+   "flow": "wise_mind",
+   "step": "who",
+   "order": 2,
+   "copy": "The room, with the light in the middle",
+   "reviewStatus": "draft"
+  },
+  "wm_step_back": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 3,
+   "copy": "Ask everyone to take one step back.",
+   "reviewStatus": "draft"
+  },
+  "wm_hold": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 4,
+   "copy": "Hold to ask",
+   "reviewStatus": "draft"
+  },
+  "wm_held": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 5,
+   "copy": "From here, what's the wise next step?",
+   "reviewStatus": "draft"
+  },
+  "wm_tap_one": {
+   "flow": "wise_mind",
+   "step": "step_back",
+   "order": 6,
+   "copy": "Tap a part if it won't step back.",
+   "reviewStatus": "draft"
+  },
+  "wm_wont_line": {
+   "flow": "wise_mind",
+   "step": "wont",
+   "order": 7,
+   "copy": "That's fine. It might need its own time.",
+   "reviewStatus": "draft"
+  },
+  "wm_later_done": {
+   "flow": "wise_mind",
+   "step": "wont",
+   "order": 8,
+   "copy": "It's in Me for another time.",
+   "reviewStatus": "draft"
+  },
+  "wm_use_minds": {
+   "flow": "wise_mind",
+   "step": "chrome",
+   "order": 9,
+   "copy": "Use the two minds instead",
+   "reviewStatus": "draft"
+  },
+  "wm_pushed": {
+   "flow": "wise_mind",
+   "step": "feel",
+   "order": 10,
+   "copy": "A part might still be close.",
+   "reviewStatus": "draft"
+  },
   "story_open": {
    "flow": "story",
    "step": "card",
@@ -3751,6 +3828,74 @@
      "selfLike": null,
      "branch": "continue",
      "order": 3,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ]
+  },
+  "wise_mind": {
+   "who": [
+    {
+     "id": "wm_unmet",
+     "label": "A part I haven't met",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "wm_no_one",
+     "label": "No one in particular",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "end",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "wont": [
+    {
+     "id": "wm_wont",
+     "label": "It won't step back",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    },
+    {
+     "id": "wm_meet_later",
+     "label": "Meet it another time",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "candidate",
+     "order": 1,
+     "moves": [],
+     "sameAs": [],
+     "reviewStatus": "draft"
+    }
+   ],
+   "chrome": [
+    {
+     "id": "wm_next",
+     "label": "Next",
+     "kind": "chip",
+     "flag": null,
+     "selfLike": null,
+     "branch": "continue",
+     "order": 0,
      "moves": [],
      "sameAs": [],
      "reviewStatus": "draft"

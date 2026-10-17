@@ -39,11 +39,13 @@ import { CANDIDATES, checkbackItem, checkbackItemTwo, ME_ITEMS, ME_LONG, PART_ID
 import { TrailOfferCard } from '../../src/components/parts/TrailOfferCard';
 import type { DriveStep } from './driver';
 import { ME_OFF_SURFACE } from './meOff';
+import { WISE_MIND_PARTS_SURFACE } from './wiseMindParts'; // lane 4: Wise mind's step back
 import { PARTS } from '../parts-example';
 import hostCopy from 'virtual:review-host-copy';
 import { DebriefWho } from '../../src/components/parts/DebriefWho';
 import { PartLaterLine } from '../../src/components/parts/PartLaterLine';
 import { TapCard } from '../../src/components/tools/oppositeAction/TapCardLoop';
+import { GoalLine as OaGoalLine } from '../../src/components/tools/oppositeAction/GoalLine';
 import { useOaGoalLine } from '../../src/hooks/useOaGoalLine';
 import { PS_AMBIVALENCE_BARRIER, psLaterCandidate, psLaterCopy } from '../../src/lib/psAmbivalence';
 // ---- The den (lane 2) ----
@@ -341,14 +343,14 @@ const OA_GOAL_PAIRS: [urge: string, goal: string, note?: string][] = [
   ['guilt-apologize', 'self_respect'], ['guilt-punish', 'repair', 'safety-line move: nothing'], ['custom', 'connection', 'My urge is different: nothing'],
 ];
 
-function GoalLine({ urgeId, goalLabel }: { urgeId: string; goalLabel: string | null }) {
+function GoalLineHost({ urgeId, goalLabel }: { urgeId: string; goalLabel: string | null }) {
   const lines = useOaGoalLine({ urgeId, goalLabel }, true);
   const oa = hostCopy.oa;
   const [value, setValue] = useState('');
   return (
     <TapCard index={3} total={4} question={oa.copy.effectiveness} options={oa.choices.effectiveness} value={value}
       onSelect={(id) => setValue(id)} onPrevious={() => {}}
-      before={lines ? <div className="space-y-1" data-testid="goal-line"><p>{lines[0]}</p><p>{lines[1]}</p></div> : null} />
+      describedBy={lines ? 'oa-goal-line' : undefined} before={lines ? <OaGoalLine id="oa-goal-line" lines={lines} /> : null} />
   );
 }
 
@@ -358,7 +360,7 @@ function OaGoalHost({ urgeId, goalId }: { urgeId: string; goalId: string }) {
     <ToolSessionProvider toolId="opposite-action">
       <div className="space-y-2">
         <p className={mockNote}>Do the Opposite · urge {urgeId} · goal “{goal?.label ?? goalId}” (the real check card)</p>
-        <GoalLine urgeId={urgeId} goalLabel={goal?.label ?? null} />
+        <GoalLineHost urgeId={urgeId} goalLabel={goal?.label ?? null} />
       </div>
     </ToolSessionProvider>
   );
@@ -801,6 +803,7 @@ export const SURFACES: Surface[] = [
     render: ({ branch }) => <OaGoalHost urgeId={branch.split('.')[0]} goalId={branch.split('.')[1]} />,
   },
   DEN_SURFACE, // lane 2: the den
+  WISE_MIND_PARTS_SURFACE, // lane 4: Wise mind's step back
   STORY_SURFACE, // lane 2: a part's story
   WISE_MIND_SURFACE, // lane 1: Wise mind (not a parts surface: dev/review/wiseMind.tsx)
   SAY_SURFACE, // lane 1: say something to it (dev/review/sayToPart.tsx)

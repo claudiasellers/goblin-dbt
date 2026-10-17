@@ -268,7 +268,7 @@ function taper(a: Spot, b: Spot): string {
 }
 
 /** A tender part, never shown uncovered: a soft cover where the figure would be. */
-function TenderCover({ size }: { size: number }) {
+export function TenderCover({ size }: { size: number }) {
   return (
     <svg width={size} height={size} viewBox={`0 0 ${FIGURE_BOX} ${FIGURE_BOX}`} aria-hidden="true" data-den-tender="">
       <ellipse cx={FIGURE_BOX / 2} cy={86} rx={28} ry={3.5} style={{ fill: 'var(--color-text-primary)' }} opacity={0.08} />

@@ -6,7 +6,7 @@
 import type { PartsContent, PartsOption } from '../data/partsContentTypes';
 import type { PartCheckbackAnswer } from '../data/partsTypes';
 import type { TodayItem } from '../services/spine';
-import { promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
+import { fillParts, promptCopy, stepOptions, surfaceReady, type SurfaceIds } from './partsContent';
 
 export const PART_CHECKBACK_TYPE = 'part_checkback';
 
@@ -52,14 +52,14 @@ export function withReadyCheckbacks(items: TodayItem[], ready: boolean, twoReady
 /** "How's {name} today?", or the unnamed wording when the part has no name. Never the part's tenderness. */
 export function checkbackTitle(content: PartsContent, name: string | null | undefined): string {
   const n = name?.trim();
-  return n ? (promptCopy(content, 'checkback_title') ?? '').replace('{name}', n) : promptCopy(content, 'checkback_title_noname') ?? '';
+  return n ? fillParts(promptCopy(content, 'checkback_title') ?? '', { name: n }) : promptCopy(content, 'checkback_title_noname') ?? '';
 }
 
 /** "How are {A} and {B} today?", or the no-name wording when either has no name. */
 export function checkbackTitleTwo(content: PartsContent, names: readonly (string | null | undefined)[]): string {
   const [a, b] = names.map((n) => n?.trim() || null);
   const tpl = promptCopy(content, 'checkback_title_two');
-  if (a && b && tpl) return tpl.replace('{A}', a).replace('{B}', b);
+  if (a && b && tpl) return fillParts(tpl, { A: a, B: b });
   return promptCopy(content, 'checkback_title_two_noname') ?? '';
 }
 

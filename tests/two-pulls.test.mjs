@@ -477,8 +477,8 @@ test("Ask wise mind what's next: after the keepsake's answer, only when Wise min
   const notNow = run(["pulls_not_now"], { state: want });
   const label = fixture.prompts.pulls_wise_mind.copy;
   assert.equal(S.wiseMindLink(ALL, v, want, true), null, "not answered yet");
-  assert.deepEqual(S.wiseMindLink(ALL, v, kept, true), { to: `/tool/wise-mind?a=${PA}&b=${PB}`, label });
-  assert.deepEqual(S.wiseMindLink(ALL, pv, notNow, true), { to: "/tool/wise-mind", label });
+  assert.deepEqual(S.wiseMindLink(ALL, v, kept, true), { to: `/tool/wise-mind?first=wm_q_next&a=${PA}&b=${PB}`, label });
+  assert.deepEqual(S.wiseMindLink(ALL, pv, notNow, true), { to: "/tool/wise-mind?first=wm_q_next", label });
   assert.equal(S.wiseMindLink(ALL, v, kept, false), null, "no Wise mind tool");
   assert.equal(S.wiseMindLink(partsFromFixture(fixture, (x) => x !== S.PULLS_WISE_MIND), v, kept, true), null, "line not shipped");
   assert.match(read("src/pages/tools/TwoPulls.tsx"), /getToolById\('wise-mind'\)/);

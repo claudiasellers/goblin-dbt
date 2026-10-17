@@ -16,6 +16,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'pause': { module: 'dt', closeKind: 'urge' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
+  // Cope Ahead (docs/design/cope-ahead.md): screen 1 already asked when, so no close question; its outcome
+  // is the cope_ahead_after card.
+  'cope-ahead': { module: 'er', closeKind: 'none' },
   // FTF asks its own then-vs-now (stored `close`, mapped at read: R3).
   'find-the-feeling': { module: 'er', closeKind: 'regulation_down' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).

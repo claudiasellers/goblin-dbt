@@ -26,6 +26,7 @@ const HOSTS = {
   "src/pages/tools/DearMan.tsx": [["CopeAheadStep", "LazyCopeAheadStep", "loadCope"], ["DebriefWho", "LazyDebriefWho", "loadWho"]],
   "src/pages/tools/ProblemSolve.tsx": [["PartLaterLine", "LazyPartLaterLine", "loadLater"]],
   "src/App.tsx": [["PartsDenPage", "LazyPartsDenPage"]],
+  "src/hooks/useStepBackSlot.tsx": [["StepBackScreen", "LazyStepBackScreen", "loadStepBack"]],
 };
 const ALSO_NO_STATIC = ["src/hooks/useToolGate.ts", "src/contexts/TodayContext.tsx"];
 
@@ -69,7 +70,7 @@ test("Meet a part, Two pulls and Wise mind are the lazy tools; the parts gates s
   // Wise mind (not a parts surface): its own chunk, for everyone.
   assert.match(page, /const loadWiseMind = \(\) => import\('\.\/tools\/WiseMind'\);/);
   assert.match(page, /const LazyWiseMind = lazy\(\(\) => loadWiseMind\(\)\.then\(\(m\) => \(\{ default: m\.WiseMind \}\)\)\);/);
-  assert.match(page, /<Suspense fallback=\{<ToolLoading \/>\}><LazyWiseMind \/><\/Suspense>/);
+  assert.match(page, /<Suspense fallback=\{<ToolLoading \/>\}><LazyWiseMind stepBack=\{slot\} \/><\/Suspense>/, "with its parts form's slot (or null)");
   assert.match(page, /'wise-mind': WiseMind,/);
   assert.match(page, /'meet-a-part': MeetAPart,/);
   assert.match(page, /'two-pulls': TwoPulls,/);

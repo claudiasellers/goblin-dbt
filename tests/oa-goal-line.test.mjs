@@ -104,12 +104,15 @@ test("host: the effectiveness card's before slot, two body lines, OA's own goal 
   const oa = read("src/pages/tools/OppositeAction.tsx");
   assert.match(oa, /const EFFECTIVENESS_STEP = CHECK_STEPS\.indexOf\("effectiveness"\);/);
   assert.match(oa, /useOaGoalLine\(\s*\{\s*urgeId: draft\.urgeId \|\| null,\s*goalLabel: choices\.goal\?\.find\(\(o\) => o\.id === draft\.goal\)\?\.label \?\? null,\s*\},\s*stage === "check" && checkStep === EFFECTIVENESS_STEP,\s*\)/);
-  assert.match(oa, /key="effectiveness"[\s\S]*?before=\{\s*goalLine && \(\s*<div id=\{OA_GOAL_LINE_ID\} className="space-y-1">\s*<p>\{goalLine\[0\]\}<\/p>\s*<p>\{goalLine\[1\]\}<\/p>\s*<\/div>\s*\)\s*\}/);
+  assert.match(oa, /key="effectiveness"[\s\S]*?before=\{\s*goalLine && <GoalLine id=\{OA_GOAL_LINE_ID\} lines=\{goalLine\} \/>\s*\}/);
+  // The two lines as a polite status line (it arrives after the card), shared with the review harness.
+  assert.match(read("src/components/tools/oppositeAction/GoalLine.tsx"),
+    /<div id=\{id\} role="status" className="space-y-1" data-testid="goal-line">\s*<p>\{lines\[0\]\}<\/p>\s*<p>\{lines\[1\]\}<\/p>/);
   // Above the question, and read with it: the focused question is described by the line, only while it shows.
   assert.match(oa, /key="effectiveness"[\s\S]*?describedBy=\{goalLine \? OA_GOAL_LINE_ID : undefined\}/);
   assert.match(read("src/components/tools/oppositeAction/TapCardLoop.tsx"), /<h3 ref=\{heading\} tabIndex=\{-1\} aria-describedby=\{describedBy\}/);
   // Only the effectiveness card has it.
-  assert.equal((oa.match(/goalLine\[0\]/g) ?? []).length, 1);
+  assert.equal((oa.match(/<GoalLine /g) ?? []).length, 1);
   // No hard-coded copy: the lines and the goal labels are content.
   for (const f of ["src/pages/tools/OppositeAction.tsx", "src/lib/oaGoalLine.ts", "src/hooks/useOaGoalLine.ts"]) {
     const code = read(f).replace(/^\s*(\/\/|\*|\/\*\*).*$/gm, "");

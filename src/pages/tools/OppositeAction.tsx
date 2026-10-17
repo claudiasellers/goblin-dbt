@@ -57,6 +57,7 @@ import {
 import { useToolSession } from "../../hooks/useToolSession";
 import { useUnblendLine } from "../../hooks/useUnblendLine";
 import { useOaGoalLine } from "../../hooks/useOaGoalLine";
+import { GoalLine } from "../../components/tools/oppositeAction/GoalLine";
 import { oaSkillIds } from "../../lib/spine/wrap";
 
 const FLOW_VERSION = "oa-guided-v2";
@@ -1055,12 +1056,7 @@ export function OppositeAction() {
           onPrevious={previous}
           describedBy={goalLine ? OA_GOAL_LINE_ID : undefined}
           before={
-            goalLine && (
-              <div id={OA_GOAL_LINE_ID} className="space-y-1">
-                <p>{goalLine[0]}</p>
-                <p>{goalLine[1]}</p>
-              </div>
-            )
+            goalLine && <GoalLine id={OA_GOAL_LINE_ID} lines={goalLine} />
           }
           onSelect={(id) => {
             change("effectiveness", id);

@@ -175,7 +175,7 @@ test("the client mirror: the callables' types appear in src/data/partsTypes.ts; 
     "export interface GetTrailOfferEvidenceRequest { offerId: string }",
     "next: 'meet' | 'candidates' | 'two_pulls' | 'none';",
     "offerId?: string;",
-    "export type TagSource = 'close' | 'debrief' | 'review';",
+    "export type TagSource = 'close' | 'debrief' | 'review' | 'wise_mind';",
   ]) assert.ok(mirror.includes(s), s);
   const types = read("functions/src/parts/offers/types.ts");
   for (const s of ["export type TrailOfferAnswer = 'not_now' | 'not_me' | 'yes' | 'more_than_one' | 'how_it_goes';", "next: 'meet' | 'candidates' | 'two_pulls' | 'none';"]) {
