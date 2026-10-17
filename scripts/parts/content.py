@@ -365,7 +365,7 @@ UNDERNEATH_HELD = {
 # flows: meet (Meet a part), pulls (Two pulls), offer (trail offer), tag (the tag row after a better
 # close), unblend (the in-the-moment line), angry (the angry-part card), aftercare, checkback (the
 # next-day check-back card), dearman (DEAR MAN's cope ahead), gate, settings, me (Parts of me), ps (Problem Solve's ambivalence line), common (shared), reflect,
-# review (rule D's batch in Reflect)
+# review (rule D's batch in Reflect), den (the den: Me → Parts of me → See them together)
 # --------------------------------------------------------------------------------------------------
 PROMPTS = [
     # Meet a part, in order (parts.md "Meet a part")
@@ -581,6 +581,22 @@ PROMPTS = [
     ("candidate_line_plain", "me", "candidate", "One you wanted to come back to"),
     ("candidate_go", "me", "candidate", "Get to know it"),
     ("candidate_dismiss", "me", "candidate", "Not any more"),
+    # The den (parts.md "The den"): Me → Parts of me → See them together. The light is the person and is
+    # never labelled; threads appear only on a yes. {month} = the snapshot's month in the locale's words.
+    ("den_link", "den", "room", "See them together"),
+    ("den_room", "den", "room", "Everyone here is in your house."),
+    ("den_unnamed", "den", "room", "A part"),
+    ("den_move_help", "den", "room", "Tap one, then another, to say how they go together. Drag to move them."),
+    ("den_move_keys", "den", "room", "Enter picks one up, the arrow keys move it, Enter puts it down."),
+    ("den_one_part", "den", "room", "When you get to know another part, it will be here too."),
+    ("den_list", "den", "room", "See them as a list"),
+    ("den_pull_against", "den", "thread", "These two pull against each other"),
+    ("den_stands_front", "den", "thread", "This one stands in front of that one"),
+    ("den_which_front", "den", "thread", "Which one stands in front?"),
+    ("den_thread_cancel", "den", "thread", "Not now"),
+    ("den_remove", "den", "thread", "Remove this thread"),
+    ("den_then", "den", "then", "How it looked in {month}"),
+    ("den_now", "den", "then", "Now"),
 ]
 
 # Lines of a two-wordings flow that show with parts on only, so they have no `_plain` twin (the angry

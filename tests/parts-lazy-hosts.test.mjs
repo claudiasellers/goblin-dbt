@@ -24,6 +24,7 @@ const HOSTS = {
   "src/pages/tools/InvalidationRecovery.tsx": [["AngryPartCard", "LazyAngryPartCard", "loadAngryCard"]],
   "src/pages/tools/DearMan.tsx": [["CopeAheadStep", "LazyCopeAheadStep", "loadCope"], ["DebriefWho", "LazyDebriefWho", "loadWho"]],
   "src/pages/tools/ProblemSolve.tsx": [["PartLaterLine", "LazyPartLaterLine", "loadLater"]],
+  "src/App.tsx": [["PartsDenPage", "LazyPartsDenPage"]],
 };
 const ALSO_NO_STATIC = ["src/hooks/useToolGate.ts", "src/contexts/TodayContext.tsx"];
 
