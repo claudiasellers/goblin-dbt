@@ -7,10 +7,12 @@
  * Where a tag comes from: `close` (the tag row after a better close; the default), `debrief` (DEAR MAN's
  * debrief, "who showed up?"), `review` (rule D's "Was this {name}?", answered later in a batch in Reflect:
  * functions/src/parts/offers/review.ts) or `wise_mind` (the parts the person placed in Wise mind's step
- * back, on that visit's own ToolSession, open or closed; one per session and part).
+ * back, on that visit's own ToolSession, open or closed; one per session and part) or `cope_ahead`
+ * (Cope Ahead's after card, "Used it, it helped", for the part the visit named: written by the server in
+ * that resolve, never through tagPart; one per session).
  */
-export type TagSource = 'close' | 'debrief' | 'review' | 'wise_mind';
-export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review', 'wise_mind'];
+export type TagSource = 'close' | 'debrief' | 'review' | 'wise_mind' | 'cope_ahead';
+export const TAG_SOURCES: readonly TagSource[] = ['close', 'debrief', 'review', 'wise_mind', 'cope_ahead'];
 /** A debrief tag's answer: Yes or A bit (No and Skip write nothing). */
 export type TagStrength = 'yes' | 'a_bit';
 export const TAG_STRENGTHS: readonly TagStrength[] = ['yes', 'a_bit'];

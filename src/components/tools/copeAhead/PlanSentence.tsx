@@ -1,12 +1,13 @@
 import { Fragment } from 'react';
 import type { CopeAheadContent } from '../../../data/copeAheadTypes';
+import type { PlanParts } from '../../../lib/copeAheadPlan';
 
 /**
- * The plan's shape (docs/design/cope-ahead.md, "The plan line"): lane 4's `PlanParts` from
- * src/lib/copeAheadPlan.ts, which `planLine(content, ca)` returns. Structural, so the page passes
- * planLine's result straight in.
+ * The plan's shape (docs/design/cope-ahead.md, "The plan line"): `PlanParts` from src/lib/copeAheadPlan.ts,
+ * which `planLine(content, ca)` returns, so the page passes planLine's result straight in. Re-exported for
+ * this folder's screens.
  */
-export type PlanParts = { ifText: string; moves: string[]; text: string };
+export type { PlanParts };
 
 /**
  * The plan as Cope Ahead's closing screens show it: *If* {ifText}*, I'll* {move}[ *and* {move}], the three

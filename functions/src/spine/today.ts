@@ -11,6 +11,7 @@ import { BANDS, type Band } from '../capacity/types';
 import { readFollowUpTypes, type FollowUpTypeContent } from './registry';
 import { fillDeepLink, followUpState, orderToday, type TodayItem } from './todayOrder';
 import { NOT_WHAT_HELPS } from './tools';
+import { COPE_AHEAD_AFTER, planIdsFromExt } from './copeAheadAfter';
 
 export interface GetTodayResponse {
   items: TodayItem[];
@@ -59,7 +60,10 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
        AND f.dueAt > datetime() - duration({hours: coalesce(t.staleAfterHours, 36) + 168})
      OPTIONAL MATCH (f)-[:DETAIL]->(d)
      RETURN f.id AS id, f.type AS type, toString(f.dueAt) AS dueAt, f.sourceToolId AS sourceToolId,
-            f.sourceSessionId AS sourceSessionId, coalesce(f.notifyInTab, false) AS notifyInTab, d.id AS detailId
+            f.sourceSessionId AS sourceSessionId, coalesce(f.notifyInTab, false) AS notifyInTab, d.id AS detailId,
+            // Cope Ahead's after card: the visit's ext, for the plan's ids (copeAheadAfter.ts), nothing else.
+            head([(f)<-[:SCHEDULED]-(ts:ToolSession {toolId: 'cope-ahead'})
+                  WHERE f.type = 'cope_ahead_after' AND ts.ownerId = $uid | ts.ext]) AS planExt
      ORDER BY f.dueAt LIMIT 25`,
     { uid, owned: [...ownedTypes] },
   );
@@ -83,6 +87,8 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
         copy: t.copy,
         source: { ...(vars.sourceToolId ? { toolId: vars.sourceToolId } : {}), ...(vars.sourceSessionId ? { toolSessionId: vars.sourceSessionId } : {}),
           ...(vars.detailId ? { detailId: vars.detailId } : {}) },
+        // The plan's ids from the visit (never a stored plan string): the card composes the words.
+        ...(t.id === COPE_AHEAD_AFTER ? { plan: planIdsFromExt(r.get('planExt')) } : {}),
       });
     }
     // OA plans keep their own reminder (useOppositeActionFollowUps); the rest remind from here.

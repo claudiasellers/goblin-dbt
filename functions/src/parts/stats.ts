@@ -40,8 +40,12 @@ export interface StatsPartRow {
   firstPlace: string | null;
   shapeSig: number[] | null;
 }
-/** One close PartTag (statsQueries.ts reads no other source): the tagged ToolSession's tool and when the tag was made. */
-export interface StatsTagRow { partId: string; toolId: string; at: string }
+/**
+ * One close or cope_ahead PartTag (statsQueries.ts reads no other source): the tagged ToolSession's tool,
+ * when the tag was made and its source (absent is `close`). Both count for *helped*; only close tags for
+ * *when* (a cope_ahead tag's time is the after card's answer, not the moment).
+ */
+export interface StatsTagRow { partId: string; toolId: string; at: string; source?: 'close' | 'cope_ahead' }
 /**
  * One Meet a part visit of the part with a feel-toward answer: only its FIRST answer (how they arrived,
  * which is what changes as the relationship does). feelTowardIds is ask-fresh: the query returns the
@@ -163,7 +167,8 @@ export function whenFor(tags: readonly StatsTagRow[], timeZone: string | null): 
 export function partStats(
   tags: readonly StatsTagRow[], sessions: readonly StatsSessionRow[], timeZone: string | null, steps: readonly StatsStepRow[] = [],
 ): PartStats {
-  return { helped: helpedFor(tags), felt: feltFor(sessions, timeZone), when: whenFor(tags, timeZone), steps: stepsFor(steps) };
+  const closes = tags.filter((t) => (t.source ?? 'close') === 'close');
+  return { helped: helpedFor(tags), felt: feltFor(sessions, timeZone), when: whenFor(closes, timeZone), steps: stepsFor(steps) };
 }
 
 export const hasLine = (s: PartStats): boolean => s.helped !== null || s.felt !== null || s.when !== null || s.steps !== null;
