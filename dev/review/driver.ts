@@ -11,8 +11,8 @@ import { getSpineContent } from '../../src/services/spine';
 import { getFindTheFeelingContent } from '../../src/services/neo4j';
 
 export type DriveStep =
-  /** A chip or link by parts option id. */
-  | { opt: string }
+  /** A chip or link by parts option id; `in`: only inside this selector (a label the screen shows twice). */
+  | { opt: string; in?: string }
   /** A Find chip by move id. */
   | { move: string }
   /** A hurt chip by id. */
@@ -46,6 +46,16 @@ async function find(root: HTMLElement, label: string, what = 'button, a'): Promi
   throw new Error(`nothing to tap: "${want}"`);
 }
 
+/** The element `selector` names inside `root`, once it is there. */
+async function within(root: HTMLElement, selector: string): Promise<HTMLElement> {
+  for (let i = 0; i < 100; i++) {
+    const el = root.querySelector<HTMLElement>(selector);
+    if (el) return el;
+    await sleep(50);
+  }
+  throw new Error(`nothing at ${selector}`);
+}
+
 function labels(parts: PartsContent): Map<string, string> {
   const m = new Map<string, string>();
   for (const steps of Object.values(parts.options)) for (const list of Object.values(steps)) for (const o of list) m.set(`opt:${o.id}`, o.label);
@@ -70,7 +80,7 @@ export async function drive(root: HTMLElement, steps: readonly DriveStep[]): Pro
     const label = (k: string) => { const v = map.get(k); if (v === undefined) throw new Error(`no copy for ${k}`); return v; };
     for (const s of steps) {
       await sleep(120);
-      if ('opt' in s) (await find(root, label(`opt:${s.opt}`))).click();
+      if ('opt' in s) (await find(s.in ? await within(root, s.in) : root, label(`opt:${s.opt}`))).click();
       else if ('move' in s) (await find(root, label(`move:${s.move}`))).click();
       else if ('hurt' in s) (await find(root, label(`hurt:${s.hurt}`))).click();
       else if ('prompt' in s) (await find(root, label(`prompt:${s.prompt}`))).click();
