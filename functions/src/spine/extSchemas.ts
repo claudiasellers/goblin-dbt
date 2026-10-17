@@ -3,7 +3,9 @@
  *
  * Each namespace has a registered schema. Values are ids / enums / booleans; integers are allowed
  * only on keys ending `Sec` or `Count` (durations and counts are not scales); the whole object is
- * ≤ 4 KB serialised. No free text, no numeric scale ever reaches a session record.
+ * ≤ 4 KB serialised. No numeric scale ever reaches a session record, and no free text except the
+ * person's own words on a key a tool registers as `text` (Wise mind's `*Own`, docs/design/wise-mind.md):
+ * length-checked only, never linted or interpreted, never shown back outside that visit and My words.
  */
 import { ValidationError } from '../shared/validate';
 
@@ -12,11 +14,14 @@ type Field =
   | { t: 'ids'; max: number }
   | { t: 'bool' }
   | { t: 'int'; max: number }                    // key must end in Sec or Count
+  | { t: 'text'; max: number }                   // key must end in Own: the person's own words, length-checked only
   | { t: 'obj'; of: Record<string, Field> }
   | { t: 'objs'; max: number; of: Record<string, Field> };
 
 const ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
 export const EXT_MAX_BYTES = 4096;
+/** Wise mind's own words (scripts/wise-mind/content.py OWN_MAX). */
+export const WM_OWN_MAX = 140;
 
 /** Registered namespaces. A module adds its keys here in the PR that writes them. */
 export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
@@ -64,6 +69,24 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     unblendShown: { t: 'bool' },                                                   // parts on: the unblend line showed after Recover's pull
   },
   mf: {},
+  // Wise mind (docs/design/wise-mind.md). wiseMindAnswer itself is the session's top-level ask-fresh field.
+  wm: {
+    questionId: { t: 'id' },                                                       // WiseMindQuestion id
+    questionOwn: { t: 'text', max: WM_OWN_MAX },
+    form: { t: 'id' },                                                             // minds | parts (checked by the client)
+    emotionSaysIds: { t: 'ids', max: 4 },                                          // MindVoice ids
+    emotionSaysOwn: { t: 'text', max: WM_OWN_MAX },
+    reasonSaysIds: { t: 'ids', max: 4 },
+    reasonSaysOwn: { t: 'text', max: WM_OWN_MAX },
+    partIds: { t: 'ids', max: 12 },                                                // parts form: part ids only
+    stillCloseIds: { t: 'ids', max: 12 },                                          // parts form: "It won't step back", part ids only
+    practiceId: { t: 'id' },                                                       // WiseMindPractice id
+    answerOwn: { t: 'text', max: WM_OWN_MAX },
+    feel: { t: 'id' },                                                             // calm | pushed | unsure (checked by the client)
+    onceMore: { t: 'bool' },                                                       // "Drop in once more" (once)
+    nextToolId: { t: 'id' },                                                       // the tool it handed off to
+    kept: { t: 'bool' },                                                           // "Keep what wise mind said" wrote an OwnLine
+  },
 };
 
 function checkField(key: string, f: Field, v: unknown, path: string): unknown {
@@ -83,6 +106,13 @@ function checkField(key: string, f: Field, v: unknown, path: string): unknown {
       if (!/(Sec|Count)$/.test(key)) throw new ValidationError(`ext ${path}: integers only on *Sec / *Count keys`);
       if (typeof v !== 'number' || !Number.isInteger(v) || v < 0 || v > f.max) throw new ValidationError(`ext ${path}: expected an integer`);
       return v;
+    case 'text': {
+      if (!/Own$/.test(key)) throw new ValidationError(`ext ${path}: text only on *Own keys`);
+      // eslint-disable-next-line no-control-regex
+      const t = typeof v === 'string' ? v.replace(/[\r\n\t]+/g, ' ').replace(/[\u0000-\u001f\u007f-\u009f]/g, '').trim() : '';
+      if (!t || t.length > f.max) throw new ValidationError(`ext ${path}: expected 1 to ${f.max} characters`);
+      return t;
+    }
     case 'obj':
       return checkObject(f.of, v, path);
     case 'objs':

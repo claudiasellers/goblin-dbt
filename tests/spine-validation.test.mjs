@@ -75,6 +75,36 @@ test("ext (R18): namespaced, ids/enums only, integers only on *Sec / *Count, ≤
   try { assert.throws(() => ext.validateExt({ mf: { intensity: 7 } }), /Sec \/ \*Count/); } finally { delete ext.EXT_SCHEMAS.mf.intensity; }
 });
 
+test("ext wm: Wise mind's ids, and the person's own words on *Own keys only (≤ 140, never linted)", () => {
+  const wm = {
+    questionId: "wm_q_next", form: "minds", emotionSaysIds: ["wm_v_next_emotion_1"], reasonSaysIds: ["wm_v_next_reason_2"],
+    practiceId: "wm_breath", feel: "pushed", onceMore: true, nextToolId: "dear-man", kept: true,
+    partIds: ["p1", "p2"], stillCloseIds: ["p2"],
+  };
+  assert.deepEqual(JSON.parse(ext.validateExt({ wm })).wm, wm);
+  const own = JSON.parse(ext.validateExt({ wm: { questionOwn: " Whether to\nmove out ", answerOwn: "x".repeat(140), emotionSaysOwn: "Run.", reasonSaysOwn: "Stay put." } })).wm;
+  assert.equal(own.questionOwn, "Whether to move out");
+  assert.equal(own.answerOwn.length, 140);
+  assert.throws(() => ext.validateExt({ wm: { answerOwn: "x".repeat(141) } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ wm: { answerOwn: " \n " } }), /1 to 140/);
+  assert.throws(() => ext.validateExt({ wm: { answerOwn: 7 } }), /1 to 140/);
+  for (const key of ["questionId", "practiceId", "feel", "nextToolId"]) {
+    assert.throws(() => ext.validateExt({ wm: { [key]: "wait, not now" } }), /expected an id/, `${key}: no free text`);
+  }
+  assert.throws(() => ext.validateExt({ wm: { partNames: ["the critic"] } }), /not registered/, "parts are ids only");
+  ext.EXT_SCHEMAS.mf.note = { t: "text", max: 10 };
+  try { assert.throws(() => ext.validateExt({ mf: { note: "hi" } }), /\*Own keys/); } finally { delete ext.EXT_SCHEMAS.mf.note; }
+});
+
+test("close: wiseMindAnswer is an id (ask-fresh, on the session only)", () => {
+  assert.equal(v.validateClose({ id: ID, status: "completed", wiseMindAnswer: "wm_a_wait" }, now, "orienting").wiseMindAnswer, "wm_a_wait");
+  assert.equal(v.validateClose({ id: ID, status: "completed" }, now, "orienting").wiseMindAnswer, null);
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", wiseMindAnswer: "Wait, not now" }, now, "orienting"));
+  const src = readFileSync("functions/src/spine/toolSession.ts", "utf8");
+  assert.match(src, /wiseMindAnswer: rec\.get\('toolId'\) === 'wise-mind' \? c\.wiseMindAnswer : null/, "another tool's answer is dropped");
+  assert.ok(!tools.NOT_WHAT_HELPS.includes("wise-mind"), "a More here after Wise mind counts toward what helps");
+});
+
 test("ext er: Problem Solve keeps what got in the way as ids (parts data fix 2)", () => {
   const er = { barrierTypeId: "know-but-cant", barrierSubId: "cant-ambivalent", ambivalenceId: "ambiv-change-might-not-help", confidence: "low" };
   assert.deepEqual(JSON.parse(ext.validateExt({ er })).er, er);

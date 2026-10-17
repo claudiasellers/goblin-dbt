@@ -14,6 +14,8 @@ export const WITNESS_VERSION = 'witness-v1';
 export const WITNESS_MOMENTS = [
   'checkin_result', 'recover_validate', 'oa_start', 'ps_define', 'dearman_describe',
   'debrief_turning_point', 'missed_followup', 'urge_louder', 'crisis',
+  // Wise mind's "Keep what wise mind said" (an own line only: no ToolMoment, no line is ever served for it).
+  'wise_mind',
 ] as const;
 export type WitnessMoment = (typeof WITNESS_MOMENTS)[number];
 
@@ -75,7 +77,8 @@ export interface RecordWitnessBeatRequest {
   hostKind: 'checkin' | 'tool_session';
   hostId: string;                // must belong to request.auth.uid
   moment: WitnessMoment;
-  band: Band;
+  /** Required when a line was shown (it is stored on SHOWED_LINE); a beat that only keeps an own line may leave it out. */
+  band?: Band;
   shown: Array<{ lineId: string; landed: Landed | null }>;
   ownLineShownId?: string;
   skipped: boolean;

@@ -64,11 +64,12 @@ export function parseRecordWitnessBeat(data: unknown): RecordWitnessBeatRequest 
     hostKind: oneOf(d.hostKind, ['checkin', 'tool_session'] as const),
     hostId: uuid(d.hostId),
     moment: oneOf(d.moment, WITNESS_MOMENTS) as WitnessMoment,
-    band: oneOf(d.band, BANDS) as Band,
     shown,
     skipped: bool(d.skipped, false),
     noneFit: bool(d.noneFit, false),
   };
+  // The band is stored on SHOWED_LINE: required with a shown line, optional otherwise (Wise mind's keep has none).
+  if (shown.length || (d.band !== undefined && d.band !== null)) out.band = oneOf(d.band, BANDS) as Band;
   if (d.ownLineShownId !== undefined && d.ownLineShownId !== null) out.ownLineShownId = uuid(d.ownLineShownId);
   if (d.keepLineId !== undefined && d.keepLineId !== null) {
     out.keepLineId = graphId(d.keepLineId);
