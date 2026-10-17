@@ -73,6 +73,11 @@ export interface ProfileSlices {
     lastVisitedAt: string | null;
     /** Set when the next-day check-back said Louder (PartsPolicy.louderPauseHours ahead); trails skip a paused part. */
     pausedUntil: string | null;
+    /**
+     * The part safety flag (functions/src/safety/partSafetyFlag.ts): a safetyLine move or a danger fear.
+     * Show CrisisBanner alongside, never instead; computed on the server, so no fears are needed here.
+     */
+    safety: boolean;
     meta: ProfileItemMeta;
   }>;
   /** The rest of a kept part (Meet a part reads it); `hurtIds` from GUARDS. Own-words fields as written. */

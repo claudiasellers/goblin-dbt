@@ -10,6 +10,7 @@ import {
   type PartCandidatePromptId, type PartRevisitCopy, type PartWriteCall, type PartsOfMePromptId,
 } from '../../lib/partsOfMe';
 import { newId } from '../../lib/spine/ids';
+import { CrisisBanner } from '../safety/CrisisBanner';
 import { PartFigure } from '../parts/PartFigure';
 import { getToolById } from '../../data/tools';
 import { monthName, partStatLines, statsReady, type PartStatLines } from '../../lib/partStats';
@@ -225,6 +226,9 @@ function PartCard({ item, content, copy, revisit, showStats, onWrite }: {
           </button>
         ))}
       </div>
+      {/* A safety-line or danger part (functions/src/safety/partSafetyFlag.ts): crisis resources under the
+          actions, quiet, alongside the card and its 30-day check-back above, never instead. */}
+      {part.safety === true && <div className="mt-3"><CrisisBanner compact /></div>}
     </li>
   );
 }

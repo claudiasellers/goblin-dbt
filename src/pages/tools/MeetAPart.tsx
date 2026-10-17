@@ -72,7 +72,7 @@ export function MeetAPart() {
 }
 
 type PickedChip = { id: string; branch: string; flag?: string | null };
-type KnownPart = { id: string; name: string | null; tender: boolean; moveIds: string[] };
+type KnownPart = { id: string; name: string | null; tender: boolean; moveIds: string[]; safety?: boolean };
 
 function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
   entry: MeetEntry; plan: EntryPlan; tooMany: boolean; paused: boolean; parts: PartsContent; rounds: ShapeRoundLabels; known: readonly KnownPart[];
@@ -90,7 +90,10 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
   /** P2 runs outside the machine: on entry, the too-much link, a body aside. They ride with the session's own. */
   const [extra, setExtra] = useState<HandoffResult[]>([]);
   const [asideDone, setAsideDone] = useState(false);
-  const entryCrisis = plan.open === 'p2' && plan.crisis;
+  // A visit to a safety-line or danger part (its card's link; functions/src/safety/partSafetyFlag.ts) shows
+  // crisis resources from the first screen to the last, alongside the visit, never instead of it.
+  const partCrisis = visited?.safety === true;
+  const entryCrisis = (plan.open === 'p2' && plan.crisis) || partCrisis;
 
   /** The flow's first real screen is still up (the too-many line shows there, once). */
   const [firstScreen, setFirstScreen] = useState(true);
@@ -231,6 +234,7 @@ function MeetVisit({ entry, plan, tooMany, paused, parts, rounds, known }: {
     const goOn = opts.find((o) => o.id === HEADS_UP_GO_ON);
     return (
       <div className="space-y-5">
+        {entryCrisis && <CrisisBanner />}
         <Prompt serif>{P(HEADS_UP_PROMPT)}</Prompt>
         <div className="flex flex-wrap gap-2.5">
           {look && groundingLink(look.label)}
