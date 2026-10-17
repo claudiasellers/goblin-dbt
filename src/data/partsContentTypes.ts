@@ -4,8 +4,10 @@
  * tests/fixtures/parts-content.json's moves / prompts / options / hurts. Everything here is approved by
  * construction, so no row carries a review status. Pure, no imports.
  *
- * The builder copies a node's content properties generically, so a field added in
- * scripts/parts/content.py reaches the file before it reaches these types: add it here when a screen reads it.
+ * The file ships an allowlist: exactly the fields declared here, which are the fields a screen or a client
+ * gate reads (PARTS_FIELDS in scripts/content-snapshot/partsAllowlist.mjs; tests/content-snapshot.test.mjs
+ * holds the two equal). A field added in scripts/parts/content.py stays on the server until a screen needs
+ * it: then add it to both. Rows arrive in content order.
  */
 
 /** A protective move a part may use (offerable moves only). Copy is second person. */
@@ -14,21 +16,14 @@ export interface PartsMove {
   label: string;
   /** Follows "A part of you …" (fills {move}). */
   unblendPhrase: string;
-  /** Fills {pull} in a trail statement. */
-  trailPhrase: string;
   /** A describing name suggestion ("the one who hides"), never an archetype. */
   nameHint: string;
-  kind: 'proactive' | 'reactive' | 'either';
   /** Picking a danger chip or own words on this move shows crisis resources alongside. */
   safetyLine: boolean;
-  order: number;
 }
 
 /** One of the app's questions or statements in a parts flow. */
 export interface PartsPrompt {
-  flow: string;
-  step: string;
-  order: number;
   copy: string;
 }
 
@@ -37,11 +32,10 @@ export type PartsBranch =
   | 'continue' | 'tender_offer' | 'tender_path' | 'grounding' | 'unblend' | 'conservative' | 'danger'
   | 'body_first' | 'candidate' | 'end' | 'keep' | 'own_words' | 'meet' | 'split' | 'new' | 'aftercare' | 'checkback';
 
-/** A chip the person taps (or, `kind: 'voice'`, what a part says). */
+/** A chip the person taps (at the voice step, what the part might say, in the person's pick). */
 export interface PartsOption {
   id: string;
   label: string;
-  kind: 'chip' | 'voice';
   flag: 'tender' | 'danger' | null;
   /** Feel-toward only: whether the answer is Self-like. */
   selfLike: boolean | null;
@@ -49,15 +43,12 @@ export interface PartsOption {
   order: number;
   /** Move ids it is offered for, in order; empty means every move. A listed move may not be signed off yet. */
   moves: string[];
-  /** The same answer in another module (e.g. a DEAR MAN ThoughtPattern). */
-  sameAs: { label: string; id: string }[];
 }
 
 /** A hurt a protective move may be guarding (a category, never a memory). */
 export interface PartsHurt {
   id: string;
   label: string;
-  hurtPhrase: string;
   feltPhrase: string;
   /** What the anger says matters (the angry card's vote of confidence, fills {matters}). */
   matters: string;

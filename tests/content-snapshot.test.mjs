@@ -6,6 +6,7 @@ import { readFileSync } from "node:fs";
 import { assertContentOnly, buildParts, buildRelatedWords, buildSnapshots, indexGraph, USER_LABELS } from "../scripts/content-snapshot/build.mjs";
 import { isLocalUri } from "../scripts/load-graph.mjs";
 import { partsFromFixture } from "./lib/partsContentFixture.mjs";
+import { PARTS_FIELDS, PARTS_KEYS } from "../scripts/content-snapshot/partsAllowlist.mjs";
 
 const shipped = (name) => JSON.parse(readFileSync(`src/data/content/${name}`, "utf8"));
 const node = (id, labels, props = {}) => ({ elementId: id, labels, props: { id, ...props } });
@@ -152,11 +153,11 @@ test("shipped parts content is content.py's signed-off rows, and nothing a scree
   assert.deepEqual(shippedIds.filter((id) => draft.has(id)), [], "draft parts content in the app bundle");
 });
 
-test("buildParts: signed-off rows only, any content property carried, edges by their source's review", () => {
+test("buildParts: signed-off rows only, only the allowlisted fields, edges by their source's review", () => {
   const ok = { reviewStatus: "approved", version: "parts-v1" };
   const draft = { reviewStatus: "draft", version: "parts-v1" };
   const nodes = [
-    node("hide", ["ProtectiveMove"], { ...ok, label: "Hide", offerable: true, safetyLine: false, order: 2, newField: "kept" }),
+    node("hide", ["ProtectiveMove"], { ...ok, label: "Hide", offerable: true, safetyLine: false, order: 2, kind: "reactive", trailPhrase: "hide", newField: "never" }),
     node("chase", ["ProtectiveMove"], { ...draft, label: "Chase", offerable: true, order: 1 }),
     node("go_blank", ["ProtectiveMove"], { ...ok, label: "Go blank", offerable: false, order: 3 }),
     node("meet_find", ["PartPrompt"], { ...ok, flow: "meet", step: "find", order: 0, copy: "What's showing up?" }),
@@ -205,13 +206,13 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
   assertContentOnly(exp);
   assert.deepEqual(buildParts(indexGraph(exp)), {
     version: "parts-v1",
-    moves: [{ id: "hide", label: "Hide", safetyLine: false, order: 2, newField: "kept" }],
-    prompts: { meet_find: { flow: "meet", step: "find", order: 0, copy: "What's showing up?" } },
+    moves: [{ id: "hide", label: "Hide", safetyLine: false }],
+    prompts: { meet_find: { copy: "What's showing up?" } },
     options: {
       meet: {
         voice: [
-          { id: "voice_a", label: "A", kind: "chip", flag: "tender", selfLike: false, branch: "conservative", order: 0, moves: ["hide", "chase"], sameAs: [] },
-          { id: "voice_b", label: "B", kind: "voice", flag: null, selfLike: null, branch: "continue", order: 1, moves: [], sameAs: [{ label: "ThoughtPattern", id: "tp_agree" }] },
+          { id: "voice_a", label: "A", flag: "tender", selfLike: false, branch: "conservative", order: 0, moves: ["hide", "chase"] },
+          { id: "voice_b", label: "B", flag: null, selfLike: null, branch: "continue", order: 1, moves: [] },
         ],
       },
     },
@@ -235,6 +236,98 @@ test("buildParts: signed-off rows only, any content property carried, edges by t
   assert.ok(!("limits" in buildParts(indexGraph(exp))), "a draft policy: no limits key");
   const mixed = { ...exp, nodes: nodes.map((n) => (n.props.id === "voice_b" ? { ...n, props: { ...n.props, version: "parts-v2" } } : n)) };
   assert.throws(() => buildParts(indexGraph(mixed)), /mixes versions/);
+});
+
+// parts.json is public once deployed: it ships an allowlist (scripts/content-snapshot/partsAllowlist.mjs),
+// never "every content property", so a field added in content.py stays on the server until a screen reads it.
+const partsRowKeys = (c) => ({
+  top: Object.keys(c),
+  moves: c.moves.flatMap(Object.keys),
+  prompts: Object.values(c.prompts).flatMap(Object.keys),
+  options: Object.values(c.options).flatMap((steps) => Object.values(steps).flat()).flatMap(Object.keys),
+  hurts: c.hurts.flatMap(Object.keys),
+  guardedBy: c.hurts.flatMap((h) => h.guardedBy).flatMap(Object.keys),
+  limits: Object.keys(c.limits ?? {}),
+});
+const within = (keys, allowed, what) => assert.deepEqual([...new Set(keys)].filter((k) => !allowed.includes(k)), [], `${what}: fields off the allowlist`);
+
+test("parts.json: a property not on the allowlist never ships, whatever node or edge it is on", () => {
+  const ok = { reviewStatus: "approved", version: "parts-v1" };
+  const leak = { leak: "never", kind: "reactive", why: "never", reason: "never" };
+  const exp = {
+    scope: "content-only",
+    nodes: [
+      node("hide", ["ProtectiveMove"], { ...ok, ...leak, label: "Hide", offerable: true, unblendPhrase: "wants to hide", trailPhrase: "hide", nameHint: "the one who hides", safetyLine: false, order: 0 }),
+      node("meet_find", ["PartPrompt"], { ...ok, ...leak, flow: "meet", step: "find", order: 0, copy: "What's showing up?", copyKind: "prompt" }),
+      node("find_a", ["PartOption"], { ...ok, ...leak, flow: "meet", step: "find", order: 0, label: "A", flag: null, selfLike: null, branch: "continue" }),
+      node("brushed_off", ["ProtectedHurt"], { ...ok, ...leak, label: "being brushed off", hurtPhrase: "being brushed off", feltPhrase: "brushed off", matters: "being taken seriously", order: 0 }),
+      node("hurt", ["Emotion"]), node("tp_agree", ["ThoughtPattern"]), node("dismissed", ["InvalidationEvent"]), node("shame-hide", ["ActionUrge"]),
+      node("trail_a", ["TrailRule"], { ...ok, ...leak, shape: "A", minEpisodes: 4, windowDays: 42, statementTemplate: "When {context}, the pull is to {pull}." }),
+      node("ctx", ["TrailContext"], { ...ok, ...leak, phrase: "it's late" }),
+      node("parts", ["PartsPolicy"], { ...ok, ...leak, offersEnabled: false, floodGateHours: 2, tooManyPartsCount: 3, nameMaxChars: 40, maxNonSelfAnswers: 2, harmWindowDays: 30 }),
+    ],
+    relationships: [
+      rel("OFFERED_FOR", "find_a", "hide", { reviewStatus: "approved", ...leak, order: 0 }),
+      rel("SAME_AS", "find_a", "tp_agree", { reviewStatus: "approved", ...leak }),
+      rel("NAMED_AS", "brushed_off", "hurt", { reviewStatus: "approved", ...leak }),
+      rel("OFTEN_GUARDS", "hide", "brushed_off", { reviewStatus: "approved", ...leak, rank: 0 }),
+      rel("CAN_TOUCH", "dismissed", "brushed_off", { reviewStatus: "approved", ...leak, order: 0 }),
+      rel("EXPRESSES", "shame-hide", "hide", { reviewStatus: "approved", ...leak }),
+    ],
+  };
+  const c = buildParts(indexGraph(exp));
+  assert.doesNotMatch(JSON.stringify(c), /never|"(kind|why|reason|leak|trailPhrase|hurtPhrase|sameAs|copyKind|offerable|flow|step|reviewStatus|pending)"|minEpisodes|windowDays|statementTemplate|offersEnabled|floodGateHours|tooManyPartsCount|harmWindowDays|it's late/);
+  const keys = partsRowKeys(c);
+  within(keys.top, PARTS_KEYS, "top level");
+  for (const t of ["moves", "prompts", "options", "hurts", "guardedBy", "limits"]) within(keys[t], PARTS_FIELDS[t], t);
+  // Every allowlisted field does arrive when the graph has it (the list is not just a filter that drops all).
+  assert.deepEqual(Object.keys(c.moves[0]).sort(), [...PARTS_FIELDS.moves].sort());
+  assert.deepEqual(Object.keys(c.prompts.meet_find), [...PARTS_FIELDS.prompts]);
+  assert.deepEqual(Object.keys(c.options.meet.find[0]).sort(), [...PARTS_FIELDS.options].sort());
+  assert.deepEqual(Object.keys(c.hurts[0]).sort(), [...PARTS_FIELDS.hurts].sort());
+  assert.deepEqual(c.limits, { nameMaxChars: 40, maxNonSelfAnswers: 2 });
+  assert.deepEqual(c.canTouch, { dismissed: ["brushed_off"] });
+  assert.deepEqual(c.expresses, { ActionUrge: { "shame-hide": "hide" } });
+});
+
+test("parts.json: with every row signed off, only allowlisted fields ship (kind, why, HELD, review and policy numbers never)", () => {
+  const fixture = JSON.parse(readFileSync("tests/fixtures/parts-content.json", "utf8"));
+  const all = partsFromFixture(fixture, () => true);
+  assert.ok(all.moves.length >= 8 && Object.keys(all.prompts).length > 100 && all.hurts.length >= 6, "the whole fixture went through");
+  const keys = partsRowKeys(all);
+  within(keys.top, PARTS_KEYS, "top level");
+  for (const t of ["moves", "prompts", "options", "hurts", "guardedBy", "limits"]) within(keys[t], PARTS_FIELDS[t], t);
+  // What the fixture has and the file never carries: the move's role-like kind, EXPRESSES' why, HELD
+  // reasons, review metadata, trail rules and contexts, and the policy's inference and safety numbers.
+  // Checked on the field names (map keys are ids: "shape" and "keepsake" are also step ids).
+  const fieldNames = new Set(Object.values(keys).flat());
+  const never = ["kind", "why", "reason", "held", "reviewStatus", "pending", "trailRules", "contexts", "pairs", "keepsake", "policy",
+    "trailPhrase", "hurtPhrase", "sameAs", "copyKind", "offerable", "flow", "step",
+    ...Object.keys(fixture.policy).filter((x) => !PARTS_FIELDS.limits.includes(x) && x !== "id"),
+    ...Object.keys(fixture.trailRules[0]).filter((x) => x !== "id")];
+  assert.deepEqual(never.filter((k) => fieldNames.has(k)), []);
+  for (const e of Object.values(all.expresses)) for (const moveId of Object.values(e)) assert.equal(typeof moveId, "string", "EXPRESSES ships the move id only");
+  for (const hs of Object.values(all.canTouch)) assert.ok(hs.every((h) => typeof h === "string"), "CAN_TOUCH ships hurt ids only");
+});
+
+test("parts.json's allowlist is exactly the fields the client types declare", () => {
+  const src = readFileSync("src/data/partsContentTypes.ts", "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");
+  const body = (name) => src.match(new RegExp(`export interface ${name} \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? assert.fail(name);
+  // Top-level fields of an interface body (nested object types are one field).
+  const fields = (b) => {
+    let depth = 0, flat = "";
+    for (const ch of b) { if (ch === "{") depth++; if (depth === 0) flat += ch; if (ch === "}") depth--; }
+    return [...flat.matchAll(/^\s*(\w+)\??:/gm)].map((m) => m[1]).sort();
+  };
+  const inline = (b, field) => [...(b.match(new RegExp(`\\b${field}\\??: \\{([^}]*)\\}`))?.[1] ?? "").matchAll(/(\w+):/g)].map((m) => m[1]).sort();
+  const sorted = (xs) => [...xs].sort();
+  assert.deepEqual(fields(body("PartsMove")), sorted(PARTS_FIELDS.moves));
+  assert.deepEqual(fields(body("PartsPrompt")), sorted(PARTS_FIELDS.prompts));
+  assert.deepEqual(fields(body("PartsOption")), sorted(PARTS_FIELDS.options));
+  assert.deepEqual(fields(body("PartsHurt")), sorted(PARTS_FIELDS.hurts));
+  assert.deepEqual(inline(body("PartsHurt"), "guardedBy"), sorted(PARTS_FIELDS.guardedBy));
+  assert.deepEqual(fields(body("PartsContent")), sorted(PARTS_KEYS));
+  assert.deepEqual(inline(body("PartsContent"), "limits"), sorted(PARTS_FIELDS.limits));
 });
 
 test("load-graph never refreshes the shipped files from a local graph", () => {
