@@ -1225,6 +1225,10 @@ check-back) and the witness `part` kind (no moment needs it yet).
 3. A surface lights up only when every id it needs is signed off and the person has parts on (the angry
    card's plain wording is the one exception: it reaches people with parts off).
 
+Steps 1 and 2 in one command: `node scripts/parts/sign-off.mjs --all`, `--surface <id>` (repeatable, a
+pack surface: its lines and the vocabulary it shows through) or `--ids <id>,…`, with `--date` and
+`--dry-run`; it skips `PENDING` ids and never changes `enabled` / `offersEnabled`.
+
 Every surface declares the ids it needs as one exported constant (`*_REQUIRED` / `*Required`), and its
 gate checks that constant through `surfaceReady`, so the review can't drift from the code.
 `node scripts/parts/review.mjs` writes the sign-off pack from the content and those constants: totals,
