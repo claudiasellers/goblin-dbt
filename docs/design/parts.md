@@ -799,7 +799,7 @@ aggregates (`FOUND_WORD`, offers). Stats come from there, never from a profile s
 
   A line shows only when its data and its words exist. There is never a fear, and no number but the
   readout's own counts.
-- *See them together* sits above the cards with 2 or more active or resting parts, and opens the den.
+- *See them together* sits above the cards from the first active or resting part, and opens the den (with one part the room says *When you get to know another part, it will be here too.*). It and *Get to know a part* are buttons; each card's actions stay links.
 
 ### Still true? = checking back with protectors
 
@@ -876,7 +876,7 @@ The map, at Me → Parts of me → *See them together*.
 
 **As built (17 Oct, 2D).**
 - **Route and gate.** `#/me/parts/den` (`src/components/parts/den/`, a lazy chunk), reached from *See them
-  together* above the cards in Parts of me when the person has 2 or more active or resting parts. Its
+  together* above the cards in Parts of me from the first active or resting part (18 Oct; it was 2). Its
   gate is parts on plus `DEN_REQUIRED` through `surfaceReady`.
 - **The room.**
   - The read is `getDen`, the `den` slice, declared for `'me'` only. It returns every active and resting

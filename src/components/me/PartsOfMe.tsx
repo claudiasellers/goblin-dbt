@@ -61,14 +61,14 @@ export function PartsOfMe({ items, candidates, content, copy, onWrite, onDismiss
 
   return (
     <div className="mt-1 space-y-3">
-      <div className="flex flex-wrap gap-x-4">
-        <Link to={getToKnow.pathname} state={getToKnow.state}
-          className="inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
+      {/* The section's two ways in, as buttons: each card's own actions below are underlined links. */}
+      <div className="flex flex-wrap gap-2">
+        <Link to={getToKnow.pathname} state={getToKnow.state} className={entry}>
           {copy.me_get_to_know}
         </Link>
-        {/* The den, once there are two parts to see together and its copy ships. */}
+        {/* The den, once there's a part to see and its copy ships. */}
         {den && showDenLink(live.length, den) && (
-          <Link to={DEN_PATH} className="inline-flex items-center min-h-11 text-sm text-[var(--color-text-secondary)] underline underline-offset-2">
+          <Link to={DEN_PATH} className={entry}>
             {den.den_link}
           </Link>
         )}
@@ -153,6 +153,7 @@ const link = 'inline-flex items-center justify-center min-h-11 min-w-11 text-sm 
 const quiet = `${link} text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)]`;
 const plain = `${link} text-[var(--color-text-secondary)]`;
 const chip = 'min-h-11 px-3 rounded-lg border text-sm text-left disabled:opacity-50';
+const entry = 'inline-flex items-center min-h-11 px-4 rounded-full border border-[var(--color-border)] text-sm text-[var(--color-text-primary)] hover:border-[var(--color-border-accent)] transition-colors';
 const choice = `${chip} border-[var(--color-border)] text-[var(--color-text-secondary)] hover:border-[var(--color-border-accent)]`;
 const chosen = `${chip} border-[var(--color-border-accent)] text-[var(--color-text-primary)]`;
 const box = 'mt-2 p-3 rounded-lg bg-[var(--color-bg-card)] border border-[var(--color-border-subtle)]';

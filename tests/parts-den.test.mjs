@@ -13,7 +13,7 @@ const content = { prompts: fixture.prompts, options: fixture.options };
 
 const A = "4a2c9a0e-1b2c-4d5e-8f90-123456789abc", B = "5b2c9a0e-1b2c-4d5e-8f90-123456789abc", C = "6c2c9a0e-1b2c-4d5e-8f90-123456789abc";
 
-test("gate: every den line in the content, or nothing; the link needs two parts", () => {
+test("gate: every den line in the content, or nothing; the link shows from one part", () => {
   const copy = den.denCopy(content);
   assert.ok(copy, "the fixture carries every den line");
   for (const id of den.DEN_PROMPTS) assert.equal(typeof copy[id], "string", id);
@@ -21,7 +21,8 @@ test("gate: every den line in the content, or nothing; the link needs two parts"
   delete missing.prompts.den_room;
   assert.equal(den.denCopy(missing), null);
   assert.equal(den.denCopy(null), null);
-  assert.equal(den.showDenLink(1, copy), false);
+  assert.equal(den.showDenLink(0, copy), false);
+  assert.equal(den.showDenLink(1, copy), true);
   assert.equal(den.showDenLink(2, copy), true);
   assert.equal(den.showDenLink(5, null), false);
   assert.equal(den.DEN_PATH, "/me/parts/den");
@@ -112,7 +113,7 @@ test("the route: its own lazy chunk; the gate is parts on and DEN_REQUIRED, else
   assert.match(page, /const copy = denCopy\(content\);\s+if \(!copy\) return <Navigate to="\/profile" replace \/>;/);
   assert.match(page, /if \(!partsOn\) return;\s+let live = true;/, "nothing fetched with parts off");
   assert.match(page, /twoPullsAvailable=\{!!getToolById\('two-pulls'\)\}/, "Two pulls is offered only once it is built");
-  // Parts of me's link: above the cards, two parts, the den's copy.
+  // Parts of me's link: above the cards, from one part, the den's copy.
   const me = read("src/components/me/PartsOfMe.tsx");
   assert.match(me, /\{den && showDenLink\(live\.length, den\) && \(\s+<Link to=\{DEN_PATH\}/);
 });

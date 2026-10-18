@@ -484,7 +484,7 @@ function DenHost({ one }: { one: boolean }) {
 
 const DEN_SURFACE: Surface = {
   id: 'den', pack: 'den', title: 'The den',
-  who: 'Parts on, two or more parts: Me → Parts of me → See them together. Drag (or Enter, arrows, Enter) to place; tap one figure then another for a thread.',
+  who: 'Parts on, one or more parts: Me → Parts of me → See them together. Drag (or Enter, arrows, Enter) to place; tap one figure then another for a thread.',
   branches: [
     { id: 'room', label: 'The room: placed, arriving, resting, tender, a thread, the safety flag' },
     { id: 'one', label: 'One part' },
