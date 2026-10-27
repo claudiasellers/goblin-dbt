@@ -1,0 +1,108 @@
+# Deploys Cloud Functions and Hosting after a merge to main, so a merge no longer needs
+# `firebase deploy` from Claudia's Mac. Graph loads and one-off migrations stay on her Mac.
+#
+# What goes out is decided by scripts/ci/deploy-plan.mjs: each target deploys only when its files
+# changed since its last deploy (the `deploy/functions` / `deploy/hosting` tags, moved after each
+# success). A push is held while `schema/` changed since then (the graph load comes first): load,
+# then Actions → Deploy → Run workflow. By hand never holds and can name one target.
+#
+# Needs (repo Settings → Secrets and variables → Actions):
+#   secret   FIREBASE_SERVICE_ACCOUNT   JSON key of the deploy service account
+#   vars     VITE_FIREBASE_*            the six web-config values from .env (public, baked into the build)
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: What to deploy
+        type: choice
+        options: [changed, functions, hosting, both]
+        default: changed
+
+permissions:
+  contents: write # moves the deploy/* tags
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' # a by-hand run from another branch never deploys
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the plan diffs against the deploy/* tags
+
+      - name: Plan
+        id: plan
+        run: node scripts/ci/deploy-plan.mjs "${{ github.event_name }}" "${{ inputs.only || 'changed' }}"
+
+      - uses: actions/setup-node@v4
+        if: steps.plan.outputs.any == 'true'
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+      - uses: actions/setup-python@v5
+        if: steps.plan.outputs.any == 'true'
+        with:
+          python-version: '3.12' # generator-freshness tests shell out to python3
+
+      # Without these the build falls back to placeholder config and ships an app that can't sign in.
+      - name: Check web config
+        if: steps.plan.outputs.hosting == 'true'
+        run: |
+          for v in API_KEY AUTH_DOMAIN PROJECT_ID STORAGE_BUCKET MESSAGING_SENDER_ID APP_ID; do
+            [ -n "$(printenv VITE_FIREBASE_$v)" ] || { echo "::error::Repository variable VITE_FIREBASE_$v is not set"; exit 1; }
+          done
+
+      # Same gate as CI: nothing deploys that wouldn't pass it.
+      - name: Install
+        if: steps.plan.outputs.any == 'true'
+        run: npm ci && npm ci --prefix functions
+      - name: Build
+        if: steps.plan.outputs.any == 'true'
+        run: npm run build && npm --prefix functions run build
+      - name: Test
+        if: steps.plan.outputs.any == 'true'
+        run: npm test
+      - name: Lint (no new errors)
+        if: steps.plan.outputs.any == 'true'
+        run: node scripts/ci/lint-budget.mjs
+
+      - uses: google-github-actions/auth@v2
+        if: steps.plan.outputs.any == 'true'
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      # Functions before hosting: the app may call something only the new functions accept.
+      # No --force: a deploy that would delete a function, raise the minimum bill or change a
+      # trigger stops and says so, for a deploy by hand.
+      - name: Deploy functions
+        if: steps.plan.outputs.functions == 'true'
+        run: |
+          ./functions/node_modules/.bin/firebase deploy --only functions --non-interactive
+          git tag -f deploy/functions "$GITHUB_SHA"
+          git push -f origin refs/tags/deploy/functions
+
+      - name: Deploy hosting
+        if: steps.plan.outputs.hosting == 'true'
+        run: |
+          ./functions/node_modules/.bin/firebase deploy --only hosting --non-interactive
+          git tag -f deploy/hosting "$GITHUB_SHA"
+          git push -f origin refs/tags/deploy/hosting

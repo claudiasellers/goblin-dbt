@@ -19,7 +19,7 @@ As a general guiding principle, every phase and tool should lead with curated, t
 - **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
-- **Deployment** `firebase deploy` (`--only functions` / `--only hosting`; hosting's `predeploy` runs the build). There is no `npm run deploy` (the old gh-pages script is gone).
+- **Deployment** automatic on merge to main (`.github/workflows/deploy.yml`, plan in `scripts/ci/deploy-plan.mjs`): functions, then hosting, each only when its files changed since its `deploy/<target>` tag; a push is held while `schema/` changed since then, until Claudia loads the graph and runs the workflow by hand (Actions → Deploy → Run workflow). By hand from her Mac still works: `firebase deploy` (`--only functions` / `--only hosting`; hosting's `predeploy` runs the build). There is no `npm run deploy` (the old gh-pages script is gone).
 
 Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `capacity/`, `witness/`, `spine/`, `profile/`, `userdata/`, `safety/`):
 
@@ -261,9 +261,13 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 
 ## After a PR merges: tell Claudia the deploy steps
 
-Claudia runs every deploy and graph load herself, on her Mac (`~/Documents/goblin-dbt`); sessions have
-no `.env` or bolt access. Every PR description ends with a **Deploy** section, and when she says a PR is
-merged, reply with the exact commands in order, even when the answer is "nothing to run":
+Functions and hosting deploy themselves on merge (`deploy.yml`) unless the PR touches `schema/`; graph loads
+and migrations are always Claudia's, on her Mac (`~/Documents/goblin-dbt`); sessions have no `.env` or bolt
+access. Every PR description ends with a **Deploy** section. For a PR with no `schema/` change, it says the
+merge deploys it and lists anything else to run. For a `schema/` PR (held), give the order: `git pull`, the
+graph loads, then Actions → Deploy → Run workflow (`changed`; or `functions`, the migration, then `hosting`
+when a migration runs between them). When she says a PR is merged, reply with the exact steps in order,
+even when the answer is "nothing to run". The manual equivalents:
 `git pull`, then any graph loads (`node scripts/load-graph.mjs --only <file>`, constraints first; each load refreshes `src/data/content/`, so commit any change it makes there and deploy hosting), then
 `firebase deploy --only functions` (before hosting whenever the server must accept something new), then
 any one-off migration (`--file schema/migrations/…`) the PR says runs after functions, then
