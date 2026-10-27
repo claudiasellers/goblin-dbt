@@ -26,8 +26,11 @@ export function denCopy(content: PartsContent | null): DenCopy | null {
 
 /** The route. */
 export const DEN_PATH = '/me/parts/den';
-/** "See them together" sits above the cards once there are two parts to see together. */
-export const DEN_MIN_PARTS = 2;
+/**
+ * "See them together" sits above the cards from the first kept part: the room already says so when
+ * there's one ("When you get to know another part, it will be here too.").
+ */
+export const DEN_MIN_PARTS = 1;
 export const showDenLink = (liveParts: number, copy: DenCopy | null): boolean => !!copy && liveParts >= DEN_MIN_PARTS;
 
 // ---- Where each part stands ----

@@ -1,6 +1,7 @@
 /**
  * The parts switch (docs/design/parts.md, "The switch"): Settings' and Me's (with parts off) share it.
- * The track is 40×22 inside a 44×44 target; labelled and described by the host's own lines.
+ * The track is 40×22 inside a 44×44 target; labelled and described by the host's own lines. The knob
+ * is pinned with left-0: a button centres its content, so without it an off knob starts mid-track and reads as on.
  */
 export function PartsSwitch({ enabled, onClick, labelledBy, describedBy }: {
   enabled: boolean; onClick: () => void; labelledBy: string; describedBy: string;
@@ -19,7 +20,7 @@ export function PartsSwitch({ enabled, onClick, labelledBy, describedBy }: {
         enabled ? 'bg-[var(--color-accent-fill)]' : 'bg-[var(--color-border-accent)]'
       }`}>
         <span
-          className={`absolute top-0.5 w-4.5 h-4.5 rounded-full bg-white transition-transform shadow-sm ${
+          className={`absolute left-0 top-0.5 w-4.5 h-4.5 rounded-full bg-white transition-transform shadow-sm ${
             enabled ? 'translate-x-5' : 'translate-x-0.5'
           }`}
         />

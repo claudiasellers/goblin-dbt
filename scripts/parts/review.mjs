@@ -155,7 +155,7 @@ export function surfaces(g) {
     },
     {
       id: 'den', title: 'The den',
-      where: 'Me → Parts of me → "See them together" (the link shows once the person has two active or resting parts), with parts on: the room seen from above with the person as the light (never labelled), each part where they put it (drag, or the keyboard), "Everyone here is in your house." under it. Tap one figure, then another: "These two pull against each other" (opens Two pulls, once it is built) or "This one stands in front of that one", then "Which one stands in front?" with both names; a confirmed thread has a remove. "How it looked in {month}" shows a past layout beside today. A part with a safety-line move or a danger fear shows the crisis resources under the room.',
+      where: 'Me → Parts of me → "See them together" (the link shows from the first active or resting part), with parts on: the room seen from above with the person as the light (never labelled), each part where they put it (drag, or the keyboard), "Everyone here is in your house." under it. Tap one figure, then another: "These two pull against each other" (opens Two pulls, once it is built) or "This one stands in front of that one", then "Which one stands in front?" with both names; a confirmed thread has a remove. "How it looked in {month}" shows a past layout beside today. A part with a safety-line move or a danger fear shows the crisis resources under the room.',
       groups: [{ label: null, ids: g.DEN_REQUIRED }],
     },
     {
