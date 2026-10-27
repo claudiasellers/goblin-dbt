@@ -26,14 +26,18 @@ export const START_STATE_QUERY = `
          o IS NOT NULL AS offerFound, coalesce(o.moveIds, []) AS offerMoves
 `;
 
-/** Create once (MERGE on key); moves are kept only when they are ProtectiveMove ids. */
+/**
+ * Create once (MERGE on key); moves are kept only when they are ProtectiveMove ids. The filter runs
+ * before the MERGE: Neo4j refuses a subquery (EXISTS { … }) inside a MERGE's ON CREATE SET.
+ */
 export const CREATE_QUERY = `
   ${MERGE_USER}
+  WITH u, [m IN $moveIds WHERE EXISTS { MATCH (:ProtectiveMove {id: m}) }] AS moveIds
   MERGE (ps:PartSession {key: $key})
   ON CREATE SET ps:UserData:LogRecord, ps.id = $id, ps.ownerId = $uid, ps.createdAt = datetime(),
     ps.schemaVersion = 1, ps.status = 'open', ps.trailheadKind = $trailheadKind,
     ps.partId = $partId, ps.candidateId = $candidateId, ps.offerId = $offerId,
-    ps.moveIds = [m IN $moveIds WHERE EXISTS { MATCH (:ProtectiveMove {id: m}) }]
+    ps.moveIds = moveIds
   MERGE (u)-[:HAS_PART_SESSION]->(ps)
   WITH u, ps
   OPTIONAL MATCH (u)-[:HAS_PART]->(p:Part {key: $partKey})
