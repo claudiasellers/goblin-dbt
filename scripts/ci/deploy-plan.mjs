@@ -1,28 +1,35 @@
 #!/usr/bin/env node
 /**
- * What `.github/workflows/deploy.yml` deploys. Each target remembers the commit it last went out
- * from as a tag (`deploy/functions`, `deploy/hosting`), so a run deploys exactly what changed since,
- * whatever runs were skipped or failed in between.
+ * What `.github/workflows/deploy.yml` does after a merge, in the order a PR's Deploy section always
+ * gives: graph load → functions → migrations → hosting. Each step remembers the commit it last ran
+ * from as a tag (`deploy/graph`, `deploy/functions`, `deploy/migrations`, `deploy/hosting`), so a run
+ * does exactly what changed since, whatever runs were skipped or failed in between.
  *
- * A push to main holds the whole deploy while `schema/` has changed since a target's last deploy:
- * those PRs need a graph load (or a migration) on Claudia's Mac first, in the order the PR's Deploy
- * section gives. She releases it by running the workflow by hand (workflow_dispatch), which never
- * holds. A target with no tag yet also holds a push: the first run is by hand.
+ * - graph: a full `load-graph.mjs --verify` (MERGE-only, so safe to re-run) when a loaded schema file
+ *   changed. The load refreshes src/data/content/, so hosting follows it.
+ * - migrations: each schema/migrations/*.cypher *added* since the tag, once, after functions.
+ *   With no tag yet nothing runs: the migrations already in the repo ran by hand long ago.
+ * - functions / hosting: when their files changed.
  *
- * CLI (in the workflow): node scripts/ci/deploy-plan.mjs <event> <only>
- * writes `functions` / `hosting` (true|false) to $GITHUB_OUTPUT and a summary to $GITHUB_STEP_SUMMARY.
+ * CLI (in the workflow): node scripts/ci/deploy-plan.mjs <changed|all>
+ * writes graph / functions / hosting (true|false), migrations (space-separated paths) and any to
+ * $GITHUB_OUTPUT, and a summary to $GITHUB_STEP_SUMMARY.
  */
 import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 
-export const TARGETS = ['functions', 'hosting'];
+export const STEPS = ['graph', 'functions', 'migrations', 'hosting'];
 
 const ROOT_BUILD_FILES = new Set(['index.html', 'vite.config.ts', 'package.json', 'package-lock.json', 'firebase.json', '.firebaserc']);
 
-/** Does a changed path need this target redeployed? */
-export function touches(target, path) {
+/** Does a changed path need this step? (migrations go by added files, not here) */
+export function touches(step, path) {
+  if (step === 'graph') {
+    return path.startsWith('schema/') && path.endsWith('.cypher')
+      && !path.startsWith('schema/migrations/') && !path.startsWith('schema/maintenance/');
+  }
   if (path === 'firebase.json' || path === '.firebaserc') return true;
-  if (target === 'functions') {
+  if (step === 'functions') {
     return path.startsWith('functions/') && !path.startsWith('functions/test/') && !path.endsWith('.md');
   }
   // The app imports from functions/src (shared types, body-map scoring), so those count for hosting too.
@@ -30,79 +37,78 @@ export function touches(target, path) {
     || ROOT_BUILD_FILES.has(path) || /^tsconfig[^/]*\.json$/.test(path);
 }
 
-export const needsGraphFirst = (path) => path.startsWith('schema/');
+export const isMigration = (path) => /^schema\/migrations\/[^/]+\.cypher$/.test(path);
 
 /**
- * @param {{ event: 'push' | 'workflow_dispatch', only: 'changed' | 'functions' | 'hosting' | 'both',
- *   changed: Record<string, string[] | null> }} input  changed[target]: paths since its tag, null when it has no tag
- * @returns {{ deploy: Record<string, boolean>, hold: string | null, reasons: Record<string, string> }}
+ * @param {{ only: 'changed' | 'all',
+ *   changed: Record<'graph'|'functions'|'hosting', string[] | null>,
+ *   addedMigrations: string[] | null }} input
+ *   changed[step]: paths since its tag, null when it has none; addedMigrations: files added since
+ *   `deploy/migrations`, null when it has none
  */
-export function planDeploy({ event, only, changed }) {
-  const deploy = Object.fromEntries(TARGETS.map((t) => [t, false]));
+export function planDeploy({ only, changed, addedMigrations }) {
+  const run = { graph: false, functions: false, hosting: false };
   const reasons = {};
-
-  if (event === 'push') {
-    const untagged = TARGETS.filter((t) => changed[t] === null);
-    if (untagged.length) {
-      return { deploy, reasons, hold: `no previous deploy recorded for ${untagged.join(' and ')}: run this workflow by hand once to set the baseline` };
-    }
-    const schema = [...new Set(TARGETS.flatMap((t) => changed[t].filter(needsGraphFirst)))];
-    if (schema.length) {
-      return { deploy, reasons, hold: `schema changed since the last deploy (${schema.slice(0, 5).join(', ')}${schema.length > 5 ? ', …' : ''}): run the graph load / migration from the PR's Deploy section, then run this workflow by hand` };
-    }
-  }
-
-  for (const t of TARGETS) {
-    if (only === t || only === 'both') {
-      deploy[t] = true;
-      reasons[t] = 'asked for by hand';
-    } else if (only === 'changed') {
-      if (changed[t] === null) {
-        deploy[t] = true;
-        reasons[t] = 'no previous deploy recorded';
-      } else {
-        const hits = changed[t].filter((p) => touches(t, p));
-        deploy[t] = hits.length > 0;
-        reasons[t] = hits.length ? `${hits.length} changed file(s), e.g. ${hits[0]}` : 'nothing changed';
-      }
+  for (const step of ['graph', 'functions', 'hosting']) {
+    if (only === 'all') {
+      run[step] = true;
+      reasons[step] = 'everything asked for by hand';
+    } else if (changed[step] === null) {
+      run[step] = true;
+      reasons[step] = 'no previous run recorded';
     } else {
-      reasons[t] = 'not asked for';
+      const hits = changed[step].filter((p) => touches(step, p));
+      run[step] = hits.length > 0;
+      reasons[step] = hits.length ? `${hits.length} changed file(s), e.g. ${hits[0]}` : 'nothing changed';
     }
   }
-  return { deploy, reasons, hold: null };
+  if (run.graph && !run.hosting) {
+    run.hosting = true;
+    reasons.hosting = 'follows the graph load (its content files)';
+  }
+  const migrations = (addedMigrations ?? []).filter(isMigration).sort();
+  reasons.migrations = addedMigrations === null ? 'first run: the ones already in the repo are taken as done'
+    : migrations.length ? migrations.join(', ') : 'none new';
+  return { run, migrations, reasons };
 }
 
 function git(...args) {
   return execFileSync('git', args, { encoding: 'utf8' }).trim();
 }
 
-function changedSinceTag(target) {
-  let base;
+function tag(step) {
   try {
-    base = git('rev-parse', '--verify', '-q', `refs/tags/deploy/${target}^{commit}`);
+    return git('rev-parse', '--verify', '-q', `refs/tags/deploy/${step}^{commit}`);
   } catch {
     return null;
   }
-  const out = git('diff', '--name-only', base, 'HEAD');
-  return out ? out.split('\n') : [];
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
-  const [event = 'push', only = 'changed'] = process.argv.slice(2);
-  const changed = Object.fromEntries(TARGETS.map((t) => [t, changedSinceTag(t)]));
-  const { deploy, hold, reasons } = planDeploy({ event, only, changed });
+const lines = (out) => (out ? out.split('\n') : []);
 
-  const lines = ['## Deploy plan', ''];
-  if (hold) {
-    lines.push(`**Held:** ${hold}.`);
-    if (process.env.GITHUB_ACTIONS) console.log(`::warning title=Deploy held::${hold}`);
+if (import.meta.url === `file://${process.argv[1]}`) {
+  const only = process.argv[2] === 'all' ? 'all' : 'changed';
+  const changed = {};
+  for (const step of ['graph', 'functions', 'hosting']) {
+    const base = tag(step);
+    changed[step] = base === null ? null : lines(git('diff', '--name-only', base, 'HEAD'));
   }
-  else for (const t of TARGETS) lines.push(`- **${t}**: ${deploy[t] ? 'deploy' : 'skip'} (${reasons[t]})`);
-  const summary = lines.join('\n');
+  const mBase = tag('migrations');
+  const addedMigrations = mBase === null ? null : lines(git('diff', '--name-only', '--diff-filter=A', mBase, 'HEAD', '--', 'schema/migrations'));
+  const { run, migrations, reasons } = planDeploy({ only, changed, addedMigrations });
+
+  const summary = ['## Deploy plan', '', ...STEPS.map((s) => {
+    const doing = s === 'migrations' ? migrations.length > 0 : run[s];
+    return `- **${s}**: ${doing ? 'run' : 'skip'} (${reasons[s]})`;
+  })].join('\n');
   console.log(summary);
 
   if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary + '\n');
   if (process.env.GITHUB_OUTPUT) {
-    appendFileSync(process.env.GITHUB_OUTPUT, TARGETS.map((t) => `${t}=${deploy[t]}`).join('\n') + `\nany=${TARGETS.some((t) => deploy[t])}\n`);
+    const any = run.graph || run.functions || run.hosting || migrations.length > 0;
+    appendFileSync(process.env.GITHUB_OUTPUT, [
+      `graph=${run.graph}`, `functions=${run.functions}`, `hosting=${run.hosting}`,
+      `migrations=${migrations.join(' ')}`, `any=${any}`, '',
+    ].join('\n'));
   }
 }
