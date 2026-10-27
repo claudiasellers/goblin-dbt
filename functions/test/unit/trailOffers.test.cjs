@@ -211,7 +211,7 @@ test('evaluatePatternOffers reads the trail offers\' times into the shared budge
     return [];
   });
   setDriver(f.driver);
-  await offers.evaluatePatternOffers('u1', new Date());
+  await offers.evaluatePatternOffers('u1', NOW);
   const t = f.calls.find((c) => c.query === offers.TRAIL_OFFER_TIMES_QUERY);
   assert.ok(t, 'read');
   assert.equal(t.params.days, OFFER_EVERY_DAYS);
