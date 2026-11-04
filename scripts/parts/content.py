@@ -585,6 +585,7 @@ SIGNED_OFF = {
     "turn_voice_too_much": "2026-10-17",
     "unblend_eased": "2026-10-17",
     "unblend_line": "2026-10-17",
+    "cf_unblend": "2026-11-04",
     "unblend_not_sure": "2026-10-17",
     "unblend_still": "2026-10-17",
     "under_fear_rejection": "2026-10-17",
@@ -1064,6 +1065,9 @@ PROMPTS = [
     ("review_noname", "review", "question", "Was this that part?"),
     # In the moment: only after a move the person picked themselves, parts on, never named
     ("unblend_line", "unblend", "line", "A part of you {move} right now."),
+    # Check the Facts (docs/design/check-the-facts.md, screen 3): under the story chips once a story is picked,
+    # parts on. Names no part; the tag row after a better close is where "Was this a part you know?" happens.
+    ("cf_unblend", "cf", "story", "This story might come from a part of you that's trying to protect you."),
     # The angry-part card (alexithymia-first-interaction.md, "Anger: the angry part"): the fire back urge,
     # out of the flooded band. Every line has two wordings: X with parts on, X_plain with parts off (plain
     # distanced self-talk, never the word "part": build check). _noname when there is no first name;

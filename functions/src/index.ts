@@ -20,6 +20,7 @@ export { getFindTheFeelingContent, saveFindTheFeelingSession, getFeelingCollecti
 export { getCapacityContent } from './capacity';
 export { getWiseMindContent } from './wiseMind';
 export { getCopeAheadContent } from './copeAhead';
+export { getSkillContent } from './skills';
 export { getBodyMapContent, suggestEmotionsFromBody } from './bodyMap';
 export { getWitnessLines, recordWitnessBeat } from './witness';
 export {

@@ -63,11 +63,14 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part, Two pulls, Wise mind and Cope Ahead are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
+test("Meet a part, Two pulls, Wise mind, Cope Ahead and Check the Facts are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
-  assert.equal((page.match(/\blazy\(/g) ?? []).length, 4, "four lazy tools");
+  assert.equal((page.match(/\blazy\(/g) ?? []).length, 5, "five lazy tools");
+  // Check the Facts (not a parts surface): the skill player in its own chunk, for everyone.
+  assert.match(page, /const LazyCheckTheFacts = lazy\(\(\) => import\('\.\/tools\/CheckTheFacts'\)/);
+  assert.match(page, /'check-the-facts': CheckTheFacts,/);
   // Cope Ahead (not a parts surface): its own chunk, for everyone.
   assert.match(page, /const loadCopeAhead = \(\) => import\('\.\/tools\/CopeAhead'\);/);
   assert.match(page, /'cope-ahead': CopeAhead,/);

@@ -1,0 +1,1283 @@
+{
+  "source": {
+    "file": "scripts/skills/fixture.py (from the schema files)",
+    "exportedAt": null
+  },
+  "content": {
+    "version": "skills-v1",
+    "parentOf": {
+      "abandoned": "sadness",
+      "aggressive": "anger",
+      "anger": "anger",
+      "angry": "anger",
+      "annoyed": "anger",
+      "anxious": "fear",
+      "appalled": "disgust",
+      "ashamed": "shame",
+      "awful": "sadness",
+      "betrayed": "anger",
+      "bitter": "anger",
+      "cold_shame": "shame",
+      "critical": "anger",
+      "depressed": "sadness",
+      "despair": "sadness",
+      "detestable": "disgust",
+      "disappointed": "sadness",
+      "disapproving": "disgust",
+      "disgust": "disgust",
+      "disgusted": "disgust",
+      "disillusioned": "sadness",
+      "dismayed": "sadness",
+      "dismissive": "disgust",
+      "disrespected": "anger",
+      "distant": "sadness",
+      "embarrassed": "shame",
+      "empty": "sadness",
+      "excluded": "shame",
+      "exposed": "shame",
+      "fear": "fear",
+      "fearful": "fear",
+      "fragile": "fear",
+      "frightened": "fear",
+      "frustrated": "anger",
+      "furious": "anger",
+      "grief": "sadness",
+      "guilt": "guilt",
+      "guilty": "guilt",
+      "helpless": "sadness",
+      "hesitant": "fear",
+      "horrified": "fear",
+      "hostile": "anger",
+      "hot_shame": "shame",
+      "humiliated": "shame",
+      "hurt": "sadness",
+      "inadequate": "shame",
+      "indignant": "anger",
+      "inferior": "shame",
+      "infuriated": "anger",
+      "insecure": "shame",
+      "insignificant": "shame",
+      "intimate": "love",
+      "isolated": "sadness",
+      "jealous": "jealousy",
+      "judgmental": "anger",
+      "let_down": "sadness",
+      "lonely": "sadness",
+      "love": "love",
+      "loving": "love",
+      "mad": "anger",
+      "nauseated": "disgust",
+      "nervous": "fear",
+      "out_of_control": "fear",
+      "overwhelmed": "fear",
+      "persecuted": "fear",
+      "powerless": "sadness",
+      "pressured": "fear",
+      "provoked": "anger",
+      "rejected": "shame",
+      "remorseful": "guilt",
+      "repelled": "disgust",
+      "resentful": "anger",
+      "revolted": "disgust",
+      "ridiculed": "shame",
+      "sad": "sadness",
+      "sadness": "sadness",
+      "scared": "fear",
+      "shocked": "fear",
+      "stressed": "fear",
+      "tender": "love",
+      "threatened": "fear",
+      "victimized": "anger",
+      "violated": "anger",
+      "vulnerable": "fear",
+      "weak": "shame",
+      "withdrawn": "sadness",
+      "worried": "fear",
+      "worthless": "shame"
+    },
+    "fitsWhen": {
+      "anger": {
+        "label": "Anger",
+        "lines": [
+          "Something important to me is being blocked or taken away.",
+          "Someone hurt me or someone I care about — physically or emotionally.",
+          "Someone insulted, disrespected, or threatened me or someone I care about.",
+          "My people are being treated unfairly or disrespected."
+        ]
+      },
+      "disgust": {
+        "label": "Disgust",
+        "lines": [
+          "Something I'm in contact with could actually make me sick or contaminate me.",
+          "Someone who has seriously wronged me is physically too close.",
+          "I'm around people whose behavior could genuinely harm me or my community."
+        ]
+      },
+      "envy": {
+        "label": "Envy",
+        "lines": [
+          "Someone has something I genuinely need or want — and I don't have it."
+        ]
+      },
+      "fear": {
+        "label": "Fear",
+        "lines": [
+          "I'm in actual danger — something could hurt me or someone I care about.",
+          "My health or someone else's health is genuinely at risk right now.",
+          "Something is seriously threatening my safety or well-being."
+        ]
+      },
+      "guilt": {
+        "label": "Guilt",
+        "lines": [
+          "What I did actually goes against my own values — not someone else's rules, but mine."
+        ]
+      },
+      "jealousy": {
+        "label": "Jealousy",
+        "lines": [
+          "A relationship or something I deeply value is genuinely at risk of being lost or damaged.",
+          "Someone is actually trying to take away a person or thing that matters to me."
+        ]
+      },
+      "love": {
+        "label": "Love",
+        "lines": [
+          "Being with this person genuinely makes my life better.",
+          "This relationship helps me become who I want to be."
+        ]
+      },
+      "sadness": {
+        "label": "Sadness",
+        "lines": [
+          "I've lost something or someone — and they're not coming back.",
+          "Things didn't turn out how I hoped or expected."
+        ]
+      },
+      "shame": {
+        "label": "Shame",
+        "lines": [
+          "If people I care about found out about this, they would actually reject me — not just disapprove, but leave."
+        ]
+      }
+    },
+    "skills": [
+      {
+        "id": "check_the_facts",
+        "toolId": "check-the-facts",
+        "version": "cf-v1",
+        "start": "feel",
+        "ownMax": 140,
+        "emotionFields": [
+          "feel"
+        ],
+        "copy": {
+          "feel_title": "What's the feeling you want to check?",
+          "feel_more": "Something else",
+          "event_title": "What happened, as a camera would have caught it?",
+          "event_own_hint": "Only what happened, no why.",
+          "story_title": "What's the story you're telling yourself about it?",
+          "story_hint": "Pick one or two.",
+          "alt_title": "What else could explain it?",
+          "alt_note": "You don't have to believe them. Notice that they're possible.",
+          "threat_title": "What are you afraid will happen?",
+          "likely_q": "How likely is it, really?",
+          "through_q": "If it did happen, could you get through it?",
+          "through_cope_ahead": "Plan for it with Cope Ahead",
+          "fits_title": "Here's when feeling {feeling} fits the facts. Does one of these match what happened?",
+          "fits_title_general": "Does feeling {feeling} fit what happened?",
+          "next_fits": "When a feeling fits, the move is to work on the situation.",
+          "next_partly": "The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.",
+          "next_no": "The feeling is bigger than the facts. Acting opposite to its urge helps it settle.",
+          "next_unsure": "That's all right. Sometimes the facts come later.",
+          "own_hint": "Say it your way",
+          "not_sure": "Not sure",
+          "next": "Next",
+          "done": "Done",
+          "entry_oa": "Go through it slowly with Check the Facts"
+        },
+        "tables": {
+          "storySetOf": {
+            "fear": "fear",
+            "anger": "anger",
+            "sadness": "sadness",
+            "shame": "shame",
+            "guilt": "guilt"
+          }
+        },
+        "derive": [
+          {
+            "name": "parent",
+            "from": "$a.feel",
+            "table": "parentOf"
+          },
+          {
+            "name": "set",
+            "from": "$d.parent",
+            "table": "storySetOf",
+            "default": "general"
+          },
+          {
+            "name": "fitsParent",
+            "from": "$d.parent",
+            "table": "fitsWhen",
+            "keep": "key"
+          }
+        ],
+        "steps": [
+          {
+            "id": "feel",
+            "kind": "ask",
+            "title": "feel_title",
+            "fields": [
+              {
+                "id": "feel",
+                "options": {
+                  "emotions": [
+                    "anxious",
+                    "worried",
+                    "annoyed",
+                    "angry",
+                    "hurt",
+                    "guilty",
+                    "ashamed",
+                    "embarrassed"
+                  ],
+                  "carriedFirst": true,
+                  "moreKey": "feel_more"
+                },
+                "max": 1,
+                "required": true,
+                "emotion": true
+              }
+            ],
+            "next": [
+              {
+                "to": "event",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "event",
+            "kind": "ask",
+            "title": "event_title",
+            "fields": [
+              {
+                "id": "event",
+                "options": {
+                  "list": "event"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "event_own_hint",
+                  "countsAsPick": false,
+                  "open": true
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "story",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "story",
+            "kind": "ask",
+            "title": "story_title",
+            "hint": "story_hint",
+            "fields": [
+              {
+                "id": "story",
+                "options": {
+                  "list": "story",
+                  "where": {
+                    "eq": [
+                      "$opt.set",
+                      "$d.set"
+                    ]
+                  }
+                },
+                "max": 2,
+                "swap": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                }
+              }
+            ],
+            "slots": [
+              {
+                "after": "story",
+                "embed": "partsLine",
+                "props": {
+                  "promptId": "cf_unblend"
+                },
+                "showWhen": {
+                  "set": "$a.story"
+                },
+                "record": "unblend"
+              }
+            ],
+            "next": [
+              {
+                "to": "alt",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "alt",
+            "kind": "ask",
+            "title": "alt_title",
+            "note": "alt_note",
+            "fields": [
+              {
+                "id": "alt",
+                "options": {
+                  "list": "alt",
+                  "groupBy": "story",
+                  "ownGroup": "own_story"
+                },
+                "max": 9,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": false
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "threat",
+                "when": {
+                  "any": [
+                    {
+                      "in": [
+                        "$d.set",
+                        [
+                          "fear",
+                          "anger",
+                          "shame"
+                        ]
+                      ]
+                    },
+                    {
+                      "some": [
+                        "story",
+                        {
+                          "eq": [
+                            "$opt.predicts",
+                            true
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "fits",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "threat",
+            "kind": "ask",
+            "title": "threat_title",
+            "fields": [
+              {
+                "id": "threat",
+                "max": 1,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                },
+                "options": {
+                  "list": "threat",
+                  "where": {
+                    "any": [
+                      {
+                        "has": [
+                          "$opt.parents",
+                          "$d.parent"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "set": "$d.parent"
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "id": "likely",
+                "label": "likely_q",
+                "max": 1,
+                "options": {
+                  "list": "likely"
+                },
+                "showWhen": {
+                  "all": [
+                    {
+                      "set": "$a.threat"
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.threat",
+                          "none"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "through",
+                "label": "through_q",
+                "max": 1,
+                "options": {
+                  "list": "through"
+                },
+                "showWhen": {
+                  "all": [
+                    {
+                      "all": [
+                        {
+                          "set": "$a.threat"
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$a.threat",
+                              "none"
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "set": "$a.likely"
+                    }
+                  ]
+                },
+                "links": [
+                  {
+                    "exit": "cope_ahead",
+                    "label": "through_cope_ahead",
+                    "when": {
+                      "set": "$a.through"
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "fits",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "fits",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "set": "$d.fitsParent"
+                },
+                "key": "fits_title"
+              },
+              {
+                "key": "fits_title_general"
+              }
+            ],
+            "titleSlots": {
+              "feeling": {
+                "labelOf": "feel"
+              }
+            },
+            "fields": [
+              {
+                "id": "fits",
+                "options": {
+                  "list": "fits"
+                },
+                "max": 1,
+                "required": true,
+                "askFresh": "fitsFacts",
+                "list": {
+                  "table": "fitsWhen",
+                  "key": "$d.fitsParent"
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "next",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "fits"
+                  ]
+                },
+                "key": "next_fits"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "partly"
+                  ]
+                },
+                "key": "next_partly"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "doesnt_fit"
+                  ]
+                },
+                "key": "next_no"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "unsure"
+                  ]
+                },
+                "key": "next_unsure"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "fits"
+                  ]
+                }
+              },
+              {
+                "exit": "dear_man",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.fits",
+                        "fits"
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.event",
+                        [
+                          "said",
+                          "didnt"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "opposite_action",
+                "when": {
+                  "in": [
+                    "$a.fits",
+                    [
+                      "partly",
+                      "doesnt_fit"
+                    ]
+                  ]
+                }
+              },
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "partly"
+                  ]
+                }
+              },
+              {
+                "exit": "wise_mind",
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "unsure"
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "cope_ahead",
+            "toolId": "cope-ahead",
+            "query": {
+              "first": "other"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "dear_man",
+            "toolId": "dear-man",
+            "query": {},
+            "carry": [
+              "feel"
+            ],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "opposite_action",
+            "toolId": "opposite-action",
+            "query": {},
+            "carry": [
+              "feel"
+            ],
+            "done": false
+          },
+          {
+            "id": "problem_solve",
+            "toolId": "problem-solve",
+            "query": {},
+            "carry": [
+              "feel"
+            ],
+            "done": false
+          },
+          {
+            "id": "wise_mind",
+            "toolId": "wise-mind",
+            "query": {
+              "first": "wm_q_next"
+            },
+            "carry": [],
+            "done": false
+          }
+        ],
+        "options": {
+          "event": [
+            {
+              "value": "said",
+              "label": "Someone said something"
+            },
+            {
+              "value": "didnt",
+              "label": "Someone didn't do something"
+            },
+            {
+              "value": "saw",
+              "label": "Something I saw or read"
+            },
+            {
+              "value": "thought",
+              "label": "A thought or a memory"
+            },
+            {
+              "value": "cant_name",
+              "label": "I can't name it"
+            }
+          ],
+          "story": [
+            {
+              "value": "fear_bad_coming",
+              "label": "Something bad is about to happen",
+              "set": "fear",
+              "predicts": true
+            },
+            {
+              "value": "fear_wont_cope",
+              "label": "I won't be able to handle it",
+              "set": "fear",
+              "predicts": true
+            },
+            {
+              "value": "fear_theyll_leave",
+              "label": "They're going to leave me",
+              "set": "fear",
+              "predicts": true
+            },
+            {
+              "value": "fear_theyll_see",
+              "label": "Everyone will see I'm not good enough",
+              "set": "fear",
+              "predicts": true
+            },
+            {
+              "value": "anger_on_purpose",
+              "label": "They did it on purpose",
+              "set": "anger",
+              "predicts": false
+            },
+            {
+              "value": "anger_no_respect",
+              "label": "They don't respect me",
+              "set": "anger",
+              "predicts": false
+            },
+            {
+              "value": "anger_always",
+              "label": "This always happens",
+              "set": "anger",
+              "predicts": true
+            },
+            {
+              "value": "anger_unfair",
+              "label": "It isn't fair",
+              "set": "anger",
+              "predicts": false
+            },
+            {
+              "value": "sad_gone",
+              "label": "It's gone for good",
+              "set": "sadness",
+              "predicts": false
+            },
+            {
+              "value": "sad_nobody_cares",
+              "label": "Nobody cares about me",
+              "set": "sadness",
+              "predicts": false
+            },
+            {
+              "value": "sad_never_better",
+              "label": "It'll never get better",
+              "set": "sadness",
+              "predicts": true
+            },
+            {
+              "value": "shame_wrong_with_me",
+              "label": "There's something wrong with me",
+              "set": "shame",
+              "predicts": false
+            },
+            {
+              "value": "shame_think_less",
+              "label": "They think less of me now",
+              "set": "shame",
+              "predicts": false
+            },
+            {
+              "value": "shame_if_they_knew",
+              "label": "If they knew, they'd turn away",
+              "set": "shame",
+              "predicts": true
+            },
+            {
+              "value": "guilt_hurt_them",
+              "label": "I hurt someone",
+              "set": "guilt",
+              "predicts": false
+            },
+            {
+              "value": "guilt_not_enough",
+              "label": "I didn't do enough",
+              "set": "guilt",
+              "predicts": false
+            },
+            {
+              "value": "guilt_bad_person",
+              "label": "I'm a bad person",
+              "set": "guilt",
+              "predicts": false
+            },
+            {
+              "value": "gen_my_fault",
+              "label": "It's my fault",
+              "set": "general",
+              "predicts": false
+            },
+            {
+              "value": "gen_go_wrong",
+              "label": "It's going to go wrong",
+              "set": "general",
+              "predicts": true
+            },
+            {
+              "value": "gen_against_me",
+              "label": "They're against me",
+              "set": "general",
+              "predicts": true
+            }
+          ],
+          "alt": [
+            {
+              "value": "fear_bad_coming_alt1",
+              "label": "Nothing bad has happened yet",
+              "for": "fear_bad_coming"
+            },
+            {
+              "value": "fear_bad_coming_alt2",
+              "label": "It could go several ways",
+              "for": "fear_bad_coming"
+            },
+            {
+              "value": "fear_bad_coming_alt3",
+              "label": "I'd see it coming and could act",
+              "for": "fear_bad_coming"
+            },
+            {
+              "value": "fear_wont_cope_alt1",
+              "label": "I've handled hard things before",
+              "for": "fear_wont_cope"
+            },
+            {
+              "value": "fear_wont_cope_alt2",
+              "label": "I'd have help",
+              "for": "fear_wont_cope"
+            },
+            {
+              "value": "fear_wont_cope_alt3",
+              "label": "I won't know until I'm there",
+              "for": "fear_wont_cope"
+            },
+            {
+              "value": "fear_theyll_leave_alt1",
+              "label": "They're busy, not leaving",
+              "for": "fear_theyll_leave"
+            },
+            {
+              "value": "fear_theyll_leave_alt2",
+              "label": "One moment isn't the whole relationship",
+              "for": "fear_theyll_leave"
+            },
+            {
+              "value": "fear_theyll_leave_alt3",
+              "label": "I could ask them",
+              "for": "fear_theyll_leave"
+            },
+            {
+              "value": "fear_theyll_see_alt1",
+              "label": "Most people are thinking about themselves",
+              "for": "fear_theyll_see"
+            },
+            {
+              "value": "fear_theyll_see_alt2",
+              "label": "One mistake isn't who I am",
+              "for": "fear_theyll_see"
+            },
+            {
+              "value": "fear_theyll_see_alt3",
+              "label": "Someone might not notice at all",
+              "for": "fear_theyll_see"
+            },
+            {
+              "value": "anger_on_purpose_alt1",
+              "label": "They were distracted or stressed",
+              "for": "anger_on_purpose"
+            },
+            {
+              "value": "anger_on_purpose_alt2",
+              "label": "They didn't know it mattered to me",
+              "for": "anger_on_purpose"
+            },
+            {
+              "value": "anger_on_purpose_alt3",
+              "label": "I don't know why yet",
+              "for": "anger_on_purpose"
+            },
+            {
+              "value": "anger_no_respect_alt1",
+              "label": "They were thinking about something else",
+              "for": "anger_no_respect"
+            },
+            {
+              "value": "anger_no_respect_alt2",
+              "label": "They show respect in other ways",
+              "for": "anger_no_respect"
+            },
+            {
+              "value": "anger_no_respect_alt3",
+              "label": "I could ask what they meant",
+              "for": "anger_no_respect"
+            },
+            {
+              "value": "anger_always_alt1",
+              "label": "It's happened before, not every time",
+              "for": "anger_always"
+            },
+            {
+              "value": "anger_always_alt2",
+              "label": "This time has its own details",
+              "for": "anger_always"
+            },
+            {
+              "value": "anger_always_alt3",
+              "label": "Something can change",
+              "for": "anger_always"
+            },
+            {
+              "value": "anger_unfair_alt1",
+              "label": "It might be unfair, and I can act on that",
+              "for": "anger_unfair"
+            },
+            {
+              "value": "anger_unfair_alt2",
+              "label": "There's something I don't know",
+              "for": "anger_unfair"
+            },
+            {
+              "value": "anger_unfair_alt3",
+              "label": "Both can be true",
+              "for": "anger_unfair"
+            },
+            {
+              "value": "sad_gone_alt1",
+              "label": "Some of it might come back",
+              "for": "sad_gone"
+            },
+            {
+              "value": "sad_gone_alt2",
+              "label": "What it meant to me stays",
+              "for": "sad_gone"
+            },
+            {
+              "value": "sad_gone_alt3",
+              "label": "I don't know yet",
+              "for": "sad_gone"
+            },
+            {
+              "value": "sad_nobody_cares_alt1",
+              "label": "Some people do, even if not right now",
+              "for": "sad_nobody_cares"
+            },
+            {
+              "value": "sad_nobody_cares_alt2",
+              "label": "They may not know how I feel",
+              "for": "sad_nobody_cares"
+            },
+            {
+              "value": "sad_nobody_cares_alt3",
+              "label": "I could reach out to one person",
+              "for": "sad_nobody_cares"
+            },
+            {
+              "value": "sad_never_better_alt1",
+              "label": "Feelings move, even slowly",
+              "for": "sad_never_better"
+            },
+            {
+              "value": "sad_never_better_alt2",
+              "label": "It has changed before",
+              "for": "sad_never_better"
+            },
+            {
+              "value": "sad_never_better_alt3",
+              "label": "I don't know what's ahead",
+              "for": "sad_never_better"
+            },
+            {
+              "value": "shame_wrong_with_me_alt1",
+              "label": "I did something; I'm not something",
+              "for": "shame_wrong_with_me"
+            },
+            {
+              "value": "shame_wrong_with_me_alt2",
+              "label": "I'd be kinder to a friend than this",
+              "for": "shame_wrong_with_me"
+            },
+            {
+              "value": "shame_wrong_with_me_alt3",
+              "label": "Most people feel this sometimes",
+              "for": "shame_wrong_with_me"
+            },
+            {
+              "value": "shame_think_less_alt1",
+              "label": "I don't know what they think",
+              "for": "shame_think_less"
+            },
+            {
+              "value": "shame_think_less_alt2",
+              "label": "One moment doesn't define me to them",
+              "for": "shame_think_less"
+            },
+            {
+              "value": "shame_think_less_alt3",
+              "label": "They might not have noticed",
+              "for": "shame_think_less"
+            },
+            {
+              "value": "shame_if_they_knew_alt1",
+              "label": "Some people would understand",
+              "for": "shame_if_they_knew"
+            },
+            {
+              "value": "shame_if_they_knew_alt2",
+              "label": "I could share a small part",
+              "for": "shame_if_they_knew"
+            },
+            {
+              "value": "shame_if_they_knew_alt3",
+              "label": "I'm worth something without hiding",
+              "for": "shame_if_they_knew"
+            },
+            {
+              "value": "guilt_hurt_them_alt1",
+              "label": "I might have, and I can repair it",
+              "for": "guilt_hurt_them"
+            },
+            {
+              "value": "guilt_hurt_them_alt2",
+              "label": "They may see it differently",
+              "for": "guilt_hurt_them"
+            },
+            {
+              "value": "guilt_hurt_them_alt3",
+              "label": "I could ask them",
+              "for": "guilt_hurt_them"
+            },
+            {
+              "value": "guilt_not_enough_alt1",
+              "label": "I did what I could with what I knew",
+              "for": "guilt_not_enough"
+            },
+            {
+              "value": "guilt_not_enough_alt2",
+              "label": "There may still be something I can do",
+              "for": "guilt_not_enough"
+            },
+            {
+              "value": "guilt_not_enough_alt3",
+              "label": "It wasn't all on me",
+              "for": "guilt_not_enough"
+            },
+            {
+              "value": "guilt_bad_person_alt1",
+              "label": "I did something I regret; I'm not all bad",
+              "for": "guilt_bad_person"
+            },
+            {
+              "value": "guilt_bad_person_alt2",
+              "label": "Regret means I care",
+              "for": "guilt_bad_person"
+            },
+            {
+              "value": "guilt_bad_person_alt3",
+              "label": "I can make it right",
+              "for": "guilt_bad_person"
+            },
+            {
+              "value": "gen_my_fault_alt1",
+              "label": "Other things played a part",
+              "for": "gen_my_fault"
+            },
+            {
+              "value": "gen_my_fault_alt2",
+              "label": "I can own my part, not all of it",
+              "for": "gen_my_fault"
+            },
+            {
+              "value": "gen_my_fault_alt3",
+              "label": "I don't know the whole picture",
+              "for": "gen_my_fault"
+            },
+            {
+              "value": "gen_go_wrong_alt1",
+              "label": "It might go fine",
+              "for": "gen_go_wrong"
+            },
+            {
+              "value": "gen_go_wrong_alt2",
+              "label": "I can't know yet",
+              "for": "gen_go_wrong"
+            },
+            {
+              "value": "gen_go_wrong_alt3",
+              "label": "I'd cope if it did",
+              "for": "gen_go_wrong"
+            },
+            {
+              "value": "gen_against_me_alt1",
+              "label": "They might be against the situation, not me",
+              "for": "gen_against_me"
+            },
+            {
+              "value": "gen_against_me_alt2",
+              "label": "They might be dealing with their own thing",
+              "for": "gen_against_me"
+            },
+            {
+              "value": "gen_against_me_alt3",
+              "label": "I could check",
+              "for": "gen_against_me"
+            },
+            {
+              "value": "own_alt_unknown",
+              "label": "There's something I don't know yet",
+              "for": "$own"
+            },
+            {
+              "value": "own_alt_other_view",
+              "label": "Someone else might see it differently",
+              "for": "$own"
+            },
+            {
+              "value": "own_alt_meaning",
+              "label": "It might not mean what it feels like it means",
+              "for": "$own"
+            }
+          ],
+          "threat": [
+            {
+              "value": "hurt",
+              "label": "Being hurt",
+              "parents": [
+                "fear",
+                "anger"
+              ]
+            },
+            {
+              "value": "left",
+              "label": "Being left",
+              "parents": [
+                "fear",
+                "sadness",
+                "jealousy"
+              ]
+            },
+            {
+              "value": "embarrassed",
+              "label": "Being embarrassed",
+              "parents": [
+                "shame",
+                "fear"
+              ]
+            },
+            {
+              "value": "lose",
+              "label": "Losing something I need",
+              "parents": [
+                "fear",
+                "sadness",
+                "envy"
+              ]
+            },
+            {
+              "value": "unfair",
+              "label": "Being treated unfairly again",
+              "parents": [
+                "anger"
+              ]
+            },
+            {
+              "value": "cant_say",
+              "label": "I can't say",
+              "parents": [
+                "fear",
+                "anger",
+                "disgust",
+                "envy",
+                "jealousy",
+                "love",
+                "sadness",
+                "shame",
+                "guilt"
+              ]
+            },
+            {
+              "value": "none",
+              "label": "Nothing like that",
+              "parents": [
+                "fear",
+                "anger",
+                "disgust",
+                "envy",
+                "jealousy",
+                "love",
+                "sadness",
+                "shame",
+                "guilt"
+              ]
+            }
+          ],
+          "likely": [
+            {
+              "value": "very",
+              "label": "Very likely"
+            },
+            {
+              "value": "either",
+              "label": "Could go either way"
+            },
+            {
+              "value": "not_that",
+              "label": "Not that likely"
+            },
+            {
+              "value": "unknown",
+              "label": "I don't know"
+            }
+          ],
+          "through": [
+            {
+              "value": "yes",
+              "label": "I'd get through it, even if it's hard"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure I would"
+            }
+          ],
+          "fits": [
+            {
+              "value": "fits",
+              "label": "Yes, it fits"
+            },
+            {
+              "value": "partly",
+              "label": "It fits, and it's bigger than this"
+            },
+            {
+              "value": "doesnt_fit",
+              "label": "Not really"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure"
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

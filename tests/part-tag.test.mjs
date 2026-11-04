@@ -82,8 +82,12 @@ test("chips: up to four, in the slice's order (most recently visited first); nam
 const toolPage = read("src/pages/ToolPage.tsx");
 const pageOf = (id) => {
   const comp = toolPage.match(new RegExp(`'${id}': (\\w+),`))?.[1];
-  const file = comp && toolPage.match(new RegExp(`import \\{ ${comp} \\} from '\\./tools/(\\w+)'`))?.[1];
-  return file ? `src/pages/tools/${file}.tsx` : null;
+  const file = comp && (toolPage.match(new RegExp(`import \\{ ${comp} \\} from '\\./tools/(\\w+)'`))?.[1]
+    ?? toolPage.match(new RegExp(`const Lazy${comp} = lazy\\(\\(\\) => import\\('\\./tools/(\\w+)'\\)`))?.[1]);
+  if (!file) return null;
+  const page = `src/pages/tools/${file}.tsx`;
+  // A skill on the runtime (docs/design/skill-runtime.md) has no screens of its own: the player closes it.
+  return /<SkillPlayer skillId=/.test(read(page)) ? "src/components/skillPlayer/SkillPlayer.tsx" : page;
 };
 /**
  * Tools that may never show the row although their close asks then-vs-now. Wise mind: its parts form
@@ -98,7 +102,7 @@ test("hosts: every tool whose close asks then-vs-now or about the urge, minus Me
     .filter(([, k]) => dirFor(k.closeKind) !== null || k.closeKind === "urge").map(([id]) => id);
   const hosts = asks.filter((id) => !NEVER_HOSTS.includes(id));
   assert.deepEqual([...lib.TAG_ROW_TOOLS], hosts);
-  assert.deepEqual(hosts, ["cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling"], "the survey (Oct 2026)");
+  assert.deepEqual(hosts, ["cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "check-the-facts"], "the survey (Oct 2026), plus Check the Facts (Nov 2026)");
   // Every page that closes with a then-vs-now is a host or never one (a tool recording it by hand
   // without a then-vs-now close kind would fail here).
   for (const id of Object.keys(TOOL_CLOSE_KIND)) {

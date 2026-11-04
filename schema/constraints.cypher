@@ -187,3 +187,9 @@ CREATE CONSTRAINT cope_situation_id IF NOT EXISTS FOR (n:CopeSituation) REQUIRE 
 CREATE CONSTRAINT hard_moment_id IF NOT EXISTS FOR (n:HardMoment) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT cope_move_id IF NOT EXISTS FOR (n:CopeMove) REQUIRE n.id IS UNIQUE;
 CREATE CONSTRAINT rehearsal_beat_id IF NOT EXISTS FOR (n:RehearsalBeat) REQUIRE n.id IS UNIQUE;
+
+// --- The skill runtime (docs/design/skill-runtime.md, schema/skills.cypher) ---
+CREATE CONSTRAINT skill_id IF NOT EXISTS FOR (n:Skill) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT skill_step_id IF NOT EXISTS FOR (n:SkillStep) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT skill_exit_id IF NOT EXISTS FOR (n:SkillExit) REQUIRE n.id IS UNIQUE;
+CREATE CONSTRAINT skill_option_id IF NOT EXISTS FOR (n:SkillOption) REQUIRE n.id IS UNIQUE;

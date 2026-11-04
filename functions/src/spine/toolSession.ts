@@ -21,7 +21,7 @@ import { GUARDS } from '../userdata/lifecycle';
 import { MERGE_USER, userKey } from '../userdata/ownership';
 import { USER_DATA } from '../userdata/layers';
 import { legacyOutcome, readingProps } from '../capacity/reading';
-import { validateAnswer, validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
+import { FITS_FACTS_TOOLS, validateAnswer, validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
 import type { CloseKind, DetailKind } from './types';
 import { scheduleTx } from './followUp';
 import { NOT_WHAT_HELPS } from './tools';
@@ -140,7 +140,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
          ts.actedOnUrge = CASE WHEN ts.answeredAt IS NULL THEN $actedOnUrge ELSE ts.actedOnUrge END,
          ts.answeredAt = CASE WHEN ts.answeredAt IS NULL AND $answered THEN datetime() ELSE ts.answeredAt END,
          ts.urgeIds = $urgeIds, ts.durationSec = $durationSec, ts.ext = $ext, ts.updatedAt = datetime(),
-         ts.wiseMindAnswer = $wiseMindAnswer,
+         ts.wiseMindAnswer = $wiseMindAnswer, ts.fitsFacts = $fitsFacts,
          // Emotions picked inside the tool: set once, never over a hand-off's ids from the start.
          ts.emotionIds = CASE WHEN size(coalesce(ts.emotionIds, [])) = 0 AND size($emotionIds) > 0
                               THEN $emotionIds ELSE ts.emotionIds END
@@ -164,6 +164,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
       // Ask-fresh, on the log record only (layers.ts ASK_FRESH_FIELDS); another tool's is dropped.
       wiseMindAnswer: rec.get('toolId') === 'wise-mind' ? c.wiseMindAnswer : null,
+      fitsFacts: FITS_FACTS_TOOLS.includes(rec.get('toolId') as string) ? c.fitsFacts : null,
       ...readingProps('bandAtStart', c.bandAtStart),
       detailKey: c.detail ? userKey(uid, c.detail.id) : null, detailLabel,
       // A "more here" close is not "it helped": no compat outcome for those tools.

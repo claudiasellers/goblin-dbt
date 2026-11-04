@@ -361,6 +361,17 @@
     "irritation"
    ]
   },
+  "dbt_check_facts": {
+   "appToolId": "check-the-facts",
+   "name": "Check the Facts",
+   "description": "Examining whether emotional response fits the facts of the situation",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "change",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_cope_ahead": {
    "appToolId": "cope-ahead",
    "name": "Cope Ahead",

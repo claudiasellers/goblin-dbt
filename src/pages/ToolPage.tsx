@@ -46,6 +46,10 @@ const loadCopeAhead = () => import('./tools/CopeAhead');
 const LazyCopeAhead = lazy(() => loadCopeAhead().then((m) => ({ default: m.CopeAhead })));
 function CopeAhead() { return <Suspense fallback={<ToolLoading />}><LazyCopeAhead /></Suspense>; }
 
+// Check the Facts runs on the skill player (docs/design/skill-runtime.md), its own chunk.
+const LazyCheckTheFacts = lazy(() => import('./tools/CheckTheFacts').then((m) => ({ default: m.CheckTheFacts })));
+function CheckTheFacts() { return <Suspense fallback={<ToolLoading />}><LazyCheckTheFacts /></Suspense>; }
+
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
   'cool-down': CoolDown,
@@ -56,6 +60,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'dear-man': DearMan,
   'problem-solve': ProblemSolve,
   'cope-ahead': CopeAhead,
+  'check-the-facts': CheckTheFacts,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,

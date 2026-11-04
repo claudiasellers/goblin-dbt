@@ -25,6 +25,8 @@
  *   spine.json             getSpineContent (session-close copy, follow-up types; loaded with every tool)
  *   wise-mind.json         getWiseMindContent (Wise mind's questions, what each mind says, practices, answers, copy)
  *   cope-ahead.json        getCopeAheadContent (Cope Ahead's situations, hardest moments, moves, rehearsal beats, copy)
+ *   skills.json            getSkillContent (every skill on the runtime, docs/design/skill-runtime.md, with the
+ *                          shared parentOf / fitsWhen tables read from the emotion regulation content)
  *   parts.json             parts copy (schema/parts.cypher), signed-off rows only: no Cloud Function
  *                          serves it; the shape is tests/fixtures/parts-content.json's moves / prompts /
  *                          options / hurts, plus canTouch (Recover event → hurt ids, approved edges),
@@ -57,6 +59,7 @@ export const CAPACITY_VERSION = constant('functions/src/capacity/index.ts', 'CAP
 export const SPINE_VERSION = constant('functions/src/spine/registry.ts', 'SPINE_VERSION');
 export const WISE_MIND_VERSION = constant('functions/src/wiseMind/index.ts', 'WISE_MIND_VERSION');
 export const COPE_AHEAD_VERSION = constant('functions/src/copeAhead/index.ts', 'COPE_AHEAD_VERSION');
+export const SKILLS_VERSION = constant('functions/src/skills/index.ts', 'SKILLS_VERSION');
 
 /** Refuses anything but a content-only export with no user data and no dangling relationships. */
 export function assertContentOnly(exp) {
@@ -480,8 +483,66 @@ export function buildCopeAhead(g) {
     pullIf: doc.pullIf, after: doc.after, situations, hardMoments, moves, beats };
 }
 
+/**
+ * getSkillContent (functions/src/skills/index.ts), with its version check. null when the graph has no skills
+ * yet (a load before schema/skills.cypher's first load): the committed skills.json is kept.
+ */
+export function buildSkills(g) {
+  const nodes = g.nodes('Skill');
+  if (!nodes.length) return null;
+  const json = (v, fallback) => (typeof v === 'string' ? JSON.parse(v) : fallback);
+  for (const n of nodes) {
+    if (n.props.contentVersion !== SKILLS_VERSION) {
+      throw new Error(`Skill ${n.props.id} is ${n.props.contentVersion}; the app expects ${SKILLS_VERSION}`);
+    }
+  }
+  const skills = nodes.map((n) => n.props).sort((a, b) => asc(a.id, b.id)).map((s) => ({
+    id: s.id, toolId: s.toolId, version: s.version, start: s.start, ownMax: intOrNull(s.ownMax), emotionFields: s.emotionFields ?? [],
+    copy: json(s.copyJson, {}), tables: json(s.tablesJson, {}), derive: json(s.deriveJson, []), steps: [], exits: [], options: {},
+  }));
+  const by = new Map(skills.map((s) => [s.id, s]));
+  for (const r of g.rels('HAS_STEP', 'Skill', 'SkillStep').sort((x, y) => asc(x.a.props.id, y.a.props.id) || asc(x.props.order, y.props.order))) {
+    by.get(r.a.props.id)?.steps.push({ id: r.b.props.step, kind: r.b.props.kind, ...json(r.b.props.specJson, {}), next: [], offers: [] });
+  }
+  const skillOfStep = new Map(g.rels('HAS_STEP', 'Skill', 'SkillStep').map((r) => [r.b, r.a.props.id]));
+  const step = (node) => by.get(skillOfStep.get(node))?.steps.find((x) => x.id === node.props.step);
+  for (const r of g.rels('NEXT', 'SkillStep', 'SkillStep').sort((x, y) => asc(x.props.order, y.props.order))) {
+    step(r.a)?.next.push({ to: r.b.props.step, when: json(r.props.whenJson, null) });
+  }
+  const offerRows = new Map();
+  for (const r of g.rels('OFFERS', 'SkillStep', 'SkillExit')) {
+    const st = step(r.a);
+    if (!st) continue;
+    const rows = json(r.props.rowsJson, []).map((x) => ({ exit: r.b.props.exit, when: x.when, order: x.order }));
+    offerRows.set(st, [...(offerRows.get(st) ?? []), ...rows]);
+  }
+  for (const [st, rows] of offerRows) st.offers = rows.sort((a, b) => a.order - b.order).map(({ exit, when }) => ({ exit, when }));
+  for (const r of g.rels('HAS_EXIT', 'Skill', 'SkillExit').sort((x, y) => asc(x.b.props.id, y.b.props.id))) {
+    const x = r.b.props;
+    by.get(r.a.props.id)?.exits.push({ id: x.exit, toolId: x.toolId ?? null, query: json(x.queryJson, {}), carry: x.carry ?? [], done: x.done === true });
+  }
+  const storyOf = new Map(g.rels('ALTERNATIVE_TO', 'SkillOption', 'SkillOption').map((r) => [r.a, r.b.props.value]));
+  for (const r of g.rels('HAS_OPTION', 'Skill', 'SkillOption').sort((x, y) => asc(x.a.props.id, y.a.props.id) || asc(x.props.order, y.props.order))) {
+    const s = by.get(r.a.props.id);
+    if (!s) continue;
+    const o = r.b.props;
+    const forStory = storyOf.get(r.b);
+    (s.options[r.props.list] ??= []).push({ value: o.value, label: o.label, ...json(o.propsJson, {}),
+      ...(forStory ? { for: forStory } : o.forOwn === true ? { for: '$own' } : {}) });
+  }
+  const parentOf = {};
+  for (const r of g.rels('HAS_REGULATION_CONTENT', 'Emotion', 'EmotionRegulationContent').sort((x, y) => asc(x.a.props.id, y.a.props.id))) {
+    parentOf[r.a.props.id] = r.b.props.dbtParent;
+  }
+  const fitsWhen = {};
+  for (const c of g.nodes('EmotionRegulationContent').map((n) => n.props).filter((c) => (c.fitsTheFactsWhen ?? []).length).sort((a, b) => asc(a.dbtParent, b.dbtParent))) {
+    fitsWhen[c.dbtParent] = { label: c.label ?? null, lines: c.fitsTheFactsWhen };
+  }
+  return { version: SKILLS_VERSION, parentOf, fitsWhen, skills };
+}
+
 /** Files a graph may not have content for yet: missing from an export, the committed file is kept. */
-export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json'];
+export const KEPT_WHEN_MISSING = ['wise-mind.json', 'cope-ahead.json', 'skills.json'];
 
 /**
  * All the snapshots from one export (pure apart from reading the version constants). A file in
@@ -492,6 +553,7 @@ export function buildSnapshots(exp) {
   const g = indexGraph(exp);
   const wiseMind = buildWiseMind(g);
   const copeAhead = buildCopeAhead(g);
+  const skills = buildSkills(g);
   return {
     'related-words.json': buildRelatedWords(g),
     'body-map.json': buildBodyMap(g),
@@ -502,6 +564,7 @@ export function buildSnapshots(exp) {
     'parts.json': buildParts(g),
     ...(wiseMind ? { 'wise-mind.json': wiseMind } : {}),
     ...(copeAhead ? { 'cope-ahead.json': copeAhead } : {}),
+    ...(skills ? { 'skills.json': skills } : {}),
   };
 }
 

@@ -71,6 +71,7 @@ export { DEN_REQUIRED } from './src/lib/den';
 export { WISE_MIND_PARTS_REQUIRED } from './src/lib/wiseMindParts';
 export { PART_STORY_REQUIRED } from './src/lib/partStory';
 export { SAY_TO_PART_REQUIRED, SAY_STORY_REQUIRED } from './src/lib/sayToPart';
+export { CF_UNBLEND_REQUIRED } from './src/lib/skillRuntime/partsLine';
 `;
   const out = await build({
     stdin: { contents, resolveDir: root, loader: 'ts', sourcefile: 'parts-surfaces.ts' },
@@ -230,6 +231,12 @@ export function surfaces(g) {
       vocab: ['moves', 'expresses'],
       where: 'In Do the Opposite, with parts on, on the check\'s "will it help you move toward your goal" card, above the question: two quiet lines setting the pull beside the goal the person picked, when the picked urge EXPRESSES an offerable move that isn\'t a safety-line move (never for "My urge is different", never while P2 is open). {move} is the move\'s `unblendPhrase` (the unblend line\'s); {goal} is Do the Opposite\'s own goal label with its first letter lower-cased ("You want to stay connected."). It also needs the move and the urge\'s EXPRESSES edge signed off (see The vocabulary).',
       groups: [{ label: null, ids: g.OA_GOAL_LINE_REQUIRED }],
+    },
+    {
+      id: 'cf_unblend', title: 'Check the Facts: the story line',
+      vocab: [],
+      where: 'In Check the Facts, with parts on, under the story chips (screen 3) once a story is picked: one quiet line. It names no part; the tag row after a better close is where "Was this a part you know?" happens. Signed off 4 Nov with the build (every other parts line was signed off 17 Oct: "ship it all").',
+      groups: [{ label: null, ids: g.CF_UNBLEND_REQUIRED }],
     },
   ];
 }

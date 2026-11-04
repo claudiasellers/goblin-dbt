@@ -38,6 +38,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts"], "the tag row on its urge close");
   assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts"], "the tag row on its urge close");
+  assert.deepEqual(types.PROFILE_NEEDS["check-the-facts"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness", "me"]);
   // The den (Me only, server-side: getDen adds the recency bucket from the log); no other consumer reads it.
   assert.deepEqual(types.PROFILE_NEEDS.me, ["den"]);
@@ -59,7 +60,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
     if (consumer === "meet-a-part") continue;
     if (consumer !== "dear-man" && consumer !== "cope-ahead") assert.ok(!needs.includes("partAnchors"), `${consumer} reads partAnchors`);
     assert.ok(!needs.includes("partDetail"), `${consumer} reads partDetail before its phase`);
-    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "dear-man", "cope-ahead", "two-pulls", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead (or Cope Ahead's), Two pulls nor Wise mind's step back`);
+    if (needs.includes("parts")) assert.ok(["today", "cool-down", "five-senses", "pause", "urge-surfing", "find-the-feeling", "check-the-facts", "dear-man", "cope-ahead", "two-pulls", "wise-mind"].includes(consumer), `${consumer} reads parts but is neither Today, a tag-row host, DEAR MAN's cope ahead (or Cope Ahead's), Two pulls nor Wise mind's step back`);
   }
   assert.deepEqual(types.PROFILE_AREAS, ["about_me", "my_people", "my_body", "my_words", "my_plans", "my_patterns", "my_parts", "my_progress"]);
   for (const s of types.SLICE_IDS) assert.ok(!layers.isAskFreshField(s), `${s} is ask-fresh`);
