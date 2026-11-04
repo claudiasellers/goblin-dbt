@@ -81,7 +81,15 @@ test("screen 3: stories from the word's set; two at most, a third tap swaps out 
   let s = run([...base, pick("story", "anger_on_purpose"), pick("story", "anger_always"), pick("story", "anger_unfair")]);
   assert.deepEqual(s.answers.story.ids, ["anger_always", "anger_unfair"]);
   s = run([...base, pick("story", "anger_on_purpose"), pick("story", "anger_always"), own("story", "They think I'm useless")]);
-  assert.deepEqual(s.answers.story, { ids: ["anger_always"], own: "They think I'm useless" });
+  assert.deepEqual([s.answers.story.ids, s.answers.story.own], [["anger_always"], "They think I'm useless"]);
+  // Own words are a pick in time order too: given first, they are the older one a third tap swaps out.
+  s = run([...base, own("story", "They think I'm useless"), pick("story", "anger_always"), pick("story", "anger_unfair")]);
+  assert.deepEqual([s.answers.story.ids, s.answers.story.own], [["anger_always", "anger_unfair"], null]);
+  // Given second, the older chip goes and the words stay; the next tap then swaps out the words.
+  s = run([...base, pick("story", "anger_always"), own("story", "Mine"), pick("story", "anger_unfair")]);
+  assert.deepEqual([s.answers.story.ids, s.answers.story.own], [["anger_unfair"], "Mine"]);
+  s = run([...base, pick("story", "anger_always"), own("story", "Mine"), pick("story", "anger_unfair"), pick("story", "anger_on_purpose")]);
+  assert.deepEqual([s.answers.story.ids, s.answers.story.own], [["anger_unfair", "anger_on_purpose"], null]);
   s = run([...base, own("story", "x".repeat(200))]);
   assert.equal(s.answers.story.own.length, 140, "own words are capped at 140");
   // Changing the word drops stories its new set doesn't offer.

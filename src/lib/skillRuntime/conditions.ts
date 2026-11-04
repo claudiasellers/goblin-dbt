@@ -8,7 +8,8 @@
  */
 import type { Cond, OptionDef } from '../../data/skillTypes';
 
-export interface Answer { ids: string[]; own: string | null }
+/** `ownAt`: how many of `ids` were picked before the own words (the oldest-first swap); absent means after them all. */
+export interface Answer { ids: string[]; own: string | null; ownAt?: number }
 export type Answers = Record<string, Answer>;
 
 export interface Scope {

@@ -72,6 +72,8 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   }), [skill, content, carried]);
   const [st, setSt] = useState<RunState>(() => initialRun(skill));
   const [leaving, setLeaving] = useState<ExitDef | null>(null);
+  // Answered: stay on the close so its tag row ("Was this a part you know?") can show, then go on a tap.
+  const [answered, setAnswered] = useState(false);
   const handoffs = useRef<HandoffResult[]>([]);
   const send = useCallback((e: RunEvent) => setSt((s) => runNext(ctx, s, e)), [ctx]);
   const step = stepOf(skill, st.stepId);
@@ -112,7 +114,12 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   if (leaving) {
     body = (
       <div className="space-y-4">
-        <SessionClose onAnswered={() => go(leaving)} onSkipped={() => go(leaving)} />
+        <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />
+        {!leaving.done && leaving.toolId && answered && (
+          <button type="button" className={primaryButton} onClick={() => go(leaving)}>
+            {getToolById(leaving.toolId)?.name ?? 'Continue'} →
+          </button>
+        )}
         {leaving.done && (
           <div className="flex justify-center"><Link to="/tools" className={linkButton}>All tools</Link></div>
         )}
@@ -228,7 +235,7 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
       )}
       {chips}
       {field.own && ownOpen && (
-        <textarea rows={2} maxLength={ctx.skill.ownMax} defaultValue={a?.own ?? ''}
+        <textarea rows={2} maxLength={ctx.skill.ownMax} value={a?.own ?? ''}
           aria-label={c[field.own.hint] ?? c.own_hint} placeholder={field.own.open ? c[field.own.hint] : undefined}
           onChange={(e) => send({ type: 'own', fieldId: field.id, text: e.target.value })}
           className="w-full p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] font-serif text-lg focus:ring-2 focus:ring-[var(--color-accent)]" />

@@ -149,7 +149,10 @@ function normalize(ctx: RunContext, answers: Answers): Answers {
       const valid = validValues(ctx, f, cur, sc);
       if (!valid) continue;
       const ids = a.ids.filter((v) => valid.has(v));
-      if (ids.length !== a.ids.length) { next[f.id] = { ...a, ids }; changed = true; }
+      if (ids.length !== a.ids.length) {
+        const kept = a.own ? { ownAt: a.ids.slice(0, ownAt(a)).filter((v) => valid.has(v)).length } : {};
+        next[f.id] = { ...a, ids, ...kept }; changed = true;
+      }
     }
     if (!changed) return cur;
     cur = next;
@@ -159,23 +162,37 @@ function normalize(ctx: RunContext, answers: Answers): Answers {
 
 const count = (f: FieldDef, a: Answer) => a.ids.length + (f.own?.countsAsPick && a.own ? 1 : 0);
 
+/** Where the own words sit among the picks, by when they were given: the number of picks older than them. */
+const ownAt = (a: Answer) => Math.min(a.ownAt ?? a.ids.length, a.ids.length);
+
+/** The answer without its oldest pick (own words count when they are a pick: the two-story swap). */
+function dropOldest(f: FieldDef, a: Answer): Answer {
+  if (a.own && f.own?.countsAsPick && ownAt(a) === 0) return { ids: a.ids, own: null };
+  if (!a.ids.length) return a;
+  return { ...a, ids: a.ids.slice(1), ...(a.own ? { ownAt: Math.max(0, ownAt(a) - 1) } : {}) };
+}
+
 function pick(ctx: RunContext, f: FieldDef, a: Answer, value: string): Answer {
-  if (a.ids.includes(value)) return { ...a, ids: a.ids.filter((v) => v !== value) };
+  const i = a.ids.indexOf(value);
+  if (i >= 0) return { ...a, ids: a.ids.filter((v) => v !== value), ...(a.own && i < ownAt(a) ? { ownAt: ownAt(a) - 1 } : {}) };
   if (f.options.emotions && !ctx.gridIds.has(value)) return a;
   if (count(f, a) < f.max) return { ...a, ids: [...a.ids, value] };
-  if (f.max === 1) return { ids: [value], own: f.own?.countsAsPick ? null : a.own };
+  if (f.max === 1) return f.own?.countsAsPick ? { ids: [value], own: null } : { ...a, ids: [value] };
   if (!f.swap) return a;
-  return a.ids.length ? { ...a, ids: [...a.ids.slice(1), value] } : { ids: [value], own: null };
+  const d = dropOldest(f, a);
+  return { ...d, ids: [...d.ids, value] };
 }
 
 function own(ctx: RunContext, f: FieldDef, a: Answer, raw: string): Answer {
   if (!f.own) return a;
   const text = raw.slice(0, ctx.skill.ownMax);
-  if (!text.trim()) return { ...a, own: null };
-  if (a.own || !f.own.countsAsPick || count(f, a) < f.max) return { ...a, own: text };
+  if (!text.trim()) { const { ownAt: _gone, ...rest } = a; void _gone; return { ...rest, own: null }; }
+  if (a.own) return { ...a, own: text };
+  if (!f.own.countsAsPick || count(f, a) < f.max) return { ...a, own: text, ownAt: a.ids.length };
   if (f.max === 1) return { ids: [], own: text };
   if (!f.swap) return a;
-  return { ids: a.ids.slice(1), own: text };
+  const d = dropOldest(f, a);
+  return { ids: d.ids, own: text, ownAt: d.ids.length };
 }
 
 /** The fields a step shows right now. */
