@@ -256,6 +256,7 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 - Lint: `npx eslint .` still reports 4 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
 - Cypher syntax: `npx -y -p @neo4j-cypher/language-support@2.0.0-next.6 node scripts/lint-cypher.mjs`.
 - CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 22, no secrets).
+- Merging: don't merge PRs yourself. When a PR is finished, add the `ready-to-merge` label (`gh pr edit <n> --add-label ready-to-merge`); the merge lane on Claudia's Mac tests it on top of main and merges it in a queue. A `lane-failed` label plus a comment means fix the branch and re-add the label. See `scripts/lane/README.md`.
 
 ---
 
