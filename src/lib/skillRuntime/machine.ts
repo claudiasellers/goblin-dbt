@@ -429,7 +429,8 @@ export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { a
  * Resume (R9): a run reopened from its own record (`ext.run`, the same visit's answers read back, so not a
  * pre-fill from memory), at `at` if the record's path went through it. Ask-fresh fields are never restored:
  * they are asked again, so the run reopens no later than the first step on its path that asks one (what comes
- * after it may hang on that answer). A hand-off reopened works out its offers again. Null when the record isn't
+ * after it may hang on that answer), and only the steps up to the one reopened bring their answers back (a later
+ * step is asked again, never pre-filled). A hand-off reopened works out its offers again. Null when the record isn't
  * this skill's version or `at` isn't a step it reached. `keepFresh` is for the review page only (dev/
  * skills-review.tsx, which shows every step from a made-up run); the app never passes it.
  */
@@ -443,15 +444,21 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const fresh = new Set(keepFresh ? [] : allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
   const asksFresh = path.findIndex((id) => (stepOf(ctx.skill, id).fields ?? []).some((f) => fresh.has(f.id)));
   if (asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
+  const upTo = path.slice(0, path.lastIndexOf(stepId) + 1);
+  // Only the answers of the steps up to the one reopened: a step after it will be asked again, and an answer
+  // read back there would be a pre-fill (a reminder chip picked last time would schedule again unasked).
+  const onPath = new Set(upTo.flatMap((id) => {
+    const st = stepOf(ctx.skill, id);
+    return [...(st.fields ?? []).map((f) => f.id), ...(st.answerAs ? [st.answerAs] : [])];
+  }));
   const answers: Answers = {};
   for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
     const fieldId = a.fieldId;
-    if (typeof fieldId !== 'string' || fresh.has(fieldId) || !fieldOf(ctx.skill, fieldId)) continue;
+    if (typeof fieldId !== 'string' || fresh.has(fieldId) || !onPath.has(fieldId) || !fieldOf(ctx.skill, fieldId)) continue;
     const ids = Array.isArray(a.optionIds) ? (a.optionIds as unknown[]).filter((x): x is string => typeof x === 'string' && ID.test(x)) : [];
     const own = typeof a.valueOwn === 'string' && a.valueOwn.trim() ? a.valueOwn : null;
     answers[fieldId] = { ids, own };
   }
-  const upTo = path.slice(0, path.lastIndexOf(stepId) + 1);
   const kept = normalize(ctx, answers);
   const step = stepOf(ctx.skill, stepId);
   return {

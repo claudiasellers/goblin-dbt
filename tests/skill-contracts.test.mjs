@@ -148,7 +148,8 @@ for (const sk of fixture.skills) {
         embed: st.embed, stepId: st.id,
         ...(d.ids?.length ? { optionIds: Array(12).fill(longest(d.ids)) } : {}),
         ...(d.ownText ? { valueOwn: "愛".repeat(sk.ownMax) } : {}),
-        ...Object.fromEntries((d.measures ?? []).map((k) => [k, 3600])),
+        // Each measure at the server's cap (seconds to an hour, counts to 100).
+        ...Object.fromEntries((d.measures ?? []).map((k) => [k, k === "durationSec" ? 3600 : 100])),
       };
     });
     const run = {
@@ -497,6 +498,7 @@ test("resume: the run's own answers read back at a step it reached; ask-fresh an
   assert.deepEqual(s.path, ["who", "when", "check"]);
   assert.deepEqual(Object.keys(s.answers).sort(), ["chip", "line"], "the ask-fresh change check is asked again; unknown fields dropped");
   assert.equal(m.resumeRun(ctx, rec, "when").stepId, "when", "a step before the ask-fresh one: there");
+  assert.deepEqual(Object.keys(m.resumeRun(ctx, rec, "who").answers), ["line"], "a later step's answers aren't read back: it is asked again, never pre-filled");
   assert.equal(m.resumeRun(ctx, rec, "end").stepId, "check", "past an ask-fresh step: back to it, since what follows may hang on it");
   assert.equal(m.resumeRun(ctx, rec, "nowhere").stepId, "check", "a step it never reached: where it stopped, clamped the same way");
   assert.equal(m.resumeRun(ctx, rec, "end", { keepFresh: true }).stepId, "end", "the review page's made-up run: every step");
