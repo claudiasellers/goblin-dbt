@@ -1,21 +1,29 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
-import type { HandoffResult } from '../../data/capacityTypes';
+import type { HandoffResult, ThenVsNow } from '../../data/capacityTypes';
+import { PROFILE_NEEDS, type ClientProfileConsumer } from '../../data/profileTypes';
 import { emotions, getEmotionById } from '../../data/emotions';
 import type { ExitDef, FieldDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
 import { getToolById } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
+import { useProfileContext } from '../../hooks/useProfileContext';
+import { ToolSessionProvider } from '../../contexts/ToolSessionContext';
+import { newId } from '../../lib/spine/ids';
+import { dueAtFor } from '../../lib/spine/windows';
+import { profileCache } from '../../lib/profileCache';
 import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, emotionChoices, fieldLinks, fieldList, handoffLine,
-  initialRun, optionGroups, ownMaxOf, pickedLabels, runEmotionIds, runNext, runRecord, scope, shownFields, stepOf, titleSlots,
-  type RunContext, type RunEvent, type RunState,
+  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, emotionChoices, fieldLinks, fieldList, followUpFor,
+  handoffLine, initialRun, inlineResult, keepFor, optionGroups, ownMaxOf, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
+  scope, shownFields, stepOf, titleSlots,
+  type Answer, type RunContext, type RunEvent, type RunState,
 } from '../../lib/skillRuntime/machine';
 import { holds } from '../../lib/skillRuntime/conditions';
-import { getSkillsContent } from '../../services/skills';
-import { getSpineContent } from '../../services/spine';
+import { getSkillRun, getSkillsContent } from '../../services/skills';
+import { getSpineContent, scheduleFollowUps } from '../../services/spine';
+import { keepProfileItem } from '../../services/profile';
 import { TooMuchLink } from '../capacity/TooMuchLink';
 import { CrisisBanner } from '../safety/CrisisBanner';
 import { SafetyOpen } from '../safety/SafetyOpen';
@@ -39,8 +47,30 @@ import { EMBEDS, EMBED_OUTPUTS } from './embeds';
  * `safety.open` exit: it opens the crisis resources over the skill (SafetyOpen), the run underneath, and going
  * back returns to the same screen. A whole-screen embed step hands the screen to its embed; its `onDone` output
  * goes into the run (docs/design/dbt-modules-plan.md C1, C3a).
+ *
+ * F2: the tool's profile slices (PROFILE_NEEDS) feed `$p.*` and kept-item options; a step's keep and follow-up
+ * run on its primary tap (the tap is the yes; a failure never stops the run); `?run=<sessionId>&at=<stepId>`
+ * reopens the person's own earlier run (R9); `mode="inline"` runs the skill inside a host screen with its own
+ * session (entry `embedded`, the host's session as `hostSessionId`), no close question and no P2 link of its own
+ * (the host has them), and hands `onReturn` its `returns` answers when it reaches its hand-off or the person
+ * goes back (R8).
  */
-export function SkillPlayer({ skillId }: { skillId: string }) {
+export interface InlineReturn {
+  /** The `returns` fields' answers (own words included: the host shows them back in this visit only). */
+  answers: Record<string, Answer>;
+  /** Reached its end (true) or the person went back early (false). */
+  finished: boolean;
+}
+
+export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn }: {
+  skillId: string;
+  mode?: 'page' | 'inline';
+  /** Inline: the step to start at (one the skill's `inline.enterAt` lists; otherwise its start). */
+  enterAt?: string;
+  /** Inline: the host's ToolSession id. */
+  hostSessionId?: string;
+  onReturn?: (r: InlineReturn) => void;
+}) {
   const [content, setContent] = useState<SkillsContent | null>(null);
   const [failed, setFailed] = useState(false);
   useEffect(() => {
@@ -57,8 +87,19 @@ export function SkillPlayer({ skillId }: { skillId: string }) {
       </div>
     );
   }
+  if (mode === 'inline') {
+    if (!skill.inline || !hostSessionId) return null;
+    return (
+      <ToolSessionProvider toolId={skill.toolId} inside={{ hostSessionId }}>
+        <SkillRun skill={skill} content={content} inline={{ enterAt, onReturn }} />
+      </ToolSessionProvider>
+    );
+  }
   return <SkillRun skill={skill} content={content} />;
 }
+
+const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, readonly string[]>)[toolId]?.length ?? 0) > 0;
+const UUID = /^[0-9a-f-]{36}$/i;
 
 const GRID = new Set(emotions.map((e) => e.id));
 const emotionLabel = (id: string) => (getEmotionById(id)?.name ?? id.replace(/_/g, ' ')).toLowerCase();
@@ -78,18 +119,43 @@ function carriedFrom(search: string, state: unknown): string[] {
   return [...new Set([...(feel ? [feel] : []), ...emotionIdsFromLink(state)])].filter((id) => GRID.has(id));
 }
 
-function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent }) {
+function SkillRun({ skill, content, inline }: {
+  skill: SkillDef; content: SkillsContent; inline?: { enterAt?: string; onReturn?: (r: InlineReturn) => void };
+}) {
   const toolSession = useToolSession();
   const navigate = useNavigate();
   const location = useLocation();
-  const [carried] = useState(() => carriedFrom(location.search, location.state));
-  const [ctxIn] = useState(() => contextFrom(skill, location.search, location.state));
+  // Inline, the host owns the address: nothing is read from it.
+  const [carried] = useState(() => (inline ? [] : carriedFrom(location.search, location.state)));
+  const [ctxIn] = useState(() => (inline ? {} : contextFrom(skill, location.search, location.state)));
+  const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
+  const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
     skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn,
-    embedOutputs: EMBED_OUTPUTS,
-  }), [skill, content, carried, ctxIn]);
+    embedOutputs: EMBED_OUTPUTS, profile: slices,
+  }), [skill, content, carried, ctxIn, slices]);
   const [safetyOpen, setSafetyOpen] = useState(false);
-  const [st, setSt] = useState<RunState>(() => initialRun(skill));
+  const [st, setSt] = useState<RunState>(() => initialRun(skill, inline?.enterAt));
+  // Resume (R9): `?run=<sessionId>&at=<stepId>` reopens the person's own run of this tool, or starts fresh.
+  const [resumeFrom] = useState(() => {
+    if (inline) return null;
+    const q = new URLSearchParams(location.search);
+    const run = q.get('run');
+    return run && UUID.test(run) ? { run, at: q.get('at') } : null;
+  });
+  const [resuming, setResuming] = useState(!!resumeFrom);
+  useEffect(() => {
+    if (!resumeFrom) return;
+    let live = true;
+    getSkillRun(resumeFrom.run, skill.toolId)
+      .then((rec) => { if (live) { const r = resumeRun(ctx, rec, resumeFrom.at); if (r) setSt(r); } })
+      .catch(() => { /* nothing to reopen: a fresh run */ })
+      .finally(() => { if (live) setResuming(false); });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const [busy, setBusy] = useState(false);
+  const [saveNote, setSaveNote] = useState(false);
   const [leaving, setLeaving] = useState<ExitDef | null>(null);
   // Answered: stay on the close so its tag row ("Was this a part you know?") can show, then go on a tap.
   const [answered, setAnswered] = useState(false);
@@ -136,8 +202,65 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
 
   const onShown = useCallback((record: string) => send({ type: 'shown', record }), [send]);
 
+  /**
+   * The step's primary tap: its keep (R4) and follow-up (R5) first, then on. The tap is the yes. A failed save
+   * never holds the person here: the run goes on and a quiet line says it didn't save.
+   */
+  const primary = useCallback(async () => {
+    const k = keepFor(ctx, step, st);
+    const f = followUpFor(ctx, step, st);
+    if (k || f) {
+      setBusy(true);
+      let failed = false;
+      if (k) {
+        try {
+          const id = k.id ?? (step.keep?.many ? newId() : undefined);
+          const r = await keepProfileItem({ kind: k.kind, ...(id ? { id } : {}), value: k.value, sourceSessionId: toolSession.id });
+          profileCache.clear();
+          send({ type: 'kept', stepId: step.id, kind: k.kind, id: r.id });
+        } catch { failed = true; }
+      }
+      if (f) {
+        try {
+          const spine = await getSpineContent();
+          const type = spine.followUpTypes.find((t) => t.id === f.type && t.enabled);
+          const due = type ? dueAtFor(type.window, new Date(), f.chip ?? undefined) : null;
+          if (!type || !due) throw new Error('no window');
+          const id = newId();
+          await scheduleFollowUps([{ id, type: f.type, dueAt: due.toISOString(), ...(f.chip ? { window: f.chip } : {}) }],
+            { sourceSessionId: toolSession.id, sourceToolId: skill.toolId });
+          send({ type: 'scheduled', stepId: step.id, followUpType: f.type, id });
+        } catch { failed = true; }
+      }
+      setSaveNote(failed);
+      setBusy(false);
+    }
+    send({ type: 'next' });
+  }, [ctx, step, st, send, toolSession.id, skill.toolId]);
+
+  // Inline: the hand-off is the way back to the host (R8). The sub-run asks no close of its own; its change
+  // check, if it has one, is its then-vs-now (C1 rule 5).
+  const returned = useRef(false);
+  const giveBack = useCallback((finished: boolean) => {
+    if (!inline || returned.current) return;
+    returned.current = true;
+    const r = inlineResult(ctx, st);
+    const tvn = r?.thenVsNow as ThenVsNow | null | undefined;
+    void toolSession.close({ status: finished ? 'completed' : 'exited_early', ...(tvn ? { thenVsNow: tvn } : {}) });
+    inline.onReturn?.({ answers: r?.answers ?? {}, finished });
+  }, [inline, ctx, st, toolSession]);
+  useEffect(() => { if (inline && step.kind === 'handoff') giveBack(true); }, [inline, step.kind, giveBack]);
+
   let body: ReactNode;
-  if (leaving) {
+  if (resuming) {
+    body = (
+      <div className="py-8 flex justify-center" aria-busy="true">
+        <span className="inline-block w-6 h-6 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full motion-safe:animate-spin" aria-hidden="true" />
+      </div>
+    );
+  } else if (inline && step.kind === 'handoff') {
+    body = null;
+  } else if (leaving) {
     body = (
       <div className="space-y-4">
         <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />
@@ -156,7 +279,7 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   } else if (step.kind === 'embed') {
     body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} />;
   } else {
-    body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} />;
+    body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy} />;
   }
 
   return (
@@ -164,7 +287,13 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
       {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. */}
       {safetyOpen && <SafetyOpen onBack={() => setSafetyOpen(false)} />}
       <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
-      {!leaving && !safetyOpen && (
+      {saveNote && <p role="status" className={`${secondaryText} text-center`}>{skill.copy.save_failed ?? "That didn't save just now. You can carry on."}</p>}
+      {inline && !safetyOpen && (
+        <div className="flex justify-center">
+          <button type="button" className={linkButton} onClick={() => giveBack(false)}>{skill.copy.inline_back ?? 'Back to where I was'}</button>
+        </div>
+      )}
+      {!inline && !leaving && !safetyOpen && (
         <div className="flex justify-center">
           <TooMuchLink host={skill.toolId} onResult={(r) => {
             handoffs.current.push(r);
@@ -176,8 +305,9 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   );
 }
 
-function AskStep({ ctx, step, st, send, onExit, onShown }: {
+function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
   ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onExit: (x: ExitDef) => void; onShown: (record: string) => void;
+  onPrimary: () => void; busy: boolean;
 }) {
   const c = ctx.skill.copy;
   const sc = scope(ctx, st);
@@ -215,8 +345,8 @@ function AskStep({ ctx, step, st, send, onExit, onShown }: {
       );
     })}
     {step.note && c[step.note] && <p className={secondaryText}>{c[step.note]}</p>}
-    <button type="button" className={primaryButton} disabled={!canGoOn(ctx, st)} onClick={() => send({ type: 'next' })}>
-      {c.next ?? 'Next'}
+    <button type="button" className={primaryButton} disabled={busy || !canGoOn(ctx, st)} aria-busy={busy} onClick={onPrimary}>
+      {(step.primary && c[step.primary]) || c.next || 'Next'}
     </button>
   </>);
 }

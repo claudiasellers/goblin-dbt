@@ -18,6 +18,38 @@ export type Cond =
 /** Context keys a skill may accept from the page that opens it (`SkillDef.accepts`, refs `$ctx.<key>`). */
 export type CtxKey = 'urgeId' | 'personId' | 'frame' | 'enterAt' | 'situationId' | 'partId' | 'band' | 'returnTo';
 
+/** Profile slices a field can list as options (R3): each item has an id and something to call it. */
+export type ProfileOptionSlice = 'parts' | 'ownLines' | 'savedLines' | 'people' | 'values' | 'goals'
+  | 'copeAheadPlans' | 'boundaryLines' | 'thingsILike';
+
+/**
+ * Keep (plan C3a R4, C2): on the step's primary tap, while `when` holds, the runtime keeps the `from` fields'
+ * answers through keepProfileItem as `kind`, the value `{<field>Ids: [...], <field>Own: '...'}` (only what was
+ * answered). The tap is the yes; the step shows what will be kept. Kept once per step per run (the item id is
+ * reused if the person comes back to the step).
+ */
+export interface KeepAction {
+  kind: string;
+  /** The kind's `many` (functions/src/profile/kinds.ts): many → a new item id; one per person → none. */
+  many: boolean;
+  from: string[];
+  when?: Cond;
+}
+
+/**
+ * Follow-up (plan C3a R5): on the step's primary tap, while `when` holds, schedule a FollowUpType (the spine's
+ * registry). Its time: the type's window, from the `whenFrom` field's pick when the window is a choice of chips
+ * (the field's options are the chip ids). Once per step per run.
+ */
+export interface FollowUpAction { type: string; whenFrom?: string; when?: Cond }
+
+/**
+ * Inline (plan C3a R8, C1 rule 5): a skill another screen can run inside itself, from one of `enterAt`, giving
+ * back the `returns` fields. `thenVsNowFrom` names the mid-flow change check written as the sub-run's
+ * then-vs-now (the sub-run asks no close of its own).
+ */
+export interface InlineDef { enterAt: string[]; returns: string[]; thenVsNowFrom?: string }
+
 /** Copy: a key into the skill's copy, or keys under conditions (first match wins; the last has no `when`). */
 export type CopyRef = string | Array<{ when?: Cond; key: string }>;
 
@@ -31,6 +63,11 @@ export interface OptionsSource {
   ownGroup?: string;
   /** Put this option first (never selected): a `$ctx.<key>` ref, e.g. Cope Ahead's `?first=`. */
   firstFrom?: string;
+  /**
+   * The person's own kept items from a profile slice (plan C3a R3), listed before `list`'s options, never
+   * selected. The pick is the item's id; its label is what the person kept (shown, never recorded).
+   */
+  profile?: ProfileOptionSlice;
   /** Grid words (src/data/emotions.ts ids), in order; carried emotions first; `moreKey` opens the full list. */
   emotions?: string[];
   carriedFirst?: boolean;
@@ -109,6 +146,10 @@ export interface StepDef {
   /** kind 'embed': the field id the embed's output ids are answered as (transitions read `$a.<answerAs>`). */
   answerAs?: string;
   crisis?: CrisisSlot[];
+  keep?: KeepAction;
+  followUp?: FollowUpAction;
+  /** The primary button's copy key (default `next`). A keep step's says what the tap keeps: the tap is the yes. */
+  primary?: string;
   next: Array<{ to: string; when: Cond | null }>;
   /** kind 'handoff'. */
   lines?: Array<{ when: Cond; key: string }>;
@@ -151,6 +192,8 @@ export interface SkillDef {
   steps: StepDef[];
   exits: ExitDef[];
   options: Record<string, OptionDef[]>;
+  /** Present when other screens may run the skill inline (R8). */
+  inline?: InlineDef;
 }
 
 export interface SkillsContent {

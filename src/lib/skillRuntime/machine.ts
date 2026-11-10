@@ -11,9 +11,12 @@
  * the run's `out`, and the run goes on. Context in (`$ctx.*`) is only what the skill `accepts`, ids only; `band`
  * only one of the three bands, and never from a link (the player strips it from the query: R1, C4.6).
  * Planned exits (tools not built yet) are never offered or linked.
+ * F2: profile slices (`$p.*`, a field's `profile` options: the person's kept items first, never selected), a
+ * step's keep and follow-up actions (the player runs them on the primary tap, the run records `kept` /
+ * `scheduled`), inline runs (`initialRun(skill, enterAt)`, `inlineResult`) and resume (`resumeRun`).
  */
-import type { CrisisSlot, EmbedOutput, EmbedOutputSchema, ExitDef, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
-import { holds, resolve, type Answer, type Answers, type Scope } from './conditions';
+import type { CrisisSlot, EmbedOutput, EmbedOutputSchema, ExitDef, FollowUpAction, KeepAction, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
+import { holds, profileItemId, resolve, type Answer, type Answers, type Scope } from './conditions';
 
 export type { Answer, Answers } from './conditions';
 
@@ -31,6 +34,8 @@ export interface RunContext {
   ctxIn?: Readonly<Record<string, string>>;
   /** What each embed may report (embeds.ts EMBED_OUTPUTS). An embed with no entry reports nothing. */
   embedOutputs?: Readonly<Record<string, EmbedOutputSchema>>;
+  /** The tool's profile slices (PROFILE_NEEDS), or null while loading / signed out (`$p.*` reads absent). */
+  profile?: Readonly<Record<string, unknown>> | null;
 }
 
 /** One whole-screen embed's report, as the run keeps it (and `ext.run.out` records it). */
@@ -48,6 +53,10 @@ export interface RunState {
   exitId: string | null;
   /** Whole-screen embeds' reports, by step id. */
   out: Record<string, EmbedRecord>;
+  /** Profile items this run kept, by step (the id is reused if the step is passed again). */
+  kept: Record<string, { kind: string; id: string }>;
+  /** Follow-ups this run scheduled, by step. */
+  scheduled: Record<string, { type: string; id: string }>;
 }
 
 export type RunEvent =
@@ -57,7 +66,10 @@ export type RunEvent =
   | { type: 'next' }
   | { type: 'back' }
   | { type: 'exit'; exitId: string }
-  | { type: 'embedDone'; output: EmbedOutput };
+  | { type: 'embedDone'; output: EmbedOutput }
+  /** The player kept the step's item / scheduled its follow-up (after the server said yes). */
+  | { type: 'kept'; stepId: string; kind: string; id: string }
+  | { type: 'scheduled'; stepId: string; followUpType: string; id: string };
 
 export interface OptionGroup {
   /** The pick this group belongs to (`groupBy`), `$own` for own words, or null when ungrouped. */
@@ -78,8 +90,10 @@ const RECORDED_CTX = ['urgeId', 'personId', 'frame', 'enterAt', 'situationId', '
 const BAND_VALUES = new Set(['steady', 'stirred', 'flooded']);
 const EMPTY: Answer = { ids: [], own: null };
 
-export function initialRun(skill: SkillDef): RunState {
-  return { stepId: skill.start, path: [skill.start], answers: {}, shown: [], offered: [], exitId: null, out: {} };
+/** A fresh run, at the skill's start, or (inline, R8) at one of the steps it declares it can start at. */
+export function initialRun(skill: SkillDef, enterAt?: string | null): RunState {
+  const at = enterAt && skill.inline?.enterAt.includes(enterAt) ? enterAt : skill.start;
+  return { stepId: at, path: [at], answers: {}, shown: [], offered: [], exitId: null, out: {}, kept: {}, scheduled: {} };
 }
 
 /**
@@ -157,6 +171,7 @@ function scopeOf(ctx: RunContext, answers: Answers, derived: Record<string, unkn
     answers,
     derived,
     ctx: ctx.ctxIn ?? {},
+    profile: ctx.profile ?? null,
     picked: (fieldId) => {
       const f = fieldOf(ctx.skill, fieldId);
       const list = f?.options.list ? ctx.skill.options[f.options.list] ?? [] : [];
@@ -182,8 +197,9 @@ export function emotionChoices(ctx: RunContext, field: FieldDef, answers: Answer
 /** A list field's chips, grouped (alternatives per story) or as one group. */
 export function optionGroups(ctx: RunContext, field: FieldDef, answers: Answers, sc: Scope = scope(ctx, { answers })): OptionGroup[] {
   const src = field.options;
-  if (!src.list) return [];
-  let list = (ctx.skill.options[src.list] ?? []).filter((opt) => holds(src.where, { ...sc, opt }));
+  if (!src.list && !src.profile) return [];
+  const mine = src.profile ? profileOptions(ctx, src.profile) : [];
+  let list = [...mine, ...(src.list ? ctx.skill.options[src.list] ?? [] : []).filter((opt) => holds(src.where, { ...sc, opt }))];
   const first = src.firstFrom ? resolve(src.firstFrom, sc) : null;
   if (typeof first === 'string' && list.some((o) => o.value === first)) {
     list = [...list.filter((o) => o.value === first), ...list.filter((o) => o.value !== first)];
@@ -197,6 +213,23 @@ export function optionGroups(ctx: RunContext, field: FieldDef, answers: Answers,
   }));
   if (a.own) groups.push({ key: '$own', label: a.own, own: true, options: list.filter((o) => o.for === '$own') });
   return groups.filter((g) => g.options.length > 0);
+}
+
+/**
+ * A profile slice's items as options (R3): value the item id, label what the person kept (a part's name, a
+ * line's text, a person's name). An item with nothing to call it uses the skill's `profile_unnamed` copy, or
+ * is left out. Labels are shown, never recorded: the pick is the id.
+ */
+export function profileOptions(ctx: RunContext, slice: string): OptionDef[] {
+  const items = ctx.profile?.[slice];
+  if (!Array.isArray(items)) return [];
+  const fallback = ctx.skill.copy.profile_unnamed ?? null;
+  return items.flatMap((it) => {
+    const id = profileItemId(it);
+    const o = it as { name?: unknown; text?: unknown; label?: unknown };
+    const label = [o.name, o.text, o.label].find((x): x is string => typeof x === 'string' && x.trim() !== '') ?? fallback;
+    return id && ID.test(id) && label ? [{ value: id, label, mine: true }] : [];
+  });
 }
 
 /** Every value a field may hold right now. */
@@ -317,6 +350,16 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const answers = step.answerAs ? { ...s.answers, [step.answerAs]: { ids, own: null } } : s.answers;
       return runNext(ctx, { ...s, answers, out: { ...s.out, [step.id]: rec } }, { type: 'next' });
     }
+    case 'kept': {
+      const step = ctx.skill.steps.find((x) => x.id === e.stepId);
+      if (!step?.keep || step.keep.kind !== e.kind || !ID.test(e.id)) return s;
+      return { ...s, kept: { ...s.kept, [e.stepId]: { kind: e.kind, id: e.id } } };
+    }
+    case 'scheduled': {
+      const step = ctx.skill.steps.find((x) => x.id === e.stepId);
+      if (!step?.followUp || step.followUp.type !== e.followUpType || !ID.test(e.id)) return s;
+      return { ...s, scheduled: { ...s.scheduled, [e.stepId]: { type: e.followUpType, id: e.id } } };
+    }
     case 'next': {
       if (!canGoOn(ctx, s)) return s;
       const step = stepOf(ctx.skill, s.stepId);
@@ -342,6 +385,69 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
     case 'exit':
       return ctx.skill.exits.some((x) => x.id === e.exitId && !x.planned && !x.safety) ? { ...s, exitId: e.exitId } : s;
   }
+}
+
+/**
+ * What the current step keeps on its primary tap (R4), or null: no keep, its `when` doesn't hold, or nothing to
+ * keep. `id` is the item this run already kept from this step (passed again, the same item is kept again).
+ */
+export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'kept'>): { kind: string; value: Record<string, unknown>; id: string | null } | null {
+  const k: KeepAction | undefined = step.keep;
+  if (!k || !holds(k.when, scope(ctx, s))) return null;
+  const value: Record<string, unknown> = {};
+  for (const f of k.from) {
+    const a = s.answers[f];
+    if (a?.ids.length) value[`${f}Ids`] = a.ids;
+    if (a?.own?.trim()) value[`${f}Own`] = a.own.trim();
+  }
+  if (!Object.keys(value).length) return null;
+  return { kind: k.kind, value, id: s.kept[step.id]?.id ?? null };
+}
+
+/** What the current step schedules on its primary tap (R5): the type and the chip picked, or null. */
+export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'scheduled'>): { type: string; chip: string | null } | null {
+  const f: FollowUpAction | undefined = step.followUp;
+  if (!f || s.scheduled[step.id] || !holds(f.when, scope(ctx, s))) return null;
+  if (!f.whenFrom) return { type: f.type, chip: null };
+  const chip = s.answers[f.whenFrom]?.ids[0];
+  return chip ? { type: f.type, chip } : null;
+}
+
+/**
+ * An inline run's result for its host (R8): each `returns` field's answer, and the then-vs-now its change check
+ * gave (written as the sub-run's close). Null when the skill isn't inline.
+ */
+export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { answers: Record<string, Answer>; thenVsNow: string | null } | null {
+  const inl = ctx.skill.inline;
+  if (!inl) return null;
+  const answers = Object.fromEntries(inl.returns.filter((f) => s.answers[f]).map((f) => [f, s.answers[f]]));
+  const tvn = inl.thenVsNowFrom ? s.answers[inl.thenVsNowFrom]?.ids[0] ?? null : null;
+  return { answers, thenVsNow: tvn };
+}
+
+/**
+ * Resume (R9): a run reopened from its own record (`ext.run`, the same visit's answers read back, so not a
+ * pre-fill from memory), at `at` if the record's path went through it. Ask-fresh fields are never restored:
+ * they are asked again. Null when the record isn't this skill's version or `at` isn't a step it reached.
+ */
+export function resumeRun(ctx: RunContext, rec: unknown, at: string | null): RunState | null {
+  if (!rec || typeof rec !== 'object') return null;
+  const r = rec as { skillId?: unknown; versionId?: unknown; path?: unknown; answers?: unknown };
+  if (r.skillId !== ctx.skill.id || r.versionId !== ctx.skill.version || !Array.isArray(r.path)) return null;
+  const path = (r.path as unknown[]).filter((x): x is string => typeof x === 'string' && ctx.skill.steps.some((st) => st.id === x));
+  const stepId = at && path.includes(at) ? at : path[path.length - 1];
+  if (!stepId) return null;
+  const fresh = new Set(allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
+  const answers: Answers = {};
+  for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
+    const fieldId = a.fieldId;
+    if (typeof fieldId !== 'string' || fresh.has(fieldId) || !fieldOf(ctx.skill, fieldId)) continue;
+    const ids = Array.isArray(a.optionIds) ? (a.optionIds as unknown[]).filter((x): x is string => typeof x === 'string' && ID.test(x)) : [];
+    const own = typeof a.valueOwn === 'string' && a.valueOwn.trim() ? a.valueOwn : null;
+    answers[fieldId] = { ids, own };
+  }
+  const upTo = path.slice(0, path.lastIndexOf(stepId) + 1);
+  return { ...initialRun(ctx.skill), stepId, path: upTo.slice(-PATH_MAX), answers: normalize(ctx, answers) };
 }
 
 /** A copy ref's text: a key, or the first conditional key that holds. Slots `{name}` filled from `slots`. */
@@ -458,5 +564,7 @@ export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown>
     ...(s.shown.length ? { embedsShown: s.shown } : {}),
     ...(Object.keys(ctxRec).length ? { ctx: ctxRec } : {}),
     ...(out.length ? { out } : {}),
+    ...(Object.keys(s.kept ?? {}).length ? { kept: [...new Set(Object.values(s.kept).map((k) => k.kind))].slice(0, 8) } : {}),
+    ...(Object.keys(s.scheduled ?? {}).length ? { scheduled: [...new Set(Object.values(s.scheduled).map((k) => k.type))].slice(0, 8) } : {}),
   };
 }
