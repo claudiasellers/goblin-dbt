@@ -5,6 +5,7 @@ import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
 import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
+import { RescriptCard } from './RescriptCard';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -37,6 +38,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   witness: WitnessEmbed,
   rebellionCard: RebellionCard,
   boundaryLine: BoundaryLine,
+  rescriptCard: RescriptCard,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -45,6 +47,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   witness: { ids: ['yes', 'sort_of', 'no', 'none_fit', 'own', 'skip', 'seen'] },
   rebellionCard: { ids: ['now', 'today', 'week'] },
   boundaryLine: { ids: ['copied'] },
+  rescriptCard: { ids: ['read', 'stopped'], measures: ['durationSec'] },
 };
 
 /**
@@ -91,5 +94,20 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     copiedLabel: { type: 'copy', optional: true },
     selectedLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
+  },
+  rescriptCard: {
+    startField: { type: 'field' },
+    turnField: { type: 'field' },
+    endField: { type: 'field' },
+    seconds: { type: 'int', min: 10, max: 300 },
+    startLabel: { type: 'copy' },
+    turnLabel: { type: 'copy' },
+    endLabel: { type: 'copy' },
+    fallback: { type: 'copy' },
+    readLabel: { type: 'copy' },
+    runningLabel: { type: 'copy' },
+    stopLabel: { type: 'copy' },
+    doneLabel: { type: 'copy' },
+    skipLabel: { type: 'copy' },
   },
 };

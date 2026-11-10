@@ -140,6 +140,19 @@ export const tools: Tool[] = [
     emoji: '🧩',
     bare: true,
   },
+  {
+    // ER-15 on the skill runtime (docs/design/nightmare-rescript.md): a nightmare that keeps coming back, changed
+    // while awake. Not for one that replays something real (a clinician's), never from the check-in or night mode.
+    id: 'nightmare-rescript',
+    name: 'Rewrite the Nightmare',
+    tagline: 'Change how a recurring nightmare goes, while you\'re awake',
+    description: 'Pick a nightmare that keeps coming back, change it before the bad part, give it a new ending, and read the new version through. Stop at any point.',
+    whenToUse: 'When the same nightmare keeps coming back. Best in the daytime.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 20a',
+    emoji: '🌙',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -240,6 +253,7 @@ export const allIntents: Intent[] = [
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
   { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
+  { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 
 /** The intents the Tools page lists: those whose tool is listed for everyone. */

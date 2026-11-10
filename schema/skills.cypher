@@ -2190,3 +2190,309 @@ SET o:SkillOption:BoundaryLine, o += {skillId: "fast_let_go", list: "line", valu
 MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:not_argue"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "line", order: 5};
+
+// --- nightmare_rescript (nr-v1) ---
+MERGE (s:Skill {id: "nightmare_rescript"})
+SET s += {toolId: "nightmare-rescript", version: "nr-v1", contentVersion: "skills-v1", start: "replay", ownMax: 90, emotionFields: [], accepts: ["band", "enterAt"]}, s.inlineJson = "null", s.copyJson = "{\"after_title\": \"How was that?\", \"again\": \"That's one more read-through.\", \"again_q\": \"Want a reminder for the next one?\", \"card_end\": \"It ends\", \"card_fallback\": \"Your version\", \"card_start\": \"It starts\", \"card_turn\": \"Then\", \"clinician\": \"Nightmares that replay something real are best worked on with a clinician, who can go at your pace. For tonight, settling your body and the room around you can help.\", \"clinician_memory\": \"That's a good place to stop. When it feels like a memory, it's one to work on with a clinician, at your pace. For now, come back to the room around you.\", \"close\": \"You changed how it goes. Each read-through is practice for the new version.\", \"close_kept\": \"It's in Me. Each read-through is practice for the new version.\", \"done\": \"Done\", \"ending_own\": \"Write your ending\", \"ending_title\": \"How does it end now?\", \"next\": \"Next\", \"plan_hint\": \"Reading it through once a day, for a while, is what helps the new version take hold.\", \"plan_primary\": \"Next\", \"plan_title\": \"Keep this new version?\", \"read_done\": \"Done\", \"read_running\": \"Picture it, start to finish, eyes open. Stop any time.\", \"read_skip\": \"I'd rather stop here\", \"read_start\": \"Read it through\", \"read_stop\": \"Stop\", \"rehearse_title\": \"Your new version\", \"remind_q\": \"Want a reminder to read it through?\", \"replay_hint\": \"This works on a nightmare that keeps coming back. It's best done in the daytime, with your eyes open. You can stop at any point.\", \"replay_note\": \"When nightmares follow something that happened to you, a clinician can help with that.\", \"replay_title\": \"Is this nightmare a replay of something that really happened?\", \"replay_title_flooded\": \"This is one for a calmer moment. Is the nightmare a replay of something that really happened?\", \"safety_open\": \"Talk to someone now\", \"settle_again_title\": \"Settle again before you go on.\", \"settle_done\": \"That's enough.\", \"settle_first\": \"Settle first\", \"settle_hint\": \"Hold the circle and notice your feet on the floor.\", \"settle_label\": \"Hold\", \"settle_title\": \"Before you start, settle for a moment.\", \"settle_title_unsure\": \"Before you start, settle for a moment. If it starts to feel like a memory, you can stop there.\", \"start_hint\": \"Pick one that keeps coming back, not the worst one. You don't need to say what happens.\", \"start_own\": \"Say it your way\", \"start_title\": \"Where does it start?\", \"stopped\": \"Stopping is part of this. You can come back on another day, or leave it here.\", \"stopped_unsafe\": \"Thank you for stopping. Someone to talk to is right here.\", \"turn_hint\": \"Anything can change. It's your dream.\", \"turn_own\": \"Say it your way\", \"turn_title\": \"Before it turns bad, what changes?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_nightmare_protocol"}), (s:Skill {id: "nightmare_rescript"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "nightmare_rescript"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "nightmare_rescript"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "nightmare_rescript:replay"})
+SET n += {skillId: "nightmare_rescript", step: "replay", kind: "ask", version: "nr-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"fields\": [{\"id\": \"replay\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"settle_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"replay\"}, \"required\": true}], \"hint\": \"replay_hint\", \"note\": \"replay_note\", \"title\": [{\"key\": \"replay_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"replay_title\"}]}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:replay"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "nightmare_rescript:clinician"})
+SET n += {skillId: "nightmare_rescript", step: "clinician", kind: "handoff", version: "nr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"clinician_memory\", \"when\": {\"eq\": [\"$a.after\", \"memory\"]}}, {\"key\": \"clinician\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:clinician"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "nightmare_rescript:settle"})
+SET n += {skillId: "nightmare_rescript", step: "settle", kind: "embed", version: "nr-v1"}, n.specJson = "{\"answerAs\": \"settle\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"embed\": \"holdRing\", \"props\": {\"doneLabel\": \"settle_done\", \"hint\": \"settle_hint\", \"holds\": 3, \"label\": \"settle_label\", \"next\": \"next\", \"seconds\": 5, \"variant\": \"settle\"}, \"title\": [{\"key\": \"settle_title_unsure\", \"when\": {\"eq\": [\"$a.replay\", \"unsure\"]}}, {\"key\": \"settle_title\"}]}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "nightmare_rescript:start"})
+SET n += {skillId: "nightmare_rescript", step: "start", kind: "ask", version: "nr-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"fields\": [{\"id\": \"setting\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"setting\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"start_own\", \"max\": 60}, \"required\": true}], \"hint\": \"start_hint\", \"title\": \"start_title\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:start"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "nightmare_rescript:turn"})
+SET n += {skillId: "nightmare_rescript", step: "turn", kind: "ask", version: "nr-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"fields\": [{\"id\": \"turn\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"turn\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"turn_own\"}, \"required\": true}], \"hint\": \"turn_hint\", \"title\": \"turn_title\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:turn"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "nightmare_rescript:ending"})
+SET n += {skillId: "nightmare_rescript", step: "ending", kind: "ask", version: "nr-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"fields\": [{\"id\": \"ending\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"ending\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"ending_own\", \"open\": true}, \"required\": true}], \"title\": \"ending_title\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:ending"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "nightmare_rescript:rehearse"})
+SET n += {skillId: "nightmare_rescript", step: "rehearse", kind: "embed", version: "nr-v1"}, n.specJson = "{\"answerAs\": \"read\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"embed\": \"rescriptCard\", \"props\": {\"doneLabel\": \"read_done\", \"endField\": \"ending\", \"endLabel\": \"card_end\", \"fallback\": \"card_fallback\", \"readLabel\": \"read_start\", \"runningLabel\": \"read_running\", \"seconds\": 60, \"skipLabel\": \"read_skip\", \"startField\": \"setting\", \"startLabel\": \"card_start\", \"stopLabel\": \"read_stop\", \"turnField\": \"turn\", \"turnLabel\": \"card_turn\"}, \"title\": \"rehearse_title\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:rehearse"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "nightmare_rescript:after"})
+SET n += {skillId: "nightmare_rescript", step: "after", kind: "ask", version: "nr-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"fields\": [{\"id\": \"after\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"not\": {\"eq\": [\"$a.after\", \"unsafe\"]}}}], \"max\": 1, \"options\": {\"list\": \"after\"}, \"required\": true}], \"title\": \"after_title\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:after"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "nightmare_rescript:settle_again"})
+SET n += {skillId: "nightmare_rescript", step: "settle_again", kind: "embed", version: "nr-v1"}, n.specJson = "{\"answerAs\": \"settle_again\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"embed\": \"holdRing\", \"props\": {\"doneLabel\": \"settle_done\", \"hint\": \"settle_hint\", \"holds\": 3, \"label\": \"settle_label\", \"next\": \"next\", \"seconds\": 5, \"variant\": \"settle\"}, \"title\": \"settle_again_title\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:settle_again"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "nightmare_rescript:plan"})
+SET n += {skillId: "nightmare_rescript", step: "plan", kind: "ask", version: "nr-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"fields\": [{\"id\": \"keepit\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"keepit\"}, \"required\": true}, {\"id\": \"remind\", \"label\": \"remind_q\", \"max\": 1, \"options\": {\"list\": \"remind\"}}], \"followUp\": {\"type\": \"nightmare_rehearse\", \"whenFrom\": \"remind\"}, \"hint\": \"plan_hint\", \"keep\": {\"from\": [\"setting\", \"turn\", \"ending\"], \"kind\": \"nightmare_script\", \"many\": true, \"when\": {\"eq\": [\"$a.keepit\", \"yes\"]}}, \"primary\": \"plan_primary\", \"title\": \"plan_title\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:plan"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "nightmare_rescript:close"})
+SET n += {skillId: "nightmare_rescript", step: "close", kind: "handoff", version: "nr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"close_kept\", \"when\": {\"eq\": [\"$a.keepit\", \"yes\"]}}, {\"key\": \"close\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:close"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "nightmare_rescript:again"})
+SET n += {skillId: "nightmare_rescript", step: "again", kind: "handoff", version: "nr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"done\": \"done\", \"fields\": [{\"id\": \"again_remind\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"remind\"}}], \"followUp\": {\"type\": \"nightmare_rehearse\", \"whenFrom\": \"again_remind\"}, \"lines\": [{\"key\": \"again\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:again"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "nightmare_rescript:stopped"})
+SET n += {skillId: "nightmare_rescript", step: "stopped", kind: "handoff", version: "nr-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"stopped_unsafe\", \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}, {\"key\": \"stopped\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (n:SkillStep {id: "nightmare_rescript:stopped"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (x:SkillExit {id: "nightmare_rescript:five_senses"})
+SET x += {skillId: "nightmare_rescript", exit: "five_senses", toolId: "five-senses", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:five_senses"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "nightmare_rescript:five_senses"}), (t:TherapyConcept {appToolId: "five-senses"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "nightmare_rescript:sleep_reset"})
+SET x += {skillId: "nightmare_rescript", exit: "sleep_reset", toolId: "sleep-reset", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:sleep_reset"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "nightmare_rescript:sleep_reset"}), (t:TherapyConcept {appToolId: "sleep-reset"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "nightmare_rescript:safety_open"})
+SET x += {skillId: "nightmare_rescript", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "nightmare_rescript:done"})
+SET x += {skillId: "nightmare_rescript", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (x:SkillExit {id: "nightmare_rescript:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "nightmare_rescript:replay"}), (b:SkillStep {id: "nightmare_rescript:clinician"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.replay\", [\"yes\", \"partly\"]]}";
+MATCH (a:SkillStep {id: "nightmare_rescript:replay"}), (b:SkillStep {id: "nightmare_rescript:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:replay"}), (x:SkillExit {id: "nightmare_rescript:five_senses"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "replay", label: "settle_first"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "nightmare_rescript:replay"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "replay", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "nightmare_rescript:clinician"}), (x:SkillExit {id: "nightmare_rescript:five_senses"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "nightmare_rescript:clinician"}), (x:SkillExit {id: "nightmare_rescript:sleep_reset"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "nightmare_rescript:clinician"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "nightmare_rescript:settle"}), (b:SkillStep {id: "nightmare_rescript:start"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:start"}), (b:SkillStep {id: "nightmare_rescript:turn"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:start"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "setting", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "nightmare_rescript:turn"}), (b:SkillStep {id: "nightmare_rescript:ending"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:turn"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "turn", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "nightmare_rescript:ending"}), (b:SkillStep {id: "nightmare_rescript:rehearse"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:ending"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "ending", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "nightmare_rescript:rehearse"}), (b:SkillStep {id: "nightmare_rescript:stopped"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.read\", \"stopped\"]}";
+MATCH (a:SkillStep {id: "nightmare_rescript:rehearse"}), (b:SkillStep {id: "nightmare_rescript:again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.enterAt\", \"rehearse\"]}";
+MATCH (a:SkillStep {id: "nightmare_rescript:rehearse"}), (b:SkillStep {id: "nightmare_rescript:after"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:after"}), (b:SkillStep {id: "nightmare_rescript:stopped"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.after\", \"unsafe\"]}";
+MATCH (a:SkillStep {id: "nightmare_rescript:after"}), (b:SkillStep {id: "nightmare_rescript:clinician"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.after\", \"memory\"]}";
+MATCH (a:SkillStep {id: "nightmare_rescript:after"}), (b:SkillStep {id: "nightmare_rescript:settle_again"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:after"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "after", label: "safety_open"}, r.whenJson = "{\"not\": {\"eq\": [\"$a.after\", \"unsafe\"]}}";
+MATCH (a:SkillStep {id: "nightmare_rescript:settle_again"}), (b:SkillStep {id: "nightmare_rescript:plan"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:plan"}), (b:SkillStep {id: "nightmare_rescript:close"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "nightmare_rescript:plan"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "keepit", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "nightmare_rescript:stopped"}), (x:SkillExit {id: "nightmare_rescript:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.after\", \"unsafe\"]}}, {\"order\": 2, \"when\": {\"not\": {\"eq\": [\"$a.after\", \"unsafe\"]}}}]";
+MATCH (a:SkillStep {id: "nightmare_rescript:stopped"}), (x:SkillExit {id: "nightmare_rescript:five_senses"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": []}}]";
+MERGE (o:SkillOption {id: "nightmare_rescript:replay:yes"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "replay", value: "yes", label: "Yes, it replays something that happened", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:replay:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "replay", order: 0};
+MERGE (o:SkillOption {id: "nightmare_rescript:replay:partly"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "replay", value: "partly", label: "Partly", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:replay:partly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "replay", order: 1};
+MERGE (o:SkillOption {id: "nightmare_rescript:replay:no"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "replay", value: "no", label: "No, it's its own thing", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:replay:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "replay", order: 2};
+MERGE (o:SkillOption {id: "nightmare_rescript:replay:unsure"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "replay", value: "unsure", label: "I'm not sure", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:replay:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "replay", order: 3};
+MERGE (o:SkillOption {id: "nightmare_rescript:setting:home"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "setting", value: "home", label: "Somewhere like home", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:setting:home"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "setting", order: 4};
+MERGE (o:SkillOption {id: "nightmare_rescript:setting:outside"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "setting", value: "outside", label: "Outside", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:setting:outside"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "setting", order: 5};
+MERGE (o:SkillOption {id: "nightmare_rescript:setting:work"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "setting", value: "work", label: "Somewhere like school or work", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:setting:work"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "setting", order: 6};
+MERGE (o:SkillOption {id: "nightmare_rescript:setting:travelling"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "setting", value: "travelling", label: "Travelling somewhere", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:setting:travelling"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "setting", order: 7};
+MERGE (o:SkillOption {id: "nightmare_rescript:setting:unknown"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "setting", value: "unknown", label: "Somewhere I don't know", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:setting:unknown"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "setting", order: 8};
+MERGE (o:SkillOption {id: "nightmare_rescript:turn:bigger"})
+SET o:SkillOption:RescriptChange, o += {skillId: "nightmare_rescript", list: "turn", value: "bigger", label: "I get bigger and stronger", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:turn:bigger"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 9};
+MERGE (o:SkillOption {id: "nightmare_rescript:turn:ally"})
+SET o:SkillOption:RescriptChange, o += {skillId: "nightmare_rescript", list: "turn", value: "ally", label: "Someone on my side arrives", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:turn:ally"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 10};
+MERGE (o:SkillOption {id: "nightmare_rescript:turn:door"})
+SET o:SkillOption:RescriptChange, o += {skillId: "nightmare_rescript", list: "turn", value: "door", label: "A door appears, and I go through it", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:turn:door"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 11};
+MERGE (o:SkillOption {id: "nightmare_rescript:turn:silly"})
+SET o:SkillOption:RescriptChange, o += {skillId: "nightmare_rescript", list: "turn", value: "silly", label: "It turns silly", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:turn:silly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 12};
+MERGE (o:SkillOption {id: "nightmare_rescript:turn:stop"})
+SET o:SkillOption:RescriptChange, o += {skillId: "nightmare_rescript", list: "turn", value: "stop", label: "I say stop, and it stops", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:turn:stop"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 13};
+MERGE (o:SkillOption {id: "nightmare_rescript:turn:leave"})
+SET o:SkillOption:RescriptChange, o += {skillId: "nightmare_rescript", list: "turn", value: "leave", label: "I can leave, and I do", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:turn:leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "turn", order: 14};
+MERGE (o:SkillOption {id: "nightmare_rescript:ending:safe"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "ending", value: "safe", label: "I end up somewhere safe", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:ending:safe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ending", order: 15};
+MERGE (o:SkillOption {id: "nightmare_rescript:ending:trusted"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "ending", value: "trusted", label: "I'm with someone I trust", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:ending:trusted"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ending", order: 16};
+MERGE (o:SkillOption {id: "nightmare_rescript:ending:fades"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "ending", value: "fades", label: "It fades out quietly", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:ending:fades"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ending", order: 17};
+MERGE (o:SkillOption {id: "nightmare_rescript:ending:calm"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "ending", value: "calm", label: "I wake up calm", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:ending:calm"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "ending", order: 18};
+MERGE (o:SkillOption {id: "nightmare_rescript:after:all_right"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "after", value: "all_right", label: "That was all right", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:after:all_right"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "after", order: 19};
+MERGE (o:SkillOption {id: "nightmare_rescript:after:stirred"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "after", value: "stirred", label: "It stirred me up", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:after:stirred"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "after", order: 20};
+MERGE (o:SkillOption {id: "nightmare_rescript:after:memory"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "after", value: "memory", label: "It started to feel like a memory", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:after:memory"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "after", order: 21};
+MERGE (o:SkillOption {id: "nightmare_rescript:after:unsafe"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "after", value: "unsafe", label: "I'm not feeling safe", version: "nr-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:after:unsafe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "after", order: 22};
+MERGE (o:SkillOption {id: "nightmare_rescript:keepit:yes"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "keepit", value: "yes", label: "Keep it in Me", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:keepit:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 23};
+MERGE (o:SkillOption {id: "nightmare_rescript:keepit:no"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "keepit", value: "no", label: "Not this time", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:keepit:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "keepit", order: 24};
+MERGE (o:SkillOption {id: "nightmare_rescript:remind:tonight"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "remind", value: "tonight", label: "Tonight, before bed", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:remind:tonight"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 25};
+MERGE (o:SkillOption {id: "nightmare_rescript:remind:tomorrow"})
+SET o:SkillOption, o += {skillId: "nightmare_rescript", list: "remind", value: "tomorrow", label: "Tomorrow, in the day", version: "nr-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "nightmare_rescript"}), (o:SkillOption {id: "nightmare_rescript:remind:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "remind", order: 26};

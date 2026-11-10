@@ -260,6 +260,48 @@
         "notification": "A plan you made is ready."
       },
       {
+        "id": "nightmare_rehearse",
+        "ownerModule": "er",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/nightmare-rescript?run={sourceSessionId}&at=rehearse&enterAt=rehearse&followUp={followUpId}",
+        "staleAfterHours": 36,
+        "missedPath": "none",
+        "notify": {
+          "ics": false,
+          "inTab": true,
+          "push": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "A read-through you asked for. A minute, eyes open.",
+          "title": "Your new version"
+        },
+        "choices": [
+          {
+            "id": "not_today",
+            "label": "Not today",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "12:00"
+            },
+            "tonight": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "21:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Something you asked to be reminded of is ready."
+      },
+      {
         "id": "oa_plan",
         "ownerModule": "er",
         "tier": "quality",

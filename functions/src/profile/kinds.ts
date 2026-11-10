@@ -11,7 +11,7 @@
  *
  * Pure: no firebase imports, so tests load it directly.
  */
-import { ValidationError, obj, str } from '../shared/validate';
+import { ValidationError, obj, str, strArray } from '../shared/validate';
 import { isAskFreshField } from '../userdata/layers';
 import { HHMM } from './meta';
 import type { ProfileAreaId, SliceId } from './types';
@@ -49,7 +49,31 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return { start, end };
     },
   },
+  // Rewrite the nightmare (ER-15, docs/design/nightmare-rescript.md): the new version the person kept, on the
+  // keep step's *Keep it in Me* (the runtime's keep, R4: `<field>Ids` / `<field>Own`). Where it starts, what
+  // changes, how it ends now: an option id or their own words each. Never what happens in the nightmare: no
+  // field asks it. ProfileFact like quiet_hours (no new label, plan D2), so Me lists it under My plans.
+  nightmare_script: {
+    kind: 'nightmare_script', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: null,
+    owner: 'ER', many: true, maxItems: 5, editor: null, ownFields: ['settingOwn', 'turnOwn', 'endingOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      for (const f of ['setting', 'turn', 'ending'] as const) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: 1, item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${f}Own`] = str(own, { max: f === 'setting' ? 60 : 90 });
+      }
+      for (const k of Object.keys(o)) if (!/^(setting|turn|ending)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      if (!out.turnIds && !out.turnOwn && !out.endingIds && !out.endingOwn) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
 };
+
+/** A skill option id (scripts/skills: snake_case). */
+const OPTION_ID = /^[a-z][a-z0-9_]*$/;
 
 /** The kind's definition, or a ValidationError (unknown kinds are refused, never guessed). */
 export function kindDef(kind: unknown): ProfileKindDef {

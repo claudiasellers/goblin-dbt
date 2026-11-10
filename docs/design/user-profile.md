@@ -199,6 +199,7 @@ moves in the same PR.
 | `safety_plan` (`SafetyPlan`) | My plans | CORE | CORE-02 (paused) | `safety.open`, server-side only |
 | `fade_levels` (`ProfileFact`) | My progress | CORE | CORE-12, via a fade offer (*yes*) | witness, MF |
 | `country` (`ProfileFact`) | About me | CORE | CORE-01 helplines | `CrisisBanner` |
+| `nightmare_script` (`ProfileFact`, many, own words encrypted) | My plans | ER | **Built:** ER-15 Rewrite the nightmare, on *Keep it in Me* (`docs/design/nightmare-rescript.md`) | Me only (a read-through reopens the visit's run, not the item) |
 
 **Outside the registry, on purpose:** `Part` / `PartLink` / `DenSnapshot` (parts keep their own writers,
 test-enforced, because a part is built from the stored session, never from client fields) and a
