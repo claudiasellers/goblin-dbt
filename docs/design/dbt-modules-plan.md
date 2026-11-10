@@ -381,8 +381,10 @@ Every lane holds to these. The clinical gate (§6, Gate 3) checks each one.
    stronger".
 8. **The safety batch is paused** (Claudia, 10 Nov; `/mnt/project-files/handoffs/safety-plan-resume.md`).
    Until it resumes: `safety.open` opens the interim crisis screen (D5); DT-03, the full medical screen,
-   IE-03's safe/risk fields, IE-01's safety question, IE-08 and DV resources wait for it, except what D4
-   brings forward. Every lane PR that touches one of those lists it under *Waits on the safety batch*.
+   IE-03's safe/risk fields and IE-01's safety question wait for it, except what D4 brings forward.
+   IE-08 does not wait (D14, Claudia 10 Nov): it builds now on the existing `other_person` banner and its DV
+   resources (911, then the DV Hotline, then 988), with R15 and a quick exit; fuller DV resources stay with
+   the safety batch. Every lane PR that touches one of those lists it under *Waits on the safety batch*.
 
 ### C7. Ownership
 
