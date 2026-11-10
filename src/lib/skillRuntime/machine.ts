@@ -430,7 +430,7 @@ export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { a
  * pre-fill from memory), at `at` if the record's path went through it. Ask-fresh fields are never restored:
  * they are asked again, so the run reopens no later than the first step on its path that asks one (what comes
  * after it may hang on that answer), and only the steps up to the one reopened bring their answers back (a later
- * step is asked again, never pre-filled). A hand-off reopened works out its offers again. Null when the record isn't
+ * step is asked again, never pre-filled); a field that books a reminder (`followUp.whenFrom`) is never read back. A hand-off reopened works out its offers again. Null when the record isn't
  * this skill's version or `at` isn't a step it reached. `keepFresh` is for the review page only (dev/
  * skills-review.tsx, which shows every step from a made-up run); the app never passes it.
  */
@@ -451,10 +451,13 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
     const st = stepOf(ctx.skill, id);
     return [...(st.fields ?? []).map((f) => f.id), ...(st.answerAs ? [st.answerAs] : [])];
   }));
+  // A chip that books a reminder (a followUp's `whenFrom`) is always a fresh tap: `scheduled` isn't restored, so a
+  // pick read back would book it a second time unasked.
+  const books = new Set(ctx.skill.steps.flatMap((st) => (st.followUp?.whenFrom ? [st.followUp.whenFrom] : [])));
   const answers: Answers = {};
   for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
     const fieldId = a.fieldId;
-    if (typeof fieldId !== 'string' || fresh.has(fieldId) || !onPath.has(fieldId) || !fieldOf(ctx.skill, fieldId)) continue;
+    if (typeof fieldId !== 'string' || fresh.has(fieldId) || !onPath.has(fieldId) || books.has(fieldId) || !fieldOf(ctx.skill, fieldId)) continue;
     const ids = Array.isArray(a.optionIds) ? (a.optionIds as unknown[]).filter((x): x is string => typeof x === 'string' && ID.test(x)) : [];
     const own = typeof a.valueOwn === 'string' && a.valueOwn.trim() ? a.valueOwn : null;
     answers[fieldId] = { ids, own };

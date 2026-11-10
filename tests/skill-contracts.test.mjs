@@ -496,7 +496,8 @@ test("resume: the run's own answers read back at a step it reached; ask-fresh an
   const s = m.resumeRun(ctx, rec, "check");
   assert.equal(s.stepId, "check");
   assert.deepEqual(s.path, ["who", "when", "check"]);
-  assert.deepEqual(Object.keys(s.answers).sort(), ["chip", "line"], "the ask-fresh change check is asked again; unknown fields dropped");
+  assert.deepEqual(Object.keys(s.answers).sort(), ["line"], "the ask-fresh change check is asked again; unknown fields dropped; the reminder chip (followUp.whenFrom) is never read back");
+  assert.equal(m.resumeRun(ctx, rec, "when").answers.chip, undefined, "reopened at the step that books it: still a fresh tap, since scheduled isn't restored");
   assert.equal(m.resumeRun(ctx, rec, "when").stepId, "when", "a step before the ask-fresh one: there");
   assert.deepEqual(Object.keys(m.resumeRun(ctx, rec, "who").answers), ["line"], "a later step's answers aren't read back: it is asked again, never pre-filled");
   assert.equal(m.resumeRun(ctx, rec, "end").stepId, "check", "past an ask-fresh step: back to it, since what follows may hang on it");
