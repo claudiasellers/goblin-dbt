@@ -51,6 +51,12 @@ test("CrisisBanner other_person: 911 first, the Hotline by call and text, 988 la
     assert.doesNotMatch(html, /role="alert"|aria-live="assertive"|aria-modal/, "alongside, never blocking");
     assert.equal(/data-testid="crisis-banner-compact"/.test(html), compact);
   }
+  // Compact packs into three rows (DT lane, gate 2): short visible labels, each carrying the full name to a screen reader.
+  const compact = renderToStaticMarkup(h(CrisisBanner, { compact: true, variant: "other_person" }));
+  assert.match(compact, /aria-label="Call 1-800-799-7233 \(National Domestic Violence Hotline\)"[^>]*>Call</);
+  assert.match(compact, /aria-label="Text START to 88788 \(National Domestic Violence Hotline\)"[^>]*>Text</);
+  assert.match(compact, />Call 911</);
+  assert.match(compact, />Call 988 \(Suicide &amp; Crisis Lifeline\)</);
   // The default is unchanged.
   const plain = renderToStaticMarkup(h(CrisisBanner, { compact: true }));
   assert.match(plain, /href="tel:988"[\s\S]*href="sms:741741\?body=HELLO"/);
