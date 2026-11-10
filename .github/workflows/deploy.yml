@@ -69,7 +69,9 @@ jobs:
         if: steps.plan.outputs.any == 'true'
         env:
           HAS_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
-          HAS_NEO4J: ${{ secrets.NEO4J_URI != '' && secrets.NEO4J_PASSWORD != '' }}
+          # All three: an unset NEO4J_USER makes the loader fall back to 'neo4j', which Aura refuses
+          # ("unauthorized") when the instance's user is its id, four minutes in.
+          HAS_NEO4J: ${{ secrets.NEO4J_URI != '' && secrets.NEO4J_USER != '' && secrets.NEO4J_PASSWORD != '' }}
         run: |
           ok=true
           if [ "${{ steps.plan.outputs.hosting }}" = true ]; then
@@ -82,7 +84,7 @@ jobs:
             [ "$HAS_SA" = true ] || { echo "::error::Secret FIREBASE_SERVICE_ACCOUNT is not set"; ok=false; }
           fi
           if [ "${{ steps.plan.outputs.graph }}" = true ] || [ -n "${{ steps.plan.outputs.migrations }}" ]; then
-            [ "$HAS_NEO4J" = true ] || { echo "::error::Secrets NEO4J_URI / NEO4J_PASSWORD are not set"; ok=false; }
+            [ "$HAS_NEO4J" = true ] || { echo "::error::Secrets NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD are not all set"; ok=false; }
           fi
           $ok
 
