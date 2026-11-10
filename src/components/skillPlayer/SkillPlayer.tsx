@@ -335,9 +335,10 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
 
   return (
     <div className="space-y-5" data-testid="skill-player" data-skill={skill.id} data-step={st.stepId}>
-      {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. */}
+      {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. P2 is
+          modal too: under it the step is inert, so a step that moves on underneath can't take focus from the dialog. */}
       {safetyOpen && <SafetyOpen onBack={() => setSafetyOpen(false)} />}
-      <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
+      <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen || p2Open} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
       {saveNote && <p role="status" className={`${secondaryText} text-center`}>{skill.copy.save_failed ?? "That didn't save just now. You can carry on."}</p>}
       {inline && !safetyOpen && (
         <div className="flex justify-center">
