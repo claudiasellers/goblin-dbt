@@ -11,7 +11,10 @@ CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
-# Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS); a test pins the two.
-EMBEDS = ("partsLine",)
+# Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
+# (EMBED_OUTPUTS there: ids, ownText, measures, danger); tests/skill-contracts.test.mjs keeps the two equal.
+EMBEDS = {
+    "partsLine": {},
+}
 # Shared tables the graph supplies to every skill (never written here).
 GRAPH_TABLES = ("parentOf", "fitsWhen")

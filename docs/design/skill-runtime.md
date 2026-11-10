@@ -98,20 +98,42 @@ links and conditional copy. No `eval`, nothing Turing-complete; the build checks
 | `{"all": […]}`, `{"any": […]}`, `{"not": c}` | as named |
 
 Refs: `$a.<field>` (first pick), `$a.<field>.ids` (all picks), `$a.<field>.own`, `$d.<name>` (derived),
-`$opt.<prop>` (the option under test). Derived values are lookups through tables: `{name: 'parent', from:
+`$opt.<prop>` (the option under test), `$ctx.<key>` (context in: one id, no suffix; only keys the skill
+`accepts`). Derived values are lookups through tables: `{name: 'parent', from:
 '$a.feel', table: 'parentOf'}`, `{name: 'set', from: '$d.parent', table: 'storySetOf', default:
 'general'}`, `{name: 'fitsParent', from: '$d.parent', table: 'fitsWhen', keep: 'key'}`.
 
 ### The run (`src/lib/skillRuntime/machine.ts`, pure)
 
-State: `{ stepId, path, answers: {fieldId: {ids, own}}, shown: embed records, exitId }`. Events: `pick`,
-`own`, `next`, `back`, `exit`. Rules every skill gets for free:
+State: `{ stepId, path, answers: {fieldId: {ids, own}}, shown: embed records, offered, exitId, out: {stepId:
+embed report} }`. Events: `pick`, `own`, `next`, `back`, `exit`, `shown`, `embedDone`. Rules every skill gets
+for free:
 
 - A pick past `max` swaps out the oldest (`swap`) or is ignored.
 - Picks of a field another field is grouped by (alternatives per story) are pruned when their group goes.
 - Answers of fields hidden by `showWhen` are dropped when leaving the step, so nothing hidden is saved.
 - `next` follows the first transition whose `when` holds; a step with `required` fields waits for them.
 - Answers are asked fresh each visit. Nothing is pre-filled from a past run.
+
+Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
+
+- **Context in.** A skill declares `accepts` (`urgeId`, `personId`, `frame`, `enterAt`, `situationId`, `partId`,
+  `band`, `returnTo`). `contextIn` keeps only those keys, ids only; `returnTo` must be an in-app path and is
+  never recorded; `band` must be one of the three bands, never comes from a link (the player strips it from the
+  query) and is never recorded (it is ask-fresh). `options.firstFrom: '$ctx.<key>'` puts that option first,
+  never selected.
+- **Whole-screen embeds.** A step of kind `embed` hands the screen to a registered embed (props, `ctx`, and the
+  run's answers as labels, `picked`). Its `onDone` output is cut to what its `EMBED_OUTPUTS` entry declares
+  (ids, `ownText`, measures; content.py `EMBEDS` mirrors it), its ids become the `answerAs` answer (ids only),
+  and the whole report goes in `out`. Own words from an embed are kept once, in `out`.
+- **Crisis slots.** `crisis: [{variant: 'crisis' | 'other_person', when}]` on any step (ask, embed, hand-off)
+  shows the compact `CrisisBanner` while `when` holds. An option or embed id marked `danger` needs a slot of its
+  variant that holds when it is picked (`build.py` and `tests/skill-contracts.test.mjs`).
+- **Exits.** A `planned` exit (a tool not built yet) is recorded in content but never offered or linked. The
+  reserved exit `safety_open` (`safety: true`, no tool, at most one per skill) opens `SafetyOpen` over the step,
+  which stays mounted underneath, and records `safety_open` in `embedsShown`; it is not a way out.
+- **Counting derive** (`kind: 'count'`: weighted picks summed, the table row with the largest threshold at or
+  below the total) and a per-field `own.max` under the skill's `ownMax` (≤ 140).
 
 ### The attempt record (what a router reads)
 
@@ -121,8 +143,10 @@ ext namespace, `ext.run`, registered once in `functions/src/spine/extSchemas.ts`
 ```
 ext.run = {
   skillId, versionId,                  // which skill and which version of it ran
-  path: [stepId…],                     // the screens it went through, in order (≤ 24)
-  answers: [{fieldId, optionIds, valueOwn?}…],  // what was chosen (≤ 16; own words length-checked only)
+  path: [stepId…],                     // the screens it went through, in order (≤ 48)
+  answers: [{fieldId, optionIds, valueOwn?}…],  // what was chosen (≤ 32; own words length-checked only)
+  ctx: {urgeId?, personId?, frame?, enterAt?, situationId?, partId?},  // context in, ids only (never band, returnTo)
+  out: [{embed, stepId, optionIds?, valueOwn?, durationSec?, doneCount?, earlyCount?}…],  // embed reports (≤ 8)
   offeredExitIds: [exitId…],           // what the hand-off offered (the router's counterfactual)
   exitId,                              // where it went: another tool, `done`, or absent (left early)
   embedsShown: [name…],                // e.g. `unblend`: the parts line showed

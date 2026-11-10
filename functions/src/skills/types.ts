@@ -81,6 +81,19 @@ export interface EmbedOutput {
   earlyCount?: number;
 }
 
+/**
+ * What an embed may report through `onDone` (src/components/skillPlayer/embeds.ts EMBED_OUTPUTS, mirrored in
+ * scripts/skills/content.py EMBEDS): the option ids it can produce, whether it takes own words (`ownText`), which
+ * measurements, and which of its ids can carry danger (each needs a crisis slot of its variant on the step). The
+ * machine drops anything an embed reports that its entry doesn't declare.
+ */
+export interface EmbedOutputSchema {
+  ids?: readonly string[];
+  ownText?: boolean;
+  measures?: ReadonlyArray<'durationSec' | 'doneCount' | 'earlyCount'>;
+  danger?: Readonly<Record<string, 'self' | 'other'>>;
+}
+
 export interface StepDef {
   id: string;
   kind: 'ask' | 'handoff' | 'embed';

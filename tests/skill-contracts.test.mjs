@@ -15,7 +15,16 @@ const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId
 const EXT_MAX_BYTES = 4096;
 
 const m = await importTs("src/lib/skillRuntime/machine.ts");
-const { validateExt } = await importTs("functions/src/spine/extSchemas.ts");
+const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX } = await importTs("functions/src/spine/extSchemas.ts");
+const conditions = await importTs("src/lib/skillRuntime/conditions.ts");
+/** content.py's EMBEDS: each embed's declared output (ids, ownText, measures, danger). */
+const EMBEDS_PY = py("from content import EMBEDS; print(json.dumps(EMBEDS))");
+/** embeds.ts's EMBED_OUTPUTS, read as the literal it is. */
+const EMBED_OUTPUTS_TS = (() => {
+  const src = read("src/components/skillPlayer/embeds.ts");
+  const block = /export const EMBED_OUTPUTS[^=]*=\s*(\{[\s\S]*?\n\});/.exec(src)[1];
+  return new Function(`return ${block}`)();
+})();
 
 const fields = (sk) => sk.steps.flatMap((s) => s.fields ?? []);
 
@@ -57,7 +66,7 @@ for (const sk of fixture.skills) {
   });
 
   test(`${sk.id}: embed steps and slots name registered embeds`, () => {
-    const embeds = py("from content import EMBEDS; print(json.dumps(list(EMBEDS)))");
+    const embeds = Object.keys(EMBEDS_PY);
     for (const st of sk.steps) {
       if (st.kind === "embed") {
         assert.ok(embeds.includes(st.embed), `${st.id}: ${st.embed}`);
@@ -67,13 +76,22 @@ for (const sk of fixture.skills) {
     }
   });
 
-  test(`${sk.id}: an option that can carry danger has a crisis slot of its variant on its step (C6.4)`, () => {
+  test(`${sk.id}: picking anything that can carry danger shows a crisis slot of its variant on its step (C6.4)`, () => {
+    // Not just "a slot exists": with that pick made, the step's slot holds. Embed ids an embed marks danger too.
+    const ctx = { skill: sk, shared: fixture, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn: {}, embedOutputs: EMBEDS_PY };
+    const want = (d) => (d === "other" ? "other_person" : "crisis");
     for (const st of sk.steps) {
       for (const f of st.fields ?? []) {
         for (const o of sk.options[f.options.list] ?? []) {
           if (!o.danger) continue;
-          const want = o.danger === "other" ? "other_person" : "crisis";
-          assert.ok((st.crisis ?? []).some((c) => c.variant === want), `${st.id}.${f.id}: ${o.value} needs a ${want} slot`);
+          const slot = m.crisisFor(ctx, st, { answers: { [f.id]: { ids: [o.value], own: null } } });
+          assert.equal(slot?.variant, want(o.danger), `${st.id}.${f.id}: ${o.value} needs a ${want(o.danger)} slot that holds`);
+        }
+      }
+      if (st.kind === "embed" && st.answerAs) {
+        for (const [v, d] of Object.entries(EMBEDS_PY[st.embed]?.danger ?? {})) {
+          const slot = m.crisisFor(ctx, st, { answers: { [st.answerAs]: { ids: [v], own: null } } });
+          assert.equal(slot?.variant, want(d), `${st.id}: ${st.embed} id ${v} needs a ${want(d)} slot that holds`);
         }
       }
     }
@@ -96,8 +114,21 @@ for (const sk of fixture.skills) {
       const own = f.own ? "愛".repeat(Math.min(f.own.max ?? sk.ownMax, sk.ownMax)) : null;
       return { fieldId: f.id, optionIds: pick, ...(own ? { valueOwn: own } : {}) };
     });
+    // Every recorded context key at the id cap, and each embed step's report at what its embed declares.
+    const id64 = "x".repeat(64);
+    const ctxRec = Object.fromEntries(Object.keys(EXT_SCHEMAS.run.ctx.of).map((k) => [k, id64]));
+    const out = sk.steps.filter((st) => st.kind === "embed").slice(0, 8).map((st) => {
+      const d = EMBEDS_PY[st.embed] ?? {};
+      return {
+        embed: st.embed, stepId: st.id,
+        ...(d.ids?.length ? { optionIds: Array(12).fill(longest(d.ids)) } : {}),
+        ...(d.ownText ? { valueOwn: "愛".repeat(sk.ownMax) } : {}),
+        ...Object.fromEntries((d.measures ?? []).map((k) => [k, 3600])),
+      };
+    });
     const run = {
       skillId: sk.id, versionId: sk.version, path: Array(48).fill(stepId), answers: answers.slice(0, 32),
+      ctx: ctxRec, ...(out.length ? { out } : {}),
       offeredExitIds: sk.exits.slice(0, 8).map((x) => x.id), exitId: longest(sk.exits.map((x) => x.id)),
       embedsShown: ["safety_open"],
       handoffs: [{ primitiveId: "sigh", completed: true, durationSec: 60, thenVsNow: "better", resumed: true, overridden: false }],
@@ -111,15 +142,28 @@ for (const sk of fixture.skills) {
 test("embeds: one registry in the player, the same names in content.py, and every embed declares what it reports", () => {
   const src = read("src/components/skillPlayer/embeds.ts");
   const keys = (name) => [...(new RegExp(`export const ${name}[^{]*\\{([\\s\\S]*?)\\n\\};`).exec(src)[1].matchAll(/^\s*([A-Za-z]+)\s*[,:]/gm))].map((x) => x[1]).sort();
-  const listed = py("from content import EMBEDS; print(json.dumps(sorted(EMBEDS)))");
+  const listed = Object.keys(EMBEDS_PY).sort();
   assert.deepEqual(keys("EMBEDS"), listed);
-  assert.deepEqual(keys("EMBED_OUTPUTS"), listed);
+  assert.deepEqual(Object.keys(EMBED_OUTPUTS_TS).sort(), listed);
+  // What each embed may report is the same on both sides (the machine keeps only what is declared).
+  assert.deepEqual(EMBED_OUTPUTS_TS, EMBEDS_PY);
+});
+
+test("own-words cap: build.py and the server's schema agree", () => {
+  const m2 = /^RUN_OWN_MAX = (\d+)/m.exec(read("scripts/skills/build.py"));
+  assert.equal(Number(m2[1]), RUN_OWN_MAX);
 });
 
 test("ext.run: free text only on own-words keys, so every own-words value is one the server encrypts (C1 rule 7)", () => {
-  const src = read("functions/src/spine/extSchemas.ts");
-  const run = src.slice(src.indexOf("  run: {"));
-  const textKeys = [...run.matchAll(/(\w+): \{ t: 'text'/g)].map((x) => x[1]);
+  // Walk the schema itself, nested objects included.
+  const textKeys = [];
+  const walk = (fields) => {
+    for (const [k, f] of Object.entries(fields)) {
+      if (f.t === "text") textKeys.push(k);
+      if (f.t === "obj" || f.t === "objs") walk(f.of);
+    }
+  };
+  walk(EXT_SCHEMAS.run);
   assert.ok(textKeys.length > 0);
   for (const k of textKeys) assert.match(k, /Own$/, k);
   // The machine records own words only as valueOwn (answers and embed outputs).
@@ -146,13 +190,13 @@ const SKILL = {
       { id: "q1", options: { list: "yn" }, max: 1 }, { id: "q2", options: { list: "yn" }, max: 1 },
     ], next: [{ to: "end", when: null }], offers: [] },
     { id: "end", kind: "handoff", next: [], offers: [
-      { exit: "built", when: null }, { exit: "later", when: null }, { exit: "help", when: null },
+      { exit: "built", when: null }, { exit: "later", when: null }, { exit: "safety_open", when: null },
     ], done: "done" },
   ],
   exits: [
     { id: "built", toolId: "problem-solve", query: {}, carry: [], done: false },
     { id: "done", toolId: null, query: {}, carry: [], done: true },
-    { id: "help", toolId: null, query: {}, carry: [], done: false, safety: true },
+    { id: "safety_open", toolId: null, query: {}, carry: [], done: false, safety: true },
     { id: "later", toolId: "let-it-be", query: {}, carry: [], done: false, planned: true },
   ],
   options: {
@@ -160,16 +204,32 @@ const SKILL = {
     yn: [opt("yes"), opt("not_sure"), opt("no")],
   },
 };
-const ctxOf = (ctxIn) => ({ skill: SKILL, shared: { parentOf: {}, fitsWhen: {} }, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn });
+// The probe's embed declares what it reports here, as EMBED_OUTPUTS would.
+const PROBE_OUTPUTS = { partsLine: { ids: ["held", "no"], measures: ["durationSec", "earlyCount"] } };
+const ctxOf = (ctxIn, skill = SKILL) => ({
+  skill, shared: { parentOf: {}, fitsWhen: {} }, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn, embedOutputs: PROBE_OUTPUTS,
+});
 const go = (ctx, events, s = m.initialRun(SKILL)) => events.reduce((st, e) => m.runNext(ctx, st, e), s);
 
 test("context in: only accepted keys, ids only, returnTo an in-app path; $ctx refs read it", () => {
   assert.deepEqual(m.contextIn(SKILL, { urgeId: "send", personId: "p1", situationId: "../x", returnTo: "/tool/x?a=1", band: "flooded" }),
     { urgeId: "send", returnTo: "/tool/x?a=1" });
   assert.deepEqual(m.contextIn(SKILL, { returnTo: "//evil.example" }), {});
+  // A context value is one id: suffixes mean nothing on it.
+  assert.equal(conditions.resolve("$ctx.urgeId.ids", { answers: {}, derived: {}, ctx: { urgeId: "send" } }), null);
   const step = SKILL.steps[0];
   assert.equal(m.shownFields(ctxOf({}), step, m.initialRun(SKILL)).length, 1);
   assert.equal(m.shownFields(ctxOf({ urgeId: "send" }), step, m.initialRun(SKILL)).length, 0, "the host sent the urge: not asked");
+});
+
+test("band: only one of the three bands steers a run, and it is never recorded (C4.6)", () => {
+  const withBand = { ...SKILL, accepts: [...SKILL.accepts, "band"] };
+  assert.deepEqual(m.contextIn(withBand, { band: "flooded" }), { band: "flooded" });
+  assert.deepEqual(m.contextIn(withBand, { band: "panicking" }), {});
+  const ctx = ctxOf({ band: "flooded", urgeId: "send" }, withBand);
+  const rec = m.runRecord(ctx, m.initialRun(withBand));
+  assert.deepEqual(rec.ctx, { urgeId: "send" });
+  assert.equal(EXT_SCHEMAS.run.ctx.of.band, undefined, "the server has no band in ext.run.ctx");
 });
 
 test("option first from context: first, never selected", () => {
@@ -195,10 +255,14 @@ test("embed step: its output is answered as answerAs, measured in out, and the r
   const ctx = ctxOf({ urgeId: "send" });
   let s = go(ctx, [{ type: "next" }]);
   assert.equal(s.stepId, "hold");
-  s = m.runNext(ctx, s, { type: "embedDone", output: { ids: ["held", "../bad"], durationSec: 95, earlyCount: 2, doneCount: 1.5 } });
+  s = m.runNext(ctx, s, { type: "embedDone", output: { ids: ["held", "../bad", "undeclared"], own: "secret", durationSec: 95, earlyCount: 2, doneCount: 3 } });
   assert.equal(s.stepId, "size");
-  assert.deepEqual(s.answers.held, { ids: ["held"], own: null });
+  assert.deepEqual(s.answers.held, { ids: ["held"], own: null }, "answerAs takes ids only");
+  // Only what the embed declares: no own words (no ownText), no doneCount (not a declared measure).
   assert.deepEqual(s.out.hold, { embed: "partsLine", stepId: "hold", ids: ["held"], own: null, durationSec: 95, doneCount: undefined, earlyCount: 2 });
+  const quiet = m.runNext({ ...ctx, embedOutputs: {} }, go(ctx, [{ type: "next" }]), { type: "embedDone", output: { ids: ["held"], durationSec: 9 } });
+  assert.deepEqual(quiet.out.hold.ids, [], "an embed with no entry reports nothing");
+  assert.equal(quiet.out.hold.durationSec, undefined);
   const notHeld = m.runNext(ctx, go(ctx, [{ type: "next" }]), { type: "embedDone", output: { ids: [] } });
   assert.equal(notHeld.stepId, "end");
 });
@@ -216,12 +280,24 @@ test("planned exits are never offered; safety.open is not a way out; the record 
   const ctx = ctxOf({ urgeId: "send", situationId: "leave", returnTo: "/x" });
   let s = go(ctx, [{ type: "next" }, { type: "embedDone", output: { ids: ["no"] } }]);
   assert.equal(s.stepId, "end");
-  assert.deepEqual(s.offered, ["built", "help"]);
-  assert.equal(m.runNext(ctx, s, { type: "exit", exitId: "help" }).exitId, null);
+  assert.deepEqual(s.offered, ["built", "safety_open"]);
+  assert.equal(m.runNext(ctx, s, { type: "exit", exitId: "safety_open" }).exitId, null);
   assert.equal(m.runNext(ctx, s, { type: "exit", exitId: "later" }).exitId, null);
   s = m.runNext(ctx, s, { type: "exit", exitId: "built" });
   const rec = m.runRecord(ctx, s);
   assert.deepEqual(rec.ctx, { urgeId: "send", situationId: "leave" }, "returnTo steers; it isn't kept");
   assert.deepEqual(rec.out, [{ embed: "partsLine", stepId: "hold", optionIds: ["no"] }]);
   assert.doesNotThrow(() => validateExt({ run: rec }));
+});
+
+test("picked labels: what an embed reads back, labels in pick order, own words last", () => {
+  const ctx = ctxOf({});
+  const picked = go(ctx, [{ type: "pick", fieldId: "urge", value: "leave" }, { type: "pick", fieldId: "q1", value: "not_sure" }]);
+  assert.deepEqual(m.pickedLabels(ctx, picked), { urge: ["leave"], q1: ["not_sure"] });
+  // The probe's urge counts own words as its one pick, so they replace the chip.
+  const own = go(ctx, [{ type: "pick", fieldId: "urge", value: "leave" }, { type: "own", fieldId: "urge", text: "  slam it  " }]);
+  assert.deepEqual(m.pickedLabels(ctx, own), { urge: ["slam it"] });
+  const both = { answers: { urge: { ids: ["send"], own: "my way" } } };
+  assert.deepEqual(m.pickedLabels(ctx, both), { urge: ["send", "my way"] });
+  assert.deepEqual(m.pickedLabels(ctx, m.initialRun(SKILL)), {});
 });

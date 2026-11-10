@@ -450,8 +450,9 @@ and both are tested best with that embed. The keep and follow-up contract checks
 - R3 profile reads, R4 keep action, R5 follow-up action, R7 `urge_change` close, R8 inline mode, R9
   resume, R13 `useDeadlineTimer`, R14 the empty projection registry, `playerTools.ts` and
   `tests/fixtures/legacy-exits.json` (C8).
-- Own-words encryption: register `run: ['answers[].valueOwn', 'out[].valueOwn']` in the profile thread's
-  `ownWordsPaths`, so `ext.run` own words go through `encryptOwn` / `decryptOwn` (C1 rule 7).
+- Own-words encryption: nothing to register. PR #55 encrypts every `text` field of `EXT_SCHEMAS` at close
+  (`spine/extOwn.ts`), so `ext.run`'s `valueOwn` (answers and `out`) is covered; readers call `decryptExtOwn`.
+  `tests/skill-contracts.test.mjs` keeps free text in `ext.run` on `*Own` keys only (C1 rule 7).
 - Contract checks for keep actions (registered kinds) and follow-up actions (registered types).
 - Shared embeds `witness` and `holdRing` (C3b).
 - **The skill review harness**, extending `dev/review/` (which already renders Parts and Cope Ahead with

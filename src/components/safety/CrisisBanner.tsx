@@ -45,9 +45,9 @@ export type CrisisBannerVariant = 'crisis' | 'other_person';
 /** National crisis lines outside the US: country, then each line. */
 const OUTSIDE_US = [
   { country: 'UK and Ireland', links: [{ href: 'tel:116123', label: 'Call 116 123 (Samaritans)' }] },
-  { country: 'Canada', links: [{ href: 'tel:988', label: 'Call or text 988' }] },
+  { country: 'Canada', links: [{ href: 'tel:988', label: 'Call 988' }, { href: 'sms:988', label: 'Text 988' }] },
   { country: 'Australia', links: [{ href: 'tel:131114', label: 'Call 13 11 14 (Lifeline)' }] },
-  { country: 'New Zealand', links: [{ href: 'tel:1737', label: 'Call or text 1737' }] },
+  { country: 'New Zealand', links: [{ href: 'tel:1737', label: 'Call 1737' }, { href: 'sms:1737', label: 'Text 1737' }] },
 ] as const;
 
 function OutsideUs({ compact }: { compact: boolean }) {
@@ -59,7 +59,7 @@ function OutsideUs({ compact }: { compact: boolean }) {
           <li key={c.country}>
             <span className="block">{c.country}</span>
             {c.links.map((l) => (
-              <a key={l.href + c.country} href={l.href} className="inline-flex items-center min-h-11 underline">{l.label}</a>
+              <a key={l.href + c.country} href={l.href} className="inline-flex items-center min-h-11 mr-4 underline">{l.label}</a>
             ))}
           </li>
         ))}

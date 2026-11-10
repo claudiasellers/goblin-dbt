@@ -40,7 +40,8 @@ export function resolve(v: unknown, scope: Scope): unknown {
     return a?.ids[0] ?? null;
   }
   if (kind === 'd') return scope.derived[name] ?? null;
-  if (kind === 'ctx') return scope.ctx?.[name] ?? null;
+  // A context value is one id: `.ids` / `.own` mean nothing on it (build.py refuses them too).
+  if (kind === 'ctx') return part ? null : scope.ctx?.[name] ?? null;
   return (scope.opt as Record<string, unknown> | undefined)?.[name] ?? null;
 }
 

@@ -6,11 +6,13 @@
  * Rules every skill gets: picks past `max` swap out the oldest (`swap`) or are ignored; a pick that its
  * field's filter or group no longer offers is dropped; answers of fields hidden by `showWhen` are dropped
  * when the step is left; `next` follows the first transition that holds; nothing is pre-filled from a past run.
- * A whole-screen embed step ends with `embedDone`: its option ids become the `answerAs` answer, its measurements
- * the run's `out`, and the run goes on. Context in (`$ctx.*`) is only what the skill `accepts`, ids only.
+ * A whole-screen embed step ends with `embedDone`: only what its EMBED_OUTPUTS entry declares is kept; its option
+ * ids become the `answerAs` answer (ids only: own words are kept once, in `out`), its measurements and own words
+ * the run's `out`, and the run goes on. Context in (`$ctx.*`) is only what the skill `accepts`, ids only; `band`
+ * only one of the three bands, and never from a link (the player strips it from the query: R1, C4.6).
  * Planned exits (tools not built yet) are never offered or linked.
  */
-import type { CrisisSlot, EmbedOutput, ExitDef, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
+import type { CrisisSlot, EmbedOutput, EmbedOutputSchema, ExitDef, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
 import { holds, resolve, type Answer, type Answers, type Scope } from './conditions';
 
 export type { Answer, Answers } from './conditions';
@@ -27,6 +29,8 @@ export interface RunContext {
   emotionLabel: (id: string) => string;
   /** Context in (`$ctx.*`), already narrowed by `contextIn` to the keys the skill accepts. */
   ctxIn?: Readonly<Record<string, string>>;
+  /** What each embed may report (embeds.ts EMBED_OUTPUTS). An embed with no entry reports nothing. */
+  embedOutputs?: Readonly<Record<string, EmbedOutputSchema>>;
 }
 
 /** One whole-screen embed's report, as the run keeps it (and `ext.run.out` records it). */
@@ -66,8 +70,12 @@ export interface OptionGroup {
 
 const PATH_MAX = 48;
 const ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
-/** Context keys that are recorded (`returnTo` is a path, not an id: it steers, it isn't kept). */
-const RECORDED_CTX = ['urgeId', 'personId', 'frame', 'enterAt', 'situationId', 'partId', 'band'] as const;
+/**
+ * Context keys that are recorded. `returnTo` is a path: it steers, it isn't kept. `band` is ask-fresh: it may
+ * steer this run (carried by `band.current()`), but it is never recorded or carried on (C4.6).
+ */
+const RECORDED_CTX = ['urgeId', 'personId', 'frame', 'enterAt', 'situationId', 'partId'] as const;
+const BAND_VALUES = new Set(['steady', 'stirred', 'flooded']);
 const EMPTY: Answer = { ids: [], own: null };
 
 export function initialRun(skill: SkillDef): RunState {
@@ -83,7 +91,10 @@ export function contextIn(skill: SkillDef, raw: Record<string, unknown>): Record
   for (const key of skill.accepts ?? []) {
     const v = raw[key];
     if (typeof v !== 'string') continue;
-    if (key === 'returnTo' ? /^\/[A-Za-z0-9/_?=&.-]{0,200}$/.test(v) && !v.startsWith('//') : ID.test(v)) out[key] = v;
+    const ok = key === 'returnTo' ? /^\/[A-Za-z0-9/_?=&.-]{0,200}$/.test(v) && !v.startsWith('//')
+      : key === 'band' ? BAND_VALUES.has(v)
+        : ID.test(v);
+    if (ok) out[key] = v;
   }
   return out;
 }
@@ -290,14 +301,20 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const step = stepOf(ctx.skill, s.stepId);
       if (step.kind !== 'embed' || !step.embed) return s;
       const o = e.output;
-      const ids = (o.ids ?? []).filter((v) => typeof v === 'string' && ID.test(v)).slice(0, 12);
-      const own = typeof o.own === 'string' && o.own.trim() ? o.own.trim().slice(0, ctx.skill.ownMax) : null;
-      const n = (v: unknown, max: number) => (typeof v === 'number' && Number.isInteger(v) && v >= 0 ? Math.min(v, max) : undefined);
+      const decl = ctx.embedOutputs?.[step.embed] ?? {};
+      const allowed = new Set(decl.ids ?? []);
+      const ids = (o.ids ?? []).filter((v) => typeof v === 'string' && ID.test(v) && allowed.has(v)).slice(0, 12);
+      const own = decl.ownText && typeof o.own === 'string' && o.own.trim() ? o.own.trim().slice(0, ctx.skill.ownMax) : null;
+      const measures = new Set(decl.measures ?? []);
+      const n = (k: 'durationSec' | 'doneCount' | 'earlyCount', max: number) => {
+        const v = o[k];
+        return measures.has(k) && typeof v === 'number' && Number.isInteger(v) && v >= 0 ? Math.min(v, max) : undefined;
+      };
       const rec: EmbedRecord = {
         embed: step.embed, stepId: step.id, ids, own,
-        durationSec: n(o.durationSec, 3600), doneCount: n(o.doneCount, 100), earlyCount: n(o.earlyCount, 100),
+        durationSec: n('durationSec', 3600), doneCount: n('doneCount', 100), earlyCount: n('earlyCount', 100),
       };
-      const answers = step.answerAs ? { ...s.answers, [step.answerAs]: { ids, own } } : s.answers;
+      const answers = step.answerAs ? { ...s.answers, [step.answerAs]: { ids, own: null } } : s.answers;
       return runNext(ctx, { ...s, answers, out: { ...s.out, [step.id]: rec } }, { type: 'next' });
     }
     case 'next': {
@@ -371,6 +388,22 @@ export function fieldLinks(ctx: RunContext, field: FieldDef, s: Pick<RunState, '
     const exit = ctx.skill.exits.find((x) => x.id === l.exit && !x.planned);
     return exit ? [{ exit, label: ctx.skill.copy[l.label] ?? l.label }] : [];
   });
+}
+
+/**
+ * The run's answers as the person saw them, for an embed to read back (`EmbedProps.picked`): each answered
+ * field's labels in pick order (grid words as the grid shows them, list options by their label), own words last.
+ */
+export function pickedLabels(ctx: RunContext, s: Pick<RunState, 'answers'>): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const [fieldId, a] of Object.entries(s.answers)) {
+    const f = fieldOf(ctx.skill, fieldId);
+    const list = f?.options.list ? ctx.skill.options[f.options.list] ?? [] : [];
+    const labels = a.ids.map((id) => (f?.options.emotions ? ctx.emotionLabel(id) : list.find((o) => o.value === id)?.label ?? id));
+    if (a.own?.trim()) labels.push(a.own.trim());
+    if (labels.length) out[fieldId] = labels;
+  }
+  return out;
 }
 
 /** The emotions this run names (the skill's `emotionFields`): the session's `setEmotionIds`. */

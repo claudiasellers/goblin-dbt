@@ -13,7 +13,8 @@ REF = re.compile(r"^\$(a|d|opt|ctx)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
 # Context keys a skill may accept (src/data/skillTypes.ts CtxKey).
 CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo"}
 CRISIS_VARIANTS = {"crisis", "other_person"}
-RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX
+RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
+SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
 
 
@@ -47,6 +48,7 @@ def check_cond(c, fields, derived, where, accepts=None):
                 assert name in derived, (where, "unknown derived value", r)
             if kind == "ctx":
                 assert accepts is not None and name in accepts, (where, "context the skill doesn't accept", r)
+                assert r.count(".") == 1, (where, "a context value is one id: no .ids / .own", r)
     if op in ("all", "any"):
         for x in arg:
             check_cond(x, fields, derived, where, accepts)
@@ -90,13 +92,17 @@ def check(skill):
                 float(k)  # a count's table is keyed by thresholds
         else:
             assert d.get("kind", "lookup") == "lookup" and isinstance(d.get("from"), str), (sid, d)
+    assert sum(1 for e in skill["exits"] if e.get("safety")) <= 1, (sid, "one safety.open exit at most")
     for e in skill["exits"]:
         if e.get("safety"):
+            assert e["id"] == SAFETY_EXIT_ID, (sid, f"the safety.open exit has the reserved id {SAFETY_EXIT_ID}", e)
             assert not e.get("toolId") and not e.get("planned") and not e.get("done"), (sid, "safety.open opens no tool", e)
-        elif e.get("planned"):
-            assert e.get("toolId") and e["toolId"] not in tools, (sid, "a planned exit names a tool that isn't built (flip it when it is)", e)
         else:
-            assert e.get("done") or e.get("toolId") in tools, (sid, e)
+            assert e["id"] != SAFETY_EXIT_ID, (sid, f"{SAFETY_EXIT_ID} is reserved for safety.open", e)
+            if e.get("planned"):
+                assert e.get("toolId") and e["toolId"] not in tools, (sid, "a planned exit names a tool that isn't built (flip it when it is)", e)
+            else:
+                assert e.get("done") or e.get("toolId") in tools, (sid, e)
         for f in e.get("carry", []):
             assert f in fields, (sid, e)
     for s in skill["steps"]:
@@ -105,6 +111,10 @@ def check(skill):
         if s["kind"] == "embed":
             assert s.get("embed") in EMBEDS, (w, "a whole-screen embed the player has", s.get("embed"))
             assert not s.get("fields"), (w, "an embed step has no fields; its output is `answerAs`")
+            for v, kind in EMBEDS[s["embed"]].get("danger", {}).items():
+                want = "other_person" if kind == "other" else "crisis"
+                assert any(c["variant"] == want for c in s.get("crisis", [])), (
+                    w, f"embed id {v} can carry danger: the step declares a {want} crisis slot (plan C6.4)")
         else:
             assert "embed" not in s and "answerAs" not in s, (w, "only embed steps name an embed")
         for slot in s.get("crisis", []):

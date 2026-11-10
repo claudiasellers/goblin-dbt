@@ -10,7 +10,7 @@ import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
   askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, emotionChoices, fieldLinks, fieldList, handoffLine,
-  initialRun, optionGroups, ownMaxOf, runEmotionIds, runNext, runRecord, scope, shownFields, stepOf, titleSlots,
+  initialRun, optionGroups, ownMaxOf, pickedLabels, runEmotionIds, runNext, runRecord, scope, shownFields, stepOf, titleSlots,
   type RunContext, type RunEvent, type RunState,
 } from '../../lib/skillRuntime/machine';
 import { holds } from '../../lib/skillRuntime/conditions';
@@ -23,7 +23,7 @@ import { SessionClose } from '../spine/SessionClose';
 import { EmotionPicker } from '../tools/EmotionPicker';
 import { Chip, Line, Prompt } from '../tools/wiseMind/bits';
 import { choiceButton, linkButton, primaryButton, secondaryText } from '../tools/oppositeAction/styles';
-import { EMBEDS } from './embeds';
+import { EMBEDS, EMBED_OUTPUTS } from './embeds';
 
 /**
  * The skill player (docs/design/skill-runtime.md): runs any skill from skills.json inside the page's
@@ -65,7 +65,9 @@ const emotionLabel = (id: string) => (getEmotionById(id)?.name ?? id.replace(/_/
 
 /** Context in: the query's keys, then route state's `skillCtx`, narrowed by `contextIn` to what the skill accepts. */
 function contextFrom(skill: SkillDef, search: string, state: unknown): Record<string, string> {
-  const q = Object.fromEntries(new URLSearchParams(search));
+  // The band never comes from a link: only a hand-off's route state (band.current()) carries it (C4.6, C6.2).
+  const { band: _band, ...q } = Object.fromEntries(new URLSearchParams(search));
+  void _band;
   const fromState = (state && typeof state === 'object' && 'skillCtx' in state ? (state as { skillCtx?: unknown }).skillCtx : null);
   return contextIn(skill, { ...q, ...(fromState && typeof fromState === 'object' ? fromState as Record<string, unknown> : {}) });
 }
@@ -84,6 +86,7 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   const [ctxIn] = useState(() => contextFrom(skill, location.search, location.state));
   const ctx = useMemo<RunContext>(() => ({
     skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn,
+    embedOutputs: EMBED_OUTPUTS,
   }), [skill, content, carried, ctxIn]);
   const [safetyOpen, setSafetyOpen] = useState(false);
   const [st, setSt] = useState<RunState>(() => initialRun(skill));
@@ -134,9 +137,7 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   const onShown = useCallback((record: string) => send({ type: 'shown', record }), [send]);
 
   let body: ReactNode;
-  if (safetyOpen) {
-    body = <SafetyOpen onBack={() => setSafetyOpen(false)} />;
-  } else if (leaving) {
+  if (leaving) {
     body = (
       <div className="space-y-4">
         <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />
@@ -160,7 +161,9 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
 
   return (
     <div className="space-y-5" data-testid="skill-player" data-skill={skill.id} data-step={st.stepId}>
-      <div key={safetyOpen ? 'safety' : leaving ? 'leaving' : st.stepId} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
+      {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. */}
+      {safetyOpen && <SafetyOpen onBack={() => setSafetyOpen(false)} />}
+      <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
       {!leaving && !safetyOpen && (
         <div className="flex justify-center">
           <TooMuchLink host={skill.toolId} onResult={(r) => {
@@ -204,7 +207,7 @@ function AskStep({ ctx, step, st, send, onExit, onShown }: {
             const show = holds(s.showWhen, sc);
             return (
               <div key={`${s.embed}:${s.record}`} className="min-h-6">
-                {Embed && show ? <Embed props={s.props ?? {}} onShown={() => onShown(s.record)} /> : null}
+                {Embed && show ? <Embed props={s.props ?? {}} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} onShown={() => onShown(s.record)} /> : null}
               </div>
             );
           })}
@@ -230,7 +233,7 @@ function EmbedStep({ ctx, step, st, send, onShown }: {
   return (<>
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
-    <Embed props={step.props ?? {}} ctx={ctx.ctxIn ?? {}} onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
+    <Embed props={step.props ?? {}} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
   </>);
 }
 
@@ -294,21 +297,26 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
   );
 }
 
-/** One card: the line, the offers named from tools.ts (the first primary), and a quiet Done. */
+/**
+ * One card: the line, the offers named from tools.ts (the first primary), and a quiet Done. A `safety.open` exit
+ * has no tool: it is named by the skill's `safety_open` copy and opens SafetyOpen through `onExit`.
+ */
 function HandoffCard({ ctx, step, st, onExit }: { ctx: RunContext; step: StepDef; st: RunState; onExit: (x: ExitDef) => void }) {
   const c = ctx.skill.copy;
   const line = handoffLine(ctx, step, st);
   const offers = st.offered
     .map((id) => ctx.skill.exits.find((x) => x.id === id))
-    .filter((x): x is ExitDef => !!x && !!x.toolId && !!getToolById(x.toolId));
+    .filter((x): x is ExitDef => !!x && (!!x.safety || (!!x.toolId && !!getToolById(x.toolId))));
   const done = step.done ? ctx.skill.exits.find((x) => x.id === step.done) : undefined;
-  return (
+  const crisis = crisisFor(ctx, step, st);
+  return (<>
+    {crisis && <CrisisBanner compact variant={crisis.variant} />}
     <section className="space-y-4 p-5 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]" data-testid="skill-handoff">
       {line && <Prompt serif>{line}</Prompt>}
       <div className="space-y-2">
         {offers.map((x, i) => (
           <button key={x.id} type="button" className={i === 0 ? primaryButton : choiceButton} data-exit={x.id} onClick={() => onExit(x)}>
-            {getToolById(x.toolId!)?.name}
+            {x.safety ? (c.safety_open ?? 'Talk to someone now') : getToolById(x.toolId!)?.name}
           </button>
         ))}
       </div>
@@ -318,5 +326,5 @@ function HandoffCard({ ctx, step, st, onExit }: { ctx: RunContext; step: StepDef
         </div>
       )}
     </section>
-  );
+  </>);
 }
