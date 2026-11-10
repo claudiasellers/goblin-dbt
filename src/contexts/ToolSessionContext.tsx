@@ -16,11 +16,18 @@ import type { CapacityReading } from '../data/capacityTypes';
  * `close()` or, failing that, when the page unmounts: completed if the tool reached its completion
  * screen, else exited early. A killed tab leaves it open, which reads as abandoned (derived).
  */
-export function ToolSessionProvider({ toolId, children }: { toolId: string; children: ReactNode }) {
+/**
+ * `inside`: a sub-run inside another tool's screen (plan C1 rule 5, R8): entry `embedded`, the host's session
+ * as `hostSessionId`, nothing read from the page's address (the host owns that).
+ */
+export function ToolSessionProvider({ toolId, inside, children }: { toolId: string; inside?: { hostSessionId: string }; children: ReactNode }) {
   const { user } = useAuth();
   const location = useLocation();
   const [id] = useState(() => newId());
   const [link] = useState(() => {
+    if (inside) {
+      return { entry: 'embedded', checkInId: undefined, hostSessionId: inside.hostSessionId, followUpId: undefined, patternId: undefined, emotionIds: [] as string[] } as const;
+    }
     const spine = spineFrom(location.state);
     const followUp = new URLSearchParams(location.search).get('followUp');
     const patternId = (location.state as { activationPatternId?: unknown } | null)?.activationPatternId;
@@ -114,6 +121,10 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
       followUpId: link.followUpId,
       closeKind: closeKindFor(toolId),
       persisted: uid !== null,
+      // A child's mount effect runs before this provider's start effect: give the start one turn to begin.
+      ready: () => (started.current ?? (uid
+        ? new Promise<boolean>((r) => { setTimeout(() => { void (started.current ?? Promise.resolve(false)).then(r); }, 0); })
+        : Promise.resolve(false))),
       setStep: (s) => { step.current = s; },
       markPracticed: () => { practiced.current = true; },
       markComplete: () => { complete.current = true; },

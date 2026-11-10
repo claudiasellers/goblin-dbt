@@ -80,14 +80,16 @@ test("chips: up to four, in the slice's order (most recently visited first); nam
 
 /** A tool's page file, from src/pages/ToolPage.tsx's toolComponents map. */
 const toolPage = read("src/pages/ToolPage.tsx");
+const playerTools = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
 const pageOf = (id) => {
+  // A skill on the runtime (docs/design/skill-runtime.md; the switch, playerTools.ts) has no screens of its own:
+  // the player closes it.
+  if (playerTools.includes(`'${id}': '`)) return "src/components/skillPlayer/SkillPlayer.tsx";
   const comp = toolPage.match(new RegExp(`'${id}': (\\w+),`))?.[1];
   const file = comp && (toolPage.match(new RegExp(`import \\{ ${comp} \\} from '\\./tools/(\\w+)'`))?.[1]
     ?? toolPage.match(new RegExp(`const Lazy${comp} = lazy\\(\\(\\) => import\\('\\./tools/(\\w+)'\\)`))?.[1]);
   if (!file) return null;
-  const page = `src/pages/tools/${file}.tsx`;
-  // A skill on the runtime (docs/design/skill-runtime.md) has no screens of its own: the player closes it.
-  return /<SkillPlayer skillId=/.test(read(page)) ? "src/components/skillPlayer/SkillPlayer.tsx" : page;
+  return `src/pages/tools/${file}.tsx`;
 };
 /**
  * Tools that may never show the row although their close asks then-vs-now. Wise mind: its parts form

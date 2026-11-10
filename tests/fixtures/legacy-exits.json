@@ -1,0 +1,86 @@
+{
+  "about": "Jumps from hand-built pages to another tool (docs/design/dbt-modules-plan.md C4.1). A page not on the skill runtime links with linkTo or a /tool/ path and is listed here until it ports; when it ports, its jumps become SkillExits in the graph and leave this list. tests/legacy-exits.test.mjs holds the source to this list in both directions.",
+  "exits": [
+    {
+      "from": "src/lib/checkFactsEntry.ts",
+      "to": "check-the-facts",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/copeAheadEntry.ts",
+      "to": "cope-ahead",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/den.ts",
+      "to": "two-pulls",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/partCard.ts",
+      "to": "meet-a-part",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/partsOfMe.ts",
+      "to": "meet-a-part",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/trailOfferCard.ts",
+      "to": "meet-a-part",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/twoPullsLink.ts",
+      "to": "two-pulls",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/twoPullsSave.ts",
+      "to": "wise-mind",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/wiseMindParts.ts",
+      "to": "meet-a-part",
+      "state": "built"
+    },
+    {
+      "from": "src/pages/tools/CopeAhead.tsx",
+      "to": "five-senses",
+      "state": "built"
+    },
+    {
+      "from": "src/pages/tools/DearMan.tsx",
+      "to": "cool-down",
+      "state": "built"
+    },
+    {
+      "from": "src/pages/tools/InvalidationRecovery.tsx",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
+      "from": "src/pages/tools/MeetAPart.tsx",
+      "to": "five-senses",
+      "state": "built"
+    },
+    {
+      "from": "src/pages/tools/ProblemSolve.tsx",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
+      "from": "src/pages/tools/ProblemSolve.tsx",
+      "to": "give",
+      "state": "missing",
+      "note": "No such tool: a dead link today (IE-03 GIVE is not built). ER-12 Problem Solve port turns it into a planned exit."
+    },
+    {
+      "from": "src/pages/tools/TwoPulls.tsx",
+      "to": "five-senses",
+      "state": "built"
+    }
+  ]
+}

@@ -40,6 +40,7 @@ def served(sk):
         "accepts": sk.get("accepts", []), "ownMax": sk["ownMax"],
         "emotionFields": sk["emotionFields"], "copy": sk["copy"], "tables": sk["tables"], "derive": sk["derive"],
         "steps": steps, "exits": exits, "options": options,
+        **({"inline": sk["inline"]} if sk.get("inline") else {}),
     }
 
 

@@ -37,6 +37,11 @@ export interface ToolSessionApi {
   closeKind: CloseKind;
   /** True when the session is written to the server (signed in, inside a provider). */
   persisted: boolean;
+  /**
+   * Resolves once the session is written (true) or couldn't be (false; signed out, outside a provider, the
+   * start failed). A write that hangs off the session (a witness beat logged against it) waits for this.
+   */
+  ready(): Promise<boolean>;
   /** The step the user is on (sent as exitStep if they leave). */
   setStep(stepId: string): void;
   /** The active skill step began: an early exit still logs the rep. */
@@ -79,6 +84,7 @@ export const NO_SESSION: ToolSessionApi = {
   entry: 'direct',
   closeKind: 'none',
   persisted: false,
+  ready: async () => false,
   setStep: () => {},
   markPracticed: () => {},
   markComplete: () => {},

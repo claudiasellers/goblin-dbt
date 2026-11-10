@@ -20,7 +20,10 @@ test("types mirror: src/data/spineTypes.ts equals functions/src/spine/types.ts (
 test("every interactive tool declares its close; client and server registries agree", () => {
   const page = readFileSync("src/pages/ToolPage.tsx", "utf8");
   const block = page.slice(page.indexOf("const toolComponents"), page.indexOf("};", page.indexOf("const toolComponents")));
-  const components = [...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]);
+  // Hand-built pages, plus the tools the skill player plays (src/lib/skillRuntime/playerTools.ts).
+  const played = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
+  const playedIds = [...played.slice(played.indexOf("PLAYER_TOOLS")).matchAll(/^\s*'([a-z-]+)': '/gm)].map((m) => m[1]);
+  const components = [...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds];
   assert.equal(components.length, 14);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
@@ -223,4 +226,21 @@ test("the five silent tools use the session and render the close on completion",
   const page = readFileSync("src/pages/ToolPage.tsx", "utf8");
   assert.match(page, /<ToolSessionProvider key=\{location\.key\} toolId=\{tool\.id\}>/);
   assert.doesNotMatch(page, /trackToolUsage\(/, "startToolSession writes the compat ToolUsage");
+});
+
+test("two-part close (urge_change, plan R7): the urge question, then then-vs-now down; both answers accepted", () => {
+  const content = { kinds: { urge: { question: "Q", choices: [] }, regulation_down: { question: "D", choices: [] } },
+    byTool: { pause: { regulation_down: { question: "PD", choices: [] } } }, skip: "Skip", saved: "Noted." };
+  assert.equal(close.closeQuestion(content, "x", "urge_change").question, "Q");
+  assert.equal(close.secondCloseQuestion(content, "x", "urge_change").question, "D");
+  assert.equal(close.secondCloseQuestion(content, "pause", "urge_change").question, "PD");
+  assert.equal(close.secondCloseQuestion(content, "x", "urge"), null, "a one-part kind has no second question");
+  assert.ok(close.asksAtClose("urge_change"));
+  assert.equal(close.dirFor("urge_change"), "down");
+  assert.equal(tools.thenVsNowDirFor("urge_change"), "down");
+  const now = new Date();
+  const c = v.validateClose({ id: ID, status: "completed", actedOnUrge: "no", thenVsNow: "better" }, now, "urge_change");
+  assert.equal(c.actedOnUrge, "no");
+  assert.equal(c.thenVsNow, "better");
+  assert.throws(() => v.validateClose({ id: ID, status: "completed", actedOnUrge: "no" }, now, "regulation_down"));
 });

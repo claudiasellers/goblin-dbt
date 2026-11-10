@@ -126,6 +126,12 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   run's answers as labels, `picked`). Its `onDone` output is cut to what its `EMBED_OUTPUTS` entry declares
   (ids, `ownText`, measures; content.py `EMBEDS` mirrors it), its ids become the `answerAs` answer (ids only),
   and the whole report goes in `out`. Own words from an embed are kept once, in `out`.
+- **Embed props** (F2). Each embed declares what it takes in `EMBED_PROPS` (`copy`, `int` with a range, `enum`,
+  `field`, `id`; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
+  missing prop on any embed step or slot, and a `copy` prop must name a key in the skill's copy: the player
+  passes its text (`resolveEmbedProps`), so an embed never carries its own words. Embeds also get `answerIds`.
+  Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`) and `witness` (the receive beat,
+  logged against the visit's session). `dev/skills-review.html` shows every step of every skill and each embed.
 - **Crisis slots.** `crisis: [{variant: 'crisis' | 'other_person', when}]` on any step (ask, embed, hand-off)
   shows the compact `CrisisBanner` while `when` holds. An option or embed id marked `danger` needs a slot of its
   variant that holds when it is picked (`build.py` and `tests/skill-contracts.test.mjs`).
