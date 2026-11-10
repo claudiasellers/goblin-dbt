@@ -225,6 +225,9 @@ def check(skill):
         for ln in s.get("links", []):
             assert ln["exit"] in exits and ln["label"] in copy, (w, ln)
             check_cond(ln["when"], fields, derived, w, accepts)
+        # LINKS is one edge per (step, exit): one link per exit on a screen, whether on a field or the step.
+        link_exits = [ln["exit"] for ln in s.get("links", [])] + [ln["exit"] for f in s.get("fields", []) for ln in f.get("links", [])]
+        assert len(link_exits) == len(set(link_exits)), (w, "one quiet link per exit on a screen (LINKS is one edge per step and exit)", link_exits)
         for sl in s.get("slots", []):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
             check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
