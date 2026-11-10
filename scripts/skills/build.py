@@ -203,6 +203,9 @@ def check(skill):
                 if f["own"].get("seed"):
                     assert f["own"].get("open") and f.get("max") == 1 and "list" in o, (
                         w, "seed chips start the open own-words box of a one-pick list field", f)
+                    cap = f["own"].get("max", skill["ownMax"])
+                    long = [x[2] for x in skill["options"] if x[0] == o["list"] and len(x[2]) > cap]
+                    assert not long, (w, "every starter fits the box (else it stops matching once written in)", long)
                 assert f["own"].get("max", skill["ownMax"]) <= skill["ownMax"], (w, "own max above the skill's", f)
             if "firstFrom" in o:
                 assert o["firstFrom"].startswith("$ctx."), (w, "firstFrom is a context ref", o)
