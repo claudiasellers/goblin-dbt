@@ -73,10 +73,12 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   const cf = rows.filter((r) => r.conceptId === "dbt_check_facts");
   assert.equal(cf.length, 6);
   assert.ok(cf.every((r) => r.active === false && r.reviewStatus === "draft"), "Check the Facts rows stay off and drafts");
-  // Keep your self-respect (docs/design/fast.md, IE-B1) the same way: built on the skill runtime, its three word rows off and drafts.
+  // Keep your self-respect (docs/design/fast.md, IE-B1) the same way: built on the skill runtime, its two word rows off and drafts.
+  // Never on violated or victimized (Claudia, 10 Nov 2026): the review opens on what the person did.
   assert.equal(graph.concepts.dbt_fast.appToolId, "fast");
   const fast = rows.filter((r) => r.conceptId === "dbt_fast");
-  assert.equal(fast.length, 3);
+  assert.equal(fast.length, 2);
+  assert.ok(fast.every((r) => !(r.words ?? []).some((w) => w === "violated" || w === "victimized")), "FAST never on violated or victimized");
   assert.ok(fast.every((r) => r.active === false && r.reviewStatus === "draft"), "FAST rows stay off and drafts");
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });

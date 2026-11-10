@@ -3696,31 +3696,6 @@
    "rationale": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."
   },
   {
-   "id": "rf_rumination_loop_words_victimized_fast",
-   "conceptId": "dbt_fast",
-   "patternId": "rumination_loop",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.6,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "victimized"
-   ],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to delete this row before sign-off: the review opens on what the person did."
-  },
-  {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
    "conceptId": "dbt_recovering_from_invalidation",
    "patternId": "social_threat_shame",
@@ -3922,8 +3897,7 @@
    "emotionGate": "words",
    "words": [
     "betrayed",
-    "disrespected",
-    "violated"
+    "disrespected"
    ],
    "tier": "quality_of_life",
    "surface": [
@@ -3932,7 +3906,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to drop violated before sign-off: the review opens on what the person did."
+   "rationale": "FAST (keep self-respect) as the alternative to Recover. Not violated (Claudia, 10 Nov, IE-B1): the review opens on what the person did, which reads as self-blame after a violation."
   },
   {
    "id": "rf_social_threat_shame_words_self-worth_check-the-facts",

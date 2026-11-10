@@ -129,7 +129,7 @@ CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "sk
 # out of PLANNED; its six rows stay switched off and drafts until Claudia signs them off, row by row.
 CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change", "skillKind": "change", "direction": "neutral"}
 # Keep your self-respect (FAST) has shipped on the skill runtime (appToolId 'fast', docs/design/fast.md, IE-B1):
-# out of PLANNED; its three word rows stay switched off and drafts until Claudia signs them off (D15).
+# out of PLANNED; its two word rows stay switched off and drafts until Claudia signs them off (D15).
 CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "relational", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
     "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
@@ -277,8 +277,8 @@ WORD_RULES = [
      "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
     {"key": "let-down", "pattern": "social_threat_shame", "tool": "give", "priority": 1.5, "words": ["let_down"],
      "why": "Planned: GIVE (keep the relationship) as the alternative to Recover."},
-    {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected", "violated"],
-     "why": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to drop violated before sign-off: the review opens on what the person did."},
+    {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected"],
+     "why": "FAST (keep self-respect) as the alternative to Recover. Not violated (Claudia, 10 Nov, IE-B1): the review opens on what the person did, which reads as self-blame after a violation."},
     # --- Ready to fight ---
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["bitter", "resentful"],
      "why": "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."},
@@ -297,8 +297,6 @@ WORD_RULES = [
      "why": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_NEXT, "words": ["embarrassed", "ashamed"],
      "why": "Do the Opposite (unhiding) as the alternative for shame."},
-    {"key": "victimized", "pattern": "rumination_loop", "tool": "fast", "priority": WORD_NEXT, "words": ["victimized"],
-     "why": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to delete this row before sign-off: the review opens on what the person did."},
     # --- Low drive ---
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},

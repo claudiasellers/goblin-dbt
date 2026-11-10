@@ -101,7 +101,7 @@ close offers the tag row, like Check the Facts.
 - `dbt_fast` has `appToolId: 'fast'` (`schema/app-tool-ids.cypher`), so Problem Solve's seven `fast` links
   (`schema/problem-solve-data.cypher` ×5, `problem-solve-barriers.cypher` ×2) open the tool with no Problem Solve
   change.
-- Three `RECOMMENDED_FOR` rows exist and are **off and drafts** (`BUILT_NOT_SIGNED_OFF` in
+- Two `RECOMMENDED_FOR` rows exist and are **off and drafts** (`BUILT_NOT_SIGNED_OFF` in
   `scripts/recommendations/content.py`, D15). Concept tags: `change`, `relational`, `neutral`.
 - Listed under Interpersonal Effectiveness for everyone (`src/data/tools.ts`, emoji 🪶).
 - Edges in `tests/fixtures/module-edges.json`: IE PRD IE-05 (fast → rehearse planned, dear-man, check-the-facts,
@@ -138,16 +138,26 @@ close offers the tag row, like Check the Facts.
 
 The skill copy isn't gated on content sign-off (Check the Facts' precedent). For Claudia:
 
-- **Boundary lines (review required, PRD IE-05 "≥ 8, reviewed"):** `not_argue`, `not_keep_asking`, `hear_no`,
-  `see_differently`, `not_today`, `another_time`, `space`, `another_way`. The clinical gate replaced two before
-  this PR: *…when we can both talk calmly* (implies they weren't) and *That doesn't work for me, and that hasn't
-  changed* (doesn't fit after their no to your ask).
-- **Routing rows** (drop from `BUILT_NOT_SIGNED_OFF`, row by row): `self-respect` (betrayed, disrespected,
-  violated), `grievance` (bitter, resentful), `victimized`. The clinical gate asks to drop *violated* and delete
-  the `victimized` row before switching on: after a violation, a review that opens on what *you* did reads as
-  self-blame. They came from the Oct routing review, so they're left for your call.
-- **`ADDRESSES` edges** for `dbt_fast` (unjustified guilt, cold shame, inferior, insignificant): the PRD's, left out until you decide.
+- **Boundary lines** (PRD IE-05 "≥ 8, reviewed"): `not_argue`, `not_keep_asking`, `hear_no`, `see_differently`,
+  `not_today`, `another_time`, `space`, `another_way`. **Signed off as written (Claudia, 10 Nov 2026).** The
+  clinical gate replaced two before this PR: *…when we can both talk calmly* (implies they weren't) and *That
+  doesn't work for me, and that hasn't changed* (doesn't fit after their no to your ask).
+- **Routing rows:** `self-respect` (betrayed, disrespected) and `grievance` (bitter, resentful) stay **off and
+  drafts**. *Violated* is out of `self-respect` and the `victimized` row is deleted (Claudia, 10 Nov 2026, the
+  clinical gate's call): after a violation, a review that opens on what *you* did reads as self-blame. Switching
+  the two remaining rows on is a later call (drop them from `BUILT_NOT_SIGNED_OFF`, row by row).
+- **`ADDRESSES` edges** for `dbt_fast` (unjustified guilt, cold shame, inferior, insignificant): the PRD's, left
+  out of this PR; Claudia's call is still open (whether to add them now for the personal ranking work).
 - The review copy, if you want it on the witness voice list.
+
+## Open idea: a trauma-aware look back (not built)
+
+Claudia, 10 Nov 2026: a retrospective after being hurt isn't a bad idea in itself, but today's review is the wrong
+one for it, because it opens on the person's own conduct (*what did you do that you'd like to change?*). A
+trauma-aware version would open on **what happened to them** and **what they want to protect** (a value, a limit,
+their footing with this person), and only reach their own choices later, if at all, and by their choice. That is
+the shape a route from *violated* or *victimized* would need. Nothing is built or routed for it; it needs its own
+clinical design (who it's for, what it never asks, how it hands off to Recover and safety) before a batch.
 
 ## The DEAR MAN content source (same batch)
 
