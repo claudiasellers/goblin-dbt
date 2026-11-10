@@ -1,7 +1,7 @@
 {
   "source": {
-    "file": "graph-content-only-2026-10-27.json",
-    "exportedAt": "2026-10-27T18:19:40.522Z"
+    "file": "graph-content-only-2026-11-10.json",
+    "exportedAt": "2026-11-10T22:22:55.882Z"
   },
   "content": {
     "version": "find-v1",
@@ -429,7 +429,9 @@
               0.15
             ],
             "offer": 2,
-            "addressedBy": []
+            "addressedBy": [
+              "fast"
+            ]
           },
           {
             "emotionId": "sad",
@@ -637,7 +639,9 @@
               0.05
             ],
             "offer": 3,
-            "addressedBy": []
+            "addressedBy": [
+              "fast"
+            ]
           }
         ]
       },
