@@ -34,7 +34,16 @@ test("the made-up run: the skill's version, the path, each earlier field's first
   assert.deepEqual(run.path, r.stepPaths(ctf)[last]);
   assert.deepEqual(run.answers[0], { fieldId: "feel", optionIds: [ctf.steps[0].fields[0].options.emotions[0]] });
   const ctx = { skill: ctf, shared: { parentOf: {}, fitsWhen: {} }, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn: {} };
-  assert.equal(m.resumeRun(ctx, run, last).stepId, last);
+  assert.equal(m.resumeRun(ctx, run, last, { keepFresh: true }).stepId, last);
+  const handoff = ctf.steps.find((s) => s.kind === "handoff" && s.offers.length);
+  if (handoff) {
+    const back = m.resumeRun(ctx, r.reviewRun(ctf, handoff.id), handoff.id, { keepFresh: true });
+    assert.equal(back.stepId, handoff.id);
+    assert.ok(back.offered.length, "the made-up run reaches a hand-off with something to offer");
+    assert.deepEqual(back.offered, m.offersFor(ctx, handoff, back), "a hand-off reopened works out its offers again");
+  }
+  const freshStep = ctf.steps.find((s) => (s.fields ?? []).some((f) => f.askFresh));
+  if (freshStep) assert.equal(m.resumeRun(ctx, run, last).stepId, freshStep.id, "in the app: back to the ask-fresh question");
 });
 
 test("the embeds skill's props pass build.py's embed check (copy keys, ranges, fields)", () => {

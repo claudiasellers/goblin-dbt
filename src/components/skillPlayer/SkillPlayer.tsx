@@ -63,7 +63,7 @@ export interface InlineReturn {
   finished: boolean;
 }
 
-export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn }: {
+export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, resumeKeepsFresh }: {
   skillId: string;
   mode?: 'page' | 'inline';
   /** Inline: the step to start at (one the skill's `inline.enterAt` lists; otherwise its start). */
@@ -71,6 +71,8 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
   /** Inline: the host's ToolSession id. */
   hostSessionId?: string;
   onReturn?: (r: InlineReturn) => void;
+  /** The review page only (dev/skills-review.tsx): a resumed run keeps its ask-fresh answers, so every step shows. */
+  resumeKeepsFresh?: boolean;
 }) {
   const [content, setContent] = useState<SkillsContent | null>(null);
   const [failed, setFailed] = useState(false);
@@ -96,7 +98,7 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
       </ToolSessionProvider>
     );
   }
-  return <SkillRun skill={skill} content={content} />;
+  return <SkillRun skill={skill} content={content} resumeKeepsFresh={resumeKeepsFresh} />;
 }
 
 const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, readonly string[]>)[toolId]?.length ?? 0) > 0;
@@ -120,8 +122,8 @@ function carriedFrom(search: string, state: unknown): string[] {
   return [...new Set([...(feel ? [feel] : []), ...emotionIdsFromLink(state)])].filter((id) => GRID.has(id));
 }
 
-function SkillRun({ skill, content, inline }: {
-  skill: SkillDef; content: SkillsContent; inline?: { enterAt?: string; onReturn?: (r: InlineReturn) => void };
+function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
+  skill: SkillDef; content: SkillsContent; inline?: { enterAt?: string; onReturn?: (r: InlineReturn) => void }; resumeKeepsFresh?: boolean;
 }) {
   const toolSession = useToolSession();
   const navigate = useNavigate();
@@ -145,16 +147,19 @@ function SkillRun({ skill, content, inline }: {
     return run && UUID.test(run) ? { run, at: q.get('at') } : null;
   });
   const [resuming, setResuming] = useState(!!resumeFrom);
+  // A run with kept items among its options reopens once the profile has answered (ready, error or signed
+  // out), so those picks aren't read as options it no longer offers and dropped.
+  const profileSettled = !needsProfile(skill.toolId) || profile.status !== 'loading';
+  const resumed = useRef(false);
   useEffect(() => {
-    if (!resumeFrom) return;
-    let live = true;
+    if (!resumeFrom || !profileSettled || resumed.current) return;
+    resumed.current = true;
     getSkillRun(resumeFrom.run, skill.toolId)
-      .then((rec) => { if (live) { const r = resumeRun(ctx, rec, resumeFrom.at); if (r) setSt(r); } })
+      .then((rec) => { const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh }); if (r) setSt(r); })
       .catch(() => { /* nothing to reopen: a fresh run */ })
-      .finally(() => { if (live) setResuming(false); });
-    return () => { live = false; };
+      .finally(() => setResuming(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [profileSettled]);
   const [busy, setBusy] = useState(false);
   const [saveNote, setSaveNote] = useState(false);
   const [leaving, setLeaving] = useState<ExitDef | null>(null);
