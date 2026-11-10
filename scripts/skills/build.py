@@ -286,6 +286,30 @@ def check(skill):
             if "when" in fu:
                 check_cond(fu["when"], fields, derived, w, accepts)
         assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))
+        if s.get("reopens"):
+            # R9: only a reopened run starts here, after the whole recorded path of a run that reached `after`. Nothing
+            # leads to it, and it isn't the start, so a first visit never reaches it.
+            ro = s["reopens"]
+            assert isinstance(ro, dict) and set(ro) == {"after"}, (w, "reopens is {after: <step>}", ro)
+            assert ro["after"] in steps and ro["after"] != s["id"], (w, "reopens after a step of the skill, not itself", ro)
+            assert s["id"] != skill["start"], (w, "a reopens step is never the start")
+            into = [x["id"] for x in skill["steps"] if any(t["to"] == s["id"] for t in x.get("next", []))]
+            assert not into, (w, "no step leads to a reopens step: only a reopened run starts there", into)
+            assert s["kind"] == "ask", (w, "a reopens step asks how it went", s["kind"])
+            # A reopen leaves ask-fresh answers unread, so neither the step nor anything after it may read one.
+            fresh = {f["id"] for x in skill["steps"] for f in x.get("fields", []) if f.get("askFresh")}
+            by_id = {x["id"]: x for x in skill["steps"]}
+            seen, todo = set(), [s["id"]]
+            while todo:
+                x = todo.pop()
+                if x in seen:
+                    continue
+                seen.add(x)
+                todo += [t["to"] for t in by_id[x].get("next", [])]
+            for x in seen:
+                text = json.dumps({k: v for k, v in by_id[x].items() if k not in ("id", "kind")})
+                reads = [f for f in fresh if re.search(rf'"(\$a\.)?{re.escape(f)}(\.(ids|own))?"', text)]
+                assert not reads, (w, f"the reopens step and the steps after it never read an ask-fresh field ({x})", reads)
     inl = skill.get("inline")
     if inl:
         assert inl["enterAt"] and set(inl["enterAt"]) <= steps, (sid, "inline starts at steps that exist", inl)

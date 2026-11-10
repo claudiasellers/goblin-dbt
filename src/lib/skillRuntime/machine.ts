@@ -443,7 +443,9 @@ export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { a
  * pre-fill from memory), at `at` if the record's path went through it. Ask-fresh fields are never restored:
  * they are asked again, so the run reopens no later than the first step on its path that asks one (what comes
  * after it may hang on that answer), and only the steps up to the one reopened bring their answers back (a later
- * step is asked again, never pre-filled); a field that books a reminder (`followUp.whenFrom`) is never read back. A hand-off reopened works out its offers again. Null when the record isn't
+ * step is asked again, never pre-filled); a `reopens` step, which only a reopened run starts on, comes after the
+ * whole recorded path of a run that reached its `after` step and brings every answer back but the ask-fresh ones
+ * (null for a run that didn't get that far); a field that books a reminder (`followUp.whenFrom`) is never read back. A hand-off reopened works out its offers again. Null when the record isn't
  * this skill's version or `at` isn't a step it reached. `keepFresh` is for the review page only (dev/
  * skills-review.tsx, which shows every step from a made-up run); the app never passes it.
  */
@@ -452,12 +454,21 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const r = rec as { skillId?: unknown; versionId?: unknown; path?: unknown; answers?: unknown };
   if (r.skillId !== ctx.skill.id || r.versionId !== ctx.skill.version || !Array.isArray(r.path)) return null;
   const path = (r.path as unknown[]).filter((x): x is string => typeof x === 'string' && ctx.skill.steps.some((st) => st.id === x));
-  let stepId = at && path.includes(at) ? at : path[path.length - 1];
+  // A `reopens` step (a step only a reopened run starts on, never reached on a first visit, e.g. Problem Solve's
+  // *How did it go?*) comes after the whole recorded path, so every answer of that run comes back.
+  // It holds only for a run that got as far as its `after` step (the plan it asks about); any other run has nothing to
+  // ask about and doesn't reopen (null: a whole first visit). Its ask-fresh answers stay unread, and there is no
+  // detour back to the step that asked one: the person tapped *How did it go?*, not the middle of the plan (build.py
+  // keeps the reopens step and everything after it from reading an ask-fresh field).
+  const reopensAt = at && !path.includes(at) ? ctx.skill.steps.find((st) => st.id === at && st.reopens) : undefined;
+  if (reopensAt && !path.includes(reopensAt.reopens!.after)) return null;
+  const reopened = !!reopensAt;
+  let stepId = reopensAt?.id ?? (at && path.includes(at) ? at : path[path.length - 1]);
   if (!stepId) return null;
   const fresh = new Set(keepFresh ? [] : allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
   const asksFresh = path.findIndex((id) => (stepOf(ctx.skill, id).fields ?? []).some((f) => fresh.has(f.id)));
-  if (asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
-  const upTo = path.slice(0, path.lastIndexOf(stepId) + 1);
+  if (!reopened && asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
+  const upTo = reopened ? path : path.slice(0, path.lastIndexOf(stepId) + 1);
   // Only the answers of the steps up to the one reopened: a step after it will be asked again, and an answer
   // read back there would be a pre-fill (a reminder chip picked last time would schedule again unasked).
   const onPath = new Set(upTo.flatMap((id) => {
@@ -478,7 +489,7 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const kept = normalize(ctx, answers);
   const step = stepOf(ctx.skill, stepId);
   return {
-    ...initialRun(ctx.skill), stepId, path: upTo.slice(-PATH_MAX), answers: kept,
+    ...initialRun(ctx.skill), stepId, path: (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX), answers: kept,
     offered: step.kind === 'handoff' ? offersFor(ctx, step, { answers: kept }) : [],
   };
 }

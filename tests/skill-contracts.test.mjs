@@ -509,6 +509,35 @@ test("resume: the run's own answers read back at a step it reached; ask-fresh an
   assert.equal(m.resumeRun(ctx, { ...rec, skillId: "other" }, "check"), null);
 });
 
+test("reopens: only a run that reached `after` reopens there, after the whole path, every answer back but the ask-fresh ones", () => {
+  const how = { id: "how", kind: "ask", reopens: { after: "end" },
+    fields: [{ id: "went", options: { list: "tvn" }, max: 1 }], next: [{ to: "end", when: null }], offers: [] };
+  const R = { ...F2, steps: [...F2.steps, how] };
+  const ctx = { ...f2Ctx(null), skill: R };
+  const rec = {
+    skillId: "f2_probe", versionId: "t2", path: ["who", "when", "check", "end"],
+    answers: [{ fieldId: "line", optionIds: ["l2"] }, { fieldId: "chip", optionIds: ["1h"] }, { fieldId: "change", optionIds: ["better"] }],
+  };
+  const s = m.resumeRun(ctx, rec, "how");
+  assert.equal(s.stepId, "how", "no detour back to the ask-fresh step: the person asked how it went");
+  assert.deepEqual(s.path, ["who", "when", "check", "end", "how"], "after the whole recorded path");
+  assert.deepEqual(Object.keys(s.answers).sort(), ["line"], "every answer back but the ask-fresh one and the reminder chip");
+  assert.equal(m.resumeRun(ctx, { ...rec, path: ["who", "when"] }, "how"), null, "a run that never reached `after` has nothing to ask about: no reopen");
+  assert.equal(m.resumeRun({ ...ctx, skill: F2 }, rec, "how").stepId, "check", "no such step: an ordinary resume, clamped as before");
+  assert.equal(m.resumeRun(ctx, rec, "check").stepId, "check", "an ordinary resume still detours to the ask-fresh step");
+  assert.equal(m.initialRun(R).stepId, "who", "a first visit starts at the start");
+  for (const sk of fixture.skills) {
+    for (const st of sk.steps.filter((x) => x.reopens)) {
+      assert.notEqual(sk.start, st.id, `${sk.id}.${st.id}: never the start`);
+      assert.ok(sk.steps.some((x) => x.id === st.reopens.after), `${sk.id}.${st.id}: after a step of the skill`);
+      assert.ok(!sk.steps.some((x) => x.next.some((t) => t.to === st.id)), `${sk.id}.${st.id}: no step leads to it`);
+    }
+  }
+  const build = read("scripts/skills/build.py");
+  assert.match(build, /no step leads to a reopens step/, "build.py refuses a jump into a reopens step");
+  assert.match(build, /the reopens step and the steps after it never read an ask-fresh field/, "build.py refuses an ask-fresh read from the reopen on");
+});
+
 test("noClose: only on a hand-off, and the player leaves it without the close question", () => {
   for (const sk of fixture.skills) {
     for (const st of sk.steps) {

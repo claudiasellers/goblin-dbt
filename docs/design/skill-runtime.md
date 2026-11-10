@@ -153,6 +153,15 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   may read the chip, so the card can't change under the person's thumb. `build.py` refuses every other shape
   (`tests/skill-contracts.test.mjs`). An inline run gives back on its hand-off, so it never shows the chips.
 
+- **A step only a reopened run starts on** (`reopens: {after}`, R9, ER-12; agreed with the plan thread).
+  `?run=<id>&at=<step>` reopens a run at a step its path reached. A `reopens` step is the other case: no step leads to
+  it and it is never the start, so a first visit never sees it. It holds only for a run whose path reached `after`
+  (the step that made the plan it asks about); any other run doesn't reopen, so the page starts a whole first visit.
+  Reopened there, the run comes back after its whole recorded path with every answer but the ask-fresh ones and the
+  reminder chips, and with no detour back to an ask-fresh step: neither the reopens step nor any step after it may
+  read an ask-fresh field (`build.py`). For a step that asks how it went afterwards: Problem Solve's *How did it go?*
+  (Handout 12's evaluate step), opened from its `ps_review` card.
+
 ### The attempt record (what a router reads)
 
 There is no new label. A run **is** a `ToolSession` (the spine's per-visit log record), with one generic
