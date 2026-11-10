@@ -22,7 +22,7 @@ def served(sk):
     for st in sk["steps"]:
         s = {"id": st["id"], "kind": st["kind"], **spec_of(st)}
         s["next"] = [{"to": t["to"], "when": t.get("when")} for t in st.get("next", [])]
-        rows = sorted(({"exit": o["exit"], "when": o["when"], "order": i} for i, o in enumerate(st.get("offers", []))),
+        rows = sorted(({"exit": o["exit"], "when": o.get("when"), "order": i} for i, o in enumerate(st.get("offers", []))),
                       key=lambda r: r["order"])
         s["offers"] = [{"exit": r["exit"], "when": r["when"]} for r in rows]
         steps.append(s)

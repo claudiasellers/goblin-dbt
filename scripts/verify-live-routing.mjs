@@ -115,7 +115,7 @@ try {
     report.toolsByPattern[pid] = (await q(`
       MATCH (p:ActivationPattern {id: $patternId})-[:ASSOCIATED_WITH]->(e:Emotion)
       MATCH (tc:TherapyConcept)-[r:ADDRESSES|REDUCES|TARGETS]->(e)
-      WHERE tc.id STARTS WITH 'dbt_'
+      WHERE tc.id STARTS WITH 'dbt_' AND coalesce(r.legacy, true)
       WITH tc, count(DISTINCT e) as relevanceScore
       ORDER BY relevanceScore DESC
       LIMIT 2

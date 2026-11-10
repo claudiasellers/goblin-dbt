@@ -109,7 +109,7 @@ test("never a confrontation plan for someone they're scared of (D4): no DEAR MAN
   }
   assert.equal(M.handoffLine(ctx(), step("next"), scared), "You named someone you're scared of. You don't have to work that out alone.");
   const plain = run([...toReal(["controlling"]), pick("real", "say"), next]);
-  assert.deepEqual(plain.offered, ["dear_man"], "FAST is planned");
+  assert.deepEqual(plain.offered, ["dear_man", "fast"], "FAST is built (IE-B1)");
   assert.ok(skill.exits.find((x) => x.id === "ending").planned);
 });
 
@@ -199,10 +199,10 @@ test("on the player (F2): the tool plays this skill, no page of its own; the car
   assert.equal(skill.copy[props.today], "Later today");
 });
 
-test("the real squeeze (PRD step 6): change → Problem Solve, a person → DEAR MAN (FAST planned), can't → Let it be (planned), not now → Done", () => {
+test("the real squeeze (PRD step 6): change → Problem Solve, a person → DEAR MAN and FAST, can't → Let it be (planned), not now → Done", () => {
   const offered = (real) => run([...toReal(["rules"]), pick("real", real), next]).offered;
   assert.deepEqual(offered("change"), ["problem_solve"]);
-  assert.deepEqual(offered("say"), ["dear_man"]);
+  assert.deepEqual(offered("say"), ["dear_man", "fast"]);
   assert.deepEqual(offered("cant"), []);
   assert.deepEqual(offered("not_now"), []);
   const done = run([...toReal(["rules"]), pick("real", "not_now"), next]);

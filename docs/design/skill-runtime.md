@@ -1,6 +1,6 @@
 # The skill runtime: skills as graph data, one player
 
-Written 4 Nov 2026. Status: **built for Check the Facts** (the first skill on it). Thread 3 of
+Written 4 Nov 2026. Status: **built for Check the Facts** (the first skill on it); Keep your self-respect (`fast`, two skills under one tool id, `docs/design/fast.md`) since 10 Nov. Thread 3 of
 [the path forward](https://claude.ai/artifact/QnR4Q9J8HEucUZXsPdq4T2): the DBT catalogue becomes data the
 graph holds, one player runs any of it, and every run leaves one record a router can learn from.
 

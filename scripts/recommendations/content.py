@@ -93,6 +93,8 @@ SIGNED_OFF = {
     "rf_rumination_loop_words_low-shame_recovering-from-invalidation": "2026-10-05",
     "rf_rumination_loop_words_low-shame_opposite-action": "2026-10-05",
     "rf_reward_drive_low_words_fragile_problem-solve": "2026-10-05",
+    # Rebel without the wreckage (DT-11), Pause's swap on provoked / indignant: signed off 10 Nov (Claudia).
+    "rf_reactive_aggression_words_rebel_alternate-rebellion": "2026-11-10",
 }
 BANDS = ["steady", "stirred", "flooded"]
 
@@ -129,16 +131,19 @@ CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "sk
 # out of PLANNED; its six rows stay switched off and drafts until Claudia signs them off, row by row.
 CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change", "skillKind": "change", "direction": "neutral"}
 # Rebel without the wreckage (DT-11) has shipped on the skill runtime (appToolId 'alternate-rebellion'): its one
-# row is written switched off and a draft until Claudia signs it off (plan D15). Its skillKind is `redirect` (the
+# row was signed off on 10 Nov (plan D15) and is live. Its skillKind is `redirect` (the
 # urge acted on in a harmless form), not `hold` (sitting with it without acting, Pause's kind): with `hold` the
 # diversity rule could never set it beside Pause, and its one row could never show.
 CONCEPT_TAGS["alternate-rebellion"] = {"concept": "dbt_alternate_rebellion", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
+# Keep your self-respect (FAST) has shipped on the skill runtime (appToolId 'fast', docs/design/fast.md, IE-B1):
+# out of PLANNED; its two word rows stay switched off and drafts until Claudia signs them off (D15).
+CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "relational", "direction": "neutral"}
 
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
 # readouts (Do the Opposite, the wave), the Tools intent and later Reflect, so no concept tags either.
 BUILT_NOT_SIGNED_OFF = {
-    "alternate-rebellion": "built on the skill runtime (DT-11); its row goes live on Claudia's sign-off (docs/design/alternate-rebellion.md)",
+    "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
     "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",
 }
@@ -147,7 +152,6 @@ PLANNED = {
     "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "radical-acceptance": {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "wise-mind":          {"concept": "dbt_wise_mind",          "side": "both",       "skillKind": "naming",     "direction": "neutral"},
-    "fast":               {"concept": "dbt_fast",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
     "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
 }
 CONCEPT_TAGS.update(PLANNED)
@@ -284,15 +288,15 @@ WORD_RULES = [
      "why": "Planned: Check the Facts beside Do the Opposite (unhiding) for shame about the self."},
     {"key": "let-down", "pattern": "social_threat_shame", "tool": "give", "priority": 1.5, "words": ["let_down"],
      "why": "Planned: GIVE (keep the relationship) as the alternative to Recover."},
-    {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected", "violated"],
-     "why": "Planned: FAST (keep self-respect) as the alternative to Recover."},
+    {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected"],
+     "why": "FAST (keep self-respect) as the alternative to Recover. Not violated (Claudia, 10 Nov, IE-B1): the review opens on what the person did, which reads as self-blame after a violation."},
     # --- Ready to fight ---
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["bitter", "resentful"],
      "why": "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."},
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "check-the-facts", "priority": 0.4, "words": ["bitter", "resentful"],
      "why": "Planned: Check the Facts leads for resentment."},
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "fast", "priority": WORD_NEXT, "words": ["bitter", "resentful"],
-     "why": "Planned: FAST as the alternative."},
+     "why": "FAST as the alternative."},
     {"key": "rebel", "pattern": "reactive_aggression", "tool": "alternate-rebellion", "priority": 1.5,
      "words": ["provoked", "indignant"],
      "why": "DT-11 (PRD): the push-back words, where a rebellion function is likely, get Rebel without the wreckage as the alternative to Pause; never flooded (body first). Anger alone doesn't imply a rebellion function (the PRD's open question), so not every anger word. Not resentful or bitter: their grievance rows (Do the Opposite, Check the Facts, FAST) lead there, and Pause would always take the swap."},
@@ -307,8 +311,6 @@ WORD_RULES = [
      "why": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."},
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_NEXT, "words": ["embarrassed", "ashamed"],
      "why": "Do the Opposite (unhiding) as the alternative for shame."},
-    {"key": "victimized", "pattern": "rumination_loop", "tool": "fast", "priority": WORD_NEXT, "words": ["victimized"],
-     "why": "Planned: FAST (keep self-respect) as the alternative to Recover."},
     # --- Low drive ---
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},

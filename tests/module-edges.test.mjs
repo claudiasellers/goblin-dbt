@@ -21,23 +21,30 @@ test("every edge row is well formed", () => {
 
 const targetOf = (x) => (x.safety ? "safety.open" : x.toolId);
 
-for (const sk of skills) {
-  const rows = edges.edges.filter((e) => e.from === sk.toolId && (e.kind === "exit" || e.kind === "gate"));
-  test(`${sk.id}: built and planned edges exist as exits`, () => {
+// A tool may run more than one skill (DEAR MAN's three, D11; FAST's review and Let go): the tool's edges are the
+// union of its skills' exits.
+const byTool = new Map();
+for (const sk of skills) byTool.set(sk.toolId, [...(byTool.get(sk.toolId) ?? []), sk]);
+
+for (const [toolId, sks] of byTool) {
+  const rows = edges.edges.filter((e) => e.from === toolId && (e.kind === "exit" || e.kind === "gate"));
+  const exits = sks.flatMap((sk) => sk.exits);
+  const name = sks.map((sk) => sk.id).join(" + ");
+  test(`${name}: built and planned edges exist as exits`, () => {
     for (const e of rows) {
       for (const t of e.to) {
-        const exits = sk.exits.filter((x) => targetOf(x) === t.tool);
-        if (t.state === "built") assert.ok(exits.some((x) => !x.planned), `${sk.toolId} → ${t.tool} is recorded built`);
-        if (t.state === "planned") assert.ok(exits.some((x) => x.planned), `${sk.toolId} → ${t.tool} is recorded planned`);
+        const to = exits.filter((x) => targetOf(x) === t.tool);
+        if (t.state === "built") assert.ok(to.some((x) => !x.planned), `${toolId} → ${t.tool} is recorded built`);
+        if (t.state === "planned") assert.ok(to.some((x) => x.planned), `${toolId} → ${t.tool} is recorded planned`);
       }
     }
   });
-  test(`${sk.id}: every exit to another tool is a recorded edge with its true state`, () => {
-    for (const x of sk.exits) {
+  test(`${name}: every exit to another tool is a recorded edge with its true state`, () => {
+    for (const x of exits) {
       if (x.done) continue;
       const t = rows.flatMap((e) => e.to).find((y) => y.tool === targetOf(x));
-      assert.ok(t, `${sk.toolId} → ${targetOf(x)}: add it to tests/fixtures/module-edges.json`);
-      assert.equal(t.state, x.planned ? "planned" : "built", `${sk.toolId} → ${targetOf(x)}`);
+      assert.ok(t, `${toolId} → ${targetOf(x)}: add it to tests/fixtures/module-edges.json`);
+      assert.equal(t.state, x.planned ? "planned" : "built", `${toolId} → ${targetOf(x)}`);
     }
   });
 }

@@ -219,12 +219,15 @@ def check(skill):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
             check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
             check_cond(sl["showWhen"], fields, derived, w, accepts)
+        # A line or an offer with `when: None` always holds (a hand-off's default line, an offer for every path).
         for ln in s.get("lines", []):
             assert ln["key"] in copy, (w, ln)
-            check_cond(ln["when"], fields, derived, w, accepts)
+            if ln.get("when") is not None:
+                check_cond(ln["when"], fields, derived, w, accepts)
         for of in s.get("offers", []):
             assert of["exit"] in exits, (w, of)
-            check_cond(of["when"], fields, derived, w, accepts)
+            if of.get("when") is not None:
+                check_cond(of["when"], fields, derived, w, accepts)
         assert "done" not in s or s["done"] in exits, w
         step_fields = {f["id"] for f in s.get("fields", [])}
         assert "primary" not in s or s["primary"] in copy, (w, "primary is a copy key", s.get("primary"))
@@ -304,6 +307,13 @@ for sk in SKILLS:
     A(f"\n// --- {sid} ({sk['version']}) ---")
     A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.inlineJson = {js(sk.get('inline'))}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
     A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (s:Skill {{id: {q(sid)}}})\nMERGE (t)-[:HAS_SKILL]->(s);")
+    if "addresses" in sk:
+        # The concept's ADDRESSES set (Find the feeling's word routes, the routing tie-break), owned by this skill:
+        # rebuilt each load so a dropped emotion disappears. `legacy: false` keeps them out of the kill-switch ranker
+        # (legacy.ts), so switching routing off still restores the pre-review routing whole.
+        A(f"MATCH (:TherapyConcept {{id: {q(sk['concept'])}}})-[r:ADDRESSES]->(:Emotion) DELETE r;")
+        for eid in sk["addresses"]:
+            A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (e:Emotion {{id: {q(eid)}}})\nMERGE (t)-[r:ADDRESSES]->(e)\nSET r += {{legacy: false}};")
     # Edges are rebuilt each load (a removed step / jump / offer must disappear).
     A(f"MATCH (:SkillStep {{skillId: {q(sid)}}})-[r:NEXT|OFFERS|LINKS]->() DELETE r;")
     A(f"MATCH (:Skill {{id: {q(sid)}}})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;")

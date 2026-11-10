@@ -394,6 +394,22 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_fast": {
+   "appToolId": "fast",
+   "name": "FAST",
+   "description": "Fair, no excessive Apologies, Stick to values, Truthful",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "neutral",
+   "addresses": [
+    "cold_shame",
+    "inferior",
+    "insignificant"
+   ],
+   "legacyAddresses": []
+  },
   "dbt_find_the_feeling": {
    "appToolId": "find-the-feeling",
    "name": "Find the Feeling",
@@ -3206,7 +3222,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: FAST as the alternative."
+   "rationale": "FAST as the alternative."
   },
   {
    "id": "rf_reactive_aggression_words_grievance_opposite-action",
@@ -3255,9 +3271,9 @@
    "surface": [
     "checkin_result"
    ],
-   "active": false,
+   "active": true,
    "version": "rf-v2",
-   "reviewStatus": "draft",
+   "reviewStatus": "approved",
    "rationale": "DT-11 (PRD): the push-back words, where a rebellion function is likely, get Rebel without the wreckage as the alternative to Pause; never flooded (body first). Anger alone doesn't imply a rebellion function (the PRD's open question), so not every anger word. Not resentful or bitter: their grievance rows (Do the Opposite, Check the Facts, FAST) lead there, and Pause would always take the swap."
   },
   {
@@ -3722,31 +3738,6 @@
    "rationale": "Low-energy shame: Recover (self-validation) first. The review's Cool Down isn't used on this side: the person marked low energy and Cool Down brings it down further."
   },
   {
-   "id": "rf_rumination_loop_words_victimized_fast",
-   "conceptId": "dbt_fast",
-   "patternId": "rumination_loop",
-   "bands": [
-    "steady",
-    "stirred"
-   ],
-   "priority": 0.6,
-   "direction": "neutral",
-   "side": null,
-   "requiresPrior": null,
-   "emotionGate": "words",
-   "words": [
-    "victimized"
-   ],
-   "tier": "quality_of_life",
-   "surface": [
-    "checkin_result"
-   ],
-   "active": false,
-   "version": "rf-v2",
-   "reviewStatus": "draft",
-   "rationale": "Planned: FAST (keep self-respect) as the alternative to Recover."
-  },
-  {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
    "conceptId": "dbt_recovering_from_invalidation",
    "patternId": "social_threat_shame",
@@ -3948,8 +3939,7 @@
    "emotionGate": "words",
    "words": [
     "betrayed",
-    "disrespected",
-    "violated"
+    "disrespected"
    ],
    "tier": "quality_of_life",
    "surface": [
@@ -3958,7 +3948,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: FAST (keep self-respect) as the alternative to Recover."
+   "rationale": "FAST (keep self-respect) as the alternative to Recover. Not violated (Claudia, 10 Nov, IE-B1): the review opens on what the person did, which reads as self-blame after a violation."
   },
   {
    "id": "rf_social_threat_shame_words_self-worth_check-the-facts",

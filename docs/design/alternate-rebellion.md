@@ -120,18 +120,19 @@ then-vs-now on the urge, and nothing outside the skill reads it. The close write
 
 ## Routing
 
-One row, switched off and a draft (D15): `rf_reactive_aggression_words_rebel_alternate-rebellion`, the
+One row, signed off by Claudia on 10 Nov 2026 and live (D15): `rf_reactive_aggression_words_rebel_alternate-rebellion`, the
 alternative (priority 1.5) to Pause on Ready to fight for *provoked, indignant*: the push-back words, where a
 rebellion function is likely. Never flooded. Not every anger word: the PRD's open question (anger alone doesn't
-imply a rebellion function) is answered narrowly; Claudia decides at sign-off. Not *resentful, bitter*: their
+imply a rebellion function) is answered narrowly, as signed off. Not *resentful, bitter*: their
 grievance rows lead there and Pause always takes the swap, so the row could never show. Concept tags: `side:
 acceptance`, `skillKind: redirect` (a new kind: the urge acted on in a harmless form; with `hold`, Pause's kind,
-the diversity rule could never set it beside Pause), `direction: neutral`. A test switches the row on and checks
-it shows as Pause's swap for both words and never when flooded.
+the diversity rule could never set it beside Pause; approved 10 Nov), `direction: neutral`. A test checks it shows
+as Pause's swap for both words, never when flooded, and that switched off the swap is Cool Down again.
 
-**For Claudia's sign-off:** the opening line (`open_title`, the D16 witness line, shipped as the skill's own copy
-until F2), and the routing row (add its id to `SIGNED_OFF` in `scripts/recommendations/content.py`). The rest of
-the copy isn't sign-off gated (the Check the Facts and Cope Ahead precedent).
+**Signed off (Claudia, 10 Nov 2026):** the opening line (`open_title`, kept as the skill's own copy until the D16
+witness lines replace it), the `redirect` kind, and the routing row (in `SIGNED_OFF` in
+`scripts/recommendations/content.py`). The rest of the copy isn't sign-off gated (the Check the Facts and Cope Ahead
+precedent).
 
 With the kill switch off, the legacy ranker can now return this card (it used to drop it as unknown): that is
 the intended effect of the tool existing.
