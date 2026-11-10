@@ -24,7 +24,7 @@ test("every interactive tool declares its close; client and server registries ag
   const played = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
   const playedIds = [...played.slice(played.indexOf("PLAYER_TOOLS")).matchAll(/^\s*'([a-z-]+)': '/gm)].map((m) => m[1]);
   const components = [...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds];
-  assert.equal(components.length, 14);
+  assert.equal(components.length, 15);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);

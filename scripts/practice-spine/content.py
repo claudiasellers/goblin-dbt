@@ -54,6 +54,13 @@ CLOSE_FLOW = {
                 "choices": [{"id": "no", "label": "Held off"}, {"id": "yes", "label": "Went ahead"}, {"id": "not_yet", "label": "Still deciding"}],
             },
         },
+        # DT-11: the acted answer is on the destructive urge, not on the rebellion picked.
+        "alternate-rebellion": {
+            "urge": {
+                "question": "And the urge to blow it all up?",
+                "choices": [{"id": "no", "label": "Held off"}, {"id": "yes", "label": "Went ahead"}, {"id": "not_yet", "label": "Still deciding"}],
+            },
+        },
     },
     "skip": "Skip",
     "saved": "Noted.",

@@ -63,7 +63,7 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part, Two pulls, Wise mind, Cope Ahead and Check the Facts are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
+test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts and Rebel without the wreckage are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
