@@ -281,6 +281,9 @@ test("quick exit replaces the page with a neutral one; the player shows it on ev
   assert.match(readFileSync("src/lib/quickExit.ts", "utf8"), /window\.location\.replace\(url\)/, "replace, so Back doesn't return here");
   const player = readFileSync("src/components/skillPlayer/SkillPlayer.tsx", "utf8");
   assert.match(player, /\{skill\.quickExit && !inline && <QuickExit \/>\}/);
+  // Never covered: above the too-much overlay (z-50), the one full-screen overlay a skill opens.
+  assert.match(readFileSync("src/components/safety/QuickExit.tsx", "utf8"), /className="fixed z-\[60\] /);
+  assert.match(readFileSync("src/components/capacity/TooMuchLink.tsx", "utf8"), /fixed inset-0 z-50/);
   // R15 in the player: the visit begins only at the run's end or a check-in, and only when the run may save.
   assert.match(player, /if \(persist === 'save' && step\.complete\) toolSession\.begin\(\);/);
   assert.match(player, /toolSession\.begin\(\);\n\s+if \(!\(await toolSession\.ready\(\)\)\) throw new Error\('no session'\);/);
