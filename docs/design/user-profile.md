@@ -1,6 +1,6 @@
 # The user profile: what we keep about a person, what it powers, and how they control it
 
-Status: plan, 10 Nov 2026 (decisions answered 10 Nov; storage re-evaluated in §3). No product code in this PR. Owner of this contract: the profile thread. The
+Status: approved 10 Nov 2026 (§10). The same PR builds §9 P1 (the kind registry and keep / edit / delete) and the cheaper half of P2: retention as a daily job, App Check staged, own-words encryption in the keep path and on `ToolSession.ext`, and the crew's content-only copy. Still to do: migrating existing own words, Me's delete UI, the settings-cache pin test. Owner of this contract: the profile thread. The
 **attempt record** (what one skill run writes on the spine) is owned by the runtime plan,
 [`dbt-modules-plan.md` §C1](dbt-modules-plan.md), which extends
 [`skill-runtime.md` "The attempt record"](skill-runtime.md) (PR #54). This doc links to it and does not
@@ -92,8 +92,9 @@ confirmed history reorders them. No model ever reads user data (§8).
 **Don't migrate now.** It means rewriting most of the functions layer and its tests for one user-facing
 gain (faster Me and profile reads). The other gains can be had more cheaply:
 
-- **Crew exposure:** take the crew off the production database. It reads a content-only export, the same
-  `graph-export.mjs --content-only` that `build.mjs` already refuses to accept with any user node in it.
+- **Crew exposure:** take the crew off the production database. It reads its own Neo4j database loaded
+  from a content-only export (`scripts/crew/load-content-copy.mjs`, which refuses the same user labels
+  `build.mjs` does, a target that is the production URI, and a target that holds any `User` node).
 - **Retention:** a daily scheduled function (§8 #1). Firestore isn't needed for that.
 - **Speed:** keep the warm-up pattern (`{ warm: true }`), and let Me prefetch on app open.
 
@@ -326,10 +327,10 @@ Gaps to close (in order of risk):
 
 | # | Gap | Fix |
 |---|---|---|
-| 1 | Retention runs only when `getUserProfile` loads, so a person who stops opening the app keeps their history forever, against their setting | Daily `onSchedule` (planned as PR-S8; never built) |
-| 2 | The Slack crew's read-only Aura credential can read user data (`graph.md` open question) | Give the crew no production credential: it reads a content-only export (`graph-export.mjs --content-only`), and `pulse` gets counts from a function that returns numbers only (§3.3) |
-| 3 | No App Check on callables | Turn on App Check for every callable (D-12 said "with the safety batch") |
-| 4 | Sensitive free text (own lines, part own words, `ext.run` own words, later `Person` labels and safety-plan contacts) is plaintext in Aura (encrypted at rest by Aura, readable by anyone with DB access) | **Decided (P5): encrypt own-words free text at the application layer from the first module lane on**: envelope encryption, one data key per person wrapped by a Cloud KMS key that only Functions can use, cached per function instance. New own-words fields (`ext.run` answers' `valueOwn`, kept items' own text, `Person` labels, safety-plan contacts) are written encrypted from day one; existing ones (own lines, part own words) are re-encrypted by a one-off migration. Device-only storage stays an option for the plan and kit. Cost: well under a millisecond per field, plus one KMS call per cold instance (~10–30 ms). Not noticeable. Encrypted fields can't be searched or counted in Cypher, which is fine: own words are never queried, only shown back. Delete gets stronger too: dropping a person's data key makes any copy of their text unreadable, backups included |
+| 1 | Retention runs only when `getUserProfile` loads, so a person who stops opening the app keeps their history forever, against their setting | **Built:** `applyRetentionDaily` (`userdata/retention.ts`), every day 03:30 UTC, log records only; `getUserProfile` no longer runs it |
+| 2 | The Slack crew's read-only Aura credential can read user data (`graph.md` open question) | Give the crew no production credential. **Built:** `scripts/crew/load-content-copy.mjs` loads a `--content-only` export into the crew's own database (Aura Free). Still to do: revoke the crew's prod login once it reads the copy; `pulse` gets counts from a function that returns numbers only (§3.3) |
+| 3 | No App Check on callables | **Staged:** every callable takes `CALL_OPTS` (`shared/callOptions.ts`); the app sends App Check tokens once `VITE_APP_CHECK_SITE_KEY` is set (reCAPTCHA Enterprise). Enforcing is one constant, `APP_CHECK_ENFORCED`, flipped in its own PR after the metrics show every request carries a token |
+| 4 | Sensitive free text (own lines, part own words, `ext.run` own words, later `Person` labels and safety-plan contacts) is plaintext in Aura (encrypted at rest by Aura, readable by anyone with DB access) | **Decided (P5), built for new writes** (`shared/crypto.ts`): envelope encryption, one AES-256 data key per person, created on first use and stored on their `User` node wrapped (AES-256-GCM, uid as additional data) by a master key held as the Firebase secret `OWN_WORDS_KEY`, which only Functions can read. Unwrapped keys are cached per function instance. Values are stored as `enc:v1:…`, also bound to the uid, so a value copied onto another person's record won't open. Encrypted now: kept profile items' own-words fields (each kind's `ownFields`) and every text field of `ToolSession.ext` at close (the `*Own` answers). Length limits apply to the plaintext. Reads pass a plain string through unchanged, so existing own words (own lines, part own words, DEAR MAN customs) keep working until a one-off migration encrypts them (still to do). Export decrypts for the person and never includes the wrapped key. Cost: microseconds per field and one unwrap per person per warm instance. Encrypted fields can't be searched, ordered or counted in Cypher, which is fine because own words are only shown back. What it protects: anyone reading the database, a database export, or the crew without the Functions secret. What it doesn't: Aura backups hold the wrapped key next to the text, so deleting a person doesn't make their backed-up text unreadable to someone who also holds the master key (gap 7 still applies). The master key sits behind a `KeyProvider` interface so Cloud KMS can replace it later by rewrapping the keys, with no change to stored values |
 | 5 | `localStorage` holds the settings cache (incl. `partsEnabled`) and DEAR MAN resume drafts with own words (≤ 24 h, cleared on sign-out; an expired draft that is never read stays until sign-out or the next read) | Pin the settings cache's field list in a test; sweep expired resume tokens on app start; any new runtime resume draft (the skill player) uses the same token store and rules, and never holds ask-fresh fields |
 | 6 | Function logs | Keep `errorTag`-only logging; a test that no profile write logs its payload |
 | 7 | Deleted data survives in Aura backups until they expire | Say so in the privacy copy with the backup window; no code |
@@ -344,8 +345,8 @@ scoped per area, revocable.
 
 | Step | What | Depends on |
 |---|---|---|
-| P1 | `kinds.ts` registry + `keepProfileItem` / `editProfileItem` / `deleteProfileItem`; move `quiet_hours` onto it; Me's delete and "Used by" | Nothing; lands before the runtime's keep step needs it |
-| P2 | Retention on a schedule; settings-cache pin test; crew off the production database; own-words encryption helper (`shared/crypto.ts`) and the migration for existing own words | Nothing; encryption lands before the first module lane writes own words |
+| P1 | `kinds.ts` registry + `keepProfileItem` / `editProfileItem` / `deleteProfileItem`; move `quiet_hours` onto it; Me's delete and "Used by" | **Server built** (this PR); Me's delete and "Used by" UI still to do |
+| P2 | Retention on a schedule; settings-cache pin test; crew off the production database; own-words encryption helper (`shared/crypto.ts`) and the migration for existing own words; App Check | **Built** (this PR): retention job, crypto + keep path + ext, crew loader, App Check staged. Still to do: the migration for existing own words, the settings-cache pin test, enforcing App Check |
 | P3 | Personal ranking read model, observe-only (§6.4), plus its dry run | Enough answered closes; the runtime's `ext.run` for skills on the player |
 | P4 | Dry-run `what_helps_better` on real counts, then switch it on (D-10 said after four weeks; it's been five, with one user) | Claudia's look at the counts |
 | P5 | First module kinds: `cope_ahead_plan` (Cope Ahead's port), `body_flags` (DT-01), `person` (IE-03) | Their module lanes |
@@ -360,7 +361,7 @@ Answered 10 Nov.
 
 | # | Decision | Answer |
 |---|---|---|
-| P1 | Keep every piece of user data in Neo4j (no Firestore) | **Asked to re-evaluate.** §3 compares the two; recommendation: stay, with the triggers in §3.3 for revisiting. Waiting on Claudia |
+| P1 | Keep every piece of user data in Neo4j (no Firestore) | **Stay in Neo4j** (Claudia, 10 Nov, after the §3 comparison); revisit on the triggers in §3.3 |
 | P2 | How much can your own history move a recommendation? | **Agreed:** reorders tools of equal priority only, never above a higher-priority row, never past a safety filter |
 | P3 | Can a result card say *why* from your history? | **Agreed:** only for a pattern you confirmed. Also: build up the history first; observe-only until then (§6.4) |
 | P4 | A real "delete this" on single items in Me | **Agreed**, two-step confirm |

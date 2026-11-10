@@ -3,8 +3,9 @@
  * Moved verbatim from the single-file functions/src/index.ts (A1-2); deploy names are the export names.
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { getDriver } from '../shared/neo4j';
 import { GUARDS } from '../userdata/lifecycle';
+import { CALL_OPTS } from '../shared/callOptions';
 
 // ============================================
 // TOOL USAGE TRACKING
@@ -14,7 +15,7 @@ import { GUARDS } from '../userdata/lifecycle';
  * Track that a user opened/used a tool
  */
 export const trackToolUsage = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -71,7 +72,7 @@ export const trackToolUsage = onCall(
  * Finds the user's most recent ToolUsage with null outcome.
  */
 export const recordToolOutcome = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');

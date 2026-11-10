@@ -4,13 +4,14 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { Record as Neo4jRecord } from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword, readTx } from '../shared/neo4j';
+import { getDriver, readTx } from '../shared/neo4j';
 import { callable } from '../shared/callable';
 import { parseOrInvalid } from '../shared/errors';
 import { getStateAndToolsHandler, PatternNotFoundError } from './handler';
 import { graphDeps } from './queries';
 import { isWarmRequest, parseStateRequest } from './validation';
 import type { StateResult } from './types';
+import { CALL_OPTS } from '../shared/callOptions';
 
 // ============================================
 // KNOWLEDGE GRAPH QUERY FUNCTIONS
@@ -69,7 +70,7 @@ export const getStateAndTools = callable<unknown, StateResult | { warm: true }>(
  * Returns questions with their responses and conditional flow (TRIGGERS_NEXT).
  */
 export const getDiscriminatingQuestions = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request): Promise<{ questions: Array<{
     id: string;
     text: string;
@@ -178,7 +179,7 @@ export const getDiscriminatingQuestions = onCall(
  * Powers the "You might also be feeling..." feature
  */
 export const getRelatedEmotions = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request): Promise<{ relatedEmotions: Array<{ id: string; name: string; reason: string }> }> => {
     const { emotionId, quadrant } = request.data as { emotionId: string; quadrant?: string };
 

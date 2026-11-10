@@ -3,7 +3,8 @@
  * Moved verbatim from the single-file functions/src/index.ts (A1-2); deploy names are the export names.
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { getDriver } from '../shared/neo4j';
+import { CALL_OPTS } from '../shared/callOptions';
 
 // ============================================
 // PROBLEM SOLVE CONTENT
@@ -137,7 +138,7 @@ interface ProblemSolveContentResult {
  * No auth required — this is public emotion knowledge.
  */
 export const getProblemSolveContent = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request): Promise<ProblemSolveContentResult> => {
     const { emotionIds } = request.data as { emotionIds: string[] };
 
