@@ -1,6 +1,8 @@
 import type { ComponentType } from 'react';
-import type { EmbedOutput, EmbedOutputSchema } from '../../data/skillTypes';
+import type { EmbedOutput, EmbedOutputSchema, EmbedPropSpec } from '../../data/skillTypes';
+import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
+import { WitnessEmbed } from './WitnessEmbed';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -21,14 +23,47 @@ export interface EmbedProps {
   ctx?: Readonly<Record<string, string>>;
   /** The run's answers as the person saw them: each answered field's labels in pick order, own words last. */
   picked?: Readonly<Record<string, readonly string[]>>;
+  /** The same answers as ids (an emotion field's grid ids, for an embed that asks the server about them). */
+  answerIds?: Readonly<Record<string, readonly string[]>>;
   onShown: () => void;
   onDone?: (output: EmbedOutput) => void;
 }
 
 export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   partsLine: PartsLine,
+  holdRing: HoldRingEmbed,
+  witness: WitnessEmbed,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   partsLine: {},
+  holdRing: { ids: ['held', 'partly', 'skipped'], measures: ['durationSec', 'doneCount', 'earlyCount'] },
+  witness: { ids: ['yes', 'sort_of', 'no', 'none_fit', 'own', 'skip', 'seen'] },
+};
+
+/**
+ * What each embed takes from the skill (C3b "declared props"), mirrored in content.py EMBED_PROPS, which
+ * build.py checks every step against; the player resolves `copy` props to the skill's text
+ * (src/lib/skillRuntime/embedProps.ts) and passes nothing undeclared.
+ */
+export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, EmbedPropSpec>>> = {
+  partsLine: { promptId: { type: 'id' } },
+  holdRing: {
+    variant: { type: 'enum', values: ['press', 'timed', 'settle'] },
+    seconds: { type: 'int', min: 1, max: 900 },
+    holds: { type: 'int', min: 1, max: 10, optional: true },
+    growthPct: { type: 'int', min: 100, max: 300, optional: true },
+    maxSeconds: { type: 'int', min: 1, max: 900, optional: true },
+    label: { type: 'copy' },
+    runningLabel: { type: 'copy', optional: true },
+    hint: { type: 'copy' },
+    doneLabel: { type: 'copy', optional: true },
+    next: { type: 'copy' },
+  },
+  witness: {
+    moment: { type: 'id' },
+    wordsFrom: { type: 'field', optional: true },
+    emotionsFrom: { type: 'field', optional: true },
+    next: { type: 'copy', optional: true },
+  },
 };

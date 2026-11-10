@@ -17,6 +17,12 @@ const EXT_MAX_BYTES = 4096;
 const m = await importTs("src/lib/skillRuntime/machine.ts");
 const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX } = await importTs("functions/src/spine/extSchemas.ts");
 const conditions = await importTs("src/lib/skillRuntime/conditions.ts");
+const holdRing = await importTs("src/lib/holdRing.ts");
+const embedProps = await importTs("src/lib/skillRuntime/embedProps.ts");
+const witness = await importTs("src/lib/witness.ts");
+const { WITNESS_MOMENTS } = await importTs("functions/src/witness/types.ts");
+const profileTypes = await importTs("src/data/profileTypes.ts");
+const { PROFILE_KINDS } = await importTs("functions/src/profile/kinds.ts");
 /** content.py's EMBEDS: each embed's declared output (ids, ownText, measures, danger). */
 const EMBEDS_PY = py("from content import EMBEDS; print(json.dumps(EMBEDS))");
 /** embeds.ts's EMBED_OUTPUTS, read as the literal it is. */
@@ -97,6 +103,25 @@ for (const sk of fixture.skills) {
     }
   });
 
+  test(`${sk.id}: reads only the profile slices its tool declares; keeps only registered kinds, own words to own fields (C2)`, () => {
+    const needs = profileTypes.PROFILE_NEEDS[sk.toolId] ?? [];
+    const refs = JSON.stringify(sk.steps).match(/\$p\.[A-Za-z]+/g) ?? [];
+    for (const r of refs) assert.ok(needs.includes(r.slice(3)), `${sk.id}: ${r} needs '${r.slice(3)}' in PROFILE_NEEDS['${sk.toolId}']`);
+    for (const f of fields(sk)) {
+      if (f.options.profile) assert.ok(needs.includes(f.options.profile), `${f.id}: lists ${f.options.profile}, not in PROFILE_NEEDS['${sk.toolId}']`);
+    }
+    for (const st of sk.steps) {
+      if (!st.keep) continue;
+      const def = PROFILE_KINDS[st.keep.kind];
+      assert.ok(def, `${st.id}: keeps ${st.keep.kind}, which functions/src/profile/kinds.ts doesn't register`);
+      assert.equal(st.keep.many, def.many, `${st.id}: keep.many must be ${def.many} for ${st.keep.kind}`);
+      for (const fid of st.keep.from) {
+        const f = fields(sk).find((x) => x.id === fid);
+        if (f?.own) assert.ok(def.ownFields.includes(`${fid}Own`), `${st.id}: ${fid}Own is own words: list it in ${st.keep.kind}'s ownFields`);
+      }
+    }
+  });
+
   test(`${sk.id}: its tool declares a close kind on both sides`, () => {
     const decl = new RegExp(`'${sk.toolId}': \\{ module: '[a-z]+', closeKind: '[a-z_]+' \\}`);
     assert.match(read("functions/src/spine/tools.ts"), decl);
@@ -147,6 +172,85 @@ test("embeds: one registry in the player, the same names in content.py, and ever
   assert.deepEqual(Object.keys(EMBED_OUTPUTS_TS).sort(), listed);
   // What each embed may report is the same on both sides (the machine keeps only what is declared).
   assert.deepEqual(EMBED_OUTPUTS_TS, EMBEDS_PY);
+});
+
+/** embeds.ts's EMBED_PROPS, read as the literal it is. */
+const EMBED_PROPS_TS = (() => {
+  const block = /export const EMBED_PROPS[^=]*=\s*(\{[\s\S]*?\n\});/.exec(read("src/components/skillPlayer/embeds.ts"))[1];
+  return new Function(`return ${block}`)();
+})();
+const EMBED_PROPS_PY = py("from content import EMBED_PROPS; print(json.dumps(EMBED_PROPS))");
+/** build.py's check_embed_props on one set of props (copy keys `a`, `b`; fields `f`): null when it passes. */
+const propsCheck = (name, props) => {
+  try {
+    execFileSync("python3", ["-c", `import sys,json; sys.path.insert(0,'scripts/skills'); import build
+build.check_embed_props(${JSON.stringify(name)}, json.loads(sys.argv[1]), {"a": "A", "b": "B"}, {"f"}, "probe")`, JSON.stringify(props)], { stdio: "pipe" });
+    return null;
+  } catch (e) { return String(e.stderr); }
+};
+
+test("embed props: declared the same on both sides; build.py refuses undeclared, mistyped or missing props", () => {
+  assert.deepEqual(EMBED_PROPS_TS, EMBED_PROPS_PY);
+  assert.deepEqual(Object.keys(EMBED_PROPS_PY).sort(), Object.keys(EMBEDS_PY).sort(), "every embed declares its props");
+  assert.deepEqual(EMBED_PROPS_PY.holdRing.variant.values, [...holdRing.HOLD_VARIANTS]);
+  const ring = { variant: "press", seconds: 90, label: "a", hint: "b", next: "a" };
+  assert.equal(propsCheck("holdRing", ring), null);
+  assert.equal(propsCheck("holdRing", { ...ring, holds: 3, growthPct: 150, maxSeconds: 900, doneLabel: "b" }), null);
+  assert.match(propsCheck("holdRing", { ...ring, colour: "red" }), /takes no such prop/);
+  assert.match(propsCheck("holdRing", { ...ring, label: "Hold here" }), /copy key/, "words come from the skill's copy");
+  assert.match(propsCheck("holdRing", { ...ring, seconds: 901 }), /in range/);
+  assert.match(propsCheck("holdRing", { ...ring, seconds: true }), /in range/);
+  assert.match(propsCheck("holdRing", { ...ring, variant: "spin" }), /one of/);
+  const { next: _n, ...noNext } = ring;
+  assert.match(propsCheck("holdRing", noNext), /needs next/);
+  assert.equal(propsCheck("witness", { moment: "crisis", wordsFrom: "f", emotionsFrom: "f", next: "a" }), null);
+  assert.match(propsCheck("witness", { moment: "crisis", wordsFrom: "g" }), /field of the skill/);
+  assert.match(propsCheck("witness", { moment: "Not An Id" }), /is an id/);
+  // Every witness step a skill ships names a moment the witness server knows.
+  for (const sk of fixture.skills) {
+    for (const st of sk.steps) {
+      const uses = [...(st.embed === "witness" ? [st.props] : []), ...(st.slots ?? []).filter((x) => x.embed === "witness").map((x) => x.props)];
+      for (const pr of uses) assert.ok(WITNESS_MOMENTS.includes(pr.moment), `${sk.id}.${st.id}: moment ${pr.moment}`);
+    }
+  }
+});
+
+test("embed props in the player: only what is declared, copy keys as the skill's text, a missing optional key dropped", () => {
+  const spec = EMBED_PROPS_TS.holdRing;
+  const copy = { hold: "Hold here", hint: "Press and hold", on: "Go on" };
+  assert.deepEqual(
+    embedProps.resolveEmbedProps(spec, { variant: "timed", seconds: 30, label: "hold", hint: "hint", next: "on", doneLabel: "gone", extra: 1 }, copy),
+    { variant: "timed", seconds: 30, label: "Hold here", hint: "Press and hold", next: "Go on" },
+  );
+  assert.deepEqual(embedProps.resolveEmbedProps(undefined, { a: 1 }, copy), {});
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.equal((player.match(/props=\{embedProps\(ctx, /g) ?? []).length, 2, "slots and whole-screen embeds both get resolved props");
+  assert.equal((player.match(/answerIds=\{answerIds\(st\)\}/g) ?? []).length, 2);
+});
+
+test("witness outcome: own words, skip and none-fit first, then the last line's landed; nothing answered is seen", () => {
+  const r = (o) => ({ landed: {}, skipped: false, noneFit: false, shownLineIds: [], ...o });
+  assert.equal(witness.witnessOutcome(null), "seen");
+  assert.equal(witness.witnessOutcome(r({})), "seen");
+  assert.equal(witness.witnessOutcome(r({ shownLineIds: ["a", "b"], landed: { a: "no", b: "yes" } })), "yes");
+  assert.equal(witness.witnessOutcome(r({ shownLineIds: ["a"], landed: { a: "sort_of" }, skipped: true })), "skip");
+  assert.equal(witness.witnessOutcome(r({ noneFit: true })), "none_fit");
+  assert.equal(witness.witnessOutcome(r({ ownLine: { id: "x", text: "mine" }, skipped: true })), "own");
+  for (const id of ["yes", "sort_of", "no", "none_fit", "own", "skip", "seen"]) assert.ok(EMBEDS_PY.witness.ids.includes(id));
+  // The beat is logged against this visit's session once it's written, never against a check-in.
+  const src = read("src/components/skillPlayer/WitnessEmbed.tsx");
+  assert.match(src, /hostKind: 'tool_session'/);
+  assert.match(src, /\.then\(\(\) => session\.ready\(\)\)/);
+  assert.equal(witness.beatRequest({ checkInId: "s1", hostKind: "tool_session", moment: "crisis", band: "stirred", lines: [], result: r({}), emotionIds: [] }).hostKind, "tool_session");
+  assert.equal(witness.beatRequest({ checkInId: "c1", moment: "checkin_result", band: "stirred", lines: [], result: r({}), emotionIds: [] }).hostKind, "checkin");
+});
+
+test("profile slices: build.py's lists are the app's", () => {
+  const src = read("scripts/skills/build.py");
+  const set = (name) => [...new RegExp(`^${name} = \\{([\\s\\S]*?)\\}`, "m").exec(src)[1].matchAll(/"([A-Za-z]+)"/g)].map((x) => x[1]).sort();
+  assert.deepEqual(set("PROFILE_SLICES"), [...profileTypes.SLICE_IDS].sort());
+  const optionSlices = /export type ProfileOptionSlice = ([^;]+);/.exec(read("src/data/skillTypes.ts"))[1];
+  assert.deepEqual(set("PROFILE_OPTION_SLICES"), [...optionSlices.matchAll(/'([A-Za-z]+)'/g)].map((x) => x[1]).sort());
 });
 
 test("own-words cap: build.py and the server's schema agree", () => {
@@ -300,6 +404,101 @@ test("picked labels: what an embed reads back, labels in pick order, own words l
   const both = { answers: { urge: { ids: ["send"], own: "my way" } } };
   assert.deepEqual(m.pickedLabels(ctx, both), { urge: ["send", "my way"] });
   assert.deepEqual(m.pickedLabels(ctx, m.initialRun(SKILL)), {});
+});
+
+// --- F2: profile reads, keep and follow-up actions, inline runs and resume, over a second synthetic skill ------
+
+const F2 = {
+  id: "f2_probe", toolId: "f2-probe", version: "t2", start: "who", accepts: [], ownMax: 140, emotionFields: [],
+  copy: { keep: "Keep this", profile_unnamed: "One without a name" }, tables: {}, derive: [],
+  steps: [
+    { id: "who", kind: "ask", fields: [
+      { id: "part", options: { profile: "parts", list: "general" }, max: 1, showWhen: { set: "$p.parts" } },
+      { id: "line", options: { list: "lines" }, max: 1, own: { hint: "keep", countsAsPick: true } },
+    ], keep: { kind: "test_kind", many: true, from: ["line"], when: { set: "$a.line" } }, primary: "keep",
+      next: [{ to: "when", when: null }], offers: [] },
+    { id: "when", kind: "ask", fields: [{ id: "chip", options: { list: "chips" }, max: 1 }],
+      followUp: { type: "resume_skill", whenFrom: "chip" }, next: [{ to: "check", when: null }], offers: [] },
+    { id: "check", kind: "ask", fields: [{ id: "change", options: { list: "tvn" }, max: 1, askFresh: "fitsFacts" }],
+      next: [{ to: "end", when: null }], offers: [] },
+    { id: "end", kind: "handoff", next: [], offers: [], done: "done" },
+  ],
+  exits: [{ id: "done", toolId: null, query: {}, carry: [], done: true }],
+  options: {
+    general: [opt("someone")], lines: [opt("l1"), opt("l2")], chips: [opt("1h"), opt("tomorrow")],
+    tvn: [opt("better"), opt("same")],
+  },
+  inline: { enterAt: ["when"], returns: ["line", "chip"], thenVsNowFrom: "change" },
+};
+const PARTS = [
+  { id: "11111111-1111-4111-8111-111111111111", name: "The guard" },
+  { id: "22222222-2222-4222-8222-222222222222", name: null },
+];
+const f2Ctx = (profile) => ({ skill: F2, shared: { parentOf: {}, fitsWhen: {} }, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn: {}, profile });
+const f2 = (ctx, events, s = m.initialRun(F2)) => events.reduce((st, e) => m.runNext(ctx, st, e), s);
+
+test("profile reads: $p shows the field only with kept items; their items come first, never selected, labels shown not recorded", () => {
+  const step = F2.steps[0];
+  assert.equal(m.shownFields(f2Ctx(null), step, m.initialRun(F2)).length, 1, "loading or signed out: no parts, no field");
+  assert.equal(m.shownFields(f2Ctx({ parts: [] }), step, m.initialRun(F2)).length, 1);
+  const ctx = f2Ctx({ parts: PARTS });
+  assert.equal(m.shownFields(ctx, step, m.initialRun(F2)).length, 2);
+  const [g] = m.optionGroups(ctx, step.fields[0], {});
+  assert.deepEqual(g.options.map((o) => [o.value, o.label]), [[PARTS[0].id, "The guard"], [PARTS[1].id, "One without a name"], ["someone", "someone"]]);
+  const s = f2(ctx, [{ type: "pick", fieldId: "part", value: PARTS[0].id }]);
+  assert.deepEqual(m.runRecord(ctx, s).answers, [{ fieldId: "part", optionIds: [PARTS[0].id] }], "the id, never the name");
+  assert.deepEqual(conditions.resolve("$p.parts.ids", m.scope(ctx, s)), PARTS.map((p) => p.id));
+});
+
+test("keep: the from fields as <field>Ids / <field>Own, only while `when` holds; kept once per step, the id reused", () => {
+  const ctx = f2Ctx(null);
+  const step = F2.steps[0];
+  assert.equal(m.keepFor(ctx, step, m.initialRun(F2)), null, "nothing answered: nothing to keep");
+  const s = f2(ctx, [{ type: "own", fieldId: "line", text: " my words " }]);
+  assert.deepEqual(m.keepFor(ctx, step, s), { kind: "test_kind", value: { lineOwn: "my words" }, id: null });
+  const kept = m.runNext(ctx, s, { type: "kept", stepId: "who", kind: "test_kind", id: "33333333-3333-4333-8333-333333333333" });
+  assert.equal(m.keepFor(ctx, step, kept).id, "33333333-3333-4333-8333-333333333333", "passed again: the same item");
+  assert.equal(m.runNext(ctx, s, { type: "kept", stepId: "who", kind: "other_kind", id: "x" }).kept.who, undefined, "only the step's own kind");
+  assert.deepEqual(m.runRecord(ctx, kept).kept, ["test_kind"]);
+  assert.doesNotThrow(() => validateExt({ run: m.runRecord(ctx, kept) }));
+});
+
+test("follow-up: the chip picked on the step, once per run", () => {
+  const ctx = f2Ctx(null);
+  const step = F2.steps[1];
+  let s = f2(ctx, [{ type: "next" }]);
+  assert.equal(s.stepId, "when");
+  assert.equal(m.followUpFor(ctx, step, s), null, "no chip yet");
+  s = m.runNext(ctx, s, { type: "pick", fieldId: "chip", value: "tomorrow" });
+  assert.deepEqual(m.followUpFor(ctx, step, s), { type: "resume_skill", chip: "tomorrow" });
+  s = m.runNext(ctx, s, { type: "scheduled", stepId: "when", followUpType: "resume_skill", id: "44444444-4444-4444-8444-444444444444" });
+  assert.equal(m.followUpFor(ctx, step, s), null, "scheduled already");
+  assert.deepEqual(m.runRecord(ctx, s).scheduled, ["resume_skill"]);
+});
+
+test("inline: starts only at a step it declares; returns its returns fields and the change check as then-vs-now", () => {
+  assert.equal(m.initialRun(F2, "when").stepId, "when");
+  assert.equal(m.initialRun(F2, "check").stepId, "who", "not an enterAt step: the start");
+  assert.equal(m.initialRun({ ...F2, inline: undefined }, "when").stepId, "who");
+  const ctx = f2Ctx(null);
+  const s = f2(ctx, [{ type: "pick", fieldId: "chip", value: "1h" }, { type: "next" }, { type: "pick", fieldId: "change", value: "better" }], m.initialRun(F2, "when"));
+  assert.deepEqual(m.inlineResult(ctx, s), { answers: { chip: { ids: ["1h"], own: null } }, thenVsNow: "better" });
+  assert.equal(m.inlineResult({ ...ctx, skill: SKILL }, s), null, "not an inline skill");
+});
+
+test("resume: the run's own answers read back at a step it reached; ask-fresh answers are asked again; another skill's record is ignored", () => {
+  const ctx = f2Ctx(null);
+  const rec = {
+    skillId: "f2_probe", versionId: "t2", path: ["who", "when", "check", "end"],
+    answers: [{ fieldId: "line", optionIds: ["l2"] }, { fieldId: "chip", optionIds: ["1h"] }, { fieldId: "change", optionIds: ["better"] }, { fieldId: "gone", optionIds: ["x"] }],
+  };
+  const s = m.resumeRun(ctx, rec, "check");
+  assert.equal(s.stepId, "check");
+  assert.deepEqual(s.path, ["who", "when", "check"]);
+  assert.deepEqual(Object.keys(s.answers).sort(), ["chip", "line"], "the ask-fresh change check is asked again; unknown fields dropped");
+  assert.equal(m.resumeRun(ctx, rec, "nowhere").stepId, "end", "a step it never reached: where it stopped");
+  assert.equal(m.resumeRun(ctx, { ...rec, versionId: "t1" }, "check"), null, "another version's answers don't fit");
+  assert.equal(m.resumeRun(ctx, { ...rec, skillId: "other" }, "check"), null);
 });
 
 test("noClose: only on a hand-off, and the player leaves it without the close question", () => {

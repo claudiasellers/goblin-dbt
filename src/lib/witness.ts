@@ -102,13 +102,17 @@ export function beatResult(lines: WitnessLine[], index: number, answers: BeatAns
   };
 }
 
-/** The recordWitnessBeat request for a check-in host (graph lines only in `shown`). */
+/**
+ * The recordWitnessBeat request (graph lines only in `shown`): for a check-in host by default, or for a tool
+ * session (`hostKind: 'tool_session'`, the session's id as `checkInId`'s place: the skill player's witness embed).
+ */
 export function beatRequest(o: {
   checkInId: string; moment: WitnessMoment; band: Band; lines: WitnessLine[]; result: WitnessResult; emotionIds: string[];
+  hostKind?: 'checkin' | 'tool_session';
 }): RecordWitnessBeatRequest {
   const graph = new Set(o.lines.filter((l) => l.source === 'graph').map((l) => l.id));
   const req: RecordWitnessBeatRequest = {
-    hostKind: 'checkin',
+    hostKind: o.hostKind ?? 'checkin',
     hostId: o.checkInId,
     moment: o.moment,
     band: o.band,
@@ -126,4 +130,21 @@ export function beatRequest(o: {
 export interface WitnessHandlers {
   onShown(result: WitnessResult, lines: WitnessLine[]): void;
   onDone(result: WitnessResult, lines: WitnessLine[]): void;
+}
+
+/** The ids a whole-screen witness step answers with (EMBED_OUTPUTS.witness.ids). */
+export type WitnessOutcome = 'yes' | 'sort_of' | 'no' | 'none_fit' | 'own' | 'skip' | 'seen';
+
+/**
+ * What the person did with the beat, as one id (the skill player's witness embed, as a whole step): own words,
+ * skip and none-fit first, then the last shown line's landed answer; nothing answered is `seen`.
+ */
+export function witnessOutcome(r: WitnessResult | null): WitnessOutcome {
+  if (!r) return 'seen';
+  if (r.ownLine) return 'own';
+  if (r.skipped) return 'skip';
+  if (r.noneFit) return 'none_fit';
+  const last = r.shownLineIds[r.shownLineIds.length - 1];
+  const landed = last ? r.landed[last] : null;
+  return landed ?? 'seen';
 }

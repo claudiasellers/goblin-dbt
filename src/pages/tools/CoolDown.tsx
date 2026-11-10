@@ -4,7 +4,7 @@ import { useReducedMotion } from 'motion/react';
 import { useToolSession } from '../../hooks/useToolSession';
 import type { ThenVsNow } from '../../data/capacityTypes';
 import { primaryButton } from '../../components/tools/oppositeAction/styles';
-import { buzz } from '../../components/tools/regulation/hooks';
+import { useCues, useKeepAwake } from '../../hooks/useDeadlineTimer';
 import { PartTagSlot } from '../../components/spine/PartTagSlot';
 
 // Circuit Breaker (tool id stays `cool-down`): TIPP temperature, cold on the face.
@@ -56,78 +56,7 @@ function edgeMask(handsIn: boolean): CSSProperties {
 
 type Step = 'ready' | 'lead' | 'running' | 'done' | 'check';
 
-// ── Sound: the user's hands are on their face, so the cues are heard (iOS web can't vibrate) ──
-function useCues() {
-  const ctx = useRef<AudioContext | null>(null);
-  useEffect(() => () => { void ctx.current?.close().catch(() => {}); }, []);
-
-  /** Must run inside the tap (iOS only unlocks audio from a user gesture). */
-  const unlock = () => {
-    try {
-      if (!ctx.current) {
-        const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-        if (AC) ctx.current = new AC();
-      }
-      if (ctx.current?.state === 'suspended') void ctx.current.resume();
-    } catch { /* no audio: the visuals still run */ }
-  };
-
-  const tone = (type: OscillatorType, from: number, to: number, peak: number, at: number, len: number) => {
-    const c = ctx.current;
-    if (!c) return;
-    const t = c.currentTime + at;
-    const o = c.createOscillator();
-    const g = c.createGain();
-    o.type = type;
-    o.frequency.setValueAtTime(from, t);
-    if (to !== from) o.frequency.exponentialRampToValueAtTime(to, t + Math.min(0.12, len));
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(peak, t + 0.01);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + len);
-    o.connect(g);
-    g.connect(c.destination);
-    o.start(t);
-    o.stop(t + len + 0.05);
-  };
-
-  return {
-    unlock,
-    /** Lub-dub: a pitch-dropping thud, audible on phone speakers. */
-    beat: () => { tone('sine', 150, 58, 0.9, 0, 0.22); tone('sine', 150, 58, 0.55, 0.16, 0.22); buzz([38, 120, 24]); },
-    tick: () => { tone('sine', 520, 520, 0.25, 0, 0.18); buzz(30); },
-    chime: () => { tone('sine', 660, 660, 0.35, 0, 1.1); tone('sine', 880, 880, 0.35, 0.22, 1.1); buzz([220, 120, 220]); },
-  };
-}
-
-/**
- * Keep the screen on while the timer runs. A locked phone pauses the page, so the end chime
- * and buzz would only fire once it wakes, and the user is holding ice until they hear it
- * (iOS auto-lock can be 30 s, shorter than lead-in + dose). Re-acquired if the page comes
- * back into view mid-run (the browser drops the lock when it's hidden). Unsupported: no-op.
- */
-function useKeepAwake(active: boolean) {
-  useEffect(() => {
-    if (!active || !('wakeLock' in navigator)) return;
-    let lock: WakeLockSentinel | null = null;
-    let cancelled = false;
-    const acquire = async () => {
-      if (document.visibilityState !== 'visible' || (lock && !lock.released)) return;
-      try {
-        const next = await navigator.wakeLock.request('screen');
-        if (cancelled) void next.release().catch(() => {});
-        else lock = next;
-      } catch { /* denied (battery saver, not visible): the dose still runs on timestamps */ }
-    };
-    void acquire();
-    const onVisible = () => { void acquire(); };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => {
-      cancelled = true;
-      document.removeEventListener('visibilitychange', onVisible);
-      void lock?.release().catch(() => {});
-    };
-  }, [active]);
-}
+// Cues and keep-awake are the shared timer's (src/hooks/useDeadlineTimer.ts, plan R13).
 
 export function CoolDown() {
   const session = useToolSession();

@@ -17,3 +17,13 @@ export function getSkillsContent(): Promise<SkillsContent> {
   }
   return cached;
 }
+
+/**
+ * Resume (plan C3a R9): the caller's own earlier run of this tool (its `ext.run`, own words readable), or null
+ * when there is none to reopen (another person's, another tool's, older than the server's window).
+ */
+export async function getSkillRun(sessionId: string, toolId: string): Promise<Record<string, unknown> | null> {
+  const [{ httpsCallable }, { functions }] = await Promise.all([import('firebase/functions'), import('./firebase')]);
+  const fn = httpsCallable<{ sessionId: string; toolId: string }, { run: Record<string, unknown> | null }>(functions, 'getSkillRun');
+  return (await fn({ sessionId, toolId })).data.run;
+}

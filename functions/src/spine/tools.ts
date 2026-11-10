@@ -57,5 +57,5 @@ export const RESERVED_ENTRIES: Record<string, readonly ToolEntry[]> = {
 
 /** then-vs-now direction of a close kind (R3); null when the kind doesn't ask it. */
 export function thenVsNowDirFor(k: CloseKind): 'down' | 'orient' | 'up' | null {
-  return k === 'regulation_down' ? 'down' : k === 'orienting' ? 'orient' : k === 'regulation_up' ? 'up' : null;
+  return k === 'regulation_down' || k === 'urge_change' ? 'down' : k === 'orienting' ? 'orient' : k === 'regulation_up' ? 'up' : null;
 }

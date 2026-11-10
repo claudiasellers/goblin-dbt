@@ -108,7 +108,7 @@ async function toolOutcomeItem(
   if (!t?.enabled || !flow) return [];
   const res = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession)
-     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge'] AND NOT ts.toolId IN $notWhatHelps
+     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge', 'urge_change'] AND NOT ts.toolId IN $notWhatHelps
        AND ts.answeredAt IS NULL AND coalesce(ts.outcomeAskDismissed, false) = false
        AND coalesce(ts.endedAt, ts.startedAt) > datetime() - duration({hours: 12})
        AND (ts.status = 'completed' OR coalesce(ts.practiced, false))
@@ -121,7 +121,8 @@ async function toolOutcomeItem(
   const r = res.records[0];
   if (!r) return [];
   const toolId = r.get('toolId') as string;
-  const kind = r.get('closeKind') as string;
+  // A skipped two-part close comes back as its urge question only (one tap in Today).
+  const kind = (r.get('closeKind') as string) === 'urge_change' ? 'urge' : (r.get('closeKind') as string);
   const q = flow.byTool[toolId]?.[kind] ?? flow.kinds[kind];
   if (!q) return [];
   return [{

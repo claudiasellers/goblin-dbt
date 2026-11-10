@@ -6,10 +6,27 @@ Then: node --test tests/skill-*.test.mjs
 """
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from content import SKILLS, CONTENT_VERSION, STEP_KINDS, EMBEDS, GRAPH_TABLES  # noqa: E402
+from content import SKILLS, CONTENT_VERSION, STEP_KINDS, EMBEDS, EMBED_PROPS, GRAPH_TABLES  # noqa: E402
+import importlib.util  # noqa: E402
+_spec = importlib.util.spec_from_file_location(
+    "practice_spine_content", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "practice-spine", "content.py"))
+_spine = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_spine)
+FOLLOW_UP_TYPES = _spine.FOLLOW_UP_TYPES  # the FollowUpType registry (scripts/practice-spine)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-REF = re.compile(r"^\$(a|d|opt|ctx)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
+REF = re.compile(r"^\$(a|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
+# Profile slices (src/data/profileTypes.ts SLICE_IDS; tests/skill-contracts.test.mjs keeps them equal). A skill
+# may read only the ones its tool's PROFILE_NEEDS declares (checked there too).
+PROFILE_SLICES = {
+    "name", "quietHours", "patterns", "ownLines", "savedLines", "people", "bodyFlags", "values", "goals",
+    "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "crisisKit",
+    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den",
+}
+# Slices a field may list as options (src/data/skillTypes.ts ProfileOptionSlice).
+PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", "goals", "copeAheadPlans", "boundaryLines", "thingsILike"}
+THEN_VS_NOW = {"worse", "same", "better", "much_better"}
+FOLLOW_UPS = {t["id"]: t for t in FOLLOW_UP_TYPES}
 # Context keys a skill may accept (src/data/skillTypes.ts CtxKey).
 CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo"}
 CRISIS_VARIANTS = {"crisis", "other_person"}
@@ -49,6 +66,9 @@ def check_cond(c, fields, derived, where, accepts=None):
             if kind == "ctx":
                 assert accepts is not None and name in accepts, (where, "context the skill doesn't accept", r)
                 assert r.count(".") == 1, (where, "a context value is one id: no .ids / .own", r)
+            if kind == "p":
+                assert name in PROFILE_SLICES, (where, "unknown profile slice", r)
+                assert not r.endswith(".own"), (where, "a profile slice has no .own", r)
     if op in ("all", "any"):
         for x in arg:
             check_cond(x, fields, derived, where, accepts)
@@ -65,6 +85,32 @@ def check_cond(c, fields, derived, where, accepts=None):
         ref(arg[0])
         if isinstance(arg[1], str):
             ref(arg[1])
+
+
+ID = re.compile(r"^[a-z0-9][a-z0-9_:-]{0,63}$")
+
+
+def check_embed_props(name, props, copy, fields, w):
+    """A step's or slot's props against the embed's EMBED_PROPS: declared, typed, and every copy key in the skill."""
+    spec = EMBED_PROPS[name]
+    props = props or {}
+    assert set(props) <= set(spec), (w, f"{name} takes no such prop", set(props) - set(spec))
+    for k, sp in spec.items():
+        if k not in props:
+            assert sp.get("optional"), (w, f"{name} needs {k}")
+            continue
+        v = props[k]
+        t = sp["type"]
+        if t == "copy":
+            assert isinstance(v, str) and v in copy, (w, f"{name}.{k} is a copy key of the skill", v)
+        elif t == "int":
+            assert isinstance(v, int) and not isinstance(v, bool) and sp["min"] <= v <= sp["max"], (w, f"{name}.{k} in range", v)
+        elif t == "enum":
+            assert v in sp["values"], (w, f"{name}.{k} is one of {sp['values']}", v)
+        elif t == "field":
+            assert v in fields, (w, f"{name}.{k} is a field of the skill", v)
+        else:
+            assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
 
 
 def check(skill):
@@ -110,6 +156,7 @@ def check(skill):
         assert s["kind"] in STEP_KINDS, w
         if s["kind"] == "embed":
             assert s.get("embed") in EMBEDS, (w, "a whole-screen embed the player has", s.get("embed"))
+            check_embed_props(s["embed"], s.get("props"), copy, fields, w)
             assert not s.get("fields"), (w, "an embed step has no fields; its output is `answerAs`")
             for v, kind in EMBEDS[s["embed"]].get("danger", {}).items():
                 want = "other_person" if kind == "other" else "crisis"
@@ -136,7 +183,9 @@ def check(skill):
         assert s["kind"] == "handoff" or s.get("next"), (w, "an ask step goes somewhere")
         for f in s.get("fields", []):
             o = f["options"]
-            assert ("emotions" in o) != ("list" in o), (w, f["id"])
+            assert ("emotions" in o) != ("list" in o or "profile" in o), (w, f["id"])
+            if "profile" in o:
+                assert o["profile"] in PROFILE_OPTION_SLICES, (w, "a slice of kept items", o)
             if "list" in o:
                 assert o["list"] in lists, (w, o)
                 if "where" in o:
@@ -168,6 +217,7 @@ def check(skill):
                 check_cond(ln["when"], fields, derived, w, accepts)
         for sl in s.get("slots", []):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
+            check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
             check_cond(sl["showWhen"], fields, derived, w, accepts)
         for ln in s.get("lines", []):
             assert ln["key"] in copy, (w, ln)
@@ -176,7 +226,38 @@ def check(skill):
             assert of["exit"] in exits, (w, of)
             check_cond(of["when"], fields, derived, w, accepts)
         assert "done" not in s or s["done"] in exits, w
+        step_fields = {f["id"] for f in s.get("fields", [])}
+        assert "primary" not in s or s["primary"] in copy, (w, "primary is a copy key", s.get("primary"))
+        if "keep" in s:
+            k = s["keep"]
+            assert s["kind"] == "ask" and isinstance(k.get("kind"), str), (w, "a keep runs on an ask step's primary tap", k)
+            assert isinstance(k.get("many"), bool), (w, "keep says whether its kind is many (profile/kinds.ts)", k)
+            assert "primary" in s, (w, "a keep step's button says what it keeps: the tap is the yes (C2.2)")
+            assert k["from"] and all(f in fields for f in k["from"]), (w, "keep from fields that exist", k)
+            if "when" in k:
+                check_cond(k["when"], fields, derived, w, accepts)
+        if "followUp" in s:
+            fu = s["followUp"]
+            t = FOLLOW_UPS.get(fu.get("type"))
+            assert s["kind"] == "ask" and t, (w, "a follow-up type the spine registers", fu)
+            if t["window"]["kind"] == "chip":
+                assert fu.get("whenFrom") in step_fields, (w, "a chip window needs the field on this step that picks it", fu)
+                f = next(f for f in s["fields"] if f["id"] == fu["whenFrom"])
+                values = {x[1] for x in skill["options"] if x[0] == f["options"].get("list")}
+                assert values and values <= set(t["window"]["chips"]), (w, "the field's options are the window's chips", values)
+            else:
+                assert "whenFrom" not in fu, (w, "this type's window has no choice", fu)
+            if "when" in fu:
+                check_cond(fu["when"], fields, derived, w, accepts)
         assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))
+    inl = skill.get("inline")
+    if inl:
+        assert inl["enterAt"] and set(inl["enterAt"]) <= steps, (sid, "inline starts at steps that exist", inl)
+        assert set(inl["returns"]) <= fields, (sid, "inline returns fields that exist", inl)
+        if inl.get("thenVsNowFrom"):
+            f = next((f for s in skill["steps"] for f in s.get("fields", []) if f["id"] == inl["thenVsNowFrom"]), None)
+            values = {x[1] for x in skill["options"] if f and x[0] == f["options"].get("list")}
+            assert f and values and values <= THEN_VS_NOW, (sid, "the change check's options are then-vs-now answers", values)
     every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
 
@@ -204,7 +285,7 @@ A(f"""// ============================================================
 for sk in SKILLS:
     sid = sk["id"]
     A(f"\n// --- {sid} ({sk['version']}) ---")
-    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
+    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.inlineJson = {js(sk.get('inline'))}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
     A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (s:Skill {{id: {q(sid)}}})\nMERGE (t)-[:HAS_SKILL]->(s);")
     # Edges are rebuilt each load (a removed step / jump / offer must disappear).
     A(f"MATCH (:SkillStep {{skillId: {q(sid)}}})-[r:NEXT|OFFERS|LINKS]->() DELETE r;")

@@ -15,6 +15,7 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
       id: 'check_the_facts', toolId: 'check-the-facts', version: 'cf-v1', contentVersion: 'skills-v1', start: 'feel', accepts: ['situationId'], ownMax: 140,
       emotionFields: ['feel'], copy: JSON.stringify({ next: 'Next' }), tables: JSON.stringify({ storySetOf: { fear: 'fear' } }),
       derive: JSON.stringify([{ name: 'parent', from: '$a.feel', table: 'parentOf' }]),
+      inline: JSON.stringify({ enterAt: ['feel'], returns: ['feel'] }),
     }];
     if (/HAS_STEP\]->\(st:SkillStep\)/.test(q)) return [
       { skillId: 'check_the_facts', id: 'feel', kind: 'ask', spec: JSON.stringify({ title: 'feel_title', fields: [] }), order: 0 },
@@ -48,6 +49,7 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
   const [s] = out.skills;
   assert.deepEqual([s.id, s.toolId, s.start, s.ownMax], ['check_the_facts', 'check-the-facts', 'feel', 140]);
   assert.deepEqual(s.accepts, ['situationId']);
+  assert.deepEqual(s.inline, { enterAt: ['feel'], returns: ['feel'] }, 'an inline skill says where it starts and what it returns');
   assert.deepEqual(s.steps.map((x) => x.id), ['feel', 'next']);
   assert.deepEqual(s.steps[0].next, [{ to: 'next', when: null }]);
   assert.deepEqual(s.steps[1].offers.map((o) => o.exit), ['problem_solve', 'opposite_action', 'problem_solve'], 'rows in their order, an exit offered twice');
@@ -64,4 +66,37 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
 test('getSkillContent fails with failed-precondition until schema/skills.cypher is loaded', async () => {
   setDriver(fakeDriver(() => []).driver);
   await assert.rejects(fns.getSkillContent.run({ data: {} }), (e) => e.code === 'failed-precondition');
+});
+
+test('getSkillContent: a skill that is not inline has no inline key', async () => {
+  setDriver(fakeDriver((q) => {
+    if (/MATCH \(s:Skill\) RETURN/.test(q)) return [{
+      id: 'x', toolId: 'x', version: 'v', contentVersion: 'skills-v1', start: 'a', accepts: [], ownMax: 140, emotionFields: [],
+      copy: '{}', tables: '{}', derive: '[]', inline: 'null',
+    }];
+    return [];
+  }).driver);
+  const out = await fns.getSkillContent.run({ data: {} });
+  assert.equal('inline' in out.skills[0], false);
+});
+
+test('getSkillRun: the caller\'s own run of that tool, within the window, own words decrypted; anything else is null', async () => {
+  const run = { skillId: 'check_the_facts', versionId: 'cf-v1', path: ['feel'], answers: [{ fieldId: 'feel', optionIds: ['hurt'] }] };
+  const f = fakeDriver((q, p) => {
+    if (/RETURN ts\.ext AS ext/.test(q)) {
+      assert.equal(p.key, 'u1:00000000-0000-4000-8000-000000000001', 'by key, never by id alone');
+      assert.equal(p.toolId, 'check-the-facts');
+      assert.equal(p.days, 14);
+      return [{ ext: JSON.stringify({ run }) }];
+    }
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.getSkillRun.run({ auth: { uid: 'u1' }, data: { sessionId: '00000000-0000-4000-8000-000000000001', toolId: 'check-the-facts' } });
+  assert.deepEqual(out.run, run);
+  assert.equal(f.sessions[0].config.defaultAccessMode, 'READ');
+  setDriver(fakeDriver(() => []).driver);
+  const none = await fns.getSkillRun.run({ auth: { uid: 'u1' }, data: { sessionId: '00000000-0000-4000-8000-000000000001', toolId: 'check-the-facts' } });
+  assert.equal(none.run, null);
+  await assert.rejects(fns.getSkillRun.run({ auth: { uid: 'u1' }, data: { sessionId: 'nope', toolId: 'check-the-facts' } }), (e) => e.code === 'invalid-argument');
 });

@@ -14,7 +14,7 @@ const AUTHED = [
   'getOppositeActionFollowUps', 'getOppositeActionSession', 'getOppositeActionSessions', 'getUserProfile',
   'recordToolOutcome', 'saveCheckIn', 'setCheckInNextAction',
   'startToolSession', 'closeToolSession', 'recordToolSession', 'answerToolOutcome',
-  'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday',
+  'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday', 'getSkillRun',
   'getProfileContext', 'getMe', 'upsertProfileFact', 'keepProfileItem', 'editProfileItem', 'deleteProfileItem',
   'confirmProfileItem', 'setAsideProfileItem',
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
