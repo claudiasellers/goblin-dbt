@@ -23,7 +23,7 @@ import { MERGE_USER, userKey } from '../userdata/ownership';
 import { USER_DATA } from '../userdata/layers';
 import { legacyOutcome, readingProps } from '../capacity/reading';
 import { FITS_FACTS_TOOLS, validateAnswer, validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
-import type { CloseKind, DetailKind } from './types';
+import { URGE_KINDS, type CloseKind, type DetailKind } from './types';
 import { scheduleTx } from './followUp';
 import { NOT_WHAT_HELPS } from './tools';
 
@@ -124,9 +124,9 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
   if (rec.get('open') !== true) return { reps: rec.get('reps') as string[], followUps: rec.get('followUps') as string[] };
   const closeKind = rec.get('closeKind') as CloseKind;
   // An answer the tool doesn't ask is dropped (the stored closeKind is authoritative).
-  const dir = closeKind === 'regulation_down' ? 'down' : closeKind === 'orienting' ? 'orient' : null;
+  const dir = closeKind === 'regulation_down' || closeKind === 'urge_change' ? 'down' : closeKind === 'orienting' ? 'orient' : null;
   const thenVsNow = dir ? c.thenVsNow : null;
-  const actedOnUrge = closeKind === 'urge' ? c.actedOnUrge : null;
+  const actedOnUrge = URGE_KINDS.includes(closeKind) ? c.actedOnUrge : null;
   const answered = Boolean(thenVsNow || actedOnUrge);
   const detailLabel = c.detail ? DETAIL_LABELS[c.detail.kind] : null;
   // Own words in ext are stored encrypted (spine/extOwn.ts); their length was checked on the plaintext.
@@ -247,10 +247,11 @@ export const answerToolOutcome = callable<unknown, { ok: true; recorded: boolean
     const res = await writeTx((tx) => tx.run(
       `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
        WHERE ${GUARDS.ToolSession.answer('ts')}
-       WITH ts, CASE ts.closeKind WHEN 'regulation_down' THEN 'down' WHEN 'orienting' THEN 'orient' ELSE null END AS dir
+       WITH ts, CASE ts.closeKind WHEN 'regulation_down' THEN 'down' WHEN 'urge_change' THEN 'down'
+                                  WHEN 'orienting' THEN 'orient' ELSE null END AS dir
        WITH ts, dir,
             CASE WHEN dir IS NULL THEN null ELSE $thenVsNow END AS tvn,
-            CASE WHEN ts.closeKind = 'urge' THEN $actedOnUrge ELSE null END AS acted
+            CASE WHEN ts.closeKind IN ['urge', 'urge_change'] THEN $actedOnUrge ELSE null END AS acted
        SET ts.outcomeAskDismissed = CASE WHEN $dismissed AND tvn IS NULL AND acted IS NULL THEN true ELSE ts.outcomeAskDismissed END,
            ts.thenVsNow = coalesce(tvn, ts.thenVsNow),
            ts.thenVsNowDir = CASE WHEN tvn IS NULL THEN ts.thenVsNowDir ELSE dir END,
