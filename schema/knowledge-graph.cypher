@@ -1360,6 +1360,16 @@ SET check_the_facts += {
   skill_type: "changing_response"
 };
 
+// ER Handout 24 (PRD ER-14): troubleshooting when a skill was used and didn't help.
+MERGE (troubleshooting:TherapyConcept {id: "dbt_troubleshooting"})
+SET troubleshooting += {
+  name: "Troubleshooting Emotion Regulation Skills",
+  description: "Checking what got in the way when an emotion regulation skill was used and didn't help: body vulnerability, skill fit, practising it fully, reinforcers, willingness, overload and emotion myths",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "troubleshooting"
+};
+
 MERGE (opposite_action:TherapyConcept {id: "dbt_opposite_action"})
 SET opposite_action += {
   name: "Opposite Action",

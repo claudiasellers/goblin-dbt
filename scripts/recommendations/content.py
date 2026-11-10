@@ -133,6 +133,10 @@ CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change
 # urge acted on in a harmless form), not `hold` (sitting with it without acting, Pause's kind): with `hold` the
 # diversity rule could never set it beside Pause, and its one row could never show.
 CONCEPT_TAGS["alternate-rebellion"] = {"concept": "dbt_alternate_rebellion", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
+
+# It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
+# by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
+# readouts (Do the Opposite, the wave), the Tools intent and later Reflect, so no concept tags either.
 BUILT_NOT_SIGNED_OFF = {
     "alternate-rebellion": "built on the skill runtime (DT-11); its row goes live on Claudia's sign-off (docs/design/alternate-rebellion.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",

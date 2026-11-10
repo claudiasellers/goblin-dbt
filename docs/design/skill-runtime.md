@@ -189,9 +189,9 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
 - **Safety and overwhelm, preserved.** `TooMuchLink` (P2) sits under every screen, as the rules require
   of a tool that doesn't gate on the band; its hand-offs are recorded in `ext.run.handoffs`. The player
   never adds a band gate or the capacity question (out since 30 Sep). A skill whose content can carry
-  danger declares a `CrisisBanner` slot the same way (Cope Ahead's pattern); Check the Facts has none,
-  since nothing in it raises a risk signal. When CORE-01's safety route ships, it becomes a slot the
-  player shows on any skill.
+  danger declares a `CrisisBanner` slot the same way (Cope Ahead's pattern): Check the Facts v1.1's
+  camera chips for danger from a person (`other_person`), It isn't working's *Nothing will ever help me*
+  (`crisis`). When CORE-01's safety route ships, it becomes a slot the player shows on any skill.
 - **The session.** Every state change writes `setStep` (the step id), `setExt({run})`, `setEmotionIds`
   (the fields the skill marks as the feeling) and the ask-fresh field. Reaching the hand-off marks the
   visit complete.
@@ -220,6 +220,21 @@ Differences from the hand-built contract in `check-the-facts-handover.md`, all d
   `check-the-facts.json`: one callable and one file for every skill.
 - **There was no old page to keep.** The handover's build never started (no Check the Facts code existed
   on any branch), so parity is against the spec and the handover's contract, test by test.
+
+**v1.1 (10 Nov 2026, ER-B1 first PR; PRD ER-02 "Safety rules" and verdict table).** Built: the camera chips
+*Someone threatened me*, *Someone hurt me*, *I'm not safe with them* (`danger: 'other'`) show the `other_person`
+crisis slot and skip screens 3–5 to a `safe` hand-off ("Your read of danger is the one that counts here"), Done
+only; camera own words get a quiet *Talk to someone now* (`safety_open`), since own words are never read; the
+wave (`mindfulness-emotions`) and Let it be (`let-it-be`) are planned exits on the verdict card. Departures:
+- The PRD's "→ CORE safety resources / OA support copy" is the `other_person` slot plus the `safe` card; the
+  OA support copy isn't built, and the full safety route waits for CORE-01.
+- `Person.safe = false` (IE) skipping screens 3–5 waits for IE-03 and the safety batch.
+- "Fits, can be changed" and "fits, can't be changed" are still one `fits` answer, and "the wave if there's no
+  urge" is unconditional on *doesn't fit*. **Before the planned exits flip** (ER-B5, DT-B4), the flip PR adds
+  the changeable split (or another condition), or *fits* would offer four moves (Problem Solve, DEAR MAN, the
+  wave, Let it be) instead of one plus a swap.
+- Still to come with F2: the missing-fact follow-up, the loop guard and the inline mini-card.
+- The `safe` card is `noClose`: leaving it closes the visit without the close question.
 
 ## Moving the next skill
 
