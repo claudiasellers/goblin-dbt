@@ -66,9 +66,15 @@ fail() {  # pr, reason, [logfile]
 }
 
 process() {  # pr
-  local pr=$1 head branch base logf attempt
+  local pr=$1 head branch base logf attempt prbase
   for attempt in 1 2 3; do
-    read -r head branch < <(gh pr view "$pr" -R "$REPO" --json headRefOid,headRefName -q '.headRefOid+" "+.headRefName')
+    read -r head branch prbase < <(gh pr view "$pr" -R "$REPO" --json headRefOid,headRefName,baseRefName -q '.headRefOid+" "+.headRefName+" "+.baseRefName')
+    # A PR stacked on another branch would bring that branch's commits to main with it, untested on
+    # their own and past whatever stopped that PR. Only PRs into main merge.
+    if [ "$prbase" != main ]; then
+      fail "$pr" "its base is \`$prbase\`, not \`main\` (merge the PR under it first, then change this PR's base to main)"
+      return
+    fi
     git fetch -q origin main "pull/$pr/head" || { log "#$pr fetch failed, will retry next run"; return; }
     base=$(git rev-parse origin/main)
     git checkout -q -f -B lane-test "$base" && git clean -qfdx
