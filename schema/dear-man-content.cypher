@@ -48,28 +48,28 @@ FOR (s:DearManSession) REQUIRE s.id IS UNIQUE;
 // ============================================================
 // 1. SITUATION TYPES
 // ============================================================
-MERGE (s:DearManSituationType {id: "ask"})
-SET s.label = "I need to ask for something",
-    s.sublabel = "A request, favor, or change",
-    s.emoji = "🗨️",
+MERGE (s:DearManSituationType {id: 'ask'})
+SET s.label = 'I need to ask for something',
+    s.sublabel = 'A request, favor, or change',
+    s.emoji = '🗨️',
     s.sortOrder = 1;
 
-MERGE (s:DearManSituationType {id: "boundary"})
-SET s.label = "I need to set or hold a boundary",
-    s.sublabel = "Saying no or protecting my space",
-    s.emoji = "🛑",
+MERGE (s:DearManSituationType {id: 'boundary'})
+SET s.label = 'I need to set or hold a boundary',
+    s.sublabel = 'Saying no or protecting my space',
+    s.emoji = '🛑',
     s.sortOrder = 2;
 
-MERGE (s:DearManSituationType {id: "address"})
-SET s.label = "I need to address something that happened",
-    s.sublabel = "Bringing up a problem or hurt",
-    s.emoji = "💬",
+MERGE (s:DearManSituationType {id: 'address'})
+SET s.label = 'I need to address something that happened',
+    s.sublabel = 'Bringing up a problem or hurt',
+    s.emoji = '💬',
     s.sortOrder = 3;
 
-MERGE (s:DearManSituationType {id: "pattern"})
-SET s.label = "I need to address an ongoing pattern",
-    s.sublabel = "Something that keeps happening",
-    s.emoji = "🔄",
+MERGE (s:DearManSituationType {id: 'pattern'})
+SET s.label = 'I need to address an ongoing pattern',
+    s.sublabel = 'Something that keeps happening',
+    s.emoji = '🔄',
     s.sortOrder = 4;
 
 // ============================================================
@@ -77,10 +77,10 @@ SET s.label = "I need to address an ongoing pattern",
 // ============================================================
 // --- ASK ---
 UNWIND [
-  {id: "ask_need_help",   label: "I need help with something and haven't asked yet",      sort: 1},
-  {id: "ask_not_working", label: "Something about how we do things isn't working for me", sort: 2},
-  {id: "ask_time_space",  label: "I need time, space, or flexibility for something",      sort: 3},
-  {id: "ask_support",     label: "I'm going through something and need their support",    sort: 4}
+  {id: 'ask_need_help',   label: "I need help with something and haven't asked yet",      sort: 1},
+  {id: 'ask_not_working', label: "Something about how we do things isn't working for me", sort: 2},
+  {id: 'ask_time_space',  label: 'I need time, space, or flexibility for something',      sort: 3},
+  {id: 'ask_support',     label: "I'm going through something and need their support",    sort: 4}
 ] AS d
 MERGE (opt:DearManDescribeOption {id: d.id})
 SET opt.label = d.label, opt.sortOrder = d.sort
@@ -90,10 +90,10 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 
 // --- BOUNDARY ---
 UNWIND [
-  {id: "bound_unnamed_line", label: "They keep crossing a line I haven't clearly named",        sort: 1},
-  {id: "bound_new_thing",    label: "Something new happened that I'm not okay with",            sort: 2},
-  {id: "bound_pressure",     label: "They're pressuring me to do something I don't want to do", sort: 3},
-  {id: "bound_overcommit",   label: "I said yes to something and need to change that",          sort: 4}
+  {id: 'bound_unnamed_line', label: "They keep crossing a line I haven't clearly named",        sort: 1},
+  {id: 'bound_new_thing',    label: "Something new happened that I'm not okay with",            sort: 2},
+  {id: 'bound_pressure',     label: "They're pressuring me to do something I don't want to do", sort: 3},
+  {id: 'bound_overcommit',   label: 'I said yes to something and need to change that',          sort: 4}
 ] AS d
 MERGE (opt:DearManDescribeOption {id: d.id})
 SET opt.label = d.label, opt.sortOrder = d.sort
@@ -103,10 +103,10 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 
 // --- ADDRESS ---
 UNWIND [
-  {id: "addr_broke_promise", label: "They said they'd do something and didn't follow through",      sort: 1},
-  {id: "addr_hurtful",       label: "They said or did something hurtful and didn't seem to notice", sort: 2},
-  {id: "addr_dismissed",     label: "I told them how I felt and they dismissed it",                 sort: 3},
-  {id: "addr_no_consult",    label: "They made a decision that affects me without asking",          sort: 4}
+  {id: 'addr_broke_promise', label: "They said they'd do something and didn't follow through",      sort: 1},
+  {id: 'addr_hurtful',       label: "They said or did something hurtful and didn't seem to notice", sort: 2},
+  {id: 'addr_dismissed',     label: 'I told them how I felt and they dismissed it',                 sort: 3},
+  {id: 'addr_no_consult',    label: 'They made a decision that affects me without asking',          sort: 4}
 ] AS d
 MERGE (opt:DearManDescribeOption {id: d.id})
 SET opt.label = d.label, opt.sortOrder = d.sort
@@ -116,10 +116,10 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 
 // --- PATTERN ---
 UNWIND [
-  {id: "patt_keeps_doing", label: "They keep doing something I've asked them to stop",             sort: 1},
-  {id: "patt_shuts_down",  label: "They shut down or blow up every time I bring this up",          sort: 2},
-  {id: "patt_avoids",      label: "They avoid the conversation every time I try to talk about it", sort: 3},
-  {id: "patt_one_sided",   label: "The effort in this relationship feels one-sided",               sort: 4}
+  {id: 'patt_keeps_doing', label: "They keep doing something I've asked them to stop",             sort: 1},
+  {id: 'patt_shuts_down',  label: 'They shut down or blow up every time I bring this up',          sort: 2},
+  {id: 'patt_avoids',      label: 'They avoid the conversation every time I try to talk about it', sort: 3},
+  {id: 'patt_one_sided',   label: 'The effort in this relationship feels one-sided',               sort: 4}
 ] AS d
 MERGE (opt:DearManDescribeOption {id: d.id})
 SET opt.label = d.label, opt.sortOrder = d.sort
@@ -132,10 +132,10 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 // ============================================================
 // --- ASK ---
 UNWIND [
-  {id: "ask_specific_help", label: "I'd like help with [specific thing]",                hasPlaceholder: true,  sort: 1},
-  {id: "ask_flexibility",   label: "I need [time/space/flexibility] for [this]",         hasPlaceholder: true,  sort: 2},
-  {id: "ask_change_how",    label: "I'd like us to change how we handle [this]",         hasPlaceholder: true,  sort: 3},
-  {id: "ask_just_listen",   label: "I need you to just listen and support me right now", hasPlaceholder: false, sort: 4}
+  {id: 'ask_specific_help', label: "I'd like help with [specific thing]",                hasPlaceholder: true,  sort: 1},
+  {id: 'ask_flexibility',   label: 'I need [time/space/flexibility] for [this]',         hasPlaceholder: true,  sort: 2},
+  {id: 'ask_change_how',    label: "I'd like us to change how we handle [this]",         hasPlaceholder: true,  sort: 3},
+  {id: 'ask_just_listen',   label: 'I need you to just listen and support me right now', hasPlaceholder: false, sort: 4}
 ] AS a
 MERGE (opt:DearManAssertOption {id: a.id})
 SET opt.label = a.label, opt.hasPlaceholder = a.hasPlaceholder, opt.sortOrder = a.sort
@@ -145,10 +145,10 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 
 // --- BOUNDARY ---
 UNWIND [
-  {id: "bound_stop_behavior", label: "I need you to stop [specific behavior]",                hasPlaceholder: true, sort: 1},
-  {id: "bound_respect_no",    label: "I need you to respect my decision about [this]",        hasPlaceholder: true, sort: 2},
-  {id: "bound_cant_do",       label: "I'm not able to do [thing] and I need that to be okay", hasPlaceholder: true, sort: 3},
-  {id: "bound_need_space",    label: "I need space when [this happens]",                      hasPlaceholder: true, sort: 4}
+  {id: 'bound_stop_behavior', label: 'I need you to stop [specific behavior]',                hasPlaceholder: true, sort: 1},
+  {id: 'bound_respect_no',    label: 'I need you to respect my decision about [this]',        hasPlaceholder: true, sort: 2},
+  {id: 'bound_cant_do',       label: "I'm not able to do [thing] and I need that to be okay", hasPlaceholder: true, sort: 3},
+  {id: 'bound_need_space',    label: 'I need space when [this happens]',                      hasPlaceholder: true, sort: 4}
 ] AS a
 MERGE (opt:DearManAssertOption {id: a.id})
 SET opt.label = a.label, opt.hasPlaceholder = a.hasPlaceholder, opt.sortOrder = a.sort
@@ -158,10 +158,10 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 
 // --- ADDRESS ---
 UNWIND [
-  {id: "addr_follow_through", label: "I need you to follow through on what you said you'd do",              sort: 1},
-  {id: "addr_acknowledge",    label: "I need you to acknowledge what happened and how it affected me",      sort: 2},
-  {id: "addr_check_first",    label: "I'd like you to check with me before deciding things that affect me", sort: 3},
-  {id: "addr_hear_me",        label: "I need you to hear me out without getting defensive",                 sort: 4}
+  {id: 'addr_follow_through', label: "I need you to follow through on what you said you'd do",              sort: 1},
+  {id: 'addr_acknowledge',    label: 'I need you to acknowledge what happened and how it affected me',      sort: 2},
+  {id: 'addr_check_first',    label: "I'd like you to check with me before deciding things that affect me", sort: 3},
+  {id: 'addr_hear_me',        label: 'I need you to hear me out without getting defensive',                 sort: 4}
 ] AS a
 MERGE (opt:DearManAssertOption {id: a.id})
 SET opt.label = a.label, opt.hasPlaceholder = false, opt.sortOrder = a.sort
@@ -171,10 +171,10 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 
 // --- PATTERN ---
 UNWIND [
-  {id: "patt_actually_stop", label: "I need this to actually change, not just be talked about",       sort: 1},
-  {id: "patt_stay_in_it",    label: "I need you to stay in the conversation when it's uncomfortable", sort: 2},
-  {id: "patt_more_effort",   label: "I need you to put in more effort with [specific thing]",         sort: 3, hasPlaceholder: true},
-  {id: "patt_new_approach",  label: "I need us to find a different way to handle this",               sort: 4}
+  {id: 'patt_actually_stop', label: 'I need this to actually change, not just be talked about',       sort: 1},
+  {id: 'patt_stay_in_it',    label: "I need you to stay in the conversation when it's uncomfortable", sort: 2},
+  {id: 'patt_more_effort',   label: 'I need you to put in more effort with [specific thing]',         sort: 3, hasPlaceholder: true},
+  {id: 'patt_new_approach',  label: 'I need us to find a different way to handle this',               sort: 4}
 ] AS a
 MERGE (opt:DearManAssertOption {id: a.id})
 SET opt.label = a.label, opt.hasPlaceholder = coalesce(a.hasPlaceholder, false), opt.sortOrder = a.sort
@@ -186,14 +186,14 @@ MERGE (opt)-[:FOR_SITUATION]->(s);
 // 4. REINFORCE OPTIONS (universal — not per situation type)
 // ============================================================
 UNWIND [
-  {id: "reinf_less_fighting",    label: "We'd fight less about this",              sort: 1},
-  {id: "reinf_more_relaxed",     label: "Our time together would be more relaxed", sort: 2},
-  {id: "reinf_stop_bringing_up", label: "I'd stop bringing it up",                 sort: 3},
-  {id: "reinf_more_respected",   label: "We'd both feel more respected",           sort: 4},
-  {id: "reinf_less_pressure",    label: "It would take pressure off both of us",   sort: 5},
-  {id: "reinf_more_trust",       label: "I'd be able to trust them more",          sort: 6},
-  {id: "reinf_closer",           label: "We'd actually be closer",                 sort: 7},
-  {id: "reinf_less_resentment",  label: "I wouldn't be resentful",                 sort: 8}
+  {id: 'reinf_less_fighting',    label: "We'd fight less about this",              sort: 1},
+  {id: 'reinf_more_relaxed',     label: 'Our time together would be more relaxed', sort: 2},
+  {id: 'reinf_stop_bringing_up', label: "I'd stop bringing it up",                 sort: 3},
+  {id: 'reinf_more_respected',   label: "We'd both feel more respected",           sort: 4},
+  {id: 'reinf_less_pressure',    label: 'It would take pressure off both of us',   sort: 5},
+  {id: 'reinf_more_trust',       label: "I'd be able to trust them more",          sort: 6},
+  {id: 'reinf_closer',           label: "We'd actually be closer",                 sort: 7},
+  {id: 'reinf_less_resentment',  label: "I wouldn't be resentful",                 sort: 8}
 ] AS r
 MERGE (opt:DearManReinforceOption {id: r.id})
 SET opt.label = r.label, opt.sortOrder = r.sort;
@@ -202,73 +202,73 @@ SET opt.label = r.label, opt.sortOrder = r.sort;
 // 5. BARRIERS + BARRIER COACHING
 // ============================================================
 UNWIND [
-  {id: "barrier_angry",        label: "I'm afraid they'll get angry"},
-  {id: "barrier_dont_know",    label: "I don't know how to say it"},
-  {id: "barrier_guilty",       label: "I feel guilty asking"},
-  {id: "barrier_tried_before", label: "I've tried before and it didn't work"},
-  {id: "barrier_emotional",    label: "I'm worried I'll get emotional"},
-  {id: "barrier_no_right",     label: "I don't feel like I have the right to ask"}
+  {id: 'barrier_angry',        label: "I'm afraid they'll get angry"},
+  {id: 'barrier_dont_know',    label: "I don't know how to say it"},
+  {id: 'barrier_guilty',       label: 'I feel guilty asking'},
+  {id: 'barrier_tried_before', label: "I've tried before and it didn't work"},
+  {id: 'barrier_emotional',    label: "I'm worried I'll get emotional"},
+  {id: 'barrier_no_right',     label: "I don't feel like I have the right to ask"}
 ] AS b
 MERGE (bar:DearManBarrier {id: b.id})
 SET bar.label = b.label;
 
 // --- Coaching per barrier ---
-MERGE (c:DearManBarrierCoaching {id: "coaching_angry"})
-SET c.title = "If they get defensive",
+MERGE (c:DearManBarrierCoaching {id: 'coaching_angry'})
+SET c.title = 'If they get defensive',
     c.body = "That's their emotion — not proof that you're wrong. You can acknowledge it ('I can see this is frustrating') and come back to what you need."
 WITH c
-MATCH (b:DearManBarrier {id: "barrier_angry"})
+MATCH (b:DearManBarrier {id: 'barrier_angry'})
 MERGE (c)-[:ADDRESSES]->(b);
 
-MERGE (c:DearManBarrierCoaching {id: "coaching_dont_know"})
-SET c.title = "If you blank on what to say",
+MERGE (c:DearManBarrierCoaching {id: 'coaching_dont_know'})
+SET c.title = 'If you blank on what to say',
     c.body = "You've already built your plan. It's okay to glance at it. You can even say 'I wrote some things down because this matters to me.'"
 WITH c
-MATCH (b:DearManBarrier {id: "barrier_dont_know"})
+MATCH (b:DearManBarrier {id: 'barrier_dont_know'})
 MERGE (c)-[:ADDRESSES]->(b);
 
-MERGE (c:DearManBarrierCoaching {id: "coaching_guilty"})
-SET c.title = "If guilt shows up",
+MERGE (c:DearManBarrierCoaching {id: 'coaching_guilty'})
+SET c.title = 'If guilt shows up',
     c.body = "Guilt might tell you to back down or apologize for having needs. Notice it, and stay with your ask anyway. Having needs doesn't make you a burden."
 WITH c
-MATCH (b:DearManBarrier {id: "barrier_guilty"})
+MATCH (b:DearManBarrier {id: 'barrier_guilty'})
 MERGE (c)-[:ADDRESSES]->(b);
 
-MERGE (c:DearManBarrierCoaching {id: "coaching_tried_before"})
-SET c.title = "If your brain pulls you to the past",
+MERGE (c:DearManBarrierCoaching {id: 'coaching_tried_before'})
+SET c.title = 'If your brain pulls you to the past',
     c.body = "Your mind might want to bring up the last 5 times. Try to stay with this conversation, this specific ask, right now. 'This time, I'm asking differently.'"
 WITH c
-MATCH (b:DearManBarrier {id: "barrier_tried_before"})
+MATCH (b:DearManBarrier {id: 'barrier_tried_before'})
 MERGE (c)-[:ADDRESSES]->(b);
 
-MERGE (c:DearManBarrierCoaching {id: "coaching_emotional"})
-SET c.title = "If emotions come up mid-conversation",
+MERGE (c:DearManBarrierCoaching {id: 'coaching_emotional'})
+SET c.title = 'If emotions come up mid-conversation',
     c.body = "Emotions are allowed. If you feel tears or your voice shaking, take a breath. You can say 'This is hard for me to say, and I want to get through it.' That's not weakness — that's staying present."
 WITH c
-MATCH (b:DearManBarrier {id: "barrier_emotional"})
+MATCH (b:DearManBarrier {id: 'barrier_emotional'})
 MERGE (c)-[:ADDRESSES]->(b);
 
-MERGE (c:DearManBarrierCoaching {id: "coaching_no_right"})
-SET c.title = "If you start doubting yourself",
+MERGE (c:DearManBarrierCoaching {id: 'coaching_no_right'})
+SET c.title = 'If you start doubting yourself',
     c.body = "You don't need to earn the right to have needs. Asking clearly isn't pushy — it's respectful. Remind yourself: I'm allowed to want this."
 WITH c
-MATCH (b:DearManBarrier {id: "barrier_no_right"})
+MATCH (b:DearManBarrier {id: 'barrier_no_right'})
 MERGE (c)-[:ADDRESSES]->(b);
 
 // --- Default coaching (no specific barrier) ---
-MERGE (c:DearManBarrierCoaching {id: "coaching_default"})
-SET c.title = "Staying present",
-    c.body = "The hardest part of any conversation is staying with it when it gets uncomfortable. If your mind starts racing or shutting down, come back to your anchor phrase.",
+MERGE (c:DearManBarrierCoaching {id: 'coaching_default'})
+SET c.title = 'Staying present',
+    c.body = 'The hardest part of any conversation is staying with it when it gets uncomfortable. If your mind starts racing or shutting down, come back to your anchor phrase.',
     c.isDefault = true;
 
 // ============================================================
 // 6. ANCHOR PHRASES
 // ============================================================
 UNWIND [
-  {id: "anchor_needs_valid",  label: "My needs are valid",       sortOrder: 1},
-  {id: "anchor_stay_with",    label: "I can stay with this",     sortOrder: 2},
-  {id: "anchor_worth_saying", label: "This is worth saying",     sortOrder: 3},
-  {id: "anchor_allowed",      label: "I'm allowed to want this", sortOrder: 4}
+  {id: 'anchor_needs_valid',  label: 'My needs are valid',       sortOrder: 1},
+  {id: 'anchor_stay_with',    label: 'I can stay with this',     sortOrder: 2},
+  {id: 'anchor_worth_saying', label: 'This is worth saying',     sortOrder: 3},
+  {id: 'anchor_allowed',      label: "I'm allowed to want this", sortOrder: 4}
 ] AS a
 MERGE (p:DearManAnchorPhrase {id: a.id})
 SET p.label = a.label, p.sortOrder = a.sortOrder;
@@ -278,19 +278,19 @@ SET p.label = a.label, p.sortOrder = a.sortOrder;
 // ============================================================
 // --- Middle ground ---
 UNWIND [
-  {id: "neg_partial",      label: "They do part of it — not everything",            type: "middle_ground", sort: 1},
-  {id: "neg_trial",        label: "They try for a set period and we check back in", type: "middle_ground", sort: 2},
-  {id: "neg_third_option", label: "We find a third option together",                type: "middle_ground", sort: 3}
+  {id: 'neg_partial',      label: 'They do part of it — not everything',            type: 'middle_ground', sort: 1},
+  {id: 'neg_trial',        label: 'They try for a set period and we check back in', type: 'middle_ground', sort: 2},
+  {id: 'neg_third_option', label: 'We find a third option together',                type: 'middle_ground', sort: 3}
 ] AS n
 MERGE (opt:DearManNegotiateOption {id: n.id})
 SET opt.label = n.label, opt.type = n.type, opt.sortOrder = n.sort;
 
 // --- Walk-away ---
 UNWIND [
-  {id: "neg_feelings_dismissed", label: "Being told my feelings don't matter",               type: "walk_away", sort: 1},
-  {id: "neg_yelled_at",          label: "Being yelled at or shut down",                      type: "walk_away", sort: 2},
-  {id: "neg_no_change",          label: "Having the same thing happen again with no change", type: "walk_away", sort: 3},
-  {id: "neg_give_up_ask",        label: "Giving up on the ask entirely",                     type: "walk_away", sort: 4}
+  {id: 'neg_feelings_dismissed', label: "Being told my feelings don't matter",               type: 'walk_away', sort: 1},
+  {id: 'neg_yelled_at',          label: 'Being yelled at or shut down',                      type: 'walk_away', sort: 2},
+  {id: 'neg_no_change',          label: 'Having the same thing happen again with no change', type: 'walk_away', sort: 3},
+  {id: 'neg_give_up_ask',        label: 'Giving up on the ask entirely',                     type: 'walk_away', sort: 4}
 ] AS n
 MERGE (opt:DearManNegotiateOption {id: n.id})
 SET opt.label = n.label, opt.type = n.type, opt.sortOrder = n.sort;
@@ -299,31 +299,31 @@ SET opt.label = n.label, opt.type = n.type, opt.sortOrder = n.sort;
 // Stored as properties on the DEAR MAN TherapyConcept node
 MATCH (tc:TherapyConcept {id: 'dbt_dear_man'})
 SET tc.negotiateHintObjective = "Since getting what you need is the priority, be clear about your minimum — the thing you won't budge on.",
-    tc.negotiateHintRelationship = "Since keeping the relationship strong matters most, you might flex on specifics — as long as you feel heard.",
+    tc.negotiateHintRelationship = 'Since keeping the relationship strong matters most, you might flex on specifics — as long as you feel heard.',
     tc.negotiateHintSelfRespect = "Since your self-respect is the priority, pay attention to any pressure to agree to something that doesn't sit right.";
 
 // ============================================================
 // 8. FEELING CHIPS (curated interpersonal feeling words)
 // ============================================================
 UNWIND [
-  {id: "feel_hurt",         label: "Hurt",         sort: 1},
-  {id: "feel_frustrated",   label: "Frustrated",   sort: 2},
-  {id: "feel_anxious",      label: "Anxious",      sort: 3},
-  {id: "feel_sad",          label: "Sad",          sort: 4},
-  {id: "feel_angry",        label: "Angry",        sort: 5},
-  {id: "feel_lonely",       label: "Lonely",       sort: 6},
-  {id: "feel_overwhelmed",  label: "Overwhelmed",  sort: 7},
-  {id: "feel_scared",       label: "Scared",       sort: 8},
-  {id: "feel_disappointed", label: "Disappointed", sort: 9},
-  {id: "feel_resentful",    label: "Resentful",    sort: 10},
-  {id: "feel_embarrassed",  label: "Embarrassed",  sort: 11},
-  {id: "feel_disrespected", label: "Disrespected", sort: 12},
-  {id: "feel_unheard",      label: "Unheard",      sort: 13},
-  {id: "feel_invisible",    label: "Invisible",    sort: 14},
-  {id: "feel_confused",     label: "Confused",     sort: 15},
-  {id: "feel_helpless",     label: "Helpless",     sort: 16},
-  {id: "feel_exhausted",    label: "Exhausted",    sort: 17},
-  {id: "feel_trapped",      label: "Trapped",      sort: 18}
+  {id: 'feel_hurt',         label: 'Hurt',         sort: 1},
+  {id: 'feel_frustrated',   label: 'Frustrated',   sort: 2},
+  {id: 'feel_anxious',      label: 'Anxious',      sort: 3},
+  {id: 'feel_sad',          label: 'Sad',          sort: 4},
+  {id: 'feel_angry',        label: 'Angry',        sort: 5},
+  {id: 'feel_lonely',       label: 'Lonely',       sort: 6},
+  {id: 'feel_overwhelmed',  label: 'Overwhelmed',  sort: 7},
+  {id: 'feel_scared',       label: 'Scared',       sort: 8},
+  {id: 'feel_disappointed', label: 'Disappointed', sort: 9},
+  {id: 'feel_resentful',    label: 'Resentful',    sort: 10},
+  {id: 'feel_embarrassed',  label: 'Embarrassed',  sort: 11},
+  {id: 'feel_disrespected', label: 'Disrespected', sort: 12},
+  {id: 'feel_unheard',      label: 'Unheard',      sort: 13},
+  {id: 'feel_invisible',    label: 'Invisible',    sort: 14},
+  {id: 'feel_confused',     label: 'Confused',     sort: 15},
+  {id: 'feel_helpless',     label: 'Helpless',     sort: 16},
+  {id: 'feel_exhausted',    label: 'Exhausted',    sort: 17},
+  {id: 'feel_trapped',      label: 'Trapped',      sort: 18}
 ] AS f
 MERGE (chip:DearManFeelingChip {id: f.id})
 SET chip.label = f.label, chip.sortOrder = f.sort;
@@ -332,10 +332,10 @@ SET chip.label = f.label, chip.sortOrder = f.sort;
 // 9. STEP INSIGHTS (one-liner per DEAR step)
 // ============================================================
 UNWIND [
-  {id: "insight_describe",  step: "describe",  text: "Facts are harder to argue with than judgments. 'You raised your voice' lands differently than 'you were being rude.'"},
-  {id: "insight_express",   step: "express",   text: "Naming feelings isn't weakness — it's what makes the other person understand this matters to you."},
-  {id: "insight_assert",    step: "assert",    text: "Specific asks are easier to say yes to. 'Text me if you'll be late' beats 'be more considerate.'"},
-  {id: "insight_reinforce", step: "reinforce", text: "This is the step most people skip. It's what makes the other person want to listen instead of defend."}
+  {id: 'insight_describe',  step: 'describe',  text: "Facts are harder to argue with than judgments. 'You raised your voice' lands differently than 'you were being rude.'"},
+  {id: 'insight_express',   step: 'express',   text: "Naming feelings isn't weakness — it's what makes the other person understand this matters to you."},
+  {id: 'insight_assert',    step: 'assert',    text: "Specific asks are easier to say yes to. 'Text me if you'll be late' beats 'be more considerate.'"},
+  {id: 'insight_reinforce', step: 'reinforce', text: "This is the step most people skip. It's what makes the other person want to listen instead of defend."}
 ] AS i
 MERGE (ins:DearManStepInsight {id: i.id})
 SET ins.step = i.step, ins.text = i.text;
@@ -345,28 +345,28 @@ SET ins.step = i.step, ins.text = i.text;
 // ============================================================
 // --- What went well ---
 UNWIND [
-  {id: "debrief_stayed_calm",       label: "I stayed calm",                       type: "went_well", sort: 1},
-  {id: "debrief_said_it",           label: "I said what I needed to say",         type: "went_well", sort: 2},
-  {id: "debrief_they_listened",     label: "They actually listened",              type: "went_well", sort: 3},
-  {id: "debrief_didnt_back_down",   label: "I didn't back down",                  type: "went_well", sort: 4},
-  {id: "debrief_kept_facts",        label: "I kept it about the facts",           type: "went_well", sort: 5},
-  {id: "debrief_compromised",       label: "We found a compromise",               type: "went_well", sort: 6},
-  {id: "debrief_no_over_apologize", label: "I didn't apologize for having needs", type: "went_well", sort: 7},
-  {id: "debrief_used_anchor",       label: "I used my anchor phrase",             type: "went_well", sort: 8}
+  {id: 'debrief_stayed_calm',       label: 'I stayed calm',                       type: 'went_well', sort: 1},
+  {id: 'debrief_said_it',           label: 'I said what I needed to say',         type: 'went_well', sort: 2},
+  {id: 'debrief_they_listened',     label: 'They actually listened',              type: 'went_well', sort: 3},
+  {id: 'debrief_didnt_back_down',   label: "I didn't back down",                  type: 'went_well', sort: 4},
+  {id: 'debrief_kept_facts',        label: 'I kept it about the facts',           type: 'went_well', sort: 5},
+  {id: 'debrief_compromised',       label: 'We found a compromise',               type: 'went_well', sort: 6},
+  {id: 'debrief_no_over_apologize', label: "I didn't apologize for having needs", type: 'went_well', sort: 7},
+  {id: 'debrief_used_anchor',       label: 'I used my anchor phrase',             type: 'went_well', sort: 8}
 ] AS d
 MERGE (opt:DearManDebriefOption {id: d.id})
 SET opt.label = d.label, opt.type = d.type, opt.sortOrder = d.sort;
 
 // --- What to try differently ---
 UNWIND [
-  {id: "debrief_more_specific",     label: "Get more specific about what I need",   type: "to_change", sort: 1},
-  {id: "debrief_name_feelings",     label: "Name my feelings earlier",              type: "to_change", sort: 2},
-  {id: "debrief_stay_with_defense", label: "Stay with it when they got defensive",  type: "to_change", sort: 3},
-  {id: "debrief_no_old_stuff",      label: "Not bring up old stuff",                type: "to_change", sort: 4},
-  {id: "debrief_better_time",       label: "Pick a better time",                    type: "to_change", sort: 5},
-  {id: "debrief_less_apologizing",  label: "Not apologize so much",                 type: "to_change", sort: 6},
-  {id: "debrief_plan_b",            label: "Have a plan B ready",                   type: "to_change", sort: 7},
-  {id: "debrief_breathe",           label: "Take a breath when I felt overwhelmed", type: "to_change", sort: 8}
+  {id: 'debrief_more_specific',     label: 'Get more specific about what I need',   type: 'to_change', sort: 1},
+  {id: 'debrief_name_feelings',     label: 'Name my feelings earlier',              type: 'to_change', sort: 2},
+  {id: 'debrief_stay_with_defense', label: 'Stay with it when they got defensive',  type: 'to_change', sort: 3},
+  {id: 'debrief_no_old_stuff',      label: 'Not bring up old stuff',                type: 'to_change', sort: 4},
+  {id: 'debrief_better_time',       label: 'Pick a better time',                    type: 'to_change', sort: 5},
+  {id: 'debrief_less_apologizing',  label: 'Not apologize so much',                 type: 'to_change', sort: 6},
+  {id: 'debrief_plan_b',            label: 'Have a plan B ready',                   type: 'to_change', sort: 7},
+  {id: 'debrief_breathe',           label: 'Take a breath when I felt overwhelmed', type: 'to_change', sort: 8}
 ] AS d
 MERGE (opt:DearManDebriefOption {id: d.id})
 SET opt.label = d.label, opt.type = d.type, opt.sortOrder = d.sort;

@@ -38,17 +38,17 @@ FOR (c:DearManSafetyCopy) REQUIRE c.id IS UNIQUE;
 //    {emotion} / {need} / {minutes} are filled by the frontend.
 // ============================================================
 
-MERGE (c:DearManSafetyCopy {id: "dear_man_safety_copy"})
-SET c.version = "dear-man-safety-v3",
-    c.handoffSituationId = "address",
-    c.carriedOver = "Carried over: {emotion} · you needed {need}",
-    c.carriedOverDismiss = "Hide",
-    c.oneMessageOnly = "One message only. Say it once, then give them room to answer.",
+MERGE (c:DearManSafetyCopy {id: 'dear_man_safety_copy'})
+SET c.version = 'dear-man-safety-v3',
+    c.handoffSituationId = 'address',
+    c.carriedOver = 'Carried over: {emotion} · you needed {need}',
+    c.carriedOverDismiss = 'Hide',
+    c.oneMessageOnly = 'One message only. Say it once, then give them room to answer.',
     c.hotHeading = "Your plan is ready. Heads up: it's still loud in there.",
     c.hotBody = "When you're this angry or worked up, even a good plan comes out sharper than you mean it, and they'll hear the anger before they hear the ask. Taking the edge off first makes it more likely you get what you're asking for.",
-    c.hotCoolDown = "Take the edge off (about 30 seconds)",
+    c.hotCoolDown = 'Take the edge off (about 30 seconds)',
     c.hotReady = "I'm good to go",
-    c.hotBodyCue = "Unclench your jaw and drop your shoulders while you read it through.",
+    c.hotBodyCue = 'Unclench your jaw and drop your shoulders while you read it through.',
     c.hotCooled = "That's the edge off. Read your plan once more, out loud if you can, then go when it feels right."
 REMOVE c.planLocked, c.planUnlocked, c.planLockedHeading;
 // The old number-scale copy (intensityQuestion, intensityHint, intensityLow, intensityHigh,

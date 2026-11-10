@@ -32,6 +32,9 @@ def lit(v):
     if isinstance(v, int):
         return str(v)
     if isinstance(v, str):
+        # Single quotes, as the hand-written files mostly had; double when the text has an apostrophe.
+        if "'" not in v and "\\" not in v:
+            return "'" + v + "'"
         return json.dumps(v, ensure_ascii=False)
     if isinstance(v, list):
         return "[" + ", ".join(lit(x) for x in v) + "]"
