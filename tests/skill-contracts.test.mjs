@@ -583,3 +583,41 @@ test("resume settled: a link's enterAt holds only for the run it reopened; a fre
   assert.match(player, /else setCtxIn\(\(c\) => ctxAfterResume\(c, false\)\)/, "resume found nothing");
   assert.match(player, /\.catch\(\(\) => setCtxIn\(\(c\) => ctxAfterResume\(c, false\)\)\)/, "resume read failed");
 });
+
+test("own.seed: a chip writes its words into the open box to change; once the words are the person's, a tap never erases them", () => {
+  const skill = {
+    ...F2, copy: { ...F2.copy, h: "Your own" },
+    options: { ...F2.options, ends: [{ value: "a", label: "Somewhere safe" }, { value: "b", label: "With a friend" }] },
+    steps: [{ id: "e", kind: "ask", fields: [{ id: "end", options: { list: "ends" }, max: 1, own: { hint: "h", countsAsPick: true, open: true, seed: true } }], next: [], offers: [] }],
+    start: "e",
+  };
+  const ctx = { ...f2Ctx(null), skill };
+  const f = skill.steps[0].fields[0];
+  let s = m.initialRun(skill);
+  s = m.runNext(ctx, s, { type: "pick", fieldId: "end", value: "a" });
+  assert.deepEqual(s.answers.end, { ids: [], own: "Somewhere safe" }, "the starter's words, in the box");
+  assert.equal(m.seededFrom(ctx, f, s.answers.end), "a");
+  s = m.runNext(ctx, s, { type: "pick", fieldId: "end", value: "b" });
+  assert.equal(s.answers.end.own, "With a friend", "another starter replaces an unchanged one");
+  s = m.runNext(ctx, s, { type: "own", fieldId: "end", text: "With a friend, by the sea" });
+  assert.equal(m.seededFrom(ctx, f, s.answers.end), null, "changed: the words are theirs now");
+  assert.equal(m.runNext(ctx, s, { type: "pick", fieldId: "end", value: "a" }), s, "a tap never erases what they wrote");
+  const again = m.runNext(ctx, m.runNext(ctx, m.initialRun(skill), { type: "pick", fieldId: "end", value: "a" }), { type: "pick", fieldId: "end", value: "a" });
+  assert.equal(again.answers.end.own, null, "the same chip again empties the box");
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(player, /const startersHidden = !!field\.own\?\.seed && !!a\?\.own\?\.trim\(\) && seeded === null;/, "the chips step aside");
+  assert.match(read("scripts/skills/build.py"), /seed chips start the open own-words box/);
+});
+
+test("covered: P2 or safety.open over an embed step reaches the embed; a new step starts uncovered", () => {
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(player, /covered=\{safetyOpen \|\| p2Open\}/);
+  assert.match(player, /onOpen=\{\(\) => setP2Open\(true\)\} onClose=\{\(\) => setP2Open\(false\)\}/);
+  assert.match(player, /useEffect\(\(\) => \{ setP2Open\(false\); \}, \[st\.stepId\]\);/);
+  assert.match(read("src/components/capacity/TooMuchLink.tsx"), /setOpen\(\{ draft: resume\?\.\(\) \}\); onOpen\?\.\(\);/);
+  assert.match(read("src/components/skillPlayer/embeds.ts"), /covered\?: boolean;/);
+});
+
+test("a link's enterAt without a run to reopen doesn't hold from the start", () => {
+  assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /UUID\.test\(new URLSearchParams\(location\.search\)\.get\('run'\) \?\? ''\) \? c : ctxAfterResume\(c, false\)/);
+});

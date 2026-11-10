@@ -30,6 +30,11 @@ export interface EmbedProps {
   answerIds?: Readonly<Record<string, readonly string[]>>;
   onShown: () => void;
   onDone?: (output: EmbedOutput) => void;
+  /**
+   * True while something sits over the step (safety.open, or P2 from *This is too much right now*): the step stays
+   * mounted, so an embed with a clock decides what that means for it (the read-through counts it as Stop).
+   */
+  covered?: boolean;
 }
 
 export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {

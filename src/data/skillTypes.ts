@@ -87,7 +87,12 @@ export interface FieldDef {
    * chip); `max` caps it below the skill's `ownMax`. Own words are encrypted at rest and are never data: nothing
    * counts, filters or routes on them (docs/design/dbt-modules-plan.md C1 rule 7).
    */
-  own?: { hint: string; countsAsPick: boolean; open?: boolean; max?: number };
+  /**
+   * `seed`: the chips are starters for the own words, not answers: a tap writes the chip's words into the box to
+   * change, and the chips step aside once the words are the person's own (so a tap never erases what they wrote).
+   * Needs `open`, `max: 1` and a list.
+   */
+  own?: { hint: string; countsAsPick: boolean; open?: boolean; max?: number; seed?: boolean };
   showWhen?: Cond;
   required?: boolean;
   /** The answer is also this ask-fresh field on the session (functions/src/userdata/layers.ts). */

@@ -78,7 +78,9 @@ linted by the voice gate like every flow document; `specJson` holds no copy, onl
   `where` filter, optionally grouped per pick of another field, or the grid words), `max` picks (`swap`:
   a tap past the cap replaces the oldest), `own` (the own-words escape hatch, counts as a pick or not),
   `showWhen`, `required`, `list` (a table read to show above the chips, e.g. `fitsWhen`), `askFresh` (the
-  answer is also an ask-fresh field on the session, e.g. `fitsFacts`), `links` (quiet exits).
+  answer is also an ask-fresh field on the session, e.g. `fitsFacts`), `links` (quiet exits). `own.seed` makes
+  the chips starters for an open own-words box (a tap writes their words in to change; they step aside once the
+  words are the person's).
 - **Slot** = a registered embed placed in a step (`after: <fieldId>`), with `showWhen` and `record` (the
   name it's recorded under when it shows). Check the Facts' parts line is one.
 - **Exit** = where the skill can send you: another tool (`toolId`, `query`, `carry` which answers go

@@ -477,7 +477,12 @@ and both are tested best with that embed. The keep and follow-up contract checks
   finds nothing (too old, another version, a failed read), the fresh run drops it and is a whole first visit.
 - Embed and hand-off steps take step-level quiet `links` (ER-15's `runtime:` commit), rendered under the embed
   or the card; an ask step's links stay on its fields. For a way out that belongs on every screen, such as
-  *Talk to someone now*.
+  *Talk to someone now*. A link's `enterAt` with no `?run=` at all doesn't hold either.
+- `own.seed` (ER-15): on an open own-words box of a one-pick list field, the chips are starters, not answers. A
+  tap writes the chip's words into the box to change; once the words are the person's own, the chips step aside,
+  so a tap never erases what they wrote.
+- Embeds hear `covered` while safety.open or P2 sits over the step (it stays mounted). An embed with a clock
+  decides what that means: ER-15's read-through counts it as Stop. `TooMuchLink` gained an optional `onOpen`.
 - Embeds declare their **props** as well as their output: `EMBED_PROPS` in `embeds.ts`, mirrored in
   `content.py` (`copy` · `int` · `enum` · `field` · `id`, each optionally `optional`). `build.py` checks
   every embed step and slot against it, and a `copy` prop must be a key in the skill's copy, which the

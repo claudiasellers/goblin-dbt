@@ -200,6 +200,9 @@ def check(skill):
                 assert k not in f or f[k] in copy, (w, f)
             if "own" in f:
                 assert f["own"]["hint"] in copy, (w, f)
+                if f["own"].get("seed"):
+                    assert f["own"].get("open") and f.get("max") == 1 and "list" in o, (
+                        w, "seed chips start the open own-words box of a one-pick list field", f)
                 assert f["own"].get("max", skill["ownMax"]) <= skill["ownMax"], (w, "own max above the skill's", f)
             if "firstFrom" in o:
                 assert o["firstFrom"].startswith("$ctx."), (w, "firstFrom is a context ref", o)

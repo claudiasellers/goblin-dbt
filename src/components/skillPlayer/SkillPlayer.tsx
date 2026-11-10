@@ -15,7 +15,7 @@ import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, ctxAfterResume, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
+  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
   handoffLine, initialRun, inlineResult, keepFor, optionGroups, ownMaxOf, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
   scope, shownFields, stepOf, titleSlots,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -130,7 +130,12 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   const location = useLocation();
   // Inline, the host owns the address: nothing is read from it.
   const [carried] = useState(() => (inline ? [] : carriedFrom(location.search, location.state)));
-  const [ctxIn, setCtxIn] = useState(() => (inline ? {} : contextFrom(skill, location.search, location.state)));
+  // A link's `enterAt` is for the run it reopens (R9): with no `?run=` to reopen, it doesn't hold from the start.
+  const [ctxIn, setCtxIn] = useState(() => {
+    if (inline) return {};
+    const c = contextFrom(skill, location.search, location.state);
+    return UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
+  });
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
@@ -138,7 +143,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     embedOutputs: EMBED_OUTPUTS, profile: slices,
   }), [skill, content, carried, ctxIn, slices]);
   const [safetyOpen, setSafetyOpen] = useState(false);
+  // P2 (This is too much right now) over the step: an embed hears it as `covered`, with safety.open.
+  const [p2Open, setP2Open] = useState(false);
   const [st, setSt] = useState<RunState>(() => initialRun(skill, inline?.enterAt));
+  // A new step starts uncovered (P2 left open by a path that didn't say so never stops a later clock).
+  useEffect(() => { setP2Open(false); }, [st.stepId]);
   // Resume (R9): `?run=<sessionId>&at=<stepId>` reopens the person's own run of this tool, or starts fresh.
   const [resumeFrom] = useState(() => {
     if (inline) return null;
@@ -319,7 +328,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   } else if (step.kind === 'handoff') {
     body = <HandoffCard ctx={ctx} step={step} st={st} send={send} onExit={leave} busy={busy} />;
   } else if (step.kind === 'embed') {
-    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} onExit={leave} />;
+    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} onExit={leave} covered={safetyOpen || p2Open} />;
   } else {
     body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy} />;
   }
@@ -337,7 +346,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
       )}
       {!inline && !leaving && !safetyOpen && (
         <div className="flex justify-center">
-          <TooMuchLink host={skill.toolId} onResult={(r) => {
+          <TooMuchLink host={skill.toolId} onOpen={() => setP2Open(true)} onClose={() => setP2Open(false)} onResult={(r) => {
             handoffs.current.push(r);
             toolSession.setExt({ run: { handoffs: handoffExt(handoffs.current) } });
           }} />
@@ -405,8 +414,9 @@ function answerIds(st: RunState): Record<string, readonly string[]> {
 }
 
 /** A whole-screen embed step: the embed owns the screen; its `onDone` output moves the run on. */
-function EmbedStep({ ctx, step, st, send, onShown, onExit }: {
+function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
   ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onShown: (record: string) => void; onExit: (x: ExitDef) => void;
+  covered: boolean;
 }) {
   const Embed = step.embed ? EMBEDS[step.embed] : undefined;
   const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
@@ -417,7 +427,7 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit }: {
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
-      onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
+      onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} covered={covered} />
     <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
   </>);
 }
@@ -440,7 +450,11 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
 }) {
   const c = ctx.skill.copy;
   const a = st.answers[field.id];
-  const picked = (v: string) => !!a?.ids.includes(v);
+  // A seed field (own.seed): a chip is pressed while the box holds its words unchanged; once the words are the
+  // person's own, the chips step aside, so a tap can never erase what they wrote.
+  const seeded = field.own?.seed ? seededFrom(ctx, field, a) : null;
+  const picked = (v: string) => (field.own?.seed ? seeded === v : !!a?.ids.includes(v));
+  const startersHidden = !!field.own?.seed && !!a?.own?.trim() && seeded === null;
   const [ownOpen, setOwnOpen] = useState(!!field.own?.open || !!a?.own);
   const list = fieldList(ctx, field, st);
   const label = field.label ? c[field.label] : null;
@@ -479,13 +493,14 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
           {list.map((line) => <li key={line}>{line}</li>)}
         </ul>
       )}
-      {chips}
+      {!field.own?.seed && chips}
       {field.own && ownOpen && (
         <textarea rows={2} maxLength={ownMaxOf(ctx, field)} value={a?.own ?? ''}
           aria-label={c[field.own.hint] ?? c.own_hint} placeholder={field.own.open ? c[field.own.hint] : undefined}
           onChange={(e) => send({ type: 'own', fieldId: field.id, text: e.target.value })}
           className="w-full p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] font-serif text-lg focus:ring-2 focus:ring-[var(--color-accent)]" />
       )}
+      {field.own?.seed && !startersHidden && chips}
       {fieldLinks(ctx, field, st).map((l) => (
         <div key={l.exit.id} className="flex justify-center">
           <button type="button" className={linkButton} onClick={() => onExit(l.exit)}>{l.label}</button>

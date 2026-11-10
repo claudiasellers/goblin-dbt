@@ -274,7 +274,20 @@ function dropOldest(f: FieldDef, a: Answer): Answer {
   return { ...a, ids: a.ids.slice(1), ...(a.own ? { ownAt: Math.max(0, ownAt(a) - 1) } : {}) };
 }
 
+/** A seed field's starter (`own.seed`): the option whose words the box still holds unchanged, or null. */
+export function seededFrom(ctx: RunContext, f: FieldDef, a: Answer | undefined): string | null {
+  if (!f.own?.seed || !a?.own || !f.options.list) return null;
+  return (ctx.skill.options[f.options.list] ?? []).find((o) => o.label === a.own)?.value ?? null;
+}
+
 function pick(ctx: RunContext, f: FieldDef, a: Answer, value: string): Answer {
+  if (f.own?.seed) {
+    // A starter: its words go into the box to change. Never over words the person wrote (the chips are hidden
+    // then; this holds even if a tap arrives); the same chip again empties the box.
+    const label = (f.options.list ? ctx.skill.options[f.options.list] ?? [] : []).find((o) => o.value === value)?.label;
+    if (!label || (a.own && seededFrom(ctx, f, a) === null)) return a;
+    return a.own === label ? { ids: [], own: null } : { ids: [], own: label.slice(0, ownMaxOf(ctx, f)) };
+  }
   const i = a.ids.indexOf(value);
   if (i >= 0) return { ...a, ids: a.ids.filter((v) => v !== value), ...(a.own && i < ownAt(a) ? { ownAt: ownAt(a) - 1 } : {}) };
   if (f.options.emotions && !ctx.gridIds.has(value)) return a;
