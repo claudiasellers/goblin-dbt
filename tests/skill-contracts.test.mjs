@@ -17,6 +17,10 @@ const EXT_MAX_BYTES = 4096;
 const m = await importTs("src/lib/skillRuntime/machine.ts");
 const { validateExt, EXT_SCHEMAS, RUN_OWN_MAX } = await importTs("functions/src/spine/extSchemas.ts");
 const conditions = await importTs("src/lib/skillRuntime/conditions.ts");
+const holdRing = await importTs("src/lib/holdRing.ts");
+const embedProps = await importTs("src/lib/skillRuntime/embedProps.ts");
+const witness = await importTs("src/lib/witness.ts");
+const { WITNESS_MOMENTS } = await importTs("functions/src/witness/types.ts");
 const profileTypes = await importTs("src/data/profileTypes.ts");
 const { PROFILE_KINDS } = await importTs("functions/src/profile/kinds.ts");
 /** content.py's EMBEDS: each embed's declared output (ids, ownText, measures, danger). */
@@ -168,6 +172,77 @@ test("embeds: one registry in the player, the same names in content.py, and ever
   assert.deepEqual(Object.keys(EMBED_OUTPUTS_TS).sort(), listed);
   // What each embed may report is the same on both sides (the machine keeps only what is declared).
   assert.deepEqual(EMBED_OUTPUTS_TS, EMBEDS_PY);
+});
+
+/** embeds.ts's EMBED_PROPS, read as the literal it is. */
+const EMBED_PROPS_TS = (() => {
+  const block = /export const EMBED_PROPS[^=]*=\s*(\{[\s\S]*?\n\});/.exec(read("src/components/skillPlayer/embeds.ts"))[1];
+  return new Function(`return ${block}`)();
+})();
+const EMBED_PROPS_PY = py("from content import EMBED_PROPS; print(json.dumps(EMBED_PROPS))");
+/** build.py's check_embed_props on one set of props (copy keys `a`, `b`; fields `f`): null when it passes. */
+const propsCheck = (name, props) => {
+  try {
+    execFileSync("python3", ["-c", `import sys,json; sys.path.insert(0,'scripts/skills'); import build
+build.check_embed_props(${JSON.stringify(name)}, json.loads(sys.argv[1]), {"a": "A", "b": "B"}, {"f"}, "probe")`, JSON.stringify(props)], { stdio: "pipe" });
+    return null;
+  } catch (e) { return String(e.stderr); }
+};
+
+test("embed props: declared the same on both sides; build.py refuses undeclared, mistyped or missing props", () => {
+  assert.deepEqual(EMBED_PROPS_TS, EMBED_PROPS_PY);
+  assert.deepEqual(Object.keys(EMBED_PROPS_PY).sort(), Object.keys(EMBEDS_PY).sort(), "every embed declares its props");
+  assert.deepEqual(EMBED_PROPS_PY.holdRing.variant.values, [...holdRing.HOLD_VARIANTS]);
+  const ring = { variant: "press", seconds: 90, label: "a", hint: "b", next: "a" };
+  assert.equal(propsCheck("holdRing", ring), null);
+  assert.equal(propsCheck("holdRing", { ...ring, holds: 3, growthPct: 150, maxSeconds: 900, doneLabel: "b" }), null);
+  assert.match(propsCheck("holdRing", { ...ring, colour: "red" }), /takes no such prop/);
+  assert.match(propsCheck("holdRing", { ...ring, label: "Hold here" }), /copy key/, "words come from the skill's copy");
+  assert.match(propsCheck("holdRing", { ...ring, seconds: 901 }), /in range/);
+  assert.match(propsCheck("holdRing", { ...ring, seconds: true }), /in range/);
+  assert.match(propsCheck("holdRing", { ...ring, variant: "spin" }), /one of/);
+  const { next: _n, ...noNext } = ring;
+  assert.match(propsCheck("holdRing", noNext), /needs next/);
+  assert.equal(propsCheck("witness", { moment: "crisis", wordsFrom: "f", emotionsFrom: "f", next: "a" }), null);
+  assert.match(propsCheck("witness", { moment: "crisis", wordsFrom: "g" }), /field of the skill/);
+  assert.match(propsCheck("witness", { moment: "Not An Id" }), /is an id/);
+  // Every witness step a skill ships names a moment the witness server knows.
+  for (const sk of fixture.skills) {
+    for (const st of sk.steps) {
+      const uses = [...(st.embed === "witness" ? [st.props] : []), ...(st.slots ?? []).filter((x) => x.embed === "witness").map((x) => x.props)];
+      for (const pr of uses) assert.ok(WITNESS_MOMENTS.includes(pr.moment), `${sk.id}.${st.id}: moment ${pr.moment}`);
+    }
+  }
+});
+
+test("embed props in the player: only what is declared, copy keys as the skill's text, a missing optional key dropped", () => {
+  const spec = EMBED_PROPS_TS.holdRing;
+  const copy = { hold: "Hold here", hint: "Press and hold", on: "Go on" };
+  assert.deepEqual(
+    embedProps.resolveEmbedProps(spec, { variant: "timed", seconds: 30, label: "hold", hint: "hint", next: "on", doneLabel: "gone", extra: 1 }, copy),
+    { variant: "timed", seconds: 30, label: "Hold here", hint: "Press and hold", next: "Go on" },
+  );
+  assert.deepEqual(embedProps.resolveEmbedProps(undefined, { a: 1 }, copy), {});
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.equal((player.match(/props=\{embedProps\(ctx, /g) ?? []).length, 2, "slots and whole-screen embeds both get resolved props");
+  assert.equal((player.match(/answerIds=\{answerIds\(st\)\}/g) ?? []).length, 2);
+});
+
+test("witness outcome: own words, skip and none-fit first, then the last line's landed; nothing answered is seen", () => {
+  const r = (o) => ({ landed: {}, skipped: false, noneFit: false, shownLineIds: [], ...o });
+  assert.equal(witness.witnessOutcome(null), "seen");
+  assert.equal(witness.witnessOutcome(r({})), "seen");
+  assert.equal(witness.witnessOutcome(r({ shownLineIds: ["a", "b"], landed: { a: "no", b: "yes" } })), "yes");
+  assert.equal(witness.witnessOutcome(r({ shownLineIds: ["a"], landed: { a: "sort_of" }, skipped: true })), "skip");
+  assert.equal(witness.witnessOutcome(r({ noneFit: true })), "none_fit");
+  assert.equal(witness.witnessOutcome(r({ ownLine: { id: "x", text: "mine" }, skipped: true })), "own");
+  for (const id of ["yes", "sort_of", "no", "none_fit", "own", "skip", "seen"]) assert.ok(EMBEDS_PY.witness.ids.includes(id));
+  // The beat is logged against this visit's session once it's written, never against a check-in.
+  const src = read("src/components/skillPlayer/WitnessEmbed.tsx");
+  assert.match(src, /hostKind: 'tool_session'/);
+  assert.match(src, /\.then\(\(\) => session\.ready\(\)\)/);
+  assert.equal(witness.beatRequest({ checkInId: "s1", hostKind: "tool_session", moment: "crisis", band: "stirred", lines: [], result: r({}), emotionIds: [] }).hostKind, "tool_session");
+  assert.equal(witness.beatRequest({ checkInId: "c1", moment: "checkin_result", band: "stirred", lines: [], result: r({}), emotionIds: [] }).hostKind, "checkin");
 });
 
 test("profile slices: build.py's lists are the app's", () => {

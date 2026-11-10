@@ -119,6 +119,19 @@ export interface EmbedOutput {
 }
 
 /**
+ * One prop an embed takes from the skill (embeds.ts EMBED_PROPS, mirrored in content.py EMBED_PROPS; build.py
+ * checks every step against it): `copy` names a key in the skill's copy (the player passes its text), `int` a
+ * whole number in [min, max], `enum` one of `values`, `field` a field id of the skill, `id` a plain id (another
+ * module's content id). `optional` props may be left out.
+ */
+export type EmbedPropSpec =
+  | { type: 'copy'; optional?: boolean }
+  | { type: 'int'; min: number; max: number; optional?: boolean }
+  | { type: 'enum'; values: readonly string[]; optional?: boolean }
+  | { type: 'field'; optional?: boolean }
+  | { type: 'id'; optional?: boolean };
+
+/**
  * What an embed may report through `onDone` (src/components/skillPlayer/embeds.ts EMBED_OUTPUTS, mirrored in
  * scripts/skills/content.py EMBEDS): the option ids it can produce, whether it takes own words (`ownText`), which
  * measurements, and which of its ids can carry danger (each needs a crisis slot of its variant on the step). The

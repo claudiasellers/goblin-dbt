@@ -121,6 +121,10 @@ export function ToolSessionProvider({ toolId, inside, children }: { toolId: stri
       followUpId: link.followUpId,
       closeKind: closeKindFor(toolId),
       persisted: uid !== null,
+      // A child's mount effect runs before this provider's start effect: give the start one turn to begin.
+      ready: () => (started.current ?? (uid
+        ? new Promise<boolean>((r) => { setTimeout(() => { void (started.current ?? Promise.resolve(false)).then(r); }, 0); })
+        : Promise.resolve(false))),
       setStep: (s) => { step.current = s; },
       markPracticed: () => { practiced.current = true; },
       markComplete: () => { complete.current = true; },

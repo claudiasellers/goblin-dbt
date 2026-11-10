@@ -31,7 +31,8 @@ import { SessionClose } from '../spine/SessionClose';
 import { EmotionPicker } from '../tools/EmotionPicker';
 import { Chip, Line, Prompt } from '../tools/wiseMind/bits';
 import { choiceButton, linkButton, primaryButton, secondaryText } from '../tools/oppositeAction/styles';
-import { EMBEDS, EMBED_OUTPUTS } from './embeds';
+import { EMBEDS, EMBED_OUTPUTS, EMBED_PROPS } from './embeds';
+import { resolveEmbedProps } from '../../lib/skillRuntime/embedProps';
 
 /**
  * The skill player (docs/design/skill-runtime.md): runs any skill from skills.json inside the page's
@@ -344,7 +345,7 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
             const show = holds(s.showWhen, sc);
             return (
               <div key={`${s.embed}:${s.record}`} className="min-h-6">
-                {Embed && show ? <Embed props={s.props ?? {}} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} onShown={() => onShown(s.record)} /> : null}
+                {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} onShown={() => onShown(s.record)} /> : null}
               </div>
             );
           })}
@@ -360,6 +361,16 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
   </>);
 }
 
+/** An embed's props as it receives them: only what EMBED_PROPS declares, copy keys swapped for the skill's text. */
+function embedProps(ctx: RunContext, name: string, props: Record<string, unknown> | undefined) {
+  return resolveEmbedProps(EMBED_PROPS[name], props, ctx.skill.copy);
+}
+
+/** The run's answers as ids, for an embed that asks the server about them (the witness beat's emotions). */
+function answerIds(st: RunState): Record<string, readonly string[]> {
+  return Object.fromEntries(Object.entries(st.answers).map(([k, a]) => [k, a.ids]));
+}
+
 /** A whole-screen embed step: the embed owns the screen; its `onDone` output moves the run on. */
 function EmbedStep({ ctx, step, st, send, onShown }: {
   ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onShown: (record: string) => void;
@@ -372,7 +383,8 @@ function EmbedStep({ ctx, step, st, send, onShown }: {
   return (<>
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
-    <Embed props={step.props ?? {}} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
+    <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
+      onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
   </>);
 }
 

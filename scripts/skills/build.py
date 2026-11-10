@@ -6,7 +6,7 @@ Then: node --test tests/skill-*.test.mjs
 """
 import json, os, re, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from content import SKILLS, CONTENT_VERSION, STEP_KINDS, EMBEDS, GRAPH_TABLES  # noqa: E402
+from content import SKILLS, CONTENT_VERSION, STEP_KINDS, EMBEDS, EMBED_PROPS, GRAPH_TABLES  # noqa: E402
 import importlib.util  # noqa: E402
 _spec = importlib.util.spec_from_file_location(
     "practice_spine_content", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "practice-spine", "content.py"))
@@ -87,6 +87,32 @@ def check_cond(c, fields, derived, where, accepts=None):
             ref(arg[1])
 
 
+ID = re.compile(r"^[a-z0-9][a-z0-9_:-]{0,63}$")
+
+
+def check_embed_props(name, props, copy, fields, w):
+    """A step's or slot's props against the embed's EMBED_PROPS: declared, typed, and every copy key in the skill."""
+    spec = EMBED_PROPS[name]
+    props = props or {}
+    assert set(props) <= set(spec), (w, f"{name} takes no such prop", set(props) - set(spec))
+    for k, sp in spec.items():
+        if k not in props:
+            assert sp.get("optional"), (w, f"{name} needs {k}")
+            continue
+        v = props[k]
+        t = sp["type"]
+        if t == "copy":
+            assert isinstance(v, str) and v in copy, (w, f"{name}.{k} is a copy key of the skill", v)
+        elif t == "int":
+            assert isinstance(v, int) and not isinstance(v, bool) and sp["min"] <= v <= sp["max"], (w, f"{name}.{k} in range", v)
+        elif t == "enum":
+            assert v in sp["values"], (w, f"{name}.{k} is one of {sp['values']}", v)
+        elif t == "field":
+            assert v in fields, (w, f"{name}.{k} is a field of the skill", v)
+        else:
+            assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
+
+
 def check(skill):
     sid = skill["id"]
     copy = skill["copy"]
@@ -130,6 +156,7 @@ def check(skill):
         assert s["kind"] in STEP_KINDS, w
         if s["kind"] == "embed":
             assert s.get("embed") in EMBEDS, (w, "a whole-screen embed the player has", s.get("embed"))
+            check_embed_props(s["embed"], s.get("props"), copy, fields, w)
             assert not s.get("fields"), (w, "an embed step has no fields; its output is `answerAs`")
             for v, kind in EMBEDS[s["embed"]].get("danger", {}).items():
                 want = "other_person" if kind == "other" else "crisis"
@@ -190,6 +217,7 @@ def check(skill):
                 check_cond(ln["when"], fields, derived, w, accepts)
         for sl in s.get("slots", []):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
+            check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
             check_cond(sl["showWhen"], fields, derived, w, accepts)
         for ln in s.get("lines", []):
             assert ln["key"] in copy, (w, ln)
