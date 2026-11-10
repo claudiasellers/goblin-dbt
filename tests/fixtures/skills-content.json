@@ -1444,7 +1444,7 @@
   {
    "id": "check_the_facts",
    "toolId": "check-the-facts",
-   "version": "cf-v1",
+   "version": "cf-v1-1",
    "start": "feel",
    "accepts": [],
    "ownMax": 140,
@@ -1474,7 +1474,9 @@
     "not_sure": "Not sure",
     "next": "Next",
     "done": "Done",
-    "entry_oa": "Go through it slowly with Check the Facts"
+    "entry_oa": "Go through it slowly with Check the Facts",
+    "safety_open": "Talk to someone now",
+    "safe_line": "Your read of danger is the one that counts here. You don't have to check it against anything."
    },
    "tables": {
     "storySetOf": {
@@ -1555,10 +1557,47 @@
         "hint": "event_own_hint",
         "countsAsPick": false,
         "open": true
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "own": "event"
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.event",
+         [
+          "threatened",
+          "hurt_me",
+          "unsafe"
+         ]
+        ]
        }
       }
      ],
      "next": [
+      {
+       "to": "safe",
+       "when": {
+        "in": [
+         "$a.event",
+         [
+          "threatened",
+          "hurt_me",
+          "unsafe"
+         ]
+        ]
+       }
+      },
       {
        "to": "story",
        "when": null
@@ -1917,8 +1956,74 @@
          "unsure"
         ]
        }
+      },
+      {
+       "exit": "mindfulness_emotions",
+       "when": {
+        "eq": [
+         "$a.fits",
+         "fits"
+        ]
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": {
+        "eq": [
+         "$a.fits",
+         "fits"
+        ]
+       }
+      },
+      {
+       "exit": "mindfulness_emotions",
+       "when": {
+        "eq": [
+         "$a.fits",
+         "doesnt_fit"
+        ]
+       }
       }
      ]
+    },
+    {
+     "id": "safe",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "other_person",
+       "when": {
+        "in": [
+         "$a.event",
+         [
+          "threatened",
+          "hurt_me",
+          "unsafe"
+         ]
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "in": [
+         "$a.event",
+         [
+          "threatened",
+          "hurt_me",
+          "unsafe"
+         ]
+        ]
+       },
+       "key": "safe_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
     }
    ],
    "exits": [
@@ -1948,6 +2053,22 @@
      "done": true
     },
     {
+     "id": "let_it_be",
+     "toolId": "let-it-be",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "mindfulness_emotions",
+     "toolId": "mindfulness-emotions",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
      "id": "opposite_action",
      "toolId": "opposite-action",
      "query": {},
@@ -1964,6 +2085,14 @@
       "feel"
      ],
      "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
     },
     {
      "id": "wise_mind",
@@ -1992,6 +2121,21 @@
      {
       "value": "thought",
       "label": "A thought or a memory"
+     },
+     {
+      "value": "threatened",
+      "label": "Someone threatened me",
+      "danger": "other"
+     },
+     {
+      "value": "hurt_me",
+      "label": "Someone hurt me",
+      "danger": "other"
+     },
+     {
+      "value": "unsafe",
+      "label": "I'm not safe with them",
+      "danger": "other"
      },
      {
       "value": "cant_name",
@@ -2554,6 +2698,799 @@
      {
       "value": "unsure",
       "label": "I'm not sure"
+     }
+    ]
+   }
+  },
+  {
+   "id": "er_troubleshoot",
+   "toolId": "er-troubleshoot",
+   "version": "et-v1",
+   "start": "body",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 140,
+   "emotionFields": [],
+   "copy": {
+    "validate": "When a skill doesn't help, that's information. It isn't proof you can't do this.",
+    "settle_first": "Things feel loud right now. You could ground yourself first.",
+    "body_title": "Could your body be turning the volume up?",
+    "body_note": "Like running on little sleep, feeling ill, not eating regularly, or something you took.",
+    "fix_body": "When your body is running low, feelings can get louder and skills have less to work with. Looking after one of those counts as a skill too.",
+    "fit_title": "Did the feeling fit the facts?",
+    "fit_hint": "Some skills are for feelings that fit what happened, some for feelings that are bigger than it.",
+    "fix_fit": "When a feeling fits, the move is usually the situation, or making room for the feeling.",
+    "fix_fit_unsure": "Checking the facts first can show which kind of skill fits.",
+    "way_title": "Did you do it all the way, or partly, while still protecting yourself?",
+    "way_hint": "Like going to the party, then staying in the kitchen.",
+    "fix_way": "That makes sense: protecting yourself is what the feeling pushes for. A smaller step, done all the way, can help more than a big one done partly.",
+    "env_title": "Is something around you rewarding the old way?",
+    "env_hint": "Feelings tend to stick around when they get us something.",
+    "fix_env": "Then the old way is doing a job for you, and the skill is up against it. You could look for another way to get what the old way gets you.",
+    "will_title": "Were you willing, or was part of you not up for it that day?",
+    "fix_will": "That's human. Willingness comes and goes. Making room for the part that isn't up for it can come first.",
+    "much_title": "Was there too much going on at once?",
+    "fix_much": "When a lot is going on, one skill can get buried. Picking one thing to start with can help.",
+    "belief_title": "Is a belief getting in the way?",
+    "belief_hint": "Beliefs about feelings can make a skill feel pointless before it starts.",
+    "safety_open": "Talk to someone now",
+    "fix_belief": "Beliefs like that can feel like facts. They're beliefs, and you can look at them.",
+    "fix_belief_heavy": "That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.",
+    "none": "Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.",
+    "own_hint": "Say it your way",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "body",
+     "kind": "ask",
+     "title": "body_title",
+     "hint": "validate",
+     "note": "body_note",
+     "fields": [
+      {
+       "id": "body",
+       "options": {
+        "list": "body"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "settle_first",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "fix_body",
+       "when": {
+        "in": [
+         "$a.body",
+         [
+          "body_yes"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "fit",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "fit",
+     "kind": "ask",
+     "title": "fit_title",
+     "hint": "fit_hint",
+     "fields": [
+      {
+       "id": "fit",
+       "options": {
+        "list": "fit"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "fix_fit",
+       "when": {
+        "eq": [
+         "$a.fit",
+         "fit_yes"
+        ]
+       }
+      },
+      {
+       "to": "fix_fit_unsure",
+       "when": {
+        "eq": [
+         "$a.fit",
+         "fit_unsure"
+        ]
+       }
+      },
+      {
+       "to": "way",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "way",
+     "kind": "ask",
+     "title": "way_title",
+     "hint": "way_hint",
+     "fields": [
+      {
+       "id": "way",
+       "options": {
+        "list": "way"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "fix_way",
+       "when": {
+        "in": [
+         "$a.way",
+         [
+          "way_part"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "env",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "env",
+     "kind": "ask",
+     "title": "env_title",
+     "hint": "env_hint",
+     "fields": [
+      {
+       "id": "env",
+       "options": {
+        "list": "env"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "fix_env",
+       "when": {
+        "in": [
+         "$a.env",
+         [
+          "env_back_off",
+          "env_get_out",
+          "env_step_in"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "will",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "will",
+     "kind": "ask",
+     "title": "will_title",
+     "fields": [
+      {
+       "id": "will",
+       "options": {
+        "list": "will"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "fix_will",
+       "when": {
+        "in": [
+         "$a.will",
+         [
+          "will_not"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "much",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "much",
+     "kind": "ask",
+     "title": "much_title",
+     "fields": [
+      {
+       "id": "much",
+       "options": {
+        "list": "much"
+       },
+       "max": 1,
+       "required": true
+      }
+     ],
+     "next": [
+      {
+       "to": "fix_much",
+       "when": {
+        "in": [
+         "$a.much",
+         [
+          "much_yes"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "belief",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "belief",
+     "kind": "ask",
+     "title": "belief_title",
+     "hint": "belief_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.belief",
+         "myth_nothing"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "belief",
+       "options": {
+        "list": "belief"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "own_hint",
+        "countsAsPick": true
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "not": {
+           "eq": [
+            "$a.belief",
+            "myth_nothing"
+           ]
+          }
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "fix_belief",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.belief",
+           [
+            "myth_failing",
+            "myth_past_it",
+            "myth_true",
+            "myth_nothing"
+           ]
+          ]
+         },
+         {
+          "own": "belief"
+         }
+        ]
+       }
+      },
+      {
+       "to": "none",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "fix_body",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_body"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "please",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fix_fit",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_fit"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "mindfulness_emotions",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fix_fit_unsure",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_fit_unsure"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "check_the_facts",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fix_way",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_way"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "fix_env",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_env"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fix_will",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_will"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "let_it_be",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fix_much",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_much"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fix_belief",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.belief",
+         "myth_nothing"
+        ]
+       },
+       "key": "fix_belief_heavy"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "fix_belief"
+      }
+     ],
+     "done": "done",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.belief",
+         "myth_nothing"
+        ]
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "eq": [
+         "$a.belief",
+         "myth_nothing"
+        ]
+       }
+      },
+      {
+       "exit": "emotion_guide",
+       "when": {
+        "not": {
+         "eq": [
+          "$a.belief",
+          "myth_nothing"
+         ]
+        }
+       }
+      }
+     ]
+    },
+    {
+     "id": "none",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "none"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "missing_links",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "check_the_facts",
+     "toolId": "check-the-facts",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "emotion_guide",
+     "toolId": "emotion-guide",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "five_senses",
+     "toolId": "five-senses",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "let_it_be",
+     "toolId": "let-it-be",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "mindfulness_emotions",
+     "toolId": "mindfulness-emotions",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "missing_links",
+     "toolId": "missing-links",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "please",
+     "toolId": "please-skill",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "problem_solve",
+     "toolId": "problem-solve",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "body": [
+     {
+      "value": "body_yes",
+      "label": "Maybe, yes"
+     },
+     {
+      "value": "body_no",
+      "label": "I don't think so"
+     },
+     {
+      "value": "body_unsure",
+      "label": "Not sure"
+     }
+    ],
+    "fit": [
+     {
+      "value": "fit_yes",
+      "label": "Yes, it fit"
+     },
+     {
+      "value": "fit_no",
+      "label": "No, it was bigger than the facts"
+     },
+     {
+      "value": "fit_unsure",
+      "label": "I'm not sure"
+     }
+    ],
+    "way": [
+     {
+      "value": "way_all",
+      "label": "All the way"
+     },
+     {
+      "value": "way_part",
+      "label": "Partly"
+     },
+     {
+      "value": "way_unsure",
+      "label": "Not sure"
+     }
+    ],
+    "env": [
+     {
+      "value": "env_back_off",
+      "label": "People back off when I get angry"
+     },
+     {
+      "value": "env_get_out",
+      "label": "I get out of things when I go quiet"
+     },
+     {
+      "value": "env_step_in",
+      "label": "Someone steps in when I'm struggling"
+     },
+     {
+      "value": "env_no",
+      "label": "Nothing like that"
+     },
+     {
+      "value": "env_unsure",
+      "label": "Not sure"
+     }
+    ],
+    "will": [
+     {
+      "value": "will_yes",
+      "label": "I was willing"
+     },
+     {
+      "value": "will_not",
+      "label": "Part of me wasn't up for it"
+     },
+     {
+      "value": "will_unsure",
+      "label": "Not sure"
+     }
+    ],
+    "much": [
+     {
+      "value": "much_yes",
+      "label": "Yes, a lot at once"
+     },
+     {
+      "value": "much_no",
+      "label": "Not really"
+     },
+     {
+      "value": "much_unsure",
+      "label": "Not sure"
+     }
+    ],
+    "belief": [
+     {
+      "value": "myth_failing",
+      "label": "Having this feeling means I'm failing"
+     },
+     {
+      "value": "myth_past_it",
+      "label": "I'm meant to be past this by now"
+     },
+     {
+      "value": "myth_true",
+      "label": "If I feel it this strongly, it must be true"
+     },
+     {
+      "value": "myth_nothing",
+      "label": "Nothing will ever help me",
+      "danger": "self"
+     },
+     {
+      "value": "myth_no",
+      "label": "Nothing like that"
+     },
+     {
+      "value": "myth_unsure",
+      "label": "Not sure"
      }
     ]
    }

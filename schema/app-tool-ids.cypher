@@ -23,6 +23,7 @@ UNWIND [
   {c: "dbt_wise_mind", t: "wise-mind"},
   {c: "dbt_cope_ahead", t: "cope-ahead"},
   {c: "dbt_check_facts", t: "check-the-facts"},
+  {c: "dbt_troubleshooting", t: "er-troubleshoot"},
   {c: "dbt_alternate_rebellion", t: "alternate-rebellion"},
   {c: "dbt_fast", t: "fast"}
 ] AS row

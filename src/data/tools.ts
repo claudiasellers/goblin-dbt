@@ -128,6 +128,18 @@ export const tools: Tool[] = [
     emoji: '🔍',
     bare: true,
   },
+  {
+    // ER-14 on the skill runtime (docs/design/er-troubleshoot.md): for when a skill was done and didn't help.
+    id: 'er-troubleshoot',
+    name: 'It Isn\'t Working',
+    tagline: 'Find what got in the way of a skill',
+    description: 'When you used a skill and it didn\'t help, go through the usual reasons one tap at a time, and find one thing to try next.',
+    whenToUse: 'When you did a skill and nothing changed.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 24',
+    emoji: '🧩',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -227,6 +239,7 @@ export const allIntents: Intent[] = [
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
   { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
+  { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
 ];
 
 /** The intents the Tools page lists: those whose tool is listed for everyone. */

@@ -63,7 +63,7 @@ test("each one comes through lazy(), in its own Suspense", () => {
   assert.match(read("src/components/spine/SessionClose.tsx"), /import \{ PartTagSlot \} from '\.\/PartTagSlot';/);
 });
 
-test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel without the wreckage and Keep your self-respect are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
+test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel without the wreckage, It isn't working and Keep your self-respect are the lazy tools; the parts gates stay eager and fetch the content on demand", () => {
   const page = read("src/pages/ToolPage.tsx");
   const tools = importsOf(page).filter((s) => s.startsWith("./tools/")).map((s) => s.slice("./tools/".length)).sort();
   assert.deepEqual(tools, ["CoolDown", "DearMan", "FindTheFeeling", "FiveSenses", "InvalidationRecovery", "OppositeAction", "Pause", "ProblemSolve", "UrgeSurfing"]);
@@ -71,6 +71,8 @@ test("Meet a part, Two pulls, Wise mind, Cope Ahead, Check the Facts, Rebel with
   // Check the Facts (not a parts surface): played by the skill player (playerTools.ts), its own chunk, for everyone.
   assert.match(page, /const LazySkillPlayer = lazy\(\(\) => import\('\.\.\/components\/skillPlayer\/SkillPlayer'\)/);
   assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'check-the-facts': 'check_the_facts',/);
+  // It isn't working (ER-14): the same player and chunk.
+  assert.match(read("src/lib/skillRuntime/playerTools.ts"), /'er-troubleshoot': 'er_troubleshoot',/);
   // Keep your self-respect (FAST, not a parts surface): its own chunk, which picks one of its two skills.
   assert.match(page, /const LazyFast = lazy\(\(\) => import\('\.\/tools\/Fast'\)/);
   assert.match(page, /'fast': Fast,/);

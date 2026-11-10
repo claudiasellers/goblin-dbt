@@ -28,7 +28,9 @@ test("every step of every shipped skill has a path from the start, and the revie
 test("the made-up run: the skill's version, the path, each earlier field's first option; the player's resume reads it", async () => {
   const m = await importTs("src/lib/skillRuntime/machine.ts");
   const ctf = shipped.find((s) => s.id === "check_the_facts");
-  const last = ctf.steps.at(-1).id;
+  // The last step on the main path, through the ask-fresh question (v1.1's `safe` card, the danger chips' end, skips it).
+  const freshId = ctf.steps.find((s) => (s.fields ?? []).some((f) => f.askFresh))?.id;
+  const last = ctf.steps.filter((s) => !freshId || r.stepPaths(ctf)[s.id].includes(freshId)).at(-1).id;
   const run = r.reviewRun(ctf, last);
   assert.equal(run.versionId, ctf.version);
   assert.deepEqual(run.path, r.stepPaths(ctf)[last]);
