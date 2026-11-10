@@ -8,7 +8,7 @@
  *   npx vite build --config dev/vite.harness.config.ts  →  dev-dist/dev/skills-review.html
  *   (cd dev-dist && python3 -m http.server 4321), then open http://localhost:4321/dev/skills-review.html
  *   node dev/review/skills-shots.mjs: every step of every skill at 390×844, screenshots, no errors
- * Navigation is by the hash: #k=<skill>&s=<step>&band=<steady|stirred|flooded>; no `s` plays the skill from
+ * Navigation is by the hash: #k=<skill>&s=<step>&band=<steady|stirred|flooded>&theme=light; no `s` plays the skill from
  * its start. A step opens through the player's own resume (`?run=&at=`, R9): getSkillRun answers with a run
  * whose path reaches it, each earlier field answered with its first option (dev/review/skillsReview.ts).
  */
@@ -23,6 +23,7 @@ import { ToolSessionProvider } from '../src/contexts/ToolSessionContext';
 import { SkillPlayer } from '../src/components/skillPlayer/SkillPlayer';
 import { DEFAULT_PROFILE } from '../src/services/neo4j';
 import type { SkillDef } from '../src/data/skillTypes';
+import { applyRoom } from '../src/data/palettes';
 import skillsFile from '../src/data/content/skills.json';
 import witnessLines from 'virtual:review-witness-lines';
 import { answers, resetAnswers, REVIEW_USER, reviewEvents, type ReviewEvent } from './review/backend';
@@ -33,17 +34,17 @@ const SKILLS = (skillsFile as unknown as { content: { skills: SkillDef[] } }).co
 const RUN_ID = '00000000-0000-4000-8000-00000000c0de';
 const BANDS = ['steady', 'stirred', 'flooded'] as const;
 
-interface Nav { skill: SkillDef | null; step: string | null; band: (typeof BANDS)[number] | null; blank?: boolean }
+interface Nav { skill: SkillDef | null; step: string | null; band: (typeof BANDS)[number] | null; light?: boolean; blank?: boolean }
 function readNav(): Nav {
   const q = new URLSearchParams(location.hash.slice(1));
   const skill = SKILLS.find((s) => s.id === q.get('k')) ?? null;
   const step = skill?.steps.some((s) => s.id === q.get('s')) ? q.get('s') : null;
   const b = q.get('band');
-  return { skill, step, band: (BANDS as readonly string[]).includes(b ?? '') ? (b as Nav['band']) : null };
+  return { skill, step, band: (BANDS as readonly string[]).includes(b ?? '') ? (b as Nav['band']) : null, light: q.get('theme') === 'light' };
 }
 const ht = (nav: Nav, p: Record<string, string | null>) => {
   const n = new URLSearchParams();
-  for (const [k, v] of Object.entries({ k: nav.skill?.id ?? null, s: nav.step, band: nav.band, ...p })) if (v) n.set(k, v);
+  for (const [k, v] of Object.entries({ k: nav.skill?.id ?? null, s: nav.step, band: nav.band, theme: nav.light ? 'light' : null, ...p })) if (v) n.set(k, v);
   const s = n.toString();
   return s ? `#${s}` : '#';
 };
@@ -51,12 +52,14 @@ const ht = (nav: Nav, p: Record<string, string | null>) => {
 type Req = Record<string, unknown>;
 const ok = (d: unknown) => d as Req;
 function prepare(nav: Nav) {
+  // Light is a light room (Daylight), dark the default (Velvet): a room sets palette and theme together.
+  applyRoom(nav.light ? 'daylight' : 'velvet');
   resetAnswers();
   answers({
     ensureUserExists: () => ({ success: true }),
     getUserProfile: () => ({
       profile: {
-        ...DEFAULT_PROFILE, displayName: 'Sam', email: REVIEW_USER.email, theme: 'dark', palette: 'velvet', partsEnabled: true,
+        ...DEFAULT_PROFILE, displayName: 'Sam', email: REVIEW_USER.email, theme: nav.light ? 'light' : 'dark', palette: nav.light ? 'daylight' : 'velvet', partsEnabled: true,
         timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone ?? null,
       },
     }),

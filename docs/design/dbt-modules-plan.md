@@ -457,11 +457,36 @@ and both are tested best with that embed. The keep and follow-up contract checks
 - Shared embeds `witness` and `holdRing` (C3b).
 - **The skill review harness**, extending `dev/review/` (which already renders Parts and Cope Ahead with
   real components): `dev/skills-review.html` renders any skill with fixture content and stubbed services,
-  and `dev/review/skills-shots.mjs` walks every branch (the pure machine enumerates paths: one per option
-  of every field a transition reads) and screenshots each step at 390 × 844 and 360 × 780, light and dark,
-  plus each room palette for screens that use room tokens. `dev/review/check.mjs` and `a11y.mjs` run over
-  the same screens (44 px targets, focus on the title, contrast). Output: a gallery page per skill, which
-  Gate 2 reviews and the PR links.
+  and `dev/review/skills-shots.mjs` screenshots each step at 390 × 844 and 360 × 780, light and dark. Output:
+  a gallery per skill, which Gate 2 reviews and the PR links.
+
+**F2 as built (10 Nov), and where it departs from the above:**
+
+- R8 inline runs use the existing entry `embedded` (host session as `hostSessionId`), not a new `inline`
+  entry: the spine already had the shape. R9 resume reads the person's own run through a new callable,
+  `getSkillRun` (own session, the asked tool, ≤ 14 days, own words decrypted), opened by
+  `?run=<sessionId>&at=<stepId>`; ask-fresh answers are always asked again.
+- Embeds declare their **props** as well as their output: `EMBED_PROPS` in `embeds.ts`, mirrored in
+  `content.py` (`copy` · `int` · `enum` · `field` · `id`, each optionally `optional`). `build.py` checks
+  every embed step and slot against it, and a `copy` prop must be a key in the skill's copy, which the
+  player swaps for its text, so every word an embed shows is voice-checked graph copy. Embeds receive
+  `answerIds` (the run's answers as ids) next to `picked`. A lane adding an embed (IE's `boundaryLine`,
+  for example) adds it to both `EMBED_PROPS` as well as `EMBEDS` / `EMBED_OUTPUTS`.
+- `holdRing` (built in F2, owned by DT from here): `press` · `timed` · `settle`, on `ProgressRing` and the
+  parts flows' press gesture (lifted unchanged into `src/hooks/useHoldGesture.ts`, which `HoldButton` now
+  uses). The rules are pure in `src/lib/holdRing.ts`: the 1 Hz pulse slowing 8% a beat to 45%, growth
+  across holds (`growthPct`), early release keeping its seconds, settle counting a breath from a quarter.
+  It answers `held` · `partly` · `skipped` with seconds, holds done and early releases. No digits; the
+  pulse stops under reduced motion; a way past appears after the first try.
+- `witness`: `WitnessBeat` unchanged, logged against the visit's ToolSession (`hostKind: 'tool_session'`)
+  once the session is written (`ToolSessionApi.ready()`). As a whole step it answers what the person did
+  (`yes` · `sort_of` · `no` · `none_fit` · `own` · `skip` · `seen`). A skill's `moment` must be one the
+  witness server knows (test-enforced); a module needing its own moment adds it with its lines.
+- The harness opens any step through the player's own resume, with a made-up run whose path reaches it
+  (each earlier field's first option), and adds a review-only skill (`dev/review/embeds-skill.json`) that
+  shows each shared embed. `--bands` shoots each band and `--all` adds 360 × 780 and a light room. Not
+  built yet: walking every branch (one shot per option of every field a transition reads) and running
+  `a11y.mjs` over the same screens. Until then, Gate 2 opens branches by hand on the page.
 
 The profile thread builds `user-profile.md` P1 and the own-words crypto (`encryptOwn` / `decryptOwn`,
 PR #55); F2 starts when that is pushed and builds on it.

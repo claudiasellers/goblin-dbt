@@ -5,7 +5,8 @@
  * each, and fails on any console error, page error, failed non-font request, or a step where the player shows
  * nothing. The UI-design and clinical QC passes read the screenshots (index.json lists them in review order).
  *   npx vite build --config dev/vite.harness.config.ts
- *   node dev/review/skills-shots.mjs [shots dir] [--skill <id>] [--bands]   (default dev-dist/skills-shots)
+ *   node dev/review/skills-shots.mjs [shots dir] [--skill <id>] [--bands] [--all]   (default dev-dist/skills-shots)
+ *   --all adds 360×780 and the light theme.
  * Uses the preinstalled Playwright and its browsers (PLAYWRIGHT_BROWSERS_PATH, default /opt/pw-browsers).
  */
 import { createServer } from 'node:http';
@@ -22,6 +23,9 @@ const opt = (f) => { const i = args.indexOf(f); return i >= 0 ? args[i + 1] : nu
 const SHOTS = resolve(args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--skill') ?? join(DIST, 'skills-shots'));
 const ONLY = opt('--skill');
 const BANDS = flag('--bands') ? [null, 'steady', 'stirred', 'flooded'] : [null];
+// --all: both phone sizes the plan names (390×844, 360×780) and both themes; else 390×844 dark.
+const VIEWPORTS = flag('--all') ? [[390, 844], [360, 780]] : [[390, 844]];
+const THEMES = flag('--all') ? ['dark', 'light'] : ['dark'];
 process.env.PLAYWRIGHT_BROWSERS_PATH ??= '/opt/pw-browsers';
 
 if (!existsSync(join(DIST, PAGE))) {
@@ -61,11 +65,14 @@ await page.mouse.click(2, 2);
 const map = (await page.evaluate(() => window.__skillsMap)).filter((s) => !ONLY || s.skill === ONLY);
 mkdirSync(SHOTS, { recursive: true });
 const index = [];
+for (const [vw, vh] of VIEWPORTS) {
+await page.setViewportSize({ width: vw, height: vh });
+for (const theme of THEMES) {
 for (const { skill, steps } of map) {
   for (const step of steps) {
     for (const band of BANDS) {
-      where = `${skill}/${step}${band ? `@${band}` : ''}`;
-      const hash = new URLSearchParams({ k: skill, s: step, ...(band ? { band } : {}) }).toString();
+      where = `${skill}/${step}${band ? `@${band}` : ''}${vw !== 390 ? `@${vw}` : ''}${theme !== 'dark' ? `@${theme}` : ''}`;
+      const hash = new URLSearchParams({ k: skill, s: step, ...(band ? { band } : {}), ...(theme !== 'dark' ? { theme } : {}) }).toString();
       await page.evaluate((h) => { location.hash = h; }, hash);
       await page.waitForSelector(`[data-testid="skill-player"][data-step="${step}"]`, { timeout: 8000 })
         .catch(() => problems.push(`${where}: the player never reached the step`));
@@ -74,10 +81,10 @@ for (const { skill, steps } of map) {
       if (empty) problems.push(`${where}: the step shows nothing`);
       const file = `${where.replace(/[/@]/g, '__')}.png`;
       await page.screenshot({ path: join(SHOTS, file), fullPage: true });
-      index.push({ skill, step, band, file });
+      index.push({ skill, step, band, viewport: `${vw}x${vh}`, theme, file });
       // A hold mid-way, for the look of the fill and the pulse: press (or tap a timed ring), wait, shoot, let go.
       const ring = await page.$('[data-testid="hold-ring"] button[data-hold], [data-testid="hold-ring"] button[aria-pressed]');
-      if (ring && !band) {
+      if (ring && !band && vw === 390 && theme === 'dark') {
         const box = await ring.boundingBox();
         const timed = (await ring.getAttribute('aria-pressed')) !== null;
         await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
@@ -92,6 +99,8 @@ for (const { skill, steps } of map) {
       }
     }
   }
+}
+}
 }
 writeFileSync(join(SHOTS, 'index.json'), `${JSON.stringify(index, null, 2)}\n`);
 await browser.close();
