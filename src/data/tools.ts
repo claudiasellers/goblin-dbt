@@ -138,6 +138,18 @@ export const tools: Tool[] = [
     dbtBasis: 'Walking the Middle Path: recovering from invalidation (with STOP, TIPP, Opposite Action and DEAR MAN)',
     emoji: '💬',
   },
+  {
+    // On the skill runtime (docs/design/fast.md): the review and the Let go route are graph data.
+    id: 'fast',
+    name: 'Keep your self-respect',
+    tagline: 'Look at how you handled it, and pick one thing to keep next time',
+    description: 'Name what slipped (an extra sorry, going along, bending the truth, dropping your ask), pick the move you\'d make next time, and keep the line. After a no, hold your ground with one line and let it go.',
+    whenToUse: 'When you gave up more of yourself than you meant to, or they said no and you want to let it go with your self-respect.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handout 7 (FAST)',
+    emoji: '🪶',
+    bare: true,
+  },
   // Mindfulness
   {
     id: 'wise-mind',

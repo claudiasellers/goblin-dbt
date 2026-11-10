@@ -128,7 +128,11 @@ CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "sk
 # Check the Facts has shipped on the skill runtime (appToolId 'check-the-facts', docs/design/skill-runtime.md):
 # out of PLANNED; its six rows stay switched off and drafts until Claudia signs them off, row by row.
 CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change", "skillKind": "change", "direction": "neutral"}
+# Keep your self-respect (FAST) has shipped on the skill runtime (appToolId 'fast', docs/design/fast.md, IE-B1):
+# out of PLANNED; its three word rows stay switched off and drafts until Claudia signs them off (D15).
+CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "relational", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
+    "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
     "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",
 }
@@ -137,7 +141,6 @@ PLANNED = {
     "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "radical-acceptance": {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "wise-mind":          {"concept": "dbt_wise_mind",          "side": "both",       "skillKind": "naming",     "direction": "neutral"},
-    "fast":               {"concept": "dbt_fast",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
     "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
 }
 CONCEPT_TAGS.update(PLANNED)

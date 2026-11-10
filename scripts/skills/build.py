@@ -219,12 +219,15 @@ def check(skill):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
             check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
             check_cond(sl["showWhen"], fields, derived, w, accepts)
+        # A line or an offer with `when: None` always holds (a hand-off's default line, an offer for every path).
         for ln in s.get("lines", []):
             assert ln["key"] in copy, (w, ln)
-            check_cond(ln["when"], fields, derived, w, accepts)
+            if ln.get("when") is not None:
+                check_cond(ln["when"], fields, derived, w, accepts)
         for of in s.get("offers", []):
             assert of["exit"] in exits, (w, of)
-            check_cond(of["when"], fields, derived, w, accepts)
+            if of.get("when") is not None:
+                check_cond(of["when"], fields, derived, w, accepts)
         assert "done" not in s or s["done"] in exits, w
         step_fields = {f["id"] for f in s.get("fields", [])}
         assert "primary" not in s or s["primary"] in copy, (w, "primary is a copy key", s.get("primary"))

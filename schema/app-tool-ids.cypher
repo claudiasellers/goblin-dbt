@@ -22,7 +22,8 @@ UNWIND [
   {c: "dbt_recovering_from_invalidation", t: "recovering-from-invalidation"},
   {c: "dbt_wise_mind", t: "wise-mind"},
   {c: "dbt_cope_ahead", t: "cope-ahead"},
-  {c: "dbt_check_facts", t: "check-the-facts"}
+  {c: "dbt_check_facts", t: "check-the-facts"},
+  {c: "dbt_fast", t: "fast"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})
 SET c.appToolId = row.t;

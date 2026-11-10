@@ -394,6 +394,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_fast": {
+   "appToolId": "fast",
+   "name": "FAST",
+   "description": "Fair, no excessive Apologies, Stick to values, Truthful",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": "change",
+   "skillKind": "relational",
+   "direction": "neutral",
+   "addresses": []
+  },
   "dbt_find_the_feeling": {
    "appToolId": "find-the-feeling",
    "name": "Find the Feeling",

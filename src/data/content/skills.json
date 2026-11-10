@@ -1278,6 +1278,761 @@
             }
           ]
         }
+      },
+      {
+        "id": "fast_let_go",
+        "toolId": "fast",
+        "version": "fast-let-go-v1",
+        "start": "line",
+        "accepts": [
+          "frame"
+        ],
+        "ownMax": 140,
+        "emotionFields": [],
+        "copy": {
+          "line_title": "You said what you needed, and that counts. Do you want a line that says where you stand?",
+          "line_hint": "A boundary line says what you'll do. It doesn't argue.",
+          "line_none": "I don't need to say anything",
+          "own_hint": "Say it my way",
+          "card_title": "Your line, to use or not",
+          "elsewhere_line": "What you needed from them still matters. It can be met somewhere else.",
+          "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
+          "next": "Next",
+          "done": "Done"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "line",
+            "kind": "ask",
+            "title": "line_title",
+            "hint": "line_hint",
+            "fields": [
+              {
+                "id": "line",
+                "options": {
+                  "list": "line"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "elsewhere",
+                "when": {
+                  "eq": [
+                    "$a.line",
+                    "none"
+                  ]
+                }
+              },
+              {
+                "to": "card",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "card",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "card_title",
+            "answerAs": "card_copied",
+            "props": {
+              "from": [
+                "line"
+              ],
+              "copyable": true,
+              "labels": {
+                "copy": "Copy",
+                "copied": "Copied",
+                "next": "Next"
+              }
+            },
+            "next": [
+              {
+                "to": "elsewhere",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "elsewhere",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.line",
+                    "none"
+                  ]
+                },
+                "key": "elsewhere_line_none"
+              },
+              {
+                "when": null,
+                "key": "elsewhere_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "let_it_be",
+                "when": null
+              },
+              {
+                "exit": "recover",
+                "when": null
+              },
+              {
+                "exit": "finding_connection",
+                "when": null
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "finding_connection",
+            "toolId": "finding-connection",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "let_it_be",
+            "toolId": "let-it-be",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "recover",
+            "toolId": "recovering-from-invalidation",
+            "query": {},
+            "carry": [],
+            "done": false
+          }
+        ],
+        "options": {
+          "line": [
+            {
+              "value": "not_argue",
+              "label": "I've said how this lands. I won't argue about whether my feelings are real."
+            },
+            {
+              "value": "not_keep_asking",
+              "label": "I've said what I need. I'm not going to keep asking."
+            },
+            {
+              "value": "hear_no",
+              "label": "I hear that it's a no. I'm stepping back from this for now."
+            },
+            {
+              "value": "see_differently",
+              "label": "We see this differently. I'm leaving it there."
+            },
+            {
+              "value": "not_today",
+              "label": "I'm not going to talk about this any more today."
+            },
+            {
+              "value": "calmer",
+              "label": "I'll come back to this when we can both talk calmly."
+            },
+            {
+              "value": "not_changing",
+              "label": "That doesn't work for me, and that hasn't changed."
+            },
+            {
+              "value": "another_way",
+              "label": "I'm going to look after this need another way."
+            },
+            {
+              "value": "none",
+              "label": "I don't need to say anything"
+            }
+          ]
+        }
+      },
+      {
+        "id": "fast_review",
+        "toolId": "fast",
+        "version": "fast-review-v1",
+        "start": "what",
+        "accepts": [
+          "frame"
+        ],
+        "ownMax": 140,
+        "emotionFields": [],
+        "copy": {
+          "what_title": "Looking back, which of these happened?",
+          "what_hint": "Pick the one that sits worst.",
+          "what_own": "Something else",
+          "sorry_title": "Was there something you did that needs a sorry?",
+          "sorry_instead_title": "What could take the place of the extra sorries next time?",
+          "card_a_title": "One sorry for a real wrong. None for having a need.",
+          "values_title": "Which value do you want to keep next time?",
+          "values_hint": "Pick one or two.",
+          "card_s_title": "The value you'd keep",
+          "truth_title": "What's the true version?",
+          "card_t_title": "The true version",
+          "instead_title": "What would you say instead, next time?",
+          "card_f_title": "What you'd say instead",
+          "own_hint": "Say it my way",
+          "next_line": "That's one move to carry into the next conversation.",
+          "next_line_wrong": "That's one move to carry with you. A sorry for a real wrong is part of keeping your self-respect.",
+          "next": "Next",
+          "done": "Done"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "what",
+            "kind": "ask",
+            "title": "what_title",
+            "hint": "what_hint",
+            "fields": [
+              {
+                "id": "what",
+                "options": {
+                  "list": "what"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "what_own",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "sorry",
+                "when": {
+                  "eq": [
+                    "$a.what",
+                    "over_sorry"
+                  ]
+                }
+              },
+              {
+                "to": "values",
+                "when": {
+                  "eq": [
+                    "$a.what",
+                    "went_along"
+                  ]
+                }
+              },
+              {
+                "to": "truth",
+                "when": {
+                  "eq": [
+                    "$a.what",
+                    "bent_truth"
+                  ]
+                }
+              },
+              {
+                "to": "instead",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "sorry",
+            "kind": "ask",
+            "title": "sorry_title",
+            "fields": [
+              {
+                "id": "sorry",
+                "options": {
+                  "list": "sorry"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "sorry_instead",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "sorry_instead",
+            "kind": "ask",
+            "title": "sorry_instead_title",
+            "fields": [
+              {
+                "id": "sorry_instead",
+                "options": {
+                  "list": "sorry_instead"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "card_a",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "card_a",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "card_a_title",
+            "answerAs": "card_a_copied",
+            "props": {
+              "from": [
+                "sorry_instead"
+              ],
+              "copyable": true,
+              "labels": {
+                "copy": "Copy",
+                "copied": "Copied",
+                "next": "Next"
+              }
+            },
+            "next": [
+              {
+                "to": "next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "values",
+            "kind": "ask",
+            "title": "values_title",
+            "hint": "values_hint",
+            "fields": [
+              {
+                "id": "values",
+                "options": {
+                  "list": "values"
+                },
+                "max": 2,
+                "swap": true,
+                "required": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 40
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "card_s",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "card_s",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "card_s_title",
+            "answerAs": "card_s_copied",
+            "props": {
+              "from": [
+                "values"
+              ],
+              "copyable": false,
+              "labels": {
+                "copy": "Copy",
+                "copied": "Copied",
+                "next": "Next"
+              }
+            },
+            "next": [
+              {
+                "to": "next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "truth",
+            "kind": "ask",
+            "title": "truth_title",
+            "fields": [
+              {
+                "id": "truth",
+                "options": {
+                  "list": "truth"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "card_t",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "card_t",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "card_t_title",
+            "answerAs": "card_t_copied",
+            "props": {
+              "from": [
+                "truth"
+              ],
+              "copyable": true,
+              "labels": {
+                "copy": "Copy",
+                "copied": "Copied",
+                "next": "Next"
+              }
+            },
+            "next": [
+              {
+                "to": "next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "instead",
+            "kind": "ask",
+            "title": "instead_title",
+            "fields": [
+              {
+                "id": "instead",
+                "options": {
+                  "list": "instead"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 90
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "card_f",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "card_f",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "title": "card_f_title",
+            "answerAs": "card_f_copied",
+            "props": {
+              "from": [
+                "instead"
+              ],
+              "copyable": true,
+              "labels": {
+                "copy": "Copy",
+                "copied": "Copied",
+                "next": "Next"
+              }
+            },
+            "next": [
+              {
+                "to": "next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "next",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.sorry",
+                    "real_wrong"
+                  ]
+                },
+                "key": "next_line_wrong"
+              },
+              {
+                "when": null,
+                "key": "next_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "check_the_facts",
+                "when": {
+                  "in": [
+                    "$a.sorry",
+                    [
+                      "real_wrong",
+                      "unsure"
+                    ]
+                  ]
+                }
+              },
+              {
+                "exit": "rehearse",
+                "when": null
+              },
+              {
+                "exit": "dear_man",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.what",
+                        "dropped_ask"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.what",
+                        "let_decide"
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "own": "what"
+                        },
+                        {
+                          "not": {
+                            "set": "$a.what.ids"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "check_the_facts",
+            "toolId": "check-the-facts",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "dear_man",
+            "toolId": "dear-man",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "rehearse",
+            "toolId": "rehearse",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          }
+        ],
+        "options": {
+          "what": [
+            {
+              "value": "over_sorry",
+              "label": "I said sorry more than I meant",
+              "letter": "A"
+            },
+            {
+              "value": "went_along",
+              "label": "I went along with something I don't agree with",
+              "letter": "S"
+            },
+            {
+              "value": "bent_truth",
+              "label": "I made it sound bigger or smaller than it was",
+              "letter": "T"
+            },
+            {
+              "value": "let_decide",
+              "label": "I let them decide for me",
+              "letter": "F"
+            },
+            {
+              "value": "dropped_ask",
+              "label": "I dropped what I was asking for",
+              "letter": "F"
+            }
+          ],
+          "sorry": [
+            {
+              "value": "real_wrong",
+              "label": "Yes, one thing"
+            },
+            {
+              "value": "no_wrong",
+              "label": "No, I was sorry for asking"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure"
+            }
+          ],
+          "sorry_instead": [
+            {
+              "value": "thanks",
+              "label": "Thank you for hearing me out"
+            },
+            {
+              "value": "big_ask",
+              "label": "I know this is a big ask"
+            },
+            {
+              "value": "matters",
+              "label": "This matters to me"
+            },
+            {
+              "value": "what_i_need",
+              "label": "Here's what I need"
+            }
+          ],
+          "values": [
+            {
+              "value": "honesty",
+              "label": "Honesty"
+            },
+            {
+              "value": "fairness",
+              "label": "Fairness"
+            },
+            {
+              "value": "keeping_my_word",
+              "label": "Keeping my word"
+            },
+            {
+              "value": "standing_up",
+              "label": "Standing up for myself"
+            },
+            {
+              "value": "kindness",
+              "label": "Kindness"
+            },
+            {
+              "value": "respect",
+              "label": "Respect for both of us"
+            },
+            {
+              "value": "my_health",
+              "label": "Looking after my health"
+            },
+            {
+              "value": "my_time",
+              "label": "My time"
+            }
+          ],
+          "truth": [
+            {
+              "value": "plainly",
+              "label": "It mattered to me, and I can say that plainly"
+            },
+            {
+              "value": "some_of_it",
+              "label": "It's hard, and I can do some of it"
+            },
+            {
+              "value": "sometimes",
+              "label": "It happens sometimes, not every time"
+            },
+            {
+              "value": "need_help",
+              "label": "I can do this part, and I'd like help with that part"
+            }
+          ],
+          "instead": [
+            {
+              "value": "think_it_over",
+              "label": "I'd like to think it over before I answer"
+            },
+            {
+              "value": "heres_what",
+              "label": "Here's what I'd like"
+            },
+            {
+              "value": "doesnt_work",
+              "label": "That doesn't work for me"
+            },
+            {
+              "value": "together",
+              "label": "Can we decide this together?"
+            },
+            {
+              "value": "still_want",
+              "label": "I'm still asking for what I asked for"
+            }
+          ]
+        }
       }
     ]
   }
