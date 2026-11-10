@@ -11,7 +11,8 @@ import type { EmbedProps } from './embeds';
  *
  * *Read it through* starts a quiet clock (`seconds`, the deadline timer every hold uses; no digits, no chime: it
  * may be near bedtime). While it runs the card stays in view, with one line of what to do and *Stop* always
- * there. *Stop*, or *I'd rather stop here* before starting, reports `stopped`; the skill takes that to a card that
+ * there. *Stop*, *I'd rather stop here* before starting, or anything opening over the running clock (`covered`: P2 or
+ * safety.open), reports `stopped`; the skill takes that to a card that
  * settles and orients, never back into the dream. The clock done, *Done* reports `read`. Both carry the seconds
  * read (a measurement, never a rating). A whole-screen embed: the skill answers its id as `read`.
  *
@@ -20,7 +21,7 @@ import type { EmbedProps } from './embeds';
  */
 export const RESCRIPT_IDS = ['read', 'stopped'] as const;
 
-export function RescriptCard({ props, picked = {}, onShown, onDone }: EmbedProps) {
+export function RescriptCard({ props, picked = {}, onShown, onDone, covered = false }: EmbedProps) {
   const text = (k: string) => (typeof props[k] === 'string' ? (props[k] as string) : '');
   const field = (k: string) => (typeof props[k] === 'string' ? (picked[props[k] as string] ?? []) : []);
   const lines = ([['startLabel', 'startField'], ['turnLabel', 'turnField'], ['endLabel', 'endField']] as const)
@@ -32,12 +33,20 @@ export function RescriptCard({ props, picked = {}, onShown, onDone }: EmbedProps
   useEffect(() => { if (!shown.current) { shown.current = true; onShown(); } }, [onShown]);
 
   const doneRef = useRef<HTMLButtonElement>(null);
+  const stopRef = useRef<HTMLButtonElement>(null);
   const timer = useDeadlineTimer({ durationMs: seconds * 1000, chime: false, tickMs: 250 });
   const running = timer.state === 'running';
   const finished = timer.state === 'done';
+  // Focus follows the one control that's there: Read it through → Stop (always reachable) → Done.
+  useEffect(() => { if (running) stopRef.current?.focus({ preventScroll: true }); }, [running]);
   useEffect(() => { if (finished) doneRef.current?.focus({ preventScroll: true }); }, [finished]);
   const secs = () => Math.round(timer.elapsedMs / 1000);
   const stop = () => { const s = secs(); timer.stop(); onDone?.({ ids: ['stopped'], durationSec: s }); };
+  // Something opened over the read-through (This is too much, or Talk to someone now): that counts as Stop, so
+  // coming back lands on the stop card, never back into the dream with the clock still going.
+  const stopNow = useRef(stop);
+  useEffect(() => { stopNow.current = stop; });
+  useEffect(() => { if (covered && running) stopNow.current(); }, [covered, running]);
 
   const label = lines.length ? lines.map((l) => `${l.label}: ${l.value}`).join('. ') : text('fallback');
   return (
@@ -67,7 +76,7 @@ export function RescriptCard({ props, picked = {}, onShown, onDone }: EmbedProps
           <button type="button" className={primaryButton} data-read="" onClick={() => timer.start()}>{text('readLabel')}</button>
         )}
         {running && (
-          <button type="button" className={primaryButton} data-stop="" onClick={stop}>{text('stopLabel')}</button>
+          <button ref={stopRef} type="button" className={primaryButton} data-stop="" onClick={stop}>{text('stopLabel')}</button>
         )}
         {finished && (
           <button ref={doneRef} type="button" className={primaryButton} data-done=""

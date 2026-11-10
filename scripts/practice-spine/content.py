@@ -230,7 +230,10 @@ FOLLOW_UP_TYPES = [
         # dismisses it. The copy and the notification never name the nightmare.
         "id": "nightmare_rehearse", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/nightmare-rescript?run={sourceSessionId}&at=rehearse&enterAt=rehearse&followUp={followUpId}",
+        # tonight: a first visit's; tomorrow_night: a read-through visit's (it ends near bedtime, so not "tonight"
+        # again within the hour); tomorrow: daytime, the only one after a read-through that stirred them up.
         "window": {"kind": "chip", "chips": {"tonight": {"kind": "at_local", "days": 0, "time": "21:00"},
+                                             "tomorrow_night": {"kind": "at_local", "days": 1, "time": "21:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "12:00"}}},
         "staleAfterHours": 36, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,

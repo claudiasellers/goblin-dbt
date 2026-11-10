@@ -47,11 +47,12 @@ COPY = {
     "clinician": "Nightmares that replay something real are best worked on with a clinician, who can go at your pace. For tonight, settling your body and the room around you can help.",
     "clinician_memory": "That's a good place to stop. When it feels like a memory, it's one to work on with a clinician, at your pace. For now, come back to the room around you.",
     # Settle (absorb first): a grounding hold, not slow breathing (direction-safe, C6.3).
-    "settle_title": "Before you start, settle for a moment.",
-    "settle_title_unsure": "Before you start, settle for a moment. If it starts to feel like a memory, you can stop there.",
+    "settle_title": "Before you start, settle for a moment, with your feet on the floor.",
+    "settle_title_unsure": "Before you start, settle for a moment, with your feet on the floor. If it starts to feel like a memory, you can stop there.",
     "settle_label": "Hold",
     "settle_hint": "Hold the circle and notice your feet on the floor.",
     "settle_done": "That's enough.",
+    "settle_running": "Feet on the floor",
     # Screen 3: where it starts. Not what happens.
     "start_title": "Where does it start?",
     "start_hint": "Pick one that keeps coming back, not the worst one. You don't need to say what happens.",
@@ -62,10 +63,12 @@ COPY = {
     "turn_own": "Say it your way",
     # Screen 5: the new ending, theirs to write.
     "ending_title": "How does it end now?",
-    "ending_label": "Write your own, or start from one of these.",
+    "ending_label": "Write your own, or start from one of these and change it.",
     "ending_own": "Write your ending",
     # Screen 6: the new version on the paper, and the read-through (the rich moment).
     "rehearse_title": "Your new version",
+    # A read-through visit opens here (no settle before it): the body cue first, and no hurry.
+    "rehearse_title_again": "Your new version. Feet on the floor first, then read it when you're ready.",
     "card_start": "It starts",
     "card_turn": "Then",
     "card_end": "It ends",
@@ -78,7 +81,7 @@ COPY = {
     # Screen 7: after the first read-through.
     "after_title": "How was that?",
     # Screen 8: settle again (PRD step 6).
-    "settle_again_title": "Settle again before you go on.",
+    "settle_again_title": "Settle again before you go on, with your feet on the floor.",
     # Screen 9: keep and the reminder.
     "plan_title": "Keep this new version?",
     "plan_hint": "Reading it through once a day, for a while, can help the new version take hold.",
@@ -113,7 +116,11 @@ MEMORY = {"eq": [a("after"), "memory"]}
 FAR = {"eq": [a("after"), "far"]}
 STIRRED = {"eq": [a("after"), "stirred"]}
 # After a read-through that stirred them up, the reminder is daytime only: rehearse awake, away from sleep onset.
-REMIND_WHERE = {"any": [{"not": STIRRED}, {"not": {"eq": ["$opt.night", True]}}]}
+DAYTIME_IF_STIRRED = {"any": [{"not": STIRRED}, {"not": {"eq": ["$opt.night", True]}}]}
+# A first visit offers tonight or tomorrow in the day; a read-through visit (which ends near bedtime) offers
+# tomorrow before bed or tomorrow in the day, never "tonight" again within the hour.
+REMIND_WHERE = {"all": [DAYTIME_IF_STIRRED, {"not": {"eq": ["$opt.againOnly", True]}}]}
+AGAIN_REMIND_WHERE = {"all": [DAYTIME_IF_STIRRED, {"not": {"eq": ["$opt.firstOnly", True]}}]}
 KEPT = {"eq": [a("keepit"), "yes"]}
 # A run reopened from the Today reminder (R9: `?run=<session>&at=rehearse&enterAt=rehearse`): after the
 # read-through it asks *How was that?* and settles again, as a first visit does, then ends on the *again* card
@@ -165,9 +172,13 @@ AFTER = [
 ]
 KEEP = [("yes", "Keep it in Me"), ("no", "Not this time")]
 # The nightmare_rehearse window chips (scripts/practice-spine/content.py): no dates.
-REMIND = [("tonight", "Tonight, before bed", {"night": True}), ("tomorrow", "Tomorrow, in the day", {})]
+REMIND = [("tonight", "Tonight, before bed", {"night": True, "firstOnly": True}),
+          ("tomorrow_night", "Tomorrow, before bed", {"night": True, "againOnly": True}),
+          ("tomorrow", "Tomorrow, in the day", {})]
 
+# The body cue shows on the title and while holding (`hint` is the ring's screen-reader text).
 SETTLE_PROPS = {"variant": "settle", "seconds": 5, "holds": 3, "label": "settle_label", "hint": "settle_hint",
+                "runningLabel": "settle_running",
                 "doneLabel": "settle_done", "next": "next"}
 
 STEPS = [
@@ -212,12 +223,15 @@ STEPS = [
     {
         "id": "ending", "kind": "ask", "title": "ending_title", "crisis": CRISIS,
         "fields": [{"id": "ending", "label": "ending_label", "options": {"list": "ending"}, "max": 1, "required": True,
-                    "own": {"hint": "ending_own", "countsAsPick": True, "open": True}, "links": [SAFETY_LINK]}],
+                    # Starters, not answers (own.seed): a chip's words go into the box to change, and the chips
+                    # step aside once the words are theirs, so a tap never erases what they wrote.
+                    "own": {"hint": "ending_own", "countsAsPick": True, "open": True, "seed": True}, "links": [SAFETY_LINK]}],
         "next": [{"to": "rehearse"}],
     },
     {
         # The rich moment: the new version on the square paper, then one read-through with Stop always there.
-        "id": "rehearse", "kind": "embed", "embed": "rescriptCard", "answerAs": "read", "title": "rehearse_title",
+        "id": "rehearse", "kind": "embed", "embed": "rescriptCard", "answerAs": "read",
+        "title": [{"when": RESUMED, "key": "rehearse_title_again"}, {"key": "rehearse_title"}],
         "crisis": CRISIS, "links": [SAFETY_LINK],
         "props": {"startField": "setting", "turnField": "turn", "endField": "ending", "seconds": 60,
                   "startLabel": "card_start", "turnLabel": "card_turn", "endLabel": "card_end", "fallback": "card_fallback",
@@ -244,8 +258,10 @@ STEPS = [
         # reminder chips (R5) schedule the first read-through; each read-through visit sets the next.
         "id": "plan", "kind": "ask", "title": "plan_title", "hint": "plan_hint", "crisis": CRISIS,
         "fields": [
-            {"id": "keepit", "options": {"list": "keepit"}, "max": 1, "required": True, "links": [SAFETY_LINK]},
-            {"id": "remind", "label": "remind_q", "options": {"list": "remind", "where": REMIND_WHERE}, "max": 1},
+            # The quiet link under the last question, so it doesn't split the two.
+            {"id": "keepit", "options": {"list": "keepit"}, "max": 1, "required": True},
+            {"id": "remind", "label": "remind_q", "options": {"list": "remind", "where": REMIND_WHERE}, "max": 1,
+             "links": [SAFETY_LINK]},
         ],
         "keep": {"kind": "nightmare_script", "many": True, "from": ["setting", "turn", "ending"], "when": KEPT},
         "followUp": {"type": "nightmare_rehearse", "whenFrom": "remind"},
@@ -261,7 +277,7 @@ STEPS = [
         # A read-through visit's end, with its own reminder chip (R5 on a hand-off): the next one, if they want it.
         "id": "again", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "again"}],
-        "fields": [{"id": "again_remind", "label": "again_q", "max": 1, "options": {"list": "remind", "where": REMIND_WHERE}}],
+        "fields": [{"id": "again_remind", "label": "again_q", "max": 1, "options": {"list": "remind", "where": AGAIN_REMIND_WHERE}}],
         "followUp": {"type": "nightmare_rehearse", "whenFrom": "again_remind"},
         "offers": [], "done": "done", "links": [SAFETY_LINK],
     },

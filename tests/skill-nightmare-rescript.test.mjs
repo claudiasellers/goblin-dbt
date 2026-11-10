@@ -121,7 +121,7 @@ test("someone to talk to on every screen: a quiet link or an offer on every step
   const s0 = M.initialRun(skill);
   for (const st of skill.steps) {
     assert.ok(st.crisis?.length, `${st.id}: declares the crisis slot`);
-    const shown = st.kind === "ask" ? M.fieldLinks(ctx(), st.fields[0], s0) : M.stepLinks(ctx(), st, s0);
+    const shown = st.kind === "ask" ? st.fields.flatMap((f) => M.fieldLinks(ctx(), f, s0)) : M.stepLinks(ctx(), st, s0);
     const offered = M.offersFor(ctx(), st, s0);
     assert.ok(shown.some((l) => l.exit.id === "safety_open") || offered.includes("safety_open"), `${st.id}: Talk to someone now`);
   }
@@ -175,15 +175,38 @@ test("the read-through reminder: a chip on the keep step schedules nightmare_reh
   assert.deepEqual(M.followUpFor(ctx(), plan, M.runNext(ctx(), atPlan, pick("remind", "tonight"))), { type: "nightmare_rehearse", chip: "tonight" });
 });
 
-test("after a read-through that stirred them up, the reminder is daytime only", () => {
-  const stirred = run([...READ, pick("after", "stirred"), next, embed(["held"], 15)]);
+test("the reminder chips: tonight on a first visit, tomorrow before bed on a read-through visit, daytime only after a stir", () => {
+  const values = (field, st) => M.optionGroups(ctx(), field, st.answers).flatMap((g) => g.options.map((o) => o.value));
   const remind = M.stepOf(skill, "plan").fields.find((f) => f.id === "remind");
-  const values = (st) => M.optionGroups(ctx(), remind, st.answers).flatMap((g) => g.options.map((o) => o.value));
-  assert.deepEqual(values(stirred), ["tomorrow"]);
-  assert.deepEqual(values(run([...READ, pick("after", "all_right"), next, embed(["held"], 15)])), ["tonight", "tomorrow"]);
-  assert.deepEqual(skill.options.remind.filter((o) => o.night).map((o) => o.value), ["tonight"]);
-  assert.deepEqual(remind.options.where, { any: [{ not: { eq: ["$a.after", "stirred"] } }, { not: { eq: ["$opt.night", true] } }] });
-  assert.deepEqual(M.stepOf(skill, "again").fields[0].options.where, remind.options.where, "and on a read-through visit's card");
+  const again = M.stepOf(skill, "again").fields[0];
+  const at = (v) => run([...READ, pick("after", v), next, embed(["held"], 15)]);
+  assert.deepEqual(values(remind, at("all_right")), ["tonight", "tomorrow"]);
+  assert.deepEqual(values(remind, at("stirred")), ["tomorrow"]);
+  assert.deepEqual(values(again, at("all_right")), ["tomorrow_night", "tomorrow"], "never tonight again within the hour");
+  assert.deepEqual(values(again, at("stirred")), ["tomorrow"]);
+  assert.deepEqual(skill.options.remind.filter((o) => o.night).map((o) => o.value), ["tonight", "tomorrow_night"]);
+});
+
+test("the ending's chips are starters: a tap writes their words into the box to change, and never erases words the person wrote", () => {
+  const atEnding = run(TO_CARD.slice(0, TO_CARD.findIndex((e) => e.fieldId === "ending")));
+  assert.equal(atEnding.stepId, "ending");
+  const f = M.stepOf(skill, "ending").fields[0];
+  assert.equal(f.own.seed, true);
+  const started = M.runNext(ctx(), atEnding, pick("ending", "safe"));
+  assert.deepEqual(started.answers.ending, { ids: [], own: "I end up somewhere safe" });
+  const theirs = M.runNext(ctx(), started, own("ending", "I end up somewhere safe, at my gran's"));
+  assert.equal(M.runNext(ctx(), theirs, pick("ending", "calm")), theirs, "a tap after they've written changes nothing");
+  assert.equal(M.copyText(ctx(), f.label, atEnding), "Write your own, or start from one of these and change it.");
+});
+
+test("the read-through card: anything opening over the running clock counts as Stop; focus follows the one control there", () => {
+  const card = readFileSync("src/components/skillPlayer/RescriptCard.tsx", "utf8");
+  assert.match(card, /useEffect\(\(\) => \{ if \(covered && running\) stopNow\.current\(\); \}, \[covered, running\]\);/);
+  assert.match(card, /if \(running\) stopRef\.current\?\.focus/);
+  assert.match(card, /<button ref=\{stopRef\}/);
+  const s = M.resumeRun(ctx({ enterAt: "rehearse" }), M.runRecord(ctx(), run(READ)), "rehearse");
+  assert.match(M.copyText(ctx({ enterAt: "rehearse" }), M.stepOf(skill, "rehearse").title, s), /Feet on the floor first/, "a read-through visit opens on the body cue");
+  assert.equal(M.copyText(ctx(), M.stepOf(skill, "rehearse").title, run(TO_CARD)), "Your new version");
 });
 
 test("a read-through visit (resume at the read-through): no question is pre-filled, it ends on its own card, and sets the next reminder only on a tap", () => {
@@ -211,7 +234,7 @@ test("a read-through visit (resume at the read-through): no question is pre-fill
   assert.equal(again.stepId, "again", "its own end card: the keep step is a first visit's");
   const card = M.stepOf(skill, "again");
   assert.equal(M.followUpFor(c, card, again), null, "last time's reminder chip isn't picked again for them");
-  assert.deepEqual(M.followUpFor(c, card, M.runNext(c, again, pick("again_remind", "tonight"))), { type: "nightmare_rehearse", chip: "tonight" });
+  assert.deepEqual(M.followUpFor(c, card, M.runNext(c, again, pick("again_remind", "tomorrow_night"))), { type: "nightmare_rehearse", chip: "tomorrow_night" });
   assert.equal(M.runNext(c, s, embed(["stopped"], 5)).stepId, "stopped", "Stop works the same on a read-through visit");
 });
 

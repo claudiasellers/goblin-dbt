@@ -4433,11 +4433,12 @@
     "settle_first": "Settle first",
     "clinician": "Nightmares that replay something real are best worked on with a clinician, who can go at your pace. For tonight, settling your body and the room around you can help.",
     "clinician_memory": "That's a good place to stop. When it feels like a memory, it's one to work on with a clinician, at your pace. For now, come back to the room around you.",
-    "settle_title": "Before you start, settle for a moment.",
-    "settle_title_unsure": "Before you start, settle for a moment. If it starts to feel like a memory, you can stop there.",
+    "settle_title": "Before you start, settle for a moment, with your feet on the floor.",
+    "settle_title_unsure": "Before you start, settle for a moment, with your feet on the floor. If it starts to feel like a memory, you can stop there.",
     "settle_label": "Hold",
     "settle_hint": "Hold the circle and notice your feet on the floor.",
     "settle_done": "That's enough.",
+    "settle_running": "Feet on the floor",
     "start_title": "Where does it start?",
     "start_hint": "Pick one that keeps coming back, not the worst one. You don't need to say what happens.",
     "start_own": "Say it your way",
@@ -4445,9 +4446,10 @@
     "turn_hint": "Anything can change. It's your dream.",
     "turn_own": "Say it your way",
     "ending_title": "How does it end now?",
-    "ending_label": "Write your own, or start from one of these.",
+    "ending_label": "Write your own, or start from one of these and change it.",
     "ending_own": "Write your ending",
     "rehearse_title": "Your new version",
+    "rehearse_title_again": "Your new version. Feet on the floor first, then read it when you're ready.",
     "card_start": "It starts",
     "card_turn": "Then",
     "card_end": "It ends",
@@ -4458,7 +4460,7 @@
     "read_done": "Done",
     "read_skip": "I'd rather stop here",
     "after_title": "How was that?",
-    "settle_again_title": "Settle again before you go on.",
+    "settle_again_title": "Settle again before you go on, with your feet on the floor.",
     "plan_title": "Keep this new version?",
     "plan_hint": "Reading it through once a day, for a while, can help the new version take hold.",
     "remind_q": "Want a reminder to read it through?",
@@ -4648,6 +4650,7 @@
       "holds": 3,
       "label": "settle_label",
       "hint": "settle_hint",
+      "runningLabel": "settle_running",
       "doneLabel": "settle_done",
       "next": "next"
      },
@@ -4790,7 +4793,8 @@
        "own": {
         "hint": "ending_own",
         "countsAsPick": true,
-        "open": true
+        "open": true,
+        "seed": true
        },
        "links": [
         {
@@ -4816,7 +4820,20 @@
      "kind": "embed",
      "embed": "rescriptCard",
      "answerAs": "read",
-     "title": "rehearse_title",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "rehearse"
+        ]
+       },
+       "key": "rehearse_title_again"
+      },
+      {
+       "key": "rehearse_title"
+      }
+     ],
      "crisis": [
       {
        "variant": "crisis",
@@ -4967,6 +4984,7 @@
       "holds": 3,
       "label": "settle_label",
       "hint": "settle_hint",
+      "runningLabel": "settle_running",
       "doneLabel": "settle_done",
       "next": "next"
      },
@@ -5019,7 +5037,47 @@
         "list": "keepit"
        },
        "max": 1,
-       "required": true,
+       "required": true
+      },
+      {
+       "id": "remind",
+       "label": "remind_q",
+       "options": {
+        "list": "remind",
+        "where": {
+         "all": [
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$a.after",
+               "stirred"
+              ]
+             }
+            },
+            {
+             "not": {
+              "eq": [
+               "$opt.night",
+               true
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "not": {
+            "eq": [
+             "$opt.againOnly",
+             true
+            ]
+           }
+          }
+         ]
+        }
+       },
+       "max": 1,
        "links": [
         {
          "exit": "safety_open",
@@ -5029,34 +5087,6 @@
          }
         }
        ]
-      },
-      {
-       "id": "remind",
-       "label": "remind_q",
-       "options": {
-        "list": "remind",
-        "where": {
-         "any": [
-          {
-           "not": {
-            "eq": [
-             "$a.after",
-             "stirred"
-            ]
-           }
-          },
-          {
-           "not": {
-            "eq": [
-             "$opt.night",
-             true
-            ]
-           }
-          }
-         ]
-        }
-       },
-       "max": 1
       }
      ],
      "keep": {
@@ -5163,19 +5193,31 @@
        "options": {
         "list": "remind",
         "where": {
-         "any": [
+         "all": [
           {
-           "not": {
-            "eq": [
-             "$a.after",
-             "stirred"
-            ]
-           }
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$a.after",
+               "stirred"
+              ]
+             }
+            },
+            {
+             "not": {
+              "eq": [
+               "$opt.night",
+               true
+              ]
+             }
+            }
+           ]
           },
           {
            "not": {
             "eq": [
-             "$opt.night",
+             "$opt.firstOnly",
              true
             ]
            }
@@ -5430,7 +5472,14 @@
      {
       "value": "tonight",
       "label": "Tonight, before bed",
-      "night": true
+      "night": true,
+      "firstOnly": true
+     },
+     {
+      "value": "tomorrow_night",
+      "label": "Tomorrow, before bed",
+      "night": true,
+      "againOnly": true
      },
      {
       "value": "tomorrow",

@@ -291,6 +291,11 @@
               "kind": "at_local",
               "time": "12:00"
             },
+            "tomorrow_night": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "21:00"
+            },
             "tonight": {
               "days": 0,
               "kind": "at_local",

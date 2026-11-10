@@ -26,13 +26,14 @@ treats PTSD.
 | 2 | `settle` | `holdRing`, settle variant: three short holds, *notice your feet on the floor*. With *I'm not sure*, the title adds *If it starts to feel like a memory, you can stop there.* | PRD step 1 (absorb first). Grounding, not slow breathing (C6.3) |
 | 3 | `start` | *Where does it start?* Somewhere like home · Outside · Somewhere like school or work · Travelling somewhere · Somewhere I don't know · Say it your way (60 characters). Hint: *Pick one that keeps coming back, not the worst one. You don't need to say what happens.* | H20a "choose a nightmare"; PRD step 2–3 (setting only) |
 | 4 | `turn` | *Before it turns bad, what changes?* I get bigger and stronger · Someone on my side arrives · A door appears, and I go through it · It turns silly · I say stop, and it stops · I can leave, and I do · Say it your way | H20a "change the nightmare any way you wish"; PRD step 4 (`RescriptChange`) |
-| 5 | `ending` | *How does it end now?* *Write your own, or start from one of these.* The own-words box is open (*Write your ending*) and nothing is picked; the chips are starters: I end up somewhere safe · I'm with someone I trust · It fades out quietly · I wake up calm | H20a "the changed nightmare"; the ER-B6 gate: the person writes the new ending |
-| 6 | `rehearse` | `rescriptCard`: the new version on the square paper (*It starts* / *Then* / *It ends*), *Read it through*: a minute, eyes open, a thin line filling with no number, *Stop* always there; *I'd rather stop here* before starting | H20a "rehearse the changed nightmare"; PRD steps 5–6 |
+| 5 | `ending` | *How does it end now?* *Write your own, or start from one of these and change it.* The own-words box comes first, open (*Write your ending*); the chips under it are starters (`own.seed`): a tap writes their words into the box to change, and once the words are the person's own the chips step aside, so a tap never erases them: I end up somewhere safe · I'm with someone I trust · It fades out quietly · I wake up calm | H20a "the changed nightmare"; the ER-B6 gate: the person writes the new ending |
+| 6 | `rehearse` | (On a read-through visit the title adds *Feet on the floor first, then read it when you're ready.*) `rescriptCard`: the new version on the square paper (*It starts* / *Then* / *It ends*), *Read it through*: a minute, eyes open, a thin line filling with no number, *Stop* always there; *I'd rather stop here* before starting. *This is too much right now* or *Talk to someone now* opened while the clock runs counts as Stop | H20a "rehearse the changed nightmare"; PRD steps 5–6 |
 | — | `stopped` | Stop, not feeling safe, or far away. *Stopping is part of this. You can come back on another day, or leave it here.* (far away: *Stopping here is fine. Coming back to the room around you can help.*) Offers 5-4-3-2-1 and Talk to someone now (first when not safe), Done. No close question. Never back into the dream. | The coordinator's ask: a clear stop / overwhelm exit |
 | 7 | `after` | *How was that?* That was all right · It stirred me up · It started to feel like a memory (→ the clinician card) · I went far away or foggy (→ `stopped`, 5-4-3-2-1 first: orient, C6.3) · I'm not feeling safe (→ the crisis banner, then `stopped`) | PRD risks: re-exposure, flooding, dissociation |
 | 8 | `settle_again` | `holdRing` again | PRD step 6 (settle after) |
-| 9 | `plan` | *Keep this new version?* Keep it in Me · Not this time. *Want a reminder to read it through?* Tonight, before bed · Tomorrow, in the day. Hint: *Reading it through once a day, for a while, can help the new version take hold.* After *It stirred me up*, only *Tomorrow, in the day*: rehearse awake, away from sleep onset | H20a "rehearse every night before sleep"; PRD step 7 |
+| 9 | `plan` | *Keep this new version?* Keep it in Me · Not this time. *Want a reminder to read it through?* Tonight, before bed · Tomorrow, in the day. The quiet *Talk to someone now* sits under the second question, so it doesn't split them. Hint: *Reading it through once a day, for a while, can help the new version take hold.* After *It stirred me up*, only *Tomorrow, in the day*: rehearse awake, away from sleep onset | H20a "rehearse every night before sleep"; PRD step 7 |
 | 10 | `close` | *It's in Me* (when kept) or *You wrote a new way for it to go. Each read-through is practice for it.* | |
+| — | `again` | A read-through visit's end, after *How was that?* and the settle: *That's one more read-through. Want a reminder for the next one?* Tomorrow, before bed · Tomorrow, in the day (only the daytime one after *It stirred me up*); never *Tonight* again within the hour | H20a "rehearse every night"; R5 on a hand-off |
 
 **A read-through visit.** The reminder (`nightmare_rehearse`, on Today, *Your new version — A read-through you
 asked for. A minute, eyes open.*) opens `/tool/nightmare-rescript?run=<that visit>&at=rehearse&enterAt=rehearse`.
@@ -93,12 +94,13 @@ fresh run is a whole first visit, keep step included.
 - **A carried flooded band goes on** (the PRD says *steady only*). C6.1 never locks a tool, so the first screen
   says it's one for a calmer moment and offers *Settle first* (5-4-3-2-1) as a quiet link; going on stays the
   default. Flooded only ever arrives carried from a host (C6.2).
-- **No settle before a read-through visit's card.** The reopened run starts at the card, eyes open, read when
-  ready; *How was that?* and the settle come after it, as on a first visit. Reopening earlier would mean asking
-  the questions again.
-- **A *Tonight* reminder picked late** falls due an hour later (the spine's rule for a time already past), so
-  near midnight it can land after bedtime. A per-type latest time is a spine change for every follow-up, left for
-  the safety batch's night-mode work (ER-13).
+- **No settle hold before a read-through visit's card.** The reopened run starts at the card, and its title
+  leads with the body cue (*Feet on the floor first, then read it when you're ready*); *How was that?* and the
+  settle hold come after it, as on a first visit. Reopening earlier would mean asking the questions again.
+- **A *Tonight* reminder picked late on a first visit** falls due an hour later (the spine's rule for a time
+  already past). It's Today only (no push), and the read-through visit's own card never offers *Tonight*, so
+  this is a first visit done late at night. A per-type latest time is a spine change for every follow-up, left
+  for CORE's night mode (ER-13).
 - **The referral exit** (*Out: referral*) has no target until CORE's clinician-in-the-loop; the clinician card
   says a clinician can help and offers grounding and someone to talk to.
 - **Rehearsing from Me waits.** A kept version lists in Me; reading it through from there needs a profile read
