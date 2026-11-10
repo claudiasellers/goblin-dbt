@@ -241,8 +241,8 @@ BOUNDARY_LINES = [
     ("another_way", "I'm going to look after this need another way."),
 ]
 # Served on Let go: five lines and the choice to say nothing, second, so the whole screen and its quiet link fit
-# one phone screen (flooded is this route's entry). The other three stay in the reviewed set above for the hosts
-# that use the embed next (Recover's Land, IE-B4; Ending, IE-08).
+# one phone screen (flooded is this route's entry). The other three are Python-only drafts (never options in the
+# graph) until a host serves them (Recover's Land, IE-B4; Ending, IE-08).
 SERVED_LINES = ["not_keep_asking", "none", "hear_no", "not_today", "another_way", "not_argue"]
 LINE_LABEL = {**dict(BOUNDARY_LINES), "none": LET_GO_COPY["line_none"]}
 
@@ -261,7 +261,8 @@ LET_GO_STEPS = [
             {"when": {"eq": ["$ctx.frame", "let_go"]}, "key": "elsewhere_line_no"},
             {"when": None, "key": "elsewhere_line"},
         ],
-        # Meet the need elsewhere: Recover's need step today (WMP's need-restoration picker); acceptance (DT-04)
+        # Meet the need elsewhere: Recover, from its start until IE-B4 gives it `enterAt` (then its need step, WMP's
+        # need-restoration picker; the Witness deck waits on WMP); acceptance (DT-04)
         # and finding your people (IE-09) once they ship.
         "offers": [
             {"exit": "let_it_be", "when": None},

@@ -22,7 +22,14 @@ export function BoundaryLine({ props, picked, onShown, onDone }: EmbedProps) {
   const [status, setStatus] = useState('');
   const lineRef = useRef<HTMLParagraphElement>(null);
   useEffect(() => { if (text) onShown(); }, [text, onShown]);
-  if (!text) return null;
+  // Nothing picked to show (content drift): never strand the person on a whole-screen embed.
+  if (!text) {
+    return (
+      <div className="flex justify-center">
+        <button type="button" className={primaryButton} onClick={() => onDone?.({ ids: [] })}>{labels.next}</button>
+      </div>
+    );
+  }
 
   const copy = async () => {
     try {

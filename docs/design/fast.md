@@ -61,12 +61,12 @@ really wrong".
 |---|---|---|
 | `line` | ask, one pick, own words | *Do you want a line that says where you stand?* Five boundary lines, each saying what **you** will do, with *I don't need to say anything* second |
 | `card` | embed `boundaryLine` | The line on the keepsake paper, Copy, Next. Skipped for *I don't need to say anything* |
-| `elsewhere` | hand-off, completes | After a host's no (`?frame=let_go`): *You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.* (the acknowledgement and the one acceptance line, IE Arch #31). On a flooded entry with no frame, where no one may have said no: *What you needed still matters. It can be met somewhere else.* After *say nothing*: *Saying nothing is a choice too…* Offers Recover; Let it be (DT-04) and Find your people (IE-09) are **planned** |
+| `elsewhere` | hand-off, completes | After a host's no (`?frame=let_go`): *You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.* (the acknowledgement and the one acceptance line, IE Arch #31). On a flooded entry with no frame, where no one may have said no: *What you needed still matters. It can be met somewhere else.* After *say nothing*: *Saying nothing is a choice too…* Offers Recover (from its start until IE-B4 gives it `enterAt`); Let it be (DT-04) and Find your people (IE-09) are **planned** |
 
 The reviewed set is eight lines (PRD: ≥ 8) in `BOUNDARY_LINES`; Let go serves five of them plus saying nothing
 (`SERVED_LINES`: *not_keep_asking*, *none*, *hear_no*, *not_today*, *another_way*, *not_argue*), so the screen and
-its quiet link fit one phone screen on a flooded entry. *see_differently*, *another_time* and *space* wait for the
-next hosts (Recover's Land in IE-B4, Ending in IE-08). *not_argue* is Recover's *Let it land* line without its last
+its quiet link fit one phone screen on a flooded entry. *see_differently*, *another_time* and *space* are Python-only drafts (never options in the graph) until the
+next hosts serve them (Recover's Land in IE-B4, Ending in IE-08). *not_argue* is Recover's *Let it land* line without its last
 sentence. Every line is short and non-attacking, says what the person will do, and is usable while flooded.
 
 ## The `boundaryLine` embed
@@ -126,7 +126,8 @@ close offers the tag row, like Check the Facts.
 | Rehearse it after the review | IE-02 (IE-B5); the exit is in place, planned |
 | Let it be inline in Let go | DT-04 (DT-B4); planned exit until then, inline in IE-B4 |
 | Recover dropping `boundaryLocked` and using this embed | IE-B4 |
-| `ADDRESSES` edges (unjustified guilt, cold shame, inferior, insignificant) | Clinical review |
+| `ADDRESSES` edges (unjustified guilt, cold shame, inferior, insignificant) | Claudia's clinical call (listed under Sign-off); no batch until then |
+| The Witness deck as a place to meet the need (Arch #30) | WMP's witness pieces (F2 `witness` embed) |
 | `SkillPractice` reps `self_respect` / `let_go` | The spine's reps from a run (F2) |
 | Let go for an unsafe or refusing person (`reason=unsafe`): start on *I don't need to say anything* and hide the other lines (the PRD's "step away without saying anything") | The safety batch / IE-03. No host links `frame=let_go` until then |
 | Hiding the Recover offer when Recover is the host (no loop), and opening Recover at its need step | IE-B4 (Recover's `enterAt`) |
@@ -145,6 +146,7 @@ The skill copy isn't gated on content sign-off (Check the Facts' precedent). For
   violated), `grievance` (bitter, resentful), `victimized`. The clinical gate asks to drop *violated* and delete
   the `victimized` row before switching on: after a violation, a review that opens on what *you* did reads as
   self-blame. They came from the Oct routing review, so they're left for your call.
+- **`ADDRESSES` edges** for `dbt_fast` (unjustified guilt, cold shame, inferior, insignificant): the PRD's, left out until you decide.
 - The review copy, if you want it on the witness voice list.
 
 ## The DEAR MAN content source (same batch)
