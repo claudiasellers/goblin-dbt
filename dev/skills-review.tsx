@@ -155,7 +155,7 @@ function StepView({ nav }: { nav: Nav }) {
       <MemoryRouter initialEntries={[{ pathname: `/tool/${sk.toolId}`, search, state: nav.band ? { skillCtx: { band: nav.band } } : null }]}>
         <div data-testid="frame" className="pt-2">
           <ToolSessionProvider toolId={sk.toolId}>
-            <SkillPlayer skillId={sk.id} />
+            <SkillPlayer skillId={sk.id} resumeKeepsFresh />
           </ToolSessionProvider>
         </div>
       </MemoryRouter>
