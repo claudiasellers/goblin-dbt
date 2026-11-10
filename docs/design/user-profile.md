@@ -72,7 +72,7 @@ referenced by check-ins, plans and kit cards. That is what the graph is for.
 | History | `:<Label>:UserData:LogRecord` | `CheckIn`, `ToolSession`, `PatternOffer`, `PartSession` |
 | Settings | `User` properties | `theme`, `dataRetentionDays`, `partsEnabled` |
 | System | `:<Label>:UserData:System` | `PushToken` (reserved) |
-| Device only | `sessionStorage` / `localStorage` | `goblin.band.v1` (≤ 20 min), resume tokens, the settings cache |
+| Device only | `sessionStorage` / `localStorage` | `goblin.band.v1` (≤ 20 min); DEAR MAN resume tokens (`src/lib/resumeToken.ts`, ≤ 24 h, holding a draft **with own words**: `describeCustom`, `assertCustom`, `anchorPhrase`, …); the settings cache |
 
 Mandatory on every `:UserData` node (unchanged): `id`, `ownerId`, `key = ownerId:id` (unique per label),
 `createdAt`, `schemaVersion`; writes `MERGE` on `key`. Profile items add the meta:
@@ -269,7 +269,7 @@ What already holds (keep it):
   (test-enforced). Scheduled code can't import profile writers (grep test).
 - Own words are stored as written, never linted, **never sent to a model**, never in content snapshots
   (`build.mjs` refuses any export with a `User` / `UserData` node).
-- Profile slices are cached in memory only; `localStorage` holds settings only.
+- Profile slices are cached in memory only. `localStorage` holds the settings cache and one exception: a DEAR MAN resume draft, written only when the person leaves mid-flow through the too-much hand-off, read back once (`takeResumeToken` removes it), expired after 24 h, and cleared on sign-out (`clearResumeTokens` in `BandContext`).
 - Graph content never points at user data; export and delete are generic, so a new label can't be missed.
 
 Gaps to close (in order of risk):
@@ -280,7 +280,7 @@ Gaps to close (in order of risk):
 | 2 | The Slack crew's read-only Aura credential can read user data (`graph.md` open question) | A role or query denylist that excludes `:UserData` and `User` from crew reads; `pulse` keeps counts only |
 | 3 | No App Check on callables | Turn on App Check for every callable (D-12 said "with the safety batch") |
 | 4 | Sensitive free text (own lines, part own words, `ext.run` own words, later `Person` labels and safety-plan contacts) is plaintext in Aura (encrypted at rest by Aura, readable by anyone with DB access) | Default: leave as is now; **when `SafetyPlan` or `Person` ships**, encrypt their free-text fields at the application layer (a KMS key held by Functions) and offer device-only storage. Decision P5 |
-| 5 | The settings cache in `localStorage` includes `partsEnabled` | Fine as a setting, but nothing more sensitive may join it: add a test that pins the cached field list |
+| 5 | `localStorage` holds the settings cache (incl. `partsEnabled`) and DEAR MAN resume drafts with own words (≤ 24 h, cleared on sign-out; an expired draft that is never read stays until sign-out or the next read) | Pin the settings cache's field list in a test; sweep expired resume tokens on app start; any new runtime resume draft (the skill player) uses the same token store and rules, and never holds ask-fresh fields |
 | 6 | Function logs | Keep `errorTag`-only logging; a test that no profile write logs its payload |
 | 7 | Deleted data survives in Aura backups until they expire | Say so in the privacy copy with the backup window; no code |
 | 8 | Notifications | Push (when built) stays content-free; `discreetMode` (CORE) hides tool names on Today |
