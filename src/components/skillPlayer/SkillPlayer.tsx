@@ -157,6 +157,7 @@ function SkillRun({ skill, content, inline }: {
   const [busy, setBusy] = useState(false);
   const [saveNote, setSaveNote] = useState(false);
   const [leaving, setLeaving] = useState<ExitDef | null>(null);
+  const [quietLeave, setQuietLeave] = useState(false);
   // Answered: stay on the close so its tag row ("Was this a part you know?") can show, then go on a tap.
   const [answered, setAnswered] = useState(false);
   const handoffs = useRef<HandoffResult[]>([]);
@@ -191,6 +192,13 @@ function SkillRun({ skill, content, inline }: {
     }
     send({ type: 'exit', exitId: exit.id });
     setLeaving(exit);
+    // A hand-off that asks no close (`noClose`: after a danger route) leaves at once, the session closed completed.
+    if (stepOf(skill, st.stepId).noClose) {
+      setQuietLeave(true);
+      void toolSession.close({ status: 'completed' });
+      go(exit);
+      return;
+    }
     // With no close question to ask (none for this tool, or its copy can't load), leave at once.
     getSpineContent().then((c) => {
       if (!closeQuestion(c.closeFlow, skill.toolId, closeKindFor(skill.toolId))) throw new Error('no close');
@@ -198,7 +206,7 @@ function SkillRun({ skill, content, inline }: {
       void toolSession.close({ status: 'completed' });
       go(exit);
     });
-  }, [send, skill.toolId, toolSession, go]);
+  }, [send, skill, st.stepId, toolSession, go]);
 
   const onShown = useCallback((record: string) => send({ type: 'shown', record }), [send]);
 
@@ -263,7 +271,7 @@ function SkillRun({ skill, content, inline }: {
   } else if (leaving) {
     body = (
       <div className="space-y-4">
-        <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />
+        {!quietLeave && <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />}
         {!leaving.done && leaving.toolId && answered && (
           <button type="button" className={primaryButton} onClick={() => go(leaving)}>
             {getToolById(leaving.toolId)?.name ?? 'Continue'} →
@@ -324,7 +332,6 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
   }
   const crisis = crisisFor(ctx, step, st);
   return (<>
-    {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     {step.hint && c[step.hint] && <Line>{c[step.hint]}</Line>}
     {fields.map((f, i) => {
@@ -344,6 +351,8 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
         </div>
       );
     })}
+    {/* Under the question, so the chip that raised it stays where it was tapped. */}
+    {crisis && <div aria-live="polite"><CrisisBanner compact variant={crisis.variant} /></div>}
     {step.note && c[step.note] && <p className={secondaryText}>{c[step.note]}</p>}
     <button type="button" className={primaryButton} disabled={busy || !canGoOn(ctx, st)} aria-busy={busy} onClick={onPrimary}>
       {(step.primary && c[step.primary]) || c.next || 'Next'}

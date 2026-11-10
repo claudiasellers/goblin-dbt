@@ -221,6 +221,7 @@ def check(skill):
                 assert "whenFrom" not in fu, (w, "this type's window has no choice", fu)
             if "when" in fu:
                 check_cond(fu["when"], fields, derived, w, accepts)
+        assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))
     inl = skill.get("inline")
     if inl:
         assert inl["enterAt"] and set(inl["enterAt"]) <= steps, (sid, "inline starts at steps that exist", inl)

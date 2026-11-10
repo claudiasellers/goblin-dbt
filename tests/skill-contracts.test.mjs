@@ -425,3 +425,17 @@ test("resume: the run's own answers read back at a step it reached; ask-fresh an
   assert.equal(m.resumeRun(ctx, { ...rec, versionId: "t1" }, "check"), null, "another version's answers don't fit");
   assert.equal(m.resumeRun(ctx, { ...rec, skillId: "other" }, "check"), null);
 });
+
+test("noClose: only on a hand-off, and the player leaves it without the close question", () => {
+  for (const sk of fixture.skills) {
+    for (const st of sk.steps) {
+      if (st.noClose === undefined) continue;
+      assert.equal(st.kind, "handoff", `${sk.id}.${st.id}: noClose is for hand-offs`);
+      assert.equal(st.noClose, true, `${sk.id}.${st.id}: noClose is true or absent`);
+    }
+  }
+  const src = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(src, /stepOf\(skill, st\.stepId\)\.noClose/, "leave() reads the step's noClose");
+  assert.match(src, /!quietLeave/, "SessionClose is skipped after a quiet leave");
+  assert.match(read("scripts/skills/build.py"), /"noClose" not in s or \(s\["kind"\] == "handoff"/, "build.py refuses noClose off a hand-off");
+});
