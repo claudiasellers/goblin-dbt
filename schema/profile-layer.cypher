@@ -42,6 +42,10 @@ MERGE (k:ProfileKind {id: "part"})
 SET k.area = "my_parts", k.label = "A part", k.revisitAfterDays = 30, k.stillTrueCopy = "Is {name} still doing the same job?", k.setAsideCopy = "Set aside. You can bring it back any time.", k.reviewStatus = "draft";
 MATCH (k:ProfileKind {id: "part"}), (a:ProfileArea {id: "my_parts"})
 MERGE (k)-[:IN_AREA]->(a);
+MERGE (k:ProfileKind {id: "nightmare_script"})
+SET k.area = "my_plans", k.label = "A nightmare I rewrote", k.revisitAfterDays = null, k.stillTrueCopy = "", k.setAsideCopy = "Set aside. It stays out of the way until you bring it back.", k.reviewStatus = "draft";
+MATCH (k:ProfileKind {id: "nightmare_script"}), (a:ProfileArea {id: "my_plans"})
+MERGE (k)-[:IN_AREA]->(a);
 
 // --- Pattern rules (enabled false until reviewed on real data, D-10) ---
 MERGE (p:PatternRule {id: "what_helps_better"})

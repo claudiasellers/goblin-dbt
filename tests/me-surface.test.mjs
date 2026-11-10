@@ -37,6 +37,9 @@ test("Me: Phase A areas; stale items first; set aside is restorable, never a del
   const me = read("src/components/me/MeSection.tsx");
   assert.match(me, /PHASE_A_AREAS: ProfileAreaId\[\] = \['about_me', 'my_body', 'my_words', 'my_patterns'\]/);
   assert.match(me, /A few things to check/);
+  // My plans (ER-15's kept nightmare) shows once it holds something, so a kept version can be set aside.
+  assert.match(me, /\[\.\.\.PHASE_A_AREAS, 'my_plans'/);
+  assert.match(me, /if \(a\.id === 'my_plans'\) return a\.items\.length > 0;/);
   assert.match(me, /restoreProfileItem/);
   assert.doesNotMatch(me, /delete/i);
   // "A few things to check" gathers only from the areas Me renders (a kept part's area isn't one yet).

@@ -15,7 +15,7 @@ import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, emotionChoices, fieldLinks, fieldList, followUpFor,
+  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
   handoffLine, initialRun, inlineResult, keepFor, optionGroups, ownMaxOf, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
   scope, shownFields, stepOf, titleSlots,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -130,7 +130,12 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   const location = useLocation();
   // Inline, the host owns the address: nothing is read from it.
   const [carried] = useState(() => (inline ? [] : carriedFrom(location.search, location.state)));
-  const [ctxIn] = useState(() => (inline ? {} : contextFrom(skill, location.search, location.state)));
+  // A link's `enterAt` is for the run it reopens (R9): with no `?run=` to reopen, it doesn't hold from the start.
+  const [ctxIn, setCtxIn] = useState(() => {
+    if (inline) return {};
+    const c = contextFrom(skill, location.search, location.state);
+    return UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
+  });
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
@@ -138,7 +143,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     embedOutputs: EMBED_OUTPUTS, profile: slices,
   }), [skill, content, carried, ctxIn, slices]);
   const [safetyOpen, setSafetyOpen] = useState(false);
+  // P2 (This is too much right now) over the step: an embed hears it as `covered`, with safety.open.
+  const [p2Open, setP2Open] = useState(false);
   const [st, setSt] = useState<RunState>(() => initialRun(skill, inline?.enterAt));
+  // A new step starts uncovered (P2 left open by a path that didn't say so never stops a later clock).
+  useEffect(() => { setP2Open(false); }, [st.stepId]);
   // Resume (R9): `?run=<sessionId>&at=<stepId>` reopens the person's own run of this tool, or starts fresh.
   const [resumeFrom] = useState(() => {
     if (inline) return null;
@@ -155,8 +164,13 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     if (!resumeFrom || !profileSettled || resumed.current) return;
     resumed.current = true;
     getSkillRun(resumeFrom.run, skill.toolId)
-      .then((rec) => { const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh }); if (r) setSt(r); })
-      .catch(() => { /* nothing to reopen: a fresh run */ })
+      .then((rec) => {
+        const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
+        if (r) setSt(r);
+        else setCtxIn((c) => ctxAfterResume(c, false));
+      })
+      // Nothing to reopen: a fresh run, and a whole first visit (the link's enterAt was for the run it named).
+      .catch(() => setCtxIn((c) => ctxAfterResume(c, false)))
       .finally(() => setResuming(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileSettled]);
@@ -314,16 +328,17 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   } else if (step.kind === 'handoff') {
     body = <HandoffCard ctx={ctx} step={step} st={st} send={send} onExit={leave} busy={busy} />;
   } else if (step.kind === 'embed') {
-    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} />;
+    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} onExit={leave} covered={safetyOpen || p2Open} />;
   } else {
     body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy} />;
   }
 
   return (
     <div className="space-y-5" data-testid="skill-player" data-skill={skill.id} data-step={st.stepId}>
-      {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. */}
+      {/* safety.open sits over the step, which stays mounted (a hold keeps its time) and comes back as it was. P2 is
+          modal too: under it the step is inert, so a step that moves on underneath can't take focus from the dialog. */}
       {safetyOpen && <SafetyOpen onBack={() => setSafetyOpen(false)} />}
-      <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
+      <div key={leaving ? 'leaving' : st.stepId} hidden={safetyOpen} inert={safetyOpen || p2Open} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
       {saveNote && <p role="status" className={`${secondaryText} text-center`}>{skill.copy.save_failed ?? "That didn't save just now. You can carry on."}</p>}
       {inline && !safetyOpen && (
         <div className="flex justify-center">
@@ -332,7 +347,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
       )}
       {!inline && !leaving && !safetyOpen && (
         <div className="flex justify-center">
-          <TooMuchLink host={skill.toolId} onResult={(r) => {
+          <TooMuchLink host={skill.toolId} onOpen={() => setP2Open(true)} onClose={() => setP2Open(false)} onResult={(r) => {
             handoffs.current.push(r);
             toolSession.setExt({ run: { handoffs: handoffExt(handoffs.current) } });
           }} />
@@ -400,8 +415,9 @@ function answerIds(st: RunState): Record<string, readonly string[]> {
 }
 
 /** A whole-screen embed step: the embed owns the screen; its `onDone` output moves the run on. */
-function EmbedStep({ ctx, step, st, send, onShown }: {
-  ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onShown: (record: string) => void;
+function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
+  ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onShown: (record: string) => void; onExit: (x: ExitDef) => void;
+  covered: boolean;
 }) {
   const Embed = step.embed ? EMBEDS[step.embed] : undefined;
   const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
@@ -412,7 +428,21 @@ function EmbedStep({ ctx, step, st, send, onShown }: {
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
-      onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
+      onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} covered={covered} />
+    <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
+  </>);
+}
+
+/** An embed or hand-off screen's quiet links (an ask step's are on its fields). Never held while something saves. */
+function StepLinks({ ctx, step, st, onExit }: { ctx: RunContext; step: StepDef; st: RunState; onExit: (x: ExitDef) => void }) {
+  const links = stepLinks(ctx, step, st);
+  if (!links.length) return null;
+  return (<>
+    {links.map((l) => (
+      <div key={l.exit.id} className="flex justify-center" data-step-link={l.exit.id}>
+        <button type="button" className={linkButton} onClick={() => onExit(l.exit)}>{l.label}</button>
+      </div>
+    ))}
   </>);
 }
 
@@ -421,7 +451,11 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
 }) {
   const c = ctx.skill.copy;
   const a = st.answers[field.id];
-  const picked = (v: string) => !!a?.ids.includes(v);
+  // A seed field (own.seed): a chip is pressed while the box holds its words unchanged; once the words are the
+  // person's own, the chips step aside, so a tap can never erase what they wrote.
+  const seeded = field.own?.seed ? seededFrom(ctx, field, a) : null;
+  const picked = (v: string) => (field.own?.seed ? seeded === v : !!a?.ids.includes(v));
+  const startersHidden = !!field.own?.seed && !!a?.own?.trim() && seeded === null;
   const [ownOpen, setOwnOpen] = useState(!!field.own?.open || !!a?.own);
   const list = fieldList(ctx, field, st);
   const label = field.label ? c[field.label] : null;
@@ -460,13 +494,14 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
           {list.map((line) => <li key={line}>{line}</li>)}
         </ul>
       )}
-      {chips}
+      {!field.own?.seed && chips}
       {field.own && ownOpen && (
         <textarea rows={2} maxLength={ownMaxOf(ctx, field)} value={a?.own ?? ''}
           aria-label={c[field.own.hint] ?? c.own_hint} placeholder={field.own.open ? c[field.own.hint] : undefined}
           onChange={(e) => send({ type: 'own', fieldId: field.id, text: e.target.value })}
           className="w-full p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] font-serif text-lg focus:ring-2 focus:ring-[var(--color-accent)]" />
       )}
+      {field.own?.seed && !startersHidden && chips}
       {fieldLinks(ctx, field, st).map((l) => (
         <div key={l.exit.id} className="flex justify-center">
           <button type="button" className={linkButton} onClick={() => onExit(l.exit)}>{l.label}</button>
@@ -517,6 +552,7 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
           <button type="button" className={linkButton} disabled={busy} aria-busy={busy} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
         </div>
       )}
+      <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
     </section>
   </>);
 }

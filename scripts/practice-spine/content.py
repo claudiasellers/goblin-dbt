@@ -223,6 +223,25 @@ FOLLOW_UP_TYPES = [
         "notification": "",
     },
     {
+        # Rewrite the nightmare (ER-15, docs/design/nightmare-rescript.md): a read-through the person asked for, on
+        # the keep step's chips or a read-through's own end card (each visit sets the next, one at a time). It
+        # reopens the visit's run at the read-through (R9 resume; `enterAt` takes it straight to the end card after).
+        # Opening it is the resolution, as for resume_skill (functions/src/spine/toolSession.ts); *Not today*
+        # dismisses it. The copy and the notification never name the nightmare.
+        "id": "nightmare_rehearse", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/nightmare-rescript?run={sourceSessionId}&at=rehearse&enterAt=rehearse&followUp={followUpId}",
+        # tonight: a first visit's; tomorrow_night: a read-through visit's (it ends near bedtime, so not "tonight"
+        # again within the hour); tomorrow: daytime, the only one after a read-through that stirred them up.
+        "window": {"kind": "chip", "chips": {"tonight": {"kind": "at_local", "days": 0, "time": "21:00"},
+                                             "tomorrow_night": {"kind": "at_local", "days": 1, "time": "21:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "12:00"}}},
+        "staleAfterHours": 36, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your new version", "body": "A read-through you asked for. A minute, eyes open."},
+        "choices": [{"id": "not_today", "label": "Not today", "status": "dismissed"}],
+        "notification": "Something you asked to be reminded of is ready.",
+    },
+    {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).
         "id": "resume_skill", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/{sourceToolId}?resume={sourceSessionId}&followUp={followUpId}",

@@ -236,6 +236,6 @@ test('startToolSession resolves a resume_skill follow-up when its link is opened
   setDriver(f.driver);
   await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'dear-man', entry: 'today', followUpId: CI } });
   const q1 = f.calls[0].query;
-  assert.match(q1, /f\.type = 'resume_skill' AND f\.status = 'scheduled' THEN \[f\][\s\S]*SET x\.status = 'done', x\.resolvedAt = datetime\(\)/);
+  assert.match(q1, /f\.type IN \['resume_skill', 'nightmare_rehearse'\] AND f\.status = 'scheduled' THEN \[f\][\s\S]*SET x\.status = 'done', x\.resolvedAt = datetime\(\)/);
   assert.equal(f.calls[0].params.followUpKey, `u1:${CI}`);
 });

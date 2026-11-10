@@ -76,9 +76,11 @@ export function MeSection() {
   const ref = (i: MeItem) => ({ id: i.meta.id, label: i.label });
   // Parts of me joins (after My patterns, getMe's order) only with parts on and its copy signed off.
   const partsCopy = partsOn ? partsOfMeCopy(partsContent) : null;
-  const shown: ProfileAreaId[] = partsCopy ? [...PHASE_A_AREAS, 'my_parts'] : PHASE_A_AREAS;
+  // My plans (a rewritten nightmare, ER-15) shows once something is kept there; the order is getMe's.
+  const shown: ProfileAreaId[] = [...PHASE_A_AREAS, 'my_plans', ...(partsCopy ? ['my_parts' as const] : [])];
   const areas = me.areas.filter((a) => shown.includes(a.id)).filter((a) => {
     if (a.id === 'my_patterns') return a.items.length > 0 || me.offers.length > 0;
+    if (a.id === 'my_plans') return a.items.length > 0;
     return true;
   });
   // Only from the areas shown: an item of an area not rendered yet never surfaces here. Parts are left
@@ -110,7 +112,7 @@ export function MeSection() {
               Restore
             </button>
           )}
-          {i.label === 'OwnLine' && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside

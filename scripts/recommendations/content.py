@@ -142,6 +142,9 @@ CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "r
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
 # readouts (Do the Opposite, the wave), the Tools intent and later Reflect, so no concept tags either.
+# Rewrite the nightmare (ER-15, appToolId 'nightmare-rescript', docs/design/nightmare-rescript.md) has none either, by
+# design: a recurring nightmare is not a check-in state, and the PRD's entries are the Tools intent, Sleep reset
+# (ER-13) and Running low's sleep row (ER-07), never the check-in and never night mode.
 BUILT_NOT_SIGNED_OFF = {
     "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",

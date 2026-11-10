@@ -211,3 +211,16 @@ test("CLAUDE.md documents the data layers (R11)", () => {
   assert.match(md, /^## Data layers/m);
   assert.match(md, /functions\/src\/userdata\/layers\.ts/);
 });
+
+test("profile kinds (user-profile.md §4.2): a kept value never holds an ask-fresh field, refused or stripped", async () => {
+  const { PROFILE_KINDS, checkValue } = await importTs("functions/src/profile/kinds.ts");
+  const ok = { quiet_hours: { start: "22:00", end: "07:00" }, nightmare_script: { turnIds: ["door"], endingOwn: "I wake up" } };
+  for (const [kind, def] of Object.entries(PROFILE_KINDS)) {
+    assert.ok(ok[kind], `${kind}: add a valid value here`);
+    for (const f of ["thenVsNow", "fitsFacts", "bandLevel", "urgeIds"]) {
+      let kept = null;
+      try { kept = checkValue(def, { ...ok[kind], [f]: "x" }); } catch { kept = null; }
+      assert.ok(kept === null || !(f in kept), `${kind}: ${f}`);
+    }
+  }
+});

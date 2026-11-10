@@ -127,7 +127,7 @@ the rest are not built. "Needs" names the runtime pieces from §3 C3 and the sha
 | ER-12 | Problem Solve (`problem-solve`) | ER 12 | **Shipped, hand-built, partly complete.** No `TooMuchLink`, `/tool/give` hard-coded, no evaluation step | In: Tools, OA, Check the Facts, check-in, Today `ps_step`. Out: companion tools by `linkedToolId`, CORE-11 | chips only; resume for the evaluation card; DT-10 inline later | `ext.run` (old `ext.er` keys kept readable) |
 | ER-13 | Sleep reset (`sleep-reset`) | ER 20b | **None** | In: ER-07, Tools. Out: CORE safety, ER-15 | night mode is CORE's (Index §5.1 #13) | profile anchor times |
 | ER-14 | It isn't working (`er-troubleshoot`) | ER 24 | **On the runtime** (ER-B1; [`er-troubleshoot.md`](er-troubleshoot.md)), with its `try_again` nudge on the cards whose move is another go. No routing rows by design (Claudia, 10 Nov) | In: OA readout, ER-08, Tools. Out: ER-07, ER-02, DT, PS, ER-10, CORE-11 | chips + "first yes wins" transitions | `ext.run` |
-| ER-15 | Rewrite the nightmare (`nightmare-rescript`) | ER 20a | **None.** Unparked by Claudia, 10 Nov (D14): built now in the ER lane on the existing crisis banner | In: ER-13. Out: referral | `holdRing`, `rehearsal` | profile `NightmareScript` |
+| ER-15 | Rewrite the nightmare (`nightmare-rescript`) | ER 20a | **On the runtime** (ER-B6; [`nightmare-rescript.md`](nightmare-rescript.md)): replay gate to a clinician card, setting / change / your ending, the `rescriptCard` read-through with Stop, `nightmare_script` keep, `nightmare_rehearse` reminders one at a time. No routing rows by design | In: ER-13. Out: referral (waits on CORE) | `holdRing` (settle), `rescriptCard` | `ext.run`; profile `nightmare_script` (`ProfileFact`) |
 
 ---
 
@@ -244,7 +244,7 @@ Built once, in the foundation (§4), never per lane. Each is generic: no skill i
 | R6 | **Crisis slot and `safety.open`** | A step may declare `crisis: {variant, when}`: `CrisisBanner` (default or `other_person`) shown above the step while the condition holds. `safety.open` is a reserved exit every skill may offer; until CORE-01 ships it opens the interim crisis screen (D5), afterwards CORE-01's route. No lane builds its own crisis screen | DT-02/05, IE-04/08, ER-02/05 |
 | R7 | **Two-part close** | A close kind `urge_change` asking *Did you act on it?* (`actedOnUrge`) then then-vs-now, in `functions/src/spine/tools.ts` and `src/lib/spine/close.ts` | DT-02, DT-05 |
 | R8 | **Inline mode** | `<SkillPlayer mode="inline" skillId enterAt onReturn>` runs a skill inside a host screen (host stays mounted, like `TooMuchLink`), with its own `ToolSession` (C1 rule 5), returning declared outputs. A skill marks the steps it can start at (`enterAt`) and what it returns (`returns`). This is how the Index §9 primitives that have steps are built (C3c) | DT-01 `regulate`, DT-04 `acceptance`, DT-10 builder, ER-02 mini-card, ER-05 if-then |
-| R9 | **Resume** | A run can be reopened at a step from a deep link or a follow-up (`?run=<sessionId>&at=<stepId>`), reading that run's own answers back (the same visit's answers, so not a pre-fill from memory) | ER-12 evaluation, ER-03 `oa_plan`, DT-06 reopen, ER-01 *come back later* |
+| R9 | **Resume** | A run can be reopened at a step from a deep link or a follow-up (`?run=<sessionId>&at=<stepId>`), reading that run's own answers back up to that step (the same visit's answers, so not a pre-fill from memory; later steps are asked again) | ER-12 evaluation, ER-03 `oa_plan`, DT-06 reopen, ER-01 *come back later* |
 | R10 | **Counting derive** | `derive: {kind: 'count', from, weights, table}`: count picks (half for *not sure*) and look the total up in a table. Keeps `sizeIt`'s dime game as data instead of code | IE-07 |
 | R11 | **Per-field own-words max** | `own.max` per field (Cope Ahead's moves are 90, the skill default 140) | ER-05 |
 | R12 | **Option first, not pre-selected** | An option list can put a `$ctx` value first without selecting it (generalises `carriedFirst`) | ER-05 `?first=`, IE-01 Recover hurt chip |
@@ -287,7 +287,8 @@ lands with F2 because two lanes need it in their first batch.
 | `rehearsalStage` | Two figures, scripted turns, move chips, stop (2D first, D12) | `PartFigure`, `PullsStage`, den SVG | IE | IE-B5 | IE-02, IE-08 |
 | DEAR MAN's own pieces: `anchorGenerator`, `priorityRank`, `copeAheadStep`, `debriefWho`, `angryPartCard`, `checkInResult` | Existing components, wrapped | as named | IE | IE-B2/B4 | DEAR MAN skills; `angryPartCard` also Recover |
 | `keepCard` | The paper keepsake (PaperCard), then the keep action | `PaperCard`, `KeepCard` | ER | ER-B2 | ER-05, IE-01 plan card, ER-04, DT-03 |
-| `rehearsal` | Imaginal first-person beats | Cope Ahead `Rehearse` | ER | ER-B2 | ER-05, ER-15 |
+| `rehearsal` | Imaginal first-person beats | Cope Ahead `Rehearse` | ER | ER-B2 | ER-05 |
+| `rescriptCard` | The rewritten nightmare on the square paper (wraps `PaperCard` unchanged, no keep): *It starts* / *Then* / *It ends*, one read-through with a quiet clock and Stop | `RescriptCard.tsx` | ER | ER-B6 | ER-15 |
 | `planSentence`, `partAnchor`, `partsWhoShowsUp` | Cope Ahead's live read-back, part anchor, parts step | Cope Ahead components | ER | ER-B2 | ER-05 |
 | `pileSort` | Flick items into two or three piles | new (the family behind IE's two columns, ER-09's card sort, PS decompose, MF-03) | ER | ER-B4 | ER-09, ER-12 decompose, IE-10, IE-12 |
 | `weekPlanner` | Place items on days, one follow-up each | new | ER | ER-B4 | ER-04 L2, ER-11 |
@@ -468,7 +469,20 @@ and both are tested best with that embed. The keep and follow-up contract checks
 - R8 inline runs use the existing entry `embedded` (host session as `hostSessionId`), not a new `inline`
   entry: the spine already had the shape. R9 resume reads the person's own run through a new callable,
   `getSkillRun` (own session, the asked tool, ≤ 14 days, own words decrypted), opened by
-  `?run=<sessionId>&at=<stepId>`; ask-fresh answers are always asked again.
+  `?run=<sessionId>&at=<stepId>`; ask-fresh answers are always asked again. Since ER-15 (`runtime:` commit in
+  its PR), only the answers of the steps up to the one reopened come back: a later step is asked again, never
+  pre-filled (a read-through visit would otherwise re-pick last time's reminder chip and schedule it unasked).
+  A field a step's `followUp.whenFrom` names is never read back at all, even at the step reopened (`scheduled`
+  isn't restored, so it would book twice). A link's `enterAt` holds only for the run it reopens: when the resume
+  finds nothing (too old, another version, a failed read), the fresh run drops it and is a whole first visit.
+- Embed and hand-off steps take step-level quiet `links` (ER-15's `runtime:` commit), rendered under the embed
+  or the card; an ask step's links stay on its fields. For a way out that belongs on every screen, such as
+  *Talk to someone now*. A link's `enterAt` with no `?run=` at all doesn't hold either.
+- `own.seed` (ER-15): on an open own-words box of a one-pick list field, the chips are starters, not answers. A
+  tap writes the chip's words into the box to change; once the words are the person's own, the chips step aside,
+  so a tap never erases what they wrote.
+- Embeds hear `covered` while safety.open or P2 sits over the step (it stays mounted). An embed with a clock
+  decides what that means: ER-15's read-through counts it as Stop. `TooMuchLink` gained an optional `onOpen`.
 - Embeds declare their **props** as well as their output: `EMBED_PROPS` in `embeds.ts`, mirrored in
   `content.py` (`copy` · `int` · `enum` · `field` · `id`, each optionally `optional`). `build.py` checks
   every embed step and slot against it, and a `copy` prop must be a key in the skill's copy, which the
@@ -542,7 +556,7 @@ lanes, only the arrows in §5.4 hold anyone up.
 | ER-B3 | **ER-03** Opposite Action v3 port (doors per D7, scale removal, `OppositeActionSession` v3 projection, route fix, danger / boundary / not-sure split, want-change and prediction per D9; R16 if multi-feeling stays); `ActionUrge` moves to a `content.py` | ER-B1, D7, D9; builds Check the Facts' inline mini-card itself, as its first host (*clarify*) | The biggest port; last of the existing tools |
 | ER-B4 | **ER-07** PLEASE (id per D6, shape per D8); **ER-04** Good things (`thing_i_like`, `weekPlanner`, `cardDeck`); **ER-09** Values (`pileSort`, `value`) | F2; DT-B3 (`cardDeck`) | DT-06 level 3, IE-05's value chips and IE-09 wait on ER-04 / ER-09 |
 | ER-B5 | **ER-08** Let it be a wave (`waveRoom` on DT's motion engine); **ER-10** Know this feeling; **ER-11** Build mastery (WMP-05 ladder) ; **ER-13** Sleep reset (with CORE's night mode) | D3, DT-B3 (motion engine), CORE night mode for ER-13 | |
-| ER-B6 (now, alongside ER-B1) | **ER-15** Rewrite the nightmare (`holdRing` for the rehearsal; a `nightmare_script` kind in `kinds.ts` with its `ownFields` encrypted) | F2; D14 decided (Claudia, 10 Nov: build now, on the existing crisis banner) | Unparked by Claudia. Its clinical gate (§6) checks: the person writes the new ending, and no field asks what happened; a crisis slot on every step; *this is too much* reaches P2; no claim that it treats PTSD; one plain line that a clinician can help when nightmares follow a trauma |
+| ER-B6 (now, alongside ER-B1; **built**, its own PR after ER-B1's second) | **ER-15** Rewrite the nightmare (`holdRing` for the rehearsal; a `nightmare_script` kind in `kinds.ts` with its `ownFields` encrypted) | F2; D14 decided (Claudia, 10 Nov: build now, on the existing crisis banner) | Unparked by Claudia. Its clinical gate (§6) checks: the person writes the new ending, and no field asks what happened; a crisis slot on every step; *this is too much* reaches P2; no claim that it treats PTSD; one plain line that a clinician can help when nightmares follow a trauma |
 | Done already | **ER-01** (P2 is the player's), **ER-06** (rows land with each tool) | — | |
 
 ### 5.4 How the lanes work together

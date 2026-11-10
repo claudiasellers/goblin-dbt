@@ -42,7 +42,7 @@ test("the area's copy: every me / card prompt, all or nothing; signed off 17 Oct
 test("Me's gate: parts off or copy missing → no Parts of me (with parts off, only the switch card, tests/parts-reachable.test.mjs)", () => {
   const me = read("src/components/me/MeSection.tsx");
   assert.match(me, /const partsCopy = partsOn \? partsOfMeCopy\(partsContent\) : null;/);
-  assert.match(me, /const shown: ProfileAreaId\[\] = partsCopy \? \[\.\.\.PHASE_A_AREAS, 'my_parts'\] : PHASE_A_AREAS;/);
+  assert.match(me, /const shown: ProfileAreaId\[\] = \[\.\.\.PHASE_A_AREAS, 'my_plans', \.\.\.\(partsCopy \? \['my_parts' as const\] : \[\]\)\];/);
   assert.match(me, /const partsOn = profile\.partsEnabled === true;/);
   // Read on every visit: Parts of me's copy with parts on, the switch card's with parts off (Profile reads the same file).
   assert.match(me, /getPartsContent\(\)\.then\(\(c\) => \{ if \(live\) setPartsContent\(c\); \}\)[\s\S]{0,120}\}, \[\]\);/);

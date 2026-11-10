@@ -24,7 +24,7 @@ test("every interactive tool declares its close; client and server registries ag
   const played = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
   const playedIds = [...played.slice(played.indexOf("PLAYER_TOOLS")).matchAll(/^\s*'([a-z-]+)': '/gm)].map((m) => m[1]);
   const components = [...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds];
-  assert.equal(components.length, 17);
+  assert.equal(components.length, 18);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);
@@ -243,4 +243,12 @@ test("two-part close (urge_change, plan R7): the urge question, then then-vs-now
   assert.equal(c.actedOnUrge, "no");
   assert.equal(c.thenVsNow, "better");
   assert.throws(() => v.validateClose({ id: ID, status: "completed", actedOnUrge: "no" }, now, "regulation_down"));
+});
+
+test("every chip a follow-up window offers is a window the server accepts (scheduleFollowUp)", async () => {
+  const { FOLLOW_UP_WINDOWS } = await importTs("functions/src/spine/validation.ts");
+  const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content;
+  const bad = spine.followUpTypes.flatMap((t) => (t.window?.kind === "chip" ? Object.keys(t.window.chips) : [])
+    .filter((c) => !FOLLOW_UP_WINDOWS.includes(c)).map((c) => `${t.id}.${c}`));
+  assert.deepEqual(bad, [], "a chip the server refuses never schedules (the person only sees 'didn't save')");
 });

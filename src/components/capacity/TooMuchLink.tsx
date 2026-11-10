@@ -7,7 +7,7 @@ import { BreakdownHandoff, type HandoffResumeDraft, type LaterChip } from './Bre
  * A quiet "This is too much right now" (ER-01). Opens P2 at any band as an overlay, so the host's
  * state stays mounted underneath and the user comes back to the same step.
  */
-export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, className, label: ownLabel, onClose }: {
+export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, className, label: ownLabel, onClose, onOpen }: {
   host: string;
   blank?: boolean;
   /** The host's step + draft at the moment the link is tapped (for "come back to this later"). */
@@ -19,13 +19,15 @@ export function TooMuchLink({ host, blank, resume, onResult, onScheduleLater, cl
   label?: string;
   /** Called when the overlay closes (✕, Escape or resume). */
   onClose?: () => void;
+  /** Called when the overlay opens over the host (a host's clock can stop: the skill player's read-through). */
+  onOpen?: () => void;
 }) {
   const band = useBand();
   const [open, setOpen] = useState<{ draft?: HandoffResumeDraft } | null>(null);
   // Closing the overlay returns the user to the same step (the host stayed mounted): not a leave,
   // so P2 must not write the draft to the device. Navigating away with it open still does.
   const dismissed = useRef(false);
-  const openP2 = () => { dismissed.current = false; setOpen({ draft: resume?.() }); };
+  const openP2 = () => { dismissed.current = false; setOpen({ draft: resume?.() }); onOpen?.(); };
   const close = () => { dismissed.current = true; setOpen(null); };
   const closeAndTell = () => { close(); onClose?.(); };
   useEffect(() => { if (open) band.load(); }, [open, band]);
