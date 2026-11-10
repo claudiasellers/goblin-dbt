@@ -245,7 +245,8 @@ test('getDen over the fake driver: one read transaction, parts off reads nothing
     if (/HAS_DEN_SNAPSHOT/.test(q) && /AS snapshots/.test(q)) {
       return [{ parts: [{ id: A, name: 'a', status: 'active', tender: false, shapeSig: null, mapX: 0.5, mapY: 0.5, lastVisitedAt: null, safety: false }], links: [], snapshots: [] }];
     }
-    if (q === D.DEN_TOUCHES_QUERY) return [{ partId: A, tagAt: '2026-10-16T10:00:00Z', checkbackAt: null, revisitAt: null }];
+    // The callable reads the real clock, so the touch is a day before it: a fixed date drifts out of `near`.
+    if (q === D.DEN_TOUCHES_QUERY) return [{ partId: A, tagAt: new Date(Date.now() - 86_400_000).toISOString(), checkbackAt: null, revisitAt: null }];
     return new Error('unexpected');
   });
   setDriver(on.driver);
