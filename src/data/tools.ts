@@ -18,6 +18,11 @@ export interface Tool {
    * only by a link. Neither is ever in the intents or recommended by routing.
    */
   listed?: false | 'parts';
+  /**
+   * Persist-nothing (plan C3a R15): the visit's session isn't started when the page opens; the tool's skill starts
+   * it, or never does (its `persist`). Ending a relationship: its safety branch saves nothing unless chosen.
+   */
+  deferSession?: boolean;
 }
 
 export const tools: Tool[] = [
@@ -172,6 +177,20 @@ export const tools: Tool[] = [
     dbtBasis: 'DBT IE Handout 7 (FAST)',
     emoji: '🪶',
     bare: true,
+  },
+  {
+    // On the skill runtime (docs/design/ending-relationships.md). Safety first: nothing is saved before the
+    // safety answer, and nothing at all in the safety branch unless the person saves it.
+    id: 'ending-relationships',
+    name: 'Ending a relationship that\'s hurting you',
+    tagline: 'Safety first, then what\'s going on, and what you want to do',
+    description: 'Check your safety first. Then name what this relationship is doing to you, decide from a steady place (end it, step back, or not yet), and, if it\'s safe, plan how to say it.',
+    whenToUse: 'When you keep going back, or can\'t tell whether this is normal-hard or bad for you.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handout 13 (Ending relationships)',
+    emoji: '🚪',
+    bare: true,
+    deferSession: true,
   },
   // Mindfulness
   {

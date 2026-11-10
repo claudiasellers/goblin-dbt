@@ -500,6 +500,7 @@ export function buildSkills(g) {
     id: s.id, toolId: s.toolId, version: s.version, start: s.start, accepts: s.accepts ?? [], ownMax: intOrNull(s.ownMax), emotionFields: s.emotionFields ?? [],
     copy: json(s.copyJson, {}), tables: json(s.tablesJson, {}), derive: json(s.deriveJson, []), steps: [], exits: [], options: {},
     ...(json(s.inlineJson, null) ? { inline: json(s.inlineJson, null) } : {}),
+    ...json(s.runtimeJson, {}),
   }));
   const by = new Map(skills.map((s) => [s.id, s]));
   for (const r of g.rels('HAS_STEP', 'Skill', 'SkillStep').sort((x, y) => asc(x.a.props.id, y.a.props.id) || asc(x.props.order, y.props.order))) {

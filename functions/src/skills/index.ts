@@ -19,7 +19,7 @@ export const getSkillContent = callable<unknown, SkillsContent>(
     const sRes = await tx.run(
       `MATCH (s:Skill) RETURN s.id AS id, s.toolId AS toolId, s.version AS version, s.contentVersion AS contentVersion,
               s.start AS start, s.accepts AS accepts, s.ownMax AS ownMax, s.emotionFields AS emotionFields, s.copyJson AS copy,
-              s.tablesJson AS tables, s.deriveJson AS derive, s.inlineJson AS inline ORDER BY s.id`);
+              s.tablesJson AS tables, s.deriveJson AS derive, s.inlineJson AS inline, s.runtimeJson AS runtime ORDER BY s.id`);
     if (!sRes.records.length || sRes.records.some((r) => r.get('contentVersion') !== SKILLS_VERSION)) {
       throw new HttpsError('failed-precondition', 'Skill content migration is required');
     }
@@ -55,6 +55,8 @@ export const getSkillContent = callable<unknown, SkillsContent>(
       derive: json(r.get('derive'), []), steps: [], exits: [], options: {},
       // Served only when the skill can run inline (R8).
       ...(json<SkillDef['inline'] | null>(r.get('inline'), null) ? { inline: json<SkillDef['inline']>(r.get('inline'), undefined) } : {}),
+      // Persist-nothing (R15), quick exit, re-entry steps: served only when the skill sets them.
+      ...json<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt'>>(r.get('runtime'), {}),
     }));
     const by = new Map(skills.map((s) => [s.id, s]));
     for (const r of stepRes.records) {

@@ -394,6 +394,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_ending_relationships": {
+   "appToolId": "ending-relationships",
+   "name": "Ending relationships",
+   "description": "Deciding whether to end a relationship that is harmful, interferes with your goals, or is hard to fix, and doing it safely and clearly",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_fast": {
    "appToolId": "fast",
    "name": "FAST",

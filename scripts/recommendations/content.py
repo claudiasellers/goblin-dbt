@@ -142,6 +142,10 @@ CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "r
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
 # readouts (Do the Opposite, the wave), the Tools intent and later Reflect, so no concept tags either.
+# Ending a relationship that's hurting you (IE-08, appToolId 'ending-relationships',
+# docs/design/ending-relationships.md) has none either, by design (PRD: "No intent row"): ending a relationship is a
+# decision made at a calm time, never a card a feeling word earns, and a check-in that surfaced it unasked could be
+# seen by the other person. Its entries are the Tools list, Problem Solve's and Rebel's links.
 BUILT_NOT_SIGNED_OFF = {
     "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",

@@ -141,6 +141,21 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
 - **Counting derive** (`kind: 'count'`: weighted picks summed, the table row with the largest threshold at or
   below the total) and a per-field `own.max` under the skill's `ownMax` (≤ 140).
 
+Added by IE-08 (`docs/design/ending-relationships.md`, 10 Nov 2026):
+
+- **Persist-nothing (R15).** `persist: {after, nothingWhen}` on a skill: `persistence()` is `wait` until the run
+  leaves `after`, then `nothing` while `nothingWhen` holds, else `save`. A tool mounted with `deferSession`
+  (`tools.ts`) writes no session at mount; the player calls `begin()` when the run reaches a `complete` hand-off or
+  a step schedules a follow-up, and only on `save`. Never begun, a visit leaves no ToolSession and no compat
+  ToolUsage. Keeps and follow-ups need `save`; a session that began and then turns `nothing` closes bare (status
+  only). `build.py` requires `quickExit` with `persist` and refuses a keep or follow-up at or before `after`.
+- **Quick exit.** `quickExit: true` puts the *Quick exit* button on every screen (`src/lib/quickExit.ts`).
+- **Re-entry steps.** `resumeAt: [stepId]`: a check-in may reopen the run at that step even when its path never
+  reached it (`?run=&at=`); the step's own answers are asked again, never restored.
+- **The carried band.** For a skill that accepts `band`, the player passes `band.current()` (≤ 20 min) when the
+  route state carries none.
+- These switches live in one `Skill.runtimeJson` property and are spread onto the served skill.
+
 ### The attempt record (what a router reads)
 
 There is no new label. A run **is** a `ToolSession` (the spine's per-visit log record), with one generic

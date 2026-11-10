@@ -8,10 +8,11 @@ import check_the_facts  # noqa: E402
 import alternate_rebellion  # noqa: E402
 import er_troubleshoot  # noqa: E402
 import fast  # noqa: E402
+import ending_relationships  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
-SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS]
+SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, ending_relationships.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -61,6 +62,8 @@ EMBED_PROPS = {
     },
     "boundaryLine": {
         "field": {"type": "field"},
+        "field2": {"type": "field", "optional": True},
+        "field3": {"type": "field", "optional": True},
         "shape": {"type": "enum", "values": ["line", "list"]},
         "copyLabel": {"type": "copy", "optional": True},
         "copiedLabel": {"type": "copy", "optional": True},

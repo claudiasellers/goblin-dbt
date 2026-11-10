@@ -263,7 +263,7 @@ STEPS = [
         ],
         # PRD step 6: a squeeze that can change → Problem Solve; a person → DEAR MAN, FAST; can't change → Let it
         # be. Never a confrontation plan for someone the person is scared of (decision D4, plan C6.6): that one
-        # goes to Ending a relationship (IE-08, planned), with the other-person resources already shown.
+        # goes to Ending a relationship (IE-08, which asks about safety first), with the other-person resources shown.
         "offers": [
             {"exit": "ending", "when": SCARED},
             {"exit": "problem_solve", "when": {"all": [REAL_IS("change"), {"not": SCARED}]}},
@@ -281,7 +281,7 @@ EXITS = [
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "fast", "toolId": "fast"},
     {"id": "let_it_be", "toolId": "let-it-be", "planned": True},
-    {"id": "ending", "toolId": "ending-relationships", "planned": True},
+    {"id": "ending", "toolId": "ending-relationships"},
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "pause", "toolId": "pause"},
     {"id": "safety_open", "toolId": None, "safety": True},

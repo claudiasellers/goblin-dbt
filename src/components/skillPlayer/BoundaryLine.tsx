@@ -8,17 +8,19 @@ import type { EmbedProps } from './embeds';
  * wrote, on the keepsake paper, with Copy. Never locked: the line is usable at any band, including flooded (PRD
  * IE-05; removing Recover's `boundaryLocked` is IE-B4's). Reports `copied` when the copy went through.
  *
- * Props (EMBED_PROPS): `field`, the field whose picks make the card (labels, own words last); `shape` `line` (one
- * line, copyable) or `list` (e.g. the values to keep, not a sentence, no Copy); the words as resolved copy:
- * `copyLabel`, `copiedLabel`, `selectedLabel` (said when there's no clipboard and the line is selected instead),
+ * Props (EMBED_PROPS): `field`, the field whose picks make the card (labels, own words last); optional `field2` and
+ * `field3`, whose picks follow in that order (Ending's opening, decision and practical lines, IE-08), so a line card
+ * can be a short paragraph built from more than one pick; `shape` `line` (one line or paragraph, copyable) or
+ * `list` (e.g. the values to keep, not a sentence, no Copy); the words as resolved copy: `copyLabel`, `copiedLabel`, `selectedLabel` (said when there's no clipboard and the line is selected instead),
  * `next`.
  */
 export function BoundaryLine({ props, picked, onShown, onDone }: EmbedProps) {
-  const field = typeof props.field === 'string' ? props.field : '';
+  const fields = (['field', 'field2', 'field3'] as const)
+    .map(k => props[k]).filter((f): f is string => typeof f === 'string' && f.length > 0);
   const copyable = props.shape !== 'list';
   const text = (k: string) => (typeof props[k] === 'string' ? (props[k] as string) : '');
-  const lines = picked?.[field] ?? [];
-  // A copyable card is one line (one single-pick field); a list is never joined into one sentence.
+  const lines = fields.flatMap(f => picked?.[f] ?? []).filter(l => l.trim().length > 0);
+  // A copyable card is one line or a short paragraph (the picks in field order); a list is never joined.
   const line = lines.join(' ');
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState('');

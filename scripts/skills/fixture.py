@@ -10,7 +10,7 @@ import json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 from content import SKILLS, CONTENT_VERSION  # noqa: E402
-from build import spec_of  # noqa: E402  (also runs the content checks)
+from build import spec_of, runtime_of  # noqa: E402  (also runs the content checks)
 from graph_tables import tables  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(HERE))
@@ -41,6 +41,7 @@ def served(sk):
         "emotionFields": sk["emotionFields"], "copy": sk["copy"], "tables": sk["tables"], "derive": sk["derive"],
         "steps": steps, "exits": exits, "options": options,
         **({"inline": sk["inline"]} if sk.get("inline") else {}),
+        **runtime_of(sk),
     }
 
 

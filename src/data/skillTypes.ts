@@ -212,7 +212,25 @@ export interface SkillDef {
   options: Record<string, OptionDef[]>;
   /** Present when other screens may run the skill inline (R8). */
   inline?: InlineDef;
+  /** Persist-nothing (R15): see PersistDef. Absent: the session starts at mount, as for every tool. */
+  persist?: PersistDef;
+  /** A Quick exit on every screen (to a neutral page, replacing this one in history). */
+  quickExit?: boolean;
+  /**
+   * Steps a follow-up may reopen the person's run at (R9) even when that run's path never reached them: a check-in
+   * days later (Ending's `after`). Without this, a resume opens only at a step the run went through.
+   */
+  resumeAt?: string[];
 }
+
+/**
+ * Persist-nothing (plan C3a R15; docs/design/ending-relationships.md): the visit's ToolSession isn't started at
+ * mount. It starts once the run has left the `after` step, unless `nothingWhen` holds; while it holds, nothing is
+ * written at all (no session, no compat ToolUsage, no keep, no follow-up, no close question). If it starts to hold
+ * after the session began (the person went back and changed an answer), the session closes bare: status only.
+ * A step whose answer makes `nothingWhen` false (the person's *Save privately*) starts the session then.
+ */
+export interface PersistDef { after: string; nothingWhen: Cond }
 
 export interface SkillsContent {
   version: string;
