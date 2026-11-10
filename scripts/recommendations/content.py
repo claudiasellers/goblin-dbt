@@ -128,6 +128,9 @@ CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "sk
 # Check the Facts has shipped on the skill runtime (appToolId 'check-the-facts', docs/design/skill-runtime.md):
 # out of PLANNED; its six rows stay switched off and drafts until Claudia signs them off, row by row.
 CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change", "skillKind": "change", "direction": "neutral"}
+# It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
+# by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
+# readouts (Do the Opposite, the wave), the Tools intent and later Reflect, so no concept tags either.
 BUILT_NOT_SIGNED_OFF = {
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
     "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",

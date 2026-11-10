@@ -109,7 +109,9 @@ test("hosts: every tool whose close asks then-vs-now or about the urge, minus Me
   // without a then-vs-now close kind would fail here).
   for (const id of Object.keys(TOOL_CLOSE_KIND)) {
     const page = pageOf(id);
-    if (!page) continue;
+    // The skill player is shared and closes each skill by its close kind (filtered above), so its source
+    // says nothing about one played tool: ER-14's close kind is `none`.
+    if (!page || page.includes("skillPlayer/")) continue;
     const src = read(page);
     const kind = TOOL_CLOSE_KIND[id].closeKind;
     if (/\.close\(\{[^}]*(thenVsNow|actedOnUrge)/.test(src) || /<SessionClose\b/.test(src) && (dirFor(kind) || kind === "urge")) {

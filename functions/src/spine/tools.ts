@@ -24,6 +24,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // Check the Facts (docs/design/check-the-facts.md), the first skill on the runtime: "How strong is it now,
   // compared to when you started?", asked before any hand-off leaves.
   'check-the-facts': { module: 'er', closeKind: 'regulation_down' },
+  // It isn't working (ER-14, docs/design/er-troubleshoot.md): a calm-time look at why a skill didn't help. No
+  // close question: its outcome is the next skill's close, linked by hostSessionId.
+  'er-troubleshoot': { module: 'er', closeKind: 'none' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'none' },
   'dear-man': { module: 'ie', closeKind: 'none' },

@@ -29,8 +29,8 @@ const own = (fieldId, text) => ({ type: "own", fieldId, text });
 const next = { type: "next" };
 const toFits = (feel, stories, event = "said") => [pick("feel", feel), next, pick("event", event), next, ...stories.map((x) => pick("story", x)), next, next];
 
-test("the seven screens, in order: feel, event, story, alt, (threat), fits, next", () => {
-  assert.deepEqual(skill.steps.map((s) => s.id), ["feel", "event", "story", "alt", "threat", "fits", "next"]);
+test("the seven screens, in order: feel, event, story, alt, (threat), fits, next; then v1.1's safe hand-off", () => {
+  assert.deepEqual(skill.steps.map((s) => s.id), ["feel", "event", "story", "alt", "threat", "fits", "next", "safe"]);
   assert.equal(skill.toolId, "check-the-facts");
   // anger skips nothing: screen 5 shows
   const s = run(toFits("annoyed", ["anger_on_purpose"]));
@@ -194,7 +194,7 @@ test("the attempt record: ext.run validates on the server, ids and own words onl
     pick("through", "yes"), next, pick("fits", "partly"), next, { type: "shown", record: "unblend" }, { type: "exit", exitId: "opposite_action" }], c);
   const rec = M.runRecord(c, s);
   assert.equal(rec.skillId, "check_the_facts");
-  assert.equal(rec.versionId, "cf-v1");
+  assert.equal(rec.versionId, "cf-v1-1");
   assert.deepEqual(rec.path, ["feel", "event", "story", "alt", "threat", "fits", "next"]);
   assert.deepEqual(rec.offeredExitIds, ["opposite_action", "problem_solve"]);
   assert.equal(rec.exitId, "opposite_action");
@@ -218,4 +218,47 @@ test("never: no 'overreacting', no scale, no pre-selection, no story marked true
   assert.ok(!/%|\b(score|scale|rate)\b/i.test(JSON.stringify(skill.copy)));
   assert.ok(!/\ba part of (you|me)\b/i.test(JSON.stringify([skill.copy, skill.options])), "the skill's own copy never names a part (the parts line is parts copy)");
   assert.ok(skill.options.alt.every((o) => !("right" in o) && !("true" in o)));
+});
+
+// --- v1.1 (PRD ER-02; docs/design/dbt-modules-plan.md ER-B1): safety chips and planned exits ---------------
+
+test("v1.1 safety chips: danger from a person shows the other_person resources and skips the story, readings and threat", () => {
+  const c = ctx();
+  const event = skill.steps.find((x) => x.id === "event");
+  for (const chip of ["threatened", "hurt_me", "unsafe"]) {
+    const opt = skill.options.event.find((o) => o.value === chip);
+    assert.equal(opt.danger, "other", chip);
+    let s = run([pick("feel", "anxious"), next, pick("event", chip)], c);
+    assert.equal(M.crisisFor(c, event, s).variant, "other_person", `${chip}: the banner shows as soon as it's picked`);
+    s = M.runNext(c, s, next);
+    assert.equal(s.stepId, "safe");
+    assert.deepEqual(s.path, ["feel", "event", "safe"]);
+    const safe = M.stepOf(skill, "safe");
+    assert.equal(M.crisisFor(c, safe, s).variant, "other_person", "and stays on the hand-off");
+    assert.match(M.handoffLine(c, safe, s), /Your read of danger is the one that counts here/);
+    assert.deepEqual(s.offered, [], "nothing to weigh, nothing to work on: Done only");
+    assert.equal(M.askFresh(c, s).fitsFacts, undefined, "no verdict is asked for");
+    assert.equal(safe.done, "done");
+    assert.equal(safe.noClose, true, "no close question after a disclosure of danger");
+  }
+  // Own words are never read: once there are any, a quiet way to talk to someone shows under them.
+  const field = event.fields[0];
+  assert.deepEqual(M.fieldLinks(c, field, run([pick("feel", "anxious"), next, pick("event", "said")], c)), []);
+  assert.deepEqual(M.fieldLinks(c, field, run([pick("feel", "anxious"), next, own("event", "he grabbed my arm")], c)).map((l) => l.exit.id), ["safety_open"]);
+  // Other event kinds: no banner, the usual way on.
+  const s = run([pick("feel", "anxious"), next, pick("event", "said")], c);
+  assert.equal(M.crisisFor(c, event, s), null);
+  assert.equal(M.runNext(c, s, next).stepId, "story");
+});
+
+test("v1.1 planned exits: the wave and let it be are written for fits and doesn't-fit, and never offered until they ship", () => {
+  const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId).sort();
+  assert.deepEqual(planned, ["let-it-be", "mindfulness-emotions"]);
+  const nextStep = M.stepOf(skill, "next");
+  const offeredExits = nextStep.offers.map((o) => o.exit);
+  assert.ok(offeredExits.includes("mindfulness_emotions") && offeredExits.includes("let_it_be"));
+  for (const fits of ["fits", "doesnt_fit"]) {
+    const s = run([...toFits("hurt", ["sad_gone"]), pick("fits", fits), next]);
+    assert.ok(!s.offered.includes("mindfulness_emotions") && !s.offered.includes("let_it_be"), fits);
+  }
 });

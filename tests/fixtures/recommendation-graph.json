@@ -482,6 +482,17 @@
     "panic"
    ]
   },
+  "dbt_troubleshooting": {
+   "appToolId": "er-troubleshoot",
+   "name": "Troubleshooting Emotion Regulation Skills",
+   "description": "Checking what got in the way when an emotion regulation skill was used and didn't help: body vulnerability, skill fit, practising it fully, reinforcers, willingness, overload and emotion myths",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_wise_mind": {
    "appToolId": "wise-mind",
    "name": "Wise Mind",

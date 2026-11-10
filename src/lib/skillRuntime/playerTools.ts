@@ -6,6 +6,7 @@
  */
 export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'check-the-facts': 'check_the_facts',
+  'er-troubleshoot': 'er_troubleshoot',
 };
 
 /** The skill a tool's page plays, or null when the tool still has its own page. */

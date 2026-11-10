@@ -11,7 +11,7 @@ Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher
 ID = "check_the_facts"
 TOOL_ID = "check-the-facts"
 CONCEPT = "dbt_check_facts"
-VERSION = "cf-v1"
+VERSION = "cf-v1-1"
 OWN_MAX = 140
 
 # --- Copy (CheckFactsFlow in the spec; every screen key, plus the decisions' additions) ---
@@ -39,6 +39,10 @@ COPY = {
     "next": "Next",
     "done": "Done",
     "entry_oa": "Go through it slowly with Check the Facts",
+    # v1.1 (PRD ER-02 safety rules): a camera chip that is danger from a person skips the story, other readings
+    # and threat screens. Nothing here asks the person to weigh their read of danger.
+    "safety_open": "Talk to someone now",
+    "safe_line": "Your read of danger is the one that counts here. You don't have to check it against anything.",
 }
 
 # --- Screen 1: the curated grid words (decision 1), in order ---
@@ -54,8 +58,14 @@ EVENT_KINDS = [
     ("didnt", "Someone didn't do something"),
     ("saw", "Something I saw or read"),
     ("thought", "A thought or a memory"),
+    ("threatened", "Someone threatened me"),
+    ("hurt_me", "Someone hurt me"),
+    ("unsafe", "I'm not safe with them"),
     ("cant_name", "I can't name it"),
 ]
+# v1.1 safety chips (PRD ER-02 "Safety rules"): danger from another person. Each opens the `other_person` crisis
+# slot (911, the National Domestic Violence Hotline, 988 last) and skips screens 3-5.
+DANGER_EVENTS = ["threatened", "hurt_me", "unsafe"]
 
 # --- Screens 3-4: stories (Interpretation) and other ways to see them (Alternative) ---
 # (set, id, story, predicts, [alternatives]). predicts per decision 5.
@@ -142,6 +152,7 @@ SHOWS_THREAT = {"any": [
 # A threat was named (a chip other than *Nothing like that*, or own words): the next two parts appear.
 THREAT_OPEN = {"all": [{"set": a("threat")}, {"not": {"eq": [a("threat"), "none"]}}]}
 FITS_IS = lambda v: {"eq": [a("fits"), v]}  # noqa: E731
+DANGER = {"in": [a("event"), DANGER_EVENTS]}
 
 DERIVE = [
     {"name": "parent", "from": a("feel"), "table": "parentOf"},
@@ -163,8 +174,12 @@ STEPS = [
         "fields": [{
             "id": "event", "options": {"list": "event"}, "max": 1, "required": True,
             "own": {"hint": "event_own_hint", "countsAsPick": False, "open": True},
+            # v1.1: own words are never read, so danger told in them can't raise the slot. Once there are own
+            # words, someone to talk to is one quiet tap away (safety.open), whatever they say.
+            "links": [{"exit": "safety_open", "label": "safety_open", "when": {"own": "event"}}],
         }],
-        "next": [{"to": "story"}],
+        "crisis": [{"variant": "other_person", "when": DANGER}],
+        "next": [{"when": DANGER, "to": "safe"}, {"to": "story"}],
     },
     {
         "id": "story", "kind": "ask", "title": "story_title", "hint": "story_hint",
@@ -225,7 +240,21 @@ STEPS = [
             {"exit": "opposite_action", "when": {"in": [a("fits"), ["partly", "doesnt_fit"]]}},
             {"exit": "problem_solve", "when": FITS_IS("partly")},
             {"exit": "wise_mind", "when": FITS_IS("unsure")},
+            # v1.1, planned until their tools ship (the owner flips them): it fits and can't be changed today →
+            # the wave (ER-08) or let it be (DT-04); doesn't fit with no urge to act on → the wave.
+            {"exit": "mindfulness_emotions", "when": FITS_IS("fits")},
+            {"exit": "let_it_be", "when": FITS_IS("fits")},
+            {"exit": "mindfulness_emotions", "when": FITS_IS("doesnt_fit")},
         ],
+        "done": "done",
+    },
+    {
+        # v1.1: danger from a person. The resources above, the line, and Done; no verdict is asked for.
+        # noClose: no "how strong is it now?" after someone has said a person hurt or threatened them.
+        "id": "safe", "kind": "handoff", "complete": True, "noClose": True,
+        "crisis": [{"variant": "other_person", "when": DANGER}],
+        "lines": [{"when": DANGER, "key": "safe_line"}],
+        "offers": [],
         "done": "done",
     },
 ]
@@ -236,12 +265,15 @@ EXITS = [
     {"id": "opposite_action", "toolId": "opposite-action", "carry": ["feel"]},
     {"id": "wise_mind", "toolId": "wise-mind", "query": {"first": "wm_q_next"}},
     {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"first": "other"}},
+    {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 (ER-B5)
+    {"id": "let_it_be", "toolId": "let-it-be", "planned": True},                        # DT-04 (DT-B4)
+    {"id": "safety_open", "safety": True},                                              # safety.open (R6)
     {"id": "done", "done": True},
 ]
 
 # Option lists: (list, value, label, props, clinical label or None)
 def options():
-    out = [("event", v, label, {}, "FactsEventKind") for v, label in EVENT_KINDS]
+    out = [("event", v, label, {"danger": "other"} if v in DANGER_EVENTS else {}, "FactsEventKind") for v, label in EVENT_KINDS]
     for st, sid, label, predicts, _alts in STORIES:
         out.append(("story", sid, label, {"set": st, "predicts": predicts}, "Interpretation"))
     for st, sid, _label, _p, alts in STORIES:
