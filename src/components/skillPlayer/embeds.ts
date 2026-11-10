@@ -55,6 +55,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     growthPct: { type: 'int', min: 100, max: 300, optional: true },
     maxSeconds: { type: 'int', min: 1, max: 900, optional: true },
     label: { type: 'copy' },
+    runningLabel: { type: 'copy', optional: true },
     hint: { type: 'copy' },
     doneLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },

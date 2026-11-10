@@ -30,6 +30,7 @@ EMBED_PROPS = {
         "growthPct": {"type": "int", "min": 100, "max": 300, "optional": True},
         "maxSeconds": {"type": "int", "min": 1, "max": 900, "optional": True},
         "label": {"type": "copy"},
+        "runningLabel": {"type": "copy", "optional": True},
         "hint": {"type": "copy"},
         "doneLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},

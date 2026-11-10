@@ -19,12 +19,14 @@ import type { EmbedProps } from './embeds';
  * · `skipped`, with the seconds held, holds done and early releases.
  *
  * Props (copy props arrive as text): variant, seconds, holds, growthPct, maxSeconds; label (inside the ring),
- * hint (what a screen reader hears with it), doneLabel (after the last hold), next (the way on).
+ * runningLabel (inside it while a hold runs, e.g. a timed ring's "Tap to stop"; else the label stays), hint (what a
+ * screen reader hears with it), doneLabel (after the last hold), next (the way on).
  */
 export function HoldRingEmbed({ props, onShown, onDone }: EmbedProps) {
   const plan = holdPlan(props);
   const label = String(props.label ?? '');
   const hint = String(props.hint ?? '');
+  const runningLabel = typeof props.runningLabel === 'string' ? props.runningLabel : label;
   const doneLabel = typeof props.doneLabel === 'string' ? props.doneLabel : null;
   const next = String(props.next ?? '');
   const [t, setT] = useState<HoldTally>(EMPTY_TALLY);
@@ -63,8 +65,8 @@ export function HoldRingEmbed({ props, onShown, onDone }: EmbedProps) {
       ) : (
         <>
           {plan.variant === 'timed'
-            ? <TimedRing key={t.doneCount} plan={plan} done={t.doneCount} label={label} hint={hint} onEnd={ended} />
-            : <PressRing key={t.doneCount} plan={plan} done={t.doneCount} label={label} hint={hint} onEnd={ended} />}
+            ? <TimedRing key={t.doneCount} plan={plan} done={t.doneCount} label={label} runningLabel={runningLabel} hint={hint} onEnd={ended} />
+            : <PressRing key={t.doneCount} plan={plan} done={t.doneCount} label={label} runningLabel={runningLabel} hint={hint} onEnd={ended} />}
           {tried && (
             <div className="flex justify-center">
               <button type="button" className={linkButton} onClick={finish}>{next}</button>
@@ -76,22 +78,30 @@ export function HoldRingEmbed({ props, onShown, onDone }: EmbedProps) {
   );
 }
 
-interface RingProps { plan: HoldPlan; done: number; label: string; hint: string; onEnd: (reached: number) => void }
+interface RingProps { plan: HoldPlan; done: number; label: string; runningLabel: string; hint: string; onEnd: (reached: number) => void }
+
+/** The next ring after a completed hold takes focus, so a keyboard or switch user keeps their place. */
+function useFocusAfterFirst(done: number) {
+  const ref = useRef<HTMLButtonElement>(null);
+  useEffect(() => { if (done > 0) ref.current?.focus({ preventScroll: true }); }, [done]);
+  return ref;
+}
 
 /** press / settle: hold the ring. Its length is this hold's (growth applied); a release ends it at how far it got. */
-function PressRing({ plan, done, label, hint, onEnd }: RingProps) {
+function PressRing({ plan, done, label, runningLabel, hint, onEnd }: RingProps) {
   const hintId = useId();
+  const ref = useFocusAfterFirst(done);
   const { p, mode, handlers } = useHoldGesture({ ms: holdMs(plan, done), onLetGo: onEnd, onComplete: () => onEnd(1) });
   const running = mode !== 'idle';
   useKeepAwake(running);
   return (
     <div className="flex justify-center">
       <span id={hintId} hidden>{hint}</span>
-      <button type="button" data-hold="" aria-describedby={hintId} {...handlers}
+      <button ref={ref} type="button" data-hold="" aria-describedby={hintId} {...handlers}
         className="rounded-full select-none touch-none [-webkit-touch-callout:none] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)]">
         <Breathing on={running}>
-          <ProgressRing value={p} size={200} stroke={5}>
-            <span className="block max-w-[9rem] text-center text-lg font-medium text-[var(--color-text-primary)] text-balance">{label}</span>
+          <ProgressRing value={p} size={200} stroke={5} smooth={false}>
+            <span className="block max-w-[9rem] text-center text-lg font-medium text-[var(--color-text-primary)] text-balance">{running ? runningLabel : label}</span>
           </ProgressRing>
         </Breathing>
       </button>
@@ -100,9 +110,10 @@ function PressRing({ plan, done, label, hint, onEnd }: RingProps) {
 }
 
 /** timed: a tap starts a hands-free fill on the deadline clock; a second tap stops it where it is. */
-function TimedRing({ plan, done, label, hint, onEnd }: RingProps) {
+function TimedRing({ plan, done, label, runningLabel, hint, onEnd }: RingProps) {
   const hintId = useId();
-  const timer = useDeadlineTimer({ durationMs: holdMs(plan, done), chime: false, onDone: () => onEnd(1) });
+  const ref = useFocusAfterFirst(done);
+  const timer = useDeadlineTimer({ durationMs: holdMs(plan, done), chime: false, tickMs: 100, onDone: () => onEnd(1) });
   const running = timer.state === 'running';
   const toggle = () => {
     if (running) { const reached = timer.fraction; timer.stop(); onEnd(reached); }
@@ -111,11 +122,11 @@ function TimedRing({ plan, done, label, hint, onEnd }: RingProps) {
   return (
     <div className="flex justify-center">
       <span id={hintId} hidden>{hint}</span>
-      <button type="button" aria-describedby={hintId} aria-pressed={running} onClick={toggle}
+      <button ref={ref} type="button" aria-describedby={hintId} aria-pressed={running} onClick={toggle}
         className="rounded-full select-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[var(--color-accent)]">
         <Breathing on={running}>
-          <ProgressRing value={timer.fraction} size={200} stroke={5}>
-            <span className="block max-w-[9rem] text-center text-lg font-medium text-[var(--color-text-primary)] text-balance">{label}</span>
+          <ProgressRing value={timer.fraction} size={200} stroke={5} smooth={false}>
+            <span className="block max-w-[9rem] text-center text-lg font-medium text-[var(--color-text-primary)] text-balance">{running ? runningLabel : label}</span>
           </ProgressRing>
         </Breathing>
       </button>

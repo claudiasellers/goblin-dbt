@@ -59,7 +59,7 @@ test("output: held only when every hold is done; partly for any time held; skipp
 test("the embed: no digits in the ring, the shared gesture, the deadline clock for timed, still under reduced motion", () => {
   const src = readFileSync("src/components/skillPlayer/HoldRingEmbed.tsx", "utf8");
   assert.match(src, /useHoldGesture\(/, "press and settle use the parts flows' gesture");
-  assert.match(src, /useDeadlineTimer\(\{ durationMs: holdMs\(plan, done\), chime: false/, "timed runs on the deadline clock, no sound by default");
+  assert.match(src, /useDeadlineTimer\(\{ durationMs: holdMs\(plan, done\), chime: false, tickMs: 100/, "timed runs on the deadline clock, no sound by default");
   assert.match(src, /useKeepAwake\(running\)/);
   assert.doesNotMatch(src, /secondsLeft|mmss|leftMs/, "the acute path shows no digits");
   assert.match(src, /if \(!on \|\| reduce\) return;/, "the pulse stops under reduced motion");
