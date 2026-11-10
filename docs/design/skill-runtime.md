@@ -140,6 +140,15 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   which stays mounted underneath, and records `safety_open` in `embedsShown`; it is not a way out.
 - **Counting derive** (`kind: 'count'`: weighted picks summed, the table row with the largest threshold at or
   below the total) and a per-field `own.max` under the skill's `ownMax` (≤ 140).
+- **Follow-up on a hand-off** (R5, ER-B1 second PR, agreed with the plan thread). A step's `followUp`
+  (`{type, whenFrom, when?}`, a `FollowUpType` from the spine's registry) runs on an ask step's primary tap,
+  or on a hand-off. On a hand-off, `whenFrom` names the card's one field, the reminder chips (the type's
+  window chips): a list, one pick, optional, never ask-fresh, no own words, links or `showWhen`. The card shows
+  them under the line; a tap picks or changes a chip and nothing more; leaving the card by its move or *Done*
+  schedules the reminder before anything navigates (`safety_open` isn't leaving). No chip, nothing scheduled.
+  Once per step per run, through the same `scheduled` event. Nothing on the card (lines, offers, crisis slots)
+  may read the chip, so the card can't change under the person's thumb. `build.py` refuses every other shape
+  (`tests/skill-contracts.test.mjs`). An inline run gives back on its hand-off, so it never shows the chips.
 
 ### The attempt record (what a router reads)
 
@@ -185,7 +194,8 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
 
 - **Screens.** Each step renders its title (focus lands on it), hint, fields (chips with `aria-pressed`,
   44 px targets, own words ≤ `ownMax`, never linted), slots, and *Next*. A hand-off step renders one card:
-  the line, the offers as buttons named from `tools.ts` (first primary), and a quiet *Done*.
+  the line, its reminder chips if it has a follow-up, the offers as buttons named from `tools.ts` (first
+  primary), and a quiet *Done*.
 - **Safety and overwhelm, preserved.** `TooMuchLink` (P2) sits under every screen, as the rules require
   of a tool that doesn't gate on the band; its hand-offs are recorded in `ext.run.handoffs`. The player
   never adds a band gate or the capacity question (out since 30 Sep). A skill whose content can carry
@@ -233,7 +243,16 @@ wave (`mindfulness-emotions`) and Let it be (`let-it-be`) are planned exits on t
   urge" is unconditional on *doesn't fit*. **Before the planned exits flip** (ER-B5, DT-B4), the flip PR adds
   the changeable split (or another condition), or *fits* would offer four moves (Problem Solve, DEAR MAN, the
   wave, Let it be) instead of one plus a swap.
-- Still to come with F2: the missing-fact follow-up, the loop guard and the inline mini-card.
+- **v1.2** (ER-B1 second PR): *I'm not sure* goes by a `missing` step first: one fact to find out (*Ask them ·
+  Wait a while and see · Look into it · Ask someone I trust*, or own words up to 60 characters, which keep the
+  worst-case record under 4 KB) and *Want me to ask later if you found out?* (*Tonight · Tomorrow · Later this
+  week*). A chip schedules `check_fact` ("Did you find out?") on Next. Both fields are optional. The fact's
+  own words get the same quiet *Talk to someone now* as the camera's.
+- Not built: the **loop guard** ("you've checked this twice today") is an aggregate over past runs, which a
+  live flow never reads (data layers); it waits for a server-side read the router or Today can own. The
+  **inline mini-card** moves to ER-B3, with its first host (Do the Opposite's *clarify*): an inline run gives
+  back as soon as it reaches a hand-off, so a danger chip would return to the host without the `safe` card's
+  line, and that needs deciding with a real host, not ahead of one.
 - The `safe` card is `noClose`: leaving it closes the visit without the close question.
 
 ## Moving the next skill

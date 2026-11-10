@@ -188,13 +188,41 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     navigate({ pathname: to.pathname, search: q ? `?${q}` : '' }, { state: to.state });
   }, [toolSession, navigate, st]);
 
-  const leave = useCallback((exit: ExitDef) => {
+  /**
+   * The step's follow-up (R5), when it has one to schedule now: its time from the type's window and the chip
+   * picked. False when it didn't save (the person goes on regardless).
+   */
+  const scheduleStep = useCallback(async (): Promise<boolean> => {
+    const f = followUpFor(ctx, step, st);
+    if (!f) return true;
+    try {
+      const spine = await getSpineContent();
+      const type = spine.followUpTypes.find((t) => t.id === f.type && t.enabled);
+      const due = type ? dueAtFor(type.window, new Date(), f.chip ?? undefined) : null;
+      if (!type || !due) throw new Error('no window');
+      const id = newId();
+      await scheduleFollowUps([{ id, type: f.type, dueAt: due.toISOString(), ...(f.chip ? { window: f.chip } : {}) }],
+        { sourceSessionId: toolSession.id, sourceToolId: skill.toolId });
+      send({ type: 'scheduled', stepId: step.id, followUpType: f.type, id });
+      return true;
+    } catch { return false; }
+  }, [ctx, step, st, send, toolSession.id, skill.toolId]);
+
+  const leave = useCallback(async (exit: ExitDef) => {
     if (exit.planned) return;
     if (exit.safety) {
       // Not a way out: the resources open over the skill, and the run stays where it was.
       send({ type: 'shown', record: 'safety_open' });
       setSafetyOpen(true);
       return;
+    }
+    // A hand-off's reminder chip (R5 on a hand-off): scheduled as the person leaves the card, by its move or by
+    // Done, before anything navigates. No chip picked, nothing scheduled.
+    if (step.kind === 'handoff' && followUpFor(ctx, step, st)) {
+      setBusy(true);
+      const ok = await scheduleStep();
+      setBusy(false);
+      if (!ok) setSaveNote(true);
     }
     send({ type: 'exit', exitId: exit.id });
     setLeaving(exit);
@@ -212,7 +240,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
       void toolSession.close({ status: 'completed' });
       go(exit);
     });
-  }, [send, skill, st.stepId, toolSession, go]);
+  }, [send, skill, st, step, ctx, scheduleStep, toolSession, go]);
 
   const onShown = useCallback((record: string) => send({ type: 'shown', record }), [send]);
 
@@ -234,23 +262,12 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
           send({ type: 'kept', stepId: step.id, kind: k.kind, id: r.id });
         } catch { failed = true; }
       }
-      if (f) {
-        try {
-          const spine = await getSpineContent();
-          const type = spine.followUpTypes.find((t) => t.id === f.type && t.enabled);
-          const due = type ? dueAtFor(type.window, new Date(), f.chip ?? undefined) : null;
-          if (!type || !due) throw new Error('no window');
-          const id = newId();
-          await scheduleFollowUps([{ id, type: f.type, dueAt: due.toISOString(), ...(f.chip ? { window: f.chip } : {}) }],
-            { sourceSessionId: toolSession.id, sourceToolId: skill.toolId });
-          send({ type: 'scheduled', stepId: step.id, followUpType: f.type, id });
-        } catch { failed = true; }
-      }
+      if (f && !(await scheduleStep())) failed = true;
       setSaveNote(failed);
       setBusy(false);
     }
     send({ type: 'next' });
-  }, [ctx, step, st, send, toolSession.id, skill.toolId]);
+  }, [ctx, step, st, send, toolSession.id, scheduleStep]);
 
   // Inline: the hand-off is the way back to the host (R8). The sub-run asks no close of its own; its change
   // check, if it has one, is its then-vs-now (C1 rule 5).
@@ -289,7 +306,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
       </div>
     );
   } else if (step.kind === 'handoff') {
-    body = <HandoffCard ctx={ctx} step={step} st={st} onExit={leave} />;
+    body = <HandoffCard ctx={ctx} step={step} st={st} send={send} onExit={leave} busy={busy} />;
   } else if (step.kind === 'embed') {
     body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} />;
   } else {
@@ -457,8 +474,13 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
  * One card: the line, the offers named from tools.ts (the first primary), and a quiet Done. A `safety.open` exit
  * has no tool: it is named by the skill's `safety_open` copy and opens SafetyOpen through `onExit`.
  */
-function HandoffCard({ ctx, step, st, onExit }: { ctx: RunContext; step: StepDef; st: RunState; onExit: (x: ExitDef) => void }) {
+function HandoffCard({ ctx, step, st, send, onExit, busy }: {
+  ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onExit: (x: ExitDef) => void; busy: boolean;
+}) {
   const c = ctx.skill.copy;
+  // The reminder chips (R5 on a hand-off; build.py allows a hand-off no other field). A tap picks or changes
+  // them; leaving the card schedules the reminder.
+  const chips = (step.fields ?? []).filter((f) => f.id === step.followUp?.whenFrom);
   const line = handoffLine(ctx, step, st);
   const offers = st.offered
     .map((id) => ctx.skill.exits.find((x) => x.id === id))
@@ -469,16 +491,21 @@ function HandoffCard({ ctx, step, st, onExit }: { ctx: RunContext; step: StepDef
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     <section className="space-y-4 p-5 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]" data-testid="skill-handoff">
       {line && <Prompt serif>{line}</Prompt>}
+      {chips.map((f) => (
+        <div key={f.id} data-testid="handoff-reminder">
+          <FieldView ctx={ctx} field={f} st={st} send={send} onMore={() => {}} onExit={onExit} />
+        </div>
+      ))}
       <div className="space-y-2">
         {offers.map((x, i) => (
-          <button key={x.id} type="button" className={i === 0 ? primaryButton : choiceButton} data-exit={x.id} onClick={() => onExit(x)}>
+          <button key={x.id} type="button" className={i === 0 ? primaryButton : choiceButton} data-exit={x.id} disabled={busy} aria-busy={busy} onClick={() => onExit(x)}>
             {x.safety ? (c.safety_open ?? 'Talk to someone now') : getToolById(x.toolId!)?.name}
           </button>
         ))}
       </div>
       {done && (
         <div className="flex justify-center">
-          <button type="button" className={linkButton} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
+          <button type="button" className={linkButton} disabled={busy} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
         </div>
       )}
     </section>
