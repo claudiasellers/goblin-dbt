@@ -33,6 +33,8 @@ CRISIS_VARIANTS = {"crisis", "other_person"}
 RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
 SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
+# Content nodes an option may show (PRESENTS): Problem Solve's, which live in their own schema files (ps_graph.py).
+PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "BarrierType", "BarrierSubResponse", "AmbivalenceOption"}
 
 
 def q(s): return json.dumps(s, ensure_ascii=False)
@@ -128,6 +130,9 @@ def check(skill):
     tools = tool_ids()
     assert skill["start"] in steps, sid
     assert len(steps) == len(skill["steps"]), (sid, "step ids are unique")
+    for o in skill["options"]:
+        if isinstance(o[4], tuple):
+            assert len(o[4]) == 2 and o[4][0] in PRESENTS_LABELS and ID.match(o[4][1]), (sid, "an option presents a content node by label and id", o)
     values = [(o[0], o[1]) for o in skill["options"]]
     assert len(set(values)) == len(values), (sid, "option values are unique per list")
     for d in skill["derive"]:
@@ -385,10 +390,15 @@ for sk in SKILLS:
                 A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ln['exit'])}}})\nMERGE (a)-[r:LINKS]->(x)\nSET r += {props({'order': i, 'field': f['id'], 'label': ln['label']})}, r.whenJson = {js(ln['when'])};")
     for i, (lst, value, label, extra, clinical) in enumerate(sk["options"]):
         nid = f"{sid}:{lst}:{value}"
+        # A clinical label, or (Label, id): the content node elsewhere in the graph the option shows (PRESENTS).
+        presents = clinical if isinstance(clinical, tuple) else None
+        clinical = None if presents else clinical
         labels = "SkillOption" + (f":{clinical}" if clinical else "")
         p = {k: v for k, v in extra.items() if k != "for"}
         A(f"MERGE (o:SkillOption {{id: {q(nid)}}})\nSET o:{labels}, o += {props({'skillId': sid, 'list': lst, 'value': value, 'label': label, 'version': sk['version']})}, o.propsJson = {js(p)}{', o.forOwn = true' if extra.get('for') == '$own' else ''};")
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (s)-[r:HAS_OPTION]->(o)\nSET r += {props({'list': lst, 'order': i})};")
+        if presents:
+            A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (c:{presents[0]} {{id: {q(presents[1])}}})\nMERGE (o)-[:PRESENTS]->(c);")
         if clinical == "Interpretation" and extra["set"] != "general":
             A(f"MATCH (c:EmotionRegulationContent {{dbtParent: {q(extra['set'])}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (c)-[:HAS_INTERPRETATION]->(o);")
         if clinical == "Interpretation" and extra["set"] == "general":

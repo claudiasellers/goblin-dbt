@@ -23,7 +23,8 @@ test("every interactive tool declares its close; client and server registries ag
   // Hand-built pages, plus the tools the skill player plays (src/lib/skillRuntime/playerTools.ts).
   const played = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
   const playedIds = [...played.slice(played.indexOf("PLAYER_TOOLS")).matchAll(/^\s*'([a-z-]+)': '/gm)].map((m) => m[1]);
-  const components = [...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds];
+  // A port keeps its old page in the tree until a follow-up deletes it (C8.4), so a tool can be in both lists.
+  const components = [...new Set([...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds])];
   assert.equal(components.length, 18);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);

@@ -74,9 +74,9 @@ async function startTx(tx: ManagedTransaction, uid: string, email: string | null
      FOREACH (x IN CASE WHEN h IS NULL OR h = ts THEN [] ELSE [h] END | MERGE (ts)-[:HANDED_OFF_FROM]->(x))
      FOREACH (x IN CASE WHEN f IS NULL THEN [] ELSE [f] END | MERGE (ts)-[:RESOLVING]->(x))
      // Opening a "come back to this later" link is the resolution (Codex, PR #17), and so is opening a
-     // nightmare read-through (ER-15); other deep-link types are resolved by their own tool (oa_plan by
+     // nightmare read-through (ER-15) or a Problem Solve review (ER-12); other deep-link types are resolved by their own tool (oa_plan by
      // Opposite Action).
-     FOREACH (x IN CASE WHEN f IS NOT NULL AND f.type IN ['resume_skill', 'nightmare_rehearse'] AND ${GUARDS.FollowUp.update('f')} THEN [f] ELSE [] END |
+     FOREACH (x IN CASE WHEN f IS NOT NULL AND f.type IN ['resume_skill', 'nightmare_rehearse', 'ps_review'] AND ${GUARDS.FollowUp.update('f')} THEN [f] ELSE [] END |
        SET x.status = 'done', x.resolvedAt = datetime(), x.updatedAt = datetime())
      WITH u, ts
      MERGE (tu:ToolUsage {key: $usageKey})

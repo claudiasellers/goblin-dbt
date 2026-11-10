@@ -9,6 +9,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'alternate-rebellion': 'alternate_rebellion',
   'er-troubleshoot': 'er_troubleshoot',
   'nightmare-rescript': 'nightmare_rescript',
+  'problem-solve': 'problem_solve',
 };
 
 /** The skill a tool's page plays, or null when the tool still has its own page. */

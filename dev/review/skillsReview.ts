@@ -6,18 +6,27 @@
  */
 import type { SkillDef } from '../../src/data/skillTypes';
 
-/** Every step's first path from the start (breadth-first over `next`, conditions ignored). */
+/**
+ * Every step's first path from the start (breadth-first over `next`, conditions ignored). A `reopens` step, which only
+ * a reopened run starts on, comes after its `after` step's path, and the steps after it from there.
+ */
 export function stepPaths(skill: SkillDef): Record<string, string[]> {
   const paths: Record<string, string[]> = { [skill.start]: [skill.start] };
-  const queue = [skill.start];
-  while (queue.length) {
-    const id = queue.shift()!;
-    const st = skill.steps.find((s) => s.id === id);
-    for (const t of st?.next ?? []) {
-      if (paths[t.to]) continue;
-      paths[t.to] = [...paths[id], t.to];
-      queue.push(t.to);
+  const walk = (queue: string[]) => {
+    while (queue.length) {
+      const id = queue.shift()!;
+      const st = skill.steps.find((s) => s.id === id);
+      for (const t of st?.next ?? []) {
+        if (paths[t.to]) continue;
+        paths[t.to] = [...paths[id], t.to];
+        queue.push(t.to);
+      }
     }
+  };
+  walk([skill.start]);
+  for (const st of skill.steps.filter((s) => s.reopens && !paths[s.id] && paths[s.reopens.after])) {
+    paths[st.id] = [...paths[st.reopens!.after], st.id];
+    walk([st.id]);
   }
   return paths;
 }
