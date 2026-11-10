@@ -145,7 +145,7 @@ export const tools: Tool[] = [
     // while awake. Not for one that replays something real (a clinician's), never from the check-in or night mode.
     id: 'nightmare-rescript',
     name: 'Rewrite the Nightmare',
-    tagline: 'Change how a recurring nightmare goes, while you\'re awake',
+    tagline: 'Write a new version of a recurring nightmare, while you\'re awake',
     description: 'Pick a nightmare that keeps coming back, change it before the bad part, give it a new ending, and read the new version through. Stop at any point.',
     whenToUse: 'When the same nightmare keeps coming back. Best in the daytime.',
     module: 'emotion-regulation',

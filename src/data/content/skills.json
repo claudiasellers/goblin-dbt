@@ -4431,9 +4431,9 @@
         "ownMax": 90,
         "emotionFields": [],
         "copy": {
-          "replay_title": "Is this nightmare a replay of something that really happened?",
-          "replay_title_flooded": "This is one for a calmer moment. Is the nightmare a replay of something that really happened?",
-          "replay_hint": "This works on a nightmare that keeps coming back. It's best done in the daytime, with your eyes open. You can stop at any point.",
+          "replay_title": "Is this nightmare a replay of something that happened to you?",
+          "replay_title_flooded": "This is one for a calmer moment. Is the nightmare a replay of something that happened to you?",
+          "replay_hint": "This is for a nightmare that keeps coming back. It's best done in the daytime, with your eyes open. You can stop at any point.",
           "replay_note": "When nightmares follow something that happened to you, a clinician can help with that.",
           "settle_first": "Settle first",
           "clinician": "Nightmares that replay something real are best worked on with a clinician, who can go at your pace. For tonight, settling your body and the room around you can help.",
@@ -4450,6 +4450,7 @@
           "turn_hint": "Anything can change. It's your dream.",
           "turn_own": "Say it your way",
           "ending_title": "How does it end now?",
+          "ending_label": "Write your own, or start from one of these.",
           "ending_own": "Write your ending",
           "rehearse_title": "Your new version",
           "card_start": "It starts",
@@ -4464,15 +4465,16 @@
           "after_title": "How was that?",
           "settle_again_title": "Settle again before you go on.",
           "plan_title": "Keep this new version?",
-          "plan_hint": "Reading it through once a day, for a while, is what helps the new version take hold.",
+          "plan_hint": "Reading it through once a day, for a while, can help the new version take hold.",
           "remind_q": "Want a reminder to read it through?",
           "plan_primary": "Next",
-          "close": "You changed how it goes. Each read-through is practice for the new version.",
+          "close": "You wrote a new way for it to go. Each read-through is practice for it.",
           "close_kept": "It's in Me. Each read-through is practice for the new version.",
           "again": "That's one more read-through.",
           "again_q": "Want a reminder for the next one?",
           "stopped": "Stopping is part of this. You can come back on another day, or leave it here.",
           "stopped_unsafe": "Thank you for stopping. Someone to talk to is right here.",
+          "stopped_far": "Stopping here is fine. Coming back to the room around you can help.",
           "safety_open": "Talk to someone now",
           "next": "Next",
           "done": "Done"
@@ -4654,6 +4656,15 @@
               "doneLabel": "settle_done",
               "next": "next"
             },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [
               {
                 "to": "start",
@@ -4775,6 +4786,7 @@
             "fields": [
               {
                 "id": "ending",
+                "label": "ending_label",
                 "options": {
                   "list": "ending"
                 },
@@ -4821,6 +4833,15 @@
                 }
               }
             ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "props": {
               "startField": "setting",
               "turnField": "turn",
@@ -4843,15 +4864,6 @@
                   "eq": [
                     "$a.read",
                     "stopped"
-                  ]
-                }
-              },
-              {
-                "to": "again",
-                "when": {
-                  "eq": [
-                    "$ctx.enterAt",
-                    "rehearse"
                   ]
                 }
               },
@@ -4905,9 +4917,19 @@
               {
                 "to": "stopped",
                 "when": {
-                  "eq": [
-                    "$a.after",
-                    "unsafe"
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.after",
+                        "unsafe"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.after",
+                        "far"
+                      ]
+                    }
                   ]
                 }
               },
@@ -4953,7 +4975,25 @@
               "doneLabel": "settle_done",
               "next": "next"
             },
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [
+              {
+                "to": "again",
+                "when": {
+                  "eq": [
+                    "$ctx.enterAt",
+                    "rehearse"
+                  ]
+                }
+              },
               {
                 "to": "plan",
                 "when": null
@@ -4999,7 +5039,27 @@
                 "id": "remind",
                 "label": "remind_q",
                 "options": {
-                  "list": "remind"
+                  "list": "remind",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "eq": [
+                            "$a.after",
+                            "stirred"
+                          ]
+                        }
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$opt.night",
+                            true
+                          ]
+                        }
+                      }
+                    ]
+                  }
                 },
                 "max": 1
               }
@@ -5065,6 +5125,15 @@
               }
             ],
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [],
             "offers": []
           },
@@ -5097,7 +5166,27 @@
                 "label": "again_q",
                 "max": 1,
                 "options": {
-                  "list": "remind"
+                  "list": "remind",
+                  "where": {
+                    "any": [
+                      {
+                        "not": {
+                          "eq": [
+                            "$a.after",
+                            "stirred"
+                          ]
+                        }
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$opt.night",
+                            true
+                          ]
+                        }
+                      }
+                    ]
+                  }
                 }
               }
             ],
@@ -5106,6 +5195,15 @@
               "whenFrom": "again_remind"
             },
             "done": "done",
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
             "next": [],
             "offers": []
           },
@@ -5134,6 +5232,15 @@
                   ]
                 },
                 "key": "stopped_unsafe"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "far"
+                  ]
+                },
+                "key": "stopped_far"
               },
               {
                 "when": {
@@ -5305,6 +5412,10 @@
               "label": "It started to feel like a memory"
             },
             {
+              "value": "far",
+              "label": "I went far away or foggy"
+            },
+            {
               "value": "unsafe",
               "label": "I'm not feeling safe",
               "danger": "self"
@@ -5323,7 +5434,8 @@
           "remind": [
             {
               "value": "tonight",
-              "label": "Tonight, before bed"
+              "label": "Tonight, before bed",
+              "night": true
             },
             {
               "value": "tomorrow",

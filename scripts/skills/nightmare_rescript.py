@@ -14,11 +14,14 @@ crisis banner and the player's *This is too much right now* (P2), without a clin
   read-through has its own *Stop*, which goes to a card that settles and orients (5-4-3-2-1), never back into the
   dream. *It started to feel like a memory* after a read-through goes to the clinician card; *I'm not feeling safe*
   opens the crisis banner and puts someone to talk to first.
-- **Someone to talk to on every screen.** Every ask step's first field carries the quiet *Talk to someone now*
-  link (own words are never read, so they can't raise the banner themselves); the clinician and stop cards offer it.
+- **Someone to talk to on every screen.** The quiet *Talk to someone now* link is on every screen: on each ask
+  step's first field, and as a step link under the holds, the read-through card and the end cards (own words are
+  never read, so they can't raise the banner themselves); the clinician and stop cards offer it.
 - **Rehearsal by reminder.** The keep step's chips schedule `nightmare_rehearse`, a Today card that reopens this
-  run at the read-through (R9 resume). That visit skips the questions and ends on a card with its own reminder chip
-  (R5 on a hand-off), so the person sets each next read-through, one at a time, for as long as they want.
+  run at the read-through (R9 resume). That visit skips the questions, then asks *How was that?* and settles again
+  like a first visit, and ends on a card with its own reminder chip (R5 on a hand-off), so the person sets each
+  next read-through, one at a time, for as long as they want. After *It stirred me up*, the reminder is daytime
+  only.
 
 Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher schema/skills.cypher
              python3 scripts/skills/fixture.py --ship
@@ -35,9 +38,9 @@ SETTING_OWN_MAX = 60
 
 COPY = {
     # Screen 1: the replay gate (PRD gating), and the plain clinician line for everyone (ER-B6 gate).
-    "replay_title": "Is this nightmare a replay of something that really happened?",
-    "replay_title_flooded": "This is one for a calmer moment. Is the nightmare a replay of something that really happened?",
-    "replay_hint": "This works on a nightmare that keeps coming back. It's best done in the daytime, with your eyes open. You can stop at any point.",
+    "replay_title": "Is this nightmare a replay of something that happened to you?",
+    "replay_title_flooded": "This is one for a calmer moment. Is the nightmare a replay of something that happened to you?",
+    "replay_hint": "This is for a nightmare that keeps coming back. It's best done in the daytime, with your eyes open. You can stop at any point.",
     "replay_note": "When nightmares follow something that happened to you, a clinician can help with that.",
     "settle_first": "Settle first",
     # The clinician card (replay yes / partly, or a read-through that started to feel like a memory).
@@ -59,6 +62,7 @@ COPY = {
     "turn_own": "Say it your way",
     # Screen 5: the new ending, theirs to write.
     "ending_title": "How does it end now?",
+    "ending_label": "Write your own, or start from one of these.",
     "ending_own": "Write your ending",
     # Screen 6: the new version on the paper, and the read-through (the rich moment).
     "rehearse_title": "Your new version",
@@ -77,11 +81,11 @@ COPY = {
     "settle_again_title": "Settle again before you go on.",
     # Screen 9: keep and the reminder.
     "plan_title": "Keep this new version?",
-    "plan_hint": "Reading it through once a day, for a while, is what helps the new version take hold.",
+    "plan_hint": "Reading it through once a day, for a while, can help the new version take hold.",
     "remind_q": "Want a reminder to read it through?",
     "plan_primary": "Next",
     # The end of a first visit.
-    "close": "You changed how it goes. Each read-through is practice for the new version.",
+    "close": "You wrote a new way for it to go. Each read-through is practice for it.",
     "close_kept": "It's in Me. Each read-through is practice for the new version.",
     # The end of a read-through visit (from the Today reminder).
     "again": "That's one more read-through.",
@@ -89,6 +93,7 @@ COPY = {
     # Stopped (the read-through's Stop, or not feeling safe after it).
     "stopped": "Stopping is part of this. You can come back on another day, or leave it here.",
     "stopped_unsafe": "Thank you for stopping. Someone to talk to is right here.",
+    "stopped_far": "Stopping here is fine. Coming back to the room around you can help.",
     "safety_open": "Talk to someone now",
     "next": "Next",
     "done": "Done",
@@ -105,10 +110,16 @@ REPLAY = {"in": [a("replay"), ["yes", "partly"]]}
 UNSURE = {"eq": [a("replay"), "unsure"]}
 UNSAFE = {"eq": [a("after"), "unsafe"]}
 MEMORY = {"eq": [a("after"), "memory"]}
+FAR = {"eq": [a("after"), "far"]}
+STIRRED = {"eq": [a("after"), "stirred"]}
+# After a read-through that stirred them up, the reminder is daytime only: rehearse awake, away from sleep onset.
+REMIND_WHERE = {"any": [{"not": STIRRED}, {"not": {"eq": ["$opt.night", True]}}]}
 KEPT = {"eq": [a("keepit"), "yes"]}
-# A run reopened from the Today reminder (R9: `?run=<session>&at=rehearse&enterAt=rehearse`): it skips the
-# questions after the read-through and ends on the *again* card. Resume reads back only the answers up to the
-# read-through, so nothing after it (the last reminder picked, how it went last time) is ever pre-filled.
+# A run reopened from the Today reminder (R9: `?run=<session>&at=rehearse&enterAt=rehearse`): after the
+# read-through it asks *How was that?* and settles again, as a first visit does, then ends on the *again* card
+# instead of the keep step. Resume reads back only the answers up to the read-through, so nothing after it (how it
+# went last time, the last reminder picked) is ever pre-filled; and when the resume finds nothing, the player
+# drops `enterAt`, so a fresh run is a whole first visit.
 RESUMED = {"eq": ["$ctx.enterAt", "rehearse"]}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 CRISIS = [{"variant": "crisis", "when": UNSAFE}]
@@ -147,12 +158,14 @@ AFTER = [
     ("all_right", "That was all right"),
     ("stirred", "It stirred me up"),
     ("memory", "It started to feel like a memory"),
+    # Going blank or far away (dissociation, C6.3): orient, never settle; the stop card with 5-4-3-2-1 first.
+    ("far", "I went far away or foggy"),
     # Plan C6.4: an option that can carry danger declares it, and its step the crisis slot.
     ("unsafe", "I'm not feeling safe", {"danger": "self"}),
 ]
 KEEP = [("yes", "Keep it in Me"), ("no", "Not this time")]
 # The nightmare_rehearse window chips (scripts/practice-spine/content.py): no dates.
-REMIND = [("tonight", "Tonight, before bed"), ("tomorrow", "Tomorrow, in the day")]
+REMIND = [("tonight", "Tonight, before bed", {"night": True}), ("tomorrow", "Tomorrow, in the day", {})]
 
 SETTLE_PROPS = {"variant": "settle", "seconds": 5, "holds": 3, "label": "settle_label", "hint": "settle_hint",
                 "doneLabel": "settle_done", "next": "next"}
@@ -181,7 +194,7 @@ STEPS = [
     {
         "id": "settle", "kind": "embed", "embed": "holdRing", "answerAs": "settle", "crisis": CRISIS,
         "title": [{"when": UNSURE, "key": "settle_title_unsure"}, {"key": "settle_title"}],
-        "props": SETTLE_PROPS,
+        "props": SETTLE_PROPS, "links": [SAFETY_LINK],
         "next": [{"to": "start"}],
     },
     {
@@ -198,31 +211,33 @@ STEPS = [
     },
     {
         "id": "ending", "kind": "ask", "title": "ending_title", "crisis": CRISIS,
-        "fields": [{"id": "ending", "options": {"list": "ending"}, "max": 1, "required": True,
+        "fields": [{"id": "ending", "label": "ending_label", "options": {"list": "ending"}, "max": 1, "required": True,
                     "own": {"hint": "ending_own", "countsAsPick": True, "open": True}, "links": [SAFETY_LINK]}],
         "next": [{"to": "rehearse"}],
     },
     {
         # The rich moment: the new version on the square paper, then one read-through with Stop always there.
         "id": "rehearse", "kind": "embed", "embed": "rescriptCard", "answerAs": "read", "title": "rehearse_title",
-        "crisis": CRISIS,
+        "crisis": CRISIS, "links": [SAFETY_LINK],
         "props": {"startField": "setting", "turnField": "turn", "endField": "ending", "seconds": 60,
                   "startLabel": "card_start", "turnLabel": "card_turn", "endLabel": "card_end", "fallback": "card_fallback",
                   "readLabel": "read_start", "runningLabel": "read_running", "stopLabel": "read_stop",
                   "doneLabel": "read_done", "skipLabel": "read_skip"},
-        "next": [{"when": {"eq": [a("read"), "stopped"]}, "to": "stopped"},
-                 {"when": RESUMED, "to": "again"}, {"to": "after"}],
+        "next": [{"when": {"eq": [a("read"), "stopped"]}, "to": "stopped"}, {"to": "after"}],
     },
     {
         "id": "after", "kind": "ask", "title": "after_title", "crisis": CRISIS,
         "fields": [{"id": "after", "options": {"list": "after"}, "max": 1, "required": True,
                     "links": [{"exit": "safety_open", "label": "safety_open", "when": {"not": UNSAFE}}]}],
-        "next": [{"when": UNSAFE, "to": "stopped"}, {"when": MEMORY, "to": "clinician"}, {"to": "settle_again"}],
+        # One jump per target (NEXT is an edge per step pair): not safe or far away, both to the stop card.
+        "next": [{"when": {"any": [UNSAFE, FAR]}, "to": "stopped"}, {"when": MEMORY, "to": "clinician"},
+                 {"to": "settle_again"}],
     },
     {
         "id": "settle_again", "kind": "embed", "embed": "holdRing", "answerAs": "settle_again", "crisis": CRISIS,
-        "title": "settle_again_title", "props": SETTLE_PROPS,
-        "next": [{"to": "plan"}],
+        "title": "settle_again_title", "props": SETTLE_PROPS, "links": [SAFETY_LINK],
+        # A read-through visit ends on its own card (no keep: the version is already theirs, or they chose not to).
+        "next": [{"when": RESUMED, "to": "again"}, {"to": "plan"}],
     },
     {
         # Keep (R4) on the chip *Keep it in Me*: that tap is the yes (C2.2); *Not this time* keeps nothing. The
@@ -230,7 +245,7 @@ STEPS = [
         "id": "plan", "kind": "ask", "title": "plan_title", "hint": "plan_hint", "crisis": CRISIS,
         "fields": [
             {"id": "keepit", "options": {"list": "keepit"}, "max": 1, "required": True, "links": [SAFETY_LINK]},
-            {"id": "remind", "label": "remind_q", "options": {"list": "remind"}, "max": 1},
+            {"id": "remind", "label": "remind_q", "options": {"list": "remind", "where": REMIND_WHERE}, "max": 1},
         ],
         "keep": {"kind": "nightmare_script", "many": True, "from": ["setting", "turn", "ending"], "when": KEPT},
         "followUp": {"type": "nightmare_rehearse", "whenFrom": "remind"},
@@ -240,20 +255,21 @@ STEPS = [
     {
         "id": "close", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "lines": [{"when": KEPT, "key": "close_kept"}, {"when": ALWAYS, "key": "close"}],
-        "offers": [], "done": "done",
+        "offers": [], "done": "done", "links": [SAFETY_LINK],
     },
     {
         # A read-through visit's end, with its own reminder chip (R5 on a hand-off): the next one, if they want it.
         "id": "again", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "lines": [{"when": ALWAYS, "key": "again"}],
-        "fields": [{"id": "again_remind", "label": "again_q", "max": 1, "options": {"list": "remind"}}],
+        "fields": [{"id": "again_remind", "label": "again_q", "max": 1, "options": {"list": "remind", "where": REMIND_WHERE}}],
         "followUp": {"type": "nightmare_rehearse", "whenFrom": "again_remind"},
-        "offers": [], "done": "done",
+        "offers": [], "done": "done", "links": [SAFETY_LINK],
     },
     {
         # Stop: grounding and someone to talk to, never back into the dream; no close question.
         "id": "stopped", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
-        "lines": [{"when": UNSAFE, "key": "stopped_unsafe"}, {"when": ALWAYS, "key": "stopped"}],
+        "lines": [{"when": UNSAFE, "key": "stopped_unsafe"}, {"when": FAR, "key": "stopped_far"},
+                  {"when": ALWAYS, "key": "stopped"}],
         "offers": [{"exit": "safety_open", "when": UNSAFE}, {"exit": "five_senses", "when": ALWAYS},
                    {"exit": "safety_open", "when": {"not": UNSAFE}}],
         "done": "done",
@@ -275,7 +291,7 @@ def options():
     out += [("ending", v, label, {}, None) for v, label in ENDINGS]
     out += [("after", o[0], o[1], (o[2] if len(o) > 2 else {}), None) for o in AFTER]
     out += [("keepit", v, label, {}, None) for v, label in KEEP]
-    out += [("remind", v, label, {}, None) for v, label in REMIND]
+    out += [("remind", v, label, extra, None) for v, label, extra in REMIND]
     return out
 
 

@@ -176,6 +176,8 @@ def check(skill):
                 check_cond(t["when"], fields, derived, w, accepts)
         for k in ("hint", "note"):
             assert k not in s or s[k] in copy, (w, k)
+        tos = [t["to"] for t in s.get("next", [])]
+        assert len(tos) == len(set(tos)), (w, "one jump per target (NEXT is one edge per step pair): join the conditions with any", tos)
         for t in s.get("next", []):
             assert t["to"] in steps, (w, t)
             if "when" in t:

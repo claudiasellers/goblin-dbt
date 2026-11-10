@@ -127,7 +127,7 @@ the rest are not built. "Needs" names the runtime pieces from §3 C3 and the sha
 | ER-12 | Problem Solve (`problem-solve`) | ER 12 | **Shipped, hand-built, partly complete.** No `TooMuchLink`, `/tool/give` hard-coded, no evaluation step | In: Tools, OA, Check the Facts, check-in, Today `ps_step`. Out: companion tools by `linkedToolId`, CORE-11 | chips only; resume for the evaluation card; DT-10 inline later | `ext.run` (old `ext.er` keys kept readable) |
 | ER-13 | Sleep reset (`sleep-reset`) | ER 20b | **None** | In: ER-07, Tools. Out: CORE safety, ER-15 | night mode is CORE's (Index §5.1 #13) | profile anchor times |
 | ER-14 | It isn't working (`er-troubleshoot`) | ER 24 | **On the runtime** (ER-B1; [`er-troubleshoot.md`](er-troubleshoot.md)), with its `try_again` nudge on the cards whose move is another go. No routing rows by design (Claudia, 10 Nov) | In: OA readout, ER-08, Tools. Out: ER-07, ER-02, DT, PS, ER-10, CORE-11 | chips + "first yes wins" transitions | `ext.run` |
-| ER-15 | Rewrite the nightmare (`nightmare-rescript`) | ER 20a | **On the runtime** (ER-B6; [`nightmare-rescript.md`](nightmare-rescript.md)): replay gate to a clinician card, setting / change / your ending, the `rescriptCard` read-through with Stop, `nightmare_script` keep, `nightmare_rehearse` reminders one at a time. No routing rows by design | In: ER-13. Out: referral | `holdRing`, `rehearsal` | profile `NightmareScript` |
+| ER-15 | Rewrite the nightmare (`nightmare-rescript`) | ER 20a | **On the runtime** (ER-B6; [`nightmare-rescript.md`](nightmare-rescript.md)): replay gate to a clinician card, setting / change / your ending, the `rescriptCard` read-through with Stop, `nightmare_script` keep, `nightmare_rehearse` reminders one at a time. No routing rows by design | In: ER-13. Out: referral (waits on CORE) | `holdRing` (settle), `rescriptCard` | `ext.run`; profile `nightmare_script` (`ProfileFact`) |
 
 ---
 
@@ -287,7 +287,8 @@ lands with F2 because two lanes need it in their first batch.
 | `rehearsalStage` | Two figures, scripted turns, move chips, stop (2D first, D12) | `PartFigure`, `PullsStage`, den SVG | IE | IE-B5 | IE-02, IE-08 |
 | DEAR MAN's own pieces: `anchorGenerator`, `priorityRank`, `copeAheadStep`, `debriefWho`, `angryPartCard`, `checkInResult` | Existing components, wrapped | as named | IE | IE-B2/B4 | DEAR MAN skills; `angryPartCard` also Recover |
 | `keepCard` | The paper keepsake (PaperCard), then the keep action | `PaperCard`, `KeepCard` | ER | ER-B2 | ER-05, IE-01 plan card, ER-04, DT-03 |
-| `rehearsal` | Imaginal first-person beats | Cope Ahead `Rehearse` | ER | ER-B2 | ER-05, ER-15 |
+| `rehearsal` | Imaginal first-person beats | Cope Ahead `Rehearse` | ER | ER-B2 | ER-05 |
+| `rescriptCard` | The rewritten nightmare on the square paper (wraps `PaperCard` unchanged, no keep): *It starts* / *Then* / *It ends*, one read-through with a quiet clock and Stop | `RescriptCard.tsx` | ER | ER-B6 | ER-15 |
 | `planSentence`, `partAnchor`, `partsWhoShowsUp` | Cope Ahead's live read-back, part anchor, parts step | Cope Ahead components | ER | ER-B2 | ER-05 |
 | `pileSort` | Flick items into two or three piles | new (the family behind IE's two columns, ER-09's card sort, PS decompose, MF-03) | ER | ER-B4 | ER-09, ER-12 decompose, IE-10, IE-12 |
 | `weekPlanner` | Place items on days, one follow-up each | new | ER | ER-B4 | ER-04 L2, ER-11 |

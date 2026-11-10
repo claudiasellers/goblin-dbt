@@ -108,13 +108,22 @@ test("after a read-through: a memory goes to the clinician; not feeling safe rai
   assert.deepEqual(M.offersFor(ctx(), M.stepOf(skill, "stopped"), unsafe), ["safety_open", "five_senses"], "someone to talk to first");
   assert.ok(M.crisisFor(ctx(), M.stepOf(skill, "stopped"), unsafe));
   for (const v of ["all_right", "stirred"]) assert.equal(run([...READ, pick("after", v), next]).stepId, "settle_again", v);
+  // Far away or foggy (dissociation, C6.3): orient, never a settling hold; the stop card with 5-4-3-2-1 first.
+  const far = run([...READ, pick("after", "far"), next]);
+  assert.equal(far.stepId, "stopped");
+  assert.deepEqual(M.offersFor(ctx(), M.stepOf(skill, "stopped"), far), ["five_senses", "safety_open"]);
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "stopped"), far), /back to the room/);
+  assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "stopped"), far), null, "not a danger answer: no banner");
   assert.deepEqual(skill.options.after.find((o) => o.value === "unsafe").danger, "self");
 });
 
-test("someone to talk to on every screen: a quiet link on every ask step, an offer on the clinician and stop cards, a crisis slot on every step", () => {
+test("someone to talk to on every screen: a quiet link or an offer on every step, and a crisis slot on every step", () => {
+  const s0 = M.initialRun(skill);
   for (const st of skill.steps) {
     assert.ok(st.crisis?.length, `${st.id}: declares the crisis slot`);
-    if (st.kind === "ask") assert.ok(st.fields[0].links.some((l) => l.exit === "safety_open"), `${st.id}: Talk to someone now`);
+    const shown = st.kind === "ask" ? M.fieldLinks(ctx(), st.fields[0], s0) : M.stepLinks(ctx(), st, s0);
+    const offered = M.offersFor(ctx(), st, s0);
+    assert.ok(shown.some((l) => l.exit.id === "safety_open") || offered.includes("safety_open"), `${st.id}: Talk to someone now`);
   }
   for (const id of ["clinician", "stopped"]) assert.ok(M.stepOf(skill, id).offers.some((o) => o.exit === "safety_open"), id);
 });
@@ -166,6 +175,17 @@ test("the read-through reminder: a chip on the keep step schedules nightmare_reh
   assert.deepEqual(M.followUpFor(ctx(), plan, M.runNext(ctx(), atPlan, pick("remind", "tonight"))), { type: "nightmare_rehearse", chip: "tonight" });
 });
 
+test("after a read-through that stirred them up, the reminder is daytime only", () => {
+  const stirred = run([...READ, pick("after", "stirred"), next, embed(["held"], 15)]);
+  const remind = M.stepOf(skill, "plan").fields.find((f) => f.id === "remind");
+  const values = (st) => M.optionGroups(ctx(), remind, st.answers).flatMap((g) => g.options.map((o) => o.value));
+  assert.deepEqual(values(stirred), ["tomorrow"]);
+  assert.deepEqual(values(run([...READ, pick("after", "all_right"), next, embed(["held"], 15)])), ["tonight", "tomorrow"]);
+  assert.deepEqual(skill.options.remind.filter((o) => o.night).map((o) => o.value), ["tonight"]);
+  assert.deepEqual(remind.options.where, { any: [{ not: { eq: ["$a.after", "stirred"] } }, { not: { eq: ["$opt.night", true] } }] });
+  assert.deepEqual(M.stepOf(skill, "again").fields[0].options.where, remind.options.where, "and on a read-through visit's card");
+});
+
 test("a read-through visit (resume at the read-through): no question is pre-filled, it ends on its own card, and sets the next reminder only on a tap", () => {
   const first = run([...READ, pick("after", "stirred"), next, embed(["held"], 15), pick("keepit", "yes"), pick("remind", "tomorrow"), next]);
   const rec = M.runRecord(ctx(), first);
@@ -175,12 +195,32 @@ test("a read-through visit (resume at the read-through): no question is pre-fill
   const s = M.resumeRun(c, rec, "rehearse");
   assert.equal(s.stepId, "rehearse");
   assert.deepEqual(Object.keys(s.answers).sort(), ["ending", "replay", "setting", "turn"], "only the answers up to the read-through come back (an embed's report is its own)");
-  const again = M.runNext(c, s, embed(["read"]));
-  assert.equal(again.stepId, "again", "straight to its end card: How was that? and the keep step are a first visit's");
+  // The safety shape of a first visit: How was that? (memory → clinician, not safe → crisis, far away → orient),
+  // then settle again, then its own end card instead of the keep step.
+  const after = M.runNext(c, s, embed(["read"]));
+  assert.equal(after.stepId, "after");
+  assert.equal(after.answers.after, undefined, "how it went last time isn't read back");
+  assert.equal(M.runNext(c, M.runNext(c, after, pick("after", "memory")), next).stepId, "clinician");
+  const unsafe = M.runNext(c, after, pick("after", "unsafe"));
+  assert.ok(M.crisisFor(c, M.stepOf(skill, "after"), unsafe));
+  assert.equal(M.runNext(c, unsafe, next).stepId, "stopped");
+  assert.equal(M.runNext(c, M.runNext(c, after, pick("after", "far")), next).stepId, "stopped");
+  const settling = M.runNext(c, M.runNext(c, after, pick("after", "all_right")), next);
+  assert.equal(settling.stepId, "settle_again");
+  const again = M.runNext(c, settling, embed(["held"], 15));
+  assert.equal(again.stepId, "again", "its own end card: the keep step is a first visit's");
   const card = M.stepOf(skill, "again");
   assert.equal(M.followUpFor(c, card, again), null, "last time's reminder chip isn't picked again for them");
   assert.deepEqual(M.followUpFor(c, card, M.runNext(c, again, pick("again_remind", "tonight"))), { type: "nightmare_rehearse", chip: "tonight" });
   assert.equal(M.runNext(c, s, embed(["stopped"], 5)).stepId, "stopped", "Stop works the same on a read-through visit");
+});
+
+test("a reminder link whose run can't be reopened: the fresh run is a whole first visit, with the keep step", () => {
+  // The player drops the link's enterAt when the resume finds nothing (too old, another version, a failed read).
+  const c = ctx(M.ctxAfterResume(M.contextIn(skill, { run: "x", at: "rehearse", enterAt: "rehearse" }), false));
+  assert.deepEqual(c.ctxIn, {});
+  const s = run([...READ, pick("after", "all_right"), next, embed(["held"], 15)], c);
+  assert.equal(s.stepId, "plan", "How was that?, settle again, then the keep step");
 });
 
 test("the longest run's record validates; own words stay within their caps", () => {
