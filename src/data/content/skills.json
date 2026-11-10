@@ -1290,12 +1290,13 @@
         "ownMax": 140,
         "emotionFields": [],
         "copy": {
-          "line_title": "You said what you needed, and that counts. Do you want a line that says where you stand?",
+          "line_title": "Do you want a line that says where you stand?",
           "line_hint": "A boundary line says what you'll do. It doesn't argue.",
           "line_none": "I don't need to say anything",
           "own_hint": "Say it my way",
           "card_title": "Your line, to use or not",
-          "elsewhere_line": "What you needed from them still matters. It can be met somewhere else.",
+          "elsewhere_line_no": "You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.",
+          "elsewhere_line": "What you needed still matters. It can be met somewhere else.",
           "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
           "next": "Next",
           "done": "Done"
@@ -1354,6 +1355,7 @@
               "labels": {
                 "copy": "Copy",
                 "copied": "Copied",
+                "selected": "The line is selected, ready to copy.",
                 "next": "Next"
               }
             },
@@ -1378,6 +1380,15 @@
                   ]
                 },
                 "key": "elsewhere_line_none"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "let_go"
+                  ]
+                },
+                "key": "elsewhere_line_no"
               },
               {
                 "when": null,
@@ -1437,40 +1448,28 @@
         "options": {
           "line": [
             {
-              "value": "not_argue",
-              "label": "I've said how this lands. I won't argue about whether my feelings are real."
-            },
-            {
               "value": "not_keep_asking",
               "label": "I've said what I need. I'm not going to keep asking."
+            },
+            {
+              "value": "none",
+              "label": "I don't need to say anything"
             },
             {
               "value": "hear_no",
               "label": "I hear that it's a no. I'm stepping back from this for now."
             },
             {
-              "value": "see_differently",
-              "label": "We see this differently. I'm leaving it there."
-            },
-            {
               "value": "not_today",
               "label": "I'm not going to talk about this any more today."
-            },
-            {
-              "value": "calmer",
-              "label": "I'll come back to this when we can both talk calmly."
-            },
-            {
-              "value": "not_changing",
-              "label": "That doesn't work for me, and that hasn't changed."
             },
             {
               "value": "another_way",
               "label": "I'm going to look after this need another way."
             },
             {
-              "value": "none",
-              "label": "I don't need to say anything"
+              "value": "not_argue",
+              "label": "I've said how this lands. I won't argue about whether my feelings are real."
             }
           ]
         }
@@ -1487,7 +1486,7 @@
         "emotionFields": [],
         "copy": {
           "what_title": "Looking back, which of these happened?",
-          "what_hint": "Pick the one that sits worst.",
+          "what_hint": "This happens to a lot of people. Pick the one you'd most like to change.",
           "what_own": "Something else",
           "sorry_title": "Was there something you did that needs a sorry?",
           "sorry_instead_title": "What could take the place of the extra sorries next time?",
@@ -1501,7 +1500,8 @@
           "card_f_title": "What you'd say instead",
           "own_hint": "Say it my way",
           "next_line": "That's one move to carry into the next conversation.",
-          "next_line_wrong": "That's one move to carry with you. A sorry for a real wrong is part of keeping your self-respect.",
+          "next_line_wrong": "A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.",
+          "next_line_unsure": "Not sure about the sorry? Check the Facts can help sort it out.",
           "next": "Next",
           "done": "Done"
         },
@@ -1550,9 +1550,12 @@
               {
                 "to": "truth",
                 "when": {
-                  "eq": [
+                  "in": [
                     "$a.what",
-                    "bent_truth"
+                    [
+                      "bent_truth",
+                      "made_excuse"
+                    ]
                   ]
                 }
               },
@@ -1626,6 +1629,7 @@
               "labels": {
                 "copy": "Copy",
                 "copied": "Copied",
+                "selected": "The line is selected, ready to copy.",
                 "next": "Next"
               }
             },
@@ -1680,6 +1684,7 @@
               "labels": {
                 "copy": "Copy",
                 "copied": "Copied",
+                "selected": "The line is selected, ready to copy.",
                 "next": "Next"
               }
             },
@@ -1732,6 +1737,7 @@
               "labels": {
                 "copy": "Copy",
                 "copied": "Copied",
+                "selected": "The line is selected, ready to copy.",
                 "next": "Next"
               }
             },
@@ -1784,6 +1790,7 @@
               "labels": {
                 "copy": "Copy",
                 "copied": "Copied",
+                "selected": "The line is selected, ready to copy.",
                 "next": "Next"
               }
             },
@@ -1808,6 +1815,15 @@
                   ]
                 },
                 "key": "next_line_wrong"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.sorry",
+                    "unsure"
+                  ]
+                },
+                "key": "next_line_unsure"
               },
               {
                 "when": null,
@@ -1916,6 +1932,11 @@
               "letter": "T"
             },
             {
+              "value": "made_excuse",
+              "label": "I made up a reason instead of saying what was true",
+              "letter": "T"
+            },
+            {
               "value": "let_decide",
               "label": "I let them decide for me",
               "letter": "F"
@@ -2008,6 +2029,10 @@
             {
               "value": "need_help",
               "label": "I can do this part, and I'd like help with that part"
+            },
+            {
+              "value": "real_answer",
+              "label": "I don't want to, and that's a real answer"
             }
           ],
           "instead": [
@@ -2026,6 +2051,10 @@
             {
               "value": "together",
               "label": "Can we decide this together?"
+            },
+            {
+              "value": "both_sides",
+              "label": "I can see your side. Here's mine."
             },
             {
               "value": "still_want",

@@ -3206,7 +3206,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: FAST as the alternative."
+   "rationale": "FAST as the alternative."
   },
   {
    "id": "rf_reactive_aggression_words_grievance_opposite-action",
@@ -3718,7 +3718,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: FAST (keep self-respect) as the alternative to Recover."
+   "rationale": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to delete this row before sign-off: the review opens on what the person did."
   },
   {
    "id": "rf_social_threat_shame_addresses_recovering-from-invalidation",
@@ -3932,7 +3932,7 @@
    "active": false,
    "version": "rf-v2",
    "reviewStatus": "draft",
-   "rationale": "Planned: FAST (keep self-respect) as the alternative to Recover."
+   "rationale": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to drop violated before sign-off: the review opens on what the person did."
   },
   {
    "id": "rf_social_threat_shame_words_self-worth_check-the-facts",

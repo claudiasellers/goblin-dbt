@@ -12,9 +12,9 @@ const content = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "u
 const review = content.skills.find((s) => s.id === "fast_review");
 const letGo = content.skills.find((s) => s.id === "fast_let_go");
 const embedOutputs = { boundaryLine: { ids: ["copied"] } };
-const ctx = (skill) => ({ skill, shared: content, carried: [], gridIds: new Set(), emotionLabel: (id) => id, embedOutputs });
-function run(skill, events) {
-  const c = ctx(skill);
+const ctx = (skill, ctxIn = {}) => ({ skill, shared: content, carried: [], gridIds: new Set(), emotionLabel: (id) => id, embedOutputs, ctxIn });
+function run(skill, events, ctxIn = {}) {
+  const c = ctx(skill, ctxIn);
   let s = M.initialRun(skill);
   for (const e of events) s = M.runNext(c, s, e);
   return s;
@@ -61,6 +61,17 @@ test("S: the values, two at most, a third swaps; the card is a list, not copyabl
   assert.deepEqual(run(review, [pick("what", "went_along"), next, pick("values", review.options.values[0].value), next]).path, ["what", "values", "card_s"]);
 });
 
+test("A: not sure about the sorry gets its own line and Check the Facts", () => {
+  const s = run(review, [pick("what", "over_sorry"), next, pick("sorry", "unsure"), next, pick("sorry_instead", "matters"), next, notCopied]);
+  assert.deepEqual(s.offered, ["check_the_facts"]);
+  assert.equal(M.handoffLine(ctx(review), M.stepOf(review, "next"), s), review.copy.next_line_unsure);
+});
+
+test("T covers excuses as well as bending the truth; F has the other person's side", () => {
+  assert.deepEqual(run(review, [pick("what", "made_excuse"), next, pick("truth", "real_answer"), next]).path, ["what", "truth", "card_t"]);
+  assert.ok(review.options.instead.some((o) => o.value === "both_sides"));
+});
+
 test("T and F: truth and instead each lead to their card; a dropped ask or own words offer DEAR MAN", () => {
   assert.deepEqual(run(review, [pick("what", "bent_truth"), next, pick("truth", "plainly"), next]).path, ["what", "truth", "card_t"]);
   const f = run(review, [pick("what", "dropped_ask"), next, pick("instead", "heres_what"), next, notCopied]);
@@ -79,11 +90,16 @@ test("the card only keeps what boundaryLine declares", () => {
 });
 
 test("Let go: a line, the card, then elsewhere with Recover; I don't need to say anything skips the card", () => {
+  assert.deepEqual(letGo.options.line.map((o) => o.value), ["not_keep_asking", "none", "hear_no", "not_today", "another_way", "not_argue"],
+    "five lines and saying nothing, second, so the screen fits a phone");
   const first = letGo.options.line[0].value;
   const s = run(letGo, [pick("line", first), next, copied]);
   assert.deepEqual(s.path, ["line", "card", "elsewhere"]);
   assert.deepEqual(s.offered, ["recover"], "Let it be and Finding connection are planned");
   assert.equal(M.handoffLine(ctx(letGo), M.stepOf(letGo, "elsewhere"), s), letGo.copy.elsewhere_line);
+  const heard = run(letGo, [pick("line", first), next, copied], { frame: "let_go" });
+  assert.equal(M.handoffLine(ctx(letGo, { frame: "let_go" }), M.stepOf(letGo, "elsewhere"), heard), letGo.copy.elsewhere_line_no,
+    "the acknowledgement only after a host's no, never on a flooded entry where no one may have said no");
   const none = run(letGo, [pick("line", "none"), next]);
   assert.deepEqual(none.path, ["line", "elsewhere"]);
   assert.equal(M.handoffLine(ctx(letGo), M.stepOf(letGo, "elsewhere"), none), letGo.copy.elsewhere_line_none);

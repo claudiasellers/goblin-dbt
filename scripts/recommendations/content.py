@@ -278,14 +278,14 @@ WORD_RULES = [
     {"key": "let-down", "pattern": "social_threat_shame", "tool": "give", "priority": 1.5, "words": ["let_down"],
      "why": "Planned: GIVE (keep the relationship) as the alternative to Recover."},
     {"key": "self-respect", "pattern": "social_threat_shame", "tool": "fast", "priority": 1.5, "words": ["betrayed", "disrespected", "violated"],
-     "why": "Planned: FAST (keep self-respect) as the alternative to Recover."},
+     "why": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to drop violated before sign-off: the review opens on what the person did."},
     # --- Ready to fight ---
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "opposite-action", "priority": WORD_LEAD, "words": ["bitter", "resentful"],
      "why": "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."},
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "check-the-facts", "priority": 0.4, "words": ["bitter", "resentful"],
      "why": "Planned: Check the Facts leads for resentment."},
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "fast", "priority": WORD_NEXT, "words": ["bitter", "resentful"],
-     "why": "Planned: FAST as the alternative."},
+     "why": "FAST as the alternative."},
     # --- On replay ---
     {"key": "aversion", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_LEAD, "words": DISGUST_WORDS + ["hesitant", "guilty", "remorseful"],
      "why": "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."},
@@ -298,7 +298,7 @@ WORD_RULES = [
     {"key": "low-shame", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_NEXT, "words": ["embarrassed", "ashamed"],
      "why": "Do the Opposite (unhiding) as the alternative for shame."},
     {"key": "victimized", "pattern": "rumination_loop", "tool": "fast", "priority": WORD_NEXT, "words": ["victimized"],
-     "why": "Planned: FAST (keep self-respect) as the alternative to Recover."},
+     "why": "FAST (keep self-respect) as the alternative to Recover. Clinical review (IE-B1) asks to delete this row before sign-off: the review opens on what the person did."},
     # --- Low drive ---
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["vulnerable", "fragile", "powerless"],
      "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},

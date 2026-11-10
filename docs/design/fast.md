@@ -29,16 +29,16 @@ The band is never asked, inferred or recorded here (D1, R2).
 
 | Step | Kind | What it asks | Next |
 |---|---|---|---|
-| `what` | ask, one pick, own words count | *Looking back, which of these happened?* (*Pick the one that sits worst.*) | by letter, below |
+| `what` | ask, one pick, own words count | *Looking back, which of these happened?* (*This happens to a lot of people. Pick the one you'd most like to change.*) | by letter, below |
 | `sorry` → `sorry_instead` → `card_a` | **A** | Was there a real wrong? What takes the place of the extra sorries? | the card |
 | `values` → `card_s` | **S** | Which value to keep (1–2, a third swaps out the older) | the card (a list, not copyable) |
-| `truth` → `card_t` | **T** | The true version (no helplessness, no exaggeration) | the card |
+| `truth` → `card_t` | **T** | The true version (no excuses, no helplessness, no exaggeration) | the card |
 | `instead` → `card_f` | **F** | What you'd say instead | the card |
 | `next` | hand-off, completes | one line; offers | exits |
 
 `what` chips, each tagged with its letter in props: *I said sorry more than I meant* (A), *I went along with
-something I don't agree with* (S), *I made it sound bigger or smaller than it was* (T), *I let them decide for me*
-(F), *I dropped what I was asking for* (F). Own words go to the F branch (what you'd say instead), since the
+something I don't agree with* (S), *I made it sound bigger or smaller than it was* (T), *I made up a reason
+instead of saying what was true* (T), *I let them decide for me* (F), *I dropped what I was asking for* (F). Own words go to the F branch (what you'd say instead), since the
 repair for an unnamed slip is your own next line.
 
 Hand-off offers (`next`):
@@ -49,19 +49,25 @@ Hand-off offers (`next`):
 | `what` is *dropped my ask*, *let them decide*, or own words with no chip | Ask for what you need (DEAR MAN) |
 | always | Rehearse it (`rehearse`, **planned**, hidden until IE-B5) |
 
-A real wrong changes the hand-off line: *A sorry for a real wrong is part of keeping your self-respect.* That
-line is the guard against FAST read as "never apologise" (PRD IE-05 risks).
+A real wrong changes the hand-off line: *A sorry for a real wrong is part of keeping your self-respect. Check the
+Facts can help with whether the guilt fits, and what would repair it.* *I'm not sure* gets *Not sure about the
+sorry? Check the Facts can help sort it out.* Those lines are the guard against FAST read as "never apologise"
+(PRD IE-05 risks), and they say why Check the Facts is offered, so it doesn't read as "check whether you were
+really wrong".
 
 ## Let go (`fast_let_go`, `fast-let-go-v1`)
 
 | Step | Kind | What it does |
 |---|---|---|
-| `line` | ask, one pick, own words | *You said what you needed, and that counts. Do you want a line that says where you stand?* Eight boundary lines, each saying what **you** will do, plus *I don't need to say anything* |
+| `line` | ask, one pick, own words | *Do you want a line that says where you stand?* Five boundary lines, each saying what **you** will do, with *I don't need to say anything* second |
 | `card` | embed `boundaryLine` | The line on the keepsake paper, Copy, Next. Skipped for *I don't need to say anything* |
-| `elsewhere` | hand-off, completes | *What you needed from them still matters. It can be met somewhere else.* Offers Recover; Let it be (DT-04) and Find your people (IE-09) are **planned** |
+| `elsewhere` | hand-off, completes | After a host's no (`?frame=let_go`): *You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.* (the acknowledgement and the one acceptance line, IE Arch #31). On a flooded entry with no frame, where no one may have said no: *What you needed still matters. It can be met somewhere else.* After *say nothing*: *Saying nothing is a choice too…* Offers Recover; Let it be (DT-04) and Find your people (IE-09) are **planned** |
 
-The first boundary line is Recover's *Let it land* line without its last sentence. Every line is short and
-non-attacking by construction, so it is usable while flooded (PRD IE-05 band branching).
+The reviewed set is eight lines (PRD: ≥ 8) in `BOUNDARY_LINES`; Let go serves five of them plus saying nothing
+(`SERVED_LINES`: *not_keep_asking*, *none*, *hear_no*, *not_today*, *another_way*, *not_argue*), so the screen and
+its quiet link fit one phone screen on a flooded entry. *see_differently*, *another_time* and *space* wait for the
+next hosts (Recover's Land in IE-B4, Ending in IE-08). *not_argue* is Recover's *Let it land* line without its last
+sentence. Every line is short and non-attacking, says what the person will do, and is usable while flooded.
 
 ## The `boundaryLine` embed
 
@@ -69,17 +75,18 @@ non-attacking by construction, so it is usable while flooded (PRD IE-05 band bra
 `EMBEDS` with one output id, `copied`. Props: `from` (the fields whose picks make the line, their labels joined,
 own words last), `copyable` (false for the values list), `labels`. **Never locked**, at any band: this is the
 primitive that replaces Recover's `boundaryLocked` copy lock (the swap itself is IE-B4's, with Recover's other
-locks). No clipboard falls back to selecting the line so it can be copied by hand. The step records
+locks). No clipboard falls back to selecting the line and saying so (*The line is selected, ready to copy.*, a
+status line). Focus stays on the step's title. A copyable card is one line; only the values card is a list. The step records
 `<card>_copied: ['copied']` when the copy went through, nothing otherwise.
 
 ## Mapping to the handout
 
 | IE 7 | Here |
 |---|---|
-| **F**air to yourself and the other person | *I let them decide for me* / *I dropped what I was asking for* → what you'd say instead (*Can we decide this together?*, *I'm still asking for what I asked for*) |
+| **F**air to yourself and the other person | *I let them decide for me* / *I dropped what I was asking for* → what you'd say instead: fair to you (*I'm still asking for what I asked for*, *That doesn't work for me*) and to them (*Can we decide this together?*, *I can see your side. Here's mine.*) |
 | No **A**pologies (unless one is warranted) | The one-sorry rule: one for a real wrong, none for having a need; the extra sorries swapped for *Thank you for hearing me out*, *This matters to me* |
 | **S**tick to values | The value you'd keep next time, one or two |
-| **T**ruthful (no lies, no acting helpless, no exaggerating) | The true version: *It's hard, and I can do some of it*, *It happens sometimes, not every time* |
+| **T**ruthful (no lies, no excuses, no acting helpless, no exaggerating) | *I made it sound bigger or smaller* / *I made up a reason* → the true version: *It's hard, and I can do some of it*, *It happens sometimes, not every time*, *I don't want to, and that's a real answer* |
 
 ## What's saved
 
@@ -121,12 +128,24 @@ close offers the tag row, like Check the Facts.
 | Recover dropping `boundaryLocked` and using this embed | IE-B4 |
 | `ADDRESSES` edges (unjustified guilt, cold shame, inferior, insignificant) | Clinical review |
 | `SkillPractice` reps `self_respect` / `let_go` | The spine's reps from a run (F2) |
+| Let go for an unsafe or refusing person (`reason=unsafe`): start on *I don't need to say anything* and hide the other lines (the PRD's "step away without saying anything") | The safety batch / IE-03. No host links `frame=let_go` until then |
+| Hiding the Recover offer when Recover is the host (no loop), and opening Recover at its need step | IE-B4 (Recover's `enterAt`) |
+| A shorter flooded line set (four lines plus *say nothing*) | A band ref in option conditions (`runtime:` PR) or a flooded skill; today's five lines are the compromise |
+| Check the Facts opening with *guilty* first | Check the Facts accepting context (`firstFrom`) |
 
 ## Sign-off
 
-Nothing here is gated on content sign-off (Check the Facts' precedent). What Claudia signs off before it
-matters: the three routing rows (drop from `BUILT_NOT_SIGNED_OFF`), and the eight boundary lines and the
-review copy if she wants them on the witness voice list.
+The skill copy isn't gated on content sign-off (Check the Facts' precedent). For Claudia:
+
+- **Boundary lines (review required, PRD IE-05 "≥ 8, reviewed"):** `not_argue`, `not_keep_asking`, `hear_no`,
+  `see_differently`, `not_today`, `another_time`, `space`, `another_way`. The clinical gate replaced two before
+  this PR: *…when we can both talk calmly* (implies they weren't) and *That doesn't work for me, and that hasn't
+  changed* (doesn't fit after their no to your ask).
+- **Routing rows** (drop from `BUILT_NOT_SIGNED_OFF`, row by row): `self-respect` (betrayed, disrespected,
+  violated), `grievance` (bitter, resentful), `victimized`. The clinical gate asks to drop *violated* and delete
+  the `victimized` row before switching on: after a violation, a review that opens on what *you* did reads as
+  self-blame. They came from the Oct routing review, so they're left for your call.
+- The review copy, if you want it on the witness voice list.
 
 ## The DEAR MAN content source (same batch)
 
