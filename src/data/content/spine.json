@@ -131,6 +131,68 @@
     },
     "followUpTypes": [
       {
+        "id": "check_fact",
+        "ownerModule": "er",
+        "tier": "quality",
+        "resolveMode": "inline",
+        "deepLinkTemplate": null,
+        "staleAfterHours": 72,
+        "missedPath": "none",
+        "notify": {
+          "ics": false,
+          "inTab": true,
+          "push": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "The one thing you wanted to know, from Check the Facts.",
+          "title": "Did you find out?"
+        },
+        "choices": [
+          {
+            "id": "fit",
+            "label": "Yes, and the feeling fit",
+            "status": "done"
+          },
+          {
+            "id": "didnt_fit",
+            "label": "Yes, and it didn't fit",
+            "status": "done"
+          },
+          {
+            "id": "still",
+            "label": "Still don't know",
+            "status": "partly"
+          },
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "snoozeHours": 3
+          }
+        ],
+        "window": {
+          "chips": {
+            "this_week": {
+              "days": 4,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "today": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "18:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
         "id": "cope_ahead_after",
         "ownerModule": "er",
         "tier": "quality",
@@ -669,6 +731,68 @@
           "kind": "derived"
         },
         "notification": ""
+      },
+      {
+        "id": "try_again",
+        "ownerModule": "er",
+        "tier": "quality",
+        "resolveMode": "inline",
+        "deepLinkTemplate": null,
+        "staleAfterHours": 72,
+        "missedPath": "none",
+        "notify": {
+          "ics": false,
+          "inTab": true,
+          "push": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "The skill you looked at in It isn't working. Did you try it again?",
+          "title": "Another go?"
+        },
+        "choices": [
+          {
+            "id": "helped",
+            "label": "Tried it, it helped",
+            "status": "done"
+          },
+          {
+            "id": "still_stuck",
+            "label": "Tried it, still stuck",
+            "status": "done"
+          },
+          {
+            "id": "not_yet",
+            "label": "Not yet",
+            "snoozeHours": 24
+          },
+          {
+            "id": "skip",
+            "label": "Skip",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "this_week": {
+              "days": 4,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "today": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "18:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A check-in you asked for is ready."
       },
       {
         "id": "two_pulls_checkback",

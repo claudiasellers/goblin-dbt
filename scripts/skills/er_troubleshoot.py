@@ -18,7 +18,7 @@ Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher
 ID = "er_troubleshoot"
 TOOL_ID = "er-troubleshoot"
 CONCEPT = "dbt_troubleshooting"
-VERSION = "et-v1"
+VERSION = "et-v1-1"
 OWN_MAX = 140
 
 COPY = {
@@ -56,6 +56,8 @@ COPY = {
     "fix_belief_heavy": "That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.",
     # Nothing stood out.
     "none": "Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.",
+    # v1.1 (F2's follow-up on a hand-off): a nudge to try again, on the cards whose move is another go.
+    "again_q": "Want a nudge to try it again?",
     "own_hint": "Say it your way",
     "next": "Next",
     "done": "Done",
@@ -133,25 +135,30 @@ def steps():
         step["next"] = transitions + [{"to": nxt}]
         out.append(step)
 
-    def fix(sid, line, offers, **extra):
+    def fix(sid, line, offers, again=False, **extra):
         lines = line if isinstance(line, list) else [{"when": ALWAYS, "key": line}]
-        return {"id": sid, "kind": "handoff", "complete": True, "lines": lines,
+        step = {"id": sid, "kind": "handoff", "complete": True, "lines": lines,
                 "offers": [{"exit": x, "when": ALWAYS} for x in offers], "done": "done", **extra}
+        if again:
+            # The reminder chips (R5 on a hand-off): optional; leaving the card with one picked schedules try_again.
+            step["fields"] = [{"id": f"again_{sid}", "label": "again_q", "max": 1, "options": {"list": "again"}}]
+            step["followUp"] = {"type": "try_again", "whenFrom": f"again_{sid}"}
+        return step
 
     out += [
-        fix("fix_body", "fix_body", ["please"]),
+        fix("fix_body", "fix_body", ["please"], again=True),
         fix("fix_fit", "fix_fit", ["problem_solve", "mindfulness_emotions", "let_it_be"]),
         fix("fix_fit_unsure", "fix_fit_unsure", ["check_the_facts"]),
         # The PRD's move is the line itself: the skill that didn't help is the one to retry, smaller and whole.
-        fix("fix_way", "fix_way", []),
+        fix("fix_way", "fix_way", [], again=True),
         fix("fix_env", "fix_env", ["problem_solve"]),
-        fix("fix_will", "fix_will", ["let_it_be"]),
-        fix("fix_much", "fix_much", ["problem_solve", "five_senses"]),
+        fix("fix_will", "fix_will", ["let_it_be"], again=True),
+        fix("fix_much", "fix_much", ["problem_solve", "five_senses"], again=True),
         {**fix("fix_belief", [{"when": HOPELESS, "key": "fix_belief_heavy"}, {"when": ALWAYS, "key": "fix_belief"}],
                ["emotion_guide"], crisis=[{"variant": "crisis", "when": HOPELESS}]),
          # Hopelessness: someone to talk to, and Done; no myth cards and no reappraisal (voice.md S9, crisis speech).
          "offers": [{"exit": "safety_open", "when": HOPELESS}, {"exit": "emotion_guide", "when": {"not": HOPELESS}}]},
-        fix("none", "none", ["missing_links"]),
+        fix("none", "none", ["missing_links"], again=True),
     ]
     return out
 
@@ -170,8 +177,13 @@ EXITS = [
 ]
 
 
+# The try_again follow-up's window chips (scripts/practice-spine/content.py). Kept vague: no dates.
+AGAIN = [("today", "Tonight"), ("tomorrow", "Tomorrow"), ("this_week", "Later this week")]
+
+
 def options():
-    return [(fid, v, label, props, None) for _s, fid, _t, _h, _l, opts, _y in CHECKS for v, label, props in opts]
+    out = [(fid, v, label, props, None) for _s, fid, _t, _h, _l, opts, _y in CHECKS for v, label, props in opts]
+    return out + [("again", v, label, {}, None) for v, label in AGAIN]
 
 
 SKILL = {

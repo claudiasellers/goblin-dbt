@@ -1,7 +1,7 @@
 # It isn't working (ER-14)
 
 Written 10 Nov 2026. Status: **built on the skill runtime** (batch ER-B1 of
-[the modules plan](dbt-modules-plan.md), first PR, F1 only). Source: `scripts/skills/er_troubleshoot.py`;
+[the modules plan](dbt-modules-plan.md); v1.1, the nudge to try again, in its second PR). Source: `scripts/skills/er_troubleshoot.py`;
 played by the skill player (`src/lib/skillRuntime/playerTools.ts`); tests `tests/skill-er-troubleshoot.test.mjs`.
 Spec: PRD ER-14 in `PRD – Emotion Regulation.md` (§5), DBT ER Handout 24 (troubleshooting emotion
 regulation skills).
@@ -71,8 +71,11 @@ linked by `hostSessionId`. No new label, no ask-fresh field, no profile write.
 
 - **The checks stop at the first yes.** The PRD lets the rest be answered after the fix. A hand-off can't go back
   into the checks without a runtime capability, and one fix at a time is the point. Revisit if people want it.
-- **No follow-up yet.** "One next move + FollowUp" needs the follow-up action (R5, F2). Lands with the rest of
-  ER-B1 after F2.
+- **The follow-up is a nudge to try again** (v1.1, ER-B1 second PR): *Want a nudge to try it again? Tonight ·
+  Tomorrow · Later this week* on the cards whose move is another go (body, all the way, willingness, too much,
+  nothing stood out), scheduled as the card is left (`try_again`: "Another go?", *Tried it, it helped · Tried
+  it, still stuck · Not yet · Skip*). Not on the cards that hand to another tool (that tool's own follow-up
+  is the next step), and never on the belief card, so never beside the crisis banner.
 - **No "last three times it was the body".** That is an aggregate over past runs; a live flow never reads the log
   (data layers). Reflect can show it from `ext.run` when the router or Reflect work picks it up.
 - **Flooded is a quiet grounding link, not P2 first.** The PRD says "flooded → ER-01 first". P2 is the
@@ -81,8 +84,8 @@ linked by `hostSessionId`. No new label, no ask-fresh field, no profile write.
   retry is the one that didn't help, which the skill can't know yet (no host id in context). Sending everyone
   to Do the Opposite was dropped: it's contraindicated for dissociation and wrong after Problem Solve.
 - **Four fix cards end on Done** (body, all the way, willingness, belief) and so does *nothing stood out*,
-  until Running low, Let it be, the myth cards, missing links and F2's follow-up ("try it again another day")
-  land. Their lines are the move meanwhile.
+  until Running low, Let it be, the myth cards and missing links land. Their lines and the nudge to try
+  again are the move meanwhile.
 - **The check for reinforcers offers Problem Solve,** since the PRD's target is WMP behaviour-change content that
   doesn't exist as a tool. The line carries the explanation.
 - **`ToolSession` + `ext.run`, not a `SkillPractice` rep** (D2).

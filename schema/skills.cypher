@@ -8,53 +8,58 @@
 // ============================================================
 
 
-// --- check_the_facts (cf-v1-1) ---
+// --- check_the_facts (cf-v1-2) ---
 MERGE (s:Skill {id: "check_the_facts"})
-SET s += {toolId: "check-the-facts", version: "cf-v1-1", contentVersion: "skills-v1", start: "feel", ownMax: 140, emotionFields: ["feel"], accepts: []}, s.inlineJson = "null", s.copyJson = "{\"alt_note\": \"You don't have to believe them. Notice that they're possible.\", \"alt_title\": \"What else could explain it?\", \"done\": \"Done\", \"entry_oa\": \"Go through it slowly with Check the Facts\", \"event_own_hint\": \"Only what happened, no why.\", \"event_title\": \"What happened, as a camera would have caught it?\", \"feel_more\": \"Something else\", \"feel_title\": \"What's the feeling you want to check?\", \"fits_title\": \"Here's when feeling {feeling} fits the facts. Does one of these match what happened?\", \"fits_title_general\": \"Does feeling {feeling} fit what happened?\", \"likely_q\": \"How likely is it, really?\", \"next\": \"Next\", \"next_fits\": \"When a feeling fits, the move is to work on the situation.\", \"next_no\": \"The feeling is bigger than the facts. Acting opposite to its urge helps it settle.\", \"next_partly\": \"The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.\", \"next_unsure\": \"That's all right. Sometimes the facts come later.\", \"not_sure\": \"Not sure\", \"own_hint\": \"Say it your way\", \"safe_line\": \"Your read of danger is the one that counts here. You don't have to check it against anything.\", \"safety_open\": \"Talk to someone now\", \"story_hint\": \"Pick one or two.\", \"story_title\": \"What's the story you're telling yourself about it?\", \"threat_title\": \"What are you afraid will happen?\", \"through_cope_ahead\": \"Plan for it with Cope Ahead\", \"through_q\": \"If it did happen, could you get through it?\"}", s.tablesJson = "{\"storySetOf\": {\"anger\": \"anger\", \"fear\": \"fear\", \"guilt\": \"guilt\", \"sadness\": \"sadness\", \"shame\": \"shame\"}}", s.deriveJson = "[{\"from\": \"$a.feel\", \"name\": \"parent\", \"table\": \"parentOf\"}, {\"default\": \"general\", \"from\": \"$d.parent\", \"name\": \"set\", \"table\": \"storySetOf\"}, {\"from\": \"$d.parent\", \"keep\": \"key\", \"name\": \"fitsParent\", \"table\": \"fitsWhen\"}]";
+SET s += {toolId: "check-the-facts", version: "cf-v1-2", contentVersion: "skills-v1", start: "feel", ownMax: 140, emotionFields: ["feel"], accepts: []}, s.inlineJson = "null", s.copyJson = "{\"alt_note\": \"You don't have to believe them. Notice that they're possible.\", \"alt_title\": \"What else could explain it?\", \"done\": \"Done\", \"entry_oa\": \"Go through it slowly with Check the Facts\", \"event_own_hint\": \"Only what happened, no why.\", \"event_title\": \"What happened, as a camera would have caught it?\", \"feel_more\": \"Something else\", \"feel_title\": \"What's the feeling you want to check?\", \"fits_title\": \"Here's when feeling {feeling} fits the facts. Does one of these match what happened?\", \"fits_title_general\": \"Does feeling {feeling} fit what happened?\", \"likely_q\": \"How likely is it, really?\", \"missing_hint\": \"Not knowing is an answer. The move is one fact, not a decision.\", \"missing_title\": \"What's one thing you could find out?\", \"next\": \"Next\", \"next_fits\": \"When a feeling fits, the move is to work on the situation.\", \"next_no\": \"The feeling is bigger than the facts. Acting opposite to its urge helps it settle.\", \"next_partly\": \"The feeling makes sense, and it's turned up loud. Bring the volume down, then work on what's left.\", \"next_unsure\": \"That's all right. Sometimes the facts come later.\", \"not_sure\": \"Not sure\", \"own_hint\": \"Say it your way\", \"safe_line\": \"Your read of danger is the one that counts here. You don't have to check it against anything.\", \"safety_open\": \"Talk to someone now\", \"story_hint\": \"Pick one or two.\", \"story_title\": \"What's the story you're telling yourself about it?\", \"threat_title\": \"What are you afraid will happen?\", \"through_cope_ahead\": \"Plan for it with Cope Ahead\", \"through_q\": \"If it did happen, could you get through it?\", \"when_q\": \"Want me to ask later if you found out?\"}", s.tablesJson = "{\"storySetOf\": {\"anger\": \"anger\", \"fear\": \"fear\", \"guilt\": \"guilt\", \"sadness\": \"sadness\", \"shame\": \"shame\"}}", s.deriveJson = "[{\"from\": \"$a.feel\", \"name\": \"parent\", \"table\": \"parentOf\"}, {\"default\": \"general\", \"from\": \"$d.parent\", \"name\": \"set\", \"table\": \"storySetOf\"}, {\"from\": \"$d.parent\", \"keep\": \"key\", \"name\": \"fitsParent\", \"table\": \"fitsWhen\"}]";
 MATCH (t:TherapyConcept {id: "dbt_check_facts"}), (s:Skill {id: "check_the_facts"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "check_the_facts"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "check_the_facts"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "check_the_facts:feel"})
-SET n += {skillId: "check_the_facts", step: "feel", kind: "ask", version: "cf-v1-1"}, n.specJson = "{\"fields\": [{\"emotion\": true, \"id\": \"feel\", \"max\": 1, \"options\": {\"carriedFirst\": true, \"emotions\": [\"anxious\", \"worried\", \"annoyed\", \"angry\", \"hurt\", \"guilty\", \"ashamed\", \"embarrassed\"], \"moreKey\": \"feel_more\"}, \"required\": true}], \"title\": \"feel_title\"}";
+SET n += {skillId: "check_the_facts", step: "feel", kind: "ask", version: "cf-v1-2"}, n.specJson = "{\"fields\": [{\"emotion\": true, \"id\": \"feel\", \"max\": 1, \"options\": {\"carriedFirst\": true, \"emotions\": [\"anxious\", \"worried\", \"annoyed\", \"angry\", \"hurt\", \"guilty\", \"ashamed\", \"embarrassed\"], \"moreKey\": \"feel_more\"}, \"required\": true}], \"title\": \"feel_title\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:feel"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
 MERGE (n:SkillStep {id: "check_the_facts:event"})
-SET n += {skillId: "check_the_facts", step: "event", kind: "ask", version: "cf-v1-1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.event\", [\"threatened\", \"hurt_me\", \"unsafe\"]]}}], \"fields\": [{\"id\": \"event\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"own\": \"event\"}}], \"max\": 1, \"options\": {\"list\": \"event\"}, \"own\": {\"countsAsPick\": false, \"hint\": \"event_own_hint\", \"open\": true}, \"required\": true}], \"title\": \"event_title\"}";
+SET n += {skillId: "check_the_facts", step: "event", kind: "ask", version: "cf-v1-2"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.event\", [\"threatened\", \"hurt_me\", \"unsafe\"]]}}], \"fields\": [{\"id\": \"event\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"own\": \"event\"}}], \"max\": 1, \"options\": {\"list\": \"event\"}, \"own\": {\"countsAsPick\": false, \"hint\": \"event_own_hint\", \"open\": true}, \"required\": true}], \"title\": \"event_title\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:event"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
 MERGE (n:SkillStep {id: "check_the_facts:story"})
-SET n += {skillId: "check_the_facts", step: "story", kind: "ask", version: "cf-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"story\", \"max\": 2, \"options\": {\"list\": \"story\", \"where\": {\"eq\": [\"$opt.set\", \"$d.set\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\"}, \"swap\": true}], \"hint\": \"story_hint\", \"slots\": [{\"after\": \"story\", \"embed\": \"partsLine\", \"props\": {\"promptId\": \"cf_unblend\"}, \"record\": \"unblend\", \"showWhen\": {\"set\": \"$a.story\"}}], \"title\": \"story_title\"}";
+SET n += {skillId: "check_the_facts", step: "story", kind: "ask", version: "cf-v1-2"}, n.specJson = "{\"fields\": [{\"id\": \"story\", \"max\": 2, \"options\": {\"list\": \"story\", \"where\": {\"eq\": [\"$opt.set\", \"$d.set\"]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\"}, \"swap\": true}], \"hint\": \"story_hint\", \"slots\": [{\"after\": \"story\", \"embed\": \"partsLine\", \"props\": {\"promptId\": \"cf_unblend\"}, \"record\": \"unblend\", \"showWhen\": {\"set\": \"$a.story\"}}], \"title\": \"story_title\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:story"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "check_the_facts:alt"})
-SET n += {skillId: "check_the_facts", step: "alt", kind: "ask", version: "cf-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"alt\", \"max\": 9, \"options\": {\"groupBy\": \"story\", \"list\": \"alt\", \"ownGroup\": \"own_story\"}, \"own\": {\"countsAsPick\": false, \"hint\": \"own_hint\"}}], \"note\": \"alt_note\", \"title\": \"alt_title\"}";
+SET n += {skillId: "check_the_facts", step: "alt", kind: "ask", version: "cf-v1-2"}, n.specJson = "{\"fields\": [{\"id\": \"alt\", \"max\": 9, \"options\": {\"groupBy\": \"story\", \"list\": \"alt\", \"ownGroup\": \"own_story\"}, \"own\": {\"countsAsPick\": false, \"hint\": \"own_hint\"}}], \"note\": \"alt_note\", \"title\": \"alt_title\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:alt"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "check_the_facts:threat"})
-SET n += {skillId: "check_the_facts", step: "threat", kind: "ask", version: "cf-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"threat\", \"max\": 1, \"options\": {\"list\": \"threat\", \"where\": {\"any\": [{\"has\": [\"$opt.parents\", \"$d.parent\"]}, {\"not\": {\"set\": \"$d.parent\"}}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\"}}, {\"id\": \"likely\", \"label\": \"likely_q\", \"max\": 1, \"options\": {\"list\": \"likely\"}, \"showWhen\": {\"all\": [{\"set\": \"$a.threat\"}, {\"not\": {\"eq\": [\"$a.threat\", \"none\"]}}]}}, {\"id\": \"through\", \"label\": \"through_q\", \"links\": [{\"exit\": \"cope_ahead\", \"label\": \"through_cope_ahead\", \"when\": {\"set\": \"$a.through\"}}], \"max\": 1, \"options\": {\"list\": \"through\"}, \"showWhen\": {\"all\": [{\"all\": [{\"set\": \"$a.threat\"}, {\"not\": {\"eq\": [\"$a.threat\", \"none\"]}}]}, {\"set\": \"$a.likely\"}]}}], \"title\": \"threat_title\"}";
+SET n += {skillId: "check_the_facts", step: "threat", kind: "ask", version: "cf-v1-2"}, n.specJson = "{\"fields\": [{\"id\": \"threat\", \"max\": 1, \"options\": {\"list\": \"threat\", \"where\": {\"any\": [{\"has\": [\"$opt.parents\", \"$d.parent\"]}, {\"not\": {\"set\": \"$d.parent\"}}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\"}}, {\"id\": \"likely\", \"label\": \"likely_q\", \"max\": 1, \"options\": {\"list\": \"likely\"}, \"showWhen\": {\"all\": [{\"set\": \"$a.threat\"}, {\"not\": {\"eq\": [\"$a.threat\", \"none\"]}}]}}, {\"id\": \"through\", \"label\": \"through_q\", \"links\": [{\"exit\": \"cope_ahead\", \"label\": \"through_cope_ahead\", \"when\": {\"set\": \"$a.through\"}}], \"max\": 1, \"options\": {\"list\": \"through\"}, \"showWhen\": {\"all\": [{\"all\": [{\"set\": \"$a.threat\"}, {\"not\": {\"eq\": [\"$a.threat\", \"none\"]}}]}, {\"set\": \"$a.likely\"}]}}], \"title\": \"threat_title\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:threat"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "check_the_facts:fits"})
-SET n += {skillId: "check_the_facts", step: "fits", kind: "ask", version: "cf-v1-1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"fitsFacts\", \"id\": \"fits\", \"list\": {\"key\": \"$d.fitsParent\", \"table\": \"fitsWhen\"}, \"max\": 1, \"options\": {\"list\": \"fits\"}, \"required\": true}], \"title\": [{\"key\": \"fits_title\", \"when\": {\"set\": \"$d.fitsParent\"}}, {\"key\": \"fits_title_general\"}], \"titleSlots\": {\"feeling\": {\"labelOf\": \"feel\"}}}";
+SET n += {skillId: "check_the_facts", step: "fits", kind: "ask", version: "cf-v1-2"}, n.specJson = "{\"fields\": [{\"askFresh\": \"fitsFacts\", \"id\": \"fits\", \"list\": {\"key\": \"$d.fitsParent\", \"table\": \"fitsWhen\"}, \"max\": 1, \"options\": {\"list\": \"fits\"}, \"required\": true}], \"title\": [{\"key\": \"fits_title\", \"when\": {\"set\": \"$d.fitsParent\"}}, {\"key\": \"fits_title_general\"}], \"titleSlots\": {\"feeling\": {\"labelOf\": \"feel\"}}}";
 MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:fits"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
-MERGE (n:SkillStep {id: "check_the_facts:next"})
-SET n += {skillId: "check_the_facts", step: "next", kind: "handoff", version: "cf-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"next_fits\", \"when\": {\"eq\": [\"$a.fits\", \"fits\"]}}, {\"key\": \"next_partly\", \"when\": {\"eq\": [\"$a.fits\", \"partly\"]}}, {\"key\": \"next_no\", \"when\": {\"eq\": [\"$a.fits\", \"doesnt_fit\"]}}, {\"key\": \"next_unsure\", \"when\": {\"eq\": [\"$a.fits\", \"unsure\"]}}]}";
-MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:next"})
+MERGE (n:SkillStep {id: "check_the_facts:missing"})
+SET n += {skillId: "check_the_facts", step: "missing", kind: "ask", version: "cf-v1-2"}, n.specJson = "{\"fields\": [{\"id\": \"fact\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"own\": \"fact\"}}], \"max\": 1, \"options\": {\"list\": \"fact\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\", \"max\": 60}}, {\"id\": \"when\", \"label\": \"when_q\", \"max\": 1, \"options\": {\"list\": \"when\"}}], \"followUp\": {\"type\": \"check_fact\", \"when\": {\"set\": \"$a.when\"}, \"whenFrom\": \"when\"}, \"hint\": \"missing_hint\", \"title\": \"missing_title\"}";
+MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:missing"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
-MERGE (n:SkillStep {id: "check_the_facts:safe"})
-SET n += {skillId: "check_the_facts", step: "safe", kind: "handoff", version: "cf-v1-1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.event\", [\"threatened\", \"hurt_me\", \"unsafe\"]]}}], \"done\": \"done\", \"lines\": [{\"key\": \"safe_line\", \"when\": {\"in\": [\"$a.event\", [\"threatened\", \"hurt_me\", \"unsafe\"]]}}], \"noClose\": true}";
-MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:safe"})
+MERGE (n:SkillStep {id: "check_the_facts:next"})
+SET n += {skillId: "check_the_facts", step: "next", kind: "handoff", version: "cf-v1-2"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"next_fits\", \"when\": {\"eq\": [\"$a.fits\", \"fits\"]}}, {\"key\": \"next_partly\", \"when\": {\"eq\": [\"$a.fits\", \"partly\"]}}, {\"key\": \"next_no\", \"when\": {\"eq\": [\"$a.fits\", \"doesnt_fit\"]}}, {\"key\": \"next_unsure\", \"when\": {\"eq\": [\"$a.fits\", \"unsure\"]}}]}";
+MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:next"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
+MERGE (n:SkillStep {id: "check_the_facts:safe"})
+SET n += {skillId: "check_the_facts", step: "safe", kind: "handoff", version: "cf-v1-2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"in\": [\"$a.event\", [\"threatened\", \"hurt_me\", \"unsafe\"]]}}], \"done\": \"done\", \"lines\": [{\"key\": \"safe_line\", \"when\": {\"in\": [\"$a.event\", [\"threatened\", \"hurt_me\", \"unsafe\"]]}}], \"noClose\": true}";
+MATCH (s:Skill {id: "check_the_facts"}), (n:SkillStep {id: "check_the_facts:safe"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
 MERGE (x:SkillExit {id: "check_the_facts:problem_solve"})
 SET x += {skillId: "check_the_facts", exit: "problem_solve", toolId: "problem-solve", done: false, carry: ["feel"], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (x:SkillExit {id: "check_the_facts:problem_solve"})
@@ -132,9 +137,18 @@ SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "check_the_facts:threat"}), (x:SkillExit {id: "check_the_facts:cope_ahead"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "through", label: "through_cope_ahead"}, r.whenJson = "{\"set\": \"$a.through\"}";
+MATCH (a:SkillStep {id: "check_the_facts:fits"}), (b:SkillStep {id: "check_the_facts:missing"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.fits\", \"unsure\"]}";
 MATCH (a:SkillStep {id: "check_the_facts:fits"}), (b:SkillStep {id: "check_the_facts:next"})
 MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "check_the_facts:missing"}), (b:SkillStep {id: "check_the_facts:next"})
+MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "check_the_facts:missing"}), (x:SkillExit {id: "check_the_facts:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "fact", label: "safety_open"}, r.whenJson = "{\"own\": \"fact\"}";
 MATCH (a:SkillStep {id: "check_the_facts:next"}), (x:SkillExit {id: "check_the_facts:problem_solve"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.fits\", \"fits\"]}}, {\"order\": 3, \"when\": {\"eq\": [\"$a.fits\", \"partly\"]}}]";
@@ -154,705 +168,740 @@ MATCH (a:SkillStep {id: "check_the_facts:next"}), (x:SkillExit {id: "check_the_f
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 6}, r.rowsJson = "[{\"order\": 6, \"when\": {\"eq\": [\"$a.fits\", \"fits\"]}}]";
 MERGE (o:SkillOption {id: "check_the_facts:event:said"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "said", label: "Someone said something", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "said", label: "Someone said something", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:said"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 0};
 MERGE (o:SkillOption {id: "check_the_facts:event:didnt"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "didnt", label: "Someone didn't do something", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "didnt", label: "Someone didn't do something", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:didnt"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 1};
 MERGE (o:SkillOption {id: "check_the_facts:event:saw"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "saw", label: "Something I saw or read", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "saw", label: "Something I saw or read", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:saw"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 2};
 MERGE (o:SkillOption {id: "check_the_facts:event:thought"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "thought", label: "A thought or a memory", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "thought", label: "A thought or a memory", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:thought"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 3};
 MERGE (o:SkillOption {id: "check_the_facts:event:threatened"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "threatened", label: "Someone threatened me", version: "cf-v1-1"}, o.propsJson = "{\"danger\": \"other\"}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "threatened", label: "Someone threatened me", version: "cf-v1-2"}, o.propsJson = "{\"danger\": \"other\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:threatened"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 4};
 MERGE (o:SkillOption {id: "check_the_facts:event:hurt_me"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "hurt_me", label: "Someone hurt me", version: "cf-v1-1"}, o.propsJson = "{\"danger\": \"other\"}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "hurt_me", label: "Someone hurt me", version: "cf-v1-2"}, o.propsJson = "{\"danger\": \"other\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:hurt_me"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 5};
 MERGE (o:SkillOption {id: "check_the_facts:event:unsafe"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "unsafe", label: "I'm not safe with them", version: "cf-v1-1"}, o.propsJson = "{\"danger\": \"other\"}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "unsafe", label: "I'm not safe with them", version: "cf-v1-2"}, o.propsJson = "{\"danger\": \"other\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:unsafe"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 6};
 MERGE (o:SkillOption {id: "check_the_facts:event:cant_name"})
-SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "cant_name", label: "I can't name it", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:FactsEventKind, o += {skillId: "check_the_facts", list: "event", value: "cant_name", label: "I can't name it", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:event:cant_name"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "event", order: 7};
 MERGE (o:SkillOption {id: "check_the_facts:story:fear_bad_coming"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_bad_coming", label: "Something bad is about to happen", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_bad_coming", label: "Something bad is about to happen", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:fear_bad_coming"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 8};
 MATCH (c:EmotionRegulationContent {dbtParent: "fear"}), (o:SkillOption {id: "check_the_facts:story:fear_bad_coming"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:fear_wont_cope"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_wont_cope", label: "I won't be able to handle it", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_wont_cope", label: "I won't be able to handle it", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:fear_wont_cope"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 9};
 MATCH (c:EmotionRegulationContent {dbtParent: "fear"}), (o:SkillOption {id: "check_the_facts:story:fear_wont_cope"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:fear_theyll_leave"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_theyll_leave", label: "They're going to leave me", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_theyll_leave", label: "They're going to leave me", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:fear_theyll_leave"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 10};
 MATCH (c:EmotionRegulationContent {dbtParent: "fear"}), (o:SkillOption {id: "check_the_facts:story:fear_theyll_leave"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:fear_theyll_see"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_theyll_see", label: "Everyone will see I'm not good enough", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "fear_theyll_see", label: "Everyone will see I'm not good enough", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"fear\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:fear_theyll_see"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 11};
 MATCH (c:EmotionRegulationContent {dbtParent: "fear"}), (o:SkillOption {id: "check_the_facts:story:fear_theyll_see"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:anger_on_purpose"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_on_purpose", label: "They did it on purpose", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"anger\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_on_purpose", label: "They did it on purpose", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"anger\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:anger_on_purpose"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 12};
 MATCH (c:EmotionRegulationContent {dbtParent: "anger"}), (o:SkillOption {id: "check_the_facts:story:anger_on_purpose"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:anger_no_respect"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_no_respect", label: "They don't respect me", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"anger\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_no_respect", label: "They don't respect me", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"anger\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:anger_no_respect"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 13};
 MATCH (c:EmotionRegulationContent {dbtParent: "anger"}), (o:SkillOption {id: "check_the_facts:story:anger_no_respect"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:anger_always"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_always", label: "This always happens", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"anger\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_always", label: "This always happens", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"anger\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:anger_always"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 14};
 MATCH (c:EmotionRegulationContent {dbtParent: "anger"}), (o:SkillOption {id: "check_the_facts:story:anger_always"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:anger_unfair"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_unfair", label: "It isn't fair", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"anger\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "anger_unfair", label: "It isn't fair", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"anger\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:anger_unfair"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 15};
 MATCH (c:EmotionRegulationContent {dbtParent: "anger"}), (o:SkillOption {id: "check_the_facts:story:anger_unfair"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:sad_gone"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "sad_gone", label: "It's gone for good", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"sadness\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "sad_gone", label: "It's gone for good", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"sadness\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:sad_gone"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 16};
 MATCH (c:EmotionRegulationContent {dbtParent: "sadness"}), (o:SkillOption {id: "check_the_facts:story:sad_gone"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:sad_nobody_cares"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "sad_nobody_cares", label: "Nobody cares about me", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"sadness\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "sad_nobody_cares", label: "Nobody cares about me", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"sadness\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:sad_nobody_cares"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 17};
 MATCH (c:EmotionRegulationContent {dbtParent: "sadness"}), (o:SkillOption {id: "check_the_facts:story:sad_nobody_cares"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:sad_never_better"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "sad_never_better", label: "It'll never get better", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"sadness\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "sad_never_better", label: "It'll never get better", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"sadness\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:sad_never_better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 18};
 MATCH (c:EmotionRegulationContent {dbtParent: "sadness"}), (o:SkillOption {id: "check_the_facts:story:sad_never_better"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:shame_wrong_with_me"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "shame_wrong_with_me", label: "There's something wrong with me", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"shame\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "shame_wrong_with_me", label: "There's something wrong with me", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"shame\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:shame_wrong_with_me"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 19};
 MATCH (c:EmotionRegulationContent {dbtParent: "shame"}), (o:SkillOption {id: "check_the_facts:story:shame_wrong_with_me"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:shame_think_less"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "shame_think_less", label: "They think less of me now", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"shame\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "shame_think_less", label: "They think less of me now", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"shame\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:shame_think_less"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 20};
 MATCH (c:EmotionRegulationContent {dbtParent: "shame"}), (o:SkillOption {id: "check_the_facts:story:shame_think_less"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:shame_if_they_knew"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "shame_if_they_knew", label: "If they knew, they'd turn away", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"shame\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "shame_if_they_knew", label: "If they knew, they'd turn away", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"shame\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:shame_if_they_knew"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 21};
 MATCH (c:EmotionRegulationContent {dbtParent: "shame"}), (o:SkillOption {id: "check_the_facts:story:shame_if_they_knew"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:guilt_hurt_them"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "guilt_hurt_them", label: "I hurt someone", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"guilt\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "guilt_hurt_them", label: "I hurt someone", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"guilt\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:guilt_hurt_them"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 22};
 MATCH (c:EmotionRegulationContent {dbtParent: "guilt"}), (o:SkillOption {id: "check_the_facts:story:guilt_hurt_them"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:guilt_not_enough"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "guilt_not_enough", label: "I didn't do enough", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"guilt\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "guilt_not_enough", label: "I didn't do enough", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"guilt\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:guilt_not_enough"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 23};
 MATCH (c:EmotionRegulationContent {dbtParent: "guilt"}), (o:SkillOption {id: "check_the_facts:story:guilt_not_enough"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:guilt_bad_person"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "guilt_bad_person", label: "I'm a bad person", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"guilt\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "guilt_bad_person", label: "I'm a bad person", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"guilt\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:guilt_bad_person"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 24};
 MATCH (c:EmotionRegulationContent {dbtParent: "guilt"}), (o:SkillOption {id: "check_the_facts:story:guilt_bad_person"})
 MERGE (c)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:gen_my_fault"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "gen_my_fault", label: "It's my fault", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": false, \"set\": \"general\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "gen_my_fault", label: "It's my fault", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": false, \"set\": \"general\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:gen_my_fault"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 25};
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:gen_my_fault"})
 MERGE (s)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:gen_go_wrong"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "gen_go_wrong", label: "It's going to go wrong", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"general\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "gen_go_wrong", label: "It's going to go wrong", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"general\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:gen_go_wrong"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 26};
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:gen_go_wrong"})
 MERGE (s)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:story:gen_against_me"})
-SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "gen_against_me", label: "They're against me", version: "cf-v1-1"}, o.propsJson = "{\"predicts\": true, \"set\": \"general\"}";
+SET o:SkillOption:Interpretation, o += {skillId: "check_the_facts", list: "story", value: "gen_against_me", label: "They're against me", version: "cf-v1-2"}, o.propsJson = "{\"predicts\": true, \"set\": \"general\"}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:gen_against_me"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "story", order: 27};
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:story:gen_against_me"})
 MERGE (s)-[:HAS_INTERPRETATION]->(o);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_bad_coming_alt1", label: "Nothing bad has happened yet", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_bad_coming_alt1", label: "Nothing bad has happened yet", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 28};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt1"}), (st:SkillOption {id: "check_the_facts:story:fear_bad_coming"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_bad_coming_alt2", label: "It could go several ways", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_bad_coming_alt2", label: "It could go several ways", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 29};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt2"}), (st:SkillOption {id: "check_the_facts:story:fear_bad_coming"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_bad_coming_alt3", label: "I'd see it coming and could act", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_bad_coming_alt3", label: "I'd see it coming and could act", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 30};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_bad_coming_alt3"}), (st:SkillOption {id: "check_the_facts:story:fear_bad_coming"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_wont_cope_alt1", label: "I've handled hard things before", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_wont_cope_alt1", label: "I've handled hard things before", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 31};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt1"}), (st:SkillOption {id: "check_the_facts:story:fear_wont_cope"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_wont_cope_alt2", label: "I'd have help", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_wont_cope_alt2", label: "I'd have help", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 32};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt2"}), (st:SkillOption {id: "check_the_facts:story:fear_wont_cope"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_wont_cope_alt3", label: "I won't know until I'm there", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_wont_cope_alt3", label: "I won't know until I'm there", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 33};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_wont_cope_alt3"}), (st:SkillOption {id: "check_the_facts:story:fear_wont_cope"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_leave_alt1", label: "They're busy, not leaving", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_leave_alt1", label: "They're busy, not leaving", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 34};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt1"}), (st:SkillOption {id: "check_the_facts:story:fear_theyll_leave"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_leave_alt2", label: "One moment isn't the whole relationship", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_leave_alt2", label: "One moment isn't the whole relationship", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 35};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt2"}), (st:SkillOption {id: "check_the_facts:story:fear_theyll_leave"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_leave_alt3", label: "I could ask them", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_leave_alt3", label: "I could ask them", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 36};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_theyll_leave_alt3"}), (st:SkillOption {id: "check_the_facts:story:fear_theyll_leave"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_see_alt1", label: "Most people are thinking about themselves", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_see_alt1", label: "Most people are thinking about themselves", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 37};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt1"}), (st:SkillOption {id: "check_the_facts:story:fear_theyll_see"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_see_alt2", label: "One mistake isn't who I am", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_see_alt2", label: "One mistake isn't who I am", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 38};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt2"}), (st:SkillOption {id: "check_the_facts:story:fear_theyll_see"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_see_alt3", label: "Someone might not notice at all", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "fear_theyll_see_alt3", label: "Someone might not notice at all", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 39};
 MATCH (o:SkillOption {id: "check_the_facts:alt:fear_theyll_see_alt3"}), (st:SkillOption {id: "check_the_facts:story:fear_theyll_see"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_on_purpose_alt1", label: "They were distracted or stressed", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_on_purpose_alt1", label: "They were distracted or stressed", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 40};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt1"}), (st:SkillOption {id: "check_the_facts:story:anger_on_purpose"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_on_purpose_alt2", label: "They didn't know it mattered to me", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_on_purpose_alt2", label: "They didn't know it mattered to me", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 41};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt2"}), (st:SkillOption {id: "check_the_facts:story:anger_on_purpose"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_on_purpose_alt3", label: "I don't know why yet", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_on_purpose_alt3", label: "I don't know why yet", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 42};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_on_purpose_alt3"}), (st:SkillOption {id: "check_the_facts:story:anger_on_purpose"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_no_respect_alt1", label: "They were thinking about something else", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_no_respect_alt1", label: "They were thinking about something else", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 43};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt1"}), (st:SkillOption {id: "check_the_facts:story:anger_no_respect"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_no_respect_alt2", label: "They show respect in other ways", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_no_respect_alt2", label: "They show respect in other ways", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 44};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt2"}), (st:SkillOption {id: "check_the_facts:story:anger_no_respect"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_no_respect_alt3", label: "I could ask what they meant", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_no_respect_alt3", label: "I could ask what they meant", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 45};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_no_respect_alt3"}), (st:SkillOption {id: "check_the_facts:story:anger_no_respect"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_always_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_always_alt1", label: "It's happened before, not every time", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_always_alt1", label: "It's happened before, not every time", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_always_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 46};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_always_alt1"}), (st:SkillOption {id: "check_the_facts:story:anger_always"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_always_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_always_alt2", label: "This time has its own details", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_always_alt2", label: "This time has its own details", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_always_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 47};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_always_alt2"}), (st:SkillOption {id: "check_the_facts:story:anger_always"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_always_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_always_alt3", label: "Something can change", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_always_alt3", label: "Something can change", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_always_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 48};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_always_alt3"}), (st:SkillOption {id: "check_the_facts:story:anger_always"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_unfair_alt1", label: "It might be unfair, and I can act on that", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_unfair_alt1", label: "It might be unfair, and I can act on that", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 49};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt1"}), (st:SkillOption {id: "check_the_facts:story:anger_unfair"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_unfair_alt2", label: "There's something I don't know", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_unfair_alt2", label: "There's something I don't know", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 50};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt2"}), (st:SkillOption {id: "check_the_facts:story:anger_unfair"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_unfair_alt3", label: "Both can be true", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "anger_unfair_alt3", label: "Both can be true", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 51};
 MATCH (o:SkillOption {id: "check_the_facts:alt:anger_unfair_alt3"}), (st:SkillOption {id: "check_the_facts:story:anger_unfair"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_gone_alt1", label: "Some of it might come back", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_gone_alt1", label: "Some of it might come back", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 52};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt1"}), (st:SkillOption {id: "check_the_facts:story:sad_gone"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_gone_alt2", label: "What it meant to me stays", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_gone_alt2", label: "What it meant to me stays", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 53};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt2"}), (st:SkillOption {id: "check_the_facts:story:sad_gone"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_gone_alt3", label: "I don't know yet", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_gone_alt3", label: "I don't know yet", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 54};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_gone_alt3"}), (st:SkillOption {id: "check_the_facts:story:sad_gone"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_nobody_cares_alt1", label: "Some people do, even if not right now", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_nobody_cares_alt1", label: "Some people do, even if not right now", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 55};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt1"}), (st:SkillOption {id: "check_the_facts:story:sad_nobody_cares"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_nobody_cares_alt2", label: "They may not know how I feel", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_nobody_cares_alt2", label: "They may not know how I feel", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 56};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt2"}), (st:SkillOption {id: "check_the_facts:story:sad_nobody_cares"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_nobody_cares_alt3", label: "I could reach out to one person", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_nobody_cares_alt3", label: "I could reach out to one person", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 57};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_nobody_cares_alt3"}), (st:SkillOption {id: "check_the_facts:story:sad_nobody_cares"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_never_better_alt1", label: "Feelings move, even slowly", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_never_better_alt1", label: "Feelings move, even slowly", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 58};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt1"}), (st:SkillOption {id: "check_the_facts:story:sad_never_better"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_never_better_alt2", label: "It has changed before", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_never_better_alt2", label: "It has changed before", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 59};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt2"}), (st:SkillOption {id: "check_the_facts:story:sad_never_better"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_never_better_alt3", label: "I don't know what's ahead", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "sad_never_better_alt3", label: "I don't know what's ahead", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 60};
 MATCH (o:SkillOption {id: "check_the_facts:alt:sad_never_better_alt3"}), (st:SkillOption {id: "check_the_facts:story:sad_never_better"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_wrong_with_me_alt1", label: "I did something; I'm not something", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_wrong_with_me_alt1", label: "I did something; I'm not something", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 61};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt1"}), (st:SkillOption {id: "check_the_facts:story:shame_wrong_with_me"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_wrong_with_me_alt2", label: "I'd be kinder to a friend than this", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_wrong_with_me_alt2", label: "I'd be kinder to a friend than this", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 62};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt2"}), (st:SkillOption {id: "check_the_facts:story:shame_wrong_with_me"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_wrong_with_me_alt3", label: "Most people feel this sometimes", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_wrong_with_me_alt3", label: "Most people feel this sometimes", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 63};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_wrong_with_me_alt3"}), (st:SkillOption {id: "check_the_facts:story:shame_wrong_with_me"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_think_less_alt1", label: "I don't know what they think", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_think_less_alt1", label: "I don't know what they think", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 64};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt1"}), (st:SkillOption {id: "check_the_facts:story:shame_think_less"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_think_less_alt2", label: "One moment doesn't define me to them", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_think_less_alt2", label: "One moment doesn't define me to them", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 65};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt2"}), (st:SkillOption {id: "check_the_facts:story:shame_think_less"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_think_less_alt3", label: "They might not have noticed", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_think_less_alt3", label: "They might not have noticed", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 66};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_think_less_alt3"}), (st:SkillOption {id: "check_the_facts:story:shame_think_less"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_if_they_knew_alt1", label: "Some people would understand", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_if_they_knew_alt1", label: "Some people would understand", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 67};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt1"}), (st:SkillOption {id: "check_the_facts:story:shame_if_they_knew"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_if_they_knew_alt2", label: "I could share a small part", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_if_they_knew_alt2", label: "I could share a small part", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 68};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt2"}), (st:SkillOption {id: "check_the_facts:story:shame_if_they_knew"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_if_they_knew_alt3", label: "I'm worth something without hiding", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "shame_if_they_knew_alt3", label: "I'm worth something without hiding", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 69};
 MATCH (o:SkillOption {id: "check_the_facts:alt:shame_if_they_knew_alt3"}), (st:SkillOption {id: "check_the_facts:story:shame_if_they_knew"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_hurt_them_alt1", label: "I might have, and I can repair it", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_hurt_them_alt1", label: "I might have, and I can repair it", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 70};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt1"}), (st:SkillOption {id: "check_the_facts:story:guilt_hurt_them"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_hurt_them_alt2", label: "They may see it differently", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_hurt_them_alt2", label: "They may see it differently", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 71};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt2"}), (st:SkillOption {id: "check_the_facts:story:guilt_hurt_them"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_hurt_them_alt3", label: "I could ask them", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_hurt_them_alt3", label: "I could ask them", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 72};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_hurt_them_alt3"}), (st:SkillOption {id: "check_the_facts:story:guilt_hurt_them"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_not_enough_alt1", label: "I did what I could with what I knew", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_not_enough_alt1", label: "I did what I could with what I knew", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 73};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt1"}), (st:SkillOption {id: "check_the_facts:story:guilt_not_enough"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_not_enough_alt2", label: "There may still be something I can do", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_not_enough_alt2", label: "There may still be something I can do", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 74};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt2"}), (st:SkillOption {id: "check_the_facts:story:guilt_not_enough"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_not_enough_alt3", label: "It wasn't all on me", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_not_enough_alt3", label: "It wasn't all on me", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 75};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_not_enough_alt3"}), (st:SkillOption {id: "check_the_facts:story:guilt_not_enough"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_bad_person_alt1", label: "I did something I regret; I'm not all bad", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_bad_person_alt1", label: "I did something I regret; I'm not all bad", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 76};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt1"}), (st:SkillOption {id: "check_the_facts:story:guilt_bad_person"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_bad_person_alt2", label: "Regret means I care", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_bad_person_alt2", label: "Regret means I care", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 77};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt2"}), (st:SkillOption {id: "check_the_facts:story:guilt_bad_person"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_bad_person_alt3", label: "I can make it right", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "guilt_bad_person_alt3", label: "I can make it right", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 78};
 MATCH (o:SkillOption {id: "check_the_facts:alt:guilt_bad_person_alt3"}), (st:SkillOption {id: "check_the_facts:story:guilt_bad_person"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_my_fault_alt1", label: "Other things played a part", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_my_fault_alt1", label: "Other things played a part", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 79};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt1"}), (st:SkillOption {id: "check_the_facts:story:gen_my_fault"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_my_fault_alt2", label: "I can own my part, not all of it", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_my_fault_alt2", label: "I can own my part, not all of it", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 80};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt2"}), (st:SkillOption {id: "check_the_facts:story:gen_my_fault"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_my_fault_alt3", label: "I don't know the whole picture", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_my_fault_alt3", label: "I don't know the whole picture", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 81};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_my_fault_alt3"}), (st:SkillOption {id: "check_the_facts:story:gen_my_fault"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_go_wrong_alt1", label: "It might go fine", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_go_wrong_alt1", label: "It might go fine", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 82};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt1"}), (st:SkillOption {id: "check_the_facts:story:gen_go_wrong"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_go_wrong_alt2", label: "I can't know yet", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_go_wrong_alt2", label: "I can't know yet", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 83};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt2"}), (st:SkillOption {id: "check_the_facts:story:gen_go_wrong"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_go_wrong_alt3", label: "I'd cope if it did", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_go_wrong_alt3", label: "I'd cope if it did", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 84};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_go_wrong_alt3"}), (st:SkillOption {id: "check_the_facts:story:gen_go_wrong"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt1"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_against_me_alt1", label: "They might be against the situation, not me", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_against_me_alt1", label: "They might be against the situation, not me", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt1"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 85};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt1"}), (st:SkillOption {id: "check_the_facts:story:gen_against_me"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt2"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_against_me_alt2", label: "They might be dealing with their own thing", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_against_me_alt2", label: "They might be dealing with their own thing", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt2"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 86};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt2"}), (st:SkillOption {id: "check_the_facts:story:gen_against_me"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt3"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_against_me_alt3", label: "I could check", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "gen_against_me_alt3", label: "I could check", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt3"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 87};
 MATCH (o:SkillOption {id: "check_the_facts:alt:gen_against_me_alt3"}), (st:SkillOption {id: "check_the_facts:story:gen_against_me"})
 MERGE (o)-[:ALTERNATIVE_TO]->(st);
 MERGE (o:SkillOption {id: "check_the_facts:alt:own_alt_unknown"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "own_alt_unknown", label: "There's something I don't know yet", version: "cf-v1-1"}, o.propsJson = "{}", o.forOwn = true;
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "own_alt_unknown", label: "There's something I don't know yet", version: "cf-v1-2"}, o.propsJson = "{}", o.forOwn = true;
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:own_alt_unknown"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 88};
 MERGE (o:SkillOption {id: "check_the_facts:alt:own_alt_other_view"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "own_alt_other_view", label: "Someone else might see it differently", version: "cf-v1-1"}, o.propsJson = "{}", o.forOwn = true;
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "own_alt_other_view", label: "Someone else might see it differently", version: "cf-v1-2"}, o.propsJson = "{}", o.forOwn = true;
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:own_alt_other_view"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 89};
 MERGE (o:SkillOption {id: "check_the_facts:alt:own_alt_meaning"})
-SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "own_alt_meaning", label: "It might not mean what it feels like it means", version: "cf-v1-1"}, o.propsJson = "{}", o.forOwn = true;
+SET o:SkillOption:Alternative, o += {skillId: "check_the_facts", list: "alt", value: "own_alt_meaning", label: "It might not mean what it feels like it means", version: "cf-v1-2"}, o.propsJson = "{}", o.forOwn = true;
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:alt:own_alt_meaning"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "alt", order: 90};
 MERGE (o:SkillOption {id: "check_the_facts:threat:hurt"})
-SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "hurt", label: "Being hurt", version: "cf-v1-1"}, o.propsJson = "{\"parents\": [\"fear\", \"anger\"]}";
+SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "hurt", label: "Being hurt", version: "cf-v1-2"}, o.propsJson = "{\"parents\": [\"fear\", \"anger\"]}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:threat:hurt"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "threat", order: 91};
 MERGE (o:SkillOption {id: "check_the_facts:threat:left"})
-SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "left", label: "Being left", version: "cf-v1-1"}, o.propsJson = "{\"parents\": [\"fear\", \"sadness\", \"jealousy\"]}";
+SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "left", label: "Being left", version: "cf-v1-2"}, o.propsJson = "{\"parents\": [\"fear\", \"sadness\", \"jealousy\"]}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:threat:left"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "threat", order: 92};
 MERGE (o:SkillOption {id: "check_the_facts:threat:embarrassed"})
-SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "embarrassed", label: "Being embarrassed", version: "cf-v1-1"}, o.propsJson = "{\"parents\": [\"shame\", \"fear\"]}";
+SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "embarrassed", label: "Being embarrassed", version: "cf-v1-2"}, o.propsJson = "{\"parents\": [\"shame\", \"fear\"]}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:threat:embarrassed"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "threat", order: 93};
 MERGE (o:SkillOption {id: "check_the_facts:threat:lose"})
-SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "lose", label: "Losing something I need", version: "cf-v1-1"}, o.propsJson = "{\"parents\": [\"fear\", \"sadness\", \"envy\"]}";
+SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "lose", label: "Losing something I need", version: "cf-v1-2"}, o.propsJson = "{\"parents\": [\"fear\", \"sadness\", \"envy\"]}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:threat:lose"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "threat", order: 94};
 MERGE (o:SkillOption {id: "check_the_facts:threat:unfair"})
-SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "unfair", label: "Being treated unfairly again", version: "cf-v1-1"}, o.propsJson = "{\"parents\": [\"anger\"]}";
+SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "unfair", label: "Being treated unfairly again", version: "cf-v1-2"}, o.propsJson = "{\"parents\": [\"anger\"]}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:threat:unfair"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "threat", order: 95};
 MERGE (o:SkillOption {id: "check_the_facts:threat:cant_say"})
-SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "cant_say", label: "I can't say", version: "cf-v1-1"}, o.propsJson = "{\"parents\": [\"fear\", \"anger\", \"disgust\", \"envy\", \"jealousy\", \"love\", \"sadness\", \"shame\", \"guilt\"]}";
+SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "cant_say", label: "I can't say", version: "cf-v1-2"}, o.propsJson = "{\"parents\": [\"fear\", \"anger\", \"disgust\", \"envy\", \"jealousy\", \"love\", \"sadness\", \"shame\", \"guilt\"]}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:threat:cant_say"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "threat", order: 96};
 MERGE (o:SkillOption {id: "check_the_facts:threat:none"})
-SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "none", label: "Nothing like that", version: "cf-v1-1"}, o.propsJson = "{\"parents\": [\"fear\", \"anger\", \"disgust\", \"envy\", \"jealousy\", \"love\", \"sadness\", \"shame\", \"guilt\"]}";
+SET o:SkillOption:ThreatChip, o += {skillId: "check_the_facts", list: "threat", value: "none", label: "Nothing like that", version: "cf-v1-2"}, o.propsJson = "{\"parents\": [\"fear\", \"anger\", \"disgust\", \"envy\", \"jealousy\", \"love\", \"sadness\", \"shame\", \"guilt\"]}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:threat:none"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "threat", order: 97};
 MERGE (o:SkillOption {id: "check_the_facts:likely:very"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "very", label: "Very likely", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "very", label: "Very likely", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:likely:very"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "likely", order: 98};
 MERGE (o:SkillOption {id: "check_the_facts:likely:either"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "either", label: "Could go either way", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "either", label: "Could go either way", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:likely:either"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "likely", order: 99};
 MERGE (o:SkillOption {id: "check_the_facts:likely:not_that"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "not_that", label: "Not that likely", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "not_that", label: "Not that likely", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:likely:not_that"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "likely", order: 100};
 MERGE (o:SkillOption {id: "check_the_facts:likely:unknown"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "unknown", label: "I don't know", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "likely", value: "unknown", label: "I don't know", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:likely:unknown"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "likely", order: 101};
 MERGE (o:SkillOption {id: "check_the_facts:through:yes"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "through", value: "yes", label: "I'd get through it, even if it's hard", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "through", value: "yes", label: "I'd get through it, even if it's hard", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:through:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "through", order: 102};
 MERGE (o:SkillOption {id: "check_the_facts:through:unsure"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "through", value: "unsure", label: "I'm not sure I would", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "through", value: "unsure", label: "I'm not sure I would", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:through:unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "through", order: 103};
 MERGE (o:SkillOption {id: "check_the_facts:fits:fits"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "fits", label: "Yes, it fits", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "fits", label: "Yes, it fits", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fits:fits"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fits", order: 104};
 MERGE (o:SkillOption {id: "check_the_facts:fits:partly"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "partly", label: "It fits, and it's bigger than this", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "partly", label: "It fits, and it's bigger than this", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fits:partly"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fits", order: 105};
 MERGE (o:SkillOption {id: "check_the_facts:fits:doesnt_fit"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "doesnt_fit", label: "Not really", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "doesnt_fit", label: "Not really", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fits:doesnt_fit"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fits", order: 106};
 MERGE (o:SkillOption {id: "check_the_facts:fits:unsure"})
-SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "unsure", label: "I'm not sure", version: "cf-v1-1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "fits", value: "unsure", label: "I'm not sure", version: "cf-v1-2"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fits:unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fits", order: 107};
+MERGE (o:SkillOption {id: "check_the_facts:fact:ask_them"})
+SET o:SkillOption:MissingFactAction, o += {skillId: "check_the_facts", list: "fact", value: "ask_them", label: "Ask them", version: "cf-v1-2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fact:ask_them"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 108};
+MERGE (o:SkillOption {id: "check_the_facts:fact:wait"})
+SET o:SkillOption:MissingFactAction, o += {skillId: "check_the_facts", list: "fact", value: "wait", label: "Wait a while and see", version: "cf-v1-2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fact:wait"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 109};
+MERGE (o:SkillOption {id: "check_the_facts:fact:look"})
+SET o:SkillOption:MissingFactAction, o += {skillId: "check_the_facts", list: "fact", value: "look", label: "Look into it", version: "cf-v1-2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fact:look"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 110};
+MERGE (o:SkillOption {id: "check_the_facts:fact:ask_trusted"})
+SET o:SkillOption:MissingFactAction, o += {skillId: "check_the_facts", list: "fact", value: "ask_trusted", label: "Ask someone I trust", version: "cf-v1-2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fact:ask_trusted"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 111};
+MERGE (o:SkillOption {id: "check_the_facts:when:today"})
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "when", value: "today", label: "Tonight", version: "cf-v1-2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:when:today"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 112};
+MERGE (o:SkillOption {id: "check_the_facts:when:tomorrow"})
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "when", value: "tomorrow", label: "Tomorrow", version: "cf-v1-2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:when:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 113};
+MERGE (o:SkillOption {id: "check_the_facts:when:this_week"})
+SET o:SkillOption, o += {skillId: "check_the_facts", list: "when", value: "this_week", label: "Later this week", version: "cf-v1-2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:when:this_week"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "when", order: 114};
 
 // --- alternate_rebellion (ar-v2) ---
 MERGE (s:Skill {id: "alternate_rebellion"})
@@ -1370,90 +1419,90 @@ MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebe
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "real", order: 56};
 
-// --- er_troubleshoot (et-v1) ---
+// --- er_troubleshoot (et-v1-1) ---
 MERGE (s:Skill {id: "er_troubleshoot"})
-SET s += {toolId: "er-troubleshoot", version: "et-v1", contentVersion: "skills-v1", start: "body", ownMax: 140, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.copyJson = "{\"belief_hint\": \"Beliefs about feelings can make a skill feel pointless before it starts.\", \"belief_title\": \"Is a belief getting in the way?\", \"body_note\": \"Like running on little sleep, feeling ill, not eating regularly, or something you took.\", \"body_title\": \"Could your body be turning the volume up?\", \"done\": \"Done\", \"env_hint\": \"Feelings tend to stick around when they get us something.\", \"env_title\": \"Is something around you rewarding the old way?\", \"fit_hint\": \"Some skills are for feelings that fit what happened, some for feelings that are bigger than it.\", \"fit_title\": \"Did the feeling fit the facts?\", \"fix_belief\": \"Beliefs like that can feel like facts. They're beliefs, and you can look at them.\", \"fix_belief_heavy\": \"That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.\", \"fix_body\": \"When your body is running low, feelings can get louder and skills have less to work with. Looking after one of those counts as a skill too.\", \"fix_env\": \"Then the old way is doing a job for you, and the skill is up against it. You could look for another way to get what the old way gets you.\", \"fix_fit\": \"When a feeling fits, the move is usually the situation, or making room for the feeling.\", \"fix_fit_unsure\": \"Checking the facts first can show which kind of skill fits.\", \"fix_much\": \"When a lot is going on, one skill can get buried. Picking one thing to start with can help.\", \"fix_way\": \"That makes sense: protecting yourself is what the feeling pushes for. A smaller step, done all the way, can help more than a big one done partly.\", \"fix_will\": \"That's human. Willingness comes and goes. Making room for the part that isn't up for it can come first.\", \"much_title\": \"Was there too much going on at once?\", \"next\": \"Next\", \"none\": \"Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.\", \"own_hint\": \"Say it your way\", \"safety_open\": \"Talk to someone now\", \"settle_first\": \"Things feel loud right now. You could ground yourself first.\", \"validate\": \"When a skill doesn't help, that's information. It isn't proof you can't do this.\", \"way_hint\": \"Like going to the party, then staying in the kitchen.\", \"way_title\": \"Did you do it all the way, or partly, while still protecting yourself?\", \"will_title\": \"Were you willing, or was part of you not up for it that day?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "er-troubleshoot", version: "et-v1-1", contentVersion: "skills-v1", start: "body", ownMax: 140, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.copyJson = "{\"again_q\": \"Want a nudge to try it again?\", \"belief_hint\": \"Beliefs about feelings can make a skill feel pointless before it starts.\", \"belief_title\": \"Is a belief getting in the way?\", \"body_note\": \"Like running on little sleep, feeling ill, not eating regularly, or something you took.\", \"body_title\": \"Could your body be turning the volume up?\", \"done\": \"Done\", \"env_hint\": \"Feelings tend to stick around when they get us something.\", \"env_title\": \"Is something around you rewarding the old way?\", \"fit_hint\": \"Some skills are for feelings that fit what happened, some for feelings that are bigger than it.\", \"fit_title\": \"Did the feeling fit the facts?\", \"fix_belief\": \"Beliefs like that can feel like facts. They're beliefs, and you can look at them.\", \"fix_belief_heavy\": \"That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.\", \"fix_body\": \"When your body is running low, feelings can get louder and skills have less to work with. Looking after one of those counts as a skill too.\", \"fix_env\": \"Then the old way is doing a job for you, and the skill is up against it. You could look for another way to get what the old way gets you.\", \"fix_fit\": \"When a feeling fits, the move is usually the situation, or making room for the feeling.\", \"fix_fit_unsure\": \"Checking the facts first can show which kind of skill fits.\", \"fix_much\": \"When a lot is going on, one skill can get buried. Picking one thing to start with can help.\", \"fix_way\": \"That makes sense: protecting yourself is what the feeling pushes for. A smaller step, done all the way, can help more than a big one done partly.\", \"fix_will\": \"That's human. Willingness comes and goes. Making room for the part that isn't up for it can come first.\", \"much_title\": \"Was there too much going on at once?\", \"next\": \"Next\", \"none\": \"Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.\", \"own_hint\": \"Say it your way\", \"safety_open\": \"Talk to someone now\", \"settle_first\": \"Things feel loud right now. You could ground yourself first.\", \"validate\": \"When a skill doesn't help, that's information. It isn't proof you can't do this.\", \"way_hint\": \"Like going to the party, then staying in the kitchen.\", \"way_title\": \"Did you do it all the way, or partly, while still protecting yourself?\", \"will_title\": \"Were you willing, or was part of you not up for it that day?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_troubleshooting"}), (s:Skill {id: "er_troubleshoot"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "er_troubleshoot"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "er_troubleshoot"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "er_troubleshoot:body"})
-SET n += {skillId: "er_troubleshoot", step: "body", kind: "ask", version: "et-v1"}, n.specJson = "{\"fields\": [{\"id\": \"body\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"settle_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"list\": \"body\"}, \"required\": true}], \"hint\": \"validate\", \"note\": \"body_note\", \"title\": \"body_title\"}";
+SET n += {skillId: "er_troubleshoot", step: "body", kind: "ask", version: "et-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"body\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"settle_first\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"list\": \"body\"}, \"required\": true}], \"hint\": \"validate\", \"note\": \"body_note\", \"title\": \"body_title\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:body"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
 MERGE (n:SkillStep {id: "er_troubleshoot:fit"})
-SET n += {skillId: "er_troubleshoot", step: "fit", kind: "ask", version: "et-v1"}, n.specJson = "{\"fields\": [{\"id\": \"fit\", \"max\": 1, \"options\": {\"list\": \"fit\"}, \"required\": true}], \"hint\": \"fit_hint\", \"title\": \"fit_title\"}";
+SET n += {skillId: "er_troubleshoot", step: "fit", kind: "ask", version: "et-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"fit\", \"max\": 1, \"options\": {\"list\": \"fit\"}, \"required\": true}], \"hint\": \"fit_hint\", \"title\": \"fit_title\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fit"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
 MERGE (n:SkillStep {id: "er_troubleshoot:way"})
-SET n += {skillId: "er_troubleshoot", step: "way", kind: "ask", version: "et-v1"}, n.specJson = "{\"fields\": [{\"id\": \"way\", \"max\": 1, \"options\": {\"list\": \"way\"}, \"required\": true}], \"hint\": \"way_hint\", \"title\": \"way_title\"}";
+SET n += {skillId: "er_troubleshoot", step: "way", kind: "ask", version: "et-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"way\", \"max\": 1, \"options\": {\"list\": \"way\"}, \"required\": true}], \"hint\": \"way_hint\", \"title\": \"way_title\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:way"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "er_troubleshoot:env"})
-SET n += {skillId: "er_troubleshoot", step: "env", kind: "ask", version: "et-v1"}, n.specJson = "{\"fields\": [{\"id\": \"env\", \"max\": 1, \"options\": {\"list\": \"env\"}, \"required\": true}], \"hint\": \"env_hint\", \"title\": \"env_title\"}";
+SET n += {skillId: "er_troubleshoot", step: "env", kind: "ask", version: "et-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"env\", \"max\": 1, \"options\": {\"list\": \"env\"}, \"required\": true}], \"hint\": \"env_hint\", \"title\": \"env_title\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:env"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "er_troubleshoot:will"})
-SET n += {skillId: "er_troubleshoot", step: "will", kind: "ask", version: "et-v1"}, n.specJson = "{\"fields\": [{\"id\": \"will\", \"max\": 1, \"options\": {\"list\": \"will\"}, \"required\": true}], \"title\": \"will_title\"}";
+SET n += {skillId: "er_troubleshoot", step: "will", kind: "ask", version: "et-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"will\", \"max\": 1, \"options\": {\"list\": \"will\"}, \"required\": true}], \"title\": \"will_title\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:will"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "er_troubleshoot:much"})
-SET n += {skillId: "er_troubleshoot", step: "much", kind: "ask", version: "et-v1"}, n.specJson = "{\"fields\": [{\"id\": \"much\", \"max\": 1, \"options\": {\"list\": \"much\"}, \"required\": true}], \"title\": \"much_title\"}";
+SET n += {skillId: "er_troubleshoot", step: "much", kind: "ask", version: "et-v1-1"}, n.specJson = "{\"fields\": [{\"id\": \"much\", \"max\": 1, \"options\": {\"list\": \"much\"}, \"required\": true}], \"title\": \"much_title\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:much"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
 MERGE (n:SkillStep {id: "er_troubleshoot:belief"})
-SET n += {skillId: "er_troubleshoot", step: "belief", kind: "ask", version: "et-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}], \"fields\": [{\"id\": \"belief\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"not\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}}], \"max\": 1, \"options\": {\"list\": \"belief\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\"}, \"required\": true}], \"hint\": \"belief_hint\", \"title\": \"belief_title\"}";
+SET n += {skillId: "er_troubleshoot", step: "belief", kind: "ask", version: "et-v1-1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}], \"fields\": [{\"id\": \"belief\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"not\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}}], \"max\": 1, \"options\": {\"list\": \"belief\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\"}, \"required\": true}], \"hint\": \"belief_hint\", \"title\": \"belief_title\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:belief"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_body"})
-SET n += {skillId: "er_troubleshoot", step: "fix_body", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_body\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_body", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again_fix_body\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"try_again\", \"whenFrom\": \"again_fix_body\"}, \"lines\": [{\"key\": \"fix_body\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_body"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_fit"})
-SET n += {skillId: "er_troubleshoot", step: "fix_fit", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_fit\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_fit", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_fit\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_fit"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_fit_unsure"})
-SET n += {skillId: "er_troubleshoot", step: "fix_fit_unsure", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_fit_unsure\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_fit_unsure", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_fit_unsure\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_fit_unsure"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_way"})
-SET n += {skillId: "er_troubleshoot", step: "fix_way", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_way\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_way", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again_fix_way\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"try_again\", \"whenFrom\": \"again_fix_way\"}, \"lines\": [{\"key\": \"fix_way\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_way"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_env"})
-SET n += {skillId: "er_troubleshoot", step: "fix_env", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_env\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_env", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_env\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_env"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 11};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_will"})
-SET n += {skillId: "er_troubleshoot", step: "fix_will", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_will\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_will", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again_fix_will\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"try_again\", \"whenFrom\": \"again_fix_will\"}, \"lines\": [{\"key\": \"fix_will\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_will"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 12};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_much"})
-SET n += {skillId: "er_troubleshoot", step: "fix_much", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_much\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_much", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again_fix_much\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"try_again\", \"whenFrom\": \"again_fix_much\"}, \"lines\": [{\"key\": \"fix_much\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_much"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 13};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_belief"})
-SET n += {skillId: "er_troubleshoot", step: "fix_belief", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"fix_belief_heavy\", \"when\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}, {\"key\": \"fix_belief\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_belief", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"fix_belief_heavy\", \"when\": {\"eq\": [\"$a.belief\", \"myth_nothing\"]}}, {\"key\": \"fix_belief\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_belief"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
 MERGE (n:SkillStep {id: "er_troubleshoot:none"})
-SET n += {skillId: "er_troubleshoot", step: "none", kind: "handoff", version: "et-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"none\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "none", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again_none\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"try_again\", \"whenFrom\": \"again_none\"}, \"lines\": [{\"key\": \"none\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:none"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};
@@ -1601,132 +1650,147 @@ MATCH (a:SkillStep {id: "er_troubleshoot:none"}), (x:SkillExit {id: "er_troubles
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
 MERGE (o:SkillOption {id: "er_troubleshoot:body:body_yes"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "body", value: "body_yes", label: "Maybe, yes", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "body", value: "body_yes", label: "Maybe, yes", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:body:body_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "body", order: 0};
 MERGE (o:SkillOption {id: "er_troubleshoot:body:body_no"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "body", value: "body_no", label: "I don't think so", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "body", value: "body_no", label: "I don't think so", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:body:body_no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "body", order: 1};
 MERGE (o:SkillOption {id: "er_troubleshoot:body:body_unsure"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "body", value: "body_unsure", label: "Not sure", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "body", value: "body_unsure", label: "Not sure", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:body:body_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "body", order: 2};
 MERGE (o:SkillOption {id: "er_troubleshoot:fit:fit_yes"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "fit", value: "fit_yes", label: "Yes, it fit", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "fit", value: "fit_yes", label: "Yes, it fit", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:fit:fit_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fit", order: 3};
 MERGE (o:SkillOption {id: "er_troubleshoot:fit:fit_no"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "fit", value: "fit_no", label: "No, it was bigger than the facts", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "fit", value: "fit_no", label: "No, it was bigger than the facts", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:fit:fit_no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fit", order: 4};
 MERGE (o:SkillOption {id: "er_troubleshoot:fit:fit_unsure"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "fit", value: "fit_unsure", label: "I'm not sure", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "fit", value: "fit_unsure", label: "I'm not sure", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:fit:fit_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fit", order: 5};
 MERGE (o:SkillOption {id: "er_troubleshoot:way:way_all"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "way", value: "way_all", label: "All the way", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "way", value: "way_all", label: "All the way", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:way:way_all"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "way", order: 6};
 MERGE (o:SkillOption {id: "er_troubleshoot:way:way_part"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "way", value: "way_part", label: "Partly", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "way", value: "way_part", label: "Partly", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:way:way_part"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "way", order: 7};
 MERGE (o:SkillOption {id: "er_troubleshoot:way:way_unsure"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "way", value: "way_unsure", label: "Not sure", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "way", value: "way_unsure", label: "Not sure", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:way:way_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "way", order: 8};
 MERGE (o:SkillOption {id: "er_troubleshoot:env:env_back_off"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_back_off", label: "People back off when I get angry", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_back_off", label: "People back off when I get angry", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:env:env_back_off"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "env", order: 9};
 MERGE (o:SkillOption {id: "er_troubleshoot:env:env_get_out"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_get_out", label: "I get out of things when I go quiet", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_get_out", label: "I get out of things when I go quiet", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:env:env_get_out"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "env", order: 10};
 MERGE (o:SkillOption {id: "er_troubleshoot:env:env_step_in"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_step_in", label: "Someone steps in when I'm struggling", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_step_in", label: "Someone steps in when I'm struggling", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:env:env_step_in"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "env", order: 11};
 MERGE (o:SkillOption {id: "er_troubleshoot:env:env_no"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_no", label: "Nothing like that", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_no", label: "Nothing like that", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:env:env_no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "env", order: 12};
 MERGE (o:SkillOption {id: "er_troubleshoot:env:env_unsure"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_unsure", label: "Not sure", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "env", value: "env_unsure", label: "Not sure", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:env:env_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "env", order: 13};
 MERGE (o:SkillOption {id: "er_troubleshoot:will:will_yes"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "will", value: "will_yes", label: "I was willing", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "will", value: "will_yes", label: "I was willing", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:will:will_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "will", order: 14};
 MERGE (o:SkillOption {id: "er_troubleshoot:will:will_not"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "will", value: "will_not", label: "Part of me wasn't up for it", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "will", value: "will_not", label: "Part of me wasn't up for it", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:will:will_not"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "will", order: 15};
 MERGE (o:SkillOption {id: "er_troubleshoot:will:will_unsure"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "will", value: "will_unsure", label: "Not sure", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "will", value: "will_unsure", label: "Not sure", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:will:will_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "will", order: 16};
 MERGE (o:SkillOption {id: "er_troubleshoot:much:much_yes"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "much", value: "much_yes", label: "Yes, a lot at once", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "much", value: "much_yes", label: "Yes, a lot at once", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:much:much_yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "much", order: 17};
 MERGE (o:SkillOption {id: "er_troubleshoot:much:much_no"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "much", value: "much_no", label: "Not really", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "much", value: "much_no", label: "Not really", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:much:much_no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "much", order: 18};
 MERGE (o:SkillOption {id: "er_troubleshoot:much:much_unsure"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "much", value: "much_unsure", label: "Not sure", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "much", value: "much_unsure", label: "Not sure", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:much:much_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "much", order: 19};
 MERGE (o:SkillOption {id: "er_troubleshoot:belief:myth_failing"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_failing", label: "Having this feeling means I'm failing", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_failing", label: "Having this feeling means I'm failing", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:belief:myth_failing"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "belief", order: 20};
 MERGE (o:SkillOption {id: "er_troubleshoot:belief:myth_past_it"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_past_it", label: "I'm meant to be past this by now", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_past_it", label: "I'm meant to be past this by now", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:belief:myth_past_it"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "belief", order: 21};
 MERGE (o:SkillOption {id: "er_troubleshoot:belief:myth_true"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_true", label: "If I feel it this strongly, it must be true", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_true", label: "If I feel it this strongly, it must be true", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:belief:myth_true"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "belief", order: 22};
 MERGE (o:SkillOption {id: "er_troubleshoot:belief:myth_nothing"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_nothing", label: "Nothing will ever help me", version: "et-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_nothing", label: "Nothing will ever help me", version: "et-v1-1"}, o.propsJson = "{\"danger\": \"self\"}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:belief:myth_nothing"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "belief", order: 23};
 MERGE (o:SkillOption {id: "er_troubleshoot:belief:myth_no"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_no", label: "Nothing like that", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_no", label: "Nothing like that", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:belief:myth_no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "belief", order: 24};
 MERGE (o:SkillOption {id: "er_troubleshoot:belief:myth_unsure"})
-SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_unsure", label: "Not sure", version: "et-v1"}, o.propsJson = "{}";
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myth_unsure", label: "Not sure", version: "et-v1-1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:belief:myth_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "belief", order: 25};
+MERGE (o:SkillOption {id: "er_troubleshoot:again:today"})
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "again", value: "today", label: "Tonight", version: "et-v1-1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:again:today"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 26};
+MERGE (o:SkillOption {id: "er_troubleshoot:again:tomorrow"})
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "again", value: "tomorrow", label: "Tomorrow", version: "et-v1-1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:again:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 27};
+MERGE (o:SkillOption {id: "er_troubleshoot:again:this_week"})
+SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "again", value: "this_week", label: "Later this week", version: "et-v1-1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:again:this_week"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 28};

@@ -154,6 +154,40 @@ FOLLOW_UP_TYPES = [
         "notification": "A plan you made is ready.",
     },
     {
+        # Check the Facts v1.2 (PRD ER-02, *still don't know*): "Did you find out?" about the one missing fact,
+        # at the time the person picked (the missing step's chip; no chip, no follow-up). Scheduled by the skill
+        # player on the caller's own check-the-facts ToolSession. Resolved in place; the answer is a log field.
+        "id": "check_fact", "ownerModule": "er", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Did you find out?", "body": "The one thing you wanted to know, from Check the Facts."},
+        "choices": [{"id": "fit", "label": "Yes, and the feeling fit", "status": "done"},
+                    {"id": "didnt_fit", "label": "Yes, and it didn't fit", "status": "done"},
+                    {"id": "still", "label": "Still don't know", "status": "partly"},
+                    NOT_NOW],
+        "notification": "A check-in you asked for is ready.",
+    },
+    {
+        # It isn't working v1.1 (PRD ER-14, "one next move + FollowUp"): a nudge to give the skill another go, on
+        # the fix cards whose move is another try (body, all the way, willingness, too much, nothing stood out).
+        # Picked as a chip on the card and scheduled as the person leaves it. Never on the hopelessness card.
+        "id": "try_again", "ownerModule": "er", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Another go?", "body": "The skill you looked at in It isn't working. Did you try it again?"},
+        "choices": [{"id": "helped", "label": "Tried it, it helped", "status": "done"},
+                    {"id": "still_stuck", "label": "Tried it, still stuck", "status": "done"},
+                    {"id": "not_yet", "label": "Not yet", "snoozeHours": 24},
+                    {"id": "skip", "label": "Skip", "status": "dismissed"}],
+        "notification": "A check-in you asked for is ready.",
+    },
+    {
         # Derived (no FollowUp node): the latest tool session closed without an answer.
         "id": "tool_outcome", "ownerModule": "core", "tier": "skills", "resolveMode": "inline",
         "window": {"kind": "derived"}, "staleAfterHours": 12, "missedPath": "none",
