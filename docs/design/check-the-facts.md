@@ -142,6 +142,9 @@ One card, picked from the answer:
 | doesnt_fit | *"The feeling is bigger than the facts. Acting opposite to its urge helps it settle."* | *Do the Opposite* (emotion carried) |
 | unsure | *"That's all right. Sometimes the facts come later."* | *Wise mind* (`?first=wm_q_next`), or *Done* |
 
+Since v1.2, *unsure* goes by one more screen first: one fact to find out and an optional *ask me later* chip
+(`check_fact`; see `skill-runtime.md`, *v1.2*). The PRD's *Park it* waits for DT/MF's postponement skill.
+
 Then the regulation close: *"How strong is it now, compared to when you started?"* (`closeKind:
 'regulation_down'`, module `er`). It counts toward what helps the way every regulation tool does.
 

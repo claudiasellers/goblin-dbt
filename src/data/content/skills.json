@@ -1449,7 +1449,7 @@
       {
         "id": "check_the_facts",
         "toolId": "check-the-facts",
-        "version": "cf-v1-1",
+        "version": "cf-v1-2",
         "start": "feel",
         "accepts": [],
         "ownMax": 140,
@@ -1481,7 +1481,10 @@
           "done": "Done",
           "entry_oa": "Go through it slowly with Check the Facts",
           "safety_open": "Talk to someone now",
-          "safe_line": "Your read of danger is the one that counts here. You don't have to check it against anything."
+          "safe_line": "Your read of danger is the one that counts here. You don't have to check it against anything.",
+          "missing_title": "What's one thing you could find out?",
+          "missing_hint": "Not knowing is an answer. The move is one fact, not a decision.",
+          "when_q": "Want me to ask later if you found out?"
         },
         "tables": {
           "storySetOf": {
@@ -1848,6 +1851,66 @@
                 }
               }
             ],
+            "next": [
+              {
+                "to": "missing",
+                "when": {
+                  "eq": [
+                    "$a.fits",
+                    "unsure"
+                  ]
+                }
+              },
+              {
+                "to": "next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "missing",
+            "kind": "ask",
+            "title": "missing_title",
+            "hint": "missing_hint",
+            "fields": [
+              {
+                "id": "fact",
+                "options": {
+                  "list": "fact"
+                },
+                "max": 1,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 60
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "own": "fact"
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "when",
+                "label": "when_q",
+                "max": 1,
+                "options": {
+                  "list": "when"
+                }
+              }
+            ],
+            "followUp": {
+              "type": "check_fact",
+              "whenFrom": "when",
+              "when": {
+                "set": "$a.when"
+              }
+            },
             "next": [
               {
                 "to": "next",
@@ -2704,13 +2767,45 @@
               "value": "unsure",
               "label": "I'm not sure"
             }
+          ],
+          "fact": [
+            {
+              "value": "ask_them",
+              "label": "Ask them"
+            },
+            {
+              "value": "wait",
+              "label": "Wait a while and see"
+            },
+            {
+              "value": "look",
+              "label": "Look into it"
+            },
+            {
+              "value": "ask_trusted",
+              "label": "Ask someone I trust"
+            }
+          ],
+          "when": [
+            {
+              "value": "today",
+              "label": "Tonight"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "this_week",
+              "label": "Later this week"
+            }
           ]
         }
       },
       {
         "id": "er_troubleshoot",
         "toolId": "er-troubleshoot",
-        "version": "et-v1",
+        "version": "et-v1-1",
         "start": "body",
         "accepts": [
           "band"
@@ -2743,6 +2838,7 @@
           "fix_belief": "Beliefs like that can feel like facts. They're beliefs, and you can look at them.",
           "fix_belief_heavy": "That sounds heavy to carry. After trying this much, it makes sense to feel it. You don't have to hold it alone.",
           "none": "Nothing stood out this time. That's information too. Skills can take a few goes, and that isn't on you.",
+          "again_q": "Want a nudge to try it again?",
           "own_hint": "Say it your way",
           "next": "Next",
           "done": "Done"
@@ -3141,6 +3237,20 @@
               }
             ],
             "done": "done",
+            "fields": [
+              {
+                "id": "again_fix_way",
+                "label": "again_q",
+                "max": 1,
+                "options": {
+                  "list": "again"
+                }
+              }
+            ],
+            "followUp": {
+              "type": "try_again",
+              "whenFrom": "again_fix_way"
+            },
             "next": [],
             "offers": []
           },
@@ -3180,6 +3290,20 @@
               }
             ],
             "done": "done",
+            "fields": [
+              {
+                "id": "again_fix_will",
+                "label": "again_q",
+                "max": 1,
+                "options": {
+                  "list": "again"
+                }
+              }
+            ],
+            "followUp": {
+              "type": "try_again",
+              "whenFrom": "again_fix_will"
+            },
             "next": [],
             "offers": [
               {
@@ -3203,6 +3327,20 @@
               }
             ],
             "done": "done",
+            "fields": [
+              {
+                "id": "again_fix_much",
+                "label": "again_q",
+                "max": 1,
+                "options": {
+                  "list": "again"
+                }
+              }
+            ],
+            "followUp": {
+              "type": "try_again",
+              "whenFrom": "again_fix_much"
+            },
             "next": [],
             "offers": [
               {
@@ -3496,6 +3634,20 @@
             {
               "value": "myth_unsure",
               "label": "Not sure"
+            }
+          ],
+          "again": [
+            {
+              "value": "today",
+              "label": "Tonight"
+            },
+            {
+              "value": "tomorrow",
+              "label": "Tomorrow"
+            },
+            {
+              "value": "this_week",
+              "label": "Later this week"
             }
           ]
         }

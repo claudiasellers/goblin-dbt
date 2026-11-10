@@ -11,7 +11,7 @@ Regenerate:  python3 scripts/skills/build.py > /tmp/s.cypher && mv /tmp/s.cypher
 ID = "check_the_facts"
 TOOL_ID = "check-the-facts"
 CONCEPT = "dbt_check_facts"
-VERSION = "cf-v1-1"
+VERSION = "cf-v1-2"
 OWN_MAX = 140
 
 # --- Copy (CheckFactsFlow in the spec; every screen key, plus the decisions' additions) ---
@@ -43,6 +43,10 @@ COPY = {
     # and threat screens. Nothing here asks the person to weigh their read of danger.
     "safety_open": "Talk to someone now",
     "safe_line": "Your read of danger is the one that counts here. You don't have to check it against anything.",
+    # v1.2 (PRD ER-02 verdict table, *still don't know*): one missing fact, and an optional check-in about it.
+    "missing_title": "What's one thing you could find out?",
+    "missing_hint": "Not knowing is an answer. The move is one fact, not a decision.",
+    "when_q": "Want me to ask later if you found out?",
 }
 
 # --- Screen 1: the curated grid words (decision 1), in order ---
@@ -136,6 +140,12 @@ THROUGH = [("yes", "I'd get through it, even if it's hard"), ("unsure", "I'm not
 # --- Screen 6: the fits answers (the ask-fresh `fitsFacts` values) ---
 FITS = [("fits", "Yes, it fits"), ("partly", "It fits, and it's bigger than this"), ("doesnt_fit", "Not really"), ("unsure", "I'm not sure")]
 
+# --- v1.2, after *I'm not sure*: one missing fact (MissingFactAction) and when to ask about it ---
+MISSING_FACTS = [("ask_them", "Ask them"), ("wait", "Wait a while and see"), ("look", "Look into it"),
+                 ("ask_trusted", "Ask someone I trust")]
+# The check_fact follow-up's window chips (scripts/practice-spine/content.py). No chip: no check-in.
+FACT_WHEN = [("today", "Tonight"), ("tomorrow", "Tomorrow"), ("this_week", "Later this week")]
+
 
 # ---------------------------------------------------------------------------------------------
 # The skill (docs/design/skill-runtime.md: Step, Field, Slot, Exit; conditions in the JSON language)
@@ -223,6 +233,21 @@ STEPS = [
             "id": "fits", "options": {"list": "fits"}, "max": 1, "required": True, "askFresh": "fitsFacts",
             "list": {"table": "fitsWhen", "key": "$d.fitsParent"},
         }],
+        "next": [{"when": FITS_IS("unsure"), "to": "missing"}, {"to": "next"}],
+    },
+    {
+        # v1.2: *still don't know* gets one fact to find out, not a decision. Both fields are optional: Next with
+        # nothing picked goes on to the card. A window chip schedules check_fact on Next ("Did you find out?").
+        "id": "missing", "kind": "ask", "title": "missing_title", "hint": "missing_hint",
+        "fields": [
+            {"id": "fact", "options": {"list": "fact"}, "max": 1,
+             # One fact is short; 60 keeps the worst-case record under ext's 4 KB (tests/skill-contracts.test.mjs).
+             "own": {"hint": "own_hint", "countsAsPick": True, "max": 60},
+             # Own words aren't read, so someone to talk to stays one quiet tap away, as on the camera screen.
+             "links": [{"exit": "safety_open", "label": "safety_open", "when": {"own": "fact"}}]},
+            {"id": "when", "label": "when_q", "max": 1, "options": {"list": "when"}},
+        ],
+        "followUp": {"type": "check_fact", "whenFrom": "when", "when": {"set": a("when")}},
         "next": [{"to": "next"}],
     },
     {
@@ -286,6 +311,8 @@ def options():
     out += [("likely", v, label, {}, None) for v, label in LIKELY]
     out += [("through", v, label, {}, None) for v, label in THROUGH]
     out += [("fits", v, label, {}, None) for v, label in FITS]
+    out += [("fact", v, label, {}, "MissingFactAction") for v, label in MISSING_FACTS]
+    out += [("when", v, label, {}, None) for v, label in FACT_WHEN]
     return out
 
 
