@@ -167,6 +167,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   // Answered: stay on the close so its tag row ("Was this a part you know?") can show, then go on a tap.
   const [answered, setAnswered] = useState(false);
   const handoffs = useRef<HandoffResult[]>([]);
+  const leavingRef = useRef(false);
+  useEffect(() => { if (!leaving) leavingRef.current = false; }, [leaving, st.stepId]);
   const send = useCallback((e: RunEvent) => setSt((s) => runNext(ctx, s, e)), [ctx]);
   const step = stepOf(skill, st.stepId);
 
@@ -218,7 +220,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     }
     // A hand-off's reminder chip (R5 on a hand-off): scheduled as the person leaves the card, by its move or by
     // Done, before anything navigates. No chip picked, nothing scheduled.
+    // `leavingRef`, not `busy`: two taps in one frame both see busy false, and would schedule twice. It stays set
+    // while this card is being left, and clears when the run is on another step or back on the card.
+    if (leavingRef.current) return;
     if (step.kind === 'handoff' && followUpFor(ctx, step, st)) {
+      leavingRef.current = true;
       setBusy(true);
       const ok = await scheduleStep();
       setBusy(false);
@@ -492,20 +498,23 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
     <section className="space-y-4 p-5 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]" data-testid="skill-handoff">
       {line && <Prompt serif>{line}</Prompt>}
       {chips.map((f) => (
-        <div key={f.id} data-testid="handoff-reminder">
+        // Held while the reminder saves, so the chip shown is the one that was scheduled.
+        <fieldset key={f.id} data-testid="handoff-reminder" disabled={busy} className="m-0 p-0 border-0 min-w-0">
           <FieldView ctx={ctx} field={f} st={st} send={send} onMore={() => {}} onExit={onExit} />
-        </div>
+        </fieldset>
       ))}
       <div className="space-y-2">
         {offers.map((x, i) => (
-          <button key={x.id} type="button" className={i === 0 ? primaryButton : choiceButton} data-exit={x.id} disabled={busy} aria-busy={busy} onClick={() => onExit(x)}>
+          <button key={x.id} type="button" className={i === 0 ? primaryButton : choiceButton} data-exit={x.id}
+            // Someone to talk to is never held back, not even for the moment a reminder takes to save.
+            disabled={busy && !x.safety} aria-busy={busy && !x.safety} onClick={() => onExit(x)}>
             {x.safety ? (c.safety_open ?? 'Talk to someone now') : getToolById(x.toolId!)?.name}
           </button>
         ))}
       </div>
       {done && (
         <div className="flex justify-center">
-          <button type="button" className={linkButton} disabled={busy} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
+          <button type="button" className={linkButton} disabled={busy} aria-busy={busy} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
         </div>
       )}
     </section>
