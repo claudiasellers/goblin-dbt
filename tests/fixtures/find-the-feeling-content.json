@@ -424,7 +424,9 @@
       0.15
      ],
      "offer": 2,
-     "addressedBy": []
+     "addressedBy": [
+      "fast"
+     ]
     },
     {
      "emotionId": "sad",
@@ -632,7 +634,9 @@
       0.05
      ],
      "offer": 3,
-     "addressedBy": []
+     "addressedBy": [
+      "fast"
+     ]
     }
    ]
   },

@@ -20,6 +20,16 @@ m = re.search(r'UNWIND (\[[^\]]*\]) AS eid\nMATCH \(t:TherapyConcept \{id: \'dbt
 if m:
     addresses['dbt_recovering_from_invalidation'] = json.loads(m.group(1))
 
+# A skill on the runtime can own its concept's ADDRESSES set (scripts/skills/build.py, e.g. FAST's shame words).
+import importlib.util  # noqa: E402
+sys.path.insert(0, os.path.join(root, 'scripts/skills'))  # its content.py imports the skill files beside it
+_spec = importlib.util.spec_from_file_location('skills_content', os.path.join(root, 'scripts/skills/content.py'))
+_skills = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(_skills)
+for sk in _skills.SKILLS:
+    if sk.get('addresses'):
+        addresses[sk['concept']] = sk['addresses']
+
 SHAPE = ["sharp", "heat", "weight", "buzz", "clench"]
 families = []
 for fi, (fid, label, words) in enumerate(FAMILIES):
