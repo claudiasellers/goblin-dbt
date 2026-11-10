@@ -19,7 +19,7 @@ As a general guiding principle, every phase and tool should lead with curated, t
 - **Graph Database** (`/schema/*.cypher`):Neo4j Aura (knowledge graph + user data) Neo4j with nodes for User and all of the emotion / therapy / modality information. Again, this is the brain of the app.
 - **Data layer** (`/src/data/`): Static TypeScript files for UI presentation metadata only — emotions (display names, families, emojis), tools (names, categories, taglines), body regions, micro-steps. All emotion knowledge and clinical content comes from the graph via Cloud Functions.
 - **Hosting** Firebase Hosting
-- **Deployment** `firebase deploy` (`--only functions` / `--only hosting`; hosting's `predeploy` runs the build). There is no `npm run deploy` (the old gh-pages script is gone).
+- **Deployment** automatic on merge to main (`.github/workflows/deploy.yml`, plan in `scripts/ci/deploy-plan.mjs`), in the Deploy-section order: graph load (full `load-graph.mjs --verify` when a loaded `schema/` file changed; it commits the refreshed `src/data/content/`) → functions → migrations added since the last run (once each) → hosting. Each step runs only when its files changed since its `deploy/<step>` tag, and a failed step stops the rest. By hand still works: `firebase deploy` (`--only functions` / `--only hosting`; hosting's `predeploy` runs the build). There is no `npm run deploy` (the old gh-pages script is gone).
 
 Functions modules (`functions/src/<domain>/index.ts`; reserved for Phase A: `capacity/`, `witness/`, `spine/`, `profile/`, `userdata/`, `safety/`):
 
@@ -260,14 +260,19 @@ Child emotions map to their DBT parent category (e.g., `anxiety` → `fear`, `ir
 - Lint: `npx eslint .` still reports 4 pre-existing errors; don't add any (`node scripts/ci/lint-budget.mjs`, also run by CI).
 - Cypher syntax: `npx -y -p @neo4j-cypher/language-support@2.0.0-next.6 node scripts/lint-cypher.mjs`.
 - CI: `.github/workflows/ci.yml` runs both builds, `npm test` and the lint budget on every PR (Node 22, no secrets).
+- Merging: don't merge PRs yourself. When a PR is finished, add the `ready-to-merge` label (`gh pr edit <n> --add-label ready-to-merge`); the merge lane on Claudia's Mac tests it on top of main and merges it in a queue. A `lane-failed` label plus a comment means fix the branch and re-add the label. See `scripts/lane/README.md`.
 
 ---
 
 ## After a PR merges: tell Claudia the deploy steps
 
-Claudia runs every deploy and graph load herself, on her Mac (`~/Documents/goblin-dbt`); sessions have
-no `.env` or bolt access. Every PR description ends with a **Deploy** section, and when she says a PR is
-merged, reply with the exact commands in order, even when the answer is "nothing to run":
+A merge to main runs the whole deploy (`deploy.yml`): the graph load, functions, any migration the PR adds
+(a new file in `schema/migrations/`, run once, after functions) and hosting, in that order. Claudia runs
+nothing unless a step fails; sessions have no `.env` or bolt access. Every PR description still ends with a
+**Deploy** section saying what the merge will run, and anything it can't (a migration that must run
+*before* functions, a step that needs a decision). A migration that isn't safe to run unattended doesn't go
+in `schema/migrations/` until it is. When she says a PR is merged, say what the run did or will do, even when
+the answer is "nothing". If it fails, the run's summary names the step; the manual equivalents:
 `git pull`, then any graph loads (`node scripts/load-graph.mjs --only <file>`, constraints first; each load refreshes `src/data/content/`, so commit any change it makes there and deploy hosting), then
 `firebase deploy --only functions` (before hosting whenever the server must accept something new), then
 any one-off migration (`--file schema/migrations/…`) the PR says runs after functions, then
