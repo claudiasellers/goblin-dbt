@@ -346,14 +346,14 @@
    ]
   },
   "dbt_alternate_rebellion": {
-   "appToolId": null,
+   "appToolId": "alternate-rebellion",
    "name": "Alternate Rebellion",
    "description": "Finding non-destructive ways to rebel when feeling controlled or wanting to act against expectations; channel rebellious urges into harmless or even positive actions",
    "whenToUse": "When feeling controlled, wanting to defy expectations, or having urges to do something destructive just to rebel",
    "dbtBasis": null,
-   "side": null,
-   "skillKind": null,
-   "direction": null,
+   "side": "acceptance",
+   "skillKind": "redirect",
+   "direction": "neutral",
    "addresses": [
     "anger",
     "angsty",
@@ -3222,6 +3222,32 @@
    "version": "rf-v2",
    "reviewStatus": "approved",
    "rationale": "Settled resentment: Check the Facts (planned), FAST as the alternative; Do the Opposite until then, Pause after it."
+  },
+  {
+   "id": "rf_reactive_aggression_words_rebel_alternate-rebellion",
+   "conceptId": "dbt_alternate_rebellion",
+   "patternId": "reactive_aggression",
+   "bands": [
+    "steady",
+    "stirred"
+   ],
+   "priority": 1.5,
+   "direction": "neutral",
+   "side": null,
+   "requiresPrior": null,
+   "emotionGate": "words",
+   "words": [
+    "provoked",
+    "indignant"
+   ],
+   "tier": "quality_of_life",
+   "surface": [
+    "checkin_result"
+   ],
+   "active": false,
+   "version": "rf-v2",
+   "reviewStatus": "draft",
+   "rationale": "DT-11 (PRD): the push-back words, where a rebellion function is likely, get Rebel without the wreckage as the alternative to Pause; never flooded (body first). Anger alone doesn't imply a rebellion function (the PRD's open question), so not every anger word. Not resentful or bitter: their grievance rows (Do the Opposite, Check the Facts, FAST) lead there, and Pause would always take the swap."
   },
   {
    "id": "rf_reward_drive_low_addresses_recovering-from-invalidation",

@@ -324,6 +324,10 @@ for sk in SKILLS:
             A(f"MATCH (c:EmotionRegulationContent {{dbtParent: {q(extra['set'])}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (c)-[:HAS_INTERPRETATION]->(o);")
         if clinical == "Interpretation" and extra["set"] == "general":
             A(f"MATCH (s:Skill {{id: {q(sid)}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (s)-[:HAS_INTERPRETATION]->(o);")
+        if clinical == "RebellionOption":
+            # A rebellion serves the functions it's matched to (DT-11): queryable as knowledge, not only as UI.
+            for fn in extra["functions"]:
+                A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (f:SkillOption {{id: {q(sid + ':function:' + fn)}}})\nMERGE (o)-[:SERVES]->(f);")
         if clinical == "Alternative" and extra["for"] != "$own":
             A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (st:SkillOption {{id: {q(sid + ':story:' + extra['for'])}}})\nMERGE (o)-[:ALTERNATIVE_TO]->(st);")
 CYPHER = "\n".join(L)
