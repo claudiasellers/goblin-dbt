@@ -66,6 +66,9 @@ const upsertFn = httpsCallable<{ kind: 'quiet_hours'; value: QuietHours }, { ver
 const confirmFn = httpsCallable<ProfileItemRef, { version: number }>(functions, 'confirmProfileItem');
 const setAsideFn = httpsCallable<ProfileItemRef, { version: number }>(functions, 'setAsideProfileItem');
 const restoreFn = httpsCallable<ProfileItemRef, { version: number }>(functions, 'restoreProfileItem');
+const keepFn = httpsCallable<{ kind: string; id?: string; value: unknown; sourceSessionId?: string }, { version: number; id: string }>(functions, 'keepProfileItem');
+const editFn = httpsCallable<{ kind: string; id?: string; value: unknown }, { version: number }>(functions, 'editProfileItem');
+const deleteFn = httpsCallable<ProfileItemRef, { version: number }>(functions, 'deleteProfileItem');
 const offerFn = httpsCallable<{ id: string; answer: PatternOfferAnswer }, { version: number | null; status: string }>(functions, 'answerPatternOffer');
 
 export async function getProfileContext(toolId: ClientProfileConsumer): Promise<GetProfileContextResponse> {
@@ -85,6 +88,20 @@ export async function setAsideProfileItem(ref: ProfileItemRef): Promise<number> 
 }
 export async function restoreProfileItem(ref: ProfileItemRef): Promise<number> {
   return (await restoreFn(ref)).data.version;
+}
+/**
+ * Keep a profile item on the person's tap (the kind registry, functions/src/profile/kinds.ts). One-per-person
+ * kinds ignore `id`; others need a client UUID. `sourceSessionId` is the visit it was kept in.
+ */
+export async function keepProfileItem(input: { kind: string; id?: string; value: unknown; sourceSessionId?: string }): Promise<{ version: number; id: string }> {
+  return (await keepFn(input)).data;
+}
+export async function editProfileItem(input: { kind: string; id?: string; value: unknown }): Promise<number> {
+  return (await editFn(input)).data.version;
+}
+/** "Delete this" in Me (behind a two-step confirm). */
+export async function deleteProfileItem(ref: ProfileItemRef): Promise<number> {
+  return (await deleteFn(ref)).data.version;
 }
 export async function answerPatternOffer(id: string, answer: PatternOfferAnswer): Promise<{ version: number | null; status: string }> {
   return (await offerFn({ id, answer })).data;

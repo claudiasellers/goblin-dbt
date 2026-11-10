@@ -9,7 +9,9 @@ import { obj, str } from '../shared/validate';
 import { readProfileSlices, readProfileVersion } from './slices';
 import { PROFILE_NEEDS, SERVER_ONLY_CONSUMERS, type GetProfileContextResponse, type ProfileConsumer } from './types';
 
-export { upsertProfileFact, confirmProfileItem, setAsideProfileItem, restoreProfileItem } from './items';
+export {
+  upsertProfileFact, keepProfileItem, editProfileItem, deleteProfileItem, confirmProfileItem, setAsideProfileItem, restoreProfileItem,
+} from './items';
 export { answerPatternOffer } from './patternOffers';
 export { getMe } from './me';
 

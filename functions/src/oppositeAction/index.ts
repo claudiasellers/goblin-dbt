@@ -4,8 +4,9 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import neo4j, { Record as Neo4jRecord } from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { getDriver } from '../shared/neo4j';
 import { validateOppositeActionSession } from '../oppositeActionValidation';
+import { CALL_OPTS } from '../shared/callOptions';
 
 // ============================================
 // OPPOSITE ACTION CONTENT
@@ -57,7 +58,7 @@ interface OppositeActionContentResult {
  * No auth required — this is public emotion knowledge.
  */
 export const getOppositeActionContent = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request): Promise<OppositeActionContentResult> => {
     const { emotionIds } = request.data as { emotionIds: string[] };
 
@@ -201,7 +202,7 @@ const OA_SESSION_RETURN = `RETURN s.dataJson AS dataJson, toString(s.createdAt) 
 /** Explicit opt-in save. No LLM call; typed private evidence for future retrieval.
  * v2 follow-up reflections upsert the same session key (planned -> practiced | missed). */
 export const saveOppositeActionSession = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to save');
     let data: Record<string, unknown>;
@@ -319,7 +320,7 @@ export const saveOppositeActionSession = onCall(
 
 /** The signed-in user's saved guided (schemaVersion 2) sessions, newest first. */
 export const getOppositeActionSessions = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see saved exercises');
     const rawLimit = (request.data as { limit?: unknown } | null | undefined)?.limit;
@@ -355,7 +356,7 @@ export const getOppositeActionSessions = onCall(
 
 /** One of the signed-in user's v2 sessions by id (follow-up deep links), or null. */
 export const getOppositeActionSession = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see saved exercises');
     const id = (request.data as { id?: unknown } | null | undefined)?.id;
@@ -391,7 +392,7 @@ const OA_FOLLOW_UP_COPY_KEYS = [
  * upcoming), soonest first, plus the graph copy the home card needs.
  */
 export const getOppositeActionFollowUps = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see follow-ups');
     const userId = request.auth.uid;
