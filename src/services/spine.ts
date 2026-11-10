@@ -42,6 +42,8 @@ export interface CloseToolSessionRequest {
   schedule?: ScheduleFollowUpInput[];
   /** Wise mind's answer (a WiseMindAnswer id, or `own`): ask-fresh, on this session only; the server drops it for other tools. */
   wiseMindAnswer?: string;
+  /** Check the Facts' "Does it fit?": ask-fresh, on this session only; the server drops it for other tools. */
+  fitsFacts?: 'fits' | 'partly' | 'doesnt_fit' | 'unsure';
 }
 
 export interface CloseToolSessionResponse { id: string; skillPracticeIds: string[]; followUpIds: string[] }

@@ -125,9 +125,14 @@ NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the 
 # PLANNED, and its anticipatory row stays switched off (BUILT_NOT_SIGNED_OFF) and a draft until Claudia
 # signs it off.
 CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "skillKind": "change", "direction": "neutral"}
-BUILT_NOT_SIGNED_OFF = {"cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)"}
+# Check the Facts has shipped on the skill runtime (appToolId 'check-the-facts', docs/design/skill-runtime.md):
+# out of PLANNED; its six rows stay switched off and drafts until Claudia signs them off, row by row.
+CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change", "skillKind": "change", "direction": "neutral"}
+BUILT_NOT_SIGNED_OFF = {
+    "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
+    "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",
+}
 PLANNED = {
-    "check-the-facts":    {"concept": "dbt_check_facts",        "side": "change",     "skillKind": "change",     "direction": "neutral"},
     "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
     "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "radical-acceptance": {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},

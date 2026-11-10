@@ -21,6 +21,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'cope-ahead': { module: 'er', closeKind: 'none' },
   // FTF asks its own then-vs-now (stored `close`, mapped at read: R3).
   'find-the-feeling': { module: 'er', closeKind: 'regulation_down' },
+  // Check the Facts (docs/design/check-the-facts.md), the first skill on the runtime: "How strong is it now,
+  // compared to when you started?", asked before any hand-off leaves.
+  'check-the-facts': { module: 'er', closeKind: 'regulation_down' },
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'none' },
   'dear-man': { module: 'ie', closeKind: 'none' },

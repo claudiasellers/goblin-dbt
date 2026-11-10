@@ -28,6 +28,9 @@ export const WM_OWN_MAX = 140;
 export const CA_OWN_MAX = 140;
 export const CA_MOVE_OWN_MAX = 90;
 
+/** Own words on a skill-runtime answer (scripts/skills/<skill>.py OWN_MAX). */
+export const RUN_OWN_MAX = 140;
+
 /** Registered namespaces. A module adds its keys here in the PR that writes them. */
 export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
   core: {
@@ -113,6 +116,44 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
     settle: { t: 'one', of: ['breath', 'five_senses', 'ok'] },
     kept: { t: 'bool' },                                                           // "Keep this" wrote an OwnLine
     followUp: { t: 'bool' },                                                       // "Want me to ask how it went?" Yes
+  },
+  // The skill runtime (docs/design/skill-runtime.md): one shape for every skill the player runs, the
+  // attempt record a router reads. Ids only, plus the person's own words on an answer (length-checked only).
+  run: {
+    skillId: { t: 'id' },                                                          // Skill id (schema/skills.cypher)
+    versionId: { t: 'id' },                                                        // its version (cf-v1)
+    path: { t: 'ids', max: 48 },                                                   // step ids, in the order shown
+    answers: {                                                                     // what was chosen, per question
+      t: 'objs', max: 32,
+      of: { fieldId: { t: 'id' }, optionIds: { t: 'ids', max: 12 }, valueOwn: { t: 'text', max: RUN_OWN_MAX } },
+    },
+    offeredExitIds: { t: 'ids', max: 8 },                                          // what the hand-off offered
+    exitId: { t: 'id' },                                                           // where it went (a SkillExit id, or done)
+    embedsShown: { t: 'ids', max: 8 },                                             // e.g. unblend: the parts line showed
+    // What the page that opened the skill passed in (docs/design/dbt-modules-plan.md C1): ids only. Never the
+    // band: it is ask-fresh, and may steer a run but is not recorded (C4.6).
+    ctx: {
+      t: 'obj',
+      of: {
+        urgeId: { t: 'id' }, personId: { t: 'id' }, frame: { t: 'id' }, enterAt: { t: 'id' },
+        situationId: { t: 'id' }, partId: { t: 'id' },
+      },
+    },
+    // Whole-screen embeds' reports: option ids, own words, and measurements (seconds held, counts), never ratings.
+    out: {
+      t: 'objs', max: 8,
+      of: {
+        embed: { t: 'id' }, stepId: { t: 'id' }, optionIds: { t: 'ids', max: 12 }, valueOwn: { t: 'text', max: RUN_OWN_MAX },
+        durationSec: { t: 'int', max: 3600 }, doneCount: { t: 'int', max: 100 }, earlyCount: { t: 'int', max: 100 },
+      },
+    },
+    handoffs: {                                                                    // P2 breakdown hand-off, as ext.er.handoffs
+      t: 'objs', max: 4,
+      of: {
+        primitiveId: { t: 'id' }, completed: { t: 'bool' }, durationSec: { t: 'int', max: 3600 },
+        thenVsNow: { t: 'id' }, resumed: { t: 'bool' }, overridden: { t: 'bool' },
+      },
+    },
   },
 };
 

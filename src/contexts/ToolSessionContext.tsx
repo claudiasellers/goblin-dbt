@@ -52,6 +52,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
   const urgeIds = useRef<string[]>([]);
   const bandAtStart = useRef<CapacityReading | null>(null);
   const wiseMindAnswer = useRef<string | null>(null);
+  const fitsFacts = useRef<'fits' | 'partly' | 'doesnt_fit' | 'unsure' | null>(null);
   const closed = useRef(false);
   const mounted = useRef(false);
 
@@ -96,6 +97,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
           ...(input.repSource ? { repSource: input.repSource } : {}),
           ...(input.schedule?.length ? { schedule: input.schedule } : {}),
           ...(wiseMindAnswer.current ? { wiseMindAnswer: wiseMindAnswer.current } : {}),
+          ...(fitsFacts.current ? { fitsFacts: fitsFacts.current } : {}),
         });
         refreshToday();
         return res;
@@ -123,6 +125,7 @@ export function ToolSessionProvider({ toolId, children }: { toolId: string; chil
       setUrgeIds: (ids) => { urgeIds.current = sessionUrgeIds(ids); },
       setBandAtStart: (r) => { bandAtStart.current = r; },
       setWiseMindAnswer: (a) => { wiseMindAnswer.current = a; },
+      setFitsFacts: (v) => { fitsFacts.current = v; },
       close,
       linkTo: (target, state) => ({
         pathname: `/tool/${target}`,

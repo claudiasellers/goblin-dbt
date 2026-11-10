@@ -128,6 +128,7 @@ export const PROFILE_NEEDS = {
   'five-senses': ['parts'],
   'pause': ['parts'],
   'urge-surfing': ['parts'],
+  'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,
   // tender and safety flags. Empty while parts are off, so the tool shows its two-minds form.
   'wise-mind': ['parts'],

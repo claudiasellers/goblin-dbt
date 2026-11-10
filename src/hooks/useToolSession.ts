@@ -65,6 +65,8 @@ export interface ToolSessionApi {
    * Ask-fresh (layers.ts ASK_FRESH_FIELDS): only what was picked now, never read back or pre-filled.
    */
   setWiseMindAnswer(id: string | null): void;
+  /** Check the Facts' "Does it fit?" in this visit (ask-fresh, like the wise mind answer). */
+  setFitsFacts(v: 'fits' | 'partly' | 'doesnt_fit' | 'unsure' | null): void;
   /** Close once (later calls resolve null). Resolves null when nothing was written. */
   close(input?: ToolSessionCloseInput): Promise<CloseToolSessionResponse | null>;
   /** Route + state for handing off to another tool from inside this one. */
@@ -86,6 +88,7 @@ export const NO_SESSION: ToolSessionApi = {
   setEmotionIds: () => {},
   setUrgeIds: () => {},
   setWiseMindAnswer: () => {},
+  setFitsFacts: () => {},
   close: async () => null,
   linkTo: (toolId, state) => ({ pathname: `/tool/${toolId}`, state: { ...state, spine: { entry: 'handoff' } } }),
 };

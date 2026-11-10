@@ -84,7 +84,14 @@ export interface CloseInput {
   schedule: ScheduleInput[];
   /** Wise mind's answer (a WiseMindAnswer id, or `own`): ask-fresh, on this session only; kept for wise-mind only. */
   wiseMindAnswer: string | null;
+  /** Check the Facts' "Does it fit?" (FITS_FACTS): ask-fresh, on this session only; kept for FITS_FACTS_TOOLS only. */
+  fitsFacts: FitsFacts | null;
 }
+
+export const FITS_FACTS = ['fits', 'partly', 'doesnt_fit', 'unsure'] as const;
+export type FitsFacts = (typeof FITS_FACTS)[number];
+/** The tools that ask "Does it fit?": another tool's fitsFacts is dropped at the write. */
+export const FITS_FACTS_TOOLS: readonly string[] = ['check-the-facts'];
 
 /** `closeKind` is the tool's (from SPINE_TOOLS): an answer the kind doesn't ask is rejected. */
 export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): CloseInput {
@@ -117,6 +124,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
     ext: validateExt(d.ext),
     schedule: validateSchedule(d.schedule, now),
     wiseMindAnswer: opt(d.wiseMindAnswer, (x) => str(x, { max: 64, pattern: GRAPH_ID })),
+    fitsFacts: opt(d.fitsFacts, (x) => oneOf(x, FITS_FACTS)),
   };
 }
 

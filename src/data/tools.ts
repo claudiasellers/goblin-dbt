@@ -105,6 +105,18 @@ export const tools: Tool[] = [
     emoji: '🧭',
     bare: true,
   },
+  {
+    // The first skill on the skill runtime (docs/design/skill-runtime.md): its screens are graph data.
+    id: 'check-the-facts',
+    name: 'Check the Facts',
+    tagline: 'See if a feeling fits what happened',
+    description: 'Name the feeling, set down what happened, notice the story you\'re telling about it and other ways to see it, then check whether the feeling fits the facts.',
+    whenToUse: 'When a feeling is strong and you\'re not sure it matches what happened.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 8',
+    emoji: '🔍',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -190,6 +202,7 @@ export const allIntents: Intent[] = [
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
+  { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
 ];
 
 /** The intents the Tools page lists: those whose tool is listed for everyone. */

@@ -574,6 +574,13 @@
    "copy": "A part of you {move} right now.",
    "reviewStatus": "approved"
   },
+  "cf_unblend": {
+   "flow": "cf",
+   "step": "story",
+   "order": 0,
+   "copy": "This story might come from a part of you that's trying to protect you.",
+   "reviewStatus": "approved"
+  },
   "angry_unblend": {
    "flow": "angry",
    "step": "unblend",
