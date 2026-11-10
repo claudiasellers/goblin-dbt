@@ -89,7 +89,9 @@ const pageOf = (id) => {
   const file = comp && (toolPage.match(new RegExp(`import \\{ ${comp} \\} from '\\./tools/(\\w+)'`))?.[1]
     ?? toolPage.match(new RegExp(`const Lazy${comp} = lazy\\(\\(\\) => import\\('\\./tools/(\\w+)'\\)`))?.[1]);
   if (!file) return null;
-  return `src/pages/tools/${file}.tsx`;
+  const page = `src/pages/tools/${file}.tsx`;
+  // A page that only picks which of its skills to play (FAST: docs/design/fast.md) is closed by the player too.
+  return /<SkillPlayer skillId=/.test(read(page)) ? "src/components/skillPlayer/SkillPlayer.tsx" : page;
 };
 /**
  * Tools that may never show the row although their close asks then-vs-now. Wise mind: its parts form

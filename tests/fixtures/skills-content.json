@@ -1294,7 +1294,10 @@
     "elsewhere_line": "What you needed still matters. It can be met somewhere else.",
     "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
     "next": "Next",
-    "done": "Done"
+    "done": "Done",
+    "card_copy": "Copy",
+    "card_copied": "Copied",
+    "card_selected": "The line is selected, ready to copy."
    },
    "tables": {},
    "derive": [],
@@ -1343,16 +1346,12 @@
      "title": "card_title",
      "answerAs": "card_copied",
      "props": {
-      "from": [
-       "line"
-      ],
-      "copyable": true,
-      "labels": {
-       "copy": "Copy",
-       "copied": "Copied",
-       "selected": "The line is selected, ready to copy.",
-       "next": "Next"
-      }
+      "field": "line",
+      "shape": "line",
+      "next": "next",
+      "copyLabel": "card_copy",
+      "copiedLabel": "card_copied",
+      "selectedLabel": "card_selected"
      },
      "next": [
       {
@@ -1498,7 +1497,10 @@
     "next_line_wrong": "A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.",
     "next_line_unsure": "Not sure about the sorry? Check the Facts can help sort it out.",
     "next": "Next",
-    "done": "Done"
+    "done": "Done",
+    "card_copy": "Copy",
+    "card_copied": "Copied",
+    "card_selected": "The line is selected, ready to copy."
    },
    "tables": {},
    "derive": [],
@@ -1617,16 +1619,12 @@
      "title": "card_a_title",
      "answerAs": "card_a_copied",
      "props": {
-      "from": [
-       "sorry_instead"
-      ],
-      "copyable": true,
-      "labels": {
-       "copy": "Copy",
-       "copied": "Copied",
-       "selected": "The line is selected, ready to copy.",
-       "next": "Next"
-      }
+      "field": "sorry_instead",
+      "shape": "line",
+      "next": "next",
+      "copyLabel": "card_copy",
+      "copiedLabel": "card_copied",
+      "selectedLabel": "card_selected"
      },
      "next": [
       {
@@ -1672,16 +1670,9 @@
      "title": "card_s_title",
      "answerAs": "card_s_copied",
      "props": {
-      "from": [
-       "values"
-      ],
-      "copyable": false,
-      "labels": {
-       "copy": "Copy",
-       "copied": "Copied",
-       "selected": "The line is selected, ready to copy.",
-       "next": "Next"
-      }
+      "field": "values",
+      "shape": "list",
+      "next": "next"
      },
      "next": [
       {
@@ -1725,16 +1716,12 @@
      "title": "card_t_title",
      "answerAs": "card_t_copied",
      "props": {
-      "from": [
-       "truth"
-      ],
-      "copyable": true,
-      "labels": {
-       "copy": "Copy",
-       "copied": "Copied",
-       "selected": "The line is selected, ready to copy.",
-       "next": "Next"
-      }
+      "field": "truth",
+      "shape": "line",
+      "next": "next",
+      "copyLabel": "card_copy",
+      "copiedLabel": "card_copied",
+      "selectedLabel": "card_selected"
      },
      "next": [
       {
@@ -1778,16 +1765,12 @@
      "title": "card_f_title",
      "answerAs": "card_f_copied",
      "props": {
-      "from": [
-       "instead"
-      ],
-      "copyable": true,
-      "labels": {
-       "copy": "Copy",
-       "copied": "Copied",
-       "selected": "The line is selected, ready to copy.",
-       "next": "Next"
-      }
+      "field": "instead",
+      "shape": "line",
+      "next": "next",
+      "copyLabel": "card_copy",
+      "copiedLabel": "card_copied",
+      "selectedLabel": "card_selected"
      },
      "next": [
       {

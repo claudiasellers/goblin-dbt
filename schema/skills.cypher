@@ -808,7 +808,7 @@ SET r += {list: "fits", order: 104};
 
 // --- fast_review (fast-review-v1) ---
 MERGE (s:Skill {id: "fast_review"})
-SET s += {toolId: "fast", version: "fast-review-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.copyJson = "{\"card_a_title\": \"One sorry for a real wrong. None for having a need.\", \"card_f_title\": \"What you'd say instead\", \"card_s_title\": \"The value you'd keep\", \"card_t_title\": \"The true version\", \"done\": \"Done\", \"instead_title\": \"What would you say instead, next time?\", \"next\": \"Next\", \"next_line\": \"That's one move to carry into the next conversation.\", \"next_line_unsure\": \"Not sure about the sorry? Check the Facts can help sort it out.\", \"next_line_wrong\": \"A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.\", \"own_hint\": \"Say it my way\", \"sorry_instead_title\": \"What could take the place of the extra sorries next time?\", \"sorry_title\": \"Was there something you did that needs a sorry?\", \"truth_title\": \"What's the true version?\", \"values_hint\": \"Pick one or two.\", \"values_title\": \"Which value do you want to keep next time?\", \"what_hint\": \"This happens to a lot of people. Pick the one you'd most like to change.\", \"what_own\": \"Something else\", \"what_title\": \"Looking back, which of these happened?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "fast", version: "fast-review-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.inlineJson = "null", s.copyJson = "{\"card_a_title\": \"One sorry for a real wrong. None for having a need.\", \"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_f_title\": \"What you'd say instead\", \"card_s_title\": \"The value you'd keep\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_t_title\": \"The true version\", \"done\": \"Done\", \"instead_title\": \"What would you say instead, next time?\", \"next\": \"Next\", \"next_line\": \"That's one move to carry into the next conversation.\", \"next_line_unsure\": \"Not sure about the sorry? Check the Facts can help sort it out.\", \"next_line_wrong\": \"A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.\", \"own_hint\": \"Say it my way\", \"sorry_instead_title\": \"What could take the place of the extra sorries next time?\", \"sorry_title\": \"Was there something you did that needs a sorry?\", \"truth_title\": \"What's the true version?\", \"values_hint\": \"Pick one or two.\", \"values_title\": \"Which value do you want to keep next time?\", \"what_hint\": \"This happens to a lot of people. Pick the one you'd most like to change.\", \"what_own\": \"Something else\", \"what_title\": \"Looking back, which of these happened?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_fast"}), (s:Skill {id: "fast_review"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "fast_review"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -829,7 +829,7 @@ MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:sorry_instea
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
 MERGE (n:SkillStep {id: "fast_review:card_a"})
-SET n += {skillId: "fast_review", step: "card_a", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_a_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copyable\": true, \"from\": [\"sorry_instead\"], \"labels\": {\"copied\": \"Copied\", \"copy\": \"Copy\", \"next\": \"Next\", \"selected\": \"The line is selected, ready to copy.\"}}, \"title\": \"card_a_title\"}";
+SET n += {skillId: "fast_review", step: "card_a", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_a_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"sorry_instead\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_a_title\"}";
 MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_a"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
@@ -839,7 +839,7 @@ MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:values"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
 MERGE (n:SkillStep {id: "fast_review:card_s"})
-SET n += {skillId: "fast_review", step: "card_s", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_s_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copyable\": false, \"from\": [\"values\"], \"labels\": {\"copied\": \"Copied\", \"copy\": \"Copy\", \"next\": \"Next\", \"selected\": \"The line is selected, ready to copy.\"}}, \"title\": \"card_s_title\"}";
+SET n += {skillId: "fast_review", step: "card_s", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_s_copied\", \"embed\": \"boundaryLine\", \"props\": {\"field\": \"values\", \"next\": \"next\", \"shape\": \"list\"}, \"title\": \"card_s_title\"}";
 MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_s"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
@@ -849,7 +849,7 @@ MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:truth"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "fast_review:card_t"})
-SET n += {skillId: "fast_review", step: "card_t", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_t_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copyable\": true, \"from\": [\"truth\"], \"labels\": {\"copied\": \"Copied\", \"copy\": \"Copy\", \"next\": \"Next\", \"selected\": \"The line is selected, ready to copy.\"}}, \"title\": \"card_t_title\"}";
+SET n += {skillId: "fast_review", step: "card_t", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_t_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"truth\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_t_title\"}";
 MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_t"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
@@ -859,7 +859,7 @@ MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:instead"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
 MERGE (n:SkillStep {id: "fast_review:card_f"})
-SET n += {skillId: "fast_review", step: "card_f", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_f_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copyable\": true, \"from\": [\"instead\"], \"labels\": {\"copied\": \"Copied\", \"copy\": \"Copy\", \"next\": \"Next\", \"selected\": \"The line is selected, ready to copy.\"}}, \"title\": \"card_f_title\"}";
+SET n += {skillId: "fast_review", step: "card_f", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_f_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"instead\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_f_title\"}";
 MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_f"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
@@ -1101,7 +1101,7 @@ SET r += {list: "instead", order: 31};
 
 // --- fast_let_go (fast-let-go-v1) ---
 MERGE (s:Skill {id: "fast_let_go"})
-SET s += {toolId: "fast", version: "fast-let-go-v1", contentVersion: "skills-v1", start: "line", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.copyJson = "{\"card_title\": \"Your line, to use or not\", \"done\": \"Done\", \"elsewhere_line\": \"What you needed still matters. It can be met somewhere else.\", \"elsewhere_line_no\": \"You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.\", \"elsewhere_line_none\": \"Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.\", \"line_hint\": \"A boundary line says what you'll do. It doesn't argue.\", \"line_none\": \"I don't need to say anything\", \"line_title\": \"Do you want a line that says where you stand?\", \"next\": \"Next\", \"own_hint\": \"Say it my way\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "fast", version: "fast-let-go-v1", contentVersion: "skills-v1", start: "line", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.inlineJson = "null", s.copyJson = "{\"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_title\": \"Your line, to use or not\", \"done\": \"Done\", \"elsewhere_line\": \"What you needed still matters. It can be met somewhere else.\", \"elsewhere_line_no\": \"You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.\", \"elsewhere_line_none\": \"Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.\", \"line_hint\": \"A boundary line says what you'll do. It doesn't argue.\", \"line_none\": \"I don't need to say anything\", \"line_title\": \"Do you want a line that says where you stand?\", \"next\": \"Next\", \"own_hint\": \"Say it my way\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_fast"}), (s:Skill {id: "fast_let_go"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "fast_let_go"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -1112,7 +1112,7 @@ MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:line"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
 MERGE (n:SkillStep {id: "fast_let_go:card"})
-SET n += {skillId: "fast_let_go", step: "card", kind: "embed", version: "fast-let-go-v1"}, n.specJson = "{\"answerAs\": \"card_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copyable\": true, \"from\": [\"line\"], \"labels\": {\"copied\": \"Copied\", \"copy\": \"Copy\", \"next\": \"Next\", \"selected\": \"The line is selected, ready to copy.\"}}, \"title\": \"card_title\"}";
+SET n += {skillId: "fast_let_go", step: "card", kind: "embed", version: "fast-let-go-v1"}, n.specJson = "{\"answerAs\": \"card_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"line\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_title\"}";
 MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:card"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};

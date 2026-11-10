@@ -21,7 +21,8 @@ OWN_MAX = 140
 LINE_MAX = 90
 
 # Words the line card uses (props on its steps; the embed has no copy of its own).
-CARD = {"copy": "Copy", "copied": "Copied", "selected": "The line is selected, ready to copy.", "next": "Next"}
+# The boundary line card's words (copy keys in both skills; the player resolves them, EMBED_PROPS).
+CARD_COPY = {"card_copy": "Copy", "card_copied": "Copied", "card_selected": "The line is selected, ready to copy."}
 
 
 def a(field):
@@ -60,6 +61,7 @@ REVIEW_COPY = {
     "next_line_unsure": "Not sure about the sorry? Check the Facts can help sort it out.",
     "next": "Next",
     "done": "Done",
+    **CARD_COPY,
 }
 
 # What happened: one chip per FAST slip, each with its letter (props) so a reader can count them.
@@ -114,10 +116,13 @@ LETTER_OF = {v: letter for v, _label, letter in WHAT}
 OWN_WHAT = {"all": [{"own": "what"}, {"not": {"set": a("what") + ".ids"}}]}  # own words, no chip (`set` on the bare ref counts own words)
 
 
-def card(step_id, title, fields, copyable, next_to="next"):
+def card(step_id, title, field, copyable, next_to="next"):
+    props = {"field": field, "shape": "line" if copyable else "list", "next": "next"}
+    if copyable:
+        props.update({"copyLabel": "card_copy", "copiedLabel": "card_copied", "selectedLabel": "card_selected"})
     return {
         "id": step_id, "kind": "embed", "embed": "boundaryLine", "title": title, "answerAs": f"{step_id}_copied",
-        "props": {"from": fields, "copyable": copyable, "labels": CARD},
+        "props": props,
         "next": [{"to": next_to}],
     }
 
@@ -145,28 +150,28 @@ REVIEW_STEPS = [
                     "own": {"hint": "own_hint", "countsAsPick": True, "max": LINE_MAX}}],
         "next": [{"to": "card_a"}],
     },
-    card("card_a", "card_a_title", ["sorry_instead"], True),
+    card("card_a", "card_a_title", "sorry_instead", True),
     {
         "id": "values", "kind": "ask", "title": "values_title", "hint": "values_hint",
         "fields": [{"id": "values", "options": {"list": "values"}, "max": 2, "swap": True, "required": True,
                     "own": {"hint": "own_hint", "countsAsPick": True, "max": 40}}],
         "next": [{"to": "card_s"}],
     },
-    card("card_s", "card_s_title", ["values"], False),
+    card("card_s", "card_s_title", "values", False),
     {
         "id": "truth", "kind": "ask", "title": "truth_title",
         "fields": [{"id": "truth", "options": {"list": "truth"}, "max": 1, "required": True,
                     "own": {"hint": "own_hint", "countsAsPick": True, "max": LINE_MAX}}],
         "next": [{"to": "card_t"}],
     },
-    card("card_t", "card_t_title", ["truth"], True),
+    card("card_t", "card_t_title", "truth", True),
     {
         "id": "instead", "kind": "ask", "title": "instead_title",
         "fields": [{"id": "instead", "options": {"list": "instead"}, "max": 1, "required": True,
                     "own": {"hint": "own_hint", "countsAsPick": True, "max": LINE_MAX}}],
         "next": [{"to": "card_f"}],
     },
-    card("card_f", "card_f_title", ["instead"], True),
+    card("card_f", "card_f_title", "instead", True),
     {
         "id": "next", "kind": "handoff", "complete": True,
         "lines": [
@@ -226,6 +231,7 @@ LET_GO_COPY = {
     "elsewhere_line_none": "Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.",
     "next": "Next",
     "done": "Done",
+    **CARD_COPY,
 }
 
 # Boundary lines (Wound PRD §7.1 BoundaryLine, ≥ 8): each says what the person will do, short and non-attacking,
@@ -253,7 +259,7 @@ LET_GO_STEPS = [
                     "own": {"hint": "own_hint", "countsAsPick": True, "max": LINE_MAX}}],
         "next": [{"when": is_("line", "none"), "to": "elsewhere"}, {"to": "card"}],
     },
-    card("card", "card_title", ["line"], True, next_to="elsewhere"),
+    card("card", "card_title", "line", True, next_to="elsewhere"),
     {
         "id": "elsewhere", "kind": "handoff", "complete": True,
         "lines": [

@@ -56,8 +56,8 @@ test("S: the values, two at most, a third swaps; the card is a list, not copyabl
   assert.equal(s.stepId, "values");
   assert.equal(s.answers.values.ids.length, 2);
   const card = M.stepOf(review, "card_s");
-  assert.equal(card.props.copyable, false);
-  assert.equal(M.stepOf(review, "card_a").props.copyable, true);
+  assert.equal(card.props.shape, "list");
+  assert.equal(M.stepOf(review, "card_a").props.shape, "line");
   assert.deepEqual(run(review, [pick("what", "went_along"), next, pick("values", review.options.values[0].value), next]).path, ["what", "values", "card_s"]);
 });
 
