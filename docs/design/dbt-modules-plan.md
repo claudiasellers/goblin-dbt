@@ -189,6 +189,16 @@ Rules:
    as the sub-run's `thenVsNow`, so the sub-run still has an outcome.
 6. **Legacy ext namespaces are frozen for new skills.** `ext.dt`, `ext.er`, `ext.ie`, `ext.ca`, `ext.wm`
    take no new fields. A ported tool keeps writing its old namespace only as a C8 projection.
+7. **Own words are encrypted, and are never data.** From the first lane PR on, every own-words value
+   (`answers[].valueOwn`, own text an embed's `out` declares, own text a keep step passes) is written
+   through `functions/src/shared/crypto.ts` (envelope encryption, one data key per person, Cloud KMS;
+   decided in `user-profile.md` on PR #55). A field is marked own words in the skill file (`own`) or the
+   embed's `out` schema (`ownText: true`), and the contract test fails an unmarked free-text field.
+   Nothing a reader counts, filters or routes on may be an own-words field: those are option ids.
+8. **Store-agnostic.** Whether user data stays in Neo4j or moves to Firestore is still open (Claudia,
+   `user-profile.md` §3; recommendation: stay). Nothing here depends on the answer: the record stays
+   `ToolSession` + `ext.run`, and every write goes through the userdata registry, so a whole-store move
+   would be one migration. No lane puts new data in a second store.
 
 ### C2. Profile writes and reads
 
