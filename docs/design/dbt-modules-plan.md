@@ -1,6 +1,6 @@
 # Finishing Distress Tolerance, Interpersonal Effectiveness and Emotion Regulation
 
-Written 10 Nov 2026. Status: **plan, awaiting Claudia's approval. Nothing here is built.**
+Written 10 Nov 2026. Status: **approved by Claudia on 10 Nov** (all 17 decisions in §7, with her changes to D5, D6, D12 and D13). The foundation (§4) is the work in progress.
 
 Claudia's ask (10 Nov): *"I want the modules in. I want to aim for finishing distress tolerance,
 interpersonal effectiveness and emotional regulation"*, then *"I want this all to be following a plan, if
@@ -612,26 +612,28 @@ room palettes where used, and side by side with the old page when it's a port.
 
 ---
 
-## 7. Decisions for Claudia
+## 7. Decisions
 
-Each has a default that applies if you approve the plan without changing it.
+Claudia approved every default on 10 Nov, with four changes (marked **Changed**). User data stays in
+Neo4j (`user-profile.md` §3), and own-words free text is encrypted server-side with Cloud KMS from the
+first lane PR on (§3 C1 rule 7).
 
-| # | Decision | Default |
+| # | Decision | Decided |
 |---|---|---|
 | D1 | With the capacity question out, what drives the PRDs' steady / stirred / flooded branches? | **No band = the standard path.** Flooded only from a carried reading, a host, or Help me now. No skill asks or infers a band |
 | D2 | New log labels the PRDs name per visit (`UrgeEpisode`, `FactCheck`, `RehearsalSession`, `SayNoSession`, `VulnerabilityCheck`, `ParkedItem`…) | **None.** `ToolSession` + `ext.run` + spine fields; a parked item is a follow-up plus its run. `Interaction` stays a label (it has its own lifecycle) |
 | D3 | Is the skill runtime also MF's practice runtime (DT-07 body scan, DT-08, ER-08, IE-10)? | **Yes.** One player; the MF practice pieces become embeds and runtime options |
 | D4 | Two live hazards in shipped tools: Circuit Breaker has no self-check before ice on the face, and DEAR MAN can build a confrontation plan for someone who is dangerous. Fix ahead of the paused safety batch? | **Yes, both, as small pieces inside the lanes:** a one-tap self-check in DT-B2, and IE-01's *Is it safe to bring hard things up with them?* in IE-B2 (with the `other_person` banner). The rest of the safety batch stays paused |
-| D5 | What `safety.open` opens until CORE-01 ships | **The crisis banner as a full screen** (988, text line), with the host still underneath; DT-02's *hurt myself* chip on the first row |
-| D6 | Tool ids | **`cool-down`** keeps DT-01 (signed-off rows stay; named "First, the body"; Circuit Breaker becomes its cold mode); **`five-senses`** stays as an entry that starts DT-01 at orient; **`pause`** (named "Hold to wait"); **`urge-surfing`** (named "Ride it out"); **`let-it-be`** (routing's planned `radical-acceptance` renamed); **`mind-job`** (routing's `accepts` renamed); **`please-skill`** (named "Running low"; 13 graph refs already use it) |
+| D5 | What `safety.open` opens until CORE-01 ships | **The crisis banner as a full screen** (988, text line), with the host still underneath; DT-02's *hurt myself* chip on the first row. **Changed:** add a few non-US crisis numbers now (the banner stays the only file that holds numbers), ahead of CORE-01's full helpline list |
+| D6 | Tool ids | **`cool-down`** keeps DT-01 (signed-off rows stay; named "First, the body"; Circuit Breaker becomes its cold mode, **changed:** keeping the label "Circuit Breaker" on that mode); **`five-senses`** stays as an entry that starts DT-01 at orient; **`pause`** (named "Hold to wait"); **`urge-surfing`** (named "Ride it out"); **`let-it-be`** (routing's planned `radical-acceptance` renamed); **`mind-job`** (routing's `accepts` renamed); **`please-skill`** (named "Running low"; 13 graph refs already use it) |
 | D7 | PR #48 (OA doors, multi-feeling) | **Merge it as it is first**, then ER-B3 ports the merged page, keeping doors as an embed and multi-feeling as per-feeling sub-runs (R16) |
 | D8 | PLEASE's shape | **The PRD's five rows**, reusing PR #33's copy |
 | D9 | OA v3's clinical changes: *do I want to change it?*, prediction vs actual, the repair route, removing the 0–10 numbers, splitting danger / boundary / not sure | **All in, as the PRD has them** |
 | D10 | Cope Ahead | **Absorb DEAR MAN's 11 moves** (linked, not deleted); a kept plan becomes a `cope_ahead_plan` (`user-profile.md` P6) |
 | D11 | DEAR MAN | **Three skills under the one `dear-man` id**: prep, one message, debrief |
-| D12 | IE-02's stage | **2D (den / Two pulls style) for v1**, fully scripted other-person turns |
-| D13 | Voice memos and photos (kit, acceptance statement, trusted voice, safe place) | **Not in v1.** Text only; storage and export/delete designed separately |
-| D14 | Three features that need your clinical call before a lane starts them: DT-09's substance scope, ER-15 without a clinician, IE-08's DV specialist review | **Lanes don't start them** until you decide |
+| D12 | IE-02's stage | **2D (den / Two pulls style) for v1**, fully scripted other-person turns. **Changed:** AI role-play for the other person is noted as a planned v2 |
+| D13 | Voice memos and photos (kit, acceptance statement, trusted voice, safe place) | **Not in v1.** Text only. **Changed:** media storage (with export and delete) is the first thing built after the modules |
+| D14 | Three features that need your clinical call before a lane starts them: DT-09's substance scope, ER-15 without a clinician, IE-08's DV specialist review | **Lanes don't start them** until Claudia decides (still open) |
 | D15 | Routing | **Lanes author rows off and as drafts; you sign off per tool** after its clinical gate |
 | D16 | Witness lines the skills open with (DT-04, DT-11, ER function lines, IE-06 `forOther`) | **Drafts, signed off by you per batch**; skills work with the line absent |
 | D17 | Who reviews | **Three independent Claude reviews per PR (§6), then you** for the final look and sign-offs, then your merge queue |
