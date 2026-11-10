@@ -93,11 +93,15 @@ test('exportUserData adds formatVersion 2, records grouped by exportAs, and link
   assert.ok(f.allClosed());
 });
 
-test('retention deletes log records only, never profile items (D-10)', async () => {
+test('retention deletes log records only, never profile items (D-10); the settings read no longer runs it', async () => {
   const f = fakeDriver((q) => (/RETURN u \{\.\*\} AS user/.test(q) ? [{ user: { dataRetentionDays: 90 } }] : []));
   setDriver(f.driver);
   await fns.getUserProfile.run({ auth: auth(), data: {} });
-  const retention = f.calls.map((c) => c.query).filter((q) => /DETACH DELETE/.test(q));
+  assert.ok(f.calls.every((c) => !/DETACH DELETE/.test(c.query)), 'getUserProfile is a read');
+  const { applyRetention } = require('../../lib/userdata/exportDelete.js');
+  const g = fakeDriver(() => []);
+  await applyRetention(g.driver.session(), 'u1', 90);
+  const retention = g.calls.map((c) => c.query).filter((q) => /DETACH DELETE/.test(q));
   assert.ok(retention.some((q) => /MATCH \(n:LogRecord \{ownerId: \$uid\}\)/.test(q)));
   assert.ok(retention.every((q) => !/ProfileItem/.test(q)));
 });

@@ -4,9 +4,10 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import neo4j from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { getDriver } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { validateInvalidationRecoverySession, expectedRecoveryGate, type RecoveryGates } from '../invalidationRecoveryValidation';
+import { CALL_OPTS } from '../shared/callOptions';
 
 // ============================================
 // INVALIDATION RECOVERY ("Recover from a hurtful moment", Walking the Middle Path) — recovery-v1
@@ -35,7 +36,7 @@ function parseRecoveryFlow(raw: unknown): RecoveryFlowDoc {
 
 /** All content for the flow in one call. Public therapeutic content (same as OA / DEAR MAN). */
 export const getInvalidationRecoveryContent = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async () => {
     const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
     try {
@@ -117,7 +118,7 @@ export const getInvalidationRecoveryContent = onCall(
 
 /** Explicit save at the end of a session. Ids and clinical gates are verified against the graph; no free text is stored. */
 export const saveInvalidationRecoverySession = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to save');
     let data: ReturnType<typeof validateInvalidationRecoverySession>;
@@ -215,7 +216,7 @@ export const saveInvalidationRecoverySession = onCall(
 
 /** Practice view: recent sessions plus skill-use counts (mastery levels are computed client-side). */
 export const getInvalidationRecoveryProgress = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see your practice');
     const userId = request.auth.uid;

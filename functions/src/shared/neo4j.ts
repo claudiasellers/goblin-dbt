@@ -6,7 +6,7 @@ export const neo4jUri = defineSecret('NEO4J_URI');
 export const neo4jUser = defineSecret('NEO4J_USER');
 export const neo4jPassword = defineSecret('NEO4J_PASSWORD');
 
-/** The secrets every graph callable declares (`onCall({ secrets: NEO4J_SECRETS }, …)`). */
+/** The Neo4j secrets (callables declare them through shared/callOptions.ts CALL_OPTS). */
 export const NEO4J_SECRETS = [neo4jUri, neo4jUser, neo4jPassword];
 
 // Neo4j driver singleton

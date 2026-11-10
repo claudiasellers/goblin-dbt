@@ -4,9 +4,10 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import neo4j, { Record as Neo4jRecord } from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { getDriver } from '../shared/neo4j';
 import { int } from '../shared/values';
 import { validateFindTheFeelingSession, checkFindTheFeelingGates, type FindTheFeelingGates } from '../findTheFeelingValidation';
+import { CALL_OPTS } from '../shared/callOptions';
 
 // ============================================
 // FIND THE FEELING (Shape it / Tune it)
@@ -67,7 +68,7 @@ async function readFindContent(tx: { run: (q: string, p?: Record<string, unknown
 }
 
 export const getFindTheFeelingContent = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async () => {
     const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
     try {
@@ -86,7 +87,7 @@ export const getFindTheFeelingContent = onCall(
  * from the same flow document the client used. Accepted words join the user's collection (FOUND_WORD).
  */
 export const saveFindTheFeelingSession = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to save');
     let data: ReturnType<typeof validateFindTheFeelingSession>;
@@ -149,7 +150,7 @@ export const saveFindTheFeelingSession = onCall(
 
 /** The user's word collection (shelf / strings), with each word's signature for rendering. */
 export const getFeelingCollection = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) throw new HttpsError('unauthenticated', 'Sign in to see your collection');
     const session = getDriver().session({ defaultAccessMode: neo4j.session.READ });
