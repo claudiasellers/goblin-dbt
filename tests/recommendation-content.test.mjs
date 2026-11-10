@@ -51,7 +51,7 @@ test("rows are drafts until signed off; the policy can only be enabled once ever
 });
 
 test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause active; planned tools are written switched off", () => {
-  const planned = ["dbt_accepts", "dbt_alternate_rebellion", "dbt_check_facts", "dbt_cope_ahead", "dbt_fast", "dbt_give", "dbt_please", "dbt_radical_acceptance", "dbt_wise_mind"];
+  const planned = ["dbt_accepts", "dbt_check_facts", "dbt_cope_ahead", "dbt_fast", "dbt_give", "dbt_please", "dbt_radical_acceptance", "dbt_wise_mind"];
   for (const r of rows) {
     assert.notEqual(r.conceptId, "dbt_dear_man", r.id);
     const off = r.conceptId === "urge_surfing" || planned.includes(r.conceptId);
@@ -60,7 +60,7 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
   // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
   // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
-  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_alternate_rebellion")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
@@ -73,10 +73,10 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   const cf = rows.filter((r) => r.conceptId === "dbt_check_facts");
   assert.equal(cf.length, 6);
   assert.ok(cf.every((r) => r.active === false && r.reviewStatus === "draft"), "Check the Facts rows stay off and drafts");
-  // Rebel without the wreckage (DT-11) the same way: built on the skill runtime, its one row off and a draft.
+  // Rebel without the wreckage (DT-11): built on the skill runtime, its one row signed off (10 Nov) and live.
   assert.equal(graph.concepts.dbt_alternate_rebellion.appToolId, "alternate-rebellion");
   const ar = rows.filter((r) => r.conceptId === "dbt_alternate_rebellion");
-  assert.deepEqual(ar.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_reactive_aggression_words_rebel_alternate-rebellion", false, "draft"]]);
+  assert.deepEqual(ar.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_reactive_aggression_words_rebel_alternate-rebellion", true, "approved"]]);
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });
 
