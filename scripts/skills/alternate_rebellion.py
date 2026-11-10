@@ -279,7 +279,7 @@ STEPS = [
 EXITS = [
     {"id": "problem_solve", "toolId": "problem-solve"},
     {"id": "dear_man", "toolId": "dear-man"},
-    {"id": "fast", "toolId": "fast", "planned": True},
+    {"id": "fast", "toolId": "fast"},
     {"id": "let_it_be", "toolId": "let-it-be", "planned": True},
     {"id": "ending", "toolId": "ending-relationships", "planned": True},
     {"id": "cool_down", "toolId": "cool-down"},

@@ -919,7 +919,7 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
 MERGE (x)-[:OPENS]->(t);
 MERGE (x:SkillExit {id: "alternate_rebellion:fast"})
-SET x += {skillId: "alternate_rebellion", exit: "fast", toolId: "fast", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+SET x += {skillId: "alternate_rebellion", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:fast"})
 MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (x:SkillExit {id: "alternate_rebellion:fast"}), (t:TherapyConcept {appToolId: "fast"})
@@ -1730,3 +1730,399 @@ SET o:SkillOption, o += {skillId: "er_troubleshoot", list: "belief", value: "myt
 MATCH (s:Skill {id: "er_troubleshoot"}), (o:SkillOption {id: "er_troubleshoot:belief:myth_unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "belief", order: 25};
+
+// --- fast_review (fast-review-v1) ---
+MERGE (s:Skill {id: "fast_review"})
+SET s += {toolId: "fast", version: "fast-review-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.inlineJson = "null", s.copyJson = "{\"card_a_title\": \"One sorry for a real wrong. None for having a need.\", \"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_f_title\": \"What you'd say instead\", \"card_s_title\": \"The value you'd keep\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_t_title\": \"The true version\", \"done\": \"Done\", \"instead_title\": \"What would you say instead, next time?\", \"next\": \"Next\", \"next_line\": \"That's one move to carry into the next conversation.\", \"next_line_unsure\": \"Not sure about the sorry? Check the Facts can help sort it out.\", \"next_line_wrong\": \"A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.\", \"own_hint\": \"Say it my way\", \"sorry_instead_title\": \"What could take the place of the extra sorries next time?\", \"sorry_title\": \"Was there something you did that needs a sorry?\", \"truth_title\": \"What's the true version?\", \"values_hint\": \"Pick one or two.\", \"values_title\": \"Which value do you want to keep next time?\", \"what_hint\": \"This happens to a lot of people. Pick the one you'd most like to change.\", \"what_own\": \"Something else\", \"what_title\": \"Looking back, which of these happened?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (s:Skill {id: "fast_review"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:TherapyConcept {id: "dbt_fast"})-[r:ADDRESSES]->(:Emotion) DELETE r;
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (e:Emotion {id: "cold_shame"})
+MERGE (t)-[r:ADDRESSES]->(e)
+SET r += {legacy: false};
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (e:Emotion {id: "inferior"})
+MERGE (t)-[r:ADDRESSES]->(e)
+SET r += {legacy: false};
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (e:Emotion {id: "insignificant"})
+MERGE (t)-[r:ADDRESSES]->(e)
+SET r += {legacy: false};
+MATCH (:SkillStep {skillId: "fast_review"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "fast_review"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "fast_review:what"})
+SET n += {skillId: "fast_review", step: "what", kind: "ask", version: "fast-review-v1"}, n.specJson = "{\"fields\": [{\"id\": \"what\", \"max\": 1, \"options\": {\"list\": \"what\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"what_own\", \"max\": 90}, \"required\": true}], \"hint\": \"what_hint\", \"title\": \"what_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:what"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "fast_review:sorry"})
+SET n += {skillId: "fast_review", step: "sorry", kind: "ask", version: "fast-review-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sorry\", \"max\": 1, \"options\": {\"list\": \"sorry\"}, \"required\": true}], \"title\": \"sorry_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:sorry"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "fast_review:sorry_instead"})
+SET n += {skillId: "fast_review", step: "sorry_instead", kind: "ask", version: "fast-review-v1"}, n.specJson = "{\"fields\": [{\"id\": \"sorry_instead\", \"max\": 1, \"options\": {\"list\": \"sorry_instead\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\", \"max\": 90}, \"required\": true}], \"title\": \"sorry_instead_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:sorry_instead"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "fast_review:card_a"})
+SET n += {skillId: "fast_review", step: "card_a", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_a_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"sorry_instead\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_a_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_a"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "fast_review:values"})
+SET n += {skillId: "fast_review", step: "values", kind: "ask", version: "fast-review-v1"}, n.specJson = "{\"fields\": [{\"id\": \"values\", \"max\": 2, \"options\": {\"list\": \"values\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\", \"max\": 40}, \"required\": true, \"swap\": true}], \"hint\": \"values_hint\", \"title\": \"values_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:values"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "fast_review:card_s"})
+SET n += {skillId: "fast_review", step: "card_s", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_s_copied\", \"embed\": \"boundaryLine\", \"props\": {\"field\": \"values\", \"next\": \"next\", \"shape\": \"list\"}, \"title\": \"card_s_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_s"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "fast_review:truth"})
+SET n += {skillId: "fast_review", step: "truth", kind: "ask", version: "fast-review-v1"}, n.specJson = "{\"fields\": [{\"id\": \"truth\", \"max\": 1, \"options\": {\"list\": \"truth\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\", \"max\": 90}, \"required\": true}], \"title\": \"truth_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:truth"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "fast_review:card_t"})
+SET n += {skillId: "fast_review", step: "card_t", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_t_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"truth\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_t_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_t"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "fast_review:instead"})
+SET n += {skillId: "fast_review", step: "instead", kind: "ask", version: "fast-review-v1"}, n.specJson = "{\"fields\": [{\"id\": \"instead\", \"max\": 1, \"options\": {\"list\": \"instead\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\", \"max\": 90}, \"required\": true}], \"title\": \"instead_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:instead"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "fast_review:card_f"})
+SET n += {skillId: "fast_review", step: "card_f", kind: "embed", version: "fast-review-v1"}, n.specJson = "{\"answerAs\": \"card_f_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"instead\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_f_title\"}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:card_f"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "fast_review:next"})
+SET n += {skillId: "fast_review", step: "next", kind: "handoff", version: "fast-review-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"next_line_wrong\", \"when\": {\"eq\": [\"$a.sorry\", \"real_wrong\"]}}, {\"key\": \"next_line_unsure\", \"when\": {\"eq\": [\"$a.sorry\", \"unsure\"]}}, {\"key\": \"next_line\", \"when\": null}]}";
+MATCH (s:Skill {id: "fast_review"}), (n:SkillStep {id: "fast_review:next"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (x:SkillExit {id: "fast_review:check_the_facts"})
+SET x += {skillId: "fast_review", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:check_the_facts"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_review:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_review:rehearse"})
+SET x += {skillId: "fast_review", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:rehearse"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_review:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_review:dear_man"})
+SET x += {skillId: "fast_review", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:dear_man"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_review:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_review:done"})
+SET x += {skillId: "fast_review", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (x:SkillExit {id: "fast_review:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "fast_review:what"}), (b:SkillStep {id: "fast_review:sorry"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.what\", \"over_sorry\"]}";
+MATCH (a:SkillStep {id: "fast_review:what"}), (b:SkillStep {id: "fast_review:values"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.what\", \"went_along\"]}";
+MATCH (a:SkillStep {id: "fast_review:what"}), (b:SkillStep {id: "fast_review:truth"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.what\", [\"bent_truth\", \"made_excuse\"]]}";
+MATCH (a:SkillStep {id: "fast_review:what"}), (b:SkillStep {id: "fast_review:instead"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:sorry"}), (b:SkillStep {id: "fast_review:sorry_instead"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:sorry_instead"}), (b:SkillStep {id: "fast_review:card_a"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:card_a"}), (b:SkillStep {id: "fast_review:next"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:values"}), (b:SkillStep {id: "fast_review:card_s"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:card_s"}), (b:SkillStep {id: "fast_review:next"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:truth"}), (b:SkillStep {id: "fast_review:card_t"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:card_t"}), (b:SkillStep {id: "fast_review:next"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:instead"}), (b:SkillStep {id: "fast_review:card_f"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:card_f"}), (b:SkillStep {id: "fast_review:next"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_review:next"}), (x:SkillExit {id: "fast_review:check_the_facts"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"in\": [\"$a.sorry\", [\"real_wrong\", \"unsure\"]]}}]";
+MATCH (a:SkillStep {id: "fast_review:next"}), (x:SkillExit {id: "fast_review:rehearse"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
+MATCH (a:SkillStep {id: "fast_review:next"}), (x:SkillExit {id: "fast_review:dear_man"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"any\": [{\"eq\": [\"$a.what\", \"dropped_ask\"]}, {\"eq\": [\"$a.what\", \"let_decide\"]}, {\"all\": [{\"own\": \"what\"}, {\"not\": {\"set\": \"$a.what.ids\"}}]}]}}]";
+MERGE (o:SkillOption {id: "fast_review:what:over_sorry"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "what", value: "over_sorry", label: "I said sorry more than I meant", version: "fast-review-v1"}, o.propsJson = "{\"letter\": \"A\"}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:what:over_sorry"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 0};
+MERGE (o:SkillOption {id: "fast_review:what:went_along"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "what", value: "went_along", label: "I went along with something I don't agree with", version: "fast-review-v1"}, o.propsJson = "{\"letter\": \"S\"}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:what:went_along"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 1};
+MERGE (o:SkillOption {id: "fast_review:what:bent_truth"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "what", value: "bent_truth", label: "I made it sound bigger or smaller than it was", version: "fast-review-v1"}, o.propsJson = "{\"letter\": \"T\"}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:what:bent_truth"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 2};
+MERGE (o:SkillOption {id: "fast_review:what:made_excuse"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "what", value: "made_excuse", label: "I made up a reason instead of saying what was true", version: "fast-review-v1"}, o.propsJson = "{\"letter\": \"T\"}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:what:made_excuse"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 3};
+MERGE (o:SkillOption {id: "fast_review:what:let_decide"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "what", value: "let_decide", label: "I let them decide for me", version: "fast-review-v1"}, o.propsJson = "{\"letter\": \"F\"}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:what:let_decide"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 4};
+MERGE (o:SkillOption {id: "fast_review:what:dropped_ask"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "what", value: "dropped_ask", label: "I dropped what I was asking for", version: "fast-review-v1"}, o.propsJson = "{\"letter\": \"F\"}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:what:dropped_ask"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "what", order: 5};
+MERGE (o:SkillOption {id: "fast_review:sorry:real_wrong"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "sorry", value: "real_wrong", label: "Yes, one thing", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:sorry:real_wrong"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sorry", order: 6};
+MERGE (o:SkillOption {id: "fast_review:sorry:no_wrong"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "sorry", value: "no_wrong", label: "No, I was sorry for asking", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:sorry:no_wrong"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sorry", order: 7};
+MERGE (o:SkillOption {id: "fast_review:sorry:unsure"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "sorry", value: "unsure", label: "I'm not sure", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:sorry:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sorry", order: 8};
+MERGE (o:SkillOption {id: "fast_review:sorry_instead:thanks"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "sorry_instead", value: "thanks", label: "Thank you for hearing me out", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:sorry_instead:thanks"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sorry_instead", order: 9};
+MERGE (o:SkillOption {id: "fast_review:sorry_instead:big_ask"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "sorry_instead", value: "big_ask", label: "I know this is a big ask", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:sorry_instead:big_ask"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sorry_instead", order: 10};
+MERGE (o:SkillOption {id: "fast_review:sorry_instead:matters"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "sorry_instead", value: "matters", label: "This matters to me", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:sorry_instead:matters"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sorry_instead", order: 11};
+MERGE (o:SkillOption {id: "fast_review:sorry_instead:what_i_need"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "sorry_instead", value: "what_i_need", label: "Here's what I need", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:sorry_instead:what_i_need"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sorry_instead", order: 12};
+MERGE (o:SkillOption {id: "fast_review:values:honesty"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "honesty", label: "Honesty", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:honesty"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 13};
+MERGE (o:SkillOption {id: "fast_review:values:fairness"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "fairness", label: "Fairness", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:fairness"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 14};
+MERGE (o:SkillOption {id: "fast_review:values:keeping_my_word"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "keeping_my_word", label: "Keeping my word", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:keeping_my_word"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 15};
+MERGE (o:SkillOption {id: "fast_review:values:standing_up"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "standing_up", label: "Standing up for myself", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:standing_up"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 16};
+MERGE (o:SkillOption {id: "fast_review:values:kindness"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "kindness", label: "Kindness", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:kindness"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 17};
+MERGE (o:SkillOption {id: "fast_review:values:respect"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "respect", label: "Respect for both of us", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:respect"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 18};
+MERGE (o:SkillOption {id: "fast_review:values:my_health"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "my_health", label: "Looking after my health", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:my_health"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 19};
+MERGE (o:SkillOption {id: "fast_review:values:my_time"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "values", value: "my_time", label: "My time", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:values:my_time"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "values", order: 20};
+MERGE (o:SkillOption {id: "fast_review:truth:plainly"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "truth", value: "plainly", label: "It mattered to me, and I can say that plainly", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:truth:plainly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "truth", order: 21};
+MERGE (o:SkillOption {id: "fast_review:truth:some_of_it"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "truth", value: "some_of_it", label: "It's hard, and I can do some of it", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:truth:some_of_it"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "truth", order: 22};
+MERGE (o:SkillOption {id: "fast_review:truth:sometimes"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "truth", value: "sometimes", label: "It happens sometimes, not every time", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:truth:sometimes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "truth", order: 23};
+MERGE (o:SkillOption {id: "fast_review:truth:need_help"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "truth", value: "need_help", label: "I can do this part, and I'd like help with that part", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:truth:need_help"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "truth", order: 24};
+MERGE (o:SkillOption {id: "fast_review:truth:real_answer"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "truth", value: "real_answer", label: "I don't want to, and that's a real answer", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:truth:real_answer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "truth", order: 25};
+MERGE (o:SkillOption {id: "fast_review:instead:think_it_over"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "instead", value: "think_it_over", label: "I'd like to think it over before I answer", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:instead:think_it_over"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 26};
+MERGE (o:SkillOption {id: "fast_review:instead:heres_what"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "instead", value: "heres_what", label: "Here's what I'd like", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:instead:heres_what"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 27};
+MERGE (o:SkillOption {id: "fast_review:instead:doesnt_work"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "instead", value: "doesnt_work", label: "That doesn't work for me", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:instead:doesnt_work"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 28};
+MERGE (o:SkillOption {id: "fast_review:instead:together"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "instead", value: "together", label: "Can we decide this together?", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:instead:together"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 29};
+MERGE (o:SkillOption {id: "fast_review:instead:both_sides"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "instead", value: "both_sides", label: "I can see your side. Here's mine.", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:instead:both_sides"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 30};
+MERGE (o:SkillOption {id: "fast_review:instead:still_want"})
+SET o:SkillOption, o += {skillId: "fast_review", list: "instead", value: "still_want", label: "I'm still asking for what I asked for", version: "fast-review-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_review"}), (o:SkillOption {id: "fast_review:instead:still_want"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "instead", order: 31};
+
+// --- fast_let_go (fast-let-go-v1) ---
+MERGE (s:Skill {id: "fast_let_go"})
+SET s += {toolId: "fast", version: "fast-let-go-v1", contentVersion: "skills-v1", start: "line", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.inlineJson = "null", s.copyJson = "{\"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_title\": \"Your line, to use or not\", \"done\": \"Done\", \"elsewhere_line\": \"What you needed still matters. It can be met somewhere else.\", \"elsewhere_line_no\": \"You said what you needed, and that counts. It's a no for now. What you needed still matters, and it can be met somewhere else.\", \"elsewhere_line_none\": \"Saying nothing is a choice too. What you needed still matters, and it can be met somewhere else.\", \"line_hint\": \"A boundary line says what you'll do. It doesn't argue.\", \"line_none\": \"I don't need to say anything\", \"line_title\": \"Do you want a line that says where you stand?\", \"next\": \"Next\", \"own_hint\": \"Say it my way\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (s:Skill {id: "fast_let_go"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "fast_let_go"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "fast_let_go"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "fast_let_go:line"})
+SET n += {skillId: "fast_let_go", step: "line", kind: "ask", version: "fast-let-go-v1"}, n.specJson = "{\"fields\": [{\"id\": \"line\", \"max\": 1, \"options\": {\"list\": \"line\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_hint\", \"max\": 90}, \"required\": true}], \"hint\": \"line_hint\", \"title\": \"line_title\"}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:line"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "fast_let_go:card"})
+SET n += {skillId: "fast_let_go", step: "card", kind: "embed", version: "fast-let-go-v1"}, n.specJson = "{\"answerAs\": \"card_copied\", \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"card_copied\", \"copyLabel\": \"card_copy\", \"field\": \"line\", \"next\": \"next\", \"selectedLabel\": \"card_selected\", \"shape\": \"line\"}, \"title\": \"card_title\"}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:card"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "fast_let_go:elsewhere"})
+SET n += {skillId: "fast_let_go", step: "elsewhere", kind: "handoff", version: "fast-let-go-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"elsewhere_line_none\", \"when\": {\"eq\": [\"$a.line\", \"none\"]}}, {\"key\": \"elsewhere_line_no\", \"when\": {\"eq\": [\"$ctx.frame\", \"let_go\"]}}, {\"key\": \"elsewhere_line\", \"when\": null}]}";
+MATCH (s:Skill {id: "fast_let_go"}), (n:SkillStep {id: "fast_let_go:elsewhere"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (x:SkillExit {id: "fast_let_go:let_it_be"})
+SET x += {skillId: "fast_let_go", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:let_it_be"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_let_go:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_let_go:recover"})
+SET x += {skillId: "fast_let_go", exit: "recover", toolId: "recovering-from-invalidation", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:recover"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_let_go:recover"}), (t:TherapyConcept {appToolId: "recovering-from-invalidation"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_let_go:finding_connection"})
+SET x += {skillId: "fast_let_go", exit: "finding_connection", toolId: "finding-connection", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:finding_connection"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "fast_let_go:finding_connection"}), (t:TherapyConcept {appToolId: "finding-connection"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "fast_let_go:done"})
+SET x += {skillId: "fast_let_go", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (x:SkillExit {id: "fast_let_go:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "fast_let_go:line"}), (b:SkillStep {id: "fast_let_go:elsewhere"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.line\", \"none\"]}";
+MATCH (a:SkillStep {id: "fast_let_go:line"}), (b:SkillStep {id: "fast_let_go:card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_let_go:card"}), (b:SkillStep {id: "fast_let_go:elsewhere"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "fast_let_go:elsewhere"}), (x:SkillExit {id: "fast_let_go:let_it_be"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
+MATCH (a:SkillStep {id: "fast_let_go:elsewhere"}), (x:SkillExit {id: "fast_let_go:recover"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
+MATCH (a:SkillStep {id: "fast_let_go:elsewhere"}), (x:SkillExit {id: "fast_let_go:finding_connection"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": null}]";
+MERGE (o:SkillOption {id: "fast_let_go:line:not_keep_asking"})
+SET o:SkillOption:BoundaryLine, o += {skillId: "fast_let_go", list: "line", value: "not_keep_asking", label: "I've said what I need. I'm not going to keep asking.", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:not_keep_asking"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 0};
+MERGE (o:SkillOption {id: "fast_let_go:line:none"})
+SET o:SkillOption, o += {skillId: "fast_let_go", list: "line", value: "none", label: "I don't need to say anything", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:none"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 1};
+MERGE (o:SkillOption {id: "fast_let_go:line:hear_no"})
+SET o:SkillOption:BoundaryLine, o += {skillId: "fast_let_go", list: "line", value: "hear_no", label: "I hear that it's a no. I'm stepping back from this for now.", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:hear_no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 2};
+MERGE (o:SkillOption {id: "fast_let_go:line:not_today"})
+SET o:SkillOption:BoundaryLine, o += {skillId: "fast_let_go", list: "line", value: "not_today", label: "I'm not going to talk about this any more today.", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:not_today"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 3};
+MERGE (o:SkillOption {id: "fast_let_go:line:another_way"})
+SET o:SkillOption:BoundaryLine, o += {skillId: "fast_let_go", list: "line", value: "another_way", label: "I'm going to look after this need another way.", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:another_way"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 4};
+MERGE (o:SkillOption {id: "fast_let_go:line:not_argue"})
+SET o:SkillOption:BoundaryLine, o += {skillId: "fast_let_go", list: "line", value: "not_argue", label: "I've said how this lands. I won't argue about whether my feelings are real.", version: "fast-let-go-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "fast_let_go"}), (o:SkillOption {id: "fast_let_go:line:not_argue"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "line", order: 5};

@@ -7,10 +7,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import check_the_facts  # noqa: E402
 import alternate_rebellion  # noqa: E402
 import er_troubleshoot  # noqa: E402
+import fast  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
-SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL]
+SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -20,6 +21,8 @@ EMBEDS = {
     "holdRing": {"ids": ["held", "partly", "skipped"], "measures": ["durationSec", "doneCount", "earlyCount"]},
     "witness": {"ids": ["yes", "sort_of", "no", "none_fit", "own", "skip", "seen"]},
     "rebellionCard": {"ids": ["now", "today", "week"]},
+    # IE-05's boundary line card (plan C3b, IE-owned): the picked line on paper, copyable; reports whether it was copied.
+    "boundaryLine": {"ids": ["copied"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -55,6 +58,14 @@ EMBED_PROPS = {
         "now": {"type": "copy"},
         "today": {"type": "copy"},
         "week": {"type": "copy"},
+    },
+    "boundaryLine": {
+        "field": {"type": "field"},
+        "shape": {"type": "enum", "values": ["line", "list"]},
+        "copyLabel": {"type": "copy", "optional": True},
+        "copiedLabel": {"type": "copy", "optional": True},
+        "selectedLabel": {"type": "copy", "optional": True},
+        "next": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

@@ -60,7 +60,7 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.deepEqual([...new Set(rows.filter((r) => !r.active).map((r) => r.conceptId))].sort(), [...planned, "urge_surfing"].sort());
   // Wise mind's module ships before its row is signed off: it has its app tool id, and the watchful row
   // stays switched off and a draft (Claudia signs it off separately; build.py refuses an active draft).
-  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
+  for (const c of planned.filter((x) => x !== "dbt_wise_mind" && x !== "dbt_cope_ahead" && x !== "dbt_check_facts" && x !== "dbt_fast")) assert.ok(!graph.concepts[c]?.appToolId, `${c} has no app module yet`);
   assert.equal(graph.concepts.dbt_wise_mind.appToolId, "wise-mind");
   const wise = rows.filter((r) => r.conceptId === "dbt_wise_mind");
   assert.deepEqual(wise.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_chronic_vigilance_words_watchful_wise-mind", false, "draft"]]);
@@ -77,6 +77,13 @@ test("D-02 defaults kept: Urge Surfing switched off, no DEAR MAN rows, Pause act
   assert.equal(graph.concepts.dbt_alternate_rebellion.appToolId, "alternate-rebellion");
   const ar = rows.filter((r) => r.conceptId === "dbt_alternate_rebellion");
   assert.deepEqual(ar.map((r) => [r.id, r.active, r.reviewStatus]), [["rf_reactive_aggression_words_rebel_alternate-rebellion", true, "approved"]]);
+  // Keep your self-respect (docs/design/fast.md, IE-B1) the same way: built on the skill runtime, its two word rows off and drafts.
+  // Never on violated or victimized (Claudia, 10 Nov 2026): the review opens on what the person did.
+  assert.equal(graph.concepts.dbt_fast.appToolId, "fast");
+  const fast = rows.filter((r) => r.conceptId === "dbt_fast");
+  assert.equal(fast.length, 2);
+  assert.ok(fast.every((r) => !(r.words ?? []).some((w) => w === "violated" || w === "victimized")), "FAST never on violated or victimized");
+  assert.ok(fast.every((r) => r.active === false && r.reviewStatus === "draft"), "FAST rows stay off and drafts");
   assert.ok(rows.some((r) => tool(r) === "pause" && r.active));
 });
 
@@ -88,7 +95,7 @@ test("tags (WMP-04 v0 side, skillKind, direction) on the 13 app-tool concepts; D
     "find-the-feeling": ["acceptance", "naming", "neutral"], "problem-solve": ["change", "change", "neutral"],
     "dear-man": ["change", "relational", "neutral"], "recovering-from-invalidation": ["both", "relational", "neutral"],
     "wise-mind": ["both", "naming", "neutral"], "cope-ahead": ["change", "change", "neutral"],
-    "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"],
+    "check-the-facts": ["change", "change", "neutral"], "alternate-rebellion": ["acceptance", "redirect", "neutral"], fast: ["change", "relational", "neutral"],
   });
   for (const id of Object.keys(tags)) assert.ok(toolIds.includes(id), id);
 });

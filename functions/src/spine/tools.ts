@@ -32,6 +32,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   // These ask their own questions inside their flows; the spine adds none (PR-S4 wraps them).
   'opposite-action': { module: 'er', closeKind: 'none' },
   'dear-man': { module: 'ie', closeKind: 'none' },
+  // Keep your self-respect (docs/design/fast.md), on the skill runtime: "Compared to when you started, it's…".
+  'fast': { module: 'ie', closeKind: 'regulation_down' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },

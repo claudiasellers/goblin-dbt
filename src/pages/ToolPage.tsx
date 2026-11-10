@@ -53,6 +53,9 @@ const LazySkillPlayer = lazy(() => import('../components/skillPlayer/SkillPlayer
 function PlayedTool({ skillId }: { skillId: string }) {
   return <Suspense fallback={<ToolLoading />}><LazySkillPlayer skillId={skillId} /></Suspense>;
 }
+// Keep your self-respect (FAST): two skills under one tool id, so its page picks which to play (docs/design/fast.md).
+const LazyFast = lazy(() => import('./tools/Fast').then((m) => ({ default: m.Fast })));
+function Fast() { return <Suspense fallback={<ToolLoading />}><LazyFast /></Suspense>; }
 
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
@@ -64,6 +67,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'dear-man': DearMan,
   'problem-solve': ProblemSolve,
   'cope-ahead': CopeAhead,
+  'fast': Fast,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,

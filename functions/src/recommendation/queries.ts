@@ -70,11 +70,15 @@ export const CO_OCCURRENCE_QUERY = `
   LIMIT 1
 `;
 
-/** Every `dbt_*` concept touching the pattern's emotions; legacy.ts ranks them (no LIMIT here). */
+/**
+ * Every `dbt_*` concept touching the pattern's emotions; legacy.ts ranks them (no LIMIT here). Edges written with
+ * `legacy: false` (added after the routing review, e.g. FAST's) are left out, so the kill switch restores the
+ * pre-review routing whole.
+ */
 export const LEGACY_TOOLS_QUERY = `
   MATCH (p:ActivationPattern {id: $patternId})-[:ASSOCIATED_WITH]->(e:Emotion)
-  MATCH (tc:TherapyConcept)-[:ADDRESSES|REDUCES|TARGETS]->(e)
-  WHERE tc.id STARTS WITH 'dbt_'
+  MATCH (tc:TherapyConcept)-[t:ADDRESSES|REDUCES|TARGETS]->(e)
+  WHERE tc.id STARTS WITH 'dbt_' AND coalesce(t.legacy, true)
   WITH tc, count(DISTINCT e) AS relevanceScore
   RETURN tc.id AS id, tc.appToolId as appToolId, tc.name AS name, tc.description AS description,
          tc.whenToUse AS whenToUse, tc.dbtBasis AS dbtBasis, relevanceScore

@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import type { EmbedOutput, EmbedOutputSchema, EmbedPropSpec } from '../../data/skillTypes';
+import { BoundaryLine } from './BoundaryLine';
 import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
 import { WitnessEmbed } from './WitnessEmbed';
@@ -35,6 +36,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   holdRing: HoldRingEmbed,
   witness: WitnessEmbed,
   rebellionCard: RebellionCard,
+  boundaryLine: BoundaryLine,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -42,6 +44,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   holdRing: { ids: ['held', 'partly', 'skipped'], measures: ['durationSec', 'doneCount', 'earlyCount'] },
   witness: { ids: ['yes', 'sort_of', 'no', 'none_fit', 'own', 'skip', 'seen'] },
   rebellionCard: { ids: ['now', 'today', 'week'] },
+  boundaryLine: { ids: ['copied'] },
 };
 
 /**
@@ -80,5 +83,13 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     now: { type: 'copy' },
     today: { type: 'copy' },
     week: { type: 'copy' },
+  },
+  boundaryLine: {
+    field: { type: 'field' },
+    shape: { type: 'enum', values: ['line', 'list'] },
+    copyLabel: { type: 'copy', optional: true },
+    copiedLabel: { type: 'copy', optional: true },
+    selectedLabel: { type: 'copy', optional: true },
+    next: { type: 'copy' },
   },
 };
