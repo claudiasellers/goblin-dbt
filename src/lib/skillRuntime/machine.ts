@@ -6,8 +6,11 @@
  * Rules every skill gets: picks past `max` swap out the oldest (`swap`) or are ignored; a pick that its
  * field's filter or group no longer offers is dropped; answers of fields hidden by `showWhen` are dropped
  * when the step is left; `next` follows the first transition that holds; nothing is pre-filled from a past run.
+ * A whole-screen embed step ends with `embedDone`: its option ids become the `answerAs` answer, its measurements
+ * the run's `out`, and the run goes on. Context in (`$ctx.*`) is only what the skill `accepts`, ids only.
+ * Planned exits (tools not built yet) are never offered or linked.
  */
-import type { ExitDef, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
+import type { CrisisSlot, EmbedOutput, ExitDef, FieldDef, OptionDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
 import { holds, resolve, type Answer, type Answers, type Scope } from './conditions';
 
 export type { Answer, Answers } from './conditions';
@@ -22,7 +25,12 @@ export interface RunContext {
   gridIds: ReadonlySet<string>;
   /** A grid word as the grid shows it, lower-case ("let down"). */
   emotionLabel: (id: string) => string;
+  /** Context in (`$ctx.*`), already narrowed by `contextIn` to the keys the skill accepts. */
+  ctxIn?: Readonly<Record<string, string>>;
 }
+
+/** One whole-screen embed's report, as the run keeps it (and `ext.run.out` records it). */
+export interface EmbedRecord extends EmbedOutput { embed: string; stepId: string }
 
 export interface RunState {
   stepId: string;
@@ -34,6 +42,8 @@ export interface RunState {
   /** What the hand-off offered when it was reached. */
   offered: string[];
   exitId: string | null;
+  /** Whole-screen embeds' reports, by step id. */
+  out: Record<string, EmbedRecord>;
 }
 
 export type RunEvent =
@@ -42,7 +52,8 @@ export type RunEvent =
   | { type: 'shown'; record: string }
   | { type: 'next' }
   | { type: 'back' }
-  | { type: 'exit'; exitId: string };
+  | { type: 'exit'; exitId: string }
+  | { type: 'embedDone'; output: EmbedOutput };
 
 export interface OptionGroup {
   /** The pick this group belongs to (`groupBy`), `$own` for own words, or null when ungrouped. */
@@ -53,12 +64,31 @@ export interface OptionGroup {
   options: OptionDef[];
 }
 
-const PATH_MAX = 24;
+const PATH_MAX = 48;
+const ID = /^[a-z0-9][a-z0-9_:-]{0,63}$/i;
+/** Context keys that are recorded (`returnTo` is a path, not an id: it steers, it isn't kept). */
+const RECORDED_CTX = ['urgeId', 'personId', 'frame', 'enterAt', 'situationId', 'partId', 'band'] as const;
 const EMPTY: Answer = { ids: [], own: null };
 
 export function initialRun(skill: SkillDef): RunState {
-  return { stepId: skill.start, path: [skill.start], answers: {}, shown: [], offered: [], exitId: null };
+  return { stepId: skill.start, path: [skill.start], answers: {}, shown: [], offered: [], exitId: null, out: {} };
 }
+
+/**
+ * The context a page passes in (query and route state), narrowed to what the skill accepts. Every value must be
+ * an id; `returnTo` must be an in-app path. Anything else is dropped, never guessed.
+ */
+export function contextIn(skill: SkillDef, raw: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const key of skill.accepts ?? []) {
+    const v = raw[key];
+    if (typeof v !== 'string') continue;
+    if (key === 'returnTo' ? /^\/[A-Za-z0-9/_?=&.-]{0,200}$/.test(v) && !v.startsWith('//') : ID.test(v)) out[key] = v;
+  }
+  return out;
+}
+
+const plannedExit = (ctx: RunContext, id: string) => !!ctx.skill.exits.find((x) => x.id === id)?.planned;
 
 export const stepOf = (skill: SkillDef, id: string): StepDef => {
   const s = skill.steps.find((x) => x.id === id);
@@ -79,19 +109,43 @@ function table(ctx: RunContext, name: string): Record<string, unknown> | undefin
 export function derive(ctx: RunContext, answers: Answers): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const d of ctx.skill.derive) {
-    const from = scopeOf(ctx, answers, out);
-    const v = resolve(d.from, from);
     const t = table(ctx, d.table);
+    if (d.kind === 'count') {
+      out[d.name] = countRow(t, countPicks(d, answers)) ?? d.default ?? null;
+      continue;
+    }
+    const v = resolve(d.from, scopeOf(ctx, answers, out));
     if (typeof v === 'string' && t && Object.hasOwn(t, v)) out[d.name] = d.keep === 'key' ? v : t[v];
     else out[d.name] = d.default ?? null;
   }
   return out;
 }
 
+/** A counting derive's total: every pick of its fields, weighted by option value (1 each when it has no weights). */
+export function countPicks(d: Pick<SkillDef['derive'][number], 'fields' | 'weights'>, answers: Answers): number {
+  let total = 0;
+  for (const f of d.fields ?? []) {
+    for (const v of answers[f]?.ids ?? []) total += d.weights ? d.weights[v] ?? 0 : 1;
+  }
+  return total;
+}
+
+/** The row of a threshold table (numeric keys) with the largest key at or below the total. */
+function countRow(t: Record<string, unknown> | undefined, total: number): unknown {
+  if (!t) return undefined;
+  let best: number | null = null;
+  for (const k of Object.keys(t)) {
+    const n = Number(k);
+    if (Number.isFinite(n) && n <= total && (best === null || n > best)) best = n;
+  }
+  return best === null ? undefined : t[String(best)];
+}
+
 function scopeOf(ctx: RunContext, answers: Answers, derived: Record<string, unknown>): Scope {
   return {
     answers,
     derived,
+    ctx: ctx.ctxIn ?? {},
     picked: (fieldId) => {
       const f = fieldOf(ctx.skill, fieldId);
       const list = f?.options.list ? ctx.skill.options[f.options.list] ?? [] : [];
@@ -118,7 +172,11 @@ export function emotionChoices(ctx: RunContext, field: FieldDef, answers: Answer
 export function optionGroups(ctx: RunContext, field: FieldDef, answers: Answers, sc: Scope = scope(ctx, { answers })): OptionGroup[] {
   const src = field.options;
   if (!src.list) return [];
-  const list = (ctx.skill.options[src.list] ?? []).filter((opt) => holds(src.where, { ...sc, opt }));
+  let list = (ctx.skill.options[src.list] ?? []).filter((opt) => holds(src.where, { ...sc, opt }));
+  const first = src.firstFrom ? resolve(src.firstFrom, sc) : null;
+  if (typeof first === 'string' && list.some((o) => o.value === first)) {
+    list = [...list.filter((o) => o.value === first), ...list.filter((o) => o.value !== first)];
+  }
   if (!src.groupBy) return [{ key: null, label: null, own: false, options: list }];
   const by = fieldOf(ctx.skill, src.groupBy);
   const parents = by?.options.list ? ctx.skill.options[by.options.list] ?? [] : [];
@@ -185,7 +243,7 @@ function pick(ctx: RunContext, f: FieldDef, a: Answer, value: string): Answer {
 
 function own(ctx: RunContext, f: FieldDef, a: Answer, raw: string): Answer {
   if (!f.own) return a;
-  const text = raw.slice(0, ctx.skill.ownMax);
+  const text = raw.slice(0, ownMaxOf(ctx, f));
   if (!text.trim()) { const { ownAt: _gone, ...rest } = a; void _gone; return { ...rest, own: null }; }
   if (a.own) return { ...a, own: text };
   if (!f.own.countsAsPick || count(f, a) < f.max) return { ...a, own: text, ownAt: a.ids.length };
@@ -194,6 +252,9 @@ function own(ctx: RunContext, f: FieldDef, a: Answer, raw: string): Answer {
   const d = dropOldest(f, a);
   return { ids: d.ids, own: text, ownAt: d.ids.length };
 }
+
+/** A field's own-words cap: its own `max`, never above the skill's. */
+export const ownMaxOf = (ctx: RunContext, f: FieldDef): number => Math.min(f.own?.max ?? ctx.skill.ownMax, ctx.skill.ownMax);
 
 /** The fields a step shows right now. */
 export function shownFields(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers'>, sc: Scope = scope(ctx, s)): FieldDef[] {
@@ -209,7 +270,7 @@ export function canGoOn(ctx: RunContext, s: RunState): boolean {
 /** The exits a hand-off step offers for these answers, in order, each once. */
 export function offersFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers'>): string[] {
   const sc = scope(ctx, s);
-  return [...new Set(step.offers.filter((o) => holds(o.when, sc)).map((o) => o.exit))];
+  return [...new Set(step.offers.filter((o) => holds(o.when, sc) && !plannedExit(ctx, o.exit)).map((o) => o.exit))];
 }
 
 export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
@@ -225,6 +286,20 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
     }
     case 'shown':
       return s.shown.includes(e.record) ? s : { ...s, shown: [...s.shown, e.record] };
+    case 'embedDone': {
+      const step = stepOf(ctx.skill, s.stepId);
+      if (step.kind !== 'embed' || !step.embed) return s;
+      const o = e.output;
+      const ids = (o.ids ?? []).filter((v) => typeof v === 'string' && ID.test(v)).slice(0, 12);
+      const own = typeof o.own === 'string' && o.own.trim() ? o.own.trim().slice(0, ctx.skill.ownMax) : null;
+      const n = (v: unknown, max: number) => (typeof v === 'number' && Number.isInteger(v) && v >= 0 ? Math.min(v, max) : undefined);
+      const rec: EmbedRecord = {
+        embed: step.embed, stepId: step.id, ids, own,
+        durationSec: n(o.durationSec, 3600), doneCount: n(o.doneCount, 100), earlyCount: n(o.earlyCount, 100),
+      };
+      const answers = step.answerAs ? { ...s.answers, [step.answerAs]: { ids, own } } : s.answers;
+      return runNext(ctx, { ...s, answers, out: { ...s.out, [step.id]: rec } }, { type: 'next' });
+    }
     case 'next': {
       if (!canGoOn(ctx, s)) return s;
       const step = stepOf(ctx.skill, s.stepId);
@@ -248,7 +323,7 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       return { ...s, stepId: prev, path: [...s.path, prev].slice(0, PATH_MAX), offered: [] };
     }
     case 'exit':
-      return ctx.skill.exits.some((x) => x.id === e.exitId) ? { ...s, exitId: e.exitId } : s;
+      return ctx.skill.exits.some((x) => x.id === e.exitId && !x.planned && !x.safety) ? { ...s, exitId: e.exitId } : s;
   }
 }
 
@@ -293,7 +368,7 @@ export function fieldList(ctx: RunContext, field: FieldDef, s: Pick<RunState, 'a
 export function fieldLinks(ctx: RunContext, field: FieldDef, s: Pick<RunState, 'answers'>): Array<{ exit: ExitDef; label: string }> {
   const sc = scope(ctx, s);
   return (field.links ?? []).filter((l) => holds(l.when, sc)).flatMap((l) => {
-    const exit = ctx.skill.exits.find((x) => x.id === l.exit);
+    const exit = ctx.skill.exits.find((x) => x.id === l.exit && !x.planned);
     return exit ? [{ exit, label: ctx.skill.copy[l.label] ?? l.label }] : [];
   });
 }
@@ -301,6 +376,12 @@ export function fieldLinks(ctx: RunContext, field: FieldDef, s: Pick<RunState, '
 /** The emotions this run names (the skill's `emotionFields`): the session's `setEmotionIds`. */
 export function runEmotionIds(ctx: RunContext, s: Pick<RunState, 'answers'>): string[] {
   return ctx.skill.emotionFields.flatMap((f) => s.answers[f]?.ids ?? []);
+}
+
+/** The crisis slot a step shows right now (variant), or null. */
+export function crisisFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers'>): CrisisSlot | null {
+  const sc = scope(ctx, s);
+  return step.crisis?.find((c) => holds(c.when, sc)) ?? null;
 }
 
 /** The ask-fresh answers this run carries (e.g. `fitsFacts`). */
@@ -322,8 +403,18 @@ export function carried(exit: ExitDef, s: Pick<RunState, 'answers'>): string[] {
 export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown> {
   const answers = Object.entries(s.answers)
     .filter(([, a]) => a.ids.length > 0 || a.own)
-    .map(([fieldId, a]) => ({ fieldId, optionIds: a.ids, ...(a.own ? { valueOwn: a.own.trim().slice(0, ctx.skill.ownMax) } : {}) }))
-    .filter((a) => a.optionIds.length > 0 || a.valueOwn);
+    .map(([fieldId, a]) => ({ fieldId, optionIds: a.ids.slice(0, 12), ...(a.own ? { valueOwn: a.own.trim().slice(0, ctx.skill.ownMax) } : {}) }))
+    .filter((a) => a.optionIds.length > 0 || a.valueOwn)
+    .slice(0, 32);
+  const ctxRec = Object.fromEntries(RECORDED_CTX.filter((k) => ctx.ctxIn?.[k]).map((k) => [k, ctx.ctxIn![k]]));
+  const out = Object.values(s.out ?? {}).slice(0, 8).map((r) => ({
+    embed: r.embed, stepId: r.stepId,
+    ...(r.ids.length ? { optionIds: r.ids } : {}),
+    ...(r.own ? { valueOwn: r.own } : {}),
+    ...(r.durationSec !== undefined ? { durationSec: r.durationSec } : {}),
+    ...(r.doneCount !== undefined ? { doneCount: r.doneCount } : {}),
+    ...(r.earlyCount !== undefined ? { earlyCount: r.earlyCount } : {}),
+  }));
   return {
     skillId: ctx.skill.id,
     versionId: ctx.skill.version,
@@ -332,5 +423,7 @@ export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown>
     ...(s.offered.length ? { offeredExitIds: s.offered } : {}),
     ...(s.exitId ? { exitId: s.exitId } : {}),
     ...(s.shown.length ? { embedsShown: s.shown } : {}),
+    ...(Object.keys(ctxRec).length ? { ctx: ctxRec } : {}),
+    ...(out.length ? { out } : {}),
   };
 }

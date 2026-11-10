@@ -3,7 +3,9 @@
  * transitions, `showWhen`, option filters, offers, links and conditional copy all use it.
  *
  * Refs: `$a.<field>` (its first pick), `$a.<field>.ids` (every pick), `$a.<field>.own` (own words),
- * `$d.<name>` (a derived value), `$opt.<prop>` (the option under test). Anything else is a literal.
+ * `$d.<name>` (a derived value), `$opt.<prop>` (the option under test), `$ctx.<key>` (what the page that opened
+ * the skill passed in: an urge, a person, a frame, a carried band; only keys the skill `accepts`). Anything else
+ * is a literal.
  * `{set: '$a.<field>'}` is true for a pick or own words; every other operator reads the first pick.
  */
 import type { Cond, OptionDef } from '../../data/skillTypes';
@@ -19,9 +21,11 @@ export interface Scope {
   opt?: OptionDef;
   /** The option objects a field's picks are (for `some`). */
   picked: (fieldId: string) => OptionDef[];
+  /** Context in (`$ctx.*`): ids only, absent keys are null. */
+  ctx?: Readonly<Record<string, string>>;
 }
 
-const REF = /^\$(a|d|opt)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/;
+const REF = /^\$(a|d|opt|ctx)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/;
 
 /** A ref's value, or the literal itself. */
 export function resolve(v: unknown, scope: Scope): unknown {
@@ -36,6 +40,7 @@ export function resolve(v: unknown, scope: Scope): unknown {
     return a?.ids[0] ?? null;
   }
   if (kind === 'd') return scope.derived[name] ?? null;
+  if (kind === 'ctx') return scope.ctx?.[name] ?? null;
   return (scope.opt as Record<string, unknown> | undefined)?.[name] ?? null;
 }
 

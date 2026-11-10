@@ -167,6 +167,7 @@
         "toolId": "check-the-facts",
         "version": "cf-v1",
         "start": "feel",
+        "accepts": [],
         "ownMax": 140,
         "emotionFields": [
           "feel"

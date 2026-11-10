@@ -9,7 +9,11 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from content import SKILLS, CONTENT_VERSION, STEP_KINDS, EMBEDS, GRAPH_TABLES  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-REF = re.compile(r"^\$(a|d|opt)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
+REF = re.compile(r"^\$(a|d|opt|ctx)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
+# Context keys a skill may accept (src/data/skillTypes.ts CtxKey).
+CTX_KEYS = {"urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo"}
+CRISIS_VARIANTS = {"crisis", "other_person"}
+RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
 
 
@@ -26,7 +30,7 @@ def tool_ids():
     return set(re.findall(r"^\s*id: '([a-z0-9-]+)',", src, re.M))
 
 
-def check_cond(c, fields, derived, where):
+def check_cond(c, fields, derived, where, accepts=None):
     """Every condition is total: known operators, refs to fields/derived values that exist."""
     if not isinstance(c, dict) or len(c) != 1:
         raise AssertionError(f"{where}: a condition is one operator, got {c!r}")
@@ -41,18 +45,20 @@ def check_cond(c, fields, derived, where):
                 assert name in fields, (where, "unknown field", r)
             if kind == "d":
                 assert name in derived, (where, "unknown derived value", r)
+            if kind == "ctx":
+                assert accepts is not None and name in accepts, (where, "context the skill doesn't accept", r)
     if op in ("all", "any"):
         for x in arg:
-            check_cond(x, fields, derived, where)
+            check_cond(x, fields, derived, where, accepts)
     elif op == "not":
-        check_cond(arg, fields, derived, where)
+        check_cond(arg, fields, derived, where, accepts)
     elif op == "set":
         ref(arg)
     elif op == "own":
         assert arg in fields, (where, arg)
     elif op == "some":
         assert arg[0] in fields, (where, arg)
-        check_cond(arg[1], fields, derived, where)
+        check_cond(arg[1], fields, derived, where, accepts)
     else:
         ref(arg[0])
         if isinstance(arg[1], str):
@@ -62,7 +68,10 @@ def check_cond(c, fields, derived, where):
 def check(skill):
     sid = skill["id"]
     copy = skill["copy"]
-    fields = {f["id"] for s in skill["steps"] for f in s.get("fields", [])}
+    accepts = set(skill.get("accepts", []))
+    assert accepts <= CTX_KEYS, (sid, "unknown context keys", accepts - CTX_KEYS)
+    assert skill["ownMax"] <= RUN_OWN_MAX, (sid, "ownMax over the record's limit")
+    fields = {f["id"] for s in skill["steps"] for f in s.get("fields", [])} | {s["answerAs"] for s in skill["steps"] if s.get("answerAs")}
     derived = {d["name"] for d in skill["derive"]}
     steps = {s["id"] for s in skill["steps"]}
     exits = {e["id"] for e in skill["exits"]}
@@ -75,25 +84,45 @@ def check(skill):
     assert len(set(values)) == len(values), (sid, "option values are unique per list")
     for d in skill["derive"]:
         assert d["table"] in tables, (sid, d)
+        if d.get("kind") == "count":
+            assert d.get("fields") and all(f in fields for f in d["fields"]), (sid, "a count reads fields that exist", d)
+            for k in skill["tables"].get(d["table"], {}):
+                float(k)  # a count's table is keyed by thresholds
+        else:
+            assert d.get("kind", "lookup") == "lookup" and isinstance(d.get("from"), str), (sid, d)
     for e in skill["exits"]:
-        assert e.get("done") or e.get("toolId") in tools, (sid, e)
+        if e.get("safety"):
+            assert not e.get("toolId") and not e.get("planned") and not e.get("done"), (sid, "safety.open opens no tool", e)
+        elif e.get("planned"):
+            assert e.get("toolId") and e["toolId"] not in tools, (sid, "a planned exit names a tool that isn't built (flip it when it is)", e)
+        else:
+            assert e.get("done") or e.get("toolId") in tools, (sid, e)
         for f in e.get("carry", []):
             assert f in fields, (sid, e)
     for s in skill["steps"]:
         w = f"{sid}.{s['id']}"
         assert s["kind"] in STEP_KINDS, w
+        if s["kind"] == "embed":
+            assert s.get("embed") in EMBEDS, (w, "a whole-screen embed the player has", s.get("embed"))
+            assert not s.get("fields"), (w, "an embed step has no fields; its output is `answerAs`")
+        else:
+            assert "embed" not in s and "answerAs" not in s, (w, "only embed steps name an embed")
+        for slot in s.get("crisis", []):
+            assert slot["variant"] in CRISIS_VARIANTS, (w, slot)
+            check_cond(slot["when"], fields, derived, w, accepts)
+
         titles = s.get("title")
         for t in ([titles] if isinstance(titles, str) else titles or []):
             key = t if isinstance(t, str) else t["key"]
             assert key in copy, (w, key)
             if isinstance(t, dict) and "when" in t:
-                check_cond(t["when"], fields, derived, w)
+                check_cond(t["when"], fields, derived, w, accepts)
         for k in ("hint", "note"):
             assert k not in s or s[k] in copy, (w, k)
         for t in s.get("next", []):
             assert t["to"] in steps, (w, t)
             if "when" in t:
-                check_cond(t["when"], fields, derived, w)
+                check_cond(t["when"], fields, derived, w, accepts)
         assert s["kind"] == "handoff" or s.get("next"), (w, "an ask step goes somewhere")
         for f in s.get("fields", []):
             o = f["options"]
@@ -101,7 +130,7 @@ def check(skill):
             if "list" in o:
                 assert o["list"] in lists, (w, o)
                 if "where" in o:
-                    check_cond(o["where"], fields, derived, w)
+                    check_cond(o["where"], fields, derived, w, accepts)
                 if "groupBy" in o:
                     assert o["groupBy"] in fields, (w, o)
             if "moreKey" in o:
@@ -110,22 +139,32 @@ def check(skill):
                 assert k not in f or f[k] in copy, (w, f)
             if "own" in f:
                 assert f["own"]["hint"] in copy, (w, f)
+                assert f["own"].get("max", skill["ownMax"]) <= skill["ownMax"], (w, "own max above the skill's", f)
+            if "firstFrom" in o:
+                assert o["firstFrom"].startswith("$ctx."), (w, "firstFrom is a context ref", o)
+                check_cond({"set": o["firstFrom"]}, fields, derived, w, accepts)
+            if "list" in o:
+                for x in (x for x in skill["options"] if x[0] == o["list"] and x[3].get("danger")):
+                    assert x[3]["danger"] in ("self", "other"), (w, x[1])
+                    want = "other_person" if x[3]["danger"] == "other" else "crisis"
+                    assert any(slot["variant"] == want for slot in s.get("crisis", [])), (
+                        w, f"option {x[1]} can carry danger: the step declares a {want} crisis slot (plan C6.4)")
             if "showWhen" in f:
-                check_cond(f["showWhen"], fields, derived, w)
+                check_cond(f["showWhen"], fields, derived, w, accepts)
             if "list" in f:
                 assert f["list"]["table"] in tables, (w, f)
             for ln in f.get("links", []):
                 assert ln["exit"] in exits and ln["label"] in copy, (w, ln)
-                check_cond(ln["when"], fields, derived, w)
+                check_cond(ln["when"], fields, derived, w, accepts)
         for sl in s.get("slots", []):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
-            check_cond(sl["showWhen"], fields, derived, w)
+            check_cond(sl["showWhen"], fields, derived, w, accepts)
         for ln in s.get("lines", []):
             assert ln["key"] in copy, (w, ln)
-            check_cond(ln["when"], fields, derived, w)
+            check_cond(ln["when"], fields, derived, w, accepts)
         for of in s.get("offers", []):
             assert of["exit"] in exits, (w, of)
-            check_cond(of["when"], fields, derived, w)
+            check_cond(of["when"], fields, derived, w, accepts)
         assert "done" not in s or s["done"] in exits, w
     every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
@@ -154,7 +193,7 @@ A(f"""// ============================================================
 for sk in SKILLS:
     sid = sk["id"]
     A(f"\n// --- {sid} ({sk['version']}) ---")
-    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields']})}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
+    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
     A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (s:Skill {{id: {q(sid)}}})\nMERGE (t)-[:HAS_SKILL]->(s);")
     # Edges are rebuilt each load (a removed step / jump / offer must disappear).
     A(f"MATCH (:SkillStep {{skillId: {q(sid)}}})-[r:NEXT|OFFERS|LINKS]->() DELETE r;")
@@ -165,7 +204,7 @@ for sk in SKILLS:
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (n:SkillStep {{id: {q(nid)}}})\nMERGE (s)-[r:HAS_STEP]->(n)\nSET r += {{order: {i}}};")
     for e in sk["exits"]:
         nid = f"{sid}:{e['id']}"
-        A(f"MERGE (x:SkillExit {{id: {q(nid)}}})\nSET x += {props({'skillId': sid, 'exit': e['id'], 'toolId': e.get('toolId'), 'done': bool(e.get('done')), 'carry': e.get('carry', [])})}, x.queryJson = {js(e.get('query', {}))};")
+        A(f"MERGE (x:SkillExit {{id: {q(nid)}}})\nSET x += {props({'skillId': sid, 'exit': e['id'], 'toolId': e.get('toolId'), 'done': bool(e.get('done')), 'carry': e.get('carry', []), 'planned': bool(e.get('planned')), 'safety': bool(e.get('safety'))})}, x.queryJson = {js(e.get('query', {}))};")
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (x:SkillExit {{id: {q(nid)}}})\nMERGE (s)-[:HAS_EXIT]->(x);")
         if e.get("toolId"):
             A(f"MATCH (x:SkillExit {{id: {q(nid)}}}), (t:TherapyConcept {{appToolId: {q(e['toolId'])}}})\nMERGE (x)-[:OPENS]->(t);")

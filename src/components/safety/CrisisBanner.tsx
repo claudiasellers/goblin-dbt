@@ -20,6 +20,10 @@
  * `variant="other_person"`: danger from another person (Cope Ahead's *They might hurt me*), where a suicide
  * and crisis line is the wrong first call. 911 first, then the National Domestic Violence Hotline (call or
  * text), and 988 kept as the last option. Same placement rules: compact or full, alongside, never blocking.
+ *
+ * Outside the US (decision D5 of docs/design/dbt-modules-plan.md, until CORE-01's helpline list): a quiet
+ * *Outside the US?* list under the crisis variant, with a few national lines. Closed by default so the US
+ * numbers stay first.
  */
 
 // Must work for someone who is flooded but not suicidal: every
@@ -37,6 +41,32 @@ const OTHER_PERSON_LINKS = [
 ] as const;
 
 export type CrisisBannerVariant = 'crisis' | 'other_person';
+
+/** National crisis lines outside the US: country, then each line. */
+const OUTSIDE_US = [
+  { country: 'UK and Ireland', links: [{ href: 'tel:116123', label: 'Call 116 123 (Samaritans)' }] },
+  { country: 'Canada', links: [{ href: 'tel:988', label: 'Call or text 988' }] },
+  { country: 'Australia', links: [{ href: 'tel:131114', label: 'Call 13 11 14 (Lifeline)' }] },
+  { country: 'New Zealand', links: [{ href: 'tel:1737', label: 'Call or text 1737' }] },
+] as const;
+
+function OutsideUs({ compact }: { compact: boolean }) {
+  return (
+    <details className={`${compact ? 'mt-2 text-sm' : 'mt-4 text-left'} text-[var(--color-q-hu-text)]`} data-testid="crisis-outside-us">
+      <summary className="cursor-pointer min-h-11 flex items-center font-medium">Outside the US?</summary>
+      <ul className="mt-2 space-y-2">
+        {OUTSIDE_US.map((c) => (
+          <li key={c.country}>
+            <span className="block">{c.country}</span>
+            {c.links.map((l) => (
+              <a key={l.href + c.country} href={l.href} className="inline-flex items-center min-h-11 underline">{l.label}</a>
+            ))}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
 
 function OtherPersonBanner({ compact }: { compact: boolean }) {
   const link = compact
@@ -81,6 +111,7 @@ export function CrisisBanner({ compact = false, variant = 'crisis' }: { compact?
             Text HOME to 741741
           </a>
         </div>
+        <OutsideUs compact />
       </section>
     );
   }
@@ -108,6 +139,7 @@ export function CrisisBanner({ compact = false, variant = 'crisis' }: { compact?
       >
         Text HOME to 741741
       </a>
+      <OutsideUs compact={false} />
     </section>
   );
 }

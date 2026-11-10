@@ -434,19 +434,25 @@ user-visible changes in either: Check the Facts keeps working, and the contract 
 **F1. Player contract** (no profile work, so it doesn't wait on the profile thread)
 
 - R1 whole-screen embeds with `out`; R2 `$ctx` and `accepts`; R6 crisis slot, reserved `safety.open`
-  exit and the interim crisis screen (D5); R7 `urge_change` close; R10 counting derive; R11 per-field
-  own max; R12 option first; R13 `useDeadlineTimer`; the new `ext.run` limits and fields (C1).
+  exit and the interim crisis screen with the non-US lines (D5); R10 counting derive; R11 per-field own
+  max; R12 option first; planned exits; the new `ext.run` limits and fields (C1: `ctx`, `out[]`).
 - `tests/skill-contracts.test.mjs`: every skill's exits target known or planned tool ids; carry and query
   keys are accepted; embeds are registered on both sides with an `out` schema; danger options have a
-  crisis slot; worst-case `ext` ≤ 4 KB; every step reachable, no dead ends; keep actions name registered
-  kinds; follow-up actions name registered types; close kind declared.
+  crisis slot; worst-case `ext` ≤ 4 KB and passes the server schema; every step reachable; close kind
+  declared; text in `ext.run` only on `*Own` keys (what encryption will cover).
 - `tests/module-edges.test.mjs` and `tests/fixtures/module-edges.json` (C4).
-- `tests/fixtures/legacy-exits.json`.
+
+R7 and R13 moved to F2 (built 10 Nov): their first user is DT-02, which needs `holdRing` from F2 anyway,
+and both are tested best with that embed. The keep and follow-up contract checks move with R4 and R5.
 
 **F2. Writes, inline and the review harness** (after `user-profile.md` P1 lands)
 
-- R3 profile reads, R4 keep action, R5 follow-up action, R8 inline mode, R9 resume, R14 the empty
-  projection registry, `playerTools.ts` (C8).
+- R3 profile reads, R4 keep action, R5 follow-up action, R7 `urge_change` close, R8 inline mode, R9
+  resume, R13 `useDeadlineTimer`, R14 the empty projection registry, `playerTools.ts` and
+  `tests/fixtures/legacy-exits.json` (C8).
+- Own-words encryption: register `run: ['answers[].valueOwn', 'out[].valueOwn']` in the profile thread's
+  `ownWordsPaths`, so `ext.run` own words go through `encryptOwn` / `decryptOwn` (C1 rule 7).
+- Contract checks for keep actions (registered kinds) and follow-up actions (registered types).
 - Shared embeds `witness` and `holdRing` (C3b).
 - **The skill review harness**, extending `dev/review/` (which already renders Parts and Cope Ahead with
   real components): `dev/skills-review.html` renders any skill with fixture content and stubbed services,
@@ -456,8 +462,8 @@ user-visible changes in either: Check the Facts keeps working, and the contract 
   the same screens (44 px targets, focus on the title, contrast). Output: a gallery page per skill, which
   Gate 2 reviews and the PR links.
 
-If nobody has started `user-profile.md` P1 when F1 merges, the foundation lane builds P1 exactly as that
-doc specifies, as its own PR before F2.
+The profile thread builds `user-profile.md` P1 and the own-words crypto (`encryptOwn` / `decryptOwn`,
+PR #55); F2 starts when that is pushed and builds on it.
 
 **Lanes may start writing skill files after F1** for skills that need only F1 (§5 marks them).
 

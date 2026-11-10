@@ -9,14 +9,16 @@ import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  askFresh, canGoOn, carried as carriedOf, copyText, emotionChoices, fieldLinks, fieldList, handoffLine, initialRun,
-  optionGroups, runEmotionIds, runNext, runRecord, scope, shownFields, stepOf, titleSlots,
+  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, emotionChoices, fieldLinks, fieldList, handoffLine,
+  initialRun, optionGroups, ownMaxOf, runEmotionIds, runNext, runRecord, scope, shownFields, stepOf, titleSlots,
   type RunContext, type RunEvent, type RunState,
 } from '../../lib/skillRuntime/machine';
 import { holds } from '../../lib/skillRuntime/conditions';
 import { getSkillsContent } from '../../services/skills';
 import { getSpineContent } from '../../services/spine';
 import { TooMuchLink } from '../capacity/TooMuchLink';
+import { CrisisBanner } from '../safety/CrisisBanner';
+import { SafetyOpen } from '../safety/SafetyOpen';
 import { SessionClose } from '../spine/SessionClose';
 import { EmotionPicker } from '../tools/EmotionPicker';
 import { Chip, Line, Prompt } from '../tools/wiseMind/bits';
@@ -32,6 +34,11 @@ import { EMBEDS } from './embeds';
  * hand-offs recorded in `ext.run.handoffs`; no band gate and no capacity question. Leaving (an offer, a
  * quiet link, Done) asks the tool's close question first, then goes through `linkTo` with the exit's
  * emotions and query, so the next tool's session is linked to this one.
+ *
+ * A step may show crisis resources (its `crisis` slots) above its questions, and any skill may offer the reserved
+ * `safety.open` exit: it opens the crisis resources over the skill (SafetyOpen), the run underneath, and going
+ * back returns to the same screen. A whole-screen embed step hands the screen to its embed; its `onDone` output
+ * goes into the run (docs/design/dbt-modules-plan.md C1, C3a).
  */
 export function SkillPlayer({ skillId }: { skillId: string }) {
   const [content, setContent] = useState<SkillsContent | null>(null);
@@ -56,6 +63,13 @@ export function SkillPlayer({ skillId }: { skillId: string }) {
 const GRID = new Set(emotions.map((e) => e.id));
 const emotionLabel = (id: string) => (getEmotionById(id)?.name ?? id.replace(/_/g, ' ')).toLowerCase();
 
+/** Context in: the query's keys, then route state's `skillCtx`, narrowed by `contextIn` to what the skill accepts. */
+function contextFrom(skill: SkillDef, search: string, state: unknown): Record<string, string> {
+  const q = Object.fromEntries(new URLSearchParams(search));
+  const fromState = (state && typeof state === 'object' && 'skillCtx' in state ? (state as { skillCtx?: unknown }).skillCtx : null);
+  return contextIn(skill, { ...q, ...(fromState && typeof fromState === 'object' ? fromState as Record<string, unknown> : {}) });
+}
+
 /** Emotions the visit was opened with: `?feel=<grid id>` first, then a hand-off's or check-in's words. */
 function carriedFrom(search: string, state: unknown): string[] {
   const feel = new URLSearchParams(search).get('feel');
@@ -67,9 +81,11 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   const navigate = useNavigate();
   const location = useLocation();
   const [carried] = useState(() => carriedFrom(location.search, location.state));
+  const [ctxIn] = useState(() => contextFrom(skill, location.search, location.state));
   const ctx = useMemo<RunContext>(() => ({
-    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel,
-  }), [skill, content, carried]);
+    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn,
+  }), [skill, content, carried, ctxIn]);
+  const [safetyOpen, setSafetyOpen] = useState(false);
   const [st, setSt] = useState<RunState>(() => initialRun(skill));
   const [leaving, setLeaving] = useState<ExitDef | null>(null);
   // Answered: stay on the close so its tag row ("Was this a part you know?") can show, then go on a tap.
@@ -97,6 +113,13 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   }, [toolSession, navigate, st]);
 
   const leave = useCallback((exit: ExitDef) => {
+    if (exit.planned) return;
+    if (exit.safety) {
+      // Not a way out: the resources open over the skill, and the run stays where it was.
+      send({ type: 'shown', record: 'safety_open' });
+      setSafetyOpen(true);
+      return;
+    }
     send({ type: 'exit', exitId: exit.id });
     setLeaving(exit);
     // With no close question to ask (none for this tool, or its copy can't load), leave at once.
@@ -111,7 +134,9 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
   const onShown = useCallback((record: string) => send({ type: 'shown', record }), [send]);
 
   let body: ReactNode;
-  if (leaving) {
+  if (safetyOpen) {
+    body = <SafetyOpen onBack={() => setSafetyOpen(false)} />;
+  } else if (leaving) {
     body = (
       <div className="space-y-4">
         <SessionClose onAnswered={() => setAnswered(true)} onSkipped={() => go(leaving)} />
@@ -127,14 +152,16 @@ function SkillRun({ skill, content }: { skill: SkillDef; content: SkillsContent 
     );
   } else if (step.kind === 'handoff') {
     body = <HandoffCard ctx={ctx} step={step} st={st} onExit={leave} />;
+  } else if (step.kind === 'embed') {
+    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} />;
   } else {
     body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} />;
   }
 
   return (
     <div className="space-y-5" data-testid="skill-player" data-skill={skill.id} data-step={st.stepId}>
-      <div key={leaving ? 'leaving' : st.stepId} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
-      {!leaving && (
+      <div key={safetyOpen ? 'safety' : leaving ? 'leaving' : st.stepId} className="space-y-4 motion-safe:animate-[stepEnter_300ms_ease-out]">{body}</div>
+      {!leaving && !safetyOpen && (
         <div className="flex justify-center">
           <TooMuchLink host={skill.toolId} onResult={(r) => {
             handoffs.current.push(r);
@@ -162,7 +189,9 @@ function AskStep({ ctx, step, st, send, onExit, onShown }: {
         onContinue={() => setPicker(null)} />
     );
   }
+  const crisis = crisisFor(ctx, step, st);
   return (<>
+    {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     {step.hint && c[step.hint] && <Line>{c[step.hint]}</Line>}
     {fields.map((f, i) => {
@@ -186,6 +215,22 @@ function AskStep({ ctx, step, st, send, onExit, onShown }: {
     <button type="button" className={primaryButton} disabled={!canGoOn(ctx, st)} onClick={() => send({ type: 'next' })}>
       {c.next ?? 'Next'}
     </button>
+  </>);
+}
+
+/** A whole-screen embed step: the embed owns the screen; its `onDone` output moves the run on. */
+function EmbedStep({ ctx, step, st, send, onShown }: {
+  ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onShown: (record: string) => void;
+}) {
+  const Embed = step.embed ? EMBEDS[step.embed] : undefined;
+  const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
+  const crisis = crisisFor(ctx, step, st);
+  const shown = useCallback(() => onShown(step.embed ?? step.id), [onShown, step.embed, step.id]);
+  if (!Embed) return null;
+  return (<>
+    {crisis && <CrisisBanner compact variant={crisis.variant} />}
+    {title && <Prompt>{title}</Prompt>}
+    <Embed props={step.props ?? {}} ctx={ctx.ctxIn ?? {}} onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
   </>);
 }
 
@@ -235,7 +280,7 @@ function FieldView({ ctx, field, st, send, onMore, onExit }: {
       )}
       {chips}
       {field.own && ownOpen && (
-        <textarea rows={2} maxLength={ctx.skill.ownMax} value={a?.own ?? ''}
+        <textarea rows={2} maxLength={ownMaxOf(ctx, field)} value={a?.own ?? ''}
           aria-label={c[field.own.hint] ?? c.own_hint} placeholder={field.own.open ? c[field.own.hint] : undefined}
           onChange={(e) => send({ type: 'own', fieldId: field.id, text: e.target.value })}
           className="w-full p-3 rounded-xl border border-[var(--color-border)] bg-[var(--color-bg-input)] text-[var(--color-text-primary)] font-serif text-lg focus:ring-2 focus:ring-[var(--color-accent)]" />

@@ -15,6 +15,9 @@ export type Cond =
   | { any: Cond[] }
   | { not: Cond };
 
+/** Context keys a skill may accept from the page that opens it (`SkillDef.accepts`, refs `$ctx.<key>`). */
+export type CtxKey = 'urgeId' | 'personId' | 'frame' | 'enterAt' | 'situationId' | 'partId' | 'band' | 'returnTo';
+
 /** Copy: a key into the skill's copy, or keys under conditions (first match wins; the last has no `when`). */
 export type CopyRef = string | Array<{ when?: Cond; key: string }>;
 
@@ -26,6 +29,8 @@ export interface OptionsSource {
   /** One group per pick of this field (an option's `for` names the pick); `ownGroup` for that field's own words. */
   groupBy?: string;
   ownGroup?: string;
+  /** Put this option first (never selected): a `$ctx.<key>` ref, e.g. Cope Ahead's `?first=`. */
+  firstFrom?: string;
   /** Grid words (src/data/emotions.ts ids), in order; carried emotions first; `moreKey` opens the full list. */
   emotions?: string[];
   carriedFirst?: boolean;
@@ -40,8 +45,12 @@ export interface FieldDef {
   max: number;
   /** Past `max`, a tap swaps out the oldest pick. */
   swap?: boolean;
-  /** The own-words escape hatch: `hint` is its label / placeholder; `open` shows the box at once (else behind a chip). */
-  own?: { hint: string; countsAsPick: boolean; open?: boolean };
+  /**
+   * The own-words escape hatch: `hint` is its label / placeholder; `open` shows the box at once (else behind a
+   * chip); `max` caps it below the skill's `ownMax`. Own words are encrypted at rest and are never data: nothing
+   * counts, filters or routes on them (docs/design/dbt-modules-plan.md C1 rule 7).
+   */
+  own?: { hint: string; countsAsPick: boolean; open?: boolean; max?: number };
   showWhen?: Cond;
   required?: boolean;
   /** The answer is also this ask-fresh field on the session (functions/src/userdata/layers.ts). */
@@ -55,6 +64,23 @@ export interface FieldDef {
 
 export interface SlotDef { after: string; embed: string; props?: Record<string, unknown>; showWhen: Cond; record: string }
 
+/**
+ * Crisis resources above a step while `when` holds (CrisisBanner, compact); a step lists them, the first that holds
+ * shows. An option with a `danger` prop (`self` / `other`) needs a slot of the matching variant on its step.
+ */
+export interface CrisisSlot { variant: 'crisis' | 'other_person'; when: Cond }
+
+/** What a whole-screen embed may report (functions/src/spine/extSchemas.ts `run.out`). Measurements, never ratings. */
+export interface EmbedOutput {
+  /** Option ids it produced: they become the answer of the step's `answerAs` field. */
+  ids: string[];
+  /** The person's own words, if the embed takes any (encrypted at rest like every own-words value). */
+  own?: string | null;
+  durationSec?: number;
+  doneCount?: number;
+  earlyCount?: number;
+}
+
 export interface StepDef {
   id: string;
   kind: 'ask' | 'handoff' | 'embed';
@@ -67,6 +93,9 @@ export interface StepDef {
   /** kind 'embed': the registered embed that runs the whole screen, and its props. */
   embed?: string;
   props?: Record<string, unknown>;
+  /** kind 'embed': the field id the embed's output ids are answered as (transitions read `$a.<answerAs>`). */
+  answerAs?: string;
+  crisis?: CrisisSlot[];
   next: Array<{ to: string; when: Cond | null }>;
   /** kind 'handoff'. */
   lines?: Array<{ when: Cond; key: string }>;
@@ -76,11 +105,22 @@ export interface StepDef {
   complete?: boolean;
 }
 
-export interface ExitDef { id: string; toolId: string | null; query: Record<string, string>; carry: string[]; done: boolean }
+/**
+ * A hand-on. `planned`: the tool isn't built yet; the exit is written (so the edge exists) but never shown.
+ * `safety`: the reserved `safety.open` exit, opening the crisis resources over the skill (it doesn't end the run).
+ */
+export interface ExitDef { id: string; toolId: string | null; query: Record<string, string>; carry: string[]; done: boolean; planned?: boolean; safety?: boolean }
 
 export interface OptionDef { value: string; label: string; for?: string; [prop: string]: unknown }
 
-export interface DeriveDef { name: string; from: string; table: string; default?: string; keep?: 'key' | 'value' }
+/**
+ * A derived value. `lookup` (the default): `from` (a ref) looked up in `table`. `count`: the picks of the `fields`
+ * summed (`weights` by option value, else 1 each), then the table row with the largest numeric key ≤ the total.
+ */
+export interface DeriveDef {
+  name: string; kind?: 'lookup' | 'count'; from?: string; fields?: string[]; weights?: Record<string, number>;
+  table: string; default?: string; keep?: 'key' | 'value';
+}
 
 export interface SkillDef {
   id: string;
@@ -88,6 +128,8 @@ export interface SkillDef {
   toolId: string;
   version: string;
   start: string;
+  /** Context keys the skill takes from the page that opens it; an exit carrying any other key fails the contract test. */
+  accepts: CtxKey[];
   ownMax: number;
   emotionFields: string[];
   copy: Record<string, string>;

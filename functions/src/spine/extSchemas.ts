@@ -122,14 +122,30 @@ export const EXT_SCHEMAS: Record<string, Record<string, Field>> = {
   run: {
     skillId: { t: 'id' },                                                          // Skill id (schema/skills.cypher)
     versionId: { t: 'id' },                                                        // its version (cf-v1)
-    path: { t: 'ids', max: 24 },                                                   // step ids, in the order shown
+    path: { t: 'ids', max: 48 },                                                   // step ids, in the order shown
     answers: {                                                                     // what was chosen, per question
-      t: 'objs', max: 16,
+      t: 'objs', max: 32,
       of: { fieldId: { t: 'id' }, optionIds: { t: 'ids', max: 12 }, valueOwn: { t: 'text', max: RUN_OWN_MAX } },
     },
     offeredExitIds: { t: 'ids', max: 8 },                                          // what the hand-off offered
     exitId: { t: 'id' },                                                           // where it went (a SkillExit id, or done)
     embedsShown: { t: 'ids', max: 8 },                                             // e.g. unblend: the parts line showed
+    // What the page that opened the skill passed in (docs/design/dbt-modules-plan.md C1): ids only.
+    ctx: {
+      t: 'obj',
+      of: {
+        urgeId: { t: 'id' }, personId: { t: 'id' }, frame: { t: 'id' }, enterAt: { t: 'id' },
+        situationId: { t: 'id' }, partId: { t: 'id' }, band: { t: 'id' },
+      },
+    },
+    // Whole-screen embeds' reports: option ids, own words, and measurements (seconds held, counts), never ratings.
+    out: {
+      t: 'objs', max: 8,
+      of: {
+        embed: { t: 'id' }, stepId: { t: 'id' }, optionIds: { t: 'ids', max: 12 }, valueOwn: { t: 'text', max: RUN_OWN_MAX },
+        durationSec: { t: 'int', max: 3600 }, doneCount: { t: 'int', max: 100 }, earlyCount: { t: 'int', max: 100 },
+      },
+    },
     handoffs: {                                                                    // P2 breakdown hand-off, as ext.er.handoffs
       t: 'objs', max: 4,
       of: {
