@@ -69,7 +69,7 @@ starts a new window.
   dream.
 - Profile `nightmare_script` (`functions/src/profile/kinds.ts`; a `ProfileFact` like quiet hours, so no new label
   per plan D2): `settingIds|settingOwn`, `turnIds|turnOwn`, `endingIds|endingOwn`, own words encrypted. Only on
-  *Keep it in Me*. Me lists it under *My plans* as *A nightmare I rewrote*, with the ending when they wrote it,
+  *Keep it in Me*. Me lists it under *My plans* (an area Me shows once it holds something) as *A nightmare I rewrote*, with the ending when they wrote it,
   and *Set aside*. At most 5.
 - `FollowUp nightmare_rehearse` (practice tier). The copy and the notification never name the nightmare.
 
@@ -93,6 +93,7 @@ starts a new window.
 
 - **R9 resume reads back only the steps up to the one reopened.** A later step is asked again, never pre-filled.
   Without this, a read-through visit would come back with last time's reminder chip picked and schedule it
-  unasked. `tests/skill-contracts.test.mjs` pins it.
+  unasked. A field that books a reminder (a step's `followUp.whenFrom`) is never read back at all, even at
+  the step reopened, since `scheduled` isn't restored. `tests/skill-contracts.test.mjs` pins both.
 - **Opening a `nightmare_rehearse` link resolves it**, as for `resume_skill` (`functions/src/spine/toolSession.ts`).
 - One new embed, `rescriptCard` (ER-owned; `src/components/skillPlayer/RescriptCard.tsx`), on the shared paper.
