@@ -559,3 +559,27 @@ test("R5 on a hand-off: one optional chip field its followUp names; build.py ref
   assert.ok(leave.indexOf("await scheduleStep()") > 0 && leave.indexOf("await scheduleStep()") < leave.indexOf("send({ type: 'exit'"), "scheduled before the exit");
   assert.ok(leave.indexOf("if (exit.safety)") < leave.indexOf("await scheduleStep()"), "safety.open isn't leaving: nothing scheduled");
 });
+
+test("step links: an embed or hand-off screen's quiet links, never an ask step's (theirs are on their fields)", () => {
+  const exits = [{ id: "talk", toolId: null, query: {}, carry: [], done: false, safety: true }, { id: "later", toolId: "x", query: {}, carry: [], done: false, planned: true }];
+  const skill = { ...F2, exits: [...F2.exits, ...exits], copy: { ...F2.copy, talk: "Talk" } };
+  const ctx = { ...f2Ctx(null), skill };
+  const links = [{ exit: "talk", label: "talk", when: { all: [] } }, { exit: "later", label: "talk", when: { all: [] } }];
+  const s = m.initialRun(skill);
+  assert.deepEqual(m.stepLinks(ctx, { id: "e", kind: "embed", links, next: [], offers: [] }, s).map((l) => [l.exit.id, l.label]), [["talk", "Talk"]], "a planned exit is never shown");
+  assert.equal(m.stepLinks(ctx, { id: "h", kind: "handoff", links, next: [], offers: [] }, s).length, 1);
+  assert.deepEqual(m.stepLinks(ctx, { id: "a", kind: "ask", links, next: [], offers: [] }, s), []);
+  assert.match(read("scripts/skills/build.py"), /an ask step's links live on its fields/);
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.equal((player.match(/<StepLinks /g) ?? []).length, 2, "under every embed and every hand-off");
+});
+
+test("resume settled: a link's enterAt holds only for the run it reopened; a fresh run is a whole first visit", () => {
+  const ctxIn = { enterAt: "rehearse", band: "stirred" };
+  assert.equal(m.ctxAfterResume(ctxIn, true), ctxIn);
+  assert.deepEqual(m.ctxAfterResume(ctxIn, false), { band: "stirred" });
+  assert.deepEqual(m.ctxAfterResume({ band: "stirred" }, false), { band: "stirred" });
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(player, /else setCtxIn\(\(c\) => ctxAfterResume\(c, false\)\)/, "resume found nothing");
+  assert.match(player, /\.catch\(\(\) => setCtxIn\(\(c\) => ctxAfterResume\(c, false\)\)\)/, "resume read failed");
+});

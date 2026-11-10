@@ -471,6 +471,12 @@ and both are tested best with that embed. The keep and follow-up contract checks
   `?run=<sessionId>&at=<stepId>`; ask-fresh answers are always asked again. Since ER-15 (`runtime:` commit in
   its PR), only the answers of the steps up to the one reopened come back: a later step is asked again, never
   pre-filled (a read-through visit would otherwise re-pick last time's reminder chip and schedule it unasked).
+  A field a step's `followUp.whenFrom` names is never read back at all, even at the step reopened (`scheduled`
+  isn't restored, so it would book twice). A link's `enterAt` holds only for the run it reopens: when the resume
+  finds nothing (too old, another version, a failed read), the fresh run drops it and is a whole first visit.
+- Embed and hand-off steps take step-level quiet `links` (ER-15's `runtime:` commit), rendered under the embed
+  or the card; an ask step's links stay on its fields. For a way out that belongs on every screen, such as
+  *Talk to someone now*.
 - Embeds declare their **props** as well as their output: `EMBED_PROPS` in `embeds.ts`, mirrored in
   `content.py` (`copy` · `int` · `enum` · `field` · `id`, each optionally `optional`). `build.py` checks
   every embed step and slot against it, and a `copy` prop must be a key in the skill's copy, which the

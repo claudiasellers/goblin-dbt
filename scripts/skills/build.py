@@ -215,6 +215,11 @@ def check(skill):
             for ln in f.get("links", []):
                 assert ln["exit"] in exits and ln["label"] in copy, (w, ln)
                 check_cond(ln["when"], fields, derived, w, accepts)
+        # Step-level quiet links (an embed or hand-off screen has no field to hang them on; an ask step's are on its fields).
+        assert not s.get("links") or s["kind"] in ("embed", "handoff"), (w, "an ask step's links live on its fields")
+        for ln in s.get("links", []):
+            assert ln["exit"] in exits and ln["label"] in copy, (w, ln)
+            check_cond(ln["when"], fields, derived, w, accepts)
         for sl in s.get("slots", []):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
             check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
@@ -338,6 +343,8 @@ for sk in SKILLS:
             offers.setdefault(of["exit"], []).append({"order": i, "when": of["when"]})
         for ex, rows in offers.items():
             A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ex)}}})\nMERGE (a)-[r:OFFERS]->(x)\nSET r += {{order: {rows[0]['order']}}}, r.rowsJson = {js(rows)};")
+        for i, ln in enumerate(st.get("links", [])):
+            A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ln['exit'])}}})\nMERGE (a)-[r:LINKS]->(x)\nSET r += {props({'order': i, 'field': '', 'label': ln['label']})}, r.whenJson = {js(ln['when'])};")
         for f in st.get("fields", []):
             for i, ln in enumerate(f.get("links", [])):
                 A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ln['exit'])}}})\nMERGE (a)-[r:LINKS]->(x)\nSET r += {props({'order': i, 'field': f['id'], 'label': ln['label']})}, r.whenJson = {js(ln['when'])};")

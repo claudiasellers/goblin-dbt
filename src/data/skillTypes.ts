@@ -175,6 +175,11 @@ export interface StepDef {
    * where "how strong is it now?" would land wrong, such as after someone says a person hurt or threatened them.
    */
   noClose?: boolean;
+  /**
+   * kind 'embed' or 'handoff': quiet links under the screen (an ask step's live on its fields). For a way out that
+   * belongs on every screen, such as *Talk to someone now*, where the screen has no field to hang it on.
+   */
+  links?: Array<{ exit: string; label: string; when: Cond }>;
 }
 
 /**

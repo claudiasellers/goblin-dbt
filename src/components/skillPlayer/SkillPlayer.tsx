@@ -15,7 +15,7 @@ import { handoffExt } from '../../lib/bandStore';
 import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
-  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, emotionChoices, fieldLinks, fieldList, followUpFor,
+  askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, ctxAfterResume, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
   handoffLine, initialRun, inlineResult, keepFor, optionGroups, ownMaxOf, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
   scope, shownFields, stepOf, titleSlots,
   type Answer, type RunContext, type RunEvent, type RunState,
@@ -130,7 +130,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   const location = useLocation();
   // Inline, the host owns the address: nothing is read from it.
   const [carried] = useState(() => (inline ? [] : carriedFrom(location.search, location.state)));
-  const [ctxIn] = useState(() => (inline ? {} : contextFrom(skill, location.search, location.state)));
+  const [ctxIn, setCtxIn] = useState(() => (inline ? {} : contextFrom(skill, location.search, location.state)));
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
@@ -155,8 +155,13 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     if (!resumeFrom || !profileSettled || resumed.current) return;
     resumed.current = true;
     getSkillRun(resumeFrom.run, skill.toolId)
-      .then((rec) => { const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh }); if (r) setSt(r); })
-      .catch(() => { /* nothing to reopen: a fresh run */ })
+      .then((rec) => {
+        const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
+        if (r) setSt(r);
+        else setCtxIn((c) => ctxAfterResume(c, false));
+      })
+      // Nothing to reopen: a fresh run, and a whole first visit (the link's enterAt was for the run it named).
+      .catch(() => setCtxIn((c) => ctxAfterResume(c, false)))
       .finally(() => setResuming(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [profileSettled]);
@@ -314,7 +319,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   } else if (step.kind === 'handoff') {
     body = <HandoffCard ctx={ctx} step={step} st={st} send={send} onExit={leave} busy={busy} />;
   } else if (step.kind === 'embed') {
-    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} />;
+    body = <EmbedStep ctx={ctx} step={step} st={st} send={send} onShown={onShown} onExit={leave} />;
   } else {
     body = <AskStep ctx={ctx} step={step} st={st} send={send} onExit={leave} onShown={onShown} onPrimary={primary} busy={busy} />;
   }
@@ -400,8 +405,8 @@ function answerIds(st: RunState): Record<string, readonly string[]> {
 }
 
 /** A whole-screen embed step: the embed owns the screen; its `onDone` output moves the run on. */
-function EmbedStep({ ctx, step, st, send, onShown }: {
-  ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onShown: (record: string) => void;
+function EmbedStep({ ctx, step, st, send, onShown, onExit }: {
+  ctx: RunContext; step: StepDef; st: RunState; send: (e: RunEvent) => void; onShown: (record: string) => void; onExit: (x: ExitDef) => void;
 }) {
   const Embed = step.embed ? EMBEDS[step.embed] : undefined;
   const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
@@ -413,6 +418,20 @@ function EmbedStep({ ctx, step, st, send, onShown }: {
     {title && <Prompt>{title}</Prompt>}
     <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
       onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} />
+    <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
+  </>);
+}
+
+/** An embed or hand-off screen's quiet links (an ask step's are on its fields). Never held while something saves. */
+function StepLinks({ ctx, step, st, onExit }: { ctx: RunContext; step: StepDef; st: RunState; onExit: (x: ExitDef) => void }) {
+  const links = stepLinks(ctx, step, st);
+  if (!links.length) return null;
+  return (<>
+    {links.map((l) => (
+      <div key={l.exit.id} className="flex justify-center" data-step-link={l.exit.id}>
+        <button type="button" className={linkButton} onClick={() => onExit(l.exit)}>{l.label}</button>
+      </div>
+    ))}
   </>);
 }
 
@@ -517,6 +536,7 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
           <button type="button" className={linkButton} disabled={busy} aria-busy={busy} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
         </div>
       )}
+      <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
     </section>
   </>);
 }

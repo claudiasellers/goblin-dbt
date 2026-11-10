@@ -470,6 +470,16 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   };
 }
 
+/**
+ * The context a page run goes on with once its resume is settled (R9): a link's `enterAt` names where the run it
+ * reopens picks up, so it holds only when that run reopened. When it didn't (too old, another version, a failed
+ * read), the fresh run starts without it and is a whole first visit, never one that thinks it was reopened.
+ */
+export function ctxAfterResume(ctxIn: Readonly<Record<string, string>>, reopened: boolean): Readonly<Record<string, string>> {
+  if (reopened || !('enterAt' in ctxIn)) return ctxIn;
+  return Object.fromEntries(Object.entries(ctxIn).filter(([k]) => k !== 'enterAt'));
+}
+
 /** A copy ref's text: a key, or the first conditional key that holds. Slots `{name}` filled from `slots`. */
 export function copyText(ctx: RunContext, ref: StepDef['title'], s: Pick<RunState, 'answers'>, slots: Record<string, string> = {}): string | null {
   if (!ref) return null;
@@ -509,8 +519,17 @@ export function fieldList(ctx: RunContext, field: FieldDef, s: Pick<RunState, 'a
 
 /** The quiet links under a field that hold now. */
 export function fieldLinks(ctx: RunContext, field: FieldDef, s: Pick<RunState, 'answers'>): Array<{ exit: ExitDef; label: string }> {
+  return linksThatHold(ctx, field.links, s);
+}
+
+/** The quiet links under an embed or hand-off screen that hold now (an ask step's are on its fields). */
+export function stepLinks(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers'>): Array<{ exit: ExitDef; label: string }> {
+  return step.kind === 'ask' ? [] : linksThatHold(ctx, step.links, s);
+}
+
+function linksThatHold(ctx: RunContext, links: FieldDef['links'], s: Pick<RunState, 'answers'>): Array<{ exit: ExitDef; label: string }> {
   const sc = scope(ctx, s);
-  return (field.links ?? []).filter((l) => holds(l.when, sc)).flatMap((l) => {
+  return (links ?? []).filter((l) => holds(l.when, sc)).flatMap((l) => {
     const exit = ctx.skill.exits.find((x) => x.id === l.exit && !x.planned);
     return exit ? [{ exit, label: ctx.skill.copy[l.label] ?? l.label }] : [];
   });

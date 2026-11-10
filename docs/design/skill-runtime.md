@@ -72,7 +72,8 @@ linted by the voice gate like every flow document; `specJson` holds no copy, onl
   `copy`, `tables` (the skill's own lookups, e.g. DBT parent → story set), `derive`, `steps`, `exits`,
   `options` (by list).
 - **Step** = one screen: `kind` (`ask` | `handoff` | `embed`), `title` (copy key, or conditional keys),
-  `hint`, `fields`, `slots`, `next` (transitions), and for a hand-off, `lines` and `offers`.
+  `hint`, `fields`, `slots`, `next` (transitions), and for a hand-off, `lines` and `offers`. An embed or
+  hand-off step may carry its own quiet `links` (an ask step's are on its fields).
 - **Field** = one question on a screen: `id` (its answer key), `options` (a list from the skill, with a
   `where` filter, optionally grouped per pick of another field, or the grid words), `max` picks (`swap`:
   a tap past the cap replaces the oldest), `own` (the own-words escape hatch, counts as a pick or not),
