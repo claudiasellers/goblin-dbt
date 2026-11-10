@@ -4,6 +4,7 @@
  * and (PR-P1) pattern offers. Ordering is pure (todayOrder.ts). A fresh `flooded` band collapses
  * the stack; nothing is hidden.
  */
+import { decryptExtOwn } from './extOwn';
 import type { ManagedTransaction } from 'neo4j-driver';
 import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
@@ -88,7 +89,7 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
         source: { ...(vars.sourceToolId ? { toolId: vars.sourceToolId } : {}), ...(vars.sourceSessionId ? { toolSessionId: vars.sourceSessionId } : {}),
           ...(vars.detailId ? { detailId: vars.detailId } : {}) },
         // The plan's ids from the visit (never a stored plan string): the card composes the words.
-        ...(t.id === COPE_AHEAD_AFTER ? { plan: planIdsFromExt(r.get('planExt')) } : {}),
+        ...(t.id === COPE_AHEAD_AFTER ? { plan: planIdsFromExt(await decryptExtOwn(tx, uid, r.get('planExt'))) } : {}),
       });
     }
     // OA plans keep their own reminder (useOppositeActionFollowUps); the rest remind from here.

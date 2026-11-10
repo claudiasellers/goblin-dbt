@@ -12,6 +12,7 @@
  * - recordToolSession: both in one transaction, for one-shots (micro-step, guided activity,
  *   help-now, FTF inside the check-in).
  */
+import { encryptExtOwn } from './extOwn';
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
 import { callable } from '../shared/callable';
@@ -128,6 +129,8 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
   const actedOnUrge = closeKind === 'urge' ? c.actedOnUrge : null;
   const answered = Boolean(thenVsNow || actedOnUrge);
   const detailLabel = c.detail ? DETAIL_LABELS[c.detail.kind] : null;
+  // Own words in ext are stored encrypted (spine/extOwn.ts); their length was checked on the plaintext.
+  const ext = await encryptExtOwn(tx, uid, c.ext);
   // An answer already given in Today (an abandoned session answered before its late close) is final
   // (R2): the close never overwrites it. answeredAt is set last, so the items before it read the old value.
   await tx.run(
@@ -161,7 +164,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
     {
       uid, key, status: c.status, exitStep: c.exitStep, practiced: c.practiced,
       thenVsNow, thenVsNowDir: thenVsNow ? dir : null, actedOnUrge, answered,
-      urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
+      urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext, ...readingProps('bandAtEnd', c.bandAtEnd),
       // Ask-fresh, on the log record only (layers.ts ASK_FRESH_FIELDS); another tool's is dropped.
       wiseMindAnswer: rec.get('toolId') === 'wise-mind' ? c.wiseMindAnswer : null,
       fitsFacts: FITS_FACTS_TOOLS.includes(rec.get('toolId') as string) ? c.fitsFacts : null,

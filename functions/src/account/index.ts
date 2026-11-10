@@ -4,18 +4,20 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import { Record as Neo4jRecord } from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword, withSession } from '../shared/neo4j';
+import { getDriver, withSession } from '../shared/neo4j';
 import { admin, authAdmin } from '../shared/admin';
-import { applyRetention, deleteUserGraph, exportUserRecords, plain } from '../userdata/exportDelete';
+import { decryptDeep, ownDecrypter } from '../shared/crypto';
+import { deleteUserGraph, exportUserRecords, plain } from '../userdata/exportDelete';
 import { toNumber } from '../shared/values';
 import { errorTag } from '../shared/errors';
 import { toSavedOppositeActionSession } from '../oppositeAction';
+import { CALL_OPTS } from '../shared/callOptions';
 
 /**
  * Ensure user exists in Neo4j (called after Firebase Auth signup/login)
  */
 export const ensureUserExists = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     // Verify user is authenticated
     if (!request.auth) {
@@ -85,7 +87,7 @@ const PROFILE_DEFAULTS = {
  * Get user profile -- returns User node properties merged with defaults
  */
 export const getUserProfile = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -120,25 +122,12 @@ export const getUserProfile = onCall(
       // Remove internal fields. The settings profile is cached in localStorage for the theme paint:
       // it never carries profile-layer or system fields (PR-P2), nor the retired goal fields
       // (removed from User by schema/migrations/2026-10-remove-goal-fields.cypher).
-      for (const k of ['id', 'createdAt', 'updatedAt', 'profileVersion', 'patternsEvaluatedAt',
+      for (const k of ['id', 'createdAt', 'updatedAt', 'profileVersion', 'patternsEvaluatedAt', 'ownKeyWrapped',
         'dailyCheckInGoal', 'weeklyToolGoal', 'focusCategories']) {
         delete (profile as Record<string, unknown>)[k];
       }
 
-      // Enforce data retention: delete check-ins older than dataRetentionDays
-      const retentionDays = profile.dataRetentionDays != null
-        ? toNumber(profile.dataRetentionDays)
-        : null;
-
-      if (retentionDays != null && retentionDays > 0) {
-        try {
-          // D-10: every log record older than the window; profile items never expire.
-          await applyRetention(session, userId, retentionDays);
-        } catch (cleanupErr) {
-          // Don't fail the profile load if cleanup fails
-          console.warn('getUserProfile retention failed', errorTag(cleanupErr));
-        }
-      }
+      // Retention runs as a daily job (userdata/retention.ts), not on this read.
 
       return { profile };
     } catch (error) {
@@ -154,7 +143,7 @@ export const getUserProfile = onCall(
  * Update user profile -- partial update of User node properties
  */
 export const updateUserProfile = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -245,7 +234,7 @@ export const updateUserProfile = onCall(
  * failed Auth delete can be retried; onUserDeleted also runs the (idempotent) graph delete.
  */
 export const deleteUserData = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -278,7 +267,7 @@ export const deleteUserData = onCall(
  * Export all user data as JSON
  */
 export const exportUserData = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -293,7 +282,9 @@ export const exportUserData = onCall(
         `MATCH (u:User {id: $userId}) RETURN u {.*} AS user`,
         { userId }
       );
-      const userProfile = profileResult.records[0]?.get('user') || {};
+      // The wrapped own-words key is a system field: never exported (shared/crypto.ts).
+      const { ownKeyWrapped: _key, ...userProfile } = profileResult.records[0]?.get('user') || {};
+      void _key;
 
       // Get all check-ins with body sensations
       const checkInsResult = await session.run(
@@ -356,8 +347,10 @@ export const exportUserData = onCall(
       // Generic part (PR-S1): every :UserData label, grouped by the registry's exportAs, plus links.
       // The legacy keys above stay for format stability.
       const generic = await exportUserRecords(session, userId);
+      // Own words come back to the person readable (shared/crypto.ts decryptDeep).
+      const dec = await ownDecrypter(session, userId);
       return {
-        data: {
+        data: decryptDeep({
           formatVersion: generic.formatVersion,
           records: generic.records,
           links: generic.links,
@@ -372,7 +365,7 @@ export const exportUserData = onCall(
           profile: userProfile,
           checkIns,
           totalCheckIns: checkIns.length,
-        },
+        }, dec),
       };
     } catch (error) {
       console.error('exportUserData failed', errorTag(error));
