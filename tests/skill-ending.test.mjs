@@ -39,8 +39,8 @@ const unsafe = (v = "maybe") => [...answer("safety", v), ...answer("go", "think"
 test("the screens, and the safe path to the plan: safety, what, decide, channel, the lines, the card, when, ahead", () => {
   assert.equal(skill.toolId, "ending-relationships");
   assert.equal(skill.start, "safety");
-  const s = run([...toCard(), card(["copied"]), pick("when", "this_week"), pick("checkin", "yes"), next]);
-  assert.deepEqual(s.path, ["safety", "what", "decide", "channel", "open_line", "decision_line", "practical", "card", "when", "ahead"]);
+  const s = run([...toCard(), card(["copied"]), ...answer("checkin", "yes"), ...answer("when", "this_week")]);
+  assert.deepEqual(s.path, ["safety", "what", "decide", "channel", "open_line", "decision_line", "practical", "card", "checkin", "when", "ahead"]);
   assert.deepEqual(s.offered, ["cope_ahead"], "rehearse is planned (IE-02), so only Cope Ahead shows");
   assert.equal(skill.exits.find((x) => x.id === "cope_ahead").query.first, "conversation");
   assert.equal(M.crisisFor(ctx(), step("ahead"), s), null, "no resources on the safe path");
@@ -79,13 +79,21 @@ test("the safety branch never plans the conversation: no script, no rehearsal, n
   }
   assert.equal(step("advocate").noClose, true);
   const notYet = run([...unsafe(), ...answer("what", "harms"), ...answer("decide", "not_yet"), ...answer("save", "no")]);
-  assert.match(M.handoffLine(ctx(), step("advocate"), notYet), /Not yet is a real answer/);
-  // Hard right now, while unsafe: no DEAR MAN, no GIVE, no Problem Solve; a line about planning it safely.
-  const hard = run([...unsafe(), ...answer("what", "hard"), ...answer("try", "try")]);
-  assert.equal(hard.stepId, "change");
-  assert.deepEqual(hard.offered, []);
-  assert.match(M.handoffLine(ctx(), step("change"), hard), /safely/);
-  for (const o of step("change").offers) assert.deepEqual(o.when, { eq: ["$a.safety", "no"] }, `${o.exit} only when safe`);
+  assert.match(M.handoffLine(ctx(), step("advocate"), notYet), /Whenever you want to plan anything/);
+  // Hard right now or interfering, while unsafe: no invitation to work on it; straight to the decision.
+  for (const what of ["hard", "interferes"]) assert.equal(run([...unsafe(), ...answer("what", what)]).stepId, "decide", what);
+  // Stay and work on it, while unsafe: saved or not first, then advocates (never DEAR MAN, GIVE or Problem Solve).
+  const stay = run([...unsafe(), ...answer("what", "hard"), ...answer("decide", "work_on")]);
+  assert.equal(stay.stepId, "save");
+  // The change hand-off itself, if a forced unsafe state reached it: no offers, the planning-safely line.
+  const forced = { answers: { safety: { ids: ["yes"], own: null } } };
+  assert.deepEqual(M.offersFor(ctx(), step("change"), forced), []);
+  assert.match(M.handoffLine(ctx(), step("change"), forced), /safely/);
+  // No Wise mind or pros-and-cons link in the branch (Wise mind saves what's written there).
+  const unsure = run([...unsafe(), pick("what", "unsure")]);
+  assert.deepEqual(M.fieldLinks(ctx(), step("what").fields[0], unsure), []);
+  const deciding = run([...unsafe(), ...answer("what", "harms")]);
+  assert.deepEqual(M.fieldLinks(ctx(), step("decide").fields[0], deciding), []);
   // No step with a check-in or a keep is reachable from the branch (build.py also refuses a keep or follow-up at or
   // before persist.after).
   for (const st of skill.steps) assert.equal(st.keep, undefined, st.id);
@@ -102,8 +110,8 @@ test("persist-nothing (R15): nothing before the safety answer; nothing in the sa
   }
   const branch = [...unsafe(), ...answer("what", "harms"), ...answer("decide", "end")];
   assert.equal(M.persistence(ctx(), run([...branch, ...answer("save", "no")])), "nothing", "Leave it unsaved");
-  assert.equal(M.persistence(ctx(), run([...branch, ...answer("save", "yes")])), "save", "Save it privately");
-  assert.deepEqual(skill.options.save.map((o) => [o.value, o.label]), [["no", "Leave it unsaved"], ["yes", "Save it privately"]],
+  assert.equal(M.persistence(ctx(), run([...branch, ...answer("save", "yes")])), "save", "Save it to my account");
+  assert.deepEqual(skill.options.save.map((o) => [o.value, o.label]), [["no", "Leave it unsaved"], ["yes", "Save it to my account"]],
     "leaving it unsaved is the first choice");
   // Going back to the first screen waits again: nothing is decided while the question is open.
   const back = M.runNext(ctx(), run(answer("safety", "yes")), { type: "back" });
@@ -122,7 +130,7 @@ test("a run that writes nothing schedules nothing, even where a step would", () 
 });
 
 test("body first when flooded (a carried or host band), then on; never asked or inferred", () => {
-  assert.deepEqual(skill.accepts, ["band"]);
+  assert.deepEqual(skill.accepts, ["band", "frame"]);
   const flooded = ctx({ band: "flooded" });
   const s = run(safe, flooded);
   assert.equal(s.stepId, "steady");
@@ -135,10 +143,10 @@ test("body first when flooded (a carried or host band), then on; never asked or 
   assert.equal(run(safe, ctx({ band: "stirred" })).stepId, "what");
 });
 
-test("IE Handout 13: harmful, interfering, hard right now, not sure; hard right now tries to change it first", () => {
+test("IE Handout 13: harmful, interfering, hard right now, not sure; not destructive tries to change it first", () => {
   assert.deepEqual(skill.options.what.map((o) => o.value), ["harms", "interferes", "hard", "unsure"]);
   assert.equal(run(toDecide("harms")).stepId, "decide");
-  assert.equal(run(toDecide("interferes")).stepId, "decide");
+  assert.equal(run(toDecide("interferes")).stepId, "try_first", "H13: repair an interfering relationship first");
   assert.equal(run(toDecide("hard")).stepId, "try_first");
   const change = run([...toDecide("hard"), ...answer("try", "try")]);
   assert.equal(change.stepId, "change");
@@ -149,10 +157,17 @@ test("IE Handout 13: harmful, interfering, hard right now, not sure; hard right 
   assert.deepEqual(M.fieldLinks(ctx(), step("what").fields[0], unsure).map((l) => l.exit.id), ["wise_mind"]);
   const decide = run(toDecide("unsure"));
   assert.match(M.copyText(ctx(), step("decide").title, decide), /OK not to know/);
+  // Decide from wise mind (PRD #12): the link on the decision, for everyone who is safe.
+  assert.deepEqual(M.fieldLinks(ctx(), step("decide").fields[0], run(toDecide("harms"))).map((l) => l.exit.id), ["wise_mind"]);
+  // Staying is an answer too: it goes to trying to change it.
+  assert.equal(run([...toDecide("harms"), ...answer("decide", "work_on")]).stepId, "change");
+  // Harmful: the channel question says a message is often safer.
+  assert.match(M.copyText(ctx(), step("channel").title, run([...toDecide("harms"), ...answer("decide", "end")])), /a message is often safer/);
+  assert.equal(M.copyText(ctx(), step("channel").title, run([...toDecide("interferes"), ...answer("try", "still"), ...answer("decide", "end")])), "How will you tell them?");
 });
 
 test("Not yet is a real answer: accepted, with an optional check-in in two weeks that opens a fresh visit", () => {
-  assert.deepEqual(skill.options.decide.map((o) => o.value), ["end", "step_back", "not_yet"]);
+  assert.deepEqual(skill.options.decide.map((o) => o.value), ["end", "step_back", "work_on", "not_yet"]);
   const s = run([...toDecide(), ...answer("decide", "not_yet"), ...answer("revisit", "no")]);
   assert.equal(s.stepId, "not_yet_done");
   assert.ok(!s.path.includes("channel"));
@@ -186,10 +201,10 @@ test("the decision line matches the decision; the card is the lines in order, co
 });
 
 test("the after check-in is opt-in and content-free; it re-enters at `after`, asking again", () => {
-  const s = run([...toCard(), card(), pick("when", "today"), pick("checkin", "no"), next]);
-  assert.equal(M.followUpFor(ctx(), step("when"), run([...toCard(), card(), pick("when", "today"), pick("checkin", "no")])), null);
+  const s = run([...toCard(), card(), ...answer("checkin", "no"), ...answer("when", "today")]);
+  assert.equal(M.followUpFor(ctx(), step("when"), run([...toCard(), card(), ...answer("checkin", "no"), pick("when", "today")])), null);
   assert.equal(s.stepId, "ahead");
-  const yes = run([...toCard(), card(), pick("when", "today"), pick("checkin", "yes")]);
+  const yes = run([...toCard(), card(), ...answer("checkin", "yes"), pick("when", "today")]);
   assert.deepEqual(M.followUpFor(ctx(), step("when"), yes), { type: "ending_after", chip: "today" });
   for (const id of ["ending_after", "ending_again", "ending_revisit"]) {
     const t = spine.followUpTypes.find((x) => x.id === id);
@@ -217,7 +232,7 @@ test("the after check-in is opt-in and content-free; it re-enters at `after`, as
 });
 
 test("after: the pull back is expected; going back isn't failure; I don't feel safe is the safety branch", () => {
-  const back = M.resumeRun(ctx(), M.runRecord(ctx(), run([...toCard(), card(), pick("when", "today"), pick("checkin", "yes"), next])), "after");
+  const back = M.resumeRun(ctx(), M.runRecord(ctx(), run([...toCard(), card(), ...answer("checkin", "yes"), ...answer("when", "today")])), "after");
   const at = (v, again) => {
     let s = M.runNext(ctx(), back, pick("after", v));
     if (again) s = M.runNext(ctx(), s, pick("again", again));
@@ -232,6 +247,16 @@ test("after: the pull back is expected; going back isn't failure; I don't feel s
   assert.equal(unsafeNow.stepId, "after_unsafe");
   assert.equal(M.crisisFor(ctx(), step("after_unsafe"), unsafeNow)?.variant, "other_person");
   assert.equal(step("after_unsafe").noClose, true);
+  // ...and nothing from that check-in is saved (R15), though the first visit's answer was No.
+  assert.equal(M.persistence(ctx(), unsafeNow), "nothing");
+  assert.equal(M.persistence(ctx(), pull), "save");
+  // A really bad place: the crisis slot and safety.open, no further check-in; a quiet link there on every answer.
+  const low = at("low");
+  assert.equal(low.stepId, "after_low");
+  assert.equal(M.crisisFor(ctx(), step("after_low"), low)?.variant, "crisis");
+  assert.deepEqual(low.offered, ["safety_open"]);
+  assert.equal(M.crisisFor(ctx(), step("after"), M.runNext(ctx(), back, pick("after", "low")))?.variant, "crisis");
+  assert.deepEqual(M.fieldLinks(ctx(), step("after").fields[0], back).map((l) => l.exit.id), ["safety_open"]);
   // I don't feel safe: no "another check-in?", and nothing scheduled.
   const asked = M.runNext(ctx(), back, pick("after", "unsafe"));
   assert.deepEqual(M.shownFields(ctx(), step("after"), asked).map((f) => f.id), ["after"]);
@@ -259,8 +284,22 @@ test("quick exit replaces the page with a neutral one; the player shows it on ev
   // R15 in the player: the visit begins only at the run's end or a check-in, and only when the run may save.
   assert.match(player, /if \(persist === 'save' && step\.complete\) toolSession\.begin\(\);/);
   assert.match(player, /toolSession\.begin\(\);\n\s+if \(!\(await toolSession\.ready\(\)\)\) throw new Error\('no session'\);/);
-  assert.equal((player.match(/toolSession\.begin\(\)/g) ?? []).length, 2);
+  assert.equal((player.match(/toolSession\.begin\(\)/g) ?? []).length, 3, "the end, a check-in, a keep");
+  assert.match(player, /toolSession\.setBare\(persist !== 'save'\);/, "bare while waiting on the first question again");
   const provider = readFileSync("src/contexts/ToolSessionContext.tsx", "utf8");
   assert.match(provider, /if \(!uid \|\| !begun\.current \|\| started\.current \|\| closed\.current\) return;/, "never begun, never written");
   assert.match(provider, /persisted: uid !== null && !deferStart/);
+});
+
+test("from Rebel's someone I'm scared of (frame=careful): the safety branch whatever the answer (D4, C6.6)", () => {
+  const careful = ctx({ frame: "careful" });
+  assert.match(M.copyText(careful, step("safety").title, M.initialRun(skill)), /Earlier you said you're scared of them/);
+  const s = run(safe, careful);
+  assert.equal(s.stepId, "safe_first", "No here doesn't undo what they said in Rebel");
+  assert.equal(M.persistence(careful, s), "nothing");
+  const end = run([...safe, ...answer("go", "think"), ...answer("what", "harms"), ...answer("decide", "end")], careful);
+  assert.equal(end.stepId, "save", "never a script");
+  const rebel = content.skills.find((x) => x.id === "alternate_rebellion");
+  assert.deepEqual(rebel.exits.find((x) => x.id === "ending").query, { frame: "careful" }, "a word that says nothing in the address bar");
+  assert.equal(M.contextIn(skill, { frame: "careful" }).frame, "careful");
 });

@@ -11,7 +11,7 @@ export function QuickExit() {
       type="button"
       onClick={() => quickExit()}
       data-testid="quick-exit"
-      className="fixed z-50 right-3 top-[max(0.75rem,env(safe-area-inset-top))] min-h-11 px-4 rounded-full text-sm font-medium shadow-md bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
+      className="fixed z-50 right-3 top-[max(0.75rem,env(safe-area-inset-top))] min-h-11 px-4 rounded-full text-sm font-medium bg-[var(--color-bg-elevated)] text-[var(--color-text-primary)] border border-[var(--color-border)] hover:border-[var(--color-border-accent)] focus:outline-none focus:ring-2 focus:ring-[var(--color-accent)]"
     >
       Quick exit
     </button>

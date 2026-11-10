@@ -231,11 +231,12 @@ test('startToolSession survives the render-save race: claims its check-in, never
   assert.match(q2.query, /given IS NULL AND ts\.checkInId IS NULL AND latest\.timestamp <= tu\.timestamp/);
 });
 
-test('startToolSession resolves a resume_skill follow-up when its link is opened; other types are left to their tool (Codex, PR #17)', async () => {
+test('startToolSession resolves a resume_skill or Ending check-in follow-up when its link is opened; other types are left to their tool (Codex, PR #17; IE-08)', async () => {
   const f = fakeDriver((q) => (/RETURN tu\.id AS toolUsageId/.test(q) ? [{ toolUsageId: `${ID}:usage` }] : []));
   setDriver(f.driver);
   await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'dear-man', entry: 'today', followUpId: CI } });
   const q1 = f.calls[0].query;
-  assert.match(q1, /f\.type = 'resume_skill' AND f\.status = 'scheduled' THEN \[f\][\s\S]*SET x\.status = 'done', x\.resolvedAt = datetime\(\)/);
+  assert.match(q1, /f\.type IN \$openResolves AND f\.status = 'scheduled' THEN \[f\][\s\S]*SET x\.status = 'done', x\.resolvedAt = datetime\(\)/);
+  assert.deepEqual(f.calls[0].params.openResolves, ['resume_skill', 'ending_after', 'ending_again', 'ending_revisit']);
   assert.equal(f.calls[0].params.followUpKey, `u1:${CI}`);
 });

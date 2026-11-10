@@ -182,7 +182,9 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   const persist = persistence(ctx, st);
   useEffect(() => {
     if (persist === 'save' && step.complete) toolSession.begin();
-    toolSession.setBare(persist === 'nothing');
+    // Bare unless the run may save: going back to the first question after the visit began keeps it bare until the
+    // answer is given again.
+    toolSession.setBare(persist !== 'save');
   }, [persist, step.complete, toolSession]);
 
   // The session always carries what the run has said so far, so whichever close happens sends it.
@@ -244,6 +246,8 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
       let failed = false;
       if (k) {
         try {
+          // A deferred session (R15) begins here: the keep links to it.
+          toolSession.begin();
           const id = k.id ?? (step.keep?.many ? newId() : undefined);
           const r = await keepProfileItem({ kind: k.kind, ...(id ? { id } : {}), value: k.value, sourceSessionId: toolSession.id });
           profileCache.clear();

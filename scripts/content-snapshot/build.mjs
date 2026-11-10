@@ -500,7 +500,7 @@ export function buildSkills(g) {
     id: s.id, toolId: s.toolId, version: s.version, start: s.start, accepts: s.accepts ?? [], ownMax: intOrNull(s.ownMax), emotionFields: s.emotionFields ?? [],
     copy: json(s.copyJson, {}), tables: json(s.tablesJson, {}), derive: json(s.deriveJson, []), steps: [], exits: [], options: {},
     ...(json(s.inlineJson, null) ? { inline: json(s.inlineJson, null) } : {}),
-    ...json(s.runtimeJson, {}),
+    ...runtimeOf(json(s.runtimeJson, {})),
   }));
   const by = new Map(skills.map((s) => [s.id, s]));
   for (const r of g.rels('HAS_STEP', 'Skill', 'SkillStep').sort((x, y) => asc(x.a.props.id, y.a.props.id) || asc(x.props.order, y.props.order))) {
@@ -613,3 +613,12 @@ function main() {
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) main();
+
+/** The runtime switches a skill may carry (R15, quick exit, re-entry; functions/src/skills/index.ts runtimeOf). */
+function runtimeOf(r) {
+  const out = {};
+  if (r && typeof r.persist === 'object' && r.persist) out.persist = r.persist;
+  if (r && r.quickExit === true) out.quickExit = true;
+  if (r && Array.isArray(r.resumeAt)) out.resumeAt = r.resumeAt.filter((x) => typeof x === 'string');
+  return out;
+}

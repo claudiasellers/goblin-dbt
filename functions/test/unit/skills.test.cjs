@@ -103,3 +103,13 @@ test('getSkillRun: the caller\'s own run of that tool, within the window, own wo
   assert.equal(none.run, null);
   await assert.rejects(fns.getSkillRun.run({ auth: { uid: 'u1' }, data: { sessionId: 'nope', toolId: 'check-the-facts' } }), (e) => e.code === 'invalid-argument');
 });
+
+test('getSkillRun: Ending a relationship reopens a run up to 45 days back (its check-ins can be a month out, IE-08)', async () => {
+  const f = fakeDriver((q, p) => {
+    if (/RETURN ts\.ext AS ext/.test(q)) { assert.equal(p.days, 45); return []; }
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.getSkillRun.run({ auth: { uid: 'u1', token: {} }, data: { sessionId: '00000000-0000-4000-8000-000000000001', toolId: 'ending-relationships' } });
+  assert.deepEqual(out, { run: null });
+});

@@ -191,6 +191,9 @@ export const tools: Tool[] = [
     emoji: '🚪',
     bare: true,
     deferSession: true,
+    // Unlisted until a DV specialist has reviewed the safety branch (PRD IE-08, plan D14): reached from Problem
+    // Solve's and Rebel's links only. Drop this line to list it under Interpersonal Effectiveness.
+    listed: false,
   },
   // Mindfulness
   {

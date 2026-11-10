@@ -281,7 +281,7 @@ EXITS = [
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "fast", "toolId": "fast"},
     {"id": "let_it_be", "toolId": "let-it-be", "planned": True},
-    {"id": "ending", "toolId": "ending-relationships"},
+    {"id": "ending", "toolId": "ending-relationships", "query": {"frame": "careful"}},
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "pause", "toolId": "pause"},
     {"id": "safety_open", "toolId": None, "safety": True},

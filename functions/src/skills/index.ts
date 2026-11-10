@@ -56,7 +56,7 @@ export const getSkillContent = callable<unknown, SkillsContent>(
       // Served only when the skill can run inline (R8).
       ...(json<SkillDef['inline'] | null>(r.get('inline'), null) ? { inline: json<SkillDef['inline']>(r.get('inline'), undefined) } : {}),
       // Persist-nothing (R15), quick exit, re-entry steps: served only when the skill sets them.
-      ...json<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt'>>(r.get('runtime'), {}),
+      ...runtimeOf(json<Record<string, unknown>>(r.get('runtime'), {})),
     }));
     const by = new Map(skills.map((s) => [s.id, s]));
     for (const r of stepRes.records) {
@@ -96,3 +96,12 @@ export const getSkillContent = callable<unknown, SkillsContent>(
     return { version: SKILLS_VERSION, parentOf, fitsWhen, skills };
   }),
 );
+
+/** The runtime switches a skill may carry (R15, quick exit, re-entry): only these keys are served. */
+function runtimeOf(r: Record<string, unknown>): Partial<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt'>> {
+  const out: Partial<Pick<SkillDef, 'persist' | 'quickExit' | 'resumeAt'>> = {};
+  if (r.persist && typeof r.persist === 'object') out.persist = r.persist as SkillDef['persist'];
+  if (r.quickExit === true) out.quickExit = true;
+  if (Array.isArray(r.resumeAt)) out.resumeAt = r.resumeAt.filter((x): x is string => typeof x === 'string');
+  return out;
+}

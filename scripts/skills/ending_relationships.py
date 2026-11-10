@@ -31,7 +31,8 @@ OWN_MAX = 140
 COPY = {
     # Screen 1: safety first, always (PRD step 1).
     "safety_title": "Before anything: would ending this, or even talking about it, put you at risk?",
-    "safety_hint": "Whatever you answer, everything here stays open to you.",
+    "safety_title_scared": "Earlier you said you're scared of them. Would ending this, or talking about it, put you at risk?",
+    "safety_hint": "For example, they've hurt or threatened you, or you're scared of how they'd react. Whatever you answer, you can still think it through and decide here.",
     # The safety branch (PRD step 1): plain lines, the resources, and how private this is.
     "safe_title": "Your safety comes first.",
     "safe_hint": "Ending things with someone who might hurt you can be the most dangerous time. People who help with this every day can plan it with you, in confidence.",
@@ -48,43 +49,47 @@ COPY = {
     "what_pros": "Weigh it up",
     # Hard right now (PRD step 3): worth trying to change it first?
     "try_title": "It might be worth trying to change it first. Do you want to?",
+    "decide_wise": "Check it with Wise mind first",
     "change_line": "Working on it first is a real choice. If it doesn't change, this is here.",
     "change_line_unsafe": "Changing it safely is worth planning with someone who knows about safety. The hotline can help with that too.",
     # Decide (PRD step 4).
     "decide_title": "What do you want to do?",
     "decide_title_unsure": "It's OK not to know yet. Where are you leaning?",
-    "decide_hint": "Not yet is a real answer.",
+    "decide_hint": "Not yet is a real answer, and so is staying.",
     # Save privately (R15): the safety branch only.
     "save_title": "Do you want any of this saved?",
     "save_hint": "Nothing has been saved so far. If someone else could open this app, it's safer to leave it unsaved.",
     # The safety branch's end: advocates, never scripts (PRD step 1).
-    "advocate_line": "Planning this with someone who does it every day is the safest way. They can help with when, where and how, at your pace.",
-    "advocate_line_not_yet": "Not yet is a real answer. Whenever you want to plan anything, the hotline can help, in confidence.",
+    "advocate_line": "Planning this with someone who does it every day is often the safest way. They can help with when, where and how, at your pace.",
+    "advocate_line_not_yet": "Whenever you want to plan anything, the hotline can help, in confidence.",
     # Not yet (PRD step 4): accepted, with an optional check-in in two weeks.
-    "not_yet_title": "Not yet is a real answer. Do you want a check-in in two weeks?",
+    "not_yet_title": "Do you want a check-in in two weeks?",
     "not_yet_hint": "Check-ins say nothing about what they're for.",
     "not_yet_line": "It stays here for whenever you want to look again.",
     # Plan the ending (PRD step 5): channel, then DEAR MAN for endings, with GIVE and FAST in the lines.
     "channel_title": "How will you tell them?",
+    "channel_title_harms": "How will you tell them? If you're worried how they'll react, a message is often safer than in person.",
     "channel_hint": "A message is fine, and often the wisest way.",
     "open_title": "How do you want to start? One line is enough.",
     "decision_title": "Now say what you've decided, plainly.",
     "decision_hint": "No over-explaining, and no apology for deciding. It isn't up for debate.",
     "practical_title": "Anything practical to sort out?",
-    "practical_hint": "Only practical things. Skip this if there's nothing.",
+    "practical_hint": "Only practical things. If there's nothing, go on.",
     "card_title": "Here's what you could say.",
     "when_title": "When are you thinking of doing it?",
-    "checkin_label": "A check-in afterwards?",
+    "checkin_title": "Do you want a check-in after you've told them?",
     "checkin_hint": "Check-ins say nothing about what they're for.",
-    "ahead_line": "Their reaction can be the hardest part. Planning for it ahead makes it easier to hold your ground.",
+    "ahead_line": "Their reaction can be the hardest part. Planning for it ahead can make it easier to hold your ground.",
     # After (PRD step 6), reopened by the check-in.
     "after_title": "How's it going?",
     "again_label": "Another check-in?",
     "after_line_pull": "The pull back is expected. It doesn't mean the decision was wrong.",
     "after_line_back": "Going back happens a lot. You can look at it again whenever you want.",
     "after_line_not_yet": "It's still your decision, and your timing.",
-    "after_line": "Holding steady takes something. Keep leaning on the people who help.",
-    "after_unsafe_line": "Your safety comes first. The time around leaving can be the most dangerous, and the hotline can plan with you now.",
+    "after_line": "Holding steady takes something. People who help can make it lighter.",
+    "after_unsafe_line": "Your safety comes first. The time around leaving can be the most dangerous, and the hotline can plan with you now. Nothing from this check-in is saved.",
+    "after_low_line": "You don't have to hold this alone. Talking to someone right now can help.",
+    "after_help": "I might hurt myself",
     "own_hint": "Say it my way",
     "next": "Next",
     "done": "Done",
@@ -104,8 +109,9 @@ WHAT = [
     ("unsure", "I'm not sure", {}),
 ]
 TRY = [("try", "Try to change it first"), ("still", "I still want to think about ending it")]
-DECIDE = [("end", "End it"), ("step_back", "Step back, with less contact"), ("not_yet", "Not yet")]
-SAVE = [("no", "Leave it unsaved"), ("yes", "Save it privately")]
+DECIDE = [("end", "End it"), ("step_back", "Step back, with less contact"), ("work_on", "Stay and work on it"),
+          ("not_yet", "Not yet")]
+SAVE = [("no", "Leave it unsaved"), ("yes", "Save it to my account")]
 REVISIT = [("yes", "Yes, in two weeks"), ("no", "No thanks")]
 CHANNEL = [("message", "A message"), ("call", "A call"), ("in_person", "In person")]
 # DEAR MAN for endings (PRD step 5): Describe in one line; GIVE's kind openings where wanted, never first.
@@ -136,6 +142,7 @@ AFTER = [
     ("went_back", "I went back", {}),
     ("not_yet", "I haven't done it yet", {}),
     ("unsafe", "I don't feel safe", {"danger": "other"}),
+    ("low", "I'm in a really bad place", {"danger": "self"}),
 ]
 AGAIN = [("week", "In a week"), ("month", "In a month")]
 
@@ -145,7 +152,10 @@ def a(field):
 
 
 ALWAYS = {"all": []}  # the condition language's true
-SAFE = {"eq": [a("safety"), "no"]}
+# Rebel's *someone I'm scared of* opens this with `frame=careful` (a word that says nothing in the address bar):
+# the safety branch whatever the answer here (plan D4, C6.6).
+CAREFUL = {"eq": ["$ctx.frame", "careful"]}
+SAFE = {"all": [{"eq": [a("safety"), "no"]}, {"not": CAREFUL}]}
 UNSAFE = {"not": SAFE}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
 IS = lambda f, v: {"eq": [a(f), v]}  # noqa: E731
@@ -154,7 +164,8 @@ ALWAYS_OTHER_PERSON = [{"variant": "other_person", "when": ALWAYS}]
 
 STEPS = [
     {
-        "id": "safety", "kind": "ask", "title": "safety_title", "hint": "safety_hint",
+        "id": "safety", "kind": "ask", "title": [{"when": CAREFUL, "key": "safety_title_scared"}, {"key": "safety_title"}],
+        "hint": "safety_hint",
         "fields": [{"id": "safety", "options": {"list": "safety"}, "max": 1, "required": True}],
         "next": [{"when": UNSAFE, "to": "safe_first"}, {"when": FLOODED, "to": "steady"}, {"to": "what"}],
     },
@@ -185,12 +196,15 @@ STEPS = [
         "fields": [{
             "id": "what", "options": {"list": "what"}, "max": 1, "required": True,
             "links": [
-                {"exit": "wise_mind", "label": "what_wise", "when": IS("what", "unsure")},
+                # Only when safe: Wise mind saves what's written there, and the safety branch promises nothing is.
+                {"exit": "wise_mind", "label": "what_wise", "when": {"all": [IS("what", "unsure"), SAFE]}},
                 # DT-10 Pros and cons (planned): stay vs end, then back here (Arch #34).
-                {"exit": "pros_cons", "label": "what_pros", "when": IS("what", "unsure")},
+                {"exit": "pros_cons", "label": "what_pros", "when": {"all": [IS("what", "unsure"), SAFE]}},
             ],
         }],
-        "next": [{"when": IS("what", "hard"), "to": "try_first"}, {"to": "decide"}],
+        # H13: repair first when it isn't destructive (hard right now, or interfering). Not in the safety branch:
+        # there, an invitation to work on it is the wrong nudge.
+        "next": [{"when": {"all": [{"in": [a("what"), ["hard", "interferes"]]}, SAFE]}, "to": "try_first"}, {"to": "decide"}],
     },
     {
         "id": "try_first", "kind": "ask", "title": "try_title", "crisis": OTHER_PERSON,
@@ -213,9 +227,14 @@ STEPS = [
         "id": "decide", "kind": "ask",
         "title": [{"when": IS("what", "unsure"), "key": "decide_title_unsure"}, {"key": "decide_title"}],
         "hint": "decide_hint", "crisis": OTHER_PERSON,
-        "fields": [{"id": "decide", "options": {"list": "decide"}, "max": 1, "required": True}],
+        "fields": [{
+            "id": "decide", "options": {"list": "decide"}, "max": 1, "required": True,
+            # H13 / PRD #12: decide from wise mind, for everyone who is safe (a link: MF-04's embed comes later).
+            "links": [{"exit": "wise_mind", "label": "decide_wise", "when": SAFE}],
+        }],
         "next": [
             {"when": UNSAFE, "to": "save"},
+            {"when": IS("decide", "work_on"), "to": "change"},
             {"when": IS("decide", "not_yet"), "to": "not_yet"},
             {"to": "channel"},
         ],
@@ -243,7 +262,9 @@ STEPS = [
         "offers": [], "done": "done",
     },
     {
-        "id": "channel", "kind": "ask", "title": "channel_title", "hint": "channel_hint",
+        "id": "channel", "kind": "ask",
+        "title": [{"when": IS("what", "harms"), "key": "channel_title_harms"}, {"key": "channel_title"}],
+        "hint": "channel_hint",
         "fields": [{"id": "channel", "options": {"list": "channel"}, "max": 1, "required": True}],
         "next": [{"to": "open_line"}],
     },
@@ -270,15 +291,17 @@ STEPS = [
         "id": "card", "kind": "embed", "embed": "boundaryLine", "answerAs": "card_copied", "title": "card_title",
         "props": {"field": "open_line", "field2": "decision_line", "field3": "practical", "shape": "line",
                   "copyLabel": "card_copy", "copiedLabel": "card_copied", "selectedLabel": "card_selected", "next": "next"},
+        "next": [{"to": "checkin"}],
+    },
+    {
+        # One question a screen: the check-in first, then when (the when sets the check-in's day).
+        "id": "checkin", "kind": "ask", "title": "checkin_title", "hint": "checkin_hint",
+        "fields": [{"id": "checkin", "options": {"list": "checkin"}, "max": 1, "required": True}],
         "next": [{"to": "when"}],
     },
     {
         "id": "when", "kind": "ask", "title": "when_title",
-        "fields": [
-            {"id": "when", "options": {"list": "when"}, "max": 1, "required": True},
-            {"id": "checkin", "label": "checkin_label", "options": {"list": "checkin"}, "max": 1, "required": True},
-        ],
-        "note": "checkin_hint",
+        "fields": [{"id": "when", "options": {"list": "when"}, "max": 1, "required": True}],
         "followUp": {"type": "ending_after", "whenFrom": "when", "when": IS("checkin", "yes")},
         "next": [{"to": "ahead"}],
     },
@@ -292,14 +315,17 @@ STEPS = [
     {
         # PRD step 6, reopened by the check-in (`resumeAt`): the pull back is expected.
         "id": "after", "kind": "ask", "title": "after_title",
-        "crisis": [{"variant": "other_person", "when": IS("after", "unsafe")}],
+        "crisis": [{"variant": "other_person", "when": IS("after", "unsafe")}, {"variant": "crisis", "when": IS("after", "low")}],
         "fields": [
-            {"id": "after", "options": {"list": "after"}, "max": 1, "required": True},
+            {"id": "after", "options": {"list": "after"}, "max": 1, "required": True,
+             # A break-up is a common trigger for thoughts of suicide (plan C6.5: self-harm reaches safety.open).
+             "links": [{"exit": "safety_open", "label": "after_help", "when": ALWAYS}]},
             {"id": "again", "label": "again_label", "options": {"list": "again"}, "max": 1,
-             "showWhen": {"all": [{"set": a("after")}, {"not": IS("after", "unsafe")}]}},
+             "showWhen": {"all": [{"set": a("after")}, {"not": {"in": [a("after"), ["unsafe", "low"]]}}]}},
         ],
-        "followUp": {"type": "ending_again", "whenFrom": "again", "when": {"not": IS("after", "unsafe")}},
-        "next": [{"when": IS("after", "unsafe"), "to": "after_unsafe"}, {"to": "after_next"}],
+        "followUp": {"type": "ending_again", "whenFrom": "again", "when": {"not": {"in": [a("after"), ["unsafe", "low"]]}}},
+        "next": [{"when": IS("after", "unsafe"), "to": "after_unsafe"}, {"when": IS("after", "low"), "to": "after_low"},
+                 {"to": "after_next"}],
     },
     {
         "id": "after_next", "kind": "handoff", "complete": True,
@@ -323,6 +349,12 @@ STEPS = [
         "lines": [{"when": None, "key": "after_unsafe_line"}],
         "offers": [], "done": "done",
     },
+    {
+        "id": "after_low", "kind": "handoff", "complete": True, "noClose": True,
+        "crisis": [{"variant": "crisis", "when": ALWAYS}],
+        "lines": [{"when": None, "key": "after_low_line"}],
+        "offers": [{"exit": "safety_open", "when": None}], "done": "done",
+    },
 ]
 
 EXITS = [
@@ -338,6 +370,7 @@ EXITS = [
     {"id": "opposite_action", "toolId": "opposite-action"},
     {"id": "finding_connection", "toolId": "finding-connection", "planned": True},
     {"id": "let_it_be", "toolId": "let-it-be", "planned": True},
+    {"id": "safety_open", "toolId": None, "safety": True},
     {"id": "done", "done": True},
 ]
 
@@ -365,11 +398,15 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "safety", "ownMax": OWN_MAX,
     # band: a host's or the carried reading (plan C6.2), never asked or inferred (D1).
-    "accepts": ["band"],
+    "accepts": ["band", "frame"],
     "copy": {**COPY, **CARD_COPY}, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
     "emotionFields": [],
-    # R15: nothing is written until the safety answer; in the safety branch, nothing at all unless saved privately.
-    "persist": {"after": "safety", "nothingWhen": {"all": [UNSAFE, {"not": IS("save", "yes")}]}},
+    # R15: nothing is written until the safety answer; in the safety branch, nothing at all unless saved; and a
+    # check-in answered *I don't feel safe* saves nothing from that visit.
+    "persist": {"after": "safety", "nothingWhen": {"any": [
+        {"all": [UNSAFE, {"not": IS("save", "yes")}]},
+        IS("after", "unsafe"),
+    ]}},
     "quickExit": True,
     "resumeAt": ["after"],
 }

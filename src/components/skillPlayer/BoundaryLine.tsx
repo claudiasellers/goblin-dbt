@@ -48,7 +48,8 @@ export function BoundaryLine({ props, picked, onShown, onDone }: EmbedProps) {
   return (
     <div className="space-y-5" data-testid="boundary-line">
       {/* Focus stays on the step's title (the player's Prompt); the paper doesn't take it. */}
-      <PaperCard label={lines.join(', ')}>
+      {/* A line card is read as the sentence it is; a list, item by item. */}
+      <PaperCard label={copyable ? line : lines.join(', ')}>
         {copyable
           ? <p ref={lineRef} className={paperLine}>{line}</p>
           : <ul className="space-y-2">{lines.map((l, i) => <li key={i} className={paperLine}>{l}</li>)}</ul>}
