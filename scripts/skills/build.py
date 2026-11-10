@@ -247,10 +247,27 @@ def check(skill):
             assert k["from"] and all(f in fields for f in k["from"]), (w, "keep from fields that exist", k)
             if "when" in k:
                 check_cond(k["when"], fields, derived, w, accepts)
+        if s["kind"] == "handoff" and s.get("fields"):
+            # A hand-off's one field is its reminder chips (R5 on a hand-off): never a question in disguise.
+            fu = s.get("followUp") or {}
+            assert len(s["fields"]) == 1 and s["fields"][0]["id"] == fu.get("whenFrom"), (
+                w, "a hand-off's only field is the chip field its followUp's whenFrom names")
+            f = s["fields"][0]
+            assert "list" in f["options"] and f.get("max") == 1, (w, "the reminder chips: a list, one pick", f)
+            for k in ("required", "askFresh", "own", "links", "showWhen", "list"):
+                assert not f.get(k), (w, f"the reminder chips take no {k}", f)
+        if s["kind"] == "handoff" and s.get("followUp", {}).get("whenFrom"):
+            # The card can't change under the person's thumb: nothing on it reads the chip.
+            chip = s["followUp"]["whenFrom"]
+            on_card = [c["when"] for c in s.get("lines", []) + s.get("offers", []) + s.get("crisis", [])]
+            assert not any(re.search(rf'"(\$a\.)?{re.escape(chip)}(\.(ids|own))?"', json.dumps(c)) for c in on_card), (
+                w, "lines, offers and crisis slots never read the reminder chip", chip)
         if "followUp" in s:
             fu = s["followUp"]
             t = FOLLOW_UPS.get(fu.get("type"))
-            assert s["kind"] == "ask" and t, (w, "a follow-up type the spine registers", fu)
+            assert s["kind"] in ("ask", "handoff") and t, (w, "a follow-up type the spine registers, on an ask step or a hand-off", fu)
+            if s["kind"] == "handoff":
+                assert t["window"]["kind"] == "chip" and fu.get("whenFrom"), (w, "a hand-off's follow-up is picked by its chips", fu)
             if t["window"]["kind"] == "chip":
                 assert fu.get("whenFrom") in step_fields, (w, "a chip window needs the field on this step that picks it", fu)
                 f = next(f for f in s["fields"] if f["id"] == fu["whenFrom"])

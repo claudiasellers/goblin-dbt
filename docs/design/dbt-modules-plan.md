@@ -1,6 +1,6 @@
 # Finishing Distress Tolerance, Interpersonal Effectiveness and Emotion Regulation
 
-Written 10 Nov 2026. Status: **approved by Claudia on 10 Nov** (all 17 decisions in §7, with her changes to D5, D6, D12 and D13). The foundation (§4) is the work in progress.
+Written 10 Nov 2026. Status: **approved by Claudia on 10 Nov** (all 17 decisions in §7, with her changes to D5, D6, D12 and D13). F1 (#56) and F2 (#62, #63) are merged; the lanes build on main. **D14 partly decided (10 Nov, later):** Claudia unparked ER-15 and IE-08 (*"build them now"*); DT-09 stays parked.
 
 Claudia's ask (10 Nov): *"I want the modules in. I want to aim for finishing distress tolerance,
 interpersonal effectiveness and emotional regulation"*, then *"I want this all to be following a plan, if
@@ -114,7 +114,7 @@ the rest are not built. "Needs" names the runtime pieces from §3 C3 and the sha
 | ID | Feature (tool id) | Handouts | Today | Connects | Needs | Saves |
 |---|---|---|---|---|---|---|
 | ER-01 | Too hot to think (P2 service) | ER 23 | **Partial, and enough.** `TooMuchLink` + `BreakdownHandoff`; the probe is out (30 Sep). The player puts P2 under every screen | Plays DT-01 rows once DT-01 ships | resume (for *come back later*) | `ext.run.handoffs` |
-| ER-02 | Check the facts (`check-the-facts`) | ER 8 | **On the runtime, v1.1 in part** (ER-B1, first PR): safety chips (danger from a person → `other_person` crisis slot and a safe hand-off, screens 3–5 skipped) and planned exits to DT-04 and ER-08 built. 6 routing rows built, off. Not built: missing-fact follow-up, loop guard, inline mini-card (F2) | In: OA, Tools, PS, CORE-08; planned MF-03, Recover, DEAR MAN, IE-06/10/12. Out: PS, DEAR MAN, OA, `wise-mind`, `cope-ahead`; planned DT-04, ER-08 | crisis slot, follow-up action, inline mode | `ext.run`, `fitsFacts` |
+| ER-02 | Check the facts (`check-the-facts`) | ER 8 | **On the runtime, v1.2** (ER-B1): safety chips (danger from a person → `other_person` crisis slot and a safe hand-off, screens 3–5 skipped), planned exits to DT-04 and ER-08, and the missing-fact step with its `check_fact` follow-up built. 6 routing rows built, off. Not built: loop guard (needs a server-side read), inline mini-card (moved to ER-B3, with its first host) | In: OA, Tools, PS, CORE-08; planned MF-03, Recover, DEAR MAN, IE-06/10/12. Out: PS, DEAR MAN, OA, `wise-mind`, `cope-ahead`; planned DT-04, ER-08 | crisis slot, follow-up action, inline mode | `ext.run`, `fitsFacts` |
 | ER-03 | Opposite Action (`opposite-action`) | ER 9–11, 13 | **Shipped, hand-built v2** (1981 lines, own backend with 0–10 numbers). Live route error `not_fit:helpful → problem`. PR #48 (doors, multi-feeling) open | In: check-in, Check the Facts, FTF, Today `oa_plan`. Out: PS, `pause`, `check-the-facts`, MF P5, ER-08, `urge-surfing`, DEAR MAN | `doorPicker`, `bodyReset`, `stepPicker`, `urgeReadout`, `followUpResume`, per-feeling runs, resume, projection | `ext.run` + `OppositeActionSession` v3 projection (no numbers) |
 | ER-04 | Good things (`good-things`) | ER 15–17 | **None.** `micro-win` guided activity; positive-state result is a dead end | In: positive state, low-energy result, DT-06 L3, ER-08 savour, PS. Out: follow-ups, WMP-05 | `holdRing`, `cardDeck`, `weekPlanner`, keep, follow-up action, profile read | profile `thing_i_like` |
 | ER-05 | Cope ahead (`cope-ahead`) | ER 19 (C) | **Shipped, hand-built** (17 Oct). DEAR MAN's 11 `CopeAhead` nodes not absorbed; kept plan is an own line | In: Tools, DEAR MAN, Recover Today card, Check the Facts, IE-02, PS. Out: 5-4-3-2-1, move tools, Today after card | `rehearsal`, `holdRing` (settle), `keepCard`, `planSentence`, `partAnchor`, `partsWhoShowsUp`, crisis slot with variant, per-field own max, "first, not pre-selected", inline mode, projection | `ext.run` + `ext.ca` projection; profile `cope_ahead_plan` (profile plan P6) |
@@ -126,8 +126,8 @@ the rest are not built. "Needs" names the runtime pieces from §3 C3 and the sha
 | ER-11 | Build mastery (`build-mastery`) | ER 19 (B) | **None.** 6 PS refs | In: PS, low-energy result, ER-09. Out: follow-ups | follow-up action, profile read (ladder) | WMP-05 ladder (profile) |
 | ER-12 | Problem Solve (`problem-solve`) | ER 12 | **Shipped, hand-built, partly complete.** No `TooMuchLink`, `/tool/give` hard-coded, no evaluation step | In: Tools, OA, Check the Facts, check-in, Today `ps_step`. Out: companion tools by `linkedToolId`, CORE-11 | chips only; resume for the evaluation card; DT-10 inline later | `ext.run` (old `ext.er` keys kept readable) |
 | ER-13 | Sleep reset (`sleep-reset`) | ER 20b | **None** | In: ER-07, Tools. Out: CORE safety, ER-15 | night mode is CORE's (Index §5.1 #13) | profile anchor times |
-| ER-14 | It isn't working (`er-troubleshoot`) | ER 24 | **On the runtime** (ER-B1, first PR; [`er-troubleshoot.md`](er-troubleshoot.md)). Follow-up waits for F2; no routing rows by design | In: OA readout, ER-08, Tools. Out: ER-07, ER-02, DT, PS, ER-10, CORE-11 | chips + "first yes wins" transitions | `ext.run` |
-| ER-15 | Rewrite the nightmare (`nightmare-rescript`) | ER 20a | **None.** Claudia to decide whether to build it at all without a clinician (D14) | In: ER-13. Out: referral | `holdRing`, `rehearsal` | profile `NightmareScript` |
+| ER-14 | It isn't working (`er-troubleshoot`) | ER 24 | **On the runtime** (ER-B1; [`er-troubleshoot.md`](er-troubleshoot.md)), with its `try_again` nudge on the cards whose move is another go. No routing rows by design (Claudia, 10 Nov) | In: OA readout, ER-08, Tools. Out: ER-07, ER-02, DT, PS, ER-10, CORE-11 | chips + "first yes wins" transitions | `ext.run` |
+| ER-15 | Rewrite the nightmare (`nightmare-rescript`) | ER 20a | **None.** Unparked by Claudia, 10 Nov (D14): built now in the ER lane on the existing crisis banner | In: ER-13. Out: referral | `holdRing`, `rehearsal` | profile `NightmareScript` |
 
 ---
 
@@ -240,7 +240,7 @@ Built once, in the foundation (§4), never per lane. Each is generic: no skill i
 | R2 | **Context in** (`$ctx.*`) | The page passes route state and query (`urgeId`, `personId`, `frame`, `enterAt`, `situationId`, `partId`, `emotionIds`, carried `band`, `returnTo`) into the run. Steps may `showWhen` on them ("skip the urge question when the host sent one"). The skill declares which keys it accepts (`accepts`), and C4's test checks every inbound exit against it. Replaces DEAR MAN's `dearManHandoff` and Cope Ahead's `?first=` | DT-01/02/04/05/10, IE-01, ER-05 |
 | R3 | **Profile reads** | `$p.<slice>` refs and an options source `{profile: '<slice>'}` (own items first). Needs the skill's `PROFILE_NEEDS` entry | DT-03/06/10, IE-01 (person), ER-04/05/09 |
 | R4 | **Keep action** | A step action `keep: {kind, from: [fieldIds…]}` that runs on the step's primary tap, calls `keepProfileItem`, and records `kept` | DT-04/10, IE-05, ER-04/05/09 |
-| R5 | **Follow-up action** | A step action `followUp: {type, whenFrom: fieldId}` calling `scheduleFollowUp`; the type must be in the `FollowUpType` registry (`scripts/practice-spine/content.py`) | DT-02/05/06/11, IE-01/04, ER-02/04/12 |
+| R5 | **Follow-up action** | A step action `followUp: {type, whenFrom: fieldId}` calling `scheduleFollowUp`; the type must be in the `FollowUpType` registry (`scripts/practice-spine/content.py`). On an ask step it runs on the primary tap; on a hand-off (ER-B1), `whenFrom` names the card's one optional chip field and the reminder is scheduled as the card is left (see F2 as built) | DT-02/05/06/11, IE-01/04, ER-02/04/12/14 |
 | R6 | **Crisis slot and `safety.open`** | A step may declare `crisis: {variant, when}`: `CrisisBanner` (default or `other_person`) shown above the step while the condition holds. `safety.open` is a reserved exit every skill may offer; until CORE-01 ships it opens the interim crisis screen (D5), afterwards CORE-01's route. No lane builds its own crisis screen | DT-02/05, IE-04/08, ER-02/05 |
 | R7 | **Two-part close** | A close kind `urge_change` asking *Did you act on it?* (`actedOnUrge`) then then-vs-now, in `functions/src/spine/tools.ts` and `src/lib/spine/close.ts` | DT-02, DT-05 |
 | R8 | **Inline mode** | `<SkillPlayer mode="inline" skillId enterAt onReturn>` runs a skill inside a host screen (host stays mounted, like `TooMuchLink`), with its own `ToolSession` (C1 rule 5), returning declared outputs. A skill marks the steps it can start at (`enterAt`) and what it returns (`returns`). This is how the Index §9 primitives that have steps are built (C3c) | DT-01 `regulate`, DT-04 `acceptance`, DT-10 builder, ER-02 mini-card, ER-05 if-then |
@@ -250,7 +250,7 @@ Built once, in the foundation (§4), never per lane. Each is generic: no skill i
 | R12 | **Option first, not pre-selected** | An option list can put a `$ctx` value first without selecting it (generalises `carriedFirst`) | ER-05 `?first=`, IE-01 Recover hurt chip |
 | R13 | **Deadline timer hook** | `useDeadlineTimer` (timestamp deadline, wake lock, chime and buzz, audio twin for iOS, reduced motion), lifted from `CoolDown.tsx` and `WaitLock.tsx`, used by every hold and dose embed | every timed embed |
 | R14 | **Projection hook** | Server-side, `functions/src/skills/projections.ts`: a registry `toolId → project(run) → legacy writes`, run in the same transaction as the session write. Empty in the foundation; C8 says who fills it | ER-03, ER-05, IE-01 |
-| R15 | **Persist-nothing mode** | A step can switch the run to write nothing (no `ext.run`, a bare session with `status` only) unless the person taps *save privately*. **Built 10 Nov 2026** (IE-08): `persist: {after, nothingWhen}`, a deferred session that writes nothing until the run reaches its end or a check-in, and a bare close (status only) when an answer changes after that; with `quickExit` and `resumeAt` ([`ending-relationships.md`](ending-relationships.md)) | IE-08 safety branch |
+| R15 | **Persist-nothing mode** | A step can switch the run to write nothing (no `ext.run`, a bare session with `status` only) unless the person taps *save privately*. **Built 10 Nov 2026** (IE-08, IE-B6): `persist: {after, nothingWhen}`, a deferred session that writes nothing until the run reaches its end or a check-in, and a bare close (status only) when an answer changes after that; with `quickExit` and `resumeAt` ([`ending-relationships.md`](ending-relationships.md)) | IE-08 safety branch |
 | R16 | **Per-pick repeat** | `forEach: fieldId` over a run of steps, one sub-run per pick (C1 rule 5). Built by the ER lane only if D7 keeps multi-feeling OA; otherwise not built | ER-03 |
 
 #### C3b. Shared embeds
@@ -381,15 +381,16 @@ Every lane holds to these. The clinical gate (§6, Gate 3) checks each one.
    stronger".
 8. **The safety batch is paused** (Claudia, 10 Nov; `/mnt/project-files/handoffs/safety-plan-resume.md`).
    Until it resumes: `safety.open` opens the interim crisis screen (D5); DT-03, the full medical screen,
-   IE-03's safe/risk fields, IE-01's safety question and DV resources wait for it, except what D4
-   brings forward. IE-08 was unparked by Claudia on 10 Nov and built on the existing banner (unlisted until the
-   DV review); its CORE pieces (SafetyPlan, discreet mode, fuller DV resources) still wait. Every lane PR that touches one of those lists it under *Waits on the safety batch*.
+   IE-03's safe/risk fields and IE-01's safety question wait for it, except what D4 brings forward.
+   IE-08 does not wait (D14, Claudia 10 Nov): it builds now on the existing `other_person` banner and its DV
+   resources (911, then the DV Hotline, then 988), with R15 and a quick exit; fuller DV resources, SafetyPlan and discreet mode stay
+   with the safety batch. Built 10 Nov, unlisted until the DV specialist review. Every lane PR that touches one of those lists it under *Waits on the safety batch*.
 
 ### C7. Ownership
 
 | Area | Owner | Notes |
 |---|---|---|
-| Player, machine, conditions, `skillTypes.ts`, `functions/src/skills/`, `extSchemas.ts` `run` | Foundation, then shared | After F2, a lane changing these does it in a separate small PR titled `runtime:`, reviewed against C3a; never inside a skill PR |
+| Player, machine, conditions, `skillTypes.ts`, `functions/src/skills/`, `extSchemas.ts` `run` | Foundation, then shared | After F2, a lane changing these does it in a separate small PR titled `runtime:`, reviewed against C3a; never inside a skill PR. Exception for a lane that has one branch (first used by ER-B1's second PR, #67): the change is its own `runtime:` commit, reviewed by the plan thread, and called out at the top of the PR description |
 | `scripts/skills/<skill>.py`, its page, its tests | The skill's lane | One file per skill |
 | `scripts/skills/content.py` `SKILLS`, `EMBEDS`; `embeds.ts` | Shared, append-only | Merge conflicts resolved by keeping both lines |
 | Generated files: `schema/skills.cypher`, `src/data/content/skills.json`, `tests/fixtures/skills-content.json` | Nobody (generated) | Never hand-merged: on conflict, rebase and regenerate |
@@ -484,6 +485,11 @@ and both are tested best with that embed. The keep and follow-up contract checks
   once the session is written (`ToolSessionApi.ready()`). As a whole step it answers what the person did
   (`yes` · `sort_of` · `no` · `none_fit` · `own` · `skip` · `seen`). A skill's `moment` must be one the
   witness server knows (test-enforced); a module needing its own moment adds it with its lines.
+- **R5 on a hand-off** (added in ER-B1's second PR, agreed 10 Nov): a hand-off may carry a `followUp`
+  whose `whenFrom` is the card's only field: the type's window chips, one pick, optional, never ask-fresh, no
+  own words. The card shows the chips under the line; leaving by its move or *Done* schedules (before any
+  navigation), no chip schedules nothing, once per step per run; lines, offers and crisis slots never read
+  the chip. `build.py` refuses any other hand-off field. First users: ER-14's nudge to try again.
 - The harness opens any step through the player's own resume, with a made-up run whose path reaches it
   (each earlier field's first option), and adds a review-only skill (`dev/review/embeds-skill.json`) that
   shows each shared embed. `--bands` shoots each band and `--all` adds 360 × 780 and a light room. Not
@@ -522,20 +528,21 @@ lanes, only the arrows in §5.4 hold anyone up.
 | IE-B1 | **Built 10 Nov 2026** (`docs/design/fast.md`; token-equivalent, not byte-equivalent: `build.py --prove`). `scripts/dear-man/content.py` regenerating today's DEAR MAN cypher (no behaviour change); **IE-05** FAST standalone and Let go (`boundaryLine`; `fast` gets its `appToolId`, the 7 PS links resolve; Let go offers DT-04 as a `planned` exit until DT-B4) | F1 | Small, unblocks dead links, and the content source must exist before DEAR MAN can be ported |
 | IE-B2 | **IE-03** minimal (`Person`, `Interaction`, `personPicker` + `safetyGate` without the safety question unless D4; validators); **DEAR MAN debrief** as `dear_man_debrief` with **IE-11** (factor sort, conditioned offers), the outcome screen, the prep↔debrief link, `ask_outcome` switched on; fixes: *Done for now*, Body Reminder into the graph as `ConfidenceCue`; Recover passes `personId` | F2; `person` kind | The debrief is a linear chain that maps 1:1 onto steps, and it is where IE-11 lives |
 | IE-B3 | **IE-01 Mode A** one message (`messageComposer`, `predictOutcome`, `fastStrip`, `waitLock` from DT-B1, follow-up); **IE-07** `sizeIt` (R10); **IE-04** Say no; `wise_mind_check` (C3c) | IE-B2, DT-B1 | Say no is greenfield and forces the composer pieces Mode A reuses |
-| IE-B4 | **DEAR MAN prep** (Mode B) as `dear_man_prep` with the existing pieces wrapped, Mode C pocket card, Recover drops `boundaryLocked` and `tooHot`; **IE-06** Keep it warm; **IE-12** myths into the barrier step; IE-05 Let go switches to DT-04 inline | IE-B3, WMP `forOther` lines signed off (IE-06), DT-B4 (Let go), ER-B1 (Check the Facts inline for IE-06 repair) | DEAR MAN's whole page can be deleted only after this batch |
+| IE-B4 | **DEAR MAN prep** (Mode B) as `dear_man_prep` with the existing pieces wrapped, Mode C pocket card, Recover drops `boundaryLocked` and `tooHot`; **IE-06** Keep it warm; **IE-12** myths into the barrier step; IE-05 Let go switches to DT-04 inline | IE-B3, WMP `forOther` lines signed off (IE-06), DT-B4 (Let go), ER-B3 (Check the Facts inline for IE-06 repair; moved from ER-B1, 10 Nov) | DEAR MAN's whole page can be deleted only after this batch |
 | IE-B5 | **IE-02** Rehearse it (`rehearsalStage`, 2D, ~30 scripts); **IE-09** Find your people; **IE-10** Notice them | D12, ER-B2 (Cope Ahead inline), D3 (IE-10) | |
-| Safety batch | **IE-01's safety question** and IE-03 safe/risk (unless D4 brings them forward); ~~**IE-08** Ending a relationship (R15, quick exit, DV resources)~~ built 10 Nov 2026 ahead of the batch (Claudia unparked it) | The safety batch resuming; DV specialist review (D14); DT-10 | |
+| IE-B6 | **Built 10 Nov 2026** ([`ending-relationships.md`](ending-relationships.md); R15 and the skill in one PR, the lane's one branch). **IE-08** Ending a relationship that's hurting you: R15 persist-nothing mode (its runtime PR first, reviewed against §R), quick exit, crisis slot with the `other_person` banner (911, then the DV Hotline, then 988; CrisisBanner stays the only file with numbers), `Person.status` only once IE-03 exists | F2; D14 decided (Claudia, 10 Nov: build now, on the existing banner and DV resources). DT-10 and Cope Ahead are `planned` exits until DT-B2 / ER-B2 make them inline | Unparked by Claudia. Its clinical gate (§6) reads every path as someone in danger from the other person: nothing kept unless they tap *save privately*, quick exit on every screen, never a plan to confront |
+| Safety batch | **IE-01's safety question** and IE-03 safe/risk (unless D4 brings them forward) | The safety batch resuming | |
 
 ### 5.3 ER lane
 
 | Batch | Skills | Needs | Why this order |
 |---|---|---|---|
-| ER-B1 | **ER-12** Problem Solve port (adds `TooMuchLink`, `/tool/give` becomes a `planned` exit, evaluation card through resume); **ER-14** It isn't working (new); **ER-02 v1.1** (safety chips with crisis slot, missing-fact follow-up, `planned` exits to DT-04 and ER-08, inline mini-card) | F1 for ER-14; F2 for ER-12's evaluation and ER-02's follow-up and inline mode | Problem Solve is the port `skill-runtime.md` names next and needs no embeds. **First PR (F1 only):** ER-14 and ER-02 v1.1's safety chips and planned exits. **Second PR (after F2):** ER-12, ER-02's follow-up and inline mini-card, ER-14's follow-up |
+| ER-B1 | **ER-12** Problem Solve port (adds `TooMuchLink`, `/tool/give` becomes a `planned` exit, evaluation card through resume); **ER-14** It isn't working (new); **ER-02 v1.1** (safety chips with crisis slot, missing-fact follow-up, `planned` exits to DT-04 and ER-08, inline mini-card) | F1 for ER-14; F2 for ER-12's evaluation and ER-02's follow-up and inline mode | Problem Solve is the port `skill-runtime.md` names next and needs no embeds. **First PR (F1 only, merged #58):** ER-14 and ER-02 v1.1's safety chips and planned exits. **Second PR:** R5 on a hand-off, ER-02's missing-fact follow-up (v1.2), ER-14's nudge to try again. **Third PR:** ER-12. ER-02's inline mini-card moves to ER-B3, its first host |
 | ER-B2 | **ER-05** Cope Ahead port (its embeds, `ext.ca` projection, `cope_ahead_plan`, inline `copeAheadIfThen`, DEAR MAN's 11 moves linked `SAME_MOVE_AS`) | F2, IE-B1 (the DEAR MAN content source exists, so ids are stable) | IE-02, IE-08 and the debrief need the inline if-then |
-| ER-B3 | **ER-03** Opposite Action v3 port (doors per D7, scale removal, `OppositeActionSession` v3 projection, route fix, danger / boundary / not-sure split, want-change and prediction per D9; R16 if multi-feeling stays); `ActionUrge` moves to a `content.py` | ER-B1 (Check the Facts inline for *clarify*), D7, D9 | The biggest port; last of the existing tools |
+| ER-B3 | **ER-03** Opposite Action v3 port (doors per D7, scale removal, `OppositeActionSession` v3 projection, route fix, danger / boundary / not-sure split, want-change and prediction per D9; R16 if multi-feeling stays); `ActionUrge` moves to a `content.py` | ER-B1, D7, D9; builds Check the Facts' inline mini-card itself, as its first host (*clarify*) | The biggest port; last of the existing tools |
 | ER-B4 | **ER-07** PLEASE (id per D6, shape per D8); **ER-04** Good things (`thing_i_like`, `weekPlanner`, `cardDeck`); **ER-09** Values (`pileSort`, `value`) | F2; DT-B3 (`cardDeck`) | DT-06 level 3, IE-05's value chips and IE-09 wait on ER-04 / ER-09 |
 | ER-B5 | **ER-08** Let it be a wave (`waveRoom` on DT's motion engine); **ER-10** Know this feeling; **ER-11** Build mastery (WMP-05 ladder) ; **ER-13** Sleep reset (with CORE's night mode) | D3, DT-B3 (motion engine), CORE night mode for ER-13 | |
-| Decision first | **ER-15** Rewrite the nightmare | D14 | |
+| ER-B6 (now, alongside ER-B1) | **ER-15** Rewrite the nightmare (`holdRing` for the rehearsal; a `nightmare_script` kind in `kinds.ts` with its `ownFields` encrypted) | F2; D14 decided (Claudia, 10 Nov: build now, on the existing crisis banner) | Unparked by Claudia. Its clinical gate (§6) checks: the person writes the new ending, and no field asks what happened; a crisis slot on every step; *this is too much* reaches P2; no claim that it treats PTSD; one plain line that a clinician can help when nightmares follow a trauma |
 | Done already | **ER-01** (P2 is the player's), **ER-06** (rows land with each tool) | — | |
 
 ### 5.4 How the lanes work together
@@ -550,8 +557,8 @@ F1 ──► F2 ──► DT-B2 ──► DT-B3 ──► DT-B4 ─────�
  │      │              ▲          ▲         ▲
  │      │   DT-B1 ─────┘          │         │
  │      │   (waitLock)            │         │
- │      ├─► ER-B1 ────────────────┘ (Check the Facts inline for IE-06)
- │      │     └─► ER-B3
+ │      ├─► ER-B1 ──► ER-B3 ──────┘ (Check the Facts inline for IE-06)
+ │      │
  │      └─► ER-B2 (needs IE-B1) ────────────┘ (Cope Ahead inline for IE-02)
  ├─► DT-B1 (DT-11 now; DT-02 after F2)
  ├─► IE-B1
@@ -579,7 +586,7 @@ ER-B4 (ThingILike) ──► DT-06 level 3
 |---|---|---|
 | PR #54 merged | Everything | Claudia (merge) |
 | `user-profile.md` P1 (`kinds.ts`, `keepProfileItem`) | F2 and every keep | Profile thread (or the foundation lane, §4) |
-| The safety batch resuming (CORE-01/02) | DT-03, full medical screen, IE-01 safety question and IE-03 safe/risk (unless D4), IE-08, DV resources; `safety.open` moving off the interim screen | Paused by Claudia, 10 Nov |
+| The safety batch resuming (CORE-01/02) | DT-03, full medical screen, IE-01 safety question and IE-03 safe/risk (unless D4); `safety.open` moving off the interim screen. Not IE-08 any more (D14) | Paused by Claudia, 10 Nov |
 | PR #48 (OA doors) | ER-B3 | Claudia (D7) |
 | PR #47 (`routing/ties-weights-safety-question`) | Nothing in these lanes; it belongs to the safety batch | Safety batch |
 | Local branch `dev/hold-to-wait` pushed | DT-B1 can reuse the phone prototype | Claudia |
@@ -667,7 +674,7 @@ first lane PR on (§3 C1 rule 7).
 | D11 | DEAR MAN | **Three skills under the one `dear-man` id**: prep, one message, debrief |
 | D12 | IE-02's stage | **2D (den / Two pulls style) for v1**, fully scripted other-person turns. **Changed:** AI role-play for the other person is noted as a planned v2 |
 | D13 | Voice memos and photos (kit, acceptance statement, trusted voice, safe place) | **Not in v1.** Text only. **Changed:** media storage (with export and delete) is the first thing built after the modules |
-| D14 | Three features that need your clinical call before a lane starts them: DT-09's substance scope, ER-15 without a clinician, IE-08's DV specialist review | **Lanes don't start them** until Claudia decides (still open for DT-09 and ER-15; IE-08 unparked 10 Nov, "build them now": built and unlisted until the DV review) |
+| D14 | Three features that need your clinical call before a lane starts them: DT-09's substance scope, ER-15 without a clinician, IE-08's DV specialist review | **Decided 10 Nov (later):** ER-15 and IE-08 **build now**, on the existing crisis banner and the `other_person` banner's DV resources, without waiting for the safety plan (ER-B6, IE-B6). IE-08 built 10 Nov, unlisted until the DV specialist review. **DT-09 stays parked** |
 | D15 | Routing | **Lanes author rows off and as drafts; you sign off per tool** after its clinical gate |
 | D16 | Witness lines the skills open with (DT-04, DT-11, ER function lines, IE-06 `forOther`) | **Drafts, signed off by you per batch**; skills work with the line absent |
 | D17 | Who reviews | **Three independent Claude reviews per PR (§6), then you** for the final look and sign-offs, then your merge queue |

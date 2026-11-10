@@ -529,3 +529,32 @@ test("resume waits for the profile when the skill reads it, so kept-item picks a
   assert.match(src, /\}, \[profileSettled\]\);/);
   assert.doesNotMatch(read("src/pages/ToolPage.tsx"), /resumeKeepsFresh/, "the app never keeps ask-fresh answers on resume");
 });
+
+/** build.py's check on It isn't working's fix_way card, changed by `edit` (a Python statement on `st`): null when it passes. */
+const handoffCheck = (edit) => {
+  try {
+    execFileSync("python3", ["-c", `import sys,copy; sys.path.insert(0,'scripts/skills'); import build, er_troubleshoot as m
+sk = copy.deepcopy(m.SKILL); st = next(x for x in sk["steps"] if x["id"] == "fix_way")
+${edit}
+build.check(sk)`], { stdio: "pipe" });
+    return null;
+  } catch (e) { return String(e.stderr); }
+};
+
+test("R5 on a hand-off: one optional chip field its followUp names; build.py refuses every other shape", () => {
+  assert.equal(handoffCheck("pass"), null);
+  assert.match(handoffCheck('st["fields"][0]["required"] = True'), /take no required/);
+  assert.match(handoffCheck('st["fields"][0]["askFresh"] = "fitsFacts"'), /take no askFresh/);
+  assert.match(handoffCheck('st["fields"][0]["own"] = {"hint": "own_hint", "countsAsPick": True}'), /take no own/);
+  assert.match(handoffCheck('st["fields"][0]["max"] = 2'), /one pick/);
+  assert.match(handoffCheck('st["fields"].append({"id": "x", "options": {"list": "again"}, "max": 1})'), /only field/);
+  assert.match(handoffCheck('del st["followUp"]'), /only field/, "chips without a follow-up are a question in disguise");
+  assert.match(handoffCheck('st["lines"][0]["when"] = {"set": "$a.again_fix_way"}'), /never read the reminder chip/);
+  assert.match(handoffCheck('st["offers"] = [{"exit": "problem_solve", "when": {"eq": ["$a.again_fix_way", "today"]}}]'), /never read the reminder chip/);
+  assert.match(handoffCheck('st["followUp"] = {"type": "try_again"}'), /only field|picked by its chips/);
+  // The player schedules as the card is left (its move or Done), before the exit navigates; a chip tap only picks.
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  const leave = player.slice(player.indexOf("const leave = useCallback"), player.indexOf("const onShown"));
+  assert.ok(leave.indexOf("await scheduleStep()") > 0 && leave.indexOf("await scheduleStep()") < leave.indexOf("send({ type: 'exit'"), "scheduled before the exit");
+  assert.ok(leave.indexOf("if (exit.safety)") < leave.indexOf("await scheduleStep()"), "safety.open isn't leaving: nothing scheduled");
+});

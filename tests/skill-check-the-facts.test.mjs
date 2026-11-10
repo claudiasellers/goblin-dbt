@@ -29,8 +29,8 @@ const own = (fieldId, text) => ({ type: "own", fieldId, text });
 const next = { type: "next" };
 const toFits = (feel, stories, event = "said") => [pick("feel", feel), next, pick("event", event), next, ...stories.map((x) => pick("story", x)), next, next];
 
-test("the seven screens, in order: feel, event, story, alt, (threat), fits, next; then v1.1's safe hand-off", () => {
-  assert.deepEqual(skill.steps.map((s) => s.id), ["feel", "event", "story", "alt", "threat", "fits", "next", "safe"]);
+test("the seven screens, in order: feel, event, story, alt, (threat), fits, (missing), next; then v1.1's safe hand-off", () => {
+  assert.deepEqual(skill.steps.map((s) => s.id), ["feel", "event", "story", "alt", "threat", "fits", "missing", "next", "safe"]);
   assert.equal(skill.toolId, "check-the-facts");
   // anger skips nothing: screen 5 shows
   const s = run(toFits("annoyed", ["anger_on_purpose"]));
@@ -170,9 +170,10 @@ test("screen 6: the parent's fitsTheFactsWhen, unchanged, under 'feeling {word}'
 
 test("handoffFor: the hand-off table, Done always there", () => {
   const offered = (fits, event) => {
-    const s = run([...toFits("hurt", ["sad_gone"], event), pick("fits", fits), next]);
+    // I'm not sure goes by the missing fact first (v1.2); Next with nothing picked goes on.
+    const s = run([...toFits("hurt", ["sad_gone"], event), pick("fits", fits), next, ...(fits === "unsure" ? [next] : [])]);
     assert.equal(s.stepId, "next");
-    const step = skill.steps[6];
+    const step = M.stepOf(skill, "next");
     return [M.handoffLine(ctx(), step, s), s.offered.map((x) => skill.exits.find((e) => e.id === x).toolId)];
   };
   assert.deepEqual(offered("fits", "saw"), [skill.copy.next_fits, ["problem-solve"]]);
@@ -181,7 +182,7 @@ test("handoffFor: the hand-off table, Done always there", () => {
   assert.deepEqual(offered("partly", "said"), [skill.copy.next_partly, ["opposite-action", "problem-solve"]]);
   assert.deepEqual(offered("doesnt_fit", "said"), [skill.copy.next_no, ["opposite-action"]]);
   assert.deepEqual(offered("unsure", "said"), [skill.copy.next_unsure, ["wise-mind"]]);
-  assert.equal(skill.steps[6].done, "done");
+  assert.equal(M.stepOf(skill, "next").done, "done");
   const wise = skill.exits.find((e) => e.id === "wise_mind");
   assert.deepEqual(wise.query, { first: "wm_q_next" });
   for (const id of ["problem_solve", "opposite_action", "dear_man"]) assert.deepEqual(skill.exits.find((e) => e.id === id).carry, ["feel"]);
@@ -194,7 +195,7 @@ test("the attempt record: ext.run validates on the server, ids and own words onl
     pick("through", "yes"), next, pick("fits", "partly"), next, { type: "shown", record: "unblend" }, { type: "exit", exitId: "opposite_action" }], c);
   const rec = M.runRecord(c, s);
   assert.equal(rec.skillId, "check_the_facts");
-  assert.equal(rec.versionId, "cf-v1-1");
+  assert.equal(rec.versionId, "cf-v1-2");
   assert.deepEqual(rec.path, ["feel", "event", "story", "alt", "threat", "fits", "next"]);
   assert.deepEqual(rec.offeredExitIds, ["opposite_action", "problem_solve"]);
   assert.equal(rec.exitId, "opposite_action");
@@ -208,7 +209,9 @@ test("the attempt record: ext.run validates on the server, ids and own words onl
   const long = "x".repeat(140);
   s = run([pick("feel", "anxious"), next, own("event", long), next, pick("story", "fear_wont_cope"), own("story", long), next,
     pick("alt", "fear_wont_cope_alt1"), pick("alt", "fear_wont_cope_alt2"), pick("alt", "fear_wont_cope_alt3"), pick("alt", "own_alt_unknown"), pick("alt", "own_alt_other_view"), pick("alt", "own_alt_meaning"), own("alt", long), next,
-    own("threat", long), pick("likely", "very"), pick("through", "unsure"), next, pick("fits", "unsure"), next], c);
+    own("threat", long), pick("likely", "very"), pick("through", "unsure"), next, pick("fits", "unsure"), next,
+    own("fact", long), pick("when", "this_week"), next], c);
+  assert.equal(M.runRecord(c, s).answers.find((a) => a.fieldId === "fact").valueOwn.length, 60, "one fact: 60 characters");
   assert.ok(validateExt({ run: M.runRecord(c, s) }));
 });
 
@@ -261,4 +264,35 @@ test("v1.1 planned exits: the wave and let it be are written for fits and doesn'
     const s = run([...toFits("hurt", ["sad_gone"]), pick("fits", fits), next]);
     assert.ok(!s.offered.includes("mindfulness_emotions") && !s.offered.includes("let_it_be"), fits);
   }
+});
+
+test("v1.2, still don't know: one missing fact and an optional check-in; a chip schedules check_fact, none schedules nothing", () => {
+  const c = ctx();
+  const unsure = [...toFits("hurt", ["sad_gone"]), pick("fits", "unsure"), next];
+  let s = run(unsure, c);
+  assert.equal(s.stepId, "missing");
+  const step = M.stepOf(skill, "missing");
+  assert.equal(skill.copy[step.hint], "Not knowing is an answer. The move is one fact, not a decision.");
+  assert.deepEqual(skill.options.fact.map((o) => o.value), ["ask_them", "wait", "look", "ask_trusted"]);
+  assert.equal(M.canGoOn(c, s), true, "both fields are optional");
+  assert.equal(M.followUpFor(c, step, s), null, "no chip, no follow-up");
+  s = run([...unsure, pick("fact", "ask_them"), pick("when", "tomorrow")], c);
+  assert.deepEqual(M.followUpFor(c, step, s), { type: "check_fact", chip: "tomorrow" });
+  s = M.runNext(c, s, { type: "scheduled", stepId: "missing", followUpType: "check_fact", id: "fu1" });
+  assert.equal(M.followUpFor(c, step, s), null, "once per step per run");
+  s = M.runNext(c, s, next);
+  assert.equal(s.stepId, "next");
+  assert.deepEqual(s.path, ["feel", "event", "story", "alt", "fits", "missing", "next"]);
+  // The window chips are the follow-up type's own (scripts/practice-spine/content.py), and the type ships.
+  const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content;
+  const type = spine.followUpTypes.find((t) => t.id === "check_fact");
+  assert.ok(type?.enabled);
+  assert.deepEqual(skill.options.when.map((o) => o.value).sort(), Object.keys(type.window.chips).sort());
+  assert.equal(type.notification, "A check-in you asked for is ready.", "content-free");
+  // Own words for the fact aren't read: someone to talk to is a quiet tap away.
+  const links = (st) => M.fieldLinks(c, step.fields[0], st).map((l) => l.exit.id);
+  assert.deepEqual(links(run(unsure, c)), []);
+  assert.deepEqual(links(run([...unsure, own("fact", "ask him what he meant")], c)), ["safety_open"]);
+  // Every other answer goes straight to the card.
+  for (const f of ["fits", "partly", "doesnt_fit"]) assert.equal(run([...toFits("hurt", ["sad_gone"]), pick("fits", f), next], c).stepId, "next");
 });
