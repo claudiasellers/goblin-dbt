@@ -128,6 +128,7 @@ export const PROFILE_NEEDS = {
   'five-senses': ['parts'],
   'pause': ['parts'],
   'urge-surfing': ['parts'],
+  'alternate-rebellion': ['parts'],          // the tag row on its urge close (DT-11, Held off)
   'check-the-facts': ['parts'],              // the tag row on its close (docs/design/check-the-facts.md, screen 3)
   'fast': ['parts'],                         // the tag row on its close (docs/design/fast.md)
   // Wise mind's step back (parts on only): the person's parts in the room, with their names, shapes,

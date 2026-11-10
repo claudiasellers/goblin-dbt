@@ -496,7 +496,12 @@ test("resume: the run's own answers read back at a step it reached; ask-fresh an
   assert.equal(s.stepId, "check");
   assert.deepEqual(s.path, ["who", "when", "check"]);
   assert.deepEqual(Object.keys(s.answers).sort(), ["chip", "line"], "the ask-fresh change check is asked again; unknown fields dropped");
-  assert.equal(m.resumeRun(ctx, rec, "nowhere").stepId, "end", "a step it never reached: where it stopped");
+  assert.equal(m.resumeRun(ctx, rec, "when").stepId, "when", "a step before the ask-fresh one: there");
+  assert.equal(m.resumeRun(ctx, rec, "end").stepId, "check", "past an ask-fresh step: back to it, since what follows may hang on it");
+  assert.equal(m.resumeRun(ctx, rec, "nowhere").stepId, "check", "a step it never reached: where it stopped, clamped the same way");
+  assert.equal(m.resumeRun(ctx, rec, "end", { keepFresh: true }).stepId, "end", "the review page's made-up run: every step");
+  assert.deepEqual(m.resumeRun(ctx, rec, "end", { keepFresh: true }).answers.change, { ids: ["better"], own: null });
+  assert.deepEqual(m.resumeRun(ctx, rec, "check").offered, [], "not a hand-off: nothing offered");
   assert.equal(m.resumeRun(ctx, { ...rec, versionId: "t1" }, "check"), null, "another version's answers don't fit");
   assert.equal(m.resumeRun(ctx, { ...rec, skillId: "other" }, "check"), null);
 });
@@ -513,4 +518,12 @@ test("noClose: only on a hand-off, and the player leaves it without the close qu
   assert.match(src, /stepOf\(skill, st\.stepId\)\.noClose/, "leave() reads the step's noClose");
   assert.match(src, /!quietLeave/, "SessionClose is skipped after a quiet leave");
   assert.match(read("scripts/skills/build.py"), /"noClose" not in s or \(s\["kind"\] == "handoff"/, "build.py refuses noClose off a hand-off");
+});
+
+test("resume waits for the profile when the skill reads it, so kept-item picks aren't dropped as unavailable", () => {
+  const src = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(src, /profileSettled = !needsProfile\(skill\.toolId\) \|\| profile\.status !== 'loading'/);
+  assert.match(src, /if \(!resumeFrom \|\| !profileSettled \|\| resumed\.current\) return;/);
+  assert.match(src, /\}, \[profileSettled\]\);/);
+  assert.doesNotMatch(read("src/pages/ToolPage.tsx"), /resumeKeepsFresh/, "the app never keeps ask-fresh answers on resume");
 });

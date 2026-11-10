@@ -211,6 +211,9 @@ REVIEW = {
     "id": "fast_review", "toolId": TOOL_ID, "concept": CONCEPT, "version": "fast-review-v1", "start": "what",
     "ownMax": OWN_MAX, "accepts": ["frame"], "copy": REVIEW_COPY, "tables": {}, "derive": [],
     "steps": REVIEW_STEPS, "exits": REVIEW_EXITS, "options": review_options(), "emotionFields": [],
+    # dbt_fast ADDRESSES (Claudia, 10 Nov 2026): the PRD's list less unjustified guilt, which the graph can't tell
+    # apart from guilt (one guilt word). Live on load: Find the feeling can offer FAST for these words.
+    "addresses": ["cold_shame", "inferior", "insignificant"],
 }
 
 

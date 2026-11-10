@@ -63,6 +63,17 @@ export const tools: Tool[] = [
     dbtBasis: 'Urge Surfing / Distress Tolerance',
     emoji: '🌊',
   },
+  {
+    id: 'alternate-rebellion',
+    name: 'Rebel without the wreckage',
+    tagline: 'Push back without paying for it tomorrow',
+    description: 'When you want to blow it all up, name what\'s squeezing you and pick a rebellion built not to cost you tomorrow.',
+    whenToUse: 'When you feel stuck or controlled and want to quit, walk out or blow up something big.',
+    module: 'distress-tolerance',
+    dbtBasis: 'Alternate rebellion (DT Handout 21)',
+    emoji: '🎸',
+    bare: true,
+  },
   // Emotion Regulation
   {
     id: 'opposite-action',
@@ -209,6 +220,7 @@ export const allIntents: Intent[] = [
   { id: 'pause', label: 'Pause before reacting', toolId: 'pause', emoji: '✋' },
   { id: 'ground', label: 'Ground myself', toolId: 'five-senses', emoji: '👁️' },
   { id: 'urge', label: 'Ride out an urge', toolId: 'urge-surfing', emoji: '🌊' },
+  { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },

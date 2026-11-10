@@ -7,6 +7,25 @@
     "version": "spine-v1",
     "closeFlow": {
       "byTool": {
+        "alternate-rebellion": {
+          "urge": {
+            "choices": [
+              {
+                "id": "no",
+                "label": "Held off"
+              },
+              {
+                "id": "yes",
+                "label": "Went ahead"
+              },
+              {
+                "id": "not_yet",
+                "label": "Still deciding"
+              }
+            ],
+            "question": "And the urge to blow it all up?"
+          }
+        },
         "pause": {
           "urge": {
             "choices": [

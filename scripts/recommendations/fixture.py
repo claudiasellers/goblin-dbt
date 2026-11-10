@@ -42,15 +42,19 @@ def build(g):
         patterns[pid(n)] = dict({k: n.props.get(k) for k in PATTERN_FIELDS},
                                 blank=n.props.get('blank'), emotions=emotions)
 
-    addresses = {}
+    addresses, legacy = {}, {}
     for r in g.relationships:
         if r.type in TOOL_EDGES and 'TherapyConcept' in r.start.labels and 'Emotion' in r.end.labels:
             addresses.setdefault(pid(r.start), set()).add(pid(r.end))
+            if r.props.get('legacy') is not False:
+                legacy.setdefault(pid(r.start), set()).add(pid(r.end))
     concepts = {}
     for n in sorted(g.find('TherapyConcept'), key=pid):
         if n.props.get('appToolId') or pid(n) in addresses:
             concepts[pid(n)] = dict({k: n.props.get(k) for k in CONCEPT_FIELDS},
-                                    addresses=sorted(addresses.get(pid(n), ())))
+                                    addresses=sorted(addresses.get(pid(n), ())),
+                                    **({'legacyAddresses': sorted(legacy.get(pid(n), ()))}
+                                       if legacy.get(pid(n), set()) != addresses.get(pid(n), set()) else {}))
 
     evidence = sorted(({'responseId': pid(r.start), 'patternId': pid(r.end), 'weight': r.props.get('weight')}
                        for r in g.rels('EVIDENCE_FOR', 'QuestionResponse', 'ActivationPattern')),

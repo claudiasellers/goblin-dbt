@@ -806,11 +806,537 @@ MATCH (s:Skill {id: "check_the_facts"}), (o:SkillOption {id: "check_the_facts:fi
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "fits", order: 104};
 
+// --- alternate_rebellion (ar-v2) ---
+MERGE (s:Skill {id: "alternate_rebellion"})
+SET s += {toolId: "alternate-rebellion", version: "ar-v2", contentVersion: "skills-v1", start: "open", ownMax: 140, emotionFields: [], accepts: ["band", "urgeId", "returnTo"]}, s.inlineJson = "null", s.copyJson = "{\"card_against\": \"Against\", \"card_fallback\": \"A rebellion built not to cost you tomorrow.\", \"card_for\": \"For\", \"card_now\": \"Now\", \"card_title\": \"Here's your rebellion. When will you do it?\", \"card_today\": \"Later today\", \"card_week\": \"This week\", \"card_when\": \"When?\", \"cost_q\": \"Will this cost you tomorrow?\", \"done\": \"Done\", \"flooded_cool\": \"Cool my body first\", \"flooded_pause\": \"Pause first\", \"flooded_title\": \"Your body's loud. Settle it a little first.\", \"function_title\": \"What would blowing it up give you?\", \"heads_up_scared_title\": \"If they'd notice it, it could cost you. Keep it, or pick a quiet one?\", \"heads_up_title\": \"That one might cost you tomorrow. Keep it, or pick something lighter?\", \"itch_hint\": \"Go and do it first. This screen waits.\", \"itch_title\": \"Did it scratch the itch?\", \"next\": \"Next\", \"next_cant\": \"Some squeezes don't move. You still get to choose how much of you they take.\", \"next_change\": \"When the squeeze can change, working on it is the bigger rebellion.\", \"next_not_now\": \"The rebellion's yours. The squeeze can wait until you're ready.\", \"next_say\": \"Saying it clearly, and keeping your self-respect, is a rebellion too.\", \"next_scared\": \"You named someone you're scared of. You don't have to work that out alone.\", \"noticed_q\": \"Would they notice it?\", \"open_title\": \"Wanting to rebel usually means something's squeezing you. That's worth listening to.\", \"own_hint\": \"Say it your way\", \"pick_own\": \"My own rebellion\", \"pick_title\": \"Pick one that gives you that, without the wreckage.\", \"pick_title_scared\": \"Pick one that gives you that, and that nobody else has to see.\", \"pick_title_treatment\": \"Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick a rebellion built not to cost you tomorrow.\", \"pick_title_treatment_scared\": \"Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick one nobody else has to see.\", \"real_title\": \"And the squeeze itself. Is it something you want to work on?\", \"safety_open\": \"If the urge is to hurt yourself\", \"squeeze_own\": \"Something else\", \"squeeze_title\": \"What's squeezing you?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_alternate_rebellion"}), (s:Skill {id: "alternate_rebellion"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "alternate_rebellion"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "alternate_rebellion"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "alternate_rebellion:open"})
+SET n += {skillId: "alternate_rebellion", step: "open", kind: "ask", version: "ar-v2"}, n.specJson = "{\"fields\": [{\"id\": \"first\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"flooded_cool\", \"when\": {\"all\": []}}, {\"exit\": \"pause\", \"label\": \"flooded_pause\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"first\"}, \"required\": true, \"showWhen\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"title\": [{\"key\": \"flooded_title\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"open_title\"}]}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:open"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "alternate_rebellion:squeeze"})
+SET n += {skillId: "alternate_rebellion", step: "squeeze", kind: "ask", version: "ar-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"squeeze\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 2, \"options\": {\"list\": \"squeeze\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"squeeze_own\"}, \"required\": true, \"swap\": true}], \"title\": \"squeeze_title\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:squeeze"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "alternate_rebellion:function"})
+SET n += {skillId: "alternate_rebellion", step: "function", kind: "ask", version: "ar-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"function\", \"max\": 1, \"options\": {\"list\": \"function\"}, \"required\": true}], \"title\": \"function_title\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:function"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "alternate_rebellion:pick"})
+SET n += {skillId: "alternate_rebellion", step: "pick", kind: "ask", version: "ar-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"pick\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"rebellion\", \"where\": {\"all\": [{\"has\": [\"$opt.functions\", \"$a.function\"]}, {\"any\": [{\"not\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}, {\"eq\": [\"$opt.quiet\", true]}]}, {\"any\": [{\"not\": {\"has\": [\"$a.squeeze.ids\", \"treatment\"]}}, {\"all\": [{\"not\": {\"eq\": [\"$opt.skips\", true]}}, {\"not\": {\"eq\": [\"$opt.exerts\", true]}}]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"pick_own\", \"max\": 90}, \"required\": true}, {\"id\": \"cost\", \"label\": \"cost_q\", \"max\": 1, \"options\": {\"list\": \"cost\"}, \"required\": true, \"showWhen\": {\"own\": \"pick\"}}, {\"id\": \"noticed\", \"label\": \"noticed_q\", \"max\": 1, \"options\": {\"list\": \"noticed\"}, \"required\": true, \"showWhen\": {\"all\": [{\"own\": \"pick\"}, {\"has\": [\"$a.squeeze.ids\", \"scared\"]}]}}], \"title\": [{\"key\": \"pick_title_treatment_scared\", \"when\": {\"all\": [{\"has\": [\"$a.squeeze.ids\", \"treatment\"]}, {\"has\": [\"$a.squeeze.ids\", \"scared\"]}]}}, {\"key\": \"pick_title_treatment\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"treatment\"]}}, {\"key\": \"pick_title_scared\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}, {\"key\": \"pick_title\"}]}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:pick"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "alternate_rebellion:heads_up"})
+SET n += {skillId: "alternate_rebellion", step: "heads_up", kind: "ask", version: "ar-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"heads_up\", \"max\": 1, \"options\": {\"list\": \"heads_up\"}, \"required\": true}], \"title\": [{\"key\": \"heads_up_scared_title\", \"when\": {\"all\": [{\"all\": [{\"has\": [\"$a.squeeze.ids\", \"scared\"]}, {\"in\": [\"$a.noticed\", [\"yes\", \"not_sure\"]]}]}, {\"not\": {\"eq\": [\"$a.cost\", \"yes\"]}}]}}, {\"key\": \"heads_up_title\"}]}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:heads_up"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "alternate_rebellion:card"})
+SET n += {skillId: "alternate_rebellion", step: "card", kind: "embed", version: "ar-v2"}, n.specJson = "{\"answerAs\": \"when\", \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"embed\": \"rebellionCard\", \"props\": {\"against\": \"card_against\", \"fallback\": \"card_fallback\", \"for\": \"card_for\", \"functionField\": \"function\", \"now\": \"card_now\", \"pickField\": \"pick\", \"squeezeField\": \"squeeze\", \"today\": \"card_today\", \"week\": \"card_week\", \"whenLabel\": \"card_when\"}, \"title\": \"card_title\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:card"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "alternate_rebellion:itch"})
+SET n += {skillId: "alternate_rebellion", step: "itch", kind: "ask", version: "ar-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"itch\", \"max\": 1, \"options\": {\"list\": \"itch\"}}], \"hint\": \"itch_hint\", \"title\": \"itch_title\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:itch"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "alternate_rebellion:real"})
+SET n += {skillId: "alternate_rebellion", step: "real", kind: "ask", version: "ar-v2"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"real\", \"max\": 1, \"options\": {\"list\": \"real\"}, \"required\": true}], \"title\": \"real_title\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:real"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "alternate_rebellion:next"})
+SET n += {skillId: "alternate_rebellion", step: "next", kind: "handoff", version: "ar-v2"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}], \"done\": \"done\", \"lines\": [{\"key\": \"next_scared\", \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}, {\"key\": \"next_change\", \"when\": {\"eq\": [\"$a.real\", \"change\"]}}, {\"key\": \"next_say\", \"when\": {\"eq\": [\"$a.real\", \"say\"]}}, {\"key\": \"next_cant\", \"when\": {\"eq\": [\"$a.real\", \"cant\"]}}, {\"key\": \"next_not_now\", \"when\": {\"eq\": [\"$a.real\", \"not_now\"]}}]}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (n:SkillStep {id: "alternate_rebellion:next"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (x:SkillExit {id: "alternate_rebellion:problem_solve"})
+SET x += {skillId: "alternate_rebellion", exit: "problem_solve", toolId: "problem-solve", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:problem_solve"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "alternate_rebellion:problem_solve"}), (t:TherapyConcept {appToolId: "problem-solve"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "alternate_rebellion:dear_man"})
+SET x += {skillId: "alternate_rebellion", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:dear_man"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "alternate_rebellion:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "alternate_rebellion:fast"})
+SET x += {skillId: "alternate_rebellion", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:fast"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "alternate_rebellion:fast"}), (t:TherapyConcept {appToolId: "fast"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "alternate_rebellion:let_it_be"})
+SET x += {skillId: "alternate_rebellion", exit: "let_it_be", toolId: "let-it-be", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:let_it_be"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "alternate_rebellion:let_it_be"}), (t:TherapyConcept {appToolId: "let-it-be"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "alternate_rebellion:ending"})
+SET x += {skillId: "alternate_rebellion", exit: "ending", toolId: "ending-relationships", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:ending"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "alternate_rebellion:ending"}), (t:TherapyConcept {appToolId: "ending-relationships"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "alternate_rebellion:cool_down"})
+SET x += {skillId: "alternate_rebellion", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "alternate_rebellion:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "alternate_rebellion:pause"})
+SET x += {skillId: "alternate_rebellion", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:pause"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "alternate_rebellion:pause"}), (t:TherapyConcept {appToolId: "pause"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "alternate_rebellion:safety_open"})
+SET x += {skillId: "alternate_rebellion", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "alternate_rebellion:done"})
+SET x += {skillId: "alternate_rebellion", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (x:SkillExit {id: "alternate_rebellion:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "alternate_rebellion:open"}), (b:SkillStep {id: "alternate_rebellion:squeeze"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:open"}), (x:SkillExit {id: "alternate_rebellion:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "first", label: "flooded_cool"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "alternate_rebellion:open"}), (x:SkillExit {id: "alternate_rebellion:pause"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 1, field: "first", label: "flooded_pause"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "alternate_rebellion:squeeze"}), (b:SkillStep {id: "alternate_rebellion:function"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:squeeze"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "squeeze", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "alternate_rebellion:function"}), (b:SkillStep {id: "alternate_rebellion:pick"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:pick"}), (b:SkillStep {id: "alternate_rebellion:heads_up"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.cost\", \"yes\"]}, {\"all\": [{\"has\": [\"$a.squeeze.ids\", \"scared\"]}, {\"in\": [\"$a.noticed\", [\"yes\", \"not_sure\"]]}]}]}";
+MATCH (a:SkillStep {id: "alternate_rebellion:pick"}), (b:SkillStep {id: "alternate_rebellion:card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:pick"}), (x:SkillExit {id: "alternate_rebellion:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "pick", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "alternate_rebellion:heads_up"}), (b:SkillStep {id: "alternate_rebellion:pick"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.heads_up\", \"lighter\"]}";
+MATCH (a:SkillStep {id: "alternate_rebellion:heads_up"}), (b:SkillStep {id: "alternate_rebellion:card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:card"}), (b:SkillStep {id: "alternate_rebellion:itch"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.when\", \"now\"]}";
+MATCH (a:SkillStep {id: "alternate_rebellion:card"}), (b:SkillStep {id: "alternate_rebellion:real"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:itch"}), (b:SkillStep {id: "alternate_rebellion:real"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:real"}), (b:SkillStep {id: "alternate_rebellion:next"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "alternate_rebellion:next"}), (x:SkillExit {id: "alternate_rebellion:ending"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}]";
+MATCH (a:SkillStep {id: "alternate_rebellion:next"}), (x:SkillExit {id: "alternate_rebellion:problem_solve"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"all\": [{\"eq\": [\"$a.real\", \"change\"]}, {\"not\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}]}}]";
+MATCH (a:SkillStep {id: "alternate_rebellion:next"}), (x:SkillExit {id: "alternate_rebellion:dear_man"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": [{\"eq\": [\"$a.real\", \"say\"]}, {\"not\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}]}}]";
+MATCH (a:SkillStep {id: "alternate_rebellion:next"}), (x:SkillExit {id: "alternate_rebellion:fast"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": [{\"eq\": [\"$a.real\", \"say\"]}, {\"not\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}]}}]";
+MATCH (a:SkillStep {id: "alternate_rebellion:next"}), (x:SkillExit {id: "alternate_rebellion:let_it_be"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 4}, r.rowsJson = "[{\"order\": 4, \"when\": {\"all\": [{\"eq\": [\"$a.real\", \"cant\"]}, {\"not\": {\"has\": [\"$a.squeeze.ids\", \"scared\"]}}]}}]";
+MERGE (o:SkillOption {id: "alternate_rebellion:first:anyway"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "first", value: "anyway", label: "Keep going anyway", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:first:anyway"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "first", order: 0};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:rules"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "rules", label: "Rules I didn't pick", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:rules"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 1};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:told_who"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "told_who", label: "Told who to be", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:told_who"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 2};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:controlling"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "controlling", label: "Someone controlling me", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:controlling"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 3};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:stuck"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "stuck", label: "Stuck", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:stuck"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 4};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:scared"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "scared", label: "Someone I'm scared of", version: "ar-v2"}, o.propsJson = "{\"danger\": \"other\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:scared"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 5};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:plan_cage"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "plan_cage", label: "My plan feels like a cage", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:plan_cage"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 6};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:treatment"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "treatment", label: "Treatment I didn't pick", version: "ar-v2"}, o.propsJson = "{\"treatment\": true}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:treatment"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 7};
+MERGE (o:SkillOption {id: "alternate_rebellion:squeeze:be_fine"})
+SET o:SkillOption:RebellionSqueeze, o += {skillId: "alternate_rebellion", list: "squeeze", value: "be_fine", label: "Expected to be fine", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:squeeze:be_fine"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "squeeze", order: 8};
+MERGE (o:SkillOption {id: "alternate_rebellion:function:freedom"})
+SET o:SkillOption:RebellionFunction, o += {skillId: "alternate_rebellion", list: "function", value: "freedom", label: "Freedom", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:function:freedom"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "function", order: 9};
+MERGE (o:SkillOption {id: "alternate_rebellion:function:seen"})
+SET o:SkillOption:RebellionFunction, o += {skillId: "alternate_rebellion", list: "function", value: "seen", label: "Being seen", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:function:seen"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "function", order: 10};
+MERGE (o:SkillOption {id: "alternate_rebellion:function:control"})
+SET o:SkillOption:RebellionFunction, o += {skillId: "alternate_rebellion", list: "function", value: "control", label: "Control back", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:function:control"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "function", order: 11};
+MERGE (o:SkillOption {id: "alternate_rebellion:function:break"})
+SET o:SkillOption:RebellionFunction, o += {skillId: "alternate_rebellion", list: "function", value: "break", label: "A break", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:function:break"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "function", order: 12};
+MERGE (o:SkillOption {id: "alternate_rebellion:function:prove"})
+SET o:SkillOption:RebellionFunction, o += {skillId: "alternate_rebellion", list: "function", value: "prove", label: "Proving them wrong", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:function:prove"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "function", order: 13};
+MERGE (o:SkillOption {id: "alternate_rebellion:function:alive"})
+SET o:SkillOption:RebellionFunction, o += {skillId: "alternate_rebellion", list: "function", value: "alive", label: "Feeling alive", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:function:alive"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "function", order: 14};
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:different_route"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "different_route", label: "Take a different way home, for the change", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"freedom\"], \"reversible\": true, \"visibility\": \"public\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:different_route"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 15};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:different_route"}), (f:SkillOption {id: "alternate_rebellion:function:freedom"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:say_no"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "say_no", label: "Say no to one optional thing today", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"freedom\"], \"reversible\": true, \"skips\": true, \"visibility\": \"public\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:say_no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 16};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:say_no"}), (f:SkillOption {id: "alternate_rebellion:function:freedom"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:unplanned_hour"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "unplanned_hour", label: "Keep one hour today with no plan at all", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"freedom\", \"break\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:unplanned_hour"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 17};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:unplanned_hour"}), (f:SkillOption {id: "alternate_rebellion:function:freedom"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:unplanned_hour"}), (f:SkillOption {id: "alternate_rebellion:function:break"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:phone_away"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "phone_away", label: "Put your phone in another room for an hour", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"freedom\"], \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:phone_away"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 18};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:phone_away"}), (f:SkillOption {id: "alternate_rebellion:function:freedom"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:daydream"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "daydream", label: "Daydream, in detail, the day you'd pick", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"freedom\", \"alive\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:daydream"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 19};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:daydream"}), (f:SkillOption {id: "alternate_rebellion:function:freedom"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:daydream"}), (f:SkillOption {id: "alternate_rebellion:function:alive"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:keep_yours"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "keep_yours", label: "Keep one thought today that's only yours", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"freedom\", \"control\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:keep_yours"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 20};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:keep_yours"}), (f:SkillOption {id: "alternate_rebellion:function:freedom"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:keep_yours"}), (f:SkillOption {id: "alternate_rebellion:function:control"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:wear_it"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "wear_it", label: "Wear the thing you'd never wear", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"seen\", \"alive\"], \"reversible\": true, \"visibility\": \"public\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:wear_it"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 21};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:wear_it"}), (f:SkillOption {id: "alternate_rebellion:function:seen"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:wear_it"}), (f:SkillOption {id: "alternate_rebellion:function:alive"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:hair"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "hair", label: "Style your hair a way nobody expects", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"seen\"], \"reversible\": true, \"visibility\": \"public\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:hair"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 22};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:hair"}), (f:SkillOption {id: "alternate_rebellion:function:seen"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:say_true"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "say_true", label: "Tell someone safe one thing you usually keep quiet", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"seen\"], \"reversible\": true, \"visibility\": \"public\", \"when\": \"week\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:say_true"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 23};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:say_true"}), (f:SkillOption {id: "alternate_rebellion:function:seen"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:say_aloud"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "say_aloud", label: "Say out loud, alone, what you wish someone heard", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"seen\", \"prove\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:say_aloud"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 24};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:say_aloud"}), (f:SkillOption {id: "alternate_rebellion:function:seen"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:say_aloud"}), (f:SkillOption {id: "alternate_rebellion:function:prove"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:picture_seen"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "picture_seen", label: "Picture yourself, in detail, as you'd like to be seen", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"seen\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:picture_seen"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 25};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:picture_seen"}), (f:SkillOption {id: "alternate_rebellion:function:seen"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:sing"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "sing", label: "Sing along under your breath, or in your head", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"seen\", \"alive\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:sing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 26};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:sing"}), (f:SkillOption {id: "alternate_rebellion:function:seen"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:sing"}), (f:SkillOption {id: "alternate_rebellion:function:alive"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:rearrange"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "rearrange", label: "Rearrange your room tonight", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"control\"], \"reversible\": true, \"visibility\": \"private\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:rearrange"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 27};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:rearrange"}), (f:SkillOption {id: "alternate_rebellion:function:control"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:cancel_plan"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "cancel_plan", label: "Cancel one optional plan", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"control\", \"break\"], \"reversible\": true, \"skips\": true, \"visibility\": \"public\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:cancel_plan"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 28};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:cancel_plan"}), (f:SkillOption {id: "alternate_rebellion:function:control"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:cancel_plan"}), (f:SkillOption {id: "alternate_rebellion:function:break"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:my_order"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "my_order", label: "Do today's chores in your own order", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"control\"], \"reversible\": true, \"visibility\": \"private\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:my_order"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 29};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:my_order"}), (f:SkillOption {id: "alternate_rebellion:function:control"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:choose_ten"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "choose_ten", label: "Choose every minute of the next ten", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"control\", \"break\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:choose_ten"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 30};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:choose_ten"}), (f:SkillOption {id: "alternate_rebellion:function:control"})
+MERGE (o)-[:SERVES]->(f);
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:choose_ten"}), (f:SkillOption {id: "alternate_rebellion:function:break"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:decide_tomorrow"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "decide_tomorrow", label: "Decide, in your head, one thing about tomorrow that's yours", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"control\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:decide_tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 31};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:decide_tomorrow"}), (f:SkillOption {id: "alternate_rebellion:function:control"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:skip_chore"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "skip_chore", label: "Skip an optional chore on purpose, guilt-free", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"break\"], \"reversible\": true, \"skips\": true, \"visibility\": \"private\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:skip_chore"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 32};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:skip_chore"}), (f:SkillOption {id: "alternate_rebellion:function:break"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:do_nothing"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "do_nothing", label: "Do nothing for twenty minutes, on purpose", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"break\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:do_nothing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 33};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:do_nothing"}), (f:SkillOption {id: "alternate_rebellion:function:break"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:write_unsent"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "write_unsent", label: "Write what you'd tell them on paper, and keep it unsent", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"prove\"], \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:write_unsent"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 34};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:write_unsent"}), (f:SkillOption {id: "alternate_rebellion:function:prove"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:start_yours"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "start_yours", label: "Start one small thing that's yours", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"prove\"], \"reversible\": true, \"visibility\": \"private\", \"when\": \"week\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:start_yours"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 35};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:start_yours"}), (f:SkillOption {id: "alternate_rebellion:function:prove"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:three_things"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "three_things", label: "Name three things you've done that nobody saw coming", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"prove\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:three_things"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 36};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:three_things"}), (f:SkillOption {id: "alternate_rebellion:function:prove"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:learn"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "learn", label: "Learn one small new thing today, for you", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"prove\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"today\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:learn"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 37};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:learn"}), (f:SkillOption {id: "alternate_rebellion:function:prove"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:loud_song"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "loud_song", label: "Play the loud song in one earbud, all the way through", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"functions\": [\"alive\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:loud_song"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 38};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:loud_song"}), (f:SkillOption {id: "alternate_rebellion:function:alive"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:shake_out"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "shake_out", label: "Shake it out, quietly, for one song", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"exerts\": true, \"functions\": [\"alive\"], \"quiet\": true, \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:shake_out"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 39};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:shake_out"}), (f:SkillOption {id: "alternate_rebellion:function:alive"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:rebellion:walk_fast"})
+SET o:SkillOption:RebellionOption, o += {skillId: "alternate_rebellion", list: "rebellion", value: "walk_fast", label: "Go outside and walk faster than you need to", version: "ar-v2"}, o.propsJson = "{\"cost\": \"none\", \"exerts\": true, \"functions\": [\"alive\"], \"reversible\": true, \"visibility\": \"private\", \"when\": \"now\"}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:rebellion:walk_fast"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "rebellion", order: 40};
+MATCH (o:SkillOption {id: "alternate_rebellion:rebellion:walk_fast"}), (f:SkillOption {id: "alternate_rebellion:function:alive"})
+MERGE (o)-[:SERVES]->(f);
+MERGE (o:SkillOption {id: "alternate_rebellion:cost:no"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "cost", value: "no", label: "No", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:cost:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cost", order: 41};
+MERGE (o:SkillOption {id: "alternate_rebellion:cost:a_little"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "cost", value: "a_little", label: "A little", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:cost:a_little"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cost", order: 42};
+MERGE (o:SkillOption {id: "alternate_rebellion:cost:yes"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "cost", value: "yes", label: "Yes", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:cost:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "cost", order: 43};
+MERGE (o:SkillOption {id: "alternate_rebellion:noticed:no"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "noticed", value: "no", label: "No", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:noticed:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "noticed", order: 44};
+MERGE (o:SkillOption {id: "alternate_rebellion:noticed:not_sure"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "noticed", value: "not_sure", label: "Not sure", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:noticed:not_sure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "noticed", order: 45};
+MERGE (o:SkillOption {id: "alternate_rebellion:noticed:yes"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "noticed", value: "yes", label: "Yes", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:noticed:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "noticed", order: 46};
+MERGE (o:SkillOption {id: "alternate_rebellion:heads_up:lighter"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "heads_up", value: "lighter", label: "Pick something lighter", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:heads_up:lighter"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 47};
+MERGE (o:SkillOption {id: "alternate_rebellion:heads_up:keep"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "heads_up", value: "keep", label: "Keep it anyway", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:heads_up:keep"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "heads_up", order: 48};
+MERGE (o:SkillOption {id: "alternate_rebellion:itch:yes"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "itch", value: "yes", label: "Yes", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:itch:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "itch", order: 49};
+MERGE (o:SkillOption {id: "alternate_rebellion:itch:a_bit"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "itch", value: "a_bit", label: "A bit", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:itch:a_bit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "itch", order: 50};
+MERGE (o:SkillOption {id: "alternate_rebellion:itch:no"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "itch", value: "no", label: "No", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:itch:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "itch", order: 51};
+MERGE (o:SkillOption {id: "alternate_rebellion:itch:not_yet"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "itch", value: "not_yet", label: "Not yet", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:itch:not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "itch", order: 52};
+MERGE (o:SkillOption {id: "alternate_rebellion:real:change"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "real", value: "change", label: "It could change, and I want to try", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:real:change"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "real", order: 53};
+MERGE (o:SkillOption {id: "alternate_rebellion:real:say"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "real", value: "say", label: "Someone I want to say something to", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:real:say"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "real", order: 54};
+MERGE (o:SkillOption {id: "alternate_rebellion:real:cant"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "real", value: "cant", label: "It won't change", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:real:cant"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "real", order: 55};
+MERGE (o:SkillOption {id: "alternate_rebellion:real:not_now"})
+SET o:SkillOption, o += {skillId: "alternate_rebellion", list: "real", value: "not_now", label: "Not right now", version: "ar-v2"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "alternate_rebellion"}), (o:SkillOption {id: "alternate_rebellion:real:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "real", order: 56};
+
 // --- fast_review (fast-review-v1) ---
 MERGE (s:Skill {id: "fast_review"})
 SET s += {toolId: "fast", version: "fast-review-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: [], accepts: ["frame"]}, s.inlineJson = "null", s.copyJson = "{\"card_a_title\": \"One sorry for a real wrong. None for having a need.\", \"card_copied\": \"Copied\", \"card_copy\": \"Copy\", \"card_f_title\": \"What you'd say instead\", \"card_s_title\": \"The value you'd keep\", \"card_selected\": \"The line is selected, ready to copy.\", \"card_t_title\": \"The true version\", \"done\": \"Done\", \"instead_title\": \"What would you say instead, next time?\", \"next\": \"Next\", \"next_line\": \"That's one move to carry into the next conversation.\", \"next_line_unsure\": \"Not sure about the sorry? Check the Facts can help sort it out.\", \"next_line_wrong\": \"A sorry for a real wrong is part of keeping your self-respect. Check the Facts can help with whether the guilt fits, and what would repair it.\", \"own_hint\": \"Say it my way\", \"sorry_instead_title\": \"What could take the place of the extra sorries next time?\", \"sorry_title\": \"Was there something you did that needs a sorry?\", \"truth_title\": \"What's the true version?\", \"values_hint\": \"Pick one or two.\", \"values_title\": \"Which value do you want to keep next time?\", \"what_hint\": \"This happens to a lot of people. Pick the one you'd most like to change.\", \"what_own\": \"Something else\", \"what_title\": \"Looking back, which of these happened?\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_fast"}), (s:Skill {id: "fast_review"})
 MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:TherapyConcept {id: "dbt_fast"})-[r:ADDRESSES]->(:Emotion) DELETE r;
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (e:Emotion {id: "cold_shame"})
+MERGE (t)-[r:ADDRESSES]->(e)
+SET r += {legacy: false};
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (e:Emotion {id: "inferior"})
+MERGE (t)-[r:ADDRESSES]->(e)
+SET r += {legacy: false};
+MATCH (t:TherapyConcept {id: "dbt_fast"}), (e:Emotion {id: "insignificant"})
+MERGE (t)-[r:ADDRESSES]->(e)
+SET r += {legacy: false};
 MATCH (:SkillStep {skillId: "fast_review"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
 MATCH (:Skill {id: "fast_review"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
 MERGE (n:SkillStep {id: "fast_review:what"})

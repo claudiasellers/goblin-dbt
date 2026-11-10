@@ -290,6 +290,13 @@ for sk in SKILLS:
     A(f"\n// --- {sid} ({sk['version']}) ---")
     A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.inlineJson = {js(sk.get('inline'))}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
     A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (s:Skill {{id: {q(sid)}}})\nMERGE (t)-[:HAS_SKILL]->(s);")
+    if "addresses" in sk:
+        # The concept's ADDRESSES set (Find the feeling's word routes, the routing tie-break), owned by this skill:
+        # rebuilt each load so a dropped emotion disappears. `legacy: false` keeps them out of the kill-switch ranker
+        # (legacy.ts), so switching routing off still restores the pre-review routing whole.
+        A(f"MATCH (:TherapyConcept {{id: {q(sk['concept'])}}})-[r:ADDRESSES]->(:Emotion) DELETE r;")
+        for eid in sk["addresses"]:
+            A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (e:Emotion {{id: {q(eid)}}})\nMERGE (t)-[r:ADDRESSES]->(e)\nSET r += {{legacy: false}};")
     # Edges are rebuilt each load (a removed step / jump / offer must disappear).
     A(f"MATCH (:SkillStep {{skillId: {q(sid)}}})-[r:NEXT|OFFERS|LINKS]->() DELETE r;")
     A(f"MATCH (:Skill {{id: {q(sid)}}})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;")
@@ -327,6 +334,10 @@ for sk in SKILLS:
             A(f"MATCH (c:EmotionRegulationContent {{dbtParent: {q(extra['set'])}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (c)-[:HAS_INTERPRETATION]->(o);")
         if clinical == "Interpretation" and extra["set"] == "general":
             A(f"MATCH (s:Skill {{id: {q(sid)}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (s)-[:HAS_INTERPRETATION]->(o);")
+        if clinical == "RebellionOption":
+            # A rebellion serves the functions it's matched to (DT-11): queryable as knowledge, not only as UI.
+            for fn in extra["functions"]:
+                A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (f:SkillOption {{id: {q(sid + ':function:' + fn)}}})\nMERGE (o)-[:SERVES]->(f);")
         if clinical == "Alternative" and extra["for"] != "$own":
             A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (st:SkillOption {{id: {q(sid + ':story:' + extra['for'])}}})\nMERGE (o)-[:ALTERNATIVE_TO]->(st);")
 CYPHER = "\n".join(L)

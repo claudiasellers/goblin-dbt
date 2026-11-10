@@ -126,7 +126,6 @@ close offers the tag row, like Check the Facts.
 | Rehearse it after the review | IE-02 (IE-B5); the exit is in place, planned |
 | Let it be inline in Let go | DT-04 (DT-B4); planned exit until then, inline in IE-B4 |
 | Recover dropping `boundaryLocked` and using this embed | IE-B4 |
-| `ADDRESSES` edges (unjustified guilt, cold shame, inferior, insignificant) | Claudia's clinical call (listed under Sign-off); no batch until then |
 | The Witness deck as a place to meet the need (Arch #30) | WMP's witness pieces (F2 `witness` embed) |
 | `SkillPractice` reps `self_respect` / `let_go` | The spine's reps from a run (F2) |
 | Let go for an unsafe or refusing person (`reason=unsafe`): start on *I don't need to say anything* and hide the other lines (the PRD's "step away without saying anything") | The safety batch / IE-03. No host links `frame=let_go` until then |
@@ -146,8 +145,12 @@ The skill copy isn't gated on content sign-off (Check the Facts' precedent). For
   drafts**. *Violated* is out of `self-respect` and the `victimized` row is deleted (Claudia, 10 Nov 2026, the
   clinical gate's call): after a violation, a review that opens on what *you* did reads as self-blame. Switching
   the two remaining rows on is a later call (drop them from `BUILT_NOT_SIGNED_OFF`, row by row).
-- **`ADDRESSES` edges** for `dbt_fast` (unjustified guilt, cold shame, inferior, insignificant): the PRD's, left
-  out of this PR; Claudia's call is still open (whether to add them now for the personal ranking work).
+- **`ADDRESSES` edges:** `dbt_fast` → cold shame, inferior, insignificant (Claudia, 10 Nov 2026), written from
+  `fast.py` (`addresses` on `fast_review`; `build.py` rebuilds the set each load). Not the PRD's *unjustified
+  guilt*: the graph has one guilt word, so the edge would claim all guilt. Live on load: Find the feeling's word
+  routes can offer FAST for these three, and they break ties in check-in routing. Each edge carries
+  `legacy: false`, which the kill-switch ranker (`LEGACY_TOOLS_QUERY`) skips, so switching routing off still
+  restores the pre-review routing whole (without it, *Empty* would get FAST under the legacy ranker on a tie).
 - The review copy, if you want it on the witness voice list.
 
 ## Open idea: a trauma-aware look back (not built)
