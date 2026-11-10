@@ -15,6 +15,32 @@ log() { echo "$(date '+%F %T') $*"; }
 mkdir "$LANE/lock" 2>/dev/null || { log "another run holds $LANE/lock"; exit 0; }
 trap 'rmdir "$LANE/lock"' EXIT
 
+# Node 22, the same line CI uses (ci.yml `node-version: 22` = the latest 22.x), from nodejs.org with its
+# checksum checked, kept in $LANE/node. Looks for a newer 22.x at most once a day; whatever Node the Mac
+# has installed is never used.
+ensure_node22() {
+  local dist=https://nodejs.org/dist/latest-v22.x arch tarball sums want have stamp="$LANE/node.checked"
+  if [ -x "$LANE/node/bin/node" ] && [ -n "$(find "$stamp" -mtime -1 2>/dev/null)" ]; then return 0; fi
+  [ "$(uname -m)" = arm64 ] && arch=arm64 || arch=x64
+  sums=$(curl -fsSL "$dist/SHASUMS256.txt") || { [ -x "$LANE/node/bin/node" ]; return; }
+  tarball=$(awk -v a="darwin-$arch.tar.gz" '$2 ~ a"$" {print $2}' <<<"$sums")
+  want=${tarball%-darwin-*}; want=${want#node-}
+  have=$("$LANE/node/bin/node" -v 2>/dev/null)
+  if [ "$have" != "$want" ]; then
+    log "installing Node $want for the lane"
+    rm -rf "$LANE/node-dl" && mkdir -p "$LANE/node-dl" &&
+    curl -fsSL "$dist/$tarball" -o "$LANE/node-dl/$tarball" &&
+    (cd "$LANE/node-dl" && grep " $tarball\$" <<<"$sums" | shasum -a 256 -c - >/dev/null) &&
+    tar -xzf "$LANE/node-dl/$tarball" -C "$LANE/node-dl" &&
+    rm -rf "$LANE/node" && mv "$LANE/node-dl/${tarball%.tar.gz}" "$LANE/node" &&
+    rm -rf "$LANE/node-dl" || { log "Node $want download failed"; [ -x "$LANE/node/bin/node" ]; return; }
+  fi
+  touch "$stamp"
+}
+ensure_node22 || { log "no Node 22 for the lane, skipping this run"; exit 0; }
+export PATH="$LANE/node/bin:$PATH"
+case "$(node -v)" in v22.*) ;; *) log "node on PATH is $(node -v), not 22; skipping this run"; exit 0 ;; esac
+
 [ -d "$WORK/.git" ] || git clone -q "https://github.com/$REPO.git" "$WORK"
 cd "$WORK" || exit 1
 

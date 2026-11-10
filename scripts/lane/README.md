@@ -35,4 +35,7 @@ On failure it comments on the PR with the last 60 lines of the log, swaps `ready
 - Run now: `launchctl kickstart gui/$(id -u)/com.goblin.merge-lane`
 - Stop: `launchctl bootout gui/$(id -u)/com.goblin.merge-lane`
 
+The checks run on Node 22, like CI: the script downloads the latest 22.x from nodejs.org (checksum
+checked) into `~/.goblin-lane/node` and looks for a newer 22.x once a day. The Mac's own Node is not used.
+
 It only runs while the Mac is awake and logged in. Tier 2 (emulator) tests are not part of it.
