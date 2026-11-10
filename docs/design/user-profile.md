@@ -1,6 +1,6 @@
 # The user profile: what we keep about a person, what it powers, and how they control it
 
-Status: plan, 10 Nov 2026. No product code in this PR. Owner of this contract: the profile thread. The
+Status: plan, 10 Nov 2026 (decisions answered 10 Nov; storage re-evaluated in §3). No product code in this PR. Owner of this contract: the profile thread. The
 **attempt record** (what one skill run writes on the spine) is owned by the runtime plan,
 [`dbt-modules-plan.md` §C1](dbt-modules-plan.md), which extends
 [`skill-runtime.md` "The attempt record"](skill-runtime.md) (PR #54). This doc links to it and does not
@@ -56,14 +56,55 @@ yes** (an offer, or a tap on *Keep this*).
 
 ## 3. Where it's stored
 
-**Everything in Neo4j, in the person's own subgraph.** No second store.
+**Everything stays in Neo4j, in the person's own subgraph. No second store for now.** Claudia asked
+(10 Nov) whether user data belongs in Neo4j at all, or whether it should move to Firestore while the graph
+keeps only content. Here is the comparison.
 
-Why not Firestore (or any second database) for the profile: export, delete and retention are one generic
-query each over `:UserData {ownerId}`, so a new label is covered by registering it. A second store means a
-second export, a second delete, a second retention job, and a cross-store join for every reader that
-mixes profile and history (the router, Reflect, offers, parts trails). The profile is also *relational*:
-a `MyPattern` points at a tool and a pattern, a `Part` at protective moves and hurts, a `Person` will be
-referenced by check-ins, plans and kit cards. That is what the graph is for.
+### 3.1 Is Neo4j an unusual place for user data?
+
+Partly, yes. Most apps keep user data in a document or relational store and use a graph only for the
+relationships it's best at. Starting from nothing today, "content graph in Neo4j, user data in Firestore"
+would be a reasonable design. Neo4j still isn't a *bad* place for it: it's a transactional database
+(ACID, constraints, one transaction across several writes), and this app reaches it only through Cloud
+Functions. The question that matters is whether moving now pays for itself.
+
+### 3.2 What moving to Firestore would involve
+
+| | Today (Neo4j only) | Profile and history in Firestore, content in Neo4j |
+|---|---|---|
+| **What's live** | 25 user-data labels (`layers.ts`), written and read by 40 function files (~8,000 lines) and covered by ~7,800 lines of fake-driver unit tests | All 40 files rewritten. Live data is small (one person), so the data migration is easy; the cost is the code |
+| **Joins with content** | 25 of those 40 files join user data to graph content inside one query: parts to `ProtectiveMove` / `ProtectedHurt` (the safety flag, trails, stats, the den), `FOUND_WORD` and check-ins to `Emotion`, `SAVED_LINE` / `SHOWED_LINE` to `ValidationLine`, offers to `PatternRule`, sessions to `PracticeSkill` / `FollowUpType` | Every one of those becomes "read Firestore, read Neo4j, join in code". Parts would take the longest: `partSafetyCypher`, trails rules A–D and `sessionMoves.ts` are graph walks over the person's sessions and the move vocabulary |
+| **Finalise-once and "only on a yes"** | `GUARDS.<Label>` in each write's `WHERE`, in the same transaction as the write; test-enforced | Possible with Firestore transactions, but every guard and its tests get rewritten |
+| **Export / delete / retention** | One generic query each over `:UserData {ownerId}`; a new label is covered once it's registered | Two of each, kept in step. Firestore TTL policies handle retention well; delete has to succeed in both stores or report a partial failure |
+| **Security rules** | Client has no database access at all; Functions check the uid | Rules would be "client may read own docs, never write". Writes still have to go through Functions, because of validation, finalise-once and the yes rule. Gain: direct reads |
+| **Speed** | Every read is a callable; a cold one has taken 2.8 s | Me and profile slices could read straight from the client with an offline cache. **This is the one real user-facing gain** |
+| **Offline / signed out** | Signed out has no profile, by design | Offline helps signed-in people only. Signed out would still need anonymous auth plus a merge on sign-up |
+| **Crew read-only login sees user data** | Real gap (§8 #2) | Closed by the split |
+| **Personal ranking** | One read transaction: the person's closes for this pattern plus graph priority | Works the same: the ranking is a per-person count of closes by tool and pattern, which needs no graph join (§6). Neither store wins here |
+
+On "preferences + history + an algorithm + the graph, like a RAG model": that *is* the plan in §5–§6,
+and it works the same whichever store holds the history. It isn't RAG, which means retrieving text for a
+language model to write from. It's a recommender: graph rules pick the candidates, and your own
+confirmed history reorders them. No model ever reads user data (§8).
+
+### 3.3 Recommendation
+
+**Don't migrate now.** It means rewriting most of the functions layer and its tests for one user-facing
+gain (faster Me and profile reads). The other gains can be had more cheaply:
+
+- **Crew exposure:** take the crew off the production database. It reads a content-only export, the same
+  `graph-export.mjs --content-only` that `build.mjs` already refuses to accept with any user node in it.
+- **Retention:** a daily scheduled function (§8 #1). Firestore isn't needed for that.
+- **Speed:** keep the warm-up pattern (`{ warm: true }`), and let Me prefetch on app open.
+
+**When to look again** (any one of these): more than a handful of real users and Aura cost or latency
+shows up; signed-in offline becomes a requirement (e.g. the safety plan has to open with no signal and
+device-only isn't enough); or the crew, or anyone else, needs prod access that Aura's roles can't limit
+to content. If the move happens, it happens whole (all user labels, through `layers.ts`), never as a
+second store for "new" data only. Half in each store is the worst outcome: two exports, two deletes,
+and joins in code.
+
+### 3.4 Layout
 
 | Data | Stored as | Example |
 |---|---|---|
@@ -229,7 +270,16 @@ A card picked because of a **confirmed** pattern may carry one line from the gra
 helps"). Evidence alone changes the order silently: saying "this helped you 3 times" on the result
 screen would be a statement about the person they never agreed to (the `reflect.md` rule).
 
-### 6.4 Before switching it on
+### 6.4 Build up history first (Claudia, 10 Nov)
+
+Personal ranking stays **observe-only** until there's enough history to trust it. Phase 1: compute the
+boost on every check-in and record it on the result (`routing.personal = { applied: false, wouldReorder }`)
+without changing the cards. Patterns the person confirms (*you said this helps*) collect through the
+offer in the meantime. It switches on only after Claudia has looked at the dry run, and when it does, only
+confirmed patterns count at first. Evidence-only boosting is a later, separate switch
+(`RoutingPolicy.personalEvidenceEnabled`).
+
+### 6.5 Before switching it on
 
 Replay it over Claudia's own history read-only (`scripts/recommendations/personal-dry-run.mjs`, opaque
 keys, the way `trails-dry-run.mjs` works) and over the fixtures, and pin in tests: a contraindicated tool
@@ -277,9 +327,9 @@ Gaps to close (in order of risk):
 | # | Gap | Fix |
 |---|---|---|
 | 1 | Retention runs only when `getUserProfile` loads, so a person who stops opening the app keeps their history forever, against their setting | Daily `onSchedule` (planned as PR-S8; never built) |
-| 2 | The Slack crew's read-only Aura credential can read user data (`graph.md` open question) | A role or query denylist that excludes `:UserData` and `User` from crew reads; `pulse` keeps counts only |
+| 2 | The Slack crew's read-only Aura credential can read user data (`graph.md` open question) | Give the crew no production credential: it reads a content-only export (`graph-export.mjs --content-only`), and `pulse` gets counts from a function that returns numbers only (§3.3) |
 | 3 | No App Check on callables | Turn on App Check for every callable (D-12 said "with the safety batch") |
-| 4 | Sensitive free text (own lines, part own words, `ext.run` own words, later `Person` labels and safety-plan contacts) is plaintext in Aura (encrypted at rest by Aura, readable by anyone with DB access) | Default: leave as is now; **when `SafetyPlan` or `Person` ships**, encrypt their free-text fields at the application layer (a KMS key held by Functions) and offer device-only storage. Decision P5 |
+| 4 | Sensitive free text (own lines, part own words, `ext.run` own words, later `Person` labels and safety-plan contacts) is plaintext in Aura (encrypted at rest by Aura, readable by anyone with DB access) | **Decided (P5): encrypt own-words free text at the application layer from the first module lane on**: envelope encryption, one data key per person wrapped by a Cloud KMS key that only Functions can use, cached per function instance. New own-words fields (`ext.run` answers' `valueOwn`, kept items' own text, `Person` labels, safety-plan contacts) are written encrypted from day one; existing ones (own lines, part own words) are re-encrypted by a one-off migration. Device-only storage stays an option for the plan and kit. Cost: well under a millisecond per field, plus one KMS call per cold instance (~10–30 ms). Not noticeable. Encrypted fields can't be searched or counted in Cypher, which is fine: own words are never queried, only shown back. Delete gets stronger too: dropping a person's data key makes any copy of their text unreadable, backups included |
 | 5 | `localStorage` holds the settings cache (incl. `partsEnabled`) and DEAR MAN resume drafts with own words (≤ 24 h, cleared on sign-out; an expired draft that is never read stays until sign-out or the next read) | Pin the settings cache's field list in a test; sweep expired resume tokens on app start; any new runtime resume draft (the skill player) uses the same token store and rules, and never holds ask-fresh fields |
 | 6 | Function logs | Keep `errorTag`-only logging; a test that no profile write logs its payload |
 | 7 | Deleted data survives in Aura backups until they expire | Say so in the privacy copy with the backup window; no code |
@@ -295,8 +345,8 @@ scoped per area, revocable.
 | Step | What | Depends on |
 |---|---|---|
 | P1 | `kinds.ts` registry + `keepProfileItem` / `editProfileItem` / `deleteProfileItem`; move `quiet_hours` onto it; Me's delete and "Used by" | Nothing; lands before the runtime's keep step needs it |
-| P2 | Retention on a schedule; settings-cache pin test; crew denylist | Nothing |
-| P3 | Personal ranking read model behind `personalEnabled`, plus its dry run | Enough answered closes; the runtime's `ext.run` for skills on the player |
+| P2 | Retention on a schedule; settings-cache pin test; crew off the production database; own-words encryption helper (`shared/crypto.ts`) and the migration for existing own words | Nothing; encryption lands before the first module lane writes own words |
+| P3 | Personal ranking read model, observe-only (§6.4), plus its dry run | Enough answered closes; the runtime's `ext.run` for skills on the player |
 | P4 | Dry-run `what_helps_better` on real counts, then switch it on (D-10 said after four weeks; it's been five, with one user) | Claudia's look at the counts |
 | P5 | First module kinds: `cope_ahead_plan` (Cope Ahead's port), `body_flags` (DT-01), `person` (IE-03) | Their module lanes |
 | P6 | Readable export | P1 |
@@ -306,13 +356,13 @@ scoped per area, revocable.
 
 ## 10. Decisions for Claudia
 
-Each has a default that applies if nothing is said.
+Answered 10 Nov.
 
-| # | Decision | Default |
+| # | Decision | Answer |
 |---|---|---|
-| P1 | Keep every piece of user data in Neo4j (no Firestore) | **Yes** |
-| P2 | How much can your own history move a recommendation? | **Reorders tools of equal priority only**, never above a higher-priority row, never past a safety filter |
-| P3 | Can a result card say *why* from your history? | **Only for a pattern you confirmed** ("You said this one helps"); evidence alone reorders silently |
-| P4 | A real "delete this" on single items in Me, beside *not any more* | **Yes**, two-step confirm |
-| P5 | Encrypt free text (people, safety plan contacts) at the application layer | **Not now; yes when `Person` / `SafetyPlan` ship**, plus a device-only option for the plan and kit |
-| P6 | Cope Ahead's kept plan moves from an own line to a `CopeAheadPlan` | **Yes, when Cope Ahead moves onto the runtime** (existing own lines stay as they are) |
+| P1 | Keep every piece of user data in Neo4j (no Firestore) | **Asked to re-evaluate.** §3 compares the two; recommendation: stay, with the triggers in §3.3 for revisiting. Waiting on Claudia |
+| P2 | How much can your own history move a recommendation? | **Agreed:** reorders tools of equal priority only, never above a higher-priority row, never past a safety filter |
+| P3 | Can a result card say *why* from your history? | **Agreed:** only for a pattern you confirmed. Also: build up the history first; observe-only until then (§6.4) |
+| P4 | A real "delete this" on single items in Me | **Agreed**, two-step confirm |
+| P5 | Encrypt free text at the application layer | **Yes, from the start of the module lanes** (§8 #4), not later |
+| P6 | Cope Ahead's kept plan moves to a `CopeAheadPlan` | **Agreed**, when Cope Ahead moves onto the runtime |
