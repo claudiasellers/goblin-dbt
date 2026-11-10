@@ -3,6 +3,7 @@ import type { EmbedOutput, EmbedOutputSchema, EmbedPropSpec } from '../../data/s
 import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
 import { WitnessEmbed } from './WitnessEmbed';
+import { RebellionCard } from './RebellionCard';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -33,12 +34,14 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   partsLine: PartsLine,
   holdRing: HoldRingEmbed,
   witness: WitnessEmbed,
+  rebellionCard: RebellionCard,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   partsLine: {},
   holdRing: { ids: ['held', 'partly', 'skipped'], measures: ['durationSec', 'doneCount', 'earlyCount'] },
   witness: { ids: ['yes', 'sort_of', 'no', 'none_fit', 'own', 'skip', 'seen'] },
+  rebellionCard: { ids: ['now', 'today', 'week'] },
 };
 
 /**
@@ -65,5 +68,17 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     wordsFrom: { type: 'field', optional: true },
     emotionsFrom: { type: 'field', optional: true },
     next: { type: 'copy', optional: true },
+  },
+  rebellionCard: {
+    squeezeField: { type: 'field' },
+    functionField: { type: 'field' },
+    pickField: { type: 'field' },
+    against: { type: 'copy' },
+    for: { type: 'copy' },
+    fallback: { type: 'copy' },
+    whenLabel: { type: 'copy' },
+    now: { type: 'copy' },
+    today: { type: 'copy' },
+    week: { type: 'copy' },
   },
 };

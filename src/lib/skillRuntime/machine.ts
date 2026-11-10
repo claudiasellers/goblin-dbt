@@ -428,16 +428,21 @@ export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { a
 /**
  * Resume (R9): a run reopened from its own record (`ext.run`, the same visit's answers read back, so not a
  * pre-fill from memory), at `at` if the record's path went through it. Ask-fresh fields are never restored:
- * they are asked again. Null when the record isn't this skill's version or `at` isn't a step it reached.
+ * they are asked again, so the run reopens no later than the first step on its path that asks one (what comes
+ * after it may hang on that answer). A hand-off reopened works out its offers again. Null when the record isn't
+ * this skill's version or `at` isn't a step it reached. `keepFresh` is for the review page only (dev/
+ * skills-review.tsx, which shows every step from a made-up run); the app never passes it.
  */
-export function resumeRun(ctx: RunContext, rec: unknown, at: string | null): RunState | null {
+export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { keepFresh = false }: { keepFresh?: boolean } = {}): RunState | null {
   if (!rec || typeof rec !== 'object') return null;
   const r = rec as { skillId?: unknown; versionId?: unknown; path?: unknown; answers?: unknown };
   if (r.skillId !== ctx.skill.id || r.versionId !== ctx.skill.version || !Array.isArray(r.path)) return null;
   const path = (r.path as unknown[]).filter((x): x is string => typeof x === 'string' && ctx.skill.steps.some((st) => st.id === x));
-  const stepId = at && path.includes(at) ? at : path[path.length - 1];
+  let stepId = at && path.includes(at) ? at : path[path.length - 1];
   if (!stepId) return null;
-  const fresh = new Set(allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
+  const fresh = new Set(keepFresh ? [] : allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
+  const asksFresh = path.findIndex((id) => (stepOf(ctx.skill, id).fields ?? []).some((f) => fresh.has(f.id)));
+  if (asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
   const answers: Answers = {};
   for (const a of Array.isArray(r.answers) ? r.answers as Array<Record<string, unknown>> : []) {
     const fieldId = a.fieldId;
@@ -447,7 +452,12 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null): Run
     answers[fieldId] = { ids, own };
   }
   const upTo = path.slice(0, path.lastIndexOf(stepId) + 1);
-  return { ...initialRun(ctx.skill), stepId, path: upTo.slice(-PATH_MAX), answers: normalize(ctx, answers) };
+  const kept = normalize(ctx, answers);
+  const step = stepOf(ctx.skill, stepId);
+  return {
+    ...initialRun(ctx.skill), stepId, path: upTo.slice(-PATH_MAX), answers: kept,
+    offered: step.kind === 'handoff' ? offersFor(ctx, step, { answers: kept }) : [],
+  };
 }
 
 /** A copy ref's text: a key, or the first conditional key that holds. Slots `{name}` filled from `slots`. */

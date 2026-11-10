@@ -28,13 +28,24 @@ test("every step of every shipped skill has a path from the start, and the revie
 test("the made-up run: the skill's version, the path, each earlier field's first option; the player's resume reads it", async () => {
   const m = await importTs("src/lib/skillRuntime/machine.ts");
   const ctf = shipped.find((s) => s.id === "check_the_facts");
-  const last = ctf.steps.at(-1).id;
+  // The last step on the main path, through the ask-fresh question (v1.1's `safe` card, the danger chips' end, skips it).
+  const freshId = ctf.steps.find((s) => (s.fields ?? []).some((f) => f.askFresh))?.id;
+  const last = ctf.steps.filter((s) => !freshId || r.stepPaths(ctf)[s.id].includes(freshId)).at(-1).id;
   const run = r.reviewRun(ctf, last);
   assert.equal(run.versionId, ctf.version);
   assert.deepEqual(run.path, r.stepPaths(ctf)[last]);
   assert.deepEqual(run.answers[0], { fieldId: "feel", optionIds: [ctf.steps[0].fields[0].options.emotions[0]] });
   const ctx = { skill: ctf, shared: { parentOf: {}, fitsWhen: {} }, carried: [], gridIds: new Set(), emotionLabel: (x) => x, ctxIn: {} };
-  assert.equal(m.resumeRun(ctx, run, last).stepId, last);
+  assert.equal(m.resumeRun(ctx, run, last, { keepFresh: true }).stepId, last);
+  const handoff = ctf.steps.find((s) => s.kind === "handoff" && s.offers.length);
+  if (handoff) {
+    const back = m.resumeRun(ctx, r.reviewRun(ctf, handoff.id), handoff.id, { keepFresh: true });
+    assert.equal(back.stepId, handoff.id);
+    assert.ok(back.offered.length, "the made-up run reaches a hand-off with something to offer");
+    assert.deepEqual(back.offered, m.offersFor(ctx, handoff, back), "a hand-off reopened works out its offers again");
+  }
+  const freshStep = ctf.steps.find((s) => (s.fields ?? []).some((f) => f.askFresh));
+  if (freshStep) assert.equal(m.resumeRun(ctx, run, last).stepId, freshStep.id, "in the app: back to the ask-fresh question");
 });
 
 test("the embeds skill's props pass build.py's embed check (copy keys, ranges, fields)", () => {

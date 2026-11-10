@@ -282,3 +282,18 @@ test("#19 Numb (E4-5, D-14; Oct 2026 review): Shut down; with the 'numb or disco
   assert.equal(r.safetyFlag, undefined);
   assert.equal(r.guidedActivity.activityId, "gentle-movement");
 });
+
+test("DT-11's draft row, switched on, is reachable: Pause leads and Rebel without the wreckage is the swap on the push-back words, never flooded", async () => {
+  const id = "rf_reactive_aggression_words_rebel_alternate-rebellion";
+  const g = { ...on, recommendedFor: on.recommendedFor.map((r) => (r.id === id ? { ...r, active: true } : r)) };
+  assert.ok(g.recommendedFor.some((r) => r.id === id), "the row exists");
+  for (const word of ["Provoked", "Indignant"]) {
+    const r = await run(hu({ emotions: [word] }), g);
+    assert.equal(r.pattern.id, "reactive_aggression", word);
+    assert.deepEqual(ids(r), ["pause", "alternate-rebellion"], word);
+    assert.equal(r.tools[1].ruleId, id, word);
+    assert.ok(!ids(await run(hu({ emotions: [word], band: "flooded" }), g)).includes("alternate-rebellion"), `${word}, flooded`);
+  }
+  // Off (as shipped), the result is unchanged.
+  assert.deepEqual(ids(await run(hu({ emotions: ["Provoked"] }))), ["pause", "cool-down"]);
+});

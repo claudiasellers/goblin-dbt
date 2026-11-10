@@ -128,10 +128,17 @@ CONCEPT_TAGS["cope-ahead"] = {"concept": "dbt_cope_ahead", "side": "change", "sk
 # Check the Facts has shipped on the skill runtime (appToolId 'check-the-facts', docs/design/skill-runtime.md):
 # out of PLANNED; its six rows stay switched off and drafts until Claudia signs them off, row by row.
 CONCEPT_TAGS["check-the-facts"] = {"concept": "dbt_check_facts", "side": "change", "skillKind": "change", "direction": "neutral"}
+# Rebel without the wreckage (DT-11) has shipped on the skill runtime (appToolId 'alternate-rebellion'): its one
+# row is written switched off and a draft until Claudia signs it off (plan D15). Its skillKind is `redirect` (the
+# urge acted on in a harmless form), not `hold` (sitting with it without acting, Pause's kind): with `hold` the
+# diversity rule could never set it beside Pause, and its one row could never show.
+CONCEPT_TAGS["alternate-rebellion"] = {"concept": "dbt_alternate_rebellion", "side": "acceptance", "skillKind": "redirect", "direction": "neutral"}
+
 # It isn't working (ER-14, appToolId 'er-troubleshoot', docs/design/er-troubleshoot.md) has no RECOMMENDED_FOR rows
 # by design: it answers "I did a skill and it didn't help", which no check-in state names. Its entries are skill
 # readouts (Do the Opposite, the wave), the Tools intent and later Reflect, so no concept tags either.
 BUILT_NOT_SIGNED_OFF = {
+    "alternate-rebellion": "built on the skill runtime (DT-11); its row goes live on Claudia's sign-off (docs/design/alternate-rebellion.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
     "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",
 }
@@ -286,6 +293,9 @@ WORD_RULES = [
      "why": "Planned: Check the Facts leads for resentment."},
     {"key": "grievance", "pattern": "reactive_aggression", "tool": "fast", "priority": WORD_NEXT, "words": ["bitter", "resentful"],
      "why": "Planned: FAST as the alternative."},
+    {"key": "rebel", "pattern": "reactive_aggression", "tool": "alternate-rebellion", "priority": 1.5,
+     "words": ["provoked", "indignant"],
+     "why": "DT-11 (PRD): the push-back words, where a rebellion function is likely, get Rebel without the wreckage as the alternative to Pause; never flooded (body first). Anger alone doesn't imply a rebellion function (the PRD's open question), so not every anger word. Not resentful or bitter: their grievance rows (Do the Opposite, Check the Facts, FAST) lead there, and Pause would always take the swap."},
     # --- On replay ---
     {"key": "aversion", "pattern": "rumination_loop", "tool": "opposite-action", "priority": WORD_LEAD, "words": DISGUST_WORDS + ["hesitant", "guilty", "remorseful"],
      "why": "Disgust: Do the Opposite (towards acceptance); guilt: Check the Facts (is it justified?) then repair; hesitation: approach. Do the Opposite leads until Check the Facts ships."},

@@ -27,7 +27,7 @@ test("side labels (WMP-04 v0): change + acceptance → both; same side / both �
 
 test("cards: names, emoji and tagline from tools.ts; unknown ids dropped; ≤ 2; no graph name, no relevance word", () => {
   const cards = rec.recommendationCards({ tools: [
-    card("alternate-rebellion"), card("cool-down", { name: "TIPP", relevance: "medium", slot: "primary", side: "both", ruleId: "rf_x" }),
+    card("tipp-typo"), card("cool-down", { name: "TIPP", relevance: "medium", slot: "primary", side: "both", ruleId: "rf_x" }),
     card("five-senses", { slot: "swap", side: "acceptance" }), card("pause"),
   ] });
   assert.deepEqual(cards.map((c) => [c.tool.id, c.tool.name, c.slot, c.label, c.ruleId]), [

@@ -15,6 +15,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'five-senses': { module: 'dt', closeKind: 'orienting' },
   'pause': { module: 'dt', closeKind: 'urge' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
+  // Rebel without the wreckage (DT-11): "And the urge to blow it up?", the acted answer on the destructive urge.
+  'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
   // Cope Ahead (docs/design/cope-ahead.md): screen 1 already asked when, so no close question; its outcome
   // is the cope_ahead_after card.
