@@ -26,6 +26,7 @@ import { FITS_FACTS_TOOLS, validateAnswer, validateClose, validateRecord, valida
 import { URGE_KINDS, type CloseKind, type DetailKind } from './types';
 import { scheduleTx } from './followUp';
 import { NOT_WHAT_HELPS } from './tools';
+import { projectRun } from '../skills/projections';
 
 /** Detail node labels by kind (a whitelist: the label is interpolated into Cypher). */
 export const DETAIL_LABELS: Record<DetailKind, string> = {
@@ -174,6 +175,8 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       legacyOutcome: NOT_WHAT_HELPS.includes(rec.get('toolId') as string) ? null : legacyOutcome(thenVsNow),
     },
   );
+  // A tool on the skill player whose old record still has readers writes it here, from the plaintext run (R14).
+  await projectRun(tx, uid, c.id, rec.get('toolId') as string, c.ext);
   const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
   const practiced = rec.get('practiced') === true || c.practiced;
   if ((c.status !== 'completed' && !practiced) || (c.skillIds !== null && c.skillIds.length === 0)) return { reps: [], followUps };

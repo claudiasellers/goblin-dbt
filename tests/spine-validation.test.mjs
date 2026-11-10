@@ -20,7 +20,10 @@ test("types mirror: src/data/spineTypes.ts equals functions/src/spine/types.ts (
 test("every interactive tool declares its close; client and server registries agree", () => {
   const page = readFileSync("src/pages/ToolPage.tsx", "utf8");
   const block = page.slice(page.indexOf("const toolComponents"), page.indexOf("};", page.indexOf("const toolComponents")));
-  const components = [...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]);
+  // Hand-built pages, plus the tools the skill player plays (src/lib/skillRuntime/playerTools.ts).
+  const played = readFileSync("src/lib/skillRuntime/playerTools.ts", "utf8");
+  const playedIds = [...played.slice(played.indexOf("PLAYER_TOOLS")).matchAll(/^\s*'([a-z-]+)': '/gm)].map((m) => m[1]);
+  const components = [...[...block.matchAll(/'([a-z-]+)':/g)].map((m) => m[1]), ...playedIds];
   assert.equal(components.length, 14);
   for (const id of components) {
     assert.ok(tools.SPINE_TOOLS[id], `${id}: add it to functions/src/spine/tools.ts`);
