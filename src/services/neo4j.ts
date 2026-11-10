@@ -156,7 +156,7 @@ export interface ActivationPatternResult {
 
 export type RoutingSide = 'acceptance' | 'change' | 'both';
 export type RoutingDirection = 'down' | 'up' | 'orient' | 'neutral';
-export type RoutingSkillKind = 'body' | 'orient' | 'hold' | 'change' | 'naming' | 'relational';
+export type RoutingSkillKind = 'body' | 'orient' | 'hold' | 'change' | 'naming' | 'relational' | 'redirect';
 
 /** Mirrors functions/src/recommendation/types.ts. Cards are named from src/data/tools.ts, never from here. */
 export interface ToolRecommendation {

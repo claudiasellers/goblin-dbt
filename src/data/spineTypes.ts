@@ -17,8 +17,14 @@ export const SPINE_MODULES: readonly SpineModule[] = ['mf', 'dt', 'er', 'ie', 'w
  * urge asks whether the user acted on it; plan asks when (PR-S5); none asks nothing.
  * `regulation_up` (dir up) is reserved until DT authors its wording.
  */
-export type CloseKind = 'regulation_down' | 'orienting' | 'regulation_up' | 'urge' | 'plan' | 'none';
-export const CLOSE_KINDS: readonly CloseKind[] = ['regulation_down', 'orienting', 'regulation_up', 'urge', 'plan', 'none'];
+/**
+ * `urge_change` (plan R7): the two-part close, *Did you act on it?* (`actedOnUrge`) then then-vs-now (down).
+ * Today's card, if the close was skipped, asks the urge part only.
+ */
+export type CloseKind = 'regulation_down' | 'orienting' | 'regulation_up' | 'urge' | 'urge_change' | 'plan' | 'none';
+export const CLOSE_KINDS: readonly CloseKind[] = ['regulation_down', 'orienting', 'regulation_up', 'urge', 'urge_change', 'plan', 'none'];
+/** The kinds that ask "Did you act on the urge?". */
+export const URGE_KINDS: readonly CloseKind[] = ['urge', 'urge_change'];
 
 export type ActedOnUrge = 'no' | 'partly' | 'yes' | 'not_yet';
 export const ACTED_ON_URGE: readonly ActedOnUrge[] = ['no', 'partly', 'yes', 'not_yet'];

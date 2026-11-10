@@ -12,6 +12,7 @@
  * - recordToolSession: both in one transaction, for one-shots (micro-step, guided activity,
  *   help-now, FTF inside the check-in).
  */
+import { encryptExtOwn } from './extOwn';
 import { HttpsError } from 'firebase-functions/v2/https';
 import type { ManagedTransaction } from 'neo4j-driver';
 import { callable } from '../shared/callable';
@@ -22,9 +23,10 @@ import { MERGE_USER, userKey } from '../userdata/ownership';
 import { USER_DATA } from '../userdata/layers';
 import { legacyOutcome, readingProps } from '../capacity/reading';
 import { FITS_FACTS_TOOLS, validateAnswer, validateClose, validateRecord, validateStart, type CloseInput, type StartInput } from './validation';
-import type { CloseKind, DetailKind } from './types';
+import { URGE_KINDS, type CloseKind, type DetailKind } from './types';
 import { scheduleTx } from './followUp';
 import { NOT_WHAT_HELPS } from './tools';
+import { projectRun } from '../skills/projections';
 
 /** Detail node labels by kind (a whitelist: the label is interpolated into Cypher). */
 export const DETAIL_LABELS: Record<DetailKind, string> = {
@@ -123,11 +125,13 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
   if (rec.get('open') !== true) return { reps: rec.get('reps') as string[], followUps: rec.get('followUps') as string[] };
   const closeKind = rec.get('closeKind') as CloseKind;
   // An answer the tool doesn't ask is dropped (the stored closeKind is authoritative).
-  const dir = closeKind === 'regulation_down' ? 'down' : closeKind === 'orienting' ? 'orient' : null;
+  const dir = closeKind === 'regulation_down' || closeKind === 'urge_change' ? 'down' : closeKind === 'orienting' ? 'orient' : null;
   const thenVsNow = dir ? c.thenVsNow : null;
-  const actedOnUrge = closeKind === 'urge' ? c.actedOnUrge : null;
+  const actedOnUrge = URGE_KINDS.includes(closeKind) ? c.actedOnUrge : null;
   const answered = Boolean(thenVsNow || actedOnUrge);
   const detailLabel = c.detail ? DETAIL_LABELS[c.detail.kind] : null;
+  // Own words in ext are stored encrypted (spine/extOwn.ts); their length was checked on the plaintext.
+  const ext = await encryptExtOwn(tx, uid, c.ext);
   // An answer already given in Today (an abandoned session answered before its late close) is final
   // (R2): the close never overwrites it. answeredAt is set last, so the items before it read the old value.
   await tx.run(
@@ -161,7 +165,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
     {
       uid, key, status: c.status, exitStep: c.exitStep, practiced: c.practiced,
       thenVsNow, thenVsNowDir: thenVsNow ? dir : null, actedOnUrge, answered,
-      urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext: c.ext, ...readingProps('bandAtEnd', c.bandAtEnd),
+      urgeIds: c.urgeIds, emotionIds: c.emotionIds, durationSec: c.durationSec, ext, ...readingProps('bandAtEnd', c.bandAtEnd),
       // Ask-fresh, on the log record only (layers.ts ASK_FRESH_FIELDS); another tool's is dropped.
       wiseMindAnswer: rec.get('toolId') === 'wise-mind' ? c.wiseMindAnswer : null,
       fitsFacts: FITS_FACTS_TOOLS.includes(rec.get('toolId') as string) ? c.fitsFacts : null,
@@ -171,6 +175,8 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
       legacyOutcome: NOT_WHAT_HELPS.includes(rec.get('toolId') as string) ? null : legacyOutcome(thenVsNow),
     },
   );
+  // A tool on the skill player whose old record still has readers writes it here, from the plaintext run (R14).
+  await projectRun(tx, uid, c.id, rec.get('toolId') as string, c.ext);
   const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
   const practiced = rec.get('practiced') === true || c.practiced;
   if ((c.status !== 'completed' && !practiced) || (c.skillIds !== null && c.skillIds.length === 0)) return { reps: [], followUps };
@@ -244,10 +250,11 @@ export const answerToolOutcome = callable<unknown, { ok: true; recorded: boolean
     const res = await writeTx((tx) => tx.run(
       `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
        WHERE ${GUARDS.ToolSession.answer('ts')}
-       WITH ts, CASE ts.closeKind WHEN 'regulation_down' THEN 'down' WHEN 'orienting' THEN 'orient' ELSE null END AS dir
+       WITH ts, CASE ts.closeKind WHEN 'regulation_down' THEN 'down' WHEN 'urge_change' THEN 'down'
+                                  WHEN 'orienting' THEN 'orient' ELSE null END AS dir
        WITH ts, dir,
             CASE WHEN dir IS NULL THEN null ELSE $thenVsNow END AS tvn,
-            CASE WHEN ts.closeKind = 'urge' THEN $actedOnUrge ELSE null END AS acted
+            CASE WHEN ts.closeKind IN ['urge', 'urge_change'] THEN $actedOnUrge ELSE null END AS acted
        SET ts.outcomeAskDismissed = CASE WHEN $dismissed AND tvn IS NULL AND acted IS NULL THEN true ELSE ts.outcomeAskDismissed END,
            ts.thenVsNow = coalesce(tvn, ts.thenVsNow),
            ts.thenVsNowDir = CASE WHEN tvn IS NULL THEN ts.thenVsNowDir ELSE dir END,

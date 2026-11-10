@@ -3,7 +3,10 @@
  * transitions, `showWhen`, option filters, offers, links and conditional copy all use it.
  *
  * Refs: `$a.<field>` (its first pick), `$a.<field>.ids` (every pick), `$a.<field>.own` (own words),
- * `$d.<name>` (a derived value), `$opt.<prop>` (the option under test). Anything else is a literal.
+ * `$d.<name>` (a derived value), `$opt.<prop>` (the option under test), `$ctx.<key>` (what the page that opened
+ * the skill passed in: an urge, a person, a frame, a carried band; only keys the skill `accepts`), `$p.<slice>`
+ * (a profile slice the skill's tool declares in PROFILE_NEEDS: present when the person has kept something there;
+ * `.ids` its items' ids). Anything else is a literal.
  * `{set: '$a.<field>'}` is true for a pick or own words; every other operator reads the first pick.
  */
 import type { Cond, OptionDef } from '../../data/skillTypes';
@@ -19,9 +22,20 @@ export interface Scope {
   opt?: OptionDef;
   /** The option objects a field's picks are (for `some`). */
   picked: (fieldId: string) => OptionDef[];
+  /** Context in (`$ctx.*`): ids only, absent keys are null. */
+  ctx?: Readonly<Record<string, string>>;
+  /** Profile slices (`$p.*`): only what the tool's PROFILE_NEEDS reads; null while loading or signed out. */
+  profile?: Readonly<Record<string, unknown>> | null;
 }
 
-const REF = /^\$(a|d|opt)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/;
+/** A profile item's id (most items have `id`; a kept witness line has `lineId`). */
+export function profileItemId(item: unknown): string | null {
+  if (!item || typeof item !== 'object') return null;
+  const o = item as { id?: unknown; lineId?: unknown };
+  return typeof o.id === 'string' ? o.id : typeof o.lineId === 'string' ? o.lineId : null;
+}
+
+const REF = /^\$(a|d|opt|ctx|p)\.([A-Za-z_][A-Za-z0-9_]*)(?:\.(ids|own))?$/;
 
 /** A ref's value, or the literal itself. */
 export function resolve(v: unknown, scope: Scope): unknown {
@@ -36,6 +50,14 @@ export function resolve(v: unknown, scope: Scope): unknown {
     return a?.ids[0] ?? null;
   }
   if (kind === 'd') return scope.derived[name] ?? null;
+  // A context value is one id: `.ids` / `.own` mean nothing on it (build.py refuses them too).
+  if (kind === 'ctx') return part ? null : scope.ctx?.[name] ?? null;
+  if (kind === 'p') {
+    const v = scope.profile?.[name] ?? null;
+    if (part === 'own') return null;
+    if (part === 'ids') return Array.isArray(v) ? v.map(profileItemId).filter((x): x is string => !!x) : [];
+    return v;
+  }
   return (scope.opt as Record<string, unknown> | undefined)?.[name] ?? null;
 }
 

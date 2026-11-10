@@ -13,3 +13,8 @@ declare module 'virtual:review-host-copy' {
   };
   export default host;
 }
+declare module 'virtual:review-witness-lines' {
+  /** The witness corpus's check-in receive lines (dev/review/skillsPlugin.ts), shaped as getWitnessLines serves them. */
+  const lines: import('../../src/data/witnessTypes').WitnessLine[];
+  export default lines;
+}

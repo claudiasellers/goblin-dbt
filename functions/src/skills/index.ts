@@ -18,8 +18,8 @@ export const getSkillContent = callable<unknown, SkillsContent>(
   async () => readTx(async (tx) => {
     const sRes = await tx.run(
       `MATCH (s:Skill) RETURN s.id AS id, s.toolId AS toolId, s.version AS version, s.contentVersion AS contentVersion,
-              s.start AS start, s.ownMax AS ownMax, s.emotionFields AS emotionFields, s.copyJson AS copy,
-              s.tablesJson AS tables, s.deriveJson AS derive ORDER BY s.id`);
+              s.start AS start, s.accepts AS accepts, s.ownMax AS ownMax, s.emotionFields AS emotionFields, s.copyJson AS copy,
+              s.tablesJson AS tables, s.deriveJson AS derive, s.inlineJson AS inline ORDER BY s.id`);
     if (!sRes.records.length || sRes.records.some((r) => r.get('contentVersion') !== SKILLS_VERSION)) {
       throw new HttpsError('failed-precondition', 'Skill content migration is required');
     }
@@ -34,7 +34,8 @@ export const getSkillContent = callable<unknown, SkillsContent>(
        RETURN s.id AS skillId, a.step AS from, x.exit AS exit, o.rowsJson AS rows`);
     const exitRes = await tx.run(
       `MATCH (s:Skill)-[:HAS_EXIT]->(x:SkillExit)
-       RETURN s.id AS skillId, x.exit AS id, x.toolId AS toolId, x.queryJson AS query, x.carry AS carry, x.done AS done ORDER BY x.id`);
+       RETURN s.id AS skillId, x.exit AS id, x.toolId AS toolId, x.queryJson AS query, x.carry AS carry, x.done AS done,
+              x.planned AS planned, x.safety AS safety ORDER BY x.id`);
     const optRes = await tx.run(
       `MATCH (s:Skill)-[h:HAS_OPTION]->(o:SkillOption)
        OPTIONAL MATCH (o)-[:ALTERNATIVE_TO]->(story:SkillOption)
@@ -48,9 +49,12 @@ export const getSkillContent = callable<unknown, SkillsContent>(
        RETURN c.dbtParent AS parent, c.label AS label, c.fitsTheFactsWhen AS lines ORDER BY c.dbtParent`);
 
     const skills: SkillDef[] = sRes.records.map((r) => ({
-      id: r.get('id'), toolId: r.get('toolId'), version: r.get('version'), start: r.get('start'), ownMax: int(r.get('ownMax')),
+      id: r.get('id'), toolId: r.get('toolId'), version: r.get('version'), start: r.get('start'),
+      accepts: (r.get('accepts') as SkillDef['accepts'] | null) ?? [], ownMax: int(r.get('ownMax')),
       emotionFields: (r.get('emotionFields') as string[] | null) ?? [], copy: json(r.get('copy'), {}), tables: json(r.get('tables'), {}),
       derive: json(r.get('derive'), []), steps: [], exits: [], options: {},
+      // Served only when the skill can run inline (R8).
+      ...(json<SkillDef['inline'] | null>(r.get('inline'), null) ? { inline: json<SkillDef['inline']>(r.get('inline'), undefined) } : {}),
     }));
     const by = new Map(skills.map((s) => [s.id, s]));
     for (const r of stepRes.records) {
@@ -71,7 +75,8 @@ export const getSkillContent = callable<unknown, SkillsContent>(
     for (const [st, rows] of offerRows) st.offers = rows.sort((a, b) => a.order - b.order).map(({ exit, when }) => ({ exit, when }));
     for (const r of exitRes.records) {
       const e: ExitDef = { id: r.get('id'), toolId: (r.get('toolId') as string | null) ?? null, query: json(r.get('query'), {}),
-        carry: (r.get('carry') as string[] | null) ?? [], done: r.get('done') === true };
+        carry: (r.get('carry') as string[] | null) ?? [], done: r.get('done') === true,
+        ...(r.get('planned') === true ? { planned: true } : {}), ...(r.get('safety') === true ? { safety: true } : {}) };
       by.get(r.get('skillId'))?.exits.push(e);
     }
     for (const r of optRes.records) {

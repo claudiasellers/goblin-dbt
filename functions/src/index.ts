@@ -9,6 +9,7 @@ import './shared/admin'; // initialise firebase-admin once, before any callable 
 export { saveCheckIn, setCheckInNextAction, getCheckInsByUser } from './checkin';
 export { ensureUserExists, getUserProfile, updateUserProfile, deleteUserData, exportUserData } from './account';
 export { onUserCreated, onUserDeleted } from './account/triggers';
+export { applyRetentionDaily } from './userdata/retention';
 export { trackToolUsage, recordToolOutcome } from './toolUsage';
 export { getInsightsData } from './insights';
 export { getStateAndTools, getDiscriminatingQuestions, getRelatedEmotions } from './recommendation';
@@ -21,6 +22,7 @@ export { getCapacityContent } from './capacity';
 export { getWiseMindContent } from './wiseMind';
 export { getCopeAheadContent } from './copeAhead';
 export { getSkillContent } from './skills';
+export { getSkillRun } from './skills/run';
 export { getBodyMapContent, suggestEmotionsFromBody } from './bodyMap';
 export { getWitnessLines, recordWitnessBeat } from './witness';
 export {
@@ -28,7 +30,8 @@ export {
   scheduleFollowUp, resolveFollowUp, snoozeFollowUp, getToday,
 } from './spine';
 export {
-  getProfileContext, getMe, upsertProfileFact, confirmProfileItem, setAsideProfileItem, restoreProfileItem,
+  getProfileContext, getMe, upsertProfileFact, keepProfileItem, editProfileItem, deleteProfileItem,
+  confirmProfileItem, setAsideProfileItem, restoreProfileItem,
   answerPatternOffer,
 } from './profile';
 export { getPartsEntry, startPartSession, savePartSession, keepPart, queuePartCandidate } from './parts';

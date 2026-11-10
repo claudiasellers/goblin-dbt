@@ -8,7 +8,7 @@ import { THEN_VS_NOW, type CapacityReading, type ThenVsNow } from '../capacity/t
 import { validateExt } from './extSchemas';
 import { RESERVED_ENTRIES, SPINE_TOOLS, thenVsNowDirFor } from './tools';
 import {
-  ACTED_ON_URGE, CLOSE_STATUSES, DETAIL_KINDS, REP_SOURCES, TOOL_ENTRIES,
+  ACTED_ON_URGE, CLOSE_STATUSES, URGE_KINDS, DETAIL_KINDS, REP_SOURCES, TOOL_ENTRIES,
   type ActedOnUrge, type CloseKind, type CloseStatus, type DetailKind, type RepSource, type SpineModule, type ToolEntry,
 } from './types';
 
@@ -100,7 +100,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
   const actedOnUrge = opt(d.actedOnUrge, (x) => oneOf(x, ACTED_ON_URGE));
   if (closeKind) {
     if (thenVsNow && !thenVsNowDirFor(closeKind)) throw new ValidationError('This tool does not ask then-vs-now');
-    if (actedOnUrge && closeKind !== 'urge') throw new ValidationError('This tool does not ask about the urge');
+    if (actedOnUrge && !URGE_KINDS.includes(closeKind)) throw new ValidationError('This tool does not ask about the urge');
   }
   const detail = opt(d.detail, (x) => {
     const o = obj(x);

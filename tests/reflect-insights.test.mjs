@@ -252,3 +252,15 @@ test("wiring: History reads up to the server's ceiling; Insights logs no payload
   const fields = (src) => [...src.match(/interface ToolOutcomeSummary \{([\s\S]*?)\n\}/)[1].matchAll(/^\s+(\w+)\??:/gm)].map((m) => m[1]).sort();
   assert.deepEqual(fields(client), fields(server));
 });
+
+test("outcomeRows: a two-part close (urge_change) counts on its urge answer; then-vs-now alone still counts, down", () => {
+  const rows = c.outcomeRows([
+    session({ id: "1", toolId: "pause", d: 2, closeKind: "urge_change", acted: "no", tvn: "worse" }),
+    session({ id: "2", toolId: "pause", d: 1, closeKind: "urge_change", tvn: "better" }),
+  ], []);
+  assert.equal(rows.length, 2);
+  const urge = rows.find((r) => r.measure === "urge");
+  assert.equal(urge.wentWell, true);
+  const tvn = rows.find((r) => r.measure === "then_vs_now");
+  assert.equal(tvn.direction, "down");
+});

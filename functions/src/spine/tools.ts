@@ -15,6 +15,8 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'five-senses': { module: 'dt', closeKind: 'orienting' },
   'pause': { module: 'dt', closeKind: 'urge' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
+  // Rebel without the wreckage (DT-11): "And the urge to blow it up?", the acted answer on the destructive urge.
+  'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
   // Cope Ahead (docs/design/cope-ahead.md): screen 1 already asked when, so no close question; its outcome
   // is the cope_ahead_after card.
@@ -57,5 +59,5 @@ export const RESERVED_ENTRIES: Record<string, readonly ToolEntry[]> = {
 
 /** then-vs-now direction of a close kind (R3); null when the kind doesn't ask it. */
 export function thenVsNowDirFor(k: CloseKind): 'down' | 'orient' | 'up' | null {
-  return k === 'regulation_down' ? 'down' : k === 'orienting' ? 'orient' : k === 'regulation_up' ? 'up' : null;
+  return k === 'regulation_down' || k === 'urge_change' ? 'down' : k === 'orienting' ? 'orient' : k === 'regulation_up' ? 'up' : null;
 }

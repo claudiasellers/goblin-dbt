@@ -33,11 +33,14 @@ def served(sk):
             o["for"] = extra["for"]
         options.setdefault(lst, []).append(o)
     exits = [{"id": e["id"], "toolId": e.get("toolId"), "query": e.get("query", {}), "carry": e.get("carry", []),
-              "done": bool(e.get("done"))} for e in sorted(sk["exits"], key=lambda e: e["id"])]
+              "done": bool(e.get("done")), **({"planned": True} if e.get("planned") else {}),
+              **({"safety": True} if e.get("safety") else {})} for e in sorted(sk["exits"], key=lambda e: e["id"])]
     return {
-        "id": sk["id"], "toolId": sk["toolId"], "version": sk["version"], "start": sk["start"], "ownMax": sk["ownMax"],
+        "id": sk["id"], "toolId": sk["toolId"], "version": sk["version"], "start": sk["start"],
+        "accepts": sk.get("accepts", []), "ownMax": sk["ownMax"],
         "emotionFields": sk["emotionFields"], "copy": sk["copy"], "tables": sk["tables"], "derive": sk["derive"],
         "steps": steps, "exits": exits, "options": options,
+        **({"inline": sk["inline"]} if sk.get("inline") else {}),
     }
 
 

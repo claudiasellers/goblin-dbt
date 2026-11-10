@@ -4,6 +4,7 @@
  * and (PR-P1) pattern offers. Ordering is pure (todayOrder.ts). A fresh `flooded` band collapses
  * the stack; nothing is hidden.
  */
+import { decryptExtOwn } from './extOwn';
 import type { ManagedTransaction } from 'neo4j-driver';
 import { callable } from '../shared/callable';
 import { readTx } from '../shared/neo4j';
@@ -88,7 +89,7 @@ async function followUpItems(tx: ManagedTransaction, uid: string, types: Map<str
         source: { ...(vars.sourceToolId ? { toolId: vars.sourceToolId } : {}), ...(vars.sourceSessionId ? { toolSessionId: vars.sourceSessionId } : {}),
           ...(vars.detailId ? { detailId: vars.detailId } : {}) },
         // The plan's ids from the visit (never a stored plan string): the card composes the words.
-        ...(t.id === COPE_AHEAD_AFTER ? { plan: planIdsFromExt(r.get('planExt')) } : {}),
+        ...(t.id === COPE_AHEAD_AFTER ? { plan: planIdsFromExt(await decryptExtOwn(tx, uid, r.get('planExt'))) } : {}),
       });
     }
     // OA plans keep their own reminder (useOppositeActionFollowUps); the rest remind from here.
@@ -107,7 +108,7 @@ async function toolOutcomeItem(
   if (!t?.enabled || !flow) return [];
   const res = await tx.run(
     `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession)
-     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge'] AND NOT ts.toolId IN $notWhatHelps
+     WHERE ts.closeKind IN ['regulation_down', 'orienting', 'urge', 'urge_change'] AND NOT ts.toolId IN $notWhatHelps
        AND ts.answeredAt IS NULL AND coalesce(ts.outcomeAskDismissed, false) = false
        AND coalesce(ts.endedAt, ts.startedAt) > datetime() - duration({hours: 12})
        AND (ts.status = 'completed' OR coalesce(ts.practiced, false))
@@ -120,7 +121,8 @@ async function toolOutcomeItem(
   const r = res.records[0];
   if (!r) return [];
   const toolId = r.get('toolId') as string;
-  const kind = r.get('closeKind') as string;
+  // A skipped two-part close comes back as its urge question only (one tap in Today).
+  const kind = (r.get('closeKind') as string) === 'urge_change' ? 'urge' : (r.get('closeKind') as string);
   const q = flow.byTool[toolId]?.[kind] ?? flow.kinds[kind];
   if (!q) return [];
   return [{

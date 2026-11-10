@@ -20,6 +20,13 @@
  * `variant="other_person"`: danger from another person (Cope Ahead's *They might hurt me*), where a suicide
  * and crisis line is the wrong first call. 911 first, then the National Domestic Violence Hotline (call or
  * text), and 988 kept as the last option. Same placement rules: compact or full, alongside, never blocking.
+ * Compact, it packs into three rows (Call 911 · the hotline's name with Call and Text (the text is pre-filled START) · Call 988) so the
+ * step's own quiet links stay above the fold on a phone (DT lane, gate 2): the short labels carry the full name
+ * and number as their accessible name.
+ *
+ * Outside the US (decision D5 of docs/design/dbt-modules-plan.md, until CORE-01's helpline list): a quiet
+ * *Outside the US?* list under the crisis variant, with a few national lines. Closed by default so the US
+ * numbers stay first.
  */
 
 // Must work for someone who is flooded but not suicidal: every
@@ -38,23 +45,61 @@ const OTHER_PERSON_LINKS = [
 
 export type CrisisBannerVariant = 'crisis' | 'other_person';
 
+/** National crisis lines outside the US: country, then each line. */
+const OUTSIDE_US = [
+  { country: 'UK and Ireland', links: [{ href: 'tel:116123', label: 'Call 116 123 (Samaritans)' }] },
+  { country: 'Canada', links: [{ href: 'tel:988', label: 'Call 988' }, { href: 'sms:988', label: 'Text 988' }] },
+  { country: 'Australia', links: [{ href: 'tel:131114', label: 'Call 13 11 14 (Lifeline)' }] },
+  { country: 'New Zealand', links: [{ href: 'tel:1737', label: 'Call 1737' }, { href: 'sms:1737', label: 'Text 1737' }] },
+] as const;
+
+function OutsideUs({ compact }: { compact: boolean }) {
+  return (
+    <details className={`${compact ? 'mt-2 text-sm' : 'mt-4 text-left'} text-[var(--color-q-hu-text)]`} data-testid="crisis-outside-us">
+      <summary className="cursor-pointer min-h-11 flex items-center font-medium">Outside the US?</summary>
+      <ul className="mt-2 space-y-2">
+        {OUTSIDE_US.map((c) => (
+          <li key={c.country}>
+            <span className="block">{c.country}</span>
+            {c.links.map((l) => (
+              <a key={l.href + c.country} href={l.href} className="inline-flex items-center min-h-11 mr-4 underline">{l.label}</a>
+            ))}
+          </li>
+        ))}
+      </ul>
+    </details>
+  );
+}
+
 function OtherPersonBanner({ compact }: { compact: boolean }) {
-  const link = compact
-    ? 'inline-flex items-center min-h-11 py-2 px-3 rounded-lg text-sm font-medium transition-colors'
-    : 'block w-full min-h-11 py-3 px-4 rounded-lg font-medium transition-colors';
   const primary = 'bg-[var(--color-danger)] hover:opacity-90 text-[var(--color-on-danger)]';
   const quiet = 'border border-[var(--color-q-hu-border)] text-[var(--color-q-hu-text)]';
+  if (compact) {
+    const [call911, dvCall, dvText, call988] = OTHER_PERSON_LINKS;
+    const chip = 'inline-flex items-center justify-center min-h-11 px-3 rounded-lg text-sm font-medium transition-colors';
+    return (
+      <section aria-label="Support right now" data-testid="crisis-banner-compact" data-variant="other_person"
+        className="p-3 rounded-xl bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)] space-y-2">
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="text-sm leading-snug text-[var(--color-q-hu-text)] flex-[1_1_8rem]">{OTHER_PERSON_LINE}</p>
+          <a href={call911.href} className={`${chip} ${primary}`}>{call911.label}</a>
+        </div>
+        <div className="flex flex-wrap items-center gap-2" role="group" aria-label="National Domestic Violence Hotline">
+          <span className="text-sm leading-snug text-[var(--color-q-hu-text)] flex-[1_1_7rem]">Domestic Violence Hotline</span>
+          <a href={dvCall.href} aria-label={dvCall.label} className={`${chip} ${quiet}`}>Call</a>
+          <a href={dvText.href} aria-label={dvText.label} className={`${chip} ${quiet}`}>Text</a>
+        </div>
+        <a href={call988.href} className="inline-flex items-center min-h-11 text-sm underline text-[var(--color-q-hu-text)]">{call988.label}</a>
+      </section>
+    );
+  }
   return (
-    <section
-      aria-label="Support right now"
-      data-testid={compact ? 'crisis-banner-compact' : undefined}
-      data-variant="other_person"
-      className={compact ? 'p-3 rounded-xl bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]' : 'mb-6 p-4 rounded-2xl text-center bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]'}
-    >
-      <p className={`${compact ? 'text-sm mb-2' : 'mb-4'} text-[var(--color-q-hu-text)]`}>{OTHER_PERSON_LINE}</p>
-      <div className={compact ? 'flex flex-wrap gap-2' : 'space-y-3'}>
+    <section aria-label="Support right now" data-variant="other_person"
+      className="mb-6 p-4 rounded-2xl text-center bg-[var(--color-q-hu-bg)] border border-[var(--color-q-hu-border)]">
+      <p className="mb-4 text-[var(--color-q-hu-text)]">{OTHER_PERSON_LINE}</p>
+      <div className="space-y-3">
         {OTHER_PERSON_LINKS.map((l) => (
-          <a key={l.href} href={l.href} className={`${link} ${'primary' in l && l.primary ? primary : quiet}`}>{l.label}</a>
+          <a key={l.href} href={l.href} className={`block w-full min-h-11 py-3 px-4 rounded-lg font-medium transition-colors ${'primary' in l && l.primary ? primary : quiet}`}>{l.label}</a>
         ))}
       </div>
     </section>
@@ -81,6 +126,7 @@ export function CrisisBanner({ compact = false, variant = 'crisis' }: { compact?
             Text HOME to 741741
           </a>
         </div>
+        <OutsideUs compact />
       </section>
     );
   }
@@ -108,6 +154,7 @@ export function CrisisBanner({ compact = false, variant = 'crisis' }: { compact?
       >
         Text HOME to 741741
       </a>
+      <OutsideUs compact={false} />
     </section>
   );
 }

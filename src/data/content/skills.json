@@ -163,10 +163,1296 @@
     },
     "skills": [
       {
+        "id": "alternate_rebellion",
+        "toolId": "alternate-rebellion",
+        "version": "ar-v2",
+        "start": "open",
+        "accepts": [
+          "band",
+          "urgeId",
+          "returnTo"
+        ],
+        "ownMax": 140,
+        "emotionFields": [],
+        "copy": {
+          "open_title": "Wanting to rebel usually means something's squeezing you. That's worth listening to.",
+          "flooded_title": "Your body's loud. Settle it a little first.",
+          "flooded_cool": "Cool my body first",
+          "flooded_pause": "Pause first",
+          "squeeze_title": "What's squeezing you?",
+          "squeeze_own": "Something else",
+          "safety_open": "If the urge is to hurt yourself",
+          "function_title": "What would blowing it up give you?",
+          "pick_title": "Pick one that gives you that, without the wreckage.",
+          "pick_title_treatment": "Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick a rebellion built not to cost you tomorrow.",
+          "pick_title_treatment_scared": "Treatment you didn't pick is a real squeeze. Changing it is a talk with your care team first. Pick one nobody else has to see.",
+          "pick_title_scared": "Pick one that gives you that, and that nobody else has to see.",
+          "pick_own": "My own rebellion",
+          "cost_q": "Will this cost you tomorrow?",
+          "noticed_q": "Would they notice it?",
+          "heads_up_title": "That one might cost you tomorrow. Keep it, or pick something lighter?",
+          "heads_up_scared_title": "If they'd notice it, it could cost you. Keep it, or pick a quiet one?",
+          "card_title": "Here's your rebellion. When will you do it?",
+          "itch_title": "Did it scratch the itch?",
+          "itch_hint": "Go and do it first. This screen waits.",
+          "real_title": "And the squeeze itself. Is it something you want to work on?",
+          "next_scared": "You named someone you're scared of. You don't have to work that out alone.",
+          "next_change": "When the squeeze can change, working on it is the bigger rebellion.",
+          "next_say": "Saying it clearly, and keeping your self-respect, is a rebellion too.",
+          "next_cant": "Some squeezes don't move. You still get to choose how much of you they take.",
+          "next_not_now": "The rebellion's yours. The squeeze can wait until you're ready.",
+          "own_hint": "Say it your way",
+          "next": "Next",
+          "done": "Done",
+          "card_against": "Against",
+          "card_for": "For",
+          "card_fallback": "A rebellion built not to cost you tomorrow.",
+          "card_when": "When?",
+          "card_now": "Now",
+          "card_today": "Later today",
+          "card_week": "This week"
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "open",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                },
+                "key": "flooded_title"
+              },
+              {
+                "key": "open_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "first",
+                "options": {
+                  "list": "first"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                },
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "flooded_cool",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "pause",
+                    "label": "flooded_pause",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "squeeze",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "squeeze",
+            "kind": "ask",
+            "title": "squeeze_title",
+            "fields": [
+              {
+                "id": "squeeze",
+                "options": {
+                  "list": "squeeze"
+                },
+                "max": 2,
+                "swap": true,
+                "required": true,
+                "own": {
+                  "hint": "squeeze_own",
+                  "countsAsPick": true
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "function",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "function",
+            "kind": "ask",
+            "title": "function_title",
+            "fields": [
+              {
+                "id": "function",
+                "options": {
+                  "list": "function"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "pick",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "pick",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "all": [
+                    {
+                      "has": [
+                        "$a.squeeze.ids",
+                        "treatment"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.squeeze.ids",
+                        "scared"
+                      ]
+                    }
+                  ]
+                },
+                "key": "pick_title_treatment_scared"
+              },
+              {
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "treatment"
+                  ]
+                },
+                "key": "pick_title_treatment"
+              },
+              {
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                },
+                "key": "pick_title_scared"
+              },
+              {
+                "key": "pick_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "pick",
+                "options": {
+                  "list": "rebellion",
+                  "where": {
+                    "all": [
+                      {
+                        "has": [
+                          "$opt.functions",
+                          "$a.function"
+                        ]
+                      },
+                      {
+                        "any": [
+                          {
+                            "not": {
+                              "has": [
+                                "$a.squeeze.ids",
+                                "scared"
+                              ]
+                            }
+                          },
+                          {
+                            "eq": [
+                              "$opt.quiet",
+                              true
+                            ]
+                          }
+                        ]
+                      },
+                      {
+                        "any": [
+                          {
+                            "not": {
+                              "has": [
+                                "$a.squeeze.ids",
+                                "treatment"
+                              ]
+                            }
+                          },
+                          {
+                            "all": [
+                              {
+                                "not": {
+                                  "eq": [
+                                    "$opt.skips",
+                                    true
+                                  ]
+                                }
+                              },
+                              {
+                                "not": {
+                                  "eq": [
+                                    "$opt.exerts",
+                                    true
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "pick_own",
+                  "countsAsPick": true,
+                  "max": 90
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "cost",
+                "label": "cost_q",
+                "options": {
+                  "list": "cost"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "own": "pick"
+                }
+              },
+              {
+                "id": "noticed",
+                "label": "noticed_q",
+                "options": {
+                  "list": "noticed"
+                },
+                "max": 1,
+                "required": true,
+                "showWhen": {
+                  "all": [
+                    {
+                      "own": "pick"
+                    },
+                    {
+                      "has": [
+                        "$a.squeeze.ids",
+                        "scared"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "heads_up",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.cost",
+                        "yes"
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "has": [
+                            "$a.squeeze.ids",
+                            "scared"
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.noticed",
+                            [
+                              "yes",
+                              "not_sure"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "card",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "heads_up",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "all": [
+                    {
+                      "all": [
+                        {
+                          "has": [
+                            "$a.squeeze.ids",
+                            "scared"
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.noticed",
+                            [
+                              "yes",
+                              "not_sure"
+                            ]
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$a.cost",
+                          "yes"
+                        ]
+                      }
+                    }
+                  ]
+                },
+                "key": "heads_up_scared_title"
+              },
+              {
+                "key": "heads_up_title"
+              }
+            ],
+            "fields": [
+              {
+                "id": "heads_up",
+                "options": {
+                  "list": "heads_up"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "pick",
+                "when": {
+                  "eq": [
+                    "$a.heads_up",
+                    "lighter"
+                  ]
+                }
+              },
+              {
+                "to": "card",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "card",
+            "kind": "embed",
+            "embed": "rebellionCard",
+            "answerAs": "when",
+            "title": "card_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "props": {
+              "squeezeField": "squeeze",
+              "functionField": "function",
+              "pickField": "pick",
+              "against": "card_against",
+              "for": "card_for",
+              "fallback": "card_fallback",
+              "whenLabel": "card_when",
+              "now": "card_now",
+              "today": "card_today",
+              "week": "card_week"
+            },
+            "next": [
+              {
+                "to": "itch",
+                "when": {
+                  "eq": [
+                    "$a.when",
+                    "now"
+                  ]
+                }
+              },
+              {
+                "to": "real",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "itch",
+            "kind": "ask",
+            "title": "itch_title",
+            "hint": "itch_hint",
+            "fields": [
+              {
+                "id": "itch",
+                "options": {
+                  "list": "itch"
+                },
+                "max": 1
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "real",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "real",
+            "kind": "ask",
+            "title": "real_title",
+            "fields": [
+              {
+                "id": "real",
+                "options": {
+                  "list": "real"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "next",
+            "kind": "handoff",
+            "complete": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                },
+                "key": "next_scared"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.real",
+                    "change"
+                  ]
+                },
+                "key": "next_change"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.real",
+                    "say"
+                  ]
+                },
+                "key": "next_say"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.real",
+                    "cant"
+                  ]
+                },
+                "key": "next_cant"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.real",
+                    "not_now"
+                  ]
+                },
+                "key": "next_not_now"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "ending",
+                "when": {
+                  "has": [
+                    "$a.squeeze.ids",
+                    "scared"
+                  ]
+                }
+              },
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.real",
+                        "change"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.squeeze.ids",
+                          "scared"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "dear_man",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.real",
+                        "say"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.squeeze.ids",
+                          "scared"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "fast",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.real",
+                        "say"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.squeeze.ids",
+                          "scared"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "let_it_be",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.real",
+                        "cant"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "has": [
+                          "$a.squeeze.ids",
+                          "scared"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "dear_man",
+            "toolId": "dear-man",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "ending",
+            "toolId": "ending-relationships",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "fast",
+            "toolId": "fast",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "let_it_be",
+            "toolId": "let-it-be",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "pause",
+            "toolId": "pause",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "problem_solve",
+            "toolId": "problem-solve",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          }
+        ],
+        "options": {
+          "first": [
+            {
+              "value": "anyway",
+              "label": "Keep going anyway"
+            }
+          ],
+          "squeeze": [
+            {
+              "value": "rules",
+              "label": "Rules I didn't pick"
+            },
+            {
+              "value": "told_who",
+              "label": "Told who to be"
+            },
+            {
+              "value": "controlling",
+              "label": "Someone controlling me"
+            },
+            {
+              "value": "stuck",
+              "label": "Stuck"
+            },
+            {
+              "value": "scared",
+              "label": "Someone I'm scared of",
+              "danger": "other"
+            },
+            {
+              "value": "plan_cage",
+              "label": "My plan feels like a cage"
+            },
+            {
+              "value": "treatment",
+              "label": "Treatment I didn't pick",
+              "treatment": true
+            },
+            {
+              "value": "be_fine",
+              "label": "Expected to be fine"
+            }
+          ],
+          "function": [
+            {
+              "value": "freedom",
+              "label": "Freedom"
+            },
+            {
+              "value": "seen",
+              "label": "Being seen"
+            },
+            {
+              "value": "control",
+              "label": "Control back"
+            },
+            {
+              "value": "break",
+              "label": "A break"
+            },
+            {
+              "value": "prove",
+              "label": "Proving them wrong"
+            },
+            {
+              "value": "alive",
+              "label": "Feeling alive"
+            }
+          ],
+          "rebellion": [
+            {
+              "value": "different_route",
+              "label": "Take a different way home, for the change",
+              "functions": [
+                "freedom"
+              ],
+              "when": "today",
+              "visibility": "public",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "say_no",
+              "label": "Say no to one optional thing today",
+              "functions": [
+                "freedom"
+              ],
+              "when": "today",
+              "visibility": "public",
+              "reversible": true,
+              "cost": "none",
+              "skips": true
+            },
+            {
+              "value": "unplanned_hour",
+              "label": "Keep one hour today with no plan at all",
+              "functions": [
+                "freedom",
+                "break"
+              ],
+              "when": "today",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "phone_away",
+              "label": "Put your phone in another room for an hour",
+              "functions": [
+                "freedom"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "daydream",
+              "label": "Daydream, in detail, the day you'd pick",
+              "functions": [
+                "freedom",
+                "alive"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "keep_yours",
+              "label": "Keep one thought today that's only yours",
+              "functions": [
+                "freedom",
+                "control"
+              ],
+              "when": "today",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "wear_it",
+              "label": "Wear the thing you'd never wear",
+              "functions": [
+                "seen",
+                "alive"
+              ],
+              "when": "today",
+              "visibility": "public",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "hair",
+              "label": "Style your hair a way nobody expects",
+              "functions": [
+                "seen"
+              ],
+              "when": "today",
+              "visibility": "public",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "say_true",
+              "label": "Tell someone safe one thing you usually keep quiet",
+              "functions": [
+                "seen"
+              ],
+              "when": "week",
+              "visibility": "public",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "say_aloud",
+              "label": "Say out loud, alone, what you wish someone heard",
+              "functions": [
+                "seen",
+                "prove"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "picture_seen",
+              "label": "Picture yourself, in detail, as you'd like to be seen",
+              "functions": [
+                "seen"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "sing",
+              "label": "Sing along under your breath, or in your head",
+              "functions": [
+                "seen",
+                "alive"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "rearrange",
+              "label": "Rearrange your room tonight",
+              "functions": [
+                "control"
+              ],
+              "when": "today",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "cancel_plan",
+              "label": "Cancel one optional plan",
+              "functions": [
+                "control",
+                "break"
+              ],
+              "when": "today",
+              "visibility": "public",
+              "reversible": true,
+              "cost": "none",
+              "skips": true
+            },
+            {
+              "value": "my_order",
+              "label": "Do today's chores in your own order",
+              "functions": [
+                "control"
+              ],
+              "when": "today",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "choose_ten",
+              "label": "Choose every minute of the next ten",
+              "functions": [
+                "control",
+                "break"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "decide_tomorrow",
+              "label": "Decide, in your head, one thing about tomorrow that's yours",
+              "functions": [
+                "control"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "skip_chore",
+              "label": "Skip an optional chore on purpose, guilt-free",
+              "functions": [
+                "break"
+              ],
+              "when": "today",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "skips": true
+            },
+            {
+              "value": "do_nothing",
+              "label": "Do nothing for twenty minutes, on purpose",
+              "functions": [
+                "break"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "write_unsent",
+              "label": "Write what you'd tell them on paper, and keep it unsent",
+              "functions": [
+                "prove"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "start_yours",
+              "label": "Start one small thing that's yours",
+              "functions": [
+                "prove"
+              ],
+              "when": "week",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none"
+            },
+            {
+              "value": "three_things",
+              "label": "Name three things you've done that nobody saw coming",
+              "functions": [
+                "prove"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "learn",
+              "label": "Learn one small new thing today, for you",
+              "functions": [
+                "prove"
+              ],
+              "when": "today",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "loud_song",
+              "label": "Play the loud song in one earbud, all the way through",
+              "functions": [
+                "alive"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true
+            },
+            {
+              "value": "shake_out",
+              "label": "Shake it out, quietly, for one song",
+              "functions": [
+                "alive"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "quiet": true,
+              "exerts": true
+            },
+            {
+              "value": "walk_fast",
+              "label": "Go outside and walk faster than you need to",
+              "functions": [
+                "alive"
+              ],
+              "when": "now",
+              "visibility": "private",
+              "reversible": true,
+              "cost": "none",
+              "exerts": true
+            }
+          ],
+          "cost": [
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "a_little",
+              "label": "A little"
+            },
+            {
+              "value": "yes",
+              "label": "Yes"
+            }
+          ],
+          "noticed": [
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "not_sure",
+              "label": "Not sure"
+            },
+            {
+              "value": "yes",
+              "label": "Yes"
+            }
+          ],
+          "heads_up": [
+            {
+              "value": "lighter",
+              "label": "Pick something lighter"
+            },
+            {
+              "value": "keep",
+              "label": "Keep it anyway"
+            }
+          ],
+          "itch": [
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "a_bit",
+              "label": "A bit"
+            },
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            }
+          ],
+          "real": [
+            {
+              "value": "change",
+              "label": "It could change, and I want to try"
+            },
+            {
+              "value": "say",
+              "label": "Someone I want to say something to"
+            },
+            {
+              "value": "cant",
+              "label": "It won't change"
+            },
+            {
+              "value": "not_now",
+              "label": "Not right now"
+            }
+          ]
+        }
+      },
+      {
         "id": "check_the_facts",
         "toolId": "check-the-facts",
         "version": "cf-v1",
         "start": "feel",
+        "accepts": [],
         "ownMax": 140,
         "emotionFields": [
           "feel"

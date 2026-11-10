@@ -31,7 +31,7 @@ def lit(v):
 
 
 SIDES = {"acceptance", "change", "both"}
-KINDS = {"body", "orient", "hold", "change", "naming", "relational"}
+KINDS = {"body", "orient", "hold", "change", "naming", "relational", "redirect"}
 DIRECTIONS = {"down", "up", "orient", "neutral"}
 
 

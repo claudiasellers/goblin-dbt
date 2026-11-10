@@ -23,10 +23,10 @@ test('every export is a function whose deploy manifest matches the fixture', () 
   }
 });
 
-test('the only declared params are the three Neo4j secrets', () => {
+test('the only declared params are the three Neo4j secrets and the own-words key', () => {
   const { declaredParams } = require('firebase-functions/params');
   assert.deepEqual(
     declaredParams.map((p) => p.name).sort(),
-    ['NEO4J_PASSWORD', 'NEO4J_URI', 'NEO4J_USER'],
+    ['NEO4J_PASSWORD', 'NEO4J_URI', 'NEO4J_USER', 'OWN_WORDS_KEY'],
   );
 });

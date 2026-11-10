@@ -497,8 +497,9 @@ export function buildSkills(g) {
     }
   }
   const skills = nodes.map((n) => n.props).sort((a, b) => asc(a.id, b.id)).map((s) => ({
-    id: s.id, toolId: s.toolId, version: s.version, start: s.start, ownMax: intOrNull(s.ownMax), emotionFields: s.emotionFields ?? [],
+    id: s.id, toolId: s.toolId, version: s.version, start: s.start, accepts: s.accepts ?? [], ownMax: intOrNull(s.ownMax), emotionFields: s.emotionFields ?? [],
     copy: json(s.copyJson, {}), tables: json(s.tablesJson, {}), derive: json(s.deriveJson, []), steps: [], exits: [], options: {},
+    ...(json(s.inlineJson, null) ? { inline: json(s.inlineJson, null) } : {}),
   }));
   const by = new Map(skills.map((s) => [s.id, s]));
   for (const r of g.rels('HAS_STEP', 'Skill', 'SkillStep').sort((x, y) => asc(x.a.props.id, y.a.props.id) || asc(x.props.order, y.props.order))) {
@@ -519,7 +520,8 @@ export function buildSkills(g) {
   for (const [st, rows] of offerRows) st.offers = rows.sort((a, b) => a.order - b.order).map(({ exit, when }) => ({ exit, when }));
   for (const r of g.rels('HAS_EXIT', 'Skill', 'SkillExit').sort((x, y) => asc(x.b.props.id, y.b.props.id))) {
     const x = r.b.props;
-    by.get(r.a.props.id)?.exits.push({ id: x.exit, toolId: x.toolId ?? null, query: json(x.queryJson, {}), carry: x.carry ?? [], done: x.done === true });
+    by.get(r.a.props.id)?.exits.push({ id: x.exit, toolId: x.toolId ?? null, query: json(x.queryJson, {}), carry: x.carry ?? [], done: x.done === true,
+      ...(x.planned === true ? { planned: true } : {}), ...(x.safety === true ? { safety: true } : {}) });
   }
   const storyOf = new Map(g.rels('ALTERNATIVE_TO', 'SkillOption', 'SkillOption').map((r) => [r.a, r.b.props.value]));
   for (const r of g.rels('HAS_OPTION', 'Skill', 'SkillOption').sort((x, y) => asc(x.a.props.id, y.a.props.id) || asc(x.props.order, y.props.order))) {

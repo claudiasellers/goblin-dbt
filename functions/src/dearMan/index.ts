@@ -4,8 +4,9 @@
  */
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import neo4j, { Record as Neo4jRecord } from 'neo4j-driver';
-import { getDriver, neo4jUri, neo4jUser, neo4jPassword } from '../shared/neo4j';
+import { getDriver } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
+import { CALL_OPTS } from '../shared/callOptions';
 
 // ============================================
 // DEAR MAN CONTENT + SESSION
@@ -16,7 +17,7 @@ import { toNumber } from '../shared/values';
  * No auth required — this is public therapeutic content (same as OA).
  */
 export const getDearManContent = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async () => {
     interface DearManSafetyGatesResult {
       gates: { downshiftAt: number; askMax: number; waitMinutes: number; [k: string]: number };
@@ -370,7 +371,7 @@ interface DearManSessionData {
 }
 
 export const saveDearManSession = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');
@@ -477,7 +478,7 @@ export const saveDearManSession = onCall(
  * underneath emotions, and overall response text.
  */
 export const getDearManDebriefContent = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async () => {
     const session = getDriver().session();
     try {
@@ -581,7 +582,7 @@ export const getDearManDebriefContent = onCall(
  * turning-point + moment-response combination.
  */
 export const getDearManReflection = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     const { turningPointIds, momentResponseIds } = request.data as {
       turningPointIds: string[];
@@ -652,7 +653,7 @@ function parseJsonObject(raw: unknown): Record<string, string> {
 }
 
 export const getDearManSessions = onCall(
-  { secrets: [neo4jUri, neo4jUser, neo4jPassword] },
+  CALL_OPTS,
   async (request) => {
     if (!request.auth) {
       throw new HttpsError('unauthenticated', 'User must be logged in');

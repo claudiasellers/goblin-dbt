@@ -63,10 +63,10 @@ test('quiet hours slice (today) parses the fact and computes still-true', async 
 });
 
 test('upsertProfileFact: validated HH:MM, ProfileItem labels, revisit from the kind, version bumped', async () => {
-  const f = fakeDriver(() => [{ version: 3 }]);
+  const f = fakeDriver((q) => (/RETURN count\(x\) AS n/.test(q) ? [{ n: 0 }] : [{ version: 3 }]));
   setDriver(f.driver);
   assert.deepEqual(await fns.upsertProfileFact.run({ auth: auth(), data: { kind: 'quiet_hours', value: { start: '22:00', end: '07:00' } } }), { version: 3 });
-  const q = f.calls[0];
+  const q = f.calls[1];
   assert.match(q.query, /MERGE \(p:ProfileFact \{key: \$key\}\)[\s\S]*p:UserData:ProfileItem/);
   assert.match(q.query, /duration\(\{days: k\.revisitAfterDays\}\)/);
   assert.match(q.query, /u\.profileVersion = coalesce\(u\.profileVersion, 0\) \+ 1/);
