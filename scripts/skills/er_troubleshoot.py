@@ -146,7 +146,7 @@ def steps():
         return step
 
     out += [
-        fix("fix_body", "fix_body", ["please"], again=True),
+        fix("fix_body", "fix_body", ["please"]),
         fix("fix_fit", "fix_fit", ["problem_solve", "mindfulness_emotions", "let_it_be"]),
         fix("fix_fit_unsure", "fix_fit_unsure", ["check_the_facts"]),
         # The PRD's move is the line itself: the skill that didn't help is the one to retry, smaller and whole.
@@ -158,7 +158,7 @@ def steps():
                ["emotion_guide"], crisis=[{"variant": "crisis", "when": HOPELESS}]),
          # Hopelessness: someone to talk to, and Done; no myth cards and no reappraisal (voice.md S9, crisis speech).
          "offers": [{"exit": "safety_open", "when": HOPELESS}, {"exit": "emotion_guide", "when": {"not": HOPELESS}}]},
-        fix("none", "none", ["missing_links"], again=True),
+        fix("none", "none", ["missing_links"]),
     ]
     return out
 

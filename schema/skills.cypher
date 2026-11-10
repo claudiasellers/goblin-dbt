@@ -1462,7 +1462,7 @@ MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:beli
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
 MERGE (n:SkillStep {id: "er_troubleshoot:fix_body"})
-SET n += {skillId: "er_troubleshoot", step: "fix_body", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again_fix_body\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"try_again\", \"whenFrom\": \"again_fix_body\"}, \"lines\": [{\"key\": \"fix_body\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "fix_body", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"fix_body\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_body"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
@@ -1502,7 +1502,7 @@ MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:fix_
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 14};
 MERGE (n:SkillStep {id: "er_troubleshoot:none"})
-SET n += {skillId: "er_troubleshoot", step: "none", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again_none\", \"label\": \"again_q\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"try_again\", \"whenFrom\": \"again_none\"}, \"lines\": [{\"key\": \"none\", \"when\": {\"all\": []}}]}";
+SET n += {skillId: "er_troubleshoot", step: "none", kind: "handoff", version: "et-v1-1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"none\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "er_troubleshoot"}), (n:SkillStep {id: "er_troubleshoot:none"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 15};

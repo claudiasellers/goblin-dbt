@@ -247,7 +247,10 @@ wave (`mindfulness-emotions`) and Let it be (`let-it-be`) are planned exits on t
   Wait a while and see · Look into it · Ask someone I trust*, or own words up to 60 characters, which keep the
   worst-case record under 4 KB) and *Want me to ask later if you found out?* (*Tonight · Tomorrow · Later this
   week*). A chip schedules `check_fact` ("Did you find out?") on Next. Both fields are optional. The fact's
-  own words get the same quiet *Talk to someone now* as the camera's.
+  own words get the same quiet *Talk to someone now* as the camera's. Departures from the PRD: its other move
+  for *still don't know*, *Park it*, waits for DT/MF's postponement skill; the `check_fact` answers resolve in
+  place, where the PRD sends *didn't fit* on to Do the Opposite and *fit* to Problem Solve (an answer that opens
+  a tool needs a Today card that can link; tracked for ER-B3).
 - Not built: the **loop guard** ("you've checked this twice today") is an aggregate over past runs, which a
   live flow never reads (data layers); it waits for a server-side read the router or Today can own. The
   **inline mini-card** moves to ER-B3, with its first host (Do the Opposite's *clarify*): an inline run gives

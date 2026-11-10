@@ -388,7 +388,7 @@ Every lane holds to these. The clinical gate (§6, Gate 3) checks each one.
 
 | Area | Owner | Notes |
 |---|---|---|
-| Player, machine, conditions, `skillTypes.ts`, `functions/src/skills/`, `extSchemas.ts` `run` | Foundation, then shared | After F2, a lane changing these does it in a separate small PR titled `runtime:`, reviewed against C3a; never inside a skill PR |
+| Player, machine, conditions, `skillTypes.ts`, `functions/src/skills/`, `extSchemas.ts` `run` | Foundation, then shared | After F2, a lane changing these does it in a separate small PR titled `runtime:`, reviewed against C3a; never inside a skill PR. Exception for a lane that has one branch (first used by ER-B1's second PR, #67): the change is its own `runtime:` commit, reviewed by the plan thread, and called out at the top of the PR description |
 | `scripts/skills/<skill>.py`, its page, its tests | The skill's lane | One file per skill |
 | `scripts/skills/content.py` `SKILLS`, `EMBEDS`; `embeds.ts` | Shared, append-only | Merge conflicts resolved by keeping both lines |
 | Generated files: `schema/skills.cypher`, `src/data/content/skills.json`, `tests/fixtures/skills-content.json` | Nobody (generated) | Never hand-merged: on conflict, rebase and regenerate |

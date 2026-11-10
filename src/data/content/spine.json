@@ -747,7 +747,7 @@
         },
         "enabled": true,
         "copy": {
-          "body": "The skill you looked at in It isn't working. Did you try it again?",
+          "body": "A nudge you asked for in It isn't working. Did you get a chance to try it again?",
           "title": "Another go?"
         },
         "choices": [

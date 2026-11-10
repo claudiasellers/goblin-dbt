@@ -156,7 +156,8 @@ FOLLOW_UP_TYPES = [
     {
         # Check the Facts v1.2 (PRD ER-02, *still don't know*): "Did you find out?" about the one missing fact,
         # at the time the person picked (the missing step's chip; no chip, no follow-up). Scheduled by the skill
-        # player on the caller's own check-the-facts ToolSession. Resolved in place; the answer is a log field.
+        # player with the check-the-facts session as its source (not bound server-side: its card reads nothing from
+        # the session, unlike cope_ahead_after). Resolved in place; the answer is a log field.
         "id": "check_fact", "ownerModule": "er", "tier": "quality", "resolveMode": "inline",
         "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
@@ -172,15 +173,16 @@ FOLLOW_UP_TYPES = [
     },
     {
         # It isn't working v1.1 (PRD ER-14, "one next move + FollowUp"): a nudge to give the skill another go, on
-        # the fix cards whose move is another try (body, all the way, willingness, too much, nothing stood out).
-        # Picked as a chip on the card and scheduled as the person leaves it. Never on the hopelessness card.
+        # the fix cards whose move is another try of the same skill (smaller, with willingness, with a bit more room:
+        # fix_way, fix_will, fix_much). Not on body (its move is looking after the body) or nothing stood out (missing
+        # links), and never on the hopelessness card. Picked as a chip and scheduled as the person leaves the card.
         "id": "try_again", "ownerModule": "er", "tier": "quality", "resolveMode": "inline",
         "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
                                              "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
         "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
-        "copy": {"title": "Another go?", "body": "The skill you looked at in It isn't working. Did you try it again?"},
+        "copy": {"title": "Another go?", "body": "A nudge you asked for in It isn't working. Did you get a chance to try it again?"},
         "choices": [{"id": "helped", "label": "Tried it, it helped", "status": "done"},
                     {"id": "still_stuck", "label": "Tried it, still stuck", "status": "done"},
                     {"id": "not_yet", "label": "Not yet", "snoozeHours": 24},

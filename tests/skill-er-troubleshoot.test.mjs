@@ -161,11 +161,13 @@ test("the attempt record: ids only, the path to the fix, validates on the server
   assert.doesNotThrow(() => validateExt({ run: rec }));
 });
 
-test("v1.1: a nudge to try again on the cards whose move is another go; a chip schedules try_again as the card is left", () => {
+test("v1.1: a nudge to try again only on the cards whose move is another go of the same skill; a chip schedules try_again as the card is left", () => {
   const c = ctx();
   const at = (check, value) => run([...upTo(check), pick(check, value), next], c);
   const withChips = skill.steps.filter((st) => st.followUp).map((st) => st.id).sort();
-  assert.deepEqual(withChips, ["fix_body", "fix_much", "fix_way", "fix_will", "none"]);
+  assert.deepEqual(withChips, ["fix_much", "fix_way", "fix_will"]);
+  // Body (look after the body) and nothing stood out (missing links) move to something else, not a retry.
+  for (const id of ["fix_body", "none"]) assert.ok(!M.stepOf(skill, id).fields, id);
   assert.ok(!M.stepOf(skill, "fix_belief").fields, "never on the belief card, so never beside the crisis banner");
   const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content;
   const type = spine.followUpTypes.find((t) => t.id === "try_again");
@@ -190,7 +192,5 @@ test("v1.1: a nudge to try again on the cards whose move is another go; a chip s
   const rec = M.runRecord(c, s);
   assert.deepEqual(rec.answers.at(-1), { fieldId: "again_fix_way", optionIds: ["this_week"] });
   assert.doesNotThrow(() => validateExt({ run: rec }));
-  // Nothing stood out gets it too.
-  const none = run(CHECKS.flatMap((ch) => [pick(ch, NO[ch]), next]), c);
-  assert.equal(M.stepOf(skill, none.stepId).followUp.type, "try_again");
+  assert.match(type.copy.body, /get a chance/, "circumstance, not effort: the person asked for a nudge, not made a promise");
 });

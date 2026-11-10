@@ -72,10 +72,13 @@ linked by `hostSessionId`. No new label, no ask-fresh field, no profile write.
 - **The checks stop at the first yes.** The PRD lets the rest be answered after the fix. A hand-off can't go back
   into the checks without a runtime capability, and one fix at a time is the point. Revisit if people want it.
 - **The follow-up is a nudge to try again** (v1.1, ER-B1 second PR): *Want a nudge to try it again? Tonight ·
-  Tomorrow · Later this week* on the cards whose move is another go (body, all the way, willingness, too much,
-  nothing stood out), scheduled as the card is left (`try_again`: "Another go?", *Tried it, it helped · Tried
-  it, still stuck · Not yet · Skip*). Not on the cards that hand to another tool (that tool's own follow-up
-  is the next step), and never on the belief card, so never beside the crisis banner.
+  Tomorrow · Later this week* only on the cards whose move is another go of the same skill (all the way,
+  willingness, too much), scheduled as the card is left (`try_again`: "Another go?", "A nudge you asked for in
+  It isn't working. Did you get a chance to try it again?", *Tried it, it helped · Tried it, still stuck · Not
+  yet · Skip*; *get a chance* puts a miss on circumstance, not effort). Not on body (its move is looking after
+  the body) or nothing stood out (missing links), not on the cards that hand to another tool, and never on the
+  belief card, so never beside the crisis banner. *Not yet* snoozes 24 h until the card goes stale (72 h), as
+  Cope Ahead's does; a snooze cap is a spine change, not this PR's.
 - **No "last three times it was the body".** That is an aggregate over past runs; a live flow never reads the log
   (data layers). Reflect can show it from `ext.run` when the router or Reflect work picks it up.
 - **Flooded is a quiet grounding link, not P2 first.** The PRD says "flooded → ER-01 first". P2 is the

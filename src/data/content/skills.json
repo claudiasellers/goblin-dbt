@@ -3157,20 +3157,6 @@
               }
             ],
             "done": "done",
-            "fields": [
-              {
-                "id": "again_fix_body",
-                "label": "again_q",
-                "max": 1,
-                "options": {
-                  "list": "again"
-                }
-              }
-            ],
-            "followUp": {
-              "type": "try_again",
-              "whenFrom": "again_fix_body"
-            },
             "next": [],
             "offers": [
               {
@@ -3442,20 +3428,6 @@
               }
             ],
             "done": "done",
-            "fields": [
-              {
-                "id": "again_none",
-                "label": "again_q",
-                "max": 1,
-                "options": {
-                  "list": "again"
-                }
-              }
-            ],
-            "followUp": {
-              "type": "try_again",
-              "whenFrom": "again_none"
-            },
             "next": [],
             "offers": [
               {
