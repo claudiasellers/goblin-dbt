@@ -301,3 +301,17 @@ test("picked labels: what an embed reads back, labels in pick order, own words l
   assert.deepEqual(m.pickedLabels(ctx, both), { urge: ["send", "my way"] });
   assert.deepEqual(m.pickedLabels(ctx, m.initialRun(SKILL)), {});
 });
+
+test("noClose: only on a hand-off, and the player leaves it without the close question", () => {
+  for (const sk of fixture.skills) {
+    for (const st of sk.steps) {
+      if (st.noClose === undefined) continue;
+      assert.equal(st.kind, "handoff", `${sk.id}.${st.id}: noClose is for hand-offs`);
+      assert.equal(st.noClose, true, `${sk.id}.${st.id}: noClose is true or absent`);
+    }
+  }
+  const src = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(src, /stepOf\(skill, st\.stepId\)\.noClose/, "leave() reads the step's noClose");
+  assert.match(src, /!quietLeave/, "SessionClose is skipped after a quiet leave");
+  assert.match(read("scripts/skills/build.py"), /"noClose" not in s or \(s\["kind"\] == "handoff"/, "build.py refuses noClose off a hand-off");
+});

@@ -116,6 +116,11 @@ export interface StepDef {
   done?: string;
   /** Reaching this step marks the visit complete. */
   complete?: boolean;
+  /**
+   * kind 'handoff': leave without the tool's close question (the session still closes, completed). For a hand-off
+   * where "how strong is it now?" would land wrong, such as after someone says a person hurt or threatened them.
+   */
+  noClose?: boolean;
 }
 
 /**

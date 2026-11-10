@@ -176,6 +176,7 @@ def check(skill):
             assert of["exit"] in exits, (w, of)
             check_cond(of["when"], fields, derived, w, accepts)
         assert "done" not in s or s["done"] in exits, w
+        assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))
     every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
 
