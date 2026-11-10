@@ -244,3 +244,11 @@ test("two-part close (urge_change, plan R7): the urge question, then then-vs-now
   assert.equal(c.thenVsNow, "better");
   assert.throws(() => v.validateClose({ id: ID, status: "completed", actedOnUrge: "no" }, now, "regulation_down"));
 });
+
+test("every chip a follow-up window offers is a window the server accepts (scheduleFollowUp)", async () => {
+  const { FOLLOW_UP_WINDOWS } = await importTs("functions/src/spine/validation.ts");
+  const spine = JSON.parse(readFileSync("src/data/content/spine.json", "utf8")).content;
+  const bad = spine.followUpTypes.flatMap((t) => (t.window?.kind === "chip" ? Object.keys(t.window.chips) : [])
+    .filter((c) => !FOLLOW_UP_WINDOWS.includes(c)).map((c) => `${t.id}.${c}`));
+  assert.deepEqual(bad, [], "a chip the server refuses never schedules (the person only sees 'didn't save')");
+});
