@@ -7,6 +7,8 @@ in parallel without each one testing and merging itself.
 
 - When the PR is finished, add the **`ready-to-merge`** label: `gh pr edit <n> --add-label ready-to-merge`.
   Leave draft PRs as drafts until then; the lane skips drafts.
+- Only PRs whose base is `main` merge. A PR stacked on another branch fails with `lane-failed`: merge
+  the PR under it first, then change its base to `main` (`gh pr edit <n> --base main`) and requeue.
 - Don't merge it yourself. The lane picks it up within about 2 minutes.
 - If it comes back with **`lane-failed`** and a comment, fix the branch (usually: merge main in, or fix
   the failing check from the log in the comment), then add `ready-to-merge` again.
