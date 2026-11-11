@@ -134,7 +134,7 @@ PRACTICAL = [
     ("no_contact", "Please don't contact me for a while."),
     ("by_message", "Let's sort out anything practical by message."),
 ]
-WHEN = [("today", "Today"), ("this_week", "This week"), ("not_sure", "Not sure yet")]
+WHEN = [("today", "Today"), ("this_week", "This week"), ("unsure", "Not sure yet")]
 CHECKIN = [("yes", "Yes, check in with me"), ("no", "No thanks")]
 AFTER = [
     ("holding", "Holding steady", {}),
@@ -144,7 +144,7 @@ AFTER = [
     ("unsafe", "I don't feel safe", {"danger": "other"}),
     ("low", "I'm in a really bad place", {"danger": "self"}),
 ]
-AGAIN = [("week", "In a week"), ("month", "In a month")]
+AGAIN = [("this_week", "In a week"), ("month", "In a month")]
 
 
 def a(field):

@@ -26,6 +26,7 @@ UNWIND [
   {c: "dbt_troubleshooting", t: "er-troubleshoot"},
   {c: "dbt_alternate_rebellion", t: "alternate-rebellion"},
   {c: "dbt_fast", t: "fast"},
+  {c: "dbt_nightmare_protocol", t: "nightmare-rescript"},
   {c: "dbt_ending_relationships", t: "ending-relationships"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})

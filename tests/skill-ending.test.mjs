@@ -223,7 +223,7 @@ test("the after check-in is opt-in and content-free; it re-enters at `after`, as
   // A step not named in resumeAt and not on the path doesn't open.
   assert.equal(M.resumeRun(ctx(), rec, "after_next").stepId, "ahead");
   // Asked again: a later check-in never fills in the last one's answer.
-  const answered = M.runNext(ctx(), M.runNext(ctx(), back, pick("after", "pull")), pick("again", "week"));
+  const answered = M.runNext(ctx(), M.runNext(ctx(), back, pick("after", "pull")), pick("again", "this_week"));
   const again = M.resumeRun(ctx(), M.runRecord(ctx(), M.runNext(ctx(), answered, next)), "after");
   assert.equal(again.stepId, "after");
   assert.equal(again.answers.after, undefined);
@@ -238,7 +238,7 @@ test("after: the pull back is expected; going back isn't failure; I don't feel s
     if (again) s = M.runNext(ctx(), s, pick("again", again));
     return M.runNext(ctx(), s, next);
   };
-  const pull = at("pull", "week");
+  const pull = at("pull", "this_week");
   assert.equal(pull.stepId, "after_next");
   assert.deepEqual(pull.offered, ["opposite_action"], "finding connection and let it be are planned");
   assert.match(M.handoffLine(ctx(), step("after_next"), pull), /pull back is expected/);
@@ -260,7 +260,7 @@ test("after: the pull back is expected; going back isn't failure; I don't feel s
   // I don't feel safe: no "another check-in?", and nothing scheduled.
   const asked = M.runNext(ctx(), back, pick("after", "unsafe"));
   assert.deepEqual(M.shownFields(ctx(), step("after"), asked).map((f) => f.id), ["after"]);
-  assert.equal(M.followUpFor(ctx(), step("after"), M.runNext(ctx(), asked, pick("again", "week"))), null);
+  assert.equal(M.followUpFor(ctx(), step("after"), M.runNext(ctx(), asked, pick("again", "this_week"))), null);
   assert.deepEqual(M.followUpFor(ctx(), step("after"), M.runNext(ctx(), M.runNext(ctx(), back, pick("after", "holding")), pick("again", "month"))),
     { type: "ending_again", chip: "month" });
 });

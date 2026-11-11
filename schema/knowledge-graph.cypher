@@ -1370,6 +1370,16 @@ SET troubleshooting += {
   skill_type: "troubleshooting"
 };
 
+// ER Handout 20a (PRD ER-15): the nightmare protocol, imagery rehearsal for a nightmare that keeps coming back.
+MERGE (nightmare_protocol:TherapyConcept {id: "dbt_nightmare_protocol"})
+SET nightmare_protocol += {
+  name: "Nightmare Protocol",
+  description: "Changing a recurring nightmare while awake: choosing a change before the bad part and a new ending, then rehearsing the new version daily. Not for nightmares that replay a real event, which belong with a clinician",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "reducing_vulnerability"
+};
+
 MERGE (opposite_action:TherapyConcept {id: "dbt_opposite_action"})
 SET opposite_action += {
   name: "Opposite Action",

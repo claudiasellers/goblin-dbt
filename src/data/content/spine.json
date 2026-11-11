@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-10.json",
-    "exportedAt": "2026-11-10T22:22:55.882Z"
+    "exportedAt": "2026-11-10T23:11:15.650Z"
   },
   "content": {
     "version": "spine-v1",
@@ -286,11 +286,6 @@
         ],
         "window": {
           "chips": {
-            "not_sure": {
-              "days": 7,
-              "kind": "at_local",
-              "time": "10:00"
-            },
             "this_week": {
               "days": 7,
               "kind": "at_local",
@@ -298,6 +293,11 @@
             },
             "today": {
               "days": 1,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "unsure": {
+              "days": 7,
               "kind": "at_local",
               "time": "10:00"
             }
@@ -338,7 +338,7 @@
               "kind": "at_local",
               "time": "10:00"
             },
-            "week": {
+            "this_week": {
               "days": 7,
               "kind": "at_local",
               "time": "10:00"
@@ -379,6 +379,53 @@
           "time": "10:00"
         },
         "notification": "A check-in you asked for is ready."
+      },
+      {
+        "id": "nightmare_rehearse",
+        "ownerModule": "er",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/nightmare-rescript?run={sourceSessionId}&at=rehearse&enterAt=rehearse&followUp={followUpId}",
+        "staleAfterHours": 36,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "A read-through you asked for. A minute, eyes open.",
+          "title": "Your new version"
+        },
+        "choices": [
+          {
+            "id": "not_today",
+            "label": "Not today",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "12:00"
+            },
+            "tomorrow_night": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "21:00"
+            },
+            "tonight": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "21:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "Something you asked to be reminded of is ready."
       },
       {
         "id": "oa_plan",

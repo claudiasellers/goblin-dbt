@@ -237,6 +237,6 @@ test('startToolSession resolves a resume_skill or Ending check-in follow-up when
   await fns.startToolSession.run({ auth: auth(), data: { id: ID, toolId: 'dear-man', entry: 'today', followUpId: CI } });
   const q1 = f.calls[0].query;
   assert.match(q1, /f\.type IN \$openResolves AND f\.status = 'scheduled' THEN \[f\][\s\S]*SET x\.status = 'done', x\.resolvedAt = datetime\(\)/);
-  assert.deepEqual(f.calls[0].params.openResolves, ['resume_skill', 'ending_after', 'ending_again', 'ending_revisit']);
+  assert.deepEqual(f.calls[0].params.openResolves, ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit']);
   assert.equal(f.calls[0].params.followUpKey, `u1:${CI}`);
 });

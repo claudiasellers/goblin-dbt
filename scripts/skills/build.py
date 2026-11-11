@@ -184,6 +184,8 @@ def check(skill):
                 check_cond(t["when"], fields, derived, w, accepts)
         for k in ("hint", "note"):
             assert k not in s or s[k] in copy, (w, k)
+        tos = [t["to"] for t in s.get("next", [])]
+        assert len(tos) == len(set(tos)), (w, "one jump per target (NEXT is one edge per step pair): join the conditions with any", tos)
         for t in s.get("next", []):
             assert t["to"] in steps, (w, t)
             if "when" in t:
@@ -206,6 +208,12 @@ def check(skill):
                 assert k not in f or f[k] in copy, (w, f)
             if "own" in f:
                 assert f["own"]["hint"] in copy, (w, f)
+                if f["own"].get("seed"):
+                    assert f["own"].get("open") and f.get("max") == 1 and "list" in o, (
+                        w, "seed chips start the open own-words box of a one-pick list field", f)
+                    cap = f["own"].get("max", skill["ownMax"])
+                    long = [x[2] for x in skill["options"] if x[0] == o["list"] and len(x[2]) > cap]
+                    assert not long, (w, "every starter fits the box (else it stops matching once written in)", long)
                 assert f["own"].get("max", skill["ownMax"]) <= skill["ownMax"], (w, "own max above the skill's", f)
             if "firstFrom" in o:
                 assert o["firstFrom"].startswith("$ctx."), (w, "firstFrom is a context ref", o)
@@ -223,6 +231,14 @@ def check(skill):
             for ln in f.get("links", []):
                 assert ln["exit"] in exits and ln["label"] in copy, (w, ln)
                 check_cond(ln["when"], fields, derived, w, accepts)
+        # Step-level quiet links (an embed or hand-off screen has no field to hang them on; an ask step's are on its fields).
+        assert not s.get("links") or s["kind"] in ("embed", "handoff"), (w, "an ask step's links live on its fields")
+        for ln in s.get("links", []):
+            assert ln["exit"] in exits and ln["label"] in copy, (w, ln)
+            check_cond(ln["when"], fields, derived, w, accepts)
+        # LINKS is one edge per (step, exit): one link per exit on a screen, whether on a field or the step.
+        link_exits = [ln["exit"] for ln in s.get("links", [])] + [ln["exit"] for f in s.get("fields", []) for ln in f.get("links", [])]
+        assert len(link_exits) == len(set(link_exits)), (w, "one quiet link per exit on a screen (LINKS is one edge per step and exit)", link_exits)
         for sl in s.get("slots", []):
             assert sl["embed"] in EMBEDS and sl["after"] in fields, (w, sl)
             check_embed_props(sl["embed"], sl.get("props"), copy, fields, w)
@@ -361,6 +377,8 @@ for sk in SKILLS:
             offers.setdefault(of["exit"], []).append({"order": i, "when": of["when"]})
         for ex, rows in offers.items():
             A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ex)}}})\nMERGE (a)-[r:OFFERS]->(x)\nSET r += {{order: {rows[0]['order']}}}, r.rowsJson = {js(rows)};")
+        for i, ln in enumerate(st.get("links", [])):
+            A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ln['exit'])}}})\nMERGE (a)-[r:LINKS]->(x)\nSET r += {props({'order': i, 'field': '', 'label': ln['label']})}, r.whenJson = {js(ln['when'])};")
         for f in st.get("fields", []):
             for i, ln in enumerate(f.get("links", [])):
                 A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ln['exit'])}}})\nMERGE (a)-[r:LINKS]->(x)\nSET r += {props({'order': i, 'field': f['id'], 'label': ln['label']})}, r.whenJson = {js(ln['when'])};")

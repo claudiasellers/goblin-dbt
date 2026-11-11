@@ -8,11 +8,12 @@ import check_the_facts  # noqa: E402
 import alternate_rebellion  # noqa: E402
 import er_troubleshoot  # noqa: E402
 import fast  # noqa: E402
+import nightmare_rescript  # noqa: E402
 import ending_relationships  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
-SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, ending_relationships.SKILL]
+SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, ending_relationships.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -24,6 +25,7 @@ EMBEDS = {
     "rebellionCard": {"ids": ["now", "today", "week"]},
     # IE-05's boundary line card (plan C3b, IE-owned): the picked line on paper, copyable; reports whether it was copied.
     "boundaryLine": {"ids": ["copied"]},
+    "rescriptCard": {"ids": ["read", "stopped"], "measures": ["durationSec"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -69,6 +71,21 @@ EMBED_PROPS = {
         "copiedLabel": {"type": "copy", "optional": True},
         "selectedLabel": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
+    },
+    "rescriptCard": {
+        "startField": {"type": "field"},
+        "turnField": {"type": "field"},
+        "endField": {"type": "field"},
+        "seconds": {"type": "int", "min": 10, "max": 300},
+        "startLabel": {"type": "copy"},
+        "turnLabel": {"type": "copy"},
+        "endLabel": {"type": "copy"},
+        "fallback": {"type": "copy"},
+        "readLabel": {"type": "copy"},
+        "runningLabel": {"type": "copy"},
+        "stopLabel": {"type": "copy"},
+        "doneLabel": {"type": "copy"},
+        "skipLabel": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

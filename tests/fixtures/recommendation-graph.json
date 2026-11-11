@@ -437,6 +437,17 @@
     "perplexed"
    ]
   },
+  "dbt_nightmare_protocol": {
+   "appToolId": "nightmare-rescript",
+   "name": "Nightmare Protocol",
+   "description": "Changing a recurring nightmare while awake: choosing a change before the bad part and a new ending, then rehearsing the new version daily. Not for nightmares that replay a real event, which belong with a clinician",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_opposite_action": {
    "appToolId": "opposite-action",
    "name": "Opposite Action",

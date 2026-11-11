@@ -4390,7 +4390,7 @@
       "label": "This week"
      },
      {
-      "value": "not_sure",
+      "value": "unsure",
       "label": "Not sure yet"
      }
     ],
@@ -4434,7 +4434,7 @@
     ],
     "again": [
      {
-      "value": "week",
+      "value": "this_week",
       "label": "In a week"
      },
      {
@@ -6106,6 +6106,1080 @@
      {
       "value": "still_want",
       "label": "I'm still asking for what I asked for"
+     }
+    ]
+   }
+  },
+  {
+   "id": "nightmare_rescript",
+   "toolId": "nightmare-rescript",
+   "version": "nr-v1",
+   "start": "replay",
+   "accepts": [
+    "band",
+    "enterAt"
+   ],
+   "ownMax": 90,
+   "emotionFields": [],
+   "copy": {
+    "replay_title": "Is this nightmare a replay of something that happened to you?",
+    "replay_title_flooded": "This is one for a calmer moment. Is the nightmare a replay of something that happened to you?",
+    "replay_hint": "This is for a nightmare that keeps coming back. It's best done in the daytime, with your eyes open. You can stop at any point.",
+    "replay_note": "When nightmares follow something that happened to you, a clinician can help with that.",
+    "settle_first": "Settle first",
+    "clinician": "Nightmares that replay something real are best worked on with a clinician, who can go at your pace. For tonight, settling your body and the room around you can help.",
+    "clinician_memory": "That's a good place to stop. When it feels like a memory, it's one to work on with a clinician, at your pace. For now, come back to the room around you.",
+    "settle_title": "Before you start, settle for a moment, with your feet on the floor.",
+    "settle_title_unsure": "Before you start, settle for a moment, with your feet on the floor. If it starts to feel like a memory, you can stop there.",
+    "settle_label": "Hold",
+    "settle_hint": "Hold the circle and notice your feet on the floor.",
+    "settle_done": "That's enough.",
+    "settle_running": "Feet on the floor",
+    "start_title": "Where does it start?",
+    "start_hint": "Pick one that keeps coming back, not the worst one. You don't need to say what happens.",
+    "start_own": "Say it your way",
+    "turn_title": "Before it turns bad, what changes?",
+    "turn_hint": "Anything can change. It's your dream.",
+    "turn_own": "Say it your way",
+    "ending_title": "How does it end now?",
+    "ending_label": "Write your own, or start from one of these and change it.",
+    "ending_own": "Write your ending",
+    "rehearse_title": "Your new version",
+    "rehearse_title_again": "Your new version. Feet on the floor first, then read it when you're ready.",
+    "card_start": "It starts",
+    "card_turn": "Then",
+    "card_end": "It ends",
+    "card_fallback": "Your version",
+    "read_start": "Read it through",
+    "read_running": "Picture it, start to finish, eyes open. Stop any time.",
+    "read_stop": "Stop",
+    "read_done": "Done",
+    "read_skip": "I'd rather stop here",
+    "after_title": "How was that?",
+    "settle_again_title": "Settle again before you go on, with your feet on the floor.",
+    "plan_title": "Keep this new version?",
+    "plan_hint": "Reading it through once a day, for a while, can help the new version take hold.",
+    "remind_q": "Want a reminder to read it through?",
+    "plan_primary": "Next",
+    "close": "You wrote a new way for it to go. Each read-through is practice for it.",
+    "close_kept": "It's in Me. Each read-through is practice for the new version.",
+    "again": "That's one more read-through.",
+    "again_q": "Want a reminder for the next one?",
+    "stopped": "Stopping is part of this. You can come back on another day, or leave it here.",
+    "stopped_unsafe": "Thank you for stopping. Someone to talk to is right here.",
+    "stopped_far": "Stopping here is fine. Coming back to the room around you can help.",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "replay",
+     "kind": "ask",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.band",
+         "flooded"
+        ]
+       },
+       "key": "replay_title_flooded"
+      },
+      {
+       "key": "replay_title"
+      }
+     ],
+     "hint": "replay_hint",
+     "note": "replay_note",
+     "fields": [
+      {
+       "id": "replay",
+       "options": {
+        "list": "replay"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "five_senses",
+         "label": "settle_first",
+         "when": {
+          "eq": [
+           "$ctx.band",
+           "flooded"
+          ]
+         }
+        },
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "clinician",
+       "when": {
+        "in": [
+         "$a.replay",
+         [
+          "yes",
+          "partly"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "settle",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "clinician",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.after",
+         "memory"
+        ]
+       },
+       "key": "clinician_memory"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "clinician"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "sleep_reset",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "settle",
+     "kind": "embed",
+     "embed": "holdRing",
+     "answerAs": "settle",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$a.replay",
+         "unsure"
+        ]
+       },
+       "key": "settle_title_unsure"
+      },
+      {
+       "key": "settle_title"
+      }
+     ],
+     "props": {
+      "variant": "settle",
+      "seconds": 5,
+      "holds": 3,
+      "label": "settle_label",
+      "hint": "settle_hint",
+      "runningLabel": "settle_running",
+      "doneLabel": "settle_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "start",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "start",
+     "kind": "ask",
+     "title": "start_title",
+     "hint": "start_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "setting",
+       "options": {
+        "list": "setting"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "start_own",
+        "countsAsPick": true,
+        "max": 60
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "turn",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "turn",
+     "kind": "ask",
+     "title": "turn_title",
+     "hint": "turn_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "turn",
+       "options": {
+        "list": "turn"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "turn_own",
+        "countsAsPick": true
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "ending",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "ending",
+     "kind": "ask",
+     "title": "ending_title",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "ending",
+       "label": "ending_label",
+       "options": {
+        "list": "ending"
+       },
+       "max": 1,
+       "required": true,
+       "own": {
+        "hint": "ending_own",
+        "countsAsPick": true,
+        "open": true,
+        "seed": true
+       },
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "rehearse",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "rehearse",
+     "kind": "embed",
+     "embed": "rescriptCard",
+     "answerAs": "read",
+     "title": [
+      {
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "rehearse"
+        ]
+       },
+       "key": "rehearse_title_again"
+      },
+      {
+       "key": "rehearse_title"
+      }
+     ],
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "props": {
+      "startField": "setting",
+      "turnField": "turn",
+      "endField": "ending",
+      "seconds": 60,
+      "startLabel": "card_start",
+      "turnLabel": "card_turn",
+      "endLabel": "card_end",
+      "fallback": "card_fallback",
+      "readLabel": "read_start",
+      "runningLabel": "read_running",
+      "stopLabel": "read_stop",
+      "doneLabel": "read_done",
+      "skipLabel": "read_skip"
+     },
+     "next": [
+      {
+       "to": "stopped",
+       "when": {
+        "eq": [
+         "$a.read",
+         "stopped"
+        ]
+       }
+      },
+      {
+       "to": "after",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "after",
+     "kind": "ask",
+     "title": "after_title",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "after",
+       "options": {
+        "list": "after"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "not": {
+           "eq": [
+            "$a.after",
+            "unsafe"
+           ]
+          }
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "stopped",
+       "when": {
+        "any": [
+         {
+          "eq": [
+           "$a.after",
+           "unsafe"
+          ]
+         },
+         {
+          "eq": [
+           "$a.after",
+           "far"
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "clinician",
+       "when": {
+        "eq": [
+         "$a.after",
+         "memory"
+        ]
+       }
+      },
+      {
+       "to": "settle_again",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "settle_again",
+     "kind": "embed",
+     "embed": "holdRing",
+     "answerAs": "settle_again",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "title": "settle_again_title",
+     "props": {
+      "variant": "settle",
+      "seconds": 5,
+      "holds": 3,
+      "label": "settle_label",
+      "hint": "settle_hint",
+      "runningLabel": "settle_running",
+      "doneLabel": "settle_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "again",
+       "when": {
+        "eq": [
+         "$ctx.enterAt",
+         "rehearse"
+        ]
+       }
+      },
+      {
+       "to": "plan",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "plan",
+     "kind": "ask",
+     "title": "plan_title",
+     "hint": "plan_hint",
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "keepit",
+       "options": {
+        "list": "keepit"
+       },
+       "max": 1,
+       "required": true
+      },
+      {
+       "id": "remind",
+       "label": "remind_q",
+       "options": {
+        "list": "remind",
+        "where": {
+         "all": [
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$a.after",
+               "stirred"
+              ]
+             }
+            },
+            {
+             "not": {
+              "eq": [
+               "$opt.night",
+               true
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "not": {
+            "eq": [
+             "$opt.againOnly",
+             true
+            ]
+           }
+          }
+         ]
+        }
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "keep": {
+      "kind": "nightmare_script",
+      "many": true,
+      "from": [
+       "setting",
+       "turn",
+       "ending"
+      ],
+      "when": {
+       "eq": [
+        "$a.keepit",
+        "yes"
+       ]
+      }
+     },
+     "followUp": {
+      "type": "nightmare_rehearse",
+      "whenFrom": "remind"
+     },
+     "primary": "plan_primary",
+     "next": [
+      {
+       "to": "close",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "close",
+     "kind": "handoff",
+     "complete": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.keepit",
+         "yes"
+        ]
+       },
+       "key": "close_kept"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "close"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "again",
+     "kind": "handoff",
+     "complete": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "again"
+      }
+     ],
+     "fields": [
+      {
+       "id": "again_remind",
+       "label": "again_q",
+       "max": 1,
+       "options": {
+        "list": "remind",
+        "where": {
+         "all": [
+          {
+           "any": [
+            {
+             "not": {
+              "eq": [
+               "$a.after",
+               "stirred"
+              ]
+             }
+            },
+            {
+             "not": {
+              "eq": [
+               "$opt.night",
+               true
+              ]
+             }
+            }
+           ]
+          },
+          {
+           "not": {
+            "eq": [
+             "$opt.firstOnly",
+             true
+            ]
+           }
+          }
+         ]
+        }
+       }
+      }
+     ],
+     "followUp": {
+      "type": "nightmare_rehearse",
+      "whenFrom": "again_remind"
+     },
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "stopped",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       },
+       "key": "stopped_unsafe"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.after",
+         "far"
+        ]
+       },
+       "key": "stopped_far"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "stopped"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "safety_open",
+       "when": {
+        "eq": [
+         "$a.after",
+         "unsafe"
+        ]
+       }
+      },
+      {
+       "exit": "five_senses",
+       "when": {
+        "all": []
+       }
+      },
+      {
+       "exit": "safety_open",
+       "when": {
+        "not": {
+         "eq": [
+          "$a.after",
+          "unsafe"
+         ]
+        }
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "five_senses",
+     "toolId": "five-senses",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    },
+    {
+     "id": "sleep_reset",
+     "toolId": "sleep-reset",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    }
+   ],
+   "options": {
+    "replay": [
+     {
+      "value": "yes",
+      "label": "Yes, it replays something that happened"
+     },
+     {
+      "value": "partly",
+      "label": "Partly"
+     },
+     {
+      "value": "no",
+      "label": "No, it's its own thing"
+     },
+     {
+      "value": "unsure",
+      "label": "I'm not sure"
+     }
+    ],
+    "setting": [
+     {
+      "value": "home",
+      "label": "Somewhere like home"
+     },
+     {
+      "value": "outside",
+      "label": "Outside"
+     },
+     {
+      "value": "work",
+      "label": "Somewhere like school or work"
+     },
+     {
+      "value": "travelling",
+      "label": "Travelling somewhere"
+     },
+     {
+      "value": "unknown",
+      "label": "Somewhere I don't know"
+     }
+    ],
+    "turn": [
+     {
+      "value": "bigger",
+      "label": "I get bigger and stronger"
+     },
+     {
+      "value": "ally",
+      "label": "Someone on my side arrives"
+     },
+     {
+      "value": "door",
+      "label": "A door appears, and I go through it"
+     },
+     {
+      "value": "silly",
+      "label": "It turns silly"
+     },
+     {
+      "value": "stop",
+      "label": "I say stop, and it stops"
+     },
+     {
+      "value": "leave",
+      "label": "I can leave, and I do"
+     }
+    ],
+    "ending": [
+     {
+      "value": "safe",
+      "label": "I end up somewhere safe"
+     },
+     {
+      "value": "trusted",
+      "label": "I'm with someone I trust"
+     },
+     {
+      "value": "fades",
+      "label": "It fades out quietly"
+     },
+     {
+      "value": "calm",
+      "label": "I wake up calm"
+     }
+    ],
+    "after": [
+     {
+      "value": "all_right",
+      "label": "That was all right"
+     },
+     {
+      "value": "stirred",
+      "label": "It stirred me up"
+     },
+     {
+      "value": "memory",
+      "label": "It started to feel like a memory"
+     },
+     {
+      "value": "far",
+      "label": "I went far away or foggy"
+     },
+     {
+      "value": "unsafe",
+      "label": "I'm not feeling safe",
+      "danger": "self"
+     }
+    ],
+    "keepit": [
+     {
+      "value": "yes",
+      "label": "Keep it in Me"
+     },
+     {
+      "value": "no",
+      "label": "Not this time"
+     }
+    ],
+    "remind": [
+     {
+      "value": "tonight",
+      "label": "Tonight, before bed",
+      "night": true,
+      "firstOnly": true
+     },
+     {
+      "value": "tomorrow_night",
+      "label": "Tomorrow, before bed",
+      "night": true,
+      "againOnly": true
+     },
+     {
+      "value": "tomorrow",
+      "label": "Tomorrow, in the day"
      }
     ]
    }
