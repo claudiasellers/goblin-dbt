@@ -70,10 +70,19 @@ SET c.version = 'dear-man-safety-v3',
     c.riskBadly = 'It tends to go badly',
     c.riskUnsaid = "I'd rather not say",
     c.safetyRouteHeading = 'Planning a hard talk with {who} can wait. Your safety comes first.',
+    c.safetyRouteDebriefHeading = 'Thank you for telling me. With {who}, your safety comes first.',
     c.safetyRouteBody = "The people below can help you think it through, any time, and you don't have to be sure.",
     c.safetyRouteEnding = 'Thinking about ending the relationship',
     c.safetyRouteBack = 'This is about someone else',
-    c.badlyHeadsUp = 'When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits.'
+    c.badlyHeadsUp = 'When talks with them tend to go badly, it can help to keep it short, about one thing, and in writing if that suits.',
+    c.personWhoDebrief = 'Who was the conversation with?',
+    c.askOutcomeQuestion = 'When is the conversation? I can ask how it went, after.',
+    c.askOutcomeToday = 'Later today',
+    c.askOutcomeTomorrow = 'Tomorrow',
+    c.askOutcomeWeek = 'This week',
+    c.askOutcomeSet = "I'll ask how it went.",
+    c.letGoLine = "Last time you asked {who} to hear you, it didn't land. If it goes that way again, you can let this one go and keep your self-respect.",
+    c.letGoLink = 'Letting it go, and keeping my self-respect'
 REMOVE c.planLocked, c.planUnlocked, c.planLockedHeading;
 // The old number-scale copy (intensityQuestion, intensityHint, intensityLow, intensityHigh,
 // downshiftLead, rerateQuestion, rerateHint) is no longer set, but stays on the live node for one

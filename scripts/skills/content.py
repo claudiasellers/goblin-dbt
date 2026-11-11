@@ -12,11 +12,12 @@ import nightmare_rescript  # noqa: E402
 import problem_solve  # noqa: E402
 import ending_relationships  # noqa: E402
 import hold_to_wait  # noqa: E402
+import dear_man_debrief  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
-          ending_relationships.SKILL, hold_to_wait.SKILL]
+          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -35,6 +36,9 @@ EMBEDS = {
     # Problem Solve's "the part that doesn't want change" (parts on; docs/design/parts.md): a quiet yes that queues a
     # PartCandidate. Reports nothing; its slot's record says it showed.
     "partLater": {},
+    # DEAR MAN's debrief: who showed up? (src/lib/debriefWho.ts; parts on, a kept part, the lines shipped, else it moves
+    # on at once). Reports the named form's answer; the general form is the tag row, which writes its own tag.
+    "debriefWho": {"ids": ["yes", "a_bit", "no", "skip", "general", "not_shown"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -42,6 +46,7 @@ EMBEDS = {
 EMBED_PROPS = {
     "partsLine": {"promptId": {"type": "id"}},
     "partLater": {},
+    "debriefWho": {},
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},
         "seconds": {"type": "int", "min": 1, "max": 900},

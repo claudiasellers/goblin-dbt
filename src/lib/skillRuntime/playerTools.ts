@@ -14,6 +14,16 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'problem-solve': 'problem_solve',
 };
 
+/**
+ * Tools whose own page plays a skill for part of the visit (not the switch above): FAST picks one of its two skills,
+ * DEAR MAN plays its debrief on `?mode=debrief` (IE-B2) while the prep stays hand-built. A projection may exist for
+ * these too (C8.2: the skill's run still has old readers).
+ */
+export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
+  'fast': ['fast_review', 'fast_let_go'],
+  'dear-man': ['dear_man_debrief'],
+};
+
 /** The skill a tool's page plays, or null when the tool still has its own page. */
 export function playerSkillFor(toolId: string): string | null {
   return Object.prototype.hasOwnProperty.call(PLAYER_TOOLS, toolId) ? PLAYER_TOOLS[toolId] : null;

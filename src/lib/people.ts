@@ -121,5 +121,5 @@ export function withAnswer(people: readonly KeptPerson[] | null, p: PickedPerson
     id: p.personId, kind: 'person', area: 'my_people', status: 'active', source: 'user',
     confirmedAt: nowIso, revisitAt: null, prompt: 'none',
   } as KeptPerson['meta'];
-  return [{ id: p.personId, label: p.label, role: p.role, safe: p.safe, risk: p.risk, safeAskedAt: nowIso, meta }, ...list];
+  return [{ id: p.personId, label: p.label, role: p.role, safe: p.safe, risk: p.risk, safeAskedAt: nowIso, refusalsValidation: 0, meta }, ...list];
 }

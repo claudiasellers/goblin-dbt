@@ -33,8 +33,10 @@ CRISIS_VARIANTS = {"crisis", "other_person"}
 RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
 SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
-# Content nodes an option may show (PRESENTS): Problem Solve's, which live in their own schema files (ps_graph.py).
-PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "BarrierType", "BarrierSubResponse", "AmbivalenceOption"}
+# Content nodes an option may show (PRESENTS): Problem Solve's (ps_graph.py) and DEAR MAN's debrief vocabulary.
+PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "BarrierType", "BarrierSubResponse", "AmbivalenceOption",
+                   # DEAR MAN's debrief vocabulary (schema/dear-man-debrief-content.cypher, scripts/dear-man/content.py).
+                   "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor"}
 
 
 def q(s): return json.dumps(s, ensure_ascii=False)

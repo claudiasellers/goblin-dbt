@@ -91,6 +91,15 @@ export interface DearManSafetyCopy {
   safetyRouteEnding?: string;
   safetyRouteBack?: string;
   badlyHeadsUp?: string;
+  /** The debrief's picker question (IE-B2); the prep's saved screen (ask_outcome) and Let go after a refused ask. */
+  personWhoDebrief?: string;
+  askOutcomeQuestion?: string;
+  askOutcomeToday?: string;
+  askOutcomeTomorrow?: string;
+  askOutcomeWeek?: string;
+  askOutcomeSet?: string;
+  letGoLine?: string;
+  letGoLink?: string;
 }
 
 export interface SituationType {

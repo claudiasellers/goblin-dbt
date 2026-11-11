@@ -9,7 +9,7 @@ import { importTs } from "./lib/importTs.mjs";
 
 const fixture = JSON.parse(readFileSync("tests/fixtures/legacy-exits.json", "utf8"));
 const toolIds = new Set([...readFileSync("src/data/tools.ts", "utf8").matchAll(/^\s*id: '([a-z0-9-]+)',/gm)].map((m) => m[1]));
-const { PLAYER_TOOLS } = await importTs("src/lib/skillRuntime/playerTools.ts");
+const { PLAYER_TOOLS, PAGE_SKILLS } = await importTs("src/lib/skillRuntime/playerTools.ts");
 
 test("the source's jumps and the fixture agree, both ways", () => {
   const key = (e) => `${e.from} -> ${e.to}`;
@@ -37,5 +37,12 @@ test("the switch names real tools and real skills", () => {
 test("projections exist only for tools on the player (C8.2)", () => {
   const src = readFileSync("functions/src/skills/projections.ts", "utf8");
   const block = /export const PROJECTIONS[^=]*=\s*\{([\s\S]*?)\};/.exec(src)[1];
-  for (const m of block.matchAll(/'([a-z0-9-]+)'\s*:/g)) assert.ok(m[1] in PLAYER_TOOLS, `${m[1]} has a projection but isn't on the player`);
+  for (const m of block.matchAll(/'([a-z0-9-]+)'\s*:/g)) assert.ok(m[1] in PLAYER_TOOLS || m[1] in PAGE_SKILLS, `${m[1]} has a projection but isn't on the player`);
+});
+
+test("pages that play a skill name real skills of their own tool", () => {
+  const skills = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "utf8")).skills;
+  for (const [toolId, ids] of Object.entries(PAGE_SKILLS)) {
+    for (const id of ids) assert.equal(skills.find((s) => s.id === id)?.toolId, toolId, `${toolId} plays ${id}`);
+  }
 });

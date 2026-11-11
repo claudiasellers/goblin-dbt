@@ -56,6 +56,8 @@ export interface ProfileSlices {
     safe: 'yes' | 'no' | 'unsure' | null;
     risk: 'none' | 'invalidating' | 'harm' | 'unstated' | null;
     safeAskedAt: string | null;
+    /** Asks to be heard that the person's DEAR MAN debriefs said went unheard, since the last one that landed (IE-B2). */
+    refusalsValidation: number;
     meta: ProfileItemMeta;
   }>;
   bodyFlags: null;

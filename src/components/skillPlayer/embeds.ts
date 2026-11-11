@@ -8,6 +8,7 @@ import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
 import { WaitLockEmbed } from './WaitLockEmbed';
+import { DebriefWhoEmbed } from './DebriefWhoEmbed';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -48,6 +49,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   boundaryLine: BoundaryLine,
   rescriptCard: RescriptCard,
   waitLock: WaitLockEmbed,
+  debriefWho: DebriefWhoEmbed,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -59,6 +61,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   boundaryLine: { ids: ['copied'] },
   rescriptCard: { ids: ['read', 'stopped'], measures: ['durationSec'] },
   waitLock: { ids: ['waited', 'back_early'], measures: ['durationSec'] },
+  debriefWho: { ids: ['yes', 'a_bit', 'no', 'skip', 'general', 'not_shown'] },
 };
 
 /**
@@ -132,4 +135,5 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     doneShort: { type: 'copy' },
     next: { type: 'copy' },
   },
+  debriefWho: {},
 };

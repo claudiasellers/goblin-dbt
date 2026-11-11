@@ -199,10 +199,15 @@ test("people (IE-03): kept people with their label read back; nobody kept → []
   const out = await slices.readProfileSlices(tx, "u1", "dear-man");
   assert.equal(out.people.length, 1);
   const { meta: m, ...p } = out.people[0];
-  assert.deepEqual(p, { id: row.id, label: "Sam", role: "parent", safe: "no", risk: "invalidating", safeAskedAt: "2026-11-01T00:00:00Z" });
+  assert.deepEqual(p, { id: row.id, label: "Sam", role: "parent", safe: "no", risk: "invalidating", safeAskedAt: "2026-11-01T00:00:00Z", refusalsValidation: 0 });
   assert.equal(m.area, "my_people");
   const none = await slices.readProfileSlices(fakeTx(() => []), "u1", "dear-man");
   assert.deepEqual(none.people, []);
+  // IE-B2: the debrief's count of refused asks to be heard rides on the person (a whole number, never negative).
+  const counted = await slices.readProfileSlices(fakeTx((q) => (/HAS_PERSON/.test(q) ? [{ p: { ...row, refusalsValidation: 2 } }] : [])), "u1", "dear-man");
+  assert.equal(counted.people[0].refusalsValidation, 2);
+  const odd = await slices.readProfileSlices(fakeTx((q) => (/HAS_PERSON/.test(q) ? [{ p: { ...row, refusalsValidation: -3 } }] : [])), "u1", "dear-man");
+  assert.equal(odd.people[0].refusalsValidation, 0);
 });
 
 test("status: resting is live (still checked back with), set aside is not", () => {

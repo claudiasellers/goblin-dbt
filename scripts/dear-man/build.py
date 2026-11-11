@@ -314,6 +314,17 @@ MERGE (mr)-[:RESPONDS_TO]->(tp);
         for mr in r["responses"]:
             L.append(f"\nMATCH (ca:CopeAhead {{id: {lit(r['id'])}}}), (mr:MomentResponse {{id: {lit(mr)}}})\nMERGE (ca)-[:FOR_RESPONSE]->(mr);\n")
     L.append(nodes("New DearManFeelingChip nodes for debrief", "f", "DearManFeelingChip", C.DEBRIEF_FEELING_CHIPS))
+    L.append("""
+// ── TroubleshootFactor nodes (IE-11, Handout 9) ──
+// What got in the way most, after an ask that went partly or not at all. SUGGESTS_FACTOR: a turning point that
+// often points to the factor (knowledge, not routing). IMPLEMENTS: part of DEAR MAN's debrief.
+""")
+    for r in C.TROUBLESHOOT_FACTORS:
+        props = {k: v for k, v in r.items() if k not in ("id", "suggestedBy")}
+        L.append("\n" + merge("tf", "TroubleshootFactor", r["id"], props) + ";\n")
+        L.append(f"\nMATCH (tf:TroubleshootFactor {{id: {lit(r['id'])}}}), (tc:TherapyConcept {{id: 'dbt_dear_man'}})\nMERGE (tf)-[:IMPLEMENTS]->(tc);\n")
+        for tp in r["suggestedBy"]:
+            L.append(f"\nMATCH (tp:TurningPoint {{id: {lit(tp)}}}), (tf:TroubleshootFactor {{id: {lit(r['id'])}}})\nMERGE (tp)-[:SUGGESTS_FACTOR]->(tf);\n")
     return "".join(L)
 
 
