@@ -30,6 +30,11 @@ export interface EmbedProps {
   picked?: Readonly<Record<string, readonly string[]>>;
   /** The same answers as ids (an emotion field's grid ids, for an embed that asks the server about them). */
   answerIds?: Readonly<Record<string, readonly string[]>>;
+  /**
+   * The tool's profile slices (PROFILE_NEEDS, the same `$p.*` the conditions read), or null while loading or signed
+   * out. For an embed that shows something the person kept (Hold to wait's pros & cons replay); read-only.
+   */
+  profile?: Readonly<Record<string, unknown>> | null;
   onShown: () => void;
   onDone?: (output: EmbedOutput) => void;
   /**

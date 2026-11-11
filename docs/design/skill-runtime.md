@@ -133,7 +133,7 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   `field`, `id`; any may be `optional`), mirrored in content.py. `build.py` refuses an undeclared, mistyped or
   missing prop on any embed step or slot, and a `copy` prop must name a key in the skill's copy: the player
   passes its text (`resolveEmbedProps`), so an embed never carries its own words. Embeds also get `answerIds`.
-  Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`), `waitLock` (DT-02) and `witness` (the receive beat,
+  Shared embeds: `holdRing` (`press` · `timed` · `settle`; `src/lib/holdRing.ts`), `waitLock` (DT-02), `prosConsCard` / `prosConsReplay` (DT-10) and `witness` (the receive beat,
   logged against the visit's session). `dev/skills-review.html` shows every step of every skill and each embed.
 - **Crisis slots.** `crisis: [{variant: 'crisis' | 'other_person', when}]` on any step (ask, embed, hand-off)
   shows the compact `CrisisBanner` while `when` holds. An option or embed id marked `danger` needs a slot of its
@@ -144,8 +144,6 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
 - **`safetyFirst`** (DT-02): a step's condition; when the run arrives at the step and it holds, the player opens
   `safety.open` over it before it can be answered (once per arrival, a resumed run landing on it included). `build.py` requires the
   `safety_open` exit and a crisis slot on the step. Hold to wait's *Hurt myself* → `safe` is the first user.
-- **The carried band** (DT-02): with no hand-off band in route state, the player reads the person's own
-  `band.current()` (≤ 20 min, client-only, R1) for a skill that accepts `band`; never from a link.
 - **Practice and `noClose`** (DT-02): a whole-screen embed's output other than `skipped` marks the session
   practiced; leaving a `noClose` card also dismisses Today's outcome card for the session (`answerToolOutcome`
   `dismissed`), so the question it didn't ask isn't asked later.
@@ -153,6 +151,11 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   quiet link (Gate 2: easy to miss when flooded).
 - **Urge ids** (DT-02): an option's `urge` prop names the `ActionUrge` it stands for; the player sets the session's
   `urgeIds` (ask-fresh) from the run's picks. `build.py` checks every `urge` / `forUrges` id is an `ActionUrge`.
+- **Embeds read the tool's profile slices** (DT-10): `EmbedProps.profile` is the same `$p.*` the conditions read
+  (PROFILE_NEEDS, read-only, null while loading). Hold to wait's `prosConsReplay` shows the card kept for the pull.
+- **A planned exit can wait for a frame** (DT-10): an exit to a built skill stays planned while it asks for a
+  `frame` the skill doesn't accept (`build.py`, `tests/skill-contracts.test.mjs`); it is never offered. Ending's
+  *Weigh it up* → `pros-cons` `{frame: 'stay_or_end'}` is the first.
 - **Counting derive** (`kind: 'count'`: weighted picks summed, the table row with the largest threshold at or
   below the total) and a per-field `own.max` under the skill's `ownMax` (≤ 140).
 - **Follow-up on a hand-off** (R5, ER-B1 second PR, agreed with the plan thread). A step's `followUp`

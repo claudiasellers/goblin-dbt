@@ -11,6 +11,11 @@ const fixture = JSON.parse(readFileSync("tests/fixtures/skills-content.json", "u
 const read = (p) => readFileSync(p, "utf8");
 const py = (code) => JSON.parse(execFileSync("python3", ["-c", `import sys,json; sys.path.insert(0,'scripts/skills'); ${code}`], { encoding: "utf8" }));
 const toolIds = new Set([...read("src/data/tools.ts").matchAll(/^\s*id: '([a-z0-9-]+)',/gm)].map((m) => m[1]));
+/** A planned exit to a built skill that doesn't accept its `frame` yet: it waits for that frame, never opened. */
+const waitsForFrame = (x) => {
+  const target = fixture.skills.find((t) => t.toolId === x.toolId);
+  return !!target && typeof x.query?.frame === "string" && !target.accepts.includes("frame");
+};
 const CTX_KEYS = new Set(["urgeId", "personId", "frame", "enterAt", "situationId", "partId", "band", "returnTo"]);
 const EXT_MAX_BYTES = 4096;
 
@@ -56,7 +61,9 @@ for (const sk of fixture.skills) {
     const ids = new Set(sk.exits.map((x) => x.id));
     for (const x of sk.exits) {
       if (x.safety) assert.equal(x.toolId, null, x.id);
-      else if (x.planned) assert.ok(x.toolId && !toolIds.has(x.toolId), `${x.id}: planned, but ${x.toolId} is built: flip it`);
+      // Planned: the tool isn't built, or it is and its skill doesn't take the frame the exit asks for yet (Ending's
+      // stay-or-end pros and cons waits for DT-10's decision frame; the urge card is the wrong frame for it).
+      else if (x.planned) assert.ok(x.toolId && (!toolIds.has(x.toolId) || waitsForFrame(x)), `${x.id}: planned, but ${x.toolId} is built: flip it`);
       else assert.ok(x.done || toolIds.has(x.toolId), `${x.id}: ${x.toolId} is not a tool`);
     }
     for (const st of sk.steps) {
@@ -70,6 +77,7 @@ for (const sk of fixture.skills) {
     for (const x of sk.exits) {
       const target = fixture.skills.find((t) => t.toolId === x.toolId);
       if (!target) continue; // a page not on the runtime yet: its own entry contract (tests per tool)
+      if (x.planned && waitsForFrame(x)) continue; // never opened until its frame is built
       for (const key of Object.keys(x.query)) assert.ok(target.accepts.includes(key), `${x.id}: ${target.id} doesn't accept ${key}`);
     }
   });

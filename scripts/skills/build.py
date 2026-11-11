@@ -21,7 +21,7 @@ REF = re.compile(r"^\$(a|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
 PROFILE_SLICES = {
     "name", "quietHours", "patterns", "ownLines", "savedLines", "people", "bodyFlags", "values", "goals",
     "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "crisisKit",
-    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den",
+    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons",
 }
 # Slices a field may list as options (src/data/skillTypes.ts ProfileOptionSlice).
 PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", "goals", "copeAheadPlans", "boundaryLines", "thingsILike"}
@@ -159,7 +159,11 @@ def check(skill):
         else:
             assert e["id"] != SAFETY_EXIT_ID, (sid, f"{SAFETY_EXIT_ID} is reserved for safety.open", e)
             if e.get("planned"):
-                assert e.get("toolId") and e["toolId"] not in tools, (sid, "a planned exit names a tool that isn't built (flip it when it is)", e)
+                # Or a built skill that doesn't take the exit's frame yet (Ending's stay-or-end pros and cons waits for
+                # DT-10's decision frame): it waits for that frame and is never opened.
+                target = next((t for t in SKILLS if t["toolId"] == e.get("toolId")), None)
+                waits = bool(target) and isinstance(e.get("query", {}).get("frame"), str) and "frame" not in target["accepts"]
+                assert e.get("toolId") and (e["toolId"] not in tools or waits), (sid, "a planned exit names a tool that isn't built (flip it when it is)", e)
             else:
                 assert e.get("done") or e.get("toolId") in tools, (sid, e)
         for f in e.get("carry", []):
