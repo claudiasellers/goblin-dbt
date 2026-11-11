@@ -15,31 +15,41 @@ function endSentence(s: string): string {
   return /[.!?…]["')\]]?$/.test(s) ? s : `${s}.`;
 }
 
-// "sorry" and "apologise / apologize / apologies", as whole words, however they're written.
-const SORRY = /\b(sorry|apologi[sz]e[sd]?|apologies)\b/gi;
+// "sorry", "apologise / apologize" and "apologies", as whole words: an apology in the message, not one described
+// ("I apologised", "she apologises").
+const SORRY = /\b(sorry|apologi[sz]e|apologies)\b/gi;
 
 /** How many apologies the message holds (the FAST strip shows its line when there's one). */
 export function sorryCount(text: string): number {
   return (text.match(SORRY) ?? []).length;
 }
 
+// The apology clauses that go whole: "sorry to say / hear (this)", "sorry to bother / disappoint (you)", "sorry to let
+// you down". Any other "sorry to / for / about …" is left as written: what follows is the person's own sentence.
+const SORRY_TO = String.raw`sorry\s+to\s+(?:(?:say|hear)(?:\s+(?:this|that|it))?|(?:bother|disappoint)(?:\s+you)?|let\s+you\s+down)\b`;
+const NOT_OWN = String.raw`(?!\s+(?:to|for|about)\s+(?!(?:this|that)\b))`;
+const INTENS = String.raw`(?:(?:so|really|very|truly|terribly)\s+)*`;
+const TAIL = String.raw`[,.!]?\s*(?:\bbut\b[,]?\s*)?`;
+
 /**
  * The message with its apologies taken out, keeping the rest of each sentence: "I'm so sorry, but I can't." becomes
- * "I can't." A sentence that was only an apology goes. Never touches anything else the person wrote.
+ * "I can't." A sentence that was only an apology goes. Never removes the person's own words around an apology it
+ * can't take out cleanly ("sorry to the team" stays as written).
  */
 export function dropSorry(text: string): string {
   const out = text
-    // "I'm (so / really / very) sorry(,) (but / that / for this)", "I am sorry", "sorry(,) (but)"
-    // "I'm sorry to hear that / to say this(,) (but)": the whole clause goes.
-    .replace(/\b(?:(?:I'?m|I am)\s+(?:(?:so|really|very|truly|terribly)\s+)*)?sorry\s+to\s+\w+(?:\s+(?:this|that|it))?[,.!]?\s*(?:\bbut\b[,]?\s*)?/gi, '')
-    .replace(/\b(?:I'?m|I am)\s+(?:(?:so|really|very|truly|terribly)\s+)*(?:sorry|apologetic)\b[,.!]?\s*(?:\b(?:but|that|for that|about this|about that)\b[,]?\s*)?/gi, '')
-    .replace(/\b(?:I\s+)?(?:(?:have\s+)?apologi[sz]e[sd]?|apologies)\b(?:\s+(?:already|for\s+(?:this|that)))?[,.!]?\s*(?:\bbut\b[,]?\s*)?/gi, '')
-    .replace(/\bsorry\b[,.!]?\s*(?:\bbut\b[,]?\s*)?/gi, '')
+    .replace(new RegExp(String.raw`\b(?:(?:I'?m|I am)\s+${INTENS})?${SORRY_TO}${TAIL}`, 'gi'), '')
+    .replace(new RegExp(String.raw`\b(?:I'?m|I am)\s+${INTENS}(?:sorry|apologetic)\b${NOT_OWN}(?:\s+(?:for|about)\s+(?:this|that))?[,.!]?\s*(?:\b(?:but|that)\b[,]?\s*)?`, 'gi'), '')
+    .replace(new RegExp(String.raw`\b(?:I\s+|my\s+)?(?:apologi[sz]e|apologies)\b${NOT_OWN}(?:\s+for\s+(?:this|that))?${TAIL}`, 'gi'), '')
+    .replace(new RegExp(String.raw`\bsorry\b${NOT_OWN}${TAIL}`, 'gi'), '')
     .replace(/\s{2,}/g, ' ')
     .replace(/\s+([.,!?])/g, '$1')
+    .replace(/,([.!?])/g, '$1')
+    .replace(/,\s*$/, '.')
     .replace(/(^|[.!?]\s+)[,.]\s*/g, '$1')
     .trim();
   // Each sentence starts with a capital again once its apology has gone.
+  if (out === text.trim()) return out;
   return out.replace(/(^|[.!?]\s+)([a-z])/g, (_, p: string, c: string) => p + c.toUpperCase());
 }
 

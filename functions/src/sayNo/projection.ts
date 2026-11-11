@@ -1,5 +1,5 @@
 import type { ManagedTransaction } from 'neo4j-driver';
-import { answersOf, PERSON_RISK_QUERY, SAFETY_RECHECK } from '../dearMan/debriefProjection';
+import { answersOf, PERSON_RISK_QUERY, SAFETY_RECHECK, UUID } from '../dearMan/debriefProjection';
 import { personRoute, storedRisk } from '../safety/personSafety';
 import type { ProjectionInput } from '../skills/projections';
 
@@ -16,8 +16,6 @@ import type { ProjectionInput } from '../skills/projections';
  * first visit named (its session SCHEDULED the card this visit is RESOLVING). Someone on the safety route is never
  * linked. Only the caller's own records.
  */
-
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** The first visit's run, for a visit its `no_outcome` card opened. */
 export const SOURCE_RUN_QUERY = `

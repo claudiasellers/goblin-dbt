@@ -7,6 +7,8 @@ import { ToolLoading } from '../tools/ToolLoading';
 import { ToolLoadError } from '../tools/ToolLoadError';
 import { useProfileContext } from '../../hooks/useProfileContext';
 import { getSkillRun, getSkillsContent } from '../../services/skills';
+import { resumeRun, type RunContext } from '../../lib/skillRuntime/machine';
+import { emotions } from '../../data/emotions';
 import { presetPerson } from '../../lib/dearManDebrief';
 import { personFirstPickerCopy, personFirstSafetyCopy, reopenGate, RUN_ID } from '../../lib/personFirst';
 import type { PickedPerson } from '../../lib/people';
@@ -21,6 +23,8 @@ import type { PickedPerson } from '../../lib/people';
  * on the safety route gets the safety screen. Without the picker's copy the page shows the load error: the skill
  * never runs without the safety question.
  */
+const GRID = new Set(emotions.map((e) => e.id));
+
 export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctxFor }: {
   skillId: string;
   toolId: 'dear-man' | 'say-no';
@@ -37,7 +41,8 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   const profile = useProfileContext(toolId);
   const [copy, setCopy] = useState<Record<string, string> | null>(null);
   const [copyFailed, setCopyFailed] = useState(false);
-  const [skillDef, setSkillDef] = useState<{ id: string; version: string } | null>(null);
+  // The player's own context, only to ask whether a `?run=` will reopen (resumeRun), never to play.
+  const [runCtx, setRunCtx] = useState<RunContext | null>(null);
   const [picked, setPicked] = useState<PickedPerson | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
 
@@ -48,7 +53,7 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
       .then((c) => {
         if (!live) return;
         const sk = c.skills.find((s) => s.id === skillId);
-        setSkillDef(sk ? { id: sk.id, version: sk.version } : null);
+        setRunCtx(sk ? { skill: sk, shared: { parentOf: c.parentOf, fitsWhen: c.fitsWhen }, carried: [], gridIds: GRID, emotionLabel: (x) => x } : null);
         setCopy((sk?.copy as Record<string, string> | undefined) ?? {});
       })
       .catch(() => { if (live) setCopyFailed(true); });
@@ -62,7 +67,11 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
     if (!reopening || !settled || !runId || !copy) return;
     let live = true;
     getSkillRun(runId, toolId)
-      .then((run) => { if (live) setReopen(reopenGate(run, profile.slices?.people ?? null, skillDef)); })
+      .then((run) => {
+        if (!live) return;
+        const at = q.get('at');
+        setReopen(reopenGate(run, profile.slices?.people ?? null, (r) => !!runCtx && resumeRun(runCtx, r, at) !== null, Date.now()));
+      })
       .catch(() => { if (live) setReopen({ kind: 'picker' }); });
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps

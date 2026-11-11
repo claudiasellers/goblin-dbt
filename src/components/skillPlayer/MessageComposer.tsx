@@ -63,7 +63,7 @@ export function MessageComposer({ props, picked, onShown, onDone }: EmbedProps) 
           {sorry > 0 && text('sorryLine') && (
             <>
               <p className="text-sm text-[var(--color-text-secondary)]">{text('sorryLine')}</p>
-              {text('dropSorry') && (
+              {text('dropSorry') && !dropped && (
                 <button type="button" className={secondaryButton}
                   onClick={() => { done.current.add('dropped_sorry'); setDropped(true); setCopied(false); setStatus(''); }}>
                   {text('dropSorry')}

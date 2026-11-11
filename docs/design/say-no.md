@@ -70,7 +70,8 @@ message on the keepsake paper (`PaperCard`), each part ending as a sentence. Und
 
 - an apology anywhere in the message gets *There's a sorry in there. You don't owe one for saying no.* and *Take the
   sorry out*, which removes the apology and keeps the rest of the sentence (*I'm so sorry, but I can't* → *I can't*;
-  *I'm sorry to hear that, but no* → *No*), from the line to repeat too;
+  *I'm sorry to hear that, but no* → *No*), from the line to repeat too. An apology it can't take out cleanly
+  (*sorry to the team*) stays as written: it never removes the person's own words around one;
 - a reason over 70 characters gets *One reason is enough. A long one can sound like it's up for debate.*
 
 Then *If they push, say it again:* with the no on its own, Copy (select-to-copy when there's no clipboard) and Open
@@ -100,10 +101,12 @@ Nothing is locked, at any band. One message (IE-01 Mode A) reuses the card.
 - Before the skill: the safety question and route (D4), shared with DEAR MAN through `PersonFirstSkill`; the skill
   never runs without the picker's copy (fail closed).
 - A reopened visit (`?run=`, the `no_outcome` card) skips the picker only once the run has loaded and is one the
-  player will reopen (`reopenGate`, `src/lib/personFirst.ts`: same skill, same version). Nothing to reopen (offline,
-  retention, a stale or edited link, a new version) is the picker, never a fresh run without it. A person moved onto
-  the safety route since the first visit gets the safety screen, not *Did you say no?* (Gates 1 and 3). This covers
-  DEAR MAN's debrief too.
+  player will reopen (`reopenGate`, `src/lib/personFirst.ts`, asked through the player's own `resumeRun`). Nothing to
+  reopen (offline, retention, a stale, edited or already-answered link, a new version) is the picker, never a fresh
+  run without it. A person moved onto the safety route since the first visit gets the safety screen, not *Did you say
+  no?*; a person whose safety answer is due again (90 days, or a debrief's *I don't feel safe with them*), or a run
+  naming someone when the people list couldn't be read, gets the picker (Gates 1 and 3). This covers DEAR MAN's
+  debrief too.
 - *I'm scared of what they'd do* is a danger option (`danger: other`): the `other_person` crisis slot on every
   screen after it, no sizing, no reasons, no negotiation, Ending a relationship with `frame=careful` and
   `safety.open` on the end card, no close question.

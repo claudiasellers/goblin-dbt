@@ -3,6 +3,7 @@
  * shows the person picker from the skill's own copy (`picker_<key>`, one source in scripts/dear-man/content.py), with
  * the safety question when the answer isn't fresh; the safety route gets the safety screen and never the skill.
  */
+import { needsSafetyAsk } from './personSafety';
 import { PERSON_PICKER_COPY, pickedKept, pickerCopy, type KeptPerson, type PersonPickerCopy, type PickedPerson } from './people';
 
 /** The picker's copy from a skill's: its own question (`questionKey`) and every other line the prep's. Or null. */
@@ -30,26 +31,30 @@ export function sayNoCtx(p: PickedPerson): Record<string, string> {
 }
 
 /**
- * A reopened visit (`?run=`, R9: a card asking how it went) skips the picker only when the run really reopens, and
- * never for someone now on the safety route (Gate 3): `skill` plays it; `safety` shows the safety screen for that
- * person (answered since the first visit); `picker` when there's nothing to reopen (no run, a failed read, a bad id),
- * a run of another version, so a fresh run never starts without who it's with and the safety question.
+ * A reopened visit (`?run=`, R9: a card asking how it went) skips the picker only when the player will really reopen
+ * the run, and never for someone now on the safety route (Gates 1 and 3). `reopens` is the player's own test
+ * (`resumeRun(ctx, run, at) !== null`), so the two can't disagree. `skill` plays it; `safety` shows the safety screen
+ * for that person (answered since the first visit); `picker` whenever the player would start a fresh run instead (no
+ * run, a failed read, another version, a reopen step it never got to, a bad id), when the people list couldn't be read
+ * for a run that names someone, or when that person's safety answer is due again (90 days, *Things changed*).
  */
 export function reopenGate(run: Readonly<Record<string, unknown>> | null, people: readonly KeptPerson[] | null,
-  skill: { id: string; version: string } | null):
+  reopens: (run: Readonly<Record<string, unknown>>) => boolean, now: number):
   { kind: 'skill' } | { kind: 'safety'; person: PickedPerson } | { kind: 'picker' } {
-  if (!run || typeof run !== 'object' || !skill) return { kind: 'picker' };
-  // The player reopens only this skill's run of this version (resumeRun); anything else would start fresh.
-  if (run.skillId !== skill.id || run.versionId !== skill.version || !Array.isArray(run.path)) return { kind: 'picker' };
+  if (!run || typeof run !== 'object' || !reopens(run)) return { kind: 'picker' };
   const ctx = run.ctx && typeof run.ctx === 'object' ? run.ctx as Record<string, unknown> : {};
-  const id = typeof ctx.personId === 'string' ? ctx.personId : null;
-  const kept = id ? (people ?? []).find((p) => p.id === id) : undefined;
+  const id = typeof ctx.personId === 'string' && ctx.personId !== 'none' ? ctx.personId : null;
+  if (!id) return { kind: 'skill' };
+  // Fail closed: someone named and no list to check them against is asked again.
+  if (!people) return { kind: 'picker' };
+  const kept = people.find((p) => p.id === id);
+  // Forgotten since: nothing kept to check, and the run goes on without them.
+  if (!kept) return { kind: 'skill' };
   // Kept but never answered (an older record): ask, as a link's preset would.
-  if (kept && !kept.risk) return { kind: 'picker' };
-  if (kept) {
-    const picked = pickedKept(kept);
-    if (picked.route === 'safety') return { kind: 'safety', person: picked };
-  }
+  if (!kept.risk) return { kind: 'picker' };
+  const picked = pickedKept(kept);
+  if (picked.route === 'safety') return { kind: 'safety', person: picked };
+  if (needsSafetyAsk(kept, now)) return { kind: 'picker' };
   return { kind: 'skill' };
 }
 

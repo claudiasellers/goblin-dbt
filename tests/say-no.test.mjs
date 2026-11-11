@@ -167,9 +167,12 @@ test("message card: the FAST strip finds a sorry and takes it out, keeping the r
   assert.equal(MC.dropSorry("Sorry. No, I'm not going to do that."), "No, I'm not going to do that.");
   assert.equal(MC.dropSorry("I apologise, but that doesn't work for me."), "That doesn't work for me.");
   assert.equal(MC.dropSorry("No, I'm not going to do that."), "No, I'm not going to do that.", "nothing else touched");
-  assert.equal(MC.dropSorry("I apologised already, no."), "No.");
   assert.equal(MC.dropSorry("I'm sorry to hear that, but no."), "No.");
-  for (const t of ["I apologised already, no.", "I'm sorry to hear that, but no.", "Sorry to say this, but I can't."]) assert.equal(MC.sorryCount(MC.dropSorry(t)), 0, t);
+  for (const t of ["I'm sorry to hear that, but no.", "Sorry to say this, but I can't.", "I'm sorry for that, but no."]) assert.equal(MC.sorryCount(MC.dropSorry(t)), 0, t);
+  assert.equal(MC.dropSorry("No, sorry to disappoint you."), "No.");
+  // Never the person's own words around an apology it can't take out cleanly; a described apology isn't one.
+  for (const t of ["sorry to the team but I can't come", "I'm sorry to leave you hanging, but no.", "I can't. Sorry to all of you.", "Sorry for the late reply, I can't.", "She apologises for nothing. No.", "I have apologised before; still no."]) assert.equal(MC.dropSorry(t), t, t);
+  assert.equal(MC.sorryCount("I apologised already, no."), 0);
   assert.equal(MC.overExplains(["I've got too much on."]), false);
   assert.equal(MC.overExplains(["x".repeat(MC.LONG_REASON + 1)]), true);
   assert.equal(MC.messagesHref("No & thanks"), "sms:?&body=No%20%26%20thanks");
@@ -197,18 +200,23 @@ test("page: who's asking first, the safety route never reaches the skill; a reop
   assert.deepEqual(PF.sayNoCtx({ ...p, personId: null, route: "heads_up" }), { personId: "none", frame: "heads_up" });
 });
 
-test("reopen gate: nothing to reopen is the picker; someone now on the safety route gets the safety screen", () => {
+test("reopen gate: only a run the player will reopen skips the picker; someone now on the safety route gets the safety screen", () => {
+  const NOW = Date.parse("2026-11-11T12:00:00Z");
   const kept = (o) => ({ id: "p1", label: "Sam", role: "friend", safe: "yes", risk: "none", safeAskedAt: "2026-11-01T00:00:00Z", ...o });
-  const run = (personId, o = {}) => ({ skillId: "say_no", versionId: skill.version, path: ["ask"], ctx: personId ? { personId } : {}, ...o });
-  const sk = { id: skill.id, version: skill.version };
-  const gate = (r, people) => PF.reopenGate(r, people, sk);
+  const sent = ["ask", "pressure", "why", "firm", "level", "compose", "message", "predict", "sent"];
+  const run = (personId, o = {}) => ({ skillId: "say_no", versionId: skill.version, path: sent, answers: [], ctx: personId ? { personId } : {}, ...o });
+  // The player's own test, as PersonFirstSkill passes it.
+  const reopens = (at) => (r) => M.resumeRun(ctx(), r, at) !== null;
+  const gate = (r, people, at = "said") => PF.reopenGate(r, people, reopens(at), NOW);
   assert.deepEqual(gate(null, [kept()]), { kind: "picker" });
   assert.deepEqual(gate(run("p1", { versionId: "say-no-v0" }), [kept()]), { kind: "picker" }, "another version would start fresh: ask first");
   assert.deepEqual(gate(run("p1", { skillId: "fast_review" }), [kept()]), { kind: "picker" });
-  assert.deepEqual(PF.reopenGate(run("p1"), [kept()], null), { kind: "picker" });
+  assert.deepEqual(gate(run("p1", { path: ["ask", "pressure", "why"] }), [kept()]), { kind: "picker" }, "never reached sent: nothing to ask about");
+  assert.deepEqual(gate(run("p1", { path: [...sent, "said", "held", "proud", "held_end"] }), [kept()]), { kind: "picker" }, "already answered (the link opened again)");
   assert.deepEqual(gate(run("p1"), [kept()]), { kind: "skill" });
-  assert.deepEqual(gate(run("none"), [kept()]), { kind: "skill" }, "nobody kept");
+  assert.deepEqual(gate(run("none"), null), { kind: "skill" }, "nobody kept");
   assert.deepEqual(gate(run(null), null), { kind: "skill" });
+  assert.deepEqual(gate(run("p1"), null), { kind: "picker" }, "the list couldn't be read: fail closed");
   assert.deepEqual(gate(run("gone"), [kept()]), { kind: "skill" }, "forgotten since: nothing to check against");
   for (const risk of ["harm", "unstated"]) {
     const g = gate(run("p1"), [kept({ safe: "no", risk })]);
@@ -216,8 +224,12 @@ test("reopen gate: nothing to reopen is the picker; someone now on the safety ro
     assert.equal(g.person.label, "Sam");
   }
   assert.deepEqual(gate(run("p1"), [kept({ risk: null })]), { kind: "picker" }, "never answered: ask");
+  assert.deepEqual(gate(run("p1"), [kept({ safeAskedAt: "2026-07-01T00:00:00Z" })]), { kind: "picker" }, "older than 90 days: ask again");
+  assert.deepEqual(gate(run("p1"), [kept({ safetyRecheckAt: "2026-11-05T00:00:00Z" })]), { kind: "picker" }, "a debrief said not safe since");
   assert.ok(PF.RUN_ID.test("3f2c9a0e-1b2c-4d5e-8f90-123456789abc"));
   assert.equal(PF.RUN_ID.test("1"), false);
+  const pfs = read("src/components/people/PersonFirstSkill.tsx");
+  assert.match(pfs, /reopenGate\(run, profile\.slices\?\.people \?\? null, \(r\) => !!runCtx && resumeRun\(runCtx, r, at\) !== null, Date\.now\(\)\)/);
 });
 
 test("wiring: listed under Interpersonal Effectiveness with its intent; close kind none; reads people; the card's deep link", async () => {
