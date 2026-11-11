@@ -495,6 +495,15 @@ test("follow-up timed by an earlier answer: whenFrom's pick, else whenDefault (C
   assert.deepEqual(m.followUpFor(ctx, step, picked), { type: "resume_skill", chip: "1h" }, "answered: the pick");
 });
 
+test("emotionsFrom: a derived list of words in place of emotions; emotions when it resolves to nothing", () => {
+  const ctx = { ...f2Ctx(null), skill: { ...F2, tables: { ...F2.tables, feelBy: { a: ["anxious", "hurt"] } },
+    derive: [...F2.derive, { name: "feelFor", from: "$a.chip", table: "feelBy" }] } };
+  const field = { id: "feel", options: { emotions: ["sad"], emotionsFrom: "$d.feelFor" }, max: 2 };
+  assert.deepEqual(m.emotionChoices(ctx, field, { chip: { ids: ["a"], own: null } }), ["anxious", "hurt"]);
+  assert.deepEqual(m.emotionChoices(ctx, field, { chip: { ids: ["b"], own: null } }), ["sad"], "no row: the fallback");
+  assert.deepEqual(m.emotionChoices(ctx, field, { chip: { ids: ["a"], own: null }, feel: { ids: ["calm"], own: null } }), ["anxious", "hurt", "calm"], "a pick from the full list stays");
+});
+
 test("inline: starts only at a step it declares; returns its returns fields and the change check as then-vs-now", () => {
   assert.equal(m.initialRun(F2, "when").stepId, "when");
   assert.equal(m.initialRun(F2, "check").stepId, "who", "not an enterAt step: the start");

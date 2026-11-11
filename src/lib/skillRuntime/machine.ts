@@ -195,9 +195,14 @@ export function scope(ctx: RunContext, s: Pick<RunState, 'answers'>): Scope {
   return scopeOf(ctx, s.answers, derive(ctx, s.answers));
 }
 
-/** The emotion words a field offers: carried first, then its own list, then any pick from the full list. */
+/**
+ * The emotion words a field offers: carried first, then its own list (`emotionsFrom`'s derived list when it
+ * resolves to one, else `emotions`), then any pick from the full list.
+ */
 export function emotionChoices(ctx: RunContext, field: FieldDef, answers: Answers): string[] {
-  const own = field.options.emotions ?? [];
+  const from = field.options.emotionsFrom ? resolve(field.options.emotionsFrom, scope(ctx, { answers })) : null;
+  const derived = Array.isArray(from) ? from.filter((x): x is string => typeof x === 'string') : [];
+  const own = derived.length ? derived : field.options.emotions ?? [];
   const carried = field.options.carriedFirst ? ctx.carried.filter((id) => ctx.gridIds.has(id)) : [];
   const picked = answers[field.id]?.ids ?? [];
   return [...new Set([...carried, ...own, ...picked])];

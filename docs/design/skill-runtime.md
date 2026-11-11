@@ -265,6 +265,9 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
 - **A follow-up timed by an earlier answer** (ER-B2). An ask step's `followUp.whenFrom` may name a field of an earlier
   step (Cope Ahead's *When is it?* times the keep step's *Want me to ask how it went?*), with `whenDefault` the chip
   used when it wasn't answered. A hand-off's chips stay on its card.
+- **Words that follow an earlier answer** (ER-B2). An emotion field's `options.emotionsFrom` is a `$d.<name>` ref to a
+  lookup whose rows are lists of grid words (Cope Ahead's feelings by situation); `emotions` stays the fallback, used
+  when the lookup finds no row. One field instead of one per earlier answer keeps the record small.
 - **Projections** (R14, `functions/src/skills/projections.ts`). Cope Ahead's is the first: at close, `ext.ca` from
   `ext.run` (own words encrypted) and the visit's pull as `urgeIds`, so the old readers keep working.
 

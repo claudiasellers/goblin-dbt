@@ -74,6 +74,11 @@ export interface OptionsSource {
   profile?: ProfileOptionSlice;
   /** Grid words (src/data/emotions.ts ids), in order; carried emotions first; `moreKey` opens the full list. */
   emotions?: string[];
+  /**
+   * A `$d.<name>` ref to a derived list of grid words (a lookup through a table, e.g. Cope Ahead's feelings by
+   * situation), offered in place of `emotions` once it resolves to a non-empty list; `emotions` is the fallback.
+   */
+  emotionsFrom?: string;
   carriedFirst?: boolean;
   moreKey?: string;
 }

@@ -209,6 +209,15 @@ def check(skill):
                     check_cond(o["where"], fields, derived, w, accepts)
                 if "groupBy" in o:
                     assert o["groupBy"] in fields, (w, o)
+            if "emotionsFrom" in o:
+                assert "emotions" in o, (w, "emotionsFrom keeps emotions as its fallback list", o)
+                ref = o["emotionsFrom"]
+                assert ref.startswith("$d.") and ref[3:] in derived, (w, "emotionsFrom is a derived value", o)
+                d = next(x for x in skill["derive"] if x["name"] == ref[3:])
+                assert d.get("kind", "lookup") == "lookup" and d.get("keep") != "key", (w, "emotionsFrom reads a lookup's row", d)
+                rows = list(skill["tables"].get(d["table"], {}).values()) + ([d["default"]] if "default" in d else [])
+                assert rows and all(isinstance(r, list) and r and all(isinstance(x, str) for x in r) for r in rows), (
+                    w, "every row of an emotionsFrom table is a list of words", d)
             if "moreKey" in o:
                 assert o["moreKey"] in copy, (w, o)
             for k in ("label",):
