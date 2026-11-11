@@ -13,10 +13,13 @@ export function peekSkillsContent(): SkillsContent | null {
   return loaded;
 }
 
-/** Fetched as its own chunk the first time it is needed, kept for the page's life; a failed fetch can be retried. */
+/**
+ * Fetched as its own chunk the first time it is needed, kept for the page's life; a failed fetch can be retried.
+ * Cast through `unknown`: past roughly 700 KB TypeScript stops inferring a JSON module's type and gives `{}`.
+ */
 export function getSkillsContent(): Promise<SkillsContent> {
   if (!cached) {
-    cached = import('../data/content/skills.json').then((m) => (loaded = m.default.content as unknown as SkillsContent)).catch((e) => {
+    cached = import('../data/content/skills.json').then((m) => (loaded = (m.default as unknown as { content: SkillsContent }).content)).catch((e) => {
       cached = null;
       throw e;
     });

@@ -28,7 +28,8 @@ UNWIND [
   {c: "dbt_fast", t: "fast"},
   {c: "dbt_nightmare_protocol", t: "nightmare-rescript"},
   {c: "dbt_ending_relationships", t: "ending-relationships"},
-  {c: "dbt_pros_cons", t: "pros-cons"}
+  {c: "dbt_pros_cons", t: "pros-cons"},
+  {c: "dbt_radical_acceptance", t: "let-it-be"}
 ] AS row
 MATCH (c:TherapyConcept {id: row.c})
 SET c.appToolId = row.t;

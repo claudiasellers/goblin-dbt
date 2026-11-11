@@ -16,12 +16,13 @@ import dear_man_debrief  # noqa: E402
 import pros_cons  # noqa: E402
 import first_body  # noqa: E402
 import ride_it_out  # noqa: E402
+import let_it_be  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
           ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL, first_body.SKILL,
-          ride_it_out.SKILL]
+          ride_it_out.SKILL, let_it_be.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -166,7 +167,7 @@ EMBED_PROPS = {
         "next": {"type": "copy"},
     },
     "bodyCard": {
-        "kind": {"type": "enum", "values": ["hand_heart", "wake", "strong", "still", "press"]},
+        "kind": {"type": "enum", "values": ["hand_heart", "wake", "strong", "still", "press", "willing"]},
         "cue": {"type": "copy", "optional": True},
         "seconds": {"type": "int", "min": 5, "max": 300},
         "step1": {"type": "copy", "optional": True},

@@ -167,7 +167,7 @@ EXITS = [
     {"id": "please", "toolId": "please-skill", "planned": True},             # ER-07 Running low (ER-B4)
     {"id": "problem_solve", "toolId": "problem-solve"},
     {"id": "check_the_facts", "toolId": "check-the-facts"},
-    {"id": "let_it_be", "toolId": "let-it-be", "planned": True},             # DT-04 willingness (DT-B4)
+    {"id": "let_it_be", "toolId": "let-it-be"},             # DT-04 willingness (DT-B4)
     {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 the wave (ER-B5)
     {"id": "five_senses", "toolId": "five-senses"},                          # orienting (DT-01's orient entry)
     {"id": "emotion_guide", "toolId": "emotion-guide", "planned": True},     # ER-10 myth cards (ER-B5)
