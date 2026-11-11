@@ -7651,7 +7651,7 @@ SET r += {list: "keepit", order: 53};
 
 // --- first_body (fb-v1) ---
 MERGE (s:Skill {id: "first_body"})
-SET s += {toolId: "cool-down", version: "fb-v1", contentVersion: "skills-v1", start: "state", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"card_done\": \"That's it.\", \"card_running\": \"Keep going\", \"card_start\": \"Tap to start\", \"check_title\": \"Compared to when you started, it's…\", \"check_title_here\": \"Compared to when you started, you feel…\", \"cold_caution\": \"Never in a shower or a bath. Cold, not ice-cold.\", \"cold_done\": \"Cold like that can slow your heart for a bit.\", \"cold_lead\": \"Ready in\", \"cold_near_title\": \"Is there cold water, or something cold, near you?\", \"cold_running\": \"Hold it there\", \"cold_start\": \"Tap when it's on\", \"cold_step1\": \"Wet a cloth with cold water, or wrap a cold pack in a cloth.\", \"cold_step2\": \"Lean forward. Hold it on your forehead, eyes and upper cheeks.\", \"cold_step3\": \"Breathe out slowly, or hold your breath if that's comfortable.\", \"cold_title\": \"Circuit Breaker: cold on your face.\", \"cool_caution\": \"You weren't sure, so this one is short and gentle. Stop if anything feels wrong.\", \"cool_done\": \"That's enough cold for now.\", \"cool_step1\": \"A cool cloth, not ice.\", \"cool_step2\": \"Lean forward and rest it on your forehead and eyes.\", \"cool_title\": \"A cool cloth, gently.\", \"done\": \"Done\", \"drop_label\": \"Let it drop\", \"end_accept\": \"That's a heavy thing to carry. You don't have to solve it right now.\", \"end_change\": \"Then it's worth a look, while you're steadier.\", \"end_park\": \"Then it can wait. You can come back to it when you choose.\", \"end_through\": \"You got through it. That's the skill.\", \"exhale_dizzy\": \"Dizzy or tingly? Stop and breathe normally.\", \"exhale_done\": \"That's the long breath out.\", \"exhale_in\": \"In\", \"exhale_out\": \"Out, slowly\", \"exhale_start\": \"Tap to start\", \"exhale_step1\": \"A soft breath in through your nose while the circle grows.\", \"exhale_step2\": \"Out slowly while it shrinks.\", \"exhale_title\": \"Breathe out longer than you breathe in.\", \"find_done\": \"That's all of them.\", \"find_task\": \"Find five blue things around you. Tap for each one.\", \"find_title\": \"Give your eyes a job.\", \"fork_hint\": \"Any answer is fine.\", \"fork_title\": \"Can anything be done about this right now?\", \"found\": \"Found one\", \"heard\": \"Heard one\", \"listen_task\": \"Listen. Tap for each sound you can hear, near or far.\", \"listen_title\": \"Now give your ears one.\", \"lower_cue\": \"Nothing to do. Watch the ring and breathe however you breathe.\", \"lower_cue_here\": \"Nothing to do. Eyes open, feet on the floor.\", \"lower_done\": \"You got through two minutes.\", \"lower_running\": \"Two minutes\", \"lower_title\": \"You don't have to make this go away. Let's get through the next two minutes.\", \"medical_line\": \"Sit or lie down. Even if it eases, get it checked today.\", \"next\": \"Next\", \"orient_done\": \"You're here.\", \"orient_here\": \"You're here, and it's\", \"orient_task\": \"Find three things you can see. Tap for each one.\", \"orient_title\": \"Eyes open. Look around you.\", \"press_done\": \"Three presses.\", \"press_hint\": \"Keep a thumb on the circle while you press. Let go whenever you need to.\", \"press_label\": \"Press and hold\", \"press_running\": \"Push\", \"press_title\": \"Press the phone hard between your palms.\", \"safety_open\": \"Talk to someone now\", \"screen_hint\": \"Heart trouble, a slow heart or heart medicine. Fainting. An eating disorder or very low weight. Pregnant. Raynaud's or a cold allergy. Drinking or using today.\", \"screen_title\": \"Cold on your face can slow your heart. Is any of this true for you?\", \"someone_line\": \"If you want someone with you right now, you can call or text one of these.\", \"squeeze_done\": \"That's three.\", \"squeeze_label\": \"Squeeze\", \"squeeze_start\": \"Press and hold to squeeze\", \"squeeze_step1\": \"Breathe in and squeeze your hands, arms and shoulders.\", \"squeeze_step2\": \"Breathe out and let it all drop.\", \"squeeze_still1\": \"Squeeze your hands, arms and shoulders.\", \"squeeze_still2\": \"Then let it all drop. Breathe however you breathe.\", \"squeeze_title\": \"Squeeze, then let it drop.\", \"state_hint\": \"Tap the closest one.\", \"state_title\": \"What's it like right now?\", \"strong_cue\": \"Hold something cold, or smell something strong. Feet into the floor.\", \"strong_title\": \"Something strong.\", \"tight_hint\": \"Can't tell is a full answer.\", \"tight_title\": \"How does your body feel now?\", \"urge_line\": \"First, a way to wait it out.\", \"wake_cue\": \"Rub your hands together fast until they're warm. Then shake them out.\", \"wake_title\": \"Wake your hands up.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "cool-down", version: "fb-v1", contentVersion: "skills-v1", start: "state", ownMax: 60, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"card_done\": \"That's it.\", \"card_running\": \"Keep going\", \"card_start\": \"Tap to start\", \"check_title\": \"Compared to when you started, it's…\", \"check_title_here\": \"Compared to when you started, you feel…\", \"cold_caution\": \"Never in a shower or a bath. Cold, not ice-cold.\", \"cold_done\": \"Cold like that can slow your heart for a bit.\", \"cold_lead\": \"Ready in\", \"cold_near_title\": \"Is there cold water, or something cold, near you?\", \"cold_running\": \"Hold it there\", \"cold_start\": \"Tap when it's on\", \"cold_step1\": \"Wet a cloth with cold water, or wrap a cold pack in a cloth.\", \"cold_step2\": \"Lean forward. Hold it on your forehead, eyes and upper cheeks.\", \"cold_step3\": \"Breathe out slowly, or hold your breath if that's comfortable.\", \"cold_title\": \"Circuit Breaker: cold on your face.\", \"cool_caution\": \"You weren't sure, so this one is short and gentle. Stop if anything feels wrong.\", \"cool_done\": \"That's enough cold for now.\", \"cool_step1\": \"A cool cloth, not ice.\", \"cool_step2\": \"Lean forward and rest it on your forehead and eyes.\", \"cool_title\": \"A cool cloth, gently.\", \"done\": \"Done\", \"drop_label\": \"Let it drop\", \"end_accept\": \"That's a heavy thing to carry. You don't have to solve it right now.\", \"end_change\": \"Then it's worth a look, while you're steadier.\", \"end_park\": \"Then it can wait. You can come back to it when you choose.\", \"end_through\": \"You got through it. That's the skill.\", \"exhale_dizzy\": \"Dizzy or tingly? Stop and breathe normally.\", \"exhale_done\": \"That's the long breath out.\", \"exhale_in\": \"In\", \"exhale_out\": \"Out, slowly\", \"exhale_start\": \"Tap to start\", \"exhale_step1\": \"A soft breath in through your nose while the circle grows.\", \"exhale_step2\": \"Out slowly while it shrinks.\", \"exhale_title\": \"Breathe out longer than you breathe in.\", \"find_done\": \"That's all of them.\", \"find_task\": \"Find five blue things around you. Tap for each one.\", \"find_title\": \"Give your eyes a job.\", \"fork_hint\": \"Any answer is fine.\", \"fork_title\": \"Can anything be done about this right now?\", \"found\": \"Found one\", \"heard\": \"Heard one\", \"listen_task\": \"Listen. Tap for each sound you can hear, near or far.\", \"listen_title\": \"Now give your ears one.\", \"lower_cue\": \"Nothing to do. Watch the ring and breathe however you breathe.\", \"lower_cue_here\": \"Nothing to do. Eyes open, feet on the floor.\", \"lower_done\": \"You got through two minutes.\", \"lower_running\": \"Two minutes\", \"lower_title\": \"You don't have to make this go away. Let's get through the next two minutes.\", \"medical_line\": \"Sit or lie down. Even if it eases, get it checked today.\", \"move_caution\": \"Go at your own pace. Slow down or stop if anything hurts.\", \"move_done\": \"That's a minute. Let your breath settle.\", \"move_running\": \"Keep going\", \"move_start\": \"Tap to start\", \"move_step1\": \"Stand up and march on the spot, knees high.\", \"move_step2\": \"Or go up and down the stairs.\", \"move_title\": \"Move fast for a minute.\", \"next\": \"Next\", \"orient_done\": \"You're here.\", \"orient_here\": \"You're here, and it's\", \"orient_task\": \"Find three things you can see. Tap for each one.\", \"orient_title\": \"Eyes open. Look around you.\", \"press_done\": \"Three presses.\", \"press_hint\": \"Keep a thumb on the circle while you press. Let go whenever you need to.\", \"press_label\": \"Press and hold\", \"press_running\": \"Push\", \"press_title\": \"Press the phone hard between your palms.\", \"safety_open\": \"Talk to someone now\", \"screen_hint\": \"Heart trouble, a slow heart or heart medicine. Fainting. An eating disorder or very low weight. Pregnant. Raynaud's or a cold allergy. Drinking or using today.\", \"screen_title\": \"Cold on your face can slow your heart. Is any of this true for you?\", \"someone_line\": \"If you want someone with you right now, you can call or text one of these.\", \"squeeze_done\": \"That's three.\", \"squeeze_label\": \"Squeeze\", \"squeeze_start\": \"Press and hold to squeeze\", \"squeeze_step1\": \"Breathe in and squeeze your hands, arms and shoulders.\", \"squeeze_step2\": \"Breathe out and let it all drop.\", \"squeeze_still1\": \"Squeeze your hands, arms and shoulders.\", \"squeeze_still2\": \"Then let it all drop. Breathe however you breathe.\", \"squeeze_title\": \"Squeeze, then let it drop.\", \"state_hint\": \"Tap the closest one.\", \"state_title\": \"What's it like right now?\", \"strong_cue\": \"Hold something cold, or smell something strong. Feet into the floor.\", \"strong_title\": \"Something strong.\", \"tight_hint\": \"Can't tell is a full answer.\", \"tight_title\": \"How does your body feel now?\", \"urge_line\": \"First, a way to wait it out.\", \"wake_cue\": \"Rub your hands together fast until they're warm. Then shake them out.\", \"wake_title\": \"Wake your hands up.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
 MATCH (t:TherapyConcept {id: "dbt_tipp"}), (s:Skill {id: "first_body"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "first_body"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -7691,101 +7691,106 @@ SET n += {skillId: "first_body", step: "cool", kind: "embed", version: "fb-v1"},
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:cool"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
+MERGE (n:SkillStep {id: "first_body:move"})
+SET n += {skillId: "first_body", step: "move", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"move\", \"embed\": \"doseTimer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"caution\": \"move_caution\", \"done\": \"move_done\", \"lead\": \"cold_lead\", \"leadIn\": 3, \"next\": \"next\", \"running\": \"move_running\", \"seconds\": 60, \"start\": \"move_start\", \"step1\": \"move_step1\", \"step2\": \"move_step2\"}, \"title\": \"move_title\"}";
+MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:move"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
 MERGE (n:SkillStep {id: "first_body:squeeze"})
 SET n += {skillId: "first_body", step: "squeeze", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"squeeze\", \"embed\": \"squeezeRelease\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"squeeze_done\", \"dropLabel\": \"drop_label\", \"next\": \"next\", \"rounds\": 3, \"squeezeLabel\": \"squeeze_label\", \"squeezeSec\": 5, \"start\": \"squeeze_start\", \"step1\": \"squeeze_step1\", \"step2\": \"squeeze_step2\"}, \"title\": \"squeeze_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:squeeze"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 7};
+SET r += {order: 8};
 MERGE (n:SkillStep {id: "first_body:tight"})
 SET n += {skillId: "first_body", step: "tight", kind: "ask", version: "fb-v1"}, n.specJson = "{\"fields\": [{\"id\": \"tight\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tight\"}}], \"hint\": \"tight_hint\", \"title\": \"tight_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:tight"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 8};
+SET r += {order: 9};
 MERGE (n:SkillStep {id: "first_body:exhale"})
 SET n += {skillId: "first_body", step: "exhale", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"exhale\", \"embed\": \"breathPacer\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"dizzy\": \"exhale_dizzy\", \"done\": \"exhale_done\", \"inLabel\": \"exhale_in\", \"inSec\": 4, \"next\": \"next\", \"outLabel\": \"exhale_out\", \"outSec\": 7, \"seconds\": 90, \"start\": \"exhale_start\", \"step1\": \"exhale_step1\", \"step2\": \"exhale_step2\"}, \"title\": \"exhale_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:exhale"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 9};
+SET r += {order: 10};
 MERGE (n:SkillStep {id: "first_body:squeeze_still"})
 SET n += {skillId: "first_body", step: "squeeze_still", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"squeeze_still\", \"embed\": \"squeezeRelease\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"squeeze_done\", \"dropLabel\": \"drop_label\", \"next\": \"next\", \"rounds\": 3, \"squeezeLabel\": \"squeeze_label\", \"squeezeSec\": 5, \"start\": \"squeeze_start\", \"step1\": \"squeeze_still1\", \"step2\": \"squeeze_still2\"}, \"title\": \"squeeze_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:squeeze_still"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 10};
+SET r += {order: 11};
 MERGE (n:SkillStep {id: "first_body:press"})
 SET n += {skillId: "first_body", step: "press", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"press\", \"embed\": \"holdRing\", \"hint\": \"press_hint\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"doneLabel\": \"press_done\", \"hint\": \"press_hint\", \"holds\": 3, \"label\": \"press_label\", \"next\": \"next\", \"runningLabel\": \"press_running\", \"seconds\": 10, \"variant\": \"press\", \"wayOn\": \"from_start\"}, \"title\": \"press_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:press"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 11};
+SET r += {order: 12};
 MERGE (n:SkillStep {id: "first_body:wake"})
 SET n += {skillId: "first_body", step: "wake", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"wake\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"cue\": \"wake_cue\", \"done\": \"card_done\", \"kind\": \"wake\", \"next\": \"next\", \"running\": \"card_running\", \"seconds\": 30, \"start\": \"card_start\"}, \"title\": \"wake_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:wake"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 12};
+SET r += {order: 13};
 MERGE (n:SkillStep {id: "first_body:orient"})
 SET n += {skillId: "first_body", step: "orient", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"orient\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 3, \"done\": \"orient_done\", \"foundLabel\": \"found\", \"here\": \"orient_here\", \"next\": \"next\", \"task\": \"orient_task\", \"variant\": \"find\"}, \"title\": \"orient_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:orient"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 13};
+SET r += {order: 14};
 MERGE (n:SkillStep {id: "first_body:strong"})
 SET n += {skillId: "first_body", step: "strong", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"strong\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"cue\": \"strong_cue\", \"done\": \"card_done\", \"kind\": \"strong\", \"next\": \"next\", \"running\": \"card_running\", \"seconds\": 30, \"start\": \"card_start\"}, \"title\": \"strong_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:strong"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 14};
+SET r += {order: 15};
 MERGE (n:SkillStep {id: "first_body:find"})
 SET n += {skillId: "first_body", step: "find", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"find\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 5, \"done\": \"find_done\", \"foundLabel\": \"found\", \"here\": \"orient_here\", \"next\": \"next\", \"task\": \"find_task\", \"variant\": \"find\"}, \"title\": \"find_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:find"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 15};
+SET r += {order: 16};
 MERGE (n:SkillStep {id: "first_body:listen"})
 SET n += {skillId: "first_body", step: "listen", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"listen\", \"embed\": \"orientFind\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"count\": 3, \"done\": \"find_done\", \"foundLabel\": \"heard\", \"here\": \"orient_here\", \"next\": \"next\", \"task\": \"listen_task\", \"variant\": \"listen\"}, \"title\": \"listen_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:listen"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 16};
+SET r += {order: 17};
 MERGE (n:SkillStep {id: "first_body:check1"})
 SET n += {skillId: "first_body", step: "check1", kind: "ask", version: "fb-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"check1\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn_down\"}, \"required\": true}], \"title\": \"check_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:check1"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 17};
+SET r += {order: 18};
 MERGE (n:SkillStep {id: "first_body:check1_here"})
 SET n += {skillId: "first_body", step: "check1_here", kind: "ask", version: "fb-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"check1_here\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn_here\"}, \"required\": true}], \"title\": \"check_title_here\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:check1_here"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 18};
+SET r += {order: 19};
 MERGE (n:SkillStep {id: "first_body:check2"})
 SET n += {skillId: "first_body", step: "check2", kind: "ask", version: "fb-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"check2\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn_down\"}, \"required\": true}], \"title\": \"check_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:check2"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 19};
+SET r += {order: 20};
 MERGE (n:SkillStep {id: "first_body:check2_here"})
 SET n += {skillId: "first_body", step: "check2_here", kind: "ask", version: "fb-v1"}, n.specJson = "{\"fields\": [{\"askFresh\": \"thenVsNow\", \"id\": \"check2_here\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"tvn_here\"}, \"required\": true}], \"title\": \"check_title_here\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:check2_here"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 20};
+SET r += {order: 21};
 MERGE (n:SkillStep {id: "first_body:lower"})
 SET n += {skillId: "first_body", step: "lower", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"lower\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"cue\": \"lower_cue\", \"done\": \"lower_done\", \"kind\": \"still\", \"next\": \"next\", \"running\": \"lower_running\", \"seconds\": 120, \"start\": \"card_start\"}, \"title\": \"lower_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:lower"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 21};
+SET r += {order: 22};
 MERGE (n:SkillStep {id: "first_body:lower_here"})
 SET n += {skillId: "first_body", step: "lower_here", kind: "embed", version: "fb-v1"}, n.specJson = "{\"answerAs\": \"lower_here\", \"embed\": \"bodyCard\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"cue\": \"lower_cue_here\", \"done\": \"lower_done\", \"kind\": \"still\", \"next\": \"next\", \"running\": \"lower_running\", \"seconds\": 120, \"start\": \"card_start\"}, \"title\": \"lower_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:lower_here"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 22};
+SET r += {order: 23};
 MERGE (n:SkillStep {id: "first_body:someone"})
 SET n += {skillId: "first_body", step: "someone", kind: "handoff", version: "fb-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"someone_line\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:someone"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 23};
+SET r += {order: 24};
 MERGE (n:SkillStep {id: "first_body:fork"})
 SET n += {skillId: "first_body", step: "fork", kind: "ask", version: "fb-v1"}, n.specJson = "{\"fields\": [{\"id\": \"fork\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"fork\"}, \"required\": true}], \"hint\": \"fork_hint\", \"title\": \"fork_title\"}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:fork"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 24};
+SET r += {order: 25};
 MERGE (n:SkillStep {id: "first_body:end"})
 SET n += {skillId: "first_body", step: "end", kind: "handoff", version: "fb-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"end_change\", \"when\": {\"eq\": [\"$a.fork\", \"change\"]}}, {\"key\": \"end_accept\", \"when\": {\"eq\": [\"$a.fork\", \"accept\"]}}, {\"key\": \"end_park\", \"when\": {\"eq\": [\"$a.fork\", \"park\"]}}, {\"key\": \"end_through\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
 MATCH (s:Skill {id: "first_body"}), (n:SkillStep {id: "first_body:end"})
 MERGE (s)-[r:HAS_STEP]->(n)
-SET r += {order: 25};
+SET r += {order: 26};
 MERGE (x:SkillExit {id: "first_body:pause"})
 SET x += {skillId: "first_body", exit: "pause", toolId: "pause", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (x:SkillExit {id: "first_body:pause"})
@@ -7851,9 +7856,12 @@ SET r += {order: 3}, r.whenJson = "{\"eq\": [\"$a.state\", \"far_away\"]}";
 MATCH (a:SkillStep {id: "first_body:state"}), (b:SkillStep {id: "first_body:find"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 4}, r.whenJson = "{\"eq\": [\"$a.state\", \"loop\"]}";
+MATCH (a:SkillStep {id: "first_body:state"}), (b:SkillStep {id: "first_body:move"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 5}, r.whenJson = "{\"eq\": [\"$a.state\", \"restless\"]}";
 MATCH (a:SkillStep {id: "first_body:state"}), (b:SkillStep {id: "first_body:screen"})
 MERGE (a)-[r:NEXT]->(b)
-SET r += {order: 5}, r.whenJson = "null";
+SET r += {order: 6}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "first_body:state"}), (x:SkillExit {id: "first_body:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "state", label: "safety_open"}, r.whenJson = "{\"all\": []}";
@@ -7912,6 +7920,21 @@ MATCH (a:SkillStep {id: "first_body:cool"}), (b:SkillStep {id: "first_body:check
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 3}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "first_body:cool"}), (x:SkillExit {id: "first_body:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "first_body:move"}), (b:SkillStep {id: "first_body:check2_here"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"all\": [{\"any\": [{\"set\": \"$a.check1\"}, {\"set\": \"$a.check1_here\"}]}, {\"in\": [\"$a.state\", [\"frozen\", \"far_away\"]]}]}";
+MATCH (a:SkillStep {id: "first_body:move"}), (b:SkillStep {id: "first_body:check2"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"any\": [{\"set\": \"$a.check1\"}, {\"set\": \"$a.check1_here\"}]}";
+MATCH (a:SkillStep {id: "first_body:move"}), (b:SkillStep {id: "first_body:check1_here"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"in\": [\"$a.state\", [\"frozen\", \"far_away\"]]}";
+MATCH (a:SkillStep {id: "first_body:move"}), (b:SkillStep {id: "first_body:check1"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "first_body:move"}), (x:SkillExit {id: "first_body:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
 MATCH (a:SkillStep {id: "first_body:squeeze"}), (b:SkillStep {id: "first_body:tight"})
@@ -8144,128 +8167,133 @@ SET o:SkillOption, o += {skillId: "first_body", list: "state", value: "wave", la
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:state:wave"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "state", order: 0};
+MERGE (o:SkillOption {id: "first_body:state:restless"})
+SET o:SkillOption, o += {skillId: "first_body", list: "state", value: "restless", label: "Restless or buzzing", version: "fb-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:state:restless"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "state", order: 1};
 MERGE (o:SkillOption {id: "first_body:state:urge"})
 SET o:SkillOption, o += {skillId: "first_body", list: "state", value: "urge", label: "I want to do something", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:state:urge"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "state", order: 1};
+SET r += {list: "state", order: 2};
 MERGE (o:SkillOption {id: "first_body:state:frozen"})
 SET o:SkillOption, o += {skillId: "first_body", list: "state", value: "frozen", label: "Frozen or numb", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:state:frozen"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "state", order: 2};
+SET r += {list: "state", order: 3};
 MERGE (o:SkillOption {id: "first_body:state:far_away"})
 SET o:SkillOption, o += {skillId: "first_body", list: "state", value: "far_away", label: "Far away", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:state:far_away"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "state", order: 3};
+SET r += {list: "state", order: 4};
 MERGE (o:SkillOption {id: "first_body:state:loop"})
 SET o:SkillOption, o += {skillId: "first_body", list: "state", value: "loop", label: "My mind won't stop", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:state:loop"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "state", order: 4};
+SET r += {list: "state", order: 5};
 MERGE (o:SkillOption {id: "first_body:state:medical"})
 SET o:SkillOption, o += {skillId: "first_body", list: "state", value: "medical", label: "Chest pain or feeling faint", version: "fb-v1"}, o.propsJson = "{\"danger\": \"medical\"}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:state:medical"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "state", order: 5};
+SET r += {list: "state", order: 6};
 MERGE (o:SkillOption {id: "first_body:screen:some"})
 SET o:SkillOption, o += {skillId: "first_body", list: "screen", value: "some", label: "Yes, one of these", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:screen:some"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "screen", order: 6};
+SET r += {list: "screen", order: 7};
 MERGE (o:SkillOption {id: "first_body:screen:none"})
 SET o:SkillOption, o += {skillId: "first_body", list: "screen", value: "none", label: "None of these", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:screen:none"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "screen", order: 7};
+SET r += {list: "screen", order: 8};
 MERGE (o:SkillOption {id: "first_body:screen:unsure"})
 SET o:SkillOption, o += {skillId: "first_body", list: "screen", value: "unsure", label: "Not sure", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:screen:unsure"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "screen", order: 8};
+SET r += {list: "screen", order: 9};
 MERGE (o:SkillOption {id: "first_body:cold_near:yes"})
 SET o:SkillOption, o += {skillId: "first_body", list: "cold_near", value: "yes", label: "Yes", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:cold_near:yes"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "cold_near", order: 9};
+SET r += {list: "cold_near", order: 10};
 MERGE (o:SkillOption {id: "first_body:cold_near:no"})
 SET o:SkillOption, o += {skillId: "first_body", list: "cold_near", value: "no", label: "No, not right now", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:cold_near:no"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "cold_near", order: 10};
+SET r += {list: "cold_near", order: 11};
 MERGE (o:SkillOption {id: "first_body:tight:tight"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tight", value: "tight", label: "Tight", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tight:tight"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tight", order: 11};
+SET r += {list: "tight", order: 12};
 MERGE (o:SkillOption {id: "first_body:tight:loose"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tight", value: "loose", label: "Loose", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tight:loose"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tight", order: 12};
+SET r += {list: "tight", order: 13};
 MERGE (o:SkillOption {id: "first_body:tight:cant_tell"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tight", value: "cant_tell", label: "Can't tell", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tight:cant_tell"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tight", order: 13};
+SET r += {list: "tight", order: 14};
 MERGE (o:SkillOption {id: "first_body:tvn_down:worse"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_down", value: "worse", label: "Louder", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_down:worse"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_down", order: 14};
+SET r += {list: "tvn_down", order: 15};
 MERGE (o:SkillOption {id: "first_body:tvn_down:same"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_down", value: "same", label: "About the same", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_down:same"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_down", order: 15};
+SET r += {list: "tvn_down", order: 16};
 MERGE (o:SkillOption {id: "first_body:tvn_down:better"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_down", value: "better", label: "Quieter", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_down:better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_down", order: 16};
+SET r += {list: "tvn_down", order: 17};
 MERGE (o:SkillOption {id: "first_body:tvn_down:much_better"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_down", value: "much_better", label: "Much quieter", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_down:much_better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_down", order: 17};
+SET r += {list: "tvn_down", order: 18};
 MERGE (o:SkillOption {id: "first_body:tvn_here:worse"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_here", value: "worse", label: "Further away", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_here:worse"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_here", order: 18};
+SET r += {list: "tvn_here", order: 19};
 MERGE (o:SkillOption {id: "first_body:tvn_here:same"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_here", value: "same", label: "About the same", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_here:same"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_here", order: 19};
+SET r += {list: "tvn_here", order: 20};
 MERGE (o:SkillOption {id: "first_body:tvn_here:better"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_here", value: "better", label: "A bit more here", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_here:better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_here", order: 20};
+SET r += {list: "tvn_here", order: 21};
 MERGE (o:SkillOption {id: "first_body:tvn_here:much_better"})
 SET o:SkillOption, o += {skillId: "first_body", list: "tvn_here", value: "much_better", label: "More here", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:tvn_here:much_better"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "tvn_here", order: 21};
+SET r += {list: "tvn_here", order: 22};
 MERGE (o:SkillOption {id: "first_body:fork:change"})
 SET o:SkillOption, o += {skillId: "first_body", list: "fork", value: "change", label: "Yes, something can be done", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:fork:change"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 22};
+SET r += {list: "fork", order: 23};
 MERGE (o:SkillOption {id: "first_body:fork:accept"})
 SET o:SkillOption, o += {skillId: "first_body", list: "fork", value: "accept", label: "No, it's how things are", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:fork:accept"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 23};
+SET r += {list: "fork", order: 24};
 MERGE (o:SkillOption {id: "first_body:fork:park"})
 SET o:SkillOption, o += {skillId: "first_body", list: "fork", value: "park", label: "Not right now", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:fork:park"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 24};
+SET r += {list: "fork", order: 25};
 MERGE (o:SkillOption {id: "first_body:fork:through"})
 SET o:SkillOption, o += {skillId: "first_body", list: "fork", value: "through", label: "I needed to get through it", version: "fb-v1"}, o.propsJson = "{}";
 MATCH (s:Skill {id: "first_body"}), (o:SkillOption {id: "first_body:fork:through"})
 MERGE (s)-[r:HAS_OPTION]->(o)
-SET r += {list: "fork", order: 25};
+SET r += {list: "fork", order: 26};

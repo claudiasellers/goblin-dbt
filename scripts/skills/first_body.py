@@ -59,6 +59,15 @@ COPY = {
     "cool_step2": "Lean forward and rest it on your forehead and eyes.",
     "cool_caution": "You weren't sure, so this one is short and gentle. Stop if anything feels wrong.",
     "cool_done": "That's enough cold for now.",
+
+    # Restless or buzzing: the move burst (TIP-I). Claudia, 11 Nov: no medical gate, like any fitness app; a pace line.
+    "move_title": "Move fast for a minute.",
+    "move_step1": "Stand up and march on the spot, knees high.",
+    "move_step2": "Or go up and down the stairs.",
+    "move_caution": "Go at your own pace. Slow down or stop if anything hurts.",
+    "move_start": "Tap to start",
+    "move_running": "Keep going",
+    "move_done": "That's a minute. Let your breath settle.",
     # Squeeze and drop (TIP, paired relaxation without the rethinking).
     "squeeze_title": "Squeeze, then let it drop.",
     "squeeze_step1": "Breathe in and squeeze your hands, arms and shoulders.",
@@ -148,6 +157,7 @@ SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 
 STATES = [
     ("wave", "A wave", {}),
+    ("restless", "Restless or buzzing", {}),
     ("urge", "I want to do something", {}),
     ("frozen", "Frozen or numb", {}),
     ("far_away", "Far away", {}),
@@ -218,7 +228,7 @@ STEPS = [
         "fields": [{"id": "state", "options": {"list": "state"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "next": [{"when": STATE("medical"), "to": "medical"}, {"when": STATE("urge"), "to": "urge"},
                  {"when": STATE("frozen"), "to": "press"}, {"when": STATE("far_away"), "to": "orient"},
-                 {"when": STATE("loop"), "to": "find"}, {"to": "screen"}],
+                 {"when": STATE("loop"), "to": "find"}, {"when": STATE("restless"), "to": "move"}, {"to": "screen"}],
     },
     {
         # The emergency number on the card; no body mode, no close question.
@@ -253,6 +263,10 @@ STEPS = [
     embed("cool", "doseTimer", "cool_title", {
         "art": "cold", "seconds": 15, "leadIn": 3, "step1": "cool_step1", "step2": "cool_step2", "caution": "cool_caution",
         "start": "cold_start", "running": "cold_running", "lead": "cold_lead", "done": "cool_done", "next": "next"}),
+    # Restless or buzzing: a minute of fast marching. Its swap is the long out-breath (check1's default).
+    embed("move", "doseTimer", "move_title", {
+        "seconds": 60, "leadIn": 3, "step1": "move_step1", "step2": "move_step2", "caution": "move_caution",
+        "start": "move_start", "running": "move_running", "lead": "cold_lead", "done": "move_done", "next": "next"}),
     embed("squeeze", "squeezeRelease", "squeeze_title", {
         "rounds": 3, "squeezeSec": 5, "step1": "squeeze_step1", "step2": "squeeze_step2", "start": "squeeze_start",
         "squeezeLabel": "squeeze_label", "dropLabel": "drop_label", "done": "squeeze_done", "next": "next"},

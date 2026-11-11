@@ -54,6 +54,7 @@ test("each state gets its own first mode", () => {
   assert.equal(at("far_away"), "orient");
   assert.equal(at("loop"), "find");
   assert.equal(at("urge"), "urge");
+  assert.equal(at("restless"), "move", "restless or buzzing: the move burst");
   assert.equal(at("medical"), "medical");
 });
 
@@ -252,4 +253,15 @@ test("Gate 3: frozen and far away lower the demand without anything passive; the
   assert.doesNotMatch(skill.copy.medical_line, /come back/, "never reads as permission to skip care");
   assert.ok(skill.copy.medical_line.length <= 90);
   assert.equal(skill.steps.find((x) => x.id === "press").props.wayOn, "from_start", "the frozen path never locks (Gate 2)");
+});
+
+test("the move burst: a minute of marching, ungated (Claudia, 11 Nov), with a pace line; its swap is the long out-breath", () => {
+  const move = skill.steps.find((x) => x.id === "move");
+  assert.equal(move.embed, "doseTimer");
+  assert.equal(move.props.seconds, 60);
+  assert.match(skill.copy[move.props.caution], /own pace/);
+  const after = run([pick("state", "restless"), next, did()]);
+  assert.equal(after.stepId, "check1");
+  assert.equal(run([pick("check1", "same"), next], ctx(), after).stepId, "exhale");
+  assert.equal(run([pick("check1", "better"), next], ctx(), after).stepId, "fork");
 });
