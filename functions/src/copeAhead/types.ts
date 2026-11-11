@@ -46,6 +46,8 @@ export interface CopeMoveItem {
   appToolId: string | null;
   /** Shown only for these moments, first (the danger moments' first move). */
   forMoments: string[];
+  /** Shown only for these situations (empty: every situation). */
+  forSituations: string[];
   order: number;
 }
 

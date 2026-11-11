@@ -82,29 +82,56 @@ PULL_IF = {
     "blank": "I start to shut down",
 }
 
-# Moves (id, kind, label, line, forPulls, general, appToolId, forMoments). `label` is the chip; `line`
-# follows "I'll" in the plan line. general moves show with no pull or Not sure; forMoments moves show only
-# for those moments, first. A tool move's label is the tool's name in src/data/tools.ts (test-pinned).
+# Moves (id, kind, label, line, forPulls, general, appToolId, forMoments, forSituations). `label` is the chip;
+# `line` follows "I'll" in the plan line. general moves show with no pull or Not sure; forMoments moves show only
+# for those moments, first; forSituations moves only for those situations (empty: any). A tool move's label is
+# the tool's name in src/data/tools.ts (test-pinned).
 MOVES = [
-    ("long_out", "body", "Breathe out longer than in", "breathe out longer than in", ["fight", "chase", "hide"], True, None, []),
-    ("feet", "body", "Feel my feet on the floor", "feel my feet on the floor", ["hide", "blank", "fight"], True, None, []),
-    ("cold_water", "body", "Cold water on my hands", "put cold water on my hands", ["fight", "chase", "blank"], False, None, []),
-    ("hold_something", "body", "Hold something in my pocket", "hold something in my pocket", ["blank", "hide"], False, None, []),
-    ("give_minute", "words", "Say “Give me a minute”", "say “Give me a minute”", ["fight", "blank", "chase"], True, None, []),
-    ("come_back", "words", "Say “I'll come back to you on that”", "say “I'll come back to you on that”", ["fight", "chase"], False, None, []),
-    ("say_hard", "words", "Say “This is hard for me”", "say “This is hard for me”", ["hide", "blank"], True, None, []),
-    ("one_thing", "words", "Say the one thing I came to say", "say the one thing I came to say", ["hide", "chase"], False, None, []),
-    ("step_out", "action", "Step out for five minutes", "step out for five minutes", ["fight", "chase", "hide"], True, None, []),
-    ("stay_ten", "action", "Stay ten more minutes, then decide", "stay ten more minutes, then decide", ["hide"], False, None, []),
-    ("text_trust", "action", "Text someone I trust", "text someone I trust", ["hide", "blank"], True, None, []),
-    ("phone_away", "action", "Put my phone in another room", "put my phone in another room", ["chase"], False, None, []),
-    ("leave_safe", "action", "Leave and get somewhere safe", "leave and get somewhere safe", [], False, None, ["might_hurt"]),
-    ("reach_help", "action", "Call or text someone who can help, now", "call or text someone who can help, now", [], False, None, ["might_hurt_self"]),
-    ("pause", "tool", "Pause", "open Pause", ["fight", "chase"], False, "pause", []),
-    ("five_senses", "tool", "5-4-3-2-1", "do 5-4-3-2-1", ["blank", "hide", "fight"], True, "five-senses", []),
-    ("cool_down", "tool", "Circuit Breaker", "do Circuit Breaker", ["fight", "chase"], False, "cool-down", []),
-    ("urge_surfing", "tool", "Urge Surfing", "use Urge Surfing", ["chase", "fight"], False, "urge-surfing", []),
+    ("long_out", "body", "Breathe out longer than in", "breathe out longer than in", ["fight", "chase", "hide"], True, None, [], []),
+    ("feet", "body", "Feel my feet on the floor", "feel my feet on the floor", ["hide", "blank", "fight"], True, None, [], []),
+    ("cold_water", "body", "Cold water on my hands", "put cold water on my hands", ["fight", "chase", "blank"], False, None, [], []),
+    ("hold_something", "body", "Hold something in my pocket", "hold something in my pocket", ["blank", "hide"], False, None, [], []),
+    ("give_minute", "words", "Say “Give me a minute”", "say “Give me a minute”", ["fight", "blank", "chase"], True, None, [], []),
+    ("come_back", "words", "Say “I'll come back to you on that”", "say “I'll come back to you on that”", ["fight", "chase"], False, None, [], []),
+    ("say_hard", "words", "Say “This is hard for me”", "say “This is hard for me”", ["hide", "blank"], True, None, [], []),
+    ("one_thing", "words", "Say the one thing I came to say", "say the one thing I came to say", ["hide", "chase"], False, None, [], []),
+    ("step_out", "action", "Step out for five minutes", "step out for five minutes", ["fight", "chase", "hide"], True, None, [], []),
+    ("stay_ten", "action", "Stay ten more minutes, then decide", "stay ten more minutes, then decide", ["hide"], False, None, [], []),
+    ("text_trust", "action", "Text someone I trust", "text someone I trust", ["hide", "blank"], True, None, [], []),
+    ("phone_away", "action", "Put my phone in another room", "put my phone in another room", ["chase"], False, None, [], []),
+    ("leave_safe", "action", "Leave and get somewhere safe", "leave and get somewhere safe", [], False, None, ["might_hurt"], []),
+    ("reach_help", "action", "Call or text someone who can help, now", "call or text someone who can help, now", [], False, None, ["might_hurt_self"], []),
+    # DEAR MAN's cope-ahead moves, absorbed (plan D10, ER-B2): the ones that are something to do in the moment of
+    # a conversation, for a conversation or seeing someone. DEAR MAN's own nodes stay (SAME_MOVE_AS below).
+    ("name_it", "words", "Name what's happening", "name what's happening out loud", ["fight"], False, None, [], ["conversation", "someone"]),
+    ("validate_first", "words", "Say “I can see this is hard for you too”", "say “I can see this is hard for you too”", ["fight", "hide"], False, None, [], ["conversation", "someone"]),
+    ("tears_ok", "words", "Say “I might cry, and I want to keep going”", "say “I might cry, and I want to keep going”", ["hide", "blank"], False, None, [], ["conversation", "someone"]),
+    ("no_sorry", "words", "Say “I understand” instead of sorry", "say “I understand” instead of sorry", ["hide"], False, None, [], ["conversation", "someone"]),
+    ("notes", "action", "Look at the points I wrote down", "look at the points I wrote down", ["blank", "hide"], False, None, [], ["conversation", "work_school"]),
+    ("pause", "tool", "Pause", "open Pause", ["fight", "chase"], False, "pause", [], []),
+    ("five_senses", "tool", "5-4-3-2-1", "do 5-4-3-2-1", ["blank", "hide", "fight"], True, "five-senses", [], []),
+    ("cool_down", "tool", "Circuit Breaker", "do Circuit Breaker", ["fight", "chase"], False, "cool-down", [], []),
+    ("urge_surfing", "tool", "Urge Surfing", "use Urge Surfing", ["chase", "fight"], False, "urge-surfing", [], []),
 ]
+
+# DEAR MAN's 11 CopeAhead moves (schema/dear-man-debrief-content.cypher; scripts/dear-man/content.py) → the
+# CopeMove that is the same move (plan D10: absorbed, linked SAME_MOVE_AS, never renamed or deleted: parts map
+# them). HELD: not a move for the moment itself, with the reason.
+SAME_MOVE_AS = {
+    "ca_pause_phrase": "give_minute",
+    "ca_body_anchor": "feet",
+    "ca_broken_record": "one_thing",
+    "ca_planned_exit": "come_back",
+    "ca_name_the_dynamic": "name_it",
+    "ca_validate_first": "validate_first",
+    "ca_tears_plan": "tears_ok",
+    "ca_apology_check": "no_sorry",
+    "ca_write_it_down": "notes",
+}
+SAME_MOVE_HELD = {
+    "ca_time_limit": "set before the conversation starts, part of DEAR MAN's prep, not something to do at the hard moment",
+    "ca_success_anchor": "a debrief reflection on what worked, not a plan for the moment",
+}
 
 # Rehearsal beats (id, text), in order. {moment}: the moment's ifText (or own words); {plan}: the move
 # lines joined with "and". Beat 7 shows under beat 6 on the same screen. Once more runs beats 3-7 with
