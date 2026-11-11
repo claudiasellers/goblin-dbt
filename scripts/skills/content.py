@@ -11,11 +11,12 @@ import fast  # noqa: E402
 import nightmare_rescript  # noqa: E402
 import problem_solve  # noqa: E402
 import ending_relationships  # noqa: E402
+import cope_ahead  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
-          ending_relationships.SKILL]
+          ending_relationships.SKILL, cope_ahead.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -31,6 +32,11 @@ EMBEDS = {
     # Problem Solve's "the part that doesn't want change" (parts on; docs/design/parts.md): a quiet yes that queues a
     # PartCandidate. Reports nothing; its slot's record says it showed.
     "partLater": {},
+    # Cope Ahead (ER-B2): the plan line as it's built, the rehearsal (whole screen), the keepsake paper, the part's anchor.
+    "planSentence": {},
+    "rehearsal": {"ids": ["done"]},
+    "keepCard": {},
+    "partAnchor": {},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -94,6 +100,29 @@ EMBED_PROPS = {
         "doneLabel": {"type": "copy"},
         "skipLabel": {"type": "copy"},
     },
+    "planSentence": {
+        "momentField": {"type": "field"},
+        "movesField": {"type": "field"},
+        "forpullField": {"type": "field", "optional": True},
+        "pullField": {"type": "field"},
+    },
+    "rehearsal": {
+        "momentField": {"type": "field"},
+        "movesField": {"type": "field"},
+        "forpullField": {"type": "field", "optional": True},
+        "pullField": {"type": "field"},
+        "pass": {"type": "int", "min": 1, "max": 2},
+        "changeField": {"type": "field", "optional": True},
+        "changedMovesField": {"type": "field", "optional": True},
+    },
+    "keepCard": {
+        "momentField": {"type": "field"},
+        "movesField": {"type": "field"},
+        "forpullField": {"type": "field", "optional": True},
+        "pullField": {"type": "field"},
+        "partField": {"type": "field", "optional": True},
+    },
+    "partAnchor": {"partField": {"type": "field"}},
 }
 # Shared tables the graph supplies to every skill (never written here).
 GRAPH_TABLES = ("parentOf", "fitsWhen")

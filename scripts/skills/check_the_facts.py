@@ -289,7 +289,7 @@ EXITS = [
     {"id": "dear_man", "toolId": "dear-man", "carry": ["feel"]},
     {"id": "opposite_action", "toolId": "opposite-action", "carry": ["feel"]},
     {"id": "wise_mind", "toolId": "wise-mind", "query": {"first": "wm_q_next"}},
-    {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"first": "other"}},
+    {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "other"}},
     {"id": "mindfulness_emotions", "toolId": "mindfulness-emotions", "planned": True},  # ER-08 (ER-B5)
     {"id": "let_it_be", "toolId": "let-it-be", "planned": True},                        # DT-04 (DT-B4)
     {"id": "safety_open", "safety": True},                                              # safety.open (R6)

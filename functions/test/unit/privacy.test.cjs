@@ -87,6 +87,37 @@ test('closeToolSession stores ext own words encrypted; ids stay readable for CON
   assert.equal(await C.decryptOwn(s, 'u1', ext.ca.situationOwn), 'the meeting with my boss');
 });
 
+test('Cope Ahead on the skill runtime: the close projects ext.ca from ext.run, own words encrypted, the pull as urgeIds (ER-B2)', async () => {
+  let stored = null;
+  const st = keyStore((q, p) => {
+    if (/AS open/.test(q)) return [{ open: true, closeKind: 'none', practiced: false, reps: [], toolId: 'cope-ahead', followUps: [] }];
+    if (/ts\.ext = \$ext,\s+ts\.urgeIds/.test(q)) { stored = p.ext; return []; }
+    if (/ts\.ext = \$ext/.test(q)) { stored = p.ext; return []; }
+    if (/RETURN ts\.ext AS ext/.test(q)) return [{ ext: stored }];
+    return [];
+  });
+  const f = fakeDriver(st.responder);
+  setDriver(f.driver);
+  const run = {
+    skillId: 'cope_ahead', versionId: 'ca-skill-v1', path: ['what', 'feel', 'moment', 'plan'],
+    answers: [
+      { fieldId: 'situation', optionIds: ['conversation'] }, { fieldId: 'when', optionIds: ['today'] },
+      { fieldId: 'pull', optionIds: ['blank'] }, { fieldId: 'moment', optionIds: [], valueOwn: 'they bring up money' },
+      { fieldId: 'moves', optionIds: ['feet'] },
+    ],
+  };
+  await fns.closeToolSession.run({ auth: auth(), data: { id: ID, status: 'exited_early', ext: { run } } });
+  const proj = f.calls.find((c) => /ts\.urgeIds = CASE/.test(c.query));
+  assert.ok(proj, 'the projection wrote');
+  assert.deepEqual(proj.params.pull, ['blank']);
+  const ext = JSON.parse(proj.params.ext);
+  assert.equal(ext.run.skillId, 'cope_ahead', 'the run stays');
+  assert.deepEqual([ext.ca.situationId, ext.ca.when, ext.ca.ifFrom, ext.ca.moveIds], ['conversation', 'today', 'moment', ['feet']]);
+  assert.ok(ext.ca.hardMomentOwn.startsWith('enc:v1:') && ext.run.answers[3].valueOwn.startsWith('enc:v1:'));
+  assert.ok(!proj.params.ext.includes('money'), 'no own words in the clear');
+  assert.equal(await C.decryptOwn(f.driver.session(), 'u1', ext.ca.hardMomentOwn), 'they bring up money');
+});
+
 test('own-words length limits apply to the plaintext (validators unchanged)', async () => {
   setDriver(fakeDriver(keyStore().responder).driver);
   await assert.rejects(

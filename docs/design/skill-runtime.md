@@ -81,8 +81,10 @@ linted by the voice gate like every flow document; `specJson` holds no copy, onl
   answer is also an ask-fresh field on the session, e.g. `fitsFacts`), `links` (quiet exits). `own.seed` makes
   the chips starters for an open own-words box (a tap writes their words in to change; they step aside once the
   words are the person's).
-- **Slot** = a registered embed placed in a step (`after: <fieldId>`), with `showWhen` and `record` (the
-  name it's recorded under when it shows). Check the Facts' parts line is one.
+- **Slot** = a registered embed placed in an ask step, under one of its fields (`after: <fieldId>`) or under its
+  title, above every field (`after: '$title'`, ER-B2: Cope Ahead's live plan sentence, its keepsake paper, and its
+  parts step's question as a `partsLine` with `as: heading`), with `showWhen` and `record` (the name it's recorded
+  under when it shows). Check the Facts' parts line is one.
 - **Exit** = where the skill can send you: another tool (`toolId`, `query`, `carry` which answers go
   along as the hand-off's emotions) or `done`. Offer labels come from `src/data/tools.ts`, never the graph.
 
@@ -257,7 +259,14 @@ every other content file), and runs it inside the page's `ToolSessionProvider`:
   exit's emotions and query, so the next tool's session is linked to this one.
 - **Embeds.** `src/components/skillPlayer/embeds.ts` is the registry: a name → a component that gets
   the run's context and reports what it showed or returned. A step of kind `embed` hands the whole screen
-  to one (its output becomes the step's answers); a slot places one inside a step.
+  to one (its output becomes the step's answers); a slot places one inside a step. Cope Ahead's
+  (`CopeAheadEmbeds.tsx`, ER-B2): `planSentence`, `rehearsal` (whole screen, reports `done`), `keepCard` and
+  `partAnchor`, each composing the plan with `planLine` from the run's answers.
+- **A follow-up timed by an earlier answer** (ER-B2). An ask step's `followUp.whenFrom` may name a field of an earlier
+  step (Cope Ahead's *When is it?* times the keep step's *Want me to ask how it went?*), with `whenDefault` the chip
+  used when it wasn't answered. A hand-off's chips stay on its card.
+- **Projections** (R14, `functions/src/skills/projections.ts`). Cope Ahead's is the first: at close, `ext.ca` from
+  `ext.run` (own words encrypted) and the visit's pull as `urgeIds`, so the old readers keep working.
 
 ## Check the Facts on it
 
@@ -316,6 +325,9 @@ wave (`mindfulness-emotions`) and Let it be (`let-it-be`) are planned exits on t
 3. Point the tool's page at `SkillPlayer`, declare its close in `functions/src/spine/tools.ts` and
    `src/lib/spine/close.ts` if new, and delete its hand-built machine once its tests pass on the skill.
 4. Its old ext namespace stays readable (old sessions keep it); new sessions write `ext.run`.
+
+Moved so far: Check the Facts, Rebel without the wreckage, It isn't working, Keep your self-respect, Rewrite the
+nightmare, Ending a relationship, Problem Solve, Cope Ahead (ER-B2, the first with a projection and profile options).
 
 Good next candidates, in order: Problem Solve (already wants a save and a follow-up), Pause / *Hold to
 wait* (DT-02), the safety route (CORE-01, the plan's #1), then Do the Opposite's flow v3.

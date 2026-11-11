@@ -7,6 +7,7 @@ import { PartLaterEmbed } from './PartLaterEmbed';
 import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
+import { KeepCardEmbed, PartAnchorEmbed, PlanSentenceEmbed, RehearsalEmbed } from './CopeAheadEmbeds';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -46,6 +47,10 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   rebellionCard: RebellionCard,
   boundaryLine: BoundaryLine,
   rescriptCard: RescriptCard,
+  planSentence: PlanSentenceEmbed,
+  rehearsal: RehearsalEmbed,
+  keepCard: KeepCardEmbed,
+  partAnchor: PartAnchorEmbed,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -56,6 +61,10 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   rebellionCard: { ids: ['now', 'today', 'week'] },
   boundaryLine: { ids: ['copied'] },
   rescriptCard: { ids: ['read', 'stopped'], measures: ['durationSec'] },
+  planSentence: {},
+  rehearsal: { ids: ['done'] },
+  keepCard: {},
+  partAnchor: {},
 };
 
 /**
@@ -121,4 +130,28 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     doneLabel: { type: 'copy' },
     skipLabel: { type: 'copy' },
   },
+  // Cope Ahead (ER-B2, CopeAheadEmbeds.tsx): the plan's fields, for planLine.
+  planSentence: {
+    momentField: { type: 'field' },
+    movesField: { type: 'field' },
+    forpullField: { type: 'field', optional: true },
+    pullField: { type: 'field' },
+  },
+  rehearsal: {
+    momentField: { type: 'field' },
+    movesField: { type: 'field' },
+    forpullField: { type: 'field', optional: true },
+    pullField: { type: 'field' },
+    pass: { type: 'int', min: 1, max: 2 },
+    changeField: { type: 'field', optional: true },
+    changedMovesField: { type: 'field', optional: true },
+  },
+  keepCard: {
+    momentField: { type: 'field' },
+    movesField: { type: 'field' },
+    forpullField: { type: 'field', optional: true },
+    pullField: { type: 'field' },
+    partField: { type: 'field', optional: true },
+  },
+  partAnchor: { partField: { type: 'field' } },
 };

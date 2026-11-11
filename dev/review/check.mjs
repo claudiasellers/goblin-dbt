@@ -85,7 +85,7 @@ const SELECTOR = {
 const NO_CHECKBACK = new Set(['meet/danger_close']);
 // lane 4 (parts-steps-tried): screens that must also show "Steps that helped" (fresh loads, without ids).
 /** A link into Cope Ahead (src/lib/copeAheadEntry.ts): the path, then first (a situation id) and part (an id), each optional. */
-const COPE_HREF = /^#?\/tool\/cope-ahead(\?(first=[a-z][a-z0-9_]*(&part=[a-f0-9-]{36})?|part=[a-f0-9-]{36}))?$/i;
+const COPE_HREF = /^#?\/tool\/cope-ahead(\?(situationId=[a-z][a-z0-9_]*(&partId=[a-f0-9-]{36})?|partId=[a-f0-9-]{36}))?$/i;
 
 const ALSO_EXPECT = {
   'me/cards': ['stats_steps'], 'me/long': ['stats_steps'], 'reflect/': ['stats_steps'],

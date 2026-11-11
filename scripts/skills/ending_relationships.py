@@ -365,7 +365,7 @@ EXITS = [
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "give", "toolId": "give", "planned": True},
     {"id": "problem_solve", "toolId": "problem-solve"},
-    {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"first": "conversation"}},
+    {"id": "cope_ahead", "toolId": "cope-ahead", "query": {"situationId": "conversation"}},
     {"id": "rehearse", "toolId": "rehearse", "planned": True},
     {"id": "opposite_action", "toolId": "opposite-action"},
     {"id": "finding_connection", "toolId": "finding-connection", "planned": True},

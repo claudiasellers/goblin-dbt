@@ -457,3 +457,52 @@ rename fails loudly instead of drifting.
   an own line kept from the `cope_ahead` moment. DEAR MAN's anchor picker filters by it, and
   `setPartAnchor` refuses any other line, so a whole plan stays in My words and is never offered as an
   anchor.
+
+---
+
+## On the skill runtime (ER-B2, 11 Nov 2026)
+
+Cope Ahead now plays on the skill runtime ([`skill-runtime.md`](skill-runtime.md)), as the skill `cope_ahead`
+(`scripts/skills/cope_ahead.py`), under the same tool id and URL. `PLAYER_TOOLS` switches it; the hand-built page
+(`src/pages/tools/CopeAhead.tsx`, `src/lib/copeAheadTool.ts`) stays in the tree, unrouted, until a follow-up PR deletes
+it. Rolling back is removing `'cope-ahead'` from `src/lib/skillRuntime/playerTools.ts` (and its projection, which
+the legacy-exits test ties to the switch).
+
+- **Content stays Cope Ahead's.** The skill reads `scripts/cope-ahead/content.py` (and Find the feeling's pulls) and
+  uses the screens' copy by the same keys; every option keeps a `PRESENTS` edge to its `CopeSituation`, `HardMoment`,
+  `CopeMove` or `FeelingUrge`.
+- **DEAR MAN's 11 `CopeAhead` moves are absorbed** (D10): nine are linked `(:CopeAhead)-[:SAME_MOVE_AS]->(:CopeMove)`,
+  five of them through new moves (`name_it`, `validate_first`, `tears_ok`, `no_sorry`, `notes`) that show only for
+  the situations they fit (`CopeMove.forSituations`, new); `ca_time_limit` and `ca_success_anchor` are held with a
+  reason in `SAME_MOVE_HELD`. Nothing in DEAR MAN is renamed or deleted (parts mappings point at those ids).
+- **The record.** `ext.run`, and `ext.ca` written from it at close by the projection
+  (`functions/src/copeAhead/projection.ts`, `PROJECTIONS['cope-ahead']`, R14), own words encrypted like any ext own
+  words, so the after card, the `cope_ahead` part tag, Reflect and stats read exactly what they read before. The
+  projection also sets the session's `urgeIds` to this visit's pull, as the page did.
+- **The plan line** is still one function: the embeds `planSentence`, `rehearsal` and `keepCard`
+  (`src/components/skillPlayer/CopeAheadEmbeds.tsx`) compose it with `planLine` from the run's answers
+  (`planCaFromFields`), Me from the kept ids (`planCaFromKept`).
+- **Keep.** *Keep this* keeps `cope_ahead_plan` (a `ProfileFact` in Me's My plans, own words encrypted; Me composes its
+  words with `planLine`), not an own line. Old kept plans stay in My words as they were. The anchor rule
+  (`anchorableLine`) is unchanged: a kept plan was never an anchor and still isn't.
+- **The after card** is scheduled by the keep step's *Yes* (R5), timed by screen 1's *When is it?*, or *Later, or not
+  sure* when it wasn't answered (`followUp.whenDefault`, a runtime addition).
+- **Links** use the runtime's context keys: `?situationId=<id>&partId=<id>` (`copeAheadLink`). The old page reads
+  those and its old `first` / `part`. Check the Facts' and Ending's exits send `situationId`.
+
+**Departures from the hand-built page** (each smaller than it reads; reported for sign-off):
+
+- A danger moment's move is listed **first but not pre-selected** (R12: the person taps it). The banner is unchanged.
+- Moves are up to two, picked directly; there is no *Add one more* chip (a third tap swaps out the oldest).
+- Feelings have no *Not sure* chip: the question is optional, so Next is *Not sure*.
+- *Once more* offers every other non-danger moment of the situation, not just the first two.
+- Moments are chips in Cope Ahead's own order, not each situation's order (danger moments are still last).
+- 5-4-3-2-1 on the settle screen is a quiet link under the two choices, not a third button; it still leaves with the
+  plan saved.
+- The parts step's link part comes first, not preset (R12). Its question is the parts line, set as the screen's
+  heading (`partsLine` `as: heading`, a slot under `$title`).
+- A visit is complete at settle (as before); a rep is logged for a completed visit only, so a rehearsed visit left
+  before settle no longer counts as practised.
+- The keep step asks both questions on one screen and ends on a short card (*Your plan is in Me, under My plans.*).
+- Not built here: the inline if-then (`copeAheadIfThen`, R8). Its first host (IE-02 Rehearse it, IE-08) isn't built;
+  an inline run gives back on its first hand-off, so the shape is decided with a real host, as the ER-B1 mini-card was.

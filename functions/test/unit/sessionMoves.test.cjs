@@ -106,6 +106,7 @@ test('no other server reader of "this session\'s moves" walks urgeIds on its own
   const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(dir, e.name)) : [path.join(dir, e.name)]));
   const readers = walk(src).filter((f) => f.endsWith('.ts') && /\.urgeIds\b/.test(fs.readFileSync(f, 'utf8')))
     .map((f) => path.relative(src, f)).sort();
-  // The spine validates and writes them; sessionMoves.ts is the one reader.
-  assert.deepEqual(readers, ['parts/sessionMoves.ts', 'spine/toolSession.ts', 'spine/validation.ts']);
+  // The spine validates and writes them, and Cope Ahead's projection writes the visit's pull at close (ER-B2);
+  // sessionMoves.ts is the one reader.
+  assert.deepEqual(readers, ['copeAhead/projection.ts', 'parts/sessionMoves.ts', 'spine/toolSession.ts', 'spine/validation.ts']);
 });
