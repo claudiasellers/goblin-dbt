@@ -30,6 +30,9 @@ Every 2 minutes launchd runs `~/.goblin-lane/bin/merge-lane.sh`. It takes open, 
 On failure it comments on the PR with the last 60 lines of the log, swaps `ready-to-merge` for
 `lane-failed`, and leaves the PR open. It never force-pushes or rewrites a branch.
 
+Every merge and every failure also shows a macOS notification on the Mac (title `Merge lane: #<n> merged` or
+`not merged`, with the PR title), so nobody has to watch the log.
+
 ## Running it
 
 - Install or update (after `merge-lane.sh` changes): `scripts/lane/install.sh`
