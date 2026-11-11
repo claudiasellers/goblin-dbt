@@ -29,12 +29,12 @@ export const tools: Tool[] = [
   // Distress Tolerance
   {
     id: 'cool-down',
-    name: 'Circuit Breaker',
-    tagline: 'Use temperature to calm fast',
-    description: 'Cold water or ice can quickly shift your body out of crisis mode by triggering your dive reflex.',
+    name: 'First, the body',
+    tagline: 'Bring your body down first, one tap at a time',
+    description: 'Say what it\'s like with one tap, and get one thing for your body: cold on your face (Circuit Breaker), a squeeze, a long breath out, a press, or eyes open.',
     whenToUse: 'When your body is too loud to think.',
     module: 'distress-tolerance',
-    dbtBasis: 'TIP - Temperature',
+    dbtBasis: 'TIP skills',
     emoji: '🧊',
     bare: true,
   },
@@ -276,7 +276,7 @@ export interface Intent {
 export const allIntents: Intent[] = [
   { id: 'cant-tell', label: 'I can\'t tell what I\'m feeling', toolId: 'find-the-feeling', emoji: '🫧' },
   { id: 'hurt', label: 'Recover from a hurtful moment', toolId: 'recovering-from-invalidation', emoji: '💬' },
-  { id: 'calm-fast', label: 'Calm down fast', toolId: 'cool-down', emoji: '🧊' },
+  { id: 'calm-fast', label: 'My body\'s too loud', toolId: 'cool-down', emoji: '🧊' },
   { id: 'pause', label: 'Pause before reacting', toolId: 'pause', emoji: '✋' },
   { id: 'ground', label: 'Ground myself', toolId: 'five-senses', emoji: '👁️' },
   { id: 'urge', label: 'Ride out an urge', toolId: 'urge-surfing', emoji: '🌊' },

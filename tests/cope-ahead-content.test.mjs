@@ -69,7 +69,7 @@ test("moves: forPulls are the four pulls, tool labels are the tools' names, one 
     assert.equal(m.kind === "tool", !!m.appToolId, m.id);
     if (m.appToolId) assert.equal(m.label, toolName[m.appToolId], `${m.id}: label = the name of ${m.appToolId} in src/data/tools.ts`);
   }
-  assert.equal(toolName["cool-down"], "Circuit Breaker");
+  assert.equal(toolName["cool-down"], "First, the body");
   for (const d of ["might_hurt", "might_hurt_self"]) {
     const ms = fixture.moves.filter((m) => m.forMoments.includes(d));
     assert.equal(ms.length, 1, d);

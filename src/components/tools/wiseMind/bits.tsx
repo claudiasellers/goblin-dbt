@@ -12,7 +12,7 @@ export function Prompt({ children, serif = false }: { children: ReactNode; serif
   useEffect(() => { ref.current?.focus({ preventScroll: true }); }, []);
   return (
     <h2 ref={ref} tabIndex={-1}
-      className={`${serif ? 'font-serif text-2xl leading-snug' : 'text-lg font-medium'} text-[var(--color-text-primary)] text-balance focus:outline-none`}>
+      className={`${serif ? 'font-serif text-2xl leading-snug' : 'text-lg font-medium'} text-[var(--color-text-primary)] text-balance focus:outline-none focus-visible:outline-none`}>
       {children}
     </h2>
   );

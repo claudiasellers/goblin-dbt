@@ -8320,6 +8320,2087 @@
    }
   },
   {
+   "id": "first_body",
+   "toolId": "cool-down",
+   "version": "fb-v1",
+   "start": "state",
+   "accepts": [
+    "band"
+   ],
+   "ownMax": 60,
+   "emotionFields": [],
+   "copy": {
+    "state_title": "What's it like right now?",
+    "state_hint": "Tap the closest one.",
+    "medical_line": "Sit or lie down. Even if it eases, get it checked today.",
+    "urge_line": "First, a way to wait it out.",
+    "screen_title": "Cold on your face can slow your heart. Is any of this true for you?",
+    "screen_hint": "Heart trouble, a slow heart or heart medicine. Fainting. An eating disorder or very low weight. Pregnant. Raynaud's or a cold allergy. Drinking or using today.",
+    "cold_near_title": "Is there cold water, or something cold, near you?",
+    "cold_title": "Circuit Breaker: cold on your face.",
+    "cold_step1": "Wet a cloth with cold water, or wrap a cold pack in a cloth.",
+    "cold_step2": "Lean forward. Hold it on your forehead, eyes and upper cheeks.",
+    "cold_step3": "Breathe out slowly, or hold your breath if that's comfortable.",
+    "cold_caution": "Never in a shower or a bath. Cold, not ice-cold.",
+    "cold_start": "Tap when it's on",
+    "cold_running": "Hold it there",
+    "cold_lead": "Ready in",
+    "cold_done": "Cold like that can slow your heart for a bit.",
+    "cool_title": "A cool cloth, gently.",
+    "cool_step1": "A cool cloth, not ice.",
+    "cool_step2": "Lean forward and rest it on your forehead and eyes.",
+    "cool_caution": "You weren't sure, so this one is short and gentle. Stop if anything feels wrong.",
+    "cool_done": "That's enough cold for now.",
+    "move_title": "Move fast for a minute.",
+    "move_step1": "Stand up and march on the spot, knees high.",
+    "move_step2": "Or go up and down the stairs.",
+    "move_caution": "Go at your own pace. Slow down or stop if anything hurts.",
+    "move_start": "Tap to start",
+    "move_running": "Keep going",
+    "move_done": "That's a minute. Let your breath settle.",
+    "squeeze_title": "Squeeze, then let it drop.",
+    "squeeze_step1": "Breathe in and squeeze your hands, arms and shoulders.",
+    "squeeze_step2": "Breathe out and let it all drop.",
+    "squeeze_still1": "Squeeze your hands, arms and shoulders.",
+    "squeeze_still2": "Then let it all drop. Breathe however you breathe.",
+    "squeeze_start": "Press and hold to squeeze",
+    "squeeze_label": "Squeeze",
+    "drop_label": "Let it drop",
+    "squeeze_done": "That's three.",
+    "tight_title": "How does your body feel now?",
+    "tight_hint": "Can't tell is a full answer.",
+    "exhale_title": "Breathe out longer than you breathe in.",
+    "exhale_step1": "A soft breath in through your nose while the circle grows.",
+    "exhale_step2": "Out slowly while it shrinks.",
+    "exhale_start": "Tap to start",
+    "exhale_in": "In",
+    "exhale_out": "Out, slowly",
+    "exhale_dizzy": "Dizzy or tingly? Stop and breathe normally.",
+    "exhale_done": "That's the long breath out.",
+    "press_title": "Press the phone hard between your palms.",
+    "press_label": "Press and hold",
+    "press_running": "Push",
+    "press_hint": "Keep a thumb on the circle while you press. Let go whenever you need to.",
+    "press_done": "Three presses.",
+    "wake_title": "Wake your hands up.",
+    "wake_cue": "Rub your hands together fast until they're warm. Then shake them out.",
+    "orient_title": "Eyes open. Look around you.",
+    "orient_here": "You're here, and it's",
+    "orient_task": "Find three things you can see. Tap for each one.",
+    "orient_done": "You're here.",
+    "strong_title": "Something strong.",
+    "strong_cue": "Hold something cold, or smell something strong. Feet into the floor.",
+    "find_title": "Give your eyes a job.",
+    "find_task": "Find five blue things around you. Tap for each one.",
+    "listen_title": "Now give your ears one.",
+    "listen_task": "Listen. Tap for each sound you can hear, near or far.",
+    "found": "Found one",
+    "heard": "Heard one",
+    "find_done": "That's all of them.",
+    "card_start": "Tap to start",
+    "card_running": "Keep going",
+    "card_done": "That's it.",
+    "check_title": "Compared to when you started, it's…",
+    "check_title_here": "Compared to when you started, you feel…",
+    "lower_title": "You don't have to make this go away. Let's get through the next two minutes.",
+    "lower_cue": "Nothing to do. Watch the ring and breathe however you breathe.",
+    "lower_cue_here": "Nothing to do. Eyes open, feet on the floor.",
+    "lower_running": "Two minutes",
+    "lower_done": "You got through two minutes.",
+    "someone_line": "If you want someone with you right now, you can call or text one of these.",
+    "fork_title": "Can anything be done about this right now?",
+    "fork_hint": "Any answer is fine.",
+    "end_change": "Then it's worth a look, while you're steadier.",
+    "end_accept": "That's a heavy thing to carry. You don't have to solve it right now.",
+    "end_park": "Then it can wait. You can come back to it when you choose.",
+    "end_through": "You got through it. That's the skill.",
+    "safety_open": "Talk to someone now",
+    "next": "Next",
+    "done": "Done"
+   },
+   "tables": {},
+   "derive": [],
+   "steps": [
+    {
+     "id": "state",
+     "kind": "ask",
+     "title": "state_title",
+     "hint": "state_hint",
+     "crisis": [
+      {
+       "variant": "medical",
+       "when": {
+        "eq": [
+         "$a.state",
+         "medical"
+        ]
+       }
+      }
+     ],
+     "fields": [
+      {
+       "id": "state",
+       "options": {
+        "list": "state"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "medical",
+       "when": {
+        "eq": [
+         "$a.state",
+         "medical"
+        ]
+       }
+      },
+      {
+       "to": "urge",
+       "when": {
+        "eq": [
+         "$a.state",
+         "urge"
+        ]
+       }
+      },
+      {
+       "to": "press",
+       "when": {
+        "eq": [
+         "$a.state",
+         "frozen"
+        ]
+       }
+      },
+      {
+       "to": "orient",
+       "when": {
+        "eq": [
+         "$a.state",
+         "far_away"
+        ]
+       }
+      },
+      {
+       "to": "find",
+       "when": {
+        "eq": [
+         "$a.state",
+         "loop"
+        ]
+       }
+      },
+      {
+       "to": "move",
+       "when": {
+        "eq": [
+         "$a.state",
+         "restless"
+        ]
+       }
+      },
+      {
+       "to": "screen",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "medical",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "crisis": [
+      {
+       "variant": "medical",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "medical_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": []
+    },
+    {
+     "id": "urge",
+     "kind": "handoff",
+     "complete": true,
+     "noClose": true,
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "urge_line"
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "pause",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "screen",
+     "kind": "ask",
+     "title": "screen_title",
+     "hint": "screen_hint",
+     "fields": [
+      {
+       "id": "screen",
+       "options": {
+        "list": "screen"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "squeeze",
+       "when": {
+        "eq": [
+         "$a.screen",
+         "some"
+        ]
+       }
+      },
+      {
+       "to": "cold_near",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "cold_near",
+     "kind": "ask",
+     "title": "cold_near_title",
+     "fields": [
+      {
+       "id": "cold_near",
+       "options": {
+        "list": "cold_near"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "squeeze",
+       "when": {
+        "eq": [
+         "$a.cold_near",
+         "no"
+        ]
+       }
+      },
+      {
+       "to": "cool",
+       "when": {
+        "eq": [
+         "$a.screen",
+         "unsure"
+        ]
+       }
+      },
+      {
+       "to": "cold",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "cold",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "cold",
+     "title": "cold_title",
+     "props": {
+      "art": "cold",
+      "seconds": 30,
+      "leadIn": 3,
+      "step1": "cold_step1",
+      "step2": "cold_step2",
+      "step3": "cold_step3",
+      "caution": "cold_caution",
+      "start": "cold_start",
+      "running": "cold_running",
+      "lead": "cold_lead",
+      "done": "cold_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "cool",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "cool",
+     "title": "cool_title",
+     "props": {
+      "art": "cold",
+      "seconds": 15,
+      "leadIn": 3,
+      "step1": "cool_step1",
+      "step2": "cool_step2",
+      "caution": "cool_caution",
+      "start": "cold_start",
+      "running": "cold_running",
+      "lead": "cold_lead",
+      "done": "cool_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "move",
+     "kind": "embed",
+     "embed": "doseTimer",
+     "answerAs": "move",
+     "title": "move_title",
+     "props": {
+      "seconds": 60,
+      "leadIn": 3,
+      "step1": "move_step1",
+      "step2": "move_step2",
+      "caution": "move_caution",
+      "start": "move_start",
+      "running": "move_running",
+      "lead": "cold_lead",
+      "done": "move_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "squeeze",
+     "kind": "embed",
+     "embed": "squeezeRelease",
+     "answerAs": "squeeze",
+     "title": "squeeze_title",
+     "props": {
+      "rounds": 3,
+      "squeezeSec": 5,
+      "step1": "squeeze_step1",
+      "step2": "squeeze_step2",
+      "start": "squeeze_start",
+      "squeezeLabel": "squeeze_label",
+      "dropLabel": "drop_label",
+      "done": "squeeze_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "tight",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "tight",
+     "kind": "ask",
+     "title": "tight_title",
+     "hint": "tight_hint",
+     "fields": [
+      {
+       "id": "tight",
+       "options": {
+        "list": "tight"
+       },
+       "max": 1,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "exhale",
+     "kind": "embed",
+     "embed": "breathPacer",
+     "answerAs": "exhale",
+     "title": "exhale_title",
+     "props": {
+      "seconds": 90,
+      "inSec": 4,
+      "outSec": 7,
+      "step1": "exhale_step1",
+      "step2": "exhale_step2",
+      "start": "exhale_start",
+      "inLabel": "exhale_in",
+      "outLabel": "exhale_out",
+      "dizzy": "exhale_dizzy",
+      "done": "exhale_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "squeeze_still",
+       "when": {
+        "all": [
+         {
+          "eq": [
+           "$a.exhale",
+           "dizzy"
+          ]
+         },
+         {
+          "not": {
+           "set": "$a.squeeze"
+          }
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "squeeze_still",
+     "kind": "embed",
+     "embed": "squeezeRelease",
+     "answerAs": "squeeze_still",
+     "title": "squeeze_title",
+     "props": {
+      "rounds": 3,
+      "squeezeSec": 5,
+      "step1": "squeeze_still1",
+      "step2": "squeeze_still2",
+      "start": "squeeze_start",
+      "squeezeLabel": "squeeze_label",
+      "dropLabel": "drop_label",
+      "done": "squeeze_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "press",
+     "kind": "embed",
+     "embed": "holdRing",
+     "answerAs": "press",
+     "title": "press_title",
+     "props": {
+      "variant": "press",
+      "seconds": 10,
+      "holds": 3,
+      "label": "press_label",
+      "runningLabel": "press_running",
+      "hint": "press_hint",
+      "doneLabel": "press_done",
+      "next": "next",
+      "wayOn": "from_start"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "hint": "press_hint",
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "wake",
+     "kind": "embed",
+     "embed": "bodyCard",
+     "answerAs": "wake",
+     "title": "wake_title",
+     "props": {
+      "kind": "wake",
+      "cue": "wake_cue",
+      "seconds": 30,
+      "start": "card_start",
+      "running": "card_running",
+      "done": "card_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "orient",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "orient",
+     "title": "orient_title",
+     "props": {
+      "variant": "find",
+      "count": 3,
+      "here": "orient_here",
+      "task": "orient_task",
+      "foundLabel": "found",
+      "done": "orient_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "strong",
+     "kind": "embed",
+     "embed": "bodyCard",
+     "answerAs": "strong",
+     "title": "strong_title",
+     "props": {
+      "kind": "strong",
+      "cue": "strong_cue",
+      "seconds": 30,
+      "start": "card_start",
+      "running": "card_running",
+      "done": "card_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "find",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "find",
+     "title": "find_title",
+     "props": {
+      "variant": "find",
+      "count": 5,
+      "here": "orient_here",
+      "task": "find_task",
+      "foundLabel": "found",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "listen",
+     "kind": "embed",
+     "embed": "orientFind",
+     "answerAs": "listen",
+     "title": "listen_title",
+     "props": {
+      "variant": "listen",
+      "count": 3,
+      "here": "orient_here",
+      "task": "listen_task",
+      "foundLabel": "heard",
+      "done": "find_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "check2_here",
+       "when": {
+        "all": [
+         {
+          "any": [
+           {
+            "set": "$a.check1"
+           },
+           {
+            "set": "$a.check1_here"
+           }
+          ]
+         },
+         {
+          "in": [
+           "$a.state",
+           [
+            "frozen",
+            "far_away"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "check2",
+       "when": {
+        "any": [
+         {
+          "set": "$a.check1"
+         },
+         {
+          "set": "$a.check1_here"
+         }
+        ]
+       }
+      },
+      {
+       "to": "check1_here",
+       "when": {
+        "in": [
+         "$a.state",
+         [
+          "frozen",
+          "far_away"
+         ]
+        ]
+       }
+      },
+      {
+       "to": "check1",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "check1",
+     "kind": "ask",
+     "title": "check_title",
+     "fields": [
+      {
+       "id": "check1",
+       "options": {
+        "list": "tvn_down"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "fork",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.check1",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         },
+         {
+          "in": [
+           "$a.check1_here",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "listen",
+       "when": {
+        "eq": [
+         "$a.state",
+         "loop"
+        ]
+       }
+      },
+      {
+       "to": "exhale",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "check1_here",
+     "kind": "ask",
+     "title": "check_title_here",
+     "fields": [
+      {
+       "id": "check1_here",
+       "options": {
+        "list": "tvn_here"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "fork",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.check1",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         },
+         {
+          "in": [
+           "$a.check1_here",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "wake",
+       "when": {
+        "eq": [
+         "$a.state",
+         "frozen"
+        ]
+       }
+      },
+      {
+       "to": "strong",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "check2",
+     "kind": "ask",
+     "title": "check_title",
+     "fields": [
+      {
+       "id": "check2",
+       "options": {
+        "list": "tvn_down"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "fork",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.check2",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         },
+         {
+          "in": [
+           "$a.check2_here",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "lower",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "check2_here",
+     "kind": "ask",
+     "title": "check_title_here",
+     "fields": [
+      {
+       "id": "check2_here",
+       "options": {
+        "list": "tvn_here"
+       },
+       "max": 1,
+       "required": true,
+       "askFresh": "thenVsNow",
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "fork",
+       "when": {
+        "any": [
+         {
+          "in": [
+           "$a.check2",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         },
+         {
+          "in": [
+           "$a.check2_here",
+           [
+            "better",
+            "much_better"
+           ]
+          ]
+         }
+        ]
+       }
+      },
+      {
+       "to": "lower_here",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lower",
+     "kind": "embed",
+     "embed": "bodyCard",
+     "answerAs": "lower",
+     "title": "lower_title",
+     "props": {
+      "kind": "still",
+      "cue": "lower_cue",
+      "seconds": 120,
+      "start": "card_start",
+      "running": "lower_running",
+      "done": "lower_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "someone",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "lower_here",
+     "kind": "embed",
+     "embed": "bodyCard",
+     "answerAs": "lower_here",
+     "title": "lower_title",
+     "props": {
+      "kind": "still",
+      "cue": "lower_cue_here",
+      "seconds": 120,
+      "start": "card_start",
+      "running": "lower_running",
+      "done": "lower_done",
+      "next": "next"
+     },
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [
+      {
+       "to": "someone",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "someone",
+     "kind": "handoff",
+     "complete": true,
+     "crisis": [
+      {
+       "variant": "crisis",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "lines": [
+      {
+       "when": {
+        "all": []
+       },
+       "key": "someone_line"
+      }
+     ],
+     "done": "done",
+     "next": [],
+     "offers": [
+      {
+       "exit": "crisis_kit",
+       "when": {
+        "all": []
+       }
+      }
+     ]
+    },
+    {
+     "id": "fork",
+     "kind": "ask",
+     "title": "fork_title",
+     "hint": "fork_hint",
+     "fields": [
+      {
+       "id": "fork",
+       "options": {
+        "list": "fork"
+       },
+       "max": 1,
+       "required": true,
+       "links": [
+        {
+         "exit": "safety_open",
+         "label": "safety_open",
+         "when": {
+          "all": []
+         }
+        }
+       ]
+      }
+     ],
+     "next": [
+      {
+       "to": "end",
+       "when": null
+      }
+     ],
+     "offers": []
+    },
+    {
+     "id": "end",
+     "kind": "handoff",
+     "complete": true,
+     "lines": [
+      {
+       "when": {
+        "eq": [
+         "$a.fork",
+         "change"
+        ]
+       },
+       "key": "end_change"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.fork",
+         "accept"
+        ]
+       },
+       "key": "end_accept"
+      },
+      {
+       "when": {
+        "eq": [
+         "$a.fork",
+         "park"
+        ]
+       },
+       "key": "end_park"
+      },
+      {
+       "when": {
+        "all": []
+       },
+       "key": "end_through"
+      }
+     ],
+     "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "all": []
+       }
+      }
+     ],
+     "next": [],
+     "offers": [
+      {
+       "exit": "problem_solve",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "change"
+        ]
+       }
+      },
+      {
+       "exit": "dear_man",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "change"
+        ]
+       }
+      },
+      {
+       "exit": "opposite_action",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "change"
+        ]
+       }
+      },
+      {
+       "exit": "let_it_be",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "accept"
+        ]
+       }
+      },
+      {
+       "exit": "mind_job",
+       "when": {
+        "eq": [
+         "$a.fork",
+         "park"
+        ]
+       }
+      }
+     ]
+    }
+   ],
+   "exits": [
+    {
+     "id": "crisis_kit",
+     "toolId": "crisis-kit",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "dear_man",
+     "toolId": "dear-man",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "done",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": true
+    },
+    {
+     "id": "let_it_be",
+     "toolId": "let-it-be",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "mind_job",
+     "toolId": "mind-job",
+     "query": {},
+     "carry": [],
+     "done": false,
+     "planned": true
+    },
+    {
+     "id": "opposite_action",
+     "toolId": "opposite-action",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "pause",
+     "toolId": "pause",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "problem_solve",
+     "toolId": "problem-solve",
+     "query": {},
+     "carry": [],
+     "done": false
+    },
+    {
+     "id": "safety_open",
+     "toolId": null,
+     "query": {},
+     "carry": [],
+     "done": false,
+     "safety": true
+    }
+   ],
+   "options": {
+    "state": [
+     {
+      "value": "wave",
+      "label": "A wave"
+     },
+     {
+      "value": "restless",
+      "label": "Restless or buzzing"
+     },
+     {
+      "value": "urge",
+      "label": "I want to do something"
+     },
+     {
+      "value": "frozen",
+      "label": "Frozen or numb"
+     },
+     {
+      "value": "far_away",
+      "label": "Far away"
+     },
+     {
+      "value": "loop",
+      "label": "My mind won't stop"
+     },
+     {
+      "value": "medical",
+      "label": "Chest pain or feeling faint",
+      "danger": "medical"
+     }
+    ],
+    "screen": [
+     {
+      "value": "some",
+      "label": "Yes, one of these"
+     },
+     {
+      "value": "none",
+      "label": "None of these"
+     },
+     {
+      "value": "unsure",
+      "label": "Not sure"
+     }
+    ],
+    "cold_near": [
+     {
+      "value": "yes",
+      "label": "Yes"
+     },
+     {
+      "value": "no",
+      "label": "No, not right now"
+     }
+    ],
+    "tight": [
+     {
+      "value": "tight",
+      "label": "Tight"
+     },
+     {
+      "value": "loose",
+      "label": "Loose"
+     },
+     {
+      "value": "cant_tell",
+      "label": "Can't tell"
+     }
+    ],
+    "tvn_down": [
+     {
+      "value": "worse",
+      "label": "Louder"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "better",
+      "label": "Quieter"
+     },
+     {
+      "value": "much_better",
+      "label": "Much quieter"
+     }
+    ],
+    "tvn_here": [
+     {
+      "value": "worse",
+      "label": "Further away"
+     },
+     {
+      "value": "same",
+      "label": "About the same"
+     },
+     {
+      "value": "better",
+      "label": "A bit more here"
+     },
+     {
+      "value": "much_better",
+      "label": "More here"
+     }
+    ],
+    "fork": [
+     {
+      "value": "change",
+      "label": "Yes, something can be done"
+     },
+     {
+      "value": "accept",
+      "label": "No, it's how things are"
+     },
+     {
+      "value": "park",
+      "label": "Not right now"
+     },
+     {
+      "value": "through",
+      "label": "I needed to get through it"
+     }
+    ]
+   }
+  },
+  {
    "id": "hold_to_wait",
    "toolId": "pause",
    "version": "hw-v1",

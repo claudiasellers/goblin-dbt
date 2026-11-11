@@ -13,6 +13,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'pause': 'hold_to_wait',
   'problem-solve': 'problem_solve',
   'pros-cons': 'pros_cons',
+  'cool-down': 'first_body',
 };
 
 /**

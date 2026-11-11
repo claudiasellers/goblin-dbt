@@ -73,6 +73,11 @@ export interface ToolSessionApi {
   /** Check the Facts' "Does it fit?" in this visit (ask-fresh, like the wise mind answer). */
   setFitsFacts(v: 'fits' | 'partly' | 'doesnt_fit' | 'unsure' | null): void;
   /**
+   * The close answered in the flow (a skill's `askFresh: 'thenVsNow'` field, DT-01): sent with whichever close
+   * happens, unless the close passes its own. Ask-fresh: only this visit's answer.
+   */
+  setThenVsNow(v: ThenVsNow | null): void;
+  /**
    * Persist-nothing (R15): a provider mounted with `deferStart` writes nothing until `begin()`; never begun, its
    * close writes nothing. Idempotent. A provider without `deferStart` began at mount, so this does nothing.
    */
@@ -102,6 +107,7 @@ export const NO_SESSION: ToolSessionApi = {
   setUrgeIds: () => {},
   setWiseMindAnswer: () => {},
   setFitsFacts: () => {},
+  setThenVsNow: () => {},
   begin: () => {},
   setBare: () => {},
   close: async () => null,

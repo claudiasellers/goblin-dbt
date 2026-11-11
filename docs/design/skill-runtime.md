@@ -156,6 +156,16 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
 - **A planned exit can wait for a frame** (DT-10): an exit to a built skill stays planned while it asks for a
   `frame` the skill doesn't accept (`build.py`, `tests/skill-contracts.test.mjs`); it is never offered. Ending's
   *Weigh it up* → `pros-cons` `{frame: 'stay_or_end'}` is the first.
+- **The close, asked in the flow** (DT-01): a field with `askFresh: 'thenVsNow'` (one required pick of the spine's
+  `worse` · `same` · `better` · `much_better`, nothing typed; `build.py` refuses any other shape) is the close, asked
+  where the flow needs it, because what comes next depends on it (First, the body's *Quieter?* leads to the fork, a
+  swap or lowering the demand). The latest answered one is the session's `thenVsNow` (ask-fresh, sent with whichever
+  close happens, `setThenVsNow`), and leaving asks no close question after it. The direction is the tool's close
+  kind's (the server derives `thenVsNowDir`), so the copy may word it for the state while the ids stay the spine's.
+- **The `medical` crisis slot** (DT-01): `crisis: [{variant: 'medical'}]` and `danger: 'medical'` show the emergency
+  number (chest pain, fainting, trouble breathing), never a crisis line; `CrisisBanner` holds the numbers.
+- **An embed step's `hint`** (DT-01) shows under its title, as on an ask step. Before, embed steps dropped it, and
+  an embed's own `hint` prop is for a screen reader only (First, the body's press: *Keep a thumb on the circle*).
 - **Counting derive** (`kind: 'count'`: weighted picks summed, the table row with the largest threshold at or
   below the total) and a per-field `own.max` under the skill's `ownMax` (≤ 140).
 - **Follow-up on a hand-off** (R5, ER-B1 second PR, agreed with the plan thread). A step's `followUp`
