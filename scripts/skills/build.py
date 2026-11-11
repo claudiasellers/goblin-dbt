@@ -153,16 +153,6 @@ def check(skill):
                 float(k)  # a count's table is keyed by thresholds
         else:
             assert d.get("kind", "lookup") == "lookup" and isinstance(d.get("from"), str), (sid, d)
-    # Resume restores a booked follow-up by its type (the record keeps types), so a type is booked by one step before
-    # any resume point: at most one non-hand-off step per type (a hand-off is the run's end, never restored), bar a
-    # reopens loop's after / again steps (a reopened run restores nothing).
-    loop = {x for st in skill["steps"] if st.get("reopens") for x in [st["reopens"]["after"], *st["reopens"].get("again", [])]}
-    by_type = {}
-    for st in skill["steps"]:
-        if st.get("followUp") and st["kind"] != "handoff" and st["id"] not in loop:
-            by_type.setdefault(st["followUp"]["type"], []).append(st["id"])
-    for t, ids in by_type.items():
-        assert len(ids) == 1, (sid, f"one step books {t} (resume restores bookings by type)", ids)
     assert sum(1 for e in skill["exits"] if e.get("safety")) <= 1, (sid, "one safety.open exit at most")
     for e in skill["exits"]:
         if e.get("safety"):
@@ -399,6 +389,16 @@ def check(skill):
             assert o[3]["urge"] in ACTION_URGES, (sid, "an urge the graph has (schema/opposite-action-data.cypher)", o[1], o[3]["urge"])
         for u in o[3].get("forUrges", []):
             assert u in ACTION_URGES, (sid, "a move is for an urge the graph has", o[1], u)
+    # Resume restores a booked follow-up by its type (the record keeps types), so a type is booked by one step before
+    # any resume point: at most one non-hand-off step per type (a hand-off is the run's end, never restored), bar a
+    # reopens loop's after / again steps (a reopened run restores nothing).
+    loop = {x for st in skill["steps"] if st.get("reopens") for x in [st["reopens"]["after"], *st["reopens"].get("again", [])]}
+    by_type = {}
+    for st in skill["steps"]:
+        if st.get("followUp") and st["kind"] != "handoff" and st["id"] not in loop:
+            by_type.setdefault(st["followUp"]["type"], []).append(st["id"])
+    for t, ids in by_type.items():
+        assert len(ids) == 1, (sid, f"one step books {t} (resume restores bookings by type)", ids)
 
 
 # Every ActionUrge id the graph has (Do the Opposite's and DT's behaviour urges): an option's `urge` names one.
