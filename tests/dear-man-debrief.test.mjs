@@ -174,3 +174,14 @@ test("copy: the new DEAR MAN lines are in the voice (no exclamation, should, jus
   assert.equal(lines.length, 10);
   for (const l of lines) assert.doesNotMatch(l.replace(/^[^=]*= /, ""), /!|\bshould\b|\bjust\b|\bbut\b/i, l);
 });
+
+test("the profile reads what the debrief wrote: the people slice carries safetyRecheckAt, and a projected close clears the cache", async () => {
+  const { PROFILE_WRITING_CLOSES } = await importTs("src/lib/skillRuntime/playerTools.ts");
+  const src = read("functions/src/skills/projections.ts");
+  const block = /export const PROJECTIONS[^=]*=\s*\{([\s\S]*?)\};/.exec(src)[1];
+  assert.deepEqual([...block.matchAll(/'([a-z0-9-]+)'\s*:/g)].map((m) => m[1]).sort(), [...PROFILE_WRITING_CLOSES].sort(), "one per projection");
+  const ctx = read("src/contexts/ToolSessionContext.tsx");
+  assert.match(ctx, /if \(PROFILE_WRITING_CLOSES\.has\(toolId\) && mergedExt\.run\) profileCache\.clear\(\);\s*refreshToday\(\);/, "after the close lands");
+  const people = /people: `([\s\S]*?)`/.exec(read("functions/src/profile/slices.ts"))[1];
+  assert.match(people, /\.refusalsValidation, \.safetyRecheckAt,/, "both fields the projection writes are read back");
+});

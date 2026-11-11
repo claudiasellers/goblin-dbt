@@ -24,6 +24,13 @@ export const PAGE_SKILLS: Readonly<Record<string, readonly string[]>> = {
   'dear-man': ['dear_man_debrief'],
 };
 
+/**
+ * Tools whose close writes profile data through a projection (functions/src/skills/projections.ts `PROJECTIONS`,
+ * test-pinned to the same keys): DEAR MAN's debrief sets the person's refusal counts and `safetyRecheckAt`. The
+ * profile cache is cleared once such a close lands, so the next prep reads them fresh.
+ */
+export const PROFILE_WRITING_CLOSES: ReadonlySet<string> = new Set(['dear-man']);
+
 /** The skill a tool's page plays, or null when the tool still has its own page. */
 export function playerSkillFor(toolId: string): string | null {
   return Object.prototype.hasOwnProperty.call(PLAYER_TOOLS, toolId) ? PLAYER_TOOLS[toolId] : null;

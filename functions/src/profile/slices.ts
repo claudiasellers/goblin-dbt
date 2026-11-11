@@ -32,7 +32,7 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   // People (IE-03): active only (a set-aside person is never offered), the most recently used first.
   people: `MATCH (:User {id: $uid})-[:HAS_PERSON]->(p:Person {status: 'active'})
     WITH p ORDER BY coalesce(p.lastUsedAt, p.updatedAt, p.createdAt) DESC, p.id LIMIT 30
-    RETURN p {.id, .kind, .area, .status, .source, .valueJson, .refusalsValidation,
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson, .refusalsValidation, .safetyRecheckAt,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
   // Parts off (absent = off) returns no rows at all; set-aside parts are never read by a tool.
   // Nulls sort first under DESC in Cypher, hence the IS NULL keys: never-visited parts go last.
