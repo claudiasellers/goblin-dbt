@@ -30,7 +30,7 @@ const done = { type: "embedDone", output: { ids: ["done"] } };
 const run = (events, c = ctx(), from = M.initialRun(skill)) => events.reduce((s, e) => M.runNext(c, s, e), from);
 const chips = (c, s, stepId, fieldId) => M.optionGroups(c, M.stepOf(skill, stepId).fields.find((f) => f.id === fieldId), s.answers).flatMap((g) => g.options.map((o) => o.value));
 
-const TO_PLAN = [pick("situation", "conversation"), pick("when", "tomorrow"), next, pick("feel_conversation", "anxious"), pick("pull", "blank"), next,
+const TO_PLAN = [pick("situation", "conversation"), pick("when", "tomorrow"), next, pick("feel", "anxious"), pick("pull", "blank"), next,
   pick("moment", "go_blank"), next];
 const PLANNED = [...TO_PLAN, pick("moves", "feet"), pick("moves", "give_minute"), next];
 
@@ -57,21 +57,23 @@ test("a link's situation comes first and is never pressed (R12); an unknown one 
 test("the situation's feelings and moments; own words alone are Something else", () => {
   const s = run([pick("situation", "work_school"), next]);
   const feel = M.shownFields(ctx(), M.stepOf(skill, "feel"), s).map((f) => f.id);
-  assert.deepEqual(feel, ["feel_work_school", "pull"]);
-  assert.deepEqual(M.stepOf(skill, "feel").fields.find((f) => f.id === "feel_work_school").options.emotions, ["anxious", "pressured", "inadequate", "exposed"]);
+  assert.deepEqual(feel, ["feel", "pull"]);
+  const field = M.stepOf(skill, "feel").fields.find((f) => f.id === "feel");
+  assert.deepEqual(M.emotionChoices(ctx(), field, s.answers), ["anxious", "pressured", "inadequate", "exposed"]);
+  assert.deepEqual(M.emotionChoices(ctx(), field, {}), CA.situations.find((x) => x.id === "other").likelyFeelings, "no situation yet: Something else's");
   const m = run([pick("situation", "work_school"), next, next]);
-  assert.equal(m.stepId, "moment");
-  assert.deepEqual(chips(ctx(), m, "moment", "moment"), ["go_blank", "criticised", "mistake_seen", "cant_answer"].sort((a, b) => CA.hardMoments.findIndex((x) => x.id === a) - CA.hardMoments.findIndex((x) => x.id === b)));
+  assert.equal(m.stepId, "hard");
+  assert.deepEqual(chips(ctx(), m, "hard", "moment"), ["go_blank", "criticised", "mistake_seen", "cant_answer"].sort((a, b) => CA.hardMoments.findIndex((x) => x.id === a) - CA.hardMoments.findIndex((x) => x.id === b)));
   const o = run([own("situation", "My sister's wedding"), next]);
-  assert.deepEqual(M.shownFields(ctx(), M.stepOf(skill, "feel"), o).map((f) => f.id), ["feel_other", "pull"]);
+  assert.deepEqual(M.emotionChoices(ctx(), field, o.answers), CA.situations.find((x) => x.id === "other").likelyFeelings);
   const om = run([own("situation", "My sister's wedding"), next, next]);
-  assert.deepEqual(new Set(chips(ctx(), om, "moment", "moment")), new Set(CA.situations.find((x) => x.id === "other").hardMoments));
+  assert.deepEqual(new Set(chips(ctx(), om, "hard", "moment")), new Set(CA.situations.find((x) => x.id === "other").hardMoments));
 });
 
 test("a danger moment: CrisisBanner alongside on the moment and plan screens (other_person for They might hurt me), its move first, never pressed", () => {
   for (const [sit, moment, variant, move] of [["conversation", "might_hurt", "other_person", "leave_safe"], ["alone", "might_hurt_self", "crisis", "reach_help"]]) {
     const s = run([pick("situation", sit), next, next, pick("moment", moment)]);
-    assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "moment"), s)?.variant, variant, moment);
+    assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "hard"), s)?.variant, variant, moment);
     const p = run([next], ctx(), s);
     assert.equal(p.stepId, "plan");
     assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "plan"), p)?.variant, variant);
@@ -81,7 +83,7 @@ test("a danger moment: CrisisBanner alongside on the moment and plan screens (ot
     assert.equal(moves.filter((x) => x === "leave_safe" || x === "reach_help").length, 1, "only its own danger move");
   }
   const calm = run([pick("situation", "conversation"), next, next, pick("moment", "go_blank")]);
-  assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "moment"), calm), null);
+  assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "hard"), calm), null);
   assert.ok(!chips(ctx(), run([next], ctx(), calm), "plan", "moves").some((x) => x === "leave_safe" || x === "reach_help"), "a danger move never shows elsewhere");
 });
 
@@ -121,34 +123,34 @@ test("the If: the moment, or with a pull picked, the pull (one chip, pressed); n
 
 test("rehearse, once more with something new (another moment, never the plan's or a danger one), keep or change the move", () => {
   let s = run(PLANNED);
-  assert.equal(s.stepId, "rehearse");
-  assert.equal(M.stepOf(skill, "rehearse").embed, "rehearsal");
+  assert.equal(s.stepId, "walk");
+  assert.equal(M.stepOf(skill, "walk").embed, "rehearsal");
   s = run([done], ctx(), s);
-  assert.equal(s.stepId, "again");
-  assert.equal(run([pick("again", "no"), next], ctx(), s).stepId, "settle");
+  assert.equal(s.stepId, "more");
+  assert.equal(run([pick("again", "no"), next], ctx(), s).stepId, "calm");
   s = run([pick("again", "yes"), next], ctx(), s);
-  assert.equal(s.stepId, "new_moment");
-  const others = chips(ctx(), s, "new_moment", "new_moment");
+  assert.equal(s.stepId, "new");
+  const others = chips(ctx(), s, "new", "new_moment");
   assert.ok(!others.includes("go_blank") && !others.includes("might_hurt"));
   assert.deepEqual(new Set(others), new Set(["voice_raised", "not_heard", "start_crying"]));
   s = run([pick("new_moment", "not_heard")], ctx(), s);
-  assert.deepEqual(M.shownFields(ctx(), M.stepOf(skill, "new_moment"), s).map((f) => f.id), ["new_moment", "change_move"]);
+  assert.deepEqual(M.shownFields(ctx(), M.stepOf(skill, "new"), s).map((f) => f.id), ["new_moment", "change_move"]);
   assert.equal(M.canGoOn(ctx(), s), false, "keep or change, first");
   s = run([pick("change_move", "change")], ctx(), s);
   assert.equal(M.canGoOn(ctx(), s), false, "a changed plan needs a move");
   s = run([pick("new_moves", "feet"), next, done], ctx(), s);
-  assert.equal(s.stepId, "settle");
-  assert.deepEqual(s.path, ["what", "feel", "moment", "plan", "rehearse", "again", "new_moment", "rehearse2", "settle"]);
+  assert.equal(s.stepId, "calm");
+  assert.deepEqual(s.path, ["what", "feel", "hard", "plan", "walk", "more", "new", "redo", "calm"]);
 });
 
 test("settle is a choice (never skipped silently), marks the visit complete; 5-4-3-2-1 leaves with the plan saved; breath holds", () => {
   const s = run([...PLANNED, done, pick("again", "no"), next]);
-  const st = M.stepOf(skill, "settle");
+  const st = M.stepOf(skill, "calm");
   assert.ok(st.complete);
   assert.equal(M.canGoOn(ctx(), s), false);
   assert.deepEqual(st.fields[0].links.map((l) => l.exit), ["five_senses"]);
   assert.equal(skill.exits.find((x) => x.id === "five_senses").toolId, "five-senses");
-  assert.equal(run([pick("settle", "breath"), next], ctx(), s).stepId, "breathe");
+  assert.equal(run([pick("settle", "breath"), next], ctx(), s).stepId, "hold");
   assert.equal(run([pick("settle", "ok"), next], ctx(), s).stepId, "keep");
   const b = run([pick("settle", "breath"), next, { type: "embedDone", output: { ids: ["held"], durationSec: 20 } }], ctx(), s);
   assert.equal(b.stepId, "keep");
@@ -188,14 +190,14 @@ test("parts on, with a kept part: who might show up, the link's part first and n
   const parts = { parts: [{ id: PART, name: "Runner" }, { id: "1f8c2a9e-5b1d-4c3e-9a7f-2d6b8e4c1a04", name: null }] };
   const on = ctx({ partId: "1f8c2a9e-5b1d-4c3e-9a7f-2d6b8e4c1a04" }, parts);
   const s = run([pick("situation", "conversation"), next, next], on);
-  assert.equal(s.stepId, "parts");
-  assert.deepEqual(chips(on, s, "parts", "part"), ["1f8c2a9e-5b1d-4c3e-9a7f-2d6b8e4c1a04", PART]);
+  assert.equal(s.stepId, "who");
+  assert.deepEqual(chips(on, s, "who", "part"), ["1f8c2a9e-5b1d-4c3e-9a7f-2d6b8e4c1a04", PART]);
   assert.equal(s.answers.part, undefined);
   assert.equal(M.canGoOn(on, s), true, "Next is Not sure");
-  const slot = M.stepOf(skill, "parts").slots[0];
+  const slot = M.stepOf(skill, "who").slots[0];
   assert.deepEqual([slot.after, slot.embed, slot.props], ["$title", "partsLine", { promptId: "cope_title_any", as: "heading" }]);
-  assert.equal(run([pick("situation", "conversation"), next, next], ctx({}, { parts: [] })).stepId, "moment");
-  assert.equal(run([pick("situation", "conversation"), next, next]).stepId, "moment", "signed out or loading: no parts step");
+  assert.equal(run([pick("situation", "conversation"), next, next], ctx({}, { parts: [] })).stepId, "hard");
+  assert.equal(run([pick("situation", "conversation"), next, next]).stepId, "hard", "signed out or loading: no parts step");
   // The anchor slot under the plan's moves shows only with a part picked.
   const anchor = M.stepOf(skill, "plan").slots.find((x) => x.embed === "partAnchor");
   assert.equal(anchor.after, "moves");
@@ -204,7 +206,7 @@ test("parts on, with a kept part: who might show up, the link's part first and n
 test("ext.ca from the run: the after card, the part tag and Reflect read what the hand-built page wrote", () => {
   const parts = { parts: [{ id: PART, name: "Runner" }] };
   const c = ctx({}, parts);
-  const s = run([pick("situation", "conversation"), pick("when", "tomorrow"), next, pick("feel_conversation", "anxious"), pick("feel_conversation", "hurt"),
+  const s = run([pick("situation", "conversation"), pick("when", "tomorrow"), next, pick("feel", "anxious"), pick("feel", "hurt"),
     pick("pull", "blank"), next, pick("part", PART), next, own("moment", "They bring up money"), next, pick("forpull", "pull"), pick("moves", "feet"),
     own("moves", "Hold my keys"), next, done, pick("again", "yes"), next, pick("new_moment", "not_heard"), pick("change_move", "change"),
     pick("new_moves", "say_hard"), next, done, pick("settle", "breath"), next, { type: "embedDone", output: { ids: ["held"], durationSec: 18 } },
@@ -239,9 +241,9 @@ test("the embeds' plan: own words are the label past the ids; once more plays th
   const A = { moment: { ids: ["go_blank"], own: null }, moves: { ids: ["feet"], own: "hold my keys" }, pull: { ids: ["blank"], own: null },
     forpull: { ids: ["pull"], own: null }, new_moment: { ids: [], own: "the lights go out" }, change_move: { ids: ["keep"], own: null }, new_moves: { ids: ["say_hard"], own: null } };
   assert.deepEqual(P.fieldAnswer(view(A), "moves"), { ids: ["feet"], own: "hold my keys" });
-  const props1 = M.stepOf(skill, "rehearse").props;
+  const props1 = M.stepOf(skill, "walk").props;
   assert.equal(P.planLine(CA, P.runPlanCa({ ...view(A), props: props1 })).text, "If I start to shut down, I'll feel my feet on the floor and hold my keys.");
-  const props2 = M.stepOf(skill, "rehearse2").props;
+  const props2 = M.stepOf(skill, "redo").props;
   const kept = P.planLine(CA, P.runPlanCa({ ...view(A), props: props2 }, 2));
   assert.equal(kept.text, "If the lights go out, I'll feel my feet on the floor and hold my keys.", "pass 2: the new moment is the If");
   const changed = P.planLine(CA, P.runPlanCa({ ...view({ ...A, change_move: { ids: ["change"], own: null } }), props: props2 }, 2));

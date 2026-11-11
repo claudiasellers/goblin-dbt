@@ -2814,13 +2814,7 @@
         ],
         "ownMax": 140,
         "emotionFields": [
-          "feel_conversation",
-          "feel_someone",
-          "feel_work_school",
-          "feel_place_event",
-          "feel_hard_day",
-          "feel_alone",
-          "feel_other"
+          "feel"
         ],
         "copy": {
           "what_title": "What's coming up?",
@@ -2866,8 +2860,65 @@
           "done_line": "You've walked through it, start to finish.",
           "profile_unnamed": "One you haven't named"
         },
-        "tables": {},
-        "derive": [],
+        "tables": {
+          "feelBySituation": {
+            "conversation": [
+              "anxious",
+              "nervous",
+              "angry",
+              "hurt"
+            ],
+            "someone": [
+              "nervous",
+              "hurt",
+              "angry",
+              "embarrassed"
+            ],
+            "work_school": [
+              "anxious",
+              "pressured",
+              "inadequate",
+              "exposed"
+            ],
+            "place_event": [
+              "nervous",
+              "excluded",
+              "overwhelmed",
+              "embarrassed"
+            ],
+            "hard_day": [
+              "sad",
+              "grief",
+              "lonely",
+              "numb"
+            ],
+            "alone": [
+              "lonely",
+              "empty",
+              "anxious",
+              "bored"
+            ],
+            "other": [
+              "anxious",
+              "nervous",
+              "sad",
+              "angry"
+            ]
+          }
+        },
+        "derive": [
+          {
+            "name": "feelFor",
+            "from": "$a.situation",
+            "table": "feelBySituation",
+            "default": [
+              "anxious",
+              "nervous",
+              "sad",
+              "angry"
+            ]
+          }
+        ],
         "steps": [
           {
             "id": "what",
@@ -2911,127 +2962,7 @@
             "hint": "feel_hint",
             "fields": [
               {
-                "id": "feel_conversation",
-                "options": {
-                  "emotions": [
-                    "anxious",
-                    "nervous",
-                    "angry",
-                    "hurt"
-                  ],
-                  "moreKey": "feel_more"
-                },
-                "max": 2,
-                "swap": true,
-                "showWhen": {
-                  "eq": [
-                    "$a.situation",
-                    "conversation"
-                  ]
-                }
-              },
-              {
-                "id": "feel_someone",
-                "options": {
-                  "emotions": [
-                    "nervous",
-                    "hurt",
-                    "angry",
-                    "embarrassed"
-                  ],
-                  "moreKey": "feel_more"
-                },
-                "max": 2,
-                "swap": true,
-                "showWhen": {
-                  "eq": [
-                    "$a.situation",
-                    "someone"
-                  ]
-                }
-              },
-              {
-                "id": "feel_work_school",
-                "options": {
-                  "emotions": [
-                    "anxious",
-                    "pressured",
-                    "inadequate",
-                    "exposed"
-                  ],
-                  "moreKey": "feel_more"
-                },
-                "max": 2,
-                "swap": true,
-                "showWhen": {
-                  "eq": [
-                    "$a.situation",
-                    "work_school"
-                  ]
-                }
-              },
-              {
-                "id": "feel_place_event",
-                "options": {
-                  "emotions": [
-                    "nervous",
-                    "excluded",
-                    "overwhelmed",
-                    "embarrassed"
-                  ],
-                  "moreKey": "feel_more"
-                },
-                "max": 2,
-                "swap": true,
-                "showWhen": {
-                  "eq": [
-                    "$a.situation",
-                    "place_event"
-                  ]
-                }
-              },
-              {
-                "id": "feel_hard_day",
-                "options": {
-                  "emotions": [
-                    "sad",
-                    "grief",
-                    "lonely",
-                    "numb"
-                  ],
-                  "moreKey": "feel_more"
-                },
-                "max": 2,
-                "swap": true,
-                "showWhen": {
-                  "eq": [
-                    "$a.situation",
-                    "hard_day"
-                  ]
-                }
-              },
-              {
-                "id": "feel_alone",
-                "options": {
-                  "emotions": [
-                    "lonely",
-                    "empty",
-                    "anxious",
-                    "bored"
-                  ],
-                  "moreKey": "feel_more"
-                },
-                "max": 2,
-                "swap": true,
-                "showWhen": {
-                  "eq": [
-                    "$a.situation",
-                    "alone"
-                  ]
-                }
-              },
-              {
-                "id": "feel_other",
+                "id": "feel",
                 "options": {
                   "emotions": [
                     "anxious",
@@ -3039,25 +2970,11 @@
                     "sad",
                     "angry"
                   ],
+                  "emotionsFrom": "$d.feelFor",
                   "moreKey": "feel_more"
                 },
                 "max": 2,
-                "swap": true,
-                "showWhen": {
-                  "not": {
-                    "in": [
-                      "$a.situation",
-                      [
-                        "conversation",
-                        "someone",
-                        "work_school",
-                        "place_event",
-                        "hard_day",
-                        "alone"
-                      ]
-                    ]
-                  }
-                }
+                "swap": true
               },
               {
                 "id": "pull",
@@ -3070,20 +2987,20 @@
             ],
             "next": [
               {
-                "to": "parts",
+                "to": "who",
                 "when": {
                   "set": "$p.parts"
                 }
               },
               {
-                "to": "moment",
+                "to": "hard",
                 "when": null
               }
             ],
             "offers": []
           },
           {
-            "id": "parts",
+            "id": "who",
             "kind": "ask",
             "slots": [
               {
@@ -3111,14 +3028,14 @@
             ],
             "next": [
               {
-                "to": "moment",
+                "to": "hard",
                 "when": null
               }
             ],
             "offers": []
           },
           {
-            "id": "moment",
+            "id": "hard",
             "kind": "ask",
             "title": "moment_title",
             "crisis": [
@@ -3371,14 +3288,14 @@
             ],
             "next": [
               {
-                "to": "rehearse",
+                "to": "walk",
                 "when": null
               }
             ],
             "offers": []
           },
           {
-            "id": "rehearse",
+            "id": "walk",
             "kind": "embed",
             "embed": "rehearsal",
             "answerAs": "rehearsed",
@@ -3391,14 +3308,14 @@
             },
             "next": [
               {
-                "to": "again",
+                "to": "more",
                 "when": null
               }
             ],
             "offers": []
           },
           {
-            "id": "again",
+            "id": "more",
             "kind": "ask",
             "title": "rehearse_again_q",
             "fields": [
@@ -3413,7 +3330,7 @@
             ],
             "next": [
               {
-                "to": "new_moment",
+                "to": "new",
                 "when": {
                   "eq": [
                     "$a.again",
@@ -3422,14 +3339,14 @@
                 }
               },
               {
-                "to": "settle",
+                "to": "calm",
                 "when": null
               }
             ],
             "offers": []
           },
           {
-            "id": "new_moment",
+            "id": "new",
             "kind": "ask",
             "title": "rehearse_new_problem",
             "fields": [
@@ -3489,7 +3406,8 @@
                 "required": true,
                 "own": {
                   "hint": "moment_own_hint",
-                  "countsAsPick": true
+                  "countsAsPick": true,
+                  "max": 90
                 }
               },
               {
@@ -3581,7 +3499,7 @@
                 "own": {
                   "hint": "plan_own_hint",
                   "countsAsPick": true,
-                  "max": 90
+                  "max": 60
                 },
                 "showWhen": {
                   "eq": [
@@ -3593,14 +3511,14 @@
             ],
             "next": [
               {
-                "to": "rehearse2",
+                "to": "redo",
                 "when": null
               }
             ],
             "offers": []
           },
           {
-            "id": "rehearse2",
+            "id": "redo",
             "kind": "embed",
             "embed": "rehearsal",
             "answerAs": "rehearsed2",
@@ -3614,14 +3532,14 @@
             },
             "next": [
               {
-                "to": "settle",
+                "to": "calm",
                 "when": null
               }
             ],
             "offers": []
           },
           {
-            "id": "settle",
+            "id": "calm",
             "kind": "ask",
             "title": "settle_title",
             "complete": true,
@@ -3646,7 +3564,7 @@
             ],
             "next": [
               {
-                "to": "breathe",
+                "to": "hold",
                 "when": {
                   "eq": [
                     "$a.settle",
@@ -3662,7 +3580,7 @@
             "offers": []
           },
           {
-            "id": "breathe",
+            "id": "hold",
             "kind": "embed",
             "embed": "holdRing",
             "answerAs": "breath",

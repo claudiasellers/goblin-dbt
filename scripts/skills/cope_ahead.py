@@ -42,6 +42,10 @@ CONCEPT = "dbt_cope_ahead"
 VERSION = "ca-skill-v1"
 OWN_MAX = CA.OWN_MAX            # the situation and the hardest moment (140)
 MOVE_OWN_MAX = CA.MOVE_OWN_MAX  # a move (90)
+# *Once more*'s twist and its changed moves are rehearsed once and never kept: shorter boxes, so the visit's
+# longest record fits ext's 4 KB (the hand-built page used the moment's and the move's caps).
+TWIST_OWN_MAX = 90
+NEW_MOVE_OWN_MAX = 60
 
 # The screens' words are Cope Ahead's own (cope-ahead.json's copy), by the same keys.
 FLOW_KEYS = [
@@ -94,11 +98,16 @@ CRISIS = [{"variant": "other_person", "when": {"eq": [a("moment"), "might_hurt"]
 PLAN_FIELDS = {"momentField": "moment", "movesField": "moves", "forpullField": "forpull", "pullField": "pull"}
 
 
-def feel_field(sid, feels):
-    show = IS_OTHER if sid == "other" else {"eq": [a("situation"), sid]}
-    return {"id": f"feel_{sid}", "options": {"emotions": feels, "moreKey": "feel_more"}, "max": 2, "swap": True, "showWhen": show}
+# What might show up there: the situation's likely feelings (a lookup by screen 1's pick); a situation in the
+# person's own words, or none, gets *Something else*'s list. One field, so one answer in the record.
+FEEL_BY_SITUATION = {sid: feels for sid, _, _, feels, _ in SITUATIONS}
+FEEL_OTHER = FEEL_BY_SITUATION["other"]
+FEEL_FIELD = {"id": "feel", "options": {"emotions": FEEL_OTHER, "emotionsFrom": "$d.feelFor", "moreKey": "feel_more"},
+              "max": 2, "swap": True}
 
 
+# Step ids are four letters at most (the moment's step is `hard`, *Once more* is `more` → `new` → `redo`, settle is
+# `calm`): the path is in the record, and its worst case must fit ext's 4 KB. Field ids keep their names.
 STEPS = [
     {
         "id": "what", "kind": "ask", "title": "what_title",
@@ -111,20 +120,19 @@ STEPS = [
     },
     {
         "id": "feel", "kind": "ask", "title": "feel_title", "hint": "feel_hint",
-        "fields": [feel_field(sid, feels) for sid, _, _, feels, _ in SITUATIONS]
-        + [{"id": "pull", "label": "pull_title", "options": {"list": "pull"}, "max": 1}],
+        "fields": [FEEL_FIELD, {"id": "pull", "label": "pull_title", "options": {"list": "pull"}, "max": 1}],
         # Parts on, with a kept part: who might show up (the parts slice is empty with parts off).
-        "next": [{"when": {"set": "$p.parts"}, "to": "parts"}, {"to": "moment"}],
+        "next": [{"when": {"set": "$p.parts"}, "to": "who"}, {"to": "hard"}],
     },
     {
-        "id": "parts", "kind": "ask",
+        "id": "who", "kind": "ask",
         "slots": [{"after": "$title", "embed": "partsLine", "props": {"promptId": "cope_title_any", "as": "heading"},
                    "showWhen": ALWAYS, "record": "parts_title"}],
         "fields": [{"id": "part", "options": {"profile": "parts", "firstFrom": "$ctx.partId"}, "max": 1}],
-        "next": [{"to": "moment"}],
+        "next": [{"to": "hard"}],
     },
     {
-        "id": "moment", "kind": "ask", "title": "moment_title", "crisis": CRISIS,
+        "id": "hard", "kind": "ask", "title": "moment_title", "crisis": CRISIS,
         "fields": [{"id": "moment", "options": {"list": "moment", "where": FOR_SITUATION}, "max": 1, "required": True,
                     "own": {"hint": "moment_own_hint", "countsAsPick": True}}],
         "next": [{"to": "plan"}],
@@ -141,45 +149,45 @@ STEPS = [
             {"id": "moves", "options": {"list": "move", "where": MOVE_WHERE}, "max": 2, "swap": True, "required": True,
              "own": {"hint": "plan_own_hint", "countsAsPick": True, "max": MOVE_OWN_MAX}},
         ],
-        "next": [{"to": "rehearse"}],
+        "next": [{"to": "walk"}],
     },
     {
-        "id": "rehearse", "kind": "embed", "embed": "rehearsal", "answerAs": "rehearsed",
+        "id": "walk", "kind": "embed", "embed": "rehearsal", "answerAs": "rehearsed",
         "props": {**PLAN_FIELDS, "pass": 1},
-        "next": [{"to": "again"}],
+        "next": [{"to": "more"}],
     },
     {
-        "id": "again", "kind": "ask", "title": "rehearse_again_q",
+        "id": "more", "kind": "ask", "title": "rehearse_again_q",
         "fields": [{"id": "again", "options": {"list": "again"}, "max": 1, "required": True}],
-        "next": [{"when": {"eq": [a("again"), "yes"]}, "to": "new_moment"}, {"to": "settle"}],
+        "next": [{"when": {"eq": [a("again"), "yes"]}, "to": "new"}, {"to": "calm"}],
     },
     {
-        "id": "new_moment", "kind": "ask", "title": "rehearse_new_problem",
+        "id": "new", "kind": "ask", "title": "rehearse_new_problem",
         "fields": [
             {"id": "new_moment", "options": {"list": "new_moment", "where": NEW_MOMENT_WHERE}, "max": 1, "required": True,
-             "own": {"hint": "moment_own_hint", "countsAsPick": True}},
+             "own": {"hint": "moment_own_hint", "countsAsPick": True, "max": TWIST_OWN_MAX}},
             {"id": "change_move", "options": {"list": "change_move"}, "max": 1, "required": True, "showWhen": {"set": a("new_moment")}},
             {"id": "new_moves", "options": {"list": "new_move", "where": MOVE_FITS}, "max": 2, "swap": True, "required": True,
-             "own": {"hint": "plan_own_hint", "countsAsPick": True, "max": MOVE_OWN_MAX},
+             "own": {"hint": "plan_own_hint", "countsAsPick": True, "max": NEW_MOVE_OWN_MAX},
              "showWhen": {"eq": [a("change_move"), "change"]}},
         ],
-        "next": [{"to": "rehearse2"}],
+        "next": [{"to": "redo"}],
     },
     {
-        "id": "rehearse2", "kind": "embed", "embed": "rehearsal", "answerAs": "rehearsed2",
+        "id": "redo", "kind": "embed", "embed": "rehearsal", "answerAs": "rehearsed2",
         "props": {"momentField": "new_moment", "movesField": "moves", "pullField": "pull", "pass": 2,
                   "changeField": "change_move", "changedMovesField": "new_moves"},
-        "next": [{"to": "settle"}],
+        "next": [{"to": "calm"}],
     },
     {
         # The handout's relaxation step, never skipped silently: *I'm OK* is a choice. 5-4-3-2-1 leaves with the plan saved.
-        "id": "settle", "kind": "ask", "title": "settle_title", "complete": True,
+        "id": "calm", "kind": "ask", "title": "settle_title", "complete": True,
         "fields": [{"id": "settle", "options": {"list": "settle"}, "max": 1, "required": True,
                     "links": [{"exit": "five_senses", "label": "settle_five", "when": ALWAYS}]}],
-        "next": [{"when": {"eq": [a("settle"), "breath"]}, "to": "breathe"}, {"to": "keep"}],
+        "next": [{"when": {"eq": [a("settle"), "breath"]}, "to": "hold"}, {"to": "keep"}],
     },
     {
-        "id": "breathe", "kind": "embed", "embed": "holdRing", "answerAs": "breath", "title": "settle_hold",
+        "id": "hold", "kind": "embed", "embed": "holdRing", "answerAs": "breath", "title": "settle_hold",
         "props": {"variant": "settle", "seconds": 6, "holds": 3, "label": "hold_label", "hint": "settle_hold_hint",
                   "runningLabel": "hold_running", "next": "next"},
         "next": [{"to": "keep"}],
@@ -244,6 +252,7 @@ def options():
 SKILL = {
     "id": ID, "toolId": TOOL_ID, "concept": CONCEPT, "version": VERSION, "start": "what", "ownMax": OWN_MAX,
     "accepts": ["situationId", "partId"],
-    "copy": COPY, "tables": {}, "derive": [], "steps": STEPS, "exits": EXITS, "options": options(),
-    "emotionFields": [f"feel_{s[0]}" for s in SITUATIONS],
+    "copy": COPY, "tables": {"feelBySituation": FEEL_BY_SITUATION},
+    "derive": [{"name": "feelFor", "from": "$a.situation", "table": "feelBySituation", "default": FEEL_OTHER}], "steps": STEPS, "exits": EXITS, "options": options(),
+    "emotionFields": ["feel"],
 }

@@ -99,7 +99,7 @@ test('Cope Ahead on the skill runtime: the close projects ext.ca from ext.run, o
   const f = fakeDriver(st.responder);
   setDriver(f.driver);
   const run = {
-    skillId: 'cope_ahead', versionId: 'ca-skill-v1', path: ['what', 'feel', 'moment', 'plan'],
+    skillId: 'cope_ahead', versionId: 'ca-skill-v1', path: ['what', 'feel', 'hard', 'plan'],
     answers: [
       { fieldId: 'situation', optionIds: ['conversation'] }, { fieldId: 'when', optionIds: ['today'] },
       { fieldId: 'pull', optionIds: ['blank'] }, { fieldId: 'moment', optionIds: [], valueOwn: 'they bring up money' },

@@ -5780,7 +5780,7 @@ SET r += {list: "again", order: 47};
 
 // --- cope_ahead (ca-skill-v1) ---
 MERGE (s:Skill {id: "cope_ahead"})
-SET s += {toolId: "cope-ahead", version: "ca-skill-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: ["feel_conversation", "feel_someone", "feel_work_school", "feel_place_event", "feel_hard_day", "feel_alone", "feel_other"], accepts: ["situationId", "partId"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"ask_after_no\": \"No thanks\", \"ask_after_q\": \"Want me to ask how it went?\", \"ask_after_yes\": \"Yes\", \"done\": \"Done\", \"done_kept\": \"Your plan is in Me, under My plans.\", \"done_line\": \"You've walked through it, start to finish.\", \"feel_hint\": \"Pick up to two.\", \"feel_more\": \"Something else\", \"feel_title\": \"What might you feel there?\", \"hold_label\": \"Hold\", \"hold_running\": \"Breathe out, slowly\", \"keep_no\": \"Not now\", \"keep_title\": \"Here's your plan.\", \"keep_yes\": \"Keep this\", \"moment_own_hint\": \"Say it your way\", \"moment_title\": \"What's the moment you're most worried about?\", \"next\": \"Next\", \"not_sure\": \"Not sure\", \"plan_own_hint\": \"Say it your way\", \"plan_title\": \"If it happens, I'll…\", \"plan_use_pull\": \"Plan for the pull instead\", \"profile_unnamed\": \"One you haven't named\", \"pull_title\": \"What might you want to do?\", \"rehearse_again_no\": \"That's enough\", \"rehearse_again_q\": \"Once more, with something you didn't expect?\", \"rehearse_again_yes\": \"Yes\", \"rehearse_change_move\": \"Change what I'll do\", \"rehearse_keep_move\": \"Keep the same plan\", \"rehearse_new_problem\": \"Something you didn't plan for happens.\", \"settle_breath\": \"Three long breaths out\", \"settle_five\": \"5-4-3-2-1\", \"settle_hold\": \"Hold while you breathe out, slowly.\", \"settle_hold_hint\": \"Three times. Let go between them.\", \"settle_ok\": \"I'm OK\", \"settle_title\": \"Let your body come back to now.\", \"what_own_hint\": \"Say it your way\", \"what_title\": \"What's coming up?\", \"when_later\": \"Later, or not sure\", \"when_title\": \"When is it?\", \"when_today\": \"Today\", \"when_tomorrow\": \"Tomorrow\", \"when_week\": \"This week\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+SET s += {toolId: "cope-ahead", version: "ca-skill-v1", contentVersion: "skills-v1", start: "what", ownMax: 140, emotionFields: ["feel"], accepts: ["situationId", "partId"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"ask_after_no\": \"No thanks\", \"ask_after_q\": \"Want me to ask how it went?\", \"ask_after_yes\": \"Yes\", \"done\": \"Done\", \"done_kept\": \"Your plan is in Me, under My plans.\", \"done_line\": \"You've walked through it, start to finish.\", \"feel_hint\": \"Pick up to two.\", \"feel_more\": \"Something else\", \"feel_title\": \"What might you feel there?\", \"hold_label\": \"Hold\", \"hold_running\": \"Breathe out, slowly\", \"keep_no\": \"Not now\", \"keep_title\": \"Here's your plan.\", \"keep_yes\": \"Keep this\", \"moment_own_hint\": \"Say it your way\", \"moment_title\": \"What's the moment you're most worried about?\", \"next\": \"Next\", \"not_sure\": \"Not sure\", \"plan_own_hint\": \"Say it your way\", \"plan_title\": \"If it happens, I'll…\", \"plan_use_pull\": \"Plan for the pull instead\", \"profile_unnamed\": \"One you haven't named\", \"pull_title\": \"What might you want to do?\", \"rehearse_again_no\": \"That's enough\", \"rehearse_again_q\": \"Once more, with something you didn't expect?\", \"rehearse_again_yes\": \"Yes\", \"rehearse_change_move\": \"Change what I'll do\", \"rehearse_keep_move\": \"Keep the same plan\", \"rehearse_new_problem\": \"Something you didn't plan for happens.\", \"settle_breath\": \"Three long breaths out\", \"settle_five\": \"5-4-3-2-1\", \"settle_hold\": \"Hold while you breathe out, slowly.\", \"settle_hold_hint\": \"Three times. Let go between them.\", \"settle_ok\": \"I'm OK\", \"settle_title\": \"Let your body come back to now.\", \"what_own_hint\": \"Say it your way\", \"what_title\": \"What's coming up?\", \"when_later\": \"Later, or not sure\", \"when_title\": \"When is it?\", \"when_today\": \"Today\", \"when_tomorrow\": \"Tomorrow\", \"when_week\": \"This week\"}", s.tablesJson = "{\"feelBySituation\": {\"alone\": [\"lonely\", \"empty\", \"anxious\", \"bored\"], \"conversation\": [\"anxious\", \"nervous\", \"angry\", \"hurt\"], \"hard_day\": [\"sad\", \"grief\", \"lonely\", \"numb\"], \"other\": [\"anxious\", \"nervous\", \"sad\", \"angry\"], \"place_event\": [\"nervous\", \"excluded\", \"overwhelmed\", \"embarrassed\"], \"someone\": [\"nervous\", \"hurt\", \"angry\", \"embarrassed\"], \"work_school\": [\"anxious\", \"pressured\", \"inadequate\", \"exposed\"]}}", s.deriveJson = "[{\"default\": [\"anxious\", \"nervous\", \"sad\", \"angry\"], \"from\": \"$a.situation\", \"name\": \"feelFor\", \"table\": \"feelBySituation\"}]";
 MATCH (t:TherapyConcept {id: "dbt_cope_ahead"}), (s:Skill {id: "cope_ahead"})
 MERGE (t)-[:HAS_SKILL]->(s);
 MATCH (:SkillStep {skillId: "cope_ahead"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
@@ -5791,18 +5791,18 @@ MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:what"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 0};
 MERGE (n:SkillStep {id: "cope_ahead:feel"})
-SET n += {skillId: "cope_ahead", step: "feel", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"feel_conversation\", \"max\": 2, \"options\": {\"emotions\": [\"anxious\", \"nervous\", \"angry\", \"hurt\"], \"moreKey\": \"feel_more\"}, \"showWhen\": {\"eq\": [\"$a.situation\", \"conversation\"]}, \"swap\": true}, {\"id\": \"feel_someone\", \"max\": 2, \"options\": {\"emotions\": [\"nervous\", \"hurt\", \"angry\", \"embarrassed\"], \"moreKey\": \"feel_more\"}, \"showWhen\": {\"eq\": [\"$a.situation\", \"someone\"]}, \"swap\": true}, {\"id\": \"feel_work_school\", \"max\": 2, \"options\": {\"emotions\": [\"anxious\", \"pressured\", \"inadequate\", \"exposed\"], \"moreKey\": \"feel_more\"}, \"showWhen\": {\"eq\": [\"$a.situation\", \"work_school\"]}, \"swap\": true}, {\"id\": \"feel_place_event\", \"max\": 2, \"options\": {\"emotions\": [\"nervous\", \"excluded\", \"overwhelmed\", \"embarrassed\"], \"moreKey\": \"feel_more\"}, \"showWhen\": {\"eq\": [\"$a.situation\", \"place_event\"]}, \"swap\": true}, {\"id\": \"feel_hard_day\", \"max\": 2, \"options\": {\"emotions\": [\"sad\", \"grief\", \"lonely\", \"numb\"], \"moreKey\": \"feel_more\"}, \"showWhen\": {\"eq\": [\"$a.situation\", \"hard_day\"]}, \"swap\": true}, {\"id\": \"feel_alone\", \"max\": 2, \"options\": {\"emotions\": [\"lonely\", \"empty\", \"anxious\", \"bored\"], \"moreKey\": \"feel_more\"}, \"showWhen\": {\"eq\": [\"$a.situation\", \"alone\"]}, \"swap\": true}, {\"id\": \"feel_other\", \"max\": 2, \"options\": {\"emotions\": [\"anxious\", \"nervous\", \"sad\", \"angry\"], \"moreKey\": \"feel_more\"}, \"showWhen\": {\"not\": {\"in\": [\"$a.situation\", [\"conversation\", \"someone\", \"work_school\", \"place_event\", \"hard_day\", \"alone\"]]}}, \"swap\": true}, {\"id\": \"pull\", \"label\": \"pull_title\", \"max\": 1, \"options\": {\"list\": \"pull\"}}], \"hint\": \"feel_hint\", \"title\": \"feel_title\"}";
+SET n += {skillId: "cope_ahead", step: "feel", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"feel\", \"max\": 2, \"options\": {\"emotions\": [\"anxious\", \"nervous\", \"sad\", \"angry\"], \"emotionsFrom\": \"$d.feelFor\", \"moreKey\": \"feel_more\"}, \"swap\": true}, {\"id\": \"pull\", \"label\": \"pull_title\", \"max\": 1, \"options\": {\"list\": \"pull\"}}], \"hint\": \"feel_hint\", \"title\": \"feel_title\"}";
 MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:feel"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 1};
-MERGE (n:SkillStep {id: "cope_ahead:parts"})
-SET n += {skillId: "cope_ahead", step: "parts", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"part\", \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.partId\", \"profile\": \"parts\"}}], \"slots\": [{\"after\": \"$title\", \"embed\": \"partsLine\", \"props\": {\"as\": \"heading\", \"promptId\": \"cope_title_any\"}, \"record\": \"parts_title\", \"showWhen\": {\"all\": []}}]}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:parts"})
+MERGE (n:SkillStep {id: "cope_ahead:who"})
+SET n += {skillId: "cope_ahead", step: "who", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"part\", \"max\": 1, \"options\": {\"firstFrom\": \"$ctx.partId\", \"profile\": \"parts\"}}], \"slots\": [{\"after\": \"$title\", \"embed\": \"partsLine\", \"props\": {\"as\": \"heading\", \"promptId\": \"cope_title_any\"}, \"record\": \"parts_title\", \"showWhen\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:who"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 2};
-MERGE (n:SkillStep {id: "cope_ahead:moment"})
-SET n += {skillId: "cope_ahead", step: "moment", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"fields\": [{\"id\": \"moment\", \"max\": 1, \"options\": {\"list\": \"moment\", \"where\": {\"any\": [{\"has\": [\"$opt.sits\", \"$a.situation\"]}, {\"all\": [{\"not\": {\"in\": [\"$a.situation\", [\"conversation\", \"someone\", \"work_school\", \"place_event\", \"hard_day\", \"alone\"]]}}, {\"has\": [\"$opt.sits\", \"other\"]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"moment_own_hint\"}, \"required\": true}], \"title\": \"moment_title\"}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:moment"})
+MERGE (n:SkillStep {id: "cope_ahead:hard"})
+SET n += {skillId: "cope_ahead", step: "hard", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt\"]}}, {\"variant\": \"crisis\", \"when\": {\"eq\": [\"$a.moment\", \"might_hurt_self\"]}}], \"fields\": [{\"id\": \"moment\", \"max\": 1, \"options\": {\"list\": \"moment\", \"where\": {\"any\": [{\"has\": [\"$opt.sits\", \"$a.situation\"]}, {\"all\": [{\"not\": {\"in\": [\"$a.situation\", [\"conversation\", \"someone\", \"work_school\", \"place_event\", \"hard_day\", \"alone\"]]}}, {\"has\": [\"$opt.sits\", \"other\"]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"moment_own_hint\"}, \"required\": true}], \"title\": \"moment_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:hard"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 3};
 MERGE (n:SkillStep {id: "cope_ahead:plan"})
@@ -5810,34 +5810,34 @@ SET n += {skillId: "cope_ahead", step: "plan", kind: "ask", version: "ca-skill-v
 MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:plan"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 4};
-MERGE (n:SkillStep {id: "cope_ahead:rehearse"})
-SET n += {skillId: "cope_ahead", step: "rehearse", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"rehearsed\", \"embed\": \"rehearsal\", \"props\": {\"forpullField\": \"forpull\", \"momentField\": \"moment\", \"movesField\": \"moves\", \"pass\": 1, \"pullField\": \"pull\"}}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:rehearse"})
+MERGE (n:SkillStep {id: "cope_ahead:walk"})
+SET n += {skillId: "cope_ahead", step: "walk", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"rehearsed\", \"embed\": \"rehearsal\", \"props\": {\"forpullField\": \"forpull\", \"momentField\": \"moment\", \"movesField\": \"moves\", \"pass\": 1, \"pullField\": \"pull\"}}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:walk"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 5};
-MERGE (n:SkillStep {id: "cope_ahead:again"})
-SET n += {skillId: "cope_ahead", step: "again", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"title\": \"rehearse_again_q\"}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:again"})
+MERGE (n:SkillStep {id: "cope_ahead:more"})
+SET n += {skillId: "cope_ahead", step: "more", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"again\", \"max\": 1, \"options\": {\"list\": \"again\"}, \"required\": true}], \"title\": \"rehearse_again_q\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:more"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 6};
-MERGE (n:SkillStep {id: "cope_ahead:new_moment"})
-SET n += {skillId: "cope_ahead", step: "new_moment", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"new_moment\", \"max\": 1, \"options\": {\"list\": \"new_moment\", \"where\": {\"all\": [{\"any\": [{\"has\": [\"$opt.sits\", \"$a.situation\"]}, {\"all\": [{\"not\": {\"in\": [\"$a.situation\", [\"conversation\", \"someone\", \"work_school\", \"place_event\", \"hard_day\", \"alone\"]]}}, {\"has\": [\"$opt.sits\", \"other\"]}]}]}, {\"not\": {\"eq\": [\"$opt.value\", \"$a.moment\"]}}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"moment_own_hint\"}, \"required\": true}, {\"id\": \"change_move\", \"max\": 1, \"options\": {\"list\": \"change_move\"}, \"required\": true, \"showWhen\": {\"set\": \"$a.new_moment\"}}, {\"id\": \"new_moves\", \"max\": 2, \"options\": {\"list\": \"new_move\", \"where\": {\"all\": [{\"any\": [{\"not\": {\"set\": \"$opt.sits\"}}, {\"has\": [\"$opt.sits\", \"$a.situation\"]}]}, {\"any\": [{\"all\": [{\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}, {\"has\": [\"$opt.pulls\", \"$a.pull\"]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}}, {\"eq\": [\"$opt.general\", true]}]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"plan_own_hint\", \"max\": 90}, \"required\": true, \"showWhen\": {\"eq\": [\"$a.change_move\", \"change\"]}, \"swap\": true}], \"title\": \"rehearse_new_problem\"}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:new_moment"})
+MERGE (n:SkillStep {id: "cope_ahead:new"})
+SET n += {skillId: "cope_ahead", step: "new", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"fields\": [{\"id\": \"new_moment\", \"max\": 1, \"options\": {\"list\": \"new_moment\", \"where\": {\"all\": [{\"any\": [{\"has\": [\"$opt.sits\", \"$a.situation\"]}, {\"all\": [{\"not\": {\"in\": [\"$a.situation\", [\"conversation\", \"someone\", \"work_school\", \"place_event\", \"hard_day\", \"alone\"]]}}, {\"has\": [\"$opt.sits\", \"other\"]}]}]}, {\"not\": {\"eq\": [\"$opt.value\", \"$a.moment\"]}}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"moment_own_hint\", \"max\": 90}, \"required\": true}, {\"id\": \"change_move\", \"max\": 1, \"options\": {\"list\": \"change_move\"}, \"required\": true, \"showWhen\": {\"set\": \"$a.new_moment\"}}, {\"id\": \"new_moves\", \"max\": 2, \"options\": {\"list\": \"new_move\", \"where\": {\"all\": [{\"any\": [{\"not\": {\"set\": \"$opt.sits\"}}, {\"has\": [\"$opt.sits\", \"$a.situation\"]}]}, {\"any\": [{\"all\": [{\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}, {\"has\": [\"$opt.pulls\", \"$a.pull\"]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.pull\", [\"fight\", \"chase\", \"hide\", \"blank\"]]}}, {\"eq\": [\"$opt.general\", true]}]}]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"plan_own_hint\", \"max\": 60}, \"required\": true, \"showWhen\": {\"eq\": [\"$a.change_move\", \"change\"]}, \"swap\": true}], \"title\": \"rehearse_new_problem\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:new"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 7};
-MERGE (n:SkillStep {id: "cope_ahead:rehearse2"})
-SET n += {skillId: "cope_ahead", step: "rehearse2", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"rehearsed2\", \"embed\": \"rehearsal\", \"props\": {\"changeField\": \"change_move\", \"changedMovesField\": \"new_moves\", \"momentField\": \"new_moment\", \"movesField\": \"moves\", \"pass\": 2, \"pullField\": \"pull\"}}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:rehearse2"})
+MERGE (n:SkillStep {id: "cope_ahead:redo"})
+SET n += {skillId: "cope_ahead", step: "redo", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"rehearsed2\", \"embed\": \"rehearsal\", \"props\": {\"changeField\": \"change_move\", \"changedMovesField\": \"new_moves\", \"momentField\": \"new_moment\", \"movesField\": \"moves\", \"pass\": 2, \"pullField\": \"pull\"}}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:redo"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 8};
-MERGE (n:SkillStep {id: "cope_ahead:settle"})
-SET n += {skillId: "cope_ahead", step: "settle", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"complete\": true, \"fields\": [{\"id\": \"settle\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"settle_five\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"settle\"}, \"required\": true}], \"title\": \"settle_title\"}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:settle"})
+MERGE (n:SkillStep {id: "cope_ahead:calm"})
+SET n += {skillId: "cope_ahead", step: "calm", kind: "ask", version: "ca-skill-v1"}, n.specJson = "{\"complete\": true, \"fields\": [{\"id\": \"settle\", \"links\": [{\"exit\": \"five_senses\", \"label\": \"settle_five\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"settle\"}, \"required\": true}], \"title\": \"settle_title\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:calm"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 9};
-MERGE (n:SkillStep {id: "cope_ahead:breathe"})
-SET n += {skillId: "cope_ahead", step: "breathe", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"breath\", \"embed\": \"holdRing\", \"props\": {\"hint\": \"settle_hold_hint\", \"holds\": 3, \"label\": \"hold_label\", \"next\": \"next\", \"runningLabel\": \"hold_running\", \"seconds\": 6, \"variant\": \"settle\"}, \"title\": \"settle_hold\"}";
-MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:breathe"})
+MERGE (n:SkillStep {id: "cope_ahead:hold"})
+SET n += {skillId: "cope_ahead", step: "hold", kind: "embed", version: "ca-skill-v1"}, n.specJson = "{\"answerAs\": \"breath\", \"embed\": \"holdRing\", \"props\": {\"hint\": \"settle_hold_hint\", \"holds\": 3, \"label\": \"hold_label\", \"next\": \"next\", \"runningLabel\": \"hold_running\", \"seconds\": 6, \"variant\": \"settle\"}, \"title\": \"settle_hold\"}";
+MATCH (s:Skill {id: "cope_ahead"}), (n:SkillStep {id: "cope_ahead:hold"})
 MERGE (s)-[r:HAS_STEP]->(n)
 SET r += {order: 10};
 MERGE (n:SkillStep {id: "cope_ahead:keep"})
@@ -5863,46 +5863,46 @@ MERGE (s)-[:HAS_EXIT]->(x);
 MATCH (a:SkillStep {id: "cope_ahead:what"}), (b:SkillStep {id: "cope_ahead:feel"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:feel"}), (b:SkillStep {id: "cope_ahead:parts"})
+MATCH (a:SkillStep {id: "cope_ahead:feel"}), (b:SkillStep {id: "cope_ahead:who"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"set\": \"$p.parts\"}";
-MATCH (a:SkillStep {id: "cope_ahead:feel"}), (b:SkillStep {id: "cope_ahead:moment"})
+MATCH (a:SkillStep {id: "cope_ahead:feel"}), (b:SkillStep {id: "cope_ahead:hard"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:parts"}), (b:SkillStep {id: "cope_ahead:moment"})
+MATCH (a:SkillStep {id: "cope_ahead:who"}), (b:SkillStep {id: "cope_ahead:hard"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:moment"}), (b:SkillStep {id: "cope_ahead:plan"})
+MATCH (a:SkillStep {id: "cope_ahead:hard"}), (b:SkillStep {id: "cope_ahead:plan"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:plan"}), (b:SkillStep {id: "cope_ahead:rehearse"})
+MATCH (a:SkillStep {id: "cope_ahead:plan"}), (b:SkillStep {id: "cope_ahead:walk"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:rehearse"}), (b:SkillStep {id: "cope_ahead:again"})
+MATCH (a:SkillStep {id: "cope_ahead:walk"}), (b:SkillStep {id: "cope_ahead:more"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:again"}), (b:SkillStep {id: "cope_ahead:new_moment"})
+MATCH (a:SkillStep {id: "cope_ahead:more"}), (b:SkillStep {id: "cope_ahead:new"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.again\", \"yes\"]}";
-MATCH (a:SkillStep {id: "cope_ahead:again"}), (b:SkillStep {id: "cope_ahead:settle"})
+MATCH (a:SkillStep {id: "cope_ahead:more"}), (b:SkillStep {id: "cope_ahead:calm"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:new_moment"}), (b:SkillStep {id: "cope_ahead:rehearse2"})
+MATCH (a:SkillStep {id: "cope_ahead:new"}), (b:SkillStep {id: "cope_ahead:redo"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:rehearse2"}), (b:SkillStep {id: "cope_ahead:settle"})
+MATCH (a:SkillStep {id: "cope_ahead:redo"}), (b:SkillStep {id: "cope_ahead:calm"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:settle"}), (b:SkillStep {id: "cope_ahead:breathe"})
+MATCH (a:SkillStep {id: "cope_ahead:calm"}), (b:SkillStep {id: "cope_ahead:hold"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.settle\", \"breath\"]}";
-MATCH (a:SkillStep {id: "cope_ahead:settle"}), (b:SkillStep {id: "cope_ahead:keep"})
+MATCH (a:SkillStep {id: "cope_ahead:calm"}), (b:SkillStep {id: "cope_ahead:keep"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 1}, r.whenJson = "null";
-MATCH (a:SkillStep {id: "cope_ahead:settle"}), (x:SkillExit {id: "cope_ahead:five_senses"})
+MATCH (a:SkillStep {id: "cope_ahead:calm"}), (x:SkillExit {id: "cope_ahead:five_senses"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "settle", label: "settle_five"}, r.whenJson = "{\"all\": []}";
-MATCH (a:SkillStep {id: "cope_ahead:breathe"}), (b:SkillStep {id: "cope_ahead:keep"})
+MATCH (a:SkillStep {id: "cope_ahead:hold"}), (b:SkillStep {id: "cope_ahead:keep"})
 MERGE (a)-[r:NEXT]->(b)
 SET r += {order: 0}, r.whenJson = "null";
 MATCH (a:SkillStep {id: "cope_ahead:keep"}), (b:SkillStep {id: "cope_ahead:end"})

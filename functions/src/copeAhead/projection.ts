@@ -38,7 +38,7 @@ export function caFromRun(run: Record<string, unknown>): Record<string, unknown>
   }
   const when = get('when')?.ids[0];
   if (when && (WHEN as readonly string[]).includes(when)) ca.when = when;
-  const feel = answers.filter((x) => typeof x?.fieldId === 'string' && (x.fieldId as string).startsWith('feel_')).flatMap((x) => strs(x.optionIds));
+  const feel = get('feel')?.ids ?? [];
   if (feel.length) ca.feelIds = [...new Set(feel)].slice(0, 2);
   const pull = (get('pull')?.ids ?? []).filter((p) => (PULLS as readonly string[]).includes(p));
   if (pull.length) ca.pullIds = pull.slice(0, 1);

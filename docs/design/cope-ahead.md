@@ -495,6 +495,10 @@ the legacy-exits test ties to the switch).
 - A danger moment's move is listed **first but not pre-selected** (R12: the person taps it). The banner is unchanged.
 - Moves are up to two, picked directly; there is no *Add one more* chip (a third tap swaps out the oldest).
 - Feelings have no *Not sure* chip: the question is optional, so Next is *Not sure*.
+- Feelings are one field, `feel`, whose words follow the situation (`emotionsFrom`, a lookup through
+  `feelBySituation`; own words alone or no pick: *Something else*'s words), not one field per situation.
+- *Once more*'s own-words boxes are shorter than the plan's: the twist 90 characters (was 140), a changed move 60
+  (was 90). Neither is kept; the caps keep the visit's longest record inside ext's 4 KB.
 - *Once more* offers every other non-danger moment of the situation, not just the first two.
 - Moments are chips in Cope Ahead's own order, not each situation's order (danger moments are still last).
 - 5-4-3-2-1 on the settle screen is a quiet link under the two choices, not a third button; it still leaves with the
