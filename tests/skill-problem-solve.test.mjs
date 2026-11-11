@@ -369,3 +369,26 @@ test("every dead link of the old page is a planned exit: recorded, never offered
   const tools = readFileSync("src/data/tools.ts", "utf8");
   for (const x of skill.exits.filter((e) => e.toolId && !e.planned)) assert.match(tools, new RegExp(`id: '${x.toolId}'`), x.toolId);
 });
+
+test("the final gate pass: a hopeless word keeps someone to talk to on every hand-off; the danger path's *I didn't* is never a lesson", () => {
+  const hopeless = run([pick("feel", "powerless"), next]);
+  const plain = run([pick("feel", "anxious"), next]);
+  const handoffs = skill.steps.filter((st) => st.kind === "handoff");
+  assert.deepEqual(handoffs.map((st) => st.id).sort(), ["accept", "commit", "not_fit", "not_now", "rest", "review_done", "review_later"]);
+  for (const st of handoffs) {
+    assert.ok(M.stepLinks(ctx(), st, hopeless).some((l) => l.exit.id === "safety_open"), `${st.id}: Talk to someone now`);
+    assert.ok(!M.stepLinks(ctx(), st, plain).some((l) => l.exit.id === "safety_open"), `${st.id}: only for a hopeless word`);
+  }
+  const g = ps.directions["fear-safety-threat"][0];
+  const at = run([...READY, pick("problem", "fear-safety-threat"), next, pick("solutions", g.id), next, pick("size", `${g.id}:small`), next, pick("when", "today")]);
+  const back = M.resumeRun(ctx(), M.runRecord(ctx(), at), "review");
+  for (const how of ["didnt", "did_part"]) {
+    const s = run([pick("how", how), next], ctx(), back);
+    assert.equal(s.stepId, "review_next");
+    const t = M.copyText(ctx(), M.stepOf(skill, "review_next").title, s);
+    assert.match(t, /If you're not safe now, call/, how);
+    assert.doesNotMatch(t, /next time/, how);
+  }
+  // Off the danger path the plain copy stays.
+  assert.match(skill.copy.review_next_didnt, /next time/);
+});

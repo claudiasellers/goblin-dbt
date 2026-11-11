@@ -5574,6 +5574,7 @@
     "review_title_own": "How did it go? You planned: {mine}",
     "review_next_part": "Part of it is still a step. What would help with the rest?",
     "review_next_didnt": "That happens, and it's useful to know. What would help next time?",
+    "review_next_didnt_safety": "That happens. If you're not safe now, call. Or pick another way.",
     "review_next_nohelp": "You did it, and it didn't help. That's worth knowing. What would help now?",
     "review_next_nohelp_safety": "It didn't help enough. If you're not safe now, call. Or pick another way.",
     "review_help_title": "You took the step. Did it help with the problem?",
@@ -7759,6 +7760,24 @@
       }
      ],
      "done": "done",
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
      "next": [],
      "offers": [
       {
@@ -8191,6 +8210,38 @@
       },
       {
        "when": {
+        "all": [
+         {
+          "in": [
+           "$a.how",
+           [
+            "didnt",
+            "did_part"
+           ]
+          ]
+         },
+         {
+          "any": [
+           {
+            "eq": [
+             "$a.problem",
+             "fear-safety-threat"
+            ]
+           },
+           {
+            "eq": [
+             "$a.focus",
+             "fear-safety-threat"
+            ]
+           }
+          ]
+         }
+        ]
+       },
+       "key": "review_next_didnt_safety"
+      },
+      {
+       "when": {
         "eq": [
          "$a.how",
          "did_part"
@@ -8359,6 +8410,24 @@
        }
       }
      ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
      "next": [],
      "offers": []
     },
@@ -8451,6 +8520,24 @@
            "fear-safety-threat"
           ]
          }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
         ]
        }
       }
@@ -8640,6 +8727,24 @@
        }
       }
      ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
+        ]
+       }
+      }
+     ],
      "next": [],
      "offers": [
       {
@@ -8690,6 +8795,24 @@
            "fear-safety-threat"
           ]
          }
+        ]
+       }
+      }
+     ],
+     "links": [
+      {
+       "exit": "safety_open",
+       "label": "safety_open",
+       "when": {
+        "in": [
+         "$a.feel",
+         [
+          "despair",
+          "depressed",
+          "worthless",
+          "helpless",
+          "powerless"
+         ]
         ]
        }
       }

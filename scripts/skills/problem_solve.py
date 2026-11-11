@@ -109,6 +109,7 @@ COPY = {
     "review_title_own": "How did it go? You planned: {mine}",
     "review_next_part": "Part of it is still a step. What would help with the rest?",
     "review_next_didnt": "That happens, and it's useful to know. What would help next time?",
+    "review_next_didnt_safety": "That happens. If you're not safe now, call. Or pick another way.",
     "review_next_nohelp": "You did it, and it didn't help. That's worth knowing. What would help now?",
     "review_next_nohelp_safety": "It didn't help enough. If you're not safe now, call. Or pick another way.",
     "review_help_title": "You took the step. Did it help with the problem?",
@@ -507,6 +508,8 @@ STEPS = [
         "id": "review_next", "kind": "ask",
         "title": [{"when": {"all": [eq(a("help"), "not_really"), SAFETY]}, "key": "review_next_nohelp_safety"},
                   {"when": eq(a("help"), "not_really"), "key": "review_next_nohelp"},
+                  # On the danger path a step that didn't happen isn't a lesson for next time.
+                  {"when": {"all": [{"in": [a("how"), ["didnt", "did_part"]]}, SAFETY]}, "key": "review_next_didnt_safety"},
                   {"when": eq(a("how"), "did_part"), "key": "review_next_part"}, {"key": "review_next_didnt"}],
         # A step that got done and didn't help needs another direction, not a smaller version of itself.
         "fields": [{"id": "then", "max": 1, "required": True,
@@ -568,6 +571,12 @@ STEPS = [
 for _st in STEPS:
     if _st["id"] not in ("feel", "ready", "problem", "triage", "not_now", "not_fit") and "crisis" not in _st:
         _st["crisis"] = [{"variant": "other_person", "when": SAFETY}]
+
+# A hopeless word at the start keeps *Talk to someone now* on every hand-off, wherever the run ends.
+HOPELESS_LINK = {"exit": "safety_open", "label": "safety_open", "when": {"in": [a("feel"), HOPELESS]}}
+for _st in STEPS:
+    if _st["kind"] == "handoff" and not any(ln["exit"] == "safety_open" for ln in _st.get("links", [])):
+        _st["links"] = _st.get("links", []) + [HOPELESS_LINK]
 
 # Starters for "the step you already know" (own.seed: a tap writes them into the box to change).
 STARTERS = [("call", "Make the call"), ("message", "Send the message"), ("book", "Book it"), ("five_minutes", "Start it for five minutes")]

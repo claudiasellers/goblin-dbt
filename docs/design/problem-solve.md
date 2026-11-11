@@ -54,12 +54,12 @@ What changed on the way:
 | `commit` | *Your next step: {step}* (their own words for their own step), one line (on the danger path: *If it gets more dangerous, call now…*), *Want me to ask how it went?* (Tonight · Tomorrow · Later this week, not on the danger path → `ps_review`), offers: the direction's own tool, and Cope Ahead for a medium or bigger step off the danger path | Done |
 | `review` | *How did it go? You planned: {step}* (their own words for their own step) (I did it · I did part of it · I didn't · Not yet). Only a reopened run starts here (after the commit card, or after *Not yet* booked the card again); it clears the last review's answers, `ready`, and what got in the way last time (asked again if they go back to it) | did it → `review_help`; not yet → `review_later`; else `review_next` |
 | `review_help` | *You took the step. Did it help with the problem?* (It helped · Some · Not really) | not really → `review_next`; else `review_done` |
-| `review_next` | *What would help with the rest?* / *next time?* / *now?* (after *Not really*): a smaller version (not after *Not really*), a different direction, something got in the way. CORE-11's missing links as a planned link after *I didn't* | `size` (guided) or `own_step` / `solutions` / `barrier` (on the danger path, `solutions`) |
-| `review_done` | *You took the step. That's the whole loop…* | Done |
+| `review_next` | *What would help with the rest?* / *next time?* / *now?* (after *Not really*): a smaller version (not after *Not really*), a different direction, something got in the way. On the danger path, *I didn't* / *part of it* gets *If you're not safe now, call. Or pick another way.* instead of *next time?* CORE-11's missing links as a planned link after *I didn't* | `size` (guided) or `own_step` / `solutions` / `barrier` (on the danger path, `solutions`) |
+| `review_done` | *You took the step and saw what it did. That's the whole loop…* | Done |
 | `review_later` | *It can wait.* (on the danger path: *If it gets more dangerous, call now…*) *Want me to ask again?* (the same chips) | Done |
-| `not_now` | *It may help to bring it down a little first, then come back to this.* A quiet *Talk to someone now* for a hopeless word | Cool Down, 5-4-3-2-1, Pause |
+| `not_now` | *It may help to bring it down a little first, then come back to this.* | Cool Down, 5-4-3-2-1, Pause |
 | `rest` | *Stopping here is a real choice. You can come back to this when you have more in the tank.* | Look after the basics (planned), 5-4-3-2-1, Done: refilling, nothing that calms down |
-| `not_fit` | A line for shame, for not-clear-yet, or for anything else; a quiet *Talk to someone now* for a hopeless word | Do the Opposite / Check the Facts / Find the feeling (self-validation, body scan and the wave planned) |
+| `not_fit` | A line for shame, for not-clear-yet, or for anything else | Do the Opposite / Check the Facts / Find the feeling (self-validation, body scan and the wave planned) |
 | `accept` | *Most of this is facts or other people's choices… Here the skill is to carry it, not solve it.* | DEAR MAN (what to say to them); let it be, willingness, turning the mind (all planned) |
 
 **Who fits.** A word fits when the graph marks it `problemSolveApplicable` and its DBT parent has problem types: fear,
@@ -84,7 +84,7 @@ pick the danger type: with only own words, the parent's general problem type sta
 *Something bad might happen*, never safety or health), and *Talk to someone now* stays on the planning screens
 (`decompose`, `solutions`, `size`). A quiet
 *Talk to someone now* sits under own words on the problem and on the step (own words are never read), under a
-hopeless word (*hopeless*, *despair*, *depressed*, *worthless*, *helpless*, *powerless*) wherever it lands, and under *I'm exhausted* after
+hopeless word (*hopeless*, *despair*, *depressed*, *worthless*, *helpless*, *powerless*) on the problem screen and on every hand-off the run ends on, and under *I'm exhausted* after
 *tried everything*. A carried flooded band goes to grounding first (C6.2). *This is too much right now* (P2) is under
 every screen, as on every skill.
 
