@@ -134,7 +134,7 @@ test('the kind registry: unknown kinds refused, ask-fresh fields stripped, label
     assert.ok(d.maxItems >= 1);
     assert.equal(d.kind, Object.keys(K.PROFILE_KINDS).find((k) => K.PROFILE_KINDS[k] === d));
   }
-  assert.deepEqual(Object.keys(K.itemLabels()).sort(), ['MyPattern', 'OwnLine', 'ProfileFact']);
+  assert.deepEqual(Object.keys(K.itemLabels()).sort(), ['MyPattern', 'OwnLine', 'Person', 'ProfileFact']);
 });
 
 test('keepProfileItem: counts live items, keeps on the yes, KEPT_FROM the caller\'s own session, version bumped', async () => {
@@ -179,6 +179,9 @@ test('deleteProfileItem: the caller\'s own item only, whitelisted label, a real 
   assert.match(f.calls[0].query, /MATCH \(u:User \{id: \$uid\}\)-\[:HAS_OWN_LINE\]->\(p:OwnLine \{key: \$key\}\)\s+DETACH DELETE p/);
   assert.equal(f.calls[0].params.key, 'u1:l1');
   await assert.rejects(fns.deleteProfileItem.run({ auth: auth(), data: { id: 'x', label: 'CheckIn' } }), (e) => e.code === 'invalid-argument');
+  // Forgetting a person clears the id on their plans before the person goes (plans keep only the role).
+  await fns.deleteProfileItem.run({ auth: auth(), data: { id: 'p1', label: 'Person' } });
+  assert.match(f.calls[1].query, /\(p:Person \{key: \$key\}\)\s+OPTIONAL MATCH \(s:DearManSession \{ownerId: \$uid\}\)-\[:WITH_PERSON\]->\(p\)\s+REMOVE s\.personId\s+WITH DISTINCT u, p\s+DETACH DELETE p/);
   setDriver(fakeDriver(() => []).driver);
   await assert.rejects(fns.deleteProfileItem.run({ auth: auth(), data: { id: 'x', label: 'OwnLine' } }), (e) => e.code === 'not-found');
 });

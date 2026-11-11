@@ -5,7 +5,7 @@ import type { ClientProfileConsumer, GetProfileContextResponse, PatternOfferAnsw
 import type { PartMessageLine, PartStats } from '../data/partsTypes';
 
 /** getMe's item labels (functions/src/profile/me.ts). `Part` arrives only while parts are on. */
-export type MeItemLabel = 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
+export type MeItemLabel = 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part' | 'Person';
 export interface MeItem {
   label: MeItemLabel;
   meta: ProfileItemMeta;

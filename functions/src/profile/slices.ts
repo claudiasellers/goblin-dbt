@@ -11,6 +11,7 @@ import { int } from '../shared/values';
 import { partSafetyCypher } from '../safety/partSafetyFlag';
 import { ownDecrypter } from '../shared/crypto';
 import { metaFrom } from './meta';
+import { PERSON_RISK, PERSON_SAFE } from './kinds';
 import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId } from './types';
 
 /** The Cypher each resolver runs (params: $uid). Reserved slices have none. */
@@ -28,6 +29,11 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
               lastUsedAt: toString(o.lastUsedAt), confirmedAt: toString(o.confirmedAt), revisitAt: toString(o.revisitAt)} AS o`,
   savedLines: `MATCH (:User {id: $uid})-[k:SAVED_LINE]->(l:ValidationLine)
     RETURN l.id AS lineId, l.text AS text, toString(k.confirmedAt) AS confirmedAt ORDER BY k.lastAt DESC LIMIT 50`,
+  // People (IE-03): active only (a set-aside person is never offered), the most recently used first.
+  people: `MATCH (:User {id: $uid})-[:HAS_PERSON]->(p:Person {status: 'active'})
+    WITH p ORDER BY coalesce(p.lastUsedAt, p.updatedAt, p.createdAt) DESC, p.id LIMIT 30
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
   // Parts off (absent = off) returns no rows at all; set-aside parts are never read by a tool.
   // Nulls sort first under DESC in Cypher, hence the IS NULL keys: never-visited parts go last.
   parts: `MATCH (u:User {id: $uid}) WHERE coalesce(u.partsEnabled, false)
@@ -77,6 +83,27 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
 };
 
+/**
+ * A stored person's value (profile/kinds.ts `person`), its label decrypted; null when it can't be read (a label that
+ * no longer decrypts is a person the picker can't name, so it is left out rather than shown blank).
+ */
+export function personValue(valueJson: unknown, decrypt: (v: unknown) => string | null): {
+  label: string; role: string; safe: ProfileSlices['people'][number]['safe']; risk: ProfileSlices['people'][number]['risk'];
+  safeAskedAt: string | null;
+} | null {
+  let v: Record<string, unknown>;
+  try { v = JSON.parse(String(valueJson)) as Record<string, unknown>; } catch { return null; }
+  const label = decrypt(v.label);
+  if (!label || !label.trim()) return null;
+  const pick = <T extends string>(x: unknown, allowed: readonly T[]): T | null =>
+    (typeof x === 'string' && (allowed as readonly string[]).includes(x) ? x as T : null);
+  return {
+    label, role: typeof v.role === 'string' ? v.role : 'other',
+    safe: pick(v.safe, PERSON_SAFE), risk: pick(v.risk, PERSON_RISK),
+    safeAskedAt: typeof v.safeAskedAt === 'string' ? v.safeAskedAt : null,
+  };
+}
+
 /** A list property or collected ids: absent → [], nulls dropped, sorted when `sorted`. */
 function strings(v: unknown, sorted = false): string[] {
   const out = Array.isArray(v) ? v.filter((x): x is string => typeof x === 'string') : [];
@@ -93,7 +120,7 @@ const objs = (v: unknown): Record<string, unknown>[] =>
 type Resolver<K extends SliceId> = (tx: ManagedTransaction, uid: string, now: number) => Promise<ProfileSlices[K]>;
 
 const EMPTY: { [K in SliceId]?: () => ProfileSlices[K] } = {
-  people: () => [], bodyFlags: () => null, values: () => [], goals: () => [], copeAheadPlans: () => [],
+  bodyFlags: () => null, values: () => [], goals: () => [], copeAheadPlans: () => [],
   boundaryLines: () => [], practicePrefs: () => null, fadeLevels: () => ({}), ownWords: () => [],
   thingsILike: () => [], crisisKit: () => null, safetyPlan: () => null, country: () => null,
 };
@@ -139,6 +166,16 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
     return r.records.map((rec) => ({
       lineId: String(rec.get('lineId')), text: String(rec.get('text') ?? ''), confirmedAt: (rec.get('confirmedAt') as string | null) ?? null,
     }));
+  },
+  people: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.people!, { uid });
+    if (!r.records.length) return [];
+    const decrypt = await ownDecrypter(tx, uid);
+    return r.records.flatMap((rec) => {
+      const p = rec.get('p') as Record<string, unknown>;
+      const v = personValue(p.valueJson, decrypt);
+      return v ? [{ id: String(p.id), ...v, meta: metaFrom(p, now) }] : [];
+    });
   },
   parts: async (tx, uid, now) => {
     const r = await tx.run(SLICE_QUERIES.parts!, { uid });

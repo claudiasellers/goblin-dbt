@@ -19,7 +19,7 @@ import { ownDecrypter } from '../shared/crypto';
 import { PROFILE_KINDS } from './kinds';
 
 export interface MeItem {
-  label: 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
+  label: 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part' | 'Person';
   meta: ProfileItemMeta;
   /** Graph copy for the kind ("Quiet hours", "What helps"). */
   title: string;
@@ -130,12 +130,12 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
      WITH a, collect(k {.id, .label}) AS kinds
      RETURN a.id AS id, a.label AS label, a.blurb AS blurb, kinds ORDER BY a.order`);
   const itemsRes = await tx.run(
-    `MATCH (u:User {id: $uid})-[r:HAS_PROFILE_FACT|HAS_PATTERN|HAS_OWN_LINE|HAS_PART]->(p:ProfileItem)
+    `MATCH (u:User {id: $uid})-[r:HAS_PROFILE_FACT|HAS_PATTERN|HAS_OWN_LINE|HAS_PERSON|HAS_PART]->(p:ProfileItem)
      WHERE type(r) <> 'HAS_PART' OR coalesce(u.partsEnabled, false)
      OPTIONAL MATCH (k:ProfileKind {id: p.kind})
      OPTIONAL MATCH (rule:PatternRule {id: p.statementId})
      RETURN CASE type(r) WHEN 'HAS_PROFILE_FACT' THEN 'ProfileFact' WHEN 'HAS_OWN_LINE' THEN 'OwnLine'
-                         WHEN 'HAS_PART' THEN 'Part' ELSE 'MyPattern' END AS label,
+                         WHEN 'HAS_PART' THEN 'Part' WHEN 'HAS_PERSON' THEN 'Person' ELSE 'MyPattern' END AS label,
             p {.id, .kind, .area, .status, .source, .valueJson, .toolId, .text, .name,
                .tender, .places, .shapeSig, .jobIds, .ownJob, .fearIds, .preferredRoleIds,
                confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt),
@@ -203,6 +203,11 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (meta.kind === 'pros_cons' && value) {
       const own = [value.pullOwn, value.longOwn, value.keepsOwn].find((x) => typeof x === 'string' && x.trim());
       if (typeof own === 'string') summary = own;
+    }
+    // A person (IE-03): the name they gave, never the safety answer (Me is not where that's asked or shown).
+    if (meta.kind === 'person' && value) {
+      summary = typeof value.label === 'string' ? value.label : '';
+      value = { label: value.label, role: value.role };
     }
     if (r.get('label') === 'MyPattern') summary = (r.get('statement') as string | null) ?? '';
     if (r.get('label') === 'OwnLine') summary = String(p.text ?? '');
