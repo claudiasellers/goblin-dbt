@@ -1,0 +1,163 @@
+# After a merge to main, does what a PR's Deploy section says, in its order, with nobody at the Mac:
+# graph load → Cloud Functions → new migrations → Hosting. Each step runs only when its files changed
+# since it last ran (scripts/ci/deploy-plan.mjs; the deploy/<step> tags record where each got to), and
+# a failed step stops the ones after it. The graph load refreshes src/data/content/ and commits it
+# ("Content snapshots from the live graph"), so hosting ships the content just loaded.
+#
+# Needs (repo Settings → Secrets and variables → Actions):
+#   secrets  FIREBASE_SERVICE_ACCOUNT            JSON key of the deploy service account
+#            NEO4J_URI, NEO4J_USER, NEO4J_PASSWORD   Aura, as in the Mac's .env
+#   vars     VITE_FIREBASE_*                     the six web-config values from .env (public, baked into the build)
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      only:
+        description: "changed: what changed since the last deploy. all: graph, functions and hosting (never re-runs migrations)"
+        type: choice
+        options: [changed, all]
+        default: changed
+
+permissions:
+  contents: write # the content-snapshot commit and the deploy/* tags
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/main' # a by-hand run from another branch never deploys
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+    steps:
+      # main's tip, not the pushed commit: a queued run must include an earlier run's content commit.
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0 # the plan diffs against the deploy/* tags
+
+      - name: Plan
+        id: plan
+        run: node scripts/ci/deploy-plan.mjs "${{ inputs.only || 'changed' }}"
+
+      - uses: actions/setup-node@v4
+        if: steps.plan.outputs.any == 'true'
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            functions/package-lock.json
+      - uses: actions/setup-python@v5
+        if: steps.plan.outputs.any == 'true'
+        with:
+          python-version: '3.12' # generator-freshness tests shell out to python3
+
+      # Checked before anything runs, so a missing one never leaves a half-done deploy.
+      - name: Check configuration
+        if: steps.plan.outputs.any == 'true'
+        env:
+          HAS_SA: ${{ secrets.FIREBASE_SERVICE_ACCOUNT != '' }}
+          # All three: an unset NEO4J_USER makes the loader fall back to 'neo4j', which Aura refuses
+          # ("unauthorized") when the instance's user is its id, four minutes in.
+          HAS_NEO4J: ${{ secrets.NEO4J_URI != '' && secrets.NEO4J_USER != '' && secrets.NEO4J_PASSWORD != '' }}
+        run: |
+          ok=true
+          if [ "${{ steps.plan.outputs.hosting }}" = true ]; then
+            for v in API_KEY AUTH_DOMAIN PROJECT_ID STORAGE_BUCKET MESSAGING_SENDER_ID APP_ID; do
+              # Without these the build falls back to placeholder config: an app that can't sign in.
+              [ -n "$(printenv VITE_FIREBASE_$v)" ] || { echo "::error::Repository variable VITE_FIREBASE_$v is not set"; ok=false; }
+            done
+          fi
+          if [ "${{ steps.plan.outputs.functions }}" = true ] || [ "${{ steps.plan.outputs.hosting }}" = true ]; then
+            [ "$HAS_SA" = true ] || { echo "::error::Secret FIREBASE_SERVICE_ACCOUNT is not set"; ok=false; }
+          fi
+          if [ "${{ steps.plan.outputs.graph }}" = true ] || [ -n "${{ steps.plan.outputs.migrations }}" ]; then
+            [ "$HAS_NEO4J" = true ] || { echo "::error::Secrets NEO4J_URI / NEO4J_USER / NEO4J_PASSWORD are not all set"; ok=false; }
+          fi
+          $ok
+
+      # Same gate as CI: nothing goes out that CI would fail.
+      - name: Install
+        if: steps.plan.outputs.any == 'true'
+        run: npm ci && npm ci --prefix functions
+      - name: Build
+        if: steps.plan.outputs.any == 'true'
+        run: npm run build && npm --prefix functions run build
+      - name: Test
+        if: steps.plan.outputs.any == 'true'
+        run: npm test
+      - name: Lint (no new errors)
+        if: steps.plan.outputs.any == 'true'
+        run: node scripts/ci/lint-budget.mjs
+
+      - name: Git identity
+        if: steps.plan.outputs.any == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # 1. Graph. A full load: every loaded file is MERGE-only, so this is the same as loading the
+      # changed files in LOAD_ORDER, without having to pick them. --verify fails on duplicates.
+      - name: Load graph
+        if: steps.plan.outputs.graph == 'true'
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USER: ${{ secrets.NEO4J_USER }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+        run: |
+          node scripts/load-graph.mjs --verify
+          if [ -n "$(git status --porcelain -- src/data/content)" ]; then
+            git add src/data/content
+            git commit -m "Content snapshots from the live graph"
+            git push origin HEAD:main
+          fi
+          git tag -f deploy/graph HEAD && git push -f origin refs/tags/deploy/graph
+
+      - uses: google-github-actions/auth@v2
+        if: steps.plan.outputs.functions == 'true' || steps.plan.outputs.hosting == 'true'
+        with:
+          credentials_json: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+
+      # 2. Functions, before hosting: the app may call something only the new functions accept.
+      # No --force: a deploy that would delete a function, raise the minimum bill or change a
+      # trigger stops here and says so.
+      - name: Deploy functions
+        if: steps.plan.outputs.functions == 'true'
+        run: |
+          ./functions/node_modules/.bin/firebase deploy --only functions --non-interactive
+          git tag -f deploy/functions HEAD && git push -f origin refs/tags/deploy/functions
+
+      # 3. Migrations added since the last run, once each, after functions.
+      - name: Run new migrations
+        if: steps.plan.outputs.any == 'true'
+        env:
+          NEO4J_URI: ${{ secrets.NEO4J_URI }}
+          NEO4J_USER: ${{ secrets.NEO4J_USER }}
+          NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
+          MIGRATIONS: ${{ steps.plan.outputs.migrations }}
+        run: |
+          for f in $MIGRATIONS; do
+            echo "::group::$f"
+            node scripts/load-graph.mjs --file "$f" --no-content-refresh
+            echo "::endgroup::"
+          done
+          git tag -f deploy/migrations HEAD && git push -f origin refs/tags/deploy/migrations
+
+      # 4. Hosting, last; its predeploy rebuilds with the refreshed content.
+      - name: Deploy hosting
+        if: steps.plan.outputs.hosting == 'true'
+        run: |
+          ./functions/node_modules/.bin/firebase deploy --only hosting --non-interactive
+          git tag -f deploy/hosting HEAD && git push -f origin refs/tags/deploy/hosting

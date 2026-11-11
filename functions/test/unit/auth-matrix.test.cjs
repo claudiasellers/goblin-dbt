@@ -14,8 +14,9 @@ const AUTHED = [
   'getOppositeActionFollowUps', 'getOppositeActionSession', 'getOppositeActionSessions', 'getUserProfile',
   'recordToolOutcome', 'saveCheckIn', 'setCheckInNextAction',
   'startToolSession', 'closeToolSession', 'recordToolSession', 'answerToolOutcome',
-  'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday',
-  'getProfileContext', 'getMe', 'upsertProfileFact', 'confirmProfileItem', 'setAsideProfileItem',
+  'scheduleFollowUp', 'resolveFollowUp', 'snoozeFollowUp', 'getToday', 'getSkillRun',
+  'getProfileContext', 'getMe', 'upsertProfileFact', 'keepProfileItem', 'editProfileItem', 'deleteProfileItem',
+  'confirmProfileItem', 'setAsideProfileItem',
   'restoreProfileItem', 'answerPatternOffer', 'recordWitnessBeat',
   'getPartsEntry', // reads the caller's own check-ins and Recover sessions
   'deleteMyParts', 'countMyPartsLines', // deletes (counts) the caller's own parts records
@@ -37,12 +38,13 @@ const AUTHED = [
 const PUBLIC = [
   'getDearManContent', 'getDearManDebriefContent', 'getDearManReflection', 'getDiscriminatingQuestions',
   'getFindTheFeelingContent', 'getInvalidationRecoveryContent', 'getOppositeActionContent',
-  'getProblemSolveContent', 'getRelatedEmotions', 'getCapacityContent', 'getWiseMindContent', 'getCopeAheadContent', 'getSpineContent', 'getBodyMapContent', 'suggestEmotionsFromBody',
+  'getProblemSolveContent', 'getRelatedEmotions', 'getCapacityContent', 'getWiseMindContent', 'getCopeAheadContent', 'getSkillContent', 'getSpineContent', 'getBodyMapContent', 'suggestEmotionsFromBody',
   'getWitnessLines', // public content; reads the caller's own lines only when signed in
 ];
 
-// Background triggers (not callables): auth lifecycle events carry their own uid.
-const TRIGGERS = ['onUserCreated', 'onUserDeleted'];
+// Background triggers (not callables): auth lifecycle events carry their own uid; the daily retention job
+// reads every user's own setting.
+const TRIGGERS = ['onUserCreated', 'onUserDeleted', 'applyRetentionDaily'];
 
 const { fns, setDriver } = loadFunctions();
 

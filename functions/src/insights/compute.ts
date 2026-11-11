@@ -130,7 +130,7 @@ export interface OutcomeRow {
   toolId: string; patternId: string | null; at: string; measure: OutcomeMeasure; direction: OutcomeDirection | null; wentWell: boolean;
 }
 
-const DIRECTION: Record<string, OutcomeDirection> = { regulation_down: 'down', orienting: 'orient' };
+const DIRECTION: Record<string, OutcomeDirection> = { regulation_down: 'down', orienting: 'orient', urge_change: 'down' };
 
 /**
  * Answered closes, newest first. Sessions answer then-vs-now or the urge question; a pre-spine
@@ -150,7 +150,10 @@ export function outcomeRows(sessions: SessionRow[], legacy: LegacyUsageRow[]): O
     }
     // Meet a part's "more here" is not "it went well" (docs/design/parts.md): never counted.
     if (!isAppTool(s.toolId) || NOT_WHAT_HELPS.includes(s.toolId)) continue;
-    if (s.thenVsNow) {
+    // The two-part close's outcome is the urge answer (did you act on it); then-vs-now is its second part.
+    if (s.closeKind === 'urge_change' && s.actedOnUrge) {
+      rows.push({ toolId: s.toolId, patternId: s.patternId, at: s.at, measure: 'urge', direction: null, wentWell: s.actedOnUrge === 'no' });
+    } else if (s.thenVsNow) {
       rows.push({
         toolId: s.toolId, patternId: s.patternId, at: s.at, measure: 'then_vs_now', direction: DIRECTION[s.closeKind ?? ''] ?? null,
         wentWell: s.thenVsNow === 'better' || s.thenVsNow === 'much_better',

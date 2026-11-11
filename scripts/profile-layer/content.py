@@ -34,6 +34,9 @@ KINDS = [
     # doesn't fill slots today).
     ("part", "my_parts", "A part", 30,
      "Is {name} still doing the same job?", "Set aside. You can bring it back any time."),
+    # Rewrite the nightmare (ER-15): a new version the person kept. Never stale: it is theirs until they set it aside.
+    ("nightmare_script", "my_plans", "A nightmare I rewrote", None,
+     "", "Set aside. It stays out of the way until you bring it back."),
 ]
 
 # Pattern rules (CORE-owned). Evaluated lazily when Today loads, at most once a day per user.

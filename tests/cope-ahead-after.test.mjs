@@ -43,7 +43,7 @@ test("the follow-up type: er, inline, the four when chips as ext.ca has them, st
   ]);
   assert.deepEqual(A.HOW_CHOICES.map((c) => c.id), type.choices.map((c) => c.id), "the card's chips are the type's choices");
   // The server accepts the later window.
-  assert.match(read("functions/src/spine/validation.ts"), /FOLLOW_UP_WINDOWS = \[[^\]]*'later'\]/);
+  assert.match(read("functions/src/spine/validation.ts"), /FOLLOW_UP_WINDOWS = \[[^\]]*'later'[^\]]*\]/);
 });
 
 test("afterScheduleItem: the chip's due time, the chip as the window", () => {

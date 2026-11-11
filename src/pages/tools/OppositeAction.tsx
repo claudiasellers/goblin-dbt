@@ -59,6 +59,7 @@ import { useUnblendLine } from "../../hooks/useUnblendLine";
 import { useOaGoalLine } from "../../hooks/useOaGoalLine";
 import { GoalLine } from "../../components/tools/oppositeAction/GoalLine";
 import { oaSkillIds } from "../../lib/spine/wrap";
+import { CheckFactsEntryLink } from "../../components/skillPlayer/CheckFactsEntryLink";
 
 const FLOW_VERSION = "oa-guided-v2";
 
@@ -1039,6 +1040,8 @@ export function OppositeAction() {
                   value={draft.interpretation}
                   onChange={(v) => change("interpretation", v)}
                 />
+                {/* The long form (docs/design/check-the-facts.md, *Where it starts*): this step itself is unchanged. */}
+                <CheckFactsEntryLink emotionId={draft.emotionId || undefined} />
               </div>
             </details>
           }

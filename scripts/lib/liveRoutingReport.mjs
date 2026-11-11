@@ -92,7 +92,8 @@ function legacyToolsFromGraph(graph, patternId) {
   const emotions = new Set((graph.patterns[patternId]?.emotions || []).map((e) => e.id));
   return Object.entries(graph.concepts)
     .filter(([id]) => id.startsWith('dbt_'))
-    .map(([id, c]) => ({ id, appToolId: c.appToolId ?? null, score: c.addresses.filter((e) => emotions.has(e)).length }))
+    // as LEGACY_TOOLS_QUERY: `legacy: false` edges (added after the routing review) are not in the live tools query
+    .map(([id, c]) => ({ id, appToolId: c.appToolId ?? null, score: (c.legacyAddresses ?? c.addresses).filter((e) => emotions.has(e)).length }))
     .filter((t) => t.score > 0)
     .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id))
     .slice(0, 2);

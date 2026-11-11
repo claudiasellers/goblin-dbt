@@ -115,13 +115,16 @@ test("announcements are polite: the cope save failure sits in a status region th
 });
 
 test("press and hold: Space held, or a quick key / a switch or screen-reader activation fills it hands-free", () => {
-  const hold = read("src/components/parts/LightHold.tsx");
+  // The gesture lives in useHoldGesture (shared with the skill player's holdRing); HoldButton spreads it.
+  const hold = read("src/hooks/useHoldGesture.ts");
   assert.match(hold, /export const HOLD_TAP_MS = 350;/);
   assert.match(hold, /if \(byKey\.current && performance\.now\(\) - start\.current < HOLD_TAP_MS\) run\('auto'\);/, "a quick key is a tap");
   assert.match(hold, /if \(e\.detail !== 0\) return;/, "a click with no pointer or key behind it");
-  assert.match(hold, /onBlur=\{cancelPress\}/, "blur ends a press, never the hands-free fill");
-  assert.match(hold, /const cancelPress = \(\) => \{ swallowUp\.current = false; if \(mode\.current === 'press'\) letGo\(\); \};/);
-  assert.match(hold, /data-hold=""/, "the checker finds every hold by it");
+  assert.match(hold, /onBlur: cancelPress/, "blur ends a press, never the hands-free fill");
+  assert.match(hold, /const cancelPress = \(\) => \{ swallowUp\.current = false; if \(modeRef\.current === 'press'\) letGo\(\); \};/);
+  const button = read("src/components/parts/LightHold.tsx");
+  assert.match(button, /data-hold="" aria-describedby=\{hintId\} \{\.\.\.handlers\}/, "HoldButton spreads the shared gesture");
+  assert.match(button, /data-hold=""/, "the checker finds every hold by it");
 });
 
 test("targets: the parts switch and the delete buttons are 44 px; Me's quiet links are at least 44 wide", () => {

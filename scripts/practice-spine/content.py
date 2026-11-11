@@ -54,6 +54,13 @@ CLOSE_FLOW = {
                 "choices": [{"id": "no", "label": "Held off"}, {"id": "yes", "label": "Went ahead"}, {"id": "not_yet", "label": "Still deciding"}],
             },
         },
+        # DT-11: the acted answer is on the destructive urge, not on the rebellion picked.
+        "alternate-rebellion": {
+            "urge": {
+                "question": "And the urge to blow it all up?",
+                "choices": [{"id": "no", "label": "Held off"}, {"id": "yes", "label": "Went ahead"}, {"id": "not_yet", "label": "Still deciding"}],
+            },
+        },
     },
     "skip": "Skip",
     "saved": "Noted.",
@@ -147,6 +154,42 @@ FOLLOW_UP_TYPES = [
         "notification": "A plan you made is ready.",
     },
     {
+        # Check the Facts v1.2 (PRD ER-02, *still don't know*): "Did you find out?" about the one missing fact,
+        # at the time the person picked (the missing step's chip; no chip, no follow-up). Scheduled by the skill
+        # player with the check-the-facts session as its source (not bound server-side: its card reads nothing from
+        # the session, unlike cope_ahead_after). Resolved in place; the answer is a log field.
+        "id": "check_fact", "ownerModule": "er", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Did you find out?", "body": "The one thing you wanted to know, from Check the Facts."},
+        "choices": [{"id": "fit", "label": "Yes, and the feeling fit", "status": "done"},
+                    {"id": "didnt_fit", "label": "Yes, and it didn't fit", "status": "done"},
+                    {"id": "still", "label": "Still don't know", "status": "partly"},
+                    NOT_NOW],
+        "notification": "A check-in you asked for is ready.",
+    },
+    {
+        # It isn't working v1.1 (PRD ER-14, "one next move + FollowUp"): a nudge to give the skill another go, on
+        # the fix cards whose move is another try of the same skill (smaller, with willingness, with a bit more room:
+        # fix_way, fix_will, fix_much). Not on body (its move is looking after the body) or nothing stood out (missing
+        # links), and never on the hopelessness card. Picked as a chip and scheduled as the person leaves the card.
+        "id": "try_again", "ownerModule": "er", "tier": "quality", "resolveMode": "inline",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Another go?", "body": "A nudge you asked for in It isn't working. Did you get a chance to try it again?"},
+        "choices": [{"id": "helped", "label": "Tried it, it helped", "status": "done"},
+                    {"id": "still_stuck", "label": "Tried it, still stuck", "status": "done"},
+                    {"id": "not_yet", "label": "Not yet", "snoozeHours": 24},
+                    {"id": "skip", "label": "Skip", "status": "dismissed"}],
+        "notification": "A check-in you asked for is ready.",
+    },
+    {
         # Derived (no FollowUp node): the latest tool session closed without an answer.
         "id": "tool_outcome", "ownerModule": "core", "tier": "skills", "resolveMode": "inline",
         "window": {"kind": "derived"}, "staleAfterHours": 12, "missedPath": "none",
@@ -178,6 +221,25 @@ FOLLOW_UP_TYPES = [
         "copy": {"title": "Still true?", "body": "Something you told us a while ago."},
         "choices": [{"id": "yes", "label": "Yes"}, {"id": "not_any_more", "label": "Not any more"}, {"id": "change", "label": "Change it"}],
         "notification": "",
+    },
+    {
+        # Rewrite the nightmare (ER-15, docs/design/nightmare-rescript.md): a read-through the person asked for, on
+        # the keep step's chips or a read-through's own end card (each visit sets the next, one at a time). It
+        # reopens the visit's run at the read-through (R9 resume; `enterAt` takes it straight to the end card after).
+        # Opening it is the resolution, as for resume_skill (functions/src/spine/toolSession.ts); *Not today*
+        # dismisses it. The copy and the notification never name the nightmare.
+        "id": "nightmare_rehearse", "ownerModule": "er", "tier": "practice", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/nightmare-rescript?run={sourceSessionId}&at=rehearse&enterAt=rehearse&followUp={followUpId}",
+        # tonight: a first visit's; tomorrow_night: a read-through visit's (it ends near bedtime, so not "tonight"
+        # again within the hour); tomorrow: daytime, the only one after a read-through that stirred them up.
+        "window": {"kind": "chip", "chips": {"tonight": {"kind": "at_local", "days": 0, "time": "21:00"},
+                                             "tomorrow_night": {"kind": "at_local", "days": 1, "time": "21:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "12:00"}}},
+        "staleAfterHours": 36, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your new version", "body": "A read-through you asked for. A minute, eyes open."},
+        "choices": [{"id": "not_today", "label": "Not today", "status": "dismissed"}],
+        "notification": "Something you asked to be reminded of is ready.",
     },
     {
         # E3 §A4.2.6: "Come back to this later" from the breakdown hand-off (A4-2 schedules it).

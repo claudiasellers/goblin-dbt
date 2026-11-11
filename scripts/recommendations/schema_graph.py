@@ -10,6 +10,7 @@ schema files actually use after A1-4's conversion:
   MERGE (a)-[r:T {key: expr}]->(b)           key properties are part of the identity
   WHERE a.p = x / a.p <> b.p / NOT a.p IN [..] joined by AND
   SET v.p = expr, v += {map}                 expr: literal, variable, variable.field
+  SET v:Label:Other                          (adds labels; the skill runtime's clinical labels)
   WITH a, b                                  (pass-through of bound variables only)
   DELETE r
 
@@ -490,6 +491,10 @@ def where(env, cond):
 
 def set_items(env, body):
     for item in split_top(body):
+        m = re.fullmatch(r'(\w+)((?::\w+)+)', item.strip())
+        if m:
+            env[m.group(1)].labels.update(m.group(2).strip(':').split(':'))
+            continue
         m = re.fullmatch(r'(\w+)\s*\+=\s*(\{.*\})', item, re.S)
         if m:
             target = env[m.group(1)]

@@ -282,3 +282,18 @@ test("#19 Numb (E4-5, D-14; Oct 2026 review): Shut down; with the 'numb or disco
   assert.equal(r.safetyFlag, undefined);
   assert.equal(r.guidedActivity.activityId, "gentle-movement");
 });
+
+test("DT-11's row (signed off 10 Nov): Pause leads and Rebel without the wreckage is the swap on the push-back words, never flooded", async () => {
+  const id = "rf_reactive_aggression_words_rebel_alternate-rebellion";
+  assert.ok(on.recommendedFor.some((r) => r.id === id && r.active), "the row is live");
+  for (const word of ["Provoked", "Indignant"]) {
+    const r = await run(hu({ emotions: [word] }));
+    assert.equal(r.pattern.id, "reactive_aggression", word);
+    assert.deepEqual(ids(r), ["pause", "alternate-rebellion"], word);
+    assert.equal(r.tools[1].ruleId, id, word);
+    assert.ok(!ids(await run(hu({ emotions: [word], band: "flooded" }))).includes("alternate-rebellion"), `${word}, flooded`);
+  }
+  // Switched back off, the swap is Cool Down again.
+  const off = { ...on, recommendedFor: on.recommendedFor.map((r) => (r.id === id ? { ...r, active: false } : r)) };
+  assert.deepEqual(ids(await run(hu({ emotions: ["Provoked"] }), off)), ["pause", "cool-down"]);
+});

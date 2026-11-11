@@ -72,7 +72,8 @@ export function fixtureDeps(g = graph, calls = []) {
         .map(([id, c]) => ({
           conceptId: id, appToolId: c.appToolId ?? null, name: c.name ?? null, description: c.description ?? null,
           whenToUse: c.whenToUse ?? null, dbtBasis: c.dbtBasis ?? null,
-          score: c.addresses.filter((e) => emotions.has(e)).length,
+          // The kill-switch ranker skips `legacy: false` edges (queries.ts LEGACY_TOOLS_QUERY).
+          score: (c.legacyAddresses ?? c.addresses).filter((e) => emotions.has(e)).length,
         }))
         .filter((r) => r.score > 0);
     },

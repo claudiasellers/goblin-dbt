@@ -15,6 +15,8 @@ import type { PartStats } from '../parts/statsTypes';
 import { LATEST_MESSAGES_QUERY } from '../parts/say';
 import type { PartMessageLine } from '../parts/sayTypes';
 import { partSafetyCypher } from '../safety/partSafetyFlag';
+import { ownDecrypter } from '../shared/crypto';
+import { PROFILE_KINDS } from './kinds';
 
 export interface MeItem {
   label: 'ProfileFact' | 'MyPattern' | 'OwnLine' | 'Part';
@@ -177,6 +179,7 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
   }
   const byArea = new Map<string, MeItem[]>();
   let staleCount = 0;
+  let decrypt: ((v: unknown) => string | null) | null = null;
   for (const r of itemsRes.records) {
     if (r.get('label') === 'Part' && !partsOn) continue;   // the query gates it too
     const p = r.get('p') as Record<string, unknown>;
@@ -187,7 +190,15 @@ async function readMe(tx: ManagedTransaction, uid: string, now: number): Promise
     if (p.valueJson) {
       try { value = JSON.parse(String(p.valueJson)); } catch { value = undefined; }
     }
+    // A registered kind's own words are stored encrypted (profile/items.ts): read back for the person only.
+    const own = Object.prototype.hasOwnProperty.call(PROFILE_KINDS, meta.kind) ? PROFILE_KINDS[meta.kind].ownFields : [];
+    if (value && own.some((f) => typeof value![f] === 'string')) {
+      decrypt ??= await ownDecrypter(tx, uid);
+      for (const f of own) if (typeof value[f] === 'string') value[f] = decrypt(value[f]);
+    }
     if (meta.kind === 'quiet_hours' && value) summary = `${value.start}–${value.end}`;
+    // A rewritten nightmare: its ending when the person wrote it; picked endings are ids (the title says enough).
+    if (meta.kind === 'nightmare_script' && value && typeof value.endingOwn === 'string') summary = value.endingOwn;
     if (r.get('label') === 'MyPattern') summary = (r.get('statement') as string | null) ?? '';
     if (r.get('label') === 'OwnLine') summary = String(p.text ?? '');
     if (r.get('label') === 'Part') summary = String(p.name ?? '');

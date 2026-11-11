@@ -8,6 +8,7 @@ import {
   type User
 } from 'firebase/auth';
 import { getFunctions } from 'firebase/functions';
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from 'firebase/app-check';
 
 // Firebase configuration
 // Replace these with your actual Firebase project credentials
@@ -22,6 +23,20 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// App Check (docs/design/user-profile.md §8 #3): once VITE_APP_CHECK_SITE_KEY (a reCAPTCHA Enterprise
+// site key registered for this app in the Firebase console) is set at build time, every callable
+// request carries an App Check token. The server only starts refusing requests without one when
+// functions/src/shared/callOptions.ts APP_CHECK_ENFORCED is flipped, after this build is live.
+const appCheckSiteKey = import.meta.env.VITE_APP_CHECK_SITE_KEY;
+if (appCheckSiteKey && typeof window !== 'undefined') {
+  try {
+    initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider(appCheckSiteKey), isTokenAutoRefreshEnabled: true });
+  } catch (e) {
+    console.warn('App Check did not start', e instanceof Error ? e.name : 'error');
+  }
+}
+
 export const auth = getAuth(app);
 
 // Initialize Cloud Functions

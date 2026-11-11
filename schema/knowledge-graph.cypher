@@ -1360,6 +1360,26 @@ SET check_the_facts += {
   skill_type: "changing_response"
 };
 
+// ER Handout 24 (PRD ER-14): troubleshooting when a skill was used and didn't help.
+MERGE (troubleshooting:TherapyConcept {id: "dbt_troubleshooting"})
+SET troubleshooting += {
+  name: "Troubleshooting Emotion Regulation Skills",
+  description: "Checking what got in the way when an emotion regulation skill was used and didn't help: body vulnerability, skill fit, practising it fully, reinforcers, willingness, overload and emotion myths",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "troubleshooting"
+};
+
+// ER Handout 20a (PRD ER-15): the nightmare protocol, imagery rehearsal for a nightmare that keeps coming back.
+MERGE (nightmare_protocol:TherapyConcept {id: "dbt_nightmare_protocol"})
+SET nightmare_protocol += {
+  name: "Nightmare Protocol",
+  description: "Changing a recurring nightmare while awake: choosing a change before the bad part and a new ending, then rehearsing the new version daily. Not for nightmares that replay a real event, which belong with a clinician",
+  modality: "DBT",
+  module: "Emotion Regulation",
+  skill_type: "reducing_vulnerability"
+};
+
 MERGE (opposite_action:TherapyConcept {id: "dbt_opposite_action"})
 SET opposite_action += {
   name: "Opposite Action",

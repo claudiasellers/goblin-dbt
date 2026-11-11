@@ -1,9 +1,13 @@
 import { m, useReducedMotion } from 'motion/react';
 import type { ReactNode } from 'react';
 
-/** One ring used by the stop lock, wait lock, cold timer and reps counter. */
-export function ProgressRing({ value, size = 120, stroke = 6, children, label }: {
-  value: number; size?: number; stroke?: number; children?: ReactNode; label?: string;
+/**
+ * One ring used by the stop lock, wait lock, cold timer, reps counter and the skill player's holdRing. `smooth`
+ * eases each change over 700 ms (for values that step); a value updated every frame (a hold) passes false, or the
+ * transition restarts each frame and the ring trails far behind the hold.
+ */
+export function ProgressRing({ value, size = 120, stroke = 6, children, label, smooth = true }: {
+  value: number; size?: number; stroke?: number; children?: ReactNode; label?: string; smooth?: boolean;
 }) {
   const r = 50 - stroke;
   const c = 2 * Math.PI * r;
@@ -16,7 +20,7 @@ export function ProgressRing({ value, size = 120, stroke = 6, children, label }:
         <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-border)" strokeWidth={stroke} />
         <circle cx="50" cy="50" r={r} fill="none" stroke="var(--color-accent)" strokeWidth={stroke} strokeLinecap="round"
           strokeDasharray={c} strokeDashoffset={c * (1 - Math.max(0, Math.min(1, value)))}
-          className="motion-safe:transition-[stroke-dashoffset] motion-safe:duration-700" />
+          className={smooth ? 'motion-safe:transition-[stroke-dashoffset] motion-safe:duration-700' : undefined} />
       </svg>
       <div className="relative">{children}</div>
     </div>

@@ -8,7 +8,7 @@ import { THEN_VS_NOW, type CapacityReading, type ThenVsNow } from '../capacity/t
 import { validateExt } from './extSchemas';
 import { RESERVED_ENTRIES, SPINE_TOOLS, thenVsNowDirFor } from './tools';
 import {
-  ACTED_ON_URGE, CLOSE_STATUSES, DETAIL_KINDS, REP_SOURCES, TOOL_ENTRIES,
+  ACTED_ON_URGE, CLOSE_STATUSES, URGE_KINDS, DETAIL_KINDS, REP_SOURCES, TOOL_ENTRIES,
   type ActedOnUrge, type CloseKind, type CloseStatus, type DetailKind, type RepSource, type SpineModule, type ToolEntry,
 } from './types';
 
@@ -84,7 +84,14 @@ export interface CloseInput {
   schedule: ScheduleInput[];
   /** Wise mind's answer (a WiseMindAnswer id, or `own`): ask-fresh, on this session only; kept for wise-mind only. */
   wiseMindAnswer: string | null;
+  /** Check the Facts' "Does it fit?" (FITS_FACTS): ask-fresh, on this session only; kept for FITS_FACTS_TOOLS only. */
+  fitsFacts: FitsFacts | null;
 }
+
+export const FITS_FACTS = ['fits', 'partly', 'doesnt_fit', 'unsure'] as const;
+export type FitsFacts = (typeof FITS_FACTS)[number];
+/** The tools that ask "Does it fit?": another tool's fitsFacts is dropped at the write. */
+export const FITS_FACTS_TOOLS: readonly string[] = ['check-the-facts'];
 
 /** `closeKind` is the tool's (from SPINE_TOOLS): an answer the kind doesn't ask is rejected. */
 export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): CloseInput {
@@ -93,7 +100,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
   const actedOnUrge = opt(d.actedOnUrge, (x) => oneOf(x, ACTED_ON_URGE));
   if (closeKind) {
     if (thenVsNow && !thenVsNowDirFor(closeKind)) throw new ValidationError('This tool does not ask then-vs-now');
-    if (actedOnUrge && closeKind !== 'urge') throw new ValidationError('This tool does not ask about the urge');
+    if (actedOnUrge && !URGE_KINDS.includes(closeKind)) throw new ValidationError('This tool does not ask about the urge');
   }
   const detail = opt(d.detail, (x) => {
     const o = obj(x);
@@ -117,6 +124,7 @@ export function validateClose(raw: unknown, now: Date, closeKind?: CloseKind): C
     ext: validateExt(d.ext),
     schedule: validateSchedule(d.schedule, now),
     wiseMindAnswer: opt(d.wiseMindAnswer, (x) => str(x, { max: 64, pattern: GRAPH_ID })),
+    fitsFacts: opt(d.fitsFacts, (x) => oneOf(x, FITS_FACTS)),
   };
 }
 
@@ -130,7 +138,7 @@ export function validateRecord(raw: unknown, now: Date): { start: StartInput; cl
 
 // ---- Follow-ups (PR-S5) ----
 
-export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later'] as const;
+export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later', 'tonight', 'tomorrow_night'] as const;
 export type FollowUpWindow = (typeof FOLLOW_UP_WINDOWS)[number];
 const TYPE_ID = /^[a-z][a-z0-9_]{0,63}$/;
 const MINUTE = 60_000;

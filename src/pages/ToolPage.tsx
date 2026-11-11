@@ -18,6 +18,7 @@ import { DearMan } from './tools/DearMan';
 import { ProblemSolve } from './tools/ProblemSolve';
 import { InvalidationRecovery } from './tools/InvalidationRecovery';
 import { FindTheFeeling } from './tools/FindTheFeeling';
+import { playerSkillFor } from '../lib/skillRuntime/playerTools';
 
 // Meet a part, loaded on demand: its gate below (parts on, copy signed off) stays eager, so
 // a parts-off person never fetches it. With parts on, the fetch starts with the gate's own.
@@ -46,6 +47,16 @@ const loadCopeAhead = () => import('./tools/CopeAhead');
 const LazyCopeAhead = lazy(() => loadCopeAhead().then((m) => ({ default: m.CopeAhead })));
 function CopeAhead() { return <Suspense fallback={<ToolLoading />}><LazyCopeAhead /></Suspense>; }
 
+// Tools on the skill player (docs/design/skill-runtime.md; the switch is src/lib/skillRuntime/playerTools.ts):
+// one chunk for every skill, ahead of the hand-built pages below.
+const LazySkillPlayer = lazy(() => import('../components/skillPlayer/SkillPlayer').then((m) => ({ default: m.SkillPlayer })));
+function PlayedTool({ skillId }: { skillId: string }) {
+  return <Suspense fallback={<ToolLoading />}><LazySkillPlayer skillId={skillId} /></Suspense>;
+}
+// Keep your self-respect (FAST): two skills under one tool id, so its page picks which to play (docs/design/fast.md).
+const LazyFast = lazy(() => import('./tools/Fast').then((m) => ({ default: m.Fast })));
+function Fast() { return <Suspense fallback={<ToolLoading />}><LazyFast /></Suspense>; }
+
 // Map tool IDs to their interactive components
 const toolComponents: Record<string, React.ComponentType> = {
   'cool-down': CoolDown,
@@ -56,6 +67,7 @@ const toolComponents: Record<string, React.ComponentType> = {
   'dear-man': DearMan,
   'problem-solve': ProblemSolve,
   'cope-ahead': CopeAhead,
+  'fast': Fast,
   'recovering-from-invalidation': InvalidationRecovery,
   'find-the-feeling': FindTheFeeling,
   'meet-a-part': MeetAPart,
@@ -95,7 +107,8 @@ export function ToolPage() {
     return <ToolNotFound />;
   }
 
-  const ToolComponent = toolComponents[tool.id];
+  const playerSkill = playerSkillFor(tool.id);
+  const ToolComponent = playerSkill ? undefined : toolComponents[tool.id];
 
   return (
     <div className="max-w-2xl mx-auto">
@@ -139,11 +152,11 @@ export function ToolPage() {
 
       {/* Interactive tool component */}
       <div className="mb-8">
-        {ToolComponent ? (
+        {playerSkill || ToolComponent ? (
           // One ToolSession per visit (PR-S3). It replaces trackToolUsage: startToolSession writes the
           // compat ToolUsage at the same moment, linked to the check-in the tool was opened from.
           <ToolSessionProvider key={location.key} toolId={tool.id}>
-            <ToolComponent />
+            {playerSkill ? <PlayedTool skillId={playerSkill} /> : ToolComponent && <ToolComponent />}
           </ToolSessionProvider>
         ) : (
           <div className="p-8 rounded-xl border border-dashed border-[var(--color-border)] text-center">

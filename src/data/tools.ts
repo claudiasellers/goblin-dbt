@@ -63,6 +63,17 @@ export const tools: Tool[] = [
     dbtBasis: 'Urge Surfing / Distress Tolerance',
     emoji: '🌊',
   },
+  {
+    id: 'alternate-rebellion',
+    name: 'Rebel without the wreckage',
+    tagline: 'Push back without paying for it tomorrow',
+    description: 'When you want to blow it all up, name what\'s squeezing you and pick a rebellion built not to cost you tomorrow.',
+    whenToUse: 'When you feel stuck or controlled and want to quit, walk out or blow up something big.',
+    module: 'distress-tolerance',
+    dbtBasis: 'Alternate rebellion (DT Handout 21)',
+    emoji: '🎸',
+    bare: true,
+  },
   // Emotion Regulation
   {
     id: 'opposite-action',
@@ -105,6 +116,43 @@ export const tools: Tool[] = [
     emoji: '🧭',
     bare: true,
   },
+  {
+    // The first skill on the skill runtime (docs/design/skill-runtime.md): its screens are graph data.
+    id: 'check-the-facts',
+    name: 'Check the Facts',
+    tagline: 'See if a feeling fits what happened',
+    description: 'Name the feeling, set down what happened, notice the story you\'re telling about it and other ways to see it, then check whether the feeling fits the facts.',
+    whenToUse: 'When a feeling is strong and you\'re not sure it matches what happened.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 8',
+    emoji: '🔍',
+    bare: true,
+  },
+  {
+    // ER-14 on the skill runtime (docs/design/er-troubleshoot.md): for when a skill was done and didn't help.
+    id: 'er-troubleshoot',
+    name: 'It Isn\'t Working',
+    tagline: 'Find what got in the way of a skill',
+    description: 'When you used a skill and it didn\'t help, go through the usual reasons one tap at a time, and find one thing to try next.',
+    whenToUse: 'When you did a skill and nothing changed.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 24',
+    emoji: '🧩',
+    bare: true,
+  },
+  {
+    // ER-15 on the skill runtime (docs/design/nightmare-rescript.md): a nightmare that keeps coming back, changed
+    // while awake. Not for one that replays something real (a clinician's), never from the check-in or night mode.
+    id: 'nightmare-rescript',
+    name: 'Rewrite the Nightmare',
+    tagline: 'Write a new version of a recurring nightmare, while you\'re awake',
+    description: 'Pick a nightmare that keeps coming back, change it before the bad part, give it a new ending, and read the new version through. Stop at any point.',
+    whenToUse: 'When the same nightmare keeps coming back. Best in the daytime.',
+    module: 'emotion-regulation',
+    dbtBasis: 'DBT ER Handout 20a',
+    emoji: '🌙',
+    bare: true,
+  },
   // Interpersonal Effectiveness
   {
     id: 'dear-man',
@@ -125,6 +173,18 @@ export const tools: Tool[] = [
     module: 'interpersonal-effectiveness',
     dbtBasis: 'Walking the Middle Path: recovering from invalidation (with STOP, TIPP, Opposite Action and DEAR MAN)',
     emoji: '💬',
+  },
+  {
+    // On the skill runtime (docs/design/fast.md): the review and the Let go route are graph data.
+    id: 'fast',
+    name: 'Keep your self-respect',
+    tagline: 'Look at how you handled it, and pick one thing to keep next time',
+    description: 'Name what slipped (an extra sorry, going along, bending the truth, dropping your ask), pick the move you\'d make next time, and copy the line. After a no, hold your ground with one line and let it go.',
+    whenToUse: 'When you gave up more of yourself than you meant to, or they said no and you want to let it go with your self-respect.',
+    module: 'interpersonal-effectiveness',
+    dbtBasis: 'DBT IE Handout 7 (FAST)',
+    emoji: '🪶',
+    bare: true,
   },
   // Mindfulness
   {
@@ -185,11 +245,15 @@ export const allIntents: Intent[] = [
   { id: 'pause', label: 'Pause before reacting', toolId: 'pause', emoji: '✋' },
   { id: 'ground', label: 'Ground myself', toolId: 'five-senses', emoji: '👁️' },
   { id: 'urge', label: 'Ride out an urge', toolId: 'urge-surfing', emoji: '🌊' },
+  { id: 'blow-it-up', label: 'I want to blow it all up', toolId: 'alternate-rebellion', emoji: '🎸' },
   { id: 'shift', label: 'Shift a feeling that isn\'t helping', toolId: 'opposite-action', emoji: '🔄' },
   { id: 'problem', label: 'Work through a problem', toolId: 'problem-solve', emoji: '🛠️' },
   { id: 'ask', label: 'Ask someone for what I need', toolId: 'dear-man', emoji: '🗣️' },
   { id: 'dreading', label: 'Something\'s coming up that I\'m dreading', toolId: 'cope-ahead', emoji: '🧭' },
   { id: 'torn', label: 'I\'m torn about what to do', toolId: 'wise-mind', emoji: '🪨' },
+  { id: 'overreacting', label: 'I can\'t tell if I\'m overreacting', toolId: 'check-the-facts', emoji: '🔍' },
+  { id: 'not-working', label: 'My skills aren\'t working', toolId: 'er-troubleshoot', emoji: '🧩' },
+  { id: 'nightmares', label: 'The same nightmare keeps coming back', toolId: 'nightmare-rescript', emoji: '🌙' },
 ];
 
 /** The intents the Tools page lists: those whose tool is listed for everyone. */

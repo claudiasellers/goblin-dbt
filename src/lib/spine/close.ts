@@ -12,11 +12,16 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'five-senses': { module: 'dt', closeKind: 'orienting' },
   'pause': { module: 'dt', closeKind: 'urge' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
+  'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
   'cope-ahead': { module: 'er', closeKind: 'none' },
   'find-the-feeling': { module: 'er', closeKind: 'regulation_down' },
+  'check-the-facts': { module: 'er', closeKind: 'regulation_down' },
+  'er-troubleshoot': { module: 'er', closeKind: 'none' },
+  'nightmare-rescript': { module: 'er', closeKind: 'none' },
   'opposite-action': { module: 'er', closeKind: 'none' },
   'dear-man': { module: 'ie', closeKind: 'none' },
+  'fast': { module: 'ie', closeKind: 'regulation_down' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },
   'two-pulls': { module: 'mf', closeKind: 'orienting' },
@@ -32,12 +37,12 @@ export function closeKindFor(toolId: string): CloseKind {
 
 /** then-vs-now direction of a close kind (R3). */
 export function dirFor(kind: CloseKind): ThenVsNowDir | null {
-  return kind === 'regulation_down' ? 'down' : kind === 'orienting' ? 'orient' : kind === 'regulation_up' ? 'up' : null;
+  return kind === 'regulation_down' || kind === 'urge_change' ? 'down' : kind === 'orienting' ? 'orient' : kind === 'regulation_up' ? 'up' : null;
 }
 
 /** Whether the close question has something to ask (plan's when-chips arrive with follow-ups). */
 export function asksAtClose(kind: CloseKind): boolean {
-  return kind === 'regulation_down' || kind === 'orienting' || kind === 'urge';
+  return kind === 'regulation_down' || kind === 'orienting' || kind === 'urge' || kind === 'urge_change';
 }
 
 /** Whole seconds between two instants (for durationSec; never negative, capped at a day). */
@@ -48,6 +53,13 @@ export function durationSec(from: number, to: number): number {
 /** The close question for a tool: its kind's copy, or the tool's own wording of it (byTool). */
 export function closeQuestion(content: SpineContent['closeFlow'], toolId: string, kind: CloseKind): CloseQuestion | null {
   if (!asksAtClose(kind)) return null;
-  const k = kind as 'regulation_down' | 'orienting' | 'urge';
+  // The two-part close opens with the urge question; its second part is `secondCloseQuestion`.
+  const k = (kind === 'urge_change' ? 'urge' : kind) as 'regulation_down' | 'orienting' | 'urge';
   return content.byTool[toolId]?.[k] ?? content.kinds[k] ?? null;
+}
+
+/** The second question of a two-part close (`urge_change`, R7): then-vs-now, in the tool's own words if any. */
+export function secondCloseQuestion(content: SpineContent['closeFlow'], toolId: string, kind: CloseKind): CloseQuestion | null {
+  if (kind !== 'urge_change') return null;
+  return content.byTool[toolId]?.regulation_down ?? content.kinds.regulation_down ?? null;
 }
