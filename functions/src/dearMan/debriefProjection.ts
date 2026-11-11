@@ -1,5 +1,7 @@
 import type { ManagedTransaction } from 'neo4j-driver';
 import { encryptOwn } from '../shared/crypto';
+import { GUARDS } from '../userdata/lifecycle';
+import { personRoute, storedRisk } from '../safety/personSafety';
 import type { ProjectionInput } from '../skills/projections';
 
 /**
@@ -102,13 +104,16 @@ export function refusalChange(situationType: string | null, outcome: string | nu
   return null;
 }
 
+/** The page's "the picker was used, nobody kept" (src/lib/dearManDebrief.ts debriefCtx). */
+export const NOBODY = 'none';
+
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** The prep this debrief is about: via the ask_outcome card that opened it, else the person's latest in 14 days. */
 export const DEBRIEF_PREP_QUERY = `
   MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $tsKey})
   OPTIONAL MATCH (ts)-[:RESOLVING]->(:FollowUp {type: 'ask_outcome'})<-[:SCHEDULED]-(:ToolSession)-[:DETAIL]->(viaCard:DearManSession {type: 'prep'})
-  WHERE viaCard.ownerId = $uid
+  WHERE viaCard.ownerId = $uid AND ($personId IS NULL OR viaCard.personId = $personId) AND NOT $nobody
   WITH u, ts, head(collect(viaCard)) AS viaCard
   OPTIONAL MATCH (u)-[:COMPLETED_SESSION]->(recent:DearManSession {type: 'prep'})
   WHERE $personId IS NOT NULL AND recent.personId = $personId AND recent.createdAt > datetime() - duration({days: 14})
@@ -128,7 +133,7 @@ export const DEBRIEF_WRITE = `
   WITH u, s
   OPTIONAL MATCH (u)-[:HAS_PERSON]->(p:Person {key: $personKey})
   FOREACH (x IN CASE WHEN p IS NULL THEN [] ELSE [p] END |
-    SET s.personId = x.id, s.relationshipType = coalesce(s.relationshipType, ''), x.lastUsedAt = datetime()
+    SET s.personId = x.id, x.lastUsedAt = datetime()
     MERGE (s)-[:WITH_PERSON]->(x))
   WITH u, s
   OPTIONAL MATCH (u)-[:COMPLETED_SESSION]->(prep:DearManSession {key: $prepKey})
@@ -158,6 +163,21 @@ export const INTERACTION_WRITE = `
   RETURN created, p IS NOT NULL AS withPerson
 `;
 
+/** The person's stored safety answer: a debrief never links or counts against someone on the safety route. */
+export const PERSON_RISK_QUERY = `MATCH (:User {id: $uid})-[:HAS_PERSON]->(p:Person {key: $personKey}) RETURN p.valueJson AS v`;
+
+/**
+ * The prep's "How did it go?" card, when this debrief came another way (the summary link, *I just had a
+ * conversation*): done, so Today doesn't ask about a conversation already looked back on.
+ */
+export const RESOLVE_PREP_CARD = `
+  MATCH (u:User {id: $uid})-[:COMPLETED_SESSION]->(prep:DearManSession {key: $prepKey})
+  MATCH (u)-[:HAS_TOOL_SESSION]->(prepTs:ToolSession)-[:DETAIL]->(prep)
+  MATCH (prepTs)-[:SCHEDULED]->(f:FollowUp {type: 'ask_outcome'})
+  WHERE f.ownerId = $uid AND ${GUARDS.FollowUp.update('f')}
+  SET f.status = 'done', f.resolvedAt = datetime(), f.updatedAt = datetime()
+`;
+
 /** A refusal count on the caller's own person. `field` is whitelisted (refusalChange), never user input. */
 export function refusalWrite(field: 'refusalsValidation' | 'refusalsPractical', op: 'add' | 'reset'): string {
   const value = op === 'add' ? `coalesce(p.${field}, 0) + 1` : '0';
@@ -178,12 +198,19 @@ export async function projectDearManDebrief(tx: ManagedTransaction, input: Proje
   const f = debriefFields(run);
   if (!f.happened) return;
   const ctx = (run.ctx && typeof run.ctx === 'object' ? run.ctx : {}) as Record<string, unknown>;
+  // `none`: the picker was used and nobody kept (someone new, unnamed). Never fall back to a prep's person then.
+  const nobody = ctx.personId === NOBODY;
   const ctxPerson = typeof ctx.personId === 'string' && UUID.test(ctx.personId) ? ctx.personId : null;
   const tsKey = `${uid}:${toolSessionId}`;
-  const prepRow = (await tx.run(DEBRIEF_PREP_QUERY, { uid, tsKey, personId: ctxPerson })).records[0];
+  const prepRow = (await tx.run(DEBRIEF_PREP_QUERY, { uid, tsKey, personId: ctxPerson, nobody })).records[0];
   const prepId = (prepRow?.get('prepId') as string | null | undefined) ?? null;
   const situationType = (prepRow?.get('situationType') as string | null | undefined) || null;
-  const personId = ctxPerson ?? ((prepRow?.get('personId') as string | null | undefined) || null);
+  let personId = nobody ? null : ctxPerson ?? ((prepRow?.get('personId') as string | null | undefined) || null);
+  // As saveDearManSession refuses a plan: someone on the safety route is never linked or counted here (D4).
+  if (personId) {
+    const risk = (await tx.run(PERSON_RISK_QUERY, { uid, personKey: `${uid}:${personId}` })).records[0];
+    if (!risk || personRoute(storedRisk(risk.get('v'))) === 'safety') personId = null;
+  }
   const personKey = personId ? `${uid}:${personId}` : null;
   const sKey = `${uid}:${toolSessionId}`;
   const { thoughtOwn, ...ids } = f;
@@ -191,6 +218,7 @@ export async function projectDearManDebrief(tx: ManagedTransaction, input: Proje
     uid, tsKey, sKey, id: toolSessionId, personKey, prepKey: prepId ? `${uid}:${prepId}` : null,
     props: { ...ids, thoughtOwn: await encryptOwn(tx, uid, thoughtOwn), situationType: situationType ?? '' },
   });
+  if (prepId) await tx.run(RESOLVE_PREP_CARD, { uid, prepKey: `${uid}:${prepId}` });
   if (personKey && f.relationshipOk === 'unsafe') await tx.run(SAFETY_RECHECK, { uid, personKey });
   if (!f.outcome) return;
   const r = (await tx.run(INTERACTION_WRITE, {

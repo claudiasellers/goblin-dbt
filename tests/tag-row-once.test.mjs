@@ -53,5 +53,5 @@ test("hosts: Find the feeling's two places, Cool Down's remount and DEAR MAN's B
   const card = read("src/components/parts/DebriefWho.tsx");
   assert.match(card, /<PartTagRow toolId="dear-man"[^>]* debrief /, "the general form: the row, source debrief");
   assert.match(card, /markTagRowAnswered\(toolSessionId, 'debrief'\)/, "the named form marks too");
-  assert.match(read("src/components/skillPlayer/DebriefWhoEmbed.tsx"), /answered: tagRowAnswered\(session\.id, 'debrief'\)/, "Back skips an answered debrief");
+  assert.match(read("src/components/skillPlayer/DebriefWhoEmbed.tsx"), /useState\(\(\) => tagRowAnswered\(session\.id, 'debrief'\)\)/, "Back skips an answered debrief (read on each arrival)");
 });

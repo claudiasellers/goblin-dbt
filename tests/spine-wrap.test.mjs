@@ -34,7 +34,7 @@ test("each wrapped tool closes its session with its detail kind; FTF embeds insi
   assert.match(src("InvalidationRecovery"), /detail: \{ kind: 'invalidation_recovery', id: sessionId \}[\s\S]*skillIds: used[\s\S]*schedule: recoverSchedule/);
   assert.match(src("DearMan"), /detail: \{ kind: 'dear_man', id: savedId \}, repSource: dearManRepSource\('prep'\)/);
   // The debrief is a skill (IE-B2): its rep is the off-phone one, set by the close from the run (runRep).
-  assert.match(readFileSync("functions/src/skills/projections.ts", "utf8"), /dear_man_debrief: \{ happenedField: 'happened', yes: 'yes' \}/);
+  assert.match(readFileSync("functions/src/skills/projections.ts", "utf8"), /dear_man_debrief: \{ toolId: 'dear-man', happenedField: 'happened', yes: 'yes' \}/);
   const ftf = src("FindTheFeeling");
   assert.match(ftf, /recordToolSession\(\{ id: embedId, toolId: 'find-the-feeling', entry: 'embedded'/);
   assert.match(ftf, /thenVsNowFromFtf\(state\.close\)/);

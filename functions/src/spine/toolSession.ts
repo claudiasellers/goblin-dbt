@@ -184,7 +184,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
   const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
   const practiced = rec.get('practiced') === true || c.practiced;
   // A skill whose rep is something done off the phone (DEAR MAN's debrief): self-reported when it happened, else none.
-  const rep = runRep(c.ext);
+  const rep = runRep(c.ext, rec.get('toolId') as string);
   if (rep && 'noRep' in rep) return { reps: [], followUps };
   const repSource = rep ? rep.repSource : c.repSource;
   if ((c.status !== 'completed' && !practiced) || (c.skillIds !== null && c.skillIds.length === 0)) return { reps: [], followUps };

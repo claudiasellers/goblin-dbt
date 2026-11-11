@@ -37,7 +37,9 @@ function fakeTx(respond) {
       calls.push({ query, params });
       if (query === C.READ_KEY_QUERY) return { records: [record({ w: keys.get(params.uid) ?? null })] };
       if (query === C.ENSURE_KEY_QUERY) { if (!keys.has(params.uid)) keys.set(params.uid, params.w); return { records: [record({ w: keys.get(params.uid) })] }; }
-      return { records: (respond(query, params) ?? []).map(record) };
+      const rows = respond(query, params);
+      if (rows === undefined && query === P.PERSON_RISK_QUERY) return { records: [record({ v: JSON.stringify({ risk: 'none' }) })] };
+      return { records: (rows ?? []).map(record) };
     },
   };
 }
@@ -86,7 +88,7 @@ test('projection: the debrief, the Interaction WITH the person, then one refusal
     if (q === P.DEBRIEF_PREP_QUERY) return [{ prepId: PREP, situationType: 'address', personId: PERSON }];
     if (q === P.DEBRIEF_WRITE) return [{ id: TSID }];
     if (q === P.INTERACTION_WRITE) return [{ created: true, withPerson: true }];
-    return [];
+    return q === P.PERSON_RISK_QUERY ? undefined : [];
   });
   await S.PROJECTIONS['dear-man'](tx, {
     uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
@@ -114,7 +116,7 @@ test('projection: the debrief, the Interaction WITH the person, then one refusal
 
 test('projection: a re-close never counts twice; no person, no count; not yet, no Interaction; other runs, nothing', async () => {
   const again = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: PREP, situationType: 'pattern', personId: PERSON }]
-    : q === P.INTERACTION_WRITE ? [{ created: false, withPerson: true }] : []));
+    : q === P.INTERACTION_WRITE ? [{ created: false, withPerson: true }] : q === P.PERSON_RISK_QUERY ? undefined : []));
   await P.projectDearManDebrief(again, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man', run: run([ans('happened', 'yes'), ans('outcome', 'no')]) });
   assert.equal(again.calls.filter((c) => /SET p\.refusals/.test(c.query)).length, 0);
 
@@ -157,28 +159,66 @@ test("queries: only the caller's own records; the prep via the ask_outcome card,
 
 test("unsafe with them: the person's safety answer goes stale (asked again next time); nothing else about it changes", async () => {
   const tx = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }]
-    : q === P.INTERACTION_WRITE ? [{ created: true, withPerson: true }] : []));
+    : q === P.INTERACTION_WRITE ? [{ created: true, withPerson: true }] : q === P.PERSON_RISK_QUERY ? undefined : []));
   await P.projectDearManDebrief(tx, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
     run: run([ans('happened', 'yes'), ans('outcome', 'no'), ans('between', 'unsafe')], { ctx: { personId: PERSON } }) });
   const re = tx.calls.filter((c) => c.query === P.SAFETY_RECHECK);
   assert.equal(re.length, 1);
   assert.deepEqual(re[0].params, { uid: 'u1', personKey: `u1:${PERSON}` });
   assert.doesNotMatch(P.SAFETY_RECHECK, /valueJson|risk/);
-  const safe = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }] : []));
+  const safe = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }] : q === P.PERSON_RISK_QUERY ? undefined : []));
   await P.projectDearManDebrief(safe, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
     run: run([ans('happened', 'yes'), ans('outcome', 'no'), ans('between', 'shaky')], { ctx: { personId: PERSON } }) });
   assert.ok(!safe.calls.some((c) => c.query === P.SAFETY_RECHECK));
 });
 
+test('projection: someone on the safety route is never linked or counted; nobody kept never borrows the prep\'s person', async () => {
+  const harm = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: PREP, situationType: 'address', personId: PERSON }]
+    : q === P.PERSON_RISK_QUERY ? [{ v: JSON.stringify({ risk: 'harm' }) }]
+    : q === P.INTERACTION_WRITE ? [{ created: true, withPerson: false }] : []));
+  await P.projectDearManDebrief(harm, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
+    run: run([ans('happened', 'yes'), ans('outcome', 'no')], { ctx: { personId: PERSON } }) });
+  assert.equal(harm.calls.find((c) => c.query === P.DEBRIEF_WRITE).params.personKey, null);
+  assert.equal(harm.calls.find((c) => c.query === P.INTERACTION_WRITE).params.personKey, null);
+  assert.equal(harm.calls.filter((c) => /SET p\.refusals/.test(c.query)).length, 0);
+
+  const gone = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }] : []));
+  await P.projectDearManDebrief(gone, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
+    run: run([ans('happened', 'yes'), ans('outcome', 'no')], { ctx: { personId: PERSON } }) });
+  assert.equal(gone.calls.find((c) => c.query === P.DEBRIEF_WRITE).params.personKey, null, 'deleted since: no row, no link');
+
+  const none = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: PERSON }] : q === P.PERSON_RISK_QUERY ? undefined : []));
+  await P.projectDearManDebrief(none, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
+    run: run([ans('happened', 'yes'), ans('outcome', 'no')], { ctx: { personId: P.NOBODY } }) });
+  const read = none.calls.find((c) => c.query === P.DEBRIEF_PREP_QUERY).params;
+  assert.deepEqual([read.personId, read.nobody], [null, true]);
+  assert.equal(none.calls.find((c) => c.query === P.DEBRIEF_WRITE).params.personKey, null);
+  assert.ok(!none.calls.some((c) => c.query === P.PERSON_RISK_QUERY));
+  assert.match(P.DEBRIEF_PREP_QUERY, /AND \(\$personId IS NULL OR viaCard\.personId = \$personId\) AND NOT \$nobody/, "a card for someone else's prep is not this debrief's");
+});
+
+test("projection: the prep's own ask_outcome card resolves, however the debrief was opened", async () => {
+  const tx = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: PREP, situationType: 'address', personId: PERSON }] : q === P.PERSON_RISK_QUERY ? undefined : []));
+  await P.projectDearManDebrief(tx, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man', run: run([ans('happened', 'decided_not')], { ctx: { personId: PERSON } }) });
+  const r = tx.calls.filter((c) => c.query === P.RESOLVE_PREP_CARD);
+  assert.equal(r.length, 1);
+  assert.deepEqual(r[0].params, { uid: 'u1', prepKey: `u1:${PREP}` });
+  assert.match(P.RESOLVE_PREP_CARD, /\(prepTs\)-\[:SCHEDULED\]->\(f:FollowUp \{type: 'ask_outcome'\}\)/);
+  const noPrep = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }] : []));
+  await P.projectDearManDebrief(noPrep, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man', run: run([ans('happened', 'decided_not')]) });
+  assert.ok(!noPrep.calls.some((c) => c.query === P.RESOLVE_PREP_CARD));
+});
+
 test('rep: a debrief that happened is a self-reported off-phone rep; one that did not, none; other runs keep their own', () => {
   const ext = (answers, skillId = 'dear_man_debrief') => JSON.stringify({ run: { skillId, answers } });
-  assert.deepEqual(S.runRep(ext([ans('happened', 'yes')])), { repSource: 'followup_offphone' });
-  assert.deepEqual(S.runRep(ext([ans('happened', 'not_yet')])), { noRep: true });
-  assert.deepEqual(S.runRep(ext([])), { noRep: true });
-  assert.equal(S.runRep(ext([ans('happened', 'yes')], 'check_the_facts')), null);
-  assert.equal(S.runRep(null), null);
-  assert.equal(S.runRep('not json'), null);
-  assert.equal(S.runRep(JSON.stringify({ er: {} })), null);
+  assert.deepEqual(S.runRep(ext([ans('happened', 'yes')]), 'dear-man'), { repSource: 'followup_offphone' });
+  assert.deepEqual(S.runRep(ext([ans('happened', 'not_yet')]), 'dear-man'), { noRep: true });
+  assert.deepEqual(S.runRep(ext([]), 'dear-man'), { noRep: true });
+  assert.equal(S.runRep(ext([ans('happened', 'yes')]), 'check-the-facts'), null, "only the debrief's own tool: another tool's ext.run never borrows it");
+  assert.equal(S.runRep(ext([ans('happened', 'yes')], 'check_the_facts'), 'dear-man'), null);
+  assert.equal(S.runRep(null, 'dear-man'), null);
+  assert.equal(S.runRep('not json', 'dear-man'), null);
+  assert.equal(S.runRep(JSON.stringify({ er: {} }), 'dear-man'), null);
 });
 
 test('ask_outcome: opening it resolves it, and only a DEAR MAN visit schedules one', () => {

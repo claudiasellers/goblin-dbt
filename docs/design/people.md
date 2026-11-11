@@ -99,7 +99,7 @@ ships (`pickerCopy`); an older graph keeps the old role chips.
   FAST's Let go composes a boundary line, which is words to the person. Left out until IE-05 has a no-message form.
 - **Refusal counters** (`Person.refusalsValidation` / `refusalsPractical`) and `Interaction` came with the debrief
   (IE-B2's second PR, [`dear-man-debrief.md`](dear-man-debrief.md)), which writes the outcome they count from; the
-  `people` slice carries `refusalsValidation`. `witness`, `status` (ending) and discreet mode wait for
+  `people` slice carries `refusalsValidation` (read by the prep's Let go offer only; Me shows no counts). `witness`, `status` (ending) and discreet mode wait for
   their owners (WMP, IE-08's follow-ups, the safety batch).
 
 ## Decided (Claudia, 11 Nov: "go with your recommendations for all")

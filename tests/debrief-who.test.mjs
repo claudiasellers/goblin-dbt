@@ -79,7 +79,8 @@ test("DEAR MAN's debrief skill: its own step after Underneath, before the reflec
   assert.equal(step("who").embed, "debriefWho");
   assert.deepEqual(step("who").next.map((n) => n.to), ["reflect"]);
   const embed = read("src/components/skillPlayer/DebriefWhoEmbed.tsx");
-  assert.match(embed, /const shown = settled && showDebriefWho\(\{\s*partsOn, partCount: profile\.slices\?\.parts\.length \?\? 0, ready: debriefWhoReady\(content \?\? null\),\s*answered: tagRowAnswered\(session\.id, 'debrief'\),\s*\}\);/);
+  assert.match(embed, /const shown = settled && showDebriefWho\(\{\s*partsOn, partCount: profile\.slices\?\.parts\.length \?\? 0, ready: debriefWhoReady\(content \?\? null\),\s*answered: answeredOnArrival,\s*\}\);/);
+  assert.match(embed, /const \[answeredOnArrival\] = useState\(\(\) => tagRowAnswered\(session\.id, 'debrief'\)\);/, "read once: answering never takes the screen away");
   assert.match(embed, /useEffect\(\(\) => \{ if \(settled && !shown\) finish\('not_shown'\); \}\);/, "gate fails: straight on");
   assert.match(embed, /copeAheadPartId=\{ctx\?\.partId \?\? null\} toolSessionId=\{session\.id\}/, "the prep's pick, carried in as the part");
   assert.match(embed, /onDone=\{\(\) => finish\(answer\.current \?\? \(ctx\?\.partId \? 'skip' : 'general'\)\)\}/, "the named form's answer only");

@@ -61,8 +61,11 @@ asks again (`clears: ['factor']`), since the chain can change the answer.
   history, parts moves and trails read it as before), with the old fields mapped (`debriefOverall` from the
   outcome, the chain's ids, `copeAheadId`, `reflectionLanded`) plus `happened`, `outcome`, `relationshipOk`,
   `selfRespect`, `factorId`, and the thought's own words encrypted (`thoughtOwn`). `WITH_PERSON` the kept person;
-  `DEBRIEFS` the prep it is about: the prep whose `ask_outcome` card opened it, else the person's latest prep in 14
-  days.
+  `DEBRIEFS` the prep it is about: the prep whose `ask_outcome` card opened it (only when that prep is with the same
+  person), else the person's latest prep in 14 days. When the picker was used and nobody kept (`$ctx.personId` is
+  `none`), no prep's person is borrowed. A person on the safety route (stored risk harm or rather not say) is never
+  linked or counted, as `saveDearManSession` refuses a plan for them. A debrief about a prep resolves that prep's
+  open `ask_outcome` card, however the debrief was opened, so Today never asks twice.
 - **`Interaction`** (new log label, `HAS_INTERACTION`, exported as `interactions`): one per debrief with an answered
   outcome. Ids only: outcome, situation type, still okay between you, proud, factor. `WITH` the person.
 - **Refusal counts** on the `Person` (`refusalsValidation`, `refusalsPractical`): written only when the Interaction
@@ -80,7 +83,8 @@ own: *I don't feel safe with them* on *Is it still okay between you?* shows the 
 Ending a relationship (`frame=careful`) and *Talk to someone now*, never a retry, rehearsal or Cope Ahead; the
 projection sets `Person.safetyRecheckAt`, so the next prep or debrief asks the safety question again
 (`needsSafetyAsk`, both mirrors). *Hurt* or *Defeated* on the first step and *I can't handle this* among the thoughts
-add *Talk to someone now*. Without the picker's copy the page shows the load error, never the skill without it.
+add *Talk to someone now*. Without the picker's copy the page shows the load error, never the skill without it. These replace the old
+debrief's silent check-in, whose crisis banner came from `getStateAndTools` on the debrief's feelings.
 *Not yet*, *No answer yet* and the shaky deferral each offer *Want me to ask again?* (ask_outcome).
 
 ## The prep↔debrief link

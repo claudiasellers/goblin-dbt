@@ -110,7 +110,7 @@ test("page: a link's person skips the picker only when kept, answered fresh and 
 
 test("page: the context in is the kept person's id (empty clears a link's), and a plain part id", () => {
   assert.deepEqual(lib.debriefCtx({ personId: "p1" }, "part1"), { personId: "p1", partId: "part1" });
-  assert.deepEqual(lib.debriefCtx({ personId: null }, null), { personId: "" });
+  assert.deepEqual(lib.debriefCtx({ personId: null }, null), { personId: "none" }, "nobody kept: said, so no prep's person stands in");
   assert.deepEqual(lib.debriefCtx({ personId: "p1" }, "a b"), { personId: "p1" });
   assert.equal(lib.debriefLink(null, null), "/tool/dear-man?mode=debrief");
   assert.equal(lib.debriefLink("part1", "p1"), "/tool/dear-man?mode=debrief&person=p1&partId=part1");

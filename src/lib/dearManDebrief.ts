@@ -33,9 +33,12 @@ export function presetPerson(people: readonly KeptPerson[] | null, personId: str
   return picked.route === 'safety' ? null : picked;
 }
 
-/** The context the skill gets: the kept person's id (an empty value clears one a link carried), the part. */
+/**
+ * The context the skill gets: the kept person's id, or `none` when the picker was used and nobody is kept (it also
+ * clears one a link carried, and tells the projection not to fall back to a prep's person), and the part.
+ */
 export function debriefCtx(p: PickedPerson, partId: string | null): Record<string, string> {
-  return { personId: p.personId ?? '', ...(partId && ID.test(partId) ? { partId } : {}) };
+  return { personId: p.personId ?? 'none', ...(partId && ID.test(partId) ? { partId } : {}) };
 }
 
 /** The picker's copy from the skill's (`picker_<key>`, scripts/skills/dear_man_debrief.py), or null. */

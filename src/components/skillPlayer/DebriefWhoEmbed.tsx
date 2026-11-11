@@ -33,9 +33,11 @@ export function DebriefWhoEmbed({ ctx, onShown, onDone }: EmbedProps) {
     return () => { live = false; };
   }, [partsOn]);
   const settled = !partsOn || (content !== undefined && profile.status !== 'loading');
+  // Read once, on arrival: answering the card marks the row answered, which must not take the screen away mid-step.
+  const [answeredOnArrival] = useState(() => tagRowAnswered(session.id, 'debrief'));
   const shown = settled && showDebriefWho({
     partsOn, partCount: profile.slices?.parts.length ?? 0, ready: debriefWhoReady(content ?? null),
-    answered: tagRowAnswered(session.id, 'debrief'),
+    answered: answeredOnArrival,
   });
   const done = useRef(false);
   const answer = useRef<WhoShowedUp | null>(null);
