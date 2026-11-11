@@ -73,6 +73,9 @@
     { "n": null, "source": "DT PRD DT-10", "from": "pros-cons", "kind": "data", "to": [{ "tool": "crisis-kit", "state": "safety" }], "note": "the card in the kit (section pros_cons) waits for DT-03" },
     { "n": null, "source": "DT PRD DT-01", "from": "cool-down", "kind": "exit", "to": [{ "tool": "pause", "state": "built" }, { "tool": "crisis-kit", "state": "planned" }], "note": "an urge to act → Hold to wait; two checks and not lower → someone to talk to (the crisis kit when it ships)" },
     { "n": null, "source": "DT PRD DT-01", "from": "cool-down", "kind": "gate", "to": [{ "tool": "safety.open", "state": "built" }], "note": "talk to someone now on every screen; a medical emergency gets the medical banner first" },
+    { "n": null, "source": "DT PRD DT-05", "from": "urge-surfing", "kind": "exit", "to": [{ "tool": "cool-down", "state": "built" }, { "tool": "pause", "state": "built" }], "note": "bigger twice → something for the body (First, the body) or a way to wait (Hold to wait, not after hurt myself); a carried flooded reading → either first, or ride now" },
+    { "n": null, "source": "DT PRD DT-05", "from": "urge-surfing", "kind": "exit", "to": [{ "tool": "pros-cons", "state": "built" }], "note": "the end card: make a card for a pull that keeps coming back (DT-10)" },
+    { "n": null, "source": "DT PRD DT-05", "from": "urge-surfing", "kind": "exit", "to": [{ "tool": "crisis-kit", "state": "planned" }, { "tool": "safety.open", "state": "built" }], "note": "hurt myself → safety.open first (safetyFirst), then are you safe?; not sure / no → someone to talk to, the kit planned (DT-03); talk to someone now on every screen" },
     { "n": null, "source": "IE Arch #42", "from": "problem-solve", "kind": "exit", "to": [{ "tool": "fast", "state": "built" }], "note": "Problem Solve's linkedToolId / redirectToolId 'fast' (7 links) open the review" }
   ]
 }

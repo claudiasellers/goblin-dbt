@@ -113,7 +113,7 @@ CONCEPT_TAGS = {
 }
 
 # Tools whose rows are authored but switched off (content kill switch per row).
-INACTIVE_TOOLS = {"urge-surfing": "DT-05: the 1-10 slider is a rebuild, not a patch (R8, D-02)"}
+INACTIVE_TOOLS: dict = {}
 # Tools that must have no rows at all yet.
 NO_ROWS = {"dear-man": "IE-01's 'is it safe with them?' question ships with the safety batch (R9, D-02)"}
 
@@ -156,6 +156,8 @@ BUILT_NOT_SIGNED_OFF = {
     "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
     "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",
+    # DT-05: the slider is gone (rebuilt as Ride it out on the skill runtime, DT-B3); its rows stay off and drafts.
+    "urge-surfing": "rebuilt on the skill runtime as Ride it out; its rows go live on Claudia's sign-off (docs/design/ride-it-out.md)",
 }
 PLANNED = {
     "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
@@ -284,7 +286,7 @@ WORD_RULES = [
     {"key": "worry", "pattern": "chronic_vigilance", "tool": "check-the-facts", "priority": 0.4, "words": ["worried"] + WATCHFUL_WORDS,
      "why": "Planned: Check the Facts leads."},
     {"key": "worry", "pattern": "chronic_vigilance", "tool": "urge-surfing", "priority": WORD_NEXT, "words": ["worried"],
-     "why": "Urge Surfing for the checking / reassurance urge, once it's rebuilt (DT-05)."},
+     "why": "Ride it out (DT-05, rebuilt on the skill runtime) for the checking / reassurance urge; off until signed off."},
     {"key": "watchful", "pattern": "chronic_vigilance", "tool": "wise-mind", "priority": WORD_NEXT, "words": WATCHFUL_WORDS,
      "why": "Planned: Wise Mind as the alternative for suspicion and judgement."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["helpless"],

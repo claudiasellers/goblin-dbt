@@ -10,6 +10,7 @@ import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
 import { WaitLockEmbed } from './WaitLockEmbed';
+import { UrgeWave, WaveTrace } from './UrgeWave';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
 
 /**
@@ -64,6 +65,8 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   breathPacer: BreathPacer,
   squeezeRelease: SqueezeRelease,
   orientFind: OrientFind,
+  urgeWave: UrgeWave,
+  waveTrace: WaveTrace,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -83,6 +86,11 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   breathPacer: { ids: ['done', 'partly', 'skipped', 'dizzy'], measures: ['durationSec'] },
   squeezeRelease: { ids: ['done', 'partly', 'skipped'], measures: ['durationSec', 'doneCount'] },
   orientFind: { ids: ['done', 'partly', 'skipped'], measures: ['doneCount'] },
+  urgeWave: {
+    ids: ['still_here', 'fading', 'gone', 'bigger', 'ended_gone', 'ended_bigger', 'ended_not_now', 'ended_left', 'ended_long'],
+    measures: ['durationSec', 'doneCount'],
+  },
+  waveTrace: { ids: ['read'] },
 };
 
 /**
@@ -241,6 +249,30 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     task: { type: 'copy' },
     foundLabel: { type: 'copy' },
     done: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  urgeWave: {
+    checkSec: { type: 'int', min: 20, max: 180 },
+    maxChecks: { type: 'int', min: 1, max: 10 },
+    checkTitle: { type: 'copy' },
+    riding: { type: 'copy' },
+    still_here: { type: 'copy' },
+    fading: { type: 'copy' },
+    gone: { type: 'copy' },
+    bigger: { type: 'copy' },
+    /** Absent: no *not now* button (Ride it out's second ride). */
+    notNow: { type: 'copy', optional: true },
+    next: { type: 'copy' },
+    /** A first ride's field: this ride's object starts where that one left it. */
+    continueFrom: { type: 'field', optional: true },
+  },
+  waveTrace: {
+    rideField: { type: 'field' },
+    againField: { type: 'field', optional: true },
+    downLine: { type: 'copy' },
+    /** The down line when the trace rose first (a *bigger* tap); else `downLine`. */
+    riseLine: { type: 'copy', optional: true },
+    heldLine: { type: 'copy' },
     next: { type: 'copy' },
   },
 };
