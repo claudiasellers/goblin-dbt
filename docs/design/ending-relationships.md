@@ -91,6 +91,9 @@ Plan R15, built here as a runtime contract any skill can declare:
   *I don't feel safe*. Deleting one's own past runs is a CORE / Me feature, not built yet.
 - Leaving through a link (Wise mind, Circuit Breaker, Pause) opens that tool's own visit, which is saved as usual.
   It carries no answer from here.
+- Coming in from another skill (Rebel's *someone I'm scared of*, Problem Solve's *Decide if this can be repaired*):
+  the host's own record says only `private` where it offered or took this exit, and the visit opens with no host
+  session, so nothing on either side links the two (`docs/design/skill-runtime.md`, persist-nothing ways in).
 
 ## Quick exit
 

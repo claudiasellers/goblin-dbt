@@ -191,6 +191,11 @@ Added by IE-08 (`docs/design/ending-relationships.md`, 10 Nov 2026):
 - **The carried band.** For a skill that accepts `band`, the player passes `band.current()` (≤ 20 min) when the
   route state carries none.
 - These switches live in one `Skill.runtimeJson` property and are spread onto the served skill.
+- **Ways into a persist-nothing tool** (ER-12, with the plan thread). A host run that offers or takes an exit to a
+  `deferSession` tool (Ending) records it as `private` in its own `ext.run` (`offeredExitIds`, `exitId`), never by
+  the exit's or tool's id, and the player opens it without `linkTo`, so the visit carries no `hostSessionId` and a
+  saved Ending session has no `HANDED_OFF_FROM` back to the host. The host's record is kept; the trip is not in it.
+  `RunContext.privateTools` (the player passes tools.ts' `deferSession` set); pinned in `tests/skill-contracts.test.mjs`.
 
 ### The attempt record (what a router reads)
 

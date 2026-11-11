@@ -713,3 +713,25 @@ test("covered: P2 or safety.open over an embed step reaches the embed; a new ste
 test("a link's enterAt without a run to reopen doesn't hold from the start", () => {
   assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /UUID\.test\(new URLSearchParams\(location\.search\)\.get\('run'\) \?\? ''\) \? c : ctxAfterResume\(c, false\)/);
 });
+
+test("an exit into a persist-nothing tool (R15) is never named in the host's record, and carries no host session", () => {
+  // The persist-nothing tools are tools.ts' deferSession ones, and every skill with `persist` is one.
+  const toolsSrc = read("src/data/tools.ts");
+  const deferred = new Set([...toolsSrc.matchAll(/id: '([a-z0-9-]+)',[\s\S]*?(?=\n  \{|\n\];)/g)].filter((x) => /deferSession: true/.test(x[0])).map((x) => x[1]));
+  assert.deepEqual([...deferred].sort(), fixture.skills.filter((s) => s.persist).map((s) => s.toolId).sort());
+  const into = fixture.skills.flatMap((s) => s.exits.filter((x) => deferred.has(x.toolId) && !x.planned).map((x) => ({ s, x })));
+  assert.ok(into.length >= 2, "Rebel's and Problem Solve's ways into Ending");
+  for (const { s, x } of into) {
+    const ctx = { skill: s, shared: fixture, carried: [], gridIds: new Set(), emotionLabel: (e) => e, privateTools: deferred };
+    const st = { ...m.initialRun(s), offered: [x.id, ...s.exits.filter((y) => y.id !== x.id && !y.planned && !y.safety && !y.done).slice(0, 1).map((y) => y.id)] };
+    const rec = m.runRecord(ctx, m.runNext(ctx, st, { type: "exit", exitId: x.id }));
+    assert.equal(rec.exitId, m.PRIVATE_EXIT, `${s.id}.${x.id}: taken`);
+    assert.ok(rec.offeredExitIds.includes(m.PRIVATE_EXIT) && !rec.offeredExitIds.includes(x.id), `${s.id}.${x.id}: offered`);
+    assert.doesNotMatch(JSON.stringify(rec), new RegExp(`${x.toolId}|"${x.id}"`), `${s.id}: nowhere in the record`);
+    assert.doesNotThrow(() => validateExt({ run: rec }));
+  }
+  // The player opens it without linkTo (no hostSessionId), and passes the set to every run.
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(player, /PRIVATE_TOOLS\.has\(exit\.toolId\)\s*\? \{ pathname: `\/tool\/\$\{exit\.toolId\}`, state: \{ checkinEmotions/);
+  assert.match(player, /privateTools: PRIVATE_TOOLS/);
+});

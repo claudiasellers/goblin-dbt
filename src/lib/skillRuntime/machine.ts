@@ -36,7 +36,16 @@ export interface RunContext {
   embedOutputs?: Readonly<Record<string, EmbedOutputSchema>>;
   /** The tool's profile slices (PROFILE_NEEDS), or null while loading / signed out (`$p.*` reads absent). */
   profile?: Readonly<Record<string, unknown>> | null;
+  /**
+   * Tools that write nothing until the person saves (R15, `deferSession` in src/data/tools.ts: Ending a
+   * relationship). An exit to one is recorded as `private`, never by its id, in this run's own record, so a kept
+   * host run doesn't show where the person went.
+   */
+  privateTools?: ReadonlySet<string>;
 }
+
+/** The record's id for an exit to a persist-nothing tool (RunContext.privateTools). */
+export const PRIVATE_EXIT = 'private';
 
 /** One whole-screen embed's report, as the run keeps it (and `ext.run.out` records it). */
 export interface EmbedRecord extends EmbedOutput { embed: string; stepId: string }
@@ -657,6 +666,12 @@ export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown>
     .map(([fieldId, a]) => ({ fieldId, optionIds: a.ids.slice(0, 12), ...(a.own ? { valueOwn: a.own.trim().slice(0, ctx.skill.ownMax) } : {}) }))
     .filter((a) => a.optionIds.length > 0 || a.valueOwn)
     .slice(0, 32);
+  // An exit to a persist-nothing tool is never named in the host's record (offered or taken).
+  const recorded = (exitId: string) => {
+    const tool = ctx.skill.exits.find((x) => x.id === exitId)?.toolId;
+    return tool && ctx.privateTools?.has(tool) ? PRIVATE_EXIT : exitId;
+  };
+  const offered = [...new Set(s.offered.map(recorded))];
   const ctxRec = Object.fromEntries(RECORDED_CTX.filter((k) => ctx.ctxIn?.[k]).map((k) => [k, ctx.ctxIn![k]]));
   const out = Object.values(s.out ?? {}).slice(0, 8).map((r) => ({
     embed: r.embed, stepId: r.stepId,
@@ -671,8 +686,8 @@ export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown>
     versionId: ctx.skill.version,
     path: s.path,
     ...(answers.length ? { answers } : {}),
-    ...(s.offered.length ? { offeredExitIds: s.offered } : {}),
-    ...(s.exitId ? { exitId: s.exitId } : {}),
+    ...(offered.length ? { offeredExitIds: offered } : {}),
+    ...(s.exitId ? { exitId: recorded(s.exitId) } : {}),
     ...(s.shown.length ? { embedsShown: s.shown } : {}),
     ...(Object.keys(ctxRec).length ? { ctx: ctxRec } : {}),
     ...(out.length ? { out } : {}),

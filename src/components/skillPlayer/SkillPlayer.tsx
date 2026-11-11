@@ -4,7 +4,7 @@ import type { HandoffResult, ThenVsNow } from '../../data/capacityTypes';
 import { PROFILE_NEEDS, type ClientProfileConsumer } from '../../data/profileTypes';
 import { emotions, getEmotionById } from '../../data/emotions';
 import type { ExitDef, FieldDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
-import { getToolById } from '../../data/tools';
+import { getToolById, tools } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
 import { useProfileContext } from '../../hooks/useProfileContext';
 import { ToolSessionProvider } from '../../contexts/ToolSessionContext';
@@ -107,6 +107,8 @@ const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, reado
 const UUID = /^[0-9a-f-]{36}$/i;
 
 const GRID = new Set(emotions.map((e) => e.id));
+/** Tools that write nothing until the person saves (R15): exits to them are never named or linked back. */
+const PRIVATE_TOOLS: ReadonlySet<string> = new Set(tools.filter((t) => t.deferSession).map((t) => t.id));
 const emotionLabel = (id: string) => (getEmotionById(id)?.name ?? id.replace(/_/g, ' ')).toLowerCase();
 
 /**
@@ -146,7 +148,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
   const ctx = useMemo<RunContext>(() => ({
-    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn,
+    skill, shared: { parentOf: content.parentOf, fitsWhen: content.fitsWhen }, carried, gridIds: GRID, emotionLabel, ctxIn, privateTools: PRIVATE_TOOLS,
     embedOutputs: EMBED_OUTPUTS, profile: slices,
   }), [skill, content, carried, ctxIn, slices]);
   const [safetyOpen, setSafetyOpen] = useState(false);
@@ -219,7 +221,11 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   /** Go: after the close question (answered or skipped), or at once when there is none to ask. */
   const go = useCallback((exit: ExitDef) => {
     if (exit.done || !exit.toolId) return;
-    const to = toolSession.linkTo(exit.toolId, { checkinEmotions: carriedOf(exit, st) });
+    // Into a tool that writes nothing until the person saves (R15), the visit carries no host session: once it
+    // saves, nothing there may point back at this run, as nothing here names it (runRecord, `private`).
+    const to = PRIVATE_TOOLS.has(exit.toolId)
+      ? { pathname: `/tool/${exit.toolId}`, state: { checkinEmotions: carriedOf(exit, st) } }
+      : toolSession.linkTo(exit.toolId, { checkinEmotions: carriedOf(exit, st) });
     const q = new URLSearchParams(exit.query).toString();
     navigate({ pathname: to.pathname, search: q ? `?${q}` : '' }, { state: to.state });
   }, [toolSession, navigate, st]);
