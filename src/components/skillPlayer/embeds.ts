@@ -8,6 +8,7 @@ import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
 import { KeepCardEmbed, PartAnchorEmbed, PlanSentenceEmbed, RehearsalEmbed } from './CopeAheadEmbeds';
+import { WaitLockEmbed } from './WaitLockEmbed';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -51,6 +52,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   rehearsal: RehearsalEmbed,
   keepCard: KeepCardEmbed,
   partAnchor: PartAnchorEmbed,
+  waitLock: WaitLockEmbed,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -65,6 +67,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   rehearsal: { ids: ['done'] },
   keepCard: {},
   partAnchor: {},
+  waitLock: { ids: ['waited', 'back_early'], measures: ['durationSec'] },
 };
 
 /**
@@ -154,4 +157,12 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     partField: { type: 'field', optional: true },
   },
   partAnchor: { partField: { type: 'field' } },
+  waitLock: {
+    minutes: { type: 'int', min: 1, max: 60 },
+    waiting: { type: 'copy' },
+    waitingShort: { type: 'copy' },
+    done: { type: 'copy' },
+    doneShort: { type: 'copy' },
+    next: { type: 'copy' },
+  },
 };

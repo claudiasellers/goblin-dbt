@@ -38,8 +38,8 @@ test("Me: Phase A areas; stale items first; set aside is restorable, never a del
   assert.match(me, /PHASE_A_AREAS: ProfileAreaId\[\] = \['about_me', 'my_body', 'my_words', 'my_patterns'\]/);
   assert.match(me, /A few things to check/);
   // My plans (ER-15's kept nightmare) shows once it holds something, so a kept version can be set aside.
-  assert.match(me, /\[\.\.\.PHASE_A_AREAS, 'my_plans'/);
-  assert.match(me, /if \(a\.id === 'my_plans'\) return a\.items\.length > 0;/);
+  assert.match(me, /\[\.\.\.PHASE_A_AREAS, 'my_people', 'my_plans'/);
+  assert.match(me, /if \(a\.id === 'my_plans' \|\| a\.id === 'my_people'\) return a\.items\.length > 0;/);
   assert.match(me, /restoreProfileItem/);
   assert.doesNotMatch(me, /delete/i);
   // "A few things to check" gathers only from the areas Me renders (a kept part's area isn't one yet).
@@ -47,7 +47,7 @@ test("Me: Phase A areas; stale items first; set aside is restorable, never a del
   assert.doesNotMatch(me, /me\.areas\.flatMap/);
   const still = read("src/components/me/StillTrue.tsx");
   assert.match(still, /if \(meta\.status === 'set_aside'\) return null;/, "resting still gets its check-back");
-  assert.match(read("src/services/profile.ts"), /export type MeItemLabel = 'ProfileFact' \| 'MyPattern' \| 'OwnLine' \| 'Part';/);
+  assert.match(read("src/services/profile.ts"), /export type MeItemLabel = 'ProfileFact' \| 'MyPattern' \| 'OwnLine' \| 'Part' \| 'Person';/);
   for (const label of ["Yes", "Not any more", "Change"]) assert.match(still, new RegExp(`>\\s*${label}\\s*<`));
   assert.match(read("src/components/me/PatternOfferCard.tsx"), /answerPatternOffer\(id, a\)/);
   assert.match(read("src/components/today/TodayStack.tsx"), /item\.kind === 'pattern_offer'/);

@@ -31,7 +31,7 @@ test("every interactive tool declares its close; client and server registries ag
     assert.ok(close.TOOL_CLOSE_KIND[id], `${id}: add it to src/lib/spine/close.ts`);
   }
   assert.deepEqual(close.TOOL_CLOSE_KIND, tools.SPINE_TOOLS);
-  assert.equal(close.closeKindFor("pause"), "urge");
+  assert.equal(close.closeKindFor("pause"), "urge_change");
   assert.equal(close.dirFor("regulation_down"), "down");
   assert.equal(close.dirFor("orienting"), "orient");
   assert.equal(tools.thenVsNowDirFor("urge"), null);

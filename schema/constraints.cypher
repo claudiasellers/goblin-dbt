@@ -62,6 +62,7 @@ CREATE CONSTRAINT dearman_describe_option_id IF NOT EXISTS FOR (dmdo:DearManDesc
 CREATE CONSTRAINT dearman_assert_option_id IF NOT EXISTS FOR (dmao:DearManAssertOption) REQUIRE dmao.id IS UNIQUE;
 CREATE CONSTRAINT dearman_reinforce_option_id IF NOT EXISTS FOR (dmro:DearManReinforceOption) REQUIRE dmro.id IS UNIQUE;
 CREATE CONSTRAINT dearman_barrier_id IF NOT EXISTS FOR (dmb:DearManBarrier) REQUIRE dmb.id IS UNIQUE;
+CREATE CONSTRAINT confidence_cue_id IF NOT EXISTS FOR (cc:ConfidenceCue) REQUIRE cc.id IS UNIQUE;
 CREATE CONSTRAINT dearman_barrier_coaching_id IF NOT EXISTS FOR (dmbc:DearManBarrierCoaching) REQUIRE dmbc.id IS UNIQUE;
 CREATE CONSTRAINT dearman_anchor_phrase_id IF NOT EXISTS FOR (dmap:DearManAnchorPhrase) REQUIRE dmap.id IS UNIQUE;
 CREATE CONSTRAINT dearman_negotiate_option_id IF NOT EXISTS FOR (dmno:DearManNegotiateOption) REQUIRE dmno.id IS UNIQUE;
@@ -155,6 +156,7 @@ CREATE CONSTRAINT part_message_key IF NOT EXISTS FOR (n:PartMessage) REQUIRE n.k
 CREATE CONSTRAINT trail_offer_key IF NOT EXISTS FOR (n:TrailOffer) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT part_link_key IF NOT EXISTS FOR (n:PartLink) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT den_snapshot_key IF NOT EXISTS FOR (n:DenSnapshot) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT person_key IF NOT EXISTS FOR (n:Person) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
 CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);

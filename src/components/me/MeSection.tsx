@@ -19,6 +19,7 @@ import { focusStepStart } from '../../lib/focusStart';
 import type { CopeAheadContent } from '../../data/copeAheadTypes';
 import { planCaFromKept, planLine } from '../../lib/copeAheadPlan';
 import { getCopeAheadContent } from '../../services/copeAhead';
+import { ForgetPerson } from './ForgetPerson';
 
 // Parts' callables load on demand, when a candidate is dismissed.
 const answerPartCandidate: typeof import('../../services/parts').answerPartCandidate = (req) => import('../../services/parts').then((m) => m.answerPartCandidate(req));
@@ -89,11 +90,11 @@ export function MeSection() {
   const ref = (i: MeItem) => ({ id: i.meta.id, label: i.label });
   // Parts of me joins (after My patterns, getMe's order) only with parts on and its copy signed off.
   const partsCopy = partsOn ? partsOfMeCopy(partsContent) : null;
-  // My plans (a rewritten nightmare, ER-15; a Cope Ahead plan, ER-05) shows once something is kept there; the order is getMe's.
-  const shown: ProfileAreaId[] = [...PHASE_A_AREAS, 'my_plans', ...(partsCopy ? ['my_parts' as const] : [])];
+  // My plans (a rewritten nightmare, ER-15; a Cope Ahead plan, ER-05) and My people (IE-03) show once something is kept there; the order is getMe's.
+  const shown: ProfileAreaId[] = [...PHASE_A_AREAS, 'my_people', 'my_plans', ...(partsCopy ? ['my_parts' as const] : [])];
   const areas = me.areas.filter((a) => shown.includes(a.id)).filter((a) => {
     if (a.id === 'my_patterns') return a.items.length > 0 || me.offers.length > 0;
-    if (a.id === 'my_plans') return a.items.length > 0;
+    if (a.id === 'my_plans' || a.id === 'my_people') return a.items.length > 0;
     return true;
   });
   // Only from the areas shown: an item of an area not rendered yet never surfaces here. Parts are left
@@ -127,7 +128,10 @@ export function MeSection() {
               Restore
             </button>
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan') && i.meta.status === 'active' && (
+          {i.label === 'Person' && (
+            <ForgetPerson itemRef={ref(i)} after={after} />
+          )}
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'cope_ahead_plan' || i.label === 'Person') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside
@@ -217,3 +221,4 @@ export function MeSection() {
     </div>
   );
 }
+

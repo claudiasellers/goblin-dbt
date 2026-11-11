@@ -108,7 +108,7 @@ MOVES = [
     ("tears_ok", "words", "Say “I might cry, and I want to keep going”", "say “I might cry, and I want to keep going”", ["hide", "blank"], False, None, [], ["conversation", "someone"]),
     ("no_sorry", "words", "Say “I understand” instead of sorry", "say “I understand” instead of sorry", ["hide"], False, None, [], ["conversation", "someone"]),
     ("notes", "action", "Look at the points I wrote down", "look at the points I wrote down", ["blank", "hide"], False, None, [], ["conversation", "work_school"]),
-    ("pause", "tool", "Pause", "open Pause", ["fight", "chase"], False, "pause", [], []),
+    ("pause", "tool", "Hold to wait", "open Hold to wait", ["fight", "chase"], False, "pause", [], []),
     ("five_senses", "tool", "5-4-3-2-1", "do 5-4-3-2-1", ["blank", "hide", "fight"], True, "five-senses", [], []),
     ("cool_down", "tool", "Circuit Breaker", "do Circuit Breaker", ["fight", "chase"], False, "cool-down", [], []),
     ("urge_surfing", "tool", "Urge Surfing", "use Urge Surfing", ["chase", "fight"], False, "urge-surfing", [], []),

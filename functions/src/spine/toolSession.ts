@@ -29,7 +29,7 @@ import { NOT_WHAT_HELPS } from './tools';
 import { projectRun } from '../skills/projections';
 
 /** Deep-link follow-ups that opening resolves: the resume link, the nightmare read-through, Ending's check-ins (IE-08) and Problem Solve's review (ER-12). */
-export const OPEN_RESOLVES = ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'ps_review'] as const;
+export const OPEN_RESOLVES = ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'hold_come_back', 'ps_review'] as const;
 
 /** Detail node labels by kind (a whitelist: the label is interpolated into Cypher). */
 export const DETAIL_LABELS: Record<DetailKind, string> = {
@@ -77,7 +77,7 @@ async function startTx(tx: ManagedTransaction, uid: string, email: string | null
      FOREACH (x IN CASE WHEN h IS NULL OR h = ts THEN [] ELSE [h] END | MERGE (ts)-[:HANDED_OFF_FROM]->(x))
      FOREACH (x IN CASE WHEN f IS NULL THEN [] ELSE [f] END | MERGE (ts)-[:RESOLVING]->(x))
       // Opening a "come back to this later" link is the resolution (Codex, PR #17), and so is opening a
-      // nightmare read-through (ER-15), a Problem Solve review (ER-12) or one of Ending's check-ins (IE-08) once
+      // nightmare read-through (ER-15), a Problem Solve review (ER-12), Hold to wait's come-back (DT-02) or one of Ending's check-ins (IE-08) once
       // its visit saves; other deep-link types are resolved by their own tool (oa_plan by Opposite Action).
       FOREACH (x IN CASE WHEN f IS NOT NULL AND f.type IN $openResolves AND ${GUARDS.FollowUp.update('f')} THEN [f] ELSE [] END |
        SET x.status = 'done', x.resolvedAt = datetime(), x.updatedAt = datetime())

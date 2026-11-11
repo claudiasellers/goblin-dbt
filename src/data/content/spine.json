@@ -1,7 +1,7 @@
 {
   "source": {
     "file": "graph-content-only-2026-11-11.json",
-    "exportedAt": "2026-11-11T02:21:59.188Z"
+    "exportedAt": "2026-11-11T18:31:50.578Z"
   },
   "content": {
     "version": "spine-v1",
@@ -27,22 +27,44 @@
           }
         },
         "pause": {
+          "regulation_down": {
+            "choices": [
+              {
+                "id": "worse",
+                "label": "Louder"
+              },
+              {
+                "id": "same",
+                "label": "About the same"
+              },
+              {
+                "id": "better",
+                "label": "Quieter"
+              },
+              {
+                "id": "much_better",
+                "label": "Much quieter"
+              }
+            ],
+            "dir": "down",
+            "question": "And the pull now, compared to when you started?"
+          },
           "urge": {
             "choices": [
               {
                 "id": "no",
-                "label": "Held off"
+                "label": "No"
+              },
+              {
+                "id": "partly",
+                "label": "Partly"
               },
               {
                 "id": "yes",
-                "label": "Went ahead"
-              },
-              {
-                "id": "not_yet",
-                "label": "Still deciding"
+                "label": "Yes"
               }
             ],
-            "question": "And the urge?"
+            "question": "Did you act on it?"
           }
         }
       },
@@ -379,6 +401,37 @@
           "time": "10:00"
         },
         "notification": "A check-in you asked for is ready."
+      },
+      {
+        "id": "hold_come_back",
+        "ownerModule": "dt",
+        "tier": "practice",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/pause?run={sourceSessionId}&at=step_back&followUp={followUpId}",
+        "staleAfterHours": 6,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Quieter now? Want to decide what to do with the pull?",
+          "title": "A little later"
+        },
+        "choices": [
+          {
+            "id": "not_now",
+            "label": "Not now",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "kind": "after",
+          "minutes": 10
+        },
+        "notification": "Something you asked to come back to is ready."
       },
       {
         "id": "nightmare_rehearse",

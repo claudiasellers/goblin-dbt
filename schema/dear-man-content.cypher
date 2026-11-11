@@ -379,3 +379,19 @@ SET tc.revealText = "Each step you just did maps to a framework called DEAR MAN 
     tc.confidentCoaching = "Even if you don't feel confident, your body can help. Before the conversation: shoulders back, feet on the ground, steady voice. It actually changes how you feel, not just how you look.",
     tc.confidentBarrierNoRight = "Appearing confident isn't about pretending. It's about honoring the fact that what you need matters.",
     tc.assertBarrierGuilty = "Asking for what you need is allowed. It doesn't make you demanding.";
+
+// ============================================================
+// 12. CONFIDENCE CUES (Appear confident: body and voice, IE-B2)
+// ============================================================
+UNWIND [
+  {id: 'cue_feet',      label: 'Feet flat on the ground',                   kind: 'body',  sortOrder: 1},
+  {id: 'cue_shoulders', label: 'Shoulders down and back',                   kind: 'body',  sortOrder: 2},
+  {id: 'cue_breath',    label: 'One slow breath out before you start',      kind: 'body',  sortOrder: 3},
+  {id: 'cue_voice',     label: 'An even voice, a little slower than usual', kind: 'voice', sortOrder: 4},
+  {id: 'cue_eyes',      label: 'Look at them, or close to them',            kind: 'body',  sortOrder: 5}
+] AS c
+MERGE (cue:ConfidenceCue {id: c.id})
+SET cue.label = c.label, cue.kind = c.kind, cue.sortOrder = c.sortOrder
+WITH cue
+MATCH (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (cue)-[:IMPLEMENTS]->(tc);

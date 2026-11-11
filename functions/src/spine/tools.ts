@@ -13,7 +13,7 @@ export interface SpineTool { module: SpineModule; closeKind: CloseKind }
 export const SPINE_TOOLS: Record<string, SpineTool> = {
   'cool-down': { module: 'dt', closeKind: 'regulation_down' },
   'five-senses': { module: 'dt', closeKind: 'orienting' },
-  'pause': { module: 'dt', closeKind: 'urge' },
+  'pause': { module: 'dt', closeKind: 'urge_change' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
   // Rebel without the wreckage (DT-11): "And the urge to blow it up?", the acted answer on the destructive urge.
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },

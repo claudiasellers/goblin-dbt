@@ -38,11 +38,16 @@ import { useProfileContext } from '../../hooks/useProfileContext';
 import { profileCache } from '../../lib/profileCache';
 import { anchorLead, copeExt, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
 import { focusLost, focusStepStart } from '../../lib/focusStart';
+import { PersonPicker } from '../../components/people/PersonPicker';
+import { PersonSafetyRoute } from '../../components/people/PersonSafetyRoute';
+import { PERSON_SAFETY_ROUTE_COPY, pickerCopy, withAnswer, type KeptPerson, type PickedPerson } from '../../lib/people';
+import { roleLabel } from '../../data/people';
 
 type Phase =
   | 'entry'
   | 'check'
   | 'handoff'
+  | 'person-safety'
   | 'scene'
   | 'cope'
   | 'describe'
@@ -152,6 +157,10 @@ export function DearMan() {
 
   // ── Scene data ──
   const [relationshipType, setRelationshipType] = useState<string | null>(null);
+  // Who it's with and their safety answer (IE-03 + D4): the picker on scene 0. `pickerKey` remounts it after
+  // *This is about someone else* on the safety route.
+  const [person, setPerson] = useState<PickedPerson | null>(null);
+  const [pickerKey, setPickerKey] = useState(0);
   const [situationType, setSituationType] = useState<string | null>(null);
   const [priorities, setPriorities] = useState<string[]>(priorityOptions.map(p => p.id));
   const [removedPriorities, setRemovedPriorities] = useState<string[]>([]);
@@ -224,7 +233,10 @@ export function DearMan() {
   /** Ask even if a reading is current (a flooded hand-off from Recover is re-asked once, D-07). */
   const [, setGateForce] = useState(false);
   /** Where the gate (and P2) goes next: the scene by default, or the step a resumed draft left on. */
-  const afterGate = useRef<DearManStep>(resumed?.token ? dearManStepFromId(resumed.token.stepId) : { phase: 'scene', sceneStep: 0 });
+  // A draft with no person (saved before the picker shipped, or while its copy was missing) resumes at scene 0, so
+  // the safety question is asked before any plan step (the draft's answers still fill the later steps).
+  const afterGate = useRef<DearManStep>(resumed?.token && (resumed.token.draft as DearManDraft).person
+    ? dearManStepFromId(resumed.token.stepId) : { phase: 'scene', sceneStep: 0 });
   const handoffs = useRef<HandoffResult[]>([]);
   // Claudia, 30 Sep: DEAR MAN doesn't open with the band question or the breathing hand-off. Planning
   // or debriefing a conversation is a thinking moment. Every route into 'check' goes straight on to
@@ -262,11 +274,13 @@ export function DearMan() {
     setWalkAwayId(d.walkAwayId); setWalkAwayCustom(d.walkAwayCustom);
     setCopeAheadPartId(d.copeAheadPartId ?? null);
     if (d.copeAheadPartId) session.setExt(copeExt(d.copeAheadPartId));
+    setPerson(d.person ?? null);
   };
   const draftOf = (): DearManDraft => dearManDraftOf({
     relationshipType, situationType, priorities, barriers, barriersCustom, describeId, describeCustom,
     feelings, feelingCustom, assertIds, assertDetails, assertCustom, reinforceIds, reinforceCustom,
     anchorPhrase, middleGroundId, middleGroundCustom, walkAwayId, walkAwayCustom, copeAheadPartId,
+    person: person && person.route !== 'safety' ? { ...person, route: person.route } : null,
   });
 
   // ── Load content from graph (on mount, and on explicit retry) ──
@@ -328,10 +342,12 @@ export function DearMan() {
   }, [hurtInPlay, partsHurts]);
   const hurtChip = useMemo(() => hurtFeelingChip(handoff?.hurtId, partsHurts, feelings), [handoff, partsHurts, feelings]);
 
-  // Cope ahead per part ("Who might show up in this conversation?"): read only with parts on. The
-  // profile read is DEAR MAN's declared slices (parts, kept lines, anchors; never partDetail).
+  // DEAR MAN's declared profile slices (never partDetail): the people the picker lists (IE-03), and for cope
+  // ahead per part ("Who might show up in this conversation?") parts, kept lines and anchors, empty with parts off.
   const partsOn = useUserProfile().profile.partsEnabled;
-  const copeProfile = useProfileContext('dear-man', { enabled: partsOn });
+  const copeProfile = useProfileContext('dear-man');
+  /** The people slice with this visit's answers folded in (src/lib/people.ts withAnswer): the slice doesn't reload. */
+  const [answeredPeople, setAnsweredPeople] = useState<KeptPerson[] | null>(null);
   /** The shipped parts content for the cope copy: null while loading, false when it couldn't load. */
   const [copeContent, setCopeContent] = useState<PartsContent | null | false>(null);
   useEffect(() => {
@@ -466,6 +482,7 @@ export function DearMan() {
       case 'handoff':
         setPhase('entry');
         break;
+      case 'person-safety': setPerson(null); setRelationshipType(null); setPhase('scene'); setSceneStep(0); setPickerKey(k => k + 1); break;
       case 'scene':
         if (sceneStep > 0) setSceneStep(sceneStep - 1);
         else setPhase('entry');
@@ -501,6 +518,12 @@ export function DearMan() {
 
   // ── Band gate helpers (A4-4) ──
   const sc = content.safetyCopy ?? {};
+  // The picker and its safety route ship together (DearManSafetyCopy); without either, the older role chips.
+  const routeCopy = PERSON_SAFETY_ROUTE_COPY.every(k => sc[k])
+    ? { safetyRouteHeading: sc.safetyRouteHeading!, safetyRouteBody: sc.safetyRouteBody!, safetyRouteEnding: sc.safetyRouteEnding!, safetyRouteBack: sc.safetyRouteBack! }
+    : null;
+  const peopleCopy = routeCopy ? pickerCopy(sc as Record<string, string>) : null;
+  const profileSettled = copeProfile.status !== 'loading';
   const hc = band.content?.handoff ?? null;
 
   const startPrep = () => {
@@ -617,7 +640,9 @@ export function DearMan() {
   };
 
   const getRelLabel = () =>
-    relationshipTypes.find(r => r.id === relationshipType)?.label?.toLowerCase() ?? 'them';
+    (relationshipTypes.find(r => r.id === relationshipType)?.label ?? roleLabel(relationshipType))?.toLowerCase() ?? 'them';
+  /** The plan's "with …": the name they gave, else "your {role}". */
+  const withWhom = person?.label ? person.label : `your ${getRelLabel()}`;
 
   const getPriorityLabel = (id: string) =>
     priorityOptions.find(p => p.id === id)?.label ?? id;
@@ -721,6 +746,7 @@ export function DearMan() {
         type: 'prep',
         relationshipType: relationshipType || '',
         situationType: situationType || '',
+        personId: person?.personId ?? null,
         priorities,
         barriers,
         barriersCustom,
@@ -772,6 +798,7 @@ export function DearMan() {
     setUnderneathIds([]); setReflectionData(null);
     setSelectedCopeAheadId(null); setReflectionLanded(null);
     setDebriefSaving(false); setDebriefSaved(false);
+    setPerson(null); setPickerKey(k => k + 1);
     setSaved(false); setSaveError(false);
     setHandoff(null); setShowCarry(true);
     setBandReading(null); setGateForce(false); setResumeNote(null);
@@ -844,6 +871,14 @@ export function DearMan() {
       );
     }
 
+    // ─── SAFETY ROUTE (IE-03 + D4): someone who might hurt or control them, or *rather not say* ───
+    if (phase === 'person-safety' && routeCopy) {
+      return (
+        <PersonSafetyRoute copy={routeCopy} label={person?.label ?? null}
+          onBack={() => { setPerson(null); setRelationshipType(null); setPickerKey(k => k + 1); setSceneStep(0); setPhase('scene'); }} />
+      );
+    }
+
     // ─── SCENE ───
     if (phase === 'scene') {
       return (
@@ -853,8 +888,22 @@ export function DearMan() {
           {sceneStep > 0 && <BackButton />}
           <SceneDots />
 
-          {/* Sub-step 0: Relationship type */}
-          {sceneStep === 0 && (
+          {/* Sub-step 0: Who it's with, and is it safe (IE-03 + D4). The older role chips stay for a graph without the copy. */}
+          {sceneStep === 0 && peopleCopy && profileSettled && (
+            <PersonPicker key={pickerKey} people={answeredPeople ?? copeProfile.slices?.people ?? null} signedIn={copeProfile.status !== 'signed-out' && copeProfile.status !== 'error'}
+              copy={peopleCopy}
+              onDone={(p) => {
+                setAnsweredPeople(withAnswer(answeredPeople ?? copeProfile.slices?.people ?? null, p, new Date().toISOString()));
+                setPerson(p);
+                setRelationshipType(p.role);
+                if (p.route === 'safety') setPhase('person-safety');
+                else setSceneStep(1);
+              }} />
+          )}
+          {sceneStep === 0 && peopleCopy && !profileSettled && (
+            <div className="h-24 animate-pulse rounded-xl bg-[var(--color-bg-card)]" aria-hidden="true" />
+          )}
+          {sceneStep === 0 && !peopleCopy && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
                 Who is this conversation with?
@@ -883,6 +932,9 @@ export function DearMan() {
               <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
                 What kind of conversation is this?
               </h3>
+              {person?.route === 'heads_up' && sc.badlyHeadsUp && (
+                <p className={`${secondaryText} p-3 rounded-xl bg-[var(--color-bg-secondary)]`} data-testid="person-heads-up">{sc.badlyHeadsUp}</p>
+              )}
               <div className="space-y-3">
                 {content.situationTypes.map(st => (
                   <button
@@ -1592,7 +1644,7 @@ export function DearMan() {
           )}
           <div className="p-6 rounded-xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]">
             <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-1">Your Conversation Plan</h3>
-            <p className="text-sm text-[var(--color-text-secondary)] mb-6">with your {getRelLabel()}</p>
+            <p className="text-sm text-[var(--color-text-secondary)] mb-6">with {withWhom}</p>
 
             <div className="mb-4">
               <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">The Situation</p>
@@ -1642,10 +1694,14 @@ export function DearMan() {
               {waText && <p className="text-[var(--color-text-primary)]"><span className="text-[var(--color-text-secondary)]">I won&apos;t compromise on:</span> {waText}</p>}
             </div>
 
-            <div className="mb-6">
-              <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">Body Reminder</p>
-              <p className="text-[var(--color-text-secondary)] text-sm">Shoulders back, steady voice, feet on the ground.</p>
-            </div>
+            {(content.confidenceCues?.length ?? 0) > 0 && (
+              <div className="mb-6" data-testid="confidence-cues">
+                <p className="text-xs font-semibold text-[var(--color-text-tertiary)] uppercase tracking-wider mb-1">Body Reminder</p>
+                <ul className="text-[var(--color-text-secondary)] text-sm space-y-0.5">
+                  {content.confidenceCues!.map(c => <li key={c.id}>{c.label}</li>)}
+                </ul>
+              </div>
+            )}
 
             <hr className="border-[var(--color-border-subtle)] mb-6" />
 
@@ -2334,7 +2390,7 @@ export function DearMan() {
               className="w-full py-3 px-4 rounded-lg bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] font-medium lift-primary">
               Prepare to try again
             </button>
-            <button onClick={() => navigate('/category/better-relationships')}
+            <button onClick={() => navigate('/')}
               className="w-full py-3 px-4 rounded-lg border border-[var(--color-border)] text-[var(--color-text-secondary)] font-medium lift-secondary">
               Done for now
             </button>

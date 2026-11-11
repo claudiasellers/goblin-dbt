@@ -63,7 +63,7 @@ test("lines: labels resolved by id; once and n times; then vs now and since; whe
   };
   assert.deepEqual(lib.partStatLines(stats, content, deps), {
     when: "Mostly evenings",
-    helped: { title: "What's helped it settle", lines: ["Pause helped 3 times", "Circuit Breaker helped once"] },
+    helped: { title: "What's helped it settle", lines: ["Hold to wait helped 3 times", "Circuit Breaker helped once"] },
     steps: null,
     felt: { title: "How you've felt toward it", line: "In July: tired of it. Lately: curious." },
   });

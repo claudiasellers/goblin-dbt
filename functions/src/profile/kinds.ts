@@ -11,7 +11,7 @@
  *
  * Pure: no firebase imports, so tests load it directly.
  */
-import { ValidationError, obj, str, strArray } from '../shared/validate';
+import { ValidationError, obj, oneOf, str, strArray } from '../shared/validate';
 import { isAskFreshField } from '../userdata/layers';
 import { HHMM } from './meta';
 import type { ProfileAreaId, SliceId } from './types';
@@ -99,10 +99,42 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // People (IE-03 minimal, docs/design/people.md): someone the person wants help with. `label` is the nickname they
+  // gave (own words, encrypted; "no real names needed"), `role` a presentation id (src/data/people.ts). `safe` /
+  // `risk` / `safeAskedAt` are the answer to "Is it safe to bring hard things up with them?" (D4: asked in the host
+  // flow the first time and after PEOPLE_SAFE_REASK_DAYS, or on *Things changed*); the person can leave them unset.
+  // A person kept without a label is never stored: the picker keeps nobody it can't name back to them.
+  person: {
+    kind: 'person', label: 'Person', rel: 'HAS_PERSON', area: 'my_people', slice: 'people',
+    owner: 'IE', many: true, maxItems: 30, editor: null, ownFields: ['label'],
+    validate: (v) => {
+      const o = obj(v);
+      for (const k of Object.keys(o)) if (!PERSON_FIELDS.includes(k)) throw new ValidationError('Unexpected field');
+      const label = str(o.label, { max: 40 }).trim();
+      if (!label) throw new ValidationError('A person needs something to call them');
+      const out: Record<string, unknown> = { label, role: oneOf(o.role, PERSON_ROLES) };
+      if (o.safe != null) out.safe = oneOf(o.safe, PERSON_SAFE);
+      if (o.risk != null) out.risk = oneOf(o.risk, PERSON_RISK);
+      if (o.safeAskedAt != null) out.safeAskedAt = str(o.safeAskedAt, { max: 30, pattern: ISO_DAY });
+      // A risk answer comes from the safety question's second step: only after *no* or *not sure*.
+      if (out.risk && out.risk !== 'none' && out.safe === 'yes') throw new ValidationError('risk needs safe no or unsure');
+      if ((out.safe || out.risk) && !out.safeAskedAt) throw new ValidationError('safeAskedAt goes with an answer');
+      return out;
+    },
+  },
 };
 
 /** A skill option id (scripts/skills: snake_case). */
 const OPTION_ID = /^[a-z][a-z0-9_]*$/;
+
+/** People (IE-03): the role chips (presentation ids, src/data/people.ts), the safety answers and their fields. */
+export const PERSON_ROLES = ['partner', 'parent', 'family', 'friend', 'boss', 'coworker', 'roommate', 'ex', 'other'] as const;
+export const PERSON_SAFE = ['yes', 'no', 'unsure'] as const;
+/** none: safe yes; invalidating: *it tends to go badly*; harm: *they might hurt or control me*; unstated: *rather not say*. */
+export const PERSON_RISK = ['none', 'invalidating', 'harm', 'unstated'] as const;
+const PERSON_FIELDS = ['label', 'role', 'safe', 'risk', 'safeAskedAt'];
+/** An ISO date or date-time (the client's clock; only compared against PEOPLE_SAFE_REASK_DAYS). */
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}(T[0-9:.]+Z?)?$/;
 
 /** The kind's definition, or a ValidationError (unknown kinds are refused, never guessed). */
 export function kindDef(kind: unknown): ProfileKindDef {

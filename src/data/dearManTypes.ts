@@ -36,6 +36,8 @@ export interface DearManContentResult {
   safetyGates?: DearManSafetyGates | null;
   /** DEAR MAN-specific gate copy (DearManSafetyCopy node); null on an older graph. */
   safetyCopy?: DearManSafetyCopy | null;
+  /** Appear confident: body and voice cues for the plan card, in order (ConfidenceCue); absent from an older server. */
+  confidenceCues?: Array<{ id: string; label: string; kind: string }>;
 }
 
 export interface DearManSafetyGates {
@@ -64,6 +66,31 @@ export interface DearManSafetyCopy {
   hotReady?: string;
   hotBodyCue?: string;
   hotCooled?: string;
+  /** People and safety (IE-B2): the picker and the safety question (src/components/people/PersonPicker.tsx). */
+  personWho?: string;
+  personNew?: string;
+  personNameLabel?: string;
+  personNameHint?: string;
+  personRoleLabel?: string;
+  personKeepLine?: string;
+  personNoNameLine?: string;
+  personSignedOutLine?: string;
+  personGoOn?: string;
+  personChanged?: string;
+  personChangedHint?: string;
+  safeQuestion?: string;
+  safeYes?: string;
+  safeNo?: string;
+  safeUnsure?: string;
+  riskQuestion?: string;
+  riskHarm?: string;
+  riskBadly?: string;
+  riskUnsaid?: string;
+  safetyRouteHeading?: string;
+  safetyRouteBody?: string;
+  safetyRouteEnding?: string;
+  safetyRouteBack?: string;
+  badlyHeadsUp?: string;
 }
 
 export interface SituationType {
@@ -156,6 +183,8 @@ export interface DearManSessionData {
   underneathIds?: string[];
   copeAheadId?: string;
   reflectionLanded?: 'yes' | 'sort_of' | 'not_really';
+  /** IE-03: the person picked (their Person id), when they were kept. The server refuses a prep for someone on the safety route. */
+  personId?: string | null;
 }
 
 export interface DearManDebriefContentResult {
