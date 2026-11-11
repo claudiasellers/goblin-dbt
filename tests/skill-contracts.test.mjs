@@ -523,6 +523,7 @@ except AssertionError as e:
   assert.equal(probe("st['plan']['secondary'] = 'keep_no'"), "refused", "nothing to skip");
   assert.equal(probe("st['keep']['secondary'] = 'nope'"), "refused", "not a copy key");
   assert.equal(probe("st['keep']['keep']['done'] = 'nope'"), "refused");
+  assert.equal(probe("st['keep']['fields'] = [{'id': 'kq', 'options': {'list': 'ask'}, 'max': 1, 'required': True}]"), "refused", "a required field: Not now would skip its answer");
 });
 
 test("emotionsFrom: a derived list of words in place of emotions; emotions when it resolves to nothing", () => {

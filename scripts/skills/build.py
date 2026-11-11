@@ -276,6 +276,9 @@ def check(skill):
         if "secondary" in s:
             assert s["kind"] == "ask" and s["secondary"] in copy, (w, "secondary: an ask step's quiet way on, a copy key")
             assert "keep" in s or "followUp" in s, (w, "secondary skips a keep or a follow-up: a step with neither needs only Next")
+            # Not now goes on without the step's answers, so the step may not require one: the next step's
+            # conditions would otherwise read an answer the quiet way never asked for (plan thread, 11 Nov).
+            assert not any(f.get("required") for f in s.get("fields", [])), (w, "secondary: a step with a required field has no quiet way on")
         if "keep" in s:
             k = s["keep"]
             assert s["kind"] == "ask" and isinstance(k.get("kind"), str), (w, "a keep runs on an ask step's primary tap", k)
