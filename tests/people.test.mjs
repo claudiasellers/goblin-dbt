@@ -143,6 +143,7 @@ test("DEAR MAN's prep opens with the picker; the safety route has the other-pers
   assert.match(dm, /personId: person\?\.personId \?\? null/);
   const route = read("src/components/people/PersonSafetyRoute.tsx");
   assert.match(route, /<CrisisBanner variant="other_person" \/>/);
+  assert.match(route, /<QuickExit \/>/, "the other person may be close by");
   assert.match(route, /\/tool\/ending-relationships\?frame=careful/);
   assert.doesNotMatch(route, /fast|cope-ahead|dear-man/, "nothing that composes words to them");
 });
@@ -187,4 +188,6 @@ test("a resumed draft keeps the person, and never a safety-route one", async () 
   assert.equal(isDearManDraft({ ...base, person: p }), true);
   assert.equal(isDearManDraft({ ...base, person: null }), true);
   assert.equal(isDearManDraft({ ...base, person: { ...p, risk: "harm", route: "safety" } }), false);
+  // A draft with no person resumes at the picker (scene 0), so the safety question comes before any plan step.
+  assert.match(read("src/pages/tools/DearMan.tsx"), /resumed\?\.token && \(resumed\.token\.draft as DearManDraft\)\.person\s+\? dearManStepFromId\(resumed\.token\.stepId\) : \{ phase: 'scene', sceneStep: 0 \}/);
 });

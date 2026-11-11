@@ -233,7 +233,10 @@ export function DearMan() {
   /** Ask even if a reading is current (a flooded hand-off from Recover is re-asked once, D-07). */
   const [, setGateForce] = useState(false);
   /** Where the gate (and P2) goes next: the scene by default, or the step a resumed draft left on. */
-  const afterGate = useRef<DearManStep>(resumed?.token ? dearManStepFromId(resumed.token.stepId) : { phase: 'scene', sceneStep: 0 });
+  // A draft with no person (saved before the picker shipped, or while its copy was missing) resumes at scene 0, so
+  // the safety question is asked before any plan step (the draft's answers still fill the later steps).
+  const afterGate = useRef<DearManStep>(resumed?.token && (resumed.token.draft as DearManDraft).person
+    ? dearManStepFromId(resumed.token.stepId) : { phase: 'scene', sceneStep: 0 });
   const handoffs = useRef<HandoffResult[]>([]);
   // Claudia, 30 Sep: DEAR MAN doesn't open with the band question or the breathing hand-off. Planning
   // or debriefing a conversation is a thinking moment. Every route into 'check' goes straight on to
@@ -477,7 +480,7 @@ export function DearMan() {
       case 'handoff':
         setPhase('entry');
         break;
-      case 'person-safety': setPhase('scene'); setSceneStep(0); setPickerKey(k => k + 1); break;
+      case 'person-safety': setPerson(null); setRelationshipType(null); setPhase('scene'); setSceneStep(0); setPickerKey(k => k + 1); break;
       case 'scene':
         if (sceneStep > 0) setSceneStep(sceneStep - 1);
         else setPhase('entry');
@@ -885,7 +888,7 @@ export function DearMan() {
 
           {/* Sub-step 0: Who it's with, and is it safe (IE-03 + D4). The older role chips stay for a graph without the copy. */}
           {sceneStep === 0 && peopleCopy && profileSettled && (
-            <PersonPicker key={pickerKey} people={copeProfile.slices?.people ?? null} signedIn={copeProfile.status !== 'signed-out'}
+            <PersonPicker key={pickerKey} people={copeProfile.slices?.people ?? null} signedIn={copeProfile.status !== 'signed-out' && copeProfile.status !== 'error'}
               copy={peopleCopy}
               onDone={(p) => {
                 setPerson(p);

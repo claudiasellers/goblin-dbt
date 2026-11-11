@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CrisisBanner } from '../safety/CrisisBanner';
+import { QuickExit } from '../safety/QuickExit';
 import { fillWho } from '../../lib/people';
 import { focusStepStart } from '../../lib/focusStart';
 import { linkButton, secondaryText } from '../tools/oppositeAction/styles';
@@ -10,7 +11,8 @@ import { linkButton, secondaryText } from '../tools/oppositeAction/styles';
  * not say*. No plan to bring things up with them is offered (plan C6.6, and saveDearManSession refuses one); the
  * other-person resources (CrisisBanner's other_person variant: it holds the numbers), and Ending a relationship
  * that's hurting you in its safety branch (`?frame=careful`), offered and never pushed. *This is about someone
- * else* goes back to the picker. Nothing locks: the person can leave by any route.
+ * else* goes back to the picker. Nothing locks: the person can leave by any route, Quick exit included (the other
+ * person may be close by).
  */
 export function PersonSafetyRoute({ copy, label, onBack }: {
   copy: { safetyRouteHeading: string; safetyRouteBody: string; safetyRouteEnding: string; safetyRouteBack: string };
@@ -22,6 +24,7 @@ export function PersonSafetyRoute({ copy, label, onBack }: {
   useEffect(() => { focusStepStart(root.current); }, []);
   return (
     <div ref={root} className="space-y-4" data-testid="person-safety-route">
+      <QuickExit />
       <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{fillWho(copy.safetyRouteHeading, label)}</h3>
       <p className={secondaryText}>{copy.safetyRouteBody}</p>
       <CrisisBanner variant="other_person" />

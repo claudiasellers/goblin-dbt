@@ -4,7 +4,7 @@
  * after the header).
  *
  * "Is it safe to bring hard things up with them?" yes, mostly · no · not sure; after *no* / *not sure*: "Is it more
- * that they might hurt or control you, or that it just goes badly?" (harm · invalidating · unstated). Harm and
+ * that they might hurt or control you, or that it tends to go badly?" (harm · invalidating · unstated). Harm and
  * *rather not say* are the safety route: no plan to confront them, the other-person resources, Ending offered.
  * Invalidating keeps every route open with a heads-up (open question 2 in the PRD, routed to Claudia).
  */

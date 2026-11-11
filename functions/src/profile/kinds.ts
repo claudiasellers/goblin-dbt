@@ -101,7 +101,7 @@ const OPTION_ID = /^[a-z][a-z0-9_]*$/;
 /** People (IE-03): the role chips (presentation ids, src/data/people.ts), the safety answers and their fields. */
 export const PERSON_ROLES = ['partner', 'parent', 'family', 'friend', 'boss', 'coworker', 'roommate', 'ex', 'other'] as const;
 export const PERSON_SAFE = ['yes', 'no', 'unsure'] as const;
-/** none: safe yes; invalidating: *it just goes badly*; harm: *they might hurt or control me*; unstated: *rather not say*. */
+/** none: safe yes; invalidating: *it tends to go badly*; harm: *they might hurt or control me*; unstated: *rather not say*. */
 export const PERSON_RISK = ['none', 'invalidating', 'harm', 'unstated'] as const;
 const PERSON_FIELDS = ['label', 'role', 'safe', 'risk', 'safeAskedAt'];
 /** An ISO date or date-time (the client's clock; only compared against PEOPLE_SAFE_REASK_DAYS). */

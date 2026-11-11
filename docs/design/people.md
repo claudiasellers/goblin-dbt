@@ -33,13 +33,13 @@ Is it safe to bring hard things up with {who}?
                     It tends to go badly ──────────► on to the plan, with the heads-up
 ```
 
-- **Safety route** (`PersonSafetyRoute`): "Planning a hard talk with {who} isn't the move right now." Your safety
-  comes first; `CrisisBanner variant="other_person"` (911, the DV Hotline, 988; still the only file with the
-  numbers); *Thinking about ending things with them* → `ending-relationships?frame=careful` (its safety branch,
+- **Safety route** (`PersonSafetyRoute`): "Planning a hard talk with {who} can wait. Your safety comes first."
+  Quick exit on the screen (the other person may be close by); `CrisisBanner variant="other_person"` (911, the DV Hotline, 988; still the only file with the
+  numbers); *Thinking about ending the relationship* (not "ending things", which reads as suicide under 988) → `ending-relationships?frame=careful` (its safety branch,
   whatever the person answers there); *This is about someone else* back to the picker. Nothing that composes words
   to them is offered (no FAST line, no Cope Ahead rehearsal, no plan). Nothing locks: the person can leave any way.
-- **Heads-up** (*it tends to go badly*): one line on the situation step: "With someone who often makes this go badly,
-  keep it short, written if you can, and about one thing." Every situation stays open (see *Open questions*).
+- **Heads-up** (*it tends to go badly*): one line on the situation step: "When talks with them tend to go badly, it can
+  help to keep it short, about one thing, and in writing if that suits." Every situation stays open (see *Open questions*).
 - **Signed out**: the picker opens on *Someone new*, says "This stays on this screen only", keeps nothing, and asks
   the safety question every time.
 
@@ -47,7 +47,7 @@ Is it safe to bring hard things up with {who}?
 
 | What | Layer | Written by | When |
 |---|---|---|---|
-| `Person` {label, role, safe, risk, safeAskedAt} | profile (`HAS_PERSON`) | `keepProfileItem` / `editProfileItem` (kind `person`) | Someone new, **named**, signed in: the screen shows "The app will remember {who} for next time: the name you gave and who they are to you. Nothing else." before the tap (C2: the tap is the yes). A kept person asked again: the new answer |
+| `Person` {label, role, safe, risk, safeAskedAt} | profile (`HAS_PERSON`) | `keepProfileItem` / `editProfileItem` (kind `person`) | Someone new, **named**, signed in: the screen shows "The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else." before the tap (C2: the tap is the yes). A kept person asked again: the new answer |
 | `Person.lastUsedAt` | server field on the item | `saveDearManSession` | A saved plan with them (orders the picker; no content) |
 | `DearManSession.personId` + `WITH_PERSON` | log → profile edge | `saveDearManSession` | A saved plan with a kept person |
 
@@ -56,7 +56,8 @@ Is it safe to bring hard things up with {who}?
 - The safety answer is profile, not ask-fresh: it is re-asked after `PEOPLE_SAFE_REASK_DAYS` (90) or on *Things
   changed*, never shown back as a label on the person, and never shown in Me.
 - Me → **My people** lists them (name and role), with *Set aside* (out of the picker, restorable) and a two-step
-  *Forget them* (`deleteProfileItem`: the person and their `WITH_PERSON` links go; plans keep the role). Export and
+  *Forget them* (`deleteProfileItem`: the person and their `WITH_PERSON` links go, and `personId` is cleared on
+  their plans; plans keep the role). Export and
   delete-everything cover `Person` through the layer registry.
 
 ## Rules (one seam)
@@ -67,10 +68,19 @@ Is it safe to bring hard things up with {who}?
 - `needsSafetyAsk({safe, safeAskedAt}, now)`: never answered, unreadable, or older than 90 days.
 - **Server-side as well as in the flow** (plan C6.6): `saveDearManSession` refuses a prep for a kept person whose
   stored risk is on the safety route (`failed-precondition`). An id that isn't the caller's own person is not linked.
+  This covers kept people only: a plan for *Someone new* has no id to check (the flow still routes it on screen),
+  which fits "nothing locks".
 
 The picker's steps are pure (`src/lib/people.ts`), rendered by `src/components/people/PersonPicker.tsx`, with its
 copy in `DearManSafetyCopy` (`scripts/dear-man/content.py` `SAFETY_COPY`). The picker renders only when every key
 ships (`pickerCopy`); an older graph keeps the old role chips.
+
+## Resume and errors
+
+- A resumed DEAR MAN draft carries the picked person (never one on the safety route). A draft with no person (from
+  before the picker) resumes at the picker, so the question comes before any plan step.
+- If the `people` slice fails to load, the picker opens on *Someone new* and keeps nothing this visit (no
+  duplicates); the safety question is still asked.
 
 ## Also in this PR
 

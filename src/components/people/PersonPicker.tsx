@@ -8,7 +8,7 @@ import type { PersonRisk, PersonSafe } from '../../lib/personSafety';
 import { editProfileItem, keepProfileItem } from '../../services/profile';
 import { profileCache } from '../../lib/profileCache';
 import { newId } from '../../lib/spine/ids';
-import { focusStepStart } from '../../lib/focusStart';
+import { focusLine, focusStepStart } from '../../lib/focusStart';
 import { choiceButton, choiceSelected, inputField, linkButton, primaryButton, secondaryText } from '../tools/oppositeAction/styles';
 
 /**
@@ -44,6 +44,9 @@ export function PersonPicker({ people, signedIn, copy, onDone, onBack }: {
     if (first.current) { first.current = false; return; }
     focusStepStart(root.current);
   }, [stage]);
+  // *Things changed with someone?* goes away when tapped, on the same stage: focus its hint.
+  const hint = useRef<HTMLParagraphElement>(null);
+  useEffect(() => { if (reask) focusLine(hint.current); }, [reask]);
 
   const finish = async (s: PersonSafe, risk: PersonRisk) => {
     const d = { ...draft, role: draft.role ?? 'other' };
@@ -86,7 +89,7 @@ export function PersonPicker({ people, signedIn, copy, onDone, onBack }: {
       <div ref={root} className="space-y-4" data-testid="person-picker" data-stage="list">
         {back(null)}
         <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">{copy.personWho}</h3>
-        {reask && <p className={secondaryText}>{copy.personChangedHint}</p>}
+        {reask && <p ref={hint} className={secondaryText}>{copy.personChangedHint}</p>}
         <div className="flex flex-wrap gap-2">
           {people.map((p) => (
             <button key={p.id} type="button" onClick={() => pickKept(p)}
@@ -124,7 +127,7 @@ export function PersonPicker({ people, signedIn, copy, onDone, onBack }: {
           <div className="flex flex-wrap gap-2">
             {PERSON_ROLES.map((r) => (
               <button key={r.id} type="button" aria-pressed={draft.role === r.id} onClick={() => setDraft({ ...draft, role: r.id })}
-                className={`min-h-11 px-4 py-2 rounded-full border transition-all ${draft.role === r.id
+                className={`min-h-11 px-4 py-2 rounded-full border motion-safe:transition-colors ${draft.role === r.id
                   ? 'bg-[var(--color-accent-fill)] text-[var(--color-on-accent)] border-transparent'
                   : 'border-[var(--color-border)] text-[var(--color-text-secondary)]'}`}>
                 {r.label}
