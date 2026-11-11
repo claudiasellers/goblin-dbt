@@ -48,7 +48,7 @@ test("the ride: PRD step 2's line, checks every 60-90 s, no digits or durations 
   const s = run(PULL());
   assert.equal(s.stepId, "ride");
   const step = M.stepOf(skill, "ride");
-  assert.equal(skill.copy[step.title], "Urges rise and fall. The job is not to act while it's high.");
+  assert.equal(M.copyText(ctx(), step.title, s), "Urges rise and fall. The job is not to act while it's high.");
   assert.ok(step.props.checkSec >= 60 && step.props.checkSec <= 90, "PRD: every 60-90 s");
   assert.equal(W.checkMs(step.props), step.props.checkSec * 1000);
   // No promised durations (PRD risk line): no copy line says how long, or that it will pass, except the round the
@@ -86,7 +86,7 @@ test("the trace is categorical samples in order: recorded as the step's out and 
   assert.deepEqual(s.answers.ride.ids, ["still_here", "bigger", "fading", "gone", "ended_gone"]);
   const t = run([out("read")], ctx(), s);
   assert.equal(t.stepId, "end");
-  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), t), "You watched it come down without acting on it.");
+  assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "end"), t), "You watched it come down.", "the close asks whether they acted; the card doesn't say");
   assert.deepEqual(offers(t), ["pros_cons"], "make a card for this pull (DT-10)");
   assert.ok(!M.stepOf(skill, "end").noClose, "the two-part close follows the end card");
 });
@@ -120,6 +120,7 @@ test("not now (H21): something else per pull, never food or drink; a five-minute
   const ids = (s) => M.optionGroups(ctx(), field, s.answers).flatMap((g) => g.options.map((o) => o.value));
   assert.ok(!ids(nn).includes("call"), "texting someone isn't the swap when sending is the pull");
   assert.ok(ids(nn).includes("phone"));
+  for (const o of skill.options.swap) assert.doesNotMatch(o.label, /\bcold\b|face/i, `cold on the face is First, the body's, after its self-check: ${o.label}`);
   const hurtish = run([...PULL("hit"), out("ended_not_now")]);
   assert.ok(ids(hurtish).includes("cold") && ids(hurtish).includes("squeeze"));
   for (const o of skill.options.swap)
@@ -131,7 +132,10 @@ test("not now (H21): something else per pull, never food or drink; a five-minute
   const after = run([out("done")], ctx(), r);
   assert.equal(after.stepId, "after_round");
   const passed = run([pick("after_round", "passed"), next], ctx(), after);
-  assert.equal(passed.stepId, "passed");
+  assert.equal(passed.stepId, "passed", "no checks before not now: nothing to draw");
+  const drawn = run([...PULL(), out("still_here", "ended_not_now"), pick("swap", "walk"), next, out("done"), pick("after_round", "passed"), next]);
+  assert.equal(drawn.stepId, "shape", "a ride before the round is drawn first");
+  assert.equal(run([out("read")], ctx(), drawn).stepId, "passed");
   assert.equal(M.handoffLine(ctx(), M.stepOf(skill, "passed"), passed), "You told it not now, and it eased.");
   const again = run([pick("after_round", "again"), next, out("done")], ctx(), after);
   assert.equal(again.stepId, "after_round2");
@@ -157,21 +161,44 @@ test("hurt myself: safety.open first, the banner on every screen, no ride when n
   const end = run([out("fading", "gone", "ended_gone"), out("read")], ctx(), ride);
   assert.equal(end.stepId, "hurt_end");
   assert.ok(M.stepOf(skill, "hurt_end").noClose, "no *did you act on it?* after hurt myself");
-  const nn = run([out("ended_not_now"), pick("swap", "cold"), next, out("done"), pick("after_round", "passed"), next], ctx(), ride);
+  const nn = run([out("ended_not_now"), pick("swap", "walk"), next, out("done"), pick("after_round", "passed"), next], ctx(), ride);
   assert.equal(nn.stepId, "hurt_end");
-  const big = run([out("bigger", "bigger", "ended_bigger"), pick("bigger", "hold"), next], ctx(), ride);
-  assert.deepEqual(offers(big), ["cool_down"], "after hurt myself: the body, never a phone-down wait");
+  // Getting bigger: are you still safe?, with the resources opened again, never a menu of exercises.
+  const big = run([out("bigger", "bigger", "ended_bigger")], ctx(), ride);
+  assert.equal(big.stepId, "safe_again");
+  assert.ok(M.opensSafety(ctx(), M.stepOf(skill, "safe_again"), big));
+  assert.equal(run([pick("safe_again", "no"), next], ctx(), big).stepId, "reach");
+  const sw = run([pick("safe_again", "safe"), next], ctx(), big);
+  assert.equal(sw.stepId, "switch");
+  assert.deepEqual(offers(sw), ["cool_down"], "after hurt myself: the body, never a phone-down wait");
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "switch"), sw), /Something for your body first/);
+  const r2 = run([out("ended_not_now"), pick("swap", "walk"), next, out("done"), pick("after_round", "still"), next, out("bigger", "bigger", "ended_bigger")], ctx(), ride);
+  assert.equal(r2.stepId, "safe_again", "the second ride re-checks too");
+  // The swaps for hurt myself: no cold, no squeeze (a sensation substitute), cool water on the hands only.
+  const nnHurt = run([out("ended_not_now")], ctx(), ride);
+  const f = M.shownFields(ctx(), M.stepOf(skill, "not_now"), nnHurt)[0];
+  assert.deepEqual(M.optionGroups(ctx(), f, nnHurt.answers).flatMap((g) => g.options.map((o) => o.value)), ["walk", "wash", "call", "just_wait"]);
 });
 
-test("flooded: the body or Hold to wait first, or ride now; nothing locks", () => {
+test("flooded: settle first (the body, or Hold to wait) or ride now, two choices (T8); hurt myself never rides flooded", () => {
   const c = ctx({ band: "flooded" });
   const s = run(PULL(), c);
   assert.equal(s.stepId, "heads_up");
+  assert.equal(skill.options.heads_up.length, 2, "T8: two choices at most");
   const body = run([pick("heads_up", "body"), next], c, s);
   assert.equal(body.stepId, "settle");
-  assert.deepEqual(offers(body, c), ["cool_down"]);
-  assert.deepEqual(offers(run([pick("heads_up", "hold"), next], c, s), c), ["pause"]);
+  assert.deepEqual(offers(body, c), ["cool_down", "pause"]);
   assert.equal(run([pick("heads_up", "now"), next], c, s).stepId, "ride");
+  const hurt = run([...PULL("hurt"), pick("safe", "safe"), next], c);
+  assert.equal(hurt.stepId, "settle", "as Hold to wait: the body first, no ride");
+  assert.deepEqual(offers(hurt, c), ["cool_down"]);
+  assert.match(M.handoffLine(c, M.stepOf(skill, "settle"), hurt), /your support is right here/);
+});
+
+test("leave: the ride says getting away to be safe isn't what it's for, before asking them not to act", () => {
+  const s = run(PULL("leave"));
+  assert.match(M.copyText(ctx(), M.stepOf(skill, "ride").title, s), /If you need to get away to be safe, go/);
+  assert.equal(M.copyText(ctx(), M.stepOf(skill, "ride").title, run(PULL("send"))), "Urges rise and fall. The job is not to act while it's high.");
 });
 
 test("every screen has talk to someone now but the reach card, whose banner is the way", () => {
@@ -182,10 +209,14 @@ test("every screen has talk to someone now but the reach card, whose banner is t
   }
 });
 
-test("routing: urge-surfing's rows are built, switched off and drafts until Claudia signs them off", () => {
+test("routing: urge-surfing's row is built, switched off and a draft until Claudia signs it off", () => {
   const src = readFileSync("scripts/recommendations/content.py", "utf8");
   assert.match(src, /"urge-surfing": "rebuilt on the skill runtime as Ride it out/);
   const cy = readFileSync("schema/recommended-for.cypher", "utf8");
-  const rows = cy.split("\n").filter((l) => /urge-surfing|urge_surfing/.test(l) && /RECOMMENDED_FOR/.test(l));
-  for (const l of rows) assert.doesNotMatch(l, /active: true/, l);
+  const rows = cy.split("\n").filter((l) => /\{id: "rf_[^"]*_urge-surfing"/.test(l));
+  assert.ok(rows.length >= 1, "the worried row is there");
+  for (const l of rows) {
+    assert.match(l, /active: false/, l);
+    assert.match(l, /review: "draft"/, l);
+  }
 });

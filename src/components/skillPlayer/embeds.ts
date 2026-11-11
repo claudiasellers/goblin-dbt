@@ -263,11 +263,15 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     /** Absent: no *not now* button (Ride it out's second ride). */
     notNow: { type: 'copy', optional: true },
     next: { type: 'copy' },
+    /** A first ride's field: this ride's object starts where that one left it. */
+    continueFrom: { type: 'field', optional: true },
   },
   waveTrace: {
     rideField: { type: 'field' },
     againField: { type: 'field', optional: true },
     downLine: { type: 'copy' },
+    /** The down line when the trace rose first (a *bigger* tap); else `downLine`. */
+    riseLine: { type: 'copy', optional: true },
     heldLine: { type: 'copy' },
     next: { type: 'copy' },
   },

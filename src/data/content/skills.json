@@ -20684,10 +20684,13 @@
           "safe_title": "Thank you for saying it. Right now, are you safe from acting on it?",
           "safe_hint": "You can answer honestly. Whatever you say, the support stays on the screen.",
           "heads_up_title": "Your body's loud right now. It can help to settle it first.",
-          "heads_up_hint": "You can do something for your body first, or ride it now.",
-          "settle_line": "Body first. Ride it out is here when you're ready.",
+          "heads_up_hint": "You can settle your body first, or ride it now.",
+          "settle_line": "Settle first. Ride it out is here when you're ready.",
+          "settle_hurt": "Your body's loud. Settle it first. If the pull comes back, your support is right here.",
+          "safe_again_title": "It's getting stronger. Right now, are you still safe from acting on it?",
           "ride_title": "Urges rise and fall. The job is not to act while it's high.",
-          "ride_again_title": "Back to watching it. You don't have to do anything with it.",
+          "ride_title_leave": "Urges rise and fall. If you need to get away to be safe, go. This is for when you don't.",
+          "ride_again_title": "Back to watching it.",
           "riding": "Watch it. You don't have to do anything with it.",
           "check_title": "How is it now?",
           "still_here": "Still here",
@@ -20702,9 +20705,9 @@
           "not_now_hint": "Pick one, or five minutes with nothing else.",
           "round_title": "Not now. Five minutes.",
           "round_walk": "Not now. A walk for five minutes, even round the room.",
-          "round_wash": "Not now. Cold water on your hands or face, then five minutes.",
-          "round_call": "Not now. Call or text someone for five minutes.",
-          "round_cold": "Not now. Hold something cold for five minutes.",
+          "round_wash": "Not now. Cool water on your hands, then five minutes.",
+          "round_call": "Not now. Call or text someone safe for five minutes.",
+          "round_cold": "Not now. Hold something cool for five minutes.",
           "round_squeeze": "Not now. Squeeze a pillow or a ball for five minutes.",
           "round_phone": "Not now. Phone in another room for five minutes.",
           "round_hands": "Not now. Give your hands a job for five minutes.",
@@ -20716,11 +20719,13 @@
           "after_round_title": "How is it now?",
           "after_round_hint": "Any answer is fine.",
           "shape_title": "Here's the wave you rode.",
-          "shape_down": "It rose, crested and came down.",
+          "shape_down": "It came down.",
+          "shape_rise": "It rose, crested and came down.",
           "shape_held": "You rode it as far as it went today.",
           "shape_next": "Next",
           "switch_line": "Let's change what you're doing. Your body first, or a way to wait.",
-          "end_gone": "You watched it come down without acting on it.",
+          "switch_line_hurt": "Let's change what you're doing. Something for your body first. Your support is still here.",
+          "end_gone": "You watched it come down.",
           "end_passed": "You told it not now, and it eased.",
           "end_line": "You stayed with it. That's the skill.",
           "hurt_end_line": "You stayed with it. The support is still here if it comes back.",
@@ -20749,12 +20754,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -20827,12 +20845,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -20865,17 +20896,30 @@
               {
                 "to": "reach",
                 "when": {
-                  "in": [
-                    "$a.safe",
-                    [
-                      "unsure",
-                      "no"
-                    ]
+                  "any": [
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe_again",
+                        [
+                          "unsure",
+                          "no"
+                        ]
+                      ]
+                    }
                   ]
                 }
               },
               {
-                "to": "heads_up",
+                "to": "settle",
                 "when": {
                   "eq": [
                     "$ctx.band",
@@ -20885,6 +20929,103 @@
               },
               {
                 "to": "ride",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "safe_again",
+            "kind": "ask",
+            "title": "safe_again_title",
+            "hint": "safe_hint",
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "hurt"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "safetyFirst": {
+              "all": []
+            },
+            "fields": [
+              {
+                "id": "safe_again",
+                "options": {
+                  "list": "safe"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "reach",
+                "when": {
+                  "any": [
+                    {
+                      "in": [
+                        "$a.safe",
+                        [
+                          "unsure",
+                          "no"
+                        ]
+                      ]
+                    },
+                    {
+                      "in": [
+                        "$a.safe_again",
+                        [
+                          "unsure",
+                          "no"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "switch",
                 "when": null
               }
             ],
@@ -20907,12 +21048,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -20942,12 +21096,9 @@
               {
                 "to": "settle",
                 "when": {
-                  "in": [
+                  "eq": [
                     "$a.heads_up",
-                    [
-                      "body",
-                      "hold"
-                    ]
+                    "body"
                   ]
                 }
               },
@@ -20963,7 +21114,20 @@
             "kind": "embed",
             "embed": "urgeWave",
             "answerAs": "ride",
-            "title": "ride_title",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.pull",
+                    "leave"
+                  ]
+                },
+                "key": "ride_title_leave"
+              },
+              {
+                "key": "ride_title"
+              }
+            ],
             "crisis": [
               {
                 "variant": "crisis",
@@ -20976,12 +21140,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21010,6 +21187,25 @@
               "notNow": "not_now"
             },
             "next": [
+              {
+                "to": "safe_again",
+                "when": {
+                  "all": [
+                    {
+                      "has": [
+                        "$a.ride.ids",
+                        "ended_bigger"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "hurt"
+                      ]
+                    }
+                  ]
+                }
+              },
               {
                 "to": "bigger",
                 "when": {
@@ -21092,12 +21288,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21157,12 +21366,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21405,12 +21627,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21461,12 +21696,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21507,6 +21755,47 @@
                       "eq": [
                         "$a.pull",
                         "hurt"
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "shape",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.after_round",
+                        "passed"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "still_here"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "fading"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "gone"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "bigger"
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21621,12 +21910,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21677,12 +21979,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21737,6 +22052,47 @@
                 }
               },
               {
+                "to": "shape",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.after_round2",
+                        "passed"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "still_here"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "fading"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "gone"
+                          ]
+                        },
+                        {
+                          "has": [
+                            "$a.ride.ids",
+                            "bigger"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
                 "to": "passed",
                 "when": {
                   "eq": [
@@ -21770,12 +22126,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21800,9 +22169,29 @@
               "fading": "fading",
               "gone": "gone",
               "bigger": "bigger",
-              "next": "ride_next"
+              "next": "ride_next",
+              "continueFrom": "ride"
             },
             "next": [
+              {
+                "to": "safe_again",
+                "when": {
+                  "all": [
+                    {
+                      "has": [
+                        "$a.again.ids",
+                        "ended_bigger"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.pull",
+                        "hurt"
+                      ]
+                    }
+                  ]
+                }
+              },
               {
                 "to": "switch",
                 "when": {
@@ -21909,12 +22298,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -21934,6 +22336,7 @@
               "rideField": "ride",
               "againField": "again",
               "downLine": "shape_down",
+              "riseLine": "shape_rise",
               "heldLine": "shape_held",
               "next": "shape_next"
             },
@@ -21944,6 +22347,25 @@
                   "eq": [
                     "$a.pull",
                     "hurt"
+                  ]
+                }
+              },
+              {
+                "to": "passed",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.after_round",
+                        "passed"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.after_round2",
+                        "passed"
+                      ]
+                    }
                   ]
                 }
               },
@@ -21970,12 +22392,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -22026,12 +22461,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -22101,12 +22549,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -22115,6 +22576,15 @@
             ],
             "noClose": true,
             "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.pull",
+                    "hurt"
+                  ]
+                },
+                "key": "switch_line_hurt"
+              },
               {
                 "when": {
                   "all": []
@@ -22170,12 +22640,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -22183,6 +22666,15 @@
               }
             ],
             "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.pull",
+                    "hurt"
+                  ]
+                },
+                "key": "settle_hurt"
+              },
               {
                 "when": {
                   "all": []
@@ -22205,41 +22697,18 @@
               {
                 "exit": "cool_down",
                 "when": {
-                  "any": [
-                    {
-                      "eq": [
-                        "$a.heads_up",
-                        "body"
-                      ]
-                    },
-                    {
-                      "eq": [
-                        "$a.pull",
-                        "hurt"
-                      ]
-                    }
-                  ]
+                  "all": []
                 }
               },
               {
                 "exit": "pause",
                 "when": {
-                  "all": [
-                    {
-                      "eq": [
-                        "$a.heads_up",
-                        "hold"
-                      ]
-                    },
-                    {
-                      "not": {
-                        "eq": [
-                          "$a.pull",
-                          "hurt"
-                        ]
-                      }
-                    }
-                  ]
+                  "not": {
+                    "eq": [
+                      "$a.pull",
+                      "hurt"
+                    ]
+                  }
                 }
               }
             ]
@@ -22261,12 +22730,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -22324,12 +22806,25 @@
                       ]
                     },
                     {
-                      "in": [
-                        "$a.safe",
-                        [
-                          "unsure",
-                          "no"
-                        ]
+                      "any": [
+                        {
+                          "in": [
+                            "$a.safe",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        },
+                        {
+                          "in": [
+                            "$a.safe_again",
+                            [
+                              "unsure",
+                              "no"
+                            ]
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -22458,10 +22953,6 @@
               "label": "My body first"
             },
             {
-              "value": "hold",
-              "label": "A way to wait first"
-            },
-            {
               "value": "now",
               "label": "Ride it now"
             }
@@ -22494,7 +22985,7 @@
             },
             {
               "value": "wash",
-              "label": "Cold water on my hands or face",
+              "label": "Cool water on my hands",
               "send": true,
               "check": true,
               "hurt": true,
@@ -22505,7 +22996,7 @@
             },
             {
               "value": "call",
-              "label": "Call or text someone",
+              "label": "Call or text someone safe",
               "check": true,
               "hurt": true,
               "hit": true,
@@ -22515,15 +23006,12 @@
             },
             {
               "value": "cold",
-              "label": "Hold something cold",
-              "hurt": true,
-              "hit": true,
-              "use": true
+              "label": "Hold something cool",
+              "hit": true
             },
             {
               "value": "squeeze",
               "label": "Squeeze a pillow or a ball",
-              "hurt": true,
               "hit": true
             },
             {

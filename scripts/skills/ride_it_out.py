@@ -42,11 +42,17 @@ COPY = {
     "safe_hint": "You can answer honestly. Whatever you say, the support stays on the screen.",
     # A carried flooded reading (PRD: flooded → DT-01 press or DT-02 hold first, then ride).
     "heads_up_title": "Your body's loud right now. It can help to settle it first.",
-    "heads_up_hint": "You can do something for your body first, or ride it now.",
-    "settle_line": "Body first. Ride it out is here when you're ready.",
+    "heads_up_hint": "You can settle your body first, or ride it now.",
+    "settle_line": "Settle first. Ride it out is here when you're ready.",
+    # Hurt myself with a flooded reading: no ride, the body first (as Hold to wait's `next_hurt_flooded`).
+    "settle_hurt": "Your body's loud. Settle it first. If the pull comes back, your support is right here.",
+    # Hurt myself and getting bigger: ask again before anything else (S9, C6.5).
+    "safe_again_title": "It's getting stronger. Right now, are you still safe from acting on it?",
     # The ride (urgeWave). PRD step 2's opening line, word for word: no durations.
     "ride_title": "Urges rise and fall. The job is not to act while it's high.",
-    "ride_again_title": "Back to watching it. You don't have to do anything with it.",
+    # Leave can be how someone gets safe (Gate 3, as DT-10's leave note): said before the ride asks them not to.
+    "ride_title_leave": "Urges rise and fall. If you need to get away to be safe, go. This is for when you don't.",
+    "ride_again_title": "Back to watching it.",
     "riding": "Watch it. You don't have to do anything with it.",
     "check_title": "How is it now?",
     "still_here": "Still here",
@@ -63,9 +69,9 @@ COPY = {
     "not_now_hint": "Pick one, or five minutes with nothing else.",
     "round_title": "Not now. Five minutes.",
     "round_walk": "Not now. A walk for five minutes, even round the room.",
-    "round_wash": "Not now. Cold water on your hands or face, then five minutes.",
-    "round_call": "Not now. Call or text someone for five minutes.",
-    "round_cold": "Not now. Hold something cold for five minutes.",
+    "round_wash": "Not now. Cool water on your hands, then five minutes.",
+    "round_call": "Not now. Call or text someone safe for five minutes.",
+    "round_cold": "Not now. Hold something cool for five minutes.",
     "round_squeeze": "Not now. Squeeze a pillow or a ball for five minutes.",
     "round_phone": "Not now. Phone in another room for five minutes.",
     "round_hands": "Not now. Give your hands a job for five minutes.",
@@ -78,13 +84,16 @@ COPY = {
     "after_round_hint": "Any answer is fine.",
     # The close's picture (waveTrace): the wave as a shape without axes.
     "shape_title": "Here's the wave you rode.",
-    "shape_down": "It rose, crested and came down.",
+    "shape_down": "It came down.",
+    # Only when the trace went up before it came down (Gate 3, T7: say what was seen).
+    "shape_rise": "It rose, crested and came down.",
     "shape_held": "You rode it as far as it went today.",
     "shape_next": "Next",
     # The switch (bigger twice): the body or Hold to wait, offered.
     "switch_line": "Let's change what you're doing. Your body first, or a way to wait.",
+    "switch_line_hurt": "Let's change what you're doing. Something for your body first. Your support is still here.",
     # The end card.
-    "end_gone": "You watched it come down without acting on it.",
+    "end_gone": "You watched it come down.",
     "end_passed": "You told it not now, and it eased.",
     "end_line": "You stayed with it. That's the skill.",
     # Hurt myself, safe for now: its own end card, with no "did you act on it?".
@@ -103,7 +112,7 @@ def a(field):
 ALWAYS = {"all": []}
 FLOODED = {"eq": ["$ctx.band", "flooded"]}
 HURT = {"eq": [a("pull"), "hurt"]}
-UNSAFE = {"in": [a("safe"), ["unsure", "no"]]}
+UNSAFE = {"any": [{"in": [a("safe"), ["unsure", "no"]]}, {"in": [a("safe_again"), ["unsure", "no"]]}]}
 SAFETY_LINK = {"exit": "safety_open", "label": "safety_open", "when": ALWAYS}
 CRISIS = [{"variant": "crisis", "when": {"any": [HURT, UNSAFE]}}]
 URGES = ["send", "check", "hurt", "hit", "leave", "use"]
@@ -121,9 +130,9 @@ def sampled(field):
     return {"any": [ended(field, s) for s in SAMPLES]}
 
 
+# T8: two choices at most on a flooded reading. The settle card offers Hold to wait beside the body.
 HEADS_UP = [
     ("body", "My body first"),
-    ("hold", "A way to wait first"),
     ("now", "Ride it now"),
 ]
 BIGGER = [
@@ -136,10 +145,12 @@ BIGGER = [
 EVERY = [*URGES, "other"]
 SWAPS = [
     ("walk", "A walk, even round the room", EVERY),
-    ("wash", "Cold water on my hands or face", EVERY),
-    ("call", "Call or text someone", ["check", "hurt", "hit", "leave", "use", "other"]),  # not send: texting is the pull
-    ("cold", "Hold something cold", ["hurt", "hit", "use"]),
-    ("squeeze", "Squeeze a pillow or a ball", ["hurt", "hit"]),
+    # Cool, not cold, and hands only: cold on the face is First, the body's, after its self-check (D4). No cold or
+    # squeeze for hurt myself (Gate 3: a sensation substitute keeps the pattern going) or use (bingeing is in it).
+    ("wash", "Cool water on my hands", EVERY),
+    ("call", "Call or text someone safe", ["check", "hurt", "hit", "leave", "use", "other"]),  # not send: texting is the pull
+    ("cold", "Hold something cool", ["hit"]),
+    ("squeeze", "Squeeze a pillow or a ball", ["hit"]),
     ("phone", "Put the phone in another room", ["send", "check"]),
     ("hands", "Give my hands a job", ["send", "check", "use", "other"]),
     ("just_wait", "Five minutes, nothing else", EVERY),
@@ -157,11 +168,15 @@ ROUND_TITLE = [*[{"when": {"eq": [a("swap"), v]}, "key": f"round_{v}"} for v, _,
                {"key": "round_title"}]
 
 
-def wave(step_id, answer_as, title, not_now, nxt):
+def wave(step_id, answer_as, title, not_now, nxt, leave_title=None):
     props = {"checkSec": 75, "maxChecks": 10, "checkTitle": "check_title", "riding": "riding",
              **{s: s for s in SAMPLES}, "next": "ride_next"}
     if not_now:
         props["notNow"] = "not_now"
+    else:
+        props["continueFrom"] = "ride"  # the second ride's object starts where the first left it
+    if leave_title:
+        title = [{"when": {"eq": [a("pull"), "leave"]}, "key": leave_title}, {"key": title}]
     return {"id": step_id, "kind": "embed", "embed": "urgeWave", "answerAs": answer_as, "title": title,
             "crisis": CRISIS, "links": [SAFETY_LINK], "props": props, "next": nxt}
 
@@ -184,6 +199,8 @@ def after_round(step_id, again_to):
             "fields": [{"id": step_id, "options": {"list": "after_round"}, "max": 1, "required": True,
                         "links": [SAFETY_LINK]}],
             "next": [{"when": {"all": [{"eq": [a(step_id), "passed"]}, HURT]}, "to": "hurt_end"},
+                     # It passed: the wave that came before the round is drawn first (PRD step 5), if there was one.
+                     {"when": {"all": [{"eq": [a(step_id), "passed"]}, sampled("ride")]}, "to": "shape"},
                      {"when": {"eq": [a(step_id), "passed"]}, "to": "passed"},
                      {"when": {"eq": [a(step_id), "again"]}, "to": again_to},
                      {"to": "ride2"}]}
@@ -201,22 +218,33 @@ STEPS = [
         "id": "safe", "kind": "ask", "title": "safe_title", "hint": "safe_hint", "crisis": CRISIS,
         "safetyFirst": ALWAYS,
         "fields": [{"id": "safe", "options": {"list": "safe"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
-        "next": [{"when": UNSAFE, "to": "reach"}, {"when": FLOODED, "to": "heads_up"}, {"to": "ride"}],
+        # Hurt myself with a flooded reading: the body first, no ride (as Hold to wait).
+        "next": [{"when": UNSAFE, "to": "reach"}, {"when": FLOODED, "to": "settle"}, {"to": "ride"}],
+    },
+    {
+        # Hurt myself and bigger twice: are you still safe?, with the resources opened again, before anything else.
+        "id": "safe_again", "kind": "ask", "title": "safe_again_title", "hint": "safe_hint", "crisis": CRISIS,
+        "safetyFirst": ALWAYS,
+        "fields": [{"id": "safe_again", "options": {"list": "safe"}, "max": 1, "required": True,
+                    "links": [SAFETY_LINK]}],
+        "next": [{"when": UNSAFE, "to": "reach"}, {"to": "switch"}],
     },
     {
         "id": "heads_up", "kind": "ask", "title": "heads_up_title", "hint": "heads_up_hint", "crisis": CRISIS,
         "fields": [{"id": "heads_up", "options": {"list": "heads_up"}, "max": 1, "required": True,
                     "links": [SAFETY_LINK]}],
-        "next": [{"when": {"in": [a("heads_up"), ["body", "hold"]]}, "to": "settle"}, {"to": "ride"}],
+        "next": [{"when": {"eq": [a("heads_up"), "body"]}, "to": "settle"}, {"to": "ride"}],
     },
     wave("ride", "ride", "ride_title", True, [
+        # Hurt myself getting bigger: are you still safe? first, never a choice of exercises (S9).
+        {"when": {"all": [ended("ride", "ended_bigger"), HURT]}, "to": "safe_again"},
         {"when": ended("ride", "ended_bigger"), "to": "bigger"},
         {"when": ended("ride", "ended_not_now"), "to": "not_now"},
         {"when": sampled("ride"), "to": "shape"},
         *to_end(),
-    ]),
+    ], leave_title="ride_title_leave"),
     {
-        # Bigger twice in a row (PRD step 3): change the modality, or keep riding.
+        # Bigger twice in a row (PRD step 3): change the modality, or keep riding. Never reached after hurt myself.
         "id": "bigger", "kind": "ask", "title": "bigger_title", "hint": "bigger_hint", "crisis": CRISIS,
         "fields": [{"id": "bigger", "options": {"list": "bigger"}, "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "next": [{"when": {"eq": [a("bigger"), "keep"]}, "to": "ride2"}, {"to": "switch"}],
@@ -236,11 +264,13 @@ STEPS = [
         "fields": [{"id": "after_round2", "options": {"list": "after_round", "where": {"not": {"eq": ["$opt.again", True]}}},
                     "max": 1, "required": True, "links": [SAFETY_LINK]}],
         "next": [{"when": {"all": [{"eq": [a("after_round2"), "passed"]}, HURT]}, "to": "hurt_end"},
+                 {"when": {"all": [{"eq": [a("after_round2"), "passed"]}, sampled("ride")]}, "to": "shape"},
                  {"when": {"eq": [a("after_round2"), "passed"]}, "to": "passed"}, {"to": "ride2"}],
     },
     # The second ride: no *not now* button (a round was had, or *keep riding* was picked); bigger twice again goes to
     # the switch, whatever was picked before.
     wave("ride2", "again", "ride_again_title", False, [
+        {"when": {"all": [ended("again", "ended_bigger"), HURT]}, "to": "safe_again"},
         {"when": ended("again", "ended_bigger"), "to": "switch"},
         {"when": {"any": [sampled("ride"), sampled("again")]}, "to": "shape"},
         *to_end(),
@@ -249,9 +279,12 @@ STEPS = [
         # The close's picture (PRD step 5): the wave as a shape without axes, and its line.
         "id": "shape", "kind": "embed", "embed": "waveTrace", "answerAs": "shape", "title": "shape_title",
         "crisis": CRISIS, "links": [SAFETY_LINK],
-        "props": {"rideField": "ride", "againField": "again", "downLine": "shape_down", "heldLine": "shape_held",
+        "props": {"rideField": "ride", "againField": "again", "downLine": "shape_down", "riseLine": "shape_rise",
+                  "heldLine": "shape_held",
                   "next": "shape_next"},
-        "next": to_end(),
+        "next": [{"when": HURT, "to": "hurt_end"},
+                 {"when": {"any": [{"eq": [a("after_round"), "passed"]}, {"eq": [a("after_round2"), "passed"]}]}, "to": "passed"},
+                 {"to": "end"}],
     },
     {
         # Not now worked: the round passed. Straight to the end card (the wave has nothing new to draw).
@@ -275,16 +308,16 @@ STEPS = [
         # Hold to wait's own hurt path ends there.
         "id": "switch", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "noClose": True,
-        "lines": [{"when": ALWAYS, "key": "switch_line"}],
+        "lines": [{"when": HURT, "key": "switch_line_hurt"}, {"when": ALWAYS, "key": "switch_line"}],
         "offers": [{"exit": "cool_down", "when": ALWAYS},
                    {"exit": "pause", "when": {"not": HURT}}],
         "done": "done", "links": [SAFETY_LINK],
     },
     {
         "id": "settle", "kind": "handoff", "complete": True, "noClose": True, "crisis": CRISIS,
-        "lines": [{"when": ALWAYS, "key": "settle_line"}],
-        "offers": [{"exit": "cool_down", "when": {"any": [{"eq": [a("heads_up"), "body"]}, HURT]}},
-                   {"exit": "pause", "when": {"all": [{"eq": [a("heads_up"), "hold"]}, {"not": HURT}]}}],
+        "lines": [{"when": HURT, "key": "settle_hurt"}, {"when": ALWAYS, "key": "settle_line"}],
+        # The body first (PRD: DT-01 press or DT-02 hold first); Hold to wait beside it, never after hurt myself.
+        "offers": [{"exit": "cool_down", "when": ALWAYS}, {"exit": "pause", "when": {"not": HURT}}],
         "done": "done", "links": [SAFETY_LINK],
     },
     {

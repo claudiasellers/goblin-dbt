@@ -174,7 +174,10 @@ Rules:
 2. **`out` is declared per embed** in the embed registry: field names, closed sets, counts and seconds
    only. Seconds held and counts are measurements of what happened, not ratings, and are allowed; a
    rating the person gives is never a number (an option id instead). DT-05's wave trace is categorical
-   samples (`still_here`, `fading`, `gone`, `bigger`) with offsets in seconds.
+   samples (`still_here`, `fading`, `gone`, `bigger`) with offsets in seconds. **Amended (DT-05, 11 Nov):** the
+   built trace is the samples in order with no offsets, since an embed's `measures` hold single values; offsets wait
+   on a `runtime:` PR (C7) that lets an embed declare a list measure (`offsetsSec`), and the cadence is the step's
+   `checkSec` until then.
 3. **Outcomes live on the spine, not in `ext.run`.** *Did it help* is the close's `thenVsNow`; *did you
    act on it* is `actedOnUrge`; both are ask-fresh fields already registered. A skill that needs both
    asks the new two-part close (C3a, `urge_change`). Mid-flow checks that steer the flow (DT-01's

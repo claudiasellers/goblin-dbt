@@ -226,11 +226,13 @@ EMBED_PROPS = {
         "bigger": {"type": "copy"},
         "notNow": {"type": "copy", "optional": True},
         "next": {"type": "copy"},
+        "continueFrom": {"type": "field", "optional": True},
     },
     "waveTrace": {
         "rideField": {"type": "field"},
         "againField": {"type": "field", "optional": True},
         "downLine": {"type": "copy"},
+        "riseLine": {"type": "copy", "optional": True},
         "heldLine": {"type": "copy"},
         "next": {"type": "copy"},
     },
