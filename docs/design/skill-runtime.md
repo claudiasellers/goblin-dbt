@@ -144,6 +144,11 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
 - **`safetyFirst`** (DT-02): a step's condition; when the run arrives at the step and it holds, the player opens
   `safety.open` over it before it can be answered (once per arrival, a resumed run landing on it included). `build.py` requires the
   `safety_open` exit and a crisis slot on the step. Hold to wait's *Hurt myself* → `safe` is the first user.
+- **The carried band** (DT-02): with no hand-off band in route state, the player reads the person's own
+  `band.current()` (≤ 20 min, client-only, R1) for a skill that accepts `band`; never from a link.
+- **Practice and `noClose`** (DT-02): a whole-screen embed's output other than `skipped` marks the session
+  practiced; leaving a `noClose` card also dismisses Today's outcome card for the session (`answerToolOutcome`
+  `dismissed`), so the question it didn't ask isn't asked later.
 - **Done as the button** (DT-02): a hand-off card with nothing to offer shows Done as its primary button, not a
   quiet link (Gate 2: easy to miss when flooded).
 - **Urge ids** (DT-02): an option's `urge` prop names the `ActionUrge` it stands for; the player sets the session's

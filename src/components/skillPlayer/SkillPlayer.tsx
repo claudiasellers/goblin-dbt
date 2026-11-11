@@ -3,10 +3,11 @@ import { useLocation, useNavigate, Link } from 'react-router-dom';
 import type { HandoffResult, ThenVsNow } from '../../data/capacityTypes';
 import { PROFILE_NEEDS, type ClientProfileConsumer } from '../../data/profileTypes';
 import { emotions, getEmotionById } from '../../data/emotions';
-import type { ExitDef, FieldDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
+import type { EmbedOutput, ExitDef, FieldDef, SkillDef, SkillsContent, StepDef } from '../../data/skillTypes';
 import { getToolById } from '../../data/tools';
 import { useToolSession } from '../../hooks/useToolSession';
 import { useProfileContext } from '../../hooks/useProfileContext';
+import { useBand } from '../../hooks/useBand';
 import { ToolSessionProvider } from '../../contexts/ToolSessionContext';
 import { newId } from '../../lib/spine/ids';
 import { dueAtFor } from '../../lib/spine/windows';
@@ -23,7 +24,7 @@ import {
 } from '../../lib/skillRuntime/machine';
 import { holds } from '../../lib/skillRuntime/conditions';
 import { getSkillRun, getSkillsContent } from '../../services/skills';
-import { getSpineContent, scheduleFollowUps } from '../../services/spine';
+import { answerToolOutcome, getSpineContent, scheduleFollowUps } from '../../services/spine';
 import { keepProfileItem } from '../../services/profile';
 import { TooMuchLink } from '../capacity/TooMuchLink';
 import { CrisisBanner } from '../safety/CrisisBanner';
@@ -132,9 +133,13 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   // Inline, the host owns the address: nothing is read from it.
   const [carried] = useState(() => (inline ? [] : carriedFrom(location.search, location.state)));
   // A link's `enterAt` is for the run it reopens (R9): with no `?run=` to reopen, it doesn't hold from the start.
+  const band = useBand();
   const [ctxIn, setCtxIn] = useState(() => {
     if (inline) return {};
-    const c = contextFrom(skill, location.search, location.state);
+    let c = contextFrom(skill, location.search, location.state);
+    // No hand-off carried a band: the person's own current reading (band.current(), ≤ 20 min, client-only, R1) is
+    // the carry (D1, C6.2), so a skill's flooded path is reachable from the Tools page and the check-in too.
+    if (!c.band) { const r = band.current(); if (r) c = contextIn(skill, { ...c, band: r.value }); }
     return UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
   });
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
@@ -263,7 +268,10 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     // A hand-off that asks no close (`noClose`: after a danger route) leaves at once, the session closed completed.
     if (stepOf(skill, st.stepId).noClose) {
       setQuietLeave(true);
-      void toolSession.close({ status: 'completed' });
+      // Not asked here, and not asked later either: Today's outcome card skips a session whose ask was dismissed.
+      void toolSession.close({ status: 'completed' })
+        .then((r) => (r ? answerToolOutcome(toolSession.id, { dismissed: true }) : null))
+        .catch(() => { /* signed out, or offline: nothing to dismiss */ });
       go(exit);
       return;
     }
@@ -437,12 +445,19 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
   const title = copyText(ctx, step.title, st, titleSlots(ctx, step, st));
   const crisis = crisisFor(ctx, step, st);
   const shown = useCallback(() => onShown(step.embed ?? step.id), [onShown, step.embed, step.id]);
+  const toolSession = useToolSession();
+  // A whole-screen embed done for real (a hold held, a wait waited, a card read: anything but `skipped`) is
+  // practice, so a visit left before its last card still counts as a rep.
+  const done = (output: EmbedOutput) => {
+    if (output.ids.length && !output.ids.includes('skipped')) toolSession.markPracticed();
+    send({ type: 'embedDone', output });
+  };
   if (!Embed) return null;
   return (<>
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
-      onShown={shown} onDone={(output) => send({ type: 'embedDone', output })} covered={covered} />
+      onShown={shown} onDone={done} covered={covered} />
     <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
   </>);
 }
