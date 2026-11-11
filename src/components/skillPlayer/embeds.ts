@@ -10,6 +10,7 @@ import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
 import { WaitLockEmbed } from './WaitLockEmbed';
 import { DebriefWhoEmbed } from './DebriefWhoEmbed';
+import { MessageComposer } from './MessageComposer';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -58,6 +59,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   debriefWho: DebriefWhoEmbed,
   prosConsCard: ProsConsCard,
   prosConsReplay: ProsConsReplay,
+  messageComposer: MessageComposer,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -72,6 +74,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   debriefWho: { ids: ['yes', 'a_bit', 'no', 'skip', 'general', 'not_shown'] },
   prosConsCard: { ids: ['read'], measures: ['durationSec'] },
   prosConsReplay: {},
+  messageComposer: { ids: ['copied', 'opened', 'dropped_sorry'] },
 };
 
 /**
@@ -120,6 +123,21 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     copyLabel: { type: 'copy', optional: true },
     copiedLabel: { type: 'copy', optional: true },
     selectedLabel: { type: 'copy', optional: true },
+    next: { type: 'copy' },
+  },
+  messageComposer: {
+    field: { type: 'field' },
+    opener: { type: 'field', optional: true },
+    reason: { type: 'field', optional: true },
+    alt: { type: 'field', optional: true },
+    repeatLabel: { type: 'copy', optional: true },
+    sorryLine: { type: 'copy', optional: true },
+    dropSorry: { type: 'copy', optional: true },
+    explainLine: { type: 'copy', optional: true },
+    copyLabel: { type: 'copy' },
+    copiedLabel: { type: 'copy' },
+    selectedLabel: { type: 'copy' },
+    openLabel: { type: 'copy', optional: true },
     next: { type: 'copy' },
   },
   rescriptCard: {

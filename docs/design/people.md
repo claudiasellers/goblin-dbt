@@ -101,6 +101,10 @@ ships (`pickerCopy`); an older graph keeps the old role chips.
   (IE-B2's second PR, [`dear-man-debrief.md`](dear-man-debrief.md)), which writes the outcome they count from; the
   `people` slice carries `refusalsValidation` (read by the prep's Let go offer only; Me shows no counts). `witness`, `status` (ending) and discreet mode wait for
   their owners (WMP, IE-08's follow-ups, the safety batch).
+- **Say no** (IE-B3, [`say-no.md`](say-no.md)) asks *Who's asking?* through the same picker, on the shared
+  `PersonFirstSkill` page (DEAR MAN's debrief uses it too); the safety route gets the safety screen with Say no's heading,
+  *it tends to go badly* comes in as the `heads_up` frame, and Say no writes its own `Interaction {kind: 'no'}`.
+  *I'm scared of what they'd do* inside the run sets `safetyRecheckAt`, as the debrief's *I don't feel safe with them*.
 
 ## Decided (Claudia, 11 Nov: "go with your recommendations for all")
 

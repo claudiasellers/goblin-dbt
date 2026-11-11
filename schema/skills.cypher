@@ -7648,3 +7648,539 @@ SET o:SkillOption, o += {skillId: "pros_cons", list: "keepit", value: "not_now",
 MATCH (s:Skill {id: "pros_cons"}), (o:SkillOption {id: "pros_cons:keepit:not_now"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "keepit", order: 53};
+
+// --- say_no (say-no-v1) ---
+MERGE (s:Skill {id: "say_no"})
+SET s += {toolId: "say-no", version: "say-no-v1", contentVersion: "skills-v1", start: "ask", ownMax: 140, emotionFields: [], accepts: ["personId", "frame", "band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"again_label\": \"Want me to ask how it went?\", \"alt_label\": \"Something else you could offer (optional)\", \"ask_hint\": \"You're allowed to say no. You don't owe anyone a script.\", \"ask_own\": \"Something else\", \"ask_title\": \"What are they asking for?\", \"compose_title\": \"Put your no together.\", \"compose_title_flooded\": \"Your body's running hot. Your no can still go, short and plain.\", \"compose_title_heads_up\": \"Keep it short, written, and about one thing.\", \"compose_title_self\": \"Put your no together. One reason at most, and no extra sorry.\", \"compose_title_warm\": \"Put your no together. A warm line first can help it land.\", \"cool_down\": \"Settle my body first\", \"copied\": \"Copied\", \"copy\": \"Copy\", \"done\": \"Done\", \"drop_sorry\": \"Take the sorry out\", \"enough_card_title\": \"Your line\", \"enough_hint\": \"You don't have to explain, or be nice about it. Pick the line you'd use.\", \"enough_line\": \"Your safety comes first. Somewhere safe, then your line. The people below can help, any time.\", \"enough_title\": \"No is enough.\", \"explain_line\": \"One reason is enough. A long one can sound like it's up for debate.\", \"f_cost_q\": \"Would saying yes cost you something you can't spare, like time, money or energy?\", \"f_fair_q\": \"Is it more than they have a right to ask of you?\", \"f_given_q\": \"Have you already given a lot in this relationship lately?\", \"f_later_q\": \"Would a yes now make things harder later, for you or for them?\", \"f_values_q\": \"Would saying yes go against what matters to you?\", \"firm_hint\": \"Yes, no or not sure. There's no right answer.\", \"firm_title\": \"A few questions to size it.\", \"gave_in_guilt\": \"If guilt is what pulled you back, checking the facts can help. Guilt about a fair no often doesn't fit.\", \"gave_in_line\": \"That happens. Next time, the same line twice.\", \"held_line\": \"You said no, and it held.\", \"held_line_proud\": \"You said no, and it held. That's the skill working.\", \"held_title\": \"Did it hold when they pushed?\", \"how_label\": \"How will you say it?\", \"level_firm\": \"Say no firmly, and hold it if they push.\", \"level_firm_hold\": \"Say no firmly, and don't reconsider.\", \"level_gentle\": \"Say no gently, or say not yet.\", \"level_hint\": \"From what you said.\", \"level_offer\": \"Say no, and offer something else if you want to.\", \"level_yes_part\": \"The facts lean toward yes, or yes to part of it. It's still your call.\", \"message_title\": \"Here's your no.\", \"next\": \"Next\", \"no_label\": \"Your no\", \"no_push_line\": \"You said no, and they took it. Not every no gets pushed on.\", \"not_said_line\": \"Not this time. Your line is still here when you want it.\", \"nudge_label\": \"Does that sit right?\", \"open_messages\": \"Open messages\", \"opener_label\": \"A warm line first (optional)\", \"own_line\": \"In my own words\", \"partly_line\": \"A maybe buys time. When you're ready, your no is still here.\", \"picker_personChanged\": \"Things changed with someone?\", \"picker_personChangedHint\": \"Pick who it is, and you'll be asked about them again.\", \"picker_personGoOn\": \"Go on\", \"picker_personKeepLine\": \"The app will remember {who} for next time: the name you gave, who they are to you, and your answer about safety. Nothing else.\", \"picker_personNameHint\": \"A nickname is fine. No real names needed.\", \"picker_personNameLabel\": \"What do you call them?\", \"picker_personNew\": \"Someone new\", \"picker_personNoNameLine\": \"Without a name, nothing about them is kept.\", \"picker_personRoleLabel\": \"Who are they to you?\", \"picker_personSignedOutLine\": \"This stays on this screen only.\", \"picker_personWhoSayNo\": \"Who's asking?\", \"picker_riskBadly\": \"It tends to go badly\", \"picker_riskHarm\": \"They might hurt or control me\", \"picker_riskQuestion\": \"Is it more that they might hurt or control you, or that it tends to go badly?\", \"picker_riskUnsaid\": \"I'd rather not say\", \"picker_safeNo\": \"No\", \"picker_safeQuestion\": \"Is it safe to bring hard things up with {who}?\", \"picker_safeUnsure\": \"Not sure\", \"picker_safeYes\": \"Yes, mostly\", \"picker_safetyRouteBack\": \"This is about someone else\", \"picker_safetyRouteBody\": \"The people below can help you think it through, any time, and you don't have to be sure.\", \"picker_safetyRouteEnding\": \"Thinking about ending the relationship\", \"picker_safetyRouteSayNoHeading\": \"With {who}, your safety comes first. Working out how to say no can wait.\", \"predict_title\": \"How do you think they'll take it?\", \"pressure_hint\": \"Pick any that fit.\", \"pressure_title\": \"What do you think happens if you say no?\", \"proud_hint\": \"However it went.\", \"proud_title\": \"Are you proud of how you handled it?\", \"reason_hint\": \"You don't have to justify it. One reason at most.\", \"reason_label\": \"One reason (optional)\", \"repeat_label\": \"If they push, say it again:\", \"said_title\": \"Did you say no?\", \"selected\": \"Selected. Copy it from here.\", \"sent_line\": \"Your no is ready. When you say it is up to you.\", \"sent_line_in_person\": \"Saying it out loud a couple of times first can help it come out steady.\", \"sent_line_push\": \"If they push, say the same line again. You don't need a new reason.\", \"sorry_line\": \"There's a sorry in there. You don't owe one for saying no.\", \"sure_label\": \"How sure are you?\", \"talk_now\": \"Talk to someone now\", \"why_hint\": \"Pick the one that matters most.\", \"why_title\": \"What matters most to you here?\"}", s.tablesJson = "{\"level\": {\"-1\": \"yes_part\", \"1.5\": \"gentle\", \"2.5\": \"offer\", \"3.5\": \"firm\", \"4.5\": \"firm_hold\"}}", s.deriveJson = "[{\"fields\": [\"f_cost\", \"f_values\", \"f_fair\", \"f_given\", \"f_later\"], \"kind\": \"count\", \"name\": \"level\", \"table\": \"level\", \"weights\": {\"firmer\": 1, \"no\": 0, \"not_sure\": 0.5, \"right\": 0, \"softer\": -1, \"yes\": 1}}, {\"fields\": [\"f_cost\", \"f_values\", \"f_fair\", \"f_given\", \"f_later\", \"nudge\"], \"kind\": \"count\", \"name\": \"final\", \"table\": \"level\", \"weights\": {\"firmer\": 1, \"no\": 0, \"not_sure\": 0.5, \"right\": 0, \"softer\": -1, \"yes\": 1}}]";
+MATCH (t:TherapyConcept {id: "dbt_saying_no"}), (s:Skill {id: "say_no"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "say_no"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "say_no"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "say_no:ask"})
+SET n += {skillId: "say_no", step: "ask", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"asking\", \"links\": [{\"exit\": \"cool_down\", \"label\": \"cool_down\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}], \"max\": 1, \"options\": {\"list\": \"asking\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"ask_own\", \"max\": 60}, \"required\": true}], \"hint\": \"ask_hint\", \"title\": \"ask_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:ask"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "say_no:pressure"})
+SET n += {skillId: "say_no", step: "pressure", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.pressure.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"pressure\", \"max\": 3, \"options\": {\"list\": \"pressure\"}, \"required\": true, \"swap\": true}], \"hint\": \"pressure_hint\", \"title\": \"pressure_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:pressure"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "say_no:enough"})
+SET n += {skillId: "say_no", step: "enough", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.pressure.ids\", \"scared\"]}}], \"fields\": [{\"id\": \"safe_line\", \"max\": 1, \"options\": {\"list\": \"safe_line\"}, \"required\": true}], \"hint\": \"enough_hint\", \"title\": \"enough_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:enough"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "say_no:safe_card"})
+SET n += {skillId: "say_no", step: "safe_card", kind: "embed", version: "say-no-v1"}, n.specJson = "{\"answerAs\": \"safe_copied\", \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"has\": [\"$a.pressure.ids\", \"scared\"]}}], \"embed\": \"boundaryLine\", \"props\": {\"copiedLabel\": \"copied\", \"copyLabel\": \"copy\", \"field\": \"safe_line\", \"next\": \"next\", \"selectedLabel\": \"selected\", \"shape\": \"line\"}, \"title\": \"enough_card_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:safe_card"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "say_no:safe_end"})
+SET n += {skillId: "say_no", step: "safe_end", kind: "handoff", version: "say-no-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"other_person\", \"when\": {\"all\": []}}], \"done\": \"done\", \"lines\": [{\"key\": \"enough_line\", \"when\": null}], \"noClose\": true}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:safe_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "say_no:why"})
+SET n += {skillId: "say_no", step: "why", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"why\", \"max\": 1, \"options\": {\"list\": \"why\"}, \"required\": true}], \"hint\": \"why_hint\", \"title\": \"why_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:why"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "say_no:firm"})
+SET n += {skillId: "say_no", step: "firm", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"f_cost\", \"label\": \"f_cost_q\", \"max\": 1, \"options\": {\"list\": \"factor\"}, \"required\": true}, {\"id\": \"f_values\", \"label\": \"f_values_q\", \"max\": 1, \"options\": {\"list\": \"factor\"}, \"required\": true}, {\"id\": \"f_fair\", \"label\": \"f_fair_q\", \"max\": 1, \"options\": {\"list\": \"factor\"}, \"required\": true}, {\"id\": \"f_given\", \"label\": \"f_given_q\", \"max\": 1, \"options\": {\"list\": \"factor\"}, \"required\": true}, {\"id\": \"f_later\", \"label\": \"f_later_q\", \"max\": 1, \"options\": {\"list\": \"factor\"}, \"required\": true}], \"hint\": \"firm_hint\", \"title\": \"firm_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:firm"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "say_no:level"})
+SET n += {skillId: "say_no", step: "level", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"nudge\", \"label\": \"nudge_label\", \"max\": 1, \"options\": {\"list\": \"nudge\"}, \"required\": true}], \"hint\": \"level_hint\", \"title\": [{\"key\": \"level_firm_hold\", \"when\": {\"eq\": [\"$d.level\", \"firm_hold\"]}}, {\"key\": \"level_firm\", \"when\": {\"eq\": [\"$d.level\", \"firm\"]}}, {\"key\": \"level_offer\", \"when\": {\"eq\": [\"$d.level\", \"offer\"]}}, {\"key\": \"level_gentle\", \"when\": {\"eq\": [\"$d.level\", \"gentle\"]}}, {\"key\": \"level_yes_part\", \"when\": {\"eq\": [\"$d.level\", \"yes_part\"]}}]}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:level"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "say_no:compose"})
+SET n += {skillId: "say_no", step: "compose", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"opener\", \"label\": \"opener_label\", \"max\": 1, \"options\": {\"list\": \"opener\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_line\", \"max\": 60}}, {\"id\": \"no\", \"label\": \"no_label\", \"max\": 1, \"options\": {\"list\": \"no\", \"where\": {\"any\": [{\"not\": {\"set\": \"$a.f_cost\"}}, {\"has\": [\"$opt.levels\", \"$d.final\"]}]}}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_line\", \"max\": 90}, \"required\": true}, {\"id\": \"reason\", \"label\": \"reason_label\", \"max\": 1, \"options\": {\"list\": \"reason\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"reason_hint\", \"max\": 90}}, {\"id\": \"alt\", \"label\": \"alt_label\", \"max\": 1, \"options\": {\"list\": \"alt\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"own_line\", \"max\": 60}}], \"title\": [{\"key\": \"compose_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"compose_title_heads_up\", \"when\": {\"eq\": [\"$ctx.frame\", \"heads_up\"]}}, {\"key\": \"compose_title_warm\", \"when\": {\"eq\": [\"$a.why\", \"them_ok\"]}}, {\"key\": \"compose_title_self\", \"when\": {\"eq\": [\"$a.why\", \"me_ok\"]}}, {\"key\": \"compose_title\"}]}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:compose"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "say_no:message"})
+SET n += {skillId: "say_no", step: "message", kind: "embed", version: "say-no-v1"}, n.specJson = "{\"answerAs\": \"sent_how\", \"embed\": \"messageComposer\", \"props\": {\"alt\": \"alt\", \"copiedLabel\": \"copied\", \"copyLabel\": \"copy\", \"dropSorry\": \"drop_sorry\", \"explainLine\": \"explain_line\", \"field\": \"no\", \"next\": \"next\", \"openLabel\": \"open_messages\", \"opener\": \"opener\", \"reason\": \"reason\", \"repeatLabel\": \"repeat_label\", \"selectedLabel\": \"selected\", \"sorryLine\": \"sorry_line\"}, \"title\": \"message_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:message"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "say_no:predict"})
+SET n += {skillId: "say_no", step: "predict", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"predict\", \"max\": 1, \"options\": {\"list\": \"predict\"}, \"required\": true}, {\"id\": \"sure\", \"label\": \"sure_label\", \"max\": 1, \"options\": {\"list\": \"sure\"}}, {\"id\": \"how\", \"label\": \"how_label\", \"max\": 1, \"options\": {\"list\": \"how\"}}], \"title\": \"predict_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:predict"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (n:SkillStep {id: "say_no:sent"})
+SET n += {skillId: "say_no", step: "sent", kind: "handoff", version: "say-no-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"fields\": [{\"id\": \"again\", \"label\": \"again_label\", \"max\": 1, \"options\": {\"list\": \"again\"}}], \"followUp\": {\"type\": \"no_outcome\", \"whenFrom\": \"again\"}, \"lines\": [{\"key\": \"sent_line_push\", \"when\": {\"eq\": [\"$a.predict\", \"push\"]}}, {\"key\": \"sent_line_in_person\", \"when\": {\"eq\": [\"$a.how\", \"in_person\"]}}, {\"key\": \"sent_line\", \"when\": null}]}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:sent"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 11};
+MERGE (n:SkillStep {id: "say_no:said"})
+SET n += {skillId: "say_no", step: "said", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"clears\": [\"said\", \"held\", \"proud\"], \"fields\": [{\"id\": \"said\", \"max\": 1, \"options\": {\"list\": \"said\"}, \"required\": true}], \"reopens\": {\"after\": \"sent\"}, \"title\": \"said_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:said"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 12};
+MERGE (n:SkillStep {id: "say_no:held"})
+SET n += {skillId: "say_no", step: "held", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"held\", \"max\": 1, \"options\": {\"list\": \"held\"}, \"required\": true}], \"title\": \"held_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:held"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 13};
+MERGE (n:SkillStep {id: "say_no:proud"})
+SET n += {skillId: "say_no", step: "proud", kind: "ask", version: "say-no-v1"}, n.specJson = "{\"fields\": [{\"id\": \"proud\", \"max\": 1, \"options\": {\"list\": \"proud\"}, \"required\": true}], \"hint\": \"proud_hint\", \"title\": \"proud_title\"}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:proud"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 14};
+MERGE (n:SkillStep {id: "say_no:held_end"})
+SET n += {skillId: "say_no", step: "held_end", kind: "handoff", version: "say-no-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"no_push_line\", \"when\": {\"eq\": [\"$a.held\", \"no_push\"]}}, {\"key\": \"held_line_proud\", \"when\": {\"eq\": [\"$a.proud\", \"yes\"]}}, {\"key\": \"held_line\", \"when\": null}]}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:held_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 15};
+MERGE (n:SkillStep {id: "say_no:gave_in"})
+SET n += {skillId: "say_no", step: "gave_in", kind: "handoff", version: "say-no-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"gave_in_line\", \"when\": null}, {\"key\": \"gave_in_guilt\", \"when\": null}]}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:gave_in"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 16};
+MERGE (n:SkillStep {id: "say_no:not_said"})
+SET n += {skillId: "say_no", step: "not_said", kind: "handoff", version: "say-no-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"not_said_line\", \"when\": null}]}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:not_said"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 17};
+MERGE (n:SkillStep {id: "say_no:partly"})
+SET n += {skillId: "say_no", step: "partly", kind: "handoff", version: "say-no-v1"}, n.specJson = "{\"complete\": true, \"done\": \"done\", \"lines\": [{\"key\": \"partly_line\", \"when\": null}]}";
+MATCH (s:Skill {id: "say_no"}), (n:SkillStep {id: "say_no:partly"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 18};
+MERGE (x:SkillExit {id: "say_no:cool_down"})
+SET x += {skillId: "say_no", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "say_no:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "say_no:fast"})
+SET x += {skillId: "say_no", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:fast"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "say_no:fast"}), (t:TherapyConcept {appToolId: "fast"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "say_no:check_the_facts"})
+SET x += {skillId: "say_no", exit: "check_the_facts", toolId: "check-the-facts", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:check_the_facts"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "say_no:check_the_facts"}), (t:TherapyConcept {appToolId: "check-the-facts"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "say_no:rehearse"})
+SET x += {skillId: "say_no", exit: "rehearse", toolId: "rehearse", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:rehearse"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "say_no:rehearse"}), (t:TherapyConcept {appToolId: "rehearse"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "say_no:ending_careful"})
+SET x += {skillId: "say_no", exit: "ending_careful", toolId: "ending-relationships", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{\"frame\": \"careful\"}";
+MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:ending_careful"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "say_no:ending_careful"}), (t:TherapyConcept {appToolId: "ending-relationships"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "say_no:safety_open"})
+SET x += {skillId: "say_no", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "say_no:done"})
+SET x += {skillId: "say_no", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (x:SkillExit {id: "say_no:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "say_no:ask"}), (b:SkillStep {id: "say_no:pressure"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:ask"}), (x:SkillExit {id: "say_no:cool_down"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "asking", label: "cool_down"}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "say_no:pressure"}), (b:SkillStep {id: "say_no:enough"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"any\": [{\"eq\": [\"$a.asking\", \"physical\"]}, {\"has\": [\"$a.pressure.ids\", \"scared\"]}]}";
+MATCH (a:SkillStep {id: "say_no:pressure"}), (b:SkillStep {id: "say_no:compose"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "say_no:pressure"}), (b:SkillStep {id: "say_no:why"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:enough"}), (b:SkillStep {id: "say_no:safe_card"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:safe_card"}), (b:SkillStep {id: "say_no:safe_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:safe_end"}), (x:SkillExit {id: "say_no:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
+MATCH (a:SkillStep {id: "say_no:safe_end"}), (x:SkillExit {id: "say_no:ending_careful"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"has\": [\"$a.pressure.ids\", \"scared\"]}}]";
+MATCH (a:SkillStep {id: "say_no:why"}), (b:SkillStep {id: "say_no:firm"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:firm"}), (b:SkillStep {id: "say_no:level"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:level"}), (b:SkillStep {id: "say_no:compose"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:compose"}), (b:SkillStep {id: "say_no:message"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:message"}), (b:SkillStep {id: "say_no:predict"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:predict"}), (b:SkillStep {id: "say_no:sent"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:sent"}), (x:SkillExit {id: "say_no:rehearse"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.how\", \"in_person\"]}}]";
+MATCH (a:SkillStep {id: "say_no:said"}), (b:SkillStep {id: "say_no:not_said"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.said\", \"no\"]}";
+MATCH (a:SkillStep {id: "say_no:said"}), (b:SkillStep {id: "say_no:partly"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"eq\": [\"$a.said\", \"partly\"]}";
+MATCH (a:SkillStep {id: "say_no:said"}), (b:SkillStep {id: "say_no:held"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:held"}), (b:SkillStep {id: "say_no:gave_in"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.held\", \"gave_in\"]}";
+MATCH (a:SkillStep {id: "say_no:held"}), (b:SkillStep {id: "say_no:proud"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:proud"}), (b:SkillStep {id: "say_no:held_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "say_no:held_end"}), (x:SkillExit {id: "say_no:fast"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.proud\", \"no\"]}}]";
+MATCH (a:SkillStep {id: "say_no:gave_in"}), (x:SkillExit {id: "say_no:rehearse"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": null}]";
+MATCH (a:SkillStep {id: "say_no:gave_in"}), (x:SkillExit {id: "say_no:check_the_facts"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": null}]";
+MERGE (o:SkillOption {id: "say_no:asking:time"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "time", label: "My time", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:time"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 0};
+MERGE (o:SkillOption {id: "say_no:asking:money"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "money", label: "Money", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:money"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 1};
+MERGE (o:SkillOption {id: "say_no:asking:favour"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "favour", label: "A favour", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:favour"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 2};
+MERGE (o:SkillOption {id: "say_no:asking:listen"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "listen", label: "To listen or help, again", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:listen"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 3};
+MERGE (o:SkillOption {id: "say_no:asking:physical"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "physical", label: "Something sexual or physical", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:physical"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 4};
+MERGE (o:SkillOption {id: "say_no:asking:values"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "values", label: "Something against my values", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:values"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 5};
+MERGE (o:SkillOption {id: "say_no:asking:plans"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "plans", label: "To change my plans", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:plans"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 6};
+MERGE (o:SkillOption {id: "say_no:asking:take_back"})
+SET o:SkillOption, o += {skillId: "say_no", list: "asking", value: "take_back", label: "To take back a yes I gave", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:asking:take_back"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "asking", order: 7};
+MERGE (o:SkillOption {id: "say_no:pressure:disappointed"})
+SET o:SkillOption, o += {skillId: "say_no", list: "pressure", value: "disappointed", label: "They'll be disappointed", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:pressure:disappointed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pressure", order: 8};
+MERGE (o:SkillOption {id: "say_no:pressure:angry"})
+SET o:SkillOption, o += {skillId: "say_no", list: "pressure", value: "angry", label: "They'll be angry", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:pressure:angry"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pressure", order: 9};
+MERGE (o:SkillOption {id: "say_no:pressure:push"})
+SET o:SkillOption, o += {skillId: "say_no", list: "pressure", value: "push", label: "They'll keep pushing", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:pressure:push"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pressure", order: 10};
+MERGE (o:SkillOption {id: "say_no:pressure:scared"})
+SET o:SkillOption, o += {skillId: "say_no", list: "pressure", value: "scared", label: "I'm scared of what they'd do", version: "say-no-v1"}, o.propsJson = "{\"danger\": \"other\"}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:pressure:scared"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pressure", order: 11};
+MERGE (o:SkillOption {id: "say_no:pressure:hard"})
+SET o:SkillOption, o += {skillId: "say_no", list: "pressure", value: "hard", label: "Nothing much. It's hard anyway", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:pressure:hard"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pressure", order: 12};
+MERGE (o:SkillOption {id: "say_no:why:keep_no"})
+SET o:SkillOption, o += {skillId: "say_no", list: "why", value: "keep_no", label: "Keeping my no", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:why:keep_no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "why", order: 13};
+MERGE (o:SkillOption {id: "say_no:why:them_ok"})
+SET o:SkillOption, o += {skillId: "say_no", list: "why", value: "them_ok", label: "Them still feeling okay about me", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:why:them_ok"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "why", order: 14};
+MERGE (o:SkillOption {id: "say_no:why:me_ok"})
+SET o:SkillOption, o += {skillId: "say_no", list: "why", value: "me_ok", label: "Me feeling okay about me", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:why:me_ok"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "why", order: 15};
+MERGE (o:SkillOption {id: "say_no:factor:yes"})
+SET o:SkillOption, o += {skillId: "say_no", list: "factor", value: "yes", label: "Yes", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:factor:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "factor", order: 16};
+MERGE (o:SkillOption {id: "say_no:factor:not_sure"})
+SET o:SkillOption, o += {skillId: "say_no", list: "factor", value: "not_sure", label: "Not sure", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:factor:not_sure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "factor", order: 17};
+MERGE (o:SkillOption {id: "say_no:factor:no"})
+SET o:SkillOption, o += {skillId: "say_no", list: "factor", value: "no", label: "No", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:factor:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "factor", order: 18};
+MERGE (o:SkillOption {id: "say_no:nudge:right"})
+SET o:SkillOption, o += {skillId: "say_no", list: "nudge", value: "right", label: "That fits", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:nudge:right"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "nudge", order: 19};
+MERGE (o:SkillOption {id: "say_no:nudge:softer"})
+SET o:SkillOption, o += {skillId: "say_no", list: "nudge", value: "softer", label: "A bit softer", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:nudge:softer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "nudge", order: 20};
+MERGE (o:SkillOption {id: "say_no:nudge:firmer"})
+SET o:SkillOption, o += {skillId: "say_no", list: "nudge", value: "firmer", label: "A bit firmer", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:nudge:firmer"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "nudge", order: 21};
+MERGE (o:SkillOption {id: "say_no:safe_line:safe_no"})
+SET o:SkillOption, o += {skillId: "say_no", list: "safe_line", value: "safe_no", label: "No.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:safe_line:safe_no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe_line", order: 22};
+MERGE (o:SkillOption {id: "say_no:safe_line:safe_not_doing"})
+SET o:SkillOption, o += {skillId: "say_no", list: "safe_line", value: "safe_not_doing", label: "I'm not doing that.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:safe_line:safe_not_doing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe_line", order: 23};
+MERGE (o:SkillOption {id: "say_no:safe_line:safe_leaving"})
+SET o:SkillOption, o += {skillId: "say_no", list: "safe_line", value: "safe_leaving", label: "I'm leaving now.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:safe_line:safe_leaving"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe_line", order: 24};
+MERGE (o:SkillOption {id: "say_no:opener:op_matters"})
+SET o:SkillOption, o += {skillId: "say_no", list: "opener", value: "op_matters", label: "I know this matters to you.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:opener:op_matters"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "opener", order: 25};
+MERGE (o:SkillOption {id: "say_no:opener:op_thanks"})
+SET o:SkillOption, o += {skillId: "say_no", list: "opener", value: "op_thanks", label: "Thanks for thinking of me.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:opener:op_thanks"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "opener", order: 26};
+MERGE (o:SkillOption {id: "say_no:opener:op_care"})
+SET o:SkillOption, o += {skillId: "say_no", list: "opener", value: "op_care", label: "I care about you.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:opener:op_care"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "opener", order: 27};
+MERGE (o:SkillOption {id: "say_no:no:no_plain"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_plain", label: "No.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"firm\", \"firm_hold\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_plain"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 28};
+MERGE (o:SkillOption {id: "say_no:no:no_not_doing"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_not_doing", label: "No, I'm not going to do that.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"firm\", \"firm_hold\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_not_doing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 29};
+MERGE (o:SkillOption {id: "say_no:no:no_doesnt_work"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_doesnt_work", label: "That doesn't work for me.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"offer\", \"firm\", \"firm_hold\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_doesnt_work"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 30};
+MERGE (o:SkillOption {id: "say_no:no:no_cant"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_cant", label: "I can't do that.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"gentle\", \"offer\", \"firm\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_cant"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 31};
+MERGE (o:SkillOption {id: "say_no:no:no_rather_not"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_rather_not", label: "I'd rather not.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"yes_part\", \"gentle\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_rather_not"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 32};
+MERGE (o:SkillOption {id: "say_no:no:no_not_this_time"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_not_this_time", label: "Not this time.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"yes_part\", \"gentle\", \"offer\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_not_this_time"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 33};
+MERGE (o:SkillOption {id: "say_no:no:no_not_yet"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_not_yet", label: "Let me think about it, and I'll get back to you.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"yes_part\", \"gentle\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_not_yet"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 34};
+MERGE (o:SkillOption {id: "say_no:no:no_part"})
+SET o:SkillOption, o += {skillId: "say_no", list: "no", value: "no_part", label: "I can do part of it, not all of it.", version: "say-no-v1"}, o.propsJson = "{\"levels\": [\"yes_part\", \"gentle\"]}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:no:no_part"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "no", order: 35};
+MERGE (o:SkillOption {id: "say_no:reason:r_time"})
+SET o:SkillOption, o += {skillId: "say_no", list: "reason", value: "r_time", label: "I don't have the time right now.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:reason:r_time"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reason", order: 36};
+MERGE (o:SkillOption {id: "say_no:reason:r_full"})
+SET o:SkillOption, o += {skillId: "say_no", list: "reason", value: "r_full", label: "I've got too much on.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:reason:r_full"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reason", order: 37};
+MERGE (o:SkillOption {id: "say_no:reason:r_sit"})
+SET o:SkillOption, o += {skillId: "say_no", list: "reason", value: "r_sit", label: "It doesn't sit right with me.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:reason:r_sit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reason", order: 38};
+MERGE (o:SkillOption {id: "say_no:reason:r_self"})
+SET o:SkillOption, o += {skillId: "say_no", list: "reason", value: "r_self", label: "I need to look after myself right now.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:reason:r_self"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "reason", order: 39};
+MERGE (o:SkillOption {id: "say_no:alt:alt_smaller"})
+SET o:SkillOption, o += {skillId: "say_no", list: "alt", value: "alt_smaller", label: "I could do something smaller.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:alt:alt_smaller"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "alt", order: 40};
+MERGE (o:SkillOption {id: "say_no:alt:alt_later"})
+SET o:SkillOption, o += {skillId: "say_no", list: "alt", value: "alt_later", label: "I could help another time.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:alt:alt_later"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "alt", order: 41};
+MERGE (o:SkillOption {id: "say_no:alt:alt_someone"})
+SET o:SkillOption, o += {skillId: "say_no", list: "alt", value: "alt_someone", label: "I could help you find someone else.", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:alt:alt_someone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "alt", order: 42};
+MERGE (o:SkillOption {id: "say_no:predict:well"})
+SET o:SkillOption, o += {skillId: "say_no", list: "predict", value: "well", label: "Fine", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:predict:well"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "predict", order: 43};
+MERGE (o:SkillOption {id: "say_no:predict:mixed"})
+SET o:SkillOption, o += {skillId: "say_no", list: "predict", value: "mixed", label: "Mixed", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:predict:mixed"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "predict", order: 44};
+MERGE (o:SkillOption {id: "say_no:predict:badly"})
+SET o:SkillOption, o += {skillId: "say_no", list: "predict", value: "badly", label: "Badly", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:predict:badly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "predict", order: 45};
+MERGE (o:SkillOption {id: "say_no:predict:push"})
+SET o:SkillOption, o += {skillId: "say_no", list: "predict", value: "push", label: "They'll keep pushing", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:predict:push"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "predict", order: 46};
+MERGE (o:SkillOption {id: "say_no:sure:sure"})
+SET o:SkillOption, o += {skillId: "say_no", list: "sure", value: "sure", label: "Sure", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:sure:sure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sure", order: 47};
+MERGE (o:SkillOption {id: "say_no:sure:think_so"})
+SET o:SkillOption, o += {skillId: "say_no", list: "sure", value: "think_so", label: "Think so", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:sure:think_so"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sure", order: 48};
+MERGE (o:SkillOption {id: "say_no:sure:not_sure"})
+SET o:SkillOption, o += {skillId: "say_no", list: "sure", value: "not_sure", label: "Not sure", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:sure:not_sure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "sure", order: 49};
+MERGE (o:SkillOption {id: "say_no:how:message"})
+SET o:SkillOption, o += {skillId: "say_no", list: "how", value: "message", label: "In a message", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:how:message"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "how", order: 50};
+MERGE (o:SkillOption {id: "say_no:how:in_person"})
+SET o:SkillOption, o += {skillId: "say_no", list: "how", value: "in_person", label: "In person", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:how:in_person"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "how", order: 51};
+MERGE (o:SkillOption {id: "say_no:again:today"})
+SET o:SkillOption, o += {skillId: "say_no", list: "again", value: "today", label: "This evening", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:again:today"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 52};
+MERGE (o:SkillOption {id: "say_no:again:tomorrow"})
+SET o:SkillOption, o += {skillId: "say_no", list: "again", value: "tomorrow", label: "Tomorrow", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:again:tomorrow"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 53};
+MERGE (o:SkillOption {id: "say_no:again:this_week"})
+SET o:SkillOption, o += {skillId: "say_no", list: "again", value: "this_week", label: "In a few days", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:again:this_week"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "again", order: 54};
+MERGE (o:SkillOption {id: "say_no:said:yes"})
+SET o:SkillOption, o += {skillId: "say_no", list: "said", value: "yes", label: "Yes", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:said:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "said", order: 55};
+MERGE (o:SkillOption {id: "say_no:said:partly"})
+SET o:SkillOption, o += {skillId: "say_no", list: "said", value: "partly", label: "I said maybe", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:said:partly"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "said", order: 56};
+MERGE (o:SkillOption {id: "say_no:said:no"})
+SET o:SkillOption, o += {skillId: "say_no", list: "said", value: "no", label: "Not yet", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:said:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "said", order: 57};
+MERGE (o:SkillOption {id: "say_no:held:yes"})
+SET o:SkillOption, o += {skillId: "say_no", list: "held", value: "yes", label: "Yes", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:held:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "held", order: 58};
+MERGE (o:SkillOption {id: "say_no:held:gave_in"})
+SET o:SkillOption, o += {skillId: "say_no", list: "held", value: "gave_in", label: "I gave in", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:held:gave_in"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "held", order: 59};
+MERGE (o:SkillOption {id: "say_no:held:no_push"})
+SET o:SkillOption, o += {skillId: "say_no", list: "held", value: "no_push", label: "They didn't push", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:held:no_push"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "held", order: 60};
+MERGE (o:SkillOption {id: "say_no:proud:yes"})
+SET o:SkillOption, o += {skillId: "say_no", list: "proud", value: "yes", label: "Yes", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:proud:yes"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "proud", order: 61};
+MERGE (o:SkillOption {id: "say_no:proud:sort_of"})
+SET o:SkillOption, o += {skillId: "say_no", list: "proud", value: "sort_of", label: "Sort of", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:proud:sort_of"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "proud", order: 62};
+MERGE (o:SkillOption {id: "say_no:proud:no"})
+SET o:SkillOption, o += {skillId: "say_no", list: "proud", value: "no", label: "No", version: "say-no-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "say_no"}), (o:SkillOption {id: "say_no:proud:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "proud", order: 63};

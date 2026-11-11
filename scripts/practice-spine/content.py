@@ -383,6 +383,22 @@ FOLLOW_UP_TYPES += [
         "choices": [{"id": "dismiss", "label": "No need", "status": "dismissed"}],
         "notification": "Ready to look back?",
     },
+    {
+        # Say no (IE-04, IE-B3; docs/design/say-no.md): the sent card's "Want me to ask how it went?" chips. Its card
+        # reopens that visit's run at *Did you say no?* (`said`, a `reopens` step, R9); opening it is the resolution
+        # (OPEN_RESOLVES). Session-bound: only a Say no visit schedules one. The copy names no one and says nothing
+        # about a refusal: a Today card or notification can be seen by the person it was for.
+        "id": "no_outcome", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/say-no?run={sourceSessionId}&at=said&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "19:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "19:00"}}},
+        "staleAfterHours": 120, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "How did it go?", "body": "A few taps, when you're ready."},
+        "choices": [{"id": "dismiss", "label": "No need", "status": "dismissed"}],
+        "notification": "How did it go?",
+    },
 ]
 
 # Reserved rows: authored now so the ids exist, enabled false until their owners ship.

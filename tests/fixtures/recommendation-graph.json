@@ -505,6 +505,17 @@
     "rejection"
    ]
   },
+  "dbt_saying_no": {
+   "appToolId": "say-no",
+   "name": "Saying no",
+   "description": "Refusing a request clearly and kindly, sized by the facts, with a line ready for when they push",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_stop": {
    "appToolId": "pause",
    "name": "STOP",

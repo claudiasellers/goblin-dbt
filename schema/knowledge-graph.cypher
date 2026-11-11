@@ -1441,6 +1441,18 @@ SET ending += {
 };
 
 
+// IE Handouts 5 and 8 (PRD IE-04): saying no, apart from asking, so Problem Solve and routing can target refusals
+// (docs/design/say-no.md).
+MERGE (saying_no:TherapyConcept {id: "dbt_saying_no"})
+SET saying_no += {
+  name: "Saying no",
+  description: "Refusing a request clearly and kindly, sized by the facts, with a line ready for when they push",
+  modality: "DBT",
+  module: "Interpersonal Effectiveness",
+  skill_type: "objectives_effectiveness"
+};
+
+
 // ============================================================
 // MINDFULNESS AS CROSS-MODALITY CONCEPT
 // ============================================================

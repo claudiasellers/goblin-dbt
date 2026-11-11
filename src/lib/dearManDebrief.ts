@@ -8,7 +8,8 @@
  *                                          └─ else ─► the skill, `$ctx.personId` when they are kept
  */
 import type { KeptPerson, PickedPerson } from './people';
-import { pickedKept, PERSON_PICKER_COPY, pickerCopy, type PersonPickerCopy } from './people';
+import { pickedKept, type PersonPickerCopy } from './people';
+import { personFirstPickerCopy, personFirstSafetyCopy, type PersonSafetyScreenCopy } from './personFirst';
 import { needsSafetyAsk } from './personSafety';
 
 const ID = /^[A-Za-z0-9_-]{1,64}$/;
@@ -41,20 +42,14 @@ export function debriefCtx(p: PickedPerson, partId: string | null): Record<strin
   return { personId: p.personId ?? 'none', ...(partId && ID.test(partId) ? { partId } : {}) };
 }
 
-/** The picker's copy from the skill's (`picker_<key>`, scripts/skills/dear_man_debrief.py), or null. */
+/** The picker's copy from the skill's (`picker_<key>`, scripts/skills/dear_man_debrief.py), or null: the debrief's own question. */
 export function debriefPickerCopy(copy: Readonly<Record<string, string>> | null | undefined): PersonPickerCopy | null {
-  if (!copy) return null;
-  // The question is the debrief's own ("Who was the conversation with?"); every other line is the prep's.
-  return pickerCopy(Object.fromEntries(PERSON_PICKER_COPY.map((k) => [k, copy[k === 'personWho' ? 'picker_personWhoDebrief' : `picker_${k}`]])));
+  return personFirstPickerCopy(copy, 'personWhoDebrief');
 }
 
-/** The safety screen's copy on the debrief: its own heading (thanks for telling, safety first), or null. */
-export function debriefSafetyCopy(copy: Readonly<Record<string, string>> | null | undefined):
-  { safetyRouteHeading: string; safetyRouteBody: string; safetyRouteEnding: string; safetyRouteBack: string } | null {
-  const k = (key: string) => copy?.[`picker_${key}`] ?? '';
-  const c = { safetyRouteHeading: k('safetyRouteDebriefHeading'), safetyRouteBody: k('safetyRouteBody'),
-    safetyRouteEnding: k('safetyRouteEnding'), safetyRouteBack: k('safetyRouteBack') };
-  return Object.values(c).every(Boolean) ? c : null;
+/** The safety screen's copy on the debrief: its own heading (safety first, looking back can wait), or null. */
+export function debriefSafetyCopy(copy: Readonly<Record<string, string>> | null | undefined): PersonSafetyScreenCopy | null {
+  return personFirstSafetyCopy(copy, 'safetyRouteDebriefHeading');
 }
 
 /** DEAR MAN's situation types where the ask was to be heard (validation), as the debrief's projection counts them. */
