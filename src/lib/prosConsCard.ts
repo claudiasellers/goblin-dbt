@@ -33,7 +33,7 @@ export function answerOf(picked: Readonly<Record<string, readonly string[]>>, id
 
 /** A kept card as the `prosCons` slice gives it (functions/src/profile/slices.ts). */
 export interface KeptCard {
-  id: string; pullIds?: string[]; longIds?: string[]; longOwn?: string | null; keepsIds?: string[]; keepsOwn?: string | null;
+  id: string; pullIds?: string[]; pullOwn?: string | null; longIds?: string[]; longOwn?: string | null; keepsIds?: string[]; keepsOwn?: string | null;
   givesIds?: string[]; givesOwn?: string | null;
 }
 
@@ -41,6 +41,13 @@ export interface KeptCard {
 export function cardFor(slice: unknown, pullId: string | undefined): KeptCard | null {
   if (!pullId || !Array.isArray(slice)) return null;
   return (slice as KeptCard[]).find((c) => c && Array.isArray(c.pullIds) && c.pullIds.includes(pullId)) ?? null;
+}
+
+/** Which pull a kept card is for, as the person sees it: their words, or the pull's label from the skill. */
+export function keptPull(card: KeptCard, skill: SkillDef): string | null {
+  if (card.pullOwn?.trim()) return card.pullOwn.trim();
+  const id = card.pullIds?.[0];
+  return (id && skill.options.pull?.find((o) => o.value === id)?.label) || null;
 }
 
 /** A kept card's lines, its ids named through the card's own skill (never a copy of its labels). */

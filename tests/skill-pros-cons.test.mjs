@@ -212,3 +212,12 @@ test("the card's label reads once, one full stop per line, the replay's title fi
     "My reasons not to: I mean it. Regret. It pulls because: Relief.");
   assert.equal(cardLabel({ title: "Your card", reasonsLabel: "R", reasons: ["A"], pro: null }), "Your card. R: A.");
 });
+
+test("Me shows which pull a kept card is for and its reasons, so cards can be told apart and own-words cards read", async () => {
+  const { keptPull, keptLines } = await importTs("src/lib/prosConsCard.ts");
+  assert.equal(keptPull({ id: "a", pullIds: ["send"] }, skill), "Send or say something");
+  assert.equal(keptPull({ id: "b", pullIds: [], pullOwn: "Quit by email" }, skill), "Quit by email");
+  assert.deepEqual(keptLines({ id: "b", pullOwn: "Quit by email", longIds: ["regret"] }, skill, "").reasons, ["I'd regret it later"]);
+  const me = readFileSync("src/components/me/MeSection.tsx", "utf8");
+  assert.match(me, /i\.meta\.kind === 'pros_cons' && i\.value\s*\?\s*<KeptProsCons value=\{i\.value\} \/>/);
+});

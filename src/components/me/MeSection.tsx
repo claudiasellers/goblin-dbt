@@ -9,6 +9,7 @@ import { profileCache } from '../../lib/profileCache';
 import { fillToolName } from '../../lib/spine/todayCard';
 import { StillTrue } from './StillTrue';
 import { QuietHoursEditor } from './QuietHoursEditor';
+import { KeptProsCons } from './KeptProsCons';
 import { PatternOfferCard } from './PatternOfferCard';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import { getPartsContent } from '../../services/partsContent';
@@ -103,7 +104,9 @@ export function MeSection() {
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="text-sm font-medium text-[var(--color-text-primary)]">{i.title}</p>
-            <p className="text-sm text-[var(--color-text-secondary)]">{fillToolName(i.summary, toolName)}</p>
+            {i.meta.kind === 'pros_cons' && i.value
+              ? <KeptProsCons value={i.value} />
+              : <p className="text-sm text-[var(--color-text-secondary)]">{fillToolName(i.summary, toolName)}</p>}
             {i.meta.status === 'set_aside' && <p className="text-xs text-[var(--color-text-tertiary)]">Set aside</p>}
           </div>
           {i.meta.status === 'set_aside' && (
