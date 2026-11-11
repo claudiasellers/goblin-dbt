@@ -15,6 +15,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'five-senses': { module: 'dt', closeKind: 'orienting' },
   'pause': { module: 'dt', closeKind: 'urge_change' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
+  // Pros & cons card (DT-10, docs/design/pros-cons.md): made in calm, so no close question ("how strong is it now?"
+  // means little here); its outcome is the replay's, inside Hold to wait's own close.
+  'pros-cons': { module: 'dt', closeKind: 'none' },
   // Rebel without the wreckage (DT-11): "And the urge to blow it up?", the acted answer on the destructive urge.
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },

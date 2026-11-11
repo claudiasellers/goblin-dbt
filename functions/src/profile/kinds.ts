@@ -70,6 +70,30 @@ export const PROFILE_KINDS: Record<string, ProfileKindDef> = {
       return out;
     },
   },
+  // Pros & cons card (DT-10, docs/design/pros-cons.md): the card the person kept on *Keep it in Me*, for one pull.
+  // The runtime's keep (R4: `<field>Ids` / `<field>Own`): the pull, reasons not to further ahead (`long`), what acting
+  // gives (`gives`; never asked for hurt myself), what holding off costs (`cost`) and gives (`keeps`). The field is
+  // `pull`, never `urge`: `urgeIds` is ask-fresh and would be stripped. Read back by the `prosCons` slice, so Hold to
+  // wait can replay it for the same pull.
+  pros_cons: {
+    kind: 'pros_cons', label: 'ProfileFact', rel: 'HAS_PROFILE_FACT', area: 'my_plans', slice: 'prosCons',
+    owner: 'DT', many: true, maxItems: 12, editor: null, ownFields: ['pullOwn', 'longOwn', 'givesOwn', 'costOwn', 'keepsOwn'],
+    validate: (v) => {
+      const o = obj(v);
+      const out: Record<string, unknown> = {};
+      const most = { pull: 1, long: 3, gives: 2, cost: 2, keeps: 2 } as const;
+      for (const f of Object.keys(most) as Array<keyof typeof most>) {
+        const ids = o[`${f}Ids`];
+        const own = o[`${f}Own`];
+        if (ids !== undefined) out[`${f}Ids`] = strArray(ids, { max: most[f], item: (x) => str(x, { max: 40, pattern: OPTION_ID }) });
+        if (own !== undefined) out[`${f}Own`] = str(own, { max: 90 });
+      }
+      for (const k of Object.keys(o)) if (!/^(pull|long|gives|cost|keeps)(Ids|Own)$/.test(k)) throw new ValidationError('Unexpected field');
+      if (!out.pullIds && !out.pullOwn) throw new ValidationError('A card is for one pull');
+      if (!out.longIds && !out.longOwn && !out.keepsIds && !out.keepsOwn) throw new ValidationError('Nothing to keep');
+      return out;
+    },
+  },
   // People (IE-03 minimal, docs/design/people.md): someone the person wants help with. `label` is the nickname they
   // gave (own words, encrypted; "no real names needed"), `role` a presentation id (src/data/people.ts). `safe` /
   // `risk` / `safeAskedAt` are the answer to "Is it safe to bring hard things up with them?" (D4: asked in the host

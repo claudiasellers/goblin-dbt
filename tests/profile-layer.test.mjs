@@ -36,7 +36,11 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS.today, ["quietHours", "parts"], "parts: the check-back card's name (part-checkback)");
   assert.deepEqual(types.PROFILE_NEEDS.witness, ["name", "ownLines", "savedLines"], "R16");
   assert.deepEqual(types.PROFILE_NEEDS["five-senses"], ["parts"], "the tag row on its close");
-  assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts"], "the tag row on its urge close");
+  assert.deepEqual(types.PROFILE_NEEDS.pause, ["parts", "prosCons"], "the tag row on its urge close; the kept card's replay (DT-10)");
+  // The kept pros & cons cards (DT-10): only Hold to wait replays them; Me reads every kept item through getMe.
+  for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
+    if (consumer !== "pause") assert.ok(!needs.includes("prosCons"), `${consumer} reads prosCons`);
+  }
   assert.deepEqual(types.PROFILE_NEEDS["urge-surfing"], ["parts"], "the tag row on its urge close");
   assert.deepEqual(types.PROFILE_NEEDS["check-the-facts"], ["parts"], "the tag row on its close");
   assert.deepEqual(types.SERVER_ONLY_CONSUMERS, ["witness", "me"]);
@@ -48,7 +52,7 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   // Parts: the slices exist; no tool reads them before it renders them. Meet a part reads them (it
   // renders them); Phase 3's tag row is the first render on other tools' closes: exactly the tools that
   // can show it read `parts`, and none of them partDetail (tests/part-tag.test.mjs pins TAG_ROW_TOOLS).
-  assert.deepEqual(types.SLICE_IDS.slice(-4), ["parts", "partDetail", "partAnchors", "den"]);
+  assert.deepEqual(types.SLICE_IDS.slice(-5), ["parts", "partDetail", "partAnchors", "den", "prosCons"]);
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
   // DEAR MAN's cope ahead (Phase 3) shows parts, their anchors and the kept lines to pick one from;
   // never partDetail (fears and jobs it never shows).

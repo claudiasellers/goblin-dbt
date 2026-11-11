@@ -444,7 +444,7 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
             const show = holds(s.showWhen, sc);
             return (
               <div key={`${s.embed}:${s.record}`} className="min-h-6">
-                {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} onShown={() => onShown(s.record)} /> : null}
+                {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
               </div>
             );
           })}
@@ -491,7 +491,7 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
-      onShown={shown} onDone={done} covered={covered} />
+      profile={ctx.profile ?? null} onShown={shown} onDone={done} covered={covered} />
     <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
   </>);
 }

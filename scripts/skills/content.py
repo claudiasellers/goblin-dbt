@@ -13,11 +13,12 @@ import problem_solve  # noqa: E402
 import ending_relationships  # noqa: E402
 import hold_to_wait  # noqa: E402
 import dear_man_debrief  # noqa: E402
+import pros_cons  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
 SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
-          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL]
+          ending_relationships.SKILL, hold_to_wait.SKILL, dear_man_debrief.SKILL, pros_cons.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -39,6 +40,10 @@ EMBEDS = {
     # DEAR MAN's debrief: who showed up? (src/lib/debriefWho.ts; parts on, a kept part, the lines shipped, else it moves
     # on at once). Reports the named form's answer; the general form is the tag row, which writes its own tag.
     "debriefWho": {"ids": ["yes", "a_bit", "no", "skip", "general", "not_shown"]},
+    # DT-10's card (plan C3b, DT-owned): the card from this run, read once (`read`, seconds open); and the kept card
+    # for this run's pull, replayed inside Hold to wait (reports nothing; its slot's record says it showed).
+    "prosConsCard": {"ids": ["read"], "measures": ["durationSec"]},
+    "prosConsReplay": {},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -109,6 +114,26 @@ EMBED_PROPS = {
         "done": {"type": "copy"},
         "doneShort": {"type": "copy"},
         "next": {"type": "copy"},
+    },
+    "prosConsCard": {
+        "reasonsField": {"type": "field"},
+        "moreField": {"type": "field"},
+        "proField": {"type": "field"},
+        "reasonsLabel": {"type": "copy"},
+        "proLabel": {"type": "copy"},
+        "fallback": {"type": "copy"},
+        "next": {"type": "copy"},
+    },
+    "prosConsReplay": {
+        "pullField": {"type": "field"},
+        "fromSkill": {"type": "id"},
+        "title": {"type": "copy"},
+        "reasonsLabel": {"type": "copy"},
+        "proLabel": {"type": "copy"},
+        "fallback": {"type": "copy"},
+        "noProFor": {"type": "id"},
+        "noteFor": {"type": "id"},
+        "note": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

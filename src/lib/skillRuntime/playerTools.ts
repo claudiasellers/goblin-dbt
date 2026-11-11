@@ -12,6 +12,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'nightmare-rescript': 'nightmare_rescript',
   'pause': 'hold_to_wait',
   'problem-solve': 'problem_solve',
+  'pros-cons': 'pros_cons',
 };
 
 /**

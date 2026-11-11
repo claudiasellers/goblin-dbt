@@ -359,7 +359,8 @@ STEPS = [
 
 EXITS = [
     {"id": "wise_mind", "toolId": "wise-mind"},
-    {"id": "pros_cons", "toolId": "pros-cons", "planned": True},
+    # Planned until DT-10 takes a stay-or-end frame: its urge card leans towards holding off, the wrong lean here.
+    {"id": "pros_cons", "toolId": "pros-cons", "query": {"frame": "stay_or_end"}, "planned": True},
     {"id": "cool_down", "toolId": "cool-down"},
     {"id": "pause", "toolId": "pause"},
     {"id": "dear_man", "toolId": "dear-man"},
