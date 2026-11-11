@@ -84,7 +84,7 @@ pick the danger type: with only own words, the parent's general problem type sta
 *Something bad might happen*, never safety or health), and *Talk to someone now* stays on the planning screens
 (`decompose`, `solutions`, `size`). A quiet
 *Talk to someone now* sits under own words on the problem and on the step (own words are never read), under a
-hopeless word (*hopeless*, *despair*, *depressed*, *worthless*, *helpless*, *powerless*) on the problem screen and on every hand-off the run ends on, and under *I'm exhausted* after
+hopeless word (*despair*, *depressed*, *worthless*, *helpless*, *powerless*) on the problem screen and on every hand-off the run ends on, and under *I'm exhausted* after
 *tried everything*. A carried flooded band goes to grounding first (C6.2). *This is too much right now* (P2) is under
 every screen, as on every skill.
 
