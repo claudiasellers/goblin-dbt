@@ -160,13 +160,14 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   // out), so those picks aren't read as options it no longer offers and dropped.
   const profileSettled = !needsProfile(skill.toolId) || profile.status !== 'loading';
   const resumed = useRef(false);
+  const reopenedRef = useRef(false);
   useEffect(() => {
     if (!resumeFrom || !profileSettled || resumed.current) return;
     resumed.current = true;
     getSkillRun(resumeFrom.run, skill.toolId)
       .then((rec) => {
         const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
-        if (r) setSt(r);
+        if (r) { reopenedRef.current = !!stepOf(skill, r.stepId).reopens; setSt(r); }
         else setCtxIn((c) => ctxAfterResume(c, false));
       })
       // Nothing to reopen: a fresh run, and a whole first visit (the link's enterAt was for the run it named).
@@ -190,7 +191,9 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   useEffect(() => {
     toolSession.setStep(st.stepId);
     toolSession.setExt({ run: runRecord(ctx, st) });
-    toolSession.setEmotionIds(runEmotionIds(ctx, st));
+    // A run reopened at a `reopens` step (a review afterwards) is a new visit about the same plan: the feeling
+    // was the first visit's, so it isn't counted again here.
+    toolSession.setEmotionIds(reopenedRef.current ? [] : runEmotionIds(ctx, st));
     const fresh = askFresh(ctx, st);
     toolSession.setFitsFacts((fresh.fitsFacts as Parameters<typeof toolSession.setFitsFacts>[0]) ?? null);
     if (stepOf(skill, st.stepId).complete) toolSession.markComplete();

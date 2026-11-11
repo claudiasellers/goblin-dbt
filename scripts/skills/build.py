@@ -291,6 +291,10 @@ def check(skill):
             if "when" in fu:
                 check_cond(fu["when"], fields, derived, w, accepts)
         assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))
+        if "clears" in s:
+            cl = s["clears"]
+            assert isinstance(cl, list) and cl and len(set(cl)) == len(cl), (w, "clears is a list of fields", cl)
+            assert set(cl) <= set(fields), (w, "clears names fields of the skill", cl)
         if s.get("reopens"):
             # R9: only a reopened run starts here, after the whole recorded path of a run that reached `after`. Nothing
             # leads to it, and it isn't the start, so a first visit never reaches it.

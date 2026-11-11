@@ -238,6 +238,13 @@ function validValues(ctx: RunContext, field: FieldDef, answers: Answers, sc: Sco
   return new Set(optionGroups(ctx, field, answers, sc).flatMap((g) => g.options.map((o) => o.value)));
 }
 
+/** The answers without these fields' (a step's `clears`). */
+function without(answers: Answers, fields: string[]): Answers {
+  const next = { ...answers };
+  for (const f of fields) delete next[f];
+  return next;
+}
+
 /** Drop picks a field no longer offers (a filter or group changed). Repeats until nothing changes. */
 function normalize(ctx: RunContext, answers: Answers): Answers {
   let cur = answers;
@@ -384,9 +391,10 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const t = step.next.find((x) => holds(x.when, scope(ctx, after)));
       if (!t) return s;
       const to = stepOf(ctx.skill, t.to);
+      const arrived = to.clears?.length ? { ...after, answers: normalize(ctx, without(after.answers, to.clears)) } : after;
       return {
-        ...after, stepId: to.id, path: [...after.path, to.id].slice(0, PATH_MAX),
-        offered: to.kind === 'handoff' ? offersFor(ctx, to, after) : after.offered,
+        ...arrived, stepId: to.id, path: [...arrived.path, to.id].slice(0, PATH_MAX),
+        offered: to.kind === 'handoff' ? offersFor(ctx, to, arrived) : arrived.offered,
       };
     }
     case 'back': {
@@ -445,7 +453,7 @@ export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { a
  * after it may hang on that answer), and only the steps up to the one reopened bring their answers back (a later
  * step is asked again, never pre-filled); a `reopens` step, which only a reopened run starts on, comes after the
  * whole recorded path of a run that reached its `after` step and brings every answer back but the ask-fresh ones
- * (null for a run that didn't get that far); a field that books a reminder (`followUp.whenFrom`) is never read back. A hand-off reopened works out its offers again. Null when the record isn't
+ * (null for a run that didn't get that far; a run reopened a second time, the step on its path already, still comes back after its whole path, and the step's `clears` drop its last loop's answers); a field that books a reminder (`followUp.whenFrom`) is never read back. A hand-off reopened works out its offers again. Null when the record isn't
  * this skill's version or `at` isn't a step it reached. `keepFresh` is for the review page only (dev/
  * skills-review.tsx, which shows every step from a made-up run); the app never passes it.
  */
@@ -460,7 +468,9 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   // ask about and doesn't reopen (null: a whole first visit). Its ask-fresh answers stay unread, and there is no
   // detour back to the step that asked one: the person tapped *How did it go?*, not the middle of the plan (build.py
   // keeps the reopens step and everything after it from reading an ask-fresh field).
-  const reopensAt = at && !path.includes(at) ? ctx.skill.steps.find((st) => st.id === at && st.reopens) : undefined;
+  // A run reopened a second time has the step on its path already (its last review, then a new plan): it still comes
+  // after the whole path, so the new plan's answers come back, and the step's `clears` drop its last loop's answers.
+  const reopensAt = at ? ctx.skill.steps.find((st) => st.id === at && st.reopens) : undefined;
   if (reopensAt && !path.includes(reopensAt.reopens!.after)) return null;
   const reopened = !!reopensAt;
   let stepId = reopensAt?.id ?? (at && path.includes(at) ? at : path[path.length - 1]);
@@ -486,8 +496,8 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
     const own = typeof a.valueOwn === 'string' && a.valueOwn.trim() ? a.valueOwn : null;
     answers[fieldId] = { ids, own };
   }
-  const kept = normalize(ctx, answers);
   const step = stepOf(ctx.skill, stepId);
+  const kept = normalize(ctx, reopened && step.clears?.length ? without(answers, step.clears) : answers);
   return {
     ...initialRun(ctx.skill), stepId, path: (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX), answers: kept,
     offered: step.kind === 'handoff' ? offersFor(ctx, step, { answers: kept }) : [],

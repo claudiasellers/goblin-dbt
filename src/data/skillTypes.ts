@@ -189,6 +189,13 @@ export interface StepDef {
    */
   reopens?: { after: string };
   /**
+   * Fields whose answers are dropped when the run arrives here by a forward move, or reopens here: the answers
+   * of a plan this step replaces, so they don't stand in for the new one. For two ways to the same thing, such as
+   * Problem Solve's guided step and own-words step (each clears the other's), and for a reopens step's own loop
+   * (its last answers are never read back as this time's).
+   */
+  clears?: string[];
+  /**
    * kind 'embed' or 'handoff': quiet links under the screen (an ask step's live on its fields). For a way out that
    * belongs on every screen, such as *Talk to someone now*, where the screen has no field to hang it on.
    */

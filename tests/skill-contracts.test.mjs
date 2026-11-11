@@ -528,6 +528,12 @@ test("reopens: only a run that reached `after` reopens there, after the whole pa
   assert.equal(m.resumeRun({ ...ctx, skill: F2 }, rec, "how").stepId, "check", "no such step: an ordinary resume, clamped as before");
   assert.equal(m.resumeRun(ctx, rec, "check").stepId, "check", "an ordinary resume still detours to the ask-fresh step");
   assert.equal(m.initialRun(R).stepId, "who", "a first visit starts at the start");
+  // Reopened again after a later plan: the step is on the path already, and it still comes after the whole path.
+  const again = { ...rec, path: [...rec.path, "how", "end"], answers: [...rec.answers, { fieldId: "went", optionIds: ["better"] }] };
+  assert.deepEqual(m.resumeRun(ctx, again, "how").path, [...again.path, "how"], "a second reopen keeps the later steps");
+  assert.deepEqual(m.resumeRun(ctx, again, "how").answers.went, { ids: ["better"], own: null }, "without clears, the last answer comes back");
+  const C = { ...R, steps: R.steps.map((x) => (x.id === "how" ? { ...x, clears: ["went"] } : x)) };
+  assert.equal(m.resumeRun({ ...ctx, skill: C }, again, "how").answers.went, undefined, "a reopens step's clears drop its last loop's answers");
   for (const sk of fixture.skills) {
     for (const st of sk.steps.filter((x) => x.reopens)) {
       assert.notEqual(sk.start, st.id, `${sk.id}.${st.id}: never the start`);
@@ -538,6 +544,23 @@ test("reopens: only a run that reached `after` reopens there, after the whole pa
   const build = read("scripts/skills/build.py");
   assert.match(build, /no step leads to a reopens step/, "build.py refuses a jump into a reopens step");
   assert.match(build, /the reopens step and the steps after it never read an ask-fresh field/, "build.py refuses an ask-fresh read from the reopen on");
+});
+
+test("clears: arriving at a step by a forward move drops the answers it names; other steps keep them", () => {
+  const C = { ...F2, steps: F2.steps.map((x) => (x.id === "check" ? { ...x, clears: ["line"] } : x)) };
+  const ctx = { ...f2Ctx(null), skill: C };
+  const s0 = { ...m.initialRun(C), answers: { line: { ids: ["l2"], own: null } } };
+  const atWhen = m.runNext(ctx, s0, { type: "next" });
+  assert.equal(atWhen.stepId, "when");
+  assert.deepEqual(atWhen.answers.line, { ids: ["l2"], own: null }, "a step without clears keeps it");
+  const atCheck = m.runNext(ctx, atWhen, { type: "next" });
+  assert.equal(atCheck.stepId, "check");
+  assert.equal(atCheck.answers.line, undefined, "cleared on arrival");
+  for (const sk of fixture.skills) {
+    const fields = new Set(sk.steps.flatMap((x) => [...(x.fields ?? []).map((f) => f.id), ...(x.answerAs ? [x.answerAs] : [])]));
+    for (const st of sk.steps.filter((x) => x.clears)) for (const f of st.clears) assert.ok(fields.has(f), `${sk.id}.${st.id}: clears ${f}, a field of the skill`);
+  }
+  assert.match(read("scripts/skills/build.py"), /clears names fields of the skill/);
 });
 
 test("noClose: only on a hand-off, and the player leaves it without the close question", () => {

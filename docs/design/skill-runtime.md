@@ -160,7 +160,15 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   Reopened there, the run comes back after its whole recorded path with every answer but the ask-fresh ones and the
   reminder chips, and with no detour back to an ask-fresh step: neither the reopens step nor any step after it may
   read an ask-fresh field (`build.py`). For a step that asks how it went afterwards: Problem Solve's *How did it go?*
-  (Handout 12's evaluate step), opened from its `ps_review` card.
+  (Handout 12's evaluate step), opened from its `ps_review` card. A run reopened a second time (after a review led to
+  a revised plan and a new card) has the step on its path already: it still comes back after the whole path, so the
+  new plan's answers return. The player doesn't count the run's emotion ids again on a reopened visit (the feeling
+  was the first visit's).
+- **Answers a step clears** (`clears: [field…]`, ER-12). Arriving at the step by a forward move drops those fields'
+  answers, and so does a run reopened at a `reopens` step that lists them. For two ways to the same thing, so the old
+  one doesn't stand in for the new: Problem Solve's guided step and own-words step each clear the other's. For a
+  reopens step's own loop, so last time's *How did it go?* isn't read back as this time's. `build.py` refuses a field
+  the skill doesn't have. Back never clears (it goes to a step, not past one).
 
 ### The attempt record (what a router reads)
 
