@@ -46,7 +46,18 @@ export interface ProfileSlices {
   }>;
   /** Witness lines the user kept (SAVED_LINE), newest first; `text` as the corpus has it. */
   savedLines: Array<{ lineId: string; text: string; confirmedAt: string | null }>;
-  people: never[];
+  /**
+   * People (IE-03): the people the person named (active only), most recently used first. `label` is their own words,
+   * decrypted for them. `safe` / `risk` / `safeAskedAt`: the last answer to "Is it safe to bring hard things up with
+   * them?" (src/lib/people.ts decides when to ask again); null when never answered.
+   */
+  people: Array<{
+    id: string; label: string; role: string;
+    safe: 'yes' | 'no' | 'unsure' | null;
+    risk: 'none' | 'invalidating' | 'harm' | 'unstated' | null;
+    safeAskedAt: string | null;
+    meta: ProfileItemMeta;
+  }>;
   bodyFlags: null;
   values: never[];
   goals: never[];
@@ -120,7 +131,7 @@ export const PROFILE_NEEDS = {
   'witness': ['name', 'ownLines', 'savedLines'],
   'meet-a-part': ['name', 'parts', 'partDetail'], // Phase 2 (parts on only: the slices are empty while off)
   'two-pulls': ['parts'], // Phase 5: the two parts' names, figures, tenderness (parts on only)
-  'dear-man': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // Phase 3 cope ahead (parts slices empty while off); never partDetail
+  'dear-man': ['parts', 'ownLines', 'savedLines', 'partAnchors', 'people'], // Phase 3 cope ahead (parts slices empty while off); never partDetail. people: the picker (IE-03)
   'cope-ahead': ['parts', 'ownLines', 'savedLines', 'partAnchors'], // DEAR MAN's cope ahead step on screen 2, the anchor under the plan (parts on only); never partDetail
   // "Was this a part you know?" after a better close (PartTagSlot, in SessionClose or the tool's own
   // close): every tool whose close asks then-vs-now or about the urge (src/lib/partTag.ts TAG_ROW_TOOLS)

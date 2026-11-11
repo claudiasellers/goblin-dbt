@@ -63,8 +63,9 @@ test("gate: parts on, a kept part, the copy signed off, not flooded; each off â†
   for (const off of [{ partsOn: false }, { partCount: 0 }, { ready: false }, { band: "flooded" }]) {
     assert.equal(lib.showCopeAhead({ ...on, ...off }), false, JSON.stringify(off));
   }
-  // DEAR MAN wires it: parts on reads 'dear-man' (and nothing while off), the band is the visit's.
-  assert.match(tsx, /useProfileContext\('dear-man', \{ enabled: partsOn \}\)/);
+  // DEAR MAN wires it: it reads 'dear-man' always since IE-B2 (the picker's people; the parts slices are empty
+  // while parts are off), the band is the visit's.
+  assert.match(tsx, /useProfileContext\('dear-man'\)/);
   assert.match(tsx, /const partsOn = useUserProfile\(\)\.profile\.partsEnabled;/);
   assert.match(tsx, /band: bandReading\?\.value \?\? band\.current\(\)\?\.value \?\? null,/);
   assert.match(tsx, /ready: copeReady\(copeCopy\)/);
@@ -202,7 +203,7 @@ test("resume draft: carries the part id, not the anchor; old drafts still resume
   assert.equal(resume.isDearManDraft({ ...d, copeAheadPartId: 7 }), false);
   assert.deepEqual(Object.keys(d).filter((k) => /cope/i.test(k)), ["copeAheadPartId"], "no anchor text in the draft");
   assert.deepEqual(resume.dearManStepFromId(resume.dearManStepId({ phase: "cope", sceneStep: 0 })), { phase: "cope", sceneStep: 0 });
-  assert.match(tsx, /walkAwayId, walkAwayCustom, copeAheadPartId,\n {2}\}\);/);
+  assert.match(tsx, /walkAwayId, walkAwayCustom, copeAheadPartId,\n {4}person: [^\n]*\n {2}\}\);/);
   assert.match(tsx, /setCopeAheadPartId\(d\.copeAheadPartId \?\? null\);/);
 });
 
@@ -211,7 +212,7 @@ test("no hard-coded user-facing strings in the cope screen; DEAR MAN reads only 
   assert.doesNotMatch(step, />\s*[A-Za-z][^<>{}]*</, "JSX text");
   assert.doesNotMatch(step, /(aria-label|placeholder|title)="[^"]+"/, "a literal label");
   assert.doesNotMatch(step, /'[A-Z][a-z]+ [a-z]+[^']*'/, "an English phrase in a string");
-  assert.deepEqual(clientTypes.PROFILE_NEEDS["dear-man"], ["parts", "ownLines", "savedLines", "partAnchors"]);
+  assert.deepEqual(clientTypes.PROFILE_NEEDS["dear-man"], ["parts", "ownLines", "savedLines", "partAnchors", "people"]);
   assert.ok(!clientTypes.PROFILE_NEEDS["dear-man"].includes("partDetail"));
 });
 

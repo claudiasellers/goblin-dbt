@@ -182,8 +182,15 @@ export const deleteProfileItem = callable<unknown, ProfileWriteResponse>(
   async ({ uid, data }) => {
     const ref = parseOrInvalid(() => parseRef(data), 'Invalid profile item');
     const rel = ITEM_LABELS[ref.label];
+    // Forgetting a person also clears the id their plans carried (people.md: plans keep only the role).
+    const unlink = ref.label === 'Person'
+      ? `
+       OPTIONAL MATCH (s:DearManSession {ownerId: $uid})-[:WITH_PERSON]->(p)
+       REMOVE s.personId
+       WITH DISTINCT u, p`
+      : '';
     const res = await writeTx((tx) => tx.run(
-      `MATCH (u:User {id: $uid})-[:${rel}]->(p:${ref.label} {key: $key})
+      `MATCH (u:User {id: $uid})-[:${rel}]->(p:${ref.label} {key: $key})${unlink}
        DETACH DELETE p
        SET u.profileVersion = coalesce(u.profileVersion, 0) + 1
        RETURN u.profileVersion AS version`,
