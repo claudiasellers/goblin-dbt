@@ -54,7 +54,9 @@ test("close copy is the canonical then-vs-now per direction (R3)", () => {
   assert.deepEqual(f.kinds.orienting.choices.map((c) => c.label), ["Further away", "About the same", "A bit more here", "More here"]);
   assert.ok(!("regulation_up" in f.kinds), "up wording is reserved for DT");
   assert.deepEqual(ids("urge"), ["no", "partly", "yes"]);
-  assert.deepEqual(f.byTool.pause.urge.choices.map((c) => c.id), ["no", "yes", "not_yet"]);
+  // Hold to wait (DT-02) asks the PRD's three (no · partly · yes), then the pull now in its own words (urge_change).
+  assert.deepEqual(f.byTool.pause.urge.choices.map((c) => c.id), ["no", "partly", "yes"]);
+  assert.deepEqual(f.byTool.pause.regulation_down.choices.map((c) => c.id), ["worse", "same", "better", "much_better"]);
   assert.match(cypher, /SessionCloseFlow \{id: 'session_close'\}\)\nSET f\.version = "spine-v1", f\.reviewStatus = "(draft|reviewed|approved)"/);
 });
 

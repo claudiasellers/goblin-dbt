@@ -802,6 +802,14 @@ HELD = {
     "ActionUrge": {
         "disgust-push":  "Pushing away is a boundary as often as a protective move; hit back or hide depends on what and who.",
         "love-idealize": "Idealising protects the attachment but is none of the moves; a 'make it fine' move would need review first.",
+        # Hold to wait's behaviour urges (DT-02): held until the move mapping is reviewed. Proposed, for that review:
+        # check → chase, hit → hit_back, leave → hide (EXPRESSES rows are drafts until signed off, so they wait here).
+        "check":         "Proposed chase (checking for certainty); held until reviewed with parts sign-off.",
+        "hit":           "Proposed hit_back; held until reviewed with parts sign-off.",
+        "leave":         "Proposed hide; held until reviewed with parts sign-off.",
+        "send":          "Sending or saying something can be hitting back, chasing or holding a boundary; it depends on the message.",
+        "use":           "Use, drink, binge or buy waits on DT-09's substance scope (D14); zone out would be a guess.",
+        "self_harm":     "Hurt myself opens safety.open first (plan C6.5); never a part trail.",
     },
     "FeelingUrge": {},
     "PullOption": {},

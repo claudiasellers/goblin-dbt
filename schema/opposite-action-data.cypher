@@ -436,3 +436,20 @@ MATCH (e:Emotion {id: "perplexed"})
 SET e.oppositeActionApplicable = false,
     e.oaClinicalNote = "Cognitive uncertainty — examine the situation",
     e.oaAlternativeSkill = "check-the-facts";
+
+// --- BEHAVIOUR URGES (DT-02 Hold to wait; plan C5: DT adds behaviour urges, self_harm as a reviewed row) ---
+// What the person is about to do, not what a feeling pulls toward, so no HAS_ACTION_URGE: Do the Opposite's urge
+// lists never show them. Hold to wait's *What's pulling at you?* chips record these ids as the session's urgeIds;
+// DT-05 Ride it out and DT-10 Pros & cons use the same vocabulary. `use` covers use, drink, binge and buy until
+// DT-09's substance scope is decided (D14). self_harm is life-threatening: every flow that names it opens
+// safety.open first (plan C6.5). Mapped (or held) for parts in scripts/parts/content.py.
+UNWIND [
+  {id: "send", label: "Send or say something", lifeThreatening: false},
+  {id: "check", label: "Check their page, or my phone", lifeThreatening: false},
+  {id: "hit", label: "Hit, throw or slam", lifeThreatening: false},
+  {id: "leave", label: "Leave, run or disappear", lifeThreatening: false},
+  {id: "use", label: "Use, drink, binge or buy", lifeThreatening: false},
+  {id: "self_harm", label: "Hurt myself", lifeThreatening: true}
+] AS urge
+MERGE (u:ActionUrge {id: urge.id})
+SET u.label = urge.label, u.kind = "behaviour", u.lifeThreatening = urge.lifeThreatening, u.module = "dt";

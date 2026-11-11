@@ -35,9 +35,9 @@ export const tools: Tool[] = [
   },
   {
     id: 'pause',
-    name: 'Pause',
-    tagline: 'Stop before you act',
-    description: 'A quick mental checklist to interrupt impulsive reactions and give yourself space to choose your response.',
+    name: 'Hold to wait',
+    tagline: 'Hold off on the urge for a moment',
+    description: 'Name the pull, hold the ring until it eases a little, step back, then pick what to do with it.',
     whenToUse: 'When you\'re about to say or do something you might regret.',
     module: 'distress-tolerance',
     dbtBasis: 'STOP Skill',
