@@ -65,6 +65,11 @@ test("skill: *I'm scared of what they'd do* or anything sexual or physical is No
   const scared = play([pick("asking", "money"), next, pick("pressure", "scared"), next]);
   assert.equal(M.crisisFor(ctx(), step("enough"), scared)?.variant, "other_person");
   assert.equal(M.crisisFor(ctx(), step("safe_end"), play([pick("asking", "physical"), next, pick("pressure", "hard"), next]))?.variant, "other_person", "the end card always shows them");
+  const physical = play([pick("asking", "physical"), next, pick("pressure", "push"), next]);
+  assert.equal(M.crisisFor(ctx(), step("enough"), physical)?.variant, "other_person", "sexual or physical: the resources from the first No is enough screen");
+  assert.equal(M.crisisFor(ctx(), step("safe_card"), physical)?.variant, "other_person");
+  assert.ok(M.offersFor(ctx(), step("safe_end"), physical).includes("ending_careful"));
+  assert.equal(M.crisisFor(ctx(), step("pressure"), play([pick("asking", "time"), next, pick("pressure", "push")]))?.variant, undefined, "not on an ordinary no");
   const end = step("safe_end");
   assert.equal(end.noClose, true);
   assert.deepEqual(M.offersFor(ctx(), end, scared).map((x) => exitTool(x).safety ? "safety.open" : exitTool(x).toolId).sort(), ["ending-relationships", "safety.open"]);
@@ -162,6 +167,9 @@ test("message card: the FAST strip finds a sorry and takes it out, keeping the r
   assert.equal(MC.dropSorry("Sorry. No, I'm not going to do that."), "No, I'm not going to do that.");
   assert.equal(MC.dropSorry("I apologise, but that doesn't work for me."), "That doesn't work for me.");
   assert.equal(MC.dropSorry("No, I'm not going to do that."), "No, I'm not going to do that.", "nothing else touched");
+  assert.equal(MC.dropSorry("I apologised already, no."), "No.");
+  assert.equal(MC.dropSorry("I'm sorry to hear that, but no."), "No.");
+  for (const t of ["I apologised already, no.", "I'm sorry to hear that, but no.", "Sorry to say this, but I can't."]) assert.equal(MC.sorryCount(MC.dropSorry(t)), 0, t);
   assert.equal(MC.overExplains(["I've got too much on."]), false);
   assert.equal(MC.overExplains(["x".repeat(MC.LONG_REASON + 1)]), true);
   assert.equal(MC.messagesHref("No & thanks"), "sms:?&body=No%20%26%20thanks");
@@ -173,7 +181,10 @@ test("page: who's asking first, the safety route never reaches the skill; a reop
   const page = read("src/pages/tools/SayNo.tsx");
   assert.match(page, /<PersonFirstSkill skillId="say_no" toolId="say-no" questionKey="personWhoSayNo" headingKey="safetyRouteSayNoHeading"/);
   const pfs = read("src/components/people/PersonFirstSkill.tsx");
-  assert.match(pfs, /if \(reopening\) return <SkillPlayer skillId=\{skillId\} \/>;/);
+  assert.match(pfs, /if \(reopen\.kind === 'skill'\) return <SkillPlayer skillId=\{skillId\} \/>;/, "a reopened run plays only once it has loaded");
+  assert.match(pfs, /if \(reopen\.kind === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute/);
+  assert.match(pfs, /\.catch\(\(\) => \{ if \(live\) setReopen\(\{ kind: 'picker' \}\); \}\)/, "a failed read is the picker, never a fresh run without it");
+  assert.ok(pfs.indexOf("if (!pickerCopy || !safetyCopy)") < pfs.indexOf("if (reopen.kind === 'skill')"), "the reopened run needs the copy too");
   assert.match(pfs, /if \(who\.route === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute/);
   assert.match(pfs, /if \(copyFailed\) return <ToolLoadError/, "fails closed");
   assert.equal(skill.copy.picker_personWhoSayNo, "Who's asking?");
@@ -184,6 +195,29 @@ test("page: who's asking first, the safety route never reaches the skill; a reop
   const p = { personId: "p1", label: "Sam", role: "friend", safe: "yes", risk: "none", route: "ok" };
   assert.deepEqual(PF.sayNoCtx(p), { personId: "p1" });
   assert.deepEqual(PF.sayNoCtx({ ...p, personId: null, route: "heads_up" }), { personId: "none", frame: "heads_up" });
+});
+
+test("reopen gate: nothing to reopen is the picker; someone now on the safety route gets the safety screen", () => {
+  const kept = (o) => ({ id: "p1", label: "Sam", role: "friend", safe: "yes", risk: "none", safeAskedAt: "2026-11-01T00:00:00Z", ...o });
+  const run = (personId, o = {}) => ({ skillId: "say_no", versionId: skill.version, path: ["ask"], ctx: personId ? { personId } : {}, ...o });
+  const sk = { id: skill.id, version: skill.version };
+  const gate = (r, people) => PF.reopenGate(r, people, sk);
+  assert.deepEqual(gate(null, [kept()]), { kind: "picker" });
+  assert.deepEqual(gate(run("p1", { versionId: "say-no-v0" }), [kept()]), { kind: "picker" }, "another version would start fresh: ask first");
+  assert.deepEqual(gate(run("p1", { skillId: "fast_review" }), [kept()]), { kind: "picker" });
+  assert.deepEqual(PF.reopenGate(run("p1"), [kept()], null), { kind: "picker" });
+  assert.deepEqual(gate(run("p1"), [kept()]), { kind: "skill" });
+  assert.deepEqual(gate(run("none"), [kept()]), { kind: "skill" }, "nobody kept");
+  assert.deepEqual(gate(run(null), null), { kind: "skill" });
+  assert.deepEqual(gate(run("gone"), [kept()]), { kind: "skill" }, "forgotten since: nothing to check against");
+  for (const risk of ["harm", "unstated"]) {
+    const g = gate(run("p1"), [kept({ safe: "no", risk })]);
+    assert.equal(g.kind, "safety", risk);
+    assert.equal(g.person.label, "Sam");
+  }
+  assert.deepEqual(gate(run("p1"), [kept({ risk: null })]), { kind: "picker" }, "never answered: ask");
+  assert.ok(PF.RUN_ID.test("3f2c9a0e-1b2c-4d5e-8f90-123456789abc"));
+  assert.equal(PF.RUN_ID.test("1"), false);
 });
 
 test("wiring: listed under Interpersonal Effectiveness with its intent; close kind none; reads people; the card's deep link", async () => {

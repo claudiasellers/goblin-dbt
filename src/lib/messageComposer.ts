@@ -30,8 +30,10 @@ export function sorryCount(text: string): number {
 export function dropSorry(text: string): string {
   const out = text
     // "I'm (so / really / very) sorry(,) (but / that / for this)", "I am sorry", "sorry(,) (but)"
+    // "I'm sorry to hear that / to say this(,) (but)": the whole clause goes.
+    .replace(/\b(?:(?:I'?m|I am)\s+(?:(?:so|really|very|truly|terribly)\s+)*)?sorry\s+to\s+\w+(?:\s+(?:this|that|it))?[,.!]?\s*(?:\bbut\b[,]?\s*)?/gi, '')
     .replace(/\b(?:I'?m|I am)\s+(?:(?:so|really|very|truly|terribly)\s+)*(?:sorry|apologetic)\b[,.!]?\s*(?:\b(?:but|that|for that|about this|about that)\b[,]?\s*)?/gi, '')
-    .replace(/\b(?:I\s+)?(?:apologi[sz]e|apologies)\b(?:\s+for\s+(?:this|that))?[,.!]?\s*(?:\bbut\b[,]?\s*)?/gi, '')
+    .replace(/\b(?:I\s+)?(?:(?:have\s+)?apologi[sz]e[sd]?|apologies)\b(?:\s+(?:already|for\s+(?:this|that)))?[,.!]?\s*(?:\bbut\b[,]?\s*)?/gi, '')
     .replace(/\bsorry\b[,.!]?\s*(?:\bbut\b[,]?\s*)?/gi, '')
     .replace(/\s{2,}/g, ' ')
     .replace(/\s+([.,!?])/g, '$1')

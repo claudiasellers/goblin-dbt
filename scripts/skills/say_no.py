@@ -55,6 +55,8 @@ HEADS_UP = {"eq": ["$ctx.frame", "heads_up"]}
 # *No is enough*, pressure or not; so does *I'm scared of what they'd do*, whatever they asked.
 ENOUGH = {"any": [is_("asking", "physical"), has("pressure", "scared")]}
 OTHER_PERSON = [{"variant": "other_person", "when": has("pressure", "scared")}]
+# No is enough shows them on every screen, whichever way it was reached (sexual or physical can be coercion).
+OTHER_PERSON_ENOUGH = [{"variant": "other_person", "when": ENOUGH}]
 SIZED = {"set": a("f_cost")}
 
 PICKER_KEYS = [
@@ -142,7 +144,7 @@ COPY = {
     "held_line_proud": "You said no, and it held. That's the skill working.",
     "held_line": "You said no, and it held.",
     "no_push_line": "You said no, and they took it. Not every no gets pushed on.",
-    "gave_in_line": "That happens. Next time, the same line twice.",
+    "gave_in_line": "That happens. Your line is still here if you want it again.",
     "gave_in_guilt": "If guilt is what pulled you back, checking the facts can help. Guilt about a fair no often doesn't fit.",
     "not_said_line": "Not this time. Your line is still here when you want it.",
     "partly_line": "A maybe buys time. When you're ready, your no is still here.",
@@ -234,20 +236,20 @@ STEPS = [
     {
         "id": "enough", "kind": "ask", "title": "enough_title", "hint": "enough_hint",
         "fields": [{"id": "safe_line", "options": {"list": "safe_line"}, "max": 1, "required": True}],
-        "crisis": OTHER_PERSON,
+        "crisis": OTHER_PERSON_ENOUGH,
         "next": [{"to": "safe_card"}],
     },
     {
         "id": "safe_card", "kind": "embed", "embed": "boundaryLine", "title": "enough_card_title", "answerAs": "safe_copied",
         "props": {"field": "safe_line", "shape": "line", "copyLabel": "copy", "copiedLabel": "copied", "selectedLabel": "selected", "next": "next"},
-        "crisis": OTHER_PERSON,
+        "crisis": OTHER_PERSON_ENOUGH,
         "next": [{"to": "safe_end"}],
     },
     {
         "id": "safe_end", "kind": "handoff", "complete": True, "noClose": True,
         "crisis": [{"variant": "other_person", "when": ALWAYS}],
         "lines": [{"when": None, "key": "enough_line"}],
-        "offers": [{"exit": "safety_open", "when": None}, {"exit": "ending_careful", "when": has("pressure", "scared")}],
+        "offers": [{"exit": "safety_open", "when": None}, {"exit": "ending_careful", "when": ENOUGH}],
         "done": "done",
     },
     # --- How firm (IE-07, "no" column) ---

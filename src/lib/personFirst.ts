@@ -3,7 +3,7 @@
  * shows the person picker from the skill's own copy (`picker_<key>`, one source in scripts/dear-man/content.py), with
  * the safety question when the answer isn't fresh; the safety route gets the safety screen and never the skill.
  */
-import { PERSON_PICKER_COPY, pickerCopy, type PersonPickerCopy, type PickedPerson } from './people';
+import { PERSON_PICKER_COPY, pickedKept, pickerCopy, type KeptPerson, type PersonPickerCopy, type PickedPerson } from './people';
 
 /** The picker's copy from a skill's: its own question (`questionKey`) and every other line the prep's. Or null. */
 export function personFirstPickerCopy(copy: Readonly<Record<string, string>> | null | undefined, questionKey: string): PersonPickerCopy | null {
@@ -28,3 +28,30 @@ export function personFirstSafetyCopy(copy: Readonly<Record<string, string>> | n
 export function sayNoCtx(p: PickedPerson): Record<string, string> {
   return { personId: p.personId ?? 'none', ...(p.route === 'heads_up' ? { frame: 'heads_up' } : {}) };
 }
+
+/**
+ * A reopened visit (`?run=`, R9: a card asking how it went) skips the picker only when the run really reopens, and
+ * never for someone now on the safety route (Gate 3): `skill` plays it; `safety` shows the safety screen for that
+ * person (answered since the first visit); `picker` when there's nothing to reopen (no run, a failed read, a bad id),
+ * a run of another version, so a fresh run never starts without who it's with and the safety question.
+ */
+export function reopenGate(run: Readonly<Record<string, unknown>> | null, people: readonly KeptPerson[] | null,
+  skill: { id: string; version: string } | null):
+  { kind: 'skill' } | { kind: 'safety'; person: PickedPerson } | { kind: 'picker' } {
+  if (!run || typeof run !== 'object' || !skill) return { kind: 'picker' };
+  // The player reopens only this skill's run of this version (resumeRun); anything else would start fresh.
+  if (run.skillId !== skill.id || run.versionId !== skill.version || !Array.isArray(run.path)) return { kind: 'picker' };
+  const ctx = run.ctx && typeof run.ctx === 'object' ? run.ctx as Record<string, unknown> : {};
+  const id = typeof ctx.personId === 'string' ? ctx.personId : null;
+  const kept = id ? (people ?? []).find((p) => p.id === id) : undefined;
+  // Kept but never answered (an older record): ask, as a link's preset would.
+  if (kept && !kept.risk) return { kind: 'picker' };
+  if (kept) {
+    const picked = pickedKept(kept);
+    if (picked.route === 'safety') return { kind: 'safety', person: picked };
+  }
+  return { kind: 'skill' };
+}
+
+/** A `?run=` value the player can reopen (a session id). */
+export const RUN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

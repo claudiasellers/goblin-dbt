@@ -6,9 +6,9 @@ import { PersonSafetyRoute } from './PersonSafetyRoute';
 import { ToolLoading } from '../tools/ToolLoading';
 import { ToolLoadError } from '../tools/ToolLoadError';
 import { useProfileContext } from '../../hooks/useProfileContext';
-import { getSkillsContent } from '../../services/skills';
+import { getSkillRun, getSkillsContent } from '../../services/skills';
 import { presetPerson } from '../../lib/dearManDebrief';
-import { personFirstPickerCopy, personFirstSafetyCopy } from '../../lib/personFirst';
+import { personFirstPickerCopy, personFirstSafetyCopy, reopenGate, RUN_ID } from '../../lib/personFirst';
 import type { PickedPerson } from '../../lib/people';
 
 /**
@@ -16,8 +16,10 @@ import type { PickedPerson } from '../../lib/people';
  * when the answer isn't fresh, then the skill on the player in this same visit (one ToolSession: a `followUp` link's
  * card resolves on it). Someone on the safety route gets the safety screen with the skill's heading and never the
  * skill (D4). A link naming a kept person whose answer is fresh skips the picker (`?person=`). A reopened run
- * (`?run=`, R9: a card asking how it went) skips it too: the person was asked on the first visit. Without the picker's
- * copy the page shows the load error: the skill never runs without the safety question.
+ * (`?run=`, R9: a card asking how it went) skips it too, the person was asked on the first visit, but only once the
+ * run has loaded (`reopenGate`): nothing to reopen (offline, a stale or edited link) is the picker, and a person now
+ * on the safety route gets the safety screen. Without the picker's copy the page shows the load error: the skill
+ * never runs without the safety question.
  */
 export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctxFor }: {
   skillId: string;
@@ -30,39 +32,62 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
 }) {
   const { search } = useLocation();
   const [q] = useState(() => new URLSearchParams(search));
-  const reopening = !!q.get('run');
+  const runId = q.get('run');
+  const reopening = !!runId && RUN_ID.test(runId);
   const profile = useProfileContext(toolId);
   const [copy, setCopy] = useState<Record<string, string> | null>(null);
   const [copyFailed, setCopyFailed] = useState(false);
+  const [skillDef, setSkillDef] = useState<{ id: string; version: string } | null>(null);
   const [picked, setPicked] = useState<PickedPerson | null>(null);
   const [pickerKey, setPickerKey] = useState(0);
 
   const [attempt, setAttempt] = useState(0);
   useEffect(() => {
-    if (reopening) return;
     let live = true;
     getSkillsContent()
-      .then((c) => { if (live) setCopy((c.skills.find((s) => s.id === skillId)?.copy as Record<string, string> | undefined) ?? {}); })
+      .then((c) => {
+        if (!live) return;
+        const sk = c.skills.find((s) => s.id === skillId);
+        setSkillDef(sk ? { id: sk.id, version: sk.version } : null);
+        setCopy((sk?.copy as Record<string, string> | undefined) ?? {});
+      })
       .catch(() => { if (live) setCopyFailed(true); });
     return () => { live = false; };
-  }, [attempt, skillId, reopening]);
+  }, [attempt, skillId]);
 
   const settled = profile.status !== 'loading';
+  // A reopened run: read it once the profile has answered, to know whether it reopens and who it was with.
+  const [reopen, setReopen] = useState<ReturnType<typeof reopenGate> | null>(reopening ? null : { kind: 'picker' });
+  useEffect(() => {
+    if (!reopening || !settled || !runId || !copy) return;
+    let live = true;
+    getSkillRun(runId, toolId)
+      .then((run) => { if (live) setReopen(reopenGate(run, profile.slices?.people ?? null, skillDef)); })
+      .catch(() => { if (live) setReopen({ kind: 'picker' }); });
+    return () => { live = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reopening, settled, copy]);
   // A link's person: kept, answer fresh, not the safety route (else the picker asks). Dropped once the picker is used.
   const [openedAt] = useState(() => Date.now());
   const [usePreset, setUsePreset] = useState(true);
   const preset = useMemo(() => (settled && usePreset ? presetPerson(profile.slices?.people ?? null, q.get('person'), openedAt) : null),
     [settled, usePreset, profile.slices, q, openedAt]);
 
-  if (reopening) return <SkillPlayer skillId={skillId} />;
   // Fail closed (Gate 3): never the skill without who it's with and the safety question.
   if (copyFailed) return <ToolLoadError onRetry={() => { setCopyFailed(false); setCopy(null); setAttempt((n) => n + 1); }} />;
-  if (!copy || !settled) return <ToolLoading />;
+  if (!copy || !settled || !reopen) return <ToolLoading />;
 
   const pickerCopy = personFirstPickerCopy(copy, questionKey);
   const safetyCopy = personFirstSafetyCopy(copy, headingKey);
-  const who = picked ?? preset;
   if (!pickerCopy || !safetyCopy) return <ToolLoadError onRetry={() => { setCopy(null); setAttempt((n) => n + 1); }} />;
+  if (reopen.kind === 'skill') return <SkillPlayer skillId={skillId} />;
+  if (reopen.kind === 'safety') {
+    return (
+      <PersonSafetyRoute copy={safetyCopy} label={reopen.person.label}
+        onBack={() => { setReopen({ kind: 'picker' }); setUsePreset(false); setPickerKey((k) => k + 1); }} />
+    );
+  }
+  const who = picked ?? preset;
 
   if (!who) {
     return (

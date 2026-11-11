@@ -18652,7 +18652,7 @@
           "held_line_proud": "You said no, and it held. That's the skill working.",
           "held_line": "You said no, and it held.",
           "no_push_line": "You said no, and they took it. Not every no gets pushed on.",
-          "gave_in_line": "That happens. Next time, the same line twice.",
+          "gave_in_line": "That happens. Your line is still here if you want it again.",
           "gave_in_guilt": "If guilt is what pulled you back, checking the facts can help. Guilt about a fair no often doesn't fit.",
           "not_said_line": "Not this time. Your line is still here when you want it.",
           "partly_line": "A maybe buys time. When you're ready, your no is still here.",
@@ -18865,9 +18865,19 @@
               {
                 "variant": "other_person",
                 "when": {
-                  "has": [
-                    "$a.pressure.ids",
-                    "scared"
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.asking",
+                        "physical"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.pressure.ids",
+                        "scared"
+                      ]
+                    }
                   ]
                 }
               }
@@ -18898,9 +18908,19 @@
               {
                 "variant": "other_person",
                 "when": {
-                  "has": [
-                    "$a.pressure.ids",
-                    "scared"
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.asking",
+                        "physical"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.pressure.ids",
+                        "scared"
+                      ]
+                    }
                   ]
                 }
               }
@@ -18942,9 +18962,19 @@
               {
                 "exit": "ending_careful",
                 "when": {
-                  "has": [
-                    "$a.pressure.ids",
-                    "scared"
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.asking",
+                        "physical"
+                      ]
+                    },
+                    {
+                      "has": [
+                        "$a.pressure.ids",
+                        "scared"
+                      ]
+                    }
                   ]
                 }
               }

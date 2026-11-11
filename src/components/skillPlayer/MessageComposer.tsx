@@ -17,10 +17,12 @@ import type { EmbedProps } from './embeds';
 export function MessageComposer({ props, picked, onShown, onDone }: EmbedProps) {
   const text = (k: string) => (typeof props[k] === 'string' ? (props[k] as string) : '');
   const of = (k: string) => (typeof props[k] === 'string' ? picked?.[props[k] as string] : undefined);
-  const line = composeMessage([of('field')]);
   const composed = composeMessage([of('opener'), of('field'), of('reason'), of('alt')]);
   const [dropped, setDropped] = useState(false);
   const message = dropped ? dropSorry(composed) : composed;
+  // The line to repeat follows the message: once the sorry is out, it's out of both.
+  const rawLine = composeMessage([of('field')]);
+  const line = dropped ? dropSorry(rawLine) : rawLine;
   const sorry = sorryCount(message);
   const longReason = overExplains(of('reason'));
   const done = useRef(new Set<string>());
