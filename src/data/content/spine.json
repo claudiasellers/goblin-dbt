@@ -457,7 +457,7 @@
         "resolveMode": "deeplink",
         "deepLinkTemplate": "/tool/problem-solve?run={sourceSessionId}&at=review&followUp={followUpId}",
         "staleAfterHours": 72,
-        "missedPath": "none",
+        "missedPath": "missing_links",
         "notify": {
           "ics": false,
           "inTab": true,

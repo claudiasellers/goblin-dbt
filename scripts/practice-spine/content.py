@@ -141,7 +141,7 @@ FOLLOW_UP_TYPES = [
         "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
                                              "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
-        "staleAfterHours": 72, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "staleAfterHours": 72, "missedPath": "missing_links", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
         "copy": {"title": "Your next step", "body": "The step you picked in Problem Solve. How did it go?"},
         "choices": [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}],
