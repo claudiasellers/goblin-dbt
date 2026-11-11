@@ -331,7 +331,18 @@ def direction_offers():
         for d in rows:
             if d.get("linkedToolId"):
                 by_tool.setdefault(d["linkedToolId"], True)
-    return [{"exit": exit_id(t), "when": {"some": ["solutions", eq("$opt.tool", t)]}} for t in sorted(by_tool)]
+    return [{"exit": exit_id(t), "when": {"some": ["solutions", eq("$opt.tool", t)]}} for t in sorted(by_tool) if t not in DECIDE_ONLY]
+
+
+# A direction's tool that answers the question its smaller steps only ask (*Decide if this can be repaired* →
+# Ending a relationship): offered only on the step that names the choice (bigger), and behind the others, so it
+# never leads a card whose step is still weighing repair.
+DECIDE_ONLY = {"ending-relationships"}
+
+
+def decide_offers():
+    return [{"exit": exit_id(t), "when": {"all": [{"some": ["solutions", eq("$opt.tool", t)]}, {"some": ["size", eq("$opt.size", "bigger")]}]}}
+            for t in sorted(DECIDE_ONLY)]
 
 
 for t in {ln["exit"] for ln in sub_links() + ambiv_links() + conf_links()} - {k[2:] for k in COPY if k.startswith("l_")}:
@@ -483,7 +494,7 @@ STEPS = [
                     "options": {"list": "when", "where": NOT_LATER_IF_SAFE}}],
         "followUp": {"type": "ps_review", "whenFrom": "when"},
         "crisis": [{"variant": "other_person", "when": SAFETY}],
-        "offers": direction_offers() + [{"exit": "cope_ahead", "when": {"all": [BIG, {"not": SAFETY}]}}],
+        "offers": direction_offers() + [{"exit": "cope_ahead", "when": {"all": [BIG, {"not": SAFETY}]}}] + decide_offers(),
         "done": "done",
     },
     {

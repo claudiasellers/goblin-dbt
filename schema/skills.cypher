@@ -2990,7 +2990,7 @@ MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"chain-analysis\"]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:cope_ahead"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"cope-ahead\"]}]}}, {\"order\": 13, \"when\": {\"all\": [{\"any\": [{\"some\": [\"size\", {\"in\": [\"$opt.size\", [\"medium\", \"bigger\"]]}]}, {\"in\": [\"$a.mysize\", [\"medium\", \"bigger\"]]}]}, {\"not\": {\"any\": [{\"eq\": [\"$a.problem\", \"fear-safety-threat\"]}, {\"eq\": [\"$a.focus\", \"fear-safety-threat\"]}]}}]}}]";
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"cope-ahead\"]}]}}, {\"order\": 12, \"when\": {\"all\": [{\"any\": [{\"some\": [\"size\", {\"in\": [\"$opt.size\", [\"medium\", \"bigger\"]]}]}, {\"in\": [\"$a.mysize\", [\"medium\", \"bigger\"]]}]}, {\"not\": {\"any\": [{\"eq\": [\"$a.problem\", \"fear-safety-threat\"]}, {\"eq\": [\"$a.focus\", \"fear-safety-threat\"]}]}}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:dear_man"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"dear-man\"]}]}}]";
@@ -3000,27 +3000,27 @@ SET r += {order: 4}, r.rowsJson = "[{\"order\": 4, \"when\": {\"some\": [\"solut
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:effectiveness"})
 MERGE (a)-[r:OFFERS]->(x)
 SET r += {order: 5}, r.rowsJson = "[{\"order\": 5, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"effectiveness\"]}]}}]";
-MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:ending_relationships"})
-MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 6}, r.rowsJson = "[{\"order\": 6, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"ending-relationships\"]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:fast"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 7}, r.rowsJson = "[{\"order\": 7, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"fast\"]}]}}]";
+SET r += {order: 6}, r.rowsJson = "[{\"order\": 6, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"fast\"]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:finding_connection"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 8}, r.rowsJson = "[{\"order\": 8, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"finding-connection\"]}]}}]";
+SET r += {order: 7}, r.rowsJson = "[{\"order\": 7, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"finding-connection\"]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:give"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 9}, r.rowsJson = "[{\"order\": 9, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"give\"]}]}}]";
+SET r += {order: 8}, r.rowsJson = "[{\"order\": 8, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"give\"]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:let_it_be"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 10}, r.rowsJson = "[{\"order\": 10, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"let-it-be\"]}]}}]";
+SET r += {order: 9}, r.rowsJson = "[{\"order\": 9, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"let-it-be\"]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:please_skill"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 11}, r.rowsJson = "[{\"order\": 11, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"please-skill\"]}]}}]";
+SET r += {order: 10}, r.rowsJson = "[{\"order\": 10, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"please-skill\"]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:values_clarification"})
 MERGE (a)-[r:OFFERS]->(x)
-SET r += {order: 12}, r.rowsJson = "[{\"order\": 12, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"values-clarification\"]}]}}]";
+SET r += {order: 11}, r.rowsJson = "[{\"order\": 11, \"when\": {\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"values-clarification\"]}]}}]";
+MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:ending_relationships"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 13}, r.rowsJson = "[{\"order\": 13, \"when\": {\"all\": [{\"some\": [\"solutions\", {\"eq\": [\"$opt.tool\", \"ending-relationships\"]}]}, {\"some\": [\"size\", {\"eq\": [\"$opt.size\", \"bigger\"]}]}]}}]";
 MATCH (a:SkillStep {id: "problem_solve:commit"}), (x:SkillExit {id: "problem_solve:safety_open"})
 MERGE (a)-[r:LINKS]->(x)
 SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"in\": [\"$a.feel\", [\"despair\", \"depressed\", \"worthless\", \"helpless\", \"powerless\"]]}";

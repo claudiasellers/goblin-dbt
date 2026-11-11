@@ -392,3 +392,20 @@ test("the final gate pass: a hopeless word keeps someone to talk to on every han
   // Off the danger path the plain copy stays.
   assert.match(skill.copy.review_next_didnt, /next time/);
 });
+
+test("Decide if this can be repaired: Ending a relationship only on the stay-or-leave step, behind Cope Ahead, never leading a repair step", () => {
+  const dir = ps.directions["jealousy-broken-trust"].find((d) => d.id === "jealousy-trust-decide");
+  assert.equal(dir.linkedToolId, "ending-relationships");
+  const base = run([pick("feel", "jealous"), next, pick("ready", "can"), next, pick("problem", "jealousy-broken-trust"), next, pick("barrier", "not-sure-what"), next]);
+  const sol = base.stepId === "solutions" ? base : run([next], ctx(), base);
+  assert.equal(sol.stepId, "solutions");
+  const at = (size) => run([pick("solutions", dir.id), next, pick("size", `${dir.id}:${size}`), next], ctx(), sol);
+  assert.equal(at("small").stepId, "commit");
+  assert.deepEqual(at("small").offered, [], "an honest question about repair gets no push to end it");
+  assert.deepEqual(at("medium").offered, ["cope_ahead"]);
+  assert.deepEqual(at("bigger").offered, ["cope_ahead", "ending_relationships"], "the choice itself: Ending second");
+  // Another direction's bigger step never offers it.
+  const other = ps.directions["jealousy-broken-trust"].find((d) => d.id !== dir.id && d.linkedToolId !== "ending-relationships");
+  const o = run([pick("solutions", other.id), next, pick("size", `${other.id}:bigger`), next], ctx(), sol);
+  assert.ok(!o.offered.includes("ending_relationships"));
+});

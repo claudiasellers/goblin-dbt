@@ -51,7 +51,7 @@ What changed on the way:
 | `solutions` | *Which direction feels right?* (the problem type's directions, and *My own idea*). The title says *start small* after *thinking about it constantly*, *a small version*, or *outside my control* with nothing picked, and *here's what's in your hands* after something in their hands. Arriving clears an own-words step | own idea → `own_step`; else `size` |
 | `size` | *{direction}. Pick what feels doable.* (its small, medium and bigger steps) | `commit` |
 | `own_step` | *What's the step you already know you want to take?* (own words, with four starters that fill the box) and *How big is it?*. Arriving clears a guided step | `commit` |
-| `commit` | *Your next step: {step}* (their own words for their own step), one line (on the danger path: *If it gets more dangerous, call now…*), *Want me to ask how it went?* (Tonight · Tomorrow · Later this week, not on the danger path → `ps_review`), offers: the direction's own tool, and Cope Ahead for a medium or bigger step off the danger path | Done |
+| `commit` | *Your next step: {step}* (their own words for their own step), one line (on the danger path: *If it gets more dangerous, call now…*), *Want me to ask how it went?* (Tonight · Tomorrow · Later this week, not on the danger path → `ps_review`), offers: the direction's own tool, and Cope Ahead for a medium or bigger step off the danger path (Ending a relationship only on *Decide if this can be repaired*'s bigger step, after Cope Ahead) | Done |
 | `review` | *How did it go? You planned: {step}* (their own words for their own step) (I did it · I did part of it · I didn't · Not yet). Only a reopened run starts here (after the commit card, or after *Not yet* booked the card again); it clears the last review's answers, `ready`, and what got in the way last time (asked again if they go back to it) | did it → `review_help`; not yet → `review_later`; else `review_next` |
 | `review_help` | *You took the step. Did it help with the problem?* (It helped · Some · Not really) | not really → `review_next`; else `review_done` |
 | `review_next` | *What would help with the rest?* / *next time?* / *now?* (after *Not really*): a smaller version (not after *Not really*), a different direction, something got in the way. On the danger path, *I didn't* / *part of it* gets *If you're not safe now, call. Or pick another way.* instead of *next time?* CORE-11's missing links as a planned link after *I didn't* | `size` (guided) or `own_step` / `solutions` / `barrier` (on the danger path, `solutions`) |
@@ -146,8 +146,10 @@ holds.
   old page linked to all three, dead.
 - **Every dead link is a planned exit**: give, dialectics, PLEASE, build mastery, finding connection, effectiveness,
   chain analysis, values clarification, self-validation, body scan, the wave. All are recorded and never shown, so
-  they light up when their tool ships. Ending a relationship (IE-08) lit up on 11 Nov: the commit card offers it
-  for *Decide if this can be repaired* (broken trust), and it asks about safety first.
+  they light up when their tool ships. Ending a relationship (IE-08) lit up on 11 Nov: for *Decide if this can be repaired* (broken trust)
+  the commit card offers it only on the bigger step (*Make the decision: stay and rebuild, or leave and grieve*),
+  behind Cope Ahead; the smaller steps still weigh repair, and a button to end it would answer that for them.
+  Ending asks about safety first, and nothing in this run's record names it (`private`).
 - **Pros and cons (Handout 12 step 5)** waits for DT-10's card, inline (plan: *DT-10 inline later*).
 - **No separate goal step (Handout 12 step 2), and no facts check on the problem (step 1).** The old page had
   neither. The problem types are first-person and specific (*Someone crossed a line*), and each direction carries its

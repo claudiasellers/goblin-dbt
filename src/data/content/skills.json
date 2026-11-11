@@ -9566,20 +9566,6 @@
                 }
               },
               {
-                "exit": "ending_relationships",
-                "when": {
-                  "some": [
-                    "solutions",
-                    {
-                      "eq": [
-                        "$opt.tool",
-                        "ending-relationships"
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
                 "exit": "fast",
                 "when": {
                   "some": [
@@ -9711,6 +9697,35 @@
                           }
                         ]
                       }
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "ending_relationships",
+                "when": {
+                  "all": [
+                    {
+                      "some": [
+                        "solutions",
+                        {
+                          "eq": [
+                            "$opt.tool",
+                            "ending-relationships"
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "some": [
+                        "size",
+                        {
+                          "eq": [
+                            "$opt.size",
+                            "bigger"
+                          ]
+                        }
+                      ]
                     }
                   ]
                 }
