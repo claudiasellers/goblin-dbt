@@ -100,6 +100,8 @@ test("hurt myself, safe for now: no phone-down step, and its own end card with n
   // Flooded and hurt: the step back, then this card (body first), never the settle card's close.
   const f = run([pick("pull", "hurt"), next, pick("safe", "safe"), next, HELD, pick("step_back", "sit"), next], FLOODED);
   assert.equal(f.stepId, "hurt_end");
+  const fBack = run([pick("pull", "hurt"), next, pick("safe", "safe"), next, HELD, pick("step_back", "sit")], FLOODED);
+  assert.equal(M.followUpFor(FLOODED, M.stepOf(skill, "step_back"), fBack), null, "no come-back after hurt myself: the safety answer is never carried");
   assert.deepEqual(M.offersFor(FLOODED, card, f), ["cool_down"]);
   assert.match(M.handoffLine(FLOODED, card, f), /Settle it first/);
   assert.ok(M.stepOf(skill, "next").lines.every((l) => l.key !== "next_hurt"));
@@ -216,6 +218,9 @@ test("copy: no rating, no numbers to read, nothing about food or shopping as a m
 test("the player: safetyFirst opens the resources once per arrival; the run's urge ids reach the session; the wait embed never locks", () => {
   const p = readFileSync("src/components/skillPlayer/SkillPlayer.tsx", "utf8");
   assert.match(p, /toolSession\.setUrgeIds\(runUrgeIds\(ctx, st\)\)/);
+  assert.match(p, /if \(!c\.band\) \{ const r = band\.current\(\); if \(r\) c = contextIn\(skill, \{ \.\.\.c, band: r\.value \}\); \}/, "the person's own current reading is the carry");
+  assert.match(p, /answerToolOutcome\(toolSession\.id, \{ dismissed: true \}\)/, "a noClose ending never reappears as Today's outcome card");
+  assert.match(p, /if \(output\.ids\.length && !output\.ids\.includes\('skipped'\)\) toolSession\.markPracticed\(\);/, "a held hold is practice");
   assert.match(p, /if \(resuming \|\| safetyAt\.current === st\.path\.length\) return;/);
   assert.match(p, /if \(opensSafety\(ctx, stepOf\(skill, st\.stepId\), st\)\) \{/);
   const w = readFileSync("src/components/skillPlayer/WaitLockEmbed.tsx", "utf8");

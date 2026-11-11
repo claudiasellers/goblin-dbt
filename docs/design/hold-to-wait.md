@@ -25,7 +25,7 @@ screen.
 | 2 | `hold` | The witness line (*That's a strong pull. It makes sense it's this strong.*; flooded: *Your body's loud. Hold here for a moment.*), then `holdRing` press, 90 s: *Hold here*, *Your hand has a job now* while held; letting go keeps what was held, and after one try *Next* appears. *Talk to someone now* under it | Step 2 (S) |
 | — | `reach` | Not sure or no, straight from the question (S9: nothing offered in place of crisis support): the banner, *Please reach out to someone now, using the support on this screen. You don't have to hold this alone.*, Done (My crisis kit planned, DT-03). No second button competing with the banner. No close question | C6.5 |
 | 3 | `step_back` | *Now take one step back.* Sit down · Leave the room · Step outside · Hands in my lap · Put the phone down for ten minutes. Hint: *Pick one and do it. The screen waits.* Flooded: only Sit down · Hands in my lap (T8). After *Hurt myself*: no phone-down (it would take the support out of reach) | Step 3 (T) |
-| — | `wait` | The phone down: `waitLock`, ten minutes, a ring with *Waiting* inside and no digits; *I'm back* from the first second (never locks). A come-back card on Today ten minutes later (`hold_come_back`) | Step 3's phone-down |
+| — | `wait` | The phone down: `waitLock`, ten minutes, a ring with *Waiting* inside and no digits; *I'm back* from the first second (never locks). A come-back card on Today ten minutes later (`hold_come_back`; never after *Hurt myself*) | Step 3's phone-down |
 | 4 | `observe` | *What do you notice?* In your body: Hot · Tight · Shaky · Heavy · Buzzing · Can't tell (up to 3). What set it off: Someone said or did something · Something I saw · A thought · Nothing I can point to. Skippable | Step 4 (O); MF-01's card as plain chips until it's built |
 | 5 | `proceed` | *What matters most right now?* Get through this without making it worse · Get what I want · Keep the relationship · Keep my self-respect. *One next move*: only the pull's own moves (below) | Step 5 (P) |
 | 6 | `next` | The move's own line (e.g. *Saving it for later is a choice. The message will still be there when you're steadier.*) or *You gave the pull some room. What you do next is yours.*; the move's tool as the one offer; Done (the button, when there's nothing to hand on to) | Step 6 |
@@ -47,7 +47,7 @@ screen.
 Moves into tools not built yet (My crisis kit DT-03, Held DT-07, Give your mind a job DT-06) are planned exits on
 the end card and are never chips until their tools ship.
 
-**The flooded short path.** No band is asked (C6.2). A carried flooded reading (`$ctx.band`) shows the flooded
+**The flooded short path.** No band is asked (C6.2). A carried flooded reading (`$ctx.band`: a hand-off's, else the person's own `band.current()`, ≤ 20 min) shows the flooded
 hold line, then the step back (two choices), then `settle`: *Your body's loud. Settle it first. The rest can wait, and Today will
 ask you about it later.* → First, the body (after *Hurt myself*: `hurt_end`). Observe and Proceed wait for the come-back card. Any other band, or
 none, takes the standard path (D1).
@@ -60,7 +60,8 @@ resolves it (`startToolSession`, like `resume_skill`). It never names the urge.
 
 ## What it records
 
-`ToolSession.ext.run` (the runtime's record, in place of the PRD's `UrgeEpisode` (C1, D2): answers as ids, own words encrypted at close), `urgeIds` (the pull's
+A completed hold (or wait) marks the visit practiced, so leaving before the last card still counts as a rep. A
+`noClose` ending dismisses Today's outcome card for the visit too. `ToolSession.ext.run` (the runtime's record, in place of the PRD's `UrgeEpisode` (C1, D2): answers as ids, own words encrypted at close), `urgeIds` (the pull's
 `ActionUrge` id, ask-fresh; own words record none), and the two-part close (`actedOnUrge`, then-vs-now). The old
 page's `ext.dt.stepsDone` stays readable for old sessions (plan C7).
 

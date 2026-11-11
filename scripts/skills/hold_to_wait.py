@@ -204,8 +204,10 @@ STEPS = [
         "id": "step_back", "kind": "ask", "title": "back_title", "hint": "back_hint", "crisis": CRISIS,
         "fields": [{"id": "step_back", "options": {"list": "step_back", "where": BACK_WHERE}, "max": 1, "required": True,
                     "links": [SAFETY_LINK]}],
-        # The come-back on Today (R5): after the phone's been down, or after the short path's body-first card.
-        "followUp": {"type": "hold_come_back", "when": {"any": [PHONE_DOWN, FLOODED]}},
+        # The come-back on Today (R5): after the phone's been down, or after the short path's body-first card. Never
+        # after hurt myself: its copy is about the pull, and reopening the run would carry a safety answer from ten
+        # minutes earlier past the question (ask-fresh). hurt_end's line says the support is there instead.
+        "followUp": {"type": "hold_come_back", "when": {"all": [{"not": HURT}, {"any": [PHONE_DOWN, FLOODED]}]}},
         "next": [{"when": PHONE_DOWN, "to": "wait"}, {"when": {"all": [FLOODED, HURT]}, "to": "hurt_end"},
                  {"when": FLOODED, "to": "settle"}, {"to": "observe"}],
     },

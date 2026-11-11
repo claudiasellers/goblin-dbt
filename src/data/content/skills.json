@@ -4784,17 +4784,29 @@
             "followUp": {
               "type": "hold_come_back",
               "when": {
-                "any": [
+                "all": [
                   {
-                    "eq": [
-                      "$a.step_back",
-                      "phone_down"
-                    ]
+                    "not": {
+                      "eq": [
+                        "$a.pull",
+                        "hurt"
+                      ]
+                    }
                   },
                   {
-                    "eq": [
-                      "$ctx.band",
-                      "flooded"
+                    "any": [
+                      {
+                        "eq": [
+                          "$a.step_back",
+                          "phone_down"
+                        ]
+                      },
+                      {
+                        "eq": [
+                          "$ctx.band",
+                          "flooded"
+                        ]
+                      }
                     ]
                   }
                 ]
