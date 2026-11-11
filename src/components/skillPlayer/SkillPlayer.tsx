@@ -66,7 +66,7 @@ export interface InlineReturn {
   finished: boolean;
 }
 
-export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, resumeKeepsFresh, ctx }: {
+export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, resumeKeepsFresh, ctx, resumeRecord }: {
   skillId: string;
   /**
    * Page: context the page itself found before the run (DEAR MAN's debrief: the person picked on its own screen),
@@ -81,6 +81,12 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
   onReturn?: (r: InlineReturn) => void;
   /** The review page only (dev/skills-review.tsx): a resumed run keeps its ask-fresh answers, so every step shows. */
   resumeKeepsFresh?: boolean;
+  /**
+   * Page: the `?run=` record the page already read and checked (PersonFirstSkill's reopen gate), played as it is with
+   * no second read, so the player can never reopen or start something the page didn't check. `null`: don't reopen
+   * (a fresh run, the link's `?run=` ignored). Left out: the player reads `?run=` itself.
+   */
+  resumeRecord?: Record<string, unknown> | null;
 }) {
   const [content, setContent] = useState<SkillsContent | null>(null);
   const [failed, setFailed] = useState(false);
@@ -106,7 +112,7 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
       </ToolSessionProvider>
     );
   }
-  return <SkillRun skill={skill} content={content} resumeKeepsFresh={resumeKeepsFresh} pageCtx={ctx} />;
+  return <SkillRun skill={skill} content={content} resumeKeepsFresh={resumeKeepsFresh} pageCtx={ctx} resumeRecord={resumeRecord} />;
 }
 
 const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, readonly string[]>)[toolId]?.length ?? 0) > 0;
@@ -136,9 +142,9 @@ function carriedFrom(search: string, state: unknown): string[] {
   return [...new Set([...(feel ? [feel] : []), ...emotionIdsFromLink(state)])].filter((id) => GRID.has(id));
 }
 
-function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
+function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx, resumeRecord }: {
   skill: SkillDef; content: SkillsContent; inline?: { enterAt?: string; onReturn?: (r: InlineReturn) => void }; resumeKeepsFresh?: boolean;
-  pageCtx?: Readonly<Record<string, string>>;
+  pageCtx?: Readonly<Record<string, string>>; resumeRecord?: Record<string, unknown> | null;
 }) {
   const toolSession = useToolSession();
   const navigate = useNavigate();
@@ -150,7 +156,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
   const [ctxIn, setCtxIn] = useState(() => {
     if (inline) return {};
     const c = contextFrom(skill, location.search, location.state, band.current()?.value ?? null, pageCtx);
-    return UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
+    return resumeRecord !== null && UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
   });
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
   const slices = profile.slices as Record<string, unknown> | null;
@@ -166,7 +172,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
   useEffect(() => { setP2Open(false); }, [st.stepId]);
   // Resume (R9): `?run=<sessionId>&at=<stepId>` reopens the person's own run of this tool, or starts fresh.
   const [resumeFrom] = useState(() => {
-    if (inline) return null;
+    if (inline || resumeRecord === null) return null;
     const q = new URLSearchParams(location.search);
     const run = q.get('run');
     return run && UUID.test(run) ? { run, at: q.get('at') } : null;
@@ -180,7 +186,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
   useEffect(() => {
     if (!resumeFrom || !profileSettled || resumed.current) return;
     resumed.current = true;
-    getSkillRun(resumeFrom.run, skill.toolId)
+    (resumeRecord !== undefined ? Promise.resolve(resumeRecord) : getSkillRun(resumeFrom.run, skill.toolId))
       .then((rec) => {
         const r = resumeRun(ctx, rec, resumeFrom.at, { keepFresh: !!resumeKeepsFresh });
         if (r) { reopenedRef.current = !!stepOf(skill, r.stepId).reopens; setSt(r); }

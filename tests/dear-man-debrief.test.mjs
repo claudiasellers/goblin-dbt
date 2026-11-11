@@ -133,7 +133,7 @@ test("page: picker first; the safety route gets the safety screen, never the ski
   const page = read("src/components/people/PersonFirstSkill.tsx");
   assert.match(page, /<PersonPicker key=\{pickerKey\} people=\{profile\.slices\?\.people \?\? null\} copy=\{pickerCopy\}/);
   assert.match(page, /if \(who\.route === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute copy=\{safetyCopy\}/);
-  assert.match(page, /return <SkillPlayer skillId=\{skillId\} ctx=\{ctxFor\(who\)\} \/>;/);
+  assert.match(page, /return <SkillPlayer skillId=\{skillId\} ctx=\{ctxFor\(who\)\} \{\.\.\.\(reopening \? \{ resumeRecord: resumeAfterPicker\(checked, who\) \} : \{\}\)\} \/>;/);
   assert.match(page, /if \(copyFailed\) return <ToolLoadError/, "fails closed without the picker's copy");
   assert.doesNotMatch(page, /navigate\(/, "no navigation between the picker and the skill: the ToolSession (and a card's RESOLVING) stays");
   const debrief = read("src/components/tools/dearMan/DearManDebrief.tsx");

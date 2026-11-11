@@ -10,7 +10,7 @@ import { getSkillRun, getSkillsContent } from '../../services/skills';
 import { resumeRun, type RunContext } from '../../lib/skillRuntime/machine';
 import { emotions } from '../../data/emotions';
 import { presetPerson } from '../../lib/dearManDebrief';
-import { personFirstPickerCopy, personFirstSafetyCopy, reopenGate, RUN_ID } from '../../lib/personFirst';
+import { personFirstPickerCopy, personFirstSafetyCopy, reopenGate, resumeAfterPicker, RUN_ID } from '../../lib/personFirst';
 import type { PickedPerson } from '../../lib/people';
 
 /**
@@ -20,7 +20,8 @@ import type { PickedPerson } from '../../lib/people';
  * skill (D4). A link naming a kept person whose answer is fresh skips the picker (`?person=`). A reopened run
  * (`?run=`, R9: a card asking how it went) skips it too, the person was asked on the first visit, but only once the
  * run has loaded (`reopenGate`): nothing to reopen (offline, a stale or edited link) is the picker, and a person now
- * on the safety route gets the safety screen. Without the picker's copy the page shows the load error: the skill
+ * on the safety route gets the safety screen. The player plays the record the gate checked (`resumeRecord`), never
+ * a second read; after the picker it reopens only for the same person, else it starts fresh. Without the picker's copy the page shows the load error: the skill
  * never runs without the safety question.
  */
 const GRID = new Set(emotions.map((e) => e.id));
@@ -63,6 +64,8 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   const settled = profile.status !== 'loading';
   // A reopened run: read it once the profile has answered, to know whether it reopens and who it was with.
   const [reopen, setReopen] = useState<ReturnType<typeof reopenGate> | null>(reopening ? null : { kind: 'picker' });
+  // The record the gate checked: the player plays exactly this one, never a second read.
+  const [checked, setChecked] = useState<Record<string, unknown> | null>(null);
   useEffect(() => {
     if (!reopening || !settled || !runId || !copy) return;
     let live = true;
@@ -70,6 +73,7 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
       .then((run) => {
         if (!live) return;
         const at = q.get('at');
+        setChecked(run);
         setReopen(reopenGate(run, profile.slices?.people ?? null, (r) => !!runCtx && resumeRun(runCtx, r, at) !== null, Date.now()));
       })
       .catch(() => { if (live) setReopen({ kind: 'picker' }); });
@@ -89,7 +93,7 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
   const pickerCopy = personFirstPickerCopy(copy, questionKey);
   const safetyCopy = personFirstSafetyCopy(copy, headingKey);
   if (!pickerCopy || !safetyCopy) return <ToolLoadError onRetry={() => { setCopy(null); setAttempt((n) => n + 1); }} />;
-  if (reopen.kind === 'skill') return <SkillPlayer skillId={skillId} />;
+  if (reopen.kind === 'skill') return <SkillPlayer skillId={skillId} resumeRecord={checked} />;
   if (reopen.kind === 'safety') {
     return (
       <PersonSafetyRoute copy={safetyCopy} label={reopen.person.label}
@@ -111,5 +115,5 @@ export function PersonFirstSkill({ skillId, toolId, questionKey, headingKey, ctx
         onBack={() => { setPicked(null); setUsePreset(false); setPickerKey((k) => k + 1); }} />
     );
   }
-  return <SkillPlayer skillId={skillId} ctx={ctxFor(who)} />;
+  return <SkillPlayer skillId={skillId} ctx={ctxFor(who)} {...(reopening ? { resumeRecord: resumeAfterPicker(checked, who) } : {})} />;
 }

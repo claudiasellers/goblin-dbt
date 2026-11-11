@@ -190,7 +190,12 @@ test("page: who's asking first, the safety route never reaches the skill; a reop
   const page = read("src/pages/tools/SayNo.tsx");
   assert.match(page, /<PersonFirstSkill skillId="say_no" toolId="say-no" questionKey="personWhoSayNo" headingKey="safetyRouteSayNoHeading"/);
   const pfs = read("src/components/people/PersonFirstSkill.tsx");
-  assert.match(pfs, /if \(reopen\.kind === 'skill'\) return <SkillPlayer skillId=\{skillId\} \/>;/, "a reopened run plays only once it has loaded");
+  assert.match(pfs, /if \(reopen\.kind === 'skill'\) return <SkillPlayer skillId=\{skillId\} resumeRecord=\{checked\} \/>;/, "a reopened run plays only once it has loaded, the record the gate checked");
+  assert.match(pfs, /resumeRecord: resumeAfterPicker\(checked, who\)/, "after the picker: the same person reopens, anyone else is fresh");
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(player, /\(resumeRecord !== undefined \? Promise\.resolve\(resumeRecord\) : getSkillRun\(resumeFrom\.run, skill\.toolId\)\)/, "no second read");
+  assert.match(player, /if \(inline \|\| resumeRecord === null\) return null;/, "null: the link's ?run= is ignored");
+  assert.doesNotMatch(read("src/services/skills.ts"), /recentRuns/, "runs are never cached across users");
   assert.match(pfs, /if \(reopen\.kind === 'safety'\) \{\s*return \(\s*<PersonSafetyRoute/);
   assert.match(pfs, /\.catch\(\(\) => \{ if \(live\) setReopen\(\{ kind: 'picker' \}\); \}\)/, "a failed read is the picker, never a fresh run without it");
   assert.ok(pfs.indexOf("if (!pickerCopy || !safetyCopy)") < pfs.indexOf("if (reopen.kind === 'skill')"), "the reopened run needs the copy too");
@@ -232,6 +237,12 @@ test("reopen gate: only a run the player will reopen skips the picker; someone n
   assert.deepEqual(gate(run("p1"), [kept({ risk: null })]), { kind: "picker" }, "never answered: ask");
   assert.deepEqual(gate(run("p1"), [kept({ safeAskedAt: "2026-07-01T00:00:00Z" })]), { kind: "picker" }, "older than 90 days: ask again");
   assert.deepEqual(gate(run("p1"), [kept({ safetyRecheckAt: "2026-11-05T00:00:00Z" })]), { kind: "picker" }, "a debrief said not safe since");
+  const picked = (personId) => ({ personId, label: "Sam", role: "friend", safe: "yes", risk: "none", route: "ok" });
+  assert.equal(PF.resumeAfterPicker(run("p1"), picked("p1"))?.skillId, "say_no", "the same person: the run reopens");
+  assert.equal(PF.resumeAfterPicker(run("p1"), picked("p2")), null, "someone else: a fresh run, never A's outcome with B");
+  assert.equal(PF.resumeAfterPicker(run("p1"), picked(null)), null);
+  assert.equal(PF.resumeAfterPicker(run("none"), picked(null)), null);
+  assert.equal(PF.resumeAfterPicker(null, picked("p1")), null);
   assert.ok(PF.RUN_ID.test("3f2c9a0e-1b2c-4d5e-8f90-123456789abc"));
   assert.equal(PF.RUN_ID.test("1"), false);
   const pfs = read("src/components/people/PersonFirstSkill.tsx");

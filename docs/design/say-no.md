@@ -106,8 +106,9 @@ Nothing is locked, at any band. One message (IE-01 Mode A) reuses the card.
   reopen (offline, retention, a stale, edited or already-answered link, a new version) is the picker, never a fresh
   run without it. A person moved onto the safety route since the first visit gets the safety screen, not *Did you say
   no?*; a person whose safety answer is due again (90 days, or a debrief's *I don't feel safe with them*), or a run
-  naming someone when the people list couldn't be read, gets the picker (Gates 1 and 3). The gate and the player share
-  one read of the run (`getSkillRun` keeps it 15 s), so a blip between them can't start an unchecked fresh run. This
+  naming someone when the people list couldn't be read, gets the picker (Gates 1 and 3). The player plays the very
+  record the gate checked (`resumeRecord`, no second read), and after the picker it reopens only for the same
+  person; anyone else starts fresh, so an outcome about one person is never recorded with another. This
   covers DEAR MAN's debrief too.
 - *I'm scared of what they'd do* is a danger option (`danger: other`): the `other_person` crisis slot on every
   screen after it, no sizing, no reasons, no negotiation, Ending a relationship with `frame=careful` and

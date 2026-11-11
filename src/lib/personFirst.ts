@@ -42,8 +42,7 @@ export function reopenGate(run: Readonly<Record<string, unknown>> | null, people
   reopens: (run: Readonly<Record<string, unknown>>) => boolean, now: number):
   { kind: 'skill' } | { kind: 'safety'; person: PickedPerson } | { kind: 'picker' } {
   if (!run || typeof run !== 'object' || !reopens(run)) return { kind: 'picker' };
-  const ctx = run.ctx && typeof run.ctx === 'object' ? run.ctx as Record<string, unknown> : {};
-  const id = typeof ctx.personId === 'string' && ctx.personId !== 'none' ? ctx.personId : null;
+  const id = runPersonId(run);
   if (!id) return { kind: 'skill' };
   // Fail closed: someone named and no list to check them against is asked again.
   if (!people) return { kind: 'picker' };
@@ -56,6 +55,22 @@ export function reopenGate(run: Readonly<Record<string, unknown>> | null, people
   if (picked.route === 'safety') return { kind: 'safety', person: picked };
   if (needsSafetyAsk(kept, now)) return { kind: 'picker' };
   return { kind: 'skill' };
+}
+
+/** The kept person a run was with (`$ctx.personId`), or null (nobody, or `none`). */
+export function runPersonId(run: Readonly<Record<string, unknown>> | null): string | null {
+  const ctx = run?.ctx && typeof run.ctx === 'object' ? run.ctx as Record<string, unknown> : {};
+  return typeof ctx.personId === 'string' && ctx.personId !== 'none' ? ctx.personId : null;
+}
+
+/**
+ * What the player gets after the picker on a `?run=` visit: the checked run only when the person picked is the one
+ * it was with (the picker asked again, a re-ask that was due); anyone else, or nobody, is a fresh run, so an outcome
+ * about one person is never recorded with another.
+ */
+export function resumeAfterPicker(run: Readonly<Record<string, unknown>> | null, picked: PickedPerson): Record<string, unknown> | null {
+  const was = runPersonId(run);
+  return run && was && picked.personId === was ? { ...run } : null;
 }
 
 /** A `?run=` value the player can reopen (a session id). */
