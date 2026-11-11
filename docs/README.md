@@ -1,15 +1,20 @@
 # Goblin DBT: every plan, in one place
 
-As of 3 Nov 2026 (`main` at `61cf74f`). This page indexes plans; it doesn't restate them. Each row says
+As of 11 Nov 2026 (`main` at `fce0195`). This page indexes plans; it doesn't restate them. Each row says
 where the plan lives and whether it is **shipped** (in the app), **partial** (some of it is in the app, or
 an interim stands in), **spec only** (written, no code on `main`) or **dead** (retired or overtaken; kept
 for reference). Where a row is "spec only" but code exists on a branch, the note says which.
 
-The direction for the next stretch of work is
-[Goblin DBT: where it stands and the path forward](https://claude.ai/artifact/QnR4Q9J8HEucUZXsPdq4T2)
-(3 Nov): the stack stays, a flow runtime and one router get added, and five threads run in order. The
-master plan is still the Obsidian **DBT Module PRDs – Index** (30 Sep, 72 features). This page
-connects the two.
+Three plans set the direction, newest first:
+
+1. [dbt-modules-plan.md](design/dbt-modules-plan.md) (approved 10 Nov): finishing Distress Tolerance,
+   Interpersonal Effectiveness and Emotion Regulation on the skill runtime, in three lanes, with 17
+   decisions and three review gates. **This is the plan being built now.**
+2. [Goblin DBT: where it stands and the path forward](https://claude.ai/artifact/QnR4Q9J8HEucUZXsPdq4T2)
+   (3 Nov): keep the stack, add the skill runtime and one router. Threads 1–3 are done (this index,
+   [skill-runtime.md](design/skill-runtime.md), auto-deploy); the router and Library are still ahead.
+3. The Obsidian **DBT Module PRDs – Index** (30 Sep, 72 features): the master list and the evidence
+   ranking. Every feature spec is still there.
 
 **Where a doc belongs from now on**
 
@@ -17,7 +22,7 @@ connects the two.
 |---|---|
 | Anything that drives code (design specs, handovers, runbooks) | this repo, `docs/` |
 | Product record, clinical research, module PRDs, morning recaps | Obsidian vault `Claudia-mac-mini/Goblin DBT/` |
-| The project's shared folder (`/mnt/project-files/`) | frozen: a copy of the old claude.ai project, nothing new goes there |
+| The project's shared folder (`/mnt/project-files/`) | hand-offs between threads (PRD copies, resume notes, screenshots) and the old claude.ai copies; not a home for plans |
 | This index | here, `docs/README.md`. Update a row when a plan's status changes |
 
 Paths below that start with `Goblin DBT/` are in the Obsidian vault (open them from the vault on the Mac).
@@ -28,15 +33,18 @@ Claude project).
 
 ## 1. Where it stands
 
-- **The master plan: 72 features.** 6 shipped, 19 partial, 46 spec only, 1 dead (table in §2).
+- **The master plan: 72 features.** 11 shipped, 19 partial, 41 spec only, 1 dead (table in §2).
+- **The skill runtime is real.** Skills are graph data (`scripts/skills/`), one player runs them, and five
+  skills run on it: Check the Facts, It isn't working, Keep your self-respect (FAST), Rebel without the
+  wreckage and Rewrite the nightmare. Problem Solve (PR #71) and Ending a relationship (PR #70) are open.
+- **Deploys run on merge** since PR #52 (10 Nov), through the merge lane on the Mac (PR #60). "Shipped" on
+  this page means merged to `main`.
 - **Built off the plan:** Parts (IFS), Find the feeling, the body map, the Den, Reflect R1, Circuit
   Breaker and the palette picker (§3). Parts is the largest piece of code added since 1 Oct.
-- **The safety batch (CORE-01, CORE-02, DT-03, the IE-01 safety question) is still the plan's #1 and
-  still not built.** Only the crisis banner is live. Its one piece of code, the check-in's optional
-  self-harm question, waits on branch `routing/ties-weights-safety-question` (PR #47; §6).
-- **Deploys pending:** PR #50 (hosting) and PR #51 (functions) are merged and not yet deployed. The
-  thread *Automate Firebase deploys after merge* owns that (PR #52, branch `claude/project-thread-7ivmaj`);
-  this page doesn't touch it.
+- **The safety batch (CORE-01, CORE-02, DT-03, the IE-01 safety question) is paused** (your call, 10 Nov).
+  Where it stopped: `/mnt/project-files/handoffs/safety-plan-resume.md`. Until it resumes, a skill's
+  `safety.open` exit opens the crisis banner as a full screen (modules plan D5). The check-in's optional
+  self-harm question still waits on `routing/ties-weights-safety-question` (PR #47; §6).
 - **Two decisions sat in closed, unmerged PRs and never reached `main`:** your witness-voice corpus
   rewrite with rule 4 (PR #25, `fix/voice-rules-lighter`: no line validates the intensity of a negative
   feeling, and a lighter lint) and the Running low (PLEASE) tool (PR #33). `main` still has the 1 Oct
@@ -49,7 +57,7 @@ Claude project).
 
 Source: `Goblin DBT/DBT Module PRDs/DBT Module PRDs – Index.md`, §3 (order, evidence, dependencies). Each
 feature's full spec is in its module's PRD: `Goblin DBT/DBT Module PRDs/PRD – <module>.md`. Status checked
-against `main` and the Product Changelog; the 1 Oct Master List (`DBT Skills in Goblin – Master List.md`)
+against `main` (11 Nov) and the Product Changelog; the 1 Oct Master List (`DBT Skills in Goblin – Master List.md`)
 is behind by Wise mind, Cope Ahead and the routing switch-on.
 
 Waves follow the index: 1 safety floor and platform, 2 validation and the transformation core,
@@ -58,8 +66,8 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | # | ID | Feature | Status | What's there / what's missing |
 |---|---|---|---|---|
 | | | **Wave 1** | | |
-| 1 | CORE-01 | Safety route: ask, route, local help | partial | Crisis banner only (M0, PR #14): US resources, never asks, never on low-energy results. Spiral-path question on PR #47 |
-| 2 | CORE-02 | Safety plan (Stanley–Brown) | spec only | Deferred safety batch |
+| 1 | CORE-01 | Safety route: ask, route, local help | partial | Crisis banner (M0), and `safety.open` opens it full screen from any skill. Never asks. Spiral-path question on PR #47. Batch paused 10 Nov: `/mnt/project-files/handoffs/safety-plan-resume.md` |
+| 2 | CORE-02 | Safety plan (Stanley–Brown) | spec only | Safety batch, paused 10 Nov (see CORE-01) |
 | 3 | DT-01 | First, the body (Help me now + TIP) | partial | Help me now interim (`HelpNowInterim.tsx`: one safe step, Cool Down / 5-4-3-2-1); Circuit Breaker (PR #46). No `dt.regulate` primitive |
 | 4 | ER-01 | Capacity band + breakdown hand-off | partial | Band store, gate, P2 hand-off and too-much link ship; the question was removed 30 Sep (CLAUDE.md). DEAR MAN is the only host |
 | 5 | CORE-03 | Practice spine and Today | shipped | Phase A M2 |
@@ -68,10 +76,10 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 8 | IE-01 | Ask for what you need v2 (DEAR MAN) | partial | DEAR MAN, debrief and band gate shipped; the "is it safe with them?" question is in the safety batch |
 | 9 | WMP-02 | Recover fidelity pass v1.1, then v2 on Stage | partial | v1 shipped 30 Sep; v2 on Stage spec only (`docs/design/recover-from-invalidation.md`) |
 | 10 | DT-02 | Hold to wait (STOP rebuilt) | spec only | Pause is the old STOP. Phone prototype on local branch `dev/hold-to-wait`, never pushed (Changelog 6 Oct) |
-| 11 | DT-03 | My crisis kit | spec only | Safety batch |
+| 11 | DT-03 | My crisis kit | spec only | Safety batch, paused 10 Nov. Contract in modules plan §2.1 |
 | | | **Wave 2** | | |
 | 12 | WMP-01 | Witness voice (validation layer) | partial | Built (A5). 16 Recover lines live; 110 lines drafts, none signed off; your corpus rewrite is on PR #25, closed unmerged |
-| 13 | ER-02 | Check the facts | spec only | Ready to build: [check-the-facts.md](design/check-the-facts.md), [handover](design/check-the-facts-handover.md). Path-forward thread 3 builds it on the runtime |
+| 13 | ER-02 | Check the facts | shipped | First skill on the runtime: [check-the-facts.md](design/check-the-facts.md), [skill-runtime.md](design/skill-runtime.md), `scripts/skills/check_the_facts.py`. Missing-fact step and safety chips added in ER-B1 (PRs #58, #67) |
 | 14 | ER-03 | Opposite Action fidelity pass (flow v3) | partial | OA v2 shipped (PR #12). Feeling doors / multi-emotion on PR #48 (open, conflicts) |
 | 15 | ER-06 | Route ER by state + engine change | shipped | rf-v2 switched on 5 Oct (PR #43); [checkin-routing-review.md](design/checkin-routing-review.md) |
 | 16 | MF-01 | Notice it, name it (observe → describe) | partial | Inside the check-in, body step and Find the feeling; no practice of its own |
@@ -96,16 +104,16 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 34 | CORE-08 | Chain + solution analysis | spec only | |
 | 35 | WMP-06 | Louder before it quits (extinction burst) | spec only | Parts' *Louder* pause is a different thing |
 | 36 | IE-04 | Say no | spec only | |
-| 37 | IE-05 | FAST | spec only | Routing row planned, off |
+| 37 | IE-05 | FAST | shipped | Keep your self-respect, two skills under tool id `fast` (PR #59): [fast.md](design/fast.md) |
 | 38 | ER-08 | Let it be a wave (mindfulness of current emotion) | spec only | |
 | 39 | ER-09 | What matters to me (values) | spec only | |
 | 40 | IE-06 | GIVE | spec only | Routing row planned, off |
 | 41 | DT-06 | ACCEPTS + attention ladder | partial | Attention-shift activity on low-energy results only |
-| 42 | ER-12 | Problem Solve completion | partial | Problem Solve ships; saves nothing, no follow-up |
+| 42 | ER-12 | Problem Solve completion | partial | Problem Solve ships; saves nothing, no follow-up. On the runtime in PR #71 (open) |
 | 43 | MF-04 | Wise mind | shipped | 17 Oct (PR #49); [wise-mind.md](design/wise-mind.md). Routing row off |
 | 44 | IE-07 | What matters most (`SizeIt`) | partial | Embedded in DEAR MAN; no standalone |
-| 45 | DT-11 | Alternate rebellion | spec only | Also `Goblin DBT/Claudia Notes/To implement - alternate rebellion.md` |
-| 46 | IE-08 | Ending a relationship that's hurting you | spec only | Needs DV resources (Cope Ahead's *They might hurt me* banner is the only DV path) |
+| 45 | DT-11 | Alternate rebellion | shipped | Rebel without the wreckage on the runtime (PRs #57, #65): [alternate-rebellion.md](design/alternate-rebellion.md) |
+| 46 | IE-08 | Ending a relationship that's hurting you | spec only | Built in PR #70 (open): safety first, nothing kept, quick exit. Unparked 10 Nov (modules plan D14) |
 | 47 | IE-11 | When it didn't work (troubleshooting) | partial | DEAR MAN's debrief |
 | 48 | MF-05 | One thing (one-mindfully) | spec only | |
 | 49 | WMP-07 | Both can be true (dialectics) | spec only | Parts' Two pulls covers some of the ground for parts-on people |
@@ -125,12 +133,12 @@ Waves follow the index: 1 safety floor and platform, 2 validation and the transf
 | 62 | DT-08 | Thoughts passing through | spec only | |
 | 63 | IE-10 | Notice them | spec only | |
 | 64 | MF-09 | Doing mind, being mind | spec only | |
-| 65 | ER-14 | It isn't working (ER troubleshooting) | spec only | |
+| 65 | ER-14 | It isn't working (ER troubleshooting) | shipped | On the runtime (PRs #58, #67): [er-troubleshoot.md](design/er-troubleshoot.md) |
 | 66 | WMP-09 | Where am I swinging? | spec only | |
 | 67 | IE-12 | What gets in the way (myths) | partial | DEAR MAN's barrier coaching |
 | 68 | MF-10 | Join in (participate) | spec only | |
 | 69 | WMP-10 | Change the pattern with them | spec only | |
-| 70 | ER-15 | Rewrite the nightmare | spec only | |
+| 70 | ER-15 | Rewrite the nightmare | shipped | On the runtime (PR #69), unparked 10 Nov (D14): [nightmare-rescript.md](design/nightmare-rescript.md) |
 | 71 | CORE-13 | Optional clinician sharing | spec only | Export exists in Me; no sharing |
 | 72 | MF-11 | Find the middle | dead | Retired into WMP-09 |
 
@@ -144,7 +152,10 @@ registry (§9)**, which is the starting design for the flow runtime.
 
 | Plan | Status | Source |
 |---|---|---|
-| Parts (IFS): Meet a part, the den, a part's story, Two pulls, trails, offers | shipped (17 Oct); fixes in PRs #50 / #51 merged, deploys pending; trail offers off until the dry run | [parts.md](design/parts.md), [parts-handover.md](design/parts-handover.md), [parts-research/](design/parts-research/); sign-off pack `/mnt/project-files/parts/parts-copy-review.md` (snapshot, regenerate with `node scripts/parts/review.mjs`) |
+| Skill runtime: skills as graph data, one player, the attempt record | shipped (4–10 Nov; five skills on it) | [skill-runtime.md](design/skill-runtime.md); content `scripts/skills/` |
+| Finishing DT, IE and ER (lanes, contracts C1–C8, gates, decisions D1–D17) | in progress: approved 10 Nov, F1/F2 merged, lanes building | [dbt-modules-plan.md](design/dbt-modules-plan.md); read-only PRD copies for the lanes in `/mnt/project-files/handoffs/prds/` |
+| The user profile: what's kept, what it powers, keep / edit / delete | partial: P1 and half of P2 shipped (PR #55); own-words migration, Me's delete UI to do | [user-profile.md](design/user-profile.md) |
+| Parts (IFS): Meet a part, the den, a part's story, Two pulls, trails, offers | shipped (17 Oct; fixes #50 / #51); trail offers off until the dry run | [parts.md](design/parts.md), [parts-handover.md](design/parts-handover.md), [parts-research/](design/parts-research/); sign-off pack `/mnt/project-files/parts/parts-copy-review.md` (snapshot, regenerate with `node scripts/parts/review.mjs`) |
 | Find the feeling (Shape it, Tune it) | shipped (30 Sep) | [find-the-feeling.md](design/find-the-feeling.md); `Goblin DBT/Specs/Find the Feeling – Shape it + Tune it.md` |
 | Alexithymia-first direction: Stage, Shape, Tune | partial: Shape and Tune shipped, Stage spec only | [alexithymia-first-interaction.md](design/alexithymia-first-interaction.md); `Goblin DBT/Direction/Alexithymia-First Interaction – Stage, Shape, Tune.md`; `Goblin DBT/Direction/Decisions Log – Alexithymia-First Build (Sep 2026).md`; prototypes `prototypes/goblin-lab/` |
 | Body map (heat figure, drag, strength, body mirror, several feelings) | shipped (steps 1–5, 5 Oct) | [body-map.md](design/body-map.md) |
@@ -169,14 +180,15 @@ registry (§9)**, which is the starting design for the flow runtime.
 |---|---|---|
 | Phase A build plan (E1 foundations, E2 spine/profile/check-in, E3 band/witness, E4 engine; 34 PRs) | shipped (30 Sep–5 Oct) | `Goblin DBT/DBT Module PRDs/Build Plan/` (Build Plan – Phase A, E1–E4, Deploy Guide, Merge & Deploy Runbook) |
 | App as built, user-workflow map | dead as a status record (written at `1ef08b9`, 30 Sep); keep for its errata | `Goblin DBT/DBT Module PRDs/App Architecture – UX & Workflow Map.md` |
-| Auto-deploy on merge | in flight: PR #52, thread *Automate Firebase deploys after merge* | branch `claude/project-thread-7ivmaj` |
-| The path forward: flow runtime, skill catalogue as data, one router, Library | spec only (3 Nov); thread 1 is this page | [Goblin DBT: where it stands and the path forward](https://claude.ai/artifact/QnR4Q9J8HEucUZXsPdq4T2) |
+| Auto-deploy on merge, and the merge lane | shipped (PR #52, #60, #64, #68; 10–11 Nov) | `.github/workflows/`; the merge lane runs on the Mac |
+| The path forward: flow runtime, skill catalogue as data, one router, Library | partial: index, runtime and auto-deploy done; catalogue as data, router and Library ahead | [Goblin DBT: where it stands and the path forward](https://claude.ai/artifact/QnR4Q9J8HEucUZXsPdq4T2) |
 | RAG and generation direction | spec only; sits on top of the router (path-forward, after thread 5) | `Goblin DBT/Direction/RAG and Generation Direction.md` (same as `/mnt/project-files/knowledge/claude/rag-and-generation-direction.md`) |
 | Slack crew (plan + six agent specs) | dead: project threads do this job; nothing was built | `Goblin DBT/Direction/Slack Crew – Plan.md`, `Goblin DBT/Specs/Slack Crew/`; copies in `/mnt/project-files/knowledge/claude/` (`slack-agents-plan.md`, `specs/{lead,graph,goblin,voice,lit,pulse}.md`) |
 | Custom follow-up questions: where the data lives | shipped (generated content files) | `Goblin DBT/Data Considerations/Custom Follow-up Questions – Where the Data Lives.md` |
 | Product Changelog | living: the status record for every product change | `Goblin DBT/Product Changelog.md` |
 | Idea Backlog (loved ideas from the morning recaps) | living: 3 loved (light steps, put the dot down again, notice how the dot was placed), none specced | `Goblin DBT/Idea Backlog.md`; recaps in `Goblin DBT/Morning Recaps/` (29 Sep–7 Oct) |
 | Parts changelog entries (Phase 0, 16 Oct decisions) | dead: already pasted into the Product Changelog (16 Oct entries) | `/mnt/project-files/parts/changelog-phase0.md`, `changelog-16oct-decisions.md` |
+| Safety plan resume note (CORE-01/02, paused 10 Nov) | living: where the safety batch stopped | `/mnt/project-files/handoffs/safety-plan-resume.md` |
 | Check the Facts handover (project copy) | dead: duplicate of the repo copy | `/mnt/project-files/handoffs/check-the-facts-handover.md` → use [design/check-the-facts-handover.md](design/check-the-facts-handover.md) |
 | Opposite Action specs (project copies) | dead: duplicates of the Obsidian notes | `/mnt/project-files/knowledge/claude/specs/opposite-action-*.md` |
 
@@ -200,26 +212,28 @@ All in `Goblin DBT/Research/` unless noted.
 
 ## 6. Branches
 
-17 branches are not in `main`. None is safe to merge as it stands: every one either conflicts with
-`main`, is overtaken, or was never meant for it. 29 more branches are fully merged and just left behind.
-Nothing here has been deleted or closed; each line needs your call.
+Checked 11 Nov. 20 branches are not in `main`. Besides the active thread branches, none is safe to merge
+as it stands: each one conflicts with `main`, is overtaken, or was never meant for it. You approved the
+cleanup on 3 Nov; this session can't delete branches (pushes are limited to its own branch), so
+`/mnt/project-files/branch-cleanup/cleanup.sh` (in the project's Library)
+does it from `~/Documents/goblin-dbt`: it archives the overtaken branches as `archive/…` tags, then
+deletes them and the merged ones.
 
-| Branch | PR | Last commit | Recommend | Why |
+| Branch | PR | Last commit | Call | Why |
 |---|---|---|---|---|
-| `routing/ties-weights-safety-question` | #47 open | 5 Oct | **keep → safety thread** | The only safety-batch code (optional self-harm question on the spiral path, ties go to your words). One conflict (`discriminating-questions.json`, regenerate). Rebase it in path-forward thread 4 |
-| `fix/voice-rules-lighter` | #25 closed, unmerged | 1 Oct | **keep, decide** | Your corpus rewrite, rule 4 (never validate the intensity of a negative feeling) and a lighter lint. Never reached `main`, and nothing on `main` says it was dropped. 8 conflicting files (parts added lint scopes since). Decide whether rule 4 still stands; if yes, redo it on `main` as a small PR and close this |
-| `feat/please-running-low` | #33 closed, unmerged | 2 Oct | **keep, park** | *Running low* (ER-07 PLEASE), copy unsigned. 10 conflicts. The routing table already has a switched-off row for it. Rebuild it on the flow runtime (path-forward thread 5) using this as the content source |
-| `feat/oa-doors` | #48 open | 6 Oct | **keep, park** | OA feeling doors, three ways in, up to three feelings. 3 conflicts in `OppositeAction.tsx` and the content build. Port when OA moves to the runtime, or rebase now if you want it sooner |
-| `claude/project-thread-7ivmaj` | #52 open | 27 Oct | **leave alone** | Owned by *Automate Firebase deploys after merge* |
-| `labs/exploits` | none | 29 Sep | **keep** | Exploits Lab v3, 108 files of prototypes, "not for main yet". Merges cleanly but doesn't belong in the app build; keep as the lab |
-| `docs/parts-design` | none | 14 Oct | close | Overtaken: every file is on `main` in a later form except `dev/parts-fixture.ts`, which `dev/parts-example.ts` replaced |
+| `claude/project-thread-d9xzcy`, `claude/project-thread-u7okch` | #70, #71 open | 11 Nov | **active** | IE-08 and Problem Solve lanes |
+| `claude/project-thread-jfrnbz` | #53 open | 11 Nov | **active** | This index |
+| `routing/ties-weights-safety-question` | #47 open | 5 Oct | **keep → safety batch** | The only safety-batch code (optional self-harm question on the spiral path, ties go to your words). One conflict (`discriminating-questions.json`, regenerate). Rebase when the batch resumes |
+| `fix/voice-rules-lighter` | #25 closed, unmerged | 1 Oct | **keep, decide** | Your corpus rewrite, rule 4 (never validate the intensity of a negative feeling) and a lighter lint. Never reached `main`. 8 conflicting files. If rule 4 stands, redo it on `main` as a small PR and close this |
+| `feat/please-running-low` | #33 closed, unmerged | 2 Oct | **keep, park** | *Running low* (ER-07 PLEASE), copy unsigned, 10 conflicts. Content source for ER-07 on the runtime |
+| `feat/oa-doors` | #48 open | 6 Oct | **keep, park** | OA feeling doors, three ways in, up to three feelings. 3 conflicts. Port when OA moves to the runtime |
+| `labs/exploits` | none | 29 Sep | **keep** | Exploits Lab v3 prototypes, "not for main yet" |
+| `claude/project-thread-dt1q1d` | #54 closed | 10 Nov | close | Only merge commits left; the skill runtime reached `main` another way |
+| `docs/parts-design` | none | 14 Oct | close | Overtaken: every file is on `main` in a later form |
 | `design/den-rooms` | none | 30 Sep | close | Overtaken: landed as PR #23 (`design/den`) |
-| `wip` | none | 23 Sep | close | The April Firestore migration and Neo4j audit-agent drafts. Main stayed on Neo4j; nothing here is wanted |
-| `phase-a/m0-harm-patches`, `phase-a/m1-foundations`, `phase-a/m2-platform`, `phase-a/m3-band-witness` | #14–#17 merged | 30 Sep | close | Each holds only the stacked-PR merge commit; all content is on `main` |
-| `barbie-ui`, `checkin-avail-963f5`, `cursor/development-environment-setup-e68d`, `emotionquadrants` | old | Feb–Mar | close | From before `main`'s history was restarted (no common ancestor); everything useful was merged then (PRs #1–#11) |
-
-After this, open work sits on 6 branches: the safety question, the voice rules, PLEASE, OA doors, the
-deploy PR and the lab.
+| `wip` | none | 23 Sep | close | The April Firestore migration and Neo4j audit-agent drafts; `main` stayed on Neo4j |
+| `phase-a/m0-harm-patches`, `phase-a/m1-foundations`, `phase-a/m2-platform`, `phase-a/m3-band-witness` | #14–#17 merged | 30 Sep | close | Only the stacked-PR merge commit; all content is on `main` |
+| `barbie-ui`, `checkin-avail-963f5`, `cursor/development-environment-setup-e68d`, `emotionquadrants` | old | Feb–Mar | close | From before `main`'s history restarted (no common ancestor); merged then as PRs #1–#11 |
 
 **Merged and left behind (delete):** `claude/fix-ifs-den-parts-saving-v67ryh`, `content/body-map-signoff`,
 `design/den`, `feat/body-map-content`, `feat/body-map-drag`, `feat/body-map-figure`, `feat/body-mirror`,
@@ -227,5 +241,7 @@ deploy PR and the lab.
 `feat/graph-export-filters`, `feat/home-screen-app`, `feat/one-word-list`, `feat/routing-on`,
 `feat/routing-review`, `feat/today-off-the-square`, `fix/body-drag-touch`, `fix/body-map-load-error`,
 `fix/body-outlines-thumb`, `fix/continue-instant`, `fix/dearman-gate-close`, `fix/den-review`,
-`phase-a/m4-engine`, `phase-a/review-fixes`, `plan/body-map`, `reflect/r1-true-numbers`,
-`remove-capacity-question`, `ui-usability-prd`. Every commit on these is in `main`; deleting loses nothing.
+`fix/den-test-clock`, `fix/lane-base-check`, `phase-a/m4-engine`, `phase-a/review-fixes`, `plan/body-map`,
+`reflect/r1-true-numbers`, `remove-capacity-question`, `ui-usability-prd`. Every commit on these is in
+`main`. Merged `claude/project-thread-*` branches and `lane/merge-queue` are left alone: their threads
+and the merge lane may still use them.
