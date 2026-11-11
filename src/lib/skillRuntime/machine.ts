@@ -638,6 +638,28 @@ export function runEmotionIds(ctx: RunContext, s: Pick<RunState, 'answers'>): st
   return ctx.skill.emotionFields.flatMap((f) => s.answers[f]?.ids ?? []);
 }
 
+/**
+ * The urges this run names (the spine's ask-fresh `urgeIds`): each picked option's `urge` prop (an ActionUrge id),
+ * in pick order. Own words name none.
+ */
+export function runUrgeIds(ctx: RunContext, s: Pick<RunState, 'answers'>): string[] {
+  const out: string[] = [];
+  for (const f of allFields(ctx.skill)) {
+    const list = f.options.list;
+    if (!list) continue;
+    for (const id of s.answers[f.id]?.ids ?? []) {
+      const u = ctx.skill.options[list]?.find((o) => o.value === id)?.urge;
+      if (typeof u === 'string' && ID.test(u) && !out.includes(u)) out.push(u);
+    }
+  }
+  return out;
+}
+
+/** Whether safety.open opens over this step as the run arrives at it (`safetyFirst`, plan C6.5). */
+export function opensSafety(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers'>): boolean {
+  return !!step.safetyFirst && holds(step.safetyFirst, scope(ctx, s));
+}
+
 /** The crisis slot a step shows right now (variant), or null. */
 export function crisisFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers'>): CrisisSlot | null {
   const sc = scope(ctx, s);

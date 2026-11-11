@@ -5777,3 +5777,466 @@ SET o:SkillOption, o += {skillId: "ending_relationships", list: "again", value: 
 MATCH (s:Skill {id: "ending_relationships"}), (o:SkillOption {id: "ending_relationships:again:month"})
 MERGE (s)-[r:HAS_OPTION]->(o)
 SET r += {list: "again", order: 47};
+
+// --- hold_to_wait (hw-v1) ---
+MERGE (s:Skill {id: "hold_to_wait"})
+SET s += {toolId: "pause", version: "hw-v1", contentVersion: "skills-v1", start: "pull", ownMax: 90, emotionFields: [], accepts: ["band"]}, s.inlineJson = "null", s.runtimeJson = "{}", s.copyJson = "{\"back_hint\": \"Pick one and do it. The screen waits.\", \"back_title\": \"Now take one step back.\", \"body_q\": \"In your body\", \"done\": \"Done\", \"fact_q\": \"What set it off\", \"hold_done\": \"Held.\", \"hold_hint\": \"Press and hold the circle. Letting go early still counts.\", \"hold_label\": \"Hold here\", \"hold_running\": \"Your hand has a job now\", \"hold_title\": \"That's a strong pull. It makes sense it's this strong.\", \"hold_title_flooded\": \"Your body's loud. Hold here for a moment.\", \"move_q\": \"One next move\", \"next\": \"Next\", \"next_hurt\": \"You gave it some room. If it comes back, your support is right here.\", \"next_hurt_flooded\": \"Your body's loud. Settle it first. If the pull comes back, your support is right here.\", \"next_later\": \"Saving it for later is a choice. The message will still be there when you're steadier.\", \"next_line\": \"You gave the pull some room. What you do next is yours.\", \"next_look\": \"Once, later, at a time you pick. Until then it can wait.\", \"next_not_now\": \"Not now is a whole answer. It can come back later and ask again.\", \"next_phone\": \"Out of reach is easier than out of mind. That counts.\", \"next_step_out\": \"Step out, and come back when the ten minutes are up.\", \"next_tell\": \"Saying it to someone safe first can take some of the push out of it.\", \"observe_hint\": \"One tap each, or skip it.\", \"observe_title\": \"What do you notice?\", \"proceed_title\": \"What matters most right now?\", \"pull_hint\": \"Pick the closest. There's no wrong answer here.\", \"pull_own\": \"Say it your way\", \"pull_title\": \"What's pulling at you?\", \"reach_line\": \"Please reach out to someone now, using the support on this screen. You don't have to hold this alone.\", \"safe_hint\": \"You can answer honestly. Whatever you say, the support stays on the screen.\", \"safe_title\": \"Thank you for saying it. Right now, are you safe from acting on it?\", \"safety_open\": \"Talk to someone now\", \"settle_line\": \"Your body's loud. Settle it first. The rest can wait, and Today will ask you about it later.\", \"wait_back\": \"I'm back\", \"wait_done\": \"That's the wait. Come back to it when you're ready.\", \"wait_done_short\": \"Done\", \"wait_short\": \"Waiting\", \"wait_title\": \"Phone down. The pull can wait with it.\", \"wait_waiting\": \"Put the phone face down and come back when you're ready. This screen will still be here.\"}", s.tablesJson = "{}", s.deriveJson = "[]";
+MATCH (t:TherapyConcept {id: "dbt_stop"}), (s:Skill {id: "hold_to_wait"})
+MERGE (t)-[:HAS_SKILL]->(s);
+MATCH (:SkillStep {skillId: "hold_to_wait"})-[r:NEXT|OFFERS|LINKS]->() DELETE r;
+MATCH (:Skill {id: "hold_to_wait"})-[r:HAS_STEP|HAS_EXIT|HAS_OPTION]->() DELETE r;
+MERGE (n:SkillStep {id: "hold_to_wait:pull"})
+SET n += {skillId: "hold_to_wait", step: "pull", kind: "ask", version: "hw-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"pull\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"pull\"}, \"own\": {\"countsAsPick\": true, \"hint\": \"pull_own\"}, \"required\": true}], \"hint\": \"pull_hint\", \"title\": \"pull_title\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:pull"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 0};
+MERGE (n:SkillStep {id: "hold_to_wait:safe"})
+SET n += {skillId: "hold_to_wait", step: "safe", kind: "ask", version: "hw-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"safe\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"safe\"}, \"required\": true}], \"hint\": \"safe_hint\", \"safetyFirst\": {\"all\": []}, \"title\": \"safe_title\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:safe"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 1};
+MERGE (n:SkillStep {id: "hold_to_wait:hold"})
+SET n += {skillId: "hold_to_wait", step: "hold", kind: "embed", version: "hw-v1"}, n.specJson = "{\"answerAs\": \"hold\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"embed\": \"holdRing\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"doneLabel\": \"hold_done\", \"hint\": \"hold_hint\", \"label\": \"hold_label\", \"maxSeconds\": 900, \"next\": \"next\", \"runningLabel\": \"hold_running\", \"seconds\": 90, \"variant\": \"press\"}, \"title\": [{\"key\": \"hold_title_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"hold_title\"}]}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:hold"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 2};
+MERGE (n:SkillStep {id: "hold_to_wait:step_back"})
+SET n += {skillId: "hold_to_wait", step: "step_back", kind: "ask", version: "hw-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"step_back\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"step_back\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$opt.calm\", true]}]}, {\"all\": [{\"not\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"not\": {\"all\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"eq\": [\"$opt.phone\", true]}]}}]}]}}, \"required\": true}], \"followUp\": {\"type\": \"hold_come_back\", \"when\": {\"all\": [{\"not\": {\"eq\": [\"$a.pull\", \"hurt\"]}}, {\"any\": [{\"eq\": [\"$a.step_back\", \"phone_down\"]}, {\"eq\": [\"$ctx.band\", \"flooded\"]}]}]}}, \"hint\": \"back_hint\", \"title\": \"back_title\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:step_back"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 3};
+MERGE (n:SkillStep {id: "hold_to_wait:wait"})
+SET n += {skillId: "hold_to_wait", step: "wait", kind: "embed", version: "hw-v1"}, n.specJson = "{\"answerAs\": \"wait\", \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"embed\": \"waitLock\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"props\": {\"done\": \"wait_done\", \"doneShort\": \"wait_done_short\", \"minutes\": 10, \"next\": \"wait_back\", \"waiting\": \"wait_waiting\", \"waitingShort\": \"wait_short\"}, \"title\": \"wait_title\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:wait"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 4};
+MERGE (n:SkillStep {id: "hold_to_wait:observe"})
+SET n += {skillId: "hold_to_wait", step: "observe", kind: "ask", version: "hw-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"body\", \"label\": \"body_q\", \"max\": 3, \"options\": {\"list\": \"body\"}}, {\"id\": \"fact\", \"label\": \"fact_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"fact\"}}], \"hint\": \"observe_hint\", \"title\": \"observe_title\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:observe"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 5};
+MERGE (n:SkillStep {id: "hold_to_wait:proceed"})
+SET n += {skillId: "hold_to_wait", step: "proceed", kind: "ask", version: "hw-v1"}, n.specJson = "{\"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"fields\": [{\"id\": \"goal\", \"max\": 1, \"options\": {\"list\": \"goal\"}}, {\"id\": \"move\", \"label\": \"move_q\", \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"max\": 1, \"options\": {\"list\": \"move\", \"where\": {\"any\": [{\"all\": [{\"eq\": [\"$a.pull\", \"send\"]}, {\"eq\": [\"$opt.send\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"check\"]}, {\"eq\": [\"$opt.check\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"eq\": [\"$opt.hurt\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"hit\"]}, {\"eq\": [\"$opt.hit\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"leave\"]}, {\"eq\": [\"$opt.leave\", true]}]}, {\"all\": [{\"eq\": [\"$a.pull\", \"use\"]}, {\"eq\": [\"$opt.use\", true]}]}, {\"all\": [{\"not\": {\"in\": [\"$a.pull\", [\"send\", \"check\", \"hurt\", \"hit\", \"leave\", \"use\"]]}}, {\"eq\": [\"$opt.other\", true]}]}]}}}], \"title\": \"proceed_title\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:proceed"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 6};
+MERGE (n:SkillStep {id: "hold_to_wait:next"})
+SET n += {skillId: "hold_to_wait", step: "next", kind: "handoff", version: "hw-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"next_later\", \"when\": {\"eq\": [\"$a.move\", \"later\"]}}, {\"key\": \"next_tell\", \"when\": {\"eq\": [\"$a.move\", \"tell\"]}}, {\"key\": \"next_phone\", \"when\": {\"eq\": [\"$a.move\", \"phone_room\"]}}, {\"key\": \"next_look\", \"when\": {\"eq\": [\"$a.move\", \"look_once\"]}}, {\"key\": \"next_step_out\", \"when\": {\"eq\": [\"$a.move\", \"step_out\"]}}, {\"key\": \"next_not_now\", \"when\": {\"eq\": [\"$a.move\", \"not_now\"]}}, {\"key\": \"next_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:next"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 7};
+MERGE (n:SkillStep {id: "hold_to_wait:settle"})
+SET n += {skillId: "hold_to_wait", step: "settle", kind: "handoff", version: "hw-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"settle_line\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}]}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:settle"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 8};
+MERGE (n:SkillStep {id: "hold_to_wait:hurt_end"})
+SET n += {skillId: "hold_to_wait", step: "hurt_end", kind: "handoff", version: "hw-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"next_hurt_flooded\", \"when\": {\"eq\": [\"$ctx.band\", \"flooded\"]}}, {\"key\": \"next_hurt\", \"when\": {\"all\": []}}], \"links\": [{\"exit\": \"safety_open\", \"label\": \"safety_open\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:hurt_end"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 9};
+MERGE (n:SkillStep {id: "hold_to_wait:reach"})
+SET n += {skillId: "hold_to_wait", step: "reach", kind: "handoff", version: "hw-v1"}, n.specJson = "{\"complete\": true, \"crisis\": [{\"variant\": \"crisis\", \"when\": {\"any\": [{\"eq\": [\"$a.pull\", \"hurt\"]}, {\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}]}}], \"done\": \"done\", \"lines\": [{\"key\": \"reach_line\", \"when\": {\"all\": []}}], \"noClose\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (n:SkillStep {id: "hold_to_wait:reach"})
+MERGE (s)-[r:HAS_STEP]->(n)
+SET r += {order: 10};
+MERGE (x:SkillExit {id: "hold_to_wait:dear_man"})
+SET x += {skillId: "hold_to_wait", exit: "dear_man", toolId: "dear-man", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:dear_man"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:dear_man"}), (t:TherapyConcept {appToolId: "dear-man"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:cool_down"})
+SET x += {skillId: "hold_to_wait", exit: "cool_down", toolId: "cool-down", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:cool_down"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:cool_down"}), (t:TherapyConcept {appToolId: "cool-down"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:fast"})
+SET x += {skillId: "hold_to_wait", exit: "fast", toolId: "fast", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:fast"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:fast"}), (t:TherapyConcept {appToolId: "fast"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:urge_surfing"})
+SET x += {skillId: "hold_to_wait", exit: "urge_surfing", toolId: "urge-surfing", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:urge_surfing"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:urge_surfing"}), (t:TherapyConcept {appToolId: "urge-surfing"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:alternate_rebellion"})
+SET x += {skillId: "hold_to_wait", exit: "alternate_rebellion", toolId: "alternate-rebellion", done: false, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:alternate_rebellion"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:alternate_rebellion"}), (t:TherapyConcept {appToolId: "alternate-rebellion"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+SET x += {skillId: "hold_to_wait", exit: "crisis_kit", toolId: "crisis-kit", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:crisis_kit"}), (t:TherapyConcept {appToolId: "crisis-kit"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:held"})
+SET x += {skillId: "hold_to_wait", exit: "held", toolId: "soothe", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:held"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:held"}), (t:TherapyConcept {appToolId: "soothe"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:mind_job"})
+SET x += {skillId: "hold_to_wait", exit: "mind_job", toolId: "mind-job", done: false, carry: [], planned: true, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:mind_job"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (x:SkillExit {id: "hold_to_wait:mind_job"}), (t:TherapyConcept {appToolId: "mind-job"})
+MERGE (x)-[:OPENS]->(t);
+MERGE (x:SkillExit {id: "hold_to_wait:safety_open"})
+SET x += {skillId: "hold_to_wait", exit: "safety_open", done: false, carry: [], planned: false, safety: true}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MERGE (x:SkillExit {id: "hold_to_wait:done"})
+SET x += {skillId: "hold_to_wait", exit: "done", done: true, carry: [], planned: false, safety: false}, x.queryJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (x:SkillExit {id: "hold_to_wait:done"})
+MERGE (s)-[:HAS_EXIT]->(x);
+MATCH (a:SkillStep {id: "hold_to_wait:pull"}), (b:SkillStep {id: "hold_to_wait:safe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.pull\", \"hurt\"]}";
+MATCH (a:SkillStep {id: "hold_to_wait:pull"}), (b:SkillStep {id: "hold_to_wait:hold"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "hold_to_wait:pull"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "pull", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:safe"}), (b:SkillStep {id: "hold_to_wait:reach"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"in\": [\"$a.safe\", [\"unsure\", \"no\"]]}";
+MATCH (a:SkillStep {id: "hold_to_wait:safe"}), (b:SkillStep {id: "hold_to_wait:hold"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "hold_to_wait:safe"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "safe", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:hold"}), (b:SkillStep {id: "hold_to_wait:step_back"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "hold_to_wait:hold"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:step_back"}), (b:SkillStep {id: "hold_to_wait:wait"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.step_back\", \"phone_down\"]}";
+MATCH (a:SkillStep {id: "hold_to_wait:step_back"}), (b:SkillStep {id: "hold_to_wait:hurt_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "{\"all\": [{\"eq\": [\"$ctx.band\", \"flooded\"]}, {\"eq\": [\"$a.pull\", \"hurt\"]}]}";
+MATCH (a:SkillStep {id: "hold_to_wait:step_back"}), (b:SkillStep {id: "hold_to_wait:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 2}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "hold_to_wait:step_back"}), (b:SkillStep {id: "hold_to_wait:observe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 3}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "hold_to_wait:step_back"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "step_back", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:wait"}), (b:SkillStep {id: "hold_to_wait:settle"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$ctx.band\", \"flooded\"]}";
+MATCH (a:SkillStep {id: "hold_to_wait:wait"}), (b:SkillStep {id: "hold_to_wait:observe"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "hold_to_wait:wait"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:observe"}), (b:SkillStep {id: "hold_to_wait:proceed"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "hold_to_wait:observe"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "fact", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:proceed"}), (b:SkillStep {id: "hold_to_wait:hurt_end"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 0}, r.whenJson = "{\"eq\": [\"$a.pull\", \"hurt\"]}";
+MATCH (a:SkillStep {id: "hold_to_wait:proceed"}), (b:SkillStep {id: "hold_to_wait:next"})
+MERGE (a)-[r:NEXT]->(b)
+SET r += {order: 1}, r.whenJson = "null";
+MATCH (a:SkillStep {id: "hold_to_wait:proceed"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "move", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:dear_man"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"eq\": [\"$a.move\", \"ask\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"eq\": [\"$a.move\", \"cool\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:fast"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"eq\": [\"$a.move\", \"boundary\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:urge_surfing"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"eq\": [\"$a.move\", \"ride\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:alternate_rebellion"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 4}, r.rowsJson = "[{\"order\": 4, \"when\": {\"eq\": [\"$a.move\", \"rebel\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 5}, r.rowsJson = "[{\"order\": 5, \"when\": {\"eq\": [\"$a.move\", \"call\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 6}, r.rowsJson = "[{\"order\": 6, \"when\": {\"eq\": [\"$a.pull\", \"use\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:mind_job"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 7}, r.rowsJson = "[{\"order\": 7, \"when\": {\"eq\": [\"$a.pull\", \"check\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:next"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:settle"}), (x:SkillExit {id: "hold_to_wait:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:settle"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:cool_down"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"any\": [{\"eq\": [\"$a.move\", \"cool\"]}, {\"eq\": [\"$ctx.band\", \"flooded\"]}]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 1}, r.rowsJson = "[{\"order\": 1, \"when\": {\"eq\": [\"$a.move\", \"call\"]}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 2}, r.rowsJson = "[{\"order\": 2, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:held"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 3}, r.rowsJson = "[{\"order\": 3, \"when\": {\"all\": []}}]";
+MATCH (a:SkillStep {id: "hold_to_wait:hurt_end"}), (x:SkillExit {id: "hold_to_wait:safety_open"})
+MERGE (a)-[r:LINKS]->(x)
+SET r += {order: 0, field: "", label: "safety_open"}, r.whenJson = "{\"all\": []}";
+MATCH (a:SkillStep {id: "hold_to_wait:reach"}), (x:SkillExit {id: "hold_to_wait:crisis_kit"})
+MERGE (a)-[r:OFFERS]->(x)
+SET r += {order: 0}, r.rowsJson = "[{\"order\": 0, \"when\": {\"all\": []}}]";
+MERGE (o:SkillOption {id: "hold_to_wait:pull:send"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "pull", value: "send", label: "Send or say something", version: "hw-v1"}, o.propsJson = "{\"urge\": \"send\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:pull:send"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 0};
+MERGE (o:SkillOption {id: "hold_to_wait:pull:check"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "pull", value: "check", label: "Check their page, or my phone", version: "hw-v1"}, o.propsJson = "{\"urge\": \"check\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:pull:check"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 1};
+MERGE (o:SkillOption {id: "hold_to_wait:pull:hurt"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "pull", value: "hurt", label: "Hurt myself", version: "hw-v1"}, o.propsJson = "{\"danger\": \"self\", \"urge\": \"self_harm\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:pull:hurt"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 2};
+MERGE (o:SkillOption {id: "hold_to_wait:pull:hit"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "pull", value: "hit", label: "Hit, throw or slam", version: "hw-v1"}, o.propsJson = "{\"urge\": \"hit\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:pull:hit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 3};
+MERGE (o:SkillOption {id: "hold_to_wait:pull:leave"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "pull", value: "leave", label: "Leave, run or disappear", version: "hw-v1"}, o.propsJson = "{\"urge\": \"leave\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:pull:leave"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 4};
+MERGE (o:SkillOption {id: "hold_to_wait:pull:use"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "pull", value: "use", label: "Use, drink, binge or buy", version: "hw-v1"}, o.propsJson = "{\"urge\": \"use\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:pull:use"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "pull", order: 5};
+MERGE (o:SkillOption {id: "hold_to_wait:safe:safe"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "safe", value: "safe", label: "Yes, I'm safe for now", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:safe:safe"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe", order: 6};
+MERGE (o:SkillOption {id: "hold_to_wait:safe:unsure"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "safe", value: "unsure", label: "I'm not sure", version: "hw-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:safe:unsure"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe", order: 7};
+MERGE (o:SkillOption {id: "hold_to_wait:safe:no"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "safe", value: "no", label: "No", version: "hw-v1"}, o.propsJson = "{\"danger\": \"self\"}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:safe:no"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "safe", order: 8};
+MERGE (o:SkillOption {id: "hold_to_wait:step_back:sit"})
+SET o:SkillOption:StepBackOption, o += {skillId: "hold_to_wait", list: "step_back", value: "sit", label: "Sit down", version: "hw-v1"}, o.propsJson = "{\"calm\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:step_back:sit"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_back", order: 9};
+MERGE (o:SkillOption {id: "hold_to_wait:step_back:room"})
+SET o:SkillOption:StepBackOption, o += {skillId: "hold_to_wait", list: "step_back", value: "room", label: "Leave the room", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:step_back:room"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_back", order: 10};
+MERGE (o:SkillOption {id: "hold_to_wait:step_back:outside"})
+SET o:SkillOption:StepBackOption, o += {skillId: "hold_to_wait", list: "step_back", value: "outside", label: "Step outside", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:step_back:outside"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_back", order: 11};
+MERGE (o:SkillOption {id: "hold_to_wait:step_back:lap"})
+SET o:SkillOption:StepBackOption, o += {skillId: "hold_to_wait", list: "step_back", value: "lap", label: "Hands in my lap", version: "hw-v1"}, o.propsJson = "{\"calm\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:step_back:lap"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_back", order: 12};
+MERGE (o:SkillOption {id: "hold_to_wait:step_back:phone_down"})
+SET o:SkillOption:StepBackOption, o += {skillId: "hold_to_wait", list: "step_back", value: "phone_down", label: "Put the phone down for ten minutes", version: "hw-v1"}, o.propsJson = "{\"phone\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:step_back:phone_down"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "step_back", order: 13};
+MERGE (o:SkillOption {id: "hold_to_wait:body:hot"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "body", value: "hot", label: "Hot", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:body:hot"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 14};
+MERGE (o:SkillOption {id: "hold_to_wait:body:tight"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "body", value: "tight", label: "Tight", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:body:tight"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 15};
+MERGE (o:SkillOption {id: "hold_to_wait:body:shaky"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "body", value: "shaky", label: "Shaky", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:body:shaky"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 16};
+MERGE (o:SkillOption {id: "hold_to_wait:body:heavy"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "body", value: "heavy", label: "Heavy", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:body:heavy"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 17};
+MERGE (o:SkillOption {id: "hold_to_wait:body:buzzing"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "body", value: "buzzing", label: "Buzzing", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:body:buzzing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 18};
+MERGE (o:SkillOption {id: "hold_to_wait:body:cant_tell"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "body", value: "cant_tell", label: "Can't tell", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:body:cant_tell"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "body", order: 19};
+MERGE (o:SkillOption {id: "hold_to_wait:fact:someone"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "fact", value: "someone", label: "Someone said or did something", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:fact:someone"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 20};
+MERGE (o:SkillOption {id: "hold_to_wait:fact:saw"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "fact", value: "saw", label: "Something I saw", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:fact:saw"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 21};
+MERGE (o:SkillOption {id: "hold_to_wait:fact:thought"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "fact", value: "thought", label: "A thought", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:fact:thought"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 22};
+MERGE (o:SkillOption {id: "hold_to_wait:fact:nothing"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "fact", value: "nothing", label: "Nothing I can point to", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:fact:nothing"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "fact", order: 23};
+MERGE (o:SkillOption {id: "hold_to_wait:goal:tonight"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "goal", value: "tonight", label: "Get through this without making it worse", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:goal:tonight"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "goal", order: 24};
+MERGE (o:SkillOption {id: "hold_to_wait:goal:want"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "goal", value: "want", label: "Get what I want", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:goal:want"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "goal", order: 25};
+MERGE (o:SkillOption {id: "hold_to_wait:goal:relationship"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "goal", value: "relationship", label: "Keep the relationship", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:goal:relationship"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "goal", order: 26};
+MERGE (o:SkillOption {id: "hold_to_wait:goal:self_respect"})
+SET o:SkillOption, o += {skillId: "hold_to_wait", list: "goal", value: "self_respect", label: "Keep my self-respect", version: "hw-v1"}, o.propsJson = "{}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:goal:self_respect"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "goal", order: 27};
+MERGE (o:SkillOption {id: "hold_to_wait:move:later"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "later", label: "Save it, and look again when I'm steadier", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"send\"], \"send\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:later"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 28};
+MATCH (o:SkillOption {id: "hold_to_wait:move:later"}), (u:ActionUrge {id: "send"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:tell"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "tell", label: "Tell it to someone safe first", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"send\"], \"send\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:tell"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 29};
+MATCH (o:SkillOption {id: "hold_to_wait:move:tell"}), (u:ActionUrge {id: "send"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:ask"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "ask", label: "Plan how to ask for it, later", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"send\"], \"handsOn\": \"dear_man\", \"send\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:ask"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 30};
+MATCH (o:SkillOption {id: "hold_to_wait:move:ask"}), (u:ActionUrge {id: "send"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:phone_room"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "phone_room", label: "Put the phone in another room", version: "hw-v1"}, o.propsJson = "{\"check\": true, \"forUrges\": [\"check\"]}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:phone_room"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 31};
+MATCH (o:SkillOption {id: "hold_to_wait:move:phone_room"}), (u:ActionUrge {id: "check"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:look_once"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "look_once", label: "Look once, later, at a time I pick", version: "hw-v1"}, o.propsJson = "{\"check\": true, \"forUrges\": [\"check\"]}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:look_once"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 32};
+MATCH (o:SkillOption {id: "hold_to_wait:move:look_once"}), (u:ActionUrge {id: "check"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:cool"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "cool", label: "Cool my body down first", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"hit\", \"use\", \"self_harm\"], \"handsOn\": \"cool_down\", \"hit\": true, \"hurt\": true, \"other\": true, \"use\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:cool"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 33};
+MATCH (o:SkillOption {id: "hold_to_wait:move:cool"}), (u:ActionUrge {id: "hit"})
+MERGE (o)-[:FOR_URGE]->(u);
+MATCH (o:SkillOption {id: "hold_to_wait:move:cool"}), (u:ActionUrge {id: "use"})
+MERGE (o)-[:FOR_URGE]->(u);
+MATCH (o:SkillOption {id: "hold_to_wait:move:cool"}), (u:ActionUrge {id: "self_harm"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:boundary"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "boundary", label: "Say one line to hold my ground", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"leave\"], \"handsOn\": \"fast\", \"leave\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:boundary"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 34};
+MATCH (o:SkillOption {id: "hold_to_wait:move:boundary"}), (u:ActionUrge {id: "leave"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:step_out"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "step_out", label: "Step out for ten minutes, then come back", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"leave\"], \"leave\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:step_out"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 35};
+MATCH (o:SkillOption {id: "hold_to_wait:move:step_out"}), (u:ActionUrge {id: "leave"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:ride"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "ride", label: "Ride it out", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"use\"], \"handsOn\": \"urge_surfing\", \"other\": true, \"use\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:ride"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 36};
+MATCH (o:SkillOption {id: "hold_to_wait:move:ride"}), (u:ActionUrge {id: "use"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:not_now"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "not_now", label: "Tell it: not now", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"use\"], \"use\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:not_now"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 37};
+MATCH (o:SkillOption {id: "hold_to_wait:move:not_now"}), (u:ActionUrge {id: "use"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:rebel"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "rebel", label: "Rebel, without the wreckage", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"hit\", \"leave\"], \"handsOn\": \"alternate_rebellion\", \"hit\": true, \"leave\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:rebel"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 38};
+MATCH (o:SkillOption {id: "hold_to_wait:move:rebel"}), (u:ActionUrge {id: "hit"})
+MERGE (o)-[:FOR_URGE]->(u);
+MATCH (o:SkillOption {id: "hold_to_wait:move:rebel"}), (u:ActionUrge {id: "leave"})
+MERGE (o)-[:FOR_URGE]->(u);
+MERGE (o:SkillOption {id: "hold_to_wait:move:call"})
+SET o:SkillOption:ProceedOption, o += {skillId: "hold_to_wait", list: "move", value: "call", label: "Call or text someone", version: "hw-v1"}, o.propsJson = "{\"forUrges\": [\"self_harm\"], \"handsOn\": \"safety_open\", \"hurt\": true}";
+MATCH (s:Skill {id: "hold_to_wait"}), (o:SkillOption {id: "hold_to_wait:move:call"})
+MERGE (s)-[r:HAS_OPTION]->(o)
+SET r += {list: "move", order: 39};
+MATCH (o:SkillOption {id: "hold_to_wait:move:call"}), (u:ActionUrge {id: "self_harm"})
+MERGE (o)-[:FOR_URGE]->(u);

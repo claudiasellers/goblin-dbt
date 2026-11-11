@@ -181,6 +181,11 @@ export interface StepDef {
    */
   noClose?: boolean;
   /**
+   * Open safety.open over this step as the run arrives at it, while the condition holds (plan C6.5: *hurt myself*
+   * opens the safety route before anything else). Once per arrival; *Back to where I was* shows the step itself.
+   */
+  safetyFirst?: Cond;
+  /**
    * Only a reopened run starts here (R9, `?run=<id>&at=<this step>`), and only a run whose path reached `after` (the
    * step that made the plan it asks about); any other run doesn't reopen. No step leads to it; it comes after the
    * run's whole recorded path, every answer of that run comes back but the ask-fresh ones, and neither it nor any

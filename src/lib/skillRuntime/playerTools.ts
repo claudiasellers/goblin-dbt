@@ -10,6 +10,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'er-troubleshoot': 'er_troubleshoot',
   'ending-relationships': 'ending_relationships',
   'nightmare-rescript': 'nightmare_rescript',
+  'pause': 'hold_to_wait',
   'problem-solve': 'problem_solve',
 };
 

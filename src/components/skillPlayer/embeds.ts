@@ -7,6 +7,7 @@ import { PartLaterEmbed } from './PartLaterEmbed';
 import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
+import { WaitLockEmbed } from './WaitLockEmbed';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -46,6 +47,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   rebellionCard: RebellionCard,
   boundaryLine: BoundaryLine,
   rescriptCard: RescriptCard,
+  waitLock: WaitLockEmbed,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -56,6 +58,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   rebellionCard: { ids: ['now', 'today', 'week'] },
   boundaryLine: { ids: ['copied'] },
   rescriptCard: { ids: ['read', 'stopped'], measures: ['durationSec'] },
+  waitLock: { ids: ['waited', 'back_early'], measures: ['durationSec'] },
 };
 
 /**
@@ -120,5 +123,13 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     stopLabel: { type: 'copy' },
     doneLabel: { type: 'copy' },
     skipLabel: { type: 'copy' },
+  },
+  waitLock: {
+    minutes: { type: 'int', min: 1, max: 60 },
+    waiting: { type: 'copy' },
+    waitingShort: { type: 'copy' },
+    done: { type: 'copy' },
+    doneShort: { type: 'copy' },
+    next: { type: 'copy' },
   },
 };

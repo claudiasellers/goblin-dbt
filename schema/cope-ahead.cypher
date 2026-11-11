@@ -215,7 +215,7 @@ SET n += {kind: "action", label: "Call or text someone who can help, now", line:
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "reach_help"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "pause"})
-SET n += {kind: "tool", label: "Pause", line: "open Pause", forPulls: ["fight", "chase"], general: false, appToolId: "pause", forMoments: [], order: 14, version: "cope-ahead-v1"};
+SET n += {kind: "tool", label: "Hold to wait", line: "open Hold to wait", forPulls: ["fight", "chase"], general: false, appToolId: "pause", forMoments: [], order: 14, version: "cope-ahead-v1"};
 MATCH (t:TherapyConcept {id: 'dbt_cope_ahead'}), (m:CopeMove {id: "pause"})
 MERGE (t)-[:HAS_MOVE]->(m);
 MERGE (n:CopeMove {id: "five_senses"})

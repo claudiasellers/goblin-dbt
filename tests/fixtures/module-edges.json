@@ -3,7 +3,7 @@
   "batches": ["F1", "F2", "DT-B1", "DT-B2", "DT-B3", "DT-B4", "DT-B5", "IE-B1", "IE-B2", "IE-B3", "IE-B4", "IE-B5", "ER-B1", "ER-B2", "ER-B3", "ER-B4", "ER-B5", "safety", "blocked", "outside"],
   "edges": [
     { "n": 4, "from": "help-now", "kind": "exit", "to": [{ "tool": "cool-down", "state": "DT-B2" }], "note": "Help me now → DT-01, treated as flooded" },
-    { "n": 6, "from": "pause", "kind": "gate", "to": [{ "tool": "safety.open", "state": "DT-B1" }], "note": "hurt myself → safety.open first" },
+    { "n": 6, "from": "pause", "kind": "gate", "to": [{ "tool": "safety.open", "state": "built" }], "note": "hurt myself → safety.open first" },
     { "n": 8, "from": "safety-plan", "kind": "data", "to": [{ "tool": "crisis-kit", "state": "safety" }], "note": "plan step 2 references KitCard ids" },
     { "n": 9, "from": "safety.open", "kind": "inline", "to": [{ "tool": "cool-down", "state": "safety" }], "note": "dt.holdAlongside under the resources" },
     { "n": 10, "from": "cool-down", "kind": "exit", "to": [{ "tool": "problem-solve", "state": "DT-B2" }, { "tool": "dear-man", "state": "DT-B2" }, { "tool": "opposite-action", "state": "DT-B2" }, { "tool": "let-it-be", "state": "DT-B4" }, { "tool": "mind-job", "state": "DT-B3" }], "note": "Help-me-now fork (built inside DT-01 until CORE-07)" },
@@ -61,6 +61,9 @@
     { "n": null, "source": "IE Arch #30", "from": "fast", "kind": "exit", "to": [{ "tool": "recovering-from-invalidation", "state": "built" }], "note": "Let go → meet the need elsewhere (Recover from its start until IE-B4's enterAt; then its need step)" },
     { "n": null, "source": "IE Arch #37", "from": "fast", "kind": "exit", "to": [{ "tool": "finding-connection", "state": "planned" }], "note": "Let go → find your people (planned until IE-B5)" },
     { "n": null, "source": "IE PRD IE-05", "from": "fast", "kind": "exit", "to": [{ "tool": "rehearse", "state": "planned" }, { "tool": "dear-man", "state": "built" }, { "tool": "check-the-facts", "state": "built" }], "note": "review → rehearse the line (planned until IE-B5); plan the next ask; guilt that fits a real wrong → check it" },
+    { "n": null, "source": "DT PRD DT-02", "from": "pause", "kind": "exit", "to": [{ "tool": "dear-man", "state": "built" }, { "tool": "fast", "state": "built" }, { "tool": "urge-surfing", "state": "built" }, { "tool": "alternate-rebellion", "state": "built" }], "note": "the chosen move's next step: send → plan the ask (DEAR MAN); leave → one line (FAST); use or own words → ride it out; hit or leave → Rebel without the wreckage" },
+    { "n": null, "source": "DT PRD DT-02", "from": "pause", "kind": "exit", "to": [{ "tool": "cool-down", "state": "built" }], "note": "flooded (carried) → hold, step back, body first; a come-back card 10 min later" },
+    { "n": null, "source": "DT PRD DT-02", "from": "pause", "kind": "exit", "to": [{ "tool": "crisis-kit", "state": "planned" }, { "tool": "soothe", "state": "planned" }, { "tool": "mind-job", "state": "planned" }], "note": "hurt myself / not safe / use → my crisis kit (DT-03); hurt myself → Held (DT-07); check → mind job (DT-06): planned until their batches" },
     { "n": null, "source": "IE Arch #42", "from": "problem-solve", "kind": "exit", "to": [{ "tool": "fast", "state": "built" }], "note": "Problem Solve's linkedToolId / redirectToolId 'fast' (7 links) open the review" }
   ]
 }

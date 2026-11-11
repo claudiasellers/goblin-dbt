@@ -299,6 +299,11 @@ def check(skill):
             if "when" in fu:
                 check_cond(fu["when"], fields, derived, w, accepts)
         assert "noClose" not in s or (s["kind"] == "handoff" and s["noClose"] is True), (w, "noClose is a hand-off's", s.get("noClose"))
+        if "safetyFirst" in s:
+            # Plan C6.5: the resources open over the step as the run arrives; the skill must have safety.open.
+            assert SAFETY_EXIT_ID in exits, (w, "safetyFirst opens the skill's safety.open exit")
+            assert any(sl["variant"] == "crisis" for sl in s.get("crisis", [])), (w, "a safetyFirst step pins the crisis banner too")
+            check_cond(s["safetyFirst"], fields, derived, w, accepts)
         if "clears" in s:
             cl = s["clears"]
             assert isinstance(cl, list) and cl and len(set(cl)) == len(cl), (w, "clears is a list of fields", cl)
@@ -360,7 +365,16 @@ def check(skill):
         assert at in steps, (sid, "resumeAt names a step", at)
     every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
+    # An option's `urge` is the ActionUrge id the session records (spine urgeIds): one the graph has.
+    for o in skill["options"]:
+        if "urge" in o[3]:
+            assert o[3]["urge"] in ACTION_URGES, (sid, "an urge the graph has (schema/opposite-action-data.cypher)", o[1], o[3]["urge"])
+        for u in o[3].get("forUrges", []):
+            assert u in ACTION_URGES, (sid, "a move is for an urge the graph has", o[1], u)
 
+
+# Every ActionUrge id the graph has (Do the Opposite's and DT's behaviour urges): an option's `urge` names one.
+ACTION_URGES = set(re.findall(r'\{id: "([a-z0-9_-]+)", label:', open(os.path.join(ROOT, "schema/opposite-action-data.cypher"), encoding="utf8").read()))
 
 for sk in SKILLS:
     check(sk)
@@ -442,6 +456,10 @@ for sk in SKILLS:
             # A rebellion serves the functions it's matched to (DT-11): queryable as knowledge, not only as UI.
             for fn in extra["functions"]:
                 A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (f:SkillOption {{id: {q(sid + ':function:' + fn)}}})\nMERGE (o)-[:SERVES]->(f);")
+        if clinical == "ProceedOption":
+            # A next move is for the urges it answers (DT-02): queryable as knowledge, not only as UI.
+            for u in extra.get("forUrges", []):
+                A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (u:ActionUrge {{id: {q(u)}}})\nMERGE (o)-[:FOR_URGE]->(u);")
         if clinical == "Alternative" and extra["for"] != "$own":
             A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (st:SkillOption {{id: {q(sid + ':story:' + extra['for'])}}})\nMERGE (o)-[:ALTERNATIVE_TO]->(st);")
 CYPHER = "\n".join(L)
