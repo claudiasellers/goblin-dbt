@@ -37,6 +37,9 @@ KINDS = [
     # Rewrite the nightmare (ER-15): a new version the person kept. Never stale: it is theirs until they set it aside.
     ("nightmare_script", "my_plans", "A nightmare I rewrote", None,
      "", "Set aside. It stays out of the way until you bring it back."),
+    # Cope Ahead (ER-05): a plan the person kept on *Keep this*. Never stale: it is theirs until they set it aside.
+    ("cope_ahead_plan", "my_plans", "A plan for something hard", None,
+     "", "Set aside. It stays out of the way until you bring it back."),
 ]
 
 # Pattern rules (CORE-owned). Evaluated lazily when Today loads, at most once a day per user.
