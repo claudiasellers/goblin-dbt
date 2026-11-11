@@ -19,7 +19,7 @@ export default defineConfig({
       input: {
         ftf: resolve(__dirname, 'find-the-feeling.html'), capacity: resolve(__dirname, 'capacity.html'), body: resolve(__dirname, 'body-map.html'),
         parts: resolve(__dirname, 'parts.html'), review: resolve(__dirname, 'parts-review.html'),
-        skills: resolve(__dirname, 'skills-review.html'),
+        skills: resolve(__dirname, 'skills-review.html'), people: resolve(__dirname, 'people.html'),
       },
     },
   },

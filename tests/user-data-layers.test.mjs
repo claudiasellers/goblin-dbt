@@ -28,7 +28,7 @@ test("every registered label has a layer; every non-system label an exportAs, un
   assert.equal(new Set(keys).size, keys.length);
   assert.equal(exportKeyFor(["CheckIn", "UserData", "LogRecord"]), "checkIns");
   assert.equal(exportKeyFor(["PushToken", "UserData", "System"]), null);
-  assert.deepEqual(labelsOf("profile").sort(), ["DenSnapshot", "MyPattern", "OwnLine", "Part", "PartLink", "ProfileFact"]);
+  assert.deepEqual(labelsOf("profile").sort(), ["DenSnapshot", "MyPattern", "OwnLine", "Part", "PartLink", "Person", "ProfileFact"]);
   assert.deepEqual(LAYER_LABEL, { log: "LogRecord", profile: "ProfileItem", system: "System" });
 });
 
@@ -214,7 +214,7 @@ test("CLAUDE.md documents the data layers (R11)", () => {
 
 test("profile kinds (user-profile.md §4.2): a kept value never holds an ask-fresh field, refused or stripped", async () => {
   const { PROFILE_KINDS, checkValue } = await importTs("functions/src/profile/kinds.ts");
-  const ok = { quiet_hours: { start: "22:00", end: "07:00" }, nightmare_script: { turnIds: ["door"], endingOwn: "I wake up" } };
+  const ok = { quiet_hours: { start: "22:00", end: "07:00" }, nightmare_script: { turnIds: ["door"], endingOwn: "I wake up" }, person: { label: "Sam", role: "friend" } };
   for (const [kind, def] of Object.entries(PROFILE_KINDS)) {
     assert.ok(ok[kind], `${kind}: add a valid value here`);
     for (const f of ["thenVsNow", "fitsFacts", "bandLevel", "urgeIds"]) {

@@ -37,6 +37,10 @@ KINDS = [
     # Rewrite the nightmare (ER-15): a new version the person kept. Never stale: it is theirs until they set it aside.
     ("nightmare_script", "my_plans", "A nightmare I rewrote", None,
      "", "Set aside. It stays out of the way until you bring it back."),
+    # People (IE-03): someone the person named in DEAR MAN's picker. Never stale here: the safety question has its
+    # own re-ask (90 days, or *Things changed*), asked in the flow, never as a Me "still true?".
+    ("person", "my_people", "Someone in my life", None,
+     "", "Set aside. They won't be offered in the picker until you bring them back."),
 ]
 
 # Pattern rules (CORE-owned). Evaluated lazily when Today loads, at most once a day per user.

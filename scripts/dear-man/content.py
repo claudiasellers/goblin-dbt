@@ -189,6 +189,15 @@ DEBRIEF_TO_CHANGE = [
     {"id": "debrief_breathe", "label": "Take a breath when I felt overwhelmed", "type": "to_change", "sort": 8},
 ]
 # 11. Reveal text and coaching lines, on the DEAR MAN TherapyConcept.
+# Appear confident (H5): body and voice cues on the plan card, replacing the hard-coded "Body Reminder" line
+# (IE-B2, PRD IE-01 Mode B step 8). ConfidenceCue nodes, IMPLEMENTS dbt_dear_man; the plan shows them in order.
+CONFIDENCE_CUES = [
+    {"id": "cue_feet", "label": "Feet flat on the ground", "kind": "body", "sortOrder": 1},
+    {"id": "cue_shoulders", "label": "Shoulders down and back", "kind": "body", "sortOrder": 2},
+    {"id": "cue_breath", "label": "One slow breath out before you start", "kind": "body", "sortOrder": 3},
+    {"id": "cue_voice", "label": "An even voice, a little slower than usual", "kind": "voice", "sortOrder": 4},
+    {"id": "cue_eyes", "label": "Look at them, or close to them", "kind": "body", "sortOrder": 5},
+]
 CONCEPT_COPY = {"revealText": "Each step you just did maps to a framework called DEAR MAN from Dialectical Behavior Therapy: Describe the facts. Express your feelings. Assert your need. Reinforce why it matters. Stay Mindful of what pulls you off track. Appear confident — your body helps your brain. Negotiate if needed. You didn't just fill in blanks — you built a real plan for a real conversation.",
     "confidentCoaching": "Even if you don't feel confident, your body can help. Before the conversation: shoulders back, feet on the ground, steady voice. It actually changes how you feel, not just how you look.",
     "confidentBarrierNoRight": "Appearing confident isn't about pretending. It's about honoring the fact that what you need matters.",
@@ -437,5 +446,31 @@ SAFETY_COPY = {"id": "dear_man_safety_copy",
     "hotCoolDown": "Take the edge off (about 30 seconds)",
     "hotReady": "I'm good to go",
     "hotBodyCue": "Unclench your jaw and drop your shoulders while you read it through.",
-    "hotCooled": "That's the edge off. Read your plan once more, out loud if you can, then go when it feels right."}
+    "hotCooled": "That's the edge off. Read your plan once more, out loud if you can, then go when it feels right.",
+    # People and safety (IE-B2, IE-03 minimal + D4: "Is it safe to bring hard things up with them?" in the prep, with
+    # the other_person banner). {who} is the person's name, or "them". src/components/people/PersonPicker.tsx.
+    "personWho": "Who is this conversation with?",
+    "personNew": "Someone new",
+    "personNameLabel": "What do you call them?",
+    "personNameHint": "A nickname is fine. No real names needed.",
+    "personRoleLabel": "Who are they to you?",
+    "personKeepLine": "The app will remember {who} for next time: the name you gave and who they are to you. Nothing else.",
+    "personNoNameLine": "Without a name, nothing about them is kept.",
+    "personSignedOutLine": "This stays on this screen only.",
+    "personGoOn": "Go on",
+    "personChanged": "Things changed with someone?",
+    "personChangedHint": "Pick who it is, and you'll be asked about them again.",
+    "safeQuestion": "Is it safe to bring hard things up with {who}?",
+    "safeYes": "Yes, mostly",
+    "safeNo": "No",
+    "safeUnsure": "Not sure",
+    "riskQuestion": "Is it more that they might hurt or control you, or that it tends to go badly?",
+    "riskHarm": "They might hurt or control me",
+    "riskBadly": "It tends to go badly",
+    "riskUnsaid": "I'd rather not say",
+    "safetyRouteHeading": "Planning a hard talk with {who} isn't the move right now.",
+    "safetyRouteBody": "Your safety comes first. The people below can help you think it through, any time, and you don't have to be sure.",
+    "safetyRouteEnding": "Thinking about ending things with them",
+    "safetyRouteBack": "This is about someone else",
+    "badlyHeadsUp": "With someone who often makes this go badly, keep it short, written if you can, and about one thing."}
 

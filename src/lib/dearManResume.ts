@@ -39,6 +39,21 @@ export interface DearManDraft {
    * resume, and the screen is skipped if the part or parts are gone). Absent in drafts from before it.
    */
   copeAheadPartId?: string | null;
+  /**
+   * Who the plan is with and their safety answer (IE-03, the picker on scene 0), so a resumed plan keeps both: the
+   * route was already decided (a safety-route person never reaches a plan step). Absent in drafts from before it.
+   */
+  person?: DraftPerson | null;
+}
+
+/** The picker's result as the draft keeps it (src/lib/people.ts PickedPerson). */
+export interface DraftPerson {
+  personId: string | null;
+  label: string | null;
+  role: string;
+  safe: 'yes' | 'no' | 'unsure';
+  risk: 'none' | 'invalidating' | 'harm' | 'unstated';
+  route: 'ok' | 'heads_up' | 'safety';
 }
 
 export function dearManStepId(s: DearManStep): string {
@@ -66,7 +81,17 @@ export function isDearManDraft(x: unknown): x is DearManDraft {
     && strs(d.assertIds) && !!d.assertDetails && typeof d.assertDetails === 'object' && str(d.assertCustom)
     && strs(d.reinforceIds) && str(d.reinforceCustom) && str(d.anchorPhrase)
     && strOrNull(d.middleGroundId) && str(d.middleGroundCustom) && strOrNull(d.walkAwayId) && str(d.walkAwayCustom)
-    && (d.copeAheadPartId === undefined || strOrNull(d.copeAheadPartId));
+    && (d.copeAheadPartId === undefined || strOrNull(d.copeAheadPartId))
+    && (d.person === undefined || d.person === null || isDraftPerson(d.person));
+}
+
+function isDraftPerson(x: unknown): x is DraftPerson {
+  if (!x || typeof x !== 'object') return false;
+  const p = x as Record<string, unknown>;
+  return strOrNull(p.personId) && strOrNull(p.label) && str(p.role)
+    && ['yes', 'no', 'unsure'].includes(p.safe as string)
+    && ['none', 'invalidating', 'harm', 'unstated'].includes(p.risk as string)
+    && ['ok', 'heads_up'].includes(p.route as string);
 }
 
 export function dearManDraftOf(s: Omit<DearManDraft, 'v'>): DearManDraft {

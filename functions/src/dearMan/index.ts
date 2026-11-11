@@ -7,6 +7,7 @@ import neo4j, { Record as Neo4jRecord } from 'neo4j-driver';
 import { getDriver } from '../shared/neo4j';
 import { toNumber } from '../shared/values';
 import { CALL_OPTS } from '../shared/callOptions';
+import { personRoute, storedRisk } from '../safety/personSafety';
 
 // ============================================
 // DEAR MAN CONTENT + SESSION
@@ -178,6 +179,12 @@ export const getDearManContent = onCall(
         RETURN c { .* } AS copy
       `);
 
+      // 15. Appear confident: body and voice cues for the plan card (IE-B2, schema/dear-man-content.cypher §12)
+      const cueResult = await session.run(`
+        MATCH (c:ConfidenceCue)-[:IMPLEMENTS]->(:TherapyConcept {id: 'dbt_dear_man'})
+        RETURN c.id AS id, c.label AS label, c.kind AS kind ORDER BY c.sortOrder
+      `);
+
       // --- Shape the response ---
 
       const situationTypes = sitResult.records.map((r: Neo4jRecord) => ({
@@ -327,6 +334,7 @@ export const getDearManContent = onCall(
         assertBarrierGuilty: tc?.get('assertBarrierGuilty') ?? '',
         safetyGates,
         safetyCopy,
+        confidenceCues: cueResult.records.map((r: Neo4jRecord) => ({ id: String(r.get('id')), label: String(r.get('label')), kind: String(r.get('kind')) })),
       };
     } catch (error) {
       console.error('Error fetching DEAR MAN content:', error);
@@ -368,7 +376,11 @@ interface DearManSessionData {
   underneathIds?: string[];
   copeAheadId?: string;
   reflectionLanded?: 'yes' | 'sort_of' | 'not_really';
+  /** IE-03: the person picked (the caller's own Person id), or null / absent. */
+  personId?: string | null;
 }
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 export const saveDearManSession = onCall(
   CALL_OPTS,
@@ -380,8 +392,22 @@ export const saveDearManSession = onCall(
     const userId = request.auth.uid;
     const data = request.data as DearManSessionData;
 
+    // IE-03 / D4: a plan with someone on the safety route is refused here as well as never offered on screen
+    // (plan C6.6). An id that isn't the caller's own person is simply not linked.
+    const personId = typeof data.personId === 'string' && UUID.test(data.personId) ? data.personId : null;
+    const personKey = personId ? `${userId}:${personId}` : null;
+
     const session = getDriver().session();
     try {
+      if (personKey && data.type === 'prep') {
+        const p = await session.run(
+          `MATCH (:User {id: $userId})-[:HAS_PERSON]->(p:Person {key: $personKey}) RETURN p.valueJson AS v`,
+          { userId, personKey },
+        );
+        if (p.records.length && personRoute(storedRisk(p.records[0].get('v'))) === 'safety') {
+          throw new HttpsError('failed-precondition', 'Not a plan for this person');
+        }
+      }
       const written = await session.run(
         `
         MERGE (u:User {id: $userId})
@@ -422,6 +448,11 @@ export const saveDearManSession = onCall(
         })
         SET s:UserData:LogRecord, s.ownerId = $userId, s.key = $userId + ':' + s.id, s.schemaVersion = 1
         MERGE (u)-[:COMPLETED_SESSION]->(s)
+        WITH u, s
+        OPTIONAL MATCH (u)-[:HAS_PERSON]->(p:Person {key: $personKey})
+        FOREACH (x IN CASE WHEN p IS NULL THEN [] ELSE [p] END |
+          SET s.personId = x.id, x.lastUsedAt = datetime()
+          MERGE (s)-[:WITH_PERSON]->(x))
         RETURN s.id AS id
         `,
         {
@@ -458,12 +489,14 @@ export const saveDearManSession = onCall(
           underneathIds: data.underneathIds || [],
           copeAheadId: data.copeAheadId || null,
           reflectionLanded: data.reflectionLanded || null,
+          personKey,
         }
       );
 
       // PR-S4: the id links the session to its ToolSession (DETAIL) and its reps.
       return { success: true, id: (written.records[0]?.get('id') as string | undefined) ?? null };
     } catch (error) {
+      if (error instanceof HttpsError) throw error;
       console.error('Error saving DEAR MAN session:', error);
       throw new HttpsError('internal', 'Failed to save session');
     } finally {

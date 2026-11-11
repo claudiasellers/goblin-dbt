@@ -134,7 +134,7 @@ test('the kind registry: unknown kinds refused, ask-fresh fields stripped, label
     assert.ok(d.maxItems >= 1);
     assert.equal(d.kind, Object.keys(K.PROFILE_KINDS).find((k) => K.PROFILE_KINDS[k] === d));
   }
-  assert.deepEqual(Object.keys(K.itemLabels()).sort(), ['MyPattern', 'OwnLine', 'ProfileFact']);
+  assert.deepEqual(Object.keys(K.itemLabels()).sort(), ['MyPattern', 'OwnLine', 'Person', 'ProfileFact']);
 });
 
 test('keepProfileItem: counts live items, keeps on the yes, KEPT_FROM the caller\'s own session, version bumped', async () => {

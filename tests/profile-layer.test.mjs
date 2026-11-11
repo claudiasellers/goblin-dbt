@@ -52,9 +52,10 @@ test("PROFILE_NEEDS: consumers are app tools or reserved consumers; plan §5.4 P
   assert.deepEqual(types.PROFILE_NEEDS["meet-a-part"], ["name", "parts", "partDetail"]);
   // DEAR MAN's cope ahead (Phase 3) shows parts, their anchors and the kept lines to pick one from;
   // never partDetail (fears and jobs it never shows).
-  assert.deepEqual(types.PROFILE_NEEDS["dear-man"], ["parts", "ownLines", "savedLines", "partAnchors"]);
+  assert.deepEqual(types.PROFILE_NEEDS["dear-man"], ["parts", "ownLines", "savedLines", "partAnchors", "people"]);
   // Cope Ahead reuses that step as is on its screen 2, and sets the anchor under its plan (docs/design/cope-ahead.md).
-  assert.deepEqual(types.PROFILE_NEEDS["cope-ahead"], types.PROFILE_NEEDS["dear-man"]);
+  // DEAR MAN alone adds `people` (the picker, IE-03).
+  assert.deepEqual(types.PROFILE_NEEDS["cope-ahead"], types.PROFILE_NEEDS["dear-man"].filter((s) => s !== "people"));
   // `today` renders parts too (the check-back card's name, part-checkback); partDetail stays Meet a part's.
   for (const [consumer, needs] of Object.entries(types.PROFILE_NEEDS)) {
     if (consumer === "meet-a-part") continue;
@@ -183,11 +184,25 @@ test("partAnchors: own words or the kept line's text, by part id; parts off or n
     { partId: "p4", text: "   " },
   ] : []));
   const out = await slices.readProfileSlices(tx, "u1", "dear-man");
-  assert.deepEqual(Object.keys(out), ["parts", "ownLines", "savedLines", "partAnchors"]);
+  assert.deepEqual(Object.keys(out), ["parts", "ownLines", "savedLines", "partAnchors", "people"]);
   assert.deepEqual(out.partAnchors, { p1: "I can take a breath before I answer", p2: "You're allowed to be scared." });
   assert.ok(!tx.ran.some((q) => /GUARDS/.test(q)), "dear-man never reads partDetail");
   const off = await slices.readProfileSlices(fakeTx(() => []), "u1", "dear-man");
   assert.deepEqual([off.parts, off.partAnchors], [[], {}]);
+});
+
+test("people (IE-03): kept people with their label read back; nobody kept → []", async () => {
+  const row = { id: "6f1c0d3a-1111-4222-8333-444455556666", kind: "person", area: "my_people", status: "active", source: "user",
+    valueJson: JSON.stringify({ label: "Sam", role: "parent", safe: "no", risk: "invalidating", safeAskedAt: "2026-11-01T00:00:00Z" }),
+    confirmedAt: "2026-11-01T00:00:00Z", revisitAt: null };
+  const tx = fakeTx((q) => (/HAS_PERSON/.test(q) ? [{ p: row }] : []));
+  const out = await slices.readProfileSlices(tx, "u1", "dear-man");
+  assert.equal(out.people.length, 1);
+  const { meta: m, ...p } = out.people[0];
+  assert.deepEqual(p, { id: row.id, label: "Sam", role: "parent", safe: "no", risk: "invalidating", safeAskedAt: "2026-11-01T00:00:00Z" });
+  assert.equal(m.area, "my_people");
+  const none = await slices.readProfileSlices(fakeTx(() => []), "u1", "dear-man");
+  assert.deepEqual(none.people, []);
 });
 
 test("status: resting is live (still checked back with), set aside is not", () => {

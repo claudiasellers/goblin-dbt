@@ -172,6 +172,9 @@ MERGE (opt)-[:FOR_SITUATION]->(s);""")
 
     L.append(section("11. REVEAL TEXT (stored on TherapyConcept node)"))
     L.append(concept(C.CONCEPT_COPY))
+
+    L.append(section("12. CONFIDENCE CUES (Appear confident: body and voice, IE-B2)"))
+    L.append(unwind(C.CONFIDENCE_CUES, "c") + "\nMERGE (cue:ConfidenceCue {id: c.id})\nSET cue.label = c.label, cue.kind = c.kind, cue.sortOrder = c.sortOrder\nWITH cue\n" + DEAR + "\nMERGE (cue)-[:IMPLEMENTS]->(tc);")
     return "".join(L) + "\n"
 
 

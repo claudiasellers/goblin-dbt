@@ -70,6 +70,8 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   // and kind), parts/denSnapshot.ts DenSnapshot's (the server's, `den_<UTC day>`, one per day).
   PartLink: { layer: 'profile', rel: 'HAS_PART_LINK', exportAs: 'partLinks' },
   DenSnapshot: { layer: 'profile', rel: 'HAS_DEN_SNAPSHOT', exportAs: 'denSnapshots' },
+  // People (IE-03, docs/design/people.md): someone the person named, kept on the picker's tap (profile/items.ts).
+  Person: { layer: 'profile', rel: 'HAS_PERSON', exportAs: 'people' },
   // ---- system ----
   PushToken: { layer: 'system', rel: 'HAS_PUSH_TOKEN' },
 };

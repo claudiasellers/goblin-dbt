@@ -41,7 +41,7 @@ test('dear-man reads parts (with shapeSig), kept lines (with text) and partAncho
   });
   setDriver(f.driver);
   const out = await fns.getProfileContext.run({ auth: auth(), data: { toolId: 'dear-man' } });
-  assert.deepEqual(Object.keys(out.slices), ['parts', 'ownLines', 'savedLines', 'partAnchors']);
+  assert.deepEqual(Object.keys(out.slices), ['parts', 'ownLines', 'savedLines', 'partAnchors', 'people']);
   assert.deepEqual(out.slices.partAnchors, { p1: 'breathe first' });
   assert.deepEqual(out.slices.parts[0].shapeSig, [0.1, 0.2, 0.3, 0.4, 0.5]);
   assert.deepEqual(out.slices.savedLines, [{ lineId: 'wit_l1', text: 'That sounds hard.', confirmedAt: '2026-10-01T00:00:00Z' }]);
@@ -304,4 +304,20 @@ test('getMe: active and resting parts carry the stats readout, passed through un
   const off = await run(false);
   assert.ok(!off.f.calls.some((c) => /HAS_PART_TAG|HAS_PART_SESSION/.test(c.query)), 'parts off: not read');
   assert.ok(!off.me.areas.some((a) => a.items.some((i) => i.part)), 'parts off: no parts, no stats');
+});
+
+test('getMe: a person (IE-03) shows under My people by name and role, never the safety answer', async () => {
+  const f = fakeDriver((q) => {
+    if (/AS partsOn/.test(q)) return [{ partsOn: false, timeZone: null }];
+    if (/MATCH \(a:ProfileArea\)/.test(q)) return [{ id: 'my_people', label: 'My people', blurb: 'b', kinds: [{ id: 'person', label: 'Someone in my life' }] }];
+    if (/HAS_PROFILE_FACT\|HAS_PATTERN/.test(q)) return [{ label: 'Person', title: 'Someone in my life', stillTrue: '', setAside: 'Set aside.', statement: null, moveIds: [], safety: false,
+      p: { id: 'per1', kind: 'person', area: 'my_people', status: 'active', source: 'user', revisitAt: null,
+        valueJson: JSON.stringify({ label: 'Sam', role: 'parent', safe: 'no', risk: 'harm', safeAskedAt: '2026-11-01' }) } }];
+    return [];
+  });
+  setDriver(f.driver);
+  const me = await fns.getMe.run({ auth: auth(), data: {} });
+  const item = me.areas.find((a) => a.id === 'my_people').items[0];
+  assert.deepEqual([item.label, item.summary, item.value], ['Person', 'Sam', { label: 'Sam', role: 'parent' }]);
+  assert.match(f.calls.find((c) => /HAS_PROFILE_FACT/.test(c.query)).query, /HAS_PERSON\|HAS_PART\]->\(p:ProfileItem\)/);
 });
