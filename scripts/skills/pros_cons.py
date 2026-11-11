@@ -43,6 +43,8 @@ COPY = {
     "settle_line": "Settle first. The card can wait until you're steadier.",
     # Own reasons first (Miller & Rose 2015).
     "long_title": "Thinking further ahead, what are your reasons not to?",
+    # Leave can be how someone gets safe (Gate 3): the card says so before it asks.
+    "long_title_leave": "Getting away to be safe isn't what this card is for. Otherwise, what are your reasons not to?",
     "long_hint": "Pick what's true for you. Your own words count most.",
     "long_own": "A reason in your words",
     # What acting gives, acknowledged. Hurt myself: one plain line, nothing listed (C6.7).
@@ -73,7 +75,7 @@ COPY = {
     "end_kept_own": "It's in Me, for when you need it.",
     "end_act": "That's honest. Your reasons are written down now, for a harder moment.",
     "end_unsure": "Not sure is a fair place to be. Your reasons are here when you want them.",
-    "end_line": "You thought it through while you were steady. That counts.",
+    "end_line": "You thought it through. That counts.",
     "reach_line": "Please reach out to someone now, using the support on this screen. You don't have to hold this alone.",
     "safety_open": "Talk to someone now",
     "next": "Next",
@@ -119,8 +121,8 @@ URGES = ["send", "check", "hurt", "hit", "leave", "use"]
 LONG = [
     ("unsend", "I can't take it back once it's sent", ["send"]),
     ("steadier", "I want to say it when I'm steadier", ["send"]),
-    ("relationship", "It could cost me the relationship", ["send", "hit", "leave"]),
-    ("worse_after", "I never feel better after", ["check", "use", "hurt"]),
+    ("relationship", "It could cost me the relationship", ["send", "hit"]),  # not leave: leaving can be how someone gets safe
+    ("worse_after", "I end up feeling worse after", ["check", "use", "hurt"]),
     ("keeps_hurt", "It keeps the hurt going", ["check"]),
     ("time", "It eats my time", ["check"]),
     ("someone_hurt", "Someone could get hurt", ["hit"]),
@@ -128,7 +130,7 @@ LONG = [
     ("comes_with", "The problem comes with me", ["leave"]),
     ("explain", "I'd have to explain it after", ["leave"]),
     ("health", "My health", ["use"]),
-    ("progress", "It undoes the progress I've made", ["use", "hurt"]),
+    ("progress", "I've worked hard to get where I am", ["use", "hurt"]),
     ("made_it", "I've got through this before without it", ["hurt"]),
     ("stay_well", "There are people I want to stay well for", ["hurt"]),
     ("kinder", "I want to be kinder to myself", ["hurt"]),
@@ -142,29 +144,32 @@ GIVES = [
     ("heard", "Being heard, right now", ["send"]),
     ("off_chest", "Getting it off my chest", ["send"]),
     ("knowing", "Knowing", ["check"]),
-    ("close", "Feeling close to it", ["check"]),
+    ("close", "Feeling close to them", ["check"]),
     ("let_out", "Letting it out", ["hit"]),
     ("strong", "Feeling strong", ["hit"]),
     ("away", "Getting away from it", ["leave"]),
     ("not_face", "Not having to face it", ["leave"]),
-    ("break", "A break from feeling this", ["use", "other"]),
-    ("relief", "Relief, fast", ["send", "check", "hit", "leave", "use", "other"]),
-    ("control", "Feeling in control", ["other"]),
+    ("break", "A break from feeling this", ["use"]),
+    ("relief", "Relief, fast", ["send", "check", "hit", "leave", "use"]),
 ]
-# What holding off costs (cell `cost`): the same for every pull.
+# Own words have no chips here: a typed pull could be self-harm or an eating-disorder behaviour, so its pros are
+# never listed for it (C6.7). The person can say it their way; the card falls back to the plain line.
+EVERY = ["send", "check", "hurt", "hit", "leave", "use", "other"]
+# What holding off costs (cell `cost`), per pull.
 COST = [
-    ("longer", "Feeling it for longer"),
-    ("no_relief", "No relief right now"),
-    ("not_knowing", "Not knowing, for now"),
-    ("effort", "It takes effort"),
+    ("longer", "Feeling it for longer", EVERY),
+    ("no_relief", "No relief right now", EVERY),
+    ("not_knowing", "Not knowing, for now", ["send", "check"]),
+    ("effort", "It takes effort", EVERY),
 ]
-# What holding off gives (cell `keeps`): the same for every pull.
+# What holding off gives (cell `keeps`), per pull. Never *people's trust* for hurt myself: it frames self-harm as
+# betraying others (S7).
 KEEPS = [
-    ("no_regret", "No regret in the morning"),
-    ("my_word", "Keeping my word to myself"),
-    ("get_through", "Knowing I can get through it"),
-    ("my_choice", "Choosing what I do next"),
-    ("trust", "Keeping people's trust"),
+    ("no_regret", "No regret in the morning", EVERY),
+    ("my_word", "Keeping my word to myself", EVERY),
+    ("get_through", "Knowing I can get through it", EVERY),
+    ("my_choice", "Choosing what I do next", EVERY),
+    ("trust", "Keeping people's trust", ["send", "check", "hit", "leave", "use", "other"]),
 ]
 LEAN = [
     ("hold", "Holding off"),
@@ -203,7 +208,7 @@ STEPS = [
         "next": [{"when": {"eq": [a("heads_up"), "settle"]}, "to": "settle"}, {"to": "long"}],
     },
     {
-        "id": "long", "kind": "ask", "title": "long_title", "hint": "long_hint", "crisis": CRISIS,
+        "id": "long", "kind": "ask", "title": [{"when": {"eq": [a("pull"), "leave"]}, "key": "long_title_leave"}, {"key": "long_title"}], "hint": "long_hint", "crisis": CRISIS,
         "fields": [{"id": "long", "options": {"list": "long", "where": PER_PULL}, "max": 3, "required": True,
                     "own": {"hint": "long_own", "countsAsPick": True}, "links": [SAFETY_LINK]}],
         "next": [{"to": "gives"}],
@@ -218,13 +223,13 @@ STEPS = [
     },
     {
         "id": "cost", "kind": "ask", "title": "cost_title", "hint": "cost_hint", "crisis": CRISIS,
-        "fields": [{"id": "cost", "options": {"list": "cost"}, "max": 2,
+        "fields": [{"id": "cost", "options": {"list": "cost", "where": PER_PULL}, "max": 2,
                     "own": {"hint": "cost_own", "countsAsPick": True}, "links": [SAFETY_LINK]}],
         "next": [{"to": "keeps"}],
     },
     {
         "id": "keeps", "kind": "ask", "title": "keeps_title", "hint": "keeps_hint", "crisis": CRISIS,
-        "fields": [{"id": "keeps", "options": {"list": "keeps"}, "max": 2,
+        "fields": [{"id": "keeps", "options": {"list": "keeps", "where": PER_PULL}, "max": 2,
                     "own": {"hint": "keeps_own", "countsAsPick": True}, "links": [SAFETY_LINK]}],
         "next": [{"to": "lean"}],
     },
@@ -253,10 +258,11 @@ STEPS = [
     {
         "id": "end", "kind": "handoff", "complete": True, "crisis": CRISIS,
         "lines": [
-            {"when": LEAN_ACT, "key": "end_act"},
-            {"when": {"eq": [a("lean"), "unsure"]}, "key": "end_unsure"},
+            # First match wins: a kept card says where it is, whatever the lean.
             {"when": {"all": [KEPT, OWN_PULL]}, "key": "end_kept_own"},
             {"when": KEPT, "key": "end_kept"},
+            {"when": LEAN_ACT, "key": "end_act"},
+            {"when": {"eq": [a("lean"), "unsure"]}, "key": "end_unsure"},
             {"when": ALWAYS, "key": "end_line"},
         ],
         # Torn, or leaning towards it: wise mind is the next look (MF-04). Nothing else competes with Done.
@@ -293,12 +299,10 @@ def options():
     out += [("safe", v, label, props, None) for v, label, props in SAFE]
     out += [("heads_up", v, label, {}, None) for v, label in HEADS_UP]
     urge_of = {v: props["urge"] for v, _, props in PULLS}
-    for lst, rows in (("long", LONG), ("gives", GIVES)):
+    for lst, rows in (("long", LONG), ("gives", GIVES), ("cost", COST), ("keeps", KEEPS)):
         out += [(lst, v, label, {**{u: True for u in pulls}, "forUrges": [urge_of[u] for u in pulls if u in urge_of],
                                  "cell": lst}, "ProsConsItem")
                 for v, label, pulls in rows]
-    out += [("cost", v, label, {"cell": "cost"}, "ProsConsItem") for v, label in COST]
-    out += [("keeps", v, label, {"cell": "keeps"}, "ProsConsItem") for v, label in KEEPS]
     out += [("lean", v, label, {}, None) for v, label in LEAN]
     out += [("keepit", v, label, {}, None) for v, label in KEEPIT]
     return out

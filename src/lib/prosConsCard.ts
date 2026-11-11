@@ -13,6 +13,17 @@ export function cardLines(reasons: { own: string | null; picks: string[] }[], pr
   return { reasons: [...own, ...picks].slice(0, 2), pro: pro.own?.trim() || pro.picks[0] || fallback };
 }
 
+/** One sentence per part, ending in a single full stop (own words may already end in one). */
+const sentence = (s: string) => (/[.!?]$/.test(s.trim()) ? s.trim() : `${s.trim()}.`);
+
+/** The card read as one group by a screen reader: its title (if any), the reasons, the pro (if shown). */
+export function cardLabel(parts: { title?: string; reasonsLabel: string; reasons: string[]; proLabel?: string; pro?: string | null }) {
+  const out = parts.title ? [sentence(parts.title)] : [];
+  out.push(`${parts.reasonsLabel}: ${parts.reasons.map(sentence).join(' ')}`);
+  if (parts.proLabel && parts.pro) out.push(`${parts.proLabel}: ${sentence(parts.pro)}`);
+  return out.join(' ');
+}
+
 /** A field's answer from the run: own words are the last label when there are more labels than ids. */
 export function answerOf(picked: Readonly<Record<string, readonly string[]>>, ids: Readonly<Record<string, readonly string[]>>, field: string) {
   const labels = picked[field] ?? [];

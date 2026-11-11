@@ -176,3 +176,39 @@ test("C6.7: no chip is food, drink, shopping or scrolling as a comfort, no amoun
     assert.doesNotMatch(l, /\d/, l);
   }
 });
+
+test("Gate 3: a typed pull lists no pros; hurt myself never gets people's trust; leave isn't argued out of getting safe", () => {
+  // A pull in their own words could be self-harm or an eating-disorder behaviour: no pros listed (C6.7).
+  const mine = run([own("pull", "Skip meals"), next, pick("long", "regret"), next]);
+  assert.equal(mine.stepId, "gives");
+  assert.deepEqual(optionsOf("gives", "gives", mine), [], "own words only");
+  assert.ok(!skill.options.gives.some((o) => o.other), "no pro is offered for own words");
+  const card = run([next, pick("cost", "longer"), next, next, pick("lean", "hold"), next], ctx(), mine);
+  assert.equal(card.stepId, "card");
+  // Hurt myself: trust frames self-harm as betraying others (S7).
+  const hurt = run([pick("pull", "hurt"), next, pick("safe", "safe"), next, pick("long", "made_it"), next, next, next]);
+  assert.equal(hurt.stepId, "keeps");
+  assert.ok(!optionsOf("keeps", "keeps", hurt).includes("trust"));
+  assert.ok(optionsOf("keeps", "keeps", run([pick("pull", "send"), next, pick("long", "unsend"), next, next, next])).includes("trust"));
+  assert.ok(!optionsOf("cost", "cost", run([pick("pull", "hit"), next, pick("long", "someone_hurt"), next, next])).includes("not_knowing"));
+  // Leave: no "it could cost me the relationship", and the step says the card isn't for getting safe.
+  const leave = run([pick("pull", "leave"), next]);
+  assert.ok(!optionsOf("long", "long", leave).includes("relationship"));
+  assert.match(M.copyText(ctx(), M.stepOf(skill, "long").title, leave), /away to be safe/);
+  assert.doesNotMatch(M.copyText(ctx(), M.stepOf(skill, "long").title, run([pick("pull", "send"), next])), /safe/);
+  // The replay: a hurt card shows its reasons only; a leave card carries the note.
+  const slot = M.stepOf(hold, "proceed").slots.find((s) => s.embed === "prosConsReplay");
+  assert.deepEqual([slot.props.noProFor, slot.props.noteFor], ["hurt", "leave"]);
+  assert.match(hold.copy[slot.props.note], /get away to be safe/);
+  // No end line claims they were steady (a flooded *Make it now* reaches it too); a kept card says where it is.
+  assert.doesNotMatch(skill.copy.end_line, /steady/);
+  const actKept = run([...toCard("send", "act"), READ, pick("keepit", "keep"), next]);
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "end"), actKept), /It's in Me/);
+});
+
+test("the card's label reads once, one full stop per line, the replay's title first", async () => {
+  const { cardLabel } = await importTs("src/lib/prosConsCard.ts");
+  assert.equal(cardLabel({ reasonsLabel: "My reasons not to", reasons: ["I mean it.", "Regret"], proLabel: "It pulls because", pro: "Relief" }),
+    "My reasons not to: I mean it. Regret. It pulls because: Relief.");
+  assert.equal(cardLabel({ title: "Your card", reasonsLabel: "R", reasons: ["A"], pro: null }), "Your card. R: A.");
+});

@@ -126,6 +126,9 @@ EMBED_PROPS = {
         "reasonsLabel": {"type": "copy"},
         "proLabel": {"type": "copy"},
         "fallback": {"type": "copy"},
+        "noProFor": {"type": "id"},
+        "noteFor": {"type": "id"},
+        "note": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

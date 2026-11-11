@@ -158,5 +158,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     reasonsLabel: { type: 'copy' },
     proLabel: { type: 'copy' },
     fallback: { type: 'copy' },
+    noProFor: { type: 'id' },
+    noteFor: { type: 'id' },
+    note: { type: 'copy' },
   },
 };
