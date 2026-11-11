@@ -4,7 +4,7 @@ import { useDeadlineTimer } from '../../hooks/useDeadlineTimer';
 import { useHoldGesture } from '../../hooks/useHoldGesture';
 import {
   breathPace, breathPhase, breathScale, doseMs, findCount, findOutput, leadCount, leadInSeconds, nowLines,
-  SQUEEZE_COUNTS_FROM, squeezeOutput, squeezePlan, timedOutput,
+  leftAt, SQUEEZE_COUNTS_FROM, squeezeOutput, squeezePlan, timedOutput,
 } from '../../lib/bodyModes';
 import { ProgressRing } from '../tools/regulation/ProgressRing';
 import { buzz } from '../tools/regulation/hooks';
@@ -45,10 +45,12 @@ function WayOn({ done, label, onGo }: { done: boolean; label: string; onGo: () =
 }
 
 /** A tap-to-start ring on the deadline clock: tap starts, tap again stops where it is. */
-function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, autoStart = false, finished = false, children }: {
+function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, autoStart = false, finished = false, liveRef, children }: {
   ms: number; leadIn?: number; label: string; running: string; leadLabel?: (n: number) => string; autoStart?: boolean;
   /** The dose is done: the ring stays mounted (full, inert) so the timer's end chime isn't cut off by an unmount. */
   finished?: boolean;
+  /** Where a running dose is, kept fresh every tick, so leaving mid-dose reports what was done (not `skipped`). */
+  liveRef?: { current: { fraction: number; ranMs: number } | null };
   onStop: (fraction: number, ranMs: number) => void; onEnd: () => void; children?: ReactNode;
 }) {
   const total = ms + leadIn * 1000;
@@ -59,6 +61,8 @@ function TimedRing({ ms, leadIn = 0, label, running, leadLabel, onStop, onEnd, a
   useEffect(() => { if (autoStart && !started.current) { started.current = true; timer.start(); } }, [autoStart, timer]);
   const lead = on ? leadCount(leadIn, timer.elapsedMs) : null;
   const doseFraction = Math.max(0, (timer.elapsedMs - leadIn * 1000) / ms);
+  const ranMs = Math.max(0, timer.elapsedMs - leadIn * 1000);
+  useEffect(() => { if (liveRef) liveRef.current = on ? { fraction: Math.min(1, doseFraction), ranMs } : null; });
   const toggle = () => {
     if (on) { timer.stop(); onStop(Math.min(1, doseFraction), Math.max(0, timer.elapsedMs - leadIn * 1000)); }
     else timer.start();
@@ -106,6 +110,7 @@ const COLD_ART = '/tools/circuit-breaker/face.png';
 export function DoseTimer({ props, onShown, onDone }: EmbedProps) {
   useShownOnce(onShown);
   const [result, setResult] = useState<{ fraction: number; ranMs: number }>({ fraction: 0, ranMs: 0 });
+  const liveRef = useRef<{ fraction: number; ranMs: number } | null>(null);
   const ms = doseMs(props, 30);
   const lead = leadInSeconds(props);
   const done = result.fraction >= 1;
@@ -116,12 +121,12 @@ export function DoseTimer({ props, onShown, onDone }: EmbedProps) {
         <img src={COLD_ART} alt="" aria-hidden="true" draggable={false} className="mx-auto h-28 w-auto select-none pointer-events-none" />
       )}
       <Steps props={props} />
-      <TimedRing ms={ms} leadIn={lead} label={text(props, 'start')} running={text(props, 'running')} finished={done}
+      <TimedRing ms={ms} leadIn={lead} label={text(props, 'start')} running={text(props, 'running')} finished={done} liveRef={liveRef}
         leadLabel={leadWord ? (n) => `${leadWord} ${n}` : undefined}
         onStop={(fraction, ranMs) => setResult({ fraction, ranMs })}
         onEnd={() => { buzz(30); setResult({ fraction: 1, ranMs: ms }); }} />
       {done && <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>}
-      <WayOn done={done} label={text(props, 'next')} onGo={() => onDone?.(timedOutput(result.fraction, result.ranMs))} />
+      <WayOn done={done} label={text(props, 'next')} onGo={() => { const r = leftAt(result, liveRef.current); onDone?.(timedOutput(r.fraction, r.ranMs)); }} />
     </section>
   );
 }
@@ -129,17 +134,18 @@ export function DoseTimer({ props, onShown, onDone }: EmbedProps) {
 export function BodyCard({ props, onShown, onDone }: EmbedProps) {
   useShownOnce(onShown);
   const [result, setResult] = useState<{ fraction: number; ranMs: number }>({ fraction: 0, ranMs: 0 });
+  const liveRef = useRef<{ fraction: number; ranMs: number } | null>(null);
   const ms = doseMs(props, 30);
   const done = result.fraction >= 1;
   return (
     <section className="space-y-5" data-testid="body-card" data-kind={text(props, 'kind')}>
       {text(props, 'cue') && <p className="text-lg leading-snug text-[var(--color-text-primary)] text-balance">{text(props, 'cue')}</p>}
       <Steps props={props} />
-      <TimedRing ms={ms} label={text(props, 'start')} running={text(props, 'running')} autoStart={props.kind === 'still'} finished={done}
+      <TimedRing ms={ms} label={text(props, 'start')} running={text(props, 'running')} autoStart={props.kind === 'still'} finished={done} liveRef={liveRef}
         onStop={(fraction, ranMs) => setResult({ fraction, ranMs })}
         onEnd={() => setResult({ fraction: 1, ranMs: ms })} />
       {done && <p role="status" className="text-center text-[var(--color-text-secondary)]">{text(props, 'done')}</p>}
-      <WayOn done={done} label={text(props, 'next')} onGo={() => onDone?.(timedOutput(result.fraction, result.ranMs))} />
+      <WayOn done={done} label={text(props, 'next')} onGo={() => { const r = leftAt(result, liveRef.current); onDone?.(timedOutput(r.fraction, r.ranMs)); }} />
     </section>
   );
 }

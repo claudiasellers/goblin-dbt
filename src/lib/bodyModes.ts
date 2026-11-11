@@ -43,6 +43,11 @@ export function timedOutput(fraction: number, ranMs: number): { ids: [BodyOutcom
   return { ids: [outcome(fraction)], durationSec: Math.max(0, Math.round(ranMs / 1000)) };
 }
 
+/** What a timed piece reports on leaving: a running dose's progress when it's further than the last stop. */
+export function leftAt(stopped: { fraction: number; ranMs: number }, running: { fraction: number; ranMs: number } | null) {
+  return running && running.fraction > stopped.fraction ? running : stopped;
+}
+
 export interface BreathPace { inMs: number; outMs: number }
 
 /** The pace from props: the out-breath always longer than the in-breath (the long exhale is the dose). */

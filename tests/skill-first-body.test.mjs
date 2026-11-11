@@ -231,3 +231,11 @@ test("a finished dose keeps its ring mounted, so the end chime isn't cut off (th
     assert.doesNotMatch(body, /done\s*\?[^:]*:\s*\(\s*<TimedRing/, `${name}: the ring is not swapped out when done`);
   }
 });
+
+test("leaving mid-dose reports how far it ran, not skipped", () => {
+  assert.deepEqual(B.leftAt({ fraction: 0, ranMs: 0 }, { fraction: 0.5, ranMs: 15_000 }), { fraction: 0.5, ranMs: 15_000 });
+  assert.deepEqual(B.leftAt({ fraction: 0.4, ranMs: 12_000 }, null), { fraction: 0.4, ranMs: 12_000 });
+  assert.deepEqual(B.timedOutput(B.leftAt({ fraction: 0, ranMs: 0 }, { fraction: 0.5, ranMs: 15_000 }).fraction, 15_000), { ids: ["partly"], durationSec: 15 });
+  const src = readFileSync("src/components/skillPlayer/BodyEmbeds.tsx", "utf8");
+  assert.equal((src.match(/leftAt\(result, liveRef\.current\)/g) ?? []).length, 2, "DoseTimer and BodyCard both read the running dose");
+});
