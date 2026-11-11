@@ -12,6 +12,7 @@ export const TOOL_CLOSE_KIND: Record<string, { module: SpineModule; closeKind: C
   'five-senses': { module: 'dt', closeKind: 'orienting' },
   'pause': { module: 'dt', closeKind: 'urge_change' },
   'urge-surfing': { module: 'dt', closeKind: 'urge' },
+  'pros-cons': { module: 'dt', closeKind: 'none' },
   'alternate-rebellion': { module: 'dt', closeKind: 'urge' },
   'problem-solve': { module: 'er', closeKind: 'plan' },
   'cope-ahead': { module: 'er', closeKind: 'none' },

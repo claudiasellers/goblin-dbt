@@ -145,6 +145,9 @@ CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "r
 # Rewrite the nightmare (ER-15, appToolId 'nightmare-rescript', docs/design/nightmare-rescript.md) has none either, by
 # design: a recurring nightmare is not a check-in state, and the PRD's entries are the Tools intent, Sleep reset
 # (ER-13) and Running low's sleep row (ER-07), never the check-in and never night mode.
+# Pros & cons card (DT-10, appToolId 'pros-cons', docs/design/pros-cons.md) has none either, by design: it is made in
+# calm for a pull that keeps coming back, so a check-in state is the wrong moment to offer it. Its entries are the Tools
+# intent, Hold to wait's replay and later the kit (DT-03) and CORE-11's commitment step.
 # Ending a relationship that's hurting you (IE-08, appToolId 'ending-relationships',
 # docs/design/ending-relationships.md) has none either, by design (PRD: "No intent row"): ending a relationship is a
 # decision made at a calm time, never a card a feeling word earns, and a check-in that surfaced it unasked could be

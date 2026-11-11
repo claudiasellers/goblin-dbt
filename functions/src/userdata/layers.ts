@@ -61,6 +61,9 @@ export const USER_DATA: Record<string, UserDataLabel> = {
   PartRevisit: { layer: 'log', rel: 'HAS_PART_REVISIT', exportAs: 'partRevisits' }, // a part's 30-day still-true answer; create only
   PartMessage: { layer: 'log', rel: 'HAS_PART_MESSAGE', exportAs: 'partMessages' }, // "Say something to it": sayToPart, create only; edges out of it only
   TrailOffer: { layer: 'log', rel: 'HAS_TRAIL_OFFER', exportAs: 'trailOffers' }, // Phase 4: writeTrailOffer is its one writer; edges out of it only
+  // ---- log (IE, docs/design/dear-man-debrief.md) ----
+  // One conversation's outcome (IE-03's interaction log), written by DEAR MAN's debrief projection; WITH its Person.
+  Interaction: { layer: 'log', rel: 'HAS_INTERACTION', exportAs: 'interactions' },
   // ---- profile ----
   ProfileFact: { layer: 'profile', rel: 'HAS_PROFILE_FACT', exportAs: 'profileFacts' },
   MyPattern: { layer: 'profile', rel: 'HAS_PATTERN', exportAs: 'myPatterns' },

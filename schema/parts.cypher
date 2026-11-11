@@ -143,6 +143,15 @@ SET r += {why: "Give up on something that matters.", reviewStatus: "approved"};
 MATCH (a:ActionUrge {id: "envy-give-up"}), (b:ProtectiveMove {id: "put_it_off"})
 MERGE (a)-[r:EXPRESSES]->(b)
 SET r += {why: "Give up on your own goals.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "check"}), (b:ProtectiveMove {id: "chase"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Check their page, or my phone: chasing certainty.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "hit"}), (b:ProtectiveMove {id: "hit_back"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Hit, throw or slam: the fight move, out loud.", reviewStatus: "approved"};
+MATCH (a:ActionUrge {id: "leave"}), (b:ProtectiveMove {id: "hide"})
+MERGE (a)-[r:EXPRESSES]->(b)
+SET r += {why: "Leave, run or disappear: getting out of sight.", reviewStatus: "approved"};
 // FeelingUrge
 MATCH (a:FeelingUrge {id: "fight"}), (b:ProtectiveMove {id: "hit_back"})
 MERGE (a)-[r:EXPRESSES]->(b)

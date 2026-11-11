@@ -213,10 +213,9 @@ test("Reflect's trails: saving is aria-disabled, never disabled (lane 3 hands fo
 
 test("DEAR MAN: only a parts step handing back moves focus to its next step's start", () => {
   const dm = read("src/pages/tools/DearMan.tsx");
-  assert.deepEqual(dm.match(/handBack\('[a-z-]+'\)/g), ["handBack('describe')", "handBack('describe')", "handBack('debrief-reflection')"],
-    "cope ahead's go-on (and its build-the-script button), the debrief's who showed up; nothing else");
+  assert.deepEqual(dm.match(/handBack\('[a-z-]+'\)/g), ["handBack('describe')", "handBack('describe')"],
+    "cope ahead's go-on (and its build-the-script button); nothing else (the debrief is a skill since IE-B2)");
   assert.match(dm, /onGoOn=\{\(\) => handBack\('describe'\)\}/);
-  assert.match(dm, /<DebriefWho [\s\S]*?onDone=\{\(\) => handBack\('debrief-reflection'\)\}/);
   assert.match(dm, /if \(handedBackTo\.current !== phase\) \{ handedBackTo\.current = null; return; \}\s*if \(focusLost\(\)\) focusStepStart\(viewRoot\.current\);/);
   assert.match(dm, /<div ref=\{viewRoot\}>\{view\}<\/div>/);
 });

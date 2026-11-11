@@ -21,7 +21,7 @@ REF = re.compile(r"^\$(a|d|opt|ctx|p)\.[A-Za-z_][A-Za-z0-9_]*(\.(ids|own))?$")
 PROFILE_SLICES = {
     "name", "quietHours", "patterns", "ownLines", "savedLines", "people", "bodyFlags", "values", "goals",
     "copeAheadPlans", "boundaryLines", "practicePrefs", "fadeLevels", "ownWords", "thingsILike", "crisisKit",
-    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den",
+    "safetyPlan", "country", "parts", "partDetail", "partAnchors", "den", "prosCons",
 }
 # Slices a field may list as options (src/data/skillTypes.ts ProfileOptionSlice).
 PROFILE_OPTION_SLICES = {"parts", "ownLines", "savedLines", "people", "values", "goals", "copeAheadPlans", "boundaryLines", "thingsILike"}
@@ -33,10 +33,13 @@ CRISIS_VARIANTS = {"crisis", "other_person"}
 RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
 SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
-# Content nodes an option may show (PRESENTS), loaded before skills.cypher: Problem Solve's (ps_graph.py), Cope Ahead's.
+# Content nodes an option may show (PRESENTS), loaded before skills.cypher: Problem Solve's (ps_graph.py), Cope Ahead's,
+# DEAR MAN's debrief vocabulary.
 PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "BarrierType", "BarrierSubResponse", "AmbivalenceOption",
                    # Cope Ahead's (schema/cope-ahead.cypher) and Find the feeling's pulls (schema/find-the-feeling.cypher).
-                   "CopeSituation", "HardMoment", "CopeMove", "FeelingUrge"}
+                   "CopeSituation", "HardMoment", "CopeMove", "FeelingUrge",
+                   # DEAR MAN's debrief vocabulary (schema/dear-man-debrief-content.cypher, scripts/dear-man/content.py).
+                   "TurningPoint", "MomentResponse", "BodySignal", "ThoughtPattern", "Underneath", "CopeAhead", "TroubleshootFactor"}
 
 
 def q(s): return json.dumps(s, ensure_ascii=False)
@@ -161,7 +164,11 @@ def check(skill):
         else:
             assert e["id"] != SAFETY_EXIT_ID, (sid, f"{SAFETY_EXIT_ID} is reserved for safety.open", e)
             if e.get("planned"):
-                assert e.get("toolId") and e["toolId"] not in tools, (sid, "a planned exit names a tool that isn't built (flip it when it is)", e)
+                # Or a built skill that doesn't take the exit's frame yet (Ending's stay-or-end pros and cons waits for
+                # DT-10's decision frame): it waits for that frame and is never opened.
+                target = next((t for t in SKILLS if t["toolId"] == e.get("toolId")), None)
+                waits = bool(target) and isinstance(e.get("query", {}).get("frame"), str) and "frame" not in target["accepts"]
+                assert e.get("toolId") and (e["toolId"] not in tools or waits), (sid, "a planned exit names a tool that isn't built (flip it when it is)", e)
             else:
                 assert e.get("done") or e.get("toolId") in tools, (sid, e)
         for f in e.get("carry", []):

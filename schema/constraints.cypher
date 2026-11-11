@@ -79,6 +79,7 @@ CREATE CONSTRAINT thought_pattern_id IF NOT EXISTS FOR (tp:ThoughtPattern) REQUI
 CREATE CONSTRAINT underneath_id IF NOT EXISTS FOR (u:Underneath) REQUIRE u.id IS UNIQUE;
 CREATE CONSTRAINT reflection_id IF NOT EXISTS FOR (r:Reflection) REQUIRE r.id IS UNIQUE;
 CREATE CONSTRAINT cope_ahead_id IF NOT EXISTS FOR (ca:CopeAhead) REQUIRE ca.id IS UNIQUE;
+CREATE CONSTRAINT troubleshoot_factor_id IF NOT EXISTS FOR (tf:TroubleshootFactor) REQUIRE tf.id IS UNIQUE;
 
 // --- Recover from a hurtful moment (invalidation-recovery.cypher) ---
 CREATE CONSTRAINT recovery_flow_id IF NOT EXISTS FOR (irf:InvalidationRecoveryFlow) REQUIRE irf.id IS UNIQUE;
@@ -157,6 +158,7 @@ CREATE CONSTRAINT trail_offer_key IF NOT EXISTS FOR (n:TrailOffer) REQUIRE n.key
 CREATE CONSTRAINT part_link_key IF NOT EXISTS FOR (n:PartLink) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT den_snapshot_key IF NOT EXISTS FOR (n:DenSnapshot) REQUIRE n.key IS UNIQUE;
 CREATE CONSTRAINT person_key IF NOT EXISTS FOR (n:Person) REQUIRE n.key IS UNIQUE;
+CREATE CONSTRAINT interaction_key IF NOT EXISTS FOR (n:Interaction) REQUIRE n.key IS UNIQUE;
 CREATE INDEX user_data_owner IF NOT EXISTS FOR (n:UserData) ON (n.ownerId);
 CREATE INDEX tool_session_owner_started IF NOT EXISTS FOR (n:ToolSession) ON (n.ownerId, n.startedAt);
 CREATE INDEX follow_up_status_due IF NOT EXISTS FOR (n:FollowUp) ON (n.status, n.dueAt);

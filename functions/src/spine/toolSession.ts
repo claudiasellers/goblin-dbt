@@ -26,10 +26,10 @@ import { FITS_FACTS_TOOLS, validateAnswer, validateClose, validateRecord, valida
 import { URGE_KINDS, type CloseKind, type DetailKind } from './types';
 import { scheduleTx } from './followUp';
 import { NOT_WHAT_HELPS } from './tools';
-import { projectRun } from '../skills/projections';
+import { projectRun, runRep } from '../skills/projections';
 
-/** Deep-link follow-ups that opening resolves: the resume link, the nightmare read-through, Ending's check-ins (IE-08) and Problem Solve's review (ER-12). */
-export const OPEN_RESOLVES = ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'hold_come_back', 'ps_review'] as const;
+/** Deep-link follow-ups that opening resolves: the resume link, the nightmare read-through, Ending's check-ins (IE-08), Problem Solve's review (ER-12) and DEAR MAN's "How did it go?" (IE-B2). */
+export const OPEN_RESOLVES = ['resume_skill', 'nightmare_rehearse', 'ending_after', 'ending_again', 'ending_revisit', 'hold_come_back', 'ps_review', 'ask_outcome'] as const;
 
 /** Detail node labels by kind (a whitelist: the label is interpolated into Cypher). */
 export const DETAIL_LABELS: Record<DetailKind, string> = {
@@ -183,8 +183,12 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
   await projectRun(tx, uid, c.id, rec.get('toolId') as string, c.ext);
   const followUps = await scheduleTx(tx, uid, c.schedule, { sourceSessionId: c.id, sourceToolId: rec.get('toolId') as string });
   const practiced = rec.get('practiced') === true || c.practiced;
+  // A skill whose rep is something done off the phone (DEAR MAN's debrief): self-reported when it happened, else none.
+  const rep = runRep(c.ext, rec.get('toolId') as string);
+  if (rep && 'noRep' in rep) return { reps: [], followUps };
+  const repSource = rep ? rep.repSource : c.repSource;
   if ((c.status !== 'completed' && !practiced) || (c.skillIds !== null && c.skillIds.length === 0)) return { reps: [], followUps };
-  const offPhone = c.repSource === 'followup_offphone';
+  const offPhone = repSource === 'followup_offphone';
   const reps = await tx.run(
     `MATCH (u:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
      MATCH (k:PracticeSkill)
@@ -204,7 +208,7 @@ async function closeTx(tx: ManagedTransaction, uid: string, c: CloseInput): Prom
      MERGE (sp)-[:PRACTICED]->(k)
      RETURN collect(sp.id) AS ids`,
     {
-      uid, key, id: c.id, skillIds: c.skillIds, repSource: c.repSource, blankPatterns: BLANK_PATTERNS,
+      uid, key, id: c.id, skillIds: c.skillIds, repSource, blankPatterns: BLANK_PATTERNS,
       durationSec: c.durationSec, offPhone, logged: offPhone ? 'self_report' : 'in_app',
     },
   );

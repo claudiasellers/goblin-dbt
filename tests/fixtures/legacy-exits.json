@@ -53,7 +53,22 @@
     },
     {
       "from": "src/pages/tools/DearMan.tsx",
-      "to": "cool-down",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
+      "from": "src/pages/tools/DearMan.tsx",
+      "to": "fast",
+      "state": "built"
+    },
+    {
+      "from": "src/components/tools/dearMan/DearManDebrief.tsx",
+      "to": "dear-man",
+      "state": "built"
+    },
+    {
+      "from": "src/lib/dearManDebrief.ts",
+      "to": "dear-man",
       "state": "built"
     },
     {

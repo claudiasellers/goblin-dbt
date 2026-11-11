@@ -7,6 +7,8 @@ import { newId } from '../lib/spine/ids';
 import { emotionIdsFromLink, sessionEmotionIds, sessionUrgeIds, spineFrom } from '../lib/spine/toolLink';
 import { closeKindFor, durationSec } from '../lib/spine/close';
 import { useToday } from '../hooks/useToday';
+import { profileCache } from '../lib/profileCache';
+import { PROFILE_WRITING_CLOSES } from '../lib/skillRuntime/playerTools';
 import type { CapacityReading } from '../data/capacityTypes';
 
 /**
@@ -129,6 +131,8 @@ export function ToolSessionProvider({ toolId, inside, deferStart = false, childr
           ...(wiseMindAnswer.current ? { wiseMindAnswer: wiseMindAnswer.current } : {}),
           ...(fitsFacts.current ? { fitsFacts: fitsFacts.current } : {}),
         });
+        // A projection wrote to the profile (the debrief's refusal counts, safetyRecheckAt): read it fresh next time.
+        if (PROFILE_WRITING_CLOSES.has(toolId) && mergedExt.run) profileCache.clear();
         refreshToday();
         return res;
       } catch {

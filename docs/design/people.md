@@ -97,17 +97,17 @@ ships (`pickerCopy`); an older graph keeps the old role chips.
   picker at two taps for someone who doesn't want to type a name.
 - **No "step away without saying anything"** on the safety route. The PRD names IE-05's boundary option there, but
   FAST's Let go composes a boundary line, which is words to the person. Left out until IE-05 has a no-message form.
-- **Refusal counters** (`validationRefusals`, `practicalRefusals`) and `Interaction` wait for the debrief PR (IE-B2's
-  second PR), which writes the outcome they count from. `witness`, `status` (ending) and discreet mode wait for
+- **Refusal counters** (`Person.refusalsValidation` / `refusalsPractical`) and `Interaction` came with the debrief
+  (IE-B2's second PR, [`dear-man-debrief.md`](dear-man-debrief.md)), which writes the outcome they count from; the
+  `people` slice carries `refusalsValidation` (read by the prep's Let go offer only; Me shows no counts). `witness`, `status` (ending) and discreet mode wait for
   their owners (WMP, IE-08's follow-ups, the safety batch).
 
-## Open questions (routed to Claudia)
+## Decided (Claudia, 11 Nov: "go with your recommendations for all")
 
-1. Re-ask every 90 days **and** on *Things changed* (built), or only on *Things changed*?
-2. *It tends to go badly*: the PRD blocks validation-type asks (address, pattern) for that person. Built: a heads-up
-   only, every situation open, because the refusal counting that would make "let go after a no" possible isn't
-   built yet. Recommendation: keep the heads-up, and once the debrief counts refusals, offer Let go after the first
-   refused validation ask for an *it tends to go badly* person (the PRD's alternative).
+1. Re-ask every 90 days **and** on *Things changed* (as built).
+2. *It tends to go badly*: a heads-up only, every situation open; once the debrief has counted a refused ask to be
+   heard (address, pattern), the next such prep with that person offers FAST's Let go (built in the debrief PR).
+3. The debrief asks who first, and someone on the safety route gets the same safety screen as the prep.
 
 ## Waits on the safety batch
 

@@ -4,11 +4,13 @@ import { BoundaryLine } from './BoundaryLine';
 import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
 import { PartLaterEmbed } from './PartLaterEmbed';
+import { ProsConsCard, ProsConsReplay } from './ProsConsCard';
 import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
 import { KeepCardEmbed, PartAnchorEmbed, PlanSentenceEmbed, RehearsalEmbed } from './CopeAheadEmbeds';
 import { WaitLockEmbed } from './WaitLockEmbed';
+import { DebriefWhoEmbed } from './DebriefWhoEmbed';
 
 /**
  * The skill runtime's embeds (docs/design/skill-runtime.md, "Embeds"): a name the graph can place in a step
@@ -31,6 +33,11 @@ export interface EmbedProps {
   picked?: Readonly<Record<string, readonly string[]>>;
   /** The same answers as ids (an emotion field's grid ids, for an embed that asks the server about them). */
   answerIds?: Readonly<Record<string, readonly string[]>>;
+  /**
+   * The tool's profile slices (PROFILE_NEEDS, the same `$p.*` the conditions read), or null while loading or signed
+   * out. For an embed that shows something the person kept (Hold to wait's pros & cons replay); read-only.
+   */
+  profile?: Readonly<Record<string, unknown>> | null;
   onShown: () => void;
   onDone?: (output: EmbedOutput) => void;
   /**
@@ -53,6 +60,9 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   keepCard: KeepCardEmbed,
   partAnchor: PartAnchorEmbed,
   waitLock: WaitLockEmbed,
+  debriefWho: DebriefWhoEmbed,
+  prosConsCard: ProsConsCard,
+  prosConsReplay: ProsConsReplay,
 };
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
@@ -68,6 +78,9 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   keepCard: {},
   partAnchor: {},
   waitLock: { ids: ['waited', 'back_early'], measures: ['durationSec'] },
+  debriefWho: { ids: ['yes', 'a_bit', 'no', 'skip', 'general', 'not_shown'] },
+  prosConsCard: { ids: ['read'], measures: ['durationSec'] },
+  prosConsReplay: {},
 };
 
 /**
@@ -164,5 +177,26 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     done: { type: 'copy' },
     doneShort: { type: 'copy' },
     next: { type: 'copy' },
+  },
+  debriefWho: {},
+  prosConsCard: {
+    reasonsField: { type: 'field' },
+    moreField: { type: 'field' },
+    proField: { type: 'field' },
+    reasonsLabel: { type: 'copy' },
+    proLabel: { type: 'copy' },
+    fallback: { type: 'copy' },
+    next: { type: 'copy' },
+  },
+  prosConsReplay: {
+    pullField: { type: 'field' },
+    fromSkill: { type: 'id' },
+    title: { type: 'copy' },
+    reasonsLabel: { type: 'copy' },
+    proLabel: { type: 'copy' },
+    fallback: { type: 'copy' },
+    noProFor: { type: 'id' },
+    noteFor: { type: 'id' },
+    note: { type: 'copy' },
   },
 };

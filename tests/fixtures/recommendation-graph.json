@@ -475,6 +475,17 @@
    "direction": "neutral",
    "addresses": []
   },
+  "dbt_pros_cons": {
+   "appToolId": "pros-cons",
+   "name": "Pros and Cons",
+   "description": "Weighing pros and cons of tolerating vs not tolerating distress",
+   "whenToUse": null,
+   "dbtBasis": null,
+   "side": null,
+   "skillKind": null,
+   "direction": null,
+   "addresses": []
+  },
   "dbt_recovering_from_invalidation": {
    "appToolId": "recovering-from-invalidation",
    "name": "Recovering from Invalidation",

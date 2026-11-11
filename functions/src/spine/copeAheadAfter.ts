@@ -29,6 +29,8 @@ export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
   ending_after: 'ending-relationships',
   ending_again: 'ending-relationships',
   ending_revisit: 'ending-relationships',
+  // DEAR MAN's "How did it go?" (IE-B2, docs/design/dear-man-debrief.md): only from a DEAR MAN prep that saved.
+  ask_outcome: 'dear-man',
 };
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */

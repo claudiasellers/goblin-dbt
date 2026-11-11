@@ -66,8 +66,13 @@ export interface InlineReturn {
   finished: boolean;
 }
 
-export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, resumeKeepsFresh }: {
+export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, onReturn, resumeKeepsFresh, ctx }: {
   skillId: string;
+  /**
+   * Page: context the page itself found before the run (DEAR MAN's debrief: the person picked on its own screen),
+   * over the address's. Narrowed to what the skill accepts, like any context in.
+   */
+  ctx?: Readonly<Record<string, string>>;
   mode?: 'page' | 'inline';
   /** Inline: the step to start at (one the skill's `inline.enterAt` lists; otherwise its start). */
   enterAt?: string;
@@ -101,7 +106,7 @@ export function SkillPlayer({ skillId, mode = 'page', enterAt, hostSessionId, on
       </ToolSessionProvider>
     );
   }
-  return <SkillRun skill={skill} content={content} resumeKeepsFresh={resumeKeepsFresh} />;
+  return <SkillRun skill={skill} content={content} resumeKeepsFresh={resumeKeepsFresh} pageCtx={ctx} />;
 }
 
 const needsProfile = (toolId: string) => ((PROFILE_NEEDS as Record<string, readonly string[]>)[toolId]?.length ?? 0) > 0;
@@ -119,12 +124,12 @@ const emotionLabel = (id: string) => (getEmotionById(id)?.name ?? id.replace(/_/
  * The band never comes from a link: a hand-off's route state carries it, else the person's carried reading
  * (`band.current()`, ≤ 20 min, C6.2), never asked or inferred (D1).
  */
-function contextFrom(skill: SkillDef, search: string, state: unknown, carriedBand: string | null): Record<string, string> {
+function contextFrom(skill: SkillDef, search: string, state: unknown, carriedBand: string | null, pageCtx?: Readonly<Record<string, string>>): Record<string, string> {
   const { band: _band, ...q } = Object.fromEntries(new URLSearchParams(search));
   void _band;
   const fromState = (state && typeof state === 'object' && 'skillCtx' in state ? (state as { skillCtx?: unknown }).skillCtx : null);
   const st = fromState && typeof fromState === 'object' ? fromState as Record<string, unknown> : {};
-  return contextIn(skill, { ...q, ...(carriedBand && typeof st.band !== 'string' ? { band: carriedBand } : {}), ...st });
+  return contextIn(skill, { ...q, ...(carriedBand && typeof st.band !== 'string' ? { band: carriedBand } : {}), ...st, ...(pageCtx ?? {}) });
 }
 
 /** Emotions the visit was opened with: `?feel=<grid id>` first, then a hand-off's or check-in's words. */
@@ -133,8 +138,9 @@ function carriedFrom(search: string, state: unknown): string[] {
   return [...new Set([...(feel ? [feel] : []), ...emotionIdsFromLink(state)])].filter((id) => GRID.has(id));
 }
 
-function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
+function SkillRun({ skill, content, inline, resumeKeepsFresh, pageCtx }: {
   skill: SkillDef; content: SkillsContent; inline?: { enterAt?: string; onReturn?: (r: InlineReturn) => void }; resumeKeepsFresh?: boolean;
+  pageCtx?: Readonly<Record<string, string>>;
 }) {
   const toolSession = useToolSession();
   const navigate = useNavigate();
@@ -145,7 +151,7 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
   // A link's `enterAt` is for the run it reopens (R9): with no `?run=` to reopen, it doesn't hold from the start.
   const [ctxIn, setCtxIn] = useState(() => {
     if (inline) return {};
-    const c = contextFrom(skill, location.search, location.state, band.current()?.value ?? null);
+    const c = contextFrom(skill, location.search, location.state, band.current()?.value ?? null, pageCtx);
     return UUID.test(new URLSearchParams(location.search).get('run') ?? '') ? c : ctxAfterResume(c, false);
   });
   const profile = useProfileContext(skill.toolId as ClientProfileConsumer, { enabled: needsProfile(skill.toolId) });
@@ -444,7 +450,7 @@ function AskStep({ ctx, step, st, send, onExit, onShown, onPrimary, busy }: {
     const show = holds(s.showWhen, sc);
     return (
       <div key={`${s.embed}:${s.record}`} className="min-h-6">
-        {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} onShown={() => onShown(s.record)} /> : null}
+        {Embed && show ? <Embed props={embedProps(ctx, s.embed, s.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)} profile={ctx.profile ?? null} onShown={() => onShown(s.record)} /> : null}
       </div>
     );
   });
@@ -506,7 +512,7 @@ function EmbedStep({ ctx, step, st, send, onShown, onExit, covered }: {
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     <Embed props={embedProps(ctx, step.embed ?? '', step.props)} ctx={ctx.ctxIn ?? {}} picked={pickedLabels(ctx, st)} answerIds={answerIds(st)}
-      onShown={shown} onDone={done} covered={covered} />
+      profile={ctx.profile ?? null} onShown={shown} onDone={done} covered={covered} />
     <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
   </>);
 }
