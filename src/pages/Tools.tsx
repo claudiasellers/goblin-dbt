@@ -4,8 +4,11 @@ import { getToolsByModule, intents } from '../data/tools';
 import { ToolCard } from '../components/ToolCard';
 import { useToolGate } from '../hooks/useToolGate';
 import { toolsMeetLink } from '../lib/partsOfMe';
+import { toolsIntro } from '../lib/toolsIntro';
+import { useAuth } from '../contexts/AuthContext';
 
 export function Tools() {
+  const { user, loading } = useAuth();
   // Parts tools join the list only when Meet a part may open (parts on, its copy shipped): the gate
   // ToolPage opens it with. Never while that loads, so no card flickers in and out.
   const parts = useToolGate('meet-a-part') === 'open';
@@ -22,7 +25,7 @@ export function Tools() {
           Tools
         </h1>
         <p className="text-[var(--color-text-secondary)]">
-          Skills you can use right now. No account needed.
+          {toolsIntro({ signedIn: Boolean(user), loading })}
         </p>
       </div>
 
