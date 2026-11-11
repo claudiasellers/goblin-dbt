@@ -147,6 +147,7 @@ SIGNED_OFF = {
     "card_tender": "2026-10-17",
     "card_visit": "2026-10-17",
     "card_where": "2026-10-17",
+    "cf_unblend": "2026-11-04",
     "chase": "2026-10-17",
     "chase_fear_not_know": "2026-10-17",
     "chase_fear_waiting": "2026-10-17",
@@ -160,6 +161,7 @@ SIGNED_OFF = {
     "chase_voice_not_angry": "2026-10-17",
     "chase_worry_drift": "2026-10-17",
     "chase_worry_nobody_knows": "2026-10-17",
+    "check": "2026-11-11",
     "checkback_louder": "2026-10-17",
     "checkback_same": "2026-10-17",
     "checkback_settled": "2026-10-17",
@@ -268,6 +270,7 @@ SIGNED_OFF = {
     "hide_voice_see": "2026-10-17",
     "hide_worry_hurt_worse": "2026-10-17",
     "hide_worry_too_much": "2026-10-17",
+    "hit": "2026-11-11",
     "hit_back": "2026-10-17",
     "hit_back_fear_stop_mattering": "2026-10-17",
     "hit_back_fear_take_back": "2026-10-17",
@@ -301,6 +304,7 @@ SIGNED_OFF = {
     "later_no": "2026-10-17",
     "later_yes": "2026-10-17",
     "laughed_at": "2026-10-17",
+    "leave": "2026-11-11",
     "leaving": "2026-10-17",
     "left_out": "2026-10-17",
     "likes_not_sure": "2026-10-17",
@@ -585,7 +589,6 @@ SIGNED_OFF = {
     "turn_voice_too_much": "2026-10-17",
     "unblend_eased": "2026-10-17",
     "unblend_line": "2026-10-17",
-    "cf_unblend": "2026-11-04",
     "unblend_not_sure": "2026-10-17",
     "unblend_still": "2026-10-17",
     "under_fear_rejection": "2026-10-17",
@@ -739,6 +742,10 @@ EXPRESSES = {
         "fear-avoid":           ("put_it_off", "Avoid it entirely."),
         "sad-give-up":          ("put_it_off", "Give up on something that matters."),
         "envy-give-up":         ("put_it_off", "Give up on your own goals."),
+        # Hold to wait's behaviour urges (DT-02), approved by Claudia 11 Nov.
+        "check":                ("chase", "Check their page, or my phone: chasing certainty."),
+        "hit":                  ("hit_back", "Hit, throw or slam: the fight move, out loud."),
+        "leave":                ("hide", "Leave, run or disappear: getting out of sight."),
     },
     "FeelingUrge": {  # Find the feeling's pull (schema/find-the-feeling.cypher)
         "fight": ("hit_back", "FTF's fight pull."),
@@ -802,11 +809,8 @@ HELD = {
     "ActionUrge": {
         "disgust-push":  "Pushing away is a boundary as often as a protective move; hit back or hide depends on what and who.",
         "love-idealize": "Idealising protects the attachment but is none of the moves; a 'make it fine' move would need review first.",
-        # Hold to wait's behaviour urges (DT-02): held until the move mapping is reviewed. Proposed, for that review:
-        # check → chase, hit → hit_back, leave → hide (EXPRESSES rows are drafts until signed off, so they wait here).
-        "check":         "Proposed chase (checking for certainty); held until reviewed with parts sign-off.",
-        "hit":           "Proposed hit_back; held until reviewed with parts sign-off.",
-        "leave":         "Proposed hide; held until reviewed with parts sign-off.",
+        # Hold to wait's behaviour urges (DT-02): check, hit and leave are mapped (EXPRESSES, Claudia 11 Nov); these
+        # three stay held.
         "send":          "Sending or saying something can be hitting back, chasing or holding a boundary; it depends on the message.",
         "use":           "Use, drink, binge or buy waits on DT-09's substance scope (D14); zone out would be a guess.",
         "self_harm":     "Hurt myself opens safety.open first (plan C6.5); never a part trail.",
