@@ -457,7 +457,7 @@ export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'a
   // Persist-nothing (R15): a run that writes nothing schedules nothing.
   if (persistence(ctx, s) !== 'save') return null;
   if (!f.whenFrom) return { type: f.type, chip: null };
-  const chip = s.answers[f.whenFrom]?.ids[0];
+  const chip = s.answers[f.whenFrom]?.ids[0] ?? f.whenDefault;
   return chip ? { type: f.type, chip } : null;
 }
 

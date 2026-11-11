@@ -486,6 +486,15 @@ test("follow-up: the chip picked on the step, once per run", () => {
   assert.deepEqual(m.runRecord(ctx, s).scheduled, ["resume_skill"]);
 });
 
+test("follow-up timed by an earlier answer: whenFrom's pick, else whenDefault (Cope Ahead's *When is it?*)", () => {
+  const ctx = f2Ctx(null);
+  const step = { ...F2.steps[1], id: "later_step", fields: [], followUp: { type: "resume_skill", whenFrom: "chip", whenDefault: "tomorrow" } };
+  const base = { answers: {}, scheduled: {}, path: [], stepId: "later_step" };
+  assert.deepEqual(m.followUpFor(ctx, step, base), { type: "resume_skill", chip: "tomorrow" }, "not answered: the default");
+  const picked = { ...base, answers: { chip: { ids: ["1h"], own: null } } };
+  assert.deepEqual(m.followUpFor(ctx, step, picked), { type: "resume_skill", chip: "1h" }, "answered: the pick");
+});
+
 test("inline: starts only at a step it declares; returns its returns fields and the change check as then-vs-now", () => {
   assert.equal(m.initialRun(F2, "when").stepId, "when");
   assert.equal(m.initialRun(F2, "check").stepId, "who", "not an enterAt step: the start");

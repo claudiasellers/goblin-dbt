@@ -41,7 +41,11 @@ export interface KeepAction {
  * registry). Its time: the type's window, from the `whenFrom` field's pick when the window is a choice of chips
  * (the field's options are the chip ids). Once per step per run.
  */
-export interface FollowUpAction { type: string; whenFrom?: string; when?: Cond }
+/**
+ * `whenFrom` may name a field of an earlier step on an ask step (Cope Ahead's *When is it?* on screen 1 times the
+ * keep step's *Want me to ask how it went?*); `whenDefault` is the chip used when that field wasn't answered.
+ */
+export interface FollowUpAction { type: string; whenFrom?: string; whenDefault?: string; when?: Cond }
 
 /**
  * Inline (plan C3a R8, C1 rule 5): a skill another screen can run inside itself, from one of `enterAt`, giving
