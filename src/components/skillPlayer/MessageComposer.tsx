@@ -24,6 +24,9 @@ export function MessageComposer({ props, picked, onShown, onDone }: EmbedProps) 
   const rawLine = composeMessage([of('field')]);
   const line = dropped ? dropSorry(rawLine) : rawLine;
   const sorry = sorryCount(message);
+  // *Take the sorry out* only when it can take one out whole and leave a message (never a button that does nothing).
+  const cleaned = dropSorry(composed);
+  const canDrop = !dropped && !!cleaned && cleaned !== composed.trim();
   const longReason = overExplains(of('reason'));
   const done = useRef(new Set<string>());
   const [copied, setCopied] = useState(false);
@@ -63,7 +66,7 @@ export function MessageComposer({ props, picked, onShown, onDone }: EmbedProps) 
           {sorry > 0 && text('sorryLine') && (
             <>
               <p className="text-sm text-[var(--color-text-secondary)]">{text('sorryLine')}</p>
-              {text('dropSorry') && !dropped && (
+              {text('dropSorry') && canDrop && (
                 <button type="button" className={secondaryButton}
                   onClick={() => { done.current.add('dropped_sorry'); setDropped(true); setCopied(false); setStatus(''); }}>
                   {text('dropSorry')}

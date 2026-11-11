@@ -161,6 +161,7 @@ test("message card: the parts in order as one message; empty parts drop out; own
 });
 
 test("message card: the FAST strip finds a sorry and takes it out, keeping the rest", () => {
+  const card = read("src/components/skillPlayer/MessageComposer.tsx");
   assert.equal(MC.sorryCount("I'm so sorry, but I can't. Sorry!"), 2);
   assert.equal(MC.sorryCount("No, I'm not going to do that."), 0);
   assert.equal(MC.dropSorry("I'm so sorry, but I can't do that."), "I can't do that.");
@@ -170,13 +171,18 @@ test("message card: the FAST strip finds a sorry and takes it out, keeping the r
   assert.equal(MC.dropSorry("I'm sorry to hear that, but no."), "No.");
   for (const t of ["I'm sorry to hear that, but no.", "Sorry to say this, but I can't.", "I'm sorry for that, but no."]) assert.equal(MC.sorryCount(MC.dropSorry(t)), 0, t);
   assert.equal(MC.dropSorry("No, sorry to disappoint you."), "No.");
-  // Never the person's own words around an apology it can't take out cleanly; a described apology isn't one.
-  for (const t of ["sorry to the team but I can't come", "I'm sorry to leave you hanging, but no.", "I can't. Sorry to all of you.", "Sorry for the late reply, I can't.", "She apologises for nothing. No.", "I have apologised before; still no."]) assert.equal(MC.dropSorry(t), t, t);
+  assert.equal(MC.dropSorry("No, I'm sorry, I can't."), "No, I can't.");
+  assert.equal(MC.dropSorry("Sorry but no"), "No.");
+  assert.equal(MC.dropSorry("Sorry about this, I can't."), "I can't.");
+  // Only a whole apology clause goes: never the person's own words around one, never a meaning flipped.
+  for (const t of ["sorry to the team but I can't come", "I can't. Sorry to all of you.", "Sorry for the late reply, I can't.",
+    "I'm sorry that's how it is.", "I'm not sorry, I won't do it.", "No sorry state of affairs", "I'm sorry to hear about your mum, but no.",
+    "I'm sorry to bother you mum but no.", "She apologises for nothing. No."]) assert.equal(MC.dropSorry(t), t, t);
   assert.equal(MC.sorryCount("I apologised already, no."), 0);
+  assert.match(card, /const canDrop = !dropped && !!cleaned && cleaned !== composed\.trim\(\);/, "the button shows only when it can take one out");
   assert.equal(MC.overExplains(["I've got too much on."]), false);
   assert.equal(MC.overExplains(["x".repeat(MC.LONG_REASON + 1)]), true);
   assert.equal(MC.messagesHref("No & thanks"), "sms:?&body=No%20%26%20thanks");
-  const card = read("src/components/skillPlayer/MessageComposer.tsx");
   assert.doesNotMatch(card, /fetch\(|callable|httpsCallable/, "the app never sends on the person's behalf");
 });
 
