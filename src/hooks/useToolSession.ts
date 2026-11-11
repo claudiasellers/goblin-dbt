@@ -72,6 +72,13 @@ export interface ToolSessionApi {
   setWiseMindAnswer(id: string | null): void;
   /** Check the Facts' "Does it fit?" in this visit (ask-fresh, like the wise mind answer). */
   setFitsFacts(v: 'fits' | 'partly' | 'doesnt_fit' | 'unsure' | null): void;
+  /**
+   * Persist-nothing (R15): a provider mounted with `deferStart` writes nothing until `begin()`; never begun, its
+   * close writes nothing. Idempotent. A provider without `deferStart` began at mount, so this does nothing.
+   */
+  begin(): void;
+  /** Persist-nothing (R15): close with status only (no step, ext, emotions, duration or other answers). */
+  setBare(bare: boolean): void;
   /** Close once (later calls resolve null). Resolves null when nothing was written. */
   close(input?: ToolSessionCloseInput): Promise<CloseToolSessionResponse | null>;
   /** Route + state for handing off to another tool from inside this one. */
@@ -95,6 +102,8 @@ export const NO_SESSION: ToolSessionApi = {
   setUrgeIds: () => {},
   setWiseMindAnswer: () => {},
   setFitsFacts: () => {},
+  begin: () => {},
+  setBare: () => {},
   close: async () => null,
   linkTo: (toolId, state) => ({ pathname: `/tool/${toolId}`, state: { ...state, spine: { entry: 'handoff' } } }),
 };

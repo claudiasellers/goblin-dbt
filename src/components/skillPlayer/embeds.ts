@@ -98,6 +98,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
   },
   boundaryLine: {
     field: { type: 'field' },
+    field2: { type: 'field', optional: true },
+    field3: { type: 'field', optional: true },
     shape: { type: 'enum', values: ['line', 'list'] },
     copyLabel: { type: 'copy', optional: true },
     copiedLabel: { type: 'copy', optional: true },

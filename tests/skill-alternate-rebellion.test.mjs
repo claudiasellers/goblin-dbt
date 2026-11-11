@@ -99,9 +99,11 @@ test("someone I'm scared of: only quiet rebellions (nothing they'd notice, phone
   assert.ok(plain.includes("phone_away") && plain.includes("say_no"), "the full list otherwise");
 });
 
-test("never a confrontation plan for someone they're scared of (D4): no DEAR MAN, no FAST; Ending a relationship is planned", () => {
-  const scared = run([...toReal(["scared"]), pick("real", "say"), next]);
-  assert.deepEqual(scared.offered, [], "IE-08 is planned, so nothing shows yet; Done is there");
+test("never a confrontation plan for someone they're scared of (D4): no DEAR MAN, no FAST; Ending a relationship is offered", () => {
+  // (Someone they're scared of narrows the rebellions to private ones, so the run picks one that's on that list.)
+  const scared = run([...toReal(["scared"], "daydream"), pick("real", "say"), next]);
+  assert.equal(scared.stepId, "next");
+  assert.deepEqual(scared.offered, ["ending"], "IE-08 is built (it asks about safety first); never DEAR MAN or FAST");
   const offers = step("next").offers;
   for (const x of ["problem_solve", "dear_man", "fast", "let_it_be"]) {
     const o = offers.find((y) => y.exit === x);
@@ -110,7 +112,7 @@ test("never a confrontation plan for someone they're scared of (D4): no DEAR MAN
   assert.equal(M.handoffLine(ctx(), step("next"), scared), "You named someone you're scared of. You don't have to work that out alone.");
   const plain = run([...toReal(["controlling"]), pick("real", "say"), next]);
   assert.deepEqual(plain.offered, ["dear_man", "fast"], "FAST is built (IE-B1)");
-  assert.ok(skill.exits.find((x) => x.id === "ending").planned);
+  assert.ok(!skill.exits.find((x) => x.id === "ending").planned);
 });
 
 test("the function picks the rebellions (PRD step 4): every one matched, reversible, costing nothing, at least three per function", () => {

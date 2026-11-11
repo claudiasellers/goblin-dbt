@@ -944,10 +944,11 @@
           {
             "id": "ending",
             "toolId": "ending-relationships",
-            "query": {},
+            "query": {
+              "frame": "careful"
+            },
             "carry": [],
-            "done": false,
-            "planned": true
+            "done": false
           },
           {
             "id": "fast",
@@ -2801,6 +2802,1701 @@
             }
           ]
         }
+      },
+      {
+        "id": "ending_relationships",
+        "toolId": "ending-relationships",
+        "version": "ending-v1",
+        "start": "safety",
+        "accepts": [
+          "band",
+          "frame"
+        ],
+        "ownMax": 140,
+        "emotionFields": [],
+        "copy": {
+          "safety_title": "Before anything: would ending this, or even talking about it, put you at risk?",
+          "safety_title_scared": "Earlier you said you're scared of them. Would ending this, or talking about it, put you at risk?",
+          "safety_hint": "For example, they've hurt or threatened you, or you're scared of how they'd react. Whatever you answer, you can still think it through and decide here.",
+          "safe_title": "Your safety comes first.",
+          "safe_hint": "Ending things with someone who might hurt you can be the most dangerous time. People who help with this every day can plan it with you, in confidence.",
+          "safe_note": "Nothing from here on is saved unless you choose to save it. Calls and texts to these numbers show in your phone's history, so a phone nobody checks can be safer.",
+          "safe_done_line": "Whenever you want to come back, this is here. The hotline can help you plan, at your pace.",
+          "steady_title": "Big decisions go better from steady. Everything stays here.",
+          "steady_cool": "Cool my body first",
+          "steady_pause": "Pause first",
+          "what_title": "What is this relationship doing to you?",
+          "what_hint": "Harm can look like put-downs, fear, control, or pressure to act against what you value.",
+          "what_wise": "Think it through with Wise mind",
+          "what_pros": "Weigh it up",
+          "try_title": "It might be worth trying to change it first. Do you want to?",
+          "decide_wise": "Check it with Wise mind first",
+          "change_line": "Working on it first is a real choice. If it doesn't change, this is here.",
+          "change_line_unsafe": "Changing it safely is worth planning with someone who knows about safety. The hotline can help with that too.",
+          "decide_title": "What do you want to do?",
+          "decide_title_unsure": "It's OK not to know yet. Where are you leaning?",
+          "decide_hint": "Not yet is a real answer, and so is staying.",
+          "save_title": "Do you want any of this saved?",
+          "save_hint": "Nothing has been saved so far. If someone else could open this app, it's safer to leave it unsaved.",
+          "advocate_line": "Planning this with someone who does it every day is often the safest way. They can help with when, where and how, at your pace.",
+          "advocate_line_not_yet": "Whenever you want to plan anything, the hotline can help, in confidence.",
+          "not_yet_title": "Do you want a check-in in two weeks?",
+          "not_yet_hint": "Check-ins say nothing about what they're for.",
+          "not_yet_line": "It stays here for whenever you want to look again.",
+          "channel_title": "How will you tell them?",
+          "channel_title_harms": "How will you tell them? If you're worried how they'll react, a message is often safer than in person.",
+          "channel_hint": "A message is fine, and often the wisest way.",
+          "open_title": "How do you want to start? One line is enough.",
+          "decision_title": "Now say what you've decided, plainly.",
+          "decision_hint": "No over-explaining, and no apology for deciding. It isn't up for debate.",
+          "practical_title": "Anything practical to sort out?",
+          "practical_hint": "Only practical things. If there's nothing, go on.",
+          "card_title": "Here's what you could say.",
+          "when_title": "When are you thinking of doing it?",
+          "checkin_title": "Do you want a check-in after you've told them?",
+          "checkin_hint": "Check-ins say nothing about what they're for.",
+          "ahead_line": "Their reaction can be the hardest part. Planning for it ahead can make it easier to hold your ground.",
+          "after_title": "How's it going?",
+          "again_label": "Another check-in?",
+          "after_line_pull": "The pull back is expected. It doesn't mean the decision was wrong.",
+          "after_line_back": "Going back happens a lot. You can look at it again whenever you want.",
+          "after_line_not_yet": "It's still your decision, and your timing.",
+          "after_line": "Holding steady takes something. People who help can make it lighter.",
+          "after_unsafe_line": "Your safety comes first. The time around leaving can be the most dangerous, and the hotline can plan with you now. Nothing from this check-in is saved.",
+          "after_low_line": "You don't have to hold this alone. Talking to someone right now can help.",
+          "after_help": "I might hurt myself",
+          "own_hint": "Say it my way",
+          "next": "Next",
+          "done": "Done",
+          "card_copy": "Copy",
+          "card_copied": "Copied",
+          "card_selected": "The words are selected, ready to copy."
+        },
+        "tables": {},
+        "derive": [],
+        "steps": [
+          {
+            "id": "safety",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$ctx.frame",
+                    "careful"
+                  ]
+                },
+                "key": "safety_title_scared"
+              },
+              {
+                "key": "safety_title"
+              }
+            ],
+            "hint": "safety_hint",
+            "fields": [
+              {
+                "id": "safety",
+                "options": {
+                  "list": "safety"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "safe_first",
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "to": "steady",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "what",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "safe_first",
+            "kind": "ask",
+            "title": "safe_title",
+            "hint": "safe_hint",
+            "note": "safe_note",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "go",
+                "options": {
+                  "list": "go"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "safe_done",
+                "when": {
+                  "eq": [
+                    "$a.go",
+                    "enough"
+                  ]
+                }
+              },
+              {
+                "to": "steady",
+                "when": {
+                  "eq": [
+                    "$ctx.band",
+                    "flooded"
+                  ]
+                }
+              },
+              {
+                "to": "what",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "safe_done",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": null,
+                "key": "safe_done_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "steady",
+            "kind": "ask",
+            "title": "steady_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "first",
+                "options": {
+                  "list": "first"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "cool_down",
+                    "label": "steady_cool",
+                    "when": {
+                      "all": []
+                    }
+                  },
+                  {
+                    "exit": "pause",
+                    "label": "steady_pause",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "what",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "what",
+            "kind": "ask",
+            "title": "what_title",
+            "hint": "what_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "what",
+                "options": {
+                  "list": "what"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "wise_mind",
+                    "label": "what_wise",
+                    "when": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.what",
+                            "unsure"
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.safety",
+                                "no"
+                              ]
+                            },
+                            {
+                              "not": {
+                                "eq": [
+                                  "$ctx.frame",
+                                  "careful"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "exit": "pros_cons",
+                    "label": "what_pros",
+                    "when": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.what",
+                            "unsure"
+                          ]
+                        },
+                        {
+                          "all": [
+                            {
+                              "eq": [
+                                "$a.safety",
+                                "no"
+                              ]
+                            },
+                            {
+                              "not": {
+                                "eq": [
+                                  "$ctx.frame",
+                                  "careful"
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "try_first",
+                "when": {
+                  "all": [
+                    {
+                      "in": [
+                        "$a.what",
+                        [
+                          "hard",
+                          "interferes"
+                        ]
+                      ]
+                    },
+                    {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.safety",
+                            "no"
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$ctx.frame",
+                              "careful"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              },
+              {
+                "to": "decide",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "try_first",
+            "kind": "ask",
+            "title": "try_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "try",
+                "options": {
+                  "list": "try"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "change",
+                "when": {
+                  "eq": [
+                    "$a.try",
+                    "try"
+                  ]
+                }
+              },
+              {
+                "to": "decide",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "change",
+            "kind": "handoff",
+            "complete": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                },
+                "key": "change_line_unsafe"
+              },
+              {
+                "when": null,
+                "key": "change_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "dear_man",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.safety",
+                        "no"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$ctx.frame",
+                          "careful"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "give",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.safety",
+                        "no"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$ctx.frame",
+                          "careful"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              {
+                "exit": "problem_solve",
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.safety",
+                        "no"
+                      ]
+                    },
+                    {
+                      "not": {
+                        "eq": [
+                          "$ctx.frame",
+                          "careful"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "decide",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.what",
+                    "unsure"
+                  ]
+                },
+                "key": "decide_title_unsure"
+              },
+              {
+                "key": "decide_title"
+              }
+            ],
+            "hint": "decide_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "decide",
+                "options": {
+                  "list": "decide"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "wise_mind",
+                    "label": "decide_wise",
+                    "when": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.safety",
+                            "no"
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$ctx.frame",
+                              "careful"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "next": [
+              {
+                "to": "save",
+                "when": {
+                  "not": {
+                    "all": [
+                      {
+                        "eq": [
+                          "$a.safety",
+                          "no"
+                        ]
+                      },
+                      {
+                        "not": {
+                          "eq": [
+                            "$ctx.frame",
+                            "careful"
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "to": "change",
+                "when": {
+                  "eq": [
+                    "$a.decide",
+                    "work_on"
+                  ]
+                }
+              },
+              {
+                "to": "not_yet",
+                "when": {
+                  "eq": [
+                    "$a.decide",
+                    "not_yet"
+                  ]
+                }
+              },
+              {
+                "to": "channel",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "save",
+            "kind": "ask",
+            "title": "save_title",
+            "hint": "save_hint",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "save",
+                "options": {
+                  "list": "save"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "advocate",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "advocate",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.decide",
+                    "not_yet"
+                  ]
+                },
+                "key": "advocate_line_not_yet"
+              },
+              {
+                "when": null,
+                "key": "advocate_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "not_yet",
+            "kind": "ask",
+            "title": "not_yet_title",
+            "hint": "not_yet_hint",
+            "fields": [
+              {
+                "id": "revisit",
+                "options": {
+                  "list": "revisit"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "followUp": {
+              "type": "ending_revisit",
+              "when": {
+                "eq": [
+                  "$a.revisit",
+                  "yes"
+                ]
+              }
+            },
+            "next": [
+              {
+                "to": "not_yet_done",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "not_yet_done",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "not_yet_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "channel",
+            "kind": "ask",
+            "title": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.what",
+                    "harms"
+                  ]
+                },
+                "key": "channel_title_harms"
+              },
+              {
+                "key": "channel_title"
+              }
+            ],
+            "hint": "channel_hint",
+            "fields": [
+              {
+                "id": "channel",
+                "options": {
+                  "list": "channel"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "open_line",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "open_line",
+            "kind": "ask",
+            "title": "open_title",
+            "fields": [
+              {
+                "id": "open_line",
+                "options": {
+                  "list": "open_line"
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "decision_line",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "decision_line",
+            "kind": "ask",
+            "title": "decision_title",
+            "hint": "decision_hint",
+            "fields": [
+              {
+                "id": "decision_line",
+                "options": {
+                  "list": "decision_line",
+                  "where": {
+                    "eq": [
+                      "$opt.decision",
+                      "$a.decide"
+                    ]
+                  }
+                },
+                "max": 1,
+                "required": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "practical",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "practical",
+            "kind": "ask",
+            "title": "practical_title",
+            "hint": "practical_hint",
+            "fields": [
+              {
+                "id": "practical",
+                "options": {
+                  "list": "practical"
+                },
+                "max": 2,
+                "swap": true,
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "card",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "card",
+            "kind": "embed",
+            "embed": "boundaryLine",
+            "answerAs": "card_copied",
+            "title": "card_title",
+            "props": {
+              "field": "open_line",
+              "field2": "decision_line",
+              "field3": "practical",
+              "shape": "line",
+              "copyLabel": "card_copy",
+              "copiedLabel": "card_copied",
+              "selectedLabel": "card_selected",
+              "next": "next"
+            },
+            "next": [
+              {
+                "to": "checkin",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "checkin",
+            "kind": "ask",
+            "title": "checkin_title",
+            "hint": "checkin_hint",
+            "fields": [
+              {
+                "id": "checkin",
+                "options": {
+                  "list": "checkin"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "next": [
+              {
+                "to": "when",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "when",
+            "kind": "ask",
+            "title": "when_title",
+            "fields": [
+              {
+                "id": "when",
+                "options": {
+                  "list": "when"
+                },
+                "max": 1,
+                "required": true
+              }
+            ],
+            "followUp": {
+              "type": "ending_after",
+              "whenFrom": "when",
+              "when": {
+                "eq": [
+                  "$a.checkin",
+                  "yes"
+                ]
+              }
+            },
+            "next": [
+              {
+                "to": "ahead",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "ahead",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": null,
+                "key": "ahead_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "cope_ahead",
+                "when": null
+              },
+              {
+                "exit": "rehearse",
+                "when": null
+              }
+            ]
+          },
+          {
+            "id": "after",
+            "kind": "ask",
+            "title": "after_title",
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "variant": "crisis",
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "low"
+                  ]
+                }
+              }
+            ],
+            "fields": [
+              {
+                "id": "after",
+                "options": {
+                  "list": "after"
+                },
+                "max": 1,
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "after_help",
+                    "when": {
+                      "all": []
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "again",
+                "label": "again_label",
+                "options": {
+                  "list": "again"
+                },
+                "max": 1,
+                "showWhen": {
+                  "all": [
+                    {
+                      "set": "$a.after"
+                    },
+                    {
+                      "not": {
+                        "in": [
+                          "$a.after",
+                          [
+                            "unsafe",
+                            "low"
+                          ]
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "followUp": {
+              "type": "ending_again",
+              "whenFrom": "again",
+              "when": {
+                "not": {
+                  "in": [
+                    "$a.after",
+                    [
+                      "unsafe",
+                      "low"
+                    ]
+                  ]
+                }
+              }
+            },
+            "next": [
+              {
+                "to": "after_unsafe",
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "unsafe"
+                  ]
+                }
+              },
+              {
+                "to": "after_low",
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "low"
+                  ]
+                }
+              },
+              {
+                "to": "after_next",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "after_next",
+            "kind": "handoff",
+            "complete": true,
+            "lines": [
+              {
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "pull"
+                  ]
+                },
+                "key": "after_line_pull"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "went_back"
+                  ]
+                },
+                "key": "after_line_back"
+              },
+              {
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "not_yet"
+                  ]
+                },
+                "key": "after_line_not_yet"
+              },
+              {
+                "when": null,
+                "key": "after_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "opposite_action",
+                "when": {
+                  "eq": [
+                    "$a.after",
+                    "pull"
+                  ]
+                }
+              },
+              {
+                "exit": "finding_connection",
+                "when": {
+                  "in": [
+                    "$a.after",
+                    [
+                      "holding",
+                      "pull"
+                    ]
+                  ]
+                }
+              },
+              {
+                "exit": "let_it_be",
+                "when": {
+                  "in": [
+                    "$a.after",
+                    [
+                      "holding",
+                      "pull"
+                    ]
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "id": "after_unsafe",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": null,
+                "key": "after_unsafe_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": []
+          },
+          {
+            "id": "after_low",
+            "kind": "handoff",
+            "complete": true,
+            "noClose": true,
+            "crisis": [
+              {
+                "variant": "crisis",
+                "when": {
+                  "all": []
+                }
+              }
+            ],
+            "lines": [
+              {
+                "when": null,
+                "key": "after_low_line"
+              }
+            ],
+            "done": "done",
+            "next": [],
+            "offers": [
+              {
+                "exit": "safety_open",
+                "when": null
+              }
+            ]
+          }
+        ],
+        "exits": [
+          {
+            "id": "cool_down",
+            "toolId": "cool-down",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "cope_ahead",
+            "toolId": "cope-ahead",
+            "query": {
+              "first": "conversation"
+            },
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "dear_man",
+            "toolId": "dear-man",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "done",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": true
+          },
+          {
+            "id": "finding_connection",
+            "toolId": "finding-connection",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "give",
+            "toolId": "give",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "let_it_be",
+            "toolId": "let-it-be",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "opposite_action",
+            "toolId": "opposite-action",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "pause",
+            "toolId": "pause",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "problem_solve",
+            "toolId": "problem-solve",
+            "query": {},
+            "carry": [],
+            "done": false
+          },
+          {
+            "id": "pros_cons",
+            "toolId": "pros-cons",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "rehearse",
+            "toolId": "rehearse",
+            "query": {},
+            "carry": [],
+            "done": false,
+            "planned": true
+          },
+          {
+            "id": "safety_open",
+            "toolId": null,
+            "query": {},
+            "carry": [],
+            "done": false,
+            "safety": true
+          },
+          {
+            "id": "wise_mind",
+            "toolId": "wise-mind",
+            "query": {},
+            "carry": [],
+            "done": false
+          }
+        ],
+        "options": {
+          "safety": [
+            {
+              "value": "no",
+              "label": "No"
+            },
+            {
+              "value": "maybe",
+              "label": "Maybe"
+            },
+            {
+              "value": "yes",
+              "label": "Yes"
+            },
+            {
+              "value": "rather_not",
+              "label": "I'd rather not say"
+            }
+          ],
+          "go": [
+            {
+              "value": "think",
+              "label": "Think it through here"
+            },
+            {
+              "value": "enough",
+              "label": "That's enough for now"
+            }
+          ],
+          "first": [
+            {
+              "value": "anyway",
+              "label": "Keep going anyway"
+            }
+          ],
+          "what": [
+            {
+              "value": "harms",
+              "label": "It harms me",
+              "category": "destructive"
+            },
+            {
+              "value": "interferes",
+              "label": "It keeps me from things that matter",
+              "category": "interfering"
+            },
+            {
+              "value": "hard",
+              "label": "It's hard right now, and it isn't bad for me",
+              "category": "hard_now"
+            },
+            {
+              "value": "unsure",
+              "label": "I'm not sure"
+            }
+          ],
+          "try": [
+            {
+              "value": "try",
+              "label": "Try to change it first"
+            },
+            {
+              "value": "still",
+              "label": "I still want to think about ending it"
+            }
+          ],
+          "decide": [
+            {
+              "value": "end",
+              "label": "End it"
+            },
+            {
+              "value": "step_back",
+              "label": "Step back, with less contact"
+            },
+            {
+              "value": "work_on",
+              "label": "Stay and work on it"
+            },
+            {
+              "value": "not_yet",
+              "label": "Not yet"
+            }
+          ],
+          "save": [
+            {
+              "value": "no",
+              "label": "Leave it unsaved"
+            },
+            {
+              "value": "yes",
+              "label": "Save it to my account"
+            }
+          ],
+          "revisit": [
+            {
+              "value": "yes",
+              "label": "Yes, in two weeks"
+            },
+            {
+              "value": "no",
+              "label": "No thanks"
+            }
+          ],
+          "channel": [
+            {
+              "value": "message",
+              "label": "A message"
+            },
+            {
+              "value": "call",
+              "label": "A call"
+            },
+            {
+              "value": "in_person",
+              "label": "In person"
+            }
+          ],
+          "open_line": [
+            {
+              "value": "thinking",
+              "label": "I've been thinking about us for a while."
+            },
+            {
+              "value": "not_working",
+              "label": "This relationship isn't working for me any more."
+            },
+            {
+              "value": "not_myself",
+              "label": "I don't feel like myself in this relationship."
+            },
+            {
+              "value": "honest",
+              "label": "I care about you, and I need to be honest with you."
+            }
+          ],
+          "decision_line": [
+            {
+              "value": "ending",
+              "label": "I've decided to end our relationship.",
+              "decision": "end"
+            },
+            {
+              "value": "made_up",
+              "label": "I'm ending this. My mind is made up.",
+              "decision": "end"
+            },
+            {
+              "value": "less_contact",
+              "label": "I need a lot less contact for now.",
+              "decision": "step_back"
+            },
+            {
+              "value": "space",
+              "label": "I'm stepping back from us. Please give me space.",
+              "decision": "step_back"
+            }
+          ],
+          "practical": [
+            {
+              "value": "things",
+              "label": "I'll arrange to get my things back."
+            },
+            {
+              "value": "no_contact",
+              "label": "Please don't contact me for a while."
+            },
+            {
+              "value": "by_message",
+              "label": "Let's sort out anything practical by message."
+            }
+          ],
+          "when": [
+            {
+              "value": "today",
+              "label": "Today"
+            },
+            {
+              "value": "this_week",
+              "label": "This week"
+            },
+            {
+              "value": "unsure",
+              "label": "Not sure yet"
+            }
+          ],
+          "checkin": [
+            {
+              "value": "yes",
+              "label": "Yes, check in with me"
+            },
+            {
+              "value": "no",
+              "label": "No thanks"
+            }
+          ],
+          "after": [
+            {
+              "value": "holding",
+              "label": "Holding steady"
+            },
+            {
+              "value": "pull",
+              "label": "Pulled back toward them"
+            },
+            {
+              "value": "went_back",
+              "label": "I went back"
+            },
+            {
+              "value": "not_yet",
+              "label": "I haven't done it yet"
+            },
+            {
+              "value": "unsafe",
+              "label": "I don't feel safe",
+              "danger": "other"
+            },
+            {
+              "value": "low",
+              "label": "I'm in a really bad place",
+              "danger": "self"
+            }
+          ],
+          "again": [
+            {
+              "value": "this_week",
+              "label": "In a week"
+            },
+            {
+              "value": "month",
+              "label": "In a month"
+            }
+          ]
+        },
+        "persist": {
+          "after": "safety",
+          "nothingWhen": {
+            "any": [
+              {
+                "all": [
+                  {
+                    "not": {
+                      "all": [
+                        {
+                          "eq": [
+                            "$a.safety",
+                            "no"
+                          ]
+                        },
+                        {
+                          "not": {
+                            "eq": [
+                              "$ctx.frame",
+                              "careful"
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "not": {
+                      "eq": [
+                        "$a.save",
+                        "yes"
+                      ]
+                    }
+                  }
+                ]
+              },
+              {
+                "eq": [
+                  "$a.after",
+                  "unsafe"
+                ]
+              }
+            ]
+          }
+        },
+        "quickExit": true,
+        "resumeAt": [
+          "after"
+        ]
       },
       {
         "id": "er_troubleshoot",
@@ -8923,9 +10619,10 @@
             "id": "ending_relationships",
             "toolId": "ending-relationships",
             "query": {},
-            "carry": [],
-            "done": false,
-            "planned": true
+            "carry": [
+              "feel"
+            ],
+            "done": false
           },
           {
             "id": "fast",

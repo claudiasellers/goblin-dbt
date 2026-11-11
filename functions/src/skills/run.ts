@@ -7,6 +7,11 @@ import { decryptExtOwn } from '../spine/extOwn';
 
 /** How far back a run can be reopened (R9): the follow-ups that resume one are due within a fortnight. */
 export const RESUME_DAYS = 14;
+/**
+ * Tools whose check-ins come back later than that: Ending's after check-in can be a month out (`ending_again`,
+ * IE-08), plus the days a card waits on Today.
+ */
+export const RESUME_DAYS_FOR: Readonly<Record<string, number>> = { 'ending-relationships': 45 };
 
 /**
  * Resume (docs/design/dbt-modules-plan.md C3a R9): the caller's own run of a skill, its `ext.run` with own words
@@ -28,7 +33,7 @@ export const getSkillRun = callable<unknown, { run: Record<string, unknown> | nu
         `MATCH (:User {id: $uid})-[:HAS_TOOL_SESSION]->(ts:ToolSession {key: $key})
          WHERE ts.toolId = $toolId AND ts.startedAt > datetime() - duration({days: $days})
          RETURN ts.ext AS ext`,
-        { uid, key: userKey(uid as string, sessionId), toolId, days: RESUME_DAYS },
+        { uid, key: userKey(uid as string, sessionId), toolId, days: RESUME_DAYS_FOR[toolId] ?? RESUME_DAYS },
       );
       const ext = res.records[0]?.get('ext');
       if (typeof ext !== 'string' || !ext) return { run: null };

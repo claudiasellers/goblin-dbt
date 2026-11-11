@@ -8,6 +8,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'check-the-facts': 'check_the_facts',
   'alternate-rebellion': 'alternate_rebellion',
   'er-troubleshoot': 'er_troubleshoot',
+  'ending-relationships': 'ending_relationships',
   'nightmare-rescript': 'nightmare_rescript',
   'problem-solve': 'problem_solve',
 };

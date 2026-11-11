@@ -36,7 +36,7 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
 | Someone I want to say something to | DEAR MAN; FAST (planned, IE-05) | |
 | It won't change | Let it be (planned, DT-04) | Nothing shows until DT-B4 flips it; Done is always there. Never with *Someone I'm scared of* (no radical acceptance of a situation with someone they fear) |
 | Not right now | — | Done |
-| *Someone I'm scared of* was a squeeze | Ending a relationship (planned, IE-08) only | Never DEAR MAN, FAST or Let it be for someone they're scared of (decision D4, plan C6.6). The other-person resources show on every screen from 2 on |
+| *Someone I'm scared of* was a squeeze | Ending a relationship (IE-08, built 10 Nov 2026; it asks about safety first) only | Never DEAR MAN, FAST or Let it be for someone they're scared of (decision D4, plan C6.6). The other-person resources show on every screen from 2 on |
 
 ## Safety
 
@@ -102,8 +102,8 @@ explicitly in `schema/app-tool-ids.cypher`). Listed under Distress Tolerance for
 
 ## Waits on the safety batch (C6.8)
 
-- **IE-08 Ending a relationship** is the *Someone I'm scared of* route's only offer. Until it ships, that route
-  shows the other-person resources and Done, nothing else.
+- ~~**IE-08 Ending a relationship**~~ built 10 Nov 2026 (`docs/design/ending-relationships.md`): the *Someone
+  I'm scared of* route now offers it, beside the other-person resources and Done.
 - **Fuller domestic-violence resources** than the banner's (CORE-01's helpline list, D5).
 - **DEAR MAN's safety question** (*Is it safe to bring hard things up with them?*, IE-01, D4, IE-B2). Until it
   exists, *Someone controlling me* + *Someone I want to say something to* still offers DEAR MAN; coercive control

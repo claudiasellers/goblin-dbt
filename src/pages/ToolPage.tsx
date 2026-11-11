@@ -155,7 +155,7 @@ export function ToolPage() {
         {playerSkill || ToolComponent ? (
           // One ToolSession per visit (PR-S3). It replaces trackToolUsage: startToolSession writes the
           // compat ToolUsage at the same moment, linked to the check-in the tool was opened from.
-          <ToolSessionProvider key={location.key} toolId={tool.id}>
+          <ToolSessionProvider key={location.key} toolId={tool.id} deferStart={!!tool.deferSession}>
             {playerSkill ? <PlayedTool skillId={playerSkill} /> : ToolComponent && <ToolComponent />}
           </ToolSessionProvider>
         ) : (

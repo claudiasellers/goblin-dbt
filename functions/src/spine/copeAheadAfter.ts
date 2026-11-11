@@ -23,7 +23,13 @@ export const HOW_IT_WENT = ['better', 'as_expected', 'harder'] as const;
 export type HowItWent = (typeof HOW_IT_WENT)[number];
 
 /** Follow-up types that only a session of one tool may schedule: the type → that tool. */
-export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = { [COPE_AHEAD_AFTER]: COPE_AHEAD_TOOL };
+export const FOLLOW_UP_SESSION_TOOL: Readonly<Record<string, string>> = {
+  [COPE_AHEAD_AFTER]: COPE_AHEAD_TOOL,
+  // Ending a relationship's opt-in check-ins (docs/design/ending-relationships.md): only from an Ending visit that saved.
+  ending_after: 'ending-relationships',
+  ending_again: 'ending-relationships',
+  ending_revisit: 'ending-relationships',
+};
 
 /** The plan's ids, as the after card needs them. Own words are the visit's (its Today card may show them). */
 export interface CopeAheadPlanIds {

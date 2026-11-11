@@ -305,6 +305,44 @@ FOLLOW_UP_TYPES = [
     },
 ]
 
+# Ending a relationship (IE-08, docs/design/ending-relationships.md): check-ins the person opts into, only from a
+# visit that saved (never from the safety branch). Content-free on purpose (PRD IE-08, tech safety): nothing on the
+# card, the notification or the calendar says what it's about. Each reopens the person's own run (R9) at the step
+# it names; session-bound (copeAheadAfter.ts FOLLOW_UP_SESSION_TOOL), so only an Ending visit can schedule one.
+ENDING_COPY = {"title": "A check-in you asked for", "body": "Open it when you're ready."}
+ENDING_NOTE = "A check-in you asked for is ready."
+ENDING_DISMISS = [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}]
+FOLLOW_UP_TYPES += [
+    {
+        # After a plan to end it or step back: the day after "today", a week after "this week" or "not sure".
+        "id": "ending_after", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 1, "time": "10:00"},
+                                             "this_week": {"kind": "at_local", "days": 7, "time": "10:00"},
+                                             "unsure": {"kind": "at_local", "days": 7, "time": "10:00"}}},
+        "staleAfterHours": 168, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True, "copy": ENDING_COPY, "choices": ENDING_DISMISS, "notification": ENDING_NOTE,
+    },
+    {
+        # From the after step: the next check-in, a week or a month on (PRD: +1 week, +1 month), the person's pick.
+        "id": "ending_again", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"this_week": {"kind": "at_local", "days": 7, "time": "10:00"},
+                                             "month": {"kind": "at_local", "days": 30, "time": "10:00"}}},
+        "staleAfterHours": 168, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True, "copy": ENDING_COPY, "choices": ENDING_DISMISS, "notification": ENDING_NOTE,
+    },
+    {
+        # *Not yet* is a real answer; on a yes, two weeks on the skill opens again from its start (PRD step 4): a fresh
+        # visit, so safety is asked again and nothing from two weeks ago is filled in.
+        "id": "ending_revisit", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?followUp={followUpId}",
+        "window": {"kind": "at_local", "days": 14, "time": "10:00"},
+        "staleAfterHours": 168, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True, "copy": ENDING_COPY, "choices": ENDING_DISMISS, "notification": ENDING_NOTE,
+    },
+]
+
 # Reserved rows: authored now so the ids exist, enabled false until their owners ship.
 RESERVED = [
     ("safety_checkin", "core", "safety"),   # CORE-01; sorts first, push-cap exempt

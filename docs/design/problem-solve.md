@@ -145,8 +145,9 @@ holds.
 - **Acceptance offers only Done for now.** Let it be, willingness and turning the mind are all planned (DT-B4). The
   old page linked to all three, dead.
 - **Every dead link is a planned exit**: give, dialectics, PLEASE, build mastery, finding connection, effectiveness,
-  chain analysis, values clarification, ending relationships, self-validation, body scan, the wave. All are recorded
-  and never shown, so they light up when their tool ships.
+  chain analysis, values clarification, self-validation, body scan, the wave. All are recorded and never shown, so
+  they light up when their tool ships. Ending a relationship (IE-08) lit up on 11 Nov: the commit card offers it
+  for *Decide if this can be repaired* (broken trust), and it asks about safety first.
 - **Pros and cons (Handout 12 step 5)** waits for DT-10's card, inline (plan: *DT-10 inline later*).
 - **No separate goal step (Handout 12 step 2), and no facts check on the problem (step 1).** The old page had
   neither. The problem types are first-person and specific (*Someone crossed a line*), and each direction carries its

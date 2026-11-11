@@ -412,9 +412,10 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
  * What the current step keeps on its primary tap (R4), or null: no keep, its `when` doesn't hold, or nothing to
  * keep. `id` is the item this run already kept from this step (passed again, the same item is kept again).
  */
-export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'kept'>): { kind: string; value: Record<string, unknown>; id: string | null } | null {
+export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'kept' | 'path' | 'stepId'>): { kind: string; value: Record<string, unknown>; id: string | null } | null {
   const k: KeepAction | undefined = step.keep;
   if (!k || !holds(k.when, scope(ctx, s))) return null;
+  if (persistence(ctx, s) !== 'save') return null;
   const value: Record<string, unknown> = {};
   for (const f of k.from) {
     const a = s.answers[f];
@@ -425,10 +426,27 @@ export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answe
   return { kind: k.kind, value, id: s.kept[step.id]?.id ?? null };
 }
 
+/**
+ * Persist-nothing (R15): whether this visit may write anything yet. `save`: a normal visit (the session starts, or
+ * has). `wait`: not yet decided (the run hasn't left the skill's `persist.after` step): nothing is started.
+ * `nothing`: `persist.nothingWhen` holds: nothing is written, and a session already begun closes bare. A skill
+ * with no `persist` is always `save`.
+ */
+export type Persistence = 'save' | 'wait' | 'nothing';
+export function persistence(ctx: RunContext, s: Pick<RunState, 'answers' | 'path' | 'stepId'>): Persistence {
+  const p = ctx.skill.persist;
+  if (!p) return 'save';
+  const left = s.path.includes(p.after) && s.stepId !== p.after;
+  if (!left) return 'wait';
+  return holds(p.nothingWhen, scope(ctx, s)) ? 'nothing' : 'save';
+}
+
 /** What the current step schedules on its primary tap (R5): the type and the chip picked, or null. */
-export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'scheduled'>): { type: string; chip: string | null } | null {
+export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'scheduled' | 'path' | 'stepId'>): { type: string; chip: string | null } | null {
   const f: FollowUpAction | undefined = step.followUp;
   if (!f || s.scheduled[step.id] || !holds(f.when, scope(ctx, s))) return null;
+  // Persist-nothing (R15): a run that writes nothing schedules nothing.
+  if (persistence(ctx, s) !== 'save') return null;
   if (!f.whenFrom) return { type: f.type, chip: null };
   const chip = s.answers[f.whenFrom]?.ids[0];
   return chip ? { type: f.type, chip } : null;
@@ -477,14 +495,20 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const standsAt = reopensAt ? Math.max(...[reopensAt.reopens!.after, ...(reopensAt.reopens!.again ?? [])].map((x) => path.lastIndexOf(x))) : -1;
   if (reopensAt && standsAt <= path.lastIndexOf(reopensAt.id)) return null;
   const reopened = !!reopensAt;
-  let stepId = reopensAt?.id ?? (at && path.includes(at) ? at : path[path.length - 1]);
+  // A step the skill names as a re-entry point (`resumeAt`: a check-in days later) opens even off the run's path.
+  const reentry = !reopened && !!at && !path.includes(at) && !!ctx.skill.resumeAt?.includes(at) && ctx.skill.steps.some((st) => st.id === at);
+  let stepId = reopensAt?.id ?? (at && (path.includes(at) || reentry) ? at : path[path.length - 1]);
   if (!stepId) return null;
   const fresh = new Set(keepFresh ? [] : allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
+  // A re-entry step opened by its check-in asks again: its own answers from an earlier check-in are never restored.
+  if (at && stepId === at && ctx.skill.resumeAt?.includes(at)) for (const f of stepOf(ctx.skill, at).fields ?? []) fresh.add(f.id);
   const asksFresh = path.findIndex((id) => (stepOf(ctx.skill, id).fields ?? []).some((f) => fresh.has(f.id)));
   if (!reopened && asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
   // Reopened: the path up to where the plan was last made, so earlier review loops (whose answers the step clears)
   // don't pile up, and the newest steps are the ones kept.
-  const upTo = reopened ? path.slice(0, Math.max(path.lastIndexOf(reopensAt!.reopens!.after), 0) + 1) : path.slice(0, path.lastIndexOf(stepId) + 1);
+  // A re-entry step opened off the path is reached from the run's last step.
+  const upTo = reopened ? path.slice(0, Math.max(path.lastIndexOf(reopensAt!.reopens!.after), 0) + 1)
+    : reentry && stepId === at ? [...path, at] : path.slice(0, path.lastIndexOf(stepId) + 1);
   // A step after the resume point will be asked again, and an answer read back there would be a pre-fill (a reminder
   // chip picked last time would schedule again unasked).
   const fieldsOf = (id: string) => {

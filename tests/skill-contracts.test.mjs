@@ -36,8 +36,9 @@ const fields = (sk) => sk.steps.flatMap((s) => s.fields ?? []);
 
 for (const sk of fixture.skills) {
   test(`${sk.id}: every step is reachable from the start, and every ask or embed step goes somewhere`, () => {
-    // A reopens step is a second way in (R9): only a reopened run starts there.
-    const roots = [sk.start, ...sk.steps.filter((s) => s.reopens).map((s) => s.id)];
+    // Second ways in: a reopens step (R9: only a reopened run starts there) and a `resumeAt` step (a check-in the run
+    // scheduled re-enters there, IE-08).
+    const roots = [sk.start, ...sk.steps.filter((s) => s.reopens).map((s) => s.id), ...(sk.resumeAt ?? [])];
     const seen = new Set(roots);
     const queue = [...roots];
     while (queue.length) {

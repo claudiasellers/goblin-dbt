@@ -243,7 +243,7 @@ test("the evaluation (Handout 12 step 7): ps_review reopens the visit's run at H
   assert.equal(type.resolveMode, "deeplink");
   assert.equal(type.deepLinkTemplate, "/tool/problem-solve?run={sourceSessionId}&at=review&followUp={followUpId}");
   assert.deepEqual(skill.options.when.map((o) => o.value).sort(), Object.keys(type.window.chips).sort());
-  assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /f\.type IN \[[^\]]*'ps_review'\]/, "opening it resolves it");
+  assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /OPEN_RESOLVES = \[[^\]]*'ps_review'/, "opening it resolves it");
   assert.ok(spine.followUpTypes.find((t) => t.id === "ps_step")?.enabled, "the old page's cards still answer in place");
   const review = M.stepOf(skill, "review");
   assert.deepEqual(review.reopens, { after: "commit", again: ["review_later"] });

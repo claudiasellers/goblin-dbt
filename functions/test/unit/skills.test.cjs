@@ -16,6 +16,7 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
       emotionFields: ['feel'], copy: JSON.stringify({ next: 'Next' }), tables: JSON.stringify({ storySetOf: { fear: 'fear' } }),
       derive: JSON.stringify([{ name: 'parent', from: '$a.feel', table: 'parentOf' }]),
       inline: JSON.stringify({ enterAt: ['feel'], returns: ['feel'] }),
+      runtime: JSON.stringify({ quickExit: true, resumeAt: ['next'], persist: { after: 'feel', nothingWhen: when } }),
     }];
     if (/HAS_STEP\]->\(st:SkillStep\)/.test(q)) return [
       { skillId: 'check_the_facts', id: 'feel', kind: 'ask', spec: JSON.stringify({ title: 'feel_title', fields: [] }), order: 0 },
@@ -50,6 +51,7 @@ test('getSkillContent: skills with their steps, jumps, offers, exits and options
   assert.deepEqual([s.id, s.toolId, s.start, s.ownMax], ['check_the_facts', 'check-the-facts', 'feel', 140]);
   assert.deepEqual(s.accepts, ['situationId']);
   assert.deepEqual(s.inline, { enterAt: ['feel'], returns: ['feel'] }, 'an inline skill says where it starts and what it returns');
+  assert.deepEqual([s.quickExit, s.resumeAt, s.persist], [true, ['next'], { after: 'feel', nothingWhen: when }], 'the runtime switches (R15, IE-08) spread onto the skill');
   assert.deepEqual(s.steps.map((x) => x.id), ['feel', 'next']);
   assert.deepEqual(s.steps[0].next, [{ to: 'next', when: null }]);
   assert.deepEqual(s.steps[1].offers.map((o) => o.exit), ['problem_solve', 'opposite_action', 'problem_solve'], 'rows in their order, an exit offered twice');
@@ -72,12 +74,13 @@ test('getSkillContent: a skill that is not inline has no inline key', async () =
   setDriver(fakeDriver((q) => {
     if (/MATCH \(s:Skill\) RETURN/.test(q)) return [{
       id: 'x', toolId: 'x', version: 'v', contentVersion: 'skills-v1', start: 'a', accepts: [], ownMax: 140, emotionFields: [],
-      copy: '{}', tables: '{}', derive: '[]', inline: 'null',
+      copy: '{}', tables: '{}', derive: '[]', inline: 'null', runtime: null,
     }];
     return [];
   }).driver);
   const out = await fns.getSkillContent.run({ data: {} });
   assert.equal('inline' in out.skills[0], false);
+  assert.equal('persist' in out.skills[0] || 'quickExit' in out.skills[0] || 'resumeAt' in out.skills[0], false, 'no runtime switches: no keys');
 });
 
 test('getSkillRun: the caller\'s own run of that tool, within the window, own words decrypted; anything else is null', async () => {
@@ -99,4 +102,14 @@ test('getSkillRun: the caller\'s own run of that tool, within the window, own wo
   const none = await fns.getSkillRun.run({ auth: { uid: 'u1' }, data: { sessionId: '00000000-0000-4000-8000-000000000001', toolId: 'check-the-facts' } });
   assert.equal(none.run, null);
   await assert.rejects(fns.getSkillRun.run({ auth: { uid: 'u1' }, data: { sessionId: 'nope', toolId: 'check-the-facts' } }), (e) => e.code === 'invalid-argument');
+});
+
+test('getSkillRun: Ending a relationship reopens a run up to 45 days back (its check-ins can be a month out, IE-08)', async () => {
+  const f = fakeDriver((q, p) => {
+    if (/RETURN ts\.ext AS ext/.test(q)) { assert.equal(p.days, 45); return []; }
+    return [];
+  });
+  setDriver(f.driver);
+  const out = await fns.getSkillRun.run({ auth: { uid: 'u1', token: {} }, data: { sessionId: '00000000-0000-4000-8000-000000000001', toolId: 'ending-relationships' } });
+  assert.deepEqual(out, { run: null });
 });
