@@ -307,7 +307,7 @@ Differences from the hand-built contract in `check-the-facts-handover.md`, all d
 *Someone threatened me*, *Someone hurt me*, *I'm not safe with them* (`danger: 'other'`) show the `other_person`
 crisis slot and skip screens 3–5 to a `safe` hand-off ("Your read of danger is the one that counts here"), Done
 only; camera own words get a quiet *Talk to someone now* (`safety_open`), since own words are never read; the
-wave (`mindfulness-emotions`) and Let it be (`let-it-be`) are planned exits on the verdict card. Departures:
+wave (`mindfulness-emotions`) is a planned exit on the verdict card, and Let it be (`let-it-be`) is offered there since DT-04 shipped (11 Nov 2026). Departures:
 - The PRD's "→ CORE safety resources / OA support copy" is the `other_person` slot plus the `safe` card; the
   OA support copy isn't built, and the full safety route waits for CORE-01.
 - `Person.safe = false` (IE) skipping screens 3–5 waits for IE-03 and the safety batch.

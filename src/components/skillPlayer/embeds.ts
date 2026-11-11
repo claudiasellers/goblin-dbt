@@ -202,7 +202,7 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
     next: { type: 'copy' },
   },
   bodyCard: {
-    kind: { type: 'enum', values: ['hand_heart', 'wake', 'strong', 'still', 'press'] },
+    kind: { type: 'enum', values: ['hand_heart', 'wake', 'strong', 'still', 'press', 'willing'] },
     cue: { type: 'copy', optional: true },
     seconds: { type: 'int', min: 5, max: 300 },
     step1: { type: 'copy', optional: true },

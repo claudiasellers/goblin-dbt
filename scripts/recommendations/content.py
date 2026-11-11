@@ -152,17 +152,21 @@ CONCEPT_TAGS["fast"] = {"concept": "dbt_fast", "side": "change", "skillKind": "r
 # docs/design/ending-relationships.md) has none either, by design (PRD: "No intent row"): ending a relationship is a
 # decision made at a calm time, never a card a feeling word earns, and a check-in that surfaced it unasked could be
 # seen by the other person. Its entries are the Tools list, Problem Solve's and Rebel's links.
+# Let it be (DT-04, appToolId 'let-it-be', D6: routing's planned `radical-acceptance` renamed,
+# docs/design/let-it-be.md) has shipped on the skill runtime: out of PLANNED; its three rows stay switched off and
+# drafts until Claudia signs them off (D15).
+CONCEPT_TAGS["let-it-be"] = {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold", "direction": "neutral"}
 BUILT_NOT_SIGNED_OFF = {
     "fast": "built on the skill runtime; its word rows go live on Claudia's sign-off, row by row (docs/design/fast.md)",
     "cope-ahead": "built; its anticipatory row goes live on Claudia's sign-off (docs/design/cope-ahead.md)",
     "check-the-facts": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/check-the-facts.md)",
     # DT-05: the slider is gone (rebuilt as Ride it out on the skill runtime, DT-B3); its rows stay off and drafts.
+    "let-it-be": "built on the skill runtime; its rows go live on Claudia's sign-off, row by row (docs/design/let-it-be.md)",
     "urge-surfing": "rebuilt on the skill runtime as Ride it out; its rows go live on Claudia's sign-off (docs/design/ride-it-out.md)",
 }
 PLANNED = {
     "running-low":        {"concept": "dbt_please",             "side": "both",       "skillKind": "body",       "direction": "neutral"},
     "accepts":            {"concept": "dbt_accepts",            "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
-    "radical-acceptance": {"concept": "dbt_radical_acceptance", "side": "acceptance", "skillKind": "hold",       "direction": "neutral"},
     "wise-mind":          {"concept": "dbt_wise_mind",          "side": "both",       "skillKind": "naming",     "direction": "neutral"},
     "give":               {"concept": "dbt_give",               "side": "change",     "skillKind": "relational", "direction": "neutral"},
 }
@@ -290,9 +294,9 @@ WORD_RULES = [
     {"key": "watchful", "pattern": "chronic_vigilance", "tool": "wise-mind", "priority": WORD_NEXT, "words": WATCHFUL_WORDS,
      "why": "Planned: Wise Mind as the alternative for suspicion and judgement."},
     {"key": "helpless", "pattern": "chronic_vigilance", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["helpless"],
-     "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve leads until then."},
-    {"key": "helpless", "pattern": "chronic_vigilance", "tool": "radical-acceptance", "priority": 0.4, "words": ["helpless"],
-     "why": "Planned: Radical Acceptance leads for helplessness."},
+     "why": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve leads until then."},
+    {"key": "helpless", "pattern": "chronic_vigilance", "tool": "let-it-be", "priority": 0.4, "words": ["helpless"],
+     "why": "Let it be (radical acceptance) leads for helplessness."},
     # --- Social threat ---
     {"key": "exposed", "pattern": "social_threat_shame", "tool": "cool-down", "priority": WORD_LEAD, "words": ["exposed", "humiliated"],
      "why": "Hot shame: Cool Down (TIPP cold water triggers the dive reflex, slowing the heart and narrowing peripheral blood vessels), then Recover. Humiliated is a wound word, so Recover still leads it (R7)."},
@@ -325,9 +329,9 @@ WORD_RULES = [
      "why": "Do the Opposite (unhiding) as the alternative for shame."},
     # --- Low drive ---
     {"key": "fragile", "pattern": "reward_drive_low", "tool": "problem-solve", "priority": WORD_LEAD, "words": ["vulnerable", "fragile", "powerless"],
-     "why": "Radical Acceptance (planned), then Problem Solve in micro-steps; Problem Solve until then."},
-    {"key": "fragile", "pattern": "reward_drive_low", "tool": "radical-acceptance", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
-     "why": "Planned: Radical Acceptance leads."},
+     "why": "Let it be (built, row off until signed off), then Problem Solve in micro-steps; Problem Solve until then."},
+    {"key": "fragile", "pattern": "reward_drive_low", "tool": "let-it-be", "priority": 0.4, "words": ["vulnerable", "fragile", "powerless"],
+     "why": "Let it be (radical acceptance) leads."},
     {"key": "connection", "pattern": "reward_drive_low", "tool": "give", "priority": 0.85, "words": ["lonely", "isolated"],
      "why": "Planned: GIVE (reaching towards people) leads for loneliness once built, Running low after it; Do the Opposite until then."},
 ]
@@ -336,8 +340,8 @@ WORD_RULES = [
 PLANNED_ROWS = [
     {"pattern": "reward_drive_low", "tool": "running-low", "priority": 0.9,
      "why": "Planned: Running low (PLEASE: address the body's vulnerability) leads Low drive, Do the Opposite after it."},
-    {"pattern": "conservation_freeze", "tool": "radical-acceptance", "priority": 1.5,
-     "why": "Planned: Radical Acceptance after gentle movement for despair, grief, emptiness and numbness."},
+    {"pattern": "conservation_freeze", "tool": "let-it-be", "priority": 1.5,
+     "why": "Let it be (radical acceptance) after gentle movement for despair, grief, emptiness and numbness."},
 ]
 
 

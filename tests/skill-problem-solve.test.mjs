@@ -198,7 +198,7 @@ test("outside my control: two questions over the problem's parts, one a screen; 
   assert.match(M.copyText(ctx(), M.stepOf(skill, "solutions").title, none), /start small/);
   const onlyTheirs = run([pick("others", ps.aspects["fear-anticipatory"][0].id), next], ctx(), t);
   assert.equal(onlyTheirs.stepId, "accept", "only other people's parts: carrying it");
-  assert.deepEqual(onlyTheirs.offered, ["dear_man"], "what to say to them; let it be, willingness and turning the mind are planned");
+  assert.deepEqual(onlyTheirs.offered, ["dear_man", "let_it_be"], "what to say to them, or let it be (DT-04); willingness and turning the mind are planned");
   const mine = run([pick("mine", ps.aspects["fear-anticipatory"][0].id), next], ctx(), s);
   assert.equal(mine.stepId, "solutions");
   assert.match(M.copyText(ctx(), M.stepOf(skill, "solutions").title, mine), /in your hands/);
@@ -361,9 +361,10 @@ test("the second gate pass: never *it can wait* on the danger path; hopeless wor
   assert.deepEqual(values("solutions", run([pick("barrier", "not-sure-what"), next], ctx(), tri)), [...ps.directions["fear-anticipatory"].map((d) => d.id), "own"]);
 });
 
-test("every dead link of the old page is a planned exit: recorded, never offered or linked", () => {
+test("every dead link of the old page is a planned exit until its tool ships: recorded, never offered or linked", () => {
   const planned = skill.exits.filter((x) => x.planned).map((x) => x.toolId);
-  for (const t of ["give", "dialectics", "please-skill", "build-mastery", "let-it-be", "willingness", "turning-the-mind", "self-validate"]) {
+  assert.ok(!planned.includes("let-it-be"), "Let it be shipped (DT-04)");
+  for (const t of ["give", "dialectics", "please-skill", "build-mastery", "willingness", "turning-the-mind", "self-validate"]) {
     assert.ok(planned.includes(t), t);
   }
   const tools = readFileSync("src/data/tools.ts", "utf8");

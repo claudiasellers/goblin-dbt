@@ -46,7 +46,7 @@ Handout 9's factors, phrased as things that happen (`TROUBLESHOOT_FACTORS` in `s
 | My feelings took over | a plan for the moment, and a check before | Cope Ahead, try again |
 | A worry or belief stopped me | worries can be checked | Check the Facts, try again |
 | I settled for ending it fast | keep self-respect in view | FAST, try again |
-| They hold more power | a smaller ask, another route, or the relationship itself | FAST, Ending a relationship, Let it be (planned) |
+| They hold more power | a smaller ask, another route, or the relationship itself | FAST, Ending a relationship, Let it be |
 | They can't give it | the need is real, maybe met elsewhere | FAST's Let go, Finding connection (planned) |
 | I asked well, and they still said no | asking skilfully doesn't decide their answer | FAST, FAST's Let go |
 

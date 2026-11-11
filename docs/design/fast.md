@@ -105,7 +105,7 @@ close offers the tag row, like Check the Facts.
   `scripts/recommendations/content.py`, D15). Concept tags: `change`, `relational`, `neutral`.
 - Listed under Interpersonal Effectiveness for everyone (`src/data/tools.ts`, emoji 🪶).
 - Edges in `tests/fixtures/module-edges.json`: IE PRD IE-05 (fast → rehearse planned, dear-man, check-the-facts,
-  let-it-be planned), IE Arch #30 (→ Recover), #37 (→ finding-connection planned), #42 (problem-solve → fast).
+  let-it-be built 11 Nov), IE Arch #30 (→ Recover), #37 (→ finding-connection planned), #42 (problem-solve → fast).
 
 ## Departures from the PRD
 

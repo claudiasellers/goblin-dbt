@@ -335,7 +335,7 @@ EXITS = [
     {"id": "problem_solve", "toolId": "problem-solve"},                  # the fork: something can be done
     {"id": "dear_man", "toolId": "dear-man"},
     {"id": "opposite_action", "toolId": "opposite-action"},
-    {"id": "let_it_be", "toolId": "let-it-be", "planned": True},         # DT-04 (DT-B4): it's how things are
+    {"id": "let_it_be", "toolId": "let-it-be"},         # DT-04 (DT-B4): it's how things are
     {"id": "mind_job", "toolId": "mind-job", "planned": True},           # DT-06 (DT-B3): not right now, with a return
     {"id": "crisis_kit", "toolId": "crisis-kit", "planned": True},       # DT-03 the kit's people (safety batch)
     {"id": "safety_open", "toolId": None, "safety": True},               # safety.open (R6)

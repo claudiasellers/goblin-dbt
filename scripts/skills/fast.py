@@ -283,7 +283,7 @@ LET_GO_STEPS = [
 ]
 
 LET_GO_EXITS = [
-    {"id": "let_it_be", "toolId": "let-it-be", "planned": True},
+    {"id": "let_it_be", "toolId": "let-it-be"},
     {"id": "recover", "toolId": "recovering-from-invalidation"},
     {"id": "finding_connection", "toolId": "finding-connection", "planned": True},
     {"id": "done", "done": True},

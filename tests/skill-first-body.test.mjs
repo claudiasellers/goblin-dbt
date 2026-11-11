@@ -160,13 +160,14 @@ test("chest pain or fainting: the emergency number, no body mode; a pull to do s
   assert.equal(M.stepOf(skill, "urge").noClose, true);
 });
 
-test("the fork: something can be done → Problem Solve, DEAR MAN, Do the Opposite; the rest are lines until their tools ship", () => {
+test("the fork: something can be done → Problem Solve, DEAR MAN, Do the Opposite; how things are → Let it be; the rest are lines until their tools ship", () => {
   const fork = run([...FIRST.wave, pick("check1", "much_better"), next]);
   const end = (v) => run([pick("fork", v), next], ctx(), fork);
   assert.deepEqual(offers(end("change")), ["problem_solve", "dear_man", "opposite_action"]);
-  for (const v of ["accept", "park", "through"]) assert.deepEqual(offers(end(v)), [], v);
+  assert.deepEqual(offers(end("accept")), ["let_it_be"], "Let it be (DT-04, built)");
+  for (const v of ["park", "through"]) assert.deepEqual(offers(end(v)), [], v);
   const planned = Object.fromEntries(skill.exits.map((e) => [e.id, !!e.planned]));
-  assert.deepEqual([planned.let_it_be, planned.mind_job, planned.crisis_kit], [true, true, true]);
+  assert.deepEqual([planned.let_it_be, planned.mind_job, planned.crisis_kit], [false, true, true]);
   assert.match(M.handoffLine(ctx(), M.stepOf(skill, "end"), end("through")), /You got through it/);
 });
 

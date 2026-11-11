@@ -201,11 +201,11 @@ test("on the player (F2): the tool plays this skill, no page of its own; the car
   assert.equal(skill.copy[props.today], "Later today");
 });
 
-test("the real squeeze (PRD step 6): change → Problem Solve, a person → DEAR MAN and FAST, can't → Let it be (planned), not now → Done", () => {
+test("the real squeeze (PRD step 6): change → Problem Solve, a person → DEAR MAN and FAST, can't → Let it be, not now → Done", () => {
   const offered = (real) => run([...toReal(["rules"]), pick("real", real), next]).offered;
   assert.deepEqual(offered("change"), ["problem_solve"]);
   assert.deepEqual(offered("say"), ["dear_man", "fast"]);
-  assert.deepEqual(offered("cant"), []);
+  assert.deepEqual(offered("cant"), ["let_it_be"]);
   assert.deepEqual(offered("not_now"), []);
   const done = run([...toReal(["rules"]), pick("real", "not_now"), next]);
   assert.equal(M.handoffLine(ctx(), step("next"), done), "The rebellion's yours. The squeeze can wait until you're ready.");

@@ -15,6 +15,7 @@ export const PLAYER_TOOLS: Readonly<Record<string, string>> = {
   'pros-cons': 'pros_cons',
   'cool-down': 'first_body',
   'urge-surfing': 'ride_it_out',
+  'let-it-be': 'let_it_be',
 };
 
 /**
