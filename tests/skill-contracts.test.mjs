@@ -560,6 +560,26 @@ test("reopens: only a run that reached `after` reopens there, after the whole pa
   const build = read("scripts/skills/build.py");
   assert.match(build, /no step leads to a reopens step/, "build.py refuses a jump into a reopens step");
   assert.match(build, /the reopens step and the steps after it never read an ask-fresh field/, "build.py refuses an ask-fresh read from the reopen on");
+  // `again`: non-empty, no repeats, never the step itself, and each one books the same card as `after`.
+  const refusals = JSON.parse(execFileSync("python3", ["-c", `import sys, json, copy
+sys.path.insert(0, 'scripts/skills')
+import build
+from problem_solve import SKILL
+def tryit(f):
+    sk = copy.deepcopy(SKILL); st = next(x for x in sk["steps"] if x["id"] == "review"); f(st["reopens"], sk)
+    try: build.check(sk); return "ok"
+    except AssertionError as e: return str(e)
+out = {"base": tryit(lambda ro, sk: None),
+  "empty": tryit(lambda ro, sk: ro.__setitem__("again", [])),
+  "repeat": tryit(lambda ro, sk: ro.__setitem__("again", ["review_later", "review_later"])),
+  "self": tryit(lambda ro, sk: ro.__setitem__("again", ["review"])),
+  "nocard": tryit(lambda ro, sk: ro.__setitem__("again", ["review_done"]))}
+print(json.dumps(out))`], { encoding: "utf8" }));
+  assert.equal(refusals.base, "ok");
+  assert.match(refusals.empty, /non-empty list/);
+  assert.match(refusals.repeat, /non-empty list, no repeats/);
+  assert.match(refusals.self, /reopen after itself/);
+  assert.match(refusals.nocard, /books a follow-up/);
 });
 
 test("clears: arriving at a step by a forward move drops the answers it names; other steps keep them", () => {

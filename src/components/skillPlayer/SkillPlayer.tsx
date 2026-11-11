@@ -537,7 +537,8 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
     {crisis && <CrisisBanner compact variant={crisis.variant} />}
     {title && <Prompt>{title}</Prompt>}
     <section className="space-y-4 p-5 rounded-2xl bg-[var(--color-bg-elevated)] border border-[var(--color-border-subtle)]" data-testid="skill-handoff">
-      {line && <Prompt serif>{line}</Prompt>}
+      {/* Under a title the line is read after it, not focused or announced as a second heading. */}
+      {line && (title ? <Line serif>{line}</Line> : <Prompt serif>{line}</Prompt>)}
       {chips.map((f) => (
         // Held while the reminder saves, so the chip shown is the one that was scheduled.
         <fieldset key={f.id} data-testid="handoff-reminder" disabled={busy} className="m-0 p-0 border-0 min-w-0">

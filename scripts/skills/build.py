@@ -302,6 +302,13 @@ def check(skill):
             assert isinstance(ro, dict) and "after" in ro and set(ro) <= {"after", "again"}, (w, "reopens is {after: <step>, again?: [<step>]}", ro)
             assert all(x in steps for x in ro.get("again", [])), (w, "reopens again names steps of the skill", ro)
             assert ro["after"] in steps and ro["after"] != s["id"], (w, "reopens after a step of the skill, not itself", ro)
+            assert "again" not in ro or (ro["again"] and len(set(ro["again"])) == len(ro["again"])), (w, "reopens again is a non-empty list, no repeats", ro)
+            assert s["id"] not in ro.get("again", []) and s["id"] != ro["after"], (w, "a step doesn't reopen after itself", ro)
+            # Each step it reopens after books the same card that opens it (else nothing could reach it from there).
+            by_id = {x["id"]: x for x in skill["steps"]}
+            for x in [ro["after"], *ro.get("again", [])]:
+                assert by_id[x].get("followUp"), (w, "a reopens step books a follow-up", x)
+            assert len({by_id[x]["followUp"]["type"] for x in [ro["after"], *ro.get("again", [])]}) == 1, (w, "every reopens step books the same card", ro)
             assert s["id"] != skill["start"], (w, "a reopens step is never the start")
             into = [x["id"] for x in skill["steps"] if any(t["to"] == s["id"] for t in x.get("next", []))]
             assert not into, (w, "no step leads to a reopens step: only a reopened run starts there", into)
