@@ -34,6 +34,8 @@ export interface KeepAction {
   many: boolean;
   from: string[];
   when?: Cond;
+  /** A copy key: the confirmation shown on the next screen once the keep saved (*Your plan is in Me…*). */
+  done?: string;
 }
 
 /**
@@ -181,6 +183,11 @@ export interface StepDef {
   followUp?: FollowUpAction;
   /** The primary button's copy key (default `next`). A keep step's says what the tap keeps: the tap is the yes. */
   primary?: string;
+  /**
+   * kind 'ask': a quiet button under the primary (a copy key) that goes on without the step's keep or follow-up,
+   * e.g. Cope Ahead's *Not now* under *Keep this*.
+   */
+  secondary?: string;
   next: Array<{ to: string; when: Cond | null }>;
   /** kind 'handoff'. */
   lines?: Array<{ when: Cond; key: string }>;

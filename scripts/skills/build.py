@@ -273,6 +273,9 @@ def check(skill):
         assert "done" not in s or s["done"] in exits, w
         step_fields = {f["id"] for f in s.get("fields", [])}
         assert "primary" not in s or s["primary"] in copy, (w, "primary is a copy key", s.get("primary"))
+        if "secondary" in s:
+            assert s["kind"] == "ask" and s["secondary"] in copy, (w, "secondary: an ask step's quiet way on, a copy key")
+            assert "keep" in s or "followUp" in s, (w, "secondary skips a keep or a follow-up: a step with neither needs only Next")
         if "keep" in s:
             k = s["keep"]
             assert s["kind"] == "ask" and isinstance(k.get("kind"), str), (w, "a keep runs on an ask step's primary tap", k)
@@ -281,6 +284,7 @@ def check(skill):
             assert k["from"] and all(f in fields for f in k["from"]), (w, "keep from fields that exist", k)
             if "when" in k:
                 check_cond(k["when"], fields, derived, w, accepts)
+            assert "done" not in k or k["done"] in copy, (w, "keep.done is a copy key", k)
         if s["kind"] == "handoff" and s.get("fields"):
             # A hand-off's one field is its reminder chips (R5 on a hand-off): never a question in disguise.
             fu = s.get("followUp") or {}

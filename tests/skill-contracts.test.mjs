@@ -499,7 +499,7 @@ test("build.py: one non-hand-off step books each follow-up type (resume restores
   const out = execFileSync("python3", ["-c", `import sys,json,copy; sys.path.insert(0,'scripts/skills'); import build
 from content import SKILLS
 sk = copy.deepcopy(next(s for s in SKILLS if s["id"] == "cope_ahead"))
-keep = next(s for s in sk["steps"] if s["id"] == "keep")
+keep = next(s for s in sk["steps"] if s["id"] == "ask")
 calm = next(s for s in sk["steps"] if s["id"] == "calm")
 calm["followUp"] = dict(keep["followUp"])
 try:
@@ -507,6 +507,22 @@ try:
 except AssertionError as e:
     print("refused" if "one step books" in str(e) else "other: " + str(e))`], { encoding: "utf8" }).trim();
   assert.equal(out, "refused");
+});
+
+test("build.py: secondary is an ask step's quiet way past a keep or follow-up; keep.done is a copy key", () => {
+  const probe = (mut) => execFileSync("python3", ["-c", `import sys,copy; sys.path.insert(0,'scripts/skills'); import build
+from content import SKILLS
+sk = copy.deepcopy(next(s for s in SKILLS if s["id"] == "cope_ahead"))
+st = {s["id"]: s for s in sk["steps"]}
+${mut}
+try:
+    build.check(sk); print("passed")
+except AssertionError as e:
+    print("refused")`], { encoding: "utf8" }).trim();
+  assert.equal(probe("pass"), "passed");
+  assert.equal(probe("st['plan']['secondary'] = 'keep_no'"), "refused", "nothing to skip");
+  assert.equal(probe("st['keep']['secondary'] = 'nope'"), "refused", "not a copy key");
+  assert.equal(probe("st['keep']['keep']['done'] = 'nope'"), "refused");
 });
 
 test("emotionsFrom: a derived list of words in place of emotions; emotions when it resolves to nothing", () => {
