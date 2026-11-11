@@ -99,7 +99,7 @@ page's `ext.dt.stepsDone` stays readable for old sessions (plan C7).
 | A next-morning check after *Yes* | Not built; the close's *Yes* is recorded | Needs CORE-04's look-back; a reminder after a lapse needs its own clinical review |
 | The person's own hold line | Not built | A keep kind; after the clinician pass |
 | MF-01's body card on Observe | Plain chips | MF-01 isn't built |
-| DT-10's pros & cons replay for a frequent urge | Not built | DT-10 is DT-B2 (`prosConsReplay`) |
+| DT-10's pros & cons replay for a frequent urge | **Built** (DT-10): the card kept for this pull shows on the proceed step (`prosConsReplay`, recorded `pros_cons_replay`); nothing shows without one | [`pros-cons.md`](pros-cons.md) |
 | Inline entry from hosts (`enterAt`, `$ctx.urgeId`) | Not yet | The hosts (OA, Recover's *Don't send yet*, FTF, IE composer) wire it when they move to the runtime |
 | *Yes*: *Thanks for telling me. That's useful, not a failure.* · *No*: *Held.* after the close | Not shown (*Noted.*) | The close question is the spine's; a per-answer line needs a close-copy extension. Worth it for *Yes* first |
 | Behaviour urges' DBT parents | None | They're behaviours, not emotions |

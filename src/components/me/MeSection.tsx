@@ -112,7 +112,7 @@ export function MeSection() {
               Restore
             </button>
           )}
-          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script') && i.meta.status === 'active' && (
+          {(i.label === 'OwnLine' || i.meta.kind === 'nightmare_script' || i.meta.kind === 'pros_cons') && i.meta.status === 'active' && (
             <button type="button" onClick={() => { after(setAsideProfileItem(ref(i))).catch(() => { /* stays */ }); }}
               className="min-h-11 text-sm text-[var(--color-text-tertiary)] underline underline-offset-2">
               Set aside

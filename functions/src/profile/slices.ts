@@ -9,6 +9,7 @@
 import type { ManagedTransaction } from 'neo4j-driver';
 import { int } from '../shared/values';
 import { partSafetyCypher } from '../safety/partSafetyFlag';
+import { ownDecrypter } from '../shared/crypto';
 import { metaFrom } from './meta';
 import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId } from './types';
 
@@ -69,6 +70,11 @@ export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
     OPTIONAL MATCH (u)-[:HAS_DEN_SNAPSHOT]->(s:DenSnapshot)
     WITH parts, links, s ORDER BY s.takenAt DESC
     RETURN parts, links, collect(s {.id, takenAt: toString(s.takenAt)})[..36] AS snapshots`,
+  // Kept pros & cons cards (DT-10), active only, newest first; own words decrypted in the resolver.
+  prosCons: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'pros_cons', status: 'active'})
+    WITH p ORDER BY p.confirmedAt DESC, p.id LIMIT 12
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson,
+              confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
 };
 
 /** A list property or collected ids: absent → [], nulls dropped, sorted when `sorted`. */
@@ -192,6 +198,24 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
         .filter((x) => typeof x.id === 'string' && typeof x.takenAt === 'string')
         .map((x) => ({ id: x.id as string, takenAt: x.takenAt as string })),
     };
+  },
+  prosCons: async (tx, uid, now) => {
+    const r = await tx.run(SLICE_QUERIES.prosCons!, { uid });
+    if (!r.records.length) return [];
+    const decrypt = await ownDecrypter(tx, uid);
+    const out: ProfileSlices['prosCons'] = [];
+    for (const rec of r.records) {
+      const p = rec.get('p') as Record<string, unknown>;
+      let v: Record<string, unknown>;
+      try { v = JSON.parse(String(p.valueJson)) as Record<string, unknown>; } catch { continue; }
+      const own = (k: string) => (typeof v[k] === 'string' ? decrypt(v[k]) : null);
+      out.push({
+        id: String(p.id), pullIds: strings(v.pullIds), pullOwn: own('pullOwn'), longIds: strings(v.longIds), longOwn: own('longOwn'),
+        givesIds: strings(v.givesIds), givesOwn: own('givesOwn'), costIds: strings(v.costIds), costOwn: own('costOwn'),
+        keepsIds: strings(v.keepsIds), keepsOwn: own('keepsOwn'), meta: metaFrom(p, now),
+      });
+    }
+    return out;
   },
 };
 
