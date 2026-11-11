@@ -49,6 +49,8 @@ COPY = {
     "ack_sadness": "You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.",
     "ack_guilt": "Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.",
     "problem_q": "Which of these sounds closest?",
+    # A word the routing sends here from outside the graph's problem-solve words: the screen doesn't name a parent.
+    "ack_routed": "Something is asking a lot of you right now. Let's see what you can do about it.",
     "own_hint": "Say it your way",
     "piling": "It's not one thing. Everything feels like too much",
     "safety_open": "Talk to someone now",
@@ -88,7 +90,7 @@ COPY = {
     "co_none": "Then the step may need to be smaller still, or something may need to change first. Not easy. Possible.",
     "decompose_title": "Some parts of this are facts. Some are up to other people. Some are in your hands.",
     "mine_q": "Which of these are in your hands?",
-    "others_q": "Which are up to someone else?",
+    "others_title": "Which parts are up to someone else?",
     "accept_line": "Most of this is facts or other people's choices. That's painful, and it isn't a failure. Here the skill is to carry it, not solve it.",
     "solutions_title": "Which direction feels right?",
     "solutions_title_small": "Let's start small. Which direction feels right?",
@@ -98,21 +100,22 @@ COPY = {
     "own_step_hint": "Write it your way, or start from one of these.",
     "mysize_q": "How big is it?",
     "commit_title": "Your next step: {step}",
-    "commit_title_own": "Your next step is the one you wrote.",
+    "commit_title_own": "Your next step: {mine}",
     "commit_line": "Any size is a real step. If it doesn't work, or the problem shifts, come back: problem-solving goes round more than once.",
     "commit_line_rehearse": "A bigger step can help to rehearse before you take it.",
     "commit_line_safety": "If it gets more dangerous, call now. You don't have to wait for a plan.",
     "when_q": "Want me to ask how it went?",
-    "review_title": "You planned: {step}. How did it go?",
-    "review_title_own": "You planned the step you wrote. How did it go?",
+    "review_title": "How did it go? You planned: {step}",
+    "review_title_own": "How did it go? You planned: {mine}",
     "review_next_part": "Part of it is still a step. What would help with the rest?",
     "review_next_didnt": "That happens, and it's useful to know. What would help next time?",
-    "review_next_nohelp": "Doing it and finding it didn't help is useful to know. What would help now?",
+    "review_next_nohelp": "You did it, and it didn't help. That's worth knowing. What would help now?",
+    "review_next_nohelp_safety": "It didn't help enough. If you're not safe now, call. Or pick another way.",
     "review_help_title": "You took the step. Did it help with the problem?",
     "review_done_line": "You took the step and saw what it did. That's the whole loop: a problem, a step, and seeing how it went.",
     "review_later_line": "It can wait.",
     "review_later_q": "Want me to ask again?",
-    "rest_line": "Stopping here is a real choice. Rest first. The problem will still be here to work on when you have more in the tank.",
+    "rest_line": "Stopping here is a real choice. You can come back to this when you have more in the tank.",
     "go_rest": "Stop here for now",
     "own_direction": "My own idea",
     "done": "Done",
@@ -142,13 +145,16 @@ LABELS = {
     "jealousy-trust-conversation:medium": "Have the conversation with DEAR MAN: what happened, how it hit me, what I need",
     "jealousy-trust-conversation:bigger": "Agree together what rebuilding trust looks like: specific actions, not only promises",
     "sadness-loss-allow-and-move:bigger": "Honor the loss in a way that matters, then change one thing about how I'm living now",
+    "jealousy-trust-decide:medium": "Give it a set time, then look again at whether to keep going",
+    "sadness-erosion-identify-barrier:small": "Name one thing I stopped doing, and what got in the way",
     "love-internal-conversation:medium": "Tell them: \"I love you, and this thing between us needs to change\"",
 }
 
 
 def voiced(text):
     """A chip label as the graph has it, in the house voice: the spaced dash becomes a colon."""
-    t = re.sub(r"\s+—\s+", ": ", text.strip())
+    t = re.sub(r"\s+—\s+(and|even)\b", r", \1", text.strip())
+    t = re.sub(r"\s+—\s+", ": ", t)
     t = re.sub(r"\bnot just\b", "not only", t)
     t = re.sub(r"\bjust talk\b", "talk", t)
     t = re.sub(r"\bdon't just offer\b", "don't only offer", t)
@@ -200,7 +206,10 @@ assert all(PS_FIT[w] == "fit" for w in FEEL_CHIPS), [w for w in FEEL_CHIPS if PS
 
 # Words that can carry hopelessness: a quiet *Talk to someone now* wherever they land (as ER-14's *Nothing will ever
 # help me*), since nothing in the skill asks.
-HOPELESS = [w for w in ("hopeless", "despair", "depressed", "worthless") if w in PS_FIT]
+HOPELESS = [w for w in ("hopeless", "despair", "depressed", "worthless", "helpless", "powerless") if w in PS_FIT]
+# With only own words, the problem type whose parts and directions fit most problems of the parent. Fear's list starts
+# with safety and health, so own words alone would get *Get safe now* or medical steps; anticipatory is the general one.
+OWN_FALLBACK = {"fear": "fear-anticipatory"}
 SAFETY_TYPE = "fear-safety-threat"  # "My safety is at risk": the other_person banner, and straight to the directions
 KNOW_BUT_CANT, INVOLVES, TRIED, NOT_SURE, OUTSIDE = "know-but-cant", "involves-person", "tried-nothing-works", "not-sure-what", "outside-control"
 
@@ -214,17 +223,20 @@ def eq(ref, v):
 
 
 # The problem the person picked: on the problem screen, or the foothold they picked when everything piled up.
-PICKED_TYPE = {"any": [{"set": "$a.problem.ids"}, {"set": "$a.focus.ids"}]}
+PICKED_TYPE = {"any": [{"all": [{"set": "$a.problem.ids"}, {"not": eq(a("problem"), "piling")}]}, {"set": "$a.focus.ids"}]}
 SAFETY = {"any": [eq(a("problem"), SAFETY_TYPE), eq(a("focus"), SAFETY_TYPE)]}
-# An option of the problem type picked; with only own words, the parent's first problem type (as the old page did).
+# An option of the problem type picked; with only own words, the parent's general problem type (OWN_FALLBACK).
 FOR_TYPE = {"any": [
     {"all": [{"set": a("problem")}, eq("$opt.type", a("problem"))]},
     {"all": [{"set": a("focus")}, eq("$opt.type", a("focus"))]},
     {"all": [{"not": PICKED_TYPE}, eq("$opt.firstOf", "$d.parent")]},
 ]}
 FLOODED = eq("$ctx.band", "flooded")
+# Own words for the problem are never read, so danger told in them gets someone to talk to on the planning screens too.
+OWN_PROBLEM_LINK = {"exit": "safety_open", "label": "safety_open", "when": {"any": [{"own": "problem"}, {"own": "focus"}]}}
 BIG = {"any": [{"some": ["size", {"in": ["$opt.size", ["medium", "bigger"]]}]}, {"in": [a("mysize"), ["medium", "bigger"]]}]}
 OWN_STEP = {"own": "mystep"}
+NOT_LATER_IF_SAFE = {"not": {"all": [SAFETY, eq("$opt.value", "this_week")]}}
 
 DERIVE = [
     {"name": "parent", "from": a("feel"), "table": "psParent"},
@@ -339,7 +351,8 @@ STEPS = [
     },
     {
         "id": "problem", "kind": "ask",
-        "title": [{"when": eq("$d.parent", p), "key": f"ack_{p}"} for p in sorted(PS["problemTypes"])][:-1]
+        "title": [{"when": {"in": [a("feel"), sorted(ROUTED_IN)]}, "key": "ack_routed"}]
+                 + [{"when": eq("$d.parent", p), "key": f"ack_{p}"} for p in sorted(PS["problemTypes"])][:-1]
                  + [{"key": f"ack_{sorted(PS['problemTypes'])[-1]}"}],
         "fields": [{
             "id": "problem", "label": "problem_q", "max": 1, "swap": True, "required": True,
@@ -354,8 +367,10 @@ STEPS = [
     },
     {
         "id": "triage", "kind": "ask", "title": "triage_title",
-        "fields": [{"id": "focus", "max": 1, "required": True,
-                    "options": {"list": "problem", "where": {"all": [eq("$opt.parent", "$d.parent"), {"not": eq("$opt.all", True)}]}}}],
+        "fields": [{"id": "focus", "max": 1, "required": True, "swap": True,
+                    "options": {"list": "problem", "where": {"all": [eq("$opt.parent", "$d.parent"), {"not": eq("$opt.all", True)}]}},
+                    "own": {"hint": "own_hint", "countsAsPick": True, "max": 80},
+                    "links": [{"exit": "safety_open", "label": "safety_open", "when": {"any": [{"own": "focus"}, {"in": [a("feel"), HOPELESS]}]}}]}],
         "crisis": [{"variant": "other_person", "when": eq(a("focus"), SAFETY_TYPE)}],
         "next": [{"when": SAFETY, "to": "solutions"}, {"to": "barrier"}],
     },
@@ -412,15 +427,19 @@ STEPS = [
         "next": [{"when": eq(a("conf"), "high"), "to": "own_step"}, {"to": "solutions"}],
     },
     {
+        # One question a screen: what's in their hands first; only when nothing is, what's up to someone else.
         "id": "decompose", "kind": "ask", "title": "decompose_title",
-        "fields": [
-            {"id": "mine", "label": "mine_q", "options": {"list": "aspect", "where": FOR_TYPE}, "max": 9},
-            {"id": "others", "label": "others_q", "options": {"list": "aspect", "where": FOR_TYPE}, "max": 9,
-             "links": [{"exit": "dear_man", "label": "l_others", "when": {"set": a("others")}}]},
-        ],
-        # Something in their hands: the directions. Only other people's parts: the accept card. Nothing picked (not
-        # sure, or too much to sort): the directions, starting small, never a verdict on a skip.
-        "next": [{"when": {"any": [{"set": a("mine")}, {"not": {"set": a("others")}}]}, "to": "solutions"}, {"to": "accept"}],
+        "fields": [{"id": "mine", "label": "mine_q", "options": {"list": "aspect", "where": FOR_TYPE}, "max": 9,
+                    "links": [OWN_PROBLEM_LINK]}],
+        "next": [{"when": {"set": a("mine")}, "to": "solutions"}, {"to": "theirs"}],
+    },
+    {
+        # Only other people's parts: the accept card. Nothing picked (not sure, or too much to sort): the directions,
+        # starting small, never a verdict on a skip.
+        "id": "theirs", "kind": "ask", "title": "others_title",
+        "fields": [{"id": "others", "options": {"list": "aspect", "where": FOR_TYPE}, "max": 9,
+                    "links": [{"exit": "dear_man", "label": "l_others", "when": {"set": a("others")}}]}],
+        "next": [{"when": {"set": a("others")}, "to": "accept"}, {"to": "solutions"}],
     },
     {
         # A guided plan replaces an own-words one (after *A different direction*, or the barrier loop).
@@ -431,13 +450,15 @@ STEPS = [
             {"key": "solutions_title"},
         ],
         # Brainstorm's escape hatch: their own idea goes to the step they already know.
-        "fields": [{"id": "solutions", "options": {"list": "direction", "where": {"any": [FOR_TYPE, eq("$opt.all", True)]}}, "max": 1, "required": True}],
+        "fields": [{"id": "solutions", "options": {"list": "direction", "where": {"any": [FOR_TYPE, eq("$opt.all", True)]}}, "max": 1, "required": True,
+                    "links": [OWN_PROBLEM_LINK]}],
         "crisis": [{"variant": "other_person", "when": SAFETY}],
         "next": [{"when": eq(a("solutions"), "own"), "to": "own_step"}, {"to": "size"}],
     },
     {
         "id": "size", "kind": "ask", "title": "size_title", "titleSlots": {"direction": {"labelOf": "solutions"}},
-        "fields": [{"id": "size", "options": {"list": "step", "where": eq("$opt.dir", a("solutions"))}, "max": 1, "required": True}],
+        "fields": [{"id": "size", "options": {"list": "step", "where": eq("$opt.dir", a("solutions"))}, "max": 1, "required": True,
+                    "links": [OWN_PROBLEM_LINK]}],
         "crisis": [{"variant": "other_person", "when": SAFETY}],
         "next": [{"to": "commit"}],
     },
@@ -454,11 +475,11 @@ STEPS = [
     {
         "id": "commit", "kind": "handoff", "complete": True,
         "title": [{"when": OWN_STEP, "key": "commit_title_own"}, {"key": "commit_title"}],
-        "titleSlots": {"step": {"labelOf": "size"}},
+        "titleSlots": {"step": {"labelOf": "size"}, "mine": {"labelOf": "mystep"}},
         # On the danger path: call now beats any plan, and a safety step is never sent to rehearse first.
         "lines": [{"when": SAFETY, "key": "commit_line_safety"}, {"when": BIG, "key": "commit_line_rehearse"}, {"when": None, "key": "commit_line"}],
         "fields": [{"id": "when", "label": "when_q", "max": 1,
-                    "options": {"list": "when", "where": {"not": {"all": [SAFETY, eq("$opt.value", "this_week")]}}}}],
+                    "options": {"list": "when", "where": NOT_LATER_IF_SAFE}}],
         "followUp": {"type": "ps_review", "whenFrom": "when"},
         "crisis": [{"variant": "other_person", "when": SAFETY}],
         "offers": direction_offers() + [{"exit": "cope_ahead", "when": {"all": [BIG, {"not": SAFETY}]}}],
@@ -467,10 +488,11 @@ STEPS = [
     {
         # Handout 12 step 7: evaluate. Only the review card's link opens it, on a run that got to the commit card.
         # A second reopen (after a revised plan) doesn't read the last review's answers back as this time's, and the
-        # first visit's *can you think clearly right now* is never carried into a later day.
-        "id": "review", "kind": "ask", "reopens": {"after": "commit"}, "clears": ["how", "help", "then", "ready"],
+        # first visit's *can you think clearly right now* is never carried into a later day. What got in the way last
+        # time is asked again if they go back to it (it may not be the same thing); the plan itself stays.
+        "id": "review", "kind": "ask", "reopens": {"after": "commit", "again": ["review_later"]}, "clears": ["how", "help", "then", "ready", "barrier", "sub", "go", "ambiv", "conf", "mine", "others"],
         "title": [{"when": OWN_STEP, "key": "review_title_own"}, {"key": "review_title"}],
-        "titleSlots": {"step": {"labelOf": "size"}},
+        "titleSlots": {"step": {"labelOf": "size"}, "mine": {"labelOf": "mystep"}},
         "fields": [{"id": "how", "options": {"list": "how"}, "max": 1, "required": True}],
         "next": [{"when": eq(a("how"), "did_it"), "to": "review_help"}, {"when": eq(a("how"), "not_yet"), "to": "review_later"},
                  {"to": "review_next"}],
@@ -483,7 +505,8 @@ STEPS = [
     },
     {
         "id": "review_next", "kind": "ask",
-        "title": [{"when": eq(a("help"), "not_really"), "key": "review_next_nohelp"},
+        "title": [{"when": {"all": [eq(a("help"), "not_really"), SAFETY]}, "key": "review_next_nohelp_safety"},
+                  {"when": eq(a("help"), "not_really"), "key": "review_next_nohelp"},
                   {"when": eq(a("how"), "did_part"), "key": "review_next_part"}, {"key": "review_next_didnt"}],
         # A step that got done and didn't help needs another direction, not a smaller version of itself.
         "fields": [{"id": "then", "max": 1, "required": True,
@@ -500,11 +523,14 @@ STEPS = [
     },
     {"id": "review_done", "kind": "handoff", "complete": True, "lines": [{"when": None, "key": "review_done_line"}],
      "offers": [], "done": "done"},
-    {"id": "review_later", "kind": "handoff", "complete": True, "lines": [{"when": None, "key": "review_later_line"}],
-     "fields": [{"id": "again", "label": "review_later_q", "options": {"list": "when"}, "max": 1}],
+    # A safety step that hasn't happened yet is never told it can wait.
+    {"id": "review_later", "kind": "handoff", "complete": True,
+     "lines": [{"when": SAFETY, "key": "commit_line_safety"}, {"when": None, "key": "review_later_line"}],
+     "fields": [{"id": "again", "label": "review_later_q", "max": 1, "options": {"list": "when", "where": NOT_LATER_IF_SAFE}}],
      "followUp": {"type": "ps_review", "whenFrom": "again"}, "offers": [], "done": "done"},
     {
         "id": "not_now", "kind": "handoff", "complete": True, "lines": [{"when": None, "key": "not_now_line"}],
+        "links": [{"exit": "safety_open", "label": "safety_open", "when": {"in": [a("feel"), HOPELESS]}}],
         "offers": [{"exit": exit_id(t), "when": None} for t in PS["protocol"]["readinessRedirectTools"]],
         "done": "done",
     },
@@ -531,7 +557,8 @@ STEPS = [
     },
     {
         "id": "rest", "kind": "handoff", "complete": True, "lines": [{"when": None, "key": "rest_line"}],
-        "offers": [{"exit": "pause", "when": None}, {"exit": "cool_down", "when": None}],
+        # Running low wants refilling, not calming down: Look after the basics (planned), and outward attention.
+        "offers": [{"exit": "please_skill", "when": None}, {"exit": "five_senses", "when": None}],
         "done": "done",
     },
 ]
@@ -576,7 +603,8 @@ def options():
         out.append(("conf", lvl, voiced(p[key]), {}, None))
     # With only own words, the parent's first problem type that isn't danger: someone who wrote "exam tomorrow" is never
     # handed *Get safe now* (danger told in own words gets the quiet *Talk to someone now* instead).
-    firsts = {next(pt for pt in rows if pt["id"] != SAFETY_TYPE)["id"]: parent for parent, rows in PS["problemTypes"].items()}
+    firsts = {OWN_FALLBACK.get(parent) or next(pt for pt in rows if pt["id"] != SAFETY_TYPE)["id"]: parent
+              for parent, rows in PS["problemTypes"].items()}
     for parent, rows in PS["problemTypes"].items():
         for pt in rows:
             first = {"firstOf": firsts[pt["id"]]} if pt["id"] in firsts else {}

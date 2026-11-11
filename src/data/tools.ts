@@ -104,6 +104,7 @@ export const tools: Tool[] = [
     module: 'emotion-regulation',
     dbtBasis: 'Problem Solving',
     emoji: '🛠️',
+    bare: true,
   },
   {
     id: 'cope-ahead',

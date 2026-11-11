@@ -184,27 +184,34 @@ test("how sure: what to say to each level; sure goes to the step they already kn
   const own1 = run([next, pick("mystep", "call"), pick("mysize", "medium"), next], ctx(), high);
   assert.equal(own1.stepId, "commit");
   assert.equal(own1.answers.mystep.own, "Make the call", "a starter is written into the box, to change");
-  assert.match(M.copyText(ctx(), M.stepOf(skill, "commit").title, own1, M.titleSlots(ctx(), M.stepOf(skill, "commit"), own1)), /the one you wrote/);
+  assert.match(M.copyText(ctx(), M.stepOf(skill, "commit").title, own1, M.titleSlots(ctx(), M.stepOf(skill, "commit"), own1)), /^Your next step: Make the call$/, "their own words, in the title");
   assert.deepEqual(own1.offered, ["cope_ahead"], "a medium step: rehearse it");
 });
 
-test("outside my control: two questions over the problem's parts; nothing in reach is the accept card", () => {
+test("outside my control: two questions over the problem's parts, one a screen; only other people's parts is the accept card", () => {
   const s = run([...READY, pick("problem", "fear-anticipatory"), next, pick("barrier", "outside-control"), next]);
   assert.deepEqual(values("mine", s), ps.aspects["fear-anticipatory"].map((x) => x.id));
-  const none = run([next], ctx(), s);
+  const t = run([next], ctx(), s);
+  assert.equal(t.stepId, "theirs", "nothing in their hands: then what's up to someone else");
+  const none = run([next], ctx(), t);
   assert.equal(none.stepId, "solutions", "nothing picked is not a verdict: the directions, starting small");
   assert.match(M.copyText(ctx(), M.stepOf(skill, "solutions").title, none), /start small/);
-  const onlyTheirs = run([pick("others", ps.aspects["fear-anticipatory"][0].id), next], ctx(), s);
+  const onlyTheirs = run([pick("others", ps.aspects["fear-anticipatory"][0].id), next], ctx(), t);
   assert.equal(onlyTheirs.stepId, "accept", "only other people's parts: carrying it");
   assert.deepEqual(onlyTheirs.offered, ["dear_man"], "what to say to them; let it be, willingness and turning the mind are planned");
   const mine = run([pick("mine", ps.aspects["fear-anticipatory"][0].id), next], ctx(), s);
   assert.equal(mine.stepId, "solutions");
   assert.match(M.copyText(ctx(), M.stepOf(skill, "solutions").title, mine), /in your hands/);
-  const theirs = run([pick("others", ps.aspects["fear-anticipatory"][0].id)], ctx(), s);
-  assert.deepEqual(M.fieldLinks(ctx(), M.stepOf(skill, "decompose").fields[1], theirs).map((l) => l.exit.id), ["dear_man"]);
-  // Only own words for the problem: the parent's first problem type's parts and directions, as the old page did.
+  const theirs = run([pick("others", ps.aspects["fear-anticipatory"][0].id)], ctx(), t);
+  assert.deepEqual(M.fieldLinks(ctx(), M.stepOf(skill, "theirs").fields[0], theirs).map((l) => l.exit.id), ["dear_man"]);
+  // Only own words for the problem: fear's general type (something bad might happen), never safety or health, and
+  // someone to talk to stays one tap away on the planning screens.
   const ownOnly = run([...READY, own("problem", "it's complicated"), next, pick("barrier", "outside-control"), next]);
-  assert.deepEqual(values("mine", ownOnly), ps.aspects[ps.problemTypes.fear.find((p) => p.id !== "fear-safety-threat").id].map((x) => x.id));
+  assert.deepEqual(values("mine", ownOnly), ps.aspects["fear-anticipatory"].map((x) => x.id));
+  assert.deepEqual(M.fieldLinks(ctx(), M.stepOf(skill, "decompose").fields[0], ownOnly).map((l) => l.exit.id), ["safety_open"]);
+  const ownSol = run([...READY, own("problem", "it's complicated"), next, pick("barrier", "not-sure-what"), next]);
+  assert.deepEqual(values("solutions", ownSol), [...ps.directions["fear-anticipatory"].map((d) => d.id), "own"]);
+  assert.deepEqual(M.fieldLinks(ctx(), M.stepOf(skill, "solutions").fields[0], ownSol).map((l) => l.exit.id), ["safety_open"]);
 });
 
 test("the commit card: the step, the direction's own tool, Cope Ahead for a bigger step, and the review chips", () => {
@@ -239,7 +246,7 @@ test("the evaluation (Handout 12 step 7): ps_review reopens the visit's run at H
   assert.match(readFileSync("functions/src/spine/toolSession.ts", "utf8"), /f\.type IN \[[^\]]*'ps_review'\]/, "opening it resolves it");
   assert.ok(spine.followUpTypes.find((t) => t.id === "ps_step")?.enabled, "the old page's cards still answer in place");
   const review = M.stepOf(skill, "review");
-  assert.deepEqual(review.reopens, { after: "commit" });
+  assert.deepEqual(review.reopens, { after: "commit", again: ["review_later"] });
   const dir = ps.directions["fear-anticipatory"][0];
   const done = run([...READY, pick("problem", "fear-anticipatory"), next, pick("barrier", "not-sure-what"), next, pick("solutions", dir.id), next,
     pick("size", `${dir.id}:small`), next, pick("when", "today")]);
@@ -248,7 +255,7 @@ test("the evaluation (Handout 12 step 7): ps_review reopens the visit's run at H
   assert.equal(back.stepId, "review");
   assert.equal(back.answers.size.ids[0], `${dir.id}:small`, "the run's own answers: the title names the step");
   assert.equal(back.answers.when, undefined, "the reminder chip is never read back");
-  assert.match(M.copyText(ctx(), review.title, back, M.titleSlots(ctx(), review, back)), /^You planned: .+\. How did it go\?$/);
+  assert.match(M.copyText(ctx(), review.title, back, M.titleSlots(ctx(), review, back)), /^How did it go\? You planned: .+$/);
   const unfinished = M.runRecord(ctx(), run([...READY, pick("problem", "fear-anticipatory"), next]));
   assert.equal(M.resumeRun(ctx(), unfinished, "review"), null, "a run that never reached the commit card doesn't reopen");
   const go = (how, more = []) => run([pick("how", how), next, ...more], ctx(), back);
@@ -290,14 +297,57 @@ test("a revised plan replaces the old one, and its own review reopens after it (
   assert.equal(r2.answers.then, undefined);
   assert.equal(r2.path.at(-1), "review");
   // Guided, then the step they already know: the guided answers are cleared on the way in.
-  // (The run's own answers come back on the loop, so the barrier, its answer, the chip and how sure stand picked.)
-  const back = run([pick("how", "didnt"), next, pick("then", "blocked"), next, next, next, next, next, next], ctx(), r2);
+  // What got in the way is asked again, never pre-picked from last time.
+  const atBarrier = run([pick("how", "didnt"), next, pick("then", "blocked"), next], ctx(), r2);
+  assert.equal(atBarrier.stepId, "barrier");
+  assert.equal(atBarrier.answers.barrier, undefined);
+  const back = run([pick("barrier", "know-but-cant"), next, pick("sub", "cant-keep-putting-off"), next, pick("go", "ruler"), next, pick("conf", "high"), next, next], ctx(), atBarrier);
   assert.equal(back.stepId, "own_step");
   assert.equal(back.answers.size, undefined);
   assert.equal(back.answers.solutions, undefined);
   // *A smaller version* goes back to the plan's own kind of step: own words to own words, a guided step to its sizes.
   assert.equal(run([pick("how", "didnt"), next, pick("then", "smaller"), next], ctx(), r1).stepId, "own_step");
   assert.equal(run([pick("how", "didnt"), next, pick("then", "smaller"), next], ctx(), r2).stepId, "size");
+});
+
+test("the second gate pass: never *it can wait* on the danger path; hopeless words on every hand-off; rest refills; routed words keep their name", () => {
+  // A danger-path step not taken yet: call now, never *It can wait*, and no Later this week.
+  const g = ps.directions["fear-safety-threat"][0];
+  const at = run([...READY, pick("problem", "fear-safety-threat"), next, pick("solutions", g.id), next, pick("size", `${g.id}:small`), next, pick("when", "today")]);
+  const back = M.resumeRun(ctx(), M.runRecord(ctx(), at), "review");
+  const later = run([pick("how", "not_yet"), next], ctx(), back);
+  assert.equal(later.stepId, "review_later");
+  assert.match(M.handoffLine(ctx(), M.stepOf(skill, "review_later"), later), /call now/);
+  assert.deepEqual(values("again", later), ["today", "tomorrow"]);
+  // *Not yet*, again and again: every card reopens, the danger answer and its banner with it, and the path stays short.
+  let rec = M.runRecord(ctx(), run([pick("again", "tomorrow")], ctx(), later));
+  for (let i = 0; i < 30; i++) {
+    const r = M.resumeRun(ctx(), rec, "review");
+    assert.equal(r?.stepId, "review", `card ${i + 2} reopens`);
+    assert.equal(M.crisisFor(ctx(), M.stepOf(skill, "review"), r)?.variant, "other_person", `card ${i + 2}: the banner`);
+    rec = M.runRecord(ctx(), run([pick("how", "not_yet"), next, pick("again", "today")], ctx(), r));
+  }
+  assert.ok(rec.path.length < 20, "earlier review loops don't pile up");
+  assert.match(M.copyText(ctx(), M.stepOf(skill, "review_next").title, run([pick("how", "did_it"), next, pick("help", "not_really"), next], ctx(), back)), /If you're not safe now, call/);
+  // Too loud with a hopeless word: someone to talk to, there too.
+  const loud = run([pick("feel", "despair"), next, pick("ready", "too_loud"), next]);
+  assert.equal(loud.stepId, "not_now");
+  assert.deepEqual(M.stepLinks(ctx(), M.stepOf(skill, "not_now"), loud).map((l) => l.exit.id), ["safety_open"]);
+  assert.deepEqual(M.stepLinks(ctx(), M.stepOf(skill, "not_now"), run([pick("feel", "anxious"), next, pick("ready", "too_loud"), next])), []);
+  // Running low: stop, and nothing that calms down (Look after the basics is planned; 5-4-3-2-1 orients outward).
+  const low = run([...READY, pick("problem", "fear-anticipatory"), next, pick("barrier", "know-but-cant"), next, pick("sub", "cant-no-energy"), next]);
+  assert.equal(values("go", low)[0], "rest");
+  const rest = run([pick("go", "rest"), next], ctx(), low);
+  assert.equal(rest.stepId, "rest");
+  assert.deepEqual(rest.offered, ["five_senses"]);
+  // A word routed in from outside the graph's problem-solve words keeps its name: no parent named on screen.
+  const busy = run([pick("feel", "busy"), next, pick("ready", "can"), next]);
+  assert.match(M.copyText(ctx(), M.stepOf(skill, "problem").title, busy), /^Something is asking a lot of you/);
+  // Everything piling up: own words for the foothold too.
+  const tri = run([pick("problem", "piling"), next, own("focus", "the deadline"), next], ctx(), busy);
+  assert.equal(tri.stepId, "barrier");
+  assert.deepEqual(M.fieldLinks(ctx(), M.stepOf(skill, "triage").fields[0], tri).map((l) => l.exit.id), ["safety_open"]);
+  assert.deepEqual(values("solutions", run([pick("barrier", "not-sure-what"), next], ctx(), tri)), [...ps.directions["fear-anticipatory"].map((d) => d.id), "own"]);
 });
 
 test("every dead link of the old page is a planned exit: recorded, never offered or linked", () => {

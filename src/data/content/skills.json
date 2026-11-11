@@ -5522,6 +5522,7 @@
           "ack_sadness": "You've lost something, or something didn't go the way you needed. Let's see which parts you can do something about.",
           "ack_guilt": "Something you did doesn't sit right with your values. The move now is repair, not punishing yourself.",
           "problem_q": "Which of these sounds closest?",
+          "ack_routed": "Something is asking a lot of you right now. Let's see what you can do about it.",
           "own_hint": "Say it your way",
           "piling": "It's not one thing. Everything feels like too much",
           "safety_open": "Talk to someone now",
@@ -5559,7 +5560,7 @@
           "co_none": "Then the step may need to be smaller still, or something may need to change first. Not easy. Possible.",
           "decompose_title": "Some parts of this are facts. Some are up to other people. Some are in your hands.",
           "mine_q": "Which of these are in your hands?",
-          "others_q": "Which are up to someone else?",
+          "others_title": "Which parts are up to someone else?",
           "accept_line": "Most of this is facts or other people's choices. That's painful, and it isn't a failure. Here the skill is to carry it, not solve it.",
           "solutions_title": "Which direction feels right?",
           "solutions_title_small": "Let's start small. Which direction feels right?",
@@ -5569,21 +5570,22 @@
           "own_step_hint": "Write it your way, or start from one of these.",
           "mysize_q": "How big is it?",
           "commit_title": "Your next step: {step}",
-          "commit_title_own": "Your next step is the one you wrote.",
+          "commit_title_own": "Your next step: {mine}",
           "commit_line": "Any size is a real step. If it doesn't work, or the problem shifts, come back: problem-solving goes round more than once.",
           "commit_line_rehearse": "A bigger step can help to rehearse before you take it.",
           "commit_line_safety": "If it gets more dangerous, call now. You don't have to wait for a plan.",
           "when_q": "Want me to ask how it went?",
-          "review_title": "You planned: {step}. How did it go?",
-          "review_title_own": "You planned the step you wrote. How did it go?",
+          "review_title": "How did it go? You planned: {step}",
+          "review_title_own": "How did it go? You planned: {mine}",
           "review_next_part": "Part of it is still a step. What would help with the rest?",
           "review_next_didnt": "That happens, and it's useful to know. What would help next time?",
-          "review_next_nohelp": "Doing it and finding it didn't help is useful to know. What would help now?",
+          "review_next_nohelp": "You did it, and it didn't help. That's worth knowing. What would help now?",
+          "review_next_nohelp_safety": "It didn't help enough. If you're not safe now, call. Or pick another way.",
           "review_help_title": "You took the step. Did it help with the problem?",
           "review_done_line": "You took the step and saw what it did. That's the whole loop: a problem, a step, and seeing how it went.",
           "review_later_line": "It can wait.",
           "review_later_q": "Want me to ask again?",
-          "rest_line": "Stopping here is a real choice. Rest first. The problem will still be here to work on when you have more in the tank.",
+          "rest_line": "Stopping here is a real choice. You can come back to this when you have more in the tank.",
           "go_rest": "Stop here for now",
           "own_direction": "My own idea",
           "done": "Done",
@@ -5974,6 +5976,19 @@
             "title": [
               {
                 "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "busy",
+                      "helpless",
+                      "rushed"
+                    ]
+                  ]
+                },
+                "key": "ack_routed"
+              },
+              {
+                "when": {
                   "eq": [
                     "$d.parent",
                     "anger"
@@ -6085,7 +6100,9 @@
                             [
                               "despair",
                               "depressed",
-                              "worthless"
+                              "worthless",
+                              "helpless",
+                              "powerless"
                             ]
                           ]
                         }
@@ -6151,6 +6168,7 @@
                 "id": "focus",
                 "max": 1,
                 "required": true,
+                "swap": true,
                 "options": {
                   "list": "problem",
                   "where": {
@@ -6171,7 +6189,37 @@
                       }
                     ]
                   }
-                }
+                },
+                "own": {
+                  "hint": "own_hint",
+                  "countsAsPick": true,
+                  "max": 80
+                },
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "any": [
+                        {
+                          "own": "focus"
+                        },
+                        {
+                          "in": [
+                            "$a.feel",
+                            [
+                              "despair",
+                              "depressed",
+                              "worthless",
+                              "helpless",
+                              "powerless"
+                            ]
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
               }
             ],
             "crisis": [
@@ -7038,7 +7086,19 @@
                             "not": {
                               "any": [
                                 {
-                                  "set": "$a.problem.ids"
+                                  "all": [
+                                    {
+                                      "set": "$a.problem.ids"
+                                    },
+                                    {
+                                      "not": {
+                                        "eq": [
+                                          "$a.problem",
+                                          "piling"
+                                        ]
+                                      }
+                                    }
+                                  ]
                                 },
                                 {
                                   "set": "$a.focus.ids"
@@ -7057,11 +7117,67 @@
                     ]
                   }
                 },
-                "max": 9
+                "max": 9,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "any": [
+                        {
+                          "own": "problem"
+                        },
+                        {
+                          "own": "focus"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ],
+            "crisis": [
+              {
+                "variant": "other_person",
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.problem",
+                        "fear-safety-threat"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.focus",
+                        "fear-safety-threat"
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "next": [
+              {
+                "to": "solutions",
+                "when": {
+                  "set": "$a.mine"
+                }
               },
               {
+                "to": "theirs",
+                "when": null
+              }
+            ],
+            "offers": []
+          },
+          {
+            "id": "theirs",
+            "kind": "ask",
+            "title": "others_title",
+            "fields": [
+              {
                 "id": "others",
-                "label": "others_q",
                 "options": {
                   "list": "aspect",
                   "where": {
@@ -7098,7 +7214,19 @@
                             "not": {
                               "any": [
                                 {
-                                  "set": "$a.problem.ids"
+                                  "all": [
+                                    {
+                                      "set": "$a.problem.ids"
+                                    },
+                                    {
+                                      "not": {
+                                        "eq": [
+                                          "$a.problem",
+                                          "piling"
+                                        ]
+                                      }
+                                    }
+                                  ]
                                 },
                                 {
                                   "set": "$a.focus.ids"
@@ -7152,22 +7280,13 @@
             ],
             "next": [
               {
-                "to": "solutions",
+                "to": "accept",
                 "when": {
-                  "any": [
-                    {
-                      "set": "$a.mine"
-                    },
-                    {
-                      "not": {
-                        "set": "$a.others"
-                      }
-                    }
-                  ]
+                  "set": "$a.others"
                 }
               },
               {
-                "to": "accept",
+                "to": "solutions",
                 "when": null
               }
             ],
@@ -7264,7 +7383,19 @@
                                 "not": {
                                   "any": [
                                     {
-                                      "set": "$a.problem.ids"
+                                      "all": [
+                                        {
+                                          "set": "$a.problem.ids"
+                                        },
+                                        {
+                                          "not": {
+                                            "eq": [
+                                              "$a.problem",
+                                              "piling"
+                                            ]
+                                          }
+                                        }
+                                      ]
                                     },
                                     {
                                       "set": "$a.focus.ids"
@@ -7292,7 +7423,23 @@
                   }
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "any": [
+                        {
+                          "own": "problem"
+                        },
+                        {
+                          "own": "focus"
+                        }
+                      ]
+                    }
+                  }
+                ]
               }
             ],
             "crisis": [
@@ -7355,7 +7502,23 @@
                   }
                 },
                 "max": 1,
-                "required": true
+                "required": true,
+                "links": [
+                  {
+                    "exit": "safety_open",
+                    "label": "safety_open",
+                    "when": {
+                      "any": [
+                        {
+                          "own": "problem"
+                        },
+                        {
+                          "own": "focus"
+                        }
+                      ]
+                    }
+                  }
+                ]
               }
             ],
             "crisis": [
@@ -7477,6 +7640,9 @@
             "titleSlots": {
               "step": {
                 "labelOf": "size"
+              },
+              "mine": {
+                "labelOf": "mystep"
               }
             },
             "lines": [
@@ -7840,13 +8006,23 @@
             "id": "review",
             "kind": "ask",
             "reopens": {
-              "after": "commit"
+              "after": "commit",
+              "again": [
+                "review_later"
+              ]
             },
             "clears": [
               "how",
               "help",
               "then",
-              "ready"
+              "ready",
+              "barrier",
+              "sub",
+              "go",
+              "ambiv",
+              "conf",
+              "mine",
+              "others"
             ],
             "title": [
               {
@@ -7862,6 +8038,9 @@
             "titleSlots": {
               "step": {
                 "labelOf": "size"
+              },
+              "mine": {
+                "labelOf": "mystep"
               }
             },
             "fields": [
@@ -7977,6 +8156,35 @@
             "id": "review_next",
             "kind": "ask",
             "title": [
+              {
+                "when": {
+                  "all": [
+                    {
+                      "eq": [
+                        "$a.help",
+                        "not_really"
+                      ]
+                    },
+                    {
+                      "any": [
+                        {
+                          "eq": [
+                            "$a.problem",
+                            "fear-safety-threat"
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$a.focus",
+                            "fear-safety-threat"
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                "key": "review_next_nohelp_safety"
+              },
               {
                 "when": {
                   "eq": [
@@ -8165,6 +8373,25 @@
             "complete": true,
             "lines": [
               {
+                "when": {
+                  "any": [
+                    {
+                      "eq": [
+                        "$a.problem",
+                        "fear-safety-threat"
+                      ]
+                    },
+                    {
+                      "eq": [
+                        "$a.focus",
+                        "fear-safety-threat"
+                      ]
+                    }
+                  ]
+                },
+                "key": "commit_line_safety"
+              },
+              {
                 "when": null,
                 "key": "review_later_line"
               }
@@ -8173,10 +8400,38 @@
               {
                 "id": "again",
                 "label": "review_later_q",
+                "max": 1,
                 "options": {
-                  "list": "when"
-                },
-                "max": 1
+                  "list": "when",
+                  "where": {
+                    "not": {
+                      "all": [
+                        {
+                          "any": [
+                            {
+                              "eq": [
+                                "$a.problem",
+                                "fear-safety-threat"
+                              ]
+                            },
+                            {
+                              "eq": [
+                                "$a.focus",
+                                "fear-safety-threat"
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "eq": [
+                            "$opt.value",
+                            "this_week"
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                }
               }
             ],
             "followUp": {
@@ -8218,6 +8473,24 @@
                 "key": "not_now_line"
               }
             ],
+            "links": [
+              {
+                "exit": "safety_open",
+                "label": "safety_open",
+                "when": {
+                  "in": [
+                    "$a.feel",
+                    [
+                      "despair",
+                      "depressed",
+                      "worthless",
+                      "helpless",
+                      "powerless"
+                    ]
+                  ]
+                }
+              }
+            ],
             "done": "done",
             "next": [],
             "offers": [
@@ -8249,7 +8522,9 @@
                     [
                       "despair",
                       "depressed",
-                      "worthless"
+                      "worthless",
+                      "helpless",
+                      "powerless"
                     ]
                   ]
                 }
@@ -8427,11 +8702,11 @@
             "next": [],
             "offers": [
               {
-                "exit": "pause",
+                "exit": "please_skill",
                 "when": null
               },
               {
-                "exit": "cool_down",
+                "exit": "five_senses",
                 "when": null
               }
             ]
@@ -9077,46 +9352,46 @@
             {
               "value": "fear-health-da-diagnosis",
               "label": "The diagnosis or symptoms themselves",
-              "type": "fear-health-threat",
-              "firstOf": "fear"
+              "type": "fear-health-threat"
             },
             {
               "value": "fear-health-da-treatment",
               "label": "What treatment or care I pursue",
-              "type": "fear-health-threat",
-              "firstOf": "fear"
+              "type": "fear-health-threat"
             },
             {
               "value": "fear-health-da-info",
               "label": "How much I know about what's happening",
-              "type": "fear-health-threat",
-              "firstOf": "fear"
+              "type": "fear-health-threat"
             },
             {
               "value": "fear-health-da-others-support",
               "label": "Whether other people help or show up",
-              "type": "fear-health-threat",
-              "firstOf": "fear"
+              "type": "fear-health-threat"
             },
             {
               "value": "fear-antic-da-whether-happens",
               "label": "Whether the thing actually happens",
-              "type": "fear-anticipatory"
+              "type": "fear-anticipatory",
+              "firstOf": "fear"
             },
             {
               "value": "fear-antic-da-preparation",
               "label": "How prepared I am if it does",
-              "type": "fear-anticipatory"
+              "type": "fear-anticipatory",
+              "firstOf": "fear"
             },
             {
               "value": "fear-antic-da-reduce-risk",
               "label": "Steps I could take to reduce the risk",
-              "type": "fear-anticipatory"
+              "type": "fear-anticipatory",
+              "firstOf": "fear"
             },
             {
               "value": "fear-antic-da-others-decisions",
               "label": "Other people's decisions that affect the outcome",
-              "type": "fear-anticipatory"
+              "type": "fear-anticipatory",
+              "firstOf": "fear"
             },
             {
               "value": "guilt-harm-da-what-i-did",
@@ -9427,36 +9702,36 @@
             {
               "value": "fear-health-info",
               "label": "Get information",
-              "type": "fear-health-threat",
-              "firstOf": "fear"
+              "type": "fear-health-threat"
             },
             {
               "value": "fear-health-one-step",
               "label": "Take one medical or logistical step",
-              "type": "fear-health-threat",
-              "firstOf": "fear"
+              "type": "fear-health-threat"
             },
             {
               "value": "fear-health-support",
               "label": "Identify your support system",
-              "type": "fear-health-threat",
-              "firstOf": "fear"
+              "type": "fear-health-threat"
             },
             {
               "value": "fear-anticipatory-prepare",
               "label": "Prepare for the most likely scenario",
               "type": "fear-anticipatory",
+              "firstOf": "fear",
               "tool": "cope-ahead"
             },
             {
               "value": "fear-anticipatory-reduce-risk",
               "label": "Reduce the risk",
-              "type": "fear-anticipatory"
+              "type": "fear-anticipatory",
+              "firstOf": "fear"
             },
             {
               "value": "fear-anticipatory-accept-uncertainty",
               "label": "Accept the part you can't control",
               "type": "fear-anticipatory",
+              "firstOf": "fear",
               "tool": "let-it-be"
             },
             {
@@ -9701,7 +9976,7 @@
             },
             {
               "value": "anger-blocked-alternate:bigger",
-              "label": "Take the alternate route: even if it's slower or harder",
+              "label": "Take the alternate route, even if it's slower or harder",
               "dir": "anger-blocked-alternate",
               "size": "bigger"
             },
@@ -10097,7 +10372,7 @@
             },
             {
               "value": "guilt-harm-apologize:bigger",
-              "label": "Ask them what they need from you to repair this: and listen without defending",
+              "label": "Ask them what they need from you to repair this, and listen without defending",
               "dir": "guilt-harm-apologize",
               "size": "bigger"
             },
@@ -10163,7 +10438,7 @@
             },
             {
               "value": "guilt-pattern-replace:medium",
-              "label": "Practice the alternative once this week: even imperfectly",
+              "label": "Practice the alternative once this week, even imperfectly",
               "dir": "guilt-pattern-replace",
               "size": "medium"
             },
@@ -10277,7 +10552,7 @@
             },
             {
               "value": "jealousy-trust-terms:bigger",
-              "label": "Decide together on concrete agreements: and follow up on them",
+              "label": "Decide together on concrete agreements, and follow up on them",
               "dir": "jealousy-trust-terms",
               "size": "bigger"
             },
@@ -10289,7 +10564,7 @@
             },
             {
               "value": "jealousy-trust-decide:medium",
-              "label": "Give it a defined timeframe: \"I'll invest fully for [X weeks/months] and then reassess\"",
+              "label": "Give it a set time, then look again at whether to keep going",
               "dir": "jealousy-trust-decide",
               "size": "medium"
             },
@@ -10349,7 +10624,7 @@
             },
             {
               "value": "love-external-logistics:bigger",
-              "label": "Pick an option and commit: even if it's imperfect or requires sacrifice",
+              "label": "Pick an option and commit, even if it's imperfect or requires sacrifice",
               "dir": "love-external-logistics",
               "size": "bigger"
             },
@@ -10403,7 +10678,7 @@
             },
             {
               "value": "love-internal-dynamic:bigger",
-              "label": "Agree together to try a different approach next time: and practice it",
+              "label": "Agree together to try a different approach next time, and practice it",
               "dir": "love-internal-dynamic",
               "size": "bigger"
             },
@@ -10415,7 +10690,7 @@
             },
             {
               "value": "sadness-loss-rebuild-structure:medium",
-              "label": "Fill that gap with something: even temporarily, even imperfectly",
+              "label": "Fill that gap with something, even temporarily, even imperfectly",
               "dir": "sadness-loss-rebuild-structure",
               "size": "medium"
             },
@@ -10523,7 +10798,7 @@
             },
             {
               "value": "sadness-erosion-one-thing:medium",
-              "label": "Do a version of that thing today: even a 5-minute version",
+              "label": "Do a version of that thing today, even a 5-minute version",
               "dir": "sadness-erosion-one-thing",
               "size": "medium"
             },
@@ -10535,7 +10810,7 @@
             },
             {
               "value": "sadness-erosion-identify-barrier:small",
-              "label": "Finish this sentence: \"I stopped doing [X] because...\"",
+              "label": "Name one thing I stopped doing, and what got in the way",
               "dir": "sadness-erosion-identify-barrier",
               "size": "small"
             },
