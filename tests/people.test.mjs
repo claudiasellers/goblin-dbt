@@ -47,6 +47,12 @@ test("the question is asked when never answered, after 90 days, or when the date
   assert.equal(needsSafetyAsk({ safe: "yes", safeAskedAt: "garbage" }, NOW), true);
   assert.equal(needsSafetyAsk({ safe: "yes", safeAskedAt: new Date(NOW - 89 * DAY).toISOString() }, NOW), false);
   assert.equal(needsSafetyAsk({ safe: "no", safeAskedAt: new Date(NOW - 91 * DAY).toISOString() }, NOW), true);
+  // IE-B2: a debrief since said *I don't feel safe with them*: asked again, until it is answered again.
+  const asked = new Date(NOW - 10 * DAY).toISOString();
+  assert.equal(needsSafetyAsk({ safe: "yes", safeAskedAt: asked, safetyRecheckAt: new Date(NOW - DAY).toISOString() }, NOW), true);
+  assert.equal(needsSafetyAsk({ safe: "yes", safeAskedAt: asked, safetyRecheckAt: new Date(NOW - 20 * DAY).toISOString() }, NOW), false);
+  assert.equal(needsSafetyAsk({ safe: "yes", safeAskedAt: asked, safetyRecheckAt: "garbage" }, NOW), true);
+  assert.equal(needsSafetyAsk({ safe: "yes", safeAskedAt: asked, safetyRecheckAt: null }, NOW), false);
 });
 
 test("picker steps: list when anyone is kept; a fresh answer goes straight on; Things changed, stale or no risk asks again", () => {

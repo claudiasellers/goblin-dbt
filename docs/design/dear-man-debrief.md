@@ -20,11 +20,16 @@ per visit.
 feel (≤ 3; shaky / wound up → *Settle my body first*, Cool Down)
 happened ─┬─ not yet ─► a prep, Cope Ahead (`first=conversation`), rehearse (planned)
           ├─ I decided not to ─► accepted, no rescue, no offers
-          └─ yes ─► outcome (got it · partly · no · no answer yet) ─► still okay between you? ─► proud of how you did it?
-                      ├─ got it ─► the readout ─┬─ look at what worked ─► the chain
-                      │                          └─ enough for now ─► good (GIVE planned when it's shaky between you)
-                      └─ partly / no / no answer ─► factor (IE-11, one chip) ─┬─ look at what happened first ─► the chain
-                                                                               └─ a factor ─► fix
+          └─ yes ─► outcome (got it · partly · no · no answer yet) ─► still okay between you?
+                      ├─ I don't feel safe with them ─► unsafe (other_person resources, Ending careful, Talk to someone now)
+                      └─ proud of how you did it?
+                          ├─ shaky / wound up (first step) ─► later (no recall now; Cool Down; ask again?)
+                          ├─ no answer yet ─► look at how it went (the chain) or leave it (ask again?)
+                          ├─ got it ─► the readout ─┬─ look at what worked ─► the chain
+                          │                          └─ enough for now ─► good (GIVE planned when it's shaky between you;
+                          │                                               FAST when not proud of how)
+                          └─ partly / no ─► factor (IE-11, one chip) ─┬─ look at what happened first ─► the chain
+                                                                       └─ a factor ─► fix
 chain: moment → response → body → thought (own words) → underneath → who showed up (parts) → reflection → what to
        try → rehearse it → the moment plan (boundaryLine, list) ─► factor again (bad outcome) or good
 ```
@@ -42,7 +47,8 @@ Handout 9's factors, phrased as things that happen (`TROUBLESHOOT_FACTORS` in `s
 | A worry or belief stopped me | worries can be checked | Check the Facts, try again |
 | I settled for ending it fast | keep self-respect in view | FAST, try again |
 | They hold more power | a smaller ask, another route, or the relationship itself | FAST, Ending a relationship, Let it be (planned) |
-| They can't give it | the need is real, met elsewhere | FAST's Let go, Finding connection (planned) |
+| They can't give it | the need is real, maybe met elsewhere | FAST's Let go, Finding connection (planned) |
+| I asked well, and they still said no | asking skilfully doesn't decide their answer | FAST, FAST's Let go |
 
 One chip. The chain is reachable from the factor step (*look at what happened first*) and comes back to it, which
 asks again (`clears: ['factor']`), since the chain can change the answer.
@@ -61,10 +67,21 @@ asks again (`clears: ['factor']`), since the chain can change the answer.
   outcome. Ids only: outcome, situation type, still okay between you, proud, factor. `WITH` the person.
 - **Refusal counts** on the `Person` (`refusalsValidation`, `refusalsPractical`): written only when the Interaction
   is first created (a re-close never counts twice), only with a prep to say what was asked and a kept person. A
-  refused ask (*No*, *No answer yet*) adds one to its kind; *I got it* or *Partly* sets that kind back to zero. The
+  refused ask (*No*) adds one to its kind; *I got it* or *Partly* sets that kind back to zero; *No answer yet*
+  changes nothing. The
   person's own answer is the yes (plan §C2.5): no resolver reads a log; the `people` slice reads the field.
 - **The rep** is self-reported off the phone (`followup_offphone`, as the old debrief's) when the conversation
   happened, and none when it didn't (`runRep` in `functions/src/skills/projections.ts`).
+
+## Safety inside the run (Gate 3)
+
+The picker's answer can be from before the conversation (a fresh answer skips the question), so the run has its
+own: *I don't feel safe with them* on *Is it still okay between you?* shows the other-person resources and ends on
+Ending a relationship (`frame=careful`) and *Talk to someone now*, never a retry, rehearsal or Cope Ahead; the
+projection sets `Person.safetyRecheckAt`, so the next prep or debrief asks the safety question again
+(`needsSafetyAsk`, both mirrors). *Hurt* or *Defeated* on the first step and *I can't handle this* among the thoughts
+add *Talk to someone now*. Without the picker's copy the page shows the load error, never the skill without it.
+*Not yet*, *No answer yet* and the shaky deferral each offer *Want me to ask again?* (ask_outcome).
 
 ## The prep↔debrief link
 

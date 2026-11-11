@@ -375,12 +375,13 @@ FOLLOW_UP_TYPES += [
         "deepLinkTemplate": "/tool/dear-man?mode=debrief&followUp={followUpId}",
         "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
                                              "tomorrow": {"kind": "at_local", "days": 1, "time": "19:00"},
-                                             "this_week": {"kind": "at_local", "days": 4, "time": "19:00"}}},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "19:00"},
+                                             "unsure": {"kind": "at_local", "days": 4, "time": "19:00"}}},
         "staleAfterHours": 120, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
         "enabled": True,
-        "copy": {"title": "How did the conversation go?", "body": "A few taps to look back on it, when you're ready."},
-        "choices": [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}],
-        "notification": "Want to look back on your conversation?",
+        "copy": {"title": "Ready to look back?", "body": "A few taps, when you're ready."},
+        "choices": [{"id": "dismiss", "label": "No need", "status": "dismissed"}],
+        "notification": "Ready to look back?",
     },
 ]
 

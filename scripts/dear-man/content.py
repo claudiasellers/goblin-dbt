@@ -435,6 +435,8 @@ TROUBLESHOOT_FACTORS = [
     {"id": "quick_win", "label": "I settled for ending it quickly", "handout": "short_term_goals", "opens": ["fast", "dear-man"], "suggestedBy": ["tp_gave_in"], "sortOrder": 5},
     {"id": "power", "label": "They had more power in this", "handout": "environment", "opens": ["fast", "ending-relationships", "let-it-be"], "suggestedBy": [], "sortOrder": 6},
     {"id": "cant_give", "label": "What I wanted isn't something they can give", "handout": "environment", "opens": ["fast", "finding-connection"], "suggestedBy": [], "sortOrder": 7},
+    # Handout 9's environment, the other half: asking skilfully doesn't decide their answer (Gate 3, IE-B2).
+    {"id": "not_willing", "label": "I asked well, and they still said no", "handout": "environment", "opens": ["fast"], "suggestedBy": [], "sortOrder": 8},
 ]
 # DearManFeelingChip nodes added for the debrief.
 DEBRIEF_FEELING_CHIPS = [
@@ -482,7 +484,7 @@ SAFETY_COPY = {"id": "dear_man_safety_copy",
     "riskBadly": "It tends to go badly",
     "riskUnsaid": "I'd rather not say",
     "safetyRouteHeading": "Planning a hard talk with {who} can wait. Your safety comes first.",
-    "safetyRouteDebriefHeading": "Thank you for telling me. With {who}, your safety comes first.",
+    "safetyRouteDebriefHeading": "With {who}, your safety comes first. Looking back can wait.",
     "safetyRouteBody": "The people below can help you think it through, any time, and you don't have to be sure.",
     "safetyRouteEnding": "Thinking about ending the relationship",
     "safetyRouteBack": "This is about someone else",
@@ -494,8 +496,10 @@ SAFETY_COPY = {"id": "dear_man_safety_copy",
     "askOutcomeToday": "Later today",
     "askOutcomeTomorrow": "Tomorrow",
     "askOutcomeWeek": "This week",
+    "askOutcomeUnsure": "Not sure",
+    "askOutcomeFailed": "That didn't save. You can try again.",
     "askOutcomeSet": "I'll ask how it went.",
     # A refused ask to be heard, counted by the debrief: Let go (FAST), offered on the next ask to be heard by them.
-    "letGoLine": "Last time you asked {who} to hear you, it didn't land. If it goes that way again, you can let this one go and keep your self-respect.",
+    "letGoLine": "Last time you asked {who} to hear you, it didn't land. You can ask again. If it goes the same way, letting it go is a way to keep your self-respect too.",
     "letGoLink": "Letting it go, and keeping my self-respect"}
 

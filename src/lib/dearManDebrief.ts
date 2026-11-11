@@ -66,5 +66,5 @@ export function offerLetGo(person: { refusalsValidation?: number | null } | null
 }
 
 /** The prep's "When is it happening?" chips, in order: the ask_outcome window's chip ids (practice-spine content.py). */
-export const ASK_OUTCOME_CHIPS = ['today', 'tomorrow', 'this_week'] as const;
+export const ASK_OUTCOME_CHIPS = ['today', 'tomorrow', 'this_week', 'unsure'] as const;
 export type AskOutcomeChip = (typeof ASK_OUTCOME_CHIPS)[number];

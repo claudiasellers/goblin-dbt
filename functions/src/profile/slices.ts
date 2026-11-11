@@ -18,7 +18,7 @@ import { PROFILE_NEEDS, type ProfileConsumer, type ProfileSlices, type SliceId }
 export const SLICE_QUERIES: Partial<Record<SliceId, string>> = {
   name: `MATCH (u:User {id: $uid}) RETURN u.displayName AS displayName`,
   quietHours: `MATCH (:User {id: $uid})-[:HAS_PROFILE_FACT]->(p:ProfileFact {kind: 'quiet_hours', status: 'active'})
-    RETURN p {.id, .kind, .area, .status, .source, .valueJson, .refusalsValidation,
+    RETURN p {.id, .kind, .area, .status, .source, .valueJson, .refusalsValidation, .safetyRecheckAt,
               confirmedAt: toString(p.confirmedAt), revisitAt: toString(p.revisitAt)} AS p`,
   patterns: `MATCH (:User {id: $uid})-[:HAS_PATTERN]->(m:MyPattern {status: 'active'})
     RETURN m {.id, .kind, .area, .status, .source, .patternKind, .toolId, .patternId,
@@ -171,7 +171,8 @@ const RESOLVERS: { [K in SliceId]?: Resolver<K> } = {
       const v = personValue(p.valueJson, decrypt);
       // DEAR MAN's debrief counts refused asks to be heard (dearMan/debriefProjection.ts); the prep offers Let go at 1.
       const refusals = Number(p.refusalsValidation ?? 0);
-      return v ? [{ id: String(p.id), ...v, refusalsValidation: Number.isFinite(refusals) ? Math.max(0, Math.floor(refusals)) : 0, meta: metaFrom(p, now) }] : [];
+      return v ? [{ id: String(p.id), ...v, refusalsValidation: Number.isFinite(refusals) ? Math.max(0, Math.floor(refusals)) : 0,
+        safetyRecheckAt: typeof p.safetyRecheckAt === 'string' ? p.safetyRecheckAt : null, meta: metaFrom(p, now) }] : [];
     });
   },
   parts: async (tx, uid, now) => {

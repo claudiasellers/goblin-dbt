@@ -1,4 +1,5 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react';
+import { focusStepStart } from '../../lib/focusStart';
 import { useUserProfile } from '../../contexts/UserProfileContext';
 import type { PartsContent } from '../../data/partsContentTypes';
 import { useProfileContext } from '../../hooks/useProfileContext';
@@ -45,10 +46,24 @@ export function DebriefWhoEmbed({ ctx, onShown, onDone }: EmbedProps) {
   };
   useEffect(() => { if (settled && !shown) finish('not_shown'); });
   useEffect(() => { if (shown) onShown(); }, [shown, onShown]);
+  // The step has no title of its own (the card draws the question): focus its start once it is there.
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!shown) return;
+    const t = window.setTimeout(() => focusStepStart(root.current), 0);
+    return () => window.clearTimeout(t);
+  }, [shown]);
+  if (!settled) {
+    return (
+      <div className="py-8 flex justify-center" aria-busy="true">
+        <span className="inline-block w-6 h-6 border-4 border-[var(--color-border)] border-t-[var(--color-accent)] rounded-full motion-safe:animate-spin" aria-hidden="true" />
+      </div>
+    );
+  }
   if (!shown || !content || !profile.slices) return null;
   return (
-    <Suspense fallback={null}><LazyDebriefWho content={content} parts={profile.slices.parts} copeAheadPartId={ctx?.partId ?? null} toolSessionId={session.id}
+    <div ref={root}><Suspense fallback={null}><LazyDebriefWho content={content} parts={profile.slices.parts} copeAheadPartId={ctx?.partId ?? null} toolSessionId={session.id}
         onAnswer={(a) => { answer.current = a; }}
-        onDone={() => finish(answer.current ?? (ctx?.partId ? 'skip' : 'general'))} /></Suspense>
+        onDone={() => finish(answer.current ?? (ctx?.partId ? 'skip' : 'general'))} /></Suspense></div>
   );
 }

@@ -199,7 +199,7 @@ test("people (IE-03): kept people with their label read back; nobody kept → []
   const out = await slices.readProfileSlices(tx, "u1", "dear-man");
   assert.equal(out.people.length, 1);
   const { meta: m, ...p } = out.people[0];
-  assert.deepEqual(p, { id: row.id, label: "Sam", role: "parent", safe: "no", risk: "invalidating", safeAskedAt: "2026-11-01T00:00:00Z", refusalsValidation: 0 });
+  assert.deepEqual(p, { id: row.id, label: "Sam", role: "parent", safe: "no", risk: "invalidating", safeAskedAt: "2026-11-01T00:00:00Z", refusalsValidation: 0, safetyRecheckAt: null });
   assert.equal(m.area, "my_people");
   const none = await slices.readProfileSlices(fakeTx(() => []), "u1", "dear-man");
   assert.deepEqual(none.people, []);

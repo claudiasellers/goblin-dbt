@@ -97,6 +97,8 @@ export interface DearManSafetyCopy {
   askOutcomeToday?: string;
   askOutcomeTomorrow?: string;
   askOutcomeWeek?: string;
+  askOutcomeUnsure?: string;
+  askOutcomeFailed?: string;
   askOutcomeSet?: string;
   letGoLine?: string;
   letGoLink?: string;

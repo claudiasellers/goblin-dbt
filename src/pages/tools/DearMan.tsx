@@ -29,7 +29,7 @@ import { useUserProfile } from '../../contexts/UserProfileContext';
 import { useProfileContext } from '../../hooks/useProfileContext';
 import { profileCache } from '../../lib/profileCache';
 import { anchorLead, copeExt, copeParts, copeReady, keptLines, showCopeAhead } from '../../lib/copeAhead';
-import { focusLost, focusStepStart } from '../../lib/focusStart';
+import { focusLine, focusLost, focusStepStart } from '../../lib/focusStart';
 import { PersonPicker } from '../../components/people/PersonPicker';
 import { PersonSafetyRoute } from '../../components/people/PersonSafetyRoute';
 import { PERSON_SAFETY_ROUTE_COPY, fillWho, pickerCopy, withAnswer, type KeptPerson, type PickedPerson } from '../../lib/people';
@@ -1676,7 +1676,7 @@ function DearManPrep() {
 function AskOutcome({ copy, sessionId }: { copy: NonNullable<DearManContentResult['safetyCopy']>; sessionId: string }) {
   const [state, setState] = useState<'idle' | 'busy' | 'set' | 'failed'>('idle');
   const labels: Record<AskOutcomeChip, string | undefined> = {
-    today: copy.askOutcomeToday, tomorrow: copy.askOutcomeTomorrow, this_week: copy.askOutcomeWeek,
+    today: copy.askOutcomeToday, tomorrow: copy.askOutcomeTomorrow, this_week: copy.askOutcomeWeek, unsure: copy.askOutcomeUnsure,
   };
   const pick = async (chip: AskOutcomeChip) => {
     setState('busy');
@@ -1692,12 +1692,16 @@ function AskOutcome({ copy, sessionId }: { copy: NonNullable<DearManContentResul
       setState('failed');
     }
   };
-  if (state === 'set') return <p className={`${secondaryText} mt-4 text-center`} role="status">{copy.askOutcomeSet}</p>;
+  // The tapped chip goes with the row: focus lands on the line that replaces it.
+  const setLine = useRef<HTMLParagraphElement>(null);
+  useEffect(() => { if (state === 'set') focusLine(setLine.current); }, [state]);
+  if (state === 'set') return <p ref={setLine} tabIndex={-1} className={`${secondaryText} mt-4 text-center focus:outline-none`} role="status">{copy.askOutcomeSet}</p>;
   if (ASK_OUTCOME_CHIPS.some(c => !labels[c])) return null;
   return (
     <div className="mt-4 space-y-2" data-testid="ask-outcome">
       <p className={secondaryText}>{copy.askOutcomeQuestion}</p>
-      <div className="flex flex-wrap gap-2">
+      {state === 'failed' && <p role="status" className={secondaryText}>{copy.askOutcomeFailed ?? "That didn't save. You can try again."}</p>}
+      <div className="flex flex-wrap gap-2" aria-busy={state === 'busy'}>
         {ASK_OUTCOME_CHIPS.map(c => (
           <button key={c} type="button" disabled={state === 'busy'} onClick={() => void pick(c)}
             className="min-h-11 px-4 rounded-full border border-[var(--color-border)] text-[var(--color-text-primary)] lift-secondary disabled:opacity-50">

@@ -167,13 +167,13 @@
         },
         "enabled": true,
         "copy": {
-          "body": "A few taps to look back on it, when you're ready.",
-          "title": "How did the conversation go?"
+          "body": "A few taps, when you're ready.",
+          "title": "Ready to look back?"
         },
         "choices": [
           {
             "id": "dismiss",
-            "label": "Not any more",
+            "label": "No need",
             "status": "dismissed"
           }
         ],
@@ -193,11 +193,16 @@
               "days": 1,
               "kind": "at_local",
               "time": "19:00"
+            },
+            "unsure": {
+              "days": 4,
+              "kind": "at_local",
+              "time": "19:00"
             }
           },
           "kind": "chip"
         },
-        "notification": "Want to look back on your conversation?"
+        "notification": "Ready to look back?"
       },
       {
         "id": "check_fact",

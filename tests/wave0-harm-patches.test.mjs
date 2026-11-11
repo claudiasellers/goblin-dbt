@@ -236,9 +236,11 @@ test("Cool Down: no cold shower option, whenToUse has no numbers", async () => {
 });
 
 test("DEAR MAN debrief 'Cool down first' goes to an existing tool", async () => {
+  // The debrief is a skill since IE-B2: its first step's link exits to cool-down.
   const src = read("src/pages/tools/DearMan.tsx");
   assert.doesNotMatch(src, /\/tool\/tipp/);
-  assert.match(src, /navigate\('\/tool\/cool-down'\)/);
+  const dm = JSON.parse(read("src/data/content/skills.json")).content.skills.find((s) => s.id === "dear_man_debrief");
+  assert.equal(dm.exits.find((x) => x.id === "cool_down").toolId, "cool-down");
   const { tools } = await importTs("src/data/tools.ts");
   assert.ok(tools.some((t) => t.id === "cool-down"));
 });

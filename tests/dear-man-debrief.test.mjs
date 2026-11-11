@@ -36,14 +36,14 @@ test("skill: not yet and decided not are answers, not failures; no chain for the
 
 test("skill: a good outcome gets its readout and the chain only on request; a bad one asks what got in the way (IE-11)", () => {
   assert.deepEqual(nextTo("outcome"), ["between"]);
-  assert.deepEqual(nextTo("between"), ["proud"]);
-  assert.deepEqual(nextTo("proud"), ["factor", "went_well"]);
+  assert.deepEqual(nextTo("proud"), ["later", "waiting", "factor", "went_well"], "shaky first, then no answer yet, then a refusal");
+  assert.deepEqual(nextTo("between"), ["unsafe", "proud"]);
   assert.deepEqual(nextTo("went_well"), ["moment", "good"]);
   assert.deepEqual(step("factor").clears, ["factor"], "coming back from the chain asks again");
   assert.deepEqual(nextTo("factor"), ["moment", "fix"]);
   assert.deepEqual(nextTo("plan"), ["factor", "good"], "after the chain: a bad outcome comes back to the factor");
   const factors = dm.options.factor.map((o) => o.value);
-  assert.deepEqual(factors, ["no_words", "unclear", "feelings", "belief", "quick_win", "power", "cant_give", "look"]);
+  assert.deepEqual(factors, ["no_words", "unclear", "feelings", "belief", "quick_win", "power", "cant_give", "not_willing", "look"]);
   assert.equal(step("factor").fields[0].max, 1, "one chip");
 });
 
@@ -57,7 +57,7 @@ test("skill: the chain runs moment → response → body → thought → underne
 
 test("skill: every factor's fix has a line, and its offers are only the tools that do that fix", () => {
   const fix = step("fix");
-  for (const f of ["no_words", "unclear", "feelings", "belief", "quick_win", "power", "cant_give"]) {
+  for (const f of ["no_words", "unclear", "feelings", "belief", "quick_win", "power", "cant_give", "not_willing"]) {
     assert.ok(fix.lines.some((l) => JSON.stringify(l.when) === JSON.stringify({ eq: ["$a.factor", f] })), f);
   }
   const tools = new Set(fix.offers.map((o) => dm.exits.find((x) => x.id === o.exit).toolId));
@@ -77,6 +77,22 @@ test("skill: the picker's lines come from DEAR MAN's one source, with the debrie
   assert.equal(lib.debriefSafetyCopy(dm.copy).safetyRouteHeading, dm.copy.picker_safetyRouteDebriefHeading);
   assert.equal(lib.debriefPickerCopy({}), null);
   assert.equal(lib.debriefSafetyCopy({ picker_safetyRouteBody: "x" }), null);
+});
+
+test("safety inside the run: unsafe with them → the resources and Ending (careful) only; hurt, defeated or can't handle it → Talk to someone now", () => {
+  const unsafe = step("unsafe");
+  assert.equal(unsafe.noClose, true);
+  assert.deepEqual(unsafe.crisis.map((c) => c.variant), ["other_person"]);
+  const exits = unsafe.offers.map((o) => dm.exits.find((x) => x.id === o.exit));
+  assert.deepEqual(exits.map((x) => x.toolId ?? (x.safety ? "safety.open" : null)), ["ending-relationships", "safety.open"]);
+  assert.deepEqual(exits[0].query, { frame: "careful" });
+  assert.ok(!JSON.stringify(unsafe).includes("dear_man") && !JSON.stringify(unsafe).includes("rehearse"));
+  const links = (id) => step(id).fields.flatMap((f) => f.links ?? []).map((l) => l.exit);
+  assert.ok(links("feel").includes("safety_open"));
+  assert.ok(links("thought").includes("safety_open"));
+  for (const id of ["not_yet", "no_answer", "later"]) assert.equal(step(id).followUp.type, "ask_outcome", `${id} can ask again`);
+  assert.equal(step("rehearse").primary, "next", "practising is offered, never a false tap");
+  assert.deepEqual([step("plan").props.field, step("plan").props.field2, step("plan").props.field3], ["body", "thought", "cope"], "signal, thought, then the move");
 });
 
 test("page: a link's person skips the picker only when kept, answered fresh and not on the safety route", () => {
@@ -130,6 +146,9 @@ test("ask_outcome: on, a deep link into the debrief, session-bound to DEAR MAN, 
   assert.equal(t.resolveMode, "deeplink");
   assert.equal(t.deepLinkTemplate, "/tool/dear-man?mode=debrief&followUp={followUpId}");
   assert.deepEqual(Object.keys(t.window.chips).sort(), [...lib.ASK_OUTCOME_CHIPS].sort());
+  for (const id of ["not_yet", "no_answer", "later"]) {
+    for (const o of dm.options.again) assert.ok(o.value in t.window.chips, `${o.value} is an ask_outcome chip`);
+  }
   assert.doesNotMatch(JSON.stringify(t.copy) + t.notification, /\{who\}|label/, "the card names no one");
   assert.match(read("functions/src/spine/copeAheadAfter.ts"), /ask_outcome: 'dear-man',/);
   const page = read("src/pages/tools/DearMan.tsx");
@@ -152,6 +171,6 @@ test("Let go: offered on the next ask to be heard, once the debrief has counted 
 test("copy: the new DEAR MAN lines are in the voice (no exclamation, should, just or but)", () => {
   const sc = read("schema/dear-man-safety-gates.cypher");
   const lines = sc.split("\n").filter((l) => /c\.(personWhoDebrief|askOutcome\w*|letGo\w*) = /.test(l));
-  assert.equal(lines.length, 8);
+  assert.equal(lines.length, 10);
   for (const l of lines) assert.doesNotMatch(l.replace(/^[^=]*= /, ""), /!|\bshould\b|\bjust\b|\bbut\b/i, l);
 });

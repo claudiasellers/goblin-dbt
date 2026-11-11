@@ -600,3 +600,12 @@ SET tf.label = "What I wanted isn't something they can give",
 
 MATCH (tf:TroubleshootFactor {id: 'cant_give'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
 MERGE (tf)-[:IMPLEMENTS]->(tc);
+
+MERGE (tf:TroubleshootFactor {id: 'not_willing'})
+SET tf.label = 'I asked well, and they still said no',
+    tf.handout = 'environment',
+    tf.opens = ['fast'],
+    tf.sortOrder = 8;
+
+MATCH (tf:TroubleshootFactor {id: 'not_willing'}), (tc:TherapyConcept {id: 'dbt_dear_man'})
+MERGE (tf)-[:IMPLEMENTS]->(tc);

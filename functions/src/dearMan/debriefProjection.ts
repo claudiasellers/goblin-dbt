@@ -88,15 +88,16 @@ export const PRACTICAL_SITUATIONS: readonly string[] = ['ask', 'boundary'];
 
 /**
  * What one answered outcome does to the person's counts, given the prep's situation (null: no prep, nothing
- * changes). A refusal (*No*, *No answer yet*) adds one to its kind; *I got what I asked for* or *Partly* sets that
- * kind back to zero. The validation count is the one the prep reads (a refused ask to be heard → Let go, FAST).
+ * changes). A refusal (*No*) adds one to its kind; *I got what I asked for* or *Partly* sets that
+ * kind back to zero; *No answer yet* changes nothing. The validation count is the one the prep reads (a refused ask to be heard → Let go, FAST).
  */
 export function refusalChange(situationType: string | null, outcome: string | null): { field: 'refusalsValidation' | 'refusalsPractical'; op: 'add' | 'reset' } | null {
   if (!situationType || !outcome) return null;
   const field = VALIDATION_SITUATIONS.includes(situationType) ? 'refusalsValidation'
     : PRACTICAL_SITUATIONS.includes(situationType) ? 'refusalsPractical' : null;
   if (!field) return null;
-  if (outcome === 'no' || outcome === 'no_answer') return { field, op: 'add' };
+  // *No answer yet* isn't a refusal: nothing has been said yet (Gate 3). Only a *No* counts.
+  if (outcome === 'no') return { field, op: 'add' };
   if (outcome === 'got_it' || outcome === 'partly') return { field, op: 'reset' };
   return null;
 }
@@ -163,6 +164,13 @@ export function refusalWrite(field: 'refusalsValidation' | 'refusalsPractical', 
   return `MATCH (:User {id: $uid})-[:HAS_PERSON]->(p:Person {key: $personKey}) SET p.${field} = ${value}`;
 }
 
+/**
+ * *I don't feel safe with them* (the debrief's `between`): the person's safety answer is stale from now, so the next
+ * prep or debrief asks again (src/lib/personSafety.ts needsSafetyAsk reads `safetyRecheckAt`). The person's own
+ * answer is the yes; nothing about the answer itself is changed here, only that it must be asked again.
+ */
+export const SAFETY_RECHECK = `MATCH (:User {id: $uid})-[:HAS_PERSON]->(p:Person {key: $personKey}) SET p.safetyRecheckAt = toString(datetime())`;
+
 /** The projection (PROJECTIONS['dear-man']): only a debrief run; the prep saves through saveDearManSession. */
 export async function projectDearManDebrief(tx: ManagedTransaction, input: ProjectionInput): Promise<void> {
   const { uid, toolSessionId, run } = input;
@@ -183,6 +191,7 @@ export async function projectDearManDebrief(tx: ManagedTransaction, input: Proje
     uid, tsKey, sKey, id: toolSessionId, personKey, prepKey: prepId ? `${uid}:${prepId}` : null,
     props: { ...ids, thoughtOwn: await encryptOwn(tx, uid, thoughtOwn), situationType: situationType ?? '' },
   });
+  if (personKey && f.relationshipOk === 'unsafe') await tx.run(SAFETY_RECHECK, { uid, personKey });
   if (!f.outcome) return;
   const r = (await tx.run(INTERACTION_WRITE, {
     uid, iKey: `${uid}:${toolSessionId}`, id: toolSessionId, sKey, personKey,

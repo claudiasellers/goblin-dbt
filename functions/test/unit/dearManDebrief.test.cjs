@@ -68,7 +68,7 @@ test('fields: the old debrief shape from the run; *look* is never a factor; not 
 
 test('refusals: a refused ask adds one to its kind; landing resets it; no prep, nothing', () => {
   assert.deepEqual(P.refusalChange('address', 'no'), { field: 'refusalsValidation', op: 'add' });
-  assert.deepEqual(P.refusalChange('pattern', 'no_answer'), { field: 'refusalsValidation', op: 'add' });
+  assert.equal(P.refusalChange('pattern', 'no_answer'), null, 'no answer yet is not a refusal');
   assert.deepEqual(P.refusalChange('pattern', 'partly'), { field: 'refusalsValidation', op: 'reset' });
   assert.deepEqual(P.refusalChange('ask', 'no'), { field: 'refusalsPractical', op: 'add' });
   assert.deepEqual(P.refusalChange('boundary', 'got_it'), { field: 'refusalsPractical', op: 'reset' });
@@ -115,7 +115,7 @@ test('projection: the debrief, the Interaction WITH the person, then one refusal
 test('projection: a re-close never counts twice; no person, no count; not yet, no Interaction; other runs, nothing', async () => {
   const again = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: PREP, situationType: 'pattern', personId: PERSON }]
     : q === P.INTERACTION_WRITE ? [{ created: false, withPerson: true }] : []));
-  await P.projectDearManDebrief(again, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man', run: run([ans('happened', 'yes'), ans('outcome', 'no_answer')]) });
+  await P.projectDearManDebrief(again, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man', run: run([ans('happened', 'yes'), ans('outcome', 'no')]) });
   assert.equal(again.calls.filter((c) => /SET p\.refusals/.test(c.query)).length, 0);
 
   const nobody = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }]
@@ -153,6 +153,21 @@ test("queries: only the caller's own records; the prep via the ask_outcome card,
   assert.match(P.INTERACTION_WRITE, /MERGE \(u\)-\[:HAS_INTERACTION\]->\(i\)/);
   assert.match(P.INTERACTION_WRITE, /MERGE \(i\)-\[:WITH\]->\(x\)/);
   for (const q of [P.DEBRIEF_PREP_QUERY, P.DEBRIEF_WRITE, P.INTERACTION_WRITE]) assert.doesNotMatch(q, /thoughtOwn/, 'own words never in a query');
+});
+
+test("unsafe with them: the person's safety answer goes stale (asked again next time); nothing else about it changes", async () => {
+  const tx = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }]
+    : q === P.INTERACTION_WRITE ? [{ created: true, withPerson: true }] : []));
+  await P.projectDearManDebrief(tx, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
+    run: run([ans('happened', 'yes'), ans('outcome', 'no'), ans('between', 'unsafe')], { ctx: { personId: PERSON } }) });
+  const re = tx.calls.filter((c) => c.query === P.SAFETY_RECHECK);
+  assert.equal(re.length, 1);
+  assert.deepEqual(re[0].params, { uid: 'u1', personKey: `u1:${PERSON}` });
+  assert.doesNotMatch(P.SAFETY_RECHECK, /valueJson|risk/);
+  const safe = fakeTx((q) => (q === P.DEBRIEF_PREP_QUERY ? [{ prepId: null, situationType: null, personId: null }] : []));
+  await P.projectDearManDebrief(safe, { uid: 'u1', toolSessionId: TSID, toolId: 'dear-man',
+    run: run([ans('happened', 'yes'), ans('outcome', 'no'), ans('between', 'shaky')], { ctx: { personId: PERSON } }) });
+  assert.ok(!safe.calls.some((c) => c.query === P.SAFETY_RECHECK));
 });
 
 test('rep: a debrief that happened is a self-reported off-phone rep; one that did not, none; other runs keep their own', () => {
