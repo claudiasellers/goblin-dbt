@@ -6,18 +6,37 @@
  */
 import type { SkillDef } from '../../src/data/skillTypes';
 
-/** Every step's first path from the start (breadth-first over `next`, conditions ignored). */
+/**
+ * Every step's first path from the start (breadth-first over `next`, conditions ignored). A `reopens` step, which only
+ * a reopened run starts on, comes after its `after` step's path, and the steps after it from there. A re-entry step
+ * (`resumeAt`, opened by a check-in off the run's path) that no transition reaches follows the deepest step that
+ * schedules a follow-up: the run the check-in came back to.
+ */
 export function stepPaths(skill: SkillDef): Record<string, string[]> {
   const paths: Record<string, string[]> = { [skill.start]: [skill.start] };
-  const queue = [skill.start];
-  while (queue.length) {
-    const id = queue.shift()!;
-    const st = skill.steps.find((s) => s.id === id);
-    for (const t of st?.next ?? []) {
-      if (paths[t.to]) continue;
-      paths[t.to] = [...paths[id], t.to];
-      queue.push(t.to);
+  const walk = (queue: string[]) => {
+    while (queue.length) {
+      const id = queue.shift()!;
+      const st = skill.steps.find((s) => s.id === id);
+      for (const t of st?.next ?? []) {
+        if (paths[t.to]) continue;
+        paths[t.to] = [...paths[id], t.to];
+        queue.push(t.to);
+      }
     }
+  };
+  walk([skill.start]);
+  for (const st of skill.steps.filter((s) => s.reopens && !paths[s.id] && paths[s.reopens.after])) {
+    paths[st.id] = [...paths[st.reopens!.after], st.id];
+    walk([st.id]);
+  }
+  for (const at of skill.resumeAt ?? []) {
+    if (paths[at]) continue;
+    const from = skill.steps.filter((s) => s.followUp && paths[s.id])
+      .sort((a, b) => paths[b.id].length - paths[a.id].length)[0];
+    if (!from) continue;
+    paths[at] = [...paths[from.id], at];
+    walk([at]);
   }
   return paths;
 }

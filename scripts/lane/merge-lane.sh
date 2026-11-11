@@ -12,6 +12,14 @@ FAILED=lane-failed
 
 log() { echo "$(date '+%F %T') $*"; }
 
+# A macOS notification for Claudia on every merge or failure, so nobody has to watch the log.
+# osascript takes the text as arguments, so quotes in a PR title can't break the script.
+notify() {  # title, message
+  osascript -e 'on run argv' -e 'display notification (item 2 of argv) with title (item 1 of argv)' \
+    -e 'end run' "$1" "$2" >/dev/null 2>&1 || true
+}
+prtitle() { gh pr view "$1" -R "$REPO" --json title -q .title 2>/dev/null; }
+
 mkdir "$LANE/lock" 2>/dev/null || { log "another run holds $LANE/lock"; exit 0; }
 trap 'rmdir "$LANE/lock"' EXIT
 
@@ -53,6 +61,7 @@ run_checks() {  # the same gate as .github/workflows/ci.yml
 fail() {  # pr, reason, [logfile]
   local pr=$1 why=$2 file=${3:-}
   log "#$pr not merged: $why"
+  notify "Merge lane: #$pr not merged" "$(prtitle "$pr"): $why"
   {
     echo "**Merge lane:** not merged, $why."
     if [ -n "$file" ]; then
@@ -96,6 +105,7 @@ process() {  # pr
     # the PR merged once its head is on main. The push to main also starts the deploy workflow.
     if git push -q origin lane-test:main; then
       log "#$pr merged"
+      notify "Merge lane: #$pr merged" "$(prtitle "$pr")"
       gh pr edit "$pr" -R "$REPO" --remove-label "$LABEL" --remove-label "$FAILED" >/dev/null 2>&1
       gh pr comment "$pr" -R "$REPO" -b "**Merge lane:** merged after the checks passed on top of main ${base:0:7}." >/dev/null
       return

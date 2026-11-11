@@ -5,9 +5,10 @@
  *
  * Records (each reduced to a TrailRecord; finalised or closed only):
  *  - ToolSession (HAS_TOOL_SESSION, status not 'open', not Meet a part), anchored on `startedAt`:
- *      urgeIds → ActionUrge / FeelingUrge (Do the Opposite, Urge Surfing); ext's `er.barrierSubId` →
- *      BarrierSubResponse (Problem Solve; matched as the exact `"barrierSubId":"<id>"` in the validated,
- *      ids-only ext JSON); and through DETAIL its detail session (below).
+ *      urgeIds → ActionUrge / FeelingUrge (Do the Opposite, Urge Surfing); ext's `er.barrierSubId` or its
+ *      run's `sub` answer → BarrierSubResponse (Problem Solve, the old page and the skill player; matched exactly
+ *      in the validated ext JSON (own words in it are JSON-escaped, so they can't fake the match), never on a review visit: sessionMoves.ts); and through DETAIL its
+ *      detail session (below).
  *  - A detail session no ToolSession points at (COMPLETED_SESSION; e.g. Find the feeling inside the
  *    check-in, a plan saved before the spine), anchored on `createdAt`.
  *      OppositeActionSession: `urgeId` → ActionUrge (its saved urge; 'custom' matches nothing). Its

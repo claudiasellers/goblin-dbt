@@ -165,6 +165,50 @@ Added by F1 (docs/design/dbt-modules-plan.md §4, 10 Nov 2026):
   may read the chip, so the card can't change under the person's thumb. `build.py` refuses every other shape
   (`tests/skill-contracts.test.mjs`). An inline run gives back on its hand-off, so it never shows the chips.
 
+- **A step only a reopened run starts on** (`reopens: {after}`, R9, ER-12; agreed with the plan thread).
+  `?run=<id>&at=<step>` reopens a run at a step its path reached. A `reopens` step is the other case: no step leads to
+  it and it is never the start, so a first visit never sees it. It holds only for a run whose path reached `after`
+  (the step that made the plan it asks about); any other run doesn't reopen, so the page starts a whole first visit.
+  Reopened there, the run comes back after its whole recorded path with every answer but the ask-fresh ones and the
+  reminder chips, and with no detour back to an ask-fresh step: neither the reopens step nor any step after it may
+  read an ask-fresh field (`build.py`). For a step that asks how it went afterwards: Problem Solve's *How did it go?*
+  (Handout 12's evaluate step), opened from its `ps_review` card. A run reopened a second time (after a review led to
+  a revised plan and a new card) has the step on its path already: it still comes back after the whole path, so the
+  new plan's answers return; the latest loop decides, so a run whose last review led to a revised plan that never
+  reached `after` again doesn't reopen. `again` names steps after it that keep the plan standing (Problem Solve's *Not yet*, which books the card again), so a run they ended reopens too. Reopened, the path runs to where the plan was last made, then the step, so earlier loops don't pile up. Every step's answers come back, including steps the capped path no longer
+  holds. The player doesn't count the run's emotion ids again on a reopened visit (the feeling was the first visit's).
+- **The path keeps its newest steps.** Forward and Back append and keep the last 48 (`PATH_MAX`), as resume does, so a
+  long run that loops still records where it got to. A resume drops only the answers of steps the path reached after the resume point
+  (and nowhere at or before it); a step that fell off the front of the path still brings its answers back.
+- **A hand-off's title heads its card**, with its title slots, as an ask step's does (Problem Solve's *Your next step:
+  …*). A title slot names a field (`labelOf`); when the field has the person's own words, the slot is their words.
+- **Answers a step clears** (`clears: [field…]`, ER-12). Arriving at the step by a forward move drops those fields'
+  answers, and so does a run reopened at a `reopens` step that lists them. For two ways to the same thing, so the old
+  one doesn't stand in for the new: Problem Solve's guided step and own-words step each clear the other's. For a
+  reopens step's own loop, so last time's *How did it go?* isn't read back as this time's. `build.py` refuses a field
+  the skill doesn't have. Back never clears (it goes to a step, not past one).
+
+Added by IE-08 (`docs/design/ending-relationships.md`, 10 Nov 2026):
+
+- **Persist-nothing (R15).** `persist: {after, nothingWhen}` on a skill: `persistence()` is `wait` until the run
+  leaves `after`, then `nothing` while `nothingWhen` holds, else `save`. A tool mounted with `deferSession`
+  (`tools.ts`) writes no session at mount; the player calls `begin()` when the run reaches a `complete` hand-off or
+  a step schedules a follow-up, and only on `save`. Never begun, a visit leaves no ToolSession and no compat
+  ToolUsage. Keeps and follow-ups need `save`; a session that began and then turns `nothing` closes bare (status
+  only). `build.py` requires `quickExit` with `persist` and refuses a keep or follow-up at or before `after`.
+- **Quick exit.** `quickExit: true` puts the *Quick exit* button on every screen (`src/lib/quickExit.ts`).
+- **Re-entry steps.** `resumeAt: [stepId]`: a check-in may reopen the run at that step even when its path never
+  reached it (`?run=&at=`); the step's own answers are asked again, never restored. A
+  `reopens` step wins over a re-entry when both could apply (a skill names one or the other today).
+- **The carried band.** For a skill that accepts `band`, the player passes `band.current()` (≤ 20 min) when the
+  route state carries none.
+- These switches live in one `Skill.runtimeJson` property and are spread onto the served skill.
+- **Ways into a persist-nothing tool** (ER-12, with the plan thread). A host run that offers or takes an exit to a
+  `deferSession` tool (Ending) records it as `private` in its own `ext.run` (`offeredExitIds`, `exitId`), never by
+  the exit's or tool's id, and the player opens it without `linkTo`, so the visit carries no `hostSessionId` and a
+  saved Ending session has no `HANDED_OFF_FROM` back to the host. The host's record is kept; the trip is not in it.
+  `RunContext.privateTools` (the player passes tools.ts' `deferSession` set); pinned in `tests/skill-contracts.test.mjs`.
+
 ### The attempt record (what a router reads)
 
 There is no new label. A run **is** a `ToolSession` (the spine's per-visit log record), with one generic

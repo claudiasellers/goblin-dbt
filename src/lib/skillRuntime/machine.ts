@@ -36,7 +36,16 @@ export interface RunContext {
   embedOutputs?: Readonly<Record<string, EmbedOutputSchema>>;
   /** The tool's profile slices (PROFILE_NEEDS), or null while loading / signed out (`$p.*` reads absent). */
   profile?: Readonly<Record<string, unknown>> | null;
+  /**
+   * Tools that write nothing until the person saves (R15, `deferSession` in src/data/tools.ts: Ending a
+   * relationship). An exit to one is recorded as `private`, never by its id, in this run's own record, so a kept
+   * host run doesn't show where the person went.
+   */
+  privateTools?: ReadonlySet<string>;
 }
+
+/** The record's id for an exit to a persist-nothing tool (RunContext.privateTools). */
+export const PRIVATE_EXIT = 'private';
 
 /** One whole-screen embed's report, as the run keeps it (and `ext.run.out` records it). */
 export interface EmbedRecord extends EmbedOutput { embed: string; stepId: string }
@@ -238,6 +247,13 @@ function validValues(ctx: RunContext, field: FieldDef, answers: Answers, sc: Sco
   return new Set(optionGroups(ctx, field, answers, sc).flatMap((g) => g.options.map((o) => o.value)));
 }
 
+/** The answers without these fields' (a step's `clears`). */
+function without(answers: Answers, fields: string[]): Answers {
+  const next = { ...answers };
+  for (const f of fields) delete next[f];
+  return next;
+}
+
 /** Drop picks a field no longer offers (a filter or group changed). Repeats until nothing changes. */
 function normalize(ctx: RunContext, answers: Answers): Answers {
   let cur = answers;
@@ -384,16 +400,17 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
       const t = step.next.find((x) => holds(x.when, scope(ctx, after)));
       if (!t) return s;
       const to = stepOf(ctx.skill, t.to);
+      const arrived = to.clears?.length ? { ...after, answers: normalize(ctx, without(after.answers, to.clears)) } : after;
       return {
-        ...after, stepId: to.id, path: [...after.path, to.id].slice(0, PATH_MAX),
-        offered: to.kind === 'handoff' ? offersFor(ctx, to, after) : after.offered,
+        ...arrived, stepId: to.id, path: [...arrived.path, to.id].slice(-PATH_MAX),
+        offered: to.kind === 'handoff' ? offersFor(ctx, to, arrived) : arrived.offered,
       };
     }
     case 'back': {
       const i = s.path.lastIndexOf(s.stepId);
       const prev = i > 0 ? s.path[i - 1] : null;
       if (!prev || prev === s.stepId) return s;
-      return { ...s, stepId: prev, path: [...s.path, prev].slice(0, PATH_MAX), offered: [] };
+      return { ...s, stepId: prev, path: [...s.path, prev].slice(-PATH_MAX), offered: [] };
     }
     case 'exit':
       return ctx.skill.exits.some((x) => x.id === e.exitId && !x.planned && !x.safety) ? { ...s, exitId: e.exitId } : s;
@@ -404,9 +421,10 @@ export function runNext(ctx: RunContext, s: RunState, e: RunEvent): RunState {
  * What the current step keeps on its primary tap (R4), or null: no keep, its `when` doesn't hold, or nothing to
  * keep. `id` is the item this run already kept from this step (passed again, the same item is kept again).
  */
-export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'kept'>): { kind: string; value: Record<string, unknown>; id: string | null } | null {
+export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'kept' | 'path' | 'stepId'>): { kind: string; value: Record<string, unknown>; id: string | null } | null {
   const k: KeepAction | undefined = step.keep;
   if (!k || !holds(k.when, scope(ctx, s))) return null;
+  if (persistence(ctx, s) !== 'save') return null;
   const value: Record<string, unknown> = {};
   for (const f of k.from) {
     const a = s.answers[f];
@@ -417,10 +435,27 @@ export function keepFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answe
   return { kind: k.kind, value, id: s.kept[step.id]?.id ?? null };
 }
 
+/**
+ * Persist-nothing (R15): whether this visit may write anything yet. `save`: a normal visit (the session starts, or
+ * has). `wait`: not yet decided (the run hasn't left the skill's `persist.after` step): nothing is started.
+ * `nothing`: `persist.nothingWhen` holds: nothing is written, and a session already begun closes bare. A skill
+ * with no `persist` is always `save`.
+ */
+export type Persistence = 'save' | 'wait' | 'nothing';
+export function persistence(ctx: RunContext, s: Pick<RunState, 'answers' | 'path' | 'stepId'>): Persistence {
+  const p = ctx.skill.persist;
+  if (!p) return 'save';
+  const left = s.path.includes(p.after) && s.stepId !== p.after;
+  if (!left) return 'wait';
+  return holds(p.nothingWhen, scope(ctx, s)) ? 'nothing' : 'save';
+}
+
 /** What the current step schedules on its primary tap (R5): the type and the chip picked, or null. */
-export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'scheduled'>): { type: string; chip: string | null } | null {
+export function followUpFor(ctx: RunContext, step: StepDef, s: Pick<RunState, 'answers' | 'scheduled' | 'path' | 'stepId'>): { type: string; chip: string | null } | null {
   const f: FollowUpAction | undefined = step.followUp;
   if (!f || s.scheduled[step.id] || !holds(f.when, scope(ctx, s))) return null;
+  // Persist-nothing (R15): a run that writes nothing schedules nothing.
+  if (persistence(ctx, s) !== 'save') return null;
   if (!f.whenFrom) return { type: f.type, chip: null };
   const chip = s.answers[f.whenFrom]?.ids[0];
   return chip ? { type: f.type, chip } : null;
@@ -443,7 +478,9 @@ export function inlineResult(ctx: RunContext, s: Pick<RunState, 'answers'>): { a
  * pre-fill from memory), at `at` if the record's path went through it. Ask-fresh fields are never restored:
  * they are asked again, so the run reopens no later than the first step on its path that asks one (what comes
  * after it may hang on that answer), and only the steps up to the one reopened bring their answers back (a later
- * step is asked again, never pre-filled); a field that books a reminder (`followUp.whenFrom`) is never read back. A hand-off reopened works out its offers again. Null when the record isn't
+ * step is asked again, never pre-filled); a `reopens` step, which only a reopened run starts on, comes after the
+ * whole recorded path of a run that reached its `after` step and brings every answer back but the ask-fresh ones
+ * (null for a run that didn't get that far; a run reopened a second time, the step on its path already, still comes back after its whole path, and the step's `clears` drop its last loop's answers); a field that books a reminder (`followUp.whenFrom`) is never read back. A hand-off reopened works out its offers again. Null when the record isn't
  * this skill's version or `at` isn't a step it reached. `keepFresh` is for the review page only (dev/
  * skills-review.tsx, which shows every step from a made-up run); the app never passes it.
  */
@@ -452,18 +489,47 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
   const r = rec as { skillId?: unknown; versionId?: unknown; path?: unknown; answers?: unknown };
   if (r.skillId !== ctx.skill.id || r.versionId !== ctx.skill.version || !Array.isArray(r.path)) return null;
   const path = (r.path as unknown[]).filter((x): x is string => typeof x === 'string' && ctx.skill.steps.some((st) => st.id === x));
-  let stepId = at && path.includes(at) ? at : path[path.length - 1];
+  // A `reopens` step (a step only a reopened run starts on, never reached on a first visit, e.g. Problem Solve's
+  // *How did it go?*) comes after the whole recorded path, so every answer of that run comes back.
+  // It holds only for a run that got as far as its `after` step (the plan it asks about); any other run has nothing to
+  // ask about and doesn't reopen (null: a whole first visit). Its ask-fresh answers stay unread, and there is no
+  // detour back to the step that asked one: the person tapped *How did it go?*, not the middle of the plan (build.py
+  // keeps the reopens step and everything after it from reading an ask-fresh field).
+  // A run reopened a second time has the step on its path already (its last review, then a new plan): it still comes
+  // after the whole path, so the new plan's answers come back, and the step's `clears` drop its last loop's answers.
+  const reopensAt = at ? ctx.skill.steps.find((st) => st.id === at && st.reopens) : undefined;
+  // The latest loop decides: the plan must stand after the last time the step was asked, made again at `after` or
+  // kept by one of the `again` steps (a reminder booked again on *Not yet*). A run whose last review led to a revised
+  // plan that was left half-made has nothing to ask about, so it doesn't reopen.
+  const standsAt = reopensAt ? Math.max(...[reopensAt.reopens!.after, ...(reopensAt.reopens!.again ?? [])].map((x) => path.lastIndexOf(x))) : -1;
+  if (reopensAt && standsAt <= path.lastIndexOf(reopensAt.id)) return null;
+  const reopened = !!reopensAt;
+  // A step the skill names as a re-entry point (`resumeAt`: a check-in days later) opens even off the run's path.
+  const reentry = !reopened && !!at && !path.includes(at) && !!ctx.skill.resumeAt?.includes(at) && ctx.skill.steps.some((st) => st.id === at);
+  let stepId = reopensAt?.id ?? (at && (path.includes(at) || reentry) ? at : path[path.length - 1]);
   if (!stepId) return null;
   const fresh = new Set(keepFresh ? [] : allFields(ctx.skill).filter((f) => f.askFresh).map((f) => f.id));
+  // A re-entry step opened by its check-in asks again: its own answers from an earlier check-in are never restored.
+  if (at && stepId === at && ctx.skill.resumeAt?.includes(at)) for (const f of stepOf(ctx.skill, at).fields ?? []) fresh.add(f.id);
   const asksFresh = path.findIndex((id) => (stepOf(ctx.skill, id).fields ?? []).some((f) => fresh.has(f.id)));
-  if (asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
-  const upTo = path.slice(0, path.lastIndexOf(stepId) + 1);
-  // Only the answers of the steps up to the one reopened: a step after it will be asked again, and an answer
-  // read back there would be a pre-fill (a reminder chip picked last time would schedule again unasked).
-  const onPath = new Set(upTo.flatMap((id) => {
+  if (!reopened && asksFresh >= 0 && asksFresh < path.lastIndexOf(stepId)) stepId = path[asksFresh];
+  // Reopened: the path up to where the plan was last made, so earlier review loops (whose answers the step clears)
+  // don't pile up, and the newest steps are the ones kept.
+  // A re-entry step opened off the path is reached from the run's last step.
+  const upTo = reopened ? path.slice(0, Math.max(path.lastIndexOf(reopensAt!.reopens!.after), 0) + 1)
+    : reentry && stepId === at ? [...path, at] : path.slice(0, path.lastIndexOf(stepId) + 1);
+  // A step after the resume point will be asked again, and an answer read back there would be a pre-fill (a reminder
+  // chip picked last time would schedule again unasked).
+  const fieldsOf = (id: string) => {
     const st = stepOf(ctx.skill, id);
     return [...(st.fields ?? []).map((f) => f.id), ...(st.answerAs ? [st.answerAs] : [])];
-  }));
+  };
+  // Dropped: only the fields of steps the path reached after the resume point and nowhere at or before it (they are
+  // asked again). A step that fell off the front of the capped path still brings its answers back (the feeling, the
+  // problem, a danger answer and its banner). Reopened, nothing on the path is after the step.
+  const before = new Set(upTo.flatMap(fieldsOf));
+  const after = new Set(reopened ? [] : path.slice(upTo.length).flatMap(fieldsOf).filter((f) => !before.has(f)));
+  const onPath = new Set(ctx.skill.steps.flatMap((st) => fieldsOf(st.id)).filter((f) => !after.has(f)));
   // A chip that books a reminder (a followUp's `whenFrom`) is always a fresh tap: `scheduled` isn't restored, so a
   // pick read back would book it a second time unasked.
   const books = new Set(ctx.skill.steps.flatMap((st) => (st.followUp?.whenFrom ? [st.followUp.whenFrom] : [])));
@@ -475,10 +541,10 @@ export function resumeRun(ctx: RunContext, rec: unknown, at: string | null, { ke
     const own = typeof a.valueOwn === 'string' && a.valueOwn.trim() ? a.valueOwn : null;
     answers[fieldId] = { ids, own };
   }
-  const kept = normalize(ctx, answers);
   const step = stepOf(ctx.skill, stepId);
+  const kept = normalize(ctx, reopened && step.clears?.length ? without(answers, step.clears) : answers);
   return {
-    ...initialRun(ctx.skill), stepId, path: upTo.slice(-PATH_MAX), answers: kept,
+    ...initialRun(ctx.skill), stepId, path: (reopened ? [...upTo, stepId] : upTo).slice(-PATH_MAX), answers: kept,
     offered: step.kind === 'handoff' ? offersFor(ctx, step, { answers: kept }) : [],
   };
 }
@@ -507,7 +573,10 @@ export function titleSlots(ctx: RunContext, step: StepDef, s: Pick<RunState, 'an
   const out: Record<string, string> = {};
   for (const [name, src] of Object.entries(step.titleSlots ?? {})) {
     const f = fieldOf(ctx.skill, src.labelOf);
-    const v = s.answers[src.labelOf]?.ids[0];
+    const a = s.answers[src.labelOf];
+    // The person's own words, when the field has them, are what they said (a starter they changed included).
+    if (f && a?.own?.trim()) { out[name] = a.own.trim(); continue; }
+    const v = a?.ids[0];
     if (!f || !v) continue;
     out[name] = f.options.emotions ? ctx.emotionLabel(v) : (ctx.skill.options[f.options.list ?? '']?.find((o) => o.value === v)?.label ?? v);
   }
@@ -619,6 +688,12 @@ export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown>
     .map(([fieldId, a]) => ({ fieldId, optionIds: a.ids.slice(0, 12), ...(a.own ? { valueOwn: a.own.trim().slice(0, ctx.skill.ownMax) } : {}) }))
     .filter((a) => a.optionIds.length > 0 || a.valueOwn)
     .slice(0, 32);
+  // An exit to a persist-nothing tool is never named in the host's record (offered or taken).
+  const recorded = (exitId: string) => {
+    const tool = ctx.skill.exits.find((x) => x.id === exitId)?.toolId;
+    return tool && ctx.privateTools?.has(tool) ? PRIVATE_EXIT : exitId;
+  };
+  const offered = [...new Set(s.offered.map(recorded))];
   const ctxRec = Object.fromEntries(RECORDED_CTX.filter((k) => ctx.ctxIn?.[k]).map((k) => [k, ctx.ctxIn![k]]));
   const out = Object.values(s.out ?? {}).slice(0, 8).map((r) => ({
     embed: r.embed, stepId: r.stepId,
@@ -633,8 +708,8 @@ export function runRecord(ctx: RunContext, s: RunState): Record<string, unknown>
     versionId: ctx.skill.version,
     path: s.path,
     ...(answers.length ? { answers } : {}),
-    ...(s.offered.length ? { offeredExitIds: s.offered } : {}),
-    ...(s.exitId ? { exitId: s.exitId } : {}),
+    ...(offered.length ? { offeredExitIds: offered } : {}),
+    ...(s.exitId ? { exitId: recorded(s.exitId) } : {}),
     ...(s.shown.length ? { embedsShown: s.shown } : {}),
     ...(Object.keys(ctxRec).length ? { ctx: ctxRec } : {}),
     ...(out.length ? { out } : {}),

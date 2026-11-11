@@ -1,7 +1,7 @@
 {
   "source": {
-    "file": "graph-content-only-2026-11-10.json",
-    "exportedAt": "2026-11-10T23:11:15.650Z"
+    "file": "graph-content-only-2026-11-11.json",
+    "exportedAt": "2026-11-11T02:21:59.188Z"
   },
   "content": {
     "version": "spine-v1",
@@ -282,6 +282,127 @@
         "notification": "A plan you made is ready."
       },
       {
+        "id": "ending_after",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "staleAfterHours": 168,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Open it when you're ready.",
+          "title": "A check-in you asked for"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not any more",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "this_week": {
+              "days": 7,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "today": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "unsure": {
+              "days": 7,
+              "kind": "at_local",
+              "time": "10:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
+        "id": "ending_again",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "staleAfterHours": 168,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Open it when you're ready.",
+          "title": "A check-in you asked for"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not any more",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "month": {
+              "days": 30,
+              "kind": "at_local",
+              "time": "10:00"
+            },
+            "this_week": {
+              "days": 7,
+              "kind": "at_local",
+              "time": "10:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
+        "id": "ending_revisit",
+        "ownerModule": "ie",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?followUp={followUpId}",
+        "staleAfterHours": 168,
+        "missedPath": "none",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "Open it when you're ready.",
+          "title": "A check-in you asked for"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not any more",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "days": 14,
+          "kind": "at_local",
+          "time": "10:00"
+        },
+        "notification": "A check-in you asked for is ready."
+      },
+      {
         "id": "hold_come_back",
         "ownerModule": "dt",
         "tier": "practice",
@@ -502,6 +623,53 @@
           "kind": "derived"
         },
         "notification": ""
+      },
+      {
+        "id": "ps_review",
+        "ownerModule": "er",
+        "tier": "quality",
+        "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/problem-solve?run={sourceSessionId}&at=review&followUp={followUpId}",
+        "staleAfterHours": 72,
+        "missedPath": "missing_links",
+        "notify": {
+          "push": false,
+          "inTab": true,
+          "ics": false
+        },
+        "enabled": true,
+        "copy": {
+          "body": "The step you picked in Problem Solve. How did it go?",
+          "title": "Your next step"
+        },
+        "choices": [
+          {
+            "id": "dismiss",
+            "label": "Not any more",
+            "status": "dismissed"
+          }
+        ],
+        "window": {
+          "chips": {
+            "this_week": {
+              "days": 4,
+              "kind": "at_local",
+              "time": "18:00"
+            },
+            "today": {
+              "days": 0,
+              "kind": "at_local",
+              "time": "20:00"
+            },
+            "tomorrow": {
+              "days": 1,
+              "kind": "at_local",
+              "time": "18:00"
+            }
+          },
+          "kind": "chip"
+        },
+        "notification": "A step you planned is ready."
       },
       {
         "id": "ps_step",

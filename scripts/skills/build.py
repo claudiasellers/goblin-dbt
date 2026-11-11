@@ -33,6 +33,8 @@ CRISIS_VARIANTS = {"crisis", "other_person"}
 RUN_OWN_MAX = 140  # functions/src/spine/extSchemas.ts RUN_OWN_MAX (tests/skill-contracts.test.mjs keeps them equal)
 SAFETY_EXIT_ID = "safety_open"  # the reserved exit (plan C3a R6); a skill has at most one
 OPS = {"set", "eq", "in", "has", "own", "some", "all", "any", "not"}
+# Content nodes an option may show (PRESENTS): Problem Solve's, which live in their own schema files (ps_graph.py).
+PRESENTS_LABELS = {"ProblemType", "SolutionDirection", "DecompositionAspect", "BarrierType", "BarrierSubResponse", "AmbivalenceOption"}
 
 
 def q(s): return json.dumps(s, ensure_ascii=False)
@@ -113,6 +115,14 @@ def check_embed_props(name, props, copy, fields, w):
             assert isinstance(v, str) and ID.match(v), (w, f"{name}.{k} is an id", v)
 
 
+RUNTIME_KEYS = ("persist", "quickExit", "resumeAt")
+
+
+def runtime_of(sk):
+    """The skill's runtime switches (persist-nothing R15, quick exit, re-entry steps), served only when set."""
+    return {k: sk[k] for k in RUNTIME_KEYS if sk.get(k)}
+
+
 def check(skill):
     sid = skill["id"]
     copy = skill["copy"]
@@ -128,6 +138,9 @@ def check(skill):
     tools = tool_ids()
     assert skill["start"] in steps, sid
     assert len(steps) == len(skill["steps"]), (sid, "step ids are unique")
+    for o in skill["options"]:
+        if isinstance(o[4], tuple):
+            assert len(o[4]) == 2 and o[4][0] in PRESENTS_LABELS and ID.match(o[4][1]), (sid, "an option presents a content node by label and id", o)
     values = [(o[0], o[1]) for o in skill["options"]]
     assert len(set(values)) == len(values), (sid, "option values are unique per list")
     for d in skill["derive"]:
@@ -291,6 +304,42 @@ def check(skill):
             assert SAFETY_EXIT_ID in exits, (w, "safetyFirst opens the skill's safety.open exit")
             assert any(sl["variant"] == "crisis" for sl in s.get("crisis", [])), (w, "a safetyFirst step pins the crisis banner too")
             check_cond(s["safetyFirst"], fields, derived, w, accepts)
+        if "clears" in s:
+            cl = s["clears"]
+            assert isinstance(cl, list) and cl and len(set(cl)) == len(cl), (w, "clears is a list of fields", cl)
+            assert set(cl) <= set(fields), (w, "clears names fields of the skill", cl)
+        if s.get("reopens"):
+            # R9: only a reopened run starts here, after the whole recorded path of a run that reached `after`. Nothing
+            # leads to it, and it isn't the start, so a first visit never reaches it.
+            ro = s["reopens"]
+            assert isinstance(ro, dict) and "after" in ro and set(ro) <= {"after", "again"}, (w, "reopens is {after: <step>, again?: [<step>]}", ro)
+            assert all(x in steps for x in ro.get("again", [])), (w, "reopens again names steps of the skill", ro)
+            assert ro["after"] in steps and ro["after"] != s["id"], (w, "reopens after a step of the skill, not itself", ro)
+            assert "again" not in ro or (ro["again"] and len(set(ro["again"])) == len(ro["again"])), (w, "reopens again is a non-empty list, no repeats", ro)
+            assert s["id"] not in ro.get("again", []) and s["id"] != ro["after"], (w, "a step doesn't reopen after itself", ro)
+            # Each step it reopens after books the same card that opens it (else nothing could reach it from there).
+            by_id = {x["id"]: x for x in skill["steps"]}
+            for x in [ro["after"], *ro.get("again", [])]:
+                assert by_id[x].get("followUp"), (w, "a reopens step books a follow-up", x)
+            assert len({by_id[x]["followUp"]["type"] for x in [ro["after"], *ro.get("again", [])]}) == 1, (w, "every reopens step books the same card", ro)
+            assert s["id"] != skill["start"], (w, "a reopens step is never the start")
+            into = [x["id"] for x in skill["steps"] if any(t["to"] == s["id"] for t in x.get("next", []))]
+            assert not into, (w, "no step leads to a reopens step: only a reopened run starts there", into)
+            assert s["kind"] == "ask", (w, "a reopens step asks how it went", s["kind"])
+            # A reopen leaves ask-fresh answers unread, so neither the step nor anything after it may read one.
+            fresh = {f["id"] for x in skill["steps"] for f in x.get("fields", []) if f.get("askFresh")}
+            by_id = {x["id"]: x for x in skill["steps"]}
+            seen, todo = set(), [s["id"]]
+            while todo:
+                x = todo.pop()
+                if x in seen:
+                    continue
+                seen.add(x)
+                todo += [t["to"] for t in by_id[x].get("next", [])]
+            for x in seen:
+                text = json.dumps({k: v for k, v in by_id[x].items() if k not in ("id", "kind")})
+                reads = [f for f in fresh if re.search(rf'"(\$a\.)?{re.escape(f)}(\.(ids|own))?"', text)]
+                assert not reads, (w, f"the reopens step and the steps after it never read an ask-fresh field ({x})", reads)
     inl = skill.get("inline")
     if inl:
         assert inl["enterAt"] and set(inl["enterAt"]) <= steps, (sid, "inline starts at steps that exist", inl)
@@ -299,6 +348,21 @@ def check(skill):
             f = next((f for s in skill["steps"] for f in s.get("fields", []) if f["id"] == inl["thenVsNowFrom"]), None)
             values = {x[1] for x in skill["options"] if f and x[0] == f["options"].get("list")}
             assert f and values and values <= THEN_VS_NOW, (sid, "the change check's options are then-vs-now answers", values)
+    per = skill.get("persist")
+    if per:
+        # R15: the session waits until the run leaves `after`, then writes nothing while `nothingWhen` holds.
+        assert per["after"] in steps, (sid, "persist.after is a step", per)
+        check_cond(per["nothingWhen"], fields, derived, sid, accepts)
+        assert skill.get("quickExit"), (sid, "a skill that can write nothing has a Quick exit on every screen")
+        # Nothing may be kept or scheduled before the safety answer (a keep / follow-up before `after` would run
+        # while the visit hasn't decided whether to save: the machine refuses them, the build says so).
+        order = [s["id"] for s in skill["steps"]]
+        for s in skill["steps"]:
+            if order.index(s["id"]) <= order.index(per["after"]):
+                assert "keep" not in s and "followUp" not in s, (sid, s["id"], "no keep or follow-up before persist.after")
+    assert "quickExit" not in skill or skill["quickExit"] is True, (sid, "quickExit is true or absent")
+    for at in skill.get("resumeAt", []):
+        assert at in steps, (sid, "resumeAt names a step", at)
     every = json.dumps([copy, [o[2] for o in skill["options"]]], ensure_ascii=False)
     assert "!" not in every and not re.search(r"\b(should|just|but|overreact\w*)\b", every, re.I), (sid, "house voice")
     # An option's `urge` is the ActionUrge id the session records (spine urgeIds): one the graph has.
@@ -335,7 +399,7 @@ A(f"""// ============================================================
 for sk in SKILLS:
     sid = sk["id"]
     A(f"\n// --- {sid} ({sk['version']}) ---")
-    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.inlineJson = {js(sk.get('inline'))}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
+    A(f"MERGE (s:Skill {{id: {q(sid)}}})\nSET s += {props({'toolId': sk['toolId'], 'version': sk['version'], 'contentVersion': CONTENT_VERSION, 'start': sk['start'], 'ownMax': sk['ownMax'], 'emotionFields': sk['emotionFields'], 'accepts': sk.get('accepts', [])})}, s.inlineJson = {js(sk.get('inline'))}, s.runtimeJson = {js(runtime_of(sk))}, s.copyJson = {js(sk['copy'])}, s.tablesJson = {js(sk['tables'])}, s.deriveJson = {js(sk['derive'])};")
     A(f"MATCH (t:TherapyConcept {{id: {q(sk['concept'])}}}), (s:Skill {{id: {q(sid)}}})\nMERGE (t)-[:HAS_SKILL]->(s);")
     if "addresses" in sk:
         # The concept's ADDRESSES set (Find the feeling's word routes, the routing tie-break), owned by this skill:
@@ -375,10 +439,15 @@ for sk in SKILLS:
                 A(f"MATCH (a:SkillStep {{id: {q(a)}}}), (x:SkillExit {{id: {q(sid + ':' + ln['exit'])}}})\nMERGE (a)-[r:LINKS]->(x)\nSET r += {props({'order': i, 'field': f['id'], 'label': ln['label']})}, r.whenJson = {js(ln['when'])};")
     for i, (lst, value, label, extra, clinical) in enumerate(sk["options"]):
         nid = f"{sid}:{lst}:{value}"
+        # A clinical label, or (Label, id): the content node elsewhere in the graph the option shows (PRESENTS).
+        presents = clinical if isinstance(clinical, tuple) else None
+        clinical = None if presents else clinical
         labels = "SkillOption" + (f":{clinical}" if clinical else "")
         p = {k: v for k, v in extra.items() if k != "for"}
         A(f"MERGE (o:SkillOption {{id: {q(nid)}}})\nSET o:{labels}, o += {props({'skillId': sid, 'list': lst, 'value': value, 'label': label, 'version': sk['version']})}, o.propsJson = {js(p)}{', o.forOwn = true' if extra.get('for') == '$own' else ''};")
         A(f"MATCH (s:Skill {{id: {q(sid)}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (s)-[r:HAS_OPTION]->(o)\nSET r += {props({'list': lst, 'order': i})};")
+        if presents:
+            A(f"MATCH (o:SkillOption {{id: {q(nid)}}}), (c:{presents[0]} {{id: {q(presents[1])}}})\nMERGE (o)-[:PRESENTS]->(c);")
         if clinical == "Interpretation" and extra["set"] != "general":
             A(f"MATCH (c:EmotionRegulationContent {{dbtParent: {q(extra['set'])}}}), (o:SkillOption {{id: {q(nid)}}})\nMERGE (c)-[:HAS_INTERPRETATION]->(o);")
         if clinical == "Interpretation" and extra["set"] == "general":

@@ -18,7 +18,12 @@ test("every step of every shipped skill has a path from the start, and the revie
       assert.ok(p, `${sk.id}.${st.id} unreachable`);
       assert.equal(p[0], sk.start);
       assert.equal(p.at(-1), st.id);
-      for (let i = 1; i < p.length; i++) assert.ok(sk.steps.find((s) => s.id === p[i - 1]).next.some((t) => t.to === p[i]), "each hop is a transition");
+      // each hop is a transition, the reopen after its step, or the re-entry into a `resumeAt` step a check-in opens (R15, IE-08)
+      for (let i = 1; i < p.length; i++) {
+        const into = sk.steps.find((s) => s.id === p[i]);
+        assert.ok(sk.steps.find((s) => s.id === p[i - 1]).next.some((t) => t.to === p[i]) || into.reopens?.after === p[i - 1] || (sk.resumeAt ?? []).includes(p[i]),
+          "each hop is a transition, the reopen after its step, or a re-entry");
+      }
     }
     assert.equal(r.reviewOrder(sk)[0], sk.start);
     assert.equal(r.reviewOrder(sk).length, sk.steps.length);

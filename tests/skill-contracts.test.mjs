@@ -36,8 +36,11 @@ const fields = (sk) => sk.steps.flatMap((s) => s.fields ?? []);
 
 for (const sk of fixture.skills) {
   test(`${sk.id}: every step is reachable from the start, and every ask or embed step goes somewhere`, () => {
-    const seen = new Set([sk.start]);
-    const queue = [sk.start];
+    // Second ways in: a reopens step (R9: only a reopened run starts there) and a `resumeAt` step (a check-in the run
+    // scheduled re-enters there, IE-08).
+    const roots = [sk.start, ...sk.steps.filter((s) => s.reopens).map((s) => s.id), ...(sk.resumeAt ?? [])];
+    const seen = new Set(roots);
+    const queue = [...roots];
     while (queue.length) {
       const id = queue.shift();
       const st = sk.steps.find((s) => s.id === id);
@@ -509,6 +512,94 @@ test("resume: the run's own answers read back at a step it reached; ask-fresh an
   assert.equal(m.resumeRun(ctx, { ...rec, skillId: "other" }, "check"), null);
 });
 
+test("reopens: only a run that reached `after` reopens there, after the whole path, every answer back but the ask-fresh ones", () => {
+  const how = { id: "how", kind: "ask", reopens: { after: "end" },
+    fields: [{ id: "went", options: { list: "tvn" }, max: 1 }], next: [{ to: "end", when: null }], offers: [] };
+  const R = { ...F2, steps: [...F2.steps, how] };
+  const ctx = { ...f2Ctx(null), skill: R };
+  const rec = {
+    skillId: "f2_probe", versionId: "t2", path: ["who", "when", "check", "end"],
+    answers: [{ fieldId: "line", optionIds: ["l2"] }, { fieldId: "chip", optionIds: ["1h"] }, { fieldId: "change", optionIds: ["better"] }],
+  };
+  const s = m.resumeRun(ctx, rec, "how");
+  assert.equal(s.stepId, "how", "no detour back to the ask-fresh step: the person asked how it went");
+  assert.deepEqual(s.path, ["who", "when", "check", "end", "how"], "after the whole recorded path");
+  assert.deepEqual(Object.keys(s.answers).sort(), ["line"], "every answer back but the ask-fresh one and the reminder chip");
+  assert.equal(m.resumeRun(ctx, { ...rec, path: ["who", "when"] }, "how"), null, "a run that never reached `after` has nothing to ask about: no reopen");
+  assert.equal(m.resumeRun({ ...ctx, skill: F2 }, rec, "how").stepId, "check", "no such step: an ordinary resume, clamped as before");
+  assert.equal(m.resumeRun(ctx, rec, "check").stepId, "check", "an ordinary resume still detours to the ask-fresh step");
+  assert.equal(m.initialRun(R).stepId, "who", "a first visit starts at the start");
+  // Reopened again after a later plan: the step is on the path already, and it still comes after the whole path.
+  const again = { ...rec, path: [...rec.path, "how", "end"], answers: [...rec.answers, { fieldId: "went", optionIds: ["better"] }] };
+  assert.deepEqual(m.resumeRun(ctx, again, "how").path, [...again.path, "how"], "a second reopen keeps the later steps");
+  assert.deepEqual(m.resumeRun(ctx, again, "how").answers.went, { ids: ["better"], own: null }, "without clears, the last answer comes back");
+  // The latest loop decides: a revised plan left before `after` again doesn't reopen.
+  assert.equal(m.resumeRun(ctx, { ...again, path: [...rec.path, "how", "check"] }, "how"), null, "a half-made revised plan: no reopen");
+  // A step after it that keeps the plan standing (`again`, a reminder booked again) reopens too.
+  const A = { ...R, steps: R.steps.map((x) => (x.id === "how" ? { ...x, reopens: { after: "end", again: ["check"] } } : x)) };
+  assert.equal(m.resumeRun({ ...ctx, skill: A }, { ...again, path: [...rec.path, "how", "check"] }, "how")?.stepId, "how", "kept by an again step");
+  assert.deepEqual(m.resumeRun({ ...ctx, skill: A }, { ...again, path: [...rec.path, "how", "check"] }, "how").path, [...rec.path, "how"], "from where the plan was made: the old loop doesn't pile up");
+  // The path keeps its newest steps: a run past PATH_MAX still records the latest `after`, and reopens on it.
+  let long = { ...m.initialRun(R), answers: { line: { ids: ["l2"], own: null } } };
+  for (let i = 0; i < 30; i++) long = m.runNext(ctx, m.runNext(ctx, long, { type: "next" }), { type: "back" });
+  for (const _ of [1, 2, 3]) long = m.runNext(ctx, long, { type: "next" });
+  assert.equal(long.stepId, "end");
+  assert.equal(long.path.length, 48, "capped");
+  assert.equal(long.path.at(-1), "end", "the newest step is kept, not dropped");
+  const lr = m.resumeRun(ctx, m.runRecord(ctx, long), "how");
+  assert.equal(lr?.stepId, "how", "reopens on the latest `after`");
+  assert.deepEqual(lr.answers.line, { ids: ["l2"], own: null }, "answers of steps off the capped path still come back");
+  const C = { ...R, steps: R.steps.map((x) => (x.id === "how" ? { ...x, clears: ["went"] } : x)) };
+  assert.equal(m.resumeRun({ ...ctx, skill: C }, again, "how").answers.went, undefined, "a reopens step's clears drop its last loop's answers");
+  for (const sk of fixture.skills) {
+    for (const st of sk.steps.filter((x) => x.reopens)) {
+      assert.notEqual(sk.start, st.id, `${sk.id}.${st.id}: never the start`);
+      assert.ok(sk.steps.some((x) => x.id === st.reopens.after), `${sk.id}.${st.id}: after a step of the skill`);
+      assert.ok(!sk.steps.some((x) => x.next.some((t) => t.to === st.id)), `${sk.id}.${st.id}: no step leads to it`);
+    }
+  }
+  const build = read("scripts/skills/build.py");
+  assert.match(build, /no step leads to a reopens step/, "build.py refuses a jump into a reopens step");
+  assert.match(build, /the reopens step and the steps after it never read an ask-fresh field/, "build.py refuses an ask-fresh read from the reopen on");
+  // `again`: non-empty, no repeats, never the step itself, and each one books the same card as `after`.
+  const refusals = JSON.parse(execFileSync("python3", ["-c", `import sys, json, copy
+sys.path.insert(0, 'scripts/skills')
+import build
+from problem_solve import SKILL
+def tryit(f):
+    sk = copy.deepcopy(SKILL); st = next(x for x in sk["steps"] if x["id"] == "review"); f(st["reopens"], sk)
+    try: build.check(sk); return "ok"
+    except AssertionError as e: return str(e)
+out = {"base": tryit(lambda ro, sk: None),
+  "empty": tryit(lambda ro, sk: ro.__setitem__("again", [])),
+  "repeat": tryit(lambda ro, sk: ro.__setitem__("again", ["review_later", "review_later"])),
+  "self": tryit(lambda ro, sk: ro.__setitem__("again", ["review"])),
+  "nocard": tryit(lambda ro, sk: ro.__setitem__("again", ["review_done"]))}
+print(json.dumps(out))`], { encoding: "utf8" }));
+  assert.equal(refusals.base, "ok");
+  assert.match(refusals.empty, /non-empty list/);
+  assert.match(refusals.repeat, /non-empty list, no repeats/);
+  assert.match(refusals.self, /reopen after itself/);
+  assert.match(refusals.nocard, /books a follow-up/);
+});
+
+test("clears: arriving at a step by a forward move drops the answers it names; other steps keep them", () => {
+  const C = { ...F2, steps: F2.steps.map((x) => (x.id === "check" ? { ...x, clears: ["line"] } : x)) };
+  const ctx = { ...f2Ctx(null), skill: C };
+  const s0 = { ...m.initialRun(C), answers: { line: { ids: ["l2"], own: null } } };
+  const atWhen = m.runNext(ctx, s0, { type: "next" });
+  assert.equal(atWhen.stepId, "when");
+  assert.deepEqual(atWhen.answers.line, { ids: ["l2"], own: null }, "a step without clears keeps it");
+  const atCheck = m.runNext(ctx, atWhen, { type: "next" });
+  assert.equal(atCheck.stepId, "check");
+  assert.equal(atCheck.answers.line, undefined, "cleared on arrival");
+  for (const sk of fixture.skills) {
+    const fields = new Set(sk.steps.flatMap((x) => [...(x.fields ?? []).map((f) => f.id), ...(x.answerAs ? [x.answerAs] : [])]));
+    for (const st of sk.steps.filter((x) => x.clears)) for (const f of st.clears) assert.ok(fields.has(f), `${sk.id}.${st.id}: clears ${f}, a field of the skill`);
+  }
+  assert.match(read("scripts/skills/build.py"), /clears names fields of the skill/);
+});
+
 test("noClose: only on a hand-off, and the player leaves it without the close question", () => {
   for (const sk of fixture.skills) {
     for (const st of sk.steps) {
@@ -621,4 +712,26 @@ test("covered: P2 or safety.open over an embed step reaches the embed; a new ste
 
 test("a link's enterAt without a run to reopen doesn't hold from the start", () => {
   assert.match(read("src/components/skillPlayer/SkillPlayer.tsx"), /UUID\.test\(new URLSearchParams\(location\.search\)\.get\('run'\) \?\? ''\) \? c : ctxAfterResume\(c, false\)/);
+});
+
+test("an exit into a persist-nothing tool (R15) is never named in the host's record, and carries no host session", () => {
+  // The persist-nothing tools are tools.ts' deferSession ones, and every skill with `persist` is one.
+  const toolsSrc = read("src/data/tools.ts");
+  const deferred = new Set([...toolsSrc.matchAll(/id: '([a-z0-9-]+)',[\s\S]*?(?=\n  \{|\n\];)/g)].filter((x) => /deferSession: true/.test(x[0])).map((x) => x[1]));
+  assert.deepEqual([...deferred].sort(), fixture.skills.filter((s) => s.persist).map((s) => s.toolId).sort());
+  const into = fixture.skills.flatMap((s) => s.exits.filter((x) => deferred.has(x.toolId) && !x.planned).map((x) => ({ s, x })));
+  assert.ok(into.length >= 2, "Rebel's and Problem Solve's ways into Ending");
+  for (const { s, x } of into) {
+    const ctx = { skill: s, shared: fixture, carried: [], gridIds: new Set(), emotionLabel: (e) => e, privateTools: deferred };
+    const st = { ...m.initialRun(s), offered: [x.id, ...s.exits.filter((y) => y.id !== x.id && !y.planned && !y.safety && !y.done).slice(0, 1).map((y) => y.id)] };
+    const rec = m.runRecord(ctx, m.runNext(ctx, st, { type: "exit", exitId: x.id }));
+    assert.equal(rec.exitId, m.PRIVATE_EXIT, `${s.id}.${x.id}: taken`);
+    assert.ok(rec.offeredExitIds.includes(m.PRIVATE_EXIT) && !rec.offeredExitIds.includes(x.id), `${s.id}.${x.id}: offered`);
+    assert.doesNotMatch(JSON.stringify(rec), new RegExp(`${x.toolId}|"${x.id}"`), `${s.id}: nowhere in the record`);
+    assert.doesNotThrow(() => validateExt({ run: rec }));
+  }
+  // The player opens it without linkTo (no hostSessionId), and passes the set to every run.
+  const player = read("src/components/skillPlayer/SkillPlayer.tsx");
+  assert.match(player, /PRIVATE_TOOLS\.has\(exit\.toolId\)\s*\? \{ pathname: `\/tool\/\$\{exit\.toolId\}`, state: \{ checkinEmotions/);
+  assert.match(player, /privateTools: PRIVATE_TOOLS/);
 });

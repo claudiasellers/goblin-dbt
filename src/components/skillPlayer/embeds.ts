@@ -3,6 +3,7 @@ import type { EmbedOutput, EmbedOutputSchema, EmbedPropSpec } from '../../data/s
 import { BoundaryLine } from './BoundaryLine';
 import { HoldRingEmbed } from './HoldRingEmbed';
 import { PartsLine } from './PartsLine';
+import { PartLaterEmbed } from './PartLaterEmbed';
 import { WitnessEmbed } from './WitnessEmbed';
 import { RebellionCard } from './RebellionCard';
 import { RescriptCard } from './RescriptCard';
@@ -40,6 +41,7 @@ export interface EmbedProps {
 
 export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
   partsLine: PartsLine,
+  partLater: PartLaterEmbed,
   holdRing: HoldRingEmbed,
   witness: WitnessEmbed,
   rebellionCard: RebellionCard,
@@ -50,6 +52,7 @@ export const EMBEDS: Record<string, ComponentType<EmbedProps>> = {
 
 export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
   partsLine: {},
+  partLater: {},
   holdRing: { ids: ['held', 'partly', 'skipped'], measures: ['durationSec', 'doneCount', 'earlyCount'] },
   witness: { ids: ['yes', 'sort_of', 'no', 'none_fit', 'own', 'skip', 'seen'] },
   rebellionCard: { ids: ['now', 'today', 'week'] },
@@ -65,6 +68,7 @@ export const EMBED_OUTPUTS: Record<keyof typeof EMBEDS, EmbedOutputSchema> = {
  */
 export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, EmbedPropSpec>>> = {
   partsLine: { promptId: { type: 'id' } },
+  partLater: {},
   holdRing: {
     variant: { type: 'enum', values: ['press', 'timed', 'settle'] },
     seconds: { type: 'int', min: 1, max: 900 },
@@ -97,6 +101,8 @@ export const EMBED_PROPS: Record<keyof typeof EMBEDS, Readonly<Record<string, Em
   },
   boundaryLine: {
     field: { type: 'field' },
+    field2: { type: 'field', optional: true },
+    field3: { type: 'field', optional: true },
     shape: { type: 'enum', values: ['line', 'list'] },
     copyLabel: { type: 'copy', optional: true },
     copiedLabel: { type: 'copy', optional: true },

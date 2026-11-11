@@ -21,6 +21,7 @@ import { UserProfileProvider } from '../src/contexts/UserProfileContext';
 import { AuthBandProvider } from '../src/contexts/AuthBandProvider';
 import { ToolSessionProvider } from '../src/contexts/ToolSessionContext';
 import { SkillPlayer } from '../src/components/skillPlayer/SkillPlayer';
+import { getToolById } from '../src/data/tools';
 import { DEFAULT_PROFILE } from '../src/services/neo4j';
 import type { SkillDef } from '../src/data/skillTypes';
 import { applyRoom } from '../src/data/palettes';
@@ -154,7 +155,8 @@ function StepView({ nav }: { nav: Nav }) {
       </div>
       <MemoryRouter initialEntries={[{ pathname: `/tool/${sk.toolId}`, search, state: nav.band ? { skillCtx: { band: nav.band } } : null }]}>
         <div data-testid="frame" className="pt-2">
-          <ToolSessionProvider toolId={sk.toolId}>
+          {/* As ToolPage mounts it: a deferred tool (R15) shows nothing saved until its run may save. */}
+          <ToolSessionProvider toolId={sk.toolId} deferStart={!!getToolById(sk.toolId)?.deferSession}>
             <SkillPlayer skillId={sk.id} resumeKeepsFresh />
           </ToolSessionProvider>
         </div>

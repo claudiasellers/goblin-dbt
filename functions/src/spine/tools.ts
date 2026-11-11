@@ -37,6 +37,9 @@ export const SPINE_TOOLS: Record<string, SpineTool> = {
   'dear-man': { module: 'ie', closeKind: 'none' },
   // Keep your self-respect (docs/design/fast.md), on the skill runtime: "Compared to when you started, it's…".
   'fast': { module: 'ie', closeKind: 'regulation_down' },
+  // Ending a relationship that's hurting you (docs/design/ending-relationships.md): no close question. A rating
+  // after deciding to end a relationship isn't evidence of anything, and a quiet leave keeps the visit unseen.
+  'ending-relationships': { module: 'ie', closeKind: 'none' },
   'recovering-from-invalidation': { module: 'wmp', closeKind: 'none' },
   // Meet a part (docs/design/parts.md): "Further away … More here". Not in src/data/tools.ts yet.
   'meet-a-part': { module: 'mf', closeKind: 'orienting' },

@@ -9,11 +9,14 @@ import alternate_rebellion  # noqa: E402
 import er_troubleshoot  # noqa: E402
 import fast  # noqa: E402
 import nightmare_rescript  # noqa: E402
+import problem_solve  # noqa: E402
+import ending_relationships  # noqa: E402
 import hold_to_wait  # noqa: E402
 
 # The shape the player and getSkillContent agree on (functions/src/skills/index.ts SKILLS_VERSION).
 CONTENT_VERSION = "skills-v1"
-SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, hold_to_wait.SKILL]
+SKILLS = [check_the_facts.SKILL, alternate_rebellion.SKILL, er_troubleshoot.SKILL, *fast.SKILLS, nightmare_rescript.SKILL, problem_solve.SKILL,
+          ending_relationships.SKILL, hold_to_wait.SKILL]
 
 STEP_KINDS = ("ask", "handoff", "embed")
 # Embeds the player has registered (src/components/skillPlayer/embeds.ts EMBEDS), each with what it may report
@@ -29,12 +32,16 @@ EMBEDS = {
     # DT-02's wait (plan C3b, DT-owned): a timestamp wait with a come-back; never locks. `waited` when the ring ran
     # out, `back_early` when *I'm back* came first.
     "waitLock": {"ids": ["waited", "back_early"], "measures": ["durationSec"]},
+    # Problem Solve's "the part that doesn't want change" (parts on; docs/design/parts.md): a quiet yes that queues a
+    # PartCandidate. Reports nothing; its slot's record says it showed.
+    "partLater": {},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
 # in [min, max], `enum` one of its values, `field` a field id of the skill, `id` a plain id. Undeclared props fail.
 EMBED_PROPS = {
     "partsLine": {"promptId": {"type": "id"}},
+    "partLater": {},
     "holdRing": {
         "variant": {"type": "enum", "values": ["press", "timed", "settle"]},
         "seconds": {"type": "int", "min": 1, "max": 900},
@@ -67,6 +74,8 @@ EMBED_PROPS = {
     },
     "boundaryLine": {
         "field": {"type": "field"},
+        "field2": {"type": "field", "optional": True},
+        "field3": {"type": "field", "optional": True},
         "shape": {"type": "enum", "values": ["line", "list"]},
         "copyLabel": {"type": "copy", "optional": True},
         "copiedLabel": {"type": "copy", "optional": True},

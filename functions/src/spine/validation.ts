@@ -138,7 +138,7 @@ export function validateRecord(raw: unknown, now: Date): { start: StartInput; cl
 
 // ---- Follow-ups (PR-S5) ----
 
-export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later', 'tonight', 'tomorrow_night'] as const;
+export const FOLLOW_UP_WINDOWS = ['hour', 'afternoon', 'evening', 'tomorrow', 'this_week', 'next_time', 'unsure', 'today', '1h', 'later', 'tonight', 'tomorrow_night', 'month'] as const;
 export type FollowUpWindow = (typeof FOLLOW_UP_WINDOWS)[number];
 const TYPE_ID = /^[a-z][a-z0-9_]{0,63}$/;
 const MINUTE = 60_000;

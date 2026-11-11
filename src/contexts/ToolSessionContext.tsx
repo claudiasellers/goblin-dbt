@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import { ToolSessionContext, type ToolSessionApi, type ToolSessionCloseInput } from '../hooks/useToolSession';
@@ -20,7 +20,15 @@ import type { CapacityReading } from '../data/capacityTypes';
  * `inside`: a sub-run inside another tool's screen (plan C1 rule 5, R8): entry `embedded`, the host's session
  * as `hostSessionId`, nothing read from the page's address (the host owns that).
  */
-export function ToolSessionProvider({ toolId, inside, children }: { toolId: string; inside?: { hostSessionId: string }; children: ReactNode }) {
+/**
+ * `deferStart` (persist-nothing, plan C3a R15): nothing is written at mount; the session starts when the tool calls
+ * `begin()`, and a visit that never begins leaves no record at all (no ToolSession, no compat ToolUsage). Ending a
+ * relationship uses it so that its safety branch saves nothing unless the person chooses to, and a visit left
+ * half-way saves nothing either. `persisted` stays false for a deferred visit: nothing else may hang off it.
+ */
+export function ToolSessionProvider({ toolId, inside, deferStart = false, children }: {
+  toolId: string; inside?: { hostSessionId: string }; deferStart?: boolean; children: ReactNode;
+}) {
   const { user } = useAuth();
   const location = useLocation();
   const [id] = useState(() => newId());
@@ -62,9 +70,13 @@ export function ToolSessionProvider({ toolId, inside, children }: { toolId: stri
   const fitsFacts = useRef<'fits' | 'partly' | 'doesnt_fit' | 'unsure' | null>(null);
   const closed = useRef(false);
   const mounted = useRef(false);
-
-  useEffect(() => {
-    if (!uid || started.current) return;
+  const bare = useRef(false);
+  // Deferred (R15): false until `begin()`. The start effect below re-runs when it flips.
+  const begun = useRef(!deferStart);
+  // Starts the session once: at mount for a normal visit, at `begin()` for a deferred one (R15). Synchronous, so a
+  // `ready()` right after `begin()` already waits on the start.
+  const start = useCallback(() => {
+    if (!uid || !begun.current || started.current || closed.current) return;
     startedAt.current = Date.now();
     started.current = startToolSession({
       id, toolId, entry: link.entry,
@@ -75,6 +87,7 @@ export function ToolSessionProvider({ toolId, inside, children }: { toolId: stri
       ...(link.emotionIds.length ? { emotionIds: link.emotionIds } : {}),
     }).then(() => true).catch(() => false);
   }, [uid, id, toolId, link]);
+  useEffect(() => { start(); }, [start]);
 
   const api = useMemo<ToolSessionApi>(() => {
     const close = async (input: ToolSessionCloseInput = {}) => {
@@ -82,6 +95,16 @@ export function ToolSessionProvider({ toolId, inside, children }: { toolId: stri
       closed.current = true;
       const ok = started.current ? await started.current : false;
       if (!ok) return null;
+      if (bare.current) {
+        // Persist-nothing (R15): the visit began, then the person changed an answer that means nothing is kept.
+        try {
+          const res = await closeToolSession({ id, status: input.status ?? (complete.current ? 'completed' : 'exited_early') });
+          refreshToday();
+          return res;
+        } catch {
+          return null;
+        }
+      }
       const mergedExt: SessionExt = { ...ext.current };
       const urges = input.urgeIds ? sessionUrgeIds(input.urgeIds) : urgeIds.current;
       for (const [ns, v] of Object.entries(input.ext ?? {})) mergedExt[ns] = { ...mergedExt[ns], ...v };
@@ -120,9 +143,10 @@ export function ToolSessionProvider({ toolId, inside, children }: { toolId: stri
       hostSessionId: link.hostSessionId,
       followUpId: link.followUpId,
       closeKind: closeKindFor(toolId),
-      persisted: uid !== null,
+      // A deferred visit (R15) reads as not persisted until it begins: nothing may hang off it before then.
+      persisted: uid !== null && !deferStart,
       // A child's mount effect runs before this provider's start effect: give the start one turn to begin.
-      ready: () => (started.current ?? (uid
+      ready: () => (started.current ?? (uid && begun.current
         ? new Promise<boolean>((r) => { setTimeout(() => { void (started.current ?? Promise.resolve(false)).then(r); }, 0); })
         : Promise.resolve(false))),
       setStep: (s) => { step.current = s; },
@@ -137,13 +161,15 @@ export function ToolSessionProvider({ toolId, inside, children }: { toolId: stri
       setBandAtStart: (r) => { bandAtStart.current = r; },
       setWiseMindAnswer: (a) => { wiseMindAnswer.current = a; },
       setFitsFacts: (v) => { fitsFacts.current = v; },
+      begin: () => { begun.current = true; start(); },
+      setBare: (b) => { bare.current = b; },
       close,
       linkTo: (target, state) => ({
         pathname: `/tool/${target}`,
         state: { ...state, spine: { entry: 'handoff', hostSessionId: id } },
       }),
     };
-  }, [id, toolId, link, uid, refreshToday]);
+  }, [id, toolId, link, uid, refreshToday, deferStart, start]);
 
   // Close on leave. Deferred a tick so StrictMode's dev-only unmount/remount doesn't close it.
   const apiRef = useRef(api);

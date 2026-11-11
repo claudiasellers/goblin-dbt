@@ -139,6 +139,22 @@ FOLLOW_UP_TYPES = [
         "notification": "A step you planned is ready.",
     },
     {
+        # Problem Solve on the skill runtime (ER-12, docs/design/problem-solve.md): Handout 12's evaluate step. The
+        # commit card's chips schedule it; its card reopens that visit's run at *How did it go?* (`review`, a
+        # `reopens` step, R9). Opening it is the resolution, as for resume_skill (functions/src/spine/toolSession.ts);
+        # *Not any more* dismisses it. ps_step (above) stays for the cards the hand-built page scheduled.
+        "id": "ps_review", "ownerModule": "er", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/problem-solve?run={sourceSessionId}&at=review&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 0, "time": "20:00"},
+                                             "tomorrow": {"kind": "at_local", "days": 1, "time": "18:00"},
+                                             "this_week": {"kind": "at_local", "days": 4, "time": "18:00"}}},
+        "staleAfterHours": 72, "missedPath": "missing_links", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True,
+        "copy": {"title": "Your next step", "body": "The step you picked in Problem Solve. How did it go?"},
+        "choices": [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}],
+        "notification": "A step you planned is ready.",
+    },
+    {
         # Cope Ahead (docs/design/cope-ahead.md, "Today, afterwards"): on the keep screen's "Want me to ask how
         # it went?" Yes, for the time from screen 1 (the chip is ext.ca.when). Scheduled only on the caller's
         # own cope-ahead ToolSession. Its Today card is the tool's own (cope-ahead.json's after_* lines, the
@@ -308,6 +324,44 @@ FOLLOW_UP_TYPES = [
                     {"id": "louder", "label": "Louder", "status": "done"},
                     {"id": "skip", "label": "Skip", "status": "dismissed"}],
         "notification": "",
+    },
+]
+
+# Ending a relationship (IE-08, docs/design/ending-relationships.md): check-ins the person opts into, only from a
+# visit that saved (never from the safety branch). Content-free on purpose (PRD IE-08, tech safety): nothing on the
+# card, the notification or the calendar says what it's about. Each reopens the person's own run (R9) at the step
+# it names; session-bound (copeAheadAfter.ts FOLLOW_UP_SESSION_TOOL), so only an Ending visit can schedule one.
+ENDING_COPY = {"title": "A check-in you asked for", "body": "Open it when you're ready."}
+ENDING_NOTE = "A check-in you asked for is ready."
+ENDING_DISMISS = [{"id": "dismiss", "label": "Not any more", "status": "dismissed"}]
+FOLLOW_UP_TYPES += [
+    {
+        # After a plan to end it or step back: the day after "today", a week after "this week" or "not sure".
+        "id": "ending_after", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"today": {"kind": "at_local", "days": 1, "time": "10:00"},
+                                             "this_week": {"kind": "at_local", "days": 7, "time": "10:00"},
+                                             "unsure": {"kind": "at_local", "days": 7, "time": "10:00"}}},
+        "staleAfterHours": 168, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True, "copy": ENDING_COPY, "choices": ENDING_DISMISS, "notification": ENDING_NOTE,
+    },
+    {
+        # From the after step: the next check-in, a week or a month on (PRD: +1 week, +1 month), the person's pick.
+        "id": "ending_again", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?run={sourceSessionId}&at=after&followUp={followUpId}",
+        "window": {"kind": "chip", "chips": {"this_week": {"kind": "at_local", "days": 7, "time": "10:00"},
+                                             "month": {"kind": "at_local", "days": 30, "time": "10:00"}}},
+        "staleAfterHours": 168, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True, "copy": ENDING_COPY, "choices": ENDING_DISMISS, "notification": ENDING_NOTE,
+    },
+    {
+        # *Not yet* is a real answer; on a yes, two weeks on the skill opens again from its start (PRD step 4): a fresh
+        # visit, so safety is asked again and nothing from two weeks ago is filled in.
+        "id": "ending_revisit", "ownerModule": "ie", "tier": "quality", "resolveMode": "deeplink",
+        "deepLinkTemplate": "/tool/ending-relationships?followUp={followUpId}",
+        "window": {"kind": "at_local", "days": 14, "time": "10:00"},
+        "staleAfterHours": 168, "missedPath": "none", "notify": {"push": False, "inTab": True, "ics": False},
+        "enabled": True, "copy": ENDING_COPY, "choices": ENDING_DISMISS, "notification": ENDING_NOTE,
     },
 ]
 

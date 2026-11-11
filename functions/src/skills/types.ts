@@ -186,6 +186,22 @@ export interface StepDef {
    */
   safetyFirst?: Cond;
   /**
+   * Only a reopened run starts here (R9, `?run=<id>&at=<this step>`), and only a run whose path reached `after` (the
+   * step that made the plan it asks about); any other run doesn't reopen. No step leads to it; it comes after the
+   * run's whole recorded path, every answer of that run comes back but the ask-fresh ones, and neither it nor any
+   * step after it reads an ask-fresh field. For a step that asks how it went afterwards, such as Problem Solve's
+   * *How did it go?* (Handout 12's evaluate step). `again`: steps after it that keep the plan standing (a reminder
+   * booked again), so a run they ended reopens too; the latest of `after` and `again` must come after the step's last ask.
+   */
+  reopens?: { after: string; again?: string[] };
+  /**
+   * Fields whose answers are dropped when the run arrives here by a forward move, or reopens here: the answers
+   * of a plan this step replaces, so they don't stand in for the new one. For two ways to the same thing, such as
+   * Problem Solve's guided step and own-words step (each clears the other's), and for a reopens step's own loop
+   * (its last answers are never read back as this time's).
+   */
+  clears?: string[];
+  /**
    * kind 'embed' or 'handoff': quiet links under the screen (an ask step's live on its fields). For a way out that
    * belongs on every screen, such as *Talk to someone now*, where the screen has no field to hang it on.
    */
@@ -227,7 +243,25 @@ export interface SkillDef {
   options: Record<string, OptionDef[]>;
   /** Present when other screens may run the skill inline (R8). */
   inline?: InlineDef;
+  /** Persist-nothing (R15): see PersistDef. Absent: the session starts at mount, as for every tool. */
+  persist?: PersistDef;
+  /** A Quick exit on every screen (to a neutral page, replacing this one in history). */
+  quickExit?: boolean;
+  /**
+   * Steps a follow-up may reopen the person's run at (R9) even when that run's path never reached them: a check-in
+   * days later (Ending's `after`). Without this, a resume opens only at a step the run went through.
+   */
+  resumeAt?: string[];
 }
+
+/**
+ * Persist-nothing (plan C3a R15; docs/design/ending-relationships.md): the visit's ToolSession isn't started at
+ * mount. It starts once the run has left the `after` step, unless `nothingWhen` holds; while it holds, nothing is
+ * written at all (no session, no compat ToolUsage, no keep, no follow-up, no close question). If it starts to hold
+ * after the session began (the person went back and changed an answer), the session closes bare: status only.
+ * A step whose answer makes `nothingWhen` false (the person's *Save privately*) starts the session then.
+ */
+export interface PersistDef { after: string; nothingWhen: Cond }
 
 export interface SkillsContent {
   version: string;

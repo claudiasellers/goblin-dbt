@@ -18,6 +18,8 @@ const FIXTURE = JSON.parse(fs.readFileSync(path.resolve(__dirname, '../../../tes
 /** The Cypher predicate as a JS function of (src, ts, d); nodes are { labels: [...], ...props } or null. */
 function compile(cypher) {
   let js = cypher
+    // A review visit: `resolving` on a test ToolSession lists the follow-up types it is RESOLVING.
+    .replace(/NOT EXISTS \{ \((\w+)\)-\[:RESOLVING\]->\(:FollowUp \{type: '(\w+)'\}\) \}/g, "!(($1?.resolving ?? []).includes('$2'))")
     .replace(/([\w.]+) IN coalesce\(([\w.]+), \[\]\)/g, '($2 ?? []).includes($1)')
     .replace(/([\w.]+) CONTAINS \(([^)]*)\)/g, "String($1 ?? '').includes($2)")
     .replace(/\b(src|ts|d)\.(\w+)/g, '$1?.$2')
@@ -66,6 +68,24 @@ test('every other session source still reads (urge ids, Recover, DEAR MAN, Probl
   // Ids only count on their own label: urge ids on a detail session, or a pull on the ToolSession, read nothing.
   assert.deepEqual(movesOf({ labels: ['CheckIn'], urgeIds: ['anger-lash'] }, null, anyStatus), []);
   assert.deepEqual(movesOf(tool({ pull: 'hide' }), null, anyStatus), []);
+});
+
+test('Problem Solve on the skill player: the run\'s barrier answer (field sub) reads like the old ext.er.barrierSubId', () => {
+  const runRec = (sub, extra = []) => JSON.stringify({ run: { skillId: 'problem_solve', versionId: 'ps-v1', path: ['feel'],
+    answers: [{ fieldId: 'feel', optionIds: ['anxious'] }, ...extra, { fieldId: 'sub', optionIds: [sub] }] } });
+  const move = FIXTURE.expresses.BarrierSubResponse['cant-ambivalent'].moveId;
+  assert.deepEqual(movesOf(tool({ toolId: 'problem-solve', ext: runRec('cant-ambivalent') }), null, anyStatus), [move]);
+  assert.deepEqual(movesOf(tool({ toolId: 'problem-solve', ext: runRec('cant-ambivalent-not') }), null, anyStatus), [], 'exact id only');
+  assert.deepEqual(movesOf(tool({ toolId: 'check-the-facts', ext: runRec('cant-ambivalent') }), null, anyStatus), [], 'Problem Solve\'s runs only');
+  assert.deepEqual(movesOf(tool({ toolId: 'problem-solve', ext: runRec('cant-ambivalent'), resolving: ['ps_review'] }), null, anyStatus), [],
+    'a review visit reads the first visit\'s run back: its barrier answer was counted there');
+  assert.deepEqual(movesOf(tool({ toolId: 'problem-solve', ext: runRec('cant-ambivalent'), resolving: ['ps_step'] }), null, anyStatus), [move]);
+  assert.deepEqual(movesOf(tool({ toolId: 'problem-solve', ext: JSON.stringify({ run: { answers: [{ fieldId: 'ambiv', optionIds: ['cant-ambivalent'] }] } }) }), null, anyStatus),
+    [], 'only the sub field');
+  // The match leans on runRecord writing fieldId, then optionIds (src/lib/skillRuntime/machine.ts).
+  const machine = fs.readFileSync(path.resolve(__dirname, '../../../src/lib/skillRuntime/machine.ts'), 'utf8');
+  assert.match(machine, /\.map\(\(\[fieldId, a\]\) => \(\{ fieldId, optionIds: a\.ids\.slice\(0, 12\)/, 'runRecord: fieldId first, then optionIds');
+  assert.equal(require('../../lib/parts/sessionMoves').PS_RUN_SUB, '"fieldId":"sub","optionIds":["');
 });
 
 test('queuePartCandidate reads the same predicate over any owned DETAIL session, approved edges only', () => {
