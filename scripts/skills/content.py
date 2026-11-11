@@ -25,6 +25,9 @@ EMBEDS = {
     # IE-05's boundary line card (plan C3b, IE-owned): the picked line on paper, copyable; reports whether it was copied.
     "boundaryLine": {"ids": ["copied"]},
     "rescriptCard": {"ids": ["read", "stopped"], "measures": ["durationSec"]},
+    # DT-02's wait (plan C3b, DT-owned): a timestamp wait with a come-back; never locks. `waited` when the ring ran
+    # out, `back_early` when *I'm back* came first.
+    "waitLock": {"ids": ["waited", "back_early"], "measures": ["durationSec"]},
 }
 # What each embed takes from the skill (embeds.ts EMBED_PROPS; the contract test keeps the two equal). build.py
 # checks every step's props: `copy` is a key in the skill's copy (the player shows its text), `int` a whole number
@@ -83,6 +86,14 @@ EMBED_PROPS = {
         "stopLabel": {"type": "copy"},
         "doneLabel": {"type": "copy"},
         "skipLabel": {"type": "copy"},
+    },
+    "waitLock": {
+        "minutes": {"type": "int", "min": 1, "max": 60},
+        "waiting": {"type": "copy"},
+        "waitingShort": {"type": "copy"},
+        "done": {"type": "copy"},
+        "doneShort": {"type": "copy"},
+        "next": {"type": "copy"},
     },
 }
 # Shared tables the graph supplies to every skill (never written here).

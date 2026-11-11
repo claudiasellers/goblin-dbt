@@ -16,7 +16,8 @@ import { closeQuestion, closeKindFor } from '../../lib/spine/close';
 import { emotionIdsFromLink } from '../../lib/spine/toolLink';
 import {
   askFresh, canGoOn, carried as carriedOf, contextIn, copyText, crisisFor, ctxAfterResume, seededFrom, stepLinks, emotionChoices, fieldLinks, fieldList, followUpFor,
-  handoffLine, initialRun, inlineResult, keepFor, optionGroups, ownMaxOf, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
+  handoffLine, initialRun, inlineResult, keepFor, opensSafety, optionGroups, ownMaxOf, pickedLabels, resumeRun, runEmotionIds, runNext, runRecord,
+  runUrgeIds,
   scope, shownFields, stepOf, titleSlots,
   type Answer, type RunContext, type RunEvent, type RunState,
 } from '../../lib/skillRuntime/machine';
@@ -191,10 +192,23 @@ function SkillRun({ skill, content, inline, resumeKeepsFresh }: {
     toolSession.setStep(st.stepId);
     toolSession.setExt({ run: runRecord(ctx, st) });
     toolSession.setEmotionIds(runEmotionIds(ctx, st));
+    toolSession.setUrgeIds(runUrgeIds(ctx, st));
     const fresh = askFresh(ctx, st);
     toolSession.setFitsFacts((fresh.fitsFacts as Parameters<typeof toolSession.setFitsFacts>[0]) ?? null);
     if (stepOf(skill, st.stepId).complete) toolSession.markComplete();
   }, [st, ctx, skill, toolSession]);
+
+  // safetyFirst (plan C6.5): the resources open over the step as the run arrives at it, once per arrival; *Back to
+  // where I was* shows the step itself.
+  const safetyAt = useRef(-1);
+  useEffect(() => {
+    if (resuming || safetyAt.current === st.path.length) return;
+    safetyAt.current = st.path.length;
+    if (opensSafety(ctx, stepOf(skill, st.stepId), st)) {
+      send({ type: 'shown', record: 'safety_open' });
+      setSafetyOpen(true);
+    }
+  }, [st, ctx, skill, send, resuming]);
 
   /** Go: after the close question (answered or skipped), or at once when there is none to ask. */
   const go = useCallback((exit: ExitDef) => {
@@ -547,11 +561,14 @@ function HandoffCard({ ctx, step, st, send, onExit, busy }: {
           </button>
         ))}
       </div>
-      {done && (
+      {done && (offers.length ? (
         <div className="flex justify-center">
           <button type="button" className={linkButton} disabled={busy} aria-busy={busy} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
         </div>
-      )}
+      ) : (
+        // Nothing to hand on to: Done is the way forward, so it is the button, not a quiet link.
+        <button type="button" className={primaryButton} disabled={busy} aria-busy={busy} onClick={() => onExit(done)}>{c.done ?? 'Done'}</button>
+      ))}
       <StepLinks ctx={ctx} step={step} st={st} onExit={onExit} />
     </section>
   </>);

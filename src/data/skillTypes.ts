@@ -181,6 +181,11 @@ export interface StepDef {
    */
   noClose?: boolean;
   /**
+   * Open safety.open over this step as the run arrives at it, while the condition holds (plan C6.5: *hurt myself*
+   * opens the safety route before anything else). Once per arrival; *Back to where I was* shows the step itself.
+   */
+  safetyFirst?: Cond;
+  /**
    * kind 'embed' or 'handoff': quiet links under the screen (an ask step's live on its fields). For a way out that
    * belongs on every screen, such as *Talk to someone now*, where the screen has no field to hang it on.
    */
